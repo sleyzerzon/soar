@@ -30,7 +30,7 @@ namespace gSKI
       static egSKISymbolType ReMapSymbolType(unsigned short);
       static egSKIPreferenceType ReMapPreferenceType(unsigned short);
       static egSKIPhaseType ReMapPhaseType(unsigned short, bool);
-      static egSKIEventId   RemapEventType(unsigned long, unsigned char);
+      static egSKIProductionEventId   RemapProductionEventType(unsigned long, unsigned char);
       static egSKIProdType  ReMapProductionType(unsigned short);
 
       ////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ namespace gSKI
       
       ////////////////////////////////////////////////////////////////
       // OPPOSITE DIRECTION MAPPINGS 
-      static egSKIAgentEvents RemapProductionEventType(egSKIEventId eventId);
+      static egSKIAgentEvents RemapProductionEventType(egSKIProductionEventId eventId);
 
       static void Init();
    private:

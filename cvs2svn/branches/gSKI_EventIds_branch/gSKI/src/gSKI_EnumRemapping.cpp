@@ -166,7 +166,7 @@ namespace gSKI
    ==================================
    ==================================
    */
-   egSKIAgentEvents EnumRemappings::RemapProductionEventType(egSKIEventId eventId)
+   egSKIAgentEvents EnumRemappings::RemapProductionEventType(egSKIProductionEventId eventId)
    {
       if(!m_initialized) 
          Init();
@@ -192,12 +192,35 @@ namespace gSKI
    ==================================
    ==================================
    */
+   /** KJC:  egSKIEventId no longer exists.  If needed, must be EventType-specific.
+
    egSKIEventId EnumRemappings::RemapEventType(unsigned long eventId, unsigned char occured)
    {
       if(!m_initialized) 
          Init();
-      return static_cast<egSKIEventId>(EventEnumMapping[eventId][occured]);
+      switch (eventId)
+      {
+	  case IsSystemEventID(eventId):
+		  return static_cast<egSKISystemEventId>(EventEnumMapping[eventId][occured]);
+	  case IsRunEventId(eventId):
+		  return static_cast<egSKIRunEventId>(EventEnumMapping[eventId][occured]);
+	  case IsAgentEventId(eventId):
+		  return static_cast<egSKIAgentEventId>(EventEnumMapping[eventId][occured]);
+	  case IsWorkingMemoryEventId(eventId):
+		  return static_cast<egSKIWorkingMemoryEventId>(EventEnumMapping[eventId][occured]);
+	  case IsPrintEventId(eventId):
+		  return static_cast<egSKIPrintEventId>(EventEnumMapping[eventId][occured]);
+	  case IsRhsEventId(eventId):
+		  return static_cast<egSKIRhsEventId>(EventEnumMapping[eventId][occured]);
+	  case IsGenericEventId(eventId):
+		  return static_cast<egSKIWGenericEventId>(EventEnumMapping[eventId][occured]);
+      default:
+         // Error condition
+         MegaAssert(false, "Could not map a production event id");
+         return static_cast<egSKIProductionEventId>(0);   
+	  }
    }
+   */
 
    /*
    ==================================
