@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif // HAVE_CONFIG_H
+
 
 /********************************************************************
 * @file gski_conditionset.cpp
@@ -10,10 +14,6 @@
 *
 * purpose: 
 *********************************************************************/
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 
 #include "gSKI_ConditionSet.h"
 #include "gSKI_Condition.h"

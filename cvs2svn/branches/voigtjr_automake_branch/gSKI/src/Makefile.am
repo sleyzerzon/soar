@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = gnu
 lib_LTLIBRARIES = libgSKI.la
 #next line doesn't seem to work
-#libgSKI_la_LIBADD = ../../SoarKernel/lib/libsoarkernel.a
+libgSKI_la_LIBADD = ../../SoarKernel/src/libSoarKernel.la
 libgSKI_la_SOURCES = \
 ExportLibFiles.h \
 IgSKI_ActionElement.h \
@@ -150,4 +150,7 @@ gSKI_WorkingMemory.h \
 gSKI_WorkingMemoryView.cpp \
 gSKI_WorkingMemoryView.h
 INCLUDES = -I.. -I../include -I ../../SoarKernel/include
-AM_CXXFLAGS = $(CUSTOM_CXXFLAGS)
+
+#AM_CXXFLAGS = $(CUSTOM_CXXFLAGS)
+CXXFLAGS = $(CUSTOM_CXXFLAGS) -g
+

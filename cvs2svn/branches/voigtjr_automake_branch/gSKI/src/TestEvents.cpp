@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif // HAVE_CONFIG_H
+
 /********************************************************************
 * @file TestEvents.cpp 
 *********************************************************************
@@ -9,11 +13,6 @@
 *
 * purpose: 
 *********************************************************************/
-
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"	// contains NO_MEGA_UNIT_TESTS symbol
-#endif
 
 #ifndef NO_MEGA_UNIT_TESTS
 
