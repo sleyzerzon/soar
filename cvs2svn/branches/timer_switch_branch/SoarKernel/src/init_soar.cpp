@@ -486,7 +486,7 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[EXPLAIN_SYSPARAM] = FALSE; /* KJC 7/96 */
   thisAgent->sysparams[USE_LONG_CHUNK_NAMES] = TRUE;  /* kjh(B14) */
   thisAgent->sysparams[TRACE_OPERAND2_REMOVALS_SYSPARAM] = FALSE;
-  thisAgent->sysparams[TIMERS_ENABLED] = FALSE;
+  thisAgent->sysparams[TIMERS_ENABLED] = TRUE;
 }
 
 /* ===================================================================
