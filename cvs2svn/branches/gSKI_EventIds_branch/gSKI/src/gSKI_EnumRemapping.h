@@ -32,6 +32,9 @@ namespace gSKI
       static egSKIPhaseType ReMapPhaseType(unsigned short, bool);
       static egSKIProductionEventId   RemapProductionEventType(unsigned long, unsigned char);
       static egSKIProdType  ReMapProductionType(unsigned short);
+      static egSKIProductionEventId Map_Kernel_to_gSKI_ProdEventId(unsigned long eventId, unsigned char occured);
+
+
 
       ////////////////////////////////////////////////////////////////
       // The following don't require remapping, but we use the mapper
