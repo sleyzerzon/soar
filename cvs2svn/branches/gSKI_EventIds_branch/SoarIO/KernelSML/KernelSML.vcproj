@@ -167,6 +167,21 @@
 			<File
 				RelativePath=".\src\sml_OutputListener.cpp">
 			</File>
+			<File
+				RelativePath=".\src\sml_PrintListener.cpp">
+			</File>
+			<File
+				RelativePath=".\src\sml_ProductionListener.cpp">
+			</File>
+			<File
+				RelativePath=".\src\sml_RhsListener.cpp">
+			</File>
+			<File
+				RelativePath=".\src\sml_RunListener.cpp">
+			</File>
+			<File
+				RelativePath=".\src\sml_SystemListener.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -219,6 +234,21 @@
 			</File>
 			<File
 				RelativePath=".\include\sml_OutputListener.h">
+			</File>
+			<File
+				RelativePath=".\include\sml_PrintListener.h">
+			</File>
+			<File
+				RelativePath=".\include\sml_ProductionListener.h">
+			</File>
+			<File
+				RelativePath=".\include\sml_RhsListener.h">
+			</File>
+			<File
+				RelativePath=".\include\sml_RunListener.h">
+			</File>
+			<File
+				RelativePath=".\include\sml_SystemListener.h">
 			</File>
 		</Filter>
 		<Filter

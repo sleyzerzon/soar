@@ -51,20 +51,18 @@ class Connection ;
 class AgentListener : gSKI::IAgentListener, public EventManager<egSKIAgentEventId>
 {
 protected:
-	KernelSML*		m_KernelSML ;
-	gSKI::IAgent*	m_Agent ;
+	KernelSML*		m_pKernelSML ;
 
 public:
-	AgentListener(KernelSML* pKernelSML, gSKI::IAgent* pAgent)
-	{
-		m_KernelSML = pKernelSML ;
-		m_Agent		= pAgent ;
-	}
+	AgentListener() {}
 
 	virtual ~AgentListener()
 	{
 		Clear() ;
 	}
+
+	// Initialize this listener
+	void Init(KernelSML* pKernelSML) { m_pKernelSML = pKernelSML; }
 
 	// Returns true if this is the first connection listening for this event
 	virtual bool AddListener(egSKIAgentEventId eventID, Connection* pConnection) ;
@@ -74,7 +72,6 @@ public:
 
 	// Called when an "AgentEvent" occurs in the kernel
 	virtual void HandleEvent(egSKIAgentEventId eventId, gSKI::IAgent* agentPtr) ;
-
 } ;
 
 }
