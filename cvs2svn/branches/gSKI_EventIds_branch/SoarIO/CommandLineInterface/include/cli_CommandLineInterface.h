@@ -678,7 +678,7 @@ protected:
 		PrintHandler() { m_pCLI = 0; }
 
 		void SetCLI(CommandLineInterface* pCLI) { m_pCLI = pCLI; }
-		virtual void HandleEvent(egSKIEventId, gSKI::IAgent*, const char* msg) = 0;
+		virtual void HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) = 0;
 	protected:
 		CommandLineInterface*	m_pCLI;	// pointer to command line interface
 	};
@@ -689,7 +689,7 @@ protected:
 	public:
 		ResultPrintHandler() {}
 
-		virtual void HandleEvent(egSKIEventId, gSKI::IAgent*, const char* msg) {
+		virtual void HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) {
 			if (!m_pCLI) return;
 
 			// Simply append to message result
@@ -703,7 +703,7 @@ protected:
 	public:
 		LogPrintHandler() {}
 
-		virtual void HandleEvent(egSKIEventId, gSKI::IAgent*, const char* msg) {
+		virtual void HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) {
 			if (!m_pCLI) return;
 			if (!m_pCLI->m_pLogFile) return;
 			(*(m_pCLI->m_pLogFile)) << msg;
