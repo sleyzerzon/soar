@@ -11,6 +11,10 @@
 *********************************************************************/
 
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"	// contains NO_MEGA_UNIT_TESTS symbol
+#endif
+
 #ifndef NO_MEGA_UNIT_TESTS
 
 #include "MegaUnitTest.h"

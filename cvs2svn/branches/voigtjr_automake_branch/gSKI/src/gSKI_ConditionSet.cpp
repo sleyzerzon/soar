@@ -10,6 +10,11 @@
 *
 * purpose: 
 *********************************************************************/
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif // HAVE_CONFIG_H
+
 #include "gSKI_ConditionSet.h"
 #include "gSKI_Condition.h"
 #include "gSKI_Test.h"
