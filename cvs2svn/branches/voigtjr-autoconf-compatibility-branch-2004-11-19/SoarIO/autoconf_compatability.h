@@ -9,7 +9,7 @@
  
 #ifdef HAVE_CONFIG_H
 
-/* This next block is from AC_HEADER_STDC */
+/* AC_HEADER_STDC */
 # if STDC_HEADERS
 #  include <string.h>
 # else // STDC_HEADERS
@@ -24,7 +24,7 @@ char *strchr (), *strrchr ();
 #  endif // HAVE_MEMCPY
 # endif // STDC_HEADERS
 
-/* This next block is from AC_HEADER_STDBOOL */
+/* AC_HEADER_STDBOOL */
 # if HAVE_STDBOOL_H 
 #  include <stdbool.h> 
 # else // HAVE_STDBOOL_H
@@ -40,6 +40,18 @@ typedef unsigned char _Bool;
 # define true 1 
 # define __bool_true_false_are_defined 1 
 # endif // HAVE_STDBOOL_H
+
+/* AC_HEADER_TIME */
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 
 #else // HAVE_CONFIG_H
 

@@ -17,11 +17,12 @@ AC_PROG_CXX
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h pthread.h stdlib.h string.h strings.h sys/socket.h sys/time.h sys/types.h unistd.h],,
+AC_HEADER_STDBOOL
+AC_HEADER_TIME
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h pthread.h stdlib.h string.h strings.h sys/socket.h sys/types.h unistd.h],,
 	[AC_MSG_ERROR([*** Cannot find required header!  See previous line.])])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
