@@ -35,32 +35,50 @@
 using namespace sml ;
 
 // Returns true if this is the first connection listening for this event
-bool KernelListener::AddListener(egSKIEventId eventID, Connection* pConnection)
+bool KernelListener::AddListener(egSKISystemEventId eventID, Connection* pConnection)
 {
-	bool first = BaseAddListener(eventID, pConnection) ;
+    bool first = EventManager<egSKISystemEventId>::BaseAddListener(eventID, pConnection) ;
 
 	if (first)
 	{
-		if (IsSystemEvent(eventID))
-			m_pKernelSML->GetKernel()->AddSystemListener(eventID, this) ;
-		else if (IsAgentEvent(eventID))
-			m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(eventID, this) ;
+		m_pKernelSML->GetKernel()->AddSystemListener(eventID, this) ;
+	}
+
+	return first ;
+}
+
+bool KernelListener::AddListener(egSKIAgentEventId eventID, Connection* pConnection)
+{
+	bool first = EventManager<egSKIAgentEventId>::BaseAddListener(eventID, pConnection) ;
+
+	if (first)
+	{
+		m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(eventID, this) ;
 	}
 
 	return first ;
 }
 
 // Returns true if at least one connection remains listening for this event
-bool KernelListener::RemoveListener(egSKIEventId eventID, Connection* pConnection)
+bool KernelListener::RemoveListener(egSKISystemEventId eventID, Connection* pConnection)
 {
-	bool last = BaseRemoveListener(eventID, pConnection) ;
+	bool last = EventManager<egSKISystemEventId>::BaseRemoveListener(eventID, pConnection) ;
 
 	if (last)
 	{
-		if (IsSystemEvent(eventID))
-			m_pKernelSML->GetKernel()->RemoveSystemListener(eventID, this) ;
-		else if (IsAgentEvent(eventID))
-			m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(eventID, this) ;
+		m_pKernelSML->GetKernel()->RemoveSystemListener(eventID, this) ;
+	}
+
+	return last ;
+}
+
+bool KernelListener::RemoveListener(egSKIAgentEventId eventID, Connection* pConnection)
+{
+    bool last = EventManager<egSKIAgentEventId>::BaseRemoveListener(eventID, pConnection) ;
+
+	if (last)
+	{
+		m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(eventID, this) ;
 	}
 
 	return last ;
@@ -133,7 +151,8 @@ void KernelListener::Init(KernelSML* pKernel)
 // Release memory
 void KernelListener::Clear()
 {
-	EventManager::Clear() ;
+	EventManager<egSKISystemEventId>::Clear() ;
+    EventManager<egSKIAgentEventId>::Clear() ;
 
 	// Release the RHS function lists
 	m_RhsMap.clear() ;
@@ -148,7 +167,8 @@ void KernelListener::Clear()
 
 void KernelListener::RemoveAllListeners(Connection* pConnection)
 {
-	EventManager::RemoveAllListeners(pConnection) ;
+    EventManager<egSKISystemEventId>::RemoveAllListeners(pConnection) ;
+	EventManager<egSKIAgentEventId>::RemoveAllListeners(pConnection) ;
 
 	// We need to walk the list of all rhs functions, removing this connection
 	for (RhsMapIter mapIter = m_RhsMap.begin() ; mapIter != m_RhsMap.end() ; mapIter++)
@@ -161,15 +181,15 @@ void KernelListener::RemoveAllListeners(Connection* pConnection)
 }
 
 // Called when a "SystemEvent" occurs in the kernel
-void KernelListener::HandleEvent(egSKIEventId eventID, gSKI::IKernel* kernel)
+void KernelListener::HandleEvent(egSKISystemEventId eventID, gSKI::IKernel* kernel)
 {
 	// We don't send the kernel over because we only support a single kernel object in SML
 	unused(kernel) ;
 
-	ConnectionListIter connectionIter = GetBegin(eventID) ;
+	ConnectionListIter connectionIter = EventManager<egSKISystemEventId>::GetBegin(eventID) ;
 
 	// Nobody is listenening for this event.  That's an error as we should unregister from the kernel in that case.
-	if (connectionIter == GetEnd(eventID))
+	if (connectionIter == EventManager<egSKISystemEventId>::GetEnd(eventID))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
@@ -191,7 +211,7 @@ void KernelListener::HandleEvent(egSKIEventId eventID, gSKI::IKernel* kernel)
 #endif
 
 	// Send this message to all listeners
-	ConnectionListIter end = GetEnd(eventID) ;
+	ConnectionListIter end = EventManager<egSKISystemEventId>::GetEnd(eventID) ;
 
 	AnalyzeXML response ;
 
@@ -212,12 +232,12 @@ void KernelListener::HandleEvent(egSKIEventId eventID, gSKI::IKernel* kernel)
 }
 
 // Called when an "AgentEvent" occurs in the kernel
-void KernelListener::HandleEvent(egSKIEventId eventID, gSKI::IAgent* agentPtr)
+void KernelListener::HandleEvent(egSKIAgentEventId eventID, gSKI::IAgent* agentPtr)
 {
-	ConnectionListIter connectionIter = GetBegin(eventID) ;
+	ConnectionListIter connectionIter = EventManager<egSKIAgentEventId>::GetBegin(eventID) ;
 
 	// Nobody is listenening for this event.  That's an error as we should unregister from the kernel in that case.
-	if (connectionIter == GetEnd(eventID))
+	if (connectionIter == EventManager<egSKIAgentEventId>::GetEnd(eventID))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
@@ -241,7 +261,7 @@ void KernelListener::HandleEvent(egSKIEventId eventID, gSKI::IAgent* agentPtr)
 #endif
 
 	// Send this message to all listeners
-	ConnectionListIter end = GetEnd(eventID) ;
+	ConnectionListIter end = EventManager<egSKIAgentEventId>::GetEnd(eventID) ;
 
 	AnalyzeXML response ;
 
@@ -324,7 +344,7 @@ bool KernelListener::ExecuteCommandLine(gSKI::IAgent* pAgent, char const* pFunct
 // pFunctionName and pArgument define the RHS function being called (the client may parse pArgument to extract other values)
 // pResultValue is a string allocated by the caller than is of size maxLengthReturnValue that should be filled in with the return value.
 // The bool return value should be "true" if a return value is filled in, otherwise return false.
-bool KernelListener::HandleEvent(egSKIEventId eventID, gSKI::IAgent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+bool KernelListener::HandleEvent(egSKIRhsEventId eventID, gSKI::IAgent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 						    int maxLengthReturnValue, char* pReturnValue)
 {
 	// If this should be handled by the command line processor do so now without going

@@ -288,3 +288,4 @@ void AgentListener::FlushOutput()
 	// Clean up
 	delete pMsg;
 }
+

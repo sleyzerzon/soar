@@ -183,8 +183,10 @@ public:
 	* @brief	Add or remove a connection from the list listening
 	*			for a particular event in the kernel.
 	*************************************************************/
-	void AddKernelListener(egSKIEventId eventID, Connection* pConnection)	 { m_KernelListener.AddListener(eventID, pConnection) ; }
-	void RemoveKernelListener(egSKIEventId eventID, Connection* pConnection) { m_KernelListener.RemoveListener(eventID, pConnection) ; }
+	void AddKernelListener(egSKISystemEventId eventID, Connection* pConnection)	 { m_KernelListener.AddListener(eventID, pConnection) ; }
+    void AddKernelListener(egSKIAgentEventId eventID, Connection* pConnection)	 { m_KernelListener.AddListener(eventID, pConnection) ; }
+	void RemoveKernelListener(egSKISystemEventId eventID, Connection* pConnection) { m_KernelListener.RemoveListener(eventID, pConnection) ; }
+	void RemoveKernelListener(egSKIAgentEventId eventID, Connection* pConnection) { m_KernelListener.RemoveListener(eventID, pConnection) ; }
 
 	/*************************************************************
 	* @brief	Add or remove a connection from the list implementing

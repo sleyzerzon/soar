@@ -32,19 +32,19 @@ class Connection ;
 typedef std::list< Connection* >		ConnectionList ;
 typedef ConnectionList::iterator	ConnectionListIter ;
 
-// Mapping from the event to the list of connections listening to that event
-typedef std::map< egSKIEventId, ConnectionList* >	EventMap ;
-typedef EventMap::iterator						EventMapIter ;
-
+template<typename EventType>
 class EventManager
 {
 protected:
+	ConnectionList*	GetListeners(typename EventType eventID) ;
+
+public:
+    // Mapping from the event to the list of connections listening to that event
+    typedef std::map< typename EventType, ConnectionList* >	EventMap ;
+    typedef typename EventMap::iterator						EventMapIter ;
+protected:
 	// Map from event id to list of connections listening to that event
 	EventMap		m_EventMap ;
-
-protected:
-	ConnectionList*	GetListeners(egSKIEventId eventID) ;
-
 public:
 	virtual ~EventManager() ;
 
@@ -52,24 +52,24 @@ public:
 	virtual void Clear() ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool BaseAddListener(egSKIEventId eventID, Connection* pConnection) ;
+	virtual bool BaseAddListener(typename EventType eventID, Connection* pConnection) ;
 
 	// Returns true if this is the first connection listening for this event
 	// (Generally calls BaseAddListener and then registers with the kernel for this event)
-	virtual bool AddListener(egSKIEventId eventID, Connection* pConnection) = 0 ;
+	virtual bool AddListener(typename EventType eventID, Connection* pConnection) = 0 ;
 
 	// Returns true if just removed the last listener
-	virtual bool BaseRemoveListener(egSKIEventId eventID, Connection* pConnection) ;
+	virtual bool BaseRemoveListener(typename EventType eventID, Connection* pConnection) ;
 
 	// Returns true if just removed the last listener
 	// (Generally calls BaseRemoveListener and then unregisters with the kernel for this event)
-	virtual bool RemoveListener(egSKIEventId eventID, Connection* pConnection) = 0 ;
+	virtual bool RemoveListener(typename EventType eventID, Connection* pConnection) = 0 ;
 
 	// Remove all listeners that this connection has
 	virtual void RemoveAllListeners(Connection* pConnection) ;
 
-	virtual ConnectionListIter	GetBegin(egSKIEventId) ;
-	virtual ConnectionListIter  GetEnd(egSKIEventId)	;
+	virtual ConnectionListIter	GetBegin(EventType) ;
+	virtual ConnectionListIter  GetEnd(EventType)	;
 } ;
 
 } // End of namespace

@@ -39,7 +39,7 @@ class Connection ;
 typedef std::map< std::string, ConnectionList* >	RhsMap ;
 typedef RhsMap::iterator						RhsMapIter ;
 
-class KernelListener : public gSKI::ISystemListener, public gSKI::IAgentListener, public gSKI::IRhsListener, public EventManager
+class KernelListener : public gSKI::ISystemListener, public gSKI::IAgentListener, public gSKI::IRhsListener, public EventManager<egSKISystemEventId>, /*public EventManager<egSKIRhsEventId>,*/ public EventManager<egSKIAgentEventId>
 {
 protected:
 	// Mapping from a rhs function name to the list of connections implementing that function
@@ -69,10 +69,12 @@ public:
 	virtual void Clear() ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKIEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(egSKISystemEventId eventID, Connection* pConnection) ;
+    virtual bool AddListener(egSKIAgentEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKIEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(egSKISystemEventId eventID, Connection* pConnection) ;
+    virtual bool RemoveListener(egSKIAgentEventId eventID, Connection* pConnection) ;
 
 	// Returns true if this is the first connection listening for this function name
 	void AddRhsListener(char const* pFunctionName, Connection* pConnection) ;
@@ -86,17 +88,17 @@ public:
 	ConnectionList* GetRhsListeners(char const* pFunctionName) ;
 
 	// Called when a "SystemEvent" occurs in the kernel
-	virtual void HandleEvent(egSKIEventId eventId, gSKI::IKernel* kernel) ;
+	virtual void HandleEvent(egSKISystemEventId eventId, gSKI::IKernel* kernel) ;
 
 	// Called when an "AgentEvent" occurs in the kernel
-	virtual void HandleEvent(egSKIEventId eventId, gSKI::IAgent* agentPtr) ;
+	virtual void HandleEvent(egSKIAgentEventId eventId, gSKI::IAgent* agentPtr) ;
 
 	// Called when a "RhsEvent" occurs in the kernel
-	virtual bool HandleEvent(egSKIEventId eventId, gSKI::IAgent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+	virtual bool HandleEvent(egSKIRhsEventId eventId, gSKI::IAgent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 						     int maxLengthReturnValue, char* pReturnValue) ;
 
 	virtual bool ExecuteCommandLine(gSKI::IAgent* pAgent, char const* pFunctionName, char const* pArgument, int maxLengthReturnValue, char* pReturnValue) ;
-
+/*
 protected:
 	bool IsSystemEvent(egSKIEventId id)
 	{
@@ -132,6 +134,7 @@ protected:
 				return false ;
 		}
 	}
+    */
 } ;
 
 }
