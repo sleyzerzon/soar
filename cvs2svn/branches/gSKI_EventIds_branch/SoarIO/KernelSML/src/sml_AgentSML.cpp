@@ -73,7 +73,6 @@ void AgentSML::Clear()
 	// Release any WME objects we still own.
 	ReleaseAllWmes() ;
 
-	//m_AgentListener.Clear() ;
 	m_ProductionListener.Clear();
 	m_RunListener.Clear();
 	m_PrintListener.Clear();
@@ -106,7 +105,6 @@ void AgentSML::ReleaseAllWmes()
 
 void AgentSML::RemoveAllListeners(Connection* pConnection)
 {
-	//m_AgentListener.RemoveAllListeners(pConnection) ;
 	m_ProductionListener.RemoveAllListeners(pConnection);
 	m_RunListener.RemoveAllListeners(pConnection);
 	m_PrintListener.RemoveAllListeners(pConnection);

@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////
-// KernelListener class file.
+// SystemListener class file.
 //
-// Author: Douglas Pearson, www.threepenny.net
+// Author: Doug Pearson, www.threepenny.net
 // Date  : October 2004
 //
 // This class's HandleEvent method is called when
@@ -19,6 +19,7 @@
 *      gSKIEVENT_BEFORE_RHS_FUNCTION_EXECUTED,
 *      gSKIEVENT_AFTER_RHS_FUNCTION_EXECUTED,
 */////////////////////////////////////////////////////////////////
+
 #ifndef SYSTEM_LISTENER_H
 #define SYSTEM_LISTENER_H
 

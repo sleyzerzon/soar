@@ -41,7 +41,6 @@ namespace gSKI {
 
 
 #include "cli_CommandLineInterface.h"
-//#include "sml_KernelListener.h"
 #include "sml_SystemListener.h"
 #include "sml_RhsListener.h"
 #include "sml_AgentListener.h"
@@ -123,7 +122,6 @@ protected:
 	soar_thread::Mutex*	m_pKernelMutex ;
 
 	// Used to listen for kernel events that are kernel based (not for a specific agent)
-	//KernelListener	m_KernelListener ;
 	SystemListener	m_SystemListener;
 	RhsListener		m_RhsListener;
 	AgentListener	m_AgentListener;
@@ -191,10 +189,6 @@ public:
 	* @brief	Add or remove a connection from the list listening
 	*			for a particular event in the kernel.
 	*************************************************************/
-	//void AddKernelListener(egSKISystemEventId eventID, Connection* pConnection)	 { m_KernelListener.AddListener(eventID, pConnection) ; }
-    //void AddKernelListener(egSKIAgentEventId eventID, Connection* pConnection)	 { m_KernelListener.AddListener(eventID, pConnection) ; }
-	//void RemoveKernelListener(egSKISystemEventId eventID, Connection* pConnection) { m_KernelListener.RemoveListener(eventID, pConnection) ; }
-	//void RemoveKernelListener(egSKIAgentEventId eventID, Connection* pConnection) { m_KernelListener.RemoveListener(eventID, pConnection) ; }
 	void AddSystemListener(egSKISystemEventId eventID, Connection* pConnection)	 { m_SystemListener.AddListener(eventID, pConnection) ; }
 	void AddAgentListener(egSKIAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
 	void RemoveSystemListener(egSKISystemEventId eventID, Connection* pConnection) { m_SystemListener.RemoveListener(eventID, pConnection) ; }

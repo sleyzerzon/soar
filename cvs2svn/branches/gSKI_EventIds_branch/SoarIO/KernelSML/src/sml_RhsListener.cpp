@@ -3,7 +3,7 @@
 #endif // HAVE_CONFIG_H
 
 /////////////////////////////////////////////////////////////////
-// KernelListener class file.
+// RhsListener class file.
 //
 // Author: Douglas Pearson, www.threepenny.net
 // Date  : October 2004
@@ -11,18 +11,9 @@
 // This class's HandleEvent method is called when
 // specific events occur within the kernel:
 /*
-*      // System events
-*      gSKIEVENT_BEFORE_SHUTDOWN            = 1,
-*      gSKIEVENT_AFTER_CONNECTION_LOST,
-*      gSKIEVENT_BEFORE_RESTART,
-*      gSKIEVENT_AFTER_RESTART,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_ADDED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_ADDED,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_REMOVED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_REMOVED,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_EXECUTED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_EXECUTED,
-*/////////////////////////////////////////////////////////////////
+*      gSKIEVENT_RHS_USER_FUNCTION
+*/
+/////////////////////////////////////////////////////////////////
 
 #include "sml_RhsListener.h"
 #include "sml_Connection.h"

@@ -78,7 +78,6 @@ protected:
 	IdentifierMap	m_ToClientIdentifierMap ;
 
 	// Used to listen for kernel events that are agent specific
-	//AgentListener	m_AgentListener ;
 	ProductionListener m_ProductionListener;
 	RunListener m_RunListener;
 	PrintListener m_PrintListener;
@@ -122,8 +121,6 @@ public:
 
 	bool SetStopOnOutput(bool state) ;
 
-	//void AddAgentListener(egSKIAgentEventId eventID, Connection* pConnection)	{ m_AgentListener.AddListener(eventID, pConnection) ; }
-	//void RemoveAgentListener(egSKIAgentEventId eventID, Connection* pConnection) { m_AgentListener.RemoveListener(eventID, pConnection) ; }
 	void AddProductionListener(egSKIProductionEventId eventID, Connection* pConnection)	{ m_ProductionListener.AddListener(eventID, pConnection) ; }
 	void RemoveProductionListener(egSKIProductionEventId eventID, Connection* pConnection) { m_ProductionListener.RemoveListener(eventID, pConnection) ; }	
 	void AddRunListener(egSKIRunEventId eventID, Connection* pConnection)	{ m_RunListener.AddListener(eventID, pConnection) ; }

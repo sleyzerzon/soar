@@ -3,7 +3,7 @@
 #endif // HAVE_CONFIG_H
 
 /////////////////////////////////////////////////////////////////
-// AgentListener class file.
+// ProductionListener class file.
 //
 // Author: Douglas Pearson, www.threepenny.net
 // Date  : September 2004
@@ -12,26 +12,6 @@
 // specific events occur within the agent:
 //
 /*
-*     // Agent events
-*     @li gSKIEVENT_BEFORE_SMALLEST_STEP
-*     @li gSKIEVENT_AFTER_SMALLEST_STEP
-*     @li gSKIEVENT_BEFORE_ELABORATION_CYCLE
-*     @li gSKIEVENT_AFTER_ELABORATION_CYCLE
-*     @li gSKIEVENT_BEFORE_PHASE_EXECUTED
-*     @li gSKIEVENT_AFTER_PHASE_EXECUTED
-*     @li gSKIEVENT_BEFORE_DECISION_CYCLE
-*     @li gSKIEVENT_AFTER_DECISION_CYCLE
-*     @li gSKIEVENT_AFTER_INTERRUPT
-*     @li gSKIEVENT_BEFORE_RUNNING
-*     @li gSKIEVENT_AFTER_RUNNING
-*
-*      // Agent manager
-*      gSKIEVENT_AFTER_AGENT_CREATED,
-*      gSKIEVENT_BEFORE_AGENT_DESTROYED,
-*      gSKIEVENT_BEFORE_AGENT_REINITIALIZED,
-*      gSKIEVENT_AFTER_AGENT_REINITIALIZED,
-*
-*      // Production Manager
 *      gSKIEVENT_AFTER_PRODUCTION_ADDED,
 *      gSKIEVENT_BEFORE_PRODUCTION_REMOVED,
 *     //gSKIEVENT_BEFORE_PRODUCTION_FIRED,

@@ -8,6 +8,7 @@
 // the agent adds wmes to the output link.
 //
 /////////////////////////////////////////////////////////////////
+
 #ifndef OUTPUT_LISTENER_H
 #define OUTPUT_LISTENER_H
 

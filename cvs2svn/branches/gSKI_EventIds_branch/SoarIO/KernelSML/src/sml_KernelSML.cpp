@@ -106,7 +106,6 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	m_pConnectionManager = new ConnectionManager(portToListenOn) ;
 
 	// Start the kernel listener listening for events from gSKI
-	//m_KernelListener.Init(this) ;
 	m_AgentListener.Init(this);
 	m_RhsListener.Init(this);
 	m_SystemListener.Init(this);
@@ -141,7 +140,6 @@ KernelSML::~KernelSML()
 		delete pAgentSML ;
 	}
 
-	//m_KernelListener.Clear() ;
 	m_SystemListener.Clear();
 	m_AgentListener.Clear();
 	m_RhsListener.Clear();
@@ -277,7 +275,6 @@ void KernelSML::RemoveAllListeners(Connection* pConnection)
 	}
 
 	// Remove any kernel event listeners
-	//m_KernelListener.RemoveAllListeners(pConnection) ;
 	m_AgentListener.RemoveAllListeners(pConnection);
 	m_RhsListener.RemoveAllListeners(pConnection);
 	m_SystemListener.RemoveAllListeners(pConnection);
