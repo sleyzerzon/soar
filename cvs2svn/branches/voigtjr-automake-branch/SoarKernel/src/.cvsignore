@@ -1,2 +1,6 @@
 *.d
 debug
+*.lo
+.deps
+.libs
+Makefile
