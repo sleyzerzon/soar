@@ -196,7 +196,7 @@ public:
 	//void RemoveKernelListener(egSKISystemEventId eventID, Connection* pConnection) { m_KernelListener.RemoveListener(eventID, pConnection) ; }
 	//void RemoveKernelListener(egSKIAgentEventId eventID, Connection* pConnection) { m_KernelListener.RemoveListener(eventID, pConnection) ; }
 	void AddSystemListener(egSKISystemEventId eventID, Connection* pConnection)	 { m_SystemListener.AddListener(eventID, pConnection) ; }
-	void AddAgentlListener(egSKIAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
+	void AddAgentListener(egSKIAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
 	void RemoveSystemListener(egSKISystemEventId eventID, Connection* pConnection) { m_SystemListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveAgentListener(egSKIAgentEventId eventID, Connection* pConnection) { m_AgentListener.RemoveListener(eventID, pConnection) ; }
 

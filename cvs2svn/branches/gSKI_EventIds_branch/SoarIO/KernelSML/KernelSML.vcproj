@@ -153,12 +153,6 @@
 				RelativePath=".\src\sml_ConnectionManager.cpp">
 			</File>
 			<File
-				RelativePath=".\src\sml_EventManager.cpp">
-			</File>
-			<File
-				RelativePath=".\src\sml_KernelListener.cpp">
-			</File>
-			<File
 				RelativePath=".\src\sml_KernelSML.cpp">
 			</File>
 			<File
@@ -222,9 +216,6 @@
 			</File>
 			<File
 				RelativePath=".\include\sml_EventManager.h">
-			</File>
-			<File
-				RelativePath=".\include\sml_KernelListener.h">
 			</File>
 			<File
 				RelativePath=".\include\sml_KernelSML.h">

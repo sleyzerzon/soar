@@ -17,7 +17,8 @@
 
 using namespace sml ;
 
-EventManager::~EventManager()
+template<typename EventType>
+EventManager<EventType>::~EventManager()
 {
 	// This is interesting.  We can't call clear in the destructor for the event manager because it
 	// calls virtual methods, which is apparently illegal (I get a "pure virtual method" error from Visual Studio).
@@ -25,11 +26,12 @@ EventManager::~EventManager()
 	// Clear() ;
 }
 
-void EventManager::Clear()
+template<typename EventType>
+void EventManager<EventType>::Clear()
 {
 	for (EventMapIter mapIter = m_EventMap.begin() ; mapIter != m_EventMap.end() ; mapIter++)
 	{
-		egSKIEventId eventID = mapIter->first ;
+		EventType eventID = mapIter->first ;
 		ConnectionList* pList = mapIter->second ;
 
 		// Can't walk through with a normal iterator because we're deleting
@@ -49,7 +51,8 @@ void EventManager::Clear()
 }
 
 // Record that a particular connection wants to listen in on this event.
-bool EventManager::BaseAddListener(egSKIEventId eventID, Connection* pConnection)
+template<typename EventType>
+bool EventManager<EventType>::BaseAddListener(EventType eventID, Connection* pConnection)
 {
 	EventMapIter mapIter = m_EventMap.find(eventID) ;
 
@@ -74,7 +77,8 @@ bool EventManager::BaseAddListener(egSKIEventId eventID, Connection* pConnection
 
 // Find the list of connections listening to this event (or NULL)
 // The returned list can be empty.
-ConnectionList*	EventManager::GetListeners(egSKIEventId eventID)
+template<typename EventType>
+ConnectionList*	EventManager<EventType>::GetListeners(EventType eventID)
 {
 	EventMapIter mapIter = m_EventMap.find(eventID) ;
 
@@ -85,7 +89,8 @@ ConnectionList*	EventManager::GetListeners(egSKIEventId eventID)
 }
 
 // Returns true if just removed the last listener
-bool EventManager::BaseRemoveListener(egSKIEventId eventID, Connection* pConnection)
+template<typename EventType>
+bool EventManager<EventType>::BaseRemoveListener(EventType eventID, Connection* pConnection)
 {
 	ConnectionList* pList = GetListeners(eventID) ;
 
@@ -102,7 +107,8 @@ bool EventManager::BaseRemoveListener(egSKIEventId eventID, Connection* pConnect
 }
 
 // Remove all listeners that this connection has
-void EventManager::RemoveAllListeners(Connection* pConnection)
+template<typename EventType>
+void EventManager<EventType>::RemoveAllListeners(Connection* pConnection)
 {
 	// Remove any listeners for this connection
 	// We do this for all possible events even though only some will
@@ -116,7 +122,8 @@ void EventManager::RemoveAllListeners(Connection* pConnection)
 	}
 }
 
-ConnectionListIter EventManager::GetBegin(egSKIEventId eventID)
+template<typename EventType>
+ConnectionListIter EventManager<EventType>::GetBegin(EventType eventID)
 {
 	ConnectionList* pList = GetListeners(eventID) ;
 
@@ -129,7 +136,8 @@ ConnectionListIter EventManager::GetBegin(egSKIEventId eventID)
 	return pList->begin() ;
 }
 
-ConnectionListIter EventManager::GetEnd(egSKIEventId eventID)
+template<typename EventType>
+ConnectionListIter EventManager<EventType>::GetEnd(EventType eventID)
 {
 	ConnectionList* pList = GetListeners(eventID) ;
 
