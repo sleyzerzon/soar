@@ -196,18 +196,22 @@ namespace gSKI
 
   egSKIProductionEventId EnumRemappings::Map_Kernel_to_gSKI_ProdEventId(unsigned long eventId, unsigned char occured)
   { 
-      if(!m_initialized) 
-         Init();
+	unsigned long gSKIeventId;
 
-      if (IsProductionEventID(eventId)) {
-	return static_cast<egSKIProductionEventId>(EventEnumMapping[eventId][occured]);
+    if(!m_initialized) 
+       Init();
+
+	gSKIeventId = (EventEnumMapping[eventId][occured]);
+    
+	if (IsProductionEventID(gSKIeventId)) {
+		return static_cast<egSKIProductionEventId>(gSKIeventId);
       } else {
 	// Error condition
 	MegaAssert(false, "Could not map a production event id");
 	return static_cast<egSKIProductionEventId>(0);
       }
   }
-  /**  should be changed to lines below for more explicit coding 
+  /**  could be changed to lines below for more explicit coding 
       switch (eventId)
       {
       case gSKI_K_EVENT_PRODUCTION_ADDED:     return gSKIEVENT_AFTER_PRODUCTION_ADDED;
@@ -230,6 +234,8 @@ namespace gSKI
          Init();
       switch (eventId)
       {
+
+	  THESE ARE gSKI ENUM TESTS, so THIS CODE WON'T WORK
 	  case IsSystemEventId(eventId):
 		  return static_cast<egSKISystemEventId>(EventEnumMapping[eventId][occured]);
 	  case IsRunEventId(eventId):
