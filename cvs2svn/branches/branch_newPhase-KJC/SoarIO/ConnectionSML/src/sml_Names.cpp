@@ -114,6 +114,9 @@ char const* const sml_Names::kTagWMEAdd 	= "adding_wme" ;
 char const* const sml_Names::kTagPreference		= "preference" ;
 char const* const sml_Names::kPreference_Type	= "pref_type" ;
 
+//for RHS output
+char const* const sml_Names::kTagRHS_write	= "rhs_write" ;
+
 
 // Types
 char const* const sml_Names::kTypeString	= "string" ;

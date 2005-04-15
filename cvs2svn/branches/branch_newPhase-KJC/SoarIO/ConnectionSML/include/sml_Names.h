@@ -115,6 +115,9 @@ public:
 	static char const* const kTagPreference ;
 	static char const* const kPreference_Type ;
 
+	//for RHS output
+	static char const* const kTagRHS_write;
+
 	// end of tags for Trace output
 
 	// Types
