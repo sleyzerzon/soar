@@ -273,9 +273,10 @@ class smlJNI {
   public final static native boolean ElementXML_SetTagNameConst(long jarg1, String jarg2);
   public final static native String ElementXML_GetTagName(long jarg1);
   public final static native boolean ElementXML_IsTag(long jarg1, String jarg2);
-  public final static native void ElementXML_AddChild(long jarg1, long jarg2);
+  public final static native long ElementXML_AddChild(long jarg1, long jarg2);
   public final static native int ElementXML_GetNumberChildren(long jarg1);
   public final static native boolean ElementXML_GetChild(long jarg1, long jarg2, int jarg3);
+  public final static native boolean ElementXML_GetParent(long jarg1, long jarg2);
   public final static native boolean ElementXML_AddAttribute__SWIG_0(long jarg1, String jarg2, String jarg3, boolean jarg4, boolean jarg5);
   public final static native boolean ElementXML_AddAttribute__SWIG_1(long jarg1, String jarg2, String jarg3, boolean jarg4);
   public final static native boolean ElementXML_AddAttribute__SWIG_2(long jarg1, String jarg2, String jarg3);

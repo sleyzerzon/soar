@@ -184,23 +184,23 @@ public abstract class AbstractTextView extends AbstractComboView
 		// so I'm adding support for it here.  However, this support is pure Windows code.
 		// We'll need to figure out how to have code like this and still compile the debugger
 		// on Linux (even if this option won't work on Linux).
-		if (true)	// Comment out this section on Linux or set this to false (if that allows it to compile)
-		{	
-			// Send an EM_CHARFROMPOS message to the underlying edit control
-			int handle = m_Text.handle ;
-			int lParam = e.y << 16 | e.x ;	// Coords are packed as high-word, low-word
-			int result = org.eclipse.swt.internal.win32.OS.SendMessage (handle, org.eclipse.swt.internal.win32.OS.EM_CHARFROMPOS, 0, lParam);
-	
-			// Break out the character and line position from the result
-			int charPos = result & (0xFFFF) ;
-			int linePos = (result >>> 16) ;
-			
-			// Set the selection to the character position (which is measured from the first character
-			// in the control).
-			m_Text.clearSelection() ;
-			m_Text.setSelection(charPos) ;
-			//System.out.println("Char " + charPos + " Line " + linePos) 
-		}
+//		if (true)	// Comment out this section on Linux or set this to false (if that allows it to compile)
+//		{	
+//			// Send an EM_CHARFROMPOS message to the underlying edit control
+//			int handle = m_Text.handle ;
+//			int lParam = e.y << 16 | e.x ;	// Coords are packed as high-word, low-word
+//			int result = org.eclipse.swt.internal.win32.OS.SendMessage (handle, org.eclipse.swt.internal.win32.OS.EM_CHARFROMPOS, 0, lParam);
+//	
+//			// Break out the character and line position from the result
+//			int charPos = result & (0xFFFF) ;
+//			int linePos = (result >>> 16) ;
+//			
+//			// Set the selection to the character position (which is measured from the first character
+//			// in the control).
+//			m_Text.clearSelection() ;
+//			m_Text.setSelection(charPos) ;
+//			//System.out.println("Char " + charPos + " Line " + linePos) 
+//		}
 	}
 
 	/********************************************************************************************
