@@ -129,6 +129,44 @@ public class MainWindow
   		
   		return null ;
   	}
+
+  	public int getNumberViews(boolean outputViewsOnly)
+  	{
+  		int count = 0 ;
+  		for (int i = 0 ; i < m_PaneList.size() ; i++)
+  		{
+  			Pane pane = (Pane)m_PaneList.get(i) ;
+  			
+  			for (int j = 0 ; j < pane.getNumberViews() ; j++)
+  			{
+  				AbstractView view = pane.getView(j) ;
+  				if (view.canDisplayOutput() || !outputViewsOnly)
+  					count++ ;
+  			}
+  		}
+  		return count ;
+  	}
+  	
+  	public AbstractView[] getAllViews(boolean outputViewsOnly)
+  	{
+  		int counter = 0 ;
+  		int count = getNumberViews(outputViewsOnly) ;
+  		AbstractView views[] = new AbstractView[count] ;
+  		
+  		for (int i = 0 ; i < m_PaneList.size() ; i++)
+  		{
+  			Pane pane = (Pane)m_PaneList.get(i) ;
+  			
+  			for (int j = 0 ; j < pane.getNumberViews() ; j++)
+  			{
+  				AbstractView view = pane.getView(j) ;
+  				if (view.canDisplayOutput() || !outputViewsOnly)
+  					views[counter++] = view ;
+  			}
+  		}
+  		
+  		return views ;
+  	}
   	
   	/** Returns the view that currently has focus */
   	public AbstractView getFocusView()
@@ -147,23 +185,6 @@ public class MainWindow
   		}
   		
   		return null ;
-  	}
-  	
-  	public void stopAllLogging() {
-  		for (int i = 0 ; i < m_PaneList.size() ; i++)
-  		{
-  			Pane pane = (Pane)m_PaneList.get(i) ;
-  			
-  			for (int j = 0 ; j < pane.getNumberViews() ; j++)
-  			{
-  				AbstractView view = pane.getView(j) ;
-  				if (view.isLogging())
-  				{
-  					view.displayText("Log file closed due to shutdown.");
-  				}
-  				view.stopLogging();
-   			}
-  		}
   	}
   	
   	public int getPaneIndex(Pane pane)
@@ -318,7 +339,7 @@ public class MainWindow
   		m_PaneList.add(buttonsRightBottom) ;
 		
 		// Now connect up a specific type of view with these panes
-		AbstractView trace = new TreeTraceView() ;
+		AbstractView trace = new FoldingTextView() ;
 		trace.init(m_Frame, m_Document, top) ;
 		trace.generateName(m_Frame) ;
 		top.addView(trace) ;

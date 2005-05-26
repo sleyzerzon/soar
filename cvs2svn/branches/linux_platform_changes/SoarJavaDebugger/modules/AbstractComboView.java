@@ -156,6 +156,17 @@ public abstract class AbstractComboView extends AbstractView
 		return false ;
 	}
 
+	/************************************************************************
+	* 
+	* Returns true if this window can display output from commands executed through
+	* the "executeAgentCommand" method.
+	* 
+	*************************************************************************/
+	public boolean canDisplayOutput()
+	{
+		return true ;
+	}
+
 	/** Windows that do auto-updates can be usefully primed with an initial command (e.g. print --stack) when defining a default behavior */
 	public void setInitialCommand(String command)
 	{
@@ -497,11 +508,14 @@ public abstract class AbstractComboView extends AbstractView
 		String expanded = m_Frame.getExpandedCommand(command) ;
 		if (m_Frame.isDebuggerCommand(expanded))
 		{
+			m_Updating = false ;
 			return (String)m_Frame.executeDebuggerCommand(this, expanded, echoCommand) ;
 		}
 		
 		if (echoCommand && !m_ClearEachCommand)
-			appendTextSafely(getLineSeparator() + command) ;
+		{
+			appendTextSafely(kLineSeparator + command) ;
+		}
 		
 		String result = getDocument().sendAgentCommand(getAgentFocus(), command) ;
 
@@ -512,7 +526,7 @@ public abstract class AbstractComboView extends AbstractView
 		// Output from Soar doesn't include newlines and assumes that we insert
 		// a newline before the result of the command is displayed.
 		if (result != null && result.length() > 0)
-			appendTextSafely(getLineSeparator() + result) ;
+			appendTextSafely(kLineSeparator + result) ;
 
 		m_Updating = false ;
 		

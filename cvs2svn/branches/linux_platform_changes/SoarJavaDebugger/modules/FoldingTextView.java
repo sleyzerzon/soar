@@ -19,9 +19,6 @@ import java.util.Iterator;
 
 import manager.Pane;
 import menu.ParseSelectedText;
-import modules.TreeTraceView.ExpandListener;
-import modules.TreeTraceView.RunWrapper;
-import modules.TreeTraceView.TreeData;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
@@ -58,36 +55,26 @@ public class FoldingTextView extends AbstractComboView
 	protected int m_IndentSize = 3 ;
 	
 	/** When true, expand the tree automatically as it's created */
-	protected boolean m_AutoExpand = false ;
+	protected boolean m_ExpandTracePersistent = false ;
+	
+	/** When true, we expand the tree as it's created -- but this one is not persistent between debugger sessions */
+	protected boolean m_ExpandTrace = false ;
 	
 	/** The last root (top level item) added to the tree.  We add new sub items under this */
 	protected TreeItem m_LastRoot ;
 	
 	protected Composite	m_Buttons ;
 
-	protected Button m_ExpandPageButton ;
+	protected Button m_ExpandButton ;
 	protected Button m_ExpandPageArrow ;
 	protected Menu   m_ExpandPageMenu ;
 	
+	protected Label  m_FilterLabel ;
+	protected Button m_FilterArrow ;
+	protected Menu	 m_FilterMenu ;
+	
 	/** Controls whether we cache strings that are due to be subtree nodes and only add the nodes when the user clicks--or not */
 	protected final static boolean kCacheSubText = true ;
-
-	/** We cache a series of strings made up of just spaces up to a certain size, so we can do rapid indenting through a lookup */
-	protected static final int kCachedSpaces = 100 ;
-	protected static final String[] kPadSpaces = new String[kCachedSpaces] ;
-	
-	/** This is a class constructor -- it runs once, the first time the class is used.  Don't mistake it for a normal, instance constructor */
-	static
-	{
-		// Fill in the kPadSpaces array
-		StringBuffer buffer = new StringBuffer() ;
-		
-		for (int i = 0 ; i < kCachedSpaces ; i++)
-		{
-			kPadSpaces[i] = buffer.toString() ;
-			buffer.append(" ") ;
-		}
-	}
 	
 	/** We use this structure if we're caching sub nodes in the tree for expansion only when the user clicks */
 	protected static class TreeData
@@ -113,12 +100,37 @@ public class FoldingTextView extends AbstractComboView
 
 	public Color getBackgroundColor() { return m_Frame.m_White ; }
 	
-	protected class ExpandListener implements Listener
+	protected void updateButtonState()
 	{
-		public void handleEvent (final Event event) {
-			TreeItem root = (TreeItem) event.item;
+		m_ExpandButton.setText(m_ExpandTrace ? "Collapse" : " Expand ") ;
+		m_ExpandButton.setData("expand", m_ExpandTrace ? Boolean.TRUE : Boolean.FALSE) ;
+		
+		// Set the checkboxes to match current filter state
+		for (int i = 0 ; i < m_FilterMenu.getItemCount() ; i++)
+		{
+			MenuItem item = m_FilterMenu.getItem(i) ;
 			
-			expandRoot(root, true) ;
+			Long typeObj = (Long)item.getData("type") ;
+			if (typeObj == null)
+				continue ;
+
+			// Update the checkbox to match whether this type is visible or not
+			long type = typeObj.longValue() ;
+			item.setSelection((m_FoldingText.isTypeVisible(type))) ;
+			
+			// Enable/disable the item to match whether filtering is enabled at all
+			item.setEnabled(m_FoldingText.isFilteringEnabled()) ;
+		}
+
+		// Change the color of the label if any filtering is enabled, so it's clear that this is happening.
+		// Don't want to be doing this by accident and not realize it.
+		if (m_FoldingText.isFilteringEnabled() && m_FoldingText.getExclusionFilter() != 0)
+		{
+			m_FilterLabel.setForeground(getMainFrame().getDisplay().getSystemColor(SWT.COLOR_BLUE)) ;			
+		}
+		else
+		{
+			m_FilterLabel.setForeground(getMainFrame().getDisplay().getSystemColor(SWT.COLOR_GRAY)) ;
 		}
 	}
 	
@@ -133,24 +145,26 @@ public class FoldingTextView extends AbstractComboView
 		m_LastRoot = null ;
 		
 		createContextMenu(m_FoldingText.getTextWindow()) ;
-
-		// When the user expands a node in the tree we may unpack some cached data
-//		m_Tree.addListener (SWT.Expand, new ExpandListener()) ;
-
-//		m_Tree.addMouseListener(new MouseAdapter() { public void mouseDown(MouseEvent e) { if (e.button == 1) leftMouseDown(e.x, e.y) ; } } ) ;
 		
 		m_Buttons = new Composite(m_ComboContainer, 0) ;
 		m_Buttons.setLayout(new RowLayout()) ;
-		Composite owner = m_Buttons ;
+		final Composite owner = m_Buttons ;
 		
 		// Add a button that offers an expand/collapse option instantly (for just one page)
-		m_ExpandPageButton = new Button(owner, SWT.PUSH);
-		m_ExpandPageButton.setText("Expand page") ;
-		m_ExpandPageButton.setData("expanded", m_AutoExpand ? Boolean.TRUE : Boolean.FALSE) ;	// When this flag is false pressing the button expands
-
-		m_ExpandPageButton.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e)
-		{ boolean expand = (e.widget.getData("expanded") == Boolean.FALSE) ;
-		  expandPage(expand) ; } } ) ;
+		m_ExpandTrace = m_ExpandTracePersistent ;		
+		m_ExpandButton = new Button(owner, SWT.PUSH);
+		
+		m_ExpandButton.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e)
+		{
+			m_ExpandTrace = (e.widget.getData("expand") == Boolean.FALSE) ;
+			updateButtonState() ;
+			
+			// We expand the current page if the user asks for "expand" but we're not making this symmetric
+			// because "collapse" probably means "I'm done with detailed debugging" but not necessarily "I don't want to see what I was just working on".
+			// If you don't agree with that logic just comment out the "if".
+			if (m_ExpandTrace)
+				expandPage(m_ExpandTrace) ;
+		} } ) ;
 		
 		m_ExpandPageArrow = new Button(owner, SWT.ARROW | SWT.DOWN) ;
 		m_ExpandPageMenu  = new Menu(owner) ;
@@ -165,9 +179,11 @@ public class FoldingTextView extends AbstractComboView
 		menuItem.setText ("Expand page");
 		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { expandPage(true) ; } } ) ;
 
-//		menuItem = new MenuItem (m_ExpandPageMenu, SWT.PUSH);
-//		menuItem.setText ("Collapse page");		
-//		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { expandPage(false) ; } } ) ;
+		// Note: Doing expand page then collapse page doesn't get you back to where you started--the page will be showing far fewer
+		// blocks when you hit "collapse page" so it does less work.  Collapse page may have little value.
+		menuItem = new MenuItem (m_ExpandPageMenu, SWT.PUSH);
+		menuItem.setText ("Collapse page");		
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { expandPage(false) ; } } ) ;
 
 		menuItem = new MenuItem (m_ExpandPageMenu, SWT.PUSH);
 		menuItem.setText ("Expand all");		
@@ -176,8 +192,107 @@ public class FoldingTextView extends AbstractComboView
 		menuItem = new MenuItem (m_ExpandPageMenu, SWT.PUSH);
 		menuItem.setText ("Collapse all");		
 		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { expandAll(false) ; } } ) ;
+		
+		// Add a button that controls whether we are filtering or not
+		Composite labelHolder = new Composite(owner, SWT.NULL) ;
+		labelHolder.setLayout(new GridLayout(1, true)) ;
+		
+		m_FilterLabel = new Label(labelHolder, 0);
+		m_FilterLabel.setText("Filters") ;
+
+		// Place the label in the center of a tiny grid layout so we can
+		// align the text to match the expand button along side
+		GridData data = new GridData() ;
+		data.horizontalAlignment = SWT.CENTER ;
+		data.verticalAlignment = SWT.CENTER ;
+		m_FilterLabel.setLayoutData(data) ;
+		
+		m_FilterArrow = new Button(owner, SWT.ARROW | SWT.DOWN) ;
+		m_FilterMenu  = new Menu(owner) ;
+
+		m_FilterArrow.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent event)
+		{ 	Point pt = m_FilterArrow.toDisplay(new Point(event.x, event.y)) ;
+			m_FilterMenu.setLocation(pt.x, pt.y) ;
+			m_FilterMenu.setVisible(true) ;
+		} }) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Phases") ;
+		menuItem.setData("type", new Long(TraceType.kPhase)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kPhase) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Preferences") ;
+		menuItem.setData("type", new Long(TraceType.kPreference)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kPreference) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Wme Changes") ;
+		menuItem.setData("type", new Long(TraceType.kWmeChange)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kWmeChange) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Production Firings") ;
+		menuItem.setData("type", new Long(TraceType.kFiring)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kFiring) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Production Retractions") ;
+		menuItem.setData("type", new Long(TraceType.kRetraction)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kRetraction) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Stack Trace") ;
+		menuItem.setData("type", new Long(TraceType.kStack)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kStack) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Rhs Writes and Messages") ;
+		menuItem.setData("type", new Long(TraceType.kRhsWrite)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kRhsWrite) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Learning") ;
+		menuItem.setData("type", new Long(TraceType.kLearning)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kLearning) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Full Learning") ;
+		menuItem.setData("type", new Long(TraceType.kFullLearning)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kFullLearning) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Verbose") ;
+		menuItem.setData("type", new Long(TraceType.kVerbose)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kVerbose) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.CHECK);
+		menuItem.setText ("Warnings") ;
+		menuItem.setData("type", new Long(TraceType.kWarning)) ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { changeFilter(e.widget, TraceType.kWarning) ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.PUSH);
+		menuItem.setText ("Show all") ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { m_FoldingText.setExclusionFilter(0, true) ; updateButtonState() ; } } ) ;
+
+		menuItem = new MenuItem (m_FilterMenu, SWT.PUSH);
+		menuItem.setText ("Hide all") ;
+		menuItem.addSelectionListener(new SelectionAdapter() { public void widgetSelected(SelectionEvent e) { m_FoldingText.setExclusionFilter(TraceType.kAllExceptTopLevel, true) ; updateButtonState() ; } } ) ;
+
+		updateButtonState() ;
 	}
-			
+	
+	protected void changeFilter(Widget widget, long type)
+	{
+		MenuItem item = (MenuItem)widget ;
+		boolean selected = item.getSelection() ;
+		
+		m_FoldingText.changeExclusionFilter(type, !selected, true) ;
+		
+		// A change to one button can affect others
+		updateButtonState() ;
+	}
+	
 	/************************************************************************
 	* 
 	* Search for the next occurance of 'text' in this view and place the selection
@@ -197,6 +312,89 @@ public class FoldingTextView extends AbstractComboView
 		// Show the wait cursor as the hidden search could take a while
 		Cursor wait = new Cursor(getWindow().getDisplay(), SWT.CURSOR_WAIT) ;
 		getWindow().getShell().setCursor(wait) ;
+				
+		String windowText = m_FoldingText.getAllText(searchHiddenText) ;
+		
+		// If we're case insensitive shift all to lower case
+		if (!matchCase)
+		{
+			windowText = windowText.toLowerCase() ;
+			text = text.toLowerCase() ;
+		}
+		
+		// Find out where we're starting from
+		Point selectionPoint = m_FoldingText.getTextWindow().getSelection() ;
+		int selectionStart = selectionPoint.x ;
+		
+		// If we're searching the entire set of text need to switch to the position within the entire set of text
+		if (searchHiddenText)
+			selectionStart = m_FoldingText.convertVisibleToAllCharPos(selectionStart) ;
+		
+		int origStart = selectionStart ;
+		
+		int start = -1 ;
+		boolean wrapped = false ;
+		boolean done ;
+		do
+		{
+			if (searchDown)
+			{
+				start = windowText.indexOf(text, selectionStart + 1) ;
+			}
+			else
+			{
+				start = windowText.lastIndexOf(text, selectionStart - 1) ;
+			}
+			
+			if (start != -1)
+			{
+				// We found some text, so set the selection and we're done.
+				found = true ;
+				done = true ;				
+
+				// Unless we've done a wrapped search and passed our start point
+				// in which case we're actually done
+				if (wrapped && ((searchDown && (start >= origStart)) || (!searchDown && (start <= origStart))))
+					found = false ;
+			}
+			else
+			{
+				if (wrap && !wrapped)
+				{
+					// If fail to find text with the basic search repeat it here
+					// which produces a wrap effect.
+					done = false ;
+					wrapped = true ;	// Only do it once
+					selectionStart = searchDown ? -1 : windowText.length() ;
+				}
+				else
+				{
+					// If we're not wrapping (or already did the wrap) return false
+					// to signal we failed to find anything.
+					found = false ;
+					done = true ;
+				}
+			}
+		} while (!done) ;
+		
+		if (found)
+		{
+			int end = start + text.length() ;
+
+			// If we're searching in hidden text need to convert back to the visible space and
+			// possibly expand the block
+			if (searchHiddenText)
+			{
+				// Force block to expand if needed
+				m_FoldingText.makeCharPosVisible(start) ;
+				
+				start = m_FoldingText.convertAllToVisibleCharPos(start) ;
+				end   = m_FoldingText.convertAllToVisibleCharPos(end) ;
+			}
+			
+			// Set the newly found text to be selected
+			m_FoldingText.setSelection(start, end) ;
+		}
 		
 		getWindow().getShell().setCursor(null) ;
 		wait.dispose() ;
@@ -211,142 +409,62 @@ public class FoldingTextView extends AbstractComboView
 	*************************************************************************/
 	protected ParseSelectedText.SelectedObject getCurrentSelection(int mouseX, int mouseY)
 	{
-		return null ;
+		// Switchfrom screen coords to coords based on the text window
+		Point pt = m_FoldingText.getTextWindow().toControl(mouseX, mouseY) ;
+		mouseX = pt.x ;
+		mouseY = pt.y ;
+
+		int line = m_FoldingText.getLine(mouseY) ;
+		if (line == -1)
+			return null ;
+		
+		String text = m_FoldingText.getTextForLine(line) ;		
+		if (text == null)
+			return null ;
+
+		int pos = m_FoldingText.getCharacterPosition(text, mouseX) ;
+		if (pos == -1)
+			return null ;
+
+		// Sometimes we need to search back up the trace or down the trace to determine the context
+		// so we'll add these lines above and below the to current line, adjusting the position as we do.
+		// This is just a heuristic but it should cover 99% of cases.
+		int bufferLinesAbove = Math.min(20, line) ;
+		int bufferLinesBelow = 1 ;
+		String combinedText = text ;
+		int combinedPos = pos ;
+		for (int i = 0 ; i < bufferLinesAbove ; i++)
+		{
+			String lineText = m_FoldingText.getTextForLine(line - i - 1) ;
+			
+			if (lineText != null)
+			{
+				combinedText = lineText + combinedText ;
+				combinedPos += lineText.length() ;
+			}
+		}
+		for (int i = 0 ; i < bufferLinesBelow ; i++)
+		{
+			String lineText = m_FoldingText.getTextForLine(line + i + 1) ;
+			if (lineText != null)
+				combinedText = combinedText + lineText ;
+		}
+
+		// Go from the text to a Soar selection object (e.g. an id or an attribute -- that sort of thing)
+		ParseSelectedText selection = new ParseSelectedText(combinedText, combinedPos) ;
+		
+		return selection.getParsedObject() ;
+		
 	}
 	
 	protected void expandPage(boolean state)
 	{
-		/*
-		if (m_Tree.getItemCount() == 0)
-			return ;
-		
-		// Stop redrawing while we expand/collapse everything then turn it back on
-		m_Tree.setRedraw(false) ;
-		
-		TreeItem[] roots = m_Tree.getItems() ;
-		
-		// Find the root item on this page
-		TreeItem top = m_Tree.getTopItem() ;
-		while (top.getParentItem() != null)
-			top = top.getParentItem() ;
-
-		int start = -1 ;
-		for (int i = 0 ; i < roots.length ; i++)
-		{
-			if (top == roots[i])
-			{
-				start = i ;
-				break ;
-			}
-		}
-		
-		if (start == -1)
-			throw new IllegalStateException("Error finding top of the tree") ;
-		
-		int pageSize = 50 ;
-		// For now we'll approximate a page as <n> nodes in the tree.
-		// The key is that it should be enough to fill a page but not so much
-		// as to take forever to do.  I don't see a method to determine which item
-		// is at the bottom of the page which would make this precise.
-		int end = start + pageSize ;
-		if (end > roots.length) end = roots.length ;
-		
-		for (int i = start ; i < end ; i++)
-		{	
-			// In SWT the programmatic call to expand an item does not
-			// generate an expand event, so we have to explicitly handle the expansion
-			// (i.e. unpack our cached text)
-			if (state)
-				expandRoot(roots[i], false) ;
-
-			roots[i].setExpanded(state) ;
-		}
-		
-		// Scroll to have the top (now expanded) visible
-		m_Tree.showItem(top) ;
-		
-		m_Tree.setRedraw(true) ;	
-		*/	
+		m_FoldingText.expandPage(state) ;
 	}
 	
 	protected void expandAll(boolean state)
 	{
-		/*
-		// Stop redrawing while we expand/collapse everything then turn it back on
-		m_Tree.setRedraw(false) ;
-		
-		TreeItem[] roots = m_Tree.getItems() ;
-		for (int i = 0 ; i < roots.length ; i++)
-		{	
-			// In SWT the programmatic call to expand an item does not
-			// generate an expand event, so we have to explicitly handle the expansion
-			// (i.e. unpack our cached text)
-			if (state)
-				expandRoot(roots[i], false) ;
-
-			roots[i].setExpanded(state) ;
-		}
-		
-		m_Tree.setRedraw(true) ;
-		*/
-	}
-	
-	protected void expandRoot(TreeItem root, boolean redraw)
-	{
-		/*
-		// We will have exactly one dummy child item
-		// if there's cached data here.  This allows us to quickly
-		// screen out most "already been expanded before" cases.
-		if (root.getItemCount() != 1)
-			return ;
-		
-		TreeItem[] items = root.getItems() ;
-		
-		TreeData treeData = (TreeData)items[0].getData(kLazyKey) ;
-		
-		// If there's no cached data here then once again we are done
-		// (either we're not using a cache or its already been expanded)
-		if (treeData == null)
-			return ;
-		
-		// Stop updating while we add
-		// (We may want a smarter way to do this if we're expanding the entire tree
-		//  so the redraw is turned off for the entire expansion).
-		if (redraw)
-			root.getParent().setRedraw(false) ;
-		
-		// Get rid of the dummy item
-		items[0].dispose() ;
-		
-		TreeItem prev = null ;
-		
-		for (Iterator iter = treeData.getLinesIterator() ; iter.hasNext() ;)
-		{
-			String text = (String)iter.next() ;
-
-			String[] lines = text.split(getLineSeparator()) ;
-			
-			for (int i = 0 ; i < lines.length ; i++)
-			{	
-				if (lines[i].length() == 0)
-					continue ;
-				
-				TreeItem node = new TreeItem (root, 0);
-				node.setText (lines[i]);
-				
-				// Link the nodes together to make navigating from one node to the next
-				// more efficient later
-				if (prev != null)
-					prev.setData(kNextKey, node) ;
-				node.setData(kPrevKey, prev) ;
-				prev = node ;
-			}				
-		}
-					
-		// Start updating again.
-		if (redraw)
-			root.getParent().setRedraw(true) ;
-			*/
+		m_FoldingText.expandAll(state) ;
 	}
 	
 	protected void layoutComboBar(boolean top)
@@ -374,7 +492,7 @@ public class FoldingTextView extends AbstractComboView
 	********************************************************************************************/
 	public String getModuleBaseName()
 	{
-		return "treetrace" ;
+		return "trace" ;
 	}
 
 	/** The control we're using to display the output in this case **/
@@ -395,18 +513,26 @@ public class FoldingTextView extends AbstractComboView
 		return m_FoldingText.getWindow() ;
 	}
 
+	public void setTextFont(Font f)
+	{
+		super.setTextFont(f) ;
+		
+		// Changing the font means we need to redraw the icon bar, just as if we scrolled
+		m_FoldingText.scrolled() ;
+	}
+
 	/************************************************************************
 	* 
 	* Add the text to the view in a thread safe way (switches to UI thread)
 	* 
 	*************************************************************************/
-	protected void appendSubTextSafely(final String text, final boolean redrawTree)
+	protected void appendSubTextSafely(final String text, final boolean redrawTree, final long type)
 	{
 		// If Soar is running in the UI thread we can make
 		// the update directly.
 		if (!Document.kDocInOwnThread)
 		{
-			appendSubText(text, redrawTree) ;
+			appendSubText(text, type) ;
 			return ;
 		}
 
@@ -414,37 +540,26 @@ public class FoldingTextView extends AbstractComboView
 		// Callback comes in the document thread.
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-            	appendSubText(text, redrawTree) ;
+            	appendSubText(text, type) ;
             }
          }) ;
 	}
-	
-	protected void addTestText()
-	{
-		for (int groups = 0 ; groups < 3 ; groups++)
-		{
-			for (int i = 0 ; i < 10 ; i++)
-				appendText("Line " + i) ;
-			for (int i = 0 ; i < 10 ; i++)
-				appendSubText("Sub " + i, true) ;
-		}
-	}
-	
+		
 	/************************************************************************
 	* 
 	* Add the text to the view (this method assumes always called from UI thread)
 	* 
 	*************************************************************************/
-	protected void appendSubText(String text, boolean redrawTree)
+	protected void appendSubText(String text, long type)
 	{
-		String[] lines = text.split(getLineSeparator()) ;
+		String[] lines = text.split(kLineSeparator) ;
 
 		for (int i = 0 ; i < lines.length ; i++)
 		{	
 			if (lines[i].length() == 0)
 				continue ;
 
-			m_FoldingText.appendSubText(lines[i] + getLineSeparator(), redrawTree) ;
+			m_FoldingText.appendSubText(lines[i] + kLineSeparator, m_ExpandTracePersistent || m_ExpandTrace, type) ;
 		}
 	}
 	
@@ -453,20 +568,24 @@ public class FoldingTextView extends AbstractComboView
 	* Add the text to the view (this method assumes always called from UI thread)
 	* 
 	*************************************************************************/
-	protected void appendText(String text)
+	protected void appendText(String text, long type)
 	{
-		boolean redraw = true ;
-		String[] lines = text.split(getLineSeparator()) ;
+		String[] lines = text.split(kLineSeparator) ;
 
 		for (int i = 0 ; i < lines.length ; i++)
 		{	
 			if (lines[i].length() == 0)
 				continue ;
 			
-			m_FoldingText.appendText(lines[i] + getLineSeparator(), true) ;
+			m_FoldingText.appendText(lines[i] + kLineSeparator, type) ;
 		}
 	}
-
+	
+	protected void appendText(String text)
+	{
+		appendText(text, TraceType.kTopLevel) ;
+	}
+	
 	/************************************************************************
 	* 
 	* Clear the display control.
@@ -475,53 +594,6 @@ public class FoldingTextView extends AbstractComboView
 	public void clearDisplay()
 	{
 		m_FoldingText.clear() ;
-	}
-	
-	/** Returns a string of spaces of the given length (>= 0).  This is an efficient calculation */
-	protected String getSpaces(int length)
-	{
-		if (length <= 0)
-			return "" ;
-		
-		// We use a lookup from a table if the length is reasonable (< 100 right now)
-		if (length < kPadSpaces.length)
-			return kPadSpaces[length] ;
-		
-		// Otherwise we have to generate it which is slow
-		StringBuffer buffer = new StringBuffer() ;
-		buffer.append(kPadSpaces[kPadSpaces.length - 1]) ;
-		
-		// If we use this a lot we could speed it up by using a binary addition process
-		// but I hope to never use it (except in a run-away stack situation).
-		for (int i = 0 ; i < length - kPadSpaces.length ; i++)
-		{
-			buffer.append(" ") ;
-		}
-		
-		return buffer.toString() ;
-	}
-	
-	/** Add spaces to the length until reaches minLength */
-	protected String padLeft(String orig, int minLength)
-	{
-		if (orig.length() >= minLength)
-			return orig ;
-				
-		// Add the appropriate number of spaces.
-		return getSpaces(minLength - orig.length()) + orig ;
-	}
-	
-	/** Returns a string to indent to a certain stack depth (depth stored as a string) */
-	protected String indent(String depthStr, int modifier)
-	{
-		if (depthStr == null)
-			return "" ;
-		
-		int depth = Integer.parseInt(depthStr) + modifier ;
-		
-		int indentSize = depth * m_IndentSize ;
-		
-		return getSpaces(indentSize) ;
 	}
 	
 	/********************************************************************************************
@@ -550,16 +622,16 @@ public class FoldingTextView extends AbstractComboView
 			// Get each child in turn
 			xmlParent.GetChild(xmlTrace, childIndex) ;
 			
-			StringBuffer text = new StringBuffer() ;
-			final int decisionDigits = 3 ;
+			final int decisionDigits = 6 ;	// So colons match with print --stack in trace window
 			
 			// This is a state change (new decision)
 			if (xmlTrace.IsTagState())
 			{
 				// 3:    ==>S: S2 (operator no-change)
-				text.append(padLeft(xmlTrace.GetDecisionCycleCount(), decisionDigits)) ;
+				StringBuffer text = new StringBuffer() ;				
+				text.append(XmlOutput.padLeft(xmlTrace.GetDecisionCycleCount(), decisionDigits)) ;
 				text.append(": ") ;
-				text.append(indent(xmlTrace.GetStackLevel(), -1)) ;
+				text.append(XmlOutput.indent(xmlTrace.GetStackLevel(), -1, m_IndentSize)) ;
 
 				// Add an appropriate subgoal marker to match the indent size
 				if (m_IndentSize == 3)
@@ -570,7 +642,7 @@ public class FoldingTextView extends AbstractComboView
 					text.append(">") ;
 				else if (m_IndentSize > 3)
 				{
-					text.append(getSpaces(m_IndentSize - 3)) ;
+					text.append(XmlOutput.getSpaces(m_IndentSize - 3)) ;
 					text.append("==>") ;
 				}
 				
@@ -587,13 +659,14 @@ public class FoldingTextView extends AbstractComboView
 				}
 				
 				if (text.length() != 0)
-					this.appendText(text.toString()) ;
+					this.appendText(text.toString(), TraceType.kStack) ;
 			} else if (xmlTrace.IsTagOperator())
 			{
 				 //2:    O: O8 (move-block)
-				text.append(padLeft(xmlTrace.GetDecisionCycleCount(), decisionDigits)) ;
+				StringBuffer text = new StringBuffer() ;
+				text.append(XmlOutput.padLeft(xmlTrace.GetDecisionCycleCount(), decisionDigits)) ;
 				text.append(": ") ;
-				text.append(indent(xmlTrace.GetStackLevel(), 0)) ;
+				text.append(XmlOutput.indent(xmlTrace.GetStackLevel(), 0, m_IndentSize)) ;
 				text.append("O: ") ;
 				text.append(xmlTrace.GetOperatorID()) ;
 				
@@ -605,115 +678,149 @@ public class FoldingTextView extends AbstractComboView
 				}
 	
 				if (text.length() != 0)
-					this.appendText(text.toString()) ;
+					this.appendText(text.toString(), TraceType.kStack) ;
 			} else if (xmlTrace.IsTagRhsWrite())
 			{
-				text.append(xmlTrace.GetString()) ;
+				String output = xmlTrace.GetString() ;
 				
-				if (text.length() != 0)
-					this.appendText(text.toString()) ;				
+				if (output.length() != 0)
+					this.appendText(output, TraceType.kRhsWrite) ;				
 				
 			} else if (xmlTrace.IsTagPhase())
 			{
 				String status = xmlTrace.GetPhaseStatus() ;
-				String firingType = xmlTrace.GetFiringType() ;
 				
-				text.append("--- ") ;
-				text.append(xmlTrace.GetPhaseName()) ;
-				text.append(" ") ;
-				text.append("phase ") ;
-				if (status != null)
-					text.append(status) ;
-				if (firingType != null)
-				{
-					text.append("(") ;
-					text.append(firingType) ;
-					text.append(") ") ;
-				}
-				text.append("---") ;
-				
+				String output = XmlOutput.getPhaseText(agent, xmlTrace, status) ;
+								
 				// Don't show end of phase messages
 				boolean endOfPhase = (status != null && status.equalsIgnoreCase("end")) ;
 				
-				if (text.length() != 0 && !endOfPhase)
-					this.appendSubText(text.toString(), false) ;
+				if (output.length() != 0 && !endOfPhase)
+					this.appendSubText(output, TraceType.kPhase) ;
 			}
 			else if (xmlTrace.IsTagAddWme() || xmlTrace.IsTagRemoveWme())
 			{
 				boolean adding = xmlTrace.IsTagAddWme() ;
-				for (int i = 0 ; i < xmlTrace.GetNumberChildren() ; i++)
-				{
-					ClientTraceXML child = new ClientTraceXML() ;
-					xmlTrace.GetChild(child, i) ;
-					
-					if (child.IsTagWme())
-					{
-						String pref = child.GetWmePreference() ;
-						
-						text.append(adding ? "=>WM: (" : "<=WM: (") ;
-						text.append(child.GetWmeTimeTag()) ;
-						text.append(": ") ;
-						text.append(child.GetWmeID()) ;
-						text.append(" ^") ;
-						text.append(child.GetWmeAttribute()) ;
-						text.append(" ") ;
-						text.append(child.GetWmeValue()) ;
-						
-						if (pref != null)
-						{
-							text.append(" ") ;
-							text.append(pref) ;
-						}
-						
-						text.append(")") ;
-					}
-					
-					child.delete() ;
-				}
+				String output = XmlOutput.getWmeChanges(agent, xmlTrace, adding) ;
 				
-				if (text.length() != 0)
-					this.appendSubText(text.toString(), false) ;	
+				if (output.length() != 0)
+					this.appendSubText(output, TraceType.kWmeChange) ;	
 
 			} else if (xmlTrace.IsTagPreference())
 			{
-				text.append("--> (") ;
-				text.append(xmlTrace.GetPreferenceID()) ;
-				text.append(" ^") ;
-				text.append(xmlTrace.GetPreferenceAttribute()) ;
-				text.append(" ") ;
-				text.append(xmlTrace.GetPreferenceValue()) ;
-				text.append(" + )") ;	// BUGBUG: + hard-coded for now -- PreferenceType present but empty
-
-				if (text.length() != 0)
-					this.appendSubText(text.toString(), false) ;
+				String output = XmlOutput.getPreferenceProductionText(agent, xmlTrace) ;
+				
+				if (output.length() != 0)
+					this.appendSubText(output.toString(), TraceType.kPreference) ;
 				
 			} 
 			else if (xmlTrace.IsTagFiringProduction() || xmlTrace.IsTagRetractingProduction())
 			{
 				boolean firing = xmlTrace.IsTagFiringProduction() ;
 
+				String output = XmlOutput.getProductionFiring(agent, xmlTrace, firing) ;
+				
+				long type = (firing ? TraceType.kFiring : TraceType.kRetraction) ;
+
+				if (output.length() != 0)
+					this.appendSubText(output, type) ;			
+	
+			}
+			else if (xmlTrace.IsTagLearning())
+			{
+				// Building chunk*name
+				// Optionally followed by the production
 				for (int i = 0 ; i < xmlTrace.GetNumberChildren() ; i++)
 				{
-					ClientTraceXML child = new ClientTraceXML() ;
-					xmlTrace.GetChild(child, i) ;
-					if (child.IsTagProduction())
+					ClientTraceXML prod = new ClientTraceXML() ;
+					xmlTrace.GetChild(prod, i) ;
+					if (prod.IsTagProduction())
+					{
+						if (prod.GetNumberChildren() == 0)
+						{
+							// If this production has no children it's just a "we're building x" message.
+							StringBuffer text = new StringBuffer() ;
+							
+							if (i > 0)
+								text.append(kLineSeparator) ;
+							
+							text.append("Building ") ;
+							text.append(prod.GetProductionName()) ;							
+							appendText(text.toString(), TraceType.kLearning) ;			
+						}
+						else
+						{	
+							// If has children we're looking at a full production print
+							// (Note -- we get the "we're building" from above as well as this so we don't
+							// add the "build x" message when this comes in.
+							String prodText = XmlOutput.getProductionText(agent, prod) ;
+							
+							if (prodText != null && prodText.length() != 0)
+								this.appendSubText(prodText, TraceType.kFullLearning) ;			
+						}
+					}
+					prod.delete() ;
+				}
+			}
+			else if (xmlTrace.IsTagCandidate())
+			{
+				// Numeric indifferent preferences
+				String output = XmlOutput.getNumericIndiffernceText(agent, xmlTrace) ;
+				
+				if (output.length() != 0)
+					this.appendSubText(output, TraceType.kNumericIndifferent) ;
+			}
+			else if (xmlTrace.IsTagBacktraceResult() || xmlTrace.IsTagLocals() ||
+					 xmlTrace.IsTagGroundedPotentials() || xmlTrace.IsTagUngroundedPotentials())
+			{
+				String output = XmlOutput.getBacktraceTopLevelText(agent, xmlTrace) ;
+				
+				if (output.length() != 0)
+					this.appendSubText(output, TraceType.kFullLearning) ;
+			}
+			else if (xmlTrace.IsTagMessage() || xmlTrace.IsTagWarning() || xmlTrace.IsTagError() || xmlTrace.IsTagVerbose())
+			{
+				StringBuffer text = new StringBuffer() ;
+				
+				// The body of the message
+				text.append(xmlTrace.GetString()) ;
+				
+				// Some messages can include wmes as part of the report
+				for (int i = 0 ; i < xmlTrace.GetNumberChildren() ; i++)
+				{
+					ClientTraceXML wme = new ClientTraceXML() ;
+					xmlTrace.GetChild(wme, i) ;
+					
+					if (wme.IsTagWme())
 					{
 						if (i > 0)
-							text.append(getLineSeparator()) ;
+							text.append(kLineSeparator) ;
 						
-						text.append(firing ? "Firing " : "Retracting ") ;
-						text.append(child.GetProductionName()) ;
+						String output = XmlOutput.getWmeText(agent, wme) ;
+						text.append(output) ;
 					}
-					child.delete() ;
+					
+					wme.delete() ;
 				}
-
+				
+				// Figure out the type of the message so we can filter it appropriately
+				// We'll classify messages and rhs writes together for now
+				long type = TraceType.kRhsWrite ;
+				if (xmlTrace.IsTagWarning()) type = TraceType.kWarning ;
+				else if (xmlTrace.IsTagVerbose()) type = TraceType.kVerbose ;
+				else if (xmlTrace.IsTagError()) type = TraceType.kError ;
+				
 				if (text.length() != 0)
-					this.appendSubText(text.toString(), false) ;			
-	
+				{
+					if (type != TraceType.kVerbose)
+						this.appendText(text.toString(), type) ;
+					else
+						this.appendSubText(text.toString(), type) ;				}
 			}
 			else
 			{
-				// These lines can be helpful if debugging this
+				// These lines can be helpful if debugging this -- we
+				// print out any XML we completely fail to understand.
 				String xmlText = xmlParent.GenerateXMLString(true) ;
 				System.out.println(xmlText) ;
 			}
@@ -723,7 +830,7 @@ public class FoldingTextView extends AbstractComboView
 		}
 		
 		// Technically this will happen when the object is garbage collected (and finalized)
-		// but without it we'll get a million memory leak messages because (a) gc may not have been run for a while
+		// but without it we'll get a million memory leak messages on shutdown because (a) gc may not have been run for a while
 		// (b) even if it runs not all objects will be reclaimed and (c) finalize isn't guaranteed before we exit
 		// so all in all, let's just call it ourselves here :)
 		xmlParent.delete() ;
@@ -840,18 +947,24 @@ public class FoldingTextView extends AbstractComboView
 	********************************************************************************************/
 	public void showProperties()
 	{
-		PropertiesDialog.Property properties[] = new PropertiesDialog.Property[2] ;
+		PropertiesDialog.Property properties[] = new PropertiesDialog.Property[3] ;
 
 		// Providing a range for indent so we can be sure we don't get back a negative value
 		properties[0] = new PropertiesDialog.IntProperty("Indent per subgoal", m_IndentSize, 0, 10) ;
-		properties[1] = new PropertiesDialog.BooleanProperty("Expand trace as it is created", m_AutoExpand) ;
+		properties[1] = new PropertiesDialog.BooleanProperty("Expand trace as it is created", m_ExpandTracePersistent) ;
+		properties[2] = new PropertiesDialog.BooleanProperty("Capture data to support filtering", m_FoldingText.isFilteringEnabled()) ;
 
 		boolean ok = PropertiesDialog.showDialog(m_Frame, "Properties", properties) ;
 
 		if (ok)
 		{
 			m_IndentSize = ((PropertiesDialog.IntProperty)properties[0]).getValue() ;
-			m_AutoExpand = ((PropertiesDialog.BooleanProperty)properties[1]).getValue() ;
+			m_ExpandTracePersistent = ((PropertiesDialog.BooleanProperty)properties[1]).getValue() ;
+			m_FoldingText.setFilteringEnabled(((PropertiesDialog.BooleanProperty)properties[2]).getValue()) ;
+			
+			// Make the button match the persistent property
+			m_ExpandTrace = m_ExpandTracePersistent ;
+			updateButtonState() ;
 		}		
 	}
 	
@@ -867,7 +980,14 @@ public class FoldingTextView extends AbstractComboView
 	{
 		ElementXML element = super.convertToXML(tagName, storeContent) ;
 		element.addAttribute("indent", Integer.toString(m_IndentSize)) ;
-		element.addAttribute("auto-expand", Boolean.toString(m_AutoExpand)) ;
+		element.addAttribute("auto-expand", Boolean.toString(m_ExpandTracePersistent)) ;
+
+		if (m_FoldingText != null)
+		{
+			element.addAttribute("filtering", Boolean.toString(m_FoldingText.isFilteringEnabled())) ;
+			element.addAttribute("filter", Long.toString(m_FoldingText.getExclusionFilter())) ;
+		}
+		
 		return element ;
 	}
 
@@ -884,7 +1004,19 @@ public class FoldingTextView extends AbstractComboView
 	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.ElementXML element) throws Exception
 	{
 		m_IndentSize = element.getAttributeIntThrows("indent") ;
-		m_AutoExpand = element.getAttributeBooleanDefault("auto-expand", false) ;
-		super.loadFromXML(frame, doc, parent, element) ;		
+		m_ExpandTracePersistent = element.getAttributeBooleanDefault("auto-expand", false) ;
+
+		boolean filtering = element.getAttributeBooleanDefault("filtering", true) ;
+		long filter = element.getAttributeLongDefault("filter", 0) ;
+		
+		super.loadFromXML(frame, doc, parent, element) ;
+		
+		// Have to wait until base class has been called and window has been created before setting these values
+		if (m_FoldingText != null)
+		{
+			m_FoldingText.setFilteringEnabled(filtering) ;
+			m_FoldingText.setExclusionFilter(filter, false) ;
+			updateButtonState() ;
+		}
 	}
 }

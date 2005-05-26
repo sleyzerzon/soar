@@ -55,9 +55,14 @@ public abstract class AbstractView implements AgentFocusListener
 	/** The window which will contain all others within this view */
 	protected Composite		m_Container ;
 	
-	public static String getLineSeparator() { return "\n" ; }
-	public static final String kTagView = "view" ;
+	/** The line separator Soar uses and that we therefore use. */
+	public static final String kLineSeparator = "\n" ;
 	
+	/** The line separator that this platform uses (e.g. Windows has \r\n).  Unless you're sure, you usually want the other one (kLineSeparator) when working with Soar commands/output. **/
+	public static final String kSystemLineSeparator = System.getProperty("line.separator") ;
+	
+	public static final String kTagView = "view" ;
+		
 	/********************************************************
 	 * All AbstractView's need to have a default constructor
 	 * as that's how we build them (using reflection) when
@@ -172,6 +177,14 @@ public abstract class AbstractView implements AgentFocusListener
 	* 
 	*************************************************************************/
 	public abstract String executeAgentCommand(String command, boolean echoCommand) ;
+	
+	/************************************************************************
+	* 
+	* Returns true if this window can display output from commands executed through
+	* the "executeAgentCommand" method.
+	* 
+	*************************************************************************/
+	public abstract boolean canDisplayOutput() ;
 
 	/************************************************************************
 	* 
@@ -202,19 +215,6 @@ public abstract class AbstractView implements AgentFocusListener
 	*************************************************************************/
 	public abstract boolean setFocus() ;
 	public abstract boolean hasFocus() ;
-	
-	public void startLogging(String fileName) throws java.io.IOException
-	{
-	}
-	
-	public void stopLogging()
-	{
-	}
-	
-	public boolean isLogging()
-	{
-		return false;
-	}
 	
 	/************************************************************************
 	* 
@@ -257,7 +257,6 @@ public abstract class AbstractView implements AgentFocusListener
 	/** Close down this window, doing any necessary clean up */
 	public void close(boolean dispose)
 	{
-		stopLogging();
 		unregisterName() ;
 		unregisterForAgentEvents(getAgentFocus()) ;
 
@@ -376,9 +375,6 @@ public abstract class AbstractView implements AgentFocusListener
 		// Some commands are only if we're showing tabs (so names are visible)
 		if (!getPane().isSingleView())
 		{
-			new MenuItem(menu, SWT.SEPARATOR) ;
-			addItem(menu, "Rename window ...", "renameview " + m_Frame.getName() + " " + this.getName()) ;
-			
 			if (getPane().isTabAtTop())
 				addItem(menu, "Move tabs to bottom", "movetabs " + m_Frame.getName() + " " + this.getName() + " bottom") ;
 			else
@@ -386,6 +382,8 @@ public abstract class AbstractView implements AgentFocusListener
 		}
 		new MenuItem(menu, SWT.SEPARATOR) ;
 		addItem(menu, "Replace window ...", "replaceview " + m_Frame.getName() + " " + this.getName()) ;
+		addItem(menu, "Rename window ...", "renameview " + m_Frame.getName() + " " + this.getName()) ;
+		new MenuItem(menu, SWT.SEPARATOR) ;
 		addItem(menu, "Remove window", "removeview " + m_Frame.getName() + " " + this.getName()) ;
 	}
 	

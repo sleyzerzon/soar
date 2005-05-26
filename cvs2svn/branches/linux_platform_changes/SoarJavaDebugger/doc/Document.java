@@ -36,8 +36,11 @@ public class Document
 {
 	public static final String kCreateNewWindowProperty = "Agent.CreateNewWindow" ;
 	
-	/** The properties for this application (holds user preferences) */
-	protected AppProperties m_AppProperties = new AppProperties("SoarDebugger.ini", "Soar Debugger Settings") ;
+	/** This version is used to name the settings files uniquely, so there's no collisions if you use an older debugger.  Should be bumped with every release */
+	public static final String kVersion = "8_6_1" ;
+	
+	/** The properties for this application (holds user preferences).  Version specific with debugger releases (or using an older version of debugger could conflict) */
+	protected AppProperties m_AppProperties = new AppProperties("SoarDebugger" + kVersion + ".ini", "Soar Debugger Settings") ;
 
 	/** The list of all modules (types of debugger windows) that exist.  This is a list of types, not a list of window instances. */
 	private ModuleList m_ModuleList = new ModuleList() ;
@@ -45,7 +48,7 @@ public class Document
 	private SoarChangeGenerator m_SoarChangeGenerator = new SoarChangeGenerator() ;
 
 	/** This object is used to get strings for Soar commands in a version independent way */
-	private SoarCommands		m_SoarCommands = new SoarCommands(this, 8,6,0) ;
+	private SoarCommands		m_SoarCommands = new SoarCommands(this, 8,6,1) ;
 
 	/** Stores the pointer to the Soar kernel we are currently interacting with (can be local to this process or remote) */
 	private Kernel				m_Kernel = null ;
@@ -101,23 +104,19 @@ public class Document
 		
 		// BUGBUG: The name and description should come from the classes.
 		// The list should come from scanning the drive for classes in the modules folder and pulling them in.
-		Module combo1 = new Module("Text Trace Window", "Commands are entered at a prompt.  Output from the commands and trace output from runs is shown in a text window.", modules.TextTraceView.class) ;
-		Module tree   = new Module("Tree Trace Window", "Commands are entered at a prompt and output is displayed in a tree, providing a hierarchical view of the output", TreeTraceView.class) ;
-		Module combo2 = new Module("Auto Update Window", "The user's command is automatically executed at the end of each run.", modules.UpdateCommandView.class) ;
-		Module combo3 = new Module("Keep Window", "Commands are entered at a prompt and the results are displayed in a scrolling text window.  Trace output from runs is not shown.", modules.KeepCommandView.class) ;
-		Module combo4 = new Module("Button Bar", "A collection of user-customizable buttons", modules.ButtonView.class) ;
-		Module edit = new Module("Edit Production Window", "A window used to edit a production and then load it into Soar", modules.EditorView.class) ;
-		Module fold = new Module("Folding Trace Window", "Output from commands and trace output from runs is shown in a folding text window.", FoldingTextView.class) ;
-		Module structuredText = new Module("Structured Text Window", "This is a TEST view.  It displays strucuted output as strings in a text window -- for speed comparisons.", StructuredTextView.class) ;
+		Module textTrace = new Module("Text Trace Window", "Commands are entered at a prompt.  Output from the commands and trace output from runs is shown in a text window.", modules.TextTraceView.class) ;
+		Module update 	 = new Module("Auto Update Window", "The user's command is automatically executed at the end of each run.", modules.UpdateCommandView.class) ;
+		Module keep 	 = new Module("Keep Window", "Commands are entered at a prompt and the results are displayed in a scrolling text window.  Trace output from runs is not shown.", modules.KeepCommandView.class) ;
+		Module button 	 = new Module("Button Bar", "A collection of user-customizable buttons", modules.ButtonView.class) ;
+		Module edit 	 = new Module("Edit Production Window", "A window used to edit a production and then load it into Soar", modules.EditorView.class) ;
+		Module fold 	 = new Module("Folding Trace Window", "Output from commands and trace output from runs is shown in a folding text window.", FoldingTextView.class) ;
 
-		m_ModuleList.add(combo1) ;
-		m_ModuleList.add(tree) ;
-		m_ModuleList.add(combo2) ;
-		m_ModuleList.add(combo3) ;
-		m_ModuleList.add(combo4) ;
+		m_ModuleList.add(textTrace) ;
+		m_ModuleList.add(update) ;
+		m_ModuleList.add(keep) ;
+		m_ModuleList.add(button) ;
 		m_ModuleList.add(edit) ;
 		m_ModuleList.add(fold) ;
-		m_ModuleList.add(structuredText) ;
 	}
 		
 	/** Gives us a frame to work with */

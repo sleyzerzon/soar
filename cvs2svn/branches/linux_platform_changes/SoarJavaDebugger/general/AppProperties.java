@@ -70,6 +70,17 @@ public class AppProperties extends java.util.Properties
 			// Add the Application Data folder name.
 			// BUGBUG: Not sure how to do this in a language neutral way.
 			homeDir = new File(homeDir, "Application Data") ;
+			
+			// Create a SoarDebugger subfolder if necessary
+			homeDir = new File(homeDir, "SoarDebugger") ;
+			
+			if (!homeDir.exists())
+			{
+				// mkdirs makes the entire path
+				// (which could matter if we're on a foreign language system with no
+				//  ApplicationData folder)
+				homeDir.mkdirs() ;
+			}
 		}
 		
 		// If this is Unix we want to just store our settings in the

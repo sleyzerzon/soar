@@ -59,7 +59,7 @@ public class MainFrame
 	public static final FontData kDefaultFontData = new FontData("Courier New", 8, SWT.NORMAL) ;
 
 	private static final String kNoAgent = "<no agent>";
-	private static String m_WindowLayoutFile = "SoarDebuggerWindows.dlf";
+	private static String m_WindowLayoutFile = "SoarDebuggerWindows" + Document.kVersion + ".dlf";
 
 	private Composite m_Parent = null;
 
@@ -318,8 +318,6 @@ public class MainFrame
 		// Keep track of the fact that we're in the act of closing this window
 		m_bClosing = true;
 		
-		m_MainWindow.stopAllLogging();
-
 		// Need to explicitly release the focus which in turn will cause any
 		// listeners to unregister
 		// from this agent (is its still alive). Otherwise our listeners will
@@ -530,6 +528,9 @@ public class MainFrame
 	/** Look up the view based on its name **/
 	public AbstractView getView(String viewName)
 	{
+		if (viewName == null)
+			return null ;
+		
 		AbstractView view = m_NameMap.getView(viewName) ;
 		return view ;
 	}
@@ -624,6 +625,10 @@ public class MainFrame
 		{
 			setTextFont(new FontData(fontName, fontSize, fontStyle));
 		}
+		else
+		{
+	  		setTextFont(kDefaultFontData) ;  		
+		}
 
 		// Make sure our menus are enabled correctly
 		updateMenus();
@@ -707,6 +712,16 @@ public class MainFrame
 	public AbstractView getPrimeView()
 	{
 		return m_MainWindow.getPrimeView();
+	}
+
+	public AbstractView[] getAllViews()
+	{
+		return m_MainWindow.getAllViews(false) ;
+	}
+
+	public AbstractView[] getAllOutputViews()
+	{
+		return m_MainWindow.getAllViews(true) ;
 	}
 
 	/**
