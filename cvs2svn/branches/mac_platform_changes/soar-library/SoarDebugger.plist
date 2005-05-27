@@ -7,7 +7,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>Soar Debugger, Copyright University of Michigan 2005.</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.umich.toh</string>
+	<string>edu.umich.soar.debugger</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -25,7 +25,7 @@
 		<key>ClassPath</key>
 		<string>/usr/local/soar/swt/swt.jar:/usr/local/soar/swt/swt-pi.jar:$JAVAROOT/sml.jar:$JAVAROOT/SoarJavaDebugger.jar</string>
 		<key>MainClass</key>
-		<string>debuger.Application</string>
+		<string>debugger.Application</string>
 		<key>VMOptions</key>
 		<string>-Djava.library.path=/usr/local/soar/lib:/usr/local/soar/swt</string>
 	</dict>
