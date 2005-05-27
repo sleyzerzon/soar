@@ -5,9 +5,9 @@
 	<key>CFBundleExecutable</key>
 	<string>java_swt</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Missionaries and Cannibals, Copyright University of Michigan 2005.</string>
+	<string>Soar Debugger, Copyright University of Michigan 2005.</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.umich.soar.mac</string>
+	<string>edu.umich.toh</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -23,9 +23,9 @@
 	<key>Java</key>
 	<dict>
 		<key>ClassPath</key>
-		<string>/usr/local/soar/swt/swt.jar:/usr/local/soar/swt/swt-pi.jar:$JAVAROOT/sml.jar:$JAVAROOT/mac.jar</string>
+		<string>/usr/local/soar/swt/swt.jar:/usr/local/soar/swt/swt-pi.jar:$JAVAROOT/sml.jar:$JAVAROOT/toh.jar</string>
 		<key>MainClass</key>
-		<string>edu.umich.mac.MissionariesAndCannibals</string>
+		<string>debuger.Application</string>
 		<key>VMOptions</key>
 		<string>-Djava.library.path=/usr/local/soar/lib:/usr/local/soar/swt</string>
 	</dict>
