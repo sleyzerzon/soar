@@ -23,16 +23,16 @@
 	<key>Java</key>
 	<dict>
 		<key>ClassPath</key>
-		<string>/usr/local/soar/swt/swt.jar:/usr/local/soar/swt/swt-pi.jar:$JAVAROOT/sml.jar:$JAVAROOT/SoarJavaDebugger.jar</string>
+		<string>/Applications/Soar/swt/swt.jar:/Applications/Soar/swt/swt-pi.jar:$JAVAROOT/sml.jar:$JAVAROOT/SoarJavaDebugger.jar</string>
 		<key>MainClass</key>
 		<string>debugger.Application</string>
 		<key>VMOptions</key>
-		<string>-Djava.library.path=/usr/local/soar/lib:/usr/local/soar/swt</string>
+		<string>-Djava.library.path=/Applications/Soar/lib:/Applications/Soar/swt</string>
 	</dict>
 	<key>LSEnvironment</key>
 	<dict>
 		<key>DYLD_LIBRARY_PATH</key>
-		<string>/usr/local/soar/lib</string>
+		<string>/Applications/Soar/lib</string>
 	</dict>
 </dict>
 </plist>
