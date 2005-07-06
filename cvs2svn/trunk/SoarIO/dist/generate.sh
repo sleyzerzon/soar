@@ -40,13 +40,8 @@ cd ${PACKAGE_ROOT}; autoreconf 2>/dev/null
 
 # Add binaries and data
 cp ${DEV_ROOT}/soar-library/swt.jar ${PACKAGE_ROOT}/soar-library
-cp ${DEV_ROOT}/soar-library/SoarJavaDebugger.jar ${PACKAGE_ROOT}/soar-library
-cp ${DEV_ROOT}/soar-library/TestJavaSML.jar ${PACKAGE_ROOT}/soar-library
-cp ${DEV_ROOT}/soar-library/mac.jar ${PACKAGE_ROOT}/soar-library
-cp ${DEV_ROOT}/soar-library/toh.jar ${PACKAGE_ROOT}/soar-library
 mkdir ${PACKAGE_ROOT}/soar-library/mac
 cp ${DEV_ROOT}/soar-library/mac/* ${PACKAGE_ROOT}/soar-library/mac
-cp ${DEV_ROOT}/soar-library/VisualSoar.jar ${PACKAGE_ROOT}/soar-library
 
 # Remove unwanted files
 rm -rf ${PACKAGE_ROOT}/soar-library/*.dll
