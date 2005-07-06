@@ -221,22 +221,23 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 	// We want to wait for a long time.  We used to set this to 0 and just poll the socket,
 	// but that means we're consuming all of the CPU.  Setting a long wait doesn't
 	// impact performance because we're not trying to do anything else other than get a response here.
-	int waitForMessageTime = 1000 ;
+	long waitForMessageTimeSeconds = 1 ;
+	long waitForMessageTimeMicroseconds = 0 ;
 
-#ifdef __APPLE__
+/*#ifdef __APPLE__
 	// FIXME
 	// There's something wrong with OS X's implementation of something (probably the select function), so this is a workaround
 	// This basically means OS X will poll instead of using select's timeout
 	sleepTime = 1;
 	waitForMessageTime = 0;
-#endif
+#endif*/
 
 	// If we don't already have this response cached,
 	// then read any pending messages.
 	do
 	{
 		// Loop until there are no more messages waiting on the socket
-		while (ReceiveMessages(false, waitForMessageTime))
+		while (ReceiveMessages(false, waitForMessageTimeSeconds, waitForMessageTimeMicroseconds))
 		{
 			// Check each message to see if it's a match
 			if (DoesResponseMatch(m_pLastResponse, pID))
@@ -283,10 +284,10 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 *************************************************************/
 bool RemoteConnection::ReceiveMessages(bool allMessages)
 {
-	return ReceiveMessages(allMessages, 0) ;
+	return ReceiveMessages(allMessages, 0, 0) ;
 }
 
-bool RemoteConnection::ReceiveMessages(bool allMessages, int millisecondsWait)
+bool RemoteConnection::ReceiveMessages(bool allMessages, long secondsWait, long microsecondsWait)
 {
 	// Make sure only one thread is sending messages at a time
 	// (This allows us to run a separate thread in clients polling for events even
@@ -312,7 +313,7 @@ bool RemoteConnection::ReceiveMessages(bool allMessages, int millisecondsWait)
 
 		// Only check for read data after we've checked that the socket is still alive.
 		// (This is because IsReadData can't signal the difference between a dead connection and no data)
-		haveData = m_Socket->IsReadDataAvailable(millisecondsWait) ;
+		haveData = m_Socket->IsReadDataAvailable(secondsWait, microsecondsWait) ;
 		if (!haveData)
 			break ;
 
