@@ -3,7 +3,7 @@
 # Set up directories
 DIST_ROOT=${HOME}/soar/dist
 DEV_ROOT=${HOME}/soar/dev
-PACKAGE_ROOT=${DIST_ROOT}/Soar-Suite-8.6.1-r2
+PACKAGE_ROOT=${DIST_ROOT}/Soar-Suite-8.6.1
 REVISION=HEAD
 
 # Out with the old
@@ -31,6 +31,10 @@ mv ${PACKAGE_ROOT}/SoarIO/dist/build-everything.sh ${PACKAGE_ROOT}
 mv ${PACKAGE_ROOT}/SoarIO/dist/missing ${PACKAGE_ROOT}
 rm -rf ${PACKAGE_ROOT}/SoarIO/dist
 
+# Copy top level docs
+cp $PACKAGE_ROOT/SoarIO/COPYING $DIST_ROOT/Soar-Suite-8.6.1/license.txt
+cp $PACKAGE_ROOT/Documentation/announce.txt $DIST_ROOT/Soar-Suite-8.6.1
+
 # Initialize configure scripts (this recurses)
 cd ${PACKAGE_ROOT}; autoreconf 2>/dev/null
 
@@ -50,4 +54,4 @@ rm -rf ${PACKAGE_ROOT}/soar-library/java_swt ${PACKAGE_ROOT}/soar-library/libswt
 
 # Create the tarball
 cd ${DIST_ROOT}
-tar cfj Soar-Suite-8.6.1-r2.tar.bz2 Soar-Suite-8.6.1-r2
+tar cfj Soar-Suite-8.6.1.tar.bz2 Soar-Suite-8.6.1
