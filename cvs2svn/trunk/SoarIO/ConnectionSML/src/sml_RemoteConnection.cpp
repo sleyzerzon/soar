@@ -22,6 +22,8 @@
 #include "sock_Debug.h"
 #include "thread_Thread.h"
 
+#include <assert.h>
+
 using namespace sml ;
 
 RemoteConnection::RemoteConnection(bool sharedFileSystem, sock::Socket* pSocket)
@@ -289,6 +291,8 @@ bool RemoteConnection::ReceiveMessages(bool allMessages)
 
 bool RemoteConnection::ReceiveMessages(bool allMessages, long secondsWait, long microsecondsWait)
 {
+	assert(microsecondsWait<1000000 && "specified microseconds must be less than 1000000");
+
 	// Make sure only one thread is sending messages at a time
 	// (This allows us to run a separate thread in clients polling for events even
 	//  when the client is sleeping, but we don't want them both to be sending/receiving at the same time).

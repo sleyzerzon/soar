@@ -330,7 +330,8 @@ bool Socket::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 /////////////////////////////////////////////////////////////////////
 bool Socket::IsReadDataAvailable(long secondsWait, long microsecondsWait)
 {
-	assert(microsecondsWait<1000000 && "specified microseconds exceeds 1000000");
+	assert(microsecondsWait<1000000 && "specified microseconds must be less than 1000000");
+
 	CTDEBUG_ENTER_METHOD("Socket::IsReadDataAvailable");
 
 	SOCKET hSock = m_hSocket ;
