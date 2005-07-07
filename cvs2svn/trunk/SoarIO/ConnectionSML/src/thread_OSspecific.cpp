@@ -187,8 +187,7 @@ public:
 		pthread_mutex_unlock(&m_mutex); 
 	}
 	bool WaitForEvent(long milli)	{
-		return false;
-		/*
+		//return false;
 		pthread_mutex_lock(&m_mutex);
 		
 		struct timeval now;
@@ -212,7 +211,6 @@ public:
 		m_signaled = false;
 		pthread_mutex_unlock(&m_mutex);
 		return true;
-		*/
 	}
 	void TriggerEvent()				{ 
 		pthread_mutex_lock(&m_mutex); 
