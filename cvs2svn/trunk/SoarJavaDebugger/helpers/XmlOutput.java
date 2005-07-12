@@ -165,6 +165,9 @@ public class XmlOutput
 		
 		String firingType = xmlTrace.GetFiringType() ;
 		
+		String msg = xmlTrace.GenerateXMLString(true) ;
+		System.out.println(msg) ;
+		
 		text.append("--- ") ;
 		text.append(xmlTrace.GetPhaseName()) ;
 		text.append(" ") ;

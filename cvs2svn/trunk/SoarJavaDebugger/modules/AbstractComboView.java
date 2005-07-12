@@ -76,6 +76,7 @@ public abstract class AbstractComboView extends AbstractView
 	
 	protected boolean   m_Updating = false ;
 	
+	/** Record a copy of the text in the combo box.  We do this so we can look up this value when executing in a non-UI thread. */
 	protected String	m_CurrentCommand ;
 			
 	/** The history of commands for this window */
@@ -262,6 +263,9 @@ public abstract class AbstractComboView extends AbstractView
 		// Listen for key presses on the combo box so we know when the user presses return
 		m_CommandCombo.addKeyListener(new KeyAdapter() { public void keyPressed(KeyEvent e) { comboKeyPressed(e) ; } }) ;
 		
+		// Listen for changes to the text in the combo box so we can keep track of what's currently entered
+		m_CommandCombo.addModifyListener(new ModifyListener() { public void modifyText(ModifyEvent e) { comboTextModified(e) ; } } ) ;
+		
 		// Decide how many rows to show in the combo list
 		m_CommandCombo.setVisibleItemCount(this.m_CommandHistory.kMaxHistorySize > 10 ? 10 : this.m_CommandHistory.kMaxHistorySize) ;
 
@@ -322,8 +326,13 @@ public abstract class AbstractComboView extends AbstractView
 			String command = combo.getText() ;
 			commandEntered(command, true) ;	
 		}
-		
+	}
+	
+	private void comboTextModified(ModifyEvent e)
+	{
+		Combo combo = (Combo)e.getSource() ;
 		m_CurrentCommand = combo.getText() ;
+		//System.out.println("Current command is " + m_CurrentCommand) ;
 	}
 	
 	private void makeComboBoxMatchHistory(boolean placeTopItemInCombo)
@@ -340,7 +349,8 @@ public abstract class AbstractComboView extends AbstractView
 			m_CommandCombo.setText(history[0]) ;
 		else
 			m_CommandCombo.setText(text) ;
-		
+
+		// Make sure our cache of what's stored in the combo box is up to date
 		m_CurrentCommand = m_CommandCombo.getText() ;
 	}	
 		
