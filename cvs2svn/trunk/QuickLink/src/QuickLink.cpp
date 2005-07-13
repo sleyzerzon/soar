@@ -224,7 +224,7 @@ QuickLink::advMode()
 		else if (first == _QUIT)  //quit program
 		{
 			promptToSave();
-			pKernel->DestroyAgent(pAgent);
+			pKernel->Shutdown();
 			delete pKernel;
 			exit(0);
 		}
