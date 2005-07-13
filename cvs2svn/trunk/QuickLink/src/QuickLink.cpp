@@ -1304,6 +1304,8 @@ QuickLink::locFinder()
 {
 	string fileName;
 	string tmp;
+	char garbage;
+	cin.get(garbage);
 	while(cin.peek() != '\n')
 	{
 		cin >> tmp;
@@ -1312,7 +1314,7 @@ QuickLink::locFinder()
 		fileName += tmp;
 	}
 	
-	string location = "QuickLink\\ProcessesAndStructures\\";
+	string location = "";//QuickLink\\ProcessesAndStructures\\";
 
 	loc = location + fileName;	
 
