@@ -144,9 +144,12 @@ $kernel UnregisterForAgentEvent $agentCallbackId2
 $kernel UnregisterForSystemEvent $systemCallbackId
 $kernel RemoveRhsFunction $rhsCallbackId
 
+#shutdown the kernel; this makes sure agents are deleted and events fire correctly
+$kernel Shutdown
+
 #give Tcl object ownership of underlying C++ object so when we delete the Tcl object they both get deleted
 set result [$kernel -acquire]
-#delete kernel object (this will also delete any agents that are still around)
+#delete kernel object
 set result [$kernel -delete]
 #don't leave bad pointers around
 unset agent
@@ -182,7 +185,9 @@ red eval $agent Commit
 set timetag [red eval $wme GetTimeTag]
 puts "timetag = $timetag"
 
-#delete the kernel (automatically deletes the agent, too)
+#shutdown the kernel; this makes sure agents are deleted and events fire correctly
+red eval $kernel Shutdown
+#delete the kernel
 red eval $kernel -acquire
 red eval $kernel -delete
 
