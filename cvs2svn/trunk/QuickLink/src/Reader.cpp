@@ -228,6 +228,12 @@ Reader::ReadMe(istream* in)
 		}
 		return toReturn;
 	}
+	else if(QL->first == "SPAWN")
+	{
+		QL->spawnDebug();
+		toReturn = "***VOIDRETURN";
+		return toReturn;
+	}
 	else 
 	{
 		char cmd[1000] ;  //used to get entire line including spaces

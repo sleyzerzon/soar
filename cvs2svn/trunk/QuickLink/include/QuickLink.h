@@ -174,9 +174,6 @@ private:
 	bool displayTrips(string lookfor, string indent);
 	//prints output nicely
 
-	void advMode();
-	//mode for advanced users
-
 	void advValue();
     //figures out what type a value is
 
@@ -224,7 +221,6 @@ private:
 
 	void OSFinder();
 
-	void processLoader(ifstream & pFile);
 
 	void CallParser(istream* in);
 };
