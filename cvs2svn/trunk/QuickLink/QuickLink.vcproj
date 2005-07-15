@@ -119,6 +119,9 @@
 			<File
 				RelativePath=".\src\QuickLink.cpp">
 			</File>
+			<File
+				RelativePath=".\src\Reader.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -126,6 +129,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\include\QuickLink.h">
+			</File>
+			<File
+				RelativePath=".\include\Reader.h">
 			</File>
 		</Filter>
 		<Filter

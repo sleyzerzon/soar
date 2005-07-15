@@ -15,7 +15,9 @@
 
 #include "sml_Client.h"
 #include "QuickLink.h"
+#include "Reader.h"
 #include <string>
+#include <istream>
 #include <iostream>
 #include <vector>
 #include <cctype>
@@ -78,30 +80,15 @@ QuickLink::QuickLink()
 	Fvalue = 0; Ivalue = 0; counter = 0;
 	
 	pOnce = true, printStep = false, Icycle = true, printTree = false;
+	loadingStep = false, StuffToSave = false;
 
-	//******CONSTANTS FOR PARSER******
-	_QUIT = "QUIT";	_CLEAR = "CLEAR";	_SAVE = "SAVE";	_SAVES = "S";	_LOAD = "LOAD";
-	_LOADS = "L";	_ADD = "ADD";	_ADDS = "A";	_CHANGE = "CHANGE";	_CHANGES = "C";
-	_DELETE = "DELETE";	_DELETES = "D";	_DONE = "DONE";	_NEWP = "CLEARP";	_NEWPS = "CP";
-	_LOADP = "LOADP";	_LOADPS = "LP";	_SAVEP = "SAVEP";	_SAVEPS = "SP";	_ENDP = "ENDP";
-	_ENDPS = "EP";	_RUNCS = "RC";	_RUNC = "RUNCYCLE";	_RUN = "RUN";	_RUNS = "R";
-	_LASTOS = "LO";	_LASTO = "LASTOUTPUT"; _CMDLIN = "CMDLIN"; _CL = "CL"; _SOAR_FORM = "SOAR-FORM";
-	_SF = "SF"; _TREE_FORM = "TREE-FORM"; _TF = "TF";
-
+	
 	SoarSetup();
 }
 
 void
 QuickLink::SoarSetup()
 {
-	/*if(OS == "windows")
-		spawnDebug();  
-	else	
-	{
-		cout << "Launch the debugger and connect it to QuickLink" << endl;
-		WhenReady();
-	}*/
-
 	cout << endl << "Launch the debugger and connect it to QuickLink" << endl;
 	WhenReady();
 
@@ -116,188 +103,65 @@ QuickLink::SoarSetup()
 void 
 QuickLink::Run()
 {
+	
 	while (true)
 	{
 		printStep = false;  //used to print step of process
 		if (pCommand == "NEW" || pCommand == "RUN") //not running a process
-			advMode();
+		{
+			CallParser(&cin);
+		}
 		else if (inFile) //process file is open and has things left to load
 		{			
-			counter++;  //used to print step of process
+			//counter++;  //used to print step of process
 			printStep = true;  //used to print step of process
 			loadProcess();
-			advMode();	
+			CallParser(&inFile);	
 			pOnce = true;  //flag set so that end process message will be printed
 		}
 		else if (!inFile && pOnce)
 			endProcess();
 		else
-			advMode();
+		{
+			CallParser(&cin);
+		}
 
 		OutputCycle();
 		pKernel->CheckForIncomingCommands();
 	}
+
 	pKernel->DestroyAgent(pAgent);
+	pKernel->Shutdown();
 	delete pKernel;
 
 	return;
 }
 
-
-
-void 
-QuickLink::advMode()
+void
+QuickLink::CallParser(istream* in)
 {
+	Reader GetInfo(this);
 	Icycle = true;
 	//******INPUT******
-	cout << "******INPUT****** " << endl << endl;
+	if(*in == cin)
+		cout << "******INPUT****** " << endl << endl;
+	else
+		loadingStep = true;
 
 	while (Icycle)
 	{
+		if(userInput)
+			in = &cin;
 		PrintWorkingMem();
-
-		cout << "> ";
-		cin >> first;
+		if(*in == cin)
+			cout << "> ";
+		*in >> first;
 		makeUpper(first);
+		
 
-		if (first == _CLEAR)  //clear current input-link structure
-			clearAll();
-		else if (first == _SAVE || first == _SAVES)  //save current input-link structure
-		{
-			locFinder();  //gets location of file
-			ofstream tempFile;
-			tempFile.open(loc.c_str());
-			saveInput(true,tempFile);
-			tempFile.close();
-			tempFile.clear();
-		}
-		else if (first == _LOAD || first == _LOADS)  //load a saved input-link structure
-		{
-			locFinder();
-			ifstream tmpFile;
-			tmpFile.open(loc.c_str());
-			loadInput(tmpFile);
-			tmpFile.close();
-			tmpFile.clear();
-		}
-		else if (first == _ADD || first == _ADDS)  //add something to il structure
-		{
-			cin >> second >> third >> fourth;  //used to make parser changes easier
-			parent = second;
-			path = third.substr(1, third.size()-1); //gets rid of ^
-			if(fourth[0] == '#')  //IDENTIFER
-			{				
-				uniqid = fourth.substr(1, fourth.size()-1); //gets rid of #
-				createID();
-			}
-			else //VALUE_BASED
-			{
-				value = fourth;
-				advValue();
-			}
-		}
-		else if (first == _CHANGE || first == _CHANGES) //change the value of something
-		{
-			cin >> second >> third >> fourth >> fifth;
-			parent = second;
-			path = third.substr(1, third.size()-1);  //gets rid of ^
-			OldVal = fourth;
-			NewVal = fifth;
-			advAlter();
-		}
-		else if (first == _DELETE || first == _DELETES) //delete an element
-		{
-			cin >> second >> third >> fourth;
-			parent = second;
-			path = third.substr(1,third.size()-1);  //gets rid of ^
-			if(fourth[0] == '#') //IDENTIFIER
-			{
-				uniqid = fourth.substr(1,fourth.size()-1);  //gets rid of #
-				advDelInd();
-			}
-			else //VALUE_BASE
-			{
-				value = fourth;
-				advDelVal();
-			}
-		}
-		else if (first == _QUIT)  //quit program
-		{
-			promptToSave();
-			pKernel->Shutdown();
-			delete pKernel;
-			exit(0);
-		}
-		else if (first == _NEWP || first == _NEWPS)  //clears process memory
-		{
-			promptToSave();
-			aProc.resize(0);
-			clearAll();			
-		}
-		else if (first == _LOADP || first == _LOADPS) //load a process
-		{
-			clearAll();
-			pCommand = "LOAD";  //flags used to indicate loading a process for other events
-			first = "DONE";
-			locFinder();
-			cout << endl;
-			inFile.open(loc.c_str());
-			printStep = true;
-			loadProcess();
-			counter++;
-		}
-		else if (first == _SAVEP || first == _SAVEPS) //save process
-			saveProcChanges();
-		else if (first == _ENDPS || first == _ENDP) //end loaded process
-		{
-			if(pCommand == "LOAD")
-				endProcess();
-		}
-		else if (first == _RUNS || first == _RUN)  //run soar til output
-		{
-			SC.resize(0);   //clears output storage
-			Icycle = false;  //gets out of outer loop
-			forAlterProc();  //saves current input-link structure to process memory
-			pAgent->RunSelfTilOutput(15);
-		}
-		else if(first == _RUNC || first == _RUNCS)  //run soar for n cycles
-		{
-			SC.resize(0); //clears output storage
-			int amount;
-			cin >> amount;
-			if(amount > 15)
-				amount = 15;
-			Icycle = false;
-			forAlterProc();  //saves current input-link structure to process memory
-			pAgent->RunSelf(amount);
-		}
-		else if(first == _LASTO || first == _LASTOS)  //re-print last output
-		{
-			cout << endl;
-			printOutput();
-		}
-		else if(first == _CMDLIN || first == _CL)  //execute command line command
-		{
-			char cmd[1000] ;  //used to get entire line including spaces
-			cin.getline(cmd,1000) ;
-			string strcmd = cmd;
-			cout << endl << pKernel->ExecuteCommandLine(strcmd.c_str(), pAgent->GetAgentName()) << endl;
-		}
-		else if(first == _TF || first == _TREE_FORM)  //print structures in tree-form
-		{
-			cout << endl << "***Structures will now be printed in Tree-form***" << endl;
-			printTree = true;
-		}
-		else if (first == _SF || first == _SOAR_FORM)  //print structures in soar-form
-		{
-			cout << endl << "***Structures will now be printed in Soar-form***" << endl;
-			printTree = false;
-		}
-		else 
-		{
-			cout << "***INVALID COMMAND***" << endl;
-			WhenReady();
-		}		
+		toStore = GetInfo.ReadMe(in);	
+		if(toStore != "***VOIDRETURN***")
+			commandStore.push_back(toStore);
 	}
 	pAgent->Commit();
 }
@@ -305,7 +169,7 @@ QuickLink::advMode()
 void
 QuickLink::loadProcess()
 {
-	loadInput(inFile);
+	CallParser(&inFile);
 	pAgent->Commit();
 }
 
@@ -322,55 +186,93 @@ QuickLink::advValue()  //figure out what type the value is
 	{
 		command = "FLOAT";  //flag for createEL
 		Fvalue = static_cast<float>(atof(value.c_str()));
-		createEL();			
+		bool tester = true;
+		for(unsigned int i = 0; i < FEs.size() && tester; i++)  //checks to see if element already exists
+		{
+			if(FEparent[i] == parent && FEnames[i] == path && FEvalue[i] == Fvalue)
+				tester = false;
+		}
+		if(tester)	
+		{
+			
+			createEL();	
+		}				
 	}
 	else if(isdigit(value[0])) //value is int
 	{
 		command = "INT";  //flag for createEL
-        Ivalue = atoi(value.c_str());
-		createEL();
+		Ivalue = atoi(value.c_str());
+		bool tester = true;
+		for(unsigned int i = 0; i < IEs.size() && tester; i++)  //checks to see if element already exists
+		{
+			if(IEparent[i] == parent && IEnames[i] == path && IEvalue[i] == Ivalue)
+				tester = false;
+		}
+		if(tester)
+		{
+			
+			createEL();
+		}
 	}
 	else //value is string
 	{
-		command = "STRING";  //flag for createEL
-		createEL();
+		bool tester = true;
+		for(unsigned int i = 0; i < SEs.size() && tester; i++)  //checks to see if element already exists
+		{
+			if(SEparent[i] == parent && SEnames[i] == path && SEvalue[i] == value)
+				tester = false;
+		}
+		if(tester)	
+		{
+			command = "STRING";  //flag for createEL
+			createEL();
+		}		
 	}
 }
 
 void
 QuickLink::createID()
 {
-	if(parent == "il")
+	bool tester = true;
+	for(unsigned int i = 0; i < IDs.size() && tester; i++)  //checks to see if element already exists
 	{
-		sml::Identifier* temp1;
-		temp1 = pAgent->CreateIdWME(pInputLink, path.c_str());
-		IDnames.push_back(path);
-		IDparent.push_back(parent);
-		IDsoar.push_back(uniqid);
-		IDs.push_back(temp1);
+		if(IDparent[i] == parent && IDnames[i] == path && IDsoar[i] == uniqid)
+			tester = false;
 	}
-	else
+	if(tester)	
 	{
-		int iI = -1;
-		for(unsigned int i = 0; i < IDs.size(); i++)
-		{
-			if(IDsoar[i] == parent)
-				iI = i;
-		}
-		if(iI == -1)  //parent doesn't exist
-		{
-			cout << endl << "ERROR: Parent name not found!" << endl << endl;
-			WhenReady();
-		}
-		else
+		if(parent == "IL")
 		{
 			sml::Identifier* temp1;
-			temp1 = pAgent->CreateIdWME(IDs[iI], path.c_str());
+			temp1 = pAgent->CreateIdWME(pInputLink, path.c_str());
 			IDnames.push_back(path);
 			IDparent.push_back(parent);
 			IDsoar.push_back(uniqid);
 			IDs.push_back(temp1);
-		}					
+		}
+		else
+		{
+			int iI = -1;
+			for(unsigned int i = 0; i < IDs.size(); i++)
+			{
+				if(IDsoar[i] == parent)
+					iI = i;
+			}
+			if(iI == -1)  //parent doesn't exist
+			{
+				cout << endl << "ERROR: Parent name not found!" << endl << endl;
+				WhenReady();
+			}
+			else
+			{
+				sml::Identifier* temp1;
+				temp1 = pAgent->CreateIdWME(IDs[iI], path.c_str());
+				IDnames.push_back(path);
+				IDparent.push_back(parent);
+				IDsoar.push_back(uniqid);
+				IDs.push_back(temp1);
+			}					
+		}
 	}
 }
 
@@ -384,7 +286,7 @@ QuickLink::createEL()
 		if(IDsoar[i] == parent)
 			pI = i;
 	}
-	if(pI == -1 && parent != "il") //parent doesn't exist
+	if(pI == -1 && parent != "IL") //parent doesn't exist
 	{
 		cout << endl << "ERROR: Parent name not found!" << endl << endl;
 		WhenReady();
@@ -395,7 +297,7 @@ QuickLink::createEL()
 		{
 			SEnames.push_back(path);
 			SEvalue.push_back(value);
-			if(parent == "il")  //create on input-link
+			if(parent == "IL")  //create on input-link
 			{
 				SEparent.push_back(parent);
 				sml::StringElement* temp2 = pAgent->CreateStringWME(pInputLink, path.c_str(), value.c_str());
@@ -413,7 +315,7 @@ QuickLink::createEL()
 		{
             IEnames.push_back(path);
 			IEvalue.push_back(Ivalue);
-			if(parent == "il")
+			if(parent == "IL")
 			{
 				IEparent.push_back(parent);
 				sml::IntElement* temp3 = pAgent->CreateIntWME(pInputLink, path.c_str(), Ivalue);
@@ -430,7 +332,7 @@ QuickLink::createEL()
 		{
 			FEnames.push_back(path);
 			FEvalue.push_back(Fvalue);
-			if(parent == "il")
+			if(parent == "IL")
 			{
 				FEparent.push_back(parent);
 				sml::FloatElement* temp4 = pAgent->CreateFloatWME(pInputLink, path.c_str(), Fvalue);
@@ -450,34 +352,39 @@ QuickLink::createEL()
 void
 QuickLink::PrintWorkingMem()
 {
-	cout << endl << "******CURRENT INPUT-LINK STRUCTURE******" << endl << endl;
-	if (printStep)
+	if(!loadingStep)
 	{
-		cout << "******Step " << counter << " of Process " << processExt << "******" << endl << endl;
-	}
-	//Resize all to size of respective element number
-	IDprint.resize(IDs.size());
-	FEprint.resize(FEs.size());
-	IEprint.resize(IEs.size());
-	SEprint.resize(SEs.size());
+		cout << endl << "******CURRENT INPUT-LINK STRUCTURE******" << endl << endl;
+		if (printStep)
+		{
+			cout << "******Step " << counter << " of Process " << processExt << "******" << endl << endl;
+		}
+		//Resize all to size of respective element number
+		IDprint.resize(IDs.size());
+		FEprint.resize(FEs.size());
+		IEprint.resize(IEs.size());
+		SEprint.resize(SEs.size());
 
-	//set all to false
-	for(unsigned int i = 0; i < IDs.size(); i++)
-		IDprint[i] = false;
-	for(unsigned int i = 0; i < IEs.size(); i++)
-		IEprint[i] = false;
-	for(unsigned int i = 0; i < SEs.size(); i++)
-		SEprint[i] = false;
-	for(unsigned int i = 0; i < FEs.size(); i++)
-		FEprint[i] = false;
-	if(printTree)
-	{
-		cout << "^input-link [il]" << endl;
-		WMrecurse("il","  ",true);
+		//set all to false
+		for(unsigned int i = 0; i < IDs.size(); i++)
+			IDprint[i] = false;
+		for(unsigned int i = 0; i < IEs.size(); i++)
+			IEprint[i] = false;
+		for(unsigned int i = 0; i < SEs.size(); i++)
+			SEprint[i] = false;
+		for(unsigned int i = 0; i < FEs.size(); i++)
+			FEprint[i] = false;
+		if(printTree)
+		{
+			cout << "^input-link [IL]" << endl;
+			WMrecurse("IL","  ",true);
+		}
+		else
+			printSoarInForm();	
+		cout << endl;
 	}
-	else
-		printSoarInForm();	
-	cout << endl;
+	
+	
 	
 }
 
@@ -554,15 +461,15 @@ QuickLink::printSoarInForm()
 {	
 	vector<spaceControl> toPrint;  //queue of identifiers to print
 	spaceControl tmp;  //controls indent level
-	tmp.iden = "il";
+	tmp.iden = "IL";
 	tmp.indent = "";
 	toPrint.push_back(tmp);
 	for(unsigned int j = 0; j < toPrint.size(); j++)
 	{
-		if(IDs.size() > 0)
+		if(IDs.size() > 0 || FEs.size() >0 || SEs.size() > 0 || IEs.size() >0)
 			cout << toPrint[j].indent << "(" << toPrint[j].iden;
 		else  //nothing in input-link structure
-			cout << "(il)" << endl << endl;
+			cout << "(IL)" << endl << endl;
 		int length = (3 + toPrint[j].indent.size() + toPrint[j].iden.size());  //controls word wrapping
 		for(unsigned int i = 0; i < IDs.size(); i++)
 		{
@@ -623,7 +530,7 @@ QuickLink::printSoarInForm()
 					length = (4 + toPrint[j].indent.size());  //controls word wrapping
 				}
 			}
-		if(IDs.size() > 0)
+		if(IDs.size() > 0 || FEs.size() >0 || SEs.size() > 0 || IEs.size() >0)
 			cout << ")" << endl;
 		
 	}
@@ -749,6 +656,76 @@ QuickLink::printSoarOutForm()
 }
 
 void
+QuickLink::processLoader(ifstream & pFile)
+{
+	bool EndOfFile = false;
+	bool EndOfStep = false;
+	if(!pFile)
+	{
+		cout << "ERROR: File failed to open!" << endl;
+		pFile.clear();
+		printStep = false;
+		counter--; //keeps step number correct
+		WhenReady();
+	}
+	else
+	{
+		while(!EndOfStep && !EndOfFile)
+		{
+			while(pFile.peek() == '#')//is a comment
+			{
+				char trash[1000];
+				char elget;
+				pFile.getline(trash, 1000);
+				pFile.get(elget);
+			}
+			pFile >> parent;
+			if(parent == "EndOfFile")
+				EndOfFile = true;
+			else if(parent == "EndOfStep")
+				EndOfStep = true;
+			else
+			{
+				pFile >> path;
+				path = path.substr(1,path.size()-1);
+				pFile >> value;
+				if(pFile.peek() != '\n')
+				{
+					char trash[1000];
+					char elget;
+					pFile.getline(trash, 1000);
+					pFile.get(elget);
+				}
+				else
+				{
+					char elget;
+					pFile.get(elget);
+				}			
+				if(value[0] == '/') //is an identifier
+				{
+					value = value.substr(1,value.size()-1); //gets rid of /
+					uniqid = value;
+					bool tester = true;
+					for(unsigned int i = 0; i < IDs.size() && tester; i++)  //checks to see if element already exists
+					{
+						if(IDparent[i] == parent && IDnames[i] == path && IDsoar[i] == value)
+							tester = false;
+					}
+					if(tester)	
+						createID();
+				}
+				else //is a string, int or float
+				{
+					advValue();
+				}
+			}
+		}
+	}
+		if(EndOfFile)
+			pFile >> path;
+}
+
+void
 QuickLink::loadInput(ifstream& iFile)
 {
 	if(!iFile)
@@ -756,85 +733,14 @@ QuickLink::loadInput(ifstream& iFile)
 		cout << "ERROR: File failed to open!" << endl;
 		iFile.clear();
 		printStep = false;
-		counter--; //keeps step number correct
 		WhenReady();
 	}
 	else
 	{
-		int lpi = -1;
-		for (unsigned int i = 0; i < loadPair.size(); i++)
-			if (&iFile == loadPair[i].str)  //trick used so that multiple load files can be open at
-				lpi = i;					//same time that all use this function
-		if(lpi == -1)
-		{
-			pair tmp;
-			tmp.str = &iFile;
-			tmp.title = "";
-			loadPair.push_back(tmp);
-			lpi = loadPair.size() -1;
-		}	
-		if (loadPair[lpi].title == "")
-            iFile >> loadPair[lpi].title;
-		while(loadPair[lpi].title == "id")  //loads identifiers
-		{
-			iFile >> parent;
-			iFile >> path;
-			iFile >> uniqid;
-			bool tester = true;
-			for(unsigned int i = 0; i < IDs.size() && tester; i++)  //checks to see if element already exists
-				if(IDparent[i] == parent && IDnames[i] == path && IDsoar[i] == uniqid)
-					tester = false;
-			if(tester)	
-                createID();
-			iFile >> loadPair[lpi].title;  
-		}
-		while(loadPair[lpi].title == "ie") //loads int elements
-		{
-			iFile >> parent;
-			iFile >> path;
-			iFile >> Ivalue;
-			command = "INT";
-			bool tester = true;
-			for(unsigned int i = 0; i < IEs.size() && tester; i++)  //checks to see if element already exists
-				if(IEparent[i] == parent && IEnames[i] == path && IEvalue[i] == Ivalue)
-					tester = false;
-			if(tester)	
-				createEL();
-			iFile >> loadPair[lpi].title;
-		}
-		while(loadPair[lpi].title == "fe") //loads float elements
-		{
-			iFile >> parent;
-			iFile >> path;
-			iFile >> Fvalue;
-			command = "FLOAT";
-			bool tester = true;
-			for(unsigned int i = 0; i < FEs.size() && tester; i++)  //checks to see if element already exists
-				if(FEparent[i] == parent && FEnames[i] == path && FEvalue[i] == Fvalue)
-					tester = false;
-			if(tester)	
-				createEL();
-			iFile >> loadPair[lpi].title;
-		}
-		while(loadPair[lpi].title == "se")  //loads string elements
-		{
-			iFile >> parent;
-			iFile >> path;
-			iFile >> value;
-			command = "STRING";
-			bool tester = true;
-			for(unsigned int i = 0; i < SEs.size() && tester; i++)  //checks to see if element already exists
-				if(SEparent[i] == parent && SEnames[i] == path && SEvalue[i] == value)
-					tester = false;
-			if(tester)	
-				createEL();
-			iFile >> loadPair[lpi].title;
-		}
-		iFile >> loadPair[lpi].title;  //gets next title, used mainly to initiate eof
-	}
+		counter--;
+		CallParser(&iFile);
+	}	
 }
-
-
 
 void
 QuickLink::delSE(int index)
@@ -942,61 +848,6 @@ QuickLink::deleteChilds(string father)
 	}			
 }
 
-void 
-QuickLink::forAlterProc()
-{
-	vector<wme> VecWme;
-	for(unsigned int i =0; i< IDs.size(); i++)
-	{
-		wme tmpWme;
-		tmpWme.title = "id";
-		tmpWme.parent = IDparent[i];
-		tmpWme.name = IDnames[i];
-		tmpWme.value = IDsoar[i]; 
-		tmpWme.num = 0;
-		tmpWme.dec = 0;
-		tmpWme.fl = false;
-		VecWme.push_back(tmpWme);
-	}
-	for(unsigned int i =0; i< IEs.size(); i++)
-	{
-		wme tmpWme;
-		tmpWme.title = "ie";
-		tmpWme.parent = IEparent[i];
-		tmpWme.name = IEnames[i];
-		tmpWme.num = IEvalue[i];
-		tmpWme.value = "";
-		tmpWme.dec = 0;
-		tmpWme.fl = false;
-		VecWme.push_back(tmpWme);
-	}
-	for(unsigned int i =0; i< FEs.size(); i++)
-	{
-		wme tmpWme;
-		tmpWme.title = "fe";
-		tmpWme.parent = FEparent[i];
-		tmpWme.name = FEnames[i];
-		tmpWme.dec = FEvalue[i]; 
-		tmpWme.num = 0;
-		tmpWme.value = "";
-		tmpWme.fl = true;
-		VecWme.push_back(tmpWme);
-	}
-	for(unsigned int i =0; i< SEs.size(); i++)
-	{
-		wme tmpWme;
-		tmpWme.title = "se";
-		tmpWme.parent = SEparent[i];
-		tmpWme.name = SEnames[i];
-		tmpWme.value = SEvalue[i]; 
-		tmpWme.num = 0;
-		tmpWme.dec = 0;
-		tmpWme.fl = false;
-		VecWme.push_back(tmpWme);
-	}
-	aProc.push_back(VecWme);
-}
-
 void
 QuickLink::saveProcChanges()
 {
@@ -1004,24 +855,30 @@ QuickLink::saveProcChanges()
 	cout << endl;
 	ofstream aFile;
 	aFile.open(loc.c_str());
-
-	for(unsigned int j = 0; j < aProc.size(); j++)
+	bool ready = false;
+	int count = commandStore.size()-1;
+	while(!ready && count >=0)
 	{
-		for(unsigned int i = 0; i < aProc[j].size(); i++)
+		if(commandStore[count] == "EndOfStep")
 		{
-			aFile << aProc[j][i].title << " " << aProc[j][i].parent << " " << aProc[j][i].name << " " ;
-			if(aProc[j][i].fl == true)
-				aFile << aProc[j][i].dec << endl;
-			else if (aProc[j][i].value != "")
-				aFile << aProc[j][i].value << endl;
-			else
-				aFile << aProc[j][i].num << endl;
+			commandStore[count] = "EndOfFile";
+			commandStore.resize(count +1);
+			ready = true;
 		}
-		aFile << "&&&" << endl;
+		count--;
 	}
 
+	for(unsigned int i = 0; i < commandStore.size(); i++)
+	{
+		aFile << commandStore[i];
+		if (i != commandStore.size()-1)
+			aFile << endl;
+	}
+
+	aFile.close();
+	aFile.clear();
 	cout << endl << endl << "***Your process has been saved***" << endl;
-	WhenReady();
+	//WhenReady();
 }
 
 void 
@@ -1029,35 +886,35 @@ QuickLink::saveInput(bool toClose, ofstream& oFile)
 {
 	if(!oFile)
 	{
-		cout << endl << "***File failed to open***" << endl << endl;
+		cout << endl << "***ERROR: File failed to open***" << endl << endl;
 		WhenReady();
 	}
 	else //write to file
 	{	
 		for(unsigned int i =0; i< IDs.size(); i++)
 		{
-			oFile << "id " << IDparent[i] << " " << IDnames[i] << " " << IDsoar[i] << endl;
+			oFile << "add " << IDparent[i] << " ^" << IDnames[i] << " /" << IDsoar[i] << endl;
 		}
 		for(unsigned int i =0; i< IEs.size(); i++)
 		{
-			oFile << "ie " << IEparent[i] << " " << IEnames[i] << " " << IEvalue[i] << endl;
+			oFile << "add " << IEparent[i] << " ^" << IEnames[i] << " " << IEvalue[i] << endl;
 		}
 		for(unsigned int i =0; i< FEs.size(); i++)
 		{
-			oFile << "fe " << FEparent[i] << " " << FEnames[i] << " " << FEvalue[i] << endl;
+			oFile << "add " << FEparent[i] << " ^" << FEnames[i] << " " << FEvalue[i] << endl;
 		}
 		for(unsigned int i =0; i< SEs.size(); i++)
 		{
-			oFile << "se " << SEparent[i] << " " << SEnames[i] << " " << SEvalue[i] << endl;
+			oFile << "add " << SEparent[i] << " ^" << SEnames[i] << " " << SEvalue[i] << endl;
 		}
 
-		oFile << "&&&" << endl;  //prints delimeter
+		oFile << "EndOfFile";  //prints delimeter
 		if (toClose)  //only closes structure files, not process files
 		{
 			oFile.close();
 			oFile.clear();
 			cout << "***YOUR FILE HAS BEEN SAVED***" << endl << endl;
-			WhenReady();
+			//WhenReady();
 		}
 	}
 }
@@ -1081,7 +938,7 @@ QuickLink::advDelInd()  //deletes identifiers
 		deleteChilds(IDsoar[ind]);
 		delID(ind);
 		cout << endl << "***WME HAS BEEN DELETED***" << endl << endl;
-		WhenReady();
+		//WhenReady();
 	}			
 }
 
@@ -1112,7 +969,7 @@ QuickLink::advDelVal()  //deletes value based elements
 		{
 			delFE(ind);
 			cout << endl << "***WME HAS BEEN DELETED***" << endl << endl;
-			WhenReady();
+			//WhenReady();
 		}
 
 	}
@@ -1133,7 +990,7 @@ QuickLink::advDelVal()  //deletes value based elements
 		{
 			delIE(ind);
 			cout << endl << "***WME HAS BEEN DELETED***" << endl << endl;
-			WhenReady();
+			//WhenReady();
 		}
 
 	}
@@ -1153,7 +1010,7 @@ QuickLink::advDelVal()  //deletes value based elements
 		{
 			delSE(ind);
 			cout << endl << "***WME HAS BEEN DELETED***" << endl << endl;
-			WhenReady();
+			//WhenReady();
 		}
 
 	}
@@ -1236,12 +1093,13 @@ QuickLink::endProcess()
 	inFile.close();
 	loadPair.resize(0);
 	cout << endl << "***Your process file has ended***" << endl << endl;
-	WhenReady();
+	//WhenReady();
 	counter = 0;
 	pCommand = "NEW";
+	loadingStep = false;
 	printStep = false;
 	pOnce = false;
-	advMode();	
+	CallParser(&cin);	
 }
 
 void 
@@ -1257,16 +1115,16 @@ QuickLink::printOutput()
 		printSoarOutForm();  //soar-form
 	
 	cout << endl << endl << "******END OF OUTPUT******" << endl << endl;
-	WhenReady();
+	//WhenReady();
 }
 
 void
 QuickLink::promptToSave()
 {
-	if(aProc.size() != 0)
+	if(commandStore.size() != 0 && StuffToSave)
 	{
 		string toSave;
-		cout << endl << "Would you like to save the past " << aProc.size() << " steps as a process before" 
+		cout << endl << "Would you like to save the steps stored in memory as a process before" 
 			<< endl << "they are destroyed?: ";
 		cin >> toSave;
 		makeUpper(toSave);
@@ -1289,14 +1147,17 @@ QuickLink::WhenReady()
 {
 	cout << "Press any non white-space key + enter to continue: ";
 	cout << endl;
-	cin >> garbage;
+	cin>> garbage;
 	cout << endl << endl;
 }
 
 void
 QuickLink::clearAll()
 {
-	deleteChilds("il");
+	commandStore.resize(0);
+	deleteChilds("IL");
+	if(IDs.size() > 0 || FEs.size() > 0 || SEs.size() > 0 || IEs.size() > 0)  //used to guarentee clear
+		clearAll();
 }
 
 void
@@ -1317,6 +1178,8 @@ QuickLink::locFinder()
 	string location = "";//QuickLink\\ProcessesAndStructures\\";
 
 	loc = location + fileName;	
+	if(loc[loc.size()-4] != '.')
+		loc += ".txt";
 
 }
 
@@ -1351,8 +1214,8 @@ QuickLink::spawnDebug()
 
 int main ()
 {		
-	
 	QuickLink QL;
+	Reader R(&QL);
 	QL.Run();
 	
 	return 0;
