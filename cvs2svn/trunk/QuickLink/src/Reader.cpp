@@ -129,7 +129,9 @@ Reader::ReadMe(istream* in)
 		cout << endl;
 		QL->inFile.open(QL->loc.c_str());
 		QL->printStep = true;
+		QL->loadingProcess = true;
 		QL->loadProcess();
+		QL->Icycle = false;
 		//QL->counter++;
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
@@ -205,6 +207,7 @@ Reader::ReadMe(istream* in)
 		QL->counter++;
 		QL->loadingStep = false;
 		QL->userInput = true;
+		QL->Icycle = false;
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -213,6 +216,8 @@ Reader::ReadMe(istream* in)
 		QL->counter++;
 		QL->loadingStep = false;
 		QL->userInput = true;
+		QL->Icycle = false;
+		QL->loadingProcess = false;
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -221,7 +226,7 @@ Reader::ReadMe(istream* in)
 		char elget;
 		in->get(elget);
 		toReturn = "# ";
-		while (elget != '\n')
+		while (elget != '\n' && elget != EOF)
 		{
 			toReturn += elget;
 			in->get(elget);
@@ -236,9 +241,17 @@ Reader::ReadMe(istream* in)
 	}
 	else 
 	{
-		char cmd[1000] ;  //used to get entire line including spaces
-		in->getline(cmd,1000) ;
-		string strcmd = cmd;
+		string strcmd = QL->actualSize;
+
+		while(in->peek() != '\n')
+		{
+			string tmp;
+			*in >> tmp;
+			if(strcmd == "")
+				strcmd = tmp;
+			else
+				strcmd += (" " + tmp);
+		}
 		cout << endl << QL->pKernel->ExecuteCommandLine(strcmd.c_str(), QL->pAgent->GetAgentName()) << endl;
 		toReturn = "***VOIDRETURN***";
 		return toReturn;

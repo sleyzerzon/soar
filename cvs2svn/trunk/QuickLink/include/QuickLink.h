@@ -110,10 +110,10 @@ private:
 	int Ivalue;
 	string command, title, garbage, parent, path, uniqid;
 	string OldVal, NewVal, value, processExt, pCommand;
-	string first, second, third, fourth, fifth, OS, loc, toStore;
+	string first, second, third, fourth, fifth, OS, loc, toStore, actualSize;
 	ifstream inFile;
 	ofstream outFile;
-	bool toClose, pOnce, printStep, askToSave, Icycle, printTree, loadingStep, userInput, StuffToSave;
+	bool toClose, pOnce, printStep, askToSave, Icycle, printTree, loadingStep, userInput, StuffToSave, loadingProcess;
 	char endFind;
 	int counter;
 

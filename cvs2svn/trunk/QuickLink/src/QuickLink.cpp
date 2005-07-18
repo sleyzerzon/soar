@@ -80,7 +80,7 @@ QuickLink::QuickLink()
 	Fvalue = 0; Ivalue = 0; counter = 0;
 	
 	pOnce = true, printStep = false, Icycle = true, printTree = false;
-	loadingStep = false, StuffToSave = false;
+	loadingStep = false, StuffToSave = false, loadingProcess = false;
 
 	
 	SoarSetup();
@@ -111,20 +111,23 @@ QuickLink::Run()
 		{
 			CallParser(&cin);
 		}
-		else if (inFile) //process file is open and has things left to load
+		if (inFile && loadingProcess) //process file is open and has things left to load
 		{			
 			//counter++;  //used to print step of process
 			printStep = true;  //used to print step of process
-			loadProcess();
+			//loadProcess();
 			CallParser(&inFile);	
 			pOnce = true;  //flag set so that end process message will be printed
+			if(!loadingProcess)
+                endProcess();
+			CallParser(&cin);
 		}
-		else if (!inFile && pOnce)
+		/*else if (!inFile && pOnce)
 			endProcess();
 		else
 		{
 			CallParser(&cin);
-		}
+		}*/
 
 		OutputCycle();
 		pKernel->CheckForIncomingCommands();
@@ -155,9 +158,9 @@ QuickLink::CallParser(istream* in)
 		PrintWorkingMem();
 		if(*in == cin)
 			cout << "> ";
-		*in >> first;
-		makeUpper(first);
-		
+		*in >> actualSize;
+		first = actualSize;
+		makeUpper(first);		
 
 		toStore = GetInfo.ReadMe(in);	
 		if(toStore != "***VOIDRETURN***")
@@ -169,7 +172,7 @@ QuickLink::CallParser(istream* in)
 void
 QuickLink::loadProcess()
 {
-	CallParser(&inFile);
+	//CallParser(&inFile);
 	pAgent->Commit();
 }
 
@@ -789,10 +792,12 @@ QuickLink::saveProcChanges()
 	int count = commandStore.size()-1;
 	while(!ready && count >=0)
 	{
-		if(commandStore[count] == "EndOfStep")
+		string toTest = commandStore[count];
+		makeUpper(toTest);
+		if(toTest == "ENDOFSTEP")
 		{
 			commandStore[count] = "EndOfFile";
-			commandStore.resize(count +1);
+			commandStore.resize(count+1);
 			ready = true;
 		}
 		count--;
@@ -1029,7 +1034,8 @@ QuickLink::endProcess()
 	loadingStep = false;
 	printStep = false;
 	pOnce = false;
-	CallParser(&cin);	
+
+	//CallParser(&cin);	
 }
 
 void 
