@@ -80,7 +80,7 @@ QuickLink::QuickLink()
 	Fvalue = 0; Ivalue = 0; counter = 0;
 	
 	pOnce = true, printStep = false, Icycle = true, printTree = false;
-	loadingStep = false, StuffToSave = false, loadingProcess = false;
+	loadingStep = false, StuffToSave = false, loadingProcess = false, endprocnow = false;
 
 	
 	SoarSetup();
@@ -119,7 +119,7 @@ QuickLink::Run()
 			CallParser(&inFile);	
 			pOnce = true;  //flag set so that end process message will be printed
 			if(!loadingProcess)
-                endProcess();
+                endprocnow = true;
 			CallParser(&cin);
 		}
 		/*else if (!inFile && pOnce)
@@ -131,6 +131,8 @@ QuickLink::Run()
 
 		OutputCycle();
 		pKernel->CheckForIncomingCommands();
+		if(endprocnow)
+			endProcess();
 	}
 
 	pKernel->DestroyAgent(pAgent);
@@ -663,7 +665,7 @@ QuickLink::loadInput(ifstream& iFile)
 {
 	if(!iFile)
 	{
-		cout << "ERROR: File failed to open!" << endl;
+		cout << "ERROR: File " << loc << " failed to open!" << endl;
 		iFile.clear();
 		printStep = false;
 		WhenReady();
@@ -679,7 +681,6 @@ void
 QuickLink::delSE(int index)
 {
 	int last = SEs.size() - 1;
-	pAgent->DestroyWME(SEs[index]);
 	SEs[index] = SEs[last];
 	SEnames[index] = SEnames[last];
 	SEparent[index] = SEparent[last];
@@ -694,7 +695,6 @@ void
 QuickLink::delIE(int index)
 {
 	int last = IEs.size() - 1;
-	pAgent->DestroyWME(IEs[index]);
 	IEs[index] = IEs[last];
 	IEnames[index] = IEnames[last];
 	IEparent[index] = IEparent[last];
@@ -709,7 +709,6 @@ void
 QuickLink::delFE(int index)
 {
 	int last = FEs.size() - 1;
-	pAgent->DestroyWME(FEs[index]);
 	FEs[index] = FEs[last];
 	FEnames[index] = FEnames[last];
 	FEparent[index] = FEparent[last];
@@ -724,7 +723,6 @@ void
 QuickLink::delID(int index)
 {
 	int last = IDs.size() - 1;
-	pAgent->DestroyWME(IDs[index]);
 	IDs[index] = IDs[last];
 	IDnames[index] = IDnames[last];
 	IDparent[index] = IDparent[last];
@@ -736,7 +734,7 @@ QuickLink::delID(int index)
 }
 
 void
-QuickLink::deleteChilds(string father)
+QuickLink::deleteChilds(string father, string always)
 {
 	int ind = -1;
 	for(unsigned int j = 0; j < IDs.size(); j++)
@@ -744,7 +742,9 @@ QuickLink::deleteChilds(string father)
 		if(IDparent[j] == father)
 		{
 			ind = j;
-			deleteChilds(IDsoar[ind]);
+			deleteChilds(IDsoar[ind],always);
+			if(father == always)
+				pAgent->DestroyWME(IDs[ind]);
 			delID(ind);
 			j--;  //needed because of way delete is made
 		}
@@ -755,6 +755,8 @@ QuickLink::deleteChilds(string father)
 		if(IEparent[j] == father)
 		{
 			ind = j;
+			if(father == always)
+				pAgent->DestroyWME(IEs[ind]);
 			delIE(ind);
 			j--;  //needed because of way delete is made
 		}
@@ -765,6 +767,8 @@ QuickLink::deleteChilds(string father)
 		if(FEparent[j] == father)
 		{
 			ind = j;
+			if(father == always)
+				pAgent->DestroyWME(FEs[ind]);
 			delFE(ind);
 			j--;  //needed because of way delete is made
 		}
@@ -775,6 +779,8 @@ QuickLink::deleteChilds(string father)
 		if(SEparent[j] == father)
 		{
 			ind = j;
+			if(father == always)
+				pAgent->DestroyWME(SEs[ind]);
 			delSE(ind);
 			j--;  //needed because of way delete is made
 		}
@@ -784,7 +790,7 @@ QuickLink::deleteChilds(string father)
 void
 QuickLink::saveProcChanges()
 {
-	locFinder();
+	locFinder(&cin);
 	cout << endl;
 	ofstream aFile;
 	aFile.open(loc.c_str());
@@ -870,7 +876,7 @@ QuickLink::advDelInd()  //deletes identifiers
 	}
 	else
 	{
-		deleteChilds(IDsoar[ind]);
+		deleteChilds(IDsoar[ind], IDsoar[ind]);
 		delID(ind);
 		cout << endl << "***WME HAS BEEN DELETED***" << endl << endl;
 		//WhenReady();
@@ -1034,7 +1040,7 @@ QuickLink::endProcess()
 	loadingStep = false;
 	printStep = false;
 	pOnce = false;
-
+	endprocnow = false;
 	//CallParser(&cin);	
 }
 
@@ -1091,21 +1097,20 @@ void
 QuickLink::clearAll()
 {
 	commandStore.resize(0);
-	deleteChilds("IL");
+	deleteChilds("IL", "IL");
 	if(IDs.size() > 0 || FEs.size() > 0 || SEs.size() > 0 || IEs.size() > 0)  //used to guarentee clear
 		clearAll();
 }
 
 void
-QuickLink::locFinder()
+QuickLink::locFinder(istream* in)
 {
 	string fileName;
 	string tmp;
-	char garbage;
-	cin.get(garbage);
+	*in >> fileName;
 	while(cin.peek() != '\n')
 	{
-		cin >> tmp;
+		*in >> tmp;
 		if(fileName != "")
 			tmp = " " + tmp;
 		fileName += tmp;

@@ -23,7 +23,16 @@ Reader::ReadMe(istream* in)
 {
 	string toReturn;
 	
-	if (QL->first == _CLEAR)  //clear current input-link structure
+	if(!(*in))
+	{
+		QL->counter++;
+		QL->loadingStep = false;
+		//QL->userInput = true;
+		QL->Icycle = false;
+		toReturn = "***VOIDRETURN***";
+		return toReturn;
+	}
+	else if (QL->first == _CLEAR)  //clear current input-link structure
 	{
 		QL->clearAll();
 		toReturn = QL->first;
@@ -31,7 +40,7 @@ Reader::ReadMe(istream* in)
 	}
 	else if (QL->first == _SAVE || QL->first == _SAVES)  //save current input-link structure
 	{
-		QL->locFinder();  //gets location of file
+		QL->locFinder(in);  //gets location of file
 		ofstream tempFile;
 		tempFile.open(QL->loc.c_str());
 		QL->saveInput(true,tempFile);
@@ -43,10 +52,11 @@ Reader::ReadMe(istream* in)
 	else if (QL->first == _LOAD || QL->first == _LOADS)  //load a saved input-link structure
 	{
 		QL->userInput = false;
-		QL->locFinder();
+		QL->locFinder(in);
 		ifstream tmpFile;
 		tmpFile.open(QL->loc.c_str());
 		QL->loadInput(tmpFile);
+		QL->Icycle = true;
 		tmpFile.close();
 		tmpFile.clear();
 		toReturn = "***VOIDRETURN***";
@@ -125,7 +135,7 @@ Reader::ReadMe(istream* in)
 		QL->clearAll();
 		QL->pCommand = "LOAD";  //flags used to indicate loading a process for other events
 		QL->first = "DONE";
-		QL->locFinder();
+		QL->locFinder(in);
 		cout << endl;
 		QL->inFile.open(QL->loc.c_str());
 		QL->printStep = true;
@@ -211,7 +221,7 @@ Reader::ReadMe(istream* in)
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
-	else if (QL->first == "ENDOFFILE")
+	else if (QL->first == "ENDOFPROCESS")
 	{
 		QL->counter++;
 		QL->loadingStep = false;
@@ -225,7 +235,7 @@ Reader::ReadMe(istream* in)
 	{
 		char elget;
 		in->get(elget);
-		toReturn = "# ";
+		toReturn = QL->first;
 		while (elget != '\n' && elget != EOF)
 		{
 			toReturn += elget;
@@ -236,7 +246,7 @@ Reader::ReadMe(istream* in)
 	else if(QL->first == "SPAWN")
 	{
 		QL->spawnDebug();
-		toReturn = "***VOIDRETURN";
+		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
 	else 

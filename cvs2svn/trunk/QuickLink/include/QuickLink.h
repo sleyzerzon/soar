@@ -114,6 +114,7 @@ private:
 	ifstream inFile;
 	ofstream outFile;
 	bool toClose, pOnce, printStep, askToSave, Icycle, printTree, loadingStep, userInput, StuffToSave, loadingProcess;
+	bool endprocnow;
 	char endFind;
 	int counter;
 
@@ -150,7 +151,7 @@ private:
 	void deleteWME();
 	//deletes specified WME
 
-	void deleteChilds(string parent);
+	void deleteChilds(string parent, string always);
 	//deletes all children of deleted WME
 
     void delID(int ind);
@@ -216,7 +217,7 @@ private:
 	void printSoarInForm();
 	//prints input in soar form
 
-	void locFinder();
+	void locFinder(istream* in);
 	//sets location for storage
 
 	void OSFinder();
