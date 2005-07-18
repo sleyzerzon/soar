@@ -77,7 +77,7 @@ QuickLink::QuickLink()
 	
 	garbage = ""; parent = ""; 	path = ""; command = "";
 	pInputLink = pAgent->GetInputLink();
-	Fvalue = 0; Ivalue = 0; counter = 0;
+	Fvalue = 0; Ivalue = 0; counter = 1;
 	
 	pOnce = true, printStep = false, Icycle = true, printTree = false;
 	loadingStep = false, StuffToSave = false, loadingProcess = false, endprocnow = false;
@@ -89,14 +89,14 @@ QuickLink::QuickLink()
 void
 QuickLink::SoarSetup()
 {
-	cout << endl << "Launch the debugger and connect it to QuickLink" << endl;
+	/*cout << endl << "Launch the debugger and connect it to QuickLink" << endl;
 	WhenReady();
 
 	cout << endl << "Load all productions into Soar using the debugger" << endl;
-	WhenReady();
+	WhenReady();*/
 
 	pCommand = "NEW"; //pCommand is a flag used to identify process commands
-
+	cout << endl;
 	return;
 }
 
@@ -120,7 +120,8 @@ QuickLink::Run()
 			pOnce = true;  //flag set so that end process message will be printed
 			if(!loadingProcess)
                 endprocnow = true;
-			CallParser(&cin);
+			if(userInput)
+                CallParser(&cin);
 		}
 		/*else if (!inFile && pOnce)
 			endProcess();
@@ -1035,7 +1036,7 @@ QuickLink::endProcess()
 	loadPair.resize(0);
 	cout << endl << "***Your process file has ended***" << endl << endl;
 	//WhenReady();
-	counter = 0;
+	counter = 1;
 	pCommand = "NEW";
 	loadingStep = false;
 	printStep = false;
@@ -1067,16 +1068,16 @@ QuickLink::promptToSave()
 	{
 		string toSave;
 		cout << endl << "Would you like to save the steps stored in memory as a process before" 
-			<< endl << "they are destroyed?: ";
+			<< endl << "they are destroyed (y/n)?: ";
 		cin >> toSave;
 		makeUpper(toSave);
-		while(toSave != "YES" && toSave != "NO")
+		while(toSave != "YES" && toSave != "NO" && toSave != "Y" && toSave != "N")
 		{
 			cout << endl << endl << "Please enter YES or NO: ";
 			cin >> toSave;
 			makeUpper(toSave);
 		}
-		if (toSave == "YES")
+		if (toSave == "YES" || toSave == "Y")
 		{
 			cout << endl << "Please enter the name of the file to save your changes to: ";
 			saveProcChanges();

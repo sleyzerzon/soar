@@ -161,6 +161,7 @@ Reader::ReadMe(istream* in)
 	}
 	else if (QL->first == _RUNS || QL->first == _RUN)  //run soar til output
 	{
+		QL->counter++;
 		QL->userInput = false;
 		QL->StuffToSave = true;
 		QL->SC.resize(0);   //clears output storage
@@ -214,7 +215,7 @@ Reader::ReadMe(istream* in)
 	}
 	else if(QL->first == "ENDOFSTEP")
 	{
-		QL->counter++;
+		//QL->counter++;
 		QL->loadingStep = false;
 		QL->userInput = true;
 		QL->Icycle = false;
@@ -223,11 +224,12 @@ Reader::ReadMe(istream* in)
 	}
 	else if (QL->first == "ENDOFPROCESS")
 	{
-		QL->counter++;
+		//QL->counter++;
 		QL->loadingStep = false;
 		QL->userInput = true;
 		QL->Icycle = false;
 		QL->loadingProcess = false;
+		QL->printStep = false;
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
