@@ -79,8 +79,9 @@ QuickLink::QuickLink()
 	pInputLink = pAgent->GetInputLink();
 	Fvalue = 0; Ivalue = 0; counter = 1;
 	
-	pOnce = true, printStep = false, Icycle = true, printTree = false;
+	pOnce = true, printStep = false, Icycle = true, printTree = false, shouldPrintWM = true;
 	loadingStep = false, StuffToSave = false, loadingProcess = false, endprocnow = false;
+	resetProcStat = false;
 
 	
 	SoarSetup();
@@ -113,27 +114,25 @@ QuickLink::Run()
 		}
 		if (inFile && loadingProcess) //process file is open and has things left to load
 		{			
-			//counter++;  //used to print step of process
 			printStep = true;  //used to print step of process
-			//loadProcess();
 			CallParser(&inFile);	
 			pOnce = true;  //flag set so that end process message will be printed
 			if(!loadingProcess)
-                endprocnow = true;
+                endProcess();
 			if(userInput)
-                CallParser(&cin);
+				CallParser(&cin);			
 		}
-		/*else if (!inFile && pOnce)
-			endProcess();
-		else
+		if(!resetProcStat)
 		{
-			CallParser(&cin);
-		}*/
-
-		OutputCycle();
-		pKernel->CheckForIncomingCommands();
-		if(endprocnow)
-			endProcess();
+			OutputCycle();
+			pKernel->CheckForIncomingCommands();
+		}
+		else
+			resetProcStat = false;
+		
+		
+		//if(endprocnow)
+			//endProcess();
 	}
 
 	pKernel->DestroyAgent(pAgent);
@@ -158,7 +157,10 @@ QuickLink::CallParser(istream* in)
 	{
 		if(userInput)
 			in = &cin;
-		PrintWorkingMem();
+		if(shouldPrintWM)
+			PrintWorkingMem();
+		else
+			shouldPrintWM = true;
 		if(*in == cin)
 			cout << "> ";
 		*in >> actualSize;
@@ -803,12 +805,14 @@ QuickLink::saveProcChanges()
 		makeUpper(toTest);
 		if(toTest == "ENDOFSTEP")
 		{
-			commandStore[count] = "EndOfFile";
+			commandStore[count] = "EndOfProcess";
 			commandStore.resize(count+1);
 			ready = true;
 		}
 		count--;
 	}
+	if(!ready)
+		commandStore.push_back("EndOfProcess");
 
 	for(unsigned int i = 0; i < commandStore.size(); i++)
 	{
@@ -850,7 +854,7 @@ QuickLink::saveInput(bool toClose, ofstream& oFile)
 			oFile << "add " << SEparent[i] << " ^" << SEnames[i] << " " << SEvalue[i] << endl;
 		}
 
-		oFile << "EndOfFile";  //prints delimeter
+		oFile << "EndOfProcess";  //prints delimeter
 		if (toClose)  //only closes structure files, not process files
 		{
 			oFile.close();
@@ -1035,14 +1039,14 @@ QuickLink::endProcess()
 	inFile.close();
 	loadPair.resize(0);
 	cout << endl << "***Your process file has ended***" << endl << endl;
-	//WhenReady();
 	counter = 1;
 	pCommand = "NEW";
 	loadingStep = false;
 	printStep = false;
 	pOnce = false;
 	endprocnow = false;
-	//CallParser(&cin);	
+	resetProcStat = true;	
+	userInput = false;
 }
 
 void 
@@ -1097,7 +1101,7 @@ QuickLink::WhenReady()
 void
 QuickLink::clearAll()
 {
-	commandStore.resize(0);
+	//commandStore.resize(0);
 	deleteChilds("IL", "IL");
 	if(IDs.size() > 0 || FEs.size() > 0 || SEs.size() > 0 || IEs.size() > 0)  //used to guarentee clear
 		clearAll();

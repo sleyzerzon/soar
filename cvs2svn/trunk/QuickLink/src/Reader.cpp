@@ -126,23 +126,27 @@ Reader::ReadMe(istream* in)
 		QL->promptToSave();
 		QL->commandStore.resize(0);
 		QL->StuffToSave = false;
-		QL->clearAll();	
+		QL->clearAll();
 		return toReturn;
 	}
 	else if (QL->first == _LOADP || QL->first == _LOADPS) //load a process
 	{
-		QL->loadingStep = true;
-		QL->clearAll();
-		QL->pCommand = "LOAD";  //flags used to indicate loading a process for other events
-		QL->first = "DONE";
 		QL->locFinder(in);
-		cout << endl;
-		QL->inFile.open(QL->loc.c_str());
-		QL->printStep = true;
-		QL->loadingProcess = true;
-		QL->loadProcess();
-		QL->Icycle = false;
-		//QL->counter++;
+		if(QL->loadingProcess == true)
+			cout << endl << "You cannot load a new process when one is currently running." << endl;
+		else
+		{
+			QL->loadingStep = true;
+			QL->clearAll();
+			QL->pCommand = "LOAD";  //flags used to indicate loading a process for other events
+			QL->first = "DONE";
+			cout << endl;
+			QL->inFile.open(QL->loc.c_str());
+			QL->printStep = true;
+			QL->loadingProcess = true;
+			QL->loadProcess();
+			QL->Icycle = false;
+		}	
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -155,7 +159,10 @@ Reader::ReadMe(istream* in)
 	else if (QL->first == _ENDPS || QL->first == _ENDP) //end loaded process
 	{
 		if(QL->pCommand == "LOAD")
+		{
 			QL->endProcess();
+			QL->loadingProcess = false;
+		}
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -167,11 +174,15 @@ Reader::ReadMe(istream* in)
 		QL->SC.resize(0);   //clears output storage
 		QL->Icycle = false;  //gets out of outer loop
 		QL->pAgent->RunSelfTilOutput(15);
-		toReturn = "EndOfStep";
+		if(in == &cin)
+			toReturn = "EndOfStep";
+		else
+			toReturn = "Go";
 		return toReturn;
 	}
 	else if(QL->first == _RUNC || QL->first == _RUNCS)  //run soar for n cycles
 	{
+		QL->counter++;
 		QL->userInput = false;
 		QL->StuffToSave = true;
 		QL->SC.resize(0); //clears output storage
@@ -181,13 +192,17 @@ Reader::ReadMe(istream* in)
 			amount = 15;
 		QL->Icycle = false;
 		QL->pAgent->RunSelf(amount);
-		toReturn = "EndOfStep";
+		if(in == &cin)
+            toReturn = "EndOfStep";
+		else
+			toReturn = "Go";
 		return toReturn;
 	}
 	else if(QL->first == _LASTO || QL->first == _LASTOS)  //re-print last output
 	{
 		cout << endl;
 		QL->printOutput();
+		QL->shouldPrintWM = false;
 		return toReturn;
 	}
 	else if(QL->first == _CMDLIN || QL->first == _CL)  //execute command line command
@@ -196,6 +211,7 @@ Reader::ReadMe(istream* in)
 		in->getline(cmd,1000) ;
 		string strcmd = cmd;
 		cout << endl << QL->pKernel->ExecuteCommandLine(strcmd.c_str(), QL->pAgent->GetAgentName()) << endl;
+		QL->shouldPrintWM = false;
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -254,7 +270,7 @@ Reader::ReadMe(istream* in)
 	else 
 	{
 		string strcmd = QL->actualSize;
-
+		QL->shouldPrintWM = false;
 		while(in->peek() != '\n')
 		{
 			string tmp;

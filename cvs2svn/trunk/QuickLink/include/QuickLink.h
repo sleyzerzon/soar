@@ -114,7 +114,7 @@ private:
 	ifstream inFile;
 	ofstream outFile;
 	bool toClose, pOnce, printStep, askToSave, Icycle, printTree, loadingStep, userInput, StuffToSave, loadingProcess;
-	bool endprocnow;
+	bool endprocnow, shouldPrintWM, resetProcStat;
 	char endFind;
 	int counter;
 
