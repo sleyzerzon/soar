@@ -1,0 +1,8 @@
+07.20.2005
+-Everything now loads with the keyword "load" ("loadp" is invalid).
+-The command to continue a process is "continue" or "cont".
+-There is no longer a need to use "endoffile" or "endofprocess".
+-"endofstep" is optional at the end of a file.
+-An error message is now printed if "continue" is called when a process is not running.
+-"endp" works correctly - ends a running process
+-"endofstep" has now become "pause"

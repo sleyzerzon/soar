@@ -23,18 +23,17 @@ Reader::ReadMe(istream* in)
 {
 	string toReturn;
 	
-	if(!(*in))
+	if(!(*in))  //EOF is reached in either a process or a structure
 	{
-		QL->counter++;
-		QL->loadingStep = false;
-		//QL->userInput = true;
-		QL->Icycle = false;
+		EndOfFile(in);
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
 	else if (QL->first == _CLEAR)  //clear current input-link structure
 	{
 		QL->clearAll();
+		if(in != &cin)
+			QL->shouldPrintWM = false;
 		toReturn = QL->first;
 		return toReturn;
 	}
@@ -46,19 +45,6 @@ Reader::ReadMe(istream* in)
 		QL->saveInput(true,tempFile);
 		tempFile.close();
 		tempFile.clear();
-		toReturn = "***VOIDRETURN***";
-		return toReturn;
-	}
-	else if (QL->first == _LOAD || QL->first == _LOADS)  //load a saved input-link structure
-	{
-		QL->userInput = false;
-		QL->locFinder(in);
-		ifstream tmpFile;
-		tmpFile.open(QL->loc.c_str());
-		QL->loadInput(tmpFile);
-		QL->Icycle = true;
-		tmpFile.close();
-		tmpFile.clear();
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -79,6 +65,8 @@ Reader::ReadMe(istream* in)
 			QL->value = QL->fourth;
 			QL->advValue();
 		}
+		if(in != &cin)
+			QL->shouldPrintWM = false;
 		toReturn = QL->first + " " + QL->second + " " + QL->third + " " + QL->fourth;
 		return toReturn;
 	}
@@ -91,6 +79,8 @@ Reader::ReadMe(istream* in)
 		QL->OldVal = QL->fourth;
 		QL->NewVal = QL->fifth;
 		QL->advAlter();
+		if(in != &cin)
+			QL->shouldPrintWM = false;
 		toReturn = QL->first + " " + QL->second + " " + QL->third + " " + QL->fourth + " " + QL->fifth;
 		return toReturn;
 	}
@@ -111,6 +101,8 @@ Reader::ReadMe(istream* in)
 			QL->value = QL->fourth;
 			QL->advDelVal();
 		}
+		if(in != &cin)
+			QL->shouldPrintWM = false;
 		toReturn = QL->first + " " + QL->second + " " + QL->third + " " + QL->fourth;
 		return toReturn;
 	}
@@ -127,27 +119,48 @@ Reader::ReadMe(istream* in)
 		QL->commandStore.resize(0);
 		QL->StuffToSave = false;
 		QL->clearAll();
+		if(in != &cin)
+			QL->shouldPrintWM = false;
 		return toReturn;
 	}
-	else if (QL->first == _LOADP || QL->first == _LOADPS) //load a process
+	else if(QL->first == _LOAD || QL->first == _LOADS)
 	{
-		QL->locFinder(in);
-		if(QL->loadingProcess == true)
-			cout << endl << "You cannot load a new process when one is currently running." << endl;
+		QL->shouldPrintWM = false; //we do not want to print WM everytime a new structure is added
+		QL->locFinder(in);  //gets the location of the file
+		if(!QL->inFile.is_open()) //needed because of scoping issues
+		{
+			QL->inFile.open(QL->loc.c_str()); //opens the file
+			if(!QL->inFile)
+				cout << "File " << QL->loc << " Failed to Open" << endl;
+			QL->fileStack.push_back(&QL->inFile); //pushes the file onto the stack
+		}
 		else
 		{
-			QL->loadingStep = true;
-			QL->clearAll();
-			QL->pCommand = "LOAD";  //flags used to indicate loading a process for other events
-			QL->first = "DONE";
-			cout << endl;
-			QL->inFile.open(QL->loc.c_str());
-			QL->printStep = true;
-			QL->loadingProcess = true;
-			QL->loadProcess();
-			QL->Icycle = false;
-		}	
+			QL->inFile2.open(QL->loc.c_str());
+			if(!QL->inFile2)
+				cout << "File " << QL->loc << " Failed to Open" << endl;
+			QL->fileStack.push_back(&QL->inFile2); //pushes the file onto the stack
+		}
+		QL->readFromCmd = false; //intiates CallParser(&inFile)
+		QL->Icycle = false; //allows for a change of input source
 		toReturn = "***VOIDRETURN***";
+		return toReturn;
+	}
+	else if(QL->first == "CONTINUE" || QL->first == "CONT")
+	{
+		if(QL->fileStack.size() == 0)    //a process cannot be running
+			cout << "There are no processes running, CONTINUE is an invalid command." << endl;
+		else
+		{
+			QL->Icycle = false;
+			QL->readFromCmd = false;
+			QL->enterOutputStage = true;
+			QL->pAgent->RunSelfTilOutput(15);
+			QL->shouldPrintWM = false;
+			if(in != &cin)
+				QL->printWM_runp = true;
+		}
+		toReturn = "EndOfStep";
 		return toReturn;
 	}
 	else if (QL->first == _SAVEP || QL->first == _SAVEPS) //save process
@@ -158,11 +171,7 @@ Reader::ReadMe(istream* in)
 	}
 	else if (QL->first == _ENDPS || QL->first == _ENDP) //end loaded process
 	{
-		if(QL->pCommand == "LOAD")
-		{
-			QL->endProcess();
-			QL->loadingProcess = false;
-		}
+		EndOfFile(in);
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -174,6 +183,7 @@ Reader::ReadMe(istream* in)
 		QL->SC.resize(0);   //clears output storage
 		QL->Icycle = false;  //gets out of outer loop
 		QL->pAgent->RunSelfTilOutput(15);
+		QL->enterOutputStage = true;
 		if(in == &cin)
 			toReturn = "EndOfStep";
 		else
@@ -231,21 +241,9 @@ Reader::ReadMe(istream* in)
 	}
 	else if(QL->first == "ENDOFSTEP")
 	{
-		//QL->counter++;
-		QL->loadingStep = false;
-		QL->userInput = true;
-		QL->Icycle = false;
-		toReturn = "***VOIDRETURN***";
-		return toReturn;
-	}
-	else if (QL->first == "ENDOFPROCESS")
-	{
-		//QL->counter++;
-		QL->loadingStep = false;
-		QL->userInput = true;
-		QL->Icycle = false;
-		QL->loadingProcess = false;
-		QL->printStep = false;
+		QL->shouldPrintWM = true;  
+		QL->Icycle = false;  //allows for a new input source
+		QL->readFromCmd = true;  //new source is command line
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
@@ -259,6 +257,7 @@ Reader::ReadMe(istream* in)
 			toReturn += elget;
 			in->get(elget);
 		}
+		QL->shouldPrintWM = false;
 		return toReturn;
 	}
 	else if(QL->first == "SPAWN")
@@ -285,7 +284,24 @@ Reader::ReadMe(istream* in)
 		return toReturn;
 	}		
 
+}
 
-		
-
+void
+Reader::EndOfFile(istream* in)
+{
+	in->clear();
+	if(in != &cin)          //as long as in != cin
+		QL->fileStack[QL->fileStack.size()-1]->close(); //close the file stream
+	QL->fileStack.pop_back();  //gets file stream that was just closed off of stack
+	QL->Icycle = false;     //allows for a new source of input
+	if(QL->fileStack.size() > 0)   //there is a file open somewhere
+	{
+		QL->readFromCmd = false;  //read from the file
+		QL->shouldPrintWM = false;
+	}
+	else
+	{
+		QL->readFromCmd = true; //read from cmdlin
+		QL->shouldPrintWM = true;
+	}
 }

@@ -81,66 +81,33 @@ QuickLink::QuickLink()
 	
 	pOnce = true, printStep = false, Icycle = true, printTree = false, shouldPrintWM = true;
 	loadingStep = false, StuffToSave = false, loadingProcess = false, endprocnow = false;
-	resetProcStat = false;
-
-	
-	SoarSetup();
+	resetProcStat = false, readFromCmd = true, enterOutputStage = false, printWM_runp = false;
 }
 
 void
-QuickLink::SoarSetup()
-{
-	/*cout << endl << "Launch the debugger and connect it to QuickLink" << endl;
-	WhenReady();
-
-	cout << endl << "Load all productions into Soar using the debugger" << endl;
-	WhenReady();*/
-
-	pCommand = "NEW"; //pCommand is a flag used to identify process commands
-	cout << endl;
-	return;
-}
-
-void 
 QuickLink::Run()
 {
-	
-	while (true)
+	while(true)
 	{
-		printStep = false;  //used to print step of process
-		if (pCommand == "NEW" || pCommand == "RUN") //not running a process
+		while(!enterOutputStage)
 		{
-			CallParser(&cin);
+			Icycle = true;
+			if(readFromCmd)
+			{
+				CallParser(&cin);
+			}
+			else //read from a file
+			{
+				int tmp2 = fileStack.size();
+				CallParser(fileStack[fileStack.size()-1]); //send in most recently opened filestream
+			}
 		}
-		if (inFile && loadingProcess) //process file is open and has things left to load
-		{			
-			printStep = true;  //used to print step of process
-			CallParser(&inFile);	
-			pOnce = true;  //flag set so that end process message will be printed
-			if(!loadingProcess)
-                endProcess();
-			if(userInput)
-				CallParser(&cin);			
-		}
-		if(!resetProcStat)
-		{
-			OutputCycle();
-			pKernel->CheckForIncomingCommands();
-		}
-		else
-			resetProcStat = false;
-		
-		
-		//if(endprocnow)
-			//endProcess();
+		OutputCycle();
+		pKernel->CheckForIncomingCommands();
+		enterOutputStage = false;
 	}
-
-	pKernel->DestroyAgent(pAgent);
-	pKernel->Shutdown();
-	delete pKernel;
-
-	return;
 }
+
 
 void
 QuickLink::CallParser(istream* in)
@@ -149,9 +116,7 @@ QuickLink::CallParser(istream* in)
 	Icycle = true;
 	//******INPUT******
 	if(*in == cin)
-		cout << "******INPUT****** " << endl << endl;
-	else
-		loadingStep = true;
+		cout << endl << "******INPUT****** " << endl << endl;
 
 	while (Icycle)
 	{
@@ -172,13 +137,11 @@ QuickLink::CallParser(istream* in)
 			commandStore.push_back(toStore);
 	}
 	pAgent->Commit();
-}
-
-void
-QuickLink::loadProcess()
-{
-	//CallParser(&inFile);
-	pAgent->Commit();
+	if(printWM_runp)
+	{
+		PrintWorkingMem();
+		printWM_runp = false;
+	}
 }
 
 void
@@ -664,23 +627,6 @@ QuickLink::printSoarOutForm()
 }
 
 void
-QuickLink::loadInput(ifstream& iFile)
-{
-	if(!iFile)
-	{
-		cout << "ERROR: File " << loc << " failed to open!" << endl;
-		iFile.clear();
-		printStep = false;
-		WhenReady();
-	}
-	else
-	{
-		counter--;
-		CallParser(&iFile);
-	}	
-}
-
-void
 QuickLink::delSE(int index)
 {
 	int last = SEs.size() - 1;
@@ -797,23 +743,7 @@ QuickLink::saveProcChanges()
 	cout << endl;
 	ofstream aFile;
 	aFile.open(loc.c_str());
-	bool ready = false;
-	int count = commandStore.size()-1;
-	while(!ready && count >=0)
-	{
-		string toTest = commandStore[count];
-		makeUpper(toTest);
-		if(toTest == "ENDOFSTEP")
-		{
-			commandStore[count] = "EndOfProcess";
-			commandStore.resize(count+1);
-			ready = true;
-		}
-		count--;
-	}
-	if(!ready)
-		commandStore.push_back("EndOfProcess");
-
+	
 	for(unsigned int i = 0; i < commandStore.size(); i++)
 	{
 		aFile << commandStore[i];
@@ -854,7 +784,6 @@ QuickLink::saveInput(bool toClose, ofstream& oFile)
 			oFile << "add " << SEparent[i] << " ^" << SEnames[i] << " " << SEvalue[i] << endl;
 		}
 
-		oFile << "EndOfProcess";  //prints delimeter
 		if (toClose)  //only closes structure files, not process files
 		{
 			oFile.close();
@@ -1030,23 +959,6 @@ QuickLink::advAlter()
 			SEvalue[index] = NewVal;
 		}					
 	}
-}
-
-void
-QuickLink::endProcess()
-{
-	inFile.clear();
-	inFile.close();
-	loadPair.resize(0);
-	cout << endl << "***Your process file has ended***" << endl << endl;
-	counter = 1;
-	pCommand = "NEW";
-	loadingStep = false;
-	printStep = false;
-	pOnce = false;
-	endprocnow = false;
-	resetProcStat = true;	
-	userInput = false;
 }
 
 void 

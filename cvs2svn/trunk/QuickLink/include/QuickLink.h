@@ -39,6 +39,8 @@ public:
 	void Run();
 	//Runs the program
 
+	void Run2();
+
 private:
 
 	//******MEMBER STORAGE******
@@ -96,6 +98,10 @@ private:
 
 	vector<pair> loadPair;
 
+	//******FILE STACK*******
+
+	vector<ifstream*> fileStack;
+
 	//******ALTERING PROCESS FILES******
 
 	vector<string> commandStore;
@@ -111,10 +117,10 @@ private:
 	string command, title, garbage, parent, path, uniqid;
 	string OldVal, NewVal, value, processExt, pCommand;
 	string first, second, third, fourth, fifth, OS, loc, toStore, actualSize;
-	ifstream inFile;
+	ifstream inFile, inFile2;
 	ofstream outFile;
 	bool toClose, pOnce, printStep, askToSave, Icycle, printTree, loadingStep, userInput, StuffToSave, loadingProcess;
-	bool endprocnow, shouldPrintWM, resetProcStat;
+	bool endprocnow, shouldPrintWM, resetProcStat, readFromCmd, enterOutputStage, printWM_runp;
 	char endFind;
 	int counter;
 
@@ -123,9 +129,6 @@ private:
 
 	
 	//******MEMBER METHODS******
-
-	void SoarSetup();
-	//Launch Soar and Load Productions
 
 	void InputCycle();
 	//Create and Alter working memory
@@ -144,9 +147,6 @@ private:
 
 	void saveInput(bool toClose, ofstream& oFile);
 	//saves input to a file
-
-	void loadInput(ifstream& iFile);
-	//loads input from a file
 
 	void deleteWME();
 	//deletes specified WME
@@ -196,17 +196,11 @@ private:
 	void spawnDebug();
 	//autostart debugger
 
-	void loadProcess();
-	//loads in old process
-
 	void saveProcChanges();
 	//saves Procedure Changes
 
 	void promptToSave();
 	//prompts user to save
-
-	void endProcess();
-	//ends a load early
 
 	void printOutput();
 	//prints output
@@ -222,8 +216,9 @@ private:
 
 	void OSFinder();
 
-
 	void CallParser(istream* in);
+
+
 };
 
 

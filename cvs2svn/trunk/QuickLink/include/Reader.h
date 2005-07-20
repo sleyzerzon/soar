@@ -15,8 +15,9 @@ public:
 	
 	Reader(QuickLink* bringIn);
 
-
 	string ReadMe(istream* in);
+
+	void EndOfFile(istream* in);
 private:
 
 	QuickLink* QL;
