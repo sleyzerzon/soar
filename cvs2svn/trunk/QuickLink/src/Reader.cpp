@@ -111,7 +111,7 @@ Reader::ReadMe(istream* in)
 		QL->promptToSave();
 		QL->pKernel->Shutdown();
 		delete QL->pKernel;
-		exit(0);
+		return "***QUITRETURN***";
 	}
 	else if (QL->first == _NEWP || QL->first == _NEWPS)  //clears process memory
 	{

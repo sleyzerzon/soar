@@ -216,7 +216,7 @@ private:
 
 	void OSFinder();
 
-	void CallParser(istream* in);
+	string CallParser(istream* in);
 
 
 };

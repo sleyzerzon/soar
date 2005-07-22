@@ -13,6 +13,17 @@
  *
  *****************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif // HAVE_CONFIG_H
+
+// Use Visual C++'s memory checking functionality
+#ifdef _MSC_VER
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _MSC_VER
+
 #include "sml_Client.h"
 #include "QuickLink.h"
 #include "Reader.h"
@@ -87,6 +98,8 @@ QuickLink::QuickLink()
 void
 QuickLink::Run()
 {
+	string callParserRet = "";
+
 	while(true)
 	{
 		while(!enterOutputStage)
@@ -94,14 +107,22 @@ QuickLink::Run()
 			Icycle = true;
 			if(readFromCmd)
 			{
-				CallParser(&cin);
+				callParserRet = CallParser(&cin);
+				if(callParserRet == "***QUITRETURN***")
+					break;
 			}
 			else //read from a file
 			{
 				int tmp2 = fileStack.size();
-				CallParser(fileStack[fileStack.size()-1]); //send in most recently opened filestream
+				callParserRet = CallParser(fileStack[fileStack.size()-1]); //send in most recently opened filestream
+				if(callParserRet == "***QUITRETURN***")
+					break;
 			}
 		}
+
+		if(callParserRet == "***QUITRETURN***")
+			break;
+
 		OutputCycle();
 		pKernel->CheckForIncomingCommands();
 		enterOutputStage = false;
@@ -109,7 +130,7 @@ QuickLink::Run()
 }
 
 
-void
+string
 QuickLink::CallParser(istream* in)
 {
 	Reader GetInfo(this);
@@ -133,6 +154,8 @@ QuickLink::CallParser(istream* in)
 		makeUpper(first);		
 
 		toStore = GetInfo.ReadMe(in);	
+		if(toStore == "***QUITRETURN***")
+			return "***QUITRETURN***";
 		if(toStore != "***VOIDRETURN***")
 			commandStore.push_back(toStore);
 	}
@@ -142,6 +165,7 @@ QuickLink::CallParser(istream* in)
 		PrintWorkingMem();
 		printWM_runp = false;
 	}
+	return "";
 }
 
 void
@@ -1071,11 +1095,34 @@ QuickLink::spawnDebug()
 }
 
 int main ()
-{		
-	QuickLink QL;
-	Reader R(&QL);
-	QL.Run();
-	
+{
+	// When we have a memory leak, set this variable to
+	// the allocation number (e.g. 122) and then we'll break
+	// when that allocation occurs.
+	//_crtBreakAlloc = 73 ;
+
+	{ // create local scope to allow for local memory cleanup before we check at end
+		QuickLink QL;
+		Reader R(&QL);
+		QL.Run();
+	} // end local scope
+
+#ifdef _MSC_VER
+	printf("\nNow checking memory.  Any leaks will appear below.\nNothing indicates no leaks detected.\n") ;
+	printf("\nIf no leaks appear here, but some appear in the output\nwindow in the debugger, they have been leaked from a DLL.\nWhich is reporting when it's unloaded.\n\n") ;
+
+	// Set the memory checking output to go to Visual Studio's debug window (so we have a copy to keep)
+	// and to stdout so we can see it immediately.
+	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
+	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
+
+	// Now check for memory leaks.
+	// This will only detect leaks in objects that we allocate within this executable and static libs.
+	// If we allocate something in a DLL then this call won't see it because it works by overriding the
+	// local implementation of malloc.
+	_CrtDumpMemoryLeaks();
+#endif // _MSC_VER
+
 	return 0;
 }
 
