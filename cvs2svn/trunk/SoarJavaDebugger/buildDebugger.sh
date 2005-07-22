@@ -7,11 +7,19 @@ do
   rm -f $file
 done
 
-if ! javac -classpath .:${SOARLIB}/swt.jar:${SOARLIB}/sml.jar -sourcepath . debugger/Application.java; then
-  echo "Build failed."
-  exit 1;
+if [[ `uname -s` == "Darwin" ]]
+  if ! javac -classpath .:${SOARLIB}/swt-osx.jar:${SOARLIB}/sml.jar -sourcepath . debugger/Application.java; then
+    echo "Build failed."
+    exit 1;
+  fi
+  jar cfm ${SOARLIB}/SoarJavaDebugger.jar JarManifest-osx .
+else
+  if ! javac -classpath .:${SOARLIB}/swt-motif.jar:${SOARLIB}/sml.jar -sourcepath . debugger/Application.java; then
+    echo "Build failed."
+    exit 1;
+  fi
+  jar cfm ${SOARLIB}/SoarJavaDebugger.jar JarManifest-motif .
 fi
-jar cfm ${SOARLIB}/SoarJavaDebugger.jar JarManifest .
 
 if [[ `uname -s` == "Darwin" ]]
 then

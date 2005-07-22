@@ -1,11 +1,19 @@
 #!/bin/sh
 SOARLIB="../soar-library"
 
-if ! javac -classpath .:${SOARLIB}/swt.jar:${SOARLIB}/sml.jar -sourcepath src src/edu/umich/toh/TowersOfHanoi.java; then
-  echo "Build failed."
-  exit 1;
+if [[ `uname -s` == "Darwin" ]]
+  if ! javac -classpath .:${SOARLIB}/swt-osx.jar:${SOARLIB}/sml.jar -sourcepath src src/edu/umich/toh/TowersOfHanoi.java; then
+    echo "Build failed."
+    exit 1;
+  fi
+  jar cfm ${SOARLIB}/toh.jar JarManifest-osx -C src .
+else
+  if ! javac -classpath .:${SOARLIB}/swt-motif.jar:${SOARLIB}/sml.jar -sourcepath src src/edu/umich/toh/TowersOfHanoi.java; then
+    echo "Build failed."
+    exit 1;
+  fi
+  jar cfm ${SOARLIB}/toh.jar JarManifest-motif -C src .
 fi
-jar cfm ${SOARLIB}/toh.jar tohJarManifest -C src .
 
 if [[ `uname -s` == "Darwin" ]]
 then
