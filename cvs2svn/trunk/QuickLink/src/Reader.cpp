@@ -160,7 +160,7 @@ Reader::ReadMe(istream* in)
 			if(in != &cin)
 				QL->printWM_runp = true;
 		}
-		toReturn = "EndOfStep";
+		toReturn = "PAUSE";
 		return toReturn;
 	}
 	else if (QL->first == _SAVEP || QL->first == _SAVEPS) //save process
@@ -185,7 +185,7 @@ Reader::ReadMe(istream* in)
 		QL->pAgent->RunSelfTilOutput(15);
 		QL->enterOutputStage = true;
 		if(in == &cin)
-			toReturn = "EndOfStep";
+			toReturn = "PAUSE";
 		else
 			toReturn = "Go";
 		return toReturn;
@@ -203,7 +203,7 @@ Reader::ReadMe(istream* in)
 		QL->Icycle = false;
 		QL->pAgent->RunSelf(amount);
 		if(in == &cin)
-            toReturn = "EndOfStep";
+            toReturn = "PAUSE";
 		else
 			toReturn = "Go";
 		return toReturn;
@@ -213,7 +213,18 @@ Reader::ReadMe(istream* in)
 		cout << endl;
 		QL->printOutput();
 		QL->shouldPrintWM = false;
+		toReturn = "***VOIDRETURN***";
 		return toReturn;
+	}
+	else if(QL->first == "LASTINPUT" || QL->first == "LI")
+	{
+		//Nothing has to be done here because WM will be printed by default
+		toReturn = "***VOIDRETURN***";
+		return toReturn;
+	}
+	else if(QL->first == "COMMIT")
+	{
+		QL->pAgent->Commit();
 	}
 	else if(QL->first == _CMDLIN || QL->first == _CL)  //execute command line command
 	{
@@ -239,7 +250,7 @@ Reader::ReadMe(istream* in)
 		toReturn = QL->first;
 		return toReturn;
 	}
-	else if(QL->first == "ENDOFSTEP")
+	else if(QL->first == "PAUSE")
 	{
 		QL->shouldPrintWM = true;  
 		QL->Icycle = false;  //allows for a new input source

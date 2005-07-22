@@ -1,3 +1,7 @@
+07.22.2005
+-Added "COMMIT" command
+-Added print last input-link command "li"
+-Fixed load of empty file causes infinite loop
 07.20.2005
 -Everything now loads with the keyword "load" ("loadp" is invalid).
 -The command to continue a process is "continue" or "cont".

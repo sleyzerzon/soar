@@ -57,7 +57,7 @@ QuickLink::OSFinder()
 #endif
 
 
-
+//void MySystemStartHandler()
 
 QuickLink::QuickLink()
 {
