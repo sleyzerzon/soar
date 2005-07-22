@@ -10,13 +10,10 @@
 
 // These static function create a new Kernel object which should be destroyed later
 // We need to let SWIG know this
-%newobject sml::Kernel::CreateKernelInCurrentThread(char const*, bool, int);
-%newobject sml::Kernel::CreateKernelInCurrentThread(char const*, bool);
-%newobject sml::Kernel::CreateKernelInCurrentThread(char const*);
-%newobject sml::Kernel::CreateKernelInNewThread(char const*, int);
-%newobject sml::Kernel::CreateKernelInNewThread(char const*);
-%newobject sml::Kernel::CreateRemoteConnection(bool, char const*, int);
-%newobject sml::Kernel::CreateRemoteConnection(bool, char const*);
+%newobject sml::Kernel::CreateKernelInCurrentThread;
+%newobject sml::Kernel::CreateKernelInNewThread;
+%newobject sml::Kernel::CreateRemoteConnection;
+
 // This function also creates a new object, but we need to tell SWIG how to delete it
 %typemap(newfree) char* GenerateXMLString {
     sml::ClientXML::DeleteString($1);
