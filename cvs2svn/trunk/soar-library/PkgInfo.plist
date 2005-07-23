@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleGetInfoString</key>
-	<string>8.6.1, Copyright 2005 University of Michigan</string>
+	<string>8.6.2, Copyright 2005 University of Michigan</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.umich.soar-8.6.1</string>
+	<string>edu.umich.soar-8.6.2</string>
 	<key>CFBundleShortVersionString</key>
-	<string>8.6.1</string>
+	<string>8.6.2</string>
 	<key>IFPkgFlagAllowBackRev</key>
 	<false/>
 	<key>IFPkgFlagAuthorizationAction</key>
@@ -17,7 +17,7 @@
 	<key>IFPkgFlagBackgroundScaling</key>
 	<string>none</string>
 	<key>IFPkgFlagDefaultLocation</key>
-	<string>/Applications/Soar-8.6.1</string>
+	<string>/Applications/Soar-8.6.2</string>
 	<key>IFPkgFlagFollowLinks</key>
 	<true/>
 	<key>IFPkgFlagInstallFat</key>
