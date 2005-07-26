@@ -24,6 +24,8 @@
 	<string>3.0</string>
 	<key>Java</key>
 	<dict>
+		<key>StartOnMainThread</key>
+                <true/>
 		<key>ClassPath</key>
 		<string>/Applications/Soar-8.6.2/soar-library/swt-osx.jar:/Applications/Soar-8.6.2/soar-library/sml.jar:$JAVAROOT/SoarJavaDebugger.jar</string>
 		<key>JVMVersion</key>
@@ -31,7 +33,7 @@
 		<key>MainClass</key>
 		<string>debugger.Application</string>
 		<key>VMOptions</key>
-		<string>-XstartOnFirstThread -Xmx512m -Djava.library.path=/Applications/Soar-8.6.2/lib:/Applications/Soar-8.6.2/soar-library -Dorg.eclipse.swt.internal.carbon.smallFonts</string>
+		<string>-Xmx512m -Djava.library.path=/Applications/Soar-8.6.2/lib:/Applications/Soar-8.6.2/soar-library -Dorg.eclipse.swt.internal.carbon.smallFonts</string>
 		<key>WorkingDirectory</key>
 		<string>/Applications/Soar-8.6.2/soar-library</string>
 	</dict>
