@@ -2,6 +2,7 @@
 SOARLIB="../soar-library"
 
 if [[ `uname -s` == "Darwin" ]]
+then
   if ! javac -classpath .:${SOARLIB}/swt-osx.jar:${SOARLIB}/sml.jar -sourcepath src src/edu/umich/toh/TowersOfHanoi.java; then
     echo "Build failed."
     exit 1;

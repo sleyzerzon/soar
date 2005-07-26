@@ -8,6 +8,7 @@ do
 done
 
 if [[ `uname -s` == "Darwin" ]]
+then
   if ! javac -classpath .:${SOARLIB}/swt-osx.jar:${SOARLIB}/sml.jar -sourcepath . debugger/Application.java; then
     echo "Build failed."
     exit 1;
