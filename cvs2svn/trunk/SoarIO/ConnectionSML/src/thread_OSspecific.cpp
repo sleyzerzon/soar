@@ -66,8 +66,8 @@ public:
 	WindowsEvent()					{ m_Event = CreateEvent(NULL, FALSE, FALSE, NULL); }
 	virtual ~WindowsEvent()			{ CloseHandle(m_Event) ; }
 	void WaitForEventForever()		{ WaitForSingleObject(m_Event, INFINITE); }
-	bool WaitForEvent(long milli)	{ 
-		DWORD res = WaitForSingleObject(m_Event, milli) ; 
+	bool WaitForEvent(long sec, long milli)	{ 
+		DWORD res = WaitForSingleObject(m_Event, (sec*1000) + milli) ; 
 		return (res != WAIT_TIMEOUT) ; 
 	}
 	void TriggerEvent()				{ SetEvent(m_Event) ; }
@@ -186,7 +186,7 @@ public:
 		m_signaled = false; 
 		pthread_mutex_unlock(&m_mutex); 
 	}
-	bool WaitForEvent(long milli)	{
+	bool WaitForEvent(long sec, long milli)	{
 		//return false;
 		pthread_mutex_lock(&m_mutex);
 		
@@ -198,9 +198,15 @@ public:
 		}
 		
 		struct timespec timeout;
-		timeout.tv_sec = now.tv_sec;
+		timeout.tv_sec = now.tv_sec + sec;
 		timeout.tv_nsec = now.tv_usec * 1000;
 		timeout.tv_nsec += milli * 1000000;
+
+		// make sure the nanoseconds field doesn't exceed 1 second (this is an error on OS X)
+		if(timeout.tv_nsec >= 1000000000) {
+			timeout.tv_nsec -= 1000000000;
+			timeout.tv_sec++;
+		}
 		
 		while (!m_signaled) {
 			if (pthread_cond_timedwait(&m_cond, &m_mutex, &timeout) == ETIMEDOUT) {

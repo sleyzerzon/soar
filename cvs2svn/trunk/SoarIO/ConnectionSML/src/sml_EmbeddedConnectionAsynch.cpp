@@ -223,7 +223,8 @@ ElementXML* EmbeddedConnectionAsynch::GetResponseForID(char const* pID, bool wai
 	// How long we will wait before checking for a message (in msecs)
 	// (If one comes in it'll wake us up from this immediately, but having
 	//  a timeout ensures we don't get stuck forever somehow).
-	int maximumWaitTime = 1000 ;
+	long maximumWaitTimeSeconds = 1 ;
+	long maximumWaitTimeMilliseconds = 0 ;
 
 	// If we don't already have this response cached,
 	// then read any pending messages.
@@ -255,7 +256,7 @@ ElementXML* EmbeddedConnectionAsynch::GetResponseForID(char const* pID, bool wai
 
 		// Wait for a response for up to a second
 		// If one comes in it will trigger this event to wake us up immediately.
-		m_WaitEvent.WaitForEvent(maximumWaitTime) ;
+		m_WaitEvent.WaitForEvent(maximumWaitTimeSeconds, maximumWaitTimeMilliseconds) ;
 
 		// Allow other threads the chance to update
 		// (by calling with 0 for sleep time we don't give away cycles if

@@ -34,9 +34,9 @@ void Event::WaitForEventForever()
 	m_Imp->WaitForEventForever() ;
 }
 
-bool Event::WaitForEvent(long milliseconds)
+bool Event::WaitForEvent(long seconds, long milliseconds)
 {
-	return m_Imp->WaitForEvent(milliseconds) ;
+	return m_Imp->WaitForEvent(seconds, milliseconds) ;
 }
 
 void Event::TriggerEvent()

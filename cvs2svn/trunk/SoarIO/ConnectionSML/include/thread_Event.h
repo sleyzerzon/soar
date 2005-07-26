@@ -31,7 +31,7 @@ public:
 	void WaitForEventForever() ;
 
 	// Returns true if event was triggered.  False if we just timed out.
-	bool WaitForEvent(long milliseconds) ;
+	bool WaitForEvent(long seconds, long milliseconds) ;
 	void TriggerEvent() ;	// Causes waiting thread to wake up
 } ;
 

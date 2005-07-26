@@ -38,7 +38,7 @@ class OSSpecificEvent
 public:
 	virtual ~OSSpecificEvent() {} ;
 	virtual void WaitForEventForever() = 0 ;
-	virtual bool WaitForEvent(long milliseconds) = 0 ;
+	virtual bool WaitForEvent(long seconds, long milliseconds) = 0 ;
 	virtual void TriggerEvent() = 0 ;
 } ;
 
