@@ -1,4 +1,6 @@
-07.26.2005
+07.26.2005 - 2
+-Fixed a delete issue
+07.26.2005 - 1
 -Fixed "COMMIT" command
 -infinite nested load commands possible
 07.22.2005

@@ -653,6 +653,8 @@ QuickLink::printSoarOutForm()
 void
 QuickLink::delSE(int index)
 {
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+		pAgent->DestroyWME(SEs[index]);
 	int last = SEs.size() - 1;
 	SEs[index] = SEs[last];
 	SEnames[index] = SEnames[last];
@@ -667,6 +669,8 @@ QuickLink::delSE(int index)
 void
 QuickLink::delIE(int index)
 {
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+		pAgent->DestroyWME(IEs[index]);
 	int last = IEs.size() - 1;
 	IEs[index] = IEs[last];
 	IEnames[index] = IEnames[last];
@@ -681,6 +685,8 @@ QuickLink::delIE(int index)
 void
 QuickLink::delFE(int index)
 {
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+		pAgent->DestroyWME(FEs[index]);
 	int last = FEs.size() - 1;
 	FEs[index] = FEs[last];
 	FEnames[index] = FEnames[last];
@@ -695,6 +701,8 @@ QuickLink::delFE(int index)
 void
 QuickLink::delID(int index)
 {
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+		pAgent->DestroyWME(IDs[index]);
 	int last = IDs.size() - 1;
 	IDs[index] = IDs[last];
 	IDnames[index] = IDnames[last];

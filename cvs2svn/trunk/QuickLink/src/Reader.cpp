@@ -180,7 +180,11 @@ Reader::ReadMe(istream* in)
 		if(in == &cin)
 			toReturn = "PAUSE";
 		else
+		{
+			QL->PrintWorkingMem();
+			QL->shouldPrintWM = false;
 			toReturn = "Go";
+		}
 		return toReturn;
 	}
 	else if(QL->first == _RUNC || QL->first == _RUNCS)  //run soar for n cycles
