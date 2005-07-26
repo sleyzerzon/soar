@@ -101,6 +101,7 @@ private:
 	//******FILE STACK*******
 
 	vector<ifstream*> fileStack;
+	vector<ifstream> FS;
 
 	//******ALTERING PROCESS FILES******
 
@@ -117,7 +118,6 @@ private:
 	string command, title, garbage, parent, path, uniqid;
 	string OldVal, NewVal, value, processExt, pCommand;
 	string first, second, third, fourth, fifth, OS, loc, toStore, actualSize;
-	ifstream inFile, inFile2;
 	ofstream outFile;
 	bool toClose, pOnce, printStep, askToSave, Icycle, printTree, loadingStep, userInput, StuffToSave, loadingProcess;
 	bool endprocnow, shouldPrintWM, resetProcStat, readFromCmd, enterOutputStage, printWM_runp;

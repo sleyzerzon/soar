@@ -1,3 +1,6 @@
+07.26.2005
+-Fixed "COMMIT" command
+-infinite nested load commands possible
 07.22.2005
 -Added "COMMIT" command
 -Added print last input-link command "li"

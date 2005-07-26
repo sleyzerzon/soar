@@ -127,20 +127,13 @@ Reader::ReadMe(istream* in)
 	{
 		QL->shouldPrintWM = false; //we do not want to print WM everytime a new structure is added
 		QL->locFinder(in);  //gets the location of the file
-		if(!QL->inFile.is_open()) //needed because of scoping issues
-		{
-			QL->inFile.open(QL->loc.c_str()); //opens the file
-			if(!QL->inFile)
-				cout << "File " << QL->loc << " Failed to Open" << endl;
-			QL->fileStack.push_back(&QL->inFile); //pushes the file onto the stack
-		}
-		else
-		{
-			QL->inFile2.open(QL->loc.c_str());
-			if(!QL->inFile2)
-				cout << "File " << QL->loc << " Failed to Open" << endl;
-			QL->fileStack.push_back(&QL->inFile2); //pushes the file onto the stack
-		}
+		
+		QL->fileStack.resize(QL->fileStack.size()+1);  //increase the size of the file stack
+		QL->fileStack[QL->fileStack.size()-1] = new ifstream; //create new ifstream and have end of stack point to it
+		(*(QL->fileStack[QL->fileStack.size()-1])).open(QL->loc.c_str()); //open the stream
+		if(!(*(QL->fileStack[QL->fileStack.size()-1]))) //error testing
+			cout << "File " << QL->loc << " Failed to Open" << endl;
+		
 		QL->readFromCmd = false; //intiates CallParser(&inFile)
 		QL->Icycle = false; //allows for a change of input source
 		toReturn = "***VOIDRETURN***";
@@ -224,7 +217,12 @@ Reader::ReadMe(istream* in)
 	}
 	else if(QL->first == "COMMIT")
 	{
-		QL->pAgent->Commit();
+		if(QL->pKernel->IsAgentValid(QL->pAgent))
+			QL->pAgent->Commit();
+		else
+			cout << endl << "There is no agent loaded." << endl;
+		toReturn = "Commit";
+		return toReturn;
 	}
 	else if(QL->first == _CMDLIN || QL->first == _CL)  //execute command line command
 	{
