@@ -12,6 +12,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include <assert.h>
 #include "thread_OSspecific.h"
 
 using namespace soar_thread ;
@@ -66,7 +67,9 @@ public:
 	WindowsEvent()					{ m_Event = CreateEvent(NULL, FALSE, FALSE, NULL); }
 	virtual ~WindowsEvent()			{ CloseHandle(m_Event) ; }
 	void WaitForEventForever()		{ WaitForSingleObject(m_Event, INFINITE); }
-	bool WaitForEvent(long sec, long milli)	{ 
+	//The timeout is seconds + milliseconds, where milliseconds < 1000
+	bool WaitForEvent(long sec, long milli)	{
+		assert(milli < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
 		DWORD res = WaitForSingleObject(m_Event, (sec*1000) + milli) ; 
 		return (res != WAIT_TIMEOUT) ; 
 	}
@@ -186,7 +189,10 @@ public:
 		m_signaled = false; 
 		pthread_mutex_unlock(&m_mutex); 
 	}
+
+	//The timeout is seconds + milliseconds, where milliseconds < 1000
 	bool WaitForEvent(long sec, long milli)	{
+		assert(milli < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
 		//return false;
 		pthread_mutex_lock(&m_mutex);
 		
