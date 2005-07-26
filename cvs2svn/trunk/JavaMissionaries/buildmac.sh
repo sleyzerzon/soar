@@ -34,6 +34,6 @@ then
     cp MissionariesAndCannibals.plist $APP_PATH/Info.plist
     cp $SOARLIB/icons/mac.icns $APP_PATH/Resources
     cp $SOARLIB/mac.jar $APP_PATH/Resources/Java
-    cp $SOARLIB/java_swt $APP_PATH/MacOS
-    chmod a+x $APP_PATH/MacOS/java_swt
+    cp /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub $APP_PATH/MacOS
+    chmod a+x $APP_PATH/MacOS/JavaApplicationStub
 fi
