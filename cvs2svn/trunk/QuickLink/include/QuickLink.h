@@ -41,6 +41,8 @@ public:
 
 	void Run2();
 
+	sml::Agent* pAgent;
+
 private:
 
 	//******MEMBER STORAGE******
@@ -110,7 +112,7 @@ private:
 	//*******MEMBER VARIABLES******
 
 	sml::Kernel* pKernel;
-	sml::Agent* pAgent;
+
 	sml::Identifier* pInputLink;
 	sml::Identifier* advHold;
 	float Fvalue;

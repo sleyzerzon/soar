@@ -57,7 +57,7 @@ QuickLink::OSFinder()
 #endif
 
 
-//void MySystemStartHandler()
+void MyStartSystemEventHandler(sml::smlSystemEventId id, void* pUserData, sml::Kernel* pKernel);
 
 QuickLink::QuickLink()
 {
@@ -93,6 +93,8 @@ QuickLink::QuickLink()
 	pOnce = true, printStep = false, Icycle = true, printTree = false, shouldPrintWM = true;
 	loadingStep = false, StuffToSave = false, loadingProcess = false, endprocnow = false;
 	resetProcStat = false, readFromCmd = true, enterOutputStage = false, printWM_runp = false;
+
+	pKernel->RegisterForSystemEvent( sml::smlEVENT_SYSTEM_START , MyStartSystemEventHandler , this );
 }
 
 void
@@ -129,6 +131,13 @@ QuickLink::Run()
 	}
 }
 
+void
+MyStartSystemEventHandler(sml::smlSystemEventId id, void* pUserData, sml::Kernel* pKernel)
+{
+	QuickLink* QL = (QuickLink*)pUserData;
+	QL->pAgent->Commit();
+}
+
 
 string
 QuickLink::CallParser(istream* in)
@@ -159,7 +168,7 @@ QuickLink::CallParser(istream* in)
 		if(toStore != "***VOIDRETURN***")
 			commandStore.push_back(toStore);
 	}
-	pAgent->Commit();
+	//pAgent->Commit();
 	if(printWM_runp)
 	{
 		PrintWorkingMem();
