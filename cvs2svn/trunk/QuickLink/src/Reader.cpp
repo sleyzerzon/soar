@@ -273,7 +273,7 @@ Reader::ReadMe(istream* in)
 		QL->shouldPrintWM = false;
 		return toReturn;
 	}
-	else if(QL->first == "SPAWN")
+	else if(QL->first == "DEBUG")
 	{
 		QL->spawnDebug();
 		toReturn = "***VOIDRETURN***";
@@ -283,7 +283,7 @@ Reader::ReadMe(istream* in)
 	{
 		string strcmd = QL->actualSize;
 		QL->shouldPrintWM = false;
-		while(in->peek() != '\n')
+		while(in->peek() != '\n' && in->peek() != EOF)
 		{
 			string tmp;
 			*in >> tmp;

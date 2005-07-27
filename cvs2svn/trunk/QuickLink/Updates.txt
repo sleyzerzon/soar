@@ -1,3 +1,6 @@
+07.27.2005
+-"SPAWN" is now "DEBUG"
+-fixed ending a file with a soar command problem
 07.26.2005 - 3
 -Fixed committing to early problem to commit on system start event
 07.26.2005 - 2
