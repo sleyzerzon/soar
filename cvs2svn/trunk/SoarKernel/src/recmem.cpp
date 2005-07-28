@@ -789,7 +789,7 @@ void deallocate_instantiation (agent* thisAgent, instantiation *inst) {
            #ifdef DO_TOP_LEVEL_REF_CTS
 		   preference_remove_ref (thisAgent, pref);
            #else
-	       if (level > TOP_GOAL_LEVEL)  preference_remove_ref (pref);
+	       if (level > TOP_GOAL_LEVEL)  preference_remove_ref (thisAgent, pref);
            #endif
        }
        free_list (thisAgent, c_old);
@@ -801,7 +801,7 @@ void deallocate_instantiation (agent* thisAgent, instantiation *inst) {
      #else
 	   if (level > TOP_GOAL_LEVEL) {
 		   wme_remove_ref (thisAgent, cond->bt.wme_);
-           if (cond->bt.trace) preference_remove_ref (cond->bt.trace);
+           if (cond->bt.trace) preference_remove_ref (thisAgent, cond->bt.trace);
 	   }
      #endif
    }
