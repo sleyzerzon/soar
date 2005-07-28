@@ -3,15 +3,10 @@
  * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
-/* soar.h */
+/* kernel.h */
 
 #ifndef KERNEL_H
 #define KERNEL_H
-
-#ifndef tolower
-/* I can't believe Sun's ctype.h doesn't have this. */
-//extern int tolower(int);
-#endif
 
 #ifdef _WINDOWS
 #include <stdlib.h>
@@ -109,7 +104,7 @@ typedef union symbol_union Symbol;
 
 /* Comment out the following line to avoid the overhead of keeping statistics
    on memory pool usage */
-/* #define MEMORY_POOL_STATS */
+#define MEMORY_POOL_STATS
 
 /* Uncomment the following line to eliminate all timing statistics.
    The "stats" command will have much shorter output as well. */
@@ -129,7 +124,7 @@ typedef union symbol_union Symbol;
    but if you are trying to improve performance and reduce memory, it's
    worth testing your system with the top-level-ref-cts turned off.
    See comments in recmem.cpp  */
-#define DO_TOP_LEVEL_REF_CTS
+/* #define DO_TOP_LEVEL_REF_CTS */
 
 /* UNComment the following line to eliminate all callbacks except those
    for I/O, AFTER_DECISION_PHASE, and printing. */
