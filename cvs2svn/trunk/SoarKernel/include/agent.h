@@ -110,7 +110,10 @@ typedef signed short goal_stack_level;
    sure to use the current_agent macro to ensure compatibility
    with the multi-agent code!  E.g. if your new global is "foo"
    then do NOT refer to it in the code as "foo" but instead as
-   "current_agent(foo)". */
+   "current_agent(foo)". 
+   
+   As of version 8.6, the current_agent macro was deprecated
+   when gSKI was added as a wrapper.  Use ptr directly, thisAgent->foo. */
 
 
 /* If you define a new global, initialize it in the create_soar_agent
@@ -121,10 +124,11 @@ typedef struct token_struct token;
 typedef char * test;
 
 typedef struct agent_struct {
+  /* After v8.6.1, all conditional compilations were removed
+   * from struct definitions, including the agent struct below
+   */
 
   /* ----------------------- Rete stuff -------------------------- */
-  
-
   /* 
    * These are used for statistics in rete.cpp.  They were originally
    * global variables, but in the deglobalization effort, they were moved
@@ -434,8 +438,12 @@ total_kernel_time.  If the ordering discussed above is strictly enforced,
 total_kernel_time should always be slightly greater than the derived total
 kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
-/* REW: begin 28.07.96 */  
-////#ifndef NO_TIMING_STUFF
+  /* REW: begin 28.07.96 */  
+  /* If in kernel.h, the timers are disabled by #define NO_TIMING_STUFF,
+   * then these timevals will be just wasted space...
+   * Usually they are enabled, so conditional compiles removed. July 05
+   */
+  ////#ifndef NO_TIMING_STUFF
   struct timeval      start_total_tv;
   struct timeval      total_cpu_time;
   struct timeval      start_kernel_tv, start_phase_tv;
@@ -445,39 +453,29 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   struct timeval      monitors_cpu_time[NUM_PHASE_TYPES]; 
   struct timeval      input_function_cpu_time; 
   struct timeval      output_function_cpu_time; 
-/* REW: end 28.07.96 */
-
-/* REW: begin 28.07.96 */  
+ 
   /* accumulated cpu time spent in various parts of the system */
-////#ifdef DETAILED_TIMING_STATS
+  /* only used if DETAILED_TIMING_STATS is #def'd in kernel.h */
   struct timeval      ownership_cpu_time[NUM_PHASE_TYPES];
   struct timeval      chunking_cpu_time[NUM_PHASE_TYPES];
   struct timeval      match_cpu_time[NUM_PHASE_TYPES];
-/* REW: begin 11.25.96 */ 
   struct timeval      start_gds_tv, total_gds_time; 
   struct timeval      gds_cpu_time[NUM_PHASE_TYPES];
-/* REW: end   11.25.96 */  
-/* REW: end 28.07.96 */
-////#endif
+  /* REW: end 28.07.96 */
+  ////#endif
 
-////#endif
-
-////#ifdef REAL_TIME_BEHAVIOR
    /* RMJ */
    /* Keep track of real time steps for constant real-time per decision */
+   /* used only if #def'd REAL_TIME_BEHAVIOR */
    struct timeval	*real_time_tracker;
    Bool			real_time_idling;
-////#endif
-
-
-////#ifdef ATTENTION_LAPSE
+ 
    /* RMJ */
    /* Keep track of duration of attentional lapses */
+   /* Used only if #def'd ATTENTION_LAPSE in */
    struct timeval	*attention_lapse_tracker;
    Bool			attention_lapsing;
-////#endif
-
-
+ 
   
   /* ----------------------- Chunker stuff -------------------------- */
   
@@ -668,10 +666,10 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
 /* --------- I (RBD) don't know what the following stuff is ------------ */
   
-////#ifdef _WINDOWS
+  /* Soar uses these to generate nicely formatted output strings */
   char		    current_line[1024];
-  int	            current_line_index;
-////#endif
+  int	        current_line_index;
+ 
   /* String redirection */
   Bool		    using_input_string;
   char		  * input_string;
@@ -683,11 +681,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   
   multi_attribute   * multi_attributes;
   /* char                path[MAXPATHLEN];    AGR 568 */
-  
-////#ifdef USE_TCL
-  void              * interpreter;
-  growable_string     tcl_output_buffer;
-////#endif /* USE_TCL */
   
   /* JC ADDED: Array of callbacks for gSKI objects */
   gSKI_K_CallbackData  gskiCallbacks[gSKI_K_MAX_AGENT_EVENTS];
@@ -703,11 +696,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   Bool                load_errors_quit;  /* AGR 527c */
   dir_stack_struct  * top_dir_stack;   /* AGR 568 */
   
-#ifdef USE_X_DISPLAY
-  char              * display_class;
-  x_info            * X_data;
-  x_info            * monitor;
-#endif  /* USE_X_DISPLAY */
 
   /* RCHONG: begin 10.11 */
   Bool       did_PE;

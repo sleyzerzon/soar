@@ -227,9 +227,9 @@ extern void free_growable_string (agent* thisAgent, growable_string gs);
 
 typedef struct memory_pool_struct {
   void *free_list;             /* header of chain of free items */
-#ifdef MEMORY_POOL_STATS
-  long used_count;             /* for statistics only */
-#endif
+  /// #ifdef MEMORY_POOL_STATS /* only one long per pool, so always include */
+  long used_count;             /* used for statistics only when #def'd MEMORY_POOL_STATS */
+  /// #endif
   long item_size;               /* bytes per item */
   long items_per_block;        /* number of items in each big block */
   long num_blocks;             /* number of big blocks in use by this pool */
