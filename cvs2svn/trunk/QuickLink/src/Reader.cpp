@@ -265,7 +265,7 @@ Reader::ReadMe(istream* in)
 		char elget;
 		in->get(elget);
 		toReturn = QL->first;
-		while (elget != '\n' && elget != EOF)
+		while (elget != '\n' && elget != EOF && (*in))
 		{
 			toReturn += elget;
 			in->get(elget);

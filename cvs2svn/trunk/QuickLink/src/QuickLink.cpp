@@ -237,27 +237,44 @@ QuickLink::advValue()  //figure out what type the value is
 void
 QuickLink::createID()
 {
+	int sharedId = -1;
 	bool tester = true;
 	for(unsigned int i = 0; i < IDs.size() && tester; i++)  //checks to see if element already exists
 	{
 		if(IDparent[i] == parent && IDnames[i] == path && IDsoar[i] == uniqid)
 			tester = false;
+		if(IDsoar[i] == uniqid)
+			sharedId = i;
 	}
 	if(tester)	
 	{
 		if(parent == "IL")
 		{
-			sml::Identifier* temp1;
-			temp1 = pAgent->CreateIdWME(pInputLink, path.c_str());
-			IDnames.push_back(path);
-			IDparent.push_back(parent);
-			IDsoar.push_back(uniqid);
-			IDs.push_back(temp1);
+			if(sharedId != -1)  //If this needs to be a sharedIdWme
+			{
+				sml::Identifier* temp1;
+				temp1 = pAgent->CreateSharedIdWME(pInputLink, path.c_str(), IDs[sharedId]);
+				SharedParent.push_back(parent);  
+				SharedNames.push_back(path);	 
+				SharedValue.push_back(uniqid);
+				cout << parent << " " << path << " " << uniqid << endl;
+				Shared.push_back(temp1);
+			}
+			else
+			{
+				sml::Identifier* temp1;
+				temp1 = pAgent->CreateIdWME(pInputLink, path.c_str());
+				IDnames.push_back(path);
+				IDparent.push_back(parent);
+				IDsoar.push_back(uniqid);
+				IDs.push_back(temp1);
+			}
+			
 		}
 		else
 		{
 			int iI = -1;
-			for(unsigned int i = 0; i < IDs.size(); i++)
+			for(unsigned int i = 0; i < IDs.size(); i++)  //find the parent
 			{
 				if(IDsoar[i] == parent)
 					iI = i;
@@ -269,12 +286,26 @@ QuickLink::createID()
 			}
 			else
 			{
-				sml::Identifier* temp1;
-				temp1 = pAgent->CreateIdWME(IDs[iI], path.c_str());
-				IDnames.push_back(path);
-				IDparent.push_back(parent);
-				IDsoar.push_back(uniqid);
-				IDs.push_back(temp1);
+				if(sharedId != -1)  //If this needs to be a sharedIdWme
+				{
+					sml::Identifier* temp1;
+					temp1 = pAgent->CreateSharedIdWME(IDs[iI], path.c_str(), IDs[sharedId]);
+					SharedParent.push_back(parent);  
+					SharedNames.push_back(path);	 
+					SharedValue.push_back(uniqid);
+					cout << parent << " " << path << " " << uniqid << endl;
+					Shared.push_back(temp1);
+				}
+				else
+				{
+					sml::Identifier* temp1;
+					temp1 = pAgent->CreateIdWME(IDs[iI], path.c_str());
+					IDnames.push_back(path);
+					IDparent.push_back(parent);
+					IDsoar.push_back(uniqid);
+					IDs.push_back(temp1);
+				}
+				
 			}					
 		}
 	}
@@ -488,13 +519,30 @@ QuickLink::printSoarInForm()
 				{	cout << endl << toPrint[j].indent << "    " << " ^" << IDnames[i] << " " << IDsoar[i];
 					length = (4 + toPrint[j].indent.size());  //controls word wrapping
 				}
-				IDprint[i] = true;
 				spaceControl tmp2;
+				string tmp5 = IDsoar[i];
 				tmp2.iden = IDsoar[i];
 				tmp2.indent = ("  " + toPrint[j].indent);
-				toPrint.push_back(tmp2);
+				if(IDprint[i] == false)
+				{
+					toPrint.push_back(tmp2);
+					IDprint[i] = true;
+				}
 			}
 		}
+		for(unsigned int i = 0; i < Shared.size(); i++)
+			if(SharedParent[i] == toPrint[j].iden)
+			{
+				int tmp = (length + SharedNames[i].size() + SharedValue[i].size() +3);
+				if(tmp < 78)  //controls word wrapping
+				{	cout << " ^" << SharedNames[i] << " " << SharedValue[i];
+				length = tmp;  //controls word wrapping 
+				}
+				else
+				{	cout << endl << toPrint[j].indent << "    " << " ^" << SharedNames[i] << " " << SharedValue[i];
+				length = (4 + toPrint[j].indent.size());  //controls word wrapping
+				}
+			}
 		for(unsigned int i = 0; i < SEs.size(); i++)
 			if(SEparent[i] == toPrint[j].iden)
 			{
@@ -662,9 +710,9 @@ QuickLink::printSoarOutForm()
 void
 QuickLink::delSE(int index)
 {
-	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP") //Implemented for Bob, clear should not erase lower-level structures
 		pAgent->DestroyWME(SEs[index]);
-	int last = SEs.size() - 1;
+	int last = SEs.size() - 1;  //the delete is made by swapping the element to be deleted with the last and using pop_back
 	SEs[index] = SEs[last];
 	SEnames[index] = SEnames[last];
 	SEparent[index] = SEparent[last];
@@ -678,9 +726,9 @@ QuickLink::delSE(int index)
 void
 QuickLink::delIE(int index)
 {
-	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP") //Implemented for Bob, clear should not erase lower-level structures
 		pAgent->DestroyWME(IEs[index]);
-	int last = IEs.size() - 1;
+	int last = IEs.size() - 1;  //the delete is made by swapping the element to be deleted with the last and using pop_back
 	IEs[index] = IEs[last];
 	IEnames[index] = IEnames[last];
 	IEparent[index] = IEparent[last];
@@ -694,9 +742,9 @@ QuickLink::delIE(int index)
 void
 QuickLink::delFE(int index)
 {
-	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP") //Implemented for Bob, clear should not erase lower-level structures
 		pAgent->DestroyWME(FEs[index]);
-	int last = FEs.size() - 1;
+	int last = FEs.size() - 1;  //the delete is made by swapping the element to be deleted with the last and using pop_back
 	FEs[index] = FEs[last];
 	FEnames[index] = FEnames[last];
 	FEparent[index] = FEparent[last];
@@ -708,11 +756,27 @@ QuickLink::delFE(int index)
 }
 
 void
+QuickLink::delShared(int index)
+{
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP") //Implemented for Bob, clear should not erase lower-level structures
+		pAgent->DestroyWME(Shared[index]);
+	int last = Shared.size() - 1;  //the delete is made by swapping the element to be deleted with the last and using pop_back
+	Shared[index] = Shared[last];
+	SharedParent[index] = SharedParent[last];
+	SharedNames[index] = SharedNames[last];
+	SharedValue[index] = SharedValue[last];
+	Shared.pop_back();
+	SharedParent.pop_back();
+	SharedNames.pop_back();
+	SharedValue.pop_back();
+}
+
+void
 QuickLink::delID(int index)
 {
-	if(first != "CLEAR" && first != "CLEARP" && first != "CP")
+	if(first != "CLEAR" && first != "CLEARP" && first != "CP") //Implemented for Bob, clear should not erase lower-level structures
 		pAgent->DestroyWME(IDs[index]);
-	int last = IDs.size() - 1;
+	int last = IDs.size() - 1;  //the delete is made by swapping the element to be deleted with the last and using pop_back
 	IDs[index] = IDs[last];
 	IDnames[index] = IDnames[last];
 	IDparent[index] = IDparent[last];
@@ -726,55 +790,67 @@ QuickLink::delID(int index)
 void
 QuickLink::deleteChilds(string father, string always)
 {
-	int ind = -1;
-	for(unsigned int j = 0; j < IDs.size(); j++)
+	int	ind = -1;
+	for(unsigned int j = 0; j < IEs.size(); j++) //Goes through all Int Elements 
 	{
-		if(IDparent[j] == father)
+		if(IEparent[j] == father)  //Finds ones who have this father
 		{
 			ind = j;
-			deleteChilds(IDsoar[ind],always);
-			if(father == always)
-				pAgent->DestroyWME(IDs[ind]);
-			delID(ind);
-			j--;  //needed because of way delete is made
-		}
-	}
-	ind = -1;
-	for(unsigned int j = 0; j < IEs.size(); j++)
-	{
-		if(IEparent[j] == father)
-		{
-			ind = j;
-			if(father == always)
+			if(father == always && first == "CLEAR")  //Implemented for Bob, clear should not erase lower-level structures
 				pAgent->DestroyWME(IEs[ind]);
 			delIE(ind);
 			j--;  //needed because of way delete is made
 		}
 	}
 	ind = -1;
-	for(unsigned int j = 0; j < FEs.size(); j++)
+	for(unsigned int j = 0; j < FEs.size(); j++)  //Goes through all Float Elements
 	{
-		if(FEparent[j] == father)
+		if(FEparent[j] == father ) //Finds ones who have this father
 		{
 			ind = j;
-			if(father == always)
+			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
 				pAgent->DestroyWME(FEs[ind]);
 			delFE(ind);
 			j--;  //needed because of way delete is made
 		}
 	}
 	ind = -1;
-	for(unsigned int j = 0; j < SEs.size(); j++)
+	for(unsigned int j = 0; j < SEs.size(); j++)  //Goes through all String Elements
 	{
-		if(SEparent[j] == father)
+		if(SEparent[j] == father ) //Finds ones who have this father
 		{
 			ind = j;
-			if(father == always)
+			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
 				pAgent->DestroyWME(SEs[ind]);
 			delSE(ind);
 			j--;  //needed because of way delete is made
 		}
-	}			
+	}
+	ind = -1;
+	for(unsigned int j = 0; j < Shared.size(); j++)  //Goes through all Shared Elements
+	{
+		if(SharedParent[j] == father) //Finds ones who have this father
+		{
+			ind = j;
+			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
+				pAgent->DestroyWME(Shared[ind]);
+			delShared(ind);
+			j--;  //needed because of way delete is made
+		}
+	}
+	ind = -1;
+	for(unsigned int j = 0; j < IDs.size(); j++)  //Goes through all Identifiers
+	{
+		if(IDparent[j] == father) //Finds ones who have this father
+		{
+			ind = j;
+			deleteChilds(IDsoar[ind],always);
+			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
+				pAgent->DestroyWME(IDs[ind]);
+			delID(ind);
+			j--;  //needed because of way delete is made
+		}
+	}	
 }
 
 void
@@ -1056,8 +1132,10 @@ QuickLink::clearAll()
 {
 	//commandStore.resize(0);
 	deleteChilds("IL", "IL");
-	if(IDs.size() > 0 || FEs.size() > 0 || SEs.size() > 0 || IEs.size() > 0)  //used to guarentee clear
-		clearAll();
+	if(IDs.size() > 0)  //used to guarantee clear
+		deleteChilds(IDparent[0], "IL");
+	if(FEs.size() > 0 || SEs.size() > 0 || IEs.size() > 0) //used to guarantee clear
+		deleteChilds("IL", "IL");
 }
 
 void

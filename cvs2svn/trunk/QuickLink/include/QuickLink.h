@@ -57,6 +57,11 @@ private:
 	vector<string> SEparent;
 	vector<string> SEvalue;
 	vector<bool> SEprint;
+	vector<sml::Identifier*> Shared;
+	vector<string> SharedNames;
+	vector<string> SharedParent;
+	vector<string> SharedValue;
+	vector<string> SharedPrint;
 	vector<sml::IntElement*> IEs;
 	vector<string> IEnames;
 	vector<string> IEparent;
@@ -167,6 +172,9 @@ private:
 
 	void delFE(int ind);
 	//deletes FloatElement
+
+	void delShared(int ind);
+	//deletes SharedId
 
 	void createID();
 	//creates identifier

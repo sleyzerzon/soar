@@ -1,3 +1,7 @@
+07.28.2005
+-Circular structure support added
+-fixed deletion problem
+-input-link example of eaters-bot added
 07.27.2005
 -"SPAWN" is now "DEBUG"
 -fixed ending a file with a soar command problem
