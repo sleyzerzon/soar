@@ -692,9 +692,6 @@
 				RelativePath=".\include\scheduler.h">
 			</File>
 			<File
-				RelativePath=".\src\soar.h">
-			</File>
-			<File
 				RelativePath=".\include\soarkernel.h">
 			</File>
 			<File
