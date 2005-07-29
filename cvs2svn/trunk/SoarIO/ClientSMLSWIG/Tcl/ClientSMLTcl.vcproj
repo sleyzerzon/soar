@@ -77,7 +77,8 @@ move /Y pkgIndex.tcl .\Tcl_sml_ClientInterface\
 			IntermediateDirectory="$(OutDir)\Release"
 			ConfigurationType="2"
 			CharacterSet="2"
-			ManagedExtensions="FALSE">
+			ManagedExtensions="FALSE"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(TCL_INCLUDE)&quot;;..\..\ClientSML\include;..\..\ElementXML\include;..\..\ConnectionSML\include"
@@ -96,7 +97,8 @@ move /Y pkgIndex.tcl .\Tcl_sml_ClientInterface\
 				OutputFile="$(OutDir)\Tcl_sml_ClientInterface.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(TCL_LIB)&quot;"
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				ImportLibrary="$(OutDir)/$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -188,7 +190,7 @@ echo TCL_LIB: %TCL_LIB%
 echo TCL_BIN: %TCL_BIN%
 echo SWIG: %SWIG%
 echo on
-$(SWIG)\swig.exe -Wall -c++ -tcl -pkgversion 8.6.1  -I../../ClientSML/include -I../../ElementXML/include -I../../ConnectionSML/include -outdir build &quot;$(InputPath)&quot;
+$(SWIG)\swig.exe -Wall -c++ -tcl -pkgversion 8.6.2  -I../../ClientSML/include -I../../ElementXML/include -I../../ConnectionSML/include -outdir build &quot;$(InputPath)&quot;
 "
 					Outputs="$(InputName)_wrap.cxx"/>
 			</FileConfiguration>

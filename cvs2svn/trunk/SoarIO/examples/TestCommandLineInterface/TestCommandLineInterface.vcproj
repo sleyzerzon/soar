@@ -72,7 +72,8 @@
 			IntermediateDirectory="$(OutDir)\Release"
 			ConfigurationType="1"
 			CharacterSet="2"
-			ManagedExtensions="TRUE">
+			ManagedExtensions="FALSE"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)\ClientSML\include&quot;;&quot;$(SolutionDir)\ElementXML\include&quot;;&quot;$(SolutionDir)\ConnectionSML\include&quot;;&quot;$(SolutionDir)\..\gSKI\include&quot;;&quot;$(SolutionDir)\CommandLineInterface\include&quot;"

@@ -81,7 +81,8 @@ cd ..
 			IntermediateDirectory="$(OutDir)\Release"
 			ConfigurationType="2"
 			CharacterSet="2"
-			ManagedExtensions="FALSE">
+			ManagedExtensions="FALSE"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(JAVA_INCLUDE)&quot;;&quot;$(JAVA_INCLUDE)\win32&quot;;..\..\ClientSML\include;..\..\ElementXML\include;..\..\ConnectionSML\include"
@@ -99,7 +100,8 @@ cd ..
 				OutputFile="..\..\..\soar-library\Java_sml_ClientInterface.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>

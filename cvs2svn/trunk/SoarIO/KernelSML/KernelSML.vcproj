@@ -70,7 +70,8 @@
 			OutputDirectory="build"
 			IntermediateDirectory="$(OutDir)\Release"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\CommandLineInterface\include;..\..\TgDI\include;include;..\ElementXML\include;..\ConnectionSML\include;..\..\gSKI\include;..\ClientSML\include"
@@ -91,7 +92,8 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="FALSE"
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

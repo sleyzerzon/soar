@@ -68,7 +68,8 @@
 			OutputDirectory="build"
 			IntermediateDirectory="$(OutDir)\Release"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="include"
@@ -88,7 +89,8 @@
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames="ws2_32.lib"
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

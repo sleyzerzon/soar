@@ -68,7 +68,8 @@
 			OutputDirectory="build"
 			IntermediateDirectory="$(OutDir)\Release"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)\ConnectionSML\include&quot;;&quot;$(SolutionDir)\ElementXML\include&quot;"

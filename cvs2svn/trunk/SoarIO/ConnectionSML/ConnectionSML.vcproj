@@ -59,7 +59,8 @@
 			OutputDirectory="build"
 			IntermediateDirectory="$(OutDir)\Release"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
