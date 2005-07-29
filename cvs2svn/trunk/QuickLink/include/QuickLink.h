@@ -95,24 +95,17 @@ private:
 
 	vector<spaceControl> SC;
 
-	//*******MULTIPLE LOAD FILE TRICK******
-
-	struct pair
-	{
-		ifstream* str;
-		string title;
-	};
-
-	vector<pair> loadPair;
 
 	//******FILE STACK*******
 
 	vector<ifstream*> fileStack;
-	vector<ifstream> FS;
 
 	//******ALTERING PROCESS FILES******
 
 	vector<string> commandStore;
+
+	//******FOR MEMORY LEAKS******
+	vector<sml::WMElement*> toBeCleansed;
 
 	//*******MEMBER VARIABLES******
 
@@ -120,6 +113,7 @@ private:
 
 	sml::Identifier* pInputLink;
 	sml::Identifier* advHold;
+
 	float Fvalue;
 	int Ivalue;
 	string command, title, garbage, parent, path, uniqid;
@@ -227,6 +221,8 @@ private:
 	void OSFinder();
 
 	string CallParser(istream* in);
+
+	void PurgeAllVectors();
 
 
 };

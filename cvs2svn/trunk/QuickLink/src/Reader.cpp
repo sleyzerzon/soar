@@ -108,6 +108,7 @@ Reader::ReadMe(istream* in)
 	}
 	else if (QL->first == _QUIT || QL->first == "EXIT")  //quit program
 	{
+		QL->PurgeAllVectors();
 		QL->promptToSave();
 		QL->pKernel->Shutdown();
 		delete QL->pKernel;
@@ -304,7 +305,10 @@ Reader::EndOfFile(istream* in)
 {
 	in->clear();
 	if(in != &cin)          //as long as in != cin
+	{
 		QL->fileStack[QL->fileStack.size()-1]->close(); //close the file stream
+		delete QL->fileStack[QL->fileStack.size()-1];
+	}
 	QL->fileStack.pop_back();  //gets file stream that was just closed off of stack
 	QL->Icycle = false;     //allows for a new source of input
 	if(QL->fileStack.size() > 0)   //there is a file open somewhere

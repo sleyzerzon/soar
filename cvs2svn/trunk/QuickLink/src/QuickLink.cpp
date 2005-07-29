@@ -257,7 +257,6 @@ QuickLink::createID()
 				SharedParent.push_back(parent);  
 				SharedNames.push_back(path);	 
 				SharedValue.push_back(uniqid);
-				cout << parent << " " << path << " " << uniqid << endl;
 				Shared.push_back(temp1);
 			}
 			else
@@ -293,7 +292,6 @@ QuickLink::createID()
 					SharedParent.push_back(parent);  
 					SharedNames.push_back(path);	 
 					SharedValue.push_back(uniqid);
-					cout << parent << " " << path << " " << uniqid << endl;
 					Shared.push_back(temp1);
 				}
 				else
@@ -790,14 +788,42 @@ QuickLink::delID(int index)
 void
 QuickLink::deleteChilds(string father, string always)
 {
-	int	ind = -1;
+	int ind = -1;
+	
+	for(unsigned int j = 0; j < IDs.size(); j++)  //Goes through all Identifiers
+	{
+		if(IDparent[j] == father) //Finds ones who have this father
+		{
+			ind = j;
+			deleteChilds(IDsoar[ind],always);
+			if(first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
+			{
+				if(IDparent[j] == always)
+					pAgent->DestroyWME(IDs[ind]);
+				else
+				{
+					//delete IDs[ind];
+				}
+			}
+			delID(ind);
+			j--;  //needed because of way delete is made
+		}
+	}	
+	ind = -1;
 	for(unsigned int j = 0; j < IEs.size(); j++) //Goes through all Int Elements 
 	{
 		if(IEparent[j] == father)  //Finds ones who have this father
 		{
 			ind = j;
-			if(father == always && first == "CLEAR")  //Implemented for Bob, clear should not erase lower-level structures
-				pAgent->DestroyWME(IEs[ind]);
+			if(first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
+			{
+				if(IEparent[j] == always)
+					pAgent->DestroyWME(IEs[ind]);
+				else
+				{
+					//delete IEs[ind];
+				}
+			}
 			delIE(ind);
 			j--;  //needed because of way delete is made
 		}
@@ -808,8 +834,15 @@ QuickLink::deleteChilds(string father, string always)
 		if(FEparent[j] == father ) //Finds ones who have this father
 		{
 			ind = j;
-			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
-				pAgent->DestroyWME(FEs[ind]);
+			if(first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
+			{
+				if(FEparent[j] == always)
+					pAgent->DestroyWME(FEs[ind]);
+				else
+				{
+					//delete FEs[ind];
+				}
+			}
 			delFE(ind);
 			j--;  //needed because of way delete is made
 		}
@@ -820,8 +853,15 @@ QuickLink::deleteChilds(string father, string always)
 		if(SEparent[j] == father ) //Finds ones who have this father
 		{
 			ind = j;
-			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
-				pAgent->DestroyWME(SEs[ind]);
+			if(first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
+			{
+				if(SEparent[j] == always)
+					pAgent->DestroyWME(SEs[ind]);
+				else
+				{
+					//delete SEs[ind];
+				}
+			}
 			delSE(ind);
 			j--;  //needed because of way delete is made
 		}
@@ -829,29 +869,28 @@ QuickLink::deleteChilds(string father, string always)
 	ind = -1;
 	for(unsigned int j = 0; j < Shared.size(); j++)  //Goes through all Shared Elements
 	{
-		if(SharedParent[j] == father) //Finds ones who have this father
+		if(SharedParent[j] == father || SharedValue[j] == father ) //Finds ones who have this father
 		{
 			ind = j;
-			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
-				pAgent->DestroyWME(Shared[ind]);
+			if(first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
+			{
+				if(SharedParent[j] == always)
+					pAgent->DestroyWME(Shared[ind]);
+				else
+				{
+					//delete Shared[ind];
+				}
+			}
 			delShared(ind);
 			j--;  //needed because of way delete is made
 		}
 	}
+	
 	ind = -1;
-	for(unsigned int j = 0; j < IDs.size(); j++)  //Goes through all Identifiers
-	{
-		if(IDparent[j] == father) //Finds ones who have this father
-		{
-			ind = j;
-			deleteChilds(IDsoar[ind],always);
-			if(father == always && first == "CLEAR") //Implemented for Bob, clear should not erase lower-level structures
-				pAgent->DestroyWME(IDs[ind]);
-			delID(ind);
-			j--;  //needed because of way delete is made
-		}
-	}	
+
+
 }
+	
 
 void
 QuickLink::saveProcChanges()
@@ -887,6 +926,10 @@ QuickLink::saveInput(bool toClose, ofstream& oFile)
 		for(unsigned int i =0; i< IDs.size(); i++)
 		{
 			oFile << "add " << IDparent[i] << " ^" << IDnames[i] << " /" << IDsoar[i] << endl;
+		}
+		for(unsigned int i =0; i< Shared.size(); i++)
+		{
+			oFile << "add " << SharedParent[i] << " ^" << SharedNames[i] << " /" << SharedValue[i] << endl;
 		}
 		for(unsigned int i =0; i< IEs.size(); i++)
 		{
@@ -1131,10 +1174,9 @@ void
 QuickLink::clearAll()
 {
 	//commandStore.resize(0);
+	//first = "";
 	deleteChilds("IL", "IL");
-	if(IDs.size() > 0)  //used to guarantee clear
-		deleteChilds(IDparent[0], "IL");
-	if(FEs.size() > 0 || SEs.size() > 0 || IEs.size() > 0) //used to guarantee clear
+	if(IDs.size() > 0 || FEs.size() > 0 || SEs.size() > 0 || IEs.size() > 0) //used to guarantee clear
 		deleteChilds("IL", "IL");
 }
 
@@ -1189,12 +1231,45 @@ QuickLink::spawnDebug()
 	Sleep(3500);
 }
 
+void
+QuickLink::PurgeAllVectors()
+{
+	deleteChilds("IL", "IL");
+/*	for(unsigned int i = 0; i < toBeCleansed.size(); i++)
+		pAgent->DestroyWME(toBeCleansed[i]);*/
+	IDnames.resize(0);
+	IDparent.resize(0);
+	IDsoar.resize(0);
+	IDprint.resize(0);
+	SEnames.resize(0);
+	SEparent.resize(0);
+	SEvalue.resize(0);
+	SEprint.resize(0);
+	SharedNames.resize(0);
+	SharedParent.resize(0);
+	SharedValue.resize(0);
+	SharedPrint.resize(0);
+	IEnames.resize(0);
+	IEparent.resize(0);
+	IEvalue.resize(0);
+	IEprint.resize(0);
+	FEnames.resize(0);
+	FEparent.resize(0);
+	FEvalue.resize(0);
+	FEprint.resize(0);
+	storeO.resize(0);
+	fileStack.resize(0);
+	SC.resize(0);
+	commandStore.resize(0);
+
+}
+
 int main ()
 {
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
 	// when that allocation occurs.
-	//_crtBreakAlloc = 73 ;
+	//_crtBreakAlloc = 425 ;
 
 	{ // create local scope to allow for local memory cleanup before we check at end
 		QuickLink QL;
