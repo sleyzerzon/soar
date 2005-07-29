@@ -72,7 +72,8 @@
 			IntermediateDirectory="$(OutDir)/Release-static"
 			ConfigurationType="4"
 			UseOfMFC="0"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
