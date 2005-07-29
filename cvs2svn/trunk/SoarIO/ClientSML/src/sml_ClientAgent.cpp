@@ -1195,18 +1195,12 @@ bool Agent::SetStopSelfOnOutput(bool state)
 *************************************************************/
 char const* Agent::RunSelfTilOutput(unsigned long maxDecisions)
 {
-	ClearOutputLinkChanges() ;
+	// Run this agent until it generates output.
+	// For now, maxDecisions is being ignored.  We should make this a separate call
+	// to set this parameter.
+	std::string cmd = "run --self --output" ;
 
-	// Send any pending input link changes to Soar
-	Commit() ;
-
-	SetStopSelfOnOutput(true) ;
-	
-	// Don't have the agent trigger a system stop event while
-	// the simulation is presumed to still be running (through these calls).
-	GetKernel()->SuppressSystemStop(true) ;
-
-	return RunSelf(maxDecisions) ;
+	return ExecuteCommandLine(cmd.c_str()) ;
 }
 
 /*************************************************************

@@ -1163,25 +1163,22 @@ char const* Kernel::RunAllAgentsForever()
 *************************************************************/
 char const* Kernel::RunAllTilOutput(unsigned long maxDecisions)
 {
-	int numberAgents = GetNumberAgents() ;
-	for (int i = 0 ; i < numberAgents ; i++)
-	{
-		Agent* pAgent = GetAgentByIndex(i) ;
+	// Run all agents until each has generated output.  Each agent will stop at the point
+	// it has generated output, so they may run for different numbers of decisions.
+	// For now, maxDecisions is being ignored.  We should make this a separate call
+	// to set this parameter.
+	std::string cmd = "run --output" ;
 
-		pAgent->ClearOutputLinkChanges() ;
+	// The command line currently requires an agent in order
+	// to execute a run command, so we provide one (which one should make no difference).
+	if (GetNumberAgents() == 0)
+		return "There are no agents to run" ;
 
-		// Send any pending input link changes to Soar
-		pAgent->Commit() ;
+	Agent* pFirstAgent = GetAgentByIndex(0) ;
 
-		// Ask each agent to stop when they generate output
-		pAgent->SetStopSelfOnOutput(true) ;
-
-		// Don't have the agent trigger a system stop event while
-		// the simulation is presumed to still be running (through these calls).
-		SuppressSystemStop(true) ;
-	}
-
-	return RunAllAgents(maxDecisions) ;
+	// Execute the run command.
+	char const* pResult = ExecuteCommandLine(cmd.c_str(), pFirstAgent->GetAgentName()) ;
+	return pResult ;
 }
 
 /*************************************************************
