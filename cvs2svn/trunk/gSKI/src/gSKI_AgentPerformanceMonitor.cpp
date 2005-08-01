@@ -1335,7 +1335,7 @@ void AgentPerformanceMonitor::printTimingInfo()
     struct timeval start, stop;
 #endif
 
-    double min, max, min_nz;
+    double min=0.0, max=0.0, min_nz=0.0;
 #ifndef NO_TIMING_STUFF
     min_nz = soar_cDetermineTimerResolution(&min, &max);
 #endif

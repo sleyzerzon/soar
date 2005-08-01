@@ -214,13 +214,18 @@ void abort_with_fatal_error (agent* thisAgent, char *msg) {
    Finally, timer_value() returns the accumulated value of a timer
    (in seconds).
 =================================================================== */
-#ifndef NO_TIMING_STUFF
 #define ONE_MILLION (1000000)
+
+double timer_value (struct timeval *tv) {
+  return (double)(tv->tv_sec) + (double)(tv->tv_usec)/(double)ONE_MILLION;
+}
 
 void reset_timer (struct timeval *tv_to_reset) {
   tv_to_reset->tv_sec = 0;
   tv_to_reset->tv_usec = 0;
 }
+
+#ifndef NO_TIMING_STUFF
 
 #if defined(WIN32)
 
@@ -319,10 +324,6 @@ struct timeval *tv_with_accumulated_time) {
         tv_with_accumulated_time->tv_usec -= ONE_MILLION;
         tv_with_accumulated_time->tv_sec++;
     }
-}
-
-double timer_value (struct timeval *tv) {
-  return (double)(tv->tv_sec) + (double)(tv->tv_usec)/(double)ONE_MILLION;
 }
 #endif
 
