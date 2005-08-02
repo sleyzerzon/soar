@@ -45,7 +45,7 @@ namespace gSKI
    Kernel::Kernel(const IKernelFactory* kf) : m_log(0), m_kF(kf)
    {
       m_soarKernel   = create_kernel();
-	  m_InterruptCheckRate = 1 ;
+	  m_InterruptCheckRate = 10 ;
       init_soar( m_soarKernel );
       m_instanceInfo = new InstanceInfo("test1", "test2", gSKI_IN_PROCESS, gSKI_SINGLE_THREAD);
       m_agentMgr     = new AgentManager(this);
