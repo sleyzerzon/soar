@@ -150,8 +150,26 @@ bool CommandLineInterface::DoRun(gSKI::IAgent* pAgent, const RunBitset& options,
 		pScheduler->ScheduleAllAgentsToRun(true) ;
 	}
 
+	// Decide how large of a step to run each agent before switching to the next agent
+	// By default, we run one phase per agent but this isn't always appropriate.
+	egSKIRunType interleaveStepSize = gSKI_RUN_PHASE ;
+
+	switch (runType)
+	{
+		// If the entire system is running by elaboration cycles, then we need to run each agent by elaboration cycles (they're usually
+		// smaller than a phase).
+		case gSKI_RUN_ELABORATION_CYCLE: interleaveStepSize = gSKI_RUN_ELABORATION_CYCLE ; break ;
+
+		// If we're running the system to output we want to run each agent until it generates output.  This can be many decisions.
+		// The reason is actually to do with stopping the agent after n decisions (default 15) if no output occurs.
+		// DJP -- We need to rethink this design so using phase interleaving until we do.
+		// case gSKI_RUN_UNTIL_OUTPUT: interleaveStepSize = gSKI_RUN_UNTIL_OUTPUT ; break ;
+
+		default: interleaveStepSize = gSKI_RUN_PHASE ; break ;
+	}
+
 	// Do the run
-	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, &m_gSKIError) ;
+	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, &m_gSKIError) ;
 
 	// Check for error
 	if (runResult == gSKI_RUN_ERROR) {

@@ -21,6 +21,8 @@
 #include "../../gSKI/src/gSKI_Error.h"
 #include "IgSKI_AgentManager.h"
 
+#include <assert.h>
+
 using namespace sml ;
 
 RunScheduler::RunScheduler(KernelSML* pKernelSML)
@@ -180,8 +182,27 @@ bool RunScheduler::IsRunning()
 	return m_IsRunning ;
 }
 
-egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, gSKI::Error* pError)
+/*************************************************************
+* @brief	Run all agents previously marked as being scheduled to run.
+*
+* @param runStepSize -- decision/phase etc.
+* @param count		 -- how many steps to run
+* @param runFlags	 -- type of run we're doing (passed back to environment)
+* @param interleaveStepSize -- how large of a step each agent is run before other agents are run
+* @param pError		 -- any error
+*
+* @return Not clear on how to set this when have multiple agents.
+*		  Can query each for "GetLastRunResult()".
+*************************************************************/	
+egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, gSKI::Error* pError)
 {
+	// In general we really want to assert that runStepSize >= interleaveStepSize but I'm not sure there's
+	// a strict relationship and certainly the enums aren't labelled as being in a guaranteed processing size order.
+	// So for now, we'll just check some specific cases.
+	// If we're running by elaboration cycles, can't be running each agent by something bigger (like a phase).
+	if (runStepSize == gSKI_RUN_ELABORATION_CYCLE)
+		assert(interleaveStepSize == gSKI_RUN_ELABORATION_CYCLE) ;
+
 	// We store this as a member so we can access it in gSKI event handlers
 	m_RunFlags = runFlags ;
 
@@ -205,14 +226,10 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 
 	pKernel->GetAgentManager()->ClearAllInterrupts();
 
-	// Decide how large of a step to run each agent before switching to the next agent
-	// We currently interleave each agent by PHASE til done,
-	// unless runStepSize == gSKI_RUN_ELABORATION_CYCLE, then gSKI steps by e_cycles.
-	// See definition of GetReleventCounter to change how e_cycles are counted.
-	egSKIRunType interleaveStepSize = (runStepSize == gSKI_RUN_ELABORATION_CYCLE ? gSKI_RUN_ELABORATION_CYCLE : gSKI_RUN_PHASE) ;
-
 	// Record that we're now running, so we can poll for our status during a run.
 	m_IsRunning = true ;
+
+	int interruptCheckRate = pKernel->GetInterruptCheckRate() ;
 
 	// Run all agents that have previously been marked as "scheduled to run".
 	while (!runFinished)
@@ -223,7 +240,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 		 // Callback to clients to see if they wish to stop this run.
 		 // A client can use any event, but this one is designed to allow clients
 		 // to throttle back the frequency of the event to control performance.
-		if ((stepCount % pKernel->GetInterruptCheckRate()) == 0)
+		if ((stepCount % interruptCheckRate) == 0)
 			pKernel->FireInterruptCheckEvent() ;
 		stepCount++ ;
 

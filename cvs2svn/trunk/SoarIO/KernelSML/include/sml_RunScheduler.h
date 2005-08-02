@@ -55,12 +55,13 @@ public:
 	* @param runStepSize -- decision/phase etc.
 	* @param count		 -- how many steps to run
 	* @param runFlags	 -- type of run we're doing (passed back to environment)
+	* @param interleaveStepSize -- how large of a step each agent is run before other agents are run
 	* @param pError		 -- any error
 	*
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, gSKI::Error* pError) ;
+	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, gSKI::Error* pError) ;
 
 	/*************************************************************
 	* @brief	Returns true if at least one agent is currently running.
