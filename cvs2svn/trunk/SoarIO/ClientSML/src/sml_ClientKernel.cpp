@@ -1461,7 +1461,7 @@ bool Kernel::CheckForIncomingCommands()
 *************************************************************/
 void Kernel::Sleep(long milliseconds)
 {
-	soar_thread::Thread::SleepStatic(milliseconds) ;
+	soar_thread::Thread::SleepStatic(0, milliseconds) ;
 }
 
 /*************************************************************

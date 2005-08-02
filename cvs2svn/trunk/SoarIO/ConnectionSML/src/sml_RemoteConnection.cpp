@@ -217,7 +217,8 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 		return pResponse ;
 	}
 
-	int sleepTime = 0 ;			// How long we sleep in milliseconds each pass through
+	long sleepTimeSecs = 0 ;			// How long we sleep in seconds each pass through
+	long sleepTimeMillisecs = 0 ;		// How long we sleep in milliseconds each pass through
 
 	// How long we sleep on the socket waiting for data in msecs
 	// We want to wait for a long time.  We used to set this to 0 and just poll the socket,
@@ -257,7 +258,7 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 		// Allow other threads the chance to update
 		// (by calling with 0 for sleep time we don't give away cycles if
 		//  no other thread is waiting to execute).
-		soar_thread::Thread::SleepStatic(sleepTime) ;
+		soar_thread::Thread::SleepStatic(sleepTimeSecs, sleepTimeMillisecs) ;
 
 		// Check if the connection has been closed
 		if (IsClosed())

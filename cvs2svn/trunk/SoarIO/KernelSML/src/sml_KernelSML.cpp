@@ -163,7 +163,7 @@ void KernelSML::DeleteAllAgents(bool waitTillDeleted)
 		int maxTries = 100 ;	// Wait for a second then abort anyway
 		while (waitTillDeleted && agentCount == m_AgentMap.size() && maxTries > 0)
 		{
-			soar_thread::Thread::SleepStatic(10) ;
+			soar_thread::Thread::SleepStatic(0, 10) ;
 			maxTries-- ;
 		}
 	}

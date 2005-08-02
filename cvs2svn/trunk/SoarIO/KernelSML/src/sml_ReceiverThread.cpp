@@ -79,8 +79,8 @@ void ReceiverThread::Run()
 		// Sleep(0) just allows other threads to run before we continue
 		// to execute.
 		if (current - last > delay)
-			Sleep(5) ;
+			Sleep(0, 5) ;
 		else
-			Sleep(0) ;
+			Sleep(0, 0) ;
 	}
 }

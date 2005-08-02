@@ -215,10 +215,11 @@ ElementXML* EmbeddedConnectionAsynch::GetResponseForID(char const* pID, bool wai
 		return pResponse ;
 	}
 
-	// How long we sleep in milliseconds each pass through
+	// How long we sleep in seconds+milliseconds each pass through
 	// (0 means we only sleep if another thread is scheduled to run --
 	//  it ensures maximum performance otherwise).
-	int sleepTime = 0 ;
+	long sleepTimeSecs = 0 ;
+	long sleepTimeMillisecs = 0 ;
 
 	// How long we will wait before checking for a message (in msecs)
 	// (If one comes in it'll wake us up from this immediately, but having
@@ -261,7 +262,7 @@ ElementXML* EmbeddedConnectionAsynch::GetResponseForID(char const* pID, bool wai
 		// Allow other threads the chance to update
 		// (by calling with 0 for sleep time we don't give away cycles if
 		//  no other thread is waiting to execute).
-		soar_thread::Thread::SleepStatic(sleepTime) ;
+		soar_thread::Thread::SleepStatic(sleepTimeSecs, sleepTimeMillisecs) ;
 
 		// Check if the connection has been closed
 		if (IsClosed())

@@ -74,7 +74,7 @@ void ListenerThread::Run()
 		// Sleep for a little before checking for a new connection
 		// New connections will come in very infrequently so this doesn't
 		// have to be very rapid.
-		Sleep(50) ;
+		Sleep(0, 50) ;
 	}
 
 	// Shut down our listener socket

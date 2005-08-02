@@ -2,6 +2,8 @@
 #include "config.h"
 #endif // HAVE_CONFIG_H
 
+#include <assert.h>
+
 //#include "sml_Connection.h"
 #include "sml_Client.h"
 
@@ -11,9 +13,22 @@
 #ifdef _WIN32
 #define _WINSOCKAPI_
 #include <Windows.h>
-#define SLEEP Sleep
+//#define SLEEP Sleep
+void SLEEP(long secs, long msecs)
+{
+	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
+	Sleep((secs * 1000) + msecs) ;
+}
 #else
-#include <unistd.h>
+#include <time.h>
+void SLEEP(long secs, long msecs)
+{
+	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
+	struct timespec sleeptime;
+	timeout.tv_sec = sec;
+	timeout.tv_nsec = msecs * 1000000;
+	nanosleep(sleeptime, 0);
+}
 #define SLEEP(x) usleep(1000*x)
 #endif
 
@@ -89,7 +104,7 @@ void SimpleRemoteConnection()
 			cout << "Found agent: " << pAgent->GetAgentName() << endl ;
 		}
 
-		SLEEP(1000) ;
+		SLEEP(1,0) ;
 	}
 
 	delete pKernel ;
@@ -174,7 +189,7 @@ bool SimpleRemoteConnect()
 	std::string trace ;
 	int callbackp = pAgent->RegisterForPrintEvent(smlEVENT_PRINT, MyPrintEventHandler, &trace) ;
 
-	SLEEP(1000) ;
+	SLEEP(1,0) ;
 
 	// Comment this in if you need to debug the messages going back and forth.
 	//pKernel->SetTraceCommunications(true) ;
@@ -225,14 +240,16 @@ bool SimpleListener(int life)
 	// Comment this in if you need to debug the messages going back and forth.
 	//pKernel->SetTraceCommunications(true) ;
 
-	int pause = 100 ;
+	long pauseSecs = 0;
+	long pauseMsecs = 100 ;
+	long pauseMsecsTotal = pauseSecs*1000+pauseMsecs;
 
 	// If we're running in this thread we need to wake up more rapidly.
 	if (useCurrentThread)
-	{ life *= 10 ; pause /= 10 ; }
+	{ life *= 10 ; pauseMsecsTotal /= 10 ; }
 
 	// How often we check to see if the list of connections has changed.
-	int checkConnections = 500 / pause ;
+	int checkConnections = 500 / pauseMsecsTotal ;
 	int counter = checkConnections ;
 
 	for (int i = 0 ; i < life ; i++)
@@ -244,7 +261,7 @@ bool SimpleListener(int life)
 			unused(check);
 		}
 
-		SLEEP(pause) ;
+		SLEEP(pauseSecs, pauseMsecs) ;
 	}
 
 	delete pKernel ;
@@ -929,12 +946,12 @@ bool TestSML(bool embedded, bool useClientThread, bool fullyOptimized, bool simp
 
 			if (simpleInitSoar) 
 			{
-				SLEEP(200) ;
+				SLEEP(0, 200) ;
 
 				cout << "Performing simple init-soar..." << endl << endl;
 				pAgent->InitSoar() ;
 
-				SLEEP(200) ;
+				SLEEP(0, 200) ;
 
 				ok = pKernel->DestroyAgent(pAgent) ;
 				if (!ok)

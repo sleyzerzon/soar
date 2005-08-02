@@ -18,7 +18,7 @@ namespace sock {
 bool InitializeOperatingSystemSocketLibrary() ;
 bool TerminateOperatingSystemSocketLibrary() ;
 bool MakeSocketNonBlocking(SOCKET hSock) ;
-bool SleepMillisecs(long msecs) ;
+bool SleepSocket(long secs, long msecs) ;
 } // Namespace
 
 // Map certain functions depending on the OS

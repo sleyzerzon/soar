@@ -33,9 +33,10 @@ void soar_thread::BeginThread(ThreadFuncPtr inThreadFuncPtr,void* inParam)
      _beginthread(inThreadFuncPtr,0,inParam) ;
 }
 
-bool soar_thread::SleepMillisecs(long msecs)
+bool soar_thread::SleepThread(long secs, long msecs)
 {
-	Sleep(msecs) ;
+	assert(milli < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
+	Sleep( (secs * 1000) + msecs) ;
 
 	return true ;
 }
@@ -121,10 +122,15 @@ void soar_thread::BeginThread(ThreadFuncPtr inThreadFuncPtr,void* inParam)
     pthread_attr_destroy(&attr);
 }
 
-bool soar_thread::SleepMillisecs(long msecs)
+bool soar_thread::SleepThread(longs secs, long msecs)
 {
+	assert(milli < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
 	// usleep takes microseconds
-	usleep(msecs * 1000) ;
+	//usleep(msecs * 1000) ;
+	struct timespec sleeptime;
+	timeout.tv_sec = sec;
+	timeout.tv_nsec = msecs * 1000000;
+	nanosleep(sleeptime, 0);
 
 	return true ;
 }

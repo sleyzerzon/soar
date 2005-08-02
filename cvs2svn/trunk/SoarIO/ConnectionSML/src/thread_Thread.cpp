@@ -35,9 +35,9 @@ void ThreadStartFunction(void* pThreadObject)
 
 // Static method, causing the caller's thread to sleep.
 // Just exposes a way to call sleep that is platform independent.
-void Thread::SleepStatic(long milliseconds)
+void Thread::SleepStatic(long seconds, long milliseconds)
 {
-	SleepMillisecs(milliseconds) ;
+	SleepThread(seconds, milliseconds) ;
 }
 
 Thread::Thread()
@@ -52,9 +52,9 @@ Thread::~Thread()
 }
 
 // Cause this thread to sleep for a while
-void Thread::Sleep(long milliseconds)
+void Thread::Sleep(long seconds, long milliseconds)
 {
-	SleepMillisecs(milliseconds) ;
+	SleepThread(seconds, milliseconds) ;
 }
 
 void Thread::Start()
@@ -88,7 +88,7 @@ void Thread::Stop(bool waitTillStopped)
 	// If we've been asked to wait for the thread to quit then pause for a moment while it terminates.
 	while (waitTillStopped && !IsStopped() && maxTries > 0)
 	{
-		SleepMillisecs(10) ;
+		SleepThread(0, 10) ;
 		maxTries-- ;
 	}
 
