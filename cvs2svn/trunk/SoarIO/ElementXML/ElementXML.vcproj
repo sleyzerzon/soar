@@ -13,8 +13,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="build"
-			IntermediateDirectory="$(OutDir)\Debug"
+			OutputDirectory="..\..\soar-library\"
+			IntermediateDirectory="build\Debug"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -65,8 +65,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="build"
-			IntermediateDirectory="$(OutDir)\Release"
+			OutputDirectory="..\..\soar-library\"
+			IntermediateDirectory="build\Release"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="TRUE">
