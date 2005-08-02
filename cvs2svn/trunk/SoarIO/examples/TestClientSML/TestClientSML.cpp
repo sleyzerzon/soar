@@ -13,7 +13,6 @@
 #ifdef _WIN32
 #define _WINSOCKAPI_
 #include <Windows.h>
-//#define SLEEP Sleep
 void SLEEP(long secs, long msecs)
 {
 	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
@@ -25,11 +24,10 @@ void SLEEP(long secs, long msecs)
 {
 	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
 	struct timespec sleeptime;
-	timeout.tv_sec = sec;
-	timeout.tv_nsec = msecs * 1000000;
-	nanosleep(sleeptime, 0);
+	sleeptime.tv_sec = secs;
+	sleeptime.tv_nsec = msecs * 1000000;
+	nanosleep(&sleeptime, 0);
 }
-#define SLEEP(x) usleep(1000*x)
 #endif
 
 // helps quell warnings

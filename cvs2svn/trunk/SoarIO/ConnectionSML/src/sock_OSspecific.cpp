@@ -107,9 +107,9 @@ bool sock::SleepSocket(long secs, long msecs)
 	// usleep takes microseconds
 	//usleep(msecs * 1000) ;
 	struct timespec sleeptime;
-	timeout.tv_sec = sec;
-	timeout.tv_nsec = msecs * 1000000;
-	nanosleep(sleeptime, 0);
+	sleeptime.tv_sec = secs;
+	sleeptime.tv_nsec = msecs * 1000000;
+	nanosleep(&sleeptime, 0);
 
 	return true ;
 }
