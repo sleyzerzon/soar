@@ -35,7 +35,7 @@ void soar_thread::BeginThread(ThreadFuncPtr inThreadFuncPtr,void* inParam)
 
 bool soar_thread::SleepThread(long secs, long msecs)
 {
-	assert(milli < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
+	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
 	Sleep( (secs * 1000) + msecs) ;
 
 	return true ;
