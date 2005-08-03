@@ -293,7 +293,7 @@ bool Socket::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 				if (IsErrorWouldBlock())
 				{
 					PrintDebug("Waiting for socket to unblock") ;
-					SleepMillisecs(100) ;
+					SleepSocket(0, 100) ;
 				}
 				else
 #endif
@@ -319,7 +319,7 @@ bool Socket::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 // Function name  : Socket::IsReadDataAvailable
 // 
 // Argument		  : long secondsWait -- Seconds part of how long to wait for data in secs (0 is default)
-// Argument		  : long microsecondssecondsWait -- Microseconds part of how long to wait for data in usecs (0 is default, must be < 1000000)
+// Argument		  : long millisecondssecondsWait -- Milliseconds part of how long to wait for data in usecs (0 is default, must be < 1000)
 // Return type    : bool 	
 // 
 // Description	  : Returns true if data is waiting to be read on this socket.
@@ -328,9 +328,9 @@ bool Socket::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 //					indicating that the socket is closed.
 //
 /////////////////////////////////////////////////////////////////////
-bool Socket::IsReadDataAvailable(long secondsWait, long microsecondsWait)
+bool Socket::IsReadDataAvailable(long secondsWait, long millisecondsWait)
 {
-	assert(microsecondsWait<1000000 && "specified microseconds must be less than 1000000");
+	assert(millisecondsWait<1000 && "specified milliseconds must be less than 1000");
 
 	CTDEBUG_ENTER_METHOD("Socket::IsReadDataAvailable");
 
@@ -360,7 +360,7 @@ bool Socket::IsReadDataAvailable(long secondsWait, long microsecondsWait)
 	// Wait for milliseconds for select to return (can be 0 to just poll)
 	TIMEVAL zero ;
 	zero.tv_sec = secondsWait ;
-	zero.tv_usec = microsecondsWait ;
+	zero.tv_usec = millisecondsWait * 1000 ;
 
 	// Check if anything is waiting to be read
 	int res = select( (int)hSock + 1, &set, NULL, NULL, &zero) ;
@@ -437,7 +437,7 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 				if (IsErrorWouldBlock())
 				{
 					PrintDebug("Waiting for socket to unblock") ;
-					SleepMillisecs(10) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
+					SleepSocket(0, 10) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
 				}
 				else
 #endif

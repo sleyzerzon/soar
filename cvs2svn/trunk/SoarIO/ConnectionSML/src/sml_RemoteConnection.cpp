@@ -225,14 +225,14 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 	// but that means we're consuming all of the CPU.  Setting a long wait doesn't
 	// impact performance because we're not trying to do anything else other than get a response here.
 	long waitForMessageTimeSeconds = 1 ;
-	long waitForMessageTimeMicroseconds = 0 ;
+	long waitForMessageTimeMilliseconds = 0 ;
 
 	// If we don't already have this response cached,
 	// then read any pending messages.
 	do
 	{
 		// Loop until there are no more messages waiting on the socket
-		while (ReceiveMessages(false, waitForMessageTimeSeconds, waitForMessageTimeMicroseconds))
+		while (ReceiveMessages(false, waitForMessageTimeSeconds, waitForMessageTimeMilliseconds))
 		{
 			// Check each message to see if it's a match
 			if (DoesResponseMatch(m_pLastResponse, pID))
@@ -282,9 +282,9 @@ bool RemoteConnection::ReceiveMessages(bool allMessages)
 	return ReceiveMessages(allMessages, 0, 0) ;
 }
 
-bool RemoteConnection::ReceiveMessages(bool allMessages, long secondsWait, long microsecondsWait)
+bool RemoteConnection::ReceiveMessages(bool allMessages, long secondsWait, long millisecondsWait)
 {
-	assert(microsecondsWait<1000000 && "specified microseconds must be less than 1000000");
+	assert(millisecondsWait<1000 && "specified milliseconds must be less than 1000");
 
 	// Make sure only one thread is sending messages at a time
 	// (This allows us to run a separate thread in clients polling for events even
@@ -310,7 +310,7 @@ bool RemoteConnection::ReceiveMessages(bool allMessages, long secondsWait, long 
 
 		// Only check for read data after we've checked that the socket is still alive.
 		// (This is because IsReadData can't signal the difference between a dead connection and no data)
-		haveData = m_Socket->IsReadDataAvailable(secondsWait, microsecondsWait) ;
+		haveData = m_Socket->IsReadDataAvailable(secondsWait, millisecondsWait) ;
 		if (!haveData)
 			break ;
 

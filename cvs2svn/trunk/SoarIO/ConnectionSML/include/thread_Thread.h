@@ -63,7 +63,7 @@ public:
 	// Implement this in your thread.
 	// When it exits, the thread quits.
 	// Test for "QuitNow" to know when you've been asked to stop.
-	// So generally it takes the form "while (!m_QuitNow && !done) { doWork() ; SleepMillisecs() ;  } "
+	// So generally it takes the form "while (!m_QuitNow && !done) { doWork() ; SleepThread() ;  } "
 	virtual void Run() = 0 ;
 
 	// Client's should call this (consider it to be private, but we can't actually make it so)

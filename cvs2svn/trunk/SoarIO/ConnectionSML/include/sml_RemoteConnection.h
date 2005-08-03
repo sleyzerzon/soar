@@ -61,8 +61,8 @@ protected:
 
 	bool DoesResponseMatch(ElementXML* pResponse, char const* pID) ;
 
-	/** The timeout for receiving messages is secondsWait + microsecondsWait, where microsecondsWait < 1000000 */
-	bool ReceiveMessages(bool allMessages, long secondsWait, long microsecondsWait) ;
+	/** The timeout for receiving messages is secondsWait + millisecondsWait, where millisecondsWait < 1000 */
+	bool ReceiveMessages(bool allMessages, long secondsWait, long millisecondsWait) ;
 
 public:
 	virtual ~RemoteConnection();
