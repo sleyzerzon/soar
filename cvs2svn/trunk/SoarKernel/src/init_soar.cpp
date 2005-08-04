@@ -121,28 +121,28 @@ void old_abort_with_fatal_error (agent* thisAgent) {
 
 void abort_with_fatal_error (agent* thisAgent, char *msg) {
   FILE *f;
-
-  print (thisAgent, "%s",msg);
-  print (thisAgent, "Soar cannot recover from this error.  Aborting...\n");
+  char* warning = "Soar cannot recover from this error. \nYou will have to restart Soar to run an agent.\nData is still available for inspection, but may be corrupt.\nIf a log was open, it has been closed for safety.";
+  
+  print (thisAgent, "%s", msg);
+  print (thisAgent, "%s", warning);
+  
   fprintf (stderr,"%s",msg);
-  fprintf (stderr,"Soar cannot recover from this error.  Aborting...\n");
+  fprintf (stderr,warning);
   
   GenerateErrorXML(thisAgent, msg);
-  GenerateErrorXML(thisAgent, "Soar cannot recover from this error.  Aborting...");
+  GenerateErrorXML(thisAgent, warning);
 
   f = fopen("soarerror", "w");
   fprintf (f,"%s",msg);
-  fprintf (f,"Soar cannot recover from this error.  Aborting...\n");
+  fprintf (f,warning);
   fclose(f);
+
+  // Since we're no longer terminating, should we be invoking this event?
+  // Note that this is a soar callback, not a gSKI callback, so it isn't being used for now anyway
   soar_invoke_callbacks(thisAgent, thisAgent, 
 			SYSTEM_TERMINATION_CALLBACK,
-			(soar_call_data) FALSE);		       
+			(soar_call_data) FALSE);     
   if (thisAgent->logging_to_file) stop_log_file (thisAgent);
-#ifdef _WINDOWS
-  Terminate(1);
-#else
-  abort ();
-#endif
 }
 
 /* ===================================================================
