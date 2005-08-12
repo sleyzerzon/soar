@@ -2,9 +2,6 @@ Agent.java
 AgentEventHandlerPlusData.java
 AnalyzeXML.java
 ClientErrors.java
-ClientSMLJava.exp
-ClientSMLJava.lib
-ClientSMLJava.pdb
 ClientTraceXML.java
 ClientXML.java
 ConnectionInfo.java
