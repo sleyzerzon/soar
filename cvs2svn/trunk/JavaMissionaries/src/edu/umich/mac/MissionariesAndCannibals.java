@@ -121,7 +121,7 @@ implements Runnable, PaintListener, MacEnvironmentListener {
         macCanvas.setBounds(0, 0, 640, 480);
         macCanvas.addPaintListener(this);
         // ...and initialize our double buffer
-        bufImg = new Image(dpy, landImg, SWT.IMAGE_COPY);
+        bufImg = new Image(dpy, landImg.getBounds());
         bufGC = new GC(bufImg);
         
         // create the button controls
