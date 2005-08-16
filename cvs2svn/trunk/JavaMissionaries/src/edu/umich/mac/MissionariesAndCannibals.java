@@ -223,33 +223,33 @@ implements Runnable, PaintListener, MacEnvironmentListener {
     public void paintControl(PaintEvent e) {
         // clip drawing in our buffer to the affected area.
         bufGC.setClipping(e.x, e.y, e.width, e.height);
-        paintBuffer();
+        paintBuffer(e.gc);
         // copy from the buffer to the screen
-        e.gc.drawImage(bufImg,e.x,e.y,e.width,e.height,e.x,e.y,e.width,e.height);
+        //e.gc.drawImage(bufImg,e.x,e.y,e.width,e.height,e.x,e.y,e.width,e.height);
     }
     
     /**
      * Paints the double buffer with background, the positions of the boat and
      * all of the missionaries and cannibals.
      */
-    private void paintBuffer() {
-        bufGC.drawImage(landImg, 0, 0);
+    private void paintBuffer(GC gc) {
+        gc.drawImage(landImg, 0, 0);
         
         // draw the boat
-        bufGC.drawImage(boatImg,
+        gc.drawImage(boatImg,
                 BOAT_X[me.getRightBank().getBoatCount()], BOAT_Y);
         
         // draw the cannibals on both sides of the river
         for (int i = 0; i < me.getLeftBank().getCannibalCount(); ++i)
-            bufGC.drawImage(cannibalImg, CANNIBAL_X[i], CANNIBAL_Y);
+            gc.drawImage(cannibalImg, CANNIBAL_X[i], CANNIBAL_Y);
         for (int i = 0; i < me.getRightBank().getCannibalCount(); ++i)
-            bufGC.drawImage(cannibalImg, CANNIBAL_X[i + 3], CANNIBAL_Y);
+            gc.drawImage(cannibalImg, CANNIBAL_X[i + 3], CANNIBAL_Y);
         
         // draw the missionaries on both sides of the river
         for (int i = 0; i < me.getLeftBank().getMissionaryCount(); ++i)
-            bufGC.drawImage(missionaryImg, MISSIONARY_X[i], MISSIONARY_Y);
+            gc.drawImage(missionaryImg, MISSIONARY_X[i], MISSIONARY_Y);
         for (int i = 0; i < me.getRightBank().getMissionaryCount(); ++i)
-            bufGC.drawImage(missionaryImg, MISSIONARY_X[i + 3], MISSIONARY_Y);
+            gc.drawImage(missionaryImg, MISSIONARY_X[i + 3], MISSIONARY_Y);
     }
 
     /**
