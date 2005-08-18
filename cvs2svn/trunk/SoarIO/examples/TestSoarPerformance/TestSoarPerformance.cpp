@@ -45,10 +45,15 @@ void main() {
 		agent->ExecuteCommandLineXML("time run", &response);
 		
 		cout << endl << response.GenerateXMLString(true) << endl;
-		//string time = response.GetResultString();
+		
+		//FIXME: can't actually differentiate these results yet due to bug 523
+		string realtime = response.GetArgValue("seconds");
+		string proctime = response.GetArgValue("seconds");
+		
 		agent->ExecuteCommandLineXML("stats", &response);
-		//cout << endl << "Time: " << time << endl;
-		cout << endl << response.GenerateXMLString(true) << endl;
+		
+		string kerneltime = response.GetArgValue("statskernelcputime");
+		string totaltime = response.GetArgValue("statstotalcputime");
 		
 		kernel->Shutdown();
 		delete kernel;
@@ -56,7 +61,11 @@ void main() {
 		//
 		// Show results
 		//
-		
+		cout << endl;
+		cout << "OS Real: " << realtime << endl;
+		cout << "OS Proc: " << proctime << endl;
+		cout << "Soar Kernel: " << kerneltime << endl;
+		cout << "Soar Total: " << totaltime << endl;
 
 		string dummy;
 		cout << endl << endl << "Press any key and enter to continue";
