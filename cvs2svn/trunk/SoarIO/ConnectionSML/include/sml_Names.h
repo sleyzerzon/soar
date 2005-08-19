@@ -252,7 +252,8 @@ public:
 	static char const* const kParamLearnDontLearnStates;
 	static char const* const kParamLogSetting;
 	static char const* const kParamDirectory;
-	static char const* const kParamSeconds;
+	static char const* const kParamProcSeconds;
+	static char const* const kParamRealSeconds;
 	static char const* const kParamWarningsSetting;
 	static char const* const kParamPhase ;
 	static char const* const kParamInstance ;

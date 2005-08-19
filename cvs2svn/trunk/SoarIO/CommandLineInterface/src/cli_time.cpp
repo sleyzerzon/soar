@@ -86,8 +86,8 @@ bool CommandLineInterface::DoTime(gSKI::IAgent* pAgent, std::vector<std::string>
 	if (m_RawOutput) {
 		m_Result << "\n(" << procElapsed << "s) proc" << "\n(" << realElapsed << "s) real";
 	} else {
-		AppendArgTagFast(sml_Names::kParamSeconds, sml_Names::kTypeDouble, Double2String(realElapsed, buf, kMinBufferSize));
-		AppendArgTagFast(sml_Names::kParamSeconds, sml_Names::kTypeDouble, Double2String(procElapsed, buf, kMinBufferSize));
+		AppendArgTagFast(sml_Names::kParamRealSeconds, sml_Names::kTypeDouble, Double2String(realElapsed, buf, kMinBufferSize));
+		AppendArgTagFast(sml_Names::kParamProcSeconds, sml_Names::kTypeDouble, Double2String(procElapsed, buf, kMinBufferSize));
 	}
 	return ret;
 }
