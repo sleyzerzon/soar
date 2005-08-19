@@ -1,0 +1,2 @@
+rete-net -l count-test-no-write.soarx
+max-elaborations 50000

@@ -39,7 +39,9 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				CommandLine="copy TestSoarPerformance.soar ..\..\..\soar-library /Y
+copy count-test-no-write.soarx ..\..\..\soar-library /Y"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -82,7 +84,9 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				CommandLine="copy TestSoarPerformance.soar ..\..\..\soar-library /Y
+copy count-test-no-write.soarx ..\..\..\soar-library /Y"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
