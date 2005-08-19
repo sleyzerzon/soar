@@ -3587,7 +3587,7 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 
         /* Now select the candidate */
 
-        print(thisAgent, "\n");
+        //print(thisAgent, "\n");
 		rn = rand();
         selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
         currentSumOfValues = 0;
@@ -3642,7 +3642,7 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 
         /* Now select the candidate */
 
-		print(thisAgent, "\n");
+		//print(thisAgent, "\n");
         rn = rand();
         selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
         currentSumOfValues = 0;
