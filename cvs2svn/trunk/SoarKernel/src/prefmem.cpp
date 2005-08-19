@@ -58,24 +58,6 @@ char * preference_name[] =
 
 ====================================================================== */
 
-/*
-#ifndef USE_MACROS
-
-inline void preference_add_ref(preference * p)
-{
-  (p)->reference_count++;
-}
-
-inline void preference_remove_ref(preference * p)
-{
-  (p)->reference_count--;
-  if ((p)->reference_count == 0)
-    possibly_deallocate_preference_and_clones(p);
-}
-
-#endif
-*/
-
 /* ----------------------------------------------------------------------
    Make_preference() creates a new preference structure of the given type
    with the given id/attribute/value/referent.  (Referent is only used

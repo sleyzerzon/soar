@@ -306,12 +306,14 @@ void deallocate_test (agent* thisAgent, test t) {
 }
 
 /* --- Macro for doing this (usually) without procedure call overhead. --- */
-/*#define quickly_deallocate_test(t) { \
+#ifdef USE_MACROS
+#define quickly_deallocate_test(thisAgent, t) { \
   if (! test_is_blank_test(t)) { \
     if (test_is_blank_or_equality_test(t)) { \
-      symbol_remove_ref (referent_of_equality_test(t)); \
+      symbol_remove_ref (thisAgent, referent_of_equality_test(t)); \
     } else { \
-      deallocate_test (t); } } }*/
+      deallocate_test (thisAgent, t); } } }
+#else
 inline void quickly_deallocate_test(agent* thisAgent, test t)
 {
   if (! test_is_blank_test(t)) 
@@ -324,6 +326,7 @@ inline void quickly_deallocate_test(agent* thisAgent, test t)
       deallocate_test (thisAgent, t);
     }    
 }
+#endif
 
 /* ----------------------------------------------------------------
    Destructively modifies the first test (t) by adding the second

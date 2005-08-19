@@ -421,7 +421,7 @@ void fill_in_new_instantiation_stuff (agent* thisAgent, instantiation *inst,
   /* KJC 6/00:  maintaining all the top level ref cts does have a big
      impact on memory pool usage and also performance (due to malloc).
 	 (See tests done by Scott Wallace Fall 99.)	 Therefore added 
-	 preprocessor macro so that by setting macro the top level ref cts are not 
+	 preprocessor macro so that by unsetting macro the top level ref cts are not 
 	 incremented.  It's possible that in some systems, these ref cts may 
 	 be desireable: they can be added by defining DO_TOP_LEVEL_REF_CTS
 	 */
@@ -537,17 +537,19 @@ void init_firer (agent* thisAgent) {
 
 /* --- Macro returning TRUE iff we're supposed to trace firings for the
    given instantiation, which should have the "prod" field filled in. --- */
-
-/*#define trace_firings_of_inst(inst) \
+#ifdef USE_MACROS
+#define trace_firings_of_inst(thisAgent, inst) \
   ((inst)->prod && \
    (thisAgent->sysparams[TRACE_FIRINGS_OF_USER_PRODS_SYSPARAM+(inst)->prod->type] || \
-    ((inst)->prod->trace_firings)))*/
+    ((inst)->prod->trace_firings)))
+#else
 inline Bool trace_firings_of_inst(agent* thisAgent, instantiation * inst)
 {
   return ((inst)->prod &&
     (thisAgent->sysparams[TRACE_FIRINGS_OF_USER_PRODS_SYSPARAM+(inst)->prod->type] ||
     ((inst)->prod->trace_firings)));
 }
+#endif
 
 /* -----------------------------------------------------------------------
                          Create Instantiation
@@ -643,7 +645,7 @@ void create_instantiation (agent* thisAgent, production *prod,
       *(cell++) = static_cast<symbol_union *>(c->first);
       index++;
    }
-   thisAgent->firer_highest_rhs_unboundvar_index = index-1;
+   thisAgent->firer_highest_rhs_unboundvar_index = index - 1;
 
    /* 7.1/8 merge: Not sure about this.  This code in 704, but not in either 7.1 or 703/soar8 */
    /* --- Before executing the RHS actions, tell the user that the -- */
@@ -659,7 +661,8 @@ void create_instantiation (agent* thisAgent, production *prod,
    need_to_do_support_calculations = FALSE;
    for (a=prod->action_list; a!=NIL; a=a->next) {
       pref = execute_action (thisAgent, a, tok, w);
-      while (pref) {
+	  /* SoarTech changed from an IF stmt to a WHILE loop to support GlobalDeepCpy */
+      while (pref) {   
          pref->inst = inst;
          insert_at_head_of_dll (inst->preferences_generated, pref,
                inst_next, inst_prev);
@@ -699,7 +702,7 @@ void create_instantiation (agent* thisAgent, production *prod,
 
             Getting the next pref from the set of possible prefs 
             added by the deep copy rhs function */
-         if ( glbDeepCopyWMEs != 0 ) {
+           if ( glbDeepCopyWMEs != 0 ) {
             wme* tempwme = glbDeepCopyWMEs;
             pref = make_preference(thisAgent, 
                                    a->preference_type, 
@@ -711,7 +714,7 @@ void create_instantiation (agent* thisAgent, production *prod,
          } else {
             pref = 0;
          }
-      }
+        }
    }
 
    /* --- reset rhs_variable_bindings array to all zeros --- */
@@ -811,17 +814,6 @@ void deallocate_instantiation (agent* thisAgent, instantiation *inst) {
   if (inst->prod) production_remove_ref (thisAgent, inst->prod);
   free_with_pool (&thisAgent->instantiation_pool, inst);
 }
-
-/*  Moved to recmem.h
-  #ifndef USE_MACROS
-  inline void possibly_deallocate_instantiation(instantiation * inst)
-  {
-  if ((! (inst)->preferences_generated) &&
-  (! (inst)->in_ms))
-  deallocate_instantiation (inst);
-  }
-  #endif
-*/
 
 /* -----------------------------------------------------------------------
                          Retract Instantiation

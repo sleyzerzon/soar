@@ -81,10 +81,31 @@ using namespace xmlTraceNames;
    the grounds.
 ==================================================================== */
 
-/*#define add_to_grounds(cond) { \
+#ifdef USE_MACROS
+
+#define add_to_grounds(thisAgent, cond) { \
   if ((cond)->bt.wme_->grounds_tc != thisAgent->grounds_tc) { \
     (cond)->bt.wme_->grounds_tc = thisAgent->grounds_tc; \
-    push ((cond), thisAgent->grounds); } }*/
+    push (thisAgent, (cond), thisAgent->grounds); } }
+
+#define add_to_potentials(thisAgent, cond) { \
+  if ((cond)->bt.wme_->potentials_tc != thisAgent->potentials_tc) { \
+    (cond)->bt.wme_->potentials_tc = thisAgent->potentials_tc; \
+    (cond)->bt.wme_->chunker_bt_pref = (cond)->bt.trace; \
+    push (thisAgent, (cond), thisAgent->positive_potentials); \
+  } else if ((cond)->bt.wme_->chunker_bt_pref != (cond)->bt.trace) { \
+    push (thisAgent, (cond), thisAgent->positive_potentials); } }
+
+#define add_to_locals(thisAgent, cond) { \
+  if ((cond)->bt.wme_->locals_tc != thisAgent->locals_tc) { \
+    (cond)->bt.wme_->locals_tc = thisAgent->locals_tc; \
+    (cond)->bt.wme_->chunker_bt_pref = (cond)->bt.trace; \
+    push (thisAgent, (cond), thisAgent->locals); \
+  } else if ((cond)->bt.wme_->chunker_bt_pref != (cond)->bt.trace) { \
+    push (thisAgent, (cond), thisAgent->locals); } }
+
+#else
+
 inline void add_to_grounds(agent* thisAgent, condition * cond)
 {
   if ((cond)->bt.wme_->grounds_tc != thisAgent->grounds_tc) {
@@ -92,13 +113,6 @@ inline void add_to_grounds(agent* thisAgent, condition * cond)
     push (thisAgent, (cond), thisAgent->grounds); }
 }
 
-/*#define add_to_potentials(cond) { \
-  if ((cond)->bt.wme_->potentials_tc != thisAgent->potentials_tc) { \
-    (cond)->bt.wme_->potentials_tc = thisAgent->potentials_tc; \
-    (cond)->bt.wme_->chunker_bt_pref = (cond)->bt.trace; \
-    push ((cond), thisAgent->positive_potentials); \
-  } else if ((cond)->bt.wme_->chunker_bt_pref != (cond)->bt.trace) { \
-    push ((cond), thisAgent->positive_potentials); } }*/
 inline void add_to_potentials(agent* thisAgent, condition * cond)
 {
   if ((cond)->bt.wme_->potentials_tc != thisAgent->potentials_tc) {
@@ -109,13 +123,6 @@ inline void add_to_potentials(agent* thisAgent, condition * cond)
     push (thisAgent, (cond), thisAgent->positive_potentials); }
 }
 
-/*#define add_to_locals(cond) { \
-  if ((cond)->bt.wme_->locals_tc != thisAgent->locals_tc) { \
-    (cond)->bt.wme_->locals_tc = thisAgent->locals_tc; \
-    (cond)->bt.wme_->chunker_bt_pref = (cond)->bt.trace; \
-    push ((cond), thisAgent->locals); \
-  } else if ((cond)->bt.wme_->chunker_bt_pref != (cond)->bt.trace) { \
-    push ((cond), thisAgent->locals); } }*/
 inline void add_to_locals(agent* thisAgent, condition * cond)
 {
   if ((cond)->bt.wme_->locals_tc != thisAgent->locals_tc) {
@@ -125,6 +132,7 @@ inline void add_to_locals(agent* thisAgent, condition * cond)
   } else if ((cond)->bt.wme_->chunker_bt_pref != (cond)->bt.trace) {
     push (thisAgent, (cond), thisAgent->locals); }
 }
+#endif /* USE_MACROS */
 
 /* -------------------------------------------------------------------
                      Backtrace Through Instantiation
@@ -349,7 +357,7 @@ void backtrace_through_instantiation (agent* thisAgent,
         add_to_locals (thisAgent, c);
         if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM] || 
             thisAgent->sysparams[EXPLAIN_SYSPARAM])
-	  push (thisAgent, c, locals_to_print);
+	        push (thisAgent, c, locals_to_print);
       }
     } 
     else {

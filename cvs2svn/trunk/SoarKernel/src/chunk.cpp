@@ -67,11 +67,12 @@ using namespace xmlTraceNames;
 ===================================================================== */
 
 #ifdef USE_MACROS
-#define add_results_if_needed(sym) \
+#define add_results_if_needed(thisAgent, sym) \
   { if ((sym)->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) \
       if ( ((sym)->id.level >= thisAgent->results_match_goal_level) && \
            ((sym)->id.tc_num != thisAgent->results_tc_number) ) \
-        add_results_for_id(sym); }
+        add_results_for_id(thisAgent, sym); }
+
 #else
 inline void add_results_if_needed(agent* thisAgent, Symbol * sym)
 { 
