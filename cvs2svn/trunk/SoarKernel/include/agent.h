@@ -739,14 +739,14 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
 #ifdef USE_MACROS
 
-#define allocate_cons(dest_cons_pointer) \
-  allocate_with_pool (soar_agent, &current_agent(cons_cell_pool), (dest_cons_pointer))
+#define allocate_cons(thisAgent, dest_cons_pointer) \
+  allocate_with_pool (thisAgent, &thisAgent->cons_cell_pool, (dest_cons_pointer))
 
-#define free_cons(c) free_with_pool (&current_agent(cons_cell_pool), (c))
+#define free_cons(thisAgent, c) free_with_pool (&thisAgent->cons_cell_pool, (c))
 
-#define push(item,list_header) { \
+#define push(thisAgent, item, list_header) { \
   cons *push_cons_xy298; \
-  allocate_cons (&push_cons_xy298); \
+  allocate_cons (thisAgent, &push_cons_xy298); \
   push_cons_xy298->first = (item); \
   push_cons_xy298->rest = (list_header); \
   (list_header) = push_cons_xy298; }
@@ -756,7 +756,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 #ifdef __cplusplus
 }
 #endif
-
+ 
 template <typename T>
 inline void allocate_cons(agent* thisAgent, T * dest_cons_pointer)
 {

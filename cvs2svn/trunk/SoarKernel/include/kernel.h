@@ -22,6 +22,17 @@ extern "C"
 {
 #endif
 
+/* When the Soar Kernel was moved to a C++ compiler, the 
+ * C precompiler macros were converted to inline functions
+ * The macros still work, but can make it confusing to step
+ * through a debugger during code execution.  However it's
+ * possible that some compilers on some operating systems
+ * would not inline the code properly, making Soar slower
+ * and consuming more memory.  To use the precompiler macros
+ * instead of the inline functions, define the variable below.
+ */
+//#define USE_MACROS
+
 /* -------------------------------------------------- */
 /*              Names of Rete Structures              */
 /* (only pointers to these are used outside the rete) */
@@ -118,13 +129,13 @@ typedef union symbol_union Symbol;
 /* UNcomment the following line to have Soar maintain reference counts 
    on wmes and prefs at the top level.  This can result in larger
    memory growth due to top-level objects that never get deallocated 
-   because the ref counts never drop to 0.  The default for Soar v6 - v8.2
+   because the ref counts never drop to 0.  The default for Soar v6 - v8.6.1
    was to maintain the ref cts.  It's possible that in your particular
    application, weird things could happen if you don't do these ref cts,
    but if you are trying to improve performance and reduce memory, it's
    worth testing your system with the top-level-ref-cts turned off.
-   See comments in recmem.cpp  */
-/* #define DO_TOP_LEVEL_REF_CTS */
+   Soar will be much more efficient.  See comments in recmem.cpp  */
+//#define DO_TOP_LEVEL_REF_CTS
 
 /* UNComment the following line to eliminate all callbacks except those
    for I/O, AFTER_DECISION_PHASE, and printing. */
@@ -166,7 +177,7 @@ enum ni_mode {
    its current value and asserting its new value need to ensure that the current and
    new values differ.  This option may add a small run time cost, since two loops are made
    through the preferences list. */
-//#define O_REJECTS_FIRST
+#define O_REJECTS_FIRST
 
 /**
  *  \def AGRESSIVE_ONC

@@ -346,7 +346,7 @@ typedef char * test;
 
 #define referent_of_equality_test(t) ((Symbol *) (t))
 #define complex_test_from_test(t) ((complex_test *) (((char *)(t))-1))
-
+ 
 #else
 
 inline Bool test_is_blank_test(test t) 

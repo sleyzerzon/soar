@@ -338,12 +338,12 @@ extern Symbol *generate_new_sym_constant (agent* thisAgent, char *prefix,unsigne
 
 /* --- macros used for changing the reference count --- */
 #define symbol_add_ref(x) {(x)->common.reference_count++;}
-#define symbol_remove_ref(x) { \
+#define symbol_remove_ref(thisAgent, x) { \
   (x)->common.reference_count--; \
   if ((x)->common.reference_count == 0) \
-  deallocate_symbol(x); \
+  deallocate_symbol(thisAgent, x); \
   }
-
+ 
 #else
 
 inline void symbol_add_ref(Symbol * x) 

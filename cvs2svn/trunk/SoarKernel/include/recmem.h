@@ -55,10 +55,11 @@ extern void build_prohibits_list (agent* thisAgent, instantiation *inst);
 extern void deallocate_instantiation (agent* thisAgent, instantiation *inst);
 
 #ifdef USE_MACROS
-#define possibly_deallocate_instantiation(inst) { \
+#define possibly_deallocate_instantiation(thisAgent, inst) { \
   if ((! (inst)->preferences_generated) && \
       (! (inst)->in_ms)) \
     deallocate_instantiation (thisAgent, inst); }
+ 
 #else
 inline void possibly_deallocate_instantiation(agent* thisAgent, instantiation * inst)
 {
