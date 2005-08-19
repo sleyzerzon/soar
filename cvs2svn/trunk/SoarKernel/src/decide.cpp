@@ -1834,7 +1834,11 @@ preference *make_fake_preference_for_goal_item (agent* thisAgent,
   cond->data.tests.value_test = make_equality_test (ap_wme->value);
   cond->test_for_acceptable_preference = TRUE;
   cond->bt.wme_ = ap_wme;
+  #ifdef DO_TOP_LEVEL_REF_CTS
   wme_add_ref (ap_wme);
+  #else 
+  if (inst->match_goal_level > TOP_GOAL_LEVEL) wme_add_ref (ap_wme);
+  #endif
   cond->bt.level = ap_wme->id->id.level;
   cond->bt.trace = NIL;
   cond->bt.prohibits = NIL;
@@ -2267,6 +2271,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   }
 
   /* --- remove any preferences supported by this goal --- */
+#ifdef DO_TOP_LEVEL_REF_CTS
   while (goal->id.preferences_from_goal) {
     p = goal->id.preferences_from_goal;
     remove_from_dll (goal->id.preferences_from_goal, p,
@@ -2275,7 +2280,24 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
     if (! remove_preference_from_clones (thisAgent, p))
       if (p->in_tm) remove_preference_from_tm (thisAgent, p);
   }
-  
+#else   
+  /* KJC Aug 05: this seems to cure a potential for exceeding callstack 
+   * when popping soar's goal stack and not doing DO_TOP_LEVEL_REF_CTS 
+   * Probably should make this change for all cases, but needs testing.  */
+  /* Prefs are added to head of dll, so try removing from tail */
+  if (goal->id.preferences_from_goal) {
+	  p = goal->id.preferences_from_goal;
+	  while (p->all_of_goal_next) p = p->all_of_goal_next;
+	  while (p) {
+		  remove_from_dll (goal->id.preferences_from_goal, p,
+                     all_of_goal_next, all_of_goal_prev);
+		  p->on_goal_list = FALSE;
+		  if (! remove_preference_from_clones (thisAgent, p))
+			  if (p->in_tm) remove_preference_from_tm (thisAgent, p);
+		  p = p->all_of_goal_prev;
+	  }
+  }
+#endif
   /* --- remove wmes for this goal, and garbage collect --- */
   remove_wmes_for_context_slot (thisAgent, goal->id.operator_slot);
   update_impasse_items (thisAgent, goal, NIL); /* causes items & fake pref's to go away */
