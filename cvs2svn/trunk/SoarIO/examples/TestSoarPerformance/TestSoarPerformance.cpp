@@ -58,6 +58,13 @@ public:
 	}
 
 	void PrintResults() {
+		cout << resetiosflags(ios::right) << setiosflags(ios::left);
+		cout << setw(12) << " ";
+		cout << " ";
+		cout << resetiosflags(ios::left) << setiosflags(ios::right);
+		cout << setw(10) << "Avg";
+		cout << setw(10) << "Low";
+		cout << setw(10) << "High" << endl;
 		PrintResultsHelper("OS Real", GetAverage(realtimes), GetLow(realtimes), GetHigh(realtimes));
 		PrintResultsHelper("OS Proc", GetAverage(proctimes), GetLow(proctimes), GetHigh(proctimes));
 		PrintResultsHelper("Soar Kernel", GetAverage(kerneltimes), GetLow(kerneltimes), GetHigh(kerneltimes));
@@ -66,26 +73,21 @@ public:
 
 	void PrintResultsHelper(string label, double avg, double low, double high) {
 		cout.precision(3);
-		cout << resetiosflags(ios::right);
-		cout << setiosflags(ios::left);
-		cout.width(12);
-		cout << label;
+		cout << resetiosflags(ios::right) << setiosflags(ios::left);
+		cout << setw(12) << label;
 		cout << ":";
 		cout << resetiosflags(ios::left);
 		cout << setiosflags(ios::right);
-		cout.width(10);
-		cout << "Avg: " << avg;
-		cout.width(10);
-		cout << "Low: " << low;
-		cout.width(15);
-		cout << "High: " << high;
+		cout << setw(10) << setiosflags(ios::fixed) << setprecision(3) << avg;
+		cout << setw(10) << setiosflags(ios::fixed) << setprecision(3) << low;
+		cout << setw(10) << setiosflags(ios::fixed) << setprecision(3) << high;
 		cout << endl;
 	}
 };
 
 
 void MyPrintEventHandler(smlPrintEventId id, void* pUserData, Agent* pAgent, char const* pMessage) {
-	//cout << pMessage << endl;
+	cout << pMessage << endl;
 }
 
 void PrintTest1Description(int numTrials) {
@@ -94,24 +96,23 @@ void PrintTest1Description(int numTrials) {
 	cout << "This is repeated " << numTrials << " times to measure average performance." << endl;
 	cout << "Importantly, since the kernel is destroyed between each run, memory needs to be reallocated each time." << endl;
 }
-void Test1(int numTrials, StatsTracker* pSt, int watchlevel) {
-	char wl[10];
-	snprintf(wl, 9, "%s %i", "watch", watchlevel);
+void Test1(int numTrials, StatsTracker* pSt, vector<string>* commands) {
 
 	for(int i = 0; i < numTrials; i++) {
+		cout << endl << "***** Trial " << (i+1) << " of " << numTrials << " Begin *****" << endl;
 
 		Kernel* kernel = Kernel::CreateKernelInNewThread("SoarKernelSML");
 		Agent* agent = kernel->CreateAgent("Soar1");
 		
 		agent->RegisterForPrintEvent(smlEVENT_PRINT, MyPrintEventHandler, NULL);
 
-		agent->LoadProductions("TestSoarPerformance.soar");
-		agent->ExecuteCommandLine(wl);
+		for(vector<string>::iterator itr = commands->begin(); itr != commands->end(); itr++) {
+			agent->ExecuteCommandLine((*itr).c_str());
+		}
 
 		AnalyzeXML response;
 		agent->ExecuteCommandLineXML("time run", &response);
 		
-		//FIXME: can't actually differentiate these results yet due to bug 523
 		pSt->realtimes.push_back(atof(response.GetArgValue(sml_Names::kParamRealSeconds)));
 		pSt->proctimes.push_back(atof(response.GetArgValue(sml_Names::kParamProcSeconds)));
 
@@ -124,49 +125,9 @@ void Test1(int numTrials, StatsTracker* pSt, int watchlevel) {
 
 		kernel->Shutdown();
 		delete kernel;
+
+		cout << endl << "***** Trial " << (i+1) << " of " << numTrials << " Complete *****" << endl;
 	}
-}
-
-void PrintTest2Description(int numTrials) {
-	cout << endl;
-	cout << "Test2 creates a kernel and runs the test suite once to prime the memory pools." << endl;
-	cout << "The stats from this priming step are thrown away." << endl;
-	cout << "Then init-soar is called and the test-suite is run again." << endl;
-	cout << "This is repeated " << numTrials << " times to measure average performance." << endl;
-	cout << "Importantly, since the kernel is not destroyed between each run, memory does not need to be reallocated each time." << endl;
-}
-
-void Test2(int numTrials, StatsTracker* pSt, int watchlevel) {
-	char wl[10];
-	snprintf(wl, 9, "%s %i", "watch", watchlevel);
-
-	Kernel* kernel = Kernel::CreateKernelInNewThread("SoarKernelSML");
-	Agent* agent = kernel->CreateAgent("Soar1");
-	
-	agent->RegisterForPrintEvent(smlEVENT_PRINT, MyPrintEventHandler, NULL);
-
-	agent->LoadProductions("TestSoarPerformance.soar");
-	agent->ExecuteCommandLine(wl);
-	agent->ExecuteCommandLine("run");
-
-	for(int i = 0; i < numTrials; i++) {
-
-		agent->ExecuteCommandLine("init-soar");
-		AnalyzeXML response;
-		agent->ExecuteCommandLineXML("time run", &response);
-		
-		//FIXME: can't actually differentiate these results yet due to bug 523
-		pSt->realtimes.push_back(atof(response.GetArgValue(sml_Names::kParamRealSeconds)));
-		pSt->proctimes.push_back(atof(response.GetArgValue(sml_Names::kParamProcSeconds)));
-
-		agent->ExecuteCommandLineXML("stats", &response);
-
-		pSt->kerneltimes.push_back(atof(response.GetArgValue(sml_Names::kParamStatsKernelCPUTime)));
-		pSt->totaltimes.push_back(atof(response.GetArgValue(sml_Names::kParamStatsTotalCPUTime)));
-	}
-
-	kernel->Shutdown();
-	delete kernel;
 }
 
 void main() {
@@ -178,25 +139,24 @@ void main() {
 
 	{ // create local scope to allow for local memory cleanup before we check at end
 
-		StatsTracker stTest1_w0, stTest2_w0, stTest1_w1, stTest2_w1;
+		StatsTracker stTest1_learnoff, stTest1_learnon;
+		vector<string> commands;
+		commands.push_back("source TestSoarPerformance.soar");
+		commands.push_back("watch 0");
+		
+		int numTrials = 3;
+		cout << endl << "***** Running suite with learning off *****" << endl;
+		Test1(numTrials, &stTest1_learnoff, &commands);
+		commands.push_back("learn --on");
+		cout << endl << "***** Running suite with learning on *****" << endl;
+		Test1(numTrials, &stTest1_learnon, &commands);
 
-		int numTrials = 1;
-		Test1(numTrials, &stTest1_w0, 0);
-		//Test2(numTrials, &stTest2_w0, 0);
-		//Test1(numTrials, &stTest1_w1, 1);
-		//Test2(numTrials, &stTest2_w1, 1);
+		//PrintTest1Description(numTrials);
 
-		PrintTest1Description(numTrials);
-		PrintTest2Description(numTrials);
-
-		cout << endl << "Test1 watch 0" << endl;
-		stTest1_w0.PrintResults();
-		cout << endl << "Test2 watch 0" << endl;
-		//stTest2_w0.PrintResults();
-		cout << endl << "Test1 watch 1" << endl;
-		//stTest1_w1.PrintResults();
-		cout << endl << "Test2 watch 1" << endl;
-		//stTest2_w1.PrintResults();
+		cout << endl << "watch 0 learning off" << endl;
+		stTest1_learnoff.PrintResults();
+		cout << endl << "watch 0 learning on" << endl;
+		stTest1_learnon.PrintResults();
 
 		cout << endl << endl << "Press enter to continue";
 		cin.get();
