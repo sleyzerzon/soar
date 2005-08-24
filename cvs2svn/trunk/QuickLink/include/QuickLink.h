@@ -124,6 +124,7 @@ private:
 	bool endprocnow, shouldPrintWM, resetProcStat, readFromCmd, enterOutputStage, printWM_runp;
 	char endFind;
 	int counter;
+	string connectionType;
 
 	
 
@@ -223,6 +224,10 @@ private:
 	string CallParser(istream* in);
 
 	void PurgeAllVectors();
+
+	void CreateNewKernel();
+
+	void EstRemoteConnection();
 
 
 };

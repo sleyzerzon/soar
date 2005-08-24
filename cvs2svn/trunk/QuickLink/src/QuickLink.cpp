@@ -62,9 +62,43 @@ void MyStartSystemEventHandler(sml::smlSystemEventId id, void* pUserData, sml::K
 QuickLink::QuickLink()
 {
 	//OSFinder(); //needed for spawn debugger
+
+	cout << "Would you like to create a new kernel or establish a remote connection (NEW or REMOTE): " ;
+	cin >> connectionType;
+	cout << endl << endl;
+	makeUpper(connectionType);
+
+	while(connectionType != "NEW" && connectionType != "REMOTE")
+	{
+		cout << "Please enter either NEW or REMOTE: ";
+		cin >> connectionType;
+		cout << endl << endl;
+	}
 	
+	if(connectionType == "NEW")
+		CreateNewKernel();
+	else 
+		EstRemoteConnection();
+
+
+	//*******INITIALIZE VARIABLES******
+	
+	garbage = ""; parent = ""; 	path = ""; command = "";
+	pInputLink = pAgent->GetInputLink();
+	Fvalue = 0; Ivalue = 0; counter = 1;
+	
+	pOnce = true, printStep = false, Icycle = true, printTree = false, shouldPrintWM = true;
+	loadingStep = false, StuffToSave = false, loadingProcess = false, endprocnow = false;
+	resetProcStat = false, readFromCmd = true, enterOutputStage = false, printWM_runp = false;
+
+	pKernel->RegisterForSystemEvent( sml::smlEVENT_SYSTEM_START , MyStartSystemEventHandler , this );
+}
+
+void
+QuickLink::CreateNewKernel()
+{
 	//Create an instance of Soar kernel
-	pKernel = sml::Kernel::CreateKernelInNewThread("SoarKernelSML");
+		pKernel = sml::Kernel::CreateKernelInNewThread("SoarKernelSML");
 
 
 	//Error checking to see if kernel loaded correctly
@@ -83,18 +117,38 @@ QuickLink::QuickLink()
 		cout << pKernel->GetLastErrorDescription() << endl;
 		return ;
 	}
+}
 
-	//*******INITIALIZE VARIABLES******
+void
+QuickLink::EstRemoteConnection()
+{
+	pKernel = sml::Kernel::CreateRemoteConnection( true , NULL );
 	
-	garbage = ""; parent = ""; 	path = ""; command = "";
-	pInputLink = pAgent->GetInputLink();
-	Fvalue = 0; Ivalue = 0; counter = 1;
-	
-	pOnce = true, printStep = false, Icycle = true, printTree = false, shouldPrintWM = true;
-	loadingStep = false, StuffToSave = false, loadingProcess = false, endprocnow = false;
-	resetProcStat = false, readFromCmd = true, enterOutputStage = false, printWM_runp = false;
+	//Error checking to see if kernel loaded correctly
+	while (pKernel->HadError())
+	{
+		string junk;
+		cout << pKernel->GetLastErrorDescription() << endl;
+		cout << "Make sure a Kernel exists on the default port." << endl;
+		cout << "When you are ready press any non-white space key + enter: ";
+		cin >> junk;
+		pKernel = sml::Kernel::CreateRemoteConnection( true , NULL );
+	}
 
-	pKernel->RegisterForSystemEvent( sml::smlEVENT_SYSTEM_START , MyStartSystemEventHandler , this );
+	string agentName;
+	cout << "What is the name of the agent you would like to connect to: ";
+	cin >> agentName;
+
+	pAgent = pKernel->GetAgent(agentName.c_str());
+
+	//Make sure agent was successfully created
+	while (pKernel->HadError())
+	{
+		cout << pKernel->GetLastErrorDescription() << endl;
+		cout << "Please enter a valid agent name: ";
+		cin >> agentName;
+		pAgent = pKernel->GetAgent(agentName.c_str());
+	}
 }
 
 void
