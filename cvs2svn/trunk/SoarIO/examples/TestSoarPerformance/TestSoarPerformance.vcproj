@@ -41,8 +41,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="copy TestSoarPerformance.soar ..\..\..\soar-library /Y
-copy count-test-no-write.soarx ..\..\..\soar-library /Y
-"/>
+copy count-test-5000.soarx ..\..\..\soar-library /Y"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
