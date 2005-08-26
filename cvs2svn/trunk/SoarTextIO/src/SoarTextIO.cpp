@@ -357,10 +357,20 @@ SoarTextIO::PrintOutput()
 		place.X = 0;
 		place.Y = (info.dwCursorPosition.Y - 3);
 		SetConsoleCursorPosition(hStdout,place);
-		cout  << agentName << " says: ";
-		cout << toPrint;
-		cout << endl << endl;
-		SetConsoleCursorPosition( hStdout , info.dwCursorPosition );
+		cout << ": ";
+		cout << toPrint << endl << endl;
+		char buffer[100];
+		place.X = 0;
+		place.Y = info.dwCursorPosition.Y;
+		DWORD dummy;
+		ReadConsoleOutputCharacter( hStdout , buffer , 100 , place , &dummy );
+		string holder = buffer;
+		cout << "                                                                              " << endl ;
+		cout << "                                                                              " << endl ;
+		cout << "                                                                              " << endl ;
+
+		cout << GetRelevant( holder );
+		
 		printNow = true;
 	}
 	
@@ -626,5 +636,30 @@ SoarTextIO::WhenReady()
 int main()
 {
 	SoarTextIO STIO;
+}
+
+string
+SoarTextIO::GetRelevant( string toShorten )
+{
+	int index = 0;
+	int count = 0;
+	while( index < 100 && count < 6 )
+	{
+		if( toShorten[index] == ' ' )
+			count++;
+		else
+			count = 0;
+		index++;
+	}
+	string toReturn = "";
+	for(int i = 0; i < index - 5; i++)
+	{
+		toReturn += toShorten[i];
+	}
+
+	if( toReturn.size() > 2 )
+		toReturn = toReturn.substr( 0 , toReturn.size() - 1 );
+
+	return toReturn;
 }
 

@@ -136,6 +136,8 @@ private:
 
 	void step();
 
+	string GetRelevant( string toShorten );
+
 	
 
 	

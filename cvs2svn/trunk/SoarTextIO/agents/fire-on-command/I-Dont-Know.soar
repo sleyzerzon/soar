@@ -1,15 +1,16 @@
 sp {propose*I-Dont-Know
    (state <s> ^io <io>
-             -^sentence-num <num>)
-   (<io> ^input-link.text-input.sentence <sent>
+             -^text-input-number <num>)
+   (<io> ^input-link.text <text>
          ^output-link <ol>)
-   (<sent> ^word <fw>
-           ^sentence-num <num>)
-  -(<ol> ^text-output.sentence.sentence-num <num>)
+   (<text> ^text-input-number <num>
+           ^next <sent>)
+   (<sent> ^value <fw>)
+  -(<ol> ^text-output.sentence.text-input-number <num>)
 -->
    (<s> ^operator <op> + <)
    (<op> ^name I-Dont-Know
-         ^sentence-num <num>)
+         ^text-input-number <num>)
 }
 
 
@@ -18,17 +19,18 @@ sp {apply*I-Dont-Know
    (state <s> ^operator <op>
               ^io.output-link <ol>)
    (<op> ^name I-Dont-Know
-         ^sentence-num <num>)
+         ^text-input-number <num>)
 -->
-   (<s> ^sentence-num <num>)
-   (<ol> ^text-output <to>)
-   (<to> ^sentence <sen>)
-   (<sen> ^sentence-num <num>
-          ^word I
-          ^next-word <nw1>)
-   (<nw1> ^word cannot
-          ^next-word <nw2>)
-   (<nw2> ^word do
-          ^next-word <nw3>)
-   (<nw3> ^word that)
+   (<s> ^text-input-number <num>)
+   (<ol> ^text <to>)
+   (<to> ^next <sen>
+         ^text-input-number <num>)
+   (<sen> ^value I
+          ^next <nw1>)
+   (<nw1> ^value cannot
+          ^next <nw2>)
+   (<nw2> ^value do
+          ^next <nw3>)
+   (<nw3> ^value that
+          ^next nil)
 }

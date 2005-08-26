@@ -1,16 +1,17 @@
 sp {propose*fire-on-command
    (state <s> ^io <io>
-             -^sentence-num <num>)
-   (<io> ^input-link.text-input.sentence <sent>
+             -^text-input-number <num>)
+   (<io> ^input-link.text <text>
          ^output-link <ol>)
-   (<sent> ^word fire
-           ^sentence-num <num>)
-   -(<ol> ^text-output.sentence.sentence-num <num>)
+   (<text> ^next <next>
+           ^text-input-number <num>)
+   (<next> ^value fire)
+   -(<ol> ^text-output.sentence.text-input-number <num>)
 -->
    (<s> ^operator <o> + >)
    (<o> ^name fire-on-command
         ^actions.fire.weapon missile
-        ^sentence-num <num>)
+        ^text-input-number <num>)
    
 }
 
@@ -18,13 +19,14 @@ sp {apply*fire-on-command
    (state <s> ^operator <op>
               ^io.output-link <ol>)
    (<op> ^name fire-on-command
-         ^sentence-num <num>)
+         ^text-input-number <num>)
 -->
-   (<s> ^sentence-num <num>)
-   (<ol> ^text-output <to>)
-   (<to> ^sentence <sen>)
-   (<sen> ^sentence-num <num>
-          ^word missile
-          ^next-word <nw1>)
-   (<nw1> ^word fired)
+   (<s> ^text-input-number <num>)
+   (<ol> ^text <to>)
+   (<to> ^next <next>
+         ^text-input-number <num>)
+   (<next> ^value missile
+          ^next <nw1>)
+   (<nw1> ^value fired
+          ^next nil)
 }
