@@ -63,6 +63,7 @@ class OutputListener ;
 class AgentSML; 
 class ConnectionManager ;
 class Events ;
+class RunScheduler ;
 
 // Define the CommandFunction which we'll call to process commands
 typedef bool (KernelSML::*CommandFunction)(gSKI::IAgent*, char const*, Connection*, AnalyzeXML*, ElementXML*, gSKI::Error*);
