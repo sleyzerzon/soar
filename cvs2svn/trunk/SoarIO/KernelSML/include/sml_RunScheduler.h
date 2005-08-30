@@ -77,7 +77,7 @@ protected:
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
 	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
 	bool			AreAllOutputPhasesComplete() ;
-
+	bool			HaveAllGeneratedOutput() ;
 } ;
 
 } // namespace

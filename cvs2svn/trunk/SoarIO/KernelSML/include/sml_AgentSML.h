@@ -103,6 +103,7 @@ protected:
 	// Used for update world events
 	bool m_CompletedOutputPhase ;
 	bool m_GeneratedOutput ;
+	unsigned long m_OutputCounter ;
 
 public:
 	AgentSML(KernelSML* pKernelSML, gSKI::IAgent* pAgent) ;
@@ -204,6 +205,9 @@ public:
 
 	void SetGeneratedOutput(bool state)				{ m_GeneratedOutput = state ; }
 	bool HasGeneratedOutput() 						{ return m_GeneratedOutput ; }
+
+	void SetInitialOutputCount(unsigned long count)	{ m_OutputCounter = count ; }
+	unsigned long GetInitialOutputCount()			{ return m_OutputCounter ; }
 } ;
 
 

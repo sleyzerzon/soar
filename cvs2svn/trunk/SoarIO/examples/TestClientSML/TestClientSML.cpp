@@ -654,6 +654,10 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	myCount = 0 ;
 	int callback_run_count = pAgent->RegisterForRunEvent(smlEVENT_AFTER_DECISION_CYCLE, MyRunEventHandler, &myCount) ;
 
+	int outputsGenerated ;
+	outputsGenerated = 0 ;
+	int callback_g = pKernel->RegisterForUpdateEvent(smlEVENT_AFTER_ALL_GENERATED_OUTPUT, MyUpdateEventHandler, &outputsGenerated) ;
+
 	// Can't test this at the same time as testing the getCommand() methods as registering for this clears the output link information
 	//int outputHandler = pAgent->AddOutputHandler("move", MyOutputEventHandler, NULL) ;
 
@@ -676,6 +680,12 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	}
 	cout << "Agent ran for " << myCount << " decisions before we got output" << endl ;
 
+	if (outputsGenerated != 1)
+	{
+		cout << "Error in AFTER_ALL_GENERATED event." << endl ;
+		return false ;
+	}
+
 	// Reset the agent and repeat the process to check whether init-soar works.
 	if (doInitSoars)
 	{
@@ -684,6 +694,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	}
 
 	bool ioOK = false ;
+
+	pKernel->UnregisterForUpdateEvent(callback_g) ;
 
 	//cout << "Time to dump output link" << endl ;
 
