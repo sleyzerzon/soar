@@ -1761,15 +1761,16 @@ namespace gSKI
       // Check to see if we've moved to another phase or not
       if(m_lastPhase != m_nextPhase)
       {
+         // Increment the number of outputs that have occured
+		 // (Do this before notify listeners so they can see the updated counter)
+         if((m_lastPhase == gSKI_OUTPUT_PHASE) && m_agent->output_link_changed)
+            ++m_outputCount;
+
          RunNotifier nfAfterPhase(this, m_lastPhase);
          m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED, nfAfterPhase);
       
          // Increment the phase count
          ++m_phaseCount;
-
-         // Increment the number of outputs that have occured
-         if((m_lastPhase == gSKI_OUTPUT_PHASE) && m_agent->output_link_changed)
-            ++m_outputCount;
 
          // Check an interrupt
          if(m_interruptFlags & gSKI_STOP_AFTER_PHASE)
