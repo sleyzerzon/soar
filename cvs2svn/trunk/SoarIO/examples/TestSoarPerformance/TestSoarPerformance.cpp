@@ -145,6 +145,13 @@ void main() {
 		commands.push_back("watch 0");
 		
 		int numTrials = 3;
+
+		cout << endl << "The test suite will be run in two phases, using " << numTrials << " trials each time." << endl;
+		cout << "The first phase will be with learning off. The second will be with learning on." << endl;
+		cout << "All results will be reported at the very end." << endl;
+		cout << "Press enter to begin." << endl;
+		cin.get();
+
 		cout << endl << "***** Running suite with learning off *****" << endl;
 		Test1(numTrials, &stTest1_learnoff, &commands);
 		commands.push_back("learn --on");
@@ -158,7 +165,7 @@ void main() {
 		cout << endl << "watch 0 learning on" << endl;
 		stTest1_learnon.PrintResults();
 
-		cout << endl << endl << "Press enter to continue";
+		cout << endl << endl << "Press enter to exit.";
 		cin.get();
 
 	} // end local scope
