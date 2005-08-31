@@ -32,12 +32,20 @@ RunScheduler::RunScheduler(KernelSML* pKernelSML)
 	m_IsRunning = false ;
 }
 
+/*************************************************************
+* @brief	Each agent is set to either run or not when the
+*			next run command is executed.
+*************************************************************/
 void RunScheduler::ScheduleAgentToRun(AgentSML* pAgentSML, bool state)
 {
 	if (pAgentSML)
 		pAgentSML->ScheduleAgentToRun(state) ;
 }
 
+/*************************************************************
+* @brief	Sets all agents to either run or not when the
+*			next run command is executed.
+*************************************************************/
 void RunScheduler::ScheduleAllAgentsToRun(bool state)
 {
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
@@ -47,6 +55,11 @@ void RunScheduler::ScheduleAllAgentsToRun(bool state)
 	}
 }
 
+/********************************************************************
+* @brief	Agents maintain a number of counters (for how many phase,
+*			decisions etc.) they have ever executed.
+*			We use these counters to determine when a run should stop.
+*********************************************************************/
 unsigned long RunScheduler::GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize)
 {
 	switch(runStepSize)
@@ -66,6 +79,9 @@ unsigned long RunScheduler::GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType ru
 	}
 }
 
+/*************************************************************************
+* @brief	Returns true if the given agent has reached the end of its run
+**************************************************************************/
 bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count)
 {
 	unsigned long current = GetStepCounter(pAgent, runStepSize) ;
@@ -76,6 +92,9 @@ bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, eg
 	return (difference >= count && runStepSize != gSKI_RUN_FOREVER) ;
 }
 
+/*************************************************************************
+* @brief	This event is fired to indicate that the agent is about to run.
+**************************************************************************/
 void RunScheduler::FireBeforeRunStartsEvents()
 {
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
@@ -90,6 +109,11 @@ void RunScheduler::FireBeforeRunStartsEvents()
 	}
 }
 
+/********************************************************************
+* @brief	Agents maintain a number of counters (for how many phase,
+*			decisions etc.) they have ever executed.
+*			We use these counters to determine when a run should stop.
+*********************************************************************/
 void RunScheduler::RecordInitialRunCounters(egSKIRunType runStepSize)
 {
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
@@ -105,6 +129,17 @@ void RunScheduler::RecordInitialRunCounters(egSKIRunType runStepSize)
 	}
 }
 
+/********************************************************************
+* @brief	Certain events are designed to fire "after the agents have done useful work".
+*			We use these to update the environment.
+*			The most common example is after all agents have completed the output phase
+*			the environment is updated to reflect their actions.
+*
+*			Why do we use events to do this?  You could just call "run x" and then update the
+*			world after the run completes.  Well, by listening for the event anyone can issue
+*			the "run x" command--specifically either the debugger or the environment and
+*			the environment still behaves correctly.
+*********************************************************************/
 void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 {
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
@@ -123,6 +158,10 @@ void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 	}
 }
 
+/********************************************************************
+* @brief	Returns true if all currently active agents have completed
+*			the output phase (they may not have generated output).
+*********************************************************************/
 bool RunScheduler::AreAllOutputPhasesComplete()
 {
 	// We only check the agents that are still scheduled to run.
@@ -140,19 +179,31 @@ bool RunScheduler::AreAllOutputPhasesComplete()
 	return true ;
 }
 
+/********************************************************************
+* @brief	Returns true if all currently active agents have generated
+*			output.  (This is a tighter requirement than just having
+*			completed the output phase).
+*********************************************************************/
 bool RunScheduler::HaveAllGeneratedOutput()
 {
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 	{
 		AgentSML* pAgentSML = iter->second ;
 
-		if (!pAgentSML->HasGeneratedOutput())
+		// By testing agents that are still scheduled to run this lets us more closely mimic the
+		// regular "RunTilOutput" semantics--where agents either drop out because they've generated output OR
+		// because they have reached a maximum number of decisions (by default 15) without generating output.
+		if (pAgentSML->IsAgentScheduledToRun() && !pAgentSML->HasGeneratedOutput())
 			return false ;
 	}
 
 	return true ;
 }
 
+/********************************************************************
+* @brief	Called when the agent completes a given phase.
+*			We're interested in the end of the output phase.
+*********************************************************************/
 void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase)
 {
 	if (eventID == gSKIEVENT_AFTER_PHASE_EXECUTED && phase == gSKI_OUTPUT_PHASE)
@@ -181,28 +232,45 @@ void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, eg
 		if (count != pAgentSML->GetInitialOutputCount())
 		{
 			pAgentSML->SetGeneratedOutput(true) ;
-
-			// See if this was the last agent to generate output
-			if (HaveAllGeneratedOutput())
-			{
-				// If all agents have generated output fire the event and reset the counters
-
-				// If so fire the after_all_generated_output event
-				m_pKernelSML->FireUpdateListenerEvent(gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT, m_RunFlags) ;
-
-				// Then clear the generated output flags and repeat the process.
-				for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
-				{
-					AgentSML* pAgentSML = iter->second ;
-
-					pAgentSML->SetGeneratedOutput(false) ;
-					pAgentSML->SetInitialOutputCount(pAgentSML->GetIAgent()->GetNumOutputsExecuted()) ;
-				}
-			}
+			TestForFiringGeneratedOutputEvent() ;
 		}
 	}
 }
 
+/********************************************************************
+* @brief	Check if the "AFTER_ALL_GENERATED_OUTPUT" event should be
+*			fired or not.
+*********************************************************************/
+void RunScheduler::TestForFiringGeneratedOutputEvent()
+{
+	// If the event has already been fired (for this step of the run) nothing to do.
+	// This could happen if the last agent generates output and then stops running.
+	if (m_AllGeneratedOutputEventFired)
+		return ;
+
+	// See if this was the last agent to generate output
+	if (HaveAllGeneratedOutput())
+	{
+		// If all agents have generated output fire the event and reset the counters
+		m_AllGeneratedOutputEventFired = true ;
+
+		// If so fire the after_all_generated_output event
+		m_pKernelSML->FireUpdateListenerEvent(gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT, m_RunFlags) ;
+
+		// Then clear the generated output flags and repeat the process.
+		for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
+		{
+			AgentSML* pAgentSML = iter->second ;
+
+			pAgentSML->SetGeneratedOutput(false) ;
+			pAgentSML->SetInitialOutputCount(pAgentSML->GetIAgent()->GetNumOutputsExecuted()) ;
+		}
+	}
+}
+
+/********************************************************************
+* @brief	Clean up for the update world events.
+*********************************************************************/
 void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 {
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
@@ -217,6 +285,9 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 	}
 }
 
+/********************************************************************
+* @brief	Returns true if some agents are currently running.
+*********************************************************************/
 bool RunScheduler::IsRunning()
 {
 	return m_IsRunning ;
@@ -284,6 +355,10 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 			pKernel->FireInterruptCheckEvent() ;
 		stepCount++ ;
 
+		// Use a flag to make sure we only fire the all generated event once per step.
+		// Otherwise, if the last agent generates output and then stops running we might try to fire it twice.
+		m_AllGeneratedOutputEventFired = false ;
+
 		 // Notify listeners that Soar is running.  This event is a kernel level (agent manager) event
 		 // which allows a single listener to check for client driven interrupts for all agents.
 		 // Sometimes that's easier to work with than the agent specific events (where you get <n> events from <n> agents)
@@ -313,6 +388,10 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 				{
 					pAgentSML->ScheduleAgentToRun(false) ;
 					pAgentSML->SetResultOfRun(runResult) ;
+
+					// If an agent stops running and the others have either stopped or have all generated output
+					// we should fire the "ALL_GENERATED_OUTPUT" event.
+					TestForFiringGeneratedOutputEvent() ;
 
 					// Notify listeners that this agent is finished running
 					pAgent->FireRunEndsEvent() ;

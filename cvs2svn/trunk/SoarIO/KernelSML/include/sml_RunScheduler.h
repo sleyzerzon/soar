@@ -33,6 +33,7 @@ protected:
 	KernelSML*	m_pKernelSML ;
 	smlRunFlags	m_RunFlags ;
 	bool		m_IsRunning ;
+	bool		m_AllGeneratedOutputEventFired ;
 
 public:
 	RunScheduler(KernelSML* pKernelSML) ;
@@ -78,6 +79,7 @@ protected:
 	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
 	bool			AreAllOutputPhasesComplete() ;
 	bool			HaveAllGeneratedOutput() ;
+	void			TestForFiringGeneratedOutputEvent() ;
 } ;
 
 } // namespace

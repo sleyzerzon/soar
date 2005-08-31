@@ -749,6 +749,12 @@ EXPORT void sml_DirectRun(char const* pAgentName, int decisions, bool clearInter
 	// if the run call is made through this direct path).
 	// The direct I/O methods are all still valid, but to actually run Soar you should call
 	// one of the normal SML run methods.
+	
+	// BADBAD: Actually, as long as this calls into the SML run scheduler (which has been recently added) rather than directly into gSKI
+	// there should be no problem adding this back in.
+	// Given that we should expand the parameter set to support either one agent or all agents
+	// and provide different step sizes.  I.E. The full set of capabilities the run command currently offers.
+
 	return ;
 }
 
