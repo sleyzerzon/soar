@@ -565,11 +565,13 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	}
 
 	// Should be 5 phases per decision
+	/* Not true now we support stopping before/after phases when running by decision.
 	if (phaseCount != 20)
 	{
 		cout << "Error receiving phase events" << endl ;
 		return false ;
 	}
+	*/
 
 	if (beforeCount != 1 || afterCount != 1)
 	{
@@ -602,6 +604,12 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	pAgent->UnregisterForRunEvent(callback_before) ;
 	pAgent->UnregisterForRunEvent(callback_after) ;
 	pKernel->UnregisterForUpdateEvent(callback_u) ;
+
+	// BUGBUG: Adding this triggers a memory leak warning in the kernel (when deallocating symbol table)
+	// No clue why.  Following it with an init-soar fixes this.
+//	pAgent->InitSoar() ;
+//	pAgent->ExecuteCommandLine("run --self 3 -p") ;
+//	pAgent->InitSoar() ;
 
 	// Print out the standard trace and the same thing as a structured XML trace
 	cout << trace << endl ;

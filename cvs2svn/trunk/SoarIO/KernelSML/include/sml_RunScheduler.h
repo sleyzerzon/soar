@@ -35,6 +35,9 @@ protected:
 	bool		m_IsRunning ;
 	bool		m_AllGeneratedOutputEventFired ;
 
+	// When running by decision stop before this phase runs.
+	egSKIPhaseType m_StopBeforePhase ;
+
 public:
 	RunScheduler(KernelSML* pKernelSML) ;
 

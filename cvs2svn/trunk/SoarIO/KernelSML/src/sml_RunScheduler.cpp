@@ -30,6 +30,7 @@ RunScheduler::RunScheduler(KernelSML* pKernelSML)
 	m_pKernelSML = pKernelSML ;
 	m_RunFlags = sml_NONE ;
 	m_IsRunning = false ;
+	m_StopBeforePhase = gSKI_INPUT_PHASE ;
 }
 
 /*************************************************************
@@ -89,7 +90,37 @@ bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, eg
 
 	unsigned long difference = current - initial ;
 
-	return (difference >= count && runStepSize != gSKI_RUN_FOREVER) ;
+	bool finished = difference >= count && runStepSize != gSKI_RUN_FOREVER ;
+
+	// If we're running by decision and we've run the appropriate number of decisions, then keep running until
+	// we reach the correct phase where we should stop.
+	// BUGBUG? This assumes the kernel always goes through every phase w/o skipping any or we might fail to stop.  Is that safe?
+	egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
+
+	/*
+	if (runStepSize == gSKI_RUN_DECISION_CYCLE)
+	{
+		if (current == initial)
+			printf("Starting run decision cycle run at count %d\n", current) ;
+
+		if (finished)
+			printf("Finished and Phase is %d ", phase) ;
+		else
+			printf("Executing phase %d\n",phase) ;
+
+		if (m_StopBeforePhase != phase)
+			printf("extending run\n") ;
+		else
+			printf("stopping run\n") ;
+
+		fflush(stdout) ;
+	}
+	*/
+
+	if (finished && runStepSize == gSKI_RUN_DECISION_CYCLE && m_StopBeforePhase != phase)
+		finished = false ;
+
+	return finished ;
 }
 
 /*************************************************************************

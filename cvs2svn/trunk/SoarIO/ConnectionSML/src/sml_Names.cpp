@@ -27,8 +27,12 @@ char const* const sml_Names::kDocType_Notify	= "notify" ;
 char const* const sml_Names::kSoarVersion		= "soarversion" ;
 char const* const sml_Names::kSMLVersion		= "smlversion" ;
 char const* const sml_Names::kSMLVersionValue	= "1.0.0" ;
-char const* const sml_Names::kSoarVersionValue	= "8.6.1" ;			// Hard-coding this rather than asking kernel boosts performance
 char const* const sml_Names::kOutputLinkName	= "output-link" ;
+
+// Other places to change when increasing this value:
+// 1) Debugger file Doc/Document.java -- kVersion string
+// 2) Kernel's kernel.h -- MAJOR_VERSION_NUMBER, MINOR_VERSION_NUMBER, MICRO_VERSION_NUMBER
+char const* const sml_Names::kSoarVersionValue	= "8.6.2" ;			// Hard-coding this rather than asking kernel boosts performance
 
 // <command> tag identifiers
 char const* const sml_Names::kTagCommand		= "command" ;
