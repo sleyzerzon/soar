@@ -36,8 +36,6 @@ public abstract class AbstractSingleTextView extends AbstractTextView
 	public void showProperties()
 	{
 		PropertiesDialog.Property properties[] = new PropertiesDialog.Property[3] ;
-
-		boolean decisionUpdating = (m_UpdateEveryNthDecision > 0) ;
 		
 		properties[0] = new PropertiesDialog.BooleanProperty("Update automatically on stop", m_UpdateOnStop) ;
 		properties[1] = new PropertiesDialog.BooleanProperty("Clear display before each command", m_ClearEachCommand) ;

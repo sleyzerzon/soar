@@ -620,16 +620,6 @@ public abstract class AbstractComboView extends AbstractView
          }) ;
 	}
 	
-	private class GetTextRunnable implements Runnable
-	{
-    	private String m_Result ;
-    	
-        public void run() {
-        	m_Result = m_CommandCombo.getText() ;
-        }
-        public String getResult() { return m_Result ; }
-	}
-
 	private String getCurrentCommand()
 	{
 		return m_CurrentCommand ;

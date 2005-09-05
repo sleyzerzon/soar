@@ -44,7 +44,7 @@ public abstract class AbstractTextView extends AbstractComboView
 	// This isn't supported in a platform independent way by the vanilla Text control.  But be aware the StyledText control
 	// is about 10 times slower to update than a simple Text view, so we're not using it for trace output.
 	private StyledText m_Text ;
-	private boolean m_Logging;
+	//private boolean m_Logging;
 	private PrintWriter m_LogWriter;
 
 	// The constructor must take no arguments so it can be called
@@ -54,7 +54,7 @@ public abstract class AbstractTextView extends AbstractComboView
 		m_StopCallback = -1 ;
 		m_PrintCallback = -1 ;
 		m_DecisionCallback = -1 ;
-		m_Logging = false;
+		//m_Logging = false;
 	}
 
 	/** The control we're using to display the output in this case **/

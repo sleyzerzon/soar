@@ -39,8 +39,11 @@ public class Document
 	private static final String kConnectionName = "java-debugger" ;
 	
 	/** This version is used to name the settings files uniquely, so there's no collisions if you use an older debugger.  Should be bumped with every release */
-	public static final String kVersion = "8_6_1" ;
-	
+	public static final String kVersion = "8_6_2" ;
+
+	/** This object is used to get strings for Soar commands in a version independent way */
+	private SoarCommands		m_SoarCommands = new SoarCommands(this, 8,6,2) ;
+
 	/** The properties for this application (holds user preferences).  Version specific with debugger releases (or using an older version of debugger could conflict) */
 	protected AppProperties m_AppProperties = new AppProperties("SoarDebugger" + kVersion + ".ini", "Soar Debugger Settings") ;
 
@@ -48,9 +51,6 @@ public class Document
 	private ModuleList m_ModuleList = new ModuleList() ;
 	
 	private SoarChangeGenerator m_SoarChangeGenerator = new SoarChangeGenerator() ;
-
-	/** This object is used to get strings for Soar commands in a version independent way */
-	private SoarCommands		m_SoarCommands = new SoarCommands(this, 8,6,1) ;
 
 	/** Stores the pointer to the Soar kernel we are currently interacting with (can be local to this process or remote) */
 	private Kernel				m_Kernel = null ;
