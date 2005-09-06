@@ -1,0 +1,82 @@
+<html>
+<head>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=Windows-1252">
+</head>
+<body>
+<pre>
+<table width=100% bgcolor=#CFCFE5><tr> <td> <font face=arial size=+3>
+Build Log
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+<h3>------- Build started: Project: QuickLink, Configuration: Debug|Win32 -------
+</h3>
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Command Lines
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Creating temporary file "c:\soar-8.6.1\QuickLink\QuickLinkAPI\build\Debug\RSP000002.rsp" with contents
+[
+/Od /I "..\..\SoarIO\ClientSML\include" /I "include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /FD /EHsc /MTd /GS /Fo"build\Debug/" /Fd"build\Debug/vc70.pdb" /W3 /c /Zi /TP
+".\QuickLink.cpp"
+".\QLMemory.cpp"
+".\QLInterface.cpp"
+".\QLDirtyWork.cpp"
+".\Process.cpp"
+".\Listener.cpp"
+".\Reader.cpp"
+]
+Creating command line "cl.exe @"c:\soar-8.6.1\QuickLink\QuickLinkAPI\build\Debug\RSP000002.rsp" /nologo"
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Output Window
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Compiling...
+QuickLink.cpp
+c:\soar-8.6.1\QuickLink\QuickLinkAPI\Reader.h(23) : error C2143: syntax error : missing ';' before 'private'
+QuickLink.cpp(68) : error C2079: 'Q' uses undefined class 'QLInterface'
+QuickLink.cpp(69) : error C2440: '=' : cannot convert from 'int *' to 'QLInterface *'
+        Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+QuickLink.cpp(84) : error C2027: use of undefined type 'QLInterface'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\Process.h(23) : see declaration of 'QLInterface'
+QuickLink.cpp(84) : error C2227: left of '->CreateNewKernel' must point to class/struct/union
+QuickLink.cpp(90) : error C2027: use of undefined type 'QLInterface'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\Process.h(23) : see declaration of 'QLInterface'
+QuickLink.cpp(90) : error C2227: left of '->EstablishRemoteConnection' must point to class/struct/union
+QuickLink.cpp(90) : fatal error C1903: unable to recover from previous error(s); stopping compilation
+QLMemory.cpp
+QLInterface.cpp
+c:\soar-8.6.1\QuickLink\QuickLinkAPI\Process.h(25) : error C2059: syntax error : 'namespace'
+c:\soar-8.6.1\QuickLink\QuickLinkAPI\Process.h(25) : error C2238: unexpected token(s) preceding ';'
+QLDirtyWork.cpp
+Process.cpp
+Listener.cpp
+Reader.cpp
+c:\soar-8.6.1\QuickLink\QuickLinkAPI\Reader.h(23) : error C2143: syntax error : missing ';' before 'private'
+Reader.cpp(34) : error C2039: 'clearAll' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(45) : error C2039: 'saveInput' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(61) : error C2039: 'createID' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(66) : error C2039: 'advValue' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(81) : error C2039: 'advAlter' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(97) : error C2039: 'advDelInd' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(102) : error C2039: 'advDelVal' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(111) : error C2039: 'PurgeAllVectors' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(112) : error C2039: 'promptToSave' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(119) : error C2039: 'promptToSave' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(122) : error C2039: 'clearAll' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(162) : error C2039: 'saveProcChanges' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Reader.cpp(279) : error C2039: 'spawnDebug' : is not a member of 'QuickLink'
+        c:\soar-8.6.1\QuickLink\QuickLinkAPI\QuickLink.h(30) : see declaration of 'QuickLink'
+Generating Code...
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Results
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+Build log was saved at "file://c:\soar-8.6.1\QuickLink\QuickLinkAPI\build\Debug\BuildLog.htm"
+QuickLink - 24 error(s), 0 warning(s)</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=arial size=+2>
+</font></table></body></html>
