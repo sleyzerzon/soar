@@ -81,6 +81,73 @@ unsigned long RunScheduler::GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType ru
 }
 
 /*************************************************************************
+* @brief	Returns true if phase1 is later in the execution cycle than phase2
+**************************************************************************/
+static bool IsPhaseLater(egSKIPhaseType phase1, egSKIPhaseType phase2)
+{
+	// Right now the enum is in the correct order, but if we change Soar we
+	// might need to make this more complex.
+	return phase1 > phase2 ;
+}
+
+/*************************************************************************
+* @brief	Returns the agent whose phase we should synch up to.
+**************************************************************************/
+AgentSML* RunScheduler::GetAgentToSynchronizeWith()
+{
+	AgentSML* pSynchAgent = NULL ;
+
+	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
+	{
+		AgentSML* pAgentSML = iter->second ;
+
+		if (pAgentSML->IsAgentScheduledToRun())
+		{
+			gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
+
+			// What this says is:
+			// If we don't have a current synch agent or
+			// if this agent is later in decision cycle count or
+			// matches decision cycle count and has a later phase count then
+			// adopt it as the agent to synchronize with.
+			if (!pSynchAgent || pAgent->GetNumDecisionCyclesExecuted() > pSynchAgent->GetIAgent()->GetNumDecisionCyclesExecuted() ||
+				(pAgent->GetNumDecisionCyclesExecuted() == pSynchAgent->GetIAgent()->GetNumDecisionCyclesExecuted() &&
+				IsPhaseLater(pAgent->GetCurrentPhase(), pSynchAgent->GetIAgent()->GetCurrentPhase())))
+					pSynchAgent = pAgentSML ;
+		}
+	}
+
+	return pSynchAgent ;
+}
+
+/*************************************************************************
+* @brief	Returns true if all agents scheduled to run are in the same phase.
+**************************************************************************/
+bool RunScheduler::AreAgentsSynchronized(AgentSML* pSynchAgent)
+{
+	if (!pSynchAgent)
+		return true ;
+
+	bool same = true ;
+	egSKIPhaseType phase = pSynchAgent->GetIAgent()->GetCurrentPhase() ;
+
+	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
+	{
+		AgentSML* pAgentSML = iter->second ;
+
+		if (pAgentSML->IsAgentScheduledToRun())
+		{
+			gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
+
+			if (pAgent->GetCurrentPhase() != phase)
+				same = false ;
+		}
+	}
+
+	return same ;
+}
+
+/*************************************************************************
 * @brief	Returns true if the given agent has reached the end of its run
 **************************************************************************/
 bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count)
@@ -331,12 +398,13 @@ bool RunScheduler::IsRunning()
 * @param count		 -- how many steps to run
 * @param runFlags	 -- type of run we're doing (passed back to environment)
 * @param interleaveStepSize -- how large of a step each agent is run before other agents are run
+* @param synchronize -- if true, synchronize all agents scheduled to run to the same phase before running all agents in step
 * @param pError		 -- any error
 *
 * @return Not clear on how to set this when have multiple agents.
 *		  Can query each for "GetLastRunResult()".
 *************************************************************/	
-egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, gSKI::Error* pError)
+egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError)
 {
 	// In general we really want to assert that runStepSize >= interleaveStepSize but I'm not sure there's
 	// a strict relationship and certainly the enums aren't labelled as being in a guaranteed processing size order.
@@ -344,6 +412,10 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 	// If we're running by elaboration cycles, can't be running each agent by something bigger (like a phase).
 	if (runStepSize == gSKI_RUN_ELABORATION_CYCLE)
 		assert(interleaveStepSize == gSKI_RUN_ELABORATION_CYCLE) ;
+
+	// If we want to synchronize the agents to the same phase, we need to run them by phase (or they'll never synch)
+	if (synchronize)
+		assert(interleaveStepSize == gSKI_RUN_PHASE) ;
 
 	// We store this as a member so we can access it in gSKI event handlers
 	m_RunFlags = runFlags ;
@@ -373,6 +445,18 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 
 	int interruptCheckRate = pKernel->GetInterruptCheckRate() ;
 
+	// If we need to synchronize agents, we'll set the synchAgent pointer.
+	// Otherwise, we'll clear it to indicate no synch needed.
+	m_pSynchAgentSML = NULL ;
+	if (synchronize)
+	{
+		AgentSML* pSynchAgentSML = this->GetAgentToSynchronizeWith() ;
+		bool inSynch = AreAgentsSynchronized(pSynchAgentSML) ;
+
+		if (!inSynch)
+			m_pSynchAgentSML = pSynchAgentSML ;
+	}
+
 	// Run all agents that have previously been marked as "scheduled to run".
 	while (!runFinished)
 	{
@@ -399,7 +483,11 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 		{
 			AgentSML* pAgentSML = iter->second ;
 
-			if (pAgentSML->IsAgentScheduledToRun())
+			// This is only true if we are in the process of synching up to one agent and this agent is at the correct phase
+			// In that case we don't run this agent for a step--which eventually means all agents will synch to the same point.
+			bool synched = (m_pSynchAgentSML != NULL && pAgentSML->GetIAgent()->GetCurrentPhase() == m_pSynchAgentSML->GetIAgent()->GetCurrentPhase()) ;
+
+			if (pAgentSML->IsAgentScheduledToRun() && !synched)
 			{
 				// Run all agents one "interleaveStepSize".
 				gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
@@ -432,6 +520,16 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 					// If at least one agent wants to keep running, we keep running.
 					runFinished = false ;
 				}
+			}
+		}
+
+		// If we're synching to an agent (i.e. matching the phases of all agents) see if we're done now.
+		// (This isn't as optimally efficient as possible but we're assuming synching is a rare event).
+		if (m_pSynchAgentSML)
+		{
+			if (AreAgentsSynchronized(m_pSynchAgentSML))
+			{
+				m_pSynchAgentSML = NULL ;
 			}
 		}
 	}

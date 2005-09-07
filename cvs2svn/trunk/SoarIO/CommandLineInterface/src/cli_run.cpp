@@ -168,8 +168,11 @@ bool CommandLineInterface::DoRun(gSKI::IAgent* pAgent, const RunBitset& options,
 		default: interleaveStepSize = gSKI_RUN_PHASE ; break ;
 	}
 
+	// If we're running by decision cycle synchronize up the agents to the same phase before we start
+	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
+
 	// Do the run
-	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, &m_gSKIError) ;
+	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, &m_gSKIError) ;
 
 	// Check for error
 	if (runResult == gSKI_RUN_ERROR) {

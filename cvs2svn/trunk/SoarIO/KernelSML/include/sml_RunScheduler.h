@@ -38,6 +38,9 @@ protected:
 	// When running by decision stop before this phase runs.
 	egSKIPhaseType m_StopBeforePhase ;
 
+	// When running multiple agents, we synchronize them to this agent (same phase) before starting the real run.
+	AgentSML*	m_pSynchAgentSML ;
+
 public:
 	RunScheduler(KernelSML* pKernelSML) ;
 
@@ -60,12 +63,13 @@ public:
 	* @param count		 -- how many steps to run
 	* @param runFlags	 -- type of run we're doing (passed back to environment)
 	* @param interleaveStepSize -- how large of a step each agent is run before other agents are run
+	* @param synchronize -- if true, synchronize all agents scheduled to run to the same phase before running all agents in step
 	* @param pError		 -- any error
 	*
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, gSKI::Error* pError) ;
+	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
 
 	/*************************************************************
 	* @brief	Returns true if at least one agent is currently running.
@@ -83,6 +87,8 @@ protected:
 	bool			AreAllOutputPhasesComplete() ;
 	bool			HaveAllGeneratedOutput() ;
 	void			TestForFiringGeneratedOutputEvent() ;
+	bool			AreAgentsSynchronized(AgentSML* pSynchAgent) ;
+	AgentSML*		GetAgentToSynchronizeWith() ;
 } ;
 
 } // namespace
