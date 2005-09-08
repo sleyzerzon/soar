@@ -1,0 +1,9 @@
+bin
+.classpath
+.project
+ElementXML.dll
+Java_sml_ClientInterface.dll
+soargeneral.jar
+SoarKernelSML.dll
+swt-win32-3062.dll
+swt.jar
