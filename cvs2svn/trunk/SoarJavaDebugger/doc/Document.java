@@ -38,8 +38,12 @@ public class Document
 	public static final String kCloseOnDestroyProperty  = "Agent.CloseOnDestroy" ;
 	private static final String kConnectionName = "java-debugger" ;
 	
-	/** This version is used to name the settings files uniquely, so there's no collisions if you use an older debugger.  Should be bumped with every release */
+	/** This version is used to name the settings files uniquely, so there's no collisions if you use an older debugger.  Should be bumped with every release (and add the current to the end of kPrevVersion) */
 	public static final String kVersion = "8_6_2" ;
+	
+	/** This list of versions will be checked, in order from first to last, when looking for settings to copy.  This only comes into play on the first launch of a new version of the debugger */
+	/** There's no need to have this list get too long--3 versions should be plenty **/
+	public static final String[] kPrevVersions = new String[] { "8_6_1" } ;
 
 	/** This object is used to get strings for Soar commands in a version independent way */
 	private SoarCommands		m_SoarCommands = new SoarCommands(this, 8,6,2) ;

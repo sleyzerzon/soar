@@ -687,9 +687,6 @@ public class FoldingText
 	/** Expand/contract all blocks currently on screen */
 	public void expandPage(boolean state)
 	{
-		// Stop redrawing while we expand/collapse everything then turn it back on
-		setRedraw(false) ;
-		
 		// Get all the information about which part of the text window is visible
 		int topLine = m_Text.getTopIndex() ;
 		int lineHeight = m_Text.getLineHeight() ;
@@ -703,6 +700,9 @@ public class FoldingText
 		if (topBlock == null)
 			return ;
 
+		// Stop redrawing while we expand/collapse everything then turn it back on
+		setRedraw(false) ;
+		
 		// If the lastLine is after the bottom block, use the last block in the document
 		if (bottomBlock == null)
 			bottomBlock = m_FoldingDoc.getBlock(m_FoldingDoc.getNumberBlocks()-1) ;
