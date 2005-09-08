@@ -163,7 +163,20 @@ public abstract class AbstractTextView extends AbstractComboView
 	
 	protected ParseSelectedText.SelectedObject getCurrentSelection(int mouseX, int mouseY)
 	{
-//		int pos = m_Text.getCaretPosition() ;
+		// Find out if mouseX, mouseY is over the text at all
+		try
+		{
+			Point mouse = m_Text.toControl(mouseX, mouseY) ;
+			int offset = m_Text.getOffsetAtLocation(mouse) ;
+		}
+		catch (IllegalArgumentException ex)
+		{
+			// If the click wasn't over any letters we come here and return null to indicate
+			// no text was selected (we'll just show the default context menu).
+			return null ;
+		}
+		
+		// Look up the currently selected text
 		int pos = m_Text.getCaretOffset() ;
 		if (pos == -1)
 			return null ;
@@ -208,10 +221,9 @@ public abstract class AbstractTextView extends AbstractComboView
 			int offset = m_Text.getOffsetAtLocation(mouse) ;
 			m_Text.setSelection(offset) ;
 		}
-		// If mouse is out of the range we'll put the selection at the end
 		catch (IllegalArgumentException ex)
 		{
-			m_Text.setSelection(m_Text.getCharCount()) ;
+			// If the click is out of range of the text ignore it.
 		}
 
 		// This is the Text control solution -- Windows only
