@@ -5,10 +5,10 @@ import java.util.Iterator;
 
 import org.eclipse.swt.widgets.Display;
 
-import edu.umich.soargeneral.AgentWindow;
-import edu.umich.soargeneral.SWindowManager;
-import edu.umich.soargeneral.SimulationControl;
-import edu.umich.soargeneral.SoarAgent;
+import edu.umich.JavaBaseEnvironment.AgentWindow;
+import edu.umich.JavaBaseEnvironment.SWindowManager;
+import edu.umich.JavaBaseEnvironment.SimulationControl;
+import edu.umich.JavaBaseEnvironment.SoarAgent;
 
 /**
  * 

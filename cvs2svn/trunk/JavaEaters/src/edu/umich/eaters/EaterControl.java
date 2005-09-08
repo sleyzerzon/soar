@@ -4,7 +4,7 @@
 
 package edu.umich.eaters;
 
-import edu.umich.soargeneral.*;
+import edu.umich.JavaBaseEnvironment.*;
 
 import java.io.*;
 import java.util.*;

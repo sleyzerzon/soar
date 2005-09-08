@@ -4,9 +4,9 @@
 
 package edu.umich.eaters;
 
-import edu.umich.soargeneral.Logger;
-import edu.umich.soargeneral.SoarJavaParser;
-import edu.umich.soargeneral.SoarJavaParser.argumentContainer;
+import edu.umich.JavaBaseEnvironment.Logger;
+import edu.umich.JavaBaseEnvironment.SoarJavaParser;
+import edu.umich.JavaBaseEnvironment.SoarJavaParser.argumentContainer;
 
 import java.io.File;
 

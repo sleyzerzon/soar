@@ -4,8 +4,8 @@
 //
 package edu.umich.eaters;
 
-import edu.umich.soargeneral.SoarAgent;
-import edu.umich.soargeneral.Location;
+import edu.umich.JavaBaseEnvironment.SoarAgent;
+import edu.umich.JavaBaseEnvironment.Location;
 
 import java.util.*;
 import java.io.File;
