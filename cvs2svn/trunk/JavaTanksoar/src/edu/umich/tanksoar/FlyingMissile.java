@@ -2,7 +2,7 @@
  * Aug 11, 2004
  */
 package edu.umich.tanksoar;
-import edu.umich.soargeneral.Location;
+import edu.umich.JavaBaseEnvironment.Location;
 
 /**
  * A missile flying through the simulation, this class can take care of calculating

@@ -5,8 +5,8 @@ package edu.umich.tanksoar;
 
 import org.eclipse.swt.widgets.*;
 
-import edu.umich.soargeneral.AgentWindow;
-import edu.umich.soargeneral.SoarAgent;
+import edu.umich.JavaBaseEnvironment.AgentWindow;
+import edu.umich.JavaBaseEnvironment.SoarAgent;
 
 
 import org.eclipse.swt.layout.*;

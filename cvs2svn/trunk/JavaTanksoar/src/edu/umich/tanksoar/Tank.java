@@ -3,8 +3,8 @@
  */
 package edu.umich.tanksoar;
 
-import edu.umich.soargeneral.Location;
-import edu.umich.soargeneral.SoarAgent;
+import edu.umich.JavaBaseEnvironment.Location;
+import edu.umich.JavaBaseEnvironment.SoarAgent;
 
 import sml.Kernel;
 import sml.Agent;
@@ -1052,7 +1052,7 @@ TankSoarLogger.log("Kernel should have cleaned the real agent here...");
 	
 	/**
 	 * Calculates whether the <code>Tank</code> is blocked in any direction
-	 * using <code>edu.umich.soargeneral.Location.getAdjacent(int)</code> in all
+	 * using <code>edu.umich.JavaBaseEnvironment.Location.getAdjacent(int)</code> in all
 	 * four directions.
 	 * @param sensors The <code>TankInputInfo</code> whose blocked sensor is 
 	 * being filled with the resulting calculations.

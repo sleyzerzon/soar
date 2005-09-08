@@ -6,9 +6,9 @@ package edu.umich.tanksoar;
 
 import java.io.File;
 
-import edu.umich.soargeneral.Logger;
-import edu.umich.soargeneral.SoarJavaParser;
-import edu.umich.soargeneral.SoarJavaParser.argumentContainer;
+import edu.umich.JavaBaseEnvironment.Logger;
+import edu.umich.JavaBaseEnvironment.SoarJavaParser;
+import edu.umich.JavaBaseEnvironment.SoarJavaParser.argumentContainer;
 
 /**
  * Runs the TankSoar simulation, and allows command line commands, too. For an

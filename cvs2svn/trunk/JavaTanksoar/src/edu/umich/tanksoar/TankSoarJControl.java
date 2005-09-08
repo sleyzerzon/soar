@@ -3,8 +3,8 @@ package edu.umich.tanksoar;
  * Aug 11, 2004
  */
 
-import edu.umich.soargeneral.*;
-import edu.umich.soargeneral.SoarJavaParser.argumentContainer;
+import edu.umich.JavaBaseEnvironment.*;
+import edu.umich.JavaBaseEnvironment.SoarJavaParser.argumentContainer;
 import sml.Agent;
 import sml.Kernel;
 import sml.smlSystemEventId;
@@ -1082,7 +1082,7 @@ TankSoarLogger.log("\t\tTankSoarJControl::destroyAgent called...");
 	 * Stops the simulation that is running, notifying listeners that this is the case.
 	 * If a <code>Tank</code> has won the simulation, fires that notification (that a
 	 * <code>Tank</code> has won) instead of the <code>SimulationControl.fireSimEndedNotification().</code>
-	 * @see edu.umich.soargeneral.SimulationControl#stopSimulation()
+	 * @see edu.umich.JavaBaseEnvironment.SimulationControl#stopSimulation()
 	 */
 	public void stopSimulation(){
 		if (running)

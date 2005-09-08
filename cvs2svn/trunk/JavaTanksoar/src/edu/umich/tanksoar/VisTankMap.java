@@ -3,11 +3,11 @@
  */
 package edu.umich.tanksoar;
 
-import edu.umich.soargeneral.AgentWindow;
-import edu.umich.soargeneral.SimulationControlListener;
-import edu.umich.soargeneral.SimulationControl;
-import edu.umich.soargeneral.SoarAgent;
-import edu.umich.soargeneral.Location;
+import edu.umich.JavaBaseEnvironment.AgentWindow;
+import edu.umich.JavaBaseEnvironment.SimulationControlListener;
+import edu.umich.JavaBaseEnvironment.SimulationControl;
+import edu.umich.JavaBaseEnvironment.SoarAgent;
+import edu.umich.JavaBaseEnvironment.Location;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;

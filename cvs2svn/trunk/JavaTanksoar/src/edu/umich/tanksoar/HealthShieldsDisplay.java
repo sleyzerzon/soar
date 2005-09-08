@@ -9,8 +9,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.*;
 
-import edu.umich.soargeneral.AgentColors;
-import edu.umich.soargeneral.Location;
+import edu.umich.JavaBaseEnvironment.AgentColors;
+import edu.umich.JavaBaseEnvironment.Location;
 
 /**
  * Implements a <code>Widget</code> to display a <code>Tank</code>'s health, energy,

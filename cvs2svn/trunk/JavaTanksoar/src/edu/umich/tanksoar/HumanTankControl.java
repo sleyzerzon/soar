@@ -7,9 +7,9 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
 
-import edu.umich.soargeneral.SimulationControlListener;
-import edu.umich.soargeneral.Location;
-import edu.umich.soargeneral.SoarAgent;
+import edu.umich.JavaBaseEnvironment.SimulationControlListener;
+import edu.umich.JavaBaseEnvironment.Location;
+import edu.umich.JavaBaseEnvironment.SoarAgent;
 
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;

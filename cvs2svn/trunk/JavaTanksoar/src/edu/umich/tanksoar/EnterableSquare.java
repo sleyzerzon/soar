@@ -3,7 +3,7 @@
  */
 package edu.umich.tanksoar;
 
-import edu.umich.soargeneral.SoarAgent;
+import edu.umich.JavaBaseEnvironment.SoarAgent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
