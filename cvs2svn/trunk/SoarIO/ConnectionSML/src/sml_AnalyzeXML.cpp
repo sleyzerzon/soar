@@ -101,6 +101,17 @@ bool AnalyzeXML::GetResultBool(bool defaultValue) const
 		return(IsStringEqualIgnoreCase(pResult, sml_Names::kTrue)) ;
 }
 
+// Returns the result as a double
+double AnalyzeXML::GetResultFloat(double defaultValue) const
+{
+	if (!m_pResult || m_pResult->GetCharacterData() == NULL)
+		return defaultValue ;
+
+	double value = atof(m_pResult->GetCharacterData()) ;
+
+	return value ;
+}
+
 /*************************************************************
 * @brief As "GetArgValue" but parsed as a boolean.
 *************************************************************/
@@ -133,6 +144,21 @@ int AnalyzeXML::GetArgInt(char const* pArgName, int argPos, int defaultValue) co
 	// BADBAD: If pValue is not valid, we'll get back "0" from atoi, when
 	// we should really return defaultValue.  Perhaps we should use sscanf instead?
 	int value = atoi(pValue) ;
+
+	return value ;
+}
+
+/*************************************************************
+* @brief As "GetArgValue" but parsed as an double.
+*************************************************************/
+double AnalyzeXML::GetArgFloat(char const* pArgName, int argPos, double defaultValue) const
+{
+	char const* pValue = m_ArgMap.GetArgValue(pArgName, argPos) ;
+
+	if (!pValue)
+		return defaultValue ;
+
+	double value = atof(pValue) ;
 
 	return value ;
 }

@@ -161,7 +161,7 @@ bool KernelSML::HandleCreateAgent(gSKI::IAgent* pAgentPtr, char const* pCommandN
 	unused(pCommandName) ; unused(pAgentPtr) ; unused(pResponse) ;
 
 	// Get the parameters
-	char const* pName = pIncoming->GetArgValue(sml_Names::kParamName) ;
+	char const* pName = pIncoming->GetArgString(sml_Names::kParamName) ;
 
 	if (!pName)
 	{
@@ -219,7 +219,7 @@ bool KernelSML::HandleRegisterForEvent(gSKI::IAgent* pAgent, char const* pComman
 	assert(gSKIEVENT_LAST== (egSKIGenericEventId)smlEVENT_LAST) ;
 
 	// Get the parameters
-	char const* pEventName = pIncoming->GetArgValue(sml_Names::kParamEventID) ;
+	char const* pEventName = pIncoming->GetArgString(sml_Names::kParamEventID) ;
 
 	if (!pEventName)
 	{
@@ -250,7 +250,7 @@ bool KernelSML::HandleRegisterForEvent(gSKI::IAgent* pAgent, char const* pComman
 	} else if(IsRhsEventID(id)) {
 
 		// Rhs user functions
-		char const* pRhsFunctionName = pIncoming->GetArgValue(sml_Names::kParamName) ;
+		char const* pRhsFunctionName = pIncoming->GetArgString(sml_Names::kParamName) ;
 
 		if (!pRhsFunctionName)
 			return InvalidArg(pConnection, pResponse, pCommandName, "Registering for rhs user function, but no function name was provided") ;
@@ -347,9 +347,9 @@ bool KernelSML::HandleSetConnectionInfo(gSKI::IAgent* pAgent, char const* pComma
 	unused(pAgent) ; unused(pCommandName) ; unused(pError) ;
 
 	// Get the parameters
-	char const* pName   = pIncoming->GetArgValue(sml_Names::kConnectionName) ;
-	char const* pStatus = pIncoming->GetArgValue(sml_Names::kConnectionStatus) ;
-	char const* pAgentStatus = pIncoming->GetArgValue(sml_Names::kAgentStatus) ;
+	char const* pName   = pIncoming->GetArgString(sml_Names::kConnectionName) ;
+	char const* pStatus = pIncoming->GetArgString(sml_Names::kConnectionStatus) ;
+	char const* pAgentStatus = pIncoming->GetArgString(sml_Names::kAgentStatus) ;
 
 	if (!pName)
 	{
@@ -589,7 +589,7 @@ bool KernelSML::HandleFireEvent(gSKI::IAgent* pAgent, char const* pCommandName, 
 	unused(pResponse) ; unused(pConnection) ; unused(pError) ; unused(pAgent) ;
 
 	// Get the parameters
-	char const* pEventName = pIncoming->GetArgValue(sml_Names::kParamEventID) ;
+	char const* pEventName = pIncoming->GetArgString(sml_Names::kParamEventID) ;
 
 	if (!pEventName)
 	{
@@ -615,7 +615,7 @@ bool KernelSML::HandleSuppressEvent(gSKI::IAgent* pAgent, char const* pCommandNa
 	unused(pResponse) ; unused(pConnection) ; unused(pError) ; unused(pAgent) ;
 
 	// Get the parameters
-	char const* pEventName = pIncoming->GetArgValue(sml_Names::kParamEventID) ;
+	char const* pEventName = pIncoming->GetArgString(sml_Names::kParamEventID) ;
 	bool state = pIncoming->GetArgBool(sml_Names::kParamValue, true) ;
 
 	if (!pEventName)
@@ -658,7 +658,7 @@ bool KernelSML::HandleLoadProductions(gSKI::IAgent* pAgent, char const* pCommand
 		return false ;
 
 	// Get the parameters
-	char const* pFilename = pIncoming->GetArgValue(sml_Names::kParamFilename) ;
+	char const* pFilename = pIncoming->GetArgString(sml_Names::kParamFilename) ;
 
 	if (!pFilename)
 	{
@@ -1048,7 +1048,7 @@ bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName
 #endif
 
 	// Get the parameters
-	char const* pLine = pIncoming->GetArgValue(sml_Names::kParamLine) ;
+	char const* pLine = pIncoming->GetArgString(sml_Names::kParamLine) ;
 	bool echoResults  = pIncoming->GetArgBool(sml_Names::kParamEcho, false) ;
 
 	bool rawOutput = false;
@@ -1097,7 +1097,7 @@ bool KernelSML::HandleExpandCommandLine(gSKI::IAgent* pAgent, char const* pComma
 	unused(pError);
 
 	// Get the parameters
-	char const* pLine = pIncoming->GetArgValue(sml_Names::kParamLine) ;
+	char const* pLine = pIncoming->GetArgString(sml_Names::kParamLine) ;
 
 	if (!pLine)
 	{

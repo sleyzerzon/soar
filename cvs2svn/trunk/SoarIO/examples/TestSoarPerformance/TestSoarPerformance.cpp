@@ -113,13 +113,13 @@ void Test1(int numTrials, StatsTracker* pSt, vector<string>* commands) {
 		AnalyzeXML response;
 		agent->ExecuteCommandLineXML("time run", &response);
 		
-		pSt->realtimes.push_back(atof(response.GetArgValue(sml_Names::kParamRealSeconds)));
-		pSt->proctimes.push_back(atof(response.GetArgValue(sml_Names::kParamProcSeconds)));
+		pSt->realtimes.push_back(response.GetArgFloat(sml_Names::kParamRealSeconds, 0.0));
+		pSt->proctimes.push_back(response.GetArgFloat(sml_Names::kParamProcSeconds, 0.0));
 
 		agent->ExecuteCommandLineXML("stats", &response);
 		
-		pSt->kerneltimes.push_back(atof(response.GetArgValue(sml_Names::kParamStatsKernelCPUTime)));
-		pSt->totaltimes.push_back(atof(response.GetArgValue(sml_Names::kParamStatsTotalCPUTime)));
+		pSt->kerneltimes.push_back(response.GetArgFloat(sml_Names::kParamStatsKernelCPUTime, 0.0));
+		pSt->totaltimes.push_back(response.GetArgFloat(sml_Names::kParamStatsTotalCPUTime, 0.0));
 		
 		agent->ExecuteCommandLine("stats");
 

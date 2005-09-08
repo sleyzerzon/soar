@@ -326,7 +326,7 @@ ElementXML* Kernel::ProcessIncomingSML(Connection* pConnection, ElementXML* pInc
 	char const* pCommandName = msg.GetCommandName() ;
 
 	// Look up the agent name parameter (most commands have this)
-	char const* pAgentName = msg.GetArgValue(sml_Names::kParamAgent) ;
+	char const* pAgentName = msg.GetArgString(sml_Names::kParamAgent) ;
 
 	// Find the client agent structure that matches this agent
 	if (pAgentName && pCommandName)
@@ -365,7 +365,7 @@ ElementXML* Kernel::ProcessIncomingSML(Connection* pConnection, ElementXML* pInc
 
 void Kernel::ReceivedEvent(AnalyzeXML* pIncoming, ElementXML* pResponse)
 {
-	char const* pEventName = pIncoming->GetArgValue(sml_Names::kParamEventID) ;
+	char const* pEventName = pIncoming->GetArgString(sml_Names::kParamEventID) ;
 
 	// This event had no event id field
 	if (!pEventName)
@@ -479,7 +479,7 @@ void Kernel::ReceivedUntypedEvent(smlUntypedEventId id, AnalyzeXML* pIncoming, E
 	{
 	case smlEVENT_EDIT_PRODUCTION:
 	{
-		char const* pProduction = pIncoming->GetArgValue(sml_Names::kParamValue) ;
+		char const* pProduction = pIncoming->GetArgString(sml_Names::kParamValue) ;
 		pData = (void*)pProduction ;
 		break ;
 	}
@@ -518,7 +518,7 @@ void Kernel::ReceivedAgentEvent(smlAgentEventId id, AnalyzeXML* pIncoming, Eleme
 	unused(pResponse) ;
 
 	// Get the name of the agent this event refers to.
-	char const* pAgentName = pIncoming->GetArgValue(sml_Names::kParamName) ;
+	char const* pAgentName = pIncoming->GetArgString(sml_Names::kParamName) ;
 
 	// Look up the handler(s) from the map
 	AgentEventMap::ValueList* pHandlers = m_AgentEventMap.getList(id) ;
@@ -561,9 +561,9 @@ void Kernel::ReceivedRhsEvent(smlRhsEventId id, AnalyzeXML* pIncoming, ElementXM
 {
 	// Get the function name and the argument to the function
 	// (We pass a single string but it could be parsed further to other values by the client)
-	char const* pFunctionName = pIncoming->GetArgValue(sml_Names::kParamFunction) ;
-	char const* pArgument     = pIncoming->GetArgValue(sml_Names::kParamValue) ;
-	char const* pAgentName	  = pIncoming->GetArgValue(sml_Names::kParamName) ;
+	char const* pFunctionName = pIncoming->GetArgString(sml_Names::kParamFunction) ;
+	char const* pArgument     = pIncoming->GetArgString(sml_Names::kParamValue) ;
+	char const* pAgentName	  = pIncoming->GetArgString(sml_Names::kParamName) ;
 	int maxLength			  = pIncoming->GetArgInt(sml_Names::kParamLength, 0) ;
 
 	if (!pFunctionName || !pAgentName || maxLength == 0)
@@ -1430,7 +1430,7 @@ std::string Kernel::GetLibraryLocation()
 	if (!ok)
 		return "" ;
 
-	std::string path = response.GetArgValue(sml_Names::kParamDirectory) ;
+	std::string path = response.GetArgString(sml_Names::kParamDirectory) ;
 	return path ;
 }
 

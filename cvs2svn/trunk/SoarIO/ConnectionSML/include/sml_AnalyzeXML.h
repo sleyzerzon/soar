@@ -66,6 +66,9 @@ public:
 	// Returns the result as a bool
 	bool GetResultBool(bool defaultValue) const ;
 
+	// Returns the result as a double
+	double GetResultFloat(double defaultValue) const ;
+
 	// Returns the string form of the XML.  Must be released with the static DeleteString method
 	char* GenerateXMLString(bool includeChildren) const ;
 	static void DeleteString(char* pString) ;
@@ -73,13 +76,13 @@ public:
 	/*************************************************************
 	* @brief Look up an argument by name.  Returns NULL if not found.
 	*************************************************************/
-	char const* GetArgValue(char const* pArgName) const
+	char const* GetArgString(char const* pArgName) const
 	{
 		return m_ArgMap.GetArgValue(pArgName, -1) ;
 	}
 
 	/*************************************************************
-	* @brief As "GetArgValue" but parsed as a boolean.
+	* @brief As "GetArgString" but parsed as a boolean.
 	*************************************************************/
 	bool GetArgBool(char const* pArgName, bool defaultValue) const
 	{
@@ -87,14 +90,21 @@ public:
 	}
 
 	/*************************************************************
-	* @brief As "GetArgValue" but parsed as an int.
+	* @brief As "GetArgString" but parsed as an int.
 	*************************************************************/
 	int GetArgInt(char const* pArgName, int defaultValue) const
 	{
 		return GetArgInt(pArgName, -1, defaultValue) ;
 	}
 
-	// We no longer use these argument position methods.
+	double GetArgFloat(char const* pArgName, double defaultValue) const
+	{
+		return GetArgFloat(pArgName, -1, defaultValue) ;
+	}
+
+	//
+	// BADBAD: We no longer use these argument position methods so this class could be cleaned up quite a bit.
+	//
 protected:
 	/*************************************************************
 	* @brief Arguments for commands are either named (e.g. print "-wme s2") or can be looked up based on order
@@ -102,22 +112,27 @@ protected:
 	* This lookup supports both.  You pass in the name of the argument and its position
 	* in the argument order.  We look for it by name and if that fails, look for it by position.
 	* You either get back the right arg or NULL if this document doesn't contain that argument.
-	* If you wish to look up a value by name only pass -1 for the position (shouldn't need this very often if ever).
+	* If you wish to look up a value by name only pass -1 for the position.
 	*************************************************************/
-	char const* GetArgValue(char const* pArgName, int argPos) const
+	char const* GetArgString(char const* pArgName, int argPos) const
 	{
 		return m_ArgMap.GetArgValue(pArgName, argPos) ;
 	}
 
 	/*************************************************************
-	* @brief As "GetArgValue" but parsed as a boolean.
+	* @brief As "GetArgString" but parsed as a boolean.
 	*************************************************************/
 	bool GetArgBool(char const* pArgName, int argPos, bool defaultValue) const ;
 
 	/*************************************************************
-	* @brief As "GetArgValue" but parsed as an int.
+	* @brief As "GetArgString" but parsed as an int.
 	*************************************************************/
 	int GetArgInt(char const* pArgName, int argPos, int defaultValue) const ;
+
+	/*************************************************************
+	* @brief As "GetArgString" but parsed as a double.
+	*************************************************************/
+	double GetArgFloat(char const* pArgName, int argPos, double defaultValue) const ;
 
 	void AnalyzeArgs(ElementXML const* pCommand) ;
 };

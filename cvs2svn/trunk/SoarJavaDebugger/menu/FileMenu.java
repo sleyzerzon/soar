@@ -98,7 +98,7 @@ public class FileMenu
 		
 		// Debug code to look at the result of the command in XML
 		//String check = response.GenerateXMLString(true) ;
-		String location = response.GetArgValue(sml_Names.getKParamDirectory()) ;
+		String location = response.GetArgString(sml_Names.getKParamDirectory()) ;
 		
 		// BADBAD: Need to strip quotes - they shouldn't really be added
 		if (location != null && location.length() > 2 && location.charAt(0) == '"')

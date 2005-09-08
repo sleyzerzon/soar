@@ -67,7 +67,7 @@ void Agent::ReceivedOutput(AnalyzeXML* pIncoming, ElementXML* pResponse)
 
 void Agent::ReceivedEvent(AnalyzeXML* pIncoming, ElementXML* pResponse)
 {
-	char const* pEventName = pIncoming->GetArgValue(sml_Names::kParamEventID) ;
+	char const* pEventName = pIncoming->GetArgString(sml_Names::kParamEventID) ;
 
 	// This event had no event id field
 	if (!pEventName)
@@ -133,7 +133,7 @@ void Agent::ReceivedPrintEvent(smlPrintEventId id, AnalyzeXML* pIncoming, Elemen
 {
 	unused(pResponse) ;
 
-	char const* pMessage = pIncoming->GetArgValue(sml_Names::kParamMessage) ;
+	char const* pMessage = pIncoming->GetArgString(sml_Names::kParamMessage) ;
 
 	// Look up the handler(s) from the map
 	PrintEventMap::ValueList* pHandlers = m_PrintEventMap.getList(id) ;
@@ -165,7 +165,7 @@ void Agent::ReceivedProductionEvent(smlProductionEventId id, AnalyzeXML* pIncomi
 {
 	unused(pResponse) ;
 
-	char const* pProductionName = pIncoming->GetArgValue(sml_Names::kParamName) ;
+	char const* pProductionName = pIncoming->GetArgString(sml_Names::kParamName) ;
 	char const* pInstance = 0 ;	// gSKI defines this but doesn't support it yet.
 
 	// Look up the handler(s) from the map

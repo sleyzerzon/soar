@@ -450,7 +450,7 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 	}
 
 	// Look up the agent name parameter (most commands have this)
-	char const* pAgentName = pIncoming->GetArgValue(sml_Names::kParamAgent) ;
+	char const* pAgentName = pIncoming->GetArgString(sml_Names::kParamAgent) ;
 
 	IAgent* pAgent = NULL ;
 
