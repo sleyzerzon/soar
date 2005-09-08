@@ -101,7 +101,7 @@ public class BaseDialog
 		
 		// The open area is filled in by dialogs derived from this one.
 		Composite openArea = new Composite(m_Dialog, 0) ;
-		openArea.setLayout(new FillLayout()) ;
+		openArea.setLayout(new FormLayout()) ;
 		
 		// Add ok and cancel buttons at the bottom right
 		Button ok = new Button(m_Dialog, SWT.PUSH) ;
@@ -122,6 +122,9 @@ public class BaseDialog
 		openData.bottom = new FormAttachment(ok) ;
 		openArea.setLayoutData(openData) ;
 
+// TEMPTEMP:
+		openArea.setBackground(m_Dialog.getDisplay().getSystemColor(SWT.COLOR_BLUE)) ;
+		
 		// Make these members so derived classes can work with them
 		m_OK = ok ;
 		m_Cancel = cancel ;

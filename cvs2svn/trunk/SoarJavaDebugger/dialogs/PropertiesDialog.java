@@ -11,6 +11,7 @@
 ********************************************************************************************/
 package dialogs;
 
+import helpers.FormDataHelper;
 import modules.AbstractView;
 
 import org.eclipse.swt.*;
@@ -345,9 +346,13 @@ public class PropertiesDialog extends BaseDialog
 	{
 		super(frame.getWindow(), title, modal) ;
 		m_BaseProperties = baseProperties ;
-		
+
 		m_Container = new Group(getOpenArea(), SWT.NULL) ;
 		m_Container.setLayout(new FillLayout()) ;
+		
+		FormData data = FormDataHelper.anchorTop(0) ;
+		data.bottom = new FormAttachment(100) ;
+		m_Container.setLayoutData(data) ;
 
 		final Table table = new Table (m_Container, SWT.BORDER | SWT.FULL_SELECTION);
 		table.setLinesVisible (true);

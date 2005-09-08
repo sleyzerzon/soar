@@ -117,7 +117,6 @@ public class KernelLocationDialog extends BaseDialog
 		form.top = new FormAttachment(group) ;
 		form.left = new FormAttachment(0) ;
 		form.right = new FormAttachment(100) ;
-		form.bottom = new FormAttachment(m_OK) ;
 		help.setLayoutData(form) ;
 		
 		getDialog().layout() ;

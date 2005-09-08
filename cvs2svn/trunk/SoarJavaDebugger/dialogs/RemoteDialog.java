@@ -87,7 +87,7 @@ public class RemoteDialog extends BaseDialog
 		m_Frame = frame ;
 		int margin = 10 ;
 
-		getOpenArea().setLayout(new FormLayout()) ;
+		//getOpenArea().setLayout(new FormLayout()) ;
 
 		// Create a container for the text entry portion
 		Composite group = new Group(getOpenArea(), 0) ;
@@ -140,9 +140,8 @@ public class RemoteDialog extends BaseDialog
 		form.top = new FormAttachment(group) ;
 		form.left = new FormAttachment(0) ;
 		form.right = new FormAttachment(100) ;
-		form.bottom = new FormAttachment(m_OK) ;
 		help.setLayoutData(form) ;
-		
+
 		getDialog().layout() ;
 	}
 	

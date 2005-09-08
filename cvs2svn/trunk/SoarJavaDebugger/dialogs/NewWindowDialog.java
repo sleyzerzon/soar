@@ -87,7 +87,7 @@ public class NewWindowDialog extends BaseDialog
 
 		int margin = 10 ;
 
-		getOpenArea().setLayout(new FormLayout()) ;
+		//getOpenArea().setLayout(new FormLayout()) ;
 
 		// Create the text description area
 		m_Description = new Text(getOpenArea(), SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.BORDER) ;
@@ -100,14 +100,14 @@ public class NewWindowDialog extends BaseDialog
 		data.left = new FormAttachment(0) ;
 		data.top  = new FormAttachment(0) ;
 //		data.right = new FormAttachment(m_Description) ;
-		data.bottom = new FormAttachment(m_OK) ;
+		data.bottom = new FormAttachment(100) ;
 		m_Modules.setLayoutData(data) ;
 		
 		data = new FormData() ;
 		data.left = new FormAttachment(m_Modules) ;
 		data.top  = new FormAttachment(0) ;
 		data.right = new FormAttachment(100) ;
-		data.bottom = new FormAttachment(m_OK) ;
+		data.bottom = new FormAttachment(100) ;
 		m_Description.setLayoutData(data) ;
 		
 		// If the user makes a choice we'll close the dialog (pretty aggressive)
