@@ -180,7 +180,7 @@ public abstract class AbstractTextView extends AbstractComboView
 	********************************************************************************************/
 	protected void createDisplayControl(Composite parent)
 	{
-		m_Text = new StyledText(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP | SWT.READ_ONLY) ;
+		m_Text = new StyledText(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.READ_ONLY) ;
 //		m_Text = new Text(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP | SWT.READ_ONLY) ;
 		
 		// We want a right click to set the selection instantly, so you can right click on an ID
