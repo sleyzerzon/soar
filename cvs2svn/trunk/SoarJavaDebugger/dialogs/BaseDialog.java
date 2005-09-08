@@ -121,9 +121,6 @@ public class BaseDialog
 		FormData openData = FormDataHelper.anchorTop(0) ;
 		openData.bottom = new FormAttachment(ok) ;
 		openArea.setLayoutData(openData) ;
-
-// TEMPTEMP:
-		openArea.setBackground(m_Dialog.getDisplay().getSystemColor(SWT.COLOR_BLUE)) ;
 		
 		// Make these members so derived classes can work with them
 		m_OK = ok ;
