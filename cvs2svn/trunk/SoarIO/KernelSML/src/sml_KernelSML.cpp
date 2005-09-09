@@ -430,6 +430,21 @@ IAgent* KernelSML::GetAgent(char const* pAgentName)
 }
 
 /*************************************************************
+* @brief	Defines which phase we stop before when running by decision.
+*			E.g. Pass input phase to stop just after generating output and before receiving input.
+*			This is a setting which modifies the future behavior of "run <n> --decisions" commands.
+*************************************************************/	
+void KernelSML::SetStopBefore(egSKIPhaseType phase)
+{
+	m_pRunScheduler->SetStopBefore(phase) ;
+}
+
+egSKIPhaseType KernelSML::GetStopBefore()
+{
+	return m_pRunScheduler->GetStopBefore() ;
+}
+
+/*************************************************************
 * @brief	Take an incoming command and call the appropriate
 *			handler to process it.
 *************************************************************/

@@ -371,6 +371,14 @@ public:
 	*************************************************************/	
 	RunScheduler*	GetRunScheduler() { return m_pRunScheduler ; }
 
+	/*************************************************************
+	* @brief	Defines which phase we stop before when running by decision.
+	*			E.g. Pass input phase to stop just after generating output and before receiving input.
+	*			This is a setting which modifies the future behavior of "run <n> --decisions" commands.
+	*************************************************************/	
+	void SetStopBefore(egSKIPhaseType phase) ;
+	egSKIPhaseType GetStopBefore() ;
+
 protected:
 	KernelSML(unsigned short portToListenOn);
 

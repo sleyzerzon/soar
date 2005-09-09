@@ -271,6 +271,9 @@
 					RelativePath=".\src\cli_stats.cpp">
 				</File>
 				<File
+					RelativePath=".\src\cli_stopbefore.cpp">
+				</File>
+				<File
 					RelativePath=".\src\cli_stopsoar.cpp">
 				</File>
 				<File
