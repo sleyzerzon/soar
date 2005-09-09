@@ -5,3 +5,5 @@ soargeneral.jar
 SoarKernelSML.dll
 swt-win32-3062.dll
 swt.jar
+.project
+.classpath
