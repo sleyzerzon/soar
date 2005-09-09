@@ -1,6 +1,4 @@
 bin
-.classpath
-.project
 ElementXML.dll
 Java_sml_ClientInterface.dll
 soargeneral.jar
