@@ -48,12 +48,8 @@ public class Eaters {
 		if(!ac.allWindowsOff){
 			EaterSWindowManager wm = new EaterSWindowManager(ec, ac.agentWindowsOn, ac.visualMapOn, ac.controlPanelOn,ac.autoRun);
 		}
-//		else
-//			while (!ec.isQuittable());
 		
-//		ec.logger.close();
-		
-//		System.exit(0);//Oddity in SML requires this to ensure no memory leaked
+		System.exit(0);//Oddity in SML requires this to ensure no memory leaked
 	}
 	
 	private static String OhBool(boolean b)

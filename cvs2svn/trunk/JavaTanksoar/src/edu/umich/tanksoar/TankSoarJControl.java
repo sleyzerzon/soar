@@ -1927,6 +1927,8 @@ catch(NullPointerException e)
   }
   public void runAllTanks()
   {
+	//FIXME: Singlestep should be two fxns, one for input one for output
+	  //with the runall inbetween, to handle weird cases
 	updateAllTanks();
     TankSoarLogger.log("RunAllTanks called...");
     kernel.RunAllTilOutput(15);

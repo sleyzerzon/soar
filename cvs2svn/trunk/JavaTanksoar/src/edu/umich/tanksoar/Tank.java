@@ -28,7 +28,6 @@ public class Tank implements SoarAgent
   protected Kernel kernel = null;
   protected Agent agent = null;
   protected TankSoarInputLink iLink = null;
-  private int turnsToUpdate = 0;
 
 	/** <code>int</code> to represent a move forward. */
 	public static final int FORWARD = 0;
@@ -895,9 +894,6 @@ TankSoarLogger.log("Kernel should have cleaned the real agent here...");
     ///debugPrintOutputLink();
 
     int numCommands = agent.GetNumberCommands();
-    
-    if (numCommands != 0)
-    	turnsToUpdate = 14; //Ensure tank's sensors are updated next cycle if in Andy mode
 
     for(int commandNum = 0; commandNum < numCommands; ++commandNum)
     {
