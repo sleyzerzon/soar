@@ -39,6 +39,11 @@ EXPORT bool CommandLineInterface::DoChunkNameFormat(sml::Connection* pConnection
 	return ret;
 }
 
+EXPORT bool CommandLineInterface::DoDecay(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, enum eDecayOptions setting, long arg) {
+	bool ret = DoDecay(pAgent, setting, arg);
+	GetLastResultSML(pConnection, pResponse);
+	return ret;
+}    
 EXPORT bool CommandLineInterface::DoDefaultWMEDepth(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const int* pDepth) {
 	bool ret = DoDefaultWMEDepth(pAgent, pDepth);
 	GetLastResultSML(pConnection, pResponse);
@@ -332,3 +337,4 @@ EXPORT bool CommandLineInterface::DoWatchWMEs(sml::Connection* pConnection, sml:
 	GetLastResultSML(pConnection, pResponse);
 	return ret;
 }
+

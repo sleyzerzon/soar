@@ -45,6 +45,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Constants::kCLIAlias]					= &cli::CommandLineInterface::ParseAlias;
 	m_CommandMap[Constants::kCLICD]						= &cli::CommandLineInterface::ParseCD;
 	m_CommandMap[Constants::kCLIChunkNameFormat]		= &cli::CommandLineInterface::ParseChunkNameFormat;
+	m_CommandMap[Constants::kCLIDecay]		            = &cli::CommandLineInterface::ParseDecay;
 	m_CommandMap[Constants::kCLIDefaultWMEDepth]		= &cli::CommandLineInterface::ParseDefaultWMEDepth;
 	m_CommandMap[Constants::kCLIDirs]					= &cli::CommandLineInterface::ParseDirs;
 	m_CommandMap[Constants::kCLIEcho]					= &cli::CommandLineInterface::ParseEcho;
@@ -548,6 +549,32 @@ bool CommandLineInterface::IsInteger(const string& s) {
 		++iter;
 	}
 	return true;
+}
+
+bool CommandLineInterface::IsFloat(const string& s) {
+	string::const_iterator iter = s.begin();
+    bool bDecimal = false;
+	
+	// Allow negatives
+	if (s.length() > 1) {
+		if (*iter == '-') {
+			++iter;
+		}
+	}
+
+	while (iter != s.end()) {
+		if (!isdigit(*iter)) {
+            if ((*iter == '.') && (!bDecimal)) {
+                bDecimal = true;
+            }
+            else {
+                return false;
+            }
+		}
+		++iter;
+	}
+    
+	return bDecimal;
 }
 
 bool CommandLineInterface::RequireAgent(gSKI::IAgent* pAgent) {

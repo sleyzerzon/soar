@@ -656,6 +656,16 @@ public:
 	*************************************************************/
 	EXPORT bool DoWatchWMEs(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
 
+	/*************************************************************
+	* @brief watch-wmes command
+	* @param pConnection Pointer to connection
+	* @param pResponse Pointer to XML response
+	* @param pAgent The pointer to the gSKI agent interface
+    * @param setting a particular setting to change or action to take
+    * @param arg A numeric argument used for setting system params
+    * @param filename a filename argument used when opening a new logfile
+	*************************************************************/
+	EXPORT bool DoDecay(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, enum eDecayOptions setting, long arg);
 
 protected:
 
@@ -731,6 +741,7 @@ protected:
 	bool ParseWarnings(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatch(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatchWMEs(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+    bool ParseDecay(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 
 	// the internal Do functions follow
 	bool DoAddWME(gSKI::IAgent* pAgent, const std::string& id, const std::string& attribute, const std::string& value, bool acceptable);
@@ -788,6 +799,7 @@ protected:
 	bool DoWarnings(gSKI::IAgent* pAgent, bool* pSetting = 0);
 	bool DoWatch(gSKI::IAgent* pAgent, const WatchBitset& options, const WatchBitset& settings, const int wmeSetting, const int learnSetting);
 	bool DoWatchWMEs(gSKI::IAgent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
+    bool DoDecay(gSKI::IAgent* pAgent, enum eDecayOptions setting, long arg);
 
 	// Print callback events go here
 	virtual void HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) {
@@ -841,6 +853,11 @@ protected:
 	/*************************************************************
 	* @brief 
 	*************************************************************/
+	bool IsFloat(const std::string& s);
+
+	/*************************************************************
+	* @brief 
+	*************************************************************/
 	bool RequireAgent(gSKI::IAgent* pAgent);
 
 	/*************************************************************
@@ -883,6 +900,16 @@ protected:
 	*		 if the call requested that commands be echoed.
 	*************************************************************/ 	 
 	void EchoString(char const* pString);	
+
+	/************************************************************* 	 
+	* @brief Prints a given string via m_Result or XML as appropriate
+	*************************************************************/ 	 
+	void PrintMessage(char const* pString);	
+
+	/************************************************************* 	 
+	* @brief Prints the current WM activation settings
+	*************************************************************/ 	 
+    void PrintCurrentDecaySettings(gSKI::IAgent* pAgent);
 
 	/************************************************************* 	 
 	* @brief Strip quotes off of a string.  Must start and end with
