@@ -29,6 +29,7 @@
 #include "rhsfun.h"
 #include "decide.h"
 #include "explain.h"
+#include "activate.h"
 
 //#include "../../SoarIO/ConnectionSML/include/sock_Debug.h"
 
@@ -1932,6 +1933,10 @@ namespace gSKI
 			insert_at_head_of_dll(pWme->id->id.input_wmes, pWme, next, prev);
 			add_wme_to_wm(pSoarAgent, pWme);
 
+#ifdef SOAR_WMEM_ACTIVATION
+            decay_update_new_wme(pSoarAgent, pWme, 1);
+#endif //SOAR_WMEM_ACTIVATION
+
 #ifdef USE_CAPTURE_REPLAY
 			// TODO
 #endif // USE_CAPTURE_REPLAY
@@ -2444,5 +2449,24 @@ namespace gSKI
 
 			pSoarAgent->chunk_count = count;
 		}
+
+        void TgDWorkArounds::DecayInit(IAgent* pIAgent)
+        {
+			Agent* pAgent = (Agent*)(pIAgent);
+			agent* pSoarAgent = pAgent->GetSoarAgent();
+
+            decay_init(pSoarAgent);
+        }
+
+        void TgDWorkArounds::DecayDeInit(IAgent* pIAgent)
+        {
+			Agent* pAgent = (Agent*)(pIAgent);
+			agent* pSoarAgent = pAgent->GetSoarAgent();
+
+            decay_deinit(pSoarAgent);
+        }
+
 	}// class
+
+    
 }// namespace
