@@ -54,6 +54,7 @@
 #include "production.h"
 #include "lexer.h"
 #include "gski_event_system_functions.h" // support for generating XML output
+#include "epmem.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -188,6 +189,10 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   insert_at_head_of_dll (id->id.input_wmes, w, next, prev);
   add_wme_to_wm (thisAgent, w);
 
+#ifdef SOAR_WMEM_ACTIVATION
+  decay_update_new_wme(thisAgent, w, 1);
+#endif //SOAR_WMEM_ACTIVATION
+
 
   return w;
 }
@@ -268,6 +273,7 @@ void do_input_cycle (agent* thisAgent) {
       make_sym_constant(thisAgent, "output-link"),
       thisAgent->io_header_output);
     */
+
     /* --- add top state io link before calling input phase callback so
      * --- code can use "wmem" command.
      */
@@ -277,7 +283,8 @@ void do_input_cycle (agent* thisAgent) {
       soar_invoke_callbacks(thisAgent, thisAgent, INPUT_PHASE_CALLBACK, 
       (soar_call_data) TOP_STATE_JUST_CREATED);
     */
-  }
+      
+  }//else if
 
   /* --- if there is a top state, do the normal input cycle --- */
 

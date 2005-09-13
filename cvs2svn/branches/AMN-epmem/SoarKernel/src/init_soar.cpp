@@ -44,6 +44,7 @@
 #include "kernel_struct.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
+#include "epmem.h"
 #include <signal.h>         /* used for control-c handler */
 #include <assert.h>
 #include <time.h>
@@ -477,6 +478,20 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[USE_LONG_CHUNK_NAMES] = TRUE;  /* kjh(B14) */
   thisAgent->sysparams[TRACE_OPERAND2_REMOVALS_SYSPARAM] = FALSE;
   thisAgent->sysparams[TIMERS_ENABLED] = TRUE;
+
+#ifdef SOAR_WMEM_ACTIVATION
+  //Decay system toggle
+  (thisAgent->sysparams)[WME_DECAY_SYSPARAM] = FALSE;
+  
+  //These default values are specified in activate.h
+  (thisAgent->sysparams)[WME_DECAY_EXPONENT_SYSPARAM] = DECAY_DEFAULT_EXPONENT;
+  (thisAgent->sysparams)[WME_DECAY_WME_CRITERIA_SYSPARAM] = DECAY_DEFAULT_WME_CRITERIA;
+  (thisAgent->sysparams)[WME_DECAY_ALLOW_FORGETTING_SYSPARAM] = DECAY_DEFAULT_ALLOW_FORGETTING;
+  (thisAgent->sysparams)[WME_DECAY_I_SUPPORT_MODE_SYSPARAM] = DECAY_DEFAULT_I_SUPPORT_MODE;
+  (thisAgent->sysparams)[WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM] = DECAY_DEFAULT_PERSISTENT_ACTIVATION;
+
+#endif //SOAR_WMEM_ACTIVATION
+  
 }
 
 /* ===================================================================
@@ -577,6 +592,12 @@ void reset_statistics (agent* thisAgent) {
      reset_timer (&thisAgent->match_cpu_time[ii]);
      reset_timer (&thisAgent->gds_cpu_time[ii]);
   }
+
+#ifdef SOAR_WMEM_ACTIVATION
+  reset_timer (&(thisAgent->total_decay_time));
+#endif //SOAR_WMEM_ACTIVATION
+  
+  
 }
 
 void reinitialize_all_agents ( Kernel* thisKernel ) {
@@ -1115,6 +1136,20 @@ void do_one_top_level_phase (agent* thisAgent)
 			 (soar_call_data) NULL);
       #endif
 
+#ifdef SOAR_WMEM_ACTIVATION
+     if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM])
+     {
+         decay_move_and_remove_wmes(thisAgent);
+     }
+#endif /*SOAR_WMEM_ACTIVATION*/
+
+
+#ifdef EPISODIC_MEMORY
+     epmem_update(thisAgent);
+#endif /* EPISODIC_MEMORY */
+     
+
+      
       /* REW: begin 09.15.96 */
       if (thisAgent->operand2_mode == TRUE) {
 		  /* KJC June 05:  moved here from DECISION Phase */
@@ -1165,6 +1200,9 @@ void do_one_top_level_phase (agent* thisAgent)
 
      /* JC ADDED: Tell gski about decision cycle ending */ /* soar 8 only */
      gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_DECISION_CYCLE, gSKI_K_OUTPUT_PHASE, 1);
+
+
+
      break;
     
   /////////////////////////////////////////////////////////////////////////////////
@@ -1182,9 +1220,18 @@ void do_one_top_level_phase (agent* thisAgent)
       #endif
 
       /* d_cycle_count moved to input phase for Soar 8 new decision cycle */
-      if (thisAgent->operand2_mode == FALSE) 
+      if (thisAgent->operand2_mode == FALSE)
+      {
          thisAgent->d_cycle_count++;
 
+#ifdef SOAR_WMEM_ACTIVATION
+            if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM])
+            {
+                decay_move_and_remove_wmes(thisAgent);
+            }
+#endif
+      }
+      
       /* AGR REW1 begin */
 	  if (!thisAgent->input_period) 
 		  thisAgent->input_cycle_flag = TRUE;
@@ -1665,6 +1712,12 @@ void init_agent_memory(agent* thisAgent)
                  make_sym_constant(thisAgent, "output-link"),
                  thisAgent->io_header_output);
 
+
+#ifdef EPISODIC_MEMORY
+    //Create the ^epmem buffer
+    epmem_create_buffer(thisAgent, thisAgent->top_state);
+#endif //EPISODIC_MEMORY
+  
   do_buffered_wm_and_ownership_changes(thisAgent);
 
   // This is an important part of the state of the agent for io purposes

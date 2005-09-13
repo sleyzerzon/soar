@@ -6860,6 +6860,11 @@ void init_built_in_commands (agent* thisAgent) {
   add_command (thisAgent, "sp", sp_interface_routine);
   add_help (thisAgent, "sp", help_on_sp);
 
+#ifdef SOAR_WMEM_ACTIVATION
+  add_command (thisAgent, "decay", decay_interface_routine);
+  add_help (thisAgent, "decay", help_on_decay);
+#endif //SOAR_WMEM_ACTIVATION  
+
 }
 
 #ifdef ATTENTION_LAPSE
@@ -6892,3 +6897,62 @@ Bool old_print_prompt_flag;
 
   thisAgent->print_prompt_flag = old_print_prompt_flag;
 }
+
+#ifdef SOAR_WMEM_ACTIVATION
+
+/* -------------------------------------------------------------------
+   
+                          "Decay" Command
+
+   Syntax: (decay --flag argument)
+------------------------------------------------------------------- */
+
+char *help_on_decay[] = {
+"Command: decay",
+"",
+"Syntax: (decay production-name [ 0 | 1 | 2 ])",
+"",
+"This command prints partial match information for the given production.",
+"The optional integer specifies the level of detail wanted:  0 (the default)",
+"prints out just the partial match counts, ala 'sdecay'; 1 also prints",
+"the timetags of wmes at the first failing condition, ala 'full-decay';",
+"and 2 prints the wmes rather than just their timetags.",
+0 };
+
+Bool decay_interface_routine (agent* thisAgent) {
+  Symbol *sym;
+  wme_trace_type wtt;
+  
+  set_lexer_allow_ids (thisAgent, FALSE);
+  get_lexeme(thisAgent);  /* consume "decay", advance to production name(s) */
+  if (thisAgent->lexeme.type!=SYM_CONSTANT_LEXEME) {
+    print(thisAgent, "Expected symbol for name of production for 'decay' command\n");
+    print_location_of_most_recent_lexeme(thisAgent);
+    return FALSE;
+  }
+  sym = find_sym_constant (thisAgent, thisAgent->lexeme.string);
+  if ((!sym) || (! sym->sc.production)) {
+    print(thisAgent, "No production named %s\n", thisAgent->lexeme.string);
+    print_location_of_most_recent_lexeme(thisAgent);
+    return FALSE;
+  }
+  get_lexeme(thisAgent); /* consume production name, look for level */
+  wtt = NONE_WME_TRACE;
+  if (thisAgent->lexeme.type==INT_CONSTANT_LEXEME) {
+    if ((thisAgent->lexeme.int_val>=0) && (thisAgent->lexeme.int_val<=2)) {
+      if (thisAgent->lexeme.int_val==0) wtt = NONE_WME_TRACE;
+      if (thisAgent->lexeme.int_val==1) wtt = TIMETAG_WME_TRACE;
+      if (thisAgent->lexeme.int_val==2) wtt = FULL_WME_TRACE;
+      get_lexeme(thisAgent);
+    } else {
+      print(thisAgent, "Decay 'level' must be 0, 1, or 2.\n");
+      print_location_of_most_recent_lexeme(thisAgent);
+      return FALSE;
+    }
+  }
+  print_partial_match_information (thisAgent, sym->sc.production->p_node, wtt);
+  return TRUE;
+}
+
+
+#endif //SOAR_WMEM_ACTIVATION
