@@ -1,6 +1,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.7.2.1  2005/09/13 22:36:52  anuxoll
+# Support for the specific behavior needed for episodic memory experiements.  This is the root of my AMN-epmem branch.
+#
 # Revision 1.7  2005/06/24 20:32:05  rmarinie
 # added some comments
 #
@@ -292,22 +295,17 @@ proc selectEater {w x y} {
     
 proc resetEaters {} {
    global eaterList eaterTick eaterScore worldCount agentMoved \
-       numberOfMoves localAgents
+       numberOfMoves localAgents eaterObject
 
    if [info exists eaterList] {
       foreach eater $eaterList {
          set eaterTick($eater) 0
-         set eaterScore($eater) 0
          set numberOfMoves($eater) 0
+     eval removeEaterWMEs $eaterObject($eater) $eater $eater
 	 eval placeEater $eater [eaterStartLocation]
 
       }
    }
-    if [info exists localAgents] {
-	foreach eater $localAgents {
-	    $eater eval tsiDisplayAndSendCommand init-soar
-	}
-    }
    set worldCount 0
 }
 
@@ -1428,22 +1426,9 @@ proc runSimulation {w} {
       SMLenvironmentStop
       return
    }
-   if {([.wGlobal.c find withtag normalfood] == {}) && \
-       ([.wGlobal.c find withtag bonusfood] == {})} {
-      set runningSimulation 0
-       SMLenvironmentStop; $_kernel StopAllAgents
-       $_kernel CheckForIncomingCommands
-      tk_dialog .info {Game Over} {Game over: All the food is gone.} info 0 Ok
-      return
-   }
     
    if {$worldCount >= $worldCountLimit} {
-      set runningSimulation 0
-      SMLenvironmentStop; $_kernel StopAllAgents
-      $_kernel CheckForIncomingCommands
-      tk_dialog .info {Game Over} \
-                      {Game over: Move count limit reached.} info 0 Ok
-      return
+      randomMap
    }
     if [goalIsAccomplished] {
 	

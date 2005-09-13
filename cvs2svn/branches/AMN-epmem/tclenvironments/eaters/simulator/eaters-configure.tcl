@@ -24,7 +24,7 @@ set possibleEaterColors {red blue yellow green orange purple black}
 ### worldCountLimit specifies when the game ends.
 global worldCount worldCountLimit
 set worldCount 0
-set worldCountLimit 2000
+set worldCountLimit 1500
 
 
 
