@@ -8,9 +8,8 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#ifdef __cplusplus
-extern "C"
-{
+#ifndef __cplusplus
+#error  utilities.h uses STL and must be compiled with a C++ compiler.
 #endif
 
 #include <list>
@@ -24,10 +23,8 @@ extern "C"
 // To guarantee any existing wmes will be returned, use get_new_tc_num()
 //  for the tc parameter
 ////////////////////////////////
-extern SoarSTLWMEPoolList* get_augs_of_id(agent* thisAgent, Symbol * id, tc_number tc);
+extern wme **get_augs_of_id(agent* thisAgent, Symbol * id, tc_number tc, int *num_attr);
+extern SoarSTLWMEPoolList* get_augs_of_id_STL(agent* thisAgent, Symbol * id, tc_number tc);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //UTILITIES_H

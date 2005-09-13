@@ -44,6 +44,7 @@
 #include "lexer.h"
 #include "chunk.h"
 #include "callback.h"
+#include "activate.h"
 
 /* JC ADDED: Included to allow gski callbacks */
 #include "gski_event_system_data.h"
@@ -196,6 +197,10 @@ typedef struct agent_struct {
   memory_pool         alpha_mem_pool;
   memory_pool         ms_change_pool;
   memory_pool         node_varnames_pool;
+
+#ifdef SOAR_WMEM_ACTIVATION
+  memory_pool         decay_element_pool;
+#endif
   
   /* Dummy nodes and tokens */
   struct rete_node_struct * dummy_top_node;
@@ -475,7 +480,83 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
    /* Used only if #def'd ATTENTION_LAPSE in */
    struct timeval	*attention_lapse_tracker;
    Bool			attention_lapsing;
- 
+
+#ifdef SOAR_WMEM_ACTIVATION
+  struct decay_timelist_element_struct decay_timelist[DECAY_ARRAY_SIZE];
+  struct decay_timelist_element_struct *current_decay_timelist_element;
+    
+  struct timeval      decay_tv;
+  struct timeval      total_decay_time;
+
+  struct timeval      decay_new_wme_tv;
+  struct timeval      total_decay_new_wme_time;
+
+  struct timeval      decay_move_remove_tv;
+  struct timeval      total_decay_move_remove_time;
+
+  struct timeval      decay_rhs_tv;
+  struct timeval      total_decay_rhs_time;
+
+  struct timeval      decay_lhs_tv;
+  struct timeval      total_decay_lhs_time;
+
+  struct timeval      decay_deallocate_tv;
+  struct timeval      total_decay_deallocate_time;
+
+  struct timeval      decay_deallocate_tv_2;
+  struct timeval      total_decay_deallocate_time_2;
+
+  // this is the array to hold precomputed power calculations
+  float decay_power_array[DECAY_POWER_ARRAY_SIZE];
+  //This is used to store the amount of boost received in low precision mode
+  int decay_quick_boost[DECAY_HISTORY_SIZE];
+    
+    
+#endif SOAR_WMEM_ACTIVATION
+
+#ifdef EPISODIC_MEMORY
+    struct timeval epmem_start_time;
+    struct timeval epmem_total_time;
+
+    struct timeval epmem_record_start_time;
+    struct timeval epmem_record_total_time;
+
+    struct timeval epmem_retrieve_start_time;
+    struct timeval epmem_retrieve_total_time;
+
+    struct timeval epmem_clearmem_start_time;
+    struct timeval epmem_clearmem_total_time;
+
+    struct timeval epmem_updatewmetree_start_time;
+    struct timeval epmem_updatewmetree_total_time;
+
+    struct timeval epmem_getaugs_start_time;
+    struct timeval epmem_getaugs_total_time;
+
+    struct timeval epmem_match_start_time;
+    struct timeval epmem_match_total_time;
+
+    struct timeval epmem_findchild_start_time;
+    struct timeval epmem_findchild_total_time;
+    
+    struct timeval epmem_addnode_start_time;
+    struct timeval epmem_addnode_total_time;
+    
+    struct timeval epmem_installmem_start_time;
+    struct timeval epmem_installmem_total_time;
+
+    struct timeval epmem_misc1_start_time;
+    struct timeval epmem_misc1_total_time;
+
+    struct timeval epmem_misc2_start_time;
+    struct timeval epmem_misc2_total_time;
+
+    
+#endif //EPISODIC_MEMORY
+
+////#endif
+    
+    
   
   /* ----------------------- Chunker stuff -------------------------- */
   

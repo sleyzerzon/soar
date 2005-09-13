@@ -17,6 +17,11 @@
 #endif /* !WIN32 */
 #endif /* _WINDOWS */
 
+
+#define SOAR_WMEM_ACTIVATION    // compile switch
+#define EPISODIC_MEMORY         // compile switch
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -135,7 +140,7 @@ typedef union symbol_union Symbol;
    but if you are trying to improve performance and reduce memory, it's
    worth testing your system with the top-level-ref-cts turned off.
    Soar will be much more efficient.  See comments in recmem.cpp  */
-//#define DO_TOP_LEVEL_REF_CTS
+#define DO_TOP_LEVEL_REF_CTS
 
 /* UNComment the following line to eliminate all callbacks except those
    for I/O, AFTER_DECISION_PHASE, and printing. */
@@ -177,7 +182,7 @@ enum ni_mode {
    its current value and asserting its new value need to ensure that the current and
    new values differ.  This option may add a small run time cost, since two loops are made
    through the preferences list. */
-#define O_REJECTS_FIRST
+//#define O_REJECTS_FIRST
 
 /**
  *  \def AGRESSIVE_ONC
@@ -196,7 +201,7 @@ enum ni_mode {
 
 #define MAJOR_VERSION_NUMBER 8
 #define MINOR_VERSION_NUMBER 6
-#define MICRO_VERSION_NUMBER 2
+#define MICRO_VERSION_NUMBER 1
 #define GREEK_VERSION_NUMBER 0
 
 #ifdef _MSC_VER
