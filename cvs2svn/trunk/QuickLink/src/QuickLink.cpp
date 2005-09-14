@@ -1297,18 +1297,20 @@ QuickLink::spawnDebug()
 		}
 	}
 
-	Sleep(3500);
-/*	pKernel->GetAllConnectionInfo();
-	char* java_debugger = "unknown";
-	char* ready = "ready";
-	const char* status = pKernel->GetConnectionStatus(java_debugger);
-	printf("%s", status);
-	while(strcmp(status,ready))
+//	Sleep(3500);
+
+	pKernel->GetAllConnectionInfo();
+	char const * java_debugger = "java-debugger";
+	char const * ready = "ready";
+	
+	//printf("%s", status);
+	while(1)
 	{
-		Sleep(1000);
+		Sleep(100);
 		pKernel->GetAllConnectionInfo();
-		status = pKernel->GetConnectionStatus(java_debugger);
-	}*/
+		char const * status = pKernel->GetAgentStatus(java_debugger);
+		if(status && !strcmp(status,ready)) break;
+	}
 }
 
 void
