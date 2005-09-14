@@ -59,27 +59,29 @@ QuickLink::OSFinder()
 
 void MyStartSystemEventHandler(sml::smlSystemEventId id, void* pUserData, sml::Kernel* pKernel);
 
-QuickLink::QuickLink()
+QuickLink::QuickLink(int argc, char* argv[])
 {
 	//OSFinder(); //needed for spawn debugger
 
-	cout << "Would you like to create a new kernel or establish a remote connection (NEW or REMOTE): " ;
-	cin >> connectionType;
-	cout << endl << endl;
-	makeUpper(connectionType);
-
-	while(connectionType != "NEW" && connectionType != "REMOTE")
-	{
-		cout << "Please enter either NEW or REMOTE: ";
-		cin >> connectionType;
-		cout << endl << endl;
-	}
-	
-	if(connectionType == "NEW")
+	if(argc == 1)
 		CreateNewKernel();
 	else 
-		EstRemoteConnection();
+	{
+		char* r = "-r";
+		char* remote = "-remote";
+		char* l = "-l";
+		char* local = "-local";
 
+		if(!strcmp(argv[1], r) || !strcmp(argv[1], remote))
+			EstRemoteConnection();
+		else if(!strcmp(argv[1], l) || !strcmp(argv[1], local))
+			CreateNewKernel();
+		else
+		{
+			cout << "Error: usage: legal commands are -l -local -r -remote.\n Example: QuickLink -remote" << endl;
+			exit(1);
+		}
+	}
 
 	//*******INITIALIZE VARIABLES******
 	
@@ -136,10 +138,22 @@ QuickLink::EstRemoteConnection()
 	}
 
 	string agentName;
-	cout << "What is the name of the agent you would like to connect to: ";
-	cin >> agentName;
 
-	pAgent = pKernel->GetAgent(agentName.c_str());
+	int numAgents = pKernel->GetNumberAgents();
+	if(numAgents == 1)
+		pAgent = pKernel->GetAgentByIndex(0);
+	else
+	{
+		cout << "\nAvailable agents are:\n\n";
+		for(int i = 0; i < numAgents; i++)
+			cout << (pKernel->GetAgentByIndex(i))->GetAgentName() << endl;
+
+		
+		cout << "\nWhat is the name of the agent you would like to connect to: ";
+		cin >> agentName;
+
+		pAgent = pKernel->GetAgent(agentName.c_str());
+	}	
 
 	//Make sure agent was successfully created
 	while (pKernel->HadError())
@@ -1282,7 +1296,19 @@ QuickLink::spawnDebug()
 				cout << ret;
 		}
 	}
+
 	Sleep(3500);
+/*	pKernel->GetAllConnectionInfo();
+	char* java_debugger = "unknown";
+	char* ready = "ready";
+	const char* status = pKernel->GetConnectionStatus(java_debugger);
+	printf("%s", status);
+	while(strcmp(status,ready))
+	{
+		Sleep(1000);
+		pKernel->GetAllConnectionInfo();
+		status = pKernel->GetConnectionStatus(java_debugger);
+	}*/
 }
 
 void
@@ -1318,15 +1344,15 @@ QuickLink::PurgeAllVectors()
 
 }
 
-int main ()
+int main (int argc, char* argv[])
 {
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
 	// when that allocation occurs.
-	//_crtBreakAlloc = 425 ;
+	//_crtBreakAlloc = 449 ;
 
 	{ // create local scope to allow for local memory cleanup before we check at end
-		QuickLink QL;
+		QuickLink QL(argc, argv);
 		Reader R(&QL);
 		QL.Run();
 	} // end local scope

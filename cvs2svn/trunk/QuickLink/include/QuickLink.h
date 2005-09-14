@@ -31,7 +31,7 @@ public:
 
 	//******CONSTRUCTORS******
 
-	QuickLink();
+	QuickLink(int argc, char* argv[]);
 	//default constructor
 
 	//******PUBLIC METHODS******

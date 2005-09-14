@@ -280,6 +280,17 @@ Reader::ReadMe(istream* in)
 		toReturn = "***VOIDRETURN***";
 		return toReturn;
 	}
+	else if(QL->first == "SWITCH")
+	{	
+		
+		QL->clearAll();
+		QL->PurgeAllVectors();
+
+		QL->pKernel->Shutdown();
+		QL->EstRemoteConnection();
+		toReturn = "***VOIDRETURN***";
+		return toReturn;
+	}
 	else 
 	{
 		string strcmd = QL->actualSize;
