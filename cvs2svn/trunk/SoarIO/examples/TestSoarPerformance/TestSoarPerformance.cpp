@@ -3,7 +3,6 @@
 #endif // HAVE_CONFIG_H
 
 #ifdef _MSC_VER
-#define snprintf _snprintf
 // Use Visual C++'s memory checking functionality
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
