@@ -7,7 +7,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT([SoarKernel], [8.6.1], [soar-group@lists.sourceforge.net])
-AC_CONFIG_SRCDIR([src/soar.h])
+AC_CONFIG_SRCDIR([include/soarkernel.h])
 AM_INIT_AUTOMAKE([foreign])
 AC_REVISION($Revision$)
 AM_CONFIG_HEADER(config.h)
