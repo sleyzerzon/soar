@@ -54,6 +54,7 @@ cli_soarnews.cpp\
 cli_source.cpp\
 cli_sp.cpp\
 cli_stats.cpp\
+cli_stopbefore.cpp\
 cli_stopsoar.cpp\
 cli_time.cpp\
 cli_timers.cpp\
