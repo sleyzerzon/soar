@@ -120,7 +120,7 @@ implements Runnable, PaintListener, MacEnvironmentListener {
         // Specifying SWT.NO_BACKGROUND and SWT.DOUBLE_BUFFERED to reduce
         // flicker (actually, each seems to work fine without the other, but
         // what the hey)
-        macCanvas = new Canvas(shell, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
+        macCanvas = new Canvas(shell, SWT.DOUBLE_BUFFERED);
         macCanvas.setBounds(0, 0, 640, 480);
         macCanvas.addPaintListener(this);
         // ...and initialize our double buffer
