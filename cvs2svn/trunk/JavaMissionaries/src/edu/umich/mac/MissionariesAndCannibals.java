@@ -117,7 +117,10 @@ implements Runnable, PaintListener, MacEnvironmentListener {
         shell.setText("Missionaries & Cannibals");
         
         // set up our canvas...
-        macCanvas = new Canvas(shell, SWT.NONE);
+        // Specifying SWT.NO_BACKGROUND and SWT.DOUBLE_BUFFERED to reduce
+        // flicker (actually, each seems to work fine without the other, but
+        // what the hey)
+        macCanvas = new Canvas(shell, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
         macCanvas.setBounds(0, 0, 640, 480);
         macCanvas.addPaintListener(this);
         // ...and initialize our double buffer
@@ -221,15 +224,22 @@ implements Runnable, PaintListener, MacEnvironmentListener {
     }
 
     public void paintControl(PaintEvent e) {
+    	// The commented out code in this method was used to implement a double
+    	// buffer, but it didn't seem to work right on all platforms, and it
+    	// isn't necessary -- we now specify SWT.DOUBLE_BUFFERED in the canvas
+    	// creation above.
+    	
         // clip drawing in our buffer to the affected area.
-        bufGC.setClipping(e.x, e.y, e.width, e.height);
-        paintBuffer(e.gc);
+        //bufGC.setClipping(e.x, e.y, e.width, e.height);
+        //paintBuffer(bufGC);
         // copy from the buffer to the screen
         //e.gc.drawImage(bufImg,e.x,e.y,e.width,e.height,e.x,e.y,e.width,e.height);
+        
+        paintBuffer(e.gc);
     }
     
     /**
-     * Paints the double buffer with background, the positions of the boat and
+     * Paints the specified buffer with background, the positions of the boat and
      * all of the missionaries and cannibals.
      */
     private void paintBuffer(GC gc) {
