@@ -117,15 +117,21 @@ implements Runnable, PaintListener, MacEnvironmentListener {
         shell.setText("Missionaries & Cannibals");
         
         // set up our canvas...
-        // Specifying SWT.NO_BACKGROUND and SWT.DOUBLE_BUFFERED to reduce
-        // flicker (actually, each seems to work fine without the other, but
-        // what the hey)
+        // Specifying SWT.DOUBLE_BUFFERED to reduce flicker
+        // SWT.NO_BACKGROUND also seems to work on Windows
+        // and OS X, but is slow and causes tearing on Linux
         macCanvas = new Canvas(shell, SWT.DOUBLE_BUFFERED);
         macCanvas.setBounds(0, 0, 640, 480);
         macCanvas.addPaintListener(this);
+        
         // ...and initialize our double buffer
-        bufImg = new Image(dpy, landImg.getBounds());
-        bufGC = new GC(bufImg);
+        // (note: we are no longer using our own buffer
+        // because SWT's native double buffer support (see above)
+        // works better, but we're leaving the code in case we
+        // want to revisit this alternative in the future; see
+        // paintControl below to see how it was used)
+        //bufImg = new Image(dpy, landImg.getBounds());
+        //bufGC = new GC(bufImg);
         
         // create the button controls
         runButton = new Button(shell, SWT.PUSH);
