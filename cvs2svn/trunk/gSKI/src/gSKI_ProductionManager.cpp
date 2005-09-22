@@ -785,13 +785,13 @@ _|___/    __         _    _             ____  _               _
       production* p;
       p = parse_production(a);
 
+	  set_lexer_allow_ids (a, true);
+      soarAlternateInput( a, 0, 0, true); 
+
 	  if (!p) { // added by voigtjr
 		  SetError(err, gSKIERR_UNABLE_TO_ADD_PRODUCTION);
 		  return;
 	  }
-
-      set_lexer_allow_ids (a, true);
-      soarAlternateInput( a, 0, 0, true); 
   }
    
 
