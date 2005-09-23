@@ -27,6 +27,12 @@ EXPORT bool CommandLineInterface::DoAlias(sml::Connection* pConnection, sml::Ele
 	return ret;
 }
 
+EXPORT bool CommandLineInterface::DoAttributePreferences(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pMode) {
+	bool ret = DoAttributePreferences(pAgent, pMode);
+	GetLastResultSML(pConnection, pResponse);
+	return ret;
+}
+
 EXPORT bool CommandLineInterface::DoCD(sml::Connection* pConnection, sml::ElementXML* pResponse, const std::string* pDirectory) {
 	bool ret = DoCD(pDirectory);
 	GetLastResultSML(pConnection, pResponse);
@@ -94,6 +100,12 @@ EXPORT bool CommandLineInterface::DoIndifferentSelection(sml::Connection* pConne
 }
 
 EXPORT bool CommandLineInterface::DoInitSoar(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent) {
+	bool ret = DoInitSoar(pAgent);
+	GetLastResultSML(pConnection, pResponse);
+	return ret;
+}
+
+EXPORT bool CommandLineInterface::DoInputPeriod(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent) {
 	bool ret = DoInitSoar(pAgent);
 	GetLastResultSML(pConnection, pResponse);
 	return ret;

@@ -19,6 +19,7 @@ using namespace cli;
 
 char const* Constants::kCLIAddWME					= "add-wme";			
 char const* Constants::kCLIAlias					= "alias";			
+char const* Constants::kCLIAttributePreferences		= "attribute-preferences";			
 char const* Constants::kCLICD						= "cd";			
 char const* Constants::kCLIChunkNameFormat			= "chunk-name-format";			
 char const* Constants::kCLIDefaultWMEDepth			= "default-wme-depth";
@@ -32,6 +33,7 @@ char const* Constants::kCLIGDSPrint					= "gds-print";
 char const* Constants::kCLIHelp						= "help";
 char const* Constants::kCLIIndifferentSelection		= "indifferent-selection";
 char const* Constants::kCLIInitSoar					= "init-soar";
+char const* Constants::kCLIInputPeriod				= "input-period";
 char const* Constants::kCLIInternalSymbols			= "internal-symbols";
 char const* Constants::kCLILearn					= "learn";
 char const* Constants::kCLILog						= "log";

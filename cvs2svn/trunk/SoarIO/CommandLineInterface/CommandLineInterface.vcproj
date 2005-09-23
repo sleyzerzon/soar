@@ -142,6 +142,9 @@
 					RelativePath=".\src\cli_alias.cpp">
 				</File>
 				<File
+					RelativePath=".\src\cli_attributepreferences.cpp">
+				</File>
+				<File
 					RelativePath=".\src\cli_cd.cpp">
 				</File>
 				<File
@@ -179,6 +182,9 @@
 				</File>
 				<File
 					RelativePath=".\src\cli_initsoar.cpp">
+				</File>
+				<File
+					RelativePath=".\src\cli_inputperiod.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_internalsymbols.cpp">

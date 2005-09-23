@@ -43,6 +43,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	// Map command names to processing function pointers
 	m_CommandMap[Constants::kCLIAddWME]					= &cli::CommandLineInterface::ParseAddWME;
 	m_CommandMap[Constants::kCLIAlias]					= &cli::CommandLineInterface::ParseAlias;
+	m_CommandMap[Constants::kCLIAttributePreferences]	= &cli::CommandLineInterface::ParseAttributePreferences;
 	m_CommandMap[Constants::kCLICD]						= &cli::CommandLineInterface::ParseCD;
 	m_CommandMap[Constants::kCLIChunkNameFormat]		= &cli::CommandLineInterface::ParseChunkNameFormat;
 	m_CommandMap[Constants::kCLIDefaultWMEDepth]		= &cli::CommandLineInterface::ParseDefaultWMEDepth;
@@ -56,6 +57,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Constants::kCLIHelp]					= &cli::CommandLineInterface::ParseHelp;
 	m_CommandMap[Constants::kCLIIndifferentSelection]	= &cli::CommandLineInterface::ParseIndifferentSelection;
 	m_CommandMap[Constants::kCLIInitSoar]				= &cli::CommandLineInterface::ParseInitSoar;
+	m_CommandMap[Constants::kCLIInputPeriod]			= &cli::CommandLineInterface::ParseInputPeriod;
 	m_CommandMap[Constants::kCLIInternalSymbols]		= &cli::CommandLineInterface::ParseInternalSymbols;
 	m_CommandMap[Constants::kCLILearn]					= &cli::CommandLineInterface::ParseLearn;
 	m_CommandMap[Constants::kCLILog]					= &cli::CommandLineInterface::ParseLog;

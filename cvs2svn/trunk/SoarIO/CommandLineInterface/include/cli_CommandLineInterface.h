@@ -170,6 +170,15 @@ public:
 	EXPORT bool DoAlias(sml::Connection* pConnection, sml::ElementXML* pResponse, const std::string* pCommand = 0, const std::vector<std::string>* pSubstitution = 0);
 
 	/*************************************************************
+	* @brief attribute-preferences command
+	* @param pConnection Pointer to connection
+	* @param pResponse Pointer to XML response
+	* @param pMode Pointer to integer representing new attribute-preferences 
+	*		 mode, use null to query current mode
+	*************************************************************/
+	EXPORT bool DoAttributePreferences(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pMode = 0);
+
+	/*************************************************************
 	* @brief cd command
 	* @param pConnection Pointer to connection
 	* @param pResponse Pointer to XML response
@@ -285,6 +294,14 @@ public:
 	* @param pAgent The pointer to the gSKI agent interface
 	*************************************************************/
 	EXPORT bool DoInitSoar(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent);
+
+	/*************************************************************
+	* @brief input-period command
+	* @param pConnection Pointer to connection
+	* @param pResponse Pointer to XML response
+	* @param pAgent The pointer to the gSKI agent interface
+	*************************************************************/
+	EXPORT bool DoInputPeriod(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent);
 
 	/*************************************************************
 	* @brief internal-symbols command
@@ -678,6 +695,7 @@ protected:
 	// The internal Parse functions follow
 	bool ParseAddWME(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseAlias(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseAttributePreferences(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseCD(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseChunkNameFormat(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseDefaultWMEDepth(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
@@ -690,6 +708,7 @@ protected:
 	bool ParseHelp(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseIndifferentSelection(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseInitSoar(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseInputPeriod(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseInternalSymbols(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseLearn(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseLog(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
@@ -735,6 +754,7 @@ protected:
 	// the internal Do functions follow
 	bool DoAddWME(gSKI::IAgent* pAgent, const std::string& id, const std::string& attribute, const std::string& value, bool acceptable);
 	bool DoAlias(const std::string* pCommand = 0, const std::vector<std::string>* pSubstitution = 0);
+	bool DoAttributePreferences(gSKI::IAgent* pAgent, int* pMode = 0);
 	bool DoCD(const std::string* pDirectory = 0);
 	bool DoChunkNameFormat(gSKI::IAgent* pAgent, const bool* pLongFormat = 0, const int* pCount = 0, const std::string* pPrefix = 0);
 	bool DoDefaultWMEDepth(gSKI::IAgent* pAgent, const int* pDepth);
@@ -747,6 +767,7 @@ protected:
 	bool DoHelp(const std::string* pCommand = 0);
 	bool DoIndifferentSelection(gSKI::IAgent* pAgent, eIndifferentMode mode);
 	bool DoInitSoar(gSKI::IAgent* pAgent);
+	bool DoInputPeriod(gSKI::IAgent* pAgent);
 	bool DoInternalSymbols(gSKI::IAgent* pAgent);
 	bool DoLearn(gSKI::IAgent* pAgent, const LearnBitset& options);
 	bool DoLog(gSKI::IAgent* pAgent, const eLogMode mode = LOG_QUERY, const std::string* pFilename = 0, const std::string* pToAdd = 0);
