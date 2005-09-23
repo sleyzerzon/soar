@@ -176,7 +176,7 @@ public:
 	* @param pMode Pointer to integer representing new attribute-preferences 
 	*		 mode, use null to query current mode
 	*************************************************************/
-	EXPORT bool DoAttributePreferences(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pMode = 0);
+	EXPORT bool DoAttributePreferencesMode(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pMode = 0);
 
 	/*************************************************************
 	* @brief cd command
@@ -695,7 +695,7 @@ protected:
 	// The internal Parse functions follow
 	bool ParseAddWME(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseAlias(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
-	bool ParseAttributePreferences(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseAttributePreferencesMode(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseCD(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseChunkNameFormat(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseDefaultWMEDepth(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
@@ -754,7 +754,7 @@ protected:
 	// the internal Do functions follow
 	bool DoAddWME(gSKI::IAgent* pAgent, const std::string& id, const std::string& attribute, const std::string& value, bool acceptable);
 	bool DoAlias(const std::string* pCommand = 0, const std::vector<std::string>* pSubstitution = 0);
-	bool DoAttributePreferences(gSKI::IAgent* pAgent, int* pMode = 0);
+	bool DoAttributePreferencesMode(gSKI::IAgent* pAgent, int* pMode = 0);
 	bool DoCD(const std::string* pDirectory = 0);
 	bool DoChunkNameFormat(gSKI::IAgent* pAgent, const bool* pLongFormat = 0, const int* pCount = 0, const std::string* pPrefix = 0);
 	bool DoDefaultWMEDepth(gSKI::IAgent* pAgent, const int* pDepth);

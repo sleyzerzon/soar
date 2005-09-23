@@ -19,7 +19,7 @@ using namespace cli;
 
 char const* Constants::kCLIAddWME					= "add-wme";			
 char const* Constants::kCLIAlias					= "alias";			
-char const* Constants::kCLIAttributePreferences		= "attribute-preferences";			
+char const* Constants::kCLIAttributePreferencesMode	= "attribute-preferences-mode";			
 char const* Constants::kCLICD						= "cd";			
 char const* Constants::kCLIChunkNameFormat			= "chunk-name-format";			
 char const* Constants::kCLIDefaultWMEDepth			= "default-wme-depth";

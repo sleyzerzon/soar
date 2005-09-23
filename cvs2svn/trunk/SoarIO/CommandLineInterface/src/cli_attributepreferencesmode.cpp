@@ -19,22 +19,22 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseAttributePreferences(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseAttributePreferencesMode(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
 	unused(pAgent);
 	if (argv.size() > 2) return SetError(CLIError::kTooManyArgs);
 	
 	// Display current mode if no args
-	if (argv.size() < 2) return DoAttributePreferences(pAgent);
+	if (argv.size() < 2) return DoAttributePreferencesMode(pAgent);
 
 	// Set new mode
 	if (!IsInteger(argv[1])) return SetError(CLIError::kIntegerExpected);
 	int mode = atoi(argv[1].c_str());
 	if (mode < 0) return SetError(CLIError::kIntegerMustBeNonNegative);
 	if (mode > 2) return SetError(CLIError::kIntegerOutOfRange);
-	return DoAttributePreferences(pAgent, &mode);
+	return DoAttributePreferencesMode(pAgent, &mode);
 }
 
-bool CommandLineInterface::DoAttributePreferences(gSKI::IAgent* pAgent, int* pMode) {
+bool CommandLineInterface::DoAttributePreferencesMode(gSKI::IAgent* pAgent, int* pMode) {
 	unused(pAgent);
 	unused(pMode);
 	return SetError(CLIError::kNotImplemented);

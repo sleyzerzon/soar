@@ -18,7 +18,7 @@ namespace cli {
 	public:
 		static char const* kCLIAddWME;
 		static char const* kCLIAlias;
-		static char const* kCLIAttributePreferences;
+		static char const* kCLIAttributePreferencesMode;
 		static char const* kCLICD;
 		static char const* kCLIChunkNameFormat;
 		static char const* kCLIDefaultWMEDepth;

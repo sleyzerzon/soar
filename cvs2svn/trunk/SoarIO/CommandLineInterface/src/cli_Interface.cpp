@@ -27,8 +27,8 @@ EXPORT bool CommandLineInterface::DoAlias(sml::Connection* pConnection, sml::Ele
 	return ret;
 }
 
-EXPORT bool CommandLineInterface::DoAttributePreferences(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pMode) {
-	bool ret = DoAttributePreferences(pAgent, pMode);
+EXPORT bool CommandLineInterface::DoAttributePreferencesMode(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pMode) {
+	bool ret = DoAttributePreferencesMode(pAgent, pMode);
 	GetLastResultSML(pConnection, pResponse);
 	return ret;
 }

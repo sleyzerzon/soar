@@ -43,7 +43,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	// Map command names to processing function pointers
 	m_CommandMap[Constants::kCLIAddWME]					= &cli::CommandLineInterface::ParseAddWME;
 	m_CommandMap[Constants::kCLIAlias]					= &cli::CommandLineInterface::ParseAlias;
-	m_CommandMap[Constants::kCLIAttributePreferences]	= &cli::CommandLineInterface::ParseAttributePreferences;
+	m_CommandMap[Constants::kCLIAttributePreferencesMode]	= &cli::CommandLineInterface::ParseAttributePreferencesMode;
 	m_CommandMap[Constants::kCLICD]						= &cli::CommandLineInterface::ParseCD;
 	m_CommandMap[Constants::kCLIChunkNameFormat]		= &cli::CommandLineInterface::ParseChunkNameFormat;
 	m_CommandMap[Constants::kCLIDefaultWMEDepth]		= &cli::CommandLineInterface::ParseDefaultWMEDepth;

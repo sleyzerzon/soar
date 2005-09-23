@@ -142,7 +142,7 @@
 					RelativePath=".\src\cli_alias.cpp">
 				</File>
 				<File
-					RelativePath=".\src\cli_attributepreferences.cpp">
+					RelativePath=".\src\cli_attributepreferencesmode.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_cd.cpp">
