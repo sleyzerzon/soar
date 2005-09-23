@@ -1480,6 +1480,16 @@ namespace gSKI
       }
    }
 
+   int Agent::GetAttributePreferencesMode(Error* err) 
+   {
+	   return GetSoarAgent()->attribute_preferences_mode;
+   }
+	
+   void Agent::SetAttributePreferencesMode(int mode, Error* err) 
+   {
+	   MegaAssert((mode >= 0) && (mode <= 2), "Attribute preferences mode must be 0, 1, or 2");
+	   GetSoarAgent()->attribute_preferences_mode = mode;
+   }
       
    //////////////////////////////////////////////////// PRIVATES /////////////
 

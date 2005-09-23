@@ -1227,6 +1227,9 @@ namespace gSKI {
 
 	  virtual bool GetOperand2Mode() = 0;
 	  virtual void SetOperand2Mode(bool mode) = 0;
+
+	  virtual int GetAttributePreferencesMode(Error* err = 0) = 0;
+	  virtual void SetAttributePreferencesMode(int mode, Error* err = 0) = 0;
    };
 
    //

@@ -522,6 +522,8 @@ namespace gSKI
       virtual int GetMaxNilOutputCycles(Error* err = 0);
       virtual void SetMaxNilOutputCycles(int maxNils, Error* err = 0);
 
+	  virtual int GetAttributePreferencesMode(Error* err = 0);
+	  virtual void SetAttributePreferencesMode(int mode, Error* err = 0);
 
       /**
        * @brief An accessor method for querying the current "Wait on state
