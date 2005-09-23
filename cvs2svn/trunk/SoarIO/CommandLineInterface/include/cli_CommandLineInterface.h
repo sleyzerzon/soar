@@ -222,8 +222,9 @@ public:
 	* @param pConnection Pointer to connection
 	* @param pResponse Pointer to XML response
 	* @param argv The args to echo
+	* @param echoNewline True means a newline character will be appended to string
 	*************************************************************/
-	EXPORT bool DoEcho(sml::Connection* pConnection, sml::ElementXML* pResponse, const std::vector<std::string>& argv);
+	EXPORT bool DoEcho(sml::Connection* pConnection, sml::ElementXML* pResponse, const std::vector<std::string>& argv, bool echoNewline);
 
 	/*************************************************************
 	* @brief excise command
@@ -759,7 +760,7 @@ protected:
 	bool DoChunkNameFormat(gSKI::IAgent* pAgent, const bool* pLongFormat = 0, const int* pCount = 0, const std::string* pPrefix = 0);
 	bool DoDefaultWMEDepth(gSKI::IAgent* pAgent, const int* pDepth);
 	bool DoDirs();
-	bool DoEcho(const std::vector<std::string>& argv);
+	bool DoEcho(const std::vector<std::string>& argv, bool echoNewline);
 	bool DoExcise(gSKI::IAgent* pAgent, const ExciseBitset& options, const std::string* pProduction = 0);
 	bool DoExplainBacktraces(gSKI::IAgent* pAgent, const std::string* pProduction = 0, const int condition = 0);
 	bool DoFiringCounts(gSKI::IAgent* pAgent, const int numberToList = -1, const std::string* pProduction = 0);

@@ -95,6 +95,7 @@ namespace cli {
 			kAmbiguousOption					= 80, // FIXME: add to wiki
 			kProductionMemoryNotEmpty			= 81, // FIXME: add to wiki
 			kSoar7Command						= 82, // FIXME: add to wiki
+			kInvalidBackslashEscapeCharacter	= 83, // FIXME: add to wiki
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -175,6 +176,7 @@ namespace cli {
 				case kAmbiguousOption:					return "Ambiguous option."; // FIXME: add to wiki
 				case kProductionMemoryNotEmpty:			return "Can't change modes unless production memory is empty."; // FIXME: add to wiki
 				case kSoar7Command:						return "Command valid in Soar 7 mode only."; // FIXME: add to wiki
+				case kInvalidBackslashEscapeCharacter:	return "Invalid backslash escape character, see documentation."; // FIXME: add to wiki
 				default:								return "Unknown error code.";
 			}
 		}

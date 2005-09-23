@@ -57,8 +57,8 @@ EXPORT bool CommandLineInterface::DoDirs(sml::Connection* pConnection, sml::Elem
 	return ret;
 }
 
-EXPORT bool CommandLineInterface::DoEcho(sml::Connection* pConnection, sml::ElementXML* pResponse, const std::vector<std::string>& argv) {
-	bool ret = DoEcho(argv);
+EXPORT bool CommandLineInterface::DoEcho(sml::Connection* pConnection, sml::ElementXML* pResponse, const std::vector<std::string>& argv, bool echoNewline) {
+	bool ret = DoEcho(argv, echoNewline);
 	GetLastResultSML(pConnection, pResponse);
 	return ret;
 }
