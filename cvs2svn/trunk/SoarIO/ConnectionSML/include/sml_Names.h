@@ -108,6 +108,10 @@ public:
  	static char const* const kPhaseFiringType_IE ;
 	static char const* const kPhaseFiringType_PE ;
 
+	static char const* const kTagSubphase;
+	static char const* const kSubphaseName_FiringProductions;
+	static char const* const kSubphaseName_ChangingWorkingMemory;
+
 	// <prod-firing> tag identifiers for Watch level 3
 	static char const* const kTagProduction ;
 	static char const* const kProduction_Name ;

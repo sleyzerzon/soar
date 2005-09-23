@@ -1054,20 +1054,25 @@ void do_preference_phase (agent* thisAgent) {
 
 
   if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
-     if (thisAgent->operand2_mode == TRUE) {
-		 if (thisAgent->current_phase == APPLY_PHASE) {  /* it's always IE for PROPOSE */
-             	switch (thisAgent->FIRING_TYPE) {
-                    case PE_PRODS:
-                        print_phase (thisAgent, "\t--- Firing Productions (PE) ---\n",0);
-                        break;
-	                case IE_PRODS:
-	                    print_phase (thisAgent, "\t--- Firing Productions (IE) ---\n",0);
-	                    break;
-				}
-		 }
-     }
-     else
-       print_phase (thisAgent, "\n--- Preference Phase ---\n",0);
+	  if (thisAgent->operand2_mode == TRUE) {
+		  if (thisAgent->current_phase == APPLY_PHASE) {  /* it's always IE for PROPOSE */
+			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
+			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_FiringProductions);
+			  switch (thisAgent->FIRING_TYPE) {
+					case PE_PRODS:
+						print (thisAgent, "\t--- Firing Productions (PE) ---\n",0);
+						gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
+						break;
+					case IE_PRODS:
+						print (thisAgent, "\t--- Firing Productions (IE) ---\n",0);
+						gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
+						break;
+			  }
+		  }
+	  }
+	  else
+		  // the XML for this is generated in this function
+		  print_phase (thisAgent, "\n--- Preference Phase ---\n",0);
   }
 
 

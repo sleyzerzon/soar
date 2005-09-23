@@ -104,7 +104,8 @@ char const* const sml_Names::kPhaseName_Pref  	= "preference" ;
 char const* const sml_Names::kPhaseName_WM  	= "workingmemory" ;
 char const* const sml_Names::kPhaseName_Decision= "decision" ;
 char const* const sml_Names::kPhaseName_Output 	= "output" ;
-// next two are new phase names
+
+// next are new phase names
 char const* const sml_Names::kPhaseName_Propose	= "propose" ;
 char const* const sml_Names::kPhaseName_Apply  	= "apply" ;
 char const* const sml_Names::kPhaseName_Unknown	= "unknown" ;
@@ -112,6 +113,10 @@ char const* const sml_Names::kPhaseStatus_Begin	= "begin" ;
 char const* const sml_Names::kPhaseStatus_End	= "end" ;
 char const* const sml_Names::kPhaseFiringType_IE= "IE" ;
 char const* const sml_Names::kPhaseFiringType_PE= "PE" ;
+
+char const* const sml_Names::kTagSubphase						= "subphase";
+char const* const sml_Names::kSubphaseName_FiringProductions		= "firingprods";
+char const* const sml_Names::kSubphaseName_ChangingWorkingMemory	= "changingwm";
 
 // <prod-firing> tag identifiers for Watch level 3
 char const* const sml_Names::kTagProduction		= "production" ;

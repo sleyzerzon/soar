@@ -1323,14 +1323,6 @@ void print_phase (agent* thisAgent, char * s, bool end_of_phase)
     if (thisAgent->operand2_mode == TRUE)
     {
 		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Apply);
-		switch (thisAgent->FIRING_TYPE) {
-		case PE_PRODS:
-			gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
-            break;
-		case IE_PRODS:
-			gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
-            break;
-		}
 	}
     break;
   default:

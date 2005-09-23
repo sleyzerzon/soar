@@ -10,9 +10,9 @@
 //  needing ConnectionSML stuff to build (or vice versa).
 //
 // NOTE: It is very important that these constants match their
-//  partners in sml_Names.h/cpp. Those files may actually
-//  define more constants (that is ok), but the ones here must
-//  also be there and have the same values.
+//  partners in sml_Names.h/cpp (in ConnectionSML). Those files
+//  may actually define more constants (that is ok), but the ones
+//  here must also be there and have the same values.
 //
 /////////////////////////////////////////////////////////////////
 
@@ -55,7 +55,8 @@ namespace xmlTraceNames
 	static char const* const kPhaseName_WM  	= "workingmemory" ;
 	static char const* const kPhaseName_Decision= "decision" ;
 	static char const* const kPhaseName_Output 	= "output" ;
-	// next two are new phase names
+
+	// next are new phase names
 	static char const* const kPhaseName_Propose	= "propose" ;
 	static char const* const kPhaseName_Apply  	= "apply" ;
 	static char const* const kPhaseName_Unknown	= "unknown" ;
@@ -63,6 +64,10 @@ namespace xmlTraceNames
 	static char const* const kPhaseStatus_End	= "end" ;
 	static char const* const kPhaseFiringType_IE= "IE" ;
 	static char const* const kPhaseFiringType_PE= "PE" ;
+
+	static char const* const kTagSubphase							= "subphase";
+	static char const* const kSubphaseName_FiringProductions		= "firingprods";
+	static char const* const kSubphaseName_ChangingWorkingMemory	= "changingwm";
 
 	// <prod-firing> tag identifiers for Watch level 3
 	static char const* const kTagProduction		= "production" ;

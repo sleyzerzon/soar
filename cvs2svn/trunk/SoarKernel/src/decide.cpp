@@ -2701,18 +2701,23 @@ void do_working_memory_phase (agent* thisAgent) {
    if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
       if (thisAgent->operand2_mode == TRUE) {		  
 		  if (thisAgent->current_phase == APPLY_PHASE) {  /* it's always IE for PROPOSE */
+			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
+			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_ChangingWorkingMemory);
 			  switch (thisAgent->FIRING_TYPE) {
                   case PE_PRODS:
-					  print_phase (thisAgent, "\t--- Change Working Memory (PE) ---\n",0);           
+					  print (thisAgent, "\t--- Change Working Memory (PE) ---\n",0);
+					  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
 					  break;      
 				  case IE_PRODS:	
-					  print_phase (thisAgent, "\t--- Change Working Memory (IE) ---\n",0);          
+					  print (thisAgent, "\t--- Change Working Memory (IE) ---\n",0);
+					  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
 					  break;
-       
 			  }
+			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
 		  }
       }
       else
+		  // the XML for this is generated in this function
 		  print_phase (thisAgent, "\n--- Working Memory Phase ---\n",0);
    }
    
