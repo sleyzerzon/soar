@@ -1068,6 +1068,7 @@ void do_preference_phase (agent* thisAgent) {
 						gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
 						break;
 			  }
+			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
 		  }
 	  }
 	  else
