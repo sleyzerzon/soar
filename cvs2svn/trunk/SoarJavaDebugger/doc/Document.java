@@ -801,7 +801,7 @@ public class Document
 		return sendAgentCommandGeneral(agent, commandLine, null) ;
 	}
 
-	public boolean sendAgentCommandXML(Agent agent, String commandLine, AnalyzeXML response)
+	public boolean sendAgentCommandXML(Agent agent, String commandLine, ClientAnalyzedXML response)
 	{
 		if (response == null)
 			throw new IllegalArgumentException("Must provide an XML object to receive the response") ;
@@ -824,7 +824,7 @@ public class Document
 	 * @return
 	*******************************************************************************************
 	 */
-	protected String sendAgentCommandGeneral(Agent agent, String commandLine, AnalyzeXML response)
+	protected String sendAgentCommandGeneral(Agent agent, String commandLine, ClientAnalyzedXML response)
 	{
 		if (!isConnected())
 			return "Error: No Soar kernel is running.  Need to start one before executing commands." ;

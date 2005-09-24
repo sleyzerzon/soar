@@ -18,6 +18,7 @@ import doc.* ;
 import org.eclipse.swt.widgets.Menu;
 
 import sml.AnalyzeXML;
+import sml.ClientAnalyzedXML;
 import sml.sml_Names;
 
 /********************************************************************************************
@@ -86,7 +87,7 @@ public class FileMenu
 		
 		String pwd = m_Document.getSoarCommands().getWorkingDirectoryCommand() ;
 		
-		AnalyzeXML response = new AnalyzeXML() ;
+		ClientAnalyzedXML response = new ClientAnalyzedXML() ;
 		boolean ok = m_Frame.executeCommandXML(pwd, response) ;
 
 		// Check if the command failed

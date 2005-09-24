@@ -153,7 +153,7 @@ public class DemoMenu
 		
 		String getLocation = m_Document.getSoarCommands().getLibraryLocationCommand() ;
 		
-		AnalyzeXML response = new AnalyzeXML() ;
+		sml.ClientAnalyzedXML response = new sml.ClientAnalyzedXML() ;
 		boolean ok = m_Frame.executeCommandXML(getLocation, response) ;
 
 		// Check if the command failed

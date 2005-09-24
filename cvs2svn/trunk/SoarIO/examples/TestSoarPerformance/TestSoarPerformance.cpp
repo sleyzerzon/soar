@@ -109,7 +109,7 @@ void Test1(int numTrials, StatsTracker* pSt, vector<string>* commands) {
 			agent->ExecuteCommandLine((*itr).c_str());
 		}
 
-		AnalyzeXML response;
+		ClientAnalyzedXML response;
 		agent->ExecuteCommandLineXML("time run", &response);
 		
 		pSt->realtimes.push_back(response.GetArgFloat(sml_Names::kParamRealSeconds, 0.0));

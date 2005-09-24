@@ -52,6 +52,7 @@
 #include "sml_ClientAgent.h"
 #include "sml_ClientXML.h"
 #include "sml_ClientTraceXML.h"
+#include "sml_ClientAnalyzedXML.h"
 %}
 
 %include "sml_Names.h"
@@ -68,5 +69,5 @@
 %include "sml_ClientAgent.h"
 %include "sml_ClientXML.h"
 %include "sml_ClientTraceXML.h"
-
+%include "sml_ClientAnalyzedXML.h"
 

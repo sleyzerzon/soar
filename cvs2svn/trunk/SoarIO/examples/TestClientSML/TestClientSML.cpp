@@ -4,7 +4,7 @@
 
 #include <assert.h>
 
-//#include "sml_Connection.h"
+#include "sml_Connection.h"
 #include "sml_Client.h"
 
 //#include "../../Profiler/include/simple_timer.h"
@@ -495,6 +495,24 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	{
 		cout << "Error expanding run command aliases" << endl ;
 		return false ;
+	}
+
+	// Test calling CommandLineXML.
+	ClientAnalyzedXML xml ;
+	bool success = pKernel->ExecuteCommandLineXML("set-library-location", NULL, &xml) ;
+	
+	if (!success)
+	{
+		cout << "Error calling ExecuteCommandLineXML" << endl ;
+		return false ;
+	}
+
+	std::string path = xml.GetArgString(sml_Names::kParamDirectory) ;
+
+	// Check that we got some string back
+	if (path.length() < 3)
+	{
+		cout << "Error getting library location via XML call" << endl ;
 	}
 
 	// Test that we get a callback after the decision cycle runs

@@ -879,7 +879,7 @@ public class MainFrame
 	 *            An XML object which is filled in by Soar
 	 * @return
 	 **************************************************************************/
-	public boolean executeCommandXML(String commandLine, AnalyzeXML response)
+	public boolean executeCommandXML(String commandLine, ClientAnalyzedXML response)
 	{
 		if (response == null)
 			throw new IllegalArgumentException("Must allocate the response and pass it in.  The contents will be filled in during the call.");

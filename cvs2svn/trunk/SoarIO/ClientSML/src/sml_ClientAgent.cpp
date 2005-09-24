@@ -1236,7 +1236,7 @@ char const* Agent::ExecuteCommandLine(char const* pCommandLine, bool echoResults
 *                     The caller should allocate this and pass it in.
 * @returns True if the command succeeds.
 *************************************************************/
-bool Agent::ExecuteCommandLineXML(char const* pCommandLine, AnalyzeXML* pResponse)
+bool Agent::ExecuteCommandLineXML(char const* pCommandLine, ClientAnalyzedXML* pResponse)
 {
 	return GetKernel()->ExecuteCommandLineXML(pCommandLine, GetAgentName(), pResponse) ;
 }

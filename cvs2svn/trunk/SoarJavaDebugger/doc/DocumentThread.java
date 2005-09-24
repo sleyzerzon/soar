@@ -13,8 +13,7 @@ package doc;
 
 import java.util.ArrayList;
 
-import sml.Agent;
-import sml.AnalyzeXML;
+import sml.* ;
 
 /************************************************************************
  * 
@@ -35,10 +34,10 @@ public class DocumentThread extends Thread
 		private Agent m_Agent ;
 		private String m_Command ;
 		private String m_Result ;
-		private AnalyzeXML m_Response ;
+		private ClientAnalyzedXML m_Response ;
 		private boolean m_Executed ;
 		
-		public Command(Agent agent, String command, AnalyzeXML response)
+		public Command(Agent agent, String command, ClientAnalyzedXML response)
 		{
 			m_Agent = agent ;
 			m_Command = command ;
@@ -87,7 +86,7 @@ public class DocumentThread extends Thread
 	}
 	
 	/** Schedule a command to execute later (response can be null) */
-	public synchronized Command scheduleCommandToExecute(Agent agent, String commandLine, AnalyzeXML response)
+	public synchronized Command scheduleCommandToExecute(Agent agent, String commandLine, ClientAnalyzedXML response)
 	{
 		if (kTraceCommands)
 			System.out.println("Scheduling " + commandLine) ;

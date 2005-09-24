@@ -28,6 +28,7 @@ class Connection ;
 class AnalyzeXML ;
 class ElementXML ;
 class ClientXML ;
+class ClientAnalyzedXML ;
 
 class RunEventHandlerPlusData : public EventHandlerPlusData
 {
@@ -604,7 +605,7 @@ public:
 	*                     The caller should allocate this and pass it in.
 	* @returns True if the command succeeds.
 	*************************************************************/
-	bool ExecuteCommandLineXML(char const* pCommandLine, AnalyzeXML* pResponse) ;
+	bool ExecuteCommandLineXML(char const* pCommandLine, ClientAnalyzedXML* pResponse) ;
 
 	/*************************************************************
 	* @brief Get last command line result

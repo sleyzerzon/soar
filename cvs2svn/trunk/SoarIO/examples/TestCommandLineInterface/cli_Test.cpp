@@ -285,7 +285,7 @@ bool CommandProcessor::ProcessLine(std::string& commandLine) {
 		previousResult = pKernel->GetLastCommandLineResult() ;
 
 	} else {
-		sml::AnalyzeXML* pStructuredResponse = new sml::AnalyzeXML();
+		sml::ClientAnalyzedXML* pStructuredResponse = new sml::ClientAnalyzedXML();
 		previousResult = pKernel->ExecuteCommandLineXML(commandLine.c_str(), AGENT_NAME, pStructuredResponse);
 		const sml::ElementXML* pResultTag = pStructuredResponse->GetResultTag();
 

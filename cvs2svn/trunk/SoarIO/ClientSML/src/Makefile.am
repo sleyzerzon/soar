@@ -16,6 +16,7 @@ sml_ClientTraceXML.cpp\
 sml_ClientWMElement.cpp\
 sml_ClientWorkingMemory.cpp\
 sml_ClientXML.cpp\
+sml_ClientAnalyzedXML.cpp\
 sml_DeltaList.cpp\
 sml_ObjectMap.cpp\
 sml_OutputDeltaList.cpp

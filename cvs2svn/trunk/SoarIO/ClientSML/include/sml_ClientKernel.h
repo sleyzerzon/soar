@@ -33,10 +33,11 @@ namespace sml {
 // Forward declarations
 class Agent ;
 class Connection ;
-class AnalyzeXML ;
 class ElementXML ;
 class EventThread ;
 class Events ;
+class AnalyzeXML ;
+class ClientAnalyzedXML ;
 
 class SystemEventHandlerPlusData : public EventHandlerPlusData
 {
@@ -407,7 +408,7 @@ public:
 	*                     The caller should allocate this and pass it in.
 	* @returns True if the command succeeds.
 	*************************************************************/
-	bool ExecuteCommandLineXML(char const* pCommandLine, char const* pAgentName, AnalyzeXML* pResponse) ;
+	bool ExecuteCommandLineXML(char const* pCommandLine, char const* pAgentName, ClientAnalyzedXML* pResponse) ;
 
 	/*************************************************************
 	* @brief   Run Soar for the specified number of decisions

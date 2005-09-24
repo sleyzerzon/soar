@@ -20,6 +20,7 @@
 #include "sml_StringOps.h"
 #include "sml_EventThread.h"
 #include "sml_Events.h"
+#include "sml_ClientAnalyzedXML.h"
 
 #include "sock_SocketLib.h"
 #include "thread_Thread.h"	// To get to sleep
@@ -1088,12 +1089,12 @@ char const* Kernel::ExecuteCommandLine(char const* pCommandLine, char const* pAg
 *		 filled out by the agent during the call.
 * @returns True if the command succeeds.
 *************************************************************/
-bool Kernel::ExecuteCommandLineXML(char const* pCommandLine, char const* pAgentName, AnalyzeXML* pResponse)
+bool Kernel::ExecuteCommandLineXML(char const* pCommandLine, char const* pAgentName, ClientAnalyzedXML* pResponse)
 {
 	if (!pCommandLine || !pResponse)
 		return false ;
 
-	m_CommandLineSucceeded = GetConnection()->SendAgentCommand(pResponse, sml_Names::kCommand_CommandLine, pAgentName, sml_Names::kParamLine, pCommandLine);
+	m_CommandLineSucceeded = GetConnection()->SendAgentCommand(pResponse->GetAnalyzeXML(), sml_Names::kCommand_CommandLine, pAgentName, sml_Names::kParamLine, pCommandLine);
 
 	return m_CommandLineSucceeded ;
 }
@@ -1421,7 +1422,7 @@ bool Kernel::GetLastCommandLineResult()
 *************************************************************/
 std::string Kernel::GetLibraryLocation()
 {
-	AnalyzeXML response ;
+	ClientAnalyzedXML response ;
 
 	std::string cmd = "set-library-location" ;	// Without params this does a get
 
