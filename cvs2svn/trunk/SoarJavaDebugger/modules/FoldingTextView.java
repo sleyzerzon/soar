@@ -629,6 +629,7 @@ public class FoldingTextView extends AbstractComboView
 		// For debugging
 		//String message = xmlParent.GenerateXMLString(true) ;
 		//System.out.println(message) ;
+		//System.out.flush() ;
 		
 		int nChildren = xmlParent.GetNumberChildren() ;
 		
@@ -674,6 +675,12 @@ public class FoldingTextView extends AbstractComboView
 				
 				if (output.length() != 0 && !endOfPhase)
 					this.appendSubText(output, TraceType.kPhase) ;
+			} else if (xmlTrace.IsTagSubphase())
+			{
+				String output = XmlOutput.getSubphaseText(agent, xmlTrace) ;
+
+				if (output.length() != 0)
+					this.appendSubText(output, TraceType.kPhase) ;				
 			}
 			else if (xmlTrace.IsTagAddWme() || xmlTrace.IsTagRemoveWme())
 			{

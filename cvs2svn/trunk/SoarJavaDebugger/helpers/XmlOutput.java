@@ -184,6 +184,27 @@ public class XmlOutput
 		
 		return text.toString() ;
 	}
+	
+	public static String getSubphaseText(Agent agent, ClientTraceXML xmlTrace)
+	{
+		StringBuffer text = new StringBuffer() ;
+
+		String subphase = "unknown" ;
+		
+		if (xmlTrace.IsSubphaseNameFiringProductions())
+			subphase = "Firing Productions" ;
+		if (xmlTrace.IsSubphaseNameChangingWorkingMemory())
+			subphase = "Change Working Memory" ;
+		
+		text.append("--- ") ;
+		text.append(subphase) ;
+		text.append(" (") ;
+		text.append(xmlTrace.GetFiringType()) ;
+		text.append(") ") ;
+		text.append("---") ;
+		
+		return text.toString() ;
+	}
 
 /*
 <production prod_name="my*prod" documentation="my doc string" 
