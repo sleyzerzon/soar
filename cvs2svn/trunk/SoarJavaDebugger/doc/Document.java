@@ -42,14 +42,14 @@ public class Document
 	public static final String kVersion = "8_6_2" ;
 	
 	/** This list of versions will be checked, in order from first to last, when looking for settings to copy.  This only comes into play on the first launch of a new version of the debugger */
-	/** There's no need to have this list get too long--3 versions should be plenty **/
+	/** There's no need to have this list get too long--3 versions should be plenty.  If we change the layout/properties in a way that's not backwards compatible, need to clear this list. **/
 	public static final String[] kPrevVersions = new String[] { "8_6_1" } ;
 
 	/** This object is used to get strings for Soar commands in a version independent way */
 	private SoarCommands		m_SoarCommands = new SoarCommands(this, 8,6,2) ;
 
 	/** The properties for this application (holds user preferences).  Version specific with debugger releases (or using an older version of debugger could conflict) */
-	protected AppProperties m_AppProperties = new AppProperties("SoarDebugger" + kVersion + ".ini", "Soar Debugger Settings") ;
+	protected AppProperties m_AppProperties ;
 
 	/** The list of all modules (types of debugger windows) that exist.  This is a list of types, not a list of window instances. */
 	private ModuleList m_ModuleList = new ModuleList() ;
@@ -97,6 +97,10 @@ public class Document
 	
 	public static final boolean kShutdownInSeparateThread = true ;
 	
+	public static String getPropertyFileName(String version) { return "SoarDebugger" + version + ".ini" ; }
+	
+	
+	
 	public Document()
 	{
 		// Load the user's preferences from the properties file.
@@ -105,7 +109,23 @@ public class Document
 		String version = "1.0" ;
 		try
 		{
-			this.m_AppProperties.Load(version) ;
+			m_AppProperties = new AppProperties(getPropertyFileName(kVersion), "Soar Debugger Settings") ;
+			boolean found = this.m_AppProperties.Load(version) ;
+			
+			if (!found)
+			{
+				// If no properties exist, try to load earlier versions
+				for (int i = 0 ; !found && i < kPrevVersions.length ; i++)
+				{
+					m_AppProperties = new AppProperties(getPropertyFileName(kPrevVersions[i]), "Soar Debugger Settings") ;
+					found = m_AppProperties.Load(version) ;
+				}
+
+				// Whether we succeeded with loading an earlier version or not we need to use the new version when we save
+				// so switch the filename now.
+				m_AppProperties.setFilename(getPropertyFileName(kVersion)) ;
+					
+			}
 		} catch (IOException e)
 		{
 			e.printStackTrace();
@@ -133,7 +153,7 @@ public class Document
 		m_ModuleList.add(button) ;
 		m_ModuleList.add(edit) ;
 	}
-		
+	
 	/** Gives us a frame to work with */
 	public MainFrame getFirstFrame() 		 { return m_FrameList.get(0) ; }
 	

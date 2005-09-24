@@ -26,6 +26,11 @@ public class AppProperties extends java.util.Properties
 		m_Header   = header ;
 	}
 	
+	public void setFilename(String filename)
+	{
+		m_Filename = filename ;
+	}
+	
 	// Key Description of Associated Value for System.getProperty() calls.
 	//
 	// java.version Java Runtime Environment version 
@@ -95,7 +100,7 @@ public class AppProperties extends java.util.Properties
 		return GetSettingsFilePath(m_Filename) ;
 	}
 		
-	public void Load(String version) throws java.io.IOException
+	public boolean Load(String version) throws java.io.IOException
 	{
 		try {
 			File filePath = this.GetFilePath() ;
@@ -110,10 +115,13 @@ public class AppProperties extends java.util.Properties
 			
 			// Record the current version.
 			this.setProperty(kVersion, version) ;
+			
+			return true ;
 		}
 		catch (FileNotFoundException e)
 		{
 			// File doesn't exist.  No properties to load, so we're done.
+			return false ;
 		}
 		
 	}

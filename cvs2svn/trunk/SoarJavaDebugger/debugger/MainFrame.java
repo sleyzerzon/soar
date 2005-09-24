@@ -59,7 +59,7 @@ public class MainFrame
 	public static final FontData kDefaultFontData = new FontData("Courier New", 8, SWT.NORMAL);
 
 	private static final String kNoAgent = "<no agent>";
-	private static String m_WindowLayoutFile = "SoarDebuggerWindows" + Document.kVersion + ".dlf";
+	private static String m_WindowLayoutFile ;
 
 	private Composite m_Parent = null;
 
@@ -631,6 +631,35 @@ public class MainFrame
 		return m_KernelMenu;
 	}
 
+	private static String getUserLayoutFilename(String version)
+	{
+		return "SoarDebuggerWindows" + version + ".dlf" ;
+	}
+	
+	public boolean loadUserLayoutFile()
+	{
+		// Look up the name of the default window layout
+		m_WindowLayoutFile = getUserLayoutFilename(Document.kVersion) ;
+		File layoutFile = AppProperties.GetSettingsFilePath(m_WindowLayoutFile);
+
+		boolean loaded = false;
+
+		// If this version doesn't exist, go back to an earlier version (if the user happens to have that one)
+		// and read it instead.
+		for (int i = 0 ; !layoutFile.exists() && i < Document.kPrevVersions.length ; i++)
+		{
+			layoutFile = AppProperties.GetSettingsFilePath(getUserLayoutFilename(Document.kPrevVersions[i]));
+		}
+		
+		// If we have an existing window layout stored, try to load it.
+		if (layoutFile.exists())
+		{
+			loaded = loadLayoutFile(layoutFile.toString(), true);
+		}
+		
+		return loaded ;
+	}
+	
 	/***************************************************************************
 	 * 
 	 * Initializes the frame and all of its children.
@@ -653,16 +682,7 @@ public class MainFrame
 
 		getShell().setMenuBar(m_MenuBar);
 
-		// Look up the name of the default window layout
-		File layoutFile = AppProperties.GetSettingsFilePath(m_WindowLayoutFile);
-
-		boolean loaded = false;
-
-		// If we have an existing window layout stored, try to load it.
-		if (layoutFile.exists())
-		{
-			loaded = loadLayoutFile(layoutFile.toString(), true);
-		}
+		boolean loaded = loadUserLayoutFile() ;
 
 		// If we didn't load a layout, use a default layout
 		if (!loaded)
