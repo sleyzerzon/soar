@@ -164,7 +164,10 @@ public class FoldingTextView extends AbstractComboView
 			// because "collapse" probably means "I'm done with detailed debugging" but not necessarily "I don't want to see what I was just working on".
 			// If you don't agree with that logic just comment out the "if".
 			if (m_ExpandTrace)
+			{
 				expandPage(m_ExpandTrace) ;
+				m_FoldingText.scrollBottom() ;
+			}
 		} } ) ;
 		
 		m_ExpandPageArrow = new Button(owner, SWT.ARROW | SWT.DOWN) ;
