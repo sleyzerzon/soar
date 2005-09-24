@@ -44,6 +44,11 @@ char const* ClientTraceXML::GetPhaseName() const			{ return GetAttribute(sml_Nam
 char const* ClientTraceXML::GetPhaseStatus() const			{ return GetAttribute(sml_Names::kPhase_Status) ; }
 char const* ClientTraceXML::GetFiringType() const			{ return GetAttribute(sml_Names::kPhase_FiringType) ; }
 
+// Subphase (firing productions/changing wm) tag
+bool ClientTraceXML::IsTagSubphase() const							{ return IsTag(sml_Names::kTagSubphase) ; }
+bool ClientTraceXML::IsSubphaseNameFiringProductions() const		{ char const* pName = GetPhaseName() ; return (pName != NULL) && !strcmp(sml_Names::kSubphaseName_FiringProductions, pName) ; }
+bool ClientTraceXML::IsSubphaseNameChangingWorkingMemory() const	{ char const* pName = GetPhaseName() ; return (pName != NULL) && !strcmp(sml_Names::kSubphaseName_ChangingWorkingMemory, pName) ; }
+
 // Firing-production tag, contains production
 bool ClientTraceXML::IsTagFiringProduction() const			{ return IsTag(sml_Names::kTagProduction_Firing) ; }
 bool ClientTraceXML::IsTagRetractingProduction() const		{ return IsTag(sml_Names::kTagProduction_Retracting) ; }

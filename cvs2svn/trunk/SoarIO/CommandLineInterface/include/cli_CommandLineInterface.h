@@ -38,11 +38,18 @@
 #include "../../gSKI/src/gSKI_Error.h"	// this is rediculous
 #include "IgSKI_KernelFactory.h"
 
+// For test
+//#define WIN_STATIC_LINK
+
 #ifdef _WIN32
 #ifdef _USRDLL
 #define EXPORT __declspec(dllexport)
 #else
+#ifndef WIN_STATIC_LINK
 #define EXPORT __declspec(dllimport)
+#else
+#define EXPORT
+#endif	// STATIC
 #endif	// DLL
 #else
 #define EXPORT

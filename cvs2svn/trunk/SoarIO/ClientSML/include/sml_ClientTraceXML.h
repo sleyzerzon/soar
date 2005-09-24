@@ -51,6 +51,11 @@ public:
 	char const* GetPhaseStatus() const ;
 	char const* GetFiringType() const ;
 
+	// Subphase (firing productions/changing wm) tag
+	bool IsTagSubphase() const ;
+	bool IsSubphaseNameFiringProductions() const ;
+	bool IsSubphaseNameChangingWorkingMemory() const ;
+
 	// Firing-production tag, contains production
 	bool IsTagFiringProduction() const ;
 	bool IsTagRetractingProduction() const ;

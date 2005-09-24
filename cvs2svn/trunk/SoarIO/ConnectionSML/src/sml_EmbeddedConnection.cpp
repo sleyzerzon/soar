@@ -183,6 +183,18 @@ bool EmbeddedConnection::AttachConnection(char const* pLibraryName, bool optimiz
 	}
 
 #ifdef _WIN32
+
+// As a test
+//#define WIN_STATIC_LINK
+
+#ifdef WIN_STATIC_LINK
+#define WINDOWS_STATIC
+#else
+#define WINDOWS_DLL
+#endif
+#endif
+
+#ifdef WINDOWS_DLL
 	// The windows shared library
 	libraryName = libraryName + ".dll";
 	
@@ -201,7 +213,7 @@ bool EmbeddedConnection::AttachConnection(char const* pLibraryName, bool optimiz
 	// FIXME error details can be returned by a call to dlerror()
 #endif
 
-#if defined(HAVE_DLFCN_H) || defined(_WIN32)
+#if defined(HAVE_DLFCN_H) || defined(WINDOWS_DLL)
 	if (!hLibrary)
 	{
 		SetError(Error::kLibraryNotFound) ;
