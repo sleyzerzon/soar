@@ -284,10 +284,27 @@ public abstract class AbstractComboView extends AbstractView
 		
 		// Listen for Ctrl-V and execute our paste method (so paste goes to command buffer, not into the window directly)
 		getDisplayControl().addListener(SWT.KeyDown, m_ControlV) ;
-		
+
+		// When the user presses TAB in a trace window, set the focus to the combo box (for command entry)
+		// (Figuring out how to do this correctly required a lot of stepping through the SWT code).
+		getDisplayControl().addListener(SWT.Traverse, m_Tab) ;
+				
 		layoutControls() ;
 	}
 	
+	// If the user presses TAB in the display control (text window) set the focus to the combo box directly
+	// and suppress the normal tab selection logic.  Listening for the SWT.TRAVERSE_TAB_NEXT event (through event.type)
+	// is too late in the sequence it turns out.  That's why we listen for SWT.Traverse and then look at the detail.
+	protected Listener m_Tab = new Listener() { public void handleEvent(Event e) {
+    	if (e.detail == SWT.TRAVERSE_TAB_NEXT)
+    	{
+	    	m_CommandCombo.setFocus() ;
+	    	
+	    	// Suppress the normal tab logic
+	    	e.doit = false ;
+    	}
+    } } ;
+    
 	public abstract Color getBackgroundColor() ;
 	
 	// We need to remove listeners that we registered for within the debugger here.

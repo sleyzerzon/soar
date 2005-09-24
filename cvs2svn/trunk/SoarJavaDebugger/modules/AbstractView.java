@@ -183,7 +183,7 @@ public abstract class AbstractView implements AgentFocusListener
 	    		paste() ;
     	}
     } } ;
-    
+
 	/************************************************************************
 	* 
 	* Converts this object into an XML representation.
