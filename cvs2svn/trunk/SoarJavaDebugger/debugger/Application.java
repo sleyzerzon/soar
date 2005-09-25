@@ -49,6 +49,17 @@ public class Application {
 				continue ;
 			}
 			
+			// Make sure we can delete the library.  This is actually here to cover the
+			// case where we're running in Eclipse without a JAR file.  The getResourceAsStream()
+			// call can end up loading the same library that we're trying to save to and we
+			// end up with a blank file.  Explicitly trying to delete it first ensures that
+			// we're not reading the same file that we're writing.
+			if (library.exists() && !library.delete())
+			{
+				System.out.println("Failed to remove the existing layout file " + library) ;
+				continue ;
+			}
+			
 			// Create the new file on disk
 			FileOutputStream os = new FileOutputStream(library) ;
 			
@@ -91,7 +102,7 @@ public class Application {
 			//Install(new String[] { "SoarKernelSML", "ElementXML", "Java_sml_ClientInterface" }, extension, alwaysInstallLibs) ;
 			
 			// Step 3: Insall the default layout file
-			Install(new String[] { "default-layout.dlf", "default-text.dlf" } , "", false) ;
+			Install(new String[] { "default-layout.dlf", "default-text.dlf" } , "", true) ;
 
 			// Start the SWT version of the application (we used to have a Swing version too)
 			SWTApplication swtApp = new SWTApplication() ;

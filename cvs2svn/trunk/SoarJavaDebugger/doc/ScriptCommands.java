@@ -149,16 +149,21 @@ public class ScriptCommands
 		// If the parent window is a composite then it's children have
 		// fixed locations and we treat them as a unit, so we move up
 		// another level.
-		while (parent.getTagName().equals("composite"))
+		// Later adjustment is to allow two fixed windows to be added next to each other
+		// so in that case we don't navigate up the tree.
+		if (! (newView.isFixedSizeView() && view.isFixedSizeView()) )
 		{
-			existingPane = parent ;
-			parent = parent.getParent() ;
+			while (parent.getTagName().equals("composite"))
+			{
+				existingPane = parent ;
+				parent = parent.getParent() ;
+			}
 		}
-
+		
 		// If we're adding to the left side we assume the orientation is vertical
 		// If we're adding to the top we assume the orientation is horizontal
 		boolean horiz = ((direction.equals(MainWindow.kAttachTopValue) || direction.equals(MainWindow.kAttachBottomValue))) ;
-
+		
 		// We create a new pane but with no parent window (so the pane object is not instantiated
 		// into SWT windows).  We just want to use it to generate the new XML.
 		Pane newPane = new Pane("no parent") ;
