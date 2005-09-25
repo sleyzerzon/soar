@@ -569,7 +569,7 @@ public class FoldingTextView extends AbstractComboView
 
 		for (int i = 0 ; i < lines.length ; i++)
 		{	
-			if (lines[i].length() == 0)
+			if (lines[i].length() == 0 && i == 0)
 				continue ;
 
 			m_FoldingText.appendSubText(lines[i] + kLineSeparator, m_ExpandTracePersistent || m_ExpandTrace, type) ;
@@ -580,6 +580,27 @@ public class FoldingTextView extends AbstractComboView
 	* 
 	* Add the text to the view (this method assumes always called from UI thread)
 	* 
+	* Soar text output tends to assume a starting line separator model
+	* (e.g. write (crlf) | Hello World |).  This is because of the way the old trace output
+	* was built up a little bit at a time.
+	* 
+	* For the folding text view we want to switch that to a more normal terminating separator model
+	* (e.g. write | Hello World | (crlf)).  This is helpful because the folding view tracks text on
+	* a line by line basis and "keeping a line open to accept more input in a bit" adds complexity.
+	* 
+	* Switching between the two generally makes no difference -- except in the case
+	* where the user is explicitly issuing RHS writes.  In that case we'll let them continue
+	* to use the leading separator model (write (crlf) (crlf) |Hello|) but switch it over to
+	* end terminated here.  This has the effect that a single (write | Hello |) will now not
+	* appear on the end of the previous line of trace output (as it would have in earlier Soars).
+	* (This was generally just a slip anyway but now it won't be possible because the previous line
+	* of output in the trace has already added a trailing line separator).
+	* But we do still want to allow a series of writes to build up some text
+	* (e.g. writing out a board position).  To make that work we collect up all RHS writes that
+	* occur sequentially and only then process them.  This avoids us inserting unwanted line separators
+	* between writes that really are meant to concatenate together.  Fortunately, the code for this
+	* is a lot smaller than this comment and occurs in the method calling here.
+	* 
 	*************************************************************************/
 	protected void appendText(String text, long type)
 	{
@@ -587,9 +608,9 @@ public class FoldingTextView extends AbstractComboView
 
 		for (int i = 0 ; i < lines.length ; i++)
 		{	
-			if (lines[i].length() == 0)
+			if (lines[i].length() == 0 && i == 0)
 				continue ;
-			
+
 			m_FoldingText.appendText(lines[i] + kLineSeparator, type) ;
 		}
 	}
@@ -619,6 +640,27 @@ public class FoldingTextView extends AbstractComboView
 		m_FoldingText.scrollBottom() ;
 	}
 
+	protected boolean isNextChildRhsWrite(ClientXML xmlParent, int childIndex, int nChildren)
+	{
+		// We're interested in the next child
+		childIndex++ ;
+		
+		if (childIndex >= nChildren)
+			return false ;
+
+		// Get the next child
+		ClientTraceXML xmlTemp = new ClientTraceXML() ;
+		xmlParent.GetChild(xmlTemp, childIndex) ;
+		
+		// See if its a RHS write
+		boolean result = xmlTemp.IsTagRhsWrite() ;
+		
+		// Clean up
+		xmlTemp.delete() ;
+		
+		return result ;
+	}
+	
 	/********************************************************************************************
 	 * 
 	 * This handler should only be called from the UI thread as it does a lot of UI work.
@@ -634,6 +676,9 @@ public class FoldingTextView extends AbstractComboView
 		//System.out.flush() ;
 		
 		int nChildren = xmlParent.GetNumberChildren() ;
+		
+		// We collect up all rhs writes that occur together and then process them at once
+		StringBuffer rhsWrites = new StringBuffer() ;
 		
 		for (int childIndex = 0 ; childIndex < nChildren ; childIndex++)
 		{
@@ -662,9 +707,19 @@ public class FoldingTextView extends AbstractComboView
 			{
 				String output = xmlTrace.GetString() ;
 				
+				// Collect all rhs write output together and process as a unit
+				// (This lets us support writes that don't start with a leading (crlf) correctly)
 				if (output.length() != 0)
-					this.appendText(output, TraceType.kRhsWrite) ;				
-				
+				{
+					rhsWrites.append(output) ;
+	
+					// When we reach the end of a sequence of RHS writes process them all
+					if (!isNextChildRhsWrite(xmlParent, childIndex, nChildren))
+					{
+						this.appendText(rhsWrites.toString(), TraceType.kRhsWrite) ;
+						rhsWrites = new StringBuffer() ;
+					}
+				}
 			} else if (xmlTrace.IsTagPhase())
 			{
 				String status = xmlTrace.GetPhaseStatus() ;
