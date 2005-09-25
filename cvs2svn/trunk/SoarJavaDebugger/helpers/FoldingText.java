@@ -692,6 +692,8 @@ public class FoldingText
 		int lineHeight = m_Text.getLineHeight() ;
 		int visibleLines = m_Text.getClientArea().height / lineHeight ;
 		int lastLine = Math.min(m_Text.getLineCount(),m_Text.getTopIndex() + visibleLines) ;
+
+		boolean atBottom = (lastLine == m_Text.getLineCount()) ;
 		
 		// Start with the first block that starts at topLine or includes topLine.
 		Block topBlock = m_FoldingDoc.getBlockByLineNumber(topLine) ;
@@ -716,6 +718,10 @@ public class FoldingText
 			m_FoldingDoc.expandBlock(block, state) ;			
 		}
 
+		// If the selection was set to the bottom before we expanded make sure it stays there after the expansion.
+		if (state && atBottom)
+			scrollBottom() ;
+		
 		// Redraw everything
 		setRedraw(true) ;		
 	}
@@ -771,6 +777,14 @@ public class FoldingText
 		int length = m_Text.getCharCount() ;
 		m_Text.setSelection(length) ;
 		m_Text.showSelection() ;
+	}
+	
+	public boolean isScrolledToBottom()
+	{
+		Point currentSelection = m_Text.getSelection() ;
+		int length = m_Text.getCharCount() ;
+
+		return (currentSelection.x == length) ;
 	}
 	
 	public void setSelection(int start, int end)

@@ -166,7 +166,6 @@ public class FoldingTextView extends AbstractComboView
 			if (m_ExpandTrace)
 			{
 				expandPage(m_ExpandTrace) ;
-				m_FoldingText.scrollBottom() ;
 			}
 		} } ) ;
 		
