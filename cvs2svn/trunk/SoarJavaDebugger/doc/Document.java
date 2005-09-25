@@ -143,6 +143,7 @@ public class Document
 		Module update 	 = new Module("Auto Update Window", "The user's command is automatically executed at the end of each run.", modules.UpdateCommandView.class) ;
 		Module keep 	 = new Module("Keep Window", "Commands are entered at a prompt and the results are displayed in a scrolling text window.  Trace output from runs is not shown.", modules.KeepCommandView.class) ;
 		Module button 	 = new Module("Button Bar", "A collection of user-customizable buttons", modules.ButtonView.class) ;
+		Module phase 	 = new Module("Phase Diagram", "A view that shows Soar's phases of execution", modules.PhaseView.class) ;
 		Module edit 	 = new Module("Edit Production Window", "A window used to edit a production and then load it into Soar", modules.EditorView.class) ;
 		Module fold 	 = new Module("Tree Trace Window", "Output from commands and trace output from runs is shown in a tree window.", FoldingTextView.class) ;
 
@@ -151,6 +152,7 @@ public class Document
 		m_ModuleList.add(update) ;
 		m_ModuleList.add(keep) ;
 		m_ModuleList.add(button) ;
+		m_ModuleList.add(phase) ;
 		m_ModuleList.add(edit) ;
 	}
 	

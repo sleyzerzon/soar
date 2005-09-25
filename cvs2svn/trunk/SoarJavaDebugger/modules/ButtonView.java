@@ -34,7 +34,7 @@ import doc.Document;
 * Shows a series of buttons for issuing commands.
 * 
 ********************************************************************************************/
-public class ButtonView extends AbstractView
+public class ButtonView extends AbstractFixedView
 {
 	protected static class ButtonInfo
 	{
@@ -72,44 +72,7 @@ public class ButtonView extends AbstractView
 		addButton("Towers of Hanoi", null, "demo towers-of-hanoi towers-of-hanoi.soar") ;
 		addButton("Water Jug", null, "demo water-jug water-jug-look-ahead.soar") ;
 	}
-	
-	public void setTextFont(Font f)
-	{
-		// We ignore this as our window doesn't display text.
-	}
-
-	/********************************************************************************************
-	* 
-	* Return true if this view shouldn't be user resizable.  E.g. A text window would return false
-	* but a bar for buttons would return true.
-	* 
-	********************************************************************************************/
-	public boolean isFixedSizeView()
-	{
-		return true ;
-	}
-
-	/************************************************************************
-	* 
-	* Returns true if this window can display output from commands executed through
-	* the "executeAgentCommand" method.
-	* 
-	*************************************************************************/
-	public boolean canDisplayOutput()
-	{
-		return false ;
-	}
-	
-	/********************************************************************************************
-	* 
-	* Copy/paste current selection to/from the clipboard.
-	* 
-	********************************************************************************************/
-	public void copy()
-	{
-		// Nothing to copy in button view
-	}
-	
+		
 	/********************************************************************************************
 	* 
 	* This "base name" is used to generate a unique name for the window.
@@ -150,23 +113,6 @@ public class ButtonView extends AbstractView
 		addButton(name, command, null) ;
 	}
 	
-	/************************************************************************
-	* 
-	* Search for the next occurance of 'text' in this view and place the selection
-	* at that point.
-	* 
-	* @param text			The string to search for
-	* @param searchDown		If true search from top to bottom
-	* @param matchCase		If true treat the text as case-sensitive
-	* @param wrap			If true continue search from the top after reaching bottom
-	* @param searchHidden	If true and this view has hidden text (e.g. unexpanded tree nodes) search that text
-	* 
-	*************************************************************************/
-	public boolean find(String text, boolean searchDown, boolean matchCase, boolean wrap, boolean searchHiddenText)
-	{
-		return false ;
-	}
-
 	 /*******************************************************************************************
 	 * 
 	 * The button pane can be linked to a specific view -- in which case commands are executed there.
@@ -371,21 +317,6 @@ public class ButtonView extends AbstractView
 		}		
 	}
 
-	/************************************************************************
-	* 
-	* Clear the display (the text part if any)
-	* 
-	*************************************************************************/
-	public void clearDisplay() { }
-	
-	/************************************************************************
-	* 
-	* Override and return false if it doesn't make sense to clear this
-	* type of view.
-	* 
-	*************************************************************************/	
-	public boolean offerClearDisplay() { return false ; }	
-	
 	/********************************************************************************************
 	 * 
 	 * We want the button views to wrap to use a second line when needed.
@@ -559,36 +490,6 @@ public class ButtonView extends AbstractView
 		}
 	}
 
-	public String executeAgentCommand(String command, boolean echoCommand)
-	{
-		// Send the command to Soar but there's no where to display the output
-		// so we just eat it.
-		String result = getDocument().sendAgentCommand(getAgentFocus(), command) ;
-		
-		return result ;
-	}
-	
-	public void displayText(String text)
-	{
-		// Nowhere to display it so eat it.
-	}
-	
-	/************************************************************************
-	* 
-	* Set the focus to this window so the user can type commands easily.
-	* Return true if this window wants the focus.
-	* 
-	*************************************************************************/
-	public boolean setFocus()
-	{
-		return false ;
-	}
-
-	public boolean hasFocus()
-	{
-		return false ;
-	}
-
 	/************************************************************************
 	* 
 	* Converts this object into an XML representation.
@@ -680,20 +581,6 @@ public class ButtonView extends AbstractView
 
 		// Actually create the window
 		init(frame, doc, parent) ;
-	}
-
-	/** So far the button panel doesn't care about events from the agent */
-	protected void registerForAgentEvents(Agent agent)
-	{
-	}
-	
-	/** Agent deleted, so clear any callback references we have. */
-	protected void clearAgentEvents()
-	{
-	}
-	
-	protected void unregisterForAgentEvents(Agent agent)
-	{
 	}
 
 }
