@@ -215,6 +215,6 @@ public abstract class AbstractFixedView extends AbstractView
 	*************************************************************************/
 	protected void fillInContextMenu(Menu contextMenu, Control control, int mouseX, int mouseY)
 	{
-		fillWindowMenu(contextMenu, false) ;
+		fillWindowMenu(contextMenu, false, false) ;
 	}
 }

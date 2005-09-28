@@ -374,7 +374,7 @@ public class EditorView extends AbstractView
 
 	protected void fillInContextMenu(Menu contextMenu, Control control, int mouseX, int mouseY)
 	{
-		fillWindowMenu(contextMenu, false) ;
+		fillWindowMenu(contextMenu, false, true) ;
 	}
 
 	public boolean find(String text, boolean searchDown, boolean matchCase, boolean wrap, boolean searchHiddenText)

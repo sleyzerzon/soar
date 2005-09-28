@@ -31,6 +31,7 @@ import sml.smlPhase;
 import sml.smlRunEventId;
 import sml.smlSystemEventId;
 import debugger.MainFrame;
+import dialogs.PropertiesDialog;
 import doc.Document;
 
 /************************************************************************
@@ -44,11 +45,13 @@ public class PhaseView extends AbstractFixedView
 	protected Canvas	m_PhaseDiagram ;
 	protected String[]	m_ImageNames = { "phase-none.png",
 			"phase-input.png", "phase-proposal.png", "phase-decision.png", "phase-apply.png", "phase-output.png", "phase-world.png",
-			"phase-stop-cursor.png", "phase-stop-cursor-shadow.png" } ;
+			"phase-stop-cursor.png", "phase-stop-cursor2.png", "phase-stop-cursor-shadow.png", "phase-stop-cursor-shadow2.png", "phase-cursor.png" } ;
 	
 	protected Image[]	m_PhaseImages ;
 	protected Image		m_StopCursor ;
 	protected Image		m_StopCursorShadow ;
+	protected Image		m_PhaseCursor ;
+	
 	protected int		m_StopCallback = -1 ;
 	protected int		m_StartCallback = -1 ;
 	protected int		m_InitCallback = -1 ;
@@ -56,6 +59,9 @@ public class PhaseView extends AbstractFixedView
 	
 	protected boolean	m_DrawPhase = true ;
 	protected boolean	m_DrawShadow = false ;
+	
+	protected boolean	m_ShowMarkerBetweenPhases = true ;
+	protected boolean	m_HourglassCursors = true ;
 	
 	// The phase which will execute when we next run Soar
 	protected smlPhase	m_NextExecutionPhase = smlPhase.sml_INPUT_PHASE ;
@@ -108,27 +114,35 @@ public class PhaseView extends AbstractFixedView
 			}
 		}
 		
-		m_StopCursor 		= m_PhaseImages[m_ImageNames.length-2] ;
-		m_StopCursorShadow 	= m_PhaseImages[m_ImageNames.length-1] ;
-		
+		selectCursorImages() ;
+				
 		createPanel(m_Pane.getWindow()) ;
 	}
 
+	protected void selectCursorImages()
+	{
+		if (m_HourglassCursors)
+		{
+			m_StopCursor 		= m_PhaseImages[m_ImageNames.length-5] ;
+			m_StopCursorShadow 	= m_PhaseImages[m_ImageNames.length-3] ;
+			m_PhaseCursor 		= m_PhaseImages[m_ImageNames.length-1] ;
+		}
+		else
+		{
+			m_StopCursor 		= m_PhaseImages[m_ImageNames.length-4] ;
+			m_StopCursorShadow 	= m_PhaseImages[m_ImageNames.length-2] ;
+			m_PhaseCursor 		= m_PhaseImages[m_ImageNames.length-1] ;			
+		}		
+	}
+	
 	protected void createPanel(final Composite parent)
 	{
-		// Allow us to recreate the panel by calling this multiple times
-		if (m_Container != null)
-		{
-			m_Container.dispose() ;
-			m_Container = null ;
-		}
-		
 		// The container lets us control the layout of the controls
 		// within this window
 		m_Container	   = new Composite(parent, SWT.NULL) ;
 		m_Container.setLayout(null) ;	// We'll do it manually
 		
-		Canvas canvas = new Canvas(m_Container, SWT.NULL) ;
+		Canvas canvas = new Canvas(m_Container, SWT.NO_BACKGROUND) ;
 		int w = m_PhaseImages[0].getImageData().width ;
 		int h = m_PhaseImages[0].getImageData().height ;
 		canvas.setSize(w, h + 8) ;	// BADBAD: Presumably this +4 is a margin from somewhere
@@ -206,7 +220,7 @@ public class PhaseView extends AbstractFixedView
 	protected Point getCursorPosition(smlPhase phase)
 	{
 		// Position for center of stop before marker
-		int x = 28 ;
+		int x = 29 ;
 		int y = 23 ;
 				
 		if (phase == smlPhase.sml_INPUT_PHASE)
@@ -225,22 +239,23 @@ public class PhaseView extends AbstractFixedView
 	
 	protected void paintPhaseDiagram(GC gc, int imageIndex)
 	{
-		Canvas canvas = m_PhaseDiagram ;		
+		Canvas canvas = m_PhaseDiagram ;
+		
+		if (m_ShowMarkerBetweenPhases)
+			imageIndex = 0 ;
+		
 		gc.drawImage(m_PhaseImages[imageIndex], 0, 0) ;
+		
+		// The cursors extend a touch below the images so we need to clean up the overlapping area
+		gc.setBackground(canvas.getDisplay().getSystemColor(SWT.COLOR_WHITE)) ;
+		gc.fillRectangle(0, m_PhaseImages[imageIndex].getImageData().height, canvas.getClientArea().width, 5) ;
 		
 		Point stop   = getCursorPosition(this.m_StopBeforePhase) ;
 		Point shadow = getCursorPosition(this.m_StopBeforeShadow) ;
-
-		if (m_DrawShadow)
-		{
-			// Draw the shadow cursor centered on x,y
-			int x = shadow.x - m_StopCursorShadow.getImageData().width/2 ;
-			int y = shadow.y - m_StopCursorShadow.getImageData().height/2 ;
-			gc.drawImage(m_StopCursorShadow, x, y) ;
-		}
+		Point phase  = getCursorPosition(this.m_NextExecutionPhase) ;
 
 		// If we've set the location of the stop cursor draw that in
-		if (!m_DrawShadow || m_StopBeforePhase == m_StopBeforeShadow)
+		if (!m_DrawShadow)
 		{
 			// Draw the cursor centered on x,y
 			int x = stop.x - m_StopCursor.getImageData().width/2 ;
@@ -248,6 +263,29 @@ public class PhaseView extends AbstractFixedView
 			gc.drawImage(m_StopCursor, x, y) ;
 		}
 		
+		if (m_ShowMarkerBetweenPhases)
+		{
+			// Draw the phase cursor centered on x,y
+			int x = phase.x - m_PhaseCursor.getImageData().width/2 ;
+			int y = phase.y - m_PhaseCursor.getImageData().height/2 ;
+			gc.drawImage(m_PhaseCursor, x, y) ;			
+		}
+
+		if (m_DrawShadow)
+		{
+			// Draw the shadow cursor centered on x,y
+			int x = shadow.x - m_StopCursorShadow.getImageData().width/2 ;
+			int y = shadow.y - m_StopCursorShadow.getImageData().height/2 ;
+			gc.drawImage(m_StopCursorShadow, x, y) ;
+
+			if (m_StopBeforePhase == m_StopBeforeShadow)
+			{
+				x = stop.x - m_StopCursor.getImageData().width/2 ;
+				y = stop.y - m_StopCursor.getImageData().height/2 ;
+				gc.drawImage(m_StopCursor, x, y) ;				
+			}
+		}
+
 		// Draw the decision cycle counter in the corner
 		String decisions = Integer.toString(m_DecisionCycle) ;
 		gc.drawText(decisions, 125, 41) ;
@@ -283,6 +321,9 @@ public class PhaseView extends AbstractFixedView
 		Agent agent = this.getAgentFocus() ;
 		if (agent == null)
 			return ;
+		
+		if (this.m_Container.isDisposed())
+			return ;
 
 		m_NextExecutionPhase = agent.GetCurrentPhase() ;
 		m_DecisionCycle      = agent.GetDecisionCycleCounter() ;
@@ -294,22 +335,7 @@ public class PhaseView extends AbstractFixedView
 				m_PhaseDiagram.redraw() ;
 			}}) ;
 	}
-	
-	/********************************************************************************************
-	 * 
-	 * Synch up our listening to events to match those we have registered for.
-	 * 
-	 * @param agent
-	********************************************************************************************/
-	protected void updateAgentEvents(Agent agent)
-	{
-		if (agent == null)
-			return ;
 		
-		unregisterForAgentEvents(agent) ;
-		registerForAgentEvents(agent) ;
-	}
-	
 	/************************************************************************
 	* 
 	* Register and unregister for Soar events for this agent.
@@ -329,12 +355,17 @@ public class PhaseView extends AbstractFixedView
 
 	protected void unregisterForAgentEvents(Agent agent)
 	{
+		boolean ok = true ;
+		
 		if (m_StartCallback != -1)
-			agent.GetKernel().UnregisterForSystemEvent(m_StartCallback) ;
+			ok = agent.GetKernel().UnregisterForSystemEvent(m_StartCallback) && ok ;
 		if (m_StopCallback != -1)
-			agent.GetKernel().UnregisterForSystemEvent(m_StopCallback) ;
+			ok = agent.GetKernel().UnregisterForSystemEvent(m_StopCallback) && ok ;
 		if (m_InitCallback != -1)
-			agent.GetKernel().UnregisterForAgentEvent(m_InitCallback) ;
+			ok = agent.GetKernel().UnregisterForAgentEvent(m_InitCallback) && ok ;
+		
+		if (!ok)
+			throw new IllegalStateException("Error unregistering callbacks in phase view") ;
 		
 		m_StopCallback = -1 ;
 		m_StartCallback = -1 ;
@@ -356,14 +387,78 @@ public class PhaseView extends AbstractFixedView
 
 	/********************************************************************************************
 	 * 
+	 * Display a dialog that allows the user to adjust properties for this window
+	 * e.g. choosing whether to clear the window everytime a new command executes or not.
 	 * 
-	 * @see modules.AbstractView#showProperties()
-	 ********************************************************************************************/
-
+	********************************************************************************************/
 	public void showProperties()
 	{
-		// TODO Auto-generated method stub
+		PropertiesDialog.Property properties[] = new PropertiesDialog.Property[2] ;
 
+		// Providing a range for indent so we can be sure we don't get back a negative value
+		properties[0] = new PropertiesDialog.BooleanProperty("Show phase marker between phases (not within a phase)", m_ShowMarkerBetweenPhases) ;
+		properties[1] = new PropertiesDialog.BooleanProperty("Use hourglass shaped cursor set", m_HourglassCursors) ;
+
+		boolean ok = PropertiesDialog.showDialog(m_Frame, "Properties", properties) ;
+
+		if (ok)
+		{
+			m_ShowMarkerBetweenPhases = ((PropertiesDialog.BooleanProperty)properties[0]).getValue() ;
+			m_HourglassCursors = ((PropertiesDialog.BooleanProperty)properties[1]).getValue() ;
+
+			// Update the cursor set and redraw the display to match the users choices.
+			selectCursorImages() ;
+			this.m_PhaseDiagram.redraw() ;
+		}
+	}
+
+	/************************************************************************
+	* 
+	* Converts this object into an XML representation.
+	* 
+	* For the button view there is no content beyond the list of buttons.
+	* 
+	*************************************************************************/
+	public ElementXML convertToXML(String tagName, boolean storeContent)
+	{
+		ElementXML element = new ElementXML(tagName) ;
+		
+		// It's useful to record the class name to uniquely identify the type
+		// of object being stored at this point in the XML tree.
+		Class cl = this.getClass() ;
+		element.addAttribute(ElementXML.kClassAttribute, cl.getName()) ;
+
+		// Store this object's properties.
+		element.addAttribute("Name", m_Name) ;
+		element.addAttribute("BetweenPhases", Boolean.toString(m_ShowMarkerBetweenPhases)) ;
+		element.addAttribute("HourglassCursors", Boolean.toString(m_HourglassCursors)) ;
+		
+		return element ;
+	}
+
+	/************************************************************************
+	* 
+	* Rebuild the object from an XML representation.
+	* 
+	* @param frame			The top level window that owns this window
+	* @param doc			The document we're rebuilding
+	* @param parent			The pane window that owns this view
+	* @param element		The XML representation of this command
+	* 
+	*************************************************************************/
+	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.ElementXML element) throws Exception
+	{
+		setValues(frame, doc, parent) ;
+
+		m_Name   					= element.getAttributeThrows("Name") ;
+		m_ShowMarkerBetweenPhases 	= element.getAttributeBooleanDefault("BetweenPhases", true) ;
+		m_HourglassCursors 			= element.getAttributeBooleanDefault("HourglassCursors", true) ;
+		
+		// Register that this module's name is in use
+		frame.registerViewName(m_Name, this) ;
+
+		// Actually create the window
+		init(frame, doc, parent) ;
 	}
 
 }

@@ -59,7 +59,7 @@ public class ParseSelectedText
 		
 		protected void addWindowSubMenu(AbstractView view, Menu menu)
 		{
-			view.fillWindowMenu(menu, true) ;
+			view.fillWindowMenu(menu, true, true) ;
 		}	
 	}
 	
@@ -149,7 +149,7 @@ public class ParseSelectedText
 		/** Fills in menu items that are appropriate for this type of object */
 		public void fillMenu(Document doc, AbstractView owningView, AbstractView outputView, Menu menu, boolean simple)
 		{
-			owningView.fillWindowMenu(menu, false) ;
+			owningView.fillWindowMenu(menu, false, true) ;
 		}
 
 		public String toString() { return "Unknown " + m_Name ; }

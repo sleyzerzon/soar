@@ -394,7 +394,7 @@ public abstract class AbstractView implements AgentFocusListener
 	*************************************************************************/	
 	public boolean offerClearDisplay() { return true ; }
 
-	public void fillWindowMenu(Menu menu, boolean asSubMenu)
+	public void fillWindowMenu(Menu menu, boolean asSubMenu, boolean includeCopyPaste)
 	{
 		if (asSubMenu)
 		{
@@ -408,9 +408,12 @@ public abstract class AbstractView implements AgentFocusListener
 		}
 
 		// Copy and paste where paste really means to paste into the command stream, not into the window.
-		addItem(menu, "Copy", "copy " + m_Frame.getName() + " " + this.getName()) ;
-		addItem(menu, "Paste", "paste " + m_Frame.getName() + " " + this.getName()) ;
-		new MenuItem(menu, SWT.SEPARATOR) ;
+		if (includeCopyPaste)
+		{
+			addItem(menu, "Copy", "copy " + m_Frame.getName() + " " + this.getName()) ;
+			addItem(menu, "Paste", "paste " + m_Frame.getName() + " " + this.getName()) ;
+			new MenuItem(menu, SWT.SEPARATOR) ;
+		}
 		
 		addItem(menu, "Properties ...", "properties " + m_Frame.getName() + " " + this.getName()) ;
 

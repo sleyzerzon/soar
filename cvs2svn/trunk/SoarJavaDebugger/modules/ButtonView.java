@@ -247,7 +247,7 @@ public class ButtonView extends AbstractFixedView
 			item.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) { removeButton((Button)control) ; } } ) ;
 
-			fillWindowMenu(contextMenu, true) ;
+			fillWindowMenu(contextMenu, true, false) ;
 		}
 		else
 		{
@@ -265,7 +265,7 @@ public class ButtonView extends AbstractFixedView
 			new MenuItem(contextMenu, SWT.SEPARATOR) ;
 
 			// In background container
-			fillWindowMenu(contextMenu, false) ;
+			fillWindowMenu(contextMenu, false, false) ;
 		}
 	}
 
