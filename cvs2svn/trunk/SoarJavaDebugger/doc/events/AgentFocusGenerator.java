@@ -25,6 +25,9 @@ public class AgentFocusGenerator
 
 	public synchronized void addAgentFocusListener(AgentFocusListener listener)
 	{
+		if (m_Listeners.contains(listener))
+			return ;
+		
 		m_Listeners.add(listener);
 	}
 

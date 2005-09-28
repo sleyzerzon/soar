@@ -1215,6 +1215,39 @@ void Agent::Refresh()
 }
 
 /*************************************************************
+* @brief Returns the phase that the agent will execute when next
+*		 asked to run.
+*************************************************************/
+smlPhase Agent::GetCurrentPhase()
+{
+	AnalyzeXML response ;
+
+	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_GetRunState, GetAgentName(), sml_Names::kParamValue, sml_Names::kParamPhase) ;
+
+	if (!ok)
+		return sml_INPUT_PHASE ;
+
+	smlPhase phase = (smlPhase)response.GetResultInt((int)sml_INPUT_PHASE) ;
+
+	return phase ;
+}
+
+/*************************************************************
+* @brief Returns the current decision cycle counter.
+*************************************************************/
+int Agent::GetDecisionCycleCounter()
+{
+	AnalyzeXML response ;
+
+	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_GetRunState, GetAgentName(), sml_Names::kParamValue, sml_Names::kParamDecision) ;
+
+	if (!ok)
+		return 0 ;
+
+	return response.GetResultInt(0) ;
+}
+
+/*************************************************************
 * @brief Process a command line command
 *
 * @param pCommandLine Command line string to process.

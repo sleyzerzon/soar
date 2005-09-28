@@ -587,6 +587,17 @@ public:
 	void Refresh() ;
 
 	/*************************************************************
+	* @brief Returns the phase that the agent will execute when next
+	*		 asked to run.
+	*************************************************************/
+	smlPhase GetCurrentPhase() ;
+
+	/*************************************************************
+	* @brief Returns the current decision cycle counter.
+	*************************************************************/
+	int GetDecisionCycleCounter() ;
+
+	/*************************************************************
 	* @brief Process a command line command
 	*
 	* @param pCommandLine Command line string to process.

@@ -209,10 +209,9 @@ static inline bool IsUpdateEventID(int id)
 typedef enum {
     sml_INPUT_PHASE,
     sml_PROPOSAL_PHASE,
-    sml_SELECTION_PHASE,
+    sml_DECISION_PHASE,
     sml_APPLY_PHASE,
     sml_OUTPUT_PHASE,
-    sml_DECISION_PHASE,
 } smlPhase;
 
 typedef enum

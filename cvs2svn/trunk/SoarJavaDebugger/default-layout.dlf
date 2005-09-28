@@ -74,14 +74,19 @@
               <History Item0="enter*production*name*here" Size="2" Class="helpers.CommandHistory" Item1="apply*move-disk*remove*last-disk1-peg"></History>
             </view>
           </pane>
-          <pane view="buttons2" tabAtTop="false" singleView="true" horiz="true">
-            <view ButtonCount="4" Class="modules.ButtonView" Name="buttons2" LinkedView="scratch_pad">
-              <Button Command="matches" Name="Matches"></Button>
-              <Button Command="print &lt;s&gt;" Name="Print state"></Button>
-              <Button Command="print &lt;o&gt;" Name="Print op"></Button>
-              <Button Command="print --stack" Name="Print stack"></Button>
-            </view>
-          </pane>
+          <composite Class="class org.eclipse.swt.widgets.Composite" style="0" attach="Left">
+            <pane view="buttons2" tabAtTop="false" singleView="true" horiz="true">
+              <view ButtonCount="4" Class="modules.ButtonView" Name="buttons2" LinkedView="scratch_pad">
+                <Button Command="matches" Name="Matches"></Button>
+                <Button Command="print &lt;s&gt;" Name="Print state"></Button>
+                <Button Command="print &lt;o&gt;" Name="Print op"></Button>
+                <Button Command="print --stack" Name="Print stack"></Button>
+              </view>
+            </pane>
+            <pane view="phaseview1" tabAtTop="false" singleView="true" horiz="false">
+              <view Class="modules.PhaseView" Name="phaseview1"></view>
+            </pane>
+          </composite>
         </composite>
       </sash>
     </sash>

@@ -53,6 +53,7 @@ public abstract class AbstractSingleTextView extends AbstractTextView
 			if (this.getAgentFocus() != null)
 			{
 				// Make sure we're getting the events to match the new settings
+				this.unregisterForAgentEvents(this.getAgentFocus()) ;
 				this.registerForAgentEvents(this.getAgentFocus()) ;
 			}
 			

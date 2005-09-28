@@ -260,6 +260,7 @@ public:
 	static char const* const kParamRealSeconds;
 	static char const* const kParamWarningsSetting;
 	static char const* const kParamPhase ;
+	static char const* const kParamDecision ;
 	static char const* const kParamInstance ;
 	static char const* const kParamTimers;
 	static char const* const kParamMessage;
@@ -375,6 +376,7 @@ public:
 	static char const* const kCommand_GetConnections ;
 	static char const* const kCommand_SetConnectionInfo ;
 	static char const* const kCommand_GetAllInput ;
+	static char const* const kCommand_GetRunState ;
 
 	// Command line interface
 	static char const* const kCommand_CommandLine ;

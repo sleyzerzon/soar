@@ -85,7 +85,8 @@ public class Pane
 		{
 			// We provide a border around the pane so we can find the edges to drag
 			m_Pane = new Group(parent, SWT.SHADOW_ETCHED_IN) ;
-			m_Pane.setLayout(new FillLayout(SWT.VERTICAL)) ;
+			FillLayout layout = new FillLayout(SWT.VERTICAL) ;
+			m_Pane.setLayout(layout) ;
 
 			// Identify which SWT window is at the top of this pane
 			top = m_Pane ;

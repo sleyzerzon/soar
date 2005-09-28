@@ -266,6 +266,7 @@ char const* const sml_Names::kParamRealSeconds		= "real-seconds";
 char const* const sml_Names::kParamWarningsSetting	= "warnings_setting";
 char const* const sml_Names::kParamEventID			= "eventid" ;
 char const* const sml_Names::kParamPhase			= "phase" ;
+char const* const sml_Names::kParamDecision			= "decision" ;
 char const* const sml_Names::kParamInstance			= "instance" ;
 char const* const sml_Names::kParamTimers			= "timers";
 char const* const sml_Names::kParamMessage			= "message";
@@ -388,6 +389,7 @@ char const* const sml_Names::kCommand_IsSoarRunning			= "is_running" ;
 char const* const sml_Names::kCommand_GetConnections		= "get_connections" ;
 char const* const sml_Names::kCommand_SetConnectionInfo		= "set_connection_info" ;
 char const* const sml_Names::kCommand_GetAllInput			= "get_all_input" ;
+char const* const sml_Names::kCommand_GetRunState			= "get_run_state" ;
 
 // command line interface
 char const* const sml_Names::kCommand_CommandLine		 = "cmdline" ;

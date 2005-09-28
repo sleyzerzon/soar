@@ -142,6 +142,7 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_GetConnections]	= &sml::KernelSML::HandleGetConnections ;
 	m_CommandMap[sml_Names::kCommand_SetConnectionInfo] = &sml::KernelSML::HandleSetConnectionInfo ;
 	m_CommandMap[sml_Names::kCommand_GetAllInput]		= &sml::KernelSML::HandleGetAllInput ;
+	m_CommandMap[sml_Names::kCommand_GetRunState]		= &sml::KernelSML::HandleGetRunState ;
 }
 
 /*************************************************************
@@ -485,6 +486,40 @@ bool KernelSML::HandleShutdown(gSKI::IAgent* pAgent, char const* pCommandName, C
 	DeleteAllAgents(true) ;
 
 	return true ;
+}
+
+// Return information about the current runtime state of the agent (e.g. phase, decision cycle count etc.)
+bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+{
+	unused(pCommandName) ;
+
+	// Look up what type of information to report.
+	char const* pValue = pIncoming->GetArgString(sml_Names::kParamValue) ;
+
+	if (!pValue)
+	{
+		return InvalidArg(pConnection, pResponse, pCommandName, "Need to specify the type of information wanted.") ;
+	}
+
+	char buffer[100] ;
+	buffer[0] = 0;
+
+	if (strcmp(pValue, sml_Names::kParamPhase) == 0)
+	{
+		// Report the current phase.
+		sprintf(buffer, "%d", pAgent->GetCurrentPhase(pError)) ;
+	}
+	else if (strcmp(pValue, sml_Names::kParamDecision) == 0)
+	{
+		// Report the current decision cycle counter (the counter reports one more than the user expects)
+		sprintf(buffer, "%d", pAgent->GetNumDecisionCyclesExecuted(pError)-1) ;
+	}
+	else
+	{
+		return InvalidArg(pConnection, pResponse, pCommandName, "Didn't recognize the type of information requested in GetRunState().") ;
+	}
+
+	return this->ReturnResult(pConnection, pResponse, buffer) ;
 }
 
 bool KernelSML::HandleGetVersion(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)

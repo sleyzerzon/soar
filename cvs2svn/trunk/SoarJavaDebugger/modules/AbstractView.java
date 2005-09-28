@@ -290,6 +290,9 @@ public abstract class AbstractView implements AgentFocusListener
 	* Register and unregister for Soar events for this agent.
 	* (E.g. a trace window might register for the print event)
 	* 
+	* ClearAgentEvents is called when the agent has already been deleted
+	* (so we can't unregister but should just clear our references)
+	* 
 	*************************************************************************/
 	protected abstract void registerForAgentEvents(Agent agent) ;	
 	protected abstract void unregisterForAgentEvents(Agent agent) ;
@@ -308,9 +311,12 @@ public abstract class AbstractView implements AgentFocusListener
 	/** This method is called when we initialize the module. */
 	protected void setValues(MainFrame frame, Document doc, Pane parentPane)
 	{
-		m_Frame = frame ;
+		m_Frame 	= frame ;
 		m_Document  = doc ;
 		m_Pane 	    = parentPane ;
+		
+		// We want to know when the frame focuses on particular agents
+		m_Frame.addAgentFocusListener(this) ;
 	}
 	
 	/** Generates a unique name for this window */

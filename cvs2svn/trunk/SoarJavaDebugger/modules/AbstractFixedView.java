@@ -132,20 +132,30 @@ public abstract class AbstractFixedView extends AbstractView
 		return false ;
 	}
 
-	/** Most fixed panels don't care about events from the agent */
+	/************************************************************************
+	* 
+	* Register and unregister for Soar events for this agent.
+	* (E.g. a trace window might register for the print event)
+	* 
+	*************************************************************************/
 	protected void registerForAgentEvents(Agent agent)
 	{
 	}
-	
-	/** Agent deleted, so clear any callback references we have. */
-	protected void clearAgentEvents()
-	{
-	}
-	
+
 	protected void unregisterForAgentEvents(Agent agent)
 	{
 	}
 
+	/************************************************************************
+	* 
+	* ClearAgentEvents is called when the agent has already been deleted
+	* (so we can't unregister but should just clear our references)
+	* 
+	*************************************************************************/
+	protected void clearAgentEvents()
+	{
+	}
+	
 	/************************************************************************
 	* 
 	* Converts this object into an XML representation.
@@ -189,5 +199,22 @@ public abstract class AbstractFixedView extends AbstractView
 
 		// Actually create the window
 		init(frame, doc, parent) ;
+	}
+	
+	/************************************************************************
+	* 
+	* Given a context menu and a control, fill in the items you want to 
+	* see in the menu.  The simplest is to just call "fillWindowMenu".
+	* 
+	* This call is made after the user has clicked to bring up the menu
+	* so we can create a dymanic menu based on the current context.
+	* 
+	* You also have to call createContextMenu() to request a context menu
+	* be attached to a specific control.
+	* 
+	*************************************************************************/
+	protected void fillInContextMenu(Menu contextMenu, Control control, int mouseX, int mouseY)
+	{
+		fillWindowMenu(contextMenu, false) ;
 	}
 }

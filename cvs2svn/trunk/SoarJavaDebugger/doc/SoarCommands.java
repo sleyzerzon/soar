@@ -11,6 +11,8 @@
 ********************************************************************************************/
 package doc;
 
+import sml.smlPhase;
+
 /********************************************************************************************
 * 
 * Information about strings used for Soar Commands is stored here.
@@ -57,6 +59,8 @@ public class SoarCommands
 	
 	public String getStopCommand()								{ return "stop-soar" ; }
 
+	public String getStopBeforeCommand(smlPhase phase)			{ return "stop-before --" + getPhaseName(phase) ; }
+	
 	public String getPreferencesCommand(String arg) 			{ return "preferences " + arg ; }
 	public String getPreferencesNameCommand(String arg)			{ return "preferences " + arg + " --names" ; }
 	public String getMatchesCommand(String arg)					{ return "matches " + arg ; }
@@ -101,6 +105,16 @@ public class SoarCommands
 		m_MajorVersion = major ;
 		m_MinorVersion = minor ;
 		m_BuildVersion = build ;
+	}
+	
+	public String getPhaseName(smlPhase phase)
+	{
+		if (phase == smlPhase.sml_APPLY_PHASE) 		return "apply" ;
+		if (phase == smlPhase.sml_DECISION_PHASE) 	return "decision" ;
+		if (phase == smlPhase.sml_INPUT_PHASE) 		return "input" ;
+		if (phase == smlPhase.sml_OUTPUT_PHASE) 	return "output" ;
+		if (phase == smlPhase.sml_PROPOSAL_PHASE) 	return "proposal" ;
+		return "" ;
 	}
 	
 	public boolean isRunCommand(String command)

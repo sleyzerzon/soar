@@ -271,10 +271,7 @@ public abstract class AbstractComboView extends AbstractView
 
 		// Listen for when this window is disposed and unregister for anything we registered for
 		m_Container.addDisposeListener(new DisposeListener() { public void widgetDisposed(DisposeEvent e) { removeListeners() ; } } ) ;
-		
-		// We want to know when the frame focuses on particular agents
-		m_Frame.addAgentFocusListener(this) ;
-		
+				
 		m_Updating = false ;
 		
 		// Create the control that will display output from the commands
