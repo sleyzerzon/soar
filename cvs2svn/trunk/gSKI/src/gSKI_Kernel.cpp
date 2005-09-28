@@ -344,6 +344,15 @@ namespace gSKI
 		  m_systemListeners.Notify(gSKIEVENT_INTERRUPT_CHECK, sys) ;
 	  }
 
+	  /** Notify listeners that a property has changed within the system.  We're not defining which property at this point so a client
+	      who wishes to know about a specific property listens for this event and then queries for the property they care about (which may or
+		  may not have changed). */
+	  void Kernel::FireSystemPropertyChangedEvent()
+	  {
+		  SystemNotifier sys(this) ;
+		  m_systemListeners.Notify(gSKIEVENT_SYSTEM_PROPERTY_CHANGED, sys) ;
+	  }
+
    /*
    =========================
     _       _     _ _                _     _     _

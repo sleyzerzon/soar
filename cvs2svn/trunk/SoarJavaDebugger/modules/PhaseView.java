@@ -30,6 +30,7 @@ import sml.smlAgentEventId;
 import sml.smlPhase;
 import sml.smlRunEventId;
 import sml.smlSystemEventId;
+import sml.sml_Names;
 import debugger.MainFrame;
 import dialogs.PropertiesDialog;
 import doc.Document;
@@ -55,6 +56,7 @@ public class PhaseView extends AbstractFixedView
 	protected int		m_StopCallback = -1 ;
 	protected int		m_StartCallback = -1 ;
 	protected int		m_InitCallback = -1 ;
+	protected int		m_PropertyCallback = -1 ;
 	protected int		m_DecisionCycle = 0 ;
 	
 	protected boolean	m_DrawPhase = true ;
@@ -177,6 +179,9 @@ public class PhaseView extends AbstractFixedView
 		// Layout the parent again, because this set of windows has changed
 		// This only matters if we're recreating the windows
 		parent.layout(true) ;
+		
+		// Get the current stop before phase and repaint the control
+		updateNow(true) ;
 	}
 	
 	protected smlPhase getPhaseFromPosition(int x, int y)
@@ -296,7 +301,7 @@ public class PhaseView extends AbstractFixedView
 		if (eventID == smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED.swigValue())
 		{
 			m_DrawPhase = true ;
-			updateNow() ;
+			updateNow(true) ;
 		}
 	}
 	
@@ -305,18 +310,34 @@ public class PhaseView extends AbstractFixedView
 		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue())
 		{
 			m_DrawPhase = true ;
-			updateNow() ;
+			updateNow(false) ;
 		}
 		
 		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue())
 		{
 			// Don't show the phase while we're running
 			m_DrawPhase = false ;
-			updateNow() ;
+			updateNow(false) ;
+		}
+		
+		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_PROPERTY_CHANGED.swigValue())
+		{
+			updateNow(true) ;
 		}
 	}	
 	
-	public void updateNow()
+	public smlPhase getStopBeforePhase()
+	{
+		String result = m_Frame.getCommandResult(m_Document.getSoarCommands().getGetStopBeforeCommand(), sml_Names.getKParamPhase()) ;
+		
+		if (result == null)
+			return smlPhase.sml_INPUT_PHASE ;
+
+		int value = Integer.parseInt(result) ;
+		return smlPhase.swigToEnum(value) ;
+	}
+	
+	public void updateNow(final boolean getCurrentStopPhase)
 	{
 		Agent agent = this.getAgentFocus() ;
 		if (agent == null)
@@ -332,6 +353,9 @@ public class PhaseView extends AbstractFixedView
 		// Callback comes in the document thread.
 		m_PhaseDiagram.getDisplay().asyncExec(new Runnable() {
 			public void run() {
+				if (getCurrentStopPhase)
+					m_StopBeforePhase = getStopBeforePhase() ;
+				
 				m_PhaseDiagram.redraw() ;
 			}}) ;
 	}
@@ -346,11 +370,14 @@ public class PhaseView extends AbstractFixedView
 	{
 		if (m_StopCallback == -1)
 		{
-			// Update on start, stop and on init-soar
+			// Update on start, stop and on init-soar.  Also listen for any time the user types "set-stop" somewhere else.
 			m_StartCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, "systemEventHandler", this) ;
 			m_StopCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, "systemEventHandler", this) ;
+			m_PropertyCallback  = agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_PROPERTY_CHANGED, this, "systemEventHandler", this) ;
 			m_InitCallback  = agent.GetKernel().RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED, this, "initsoarEventHandler", this) ;
 		}
+		
+		System.out.println("Registered for events in Phase View") ;
 	}
 
 	protected void unregisterForAgentEvents(Agent agent)
@@ -363,13 +390,18 @@ public class PhaseView extends AbstractFixedView
 			ok = agent.GetKernel().UnregisterForSystemEvent(m_StopCallback) && ok ;
 		if (m_InitCallback != -1)
 			ok = agent.GetKernel().UnregisterForAgentEvent(m_InitCallback) && ok ;
-		
+		if (m_PropertyCallback != -1)
+			ok = agent.GetKernel().UnregisterForSystemEvent(m_PropertyCallback) && ok ;
+
+		System.out.println("Unregistered for events in Phase View") ;
+
 		if (!ok)
 			throw new IllegalStateException("Error unregistering callbacks in phase view") ;
-		
+
 		m_StopCallback = -1 ;
 		m_StartCallback = -1 ;
 		m_InitCallback = -1 ;
+		m_PropertyCallback = -1 ;
 	}
 
 	/************************************************************************
@@ -380,9 +412,12 @@ public class PhaseView extends AbstractFixedView
 	*************************************************************************/
 	protected void clearAgentEvents()
 	{
+		System.out.println("Cleared events in Phase View") ;
+
 		m_StartCallback = -1 ;
 		m_StopCallback = -1 ;
 		m_InitCallback = -1 ;
+		m_PropertyCallback = -1 ;
 	}
 
 	/********************************************************************************************

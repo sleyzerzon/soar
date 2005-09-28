@@ -892,6 +892,29 @@ public class MainFrame
 		return result;
 	}
 
+	public String getCommandResult(String command, String resultParameter)
+	{
+		ClientAnalyzedXML response = new ClientAnalyzedXML() ;
+		boolean ok = executeCommandXML(command, response) ;
+
+		// Check if the command failed
+		if (!ok)
+		{
+			response.delete() ;
+			return "" ;
+		}
+		
+		// Debug code to look at the result of the command in XML
+		//String check = response.GenerateXMLString(true) ;
+		String result = response.GetArgString(resultParameter) ;
+		
+		// We do explicit clean up so we can check for memory leaks when debugger exits.
+		// (See executeCommandXMLcomment for more).
+		response.delete() ;
+		
+		return result ;
+	}
+
 	/**
 	 * Executes a command that affects the debugger itself, using some form of
 	 * scripting language we define

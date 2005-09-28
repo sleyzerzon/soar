@@ -510,6 +510,11 @@ namespace gSKI {
 	  /** Notify listeners that Soar is running and give them a chance to interrupt it (without having to start up separate threads etc.) */
 	  virtual void FireInterruptCheckEvent() = 0 ;
 
+	  /** Notify listeners that a property has changed within the system.  We're not defining which property at this point so a client
+	      who wishes to know about a specific property listens for this event and then queries for the property they care about (which may or
+		  may not have changed). */
+	 virtual void FireSystemPropertyChangedEvent() = 0 ;
+
       private:
          //
          // We are adding an interface here to allow for some workarounds

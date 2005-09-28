@@ -52,6 +52,7 @@ namespace gSKI
 			Agent* internalAgent = (Agent*)(agent);
 			MegaAssert(internalAgent != 0, "Bad agent pointer passed to set_sysparams.");
 			internalAgent->GetSoarAgent()->sysparams[param_number] = new_value;
+			internalAgent->GetKernel()->FireSystemPropertyChangedEvent() ;
 		}
 
 		long TgDWorkArounds::GetSysparam(IAgent* agent, int param_number)

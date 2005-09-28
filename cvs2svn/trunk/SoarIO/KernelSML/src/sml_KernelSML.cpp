@@ -437,6 +437,7 @@ IAgent* KernelSML::GetAgent(char const* pAgentName)
 void KernelSML::SetStopBefore(egSKIPhaseType phase)
 {
 	m_pRunScheduler->SetStopBefore(phase) ;
+	GetKernel()->FireSystemPropertyChangedEvent() ;
 }
 
 egSKIPhaseType KernelSML::GetStopBefore()

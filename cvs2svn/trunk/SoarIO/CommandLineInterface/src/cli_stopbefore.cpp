@@ -93,7 +93,9 @@ bool CommandLineInterface::DoStopBefore(bool setPhase, egSKIPhaseType phase) {
 	if (m_RawOutput) {
 		m_Result << "Stop before " << phaseStr;
 	} else {
-		AppendArgTagFast(sml_Names::kParamPhase, sml_Names::kTypeString, phaseStr.c_str());
+		char buffer[50] ;
+		sprintf(buffer, "%d", m_pKernelSML->GetStopBefore()) ;
+		AppendArgTagFast(sml_Names::kParamPhase, sml_Names::kTypeString, buffer);
 	}
 
 	return true;

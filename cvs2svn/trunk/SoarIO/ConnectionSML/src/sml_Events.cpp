@@ -26,6 +26,7 @@ Events::Events()
 	RegisterEvent(smlEVENT_SYSTEM_START, "system-start") ;
 	RegisterEvent(smlEVENT_SYSTEM_STOP, "system-stop") ;
 	RegisterEvent(smlEVENT_INTERRUPT_CHECK, "interrupt-check") ;
+	RegisterEvent(smlEVENT_SYSTEM_PROPERTY_CHANGED, "system-property-changed") ;
 	RegisterEvent(smlEVENT_BEFORE_RHS_FUNCTION_ADDED, "before-rhs-function-added") ;
 	RegisterEvent(smlEVENT_AFTER_RHS_FUNCTION_ADDED, "after-rhs-function-added") ;
 	RegisterEvent(smlEVENT_BEFORE_RHS_FUNCTION_REMOVED, "before-rhs-function-removed") ;
