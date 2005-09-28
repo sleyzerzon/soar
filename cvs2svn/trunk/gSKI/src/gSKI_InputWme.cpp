@@ -71,7 +71,9 @@ namespace gSKI
 
      // No reference is added to the owning object to avoid a circular reference.
 
-     Update();
+     // 09/26/05 KJC:  commenting this in constructor so that updates can happen
+	 // ONLY from InputPhaseCallback
+	 // Update();
    }
 
   InputWme::~InputWme() 
@@ -159,7 +161,10 @@ namespace gSKI
   void InputWme::Remove() 
   {
     m_removeWme = true;
-    Update();
+	 // 09/26/05 KJC:  commenting this direct call so that updates will happen
+	 // ONLY from InputPhaseCallback
+
+    // Update();
   }
 
   void InputWme::Update()
