@@ -38,6 +38,8 @@ namespace gSKI
      ===============================
    */
 
+	//KJC:  This should really register thru add_input_function 
+	//      to be more explicit.
   InputLink::InputLink(Agent* agent):
     m_agent(agent),
     m_memory(agent)

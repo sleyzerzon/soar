@@ -51,6 +51,7 @@ namespace gSKI
    {
 	  // DJP: The id for this callback seems to be important but I haven't figured out why yet.
 	  // However, if I change it from "output-link" to anything else I don't get a callback any more.
+	   // KJC:  "output-link" in Soar is a specific symconstant
       soar_add_callback( m_agent->GetSoarAgent(),
 			 static_cast<void*>(m_agent->GetSoarAgent()),
 			 OUTPUT_PHASE_CALLBACK,
