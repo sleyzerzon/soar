@@ -164,26 +164,6 @@ bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, eg
 	// BUGBUG? This assumes the kernel always goes through every phase w/o skipping any or we might fail to stop.  Is that safe?
 	egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
 
-	/*
-	if (runStepSize == gSKI_RUN_DECISION_CYCLE)
-	{
-		if (current == initial)
-			printf("Starting run decision cycle run at count %d\n", current) ;
-
-		if (finished)
-			printf("Finished and Phase is %d ", phase) ;
-		else
-			printf("Executing phase %d\n",phase) ;
-
-		if (m_StopBeforePhase != phase)
-			printf("extending run\n") ;
-		else
-			printf("stopping run\n") ;
-
-		fflush(stdout) ;
-	}
-	*/
-
 	if (finished && runStepSize == gSKI_RUN_DECISION_CYCLE && m_StopBeforePhase != phase)
 		finished = false ;
 
@@ -382,6 +362,28 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 		}
 	}
 }
+/********************************************************************
+* @brief	Checks each agent to see if it has finished running.
+*			Returns true if all agents are done.
+*********************************************************************/
+bool RunScheduler::TestIfAllFinished(egSKIRunType runStepSize, unsigned long count)
+{
+	bool allDone = true ;
+
+	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
+	{
+		AgentSML* pAgentSML = iter->second ;
+
+		bool agentFinishedRun = IsAgentFinished(pAgentSML->GetIAgent(), pAgentSML, runStepSize, count) ;
+
+		if (agentFinishedRun)
+			pAgentSML->ScheduleAgentToRun(false) ;
+		else
+			allDone = false ;
+	}
+
+	return allDone ;
+}
 
 /********************************************************************
 * @brief	Returns true if some agents are currently running.
@@ -457,6 +459,10 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 			m_pSynchAgentSML = pSynchAgentSML ;
 	}
 
+	// If we issue a "run 0" and all agents are synched and in the correct state we're done.
+	if (!m_pSynchAgentSML && TestIfAllFinished(runStepSize, count))
+		runFinished = true ;
+
 	// Run all agents that have previously been marked as "scheduled to run".
 	while (!runFinished)
 	{
@@ -498,7 +504,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 				egSKIRunState runState = pAgent->GetRunState() ;
 
 				// Decide if this agent has reached its run limit
-				// Usually all agents will reach this limit at the same time.  [Should this be a requirement?]
+				// Usually all agents will reach this limit at the same time.
 				bool agentFinishedRun = IsAgentFinished(pAgent, pAgentSML, runStepSize, count) ;
 
 				// An agent should return "stopped" if it's just pausing in the middle of a run

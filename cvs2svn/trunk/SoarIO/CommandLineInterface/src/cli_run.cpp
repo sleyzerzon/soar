@@ -78,13 +78,17 @@ bool CommandLineInterface::ParseRun(gSKI::IAgent* pAgent, std::vector<std::strin
 	// Only one non-option argument allowed, count
 	if (m_NonOptionArguments > 1) return SetError(CLIError::kTooManyArgs);
 
-	// Count defaults to 0
-	int count = 0;
+	// Decide if we explicitly indicated how to run
+	bool specifiedType = (options.test(RUN_FOREVER) || options.test(RUN_ELABORATION) || options.test(RUN_DECISION) || options.test(RUN_PHASE) || options.test(RUN_OUTPUT)) ;
+
+	// Count defaults to -1
+	int count = -1;
 	if (m_NonOptionArguments == 1) {
 		int optind = m_Argument - m_NonOptionArguments;
 		if (!IsInteger(argv[optind])) return SetError(CLIError::kIntegerExpected);
 		count = atoi(argv[optind].c_str());
-		if (count <= 0) return SetError(CLIError::kIntegerMustBePositive);
+		// Allow "run 0" for decisions -- which means run agents to the current stop-before phase
+		if (count < 0 || (count == 0 && specifiedType && !options.test(RUN_DECISION))) return SetError(CLIError::kIntegerMustBePositive);
 	} 
 
 	return DoRun(pAgent, options, count);
@@ -96,7 +100,7 @@ bool CommandLineInterface::DoRun(gSKI::IAgent* pAgent, const RunBitset& options,
 	// Default run type is forever
 	egSKIRunType runType = gSKI_RUN_FOREVER;
 	// ... unless there is a count, then the default is a decision cycle:
-	if (count) runType = gSKI_RUN_DECISION_CYCLE;
+	if (count >= 0) runType = gSKI_RUN_DECISION_CYCLE;
 
 	// Override run type with option flag:
 	if (options.test(RUN_ELABORATION)) {
@@ -115,8 +119,9 @@ bool CommandLineInterface::DoRun(gSKI::IAgent* pAgent, const RunBitset& options,
 		runType = gSKI_RUN_FOREVER;	
 	}
 
-	if (!count && runType != gSKI_RUN_FOREVER) {
-		count = 1;
+	if (count == -1)
+	{
+		count = 1 ;
 	}
 
 	egSKIRunResult runResult ;

@@ -95,6 +95,7 @@ protected:
 	bool			AreAllOutputPhasesComplete() ;
 	bool			HaveAllGeneratedOutput() ;
 	void			TestForFiringGeneratedOutputEvent() ;
+	bool			TestIfAllFinished(egSKIRunType runStepSize, unsigned long count) ;
 	bool			AreAgentsSynchronized(AgentSML* pSynchAgent) ;
 	AgentSML*		GetAgentToSynchronizeWith() ;
 } ;
