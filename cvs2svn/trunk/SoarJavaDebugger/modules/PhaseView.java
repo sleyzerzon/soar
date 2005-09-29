@@ -200,6 +200,10 @@ public class PhaseView extends AbstractFixedView
 	
 	protected void mouseClicked(MouseEvent e)
 	{
+		// Only if left clicking
+		if (e.button != SWT.BUTTON1)
+			return ;
+		
 		m_StopBeforePhase = getPhaseFromPosition(e.x, e.y) ;
 		m_PhaseDiagram.redraw() ;
 
@@ -260,27 +264,24 @@ public class PhaseView extends AbstractFixedView
 		Point phase  = getCursorPosition(this.m_NextExecutionPhase) ;
 
 		// If we've set the location of the stop cursor draw that in
-		if (!m_DrawShadow)
-		{
-			// Draw the cursor centered on x,y
-			int x = stop.x - m_StopCursor.getImageData().width/2 ;
-			int y = stop.y - m_StopCursor.getImageData().height/2 ;
-			gc.drawImage(m_StopCursor, x, y) ;
-		}
+		// Draw the cursor centered on x,y
+		int x = stop.x - m_StopCursor.getImageData().width/2 ;
+		int y = stop.y - m_StopCursor.getImageData().height/2 ;
+		gc.drawImage(m_StopCursor, x, y) ;
 		
 		if (m_ShowMarkerBetweenPhases)
 		{
 			// Draw the phase cursor centered on x,y
-			int x = phase.x - m_PhaseCursor.getImageData().width/2 ;
-			int y = phase.y - m_PhaseCursor.getImageData().height/2 ;
+			x = phase.x - m_PhaseCursor.getImageData().width/2 ;
+			y = phase.y - m_PhaseCursor.getImageData().height/2 ;
 			gc.drawImage(m_PhaseCursor, x, y) ;			
 		}
 
 		if (m_DrawShadow)
 		{
 			// Draw the shadow cursor centered on x,y
-			int x = shadow.x - m_StopCursorShadow.getImageData().width/2 ;
-			int y = shadow.y - m_StopCursorShadow.getImageData().height/2 ;
+			x = shadow.x - m_StopCursorShadow.getImageData().width/2 ;
+			y = shadow.y - m_StopCursorShadow.getImageData().height/2 ;
 			gc.drawImage(m_StopCursorShadow, x, y) ;
 
 			if (m_StopBeforePhase == m_StopBeforeShadow)
