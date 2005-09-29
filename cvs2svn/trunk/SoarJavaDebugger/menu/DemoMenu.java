@@ -164,7 +164,7 @@ public class DemoMenu
 		}
 		
 		// Debug code to look at the result of the command in XML
-		String check = response.GenerateXMLString(true) ;
+		//String check = response.GenerateXMLString(true) ;
 		String location = response.GetArgString(sml_Names.getKParamDirectory()) ;
 		
 		// BADBAD: Need to strip quotes - they shouldn't really be added
@@ -204,30 +204,6 @@ public class DemoMenu
 		m_Frame.executeCommandPrimeView(setLocation, true) ;
 		
 		return true ;
-
-
-		/*
-		String currentLocation = getLibraryLocation() ;
-		
-		DirectoryDialog folderDialog = new DirectoryDialog(m_Frame.getShell(), 0) ;
-		folderDialog.setText("Set library path") ;
-		folderDialog.setMessage("Select the library folder (it should contain a 'demos' folder and a 'help' folder among others)") ;
-		folderDialog.setFilterPath(currentLocation + File.separator) ;
-
-		// Display the dialog
-		String filePath = folderDialog.open() ;
-	
-		// Check if the user cancelled
-		if (filePath == null)
-			return false ;
-		
-		// Record the new path
-		String setLocation = m_Document.getSoarCommands().setLibraryLocationCommand(filePath) ;
-		m_Frame.executeCommandPrimeView(setLocation, true) ;
-//		m_Frame.setAppProperty("DemoMenu.Library", setLocation) ;
-		
-		return true ;
-		*/
 	}
 
 }
