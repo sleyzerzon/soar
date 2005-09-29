@@ -88,7 +88,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Constants::kCLISource]					= &cli::CommandLineInterface::ParseSource;
 	m_CommandMap[Constants::kCLISP]						= &cli::CommandLineInterface::ParseSP;
 	m_CommandMap[Constants::kCLIStats]					= &cli::CommandLineInterface::ParseStats;
-	m_CommandMap[Constants::kCLIStopBefore]				= &cli::CommandLineInterface::ParseStopBefore;
+	m_CommandMap[Constants::kCLISetStopPhase]			= &cli::CommandLineInterface::ParseSetStopPhase;
 	m_CommandMap[Constants::kCLIStopSoar]				= &cli::CommandLineInterface::ParseStopSoar;
 	m_CommandMap[Constants::kCLITime]					= &cli::CommandLineInterface::ParseTime;
 	m_CommandMap[Constants::kCLITimers]					= &cli::CommandLineInterface::ParseTimers;

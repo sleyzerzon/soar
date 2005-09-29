@@ -59,8 +59,8 @@ public class SoarCommands
 	
 	public String getStopCommand()								{ return "stop-soar" ; }
 
-	public String getStopBeforeCommand(smlPhase phase)			{ return "stop-before --" + getPhaseName(phase) ; }
-	public String getGetStopBeforeCommand()						{ return "stop-before" ; }
+	public String getStopBeforeCommand(smlPhase phase)			{ return "set-stop-phase --before --" + getPhaseName(phase) ; }
+	public String getGetStopBeforeCommand()						{ return "set-stop-phase --before" ; }	// No phase => get value
 	
 	public String getPreferencesCommand(String arg) 			{ return "preferences " + arg ; }
 	public String getPreferencesNameCommand(String arg)			{ return "preferences " + arg + " --names" ; }

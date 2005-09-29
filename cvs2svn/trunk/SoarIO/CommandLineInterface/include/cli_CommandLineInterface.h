@@ -748,7 +748,7 @@ protected:
 	bool ParseSP(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseEditProduction(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseStats(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
-	bool ParseStopBefore(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseSetStopPhase(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseStopSoar(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseTime(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseTimers(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
@@ -807,7 +807,7 @@ protected:
 	bool DoSP(gSKI::IAgent* pAgent, const std::string& production);
 	bool DoEditProduction(std::string productionName);
 	bool DoStats(gSKI::IAgent* pAgent, const StatsBitset& options);
-	bool DoStopBefore(bool setPhase, egSKIPhaseType phase);
+	bool DoSetStopPhase(bool setPhase, bool before, egSKIPhaseType phase);
 	bool DoStopSoar(gSKI::IAgent* pAgent, bool self, const std::string* reasonForStopping = 0);
 	bool DoTime(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool DoTimers(gSKI::IAgent* pAgent, bool* pSetting = 0);

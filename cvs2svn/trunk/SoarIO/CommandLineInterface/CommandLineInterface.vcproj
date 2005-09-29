@@ -262,6 +262,9 @@
 					RelativePath=".\src\cli_setlibrarylocation.cpp">
 				</File>
 				<File
+					RelativePath=".\src\cli_setstopphase.cpp">
+				</File>
+				<File
 					RelativePath=".\src\cli_soar8.cpp">
 				</File>
 				<File
@@ -275,9 +278,6 @@
 				</File>
 				<File
 					RelativePath=".\src\cli_stats.cpp">
-				</File>
-				<File
-					RelativePath=".\src\cli_stopbefore.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_stopsoar.cpp">

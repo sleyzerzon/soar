@@ -20,11 +20,13 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseStopBefore(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseSetStopPhase(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
 	unused(pAgent);
 
 	Options optionsData[] = {
-		{'i', "input",	0},
+		{'B', "before",		0},	// optional (defaults to before)
+		{'A', "after",		0},	// optional
+		{'i', "input",	    0},	// requires one of these
 		{'p', "proposal",	0},
 		{'d', "decision",	0},
 		{'a', "apply",		0},
@@ -33,29 +35,39 @@ bool CommandLineInterface::ParseStopBefore(gSKI::IAgent* pAgent, std::vector<std
 	};
 
 	egSKIPhaseType phase = gSKI_INPUT_PHASE ;
-	int countOptions = 0 ;
+	int countPhaseArgs = 0 ;
+	bool before = true ;
 
 	for (;;) {
 		if (!ProcessOptions(argv, optionsData)) return false;
 		if (m_Option == -1) break;
 
-		countOptions++ ;
-
 		switch (m_Option) {
+			case 'B':
+				before = true ;
+				break ;
+			case 'A':
+				before = false ;
+				break ;
 			case 'i':
 				phase = gSKI_INPUT_PHASE ;
+				countPhaseArgs++ ;
 				break;
 			case 'p':
 				phase = gSKI_PROPOSAL_PHASE ;
+				countPhaseArgs++ ;
 				break;
 			case 'd':
 				phase = gSKI_DECISION_PHASE ;
+				countPhaseArgs++ ;
 				break;
 			case 'a':
 				phase = gSKI_APPLY_PHASE ;
+				countPhaseArgs++ ;
 				break;
 			case 'o':
 				phase = gSKI_OUTPUT_PHASE ;
+				countPhaseArgs++ ;
 				break;
 			default:
 				SetErrorDetail("Format is stop-before <phase> e.g. stop-before --input") ;
@@ -63,24 +75,43 @@ bool CommandLineInterface::ParseStopBefore(gSKI::IAgent* pAgent, std::vector<std
 		}
 	}
 
-	if (m_NonOptionArguments || countOptions > 1)
+	if (m_NonOptionArguments || countPhaseArgs > 1)
 	{
-		SetErrorDetail("Format is stop-before <phase> e.g. stop-before --input") ;
+		SetErrorDetail("Format is set-stop-phase [--before | --after] <phase> e.g. set-stop-phase --before --input") ;
 		return SetError(CLIError::kGetOptError) ;
 	}
 
-	return DoStopBefore(countOptions == 1, phase);
+	return DoSetStopPhase(countPhaseArgs == 1, before, phase);
 }
 
-bool CommandLineInterface::DoStopBefore(bool setPhase, egSKIPhaseType phase) {
+bool CommandLineInterface::DoSetStopPhase(bool setPhase, bool before, egSKIPhaseType phase) {
 
 	// We only set the phase if asked, but we always report the current setting.
 	if (setPhase)
-		m_pKernelSML->SetStopBefore(phase) ;
+	{
+		// The kernel only accepts stop before a phase logic.
+		// The "stop after" form is just a courtesy to the user in case they prefer to think that way.
+		if (!before)
+		{
+			phase = (egSKIPhaseType)(((int)phase)+1) ;
+			if (phase > gSKI_OUTPUT_PHASE)
+				phase = gSKI_INPUT_PHASE ;
+		}
 
+		m_pKernelSML->SetStopBefore(phase) ;
+	}
 
 	std::string phaseStr ;
-	switch (m_pKernelSML->GetStopBefore())
+	egSKIPhaseType stopPhase = m_pKernelSML->GetStopBefore() ;
+
+	if (!before)
+	{
+		stopPhase = (egSKIPhaseType)(((int)stopPhase)-1) ;
+		if (stopPhase < gSKI_INPUT_PHASE)
+			stopPhase = gSKI_OUTPUT_PHASE ;
+	}
+
+	switch (stopPhase)
 	{
 	case gSKI_INPUT_PHASE:    phaseStr = "input phase" ; break ;
 	case gSKI_PROPOSAL_PHASE: phaseStr = "proposal phase" ; break ;
@@ -91,10 +122,10 @@ bool CommandLineInterface::DoStopBefore(bool setPhase, egSKIPhaseType phase) {
 	}
 
 	if (m_RawOutput) {
-		m_Result << "Stop before " << phaseStr;
+		m_Result << (before ? "Stop before " : "Stop after ") << phaseStr;
 	} else {
 		char buffer[50] ;
-		sprintf(buffer, "%d", m_pKernelSML->GetStopBefore()) ;
+		sprintf(buffer, "%d", stopPhase) ;
 		AppendArgTagFast(sml_Names::kParamPhase, sml_Names::kTypeString, buffer);
 	}
 
