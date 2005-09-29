@@ -201,7 +201,7 @@ public class PhaseView extends AbstractFixedView
 	protected void mouseClicked(MouseEvent e)
 	{
 		// Only if left clicking
-		if (e.button != SWT.BUTTON1)
+		if (e.button != 1)
 			return ;
 		
 		m_StopBeforePhase = getPhaseFromPosition(e.x, e.y) ;
@@ -377,8 +377,6 @@ public class PhaseView extends AbstractFixedView
 			m_PropertyCallback  = agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_PROPERTY_CHANGED, this, "systemEventHandler", this) ;
 			m_InitCallback  = agent.GetKernel().RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED, this, "initsoarEventHandler", this) ;
 		}
-		
-		System.out.println("Registered for events in Phase View") ;
 	}
 
 	protected void unregisterForAgentEvents(Agent agent)
@@ -393,8 +391,6 @@ public class PhaseView extends AbstractFixedView
 			ok = agent.GetKernel().UnregisterForAgentEvent(m_InitCallback) && ok ;
 		if (m_PropertyCallback != -1)
 			ok = agent.GetKernel().UnregisterForSystemEvent(m_PropertyCallback) && ok ;
-
-		System.out.println("Unregistered for events in Phase View") ;
 
 		if (!ok)
 			throw new IllegalStateException("Error unregistering callbacks in phase view") ;
@@ -413,8 +409,6 @@ public class PhaseView extends AbstractFixedView
 	*************************************************************************/
 	protected void clearAgentEvents()
 	{
-		System.out.println("Cleared events in Phase View") ;
-
 		m_StartCallback = -1 ;
 		m_StopCallback = -1 ;
 		m_InitCallback = -1 ;
