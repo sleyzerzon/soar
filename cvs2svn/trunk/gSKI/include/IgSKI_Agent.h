@@ -1230,6 +1230,9 @@ namespace gSKI {
 
 	  virtual int GetAttributePreferencesMode(Error* err = 0) = 0;
 	  virtual void SetAttributePreferencesMode(int mode, Error* err = 0) = 0;
+
+	  virtual int GetInputPeriod(Error* err = 0) = 0;
+	  virtual void SetInputPeriod(int mode, Error* err = 0) = 0;
    };
 
    //

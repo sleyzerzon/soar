@@ -1491,6 +1491,17 @@ namespace gSKI
 	   GetSoarAgent()->attribute_preferences_mode = mode;
    }
       
+   int Agent::GetInputPeriod(Error* err) 
+   {
+	   return GetSoarAgent()->input_period;
+   }
+	
+   void Agent::SetInputPeriod(int period, Error* err) 
+   {
+	   MegaAssert(period >= 0, "Input period must be non-negative");
+	   GetSoarAgent()->input_period = period;
+   }
+      
    //////////////////////////////////////////////////// PRIVATES /////////////
 
       /*

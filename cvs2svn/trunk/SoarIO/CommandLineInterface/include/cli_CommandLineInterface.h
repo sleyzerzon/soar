@@ -308,8 +308,9 @@ public:
 	* @param pConnection Pointer to connection
 	* @param pResponse Pointer to XML response
 	* @param pAgent The pointer to the gSKI agent interface
+	* @param pPeriod Pointer to the period argument, null for query
 	*************************************************************/
-	EXPORT bool DoInputPeriod(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent);
+	EXPORT bool DoInputPeriod(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pPeriod = 0);
 
 	/*************************************************************
 	* @brief internal-symbols command
@@ -775,7 +776,7 @@ protected:
 	bool DoHelp(const std::string* pCommand = 0);
 	bool DoIndifferentSelection(gSKI::IAgent* pAgent, eIndifferentMode mode);
 	bool DoInitSoar(gSKI::IAgent* pAgent);
-	bool DoInputPeriod(gSKI::IAgent* pAgent);
+	bool DoInputPeriod(gSKI::IAgent* pAgent, int* pPeriod = 0);
 	bool DoInternalSymbols(gSKI::IAgent* pAgent);
 	bool DoLearn(gSKI::IAgent* pAgent, const LearnBitset& options);
 	bool DoLog(gSKI::IAgent* pAgent, const eLogMode mode = LOG_QUERY, const std::string* pFilename = 0, const std::string* pToAdd = 0);

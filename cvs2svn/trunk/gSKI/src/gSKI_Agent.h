@@ -525,6 +525,9 @@ namespace gSKI
 	  virtual int GetAttributePreferencesMode(Error* err = 0);
 	  virtual void SetAttributePreferencesMode(int mode, Error* err = 0);
 
+	  virtual int GetInputPeriod(Error* err = 0);
+	  virtual void SetInputPeriod(int period, Error* err = 0);
+
       /**
        * @brief An accessor method for querying the current "Wait on state
        *        no change" setting.

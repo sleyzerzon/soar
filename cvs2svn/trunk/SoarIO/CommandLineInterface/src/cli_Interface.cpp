@@ -105,8 +105,8 @@ EXPORT bool CommandLineInterface::DoInitSoar(sml::Connection* pConnection, sml::
 	return ret;
 }
 
-EXPORT bool CommandLineInterface::DoInputPeriod(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent) {
-	bool ret = DoInitSoar(pAgent);
+EXPORT bool CommandLineInterface::DoInputPeriod(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, int* pPeriod) {
+	bool ret = DoInputPeriod(pAgent, pPeriod);
 	GetLastResultSML(pConnection, pResponse);
 	return ret;
 }
