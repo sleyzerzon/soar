@@ -365,6 +365,7 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 /********************************************************************
 * @brief	Checks each agent to see if it has finished running.
 *			Returns true if all agents are done.
+*			Does not remove anyone from the run list.
 *********************************************************************/
 bool RunScheduler::TestIfAllFinished(egSKIRunType runStepSize, unsigned long count)
 {
@@ -376,9 +377,7 @@ bool RunScheduler::TestIfAllFinished(egSKIRunType runStepSize, unsigned long cou
 
 		bool agentFinishedRun = IsAgentFinished(pAgentSML->GetIAgent(), pAgentSML, runStepSize, count) ;
 
-		if (agentFinishedRun)
-			pAgentSML->ScheduleAgentToRun(false) ;
-		else
+		if (!agentFinishedRun)
 			allDone = false ;
 	}
 
