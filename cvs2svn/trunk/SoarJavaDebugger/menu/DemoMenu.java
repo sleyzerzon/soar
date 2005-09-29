@@ -181,6 +181,7 @@ public class DemoMenu
 		return location ;
 	}
 	
+	/*
 	private boolean setLibraryPath()
 	{
 		if (!m_Document.isConnected())
@@ -205,5 +206,5 @@ public class DemoMenu
 		
 		return true ;
 	}
-
+	*/
 }

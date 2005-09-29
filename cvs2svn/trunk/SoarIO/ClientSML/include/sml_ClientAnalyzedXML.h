@@ -36,7 +36,9 @@ private:
 
 public:
 	ClientAnalyzedXML() ;
-	~ClientAnalyzedXML() ;
+	virtual ~ClientAnalyzedXML() ;
+
+	void Attach(AnalyzeXML* pAnalyzeXML) ;
 
 	// Each of these either returns a reference to the tag or NULL (if this document doesn't contain that tag)
 	ElementXML const* GetCommandTag() const	;
@@ -63,7 +65,7 @@ public:
 	// Returns the string form of the XML.  Must be released with the static DeleteString method
 	char* GenerateXMLString(bool includeChildren) const ;
 
-	void DeleteString(char* pString) ;
+	static void DeleteString(char* pString) ;
 
 	/*************************************************************
 	* @brief Look up an argument by name.  Returns NULL if not found.

@@ -240,6 +240,15 @@ public:
 	*************************************************************/
 	ElementXMLImpl const* GetParent() const ;
 
+	/*************************************************************
+	* @brief Returns a copy of this object.
+	*		 Generally, this shouldn't be necessary as ref counting
+	*		 allows multiple clients to point to the same object.
+	*
+	*		 Call ReleaseRef() on the returned object when you are done with it.
+	*************************************************************/
+	ElementXMLImpl* MakeCopy() const ;
+
 	////////////////////////////////////////////////////////////////
 	//
 	// Attribute functions (e.g an attribute in <name first="doug">...</name> is first="doug")

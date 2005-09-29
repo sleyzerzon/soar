@@ -134,12 +134,13 @@ typedef enum {
 
 typedef enum {
 	smlEVENT_XML_TRACE_OUTPUT = smlEVENT_RHS_USER_FUNCTION + 1,
+	smlEVENT_XML_INPUT_RECEIVED,		// Echo event for input wmes added by a client (so others can listen in)
 } smlXMLEventId ;
 
 // Events that can be used by environments to trigger when the world should update
 typedef enum {
-	smlEVENT_AFTER_ALL_OUTPUT_PHASES = smlEVENT_XML_TRACE_OUTPUT + 1,	// All agents have completed output phase
-	smlEVENT_AFTER_ALL_GENERATED_OUTPUT,								// All agents have generated output (since run began)
+	smlEVENT_AFTER_ALL_OUTPUT_PHASES = smlEVENT_XML_INPUT_RECEIVED + 1,	// All agents have completed output phase
+	smlEVENT_AFTER_ALL_GENERATED_OUTPUT,						// All agents have generated output (since run began)
 } smlUpdateEventId ;
 
 // This is an experiment -- events that are not type safe (so you have to know how to cast the data you are passed)
@@ -199,7 +200,7 @@ static inline bool IsRhsEventID(int id)
 
 static inline bool IsXMLEventID(int id)
 {
-	return (id == smlEVENT_XML_TRACE_OUTPUT) ;
+	return (id >= smlEVENT_XML_TRACE_OUTPUT && id <= smlEVENT_XML_INPUT_RECEIVED) ;
 }
 
 static inline bool IsUpdateEventID(int id)

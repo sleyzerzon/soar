@@ -242,6 +242,15 @@ public:
 	*************************************************************/
 	bool GetParent(ElementXML* pParent) const ;
 
+	/*************************************************************
+	* @brief Returns a copy of this object.
+	*		 Generally, this shouldn't be necessary as ref counting
+	*		 allows multiple clients to point to the same object.
+	*
+	*		 Call delete on the returned object when you are done with it.
+	*************************************************************/
+	ElementXML* MakeCopy() const ;
+
 	////////////////////////////////////////////////////////////////
 	//
 	// Attribute functions (e.g an attribute in <name first="doug">...</name> is first="doug")

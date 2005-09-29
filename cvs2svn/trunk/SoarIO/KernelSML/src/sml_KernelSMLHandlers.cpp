@@ -999,6 +999,8 @@ bool KernelSML::HandleInput(gSKI::IAgent* pAgent, char const* pCommandName, Conn
 	ElementXML wmeXML(NULL) ;
 	ElementXML* pWmeXML = &wmeXML ;
 
+	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
+
 	bool ok = true ;
 
 	if (kDebugInput)
@@ -1039,7 +1041,7 @@ bool KernelSML::HandleInput(gSKI::IAgent* pAgent, char const* pCommandName, Conn
 
 			// Map the ID from client side to kernel side (if the id is already a kernel side id it's returned unchanged)
 			std::string id ;
-			GetAgentSML(pAgent)->ConvertID(pID, &id) ;
+			pAgentSML->ConvertID(pID, &id) ;
 
 			if (kDebugInput)
 			{
@@ -1062,6 +1064,9 @@ bool KernelSML::HandleInput(gSKI::IAgent* pAgent, char const* pCommandName, Conn
 			ok = RemoveInputWME(pAgent, pTimeTag, pError) && ok ;
 		}
 	}
+
+	// Echo back the list of wmes received, so other clients can see what's been added (rarely used).
+	pAgentSML->FireInputReceivedEvent(pCommand) ;
 
 	if (kDebugInput)
 		PrintDebugFormat("--------- %s ending input ----------", pAgent->GetName()) ;

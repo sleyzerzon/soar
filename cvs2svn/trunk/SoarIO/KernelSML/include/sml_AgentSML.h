@@ -147,6 +147,9 @@ public:
 	void AddXMLListener(egSKIXMLEventId eventID, Connection* pConnection) { m_XMLListener.AddListener(eventID, pConnection) ; }
 	void RemoveXMLListener(egSKIXMLEventId eventID, Connection* pConnection) { m_XMLListener.RemoveListener(eventID, pConnection) ; }
 
+	// Echo the list of wmes received back to any listeners
+	void FireInputReceivedEvent(ElementXML const* pCommands) { m_XMLListener.FireInputReceivedEvent(pCommands) ; }
+
 	void RemoveAllListeners(Connection* pConnection) ;
 
 	/*************************************************************

@@ -87,6 +87,9 @@ void Agent::ReceivedEvent(AnalyzeXML* pIncoming, ElementXML* pResponse)
 	} else if (IsPrintEventID(id))
 	{
 		ReceivedPrintEvent((smlPrintEventId)id, pIncoming, pResponse) ;
+	} else if (IsXMLEventID(id))
+	{
+		ReceivedXMLEvent((smlXMLEventId)id, pIncoming, pResponse) ;
 	}
 }
 
@@ -698,19 +701,18 @@ bool Agent::UnregisterForPrintEvent(int callbackID)
 	return true ;
 }
 
-/*************************************************************
-* @brief This function is called when an XML event needs to be
-*		 sent out.  It's route is a little unusual as it's called
-*		 from a Print event handler, not directly in response to
-*		 an event from the kernel (as are other events).
-*
-* @param pXMLMessage	The XML message we should distribute to our listeners.
-*						NOTE: We must delete this message when we're done.
-*************************************************************/
-void Agent::SendXMLEvent(smlXMLEventId id, ElementXML* pXMLMessage)
+void Agent::ReceivedXMLEvent(smlXMLEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse)
 {
+	unused(pResponse) ;
+
+	// Retrieve the original message
+	ElementXML* pXMLMessage = new ElementXML(pIncoming->GetElementXMLHandle()) ;
+
+	// Need to record our new reference to this handle.
+	pXMLMessage->AddRefOnHandle() ;
+
 	// NOTE: This object needs to stay in scope for as long as we're calling clients
-	// and then when it is deleted it will delete the pXMLMessage.
+	// and then when it is deleted it will delete pXMLMessage.
 	ClientXML clientXML(pXMLMessage) ;
 
 	// Look up the handler(s) from the map
@@ -732,7 +734,7 @@ void Agent::SendXMLEvent(smlXMLEventId id, ElementXML* pXMLMessage)
 	}
 }
 
-void Agent::ReceivedXMLEvent(smlXMLEventId id, ElementXML* pIncoming, ElementXML* pResponse)
+void Agent::ReceivedXMLTraceEvent(smlXMLEventId id, ElementXML* pIncoming, ElementXML* pResponse)
 {
 	unused(pResponse) ;
 
@@ -787,15 +789,6 @@ int Agent::RegisterForXMLEvent(smlXMLEventId id, XMLEventHandler handler, void* 
 
 	if (found && plus.m_Handler != 0)
 		return plus.getCallbackID() ;
-
-	// So far we only support the XML TRACE command and this is implemented
-	// by registering for the EVENT_XML_TRACE_OUTPUT xml event, capturing
-	// that output, parsing it and passing that parsed data back to the caller.
-	// We use this implementation because currently the kernel is generating
-	// raw XML strings.  Later we'll hopefully convert over to the kernel
-	// creating ElementXML objects which will just be passed directly over to the client
-	// without the string-format & parsing step.
-	assert(id == smlEVENT_XML_TRACE_OUTPUT) ;
 
 	// If we have no handlers registered with the kernel, then we need
 	// to register for the print event (which we'll then parse to create XML objects).

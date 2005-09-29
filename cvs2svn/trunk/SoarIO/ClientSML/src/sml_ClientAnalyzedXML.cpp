@@ -33,6 +33,12 @@ ClientAnalyzedXML::~ClientAnalyzedXML()
 	delete m_pAnalyzeXML ;
 }
 
+void ClientAnalyzedXML::Attach(AnalyzeXML* pAnalyzeXML)
+{
+	delete m_pAnalyzeXML ;
+	m_pAnalyzeXML = pAnalyzeXML ;
+}
+
 // Each of these either returns a reference to the tag or NULL (if this document doesn't contain that tag)
 ElementXML const* ClientAnalyzedXML::GetCommandTag() const			{ return m_pAnalyzeXML->GetCommandTag() ; }
 ElementXML const* ClientAnalyzedXML::GetResultTag() const			{ return m_pAnalyzeXML->GetResultTag() ; }

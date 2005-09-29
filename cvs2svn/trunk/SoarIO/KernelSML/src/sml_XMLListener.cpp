@@ -30,8 +30,9 @@ bool XMLListener::AddListener(egSKIXMLEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
-	if (first)
+	if (first && eventID == gSKIEVENT_XML_TRACE_OUTPUT)
 	{
+		// Listen for XML trace events within gSKI
 		m_pAgent->AddXMLListener(eventID, this); 
 
 		// Register for specific events at which point we'll flush the buffer for this event
@@ -46,8 +47,9 @@ bool XMLListener::RemoveListener(egSKIXMLEventId eventID, Connection* pConnectio
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
-	if (last)
+	if (last && eventID == gSKIEVENT_XML_TRACE_OUTPUT)
 	{
+		// Unregister for the XML trace events in gSKI
 		m_pAgent->RemoveXMLListener(eventID, this); 
 
 		// Unregister for the events when we'll flush the buffer
@@ -179,3 +181,80 @@ void XMLListener::FlushOutput(egSKIXMLEventId eventID)
 	// Clean up
 	delete pMsg;
 }
+
+// Echo the list of wmes received back to any listeners
+void XMLListener::FireInputReceivedEvent(ElementXML const* pCommands)
+{
+	egSKIXMLEventId eventID = gSKIEVENT_XML_INPUT_RECEIVED ;
+	ConnectionListIter connectionIter = GetBegin(eventID);
+
+	// Nobody is listenening for this event.
+	if (connectionIter == GetEnd(eventID))
+		return ;
+
+	// Make a copy of pCommands and send it out.
+
+	// We need the first connection for when we're building the message.  Perhaps this is a sign that
+	// we shouldn't have rolled these methods into Connection.
+	Connection* pConnection = *connectionIter;
+
+	// Convert eventID to a string
+	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
+
+	// Build the SML message we're going to send.
+	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
+
+	// Add the agent parameter and as a side-effect, get a pointer to the <command> tag.  This is an optimization.
+	ElementXML_Handle hCommand = pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pAgent->GetName()) ;
+	ElementXML command(hCommand) ;
+
+	// Copy the list of wmes from the input message over
+	int nWmes = pCommands->GetNumberChildren() ;
+	for (int i = 0 ; i < nWmes ; i++)
+	{
+		ElementXML wme ;
+		pCommands->GetChild(&wme, i) ;
+
+		if (wme.IsTag(sml_Names::kTagWME))
+		{
+			ElementXML* pCopy = wme.MakeCopy() ;
+			command.AddChild(pCopy) ;
+		}
+	}
+
+	// This is important.  We are working with a subpart of pMsg.
+	// If we retain ownership of the handle and delete the object
+	// it will release the handle...deleting part of our message.
+	command.Detach() ;
+
+#ifdef _DEBUG
+	// Generate a text form of the XML so we can look at it in the debugger.
+	char* pStr = pMsg->GenerateXMLString(true);
+#endif
+
+	// Send this message to all listeners
+	ConnectionListIter end = GetEnd(eventID);
+
+	AnalyzeXML response;
+
+	while (connectionIter != end)
+	{
+		pConnection = *connectionIter;
+		connectionIter++;
+
+		// It would be faster to just send a message here without waiting for a response
+		// but that could produce incorrect behavior if the client expects to act *during*
+		// the event that we're notifying them about (e.g. notification that we're in the input phase).
+		pConnection->SendMessageGetResponse(&response, pMsg);
+	}
+
+#ifdef _DEBUG
+	pMsg->DeleteString(pStr);
+#endif
+
+	// Clean up
+	delete pMsg;
+
+}
+

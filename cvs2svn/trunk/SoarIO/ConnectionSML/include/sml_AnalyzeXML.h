@@ -47,6 +47,10 @@ public:
 	// Call this on the message we want to analyze
 	void Analyze(ElementXML const* pRootXML) ;
 
+	// Return the handle to the XML we're analyzing.  You can wrap then this into an ElementXML* object if you wish.
+	// Be sure to call AddRef on this handle if you keep it or wrap it in another ElementXML object.
+	ElementXML_Handle GetElementXMLHandle() { return m_hRootObject ; }
+
 	// Each of these either returns a reference to the tag or NULL (if this document doesn't contain that tag)
 	ElementXML const* GetCommandTag() const			{ return m_pCommand ; }
 	ElementXML const* GetResultTag() const			{ return m_pResult ; }

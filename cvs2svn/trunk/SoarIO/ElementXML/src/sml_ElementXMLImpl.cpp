@@ -321,6 +321,54 @@ ElementXMLImpl::~ElementXMLImpl(void)
 }
 
 /*************************************************************
+* @brief Returns a copy of this object.
+*		 Generally, this shouldn't be necessary as ref counting
+*		 allows multiple clients to point to the same object.
+*
+*		 Call ReleaseRef() on the returned object when you are done with it.
+*************************************************************/
+ElementXMLImpl* ElementXMLImpl::MakeCopy() const
+{
+	ElementXMLImpl* pCopy = new ElementXMLImpl() ;
+
+	pCopy->m_ErrorCode		  = m_ErrorCode ;
+	pCopy->m_UseCData		  = m_UseCData ;
+	pCopy->m_RefCount		  = 1 ;
+
+	// Start with a null parent and override this later
+	pCopy->m_pParent		  = NULL ;
+
+	// Copy the tag name
+	pCopy->SetTagName(m_TagName) ;
+
+	// Copy the character data
+	if (m_DataIsBinary)
+		pCopy->SetBinaryCharacterData(m_CharacterData, m_BinaryDataLength) ;
+	else
+		pCopy->SetCharacterData(m_CharacterData) ;
+
+	// Copy the attributes
+	for (xmlAttributeMapConstIter mapIter = m_AttributeMap.begin() ; mapIter != m_AttributeMap.end() ; mapIter++)
+	{
+		xmlStringConst att = mapIter->first ;
+		xmlStringConst val = mapIter->second ;
+
+		pCopy->AddAttribute(att, val) ;
+	}
+
+	// Copy all of the children, overwriting the parent field for them so that everything connects up correctly.
+	for (xmlListConstIter iterChildren = m_Children.begin() ; iterChildren != m_Children.end() ; iterChildren++)
+	{
+		ElementXMLImpl* pChild = *iterChildren ;
+		ElementXMLImpl* pChildCopy = pChild->MakeCopy() ;
+		pChildCopy->m_pParent = pCopy ;
+		pCopy->AddChild(pChildCopy) ;
+	}
+
+	return pCopy ;
+}
+
+/*************************************************************
 * @brief Release our reference to this object, possibly
 *        causing it to be deleted.
 *************************************************************/

@@ -163,8 +163,12 @@
 	 //  as a single SML event.
 	 // We decided to use the same event number for both sides since the event numbers need to match up
 	 //  anyway and these are strongly related events.
- 	 gSKIEVENT_XML_TRACE_OUTPUT = gSKIEVENT_LAST_RHS_EVENT + 1,   
-	 gSKIEVENT_LAST_XML_EVENT = gSKIEVENT_XML_TRACE_OUTPUT,
+ 	 gSKIEVENT_XML_TRACE_OUTPUT = gSKIEVENT_LAST_RHS_EVENT + 1,
+
+	 // Used to echo input wmes back to a client (so one client can listen in on additions made by another).
+	 gSKIEVENT_XML_INPUT_RECEIVED,
+
+	 gSKIEVENT_LAST_XML_EVENT = gSKIEVENT_XML_INPUT_RECEIVED,
     } egSKIXMLEventId;
 
 	static inline bool IsXMLEventID (int id)

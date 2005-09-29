@@ -67,6 +67,7 @@ Events::Events()
 
 	// Raw XML messages
 	RegisterEvent(smlEVENT_XML_TRACE_OUTPUT, "xml-trace-output") ;
+	RegisterEvent(smlEVENT_XML_INPUT_RECEIVED, "xml-input-received") ;
 
 	// Update events
 	RegisterEvent(smlEVENT_AFTER_ALL_OUTPUT_PHASES, "after-all-output-phases") ;

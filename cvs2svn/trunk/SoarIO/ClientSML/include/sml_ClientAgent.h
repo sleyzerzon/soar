@@ -175,9 +175,10 @@ protected:
 	void ReceivedRunEvent(smlRunEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	void ReceivedProductionEvent(smlProductionEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	void ReceivedPrintEvent(smlPrintEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	void ReceivedXMLEvent(smlXMLEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 
 	/** NOTE: Slightly different sig as this is called without analyzing the incoming msg so it's a bit faster */
-	void ReceivedXMLEvent(smlXMLEventId id, ElementXML* pIncomingMsg, ElementXML* pResponse) ;
+	void ReceivedXMLTraceEvent(smlXMLEventId id, ElementXML* pIncomingMsg, ElementXML* pResponse) ;
 
 	/*************************************************************
 	* @brief Call any registered handlers to notify them when
@@ -186,10 +187,6 @@ protected:
 	*************************************************************/
 	void ReceivedOutputEvent(WMElement* pWmeAdded) ;
 	bool IsRegisteredForOutputEvent() ;
-
-public:
-	// This method is public but a client should never need to call it.
-	void SendXMLEvent(smlXMLEventId id, ElementXML* pXMLMessage) ;
 
 public:
 	/*************************************************************

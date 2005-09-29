@@ -362,6 +362,14 @@ void MySystemHandler(smlSystemEventId id, void* pUserData, Kernel* pKernel)
 
 static ClientXML* s_ClientXMLStorage = 0 ;
 
+void MyXMLInputReceivedHandler(smlXMLEventId id, void* pUserData, Agent* pAgent, ClientXML* pXML)
+{
+	// We'll start by turning it back into XML so we can look at it in the debugger.
+	char* pStr = pXML->GenerateXMLString(true) ;
+
+	pXML->DeleteString(pStr) ;
+}
+
 void MyXMLEventHandler(smlXMLEventId id, void* pUserData, Agent* pAgent, ClientXML* pXML)
 {
 	// pXML should be some structured trace output.
@@ -438,6 +446,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	cout << "Done our first init-soar" << endl ;
 
+	int inputReceived = pAgent->RegisterForXMLEvent(smlEVENT_XML_INPUT_RECEIVED, MyXMLInputReceivedHandler, 0) ;
+
 	// Some simple tests
 	StringElement* pWME = pAgent->CreateStringWME(pInputLink, "my-att", "my-value") ;
 	unused(pWME);
@@ -446,6 +456,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	bool ok = pAgent->Commit() ;
 	if (doInitSoars)
 		pAgent->InitSoar() ;
+
+	pAgent->UnregisterForXMLEvent(inputReceived) ;
 
 	StringElement* pWME1 = pAgent->CreateStringWME(pID, "type", "Boeing747") ;
 	unused(pWME1);

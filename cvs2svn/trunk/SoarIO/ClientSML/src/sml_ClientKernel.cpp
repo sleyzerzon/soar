@@ -315,7 +315,7 @@ ElementXML* Kernel::ProcessIncomingSML(Connection* pConnection, ElementXML* pInc
 	Agent* pAgent = IsXMLTraceEvent(pIncomingMsg) ;
 	if (pAgent)
 	{
-		pAgent->ReceivedXMLEvent(smlEVENT_XML_TRACE_OUTPUT, pIncomingMsg, pResponse) ;
+		pAgent->ReceivedXMLTraceEvent(smlEVENT_XML_TRACE_OUTPUT, pIncomingMsg, pResponse) ;
 		return pResponse ;
 	}
 

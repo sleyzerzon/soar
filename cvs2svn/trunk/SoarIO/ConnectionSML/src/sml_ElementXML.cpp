@@ -335,6 +335,20 @@ bool ElementXML::GetParent(ElementXML* pParent) const
 	return true ;
 }
 
+/*************************************************************
+* @brief Returns a copy of this object.
+*		 Generally, this shouldn't be necessary as ref counting
+*		 allows multiple clients to point to the same object.
+*
+*		 Call delete on the returned object when you are done with it.
+*************************************************************/
+ElementXML* ElementXML::MakeCopy() const
+{
+	ElementXML_Handle hCopy = ::sml_MakeCopy(m_hXML) ;
+
+	return new ElementXML(hCopy) ;
+}
+
 ////////////////////////////////////////////////////////////////
 //
 // Attribute functions (e.g an attribute in <name first="doug">...</name> is first="doug")

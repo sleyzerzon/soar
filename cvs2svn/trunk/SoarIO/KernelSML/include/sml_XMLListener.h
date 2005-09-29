@@ -85,6 +85,8 @@ public:
 	// Send the SML event to the clients (flush output)
 	void FlushOutput(egSKIXMLEventId eventID);
 
+	// Echo the list of wmes received back to any listeners
+	void XMLListener::FireInputReceivedEvent(ElementXML const* pCommands) ;
 } ;
 
 }
