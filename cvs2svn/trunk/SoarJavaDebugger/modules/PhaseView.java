@@ -338,6 +338,15 @@ public class PhaseView extends AbstractFixedView
 		return smlPhase.swigToEnum(value) ;
 	}
 	
+	public void agentGettingFocus(doc.events.AgentFocusEvent ev)
+	{
+		super.agentGettingFocus(ev) ;
+
+		// When an agent is assigned to this window, update the control to show the
+		// current phase, decision cycle count and stop point.
+		updateNow(true) ;
+	}
+	
 	public void updateNow(final boolean getCurrentStopPhase)
 	{
 		Agent agent = this.getAgentFocus() ;
