@@ -157,11 +157,12 @@ bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, eg
 
 	unsigned long difference = current - initial ;
 
+	//fprintf(stdout, "Agent %s current is %d initial is %d diff is %d\n", pAgent->GetName(), current, initial, difference) ; fflush(stdout) ;
+
 	bool finished = difference >= count && runStepSize != gSKI_RUN_FOREVER ;
 
 	// If we're running by decision and we've run the appropriate number of decisions, then keep running until
 	// we reach the correct phase where we should stop.
-	// BUGBUG? This assumes the kernel always goes through every phase w/o skipping any or we might fail to stop.  Is that safe?
 	egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
 
 	if (finished && runStepSize == gSKI_RUN_DECISION_CYCLE && m_StopBeforePhase != phase)
@@ -529,12 +530,14 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 		}
 
 		// If we're synching to an agent (i.e. matching the phases of all agents) see if we're done now.
-		// (This isn't as optimally efficient as possible but we're assuming synching is a rare event).
 		if (m_pSynchAgentSML)
 		{
+			// This isn't as optimally efficient as possible but only happens while synching agents (just a few phases)
+			// and synching should be rare anyway.
 			if (AreAgentsSynchronized(m_pSynchAgentSML))
 			{
 				m_pSynchAgentSML = NULL ;
+				runFinished = TestIfAllFinished(runStepSize, count) ;
 			}
 		}
 	}
