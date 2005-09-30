@@ -446,18 +446,25 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	cout << "Done our first init-soar" << endl ;
 
-	int inputReceived = pAgent->RegisterForXMLEvent(smlEVENT_XML_INPUT_RECEIVED, MyXMLInputReceivedHandler, 0) ;
+	//int inputReceived = pAgent->RegisterForXMLEvent(smlEVENT_XML_INPUT_RECEIVED, MyXMLInputReceivedHandler, 0) ;
 
 	// Some simple tests
 	StringElement* pWME = pAgent->CreateStringWME(pInputLink, "my-att", "my-value") ;
 	unused(pWME);
 	Identifier* pID = pAgent->CreateIdWME(pInputLink, "plane") ;
 
-	bool ok = pAgent->Commit() ;
-	if (doInitSoars)
-		pAgent->InitSoar() ;
+	// Trigger for inputWme update change problem
+	StringElement* pWMEtest = pAgent->CreateStringWME(pID, "typeTest", "Boeing747") ;
+	unused(pWMEtest) ;
 
-	pAgent->UnregisterForXMLEvent(inputReceived) ;
+	bool ok = pAgent->Commit() ;
+
+	if (doInitSoars)
+	{
+		pAgent->InitSoar() ;
+	}
+
+	//pAgent->UnregisterForXMLEvent(inputReceived) ;
 
 	StringElement* pWME1 = pAgent->CreateStringWME(pID, "type", "Boeing747") ;
 	unused(pWME1);
