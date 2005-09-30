@@ -144,7 +144,7 @@ public class PhaseView extends AbstractFixedView
 		m_Container	   = new Composite(parent, SWT.NULL) ;
 		m_Container.setLayout(null) ;	// We'll do it manually
 		
-		Canvas canvas = new Canvas(m_Container, SWT.NO_BACKGROUND) ;
+		Canvas canvas = new Canvas(m_Container, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED) ;
 		int w = m_PhaseImages[0].getImageData().width ;
 		int h = m_PhaseImages[0].getImageData().height ;
 		canvas.setSize(w, h + 8) ;	// BADBAD: Presumably this +4 is a margin from somewhere
