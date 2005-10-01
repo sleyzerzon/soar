@@ -756,13 +756,28 @@ EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool inp
 	return (Direct_WMObject_Handle)pRoot ;
 }
 
-EXPORT void sml_DirectRun(char const* pAgentName, int typeOfRun, int count)
+// A fully direct run would be a call straight to gSKI but supporting that is too dangerous
+// due to the extra events and control logic surrounding the SML RunScheduler.
+// So we compromise with a call directly to that scheduler, boosting performance over the standard "run" path
+// which goes through the command line processor.
+EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, int count)
 {
-	// A fully direct run would be a call straight to gSKI but supporting that is too dangerous
-	// due to the extra events and control logic surrounding the SML RunScheduler.
-	// So we compromise with a call directly to that scheduler, boosting performance over the standard "run" path
-	// which goes through the command line processor.
-	egSKIRunType runType = (egSKIRunType)typeOfRun ;
+	// Decide on the type of run.
+	egSKIRunType runType ;
+	if (forever)
+		runType = gSKI_RUN_FOREVER ;
+	else
+	{
+		switch ((smlRunStepSize)stepSize)
+		{
+		case sml_PHASE:       runType = gSKI_RUN_PHASE ; break ;
+		case sml_ELABORATION: runType = gSKI_RUN_ELABORATION_CYCLE ; break ;
+		case sml_DECISION:    runType = gSKI_RUN_DECISION_CYCLE ; break ;
+		case sml_UNTIL_OUTPUT:runType = gSKI_RUN_UNTIL_OUTPUT ; break ;
+		default: assert(0) ; return ;
+		}
+	}
+
 	KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
 
 	RunScheduler* pScheduler = pKernelSML->GetRunScheduler() ;

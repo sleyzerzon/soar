@@ -98,36 +98,6 @@ void Kernel::InitEvents()
 	RegisterForAgentEvent(smlEVENT_AFTER_AGENT_REINITIALIZED, &InitSoarHandler, NULL) ;
 }
 
-// NOTE: These values need to match those in gSKI_Enumerations.h
-// Including that here would create a nasty dependency between all apps and gSKI's headers
-// so we'll just encode the values directly.  If they get out of synch this will break sml_DirectRun
-// but shouldn't affect others.
-//
-//      gSKI_RUN_SMALLEST_STEP,
-//      gSKI_RUN_PHASE,
-//	    gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step 
-//      gSKI_RUN_DECISION_CYCLE,
-//      gSKI_RUN_UNTIL_OUTPUT,
-//      gSKI_RUN_FOREVER,
-//      gSKI_NUM_RUN_TYPES
-
-int Kernel::GetgSKIRunType(smlRunStepSize stepSize, bool forever)
-{
-	if (forever)
-		return 5 ;
-
-	switch (stepSize)
-	{
-	case sml_PHASE:       return 1 ;
-	case sml_ELABORATION: return 2 ;
-	case sml_DECISION:    return 3 ;
-	case sml_UNTIL_OUTPUT: return 4 ;
-	default: assert(0) ; break ;	// No mapping
-	}
-
-	return 0 ;
-}
-
 /*************************************************************
 * @brief Preparation for deleting the kernel.
 *		 Agents are destroyed at this point (if we own the kernel)
@@ -1145,7 +1115,7 @@ char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepS
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, sml::Kernel::GetgSKIRunType(stepSize, false), (int)numberSteps) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, false, stepSize, (int)numberSteps) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1175,7 +1145,7 @@ char const* Kernel::RunAllAgentsForever()
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, sml::Kernel::GetgSKIRunType(sml_DECISION, true), 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, true, sml_DECISION, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1216,7 +1186,7 @@ char const* Kernel::RunAllTilOutput(unsigned long maxDecisions)
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, sml::Kernel::GetgSKIRunType(sml_UNTIL_OUTPUT, false), 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, false, sml_UNTIL_OUTPUT, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif
