@@ -61,6 +61,8 @@ using std::cin;
 using std::endl;
 using std::string;
 
+int global_callback = -1 ;
+
 void printWMEs(WMElement const* pRoot)
 {
 	if (pRoot->GetParent() == NULL)
@@ -265,6 +267,20 @@ bool SimpleListener(int life)
 	delete pKernel ;
 
 	return true ;
+}
+
+void MyRunSelfRemovingHandler(smlRunEventId id, void* pUserData, Agent* pAgent, smlPhase phase)
+{
+	// This callback removes itself from the list of callbacks -- as a test to see if we can do that inside a callback handler.
+	if (global_callback != -1)
+	{
+		pAgent->UnregisterForRunEvent(global_callback) ;
+		global_callback = -1 ;
+	}
+	else
+	{
+		cout << "ERROR: The handler has been removed, but we're still getting the callbacks" << endl ;
+	}
 }
 
 void MyRunEventHandler(smlRunEventId id, void* pUserData, Agent* pAgent, smlPhase phase)
@@ -556,6 +572,9 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 		cout << "Error when registering the same function twice.  Should detect this and ignore the second registration" << endl ;
 		return false ;
 	}
+
+	// This callback unregisters itself in the callback -- as a test to see if we can do that safely.
+	global_callback = pAgent->RegisterForRunEvent(smlEVENT_AFTER_DECISION_CYCLE, MyRunSelfRemovingHandler, NULL) ;
 
 	// Register for an untyped event
 	int untypedCall = pKernel->RegisterForUntypedEvent(smlEVENT_EDIT_PRODUCTION, MyUntypedEventHandler, NULL) ;

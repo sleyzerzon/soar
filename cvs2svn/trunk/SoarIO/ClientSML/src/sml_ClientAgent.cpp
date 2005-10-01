@@ -113,9 +113,10 @@ void Agent::ReceivedRunEvent(smlRunEventId id, AnalyzeXML* pIncoming, ElementXML
 		return ;
 
 	// Go through the list of event handlers calling each in turn
-	for (RunEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ; iter++)
+	for (RunEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
 	{
 		RunEventHandlerPlusData handlerWithData = *iter ;
+		iter++ ;
 
 		RunEventHandler handler = handlerWithData.m_Handler ;
 		void* pUserData = handlerWithData.m_UserData ;
@@ -549,9 +550,10 @@ void Agent::ReceivedOutputEvent(WMElement* pWmeAdded)
 		return ;
 
 	// Go through the list of event handlers calling each in turn
-	for (OutputEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ; iter++)
+	for (OutputEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
 	{
 		OutputEventHandlerPlusData handlerWithData = *iter ;
+		iter++ ;
 
 		OutputEventHandler handler = handlerWithData.m_Handler ;
 		void* pUserData = handlerWithData.getUserData() ;

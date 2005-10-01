@@ -417,9 +417,10 @@ void Kernel::ReceivedSystemEvent(smlSystemEventId id, AnalyzeXML* pIncoming, Ele
 		return ;
 
 	// Go through the list of event handlers calling each in turn
-	for (SystemEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ; iter++)
+	for (SystemEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
 	{
 		SystemEventHandlerPlusData handlerWithData = *iter ;
+		iter++ ;
 
 		SystemEventHandler handler = handlerWithData.m_Handler ;
 		void* pUserData = handlerWithData.getUserData() ;
@@ -450,9 +451,10 @@ void Kernel::ReceivedUpdateEvent(smlUpdateEventId id, AnalyzeXML* pIncoming, Ele
 		return ;
 
 	// Go through the list of event handlers calling each in turn
-	for (UpdateEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ; iter++)
+	for (UpdateEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
 	{
 		UpdateEventHandlerPlusData handlerWithData = *iter ;
+		iter++ ;
 
 		UpdateEventHandler handler = handlerWithData.m_Handler ;
 		void* pUserData = handlerWithData.getUserData() ;
@@ -498,9 +500,10 @@ void Kernel::ReceivedUntypedEvent(smlUntypedEventId id, AnalyzeXML* pIncoming, E
 		return ;
 
 	// Go through the list of event handlers calling each in turn
-	for (UntypedEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ; iter++)
+	for (UntypedEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
 	{
 		UntypedEventHandlerPlusData handlerWithData = *iter ;
+		iter++ ;
 
 		UntypedEventHandler handler = handlerWithData.m_Handler ;
 		void* pUserData = handlerWithData.getUserData() ;
