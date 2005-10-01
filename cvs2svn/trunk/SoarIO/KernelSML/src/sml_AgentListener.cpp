@@ -82,32 +82,9 @@ void AgentListener::HandleEvent(egSKIAgentEventId eventID, gSKI::IAgent* agentPt
 	if (agentPtr) pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, agentPtr->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 
-#ifdef _DEBUG
-	// Generate a text form of the XML so we can look at it in the debugger.
-	char* pStr = pMsg->GenerateXMLString(true) ;
-#endif
-
-	// Send this message to all listeners
-	ConnectionListIter end = EventManager<egSKIAgentEventId>::GetEnd(eventID) ;
-
+	// Send the message out
 	AnalyzeXML response ;
-
-	while (connectionIter != end)
-	{
-		pConnection = *connectionIter ;
-
-		// It would be faster to just send a message here without waiting for a response
-		// but that could produce incorrect behavior if the client expects to act *during*
-		// the event that we're notifying them about (e.g. notification that we're in the input phase).
-		pConnection->SendMessageGetResponse(&response, pMsg) ;
-
-		connectionIter++ ;
-	}
-
-#ifdef _DEBUG
-	// Release the string form we generated for the debugger
-	pMsg->DeleteString(pStr) ;
-#endif
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
 
 	// Clean up
 	delete pMsg ;

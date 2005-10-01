@@ -242,26 +242,11 @@ void OutputListener::HandleEvent(egSKIWorkingMemoryEventId eventId, gSKI::IAgent
 	// it will release the handle...deleting part of our message.
 	command.Detach() ;
 
-#ifdef _DEBUG
-	// Generate a text form of the XML so we can look at it in the debugger.
-	char* pStr = pMsg->GenerateXMLString(true) ;
-	pMsg->DeleteString(pStr) ;
-#endif
+	egSKIWorkingMemoryEventId eventID = gSKIEVENT_OUTPUT_PHASE_CALLBACK ;
 
-	// Send this message to all listeners
-	ConnectionListIter end = GetEnd(gSKIEVENT_OUTPUT_PHASE_CALLBACK) ;
-
+	// Send the message out
 	AnalyzeXML response ;
-	while (connectionIter != end)
-	{
-		pConnection = *connectionIter ;
-
-		// Send the output to the client.
-		// Waiting for a response allows them to act on the output while we're still in the output phase.
-		pConnection->SendMessageGetResponse(&response, pMsg) ;
-
-		connectionIter++ ;
-	}
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
 
 	// Clean up
 	delete pMsg ;

@@ -13,6 +13,8 @@
 #define EVENT_MANAGER_H
 
 #include "gSKI_Enumerations.h"
+#include "sml_Connection.h"
+#include "sml_ElementXML.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable : 4702)  // warning C4702: unreachable code, need to disable for VS.NET 2003 due to STL "bug" in certain cases
@@ -26,7 +28,6 @@
 namespace sml {
 
 class KernelSML ;
-class Connection ;
 
 // The list of connections interested in an event
 typedef std::list< Connection* >		ConnectionList ;
@@ -171,6 +172,33 @@ public:
 			return NULL ;
 
 		return pList->end() ;
+	}
+
+	virtual void SendEvent(Connection* pConnection, ElementXML* pMsg, AnalyzeXML* pResponse, ConnectionListIter begin, ConnectionListIter end)
+	{
+	#ifdef _DEBUG
+		// Generate a text form of the XML so we can look at it in the debugger.
+		char* pStr = pMsg->GenerateXMLString(true) ;
+	#endif
+
+		ConnectionListIter connectionIter = begin ;
+
+		while (connectionIter != end)
+		{
+			pConnection = *connectionIter ;
+
+			// It would be faster to just send a message here without waiting for a response
+			// but that could produce incorrect behavior if the client expects to act *during*
+			// the event that we're notifying them about (e.g. notification that we're in the input phase).
+			pConnection->SendMessageGetResponse(pResponse, pMsg) ;
+
+			connectionIter++ ;
+		}
+
+	#ifdef _DEBUG
+		// Clean up the string form of the message.
+		pMsg->DeleteString(pStr) ;
+	#endif
 	}
 } ;
 

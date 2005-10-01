@@ -156,30 +156,12 @@ void XMLListener::FlushOutput(egSKIXMLEventId eventID)
 	// Clear the XML trace object, completing the flush.
 	xmlTrace->Reset() ;
 
-#ifdef _DEBUG
-	// Generate a text form of the XML so we can look at it in the debugger.
-	char* pStr = pMsg->GenerateXMLString(true);
-	pMsg->DeleteString(pStr);
-#endif
-
-	// Send this message to all listeners
-	ConnectionListIter end = GetEnd(eventID);
-
-	AnalyzeXML response;
-
-	while (connectionIter != end)
-	{
-		pConnection = *connectionIter;
-		connectionIter++;
-
-		// It would be faster to just send a message here without waiting for a response
-		// but that could produce incorrect behavior if the client expects to act *during*
-		// the event that we're notifying them about (e.g. notification that we're in the input phase).
-		pConnection->SendMessageGetResponse(&response, pMsg);
-	}
+	// Send the message out
+	AnalyzeXML response ;
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
 
 	// Clean up
-	delete pMsg;
+	delete pMsg ;
 }
 
 // Echo the list of wmes received back to any listeners
@@ -228,33 +210,11 @@ void XMLListener::FireInputReceivedEvent(ElementXML const* pCommands)
 	// it will release the handle...deleting part of our message.
 	command.Detach() ;
 
-#ifdef _DEBUG
-	// Generate a text form of the XML so we can look at it in the debugger.
-	char* pStr = pMsg->GenerateXMLString(true);
-#endif
-
-	// Send this message to all listeners
-	ConnectionListIter end = GetEnd(eventID);
-
-	AnalyzeXML response;
-
-	while (connectionIter != end)
-	{
-		pConnection = *connectionIter;
-		connectionIter++;
-
-		// It would be faster to just send a message here without waiting for a response
-		// but that could produce incorrect behavior if the client expects to act *during*
-		// the event that we're notifying them about (e.g. notification that we're in the input phase).
-		pConnection->SendMessageGetResponse(&response, pMsg);
-	}
-
-#ifdef _DEBUG
-	pMsg->DeleteString(pStr);
-#endif
+	// Send the message out
+	AnalyzeXML response ;
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
 
 	// Clean up
-	delete pMsg;
-
+	delete pMsg ;
 }
 
