@@ -594,7 +594,7 @@ void reinitialize_all_agents ( Kernel* thisKernel ) {
 }
   
 
-void reinitialize_soar (agent* thisAgent) {
+bool reinitialize_soar (agent* thisAgent) {
 
   /* kjh (CUSP-B4) begin */
   long cur_TRACE_CONTEXT_DECISIONS_SYSPARAM;
@@ -646,7 +646,7 @@ void reinitialize_soar (agent* thisAgent) {
   do_preference_phase (thisAgent);   /* allow all instantiations to retract */
 
   reset_explain(thisAgent);
-  reset_id_counters (thisAgent);
+  bool ok = reset_id_counters (thisAgent);
   reset_wme_timetags (thisAgent);
   reset_statistics (thisAgent);
 
@@ -685,6 +685,7 @@ void reinitialize_soar (agent* thisAgent) {
   /* REW: end 09.15.96 */
 
   // voigtjr: WARN_IF_TIMERS_REPORT_ZERO block goes here in other kernel
+  return ok ;
 }
 
 /* ===================================================================

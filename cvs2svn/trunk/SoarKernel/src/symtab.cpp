@@ -463,7 +463,7 @@ Bool print_identifier_ref_info(agent* thisAgent, void* item, FILE* f) {
    return TRUE;
 }
 
-void reset_id_counters (agent* thisAgent) {
+bool reset_id_counters (agent* thisAgent) {
   int i;
 
   if (thisAgent->identifier_hash_table->count != 0) {
@@ -475,9 +475,10 @@ void reset_id_counters (agent* thisAgent) {
     /* RDF 01272003: Added this to improve the output from this error message */
 	//TODO: append this to previous XML string or generate separate output?
     do_for_all_items_in_hash_table( thisAgent, thisAgent->identifier_hash_table, print_identifier_ref_info, 0);
-    return;
+    return false;
   }
   for (i=0; i<26; i++) thisAgent->id_counter[i]=1;  
+  return true ;
 }
 
 Bool reset_tc_num (agent* thisAgent, void *item, FILE* f) {

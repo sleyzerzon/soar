@@ -1281,6 +1281,25 @@ bool Agent::GetLastCommandLineResult()
 }
 
 /*************************************************************
+* @brief Returns true if this string is the name of a production
+*		 that is currently loaded in the agent.
+*************************************************************/
+bool Agent::IsProductionLoaded(char const* pProductionName)
+{
+	if (!pProductionName)
+		return false ;
+
+	AnalyzeXML response ;
+
+	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_IsProductionLoaded, GetAgentName(), sml_Names::kParamName, pProductionName) ;
+
+	if (!ok)
+		return false ;
+
+	return response.GetResultBool(false) ;
+}
+
+/*************************************************************
 * @brief This method is used to update this client's representation
 *		 of the input link to match what is currently on the agent's
 *		 input link.

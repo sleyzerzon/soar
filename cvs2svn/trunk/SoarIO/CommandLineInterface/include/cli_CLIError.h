@@ -96,6 +96,7 @@ namespace cli {
 			kProductionMemoryNotEmpty			= 81, // FIXME: add to wiki
 			kSoar7Command						= 82, // FIXME: add to wiki
 			kInvalidBackslashEscapeCharacter	= 83, // FIXME: add to wiki
+			kInitSoarFailed						= 84, // FIXME: add to wiki
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -177,6 +178,7 @@ namespace cli {
 				case kProductionMemoryNotEmpty:			return "Can't change modes unless production memory is empty."; // FIXME: add to wiki
 				case kSoar7Command:						return "Command valid in Soar 7 mode only."; // FIXME: add to wiki
 				case kInvalidBackslashEscapeCharacter:	return "Invalid backslash escape character, see documentation."; // FIXME: add to wiki
+				case kInitSoarFailed:					return "Agent could not be reinitialized.  Probably due to an internal memory leak." ;
 				default:								return "Unknown error code.";
 			}
 		}

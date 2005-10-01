@@ -626,6 +626,12 @@ public:
 	bool GetLastCommandLineResult();
 
 	/*************************************************************
+	* @brief Returns true if this string is the name of a production
+	*		 that is currently loaded in the agent.
+	*************************************************************/
+	bool IsProductionLoaded(char const* pProductionName) ;
+
+	/*************************************************************
 	* @brief This method is used to update this client's representation
 	*		 of the input link to match what is currently on the agent's
 	*		 input link.

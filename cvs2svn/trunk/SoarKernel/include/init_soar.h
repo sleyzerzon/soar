@@ -113,7 +113,7 @@ extern void remove_pwatch (agent* thisAgent, struct production_struct *prod);
 --------------------------------------------------------------------- */
 
 extern void reinitialize_all_agents (Kernel* thisKernel);
-extern void reinitialize_soar (agent* thisAgent);
+extern bool reinitialize_soar (agent* thisAgent);
 
 /* ---------------------------------------------------------------------
                          Reinitializing Soar

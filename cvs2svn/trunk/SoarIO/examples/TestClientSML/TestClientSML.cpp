@@ -425,6 +425,18 @@ std::string MyRhsFunctionHandler(smlRhsEventId id, void* pUserData, Agent* pAgen
 	return res ;
 }
 
+bool InitSoarAgent(Agent* pAgent, bool doInitSoars)
+{
+	if (doInitSoars)
+	{
+		char const* pResult = pAgent->InitSoar() ;
+		cout << pResult << endl ;
+		return pAgent->GetLastCommandLineResult() ;
+	}
+
+	return true;
+}
+
 bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 {
 	// Record a RHS function
@@ -441,8 +453,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	if (!pInputLink)
 		cout << "Error getting input link" << endl ;
 
-	if (doInitSoars)
-		pAgent->InitSoar() ;
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
 
 	cout << "Done our first init-soar" << endl ;
 
@@ -459,10 +471,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	bool ok = pAgent->Commit() ;
 
-	if (doInitSoars)
-	{
-		pAgent->InitSoar() ;
-	}
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
 
 	//pAgent->UnregisterForXMLEvent(inputReceived) ;
 
@@ -473,8 +483,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	ok = pAgent->Commit() ;
 
-	if (doInitSoars)
-		pAgent->InitSoar() ;
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
 	
 	// Remove a wme
 	pAgent->DestroyWME(pWME3) ;
@@ -499,8 +509,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	pAgent->DestroyWME(pID) ;
 	pAgent->Commit() ;
 
-	if (doInitSoars)
-		pAgent->InitSoar() ;
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
 
 	// Throw in a pattern as a test
 	std::string pattern = pAgent->ExecuteCommandLine("print -i (s1 ^* *)") ;
@@ -830,8 +840,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	// Removed the test part for now. Stats doesn't report anything.
 	int callback3 = pAgent->RegisterForRunEvent(smlEVENT_AFTER_DECISION_CYCLE, MyInterruptHandler, 0) ;
 
-	if (doInitSoars)
-		pAgent->InitSoar() ;
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
 
 	pAgent->RunSelf(20) ;
 

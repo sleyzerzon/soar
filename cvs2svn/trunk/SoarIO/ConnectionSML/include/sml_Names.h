@@ -377,6 +377,7 @@ public:
 	static char const* const kCommand_SetConnectionInfo ;
 	static char const* const kCommand_GetAllInput ;
 	static char const* const kCommand_GetRunState ;
+	static char const* const kCommand_IsProductionLoaded	;
 
 	// Command line interface
 	static char const* const kCommand_CommandLine ;

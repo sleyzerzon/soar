@@ -328,7 +328,7 @@ namespace gSKI
       // reinitialize_soar cleans out the agents memory the 
       // init_agent_memory call adds back in the top state and
       // other misc. objects and wmes.
-      reinitialize_soar( m_agent );
+      bool ok = reinitialize_soar( m_agent );
       init_agent_memory( m_agent );
 
 	  // just for completeness, let's update the counters properly from the kernel...
@@ -338,7 +338,7 @@ namespace gSKI
       // Tell listeners it is over
       am->FireAfterAgentReinitialized(this);
 
-      return false;
+      return ok;
    }
 
    /*

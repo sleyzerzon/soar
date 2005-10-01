@@ -390,6 +390,7 @@ char const* const sml_Names::kCommand_GetConnections		= "get_connections" ;
 char const* const sml_Names::kCommand_SetConnectionInfo		= "set_connection_info" ;
 char const* const sml_Names::kCommand_GetAllInput			= "get_all_input" ;
 char const* const sml_Names::kCommand_GetRunState			= "get_run_state" ;
+char const* const sml_Names::kCommand_IsProductionLoaded	= "is_production_loaded" ;
 
 // command line interface
 char const* const sml_Names::kCommand_CommandLine		 = "cmdline" ;

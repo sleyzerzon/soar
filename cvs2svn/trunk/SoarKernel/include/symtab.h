@@ -328,7 +328,7 @@ extern Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_sta
 
 extern void deallocate_symbol (agent* thisAgent, Symbol *sym);
 
-extern void reset_id_counters (agent* thisAgent);
+extern bool reset_id_counters (agent* thisAgent);
 extern void reset_id_and_variable_tc_numbers (agent* thisAgent);
 extern void reset_variable_gensym_numbers (agent* thisAgent);
 extern void print_internal_symbols (agent* thisAgent);
