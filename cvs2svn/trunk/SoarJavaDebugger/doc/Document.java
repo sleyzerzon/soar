@@ -241,6 +241,14 @@ public class Document
 		return m_Kernel.ExpandCommandLine(commandLine) ;
 	}
 	
+	public boolean isProductionLoaded(Agent agent, String productionName)
+	{
+		if (agent == null)
+			return false ;
+		
+		return agent.IsProductionLoaded(productionName) ;
+	}
+	
 	/********************************************************************************************
 	 * 
 	 * We maintain a list of MainFrames in the debugger.  A MainFrame has a menu bar and children.

@@ -594,7 +594,20 @@ public class FoldingText
 		m_Text.addListener (SWT.KeyUp, listener);
 		m_Text.addListener (SWT.Resize, listener);
 		
+		// Because the above tests aren't always correct we'll also use a timer to redraw the icon bar
+		// at a slow rate.  This ensures the icons are correct after the delay has passed in all cases.
+		// (We're using a slow timer rather than calling redraw after each line of text is added, for instance,
+		//  to boost overall performance).  In practice this timer is correcting a minor cosmetic issue so it's
+		// not worth trading real performance for.
+		periodicRepaint(500) ;
+		
 		m_LastTopIndex = m_Text.getTopIndex() ;
+	}
+	
+	private void periodicRepaint(final int delayMillis)
+	{
+		// Every n milliseconds redraw the icon bar
+		m_Text.getDisplay().timerExec(delayMillis, new Runnable() { public void run() { if (!m_IconBar.isDisposed()) { m_IconBar.redraw() ; periodicRepaint(delayMillis) ; } }} ) ;
 	}
 	
 	public void scrolled()

@@ -181,7 +181,7 @@ public class TextTraceView extends AbstractComboView
 		
 		ParseSelectedText selection = new ParseSelectedText(m_Text.getText(), pos) ;
 		
-		return selection.getParsedObject() ;
+		return selection.getParsedObject(this.m_Document, this.getAgentFocus()) ;
 	}
 
 	/********************************************************************************************

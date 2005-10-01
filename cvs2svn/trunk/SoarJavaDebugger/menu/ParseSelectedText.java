@@ -18,6 +18,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.events.*;
 
+import sml.Agent;
+
 import doc.Document;
 
 /************************************************************************
@@ -219,7 +221,7 @@ public class ParseSelectedText
 		return max ;
 	}
 	
-	protected boolean isProductionName(String token)
+	protected boolean isProductionNameQuickTest(String token)
 	{
 		if (token == null || token.length() == 0)
 			return false ;
@@ -233,6 +235,14 @@ public class ParseSelectedText
 			return false ;
 		
 		return true ;
+	}
+	
+	protected boolean isProductionNameAskKernel(Document doc, Agent agent, String token)
+	{
+		if (token == null || token.length() == 0)
+			return false ;
+
+		return doc.isProductionLoaded(agent, token) ;
 	}
 	
 	protected boolean isAttribute(String token)
@@ -269,10 +279,11 @@ public class ParseSelectedText
 	 * the new XML representations.
 	 * 
 	**********************************************************************************************/
-	public SelectedObject getParsedObject()
+	public SelectedObject getParsedObject(Document doc, Agent agent)
 	{
 		String curr = m_Tokens[kCurrToken] ;
-		if (isProductionName(curr))
+
+		if (isProductionNameQuickTest(curr))
 			return new SelectedProduction(curr) ;
 		
 		if (isAttribute(curr))
@@ -308,6 +319,11 @@ public class ParseSelectedText
 		{
 			return new SelectedID(curr) ;
 		}
+		
+		// As a final test check the string against the real list of production names in the kernel
+		// We do this last so that most RHS clicks this doesn't come up.
+		if (isProductionNameAskKernel(doc, agent, curr))
+			return new SelectedProduction(curr) ;
 		
 		return new SelectedUnknown(curr) ;
 	}
