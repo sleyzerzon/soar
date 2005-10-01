@@ -200,6 +200,8 @@ protected:
 
 	void InitEvents() ;
 
+	static int GetgSKIRunType(smlRunStepSize stepSize, bool forever) ;
+
 	/*************************************************************
 	* @brief Register for a particular event with the kernel.
 	*		 (This is a primitive function, should call one of the

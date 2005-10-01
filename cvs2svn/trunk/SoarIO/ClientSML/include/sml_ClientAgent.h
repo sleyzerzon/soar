@@ -551,9 +551,11 @@ public:
 	* @brief   Controls whether Soar will break when it next generates
 	*		   output while running.
 	*
+	*		   Now deprecated.  Use RunSelfTilOutput instead.
+	*
 	* @param state	If true, causes Soar to break on output.  If false, Soar will not break.
 	*************************************************************/
-	bool SetStopSelfOnOutput(bool state) ;
+	// bool SetStopSelfOnOutput(bool state) ;
 
 	/*************************************************************
 	* @brief   Run Soar until either output is generated or

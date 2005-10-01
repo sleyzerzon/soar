@@ -756,20 +756,65 @@ EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool inp
 	return (Direct_WMObject_Handle)pRoot ;
 }
 
-EXPORT void sml_DirectRun(char const* pAgentName, int decisions, bool clearInterrupts)
+EXPORT void sml_DirectRun(char const* pAgentName, int typeOfRun, int count)
 {
-	unused(pAgentName) ; unused(decisions) ; unused(clearInterrupts) ;
+	// A fully direct run would be a call straight to gSKI but supporting that is too dangerous
+	// due to the extra events and control logic surrounding the SML RunScheduler.
+	// So we compromise with a call directly to that scheduler, boosting performance over the standard "run" path
+	// which goes through the command line processor.
+	egSKIRunType runType = (egSKIRunType)typeOfRun ;
+	KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
 
-	// We no longer support running Soar directly through this shortcut.
-	// Providing this path just makes event handling too complex (because events may occur in different orders/ways
-	// if the run call is made through this direct path).
-	// The direct I/O methods are all still valid, but to actually run Soar you should call
-	// one of the normal SML run methods.
-	
-	// BADBAD: Actually, as long as this calls into the SML run scheduler (which has been recently added) rather than directly into gSKI
-	// there should be no problem adding this back in.
-	// Given that we should expand the parameter set to support either one agent or all agents
-	// and provide different step sizes.  I.E. The full set of capabilities the run command currently offers.
+	RunScheduler* pScheduler = pKernelSML->GetRunScheduler() ;
+	smlRunFlags runFlags = sml_NONE ;
+
+	if (pAgentName)
+	{
+		gSKI::IAgent* pAgent = pKernelSML->GetAgent(pAgentName) ;
+		
+		if (!pAgent)
+			return ;
+
+		AgentSML* pAgentSML = pKernelSML->GetAgentSML(pAgent) ;
+		runFlags = (smlRunFlags)(runFlags | sml_RUN_SELF) ;
+
+		// Schedule just this one agent to run
+		pScheduler->ScheduleAllAgentsToRun(false) ;
+		pScheduler->ScheduleAgentToRun(pAgentSML, true) ;
+	}
+	else
+	{
+		runFlags = (smlRunFlags)(runFlags | sml_RUN_ALL) ;
+
+		// Ask all agents to run
+		pScheduler->ScheduleAllAgentsToRun(true) ;
+	}
+
+	// Decide how large of a step to run each agent before switching to the next agent
+	// By default, we run one phase per agent but this isn't always appropriate.
+	egSKIRunType interleaveStepSize = gSKI_RUN_PHASE ;
+
+	switch (runType)
+	{
+		// If the entire system is running by elaboration cycles, then we need to run each agent by elaboration cycles (they're usually
+		// smaller than a phase).
+		case gSKI_RUN_ELABORATION_CYCLE: interleaveStepSize = gSKI_RUN_ELABORATION_CYCLE ; break ;
+
+		// If we're running the system to output we want to run each agent until it generates output.  This can be many decisions.
+		// The reason is actually to do with stopping the agent after n decisions (default 15) if no output occurs.
+		// DJP -- We need to rethink this design so using phase interleaving until we do.
+		// case gSKI_RUN_UNTIL_OUTPUT: interleaveStepSize = gSKI_RUN_UNTIL_OUTPUT ; break ;
+
+		default: interleaveStepSize = gSKI_RUN_PHASE ; break ;
+	}
+
+	// If we're running by decision cycle synchronize up the agents to the same phase before we start
+	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
+
+	// Do the run
+	egSKIRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, NULL) ;
+
+	unused(runResult) ;
 
 	return ;
 }

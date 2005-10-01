@@ -221,6 +221,7 @@ typedef enum
 	sml_ELABORATION,
 	sml_PHASE,
 	sml_DECISION,
+	sml_UNTIL_OUTPUT,
 } smlRunStepSize ;
 
 typedef enum

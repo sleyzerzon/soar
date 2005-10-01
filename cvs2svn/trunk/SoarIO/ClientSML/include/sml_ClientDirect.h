@@ -13,8 +13,10 @@
 #ifndef SML_CLIENT_DIRECT_H
 #define SML_CLIENT_DIRECT_H
 
+#ifndef SML_DISABLE_DIRECT_METHODS
 // Defining this allows us to make direct calls to kernel sml
 #define SML_DIRECT
+#endif
 
 #ifdef __cplusplus
 extern "C" {

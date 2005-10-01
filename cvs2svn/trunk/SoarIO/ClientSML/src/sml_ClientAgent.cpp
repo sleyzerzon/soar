@@ -1134,6 +1134,14 @@ char const*	Agent::StopSelf()
 *************************************************************/
 char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
 {
+#ifdef SML_DIRECT
+		if (GetConnection()->IsDirectConnection())
+		{
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), sml::Kernel::GetgSKIRunType(stepSize, false), (int)numberSteps) ;
+			return "DirectRun completed" ;
+		}
+#endif
+
 	// Convert int to a string
 	std::ostringstream ostr ;
 	ostr << numberSteps ;
@@ -1149,6 +1157,14 @@ char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
 
 char const* Agent::RunSelfForever()
 {
+#ifdef SML_DIRECT
+		if (GetConnection()->IsDirectConnection())
+		{
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), sml::Kernel::GetgSKIRunType(sml_DECISION, true), 1) ;
+			return "DirectRun completed" ;
+		}
+#endif
+
 	// Create the command line for the run command
 	std::string cmd = "run --self" ;
 
@@ -1161,8 +1177,11 @@ char const* Agent::RunSelfForever()
 * @brief   Controls whether this agent will break when it next generates
 *		   output while running.
 *
+*		   Now deprecated.  Use RunSelfTilOutput instead.
+*
 * @param state	If true, causes Soar to break on output.  If false, Soar will not break.
 *************************************************************/
+/*
 bool Agent::SetStopSelfOnOutput(bool state)
 {
 	AnalyzeXML response ;
@@ -1170,6 +1189,7 @@ bool Agent::SetStopSelfOnOutput(bool state)
 	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_StopOnOutput, GetAgentName(), sml_Names::kParamValue, state ? sml_Names::kTrue : sml_Names::kFalse) ;
 	return ok ;
 }
+*/
 
 /*************************************************************
 * @brief   Run Soar until either output is generated or
@@ -1188,6 +1208,14 @@ bool Agent::SetStopSelfOnOutput(bool state)
 *************************************************************/
 char const* Agent::RunSelfTilOutput(unsigned long maxDecisions)
 {
+#ifdef SML_DIRECT
+		if (GetConnection()->IsDirectConnection())
+		{
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), sml::Kernel::GetgSKIRunType(sml_UNTIL_OUTPUT, false), 1) ;
+			return "DirectRun completed" ;
+		}
+#endif
+
 	// Run this agent until it generates output.
 	// For now, maxDecisions is being ignored.  We should make this a separate call
 	// to set this parameter.
