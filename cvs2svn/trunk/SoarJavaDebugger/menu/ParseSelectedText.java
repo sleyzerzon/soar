@@ -227,7 +227,7 @@ public class ParseSelectedText
 			return false ;
 		
 		// Productions almost always start with a lower case character
-		if (token.charAt(0) < 'a' && token.charAt(0) > 'z')
+		if (token.charAt(0) < 'a' || token.charAt(0) > 'z')
 			return false ;
 		
 		// Production names almost always include multiple *'s

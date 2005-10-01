@@ -243,7 +243,7 @@ public class Document
 	
 	public boolean isProductionLoaded(Agent agent, String productionName)
 	{
-		if (agent == null)
+		if (agent == null || !this.isConnected())
 			return false ;
 		
 		return agent.IsProductionLoaded(productionName) ;
