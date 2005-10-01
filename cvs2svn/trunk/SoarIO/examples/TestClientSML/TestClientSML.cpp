@@ -1048,6 +1048,14 @@ bool TestSML(bool embedded, bool useClientThread, bool fullyOptimized, bool simp
 
 			cout << "Loaded productions" << endl ;
 
+			ok = ok && pAgent->IsProductionLoaded("apply*move") ;
+			ok = ok && !pAgent->IsProductionLoaded("made*up*name") ;
+
+			if (!ok)
+			{
+				cout << "ERROR checking whether specific productions are loaded" ;
+			}
+
 			if (!ok)
 				return false ;
 		}

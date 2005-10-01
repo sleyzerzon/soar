@@ -143,6 +143,7 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_SetConnectionInfo] = &sml::KernelSML::HandleSetConnectionInfo ;
 	m_CommandMap[sml_Names::kCommand_GetAllInput]		= &sml::KernelSML::HandleGetAllInput ;
 	m_CommandMap[sml_Names::kCommand_GetRunState]		= &sml::KernelSML::HandleGetRunState ;
+	m_CommandMap[sml_Names::kCommand_IsProductionLoaded]= &sml::KernelSML::HandleIsProductionLoaded ;
 }
 
 /*************************************************************
@@ -520,6 +521,26 @@ bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName
 	}
 
 	return this->ReturnResult(pConnection, pResponse, buffer) ;
+}
+
+// Returns true if the production name is currently loaded
+bool KernelSML::HandleIsProductionLoaded(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+{
+	unused(pCommandName) ; unused(pIncoming) ;
+
+	// Look up the name of the production
+	char const* pName = pIncoming->GetArgString(sml_Names::kParamName) ;
+
+	if (!pName)
+	{
+		return InvalidArg(pConnection, pResponse, pCommandName, "Need to specify the production name to check.") ;
+	}
+
+	tIProductionIterator* prodIter = pAgent->GetProductionManager()->GetProduction(pName, pError) ;
+	bool found = prodIter->GetNumElements() > 0 ;
+	prodIter->Release() ;
+
+	return ReturnBoolResult(pConnection, pResponse, found) ;
 }
 
 bool KernelSML::HandleGetVersion(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
