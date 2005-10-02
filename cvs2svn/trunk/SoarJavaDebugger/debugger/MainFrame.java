@@ -258,7 +258,7 @@ public class MainFrame
 		return m_Parent.getDisplay();
 	}
 
-	protected static int ShowMessageBox(Shell shell, String title, String text, int style)
+	public static int ShowMessageBox(Shell shell, String title, String text, int style)
 	{
 		// Only show messages once the shell itself is going
 		if (!shell.isVisible())

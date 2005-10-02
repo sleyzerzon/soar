@@ -125,6 +125,17 @@ public class FormDataHelper
 	}
 
 	// Anchor to the top-left of the form
+	static public FormData anchorTopRight(int offset)
+	{
+		FormData data = new FormData() ;
+		
+		data.right = new FormAttachment(100, -offset) ;
+		data.top  = new FormAttachment(0, offset) ;
+		
+		return data ;
+	}
+
+	// Anchor to the top-left of the form
 	static public FormData anchorBottomLeft(int offset)
 	{
 		FormData data = new FormData() ;

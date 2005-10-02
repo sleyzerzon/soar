@@ -27,6 +27,7 @@ import sml.Agent;
 import java.util.*;
 import debugger.MainFrame;
 import dialogs.PropertiesDialog;
+import dialogs.ReorderButtonsDialog;
 import doc.Document;
 
 /********************************************************************************************
@@ -36,12 +37,12 @@ import doc.Document;
 ********************************************************************************************/
 public class ButtonView extends AbstractFixedView
 {
-	protected static class ButtonInfo
+	public static class ButtonInfo
 	{
-		protected String	m_Name ;
-		protected String	m_Command ;
-		protected String	m_InternalCommand ;
-		protected Button	m_Button ;
+		public String	m_Name ;
+		public String	m_Command ;
+		public String	m_InternalCommand ;
+		public Button	m_Button ;
 	}
 	
 	/** A list of ButtonInfo objects */
@@ -218,6 +219,22 @@ public class ButtonView extends AbstractFixedView
 			m_Frame.saveCurrentLayoutFile() ;
 		}
 	}
+	
+	protected void reorderButtons()
+	{
+		ArrayList buttonList = ReorderButtonsDialog.showDialog(m_Frame.getWindow(), "Reorder the list of buttons", m_ButtonList) ;
+		
+		if (buttonList == null)
+			return ;
+		
+		m_ButtonList = buttonList ;
+
+		// Recreate the button panel
+		createButtonPanel(m_Container.getParent()) ;
+		
+		// Save the new layout, so a debugger crash (when working on a new layout) doesn't lose the work.
+		m_Frame.saveCurrentLayoutFile() ;
+	}
 
 	/************************************************************************
 	* 
@@ -235,11 +252,19 @@ public class ButtonView extends AbstractFixedView
 	{
 		if (control instanceof Button)
 		{
+			// The user has clicked on a specific button, so add menu items related to that button
+			
 			MenuItem item = addButtonViewItem(contextMenu, "Edit button...") ;
 
 			item.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) { editButton((Button)control) ; } } ) ;
 
+			item = addButtonViewItem(contextMenu, "Reorder buttons...") ;
+			
+			item.addSelectionListener(new SelectionAdapter() { 
+				public void widgetSelected(SelectionEvent e) { reorderButtons() ; }
+			}) ;
+			
 			new MenuItem(contextMenu, SWT.SEPARATOR) ;
 			item = addButtonViewItem(contextMenu, "Remove button") ;
 			new MenuItem(contextMenu, SWT.SEPARATOR) ;
@@ -251,10 +276,18 @@ public class ButtonView extends AbstractFixedView
 		}
 		else
 		{
+			// The user has clicked on the button bar, but not on a specific button.
+			
 			MenuItem item = addButtonViewItem(contextMenu, "Add button...") ;
 
 			item.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) { addButton() ; } } ) ;
+
+			item = addButtonViewItem(contextMenu, "Reorder buttons...") ;
+			
+			item.addSelectionListener(new SelectionAdapter() { 
+				public void widgetSelected(SelectionEvent e) { reorderButtons() ; }
+			}) ;
 
 			item = addButtonViewItem(contextMenu, "Edit/remove button...") ;
 
