@@ -56,10 +56,12 @@ class PrintEventHandlerPlusData : public EventHandlerPlusData
 {
 public:
 	PrintEventHandler m_Handler ;
+	bool m_IgnoreOwnEchos ;
 
-	PrintEventHandlerPlusData(int eventID, PrintEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
+	PrintEventHandlerPlusData(int eventID, PrintEventHandler handler, void* userData, bool ignoreOwnEchos, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
 		m_Handler = handler ;
+		m_IgnoreOwnEchos = ignoreOwnEchos ;
 	}
 } ;
 
@@ -389,6 +391,7 @@ public:
 	* @param smlEventId		The event we're interested in (see the list below for valid values)
 	* @param handler		A function that will be called when the event happens
 	* @param pUserData		Arbitrary data that will be passed back to the handler function when the event happens.
+	* @param ignoreOwnEchos If true and registering for echo event, commands issued through this connection won't echo.  If false, echos all commands.  Ignored for non-echo events.
 	* @param addToBack		If true add this handler is called after existing handlers.  If false, called before existing handlers.
 	*
 	* Current set is:
@@ -396,7 +399,7 @@ public:
 	*
 	* @returns A unique ID for this callback (used to unregister the callback later) 
 	*************************************************************/
-	int	RegisterForPrintEvent(smlPrintEventId id, PrintEventHandler handler, void* pUserData, bool addToBack = true) ;
+	int	RegisterForPrintEvent(smlPrintEventId id, PrintEventHandler handler, void* pUserData, bool ignoreOwnEchos = true, bool addToBack = true) ;
 
 	/*************************************************************
 	* @brief Unregister for a particular event

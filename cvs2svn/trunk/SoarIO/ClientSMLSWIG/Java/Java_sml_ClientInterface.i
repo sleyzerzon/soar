@@ -47,7 +47,7 @@
   
   public final static native int Agent_RegisterForRunEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
   public final static native int Agent_RegisterForProductionEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Agent_RegisterForPrintEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
+  public final static native int Agent_RegisterForPrintEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6, boolean jarg7);
   public final static native int Agent_RegisterForXMLEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
   public final static native int Agent_AddOutputHandler(long jarg1, String jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
   public final static native int Kernel_RegisterForSystemEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
@@ -76,7 +76,10 @@
   { return smlJNI.Agent_RegisterForProductionEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ; }
 
   public int RegisterForPrintEvent(smlPrintEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Agent_RegisterForPrintEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ; }
+  { return smlJNI.Agent_RegisterForPrintEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData, true) ; }
+
+  public int RegisterForPrintEvent(smlPrintEventId id, Object handlerObject, String handlerMethod, Object callbackData, boolean ignoreOwnEchos)
+  { return smlJNI.Agent_RegisterForPrintEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData, ignoreOwnEchos) ; }
 
   public int RegisterForXMLEvent(smlXMLEventId id, Object handlerObject, String handlerMethod, Object callbackData)
   { return smlJNI.Agent_RegisterForXMLEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ; }

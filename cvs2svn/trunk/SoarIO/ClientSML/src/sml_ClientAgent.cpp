@@ -139,6 +139,9 @@ void Agent::ReceivedPrintEvent(smlPrintEventId id, AnalyzeXML* pIncoming, Elemen
 
 	char const* pMessage = pIncoming->GetArgString(sml_Names::kParamMessage) ;
 
+	// This argument is only present on echo messages.
+	bool self = pIncoming->GetArgBool(sml_Names::kParamSelf, false) ;
+
 	// Look up the handler(s) from the map
 	PrintEventMap::ValueList* pHandlers = m_PrintEventMap.getList(id) ;
 
@@ -150,6 +153,11 @@ void Agent::ReceivedPrintEvent(smlPrintEventId id, AnalyzeXML* pIncoming, Elemen
 	{
 		PrintEventHandlerPlusData handlerPlus = *iter ;
 		PrintEventHandler handler = handlerPlus.m_Handler ;
+		bool ignoreOwnEchos = handlerPlus.m_IgnoreOwnEchos ;
+
+		// If this is an echo event triggered by a command issued by ourselves ignore it.
+		if (id == smlEVENT_ECHO && ignoreOwnEchos && self)
+			continue ;
 
 		void* pUserData = handlerPlus.m_UserData ;
 
@@ -640,6 +648,7 @@ bool Agent::UnregisterForProductionEvent(int callbackID)
 * @param smlEventId		The event we're interested in (see the list below for valid values)
 * @param handler		A function that will be called when the event happens
 * @param pUserData		Arbitrary data that will be passed back to the handler function when the event happens.
+* @param ignoreOwnEchos If true and registering for echo event, commands issued through this connection won't echo.  If false, echos all commands.  Ignored for non-echo events.
 * @param addToBack		If true add this handler is called after existing handlers.  If false, called before existing handlers.
 *
 * Current set is:
@@ -648,13 +657,13 @@ bool Agent::UnregisterForProductionEvent(int callbackID)
 *
 * @returns A unique ID for this callback (used to unregister the callback later) 
 *************************************************************/
-int Agent::RegisterForPrintEvent(smlPrintEventId id, PrintEventHandler handler, void* pUserData, bool addToBack)
+int Agent::RegisterForPrintEvent(smlPrintEventId id, PrintEventHandler handler, void* pUserData, bool ignoreOwnEchos, bool addToBack)
 {
 	// Start by checking if this id, handler, pUSerData combination has already been registered
 	TestPrintCallbackFull test(id, handler, pUserData) ;
 
 	// See if this handler is already registered
-	PrintEventHandlerPlusData plus(0,0,0,0) ;
+	PrintEventHandlerPlusData plus(0,0,0,false,0) ;
 	bool found = m_PrintEventMap.findFirstValueByTest(&test, &plus) ;
 
 	if (found && plus.m_Handler != 0)
@@ -670,7 +679,7 @@ int Agent::RegisterForPrintEvent(smlPrintEventId id, PrintEventHandler handler, 
 	// Record the handler
 	m_CallbackIDCounter++ ;
 
-	PrintEventHandlerPlusData handlerPlus(id, handler, pUserData, m_CallbackIDCounter) ;
+	PrintEventHandlerPlusData handlerPlus(id, handler, pUserData, ignoreOwnEchos, m_CallbackIDCounter) ;
 	m_PrintEventMap.add(id, handlerPlus, addToBack) ;
 
 	// Return the ID.  We use this later to unregister the callback

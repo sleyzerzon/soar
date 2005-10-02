@@ -692,8 +692,10 @@ public abstract class AbstractComboView extends AbstractView
 		if (m_ShowTraceOutput && m_PrintCallback == -1)
 			m_PrintCallback = agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, this, "printEventHandler", this) ;
 
+		// If we issue a command which is echoed, ignore that echo event.  Otherwise we'll get 2 sets of output from that command.
+		boolean ignoreOwnEchos = true ;
 		if (m_ShowEchoOutput && m_EchoCallback == -1)
-			m_EchoCallback = agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_ECHO, this, "printEventHandler", this) ;
+			m_EchoCallback = agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_ECHO, this, "printEventHandler", this, ignoreOwnEchos) ;
 
 		if (m_UpdateEveryNthDecision > 0 && m_DecisionCallback == -1)
 			m_DecisionCallback = agent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, this, "runEventHandler", this) ;

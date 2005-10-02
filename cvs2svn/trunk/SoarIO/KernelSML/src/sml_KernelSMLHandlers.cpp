@@ -1096,6 +1096,18 @@ bool KernelSML::HandleInput(gSKI::IAgent* pAgent, char const* pCommandName, Conn
 	return ok ;
 }
 
+static bool AlwaysEchoCommand(char const* pCommandLine)
+{
+	if (!pCommandLine)
+		return false ;
+
+	// BADBAD: Can't do this here--we need to cover aliases etc.  Need to do inside command line logic.
+	if (strcmp(pCommandLine, "init-soar") == 0)
+		return true ;
+
+	return false ;
+}
+
 // Executes a generic command line for a specific agent
 bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
@@ -1111,6 +1123,8 @@ bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName
 	// Get the parameters
 	char const* pLine = pIncoming->GetArgString(sml_Names::kParamLine) ;
 	bool echoResults  = pIncoming->GetArgBool(sml_Names::kParamEcho, false) ;
+
+	echoResults = echoResults || AlwaysEchoCommand(pLine) ;
 
 	bool rawOutput = false;
 
@@ -1137,7 +1151,7 @@ bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName
 		AgentSML* pAgentSML = this->GetAgentSML(pAgent) ;
 
 		if (pAgentSML)
-			pAgentSML->FireEchoEvent(pLine) ;
+			pAgentSML->FireEchoEvent(pConnection, pLine) ;
 	}
 
 	// Make the call.

@@ -167,7 +167,7 @@ public:
 	*			to issue a command and have another client (typically the debugger)
 	*			listen in on the output.
 	*************************************************************/
-	void FireEchoEvent(char const* pMessage) { m_PrintListener.HandleEvent(gSKIEVENT_ECHO, m_pIAgent, pMessage) ; m_PrintListener.FlushOutput(gSKIEVENT_ECHO) ; }
+	void FireEchoEvent(Connection* pConnection, char const* pMessage) { m_PrintListener.HandleEvent(gSKIEVENT_ECHO, m_pIAgent, pMessage) ; m_PrintListener.FlushOutput(pConnection, gSKIEVENT_ECHO) ; }
 
 	/*************************************************************
 	* @brief	Converts an id from a client side value to a kernel side value.

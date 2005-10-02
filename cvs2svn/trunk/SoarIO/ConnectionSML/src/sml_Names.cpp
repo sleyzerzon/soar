@@ -270,6 +270,7 @@ char const* const sml_Names::kParamDecision			= "decision" ;
 char const* const sml_Names::kParamInstance			= "instance" ;
 char const* const sml_Names::kParamTimers			= "timers";
 char const* const sml_Names::kParamMessage			= "message";
+char const* const sml_Names::kParamSelf				= "self" ;
 char const* const sml_Names::kParamAlias			= "alias";
 char const* const sml_Names::kParamAliasedCommand		= "aliasedcommand";
 char const* const sml_Names::kParamIndifferentSelectionMode = "indifferentselectionmode";

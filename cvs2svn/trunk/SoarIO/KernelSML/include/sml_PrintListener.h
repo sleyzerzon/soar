@@ -71,8 +71,9 @@ public:
 	// Allows us to temporarily stop forwarding print callback output from the kernel to the SML listeners
 	void EnablePrintCallback(bool enable) { m_EnablePrintCallback = enable ; }
 
-	// Activate the print callback (flush output)
-	void FlushOutput(egSKIPrintEventId eventID);
+	// Activate the print callback (flush output).  For echo events we want to specify which connection triggered the event.
+	void FlushOutput(egSKIPrintEventId eventID) { FlushOutput(NULL, eventID) ; }
+	void FlushOutput(Connection* pSourceConnection, egSKIPrintEventId eventID);
 
 } ;
 

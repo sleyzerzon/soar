@@ -174,7 +174,7 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
         // The command succeeded, so return the result if raw output
 		if (m_RawOutput) {
 			pConnection->AddSimpleResultToSMLResponse(pResponse, m_Result.str().c_str());
-			EchoString(m_Result.str().c_str()) ;
+			EchoString(pConnection, m_Result.str().c_str()) ;
 		} else {
 			// If there are tags in the response list, add them and return
 			if (m_ResponseTags.size()) {
@@ -193,7 +193,7 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 				// Otherwise, return result as simple result if there is one
 				if (m_Result.str().size()) {
 					pConnection->AddSimpleResultToSMLResponse(pResponse, m_Result.str().c_str());
-					EchoString(m_Result.str().c_str()) ;
+					EchoString(pConnection, m_Result.str().c_str()) ;
 				} else {
 					// Or, simply return true
 					pConnection->AddSimpleResultToSMLResponse(pResponse, sml_Names::kTrue);
@@ -222,7 +222,7 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 			errorDescription += m_gSKIError.ExtendedMsg;
 		}
 		pConnection->AddErrorToSMLResponse(pResponse, errorDescription.c_str(), m_LastError);
-		EchoString(errorDescription.c_str()) ;
+		EchoString(pConnection, errorDescription.c_str()) ;
 
         // Log error
         if (m_pLogFile) (*m_pLogFile) << errorDescription << endl;
@@ -240,14 +240,14 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 * @brief Echo the given string through the smlEVENT_ECHO event
 *		 if the call requested that commands be echoed.
 *************************************************************/ 	 
-void CommandLineInterface::EchoString(char const* pString)
+void CommandLineInterface::EchoString(sml::Connection* pConnection, char const* pString)
 {
 	if (!m_EchoResult)
 		return ;
 
 	// BUGBUG: We may need to support this for kernel level commands without an agent
 	if (m_pAgentSML)
-		m_pAgentSML->FireEchoEvent(pString) ;
+		m_pAgentSML->FireEchoEvent(pConnection, pString) ;
 }
 
 /*************************************************************

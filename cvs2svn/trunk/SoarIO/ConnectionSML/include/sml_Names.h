@@ -264,6 +264,7 @@ public:
 	static char const* const kParamInstance ;
 	static char const* const kParamTimers;
 	static char const* const kParamMessage;
+	static char const* const kParamSelf ;
 	static char const* const kParamAlias;
 	static char const* const kParamAliasedCommand;
 	static char const* const kParamIndifferentSelectionMode;

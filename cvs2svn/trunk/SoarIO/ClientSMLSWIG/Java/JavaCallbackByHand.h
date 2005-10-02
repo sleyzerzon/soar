@@ -401,7 +401,7 @@ static void PrintEventHandler(sml::smlPrintEventId id, void* pUserData, sml::Age
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForPrintEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForPrintEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6, jboolean jarg7)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -413,7 +413,7 @@ JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForPrintEvent(JNIEnv *jenv
 	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
-	pJavaData->m_CallbackID = arg1->RegisterForPrintEvent(arg2, &PrintEventHandler, pJavaData) ;
+	pJavaData->m_CallbackID = arg1->RegisterForPrintEvent(arg2, &PrintEventHandler, pJavaData, (jarg7 != JNI_FALSE)) ;
 
 	// Pass the callback info back to the Java client.  We need to do this so we can delete this later when the method is unregistered
 	return (jint)pJavaData ;

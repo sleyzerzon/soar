@@ -912,7 +912,7 @@ protected:
 	* @brief Echo the given string through the smlEVENT_ECHO event
 	*		 if the call requested that commands be echoed.
 	*************************************************************/ 	 
-	void EchoString(char const* pString);	
+	void EchoString(sml::Connection* pConnection, char const* pString);	
 
 	/************************************************************* 	 
 	* @brief Strip quotes off of a string.  Must start and end with

@@ -84,7 +84,7 @@ void PrintListener::HandleEvent(egSKIPrintEventId eventID, gSKI::IAgent* agentPt
 	m_BufferedPrintOutput[nBuffer] += msg;
 }
 
-void PrintListener::FlushOutput(egSKIPrintEventId eventID) 
+void PrintListener::FlushOutput(Connection* pSourceConnection, egSKIPrintEventId eventID) 
 {
 	int buffer = eventID - gSKIEVENT_FIRST_PRINT_EVENT ;
 
@@ -105,18 +105,62 @@ void PrintListener::FlushOutput(egSKIPrintEventId eventID)
 	// Convert eventID to a string
 	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
 
-	// Build the SML message we're going to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pAgent->GetName());
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].c_str());
-
-	m_BufferedPrintOutput[buffer].clear();
-
 	// Send the message out
 	AnalyzeXML response ;
-	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
 
-	// Clean up
-	delete pMsg ;
+	// For non-echo events, just send it normally
+	if (eventID != gSKIEVENT_ECHO)
+	{
+		// Build the SML message we're going to send.
+		ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
+		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pAgent->GetName());
+		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
+		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].c_str());
+
+		// Send the message out
+		AnalyzeXML response ;
+		SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
+
+		// Clean up
+		delete pMsg ;
+	}
+	else
+	{
+		// For echo events build up the message on a connection by connection basis.
+		// This allows us to tell a sender if they were the cause of a given message so a client
+		// can filter out echoes from commands they originated.
+		while (connectionIter != GetEnd(eventID))
+		{
+			pConnection = *connectionIter ;
+			connectionIter++ ;
+
+			// Build the SML message we're going to send.
+			ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
+			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pAgent->GetName());
+			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
+			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].c_str());
+			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamSelf, (pSourceConnection == pConnection) ? sml_Names::kTrue : sml_Names::kFalse) ;
+
+			#ifdef _DEBUG
+				// Generate a text form of the XML so we can look at it in the debugger.
+				char* pStr = pMsg->GenerateXMLString(true) ;
+			#endif
+
+			// It would be faster to just send a message here without waiting for a response
+			// but that could produce incorrect behavior if the client expects to act *during*
+			// the event that we're notifying them about (e.g. notification that we're in the input phase).
+			pConnection->SendMessageGetResponse(&response, pMsg) ;
+
+			#ifdef _DEBUG
+				// Clean up the string form of the message.
+				pMsg->DeleteString(pStr) ;
+			#endif
+
+			// Clean up
+			delete pMsg ;
+		}
+	}
+
+	// Clear the buffer now that it's been sent
+	m_BufferedPrintOutput[buffer].clear();
 }
