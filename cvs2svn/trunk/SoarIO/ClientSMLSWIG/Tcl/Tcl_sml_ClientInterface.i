@@ -343,9 +343,9 @@
 	    return self->RegisterForRunEvent(id, TclRunEventCallback, (void*)tud, addToBack);
     }
 
-    int RegisterForPrintEvent(Tcl_Interp* interp, sml::smlPrintEventId id, char* proc, char* userData, bool addToBack = true) {	    
+    int RegisterForPrintEvent(Tcl_Interp* interp, sml::smlPrintEventId id, char* proc, char* userData, bool ignoreOwnEchos = true, bool addToBack = true) {	    
 	    TclUserData* tud = CreateTclAgentUserData(self, id, proc, userData, interp);
-	    return self->RegisterForPrintEvent(id, TclPrintEventCallback, (void*)tud, addToBack);
+	    return self->RegisterForPrintEvent(id, TclPrintEventCallback, (void*)tud, ignoreOwnEchos, addToBack);
     }
     
     int RegisterForXMLEvent(Tcl_Interp* interp, sml::smlXMLEventId id, char* proc, char* userData, bool addToBack = true) {	    
