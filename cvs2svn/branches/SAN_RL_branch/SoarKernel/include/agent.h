@@ -261,6 +261,9 @@ typedef struct agent_struct {
   Symbol            * ts_context_variable;
   Symbol            * type_symbol;
   Symbol            * wait_symbol;   /* REW:  10.24.97 */
+#ifdef NUMERIC_INDIFFERENCE 
+  Symbol			* reward_symbol;
+#endif
   
   /* ----------------------- Symbol table stuff -------------------------- */
 
@@ -732,6 +735,13 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
 #ifdef NUMERIC_INDIFFERENCE
   enum ni_mode numeric_indifferent_mode;      /* SW 08.19.2003 */
+  enum exp_mode exploration_mode;
+  float Temperature;                          /* Parameter for Boltzmann exploration */
+  float epsilon;                              /* Parameter for epsilon-greedy exploration */
+  float gamma;								  /* Discount rate */ 
+  float alpha;								  /* Learning rate */
+
+  Symbol * reward_header;                     /* top state reward id */
 #endif
 
 } agent;

@@ -1061,16 +1061,9 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     p->value->common.decider_flag = UNARY_INDIFFERENT_DECIDER_FLAG;
 
 	 #ifdef NUMERIC_INDIFFERENCE
-    /* REW: 2003-01-02 Behavior Variability Kernel Experiments
-     We want to treat some binary indifferent prefs as unary indifferents,
-     the second pref is really an int representing a probability value.
-     So we identify these preferences here.
-  */
-	for (p=s->preferences[BINARY_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
-    if((p->referent->fc.common_symbol_info.symbol_type == INT_CONSTANT_SYMBOL_TYPE) || 
-	   (p->referent->fc.common_symbol_info.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE))
-     
-      p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
+    /* REW: 2003-01-02 Behavior Variability Kernel Experiments */
+	for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
+     p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
   
   /* END: 2003-01-02 Behavior Variability Kernel Experiments  */
 
@@ -1516,17 +1509,9 @@ byte run_preference_semantics_for_consistency_check (agent* thisAgent, slot *s, 
     p->value->common.decider_flag = UNARY_INDIFFERENT_DECIDER_FLAG;
 
 #ifdef NUMERIC_INDIFFERENCE
-  /* REW: 2003-01-26 Behavior Variability Kernel Experiments
-     We want to treat some binary indifferent prefs as unary indifferents,
-     the second pref is really an int representing a probability value.
-     So we identify these preferences here.
-	 -- want to guarantee decision is not interrupted by a new indiff pref
-  */
-  for (p=s->preferences[BINARY_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
-    if( (p->referent->fc.common_symbol_info.symbol_type == INT_CONSTANT_SYMBOL_TYPE) ||
-				(p->referent->fc.common_symbol_info.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE))
-       
-      p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
+  /* REW: 2003-01-26 Behavior Variability Kernel Experiments */
+  for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
+    p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
   /* END: 2003-01-02 Behavior Variability Kernel Experiments  */
 #endif
 
@@ -1679,13 +1664,21 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
   add_impasse_wme (thisAgent, id, thisAgent->type_symbol, isa_goal ? thisAgent->state_symbol : thisAgent->impasse_symbol,
                    NIL);
 
-  if (isa_goal)
+  if (isa_goal){
     add_impasse_wme (thisAgent, id, thisAgent->superstate_symbol, object, NIL);
+#ifdef NUMERIC_INDIFFERENCE
+	if (level!=TOP_GOAL_LEVEL){
+		Symbol *temp = make_new_identifier(thisAgent, 'R', level);
+		add_impasse_wme (thisAgent, id, thisAgent->reward_symbol, temp, NIL);
+		symbol_remove_ref(thisAgent,temp);
+	}
+#endif
+  }
   else
     add_impasse_wme (thisAgent, id, thisAgent->object_symbol, object, NIL);
 
   if (attr) add_impasse_wme (thisAgent, id, thisAgent->attribute_symbol, attr, NIL);
-  
+ 
   switch (impasse_type) {
   case NONE_IMPASSE_TYPE:
     break;    /* this happens only when creating the top goal */
@@ -3559,15 +3552,16 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
        value = (float)pref->referent->ic.value;
      */
 
-    for (pref = s->preferences[BINARY_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
+    for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
         /*print_with_symbols("\nPreference for %y", pref->value); */
         float value;
         if (pref->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
             value = pref->referent->fc.value;
         } else if (pref->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
             value = (float) pref->referent->ic.value;
-        } else
-            continue;
+		} else { 
+		   continue;
+		}
         for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
             /*print_with_symbols("\nConsidering candidate %y", cand->value); */
 
@@ -3585,62 +3579,115 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 		}
 	}
 
+	if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
+		for (cand = candidates; cand != NIL; cand = cand->next_candidate){
+			if ((thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM) && (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION)){
+				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
+				print(thisAgent, "Value (Sum) = %f", exp(cand->sum_of_probability / TEMPERATURE));
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->sum_of_probability / TEMPERATURE));
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+				}
+			else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM){
+				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
+				print(thisAgent, "Value (Sum) = %f", cand->sum_of_probability);
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, cand->sum_of_probability);
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+				}
+			else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_AVG){
+				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);  
+		        print(thisAgent, "Value (Avg) = %f", fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
+                gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
+                gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
+                gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeAvg);
+                gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
+                gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+			 }
+		}
+	}
+
     if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM) {
 
+		if (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION){
+			total_probability = 0.0;
+			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+	  
+				/*  Total Probability represents the range of values, we expect
+				*  the use of negative valued preferences, so its possible the
+				*  sum is negative, here that means a fractional probability
+				*/
+				total_probability += exp(cand->sum_of_probability / thisAgent->Temperature);
+				/* print("\n   Total (Sum) Probability = %f", total_probability ); */
+			}
+
+		    /* Now select the candidate */
+	
+		    //print(thisAgent, "\n");
+			rn = rand();
+			selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
+			currentSumOfValues = 0;
+	
+		    for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+	
+		        currentSumOfValues += exp(cand->sum_of_probability / thisAgent->Temperature);
+	
+		        if (selectedProbability <= currentSumOfValues) {
+			        /* 
+				       print_with_symbols("\n    Returning (Sum) candidate %y", cand->value); 
+					 */
+	
+		            return cand;
+			    }
+			}
+		} else if (thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION){ 
+			
+			if (((double)rand() / (double)RAND_MAX) <= thisAgent->epsilon){
+				int   chosen_num;
+					chosen_num = rand() % numCandidates;
+	
+					cand = candidates;
+					while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
+		
+			        return cand;
+			}
+		}
+			preference *top_cand = candidates;
+			double top_value = candidates->sum_of_probability;
+			int num_max_cand = 0;
+
+			for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
+				if (cand->sum_of_probability > top_value) {
+					top_value = cand->sum_of_probability;
+					top_cand = cand;
+					num_max_cand = 1;
+				} else if (cand->sum_of_probability == top_value) num_max_cand++;
+			}
+
+		 
+				if (num_max_cand == 1)
+					return top_cand;
+				else {
+					int chosen_num;
+					chosen_num = rand() % num_max_cand;
+					cand = candidates;
+					while (cand->sum_of_probability != top_value) cand = cand->next_candidate;
+					while (chosen_num) {
+						cand=cand->next_candidate;
+						chosen_num--;
+						while (cand->sum_of_probability != top_value) cand = cand->next_candidate;
+					}
+					return cand;
+				}
+		 }  else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_AVG) {
+
         total_probability = 0.0;
         for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
 
-            if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
-				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-		           print(thisAgent, "Value (Sum) = %f", exp(cand->sum_of_probability / TEMPERATURE));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->sum_of_probability / TEMPERATURE));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
-			}     
-            /*  Total Probability represents the range of values, we expect
-             *  the use of negative valued preferences, so its possible the
-             *  sum is negative, here that means a fractional probability
-             */
-            total_probability += exp(cand->sum_of_probability / TEMPERATURE);
-            /* print("\n   Total (Sum) Probability = %f", total_probability ); */
-        }
-
-        /* Now select the candidate */
-
-        //print(thisAgent, "\n");
-		rn = rand();
-        selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
-        currentSumOfValues = 0;
-
-        for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-
-            currentSumOfValues += exp(cand->sum_of_probability / TEMPERATURE);
-
-            if (selectedProbability <= currentSumOfValues) {
-                /* 
-                   print_with_symbols("\n    Returning (Sum) candidate %y", cand->value); 
-                 */
-
-                return cand;
-            }
-        }
-
-    } else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_AVG) {
-
-        total_probability = 0.0;
-        for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-
-            if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]) {
-				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);  
-		           print(thisAgent, "Value (Avg) = %f", fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeAvg);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
-			}    
             /* Total probability represents the range of values that
              * we'll map into for selection.  Here we don't expect the use
              * of negative values, so we'll warn when we see one.

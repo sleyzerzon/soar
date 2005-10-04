@@ -4715,6 +4715,14 @@ Bool preferences_interface_routine (agent* thisAgent) {
       old_print_preference_and_source (thisAgent, p, print_productions, wtt);
   }
 
+#ifdef NUMERIC_INDIFFERENCE
+  if (s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]) {
+	  print(thisAgent, "\nNumerics:\n");
+	  for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
+	  old_print_preference_and_source (thisAgent, p, print_productions, wtt);
+  }
+#endif
+
   if (s->preferences[UNARY_PARALLEL_PREFERENCE_TYPE]) {
     print(thisAgent, "\nUnary Parallels:\n");
     for (p=s->preferences[UNARY_PARALLEL_PREFERENCE_TYPE]; p; p=p->next)

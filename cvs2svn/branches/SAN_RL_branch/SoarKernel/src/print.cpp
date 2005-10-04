@@ -1088,6 +1088,9 @@ char preference_type_indicator (agent* thisAgent, byte type) {
   case BETTER_PREFERENCE_TYPE: return '>';
   case WORST_PREFERENCE_TYPE: return '<';
   case WORSE_PREFERENCE_TYPE: return '<';
+#ifdef NUMERIC_INDIFFERENCE
+  case NUMERIC_INDIFFERENT_PREFERENCE_TYPE: return '=';
+#endif
   default:
     { char msg[BUFFER_MSG_SIZE];
     strncpy(msg,

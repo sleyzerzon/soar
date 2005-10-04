@@ -1641,6 +1641,10 @@ void init_agent_memory(agent* thisAgent)
   thisAgent->io_header_input = get_new_io_identifier (thisAgent, 'I');
   thisAgent->io_header_output = get_new_io_identifier (thisAgent, 'I');
 
+#ifdef NUMERIC_INDIFFERENCE
+  thisAgent->reward_header = get_new_io_identifier (thisAgent, 'R');
+#endif
+
   create_top_goal(thisAgent);
   if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) 
     {
@@ -1664,6 +1668,12 @@ void init_agent_memory(agent* thisAgent)
   add_input_wme (thisAgent, thisAgent->io_header,
                  make_sym_constant(thisAgent, "output-link"),
                  thisAgent->io_header_output);
+
+#ifdef NUMERIC_INDIFFERENCE
+  add_input_wme (thisAgent, thisAgent->top_state,
+	  thisAgent->reward_symbol,
+	  thisAgent->reward_header);
+#endif
 
   do_buffered_wm_and_ownership_changes(thisAgent);
 

@@ -1323,8 +1323,16 @@ byte parse_preference_specifier_without_referent (agent* thisAgent) {
     if ((thisAgent->lexeme.type!=COMMA_LEXEME) &&
         (thisAgent->lexeme.type!=R_PAREN_LEXEME) &&
         (thisAgent->lexeme.type!=UP_ARROW_LEXEME) &&
-        (!is_preference_lexeme(thisAgent->lexeme.type)))
+		(!is_preference_lexeme(thisAgent->lexeme.type))){
+#ifdef NUMERIC_INDIFFERENCE
+			if ((thisAgent->lexeme.type == INT_CONSTANT_LEXEME) || (thisAgent->lexeme.type == FLOAT_CONSTANT_LEXEME))
+				return NUMERIC_INDIFFERENT_PREFERENCE_TYPE;
+			else
+				return BINARY_INDIFFERENT_PREFERENCE_TYPE;
+#else
       return BINARY_INDIFFERENT_PREFERENCE_TYPE;
+#endif
+		}
     /* --- forced unary preference --- */
     if (thisAgent->lexeme.type==COMMA_LEXEME) get_lexeme(thisAgent);
     return UNARY_INDIFFERENT_PREFERENCE_TYPE;

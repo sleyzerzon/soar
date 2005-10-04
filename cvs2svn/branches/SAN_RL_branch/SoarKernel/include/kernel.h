@@ -163,6 +163,17 @@ enum ni_mode {
     NUMERIC_INDIFFERENT_MODE_AVG,
     NUMERIC_INDIFFERENT_MODE_SUM,
 };
+/* Possible exploration policies. */
+
+enum exp_mode {
+
+	BOLTZMANN_EXPLORATION,
+
+	EPSILON_GREEDY_EXPLORATION,
+
+	NO_EXPLORATION,
+
+};
 #endif 
 
 /* Comment the following line to disable workaround for bug 139 */

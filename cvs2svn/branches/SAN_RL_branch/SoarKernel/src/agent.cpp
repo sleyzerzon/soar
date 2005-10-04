@@ -303,6 +303,11 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->o_support_calculation_type = 4; /* KJC 7/00 */ // changed from 3 to 4 by voigtjr  (/* bugzilla bug 339 */)
 #ifdef NUMERIC_INDIFFERENCE
   newAgent->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_AVG;
+  newAgent->exploration_mode = NO_EXPLORATION;
+  newAgent->Temperature = 10.0;
+  newAgent->epsilon = 0.1;
+  newAgent->gamma = 0.9;
+  newAgent->alpha = 0.4;
 #endif
   newAgent->attribute_preferences_mode = 0; /* RBD 4/17/95 */
 
