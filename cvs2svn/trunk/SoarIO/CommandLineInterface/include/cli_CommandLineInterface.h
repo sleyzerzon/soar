@@ -85,6 +85,9 @@ typedef std::map<std::string, CommandFunction>	CommandMap;
 typedef CommandMap::iterator					CommandMapIter;
 typedef CommandMap::const_iterator				CommandMapConstIter;
 
+// Used to decide if a given command should always be echoed
+typedef std::map<std::string, bool>				EchoMap ;
+
 // Define the stack for pushd/popd
 typedef std::stack<std::string> StringStack;
 
@@ -682,6 +685,12 @@ public:
 	*************************************************************/
 	EXPORT bool DoWatchWMEs(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
 
+	/*************************************************************
+	* @brief Returns true if the given command should always be echoed (to any listeners)
+	*        The current implementation doesn't support aliases or short forms of the commands.
+	* @param pCommandLine	The command line being tested
+	*************************************************************/
+	EXPORT bool ShouldEchoCommand(char const* pCommandLine) ;
 
 protected:
 
@@ -957,6 +966,7 @@ protected:
 	gSKI::Error			m_gSKIError;			// gSKI error output from calls made to process the command
 	bool				m_PrintEventToResult;	// True when print events should append message to result
 	bool				m_EchoResult;			// If true, copy result of command to echo event stream
+	EchoMap				m_EchoMap;				// If command appears in this map, always echo it.
 
 	Aliases				m_Aliases;				// Alias management object
 	CommandMap			m_CommandMap;			// Mapping of command names to function pointers

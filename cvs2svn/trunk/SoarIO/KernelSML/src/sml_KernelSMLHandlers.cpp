@@ -1096,18 +1096,6 @@ bool KernelSML::HandleInput(gSKI::IAgent* pAgent, char const* pCommandName, Conn
 	return ok ;
 }
 
-static bool AlwaysEchoCommand(char const* pCommandLine)
-{
-	if (!pCommandLine)
-		return false ;
-
-	// BADBAD: Can't do this here--we need to cover aliases etc.  Need to do inside command line logic.
-	if (strcmp(pCommandLine, "init-soar") == 0)
-		return true ;
-
-	return false ;
-}
-
 // Executes a generic command line for a specific agent
 bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
@@ -1124,7 +1112,8 @@ bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName
 	char const* pLine = pIncoming->GetArgString(sml_Names::kParamLine) ;
 	bool echoResults  = pIncoming->GetArgBool(sml_Names::kParamEcho, false) ;
 
-	echoResults = echoResults || AlwaysEchoCommand(pLine) ;
+	if (m_CommandLineInterface.ShouldEchoCommand(pLine))
+		echoResults = true ;
 
 	bool rawOutput = false;
 
@@ -1144,8 +1133,7 @@ bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName
 	if (kDebugCommandLine)
 		PrintDebugFormat("Executing %s", pLine) ;
 
-	// If we're echoing, I think we should also echo the command line we are executing.
-	// (If this later turns out to be wrong in some cases we should add a further option to specify whether to do this).
+	// If we're echoing the results, also echo the command we're executing
 	if (echoResults)
 	{
 		AgentSML* pAgentSML = this->GetAgentSML(pAgent) ;

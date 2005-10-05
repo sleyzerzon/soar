@@ -99,6 +99,43 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Constants::kCLIWatch]					= &cli::CommandLineInterface::ParseWatch;
 	m_CommandMap[Constants::kCLIWatchWMEs]				= &cli::CommandLineInterface::ParseWatchWMEs;
 
+	m_EchoMap[Constants::kCLIAddWME]					= true ;
+	m_EchoMap[Constants::kCLIAlias]						= true ;
+	m_EchoMap[Constants::kCLIAttributePreferencesMode]	= true ;
+	m_EchoMap[Constants::kCLICD]						= true ;
+	m_EchoMap[Constants::kCLIChunkNameFormat]			= true ;
+	m_EchoMap[Constants::kCLIDefaultWMEDepth]			= true ;
+	m_EchoMap[Constants::kCLIEcho]						= true ;
+	m_EchoMap[Constants::kCLIExcise]					= true ;
+	m_EchoMap[Constants::kCLIIndifferentSelection]		= true ;
+	m_EchoMap[Constants::kCLIInitSoar]					= true ;
+	m_EchoMap[Constants::kCLIInputPeriod]				= true ;
+	m_EchoMap[Constants::kCLILearn]						= true ;
+	m_EchoMap[Constants::kCLILog]						= true ;
+	m_EchoMap[Constants::kCLIMaxChunks]					= true ;
+	m_EchoMap[Constants::kCLIMaxElaborations]			= true ;
+	m_EchoMap[Constants::kCLIMaxNilOutputCycles]		= true ;
+	m_EchoMap[Constants::kCLIMultiAttributes]			= true ;
+	m_EchoMap[Constants::kCLINumericIndifferentMode]	= true ;
+	m_EchoMap[Constants::kCLIOSupportMode]				= true ;
+	m_EchoMap[Constants::kCLIPopD]						= true ;
+	m_EchoMap[Constants::kCLIPushD]						= true ;
+	m_EchoMap[Constants::kCLIQuit]						= true ;
+	m_EchoMap[Constants::kCLIRemoveWME]					= true ;
+	m_EchoMap[Constants::kCLIReteNet]					= true ;
+	m_EchoMap[Constants::kCLIRun]						= true ;
+	m_EchoMap[Constants::kCLISetLibraryLocation]		= true ;
+	m_EchoMap[Constants::kCLISoar8]						= true ;
+	m_EchoMap[Constants::kCLISource]					= true ;
+	m_EchoMap[Constants::kCLISP]						= true ;
+	m_EchoMap[Constants::kCLISetStopPhase]				= true ;
+	m_EchoMap[Constants::kCLIStopSoar]					= true ;
+	m_EchoMap[Constants::kCLITimers]					= true ;
+	m_EchoMap[Constants::kCLIVerbose]					= true ;
+	m_EchoMap[Constants::kCLIWaitSNC]					= true ;
+	m_EchoMap[Constants::kCLIWatch]						= true ;
+	m_EchoMap[Constants::kCLIWatchWMEs]					= true ;
+
 	// Set library directory to sane default value
 	GetCurrentWorkingDirectory(m_LibraryDirectory);
 
@@ -122,6 +159,31 @@ EXPORT CommandLineInterface::~CommandLineInterface() {
 		(*m_pLogFile) << "Log file closed due to shutdown." << std::endl;
 		delete m_pLogFile;
 	}
+}
+
+/*************************************************************
+* @brief Returns true if the given command should always be echoed (to any listeners)
+*        The current implementation doesn't support aliases or short forms of the commands.
+* @param pCommandLine	The command line being tested
+*************************************************************/
+EXPORT bool CommandLineInterface::ShouldEchoCommand(char const* pCommandLine)
+{
+	if (!pCommandLine)
+		return false ;
+
+	std::string command = pCommandLine ;
+
+	char const* pSpace = strchr(pCommandLine, ' ') ;
+	if (pSpace)
+	{
+		// Trim everything from space on
+		command.erase(pSpace-pCommandLine, command.length()) ;
+	}
+
+	// See if there's an entry in the echo map for this command
+	// BADBAD: This won't work for short forms of the command or aliases; but making this test
+	// happen later in the command line processing causes too many re-entrancy problem within the command line module.
+	return (m_EchoMap.find(command) != m_EchoMap.end()) ;
 }
 
 /*************************************************************
