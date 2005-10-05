@@ -24,6 +24,7 @@ namespace cli {
 		static char const* kCLIDefaultWMEDepth;
 		static char const* kCLIDirs;
 		static char const* kCLIEcho;
+		static char const* kCLIEchoCommands;
 		static char const* kCLIEditProduction;
 		static char const* kCLIExcise;
 		static char const* kCLIExplainBacktraces;

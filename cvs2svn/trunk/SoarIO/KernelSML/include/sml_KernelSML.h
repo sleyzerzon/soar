@@ -155,6 +155,11 @@ protected:
 	class OnSystemStopDeleteAll ;
 	OnSystemStopDeleteAll*	m_pSystemStopListener ;
 
+	// If true, whenever a user issues a command that changes the state of the kernel in some manner
+	// the command and its results are echoed to anyone listening.  This is useful when two users
+	// are debugging the same kernel (and should be off at other times).
+	bool			m_EchoCommands ;
+
 public:
 	/*************************************************************
 	* @brief	Returns the singleton kernel object.
@@ -378,6 +383,14 @@ public:
 	*************************************************************/	
 	void SetStopBefore(egSKIPhaseType phase) ;
 	egSKIPhaseType GetStopBefore() ;
+
+	/*************************************************************
+	* @brief	If true, whenever a user issues a command that changes the state of the kernel in some manner
+	*			the command and its results are echoed to anyone listening.  This is useful when two users
+	*			are debugging the same kernel (and should be off at other times).
+	*************************************************************/	
+	void SetEchoCommands(bool state) { m_EchoCommands = state ; }
+	bool GetEchoCommands()			 { return m_EchoCommands ; }
 
 protected:
 	KernelSML(unsigned short portToListenOn);

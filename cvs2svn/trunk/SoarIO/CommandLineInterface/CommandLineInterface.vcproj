@@ -160,6 +160,9 @@
 					RelativePath=".\src\cli_echo.cpp">
 				</File>
 				<File
+					RelativePath=".\src\cli_echocommands.cpp">
+				</File>
+				<File
 					RelativePath=".\src\cli_editproduction.cpp">
 				</File>
 				<File

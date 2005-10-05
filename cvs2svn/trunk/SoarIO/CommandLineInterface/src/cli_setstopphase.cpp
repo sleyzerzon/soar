@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////
-// echo command file.
+// set stop phase command file.
 //
 // Author: Douglas Pearson, doug@threepenny.net
 // Date  : 2005
@@ -70,14 +70,13 @@ bool CommandLineInterface::ParseSetStopPhase(gSKI::IAgent* pAgent, std::vector<s
 				countPhaseArgs++ ;
 				break;
 			default:
-				SetErrorDetail("Format is stop-before <phase> e.g. stop-before --input") ;
 				return SetError(CLIError::kGetOptError);
 		}
 	}
 
 	if (m_NonOptionArguments || countPhaseArgs > 1)
 	{
-		SetErrorDetail("Format is set-stop-phase [--before | --after] <phase> e.g. set-stop-phase --before --input") ;
+		SetErrorDetail("Format is 'set-stop-phase [--Before | --After] <phase>' where <phase> is --input | --proposal | --decision | --apply | --output\ne.g. set-stop-phase --before --input") ;
 		return SetError(CLIError::kGetOptError) ;
 	}
 

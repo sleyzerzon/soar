@@ -1112,7 +1112,9 @@ bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName
 	char const* pLine = pIncoming->GetArgString(sml_Names::kParamLine) ;
 	bool echoResults  = pIncoming->GetArgBool(sml_Names::kParamEcho, false) ;
 
-	if (m_CommandLineInterface.ShouldEchoCommand(pLine))
+	// If the user chooses to enable this feature, certain commands are always echoed back.
+	// This is primarily to support two users connected to and debugging the same kernel at once.
+	if (GetEchoCommands() && m_CommandLineInterface.ShouldEchoCommand(pLine))
 		echoResults = true ;
 
 	bool rawOutput = false;

@@ -132,6 +132,7 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	m_pRunScheduler = new RunScheduler(this) ;
 
 	m_pSystemStopListener = NULL ;
+	m_EchoCommands = false ;
 }
 
 /** Deletes all agents and optionally waits until this has actually happened (if the agent is running there may be a delay) */

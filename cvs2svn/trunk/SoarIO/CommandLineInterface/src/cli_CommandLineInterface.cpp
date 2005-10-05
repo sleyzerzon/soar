@@ -49,6 +49,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Constants::kCLIDefaultWMEDepth]		= &cli::CommandLineInterface::ParseDefaultWMEDepth;
 	m_CommandMap[Constants::kCLIDirs]					= &cli::CommandLineInterface::ParseDirs;
 	m_CommandMap[Constants::kCLIEcho]					= &cli::CommandLineInterface::ParseEcho;
+	m_CommandMap[Constants::kCLIEchoCommands]			= &cli::CommandLineInterface::ParseEchoCommands;
 	m_CommandMap[Constants::kCLIEditProduction]			= &cli::CommandLineInterface::ParseEditProduction;
 	m_CommandMap[Constants::kCLIExcise]					= &cli::CommandLineInterface::ParseExcise;
 	m_CommandMap[Constants::kCLIExplainBacktraces]		= &cli::CommandLineInterface::ParseExplainBacktraces;
@@ -106,6 +107,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Constants::kCLIChunkNameFormat]			= true ;
 	m_EchoMap[Constants::kCLIDefaultWMEDepth]			= true ;
 	m_EchoMap[Constants::kCLIEcho]						= true ;
+	m_EchoMap[Constants::kCLIEchoCommands]				= true ;
 	m_EchoMap[Constants::kCLIExcise]					= true ;
 	m_EchoMap[Constants::kCLIIndifferentSelection]		= true ;
 	m_EchoMap[Constants::kCLIInitSoar]					= true ;

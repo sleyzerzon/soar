@@ -719,6 +719,7 @@ protected:
 	bool ParseDefaultWMEDepth(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseDirs(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseEcho(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseEchoCommands(gSKI::IAgent* pAgent, std::vector<std::string>& argv) ;
 	bool ParseExcise(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseExplainBacktraces(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseFiringCounts(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
@@ -778,6 +779,7 @@ protected:
 	bool DoDefaultWMEDepth(gSKI::IAgent* pAgent, const int* pDepth);
 	bool DoDirs();
 	bool DoEcho(const std::vector<std::string>& argv, bool echoNewline);
+	bool DoEchoCommands(bool onlyGetValue, bool echoCommands) ;
 	bool DoExcise(gSKI::IAgent* pAgent, const ExciseBitset& options, const std::string* pProduction = 0);
 	bool DoExplainBacktraces(gSKI::IAgent* pAgent, const std::string* pProduction = 0, const int condition = 0);
 	bool DoFiringCounts(gSKI::IAgent* pAgent, const int numberToList = -1, const std::string* pProduction = 0);
