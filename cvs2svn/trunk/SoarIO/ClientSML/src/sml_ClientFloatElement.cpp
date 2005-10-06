@@ -55,9 +55,9 @@ char const* FloatElement::GetValueAsString() const
 }
 
 #ifdef SML_DIRECT
-Direct_WME_Handle FloatElement::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject)
+Direct_WME_Handle FloatElement::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag)
 {
-	Direct_WME_Handle wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectAddWME_Double(wm, wmobject, GetAttribute(), GetValue()) ;
+	Direct_WME_Handle wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectAddWME_Double(wm, wmobject, timeTag, GetAttribute(), GetValue()) ;
 	return wme ;
 }
 #endif

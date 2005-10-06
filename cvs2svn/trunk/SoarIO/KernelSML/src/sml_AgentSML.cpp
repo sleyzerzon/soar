@@ -99,8 +99,10 @@ void AgentSML::ReleaseAllWmes()
 
 		if (!deleted)
 		{
-			fprintf(stdout, "ERROR: A wme with value %s was released but not deleted.  Memory leak.\n", value.c_str()) ;
-			assert(deleted) ;
+			// Can put a break point here to see if any wmes aren't being deleted when they are released.
+			// Unforunately, we can't assert or do more because that can be valid (others places might validly have a reference to pWme).
+			int x = 1 ;
+			unused(x) ;
 		}
 	}
 
@@ -263,6 +265,14 @@ gSKI::IWme* AgentSML::ConvertTimeTag(char const* pTimeTag)
 *************************************************************/
 void AgentSML::RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWME)
 {
+#ifdef _DEBUG
+	// I believe it correct that a time tag should never be re-used in this context
+	// so I'm including this assert.  However, it's possible this assumption is wrong (in particular after an init-soar?)
+	// so I'm only including it in debug builds and if the assert fails, check the context and make sure that this re-use
+	// in indeed a mistake.
+	assert (m_TimeTagMap.find(pTimeTag) == m_TimeTagMap.end()) ;
+#endif
+
 	m_TimeTagMap[pTimeTag] = pWME ;
 }
 
@@ -274,7 +284,7 @@ void AgentSML::RecordLongTimeTag(long timeTag, gSKI::IWme* pWME)
 	char str[kMinBufferSize] ;
 	Int2String(timeTag, str, sizeof(str)) ;
 
-	m_TimeTagMap[str] = pWME ;
+	RecordTimeTag(str, pWME) ;
 }
 
 void AgentSML::RemoveTimeTag(char const* pTimeTag)

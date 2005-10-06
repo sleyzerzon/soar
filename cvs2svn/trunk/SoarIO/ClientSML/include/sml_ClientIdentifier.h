@@ -254,7 +254,7 @@ protected:
 	// Reset all handles to 0
 	void ClearAllWMObjectHandles() ;
 
-	virtual Direct_WME_Handle DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject) ;
+	virtual Direct_WME_Handle DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag) ;
 #endif
 
 	// Send over to the kernel again

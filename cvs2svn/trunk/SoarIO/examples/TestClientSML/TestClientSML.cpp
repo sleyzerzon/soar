@@ -509,8 +509,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	pAgent->Update(pWME2, 300) ;
 
 	// Create a new WME that shares the same id as plane
-	Identifier* pID2 = pAgent->CreateSharedIdWME(pInputLink, "all-planes", pID) ;
-	unused(pID2); // quell gcc warning;
+	//Identifier* pID2 = pAgent->CreateSharedIdWME(pInputLink, "all-planes", pID) ;
+	//unused(pID2);
 
 	ok = pAgent->Commit() ;
 
@@ -522,8 +522,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	*/
 
 	// Delete one of the shared WMEs to make sure that's ok
-	pAgent->DestroyWME(pID) ;
-	pAgent->Commit() ;
+	//pAgent->DestroyWME(pID) ;
+	//pAgent->Commit() ;
 
 	if (!InitSoarAgent(pAgent, doInitSoars))
 		return false ;

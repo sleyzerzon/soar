@@ -98,30 +98,30 @@ public:
 #ifdef KERNEL_SML_DIRECT
 	// Direct methods, only supported for embedded connections and only used to optimize
 	// the speed when doing I/O over an embedded connection (where speed is most critical)
-	Direct_WME_Handle			DirectAddWME_String(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, char const* value)
+	Direct_WME_Handle			DirectAddWME_String(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, char const* value)
 	{
-		return m_pDirectAddWMEStringFunction(wm, parent, pAttribute, value) ;
+		return m_pDirectAddWMEStringFunction(wm, parent, clientTimeTag, pAttribute, value) ;
 	}
-	Direct_WME_Handle			DirectAddWME_Int(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, int value)
+	Direct_WME_Handle			DirectAddWME_Int(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, int value)
 	{
-		return m_pDirectAddWMEIntFunction(wm, parent, pAttribute, value) ;
+		return m_pDirectAddWMEIntFunction(wm, parent, clientTimeTag, pAttribute, value) ;
 	}
-	Direct_WME_Handle			DirectAddWME_Double(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, double value)
+	Direct_WME_Handle			DirectAddWME_Double(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, double value)
 	{
-		return m_pDirectAddWMEDoubleFunction(wm, parent, pAttribute, value) ;
+		return m_pDirectAddWMEDoubleFunction(wm, parent, clientTimeTag, pAttribute, value) ;
 	}
-	void						DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme)
+	void						DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
 	{
-		m_pDirectRemoveWMEFunction(wm, wme) ;
+		m_pDirectRemoveWMEFunction(wm, wme, clientTimeTag) ;
 	}
 
-	Direct_WME_Handle			DirectAddID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute)
+	Direct_WME_Handle			DirectAddID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute)
 	{
-		return m_pDirectAddIDFunction(wm, parent, pAttribute) ;
+		return m_pDirectAddIDFunction(wm, parent, clientTimeTag, pAttribute) ;
 	}
-	Direct_WME_Handle			DirectLinkID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, Direct_WMObject_Handle orig)
+	Direct_WME_Handle			DirectLinkID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, Direct_WMObject_Handle orig)
 	{
-		return m_pDirectLinkIDFunction(wm, parent, pAttribute, orig) ;
+		return m_pDirectLinkIDFunction(wm, parent, clientTimeTag, pAttribute, orig) ;
 	}
 	Direct_WMObject_Handle		DirectGetThisWMObject(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme)
 	{
@@ -141,9 +141,9 @@ public:
 		m_pDirectRunFunction(pAgentName, forever, stepSize, count) ;
 	}
 
-	void						DirectReleaseWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme)
+	void						DirectReleaseWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
 	{
-		return m_pDirectReleaseWMEFunction(wm, wme) ;
+		return m_pDirectReleaseWMEFunction(wm, wme, clientTimeTag) ;
 	}
 	void						DirectReleaseWMObject(Direct_WMObject_Handle parent)
 	{

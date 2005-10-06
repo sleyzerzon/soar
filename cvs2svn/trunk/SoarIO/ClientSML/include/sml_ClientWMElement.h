@@ -121,7 +121,7 @@ protected:
 
 	void ClearAllWMObjectHandles()				{ m_WME = 0 ; }
 
-	virtual Direct_WME_Handle DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject) = 0 ;
+	virtual Direct_WME_Handle DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag) = 0 ;
 #endif
 
 private:

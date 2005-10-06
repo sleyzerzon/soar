@@ -346,14 +346,14 @@ void Identifier::ClearAllWMObjectHandles()
 	}
 }
 
-Direct_WME_Handle Identifier::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject)
+Direct_WME_Handle Identifier::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag)
 {
 	// If this identifier is sharing ID values with other identifiers, we add the first object
 	// and then link all subsequent ones together.
 	Direct_WME_Handle wme = 0 ;
 	if (m_pSymbol->IsFirstUser(this))
 	{
-		wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectAddID(wm, wmobject, GetAttribute()) ;
+		wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectAddID(wm, wmobject, timeTag, GetAttribute()) ;
 	}
 	else
 	{
@@ -365,7 +365,7 @@ Direct_WME_Handle Identifier::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_W
 		// when the first user of the symbol was called.
 		assert(sharedWMObject != 0) ;
 
-		wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectLinkID(wm, wmobject, GetAttribute(), sharedWMObject) ;
+		wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectLinkID(wm, wmobject, timeTag, GetAttribute(), sharedWMObject) ;
 	}
 
 	Direct_WMObject_Handle newwmobject = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectGetThisWMObject(wm, wme) ;

@@ -73,8 +73,7 @@ namespace gSKI
 
      // 09/26/05 KJC:  commenting this in constructor so that updates can happen
 	 // ONLY from InputPhaseCallback
-	 // DJP: Re-added so tests stop failing while we investigate why.
-	 Update();
+	 //Update();
    }
 
   InputWme::~InputWme() 
@@ -167,8 +166,7 @@ namespace gSKI
     m_removeWme = true;
 	 // 09/26/05 KJC:  commenting this direct call so that updates will happen
 	 // ONLY from InputPhaseCallback
-	 // DJP: Re-added so tests stop failing while we investigate why.
-    Update();
+    //Update();
   }
 
   void InputWme::Update()

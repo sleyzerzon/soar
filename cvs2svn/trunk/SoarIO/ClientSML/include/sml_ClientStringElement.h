@@ -51,7 +51,7 @@ protected:
 	}
 
 #ifdef SML_DIRECT
-	virtual Direct_WME_Handle DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject) ;
+	virtual Direct_WME_Handle DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag) ;
 #endif
 };
 

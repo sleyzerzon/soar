@@ -590,7 +590,7 @@ StringElement* WorkingMemory::CreateStringWME(Identifier* parent, char const* pA
 	if (GetConnection()->IsDirectConnection() && wm)
 	{
 		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_String(wm, parent->GetWMObjectHandle(), pAttribute, pValue) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_String(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, pValue) ;
 		pWME->SetWMEHandle(wme) ;
 
 		// Return immediately, without adding it to the commit list.
@@ -620,7 +620,7 @@ IntElement* WorkingMemory::CreateIntWME(Identifier* parent, char const* pAttribu
 	if (GetConnection()->IsDirectConnection() && wm)
 	{
 		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Int(wm, parent->GetWMObjectHandle(), pAttribute, value) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Int(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, value) ;
 		pWME->SetWMEHandle(wme) ;
 
 		// Return immediately, without adding it to the commit list.
@@ -650,7 +650,7 @@ FloatElement* WorkingMemory::CreateFloatWME(Identifier* parent, char const* pAtt
 	if (GetConnection()->IsDirectConnection() && wm)
 	{
 		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Double(wm, parent->GetWMObjectHandle(), pAttribute, value) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Double(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, value) ;
 		pWME->SetWMEHandle(wme) ;
 
 		// Return immediately, without adding it to the commit list.
@@ -691,10 +691,10 @@ void WorkingMemory::UpdateString(StringElement* pWME, char const* pValue)
 	if (GetConnection()->IsDirectConnection() && wm)
 	{
 		// Remove the existing wme.  This releases the gSKI WME as well, invalidating our WMEHandle which we will replace in a moment.
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle()) ;
+		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), removeTimeTag) ;
 
 		// Add the new value immediately
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_String(wm, parent->GetWMObjectHandle(), pWME->GetAttribute(), pValue) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_String(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pWME->GetAttribute(), pValue) ;
 		pWME->SetWMEHandle(wme) ;
 
 		// Return immediately, without adding it to the commit list.
@@ -728,10 +728,10 @@ void WorkingMemory::UpdateInt(IntElement* pWME, int value)
 	if (GetConnection()->IsDirectConnection())
 	{
 		// Remove the existing wme.  This releases the gSKI WME as well, invalidating our WMEHandle which we will replace in a moment.
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle()) ;
+		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), removeTimeTag) ;
 
 		// Add the new value immediately
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Int(wm, parent->GetWMObjectHandle(), pWME->GetAttribute(), value) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Int(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pWME->GetAttribute(), value) ;
 		pWME->SetWMEHandle(wme) ;
 
 		// Return immediately, without adding it to the commit list.
@@ -765,10 +765,10 @@ void WorkingMemory::UpdateFloat(FloatElement* pWME, double value)
 	if (GetConnection()->IsDirectConnection() && wm)
 	{
 		// Remove the existing wme.  This releases the gSKI WME as well, invalidating our WMEHandle which we will replace in a moment.
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle()) ;
+		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), removeTimeTag) ;
 
 		// Add the new value immediately
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Double(wm, parent->GetWMObjectHandle(), pWME->GetAttribute(), value) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Double(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pWME->GetAttribute(), value) ;
 		pWME->SetWMEHandle(wme) ;
 
 		// Return immediately, without adding it to the commit list.
@@ -838,7 +838,7 @@ Identifier* WorkingMemory::CreateIdWME(Identifier* parent, char const* pAttribut
 	if (GetConnection()->IsDirectConnection() && wm)
 	{
 		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddID(wm, parent->GetWMObjectHandle(), pAttribute) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddID(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute) ;
 		Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetThisWMObject(wm, wme) ;
 		pWME->SetWMEHandle(wme) ;
 		pWME->SetWMObjectHandle(wmobject) ;
@@ -875,7 +875,7 @@ Identifier*	WorkingMemory::CreateSharedIdWME(Identifier* parent, char const* pAt
 	if (GetConnection()->IsDirectConnection() && wm)
 	{
 		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectLinkID(wm, parent->GetWMObjectHandle(), pAttribute, pSharedValue->GetWMObjectHandle()) ;
+		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectLinkID(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, pSharedValue->GetWMObjectHandle()) ;
 		Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetThisWMObject(wm, wme) ;
 		pWME->SetWMEHandle(wme) ;
 		pWME->SetWMObjectHandle(wmobject) ;
@@ -919,7 +919,7 @@ bool WorkingMemory::DestroyWME(WMElement* pWME)
 	{
 		// Remove the wme immediately, which also invalidates the handle, so clear it immediately
 		// (or we'll crash in the destructor for pWME just below)
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle()) ;
+		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), pWME->GetTimeTag()) ;
 		pWME->SetWMEHandle(0) ;
 
 		// Return immediately, without adding it to the commit list

@@ -36,9 +36,9 @@ char const* StringElement::GetValueType() const
 }
 
 #ifdef SML_DIRECT
-Direct_WME_Handle StringElement::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject)
+Direct_WME_Handle StringElement::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag)
 {
-	Direct_WME_Handle wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectAddWME_String(wm, wmobject, GetAttribute(), GetValue()) ;
+	Direct_WME_Handle wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectAddWME_String(wm, wmobject, timeTag, GetAttribute(), GetValue()) ;
 	return wme ;
 }
 #endif

@@ -603,29 +603,27 @@ ElementXML* KernelSML::ProcessIncomingSML(Connection* pConnection, ElementXML* p
 // Unfortunately we need to keep track of all wmes as they are created and destroyed
 // so that we can release them properly if the user issues an "init-soar".
 // Under gSKI's current memory model this is the client's responsibility or the agent
-// won't release its existing WMEs.
-static inline void RecordWME_Map(IWorkingMemory* wm, IWme* wme)
+// won't release its existing WMEs.  Also the reason we go to the extend of passing in
+// the clientTimeTag is because wme->GetTimeTag() is only valid once the wme has actually
+// been added to the kernel's working memory--which won't happen until Soar is next run
+// and we pass through an input-phase.
+static inline void RecordWME_Map(IWorkingMemory* wm, IWme* wme, long clientTimeTag)
 {
 	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(wm->GetAgent()) ;
 
-	// DJP: I'm disabling this for now as there are still bugs around which objects
-	// to release prior to init-soar.  Until I've figured out what to release and what not to
-	// it's safer to leave this out (which means init-soar will fail, but nothing will crash).
-	pAgentSML->RecordLongTimeTag( wme->GetTimeTag(), wme ) ;
+	pAgentSML->RecordLongTimeTag( clientTimeTag, wme ) ;
 
-//	KernelSML::DebugPrint(wme->GetValue()->GetString(), wme->GetTimeTag(), "Recorded\n") ;
+//	KernelSML::DebugPrint(wme->GetValue()->GetString(), clientTimeTag, "Recorded\n") ;
 }
 
-static inline void RemoveWME_Map(IWorkingMemory* wm, IWme* wme)
+static inline void RemoveWME_Map(IWorkingMemory* wm, IWme* wme, long clientTimeTag)
 {
+	unused(wme) ;
 	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(wm->GetAgent()) ;
 
-	// DJP: I'm disabling this for now as there are still bugs around which objects
-	// to release prior to init-soar.  Until I've figured out what to release and what not to
-	// it's safer to leave this out (which means init-soar will fail, but nothing will crash).
-	pAgentSML->RemoveLongTimeTag( wme->GetTimeTag() ) ;
+	pAgentSML->RemoveLongTimeTag( clientTimeTag ) ;
 
-//	KernelSML::DebugPrint(wme->GetValue()->GetString(), wme->GetTimeTag(), "Removed\n") ;
+//	KernelSML::DebugPrint(wme->GetValue()->GetString(), clientTimeTag), "Removed\n") ;
 }
 
 /*************************************************************
@@ -635,26 +633,26 @@ static inline void RemoveWME_Map(IWorkingMemory* wm, IWme* wme)
 * @param pAttribute The attribute name to use
 * @param value		The value to use
 *************************************************************/
-EXPORT Direct_WME_Handle sml_DirectAddWME_String(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, char const* value)
+EXPORT Direct_WME_Handle sml_DirectAddWME_String(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, char const* value)
 {
 	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeString((IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme) ;
+	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
 
-EXPORT Direct_WME_Handle sml_DirectAddWME_Int(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, int value)
+EXPORT Direct_WME_Handle sml_DirectAddWME_Int(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, int value)
 {
 	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeInt((IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme) ;
+	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
 
-EXPORT Direct_WME_Handle sml_DirectAddWME_Double(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, double value)
+EXPORT Direct_WME_Handle sml_DirectAddWME_Double(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, double value)
 {
 	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeDouble((IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme) ;
+	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
@@ -665,10 +663,10 @@ EXPORT Direct_WME_Handle sml_DirectAddWME_Double(Direct_WorkingMemory_Handle wm,
 * @param wm			The working memory object (either input or output)
 * @param wme		The wme we're removing
 *************************************************************/
-EXPORT void sml_DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme)
+EXPORT void sml_DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
 {
 	// Remove this from the list of wme's we're tracking.  Do this before removing it from working memory
-	RemoveWME_Map((IWorkingMemory*)wm, (IWme*)wme) ;
+	RemoveWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
 
 	// Remove the wme from working memory
 	((IWorkingMemory*)wm)->RemoveWme((IWme*)wme) ;
@@ -685,10 +683,10 @@ EXPORT void sml_DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handl
 * @param parent		The identifier (WMObject) we're adding to.
 * @param pAttribute	The attribute to add
 *************************************************************/
-EXPORT Direct_WME_Handle sml_DirectAddID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute)
+EXPORT Direct_WME_Handle sml_DirectAddID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute)
 {
 	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeNewObject((IWMObject*)parent, pAttribute) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme) ;
+	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
@@ -701,10 +699,10 @@ EXPORT Direct_WME_Handle sml_DirectAddID(Direct_WorkingMemory_Handle wm, Direct_
 * @param pAttribute	The attribute to add
 * @param orig		The original identifier (whose value we are copying)
 *************************************************************/
-EXPORT Direct_WME_Handle sml_DirectLinkID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, char const* pAttribute, Direct_WMObject_Handle orig)
+EXPORT Direct_WME_Handle sml_DirectLinkID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, Direct_WMObject_Handle orig)
 {
 	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeObjectLink((IWMObject*)parent, pAttribute, (IWMObject*)orig) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme) ;
+	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
@@ -835,10 +833,10 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 	return ;
 }
 
-EXPORT void sml_DirectReleaseWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme)
+EXPORT void sml_DirectReleaseWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
 {
 	// Remove this from the list of wme's we're tracking.  Do this before we release it
-	RemoveWME_Map((IWorkingMemory*)wm, (IWme*)wme) ;
+	RemoveWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
 
 	((IWme*)wme)->Release() ;
 }

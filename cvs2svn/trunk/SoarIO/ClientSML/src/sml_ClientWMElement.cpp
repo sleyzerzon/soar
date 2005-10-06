@@ -79,7 +79,7 @@ void WMElement::Refresh()
 	if (GetAgent()->GetConnection()->IsDirectConnection())
 	{
 		// Add the new value immediately
-		Direct_WME_Handle wme = DirectAdd(wm, parent->GetWMObjectHandle()) ;
+		Direct_WME_Handle wme = DirectAdd(wm, parent->GetWMObjectHandle(), GetTimeTag()) ;
 		SetWMEHandle(wme) ;
 
 		// Return immediately, without adding it to the commit list.
