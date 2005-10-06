@@ -95,11 +95,19 @@ void AgentSML::ReleaseAllWmes()
 		gSKI::IWme* pWme = mapIter->second ;
 		std::string value = pWme->GetValue()->GetString() ;
 
-		pWme->Release() ;
+		bool deleted = pWme->Release() ;
+
+		if (!deleted)
+		{
+			fprintf(stdout, "ERROR: A wme with value %s was released but not deleted.  Memory leak.\n", value.c_str()) ;
+			assert(deleted) ;
+		}
 	}
 
 	if (m_InputLinkRoot)
+	{
 		m_InputLinkRoot->Release() ;
+	}
 	m_InputLinkRoot = NULL ;
 /*
 	if (m_OutputLinkRoot)
@@ -260,6 +268,9 @@ void AgentSML::RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWME)
 
 void AgentSML::RecordLongTimeTag(long timeTag, gSKI::IWme* pWME)
 {
+	// Make sure it's a valid time tag
+	assert(timeTag != 0) ;
+
 	char str[kMinBufferSize] ;
 	Int2String(timeTag, str, sizeof(str)) ;
 

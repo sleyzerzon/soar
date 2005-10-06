@@ -100,6 +100,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Constants::kCLIWatch]					= &cli::CommandLineInterface::ParseWatch;
 	m_CommandMap[Constants::kCLIWatchWMEs]				= &cli::CommandLineInterface::ParseWatchWMEs;
 
+	// Indicate which commands should be echoed so that all users can see them when doing a shared debugging session
 	m_EchoMap[Constants::kCLIAddWME]					= true ;
 	m_EchoMap[Constants::kCLIAlias]						= true ;
 	m_EchoMap[Constants::kCLIAttributePreferencesMode]	= true ;
