@@ -62,11 +62,12 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
     registerForSoarStopEvent();
     registerForSoarStartEvent();
     
+    int callbackid = 0;
 	// Register for Soar update event
-	kernel.RegisterForUpdateEvent(
+	callbackid = kernel.RegisterForUpdateEvent(
 			smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this,
 			"updateWorldEvent", null);
-	if (kernel.GetLastCommandLineResult())
+	if (callbackid > 0)
 		TankSoarLogger.log("Registered for Soar update event.");// Registration successful
 	else {
 		JOptionPane
@@ -109,10 +110,11 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
     registerForSoarStartEvent();
     
 	// Register for Soar update event
-	kernel.RegisterForUpdateEvent(
+	int callbackid = 0;
+	callbackid = kernel.RegisterForUpdateEvent(
 			smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this,
 			"updateWorldEvent", null);
-	if (kernel.GetLastCommandLineResult())
+	if (callbackid > 0)
 		TankSoarLogger.log("Registered for Soar update event.");// Registration successful
 	else {
 		JOptionPane
@@ -176,8 +178,8 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
 
   private void registerForSoarStopEvent()
   {
-    kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, "soarStopEvent", null);
-    if(kernel.GetLastCommandLineResult())
+    int callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, "soarStopEvent", null);
+    if(callbackid > 0)
       TankSoarLogger.log("Successfully registered for Soar kernel stop event.");
     else
     {
@@ -188,9 +190,9 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
   
   private void registerForSoarStartEvent()
   {
-    kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, 
+    int callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, 
         this, "soarStartEvent", null);
-    if(kernel.GetLastCommandLineResult())
+    if(callbackid > 0)
       TankSoarLogger.log("Successfully registered for Soar kernel start event.");
     else
     {

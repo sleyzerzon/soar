@@ -113,10 +113,11 @@ public class EaterControl extends SimulationControl implements
 			System.exit(-1);
 		}
 
+		int callbackid = 0;
 		// Register for Soar start event
-		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START,
+		callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START,
 				this, "soarStartEvent", null);
-		if (kernel.GetLastCommandLineResult())
+		if (callbackid > 0)
 			;//Registration successful
 		else {
 			JOptionPane
@@ -128,9 +129,9 @@ public class EaterControl extends SimulationControl implements
 		}
 
 		// Register for Soar stop event
-		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP,
+		callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP,
 				this, "soarStopEvent", null);
-		if (kernel.GetLastCommandLineResult())
+		if (callbackid > 0)
 			;//Registration successful
 		else {
 			JOptionPane
@@ -142,10 +143,10 @@ public class EaterControl extends SimulationControl implements
 		}
 
 		// Register for Soar update event
-		kernel.RegisterForUpdateEvent(
+		callbackid = kernel.RegisterForUpdateEvent(
 				smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this,
 				"updateWorldEvent", null);
-		if (kernel.GetLastCommandLineResult())
+		if (callbackid > 0)
 			;//Registration successful
 		else {
 			JOptionPane
