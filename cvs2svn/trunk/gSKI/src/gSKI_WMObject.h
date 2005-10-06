@@ -300,7 +300,7 @@ namespace gSKI {
      tIWMObjectIterator* GetObjectsReferencedByAttribute(const std::string& attr) const;
 
      // TODO: Document these methods
-     void Release(Error* err=0);
+     bool Release(Error* err=0);
      bool IsClientOwned(Error* err=0) const;
      
    private:

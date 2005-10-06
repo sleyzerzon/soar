@@ -55,10 +55,11 @@ namespace gSKI
 
       /** Implement gSKI::IRelease */
       //{
-      virtual void Release(Error* err = 0)
+      virtual bool Release(Error* err = 0)
       {
          ClearError(err);
          delete this;
+		 return true ;
       }
 
       virtual bool IsClientOwned(Error* err = 0) const 
@@ -145,14 +146,16 @@ namespace gSKI
 
       /** Implement gSKI::IRelease */
       //{
-      virtual void Release(Error* err = 0)
+      virtual bool Release(Error* err = 0)
       {
          assert(m_count > 0);
          ClearError(err);
          if(--m_count == 0)
          {
             delete this;
+			return true ;
          }
+		 return false ;
       }
 
       virtual bool IsClientOwned(Error* err = 0) const 

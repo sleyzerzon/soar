@@ -110,6 +110,9 @@ namespace gSKI
   // TODO: This method should probably return an unsigned long
   long InputWme::GetTimeTag(Error* err) const
   {
+	  // This method can only be validly called once the underlying kernel wme has been created
+	  assert(m_rawwme) ;
+
     ClearError(err);
       return m_rawwme ? m_rawwme->timetag : 0;
     }

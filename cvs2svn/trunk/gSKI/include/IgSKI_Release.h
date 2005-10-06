@@ -57,9 +57,11 @@ namespace gSKI {
       *               is not 0 this structure is filled with extended error
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
+	  *
+	  * @return true if the object was deleted.
       *
       */
-      virtual void Release(Error* err = 0) = 0;
+      virtual bool Release(Error* err = 0) = 0;
 
       /** 
        * @brief Returns whether or not this  object is client owned.

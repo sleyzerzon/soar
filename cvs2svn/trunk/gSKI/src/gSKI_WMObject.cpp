@@ -205,11 +205,12 @@ namespace gSKI
      ===============================
    */
   
-   void WMObject::Release(Error* err)
+   bool WMObject::Release(Error* err)
    {
       ClearError(err);
     
       MegaAssert(false, "NOT IMPLEMENTED YET!");
+	  return false ;
    }
 
    /*

@@ -178,11 +178,12 @@ namespace gSKI
     ===============================
   */
   
-  void Wme::Release(Error* err)
+  bool Wme::Release(Error* err)
   {
     ClearError(err);
     
     MegaAssert(false, "NOT IMPLEMENTED YET!");
+	return false ;
   }
 
   /*

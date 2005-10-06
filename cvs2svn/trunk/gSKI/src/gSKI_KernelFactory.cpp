@@ -318,9 +318,10 @@ namespace gSKI {
                               |___/
    =========================
    */
-   void KernelFactory::Release(Error* err)
+   bool KernelFactory::Release(Error* err)
    {
       delete(this);
+	  return true ;
    }
 
   // TODO: Implement this function properly

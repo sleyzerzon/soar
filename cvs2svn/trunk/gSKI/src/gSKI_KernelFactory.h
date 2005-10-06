@@ -290,7 +290,7 @@ namespace gSKI {
       * Call this method to remove this object from memory.  The pointer used to call Release
       *  will no longer be valid after the Release method returns.
       */
-      void Release(Error* err = 0);
+      bool Release(Error* err = 0);
 
       /**
        * @brief Required by the IRelease interface
