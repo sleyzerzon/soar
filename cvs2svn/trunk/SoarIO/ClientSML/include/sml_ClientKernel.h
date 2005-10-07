@@ -789,6 +789,12 @@ public:
 	static std::string GetSoarClientVersion() ;
 	static std::string GetSMLVersion() ;
 
+	/*************************************************************
+	* @brief Calls Commit() for all agents -- sending any queued I/O operations
+	*		 over to the kernel for processing.
+	*************************************************************/
+	void CommitAll() ;
+
 protected:
 	/*************************************************************
 	* @brief This function is called when we receive a "call" SML

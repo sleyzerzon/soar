@@ -1106,6 +1106,21 @@ bool Kernel::ExecuteCommandLineXML(char const* pCommandLine, char const* pAgentN
 }
 
 /*************************************************************
+* @brief Calls Commit() for all agents -- sending any queued I/O operations
+*		 over to the kernel for processing.
+*************************************************************/
+void Kernel::CommitAll()
+{
+	int numberAgents = GetNumberAgents() ;
+
+	for (int i = 0 ; i < numberAgents ; i++)
+	{
+		Agent* pAgent = GetAgentByIndex(i) ;
+		pAgent->Commit() ;
+	}
+}
+
+/*************************************************************
 * @brief   Run Soar for the specified number of decisions
 *
 * This command will currently run all agents.
