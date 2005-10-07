@@ -32,7 +32,7 @@ import sml.smlSystemEventId;
  * @author Trevor McCulloch, University of Michigan
  * @version 1.1
  */
-public class Game implements Runnable {
+public class Game implements Runnable, Agent.RunEventInterface, Kernel.UpdateEventInterface {
     /**
      * Constructor that creates a <code>Game</code> with the default configuration
      * of 3 towers and 11 disks.
@@ -180,8 +180,7 @@ public class Game implements Runnable {
 		}
 	}
 
-    /** This method is called when the "after_all_output_phases" event fires, at which point we update the world */
-	public void afterDecisionHandler(int eventID, Object data, Agent agent, int phase)
+	public void runEventHandler(int eventID, Object data, Agent agent, int phase)
 	{
 		try
 		{
@@ -339,20 +338,20 @@ public class Game implements Runnable {
      */
     public void removeGameListener(GameListener l)	{ listeners.remove(l); }
 
-    public void registerForStartStopEvents(GameListener listener, String methodName)
+    public void registerForStartStopEvents(GameListener listener)
     {
     	if (kernel != null)
     	{
-			int startCallback = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, listener, methodName, null) ;
-			int stopCallback  = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, listener, methodName, null) ;
+			int startCallback = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, listener, null) ;
+			int stopCallback  = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, listener, null) ;
     	}
     }
     
     /** We update the environment when this event fires.  This allows us to either run the environment directly or from a debugger and get correct behavior */
     public void registerForUpdateWorldEvent()
     {
-    	//int updateCallback = kernel.RegisterForUpdateEvent(sml.smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, "updateEventHandler", null) ;
-    	int eventCallback = agent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, this, "afterDecisionHandler", null) ;
+    	int updateCallback = kernel.RegisterForUpdateEvent(sml.smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null) ;
+    	int eventCallback = agent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, this, null) ;
     }
 
     public void detachSoar() {

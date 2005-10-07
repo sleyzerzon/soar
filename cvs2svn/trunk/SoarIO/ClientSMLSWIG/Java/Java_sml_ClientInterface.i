@@ -45,16 +45,16 @@
     }
   }
   
-  public final static native int Agent_RegisterForRunEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Agent_RegisterForProductionEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Agent_RegisterForPrintEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6, boolean jarg7);
-  public final static native int Agent_RegisterForXMLEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Agent_AddOutputHandler(long jarg1, String jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Kernel_RegisterForSystemEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Kernel_RegisterForUpdateEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Kernel_RegisterForUntypedEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Kernel_RegisterForAgentEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
-  public final static native int Kernel_AddRhsFunction(long jarg1, String jarg2, Object jarg3, Object jarg4, String jarg5, Object jarg6);
+  public final static native int Agent_RegisterForRunEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Agent_RegisterForProductionEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Agent_RegisterForPrintEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6, boolean jarg7);
+  public final static native int Agent_RegisterForXMLEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Agent_AddOutputHandler(long jarg1, String jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Kernel_RegisterForSystemEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Kernel_RegisterForUpdateEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Kernel_RegisterForUntypedEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Kernel_RegisterForAgentEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Kernel_AddRhsFunction(long jarg1, String jarg2, Object jarg3, Object jarg4, Object jarg6);
 
   public final static native boolean Agent_UnregisterForRunEvent(long jarg1, int jarg2);
   public final static native boolean Agent_UnregisterForProductionEvent(long jarg1, int jarg2);
@@ -69,20 +69,40 @@
 %}
 
 %typemap(javacode) sml::Agent %{
-  public int RegisterForRunEvent(smlRunEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Agent_RegisterForRunEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ;}
+  public interface RunEventInterface {
+	public void runEventHandler(int eventID, Object data, Agent agent, int phase) ;
+  }
+
+  public interface ProductionEventInterface {
+     public void productionEventHandler(int eventID, Object data, Agent agent, String prodName, String instantiation) ;
+  }
   
-  public int RegisterForProductionEvent(smlProductionEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Agent_RegisterForProductionEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ; }
+  public interface PrintEventInterface { 
+  		public void printEventHandler(int eventID, Object data, Agent agent, String message) ;
+  }
+  
+  public interface xmlEventInterface {
+  		public void xmlEventHandler(int eventID, Object data, Agent agent, ClientXML xml) ;
+  }
 
-  public int RegisterForPrintEvent(smlPrintEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Agent_RegisterForPrintEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData, true) ; }
+  public interface OutputEventInterface {  
+  		public void outputEventHandler(Object data, String agentName, String attributeName, WMElement pWmeAdded) ;
+  }
 
-  public int RegisterForPrintEvent(smlPrintEventId id, Object handlerObject, String handlerMethod, Object callbackData, boolean ignoreOwnEchos)
-  { return smlJNI.Agent_RegisterForPrintEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData, ignoreOwnEchos) ; }
+  public int RegisterForRunEvent(smlRunEventId id, RunEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Agent_RegisterForRunEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ;}
+  
+  public int RegisterForProductionEvent(smlProductionEventId id, ProductionEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Agent_RegisterForProductionEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ; }
 
-  public int RegisterForXMLEvent(smlXMLEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Agent_RegisterForXMLEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ; }
+  public int RegisterForPrintEvent(smlPrintEventId id, PrintEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Agent_RegisterForPrintEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData, true) ; }
+
+  public int RegisterForPrintEvent(smlPrintEventId id, PrintEventInterface handlerObject, Object callbackData, boolean ignoreOwnEchos)
+  { return smlJNI.Agent_RegisterForPrintEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData, ignoreOwnEchos) ; }
+
+  public int RegisterForXMLEvent(smlXMLEventId id, xmlEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Agent_RegisterForXMLEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ; }
   
   public boolean UnregisterForRunEvent(int callbackReturnValue)
   { return smlJNI.Agent_UnregisterForRunEvent(swigCPtr, callbackReturnValue) ;}
@@ -96,40 +116,60 @@
   public boolean UnregisterForXMLEvent(int callbackReturnValue)
   { return smlJNI.Agent_UnregisterForXMLEvent(swigCPtr, callbackReturnValue) ;}
 
-  public int AddOutputHandler(String attributeName, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Agent_AddOutputHandler(swigCPtr, attributeName, this, handlerObject, handlerMethod, callbackData) ; }
+  public int AddOutputHandler(String attributeName, OutputEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Agent_AddOutputHandler(swigCPtr, attributeName, this, handlerObject, callbackData) ; }
 
   public boolean RemoveOutputHandler(int callbackReturnValue)
   { return smlJNI.Agent_RemoveOutputHandler(swigCPtr, callbackReturnValue) ;}
 %}
 
 %typemap(javacode) sml::Kernel %{
-  public int RegisterForSystemEvent(smlSystemEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Kernel_RegisterForSystemEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ;}
+  public interface SystemEventInterface {
+     public void systemEventHandler(int eventID, Object data, Kernel kernel) ;
+  }
+
+  public interface UpdateEventInterface {  
+  	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) ;
+  }
+
+  public interface UntypedEventInterface {  
+  	public void untypedEventHandler(int eventID, Object userData, Kernel kernel, Object callbackData) ;
+  }
+
+  public interface AgentEventInterface {  
+  		public void agentEventHandler(int eventID, Object data, String agentName) ;
+  }
+
+  public interface RhsFunctionInterface {  
+  		public String rhsFunctionHandler(int eventID, Object data, String agentName, String functionName, String argument) ;
+  }
+  
+  public int RegisterForSystemEvent(smlSystemEventId id, SystemEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Kernel_RegisterForSystemEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ;}
  
   public boolean UnregisterForSystemEvent(int callbackReturnValue)
   { return smlJNI.Kernel_UnregisterForSystemEvent(swigCPtr, callbackReturnValue) ;}
 
-  public int RegisterForUpdateEvent(smlUpdateEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Kernel_RegisterForUpdateEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ;}
+  public int RegisterForUpdateEvent(smlUpdateEventId id, UpdateEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Kernel_RegisterForUpdateEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ;}
 
   public boolean UnregisterForUpdateEvent(int callbackReturnValue)
   { return smlJNI.Kernel_UnregisterForUpdateEvent(swigCPtr, callbackReturnValue) ;}
 
-  public int RegisterForUntypedEvent(smlUntypedEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Kernel_RegisterForUntypedEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ;}
+  public int RegisterForUntypedEvent(smlUntypedEventId id, UntypedEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Kernel_RegisterForUntypedEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ;}
  
   public boolean UnregisterForUntypedEvent(int callbackReturnValue)
   { return smlJNI.Kernel_UnregisterForUntypedEvent(swigCPtr, callbackReturnValue) ;}
   
-  public int RegisterForAgentEvent(smlAgentEventId id, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Kernel_RegisterForAgentEvent(swigCPtr, id.swigValue(), this, handlerObject, handlerMethod, callbackData) ; }
+  public int RegisterForAgentEvent(smlAgentEventId id, AgentEventInterface handlerObject, Object callbackData)
+  { return smlJNI.Kernel_RegisterForAgentEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ; }
 
   public boolean UnregisterForAgentEvent(int callbackReturnValue)
   { return smlJNI.Kernel_UnregisterForAgentEvent(swigCPtr, callbackReturnValue) ;}
 
-  public int AddRhsFunction(String functionName, Object handlerObject, String handlerMethod, Object callbackData)
-  { return smlJNI.Kernel_AddRhsFunction(swigCPtr, functionName, this, handlerObject, handlerMethod, callbackData) ; }
+  public int AddRhsFunction(String functionName, RhsFunctionInterface handlerObject, Object callbackData)
+  { return smlJNI.Kernel_AddRhsFunction(swigCPtr, functionName, this, handlerObject, callbackData) ; }
 
   public boolean RemoveRhsFunction(int callbackReturnValue)
   { return smlJNI.Kernel_RemoveRhsFunction(swigCPtr, callbackReturnValue) ;}

@@ -509,6 +509,9 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	pAgent->Update(pWME2, 300) ;
 
 	// Create a new WME that shares the same id as plane
+	// BUGBUG: This is triggering an assert and memory leak now after the changes
+	// to InputWME not calling Update() immediately.  For now I've removed the test until
+	// we have time to figure out what's going wrong.
 	//Identifier* pID2 = pAgent->CreateSharedIdWME(pInputLink, "all-planes", pID) ;
 	//unused(pID2);
 

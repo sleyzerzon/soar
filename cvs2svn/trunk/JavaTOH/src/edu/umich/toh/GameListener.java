@@ -17,7 +17,7 @@ package edu.umich.toh;
  * 
  * @see Game
  */
-public interface GameListener {
+public interface GameListener extends sml.Kernel.SystemEventInterface {
     /**
      * Whenever a disk is moved from one tower to another, this method is called to
      * inform this listener where the disk was moved from and where it was moved to

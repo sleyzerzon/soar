@@ -150,7 +150,7 @@ implements PaintListener, GameListener, ControlListener {
         // Only doing this now so we can set the buttons to a reasonable state when the
         // user is running from the debugger.  If all buttons were enabled at all times
         // we could skip this.
-        game.registerForStartStopEvents(this, "systemEventHandler") ;
+        game.registerForStartStopEvents(this) ;
         
         dpy = new Display();
         shell = new Shell(dpy, SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.RESIZE);

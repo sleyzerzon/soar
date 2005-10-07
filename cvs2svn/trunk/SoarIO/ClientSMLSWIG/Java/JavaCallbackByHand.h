@@ -174,7 +174,7 @@ public:
 
 // Collect the Java values into a single object which we'll register with our local event handler.
 // When this handler is called we'll unpack the Java data and make a callback to the Java process.
-static JavaCallbackData* CreateJavaCallbackData(bool storeAgent, JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+static JavaCallbackData* CreateJavaCallbackData(bool storeAgent, JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, char const* pMethodName, jobject jarg6)
 {
 	// The trick here is we collect up all of the Java information and store that as the callback data
 	// for our local handler.  When our handler is called we'll unpack the data and make the Java callback.
@@ -187,7 +187,8 @@ static JavaCallbackData* CreateJavaCallbackData(bool storeAgent, JNIEnv *jenv, j
 	jobject jglobal6 = jenv->NewGlobalRef(jarg6) ;	// Arbitrary object passed back to the caller
 
 	// Get the method name from the Java string
-	const char *pMethodName = jenv->GetStringUTFChars(jarg5, 0);
+	// We used to pass this in as a parameter to the callback, but now its imbedded in the interface definition.
+	//const char *pMethodName = jenv->GetStringUTFChars(jarg5, 0);
 
 	// Record the virtual machine we are using
 	JavaVM vm ;
@@ -203,7 +204,7 @@ static JavaCallbackData* CreateJavaCallbackData(bool storeAgent, JNIEnv *jenv, j
 	JavaCallbackData* pJavaData = new JavaCallbackData(pvm, jenv, storeAgent ? jglobal3 : 0, storeAgent ? 0 : jglobal3, jglobal4, pMethodName, jglobal6) ;
 
 	// Release the string we got from Java
-	jenv->ReleaseStringUTFChars(jarg5, pMethodName);
+	//jenv->ReleaseStringUTFChars(jarg5, pMethodName);
 
 	return pJavaData ;
 }
@@ -246,7 +247,7 @@ static void RunEventHandler(sml::smlRunEventId id, void* pUserData, sml::Agent* 
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForRunEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForRunEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -255,7 +256,7 @@ JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForRunEvent(JNIEnv *jenv, 
 	sml::smlRunEventId arg2 = (sml::smlRunEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "runEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForRunEvent(arg2, &RunEventHandler, pJavaData) ;
@@ -324,7 +325,7 @@ static void ProductionEventHandler(sml::smlProductionEventId id, void* pUserData
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT int JNICALL Java_sml_smlJNI_Agent_1RegisterForProductionEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT int JNICALL Java_sml_smlJNI_Agent_1RegisterForProductionEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -333,7 +334,7 @@ JNIEXPORT int JNICALL Java_sml_smlJNI_Agent_1RegisterForProductionEvent(JNIEnv *
 	sml::smlProductionEventId arg2 = (sml::smlProductionEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "productionEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForProductionEvent(arg2, &ProductionEventHandler, pJavaData) ;
@@ -401,7 +402,7 @@ static void PrintEventHandler(sml::smlPrintEventId id, void* pUserData, sml::Age
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForPrintEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6, jboolean jarg7)
+JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForPrintEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6, jboolean jarg7)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -410,7 +411,7 @@ JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForPrintEvent(JNIEnv *jenv
 	sml::smlPrintEventId arg2 = (sml::smlPrintEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "printEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForPrintEvent(arg2, &PrintEventHandler, pJavaData, (jarg7 != JNI_FALSE)) ;
@@ -514,7 +515,7 @@ static void XMLEventHandler(sml::smlXMLEventId id, void* pUserData, sml::Agent* 
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForXMLEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForXMLEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -523,7 +524,7 @@ JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForXMLEvent(JNIEnv *jenv, 
 	sml::smlXMLEventId arg2 = (sml::smlXMLEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "xmlEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForXMLEvent(arg2, &XMLEventHandler, pJavaData) ;
@@ -631,7 +632,7 @@ static void OutputEventHandler(void* pUserData, sml::Agent* pAgent, char const* 
 	jenv->CallVoidMethod(jobj, mid, pJavaData->m_CallbackData, agentName, attributeName, jNewObject) ;
 }
 
-JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1AddOutputHandler(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1AddOutputHandler(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -640,7 +641,7 @@ JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1AddOutputHandler(JNIEnv *jenv, jcl
 	const char *pAttributeName = jenv->GetStringUTFChars(jarg2, 0);
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, 0, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, 0, jarg3, jarg4, "outputEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->AddOutputHandler(pAttributeName, &OutputEventHandler, pJavaData) ;
@@ -704,7 +705,7 @@ static void SystemEventHandler(sml::smlSystemEventId id, void* pUserData, sml::K
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForSystemEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForSystemEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Kernel object
 	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
@@ -713,7 +714,7 @@ JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForSystemEvent(JNIEnv *jen
 	sml::smlSystemEventId arg2 = (sml::smlSystemEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "systemEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForSystemEvent(arg2, &SystemEventHandler, pJavaData) ;
@@ -777,7 +778,7 @@ static void UpdateEventHandler(sml::smlUpdateEventId id, void* pUserData, sml::K
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForUpdateEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForUpdateEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Kernel object
 	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
@@ -786,7 +787,7 @@ JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForUpdateEvent(JNIEnv *jen
 	sml::smlUpdateEventId arg2 = (sml::smlUpdateEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "updateEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForUpdateEvent(arg2, &UpdateEventHandler, pJavaData) ;
@@ -860,7 +861,7 @@ static void UntypedEventHandler(sml::smlUntypedEventId id, void* pUserData, sml:
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForUntypedEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForUntypedEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Kernel object
 	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
@@ -869,7 +870,7 @@ JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForUntypedEvent(JNIEnv *je
 	sml::smlUntypedEventId arg2 = (sml::smlUntypedEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "untypedEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForUntypedEvent(arg2, &UntypedEventHandler, pJavaData) ;
@@ -975,7 +976,7 @@ extern "C" {
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1AddRhsFunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1AddRhsFunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Kernel object
 	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
@@ -984,7 +985,7 @@ JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1AddRhsFunction(JNIEnv *jenv, jclas
 	const char *pFunctionName = jenv->GetStringUTFChars(jarg2, 0);
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, 0, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, 0, jarg3, jarg4, "rhsFunctionHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->AddRhsFunction(pFunctionName, &RhsEventHandler, pJavaData) ;
@@ -1056,7 +1057,7 @@ static void AgentEventHandler(sml::smlAgentEventId id, void* pUserData, sml::Age
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForAgentEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jstring jarg5, jobject jarg6)
+JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForAgentEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Kernel object
 	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
@@ -1065,7 +1066,7 @@ JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForAgentEvent(JNIEnv *jenv
 	sml::smlAgentEventId arg2 = (sml::smlAgentEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, jarg5, jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "agentEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
 	pJavaData->m_CallbackID = arg1->RegisterForAgentEvent(arg2, &AgentEventHandler, pJavaData) ;

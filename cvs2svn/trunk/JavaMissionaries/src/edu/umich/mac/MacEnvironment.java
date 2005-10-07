@@ -28,7 +28,7 @@ import sml.smlUpdateEventId;
  * @author Trevor McCulloch, University of Michigan
  * @version 1.0
  */
-public class MacEnvironment implements Runnable {
+public class MacEnvironment implements Runnable, Kernel.SystemEventInterface, Kernel.UpdateEventInterface {
     private Kernel kernel;
     private Agent agent;
     
@@ -66,11 +66,11 @@ public class MacEnvironment implements Runnable {
         }
         
         kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START,
-                this, "fireSystemStarted", null);
+                this, null);
         kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP,
-                this, "fireSystemStopped", null);
+                this, null);
         kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES,
-                this, "updateWorldEvent", null);
+                this, null);
         
         leftBank = new RiverBank(agent, "left", 3, 3, 1);
         rightBank = new RiverBank(agent, "right", 0, 0, 0);
@@ -207,7 +207,7 @@ public class MacEnvironment implements Runnable {
      * This method is called when the "after_all_output_phases" event fires, at
      * which point we update the world
      */
-    public void updateWorldEvent(int eventID, Object data, Kernel kernel,
+    public void updateEventHandler(int eventID, Object data, Kernel kernel,
             int runFlags)
     {
         // We have a problem at the moment with calling Stop() from arbitrary
@@ -277,6 +277,14 @@ public class MacEnvironment implements Runnable {
     public void detachSoar() {
 	kernel.Shutdown();
         kernel.delete();
+    }
+    
+    public void systemEventHandler(int eventID, Object data, Kernel kernel)
+    {
+    	if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue())
+    		fireSystemStarted(eventID, data, kernel) ;
+    	else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue())
+    		fireSystemStopped(eventID, data, kernel) ;
     }
     
     /**

@@ -27,7 +27,9 @@ public class Application
 {
 	private Kernel m_Kernel ;
 
-	public static class EventListener
+	public static class EventListener implements Agent.RunEventInterface, Agent.PrintEventInterface, Agent.ProductionEventInterface,
+												 Agent.xmlEventInterface, Agent.OutputEventInterface,
+												 Kernel.AgentEventInterface, Kernel.SystemEventInterface, Kernel.RhsFunctionInterface
 	{
 		// We'll test to make sure we can keep a ClientXML object that we're passed.
 		public ClientXML m_Keep = null ;
@@ -97,7 +99,7 @@ public class Application
 			//xml.delete() ;
 		}
 
-		public String testRhsHandler(int eventID, Object data, String agentName, String functionName, String argument)
+		public String rhsFunctionHandler(int eventID, Object data, String agentName, String functionName, String argument)
 		{
 			System.out.println("Received rhs function event in Java for function: " + functionName + "(" + argument + ")") ;
 			return "My rhs result " + argument ;
@@ -206,15 +208,15 @@ public class Application
 		// The integer we get back is only required when we unregister the handler.
 		********************************************************/
 		EventListener listener = new EventListener() ;
-		int jRunCallback    = pAgent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, listener, "runEventHandler", this) ;		
-		int jProdCallback   = pAgent.RegisterForProductionEvent(smlProductionEventId.smlEVENT_AFTER_PRODUCTION_FIRED, listener, "productionEventHandler", this) ;		
-		int jPrintCallback  = pAgent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, listener, "printEventHandler", this) ;		
-		int jSystemCallback = pKernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_AFTER_RESTART, listener, "systemEventHandler", this) ;		
-		int jSystemCallback2 = pKernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, listener, "systemEventHandler", this) ;		
-		int jAgentCallback  = pKernel.RegisterForAgentEvent(smlAgentEventId.smlEVENT_BEFORE_AGENT_REINITIALIZED, listener, "agentEventHandler", this) ;		
-		int jRhsCallback    = pKernel.AddRhsFunction("test-rhs", listener, "testRhsHandler", this) ;
-		int jTraceCallback  = pAgent.RegisterForXMLEvent(smlXMLEventId.smlEVENT_XML_TRACE_OUTPUT, listener, "xmlEventHandler", this) ;
-		int jOutputCallback = pAgent.AddOutputHandler("move", listener, "outputEventHandler", this) ;
+		int jRunCallback    = pAgent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, listener, this) ;		
+		int jProdCallback   = pAgent.RegisterForProductionEvent(smlProductionEventId.smlEVENT_AFTER_PRODUCTION_FIRED, listener, this) ;		
+		int jPrintCallback  = pAgent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, listener, this) ;		
+		int jSystemCallback = pKernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_AFTER_RESTART, listener, this) ;		
+		int jSystemCallback2 = pKernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, listener, this) ;		
+		int jAgentCallback  = pKernel.RegisterForAgentEvent(smlAgentEventId.smlEVENT_BEFORE_AGENT_REINITIALIZED, listener, this) ;		
+		int jRhsCallback    = pKernel.AddRhsFunction("test-rhs", listener, this) ;
+		int jTraceCallback  = pAgent.RegisterForXMLEvent(smlXMLEventId.smlEVENT_XML_TRACE_OUTPUT, listener, this) ;
+		int jOutputCallback = pAgent.AddOutputHandler("move", listener, this) ;
 		
 		// Trigger an agent event by doing init-soar
 		pAgent.InitSoar() ;
@@ -268,8 +270,8 @@ public class Application
 		pKernel.UnregisterForAgentEvent(jAgentCallback) ;
 		pKernel.RemoveRhsFunction(jRhsCallback) ;
 		
-		String trace2 = pAgent.RunSelfTilOutput(20) ;
-		System.out.println(trace2) ;
+		//String trace2 = pAgent.RunSelfTilOutput(20) ;
+		//System.out.println(trace2) ;
 		
 		// Clean up
 		m_Kernel.Shutdown() ;
