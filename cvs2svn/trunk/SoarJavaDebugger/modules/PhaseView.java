@@ -41,7 +41,7 @@ import doc.Document;
  * Also allows the user to select where Soar will stop when running by decision.
  * 
  ************************************************************************/
-public class PhaseView extends AbstractFixedView
+public class PhaseView extends AbstractFixedView implements Kernel.AgentEventInterface, Kernel.SystemEventInterface
 {
 	protected Canvas	m_PhaseDiagram ;
 	protected String[]	m_ImageNames = { "phase-none.png",
@@ -297,7 +297,7 @@ public class PhaseView extends AbstractFixedView
 		gc.drawText(decisions, 125, 41) ;
 	}
 	
-	public void initsoarEventHandler(int eventID, Object data, String agentName)
+	public void agentEventHandler(int eventID, Object data, String agentName)
 	{
 		if (eventID == smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED.swigValue())
 		{
@@ -381,10 +381,10 @@ public class PhaseView extends AbstractFixedView
 		if (m_StopCallback == -1)
 		{
 			// Update on start, stop and on init-soar.  Also listen for any time the user types "set-stop" somewhere else.
-			m_StartCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, "systemEventHandler", this) ;
-			m_StopCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, "systemEventHandler", this) ;
-			m_PropertyCallback  = agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_PROPERTY_CHANGED, this, "systemEventHandler", this) ;
-			m_InitCallback  = agent.GetKernel().RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED, this, "initsoarEventHandler", this) ;
+			m_StartCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, this) ;
+			m_StopCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, this) ;
+			m_PropertyCallback  = agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_PROPERTY_CHANGED, this, this) ;
+			m_InitCallback  = agent.GetKernel().RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED, this, this) ;
 		}
 	}
 

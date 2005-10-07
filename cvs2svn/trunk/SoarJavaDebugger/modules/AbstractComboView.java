@@ -42,7 +42,7 @@ import helpers.*;
 * Another derived class handles the display of those commands which may be in text or something else.
 * 
 ********************************************************************************************/
-public abstract class AbstractComboView extends AbstractView
+public abstract class AbstractComboView extends AbstractView implements Agent.RunEventInterface, Agent.PrintEventInterface, Kernel.AgentEventInterface, Kernel.SystemEventInterface
 {
 	protected Composite	m_ComboContainer ;
 	protected Combo 	m_CommandCombo ;
@@ -517,13 +517,13 @@ public abstract class AbstractComboView extends AbstractView
 		}		
 	}
 	
-	public void initsoarEventHandler(int eventID, Object data, String agentName)
+	public void agentEventHandler(int eventID, Object data, String agentName)
 	{
 		if (this.m_UpdateOnStop && eventID == smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED.swigValue())
 			updateNow() ;
 	}
 	
-	public void stopEventHandler(int eventID, Object data, Kernel kernel)
+	public void systemEventHandler(int eventID, Object data, Kernel kernel)
 	{
 		if (this.m_UpdateOnStop && eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue())
 			updateNow() ;
@@ -685,20 +685,20 @@ public abstract class AbstractComboView extends AbstractView
 		if (m_StopCallback == -1)
 		{
 			// Update on stop and on init-soar
-			m_StopCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, "stopEventHandler", this) ;
-			m_InitCallback  = agent.GetKernel().RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED, this, "initsoarEventHandler", this) ;
+			m_StopCallback	= agent.GetKernel().RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, this) ;
+			m_InitCallback  = agent.GetKernel().RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED, this, this) ;
 		}
 		
 		if (m_ShowTraceOutput && m_PrintCallback == -1)
-			m_PrintCallback = agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, this, "printEventHandler", this) ;
+			m_PrintCallback = agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, this, this) ;
 
 		// If we issue a command which is echoed, ignore that echo event.  Otherwise we'll get 2 sets of output from that command.
 		boolean ignoreOwnEchos = true ;
 		if (m_ShowEchoOutput && m_EchoCallback == -1)
-			m_EchoCallback = agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_ECHO, this, "printEventHandler", this, ignoreOwnEchos) ;
+			m_EchoCallback = agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_ECHO, this, this, ignoreOwnEchos) ;
 
 		if (m_UpdateEveryNthDecision > 0 && m_DecisionCallback == -1)
-			m_DecisionCallback = agent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, this, "runEventHandler", this) ;
+			m_DecisionCallback = agent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, this, this) ;
 		else if (m_UpdateEveryNthDecision <= 0 && m_DecisionCallback != -1)
 		{
 			// This is a bit naughty, but it's helpful to unregister for the decision event

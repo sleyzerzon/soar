@@ -45,7 +45,7 @@ import helpers.* ;
  * window in Eclipse.
  *  
  ************************************************************************/
-public class FoldingTextView extends AbstractComboView
+public class FoldingTextView extends AbstractComboView implements Agent.xmlEventInterface
 {
 	protected FoldingText m_FoldingText ;
 	
@@ -950,7 +950,7 @@ public class FoldingTextView extends AbstractComboView
 	 ********************************************************************************************/
 	protected void registerForViewAgentEvents(Agent agent)
 	{
-		m_xmlCallback = agent.RegisterForXMLEvent(smlXMLEventId.smlEVENT_XML_TRACE_OUTPUT, this, "xmlEventHandler", null) ;
+		m_xmlCallback = agent.RegisterForXMLEvent(smlXMLEventId.smlEVENT_XML_TRACE_OUTPUT, this, null) ;
 	}
 
 	protected void clearViewAgentEvents()

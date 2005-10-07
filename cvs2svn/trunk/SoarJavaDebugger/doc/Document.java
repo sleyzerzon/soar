@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 * Debugger windows register here for interesting events sent to/from the soar process.
 * 
 ********************************************************************************************/
-public class Document
+public class Document implements Kernel.AgentEventInterface, Kernel.SystemEventInterface
 {
 	public static final String kCreateNewWindowProperty = "Agent.CreateNewWindow" ;
 	public static final String kCloseOnDestroyProperty  = "Agent.CloseOnDestroy" ;
@@ -319,12 +319,12 @@ public class Document
 		// Added this just for testing
 //		int jSystemStartCallback = m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, "systemEventHandler", this) ;
 
-		int jAgentCreatedCallback = m_Kernel.RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_CREATED, this, "agentEventHandler", this) ;
-		int jAgentDestroyedCallback = m_Kernel.RegisterForAgentEvent(smlAgentEventId.smlEVENT_BEFORE_AGENT_DESTROYED, this, "agentEventHandler", this) ;
+		int jAgentCreatedCallback = m_Kernel.RegisterForAgentEvent(smlAgentEventId.smlEVENT_AFTER_AGENT_CREATED, this, this) ;
+		int jAgentDestroyedCallback = m_Kernel.RegisterForAgentEvent(smlAgentEventId.smlEVENT_BEFORE_AGENT_DESTROYED, this, this) ;
 		
 		// Register for an event that happens once each time agents are run a step to give me a chance to check for interruptions
 		// and pump the UI thread along a bit.
-		int jInterruptCallback = m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_INTERRUPT_CHECK, this, "systemEventHandler", this) ;
+		int jInterruptCallback = m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_INTERRUPT_CHECK, this, this) ;
 		m_Kernel.SetInterruptCheckRate(50) ;
 	}
 	
@@ -484,12 +484,12 @@ public class Document
 					// choose the first agent
 					Agent first = m_Kernel.GetAgentByIndex(0) ;
 					
-					System.err.println("About to call stop-soar") ;
+					//System.err.println("About to call stop-soar") ;
 					sendAgentCommand(first, getSoarCommands().getStopCommand()) ;
 	
 					while (m_DocumentThread.isBusy())
 					{
-						System.err.println("Waiting for Soar to stop") ;
+						//System.err.println("Waiting for Soar to stop") ;
 						try { Thread.sleep(100) ; } catch (InterruptedException e) { }
 					}
 				}
@@ -500,7 +500,7 @@ public class Document
 	
 					while (m_DocumentThread.isAlive())
 					{
-						System.err.println("Waiting for doc thread to stop") ;
+						//System.err.println("Waiting for doc thread to stop") ;
 						try { Thread.sleep(100) ; } catch (InterruptedException e) { }
 					}
 				}
@@ -527,7 +527,7 @@ public class Document
 				if (preserveWindows)
 					setSuppressCloseWindow(false) ;
 								
-				System.err.println("Exiting shutdown thread") ;
+				//System.err.println("Exiting shutdown thread") ;
 			}
 		} ;
 
