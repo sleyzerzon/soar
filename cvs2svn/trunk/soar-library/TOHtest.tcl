@@ -147,8 +147,6 @@ $kernel RemoveRhsFunction $rhsCallbackId
 #shutdown the kernel; this makes sure agents are deleted and events fire correctly
 $kernel Shutdown
 
-#give Tcl object ownership of underlying C++ object so when we delete the Tcl object they both get deleted
-set result [$kernel -acquire]
 #delete kernel object
 set result [$kernel -delete]
 #don't leave bad pointers around
@@ -188,7 +186,6 @@ puts "timetag = $timetag"
 #shutdown the kernel; this makes sure agents are deleted and events fire correctly
 red eval $kernel Shutdown
 #delete the kernel
-red eval $kernel -acquire
 red eval $kernel -delete
 
 #delete the interp

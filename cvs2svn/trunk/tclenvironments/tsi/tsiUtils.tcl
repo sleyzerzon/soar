@@ -483,9 +483,6 @@ proc quitSoar {} {
 	   ## (eg SoarJavaDebugger) so they can clean up (eg shut themselves down) 
 	   $_kernel Shutdown
 	   
-	   #give Tcl object ownership of underlying C++ object so when delete
-	   #  the Tcl object they both get deleted
-	   set result [$_kernel -acquire];
 	   #delete kernel object (this will also delete any agents that are
 	   #  still around)
 	   set result [$_kernel -delete];
@@ -528,9 +525,6 @@ proc quitSoar {} {
 	   }
        }
 
-       #give Tcl object ownership of underlying C++ object so when we delete
-       #  the Tcl object they both get deleted
-       set result [$_kernel -acquire];
        #delete kernel object (this will also delete any agents that are
        #  still around)
        set result [$_kernel -delete];
