@@ -77,6 +77,13 @@ namespace cli {
 		NUMERIC_INDIFFERENT_SUM,
 	};
 
+	enum eExplorationMode {
+		EXPLORATION_QUERY,
+		BOLTZMANN_EXPLORATION,
+		EPSILON_GREEDY_EXPLORATION,
+		NO_EXPLORATION,
+	};
+
 	enum ePreferencesDetail {
 		PREFERENCES_ONLY,
 		PREFERENCES_NAMES,

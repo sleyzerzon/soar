@@ -1447,6 +1447,9 @@ namespace gSKI
       m_agent->multi_attributes = m;
    }
 
+/********************************************************************
+Numeric Indifference
+*******************************************/
 
    egSKINumericIndifferentMode Agent::GetNumericIndifferentMode(Error* pErr/* = 0*/) {
 
@@ -1480,7 +1483,67 @@ namespace gSKI
       }
    }
 
-      
+//#ifdef NUMERIC_INDIFFERENCE
+/*******************************************
+Exploration
+*********************************************/
+
+   void Agent::SetExplorationMode(egSKIExplorationMode m, Error* pErr) {
+	   switch(m) {
+		   case gSKI_BOLTZMANN_EXPLORATION:
+			   GetSoarAgent()->exploration_mode = BOLTZMANN_EXPLORATION;
+			   return;
+		   case gSKI_EPSILON_GREEDY_EXPLORATION:
+			   GetSoarAgent()->exploration_mode = EPSILON_GREEDY_EXPLORATION;
+			   return;
+		   case gSKI_NO_EXPLORATION:
+			   GetSoarAgent()->exploration_mode = NO_EXPLORATION;
+			   return;
+		   default:
+			   MegaAssert(false, "Invalid exploration mode");
+	   }
+   }
+
+   
+   egSKIExplorationMode Agent::GetExplorationMode(Error* pErr/* = 0*/) {
+
+      egSKIExplorationMode m = gSKI_BOLTZMANN_EXPLORATION;
+
+      switch(GetSoarAgent()->exploration_mode) {
+         case BOLTZMANN_EXPLORATION:
+            m = gSKI_BOLTZMANN_EXPLORATION;
+            break;
+         case EPSILON_GREEDY_EXPLORATION:
+            m = gSKI_EPSILON_GREEDY_EXPLORATION;
+            break;
+		 case NO_EXPLORATION:
+			 m = gSKI_NO_EXPLORATION;
+			 break;
+         default:
+            MegaAssert(false, "Invalid exploration mode");
+            break;
+      }
+
+      return m;
+   }
+
+   void Agent::SetTemperature(double Temp, Error* pErr) {
+	   GetSoarAgent()->Temperature = Temp;
+   }
+
+   void Agent::SetEpsilon(double epsilon, Error* pErr) {
+	   GetSoarAgent()->epsilon = epsilon;
+   }
+
+   double Agent::GetTemperature(Error* pErr) {
+	   return GetSoarAgent()->Temperature;
+   }
+
+   double Agent::GetEpsilon(Error* pErr) {
+	   return GetSoarAgent()->epsilon;
+   }
+//#endif
+
    //////////////////////////////////////////////////// PRIVATES /////////////
 
       /*

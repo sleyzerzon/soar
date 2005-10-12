@@ -1037,9 +1037,27 @@ namespace gSKI
 			return true;
 		}
 
-
-
+#ifdef NUMERIC_INDIFFERENCE
+	
 		char * pref_names[] =
+		{  
+			"acceptable",
+				"require",
+				"reject",
+				"prohibit",
+				"reconsider",
+				"unary indifferent",
+				"unary parallel",
+				"best",
+				"worst",
+				"binary indifferent",
+				"binary parallel",
+				"better",
+				"worse",
+				"numeric indifferent"
+		};
+#else
+     char * pref_names[] =
 		{  
 			"acceptable",
 				"require",
@@ -1055,6 +1073,7 @@ namespace gSKI
 				"better",
 				"worse" 
 		};
+#endif
 
 		bool TgDWorkArounds::Preferences(IAgent*     thisAgent,
 			int         argc,

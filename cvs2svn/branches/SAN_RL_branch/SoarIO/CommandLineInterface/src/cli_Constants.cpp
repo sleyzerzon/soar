@@ -27,6 +27,7 @@ char const* Constants::kCLIEcho						= "echo";
 char const* Constants::kCLIEditProduction			= "edit-production";
 char const* Constants::kCLIExcise					= "excise";
 char const* Constants::kCLIExplainBacktraces		= "explain-backtraces";
+char const* Constants::kCLIExploration				= "exploration";
 char const* Constants::kCLIFiringCounts				= "firing-counts";
 char const* Constants::kCLIGDSPrint					= "gds-print";
 char const* Constants::kCLIHelp						= "help";

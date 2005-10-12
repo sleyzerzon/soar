@@ -1146,6 +1146,17 @@ namespace gSKI
       virtual egSKINumericIndifferentMode GetNumericIndifferentMode(Error* pErr = 0);
       virtual void SetNumericIndifferentMode(egSKINumericIndifferentMode m, Error* pErr = 0);
 
+// #ifdef NUMERIC_INDIFFERENCE
+	  virtual void SetExplorationMode(egSKIExplorationMode m, Error* pErr = 0);
+	  virtual egSKIExplorationMode GetExplorationMode(Error* pErr = 0);
+
+	  virtual void SetTemperature(double d, Error* pErr = 0);
+	  virtual double GetTemperature(Error* pErr = 0);
+
+	  virtual void SetEpsilon(double d, Error* pErr = 0);
+	  virtual double GetEpsilon(Error* pErr = 0);
+// #endif
+
 	  virtual bool GetOperand2Mode();
 	  virtual void SetOperand2Mode(bool mode);
 

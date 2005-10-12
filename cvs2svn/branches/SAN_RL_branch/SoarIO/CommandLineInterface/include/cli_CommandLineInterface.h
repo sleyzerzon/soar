@@ -730,6 +730,7 @@ protected:
 	bool ParseWarnings(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatch(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatchWMEs(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseExploration(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 
 	// the internal Do functions follow
 	bool DoAddWME(gSKI::IAgent* pAgent, const std::string& id, const std::string& attribute, const std::string& value, bool acceptable);
@@ -786,6 +787,7 @@ protected:
 	bool DoWarnings(gSKI::IAgent* pAgent, bool* pSetting = 0);
 	bool DoWatch(gSKI::IAgent* pAgent, const WatchBitset& options, const WatchBitset& settings, const int wmeSetting, const int learnSetting);
 	bool DoWatchWMEs(gSKI::IAgent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
+	bool DoExploration(gSKI::IAgent* pAgent, const int mode, const double Temp, const double epsilon);
 
 	// Print callback events go here
 	virtual void HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) {
@@ -828,6 +830,7 @@ protected:
 	*************************************************************/
 	int ParseLevelOptarg();
 	int ParseLearningOptarg();
+	int ParseExplorationOptarg();
 	bool CheckOptargRemoveOrZero();
 	bool ProcessWatchLevelSettings(const int level, WatchBitset& options, WatchBitset& settings, int& wmeSetting, int& learnSetting);
 

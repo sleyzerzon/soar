@@ -94,6 +94,9 @@ namespace cli {
 			kAmbiguousCommand					= 79,
 			kAmbiguousOption					= 80, // FIXME: add to wiki
 			kProductionMemoryNotEmpty				= 81, // FIXME: add to wiki
+			kInvalidExplorationSetting          = 82,
+			kTempMustBePositive                 = 83,
+			kEpsilonOutsideUnitInterval			= 84,
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -173,6 +176,9 @@ namespace cli {
 				case kAmbiguousCommand:					return "Received command is ambiguous, try adding more letters.";
 				case kAmbiguousOption:					return "Ambiguous option."; // FIXME: add to wiki
 				case kProductionMemoryNotEmpty:					return "Can't change modes unless production memory is empty."; // FIXME: add to wiki
+				case kInvalidExplorationSetting:			return "Invalid exploration mode.";
+				case kTempMustBePositive:					return "Temperature parameter must be positive.";
+				case kEpsilonOutsideUnitInterval:		return "Epsilon parameter must be in [0,1].";
 				default:								return "Unknown error code.";
 			}
 		}

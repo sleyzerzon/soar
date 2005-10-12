@@ -725,4 +725,13 @@
       gSKI_NUMERIC_INDIFFERENT_MODE_AVG,  /// do numeric indiffernce by averaging all values asserted by the rules.  Indifferent preferrences with no explicit value are assigned the numeric weight of 50.
    } egSKINumericIndifferentMode;
 
+//#ifdef NUMERIC_INDIFFERENCE
+   typedef enum
+   {
+	   gSKI_BOLTZMANN_EXPLORATION,
+	   gSKI_EPSILON_GREEDY_EXPLORATION,
+	   gSKI_NO_EXPLORATION,
+   } egSKIExplorationMode;
+//#endif
+
 #endif
