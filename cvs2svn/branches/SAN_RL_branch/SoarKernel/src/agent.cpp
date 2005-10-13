@@ -304,10 +304,11 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
 #ifdef NUMERIC_INDIFFERENCE
   newAgent->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_AVG;
   newAgent->exploration_mode = NO_EXPLORATION;
-  newAgent->Temperature = 10.0;
-  newAgent->epsilon = 0.1;
-  newAgent->gamma = 0.9;
-  newAgent->alpha = 0.4;
+  newAgent->Temperature = 25.0; /* used to keep summed indifferent preferences within a reasonable range, since they will be used as
+									an exponent to the number 10, and must be stored in a 64 bit double */
+  newAgent->epsilon = 0.1;     /* proportion of the time an exploratory action is taken */
+  newAgent->gamma = 0.9;       /* discount factor */
+  newAgent->alpha = 0.4;       /* learning rate */
 #endif
   newAgent->attribute_preferences_mode = 0; /* RBD 4/17/95 */
 

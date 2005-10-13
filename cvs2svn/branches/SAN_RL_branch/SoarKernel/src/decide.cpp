@@ -3483,11 +3483,7 @@ unsigned int count_candidates(preference * candidates)
     return numCandidates;
 }
 
-/* Below is the Temperature, used to keep summed indifferent
-   preferences within a reasonable range, since they will be used as
-	 an exponent to the number 10, and must be stored in a 64 bit double
-*/
-#define TEMPERATURE 25.0
+
 
 preference *probabilistically_select(agent* thisAgent, slot * s, preference * candidates)
 {
@@ -3583,11 +3579,11 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 		for (cand = candidates; cand != NIL; cand = cand->next_candidate){
 			if ((thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM) && (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION)){
 				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-				print(thisAgent, "Value (Sum) = %f", exp(cand->sum_of_probability / TEMPERATURE));
+				print(thisAgent, "Value (Sum) = %f", exp(cand->sum_of_probability / thisAgent->Temperature));
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
-				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->sum_of_probability / TEMPERATURE));
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->sum_of_probability / thisAgent->Temperature));
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 				}
 			else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM){
