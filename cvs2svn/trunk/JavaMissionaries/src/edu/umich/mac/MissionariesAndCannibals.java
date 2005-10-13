@@ -42,16 +42,29 @@ implements Runnable, PaintListener, MacEnvironmentListener {
     private Button stopButton;
     private Button stepButton;
     private Button resetButton;
-    
+
+    // DJP: Using this form of image loading allows us to run in Eclipse and from a JAR file.
+    // Eclipse looks for the "mac" folder to be under "bin" (with the current Eclipse project settings)
+    // while the JAR build looks for it at the top level, so this is a bit clumsy.
+    // If anyone really knows how this getResource stuff really works go ahead and clean this up :)
     private static Image landImg = new Image(dpy,
-            ClassLoader.getSystemResourceAsStream("mac/land.gif"));
+            MissionariesAndCannibals.class.getResourceAsStream("/mac/land.gif"));
     private static Image boatImg = new Image(dpy,
-            ClassLoader.getSystemResourceAsStream("mac/boat.gif"));
+    		MissionariesAndCannibals.class.getResourceAsStream("/mac/boat.gif"));
     private static Image missionaryImg = new Image(dpy,
-            ClassLoader.getSystemResourceAsStream("mac/missionary.gif"));
+    		MissionariesAndCannibals.class.getResourceAsStream("/mac/missionary.gif"));
     private static Image cannibalImg = new Image(dpy,
-            ClassLoader.getSystemResourceAsStream("mac/cannibal.gif"));
-    
+    		MissionariesAndCannibals.class.getResourceAsStream("/mac/cannibal.gif"));
+/*
+    private static Image landImg = new Image(dpy,
+            ClassLoader.getSystemResourceAsStream("/mac/land.gif"));
+    private static Image boatImg = new Image(dpy,
+            ClassLoader.getSystemResourceAsStream("/mac/boat.gif"));
+    private static Image missionaryImg = new Image(dpy,
+            ClassLoader.getSystemResourceAsStream("/mac/missionary.gif"));
+    private static Image cannibalImg = new Image(dpy,
+            ClassLoader.getSystemResourceAsStream("/mac/cannibal.gif"));
+*/    
     private static final int[] BOAT_X;
     private static final int BOAT_Y = 400;
     private static final int[] CANNIBAL_X;
