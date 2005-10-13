@@ -69,6 +69,12 @@ EXPORT bool CommandLineInterface::DoExplainBacktraces(sml::Connection* pConnecti
 	return ret;
 }
 
+EXPORT bool CommandLineInterface::DoExploration(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const int mode, const double Temp, const double epsilon) {
+	bool ret = DoExploration(pAgent, mode, Temp, epsilon);
+	GetLastResultSML(pConnection, pResponse);
+	return ret;
+}
+
 EXPORT bool CommandLineInterface::DoFiringCounts(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const int numberToList, const std::string* pProduction) {
 	bool ret = DoFiringCounts(pAgent, numberToList, pProduction);
 	GetLastResultSML(pConnection, pResponse);

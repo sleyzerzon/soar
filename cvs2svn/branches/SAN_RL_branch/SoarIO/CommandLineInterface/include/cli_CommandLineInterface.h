@@ -240,6 +240,18 @@ public:
 	*************************************************************/
 	EXPORT bool DoExplainBacktraces(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const std::string* pProduction = 0, const int condition = 0);
 
+	/****************************************************************
+	* @brief exploration command
+	* @param pConnection Pointer to connection
+	* @param pResponse Pointer to XML response
+	* @param pAgent The pointer to the gSKI agent interface
+	* @param mode What mode to set exploration to, or query
+	* @param Temp Assignment to the Temperature parameter
+	* @param epsilon Assignment to the epsilon parameter
+	*****************************************************************/
+
+	EXPORT bool DoExploration(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const int mode, const double Temp, const double epsilon);
+
 	/*************************************************************
 	* @brief firing-counts command
 	* @param pConnection Pointer to connection
