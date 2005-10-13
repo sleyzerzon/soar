@@ -22,7 +22,7 @@ import sml.smlUpdateEventId;
  * @author Alex Roper
  */
 public class EaterControl extends SimulationControl implements
-		SimulationControlListener, Runnable {
+		SimulationControlListener, Runnable, Kernel.SystemEventInterface, Kernel.UpdateEventInterface {
 
 	public static final int Wall = 0;
 	public static final int NormalFood = 1;
@@ -115,8 +115,7 @@ public class EaterControl extends SimulationControl implements
 
 		int callbackid = 0;
 		// Register for Soar start event
-		callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START,
-				this, "soarStartEvent", null);
+		callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
 		if (callbackid > 0)
 			;//Registration successful
 		else {
@@ -129,8 +128,7 @@ public class EaterControl extends SimulationControl implements
 		}
 
 		// Register for Soar stop event
-		callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP,
-				this, "soarStopEvent", null);
+		callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
 		if (callbackid > 0)
 			;//Registration successful
 		else {
@@ -144,8 +142,7 @@ public class EaterControl extends SimulationControl implements
 
 		// Register for Soar update event
 		callbackid = kernel.RegisterForUpdateEvent(
-				smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this,
-				"updateWorldEvent", null);
+				smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
 		if (callbackid > 0)
 			;//Registration successful
 		else {
@@ -1123,6 +1120,14 @@ public class EaterControl extends SimulationControl implements
 		kernel.RunAllAgentsForever();
 	}
 
+	public void systemEventHandler(int eventID, Object data, Kernel kernel)
+	{
+		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue())
+			soarStartEvent(eventID, data, kernel) ;
+		else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue())
+			soarStopEvent(eventID, data, kernel) ;
+	}
+
 	public void soarStopEvent(int eventID, Object data, Kernel kernel) {
 		if (!running) {
 			JOptionPane
@@ -1160,7 +1165,7 @@ public class EaterControl extends SimulationControl implements
 		}
 	}
 
-	public void updateWorldEvent(int eventID, Object data, Kernel kernel,
+	public void updateEventHandler(int eventID, Object data, Kernel kernel,
 			int runFlags) {
 		if (!running) {
 			JOptionPane

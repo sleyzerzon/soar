@@ -20,7 +20,7 @@ import java.util.*;
  * and updating listeners as necessary.
  * @author John Duchi
  */
-public class TankSoarJControl extends SimulationControl implements SimulationControlListener, Runnable{
+public class TankSoarJControl extends SimulationControl implements Kernel.UpdateEventInterface, Kernel.SystemEventInterface, SimulationControlListener, Runnable{
 
   /** The Soar kernel that will be used to create agents corresponding to individual tanks.  This does limit
    * the game to just using one kernel for all of the agents.
@@ -65,8 +65,7 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
     int callbackid = 0;
 	// Register for Soar update event
 	callbackid = kernel.RegisterForUpdateEvent(
-			smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this,
-			"updateWorldEvent", null);
+			smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this, null);
 	if (callbackid > 0)
 		TankSoarLogger.log("Registered for Soar update event.");// Registration successful
 	else {
@@ -112,8 +111,7 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
 	// Register for Soar update event
 	int callbackid = 0;
 	callbackid = kernel.RegisterForUpdateEvent(
-			smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this,
-			"updateWorldEvent", null);
+			smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this, null);
 	if (callbackid > 0)
 		TankSoarLogger.log("Registered for Soar update event.");// Registration successful
 	else {
@@ -178,7 +176,7 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
 
   private void registerForSoarStopEvent()
   {
-    int callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, "soarStopEvent", null);
+    int callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
     if(callbackid > 0)
       TankSoarLogger.log("Successfully registered for Soar kernel stop event.");
     else
@@ -190,8 +188,7 @@ public class TankSoarJControl extends SimulationControl implements SimulationCon
   
   private void registerForSoarStartEvent()
   {
-    int callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, 
-        this, "soarStartEvent", null);
+    int callbackid = kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
     if(callbackid > 0)
       TankSoarLogger.log("Successfully registered for Soar kernel start event.");
     else
@@ -1859,6 +1856,14 @@ catch(NullPointerException e)
 		flyingMissiles.clear();
 		super.fireNewMapNotification(message);
 	}
+	
+	public void systemEventHandler(int eventID, Object data, Kernel kernel)
+	{
+		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue())
+			soarStartEvent(eventID, data, kernel) ;
+		else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue())
+			soarStopEvent(eventID, data, kernel) ;
+	}	
 
   public void soarStopEvent(int eventID, Object data, Kernel kernel)
   {
@@ -1884,7 +1889,7 @@ catch(NullPointerException e)
   int tcount = 0;
   	private boolean initialRun = true;
 	public boolean mapShown = false;
-	public void updateWorldEvent(int eventID, Object data, Kernel kernel,
+	public void updateEventHandler(int eventID, Object data, Kernel kernel,
 			int runFlags) {
 		
 		tcount++;
