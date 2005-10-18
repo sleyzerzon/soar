@@ -15,6 +15,9 @@ cvs -q up -dP
 echo Documentation
 cd ../Documentation
 cvs -q up -dP
+echo JavaBaseEnvironment
+cd ../JavaBaseEnvironment
+cvs -q up -dP
 echo JavaMissionaries
 cd ../JavaMissionaries
 cvs -q up -dP
