@@ -44,7 +44,8 @@ bool CommandLineInterface::Trim(std::string& line) {
 	bool pipe = false;
 	std::string::size_type searchpos = 0;
 
-	for (pos = line.find_first_of("\\#|\n", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|\n", searchpos)) {
+	//for (pos = line.find_first_of("\\#|\n", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|\n", searchpos)) {
+	for (pos = line.find_first_of("\\#|", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|", searchpos)) {
 		switch (line[pos]) {
 			case '\\': // skip backslashes
 				searchpos = pos + 2;
@@ -61,7 +62,7 @@ bool CommandLineInterface::Trim(std::string& line) {
 							line = line.substr(0, pos);
 						} else {
 							std::string temp = line;
-							temp[nlpos] = ' '; // convert newline to space
+							//temp[nlpos] = ' '; // convert newline to space
 							// Newline encountered at nlpos
 							line = temp.substr(0, pos);
 							line += temp.substr(nlpos);
@@ -76,13 +77,12 @@ bool CommandLineInterface::Trim(std::string& line) {
 				searchpos = pos + 1;
 				break;
 
-			case '\n': // newlines become spaces
-				line[pos] = ' ';
-				searchpos = pos + 1;
-				break;
+			//case '\n': // newlines become spaces
+			//	line[pos] = ' ';
+			//	searchpos = pos + 1;
+			//	break;
 		}
 	}
-	const char* blarg = line.c_str();
 
 	if (pipe) return SetError(CLIError::kNewlineBeforePipe);
 	return true;
