@@ -260,8 +260,18 @@ public abstract class AbstractComboView extends AbstractView implements Agent.Ru
 		if (m_PromptForCommands != null)
 			m_CommandCombo.setText(m_PromptForCommands) ;
 		
-		// Listen for key presses on the combo box so we know when the user presses return
-		m_CommandCombo.addKeyListener(new KeyAdapter() { public void keyPressed(KeyEvent e) { comboKeyPressed(e) ; } }) ;
+		m_CommandCombo.addKeyListener(new KeyAdapter() {
+			// Listen for key presses on the combo box so we know when the user presses return
+			public void keyPressed(KeyEvent e)  { comboKeyPressed(e) ; }
+		}) ;
+		
+		// When we scroll up and down the text is selected.  We don't want that as it makes it harder to modify an earlier command.
+		// So clear the selection explicitly.
+		m_CommandCombo.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e) { 
+				m_CommandCombo.clearSelection() ;
+			}
+		}) ;
 		
 		// Listen for changes to the text in the combo box so we can keep track of what's currently entered
 		m_CommandCombo.addModifyListener(new ModifyListener() { public void modifyText(ModifyEvent e) { comboTextModified(e) ; } } ) ;
