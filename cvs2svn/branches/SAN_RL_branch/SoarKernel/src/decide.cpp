@@ -835,6 +835,9 @@ byte require_preference_semantics (slot *s, preference **result_candidates) {
     if (p->value == value) return CONSTRAINT_FAILURE_IMPASSE_TYPE;
   
   /* --- the lone require is the winner --- */
+#ifdef NUMERIC_INDIFFERENCE
+  RL_update_symbolically_chosen(s, candidates);
+#endif
   return NONE_IMPASSE_TYPE;
 }
 
@@ -890,6 +893,9 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   /* === If there are only 0 or 1 candidates, we're done === */
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
+#ifdef NUMERIC_INDIFFERENCE
+	RL_update_symbolically_chosen(s, candidates);
+#endif
     return NONE_IMPASSE_TYPE;
   }
 
@@ -1051,6 +1057,9 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   /* === If there are only 0 or 1 candidates, we're done === */
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
+#ifdef NUMERIC_INDIFFERENCE
+	RL_update_symbolically_chosen(s, candidates);
+#endif
     return NONE_IMPASSE_TYPE;
   }
 
@@ -1670,6 +1679,7 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
 	if (level!=TOP_GOAL_LEVEL){
 		Symbol *temp = make_new_identifier(thisAgent, 'R', level);
 		add_impasse_wme (thisAgent, id, thisAgent->reward_symbol, temp, NIL);
+		id->id.reward_header = temp;
 		symbol_remove_ref(thisAgent,temp);
 	}
 #endif
@@ -2337,6 +2347,11 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
     }
   }
 
+#ifdef NUMERIC_INDIFFERENCE
+  free_list(thisAgent, goal->id.RL_data->productions_to_be_updated);
+  free_memory(thisAgent, goal->id.RL_data, MISCELLANEOUS_MEM_USAGE);
+#endif
+
   /* REW: BUG
    * Tentative assertions can exist for removed goals.  However, it looks
    * like the removal forces a tentative retraction, which then leads to
@@ -2392,6 +2407,16 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.isa_goal = TRUE;
   id->id.operator_slot = make_slot (thisAgent, id, thisAgent->operator_symbol);
   id->id.allow_bottom_up_chunks = TRUE;
+
+#ifdef NUMERIC_INDIFFERENCE
+  id->id.RL_data = static_cast<RL_data_struct *>(allocate_memory(thisAgent, sizeof(RL_data_struct), 
+												   MISCELLANEOUS_MEM_USAGE));
+  id->id.RL_data->productions_to_be_updated = NIL;
+  id->id.RL_data->previous_Q = 0;
+  id->id.RL_data->max_Q = 0;
+  id->id.RL_data->reward = 0;
+  id->id.RL_data->step = 0;
+#endif
 
   /* --- invoke callback routine --- */
 #ifndef NO_CALLBACKS
@@ -2724,9 +2749,16 @@ void do_decision_phase (agent* thisAgent)
 {
    /* phase printing moved to init_soar: do_one_top_level_phase */
 
+#ifdef NUMERIC_INDIFFERENCE
+	tabulate_reward_values(thisAgent);
+#endif
+
    decide_context_slots (thisAgent);
    do_buffered_wm_and_ownership_changes(thisAgent);
 
+#ifdef NUMERIC_INDIFFERENCE
+   record_data_for_RL();
+#endif
   /*
    * Bob provided a solution to fix WME's hanging around unsupported
    * for an elaboration cycle.
@@ -3609,7 +3641,36 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 
     if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM) {
 
-		if (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION){
+		/* When doing Q-learning, we need to identify the max Q-value now. */
+	   float top_value = candidates->sum_of_probability;
+
+	   for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
+		   if (cand->sum_of_probability > top_value)
+			   top_value = cand->sum_of_probability;
+	   }
+	   
+	   if(perform_Bellman_update(top_value, s->id)){ // If the Bellman update changed current prefs, recompute operator values.
+		   for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
+			   /*print_with_symbols("\nPreference for %y", pref->value); */
+			   float value;
+			   if (pref->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
+			   value = pref->referent->fc.value;
+			   } else if (pref->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
+				   value = (float) pref->referent->ic.value;
+			   } else {
+				   continue;
+			   }
+			   for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+				   /*print_with_symbols("\nConsidering candidate %y", cand->value); */
+				   if (cand->value == pref->value) {
+					   cand->total_preferences_for_candidate += 1;
+					   cand->sum_of_probability += value;
+				   }
+			   }
+		   }
+	   } 
+	
+	   if (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION){
 			total_probability = 0.0;
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
 	  

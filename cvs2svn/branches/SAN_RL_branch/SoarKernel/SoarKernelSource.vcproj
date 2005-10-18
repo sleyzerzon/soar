@@ -431,6 +431,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\reinforcement_learning.cpp">
+			</File>
+			<File
 				RelativePath=".\src\reorder.cpp">
 				<FileConfiguration
 					Name="Release|Win32">

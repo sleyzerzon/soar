@@ -560,4 +560,30 @@ typedef struct condition_struct {
 }
 #endif
 
+#ifdef NUMERIC_INDIFFERENCE
+/*-------------------------------------------------------------------------
+                          Reinforcement learning data
+
+Stores data between decision phases that is needed to update numeric preference values. RL_data_structs
+are used on goal identifiers.
+
+Fields in an RL_data_struct:
+	productions_to_be_updated: A list of pointers to the RL rules that fired for the selected operator
+							   on a previous decision cycle, and that will have their numeric
+							   values updated on a subsequent decision cycle.
+    previous_Q: The Q-value computed for the previously selected operator.
+	max_Q: The max Q-value computed for the current cycle.
+	reward: Accumulates reward for an extended operator.
+	step: The number of decision cycles an operator has been active.
+--------------------------------------------------------------------------*/
+typedef struct RL_data_struct{
+list *productions_to_be_updated;
+float previous_Q;
+float max_Q;
+float reward;
+int step;
+} RL_data;
+
+#endif
+
 #endif

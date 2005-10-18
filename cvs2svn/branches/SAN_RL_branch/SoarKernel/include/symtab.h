@@ -224,6 +224,10 @@ typedef struct identifier_struct {
   union symbol_union *higher_goal, *lower_goal;
   struct slot_struct *operator_slot;
   struct preference_struct *preferences_from_goal;
+//#ifdef NUMERIC_INDIFFERENCE
+  struct RL_data_struct *RL_data;
+  Symbol *reward_header;
+//#endif
 
   /* REW: begin 09.15.96 */
   struct gds_struct *gds;    /* Pointer to a goal's dependency set */

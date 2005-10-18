@@ -1673,6 +1673,7 @@ void init_agent_memory(agent* thisAgent)
   add_input_wme (thisAgent, thisAgent->top_state,
 	  thisAgent->reward_symbol,
 	  thisAgent->reward_header);
+  thisAgent->top_state->id.reward_header = thisAgent->reward_header;
 #endif
 
   do_buffered_wm_and_ownership_changes(thisAgent);
