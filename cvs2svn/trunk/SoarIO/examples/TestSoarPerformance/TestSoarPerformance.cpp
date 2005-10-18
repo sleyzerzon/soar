@@ -129,7 +129,7 @@ void Test1(int numTrials, StatsTracker* pSt, vector<string>* commands) {
 	}
 }
 
-void main() {
+int main() {
 
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
@@ -182,4 +182,6 @@ void main() {
 	_CrtDumpMemoryLeaks();
 #endif // _MSC_VER
 	
+	return 0;
 }
+

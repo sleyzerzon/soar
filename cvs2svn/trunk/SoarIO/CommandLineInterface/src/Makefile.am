@@ -11,11 +11,13 @@ cli_Constants.cpp\
 cli_Interface.cpp\
 cli_addwme.cpp\
 cli_alias.cpp\
+cli_attributepreferencesmode.cpp\
 cli_cd.cpp\
 cli_chunknameformat.cpp\
 cli_defaultwmedepth.cpp\
 cli_dirs.cpp\
 cli_echo.cpp\
+cli_echocommands.cpp\
 cli_editproduction.cpp\
 cli_excise.cpp\
 cli_explainbacktraces.cpp\
@@ -24,6 +26,7 @@ cli_gdsprint.cpp\
 cli_help.cpp\
 cli_indifferentselection.cpp\
 cli_initsoar.cpp\
+cli_inputperiod.cpp\
 cli_internalsymbols.cpp\
 cli_learn.cpp\
 cli_log.cpp\
@@ -49,12 +52,12 @@ cli_retenet.cpp\
 cli_run.cpp\
 cli_savebacktraces.cpp\
 cli_setlibrarylocation.cpp\
+cli_setstopphase.cpp\
 cli_soar8.cpp\
 cli_soarnews.cpp\
 cli_source.cpp\
 cli_sp.cpp\
 cli_stats.cpp\
-cli_setstopphase.cpp\
 cli_stopsoar.cpp\
 cli_time.cpp\
 cli_timers.cpp\

@@ -5,4 +5,5 @@
 SUBDIRS = \
 TestCommandLineInterface \
 TestClientSML \
-towersSML 
+towersSML \
+TestSoarPerformance

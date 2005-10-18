@@ -1,6 +1,8 @@
+*.class
 Agent.java
 AgentEventHandlerPlusData.java
 AnalyzeXML.java
+ClientAnalyzedXML.java
 ClientErrors.java
 ClientTraceXML.java
 ClientXML.java
