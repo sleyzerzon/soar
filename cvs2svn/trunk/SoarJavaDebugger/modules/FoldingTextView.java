@@ -151,6 +151,20 @@ public class FoldingTextView extends AbstractComboView implements Agent.xmlEvent
 		m_Buttons.setLayout(new RowLayout()) ;
 		final Composite owner = m_Buttons ;
 		
+		m_FoldingText.getTextWindow().addKeyListener(new KeyAdapter() {
+			// If the user tries to type into the main text window, move the focus down
+			// to the combo box where they can usefully type.
+			public void keyPressed(KeyEvent e)  {
+				// Only for keys that generate characters (so arrows keys, shift etc. can be safely pressed)
+				if (e.character != 0)
+				{
+					m_CommandCombo.setFocus() ;
+					m_CommandCombo.setText(Character.toString(e.character)) ;
+					m_CommandCombo.setSelection(new Point(m_CommandCombo.getText().length(), m_CommandCombo.getText().length())) ;
+				}
+			}
+		}) ;
+
 		// Add a button that offers an expand/collapse option instantly (for just one page)
 		m_ExpandTrace = m_ExpandTracePersistent ;		
 		m_ExpandButton = new Button(owner, SWT.PUSH);
