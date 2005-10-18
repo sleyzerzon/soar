@@ -44,26 +44,46 @@ bool CommandLineInterface::Trim(std::string& line) {
 	bool pipe = false;
 	std::string::size_type searchpos = 0;
 
-	for (pos = line.find_first_of("\\#|", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|", searchpos)) {
+	for (pos = line.find_first_of("\\#|\n", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|\n", searchpos)) {
 		switch (line[pos]) {
-			case '\\':
+			case '\\': // skip backslashes
 				searchpos = pos + 2;
 				break;
 
-			case '#':
+			case '#': // if not inside pipe, erase from pound to end or newline encountered
 				if (pipe) {
 					searchpos = pos + 1;
 				} else {
-					line = line.substr(0, pos);
+					{
+						std::string::size_type nlpos = line.find('\n', searchpos + 1);
+						if (nlpos == std::string::npos) {
+							// No newline encountered
+							line = line.substr(0, pos);
+						} else {
+							std::string temp = line;
+							temp[nlpos] = ' '; // convert newline to space
+							// Newline encountered at nlpos
+							line = temp.substr(0, pos);
+							line += temp.substr(nlpos);
+							searchpos = nlpos;
+						}
+					}
 				}
 				break;
 
-			case '|':
+			case '|': // note pipe
 				pipe = !pipe;
+				searchpos = pos + 1;
+				break;
+
+			case '\n': // newlines become spaces
+				line[pos] = ' ';
 				searchpos = pos + 1;
 				break;
 		}
 	}
+	const char* blarg = line.c_str();
+
 	if (pipe) return SetError(CLIError::kNewlineBeforePipe);
 	return true;
 }

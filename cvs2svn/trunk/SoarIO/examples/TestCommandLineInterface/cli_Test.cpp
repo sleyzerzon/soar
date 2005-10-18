@@ -387,6 +387,9 @@ int main(int argc, char** argv)
 				++scriptIter;
 			}
 		}
+	
+		// a good spot to insert a test command line, keep in mind output will not be printed
+		//pKernel->ExecuteCommandLine("sp {test #bug\n   (state <s> ^superstate nil)\n-->\n   (<s> ^foo bar)\n}", AGENT_NAME);
 
 		if (good) {
 			// Create and start input thread
