@@ -313,6 +313,17 @@ void MyUntypedEventHandler(smlUntypedEventId id, void* pUserData, Kernel* pKerne
 	}
 }
 
+void MyProductionHandler(smlProductionEventId id, void* pUserData, Agent* pAgent, char const* pProdName, char const* pInstantiation)
+{
+	int* pInt = (int*)pUserData ;
+
+	// Increase the count
+	*pInt = *pInt + 1 ;
+
+	if (id == smlEVENT_BEFORE_PRODUCTION_REMOVED)
+		cout << "Excised " << pProdName << endl ;
+}
+
 void MyUpdateEventHandler(smlUpdateEventId id, void* pUserData, Kernel* pKernel, smlRunFlags runFlags)
 {
 	int* pInt = (int*)pUserData ;
@@ -673,12 +684,6 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	pAgent->UnregisterForRunEvent(callback_before) ;
 	pAgent->UnregisterForRunEvent(callback_after) ;
 	pKernel->UnregisterForUpdateEvent(callback_u) ;
-
-	// BUGBUG: Adding this triggers a memory leak warning in the kernel (when deallocating symbol table)
-	// No clue why.  Following it with an init-soar fixes this.
-//	pAgent->InitSoar() ;
-//	pAgent->ExecuteCommandLine("run --self 3 -p") ;
-//	pAgent->InitSoar() ;
 
 	// Print out the standard trace and the same thing as a structured XML trace
 	cout << trace << endl ;
@@ -1075,7 +1080,19 @@ bool TestSML(bool embedded, bool useClientThread, bool fullyOptimized, bool simp
 
 			if (!ok)
 			{
-				cout << "ERROR checking whether specific productions are loaded" ;
+				cout << "ERROR checking whether specific productions are loaded" << endl ;
+			}
+
+			int excisedCount = 0 ;
+			int prodCall = pAgent->RegisterForProductionEvent(smlEVENT_BEFORE_PRODUCTION_REMOVED, &MyProductionHandler, &excisedCount) ;
+			pAgent->ExecuteCommandLine("excise --all") ;
+			load = pAgent->LoadProductions(path.c_str(), echo) ;
+			ok = ok && pAgent->UnregisterForProductionEvent(prodCall) ;
+
+			if (!ok || excisedCount == 0)
+			{
+				cout << "ERROR listening for production removed events" << endl ;
+				return false ;
 			}
 
 			if (!ok)

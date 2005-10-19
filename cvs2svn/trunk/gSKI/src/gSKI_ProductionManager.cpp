@@ -991,7 +991,9 @@ _|___/    __         _    _             ____  _               _
       Production*           p;
       IProductionInstance* pi;
 
-      if(eventOccured)
+	  // The gSKI events are "before" events so we check that the kernel event
+	  // hasn't occured yet.
+      if(!eventOccured)
       {
          if((eventId == gSKI_K_EVENT_PRODUCTION_ADDED) || 
             (eventId == gSKI_K_EVENT_PRODUCTION_REMOVED))
