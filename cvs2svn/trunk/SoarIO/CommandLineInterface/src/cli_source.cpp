@@ -236,7 +236,7 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 	if (m_SourceMode == SOURCE_ALL) {
 		if (m_RawOutput) {
 			if (m_NumProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
-			m_Result << filename << ": " << m_NumProductionsSourced << ((m_NumProductionsSourced == 1) ? " production" : " productions") << " sourced.";
+			m_Result << filename << ": " << m_NumProductionsSourced << " production" << ((m_NumProductionsSourced == 1) ? " " : "s ") << "sourced.";
 		} else {
 			char buf[kMinBufferSize];
 			AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
@@ -251,7 +251,7 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 		if (m_SourceMode == SOURCE_DEFAULT) {
 			if (m_RawOutput) {
 				if (m_NumProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
-				m_Result << filename << ": " << m_NumProductionsSourced << ((m_NumProductionsSourced == 1) ? " production" : " productions") << " sourced.";
+				m_Result << filename << ": " << m_NumProductionsSourced << " production" << ((m_NumProductionsSourced == 1) ? " " : "s ") << "sourced.";
 			} else {
 				char buf[kMinBufferSize];
 				AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
