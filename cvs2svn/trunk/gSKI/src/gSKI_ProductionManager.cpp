@@ -991,10 +991,21 @@ _|___/    __         _    _             ____  _               _
       Production*           p;
       IProductionInstance* pi;
 
-	  // The gSKI events are "before" events so we check that the kernel event
-	  // hasn't occured yet.
-      if(!eventOccured)
-      {
+	  // The gSKI events are
+	  // BEFORE_PRODUCTION_REMOVED and
+	  // AFTER_PRODUCTION_ADDED
+	  // AFTER_PRODUCTION_FIRED
+	  // BEFORE_PRODUCTION_RETRACTED
+	  // so check that the timing of the before/after logic is correct from the kernel.
+	  if ((eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_REMOVED) ||
+		  (!eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_ADDED) ||
+		  (!eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_FIRED) ||
+		  (eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_RETRACTED))
+	  {
+		  // Why is the kernel issuing a callback which we can't pass on to gSKI.  One or the other should change.
+		  return ;
+	  }
+
          if((eventId == gSKI_K_EVENT_PRODUCTION_ADDED) || 
             (eventId == gSKI_K_EVENT_PRODUCTION_REMOVED))
          {
@@ -1023,8 +1034,7 @@ _|___/    __         _    _             ____  _               _
          
 //         if(pi)
 //            pi->Release();   
-      }
-   }
+	}
 }
 
 
