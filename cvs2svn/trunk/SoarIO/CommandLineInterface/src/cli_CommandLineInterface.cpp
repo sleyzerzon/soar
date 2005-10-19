@@ -876,3 +876,53 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 	}
 	return true;
 }
+
+bool CommandLineInterface::Trim(std::string& line) {
+	// trim whitespace and comments from line
+	if (!line.size()) return true; // nothing on the line
+
+	// remove leading whitespace
+	std::string::size_type pos = line.find_first_not_of(" \t");
+	if (pos != std::string::npos) line = line.substr(pos);
+
+	bool pipe = false;
+	std::string::size_type searchpos = 0;
+
+	for (pos = line.find_first_of("\\#|", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|", searchpos)) {
+		switch (line[pos]) {
+			case '\\': // skip backslashes
+				searchpos = pos + 2;
+				break;
+
+			case '#': // if not inside pipe, erase from pound to end or newline encountered
+				if (pipe) {
+					searchpos = pos + 1;
+				} else {
+					{
+						std::string::size_type nlpos = line.find('\n', searchpos + 1);
+						if (nlpos == std::string::npos) {
+							// No newline encountered
+							line = line.substr(0, pos);
+						} else {
+							std::string temp = line;
+							// Newline encountered at nlpos
+							line = temp.substr(0, pos);
+							line += temp.substr(nlpos);
+							searchpos = nlpos;
+						}
+					}
+				}
+				break;
+
+			case '|': // note pipe
+				pipe = !pipe;
+				searchpos = pos + 1;
+				break;
+		}
+	}
+
+	if (pipe) return SetError(CLIError::kNewlineBeforePipe);
+	return true;
+}
+
+

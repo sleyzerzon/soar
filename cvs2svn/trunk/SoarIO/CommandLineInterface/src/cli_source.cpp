@@ -16,76 +16,55 @@
 
 #include "cli_Constants.h"
 #include "sml_StringOps.h"
+#include "sml_Names.h"
 
 using namespace cli;
 using namespace sml;
 
 bool CommandLineInterface::ParseSource(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
-	if (argv.size() < 2) {
-		SetErrorDetail("Please supply one file to source. If there are spaces in the path, please enclose in quotes.");
-		return SetError(CLIError::kTooFewArgs);
+	Options optionsData[] = {
+		{'d', "disable",		0},
+		{'a', "all",			0},
+		{0, 0, 0}
+	};
 
-	} else if (argv.size() > 2) {
-		// but only one filename
-		return SetError(CLIError::kSourceOnlyOneFile);
+	// Set to default on first call to source
+	if (m_SourceDepth == 0) {
+		m_SourceMode = SOURCE_DEFAULT;
 	}
 
-	return DoSource(pAgent, argv[1]);
-}
+	for (;;) {
+		if (!ProcessOptions(argv, optionsData)) return false;
+		if (m_Option == -1) break;
 
-bool CommandLineInterface::Trim(std::string& line) {
-	// trim whitespace and comments from line
-	if (!line.size()) return true; // nothing on the line
-
-	// remove leading whitespace
-	std::string::size_type pos = line.find_first_not_of(" \t");
-	if (pos != std::string::npos) line = line.substr(pos);
-
-	bool pipe = false;
-	std::string::size_type searchpos = 0;
-
-	//for (pos = line.find_first_of("\\#|\n", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|\n", searchpos)) {
-	for (pos = line.find_first_of("\\#|", searchpos); pos != std::string::npos; pos = line.find_first_of("\\#|", searchpos)) {
-		switch (line[pos]) {
-			case '\\': // skip backslashes
-				searchpos = pos + 2;
-				break;
-
-			case '#': // if not inside pipe, erase from pound to end or newline encountered
-				if (pipe) {
-					searchpos = pos + 1;
-				} else {
-					{
-						std::string::size_type nlpos = line.find('\n', searchpos + 1);
-						if (nlpos == std::string::npos) {
-							// No newline encountered
-							line = line.substr(0, pos);
-						} else {
-							std::string temp = line;
-							//temp[nlpos] = ' '; // convert newline to space
-							// Newline encountered at nlpos
-							line = temp.substr(0, pos);
-							line += temp.substr(nlpos);
-							searchpos = nlpos;
-						}
-					}
+		switch (m_Option) {
+			case 'd':
+				// Only process this option on first call to source
+				if (m_SourceDepth == 0) {
+					m_SourceMode = SOURCE_DISABLE;
 				}
 				break;
-
-			case '|': // note pipe
-				pipe = !pipe;
-				searchpos = pos + 1;
+			case 'a':
+				// Only process this option on first call to source
+				if (m_SourceDepth == 0) {
+					m_SourceMode = SOURCE_ALL;
+				}
 				break;
-
-			//case '\n': // newlines become spaces
-			//	line[pos] = ' ';
-			//	searchpos = pos + 1;
-			//	break;
+			default:
+				return SetError(CLIError::kGetOptError);
 		}
 	}
 
-	if (pipe) return SetError(CLIError::kNewlineBeforePipe);
-	return true;
+	if (m_NonOptionArguments < 1) {
+		SetErrorDetail("Please supply one file to source. If there are spaces in the path, enclose it in quotes.");
+		return SetError(CLIError::kTooFewArgs);
+
+	} else if (m_NonOptionArguments > 2) {
+		SetErrorDetail("Please supply one file to source. If there are spaces in the path, enclose it in quotes.");
+		return SetError(CLIError::kSourceOnlyOneFile);
+	}
+
+	return DoSource(pAgent, argv[argv.size() - 1]);
 }
 
 bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) {
@@ -118,6 +97,7 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 	std::ifstream soarFile(filename.c_str());
 	if (!soarFile) {
 		if (path.length()) DoPopD();
+		SetErrorDetail(filename);
 		return SetError(CLIError::kOpenFileFail);
 	}
 
@@ -132,6 +112,7 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 	// Set directory depth to zero on first call to source, even though it should be zero anyway
 	if (m_SourceDepth == 0) {
 		m_SourceDirDepth = 0;
+		m_NumProductionsSourced = 0;	// set production number cache to zero on top level
 	}
 	++m_SourceDepth;
 
@@ -251,15 +232,43 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 	// Completion
 	--m_SourceDepth;
 
+	// If mode ALL, print summary
+	if (m_SourceMode == SOURCE_ALL) {
+		if (m_RawOutput) {
+			if (m_NumProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
+			m_Result << filename << ": " << m_NumProductionsSourced << " productions sourced.";
+		} else {
+			char buf[kMinBufferSize];
+			AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
+			AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
+		}
+		m_NumProductionsSourced = 0;	// set production number cache to zero after each summary
+	}
+
 	// if we're returning to the user
 	if (!m_SourceDepth) {
+		// If mode DEFAULT, print summary
+		if (m_SourceMode == SOURCE_DEFAULT) {
+			if (m_RawOutput) {
+				if (m_NumProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
+				m_Result << filename << ": " << m_NumProductionsSourced << " productions sourced.";
+			} else {
+				char buf[kMinBufferSize];
+				AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
+				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
+			}
+			m_NumProductionsSourced = 0;	// set production number cache to zero after each summary
+		}
+
 		// Print working directory if source directory depth !=  0
 		if (m_SourceDirDepth != 0) DoPWD();	// Ignore error
 		m_SourceDirDepth = 0;
 
 		// Add finished message
-		if (m_Result.str()[m_Result.str().size()-1] != '\n') m_Result << '\n';
-		m_Result << "Source finished.";
+		if (m_RawOutput) {
+			if (m_Result.str()[m_Result.str().size()-1] != '\n') m_Result << '\n';	// add a newline if none present
+			m_Result << "Source finished.";
+		}
 	}
 
 	soarFile.close();

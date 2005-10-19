@@ -54,6 +54,7 @@ bool CommandLineInterface::DoSP(gSKI::IAgent* pAgent, const std::string& product
 		return SetError(CLIError::kgSKIError);
 	}
 
+	++m_NumProductionsSourced;
 	if (m_RawOutput) {
 		m_Result << '*';
 	}

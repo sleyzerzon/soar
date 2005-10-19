@@ -122,6 +122,12 @@ namespace cli {
 		RUN_NUM_OPTIONS, // must be last
 	};
 
+	enum eSourceMode { 
+		SOURCE_DISABLE, 
+		SOURCE_DEFAULT, 
+		SOURCE_ALL, 
+	};
+
 	enum eStatsOptions {
 		STATS_MEMORY,
 		STATS_RETE,

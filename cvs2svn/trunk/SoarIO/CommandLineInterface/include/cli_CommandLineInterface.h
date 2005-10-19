@@ -952,6 +952,8 @@ protected:
 	int			m_Option;
 	std::string m_OptionArgument;
 	int			m_NonOptionArguments;
+	eSourceMode m_SourceMode;
+	int			m_NumProductionsSourced;
 
 ////////////////////////////////////////////
 
