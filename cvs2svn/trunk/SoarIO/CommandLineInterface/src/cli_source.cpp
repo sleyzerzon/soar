@@ -108,11 +108,14 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 	std::string::iterator iter;		// Iterator when parsing for braces and pounds
 	int lineCount = 0;				// Count the lines per file
 	int lineCountCache = 0;			// Used to save a line number
+	
+	static int numTotalProductionsSourced;
 
 	// Set directory depth to zero on first call to source, even though it should be zero anyway
 	if (m_SourceDepth == 0) {
 		m_SourceDirDepth = 0;
-		m_NumProductionsSourced = 0;	// set production number cache to zero on top level
+		m_NumProductionsSourced = 0;		// set production number cache to zero on top level
+		numTotalProductionsSourced = 0;	// set production number cache to zero on top level
 	}
 	++m_SourceDepth;
 
@@ -242,23 +245,36 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 			AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
 			AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
 		}
+		numTotalProductionsSourced += m_NumProductionsSourced;
 		m_NumProductionsSourced = 0;	// set production number cache to zero after each summary
 	}
 
 	// if we're returning to the user
 	if (!m_SourceDepth) {
-		// If mode DEFAULT, print summary
-		if (m_SourceMode == SOURCE_DEFAULT) {
-			if (m_RawOutput) {
+		if (m_RawOutput) {
+			if (m_SourceMode == SOURCE_DEFAULT) {
 				if (m_NumProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
-				m_Result << filename << ": " << m_NumProductionsSourced << " production" << ((m_NumProductionsSourced == 1) ? " " : "s ") << "sourced.";
-			} else {
-				char buf[kMinBufferSize];
-				AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
-				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
+				// If default mode, print file name
+				m_Result << filename << ": " << m_NumProductionsSourced << " production" 
+					<< ((m_NumProductionsSourced == 1) ? " " : "s ") << "sourced.";
+
+			} else if (m_SourceMode == SOURCE_ALL) {
+				m_Result << "\nTotal: " << numTotalProductionsSourced << " production" 
+					<< ((numTotalProductionsSourced == 1) ? " " : "s ") << "sourced.";
 			}
-			m_NumProductionsSourced = 0;	// set production number cache to zero after each summary
+		} else {
+			char buf[kMinBufferSize];
+			if (m_SourceMode == SOURCE_DEFAULT) {
+                AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
+				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
+
+			} else if (m_SourceMode == SOURCE_ALL) {
+				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(numTotalProductionsSourced, buf, kMinBufferSize));
+			}
 		}
+
+		m_NumProductionsSourced = 0;
+		numTotalProductionsSourced = 0;
 
 		// Print working directory if source directory depth !=  0
 		if (m_SourceDirDepth != 0) DoPWD();	// Ignore error
