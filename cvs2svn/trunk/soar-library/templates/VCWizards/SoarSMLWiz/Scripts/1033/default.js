@@ -35,11 +35,12 @@ function AddSpecificConfig(selProj, strProjectName)
 		config.IntermediateDirectory="$(OutDir)/Debug";
 		config.ConfigurationType="1";
 		config.CharacterSet="2";
+		config.UseManagedExtensions="FALSE";
 		config.WholeProgramOptimization="FALSE";
 		
 		var CLTool = config.Tools("VCCLCompilerTool");
 		CLTool.Optimization="0";
-		CLTool.AdditionalIncludeDirectories="../../ClientSML/include;../../ConnectionSML/include;../../ElementXML/include;..\..\KernelSML\include";
+		CLTool.AdditionalIncludeDirectories="../ClientSML/include;../ConnectionSML/include;../ElementXML/include;../KernelSML/include";
 		CLTool.PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE";
 		CLTool.MinimalRebuild="TRUE";
 		CLTool.BasicRuntimeChecks="3";
@@ -52,8 +53,9 @@ function AddSpecificConfig(selProj, strProjectName)
 		CLTool.DebugInformationFormat="4";
 
 		var LinkTool = config.Tools("VCLinkerTool");
-		LinkTool.OutputFile="..\..\..\soar-library\$(ProjectName).exe";
+		LinkTool.OutputFile="../../soar-library/$(ProjectName).exe";
 		LinkTool.LinkIncremental="2";
+		LinkTool.AdditionalLibraryDirectories="../../soar-library";
 		LinkTool.GenerateDebugInformation="TRUE";
 		LinkTool.ProgramDatabaseFile="$(OutDir)/TestClientSML.pdb";
 		LinkTool.SubSystem="1";
@@ -64,10 +66,11 @@ function AddSpecificConfig(selProj, strProjectName)
 		config.IntermediateDirectory="$(OutDir)/Release";
 		config.ConfigurationType="1";
 		config.CharacterSet="2";
+		config.UseManagedExtensions="FALSE";
 		config.WholeProgramOptimization="TRUE";
 		
 		CLTool = config.Tools("VCCLCompilerTool");
-		CLTool.AdditionalIncludeDirectories="../../ClientSML/include;../../ConnectionSML/include;../../ElementXML/include;..\..\KernelSML\include";
+		CLTool.AdditionalIncludeDirectories="../ClientSML/include;../ConnectionSML/include;../ElementXML/include;../KernelSML/include";
 		CLTool.PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE";
 		CLTool.RuntimeLibrary="0";
 		CLTool.UsePrecompiledHeader="0";
@@ -78,8 +81,9 @@ function AddSpecificConfig(selProj, strProjectName)
 		CLTool.DebugInformationFormat="3";
 
 		LinkTool = config.Tools("VCLinkerTool");
-		LinkTool.OutputFile="..\..\..\soar-library\$(ProjectName).exe";
+		LinkTool.OutputFile="../../soar-library/$(ProjectName).exe";
 		LinkTool.LinkIncremental="1";
+		LinkTool.AdditionalLibraryDirectories="../../soar-library";
 		LinkTool.GenerateDebugInformation="TRUE";
 		LinkTool.ProgramDatabaseFile="$(OutDir)/TestClientSML.pdb";
 		LinkTool.SubSystem="1";
@@ -87,6 +91,17 @@ function AddSpecificConfig(selProj, strProjectName)
 		LinkTool.EnableCOMDATFolding="2";
 		LinkTool.TargetMachine="1";
 		
+		// None of this commented out code below works
+		//var Solution = dte.Solution;
+		//var ClientSML = Solution.FindProjectItem("ClientSML");
+		//var ConnectionSML = Solution.FindProjectItem("ConnectionSML");
+		//var ElementXML = Solution.FindProjectItem("ElementXML");
+		//var KernelSML = Solution.FindProjectItem("KernelSML");
+		//var refmanager = selProj.Object.References;
+		//refmanager.AddProject(ClientSML);
+		//refmanager.AddProject(ConnectionSML);
+		//refmanager.AddProject(ElementXML);
+		//refmanager.AddProject(KernelSML);
 		// Need to get project objects for ClientSML, ConnectionSML,
 		// ElementXML, KernelSML and then pass them to AddProject()
 		//var refmanager = selProj.Object.References;
