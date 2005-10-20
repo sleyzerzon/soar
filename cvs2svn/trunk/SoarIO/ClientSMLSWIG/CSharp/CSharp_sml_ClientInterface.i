@@ -1,6 +1,5 @@
 /* File : sml_ClientInterface.i */
-%module CSharp_sml_ClientInterface
-//%module sml
+%module sml
 
 %csconst(1); // strongly recommended by SWIG manual section 19.3.5.1
 // the previous line causes problems for some enum values, so we have to set them manually here
@@ -16,6 +15,6 @@
 %csconstvalue("smlRunEventId.smlEVENT_AFTER_RUNNING + 1") smlEVENT_AFTER_PRODUCTION_ADDED;
 %csconstvalue("smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED + 1") smlEVENT_OUTPUT_PHASE_CALLBACK;
 
-// include stuff common to all languages (i.e. Java and Tcl)
+// include stuff common to all languages (i.e. Java, Tcl, C#)
 %include "../sml_ClientInterface.i"
 
