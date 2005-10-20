@@ -63,6 +63,7 @@
 namespace gSKI {
 	class IAgent;
 	class IKernel;
+	class IProductionManager;
 }
 namespace sml {
 	class ElementXML;
@@ -113,7 +114,7 @@ typedef struct {
 	int argument;
 } Options;
 
-class CommandLineInterface : public gSKI::IPrintListener{
+class CommandLineInterface : public gSKI::IPrintListener, public gSKI::IProductionListener {
 public:
 
 	EXPORT CommandLineInterface();
@@ -839,6 +840,9 @@ protected:
 		if (m_pLogFile) (*m_pLogFile) << msg;
 	}
 
+	// Production callback events go here
+	virtual void HandleEvent(egSKIProductionEventId eventId, gSKI::IAgent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match);
+
 	/*************************************************************
 	* @brief Trim comments off of a line
 	*************************************************************/
@@ -892,7 +896,7 @@ protected:
 	/*************************************************************
 	* @brief 
 	*************************************************************/
-	void HandleSourceError(int errorLine, const std::string& filename);
+	void HandleSourceError(int errorLine, const std::string& filename, gSKI::IProductionManager* pProductionManager);
 
 	/*************************************************************
 	* @brief 
@@ -952,8 +956,12 @@ protected:
 	int			m_Option;
 	std::string m_OptionArgument;
 	int			m_NonOptionArguments;
+
 	eSourceMode m_SourceMode;
 	int			m_NumProductionsSourced;
+	int			m_NumProductionsExcised;
+	std::list<const char*> m_ExcisedDuringSource;
+	bool		m_SourceVerbose;
 
 ////////////////////////////////////////////
 

@@ -18,19 +18,27 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
+#include "IgSKI_Agent.h"
+#include "IgSKI_ProductionManager.h"
+#include "IgSKI_Production.h"
+
+#include <assert.h>
+
 using namespace cli;
 using namespace sml;
 
 bool CommandLineInterface::ParseSource(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
-		{'d', "disable",		0},
 		{'a', "all",			0},
+		{'d', "disable",		0},
+		{'v', "verbose",		0},
 		{0, 0, 0}
 	};
 
 	// Set to default on first call to source
 	if (m_SourceDepth == 0) {
 		m_SourceMode = SOURCE_DEFAULT;
+		m_SourceVerbose = false; 
 	}
 
 	for (;;) {
@@ -50,6 +58,11 @@ bool CommandLineInterface::ParseSource(gSKI::IAgent* pAgent, std::vector<std::st
 					m_SourceMode = SOURCE_ALL;
 				}
 				break;
+
+			case 'v':
+				m_SourceVerbose = true;
+				break;
+
 			default:
 				return SetError(CLIError::kGetOptError);
 		}
@@ -110,12 +123,20 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 	int lineCountCache = 0;			// Used to save a line number
 	
 	static int numTotalProductionsSourced;
+	static int numTotalProductionsExcised;
 
-	// Set directory depth to zero on first call to source, even though it should be zero anyway
-	if (m_SourceDepth == 0) {
-		m_SourceDirDepth = 0;
-		m_NumProductionsSourced = 0;		// set production number cache to zero on top level
-		numTotalProductionsSourced = 0;	// set production number cache to zero on top level
+	gSKI::IProductionManager* pProductionManager = pAgent->GetProductionManager();
+
+	if (m_SourceDepth == 0) {				// Check for top-level source call
+		m_SourceDirDepth = 0;				// Set directory depth to zero on first call to source, even though it should be zero anyway
+
+		m_NumProductionsSourced = 0;		// set production number caches to zero on top level
+		m_NumProductionsExcised = 0;
+		numTotalProductionsSourced = 0;
+		numTotalProductionsExcised = 0;
+
+		// Register for production removed events so we can report the number of excised productions
+		pProductionManager->AddProductionListener(gSKIEVENT_BEFORE_PRODUCTION_REMOVED, this);
 	}
 	++m_SourceDepth;
 
@@ -130,7 +151,7 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 
 		// Trim whitespace and comments
 		if (!Trim(line)) {
-			HandleSourceError(lineCount, filename);
+			HandleSourceError(lineCount, filename, pProductionManager);
 			if (path.length()) DoPopD();
 			return false;
 		}
@@ -149,7 +170,7 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 			do {
 				if (lineCountCache != lineCount) {
 					if (!Trim(line)) { // Trim whitespace and comments on additional lines
-						HandleSourceError(lineCount, filename);
+						HandleSourceError(lineCount, filename, pProductionManager);
 						if (path.length()) DoPopD();
 						return false; 
 					}
@@ -191,13 +212,13 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 			if (braces > 0) {
 				// EOF while still nested
 				SetError(CLIError::kUnmatchedBrace);
-				HandleSourceError(lineCountCache, filename);
+				HandleSourceError(lineCountCache, filename, pProductionManager);
 				if (path.length()) DoPopD();
 				return false;
 
 			} else if (braces < 0) {
 				SetError(CLIError::kExtraClosingBrace);
-				HandleSourceError(lineCountCache, filename);
+				HandleSourceError(lineCountCache, filename, pProductionManager);
 				if (path.length()) DoPopD();
 				return false;
 			}
@@ -226,7 +247,7 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 
 		} else {
 			// Command failed, error in result
-			HandleSourceError(lineCountCache, filename);
+			HandleSourceError(lineCountCache, filename, pProductionManager);
 			if (path.length()) DoPopD();
 			return false;
 		}	
@@ -240,41 +261,71 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 		if (m_RawOutput) {
 			if (m_NumProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
 			m_Result << filename << ": " << m_NumProductionsSourced << " production" << ((m_NumProductionsSourced == 1) ? " " : "s ") << "sourced.";
+			if (m_NumProductionsExcised) {
+				m_Result << " " << m_NumProductionsExcised << " production" << ((m_NumProductionsExcised == 1) ? " " : "s ") << "excised.";
+				if (m_SourceVerbose) {
+					// print excised production names
+					m_Result << "\nExcised productions:";
+
+					std::list<const char*>::iterator iter = m_ExcisedDuringSource.begin();
+					while (iter != m_ExcisedDuringSource.end()) {
+						m_Result << "\n\t" << (*iter);
+						++iter;
+					}
+				}
+			}
+
 		} else {
 			char buf[kMinBufferSize];
 			AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
 			AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
+			AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsExcised, buf, kMinBufferSize));
 		}
-		numTotalProductionsSourced += m_NumProductionsSourced;
-		m_NumProductionsSourced = 0;	// set production number cache to zero after each summary
+
+		if (m_ExcisedDuringSource.size()) m_ExcisedDuringSource.clear();
 	}
+
+	numTotalProductionsSourced += m_NumProductionsSourced;
+	numTotalProductionsExcised += m_NumProductionsExcised;
+	m_NumProductionsSourced = 0;	// set production number cache to zero after each summary
+	m_NumProductionsExcised = 0;	// set production number cache to zero after each summary
 
 	// if we're returning to the user
 	if (!m_SourceDepth) {
+		
+		// Remove production listener
+		pProductionManager->RemoveProductionListener(gSKIEVENT_BEFORE_PRODUCTION_REMOVED, this);
+
 		if (m_RawOutput) {
-			if (m_SourceMode == SOURCE_DEFAULT) {
-				if (m_NumProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
+			if (m_SourceMode != SOURCE_DISABLE) {
+				if (numTotalProductionsSourced) m_Result << '\n';	// add a newline if a production was sourced
 				// If default mode, print file name
-				m_Result << filename << ": " << m_NumProductionsSourced << " production" 
-					<< ((m_NumProductionsSourced == 1) ? " " : "s ") << "sourced.";
+				m_Result << "Total: " << numTotalProductionsSourced << " production" << ((numTotalProductionsSourced == 1) ? " " : "s ") << "sourced.";
+				if (numTotalProductionsExcised) {
+					m_Result << " " << numTotalProductionsExcised << " production" << ((numTotalProductionsExcised == 1) ? " " : "s ") << "excised.";
 
-			} else if (m_SourceMode == SOURCE_ALL) {
-				m_Result << "\nTotal: " << numTotalProductionsSourced << " production" 
-					<< ((numTotalProductionsSourced == 1) ? " " : "s ") << "sourced.";
+					if (m_SourceVerbose && (m_SourceMode != SOURCE_ALL)) {
+						// print excised production names
+						m_Result << "\nExcised productions:";
+
+						std::list<const char*>::iterator iter = m_ExcisedDuringSource.begin();
+						while (iter != m_ExcisedDuringSource.end()) {
+							m_Result << "\n\t" << (*iter);
+							++iter;
+						}
+					}
+				}
 			}
-		} else {
-			char buf[kMinBufferSize];
-			if (m_SourceMode == SOURCE_DEFAULT) {
-                AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
-				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
 
-			} else if (m_SourceMode == SOURCE_ALL) {
+		} else {
+			if (m_SourceMode != SOURCE_DISABLE) {
+				char buf[kMinBufferSize];
 				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(numTotalProductionsSourced, buf, kMinBufferSize));
+				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(numTotalProductionsExcised, buf, kMinBufferSize));
 			}
 		}
 
-		m_NumProductionsSourced = 0;
-		numTotalProductionsSourced = 0;
+		if (m_ExcisedDuringSource.size()) m_ExcisedDuringSource.clear();
 
 		// Print working directory if source directory depth !=  0
 		if (m_SourceDirDepth != 0) DoPWD();	// Ignore error
@@ -292,8 +343,14 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 	return true;
 }
 
-void CommandLineInterface::HandleSourceError(int errorLine, const std::string& filename) {
+void CommandLineInterface::HandleSourceError(int errorLine, const std::string& filename, gSKI::IProductionManager* pProductionManager) {
 	if (!m_SourceError) {
+
+		// Remove listener
+		pProductionManager->RemoveProductionListener(gSKIEVENT_BEFORE_PRODUCTION_REMOVED, this);
+
+		// Flush excised production list
+		if (m_ExcisedDuringSource.size()) m_ExcisedDuringSource.clear();
 
 		// Output error message
 		m_SourceErrorDetail.clear();
@@ -324,5 +381,16 @@ void CommandLineInterface::HandleSourceError(int errorLine, const std::string& f
 		char buf[kMinBufferSize];
 		m_SourceErrorDetail += "\n\t--> Sourced by: " + filename + " (line " + Int2String(errorLine, buf, kMinBufferSize) + ")";
 	}
+}
+
+// Production callback events go here
+void CommandLineInterface::HandleEvent(egSKIProductionEventId eventId, gSKI::IAgent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match) {
+	unused(match);
+	unused(agentPtr);
+
+	// Only called when source command is active
+	assert(eventId == gSKIEVENT_BEFORE_PRODUCTION_REMOVED);
+	++m_NumProductionsExcised;
+	m_ExcisedDuringSource.push_back(prod->GetName());
 }
 
