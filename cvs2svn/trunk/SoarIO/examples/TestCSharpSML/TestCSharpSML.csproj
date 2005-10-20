@@ -7,7 +7,7 @@
     >
         <Build>
             <Settings
-                ApplicationIcon = "App.ico"
+                ApplicationIcon = ""
                 AssemblyKeyContainerName = ""
                 AssemblyName = "TestCSharpSML"
                 AssemblyOriginatorKeyFile = ""
@@ -76,7 +76,7 @@
                 />
                 <Reference
                     Name = "System.XML"
-                    AssemblyName = "System.XML"
+                    AssemblyName = "System.Xml"
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
                 />
             </References>
@@ -95,15 +95,6 @@
                 />
                 <File
                     RelPath = "AnalyzeXML.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "App.ico"
-                    BuildAction = "Content"
-                />
-                <File
-                    RelPath = "AssemblyInfo.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -134,16 +125,6 @@
                 />
                 <File
                     RelPath = "ConnectionInfo.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "CSharp_sml_ClientInterface.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "CSharp_sml_ClientInterfacePINVOKE.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -208,6 +189,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "sml.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "sml_Names.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -224,6 +210,11 @@
                 />
                 <File
                     RelPath = "smlPhase.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "smlPINVOKE.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
