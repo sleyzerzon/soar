@@ -278,8 +278,14 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 		} else {
 			char buf[kMinBufferSize];
 			AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, filename.c_str());
-			AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
-			AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(m_NumProductionsExcised, buf, kMinBufferSize));
+			AppendArgTag(sml_Names::kParamSourcedProductionCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
+			AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, Int2String(m_NumProductionsExcised, buf, kMinBufferSize));
+
+			std::list<const char*>::iterator iter = m_ExcisedDuringSource.begin();
+			while (iter != m_ExcisedDuringSource.end()) {
+				AppendArgTagFast(sml_Names::kParamName, sml_Names::kTypeString, (*iter));
+				++iter;
+			}
 		}
 
 		if (m_ExcisedDuringSource.size()) m_ExcisedDuringSource.clear();
@@ -320,8 +326,16 @@ bool CommandLineInterface::DoSource(gSKI::IAgent* pAgent, std::string filename) 
 		} else {
 			if (m_SourceMode != SOURCE_DISABLE) {
 				char buf[kMinBufferSize];
-				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(numTotalProductionsSourced, buf, kMinBufferSize));
-				AppendArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(numTotalProductionsExcised, buf, kMinBufferSize));
+				AppendArgTag(sml_Names::kParamSourcedProductionCount, sml_Names::kTypeInt, Int2String(numTotalProductionsSourced, buf, kMinBufferSize));
+				AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, Int2String(numTotalProductionsExcised, buf, kMinBufferSize));
+				
+				if (m_SourceVerbose) {
+					std::list<const char*>::iterator iter = m_ExcisedDuringSource.begin();
+					while (iter != m_ExcisedDuringSource.end()) {
+						AppendArgTagFast(sml_Names::kParamName, sml_Names::kTypeString, (*iter));
+						++iter;
+					}
+				}
 			}
 		}
 

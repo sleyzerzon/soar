@@ -284,6 +284,11 @@ char const* const sml_Names::kParamFunction			= "function" ;
 char const* const sml_Names::kParamChunkNamePrefix	= "chunknameprefix" ;
 char const* const sml_Names::kParamChunkCount		= "chunkcount" ;
 char const* const sml_Names::kParamChunkLongFormat	= "chunklongformat" ;
+
+// Source command parameters
+char const* const sml_Names::kParamSourcedProductionCount	= "sourced-production-count";
+char const* const sml_Names::kParamExcisedProductionCount	= "excised-production-count";
+
 // Parameter names for stats command
 char const* const sml_Names::kParamStatsProductionCountDefault				= "statsproductioncountdefault" ;
 char const* const sml_Names::kParamStatsProductionCountUser					= "statsproductioncountuser" ;

@@ -278,6 +278,11 @@ public:
 	static char const* const kParamChunkNamePrefix;
 	static char const* const kParamChunkCount;
 	static char const* const kParamChunkLongFormat;
+
+	// Parameter names for source command
+	static char const* const kParamSourcedProductionCount;
+	static char const* const kParamExcisedProductionCount;
+
 	// Parameter names for stats command
 	static char const* const kParamStatsProductionCountDefault;
 	static char const* const kParamStatsProductionCountUser;
