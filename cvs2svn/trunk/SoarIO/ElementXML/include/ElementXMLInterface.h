@@ -350,7 +350,7 @@ EXPORT char* sml_AllocateString(int length) ;
 *
 * @param string		The string to release.  Passing NULL is valid and does nothing.
 *************************************************************/
-EXPORT void sml_DeleteString(char* string) ;
+EXPORT void sml_DeleteString(char* pString) ;
 
 /*************************************************************
 * @brief	Performs an allocation and then copies the contents of the passed in string to the newly allocated string.

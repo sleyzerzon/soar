@@ -257,9 +257,9 @@ char* ClientXML::AllocateString(int length)
 *
 * @param string		The string to release.  Passing NULL is valid and does nothing.
 *************************************************************/
-void ClientXML::DeleteString(char* string)
+void ClientXML::DeleteString(char* pString)
 {
-	ElementXML::DeleteString(string) ;
+	ElementXML::DeleteString(pString) ;
 }
 
 /*************************************************************

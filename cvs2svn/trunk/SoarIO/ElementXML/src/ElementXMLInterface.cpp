@@ -415,9 +415,9 @@ char* sml_AllocateString(int length)
 *
 * @param string		The string to release.  Passing NULL is valid and does nothing.
 *************************************************************/
-void sml_DeleteString(char* string)
+void sml_DeleteString(char* pString)
 {
-	ElementXMLImpl::DeleteString(string) ;
+	ElementXMLImpl::DeleteString(pString) ;
 }
 
 /*************************************************************

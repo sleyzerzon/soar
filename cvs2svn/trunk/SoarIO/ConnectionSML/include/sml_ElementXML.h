@@ -434,7 +434,7 @@ public:
 	*
 	* @param string		The string to release.  Passing NULL is valid and does nothing.
 	*************************************************************/
-	static void DeleteString(char* string) ;
+	static void DeleteString(char* pString) ;
 
     /*************************************************************
     * @brief	Performs an allocation and then copies the contents of the passed in string to the newly allocated string.
