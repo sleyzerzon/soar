@@ -1,16 +1,29 @@
+#include <math.h>
+#include "reinforcement_learning.h"
+#include "print.h"
+#include "production.h"
+#include "rhsfun.h"
+#include "instantiations.h"
+#include "prefmem.h"
+#include "wmem.h"
+
 // Update the value on RL productions from last cycle
 bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal){
 
 	RL_data *data = goal->id.RL_data;
- 	int num_prods = list_length(data->productions_to_be_updated);
-	float update = compute_temp_diff(thisAgent, data, best_op_value);
+ 	float update = compute_temp_diff(thisAgent, data, best_op_value);
 	bool current_pref_changed = FALSE;
 	
+	int num_prods = 0;
+	for (cons *c = data->productions_to_be_updated; c ; c = c->rest){
+		if (c->first)
+			num_prods++;
+	}
 	
-	print("Update %f\n", update); // temporary
+	print(thisAgent, "Update %f\n", update); // temporary
  			
-	if (num_prods > 0){  // if there is a production to update
-		float increment = current_agent(alpha)*(update / num_prods);
+	if (num_prods > 0){  // if there are productions to update
+		float increment = thisAgent->alpha*(update / num_prods);
 		cons *c = data->productions_to_be_updated;
 			while(c){
 		 
@@ -22,20 +35,20 @@ bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal)
 				float temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
 				temp += increment;
 
-				symbol_remove_ref(rhs_value_to_symbol(prod->action_list->referent));
-				prod->action_list->referent = symbol_to_rhs_value(make_float_constant(temp));
+				symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
+				prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
 			 
 				if (prod->instantiations){
 					current_pref_changed = TRUE;
-					for (inst = prod->instantiations ; inst ; inst = inst->next){
-						for (pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
-							symbol_remove_ref(pref->referent);
-							pref->referent = symbol_to_rhs_value(make_float_constant(temp));
+					for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
+						for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
+							symbol_remove_ref(thisAgent, pref->referent);
+							pref->referent = make_float_constant(thisAgent, temp);
 						}
 					}
 				}
   
-				print_with_symbols("\n%y  ", prod->name); // temporary
+				print_with_symbols(thisAgent, "\n%y  ", prod->name); // temporary
  	 			
 	    		// print("Prediction %f ", record->previous_Q);
 				// print_with_symbols("value %y ", rhs_value_to_symbol(prod->action_list->referent));
@@ -44,7 +57,7 @@ bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal)
  		 	data->reward = 0.0;
 			data->step = 0;
 			data->previous_Q = 0;
-			free_list(data->productions_to_be_updated);
+			free_list(thisAgent, data->productions_to_be_updated);
 			data->productions_to_be_updated = NIL;
 	}
 	return current_pref_changed;
@@ -58,7 +71,7 @@ float compute_temp_diff(agent *thisAgent, RL_data* r, float best_op_value){
 	float Q = r->reward;
 
     // print("\n Q after reward is %f\n" , Q);
-	Q += pow(current_agent(gamma), r->step)*best_op_value;
+	Q += pow(thisAgent->gamma, r->step)*best_op_value;
 	//Q += pow(current_agent(gamma), r->step)*(r->next_Q);
 	// print("Q after next_Q update is %f\n", Q);
 	// print("\n alpha is %f\n", current_agent(alpha));
@@ -76,7 +89,7 @@ float compute_temp_diff(agent *thisAgent, RL_data* r, float best_op_value){
 
 void RL_update_symbolically_chosen(agent *thisAgent, slot *s, preference *candidates){ /* SAN - compute Q-value when winner decided by symbolic preferences */
 	if (!candidates) return;
-	double temp_Q = 0;   // DEFAULT_INDIFFERENT_VALUE;
+	float temp_Q = 0;   // DEFAULT_INDIFFERENT_VALUE;
 	// for (rec = current_agent(records) ; rec->level > goal_level; rec = rec->next)
 	// rec->next_Q = 0;
 	
@@ -90,17 +103,17 @@ void RL_update_symbolically_chosen(agent *thisAgent, slot *s, preference *candid
 	}
 	//   	rec->next_Q = temp_Q;
 	//	candidates->sum_of_probability = temp_Q;
-	learn_RL_productions(thisAgent, temp_Q, s->id);
+	perform_Bellman_update(thisAgent, temp_Q, s->id);
 }
 
 /* Called at the beginning of the decision phase. Also called immediately before "halting" to find rewards associated with the end of an episodic task.
 Finds numeric rewards one and two levels under the reward link and adds them together. */
-float tabulate_reward_values(agent *thisAgent){
+void tabulate_reward_values(agent *thisAgent){
 	Symbol *goal = thisAgent->top_goal;
 
 	while(goal){
 	    RL_data *data = goal->id.RL_data;
-		slot *s = goal->id.reward_header;
+		slot *s = goal->id.reward_header->id.slots;
 		float reward = 0.0;
 		if (s){
 		for ( ; s ; s = s->next){

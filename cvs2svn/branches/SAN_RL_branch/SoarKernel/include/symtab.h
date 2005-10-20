@@ -226,7 +226,7 @@ typedef struct identifier_struct {
   struct preference_struct *preferences_from_goal;
 //#ifdef NUMERIC_INDIFFERENCE
   struct RL_data_struct *RL_data;
-  Symbol *reward_header;
+  union symbol_union *reward_header;
 //#endif
 
   /* REW: begin 09.15.96 */

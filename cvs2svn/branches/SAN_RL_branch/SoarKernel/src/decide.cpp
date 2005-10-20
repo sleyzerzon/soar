@@ -49,6 +49,7 @@
 #include "explain.h"
 #include "tempmem.h"
 #include "io.h"
+#include "reinforcement_learning.h"
 
 /* JC ADDED: This is for event firing in gSKI */
 #include "gski_event_system_functions.h"
@@ -807,7 +808,7 @@ void do_buffered_link_changes (agent* thisAgent) {
    require preference for the slot.
 ************************************************************************** */
 
-byte require_preference_semantics (slot *s, preference **result_candidates) {
+byte require_preference_semantics (agent *thisAgent, slot *s, preference **result_candidates) {
   preference *p;
   preference *candidates;
   Symbol *value;
@@ -836,7 +837,7 @@ byte require_preference_semantics (slot *s, preference **result_candidates) {
   
   /* --- the lone require is the winner --- */
 #ifdef NUMERIC_INDIFFERENCE
-  RL_update_symbolically_chosen(s, candidates);
+  RL_update_symbolically_chosen(thisAgent, s, candidates);
 #endif
   return NONE_IMPASSE_TYPE;
 }
@@ -857,7 +858,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   
   /* === Requires === */
   if (s->preferences[REQUIRE_PREFERENCE_TYPE]) {
-    return require_preference_semantics (s, result_candidates);
+    return require_preference_semantics (thisAgent, s, result_candidates);
   }
     
   /* === Acceptables, Prohibits, Rejects === */
@@ -894,7 +895,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
 #ifdef NUMERIC_INDIFFERENCE
-	RL_update_symbolically_chosen(s, candidates);
+	RL_update_symbolically_chosen(thisAgent, s, candidates);
 #endif
     return NONE_IMPASSE_TYPE;
   }
@@ -1058,7 +1059,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
 #ifdef NUMERIC_INDIFFERENCE
-	RL_update_symbolically_chosen(s, candidates);
+	RL_update_symbolically_chosen(thisAgent, s, candidates);
 #endif
     return NONE_IMPASSE_TYPE;
   }
@@ -1311,7 +1312,7 @@ byte run_preference_semantics_for_consistency_check (agent* thisAgent, slot *s, 
   
   /* === Requires === */
   if (s->preferences[REQUIRE_PREFERENCE_TYPE]) {
-    return require_preference_semantics (s, result_candidates);
+    return require_preference_semantics (thisAgent, s, result_candidates);
   }
     
   /* === Acceptables, Prohibits, Rejects === */
@@ -2757,7 +2758,7 @@ void do_decision_phase (agent* thisAgent)
    do_buffered_wm_and_ownership_changes(thisAgent);
 
 #ifdef NUMERIC_INDIFFERENCE
-   record_data_for_RL();
+//   record_data_for_RL();
 #endif
   /*
    * Bob provided a solution to fix WME's hanging around unsupported
@@ -3649,7 +3650,7 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 			   top_value = cand->sum_of_probability;
 	   }
 	   
-	   if(perform_Bellman_update(top_value, s->id)){ // If the Bellman update changed current prefs, recompute operator values.
+	   if(perform_Bellman_update(thisAgent, top_value, s->id)){ // If the Bellman update changed current prefs, recompute operator values.
 		   for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
 			   /*print_with_symbols("\nPreference for %y", pref->value); */
 			   float value;
@@ -3714,7 +3715,7 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 			}
 		}
 			preference *top_cand = candidates;
-			double top_value = candidates->sum_of_probability;
+			top_value = candidates->sum_of_probability;
 			int num_max_cand = 0;
 
 			for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
