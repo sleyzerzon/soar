@@ -174,7 +174,7 @@ $(SWIG)\swig.exe -Wall -c++ -namespace sml -I../../ClientSML/include -I../../Ele
 					CommandLine="echo In order to function correctly, please ensure the following environment variables are correctly set:
 echo SWIG: %SWIG%
 echo on
-$(SWIG)\swig.exe -Wall -c++ -namespace sml -I../../ClientSML/include -I../../ElementXML/include -I../../ConnectionSML/include -csharp -outdir build &quot;$(InputPath)&quot;
+$(SWIG)\swig.exe -c++ -Wall -namespace sml -I../../ClientSML/include -I../../ElementXML/include -I../../ConnectionSML/include -csharp -outdir build &quot;$(InputPath)&quot;
 "
 					Outputs="$(InputName)_wrap.cxx"/>
 			</FileConfiguration>
