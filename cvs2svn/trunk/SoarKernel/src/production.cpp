@@ -1601,7 +1601,7 @@ void excise_all_productions_of_type(agent* thisAgent,
   while (thisAgent->all_productions_of_type[type]) {
     excise_production (thisAgent, 
                        thisAgent->all_productions_of_type[type],
-                       print_sharp_sign);
+                       (bool)(print_sharp_sign&&thisAgent->sysparams[TRACE_LOADING_SYSPARAM]));
   }
 }
 
@@ -1612,6 +1612,6 @@ void excise_all_productions(agent* thisAgent,
   for (int i=0; i < NUM_PRODUCTION_TYPES; i++) {
     excise_all_productions_of_type(thisAgent, 
                                    i, 
-                                   print_sharp_sign);
+                                   (bool)(print_sharp_sign&&thisAgent->sysparams[TRACE_LOADING_SYSPARAM]));
   }
 }
