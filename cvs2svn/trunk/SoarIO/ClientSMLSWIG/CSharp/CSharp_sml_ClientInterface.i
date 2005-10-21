@@ -15,6 +15,31 @@
 %csconstvalue("smlRunEventId.smlEVENT_AFTER_RUNNING + 1") smlEVENT_AFTER_PRODUCTION_ADDED;
 %csconstvalue("smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED + 1") smlEVENT_OUTPUT_PHASE_CALLBACK;
 
+%typemap(cscode) sml::Kernel %{
+	public delegate void MyCallback();
+
+	[DllImport("CSharp_sml_ClientInterface")]
+	public static extern void CSharp_Kernel_RegisterTestMethod(HandleRef jarg1, MyCallback callback);
+	
+	public void RegisterTestMethod(MyCallback callback)
+	{
+		CSharp_Kernel_RegisterTestMethod(swigCPtr, callback);
+	}
+%}
+
+/*
+%typemap(cscode) sml::smlPINVOKE %{
+	[DllImport("CSharp_sml_ClientInterface")]
+	public static extern void MyFunction(sml.Kernel.MyCallback callback);
+%}
+*/
+
 // include stuff common to all languages (i.e. Java, Tcl, C#)
 %include "../sml_ClientInterface.i"
+
+// include Doug's custom custom code for callbacks in the wrapper section
+//  so it's in the extern C block
+%wrapper %{
+#include "CSharpCallbackByHand.h"
+%}
 
