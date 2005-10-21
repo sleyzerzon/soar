@@ -114,7 +114,6 @@ bool CommandLineInterface::DoExcise(gSKI::IAgent* pAgent, const ExciseBitset& op
 	if (options.test(EXCISE_TASK)) {
 		pProductionManager->RemoveAllUserProductions(exciseCount);
 		pProductionManager->RemoveAllChunks(exciseCount);
-		pProductionManager->RemoveAllDefaultProductions(exciseCount);
 		this->DoInitSoar(pAgent);	// from the manual, init when --all or --task are executed
 		//ExciseInternal(pProductionManager->GetChunks(), exciseCount);
 		//ExciseInternal(pProductionManager->GetJustifications(), exciseCount);
