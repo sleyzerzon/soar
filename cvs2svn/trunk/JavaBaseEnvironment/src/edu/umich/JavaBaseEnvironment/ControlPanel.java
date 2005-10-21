@@ -97,14 +97,14 @@ public class ControlPanel implements SimulationControlListener{
 		myShell = new Shell(myDisplay);
 		setMenus();
 		setButtons();
-		myShell.setText(myTask + " control");
+		myShell.setText(myTask + " Control Panel");
 		myShell.addShellListener(new ShellAdapter(){
 			public void shellClosed(ShellEvent e){
 				if (myEC.isQuittable())
 				{
 					MessageBox mb = new MessageBox(myShell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 					mb.setText("Quit " + myTaskNoun);
-					mb.setMessage("Sure you want to quit " + myTaskNoun);
+					mb.setMessage("Are you sure you want to quit " + myTaskNoun + "?");
 					e.doit = (mb.open() == SWT.YES);
 					if(e.doit){
 						amOpen = false;
@@ -182,7 +182,7 @@ public class ControlPanel implements SimulationControlListener{
 				fd.setFilterExtensions(new String[] {"*." + myTaskFirstChar + "map", "*.*"});
         fd.setFilterPath(defaultMapsPath);
 
-				fd.setFilterNames(new String[] {myTask + "s maps (*." + myTaskFirstChar + "map)", "All files (*.*)"});
+				fd.setFilterNames(new String[] {myTask + " maps (*." + myTaskFirstChar + "map)", "All files (*.*)"});
 				String path = fd.open();
 				if(path != null && !path.equals("")){
 					myEC.loadMap(new File(path));
@@ -196,7 +196,7 @@ public class ControlPanel implements SimulationControlListener{
 		windowItem.setMenu(windowDrop);
 		windowItem.setText("Window");
 		MenuItem showMap = new MenuItem(windowDrop, SWT.PUSH);
-		showMap.setText("Show " + myTask + "s map");
+		showMap.setText("Show " + myTask + " map");
 		showMap.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
 				fireOpenMapNotification();
@@ -476,7 +476,7 @@ public class ControlPanel implements SimulationControlListener{
 			mis[i].dispose();
 		}
 		MenuItem destroyAll = new MenuItem(eatersDrop, SWT.PUSH);
-		destroyAll.setText("Destroy all " + myTask + "s agents");
+		destroyAll.setText("Destroy all " + myTask + " agents");
 		destroyAll.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
 				if(myEC.canDestroyAgent()){
