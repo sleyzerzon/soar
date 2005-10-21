@@ -95,24 +95,35 @@ bool CommandLineInterface::DoExcise(gSKI::IAgent* pAgent, const ExciseBitset& op
 
 	// Process the general options
 	if (options.test(EXCISE_ALL)) {
-		ExciseInternal(pProductionManager->GetAllProductions(), exciseCount);
-		if (exciseCount) this->DoInitSoar(pAgent);	// from the manual, init when --all or --task are executed
+		pProductionManager->RemoveAllProductions(exciseCount);
+		this->DoInitSoar(pAgent);	// from the manual, init when --all or --task are executed
+
+		//GetAllProductions leaks ref counts, do not use.
+		//ExciseInternal(pProductionManager->GetAllProductions(), exciseCount);
+		//if (exciseCount) this->DoInitSoar(pAgent);	// from the manual, init when --all or --task are executed
 	}
 	if (options.test(EXCISE_CHUNKS)) {
-		ExciseInternal(pProductionManager->GetChunks(), exciseCount);
-		ExciseInternal(pProductionManager->GetJustifications(), exciseCount);
+		pProductionManager->RemoveAllChunks(exciseCount);
+		//ExciseInternal(pProductionManager->GetChunks(), exciseCount);
+		//ExciseInternal(pProductionManager->GetJustifications(), exciseCount);
 	}
 	if (options.test(EXCISE_DEFAULT)) {
-		ExciseInternal(pProductionManager->GetDefaultProductions(), exciseCount);
+        pProductionManager->RemoveAllDefaultProductions(exciseCount);
+		//ExciseInternal(pProductionManager->GetDefaultProductions(), exciseCount);
 	}
 	if (options.test(EXCISE_TASK)) {
-		ExciseInternal(pProductionManager->GetChunks(), exciseCount);
-		ExciseInternal(pProductionManager->GetJustifications(), exciseCount);
-		ExciseInternal(pProductionManager->GetUserProductions(), exciseCount);
-		if (exciseCount) this->DoInitSoar(pAgent);	// from the manual, init when --all or --task are executed
+		pProductionManager->RemoveAllUserProductions(exciseCount);
+		pProductionManager->RemoveAllChunks(exciseCount);
+		pProductionManager->RemoveAllDefaultProductions(exciseCount);
+		this->DoInitSoar(pAgent);	// from the manual, init when --all or --task are executed
+		//ExciseInternal(pProductionManager->GetChunks(), exciseCount);
+		//ExciseInternal(pProductionManager->GetJustifications(), exciseCount);
+		//ExciseInternal(pProductionManager->GetUserProductions(), exciseCount);
+		//if (exciseCount) this->DoInitSoar(pAgent);	// from the manual, init when --all or --task are executed
 	}
 	if (options.test(EXCISE_USER)) {
-		ExciseInternal(pProductionManager->GetUserProductions(), exciseCount);
+		pProductionManager->RemoveAllUserProductions(exciseCount);
+		//ExciseInternal(pProductionManager->GetUserProductions(), exciseCount);
 	}
 
 	// Excise specific production

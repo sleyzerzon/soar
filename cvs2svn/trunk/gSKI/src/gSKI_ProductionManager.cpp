@@ -418,6 +418,19 @@ _|___/    __         _    _             ____  _               _
       return true;
    }
 
+   bool ProductionManager::RemoveAllProductions(int& exciseCount, Error* err ) const
+   {
+      agent * a;
+	  ClearError(err);
+	  a = m_agent->GetSoarAgent();
+	  exciseCount = exciseCount + a->num_productions_of_type[USER_PRODUCTION_TYPE] +
+                                  a->num_productions_of_type[CHUNK_PRODUCTION_TYPE] +
+								  a->num_productions_of_type[JUSTIFICATION_PRODUCTION_TYPE] +
+								  a->num_productions_of_type[DEFAULT_PRODUCTION_TYPE];
+      excise_all_productions(m_agent->GetSoarAgent(), false);
+	  return true;
+   }
+
    /*
    ===============================
  ____                               ____                _            _   _
@@ -436,6 +449,38 @@ _|___/    __         _    _             ____  _               _
       ClearError(err);
    
       return true;
+   }
+
+   bool ProductionManager::RemoveAllChunks(int& exciseCount, Error* err) const
+   {
+      agent * a;
+	  ClearError(err);
+	  a = m_agent->GetSoarAgent();
+	  exciseCount = exciseCount + a->num_productions_of_type[CHUNK_PRODUCTION_TYPE] +
+								  a->num_productions_of_type[JUSTIFICATION_PRODUCTION_TYPE];
+      excise_all_productions_of_type(m_agent->GetSoarAgent(), CHUNK_PRODUCTION_TYPE, false);
+      excise_all_productions_of_type(m_agent->GetSoarAgent(), JUSTIFICATION_PRODUCTION_TYPE, false);
+	  return true;
+   }
+
+   bool ProductionManager::RemoveAllUserProductions(int& exciseCount, Error* err) const
+   {
+      agent * a;
+	  ClearError(err);
+	  a = m_agent->GetSoarAgent();
+	  exciseCount = exciseCount + a->num_productions_of_type[USER_PRODUCTION_TYPE];
+      excise_all_productions_of_type(m_agent->GetSoarAgent(), USER_PRODUCTION_TYPE, false);
+ 	  return true;
+   }
+
+   bool ProductionManager::RemoveAllDefaultProductions(int& exciseCount, Error* err) const
+   {
+      agent * a;
+	  ClearError(err);
+	  a = m_agent->GetSoarAgent();
+	  exciseCount = exciseCount + a->num_productions_of_type[DEFAULT_PRODUCTION_TYPE];
+      excise_all_productions_of_type(m_agent->GetSoarAgent(), DEFAULT_PRODUCTION_TYPE, false);
+ 	  return true;
    }
 
    /*
@@ -561,6 +606,12 @@ _|___/    __         _    _             ____  _               _
  \____|\___|\__|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
    ===============================
    */
+
+   /*
+WARNING!!!  All of the Get*Production(s) methods appear to leak symbol ref counts in
+the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
+   */
+
    tIProductionIterator* ProductionManager::GetProduction(const char* pattern, Error* err) const
    {
       //

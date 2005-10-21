@@ -128,6 +128,70 @@ namespace gSKI {
        */
       virtual bool RemoveProduction(IProduction* p, Error* err = 0) const = 0;
 
+	  
+	  /**
+       * @brief Remove all Productions
+       *
+       * <p>Errors Returned:
+       *    @li @c gSKIERR_PRODUCTION_DOES_NOT_EXISTS
+       *
+       * @param  i   Counter for number of productions being removed.
+       * @param  err Pointer to client-owned error structure.  If the pointer
+       *              is not NULL this structure is filled with extended error
+       *              information.  If it is NULL (the default) extended error
+       *              information is not returned.
+       *
+       * @returns Success or failure of the operation.
+       */
+      virtual bool RemoveAllProductions(int& i, Error *pErr = 0 ) const = 0;
+
+	  /**
+       * @brief Remove all UserProductions
+       *
+       * <p>Errors Returned:
+       *    @li @c gSKIERR_PRODUCTION_DOES_NOT_EXISTS
+       *
+       * @param  i   Counter for number of productions being removed.
+       * @param  err Pointer to client-owned error structure.  If the pointer
+       *              is not NULL this structure is filled with extended error
+       *              information.  If it is NULL (the default) extended error
+       *              information is not returned.
+       *
+       * @returns Success or failure of the operation.
+       */
+       virtual bool RemoveAllUserProductions(int& i, Error *pErr = 0) const = 0;
+
+	  /**
+       * @brief Remove all Chunks and Justifications
+       *
+       * <p>Errors Returned:
+       *    @li @c gSKIERR_PRODUCTION_DOES_NOT_EXISTS
+       *
+       * @param  i   Counter for number of productions being removed.
+       * @param  err Pointer to client-owned error structure.  If the pointer
+       *              is not NULL this structure is filled with extended error
+       *              information.  If it is NULL (the default) extended error
+       *              information is not returned.
+       *
+       * @returns Success or failure of the operation.
+       */
+       virtual bool RemoveAllChunks (int& i, Error *pErr = 0) const = 0;
+
+	  /**
+       * @brief Remove all DefaultProductions
+       *
+       * <p>Errors Returned:
+       *    @li @c gSKIERR_PRODUCTION_DOES_NOT_EXISTS
+       *
+       * @param  i   Counter for number of productions being removed.
+       * @param  err Pointer to client-owned error structure.  If the pointer
+       *              is not NULL this structure is filled with extended error
+       *              information.  If it is NULL (the default) extended error
+       *              information is not returned.
+       *
+       * @returns Success or failure of the operation.
+       */
+       virtual bool RemoveAllDefaultProductions(int& i, Error *pErr = 0) const = 0;
       /**
        * @brief Deletes a set of Productions
        *
