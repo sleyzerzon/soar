@@ -405,6 +405,9 @@ void CommandLineInterface::HandleEvent(egSKIProductionEventId eventId, gSKI::IAg
 	// Only called when source command is active
 	assert(eventId == gSKIEVENT_BEFORE_PRODUCTION_REMOVED);
 	++m_NumProductionsExcised;
-	m_ExcisedDuringSource.push_back(prod->GetName());
+
+	if (m_SourceVerbose) {
+		m_ExcisedDuringSource.push_back(prod->GetName());
+	}
 }
 
