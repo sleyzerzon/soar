@@ -162,6 +162,21 @@ public class TankSoarJControl extends SimulationControl implements Kernel.Update
 		
 		return null;
 	}
+	
+	public SoarAgent getSoarAgentByColor(String color)
+	{
+		SoarAgent[] es = getAllAgents();
+		
+		for (int i = 0;i < es.length;i++)
+		{
+			if (es[i].getColorName() == color)
+			{
+				return es[i];
+			}
+		}
+		
+		return null;
+	}
 
   private void activateDetailedKernelLogging(boolean should)
   {

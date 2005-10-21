@@ -52,6 +52,17 @@ public abstract class SimulationControl {
 	}
 	
 	/**
+	 * Reload all of an agent's productions without an excise
+	 * @param color color of agent to operate on
+	 */
+	public void reload(String color)
+	{
+		Agent agent = getAgentByColor(color);
+		SoarAgent soarAgent = getSoarAgentByColor(color);
+		agent.ExecuteCommandLine("source \"" + soarAgent.getProductionPath() + "\"");
+	}
+	
+	/**
 	 * Excises all of an agent's productions
 	 * @param color color of agent to operate on
 	 */
@@ -74,6 +85,12 @@ public abstract class SimulationControl {
 	 * @return Agent object
 	 */
 	public abstract Agent getAgentByColor(String color);
+	
+	/**
+	 * @param color color of agent to get
+	 * @return Agent object
+	 */
+	public abstract SoarAgent getSoarAgentByColor(String color);
 	
 	/**
 	 * Returns the width of the map being used internally by the Simulation.

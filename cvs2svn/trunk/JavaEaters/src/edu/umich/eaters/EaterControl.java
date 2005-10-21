@@ -97,6 +97,21 @@ public class EaterControl extends SimulationControl implements
 		return null;
 	}
 
+	public SoarAgent getSoarAgentByColor(String color)
+	{
+		SoarAgent[] es = getAllAgents();
+		
+		for (int i = 0;i < es.length;i++)
+		{
+			if (es[i].getColorName() == color)
+			{
+				return es[i];
+			}
+		}
+		
+		return null;
+	}
+
 	/**
 	 * Creates Soar kernel and registers for start, stop, and update events.
 	 */

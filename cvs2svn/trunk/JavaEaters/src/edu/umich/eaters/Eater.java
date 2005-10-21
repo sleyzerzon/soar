@@ -53,6 +53,8 @@ public class Eater implements SoarAgent{
 
 	private EaterInputLink iLink;
 	
+	private String productionPath;
+	
 	/**
 	 * Creates an instance of <code>Eater</code>.
 	 * @param loc The location at which this instance of <code>Eater</code> has been created
@@ -415,9 +417,9 @@ public class Eater implements SoarAgent{
 		
 		iLink = new EaterInputLink(agent);
 		
-		String prodPath = toAttach.getPath();
+		productionPath = toAttach.getPath();
 
-		if (!agent.LoadProductions(prodPath)) {
+		if (!agent.LoadProductions(productionPath)) {
 			JOptionPane.showMessageDialog(null, "Fatal Error: Productions for agent " + agentName +
 					" did not load correctly.\nReason: " + agent.GetLastErrorDescription() + "\nand with a commandline result of " +
 					kernel.GetLastCommandLineResult(),"Eaters",
@@ -426,6 +428,11 @@ public class Eater implements SoarAgent{
 		}
 	}
 	
+	public String getProductionPath() {
+		if (productionPath.length() == 0) return null;
+		return productionPath;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @return In our case, the <code>Eater</code>'s color name, location, and score.

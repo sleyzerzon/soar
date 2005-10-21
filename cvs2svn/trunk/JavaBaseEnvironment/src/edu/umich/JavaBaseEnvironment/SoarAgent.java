@@ -57,4 +57,9 @@ public interface SoarAgent {
 	 */
 	public void attachSoarCode(File toAttach);
 	
+	/**
+	 * Returns a path to a soar file for reload command
+	 */
+	public String getProductionPath();
+	
 }

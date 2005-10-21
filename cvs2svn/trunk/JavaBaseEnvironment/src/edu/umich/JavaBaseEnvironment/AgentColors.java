@@ -1,4 +1,4 @@
-/* File: EaterColors.java
+/* File: AgentColors.java
  * Jul 12, 2004
  */
 package edu.umich.JavaBaseEnvironment;

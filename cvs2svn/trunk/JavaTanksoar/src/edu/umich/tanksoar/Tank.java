@@ -169,6 +169,8 @@ public class Tank implements SoarAgent
 	/** <code>true</code> if the <code>Tank</code> has finished its moves for the turn. */
 	private boolean finishedMoves = false;
 
+	private String productionPath;
+
 	/**
 	 * Creates a new Tank at specified location, of specified color name, and
 	 * facing north.
@@ -240,7 +242,9 @@ TankSoarLogger.log("Kernel should have cleaned the real agent here...");
     String[] pathAndFilename = toAttach.getPath().split(agentName);
     String pathOnly = pathAndFilename[0];
 
-    if(agent.LoadProductions(toAttach.getAbsolutePath()))
+    productionPath = toAttach.getAbsolutePath();
+
+    if(agent.LoadProductions(productionPath))
       TankSoarLogger.log("Productions for agent: " + agentName + " loaded successfully.");
     else
     {
@@ -249,6 +253,11 @@ TankSoarLogger.log("Kernel should have cleaned the real agent here...");
       TankSoarLogger.log("\tand with a commandline result of: " + kernel.GetLastCommandLineResult());
     }
 	}
+
+  public String getProductionPath() 
+  {
+  	return productionPath;	
+  }
 
   public void debugPrintInputLink()
   {
