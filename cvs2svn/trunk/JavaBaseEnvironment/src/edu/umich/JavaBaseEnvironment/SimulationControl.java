@@ -59,7 +59,7 @@ public abstract class SimulationControl {
 	{
 		Agent agent = getAgentByColor(color);
 		SoarAgent soarAgent = getSoarAgentByColor(color);
-		agent.ExecuteCommandLine("source \"" + soarAgent.getProductionPath() + "\"");
+		agent.LoadProductions(soarAgent.getProductionPath());
 	}
 	
 	/**

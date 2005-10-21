@@ -501,14 +501,14 @@ public class ControlPanel implements SimulationControlListener{
 			//MenuItem showWindow = new MenuItem(men, SWT.PUSH);
 			//MenuItem raiseWindow = new MenuItem(men, SWT.PUSH);
 			MenuItem reload = new MenuItem(men, SWT.PUSH);
-			//MenuItem reset = new MenuItem(men, SWT.PUSH);
+			MenuItem reset = new MenuItem(men, SWT.PUSH);
 			MenuItem exciseAll = new MenuItem(men, SWT.PUSH);
 			MenuItem exciseChunks = new MenuItem(men, SWT.PUSH);
 			//showWindow.setText("Show " + myTask + " command-line window");
 //TODO These menu items all do nothing right now.
 			//raiseWindow.setText("Raise " + myTask + " command-line window");
 			reload.setText("Reload productions");
-			//reset.setText("Reset " + myTask);
+			reset.setText("Reset agent");
 			exciseAll.setText("Excise all productions");
 			exciseChunks.setText("Excise chunks");
 			{
@@ -517,6 +517,14 @@ public class ControlPanel implements SimulationControlListener{
 				reload.addSelectionListener(new SelectionAdapter() {
 					private String myColor = ecs[j];
 					public void widgetSelected(SelectionEvent e){
+						myEC.reload(myColor);
+					}
+				});				
+				
+				reset.addSelectionListener(new SelectionAdapter() {
+					private String myColor = ecs[j];
+					public void widgetSelected(SelectionEvent e){
+						myEC.exciseAll(myColor);
 						myEC.reload(myColor);
 					}
 				});				
