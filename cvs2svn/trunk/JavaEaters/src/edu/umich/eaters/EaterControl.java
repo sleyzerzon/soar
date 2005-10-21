@@ -285,6 +285,15 @@ public class EaterControl extends SimulationControl implements
 		for (int y = 1; y < MapHeight - 1; y++) {
 			myMap[0][y] = myMap[MapWidth - 1][y] = wall;
 		}
+		
+		// Clear old map
+		NormalFood normal = new NormalFood(NormalFoodWorth);
+		for (int x = 1; x < MapWidth - 1; x++) {
+			for (int y = 1; y < MapHeight - 1; y++) {
+				myMap[x][y] = normal;
+			}
+		}
+		
 		double probability = Probability;
 		for (int x = 2; x < MapWidth - 2; x++) {
 			for (int y = 2; y < MapHeight - 2; y++) {
