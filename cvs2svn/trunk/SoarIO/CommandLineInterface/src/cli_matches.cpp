@@ -27,9 +27,6 @@ using namespace sml;
 
 bool CommandLineInterface::ParseMatches(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
-		{'0', "zero",			0},
-		{'1', "one",			0},
-		{'2', "two",			0},
 		{'a', "assertions",		0},
 		{'c', "count",			0},
 		{'n', "names",			0},
@@ -47,16 +44,13 @@ bool CommandLineInterface::ParseMatches(gSKI::IAgent* pAgent, std::vector<std::s
 		if (m_Option == -1) break;
 
 		switch (m_Option) {
-			case '0':
 			case 'n':
 			case 'c':
 				detail = WME_DETAIL_NONE;
 				break;
-			case '1':
 			case 't':
 				detail = WME_DETAIL_TIMETAG;
 				break;
-			case '2':
 			case 'w':
 				detail = WME_DETAIL_FULL;
 				break;
