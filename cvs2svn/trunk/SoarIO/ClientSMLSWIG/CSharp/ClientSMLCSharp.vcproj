@@ -46,7 +46,10 @@
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy build\*.cs ..\..\examples\TestCSharpSML /Y /I /Q"/>
+				CommandLine="csc /target:library /out:build\smlCSharp.dll build\*.cs
+xcopy build\*.dll ..\..\..\soar-library /Y /I /Q
+xcopy build\*.cs ..\..\examples\TestCSharpSML /Y /I /Q
+"/>
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="echo on
@@ -99,7 +102,8 @@ cd ..
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy build\*.cs ..\..\examples\TestCSharpSML /Y /I /Q"/>
+				CommandLine="csc /target:library /out:build\smlCSharp.dll build\*.cs
+xcopy build\*.dll ..\..\..\soar-library /Y /I /Q"/>
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="echo on

@@ -17,7 +17,7 @@
                 DelaySign = "false"
                 OutputType = "Exe"
                 PreBuildEvent = ""
-                PostBuildEvent = ""
+                PostBuildEvent = "copy tests\testcsharpsml.soar . /Y"
                 RootNamespace = "TestCSharpSML"
                 RunPostBuildEvent = "OnBuildSuccess"
                 StartupObject = ""
@@ -36,7 +36,7 @@
                     NoStdLib = "false"
                     NoWarn = ""
                     Optimize = "false"
-                    OutputPath = "bin\Debug\"
+                    OutputPath = "..\..\..\soar-library\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -56,7 +56,7 @@
                     NoStdLib = "false"
                     NoWarn = ""
                     Optimize = "true"
-                    OutputPath = "bin\Release\"
+                    OutputPath = "..\..\..\soar-library\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -65,311 +65,16 @@
             </Settings>
             <References>
                 <Reference
-                    Name = "System"
-                    AssemblyName = "System"
-                    HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.dll"
-                />
-                <Reference
-                    Name = "System.Data"
-                    AssemblyName = "System.Data"
-                    HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
-                />
-                <Reference
-                    Name = "System.XML"
-                    AssemblyName = "System.Xml"
-                    HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
+                    Name = "smlCSharp"
+                    AssemblyName = "smlCSharp"
+                    HintPath = "..\..\..\soar-library\smlCSharp.dll"
                 />
             </References>
         </Build>
         <Files>
             <Include>
                 <File
-                    RelPath = "Agent.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "AgentEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "AnalyzeXML.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "Class1.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ClientAnalyzedXML.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ClientErrors.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ClientTraceXML.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ClientXML.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ConnectionInfo.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ElementXML.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "EventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "FloatElement.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Identifier.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "IdentifierSymbol.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "IntElement.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Kernel.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "OutputEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "PrintEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ProductionEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "RhsEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "RunEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "sml.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "sml_Names.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlAgentEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlGenericEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlPhase.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlPINVOKE.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlPrintEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlProductionEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlRhsEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlRunEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlRunFlags.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlRunStepSize.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlSystemEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlUntypedEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlUpdateEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlWorkingMemoryEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "smlXMLEventId.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "StringElement.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_ElementXML_InterfaceStructTag.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlAgentEventId_p_void_p_sml__Agent__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlPrintEventId_p_void_p_sml__Agent_p_q_const__char__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlProductionEventId_p_void_p_sml__Agent_p_q_const__char_p_q_const__char__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlRunEventId_p_void_p_sml__Agent_enum_sml__smlPhase__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlSystemEventId_p_void_p_sml__Kernel__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlUntypedEventId_p_void_p_sml__Kernel_p_void__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlUpdateEventId_p_void_p_sml__Kernel_enum_sml__smlRunFlags__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_enum_sml__smlXMLEventId_p_void_p_sml__Agent_p_sml__ClientXML__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_p_void_p_sml__Agent_p_q_const__char_p_sml__WMElement__void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_f_sml__smlRhsEventId_p_void_p_sml__Agent_p_q_const__char_p_q_const__char__std__string.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_size_t.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_std__string.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SWIGTYPE_p_void.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "SystemEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "UntypedEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "UpdateEventHandlerPlusData.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "WMElement.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "XMLEventHandlerPlusData.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
