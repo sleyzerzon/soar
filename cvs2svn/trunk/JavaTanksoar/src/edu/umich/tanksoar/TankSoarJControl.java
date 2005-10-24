@@ -214,15 +214,15 @@ public class TankSoarJControl extends SimulationControl implements Kernel.Update
   }
   
 	/** Character constant for an <code>TSEmpty</code> square when reading a file. */
-	public static final char Empty1 = 'g', Empty2 ='G';
+	public static final char Empty = '.';
 	/** Character constant for a <code>TSWall</code> when reading a file. */
-	public static final char Wall1 = 'w', Wall2 = 'W';
+	public static final char Wall = '#';
 	/** Character constant for an <code>EnergySquare</code> when reading a file. */
-	public static final char Energy1 = 'e', Energy2 = 'E';
+	public static final char Energy = 'e';
 	/** Character constant for a <code>HealthSquare</code> when reading a file. */
-	public static final char Health1 = 'h', Health2 = 'H';
+	public static final char Health = 'h';
 	/** Character constant for a <code>MissileBucket</code> when reading a file. */
-	public static final char Missile1 = 'm', Missile2 = 'M';
+	public static final char Missile = 'm';
 	
 	/**
 	 * The proper formatting of the file is as follows.
@@ -238,11 +238,11 @@ public class TankSoarJControl extends SimulationControl implements Kernel.Update
 	 * characters at the top left representing locations in the top left of the
 	 * simulation's map. The characters are as follows:</p>
 	 * <ul>
-	 * <li>'g' or 'G' An <code>TSEmpty</code> square (think grass).
-	 * <li>'w' or 'W' A <code>TSWall</code> (or obstacle).
-	 * <li>'e' or 'E' An <code>EnergySquare</code>.
-	 * <li>'h' or 'H' A <code>HealthSquare</code>.
-	 * <li>'m' or 'M' A <code>MissileBucket</code>
+	 * <li>'.' An <code>TSEmpty</code> square (think grass).
+	 * <li>'#' A <code>TSWall</code> (or obstacle).
+	 * <li>'e' An <code>EnergySquare</code>.
+	 * <li>'h' A <code>HealthSquare</code>.
+	 * <li>'m' A <code>MissileBucket</code>
 	 * </ul>
 	 * {@inheritDoc}
 	 */
@@ -293,30 +293,30 @@ public class TankSoarJControl extends SimulationControl implements Kernel.Update
 					type = cs[i];
 					switch(type)
           {
-					  case(Empty1): 
-            case(Empty2): myMap[x][y] = new TSEmpty(); ++x;
+					  case(Empty): 
+            myMap[x][y] = new TSEmpty(); ++x;
               break;
-					  case(Wall1):
-            case(Wall2): myMap[x][y] = wall; ++x;
+					  case(Wall):
+           myMap[x][y] = wall; ++x;
               break;
-					  case(Energy1):
-            case(Energy2):
+					  case(Energy):
+            
             {
 						  myMap[x][y] = new EnergySquare();
 						  energyCreated = true;
 						  ++x;
 						  break;
 					  }
-            case(Health1):
-            case(Health2):
+            case(Health):
+            
             {
 						  myMap[x][y] = new HealthSquare();
 						  healthCreated = true;
 						  ++x;
 						  break;
 				 	  }
-					  case(Missile1):
-            case(Missile2):
+					  case(Missile):
+            
             {
 						  myMap[x][y] = new TSEmpty();
 						  new MissileBucket((TSEmpty)myMap[x][y], this);
