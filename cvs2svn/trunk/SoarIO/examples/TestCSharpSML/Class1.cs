@@ -28,6 +28,11 @@ namespace TestCSharpSML
 
 			System.Console.Out.WriteLine(ok ? "Loaded successfully" : "Failed") ; 
 
+			sml.Agent.MyCallback call = new sml.Agent.MyCallback(MyTestCallback) ;			
+			agent.RegisterForRunEvent(sml.smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, call) ;
+
+			agent.RunSelf(3) ;
+
 			sml.Kernel.MyCallback callback = new sml.Kernel.MyCallback(MyTestCallback) ;
 			kernel.RegisterTestMethod(callback) ;
 
@@ -35,6 +40,9 @@ namespace TestCSharpSML
 
 			// C# delete
 			kernel.Dispose() ;
+
+			System.Console.Out.WriteLine("Press return to exit") ;
+			System.Console.In.ReadLine() ;
 		}
 	}
 }

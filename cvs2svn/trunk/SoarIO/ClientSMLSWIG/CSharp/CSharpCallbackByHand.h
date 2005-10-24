@@ -40,6 +40,83 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterTestMethod(void * jarg1, unsig
 	pFunction() ;
 }
 
+class CSharpCallbackData
+{
+// Making these public as this is basically just a struct.
+public:
+	int				m_EventID ;
+	MyTestCallback	m_CallbackFunction ;
+	unsigned int	m_CallbackData ;
+	int				m_CallbackID ;
+
+public:
+	CSharpCallbackData(int eventID, MyTestCallback callbackFunction, unsigned int callbackData)
+	{
+		m_EventID = eventID ;
+		m_CallbackFunction = callbackFunction ;
+		m_CallbackData = callbackData ;
+		m_CallbackID = 0 ;
+	}
+
+	~CSharpCallbackData()
+	{
+	}
+} ;
+
+static CSharpCallbackData* CreateCSharpCallbackData(int eventID, unsigned int callbackFunction, unsigned int callbackData)
+{
+	return new CSharpCallbackData(eventID, (MyTestCallback)callbackFunction, callbackData) ;
+}
+
+// This is the C++ handler which will be called by clientSML when the event fires.
+// Then from here we need to call back to C# to pass back the message.
+static void RunEventHandler(sml::smlRunEventId id, void* pUserData, sml::Agent* pAgent, sml::smlPhase phase)
+{
+	// The user data is the class we declared above, where we store the Java data to use in the callback.
+	CSharpCallbackData* pData = (CSharpCallbackData*)pUserData ;
+
+	// Now try to call back to CSharp
+	pData->m_CallbackFunction() ;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int jarg2, unsigned int jarg3)
+{
+    // jarg1 is the C++ Agent object
+	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
+
+	// jarg2 is the event ID we're registering for
+	sml::smlRunEventId arg2 = (sml::smlRunEventId)jarg2;
+
+	// jarg3 is the callback function
+
+	// Create the information we'll need to make a Java call back later
+	CSharpCallbackData* pData = CreateCSharpCallbackData(jarg2, jarg3, 0) ;
+	
+	// Register our handler.  When this is called we'll call back to the client method.
+	pData->m_CallbackID = arg1->RegisterForRunEvent(arg2, &RunEventHandler, pData) ;
+
+	// Pass the callback info back to the client.  We need to do this so we can delete this later when the method is unregistered
+	return (int)pData ;
+}
+
+
+SWIGEXPORT bool SWIGSTDCALL CSharp_Agent_UnregisterForRunEvent(void* jarg1, int jarg2)
+{
+    // jarg1 is the C++ Agent object
+	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
+
+	// jarg2 is the callback data from the registration call
+	CSharpCallbackData* pData = (CSharpCallbackData*)jarg2 ;
+
+	// Unregister our handler.
+	bool result = arg1->UnregisterForRunEvent(pData->m_CallbackID) ;
+
+	// Release the callback data
+	delete pData ;
+
+	return result ;
+}
+
 /*
 #include <string>
 

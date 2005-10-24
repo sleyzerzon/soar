@@ -15,6 +15,17 @@
 %csconstvalue("smlRunEventId.smlEVENT_AFTER_RUNNING + 1") smlEVENT_AFTER_PRODUCTION_ADDED;
 %csconstvalue("smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED + 1") smlEVENT_OUTPUT_PHASE_CALLBACK;
 
+%ignore sml::Agent::UnregisterForRunEvent(int);
+%ignore sml::Agent::UnregisterForProductionEvent(int);
+%ignore sml::Agent::UnregisterForPrintEvent(int);
+%ignore sml::Agent::UnregisterForXMLEvent(int);
+%ignore sml::Agent::RemoveOutputHandler(int);
+%ignore sml::Kernel::UnregisterForSystemEvent(int);
+%ignore sml::Kernel::UnregisterForUpdateEvent(int);
+%ignore sml::Kernel::UnregisterForUntypedEvent(int);
+%ignore sml::Kernel::UnregisterForAgentEvent(int);
+%ignore sml::Kernel::RemoveRhsFunction(int);
+
 %typemap(cscode) sml::Kernel %{
 	public delegate void MyCallback();
 
@@ -24,6 +35,26 @@
 	public void RegisterTestMethod(MyCallback callback)
 	{
 		CSharp_Kernel_RegisterTestMethod(swigCPtr, callback);
+	}
+%}
+
+%typemap(cscode) sml::Agent %{
+	public delegate void MyCallback();
+	
+	[DllImport("CSharp_sml_ClientInterface")]
+	public static extern bool CSharp_Agent_RegisterForRunEvent(HandleRef jarg1, int eventID, MyCallback callback);
+
+	public bool RegisterForRunEvent(smlRunEventId eventID, MyCallback jarg2)
+	{
+		return CSharp_Agent_RegisterForRunEvent(swigCPtr, (int)eventID, jarg2) ;
+	}
+
+	[DllImport("CSharp_sml_ClientInterface")]
+	public static extern bool CSharp_Agent_UnregisterForRunEvent(HandleRef jarg1, int callbackID);
+
+	public bool UnregisterForRunEvent(int jarg2)
+	{
+		return CSharp_Agent_UnregisterForRunEvent(swigCPtr, jarg2) ;
 	}
 %}
 
