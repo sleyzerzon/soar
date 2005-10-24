@@ -39,12 +39,12 @@
 %}
 
 %typemap(cscode) sml::Agent %{
-	public delegate void MyCallback();
+	public delegate void MyRunCallback(smlRunEventId eventID);
 	
 	[DllImport("CSharp_sml_ClientInterface")]
-	public static extern bool CSharp_Agent_RegisterForRunEvent(HandleRef jarg1, int eventID, MyCallback callback);
+	public static extern int CSharp_Agent_RegisterForRunEvent(HandleRef jarg1, int eventID, MyRunCallback callback);
 
-	public bool RegisterForRunEvent(smlRunEventId eventID, MyCallback jarg2)
+	public int RegisterForRunEvent(smlRunEventId eventID, MyRunCallback jarg2)
 	{
 		return CSharp_Agent_RegisterForRunEvent(swigCPtr, (int)eventID, jarg2) ;
 	}

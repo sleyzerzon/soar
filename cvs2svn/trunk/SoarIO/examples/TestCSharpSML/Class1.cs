@@ -12,6 +12,11 @@ namespace TestCSharpSML
 			System.Console.Out.WriteLine("Called back successfully") ;
 		}
 
+		static void MyTestRunCallback(sml.smlRunEventId eventID)
+		{
+			System.Console.Out.WriteLine("Called back successfully " + eventID) ;
+		}
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
@@ -28,13 +33,17 @@ namespace TestCSharpSML
 
 			System.Console.Out.WriteLine(ok ? "Loaded successfully" : "Failed") ; 
 
-			sml.Agent.MyCallback call = new sml.Agent.MyCallback(MyTestCallback) ;			
-			agent.RegisterForRunEvent(sml.smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, call) ;
+			sml.Agent.MyRunCallback call = new sml.Agent.MyRunCallback(MyTestRunCallback) ;			
+			int callbackID = agent.RegisterForRunEvent(sml.smlRunEventId.smlEVENT_AFTER_DECISION_CYCLE, call) ;
 
 			agent.RunSelf(3) ;
 
 			sml.Kernel.MyCallback callback = new sml.Kernel.MyCallback(MyTestCallback) ;
 			kernel.RegisterTestMethod(callback) ;
+
+			ok = agent.UnregisterForRunEvent(callbackID) ;
+
+			System.Console.Out.WriteLine(ok ? "Unregistered run event successfully" : "Failed to unregister") ;
 
 			kernel.Shutdown() ;
 

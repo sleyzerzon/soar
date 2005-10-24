@@ -40,17 +40,19 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterTestMethod(void * jarg1, unsig
 	pFunction() ;
 }
 
+typedef void (__stdcall *MyRunCallback)(int eventID) ;
+
 class CSharpCallbackData
 {
 // Making these public as this is basically just a struct.
 public:
 	int				m_EventID ;
-	MyTestCallback	m_CallbackFunction ;
+	void*			m_CallbackFunction ;
 	unsigned int	m_CallbackData ;
 	int				m_CallbackID ;
 
 public:
-	CSharpCallbackData(int eventID, MyTestCallback callbackFunction, unsigned int callbackData)
+	CSharpCallbackData(int eventID, void* callbackFunction, unsigned int callbackData)
 	{
 		m_EventID = eventID ;
 		m_CallbackFunction = callbackFunction ;
@@ -65,7 +67,7 @@ public:
 
 static CSharpCallbackData* CreateCSharpCallbackData(int eventID, unsigned int callbackFunction, unsigned int callbackData)
 {
-	return new CSharpCallbackData(eventID, (MyTestCallback)callbackFunction, callbackData) ;
+	return new CSharpCallbackData(eventID, (void *)callbackFunction, callbackData) ;
 }
 
 // This is the C++ handler which will be called by clientSML when the event fires.
@@ -75,8 +77,10 @@ static void RunEventHandler(sml::smlRunEventId id, void* pUserData, sml::Agent* 
 	// The user data is the class we declared above, where we store the Java data to use in the callback.
 	CSharpCallbackData* pData = (CSharpCallbackData*)pUserData ;
 
+	MyRunCallback callback = (MyRunCallback)pData->m_CallbackFunction ;
+
 	// Now try to call back to CSharp
-	pData->m_CallbackFunction() ;
+	callback(pData->m_EventID) ;
 }
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int jarg2, unsigned int jarg3)
