@@ -796,7 +796,7 @@ public class TankSoarInputLink
   public final String POSITION           = "position";
   public final String PROJECTILEDAMAGE   = "projectiledamage";
   public final String RADAR              = "radar";
-  public final String RADAR_DISTANCES    = "radar-distances";
+  public final String RADAR_DISTANCES    = "radar-distance";
   public final String RADAR_SETTING      = "radar-setting";
   public final String RADAR_STATUS       = "radar-status";
   public final String RANDOM_STR         = "random";
