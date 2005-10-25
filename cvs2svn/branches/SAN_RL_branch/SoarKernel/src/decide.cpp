@@ -2414,7 +2414,6 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
 												   MISCELLANEOUS_MEM_USAGE));
   id->id.RL_data->productions_to_be_updated = NIL;
   id->id.RL_data->previous_Q = 0;
-  id->id.RL_data->max_Q = 0;
   id->id.RL_data->reward = 0;
   id->id.RL_data->step = 0;
 #endif
@@ -2581,6 +2580,10 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
       
       for(temp = candidates; temp; temp = temp->next_candidate)
          preference_remove_ref(thisAgent, temp);
+
+#ifdef NUMERIC_INDIFFERENCE
+	  store_RL_data(thisAgent, goal, candidates);
+#endif
       
       /* JC ADDED: Notify gSKI of an operator selection  */
       gSKI_MakeAgentCallback(gSKI_K_EVENT_OPERATOR_SELECTED, 1, thisAgent, 

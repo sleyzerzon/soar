@@ -302,7 +302,7 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
 
   newAgent->o_support_calculation_type = 4; /* KJC 7/00 */ // changed from 3 to 4 by voigtjr  (/* bugzilla bug 339 */)
 #ifdef NUMERIC_INDIFFERENCE
-  newAgent->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_AVG;
+  newAgent->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_SUM;
   newAgent->exploration_mode = NO_EXPLORATION;
   newAgent->Temperature = 25.0; /* used to keep summed indifferent preferences within a reasonable range, since they will be used as
 									an exponent to the number 10, and must be stored in a 64 bit double */

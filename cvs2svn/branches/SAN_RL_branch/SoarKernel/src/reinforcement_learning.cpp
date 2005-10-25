@@ -31,8 +31,15 @@ bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal)
 				c = c->rest;
 	 
 				if (!prod) continue;
-	  		 					
-				float temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
+	  		 		
+				float temp;
+				if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
+					temp = rhs_value_to_symbol(prod->action_list->referent)->ic.value;
+				} else {
+					temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
+				}
+				// BUG? - should check here that referent is really an int or float
+				// Should we force referent of Numeric-indifferent preference to always be a float?
 				temp += increment;
 
 				symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
@@ -102,7 +109,7 @@ void RL_update_symbolically_chosen(agent *thisAgent, slot *s, preference *candid
 		}
 	}
 	//   	rec->next_Q = temp_Q;
-	//	candidates->sum_of_probability = temp_Q;
+	candidates->sum_of_probability = temp_Q;
 	perform_Bellman_update(thisAgent, temp_Q, s->id);
 }
 
@@ -137,3 +144,28 @@ void tabulate_reward_values(agent *thisAgent){
 		goal = goal->id.lower_goal;
 	}
 }
+
+// record_for_RL
+// If an operator has been selected, go through binary indifferent preferences that fired for it
+// For each preference, store a pointer to the production that generated it. Later, each production
+// on this list will have its RL-value updated.
+// Also, if an RL-production needs to be specified, build a new production and place a pointer to it
+// on this list.
+
+void store_RL_data(agent *thisAgent, Symbol *goal, preference *cand)
+{
+  // SAN - catch operator ID here
+  // print_wme(chosenOp);
+	RL_data *data = goal->id.RL_data;
+	Symbol *op = cand->value;
+    data->previous_Q = cand->sum_of_probability;
+
+	for (preference *pref = goal->id.operator_slot->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref ; pref = pref->next){
+			  if (op == pref->value)
+				/* This is one scheme - where the format of an RL rule is never changed but a rule may be specialized. */
+				 {
+				  production *prod = pref->inst->prod;
+				  push(thisAgent, prod, data->productions_to_be_updated);
+				 }
+	}
+  }
