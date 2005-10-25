@@ -39,8 +39,6 @@ public class VisTankMap extends AgentWindow implements SimulationControlListener
 	/** The <code>Composite</code> making up the part inside <code>myShell</code> that contains the
 	 * <code>HealthShieldsDisplay</code>s. */
 	private Composite leftHalf;
-	/** The <code>String</code> path to the directory containing images for a TankSoar simulation. */
-	private String imageDirectory;
 	
 	/**
 	 * Constructs a new <code>VisTankMap</code> with the specified <code>Display</code> and
@@ -51,9 +49,8 @@ public class VisTankMap extends AgentWindow implements SimulationControlListener
 	 * @param imageDirectory The <code>String</code> path to the directory where the images
 	 * for TankSoar are stored.
 	 */
-	public VisTankMap(Display d, SimulationControl tc, String imageDirectory){
+	public VisTankMap(Display d, SimulationControl tc){
 		myDisplay = d;
-		this.imageDirectory = imageDirectory;
 		myTC = (TankSoarJControl)tc;
 		myTC.addSimulationControlListener(this);
 	}
@@ -80,7 +77,7 @@ public class VisTankMap extends AgentWindow implements SimulationControlListener
 				    }
 				});
 				leftHalf.setBackground(myDisplay.getSystemColor(SWT.COLOR_WHITE));
-				DrawTankMap dtm = new DrawTankMap(myTC, myShell, imageDirectory);
+				DrawTankMap dtm = new DrawTankMap(myTC, myShell);
 				myShell.setText("TankSoar Map");
 				amOpen = true;
 				myShell.addDisposeListener(new DisposeListener(){

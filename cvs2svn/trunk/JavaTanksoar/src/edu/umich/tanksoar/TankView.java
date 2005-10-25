@@ -32,7 +32,7 @@ public class TankView extends AgentWindow implements TankListener{
 	private FourWaySensorDisplay incomingSensor;
 	private RadarView radarViewSensor;
 	private Tank myTank;
-	private String myImageDirectory, myName;
+	private String myName;
 	
 	/**
 	 * Constructs a new instance of TankView, the shell through which a user can view
@@ -41,12 +41,11 @@ public class TankView extends AgentWindow implements TankListener{
 	 * @param t The <code>Tank</code> to which this <code>TankView</code> is listening.
 	 * @param imageDirectory The String path to the directory in which images are stored.
 	 */
-	public TankView(Display d, Tank t, String imageDirectory){
+	public TankView(Display d, Tank t){
 		myDisplay = d;
 		myTank = t;
 		myName = myTank.getName();
 		myTank.addTankListener(this);
-		myImageDirectory = imageDirectory;
 		initShell();
 	}
 	
@@ -72,7 +71,7 @@ public class TankView extends AgentWindow implements TankListener{
 				Composite right = new Composite(myShell, SWT.NONE);
 				mb = new MeasureBar(left, myTank, MeasureBar.ListenSmell);
 				right.setLayout(new FillLayout());
-				radarViewSensor = new RadarView(right, myTank, myImageDirectory);
+				radarViewSensor = new RadarView(right, myTank);
 				myShell.setText(myName);
 				myShell.pack();
 				myShell.open();

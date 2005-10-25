@@ -60,13 +60,10 @@ public class DrawTankMap extends Canvas implements TankListener, SimulationContr
 	private Display myDisplay;
 	
 	private static String sep = System.getProperty("file.separator");
-	
-	private String imageDirectory = null;
-	
-	public DrawTankMap(TankSoarJControl TC, Composite parent, String imageDirectory){
+		
+	public DrawTankMap(TankSoarJControl TC, Composite parent){
 		super(parent, SWT.NONE);
 		myTC = TC;
-		this.imageDirectory = imageDirectory;
 		myDisplay = parent.getDisplay();
 		white = myDisplay.getSystemColor(SWT.COLOR_WHITE);
 		myTC.addSimulationControlListener(this);
@@ -263,18 +260,30 @@ public class DrawTankMap extends Canvas implements TankListener, SimulationContr
 		loadNumberedImage(rocks, "rock");
 		loadNumberedImage(trees, "tree");
 		loadNumberedImage(grasses, "ground");
-		tanks[Tank.SOUTH] = new Image(myDisplay, imageDirectory + "tank_down.gif");
-		tanks[Tank.NORTH] = new Image(myDisplay, imageDirectory + "tank_up.gif");
-		tanks[Tank.EAST] = new Image(myDisplay, imageDirectory + "tank_right.gif");
-		tanks[Tank.WEST] = new Image(myDisplay, imageDirectory + "tank_left.gif");
-		recharger = new Image(myDisplay, imageDirectory + "battery.gif");
-		health = new Image(myDisplay, imageDirectory + "health.gif");
-		missiles = new Image(myDisplay, imageDirectory + "missile.gif");
-		flyMissile = new Image(myDisplay, imageDirectory + "fire4.gif");
-		wtf = new Image(myDisplay, imageDirectory + "wtf.gif");
-		redRecharge = new Image(myDisplay, imageDirectory + "recharge.gif");
-		blueRecharge = new Image(myDisplay, imageDirectory + "battrecharge.gif");
-		explosion = new Image(myDisplay, imageDirectory + "explosion.gif");
+		tanks[Tank.SOUTH] = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/tank_down.gif"));
+		tanks[Tank.NORTH] = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/tank_up.gif"));
+		tanks[Tank.EAST] = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/tank_right.gif"));
+		tanks[Tank.WEST] = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/tank_left.gif"));
+		recharger = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/battery.gif"));
+		health = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/health.gif"));
+		missiles = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/missile.gif"));
+		flyMissile = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/fire4.gif"));
+		wtf = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/wtf.gif"));
+		redRecharge = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/recharge.gif"));
+		blueRecharge = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/battrecharge.gif"));
+		explosion = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/explosion.gif"));
 	}
 	
 	/**
@@ -284,7 +293,8 @@ public class DrawTankMap extends Canvas implements TankListener, SimulationContr
 	 */
 	private void loadNumberedImage(Image[] arr, String name){
 		for(int i = 0; i < rocks.length; i++){
-			arr[i] = new Image(myDisplay, imageDirectory + name + (i+1) + ".gif");
+			arr[i] = new Image(myDisplay,
+					TanksoarJ.class.getResourceAsStream("/images/" + name + (i+1) + ".gif"));
 		}
 	}
 	

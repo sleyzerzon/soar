@@ -18,8 +18,6 @@ public class RadarView extends Canvas implements PaintListener, TankListener, Di
 
 	/** The <code>Display</code> managing the GUI. */
 	private Display myDisplay;
-	/** The path to the images used by this RadarView. */
-	private String myImageDirectory;
 	/** The <code>Tank</code> to which this <code>RadarView</code> is listening. */
 	private Tank myTank;
 	/** A 2D array that is 3 * <code>Tank.MaxRadar</code> that contains what was last
@@ -57,14 +55,14 @@ public class RadarView extends Canvas implements PaintListener, TankListener, Di
 	 * @param imageDirectory The String name of the directory that contains the images
 	 * that will be used to display the radar.
 	 */
-    public RadarView(Composite parent, Tank toListen, String imageDirectory){
+    public RadarView(Composite parent, Tank toListen){
 		super(parent, SWT.NONE);
 		myDisplay = parent.getDisplay();
 		myTank = toListen;
 		myTank.addTankListener(this);
 		addPaintListener(this);
 		addDisposeListener(this);
-		loadImages(imageDirectory);
+		loadImages();
     }
 	
     /**
@@ -78,19 +76,21 @@ public class RadarView extends Canvas implements PaintListener, TankListener, Di
      * change character is necessary.
      * @throws <code>NullPointerException</code> If imageDirectory is null.
      */
-	public void loadImages(String imageDirectory){
-		myImageDirectory = imageDirectory;
-		if(myImageDirectory == null) throw(new NullPointerException("Passed in null image directory"));
-		if(!(myImageDirectory.substring(myImageDirectory.length() - 1) == System.getProperty("file.separator"))){
-		    myImageDirectory.concat(System.getProperty("file.separator"));
-		}
-		question = new Image(myDisplay, myImageDirectory + "question.gif");
-		groundSmall = new Image(myDisplay, myImageDirectory + "ground_small.gif");
-		obstacleSmall = new Image(myDisplay, myImageDirectory + "obstacle_small.gif");
-		missileSmall = new Image(myDisplay, myImageDirectory + "missile_small.gif");
-		batterySmall = new Image(myDisplay, myImageDirectory + "battery_small.gif");
-		tankSmall = new Image(myDisplay, myImageDirectory + "tank_small.gif");
-		healthSmall = new Image(myDisplay, myImageDirectory + "health_small.gif");
+	public void loadImages(){
+		question = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/question.gif"));
+		groundSmall = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/ground_small.gif"));
+		obstacleSmall = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/obstacle_small.gif"));
+		missileSmall = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/missile_small.gif"));
+		batterySmall = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/battery_small.gif"));
+		tankSmall = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/tank_small.gif"));
+		healthSmall = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/health_small.gif"));
 	}
 	
 	/**

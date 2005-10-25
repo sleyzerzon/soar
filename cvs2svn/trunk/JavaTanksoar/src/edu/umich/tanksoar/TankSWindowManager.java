@@ -33,7 +33,7 @@ public class TankSWindowManager extends SWindowManager
   {
 	 if (myVisualMap == null || !((VisTankMap)myVisualMap).isMapOpen())
 	 {
-		 myVisualMap = new edu.umich.tanksoar.VisTankMap(myDisplay, mySC, startingDirectory + imagePath);
+		 myVisualMap = new edu.umich.tanksoar.VisTankMap(myDisplay, mySC);
 		 myVisualMap.open();
 	 }
   }
@@ -59,7 +59,7 @@ public class TankSWindowManager extends SWindowManager
     {
       if(mySC instanceof TankSoarJControl)
       {
-        aw = new TankView(myDisplay, (Tank)agent, startingDirectory + imagePath);
+        aw = new TankView(myDisplay, (Tank)agent);
         agentWindows.add(aw);
       }
     }
@@ -74,7 +74,7 @@ public class TankSWindowManager extends SWindowManager
 
     if(sa != null && sa instanceof HumanTankControl)
     {
-      ((HumanTankControl)sa).initControls(myDisplay, startingDirectory + imagePath);
+      ((HumanTankControl)sa).initControls(myDisplay);
       openAgentView(sa);
     }
   }

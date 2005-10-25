@@ -40,8 +40,6 @@ public class HumanTankControl extends Tank implements SimulationControlListener{
 	private Display myDisplay;
 	/** The <code>Shell</code> containing the manual controls for this <code>Tank</code>. */
 	private Shell myShell;
-	/** The <code>String</code> path to the directory containing the button images. */
-	private String imageDirectory;
 	
 	/** <code>Button</code> for moving the <code>Tank</code> forward. */
 	private Button forward;
@@ -110,9 +108,9 @@ public class HumanTankControl extends Tank implements SimulationControlListener{
 	 * @param imageDirectory The <code>String</code> name if the directory in which the .gif files are stored
 	 * for the visual representation of the simulation.
 	 */
-	public HumanTankControl(String colorName, Location loc, TankSoarJControl tc, Display d, String imageDirectory){
+	public HumanTankControl(String colorName, Location loc, TankSoarJControl tc, Display d){
 		super(colorName, loc, tc);
-		initControls(d, imageDirectory);
+		initControls(d);
 	}
 	
 	/**
@@ -122,9 +120,8 @@ public class HumanTankControl extends Tank implements SimulationControlListener{
 	 * associated with the images, to which "buttons" +
 	 * <code>System.getProperty("file.separator")</code> will be concatenated.
 	 */
-	public void initControls(Display d, String imageDirectory){
+	public void initControls(Display d){
 		myDisplay = d;
-		this.imageDirectory = imageDirectory + "buttons" + System.getProperty("file.separator");
 		loadImages();
 		myShell = new Shell(d);
 		myShell.addShellListener(new HumanTankShellAdapter());
@@ -170,15 +167,24 @@ public class HumanTankControl extends Tank implements SimulationControlListener{
 	 */
 	private void loadImages(){
 		if(forwardGif != null) return;
-		forwardGif = new Image(myDisplay, imageDirectory + "up.gif");
-		backwardGif = new Image(myDisplay, imageDirectory + "down.gif");
-		rightGif = new Image(myDisplay, imageDirectory + "right.gif");
-		leftGif = new Image(myDisplay, imageDirectory + "left.gif");
-		clockwiseGif = new Image(myDisplay, imageDirectory + "clockwise.gif");
-		counterclockwiseGif = new Image(myDisplay, imageDirectory + "counterclockwise.gif");
-		fireGif = new Image(myDisplay, imageDirectory + "fire.gif");
-		shieldsGif = new Image(myDisplay, imageDirectory + "shields.gif");
-		doneGif = new Image(myDisplay, imageDirectory + "done.gif");
+		forwardGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/up.gif"));
+		backwardGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/down.gif"));
+		rightGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/right.gif"));
+		leftGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/left.gif"));
+		clockwiseGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/clockwise.gif"));
+		counterclockwiseGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/counterclockwise.gif"));
+		fireGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/fire.gif"));
+		shieldsGif = new Image(myDisplay, 
+				TanksoarJ.class.getResourceAsStream("/images/buttons/shields.gif"));
+		doneGif = new Image(myDisplay,
+				TanksoarJ.class.getResourceAsStream("/images/buttons/done.gif"));
 	}
 	
 	/**
