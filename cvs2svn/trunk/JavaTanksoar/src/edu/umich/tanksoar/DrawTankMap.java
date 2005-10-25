@@ -259,7 +259,6 @@ public class DrawTankMap extends Canvas implements TankListener, SimulationContr
 	private void loadImages(){
 		tanks[Tank.SOUTH] = new Image(myDisplay, 
 				TanksoarJ.class.getResourceAsStream("/images/tank_down.gif"));
-		if (tanks[Tank.SOUTH] == null) System.out.println("tank_down.gif null"); 
 		tanks[Tank.NORTH] = new Image(myDisplay, 
 				TanksoarJ.class.getResourceAsStream("/images/tank_up.gif"));
 		tanks[Tank.EAST] = new Image(myDisplay, 
