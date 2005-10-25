@@ -257,11 +257,9 @@ public class DrawTankMap extends Canvas implements TankListener, SimulationContr
 	 * <li>battrecharge.gif</li><li>explosion.gif</li></ul>
 	 */
 	private void loadImages(){
-		loadNumberedImage(rocks, "rock");
-		loadNumberedImage(trees, "tree");
-		loadNumberedImage(grasses, "ground");
 		tanks[Tank.SOUTH] = new Image(myDisplay, 
 				TanksoarJ.class.getResourceAsStream("/images/tank_down.gif"));
+		if (tanks[Tank.SOUTH] == null) System.out.println("tank_down.gif null"); 
 		tanks[Tank.NORTH] = new Image(myDisplay, 
 				TanksoarJ.class.getResourceAsStream("/images/tank_up.gif"));
 		tanks[Tank.EAST] = new Image(myDisplay, 
@@ -284,6 +282,9 @@ public class DrawTankMap extends Canvas implements TankListener, SimulationContr
 				TanksoarJ.class.getResourceAsStream("/images/battrecharge.gif"));
 		explosion = new Image(myDisplay, 
 				TanksoarJ.class.getResourceAsStream("/images/explosion.gif"));
+		loadNumberedImage(rocks, "rock");
+		loadNumberedImage(trees, "tree");
+		loadNumberedImage(grasses, "ground");
 	}
 	
 	/**
