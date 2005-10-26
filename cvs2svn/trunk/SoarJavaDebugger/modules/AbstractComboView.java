@@ -376,10 +376,28 @@ public abstract class AbstractComboView extends AbstractView implements Agent.Ru
 
 		// Make sure our cache of what's stored in the combo box is up to date
 		m_CurrentCommand = m_CommandCombo.getText() ;
-	}	
+	}
+	
+	private String lookupCommand(String originalCommand)
+	{
+		// !! => Get last command
+		if (originalCommand.equals("!!"))
+		{
+			return m_CommandHistory.getMostRecent() ;
+		}
+		
+		return m_CommandHistory.getMatch(originalCommand.substring(1)) ;
+	}
 		
 	private void commandEntered(String command, boolean updateHistory)
 	{
+		// If the command starts with "!" interpret it in the "shell" style,
+		// matching it against the command history
+		if (command.length() >= 1 && command.charAt(0) == '!')
+		{
+			command = lookupCommand(command) ;
+		}
+		
 		// Update the combo box history list
 		if (updateHistory)
 		{

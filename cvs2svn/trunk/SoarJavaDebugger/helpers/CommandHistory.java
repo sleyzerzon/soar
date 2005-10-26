@@ -93,6 +93,29 @@ public class CommandHistory
 		}
 	}
 	
+	public String getMostRecent()
+	{
+		return m_History[0] ;
+	}
+	
+	// Find the first string that matches command up to the length of command
+	public String getMatch(String command)
+	{
+		int len = command.length() ;
+		
+		for (int i = 0 ; i < m_HistorySize ; i++)
+		{
+			if (m_History[i].length() < len)
+				continue ;
+			
+			if (m_History[i].substring(0, len).equalsIgnoreCase(command))
+				return m_History[i] ;
+		}
+		
+		// If there's no match, just return the command we're trying to match
+		return command ;
+	}
+	
 	/************************************************************************
 	* 
 	* Converts this object into an XML representation.

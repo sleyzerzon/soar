@@ -156,7 +156,10 @@ public class FoldingTextView extends AbstractComboView implements Agent.xmlEvent
 			// to the combo box where they can usefully type.
 			public void keyPressed(KeyEvent e)  {
 				// Only for keys that generate characters (so arrows keys, shift etc. can be safely pressed)
-				if (e.character != 0)
+				if ( (e.character >= 'A' && e.character <= 'Z') ||
+					 (e.character >= 'a' && e.character <= 'z') ||
+					 (e.character >= '0' && e.character <= '9') ||
+					 e.character == '!')
 				{
 					m_CommandCombo.setFocus() ;
 					m_CommandCombo.setText(Character.toString(e.character)) ;
