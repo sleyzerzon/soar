@@ -42,6 +42,7 @@
 #include "gdatastructs.h"
 #include "interface.h"
 #include "kernel_struct.h"
+#include "reinforcement_learning.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
 #include <signal.h>         /* used for control-c handler */
@@ -1316,6 +1317,10 @@ void do_one_top_level_phase (agent* thisAgent)
 	  soar_invoke_callbacks(thisAgent, thisAgent, 
 		  AFTER_HALT_SOAR_CALLBACK,
 		  (soar_call_data) NULL);
+#ifdef NUMERIC_INDIFFERENCE
+	tabulate_reward_values(thisAgent);
+	perform_Bellman_update(thisAgent, 0, thisAgent->top_state);
+#endif
   }
   
   if (thisAgent->stop_soar) {

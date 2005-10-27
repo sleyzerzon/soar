@@ -60,13 +60,13 @@ bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal)
 	    		// print("Prediction %f ", record->previous_Q);
 				// print_with_symbols("value %y ", rhs_value_to_symbol(prod->action_list->referent));
 		}
-		
- 		 	data->reward = 0.0;
-			data->step = 0;
-			data->previous_Q = 0;
-			free_list(thisAgent, data->productions_to_be_updated);
-			data->productions_to_be_updated = NIL;
 	}
+	data->reward = 0.0;
+	data->step = 0;
+	data->previous_Q = 0;
+	free_list(thisAgent, data->productions_to_be_updated);
+	data->productions_to_be_updated = NIL;
+	
 	return current_pref_changed;
 }
 
@@ -139,8 +139,8 @@ void tabulate_reward_values(agent *thisAgent){
 			}
 		}
 		data->reward += (reward*pow(thisAgent->gamma, data->step));
-		data->step++;
 		}
+		data->step++;
 		goal = goal->id.lower_goal;
 	}
 }

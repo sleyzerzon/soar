@@ -2265,6 +2265,9 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   /* JC ADDED: Tell gSKI that we have removed a subgoal */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_SUBSTATE_DESTROYED, 0, thisAgent, static_cast<void*>(goal));
 
+#ifdef NUMERIC_INDIFFERENCE
+  perform_Bellman_update(thisAgent, 0, goal);
+#endif
   /* --- disconnect this goal from the goal stack --- */
   if (goal == thisAgent->top_goal) {
     thisAgent->top_goal = NIL;
@@ -3654,6 +3657,7 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 	   }
 	   
 	   if(perform_Bellman_update(thisAgent, top_value, s->id)){ // If the Bellman update changed current prefs, recompute operator values.
+		   initialize_indifferent_candidates_for_probability_selection(candidates);
 		   for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
 			   /*print_with_symbols("\nPreference for %y", pref->value); */
 			   float value;
