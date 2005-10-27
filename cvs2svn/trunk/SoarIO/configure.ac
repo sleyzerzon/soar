@@ -260,21 +260,21 @@ AC_ARG_WITH(jar, [  --with-jar=path       Set location of jar executable],[JARBI
 if test "$java" = "true" ; then
 
   if test -z "$JAVABIN" ; then
-    AC_CHECK_PROGS(JAVA, java kaffe guavac)
+    AC_CHECK_PROGS(JAVA, java, ["$JAVA_HOME/bin/java"])
   else
-    JAVA="$JAVA_HOME/bin/java"
+    JAVA="$JAVABIN"
   fi
 
   if test -z "$JAVACBIN" ; then
-    AC_CHECK_PROGS(JAVAC, javac)
+    AC_CHECK_PROGS(JAVAC, javac, ["$JAVA_HOME/bin/javac"])
   else
-    JAVAC="$JAVA_HOME/bin/javac"
+    JAVAC="$JAVACBIN"
   fi
 
   if test -z "$JARBIN" ; then
-    AC_CHECK_PROGS(JAR, jar)
+    AC_CHECK_PROGS(JAR, jar, ["$JAVA_HOME/bin/jar"])
   else
-    JAR="$JAVA_HOME/bin/jar"
+    JAR="$JARBIN"
   fi
 
   AC_MSG_CHECKING(for java include file jni.h)
