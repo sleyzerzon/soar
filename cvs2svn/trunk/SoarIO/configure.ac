@@ -253,8 +253,9 @@ AC_MSG_RESULT($LINKFORSHARED)
 # Look for java
 #----------------------------------------------------------------
 
-AC_ARG_WITH(java, [  --with-java=path        Set location of Java executable],[JAVABIN="$withval"], [JAVABIN=])
-AC_ARG_WITH(javac, [  --with-javac=path       Set location of Javac executable],[JAVACBIN="$withval"], [JAVACBIN=])
+AC_ARG_WITH(java, [  --with-java=path        Set location of java executable],[JAVABIN="$withval"], [JAVABIN=])
+AC_ARG_WITH(javac, [  --with-javac=path       Set location of javac executable],[JAVACBIN="$withval"], [JAVACBIN=])
+AC_ARG_WITH(jar, [  --with-jar=path       Set location of jar executable],[JARBIN="$withval"], [JARBIN=])
 
 if test "$java" = "true" ; then
 
