@@ -9,7 +9,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifndef SML_RUN_SCHEDULERH
+#ifndef SML_RUN_SCHEDULER_H
 #define SML_RUN_SCHEDULER_H
 
 #include "gSKI_Enumerations.h"
