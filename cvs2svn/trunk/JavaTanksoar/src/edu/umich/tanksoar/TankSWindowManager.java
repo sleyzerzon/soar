@@ -23,7 +23,7 @@ public class TankSWindowManager extends SWindowManager
 {
   public TankSWindowManager(SimulationControl sc, boolean agentWindowsOn, boolean mapWindowOn)
   {
-     super(sc, agentWindowsOn, mapWindowOn, true, false, "TankSoar", "TankSoar", "*.stank", "Stank files (*.stank)");
+     super(sc, agentWindowsOn, mapWindowOn, true, false, "TankSoar", "TankSoar", "JavaTanksoar", "*.stank", "Stank files (*.stank)");
   }
 
   /**

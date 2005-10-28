@@ -25,6 +25,7 @@ public class ControlPanel implements SimulationControlListener{
 	private File myLatest;
 	private String myTask;
 	private String myTaskNoun;
+	private String myTopLevelDir;
 	private char myTaskFirstChar;
 	private Menu eatersDrop;
 	private String currentAgentPath = "Click \"Load Agent\" to select productions";
@@ -47,25 +48,27 @@ public class ControlPanel implements SimulationControlListener{
 	public static final int MaxSpeed = 19;
 	private int currentSpeed = MaxSpeed;
 	private SWindowManager myManager;
-  //FIXME //TODO remove this to a child class - will cause eaters to use same def path
-  private String defaultMapsPath = "tanksoar" + File.separator + "maps"; // this is where we expect maps to be located
-  private String defaultAgentsPath = "tanksoar" + File.separator + "agents"; // this is where we expect agents to be located
-  
-  protected String stankEquiv = null;
-  protected String stankEquivDescr = null;
 	
-    public ControlPanel(SimulationControl ec, String task, String taskNoun, Display display, String ext, String extDes)
+	// voigtjr: these are relative to myTopLevelDir
+	private String defaultMapsPath = "maps"; // this is where we expect maps to be located
+	private String defaultAgentsPath = "agents"; // this is where we expect agents to be located
+  
+	protected String stankEquiv = null;
+	protected String stankEquivDescr = null;
+	
+    public ControlPanel(SimulationControl ec, String task, String taskNoun, String topLevelDir, Display display, String ext, String extDes)
     {
-    	this(ec, task, taskNoun, display);
+    	this(ec, task, taskNoun, topLevelDir, display);
     	stankEquiv = ext;
     	stankEquivDescr = extDes;
     }
   
-	public ControlPanel(SimulationControl ec, String task, String taskNoun, Display display){
+	public ControlPanel(SimulationControl ec, String task, String taskNoun, String topLevelDir, Display display){
 		if(task == null || task.length() == 0) task = "?";
 		if(taskNoun == null || taskNoun.length() == 0) taskNoun = task + "s";
 		myTask = task;
 		myTaskNoun = taskNoun;
+		myTopLevelDir = topLevelDir;
 		myEC = ec;
 		myEC.addSimulationControlListener(this);
 		myTaskFirstChar = myTask.toLowerCase().charAt(0);
@@ -73,7 +76,7 @@ public class ControlPanel implements SimulationControlListener{
 	}
 	
 	public ControlPanel(SimulationControl ec, Display display){
-		this(ec, null, null, display);
+		this(ec, null, null, null, display);
 	}
   
   public String getDefaultMapsPath(){ return defaultMapsPath;}
@@ -242,7 +245,13 @@ public class ControlPanel implements SimulationControlListener{
 					fd.setFilterExtensions(new String[] {"*.soar", "*.*"});
 					fd.setFilterNames(new String[] {"Soar Agents (*.soar)", "All files (*.*)"});
 				}
-				fd.setFilterPath(defaultAgentsPath);
+				
+				String topLevelPath = System.getProperty("user.dir") 
+					+ System.getProperty("file.separator") + ".." 
+					+ System.getProperty("file.separator") + myTopLevelDir 
+					+ System.getProperty("file.separator") + defaultAgentsPath;
+				
+				fd.setFilterPath(topLevelPath);
 				String oldPath = currentAgentPath;
 				currentAgentPath = fd.open();
 				if(currentAgentPath != null && !currentAgentPath.equals("")){
