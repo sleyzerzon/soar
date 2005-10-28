@@ -574,10 +574,23 @@ public class EaterControl extends SimulationControl implements
 	 * color to the simulation.
 	 * @param destroyed The <code>SoarAgent</code> to permanently remove from the simulation.
 	 */
+	
+	
 	protected void removeAgentFromSimulation(SoarAgent destroyed){
+		kernel.DestroyAgent(((Eater)destroyed).agent);
 		myMap[destroyed.getLocation().getX()][destroyed.getLocation().getY()] = new EatersEmpty();
 		fireAgentDestroyedNotification(destroyed);
 		myEcs.returnColor(destroyed.getColorName());
+		((Eater) destroyed).destroyEater();
+
+		if (myAgents.size() > 0) {
+			originalLocs = new OriginalLocation[myAgents.size()];
+			for (int i = 0; i < originalLocs.length; i++) {
+				originalLocs[i] = new OriginalLocation((Eater) myAgents.get(i));
+			}
+		} else {
+			originalLocs = null;
+		}
 	}
 
 	private boolean collisioning = false;
@@ -917,31 +930,6 @@ public class EaterControl extends SimulationControl implements
 	public void destroyAllAgents() {
 		super.destroyAllAgents();
 		originalLocs = null;
-	}
-
-	/**
-	 * Removes the specified agent from the simulation permanently, returning
-	 * its color to the simulation.
-	 * 
-	 * @param destroyed
-	 *            The <code>SoarAgent</code> to permanently remove from the
-	 *            simulation.
-	 */
-	protected void removeAgentFromSimulation(SoarAgent destroyed,
-			boolean removeAll) {
-		kernel.DestroyAgent(((Eater)destroyed).agent);
-		myMap[destroyed.getLocation().getX()][destroyed.getLocation().getY()] = new EatersEmpty();
-		fireAgentDestroyedNotification(destroyed);
-		myEcs.returnColor(destroyed.getColorName());
-		((Eater) destroyed).destroyEater();
-		if (!removeAll) {
-			originalLocs = new OriginalLocation[myAgents.size()];
-			for (int i = 0; i < originalLocs.length; i++) {
-				originalLocs[i] = new OriginalLocation((Eater) myAgents.get(i));
-			}
-		} else {
-			originalLocs = null;
-		}
 	}
 
 	/**
