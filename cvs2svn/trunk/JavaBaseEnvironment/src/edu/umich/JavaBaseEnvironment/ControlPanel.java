@@ -79,8 +79,6 @@ public class ControlPanel implements SimulationControlListener{
 		this(ec, null, null, null, display);
 	}
   
-  public String getDefaultMapsPath(){ return defaultMapsPath;}
-	
 	public void open(){
 		if(myShell == null || myShell.isDisposed()){
 			amOpen = true;
@@ -183,7 +181,7 @@ public class ControlPanel implements SimulationControlListener{
 			public void widgetSelected(SelectionEvent e){
 				FileDialog fd = new FileDialog(myShell, SWT.OPEN);
 				fd.setFilterExtensions(new String[] {"*." + myTaskFirstChar + "map", "*.*"});
-        fd.setFilterPath(defaultMapsPath);
+				fd.setFilterPath(getFilterPath(defaultMapsPath));
 
 				fd.setFilterNames(new String[] {myTask + " maps (*." + myTaskFirstChar + "map)", "All files (*.*)"});
 				String path = fd.open();
@@ -216,6 +214,13 @@ public class ControlPanel implements SimulationControlListener{
 			}
 		});
 	}
+
+	private String getFilterPath(String component) {
+		return System.getProperty("user.dir") 
+			+ System.getProperty("file.separator") + ".." 
+			+ System.getProperty("file.separator") + myTopLevelDir 
+			+ System.getProperty("file.separator") + component;
+	}
 	
 	private void setButtons(){
 		
@@ -246,12 +251,7 @@ public class ControlPanel implements SimulationControlListener{
 					fd.setFilterNames(new String[] {"Soar Agents (*.soar)", "All files (*.*)"});
 				}
 				
-				String topLevelPath = System.getProperty("user.dir") 
-					+ System.getProperty("file.separator") + ".." 
-					+ System.getProperty("file.separator") + myTopLevelDir 
-					+ System.getProperty("file.separator") + defaultAgentsPath;
-				
-				fd.setFilterPath(topLevelPath);
+				fd.setFilterPath(getFilterPath(defaultAgentsPath));
 				String oldPath = currentAgentPath;
 				currentAgentPath = fd.open();
 				if(currentAgentPath != null && !currentAgentPath.equals("")){
