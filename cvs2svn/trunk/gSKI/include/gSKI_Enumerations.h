@@ -4,7 +4,7 @@
  *************************************************************************/
 
 /********************************************************************
-* @file igski_enumerations.h 
+* @file gSKI_Enumerations.h 
 *********************************************************************
 * created:	   6/19/2002   15:00
 *
@@ -61,6 +61,22 @@
       gSKIEVENT_AFTER_ELABORATION_CYCLE,
       gSKIEVENT_BEFORE_PHASE_EXECUTED,
       gSKIEVENT_AFTER_PHASE_EXECUTED,
+	  /*
+      gSKIEVENT_BEFORE_INPUT_PHASE,
+      gSKIEVENT_AFTER_INPUT_PHASE,
+      gSKIEVENT_BEFORE_PROPOSE_PHASE,
+      gSKIEVENT_AFTER_PROPOSE_PHASE,
+      gSKIEVENT_BEFORE_DECISION_PHASE,
+      gSKIEVENT_AFTER_DECISION_PHASE,
+      gSKIEVENT_BEFORE_APPLY_PHASE,
+      gSKIEVENT_AFTER_APPLY_PHASE,
+      gSKIEVENT_BEFORE_OUTPUT_PHASE,
+      gSKIEVENT_AFTER_OUTPUT_PHASE,
+      gSKIEVENT_BEFORE_PREFERENCE_PHASE,	// Soar-7 mode only
+      gSKIEVENT_AFTER_PREFERENCE_PHASE,		// Soar-7 mode only
+      gSKIEVENT_BEFORE_WM_PHASE,			// Soar-7 mode only
+      gSKIEVENT_AFTER_WM_PHASE,				// Soar-7 mode only
+	  */
       gSKIEVENT_BEFORE_DECISION_CYCLE,
       gSKIEVENT_AFTER_DECISION_CYCLE,
       gSKIEVENT_AFTER_INTERRUPT,
