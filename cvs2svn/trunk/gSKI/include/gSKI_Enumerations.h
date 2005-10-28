@@ -82,8 +82,8 @@
       gSKIEVENT_AFTER_INTERRUPT,
 	  gSKIEVENT_BEFORE_RUN_STARTS,		// Before start a run
 	  gSKIEVENT_AFTER_RUN_ENDS,			// After run ends for any reason
-      gSKIEVENT_BEFORE_RUNNING,			// Before running one phase
-      gSKIEVENT_AFTER_RUNNING,			// After running one phase
+      gSKIEVENT_BEFORE_RUNNING,			// Before running one increment
+      gSKIEVENT_AFTER_RUNNING,			// After running one increment
       gSKIEVENT_LAST_RUN_EVENT = gSKIEVENT_AFTER_RUNNING,
     } egSKIRunEventId;
 
@@ -91,6 +91,11 @@
     {
  	   return (id >= gSKIEVENT_BEFORE_SMALLEST_STEP && 
  		id <= gSKIEVENT_LAST_RUN_EVENT) ;
+    }
+     static inline bool IsPhaseEventID (int id)
+    {
+ 	   return (id > gSKIEVENT_AFTER_PHASE_EXECUTED && 
+ 		id < gSKIEVENT_BEFORE_DECISION_CYCLE) ;
     }
  
     typedef enum {
