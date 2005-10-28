@@ -1252,6 +1252,22 @@ namespace gSKI
                                             agent*                soarAgent, 
                                             void*                 data);
 
+     /** 
+       * @brief Static function to handle callbacks for Run events from the kernel.
+       *
+       * @param eventId  Id of the kernel level event that occured.
+       * @param eventOccured true if the event happened already, false if
+       *                      the event is about to happen
+       * @param object   Pointer to an Agent object (casted to void)
+       * @param soarAgent Pointer to the kernel level agent structure associated
+       *                    with this callback
+       * @param data      Callback data (in this case an egSKIPhaseType)
+       */
+      static void HandleRunEventCallback(unsigned long         eventId, 
+                                            unsigned char         eventOccured,
+                                            void*                 object, 
+                                            agent*                soarAgent, 
+                                            void*                 data);
 
 
 

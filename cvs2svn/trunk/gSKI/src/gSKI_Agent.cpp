@@ -1323,7 +1323,99 @@ namespace gSKI
 
       ClearError(err);
       m_runListeners.AddListener(eventId, listener);
+		 
 
+      // If we have added our first listener, we tell the kernel
+      //  we want to recieve these events.
+      if(m_runListeners.GetNumListeners(eventId) == 1)
+      {
+		  switch (eventId)   // temporary, til all are moved to kernel. KJC
+		  {
+		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
+		  case gSKIEVENT_AFTER_PHASE_EXECUTED:      		
+			  // This is a kernel call (not part of gSKI)	
+              // Must convert gSKI event to Kernel event     			
+			  gSKI_SetAgentCallback(GetSoarAgent(), 
+							   EnumRemappings::RemapRunEventType(eventId),
+                               static_cast<void*>(this),
+                               HandleRunEventCallback);
+			 
+			  break;
+		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
+		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
+		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
+		  case gSKIEVENT_AFTER_DECISION_CYCLE:
+    
+		  default:
+			  ; // do nothing
+		  }
+      }
+   }
+
+   /* 
+   ==========================
+	RemoveRunListener
+   ==========================
+   */   
+   void Agent::RemoveRunListener(egSKIRunEventId   eventId,
+                                 IRunListener*     listener,
+                                 Error*            err)
+   {
+      MegaAssert(listener, "Cannot remove a 0 listener pointer.");
+      if(!listener)
+      {
+         SetError(err, gSKIERR_INVALID_PTR);
+         return;
+      }
+
+      ClearError(err);
+      m_runListeners.RemoveListener(eventId, listener);
+
+
+	  // If we have no more listeners, stop asking kernel to
+      //  notify us
+      if(m_runListeners.GetNumListeners(eventId) == 0)
+      {		 
+		  switch (eventId)   // temporary, til all are moved to kernel. KJC
+		  {
+		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
+		  case gSKIEVENT_AFTER_PHASE_EXECUTED:      		
+			  // This is a kernel call (not part of gSKI)	
+              // Must convert gSKI event to Kernel event     			
+			  // Setting the callback to 0 causes the kernel        
+			  //   not to fire the event
+			  gSKI_SetAgentCallback(GetSoarAgent(), 
+							   EnumRemappings::RemapRunEventType(eventId),
+                               0,0);
+			  break;
+		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
+		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
+		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
+		  case gSKIEVENT_AFTER_DECISION_CYCLE:
+		  default:
+			  ; // do nothing
+		  }
+	  }
+   }
+   /*
+   =========================
+	HandleRunEventCallback
+   =========================
+   */
+   void Agent::HandleRunEventCallback(unsigned long         eventId, 
+                                      unsigned char         eventOccured,
+                                      void*                 object, 
+                                      agent*                soarAgent, 
+                                      void*                 data)
+   {
+      Agent*        a = static_cast<Agent*>(object);
+      gSKI_K_PhaseCallbackData* phase_data = static_cast<gSKI_K_PhaseCallbackData*>(data);
+
+      // We have to change the the event id from a kernel id to a gSKI id
+	  RunNotifier rn(a, EnumRemappings::ReMapPhaseType(phase_data->phase_type,0));
+      a->m_runListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_RunEventId(eventId,eventOccured), rn);
+
+	  
       // KJC added to propagate Kernel events outward and eliminate
 	  // pre-step and post-step notifications in gSKI Agent::Run.  
 	  // Best for Soar 7 mode and any future Kernel changes.
@@ -1347,27 +1439,11 @@ namespace gSKI
  
    }
 
-   /* 
-   ==========================
-	RemoveRunListener
-   ==========================
-   */   
-   void Agent::RemoveRunListener(egSKIRunEventId   eventId,
-                                 IRunListener*     listener,
-                                 Error*            err)
-   {
-      MegaAssert(listener, "Cannot remove a 0 listener pointer.");
-      if(!listener)
-      {
-         SetError(err, gSKIERR_INVALID_PTR);
-         return;
-      }
-
-      ClearError(err);
-      m_runListeners.RemoveListener(eventId, listener);
-   }
-
-
+   /*
+   =========================
+	
+   =========================
+   */
    // TODO: Flesh out this function (dummy body allows compilation)
    IState* Agent::GetTopState(Error* err)
    {
@@ -1701,13 +1777,14 @@ namespace gSKI
          RunNotifier nfBeforeDC(this, m_nextPhase);
          m_runListeners.Notify(gSKIEVENT_BEFORE_DECISION_CYCLE, nfBeforeDC);
       }
-
+	  if (0){  // KJC removing agent RunEvents from schedulers
       // See if we are starting a new phase
       if(m_lastPhase != m_nextPhase)
       {
          RunNotifier nfBeforePhase(this, m_nextPhase);
          m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED, nfBeforePhase);
       }
+	  }
 
       // See if this is an elaboration cycle   <<-- won't work for Soar 7 mode
       if((m_nextPhase == gSKI_PROPOSAL_PHASE) || (m_nextPhase == gSKI_APPLY_PHASE))
@@ -1787,9 +1864,10 @@ namespace gSKI
          if((m_lastPhase == gSKI_OUTPUT_PHASE) && m_agent->output_link_changed)
             ++m_outputCount;
 
+	  if (0){  // KJC removing agent RunEvents from schedulers
          RunNotifier nfAfterPhase(this, m_lastPhase);
          m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED, nfAfterPhase);
-      
+	  }
          // Increment the phase count
          ++m_phaseCount;
 
