@@ -8,3 +8,6 @@ swt.jar
 .project
 .classpath
 swt-win32-3138.dll
+sml.jar
+swt-win32-3139.dll
+swt-windows.jar
