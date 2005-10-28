@@ -260,7 +260,7 @@ namespace gSKI
          return gSKI_K_EVENT_DECISION_CYCLE;
        default:
          // Error condition
-         MegaAssert(false, "Could not map a production event id");
+         MegaAssert(false, "Could not map a run event id");
          return static_cast<egSKIAgentEvents>(0);
       }
    }
