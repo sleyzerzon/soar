@@ -7,3 +7,4 @@ Tcl_sml_ClientInterface_wrap.cpp
 Debug
 libTcl_sml_ClientInterface.la
 Tcl_sml_ClientInterface_wrap.cxx
+build

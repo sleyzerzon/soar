@@ -7,3 +7,4 @@ gski_unreleased.txt
 Debug
 TestSoarPerformance
 *.o
+build
