@@ -2266,6 +2266,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   gSKI_MakeAgentCallback(gSKI_K_EVENT_SUBSTATE_DESTROYED, 0, thisAgent, static_cast<void*>(goal));
 
 #ifdef NUMERIC_INDIFFERENCE
+  tabulate_reward_value_for_goal(thisAgent, goal);
   perform_Bellman_update(thisAgent, 0, goal);
 #endif
   /* --- disconnect this goal from the goal stack --- */

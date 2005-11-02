@@ -20,7 +20,7 @@ bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal)
 			num_prods++;
 	}
 	
-	print(thisAgent, "Update %f\n", update); // temporary
+// 	print(thisAgent, "Update %f\n", update); // temporary
  			
 	if (num_prods > 0){  // if there are productions to update
 		float increment = thisAgent->alpha*(update / num_prods);
@@ -119,10 +119,16 @@ void tabulate_reward_values(agent *thisAgent){
 	Symbol *goal = thisAgent->top_goal;
 
 	while(goal){
-	    RL_data *data = goal->id.RL_data;
-		slot *s = goal->id.reward_header->id.slots;
-		float reward = 0.0;
-		if (s){
+		tabulate_reward_value_for_goal(thisAgent, goal);
+	    goal = goal->id.lower_goal;
+	}
+}
+
+void tabulate_reward_value_for_goal(agent *thisAgent, Symbol *goal){
+	RL_data *data = goal->id.RL_data;
+	slot *s = goal->id.reward_header->id.slots;
+	float reward = 0.0;
+	if (s){
 		for ( ; s ; s = s->next){
 			for (wme *w = s->wmes ; w ; w = w->next){
 				 if (w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){
@@ -138,11 +144,9 @@ void tabulate_reward_values(agent *thisAgent){
 				}
 			}
 		}
-		data->reward += (reward*pow(thisAgent->gamma, data->step));
-		}
-		data->step++;
-		goal = goal->id.lower_goal;
+	data->reward += (reward*pow(thisAgent->gamma, data->step));
 	}
+	data->step++;
 }
 
 // record_for_RL

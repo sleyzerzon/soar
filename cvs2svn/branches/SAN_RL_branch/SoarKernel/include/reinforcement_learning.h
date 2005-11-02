@@ -35,5 +35,6 @@ extern bool perform_Bellman_update(agent *, float , Symbol *);
 extern void RL_update_symbolically_chosen(agent *, slot *, preference *);
 extern void tabulate_reward_values(agent *);
 extern void store_RL_data(agent *, Symbol *, preference *);
+extern void tabulate_reward_value_for_goal(agent *thisAgent, Symbol *goal);
 
 #endif
