@@ -1324,6 +1324,7 @@ namespace gSKI
       ClearError(err);
       m_runListeners.AddListener(eventId, listener);
 		 
+	  //If a SMALLEST_STEP listener, we need to register for PHASE and ELAB...
 
       // If we have added our first listener, we tell the kernel
       //  we want to recieve these events.
@@ -1422,6 +1423,7 @@ namespace gSKI
 	  //
 	  // Can update counters here too that used to be done in postStepNotifications
 	  //       including phase-count since Soar doesn't count phases per se.
+	  //   **No, need to ensure that a callback is registered, so do on agent constructor
 	  // If we have to retain SMALLEST_STEP events, can generate them here.
 	  // Need a separate handler for soar_invoke_callbacks on phase-specific events
 
