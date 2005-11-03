@@ -27,11 +27,12 @@ public class ControlPanel implements SimulationControlListener{
 	private String myTaskNoun;
 	private char myTaskFirstChar;
 	private Menu eatersDrop;
-	private String currentAgentPath = "Click \"Load Agent\" to select productions";
+	private String currentAgentPath = "Click \"Choose Productions\" to select productions";
 	private String currentColorName;
 
 	private boolean amOpen = false;
 	
+	private Label  statusLabel = null;
 	private Button createAgentButton;
 	private Button createHumanAgentButton;
 	private Button destroyAgentButton;
@@ -48,14 +49,14 @@ public class ControlPanel implements SimulationControlListener{
 	private int currentSpeed = MaxSpeed;
 	private SWindowManager myManager;
 	
-	protected String stankEquiv = null;
-	protected String stankEquivDescr = null;
+	protected String ext = null;
+	protected String extDescription = null;
 	
-    public ControlPanel(SimulationControl ec, String task, String taskNoun, Display display, String ext, String extDes)
+    public ControlPanel(SimulationControl ec, String task, String taskNoun, Display display, String extIn, String extDescriptionIn)
     {
     	this(ec, task, taskNoun, display);
-    	stankEquiv = ext;
-    	stankEquivDescr = extDes;
+    	ext = extIn;
+    	extDescription = extDescriptionIn;
     }
   
 	public ControlPanel(SimulationControl ec, String task, String taskNoun, Display display){
@@ -129,6 +130,30 @@ public class ControlPanel implements SimulationControlListener{
 		MenuItem file = new MenuItem(top, SWT.CASCADE);
 		file.setText("File");
 		file.setMenu(fileDrop);
+		if (ext != null){
+			MenuItem loadPredefined = new MenuItem(fileDrop, SWT.PUSH);
+			loadPredefined.setText("Load " + ext + " file");
+			loadPredefined.addSelectionListener(new SelectionAdapter(){
+				public void widgetSelected(SelectionEvent e){
+					FileDialog fd = new FileDialog(myShell, SWT.OPEN);
+					fd.setFilterExtensions(new String[] {"*." + ext, "*.soar", "*.*"});
+					fd.setFilterNames(new String[] {extDescription, "Soar Agents (*.soar)", "All files (*.*)"});
+
+					fd.setFilterPath(mySC.getAgentPath());
+					String oldPath = currentAgentPath;
+					currentAgentPath = fd.open();
+					if (statusLabel != null) {
+						if(currentAgentPath != null && !currentAgentPath.equals("")){
+							statusLabel.setText(new File(currentAgentPath).getName());
+						} else {
+							currentAgentPath = oldPath;
+						}
+					}
+					UpdateButtonEnables();
+				}
+			});
+		}
+		
 		MenuItem exit = new MenuItem(fileDrop, SWT.PUSH);
 		exit.setText("Exit");
 		exit.addSelectionListener(new SelectionAdapter(){
@@ -210,39 +235,31 @@ public class ControlPanel implements SimulationControlListener{
 	}
 
 	private void setButtons(){
-		
 		myShell.setLayout(new RowLayout(SWT.HORIZONTAL));
+		
 		Composite left = new Composite(myShell, SWT.NONE);
 		Composite right = new Composite(myShell, SWT.NONE);
+		statusLabel = new Label(left, SWT.NONE);
 		
 		/* Load buttons */
 		left.setLayout(new RowLayout(SWT.VERTICAL));
 		((RowLayout)left.getLayout()).pack = false;
-		final Label l = new Label(left, SWT.NONE);
-		l.setText(currentAgentPath);
-		l.setToolTipText("Displays the name of agent currently selected to load on \'Create\'");
+		statusLabel.setText(currentAgentPath);
+		statusLabel.setToolTipText("Displays the name of agent currently selected to load on \'Create\'");
 		Button b = new Button(left, SWT.PUSH);
-		b.setText("Load Agent");
-		b.setToolTipText("Select file to be used to load agent");
+		b.setText("Choose productions");
+		b.setToolTipText("Select file to be used for agent productions");
 		b.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
 				FileDialog fd = new FileDialog(myShell, SWT.OPEN);
-				if (stankEquiv != null)
-				{
-					fd.setFilterExtensions(new String[] {"*.soar", stankEquiv, "*.*"});
-					fd.setFilterNames(new String[] {"Soar Agents (*.soar)", stankEquivDescr, "All files (*.*)"});
-				}
-				else
-				{
-					fd.setFilterExtensions(new String[] {"*.soar", "*.*"});
-					fd.setFilterNames(new String[] {"Soar Agents (*.soar)", "All files (*.*)"});
-				}
+				fd.setFilterExtensions(new String[] {"*.soar", "*.*"});
+				fd.setFilterNames(new String[] {"Soar Agents (*.soar)", "All files (*.*)"});
 				
 				fd.setFilterPath(mySC.getAgentPath());
 				String oldPath = currentAgentPath;
 				currentAgentPath = fd.open();
 				if(currentAgentPath != null && !currentAgentPath.equals("")){
-					l.setText(new File(currentAgentPath).getName());
+					statusLabel.setText(new File(currentAgentPath).getName());
 				} else {
 					currentAgentPath = oldPath;
 				}
@@ -669,7 +686,7 @@ public class ControlPanel implements SimulationControlListener{
 		stepSimulationButton.setEnabled(mySC.isSteppable());
 		quitSimulationButton.setEnabled(mySC.isQuittable());
 		
-		createAgentButton.setEnabled(currentAgentPath != "Click \"Load Agent\" to select productions" && !mySC.isRunning());
+		createAgentButton.setEnabled(currentAgentPath != "Click \"Choose Productions\" to select productions" && !mySC.isRunning());
 		destroyAgentButton.setEnabled(mySC.getAllAgents().length != 0 && !mySC.isRunning());
 		createHumanAgentButton.setEnabled(!mySC.isRunning());
 		showMinimap.setEnabled(mySC.getAllAgents().length != 0);

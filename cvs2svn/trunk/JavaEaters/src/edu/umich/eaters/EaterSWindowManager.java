@@ -23,7 +23,7 @@ public class EaterSWindowManager extends SWindowManager
 {
   public EaterSWindowManager(SimulationControl sc, boolean agentWindowsOn, boolean mapWindowOn, boolean controlPanelOn, boolean disablePopups)
   {
-    super(sc, agentWindowsOn, mapWindowOn, controlPanelOn, disablePopups, "Eaters", "Eaters", "*.seater", "Seater files (*.seater)");
+    super(sc, agentWindowsOn, mapWindowOn, controlPanelOn, disablePopups, "Eaters", "Eaters", "seater", "Seater files (*.seater)");
   }
 
   /**
