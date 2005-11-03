@@ -80,23 +80,24 @@ typedef enum {
     smlEVENT_AFTER_SMALLEST_STEP,
     smlEVENT_BEFORE_ELABORATION_CYCLE,
     smlEVENT_AFTER_ELABORATION_CYCLE,
+  /*  inline tests depend on this ordering... */
     smlEVENT_BEFORE_PHASE_EXECUTED,
-    smlEVENT_AFTER_PHASE_EXECUTED,
-  /*  smlEVENT_BEFORE_INPUT_PHASE,
-    smlEVENT_AFTER_INPUT_PHASE,
+    smlEVENT_BEFORE_INPUT_PHASE,
     smlEVENT_BEFORE_PROPOSE_PHASE,
-    smlEVENT_AFTER_PROPOSE_PHASE,
     smlEVENT_BEFORE_DECISION_PHASE,
-    smlEVENT_AFTER_DECISION_PHASE,
     smlEVENT_BEFORE_APPLY_PHASE,
-    smlEVENT_AFTER_APPLY_PHASE,
     smlEVENT_BEFORE_OUTPUT_PHASE,
-    smlEVENT_AFTER_OUTPUT_PHASE,
     smlEVENT_BEFORE_PREFERENCE_PHASE,	// Soar-7 mode only
-    smlEVENT_AFTER_PREFERENCE_PHASE,	// Soar-7 mode only
     smlEVENT_BEFORE_WM_PHASE,			// Soar-7 mode only
+	smlEVENT_AFTER_INPUT_PHASE,
+    smlEVENT_AFTER_PROPOSE_PHASE,
+    smlEVENT_AFTER_DECISION_PHASE,
+    smlEVENT_AFTER_APPLY_PHASE,
+    smlEVENT_AFTER_OUTPUT_PHASE,
+    smlEVENT_AFTER_PREFERENCE_PHASE,	// Soar-7 mode only
     smlEVENT_AFTER_WM_PHASE,			// Soar-7 mode only
-	*/
+    smlEVENT_AFTER_PHASE_EXECUTED,
+	/* */
     smlEVENT_BEFORE_DECISION_CYCLE,
     smlEVENT_AFTER_DECISION_CYCLE,
     smlEVENT_AFTER_INTERRUPT,
@@ -186,6 +187,18 @@ static inline bool IsSystemEventID(int id)
 static inline bool IsRunEventID(int id)
 {
 	return (id >= smlEVENT_BEFORE_SMALLEST_STEP && id <= smlEVENT_AFTER_RUNNING) ;
+}
+static inline bool IsPhaseEventID (int id)
+{   
+	return (id >= smlEVENT_BEFORE_PHASE_EXECUTED && id <= smlEVENT_AFTER_PHASE_EXECUTED) ;
+}
+static inline bool IsBEFOREPhaseEventID (int id)
+{
+ 	return (id >= smlEVENT_BEFORE_PHASE_EXECUTED && id <= smlEVENT_BEFORE_WM_PHASE) ;
+}
+static inline bool IsAFTERPhaseEventID (int id)
+{
+ 	return (id >= smlEVENT_AFTER_INPUT_PHASE && id <= smlEVENT_AFTER_PHASE_EXECUTED) ;
 }
 
 static inline bool IsProductionEventID(int id)

@@ -40,6 +40,20 @@ Events::Events()
 	RegisterEvent(smlEVENT_BEFORE_ELABORATION_CYCLE, "before-elaboration-cycle") ;
 	RegisterEvent(smlEVENT_AFTER_ELABORATION_CYCLE, "after-elaboration-cycle") ;
 	RegisterEvent(smlEVENT_BEFORE_PHASE_EXECUTED, "before-phase-executed") ;
+	RegisterEvent(smlEVENT_BEFORE_INPUT_PHASE, "before-input-phase") ;
+	RegisterEvent(smlEVENT_BEFORE_PROPOSE_PHASE, "before-propose-phase") ;
+	RegisterEvent(smlEVENT_BEFORE_DECISION_PHASE, "before-decision-phase") ;
+	RegisterEvent(smlEVENT_BEFORE_APPLY_PHASE, "before-apply-phase") ;
+	RegisterEvent(smlEVENT_BEFORE_OUTPUT_PHASE, "before-output-phase") ;
+	RegisterEvent(smlEVENT_BEFORE_PREFERENCE_PHASE, "before-preference-phase") ;	// Soar-7 mode only
+	RegisterEvent(smlEVENT_BEFORE_WM_PHASE, "before-wm-phase") ;	// Soar-7 mode only
+	RegisterEvent(smlEVENT_AFTER_INPUT_PHASE, "after-input-phase") ;
+	RegisterEvent(smlEVENT_AFTER_PROPOSE_PHASE, "after-propose-phase") ;
+	RegisterEvent(smlEVENT_AFTER_DECISION_PHASE, "after-decision-phase") ;
+	RegisterEvent(smlEVENT_AFTER_APPLY_PHASE, "after-apply-phase") ;
+	RegisterEvent(smlEVENT_AFTER_OUTPUT_PHASE, "after-output-phase") ;
+	RegisterEvent(smlEVENT_AFTER_PREFERENCE_PHASE, "after-preference-phase") ;	// Soar-7 mode only
+	RegisterEvent(smlEVENT_AFTER_WM_PHASE, "after-wm-phase") ;	// Soar-7 mode only
 	RegisterEvent(smlEVENT_AFTER_PHASE_EXECUTED, "after-phase-executed") ;
 	RegisterEvent(smlEVENT_BEFORE_DECISION_CYCLE, "before-decision-cycle") ;
 	RegisterEvent(smlEVENT_AFTER_DECISION_CYCLE, "after-decision-cycle") ;

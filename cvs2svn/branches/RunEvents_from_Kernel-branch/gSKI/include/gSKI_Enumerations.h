@@ -54,29 +54,29 @@
     }
  
     typedef enum {
-      // Agent events
+      // Agent (Run)Events
       gSKIEVENT_BEFORE_SMALLEST_STEP = gSKIEVENT_LAST_SYSTEM_EVENT + 1,
       gSKIEVENT_AFTER_SMALLEST_STEP,
       gSKIEVENT_BEFORE_ELABORATION_CYCLE,
       gSKIEVENT_AFTER_ELABORATION_CYCLE,
+	  /*  tests for phase events depends on this ordering */
       gSKIEVENT_BEFORE_PHASE_EXECUTED,
-      gSKIEVENT_AFTER_PHASE_EXECUTED,
-	  /*
       gSKIEVENT_BEFORE_INPUT_PHASE,
-      gSKIEVENT_AFTER_INPUT_PHASE,
       gSKIEVENT_BEFORE_PROPOSE_PHASE,
-      gSKIEVENT_AFTER_PROPOSE_PHASE,
       gSKIEVENT_BEFORE_DECISION_PHASE,
-      gSKIEVENT_AFTER_DECISION_PHASE,
       gSKIEVENT_BEFORE_APPLY_PHASE,
-      gSKIEVENT_AFTER_APPLY_PHASE,
       gSKIEVENT_BEFORE_OUTPUT_PHASE,
-      gSKIEVENT_AFTER_OUTPUT_PHASE,
       gSKIEVENT_BEFORE_PREFERENCE_PHASE,	// Soar-7 mode only
-      gSKIEVENT_AFTER_PREFERENCE_PHASE,		// Soar-7 mode only
       gSKIEVENT_BEFORE_WM_PHASE,			// Soar-7 mode only
+      gSKIEVENT_AFTER_INPUT_PHASE,
+      gSKIEVENT_AFTER_PROPOSE_PHASE,
+      gSKIEVENT_AFTER_DECISION_PHASE,
+      gSKIEVENT_AFTER_APPLY_PHASE,
+      gSKIEVENT_AFTER_OUTPUT_PHASE,
+      gSKIEVENT_AFTER_PREFERENCE_PHASE,		// Soar-7 mode only
       gSKIEVENT_AFTER_WM_PHASE,				// Soar-7 mode only
-	  */
+	  gSKIEVENT_AFTER_PHASE_EXECUTED,
+	  /* 	  */
       gSKIEVENT_BEFORE_DECISION_CYCLE,
       gSKIEVENT_AFTER_DECISION_CYCLE,
       gSKIEVENT_AFTER_INTERRUPT,
@@ -94,10 +94,21 @@
     }
      static inline bool IsPhaseEventID (int id)
     {
- 	   return (id > gSKIEVENT_AFTER_PHASE_EXECUTED && 
- 		id < gSKIEVENT_BEFORE_DECISION_CYCLE) ;
+ 	   return (id >= gSKIEVENT_BEFORE_PHASE_EXECUTED && 
+ 		id <= gSKIEVENT_AFTER_PHASE_EXECUTED) ;
     }
- 
+      static inline bool IsBEFOREPhaseEventID (int id)
+    {
+ 	   return (id >= gSKIEVENT_BEFORE_PHASE_EXECUTED && 
+ 		id <= gSKIEVENT_BEFORE_WM_PHASE) ;
+    }
+     static inline bool IsAFTERPhaseEventID (int id)
+    {
+ 	   return (id >= gSKIEVENT_AFTER_INPUT_PHASE && 
+ 		id <= gSKIEVENT_AFTER_PHASE_EXECUTED) ;
+    }
+
+
     typedef enum {
       // Production Manager
       gSKIEVENT_AFTER_PRODUCTION_ADDED  = gSKIEVENT_LAST_RUN_EVENT + 1,
