@@ -102,19 +102,19 @@ public class TankSoarJControl extends SimulationControl implements
 
 		// need to listen for quit event so can delete Soar kernel on exit
 		addSimulationControlListener(this);
+		
+		// Set up map, agent paths
+		mapPath = System.getProperty("user.dir") 
+		+ System.getProperty("file.separator") + ".." 
+		+ System.getProperty("file.separator") + "JavaTanksoar" 
+		+ System.getProperty("file.separator");
+		agentPath = mapPath;
+		mapPath += "maps";
+		agentPath += "agents";
 
-		// FIXME //TODO duplicates a constant that's in the ControlPanel class.
-		// get legit access instead
-		String defaultMapsPath = "tanksoar" + File.separator + "maps"; // this
-																		// is
-																		// where
-																		// we
-																		// expect
-																		// maps
-																		// to be
-																		// located
-		File f = new File(defaultMapsPath, "default.tmap");
+		File f = new File(mapPath, "default.tmap");
 		loadMap(f);
+		
 		// TankSoarLogger.log(f.getPath());
 		// newOpenMap();//opens an empty map
 	}

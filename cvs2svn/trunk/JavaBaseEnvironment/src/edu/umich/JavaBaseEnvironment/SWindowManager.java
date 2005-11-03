@@ -55,7 +55,9 @@ public class SWindowManager implements SimulationControlListener, WorldCountNoti
 	 * @param mapWindowOn If true, will show the map window of the simulation.
 	 * @param controlPanelOn
 	 */
-	public SWindowManager(SimulationControl sc, boolean agentWindowsOn, boolean mapWindowOn, boolean controlPanelOn,boolean disablePopups,String taskIn, String taskNounIn, String topLevelDirIn, String extIn, String extDesIn){
+	public SWindowManager(SimulationControl sc, boolean agentWindowsOn, boolean mapWindowOn, 
+			boolean controlPanelOn,boolean disablePopups,String taskIn, 
+			String taskNounIn, String extIn, String extDesIn){
 		mySC = sc;
 		this.disablePopups = disablePopups;
 		this.agentWindowsOn = agentWindowsOn;
@@ -64,7 +66,7 @@ public class SWindowManager implements SimulationControlListener, WorldCountNoti
 		myDisplay = new Display();
 		mySC.addSimulationControlListener(this);
 		mySC.addWorldCountNotificationListener(this);
-		initializeVisuals(taskIn, taskNounIn, topLevelDirIn, extIn, extDesIn);
+		initializeVisuals(taskIn, taskNounIn, extIn, extDesIn);
 	}
     	
 	/**
@@ -72,11 +74,11 @@ public class SWindowManager implements SimulationControlListener, WorldCountNoti
 	 * SWindowManager(ec, true, true, true)).
 	 * @param sc The SimulationControl that is controlling the simulation.
 	 */
-	public SWindowManager(SimulationControl sc, String taskIn, String taskNounIn, String topLevelDirIn, String extIn, String extDesIn){
+	public SWindowManager(SimulationControl sc, String taskIn, String taskNounIn, String extIn, String extDesIn){
 		mySC = sc;
 		mySC.addSimulationControlListener(this);
 		myDisplay = new Display();
-		initializeVisuals(taskIn, taskNounIn, topLevelDirIn, extIn, extDesIn);
+		initializeVisuals(taskIn, taskNounIn, extIn, extDesIn);
 	}
 	
 	/**
@@ -113,11 +115,11 @@ public class SWindowManager implements SimulationControlListener, WorldCountNoti
 	 * those as well. Opens them, and then has the <code>Display</code> sleep until
 	 * it is dispatched.
 	 */
-	private void initializeVisuals(String task, String taskNoun, String topLevelDir, String ext, String extDes){
+	private void initializeVisuals(String task, String taskNoun, String ext, String extDes){
 		initColors(myDisplay);
 		if (controlPanelOn)
 		{
-			myCP = new ControlPanel(mySC, task, taskNoun, topLevelDir, myDisplay, ext, extDes);
+			myCP = new ControlPanel(mySC, task, taskNoun, myDisplay, ext, extDes);
 			myCP.open();
 			myCP.setManager(this);
 		}

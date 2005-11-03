@@ -33,6 +33,30 @@ public abstract class SimulationControl {
 	protected Object[][] myMap = new Object[MapWidth][MapHeight];
 	
 	/**
+	 * Directory for maps
+	 */
+	protected String mapPath = null;
+
+	/**
+	 * Directory for maps
+	 */
+	protected String agentPath = null;
+	
+	/**
+	 * Accessor for map directory
+	 */
+	public String getMapPath() {
+		return mapPath;
+	}
+
+	/**
+	 * Accessor for agent directory
+	 */
+	public String getAgentPath() {
+		return agentPath;
+	}
+
+	/**
 	 * Method defined to, if the simulation is not running, start the simulation.
 	 */
 	public abstract void runSimulation();

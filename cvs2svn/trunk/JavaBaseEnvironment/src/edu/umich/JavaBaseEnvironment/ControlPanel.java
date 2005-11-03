@@ -21,11 +21,10 @@ public class ControlPanel implements SimulationControlListener{
 
 	private Display myDisplay;
 	private Shell myShell;
-	private SimulationControl myEC;
+	private SimulationControl mySC;
 	private File myLatest;
 	private String myTask;
 	private String myTaskNoun;
-	private String myTopLevelDir;
 	private char myTaskFirstChar;
 	private Menu eatersDrop;
 	private String currentAgentPath = "Click \"Load Agent\" to select productions";
@@ -49,34 +48,29 @@ public class ControlPanel implements SimulationControlListener{
 	private int currentSpeed = MaxSpeed;
 	private SWindowManager myManager;
 	
-	// voigtjr: these are relative to myTopLevelDir
-	private String defaultMapsPath = "maps"; // this is where we expect maps to be located
-	private String defaultAgentsPath = "agents"; // this is where we expect agents to be located
-  
 	protected String stankEquiv = null;
 	protected String stankEquivDescr = null;
 	
-    public ControlPanel(SimulationControl ec, String task, String taskNoun, String topLevelDir, Display display, String ext, String extDes)
+    public ControlPanel(SimulationControl ec, String task, String taskNoun, Display display, String ext, String extDes)
     {
-    	this(ec, task, taskNoun, topLevelDir, display);
+    	this(ec, task, taskNoun, display);
     	stankEquiv = ext;
     	stankEquivDescr = extDes;
     }
   
-	public ControlPanel(SimulationControl ec, String task, String taskNoun, String topLevelDir, Display display){
+	public ControlPanel(SimulationControl ec, String task, String taskNoun, Display display){
 		if(task == null || task.length() == 0) task = "?";
 		if(taskNoun == null || taskNoun.length() == 0) taskNoun = task + "s";
 		myTask = task;
 		myTaskNoun = taskNoun;
-		myTopLevelDir = topLevelDir;
-		myEC = ec;
-		myEC.addSimulationControlListener(this);
+		mySC = ec;
+		mySC.addSimulationControlListener(this);
 		myTaskFirstChar = myTask.toLowerCase().charAt(0);
 		myDisplay = display;
 	}
 	
 	public ControlPanel(SimulationControl ec, Display display){
-		this(ec, null, null, null, display);
+		this(ec, null, null, display);
 	}
   
 	public void open(){
@@ -101,7 +95,7 @@ public class ControlPanel implements SimulationControlListener{
 		myShell.setText(myTask + " Control Panel");
 		myShell.addShellListener(new ShellAdapter(){
 			public void shellClosed(ShellEvent e){
-				if (myEC.isQuittable())
+				if (mySC.isQuittable())
 				{
 					MessageBox mb = new MessageBox(myShell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 					mb.setText("Quit " + myTaskNoun);
@@ -109,7 +103,7 @@ public class ControlPanel implements SimulationControlListener{
 					e.doit = (mb.open() == SWT.YES);
 					if(e.doit){
 						amOpen = false;
-						myEC.quitSimulation();
+						mySC.quitSimulation();
 					}
 				}
 				else
@@ -165,14 +159,14 @@ public class ControlPanel implements SimulationControlListener{
 		resetMaps.setText("Reset map");
 		resetMaps.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				myEC.resetMap();
+				mySC.resetMap();
 			}
 		});
 		MenuItem randomMap = new MenuItem(mapDrop, SWT.PUSH);
 		randomMap.setText("Random map");
 		randomMap.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				myEC.newRandomMap();
+				mySC.newRandomMap();
 			}
 		});
 		MenuItem loadMap = new MenuItem(mapDrop, SWT.PUSH);
@@ -181,12 +175,12 @@ public class ControlPanel implements SimulationControlListener{
 			public void widgetSelected(SelectionEvent e){
 				FileDialog fd = new FileDialog(myShell, SWT.OPEN);
 				fd.setFilterExtensions(new String[] {"*." + myTaskFirstChar + "map", "*.*"});
-				fd.setFilterPath(getFilterPath(defaultMapsPath));
+				fd.setFilterPath(mySC.getMapPath());
 
 				fd.setFilterNames(new String[] {myTask + " maps (*." + myTaskFirstChar + "map)", "All files (*.*)"});
 				String path = fd.open();
 				if(path != null && !path.equals("")){
-					myEC.loadMap(new File(path));
+					mySC.loadMap(new File(path));
 				}
 			}
 		});
@@ -215,13 +209,6 @@ public class ControlPanel implements SimulationControlListener{
 		});
 	}
 
-	private String getFilterPath(String component) {
-		return System.getProperty("user.dir") 
-			+ System.getProperty("file.separator") + ".." 
-			+ System.getProperty("file.separator") + myTopLevelDir 
-			+ System.getProperty("file.separator") + component;
-	}
-	
 	private void setButtons(){
 		
 		myShell.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -251,7 +238,7 @@ public class ControlPanel implements SimulationControlListener{
 					fd.setFilterNames(new String[] {"Soar Agents (*.soar)", "All files (*.*)"});
 				}
 				
-				fd.setFilterPath(getFilterPath(defaultAgentsPath));
+				fd.setFilterPath(mySC.getAgentPath());
 				String oldPath = currentAgentPath;
 				currentAgentPath = fd.open();
 				if(currentAgentPath != null && !currentAgentPath.equals("")){
@@ -271,11 +258,11 @@ public class ControlPanel implements SimulationControlListener{
 				+ "\nshown in box below. Random color assigned if none chosen.");
 		createAgentButton.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				SoarAgent sa = myEC.loadAgent(new File(currentAgentPath), currentColorName);
+				SoarAgent sa = mySC.loadAgent(new File(currentAgentPath), currentColorName);
 				if(sa != null){
 					fireOpenAgentViewNotification(sa);
 				}
-				String[] ss = myEC.getColorsAvailable();
+				String[] ss = mySC.getColorsAvailable();
 				if(ss.length > 0){
 					colorButton.setText(ss[0]);
 					currentColorName = ss[0];
@@ -301,7 +288,7 @@ public class ControlPanel implements SimulationControlListener{
 				for(int i = 0; i < mis.length; i++){
 					mis[i].dispose();
 				}
-				String[] ss = myEC.getColorsAvailable();
+				String[] ss = mySC.getColorsAvailable();
 				if(ss.length == 0){
 					MenuItem mi = new MenuItem(m, SWT.PUSH);
 					mi.setText("*None*");
@@ -330,7 +317,7 @@ public class ControlPanel implements SimulationControlListener{
 		m2.addMenuListener(new MenuAdapter(){
 			public void menuShown(MenuEvent e){
 				removeMenuItems(m2);
-				String[] ss = myEC.getColorsUsed();
+				String[] ss = mySC.getColorsUsed();
 				if(ss.length == 0){
 					MenuItem mi = new MenuItem(m2, SWT.PUSH);
 					mi.setText("*None*");
@@ -340,8 +327,8 @@ public class ControlPanel implements SimulationControlListener{
 					mi.setText(ss[i]);
 					mi.addSelectionListener(new SelectionAdapter(){
 						public void widgetSelected(SelectionEvent e){
-							if(myEC.canDestroyAgent()){
-								myEC.destroyAgent(mi.getText());
+							if(mySC.canDestroyAgent()){
+								mySC.destroyAgent(mi.getText());
 							}
 						}
 					});
@@ -354,9 +341,9 @@ public class ControlPanel implements SimulationControlListener{
 		createHumanAgentButton.setToolTipText("Creates a human-controlled agent for " + myTaskNoun);
 		createHumanAgentButton.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				if(!myEC.isRunning()){
+				if(!mySC.isRunning()){
 					myManager.createHumanAgent(currentColorName);
-					String[] ss = myEC.getColorsAvailable();
+					String[] ss = mySC.getColorsAvailable();
 					if(ss.length > 0){
 						colorButton.setText(ss[0]);
 						currentColorName = ss[0];
@@ -393,12 +380,12 @@ public class ControlPanel implements SimulationControlListener{
 		b.setText("Step");
 		b.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				if(myEC.isRunning()){
-					myEC.stopSimulation();
+				if(mySC.isRunning()){
+					mySC.stopSimulation();
 				}
 				new Thread(){
 					public void run(){
-						myEC.singleStep();
+						mySC.singleStep();
 					}
 				}.start();
 			}
@@ -409,10 +396,10 @@ public class ControlPanel implements SimulationControlListener{
 		b.setText("Run");
 		b.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				if(!myEC.isRunning()){
+				if(!mySC.isRunning()){
 					new Thread(){
 						public void run(){
-							myEC.runSimulation();
+							mySC.runSimulation();
 						}
 					}.start();
 				}
@@ -424,8 +411,8 @@ public class ControlPanel implements SimulationControlListener{
 		b.setText("Stop");
 		b.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				if(myEC.isRunning()){
-					myEC.stopSimulation();
+				if(mySC.isRunning()){
+					mySC.stopSimulation();
 				}
 			}
 		});
@@ -459,7 +446,7 @@ public class ControlPanel implements SimulationControlListener{
 		for(int i = 0; i < mis.length; i++){
 			mis[i].dispose();
 		}
-		String[] ss = myEC.getColorsUsed();
+		String[] ss = mySC.getColorsUsed();
 		if(ss == null) return;
 		for(int i = 0; i < ss.length; i++){
 			final MenuItem mi = new MenuItem(minimaps, SWT.PUSH);
@@ -488,8 +475,8 @@ public class ControlPanel implements SimulationControlListener{
 		destroyAll.setText("Destroy all " + myTask + " agents");
 		destroyAll.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
-				if(myEC.canDestroyAgent()){
-					myEC.destroyAllAgents();
+				if(mySC.canDestroyAgent()){
+					mySC.destroyAllAgents();
 				}
 			}
 		});
@@ -499,7 +486,7 @@ public class ControlPanel implements SimulationControlListener{
 		waitOutput.setText("Run til output generated");
 		*/
 		
-		final String[] ecs = myEC.getColorsUsed();
+		final String[] ecs = mySC.getColorsUsed();
 		if(ecs == null) return;
 		for(int i = 0; i < ecs.length; i++){
 //TODO Attach the excise productions to something.
@@ -526,29 +513,29 @@ public class ControlPanel implements SimulationControlListener{
 				reload.addSelectionListener(new SelectionAdapter() {
 					private String myColor = ecs[j];
 					public void widgetSelected(SelectionEvent e){
-						myEC.reload(myColor);
+						mySC.reload(myColor);
 					}
 				});				
 				
 				reset.addSelectionListener(new SelectionAdapter() {
 					private String myColor = ecs[j];
 					public void widgetSelected(SelectionEvent e){
-						myEC.exciseAll(myColor);
-						myEC.reload(myColor);
+						mySC.exciseAll(myColor);
+						mySC.reload(myColor);
 					}
 				});				
 				
 				exciseAll.addSelectionListener(new SelectionAdapter() {
 					private String myColor = ecs[j];
 					public void widgetSelected(SelectionEvent e){
-						myEC.exciseAll(myColor);
+						mySC.exciseAll(myColor);
 					}
 				});
 				
 				exciseChunks.addSelectionListener(new SelectionAdapter() {
 					private String myColor = ecs[j];
 					public void widgetSelected(SelectionEvent e){
-						myEC.exciseChunks(myColor);
+						mySC.exciseChunks(myColor);
 					}
 				});
 				
@@ -570,7 +557,7 @@ public class ControlPanel implements SimulationControlListener{
 	}
 	
 	private SoarAgent findAgent(String colorName){
-		SoarAgent[] ags = myEC.getAllAgents();
+		SoarAgent[] ags = mySC.getAllAgents();
 		for(int i = 0; i < ags.length; i++){
 			if(ags[i].getColorName().equals(colorName)) return (ags[i]);
 		}
@@ -622,7 +609,7 @@ public class ControlPanel implements SimulationControlListener{
 	}
 	
 	public void agentCreated(SoarAgent created){
-		if(myEC.getColorsAvailable() == null || myEC.getColorsAvailable().length == 0){
+		if(mySC.getColorsAvailable() == null || mySC.getColorsAvailable().length == 0){
 			myDisplay.asyncExec(new Runnable(){
 				public void run(){
 					createAgentButton.setEnabled(false);
@@ -677,15 +664,15 @@ public class ControlPanel implements SimulationControlListener{
 	
 	public void UpdateButtonEnables()
 	{
-		runSimulationButton.setEnabled(myEC.isRunnable());
-		stopSimulationButton.setEnabled(myEC.isStoppable());
-		stepSimulationButton.setEnabled(myEC.isSteppable());
-		quitSimulationButton.setEnabled(myEC.isQuittable());
+		runSimulationButton.setEnabled(mySC.isRunnable());
+		stopSimulationButton.setEnabled(mySC.isStoppable());
+		stepSimulationButton.setEnabled(mySC.isSteppable());
+		quitSimulationButton.setEnabled(mySC.isQuittable());
 		
-		createAgentButton.setEnabled(currentAgentPath != "Click \"Load Agent\" to select productions" && !myEC.isRunning());
-		destroyAgentButton.setEnabled(myEC.getAllAgents().length != 0 && !myEC.isRunning());
-		createHumanAgentButton.setEnabled(!myEC.isRunning());
-		showMinimap.setEnabled(myEC.getAllAgents().length != 0);
+		createAgentButton.setEnabled(currentAgentPath != "Click \"Load Agent\" to select productions" && !mySC.isRunning());
+		destroyAgentButton.setEnabled(mySC.getAllAgents().length != 0 && !mySC.isRunning());
+		createHumanAgentButton.setEnabled(!mySC.isRunning());
+		showMinimap.setEnabled(mySC.getAllAgents().length != 0);
 	}
 	
 }

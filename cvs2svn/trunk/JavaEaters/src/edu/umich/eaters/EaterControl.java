@@ -70,6 +70,7 @@ public class EaterControl extends SimulationControl implements
 	 * @param infile The file to be used to create a new Eaters map.
 	 */
 	public EaterControl(File infile) {
+		generatePaths();
 		initSoar();
 		loadMap(infile);
 	}
@@ -78,8 +79,20 @@ public class EaterControl extends SimulationControl implements
 	 * Creates a new instance of EaterControl, generating a random map to be used.
 	 */
 	public EaterControl() {
+		generatePaths();
 		initSoar();
 		genMap();
+	}
+	
+	public void generatePaths() {
+		// Set up map, agent paths
+		mapPath = System.getProperty("user.dir") 
+		+ System.getProperty("file.separator") + ".." 
+		+ System.getProperty("file.separator") + "JavaEaters" 
+		+ System.getProperty("file.separator");
+		agentPath = mapPath;
+		mapPath += "maps";
+		agentPath += "agents";		
 	}
 	
 	public Agent getAgentByColor(String color)
