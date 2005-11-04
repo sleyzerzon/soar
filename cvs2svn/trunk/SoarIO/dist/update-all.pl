@@ -37,7 +37,7 @@ my @modules =
 foreach my $module (@modules) {
   print $module . " ...";
   chdir $tld . "/" . $module or die " Error: Couldn't change to $module";
-  my $ret = system "cvs -Q update $module";
+  my $ret = system "cvs -q update";
   if ($ret != 0) {
     die " Error: cvs returned error for $module";
   }

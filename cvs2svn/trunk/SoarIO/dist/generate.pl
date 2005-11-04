@@ -7,6 +7,8 @@
 
 use strict;
 use File::Path;
+use File::Copy;
+use File::Remove;
 
 if ($#ARGV != 5) {
   print "Usage: sf_user dev dist version tag\n";
@@ -58,7 +60,7 @@ mkdir "$dist/Soar-Suite-$version" or die "Could not create new package dir: $dis
 chdir "$dist/Soar-Suite-$version" or die "Could not change to package dir: $dist/Soar-Suite-$version";
 
 # Check out modules
-foreach $module (@modules) {
+foreach my $module (@modules) {
   my $ret = system "cvs -Q -d /cvsroot/soar export -r $tag $module";
   if ($ret != 0) {
     die "Error: cvs returned error for module $module";
@@ -67,33 +69,32 @@ foreach $module (@modules) {
 
 my $ret = system "cvs -Q -d :ext:$sf_user\@cvs.sourceforge.net:/cvsroot/soar export -r $tag visualsoar";
 if ($ret != 0) {
-  die "Error: cvs returned error for module $module";
+  die "Error: cvs returned error for module visualsoar";
 }
 
 # Move dist files to top level
-mv ${PACKAGE_ROOT}/SoarIO/dist/configure.ac ${PACKAGE_ROOT}
-mv ${PACKAGE_ROOT}/SoarIO/dist/install-sh ${PACKAGE_ROOT}
-mv ${PACKAGE_ROOT}/SoarIO/dist/Makefile.am ${PACKAGE_ROOT}
-mv ${PACKAGE_ROOT}/SoarIO/dist/build-everything.sh ${PACKAGE_ROOT}
-mv ${PACKAGE_ROOT}/SoarIO/dist/missing ${PACKAGE_ROOT}
-rm -rf ${PACKAGE_ROOT}/SoarIO/dist
+foreach my $distfile (@distfiles) {
+  move("$dist/Soar-Suite-$version/SoarIO/dist/$distfile", "$dist/Soar-Suite-$version") or die;
+}
+rmtree "$dist/Soar-Suite-$version/SoarIO/dist";
 
 # Copy top level docs
-cp $PACKAGE_ROOT/SoarIO/COPYING $DIST_ROOT/Soar-Suite-8.6.1/license.txt
-cp $PACKAGE_ROOT/Documentation/announce.txt $DIST_ROOT/Soar-Suite-8.6.1
+copy("$dist/Soar-Suite-$version/SoarIO/COPYING $dist/Soar-Suite-$version/license.txt");
+copy("$dist/Soar-Suite-$version/Documentation/announce.txt $dist/Soar-Suite-$version");
 
 # Initialize configure scripts (this recurses)
-cd ${PACKAGE_ROOT}; autoreconf 2>/dev/null
-
+chdir "$dist/Soar-Suite-$version" or die;
+$ret = system "autoreconf 2>/dev/null";
+if ($ret != 0) { die "Autoreconf failed!"; }
+      
 # Add binaries and data
-cp ${DEV_ROOT}/soar-library/swt.jar ${PACKAGE_ROOT}/soar-library
-mkdir ${PACKAGE_ROOT}/soar-library/mac
-cp ${DEV_ROOT}/soar-library/mac/* ${PACKAGE_ROOT}/soar-library/mac
+mkdir "$dist/Soar-Suite-$version/soar-library/mac" or die;
+copy("$dev/soar-library/mac/mac.soar", "$dist/Soar-Suite-$version/soar-library/mac") or die;
 
 # Remove unwanted files
-rm -rf ${PACKAGE_ROOT}/soar-library/*.dll
-rm -rf ${PACKAGE_ROOT}/soar-library/java_swt ${PACKAGE_ROOT}/soar-library/libswt-carbon-* ${PACKAGE_ROOT}/soar-library/libswt-pi-carbon-* ${PACKAGE_ROOT}/soar-library/libswt-webkit-carbon-* ${PACKAGE_ROOT}/soar-library/swt-carbon.jar ${PACKAGE_ROOT}/soar-library/swt-pi-carbon.jar
+chdir "$dist/Soar-Suite-$version/soar-library" or die;
+remove qw( *.dll java_swt libswt-carbon-* libswt-pi-carbon-* libswt-webkit-carbon-* swt-carbon.jar swt-pi-carbon.jar );
 
 # Create the tarball
-cd ${DIST_ROOT}
-tar cfj Soar-Suite-8.6.1.tar.bz2 Soar-Suite-8.6.1
+chdir "$dist" or die;
+$ret = system "tar cfj Soar-Suite-$version.tar.bz2 Soar-Suite-$version";
