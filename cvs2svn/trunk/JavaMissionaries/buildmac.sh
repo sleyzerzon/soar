@@ -7,13 +7,13 @@ then
     echo "Build failed."
     exit 1;
   fi
-  jar cfm ${SOARLIB}/mac.jar JarManifest-osx mac -C src .
+  jar cfm ${SOARLIB}/mac.jar JarManifest-osx -C src .
 else
   if ! javac -classpath .:${SOARLIB}/swt-motif.jar:${SOARLIB}/sml.jar -sourcepath src src/edu/umich/mac/MissionariesAndCannibals.java; then
     echo "Build failed."
     exit 1;
   fi
-  jar cfm ${SOARLIB}/mac.jar JarManifest-motif mac -C src .
+  jar cfm ${SOARLIB}/mac.jar JarManifest-motif -C src .
 fi
 
 if ! test -d ${SOARLIB}/mac; then
@@ -21,7 +21,7 @@ if ! test -d ${SOARLIB}/mac; then
 fi
 
 
-cp mac/mac.soar ${SOARLIB}/mac;
+cp src/mac/mac.soar ${SOARLIB}/mac;
 
 if [[ `uname -s` == "Darwin" ]]
 then
