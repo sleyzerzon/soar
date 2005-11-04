@@ -1745,6 +1745,7 @@ namespace gSKI
       case gSKI_RUN_PHASE:
          return &m_phaseCount;
       case gSKI_RUN_ELABORATION_CYCLE:
+         return &m_elaborationCount; 
  		 if (m_agent->operand2_mode) {
  			//      count only true Soar Elaboration cycles
 			//      this makes most sense for Soar 8 mode.
