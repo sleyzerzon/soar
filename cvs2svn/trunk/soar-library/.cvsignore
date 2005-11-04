@@ -1,4 +1,4 @@
-javabaseenvironment.jar
+JavaBaseEnvironment.jar
 gSKId.dll
 gSKI.dll
 towersSML.exe
@@ -37,3 +37,4 @@ sml.jar
 mac
 mac.jar
 log.txt
+eaters.jar
