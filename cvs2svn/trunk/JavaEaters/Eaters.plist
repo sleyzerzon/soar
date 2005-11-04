@@ -5,7 +5,7 @@
 	<key>CFBundleExecutable</key>
 	<string>JavaApplicationStub</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Tanksoar, Copyright University of Michigan 2005.</string>
+	<string>Eaters, Copyright University of Michigan 2005.</string>
 	<key>CFBundleIconFile</key>
 	<string>soar.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Tanksoar</string>
+	<string>Eaters</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -27,11 +27,11 @@
 		<key>StartOnMainThread</key>
                 <true/>
 		<key>ClassPath</key>
-		<string>/Applications/Soar-8.6.2/soar-library/swt-osx.jar:/Applications/Soar-8.6.2/soar-library/sml.jar:$JAVAROOT/tanksoar.jar</string>
+		<string>/Applications/Soar-8.6.2/soar-library/swt-osx.jar:/Applications/Soar-8.6.2/soar-library/sml.jar:$JAVAROOT/eaters.jar</string>
 		<key>JVMVersion</key>
 		<string>1.4*</string>
 		<key>MainClass</key>
-		<string>edu.umich.tanksoar.TanksoarJ</string>
+		<string>edu.umich.eaters.Eaters</string>
 		<key>VMOptions</key>
 		<string>-Xmx512m -Djava.library.path=/Applications/Soar-8.6.2/lib:/Applications/Soar-8.6.2/soar-library -Dorg.eclipse.swt.internal.carbon.smallFonts</string>
 		<key>WorkingDirectory</key>
