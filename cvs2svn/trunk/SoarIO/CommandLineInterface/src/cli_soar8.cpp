@@ -90,7 +90,7 @@ bool CommandLineInterface::DoSoar8(gSKI::IAgent* pAgent, bool* pSoar8) {
 		SetErrorDetail("Unable to get production manager.");
 		return SetError(CLIError::kgSKIError);
 	}
-	gSKI::tIProductionIterator* pIter = pProductionManager->GetAllProductions(&m_gSKIError);
+	gSKI::tIProductionIterator* pIter = pProductionManager->GetAllProductions(false, &m_gSKIError);
 	if (gSKI::isError(m_gSKIError) || !pIter) {
 		SetErrorDetail("Unable to get all productions.");
 		return SetError(CLIError::kgSKIError);

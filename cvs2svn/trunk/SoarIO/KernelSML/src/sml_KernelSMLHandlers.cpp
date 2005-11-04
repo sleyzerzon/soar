@@ -536,7 +536,7 @@ bool KernelSML::HandleIsProductionLoaded(gSKI::IAgent* pAgent, char const* pComm
 		return InvalidArg(pConnection, pResponse, pCommandName, "Need to specify the production name to check.") ;
 	}
 
-	tIProductionIterator* prodIter = pAgent->GetProductionManager()->GetProduction(pName, pError) ;
+	tIProductionIterator* prodIter = pAgent->GetProductionManager()->GetProduction(pName, false, pError) ;
 	bool found = prodIter->GetNumElements() > 0 ;
 	prodIter->Release() ;
 

@@ -612,7 +612,7 @@ WARNING!!!  All of the Get*Production(s) methods appear to leak symbol ref count
 the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
    */
 
-   tIProductionIterator* ProductionManager::GetProduction(const char* pattern, Error* err) const
+   tIProductionIterator* ProductionManager::GetProduction(const char* pattern, bool includeConditions, Error* err) const
    {
       //
       // Fetch the array of linked lists that hold all of the productions.
@@ -627,7 +627,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
          {
             if(strcmp(pattern, currentProdList->name->sc.name) == 0)
             {
-               userProds.push_back(new Production(currentProdList, a));
+               userProds.push_back(new Production(currentProdList, includeConditions, a));
             }
          }
       }
@@ -643,13 +643,13 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
  \____|\___|\__/_/   \_\_|_|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|___/
    ===============================
    */
-   tIProductionIterator* ProductionManager::GetAllProductions(Error* err) const
+   tIProductionIterator* ProductionManager::GetAllProductions(bool includeConditions, Error* err) const
    {
       prodVec UserProdVec;
 
       for(unsigned char type = 0; type < NUM_PRODUCTION_TYPES; ++type)
       {
-         GetProductions(UserProdVec, type);
+         GetProductions(UserProdVec, includeConditions, type);
       }
 
       return new tProductionIter(UserProdVec);
@@ -664,7 +664,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
  \____|\___|\__|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|___/
    ==================================
    */
-   void ProductionManager::GetProductions(prodVec& prodVec, unsigned char prodType) const
+   void ProductionManager::GetProductions(prodVec& prodVec, bool includeConditions, unsigned char prodType) const
    {
       agent*              a = m_agent->GetSoarAgent();
       production*         prods;
@@ -674,7 +674,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
       // While there are still user productions in the list.
       for(; prods != 0; prods = prods->next)
       {
-         Production *p = new Production(prods, a);
+         Production *p = new Production(prods, includeConditions, a);
          prodVec.push_back(p);
       }
    }
@@ -696,7 +696,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
    {
       prodVec UserProdVec;
 
-      GetProductions(UserProdVec, USER_PRODUCTION_TYPE);
+      GetProductions(UserProdVec, false, USER_PRODUCTION_TYPE);
 
       return new tProductionIter(UserProdVec);
    }
@@ -714,7 +714,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
    {
       prodVec ChunkProdVec;
 
-      GetProductions(ChunkProdVec, CHUNK_PRODUCTION_TYPE);
+      GetProductions(ChunkProdVec, false, CHUNK_PRODUCTION_TYPE);
 
       return new tProductionIter(ChunkProdVec);
    }
@@ -732,7 +732,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
    {
       prodVec JustificationProdVec;
 
-      GetProductions(JustificationProdVec, JUSTIFICATION_PRODUCTION_TYPE);
+      GetProductions(JustificationProdVec, false, JUSTIFICATION_PRODUCTION_TYPE);
 
       return new tProductionIter(JustificationProdVec);
    }
@@ -754,7 +754,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
    {
       prodVec DefaultProdVec;
 
-      GetProductions(DefaultProdVec, DEFAULT_PRODUCTION_TYPE);
+      GetProductions(DefaultProdVec, false, DEFAULT_PRODUCTION_TYPE);
 
       return new tProductionIter(DefaultProdVec);
    }
@@ -1060,7 +1060,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
          if((eventId == gSKI_K_EVENT_PRODUCTION_ADDED) || 
             (eventId == gSKI_K_EVENT_PRODUCTION_REMOVED))
          {
-            p  = new Production(static_cast<production*>(data), pm->m_agent->GetSoarAgent());
+            p  = new Production(static_cast<production*>(data), false, pm->m_agent->GetSoarAgent());
             pi = 0;
          }
          else
@@ -1069,7 +1069,7 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
             instantiation* soarPI = static_cast<instantiation*>(data);
 
             // Get the production from the instantiation
-            p =  new Production(soarPI->prod, pm->m_agent->GetSoarAgent());
+            p =  new Production(soarPI->prod, false, pm->m_agent->GetSoarAgent());
 
             // Dont have an instantiation yet
             pi = 0;

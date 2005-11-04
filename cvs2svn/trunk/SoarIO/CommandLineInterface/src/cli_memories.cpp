@@ -111,7 +111,7 @@ bool CommandLineInterface::DoMemories(gSKI::IAgent* pAgent, const MemoriesBitset
 		if (!pProduction) return SetError(CLIError::kProductionRequired);
 		pIter = pProductionManager->GetProduction(pProduction->c_str());
 	} else {
-		pIter = pProductionManager->GetAllProductions(&m_gSKIError);
+		pIter = pProductionManager->GetAllProductions(false, &m_gSKIError);
 		if (gSKI::isError(m_gSKIError)) {
 			SetErrorDetail("Unable to get all productions.");
 			return SetError(CLIError::kgSKIError);

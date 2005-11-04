@@ -326,6 +326,9 @@ namespace gSKI {
        * @todo Specify what a pattern is exactly.
        *
        * @param pattern The Pattern we are matching against.
+	   * @param includeConditions	If true, the productions include all gSKI condition objects.
+	   *			This process involves copying the underlying list of conditions in kernel production, so
+	   *			you should only do this if you're going to work with the conditions (which is not common).
        * @param  err Pointer to client-owned error structure.  If the pointer
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
@@ -333,11 +336,14 @@ namespace gSKI {
        *
        * @returns The list of productions that match the pattern.
        */
-      virtual tIProductionIterator* GetProduction(const char* pattern, Error* err = 0) const = 0;
+      virtual tIProductionIterator* GetProduction(const char* pattern, bool includeConditions = false, Error* err = 0) const = 0;
 
       /**
        * @brief Gets all of the productions.
        *
+	   * @param includeConditions	If true, the productions include all gSKI condition objects.
+	   *			This process involves copying the underlying list of conditions in kernel production, so
+	   *			you should only do this if you're going to work with the conditions (which is not common).
        * @param  err Pointer to client-owned error structure.  If the pointer
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
@@ -346,7 +352,7 @@ namespace gSKI {
        * @returns An iterator to a list of all of the productions for
        *          this agent.
        */
-      virtual tIProductionIterator* GetAllProductions(Error* err = 0) const = 0;
+      virtual tIProductionIterator* GetAllProductions(bool includeConditions = false, Error* err = 0) const = 0;
  
       /**
        * @brief Gets user productions

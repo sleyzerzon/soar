@@ -49,7 +49,7 @@ namespace gSKI {
        * @brief: Constructor
        */
       //{
-      Production(production *prod, agent* agent);
+      Production(production *prod, bool includeConditions, agent* agent);
       Production(const Production& old): 
          RefCountedReleaseImpl<IProduction, true>(old),
          m_soarProduction(0), m_agent(0), m_conditionSet(0)

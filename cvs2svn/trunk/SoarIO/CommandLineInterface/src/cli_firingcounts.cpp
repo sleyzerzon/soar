@@ -81,7 +81,7 @@ bool CommandLineInterface::DoFiringCounts(gSKI::IAgent* pAgent, const int number
 			return SetError(CLIError::kgSKIError);
 		}
 	} else {
-		pIter = pProductionManager->GetAllProductions(&m_gSKIError);
+		pIter = pProductionManager->GetAllProductions(false, &m_gSKIError);
 		if (gSKI::isError(m_gSKIError)) {
 			SetErrorDetail("Unable to get all productions.");
 			return SetError(CLIError::kgSKIError);

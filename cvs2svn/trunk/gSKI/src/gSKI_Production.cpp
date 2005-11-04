@@ -48,21 +48,30 @@ namespace gSKI
 |_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
    ==================================
    */
-   Production::Production(production *prod, agent* agent): m_soarProduction(prod),
-                                                           m_agent(agent),
-                                                           m_conditionSet(0)  
+   // If includeConditions is false, the conditions and actions are not loaded (i.e. creating gSKI copies of the kernel conditions)
+   // and only the name etc. are valid in the production.  This turns out to be
+   // all that we are interested in 95% of the time -- boosting performance substantially.
+   // It also allows us to work around some deep bugs in gSKI's handling of conditions which in turn
+   // lead to memory leaks.  If we ever solve those problems this optional loading is still helpful
+   // due to the performance benefits.
+   Production::Production(production *prod, bool includeConditions, agent* agent):
+							m_soarProduction(prod), m_agent(agent), m_conditionSet(0)  
    {
       condition* top;
       condition* bottom;
       action*    rhs;
-      m_conditionSet = new ConditionSet(m_agent);
-      
-      // This will extract the structures for the lhs and the rhs
-      p_node_to_conditions_and_nots (m_agent, m_soarProduction->p_node, 0, 0, &top, &bottom, 0,&rhs);
 
-      // We tranlate the structures to the gSKI structures
-      loadConditions(top, *m_conditionSet);
-      loadActions(rhs, m_actions, m_functions);
+	  if (includeConditions)
+	  {
+		m_conditionSet = new ConditionSet(m_agent);
+	      
+		// This will extract the structures for the lhs and the rhs
+		p_node_to_conditions_and_nots (m_agent, m_soarProduction->p_node, 0, 0, &top, &bottom, 0,&rhs);
+
+		// We tranlate the structures to the gSKI structures
+		loadConditions(top, *m_conditionSet);
+		loadActions(rhs, m_actions, m_functions);
+	  }
    }
 
    /** 
@@ -273,6 +282,9 @@ namespace gSKI
 
    IConditionSet* Production::GetConditions(Error *err) const
    {
+      // If this is NULL, you should ask to includeConditions when building the production object.
+      assert(m_conditionSet) ;
+
       return m_conditionSet;
    }
 
@@ -288,7 +300,10 @@ namespace gSKI
 
    tIRhsActionIterator* Production::GetActions(Error *err)
    {
-      ClearError(err);
+      // If this is NULL, you should ask to includeConditions (and actions) when building the production object.
+      assert(m_conditionSet) ;
+
+	  ClearError(err);
       return new Iterator<IRhsAction*, tRhsActionVec>(m_actions);
    }
 
@@ -307,6 +322,9 @@ namespace gSKI
    */
    tIRhsFunctionActionIterator* Production::GetStandAloneFunctions(Error* err)
    {
+      // If this is NULL, you should ask to includeConditions when building the production object.
+      assert(m_conditionSet) ;
+
       ClearError(err);
       return new Iterator<IRhsFunctionAction*, tRhsFunctionVec>(m_functions);
    }
