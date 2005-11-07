@@ -539,7 +539,7 @@ SoarTextIO::RemoteConnect()
 	if(pKernel->GetNumberAgents() == 1)
 	{
 		pAgent = pKernel->GetAgentByIndex(0);
-		cout << "Your are connected to agent soar1" << endl;
+		cout << "Your are connected to agent " << pAgent->GetAgentName() << endl;
 	}
 	else
 	{
