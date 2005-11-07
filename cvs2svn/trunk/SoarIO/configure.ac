@@ -281,7 +281,7 @@ if test "$java" = "true" ; then
   AC_ARG_WITH(javaincl, [  --with-javaincl=path    Set location of Java include directory], [JAVAINCDIR="$withval"], [JAVAINCDIR=])
 
   if test -z "$JAVAINCDIR"; then
-    JAVAINCDIR="/opt/sun-jdk-*/include /opt/blackdown-jdk-*/include /usr/j2sdk*/include /usr/local/j2sdk*/include /usr/jdk*/include /usr/local/jdk*/include /opt/j2sdk*/include /opt/jdk*/include /usr/java/include /usr/java/j2sdk*/include /usr/java/jdk*/include /usr/local/java/include /opt/java/include /usr/include/java /usr/local/include/java /usr/lib/java/include /usr/include/kaffe /usr/local/include/kaffe /usr/include"
+    JAVAINCDIR="/opt/sun-jdk-*/include /opt/blackdown-jdk-*/include /usr/j2sdk*/include /usr/local/j2sdk*/include /usr/jdk*/include /usr/local/jdk*/include /opt/j2sdk*/include /opt/jdk*/include /usr/java/include /usr/java/j2sdk*/include /usr/java/jdk*/include /usr/local/java/include /opt/java/include /usr/include/java /usr/local/include/java /usr/lib/java/include /usr/include/kaffe /usr/local/include/kaffe /usr/include /usr/lib/j2sdk*/include"
 
     # Add in default installation directory on Windows for Cygwin
     case $host in

@@ -8,9 +8,9 @@
 use strict;
 use File::Path;
 use File::Copy;
-use File::Remove;
+use File::Remove qw(remove);
 
-if ($#ARGV != 5) {
+if ($#ARGV != 4) {
   print "Usage: sf_user dev dist version tag\n";
   print "  sf_user   username on sourceforge.net\n";
   print "  dev       full path to development installation\n";
@@ -79,11 +79,13 @@ foreach my $distfile (@distfiles) {
 rmtree "$dist/Soar-Suite-$version/SoarIO/dist";
 
 # Copy top level docs
-copy("$dist/Soar-Suite-$version/SoarIO/COPYING $dist/Soar-Suite-$version/license.txt");
-copy("$dist/Soar-Suite-$version/Documentation/announce.txt $dist/Soar-Suite-$version");
+copy("$dist/Soar-Suite-$version/SoarIO/COPYING", "$dist/Soar-Suite-$version/license.txt");
+copy("$dist/Soar-Suite-$version/Documentation/announce.txt", "$dist/Soar-Suite-$version");
 
 # Initialize configure scripts (this recurses)
 chdir "$dist/Soar-Suite-$version" or die;
+$ret = system "libtoolize --copy --force 2>/dev/null";
+if ($ret != 0) { die "libtoolize failed!"; }
 $ret = system "autoreconf 2>/dev/null";
 if ($ret != 0) { die "Autoreconf failed!"; }
       
