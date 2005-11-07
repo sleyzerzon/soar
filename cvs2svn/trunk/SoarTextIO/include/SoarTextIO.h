@@ -83,7 +83,7 @@ private:
 	int wordNum;
 	string checker, loc, word, forMem, top_level;
 	ifstream inFile;
-	bool loadPlease, subtractOne, ShouldPrintNow;
+	bool loadPlease, subtractOne, ShouldPrintNow, PrintNothing;
 	string agentName;	
 
 	//******MEMBER FUNCTIONS******

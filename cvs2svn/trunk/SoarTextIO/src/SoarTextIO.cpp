@@ -69,6 +69,7 @@ SoarTextIO::init()
 	initiateRem = false;
 	printNow = true;
 	ShouldPrintNow = false;
+	PrintNothing = false;
 	
 	if(!init_soar)
 	{
@@ -202,17 +203,17 @@ SoarTextIO::WriteCycle(istream* getFrom)
 	if(ShouldPrintNow)
 	{
 		cout << "READ FROM FILE: ";
-		if(inFile)
+		if(!PrintNothing)
 			cout << memory[memory.size() - 1] << endl;
 		else
-			cout << endl;
+			cout << "<NOTHING>" << endl;
 		ShouldPrintNow = false;
 	}
 	else
 		printRead = true; 
 
 	
-	while(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD" && getFrom->peek() != '\n' && checker != "#&#&" )
+	while(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD" && getFrom->peek() != '\n' && getFrom->peek() != EOF && checker != "#&#&" )
 	{
 		wordNum++;
 		word = "";
@@ -320,6 +321,7 @@ SoarTextIO::CloseFile()
 	inFile.clear();
 	inFile.close();
 	cout << "You do not have a file open, or the file has ended." << endl;
+	PrintNothing = true;
 }
 
 void
@@ -492,16 +494,11 @@ SoarTextIO::loadMem()
 	inFile.open(loc.c_str());
 
 	if(!inFile)
-	{
 		cout << "***FILE FAILED TO OPEN***";
-		//inFile.clear();
-		//WhenReady();
-	}
-	/*else
-	{
-		loadPlease = true;
-		subtractOne = true;
-	}	*/
+	else
+		PrintNothing = false;
+
+
 }
 
 
