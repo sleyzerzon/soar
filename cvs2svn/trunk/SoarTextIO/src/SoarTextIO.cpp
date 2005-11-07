@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <conio.h>
+#include <string>
 
 using namespace sml;
 
@@ -35,6 +36,13 @@ SoarTextIO::SoarTextIO()
 	RemoteConnect();
 	cout << endl;	
 	
+	
+}
+
+SoarTextIO::~SoarTextIO()
+{
+	pKernel->Shutdown();
+	delete pKernel;
 }
 
 void
@@ -60,6 +68,7 @@ SoarTextIO::init()
 	initiateRes = false;
 	initiateRem = false;
 	printNow = true;
+	ShouldPrintNow = false;
 	
 	if(!init_soar)
 	{
@@ -98,14 +107,7 @@ SoarTextIO::run()
 			//KillKernel();
 			ResetConnect();
 		}
-		if(!inFile)
-			WriteCycle(cin);
-		else
-		{
-			loadPlease = false;
-			checker = "";
-			WriteCycle(inFile);
-		}
+		WriteCycle(&cin);
 		if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD")
 		{
 			if(NextWord.size() > 0)
@@ -185,7 +187,7 @@ MyAgentEventHandler(smlAgentEventId id, void* pUserData, Agent* pAgent)
 }
 
 void
-SoarTextIO::WriteCycle(istream & getFrom)
+SoarTextIO::WriteCycle(istream* getFrom)
 {
 	wordNum = 0;
 	NextWord.resize(0);
@@ -194,30 +196,50 @@ SoarTextIO::WriteCycle(istream & getFrom)
 
 	word = "", forMem = "";
 	checker = "";
-	while(!printNow) { Sleep(1);
-	}
-	if(getFrom == cin)
+	while(!printNow) { Sleep(1); }
+	if(*getFrom == cin)
         cout << endl << endl << endl << endl << "> ";
+	if(ShouldPrintNow)
+	{
+		cout << "READ FROM FILE: ";
+		if(inFile)
+			cout << memory[memory.size() - 1] << endl;
+		else
+			cout << endl;
+		ShouldPrintNow = false;
+	}
 	else
 		printRead = true; 
 
 	
-	while(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && getFrom.peek() != '\n' && checker != "#&#&" )
+	while(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD" && getFrom->peek() != '\n' && checker != "#&#&" )
 	{
 		wordNum++;
 		word = "";
-		getFrom >> word;
+		*getFrom >> word;
 		if(init_soar)
 			init();  //reintializes SoarTextIO
 		while(word == "")
 		{
 			cout << "> ";
-			getFrom >> word;
+			if(!*getFrom)
+				getFrom = &cin;
+			*getFrom >> word;
 		}
 		if(pKernel)
-		checker = word;
+			checker = word;
 		makeUpper(checker);
-
+		if(checker == "--NEXTLINE")
+		{
+			ShouldPrintNow = true;
+			getFrom = &inFile;
+			GetFileInput(word);
+			if(!*getFrom)
+			{
+				CloseFile();
+				checker = "#&#&";  // this just gets us out of next if statement, this is bad and needs to be changed
+			}
+		}
 		if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD" && checker != "#&#&" && checker != "--STOP")
 		{
 			if(!created)
@@ -246,7 +268,7 @@ SoarTextIO::WriteCycle(istream & getFrom)
 		else if(checker == "--CMDLIN")
 		{
 			char command[100];
-			getFrom.getline(command,100);
+			getFrom->getline(command,100);
 			pAgent->ExecuteCommandLine(command, true);
 		}
 		else if(checker == "--NEWTHREAD")
@@ -260,28 +282,45 @@ SoarTextIO::WriteCycle(istream & getFrom)
 		else if(checker == "--STEP")
 			step();
 	}
-	if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--SAVE" && checker != "==LOAD" && !loadPlease && checker != "--QUIT" && checker != "--STOP")
+	if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--SAVE" && checker != "--LOAD" && !loadPlease && checker != "--QUIT" && checker != "--STOP")
 	{
 		if(getFrom != cin)
 		{
 			wordNum--;
 		}
-		forMem += "#&#&"; //#&#& used as delimeter in save files
-		memory.push_back(forMem);
+		if(forMem != "")
+			memory.push_back(forMem.substr(0, forMem.size() - 1));
 		if(sentStore.size() >0)
 			sml::IntElement* tmp3 = pAgent->CreateIntWME(sentStore[0], "length", wordNum); //add counter for num words
 	}
-	if(printRead)
-	{
-		cout << "From File: \"" << forMem.substr(0,forMem.size()-5) << "\"" << endl; 
-	}
 	char garbage;
 	if(checker != "--CMDLIN")
-		getFrom.get(garbage);
+		getFrom->get(garbage);
 	
 }
 
+bool
+SoarTextIO::GetFileInput(string& word)
+{
+	if(!inFile)
+		return false;
+	while(true)
+	{
+		inFile >> word;
+		if(word[0] != '#')  // not a comment
+			break;
+		getline(inFile, word);  // clears the line of comments
+	}
+	return true;
+}
 
+void
+SoarTextIO::CloseFile()
+{
+	inFile.clear();
+	inFile.close();
+	cout << "You do not have a file open, or the file has ended." << endl;
+}
 
 void
 SoarTextIO::RespondCycle()
@@ -419,7 +458,8 @@ SoarTextIO::CreateWord()
 void
 SoarTextIO::saveMem()  
 {
-	locFinder();
+//	locFinder();
+	cin >> loc;
 	ofstream outFile;
 	outFile.open(loc.c_str());
 
@@ -433,13 +473,12 @@ SoarTextIO::saveMem()
 		for(unsigned int i = 0; i < memory.size(); i++)
 		{
 			outFile << memory[i];
-			if(i != memory.size()-1)
-				outFile << endl;
+			outFile << endl;
 		}
 		//outFile << "&&&&" ; //used as delimeter for file
 		cout << "***YOUR FILE HAS BEEN SAVED***";
 		outFile.close();
-		WhenReady();
+	//	WhenReady();
 	}	
 }
 
@@ -447,7 +486,7 @@ void
 SoarTextIO::loadMem()
 {
 	
-	locFinder();
+	cin >> loc;
 	inFile.close();
 	inFile.clear();
 	inFile.open(loc.c_str());
@@ -456,36 +495,16 @@ SoarTextIO::loadMem()
 	{
 		cout << "***FILE FAILED TO OPEN***";
 		//inFile.clear();
-		WhenReady();
+		//WhenReady();
 	}
-	else
+	/*else
 	{
 		loadPlease = true;
 		subtractOne = true;
-	}	
+	}	*/
 }
 
-void
-SoarTextIO::locFinder()
-{
-	cout << "Please enter the name of the file: ";
-	string fileName;
-	string tmp;
-	char garbage[1000];
-	cin.getline(garbage,1000);
-	while(cin.peek() != '\n')
-	{
-		cin >> tmp;
-		if(fileName != "")
-			tmp = " " + tmp;
-		fileName += tmp;
-	}
-	cout << endl;
 
-	string location = "SoarTextIO\\Conversations\\";
-
-	loc = location + fileName;	
-}
 
 void
 SoarTextIO::ResetConnect()
@@ -520,23 +539,31 @@ SoarTextIO::RemoteConnect()
 		pKernel = sml::Kernel::CreateRemoteConnection( true , NULL , 12121 );
 	}
 	cout << endl << "A connection to the kernel has been made." << endl;
-	cout << endl << "What is the name of the agent you are trying to connect to: ";
-	string name;
-	cin >> name;
-	pAgent = pKernel->GetAgent(name.c_str());
-	while(!pKernel->IsAgentValid(pAgent))
+	if(pKernel->GetNumberAgents() == 1)
 	{
-		cout << "That agent name is invalid, please enter a new one: ";
+		pAgent = pKernel->GetAgentByIndex(0);
+		cout << "Your are connected to agent soar1" << endl;
+	}
+	else
+	{
+		cout << endl << "What is the name of the agent you are trying to connect to: ";
+		string name;
 		cin >> name;
 		pAgent = pKernel->GetAgent(name.c_str());
+		while(!pKernel->IsAgentValid(pAgent))
+		{
+			cout << "That agent name is invalid, please enter a new one: ";
+			cin >> name;
+			pAgent = pKernel->GetAgent(name.c_str());
+		}
+		if (pKernel->HadError())
+		{
+			cout << pKernel->GetLastErrorDescription() << endl;
+			return ;
+		}	
+		char junk;
+		cin.get(junk);
 	}
-	if (pKernel->HadError())
-	{
-		cout << pKernel->GetLastErrorDescription() << endl;
-		return ;
-	}	
-	char junk;
-	cin.get(junk);
 	init();
 
 	

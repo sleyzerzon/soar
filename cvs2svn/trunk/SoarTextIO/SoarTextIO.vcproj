@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\soar-8.6.1\SoarIO\ClientSML\include; C:\soar-8.6.1\SoarTextIO\include"
+				AdditionalIncludeDirectories="C:\soar-8.6.2x\SoarIO\ClientSML\include; C:\soar-8.6.2x\SoarTextIO\include"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="0"
@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\soar-8.6.1\soar-library\$(ProjectName).exe"
+				OutputFile="C:\soar-8.6.2x\soar-library\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				AssemblyDebug="1"/>

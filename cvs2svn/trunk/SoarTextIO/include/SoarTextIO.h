@@ -29,6 +29,7 @@ public:
 
 	//******CONSTRUCTORS******
 	SoarTextIO();
+	~SoarTextIO();
 
 	void RespondCycle();
 	//gets output from agent
@@ -82,10 +83,8 @@ private:
 	int wordNum;
 	string checker, loc, word, forMem, top_level;
 	ifstream inFile;
-	bool loadPlease, subtractOne;
-	string agentName;
-
-	
+	bool loadPlease, subtractOne, ShouldPrintNow;
+	string agentName;	
 
 	//******MEMBER FUNCTIONS******
 	void init();
@@ -97,7 +96,7 @@ private:
 	void createSentId();
 	//Creates Id for every sentence
 
-	void WriteCycle(istream & getFrom);
+	void WriteCycle(istream* getFrom);
 	//controls input
 
 	void spawnRunner();
@@ -109,7 +108,7 @@ private:
 	void saveMem();
 	//saves memory to a file
 
-	void locFinder();
+	//void locFinder();
 	//in charge of getting file names
 
 	void loadMem();
@@ -137,6 +136,12 @@ private:
 	void step();
 
 	string GetRelevant( string toShorten );
+
+	char checkNext(istream& getFrom);
+
+	bool GetFileInput(string& word);
+
+	void CloseFile();
 
 	
 
