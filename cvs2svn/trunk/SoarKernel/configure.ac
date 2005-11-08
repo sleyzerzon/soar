@@ -1,12 +1,12 @@
 ###########################################
 # Author: Jonathan Voigt, voigtjr@gmail.com
-# Date: 2004
+# Date: 2005
 ###########################################
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([SoarKernel], [8.6.1], [soar-group@lists.sourceforge.net])
+AC_INIT([SoarKernel], [8.6.2], [soar-group@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([include/soarkernel.h])
 AM_INIT_AUTOMAKE([foreign])
 AC_REVISION($Revision$)
@@ -26,8 +26,9 @@ AC_PROG_MAKE_SET
 # Checks for libraries.
 
 # Checks for header files.
+AC_PATH_X
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h memory.h stddef.h stdlib.h string.h sys/time.h unistd.h utime.h])
+AC_CHECK_HEADERS([malloc.h memory.h stddef.h stdlib.h string.h sys/param.h sys/time.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -35,15 +36,15 @@ AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
-AC_PATH_X
 AC_STRUCT_TM
-AC_TYPE_SIGNAL
+AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([endpwent getcwd gethostname gettimeofday memset modf sqrt])
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([endpwent getcwd gethostname gettimeofday memset modf sqrt strchr strtol])
 
 SOAR_CXXFLAGS="-Wall -g"
 AC_SUBST(SOAR_CXXFLAGS)
