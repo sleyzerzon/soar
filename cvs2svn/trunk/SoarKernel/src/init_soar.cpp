@@ -40,7 +40,6 @@
 #include "io.h"
 #include "rete.h"
 #include "gdatastructs.h"
-#include "interface.h"
 #include "kernel_struct.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
@@ -413,6 +412,15 @@ void determine_lapsing (agent* thisAgent) {
          }
       }
    }
+}
+/* RMJ;
+   When doing attentional lapsing, we need a function that determines
+   when (and for how long) attentional lapses should occur.  This
+   will normally be provided as a user-defined TCL procedure.  But
+   we need to put a placeholder function here just to be safe.
+*/
+long init_lapse_duration(struct timeval *tv) {
+   return 0;
 }
 #endif
 
@@ -1587,6 +1595,20 @@ extern char *getenv();
 
 /* AGR 536  Soar core dumped when it used filenames longer than 1000 chars
    but shorter than MAXPATHLEN (from sys/param.h).  4-May-94  */
+
+// KJC Nov 05:  moved here from old interface.cpp, so could remove interface.* files
+void load_file (Kernel* thisKernel, agent* thisAgent, char *file_name, FILE *already_open_file) {
+Bool old_print_prompt_flag;
+
+  old_print_prompt_flag = thisAgent->print_prompt_flag;
+  thisAgent->print_prompt_flag = FALSE;
+
+  start_lex_from_file (thisAgent, file_name, already_open_file);
+  //repeatedly_read_and_dispatch_commands (thisKernel, thisAgent);
+  stop_lex_from_file (thisAgent);
+
+  thisAgent->print_prompt_flag = old_print_prompt_flag;
+}
 
 void load_init_file (Kernel* thisKernel, agent* thisAgent) {
 #define LOAD_INIT_FILE_BUFFER_SIZE 1000

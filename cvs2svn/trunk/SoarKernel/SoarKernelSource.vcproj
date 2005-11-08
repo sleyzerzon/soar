@@ -251,21 +251,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\interface.cpp">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\src\io.cpp">
 				<FileConfiguration
 					Name="Release|Win32">
@@ -297,21 +282,6 @@
 			</File>
 			<File
 				RelativePath=".\src\lexer.cpp">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\src\ma_interface.cpp">
 				<FileConfiguration
 					Name="Release|Win32">
 					<Tool
@@ -491,21 +461,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\scheduler.cpp">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\src\symtab.cpp">
 				<FileConfiguration
 					Name="Release|Win32">
@@ -522,21 +477,6 @@
 			</File>
 			<File
 				RelativePath=".\src\tempmem.cpp">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\src\tilde.cpp">
 				<FileConfiguration
 					Name="Release|Win32">
 					<Tool
@@ -642,9 +582,6 @@
 				RelativePath=".\include\instantiations.h">
 			</File>
 			<File
-				RelativePath=".\src\interface.h">
-			</File>
-			<File
 				RelativePath=".\include\io.h">
 			</File>
 			<File
@@ -690,9 +627,6 @@
 				RelativePath=".\include\rhsfun_math.h">
 			</File>
 			<File
-				RelativePath=".\include\scheduler.h">
-			</File>
-			<File
 				RelativePath=".\include\soarkernel.h">
 			</File>
 			<File
@@ -706,9 +640,6 @@
 			</File>
 			<File
 				RelativePath=".\include\tempmem.h">
-			</File>
-			<File
-				RelativePath=".\src\tilde.h">
 			</File>
 			<File
 				RelativePath=".\include\trace.h">

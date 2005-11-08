@@ -33,7 +33,6 @@
 #include "gsysparam.h"
 #include "init_soar.h"
 #include "decide.h"
-#include "interface.h"
 #include "print.h"
 #include "recmem.h"
 #include "backtrace.h"
@@ -338,8 +337,6 @@ void initialize_soar_agent(Kernel *thisKernel, agent* thisAgent) {
   soar_invoke_callbacks(thisAgent, thisAgent, 
 			AFTER_INIT_AGENT_CALLBACK,
 			(soar_call_data) NULL);
-
-  scheduler_cycle_count = 0;
 }
 
 /*

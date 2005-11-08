@@ -32,7 +32,6 @@
 #include "print.h"
 #include "kernel.h"
 #include "agent.h"
-#include "interface.h"
 #include "symtab.h"
 #include "init_soar.h"
 #include "wmem.h"

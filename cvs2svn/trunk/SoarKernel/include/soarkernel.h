@@ -69,7 +69,6 @@ struct node_varnames_struct;
 #include "wmem.h"
 #include "tempmem.h"
 #include "decide.h"
-#include "interface.h"
 #include "consistency.h"
 #include "parser.h"
 #include "print.h"
@@ -80,7 +79,6 @@ struct node_varnames_struct;
 #include "osupport.h"
 #include "rete.h"
 #include "trace.h"
-#include "tilde.h"
 #include "callback.h"
 #include "io.h"
 

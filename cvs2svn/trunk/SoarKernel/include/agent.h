@@ -56,6 +56,22 @@ extern "C"
 {
 #endif
 
+
+#ifdef HAVE_GETCWD
+#include <sys/syscall.h>
+#include <unistd.h>
+inline char * getwd(char * arg)
+{
+	return _getcwd(arg, (size_t) 9999);
+}
+#else
+#include <direct.h>
+inline char * getwd(char * arg)
+{
+	return _getcwd(arg, (size_t) 9999);
+}
+#endif /* HAVE_GETCWD */
+
 /* RBD Need more comments here, or should this stuff be here at all? */
 
 #define UPDATE_LINKS_NORMALLY 0
@@ -83,9 +99,25 @@ typedef struct kernel_struct Kernel;
 typedef struct _iobuf FILE;
 #endif
 
-struct alias_struct;
-struct expansion_node;
-struct dir_stack_struct;
+// following def's moved here from old interface.h file  KJC nov 05
+/* AGR 568 begin */
+typedef struct expansion_node {
+  struct lexeme_info lexeme;
+  struct expansion_node *next;
+} expansion_node;
+
+typedef struct alias_struct {
+  char *alias;
+  struct expansion_node *expansion;
+  struct alias_struct *next;
+} alias_struct;
+
+typedef struct dir_stack_struct {
+  char *directory;
+  struct dir_stack_struct *next;
+} dir_stack_struct;
+/* AGR 568 end */
+ 
 
 /* This typedef makes soar_callback_array equivalent to an array of list
    pointers. Since it was used only one time, it has been commented out
