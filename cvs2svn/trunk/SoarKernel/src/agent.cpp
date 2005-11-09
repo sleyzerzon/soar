@@ -42,7 +42,6 @@
 #include "trace.h"
 #include "callback.h"
 #include "io.h"
-#include "scheduler.h"
 #include "kernel_struct.h"
 #include <stdlib.h>
 
