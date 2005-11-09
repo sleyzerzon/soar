@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -55,15 +56,7 @@
 #include "lexer.h"
 #include "gski_event_system_functions.h" // support for generating XML output
 
-#include <assert.h>
-#include <ctype.h>
-#include <errno.h>
-
 extern void gds_invalid_so_remove_goal (agent* thisAgent, wme *w);
-
-#ifdef _AIX
-#include <sys/select.h>
-#endif
 
 /* ====================================================================
                   Adding New Input and Output Functions

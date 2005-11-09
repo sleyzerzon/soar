@@ -79,7 +79,7 @@
 				Optimization="0"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_TCL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -555,9 +555,6 @@
 				RelativePath=".\src\consistency.h">
 			</File>
 			<File
-				RelativePath=".\src\debug.h">
-			</File>
-			<File
 				RelativePath=".\include\decide.h">
 			</File>
 			<File
@@ -603,6 +600,9 @@
 				RelativePath=".\include\parser.h">
 			</File>
 			<File
+				RelativePath=".\src\portability.h">
+			</File>
+			<File
 				RelativePath=".\src\prefmem.h">
 			</File>
 			<File
@@ -628,9 +628,6 @@
 			</File>
 			<File
 				RelativePath=".\include\soarkernel.h">
-			</File>
-			<File
-				RelativePath=".\src\standard.h">
 			</File>
 			<File
 				RelativePath=".\include\stl_support.h">

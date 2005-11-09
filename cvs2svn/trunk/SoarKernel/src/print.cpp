@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -42,15 +43,6 @@
 #include "instantiations.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
-
-#include <stdio.h>
-#include <ctype.h>
-
-#if defined(WIN32)
-#include <direct.h>
-#elif defined(UNIX)
-#include <unistd.h>
-#endif
 
 #ifdef USE_STDARGS
 #include <stdarg.h>
@@ -100,11 +92,7 @@ using namespace xmlTraceNames;
 void start_log_file (agent* thisAgent, char *filename, Bool append) {
   if (thisAgent->logging_to_file) stop_log_file (thisAgent);
 
-#if WIN32
-  _chdir(thisAgent->top_dir_stack->directory);  /* AGR 568 */
-#else
   chdir(thisAgent->top_dir_stack->directory);
-#endif   
   thisAgent->log_file = fopen (filename, (append ? "a" : "w") );
   
   if (thisAgent->log_file) {
@@ -163,10 +151,10 @@ void stop_redirection_to_file (agent* thisAgent) {
 
 void print_string (agent* thisAgent, char *s) {
   char *ch;
-#ifdef __SC__
-  char *buf, *strbuf;
-  int i,len, usebuf = 0, num_of_inserts = 0;
-#endif
+//#ifdef __SC__
+//  char *buf, *strbuf;
+//  int i,len, usebuf = 0, num_of_inserts = 0;
+//#endif
 
   for (ch=s; *ch!=0; ch++) {
     if (*ch=='\n')
@@ -174,37 +162,37 @@ void print_string (agent* thisAgent, char *s) {
     else
       thisAgent->printer_output_column++;
     /* BUGBUG doesn't handle tabs correctly */
-#ifdef __SC__
-	if (thisAgent->printer_output_column >= 80)
-	{
-		thisAgent->printer_output_column = 1;
-		len = strlen((usebuf?strbuf:s))+2;
-		buf = (char *)allocate_memory(thisAgent, len*sizeof(char),STRING_MEM_USAGE);
-		for (i=0;(s+i+num_of_inserts) <= ch;i++) {
-			buf[i] = (usebuf?strbuf:s)[i];
-		}
-		buf[i] = '\n';
-		for (;i<=(len-1);i++) {
-			buf[i+1] = (usebuf?strbuf:s)[i];
-		}
-		if (usebuf) free_memory_block_for_string(thisAgent, strbuf);
-		strbuf = (char *)allocate_memory(agent* thisAgent, len*sizeof(char),STRING_MEM_USAGE);
-		for (i=0;i<=len; i++) {
-			strbuf[i] = buf[i];
-		}
-		free_memory_block_for_string(thisAgent, buf);
-		usebuf=1;
-		num_of_inserts++;
-	}
-  }
-
-  if (thisAgent->redirecting_to_file) {
-    fputs (s, thisAgent->redirection_file);
-  } else {
-  	fputs ((usebuf?strbuf:s), stdout);
-    fflush (stdout);
-	if (usebuf) free_memory_block_for_string(thisAgent, strbuf);
-#else
+//#ifdef __SC__
+//	if (thisAgent->printer_output_column >= 80)
+//	{
+//		thisAgent->printer_output_column = 1;
+//		len = strlen((usebuf?strbuf:s))+2;
+//		buf = (char *)allocate_memory(thisAgent, len*sizeof(char),STRING_MEM_USAGE);
+//		for (i=0;(s+i+num_of_inserts) <= ch;i++) {
+//			buf[i] = (usebuf?strbuf:s)[i];
+//		}
+//		buf[i] = '\n';
+//		for (;i<=(len-1);i++) {
+//			buf[i+1] = (usebuf?strbuf:s)[i];
+//		}
+//		if (usebuf) free_memory_block_for_string(thisAgent, strbuf);
+//		strbuf = (char *)allocate_memory(agent* thisAgent, len*sizeof(char),STRING_MEM_USAGE);
+//		for (i=0;i<=len; i++) {
+//			strbuf[i] = buf[i];
+//		}
+//		free_memory_block_for_string(thisAgent, buf);
+//		usebuf=1;
+//		num_of_inserts++;
+//	}
+//  }
+//
+//  if (thisAgent->redirecting_to_file) {
+//    fputs (s, thisAgent->redirection_file);
+//  } else {
+//  	fputs ((usebuf?strbuf:s), stdout);
+//    fflush (stdout);
+//	if (usebuf) free_memory_block_for_string(thisAgent, strbuf);
+//#else
   }
 
   if (thisAgent->redirecting_to_file) {
@@ -213,16 +201,16 @@ void print_string (agent* thisAgent, char *s) {
     if (thisAgent->using_output_string) 
       strcat(thisAgent->output_string,s);
     else {
-#ifdef USE_X_DISPLAY
-      print_x_string(thisAgent->X_data, s);
-#elif _WINDOWS
-      print_string_to_window(s);
-#else
+//#ifdef USE_X_DISPLAY
+//      print_x_string(thisAgent->X_data, s);
+//#elif _WINDOWS
+//      print_string_to_window(s);
+//#else
 	   Soar_LogAndPrint(thisAgent, thisAgent, s);
       //fputs (s, stdout);
       //fflush (stdout);
-#endif /* USE_X_DISPLAY */
-#endif /* __SC__*/
+//#endif /* USE_X_DISPLAY */
+//#endif /* __SC__*/
     }
     if (thisAgent->logging_to_file) fputs (s, thisAgent->log_file);
   }

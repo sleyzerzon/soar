@@ -49,19 +49,8 @@ extern "C"
 {
 #endif
 
-#include <stdio.h>
-
 typedef char Bool;
 typedef struct agent_struct agent;
-
-#ifdef WIN32
-typedef struct _iobuf FILE;
-#endif
-
-#if defined(__hpux) || defined(UNIX)
-/*typedef struct _IO_FILE FILE;*/
-#include <stdio.h>
-#endif
 
 #define MAX_LEXER_LINE_LENGTH 1000
 #define MAX_LEXEME_LENGTH (MAX_LEXER_LINE_LENGTH+5) /* a little bigger to avoid
@@ -168,4 +157,4 @@ typedef struct lexer_source_file_struct {
 }
 #endif
 
-#endif
+#endif // LEXER_H

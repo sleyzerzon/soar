@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -17,8 +18,6 @@
 
 #include "kernel_struct.h"
 #include "gski_event_system_functions.h"
-
-#include <stdlib.h>
 
 /** 
  * @brief Creates an instance of the soar kernel structure.

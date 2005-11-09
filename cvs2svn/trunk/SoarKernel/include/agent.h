@@ -20,20 +20,6 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#if defined(MACINTOSH)
-#include <utime.h>
-#include <time.h>
-
-#elif defined(WIN32)
-#include <time.h>
-#include <windows.h>
-
-#else
-#include <sys/time.h>
-#endif
-
-#include <stdio.h>
-
 #ifndef GSYSPARAMS_H
 #include"gsysparam.h"
 #endif
@@ -55,22 +41,6 @@ typedef struct rhs_function_struct rhs_function;
 extern "C"
 {
 #endif
-
-
-#ifdef HAVE_GETCWD
-#include <sys/syscall.h>
-#include <unistd.h>
-inline char * getwd(char * arg)
-{
-	return _getcwd(arg, (size_t) 9999);
-}
-#else
-#include <direct.h>
-inline char * getwd(char * arg)
-{
-	return _getcwd(arg, (size_t) 9999);
-}
-#endif /* HAVE_GETCWD */
 
 /* RBD Need more comments here, or should this stuff be here at all? */
 
@@ -94,10 +64,6 @@ typedef struct io_wme_struct io_wme;
 typedef struct multi_attributes_struct multi_attribute;
 typedef struct replay_struct replay;
 typedef struct kernel_struct Kernel;
-
-#ifdef WIN32
-typedef struct _iobuf FILE;
-#endif
 
 // following def's moved here from old interface.h file  KJC nov 05
 /* AGR 568 begin */

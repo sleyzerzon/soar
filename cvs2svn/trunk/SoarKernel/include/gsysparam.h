@@ -166,11 +166,6 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 extern void init_sysparams (agent* thisAgent);
 extern void set_sysparam (agent* thisAgent, int param_number, long new_value);
 
-
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024   /* AGR 536  - from sys/param.h */
-#endif
-
 #define kChunkNamePrefixMaxLength  64  /* kjh (B14) */
 
 #ifdef __cplusplus

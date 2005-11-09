@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -43,27 +44,9 @@
 #include "osupport.h"
 #include "recmem.h"
 #include "tempmem.h"
-#include <ctype.h>
 
 /* JC ADDED: for gSKI events */
 #include "gski_event_system_functions.h"
-
-#ifdef __hpux
-#ifndef _INCLUDE_POSIX_SOURCE
-#define _INCLUDE_POSIX_SOURCE
-#endif
-#define _INCLUDE_XOPEN_SOURCE
-#define _INCLUDE_HPUX_SOURCE
-#include <sys/types.h>
-#undef  _INCLUDE_POSIX_SOURCE
-#undef  _INCLUDE_XOPEN_SOURCE
-#endif /* __hpux */
-#if !defined(__SC__) && !defined(THINK_C) && !defined(WIN32) && !defined(MACINTOSH)
-#include <sys/time.h>
-#endif /* !__SC__ && !THINK_C && !WIN32 */
-#ifdef __hpux
-#undef _INCLUDE_HPUX_SOURCE
-#endif /* __hpux */
 
 using namespace xmlTraceNames;
 

@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -52,10 +53,6 @@
 
 /* JC ADDED: This is for event firing in gSKI */
 #include "gski_event_system_functions.h"
-
-#include <assert.h>
-#include <math.h>
-#include <time.h>
 
 using namespace xmlTraceNames;
 
@@ -1147,14 +1144,14 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 /* AGR 615 end */
       while (TRUE) {
         char ch;
-#ifdef _WINDOWS
-		char buff[256],msg[256];
-		snprintf(msg,256,"Enter selection 1-%d",num_candidates);
-		msg[255] = 0; /* ensure null termination */
-
-		get_line_from_window(msg,buff,255);
-		sscanf(msg,"%d",num_candidates);
-#else
+//#ifdef _WINDOWS
+//		char buff[256],msg[256];
+//		snprintf(msg,256,"Enter selection 1-%d",num_candidates);
+//		msg[255] = 0; /* ensure null termination */
+//
+//		get_line_from_window(msg,buff,255);
+//		sscanf(msg,"%d",num_candidates);
+//#else
 	//  char buf[256]; /* kjh(CUSP-B10) */
         print (thisAgent, "Enter selection (1-%d): ", num_candidates);
         chosen_num = -1;
@@ -1168,7 +1165,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 	          sscanf(buf,"%d",&chosen_num); */
      /* kjh(CUSP-B10) END*/
 
-#endif
+//#endif
         if ((chosen_num>=1) && (chosen_num<=num_candidates)) break;
         print (thisAgent, "You must enter a number between 1 and %d\n", num_candidates);
       }

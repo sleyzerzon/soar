@@ -354,7 +354,7 @@ inline Bool test_is_blank_test(test t)
   return (t == NIL); 
 }
 
-#ifdef WIN32
+#ifdef MSC_VER
 #pragma warning (disable : 4311)
 #endif
 
@@ -363,7 +363,7 @@ inline Bool test_is_complex_test(test t)
   return (char)(reinterpret_cast<unsigned long>(t) & 1);
 }
 
-#ifdef WIN32
+#ifdef MSC_VER
 #pragma warning (default : 4311)
 #endif
 
@@ -443,18 +443,8 @@ enum ComplexTextTypes {
          GOAL_ID_TEST = 9,           /* item must be a goal identifier */
          IMPASSE_ID_TEST = 10       /* item must be an impasse identifier */
 };
-   
 
-
-
-
-
-
-
-
-  
 #define NUM_TEST_TYPES 10
-
 
 //
 // Symbol types.

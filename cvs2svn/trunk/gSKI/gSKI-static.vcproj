@@ -427,6 +427,9 @@
 				RelativePath="include\megaassert.h">
 			</File>
 			<File
+				RelativePath=".\src\portability.h">
+			</File>
+			<File
 				RelativePath="include\Win32LinuxDefines.h">
 			</File>
 		</Filter>

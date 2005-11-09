@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -26,11 +27,6 @@
 #include "print.h"
 #include "lexer.h"
 #include "rhsfun.h"
-
-#include <math.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
 
 /* --------------------------------------------------------------------
                                 Plus

@@ -59,8 +59,6 @@ extern "C"
 {
 #endif
 
-#include <stdio.h>
-
 struct not_struct;
 
 typedef char Bool;
@@ -76,15 +74,6 @@ typedef struct rete_node_struct rete_node;
 typedef struct agent_struct agent;
 typedef struct kernel_struct Kernel;
 typedef union symbol_union Symbol;
-
-#ifdef WIN32
-typedef struct _iobuf FILE;
-#endif
-
-#ifdef UNIX
-/*typedef struct _IO_FILE FILE;*/
-#include <stdio.h>
-#endif
 
 extern void init_rete (agent* thisAgent);
 

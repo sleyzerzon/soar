@@ -15,9 +15,9 @@ AC_PREFIX_DEFAULT(/usr/local/soar)
 
 # Checks for programs.
 AC_DISABLE_SHARED
-AC_DEFINE([_DEBUG], [1], [BUGBUG: Defined for now, needs to be removed.])
-AC_DEFINE([USE_TCL], [1], [BUGBUG: Defined for now, needs to be removed.])
-AC_DEFINE([UNIX], [1], [BUGBUG: Defined for now, needs to be removed.])
+#AC_DEFINE([_DEBUG], [1], [BUGBUG: Defined for now, needs to be removed.])
+#AC_DEFINE([USE_TCL], [1], [BUGBUG: Defined for now, needs to be removed.])
+#AC_DEFINE([UNIX], [1], [BUGBUG: Defined for now, needs to be removed.])
 AC_PROG_LIBTOOL
 AC_PROG_CXX
 AC_PROG_CC
@@ -28,7 +28,10 @@ AC_PROG_MAKE_SET
 # Checks for header files.
 AC_PATH_X
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h memory.h stddef.h stdlib.h string.h sys/param.h sys/time.h unistd.h utime.h])
+# fail for these
+AC_CHECK_HEADERS([ctype.h math.h signal.h],,[AC_MSG_ERROR([*** Cannot find required header!  See previous line.])])
+# work around these
+AC_CHECK_HEADERS([assert.h errno.h malloc.h memory.h stddef.h stdlib.h string.h sys/param.h sys/resource.h sys/time.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

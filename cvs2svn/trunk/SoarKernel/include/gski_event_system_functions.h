@@ -19,9 +19,6 @@
 #include "agent.h"
 #include "xmlTraceNames.h"
 
-#include <assert.h>
-#include <memory.h>
-
 using namespace xmlTraceNames;
 
 /**

@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -103,9 +104,6 @@
 #include "rhsfun.h"
 #include "lexer.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
-#include <ctype.h>
-
-#include <string>
 
 /* JC ADDED: for gSKI events */
 #include "gski_event_system_functions.h"
@@ -650,13 +648,14 @@ inline void new_left_token(token * New, rete_node * current_node,
 ---------------------------------------------------------------------- */
 
 /* --- Hash table sizes (actual sizes are powers of 2) --- */
-#ifdef _WINDOWS
-#define LOG2_LEFT_HT_SIZE 13
-#define LOG2_RIGHT_HT_SIZE 13
-#else
+// FIXME: investigate hash table sizes
+//#ifdef _WINDOWS
+//#define LOG2_LEFT_HT_SIZE 13
+//#define LOG2_RIGHT_HT_SIZE 13
+//#else
 #define LOG2_LEFT_HT_SIZE 14
 #define LOG2_RIGHT_HT_SIZE 14
-#endif
+//#endif
 
 #define LEFT_HT_SIZE (((long) 1) << LOG2_LEFT_HT_SIZE)
 #define RIGHT_HT_SIZE (((long) 1) << LOG2_RIGHT_HT_SIZE)
@@ -3702,9 +3701,9 @@ byte add_production_to_rete (agent* thisAgent,
                          (soar_call_data) p);
 #endif
 
-#ifdef _WINDOWS
-        add_production_to_stat_lists(new_prod);
-#endif
+//#ifdef _WINDOWS
+//        add_production_to_stat_lists(new_prod);
+//#endif
 
   /* JC ADDED: tell gSKI we're about to add a production */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_ADDED, 1, thisAgent, static_cast<void*>(p));
@@ -3733,9 +3732,9 @@ void excise_production_from_rete (agent* thisAgent, production *p)
   /* JC ADDED: Tell gSKI we are about to excise a production */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_REMOVED, 0, thisAgent, static_cast<void*>(p));
   
-#ifdef _WINDOWS
-        remove_production_from_stat_lists(prod_to_be_excised);
-#endif
+//#ifdef _WINDOWS
+//        remove_production_from_stat_lists(prod_to_be_excised);
+//#endif
   
   p_node = p->p_node;
   p->p_node = NIL;      /* mark production as not being in the rete anymore */
@@ -7746,9 +7745,6 @@ void print_partial_match_information (agent* thisAgent, rete_node *p_node,
   condition *top_cond, *bottom_cond;
   long n;
   token *tokens, *t;
-
-  std::string result;
-  result += "test";
 
   p_node_to_conditions_and_nots (thisAgent, p_node, NIL, NIL, &top_cond, &bottom_cond,
                                  NIL, NIL);

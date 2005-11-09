@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -39,7 +40,6 @@
 #include "wmem.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
-#include <ctype.h>
 
 using namespace xmlTraceNames;
 
@@ -768,27 +768,27 @@ char tracing_object_letters[3] = {'*','s','o'};
 void print_tracing_rule (agent* thisAgent, int type_restriction, Symbol *name_restriction,
                          trace_format *format) {
   if (thisAgent->printing_stack_traces)
-#ifdef USE_TCL    
+//#ifdef USE_TCL    
     print_string (thisAgent, "stack-trace-format");
   else
     print_string (thisAgent, "object-trace-format");
-#else
-    print_string (thisAgent, "(stack-trace-format");
-  else
-    print_string (thisAgent, "(object-trace-format");
-#endif /* USE_TCL */
+//#else
+//    print_string (thisAgent, "(stack-trace-format");
+//  else
+//    print_string (thisAgent, "(object-trace-format");
+//#endif /* USE_TCL */
   print (thisAgent, " :add %c ", tracing_object_letters[type_restriction]);
   if (name_restriction) print_with_symbols (thisAgent, "%y ", name_restriction);
   print_string (thisAgent, "\"");
   print_trace_format_list (thisAgent, format);
-#ifdef USE_TCL    
+//#ifdef USE_TCL    
   print (thisAgent, "\"\n");
-#else
-  print (thisAgent, "\")\n");
-#endif /* USE_TCL */
+//#else
+//  print (thisAgent, "\")\n");
+//#endif /* USE_TCL */
 }
 
-#ifdef USE_TCL
+//#ifdef USE_TCL
 void print_tracing_rule_tcl (agent* thisAgent, int type_restriction, Symbol *name_restriction,
                          trace_format *format) {
   print (thisAgent, "%c ", tracing_object_letters[type_restriction]); 
@@ -797,7 +797,7 @@ void print_tracing_rule_tcl (agent* thisAgent, int type_restriction, Symbol *nam
   print_trace_format_list (thisAgent, format);
   print (thisAgent, "}\n");
 }
-#endif /* USE_TCL */
+//#endif /* USE_TCL */
 
 
 Bool print_trace_callback_fn (agent* thisAgent, void *item, FILE* f) {
@@ -808,7 +808,7 @@ Bool print_trace_callback_fn (agent* thisAgent, void *item, FILE* f) {
   return FALSE;
 }
 
-#ifdef USE_TCL
+//#ifdef USE_TCL
 Bool print_trace_callback_fn_tcl (agent* thisAgent, void *item, FILE* f) {
   tracing_rule *tr;
 
@@ -817,7 +817,7 @@ Bool print_trace_callback_fn_tcl (agent* thisAgent, void *item, FILE* f) {
                           tr->format);
   return FALSE;
 }
-#endif /* USE_TCL */
+//#endif /* USE_TCL */
 
 void print_all_trace_formats (agent* thisAgent, Bool stack_trace, FILE* f) {
   int i;
@@ -838,7 +838,7 @@ void print_all_trace_formats (agent* thisAgent, Bool stack_trace, FILE* f) {
   }
 }
 
-#ifdef USE_TCL
+//#ifdef USE_TCL
 void print_all_trace_formats_tcl (agent* thisAgent, Bool stack_trace, FILE* f) {
   int i;
 
@@ -857,7 +857,7 @@ void print_all_trace_formats_tcl (agent* thisAgent, Bool stack_trace, FILE* f) {
     }
   }
 }
-#endif /* USE_TCL */
+//#endif /* USE_TCL */
 
 
 inline void set_print_trace_formats(agent* thisAgent){

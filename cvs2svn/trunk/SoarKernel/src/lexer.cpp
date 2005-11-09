@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -68,12 +69,6 @@
 #include "init_soar.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
-
-#include <ctype.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
 
 //
 // These three should be safe for re-entrancy.  --JNW--
@@ -161,17 +156,17 @@ void get_next_char (agent* thisAgent) {
     return;
   }
 
-#ifdef USE_X_DISPLAY
-  if (x_input_buffer != NIL) {
-    thisAgent->current_char = x_input_buffer[x_input_buffer_index++];
-    if (thisAgent->current_char == '\n') {
-      x_input_buffer = NIL;
-    }
-  } else {
-    thisAgent->current_char = thisAgent->current_file->buffer 
-                           [thisAgent->current_file->current_column++];
-  }
-#elif defined(USE_TCL)
+//#ifdef USE_X_DISPLAY
+//  if (x_input_buffer != NIL) {
+//    thisAgent->current_char = x_input_buffer[x_input_buffer_index++];
+//    if (thisAgent->current_char == '\n') {
+//      x_input_buffer = NIL;
+//    }
+//  } else {
+//    thisAgent->current_char = thisAgent->current_file->buffer 
+//                           [thisAgent->current_file->current_column++];
+//  }
+//#elif defined(USE_TCL)
   if (thisAgent->alternate_input_string != NULL)
     {
       thisAgent->current_char = *thisAgent->alternate_input_string++;
@@ -209,34 +204,34 @@ void get_next_char (agent* thisAgent) {
       thisAgent->current_char = thisAgent->current_file->buffer 
         [thisAgent->current_file->current_column++];
     }
-#elif _WINDOWS
-  if (thisAgent->current_file->file==stdin) { 
-    switch (thisAgent->current_line[thisAgent->current_line_index]) {
-      case EOF_AS_CHAR:
-      case 0:
-			if (!AvailableWindowCommand()) {
-	  			thisAgent->current_line[thisAgent->current_line_index=0]=thisAgent->current_char=EOF_AS_CHAR;
-		 	    break;
-			} else {
-	  			s=GetWindowCommand();
-	  			strncpy(thisAgent->current_line,s+1, AGENT_STRUCT_CURRENT_LINE_BUFFER_SIZE);
-				thisAgent->current_line[AGENT_STRUCT_CURRENT_LINE_BUFFER_SIZE-1] = 0; /* ensure null termination */
-	  			if (thisAgent->print_prompt_flag=(s[0]=='1')) 
-			    print("%s",s+1);
-	  			free(s);
-	  			thisAgent->current_line_index=0;
-			}
-      default:
-			thisAgent->current_char=thisAgent->current_line[thisAgent->current_line_index++];
-			break;
-    }
-  } else 
-    thisAgent->current_char = thisAgent->current_file->buffer 
-			   [thisAgent->current_file->current_column++];
-#else
-  thisAgent->current_char = thisAgent->current_file->buffer 
-                           [thisAgent->current_file->current_column++];
-#endif
+//#elif _WINDOWS
+//  if (thisAgent->current_file->file==stdin) { 
+//    switch (thisAgent->current_line[thisAgent->current_line_index]) {
+//      case EOF_AS_CHAR:
+//      case 0:
+//			if (!AvailableWindowCommand()) {
+//	  			thisAgent->current_line[thisAgent->current_line_index=0]=thisAgent->current_char=EOF_AS_CHAR;
+//		 	    break;
+//			} else {
+//	  			s=GetWindowCommand();
+//	  			strncpy(thisAgent->current_line,s+1, AGENT_STRUCT_CURRENT_LINE_BUFFER_SIZE);
+//				thisAgent->current_line[AGENT_STRUCT_CURRENT_LINE_BUFFER_SIZE-1] = 0; /* ensure null termination */
+//	  			if (thisAgent->print_prompt_flag=(s[0]=='1')) 
+//			    print("%s",s+1);
+//	  			free(s);
+//	  			thisAgent->current_line_index=0;
+//			}
+//      default:
+//			thisAgent->current_char=thisAgent->current_line[thisAgent->current_line_index++];
+//			break;
+//    }
+//  } else 
+//    thisAgent->current_char = thisAgent->current_file->buffer 
+//			   [thisAgent->current_file->current_column++];
+//#else
+//  thisAgent->current_char = thisAgent->current_file->buffer 
+//                           [thisAgent->current_file->current_column++];
+//#endif
 
   if (thisAgent->current_char) return;
 
@@ -266,11 +261,11 @@ void get_next_char (agent* thisAgent) {
     /* s==NIL means immediate eof encountered or read error occurred */
     if (! feof(thisAgent->current_file->file)) {
       if(reading_from_top_level(thisAgent)) {
-#ifndef _WINDOWS
+//#ifndef _WINDOWS
         /* Replaced deprecated control_c_handler with an appropriate assertion */
         //control_c_handler(0);
         assert(0 && "error in lexer.cpp (control_c_handler() used to be called here)");
-#endif
+//#endif
         return;
       } else {
         print (thisAgent, "I/O error while reading file %s; ignoring the rest of it.\n",
@@ -500,16 +495,16 @@ Bool determine_type_of_constituent_string (agent* thisAgent) {
     return TRUE;
   }
 
-#if defined(USE_TCL)
+//#if defined(USE_TCL)
   thisAgent->lexeme.type = QUOTED_STRING_LEXEME;
   return TRUE;
-#else
-  char msg[BUFFER_MSG_SIZE];
-  strncpy (msg, "Internal error: can't determine_type_of_constituent_string\n", BUFFER_MSG_SIZE);
-  msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
-  abort_with_fatal_error(thisAgent, msg);
-  return FALSE;
-#endif
+//#else
+//  char msg[BUFFER_MSG_SIZE];
+//  strncpy (msg, "Internal error: can't determine_type_of_constituent_string\n", BUFFER_MSG_SIZE);
+//  msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
+//  abort_with_fatal_error(thisAgent, msg);
+//  return FALSE;
+//#endif
 }
 
 void do_fake_rparen (agent* thisAgent) {
@@ -887,24 +882,24 @@ void get_lexeme (agent* thisAgent) {
   thisAgent->lexeme.length = 0;
   thisAgent->lexeme.string[0] = 0;
 
-#ifndef USE_X_DISPLAY
+//#ifndef USE_X_DISPLAY
 if (thisAgent->lexeme.type==EOF_LEXEME && 
     reading_from_top_level(thisAgent) &&
     current_lexer_parentheses_level(thisAgent)==0 &&  /* AGR 534 */
     thisAgent->print_prompt_flag)
-#ifdef USE_TCL
+//#ifdef USE_TCL
   {}
-#else
-
- /* REW: begin 09.15.96 */
- if (thisAgent->operand2_mode == TRUE)
-   print ("\nOPERAND %s> ", thisAgent->name);
- /* REW: end   09.15.96 */
- else
-   print ("\n%s> ", thisAgent->name);
-
-#endif /* USE_TCL */
-#endif /* USE_X_DISPLAY */
+//#else
+//
+// /* REW: begin 09.15.96 */
+// if (thisAgent->operand2_mode == TRUE)
+//   print ("\nOPERAND %s> ", thisAgent->name);
+// /* REW: end   09.15.96 */
+// else
+//   print ("\n%s> ", thisAgent->name);
+//
+//#endif /* USE_TCL */
+//#endif /* USE_X_DISPLAY */
 
 /* AGR 534  The only time a prompt should be printed out is if there's
    a command being expected; ie. the prompt shouldn't print out if we're
@@ -923,28 +918,28 @@ if (thisAgent->lexeme.type==EOF_LEXEME &&
               do_fake_rparen(thisAgent);
               return;
          }
-#ifndef USE_X_DISPLAY
+//#ifndef USE_X_DISPLAY
          if (current_lexer_parentheses_level(thisAgent)==0 &&  /* AGR 534 */
              thisAgent->print_prompt_flag)
-#ifdef USE_TCL
+//#ifdef USE_TCL
          {}
-#else
-
-	 /* REW: begin 09.15.96 */
-         if (thisAgent->operand2_mode == TRUE)
-	   print ("\nOPERAND %s> ", thisAgent->name);
-	 /* REW: end   09.15.96 */
-	 else
-	   print ("\n%s> ", thisAgent->name);
-
-#endif /* USE_TCL */
-#endif /* USE_X_DISPLAY */
+//#else
+//
+//	 /* REW: begin 09.15.96 */
+//         if (thisAgent->operand2_mode == TRUE)
+//	   print ("\nOPERAND %s> ", thisAgent->name);
+//	 /* REW: end   09.15.96 */
+//	 else
+//	   print ("\n%s> ", thisAgent->name);
+//
+//#endif /* USE_TCL */
+//#endif /* USE_X_DISPLAY */
       }
       get_next_char(thisAgent);
       continue;
     }
 
-#ifdef USE_TCL 
+//#ifdef USE_TCL 
     if (thisAgent->current_char==';') {
       /* --- skip the semi-colon, forces newline in TCL --- */
       get_next_char(thisAgent);  /* consume it */
@@ -962,43 +957,43 @@ if (thisAgent->lexeme.type==EOF_LEXEME &&
       if (thisAgent->current_char!=EOF_AS_CHAR) get_next_char(thisAgent);
       continue;
     }
-#else
-    if (thisAgent->current_char==';') {
-      /* --- read from semicolon to end-of-line --- */
-      while ((thisAgent->current_char!='\n') &&
-             (thisAgent->current_char!=EOF_AS_CHAR))
-        get_next_char(thisAgent);
-      if (thisAgent->current_file->fake_rparen_at_eol) {
-        do_fake_rparen(thisAgent);
-        return;
-      }
-      if (thisAgent->current_char!=EOF_AS_CHAR) get_next_char(thisAgent);
-      continue;
-    }
-    if (thisAgent->current_char=='#') {
-      /* --- comments surrounded by "#|" and "|#" delimiters --- */
-      record_position_of_start_of_lexeme(); /* in case of later error mesg. */
-      get_next_char(thisAgent);
-      if (thisAgent->current_char!='|') {
-        print ("Error: '#' not followed by '|'\n");
-        print_location_of_most_recent_lexeme(thisAgent);
-        continue;
-      }
-      get_next_char(thisAgent);  /* consume the vbar */
-      while (TRUE) {
-        if (thisAgent->current_char==EOF_AS_CHAR) {
-          print ("Error: '#|' without terminating '|#'\n");
-          print_location_of_most_recent_lexeme(thisAgent);
-          break;
-        }
-        if (thisAgent->current_char!='|') { get_next_char(thisAgent); continue; }
-        get_next_char(thisAgent);
-        if (thisAgent->current_char=='#') break;
-      }
-      get_next_char(thisAgent);  /* consume the closing '#' */
-      continue; /* continue outer while(TRUE), reading more whitespace */
-    }
-#endif  /* USE_TCL */
+//#else
+//    if (thisAgent->current_char==';') {
+//      /* --- read from semicolon to end-of-line --- */
+//      while ((thisAgent->current_char!='\n') &&
+//             (thisAgent->current_char!=EOF_AS_CHAR))
+//        get_next_char(thisAgent);
+//      if (thisAgent->current_file->fake_rparen_at_eol) {
+//        do_fake_rparen(thisAgent);
+//        return;
+//      }
+//      if (thisAgent->current_char!=EOF_AS_CHAR) get_next_char(thisAgent);
+//      continue;
+//    }
+//    if (thisAgent->current_char=='#') {
+//      /* --- comments surrounded by "#|" and "|#" delimiters --- */
+//      record_position_of_start_of_lexeme(); /* in case of later error mesg. */
+//      get_next_char(thisAgent);
+//      if (thisAgent->current_char!='|') {
+//        print ("Error: '#' not followed by '|'\n");
+//        print_location_of_most_recent_lexeme(thisAgent);
+//        continue;
+//      }
+//      get_next_char(thisAgent);  /* consume the vbar */
+//      while (TRUE) {
+//        if (thisAgent->current_char==EOF_AS_CHAR) {
+//          print ("Error: '#|' without terminating '|#'\n");
+//          print_location_of_most_recent_lexeme(thisAgent);
+//          break;
+//        }
+//        if (thisAgent->current_char!='|') { get_next_char(thisAgent); continue; }
+//        get_next_char(thisAgent);
+//        if (thisAgent->current_char=='#') break;
+//      }
+//      get_next_char(thisAgent);  /* consume the closing '#' */
+//      continue; /* continue outer while(TRUE), reading more whitespace */
+//    }
+//#endif  /* USE_TCL */
     break; /* if no whitespace or comments found, break out of the loop */
   }
   /* --- no more whitespace, so go get the actual lexeme --- */

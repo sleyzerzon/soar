@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -43,7 +44,6 @@
 #include "callback.h"
 #include "io.h"
 #include "kernel_struct.h"
-#include <stdlib.h>
 
 /* JC ADDED: Need to initialize gski callbacks */
 #include "gski_event_system_functions.h"
@@ -139,10 +139,10 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   /* mvp 5-17-94 */
   newAgent->variables_set                      = NIL;
 
-#ifdef _WINDOWS
-  newAgent->current_line[0]                    = 0;
-  newAgent->current_line_index                 = 0;
-#endif /* _WINDOWS */
+//#ifdef _WINDOWS
+//  newAgent->current_line[0]                    = 0;
+//  newAgent->current_line_index                 = 0;
+//#endif /* _WINDOWS */
   /* String redirection */
   newAgent->using_output_string                = FALSE;
   newAgent->using_input_string                 = FALSE;
@@ -284,7 +284,7 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->attention_lapse_tracker = 0;
 
 
-  if(!getwd(cur_path))
+  if(!getcwd(cur_path, MAXPATHLEN))
     print(newAgent, "Unable to set current directory while initializing agent.\n");
   newAgent->top_dir_stack = (dir_stack_struct *) malloc(sizeof(dir_stack_struct));   /* AGR 568 */
   newAgent->top_dir_stack->directory = (char *) malloc(MAXPATHLEN*sizeof(char));   /* AGR 568 */
@@ -351,11 +351,11 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
  
   //print(delete_agent, "\nDestroying agent %s.\n", delete_agent->name);  /* AGR 532 */
 
-#ifdef USE_X_DISPLAY
-
-  /* Destroy X window associated with agent */
-  destroy_agent_window (delete_agent);
-#endif /* USE_X_DISPLAY */
+//#ifdef USE_X_DISPLAY
+//
+//  /* Destroy X window associated with agent */
+//  destroy_agent_window (delete_agent);
+//#endif /* USE_X_DISPLAY */
 
   remove_built_in_rhs_functions(delete_agent);
 

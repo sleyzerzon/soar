@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -23,7 +24,9 @@
    functionality has been hidden behind the __USE_BSD define in sys/time.h
    (see sys/features.h for more information)
 */
-#define _BSD_SOURCE
+#ifndef _BSD_SOURCE
+# define _BSD_SOURCE
+#endif
 
 #include "init_soar.h"
 #include "agent.h"
@@ -43,24 +46,11 @@
 #include "kernel_struct.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
-#include <signal.h>         /* used for control-c handler */
-#include <assert.h>
-#include <time.h>
 
 /* JC ADDED: Used for gski callbacks */
 #include "gski_event_system_functions.h"
 
-#if !defined(__SC__) && !defined(THINK_C) && !defined(WIN32) && !defined(MACINTOSH)
-#include <sys/time.h>       /* used for timing stuff */
-#include <sys/resource.h>   /* used for timing stuff */
-#endif /* !__SC__ && !THINK_C && !WIN32 */
-
-#ifdef _WINDOWS
-#define INIT_FILE       "init.soa"
-#else
-#define INIT_FILE       ".init.soar"
-#endif
-
+#define INIT_FILE       "init.soar"
 
 /* REW: begin 08.20.97   these defined in consistency.c  */
 extern void determine_highest_active_production_level_in_stack_propose(agent* thisAgent);
@@ -97,12 +87,12 @@ void just_before_exit_soar (agent* thisAgent) {
 }
 
 void exit_soar (agent* thisAgent) {
-#ifdef _WINDOWS
-  print(thisAgent, "Cannot exit from Soar via the command line.\n");
-#else
+//#ifdef _WINDOWS
+//  print(thisAgent, "Cannot exit from Soar via the command line.\n");
+//#else
   just_before_exit_soar(thisAgent);
   exit (0);
-#endif
+//#endif
 }
 
 void old_abort_with_fatal_error (agent* thisAgent) {
@@ -111,11 +101,11 @@ void old_abort_with_fatal_error (agent* thisAgent) {
 			SYSTEM_TERMINATION_CALLBACK,
 			(soar_call_data) FALSE);		       
   if (thisAgent->logging_to_file) stop_log_file (thisAgent);
-#ifdef _WINDOWS
-  Terminate(1);
-#else
+//#ifdef _WINDOWS
+//  Terminate(1);
+//#else
   exit (1);
-#endif
+//#endif
 }
 
 void abort_with_fatal_error (agent* thisAgent, char *msg) {
@@ -226,7 +216,9 @@ void reset_timer (struct timeval *tv_to_reset) {
 
 #ifndef NO_TIMING_STUFF
 
-#if defined(WIN32)
+// voigtjr 11/2005
+// This HAVE_CONFIG_H not defined implies that we are in MSVC on Windows
+#ifndef HAVE_CONFIG_H
 
 /* A fake implementation of rusage for WIN32. Taken from cygwin. */
 #define RUSAGE_SELF 0
@@ -273,7 +265,7 @@ int getrusage(int who, struct rusage* r)
    totimeval (&r->ru_utime, &user_time, 0, 0);
    return 0;
 }
-#endif /* WIN32 */
+#endif // not HAVE_CONFIG_H
 
 void get_cputime_from_rusage (struct rusage *r, struct timeval *dest_tv) {
   dest_tv->tv_sec = r->ru_utime.tv_sec + r->ru_stime.tv_sec;
@@ -461,11 +453,11 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[MAX_CHUNKS_SYSPARAM] = 50;
   thisAgent->sysparams[MAX_NIL_OUTPUT_CYCLES_SYSPARAM] = 15;
 
-#ifdef USE_X_DISPLAY
-  thisAgent->sysparams[RESPOND_TO_LOAD_ERRORS_SYSPARAM] = FALSE;
-#else
+//#ifdef USE_X_DISPLAY
+//  thisAgent->sysparams[RESPOND_TO_LOAD_ERRORS_SYSPARAM] = FALSE;
+//#else
   thisAgent->sysparams[RESPOND_TO_LOAD_ERRORS_SYSPARAM] = TRUE;
-#endif
+//#endif
 
 #ifdef ATTENTION_LAPSE
   /* RMJ */
@@ -1221,12 +1213,12 @@ void do_one_top_level_phase (agent* thisAgent)
 			 (soar_call_data) NULL);
 
 	  if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) {
-          #ifdef USE_TCL
+     //     #ifdef USE_TCL
 		  print_string (thisAgent, "\n");
-          #else
-		  if(thisAgent->printer_output_column != 1)
-			  print_string ("\n");
-          #endif /* USE_TCL */
+    //      #else
+		  //if(thisAgent->printer_output_column != 1)
+			 // print_string ("\n");
+    //      #endif /* USE_TCL */
 		  print_lowest_slot_in_context_stack (thisAgent);
 	  }
 
@@ -1264,11 +1256,11 @@ void do_one_top_level_phase (agent* thisAgent)
                                     (soar_call_data) NULL);
 
 			  if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) {
-                  #ifdef USE_TCL
+//                  #ifdef USE_TCL
 				  print_string (thisAgent, "\n");
-                  #else
-				  if(thisAgent->printer_output_column != 1) print_string ("\n");
-                  #endif /* USE_TCL */
+//                  #else
+//				  if(thisAgent->printer_output_column != 1) print_string ("\n");
+//                  #endif /* USE_TCL */
 				  print_lowest_slot_in_context_stack (thisAgent);
 			  }
 			  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])			 
@@ -1609,6 +1601,7 @@ Bool old_print_prompt_flag;
 
   thisAgent->print_prompt_flag = old_print_prompt_flag;
 }
+
 
 void load_init_file (Kernel* thisKernel, agent* thisAgent) {
 #define LOAD_INIT_FILE_BUFFER_SIZE 1000

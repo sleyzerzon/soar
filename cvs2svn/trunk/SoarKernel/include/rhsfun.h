@@ -90,9 +90,11 @@ typedef union symbol_union Symbol;
 #define rhs_value_to_unboundvar(rv) (((unsigned long)(rv))>>2)
 
 #else
-#ifdef WIN32
+
+#ifdef MSC_VER
 #pragma warning (disable : 4311 4312)
 #endif
+
 inline unsigned long rhs_value_is_symbol(rhs_value rv) 
 { 
   return ((((unsigned long)(rv)) & 3)==0); 
@@ -158,7 +160,7 @@ inline unsigned long rhs_value_to_unboundvar(rhs_value rv)
   return (((unsigned long)(rv))>>2);
 }
 
-#ifdef WIN32
+#ifdef MSC_VER
 #pragma warning (default : 4311 4312)
 #endif
 
@@ -248,4 +250,3 @@ extern void remove_built_in_rhs_functions(agent* thisAgent);
 #endif
 
 #endif
-

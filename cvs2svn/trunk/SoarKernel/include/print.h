@@ -43,10 +43,6 @@
 #ifndef PRINT_H
 #define PRINT_H
 
-#ifndef WIN32
-#include <sys/types.h>	/* voigtjr: quell size_t undefined error */
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -65,13 +61,6 @@ typedef struct preference_struct preference;
 typedef struct condition_struct condition;
 typedef struct instantiation_struct instantiation;
 typedef union symbol_union Symbol;
-
-#ifdef WIN32
-typedef struct _iobuf FILE;
-#else
-/*typedef struct _IO_FILE FILE;*/
-#include <stdio.h>
-#endif
 
 extern void start_log_file (agent* thisAgent, char *filename, Bool append);
 extern void stop_log_file (agent* thisAgent);
@@ -186,9 +175,7 @@ extern void print_action (agent* thisAgent, action *a);
 extern char preference_type_indicator (agent* thisAgent, byte type);
 extern void print_preference (agent* thisAgent, preference *pref);
 extern void print_wme (agent* thisAgent, wme *w);
-//#ifdef USE_TCL
 extern void print_wme_for_tcl (wme *w);
-//#endif /* USE_TCL */
 extern void print_instantiation_with_wmes (agent* thisAgent, 
 										   instantiation *inst,
                                            wme_trace_type wtt,

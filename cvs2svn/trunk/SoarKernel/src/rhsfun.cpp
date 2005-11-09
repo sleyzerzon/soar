@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -56,9 +57,6 @@
 #include "gski_event_system_functions.h" // support for triggering XML events
 
 #include <map>
-
-// #include <soar.h>		/* kjh(CUSP-B10 (for Soar_Read) */
-#include <time.h>
 
 using namespace xmlTraceNames;
 
@@ -377,8 +375,6 @@ Symbol *accept_rhs_function_code (agent* thisAgent, list *args, void* user_data)
 /* ---------------------------------------------------------------------
   Capitalize a Symbol
 ------------------------------------------------------------------------ */
-
-#include <ctype.h>
 
 Symbol * 
 capitalize_symbol_rhs_function_code (agent* thisAgent, list *args, void* user_data) 

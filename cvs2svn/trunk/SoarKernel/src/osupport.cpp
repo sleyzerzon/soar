@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif // HAVE_CONFIG_H
+#include "portability.h"
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -38,7 +39,6 @@
 #include "reorder.h"
 #include "rete.h"
 #include "gski_event_system_functions.h" // for XML trace output
-#include <ctype.h>
 
 /* -----------------------------------------------------------------------
                   O-Support Transitive Closure Routines
