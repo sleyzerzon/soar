@@ -354,7 +354,7 @@ inline Bool test_is_blank_test(test t)
   return (t == NIL); 
 }
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 #pragma warning (disable : 4311)
 #endif
 
@@ -363,7 +363,7 @@ inline Bool test_is_complex_test(test t)
   return (char)(reinterpret_cast<unsigned long>(t) & 1);
 }
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 #pragma warning (default : 4311)
 #endif
 

@@ -91,7 +91,7 @@ typedef union symbol_union Symbol;
 
 #else
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 #pragma warning (disable : 4311 4312)
 #endif
 
@@ -160,7 +160,7 @@ inline unsigned long rhs_value_to_unboundvar(rhs_value rv)
   return (((unsigned long)(rv))>>2);
 }
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 #pragma warning (default : 4311 4312)
 #endif
 
