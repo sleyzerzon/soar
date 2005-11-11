@@ -69,20 +69,16 @@ schedule_agents (Kernel* thisKernel, agent* thisAgent, int cycles)
         print(thisAgent, "\nSelecting agent %s", thisAgent->name);
 #endif
 
-#ifndef NO_CALLBACKS /* kjc 1/00 */
-       soar_invoke_callbacks(thisAgent, thisAgent, 
+        soar_invoke_callbacks(thisAgent, thisAgent, 
 			     BEFORE_SCHEDULE_CYCLE_CALLBACK,
 			     (soar_call_data) TRUE);
-#endif
-
+ 
        //old_execute_go_selection(thisAgent);
 
-#ifndef NO_CALLBACKS /* kjc 1/00 */
-	   soar_invoke_callbacks(thisAgent, thisAgent, 
+ 	   soar_invoke_callbacks(thisAgent, thisAgent, 
 			     AFTER_SCHEDULE_CYCLE_CALLBACK,
 			     (soar_call_data) TRUE);
-#endif
-
+ 
 #ifdef USE_X_DISPLAY
         if (thisAgent->monitor) 
           {

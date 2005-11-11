@@ -137,10 +137,6 @@ typedef union symbol_union Symbol;
    Soar will be much more efficient.  See comments in recmem.cpp  */
 //#define DO_TOP_LEVEL_REF_CTS
 
-/* UNComment the following line to eliminate all callbacks except those
-   for I/O, AFTER_DECISION_PHASE, and printing. */
-/* #define NO_CALLBACKS */
-
 /* UNcomment the following line to get some marginally useful msgs
    about creating chunk names. */
 /*  #define DEBUG_CHUNK_NAMES */
