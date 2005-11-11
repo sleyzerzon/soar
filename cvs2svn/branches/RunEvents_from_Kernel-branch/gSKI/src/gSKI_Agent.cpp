@@ -919,6 +919,8 @@ namespace gSKI
    {
       ClearError(err);
       return m_nextPhase;
+	  // KJC:  shouldn't this really be 
+	  return EnumRemappings::ReMapPhaseType(m_agent->current_phase,0);
    }
 
    /*
@@ -1334,10 +1336,10 @@ namespace gSKI
 		  {
 		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
 		  case gSKIEVENT_AFTER_PHASE_EXECUTED:      		
-		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
-		  case gSKIEVENT_AFTER_DECISION_CYCLE:
 		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
 		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
+    	  //case gSKIEVENT_BEFORE_DECISION_CYCLE:  
+		  //case gSKIEVENT_AFTER_DECISION_CYCLE:
 			  // This is a kernel call (not part of gSKI)	
               // Must convert gSKI event to Kernel event     			
 			  gSKI_SetAgentCallback(GetSoarAgent(), 
@@ -1346,7 +1348,18 @@ namespace gSKI
                                HandleRunEventCallback);
 			 
 			  break;
-    
+    	  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
+		  case gSKIEVENT_AFTER_DECISION_CYCLE:
+			  { RunEventCallbackData * eventInfo = new RunEventCallbackData();
+		  eventInfo->a = this;
+		  eventInfo->eventId = eventId;
+			  soar_add_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)), 
+								 HandleKernelRunEventCallback,
+								 static_cast <void*> (eventInfo), 0, 
+								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)), 1));
+			  }
+			  break; 
 		  default:
 			  ; // do nothing
 		  }
@@ -1381,8 +1394,6 @@ namespace gSKI
 		  {
 		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
 		  case gSKIEVENT_AFTER_PHASE_EXECUTED:      		
-		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
-		  case gSKIEVENT_AFTER_DECISION_CYCLE:
 		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
 		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
 			  // This is a kernel call (not part of gSKI)	
@@ -1393,6 +1404,12 @@ namespace gSKI
 							   EnumRemappings::RemapRunEventType(eventId),
                                0,0);
 			  break;
+		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
+		  case gSKIEVENT_AFTER_DECISION_CYCLE:
+			  soar_remove_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)),
+								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)), 1));
+			  break; 
 		  default:
 			  ; // do nothing
 		  }
@@ -1403,6 +1420,25 @@ namespace gSKI
 	HandleRunEventCallback
    =========================
    */
+   void Agent::HandleKernelRunEventCallback( soar_callback_agent agent,
+					                         soar_callback_data callbackdata,
+                                             soar_call_data calldata )
+   {
+	   // Decision cycle events have NULL calldata, so do phases...at least for now
+	   // callbackdata is the agent object
+	RunEventCallbackData * e = static_cast<RunEventCallbackData*>(callbackdata);
+	Agent*            a = e->a;
+	egSKIRunEventId eventId = e->eventId;
+
+	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
+    a->m_runListeners.Notify(eventId, rn);
+   }
+
+   void Agent::DeleteRunEventCallbackData (soar_callback_data data)
+   {
+	   delete static_cast <Agent::RunEventCallbackData*>  (data); 
+   }
+
    void Agent::HandleRunEventCallback(unsigned long         eventId, 
                                       unsigned char         eventOccured,
                                       void*                 object, 
@@ -1619,12 +1655,14 @@ namespace gSKI
       {
          MegaAssert(!m_agent->system_halted, "System should not be halted here!");
 
-         // Do pre-step notifications to listeners
-		 if (m_agent->operand2_mode) {
-             preStepNotifications();
-		 } else {
-			 preStepNotificationsSoar7();
-		 }
+		 /*  Agent RunEvents moved back to Kernel
+          * // Do pre-step notifications to listeners
+		  * if (m_agent->operand2_mode) {
+          *    preStepNotifications();
+		  * } else {
+		  *	 preStepNotificationsSoar7();
+		  * }
+		  */
 
          ///////////////////////////////////////////////////////////////////
          // Execute the next step
@@ -1747,7 +1785,8 @@ namespace gSKI
       case gSKI_RUN_PHASE:
          return &m_phaseCount;
       case gSKI_RUN_ELABORATION_CYCLE:
- 		 if (m_agent->operand2_mode) {
+		 return &m_elaborationCount; 
+		 if (m_agent->operand2_mode) {
  			//      count only true Soar Elaboration cycles
 			//      this makes most sense for Soar 8 mode.
 			//      or can choose to use m_elaborationCounts...
@@ -1760,7 +1799,6 @@ namespace gSKI
 		 }
       case gSKI_RUN_DECISION_CYCLE:
 		 return &m_agent->d_cycle_count;
-         //return &m_decisionCount;
       case gSKI_RUN_UNTIL_OUTPUT:
          return &m_outputCount;
       default:
@@ -1862,14 +1900,14 @@ namespace gSKI
       if(m_interruptFlags & gSKI_STOP_AFTER_SMALLEST_STEP)
          interrupted = true;
 
-	  if (0){  // KJC removing agent RunEvents from schedulers
+	  /* // KJC removing agent RunEvents from schedulers
          // See if this was an elaboration cycle 
          if((m_lastPhase == gSKI_PROPOSAL_PHASE) || (m_lastPhase == gSKI_APPLY_PHASE))
          {
             RunNotifier nfAfterElab(this, m_lastPhase);
             m_runListeners.Notify(gSKIEVENT_AFTER_ELABORATION_CYCLE, nfAfterElab);
          }
-	  }
+	  */
 
       // Check to see if we've moved to another phase or not
       if(m_lastPhase != m_nextPhase)
@@ -1879,10 +1917,10 @@ namespace gSKI
          if((m_lastPhase == gSKI_OUTPUT_PHASE) && m_agent->output_link_changed)
             ++m_outputCount;
 
-	  if (0){  // KJC removing agent RunEvents from schedulers
+	  /*   // KJC removing agent RunEvents from schedulers
          RunNotifier nfAfterPhase(this, m_lastPhase);
          m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED, nfAfterPhase);
-	  }
+	  */
          // Increment the phase count
          ++m_phaseCount;
 
@@ -1895,14 +1933,11 @@ namespace gSKI
       // If the next phase is the input phase, we just ended a DC
       if(m_nextPhase == gSKI_INPUT_PHASE)
       {
-	  if (0){  // KJC removing agent RunEvents from schedulers
+	  /*   // KJC removing agent RunEvents from schedulers
 
          RunNotifier nfAfterDC(this, m_lastPhase);
          m_runListeners.Notify(gSKIEVENT_AFTER_DECISION_CYCLE, nfAfterDC);
-	  }
-         // Increment the decision count
-         //++m_decisionCount;  
-		 //No!  We need to get it from the agent in SoarKernel
+	  */
 
          // Check an interrupt
          if(m_interruptFlags & gSKI_STOP_AFTER_DECISION_CYCLE)

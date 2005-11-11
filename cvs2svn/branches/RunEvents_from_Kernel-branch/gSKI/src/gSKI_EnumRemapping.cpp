@@ -28,6 +28,8 @@ namespace gSKI
    unsigned short EnumRemappings::PrefTypeEnumMapping[NUM_PREFERENCE_TYPES];
    unsigned short EnumRemappings::PhaseTypeEnumMapping[NUM_PHASE_TYPES];
    unsigned short EnumRemappings::EventEnumMapping[gSKI_K_MAX_AGENT_EVENTS][2];
+   /* unsigned short EnumRemappings::EventEnumMapping[gSKI_K_MAX_AGENT_EVENTS]; */
+   unsigned short EnumRemappings::RunEventEnumMapping[NUMBER_OF_MONITORABLE_CALLBACKS];
    unsigned short EnumRemappings::PrintEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
    unsigned short EnumRemappings::XMLEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
    unsigned short EnumRemappings::ProductionTypeEnumMapping[NUM_PRODUCTION_TYPES];
@@ -102,7 +104,25 @@ namespace gSKI
 	  EventEnumMapping[gSKI_K_EVENT_ELABORATION_CYCLE][1] = gSKIEVENT_AFTER_ELABORATION_CYCLE;
 	  EventEnumMapping[gSKI_K_EVENT_DECISION_CYCLE][0]    = gSKIEVENT_BEFORE_DECISION_CYCLE;
 	  EventEnumMapping[gSKI_K_EVENT_DECISION_CYCLE][1]    = gSKIEVENT_AFTER_DECISION_CYCLE;
-	  
+
+      RunEventEnumMapping[BEFORE_INPUT_PHASE_CALLBACK]	  = gSKIEVENT_BEFORE_INPUT_PHASE;
+      RunEventEnumMapping[BEFORE_PROPOSE_PHASE_CALLBACK]  = gSKIEVENT_BEFORE_PROPOSE_PHASE;
+      RunEventEnumMapping[BEFORE_DECISION_PHASE_CALLBACK] = gSKIEVENT_BEFORE_DECISION_PHASE;
+      RunEventEnumMapping[BEFORE_APPLY_PHASE_CALLBACK]	  = gSKIEVENT_BEFORE_APPLY_PHASE;
+      RunEventEnumMapping[BEFORE_OUTPUT_PHASE_CALLBACK]   = gSKIEVENT_BEFORE_OUTPUT_PHASE;
+      RunEventEnumMapping[BEFORE_PREFERENCE_PHASE_CALLBACK]  = gSKIEVENT_BEFORE_PREFERENCE_PHASE;	// Soar-7 mode only
+      RunEventEnumMapping[BEFORE_WM_PHASE_CALLBACK]       = gSKIEVENT_BEFORE_WM_PHASE;	// Soar-7 mode only
+      RunEventEnumMapping[AFTER_INPUT_PHASE_CALLBACK]	  = gSKIEVENT_AFTER_INPUT_PHASE;
+      RunEventEnumMapping[AFTER_PROPOSE_PHASE_CALLBACK]   = gSKIEVENT_AFTER_PROPOSE_PHASE;
+      RunEventEnumMapping[AFTER_DECISION_PHASE_CALLBACK]  = gSKIEVENT_AFTER_DECISION_PHASE;
+      RunEventEnumMapping[AFTER_APPLY_PHASE_CALLBACK]	  = gSKIEVENT_AFTER_APPLY_PHASE;
+      RunEventEnumMapping[AFTER_OUTPUT_PHASE_CALLBACK]	  = gSKIEVENT_AFTER_OUTPUT_PHASE;
+      RunEventEnumMapping[AFTER_PREFERENCE_PHASE_CALLBACK]	  = gSKIEVENT_AFTER_PREFERENCE_PHASE;	// Soar-7 mode only
+      RunEventEnumMapping[AFTER_WM_PHASE_CALLBACK]		  = gSKIEVENT_AFTER_WM_PHASE;	// Soar-7 mode only
+	  /* RunEventEnumMapping[BEFORE_ELABORATION_CYCLE_CALLBACK] = gSKIEVENT_BEFORE_ELABORATION_CYCLE;
+	     RunEventEnumMapping[AFTER_ELABORATION_CYCLE_CALLBACK] = gSKIEVENT_AFTER_ELABORATION_CYCLE; */
+	  RunEventEnumMapping[BEFORE_DECISION_CYCLE_CALLBACK] = gSKIEVENT_BEFORE_DECISION_CYCLE;
+	  RunEventEnumMapping[AFTER_DECISION_CYCLE_CALLBACK]  = gSKIEVENT_AFTER_DECISION_CYCLE;
 
 	  PrintEventEnumMapping[gSKI_K_EVENT_PRINT_CALLBACK] = gSKIEVENT_PRINT;
 
@@ -255,9 +275,11 @@ namespace gSKI
       case gSKIEVENT_AFTER_ELABORATION_CYCLE:
          return gSKI_K_EVENT_ELABORATION_CYCLE;
       case gSKIEVENT_BEFORE_DECISION_CYCLE:
-         return gSKI_K_EVENT_DECISION_CYCLE;
+	      return gSKI_K_EVENT_DECISION_CYCLE;
+		 // return BEFORE_DECISION_CYCLE_CALLBACK;
       case gSKIEVENT_AFTER_DECISION_CYCLE:
-         return gSKI_K_EVENT_DECISION_CYCLE;
+ 	      return gSKI_K_EVENT_DECISION_CYCLE;
+       // return AFTER_DECISION_CYCLE_CALLBACK;
        default:
          // Error condition
          MegaAssert(false, "Could not map a run event id");

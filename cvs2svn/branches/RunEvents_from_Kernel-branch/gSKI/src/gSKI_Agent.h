@@ -33,6 +33,8 @@ typedef struct agent_struct agent;
 #include <map>
 #include <string>
 
+#include "callback.h"
+
 namespace gSKI
 {
    class IProductionManager;
@@ -1254,6 +1256,7 @@ namespace gSKI
 
      /** 
        * @brief Static function to handle callbacks for Run events from the kernel.
+	   * @brief This handler gets registered on gSKI-specific gSKI_MakeAgentCallback
        *
        * @param eventId  Id of the kernel level event that occured.
        * @param eventOccured true if the event happened already, false if
@@ -1262,6 +1265,8 @@ namespace gSKI
        * @param soarAgent Pointer to the kernel level agent structure associated
        *                    with this callback
        * @param data      Callback data (in this case an egSKIPhaseType)
+	   * 
+	   * This mechanism hardcodes the eventID and phasetype enums in the event generation code.
        */
       static void HandleRunEventCallback(unsigned long         eventId, 
                                             unsigned char         eventOccured,
@@ -1269,6 +1274,24 @@ namespace gSKI
                                             agent*                soarAgent, 
                                             void*                 data);
 
+     /** 
+       * @brief Static function to handle callbacks for Run events from the kernel.
+	   * @brief This handler gets registered on the SoarKernel native callbacks
+       *
+       * @param agent  Pointer to the kernel level agent structure associated
+       *                    with this callback (cast to void* )
+       * @param callbackdata  Pointer (cast to void* ) to the struct that has gSKI Agent object
+	   *                      and the eventID, which was already known at registration
+       * @param calldata      Callback data;  currently NULL for RunEvents 
+	   *
+	   * This mechanism queries the SoarKernel agent to get the phase type when invoked.
+       */
+   
+	  static void Agent::HandleKernelRunEventCallback( soar_callback_agent agent,
+					                                   soar_callback_data callbackdata,
+                                                       soar_call_data calldata );
+
+	  static void Agent::DeleteRunEventCallbackData (soar_callback_data);
 
 
       /** 
@@ -1341,6 +1364,9 @@ namespace gSKI
 	  tXMLListenerManager	m_XMLListeners;		/**< Holds listeners to the XML event */
 
       tRunListenerManager   m_runListeners;      /**< Holds listeners for the run events */
+
+	                                            /**  struct defined for RunEvent userdata **/
+	  struct			   RunEventCallbackData {Agent * a; egSKIRunEventId eventId;};
 
       InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
                         
