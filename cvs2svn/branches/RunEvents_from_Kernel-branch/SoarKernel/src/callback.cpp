@@ -215,12 +215,15 @@ void soar_destroy_callback(soar_callback * cb)
   free((void *) cb);
 }
 
-void soar_invoke_callbacks (agent* thisAgent, 
+inline void soar_invoke_callbacks (agent* thisAgent, 
 				soar_callback_agent the_agent, 
 			    SOAR_CALLBACK_TYPE callback_type, 
 			    soar_call_data call_data)
 {
-  cons * c;
+  cons * c;  /* we need this if we loop over multiple callback functions */
+
+/* if no callback is registered, just return */
+ if (!((agent *)the_agent)->soar_callbacks[callback_type]) return;
 
 /* REW: begin 28.07.96 */
   /* We want to stop the Soar kernel timers whenever a callback is initiated and
@@ -344,6 +347,10 @@ void soar_invoke_first_callback (agent* thisAgent,
 {
   list * head;
 
+  /* if no callback is registered, just return */
+  head = ((agent *)the_agent)->soar_callbacks[callback_type];
+  if (head == NULL) return;
+
 /* REW: begin 28.07.96 */
 
 #ifndef NO_TIMING_STUFF
@@ -391,15 +398,11 @@ void soar_invoke_first_callback (agent* thisAgent,
 
 /* REW: end 28.07.96 */
  
-  head = ((agent *)the_agent)->soar_callbacks[callback_type];
-
-  if (head != NULL)
-    {
       soar_callback * cb;
 
       cb = (soar_callback *) head->first;
       cb->function(the_agent, cb->data, call_data);
-    }
+    
 
 /* REW: begin 28.07.96 */
 
