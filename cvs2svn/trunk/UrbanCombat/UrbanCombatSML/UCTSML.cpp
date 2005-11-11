@@ -75,7 +75,7 @@ UCTSML::UCTSML(bool debugger) : m_StopNow(false), m_IsRunning(false)
 
 UCTSML::~UCTSML()
 {
-	cerr << "calling destructor" << endl;
+//	cerr << "calling destructor" << endl;
 	pKernel->Shutdown();
 	delete pKernel;
 }
@@ -135,9 +135,9 @@ void MyStopSystemEventHandler(smlSystemEventId id, void* pUserData, Kernel* pKer
 {
 	if(id == sml::smlEVENT_SYSTEM_STOP)
 	{
-		UCTSML* uctsml = (UCTSML*)pUserData;
-		uctsml->m_StopNow = true;
-		cerr << "set stop to true" << endl;
+//		UCTSML* uctsml = (UCTSML*)pUserData;
+//		uctsml->m_StopNow = true;
+//		cerr << "set stop to true" << endl;
 	}
 }
 
