@@ -70,6 +70,7 @@ SoarTextIO::init()
 	printNow = true;
 	ShouldPrintNow = false;
 	PrintNothing = false;
+	getnextline = false;
 	
 	if(!init_soar)
 	{
@@ -154,7 +155,7 @@ MyUpdateEventHandler(smlUpdateEventId id, void* pUserData, Kernel* pKernel, smlR
 	if(STIO->pAgent->GetNumberOutputLinkChanges()!=0)
 	{
 		STIO->RespondCycle();
-		STIO->pAgent->ClearOutputLinkChanges();
+		
 	}	
 	STIO->pAgent->Commit();
 }
@@ -193,7 +194,7 @@ SoarTextIO::WriteCycle(istream* getFrom)
 	wordNum = 0;
 	NextWord.resize(0);
 	bool printRead = false;
-	bool created = false;	
+		
 
 	word = "", forMem = "";
 	checker = "";
@@ -213,24 +214,34 @@ SoarTextIO::WriteCycle(istream* getFrom)
 		printRead = true; 
 
 	
+	CarryOutCommand(getFrom);
+}
+
+void
+SoarTextIO::CarryOutCommand(istream* getFrom)
+{
+	bool created = false;
 	while(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD" && getFrom->peek() != '\n' && getFrom->peek() != EOF && checker != "#&#&" )
 	{
 		wordNum++;
 		word = "";
-		*getFrom >> word;
-		if(init_soar)
-			init();  //reintializes SoarTextIO
-		while(word == "")
+		if(!getnextline)
 		{
-			cout << "> ";
-			if(!*getFrom)
-				getFrom = &cin;
 			*getFrom >> word;
+			if(init_soar)
+				init();  //reintializes SoarTextIO
+			while(word == "")
+			{
+				cout << "> ";
+				if(!*getFrom)
+					getFrom = &cin;
+				*getFrom >> word;
+			}
+			if(pKernel)
+				checker = word;
+			makeUpper(checker);
 		}
-		if(pKernel)
-			checker = word;
-		makeUpper(checker);
-		if(checker == "--NEXTLINE")
+		if(checker == "--NEXTLINE" || getnextline)
 		{
 			ShouldPrintNow = true;
 			getFrom = &inFile;
@@ -240,12 +251,14 @@ SoarTextIO::WriteCycle(istream* getFrom)
 				CloseFile();
 				checker = "#&#&";  // this just gets us out of next if statement, this is bad and needs to be changed
 			}
-		}
+			getnextline = false;
+		}		
 		if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD" && checker != "#&#&" && checker != "--STOP")
 		{
 			if(!created)
 			{
 				createSentId();	
+				int temp = sentStore.size();
 				sml::IntElement* tmp2 = pAgent->CreateIntWME(sentStore[0],"text-input-number", sentenceNum);
 				sml::Identifier* tmp3 = pAgent->CreateIdWME(NextWord[0], "next");
 				NextWord.push_back(tmp3);
@@ -297,7 +310,6 @@ SoarTextIO::WriteCycle(istream* getFrom)
 	char garbage;
 	if(checker != "--CMDLIN")
 		getFrom->get(garbage);
-	
 }
 
 bool
@@ -320,7 +332,8 @@ SoarTextIO::CloseFile()
 {
 	inFile.clear();
 	inFile.close();
-	cout << "You do not have a file open, or the file has ended." << endl;
+	getnextline = false;
+	cout << pAgent->GetAgentName() << " asked to get another line, but there is no file open\nor the file has ended." << endl;
 	PrintNothing = true;
 }
 
@@ -341,6 +354,9 @@ SoarTextIO::RespondCycle()
 			trip.val = tmp->GetValueAsString();
 			if(trip.att == "text")
 				top_level = trip.val;
+			if(trip.att == "get" && trip.val == "next-line")
+				getnextline = true;
+			
 			trip.printed = false;
 			storeO.push_back(trip);
 			//cout << "(" << storeO[i].name << "   " << storeO[i].att << "   " << storeO[i].val << ")" << endl;
@@ -355,8 +371,41 @@ SoarTextIO::RespondCycle()
 		tmp2->AddStatusComplete();
 	}
 	storeO.resize(0);
+
+	pAgent->ClearOutputLinkChanges();
+	if(getnextline)
+	{
+		GetNextLine();
+	}
 }
 
+void
+SoarTextIO::GetNextLine()
+{
+	string temp = checker;
+	string temp_word = word;
+	NextWord.resize(0);
+	sentStore.resize(0);
+	checker = "--NEXTLINE";
+	if(inFile.is_open() && inFile)
+		CarryOutCommand(&inFile);
+	else
+		CloseFile();
+	cout << endl << endl << endl << endl << endl << "> ";
+	if(forMem != "")
+	{
+		cout << "READ FROM FILE: ";
+		if(!PrintNothing)
+			cout << forMem << endl;
+		else
+			cout << "<NOTHING>" << endl;
+	}
+	forMem = "";
+	ShouldPrintNow = false;
+	checker = temp;
+	word = temp_word;
+	getnextline = false;
+}
 void
 SoarTextIO::PrintOutput()
 {
@@ -498,6 +547,7 @@ SoarTextIO::loadMem()
 	else
 		PrintNothing = false;
 
+	GetNextLine();
 
 }
 
