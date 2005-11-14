@@ -1,7 +1,7 @@
 #ifndef UCTSML_H_
 #define UCTSML_H_
 
-#include "../../Soar-8.6.1/SoarIO/ClientSML/include/sml_Client.h"
+#include "../../SoarIO/ClientSML/include/sml_Client.h"
 #include "../UrbanCombatInterface/UrbanCombatInterface.h"
 #include "../UrbanCombatInterface/UrbanCombatEffector.h"
 #include "../UrbanCombatInterface/UrbanCombatPercepts.h"
