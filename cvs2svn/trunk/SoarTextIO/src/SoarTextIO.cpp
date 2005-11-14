@@ -110,15 +110,7 @@ SoarTextIO::run()
 			ResetConnect();
 		}
 		WriteCycle(&cin);
-		if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD")
-		{
-			if(NextWord.size() > 0)
-			{
-				pAgent->DestroyWME(NextWord[NextWord.size()-1]); //gets rid of null-pointing next-word identifier
-				pAgent->CreateStringWME(NextWord[NextWord.size()-2],"next","nil");
-			}
-			sentenceNum++;		
-		}		
+		
 	}
 }
 
@@ -310,6 +302,15 @@ SoarTextIO::CarryOutCommand(istream* getFrom)
 	char garbage;
 	if(checker != "--CMDLIN")
 		getFrom->get(garbage);
+	if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD")
+	{
+		if(NextWord.size() > 0)
+		{
+			pAgent->DestroyWME(NextWord[NextWord.size()-1]); //gets rid of null-pointing next-word identifier
+			pAgent->CreateStringWME(NextWord[NextWord.size()-2],"next","nil");
+		}
+		sentenceNum++;		
+	}		
 }
 
 bool
