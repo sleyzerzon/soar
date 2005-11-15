@@ -1325,21 +1325,41 @@ namespace gSKI
 
       ClearError(err);
       m_runListeners.AddListener(eventId, listener);
-		 
+/*
+	  if (gSKIEVENT_BEFORE_PHASE_EXECUTED == eventId) 
+	  {
+	      AddRunListener(gSKIEVENT_BEFORE_INPUT_PHASE, this) ;
+		  AddRunListener(gSKIEVENT_BEFORE_INPUT_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_BEFORE_PROPOSE_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_BEFORE_DECISION_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_BEFORE_APPLY_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_BEFORE_OUTPUT_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_BEFORE_PREFERENCE_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_BEFORE_WM_PHASE, m_phaseListener);
+	  } else if (gSKIEVENT_AFTER_PHASE_EXECUTED == eventId) 
+	  {
+		  AddRunListener(gSKIEVENT_AFTER_INPUT_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_AFTER_DECISION_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_AFTER_APPLY_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, m_phaseListener);
+		  AddRunListener(gSKIEVENT_AFTER_WM_PHASE, m_phaseListener);
+	  } */
+	  
 	  //If a SMALLEST_STEP listener, we need to register for PHASE and ELAB...
 
       // If we have added our first listener, we tell the kernel
       //  we want to recieve these events.
-      if(m_runListeners.GetNumListeners(eventId) == 1)
+      if (m_runListeners.GetNumListeners(eventId) == 1)
       {
 		  switch (eventId)   // temporary, til all are moved to kernel. KJC
 		  {
 		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
 		  case gSKIEVENT_AFTER_PHASE_EXECUTED:      		
+			  // need to register for ALL phase events
 		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
 		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
-    	  //case gSKIEVENT_BEFORE_DECISION_CYCLE:  
-		  //case gSKIEVENT_AFTER_DECISION_CYCLE:
 			  // This is a kernel call (not part of gSKI)	
               // Must convert gSKI event to Kernel event     			
 			  gSKI_SetAgentCallback(GetSoarAgent(), 
@@ -1349,20 +1369,33 @@ namespace gSKI
 			 
 			  break;
     	  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
-		  case gSKIEVENT_AFTER_DECISION_CYCLE:
+		  case gSKIEVENT_AFTER_DECISION_CYCLE:			  
 			  { RunEventCallbackData * eventInfo = new RunEventCallbackData();
-		  eventInfo->a = this;
-		  eventInfo->eventId = eventId;
+			    eventInfo->a = this;
+		        eventInfo->eventId = eventId;
 			  soar_add_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
-							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)), 
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 
 								 HandleKernelRunEventCallback,
 								 static_cast <void*> (eventInfo), 0, 
-								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)), 1));
+								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
 			  }
 			  break; 
 		  default:
 			  ; // do nothing
 		  }
+
+		  if (IsPhaseEventID(eventId)) 
+		  {		 
+		      RunEventCallbackData * eventInfo = new RunEventCallbackData();
+			  eventInfo->a = this;
+		      eventInfo->eventId = eventId;
+			  soar_add_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 
+								 HandleKernelRunEventCallback,
+								 static_cast <void*> (eventInfo), 0, 
+								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
+		  }
+
       }
    }
 
@@ -1384,6 +1417,25 @@ namespace gSKI
 
       ClearError(err);
       m_runListeners.RemoveListener(eventId, listener);
+     if (gSKIEVENT_BEFORE_PHASE_EXECUTED == eventId) 
+	  {
+		  RemoveRunListener(gSKIEVENT_BEFORE_INPUT_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_BEFORE_PROPOSE_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_BEFORE_DECISION_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_BEFORE_APPLY_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_BEFORE_OUTPUT_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_BEFORE_PREFERENCE_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_BEFORE_WM_PHASE, m_phaseListener);
+	  } else if (gSKIEVENT_AFTER_PHASE_EXECUTED == eventId) 
+	  {
+		  RemoveRunListener(gSKIEVENT_AFTER_INPUT_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_AFTER_DECISION_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_AFTER_APPLY_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, m_phaseListener);
+		  RemoveRunListener(gSKIEVENT_AFTER_WM_PHASE, m_phaseListener);
+	  }
 
 
 	  // If we have no more listeners, stop asking kernel to
@@ -1407,8 +1459,8 @@ namespace gSKI
 		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
 		  case gSKIEVENT_AFTER_DECISION_CYCLE:
 			  soar_remove_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
-							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)),
-								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::RemapRunEventType(eventId)), 1));
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)),
+								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
 			  break; 
 		  default:
 			  ; // do nothing
@@ -1424,14 +1476,26 @@ namespace gSKI
 					                         soar_callback_data callbackdata,
                                              soar_call_data calldata )
    {
-	   // Decision cycle events have NULL calldata, so do phases...at least for now
-	   // callbackdata is the agent object
+	   // Kernel Decision cycle events have NULL calldata, so do phases...at least for now
+	   // callbackdata holds the agent object and eventId
 	RunEventCallbackData * e = static_cast<RunEventCallbackData*>(callbackdata);
 	Agent*            a = e->a;
 	egSKIRunEventId eventId = e->eventId;
 
 	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
     a->m_runListeners.Notify(eventId, rn);
+/*
+	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
+		(IsBEFOREPhaseEventID(eventId)))
+	{
+		a->m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED , rn);
+	}
+	else if ((a->m_runListeners.GetNumListeners(gSKIEVENT_AFTER_PHASE_EXECUTED) > 0) &&
+		(IsAFTERPhaseEventID(eventId)))
+	{
+		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
+	} 
+	*/
    }
 
    void Agent::DeleteRunEventCallbackData (soar_callback_data data)
@@ -1481,6 +1545,25 @@ namespace gSKI
 	  }
  
    }
+
+   // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events 
+   void Agent::HandleEvent(egSKIRunEventId eventId, Agent* a, egSKIPhaseType phase)
+   {
+    
+	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
+ 
+	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
+		(IsBEFOREPhaseEventID(eventId)))
+	{
+		a->m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED , rn);
+	}
+	else if ((a->m_runListeners.GetNumListeners(gSKIEVENT_AFTER_PHASE_EXECUTED) > 0) &&
+		(IsAFTERPhaseEventID(eventId)))
+	{
+		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
+	} 
+}
+
 
    /*
    =========================
@@ -1888,8 +1971,8 @@ namespace gSKI
       bool interrupted = false;
 
       // Notify listeners about the end of the phase
-      RunNotifier nfAfterStep(this, m_lastPhase);
-      m_runListeners.Notify(gSKIEVENT_AFTER_SMALLEST_STEP, nfAfterStep);
+   //   RunNotifier nfAfterStep(this, m_lastPhase);
+   //   m_runListeners.Notify(gSKIEVENT_AFTER_SMALLEST_STEP, nfAfterStep);
 
       // Increment smallest step
       ++m_smallestStepCount;

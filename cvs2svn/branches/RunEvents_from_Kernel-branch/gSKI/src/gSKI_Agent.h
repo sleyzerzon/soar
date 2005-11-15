@@ -1140,7 +1140,7 @@ namespace gSKI
 
 	  /** Fire the gSKIEVENT_AFTER_RUN_ENDS event **/
 	  void FireRunEndsEvent() ;
-	  
+	
 	  /** Multi-attribute support */
       //{
       virtual tIMultiAttributeIterator* GetMultiAttributes(Error* pErr = 0);
@@ -1185,6 +1185,19 @@ namespace gSKI
          IAgent*           m_agent;
          egSKIPhaseType    m_phase;
       };
+
+      /** 
+       * @brief RunListener for phase Events
+       */ 
+	  class PhaseListener : public IRunListener
+	  {
+      public:
+          virtual void HandleEvent(egSKIRunEventId eventId, IAgent* agentPtr, egSKIPhaseType phase);
+		  //??  { HandleKernelRunEvent ?}
+	  private:
+		  Agent* a;
+	  }; 
+
 
 	  /** 
        * @brief Event notifier for XML events
@@ -1293,6 +1306,7 @@ namespace gSKI
 
 	  static void Agent::DeleteRunEventCallbackData (soar_callback_data);
 
+	  static void Agent::HandleEvent(egSKIRunEventId eventID, Agent* pAgent, egSKIPhaseType phase) ;
 
       /** 
        * @brief Listener manager definitions 
@@ -1367,6 +1381,8 @@ namespace gSKI
 
 	                                            /**  struct defined for RunEvent userdata **/
 	  struct			   RunEventCallbackData {Agent * a; egSKIRunEventId eventId;};
+
+      PhaseListener*       m_phaseListener;     /**< Listens for the BEFORE/AFTER phase events */
 
       InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
                         
