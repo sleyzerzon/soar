@@ -94,18 +94,18 @@
     }
      static inline bool IsPhaseEventID (int id)
     {
- 	   return (id >= gSKIEVENT_BEFORE_PHASE_EXECUTED && 
- 		id <= gSKIEVENT_AFTER_PHASE_EXECUTED) ;
+ 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
+ 		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
     }
       static inline bool IsBEFOREPhaseEventID (int id)
     {
- 	   return (id >= gSKIEVENT_BEFORE_PHASE_EXECUTED && 
+ 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
  		id <= gSKIEVENT_BEFORE_WM_PHASE) ;
     }
      static inline bool IsAFTERPhaseEventID (int id)
     {
  	   return (id >= gSKIEVENT_AFTER_INPUT_PHASE && 
- 		id <= gSKIEVENT_AFTER_PHASE_EXECUTED) ;
+ 		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
     }
 
 
