@@ -18,8 +18,8 @@ Fields in an RL_data_struct:
 							   on a previous decision cycle, and that will have their numeric
 							   values updated on a subsequent decision cycle.
     previous_Q: The Q-value computed for the previously selected operator.
- 	reward: Accumulates reward for an extended operator.
-	step: The number of decision cycles an operator has been active.
+ 	reward: Accumulates reward for an extended operator. (ie, op no-change)
+	step: The number of decision cycles an operator has been active. (will be > 1 only for op no-change)
 --------------------------------------------------------------------------*/
 typedef struct RL_data_struct {
 list *productions_to_be_updated;

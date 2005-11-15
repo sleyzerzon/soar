@@ -9,7 +9,7 @@
 
 // Update the value on RL productions from last cycle
 bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal){
-
+		
 	RL_data *data = goal->id.RL_data;
  	float update = compute_temp_diff(thisAgent, data, best_op_value);
 	bool current_pref_changed = FALSE;
@@ -61,7 +61,7 @@ bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal)
 				// print_with_symbols("value %y ", rhs_value_to_symbol(prod->action_list->referent));
 		}
 	}
-	data->reward = 0.0;
+	data->reward = 0.0;  // Should this be inside the previous paren?
 	data->step = 0;
 	data->previous_Q = 0;
 	free_list(thisAgent, data->productions_to_be_updated);
@@ -125,6 +125,7 @@ void tabulate_reward_values(agent *thisAgent){
 }
 
 void tabulate_reward_value_for_goal(agent *thisAgent, Symbol *goal){
+	if (goal->id.lower_goal && !goal->id.operator_slot->wmes) return;
 	RL_data *data = goal->id.RL_data;
 	slot *s = goal->id.reward_header->id.slots;
 	float reward = 0.0;

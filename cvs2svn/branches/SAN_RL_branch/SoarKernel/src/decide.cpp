@@ -1863,15 +1863,21 @@ void remove_fake_preference_for_goal_item (agent* thisAgent, preference *pref) {
    set of items that should be there.
 ------------------------------------------------------------------ */
 
-void update_impasse_items (agent* thisAgent, Symbol *id, preference *items) {
+void update_impasse_items (agent* thisAgent, Symbol *id, preference *items) {  
   wme *w, *next_w;
   preference *cand;
   preference *bt_pref;
+  int currently_existing_items = 0;
 
   /* --- reset flags on existing items to "NOTHING" --- */
-  for (w=id->id.impasse_wmes; w!=NIL; w=w->next)
-    if (w->attr==thisAgent->item_symbol)
+  for (w=id->id.impasse_wmes; w!=NIL; w=w->next){
+	  if (w->attr==thisAgent->item_symbol){
       w->value->common.decider_flag = NOTHING_DECIDER_FLAG;
+#ifdef NUMERIC_INDIFFERENCE
+	  currently_existing_items++;
+#endif
+	  }
+  }
 
   /* --- mark set of desired items as "CANDIDATEs" --- */
   for (cand=items; cand!=NIL; cand=cand->next_candidate)
@@ -1910,6 +1916,19 @@ void update_impasse_items (agent* thisAgent, Symbol *id, preference *items) {
       add_impasse_wme (thisAgent, id, thisAgent->item_symbol, cand->value, bt_pref);
     }
   }
+#ifdef NUMERIC_INDIFFERENCE
+  /* In a tie or conflict impasse subgoal, an operator receives an architectural reward for changing the number of ^item's on the goal.
+     That reward is calculated here. It does not go through WM, but is passed directly to the relevant RL_data struct. */
+  int num_items = 0;
+  for (w=id->id.impasse_wmes ; w ; w=w->next) {
+	  if (w->attr==thisAgent->item_symbol) num_items++;
+  }
+  if (currently_existing_items > 0){
+	  if (num_items == 0) num_items = 1;
+	  float r = (currently_existing_items - num_items) / (float) currently_existing_items;
+	  id->id.RL_data->reward += pow(thisAgent->gamma, id->id.RL_data->step)*r;
+  }
+#endif
 }
 
 /* ------------------------------------------------------------------
@@ -2265,10 +2284,6 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   /* JC ADDED: Tell gSKI that we have removed a subgoal */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_SUBSTATE_DESTROYED, 0, thisAgent, static_cast<void*>(goal));
 
-#ifdef NUMERIC_INDIFFERENCE
-  tabulate_reward_value_for_goal(thisAgent, goal);
-  perform_Bellman_update(thisAgent, 0, goal);
-#endif
   /* --- disconnect this goal from the goal stack --- */
   if (goal == thisAgent->top_goal) {
     thisAgent->top_goal = NIL;
@@ -2306,11 +2321,18 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
 	  }
   }
 #endif
+
+#ifdef NUMERIC_INDIFFERENCE
+  tabulate_reward_value_for_goal(thisAgent, goal);
+  perform_Bellman_update(thisAgent, 0, goal); /* this update only sees reward - there is no next state */
+#endif
   /* --- remove wmes for this goal, and garbage collect --- */
   remove_wmes_for_context_slot (thisAgent, goal->id.operator_slot);
   update_impasse_items (thisAgent, goal, NIL); /* causes items & fake pref's to go away */
   remove_wme_list_from_wm (thisAgent, goal->id.impasse_wmes);
   goal->id.impasse_wmes = NIL;
+
+
   /* REW: begin   09.15.96 */
   /* If there was a GDS for this goal, we want to set the pointer for the
      goal to NIL to indicate it no longer exists.  
@@ -2586,6 +2608,7 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
          preference_remove_ref(thisAgent, temp);
 
 #ifdef NUMERIC_INDIFFERENCE
+	  /* Note - We only store RL data when an operator has been selected. */
 	  store_RL_data(thisAgent, goal, candidates);
 #endif
       
@@ -2756,7 +2779,6 @@ void do_working_memory_phase (agent* thisAgent) {
 void do_decision_phase (agent* thisAgent) 
 {
    /* phase printing moved to init_soar: do_one_top_level_phase */
-
 #ifdef NUMERIC_INDIFFERENCE
 	tabulate_reward_values(thisAgent);
 #endif
@@ -2764,9 +2786,6 @@ void do_decision_phase (agent* thisAgent)
    decide_context_slots (thisAgent);
    do_buffered_wm_and_ownership_changes(thisAgent);
 
-#ifdef NUMERIC_INDIFFERENCE
-//   record_data_for_RL();
-#endif
   /*
    * Bob provided a solution to fix WME's hanging around unsupported
    * for an elaboration cycle.
