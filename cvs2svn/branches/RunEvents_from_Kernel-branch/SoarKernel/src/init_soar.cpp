@@ -1173,7 +1173,6 @@ void do_one_top_level_phase (agent* thisAgent)
  
 	  do_decision_phase(thisAgent);
 
-      /* kjc 1/00: always want this CB, so can do matches cmd here */
 	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_DECISION_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
