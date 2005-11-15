@@ -55,6 +55,7 @@ namespace gSKI
       static egSKIAgentEvents RemapPrintEventType(egSKIPrintEventId eventId);
 	  static egSKIAgentEvents RemapXMLEventType(egSKIXMLEventId eventId);
 	  static egSKIAgentEvents RemapRunEventType(egSKIRunEventId eventId);
+	  static SOAR_CALLBACK_TYPE KernelRunEventType(egSKIRunEventId eventId);
 
       static void Init();
    private:

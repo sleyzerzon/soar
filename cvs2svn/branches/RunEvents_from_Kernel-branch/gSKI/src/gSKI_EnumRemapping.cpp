@@ -260,26 +260,19 @@ namespace gSKI
    ==================================
    */
    egSKIAgentEvents EnumRemappings::RemapRunEventType(egSKIRunEventId eventId)
-   /** this goes from gSKI to Kernel Events **/
+   /** this goes from gSKI to gSKI-added Kernel Events **/
    {
       if(!m_initialized) 
          Init();
       switch (eventId)
       {
-      case gSKIEVENT_BEFORE_PHASE_EXECUTED:
-         return gSKI_K_EVENT_PHASE;
-      case gSKIEVENT_AFTER_PHASE_EXECUTED:
-         return gSKI_K_EVENT_PHASE;
-      case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
-         return gSKI_K_EVENT_ELABORATION_CYCLE;
-      case gSKIEVENT_AFTER_ELABORATION_CYCLE:
-         return gSKI_K_EVENT_ELABORATION_CYCLE;
-      case gSKIEVENT_BEFORE_DECISION_CYCLE:
-	      return gSKI_K_EVENT_DECISION_CYCLE;
-		 // return BEFORE_DECISION_CYCLE_CALLBACK;
-      case gSKIEVENT_AFTER_DECISION_CYCLE:
- 	      return gSKI_K_EVENT_DECISION_CYCLE;
-       // return AFTER_DECISION_CYCLE_CALLBACK;
+      case gSKIEVENT_BEFORE_PHASE_EXECUTED:            return gSKI_K_EVENT_PHASE;
+      case gSKIEVENT_AFTER_PHASE_EXECUTED:             return gSKI_K_EVENT_PHASE;
+      case gSKIEVENT_BEFORE_ELABORATION_CYCLE:         return gSKI_K_EVENT_ELABORATION_CYCLE;
+      case gSKIEVENT_AFTER_ELABORATION_CYCLE:          return gSKI_K_EVENT_ELABORATION_CYCLE;
+      case gSKIEVENT_BEFORE_DECISION_CYCLE:			   return gSKI_K_EVENT_DECISION_CYCLE;      
+      case gSKIEVENT_AFTER_DECISION_CYCLE: 	           return gSKI_K_EVENT_DECISION_CYCLE;
+ 
        default:
          // Error condition
          MegaAssert(false, "Could not map a run event id");
@@ -287,7 +280,35 @@ namespace gSKI
       }
    }
 
-
+   SOAR_CALLBACK_TYPE EnumRemappings::KernelRunEventType(egSKIRunEventId eventId)
+   /** this goes from gSKI to Kernel native callbacks **/
+   {
+      if(!m_initialized) 
+         Init();
+      switch (eventId)
+      {
+      case gSKIEVENT_BEFORE_DECISION_CYCLE:      	  return BEFORE_DECISION_CYCLE_CALLBACK;
+      case gSKIEVENT_AFTER_DECISION_CYCLE:            return AFTER_DECISION_CYCLE_CALLBACK;
+	  case gSKIEVENT_BEFORE_INPUT_PHASE:			  return BEFORE_INPUT_PHASE_CALLBACK;
+	  case gSKIEVENT_BEFORE_PROPOSE_PHASE:			  return BEFORE_PROPOSE_PHASE_CALLBACK;
+	  case gSKIEVENT_BEFORE_DECISION_PHASE:			  return BEFORE_DECISION_PHASE_CALLBACK;
+	  case gSKIEVENT_BEFORE_APPLY_PHASE:			  return BEFORE_APPLY_PHASE_CALLBACK; 
+	  case gSKIEVENT_BEFORE_OUTPUT_PHASE:			  return BEFORE_OUTPUT_PHASE_CALLBACK;
+	  case gSKIEVENT_BEFORE_PREFERENCE_PHASE:		  return BEFORE_PREFERENCE_PHASE_CALLBACK; // Soar-7 mode only
+	  case gSKIEVENT_BEFORE_WM_PHASE:				  return BEFORE_WM_PHASE_CALLBACK;  // Soar-7 mode only
+	  case gSKIEVENT_AFTER_INPUT_PHASE:				  return AFTER_INPUT_PHASE_CALLBACK;
+	  case gSKIEVENT_AFTER_PROPOSE_PHASE:			  return AFTER_PROPOSE_PHASE_CALLBACK;
+	  case gSKIEVENT_AFTER_DECISION_PHASE:			  return AFTER_DECISION_PHASE_CALLBACK;
+	  case gSKIEVENT_AFTER_APPLY_PHASE:				  return AFTER_APPLY_PHASE_CALLBACK;
+	  case gSKIEVENT_AFTER_OUTPUT_PHASE:			  return AFTER_OUTPUT_PHASE_CALLBACK;
+	  case gSKIEVENT_AFTER_PREFERENCE_PHASE:		  return AFTER_PREFERENCE_PHASE_CALLBACK; // Soar-7 mode only
+	  case gSKIEVENT_AFTER_WM_PHASE:				  return AFTER_WM_PHASE_CALLBACK; // Soar-7 mode only
+       default:
+         // Error condition
+         MegaAssert(false, "Could not map to a kernel native callback");
+         return static_cast<SOAR_CALLBACK_TYPE>(0);
+      }
+   }
    /*
    ==================================
    ==================================
