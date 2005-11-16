@@ -49,6 +49,11 @@ public:
 	static void RunForever( void* info );
 	void runner();
 
+	void init();
+	//initializes things for SoarTextIO
+
+	
+
 private:
 
 	//******SENTENCE STORAGE******
@@ -87,8 +92,7 @@ private:
 	string agentName;	
 
 	//******MEMBER FUNCTIONS******
-	void init();
-	//initializes things for SoarTextIO
+	
 
 	void run();
 	//controls outside input and output loop

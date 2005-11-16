@@ -21,6 +21,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <string>
+#include <cctype>
 
 using namespace sml;
 
@@ -28,6 +29,7 @@ void MyUpdateEventHandler(sml::smlUpdateEventId id, void* pUserData, sml::Kernel
 void MyStartSystemEventHandler(smlSystemEventId id, void* pUserData, Kernel* pKernel);
 void MyStopSystemEventHandler(smlSystemEventId id, void* pUserData, Kernel* pKernel);
 void MyAgentEventHandler(smlAgentEventId id, void* pUserData, Agent* pAgent) ;
+void enact_init_soar(sml::smlAgentEventId id, void* pUserData, sml::Agent* pAgent);
 int callBackId;
 
 SoarTextIO::SoarTextIO()
@@ -51,11 +53,11 @@ SoarTextIO::init()
 	//******INITIALIZE VARIABLES******
 	sentenceNum = 1; 
 	wordNum = 0;
-	if(!init_soar)
-	{
-		pInputLink = pAgent->GetInputLink();
-		pOutputLink = pAgent->GetOutputLink();
-	}
+	//if(!init_soar)
+	//{
+	pInputLink = pAgent->GetInputLink();
+	pOutputLink = pAgent->GetOutputLink();
+	//}
 	
 	
 
@@ -80,6 +82,7 @@ SoarTextIO::init()
 		callBackId = pKernel->RegisterForSystemEvent(smlEVENT_SYSTEM_START,MyStartSystemEventHandler, this );
 		callBackId = pKernel->RegisterForSystemEvent(smlEVENT_SYSTEM_STOP, MyStopSystemEventHandler, this);
 		callBackId = pKernel->RegisterForAgentEvent(smlEVENT_BEFORE_AGENT_REINITIALIZED, MyAgentEventHandler, this);
+		callBackId = pKernel->RegisterForAgentEvent(smlEVENT_AFTER_AGENT_REINITIALIZED, enact_init_soar, this);
 		inFile.open("!@#$%^&*");
 
 		run();
@@ -169,15 +172,28 @@ MyStartSystemEventHandler(smlSystemEventId id, void* pUserData, Kernel* pKernel)
 void
 MyAgentEventHandler(smlAgentEventId id, void* pUserData, Agent* pAgent)
 {
-	SoarTextIO* STIO = (SoarTextIO*)pUserData;
-	if(STIO->LastSent.size() > 0)
+	if(id == smlEVENT_BEFORE_AGENT_REINITIALIZED)
 	{
-		STIO->pAgent->DestroyWME(STIO->LastSent[0]);
-		STIO->LastSent.resize(0);
+		SoarTextIO* STIO = (SoarTextIO*)pUserData;
+		if(STIO->LastSent.size() > 0)
+		{
+			STIO->pAgent->DestroyWME(STIO->LastSent[0]);
+			STIO->LastSent.resize(0);
+		}
 	}
 //	if(STIO->pTextInput != NULL)
 //		STIO->pAgent->DestroyWME(STIO->pTextInput);
 //	STIO->init_soar = true;
+}
+
+void enact_init_soar(sml::smlAgentEventId id, void* pUserData, sml::Agent* pAgent)
+{
+	if(id == smlEVENT_AFTER_AGENT_REINITIALIZED)
+	{
+		SoarTextIO* STIO = (SoarTextIO*)pUserData;
+		STIO->init_soar = true;
+		STIO->init();
+	}
 }
 
 void
@@ -273,9 +289,9 @@ SoarTextIO::CarryOutCommand(istream* getFrom)
 			spawnDebugger();
 		else if(checker == "--CMDLIN")
 		{
-			char command[100];
-			getFrom->getline(command,100);
-			pAgent->ExecuteCommandLine(command, true);
+			string command;
+			getline(*getFrom, command);
+			pAgent->ExecuteCommandLine(command.c_str(), true);
 		}
 		else if(checker == "--NEWTHREAD")
 		{
@@ -302,6 +318,14 @@ SoarTextIO::CarryOutCommand(istream* getFrom)
 	char garbage;
 	if(checker != "--CMDLIN")
 		getFrom->get(garbage);
+	if(*getFrom != cin && getFrom->peek() == '\n')
+	{
+		while(isspace(getFrom->peek()))
+		{
+			char temp = getFrom->get();
+			temp = temp;
+		}
+	}
 	if(checker != "--STEP" && checker != "--RESET" && checker != "--REMOTE" && checker != "--CMDLIN" && checker != "--DEBUG" && checker != "--RUN" && checker != "--STOP" && checker != "--QUIT" && checker != "--SAVE" && checker != "--LOAD")
 	{
 		if(NextWord.size() > 0)
@@ -323,7 +347,7 @@ SoarTextIO::GetFileInput(string& word)
 		inFile >> word;
 		if(word[0] != '#')  // not a comment
 			break;
-		getline(inFile, word);  // clears the line of comments
+		getline(inFile, word);  // clears the line of comments		
 	}
 	return true;
 }
@@ -388,6 +412,7 @@ SoarTextIO::GetNextLine()
 	NextWord.resize(0);
 	sentStore.resize(0);
 	checker = "--NEXTLINE";
+	getnextline = true;
 	if(inFile.is_open() && inFile)
 		CarryOutCommand(&inFile);
 	else
