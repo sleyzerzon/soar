@@ -415,6 +415,32 @@ namespace gSKI
       return run(runLength, count);
    }
 
+   egSKIRunResult Agent::StepInClientThread(egSKIRunType  stepSize, 
+                                           unsigned long  stepCount,
+                                           Error*         err)
+   {
+      //KJC copied from RunInClientThread above.
+
+      // Agent is already running, we cannot run
+      if(m_runState != gSKI_RUNSTATE_STOPPED)
+      {
+         if(m_runState == gSKI_RUNSTATE_HALTED)
+            SetError(err, gSKIERR_AGENT_HALTED);
+         else
+            SetError(err, gSKIERR_AGENT_RUNNING);
+
+         return gSKI_RUN_ERROR;
+      }
+
+      m_runState = gSKI_RUNSTATE_RUNNING;
+
+      // Now clear error and do the run
+      ClearError(err);
+
+      // This method does all the work
+      return step(stepSize, stepCount);
+   }
+
 
 
 
@@ -1705,8 +1731,88 @@ namespace gSKI
    }
       
    //////////////////////////////////////////////////// PRIVATES /////////////
+   /*
+   =============================
+       step
+   =============================
+   */
+   egSKIRunResult Agent::step(egSKIRunType stepSize, unsigned long count)
+   {    
+	   // This method runs a single agent.  count typically will equal 1.
+    
+	   unsigned long*  startCount        = getReleventCounter(stepSize);
+	   const unsigned long  END_COUNT    = (startCount)? ((*startCount) + count): 0;
+  
+	   MegaAssert((count >= 0) || (stepSize == gSKI_RUN_FOREVER), 
+                        "Cannot run for fewer than one steps.");
+   
+	   bool interrupted  = (m_runState == gSKI_RUNSTATE_INTERRUPTED)? true: false;
+  
+	   if (! interrupted) {
+		   MegaAssert(!m_agent->system_halted, "System should not be halted here!");
+		   // Notify that agent is about to execute. (NOT the start of a run, just a step)
+		   RunNotifier nfBeforeRunning(this,EnumRemappings::ReMapPhaseType(m_agent->current_phase,0));
+		   m_runListeners.Notify(gSKIEVENT_BEFORE_RUNNING, nfBeforeRunning);
+    
+		   switch (stepSize) 
+		   {
+		   case gSKI_RUN_ELABORATION_CYCLE: run_for_n_elaboration_cycles(m_agent, count);
+		   case gSKI_RUN_PHASE:             run_for_n_phases(m_agent, count);
+		   case gSKI_RUN_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);
+		   case gSKI_RUN_UNTIL_OUTPUT:      run_for_n_modifications_of_output(m_agent, count);
+		   case gSKI_RUN_FOREVER:           run_forever(m_agent);
+		   }
+	   }
 
-      /*
+	   // KJC:  I need to check that this test is the right one to make
+       if(m_interruptFlags & gSKI_STOP_AFTER_DECISION_CYCLE) 
+	   {
+		   interrupted = true;
+		   // Notify of the interrupt
+           RunNotifier nfAfterInt(this, m_lastPhase);
+           m_runListeners.Notify(gSKIEVENT_AFTER_INTERRUPT, nfAfterInt);
+	   }
+     
+	   egSKIRunResult retVal;
+  
+	   // We've exited the run loop so we see what we should return
+	   if(m_agent->system_halted)
+	   {
+		   // If we halted, we completed and our state is halted
+		   m_runState    = gSKI_RUNSTATE_HALTED;
+		   retVal        = gSKI_RUN_COMPLETED;
+	   }
+	   else if(maxStepsReached(startCount, END_COUNT)) 
+	   {
+		   if(interrupted)
+		   {
+			   m_runState = gSKI_RUNSTATE_INTERRUPTED;
+			   retVal     = gSKI_RUN_COMPLETED_AND_INTERRUPTED;
+		   }
+		   else
+		   {
+			   m_runState = gSKI_RUNSTATE_STOPPED;
+			   retVal     = gSKI_RUN_COMPLETED;
+		   }
+	   }
+	   else 
+	   {  
+		   // We were interrupted before we could complete
+		   MegaAssert(interrupted, "Should never get here if we aren't interrupted");
+
+		   m_runState    = gSKI_RUNSTATE_INTERRUPTED;
+		   retVal        = gSKI_RUN_INTERRUPTED;
+	   }    
+
+	   // Notify that agent stopped. (NOT the end of a run, just a step)
+	   // Use AFTER_RUN_ENDS if you want to trap the end of the complete run.
+	   RunNotifier nfAfterStop(this, m_lastPhase);
+	   m_runListeners.Notify(gSKIEVENT_AFTER_RUNNING, nfAfterStop);
+
+	   return retVal;
+   }
+ 
+   /*
    =============================
 
    =============================
