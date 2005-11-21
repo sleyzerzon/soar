@@ -144,6 +144,7 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_GetAllInput]		= &sml::KernelSML::HandleGetAllInput ;
 	m_CommandMap[sml_Names::kCommand_GetRunState]		= &sml::KernelSML::HandleGetRunState ;
 	m_CommandMap[sml_Names::kCommand_IsProductionLoaded]= &sml::KernelSML::HandleIsProductionLoaded ;
+	m_CommandMap[sml_Names::kCommand_SendClientMessage] = &sml::KernelSML::HandleSendClientMessage ;
 }
 
 /*************************************************************
@@ -642,7 +643,7 @@ bool KernelSML::HandleStopOnOutput(gSKI::IAgent* pAgent, char const* pCommandNam
 // Fire a particular event at the request of the client.
 bool KernelSML::HandleFireEvent(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
-	unused(pResponse) ; unused(pConnection) ; unused(pError) ; unused(pAgent) ;
+	unused(pError) ; unused(pAgent) ;
 
 	// Get the parameters
 	char const* pEventName = pIncoming->GetArgString(sml_Names::kParamEventID) ;
@@ -663,6 +664,24 @@ bool KernelSML::HandleFireEvent(gSKI::IAgent* pAgent, char const* pCommandName, 
 		GetKernel()->FireSystemStop() ;
 
 	return true ;
+}
+
+bool KernelSML::HandleSendClientMessage(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+{
+	unused(pError) ;
+
+	// Get the parameters
+	char const* pMessageType = pIncoming->GetArgString(sml_Names::kParamName) ;
+	char const* pMessage     = pIncoming->GetArgString(sml_Names::kParamMessage) ;
+
+	if (!pMessageType || !pMessage)
+	{
+		return InvalidArg(pConnection, pResponse, pCommandName, "Require a message type and a message and one is missing") ;
+	}
+
+	std::string result = this->SendClientMessage(pAgent, pMessageType, pMessage) ;
+
+	return ReturnResult(pConnection, pResponse, result.c_str()) ;
 }
 
 // Prevent a particular event from firing when it next would normally do so

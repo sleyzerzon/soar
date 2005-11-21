@@ -72,7 +72,8 @@ typedef enum {
     smlEVENT_BEFORE_RHS_FUNCTION_REMOVED,
     smlEVENT_AFTER_RHS_FUNCTION_REMOVED,
     smlEVENT_BEFORE_RHS_FUNCTION_EXECUTED,
-	smlEVENT_AFTER_RHS_FUNCTION_EXECUTED
+	smlEVENT_AFTER_RHS_FUNCTION_EXECUTED,
+	smlEVENT_LAST_SYSTEM_EVENT = smlEVENT_AFTER_RHS_FUNCTION_EXECUTED
 } smlSystemEventId ;
 
 typedef enum {
@@ -104,6 +105,7 @@ typedef enum {
 	smlEVENT_AFTER_RUN_ENDS,			// After run ends for any reason
     smlEVENT_BEFORE_RUNNING,			// Before running one step (phase)
     smlEVENT_AFTER_RUNNING,				// After running one step (phase)
+	smlEVENT_LAST_RUN_EVENT = smlEVENT_AFTER_RUNNING
 } smlRunEventId ;
 
 typedef enum {
@@ -113,6 +115,7 @@ typedef enum {
     //smlEVENT_BEFORE_PRODUCTION_FIRED,
     smlEVENT_AFTER_PRODUCTION_FIRED,
     smlEVENT_BEFORE_PRODUCTION_RETRACTED,
+	smlEVENT_LAST_PRODUCTION_EVENT = smlEVENT_BEFORE_PRODUCTION_RETRACTED
 } smlProductionEventId ;
 
 typedef enum {
@@ -122,11 +125,13 @@ typedef enum {
 	smlEVENT_BEFORE_AGENTS_RUN_STEP,
     smlEVENT_BEFORE_AGENT_REINITIALIZED,
     smlEVENT_AFTER_AGENT_REINITIALIZED,
+	smlEVENT_LAST_AGENT_EVENT = smlEVENT_AFTER_AGENT_REINITIALIZED
 } smlAgentEventId ;
 
 typedef enum {
 	// Working memory changes
 	smlEVENT_OUTPUT_PHASE_CALLBACK = smlEVENT_AFTER_AGENT_REINITIALIZED + 1,
+	smlEVENT_LAST_WM_EVENT = smlEVENT_OUTPUT_PHASE_CALLBACK
 } smlWorkingMemoryEventId ;
 
 typedef enum {
@@ -137,6 +142,7 @@ typedef enum {
     smlEVENT_LOG_DEBUG,
 	smlEVENT_ECHO,
     smlEVENT_PRINT,
+	smlEVENT_LAST_PRINT_EVENT = smlEVENT_PRINT
 } smlPrintEventId ;
 
 typedef enum {
@@ -145,23 +151,28 @@ typedef enum {
 	// the handler is executing the function and returning a value, not just being notified
 	// that something has happened.
 	smlEVENT_RHS_USER_FUNCTION = smlEVENT_PRINT + 1,
+	smlEVENT_CLIENT_MESSAGE,		// A generic message from one client to another (not really involving Soar/kernel directly)
+	smlEVENT_LAST_RHS_EVENT = smlEVENT_CLIENT_MESSAGE
 } smlRhsEventId ;
 
 typedef enum {
-	smlEVENT_XML_TRACE_OUTPUT = smlEVENT_RHS_USER_FUNCTION + 1,
+	smlEVENT_XML_TRACE_OUTPUT = smlEVENT_CLIENT_MESSAGE + 1,
 	smlEVENT_XML_INPUT_RECEIVED,		// Echo event for input wmes added by a client (so others can listen in)
+	smlEVENT_LAST_XML_EVENT = smlEVENT_XML_INPUT_RECEIVED
 } smlXMLEventId ;
 
 // Events that can be used by environments to trigger when the world should update
 typedef enum {
 	smlEVENT_AFTER_ALL_OUTPUT_PHASES = smlEVENT_XML_INPUT_RECEIVED + 1,	// All agents have completed output phase
 	smlEVENT_AFTER_ALL_GENERATED_OUTPUT,						// All agents have generated output (since run began)
+	smlEVENT_LAST_UPDATE_EVENT = smlEVENT_AFTER_ALL_GENERATED_OUTPUT
 } smlUpdateEventId ;
 
 // This is an experiment -- events that are not type safe (so you have to know how to cast the data you are passed)
 // May reduce the effort for kernel developers substantially.
 typedef enum {
 	smlEVENT_EDIT_PRODUCTION = smlEVENT_AFTER_ALL_GENERATED_OUTPUT + 1,	// Arg is "char const*" -- the name of the production to edit
+	smlEVENT_LAST_UNTYPED_EVENT = smlEVENT_EDIT_PRODUCTION
 } smlUntypedEventId ;
 
 typedef enum {
@@ -170,47 +181,47 @@ typedef enum {
 
 	// Marker for end of sml event list
 	// Must always be at the end of the enum
-	smlEVENT_LAST = smlEVENT_EDIT_PRODUCTION + 1
+	smlEVENT_LAST = smlEVENT_LAST_UNTYPED_EVENT + 1
 } smlGenericEventId ;
 
 static inline bool IsUntypedEventID(int id)
 {
-	return (id >= smlEVENT_EDIT_PRODUCTION && id <= smlEVENT_EDIT_PRODUCTION) ;
+	return (id >= smlEVENT_EDIT_PRODUCTION && id <= smlEVENT_LAST_UNTYPED_EVENT) ;
 }
 
 static inline bool IsSystemEventID(int id)
 {
-	return (id >= smlEVENT_BEFORE_SHUTDOWN && id <= smlEVENT_AFTER_RHS_FUNCTION_EXECUTED) ;
+	return (id >= smlEVENT_BEFORE_SHUTDOWN && id <= smlEVENT_LAST_SYSTEM_EVENT) ;
 }
 
 static inline bool IsRunEventID(int id)
 {
-	return (id >= smlEVENT_BEFORE_SMALLEST_STEP && id <= smlEVENT_AFTER_RUNNING) ;
+	return (id >= smlEVENT_BEFORE_SMALLEST_STEP && id <= smlEVENT_LAST_RUN_EVENT) ;
 }
 
 static inline bool IsProductionEventID(int id)
 {
-	return (id >= smlEVENT_AFTER_PRODUCTION_ADDED && id <= smlEVENT_BEFORE_PRODUCTION_RETRACTED) ;
+	return (id >= smlEVENT_AFTER_PRODUCTION_ADDED && id <= smlEVENT_LAST_PRODUCTION_EVENT) ;
 }
 
 static inline bool IsAgentEventID(int id)
 {
-	return (id >= smlEVENT_AFTER_AGENT_CREATED && id <= smlEVENT_AFTER_AGENT_REINITIALIZED) ;
+	return (id >= smlEVENT_AFTER_AGENT_CREATED && id <= smlEVENT_LAST_AGENT_EVENT) ;
 }
 
 static inline bool IsWorkingMemoryEventID(int id)
 {
-	return (id >= smlEVENT_OUTPUT_PHASE_CALLBACK && id <= smlEVENT_OUTPUT_PHASE_CALLBACK) ;
+	return (id >= smlEVENT_OUTPUT_PHASE_CALLBACK && id <= smlEVENT_LAST_WM_EVENT) ;
 }
 
 static inline bool IsPrintEventID(int id)
 {
-	return (id >= smlEVENT_LOG_ERROR && id <= smlEVENT_PRINT) ;
+	return (id >= smlEVENT_LOG_ERROR && id <= smlEVENT_LAST_PRINT_EVENT) ;
 }
 
 static inline bool IsRhsEventID(int id)
 {
-	return (id >= smlEVENT_RHS_USER_FUNCTION && id <= smlEVENT_RHS_USER_FUNCTION) ;
+	return (id >= smlEVENT_RHS_USER_FUNCTION && id <= smlEVENT_LAST_RHS_EVENT) ;
 }
 
 static inline bool IsXMLEventID(int id)
@@ -220,7 +231,7 @@ static inline bool IsXMLEventID(int id)
 
 static inline bool IsUpdateEventID(int id)
 {
-	return (id >= smlEVENT_AFTER_ALL_OUTPUT_PHASES && id <= smlEVENT_AFTER_ALL_GENERATED_OUTPUT) ;
+	return (id >= smlEVENT_AFTER_ALL_OUTPUT_PHASES && id <= smlEVENT_LAST_UPDATE_EVENT) ;
 }
 
 typedef enum {

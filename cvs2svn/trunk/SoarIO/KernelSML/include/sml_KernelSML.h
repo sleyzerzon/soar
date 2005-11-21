@@ -262,6 +262,13 @@ public:
 	void RemoveRhsListener(char const* pFunctionName, Connection* pConnection) { m_RhsListener.RemoveRhsListener(pFunctionName, pConnection) ; }
 
 	/*************************************************************
+	* @brief	Send this message out to any clients that are listening.
+	*			These messages are from one client to another--kernelSML is just
+	*			facilitating the message passing process without knowing/caring what is being passed.
+	*************************************************************/
+	std::string SendClientMessage(gSKI::IAgent* pAgent, char const* pMessageType, char const* pMessage) ;
+
+	/*************************************************************
 	* @brief Convert from a string version of an event to the int (enum) version.
 	*		 Returns smlEVENT_INVALID_EVENT (== 0) if the string is not recognized.
 	*************************************************************/
@@ -469,6 +476,7 @@ protected:
 	bool KernelSML::HandleGetAllInput(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
 	bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
 	bool KernelSML::HandleIsProductionLoaded(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
+	bool KernelSML::HandleSendClientMessage(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
 
 	// Note: Register and unregister are both sent to this one handler
 	bool KernelSML::HandleRegisterForEvent(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;

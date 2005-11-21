@@ -232,6 +232,12 @@ protected:
 	long	GenerateNextID()		{ return ++m_IdCounter ; }
 	long	GenerateNextTimeTag()	{ return --m_TimeTagCounter ; }	// Count down so different from Soar kernel
 
+	/***
+	***   RHS functions and message event handlers use the same internal logic, although they look rather different to the user
+	***/
+	int	InternalAddRhsFunction(smlRhsEventId id, char const* pRhsFunctionName, RhsEventHandler handler, void* pUserData, bool addToBack) ;
+	bool InternalRemoveRhsFunction(smlRhsEventId id, int callbackID) ;
+
 	/*************************************************************
 	* @brief This function is called when an event is received
 	*		 from the Soar kernel.
@@ -690,6 +696,59 @@ public:
 	* @returns True if succeeds
 	*************************************************************/
 	bool RemoveRhsFunction(int callbackID) ;
+
+	/*************************************************************
+	* @brief Register a handler for receiving generic messages sent from another client.
+	*		 The content of the messages are up to the client and really aren't related to Soar, but providing the
+	*		 ability to send a message from any client to any other client is sometimes useful.
+	*
+	*		 When the original client sends a message, the RHS function handler is called to process and (optionally) return
+	*		 a message to the caller.
+	*
+	*		 Multiple handlers can be registered for a given message type and the results will be concatenated together and returned
+	*		 to the original caller.  (This is expected to be an usual situation).
+	*		 
+	*		 A RHS (right hand side) function handler is used just to reduce the number of types in the system and because it is sufficient
+	*		 for this purpose.
+	*
+	*		 The function is implemented by providing a handler (a RhsEventHandler).  This will be passed a single string
+	*		 and returns a string.  The incoming argument string can contain arguments that the client should parse
+	*		 (e.g. passing a coordinate as "12 56").  The format of the string is up to the implementor of the specific RHS function.
+	*
+	* @param pMessageType		The message type.  It's role is up to the clients to decide on (e.g. all messages could be one type or there could be many different types) 
+	* @param handler			A function that will be called when the event happens
+	* @param pUserData			Arbitrary data that will be passed back to the handler function when the event happens.
+	* @param addToBack			If true add this handler is called after existing handlers.  If false, called before existing handlers.
+	*
+	* @returns Unique ID for this callback.  Required when unregistering this callback.
+	*************************************************************/
+	int RegisterForClientMessageEvent(char const* pMessageType, RhsEventHandler handler, void* pUserData, bool addToBack = true) ;
+
+	/*************************************************************
+	* @brief Unregister for a particular client message
+	*        using the ID passed back from RegisterForClientMessageEvent().
+	* @returns True if succeeds
+	*************************************************************/
+	bool UnregisterForClientMessageEvent(int callbackID) ;
+
+	/*************************************************************
+	* @brief Send a message to another client (not the Soar kernel).
+	*		 The other client must have registered for this message to receive it.
+	*
+	*		 This mechanism allows one client to send an arbitrary string to another client and
+	*		 get a response (as a string).  The contents of the string are up to the clients to agree upon.
+	*		 Passing a string is sufficient to support either simple functionality (passing just a single value) up to
+	*		 complex functionality (passing a complete XML message).
+	*
+	*		 If multiple other clients register for this message, their responses are concatenated together in the result.
+	*		 (This is not expected to be a common usage).
+	*
+	* @param pAgent				The originating agent (can be NULL), if this message is specific to an agent.
+	* @param pMessageType		The message type.  The meaning of this is up to the clients to agree upon, but the receiver needs to register for this same value to receive the message.
+	* @param pMessage			The message being sent.
+	* @returns The response (if any) from the receiving client.  The string "**NONE**" is reserved to indicate nobody was registered for this event.
+	*************************************************************/
+	std::string SendClientMessage(Agent* pAgent, char const* pMessageType, char const* pMessage) ;
 
 	/*************************************************************
 	* @brief Register for an "AgentEvent".

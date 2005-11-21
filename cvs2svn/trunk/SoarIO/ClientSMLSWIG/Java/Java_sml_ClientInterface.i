@@ -8,16 +8,30 @@
 %javaconst(1); // strongly recommended by SWIG manual section 19.3.5.1
 // the previous line causes problems for some enum values, so we have to set them manually here
 // the problem only affects those enums whose values are "calculated" based on other values
-%javaconstvalue("smlSystemEventId.smlEVENT_AFTER_RHS_FUNCTION_EXECUTED.swigValue() + 1") smlEVENT_BEFORE_SMALLEST_STEP;
-%javaconstvalue("smlProductionEventId.smlEVENT_BEFORE_PRODUCTION_RETRACTED.swigValue() + 1") smlEVENT_AFTER_AGENT_CREATED;
-%javaconstvalue("smlPrintEventId.smlEVENT_PRINT.swigValue() + 1") smlEVENT_RHS_USER_FUNCTION;
-%javaconstvalue("smlRhsEventId.smlEVENT_RHS_USER_FUNCTION.swigValue() + 1") smlEVENT_XML_TRACE_OUTPUT;
-%javaconstvalue("smlXMLEventId.smlEVENT_XML_INPUT_RECEIVED.swigValue() + 1") smlEVENT_AFTER_ALL_OUTPUT_PHASES;
-%javaconstvalue("smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT.swigValue() + 1") smlEVENT_EDIT_PRODUCTION;
-%javaconstvalue("smlUntypedEventId.smlEVENT_EDIT_PRODUCTION.swigValue() + 1") smlEVENT_LAST;
-%javaconstvalue("smlWorkingMemoryEventId.smlEVENT_OUTPUT_PHASE_CALLBACK.swigValue() + 1") smlEVENT_LOG_ERROR;
-%javaconstvalue("smlRunEventId.smlEVENT_AFTER_RUNNING.swigValue() + 1") smlEVENT_AFTER_PRODUCTION_ADDED;
-%javaconstvalue("smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED.swigValue() + 1") smlEVENT_OUTPUT_PHASE_CALLBACK;
+%javaconstvalue("smlSystemEventId.smlEVENT_LAST_SYSTEM_EVENT.swigValue() + 1") smlEVENT_BEFORE_SMALLEST_STEP;
+%javaconstvalue("smlProductionEventId.smlEVENT_LAST_PRODUCTION_EVENT.swigValue() + 1") smlEVENT_AFTER_AGENT_CREATED;
+%javaconstvalue("smlPrintEventId.smlEVENT_LAST_PRINT_EVENT.swigValue() + 1") smlEVENT_RHS_USER_FUNCTION;
+%javaconstvalue("smlRhsEventId.smlEVENT_LAST_RHS_EVENT.swigValue() + 1") smlEVENT_XML_TRACE_OUTPUT;
+%javaconstvalue("smlXMLEventId.smlEVENT_LAST_XML_EVENT.swigValue() + 1") smlEVENT_AFTER_ALL_OUTPUT_PHASES;
+%javaconstvalue("smlUpdateEventId.smlEVENT_LAST_UPDATE_EVENT.swigValue() + 1") smlEVENT_EDIT_PRODUCTION;
+%javaconstvalue("smlUntypedEventId.smlEVENT_LAST_UNTYPED_EVENT.swigValue() + 1") smlEVENT_LAST;
+%javaconstvalue("smlWorkingMemoryEventId.smlEVENT_LAST_WM_EVENT.swigValue() + 1") smlEVENT_LOG_ERROR;
+%javaconstvalue("smlRunEventId.smlEVENT_LAST_RUN_EVENT.swigValue() + 1") smlEVENT_AFTER_PRODUCTION_ADDED;
+%javaconstvalue("smlAgentEventId.smlEVENT_LAST_AGENT_EVENT.swigValue() + 1") smlEVENT_OUTPUT_PHASE_CALLBACK;
+
+// I hope we can figure out how to avoid having to write these lines manually (a SWIG bug?)
+// Generates:   public final static smlPrintEventId smlEVENT_LAST_PRINT_EVENT = new smlPrintEventId("smlEVENT_LAST_PRINT_EVENT", smlEVENT_PRINT);
+// but there's no constructor for smlPrintEventId(String, smlPrintEventId id).  Could write one I guess so we don't have to maintain this code.
+%javaconstvalue("smlSystemEventId.smlEVENT_AFTER_RHS_FUNCTION_EXECUTED.swigValue()") smlEVENT_LAST_SYSTEM_EVENT;
+%javaconstvalue("smlRunEventId.smlEVENT_AFTER_RUNNING.swigValue()") smlEVENT_LAST_RUN_EVENT;
+%javaconstvalue("smlProductionEventId.smlEVENT_BEFORE_PRODUCTION_RETRACTED.swigValue()") smlEVENT_LAST_PRODUCTION_EVENT;
+%javaconstvalue("smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED.swigValue()") smlEVENT_LAST_AGENT_EVENT;
+%javaconstvalue("smlWorkingMemoryEventId.smlEVENT_OUTPUT_PHASE_CALLBACK.swigValue()") smlEVENT_LAST_WM_EVENT;
+%javaconstvalue("smlPrintEventId.smlEVENT_PRINT.swigValue()") smlEVENT_LAST_PRINT_EVENT;
+%javaconstvalue("smlRhsEventId.smlEVENT_CLIENT_MESSAGE.swigValue()") smlEVENT_LAST_RHS_EVENT;
+%javaconstvalue("smlXMLEventId.smlEVENT_XML_INPUT_RECEIVED.swigValue()") smlEVENT_LAST_XML_EVENT;
+%javaconstvalue("smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT.swigValue()") smlEVENT_LAST_UPDATE_EVENT;
+%javaconstvalue("smlUntypedEventId.smlEVENT_EDIT_PRODUCTION.swigValue()") smlEVENT_LAST_UNTYPED_EVENT;
 
 //
 // Doug's custom Java code for registering/unregistering callbacks

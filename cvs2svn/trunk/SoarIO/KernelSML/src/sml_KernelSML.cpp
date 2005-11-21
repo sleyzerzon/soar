@@ -207,6 +207,25 @@ void KernelSML::Shutdown()
 }
 
 /*************************************************************
+* @brief	Send this message out to any clients that are listening.
+*			These messages are from one client to another--kernelSML is just
+*			facilitating the message passing process without knowing/caring what is being passed.
+*************************************************************/
+std::string KernelSML::SendClientMessage(gSKI::IAgent* pAgent, char const* pMessageType, char const* pMessage)
+{
+	char response[10000] ;
+	response[0] = 0 ;
+
+	bool ok = m_RhsListener.HandleEvent(gSKIEVENT_CLIENT_MESSAGE, pAgent, false, pMessageType, pMessage, sizeof(response), response) ;
+	if (!ok)
+	{
+		strcpy(response, "**NONE**") ;
+	}
+
+	return response ;
+}
+
+/*************************************************************
 * @brief Convert from a string version of an event to the int (enum) version.
 *		 Returns smlEVENT_INVALID_EVENT (== 0) if the string is not recognized.
 *************************************************************/
