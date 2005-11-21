@@ -716,6 +716,7 @@ public:
 	*		 (e.g. passing a coordinate as "12 56").  The format of the string is up to the implementor of the specific RHS function.
 	*
 	* @param pMessageType		The message type.  It's role is up to the clients to decide on (e.g. all messages could be one type or there could be many different types) 
+	*							Due to the way this is implemented, the type here must not be the same as the name of a RHS function registered with Soar.
 	* @param handler			A function that will be called when the event happens
 	* @param pUserData			Arbitrary data that will be passed back to the handler function when the event happens.
 	* @param addToBack			If true add this handler is called after existing handlers.  If false, called before existing handlers.
@@ -745,6 +746,7 @@ public:
 	*
 	* @param pAgent				The originating agent (can be NULL), if this message is specific to an agent.
 	* @param pMessageType		The message type.  The meaning of this is up to the clients to agree upon, but the receiver needs to register for this same value to receive the message.
+	*							Due to the way this is implemented, the type here must not be the same as the name of a RHS function registered with Soar.
 	* @param pMessage			The message being sent.
 	* @returns The response (if any) from the receiving client.  The string "**NONE**" is reserved to indicate nobody was registered for this event.
 	*************************************************************/
