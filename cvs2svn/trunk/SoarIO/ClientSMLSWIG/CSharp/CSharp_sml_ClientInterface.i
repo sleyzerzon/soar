@@ -38,15 +38,25 @@
 	}
 %}
 
+//typedef void (*RunEventHandler)(smlRunEventId id, void* pUserData, Agent* pAgent, smlPhase phase);
+
 %typemap(cscode) sml::Agent %{
-	public delegate void MyRunCallback(smlRunEventId eventID);
-	
+	public delegate void MyRunCallback(IntPtr agent, smlRunEventId eventID);
+
+	// DJP: NOTE!  When changing this code make sure the library smlCSharp.dll is getting
+	// updated.  I have had many cases where Visual Studio keeps the library loaded when it shouldn't causing the build
+	// to appear to work, but the library is not updated (because it can't be overwritten).
+	// The simple test is manually deleting the library from Explorer.  If that fails, close the solution and re-open it in VS
+	// which will break the lock.
 	[DllImport("CSharp_sml_ClientInterface")]
-	public static extern int CSharp_Agent_RegisterForRunEvent(HandleRef jarg1, int eventID, MyRunCallback callback);
+	public static extern int CSharp_Agent_RegisterForRunEvent(HandleRef jarg1, int eventID, IntPtr jagent, MyRunCallback callbacks);
 
 	public int RegisterForRunEvent(smlRunEventId eventID, MyRunCallback jarg2)
 	{
-		return CSharp_Agent_RegisterForRunEvent(swigCPtr, (int)eventID, jarg2) ;
+		// This call ensures the garbage collector won't delete the object until we call free on the handle.
+		// It also uses an approved way to pass a pointer to unsafe (C++) code and get it back.
+		GCHandle agentHandle = GCHandle.Alloc(this) ;
+		return CSharp_Agent_RegisterForRunEvent(swigCPtr, (int)eventID, (IntPtr)agentHandle, jarg2) ;
 	}
 
 	[DllImport("CSharp_sml_ClientInterface")]

@@ -28,8 +28,8 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_SetTraceCommunications(void * jarg1, u
 	public static extern void MyFunction(MyCallback callback);
 	*/
 
-typedef void (__stdcall *MyTestCallback)() ;
-
+//typedef void (__stdcall *MyTestCallback)() ;
+/*
 SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterTestMethod(void * jarg1, unsigned int jarg2) {
     sml::Kernel *arg1 = (sml::Kernel *) 0 ;
 	MyTestCallback pFunction = (MyTestCallback)jarg2 ;
@@ -39,21 +39,25 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterTestMethod(void * jarg1, unsig
 	// Make the callback right now as a test
 	pFunction() ;
 }
+*/
+typedef int	agentPtr ;
 
-typedef void (__stdcall *MyRunCallback)(int eventID) ;
+typedef void (__stdcall *MyRunCallback)(agentPtr jagent, int eventID) ;
 
 class CSharpCallbackData
 {
 // Making these public as this is basically just a struct.
 public:
 	int				m_EventID ;
+	agentPtr		m_Agent ;
 	void*			m_CallbackFunction ;
 	unsigned int	m_CallbackData ;
 	int				m_CallbackID ;
 
 public:
-	CSharpCallbackData(int eventID, void* callbackFunction, unsigned int callbackData)
+	CSharpCallbackData(agentPtr jagent, int eventID, void* callbackFunction, unsigned int callbackData)
 	{
+		m_Agent = jagent ;
 		m_EventID = eventID ;
 		m_CallbackFunction = callbackFunction ;
 		m_CallbackData = callbackData ;
@@ -65,9 +69,9 @@ public:
 	}
 } ;
 
-static CSharpCallbackData* CreateCSharpCallbackData(int eventID, unsigned int callbackFunction, unsigned int callbackData)
+static CSharpCallbackData* CreateCSharpCallbackData(agentPtr jagent, int eventID, unsigned int callbackFunction, unsigned int callbackData)
 {
-	return new CSharpCallbackData(eventID, (void *)callbackFunction, callbackData) ;
+	return new CSharpCallbackData(jagent, eventID, (void *)callbackFunction, callbackData) ;
 }
 
 // This is the C++ handler which will be called by clientSML when the event fires.
@@ -80,10 +84,10 @@ static void RunEventHandler(sml::smlRunEventId id, void* pUserData, sml::Agent* 
 	MyRunCallback callback = (MyRunCallback)pData->m_CallbackFunction ;
 
 	// Now try to call back to CSharp
-	callback(pData->m_EventID) ;
+	callback(pData->m_Agent, pData->m_EventID) ;
 }
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int jarg2, unsigned int jarg3)
+SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int jarg2, agentPtr jagent, unsigned int jarg3)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -94,7 +98,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int ja
 	// jarg3 is the callback function
 
 	// Create the information we'll need to make a Java call back later
-	CSharpCallbackData* pData = CreateCSharpCallbackData(jarg2, jarg3, 0) ;
+	CSharpCallbackData* pData = CreateCSharpCallbackData(jagent, jarg2, jarg3, 0) ;
 	
 	// Register our handler.  When this is called we'll call back to the client method.
 	pData->m_CallbackID = arg1->RegisterForRunEvent(arg2, &RunEventHandler, pData) ;

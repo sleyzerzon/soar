@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace TestCSharpSML
 {
@@ -7,14 +8,13 @@ namespace TestCSharpSML
 	/// </summary>
 	class Class1
 	{
-		static void MyTestCallback()
+		static void MyTestRunCallback(IntPtr agentPtr, sml.smlRunEventId eventID)
 		{
-			System.Console.Out.WriteLine("Called back successfully") ;
-		}
+			// Retrieve the original object reference from the GCHandle which is used to pass the value safely to and from C++ (unsafe/unmanaged) code.
+			sml.Agent agent = (sml.Agent)((GCHandle)agentPtr).Target ;
 
-		static void MyTestRunCallback(sml.smlRunEventId eventID)
-		{
-			System.Console.Out.WriteLine("Called back successfully " + eventID) ;
+			String name = agent.GetAgentName() ;
+			System.Console.Out.WriteLine("Called back successfully " + eventID + " for agent " + name) ;
 		}
 
 		/// <summary>
@@ -38,8 +38,8 @@ namespace TestCSharpSML
 
 			agent.RunSelf(3) ;
 
-			sml.Kernel.MyCallback callback = new sml.Kernel.MyCallback(MyTestCallback) ;
-			kernel.RegisterTestMethod(callback) ;
+			//sml.Kernel.MyCallback callback = new sml.Kernel.MyCallback(MyTestCallback) ;
+			//kernel.RegisterTestMethod(callback) ;
 
 			ok = agent.UnregisterForRunEvent(callbackID) ;
 
