@@ -166,8 +166,9 @@
    	 // fired within Soar productions.  This is different from normal events in that
  	 // the handler is executing the function and returning a value, not just being notified
  	 // that something has happened.
- 	 gSKIEVENT_RHS_USER_FUNCTION = gSKIEVENT_LAST_PRINT_EVENT + 1,   
-	 gSKIEVENT_LAST_RHS_EVENT = gSKIEVENT_RHS_USER_FUNCTION,
+ 	 gSKIEVENT_RHS_USER_FUNCTION = gSKIEVENT_LAST_PRINT_EVENT + 1,
+	 gSKIEVENT_CLIENT_MESSAGE,
+	 gSKIEVENT_LAST_RHS_EVENT = gSKIEVENT_CLIENT_MESSAGE,
     } egSKIRhsEventId;
  
     static inline bool IsRhsEventID (int id)
