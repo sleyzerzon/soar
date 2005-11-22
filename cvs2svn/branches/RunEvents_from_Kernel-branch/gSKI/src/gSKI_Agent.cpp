@@ -269,7 +269,7 @@ namespace gSKI
       m_smallestStepCount = 0;
       m_phaseCount        = 0;
       m_elaborationCount  = 0;
-      m_decisionCount     = 0;  // should be m_agent->d_cycle_count ?  Can we delete this var?
+      m_decisionCount     = 0;  // should be m_agent->d_cycle_count.  Can we delete this var?
       m_outputCount       = 0;
 
       // This tells run that we are starting a new cycle
@@ -944,14 +944,14 @@ namespace gSKI
    egSKIPhaseType Agent::GetCurrentPhase(Error* err)
    {
       ClearError(err);
-      return m_nextPhase;
+      // return m_nextPhase;
 	  // KJC:  shouldn't this really be 
 	  return EnumRemappings::ReMapPhaseType(m_agent->current_phase,0);
    }
 
    /*
    =============================
-
+   This counter deprecated as of v8.6.2
    =============================
    */
    unsigned long Agent::GetNumSmallestStepsExecuted(Error* err)
@@ -962,7 +962,7 @@ namespace gSKI
    
    /*
    =============================
-
+   This is a local gSKI counter, not from Kernel
    =============================
    */
    unsigned long Agent::GetNumPhasesExecuted(Error* err)
@@ -970,10 +970,16 @@ namespace gSKI
       ClearError(err);
       return m_phaseCount;
    }
-
+   void Agent::ResetNumPhasesExecuted(Error* err)
+   {
+      ClearError(err);
+      m_phaseCount = 0;
+   }
    /*
    =============================
-
+   This is a local gSKI counter, not from Kernel.  m_elaborationCount
+   gets incremented for each e_cycle or phase, but not both in same
+   step.  m_agent->e_cycle_count is true e_cycles only, from kernel.
    =============================
    */
    unsigned long Agent::GetNumElaborationsExecuted(Error* err)
@@ -996,7 +1002,7 @@ namespace gSKI
 
    /*
    =============================
-
+   This is a local gSKI counter, not from Kernel
    =============================
    */
    unsigned long Agent::GetNumOutputsExecuted(Error* err)
@@ -1004,7 +1010,39 @@ namespace gSKI
       ClearError(err);
       return m_outputCount;
    }
+   void Agent::ResetNumOutputsExecuted(Error* err)
+   {
+      ClearError(err);
+      m_outputCount = 0;
+   }
 
+/********************************************************************
+* @brief	Agents maintain a number of counters (for how many phase,
+*			decisions etc.) they have ever executed.
+*			We use these counters to determine when a run should stop.
+*********************************************************************/
+void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
+{
+	switch(interleaveStepSize)
+	{
+	case gSKI_RUN_SMALLEST_STEP:
+		 m_smallestStepCount++;
+		return;
+	case gSKI_RUN_PHASE:
+		 m_phaseCount++;
+		return;
+	case gSKI_RUN_ELABORATION_CYCLE:
+		 m_elaborationCount++;
+		return;
+	case gSKI_RUN_DECISION_CYCLE:
+		// do nothing.  gSKI gets d_cycles from SoarKernel
+		return;
+	case gSKI_RUN_UNTIL_OUTPUT:
+		 m_outputCount++;
+	default:
+		return;
+	}
+}
       /*
    =========================
     _       _     _ ____  _         _____                 _   _
@@ -1990,6 +2028,7 @@ namespace gSKI
 		 return &m_agent->d_cycle_count;
       case gSKI_RUN_UNTIL_OUTPUT:
          return &m_outputCount;
+		 // KJC Nov 05.  Added to kernel agent, d_cycle_last_output
       default:
          return 0;
       }

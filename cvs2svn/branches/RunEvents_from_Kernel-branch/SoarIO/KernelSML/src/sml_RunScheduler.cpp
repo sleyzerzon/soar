@@ -35,7 +35,7 @@ RunScheduler::RunScheduler(KernelSML* pKernelSML)
 
 /*************************************************************
 * @brief	Each agent is set to either run or not when the
-*			next run command is executed.
+*			next Run command is executed.
 *************************************************************/
 void RunScheduler::ScheduleAgentToRun(AgentSML* pAgentSML, bool state)
 {
@@ -45,7 +45,7 @@ void RunScheduler::ScheduleAgentToRun(AgentSML* pAgentSML, bool state)
 
 /*************************************************************
 * @brief	Sets all agents to either run or not when the
-*			next run command is executed.
+*			next Run command is executed.
 *************************************************************/
 void RunScheduler::ScheduleAllAgentsToRun(bool state)
 {
@@ -55,7 +55,62 @@ void RunScheduler::ScheduleAllAgentsToRun(bool state)
 		pAgentSML->ScheduleAgentToRun(state) ;
 	}
 }
+/********************************************************************
+* @brief	This is a method for getting the default value
+*			for the interleaveStepSize for running agents.
+*
+*********************************************************************/
+egSKIInterleaveType RunScheduler::DefaultInterleaveStepSize(egSKIRunType runStepSize)
+{
+	switch(runStepSize)
+	{
+	case gSKI_RUN_SMALLEST_STEP:  // deprecated
+		return (static_cast <egSKIInterleaveType>(0));
+	case gSKI_RUN_PHASE:
+		return gSKI_INTERLEAVE_PHASE;
+	case gSKI_RUN_ELABORATION_CYCLE:
+		return gSKI_INTERLEAVE_ELABORATION_PHASE;
+	case gSKI_RUN_DECISION_CYCLE:
+		return gSKI_INTERLEAVE_DECISION_CYCLE;
+	case gSKI_RUN_UNTIL_OUTPUT:
+		return gSKI_INTERLEAVE_OUTPUT;
+	default:
+		return gSKI_INTERLEAVE_PHASE;
+	}
+}
 
+/********************************************************************
+* @brief	Don't try to Run with an nonsense interleaveStepSize
+*
+*********************************************************************/
+bool RunScheduler::VerifyStepSizeForRunType(egSKIRunType runStepSize, egSKIInterleaveType interleave)
+{
+	switch(runStepSize)
+	{
+	case gSKI_RUN_SMALLEST_STEP:  // deprecated
+		assert (runStepSize == gSKI_RUN_SMALLEST_STEP);
+		return true;
+	case gSKI_RUN_PHASE:
+ 		assert( gSKI_INTERLEAVE_PHASE == interleave ) ;
+		return true;
+	case gSKI_RUN_ELABORATION_CYCLE: 
+		assert( gSKI_INTERLEAVE_ELABORATION_PHASE == interleave ) ;
+		return true;
+	case gSKI_RUN_DECISION_CYCLE:
+		assert(gSKI_INTERLEAVE_PHASE == interleave || 
+			   gSKI_INTERLEAVE_ELABORATION_PHASE == interleave || 
+			   gSKI_INTERLEAVE_DECISION_CYCLE == interleave) ;
+		return true;
+	case gSKI_RUN_UNTIL_OUTPUT:
+		assert(gSKI_INTERLEAVE_PHASE == interleave || 
+			   gSKI_INTERLEAVE_ELABORATION_PHASE == interleave || 
+			   gSKI_INTERLEAVE_DECISION_CYCLE == interleave ||
+			   gSKI_INTERLEAVE_OUTPUT == interleave) ;
+
+	default:
+		return false;
+	}
+}
 /********************************************************************
 * @brief	Agents maintain a number of counters (for how many phase,
 *			decisions etc.) they have ever executed.
@@ -80,6 +135,7 @@ unsigned long RunScheduler::GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType ru
 	}
 }
 
+
 /*************************************************************************
 * @brief	Returns true if phase1 is later in the execution cycle than phase2
 **************************************************************************/
@@ -87,6 +143,7 @@ static bool IsPhaseLater(egSKIPhaseType phase1, egSKIPhaseType phase2)
 {
 	// Right now the enum is in the correct order, but if we change Soar we
 	// might need to make this more complex.
+	// KJC:  won't work for Soar7-mode.  Enum not same and Decision is last.
 	return phase1 > phase2 ;
 }
 
@@ -201,6 +258,10 @@ void RunScheduler::RecordInitialRunCounters(egSKIRunType runStepSize)
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
+			// KJC:  should we reset the phase and output counters?
+			// They matter only locally within a given Run command.  
+			// pAgent->ResetNumOutputsExecuted();
+			// pAgent->ResetNumPhasesExecuted();
 			gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
 			unsigned long count = GetStepCounter(pAgent, runStepSize) ;
 			pAgentSML->SetInitialStepCount(count) ;
@@ -208,6 +269,26 @@ void RunScheduler::RecordInitialRunCounters(egSKIRunType runStepSize)
 	}
 }
 
+// The gSKI_Agent counters will maintain global values.  The counters in SML
+// are used locally within a single call to RunScheduledAgents
+void RunScheduler::ResetRunCounters(egSKIRunType runStepSize)
+{
+	egSKIRunType dummy;
+	dummy = runStepSize;  // stupid warning...
+	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
+	{
+		AgentSML* pAgentSML = iter->second ;
+
+		if (pAgentSML->IsAgentScheduledToRun())
+		{
+			// KJC:  should we reset the phase and output counters here?
+			// They should matter only locally within a given Run command.  
+			// pAgentSML->ResetNumOutputsExecuted();
+			// pAgentSML->ResetNumPhasesExecuted();
+			pAgentSML->SetInitialStepCount(0) ;
+		}
+	}
+}
 /********************************************************************
 * @brief	Certain events are designed to fire "after the agents have done useful work".
 *			We use these to update the environment.
@@ -307,6 +388,9 @@ void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, eg
 
 		// If the number of outputs generated by this agent has changed record it as
 		// having generated output and possibly fire a notification event.
+
+		//KJC Nov 05:  An assumption is being made here that within RunScheduledAgents
+		// an agent will never run the output phase more than once.  
 		unsigned long count = pAgent->GetNumOutputsExecuted() ;
 		if (count != pAgentSML->GetInitialOutputCount())
 		{
@@ -315,6 +399,59 @@ void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, eg
 		}
 	}
 }
+
+/********************************************************************
+* @brief	Called when the agent completes any phase.
+*			 
+*********************************************************************/
+void RunScheduler::NewHandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase)
+{
+	/*
+   typedef enum {
+      gSKI_INTERLEAVE_SMALLEST_STEP,
+	  gSKI_INTERLEAVE_ELABORATION_PHASE,
+      gSKI_INTERLEAVE_PHASE,
+      gSKI_INTERLEAVE_DECISION_CYCLE,
+      gSKI_INTERLEAVE_OUTPUT
+   } egSKIInterleaveType;
+
+	  typedef enum {
+      gSKI_RUN_SMALLEST_STEP,
+      gSKI_RUN_PHASE,
+	  gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step 
+      gSKI_RUN_DECISION_CYCLE,
+      gSKI_RUN_UNTIL_OUTPUT,
+      gSKI_RUN_FOREVER,
+      gSKI_NUM_RUN_TYPES
+   } egSKIRunType; 
+   */
+
+	if (IsAFTERPhaseEventID(static_cast<int>(eventID))) 
+	{
+		//pAgent->IncrementgSKIStepCounter(gSKI_INTERLEAVE_PHASE);
+        if (phase == gSKI_OUTPUT_PHASE)	
+		{
+			//IF MODIFIED_OUTPUT then IncrementgSKIStepCounter(pAgent, gSKI_INTERLEAVE_OUTPUT);
+			AgentSML* pAgentSML = m_pKernelSML->GetAgentSML(pAgent) ;
+		    pAgentSML->SetCompletedOutputPhase(true) ;
+		}
+	} else if (gSKIEVENT_AFTER_ELABORATION_CYCLE == eventID) 
+	{
+		//pAgent->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
+	}
+		AgentSML* pAgentSML = m_pKernelSML->GetAgentSML(pAgent) ;
+
+		// If the number of outputs generated by this agent has changed record it as
+		// having generated output and possibly fire a notification event.
+
+		//KJC Nov 05:  An assumption is being made here that within New RunScheduledAgents
+		// an agent will NEVER run the output phase more than once.  
+		unsigned long count = pAgent->GetNumOutputsExecuted() ;
+		if (count != pAgentSML->GetInitialOutputCount())
+		{
+			pAgentSML->SetGeneratedOutput(true) ;
+		}
+	}
 
 /********************************************************************
 * @brief	Check if the "AFTER_ALL_GENERATED_OUTPUT" event should be
@@ -555,3 +692,80 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsign
 	return overallResult ;
 }
 
+/*************************************************************
+* @brief	Run all agents previously marked as being scheduled to run.
+*
+* @param runStepSize -- decision/phase etc.
+* @param count		 -- how many steps to run
+* @param runFlags	 -- type of run we're doing (passed back to environment)
+* @param interleaveStepSize -- how large of a step each agent is run before other agents are run
+* @param synchronize -- if true, synchronize all agents scheduled to run to the same phase before running all agents in step
+* @param pError		 -- any error
+*
+* @return Not clear on how to set this when have multiple agents.
+*		  Can query each for "GetLastRunResult()".
+*************************************************************/	
+egSKIRunResult RunScheduler::NewRunScheduledAgents(egSKIRunType runStepSize, 
+												   unsigned long count, 
+												   smlRunFlags runFlags, 
+												   egSKIInterleaveType interleaveStepSize, 
+												   bool synchronize, 
+												   gSKI::Error* pError)
+{
+    // Agents were already appropriately added (or not) to the RunList before calling this method.
+	// For every Run Command issued, we can find out if agent is still scheduled to run,
+	// and/or whether it was scheduled to run at all.  When agents stop or Halt, the
+	// AgentScheduledToRun bool is set to false, but WasScheduledToRun is unchanged.
+
+	// We store this as a member so we can access it in gSKI event handlers
+	m_RunFlags = runFlags ;
+
+	// Make sure the args of the Run command are valid.
+	VerifyStepSizeForRunType(runStepSize, interleaveStepSize) ;
+
+	// Reset each SML agent's "run" counter (that we're about to be incrementing)
+	ResetRunCounters(runStepSize) ;
+
+    ////check from here ...
+	gSKI::IKernel* pKernel = m_pKernelSML->GetKernel() ;
+
+	// Fire one event to indicate the entire system is starting
+	pKernel->FireSystemStart() ;
+
+	// Send event for each agent to signal its about to start running
+	FireBeforeRunStartsEvents() ;
+
+	bool runFinished = false ;
+	long stepCount   = 0 ;
+	egSKIRunResult overallResult = gSKI_RUN_COMPLETED ;
+
+	pKernel->GetAgentManager()->ClearAllInterrupts();
+
+	// Record that we're now running, so we can poll for our status during a run.
+	m_IsRunning = true ;
+
+	int interruptCheckRate = pKernel->GetInterruptCheckRate() ;
+    /// to here...
+
+
+	// If we need to synchronize agents, we'll set the synchAgent pointer.
+	// Otherwise, we'll clear it to indicate no synch needed.
+	// This only matters when interleaving by Phases, since SoarKernel methods
+	// will naturally synch agents interleaving by Decision or Output.
+	// When interleaving by Elaboration cycles, synching can't be done.
+	m_pSynchAgentSML = NULL ;
+	if (synchronize && (gSKI_RUN_PHASE == interleaveStepSize))
+	{
+		AgentSML* pSynchAgentSML = this->GetAgentToSynchronizeWith() ;
+		bool inSynch = AreAgentsSynchronized(pSynchAgentSML) ;
+
+		if (!inSynch)
+			m_pSynchAgentSML = pSynchAgentSML ;
+	}
+
+	// If we issue a "run 0" and all agents are synched and in the correct state we're done.
+	if (!m_pSynchAgentSML && TestIfAllFinished(runStepSize, count))
+		runFinished = true ;
+
+return overallResult ;
+}

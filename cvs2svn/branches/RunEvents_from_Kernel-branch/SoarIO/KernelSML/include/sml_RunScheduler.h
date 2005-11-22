@@ -44,6 +44,24 @@ protected:
 public:
 	RunScheduler(KernelSML* pKernelSML) ;
 
+    /********************************************************************
+    * @brief	This is a method for getting the default value
+    *			for the interleaveStepSize for running agents.
+	*
+	* @return   interleaveStepSize -- how large of a step each agent is run 
+	*           before other agents are run
+    *********************************************************************/
+	egSKIInterleaveType RunScheduler::DefaultInterleaveStepSize(egSKIRunType runStepSize) ;
+
+    /********************************************************************
+    * @brief	Don't try to Run with an nonsense interleaveStepSize
+    *
+	* @param runStepSize -- increment to run an agent, phase, decision etc.
+ 	* @param interleaveStepSize -- how large of a step each agent is run 
+	*                              before other agents are run
+    *********************************************************************/
+    bool RunScheduler::VerifyStepSizeForRunType(egSKIRunType runStepSize, egSKIInterleaveType interleave) ;
+
 	/*************************************************************
 	* @brief	Indicate that the next time RunScheduledAgents() is called
 	*			this agent should (or should not) run.
@@ -72,6 +90,21 @@ public:
 	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
 
 	/*************************************************************
+	* @brief	Run all agents previously marked as being scheduled to run.
+	*
+	* @param runStepSize -- decision/phase etc.
+	* @param count		 -- how many steps to run
+	* @param runFlags	 -- type of run we're doing (passed back to environment)
+	* @param interleaveStepSize -- how large of a step each agent is run before other agents are run
+	* @param synchronize -- if true, synchronize all agents scheduled to run to the same phase before running all agents in step
+	* @param pError		 -- any error
+	*
+	* @return Not clear on how to set this when have multiple agents.
+	*		  Can query each for "GetLastRunResult()".
+	*************************************************************/	
+	egSKIRunResult NewRunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIInterleaveType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
+
+	/*************************************************************
 	* @brief	Returns true if at least one agent is currently running.
 	*************************************************************/	
 	bool IsRunning() ;
@@ -88,10 +121,12 @@ protected:
 	bool			IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count) ;
 	void			FireBeforeRunStartsEvents() ;
 	unsigned long	GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ;
-	void			RecordInitialRunCounters(egSKIRunType runStepSize) ;
+ 	void			RecordInitialRunCounters(egSKIRunType runStepSize) ;
+ 	void			ResetRunCounters(egSKIRunType runStepSize) ;
 	void			InitializeUpdateWorldEvents(bool addListeners) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
 	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
+	void			NewHandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
 	bool			AreAllOutputPhasesComplete() ;
 	bool			HaveAllGeneratedOutput() ;
 	void			TestForFiringGeneratedOutputEvent() ;

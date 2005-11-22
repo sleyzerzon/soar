@@ -188,7 +188,7 @@ public:
 	/*************************************************************
 	* @brief	Used to select which agents run on the next run command.
 	*************************************************************/
-	void ScheduleAgentToRun(bool state) { m_ScheduledToRun = state ; }
+	void ScheduleAgentToRun(bool state) { m_ScheduledToRun = state ; m_WasOnRunList = state; }
 	bool IsAgentScheduledToRun()		{ return m_ScheduledToRun ; }
 	bool WasAgentOnRunList()            { return m_WasOnRunList ; }
 

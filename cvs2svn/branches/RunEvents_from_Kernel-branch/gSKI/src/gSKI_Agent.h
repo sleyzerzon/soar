@@ -641,8 +641,18 @@ namespace gSKI
        *             initialized.
        */
       unsigned long GetNumPhasesExecuted(Error* err = 0);
+      void          ResetNumPhasesExecuted(Error* err = 0);
 
+      /********************************************************************
+       * @brief	Agents maintain a number of counters (for how many phase,
+       *			elaborations etc.) they have ever executed.
+       *			We use these counters to determine when a run should stop.
+	   *        This is a hack from KernelSML which listens to RunEvents.
+	   *        Currently gSKI itself does not listen on RunEvents.
+      *********************************************************************/
+      void IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize) ;
        
+
       /**
        * @brief Gets the current elaborations count for this agent
        *
@@ -691,6 +701,7 @@ namespace gSKI
        *             initialized.
        */
       unsigned long GetNumOutputsExecuted(Error* err = 0);
+      void          ResetNumOutputsExecuted(Error* err = 0);
 
       virtual IAgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)
       { 
