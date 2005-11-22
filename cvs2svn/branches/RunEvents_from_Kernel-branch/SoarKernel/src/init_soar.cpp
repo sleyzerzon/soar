@@ -547,6 +547,7 @@ void reset_statistics (agent* thisAgent) {
   thisAgent->pe_cycle_count = 0;
   thisAgent->pe_cycles_this_d_cycle = 0;
 /* REW: end   09.15.96 */
+  thisAgent->d_cycle_last_output = 0;   // KJC 11/17/05
 
   reset_production_firing_counts(thisAgent);
 

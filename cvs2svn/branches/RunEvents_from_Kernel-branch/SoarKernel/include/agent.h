@@ -343,6 +343,9 @@ typedef struct agent_struct {
   unsigned long       e_cycles_this_d_cycle;  /* # of EC's run this DC */
   unsigned long       num_existing_wmes;      /* current WM size */
   unsigned long       production_firing_count;  /* # of prod. firings */
+  unsigned long       d_cycle_last_output;    /* last time agent produced output */  //KJC 11.17.05
+  //?? unsigned long       out_cycle_count;       /* # of output phases have gen'd output */
+  //?? unsigned long       phase_count;       /* # of phases run so far */
 
   /* REW: begin 09.15.96 */
 /* in Soar 8, PE's are done only during the APPLY phase */
