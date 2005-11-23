@@ -19,19 +19,57 @@
 %javaconstvalue("smlRunEventId.smlEVENT_LAST_RUN_EVENT.swigValue() + 1") smlEVENT_AFTER_PRODUCTION_ADDED;
 %javaconstvalue("smlAgentEventId.smlEVENT_LAST_AGENT_EVENT.swigValue() + 1") smlEVENT_OUTPUT_PHASE_CALLBACK;
 
-// I hope we can figure out how to avoid having to write these lines manually (a SWIG bug?)
-// Generates:   public final static smlPrintEventId smlEVENT_LAST_PRINT_EVENT = new smlPrintEventId("smlEVENT_LAST_PRINT_EVENT", smlEVENT_PRINT);
-// but there's no constructor for smlPrintEventId(String, smlPrintEventId id).  Could write one I guess so we don't have to maintain this code.
-%javaconstvalue("smlSystemEventId.smlEVENT_AFTER_RHS_FUNCTION_EXECUTED.swigValue()") smlEVENT_LAST_SYSTEM_EVENT;
-%javaconstvalue("smlRunEventId.smlEVENT_AFTER_RUNNING.swigValue()") smlEVENT_LAST_RUN_EVENT;
-%javaconstvalue("smlProductionEventId.smlEVENT_BEFORE_PRODUCTION_RETRACTED.swigValue()") smlEVENT_LAST_PRODUCTION_EVENT;
-%javaconstvalue("smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED.swigValue()") smlEVENT_LAST_AGENT_EVENT;
-%javaconstvalue("smlWorkingMemoryEventId.smlEVENT_OUTPUT_PHASE_CALLBACK.swigValue()") smlEVENT_LAST_WM_EVENT;
-%javaconstvalue("smlPrintEventId.smlEVENT_PRINT.swigValue()") smlEVENT_LAST_PRINT_EVENT;
-%javaconstvalue("smlRhsEventId.smlEVENT_CLIENT_MESSAGE.swigValue()") smlEVENT_LAST_RHS_EVENT;
-%javaconstvalue("smlXMLEventId.smlEVENT_XML_INPUT_RECEIVED.swigValue()") smlEVENT_LAST_XML_EVENT;
-%javaconstvalue("smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT.swigValue()") smlEVENT_LAST_UPDATE_EVENT;
-%javaconstvalue("smlUntypedEventId.smlEVENT_EDIT_PRODUCTION.swigValue()") smlEVENT_LAST_UNTYPED_EVENT;
+// SWIG can't handle enum values that are defined in terms of other values.
+// It generates lines like this:
+// public final static smlPrintEventId smlEVENT_LAST_PRINT_EVENT = new smlPrintEventId("smlEVENT_LAST_PRINT_EVENT", smlEVENT_PRINT);
+// but there's no constructor for smlPrintEventId(String, smlPrintEventId id).
+// The solution is either to write a line like this:
+//%javaconstvalue("smlPrintEventId.smlEVENT_PRINT.swigValue()") smlEVENT_LAST_PRINT_EVENT;
+// or to add a constructor to the class manually.
+// I'm choosing to do the latter because the constructor won't change if we change which value is the "last" value in the enum,
+// while the javaconstvalue line would need to be updated each time the last changed (and avoiding this is the whole reason for
+// having a "last" value in the enum).
+
+// Add the constructors that SWIG misses
+%typemap(javacode) sml::smlPrintEventId %{
+   private smlPrintEventId(String swigName, smlPrintEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlSystemEventId %{
+   private smlSystemEventId(String swigName, smlSystemEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlProductionEventId %{
+   private smlProductionEventId(String swigName, smlProductionEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlRunEventId %{
+   private smlRunEventId(String swigName, smlRunEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlAgentEventId %{
+   private smlAgentEventId(String swigName, smlAgentEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlWorkingMemoryEventId %{
+   private smlWorkingMemoryEventId(String swigName, smlWorkingMemoryEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlRhsEventId %{
+   private smlRhsEventId(String swigName, smlRhsEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlXMLEventId %{
+   private smlXMLEventId(String swigName, smlXMLEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlUpdateEventId %{
+   private smlUpdateEventId(String swigName, smlUpdateEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+
+%typemap(javacode) sml::smlUntypedEventId %{
+   private smlUntypedEventId(String swigName, smlUntypedEventId enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
 
 //
 // Doug's custom Java code for registering/unregistering callbacks
