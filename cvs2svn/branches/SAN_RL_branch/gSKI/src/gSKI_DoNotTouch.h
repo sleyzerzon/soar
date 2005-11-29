@@ -106,6 +106,7 @@ namespace gSKI
 
 		 unsigned long GetChunkCount(IAgent* pIAgent);
 		 void SetChunkCount(IAgent* pIAgent, unsigned long count);
+		 void ResetRL(IAgent* pIAgent);
 	  };
    }
 }

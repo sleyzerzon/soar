@@ -54,6 +54,7 @@ namespace cli {
 		static char const* kCLIQuit;
 		static char const* kCLIRemoveWME;
 		static char const* kCLIReteNet;
+		static char const* kCLIRL;
 		static char const* kCLIRun;
 		static char const* kCLISaveBacktraces;
 		static char const* kCLISetLibraryLocation;

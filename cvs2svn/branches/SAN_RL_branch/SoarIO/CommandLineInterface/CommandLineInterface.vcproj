@@ -250,6 +250,9 @@
 					RelativePath=".\src\cli_retenet.cpp">
 				</File>
 				<File
+					RelativePath=".\src\cli_RL.cpp">
+				</File>
+				<File
 					RelativePath=".\src\cli_run.cpp">
 				</File>
 				<File

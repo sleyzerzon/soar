@@ -55,6 +55,7 @@ char const* Constants::kCLIPWD						= "pwd";
 char const* Constants::kCLIQuit						= "quit";
 char const* Constants::kCLIRemoveWME				= "remove-wme";
 char const* Constants::kCLIReteNet					= "rete-net";
+char const* Constants::kCLIRL						= "RL";
 char const* Constants::kCLIRun						= "run";
 char const* Constants::kCLISaveBacktraces			= "save-backtraces";
 char const* Constants::kCLISetLibraryLocation		= "set-library-location";

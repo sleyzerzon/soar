@@ -1483,7 +1483,6 @@ Numeric Indifference
       }
    }
 
-//#ifdef NUMERIC_INDIFFERENCE
 /*******************************************
 Exploration
 *********************************************/
@@ -1542,8 +1541,40 @@ Exploration
    double Agent::GetEpsilon(Error* pErr) {
 	   return GetSoarAgent()->epsilon;
    }
-//#endif
 
+   /****************************************************
+   
+   Reinforcement Learning
+
+   ****************************************************/
+
+   void Agent::SetAlpha(double alpha, Error* pErr) {
+	   GetSoarAgent()->alpha = alpha;
+   }
+
+   void Agent::SetGamma(double gamma, Error* pErr) {
+	   GetSoarAgent()->gamma = gamma;
+   }
+
+   double Agent::GetAlpha(Error* pErr) {
+	   return GetSoarAgent()->alpha;
+   }
+
+   double Agent::GetGamma(Error* pErr) {
+	   return GetSoarAgent()->gamma;
+   }
+
+    void Agent::SetRL(bool on, Error* err)
+   {
+      ClearError(err);
+      m_agent->sysparams[RL_ON_SYSPARAM] = on;
+   }
+
+    bool Agent::IsRLOn(Error* err)
+   {
+      ClearError(err);
+      return m_agent->sysparams[RL_ON_SYSPARAM] ? true : false;
+   }
    //////////////////////////////////////////////////// PRIVATES /////////////
 
       /*

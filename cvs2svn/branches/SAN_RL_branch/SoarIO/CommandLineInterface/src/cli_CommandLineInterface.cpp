@@ -79,6 +79,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Constants::kCLIQuit]					= &cli::CommandLineInterface::ParseQuit;
 	m_CommandMap[Constants::kCLIRemoveWME]				= &cli::CommandLineInterface::ParseRemoveWME;
 	m_CommandMap[Constants::kCLIReteNet]				= &cli::CommandLineInterface::ParseReteNet;
+	m_CommandMap[Constants::kCLIRL]						= &cli::CommandLineInterface::ParseRL;
 	m_CommandMap[Constants::kCLIRun]					= &cli::CommandLineInterface::ParseRun;
 	m_CommandMap[Constants::kCLISaveBacktraces]			= &cli::CommandLineInterface::ParseSaveBacktraces;
 	m_CommandMap[Constants::kCLISetLibraryLocation]		= &cli::CommandLineInterface::ParseSetLibraryLocation;

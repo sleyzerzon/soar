@@ -506,6 +506,18 @@ public:
 	*************************************************************/
 	EXPORT bool DoReteNet(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, bool save, std::string filename);
 
+	/****************************************************************
+	* @brief RL command
+	* @param pConnection Pointer to connection
+	* @param pResponse Pointer to XML response
+	* @param pAgent The pointer to the gSKI agent interface
+	* @param RLSetting RL on/off
+	* @param Temp Assignment to the alpha parameter
+	* @param epsilon Assignment to the gamma parameter
+	*****************************************************************/
+
+	EXPORT bool DoRL(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const int RLSetting, const double alpha, const double gamma);
+
 	/*************************************************************
 	* @brief run command
 	* @param pConnection Pointer to connection
@@ -743,6 +755,7 @@ protected:
 	bool ParseWatch(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatchWMEs(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseExploration(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseRL(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 
 	// the internal Do functions follow
 	bool DoAddWME(gSKI::IAgent* pAgent, const std::string& id, const std::string& attribute, const std::string& value, bool acceptable);
@@ -800,6 +813,7 @@ protected:
 	bool DoWatch(gSKI::IAgent* pAgent, const WatchBitset& options, const WatchBitset& settings, const int wmeSetting, const int learnSetting);
 	bool DoWatchWMEs(gSKI::IAgent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
 	bool DoExploration(gSKI::IAgent* pAgent, const int mode, const double Temp, const double epsilon);
+	bool DoRL(gSKI::IAgent* pAgent, const int RLSetting, const double alpha, const double gamma);
 
 	// Print callback events go here
 	virtual void HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) {

@@ -237,6 +237,12 @@ EXPORT bool CommandLineInterface::DoReteNet(sml::Connection* pConnection, sml::E
 	return ret;
 }
 
+EXPORT bool CommandLineInterface::DoRL(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const int RLSetting, const double alpha, const double gamma) {
+	bool ret = DoExploration(pAgent, RLSetting, alpha, gamma);
+	GetLastResultSML(pConnection, pResponse);
+	return ret;
+}
+
 EXPORT bool CommandLineInterface::DoRun(sml::Connection* pConnection, sml::ElementXML* pResponse, gSKI::IAgent* pAgent, const RunBitset& options, int count) {
 	bool ret = DoRun(pAgent, options, count);
 	GetLastResultSML(pConnection, pResponse);

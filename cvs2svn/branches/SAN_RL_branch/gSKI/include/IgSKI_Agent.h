@@ -1225,7 +1225,7 @@ namespace gSKI {
       */
       virtual void SetNumericIndifferentMode(egSKINumericIndifferentMode m, Error* pErr = 0) = 0;
 
-	  // #ifdef NUMERIC_INDIFFERENCE
+ 
 	  virtual void SetExplorationMode(egSKIExplorationMode m, Error* pErr = 0) = 0;
 	  virtual egSKIExplorationMode GetExplorationMode(Error* pErr = 0) = 0;
 
@@ -1234,7 +1234,15 @@ namespace gSKI {
 
 	  virtual void SetEpsilon(double d, Error* pErr = 0) = 0;
 	  virtual double GetEpsilon(Error* pErr = 0) = 0;
-// #endif
+
+	  virtual void SetAlpha(double d, Error* pErr = 0) = 0;
+	  virtual double GetAlpha(Error* pErr = 0) = 0;
+
+	  virtual void SetGamma(double d, Error* pErr = 0) = 0;
+	  virtual double GetGamma(Error* pErr = 0) = 0;
+
+	  virtual bool IsRLOn(Error* err = 0) = 0;
+      virtual void SetRL(bool on, Error* err = 0) = 0;
 
 	  virtual bool GetOperand2Mode() = 0;
 	  virtual void SetOperand2Mode(bool mode) = 0;

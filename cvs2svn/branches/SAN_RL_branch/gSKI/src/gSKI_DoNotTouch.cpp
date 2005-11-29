@@ -29,6 +29,7 @@
 #include "rhsfun.h"
 #include "decide.h"
 #include "explain.h"
+#include "reinforcement_learning.h"
 
 //#include "../../SoarIO/ConnectionSML/include/sock_Debug.h"
 
@@ -2462,6 +2463,14 @@ namespace gSKI
 			agent* pSoarAgent = pAgent->GetSoarAgent();
 
 			pSoarAgent->chunk_count = count;
+		}
+
+		void TgDWorkArounds::ResetRL(IAgent* pIAgent)
+		{
+			Agent* pAgent = (Agent*) (pIAgent);
+			agent* pSoarAgent = pAgent->GetSoarAgent();
+
+			reset_RL(pSoarAgent);
 		}
 	}// class
 }// namespace

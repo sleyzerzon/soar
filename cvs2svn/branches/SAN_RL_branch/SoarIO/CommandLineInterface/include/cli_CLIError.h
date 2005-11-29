@@ -97,6 +97,8 @@ namespace cli {
 			kInvalidExplorationSetting          = 82,
 			kTempMustBePositive                 = 83,
 			kEpsilonOutsideUnitInterval			= 84,
+			kAlphaMustBeNonNegative				= 85,
+			kGammaOutsideUnitInterval			= 86,
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -179,6 +181,8 @@ namespace cli {
 				case kInvalidExplorationSetting:			return "Invalid exploration mode.";
 				case kTempMustBePositive:					return "Temperature parameter must be positive.";
 				case kEpsilonOutsideUnitInterval:		return "Epsilon parameter must be in [0,1].";
+				case kAlphaMustBeNonNegative:		return "Alpha parameter must be non-negative.";
+				case kGammaOutsideUnitInterval:		return "Gamma parameter must be in [0,1].";
 				default:								return "Unknown error code.";
 			}
 		}
