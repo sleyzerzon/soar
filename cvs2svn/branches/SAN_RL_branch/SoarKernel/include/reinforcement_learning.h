@@ -6,7 +6,7 @@
 #include "agent.h"
 #include "symtab.h"
 
-// #ifdef NUMERIC_INDIFFERENCE
+
 /*-------------------------------------------------------------------------
                           Reinforcement learning data
 
@@ -20,12 +20,14 @@ Fields in an RL_data_struct:
     previous_Q: The Q-value computed for the previously selected operator.
  	reward: Accumulates reward for an extended operator. (ie, op no-change)
 	step: The number of decision cycles an operator has been active. (will be > 1 only for op no-change)
+	counting_rewards: indicates whether rewards are collected in this state
 --------------------------------------------------------------------------*/
 typedef struct RL_data_struct {
 list *productions_to_be_updated;
 float previous_Q;
 float reward;
 int step;
+bool counting_rewards;
 } RL_data;
 
 // #endif
@@ -36,5 +38,6 @@ extern void RL_update_symbolically_chosen(agent *, slot *, preference *);
 extern void tabulate_reward_values(agent *);
 extern void store_RL_data(agent *, Symbol *, preference *);
 extern void tabulate_reward_value_for_goal(agent *thisAgent, Symbol *goal);
+extern void reset_RL(agent *thisAgent);
 
 #endif

@@ -157,7 +157,10 @@ typedef union symbol_union Symbol;
 /* UnComment the following line to enable numeric indifference preferences */
 #define NUMERIC_INDIFFERENCE
 
-#ifdef NUMERIC_INDIFFERENCE
+/* UnComment the following line to enable reinforcement learning */
+
+#define REINFORCEMENT_LEARNING
+
 /* Possible modes for numeric indifference */
 enum ni_mode {
     NUMERIC_INDIFFERENT_MODE_AVG,
@@ -174,7 +177,7 @@ enum exp_mode {
 	NO_EXPLORATION,
 
 };
-#endif 
+
 
 /* Comment the following line to disable workaround for bug 139 */
 #define BUG_139_WORKAROUND

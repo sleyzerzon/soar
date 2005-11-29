@@ -837,7 +837,8 @@ byte require_preference_semantics (agent *thisAgent, slot *s, preference **resul
   
   /* --- the lone require is the winner --- */
 #ifdef NUMERIC_INDIFFERENCE
-  RL_update_symbolically_chosen(thisAgent, s, candidates);
+  if (thisAgent->sysparams[RL_ON_SYSPARAM])
+	  RL_update_symbolically_chosen(thisAgent, s, candidates);
 #endif
   return NONE_IMPASSE_TYPE;
 }
@@ -895,7 +896,8 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
 #ifdef NUMERIC_INDIFFERENCE
-	RL_update_symbolically_chosen(thisAgent, s, candidates);
+	if (thisAgent->sysparams[RL_ON_SYSPARAM])
+		RL_update_symbolically_chosen(thisAgent, s, candidates);
 #endif
     return NONE_IMPASSE_TYPE;
   }
@@ -1059,7 +1061,8 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
 #ifdef NUMERIC_INDIFFERENCE
-	RL_update_symbolically_chosen(thisAgent, s, candidates);
+	if (thisAgent->sysparams[RL_ON_SYSPARAM])
+		RL_update_symbolically_chosen(thisAgent, s, candidates);
 #endif
     return NONE_IMPASSE_TYPE;
   }
@@ -1070,14 +1073,15 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   for (p=s->preferences[UNARY_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
     p->value->common.decider_flag = UNARY_INDIFFERENT_DECIDER_FLAG;
 
-	 #ifdef NUMERIC_INDIFFERENCE
+/* Uncomment the following if you want numeric indifferent preferences to prevent tie impasses. */
+//	 #ifdef NUMERIC_INDIFFERENCE
     /* REW: 2003-01-02 Behavior Variability Kernel Experiments */
-	for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
-     p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
+//	for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
+  //   p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
   
   /* END: 2003-01-02 Behavior Variability Kernel Experiments  */
 
-	#endif
+	//#endif
 
   not_all_indifferent = FALSE;
   for (cand=candidates; cand!=NIL; cand=cand->next_candidate) {
@@ -1085,10 +1089,10 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     if (cand->value->common.decider_flag==UNARY_INDIFFERENT_DECIDER_FLAG)
       continue;
     
-	#ifdef NUMERIC_INDIFFERENCE
-	else if ( cand->value->common.decider_flag==UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG )
-	  continue;
-	#endif
+	//#ifdef NUMERIC_INDIFFERENCE
+	//else if ( cand->value->common.decider_flag==UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG )
+	 // continue;
+	//#endif
 
     /* --- check whether cand is binary indifferent to each other one --- */
     for (p=candidates; p!=NIL; p=p->next_candidate) {
@@ -1917,16 +1921,18 @@ void update_impasse_items (agent* thisAgent, Symbol *id, preference *items) {
     }
   }
 #ifdef NUMERIC_INDIFFERENCE
-  /* In a tie or conflict impasse subgoal, an operator receives an architectural reward for changing the number of ^item's on the goal.
-     That reward is calculated here. It does not go through WM, but is passed directly to the relevant RL_data struct. */
-  int num_items = 0;
-  for (w=id->id.impasse_wmes ; w ; w=w->next) {
-	  if (w->attr==thisAgent->item_symbol) num_items++;
-  }
-  if (currently_existing_items > 0){
-	  if (num_items == 0) num_items = 1;
-	  float r = (currently_existing_items - num_items) / (float) currently_existing_items;
-	  id->id.RL_data->reward += pow(thisAgent->gamma, id->id.RL_data->step)*r;
+  if (thisAgent->sysparams[RL_ON_SYSPARAM]){
+		/* In a tie or conflict impasse subgoal, an operator receives an architectural reward for changing the number of ^item's on the goal.
+			That reward is calculated here. It does not go through WM, but is passed directly to the relevant RL_data struct. */
+		int num_items = 0;
+		for (w=id->id.impasse_wmes ; w ; w=w->next) {
+			if (w->attr==thisAgent->item_symbol) num_items++;
+		}
+		if (currently_existing_items > 0){
+			if (num_items == 0) num_items = 1;
+			float r = (currently_existing_items - num_items) / (float) currently_existing_items;
+			id->id.RL_data->reward += pow(thisAgent->gamma, id->id.RL_data->step)*r;
+		}
   }
 #endif
 }
@@ -2322,13 +2328,18 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   }
 #endif
 
-#ifdef NUMERIC_INDIFFERENCE
-  tabulate_reward_value_for_goal(thisAgent, goal);
-  perform_Bellman_update(thisAgent, 0, goal); /* this update only sees reward - there is no next state */
-#endif
+
   /* --- remove wmes for this goal, and garbage collect --- */
   remove_wmes_for_context_slot (thisAgent, goal->id.operator_slot);
   update_impasse_items (thisAgent, goal, NIL); /* causes items & fake pref's to go away */
+
+  #ifdef NUMERIC_INDIFFERENCE
+  if (thisAgent->sysparams[RL_ON_SYSPARAM]){
+	  tabulate_reward_value_for_goal(thisAgent, goal);
+	  perform_Bellman_update(thisAgent, 0, goal); /* this update only sees reward - there is no next state */
+  }
+#endif
+
   remove_wme_list_from_wm (thisAgent, goal->id.impasse_wmes);
   goal->id.impasse_wmes = NIL;
 
@@ -2442,6 +2453,10 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.RL_data->previous_Q = 0;
   id->id.RL_data->reward = 0;
   id->id.RL_data->step = 0;
+  /* Count rewards only in op no-change impasses */
+  if ((impasse_type==CONSTRAINT_FAILURE_IMPASSE_TYPE) || (impasse_type == CONFLICT_IMPASSE_TYPE) || (impasse_type == TIE_IMPASSE_TYPE))
+	  id->id.higher_goal->id.RL_data->counting_rewards = FALSE;
+  if (attr_of_impasse == thisAgent->state_symbol) id->id.higher_goal->id.RL_data->counting_rewards = FALSE;
 #endif
 
   /* --- invoke callback routine --- */
@@ -2609,7 +2624,8 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
 
 #ifdef NUMERIC_INDIFFERENCE
 	  /* Note - We only store RL data when an operator has been selected. */
-	  store_RL_data(thisAgent, goal, candidates);
+	  if (thisAgent->sysparams[RL_ON_SYSPARAM])
+		  store_RL_data(thisAgent, goal, candidates);
 #endif
       
       /* JC ADDED: Notify gSKI of an operator selection  */
@@ -2780,7 +2796,8 @@ void do_decision_phase (agent* thisAgent)
 {
    /* phase printing moved to init_soar: do_one_top_level_phase */
 #ifdef NUMERIC_INDIFFERENCE
-	tabulate_reward_values(thisAgent);
+	if (thisAgent->sysparams[RL_ON_SYSPARAM])
+		tabulate_reward_values(thisAgent);
 #endif
 
    decide_context_slots (thisAgent);
@@ -3676,27 +3693,29 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 			   top_value = cand->sum_of_probability;
 	   }
 	   
-	   if(perform_Bellman_update(thisAgent, top_value, s->id)){ // If the Bellman update changed current prefs, recompute operator values.
-		   initialize_indifferent_candidates_for_probability_selection(candidates);
-		   for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
-			   /*print_with_symbols("\nPreference for %y", pref->value); */
-			   float value;
-			   if (pref->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
-			   value = pref->referent->fc.value;
-			   } else if (pref->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
-				   value = (float) pref->referent->ic.value;
-			   } else {
-				   continue;
-			   }
-			   for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-				   /*print_with_symbols("\nConsidering candidate %y", cand->value); */
-				   if (cand->value == pref->value) {
-					   cand->total_preferences_for_candidate += 1;
-					   cand->sum_of_probability += value;
-				   }
-			   }
-		   }
-	   } 
+	   if (thisAgent->sysparams[RL_ON_SYSPARAM]){
+			if(perform_Bellman_update(thisAgent, top_value, s->id)){ // If the Bellman update changed current prefs, recompute operator values.
+				initialize_indifferent_candidates_for_probability_selection(candidates);
+				for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
+					/*print_with_symbols("\nPreference for %y", pref->value); */
+					float value;
+					if (pref->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
+					value = pref->referent->fc.value;
+					} else if (pref->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
+						value = (float) pref->referent->ic.value;
+					} else {
+						continue;
+					}
+					for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+						/*print_with_symbols("\nConsidering candidate %y", cand->value); */
+						if (cand->value == pref->value) {
+							cand->total_preferences_for_candidate += 1;
+							cand->sum_of_probability += value;
+						}
+					}
+				}
+			}
+	   }
 	
 	   if (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION){
 			total_probability = 0.0;

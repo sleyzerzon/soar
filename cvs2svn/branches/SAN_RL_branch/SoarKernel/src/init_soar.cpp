@@ -478,6 +478,10 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[USE_LONG_CHUNK_NAMES] = TRUE;  /* kjh(B14) */
   thisAgent->sysparams[TRACE_OPERAND2_REMOVALS_SYSPARAM] = FALSE;
   thisAgent->sysparams[TIMERS_ENABLED] = TRUE;
+
+#ifdef NUMERIC_INDIFFERENCE
+  thisAgent->sysparams[RL_ON_SYSPARAM] = TRUE;
+#endif
 }
 
 /* ===================================================================
@@ -1318,8 +1322,10 @@ void do_one_top_level_phase (agent* thisAgent)
 		  AFTER_HALT_SOAR_CALLBACK,
 		  (soar_call_data) NULL);
 #ifdef NUMERIC_INDIFFERENCE
-	tabulate_reward_values(thisAgent);
-	perform_Bellman_update(thisAgent, 0, thisAgent->top_state);
+	  if (thisAgent->sysparams[RL_ON_SYSPARAM]){
+		  tabulate_reward_value_for_goal(thisAgent,thisAgent->top_state);
+		  perform_Bellman_update(thisAgent, 0, thisAgent->top_state);
+	  }
 #endif
   }
   
