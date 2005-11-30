@@ -503,25 +503,24 @@ bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName
 		return InvalidArg(pConnection, pResponse, pCommandName, "Need to specify the type of information wanted.") ;
 	}
 
-	char buffer[100] ;
-	buffer[0] = 0;
+	std::ostringstream buffer;
 
 	if (strcmp(pValue, sml_Names::kParamPhase) == 0)
 	{
 		// Report the current phase.
-		sprintf(buffer, "%d", pAgent->GetCurrentPhase(pError)) ;
+		buffer << pAgent->GetCurrentPhase(pError);
 	}
 	else if (strcmp(pValue, sml_Names::kParamDecision) == 0)
 	{
 		// Report the current decision cycle counter (the counter reports one more than the user expects)
-		sprintf(buffer, "%lu", pAgent->GetNumDecisionCyclesExecuted(pError)-1) ;
+		buffer << (pAgent->GetNumDecisionCyclesExecuted(pError)-1);
 	}
 	else
 	{
 		return InvalidArg(pConnection, pResponse, pCommandName, "Didn't recognize the type of information requested in GetRunState().") ;
 	}
 
-	return this->ReturnResult(pConnection, pResponse, buffer) ;
+	return this->ReturnResult(pConnection, pResponse, buffer.str().c_str()) ;
 }
 
 // Returns true if the production name is currently loaded
@@ -548,16 +547,16 @@ bool KernelSML::HandleGetVersion(gSKI::IAgent* pAgent, char const* pCommandName,
 {
 	unused(pAgent) ; unused(pCommandName) ;	unused(pIncoming) ;
 
-	char buffer[100] ;
+	std::ostringstream buffer;
 
 	// Look up the current version of Soar and return it as a string
 	gSKI::Version version = this->m_pKernelFactory->GetKernelVersion(pError) ;
-	sprintf(buffer, "%d.%d.%d", version.major, version.minor, version.micro) ;
+	buffer << version.major << "." << version.minor << "." << version.micro;
 
 	// Our hard-coded string should match the version returned from Soar
-	assert(strcmp(sml_Names::kSoarVersionValue, buffer) == 0) ;
+	assert(strcmp(sml_Names::kSoarVersionValue, buffer.str().c_str()) == 0) ;
 
-	return this->ReturnResult(pConnection, pResponse, buffer) ;
+	return this->ReturnResult(pConnection, pResponse, buffer.str().c_str()) ;
 }
 
 bool KernelSML::HandleIsSoarRunning(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)

@@ -123,9 +123,9 @@ bool CommandLineInterface::DoSetStopPhase(bool setPhase, bool before, egSKIPhase
 	if (m_RawOutput) {
 		m_Result << (before ? "Stop before " : "Stop after ") << phaseStr;
 	} else {
-		char buffer[50] ;
-		sprintf(buffer, "%d", stopPhase) ;
-		AppendArgTagFast(sml_Names::kParamPhase, sml_Names::kTypeString, buffer);
+		std::ostringstream buffer;
+		buffer << stopPhase;
+		AppendArgTagFast(sml_Names::kParamPhase, sml_Names::kTypeString, buffer.str().c_str());
 	}
 
 	return true;

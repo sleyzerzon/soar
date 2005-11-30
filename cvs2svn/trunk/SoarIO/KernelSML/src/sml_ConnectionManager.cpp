@@ -149,10 +149,10 @@ void ConnectionManager::AddConnection(Connection* pConnection)
 	soar_thread::Lock lock(&m_ConnectionsMutex) ;
 
 	// Assign a unique ID for this connection
-	char buffer[100] ;
 	uintptr_t value = reinterpret_cast<uintptr_t>(pConnection) ;
-	sprintf(buffer, "id_0x%p", value) ;
-	pConnection->SetID(buffer) ;
+	std::ostringstream buffer;
+	buffer << "id_0x" << value;
+	pConnection->SetID(buffer.str().c_str()) ;
 	pConnection->SetName("unknown") ;
 	pConnection->SetStatus(sml_Names::kStatusCreated) ;
 
