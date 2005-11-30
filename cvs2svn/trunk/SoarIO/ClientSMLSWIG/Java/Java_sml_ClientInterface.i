@@ -31,45 +31,26 @@
 // having a "last" value in the enum).
 
 // Add the constructors that SWIG misses
+// We do this by adding the constructor to one class and then copying the typemaps for that class to other classes
+// This could actually do too much since ALL typemaps are copied, not just the one we added, but it doesn't seem to cause any problems so far
+// SWIG should generate this constructor starting in 1.3.28, so at some point in the future we should be able to drop this code
+// (e.g. when SWIG 1.3.28 is available on Gentoo Linux)
+
+#if SWIG_VERSION < 0x010328
 %typemap(javacode) sml::smlPrintEventId %{
-   private smlPrintEventId(String swigName, smlPrintEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+   private $javaclassname(String swigName, $javaclassname enumValue) {
+      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; swigNext = this.swigValue+1 ; } %}
 
-%typemap(javacode) sml::smlSystemEventId %{
-   private smlSystemEventId(String swigName, smlSystemEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlProductionEventId %{
-   private smlProductionEventId(String swigName, smlProductionEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlRunEventId %{
-   private smlRunEventId(String swigName, smlRunEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlAgentEventId %{
-   private smlAgentEventId(String swigName, smlAgentEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlWorkingMemoryEventId %{
-   private smlWorkingMemoryEventId(String swigName, smlWorkingMemoryEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlRhsEventId %{
-   private smlRhsEventId(String swigName, smlRhsEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlXMLEventId %{
-   private smlXMLEventId(String swigName, smlXMLEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlUpdateEventId %{
-   private smlUpdateEventId(String swigName, smlUpdateEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
-
-%typemap(javacode) sml::smlUntypedEventId %{
-   private smlUntypedEventId(String swigName, smlUntypedEventId enumValue) {
-      this.swigName = swigName ; this.swigValue = enumValue.swigValue ; } %}
+%apply sml::smlPrintEventId {	sml::smlSystemEventId,
+								sml::smlProductionEventId,
+								sml::smlRunEventId,
+								sml::smlAgentEventId,
+								sml::smlWorkingMemoryEventId,
+								sml::smlRhsEventId,
+								sml::smlXMLEventId,
+								sml::smlUpdateEventId,
+								sml::smlUntypedEventId }
+#endif
 
 //
 // Doug's custom Java code for registering/unregistering callbacks
