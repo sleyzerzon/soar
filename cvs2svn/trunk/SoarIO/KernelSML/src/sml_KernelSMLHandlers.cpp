@@ -520,7 +520,9 @@ bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName
 		return InvalidArg(pConnection, pResponse, pCommandName, "Didn't recognize the type of information requested in GetRunState().") ;
 	}
 
-	return this->ReturnResult(pConnection, pResponse, buffer.str().c_str()) ;
+	std::string bufferStdString = buffer.str();
+	const char* bufferCString = bufferStdString.c_str();
+	return this->ReturnResult(pConnection, pResponse, bufferCString) ;
 }
 
 // Returns true if the production name is currently loaded
@@ -552,11 +554,13 @@ bool KernelSML::HandleGetVersion(gSKI::IAgent* pAgent, char const* pCommandName,
 	// Look up the current version of Soar and return it as a string
 	gSKI::Version version = this->m_pKernelFactory->GetKernelVersion(pError) ;
 	buffer << version.major << "." << version.minor << "." << version.micro;
+	std::string bufferStdString = buffer.str();
+	const char* bufferCString = bufferStdString.c_str();
 
 	// Our hard-coded string should match the version returned from Soar
-	assert(strcmp(sml_Names::kSoarVersionValue, buffer.str().c_str()) == 0) ;
+	assert(strcmp(sml_Names::kSoarVersionValue, bufferCString) == 0) ;
 
-	return this->ReturnResult(pConnection, pResponse, buffer.str().c_str()) ;
+	return this->ReturnResult(pConnection, pResponse, bufferCString) ;
 }
 
 bool KernelSML::HandleIsSoarRunning(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)

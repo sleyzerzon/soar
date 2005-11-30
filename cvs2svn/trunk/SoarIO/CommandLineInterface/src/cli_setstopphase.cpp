@@ -125,7 +125,8 @@ bool CommandLineInterface::DoSetStopPhase(bool setPhase, bool before, egSKIPhase
 	} else {
 		std::ostringstream buffer;
 		buffer << stopPhase;
-		AppendArgTagFast(sml_Names::kParamPhase, sml_Names::kTypeString, buffer.str().c_str());
+		const char* bufferString = buffer.str().c_str();
+		AppendArgTagFast(sml_Names::kParamPhase, sml_Names::kTypeString, bufferString);
 	}
 
 	return true;
