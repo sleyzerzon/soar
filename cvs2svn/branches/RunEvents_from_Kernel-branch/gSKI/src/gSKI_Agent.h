@@ -44,7 +44,7 @@ namespace gSKI
    class OutputLink;
    class IAgentPerformanceMonitor;
 
-   class Agent : public IAgent
+   class Agent : public IAgent /*, public IRunListener */
    {
    public:     
       /**
@@ -215,7 +215,7 @@ namespace gSKI
       egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
                                        unsigned long       count         = 1,
                                        Error*              err           = 0);
-      egSKIRunResult StepInClientThread(egSKIRunType   stepSize          = gSKI_RUN_FOREVER, 
+      egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE, 
                                         unsigned long  stepCount         = 1,
                                         Error*         err               = 0);
 
@@ -827,6 +827,12 @@ namespace gSKI
                           IRunListener*       listener, 
                           bool                allowAsynch = false,
                           Error*              err         = 0);
+	
+	 /* virtual void HandleEvent(egSKIRunEventId eventId, 
+		                       gSKI::IAgent*   agentPtr, 
+							   egSKIPhaseType  phase,
+							   Error*          err = 0);
+							   /* */
 
      /**
       *  @brief Removes an agent running event listener
@@ -1200,7 +1206,7 @@ namespace gSKI
 
       /** 
        * @brief RunListener for phase Events
-       */ 
+       */  /*
 	  class PhaseListener : public IRunListener
 	  {
       public:
@@ -1209,7 +1215,7 @@ namespace gSKI
 	  private:
 		  Agent* a;
 	  }; 
-
+*/
 
 	  /** 
        * @brief Event notifier for XML events
@@ -1320,7 +1326,7 @@ namespace gSKI
 
 	  static void Agent::HandleEvent(egSKIRunEventId eventID, Agent* pAgent, egSKIPhaseType phase) ;
 
-      /** 
+	  /** 
        * @brief Listener manager definitions 
        */
       //{
@@ -1335,7 +1341,7 @@ namespace gSKI
        * @brief Executes the low level details of each type of run
        */
       //{
-      egSKIRunResult step(egSKIRunType stepSize, unsigned long count);  
+      egSKIRunResult step(egSKIInterleaveType stepSize, unsigned long count);  
       egSKIRunResult  run(egSKIRunType runType, unsigned long maxSteps);
       void preStepNotifications();
       bool postStepNotifications();
@@ -1365,7 +1371,7 @@ namespace gSKI
        *  how long it should run.
        */
       unsigned long* getReleventCounter(egSKIRunType runType);
-
+      unsigned long* getReleventCounter(egSKIInterleaveType stepType);
       /** 
        * @brief Initializes the run counters and interrupt flags
        */
@@ -1395,7 +1401,7 @@ namespace gSKI
 	                                            /**  struct defined for RunEvent userdata **/
 	  struct			   RunEventCallbackData {Agent * a; egSKIRunEventId eventId;};
 
-      PhaseListener*       m_phaseListener;     /**< Listens for the BEFORE/AFTER phase events */
+      //PhaseListener*       m_phaseListener;     /**< Listens for the BEFORE/AFTER phase events */
 
       InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
                         

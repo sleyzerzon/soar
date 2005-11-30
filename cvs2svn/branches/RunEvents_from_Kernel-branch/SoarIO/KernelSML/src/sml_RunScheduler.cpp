@@ -314,6 +314,18 @@ void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 		{
 			gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
 			pAgent->AddRunListener(gSKIEVENT_AFTER_PHASE_EXECUTED, this) ;
+			// This is a huge hack.  These need to be registered by a gSKI RunListener
+			// because the gSKI event handler has to increment counters on these events.
+			// Added here for now because I couldn't reconcile the code for making
+			// a gSKI agent a RunListener too.  (might be circular...)
+			pAgent->AddRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
+			pAgent->AddRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
+			pAgent->AddRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
+			pAgent->AddRunListener(gSKIEVENT_AFTER_DECISION_PHASE, this) ;
+			pAgent->AddRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this) ;
+			pAgent->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
+			pAgent->AddRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
+			pAgent->AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only
 		}
 	}
 }
@@ -497,6 +509,19 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 		{
 			gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
 			pAgent->RemoveRunListener(gSKIEVENT_AFTER_PHASE_EXECUTED, this) ;
+			// This is a huge hack.  These need to be registered by a gSKI RunListener
+			// because the gSKI event handler has to increment counters on these events.
+			// Added here for now because I couldn't reconcile the code for making
+			// a gSKI agent a RunListener too.  (might be circular...)
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_DECISION_PHASE, this) ;
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this) ;
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only
+	
 		}
 	}
 }
