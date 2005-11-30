@@ -150,8 +150,8 @@ void ConnectionManager::AddConnection(Connection* pConnection)
 
 	// Assign a unique ID for this connection
 	char buffer[100] ;
-	long long value = reinterpret_cast<long long>(pConnection) ;
-	sprintf(buffer, "id_0x%x", value) ;
+	uintptr_t value = reinterpret_cast<uintptr_t>(pConnection) ;
+	sprintf(buffer, "id_0x%p", value) ;
 	pConnection->SetID(buffer) ;
 	pConnection->SetName("unknown") ;
 	pConnection->SetStatus(sml_Names::kStatusCreated) ;

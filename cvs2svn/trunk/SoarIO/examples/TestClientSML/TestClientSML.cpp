@@ -188,6 +188,7 @@ bool SimpleRemoteConnect()
 
 	std::string trace ;
 	int callbackp = pAgent->RegisterForPrintEvent(smlEVENT_PRINT, MyPrintEventHandler, &trace) ;
+	unused(callbackp); // eliminate gcc compiler warning
 
 	SLEEP(1,0) ;
 
@@ -200,6 +201,7 @@ bool SimpleRemoteConnect()
 	cout << state ;
 
 	bool changed = pKernel->GetAllConnectionInfo() ;
+	unused(changed); // eliminate gcc compiler warning
 	for (int i = 0 ; i < pKernel->GetNumberConnections() ; i++)
 	{
 		ConnectionInfo const* pInfo = pKernel->GetConnectionInfo(i) ;
@@ -250,7 +252,7 @@ bool SimpleListener(int life)
 
 	// How often we check to see if the list of connections has changed.
 	int checkConnections = 500 / pauseMsecsTotal ;
-	int counter = checkConnections ;
+	//int counter = checkConnections ;
 
 	for (int i = 0 ; i < life ; i++)
 	{
