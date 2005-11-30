@@ -831,7 +831,8 @@ void do_one_top_level_phase (agent* thisAgent)
       start_timer (thisAgent, &thisAgent->start_phase_tv);
       #endif
 
-	  /* e_cycle_count will always be zero UNLESS we are running by ELABORATIONS.
+	  /* e_cycles_this_d_cycle will always be zero UNLESS we are 
+	   * running by ELABORATIONS.
 	   * We only want to do the following if we've just finished INPUT and are
 	   * starting PROPOSE.  If this is the second elaboration for PROPOSE, then 
 	   * just do the while loop below.   KJC  June 05
@@ -847,13 +848,23 @@ void do_one_top_level_phase (agent* thisAgent)
 									BEFORE_PROPOSE_PHASE_CALLBACK,
 									(soar_call_data) NULL);
 		 
-			/* 'Prime the decision for a new round of production firings at the end of
+			// We need to generate this event here in case no elaborations fire...
+            gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
+                        (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
+
+  		   /* 'Prime the decision for a new round of production firings at the end of
 			* REW:   05.05.97   */  /*  KJC 04.05 moved here from INPUT_PHASE for 8.6.0 */
 			initialize_consistency_calculations_for_new_decision(thisAgent);
 
 			thisAgent->FIRING_TYPE = IE_PRODS;
 			thisAgent->applyPhase = FALSE;   /* KJC 04/05: do we still need this line?  gSKI does*/
 			determine_highest_active_production_level_in_stack_propose(thisAgent);
+
+			if (thisAgent->current_phase == DECISION_PHASE) 
+			{  // no elaborations will fire this phase
+				gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 	
+					(thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 1);
+			}
 	  }
 
 		/* max-elaborations are checked in determine_highest_active... and if they
@@ -863,8 +874,11 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  while (thisAgent->current_phase != DECISION_PHASE) {
 	      /* JC ADDED: Tell gski about elaboration phase beginning */
-          gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-                        (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
+		  if (thisAgent->e_cycles_this_d_cycle) 
+		  {  // only for 2nd cycle or higher.  1st cycle fired above
+			  gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
+				  (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
+		  }
 		  do_preference_phase(thisAgent);
 	      do_working_memory_phase(thisAgent);
           /* Update accounting.  Moved here by KJC 04/05/05 */
