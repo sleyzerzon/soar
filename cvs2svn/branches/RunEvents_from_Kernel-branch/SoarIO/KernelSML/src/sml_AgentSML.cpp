@@ -41,11 +41,15 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::IAgent* pAgent) : /*m_AgentListe
 	m_SuppressRunEndsEvent = false ;
 	m_WasOnRunList = false;
 	m_ScheduledToRun = false ;
+	m_OnStepList = false;
 	m_ResultOfLastRun = gSKI_RUN_COMPLETED ;
 	m_InitialStepCount = 0 ;
+	m_InitialRunCount = 0 ;
 	m_CompletedOutputPhase = false ;
 	m_GeneratedOutput = false ;
 	m_OutputCounter = 0 ;
+    m_localRunCount = 0 ;
+    m_localStepCount= 0 ;
 
 	m_pBeforeDestroyedListener = NULL ;
 

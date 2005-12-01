@@ -412,8 +412,8 @@ namespace gSKI
    }
 
    egSKIRunResult Agent::StepInClientThread(egSKIInterleaveType  stepSize, 
-                                           unsigned long  stepCount,
-                                           Error*         err)
+                                                  unsigned long  stepCount,
+                                                         Error*  err)
    {
       //KJC copied from RunInClientThread above.
 
@@ -1568,7 +1568,6 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
 	} /* */
 
-
 	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
     a->m_runListeners.Notify(eventId, rn);
 
@@ -1610,43 +1609,15 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
      // We have to change the the event id from a kernel id to a gSKI id
 	  RunNotifier rn(a, EnumRemappings::ReMapPhaseType(phase_data->phase_type,0));
       a->m_runListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_RunEventId(eventId,eventOccured), rn);
-
-	  
-      // KJC added to propagate Kernel events outward and eliminate
-	  // pre-step and post-step notifications in gSKI Agent::Run.  
-	  // Best for Soar 7 mode and any future Kernel changes.
-	  //
-	  // Can update counters here too that used to be done in postStepNotifications
-	  //       including phase-count since Soar doesn't count phases per se.
-	  //   **No, need to ensure that a callback is registered, so do on agent constructor
-	  // If we have to retain SMALLEST_STEP events, can generate them here.
-	  // Need a separate handler for soar_invoke_callbacks on phase-specific events
-
-	  if (0) {  // not implemented yet
-		  switch (eventId)   // have to test eventId here or in HandleKernelRunCallback
-		  {
-		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
-		  case gSKIEVENT_AFTER_PHASE_EXECUTED:      
-		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
-		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
-		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
-		  case gSKIEVENT_AFTER_DECISION_CYCLE:
-
-
-      
-		  default:
-			  ; // do nothing
-		  }
-	  }
- 
    }
 
    // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events 
    void Agent::HandleEvent(egSKIRunEventId eventId, Agent* a, egSKIPhaseType phase)
    {
-       
 	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
  
+	// KJC 12/1/05:  everything should be going thru HandleKernelRunEventCallback
+	//  or HandleRunEventCallback (for Elaborations only).
 	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
 		(IsBEFOREPhaseEventID(eventId)))
 	{

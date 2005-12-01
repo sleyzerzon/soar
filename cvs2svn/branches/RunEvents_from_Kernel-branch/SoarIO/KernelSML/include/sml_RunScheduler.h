@@ -119,10 +119,14 @@ public:
 
 protected:
 	bool			IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count) ;
+    void            InitializeStepList() ;
+	bool            AgentsStillStepping() ;
 	void			FireBeforeRunStartsEvents() ;
-	unsigned long	GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ;
+	unsigned long	GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ; //should be interleave...
+	unsigned long	GetRunCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ;
  	void			RecordInitialRunCounters(egSKIRunType runStepSize) ;
  	void			ResetRunCounters(egSKIRunType runStepSize) ;
+	void            InitializeRunCounters(egSKIRunType runStepSize) ;
 	void			InitializeUpdateWorldEvents(bool addListeners) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
 	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;

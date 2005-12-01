@@ -91,10 +91,14 @@ protected:
 	// Used to control runs
 	bool m_ScheduledToRun ;
 	bool m_WasOnRunList;
+	bool m_OnStepList;
 	unsigned long m_InitialStepCount ;
+	unsigned long m_InitialRunCount ;
 	egSKIRunResult m_ResultOfLastRun ;
+    unsigned long m_localRunCount;
+    unsigned long m_localStepCount;
 
-	// Used for update world events
+	  // Used for update world events
 	bool m_CompletedOutputPhase ;
 	bool m_GeneratedOutput ;
 	unsigned long m_OutputCounter ;
@@ -190,13 +194,23 @@ public:
 	*************************************************************/
 	void ScheduleAgentToRun(bool state) { m_ScheduledToRun = state ; m_WasOnRunList = state; }
 	bool IsAgentScheduledToRun()		{ return m_ScheduledToRun ; }
+	void PutAgentOnStepList(bool state) { m_OnStepList = state; }
+	bool IsAgentOnStepList()		    { return m_OnStepList ; }
 	bool WasAgentOnRunList()            { return m_WasOnRunList ; }
 
 	egSKIRunResult	GetResultOfLastRun()		  { return m_ResultOfLastRun ; }
 	void SetResultOfRun(egSKIRunResult runResult) { m_ResultOfLastRun = runResult ; }
 
 	void SetInitialStepCount(unsigned long count)	{ m_InitialStepCount = count ; }
+	void SetInitialRunCount(unsigned long count)	{ m_InitialRunCount = count ; }
 	unsigned long GetInitialStepCount()				{ return m_InitialStepCount ; }
+	unsigned long GetInitialRunCount()				{ return m_InitialRunCount ; }
+	void ResetLocalRunCounters()                    { m_localRunCount = 0 ; m_localStepCount = 0 ; }
+	void IncrementLocalRunCounter()                 { m_localRunCount++ ; }
+	bool CompletedOneRunType()                      { //(GetRunCounter(m_pIAgent, runStepSize) > 
+		                                              //(m_InitialRunCount + m_localRunCount)) ;
+		                                              return false;
+	                                                }
 
 	void SetCompletedOutputPhase(bool state)		{ m_CompletedOutputPhase = state ; }
 	bool HasCompletedOutputPhase()					{ return m_CompletedOutputPhase ; }
