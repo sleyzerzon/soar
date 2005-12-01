@@ -251,7 +251,7 @@ bool SimpleListener(int life)
 	{ life *= 10 ; pauseMsecsTotal /= 10 ; }
 
 	// How often we check to see if the list of connections has changed.
-	int checkConnections = 500 / pauseMsecsTotal ;
+	//int checkConnections = 500 / pauseMsecsTotal ;
 	//int counter = checkConnections ;
 
 	for (int i = 0 ; i < life ; i++)
