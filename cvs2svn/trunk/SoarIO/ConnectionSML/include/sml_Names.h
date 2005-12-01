@@ -273,6 +273,7 @@ public:
 	static char const* const kParamVersionMajor;
 	static char const* const kParamVersionMinor;
 	static char const* const kParamVersionMicro;
+	static char const* const kParamBuildDate;
 	static char const* const kParamWaitSNC;
 	static char const* const kParamFunction ;
 	static char const* const kParamChunkNamePrefix;

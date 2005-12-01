@@ -19,6 +19,8 @@
 using namespace cli;
 using namespace sml;
 
+const char* kTimestamp = __TIMESTAMP__;
+
 bool CommandLineInterface::ParseVersion(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
 	unused(pAgent);
 	unused(argv);
@@ -31,11 +33,14 @@ bool CommandLineInterface::DoVersion() {
 	char buf[kMinBufferSize];
 
 	if (m_RawOutput) {
-		m_Result << m_KernelVersion.major << '.' << m_KernelVersion.minor << '.' << m_KernelVersion.micro;
+		m_Result << m_KernelVersion.major << '.' << m_KernelVersion.minor << '.' << m_KernelVersion.micro << '\n';
+		m_Result << "Build date: " << kTimestamp;
+
 	} else {
 		AppendArgTagFast(sml_Names::kParamVersionMajor, sml_Names::kTypeInt, Int2String(m_KernelVersion.major, buf, kMinBufferSize));
 		AppendArgTagFast(sml_Names::kParamVersionMinor, sml_Names::kTypeInt, Int2String(m_KernelVersion.minor, buf, kMinBufferSize));
 		AppendArgTagFast(sml_Names::kParamVersionMicro, sml_Names::kTypeInt, Int2String(m_KernelVersion.micro, buf, kMinBufferSize));
+		AppendArgTagFast(sml_Names::kParamBuildDate, sml_Names::kTypeString, kTimestamp);
 	}
 	return true;
 }

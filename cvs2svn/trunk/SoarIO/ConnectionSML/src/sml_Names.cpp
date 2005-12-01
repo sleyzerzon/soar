@@ -279,6 +279,7 @@ char const* const sml_Names::kParamRunResult		= "runresult";
 char const* const sml_Names::kParamVersionMajor		= "versionmajor";
 char const* const sml_Names::kParamVersionMinor		= "versionminor";
 char const* const sml_Names::kParamVersionMicro		= "versionmicro";
+char const* const sml_Names::kParamBuildDate		= "builddate";
 char const* const sml_Names::kParamWaitSNC			= "waitsnc";
 char const* const sml_Names::kParamFunction			= "function" ;
 char const* const sml_Names::kParamChunkNamePrefix	= "chunknameprefix" ;
