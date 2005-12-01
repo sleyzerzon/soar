@@ -149,9 +149,8 @@ void ConnectionManager::AddConnection(Connection* pConnection)
 	soar_thread::Lock lock(&m_ConnectionsMutex) ;
 
 	// Assign a unique ID for this connection
-	uintptr_t value = reinterpret_cast<uintptr_t>(pConnection) ;
 	std::ostringstream buffer;
-	buffer << "id_0x" << (long long)value; // BADBAD: the ostringstream::<< operator doesn't directly support uintptr_t, leading to an implicit cast with a possible loss of data. This explicit cast should be safe on Windows and Linux (but who knows what the future holds)
+	buffer << "id_0x" << pConnection;
 	std::string bufferStdString = buffer.str();
 	const char* bufferCString = bufferStdString.c_str();
 	pConnection->SetID(bufferCString) ;
