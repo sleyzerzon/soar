@@ -1009,7 +1009,10 @@ void do_one_top_level_phase (agent* thisAgent)
  			soar_invoke_callbacks(thisAgent, thisAgent, 
 									BEFORE_APPLY_PHASE_CALLBACK,
 									(soar_call_data) NULL);
- 		 
+ 			// We need to generate this event here in case no elaborations fire...
+            gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
+                        (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
+		 
 			/* 'prime' the cycle for a new round of production firings 
 			* in the APPLY (pref/wm) phase *//* KJC 04.05 moved here from end of DECISION */
 			initialize_consistency_calculations_for_new_decision(thisAgent);
@@ -1017,6 +1020,11 @@ void do_one_top_level_phase (agent* thisAgent)
 			thisAgent->FIRING_TYPE = PE_PRODS;  /* might get reset in det_high_active_prod_level... */
 			thisAgent->applyPhase = TRUE;       /* KJC 04/05: do we still need this line?  gSKI does*/
 			determine_highest_active_production_level_in_stack_apply(thisAgent);
+			if (thisAgent->current_phase == OUTPUT_PHASE) 
+			{  // no elaborations will fire this phase	
+				gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
+				      (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 1);
+			}
 	  }
 	  /* max-elaborations are checked in determine_highest_active... and if they
 	   * are reached, the current phase is set to OUTPUT.  phase is also set
@@ -1025,8 +1033,11 @@ void do_one_top_level_phase (agent* thisAgent)
 
       while (thisAgent->current_phase != OUTPUT_PHASE) {
           /* JC ADDED: Tell gski about elaboration phase beginning */
-          gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-                        (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
+		  if (thisAgent->e_cycles_this_d_cycle) 
+		  {  // only for 2nd cycle or higher.  1st cycle fired above     
+			  gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
+                    (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
+		  }
 		  do_preference_phase(thisAgent);
 		  do_working_memory_phase(thisAgent);
           /* Update accounting.  Moved here by KJC 04/05/05 */
