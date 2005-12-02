@@ -85,11 +85,6 @@ enum egSKIAgentEvents
    gSKI_K_EVENT_ELABORATION_CYCLE,        /* Data: Phase type (char) & elab cycle count (int) ? */ // DONE!
    gSKI_K_EVENT_DECISION_CYCLE,           /* Data: cycle count (int) */          // DONE!
    
-   // KJC:  need to add phase-specific events so listeners don't have to check 
-   //       every single phase just to find the one of interest.
-   //       Could possibly do above in gSKI
-
-
    // DON'T NEED, CAN BE PROPAGATED BY gSKI
    // gSKI_K_EVENT_RETE_LOADED,              
    // gSKI_K_EVENT_AGENT_INITIALIZED,  */    

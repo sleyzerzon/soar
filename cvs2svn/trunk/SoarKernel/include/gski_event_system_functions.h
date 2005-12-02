@@ -71,6 +71,7 @@ inline void gSKI_SetAgentCallback(agent*                     soarAgent,
  * @param soarAgent     The soar agent that is related to the event
  * @param data          Event specific data
  */
+ 
 inline void gSKI_MakeAgentCallback(unsigned long eventId, 
                                    unsigned char eventOccured, 
                                    agent*        soarAgent,
@@ -80,13 +81,26 @@ inline void gSKI_MakeAgentCallback(unsigned long eventId,
    if(soarAgent->gskiCallbacks[eventId].gski_object != 0)
    {
        assert(soarAgent->gskiCallbacks[eventId].function != 0 && "Callback object valid but with invalid function.");
-       soarAgent->gskiCallbacks[eventId].function(eventId, eventOccured, soarAgent->gskiCallbacks[eventId].gski_object, soarAgent, data);
-   }
+	/*
+	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
+	    stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
+        start_timer (thisAgent, &thisAgent->start_phase_tv);
+	*/	   
+	   soarAgent->gskiCallbacks[eventId].function(eventId, eventOccured, soarAgent->gskiCallbacks[eventId].gski_object, soarAgent, data);
+	/*
+	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
+       start_timer(thisAgent, &thisAgent->start_kernel_tv);
+       start_timer(thisAgent, &thisAgent->start_phase_tv);
+	*/
+  }
 }
 
 /**
  * @brief Special function for more complex WMObject added method.
  */
+// !!!KJC :  can this go away?  Can Soar callback create struct?  Is it used?
 inline void gSKI_MakeAgentCallbackWMObjectAdded(struct agent_struct* soarAgent,
                                                 Symbol*              new_object,
                                                 Symbol*              ref_attr,
@@ -105,6 +119,7 @@ inline void gSKI_MakeAgentCallbackWMObjectAdded(struct agent_struct* soarAgent,
 /**
  * @brief Special function to handle the phase and decision cycle callbacks
  */
+// !!! KJC: this should go away.  Use Soar callbacks and create struct in handler.
 inline void gSKI_MakeAgentCallbackPhase(struct agent_struct* soarAgent,
                                         egSKIAgentEvents     event_type,
                                         egSKIPhases          phase_type,
@@ -130,12 +145,23 @@ inline void gSKI_MakeAgentCallbackXML(	agent*		soarAgent,
 										const char*	value=0)
 {
    gSKI_K_XMLCallbackData xml_data;
-
+	/*
+	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
+	    stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
+        start_timer (thisAgent, &thisAgent->start_phase_tv);
+	*/	   
    xml_data.funcType = funcType;
    xml_data.attOrTag = attOrTag;
    xml_data.value = value;
 
    gSKI_MakeAgentCallback(gSKI_K_EVENT_XML_OUTPUT, 0, soarAgent, static_cast<void*>(&xml_data));
+	/*
+	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
+       start_timer(thisAgent, &thisAgent->start_kernel_tv);
+       start_timer(thisAgent, &thisAgent->start_phase_tv);
+	*/
 }
 
 inline void gSKI_MakeAgentCallbackXML(	agent*			soarAgent,
@@ -144,8 +170,21 @@ inline void gSKI_MakeAgentCallbackXML(	agent*			soarAgent,
 										unsigned long	value)
 {
 	char buf[25];
+	/*
+	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
+	    stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
+        start_timer (thisAgent, &thisAgent->start_phase_tv);
+	*/	   
+
 	snprintf(buf, 24, "%lu", value);
 	gSKI_MakeAgentCallbackXML(soarAgent, funcType, attOrTag, (char*)buf);
+	/*
+	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
+       start_timer(thisAgent, &thisAgent->start_kernel_tv);
+       start_timer(thisAgent, &thisAgent->start_phase_tv);
+	*/
 }
 
 inline void gSKI_MakeAgentCallbackXML(	agent*		soarAgent,
@@ -154,8 +193,20 @@ inline void gSKI_MakeAgentCallbackXML(	agent*		soarAgent,
 										double      value)
 {
 	char buf[25];
+	/*
+	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
+	    stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
+        start_timer (thisAgent, &thisAgent->start_phase_tv);
+	*/	   
 	snprintf(buf, 24, "%f", value);
 	gSKI_MakeAgentCallbackXML(soarAgent, funcType, attOrTag, (char*)buf);
+	/*
+	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+                    &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
+       start_timer(thisAgent, &thisAgent->start_kernel_tv);
+       start_timer(thisAgent, &thisAgent->start_phase_tv);
+	*/
 }
 
 inline void GenerateWarningXML(agent* soarAgent, const char* message) {

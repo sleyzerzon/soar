@@ -209,7 +209,9 @@ namespace gSKI {
       virtual egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
                                                unsigned long       count         = 1,
                                                Error*              err           = 0) = 0;
-
+      virtual egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE, 
+                                                unsigned long  stepCount         = 1,
+                                                Error*         err               = 0) = 0;
       /**
        * @brief Interrupts agent execution
        *

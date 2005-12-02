@@ -17,6 +17,7 @@
 #include "gdatastructs.h"
 #include "init_soar.h"
 #include "gski_event_system_data.h"
+#include "callback.h"
 
 namespace gSKI
 {
@@ -54,6 +55,7 @@ namespace gSKI
       static egSKIAgentEvents RemapPrintEventType(egSKIPrintEventId eventId);
 	  static egSKIAgentEvents RemapXMLEventType(egSKIXMLEventId eventId);
 	  static egSKIAgentEvents RemapRunEventType(egSKIRunEventId eventId);
+	  static SOAR_CALLBACK_TYPE KernelRunEventType(egSKIRunEventId eventId);
 
       static void Init();
    private:
@@ -66,6 +68,7 @@ namespace gSKI
       static unsigned short PrefTypeEnumMapping[NUM_PREFERENCE_TYPES];
       static unsigned short PhaseTypeEnumMapping[NUM_PHASE_TYPES];
       static unsigned short EventEnumMapping[gSKI_K_MAX_AGENT_EVENTS][2];
+      static unsigned short RunEventEnumMapping[NUMBER_OF_MONITORABLE_CALLBACKS];
       static unsigned short PrintEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
 	  static unsigned short XMLEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
       static unsigned short ProductionTypeEnumMapping[NUM_PRODUCTION_TYPES];

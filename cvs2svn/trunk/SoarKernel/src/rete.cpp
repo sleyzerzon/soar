@@ -3695,11 +3695,9 @@ byte add_production_to_rete (agent* thisAgent,
       destructively_reverse_list (rhs_unbound_vars_for_new_prod);
   }
 
-#ifndef NO_CALLBACKS  /* kjc 1/00 */
-  /* --- invoke callback functions --- */
+   /* --- invoke callback functions --- */
   soar_invoke_callbacks (thisAgent, thisAgent, PRODUCTION_JUST_ADDED_CALLBACK,
                          (soar_call_data) p);
-#endif
 
 //#ifdef _WINDOWS
 //        add_production_to_stat_lists(new_prod);
@@ -3723,12 +3721,10 @@ void excise_production_from_rete (agent* thisAgent, production *p)
   rete_node *p_node, *parent;
   ms_change *msc;
 
-#ifndef NO_CALLBACKS  /* kjc 1/00 */
   soar_invoke_callbacks (thisAgent, thisAgent, 
                          PRODUCTION_JUST_ABOUT_TO_BE_EXCISED_CALLBACK,
                          (soar_call_data) p);
-#endif
-
+ 
   /* JC ADDED: Tell gSKI we are about to excise a production */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_REMOVED, 0, thisAgent, static_cast<void*>(p));
   
@@ -7196,12 +7192,10 @@ void reteload_node_and_children (Kernel* thisKernel, agent* thisAgent, rete_node
     /* --- call new node's add_left routine with all the parent's tokens --- */
     update_node_with_matches_from_above (thisAgent, New);
 
-#ifndef NO_CALLBACKS  /* kjc 1/00 */
-    /* --- invoke callback on the production --- */
+     /* --- invoke callback on the production --- */
     soar_invoke_callbacks (thisAgent, thisAgent, PRODUCTION_JUST_ADDED_CALLBACK,
                           (soar_call_data) prod);
-#endif
-
+ 
     break;
 
   default:

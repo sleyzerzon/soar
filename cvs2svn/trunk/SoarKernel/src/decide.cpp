@@ -1722,21 +1722,17 @@ void create_new_attribute_impasse_for_slot (agent* thisAgent, slot *s, byte impa
   s->impasse_id = id;
   id->id.isa_impasse = TRUE;
 
-#ifndef NO_CALLBACKS
   soar_invoke_callbacks(thisAgent, thisAgent, 
                        CREATE_NEW_ATTRIBUTE_IMPASSE_CALLBACK, 
                        (soar_call_data) s);
-#endif
 }
 
 void remove_existing_attribute_impasse_for_slot (agent* thisAgent, slot *s) {
   Symbol *id;
 
-#ifndef NO_CALLBACKS
   soar_invoke_callbacks(thisAgent, thisAgent, 
                        REMOVE_ATTRIBUTE_IMPASSE_CALLBACK, 
                        (soar_call_data) s);
-#endif
 
   id = s->impasse_id;
   s->impasse_id = NIL;
@@ -2249,11 +2245,9 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
     remove_existing_context_and_descendents (thisAgent, goal->id.lower_goal);
 
   /* --- invoke callback routine --- */
-#ifndef NO_CALLBACKS
   soar_invoke_callbacks(thisAgent, thisAgent, 
                        POP_CONTEXT_STACK_CALLBACK, 
                        (soar_call_data) goal);
-#endif
 
   /* JC ADDED: Tell gSKI that we have removed a subgoal */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_SUBSTATE_DESTROYED, 0, thisAgent, static_cast<void*>(goal));
@@ -2398,11 +2392,9 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.allow_bottom_up_chunks = TRUE;
 
   /* --- invoke callback routine --- */
-#ifndef NO_CALLBACKS
   soar_invoke_callbacks(thisAgent, thisAgent, 
                        CREATE_NEW_CONTEXT_CALLBACK, 
                        (soar_call_data) id);
-#endif
 
    /* JC ADDED: Tell gSKI we have a new object in general (there are three places this can occur). */
    gSKI_MakeAgentCallbackWMObjectAdded(thisAgent, NIL, NIL, id);

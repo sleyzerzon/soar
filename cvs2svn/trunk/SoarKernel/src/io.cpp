@@ -441,10 +441,12 @@ void inform_output_module_of_wm_changes (agent* thisAgent,
     if (w->id==thisAgent->io_header) {
 		update_for_top_state_wme_addition (thisAgent, w);
 		thisAgent->output_link_changed = TRUE; /* KJC 11/23/98 */
+        thisAgent->d_cycle_last_output = thisAgent->d_cycle_count;   /* KJC 11/17/05 */
 	}
     if (w->id->id.associated_output_links) {
 		update_for_io_wme_change (w);
  		thisAgent->output_link_changed = TRUE; /* KJC 11/23/98 */
+        thisAgent->d_cycle_last_output = thisAgent->d_cycle_count;   /* KJC 11/17/05 */
 	}
 
  #if DEBUG_RTO
@@ -620,7 +622,6 @@ void do_output_cycle (agent* thisAgent) {
       break;
  
     case NEW_OL_STATUS:
-
       /* --- calculate tc, and call the output function --- */
       calculate_output_link_tc_info (thisAgent, ol);
       iw_list = get_io_wmes_for_output_link (thisAgent, ol);

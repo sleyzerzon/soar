@@ -726,8 +726,7 @@ void create_instantiation (agent* thisAgent, production *prod,
    /* --- build chunks/justifications if necessary --- */
    chunk_instantiation (thisAgent, inst, thisAgent->sysparams[LEARNING_ON_SYSPARAM] != 0);
 
-#ifndef NO_CALLBACKS  /* kjc 1/00 */
-   /* MVP 6-8-94 */
+    /* MVP 6-8-94 */
    if (!thisAgent->system_halted) {
       /* --- invoke callback function --- */
       soar_invoke_callbacks(thisAgent, thisAgent, 
@@ -735,7 +734,7 @@ void create_instantiation (agent* thisAgent, production *prod,
             (soar_call_data) inst);
 
    }
-#endif
+ 
 
    /* JC ADDED: Need to tell gSKI that a production was fired */
    gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_FIRED, 1, thisAgent, static_cast<void*>(inst));
@@ -810,12 +809,10 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
   Bool trace_it;
 
   /* --- invoke callback function --- */
-#ifndef NO_CALLBACKS
   soar_invoke_callbacks(thisAgent, thisAgent, 
 			RETRACTION_CALLBACK,
 			(soar_call_data) inst);
-#endif
-  
+   
   /* JC ADDED: tell gSKI that we've retracted a production instantiation */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_RETRACTED, 0, thisAgent, static_cast<void*>(inst));
 

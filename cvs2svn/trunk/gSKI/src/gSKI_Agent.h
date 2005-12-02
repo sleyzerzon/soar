@@ -33,6 +33,8 @@ typedef struct agent_struct agent;
 #include <map>
 #include <string>
 
+#include "callback.h"
+
 namespace gSKI
 {
    class IProductionManager;
@@ -42,7 +44,7 @@ namespace gSKI
    class OutputLink;
    class IAgentPerformanceMonitor;
 
-   class Agent : public IAgent
+   class Agent : public IAgent /*, public IRunListener */
    {
    public:     
       /**
@@ -193,14 +195,12 @@ namespace gSKI
        * @see egSKIRunType
        *
        * @param runLength How long to run the system.  Choices are       
-       *          gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
+       *          gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
        *          gSKI_RUN_DECISION_CYCLE, gSKI_RUN_UNTIL_OUTPUT, and
        *          gSKI_RUN_FOREVER.  See egSKIRunType for details.
-       * @param  count For gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
-       *          and gSKI_RUN_DECISION_CYCLE this parameter tells the method
+       * @param  count  this parameter tells the method
        *          how many elaboration phases, decision phase or decision cycles
-       *          to run before returning. For other run types this parameter
-       *          is ignored.
+       *          to run before returning. 
        * @param  err Pointer to client-owned error structure.  If the pointer
        *               is not 0 this structure is filled with extended error
        *               information.  If it is 0 (the default) extended error
@@ -215,6 +215,9 @@ namespace gSKI
       egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
                                        unsigned long       count         = 1,
                                        Error*              err           = 0);
+      egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE, 
+                                        unsigned long  stepCount         = 1,
+                                        Error*         err               = 0);
 
       /**
        * @brief Interrupts agent execution
@@ -638,8 +641,18 @@ namespace gSKI
        *             initialized.
        */
       unsigned long GetNumPhasesExecuted(Error* err = 0);
+      void          ResetNumPhasesExecuted(Error* err = 0);
 
+      /********************************************************************
+       * @brief	Agents maintain a number of counters (for how many phase,
+       *			elaborations etc.) they have ever executed.
+       *			We use these counters to determine when a run should stop.
+	   *        This is a hack from KernelSML which listens to RunEvents.
+	   *        Currently gSKI itself does not listen on RunEvents.
+      *********************************************************************/
+      void IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize) ;
        
+
       /**
        * @brief Gets the current elaborations count for this agent
        *
@@ -688,6 +701,7 @@ namespace gSKI
        *             initialized.
        */
       unsigned long GetNumOutputsExecuted(Error* err = 0);
+      void          ResetNumOutputsExecuted(Error* err = 0);
 
       virtual IAgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)
       { 
@@ -813,6 +827,12 @@ namespace gSKI
                           IRunListener*       listener, 
                           bool                allowAsynch = false,
                           Error*              err         = 0);
+	
+	 /* virtual void HandleEvent(egSKIRunEventId eventId, 
+		                       gSKI::IAgent*   agentPtr, 
+							   egSKIPhaseType  phase,
+							   Error*          err = 0);
+							   /* */
 
      /**
       *  @brief Removes an agent running event listener
@@ -1138,7 +1158,7 @@ namespace gSKI
 
 	  /** Fire the gSKIEVENT_AFTER_RUN_ENDS event **/
 	  void FireRunEndsEvent() ;
-	  
+	
 	  /** Multi-attribute support */
       //{
       virtual tIMultiAttributeIterator* GetMultiAttributes(Error* pErr = 0);
@@ -1183,6 +1203,19 @@ namespace gSKI
          IAgent*           m_agent;
          egSKIPhaseType    m_phase;
       };
+
+      /** 
+       * @brief RunListener for phase Events
+       */  /*
+	  class PhaseListener : public IRunListener
+	  {
+      public:
+          virtual void HandleEvent(egSKIRunEventId eventId, IAgent* agentPtr, egSKIPhaseType phase);
+		  //??  { HandleKernelRunEvent ?}
+	  private:
+		  Agent* a;
+	  }; 
+*/
 
 	  /** 
        * @brief Event notifier for XML events
@@ -1254,6 +1287,7 @@ namespace gSKI
 
      /** 
        * @brief Static function to handle callbacks for Run events from the kernel.
+	   * @brief This handler gets registered on gSKI-specific gSKI_MakeAgentCallback
        *
        * @param eventId  Id of the kernel level event that occured.
        * @param eventOccured true if the event happened already, false if
@@ -1262,6 +1296,8 @@ namespace gSKI
        * @param soarAgent Pointer to the kernel level agent structure associated
        *                    with this callback
        * @param data      Callback data (in this case an egSKIPhaseType)
+	   * 
+	   * This mechanism hardcodes the eventID and phasetype enums in the event generation code.
        */
       static void HandleRunEventCallback(unsigned long         eventId, 
                                             unsigned char         eventOccured,
@@ -1269,9 +1305,28 @@ namespace gSKI
                                             agent*                soarAgent, 
                                             void*                 data);
 
+     /** 
+       * @brief Static function to handle callbacks for Run events from the kernel.
+	   * @brief This handler gets registered on the SoarKernel native callbacks
+       *
+       * @param agent  Pointer to the kernel level agent structure associated
+       *                    with this callback (cast to void* )
+       * @param callbackdata  Pointer (cast to void* ) to the struct that has gSKI Agent object
+	   *                      and the eventID, which was already known at registration
+       * @param calldata      Callback data;  currently NULL for RunEvents 
+	   *
+	   * This mechanism queries the SoarKernel agent to get the phase type when invoked.
+       */
+   
+	  static void Agent::HandleKernelRunEventCallback( soar_callback_agent agent,
+					                                   soar_callback_data callbackdata,
+                                                       soar_call_data calldata );
 
+	  static void Agent::DeleteRunEventCallbackData (soar_callback_data);
 
-      /** 
+	  static void Agent::HandleEvent(egSKIRunEventId eventID, Agent* pAgent, egSKIPhaseType phase) ;
+
+	  /** 
        * @brief Listener manager definitions 
        */
       //{
@@ -1286,7 +1341,8 @@ namespace gSKI
        * @brief Executes the low level details of each type of run
        */
       //{
-      egSKIRunResult run(egSKIRunType runType, unsigned long maxSteps);
+      egSKIRunResult step(egSKIInterleaveType stepSize, unsigned long count);  
+      egSKIRunResult  run(egSKIRunType runType, unsigned long maxSteps);
       void preStepNotifications();
       bool postStepNotifications();
       void preStepNotificationsSoar7();
@@ -1315,7 +1371,7 @@ namespace gSKI
        *  how long it should run.
        */
       unsigned long* getReleventCounter(egSKIRunType runType);
-
+      unsigned long* getReleventCounter(egSKIInterleaveType stepType);
       /** 
        * @brief Initializes the run counters and interrupt flags
        */
@@ -1341,6 +1397,11 @@ namespace gSKI
 	  tXMLListenerManager	m_XMLListeners;		/**< Holds listeners to the XML event */
 
       tRunListenerManager   m_runListeners;      /**< Holds listeners for the run events */
+
+	                                            /**  struct defined for RunEvent userdata **/
+	  struct			   RunEventCallbackData {Agent * a; egSKIRunEventId eventId;};
+
+      //PhaseListener*       m_phaseListener;     /**< Listens for the BEFORE/AFTER phase events */
 
       InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
                         
