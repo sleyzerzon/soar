@@ -11,7 +11,7 @@
 ********************************************************************************************/
 package modules;
 
-import general.ElementXML;
+import general.JavaElementXML;
 import helpers.FormDataHelper;
 
 import manager.Pane;
@@ -530,14 +530,14 @@ public class ButtonView extends AbstractFixedView
 	* For the button view there is no content beyond the list of buttons.
 	* 
 	*************************************************************************/
-	public general.ElementXML convertToXML(String title, boolean storeContent)
+	public general.JavaElementXML convertToXML(String title, boolean storeContent)
 	{
-		ElementXML element = new ElementXML(title) ;
+		JavaElementXML element = new JavaElementXML(title) ;
 		
 		// It's useful to record the class name to uniquely identify the type
 		// of object being stored at this point in the XML tree.
 		Class cl = this.getClass() ;
-		element.addAttribute(ElementXML.kClassAttribute, cl.getName()) ;
+		element.addAttribute(JavaElementXML.kClassAttribute, cl.getName()) ;
 
 		// Store this object's properties.
 		element.addAttribute("Name", m_Name) ;
@@ -551,7 +551,7 @@ public class ButtonView extends AbstractFixedView
 		{
 			ButtonInfo button = (ButtonInfo)m_ButtonList.get(i) ;
 			
-			ElementXML child = new ElementXML("Button") ;
+			JavaElementXML child = new JavaElementXML("Button") ;
 			child.addAttribute("Name", button.m_Name) ;
 			
 			if (button.m_Command != null)
@@ -587,7 +587,7 @@ public class ButtonView extends AbstractFixedView
 	* @param element		The XML representation of this command
 	* 
 	*************************************************************************/
-	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.ElementXML element) throws Exception
+	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.JavaElementXML element) throws Exception
 	{
 		setValues(frame, doc, parent) ;
 		
@@ -599,7 +599,7 @@ public class ButtonView extends AbstractFixedView
 		
 		for (int i = 0 ; i < size ; i++)
 		{
-			ElementXML child = element.getChild(i) ;
+			JavaElementXML child = element.getChild(i) ;
 			
 			ButtonInfo button = new ButtonInfo() ;
 			button.m_Name    = child.getAttributeThrows("Name") ;

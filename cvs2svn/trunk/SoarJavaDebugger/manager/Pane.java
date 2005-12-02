@@ -12,7 +12,7 @@
 package manager;
 
 import modules.* ;
-import general.ElementXML;
+import general.JavaElementXML;
 
 import java.util.*;
 
@@ -197,9 +197,9 @@ public class Pane
 		return m_Views.get(index) ;
 	}
 	
-	public ElementXML convertToXML(String tagName, boolean storeContent)
+	public JavaElementXML convertToXML(String tagName, boolean storeContent)
 	{
-		ElementXML element = new ElementXML(tagName) ;
+		JavaElementXML element = new JavaElementXML(tagName) ;
 
 		// We'll record a reference from the window the XML
 		// This allows us to quickly index into the XML tree at a specific
@@ -219,7 +219,7 @@ public class Pane
 		for (int i = 0 ; i < n ; i++)
 		{
 			AbstractView view = getView(i) ;
-			ElementXML child = view.convertToXML(AbstractView.kTagView, storeContent) ;
+			JavaElementXML child = view.convertToXML(AbstractView.kTagView, storeContent) ;
 
 			// Provide an easy way to go from the view to the XML
 			if (view.getWindow() != null)
@@ -232,13 +232,13 @@ public class Pane
 	}
 
 	/** Look up the node in the XML tree that matches this pane.  Need to have called "convertToXML" for everything before calling this */
-	public ElementXML getElementXML()
+	public JavaElementXML getElementXML()
 	{
-		return (ElementXML)getWindow().getData(kXMLKey) ;
+		return (JavaElementXML)getWindow().getData(kXMLKey) ;
 	}
 	
 	/** This load code creates the pane, because we need to know what type of pane to create -- single or multiple **/
-	public static Pane loadFromXML(MainFrame frame, Document doc, Composite parent, ElementXML element) throws Exception
+	public static Pane loadFromXML(MainFrame frame, Document doc, Composite parent, JavaElementXML element) throws Exception
 	{
 		boolean singleView = element.getAttributeBooleanThrows(kAttributeSingleView) ;
 		boolean tabAtTop = element.getAttributeBooleanThrows(kAttributeTabAtTop) ;
@@ -249,7 +249,7 @@ public class Pane
 		return pane ;
 	}
 	
-	private void loadFromXMLInternal(MainFrame frame, Document doc, Composite parent, ElementXML element) throws Exception
+	private void loadFromXMLInternal(MainFrame frame, Document doc, Composite parent, JavaElementXML element) throws Exception
 	{
 		m_Views.clear() ;
 
@@ -269,7 +269,7 @@ public class Pane
 		
 		for (int i = 0 ; i < element.getNumberChildren() ; i++)
 		{
-			ElementXML child = element.getChild(i) ;
+			JavaElementXML child = element.getChild(i) ;
 			
 			// Build an instance of the view (using its default constructor)
 			// This will throw if there is no default constructor.

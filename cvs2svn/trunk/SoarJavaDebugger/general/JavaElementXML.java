@@ -13,6 +13,15 @@ import java.io.* ;
 
 /************************************************************************
 * 
+* IMPORTANT NOTES ON THIS CLASS:
+* 	This class was written long before SML existed.
+*   During the writing of SML, this class was re-implemented in C++ as ElementXML.
+*   In general, the sml.ElementXML class should be the class of choice -- it's much more rigorously tested
+*   and will be consistently maintained.
+*   So why is this class still here?  There's a lot of code in the debugger that uses this class and we just haven't
+*   had time to go through and remove all of the uses of this code and use sml.ElementXML instead.
+*   To make sure the two aren't muddled up this one has been renamed to JavaElementXML.
+* 
 * The ElementXML class is a general utility class for reading and writing XML files.
 * It represents an XML element, such as (using square brackets instead of
 * angled so that javadoc doesn't have a fit): 
@@ -56,7 +65,7 @@ import java.io.* ;
 * to build the XML element.
 *
 *************************************************************************/
-public class ElementXML
+public class JavaElementXML
 {
 	// Lexical analyser for XML stream.
 	private static class LexXML
@@ -456,7 +465,7 @@ public class ElementXML
 	protected Object	m_Source = null ;
 	
 	/** The parent node for this element (i.e. the inverse of the child relationship) */
-	protected ElementXML m_Parent = null ;
+	protected JavaElementXML m_Parent = null ;
 	
 	/************************************************************************
 	* 
@@ -465,7 +474,7 @@ public class ElementXML
 	* @param tagName		The name of the tag for this element
 	* 
 	*************************************************************************/
-	public ElementXML(String tagName)
+	public JavaElementXML(String tagName)
 	{
 		// Check there are no spaces in the tag name -- spaces make it hard to parse when reading the file.
 		if (tagName.indexOf(" ") != -1)
@@ -475,10 +484,10 @@ public class ElementXML
 	}
 
 	/** The parent node for this element (i.e. the inverse of the child relationship) */
-	public ElementXML getParent() { return this.m_Parent ; }
+	public JavaElementXML getParent() { return this.m_Parent ; }
 
 	/** The parent node for this element (i.e. the inverse of the child relationship) */
-	public void		  setParent(ElementXML element) { this.m_Parent = element ; }
+	public void		  setParent(JavaElementXML element) { this.m_Parent = element ; }
 		
 	/************************************************************************
 	* 
@@ -567,7 +576,7 @@ public class ElementXML
 	* @param contents		The body of this tag ([tag]"contents"[/tag])
 	* 
 	*************************************************************************/
-	public ElementXML(String tagName, String contents)
+	public JavaElementXML(String tagName, String contents)
 	{
 		this(tagName) ;
 		
@@ -825,9 +834,9 @@ public class ElementXML
 	* @return The element at the given position.
 	* 
 	*************************************************************************/
-	public ElementXML getChild(int index)
+	public JavaElementXML getChild(int index)
 	{
-		return (ElementXML)this.m_ChildElementList.get(index) ;
+		return (JavaElementXML)this.m_ChildElementList.get(index) ;
 	}
 	
 	/************************************************************************
@@ -850,7 +859,7 @@ public class ElementXML
 	* 
 	* @return True if replacement succeeds (i.e. existingChild is found)
 	*************************************************************************/
-	public boolean replaceChild(ElementXML existingChild, ElementXML newChild)
+	public boolean replaceChild(JavaElementXML existingChild, JavaElementXML newChild)
 	{
 		for (int i = 0 ; i < this.m_ChildElementList.size() ; i++)
 		{
@@ -880,7 +889,7 @@ public class ElementXML
 	* 
 	* @return True if removal succeeds (i.e. existingChild is found)
 	*************************************************************************/
-	public boolean removeChild(ElementXML child)
+	public boolean removeChild(JavaElementXML child)
 	{
 		return replaceChild(child, null) ;
 	}
@@ -920,7 +929,7 @@ public class ElementXML
 	* @param element		The element to add
 	* 
 	*************************************************************************/
-	public void addChildElement(ElementXML element)
+	public void addChildElement(JavaElementXML element)
 	{
 		this.m_ChildElementList.add(element) ;
 		element.setParent(this) ;
@@ -933,11 +942,11 @@ public class ElementXML
 	* @param attName		The name to match against
 	* 
 	*************************************************************************/	
-	public ElementXML findChildByAtt(String attName, String value)
+	public JavaElementXML findChildByAtt(String attName, String value)
 	{
 		for (java.util.Iterator iter = m_ChildElementList.iterator() ; iter.hasNext() ; )
 		{
-			ElementXML element = (ElementXML)iter.next() ;
+			JavaElementXML element = (JavaElementXML)iter.next() ;
 			
 			String att = element.getAttribute(attName) ;
 			if (att != null && att.equalsIgnoreCase(value))
@@ -954,11 +963,11 @@ public class ElementXML
 	* @param tagName		The name to match against
 	* 
 	*************************************************************************/	
-	public ElementXML findChildByName(String tagName)
+	public JavaElementXML findChildByName(String tagName)
 	{
 		for (java.util.Iterator iter = m_ChildElementList.iterator() ; iter.hasNext() ; )
 		{
-			ElementXML element = (ElementXML)iter.next() ;
+			JavaElementXML element = (JavaElementXML)iter.next() ;
 			
 			if (element.getTagName().equalsIgnoreCase(tagName))
 				return element ;
@@ -975,9 +984,9 @@ public class ElementXML
 	* @param tagName		The name to match against
 	* 
 	*************************************************************************/	
-	public ElementXML findChildByAttThrows(String attName, String value) throws Exception
+	public JavaElementXML findChildByAttThrows(String attName, String value) throws Exception
 	{
-		ElementXML child = findChildByAtt(attName, value) ;
+		JavaElementXML child = findChildByAtt(attName, value) ;
 		
 		if (child == null)
 			throw new Exception("Could not find child node with name: " + attName + " while parsing XML document") ;
@@ -993,9 +1002,9 @@ public class ElementXML
 	* @param tagName		The name to match against
 	* 
 	*************************************************************************/	
-	public ElementXML findChildByNameThrows(String tagName) throws Exception
+	public JavaElementXML findChildByNameThrows(String tagName) throws Exception
 	{
-		ElementXML child = findChildByName(tagName) ;
+		JavaElementXML child = findChildByName(tagName) ;
 		
 		if (child == null)
 			throw new Exception("Could not find child node with name: " + tagName + " while parsing XML document") ;
@@ -1012,7 +1021,7 @@ public class ElementXML
 	*************************************************************************/	
 	public String findContentsByName(String tagName)
 	{
-		ElementXML element = findChildByName(tagName) ;
+		JavaElementXML element = findChildByName(tagName) ;
 		
 		if (element != null)
 			return element.getContents() ;
@@ -1034,7 +1043,7 @@ public class ElementXML
 		BufferedWriter output = new BufferedWriter(fw) ;
 		
 		// Write out the header
-		ElementXML.WriteHeader(output) ;
+		JavaElementXML.WriteHeader(output) ;
 		
 		// Write out the stream
 		WriteToStream(output, 0) ;
@@ -1052,7 +1061,7 @@ public class ElementXML
 		try
 		{
 			// Write out the header
-			ElementXML.WriteHeader(output) ;
+			JavaElementXML.WriteHeader(output) ;
 			
 			// Write out the stream
 			WriteToStream(output, 0) ;
@@ -1084,7 +1093,7 @@ public class ElementXML
 	* @return The root element.
 	* 
 	*************************************************************************/
-	public static ElementXML ReadFromFile(String filename) throws Exception
+	public static JavaElementXML ReadFromFile(String filename) throws Exception
 	{
 		// Create the file reader
 		FileReader fr 		 = new FileReader(filename) ;
@@ -1094,7 +1103,7 @@ public class ElementXML
 		LexXML lexXML = new LexXML(input) ;
 		
 		// Read in the root element (and all children)
-		ElementXML element = ElementXML.ReadFromLex(lexXML) ;
+		JavaElementXML element = JavaElementXML.ReadFromLex(lexXML) ;
 		
 		// Clean up
 		input.close() ;
@@ -1116,7 +1125,7 @@ public class ElementXML
 	* @return The element that has just been read from the input stream.
 	* 
 	*************************************************************************/
-	public static ElementXML ParseElement(LexXML lex) throws Exception
+	public static JavaElementXML ParseElement(LexXML lex) throws Exception
 	{
 		// For now ignore header tags
 		if (lex.Have(kHeaderString))
@@ -1131,7 +1140,7 @@ public class ElementXML
 		String tagName = lex.MustBe(LexXML.kIdentifier) ;
 		
 		// Create the object we'll be returning
-		ElementXML element = new ElementXML(tagName) ;
+		JavaElementXML element = new JavaElementXML(tagName) ;
 		
 		// Read all of the attributes (if there are any)
 		while (lex.Have(LexXML.kIdentifier))
@@ -1179,7 +1188,7 @@ public class ElementXML
 				}
 				else
 				{
-					ElementXML child = ParseElement(lex) ;
+					JavaElementXML child = ParseElement(lex) ;
 					element.addChildElement(child) ;
 				}
 				continue ;
@@ -1222,9 +1231,9 @@ public class ElementXML
 	* @return The root XML element.
 	* 
 	*************************************************************************/
-	public static ElementXML ReadFromLex(LexXML lex) throws Exception
+	public static JavaElementXML ReadFromLex(LexXML lex) throws Exception
 	{
-		ElementXML element = null ;
+		JavaElementXML element = null ;
 		
 		// Keep parsing till we read the first, valid XML node
 		// This is really the root of a tree of nodes.
@@ -1324,7 +1333,7 @@ public class ElementXML
 		// Go through all of the child nodes
 		for (java.util.Iterator iter = m_ChildElementList.iterator() ; iter.hasNext() ;)
 		{
-			ElementXML element = (ElementXML)iter.next() ;
+			JavaElementXML element = (JavaElementXML)iter.next() ;
 			
 			// Write out each child
 			element.WriteToStream(output, indent+1) ;
@@ -1517,14 +1526,14 @@ public class ElementXML
 		File file = new File(directory, "test.xml") ;
 		
 		// Create some test objects.
-		ElementXML root = new ElementXML("rootNode") ;
+		JavaElementXML root = new JavaElementXML("rootNode") ;
 		root.addAttribute("att1", "this is first attribute value") ;
 		root.addAttribute("att2", "true") ;
 		root.addContents("Root contents") ;
-		ElementXML child1 = new ElementXML("child1") ;
-		ElementXML child2 = new ElementXML("child2") ;
-		ElementXML subChild = new ElementXML("subchild") ;
-		ElementXML subSubChild = new ElementXML("subSubChild") ;
+		JavaElementXML child1 = new JavaElementXML("child1") ;
+		JavaElementXML child2 = new JavaElementXML("child2") ;
+		JavaElementXML subChild = new JavaElementXML("subchild") ;
+		JavaElementXML subSubChild = new JavaElementXML("subSubChild") ;
 		
 		root.addChildElement(child1) ;
 		root.addChildElement(child2) ;
@@ -1540,7 +1549,7 @@ public class ElementXML
 		root.WriteToFile(file.getAbsolutePath()) ;
 		
 		// Then read it back in.
-		ElementXML readRoot = ElementXML.ReadFromFile(file.getAbsolutePath()) ;
+		JavaElementXML readRoot = JavaElementXML.ReadFromFile(file.getAbsolutePath()) ;
 		
 		// Check that the values read back match the original.
 		Debug.Check(readRoot.getTagName().equals("rootNode")) ;
@@ -1551,8 +1560,8 @@ public class ElementXML
 		Debug.Check(val1 != null && val1.equals("this is first attribute value")) ;
 		Debug.Check(val4 != null && val4.equals("true")) ;
 		
-		ElementXML readChild1 = (ElementXML)readRoot.getChildElementList().get(0) ;
-		ElementXML readChild2 = (ElementXML)readRoot.getChildElementList().get(1) ;
+		JavaElementXML readChild1 = (JavaElementXML)readRoot.getChildElementList().get(0) ;
+		JavaElementXML readChild2 = (JavaElementXML)readRoot.getChildElementList().get(1) ;
 		Debug.Check(readChild1.getTagName().equals("child1")) ;
 		Debug.Check(readChild2.getTagName().equals("child2")) ;
 		String contents = "Child 1 has contents" + kLineSeparator + "Child 1 has more contents" ;
@@ -1563,11 +1572,11 @@ public class ElementXML
 		String val3 = readChild2.getAttribute("color") ;
 		Debug.Check(val3 != null && val3.equals("red")) ;
 		
-		ElementXML readSubChild = (ElementXML)readChild1.getChildElementList().get(0) ;
-		ElementXML sameSubChild = readChild1.getChild(0) ;
+		JavaElementXML readSubChild = (JavaElementXML)readChild1.getChildElementList().get(0) ;
+		JavaElementXML sameSubChild = readChild1.getChild(0) ;
 		Debug.Check(readSubChild == sameSubChild) ;
 		Debug.Check(readSubChild.getTagName().equals("subchild")) ;
-		ElementXML readSubSubChild = (ElementXML)readSubChild.getChildElementList().get(0) ;
+		JavaElementXML readSubSubChild = (JavaElementXML)readSubChild.getChildElementList().get(0) ;
 		Debug.Check(readSubSubChild.getTagName().equals("subSubChild")) ;
 		}
 		

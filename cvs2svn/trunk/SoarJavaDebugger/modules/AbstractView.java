@@ -15,7 +15,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
-import general.ElementXML;
+import general.JavaElementXML;
 import manager.MainWindow;
 import manager.Pane;
 
@@ -192,7 +192,7 @@ public abstract class AbstractView implements AgentFocusListener
 	* @param storeContent	If true, record the content from the display (e.g. the text from a trace window)
 	* 
 	*************************************************************************/
-	public abstract general.ElementXML convertToXML(String tagName, boolean storeContent) ;
+	public abstract general.JavaElementXML convertToXML(String tagName, boolean storeContent) ;
 
 	/************************************************************************
 	* 
@@ -204,7 +204,7 @@ public abstract class AbstractView implements AgentFocusListener
 	* @param element		The XML representation of this command
 	* 
 	*************************************************************************/
-	public abstract void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.ElementXML element) throws Exception ;
+	public abstract void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.JavaElementXML element) throws Exception ;
 
 	/************************************************************************
 	* 
@@ -470,9 +470,9 @@ public abstract class AbstractView implements AgentFocusListener
 	}
 	
 	/** Look up the node in the XML tree that matches this pane.  Need to have called "convertToXML" for everything before calling this */
-	public ElementXML getElementXML()
+	public JavaElementXML getElementXML()
 	{
-		return (ElementXML)getWindow().getData(Pane.kXMLKey) ;
+		return (JavaElementXML)getWindow().getData(Pane.kXMLKey) ;
 	}
 	
 }

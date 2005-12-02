@@ -11,7 +11,7 @@
 ********************************************************************************************/
 package doc;
 
-import general.ElementXML;
+import general.JavaElementXML;
 import manager.MainWindow;
 import manager.Pane;
 import modules.AbstractView;
@@ -139,12 +139,12 @@ public class ScriptCommands
 		//  the point of the change down, so we may as well rebuild everything since we
 		//  already have all of that code and it's both fairly complex and heavily used).
 		boolean storeContent = true ;	// Capture existing output and redisplay it
-		ElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
+		JavaElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
 		
 		// Find the XML element for the pane we're modifying
-		ElementXML existingPane = pane.getElementXML() ;
+		JavaElementXML existingPane = pane.getElementXML() ;
 
-		ElementXML parent = existingPane.getParent() ;
+		JavaElementXML parent = existingPane.getParent() ;
 
 		// If the parent window is a composite then it's children have
 		// fixed locations and we treat them as a unit, so we move up
@@ -174,10 +174,10 @@ public class ScriptCommands
 		newPane.addView(newView) ;
 
 		// Create XML for the new sash form with appropriate children
-		ElementXML newChild1 = existingPane ;
-		ElementXML newChild2 = newPane.convertToXML(Pane.kTagName, false) ;
+		JavaElementXML newChild1 = existingPane ;
+		JavaElementXML newChild2 = newPane.convertToXML(Pane.kTagName, false) ;
 
-		ElementXML newParent = null ;
+		JavaElementXML newParent = null ;
 		
 		if (addSash)
 		{
@@ -276,11 +276,11 @@ public class ScriptCommands
 		// to be changed after it was created.
 		
 		boolean storeContent = true ;	// Capture existing output so we can redisplay it
-		ElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
+		JavaElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
 		
 		// Find the XML element for the pane we're modifying
-		ElementXML existingPane = pane.getElementXML() ;
-		ElementXML parentXML = existingPane.getParent() ;
+		JavaElementXML existingPane = pane.getElementXML() ;
+		JavaElementXML parentXML = existingPane.getParent() ;
 
 		// Force the pane to be a multi-view
 		existingPane.addAttribute(Pane.kAttributeSingleView, "false") ;
@@ -289,7 +289,7 @@ public class ScriptCommands
 		existingPane.addAttribute(Pane.kAttributeView, newView.getName()) ;
 
 		// Add the new view as a child of this pane
-		ElementXML newViewXML = newView.convertToXML(AbstractView.kTagView, false) ;
+		JavaElementXML newViewXML = newView.convertToXML(AbstractView.kTagView, false) ;
 		existingPane.addChildElement(newViewXML) ;
 				
 		try
@@ -353,11 +353,11 @@ public class ScriptCommands
 		// to be changed after it was created.
 		
 		boolean storeContent = true ;	// Capture existing output and redisplay it
-		ElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
+		JavaElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
 		
 		// Find the XML element for the pane we're modifying
-		ElementXML existingPane = pane.getElementXML() ;
-		ElementXML parentXML = existingPane.getParent() ;
+		JavaElementXML existingPane = pane.getElementXML() ;
+		JavaElementXML parentXML = existingPane.getParent() ;
 		
 		// Generate a name and make this view a child of the pane we're building
 		Pane newPane = new Pane("no parent") ;
@@ -368,7 +368,7 @@ public class ScriptCommands
 		newView.generateName(frame) ;
 		newPane.addView(newView) ;
 		
-		ElementXML newPaneXML = newPane.convertToXML(Pane.kTagName, false) ;
+		JavaElementXML newPaneXML = newPane.convertToXML(Pane.kTagName, false) ;
 		
 		// Change the XML tree to insert this new sash form.			
 		boolean success = parentXML.replaceChild(existingPane, newPaneXML) ;
@@ -407,10 +407,10 @@ public class ScriptCommands
 		Pane pane = view.getPane() ;
 		
 		boolean storeContent = true ;	// Capture existing output and redisplay it
-		ElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
+		JavaElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
 		
 		// Find the XML element for the pane we're modifying
-		ElementXML existingPane = pane.getElementXML() ;
+		JavaElementXML existingPane = pane.getElementXML() ;
 		
 		// Set the tab at top value appropriately
 		boolean top = (direction.equalsIgnoreCase("top")) ;
@@ -445,10 +445,10 @@ public class ScriptCommands
 
 		// Convert everything to XML
 		boolean storeContent = true ;	// Capture existing output and redisplay it
-		ElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
+		JavaElementXML xml = frame.getMainWindow().convertToXML(storeContent) ;
 
 		// Find the XML element for the pane we're removing
-		ElementXML removePane = pane.getElementXML() ;
+		JavaElementXML removePane = pane.getElementXML() ;
 				
 		// If the pane contains multiple views we just need to delete our view
 		if (!pane.isSingleView())
@@ -476,18 +476,18 @@ public class ScriptCommands
 			{
 				// With a fixed size window we just promote the other side of the pair
 				// up a level in the hierarchy.
-				ElementXML parent = removePane.getParent() ;
+				JavaElementXML parent = removePane.getParent() ;
 				
 				if (parent.getNumberChildren() != 2)
 					throw new IllegalStateException("The parent of a fixed size window should be a composite pair") ;
 				
 				// Find the other pane of the pair
-				ElementXML otherPane = parent.getChild(0) ;
+				JavaElementXML otherPane = parent.getChild(0) ;
 				if (otherPane == removePane)
 					otherPane = parent.getChild(1) ;
 				
 				// Promote the other pane to the position of the current parent
-				ElementXML superParent = parent.getParent() ;
+				JavaElementXML superParent = parent.getParent() ;
 				superParent.replaceChild(parent, otherPane) ;
 			}
 			else
@@ -499,7 +499,7 @@ public class ScriptCommands
 	
 				while (!done)
 				{
-					ElementXML parent = removePane.getParent() ;
+					JavaElementXML parent = removePane.getParent() ;
 					
 					// Can't remove the children of the top window as the top
 					// window is just a container that hosts everything else

@@ -11,7 +11,7 @@
 ********************************************************************************************/
 package modules;
 
-import general.ElementXML;
+import general.JavaElementXML;
 import manager.Pane;
 
 import org.eclipse.swt.graphics.Font;
@@ -163,14 +163,14 @@ public abstract class AbstractFixedView extends AbstractView
 	* For the button view there is no content beyond the list of buttons.
 	* 
 	*************************************************************************/
-	public ElementXML convertToXML(String tagName, boolean storeContent)
+	public JavaElementXML convertToXML(String tagName, boolean storeContent)
 	{
-		ElementXML element = new ElementXML(tagName) ;
+		JavaElementXML element = new JavaElementXML(tagName) ;
 		
 		// It's useful to record the class name to uniquely identify the type
 		// of object being stored at this point in the XML tree.
 		Class cl = this.getClass() ;
-		element.addAttribute(ElementXML.kClassAttribute, cl.getName()) ;
+		element.addAttribute(JavaElementXML.kClassAttribute, cl.getName()) ;
 
 		// Store this object's properties.
 		element.addAttribute("Name", m_Name) ;
@@ -188,7 +188,7 @@ public abstract class AbstractFixedView extends AbstractView
 	* @param element		The XML representation of this command
 	* 
 	*************************************************************************/
-	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.ElementXML element) throws Exception
+	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.JavaElementXML element) throws Exception
 	{
 		setValues(frame, doc, parent) ;
 

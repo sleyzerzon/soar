@@ -11,7 +11,7 @@
 ********************************************************************************************/
 package modules;
 
-import general.ElementXML;
+import general.JavaElementXML;
 import helpers.CommandHistory;
 import helpers.FormDataHelper;
 import manager.Pane;
@@ -304,14 +304,14 @@ public class EditorView extends AbstractView
 			m_Text.setText(result) ;
 	}
 
-	public ElementXML convertToXML(String tagName, boolean storeContent)
+	public JavaElementXML convertToXML(String tagName, boolean storeContent)
 	{
-		ElementXML element = new ElementXML(tagName) ;
+		JavaElementXML element = new JavaElementXML(tagName) ;
 		
 		// It's useful to record the class name to uniquely identify the type
 		// of object being stored at this point in the XML tree.
 		Class cl = this.getClass() ;
-		element.addAttribute(ElementXML.kClassAttribute, cl.getName()) ;
+		element.addAttribute(JavaElementXML.kClassAttribute, cl.getName()) ;
 
 		if (m_Name == null)
 			throw new IllegalStateException("We've created a view with no name -- very bad") ;
@@ -332,14 +332,14 @@ public class EditorView extends AbstractView
 		return element ;
 	}
 
-	public void loadFromXML(MainFrame frame, Document doc, Pane parent, ElementXML element) throws Exception
+	public void loadFromXML(MainFrame frame, Document doc, Pane parent, JavaElementXML element) throws Exception
 	{
 		setValues(frame, doc, parent) ;
 
 		m_Name			   = element.getAttribute("Name") ;
 		m_ComboAtTop	   = element.getAttributeBooleanThrows("ComboAtTop") ;
 		
-		ElementXML history = element.findChildByName("History") ;
+		JavaElementXML history = element.findChildByName("History") ;
 		if (history != null)
 			this.m_CommandHistory.LoadFromXML(doc, history) ;
 		

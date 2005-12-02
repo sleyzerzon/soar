@@ -17,7 +17,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
-import general.ElementXML;
+import general.JavaElementXML;
 
 import menu.ParseSelectedText;
 
@@ -250,9 +250,9 @@ public class TextTraceView extends AbstractComboView
 	/********************************************************************************************
 	 * @param element
 	 * 
-	 * @see modules.AbstractComboView#storeContent(general.ElementXML)
+	 * @see modules.AbstractComboView#storeContent(general.JavaElementXML)
 	 ********************************************************************************************/
-	protected void storeContent(ElementXML element)
+	protected void storeContent(JavaElementXML element)
 	{
 		if (m_Text.getText() != null)
 			element.addContents(m_Text.getText()) ;
@@ -261,9 +261,9 @@ public class TextTraceView extends AbstractComboView
 	/********************************************************************************************
 	 * @param element
 	 * 
-	 * @see modules.AbstractComboView#restoreContent(general.ElementXML)
+	 * @see modules.AbstractComboView#restoreContent(general.JavaElementXML)
 	 ********************************************************************************************/
-	protected void restoreContent(ElementXML element)
+	protected void restoreContent(JavaElementXML element)
 	{
 		String text = element.getContents() ;
 		
@@ -343,7 +343,7 @@ public class TextTraceView extends AbstractComboView
 		{
 			// Convert everything to XML (using the new setting we just changed)
 			boolean storeContent = true ;
-			ElementXML xml = m_Frame.getMainWindow().convertToXML(storeContent) ;
+			JavaElementXML xml = m_Frame.getMainWindow().convertToXML(storeContent) ;
 
 			// Rebuild the entire layout from the new XML structure.
 			m_Frame.getMainWindow().loadFromXMLNoThrow(xml) ;

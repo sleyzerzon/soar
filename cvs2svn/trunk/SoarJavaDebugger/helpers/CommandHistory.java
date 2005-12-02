@@ -121,14 +121,14 @@ public class CommandHistory
 	* Converts this object into an XML representation.
 	* 
 	*************************************************************************/
-	public general.ElementXML ConvertToXML(String title)
+	public general.JavaElementXML ConvertToXML(String title)
 	{
-		ElementXML element = new ElementXML(title) ;
+		JavaElementXML element = new JavaElementXML(title) ;
 		
 		// It's useful to record the class name to uniquely identify the type
 		// of object being stored at this point in the XML tree.
 		Class cl = this.getClass() ;
-		element.addAttribute(ElementXML.kClassAttribute, cl.getName()) ;
+		element.addAttribute(JavaElementXML.kClassAttribute, cl.getName()) ;
 		
 		// Record the size of the array
 		element.addAttribute("Size", Integer.toString(this.m_HistorySize)) ;
@@ -151,7 +151,7 @@ public class CommandHistory
 	* @param element		The XML representation of this command
 	* 
 	*************************************************************************/
-	public void LoadFromXML(doc.Document doc, general.ElementXML element) throws Exception
+	public void LoadFromXML(doc.Document doc, general.JavaElementXML element) throws Exception
 	{
 		m_HistorySize = element.getAttributeIntThrows("Size") ;
 		

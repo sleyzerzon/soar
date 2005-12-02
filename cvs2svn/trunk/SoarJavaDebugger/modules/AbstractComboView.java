@@ -427,23 +427,23 @@ public abstract class AbstractComboView extends AbstractView implements Agent.Ru
 		getDisplayControl().setFont(f) ;
 	}
 	
-	protected abstract void storeContent(ElementXML element) ;
+	protected abstract void storeContent(JavaElementXML element) ;
 
-	protected abstract void restoreContent(ElementXML element) ;
+	protected abstract void restoreContent(JavaElementXML element) ;
 	
 	/************************************************************************
 	* 
 	* Converts this object into an XML representation.
 	* 
 	*************************************************************************/
-	public general.ElementXML convertToXML(String title, boolean storeContent)
+	public general.JavaElementXML convertToXML(String title, boolean storeContent)
 	{
-		ElementXML element = new ElementXML(title) ;
+		JavaElementXML element = new JavaElementXML(title) ;
 		
 		// It's useful to record the class name to uniquely identify the type
 		// of object being stored at this point in the XML tree.
 		Class cl = this.getClass() ;
-		element.addAttribute(ElementXML.kClassAttribute, cl.getName()) ;
+		element.addAttribute(JavaElementXML.kClassAttribute, cl.getName()) ;
 
 		if (m_Name == null)
 			throw new IllegalStateException("We've created a view with no name -- very bad") ;
@@ -482,7 +482,7 @@ public abstract class AbstractComboView extends AbstractView implements Agent.Ru
 	* @param element		The XML representation of this command
 	* 
 	*************************************************************************/
-	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.ElementXML element) throws Exception
+	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.JavaElementXML element) throws Exception
 	{
 		setValues(frame, doc, parent) ;
 
@@ -494,7 +494,7 @@ public abstract class AbstractComboView extends AbstractView implements Agent.Ru
 		m_ShowTraceOutput  = element.getAttributeBooleanThrows("ShowTraceOutput") ;
 		m_UpdateEveryNthDecision = element.getAttributeIntThrows("UpdateEveryNthDecision") ;
 		
-		ElementXML history = element.findChildByName("History") ;
+		JavaElementXML history = element.findChildByName("History") ;
 		if (history != null)
 			this.m_CommandHistory.LoadFromXML(doc, history) ;
 		

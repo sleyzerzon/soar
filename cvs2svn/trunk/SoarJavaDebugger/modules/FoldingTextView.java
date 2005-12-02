@@ -11,7 +11,7 @@
 ********************************************************************************************/
 package modules;
 
-import general.ElementXML;
+import general.JavaElementXML;
 import helpers.FormDataHelper;
 
 import java.util.ArrayList;
@@ -988,12 +988,12 @@ public class FoldingTextView extends AbstractComboView implements Agent.xmlEvent
 	}
 
 	
-	protected void storeContent(ElementXML element)
+	protected void storeContent(JavaElementXML element)
 	{
 		
 	}
 
-	protected void restoreContent(ElementXML element)
+	protected void restoreContent(JavaElementXML element)
 	{
 		
 	}
@@ -1035,9 +1035,9 @@ public class FoldingTextView extends AbstractComboView implements Agent.xmlEvent
 	* @param storeContent	If true, record the content from the display (e.g. the text from a trace window)
 	* 
 	*************************************************************************/
-	public general.ElementXML convertToXML(String tagName, boolean storeContent)
+	public general.JavaElementXML convertToXML(String tagName, boolean storeContent)
 	{
-		ElementXML element = super.convertToXML(tagName, storeContent) ;
+		JavaElementXML element = super.convertToXML(tagName, storeContent) ;
 		element.addAttribute("indent", Integer.toString(m_IndentSize)) ;
 		element.addAttribute("auto-expand", Boolean.toString(m_ExpandTracePersistent)) ;
 
@@ -1060,7 +1060,7 @@ public class FoldingTextView extends AbstractComboView implements Agent.xmlEvent
 	* @param element		The XML representation of this command
 	* 
 	*************************************************************************/
-	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.ElementXML element) throws Exception
+	public void loadFromXML(MainFrame frame, doc.Document doc, Pane parent, general.JavaElementXML element) throws Exception
 	{
 		m_IndentSize = element.getAttributeIntThrows("indent") ;
 		m_ExpandTracePersistent = element.getAttributeBooleanDefault("auto-expand", false) ;

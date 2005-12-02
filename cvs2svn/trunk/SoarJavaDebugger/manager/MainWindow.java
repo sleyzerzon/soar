@@ -21,7 +21,7 @@ import org.eclipse.swt.events.*;
 import sml.Agent;
 
 import general.Debug;
-import general.ElementXML;
+import general.JavaElementXML;
 import helpers.FormDataHelper;
 
 import java.util.*;
@@ -421,7 +421,7 @@ public class MainWindow
   		}
   	}
 
-  	public void loadFromXMLNoThrow(ElementXML root)
+  	public void loadFromXMLNoThrow(JavaElementXML root)
   	{
   		try
 		{
@@ -433,10 +433,10 @@ public class MainWindow
 		}
   	}
   	
-  	public void loadFromXML(ElementXML root) throws Exception
+  	public void loadFromXML(JavaElementXML root) throws Exception
 	{
 		// Find the version of the layout file.
-		String version = root.getAttributeThrows(ElementXML.kVersionAttribute) ;
+		String version = root.getAttributeThrows(JavaElementXML.kVersionAttribute) ;
 
 		if (!version.equals("1.0"))
 			throw new Exception("Layout file is from an unsupported version " + version) ;
@@ -472,7 +472,7 @@ public class MainWindow
   	{
 		try
 		{
-			ElementXML root = ElementXML.ReadFromFile(filename);
+			JavaElementXML root = JavaElementXML.ReadFromFile(filename);
 			
 			loadFromXML(root) ;
 			
@@ -495,7 +495,7 @@ public class MainWindow
 	public boolean saveLayoutToFile(String filename)
 	{
 		// Convert to XML but without storing all of the current text in the trace etc.
-		ElementXML root = convertToXML(false) ;
+		JavaElementXML root = convertToXML(false) ;
 
 		try
 		{
@@ -515,13 +515,13 @@ public class MainWindow
 	}
   		
 	/** Convert a sash form (without its children) to XML */
-	public ElementXML buildXMLForSashForm(int sashOrientation, int[] weights)
+	public JavaElementXML buildXMLForSashForm(int sashOrientation, int[] weights)
 	{
 		String tagName = "sash" ;
-		ElementXML element = new ElementXML(tagName) ;
+		JavaElementXML element = new JavaElementXML(tagName) ;
 		
 		// Record the class and style of this composite so we can rebuild it later
-		element.addAttribute(ElementXML.kClassAttribute, SashForm.class.toString()) ;
+		element.addAttribute(JavaElementXML.kClassAttribute, SashForm.class.toString()) ;
 		
 		// The sash form stores its orientation (the style we really need) separately
 		// from the control's style, so retreive it from orientation.
@@ -538,12 +538,12 @@ public class MainWindow
 	}
 	
 	/** Convert a sash form (and its children) to XML */
-	protected ElementXML convertSashFormToXML(SashForm sash, boolean storeContent)
+	protected JavaElementXML convertSashFormToXML(SashForm sash, boolean storeContent)
 	{
 		int style = sash.getOrientation() ;
 		int[] weights = sash.getWeights() ;
 
-		ElementXML element = buildXMLForSashForm(style, weights) ;
+		JavaElementXML element = buildXMLForSashForm(style, weights) ;
 		
 		// Add the children
 		addChildrenToXML(element, sash, storeContent) ;
@@ -552,7 +552,7 @@ public class MainWindow
 	}
 
 	/** Add all of the children of this composite as children of the XML element **/
-	protected void addChildrenToXML(ElementXML element, Composite composite, boolean storeContent)
+	protected void addChildrenToXML(JavaElementXML element, Composite composite, boolean storeContent)
 	{
 		Control[] controls = composite.getChildren() ;
 		
@@ -592,13 +592,13 @@ public class MainWindow
 	}
 	
 	/** Constructs the XML for the composite window -- but not for its children */
-	public ElementXML buildXMLforComposite(String attachType)
+	public JavaElementXML buildXMLforComposite(String attachType)
 	{
 		String tagName = "composite" ;
-		ElementXML element = new ElementXML(tagName) ;
+		JavaElementXML element = new JavaElementXML(tagName) ;
 		
 		// Record the class and style of this composite so we can rebuild it later
-		element.addAttribute(ElementXML.kClassAttribute, Composite.class.toString()) ;
+		element.addAttribute(JavaElementXML.kClassAttribute, Composite.class.toString()) ;
 
 		//int style = composite.getStyle() ;
 		int style = 0 ;	// Override this for now until I figure out why I get back such a different value
@@ -614,12 +614,12 @@ public class MainWindow
 	}
 	
 	/** Convert a simple composite to XML **/
-	protected ElementXML convertCompositeToXML(Composite composite, boolean storeContent)
+	protected JavaElementXML convertCompositeToXML(Composite composite, boolean storeContent)
 	{
 		// See how this composite's children are meant to be put together.
 		String attachType = (String)composite.getData(kAttachKey) ;
 
-		ElementXML element = buildXMLforComposite(attachType) ;
+		JavaElementXML element = buildXMLforComposite(attachType) ;
 		
 		addChildrenToXML(element, composite, storeContent) ;
 		
@@ -628,13 +628,13 @@ public class MainWindow
 	
 	// Convert the layout to XML, optionally recording content (e.g. text in a trace window).
 	// If in doubt, you usually do NOT want the content--it could add enormously to the size of the XML.
-	public ElementXML convertToXML(boolean storeContent)
+	public JavaElementXML convertToXML(boolean storeContent)
 	{
-		ElementXML root = new ElementXML("Debugger") ;
+		JavaElementXML root = new JavaElementXML("Debugger") ;
 
 		// Add a version to the layout file so we can have later debuggers handle earlier layout files
 		// in a special manner if we wish.
-		root.addAttribute(ElementXML.kVersionAttribute, "1.0") ;
+		root.addAttribute(JavaElementXML.kVersionAttribute, "1.0") ;
 
 		// The display consists of a list of panes (the modules that provide functionality) together
 		// with a collection of SashForms and Composite windows that are used to lay them out.
@@ -645,11 +645,11 @@ public class MainWindow
 		return root ;
 	}
 	
-	protected void loadChildrenFromXML(MainFrame frame, Document doc, Composite parent, ElementXML element) throws Exception
+	protected void loadChildrenFromXML(MainFrame frame, Document doc, Composite parent, JavaElementXML element) throws Exception
 	{
 		for (int i = 0 ; i < element.getNumberChildren() ; i++)
 		{
-			ElementXML child = element.getChild(i) ;
+			JavaElementXML child = element.getChild(i) ;
 
 			String tagName = child.getTagName() ;
 			
@@ -664,16 +664,16 @@ public class MainWindow
 		}		
 	}
 	
-	protected void loadPaneFromXML(MainFrame frame, Document doc, Composite parent, ElementXML element) throws Exception
+	protected void loadPaneFromXML(MainFrame frame, Document doc, Composite parent, JavaElementXML element) throws Exception
 	{
   		Pane pane = Pane.loadFromXML(frame, doc, parent, element) ;	
   		m_PaneList.add(pane) ;
 	}
 	
-	protected void loadSwtFromXML(MainFrame frame, Document doc, Composite parent, ElementXML element) throws Exception
+	protected void loadSwtFromXML(MainFrame frame, Document doc, Composite parent, JavaElementXML element) throws Exception
 	{
 		String tag = element.getTagName() ;
-		String className = element.getAttributeThrows(ElementXML.kClassAttribute) ;
+		String className = element.getAttributeThrows(JavaElementXML.kClassAttribute) ;
 		int style = element.getAttributeIntThrows("style") ;
 
 		// We could rebuild a generic SWT object from the class using reflection, but it's actually simpler (so far) to just
