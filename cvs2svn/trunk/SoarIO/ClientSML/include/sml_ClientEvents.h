@@ -299,6 +299,10 @@ typedef void (*SystemEventHandler)(smlSystemEventId id, void* pUserData, Kernel*
 // you are passed the working memory element ((I3 ^move M3) in this case) in the callback.  This mimics gSKI's output producer model.
 typedef void (*OutputEventHandler)(void* pUserData, Agent* pAgent, char const* pCommandName, WMElement* pOutputWme) ;
 
+// This is a simpler notification event -- it just tells you that some output was received for this agent.
+// You then call to the other client side methods to determine what has changed.
+typedef void (*OutputNotificationHandler)(void* pUserData, Agent* pAgent) ;
+
 // Handler for Update events.
 typedef void (*UpdateEventHandler)(smlUpdateEventId id, void* pUserData, Kernel* pKernel, smlRunFlags runFlags) ;
 

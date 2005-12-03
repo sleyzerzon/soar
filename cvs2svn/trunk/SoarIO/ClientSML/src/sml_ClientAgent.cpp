@@ -127,6 +127,34 @@ void Agent::ReceivedRunEvent(smlRunEventId id, AnalyzeXML* pIncoming, ElementXML
 }
 
 /*************************************************************
+* @brief This function is called after output has been received
+*		 and processed from the kernel.
+*************************************************************/
+void Agent::FireOutputNotification()
+{
+	smlWorkingMemoryEventId id = smlEVENT_OUTPUT_PHASE_CALLBACK ;
+
+	// Look up the handler(s) from the map
+	OutputNotificationMap::ValueList* pHandlers = m_OutputNotificationMap.getList(id) ;
+
+	if (!pHandlers)
+		return ;
+
+	// Go through the list of event handlers calling each in turn
+	for (OutputNotificationMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
+	{
+		OutputNotificationHandlerPlusData handlerWithData = *iter ;
+		iter++ ;
+
+		OutputNotificationHandler handler = handlerWithData.m_Handler ;
+		void* pUserData = handlerWithData.m_UserData ;
+
+		// Call the handler
+		handler(pUserData, this) ;
+	}
+}
+
+/*************************************************************
 * @brief This function is called when an event is received
 *		 from the Soar kernel.
 *
@@ -262,6 +290,38 @@ public:
 	{ m_EventID = id ; m_Handler = handler ; m_UserData = pUserData ; }
 
 	bool isEqual(RunEventHandlerPlusData handlerPlus)
+	{
+		return handlerPlus.m_EventID == m_EventID &&
+			   handlerPlus.m_Handler == m_Handler &&
+			   handlerPlus.m_UserData == m_UserData ;
+	}
+} ;
+
+class Agent::TestOutputNotificationCallback : public OutputNotificationMap::ValueTest
+{
+private:
+	int m_ID ;
+public:
+	TestOutputNotificationCallback(int id) { m_ID = id ; }
+
+	bool isEqual(OutputNotificationHandlerPlusData handler)
+	{
+		return handler.m_CallbackID == m_ID ;
+	}
+} ;
+
+class Agent::TestOutputNotificationCallbackFull : public OutputNotificationMap::ValueTest
+{
+private:
+	int				m_EventID ;
+	OutputNotificationHandler m_Handler ;
+	void*			m_UserData ;
+
+public:
+	TestOutputNotificationCallbackFull(int id, OutputNotificationHandler handler, void* pUserData)
+	{ m_EventID = id ; m_Handler = handler ; m_UserData = pUserData ; }
+
+	bool isEqual(OutputNotificationHandlerPlusData handlerPlus)
 	{
 		return handlerPlus.m_EventID == m_EventID &&
 			   handlerPlus.m_Handler == m_Handler &&
@@ -474,6 +534,70 @@ bool Agent::UnregisterForRunEvent(int callbackID)
 
 	// If we just removed the last handler, then unregister from the kernel for this event
 	if (m_RunEventMap.getListSize(id) == 0)
+	{
+		GetKernel()->UnregisterForEventWithKernel(id, GetAgentName()) ;
+	}
+
+	return true ;
+}
+
+/*************************************************************
+* @brief Register to be notified when output has been received from the agent.
+*		 This event is a bit special, because we ensure that the client side data structures
+*		 have been updated before this event is triggered.  So you can examine the current contents
+*		 of the output link (GetOutputLink() etc.) and it will be up to date.
+*************************************************************/
+int Agent::RegisterForOutputNotification(OutputNotificationHandler handler, void* pUserData, bool addToBack)
+{
+	smlWorkingMemoryEventId id = smlEVENT_OUTPUT_PHASE_CALLBACK ;
+
+	// Start by checking if this id, handler, pUSerData combination has already been registered
+	TestOutputNotificationCallbackFull test(id, handler, pUserData) ;
+
+	// See if this handler is already registered
+	OutputNotificationHandlerPlusData plus(0,0,0,0) ;
+	bool found = m_OutputNotificationMap.findFirstValueByTest(&test, &plus) ;
+
+	if (found && plus.m_Handler != 0)
+		return plus.getCallbackID() ;
+
+	// If we have no handlers registered with the kernel, then we need
+	// to register for this event.  No need to do this multiple times.
+	// (Only do this if we were ignoring output from the kernel already--otherwise we'll get two copies of everything
+	//  because we're already registered for this event)
+	if (GetKernel()->m_bIgnoreOutput && m_OutputNotificationMap.getListSize(id) == 0)
+	{
+		GetKernel()->RegisterForEventWithKernel(id, GetAgentName()) ;
+	}
+
+	// Record the handler
+	m_CallbackIDCounter++ ;
+
+	// We use a struct rather than a pointer to a struct, so there's no need to new/delete
+	// everything as the objects are added and deleted.
+	OutputNotificationHandlerPlusData handlerPlus(id, handler, pUserData, m_CallbackIDCounter) ;
+	m_OutputNotificationMap.add(id, handlerPlus, addToBack) ;
+
+	// Return the ID.  We use this later to unregister the callback
+	return m_CallbackIDCounter ;
+}
+
+bool Agent::UnregisterForOutputNotification(int callbackID)
+{
+	// Build a test object for the callbackID we're interested in
+	TestOutputNotificationCallback test(callbackID) ;
+
+	// Find the event ID for this callbackID
+	smlWorkingMemoryEventId id = m_OutputNotificationMap.findFirstKeyByTest(&test, (smlWorkingMemoryEventId)-1) ;
+
+	if (id == -1)
+		return false ;
+
+	// Remove the handler from our map
+	m_OutputNotificationMap.removeAllByTest(&test) ;
+
+	// If we just removed the last handler, then unregister from the kernel for this event
+	if (GetKernel()->m_bIgnoreOutput && m_OutputNotificationMap.getListSize(id) == 0)
 	{
 		GetKernel()->UnregisterForEventWithKernel(id, GetAgentName()) ;
 	}

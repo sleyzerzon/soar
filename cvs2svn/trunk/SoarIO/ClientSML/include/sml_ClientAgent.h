@@ -91,6 +91,17 @@ public:
 	}
 } ;
 
+class OutputNotificationHandlerPlusData : public EventHandlerPlusData
+{
+public:
+	OutputNotificationHandler	m_Handler ;
+
+	OutputNotificationHandlerPlusData(int eventID, OutputNotificationHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
+	{
+		m_Handler = handler ;
+	}
+} ;
+
 class Agent : public ClientErrors
 {
 	// By using a lot of friends we can keep methods from being exposed
@@ -111,6 +122,7 @@ protected:
 	typedef sml::ListMap<smlPrintEventId, PrintEventHandlerPlusData>			PrintEventMap ;
 	typedef sml::ListMap<smlXMLEventId, XMLEventHandlerPlusData>				XMLEventMap ;
 	typedef sml::ListMap<std::string, OutputEventHandlerPlusData>				OutputEventMap ;
+	typedef sml::ListMap<smlWorkingMemoryEventId, OutputNotificationHandlerPlusData>	OutputNotificationMap ;
 
 protected:
 	// We maintain a local copy of working memory so we can just send changes
@@ -123,11 +135,12 @@ protected:
 	std::string		m_Name ;
 
 	// Map from event id to handler function(s)
-	RunEventMap			m_RunEventMap ;
-	ProductionEventMap	m_ProductionEventMap ;
-	PrintEventMap		m_PrintEventMap ;
-	XMLEventMap			m_XMLEventMap ;
-	OutputEventMap		m_OutputEventMap ;
+	RunEventMap				m_RunEventMap ;
+	ProductionEventMap		m_ProductionEventMap ;
+	PrintEventMap			m_PrintEventMap ;
+	XMLEventMap				m_XMLEventMap ;
+	OutputEventMap			m_OutputEventMap ;
+	OutputNotificationMap	m_OutputNotificationMap ;
 
 	// These are little utility classes we define in the .cpp file to help with searching the event maps
 	class TestRunCallbackFull ;
@@ -140,6 +153,8 @@ protected:
 	class TestXMLCallback ;
 	class TestOutputCallbackFull ;
 	class TestOutputCallback ;
+	class TestOutputNotificationCallbackFull ;
+	class TestOutputNotificationCallback ;
 
 	// Used to generate unique IDs for callbacks
 	int		m_CallbackIDCounter ;
@@ -181,6 +196,12 @@ protected:
 
 	/** NOTE: Slightly different sig as this is called without analyzing the incoming msg so it's a bit faster */
 	void ReceivedXMLTraceEvent(smlXMLEventId id, ElementXML* pIncomingMsg, ElementXML* pResponse) ;
+
+	/*************************************************************
+	* @brief This function is called after output has been received
+	*		 and processed from the kernel.
+	*************************************************************/
+	void FireOutputNotification() ;
 
 	/*************************************************************
 	* @brief Call any registered handlers to notify them when
@@ -360,6 +381,15 @@ public:
 	* @brief Unregister for a particular event
 	*************************************************************/
 	bool	UnregisterForRunEvent(int callbackID) ;
+
+	/*************************************************************
+	* @brief Register to be notified when output has been received from the agent.
+	*		 This event is a bit special, because we ensure that the client side data structures
+	*		 have been updated before this event is triggered.  So you can examine the current contents
+	*		 of the output link (GetOutputLink() etc.) and it will be up to date.
+	*************************************************************/
+	int RegisterForOutputNotification(OutputNotificationHandler handler, void* pUserData, bool addToBack = true) ;
+	bool UnregisterForOutputNotification(int callbackID) ;
 
 	/*************************************************************
 	* @brief Register for a "ProductionEvent".

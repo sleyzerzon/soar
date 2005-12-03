@@ -283,6 +283,73 @@ JNIEXPORT bool JNICALL Java_sml_smlJNI_Agent_1UnregisterForRunEvent(JNIEnv *jenv
 	return result ;
 }
 
+static void OutputNotificationHandler(void* pUserData, sml::Agent* pAgent)
+{
+	// The user data is the class we declared above, where we store the Java data to use in the callback.
+	JavaCallbackData* pJavaData = (JavaCallbackData*)pUserData ;
+
+	// Now try to call back to Java
+	JNIEnv *jenv = pJavaData->GetEnv();
+
+	// We start from the Java object whose method we wish to call.
+	jobject jobj = pJavaData->m_HandlerObject ;
+	jclass cls = jenv->GetObjectClass(jobj) ;
+
+	if (cls == 0)
+	{
+		printf("Failed to get Java class\n") ;
+		return ;
+	}
+
+	// Look up the Java method we want to call.
+	// The method name is passed in by the user (and needs to match exactly, including case).
+	// The method should be owned by the m_HandlerObject that the user also passed in.
+	// Any slip here and you get a NoSuchMethod exception and my Java VM shuts down.
+	jmethodID mid = jenv->GetMethodID(cls, pJavaData->m_HandlerMethod.c_str(), "(Ljava/lang/Object;Lsml/Agent;)V") ;
+
+	if (mid == 0)
+	{
+		printf("Failed to get Java method\n") ;
+		return ;
+	}
+
+	// Make the method call.
+	jenv->CallVoidMethod(jobj, mid, pJavaData->m_CallbackData, pJavaData->m_AgentObject);
+}
+
+JNIEXPORT jint JNICALL Java_sml_smlJNI_Agent_1RegisterForOutputNotification(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg3, jobject jarg4, jobject jarg6)
+{
+    // jarg1 is the C++ Agent object
+	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
+
+	// Create the information we'll need to make a Java call back later
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(true, jenv, jcls, jarg1, 0, jarg3, jarg4, "outputNotificationHandler", jarg6) ;
+	
+	// Register our handler.  When this is called we'll call back to the Java method.
+	pJavaData->m_CallbackID = arg1->RegisterForOutputNotification(&OutputNotificationHandler, pJavaData) ;
+
+	// Pass the callback info back to the Java client.  We need to do this so we can delete this later when the method is unregistered
+	return (jint)pJavaData ;
+}
+
+
+JNIEXPORT bool JNICALL Java_sml_smlJNI_Agent_1UnregisterForOutputNotification(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2)
+{
+    // jarg1 is the C++ Agent object
+	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
+
+	// jarg2 is the callback data from the registration call
+	JavaCallbackData* pJavaData = (JavaCallbackData*)jarg2 ;
+
+	// Unregister our handler.
+	bool result = arg1->UnregisterForOutputNotification(pJavaData->m_CallbackID) ;
+
+	// Release the callback data
+	delete pJavaData ;
+
+	return result ;
+}
+
 // This is the C++ handler which will be called by clientSML when the event fires.
 // Then from here we need to call back to Java to pass back the message.
 static void ProductionEventHandler(sml::smlProductionEventId id, void* pUserData, sml::Agent* pAgent, char const* pProdName, char const* pInstantiation)

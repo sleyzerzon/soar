@@ -378,6 +378,9 @@ bool WorkingMemory::ReceivedOutput(AnalyzeXML* pIncoming, ElementXML* pResponse)
 		m_OutputOrphans.clear() ;	// Have to discard them.
 	}
 
+	// Let anyone listening for the output notification know that output was just received.
+	GetAgent()->FireOutputNotification() ;
+
 	// Call any handlers registered to listen for output
 	// (This is one way to retrieve output).
 	// We do this at the end of the output handler so that all of the children of the wme

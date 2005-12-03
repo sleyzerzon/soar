@@ -20,6 +20,11 @@
 }
 %newobject sml::ClientXML::GenerateXMLString(bool) const ;
 
+%typemap(newfree) char* GenerateXMLString {
+    sml::ElementXML::DeleteString($1);
+}
+%newobject sml::ElementXML::GenerateXMLString(bool) const ;
+
 // This function also creates a new object, but we need to tell SWIG how to delete it
 %typemap(newfree) char* GenerateXMLString {
     sml::AnalyzeXML::DeleteString($1);
@@ -31,6 +36,7 @@
 %ignore sml::Agent::RegisterForRunEvent(smlRunEventId, RunEventHandler, void*, bool addToBack = true);
 %ignore sml::Agent::RegisterForPrintEvent(smlPrintEventId, PrintEventHandler, void*, bool ignoreOwnEchos = true,  bool addToBack = true);
 %ignore sml::Agent::RegisterForXMLEvent(smlXMLEventId, XMLEventHandler, void*, bool addToBack = true);
+%ignore sml::Agent::RegisterForOutputNotification(OutputNotificationHandler, void*, bool addToBack = true);
 %ignore sml::Agent::AddOutputHandler(char const*, OutputEventHandler, void*, bool addToBack = true);
 %ignore sml::Kernel::RegisterForSystemEvent(smlSystemEventId, SystemEventHandler, void*, bool addToBack = true);
 %ignore sml::Kernel::RegisterForAgentEvent(smlAgentEventId, AgentEventHandler, void*, bool addToBack = true);

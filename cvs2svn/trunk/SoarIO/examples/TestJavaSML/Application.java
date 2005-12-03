@@ -28,7 +28,7 @@ public class Application
 	private Kernel m_Kernel ;
 
 	public static class EventListener implements Agent.RunEventInterface, Agent.PrintEventInterface, Agent.ProductionEventInterface,
-												 Agent.xmlEventInterface, Agent.OutputEventInterface,
+												 Agent.xmlEventInterface, Agent.OutputEventInterface, Agent.OutputNotificationInterface,
 												 Kernel.AgentEventInterface, Kernel.SystemEventInterface, Kernel.RhsFunctionInterface
 	{
 		// We'll test to make sure we can keep a ClientXML object that we're passed.
@@ -68,6 +68,11 @@ public class Application
 		public void printEventHandler(int eventID, Object data, Agent agent, String message)
 		{
 			System.out.println("Received print event in Java: " + message) ;
+		}
+		
+		public void outputNotificationHandler(Object data, Agent agent)
+		{
+			System.out.println("Received an output notification in Java") ;
 		}
 
 		public void xmlEventHandler(int eventID, Object data, Agent agent, ClientXML xml)
@@ -217,6 +222,7 @@ public class Application
 		int jRhsCallback    = pKernel.AddRhsFunction("test-rhs", listener, this) ;
 		int jTraceCallback  = pAgent.RegisterForXMLEvent(smlXMLEventId.smlEVENT_XML_TRACE_OUTPUT, listener, this) ;
 		int jOutputCallback = pAgent.AddOutputHandler("move", listener, this) ;
+		int jOutputNotification = pAgent.RegisterForOutputNotification(listener, this) ;		
 		
 		// Trigger an agent event by doing init-soar
 		pAgent.InitSoar() ;
@@ -264,6 +270,7 @@ public class Application
 		pAgent.UnregisterForRunEvent(jRunCallback) ;
 		pAgent.UnregisterForProductionEvent(jProdCallback) ;
 		pAgent.UnregisterForPrintEvent(jPrintCallback) ;
+		pAgent.UnregisterForOutputNotification(jOutputNotification) ;
 		pAgent.RemoveOutputHandler(jOutputCallback) ;
 		pKernel.UnregisterForSystemEvent(jSystemCallback) ;
 		pKernel.UnregisterForSystemEvent(jSystemCallback2) ;

@@ -61,6 +61,7 @@
 %ignore sml::Agent::UnregisterForProductionEvent(int);
 %ignore sml::Agent::UnregisterForPrintEvent(int);
 %ignore sml::Agent::UnregisterForXMLEvent(int);
+%ignore sml::Agent::UnregisterForOutputNotification(int);
 %ignore sml::Agent::RemoveOutputHandler(int);
 %ignore sml::Kernel::UnregisterForSystemEvent(int);
 %ignore sml::Kernel::UnregisterForUpdateEvent(int);
@@ -83,6 +84,7 @@
   public final static native int Agent_RegisterForPrintEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6, boolean jarg7);
   public final static native int Agent_RegisterForXMLEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
   public final static native int Agent_AddOutputHandler(long jarg1, String jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Agent_RegisterForOutputNotification(long jarg1, Object jarg3, Object jarg4, Object jarg6);
   public final static native int Kernel_RegisterForSystemEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
   public final static native int Kernel_RegisterForUpdateEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
   public final static native int Kernel_RegisterForUntypedEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
@@ -93,6 +95,7 @@
   public final static native boolean Agent_UnregisterForProductionEvent(long jarg1, int jarg2);
   public final static native boolean Agent_UnregisterForPrintEvent(long jarg1, int jarg2);
   public final static native boolean Agent_UnregisterForXMLEvent(long jarg1, int jarg2);
+  public final static native boolean Agent_UnregisterForOutputNotification(long jarg1, int jarg2);
   public final static native boolean Agent_RemoveOutputHandler(long jarg1, int jarg2);
   public final static native boolean Kernel_UnregisterForSystemEvent(long jarg1, int jarg2);
   public final static native boolean Kernel_UnregisterForUpdateEvent(long jarg1, int jarg2);
@@ -121,6 +124,10 @@
   public interface OutputEventInterface {  
   		public void outputEventHandler(Object data, String agentName, String attributeName, WMElement pWmeAdded) ;
   }
+  
+  public interface OutputNotificationInterface {
+  		public void outputNotificationHandler(Object data, Agent agent) ;
+  }
 
   public int RegisterForRunEvent(smlRunEventId id, RunEventInterface handlerObject, Object callbackData)
   { return smlJNI.Agent_RegisterForRunEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ;}
@@ -137,6 +144,12 @@
   public int RegisterForXMLEvent(smlXMLEventId id, xmlEventInterface handlerObject, Object callbackData)
   { return smlJNI.Agent_RegisterForXMLEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ; }
   
+  public int RegisterForOutputNotification(OutputNotificationInterface handlerObject, Object callbackData)
+  { return smlJNI.Agent_RegisterForOutputNotification(swigCPtr, this, handlerObject, callbackData) ;}
+
+  public boolean UnregisterForOutputNotification(int callbackReturnValue)
+  { return smlJNI.Agent_UnregisterForOutputNotification(swigCPtr, callbackReturnValue) ;}
+
   public boolean UnregisterForRunEvent(int callbackReturnValue)
   { return smlJNI.Agent_UnregisterForRunEvent(swigCPtr, callbackReturnValue) ;}
 
@@ -207,6 +220,35 @@
   public boolean RemoveRhsFunction(int callbackReturnValue)
   { return smlJNI.Kernel_RemoveRhsFunction(swigCPtr, callbackReturnValue) ;}
 
+%}
+
+// Some handy alternative method names and additional wrappers to help support some legacy code and may be
+// useful for future Java apps.  We don't want to add these to the underlying C++ code because the Exception logic etc.
+// would be a real pain to support cross-language.
+%typemap(javacode) sml::ElementXML %{
+   public static final String kClassAttribute   = "Class" ;
+   public static final String kVersionAttribute = "Version" ;
+
+  public ElementXML(String tagName) {
+     SetTagName(tagName) ;
+  }
+
+  public void addAttribute(String attributeName, String valueName) {
+     AddAttribute(attributeName, valueName) ;
+  }
+  
+	public String getAttributeThrows(String name) throws Exception {
+		String value = GetAttribute(name) ;
+		if (value == null)
+			throw new Exception("Could not find attribute " + name + " while parsing XML document") ;			
+		return value ;
+	}  
+
+	public int getAttributeIntThrows(String name) throws Exception {
+		String val = getAttributeThrows(name) ;
+		int intVal = Integer.parseInt(val) ;
+		return intVal ;
+	}
 %}
 
 //

@@ -326,6 +326,16 @@ void MyProductionHandler(smlProductionEventId id, void* pUserData, Agent* pAgent
 		cout << "Excised " << pProdName << endl ;
 }
 
+void MyOutputNotificationHandler(void* pUserData, Agent* pAgent)
+{
+	int* pInt = (int*)pUserData ;
+
+	// Increase the count
+	*pInt = *pInt + 1 ;
+
+	cout << "Received an output notification callback" << endl ;
+}
+
 void MyUpdateEventHandler(smlUpdateEventId id, void* pUserData, Kernel* pKernel, smlRunFlags runFlags)
 {
 	int* pInt = (int*)pUserData ;
@@ -766,6 +776,10 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	outputsGenerated = 0 ;
 	int callback_g = pKernel->RegisterForUpdateEvent(smlEVENT_AFTER_ALL_GENERATED_OUTPUT, MyUpdateEventHandler, &outputsGenerated) ;
 
+	int outputNotifications ;
+	outputNotifications = 0 ;
+	int callback_notify = pAgent->RegisterForOutputNotification(MyOutputNotificationHandler, &outputNotifications) ;
+
 	// Can't test this at the same time as testing the getCommand() methods as registering for this clears the output link information
 	//int outputHandler = pAgent->AddOutputHandler("move", MyOutputEventHandler, NULL) ;
 
@@ -794,6 +808,12 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 		return false ;
 	}
 
+	if (outputNotifications != 1)
+	{
+		cout << "Error in OUTPUT_NOTIFICATION event." << endl ;
+		return false ;
+	}
+
 	// Reset the agent and repeat the process to check whether init-soar works.
 	if (doInitSoars)
 	{
@@ -803,6 +823,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	bool ioOK = false ;
 
+	pAgent->UnregisterForOutputNotification(callback_notify) ;
 	pKernel->UnregisterForUpdateEvent(callback_g) ;
 
 	//cout << "Time to dump output link" << endl ;
