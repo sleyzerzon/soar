@@ -860,6 +860,10 @@ TankSoarLogger.log("Kernel should have cleaned the real agent here...");
       fillSensors(tankSensors);
     }
 	
+    // DJP: Addition to send current state over to Redux
+    if (TankXML.kBroadcastState)
+    	TankXML.SendInputToRedux(agent, tankSensors) ;
+    
     iLink.doAllUpdates(tankSensors);
   }
 	/**
