@@ -68,6 +68,7 @@
 %ignore sml::Kernel::UnregisterForUntypedEvent(int);
 %ignore sml::Kernel::UnregisterForAgentEvent(int);
 %ignore sml::Kernel::RemoveRhsFunction(int);
+%ignore sml::Kernel::UnregisterForClientMessageEvent(int);
 
 %pragma(java) jniclasscode=%{
   static {
@@ -90,6 +91,7 @@
   public final static native int Kernel_RegisterForUntypedEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
   public final static native int Kernel_RegisterForAgentEvent(long jarg1, int jarg2, Object jarg3, Object jarg4, Object jarg6);
   public final static native int Kernel_AddRhsFunction(long jarg1, String jarg2, Object jarg3, Object jarg4, Object jarg6);
+  public final static native int Kernel_RegisterForClientMessageEvent(long jarg1, String jarg2, Object jarg3, Object jarg4, Object jarg6);
 
   public final static native boolean Agent_UnregisterForRunEvent(long jarg1, int jarg2);
   public final static native boolean Agent_UnregisterForProductionEvent(long jarg1, int jarg2);
@@ -102,6 +104,7 @@
   public final static native boolean Kernel_UnregisterForUntypedEvent(long jarg1, int jarg2);
   public final static native boolean Kernel_UnregisterForAgentEvent(long jarg1, int jarg2);
   public final static native boolean Kernel_RemoveRhsFunction(long jarg1, int jarg2);
+  public final static native boolean Kernel_UnregisterForClientMessageEvent(long jarg1, int jarg2);
 %}
 
 %typemap(javacode) sml::Agent %{
@@ -189,6 +192,10 @@
   public interface RhsFunctionInterface {  
   		public String rhsFunctionHandler(int eventID, Object data, String agentName, String functionName, String argument) ;
   }
+
+  public interface ClientMessageInterface {  
+  		public String clientMessageHandler(int eventID, Object data, String agentName, String functionName, String argument) ;
+  }
   
   public int RegisterForSystemEvent(smlSystemEventId id, SystemEventInterface handlerObject, Object callbackData)
   { return smlJNI.Kernel_RegisterForSystemEvent(swigCPtr, id.swigValue(), this, handlerObject, callbackData) ;}
@@ -219,6 +226,12 @@
 
   public boolean RemoveRhsFunction(int callbackReturnValue)
   { return smlJNI.Kernel_RemoveRhsFunction(swigCPtr, callbackReturnValue) ;}
+
+  public int RegisterForClientMessageEvent(String functionName, ClientMessageInterface handlerObject, Object callbackData)
+  { return smlJNI.Kernel_RegisterForClientMessageEvent(swigCPtr, functionName, this, handlerObject, callbackData) ; }
+
+  public boolean UnregisterForClientMessageEvent(int callbackReturnValue)
+  { return smlJNI.Kernel_UnregisterForClientMessageEvent(swigCPtr, callbackReturnValue) ;}
 
 %}
 

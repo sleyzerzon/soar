@@ -43,6 +43,7 @@
 %ignore sml::Kernel::RegisterForUpdateEvent(smlUpdateEventId, UpdateEventHandler, void*, bool addToBack = true);
 %ignore sml::Kernel::RegisterForUntypedEvent(smlUntypedEventId, UpdateEventHandler, void*, bool addToBack = true);
 %ignore sml::Kernel::AddRhsFunction(char const*, RhsEventHandler, void*, bool addToBack = true);
+%ignore sml::Kernel::RegisterForClientMessageEvent(char const*, RhsEventHandler, void*, bool addToBack = true);
 
 %{
 #include "sml_Names.h"

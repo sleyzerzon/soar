@@ -1033,6 +1033,68 @@ static std::string RhsEventHandler(sml::smlRhsEventId id, void* pUserData, sml::
 	return resultStr ;
 }
 
+// This is the C++ handler which will be called by clientSML when the event fires.
+// Then from here we need to call back to Java to pass back the message.
+static std::string ClientMessageHandler(sml::smlRhsEventId id, void* pUserData, sml::Agent* pAgent,
+							char const* pFunctionName, char const* pArgument)
+{
+	// The user data is the class we declared above, where we store the Java data to use in the callback.
+	JavaCallbackData* pJavaData = (JavaCallbackData*)pUserData ;
+
+	// Now try to call back to Java
+	JNIEnv *jenv = pJavaData->GetEnv() ;
+
+	// We start from the Java object whose method we wish to call.
+	jobject jobj = pJavaData->m_HandlerObject ;
+	jclass cls = jenv->GetObjectClass(jobj) ;
+
+	if (cls == 0)
+	{
+		printf("Failed to get Java class\n") ;
+		return "Error -- failed to get Java class" ;
+	}
+
+	// Look up the Java method we want to call.
+	// The method name is passed in by the user (and needs to match exactly, including case).
+	// The method should be owned by the m_HandlerObject that the user also passed in.
+	// Any slip here and you get a NoSuchMethod exception and my Java VM shuts down.
+	// Method sig here is:
+	// Int eventID, Object userData, String agentName, String functionName, String argument returning a String.
+	jmethodID mid = jenv->GetMethodID(cls, pJavaData->m_HandlerMethod.c_str(), "(ILjava/lang/Object;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;") ;
+
+	if (mid == 0)
+	{
+		printf("Failed to get Java method\n") ;
+		return "Error -- failed to get Java method" ;
+	}
+
+	// Convert our C++ strings to Java strings
+	jstring agentName = pAgent != NULL ? jenv->NewStringUTF(pAgent->GetAgentName()) : 0 ;
+	jstring functionName = pFunctionName != NULL ? jenv->NewStringUTF(pFunctionName) : 0 ;
+	jstring argument = pArgument != NULL ? jenv->NewStringUTF(pArgument) : 0 ;
+
+	// Make the method call.
+	jstring result = (jstring)jenv->CallObjectMethod(jobj, mid, (int)id, pJavaData->m_CallbackData, agentName, functionName, argument) ;
+
+	// Get the returned string
+	std::string resultStr = "" ;
+
+	if (result != 0)
+	{
+		// Get the C string
+		char const* pResult = jenv->GetStringUTFChars(result, 0);
+
+		// Copy it into our std::string
+		resultStr = pResult ;
+
+		// Release the Java string
+		jenv->ReleaseStringUTFChars(result, pResult);
+	}
+
+	// Return the result
+	return resultStr ;
+}
+
 // This is a bit ugly.  We compile this header with extern "C" around it so that the public methods can be
 // exposed in a DLL with C naming (not C++ mangled names).  However, RhsEventHandler (above) returns a std::string
 // which won't compile under "C"...even though it's a static function and hence won't appear in the DLL anyway.
@@ -1074,6 +1136,46 @@ JNIEXPORT bool JNICALL Java_sml_smlJNI_Kernel_1RemoveRhsFunction(JNIEnv *jenv, j
 
 	// Unregister our handler.
 	bool result = arg1->RemoveRhsFunction(pJavaData->m_CallbackID) ;
+
+	// Release the callback data
+	delete pJavaData ;
+
+	return result ;
+}
+
+// This is the hand-written JNI method for registering a callback.
+// I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
+JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForClientMessageEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
+{
+    // jarg1 is the C++ Kernel object
+	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
+
+	// Get the function name from the Java string (jarg2 is the RHS function we're registering)
+	const char *pFunctionName = jenv->GetStringUTFChars(jarg2, 0);
+
+	// Create the information we'll need to make a Java call back later
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, 0, jarg3, jarg4, "clientMessageHandler", jarg6) ;
+	
+	// Register our handler.  When this is called we'll call back to the Java method.
+	pJavaData->m_CallbackID = arg1->RegisterForClientMessageEvent(pFunctionName, &ClientMessageHandler, pJavaData) ;
+
+	// Release the string we got from Java
+	jenv->ReleaseStringUTFChars(jarg2, pFunctionName);
+
+	// Pass the callback info back to the Java client.  We need to do this so we can delete this later when the method is unregistered
+	return (jint)pJavaData ;
+}
+
+JNIEXPORT bool JNICALL Java_sml_smlJNI_Kernel_1UnregisterForClientMessageEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2)
+{
+    // jarg1 is the C++ Agent object
+	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
+
+	// jarg2 is the callback data from the registration call
+	JavaCallbackData* pJavaData = (JavaCallbackData*)jarg2 ;
+
+	// Unregister our handler.
+	bool result = arg1->UnregisterForClientMessageEvent(pJavaData->m_CallbackID) ;
 
 	// Release the callback data
 	delete pJavaData ;
