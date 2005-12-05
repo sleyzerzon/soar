@@ -1246,11 +1246,11 @@ void print_memory(agent *thisAgent, arraylist *epmem,
     int i;
     unsigned long hash_value;
     wmetree *child;
-    actwme *aw;
+    wmetree *tmp;
 
     if (epmem == NULL) return;
     if (node == NULL) return;
-    
+
     if (node->parent == NULL) // check for root
     {
         print(thisAgent, "\n\nROOT\n");
@@ -1262,8 +1262,8 @@ void print_memory(agent *thisAgent, arraylist *epmem,
         //Find out if this node is in the arraylist
         for(i = 0; i < epmem->size; i++)
         {
-            aw = (actwme *)get_arraylist_entry(thisAgent, epmem, i);
-            if (aw->node == node)
+            tmp = (wmetree *)get_arraylist_entry(thisAgent, epmem,i);
+            if (tmp == node)
             {
                 bFound = TRUE;
                 break;
@@ -1271,7 +1271,7 @@ void print_memory(agent *thisAgent, arraylist *epmem,
         }
         
         if (!bFound) return;
-
+        
         //Check to make sure I have an attr I'm allowed to print
         if ( (attrs != NULL) && (!strstr(attrs, node->attr)) ) return;
         
@@ -1294,9 +1294,6 @@ void print_memory(agent *thisAgent, arraylist *epmem,
             default:
                 break;
         }//switch
-
-        //print the activation level
-        print(thisAgent, "(%d)", aw->activation);
     }//else
     print(thisAgent, "\n");
 
