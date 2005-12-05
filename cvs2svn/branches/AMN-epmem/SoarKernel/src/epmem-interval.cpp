@@ -1230,18 +1230,27 @@ wmetree *epmem_find_wmetree_entry(agent *thisAgent, arraylist *epmem, wmetree *i
 /* ===================================================================
    print_memory
 
+   thisAgent - duh
+   epmem - an arraylist containing the epmem
+   node - the wmetree this memory is drawn from (probably &g_wmetree)
+   indent - number of space to indent
+   depth - how deep to traverse the tree
+   attrs - an optional string containing a list of attributes that
+           should be printed
    
    Created: 01 Mar 2004
    =================================================================== */
-void print_memory(agent *thisAgent, arraylist *epmem, wmetree *node, int indent, int depth)
+void print_memory(agent *thisAgent, arraylist *epmem,
+                  wmetree *node, int indent, int depth, char *attrs = NULL)
 {
     int i;
     unsigned long hash_value;
     wmetree *child;
+    actwme *aw;
 
     if (epmem == NULL) return;
     if (node == NULL) return;
-
+    
     if (node->parent == NULL) // check for root
     {
         print(thisAgent, "\n\nROOT\n");
@@ -1253,13 +1262,18 @@ void print_memory(agent *thisAgent, arraylist *epmem, wmetree *node, int indent,
         //Find out if this node is in the arraylist
         for(i = 0; i < epmem->size; i++)
         {
-            if ((wmetree *)get_arraylist_entry(thisAgent, epmem,i) == node)
+            aw = (actwme *)get_arraylist_entry(thisAgent, epmem, i);
+            if (aw->node == node)
             {
                 bFound = TRUE;
+                break;
             }
         }
         
         if (!bFound) return;
+
+        //Check to make sure I have an attr I'm allowed to print
+        if ( (attrs != NULL) && (!strstr(attrs, node->attr)) ) return;
         
         if (indent)
         {
@@ -1280,6 +1294,9 @@ void print_memory(agent *thisAgent, arraylist *epmem, wmetree *node, int indent,
             default:
                 break;
         }//switch
+
+        //print the activation level
+        print(thisAgent, "(%d)", aw->activation);
     }//else
     print(thisAgent, "\n");
 
@@ -1290,7 +1307,7 @@ void print_memory(agent *thisAgent, arraylist *epmem, wmetree *node, int indent,
             child = (wmetree *) (*(node->children->buckets + hash_value));
             for (; child != NIL; child = child->next)
             {
-                print_memory(thisAgent, epmem, child, indent + 3, depth - 1);
+                print_memory(thisAgent, epmem, child, indent + 3, depth - 1, attrs);
             }
         }
     }
