@@ -163,6 +163,27 @@
 		
 		return Tcl_GetString(res);
 	}
+
+	std::string TclClientMessageEventCallback(sml::smlRhsEventId, void* pUserData, sml::Agent* pAgent, char const* pClientName,
+	                    char const* pMessage)
+	{
+	    TclUserData* tud = static_cast<TclUserData*>(pUserData);
+	    // this beginning part of the script will never change, but the parts we add will, so we make a copy of the beginning part so we can reuse it next time
+	    Tcl_Obj* script = Tcl_DuplicateObj(tud->script);
+	    Tcl_AppendObjToObj(script, SWIG_Tcl_NewInstanceObj(tud->interp, (void *) pAgent, SWIGTYPE_p_sml__Agent,0));
+	    Tcl_AppendStringsToObj(script, " ", pClientName, " \"", pMessage, "\"", NULL);
+	    // since we're returning a value, we need to clear out any old values
+		Tcl_ResetResult(tud->interp);
+		// since this script will never be executed again, we use TCL_EVAL_DIRECT, which skips the compilation step
+	    Tcl_EvalObjEx(tud->interp, script, TCL_EVAL_DIRECT);
+
+		// Send the event to the given interpreter using the given thread
+//		tcl_thread_send(tud->interp, tud->threadId, script) ;
+
+		Tcl_Obj* res = Tcl_GetObjResult(tud->interp);
+		
+		return Tcl_GetString(res);
+	}
 	
 	void TclAgentEventCallback(sml::smlAgentEventId id, void* pUserData, sml::Agent* agent)
 	{
@@ -312,7 +333,7 @@
 //		tcl_thread_send(tud->interp, tud->threadId, script) ;
 	}
 	
-	void TclUntypedEventCallback(sml::smlUntypedEventId id, void* pUserData, sml::Kernel* kernel, void* pData)
+	void TclStringEventCallback(sml::smlStringEventId id, void* pUserData, sml::Kernel* kernel, char const* pData)
 	{
 		// we can ignore these parameters because they're already in the script (from when we registered it)
 		unused(kernel);
@@ -321,9 +342,7 @@
 		TclUserData* tud = static_cast<TclUserData*>(pUserData);
 		// this beginning part of the script will never change, but the parts we add will, so we make a copy of the beginning part so we can reuse it next time
 		Tcl_Obj* script = Tcl_DuplicateObj(tud->script);
-		Tcl_AppendStringsToObj(script, " ", NULL);
-		// FIXME: not sure how to handle void* pData; pointer won't be meaningful to Tcl
-		
+		Tcl_AppendStringsToObj(script, " \"", pData, "\"", NULL);
 		// since this script will never be executed again, we use TCL_EVAL_DIRECT, which skips the compilation step
 		Tcl_EvalObjEx(tud->interp, script, TCL_EVAL_DIRECT);
 		
@@ -438,9 +457,9 @@
 	    return self->RegisterForUpdateEvent(id, TclUpdateEventCallback, (void*)tud, addToBack);
     };
     
-    int RegisterForUntypedEvent(Tcl_Interp* interp, sml::smlUntypedEventId id, char* proc, char* userData, bool addToBack = true) {
+    int RegisterForStringEvent(Tcl_Interp* interp, sml::smlStringEventId id, char* proc, char* userData, bool addToBack = true) {
 	    TclUserData* tud = CreateTclSystemUserData(self, id, proc, userData, interp);
-	    return self->RegisterForUntypedEvent(id, TclUntypedEventCallback, (void*)tud, addToBack);
+	    return self->RegisterForStringEvent(id, TclStringEventCallback, (void*)tud, addToBack);
     };
     
     int RegisterForAgentEvent(Tcl_Interp* interp, sml::smlAgentEventId id, char* proc, char* userData, bool addToBack = true) {
@@ -455,6 +474,6 @@
     
     int RegisterForClientMessageEvent(Tcl_Interp* interp, char const* pMessageType, char const* pRhsFunctionName, char* userData, bool addToBack = true) {
 	    TclUserData* tud = CreateTclUserData(sml::smlEVENT_RHS_USER_FUNCTION, pMessageType, userData, interp);
-	    return self->RegisterForClientMessageEvent(pMessageType, TclRhsEventCallback, (void*)tud, addToBack);
+	    return self->RegisterForClientMessageEvent(pMessageType, TclClientMessageEventCallback, (void*)tud, addToBack);
     };
 }
