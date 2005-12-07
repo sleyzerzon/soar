@@ -392,9 +392,9 @@ void Kernel::ReceivedEvent(AnalyzeXML* pIncoming, ElementXML* pResponse)
 	} else if (IsUpdateEventID(id))
 	{
 		ReceivedUpdateEvent((smlUpdateEventId)id, pIncoming, pResponse) ;
-	} else if (IsUntypedEventID(id))
+	} else if (IsStringEventID(id))
 	{
-		ReceivedUntypedEvent((smlUntypedEventId)id, pIncoming, pResponse) ;
+		ReceivedStringEvent((smlStringEventId)id, pIncoming, pResponse) ;
 	}
 }
 
@@ -471,45 +471,29 @@ void Kernel::ReceivedUpdateEvent(smlUpdateEventId id, AnalyzeXML* pIncoming, Ele
 * @param pIncoming	The event command
 * @param pResponse	The reply (no real need to fill anything in here currently)
 *************************************************************/
-void Kernel::ReceivedUntypedEvent(smlUntypedEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse)
+void Kernel::ReceivedStringEvent(smlStringEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse)
 {
 	unused(pResponse) ;
 
-	// NOTE: If we have to allocate something we should delete it at the end of the callback.
-	// The client should copy it, not keep it.
-	void* pData = NULL ;
-
-	// Retrieve the event arguments
-	// For this Untyped event these parameters are event specific
-	switch (id)
-	{
-	case smlEVENT_EDIT_PRODUCTION:
-	{
-		char const* pProduction = pIncoming->GetArgString(sml_Names::kParamValue) ;
-		pData = (void*)pProduction ;
-		break ;
-	}
-	default:
-		break ;
-	}
+	char const* pValue = pIncoming->GetArgString(sml_Names::kParamValue) ;
 
 	// Look up the handler(s) from the map
-	UntypedEventMap::ValueList* pHandlers = m_UntypedEventMap.getList(id) ;
+	StringEventMap::ValueList* pHandlers = m_StringEventMap.getList(id) ;
 
 	if (!pHandlers)
 		return ;
 
 	// Go through the list of event handlers calling each in turn
-	for (UntypedEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
+	for (StringEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
 	{
-		UntypedEventHandlerPlusData handlerWithData = *iter ;
+		StringEventHandlerPlusData handlerWithData = *iter ;
 		iter++ ;
 
-		UntypedEventHandler handler = handlerWithData.m_Handler ;
+		StringEventHandler handler = handlerWithData.m_Handler ;
 		void* pUserData = handlerWithData.getUserData() ;
 
 		// Call the handler
-		handler(id, pUserData, this, pData) ;
+		handler(id, pUserData, this, pValue) ;
 	}
 }
 
@@ -1562,31 +1546,31 @@ public:
 	}
 } ;
 
-class Kernel::TestUntypedCallback : public UntypedEventMap::ValueTest
+class Kernel::TestStringCallback : public StringEventMap::ValueTest
 {
 private:
 	int m_ID ;
 public:
-	TestUntypedCallback(int id) { m_ID = id ; }
+	TestStringCallback(int id) { m_ID = id ; }
 
-	bool isEqual(UntypedEventHandlerPlusData handler)
+	bool isEqual(StringEventHandlerPlusData handler)
 	{
 		return handler.m_CallbackID == m_ID ;
 	}
 } ;
 
-class Kernel::TestUntypedCallbackFull : public UntypedEventMap::ValueTest
+class Kernel::TestStringCallbackFull : public StringEventMap::ValueTest
 {
 private:
 	int				m_EventID ;
-	UntypedEventHandler m_Handler ;
+	StringEventHandler m_Handler ;
 	void*			m_UserData ;
 
 public:
-	TestUntypedCallbackFull(int id, UntypedEventHandler handler, void* pUserData)
+	TestStringCallbackFull(int id, StringEventHandler handler, void* pUserData)
 	{ m_EventID = id ; m_Handler = handler ; m_UserData = pUserData ; }
 
-	bool isEqual(UntypedEventHandlerPlusData handlerPlus)
+	bool isEqual(StringEventHandlerPlusData handlerPlus)
 	{
 		return handlerPlus.m_EventID == m_EventID &&
 			   handlerPlus.m_Handler == m_Handler &&
@@ -1798,7 +1782,7 @@ int	Kernel::RegisterForUpdateEvent(smlUpdateEventId id, UpdateEventHandler handl
 }
 
 /*************************************************************
-* @brief Register for an "UntypedEvent".
+* @brief Register for an "StringEvent".
 *		 Multiple handlers can be registered for the same event.
 * @param smlEventId		The event we're interested in (see the list below for valid values)
 * @param handler		A function that will be called when the event happens
@@ -1810,21 +1794,21 @@ int	Kernel::RegisterForUpdateEvent(smlUpdateEventId id, UpdateEventHandler handl
 *
 * @returns A unique ID for this callback (used to unregister the callback later) 
 *************************************************************/
-int	Kernel::RegisterForUntypedEvent(smlUntypedEventId id, UntypedEventHandler handler, void* pUserData, bool addToBack)
+int	Kernel::RegisterForStringEvent(smlStringEventId id, StringEventHandler handler, void* pUserData, bool addToBack)
 {
 	// Start by checking if this id, handler, pUserData combination has already been registered
-	TestUntypedCallbackFull test(id, handler, pUserData) ;
+	TestStringCallbackFull test(id, handler, pUserData) ;
 
 	// See if this handler is already registered
-	UntypedEventHandlerPlusData plus(0,0,0,0) ;
-	bool found = m_UntypedEventMap.findFirstValueByTest(&test, &plus) ;
+	StringEventHandlerPlusData plus(0,0,0,0) ;
+	bool found = m_StringEventMap.findFirstValueByTest(&test, &plus) ;
 
 	if (found && plus.m_Handler != 0)
 		return plus.getCallbackID() ;
 
 	// If we have no handlers registered with the kernel, then we need
 	// to register for this event.  No need to do this multiple times.
-	if (m_UntypedEventMap.getListSize(id) == 0)
+	if (m_StringEventMap.getListSize(id) == 0)
 	{
 		RegisterForEventWithKernel(id, NULL) ;
 	}
@@ -1834,8 +1818,8 @@ int	Kernel::RegisterForUntypedEvent(smlUntypedEventId id, UntypedEventHandler ha
 	// everything as the objects are added and deleted.
 	m_CallbackIDCounter++ ;
 
-	UntypedEventHandlerPlusData handlerPlus(id, handler, pUserData, m_CallbackIDCounter) ;
-	m_UntypedEventMap.add(id, handlerPlus, addToBack) ;
+	StringEventHandlerPlusData handlerPlus(id, handler, pUserData, m_CallbackIDCounter) ;
+	m_StringEventMap.add(id, handlerPlus, addToBack) ;
 
 	// Return the ID.  We use this later to unregister the callback
 	return m_CallbackIDCounter ;
@@ -2010,18 +1994,20 @@ bool Kernel::RemoveRhsFunction(int callbackID)
 *		 and returns a string.  The incoming argument string can contain arguments that the client should parse
 *		 (e.g. passing a coordinate as "12 56").  The format of the string is up to the implementor of the specific RHS function.
 *
-* @param pMessageType		The message type.  It's role is up to the clients to decide on (e.g. all messages could be one type or there could be many different types) 
-* @param handler			A function that will be called when the event happens
+* @param pClientName		The name of the client that this message relates to (e.g. "TankSoar" for messages sent to/from tank soar).  The clients sending/receiving just need to agree on this string.
+*							Due to the way this is implemented, the type here must not be the same as the name of a RHS function registered with Soar.
 * @param pUserData			Arbitrary data that will be passed back to the handler function when the event happens.
 * @param addToBack			If true add this handler is called after existing handlers.  If false, called before existing handlers.
 *
 * @returns Unique ID for this callback.  Required when unregistering this callback.
 *************************************************************/
-int Kernel::RegisterForClientMessageEvent(char const* pMessageType, RhsEventHandler handler, void* pUserData, bool addToBack)
+int Kernel::RegisterForClientMessageEvent(char const* pClientName, ClientMessageHandler handler, void* pUserData, bool addToBack)
 {
 	smlRhsEventId id = smlEVENT_CLIENT_MESSAGE ;
 
-	return InternalAddRhsFunction(id, pMessageType, handler, pUserData, addToBack) ;
+	// We actually use the RHS function code internally to process this message (since it's almost exactly like calling a RHS function that's
+	// processed on a client).
+	return InternalAddRhsFunction(id, pClientName, (RhsEventHandler)handler, pUserData, addToBack) ;
 }
 
 /*************************************************************
@@ -2049,15 +2035,16 @@ bool Kernel::UnregisterForClientMessageEvent(int callbackID)
 *		 (This is not expected to be a common usage).
 *
 * @param pAgent				The originating agent (can be NULL), if this message is specific to an agent.
-* @param pMessageType		The message type.  The meaning of this is up to the clients to agree upon, but the receiver needs to register for this same value to receive the message.
+* @param pClientName		The name of the client that this message relates to (e.g. "TankSoar" for messages sent to/from tank soar).  The clients sending/receiving just need to agree on this string.
+*							Due to the way this is implemented, the type here must not be the same as the name of a RHS function registered with Soar.
 * @param pMessage			The message being sent.
 * @returns The response (if any) from the receiving client.  The string "**NONE**" is reserved to indicate nobody was registered for this event.
 *************************************************************/
-std::string Kernel::SendClientMessage(Agent* pAgent, char const* pMessageType, char const* pMessage)
+std::string Kernel::SendClientMessage(Agent* pAgent, char const* pClientName, char const* pMessage)
 {
 	AnalyzeXML response ;
 
-	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_SendClientMessage, pAgent ? pAgent->GetAgentName() : NULL, sml_Names::kParamName, pMessageType, sml_Names::kParamMessage, pMessage) ;
+	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_SendClientMessage, pAgent ? pAgent->GetAgentName() : NULL, sml_Names::kParamName, pClientName, sml_Names::kParamMessage, pMessage) ;
 
 	if (ok)
 	{
@@ -2097,22 +2084,22 @@ bool Kernel::UnregisterForSystemEvent(int callbackID)
 * @brief Unregister for a particular event
 * @returns True if succeeds
 *************************************************************/
-bool Kernel::UnregisterForUntypedEvent(int callbackID)
+bool Kernel::UnregisterForStringEvent(int callbackID)
 {
 	// Build a test object for the callbackID we're interested in
-	TestUntypedCallback test(callbackID) ;
+	TestStringCallback test(callbackID) ;
 
 	// Find the event ID for this callbackID
-	smlUntypedEventId id = m_UntypedEventMap.findFirstKeyByTest(&test, (smlUntypedEventId)-1) ;
+	smlStringEventId id = m_StringEventMap.findFirstKeyByTest(&test, (smlStringEventId)-1) ;
 
 	if (id == -1)
 		return false ;
 
 	// Remove the handler from our map
-	m_UntypedEventMap.removeAllByTest(&test) ;
+	m_StringEventMap.removeAllByTest(&test) ;
 
 	// If we just removed the last handler, then unregister from the kernel for this event
-	if (m_UntypedEventMap.getListSize(id) == 0)
+	if (m_StringEventMap.getListSize(id) == 0)
 	{
 		UnregisterForEventWithKernel(id, NULL) ;
 	}

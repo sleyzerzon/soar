@@ -119,7 +119,7 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	m_RhsListener.Init(this);
 	m_SystemListener.Init(this);
 	m_UpdateListener.Init(this) ;
-	m_UntypedListener.Init(this) ;
+	m_StringListener.Init(this) ;
 
 	// We'll use this to make sure only one connection is executing commands
 	// in the kernel at a time.
@@ -183,7 +183,7 @@ KernelSML::~KernelSML()
 	m_AgentListener.Clear();
 	m_RhsListener.Clear();
 	m_UpdateListener.Clear() ;
-	m_UntypedListener.Clear() ;
+	m_StringListener.Clear() ;
 
 	if (m_pKernelFactory && m_pIKernel)
 		m_pKernelFactory->DestroyKernel(m_pIKernel);
@@ -219,7 +219,8 @@ std::string KernelSML::SendClientMessage(gSKI::IAgent* pAgent, char const* pMess
 	bool ok = m_RhsListener.HandleEvent(gSKIEVENT_CLIENT_MESSAGE, pAgent, false, pMessageType, pMessage, sizeof(response), response) ;
 	if (!ok)
 	{
-		strcpy(response, "**NONE**") ;
+		// There was listening to this message
+		strcpy(response, "**NOBODY RESPONDED**") ;
 	}
 
 	return response ;
@@ -359,7 +360,7 @@ void KernelSML::RemoveAllListeners(Connection* pConnection)
 	m_RhsListener.RemoveAllListeners(pConnection);
 	m_SystemListener.RemoveAllListeners(pConnection);
 	m_UpdateListener.RemoveAllListeners(pConnection) ;
-	m_UntypedListener.RemoveAllListeners(pConnection) ;
+	m_StringListener.RemoveAllListeners(pConnection) ;
 }
 
 /*************************************************************

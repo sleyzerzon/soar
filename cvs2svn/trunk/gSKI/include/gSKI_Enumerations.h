@@ -223,13 +223,12 @@
 		return (id >= gSKIEVENT_AFTER_ALL_OUTPUT_PHASES && id <= gSKIEVENT_LAST_UPDATE_EVENT) ;
 	}
 
-	// This is an experiment -- events that are not type safe (so you have to know how to cast the data you are passed)
-	// May reduce the effort for kernel developers substantially.
+	// Events that pass a string as parameter
 	typedef enum {
 		gSKIEVENT_EDIT_PRODUCTION = gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT + 1,	// Arg is "char const*".
-	} egSKIUntypedEventId ;
+	} egSKIStringEventId ;
 
-	static inline bool IsUntypedEventID(int id)
+	static inline bool IsStringEventID(int id)
 	{
 		return (id >= gSKIEVENT_EDIT_PRODUCTION && id <= gSKIEVENT_EDIT_PRODUCTION) ;
 	}

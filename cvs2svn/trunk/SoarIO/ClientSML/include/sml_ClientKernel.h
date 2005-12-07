@@ -61,12 +61,12 @@ public:
 	}
 } ;
 
-class UntypedEventHandlerPlusData : public EventHandlerPlusData
+class StringEventHandlerPlusData : public EventHandlerPlusData
 {
 public:
-	UntypedEventHandler  m_Handler ;
+	StringEventHandler  m_Handler ;
 
-	UntypedEventHandlerPlusData(int eventID, UntypedEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
+	StringEventHandlerPlusData(int eventID, StringEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
 		m_Handler = handler ;
 	}
@@ -147,7 +147,7 @@ protected:
 	typedef sml::ListMap<smlAgentEventId, AgentEventHandlerPlusData>			AgentEventMap ;
 	typedef sml::ListMap<std::string, RhsEventHandlerPlusData>					RhsEventMap ;
 	typedef sml::ListMap<smlUpdateEventId, UpdateEventHandlerPlusData>			UpdateEventMap ;
-	typedef sml::ListMap<smlUntypedEventId, UntypedEventHandlerPlusData>		UntypedEventMap ;
+	typedef sml::ListMap<smlStringEventId, StringEventHandlerPlusData>			StringEventMap ;
 
 	Connection*			m_Connection ;
 	ObjectMap<Agent*>	m_AgentMap ;
@@ -165,7 +165,7 @@ protected:
 	AgentEventMap		m_AgentEventMap ;
 	RhsEventMap			m_RhsEventMap ;
 	UpdateEventMap		m_UpdateEventMap ;
-	UntypedEventMap		m_UntypedEventMap ;
+	StringEventMap		m_StringEventMap ;
 
 	// Class used to map events ids to and from strings
 	Events*				m_pEventMap ;
@@ -179,8 +179,8 @@ protected:
 	class TestRhsCallback ;
 	class TestUpdateCallbackFull ;
 	class TestUpdateCallback ;
-	class TestUntypedCallbackFull ;
-	class TestUntypedCallback ;
+	class TestStringCallbackFull ;
+	class TestStringCallback ;
 
 	// Keep a local copy of this flag so we can report
 	// information directly about what the client is sending/receiving
@@ -250,7 +250,7 @@ protected:
 	void ReceivedAgentEvent(smlAgentEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	void ReceivedRhsEvent(smlRhsEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	void ReceivedUpdateEvent(smlUpdateEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedUntypedEvent(smlUntypedEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	void ReceivedStringEvent(smlStringEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 
 	/*************************************************************
 	* @brief If this message is an XML trace message returns
@@ -715,7 +715,7 @@ public:
 	*		 and returns a string.  The incoming argument string can contain arguments that the client should parse
 	*		 (e.g. passing a coordinate as "12 56").  The format of the string is up to the implementor of the specific RHS function.
 	*
-	* @param pMessageType		The message type.  It's role is up to the clients to decide on (e.g. all messages could be one type or there could be many different types) 
+	* @param pClientName		The name of the client that this message relates to (e.g. "TankSoar" for messages sent to/from tank soar).  The clients sending/receiving just need to agree on this string.
 	*							Due to the way this is implemented, the type here must not be the same as the name of a RHS function registered with Soar.
 	* @param handler			A function that will be called when the event happens
 	* @param pUserData			Arbitrary data that will be passed back to the handler function when the event happens.
@@ -723,7 +723,7 @@ public:
 	*
 	* @returns Unique ID for this callback.  Required when unregistering this callback.
 	*************************************************************/
-	int RegisterForClientMessageEvent(char const* pMessageType, RhsEventHandler handler, void* pUserData, bool addToBack = true) ;
+	int RegisterForClientMessageEvent(char const* pClientName, ClientMessageHandler handler, void* pUserData, bool addToBack = true) ;
 
 	/*************************************************************
 	* @brief Unregister for a particular client message
@@ -745,12 +745,12 @@ public:
 	*		 (This is not expected to be a common usage).
 	*
 	* @param pAgent				The originating agent (can be NULL), if this message is specific to an agent.
-	* @param pMessageType		The message type.  The meaning of this is up to the clients to agree upon, but the receiver needs to register for this same value to receive the message.
+	* @param pClientName		The name of the client that this message relates to (e.g. "TankSoar" for messages sent to/from tank soar).  The clients sending/receiving just need to agree on this string.
 	*							Due to the way this is implemented, the type here must not be the same as the name of a RHS function registered with Soar.
 	* @param pMessage			The message being sent.
 	* @returns The response (if any) from the receiving client.  The string "**NONE**" is reserved to indicate nobody was registered for this event.
 	*************************************************************/
-	std::string SendClientMessage(Agent* pAgent, char const* pMessageType, char const* pMessage) ;
+	std::string SendClientMessage(Agent* pAgent, char const* pClientName, char const* pMessage) ;
 
 	/*************************************************************
 	* @brief Register for an "AgentEvent".
@@ -802,7 +802,7 @@ public:
 	bool	UnregisterForUpdateEvent(int callbackID) ;
 
 	/*************************************************************
-	* @brief Register for an "UntypedEvent".
+	* @brief Register for a string event.
 	*		 Multiple handlers can be registered for the same event.
 	* @param smlEventId		The event we're interested in (see the list below for valid values)
 	* @param handler		A function that will be called when the event happens
@@ -814,13 +814,13 @@ public:
 	*
 	* @returns A unique ID for this callback (used to unregister the callback later) 
 	*************************************************************/
-	int	RegisterForUntypedEvent(smlUntypedEventId id, UntypedEventHandler handler, void* pUserData, bool addToBack = true) ;
+	int	RegisterForStringEvent(smlStringEventId id, StringEventHandler handler, void* pUserData, bool addToBack = true) ;
 
 	/*************************************************************
 	* @brief Unregister for a particular event
 	* @returns True if succeeds
 	*************************************************************/
-	bool	UnregisterForUntypedEvent(int callbackID) ;
+	bool	UnregisterForStringEvent(int callbackID) ;
 
 	/*************************************************************
 	* @brief Get the current value of the "set-library-location" path variable.

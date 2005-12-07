@@ -94,7 +94,7 @@ NamedEventDataList* CreateAgentEventData();
 NamedEventDataList* CreatePrintEventData();
 NamedEventDataList* CreateXMLEventData();
 NamedEventDataList* CreateUpdateEventData();
-NamedEventDataList* CreateUntypedEventData();
+NamedEventDataList* CreateStringEventData();
 
 void RegisterForEvents(Kernel* k, Agent* a, DataList* dataList);
 void PrintEventData(DataList* dataList, string type="");
@@ -172,7 +172,7 @@ void MyUpdateEventHandler(smlUpdateEventId id, void* pUserData, Kernel* pKernel,
 	}*/
 }
 
-void MyUntypedEventHandler(smlUntypedEventId id, void* pUserData, Kernel* pKernel, void* pData) {
+void MyStringEventHandler(smlStringEventId id, void* pUserData, Kernel* pKernel, char const* pData) {
 	EventData* eventData = static_cast<EventData*>(pUserData);
 	eventData->count++;
 
@@ -274,7 +274,7 @@ DataList* CreateEventTestData() {
 	NamedEventDataList* printEventData = CreatePrintEventData();
 	NamedEventDataList* xmlEventData = CreateXMLEventData();
 	NamedEventDataList* updateEventData = CreateUpdateEventData();
-	NamedEventDataList* untypedEventData = CreateUntypedEventData();
+	NamedEventDataList* stringEventData = CreateStringEventData();
 
 	dataList->push_back(systemEventData);
 	dataList->push_back(runEventData);
@@ -283,7 +283,7 @@ DataList* CreateEventTestData() {
 	dataList->push_back(printEventData);
 	dataList->push_back(xmlEventData);
 	dataList->push_back(updateEventData);
-	dataList->push_back(untypedEventData);
+	dataList->push_back(stringEventData);
 
 	return dataList;
 }
@@ -405,9 +405,9 @@ NamedEventDataList* CreateUpdateEventData() {
 	return namedEventData;
 }
 
-NamedEventDataList* CreateUntypedEventData() {
+NamedEventDataList* CreateStringEventData() {
 	NamedEventDataList* namedEventData = new NamedEventDataList();
-	namedEventData->name = "untyped";
+	namedEventData->name = "string";
 	
 	namedEventData->eventData.push_back(new EventData(smlEVENT_EDIT_PRODUCTION, "smlEVENT_EDIT_PRODUCTION"));
 
@@ -431,8 +431,8 @@ void RegisterForEvents(Kernel* k, Agent* a, DataList* dataList) {
 				a->RegisterForXMLEvent(static_cast<smlXMLEventId>((*j)->eventId), MyXMLEventHandler, (*j));
 			} else if(IsUpdateEventID((*j)->eventId)) {
 				k->RegisterForUpdateEvent(static_cast<smlUpdateEventId>((*j)->eventId), MyUpdateEventHandler, (*j));
-			} else if(IsUntypedEventID((*j)->eventId)) {
-				k->RegisterForUntypedEvent(static_cast<smlUntypedEventId>((*j)->eventId), MyUntypedEventHandler, (*j));
+			} else if(IsStringEventID((*j)->eventId)) {
+				k->RegisterForStringEvent(static_cast<smlStringEventId>((*j)->eventId), MyStringEventHandler, (*j));
 			} else { cout << "TestSMLEvents error: Unrecognized event id: " << (*j)->eventId << endl; }
 		}
 	}

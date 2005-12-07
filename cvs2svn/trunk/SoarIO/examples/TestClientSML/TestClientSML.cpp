@@ -300,14 +300,13 @@ void MyOutputEventHandler(void* pUserData, Agent* pAgent, char const* pAttribute
 	cout << "Received wme " << pWme->GetValueAsString() << endl ;
 }
 
-void MyUntypedEventHandler(smlUntypedEventId id, void* pUserData, Kernel* pKernel, void* pData)
+void MyStringEventHandler(smlStringEventId id, void* pUserData, Kernel* pKernel, char const* pData)
 {
 	switch (id)
 	{
 	case smlEVENT_EDIT_PRODUCTION:
 		{
-			char const* pName = (char const*)pData ;
-			cout << "Edit production " << pName << endl ;
+			cout << "Edit production " << pData << endl ;
 			break ;
 		}
 	default:
@@ -626,10 +625,10 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	// This callback unregisters itself in the callback -- as a test to see if we can do that safely.
 	global_callback = pAgent->RegisterForRunEvent(smlEVENT_AFTER_DECISION_CYCLE, MyRunSelfRemovingHandler, NULL) ;
 
-	// Register for an untyped event
-	int untypedCall = pKernel->RegisterForUntypedEvent(smlEVENT_EDIT_PRODUCTION, MyUntypedEventHandler, NULL) ;
+	// Register for an String event
+	int stringCall = pKernel->RegisterForStringEvent(smlEVENT_EDIT_PRODUCTION, MyStringEventHandler, NULL) ;
 	pKernel->ExecuteCommandLine("edit-production my*production", NULL) ;
-	pKernel->UnregisterForUntypedEvent(untypedCall) ;
+	pKernel->UnregisterForStringEvent(stringCall) ;
 
 	// Register another handler for the same event, to make sure we can do that.
 	// Register this one ahead of the previous handler (so it will fire before MyRunEventHandler)

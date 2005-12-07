@@ -3,7 +3,7 @@
 #endif // HAVE_CONFIG_H
 
 /////////////////////////////////////////////////////////////////
-// UntypedListener class file.
+// StringListener class file.
 //
 // Author: Douglas Pearson, www.threepenny.net
 // Date  : June 2005
@@ -27,7 +27,7 @@
 using namespace sml ;
 
 // Returns true if this is the first connection listening for this event
-bool UntypedListener::AddListener(egSKIUntypedEventId eventID, Connection* pConnection)
+bool StringListener::AddListener(egSKIStringEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
@@ -35,7 +35,7 @@ bool UntypedListener::AddListener(egSKIUntypedEventId eventID, Connection* pConn
 }
 
 // Returns true if at least one connection remains listening for this event
-bool UntypedListener::RemoveListener(egSKIUntypedEventId eventID, Connection* pConnection)
+bool StringListener::RemoveListener(egSKIStringEventId eventID, Connection* pConnection)
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
@@ -43,7 +43,7 @@ bool UntypedListener::RemoveListener(egSKIUntypedEventId eventID, Connection* pC
 }
 
 // Called when a event occurs in the kernel
-void UntypedListener::HandleEvent(egSKIUntypedEventId eventID, void* data)
+void StringListener::HandleEvent(egSKIStringEventId eventID, char const* pData)
 {
 	ConnectionListIter connectionIter = GetBegin(eventID) ;
 
@@ -62,19 +62,8 @@ void UntypedListener::HandleEvent(egSKIUntypedEventId eventID, void* data)
 	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 
-	// How the data is sent is event specific (for this untyped event)
-	switch (eventID)
-	{
-	case gSKIEVENT_EDIT_PRODUCTION:
-	{
-		char const* pProduction = (char const*)data ;
-		if (pProduction)
-			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, pProduction) ;
-		break ;
-	}
-	default:
-		break ;
-	}
+	if (pData)
+		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, pData) ;
 
 	// Send the message out
 	AnalyzeXML response ;

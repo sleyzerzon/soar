@@ -136,7 +136,7 @@ protected:
 	RhsListener		m_RhsListener;
 	AgentListener	m_AgentListener;
 	UpdateListener	m_UpdateListener ;
-	UntypedListener	m_UntypedListener ;
+	StringListener	m_StringListener ;
 
 	// We can suppress system start and system stop events
 	// (allowing us to Run Soar without running a connected simulation).
@@ -233,11 +233,11 @@ public:
 	void AddSystemListener(egSKISystemEventId eventID, Connection* pConnection)	 { m_SystemListener.AddListener(eventID, pConnection) ; }
 	void AddAgentListener(egSKIAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
 	void AddUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection)	 { m_UpdateListener.AddListener(eventID, pConnection) ; }
-	void AddUntypedListener(egSKIUntypedEventId eventID, Connection* pConnection)  { m_UntypedListener.AddListener(eventID, pConnection) ; }
+	void AddStringListener(egSKIStringEventId eventID, Connection* pConnection)  { m_StringListener.AddListener(eventID, pConnection) ; }
 	void RemoveSystemListener(egSKISystemEventId eventID, Connection* pConnection) { m_SystemListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveAgentListener(egSKIAgentEventId eventID, Connection* pConnection)   { m_AgentListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection) { m_UpdateListener.RemoveListener(eventID, pConnection) ; }
-	void RemoveUntypedListener(egSKIUntypedEventId eventID, Connection* pConnection) { m_UntypedListener.RemoveListener(eventID, pConnection) ; }
+	void RemoveStringListener(egSKIStringEventId eventID, Connection* pConnection) { m_StringListener.RemoveListener(eventID, pConnection) ; }
 
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
@@ -252,7 +252,7 @@ public:
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
 	*************************************************************/
-	void FireEditProductionEvent(char const* pProduction) { m_UntypedListener.HandleEvent(gSKIEVENT_EDIT_PRODUCTION, (void*)pProduction) ; }
+	void FireEditProductionEvent(char const* pProduction) { m_StringListener.HandleEvent(gSKIEVENT_EDIT_PRODUCTION, pProduction) ; }
 
 	/*************************************************************
 	* @brief	Add or remove a connection from the list implementing

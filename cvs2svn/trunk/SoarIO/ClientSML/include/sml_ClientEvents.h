@@ -169,12 +169,11 @@ typedef enum {
 	smlEVENT_LAST_UPDATE_EVENT = smlEVENT_AFTER_ALL_GENERATED_OUTPUT
 } smlUpdateEventId ;
 
-// This is an experiment -- events that are not type safe (so you have to know how to cast the data you are passed)
-// May reduce the effort for kernel developers substantially.
+// Events that pass a string as an argument
 typedef enum {
 	smlEVENT_EDIT_PRODUCTION = smlEVENT_AFTER_ALL_GENERATED_OUTPUT + 1,	// Arg is "char const*" -- the name of the production to edit
-	smlEVENT_LAST_UNTYPED_EVENT = smlEVENT_EDIT_PRODUCTION
-} smlUntypedEventId ;
+	smlEVENT_LAST_STRING_EVENT = smlEVENT_EDIT_PRODUCTION
+} smlStringEventId ;
 
 typedef enum {
     // Used to indicate an error in some cases
@@ -182,12 +181,12 @@ typedef enum {
 
 	// Marker for end of sml event list
 	// Must always be at the end of the enum
-	smlEVENT_LAST = smlEVENT_LAST_UNTYPED_EVENT + 1
+	smlEVENT_LAST = smlEVENT_LAST_STRING_EVENT + 1
 } smlGenericEventId ;
 
-static inline bool IsUntypedEventID(int id)
+static inline bool IsStringEventID(int id)
 {
-	return (id >= smlEVENT_EDIT_PRODUCTION && id <= smlEVENT_LAST_UNTYPED_EVENT) ;
+	return (id >= smlEVENT_EDIT_PRODUCTION && id <= smlEVENT_LAST_STRING_EVENT) ;
 }
 
 static inline bool IsSystemEventID(int id)
@@ -306,9 +305,8 @@ typedef void (*OutputNotificationHandler)(void* pUserData, Agent* pAgent) ;
 // Handler for Update events.
 typedef void (*UpdateEventHandler)(smlUpdateEventId id, void* pUserData, Kernel* pKernel, smlRunFlags runFlags) ;
 
-// Handler for Untyped events.  This is an experiment.  You need to know the type of the void* pData passed back.
-// smlEVENT_EDIT_PRODUCTION: pData is a "const char*" -- the production name.
-typedef void (*UntypedEventHandler)(smlUntypedEventId id, void* pUserData, Kernel* pKernel, void* pData) ;
+// Handler for string based events.
+typedef void (*StringEventHandler)(smlStringEventId id, void* pUserData, Kernel* pKernel, char const* pData) ;
 
 // Handler for XML events.  The data for the event is passed back in pXML.
 // NOTE: To keep a copy of the ClientXML* you are passed use ClientXML* pMyXML = new ClientXML(pXML) to create
@@ -324,6 +322,12 @@ typedef void (*XMLEventHandler)(smlXMLEventId id, void* pUserData, Agent* pAgent
 // so this is an easy transition.
 typedef std::string (*RhsEventHandler)(smlRhsEventId id, void* pUserData, Agent* pAgent,
 								char const* pFunctionName, char const* pArgument) ;
+
+// Handler for a generic "client message".  The content is determined by the client sending this data.
+// The message is sent as a simple string and the response is also a string.  The string can contain data that is intended to be parsed,
+// such as a simple series of integers up to a complete XML message.
+typedef std::string (*ClientMessageHandler)(smlRhsEventId id, void* pUserData, Agent* pAgent,
+								char const* pClientName, char const* pMessage) ;
 
 // We'll store a handler function together with a generic pointer to data of the user's choosing
 // (which is then passed back into the handler when the event occurs).

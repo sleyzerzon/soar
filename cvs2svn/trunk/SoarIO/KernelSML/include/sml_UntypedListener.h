@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////
-// UntypedListener class file.
+// StringListener class file.
 //
 // Author: Douglas Pearson, www.threepenny.net
 // Date  : June 2005
@@ -9,8 +9,8 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifndef UNTYPED_LISTENER_H
-#define UNTYPED_LISTENER_H
+#ifndef STRING_LISTENER_H
+#define STRING_LISTENER_H
 
 #include "gSKI_Events.h"
 #include "gSKI_Enumerations.h"
@@ -26,18 +26,18 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 
-class UntypedListener : public EventManager<egSKIUntypedEventId>
+class StringListener : public EventManager<egSKIStringEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
 
 public:
-	UntypedListener()
+	StringListener()
 	{
 		m_pKernelSML = NULL ;
 	}
 
-	virtual ~UntypedListener()
+	virtual ~StringListener()
 	{
 		Clear() ;
 	}
@@ -46,13 +46,13 @@ public:
 	void Init(KernelSML* pKernelSML) { m_pKernelSML = pKernelSML ; }
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKIUntypedEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(egSKIStringEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKIUntypedEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(egSKIStringEventId eventID, Connection* pConnection) ;
 
-	// Called when an "UntypedEvent" occurs in the kernel
-	virtual void HandleEvent(egSKIUntypedEventId eventId, void* data) ;
+	// Called when an "StringEvent" occurs in the kernel
+	virtual void HandleEvent(egSKIStringEventId eventId, char const* data) ;
 } ;
 
 }

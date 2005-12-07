@@ -882,7 +882,7 @@ JNIEXPORT bool JNICALL Java_sml_smlJNI_Kernel_1UnregisterForUpdateEvent(JNIEnv *
 
 // This is the C++ handler which will be called by clientSML when the event fires.
 // Then from here we need to call back to Java to pass back the message.
-static void UntypedEventHandler(sml::smlUntypedEventId id, void* pUserData, sml::Kernel* pKernel, void* pData)
+static void StringEventHandler(sml::smlStringEventId id, void* pUserData, sml::Kernel* pKernel, char const* pData)
 {
 	// The user data is the class we declared above, where we store the Java data to use in the callback.
 	JavaCallbackData* pJavaData = (JavaCallbackData*)pUserData ;
@@ -904,7 +904,7 @@ static void UntypedEventHandler(sml::smlUntypedEventId id, void* pUserData, sml:
 	// The method name is passed in by the user (and needs to match exactly, including case).
 	// The method should be owned by the m_HandlerObject that the user also passed in.
 	// Any slip here and you get a NoSuchMethod exception and my Java VM shuts down.
-	jmethodID mid = jenv->GetMethodID(cls, pJavaData->m_HandlerMethod.c_str(), "(ILjava/lang/Object;Lsml/Kernel;Ljava/lang/Object;)V") ;
+	jmethodID mid = jenv->GetMethodID(cls, pJavaData->m_HandlerMethod.c_str(), "(ILjava/lang/Object;Lsml/Kernel;Ljava/lang/String;)V") ;
 
 	if (mid == 0)
 	{
@@ -912,15 +912,8 @@ static void UntypedEventHandler(sml::smlUntypedEventId id, void* pUserData, sml:
 		return ;
 	}
 
-	// The type of data we pass back for this untyped handler is dependent on the event.
-	// It will always be an Object but the caller is required to know the type.
-	// This is an experiment to see if it reduces the kernel developer workload for adding new events.
-	jobject data = 0 ;
-	if (id == sml::smlEVENT_EDIT_PRODUCTION)
-	{
-		jstring prod = pData != NULL ? jenv->NewStringUTF((char const*)pData) : 0 ;
-		data = prod ;
-	}
+	// Create the string to return to the caller
+	jstring data = pData != NULL ? jenv->NewStringUTF(pData) : 0 ;
 
 	// Make the method call.
 	jenv->CallVoidMethod(jobj, mid, (int)id, pJavaData->m_CallbackData, pJavaData->m_KernelObject, data);
@@ -928,25 +921,25 @@ static void UntypedEventHandler(sml::smlUntypedEventId id, void* pUserData, sml:
 
 // This is the hand-written JNI method for registering a callback.
 // I'm going to model it after the existing SWIG JNI methods so hopefully it'll be easier to patch this into SWIG eventually.
-JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForUntypedEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
+JNIEXPORT int JNICALL Java_sml_smlJNI_Kernel_1RegisterForStringEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jobject jarg3, jobject jarg4, jobject jarg6)
 {
     // jarg1 is the C++ Kernel object
 	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
 
 	// jarg2 is the event ID we're registering for
-	sml::smlUntypedEventId arg2 = (sml::smlUntypedEventId)jarg2;
+	sml::smlStringEventId arg2 = (sml::smlStringEventId)jarg2;
 
 	// Create the information we'll need to make a Java call back later
-	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "untypedEventHandler", jarg6) ;
+	JavaCallbackData* pJavaData = CreateJavaCallbackData(false, jenv, jcls, jarg1, jarg2, jarg3, jarg4, "stringEventHandler", jarg6) ;
 	
 	// Register our handler.  When this is called we'll call back to the Java method.
-	pJavaData->m_CallbackID = arg1->RegisterForUntypedEvent(arg2, &UntypedEventHandler, pJavaData) ;
+	pJavaData->m_CallbackID = arg1->RegisterForStringEvent(arg2, &StringEventHandler, pJavaData) ;
 
 	// Pass the callback info back to the Java client.  We need to do this so we can delete this later when the method is unregistered
 	return (jint)pJavaData ;
 }
 
-JNIEXPORT bool JNICALL Java_sml_smlJNI_Kernel_1UnregisterForUntypedEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2)
+JNIEXPORT bool JNICALL Java_sml_smlJNI_Kernel_1UnregisterForStringEvent(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2)
 {
     // jarg1 is the C++ Kernel object
 	sml::Kernel *arg1 = *(sml::Kernel **)&jarg1 ;
@@ -955,7 +948,7 @@ JNIEXPORT bool JNICALL Java_sml_smlJNI_Kernel_1UnregisterForUntypedEvent(JNIEnv 
 	JavaCallbackData* pJavaData = (JavaCallbackData*)jarg2 ;
 
 	// Unregister our handler.
-	bool result = arg1->UnregisterForUntypedEvent(pJavaData->m_CallbackID) ;
+	bool result = arg1->UnregisterForStringEvent(pJavaData->m_CallbackID) ;
 
 	// Release the callback data
 	delete pJavaData ;
