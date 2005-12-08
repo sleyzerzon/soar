@@ -31,6 +31,9 @@
 }
 %newobject sml::AnalyzeXML::GenerateXMLString(bool) const ;
 
+// This parsing method returns a new ElementXML object
+%newobject sml::ElementXML::ParseXMLFromString;
+
 // don't wrap the code for registering callbacks because we need to provide some custom code to make it work
 %ignore sml::Agent::RegisterForProductionEvent(smlProductionEventId, ProductionEventHandler, void*, bool addToBack = true);
 %ignore sml::Agent::RegisterForRunEvent(smlRunEventId, RunEventHandler, void*, bool addToBack = true);

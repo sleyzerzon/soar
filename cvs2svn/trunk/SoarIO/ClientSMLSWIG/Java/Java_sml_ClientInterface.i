@@ -242,10 +242,6 @@
    public static final String kClassAttribute   = "Class" ;
    public static final String kVersionAttribute = "Version" ;
 
-  public ElementXML(String tagName) {
-     SetTagName(tagName) ;
-  }
-
   public void addAttribute(String attributeName, String valueName) {
      AddAttribute(attributeName, valueName) ;
   }
