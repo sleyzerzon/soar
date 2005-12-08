@@ -87,7 +87,7 @@ public:
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
+	egSKIRunResult OldRunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
 
 	/*************************************************************
 	* @brief	Run all agents previously marked as being scheduled to run.
@@ -102,7 +102,7 @@ public:
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	egSKIRunResult NewRunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIInterleaveType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
+	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIInterleaveType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
 
 	/*************************************************************
 	* @brief	Returns true if at least one agent is currently running.
@@ -122,15 +122,16 @@ protected:
     void            InitializeStepList() ;
 	bool            AgentsStillStepping() ;
 	void			FireBeforeRunStartsEvents() ;
-	unsigned long	GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ; //should be interleave...
+	unsigned long	GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ; //for old scheduler...
+    unsigned long   GetStepCounter(gSKI::IAgent* pAgent, egSKIInterleaveType stepSize) ;
 	unsigned long	GetRunCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ;
  	void			RecordInitialRunCounters(egSKIRunType runStepSize) ;
  	void			ResetRunCounters(egSKIRunType runStepSize) ;
-	void            InitializeRunCounters(egSKIRunType runStepSize) ;
+	void            InitializeRunCounters(egSKIRunType runStepSize, egSKIInterleaveType stepSize) ;
 	void			InitializeUpdateWorldEvents(bool addListeners) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
+	void			OldHandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
 	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
-	void			NewHandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
 	bool			AreAllOutputPhasesComplete() ;
 	bool			HaveAllGeneratedOutput() ;
 	void			TestForFiringGeneratedOutputEvent() ;

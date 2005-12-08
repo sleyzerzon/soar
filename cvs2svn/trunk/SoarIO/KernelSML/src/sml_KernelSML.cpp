@@ -827,6 +827,7 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 	// Decide how large of a step to run each agent before switching to the next agent
 	// By default, we run one phase per agent but this isn't always appropriate.
 	egSKIRunType interleaveStepSize = gSKI_RUN_PHASE ;
+	egSKIInterleaveType interleave  = pScheduler->DefaultInterleaveStepSize(runType) ;
 
 	switch (runType)
 	{
@@ -842,11 +843,14 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 		default: interleaveStepSize = gSKI_RUN_PHASE ; break ;
 	}
 
+	pScheduler->VerifyStepSizeForRunType( runType, interleave) ;
+
 	// If we're running by decision cycle synchronize up the agents to the same phase before we start
 	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
 
 	// Do the run
-	egSKIRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, NULL) ;
+	//egSKIRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, NULL) ;
+	egSKIRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleave, synchronizeAtStart, NULL) ;
 
 	unused(runResult) ;
 

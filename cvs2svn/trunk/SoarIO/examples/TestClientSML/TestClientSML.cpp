@@ -1315,7 +1315,7 @@ bool FullEmbeddedTest()
 	bool ok = TestSML(true, true, true, true) ;
 
 	// Embeddded using direct calls
-	ok = ok && TestSML(true, true, true, false) ;
+//	ok = ok && TestSML(true, true, true, false) ;
 
 	// Embedded not using direct calls
 	ok = ok && TestSML(true, true, false, false) ;
@@ -1368,7 +1368,7 @@ int main(int argc, char* argv[])
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
 	// when that allocation occurs.
-	//_crtBreakAlloc = 389 ;
+	_crtBreakAlloc = 550 ;
 
 	//SimpleTimer timer ;
 
