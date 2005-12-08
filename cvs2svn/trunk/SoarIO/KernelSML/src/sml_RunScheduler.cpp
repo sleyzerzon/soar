@@ -267,7 +267,18 @@ bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, eg
 	egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
 
 	if (finished && runStepSize == gSKI_RUN_DECISION_CYCLE && m_StopBeforePhase != phase)
-		finished = false ;
+	{
+		// This works, but may not be what we want for multiple agents because they will
+		// cross the output-input boundary all at different times on this last bit of running.
+		// Instead we should probably return true, and then in RunScheduledAgents,
+		// we should set the runSize and interleave to PHASES and run the agents again.
+ 		while (phase != m_StopBeforePhase) 
+		{
+					egSKIRunResult runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, 1) ;
+					phase = pAgent->GetCurrentPhase() ;
+		}
+	    //	finished = false ;
+	}
 
 	return finished ;
 }
