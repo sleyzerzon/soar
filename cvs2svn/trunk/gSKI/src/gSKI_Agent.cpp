@@ -1528,8 +1528,9 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		{	
 			a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
 		}
-		if ((gSKIEVENT_AFTER_OUTPUT_PHASE == eventId) && a->m_agent->output_link_changed)
-		{   // ONLY if output generated!!!
+		if ((gSKIEVENT_AFTER_OUTPUT_PHASE == eventId) && 
+			(a->m_agent->output_link_changed || a->m_agent->stop_soar))
+		{   // ONLY if output generated or exceeded MAX_NIL_OUTPUT_CYCLES
 			a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_OUTPUT);
 		}
 	}
@@ -1769,8 +1770,11 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		   case  gSKI_INTERLEAVE_ELABORATION_PHASE: run_for_n_elaboration_cycles(m_agent, count); break;
 		   case  gSKI_INTERLEAVE_PHASE:             run_for_n_phases(m_agent, count);             break;
 		   case  gSKI_INTERLEAVE_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);    break;
-		   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count); break;
- 		   }
+		   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count); 
+			                                        if (m_agent->stop_soar) 
+														this->IncrementgSKIStepCounter(gSKI_INTERLEAVE_OUTPUT);
+													break;
+		   }
 	   }
 
 	   // KJC:  I need to check that this test is the right one to make
