@@ -863,13 +863,6 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 		// Assume it is finished until proven otherwise
 		runFinished = true ;
 
-		 // Callback to clients to see if they wish to stop this run.
-		 // A client can use any event, but this one is designed to allow clients
-		 // to throttle back the frequency of the event to control performance.
-		if ((stepCount % interruptCheckRate) == 0)
-			pKernel->FireInterruptCheckEvent() ;
-		stepCount++ ;
-
 		//update relevant counters
 		//pAgent->MaxNilOutputCyclesReached = false;
 
@@ -880,6 +873,13 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 		// while not all agents have complete one RunType (agents still on stepList)
 		while (AgentsStillStepping())
 		{		
+			// Callback to clients to see if they wish to stop this run.
+			// A client can use any event, but this one is designed to allow clients
+			// to throttle back the frequency of the event to control performance.
+			if ((stepCount % interruptCheckRate) == 0)
+				pKernel->FireInterruptCheckEvent() ;
+			stepCount++ ;
+
 			for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 			{
 				AgentSML* pAgentSML = iter->second ;
