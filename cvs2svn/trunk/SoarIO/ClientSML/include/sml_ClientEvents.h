@@ -77,7 +77,7 @@ typedef enum {
 } smlSystemEventId ;
 
 typedef enum {
-    smlEVENT_BEFORE_SMALLEST_STEP = smlEVENT_AFTER_RHS_FUNCTION_EXECUTED + 1,
+    smlEVENT_BEFORE_SMALLEST_STEP = smlEVENT_LAST_SYSTEM_EVENT + 1,
     smlEVENT_AFTER_SMALLEST_STEP,
     smlEVENT_BEFORE_ELABORATION_CYCLE,
     smlEVENT_AFTER_ELABORATION_CYCLE,
@@ -111,7 +111,7 @@ typedef enum {
 
 typedef enum {
     // Production Manager
-    smlEVENT_AFTER_PRODUCTION_ADDED = smlEVENT_AFTER_RUNNING + 1,
+    smlEVENT_AFTER_PRODUCTION_ADDED = smlEVENT_LAST_RUN_EVENT + 1,
     smlEVENT_BEFORE_PRODUCTION_REMOVED,
     //smlEVENT_BEFORE_PRODUCTION_FIRED,
     smlEVENT_AFTER_PRODUCTION_FIRED,
@@ -121,7 +121,7 @@ typedef enum {
 
 typedef enum {
 	// Agent manager
-    smlEVENT_AFTER_AGENT_CREATED = smlEVENT_BEFORE_PRODUCTION_RETRACTED + 1,
+    smlEVENT_AFTER_AGENT_CREATED = smlEVENT_LAST_PRODUCTION_EVENT + 1,
     smlEVENT_BEFORE_AGENT_DESTROYED,
 	smlEVENT_BEFORE_AGENTS_RUN_STEP,
     smlEVENT_BEFORE_AGENT_REINITIALIZED,
@@ -131,13 +131,13 @@ typedef enum {
 
 typedef enum {
 	// Working memory changes
-	smlEVENT_OUTPUT_PHASE_CALLBACK = smlEVENT_AFTER_AGENT_REINITIALIZED + 1,
+	smlEVENT_OUTPUT_PHASE_CALLBACK = smlEVENT_LAST_AGENT_EVENT + 1,
 	smlEVENT_LAST_WM_EVENT = smlEVENT_OUTPUT_PHASE_CALLBACK
 } smlWorkingMemoryEventId ;
 
 typedef enum {
     // Error and print callbacks
-	smlEVENT_LOG_ERROR = smlEVENT_OUTPUT_PHASE_CALLBACK + 1,
+	smlEVENT_LOG_ERROR = smlEVENT_LAST_WM_EVENT + 1,
     smlEVENT_LOG_WARNING,
     smlEVENT_LOG_INFO,
     smlEVENT_LOG_DEBUG,
@@ -151,27 +151,27 @@ typedef enum {
 	// fired within Soar productions.  This is different from normal events in that
 	// the handler is executing the function and returning a value, not just being notified
 	// that something has happened.
-	smlEVENT_RHS_USER_FUNCTION = smlEVENT_PRINT + 1,
+	smlEVENT_RHS_USER_FUNCTION = smlEVENT_LAST_PRINT_EVENT + 1,
 	smlEVENT_CLIENT_MESSAGE,		// A generic message from one client to another (not really involving Soar/kernel directly)
 	smlEVENT_LAST_RHS_EVENT = smlEVENT_CLIENT_MESSAGE
 } smlRhsEventId ;
 
 typedef enum {
-	smlEVENT_XML_TRACE_OUTPUT = smlEVENT_CLIENT_MESSAGE + 1,
+	smlEVENT_XML_TRACE_OUTPUT = smlEVENT_LAST_RHS_EVENT + 1,
 	smlEVENT_XML_INPUT_RECEIVED,		// Echo event for input wmes added by a client (so others can listen in)
 	smlEVENT_LAST_XML_EVENT = smlEVENT_XML_INPUT_RECEIVED
 } smlXMLEventId ;
 
 // Events that can be used by environments to trigger when the world should update
 typedef enum {
-	smlEVENT_AFTER_ALL_OUTPUT_PHASES = smlEVENT_XML_INPUT_RECEIVED + 1,	// All agents have completed output phase
+	smlEVENT_AFTER_ALL_OUTPUT_PHASES = smlEVENT_LAST_XML_EVENT + 1,	// All agents have completed output phase
 	smlEVENT_AFTER_ALL_GENERATED_OUTPUT,						// All agents have generated output (since run began)
 	smlEVENT_LAST_UPDATE_EVENT = smlEVENT_AFTER_ALL_GENERATED_OUTPUT
 } smlUpdateEventId ;
 
 // Events that pass a string as an argument
 typedef enum {
-	smlEVENT_EDIT_PRODUCTION = smlEVENT_AFTER_ALL_GENERATED_OUTPUT + 1,	// Arg is "char const*" -- the name of the production to edit
+	smlEVENT_EDIT_PRODUCTION = smlEVENT_LAST_UPDATE_EVENT + 1,	// Arg is "char const*" -- the name of the production to edit
 	smlEVENT_LAST_STRING_EVENT = smlEVENT_EDIT_PRODUCTION
 } smlStringEventId ;
 
