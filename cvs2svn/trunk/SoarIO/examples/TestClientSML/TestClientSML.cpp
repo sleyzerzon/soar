@@ -1368,7 +1368,7 @@ int main(int argc, char* argv[])
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
 	// when that allocation occurs.
-	_crtBreakAlloc = 550 ;
+	//_crtBreakAlloc = 550 ;
 
 	//SimpleTimer timer ;
 
