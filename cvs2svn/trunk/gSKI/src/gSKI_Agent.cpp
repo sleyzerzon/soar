@@ -944,6 +944,7 @@ namespace gSKI
       // return m_nextPhase;
 	  // KJC:  shouldn't this really be 
 	  return EnumRemappings::ReMapPhaseType(m_agent->current_phase,0);
+	  // should we also set m_lastPhase??
    }
 
    /*
@@ -1388,28 +1389,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
       ClearError(err);
       m_runListeners.AddListener(eventId, listener);
-
-	  /*
-	  if (gSKIEVENT_BEFORE_PHASE_EXECUTED == eventId) 
-	  {
-		  AddRunListener(gSKIEVENT_BEFORE_INPUT_PHASE, this);
-		  AddRunListener(gSKIEVENT_BEFORE_PROPOSE_PHASE, this);
-		  AddRunListener(gSKIEVENT_BEFORE_DECISION_PHASE, this);
-		  AddRunListener(gSKIEVENT_BEFORE_APPLY_PHASE, this);
-		  AddRunListener(gSKIEVENT_BEFORE_OUTPUT_PHASE, this);
-		  AddRunListener(gSKIEVENT_BEFORE_PREFERENCE_PHASE, this);
-		  AddRunListener(gSKIEVENT_BEFORE_WM_PHASE, this);
-	  } else if (gSKIEVENT_AFTER_PHASE_EXECUTED == eventId) 
-	  {
-		  AddRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this);
-		  AddRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this);
-		  AddRunListener(gSKIEVENT_AFTER_DECISION_PHASE, this);
-		  AddRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this);
-		  AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this);
-		  AddRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this);
-		  AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this);
-	  } /*  */
-	  
+ 
       // If we have added our first listener, we tell the kernel
       //  we want to recieve these events.
       if (m_runListeners.GetNumListeners(eventId) == 1)
@@ -1480,28 +1460,6 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       ClearError(err);
       m_runListeners.RemoveListener(eventId, listener);
 
-	  /*
-      if (gSKIEVENT_BEFORE_PHASE_EXECUTED == eventId) 
-	  {
-		  RemoveRunListener(gSKIEVENT_BEFORE_INPUT_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_BEFORE_PROPOSE_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_BEFORE_DECISION_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_BEFORE_APPLY_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_BEFORE_OUTPUT_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_BEFORE_PREFERENCE_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_BEFORE_WM_PHASE, this);
-	  } else if (gSKIEVENT_AFTER_PHASE_EXECUTED == eventId) 
-	  {
-		  RemoveRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_AFTER_DECISION_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this);
-		  RemoveRunListener(gSKIEVENT_AFTER_WM_PHASE, this);
-	  } /* */
-
-
 	  // If we have no more listeners, stop asking kernel to
       //  notify us
       if(m_runListeners.GetNumListeners(eventId) == 0)
@@ -1531,6 +1489,17 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		  default:
 			  ; // do nothing
 		  }
+
+		  if (IsPhaseEventID(eventId)) 
+		  {		 
+			  soar_remove_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)),
+								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
+		  }
+
+		  //  We should probably do some checking to make sure the callbacks were indeed
+		  //  removed and THEN we should call m_runListeners.RemoveListener(eventId, listener);
+
 	  }
    }
    /*
@@ -1796,10 +1765,11 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
     
 		   switch (stepSize) 
 		   {
-		   case  gSKI_INTERLEAVE_ELABORATION_PHASE: run_for_n_elaboration_cycles(m_agent, count);
-		   case  gSKI_INTERLEAVE_PHASE:             run_for_n_phases(m_agent, count);
-		   case  gSKI_INTERLEAVE_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);
-		   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count);
+		   case  gSKI_INTERLEAVE_SMALLEST_STEP:     run_for_n_elaboration_cycles(m_agent, count); break;
+		   case  gSKI_INTERLEAVE_ELABORATION_PHASE: run_for_n_elaboration_cycles(m_agent, count); break;
+		   case  gSKI_INTERLEAVE_PHASE:             run_for_n_phases(m_agent, count);             break;
+		   case  gSKI_INTERLEAVE_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);    break;
+		   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count); break;
  		   }
 	   }
 
