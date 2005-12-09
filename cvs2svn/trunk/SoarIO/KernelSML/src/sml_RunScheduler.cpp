@@ -865,6 +865,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 	// IF we did a StopBeforeUpdate, this is where we need to test and generate event...
 	// TestForFiringOutputCompletedEvent();
 	TestForFiringGeneratedOutputEvent();
+	m_AllGeneratedOutputEventFired = false ;
 
 	// Initialize state required for update world events
 	// Should we do this even if previous Run was interrupted?  Probably not.
@@ -903,7 +904,6 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 	// If we issue a "run 0" and all agents are synched and in the correct state we're done.
 	if (!m_pSynchAgentSML && TestIfAllFinished(runStepSize, count))
 		runFinished = true ;
-
 
 	// Run all agents that have previously been marked as "scheduled to run".
 	while (!runFinished)
