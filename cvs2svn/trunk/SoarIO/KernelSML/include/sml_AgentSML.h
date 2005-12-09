@@ -209,11 +209,9 @@ public:
 	void ResetLocalRunCounters()                    { m_localRunCount = 0 ; m_localStepCount = 0 ; }
 	void IncrementLocalRunCounter()                 { m_localRunCount++ ; }
 	void IncrementLocalStepCounter()                { m_localStepCount++ ; }
-#ifdef newScheduler
 	bool CompletedRunType(unsigned long count)      { return (count > (m_InitialRunCount + m_localRunCount)) ;
 		                                              //return false;
 	                                                }
-#endif
 	void SetCompletedOutputPhase(bool state)		{ m_CompletedOutputPhase = state ; }
 	bool HasCompletedOutputPhase()					{ return m_CompletedOutputPhase ; }
 
