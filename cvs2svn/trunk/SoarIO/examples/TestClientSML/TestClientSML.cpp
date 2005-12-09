@@ -1315,7 +1315,7 @@ bool FullEmbeddedTest()
 	bool ok = TestSML(true, true, true, true) ;
 
 	// Embeddded using direct calls
-//	ok = ok && TestSML(true, true, true, false) ;
+	ok = ok && TestSML(true, true, true, false) ;
 
 	// Embedded not using direct calls
 	ok = ok && TestSML(true, true, false, false) ;
