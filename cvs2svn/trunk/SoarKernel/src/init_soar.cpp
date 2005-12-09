@@ -2,6 +2,7 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 #include "portability.h"
+#include "soar_rand.h" // provides SoarRand, a better random number generator (see bug 595)
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -1689,17 +1690,18 @@ void init_soar (Kernel * thisKernel)
     start_timer (NULL, &tv);
 #endif
   }
+  /* RPM 12/05 we now use SoarRand instead of ANSI rand/srand; see bug 595 */
   /* --- set the random number generator seed to a "random" value --- */
-  random_seed = (unsigned int) time(0);
+//  random_seed = (unsigned int) time(0);
 
   /* For debugging, we want the same output every time. -AJC (8/6/02) */
-#ifdef _DEBUG
-  random_seed = 1;
-#endif
-  srand( random_seed );
+//#ifdef _DEBUG
+//  random_seed = 1;
+//#endif
+//  srand( random_seed );
 
   /* For debuggin purposes */
-  printf("\nRandom Seed = %u\n", random_seed);
+//  printf("\nRandom Seed = %u\n", random_seed);
 
   /* This is deprecated. -AJC (8/6/02) */
   //setup_signal_handling();

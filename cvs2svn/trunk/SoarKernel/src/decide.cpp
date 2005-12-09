@@ -2,6 +2,7 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 #include "portability.h"
+#include "soar_rand.h" // provides SoarRand, a better random number generator (see bug 595)
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -1193,7 +1194,9 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 	set_sysparam (thisAgent, USER_SELECT_MODE_SYSPARAM, USER_SELECT_RANDOM);
 	print (thisAgent, "User-select mode changed to:  random\n");
 	
-        chosen_num = rand() % (num_candidates-3);
+	    /* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
+        //chosen_num = rand() % (num_candidates-3); // generates an integer in [0,num_candidates-3)
+	    chosen_num = SoarRand.randInt(num_candidates-4); // generates an integer in [0,num_candidates-4]
 
 	cand = candidates;
 	while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
@@ -1224,7 +1227,9 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
       for (cand=candidates; cand!=NIL; cand=cand->next_candidate)
         num_candidates++;
 
-      chosen_num = rand() % num_candidates;
+	  /* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
+      //chosen_num = rand() % num_candidates;
+	  chosen_num = SoarRand.randInt(num_candidates-1);
 
       cand = candidates;
       while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
@@ -3498,8 +3503,9 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
     unsigned int numCandidates = 0;
     double selectedProbability = 0;
     double currentSumOfValues = 0;
-    static int initialized_rand = 0;
-    unsigned long rn = 0;
+//    static int initialized_rand = 0;
+    //unsigned long rn = 0;
+	double rn = 0;
 	double default_ni;
 
     /* initialized, but not referenced, so i commented them out:
@@ -3509,10 +3515,12 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
     assert(s != 0);
     assert(candidates != 0);
 
-    if (!initialized_rand) {
-        srand((unsigned) time(NULL));
-        initialized_rand = 1;
-    }
+// RPM 12/05 The seed shouldn't be set here (see bug 593) and we aren't using srand and rand anymore (see bug 595)
+//    if (!initialized_rand) {
+//        srand((unsigned) time(NULL));
+//        initialized_rand = 1;
+//    }
+
     /*
        print("\nCandidates at top of probabilistically_select"); 
        print_candidates(candidates);  
@@ -3604,8 +3612,12 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
         /* Now select the candidate */
 
         //print(thisAgent, "\n");
-		rn = rand();
-        selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
+
+		/* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
+		//rn = rand();
+		rn = SoarRand(); // generates a number in [0,1]
+        //selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
+		selectedProbability = rn * total_probability;
         currentSumOfValues = 0;
 
         for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
@@ -3659,8 +3671,11 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
         /* Now select the candidate */
 
 		//print(thisAgent, "\n");
-        rn = rand();
-        selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
+
+		/* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
+        //rn = rand();
+		rn = SoarRand(); 
+        selectedProbability = rn * total_probability;
         currentSumOfValues = 0;
 
         for (cand = candidates; cand != NIL; cand = cand->next_candidate) {

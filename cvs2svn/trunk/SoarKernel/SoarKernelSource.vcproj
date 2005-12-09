@@ -627,6 +627,9 @@
 				RelativePath=".\include\rhsfun_math.h">
 			</File>
 			<File
+				RelativePath=".\include\soar_rand.h">
+			</File>
+			<File
 				RelativePath=".\include\soarkernel.h">
 			</File>
 			<File
