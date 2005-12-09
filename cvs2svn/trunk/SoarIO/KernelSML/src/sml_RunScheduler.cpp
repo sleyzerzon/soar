@@ -74,6 +74,8 @@ egSKIInterleaveType RunScheduler::DefaultInterleaveStepSize(egSKIRunType runStep
 		//return gSKI_INTERLEAVE_PHASE;
 		return gSKI_INTERLEAVE_DECISION_CYCLE;
 	case gSKI_RUN_UNTIL_OUTPUT:
+		//return gSKI_INTERLEAVE_PHASE;
+		//return gSKI_INTERLEAVE_DECISION_CYCLE;
 		return gSKI_INTERLEAVE_OUTPUT;
 	default:
 		return gSKI_INTERLEAVE_PHASE;
@@ -246,13 +248,37 @@ bool RunScheduler::AreAgentsSynchronized(AgentSML* pSynchAgent)
 	return same ;
 }
 
+#ifdef oldScheduler
 /*************************************************************************
 * @brief	Returns true if the given agent has reached the end of its run
 **************************************************************************/
 bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count)
 {
-	//unsigned long current = GetStepCounter(pAgent, runStepSize) ;
-	//unsigned long initial = pAgentSML->GetInitialStepCount() ;
+	unsigned long current = GetStepCounter(pAgent, runStepSize) ;
+	unsigned long initial = pAgentSML->GetInitialStepCount() ;
+
+	unsigned long difference = current - initial ;
+
+	//fprintf(stdout, "Agent %s current is %d initial is %d diff is %d\n", pAgent->GetName(), current, initial, difference) ; fflush(stdout) ;
+
+	bool finished = difference >= count && runStepSize != gSKI_RUN_FOREVER ;
+
+	// If we're running by decision and we've run the appropriate number of decisions, then keep running until
+	// we reach the correct phase where we should stop.
+	egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
+
+	if (finished && runStepSize == gSKI_RUN_DECISION_CYCLE && m_StopBeforePhase != phase)
+		finished = false ;
+
+	return finished ;
+}
+#endif
+#ifdef newScheduler
+/*************************************************************************
+* @brief	Returns true if the given agent has reached the end of its run
+**************************************************************************/
+bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count)
+{
 	unsigned long current = GetRunCounter(pAgent, runStepSize) ;
 	unsigned long initial = pAgentSML->GetInitialRunCount() ;
 
@@ -277,11 +303,11 @@ bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, eg
 					egSKIRunResult runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, 1) ;
 					phase = pAgent->GetCurrentPhase() ;
 		}
-	    //	finished = false ;
-	}
+ 	}
 
 	return finished ;
 }
+#endif
 
 /********************************************************************
 * @brief	Some agents will complete a RunType sooner than others.
@@ -404,11 +430,12 @@ void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 		if (addListeners)
 		{
 			gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
-			//pAgent->AddRunListener(gSKIEVENT_AFTER_PHASE_EXECUTED, this) ;
+			pAgent->AddRunListener(gSKIEVENT_AFTER_PHASE_EXECUTED, this) ;
 			// This is a huge hack.  These need to be registered by a gSKI RunListener
 			// because the gSKI event handler has to increment counters on these events.
 			// Added here for now because I couldn't reconcile the code for making
 			// a gSKI agent a RunListener too.  (might be circular...)
+		 
 			pAgent->AddRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
 			pAgent->AddRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
 			pAgent->AddRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
@@ -417,6 +444,7 @@ void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 			pAgent->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 			pAgent->AddRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
 			pAgent->AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only
+		 
 		}
 	}
 }
@@ -435,8 +463,14 @@ bool RunScheduler::AreAllOutputPhasesComplete()
 	{
 		AgentSML* pAgentSML = iter->second ;
 
+#ifdef oldScheduler
+		if (pAgentSML->IsAgentScheduledToRun() && !pAgentSML->HasCompletedOutputPhase())
+			return false ;
+#endif
+#ifdef newScheduler
 		if (pAgentSML->WasAgentOnRunList() && !pAgentSML->HasCompletedOutputPhase())
 			return false ;
+#endif
 	}
 
 	return true ;
@@ -453,18 +487,28 @@ bool RunScheduler::HaveAllGeneratedOutput()
 	{
 		AgentSML* pAgentSML = iter->second ;
 
+#ifdef oldScheduler
+		// By testing agents that are still scheduled to run this lets us more closely mimic the
+		// regular "RunTilOutput" semantics--where agents either drop out because they've generated output OR
+		// because they have reached a maximum number of decisions (by default 15) without generating output.
+		if (pAgentSML->IsAgentScheduledToRun() && !pAgentSML->HasGeneratedOutput())
+			return false ;
+#endif
+#ifdef newScheduler
 		if (pAgentSML->WasAgentOnRunList() && !pAgentSML->HasGeneratedOutput())
 			return false ;
+#endif
 	}
 
 	return true ;
 }
 
+#ifdef oldScheduler
 /********************************************************************
 * @brief	Called when the agent completes a given phase.
 *			We're interested in the end of the output phase.
 *********************************************************************/
-void RunScheduler::OldHandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase)
+void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase)
 {
 	if (eventID == gSKIEVENT_AFTER_PHASE_EXECUTED && phase == gSKI_OUTPUT_PHASE)
 	{
@@ -497,7 +541,8 @@ void RunScheduler::OldHandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent,
 		}
 	}
 }
-
+#endif
+#ifdef newScheduler
 /********************************************************************
 * @brief	Called when the agent completes any phase.
 *			 
@@ -522,7 +567,7 @@ void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, eg
 		}
 	} 
 }
-
+#endif
 /********************************************************************
 * @brief	Check if the "AFTER_ALL_GENERATED_OUTPUT" event should be
 *			fired or not.
@@ -566,11 +611,12 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 		if (removeListeners)
 		{
 			gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;
-			//pAgent->RemoveRunListener(gSKIEVENT_AFTER_PHASE_EXECUTED, this) ;
+			pAgent->RemoveRunListener(gSKIEVENT_AFTER_PHASE_EXECUTED, this) ;
 			// This is a huge hack.  These need to be registered by a gSKI RunListener
 			// because the gSKI event handler has to increment counters on these events.
 			// Added here for now because I couldn't reconcile the code for making
 			// a gSKI agent a RunListener too.  (might be circular...)
+		 
 			pAgent->RemoveRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
 			pAgent->RemoveRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
 			pAgent->RemoveRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
@@ -579,7 +625,7 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 			pAgent->RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 			pAgent->RemoveRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
 			pAgent->RemoveRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only
-	
+           
 		}
 	}
 }
@@ -613,6 +659,7 @@ bool RunScheduler::IsRunning()
 	return m_IsRunning ;
 }
 
+#ifdef oldScheduler
 /*************************************************************
 * @brief	Run all agents previously marked as being scheduled to run.
 *
@@ -626,7 +673,7 @@ bool RunScheduler::IsRunning()
 * @return Not clear on how to set this when have multiple agents.
 *		  Can query each for "GetLastRunResult()".
 *************************************************************/	
-egSKIRunResult RunScheduler::OldRunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError)
+egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError)
 {
 	// In general we really want to assert that runStepSize >= interleaveStepSize but I'm not sure there's
 	// a strict relationship and certainly the enums aren't labelled as being in a guaranteed processing size order.
@@ -774,7 +821,8 @@ egSKIRunResult RunScheduler::OldRunScheduledAgents(egSKIRunType runStepSize, uns
 	// You can query each agent for its GetResultOfRun() to know more.
 	return overallResult ;
 }
-
+#endif
+#ifdef newScheduler
 /*************************************************************
 * @brief	Run all agents previously marked as being scheduled to run.
 *
@@ -989,3 +1037,4 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 	// You can query each agent for its GetResultOfRun() to know more.
 	return overallResult ;
 }
+#endif

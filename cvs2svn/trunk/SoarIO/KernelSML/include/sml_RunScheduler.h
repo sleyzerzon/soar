@@ -16,6 +16,10 @@
 #include "gSKI_Events.h"
 #include "sml_ClientEvents.h"	// To get smlRunFlags
 
+//pick just one!
+#define oldScheduler
+//#define newScheduler
+
 namespace gSKI {
 	class IAgent ;
 	struct Error ;
@@ -87,7 +91,7 @@ public:
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	egSKIRunResult OldRunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
+	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
 
 	/*************************************************************
 	* @brief	Run all agents previously marked as being scheduled to run.
@@ -130,7 +134,6 @@ protected:
 	void            InitializeRunCounters(egSKIRunType runStepSize, egSKIInterleaveType stepSize) ;
 	void			InitializeUpdateWorldEvents(bool addListeners) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
-	void			OldHandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
 	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
 	bool			AreAllOutputPhasesComplete() ;
 	bool			HaveAllGeneratedOutput() ;
