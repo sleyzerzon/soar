@@ -94,9 +94,10 @@ bool UCTSML::LaunchDebugger()
             assert(false && "chdir to SOAR_LIBRARY did not work");
         system("java -jar SoarJavaDebugger.jar -remote");
         pKernel->CheckForIncomingCommands();
-        
+        exit(1); // this forked process dies
     }
-    return true;
+    else
+        return true; // parent process continues as normal
 }
 
 // Call this function to run the simulation
