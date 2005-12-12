@@ -78,19 +78,20 @@ public class AppProperties extends java.util.Properties
 			
 			// Create a SoarDebugger subfolder if necessary
 			homeDir = new File(homeDir, "SoarDebugger") ;
-			
-			if (!homeDir.exists())
-			{
-				// mkdirs makes the entire path
-				// (which could matter if we're on a foreign language system with no
-				//  ApplicationData folder)
-				homeDir.mkdirs() ;
-			}
 		}
-		
-		// If this is Unix we want to just store our settings in the
-		// user's home directory.  BADBAD: We probably want to append
-		// a "." to the filename under Unix so the settings file is hidden.
+		else
+		{
+			// For Linux (and Mac?) we'll store things in a ~/.SoarFiles folders.
+			homeDir = new File(homeDir, ".SoarFiles") ;
+		}
+
+		if (!homeDir.exists())
+		{
+			// mkdirs makes the entire path
+			// (which could matter if we're on a foreign language system with no
+			//  ApplicationData folder)
+			homeDir.mkdirs() ;
+		}
 
 		return new File(homeDir, filename) ;
 	}
