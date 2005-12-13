@@ -108,7 +108,8 @@ bool UrbanCombatInterface::LaunchUrbanCombat()
         {
             if (chdir(pStr) < 0)
                 exit(1);
-            system("./linuxuct");
+            //system("./linuxuct");
+            system("./agentstart.sh");
         }
         exit(0);
     }
