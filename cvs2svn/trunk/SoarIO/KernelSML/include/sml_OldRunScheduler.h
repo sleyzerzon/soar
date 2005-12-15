@@ -8,7 +8,7 @@
 // can function well in concert with a debugger.
 //
 /////////////////////////////////////////////////////////////////
-// If this is defined, USE_NEW_SCHEDULER (in sml_OldRunScheduler.h) must not be
+// If this is defined, USE_NEW_SCHEDULER (in sml_RunScheduler.h) must not be
 //#define USE_OLD_SCHEDULER
 #ifdef USE_OLD_SCHEDULER
 

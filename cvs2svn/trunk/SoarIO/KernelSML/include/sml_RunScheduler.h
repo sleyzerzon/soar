@@ -10,6 +10,11 @@
 /////////////////////////////////////////////////////////////////
 // If this is defined, USE_OLD_SCHEDULER (in sml_OldRunScheduler.h) must not be
 #define USE_NEW_SCHEDULER
+
+#ifndef USE_NEW_SCHEDULER
+#include "sml_OldRunScheduler.h"
+#endif
+
 #ifdef USE_NEW_SCHEDULER
 
 #ifndef SML_RUN_SCHEDULER_H

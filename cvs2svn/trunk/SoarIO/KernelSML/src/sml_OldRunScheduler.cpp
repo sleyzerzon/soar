@@ -21,6 +21,7 @@
 #include "sml_ClientEvents.h"
 
 #include "../../gSKI/src/gSKI_Error.h"
+#include "gSKI_Enumerations.h"
 #include "IgSKI_AgentManager.h"
 
 #include <assert.h>
@@ -139,6 +140,7 @@ unsigned long RunScheduler::GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType ru
 		return 0;
 	}
 }
+
 unsigned long RunScheduler::GetStepCounter(gSKI::IAgent* pAgent, egSKIInterleaveType stepSize)
 {
 	switch(stepSize)
@@ -260,12 +262,10 @@ bool RunScheduler::IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, eg
 	unsigned long current = GetStepCounter(pAgent, runStepSize) ;
 	unsigned long initial = pAgentSML->GetInitialStepCount() ;
 	unsigned long difference = current - initial ;
-
 	//fprintf(stdout, "Agent %s current is %d initial is %d diff is %d\n", pAgent->GetName(), current, initial, difference) ; fflush(stdout) ;
 
 	bool finished = difference >= count && runStepSize != gSKI_RUN_FOREVER ;
-	// If we're running by decision and we've run the appropriate number of decisions, then keep running until
-	// we reach the correct phase where we should stop.
+
 	egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
 	if (finished && runStepSize == gSKI_RUN_DECISION_CYCLE && m_StopBeforePhase != phase)
 		finished = false ;
