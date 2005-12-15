@@ -58,8 +58,9 @@ namespace gSKI
        *
        * @param eventId  Id of the event to add a listener for
        * @param listener Pointer to the listener to add to list
+	   * @return true if the listener was added (i.e. not a duplicate)
        */
-      void AddListener(EventType eventId, tListener* listener)
+      bool AddListener(EventType eventId, tListener* listener)
       {
          // Get the correct list of listeners
          tListenerVector& listenerVec = m_listeners[static_cast<tKey>(eventId)];
@@ -67,7 +68,11 @@ namespace gSKI
          // Only add if it is not in the list already
          tListenerVectorIt it = std::find(listenerVec.begin(), listenerVec.end(), listener);
          if(it == listenerVec.end())
+		 {
             listenerVec.push_back(listener);
+			return true ;
+		 }
+		 return false ;
       }
 
       /** 
@@ -77,8 +82,9 @@ namespace gSKI
        *
        * @param eventId  Id of the event to remove the listener for
        * @param listener Pointer to the listener to remove.
+	   * @return true if listener was removed (i.e. it was listening previously)
        */
-      void RemoveListener(EventType eventId, tListener* listener)
+      bool RemoveListener(EventType eventId, tListener* listener)
       {
          tListenerMapIt itMap = m_listeners.find(static_cast<tKey>(eventId));
          if(itMap != m_listeners.end())
@@ -89,8 +95,12 @@ namespace gSKI
             // Only remove if it is in the list now
             tListenerVectorIt itVec = std::find(listenerVec.begin(), listenerVec.end(), listener);
             if(itVec != listenerVec.end())
+			{
                listenerVec.erase(itVec);
+			   return true ;
+			}
          }
+		 return false ;
       }
 
       /** 

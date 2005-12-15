@@ -1196,12 +1196,12 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		  }
 
 		  ClearError(err);
-		  m_XMLListeners.AddListener(eventId, listener);
+		  bool added = m_XMLListeners.AddListener(eventId, listener);
 
 
 		  // If we have added our first listener, we tell the kernel
 		  //  we want to recieve these events.
-		  if(m_XMLListeners.GetNumListeners(eventId) == 1)
+		  if(added && m_XMLListeners.GetNumListeners(eventId) == 1)
 		  {
 			  // This is a kernel call (not part of gSKI)
 			  // Must convert gSKI event to Kernel event
@@ -1229,11 +1229,11 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       }
 
       ClearError(err);
-      m_XMLListeners.RemoveListener(eventId, listener);
+      bool removed = m_XMLListeners.RemoveListener(eventId, listener);
 
       // If we have no more listeners, stop asking kernel to
       //  notify us
-      if(m_XMLListeners.GetNumListeners(eventId) == 0)
+      if(removed && m_XMLListeners.GetNumListeners(eventId) == 0)
       {
          // This is a kernel call (not part of gSKI)
 		 // Must convert gSKI event to Kernel event
@@ -1268,12 +1268,12 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       }
 
       ClearError(err);
-      m_printListeners.AddListener(eventId, listener);
+      bool added = m_printListeners.AddListener(eventId, listener);
 
 
       // If we have added our first listener, we tell the kernel
       //  we want to recieve these events.
-      if(m_printListeners.GetNumListeners(eventId) == 1)
+      if(added && m_printListeners.GetNumListeners(eventId) == 1)
       {
          // This is a kernel call (not part of gSKI)
 		 // Must convert gSKI event to Kernel event
@@ -1305,11 +1305,11 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       }
 
       ClearError(err);
-      m_printListeners.RemoveListener(eventId, listener);
+      bool removed = m_printListeners.RemoveListener(eventId, listener);
 
       // If we have no more listeners, stop asking kernel to
       //  notify us
-      if(m_printListeners.GetNumListeners(eventId) == 0)
+      if(removed && m_printListeners.GetNumListeners(eventId) == 0)
       {
          // This is a kernel call (not part of gSKI)
 		 // Must convert gSKI event to Kernel event
@@ -1388,11 +1388,11 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       }
 
       ClearError(err);
-      m_runListeners.AddListener(eventId, listener);
+      bool added = m_runListeners.AddListener(eventId, listener);
  
       // If we have added our first listener, we tell the kernel
       //  we want to recieve these events.
-      if (m_runListeners.GetNumListeners(eventId) == 1)
+      if (added && m_runListeners.GetNumListeners(eventId) == 1)
       {
 		  switch (eventId)   // temporary, til all are moved to kernel. KJC
 		  {
@@ -1458,11 +1458,11 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       }
 
       ClearError(err);
-      m_runListeners.RemoveListener(eventId, listener);
+      bool removed = m_runListeners.RemoveListener(eventId, listener);
 
 	  // If we have no more listeners, stop asking kernel to
       //  notify us
-      if(m_runListeners.GetNumListeners(eventId) == 0)
+      if(removed && m_runListeners.GetNumListeners(eventId) == 0)
       {		 
 		  switch (eventId)   // temporary, til all are moved to kernel. KJC
 		  {
