@@ -122,24 +122,26 @@ public:
 	egSKIPhaseType GetStopBefore()				{ return m_StopBeforePhase ; }
 
 protected:
-	bool			IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count) ;
-    void            InitializeStepList() ;
 	bool            AgentsStillStepping() ;
+	bool			AreAgentsSynchronized(AgentSML* pSynchAgent) ;
+	bool			AreAllOutputPhasesComplete() ;
+	void            CheckStopBeforePhase(egSKIRunType runStepSize) ;
 	void			FireBeforeRunStartsEvents() ;
 	unsigned long	GetStepCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ; //for old scheduler...
     unsigned long   GetStepCounter(gSKI::IAgent* pAgent, egSKIInterleaveType stepSize) ;
 	unsigned long	GetRunCounter(gSKI::IAgent* pAgent, egSKIRunType runStepSize) ;
+	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
+	bool			HaveAllGeneratedOutput() ;
+	void            InitializeRunCounters(egSKIRunType runStepSize, egSKIInterleaveType stepSize) ;
+    void            InitializeStepList() ;
+	void			InitializeUpdateWorldEvents(bool addListeners) ;
+	bool			IsAgentFinished(gSKI::IAgent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count) ;
  	void			RecordInitialRunCounters(egSKIRunType runStepSize) ;
  	void			ResetRunCounters(egSKIRunType runStepSize) ;
-	void            InitializeRunCounters(egSKIRunType runStepSize, egSKIInterleaveType stepSize) ;
-	void			InitializeUpdateWorldEvents(bool addListeners) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
-	void			HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* pAgent, egSKIPhaseType phase) ;
-	bool			AreAllOutputPhasesComplete() ;
-	bool			HaveAllGeneratedOutput() ;
 	void			TestForFiringGeneratedOutputEvent() ;
 	bool			TestIfAllFinished(egSKIRunType runStepSize, unsigned long count) ;
-	bool			AreAgentsSynchronized(AgentSML* pSynchAgent) ;
+
 	AgentSML*		GetAgentToSynchronizeWith() ;
 } ;
 
