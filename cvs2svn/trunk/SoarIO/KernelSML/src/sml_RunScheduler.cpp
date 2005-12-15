@@ -175,6 +175,8 @@ unsigned long RunScheduler::GetRunCounter(gSKI::IAgent* pAgent, egSKIRunType run
 		return pAgent->GetNumDecisionCyclesExecuted();
 	case gSKI_RUN_UNTIL_OUTPUT:
 		return pAgent->GetNumOutputsExecuted();
+	case gSKI_RUN_FOREVER:
+		return pAgent->GetNumDecisionCyclesExecuted();
 	default:
 		return 0;
 	}
