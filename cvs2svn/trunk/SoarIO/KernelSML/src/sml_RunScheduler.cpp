@@ -505,7 +505,7 @@ void RunScheduler::CheckStopBeforePhase(egSKIRunType runStepSize)
 	// Output-Input Boundary together and generate events...  For now, if interrupted,
 	// or error or halted, we won't do anything here.
 
-	if (( runStepSize == gSKI_RUN_DECISION_CYCLE) && (m_StopBeforePhase != gSKI_OUTPUT_PHASE))
+	if (( runStepSize == gSKI_RUN_DECISION_CYCLE) && (m_StopBeforePhase != gSKI_INPUT_PHASE))
 	{
 		for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)	
 		{	
@@ -993,7 +993,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 					pAgentSML->SetResultOfRun(runResult) ;
 					// If we know we won't have to step to StopBefore phase
 					// notify listeners that this agent is finished running
-					if (runStepSize != gSKI_RUN_DECISION_CYCLE || m_StopBeforePhase == gSKI_OUTPUT_PHASE)
+					if (runStepSize != gSKI_RUN_DECISION_CYCLE || m_StopBeforePhase == gSKI_INPUT_PHASE)
 						pAgent->FireRunEndsEvent() ;
 				}
 				else

@@ -17,8 +17,8 @@
 #include "sml_ClientEvents.h"	// To get smlRunFlags
 
 //pick just one!
-#define oldScheduler
-//#define newScheduler
+//#define oldScheduler
+#define newScheduler
 
 namespace gSKI {
 	class IAgent ;
