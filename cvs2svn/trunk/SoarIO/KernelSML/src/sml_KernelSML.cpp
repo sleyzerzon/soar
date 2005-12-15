@@ -851,10 +851,10 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 
 	// Do the run
 
-#ifdef oldScheduler
+#ifdef USE_OLD_SCHEDULER
 	egSKIRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, NULL) ;
 #endif
-#ifdef newScheduler
+#ifdef USE_NEW_SCHEDULER
 	egSKIRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleave, synchronizeAtStart, NULL) ;
 #endif
 

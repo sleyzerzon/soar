@@ -8,12 +8,12 @@
 // can function well in concert with a debugger.
 //
 /////////////////////////////////////////////////////////////////
-// If this is defined, USE_OLD_SCHEDULER (in sml_OldRunScheduler.h) must not be
-#define USE_NEW_SCHEDULER
-#ifdef USE_NEW_SCHEDULER
+// If this is defined, USE_NEW_SCHEDULER (in sml_OldRunScheduler.h) must not be
+//#define USE_OLD_SCHEDULER
+#ifdef USE_OLD_SCHEDULER
 
-#ifndef SML_RUN_SCHEDULER_H
-#define SML_RUN_SCHEDULER_H
+#ifndef SML_OLD_RUN_SCHEDULER_H
+#define SML_OLD_RUN_SCHEDULER_H
 
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
@@ -146,7 +146,6 @@ protected:
 
 } // namespace
 
-#endif // SML_RUN_SCHEDULER_H
+#endif // SML_OLD_RUN_SCHEDULER_H
 
-#endif // USE_NEW_SCHEDULER
-
+#endif // USE_OLD_SCHEDULER

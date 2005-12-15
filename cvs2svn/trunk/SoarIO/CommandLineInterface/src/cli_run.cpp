@@ -158,7 +158,7 @@ bool CommandLineInterface::DoRun(gSKI::IAgent* pAgent, const RunBitset& options,
 	// Decide how large of a step to run each agent before switching to the next agent
 	// By default, we run one phase per agent but this isn't always appropriate.
 	egSKIRunType interleaveStepSize = gSKI_RUN_PHASE ;
-#ifdef newScheduler
+#ifdef USE_NEW_SCHEDULER
 	egSKIInterleaveType interleave  = pScheduler->DefaultInterleaveStepSize(runType) ;
 #endif
 
@@ -176,7 +176,7 @@ bool CommandLineInterface::DoRun(gSKI::IAgent* pAgent, const RunBitset& options,
 		default: interleaveStepSize = gSKI_RUN_PHASE ; break ;
 	}
 
-#ifdef newScheduler
+#ifdef USE_NEW_SCHEDULER
 	pScheduler->VerifyStepSizeForRunType( runType, interleave) ;
 #endif
 
@@ -184,10 +184,10 @@ bool CommandLineInterface::DoRun(gSKI::IAgent* pAgent, const RunBitset& options,
 	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
 
 	// Do the run
-#ifdef oldScheduler
+#ifdef USE_OLD_SCHEDULER
 	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, &m_gSKIError) ;
 #endif
-#ifdef newScheduler
+#ifdef USE_NEW_SCHEDULER
 	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleave, synchronizeAtStart, &m_gSKIError) ;
 #endif
 
