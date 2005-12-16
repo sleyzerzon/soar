@@ -247,11 +247,13 @@ static inline bool IsUpdateEventID(int id)
 }
 
 typedef enum {
-    sml_INPUT_PHASE,
+    sml_INPUT_PHASE,		// NOTE: This enum MUST be kept in synch with egSKIPhaseType defined in gSKI_Enumerations.h
     sml_PROPOSAL_PHASE,
     sml_DECISION_PHASE,
     sml_APPLY_PHASE,
     sml_OUTPUT_PHASE,
+	sml_PREFERENCE_PHASE,	// Soar 7 mode only
+	sml_WM_PHASE,			// Soar 7 mode only
 } smlPhase;
 
 typedef enum

@@ -445,7 +445,7 @@
    *       of the agent's commands.
    */
    typedef enum {
-      gSKI_INPUT_PHASE,
+      gSKI_INPUT_PHASE,			// NOTE: This enum MUST be kept in synch with smlPhase defined in sml_ClientEvents.h
       gSKI_PROPOSAL_PHASE,
       gSKI_DECISION_PHASE,
       gSKI_APPLY_PHASE,
