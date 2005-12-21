@@ -10,7 +10,7 @@
 %csconstvalue("smlRhsEventId.smlEVENT_RHS_USER_FUNCTION + 1") smlEVENT_XML_TRACE_OUTPUT;
 %csconstvalue("smlXMLEventId.smlEVENT_XML_INPUT_RECEIVED + 1") smlEVENT_AFTER_ALL_OUTPUT_PHASES;
 %csconstvalue("smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT + 1") smlEVENT_EDIT_PRODUCTION;
-%csconstvalue("smlUntypedEventId.smlEVENT_EDIT_PRODUCTION + 1") smlEVENT_LAST;
+%csconstvalue("smlStringEventId.smlEVENT_EDIT_PRODUCTION + 1") smlEVENT_LAST;
 %csconstvalue("smlWorkingMemoryEventId.smlEVENT_OUTPUT_PHASE_CALLBACK + 1") smlEVENT_LOG_ERROR;
 %csconstvalue("smlRunEventId.smlEVENT_AFTER_RUNNING + 1") smlEVENT_AFTER_PRODUCTION_ADDED;
 %csconstvalue("smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED + 1") smlEVENT_OUTPUT_PHASE_CALLBACK;
@@ -36,6 +36,35 @@
 	{
 		CSharp_Kernel_RegisterTestMethod(swigCPtr, callback);
 	}
+
+	// This class exists to expose the "DeleteHandle" method to the SWIG C++ code, so that we can call back to it to
+	// delete a GCHandle.  This code is called to free any GCHandles which were allocated in registering for a callback.
+	// All of this, is so that we can pass a pointer into the SWIG/C++ code and ensure that the pointer is not garbage collected
+	// until we explicitly indicate we're done with it by calling Free on that pointer.  However, we can't call Free from the C++ code -- 
+	// we need to call it from C# and hence the need for this class.
+	protected class HandleHelper {
+
+		public delegate void HandleDeletingDelegate(IntPtr intHandle);
+		static HandleDeletingDelegate staticHandleDelegate = new HandleDeletingDelegate(DeleteHandle);
+
+		[DllImport("CSharp_sml_ClientInterface")]
+		public static extern void CSharp_Kernel_RegisterHandleHelper(HandleDeletingDelegate handleDelegate);
+
+		static void DeleteHandle(IntPtr intHandle)
+		{
+			GCHandle handle = (GCHandle)intHandle ;
+			
+			System.Console.Out.WriteLine("Freeing handle" + handle) ;
+			handle.Free() ;
+		}
+
+		// This registration method will be called as soon as the parent class (Kernel) is loaded.
+		static HandleHelper() {
+			CSharp_Kernel_RegisterHandleHelper(staticHandleDelegate);
+		}
+	}
+
+	static protected HandleHelper staticHandleHelper = new HandleHelper();
 %}
 
 //typedef void (*RunEventHandler)(smlRunEventId id, void* pUserData, Agent* pAgent, smlPhase phase);
@@ -54,7 +83,7 @@
 	public int RegisterForRunEvent(smlRunEventId eventID, MyRunCallback jarg2)
 	{
 		// This call ensures the garbage collector won't delete the object until we call free on the handle.
-		// It also uses an approved way to pass a pointer to unsafe (C++) code and get it back.
+		// It's also an approved way to pass a pointer to unsafe (C++) code and get it back.
 		GCHandle agentHandle = GCHandle.Alloc(this) ;
 		return CSharp_Agent_RegisterForRunEvent(swigCPtr, (int)eventID, (IntPtr)agentHandle, jarg2) ;
 	}

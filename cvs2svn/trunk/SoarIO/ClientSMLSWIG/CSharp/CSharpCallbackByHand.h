@@ -40,9 +40,18 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterTestMethod(void * jarg1, unsig
 	pFunction() ;
 }
 */
+
 typedef int	agentPtr ;
 
 typedef void (__stdcall *MyRunCallback)(agentPtr jagent, int eventID) ;
+
+/* Callback for deleting GCHandle objects from within C#, so we don't leak them. */
+typedef void (SWIGSTDCALL* CSharpHandleHelperCallback)(unsigned int);
+static CSharpHandleHelperCallback SWIG_csharp_deletehandle_callback = NULL;
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterHandleHelper(CSharpHandleHelperCallback callback) {
+  SWIG_csharp_deletehandle_callback = callback;
+}
 
 class CSharpCallbackData
 {
@@ -118,6 +127,9 @@ SWIGEXPORT bool SWIGSTDCALL CSharp_Agent_UnregisterForRunEvent(void* jarg1, int 
 
 	// Unregister our handler.
 	bool result = arg1->UnregisterForRunEvent(pData->m_CallbackID) ;
+
+	// Free the GCHandle created when the callback was registered
+	SWIG_csharp_deletehandle_callback(pData->m_Agent) ;
 
 	// Release the callback data
 	delete pData ;
