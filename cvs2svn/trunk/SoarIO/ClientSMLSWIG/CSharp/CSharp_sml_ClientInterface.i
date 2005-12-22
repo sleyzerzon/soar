@@ -27,16 +27,6 @@
 %ignore sml::Kernel::RemoveRhsFunction(int);
 
 %typemap(cscode) sml::Kernel %{
-	public delegate void MyCallback();
-
-	[DllImport("CSharp_sml_ClientInterface")]
-	public static extern void CSharp_Kernel_RegisterTestMethod(HandleRef jarg1, MyCallback callback);
-	
-	public void RegisterTestMethod(MyCallback callback)
-	{
-		CSharp_Kernel_RegisterTestMethod(swigCPtr, callback);
-	}
-
 	// This class exists to expose the "DeleteHandle" method to the SWIG C++ code, so that we can call back to it to
 	// delete a GCHandle.  This code is called to free any GCHandles which were allocated in registering for a callback.
 	// All of this, is so that we can pass a pointer into the SWIG/C++ code and ensure that the pointer is not garbage collected
@@ -67,25 +57,25 @@
 	static protected HandleHelper staticHandleHelper = new HandleHelper();
 %}
 
-//typedef void (*RunEventHandler)(smlRunEventId id, void* pUserData, Agent* pAgent, smlPhase phase);
-
+// DJP: NOTE!  When changing this code make sure the library smlCSharp.dll is getting
+// updated.  I have had many cases where Visual Studio keeps the library loaded when it shouldn't causing the build
+// to appear to work, but the library is not updated (because it can't be overwritten).
+// The simple test is manually deleting the library from Explorer.  If that fails, close the solution and re-open it in VS
+// which will break the lock.
 %typemap(cscode) sml::Agent %{
-	public delegate void MyRunCallback(IntPtr agent, smlRunEventId eventID);
+	public delegate void RunEventCallback(IntPtr agent, smlRunEventId eventID, IntPtr callbackData);
 
-	// DJP: NOTE!  When changing this code make sure the library smlCSharp.dll is getting
-	// updated.  I have had many cases where Visual Studio keeps the library loaded when it shouldn't causing the build
-	// to appear to work, but the library is not updated (because it can't be overwritten).
-	// The simple test is manually deleting the library from Explorer.  If that fails, close the solution and re-open it in VS
-	// which will break the lock.
 	[DllImport("CSharp_sml_ClientInterface")]
-	public static extern int CSharp_Agent_RegisterForRunEvent(HandleRef jarg1, int eventID, IntPtr jagent, MyRunCallback callbacks);
+	public static extern int CSharp_Agent_RegisterForRunEvent(HandleRef jarg1, int eventID, IntPtr jagent, RunEventCallback callback, IntPtr callbackData);
 
-	public int RegisterForRunEvent(smlRunEventId eventID, MyRunCallback jarg2)
+	public int RegisterForRunEvent(smlRunEventId eventID, RunEventCallback jarg2, Object callbackData)
 	{
 		// This call ensures the garbage collector won't delete the object until we call free on the handle.
 		// It's also an approved way to pass a pointer to unsafe (C++) code and get it back.
 		GCHandle agentHandle = GCHandle.Alloc(this) ;
-		return CSharp_Agent_RegisterForRunEvent(swigCPtr, (int)eventID, (IntPtr)agentHandle, jarg2) ;
+		GCHandle callbackDataHandle = GCHandle.Alloc(callbackData) ;
+		
+		return CSharp_Agent_RegisterForRunEvent(swigCPtr, (int)eventID, (IntPtr)agentHandle, jarg2, (IntPtr)callbackDataHandle) ;
 	}
 
 	[DllImport("CSharp_sml_ClientInterface")]

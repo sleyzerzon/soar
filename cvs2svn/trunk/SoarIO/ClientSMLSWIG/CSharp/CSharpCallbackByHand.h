@@ -42,8 +42,9 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterTestMethod(void * jarg1, unsig
 */
 
 typedef int	agentPtr ;
+typedef int	CallbackDataPtr ;
 
-typedef void (__stdcall *MyRunCallback)(agentPtr jagent, int eventID) ;
+typedef void (__stdcall *RunEventCallback)(agentPtr jagent, int eventID, CallbackDataPtr callbackData) ;
 
 /* Callback for deleting GCHandle objects from within C#, so we don't leak them. */
 typedef void (SWIGSTDCALL* CSharpHandleHelperCallback)(unsigned int);
@@ -60,7 +61,7 @@ public:
 	int				m_EventID ;
 	agentPtr		m_Agent ;
 	void*			m_CallbackFunction ;
-	unsigned int	m_CallbackData ;
+	CallbackDataPtr	m_CallbackData ;
 	int				m_CallbackID ;
 
 public:
@@ -78,7 +79,7 @@ public:
 	}
 } ;
 
-static CSharpCallbackData* CreateCSharpCallbackData(agentPtr jagent, int eventID, unsigned int callbackFunction, unsigned int callbackData)
+static CSharpCallbackData* CreateCSharpCallbackData(agentPtr jagent, int eventID, unsigned int callbackFunction, CallbackDataPtr callbackData)
 {
 	return new CSharpCallbackData(jagent, eventID, (void *)callbackFunction, callbackData) ;
 }
@@ -90,13 +91,13 @@ static void RunEventHandler(sml::smlRunEventId id, void* pUserData, sml::Agent* 
 	// The user data is the class we declared above, where we store the Java data to use in the callback.
 	CSharpCallbackData* pData = (CSharpCallbackData*)pUserData ;
 
-	MyRunCallback callback = (MyRunCallback)pData->m_CallbackFunction ;
+	RunEventCallback callback = (RunEventCallback)pData->m_CallbackFunction ;
 
 	// Now try to call back to CSharp
-	callback(pData->m_Agent, pData->m_EventID) ;
+	callback(pData->m_Agent, pData->m_EventID, pData->m_CallbackData) ;
 }
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int jarg2, agentPtr jagent, unsigned int jarg3)
+SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int jarg2, agentPtr jagent, unsigned int jarg3, CallbackDataPtr jdata)
 {
     // jarg1 is the C++ Agent object
 	sml::Agent *arg1 = *(sml::Agent **)&jarg1 ;
@@ -107,7 +108,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int ja
 	// jarg3 is the callback function
 
 	// Create the information we'll need to make a Java call back later
-	CSharpCallbackData* pData = CreateCSharpCallbackData(jagent, jarg2, jarg3, 0) ;
+	CSharpCallbackData* pData = CreateCSharpCallbackData(jagent, jarg2, jarg3, jdata) ;
 	
 	// Register our handler.  When this is called we'll call back to the client method.
 	pData->m_CallbackID = arg1->RegisterForRunEvent(arg2, &RunEventHandler, pData) ;
@@ -128,8 +129,9 @@ SWIGEXPORT bool SWIGSTDCALL CSharp_Agent_UnregisterForRunEvent(void* jarg1, int 
 	// Unregister our handler.
 	bool result = arg1->UnregisterForRunEvent(pData->m_CallbackID) ;
 
-	// Free the GCHandle created when the callback was registered
+	// Free the GCHandles created when the callback was registered
 	SWIG_csharp_deletehandle_callback(pData->m_Agent) ;
+	SWIG_csharp_deletehandle_callback(pData->m_CallbackData) ;
 
 	// Release the callback data
 	delete pData ;
