@@ -144,6 +144,7 @@ protected:
  	void			ResetRunCounters(egSKIRunType runStepSize) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
 	void			TestForFiringGeneratedOutputEvent() ;
+	void			TestForFiringOutputCompletedEvent();
 	bool			TestIfAllFinished(egSKIRunType runStepSize, unsigned long count) ;
 
 	AgentSML*		GetAgentToSynchronizeWith() ;
