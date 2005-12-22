@@ -44,7 +44,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Kernel_RegisterTestMethod(void * jarg1, unsig
 typedef int	agentPtr ;
 typedef int	CallbackDataPtr ;
 
-typedef void (__stdcall *RunEventCallback)(agentPtr jagent, int eventID, CallbackDataPtr callbackData) ;
+typedef void (__stdcall *RunEventCallback)(int eventID, CallbackDataPtr callbackData, agentPtr jagent, int phase) ;
 
 /* Callback for deleting GCHandle objects from within C#, so we don't leak them. */
 typedef void (SWIGSTDCALL* CSharpHandleHelperCallback)(unsigned int);
@@ -94,7 +94,7 @@ static void RunEventHandler(sml::smlRunEventId id, void* pUserData, sml::Agent* 
 	RunEventCallback callback = (RunEventCallback)pData->m_CallbackFunction ;
 
 	// Now try to call back to CSharp
-	callback(pData->m_Agent, pData->m_EventID, pData->m_CallbackData) ;
+	callback(pData->m_EventID, pData->m_CallbackData, pData->m_Agent, phase) ;
 }
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Agent_RegisterForRunEvent(void * jarg1, int jarg2, agentPtr jagent, unsigned int jarg3, CallbackDataPtr jdata)
