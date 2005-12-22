@@ -216,7 +216,9 @@ void soar_destroy_callback(soar_callback * cb)
   free((void *) cb);
 }
 
-inline void soar_invoke_callbacks (agent* thisAgent, 
+// voigtjr: removed inline in an attempt to quell linker error
+//inline void soar_invoke_callbacks (agent* thisAgent, 
+void soar_invoke_callbacks (agent* thisAgent, 
 				soar_callback_agent the_agent, 
 			    SOAR_CALLBACK_TYPE callback_type, 
 			    soar_call_data call_data)
