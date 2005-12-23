@@ -472,6 +472,9 @@ namespace gSKI
       // Tell the agent where to stop
       m_interruptFlags = stopLoc;
 
+	  // BUGBUG -- DJP: Temp code to add this agent as a run listener
+	  this->AddRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this) ;
+
       // If  we implement suspend, it goes in the run method, not
       //  here.
       m_suspendOnInterrupt = (stopType == gSKI_STOP_BY_SUSPENDING)? true: false;
@@ -1502,6 +1505,12 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
 	  }
    }
+
+	// Called when a "RunEvent" occurs in the kernel
+   void Agent::HandleEvent(egSKIRunEventId eventId, gSKI::IAgent* agentPtr, egSKIPhaseType phase)
+   {
+   }
+
    /*
    =========================
 	HandleRunEventCallback
@@ -1583,7 +1592,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    }
 
    // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events 
-   void Agent::HandleEvent(egSKIRunEventId eventId, Agent* a, egSKIPhaseType phase)
+   void Agent::HandleEventStatic(egSKIRunEventId eventId, Agent* a, egSKIPhaseType phase)
    {
 	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
  

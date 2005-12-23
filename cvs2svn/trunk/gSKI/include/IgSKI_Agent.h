@@ -45,7 +45,7 @@ namespace gSKI {
    *  working memory, the input and output links and loaded productions.
    *
    */
-   class IAgent {
+   class IAgent : public gSKI::IRunListener {
    public:
     
       /** 
@@ -1177,6 +1177,9 @@ namespace gSKI {
 
 	  /** Fire the gSKIEVENT_AFTER_RUN_ENDS event **/
 	  virtual void FireRunEndsEvent() = 0 ;
+
+	  // Called when a "RunEvent" occurs in the kernel
+	  virtual void HandleEvent(egSKIRunEventId eventId, gSKI::IAgent* agentPtr, egSKIPhaseType phase) = 0 ;
 	  
 	  // Multi-attribute related methods
    

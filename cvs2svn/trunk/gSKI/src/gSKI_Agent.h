@@ -1324,7 +1324,7 @@ namespace gSKI
 
 	  static void Agent::DeleteRunEventCallbackData (soar_callback_data);
 
-	  static void Agent::HandleEvent(egSKIRunEventId eventID, Agent* pAgent, egSKIPhaseType phase) ;
+	  static void Agent::HandleEventStatic(egSKIRunEventId eventID, Agent* pAgent, egSKIPhaseType phase) ;
 
 	  /** 
        * @brief Listener manager definitions 
@@ -1334,6 +1334,9 @@ namespace gSKI
       typedef ListenerManager<egSKIRunEventId, IRunListener, RunNotifier>       tRunListenerManager;
 	  typedef ListenerManager<egSKIXMLEventId, IXMLListener, XMLNotifier>       tXMLListenerManager;
       //}
+
+	  // Called when a "RunEvent" occurs in the kernel
+	  virtual void HandleEvent(egSKIRunEventId eventId, gSKI::IAgent* agentPtr, egSKIPhaseType phase) ;
 
    private:
 
