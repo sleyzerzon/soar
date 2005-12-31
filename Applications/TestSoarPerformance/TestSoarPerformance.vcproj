@@ -21,27 +21,25 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../ClientSML/include;../../ConnectionSML/include;../../ElementXML/include;..\..\KernelSML\include"
+				AdditionalIncludeDirectories="..\..\Core\ClientSML\include;..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include;..\..\Core\KernelSML\include"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\..\..\soar-library\$(ProjectName).exe"
+				OutputFile="..\..\SoarLibrary\bin\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				AssemblyDebug="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy TestSoarPerformance.soar ..\..\..\soar-library /Y
-copy count-test-5000.soarx ..\..\..\soar-library /Y"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -68,26 +66,23 @@ copy count-test-5000.soarx ..\..\..\soar-library /Y"/>
 			ManagedExtensions="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../ClientSML/include;../../ConnectionSML/include;../../ElementXML/include;..\..\KernelSML\include"
+				AdditionalIncludeDirectories="..\..\Core\ClientSML\include;..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include;..\..\Core\KernelSML\include"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\..\..\soar-library\$(ProjectName).exe"
+				OutputFile="..\..\SoarLibrary\bin\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy TestSoarPerformance.soar ..\..\..\soar-library /Y
-copy count-test-5000.soarx ..\..\..\soar-library /Y
-"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
