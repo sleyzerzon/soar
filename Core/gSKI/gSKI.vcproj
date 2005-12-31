@@ -22,7 +22,7 @@
 				AdditionalOptions="
 "
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)include&quot;;&quot;$(ProjectDir)lib_src\pcre-4.5&quot;;&quot;$(ProjectDir)..\SoarKernel\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)include&quot;;&quot;$(ProjectDir)lib_src\pcre-4.5&quot;;&quot;$(ProjectDir)..\Kernel\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;GSKI;NO_MEGA_UNIT_TESTS; _USRDLL;GSKI_DEBUG_RELEASE_IMPL"
 				GeneratePreprocessedFile="0"
 				KeepComments="FALSE"
@@ -44,7 +44,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\soar-library\$(ProjectName).dll"
+				OutputFile="&quot;$(ProjectDir)..\..\SoarLibrary\bin\$(ProjectName).dll&quot;"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="TRUE"
 				MapLines="TRUE"
@@ -82,7 +82,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)include&quot;;&quot;$(ProjectDir)lib_src\pcre-4.5&quot;;&quot;$(ProjectDir)..\SoarKernel\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)include&quot;;&quot;$(ProjectDir)lib_src\pcre-4.5&quot;;&quot;$(ProjectDir)..\Kernel\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;GSKI;NO_MEGA_UNIT_TESTS; _USRDLL"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
@@ -100,7 +100,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\soar-library\$(ProjectName).dll"
+				OutputFile="&quot;$(ProjectDir)..\..\SoarLibrary\bin\$(ProjectName).dll&quot;"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
