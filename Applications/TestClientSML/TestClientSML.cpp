@@ -1102,7 +1102,7 @@ bool TestSML(bool embedded, bool useClientThread, bool fullyOptimized, bool simp
 			}
 
 			std::string path = pKernel->GetLibraryLocation() ;
-			path += "../tests/testsml.soar" ;
+			path += "/../tests/testsml.soar" ;
 
 			// Listen to the echo of the load
 			int echoCallback = pAgent->RegisterForPrintEvent(smlEVENT_ECHO, &MyEchoEventHandler, NULL) ;
