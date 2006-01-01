@@ -2376,7 +2376,7 @@ public class RuleEditor extends CustomInternalFrame
     }//class SendFileToSoarAction
 
     // 3P
-    // Handles the "Runtime|Send File" menu item
+    // Handles the "Runtime|Send All Files" menu item
     class SendAllFilesToSoarAction extends AbstractAction
     {
         public SendAllFilesToSoarAction()
@@ -2429,7 +2429,7 @@ public class RuleEditor extends CustomInternalFrame
             String result = agent.ExecuteCommandLine("source " + "\"" + projectFilename + "\"", true) ;
 			MainFrame.getMainFrame().reportResult(result) ;
         }
-    }//class SendFileToSoarAction
+    }//class SendAllFilesToSoarAction
     
     // 3P
     // Handles the "Runtime|Matches Production" menu item

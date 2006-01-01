@@ -105,6 +105,7 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 	Action soarRuntimeInitAction = new SoarRuntimeInitAction();
 	Action soarRuntimeTermAction = new SoarRuntimeTermAction();
 	Action soarRuntimeSendRawCommandAction = new SoarRuntimeSendRawCommandAction();
+	Action soarRuntimeSendAllFilesAction = new SendAllFilesToSoarAction() ;
 
 	public Kernel getKernel()			{ return m_Kernel ; }
 	public String getActiveAgentName()  { return m_ActiveAgent ; }
@@ -562,8 +563,8 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 
     /**
      * When the Soar Runtime|Agent menu is selected, this listener
-     * populates the menu with the agents that are currently
-     * connected to via the STI.
+     * populates the menu with the agents that exist in the kernel
+     * we're currently connected to through SML.
      * @Author ThreePenny
      */
 	class SoarRuntimeAgentMenuListener extends MenuAdapter
@@ -627,61 +628,7 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 					
 				// Add the menu item
 				soarRuntimeAgentMenu.add(connectionMenuItem);	
-			}
-
-			
-			// Check to see if we have an STI connection
-			/*
-			SoarToolJavaInterface sti=GetSoarToolJavaInterface();
-			if (sti == null)
-			
-            {
-				// Add a "not connected" menu item
-				JMenuItem menuItem=new JMenuItem("<not connected>");
-				menuItem.setEnabled(false);
-				
-				soarRuntimeAgentMenu.add(menuItem);
-				return;
-			}
-			
-			// Get the connection names
-			String[] connectionNames=sti.GetConnectionNames();
-			
-			// If we don't have any connections then display the
-			// appropriate menu item.
-			if (connectionNames == null || connectionNames.length == 0)
-			
-            {
-				// Add the "no agents" menu item
-				JMenuItem menuItem=new JMenuItem("<no agents>");
-				menuItem.setEnabled(false);
-				
-				soarRuntimeAgentMenu.add(menuItem);
-				return;
-			}
-			
-			// Add each name
-			int i;
-			for (i=0; i < connectionNames.length; i++)
-			
-            {
-				// Get this connection name
-				String sConnectionName=connectionNames[i];
-				
-				// Create the connection menu and add a listener to it
-				// which contains the connection index.
-				JCheckBoxMenuItem connectionMenuItem=new JCheckBoxMenuItem(sConnectionName);
-				connectionMenuItem.addActionListener(
-                    new AgentConnectionActionListener(connectionMenuItem, sConnectionName));
-				
-				// Set the state based on whether or not we are connected to this agent
-				boolean bConnected=sti.IsConnectionEnabledByName(sConnectionName);
-				connectionMenuItem.setState(bConnected);
-
-				// Add the menu item
-				soarRuntimeAgentMenu.add(connectionMenuItem);	
-			}
-			*/
+			}			
 		}
 	}
 
@@ -736,6 +683,7 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 		// Add the menu items
 		JMenuItem connectMenuItem=soarRuntimeMenu.add(soarRuntimeInitAction);
 		JMenuItem disconnectMenuItem=soarRuntimeMenu.add(soarRuntimeTermAction);
+		JMenuItem sendAllFilesMenuItem=soarRuntimeMenu.add(soarRuntimeSendAllFilesAction);
 		JMenuItem sendRawCommandMenuItem=soarRuntimeMenu.add(soarRuntimeSendRawCommandAction);
 			
 		// Build the "Connected Agents" menu
@@ -750,6 +698,7 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 		// Set the mnemonics
 		connectMenuItem.setMnemonic('C');
 		disconnectMenuItem.setMnemonic('D');
+		sendAllFilesMenuItem.setMnemonic('S');
 		sendRawCommandMenuItem.setMnemonic('R');
 		soarRuntimeAgentMenu.setMnemonic('A');
 
@@ -1622,6 +1571,7 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 			soarRuntimeInitAction.setEnabled(true);	// Allow us to try again later
 			soarRuntimeSendRawCommandAction.setEnabled(false);
 			soarRuntimeAgentMenu.setEnabled(false);
+			soarRuntimeSendAllFilesAction.setEnabled(false) ;
             
 			return false ;
 		}
@@ -1637,6 +1587,7 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 		soarRuntimeInitAction.setEnabled(false);
 		soarRuntimeSendRawCommandAction.setEnabled(true);
 		soarRuntimeAgentMenu.setEnabled(true);
+		soarRuntimeSendAllFilesAction.setEnabled(true) ;
 		
 		return true ;
 	}
@@ -1669,6 +1620,7 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 		soarRuntimeInitAction.setEnabled(true);
 		soarRuntimeSendRawCommandAction.setEnabled(false);
 		soarRuntimeAgentMenu.setEnabled(false);
+		soarRuntimeSendAllFilesAction.setEnabled(false) ;
 	}
 
 
@@ -1695,7 +1647,50 @@ public class MainFrame extends JFrame implements Kernel.StringEventInterface
 		}	
 	}
 	
+    // Handles the "Runtime|Send All Files" menu item
+    class SendAllFilesToSoarAction extends AbstractAction
+    {
+        public SendAllFilesToSoarAction()
+        {
+            super("Send All Files");
+			setEnabled(false);
+        }
 
+        public void actionPerformed(ActionEvent e)
+        {
+            // Get the agent
+        	Agent agent = MainFrame.getMainFrame().getActiveAgent() ;
+            if (agent == null)
+            {
+                JOptionPane.showMessageDialog(MainFrame.this,"Not connected to an agent.","Error",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Generate the path to the top level source file
+            OperatorRootNode root = (OperatorRootNode)(operatorWindow.getModel().getRoot());
+            
+            if (root == null)
+            {
+            	System.out.println("Couldn't find the top level project node") ;
+            	return ;
+            }
+            
+            String projectFilename = root.getProjectFile() ;	// Includes .vsa
+            
+            // Swap the extension from .vsa to .soar
+            projectFilename = projectFilename.replaceFirst(".vsa", ".soar") ;
+            
+            // Call source in Soar
+            String result = agent.ExecuteCommandLine("source " + "\"" + projectFilename + "\"", true) ;
+            
+            if (!agent.GetLastCommandLineResult())
+            	result = agent.GetLastErrorDescription() ;
+            
+			MainFrame.getMainFrame().reportResult(result) ;
+        }
+    }//class SendFileToSoarAction
+
+	
     /**
      * Handles Soar Runtime|Send Raw Command menu option
      * @author ThreePenny
