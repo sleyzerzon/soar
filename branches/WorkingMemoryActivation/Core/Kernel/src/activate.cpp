@@ -162,23 +162,26 @@
       WMEs that support it.
 */
 
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+#include "portability.h"
 
-#include "activate.h"
-#include "../include/gsysparam.h"
-#include "../include/agent.h"
-#include "../include/explain.h"
-#include "../include/rete.h"
-#include "../include/decide.h"
-#include "../include/production.h"
+#ifndef GSYSPARAMS_H
+#include"gsysparam.h"
+#endif
+
+ #include "kernel.h"
+#include "agent.h"
+#include "explain.h"
+#include "rete.h"
+//  #include "gdatastructs.h"
+#include "decide.h"
+//  #include "production.h"
 #include "prefmem.h"
 #include "print.h"
-#include "gski_event_system_functions.h"
-
-
-
+//  #include "gski_event_system_functions.h"
+#include "activate.h"
 
 #ifdef SOAR_WMEM_ACTIVATION
 
