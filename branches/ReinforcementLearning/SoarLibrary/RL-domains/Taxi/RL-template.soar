@@ -1,0 +1,84 @@
+sp {RL*putdown
+  :template
+(state <s> ^superoperator.name put ^info-link <i> ^operator <o> +)
+(<i> ^destination <dest> ^x-coor <x> ^y-coor <y>)
+(<o> ^name putdown)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*pickup
+  :template
+(state <s> ^superoperator.name get ^info-link <i> ^operator <o> +)
+(<i> ^destination <dest> ^x-coor <x> ^y-coor <y>)
+(<o> ^name pickup)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*taxi*put
+  :template
+(state <s> ^task taxi ^info-link <i> ^operator <o> +)
+(<o> ^name put)
+(<i>  ^destination <dest> ^x-coor <x> ^y-coor <y>)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*taxi*get
+  :template
+(state <s> ^task taxi ^info-link <i> ^operator <o> +)
+(<o> ^name get)
+(<i> ^passenger <pass> ^destination <dest> ^x-coor <x> ^y-coor <y>)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*Nav*west
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-west)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*Nav*east
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-east)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*Nav*north
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-north)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*Nav*south
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-south)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*get*navigate
+:template
+(state <s> ^superoperator.name get ^info-link <i> ^operator <o> +)
+(<o> ^name navigate)
+(<i> ^x-coor <x> ^y-coor <y> ^passenger <pass>)
+-->
+(<s> ^operator <o> = 0)}
+
+sp {RL*put*navigate
+:template
+(state <s> ^superoperator.name put ^info-link <i> ^operator <o> +)
+(<o> ^name navigate)
+(<i> ^x-coor <x> ^y-coor <y> ^destination <dest>)
+-->
+(<s> ^operator <o> = 0)}
+

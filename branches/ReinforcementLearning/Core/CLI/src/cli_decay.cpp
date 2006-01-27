@@ -6,6 +6,8 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#ifdef SOAR_WMEM_ACTIVATION
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif // HAVE_CONFIG_H
@@ -551,3 +553,5 @@ bool CommandLineInterface::DoDecay(gSKI::IAgent* pAgent,
 
     return true;
 }
+
+#endif

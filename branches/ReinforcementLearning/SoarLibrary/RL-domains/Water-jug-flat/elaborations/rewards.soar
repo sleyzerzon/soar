@@ -1,0 +1,15 @@
+#sp {Reward*for*full*jar
+#(state <s> ^name water-jug
+#	   ^reward-link <r>
+#	   ^jug <j>)
+#(<j> ^empty 0)
+#-->
+#(<r> ^reward.value 1)}
+
+sp {water-jug*reward*goal*achieved
+   (state <s> ^name water-jug
+              ^jug <j>
+              ^reward-link <r>)
+   (<j> ^volume 3 ^contents 1)
+-->
+   (<r> ^reward.value 1)}

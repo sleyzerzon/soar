@@ -36,7 +36,7 @@
 using namespace cli;
 using namespace sml;
 
-std::ostringstream CommandLineInterface::m_Result;	
+std::ostringstream CommandLineInterface::m_Result;
 
 EXPORT CommandLineInterface::CommandLineInterface() {
 
@@ -46,7 +46,9 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIAttributePreferencesMode]	= &cli::CommandLineInterface::ParseAttributePreferencesMode;
 	m_CommandMap[Commands::kCLICD]							= &cli::CommandLineInterface::ParseCD;
 	m_CommandMap[Commands::kCLIChunkNameFormat]				= &cli::CommandLineInterface::ParseChunkNameFormat;
+#ifdef SOAR_WMEM_ACTIVATION
 	m_CommandMap[Commands::kCLIDecay]                       = &cli::CommandLineInterface::ParseDecay;
+#endif
 	m_CommandMap[Commands::kCLIDefaultWMEDepth]				= &cli::CommandLineInterface::ParseDefaultWMEDepth;
 	m_CommandMap[Commands::kCLIDirs]						= &cli::CommandLineInterface::ParseDirs;
 	m_CommandMap[Commands::kCLIEcho]						= &cli::CommandLineInterface::ParseEcho;
@@ -54,6 +56,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIEditProduction]				= &cli::CommandLineInterface::ParseEditProduction;
 	m_CommandMap[Commands::kCLIExcise]						= &cli::CommandLineInterface::ParseExcise;
 	m_CommandMap[Commands::kCLIExplainBacktraces]			= &cli::CommandLineInterface::ParseExplainBacktraces;
+	m_CommandMap[Commands::kCLIExploration]			 	    = &cli::CommandLineInterface::ParseExploration;
 	m_CommandMap[Commands::kCLIFiringCounts]				= &cli::CommandLineInterface::ParseFiringCounts;
 	m_CommandMap[Commands::kCLIGDSPrint]					= &cli::CommandLineInterface::ParseGDSPrint;
 	m_CommandMap[Commands::kCLIHelp]						= &cli::CommandLineInterface::ParseHelp;
@@ -82,6 +85,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIQuit]						= &cli::CommandLineInterface::ParseQuit;
 	m_CommandMap[Commands::kCLIRemoveWME]					= &cli::CommandLineInterface::ParseRemoveWME;
 	m_CommandMap[Commands::kCLIReteNet]						= &cli::CommandLineInterface::ParseReteNet;
+	m_CommandMap[Commands::kCLIRL]						    = &cli::CommandLineInterface::ParseRL;
 	m_CommandMap[Commands::kCLIRun]							= &cli::CommandLineInterface::ParseRun;
 	m_CommandMap[Commands::kCLISaveBacktraces]				= &cli::CommandLineInterface::ParseSaveBacktraces;
 	m_CommandMap[Commands::kCLISetLibraryLocation]			= &cli::CommandLineInterface::ParseSetLibraryLocation;
@@ -299,16 +303,16 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 
 	// reset state
 	m_Result.str("");
-	m_ResponseTags.clear();	
-	m_LastError = CLIError::kNoError;	
-	m_LastErrorDetail.clear();			
+	m_ResponseTags.clear();
+	m_LastError = CLIError::kNoError;
+	m_LastErrorDetail.clear();
 	gSKI::ClearError(&m_gSKIError);
 }
 
-/************************************************************* 	 
+/*************************************************************
 * @brief Echo the given string through the smlEVENT_ECHO event
 *		 if the call requested that commands be echoed.
-*************************************************************/ 	 
+*************************************************************/
 void CommandLineInterface::EchoString(sml::Connection* pConnection, char const* pString)
 {
 	if (!m_EchoResult)
@@ -341,7 +345,7 @@ EXPORT bool CommandLineInterface::ExpandCommand(sml::Connection* pConnection, co
 	if (!argv.empty())
 	{
 		m_Aliases.Translate(argv);
-		
+
 		// 3) Reassemble the command line
 		for (unsigned int i = 0 ; i < argv.size() ; i++)
 		{
@@ -428,7 +432,7 @@ bool CommandLineInterface::DoCommandInternal(gSKI::IAgent* pAgent, vector<string
 				SetErrorDetail("(No such command: " + argv[0] + ")");
 				return SetError(CLIError::kCommandNotImplemented);
 
-			} 
+			}
 		}
 
 		if (!exactMatch) {
@@ -459,7 +463,7 @@ bool CommandLineInterface::DoCommandInternal(gSKI::IAgent* pAgent, vector<string
 	// Process command
 	CommandFunction pFunction = m_CommandMap[argv[0]];
 	assert(pFunction);
-	
+
 	// Initialize option parsing each call
 	ResetOptions();
 
@@ -489,7 +493,7 @@ int CommandLineInterface::Tokenize(string cmdline, vector<string>& argumentVecto
 			cmdline.erase(iter);
 
 			if (!cmdline.length()) break; //Nothing but space left
-			
+
 			// Next character
 			iter = cmdline.begin();
 		}
@@ -604,7 +608,7 @@ bool CommandLineInterface::GetCurrentWorkingDirectory(string& directory) {
 
 bool CommandLineInterface::IsInteger(const string& s) {
 	string::const_iterator iter = s.begin();
-	
+
 	// Allow negatives
 	if (s.length() > 1) {
 		if (*iter == '-') {
@@ -624,7 +628,7 @@ bool CommandLineInterface::IsInteger(const string& s) {
 bool CommandLineInterface::IsFloat(const string& s) {
 	string::const_iterator iter = s.begin();
     bool bDecimal = false;
-	
+
 	// Allow negatives
 	if (s.length() > 1) {
 		if (*iter == '-') {
@@ -643,7 +647,7 @@ bool CommandLineInterface::IsFloat(const string& s) {
 		}
 		++iter;
 	}
-    
+
 	return bDecimal;
 }
 
@@ -727,7 +731,7 @@ bool CommandLineInterface::StripQuotes(std::string& str) {
 
 void CommandLineInterface::ResetOptions() {
 	m_Argument = 0;
-	m_NonOptionArguments = 0;	
+	m_NonOptionArguments = 0;
 }
 
 bool CommandLineInterface::ProcessOptions(std::vector<std::string>& argv, Options* options) {
@@ -792,7 +796,7 @@ bool CommandLineInterface::ProcessOptions(std::vector<std::string>& argv, Option
 						if (!possibilities.size()) {
 							SetErrorDetail("No such m_Option: " + longOption);
 							return SetError(CLIError::kUnrecognizedOption);
-						} 
+						}
 					}
 
 					if (possibilities.size() != 1) {
@@ -896,7 +900,7 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 					if (argv[m_Argument][0] != '-') {
 						m_OptionArgument = argv[m_Argument];
 						MoveBack(argv, m_Argument, m_NonOptionArguments);
-					} 
+					}
 				}
 			}
 			if (!m_OptionArgument.size()) {

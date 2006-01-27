@@ -1,0 +1,7 @@
+RL --gamma 1.0
+learn --off
+
+source elaborations.soar
+source primitive-ops.soar
+source rewards.soar
+source RL-template.soar

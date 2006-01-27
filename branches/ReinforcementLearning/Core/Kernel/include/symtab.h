@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION. 
+ * FOR LICENSE AND COPYRIGHT INFORMATION.
  *************************************************************************/
 
 /* =======================================================================
@@ -20,7 +20,7 @@
       symbol_type:  indicates which of the five kinds of symbols this is
       reference_count:  current reference count for this symbol
       hash_id:  used for hash functions in the rete (and elsewhere)
-      
+
    Fields on symbolic constants:
       name:  points to null-terminated string giving its name
       production:  points to a production structure, or NIL if there is
@@ -58,11 +58,11 @@
        allow_bottom_up_chunks:  Used for bottom-up chunking, and only on goal
          identifiers.  This is TRUE iff no chunk has yet been built for a
          subgoal of this goal.
-        
+
        could_be_a_link_from_below:  TRUE if there might be a link to this id
          from some other id lower in the goal stack.
 
-       did_PE: 
+       did_PE:
 
        level:  current goal_stack_level of this id
 
@@ -78,7 +78,7 @@
        slots:  this is the header for a dll of the slots for this id.
 
        tc_num:  used for transitive closures, marking id's, etc.
- 
+
        variablization:  used by the chunker when variablizing chunks--this
          points to the variable to which this id gets changed
 
@@ -92,6 +92,11 @@
        preferences_from_goal:  for goals, this is the header of the dll
          of all preferences supported by this goal.  This is needed so
          we can remove o-supported preferences when the goal goes away.
+
+       RL_data: (RL) for goals, stores info between cycles
+ 	      needed to perform Bellman update at this goal level
+ 	   reward_header: (RL) for goals, pointer to reward-link identifier,
+	      used to find rewards placed in WM
 
        gds: pointer to a goal's dependency set
        saved_firing_type: the firing type that must be restored if
@@ -225,6 +230,10 @@ typedef struct identifier_struct {
   struct slot_struct *operator_slot;
   struct preference_struct *preferences_from_goal;
 
+  /* --- fields used for reinforcement learning - only on goals --- */
+  struct RL_data_struct *RL_data;
+  union symbol_union *reward_header;
+
   /* REW: begin 09.15.96 */
   struct gds_struct *gds;    /* Pointer to a goal's dependency set */
   /* REW: begin 09.15.96 */
@@ -298,13 +307,13 @@ typedef union symbol_union {
 
      Reset_id_and_variable_tc_numbers() resets the tc_num field of every
      existing id and variable to 0.
-     
+
      Reset_variable_gensym_numbers() resets the gensym_number field of
      every existing variable to 0.
-     
+
      Print_internal_symbols() just prints a list of all existing symbols.
      (This is useful for debugging memory leaks.)
-     
+
      Generate_new_sym_constant() is used to gensym new symbols that are
      guaranteed to not already exist.  It takes two arguments: "prefix"
      (the desired prefix of the new symbol's name), and "counter" (a
@@ -343,10 +352,10 @@ extern Symbol *generate_new_sym_constant (agent* thisAgent, char *prefix,unsigne
   if ((x)->common.reference_count == 0) \
   deallocate_symbol(thisAgent, x); \
   }
- 
+
 #else
 
-inline void symbol_add_ref(Symbol * x) 
+inline void symbol_add_ref(Symbol * x)
 {
    (x)->common.reference_count++;
 }
@@ -366,7 +375,7 @@ inline void symbol_remove_ref(agent* thisAgent, Symbol * x)
    Certain symbols are used so frequently that we create them at
    system startup time and never deallocate them.  These symbols are
    global variables (per-agent) and are named xxx_symbol (see glob_vars.h).
-   
+
    Create_predefined_symbols() should be called to do the creation.
    After that, the global variables can be accessed freely.  Note that
    the reference counts on these symbols should still be updated--
