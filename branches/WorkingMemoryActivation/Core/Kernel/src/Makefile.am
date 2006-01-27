@@ -5,6 +5,7 @@
 noinst_LTLIBRARIES = libSoarKernel.la
 
 libSoarKernel_la_SOURCES = \
+activate.cpp\
 agent.cpp\
 backtrace.cpp\
 callback.cpp\

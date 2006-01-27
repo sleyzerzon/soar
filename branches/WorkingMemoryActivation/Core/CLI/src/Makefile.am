@@ -13,6 +13,7 @@ cli_alias.cpp\
 cli_attributepreferencesmode.cpp\
 cli_cd.cpp\
 cli_chunknameformat.cpp\
+cli_decay.cpp\
 cli_defaultwmedepth.cpp\
 cli_dirs.cpp\
 cli_echo.cpp\
