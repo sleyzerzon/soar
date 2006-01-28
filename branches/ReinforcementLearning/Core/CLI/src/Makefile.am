@@ -7,13 +7,13 @@ noinst_LTLIBRARIES = libCommandLineInterface.la
 libCommandLineInterface_la_SOURCES = \
 cli_Aliases.cpp\
 cli_CommandLineInterface.cpp\
-cli_Constants.cpp\
-cli_Interface.cpp\
+cli_Commands.cpp\
 cli_addwme.cpp\
 cli_alias.cpp\
 cli_attributepreferencesmode.cpp\
 cli_cd.cpp\
 cli_chunknameformat.cpp\
+cli_decay.cpp\
 cli_defaultwmedepth.cpp\
 cli_dirs.cpp\
 cli_echo.cpp\
@@ -21,6 +21,7 @@ cli_echocommands.cpp\
 cli_editproduction.cpp\
 cli_excise.cpp\
 cli_explainbacktraces.cpp\
+cli_exploration.cpp\
 cli_firingcounts.cpp\
 cli_gdsprint.cpp\
 cli_help.cpp\
@@ -49,6 +50,7 @@ cli_pwd.cpp\
 cli_quit.cpp\
 cli_removewme.cpp\
 cli_retenet.cpp\
+cli_RL.cpp\
 cli_run.cpp\
 cli_savebacktraces.cpp\
 cli_setlibrarylocation.cpp\
@@ -57,6 +59,7 @@ cli_soar8.cpp\
 cli_soarnews.cpp\
 cli_source.cpp\
 cli_sp.cpp\
+cli_srand.cpp\
 cli_stats.cpp\
 cli_stopsoar.cpp\
 cli_time.cpp\

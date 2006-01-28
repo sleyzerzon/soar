@@ -5,6 +5,7 @@
 noinst_LTLIBRARIES = libSoarKernel.la
 
 libSoarKernel_la_SOURCES = \
+activate.cpp\
 agent.cpp\
 backtrace.cpp\
 callback.cpp\
@@ -23,10 +24,12 @@ prefmem.cpp\
 print.cpp\
 production.cpp\
 recmem.cpp\
+reinforcement_learning.cpp\
 reorder.cpp\
 rete.cpp\
 rhsfun.cpp\
 rhsfun_math.cpp\
+soar_rand.cpp\
 symtab.cpp\
 tempmem.cpp\
 trace.cpp\

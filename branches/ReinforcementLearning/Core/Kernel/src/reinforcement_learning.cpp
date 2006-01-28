@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h> // NAG: mem.h included indirectly below references malloc etc., req'd to build on linux
 #include "portability.h"
 #include "reinforcement_learning.h"
 #include "rhsfun.h"
