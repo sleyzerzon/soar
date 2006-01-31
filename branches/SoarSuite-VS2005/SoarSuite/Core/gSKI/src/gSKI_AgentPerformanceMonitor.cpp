@@ -24,9 +24,9 @@ using namespace gSKI;
 // a hack so I don't have to rewrite all the current_agent code below...
 #define current_agent(x) a->x
 
-// For some reason the SoarTech version of the kernel doesn't seem to have sys_sleep...
 #ifdef WIN32 
-#define sys_sleep( seconds )    _sleep( seconds )
+// Sleep on windows is in milliseconds, hence the multiplication by 1000
+#define sys_sleep( seconds )    Sleep( seconds * 1000 )
 #else /* WIN32 */
 #include <unistd.h>
 #define sys_sleep( seconds )    sleep( seconds )

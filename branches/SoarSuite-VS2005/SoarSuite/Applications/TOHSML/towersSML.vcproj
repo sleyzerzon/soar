@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="towersSML"
 	ProjectGUID="{3B7AC15A-ECCD-49CF-86D9-D813D2ABE979}"
+	RootNamespace="towersSML"
 	>
 	<Platforms>
 		<Platform
@@ -42,6 +43,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\Core\ClientSML\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
@@ -137,6 +139,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\Core\ClientSML\include"
@@ -207,12 +210,15 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{3EDBED11-A1B3-4E00-8B6E-652523D482F0}"
+			RelativePathToProject=".\Core\ClientSML\ClientSML.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{161DC1AD-FB4B-4370-9FD5-B02E2A0D8A36}"
+			RelativePathToProject=".\Core\ConnectionSML\ConnectionSML.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{E9AB0B6E-F1CA-4A63-817B-AB47F7E5417E}"
+			RelativePathToProject=".\Core\ElementXML\ElementXML.vcproj"
 		/>
 	</References>
 	<Files>

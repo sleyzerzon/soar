@@ -40,6 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="include;..\ElementXML\include;..\ClientSML\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;DEBUG"
@@ -110,6 +111,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				OmitFramePointers="true"

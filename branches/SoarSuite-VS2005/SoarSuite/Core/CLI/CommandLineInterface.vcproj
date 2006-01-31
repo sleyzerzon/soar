@@ -41,6 +41,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="include;..\gSKI\include;..\ElementXML\include;..\ConnectionSML\include;..\KernelSML\include;..\ClientSML\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;KERNELSML_EXPORTS;DEBUG"
@@ -113,6 +114,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				OmitFramePointers="true"
@@ -162,9 +164,11 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{161DC1AD-FB4B-4370-9FD5-B02E2A0D8A36}"
+			RelativePathToProject=".\Core\ConnectionSML\ConnectionSML.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{E9AB0B6E-F1CA-4A63-817B-AB47F7E5417E}"
+			RelativePathToProject=".\Core\ElementXML\ElementXML.vcproj"
 		/>
 		<AssemblyReference
 			RelativePath="mscorlib.dll"

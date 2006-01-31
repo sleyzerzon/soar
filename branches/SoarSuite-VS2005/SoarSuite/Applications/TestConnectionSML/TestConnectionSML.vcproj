@@ -40,6 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
@@ -123,6 +124,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				AdditionalIncludeDirectories="..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
@@ -185,9 +187,11 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{161DC1AD-FB4B-4370-9FD5-B02E2A0D8A36}"
+			RelativePathToProject=".\Core\ConnectionSML\ConnectionSML.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{E9AB0B6E-F1CA-4A63-817B-AB47F7E5417E}"
+			RelativePathToProject=".\Core\ElementXML\ElementXML.vcproj"
 		/>
 	</References>
 	<Files>
