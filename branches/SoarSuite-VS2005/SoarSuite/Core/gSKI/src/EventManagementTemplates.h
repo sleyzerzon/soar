@@ -127,15 +127,17 @@ namespace gSKI
             // Just for convenience, we get a reference to the list
             tListenerVector& listenerVec = (*itMap).second;
 
-            tListenerVectorIt itVec;
+            tListenerVectorIt itVec = listenerVec.begin();
             tListenerVectorIt itEND = listenerVec.end();
-            for(itVec= listenerVec.begin(); itVec != itEND; ++itVec)
-            {
-               notifier(eventId, *itVec);
-               
+			tListener* listenerTemp = 0;
+			bool done = false;
+			while (!done) {
+				listenerTemp = *itVec;
+				++itVec;
+				done = (itVec == itEND);
+	            notifier(eventId, listenerTemp);
                // Do a check for stop here!
-
-            }
+			}
          }
 
          // Do a stop after all callbacks here!
