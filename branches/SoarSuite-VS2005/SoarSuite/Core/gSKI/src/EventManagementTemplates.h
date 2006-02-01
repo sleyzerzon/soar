@@ -130,7 +130,7 @@ namespace gSKI
             tListenerVectorIt itVec = listenerVec.begin();
             tListenerVectorIt itEND = listenerVec.end();
 			tListener* listenerTemp = 0;
-			bool done = false;
+			bool done = (itVec == itEND);
 			while (!done) {
 				listenerTemp = *itVec;
 				++itVec;
@@ -155,15 +155,18 @@ namespace gSKI
             // Just for convenience, we get a reference to the list
             tListenerVector& listenerVec = (*itMap).second;
 
-            tListenerVectorIt itVec;
+            tListenerVectorIt itVec = listenerVec.begin();
             tListenerVectorIt itEND = listenerVec.end();
-            for(itVec= listenerVec.begin(); itVec != itEND; ++itVec)
-            {
-               result = notifier(eventId, *itVec);
-               
-			   if (result)
-				   return result ;
-            }
+			tListener* listenerTemp = 0;
+			bool done = (itVec == itEND);
+			while (!done) {
+				listenerTemp = *itVec;
+				++itVec;
+				done = (itVec == itEND);
+	            result = notifier(eventId, listenerTemp);
+				if (result)
+					return result ;
+			}
          }
 
 		 return result ;
