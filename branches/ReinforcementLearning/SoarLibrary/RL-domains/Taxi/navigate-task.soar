@@ -1,14 +1,4 @@
-sp {reject
-  (state <s> ^operator <o> +)
-  (<o> ^result failure)
-  -->
-  (<s> ^operator <o> -)}
-  
-sp {halt*success
-  (state <s> ^task taxi ^info-link <i>)
-  (<i> ^passenger <p> ^destination <p>)
- -->
-  (halt)}
+################ Primitive ops ##########################
 
 ################# East #########################
 
@@ -205,40 +195,41 @@ sp {apply*north*wall
  -->
    (<o> ^result failure)}
    
-  
    
+#################### RL templates ############################
 
-   
+sp {RL*Nav*west
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-west)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}
 
-   
+sp {RL*Nav*east
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-east)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}
 
-   
+sp {RL*Nav*north
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-north)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}
 
-   
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
-
-   
+sp {RL*Nav*south
+:template
+(state <s> ^superoperator <so> ^info-link <i> ^operator <o> +)
+(<i> ^x-coor <x> ^y-coor <y>)
+(<o> ^name move-south)
+(<so> ^name navigate ^to <to>)
+-->
+(<s> ^operator <o> = 0)}

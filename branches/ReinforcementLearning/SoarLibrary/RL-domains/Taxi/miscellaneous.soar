@@ -1,0 +1,66 @@
+sp {elaborate*taxi
+  (state <s> ^superstate nil)
+  -->
+  (<s> ^task taxi)}
+  
+sp {elaborate*at*zoo
+  (state <s> ^info-link <i>)
+  (<i> ^x-coor 4 ^y-coor 4)
+  -->
+  (<i> ^location zoo)}
+  
+sp {elaborate*at*library
+  (state <s> ^info-link <i>)
+  (<i> ^x-coor 3 ^y-coor 0)
+  -->
+  (<i> ^location library)}
+  
+sp {elaborate*at*hospital
+  (state <s> ^info-link <i>)
+  (<i> ^x-coor 0 ^y-coor 0)
+-->
+  (<i> ^location hospital)}
+  
+sp {elaborate*at*airport
+  (state <s> ^info-link <i>)
+  (<i> ^x-coor 0 ^y-coor 4)
+-->
+  (<i> ^location airport)}
+  
+sp {state*copy
+  (state <s> ^superstate <s1>)
+  (<s1> ^info-link <i>)
+  -->
+  (<s> ^info-link <i>)}
+  
+ sp {elaborate*state
+   (state <s> ^impasse no-change ^attribute operator ^superstate <s1>)
+   (<s1> ^operator <o>)
+   -->
+   (<s> ^superoperator <o>)}
+   
+sp {reject
+  (state <s> ^operator <o> +)
+  (<o> ^result failure)
+  -->
+  (<s> ^operator <o> -)}
+  
+sp {halt*success
+  (state <s> ^task taxi ^info-link <i>)
+  (<i> ^passenger <p> ^destination <p>)
+ -->
+  (halt)}
+
+sp {propose*initialize
+  (state <s> ^task taxi -^info-link)
+  -->
+  (<s> ^operator <o> +)
+  (<o> ^name initialize)}
+  
+sp {apply*initialize
+  (state <s> ^operator <o>)
+  (<o> ^name initialize)
+ -->
+  (<s> ^info-link <i>)
+  (<i> ^x-coor 0 ^y-coor 0
+       ^passenger zoo ^destination library)}
