@@ -23,14 +23,14 @@ public class EatersSimulation {
 		m_Logger.log(m_Settings.getCommandLine());
 
 		// Initialize Soar
-		m_Document.init();
+		//m_Document.init();
 		
 		// Generate base path
 		m_BasePath = new String(m_Document.getLibraryLocation());
 		m_BasePath += System.getProperty("file.separator")
 		+ ".." + System.getProperty("file.separator") 
-		+ m_Settings.kGroupFolder + System.getProperty("file.separator") 
-		+ m_Settings.kProjectFolder + System.getProperty("file.separator");
+		+ EatersSettings.kGroupFolder + System.getProperty("file.separator") 
+		+ EatersSettings.kProjectFolder + System.getProperty("file.separator");
 
 		// Load default map
 		String mapFile = getMapPath() + m_Settings.getMap();
@@ -39,15 +39,11 @@ public class EatersSimulation {
 	}
 	
 	public String getAgentPath() {
-		return m_BasePath + m_Settings.kAgentFolder + System.getProperty("file.separator");
+		return m_BasePath + EatersSettings.kAgentFolder + System.getProperty("file.separator");
 	}
 	
 	public String getMapPath() {
-		return m_BasePath + m_Settings.kMapFolder + System.getProperty("file.separator");
-	}	
-	
-	public String getDataPath() {
-		return m_BasePath + m_Settings.kDataFolder + System.getProperty("file.separator");
+		return m_BasePath + EatersSettings.kMapFolder + System.getProperty("file.separator");
 	}	
 	
 	public EatersSettings getSettings() {

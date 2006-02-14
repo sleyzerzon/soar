@@ -11,7 +11,6 @@ public class EatersSettings {
 	public static final String kProjectFolder = "JavaEaters";
 	public static final String kAgentFolder = "agents";
 	public static final String kMapFolder = "maps";
-	public static final String kDataFolder = "data";
 	public static final String kSoarExt = ".soar";
 	public static final String kSeaterExt = ".seater";
 	public static final String kDefaultMap = "default.emap";
