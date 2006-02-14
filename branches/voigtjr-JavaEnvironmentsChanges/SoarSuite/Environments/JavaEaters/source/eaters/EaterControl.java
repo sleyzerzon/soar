@@ -29,91 +29,13 @@ public class EaterControl extends SimulationControl {
 		generateBasePath(m_Settings.FOLDER_NAME);
 		
 		if (m_Settings.map == null) {
-			generateMap();
+			//generateMap();
 		} else {
 			loadMap(new File(m_Settings.map));
 		}		
 	}
 	
-	/**
-	 * Generates the map to be used by EaterControl, filling every #BonusFoodColumns
-	 * column with bonusfood (or at least the integer), and creating walls randomly
-	 * but with probability defined by Probability. No walls are created diagonal to
-	 * any others, but walls that will be adjacent to others have probability defined
-	 * by BetterProbability of being created.
-	 */
-	private void generateMap() {
-		int width = m_Settings.MAP_WIDTH;
-		int height = m_Settings.MAP_HEIGHT;
-		
-		EatersSquare wall = new EatersWall();
-
-		for (int x = 0; x < width; x++) {
-			map[x][0] = map[x][height - 1] = wall;
-		}
-		for (int y = 1; y < height - 1; y++) {
-			map[0][y] = map[width - 1][y] = wall;
-		}
-		
-		// Clear old map
-		NormalFood normal = new NormalFood(m_Settings.NORMAL_FOOD_WORTH);
-		for (int x = 1; x < width - 1; x++) {
-			for (int y = 1; y < height - 1; y++) {
-				map[x][y] = normal;
-			}
-		}
-		
-		double probability = m_Settings.PROBABILITY;
-		for (int x = 2; x < width - 2; x++) {
-			for (int y = 2; y < height - 2; y++) {
-				if (!(map[x + 1][y + 1] instanceof EatersWall)
-						&& !(map[x - 1][y - 1] instanceof EatersWall)
-						&& !(map[x + 1][y - 1] instanceof EatersWall)
-						&& !(map[x - 1][y + 1] instanceof EatersWall)) {
-					if ((map[x + 1][y] instanceof EatersWall)
-							|| (map[x][y + 1] instanceof EatersWall)
-							|| (map[x - 1][y] instanceof EatersWall)
-							|| (map[x][y - 1] instanceof EatersWall)) {
-						probability = m_Settings.BETTER_PROBABILITY;
-					}
-					if (random.nextDouble() < probability) {
-						map[x][y] = wall;
-					}
-					probability = m_Settings.PROBABILITY;
-				}
-			}
-		}
-		fillFoods();
-	}	
-	
-	private void fillFoods() {
-		NormalFood normal = new NormalFood(m_Settings.NORMAL_FOOD_WORTH);
-		BonusFood bonus = new BonusFood(m_Settings.BONUS_FOOD_WORTH);
-		
-		foodCount = 0;
-		for (int x = 1; x < m_Settings.MAP_WIDTH - 1; x++) {
-			for (int y = 1; y < m_Settings.MAP_HEIGHT - 1; y++) {
-				if (!(map[x][y] instanceof EatersWall)) {
-					if (x % m_Settings.BONUS_FOOD_COLUMNS == 0) {
-						map[x][y] = bonus;
-					} else {
-						map[x][y] = normal;
-					}
-					++foodCount;
-				}
-			}
-		}
-	}
-
-	public int getFoodCount() {
-		return foodCount;
-	}
-
-	public void setFoodCount(int foodCount) {
-		this.foodCount = foodCount;
-	}
-	
-	public final EatersSettings getSettings() {
+	public EatersSettings getSettings() {
 		return m_Settings;
 	}
 	
@@ -141,19 +63,19 @@ public class EaterControl extends SimulationControl {
 					int type = s.charAt(x) - '0';
 					switch (type) {
 					case (EatersSquare.EMPTY):
-						map[x][y] = empty;
+						//map[x][y] = empty;
 						break;
 					case (EatersSquare.NORMAL_FOOD):
-						map[x][y] = normal;
+						//map[x][y] = normal;
 						break;
 					case (EatersSquare.WALL):
-						map[x][y] = wall;
+						//map[x][y] = wall;
 						break;
 					case (EatersSquare.BONUS_FOOD):
-						map[x][y] = bonus;
+						//map[x][y] = bonus;
 						break;
 					default:
-						map[x][y] = empty;
+						//map[x][y] = empty;
 						break;
 					}
 					if (type == EatersSquare.NORMAL_FOOD || type == EatersSquare.BONUS_FOOD) {
