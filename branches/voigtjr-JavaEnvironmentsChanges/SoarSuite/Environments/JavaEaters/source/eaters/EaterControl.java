@@ -1,7 +1,3 @@
-/* File: EaterControl.java
- * Jul 12, 2004
- */
-
 package eaters;
 
 import java.io.BufferedReader;
@@ -10,18 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import javax.swing.JOptionPane;
-
 import eatersMap.EatersSquare;
 import eatersMap.EatersWall;
 import eatersMap.NormalFood;
 import eatersMap.BonusFood;
 import eatersMap.EatersEmpty;
-
-
-import sml.Kernel;
-import sml.smlSystemEventId;
-import sml.smlUpdateEventId;
 
 import base.SimulationControl;
 
@@ -34,7 +23,7 @@ public class EaterControl extends SimulationControl {
 		super(settings);
 		
 		m_Settings = settings;
-		logger.log("Eaters command line: " + m_Settings.toString() + "\n");		
+		logger.log(m_Settings.toString());		
 		
 		initSoar();
 		generateBasePath(m_Settings.FOLDER_NAME);
@@ -122,6 +111,10 @@ public class EaterControl extends SimulationControl {
 
 	public void setFoodCount(int foodCount) {
 		this.foodCount = foodCount;
+	}
+	
+	public final EatersSettings getSettings() {
+		return m_Settings;
 	}
 	
 	public void loadMap(File file) {
