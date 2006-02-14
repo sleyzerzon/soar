@@ -1,76 +1,83 @@
 package eaters;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
 import doc.Document;
 
 public class EatersSimulation {
+	public static final String kTagEaters = "eaters";
+	public static final String kTagSimulation = "simulation";
+	public static final String kParamNoDebuggers = "nodebuggers";
+	public static final String kParamDefaultMap = "default-map";
+	public static final String kGroupFolder = "Environments";
+	public static final String kProjectFolder = "JavaEaters";
+	public static final String kAgentFolder = "agents";
+	public static final String kMapFolder = "maps";
 	
-	protected EatersSettings m_Settings;	
+	protected boolean m_NoDebuggers = false;
+	protected String m_DefaultMap;
+	
 	protected Document m_Document;
 	protected Logger m_Logger = new Logger();
 	protected String m_BasePath;
+	protected World m_Map;
 	
-	public EatersSimulation(EatersSettings settings) {		
-		m_Settings = settings;
-		m_Document = new Document(m_Settings, m_Logger);
-		
-		// Log the command line
-		m_Logger.log(m_Settings.getCommandLine());
+	public EatersSimulation(String settingsFile) {		
+		// Log the settings file
+		m_Logger.log("Settings file: " + settingsFile);
 
 		// Initialize Soar
-		//m_Document.init();
+		m_Document = new Document(m_Logger);
+		m_Document.init();
 		
 		// Generate base path
 		m_BasePath = new String(m_Document.getLibraryLocation());
 		m_BasePath += System.getProperty("file.separator")
 		+ ".." + System.getProperty("file.separator") 
-		+ EatersSettings.kGroupFolder + System.getProperty("file.separator") 
-		+ EatersSettings.kProjectFolder + System.getProperty("file.separator");
+		+ kGroupFolder + System.getProperty("file.separator") 
+		+ kProjectFolder + System.getProperty("file.separator");
+
+		// Load settings file
+		try {
+			JavaElementXML root = JavaElementXML.ReadFromFile(settingsFile);
+			if (!root.getTagName().equalsIgnoreCase(kTagEaters)) {
+				throw new Exception("Top level tag not " + kTagEaters);
+			}
+			// TODO: Version check
+			
+			for (int i = 0 ; i < root.getNumberChildren() ; ++i)
+			{
+				JavaElementXML child = root.getChild(i) ;
+
+				String tagName = child.getTagName() ;
+				
+				if (tagName.equalsIgnoreCase(kTagSimulation)) {
+					m_NoDebuggers = child.getAttributeBooleanThrows(kParamNoDebuggers);
+					m_DefaultMap = child.getAttributeThrows(kParamDefaultMap);
+				} else {
+					// Throw during development, but really we should just ignore this
+					// when reading XML (in case we add tags later and load this into an earlier version)
+					throw new Exception("Unknown tag " + tagName) ;
+				}
+			}				
+		} catch (Exception e) {
+			System.out.println("Error loading XML settings: " + e.getMessage());
+			System.exit(1);
+		}
 
 		// Load default map
-		String mapFile = getMapPath() + m_Settings.getMap();
+		String mapFile = getMapPath() + m_DefaultMap;
 		m_Logger.log("Attempting to load " + mapFile);
-		loadMap(new File(mapFile));
+		m_Map = new World(mapFile, m_Logger);
 	}
 	
 	public String getAgentPath() {
-		return m_BasePath + EatersSettings.kAgentFolder + System.getProperty("file.separator");
+		return m_BasePath + kAgentFolder + System.getProperty("file.separator");
 	}
 	
 	public String getMapPath() {
-		return m_BasePath + EatersSettings.kMapFolder + System.getProperty("file.separator");
+		return m_BasePath + kMapFolder + System.getProperty("file.separator");
 	}	
 	
-	public EatersSettings getSettings() {
-		return m_Settings;
+	public Logger getLogger() {
+		return m_Logger;
 	}
-	
-	public void loadMap(File file) {
-		
-		BufferedReader bIn = null;
-		
-		try {
-			bIn = new BufferedReader(new FileReader(file));
-		} catch (FileNotFoundException f) {
-			m_Logger.log("File not found exception: " + f.getMessage());
-			System.exit(1);
-		}
-		
-		// TODO: create map
-		m_Logger.log("Map loaded.");
-		
-		try {
-			bIn.close();
-		} catch (IOException ignored) {
-		}
-		
-		// TODO: events
-		//fireNewMapNotification(null);
-	}
-
 }

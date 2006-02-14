@@ -11,41 +11,43 @@ import java.io.InputStream;
 
 public class Eaters {
 	
+	public static final String kDefaultXMLSettingsFile = "eaters-default-settings.xml";
+
+	protected boolean m_Quiet = false;
+	protected String m_SettingsFile;
+
 	public Eaters(String[] args) {
 		
 		// Install default settings file
 		try {
-			Install("eaters-default-settings.xml");
+			Install(kDefaultXMLSettingsFile);
 		} catch (IOException e) {
 			System.out.println("Error installing default settings: " + e.getMessage());
 			System.exit(1);
 		}
 		
 		// Deal with the command line
-		EatersSettings settings = new EatersSettings(); 
-		if (!settings.parseCommandLine(args)) {
+		if (!parseCommandLine(args)) {
 			return;
 		}
 		
 		// Initialize the simulation
-		EatersSimulation simulation = new EatersSimulation(settings);
+		EatersSimulation simulation = new EatersSimulation(m_SettingsFile);
 		
 		// Initialize the window manager, if applicable.
-		if(!settings.isQuiet()){
+		if(!m_Quiet) {
 			new EatersWindowManager(simulation);
 		}
 		
-		// TODO: Run simulation if quiet!
+		// TODO: Run simulation??!
 	}
 
-	private void Install(String file) throws IOException
-	{	
+	private void Install(String file) throws IOException {	
 		// We just work relative to the current directory because that's how
 		// load library will work.
 		File library = new File(file) ;
 
-		if (library.exists())
-		{
+		if (library.exists()) {
 			System.out.println(library + " already exists so not installing from the JAR file") ;
 			return;
 		}
@@ -55,8 +57,7 @@ public class Eaters {
 		String jarpath = "/" + library.getPath() ;
 		InputStream is = this.getClass().getResourceAsStream(jarpath) ;
 		
-		if (is == null)
-		{
+		if (is == null) {
 			System.out.println("Failed to find " + jarpath + " in the JAR file") ;
 			return;
 		}
@@ -66,8 +67,7 @@ public class Eaters {
 		// call can end up loading the same library that we're trying to save to and we
 		// end up with a blank file.  Explicitly trying to delete it first ensures that
 		// we're not reading the same file that we're writing.
-		if (library.exists() && !library.delete())
-		{
+		if (library.exists() && !library.delete()) {
 			System.out.println("Failed to remove the existing layout file " + library) ;
 			return;
 		}
@@ -78,8 +78,7 @@ public class Eaters {
 		// Copy the file onto disk
 		byte bytes[] = new byte[2048];
 		int read;
-		while (true)
-		{
+		while (true) {
 			read = is.read( bytes) ;
 			
 			// EOF
@@ -94,8 +93,49 @@ public class Eaters {
 		System.out.println("Installed " + library + " onto the local disk from JAR file") ;
 	}
 
-	public static void main(String[] args)
-	{
+	public boolean parseCommandLine(String[] args) {
+		if (hasOption(args, "-?") || hasOption(args, "-help") || hasOption(args, "-h")) {
+			printCommandLineHelp();
+			return false;
+		}
+
+		m_Quiet = hasOption(args, "-quiet");
+		m_SettingsFile = getOptionValue(args, "-settings");
+		
+		if (m_SettingsFile == null) {
+			m_SettingsFile = kDefaultXMLSettingsFile;
+		}
+		
+		return true;
+	}
+	
+	protected void printCommandLineHelp() {
+		System.out.println("Java Eaters help");
+		System.out.println("\t-quiet: Disables all windows, runs simulation quietly.");
+		System.out.println("\t-settings: XML file with with run settings.");
+	}
+	
+	// Returns true if a given option appears in the list
+	// (Use this for simple flags like -remote)
+	protected boolean hasOption(String[] args, String option) {
+		for (int i = 0 ; i < args.length ; i++){
+			if (args[i].equalsIgnoreCase(option))
+				return true ;
+		}
+		return false ;
+	}	
+	
+	// Returns the next argument after the matching option.
+	// (Use this for parameters like -port ppp)
+	protected String getOptionValue(String[] args, String option) {
+		for (int i = 0 ; i < args.length-1 ; i++) {
+			if (args[i].equalsIgnoreCase(option))
+				return args[i+1] ;
+		}		
+		return null ;
+	}
+
+	public static void main(String[] args) {
 		new Eaters(args);
 	}
 }

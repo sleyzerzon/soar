@@ -3,17 +3,14 @@ package doc;
 import sml.Kernel;
 import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
-import eaters.EatersSettings;
 import eaters.Logger;
 
 public class Document implements Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
 	
-	EatersSettings m_Settings;
 	Kernel m_Kernel;
 	Logger m_Logger;
 	
-	public Document (EatersSettings settings, Logger logger) {
-		m_Settings = settings;
+	public Document (Logger logger) {
 		m_Logger = logger;
 	}
 	
