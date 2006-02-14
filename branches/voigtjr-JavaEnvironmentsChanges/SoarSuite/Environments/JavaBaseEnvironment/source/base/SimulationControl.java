@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public abstract class SimulationControl implements Kernel.UpdateEventInterface,
-		Kernel.SystemEventInterface, Runnable {
+		Kernel.SystemEventInterface {
 	
 	public Logger logger = null;
 	
@@ -46,20 +46,9 @@ public abstract class SimulationControl implements Kernel.UpdateEventInterface,
 		}
 
 		// Register for events
-		if (kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null) <= 0) {
-			logger.log("Error registering for smlEVENT_SYSTEM_START: " + kernel.GetLastErrorDescription());
-			System.exit(1);
-		}
-
-		if (kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null) <= 0) {
-			logger.log("Error registering for smlEVENT_SYSTEM_STOP: " + kernel.GetLastErrorDescription());
-			System.exit(1);
-		}
-
-		if (kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null) <= 0) {
-			logger.log("Error registering for smlEVENT_AFTER_ALL_OUTPUT_PHASES: " + kernel.GetLastErrorDescription());
-			System.exit(1);
-		}
+		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
+		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
+		kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
 	}
 	
 	protected void generateBasePath(String folderName) {
@@ -84,10 +73,6 @@ public abstract class SimulationControl implements Kernel.UpdateEventInterface,
 	}
 
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
-		
-	}
-	
-	public void run() {
 		
 	}
 }
