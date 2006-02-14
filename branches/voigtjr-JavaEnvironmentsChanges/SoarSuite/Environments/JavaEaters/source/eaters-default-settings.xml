@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<eaters>
+  <general nodebuggers="false"></general>
+  <map map-width="0" map-height="0"></map>
+  <food>
+    <food-type food-color="0" food-value="5" food-shape="0"></food-type>
+    <food-type food-color="1" food-value="10" food-shape="1"></food-type>
+  </food>
+</eaters>
