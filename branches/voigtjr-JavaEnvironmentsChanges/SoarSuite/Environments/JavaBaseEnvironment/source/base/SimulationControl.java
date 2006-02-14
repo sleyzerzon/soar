@@ -14,7 +14,6 @@ public abstract class SimulationControl implements Kernel.UpdateEventInterface,
 	
 	protected Kernel kernel = null;
 	protected String basePath = null;
-	protected Object[][] map = null;
 	protected Random random = new Random();
 	
 	private Settings m_Settings;
@@ -26,8 +25,6 @@ public abstract class SimulationControl implements Kernel.UpdateEventInterface,
 		} catch(IOException e) {
 			// TODO: Warn
 		}
-		
-		map = new Object[m_Settings.MAP_WIDTH][m_Settings.MAP_HEIGHT];
 	}
 	
 	protected void initSoar() {
