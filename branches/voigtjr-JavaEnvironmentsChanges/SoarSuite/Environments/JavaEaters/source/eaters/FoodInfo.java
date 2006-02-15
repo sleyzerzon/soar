@@ -3,13 +3,19 @@ package eaters;
 import utilities.Logger;
 
 public class FoodInfo {
+	public static final int Round = 0;
+	public static final int Square = 1;
+		
 	protected String m_Name;
 	protected int m_Value;
+	protected int m_Shape;
+	
 	protected Logger m_Logger = Logger.logger;
 
-	public FoodInfo(String name, int value) {
+	public FoodInfo(String name, int value, int shape) {
 		m_Name = name;
 		m_Value = value;
+		m_Shape = shape;
 	}
 	
 	public String getName() {
@@ -18,6 +24,10 @@ public class FoodInfo {
 	
 	public int getValue() {
 		return m_Value;
+	}
+	
+	public int getShape() {
+		return m_Shape;
 	}
 }
 	

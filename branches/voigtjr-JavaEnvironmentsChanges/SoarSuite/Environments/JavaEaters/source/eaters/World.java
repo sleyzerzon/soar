@@ -1,5 +1,7 @@
 package eaters;
 
+import org.eclipse.swt.graphics.Point;
+
 import utilities.JavaElementXML;
 import utilities.Logger;
 
@@ -10,6 +12,7 @@ public class World {
 	public static final String kTagFoodType = "food-type";
 	public static final String kParamFoodName = "food-name";
 	public static final String kParamFoodValue = "food-value";
+	public static final String kParamFoodShape = "food-shape";
 
 	public static final String kTagCells = "cells";
 	public static final String kParamWorldWidth = "world-width";
@@ -40,8 +43,10 @@ public class World {
 			m_FoodInfo = new FoodInfo[food.getNumberChildren()];
 			for (int i = 0; i < m_FoodInfo.length; ++i) {
 				JavaElementXML foodType = food.getChild(i);
-				m_FoodInfo[i] = new FoodInfo(foodType.getAttributeThrows(kParamFoodName), 
-						foodType.getAttributeIntThrows(kParamFoodValue));
+				m_FoodInfo[i] = new FoodInfo(
+						foodType.getAttributeThrows(kParamFoodName), 
+						foodType.getAttributeIntThrows(kParamFoodValue),
+						foodType.getAttributeIntThrows(kParamFoodShape));
 			}
 
 			// Create map
@@ -73,6 +78,29 @@ public class World {
 		
 		// TODO: events
 		//fireNewMapNotification(null);
+	}
+	
+	public int getWidth() {
+		return this.m_WorldWidth;
+	}
+	
+	public int getHeight() {
+		return this.m_WorldHeight;
+	}
+	
+	public boolean isWall(Point location) {
+		return (m_World[location.y][location.x] == 0);
+	}
+	
+	public boolean isEmpty(Point location) {
+		return (m_World[location.y][location.x] == 1);
+	}
+	
+	public FoodInfo getFoodInfo(Point location) {
+		int value = m_World[location.y][location.x];
+		value -= 2;
+		if (value < 0) return null;
+		return m_FoodInfo[value];
 	}
 }
 

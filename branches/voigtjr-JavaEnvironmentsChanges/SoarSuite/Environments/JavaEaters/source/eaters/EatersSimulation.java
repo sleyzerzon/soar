@@ -24,7 +24,7 @@ public class EatersSimulation {
 	protected Logger m_Logger = Logger.logger;
 	protected Document m_Document;
 	protected String m_BasePath;
-	protected World m_Map;
+	protected World m_World;
 	protected Eater[] m_Eaters;
 	
 	
@@ -88,7 +88,7 @@ public class EatersSimulation {
 		// Load default map
 		String mapFile = getMapPath() + m_DefaultMap;
 		m_Logger.log("Attempting to load " + mapFile);
-		m_Map = new World(mapFile);
+		m_World = new World(mapFile);
 	}
 	
 	public String getAgentPath() {
@@ -97,5 +97,9 @@ public class EatersSimulation {
 	
 	public String getMapPath() {
 		return m_BasePath + kMapFolder + System.getProperty("file.separator");
-	}	
+	}
+	
+	public World getWorld() {
+		return m_World;
+	}
 }
