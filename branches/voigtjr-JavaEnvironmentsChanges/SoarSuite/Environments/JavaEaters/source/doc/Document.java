@@ -135,7 +135,7 @@ public class Document extends Thread implements Kernel.UpdateEventInterface, Ker
 			}
 			try { Thread.sleep(10) ; } catch (InterruptedException e) { } 
 		}
-		m_Logger.log("Document exiting, deleting kernel.");
+		m_Logger.log("Document exiting, shutting down soar.");
 		m_Kernel.Shutdown();
 		m_Kernel.delete();
 		m_Kernel = null;

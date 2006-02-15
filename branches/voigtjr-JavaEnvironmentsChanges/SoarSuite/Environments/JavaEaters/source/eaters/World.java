@@ -1,6 +1,5 @@
 package eaters;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -15,17 +14,20 @@ public class World implements SimulationListener {
 
 	public static final String kTagFood = "food";
 	public static final String kTagFoodType = "food-type";
-	public static final String kParamFoodName = "food-name";
-	public static final String kParamFoodValue = "food-value";
-	public static final String kParamFoodShape = "food-shape";
-	public static final String kParamFoodColor = "food-color";
+	public static final String kParamName = "name";
+	public static final String kParamValue = "value";
+	public static final String kParamShape = "shape";
+	public static final String kParamColor = "color";
 
 	public static final String kTagCells = "cells";
 	public static final String kParamWorldWidth = "world-width";
 	public static final String kParamWorldHeight = "world-height";
 	public static final String kTagRow = "row";
 	public static final String kTagCell = "cell";
-	public static final String kParamID = "id";
+	public static final String kParamType = "type";
+	
+	public static final String kTypeWall = "wall";
+	public static final String kTypeEmpty = "empty";
 	
 	public static final int kWallCell = 0;
 	public static final int kEmptyCell = 1;
@@ -59,10 +61,10 @@ public class World implements SimulationListener {
 			for (int i = 0; i < m_FoodInfo.length; ++i) {
 				JavaElementXML foodType = food.getChild(i);
 				m_FoodInfo[i] = new FoodInfo(
-						foodType.getAttributeThrows(kParamFoodName), 
-						foodType.getAttributeIntThrows(kParamFoodValue),
-						foodType.getAttributeThrows(kParamFoodShape),
-						foodType.getAttributeThrows(kParamFoodColor));
+						foodType.getAttributeThrows(kParamName), 
+						foodType.getAttributeIntThrows(kParamValue),
+						foodType.getAttributeThrows(kParamShape),
+						foodType.getAttributeThrows(kParamColor));
 			}
 
 			// Create map
@@ -80,8 +82,7 @@ public class World implements SimulationListener {
 			for(int row = 0; row < m_WorldHeight; ++row) {
 				String rowString = new String();
 				for (int col = 0; col < m_WorldWidth; ++col) {
-					// TODO: create map					
-					m_World[row][col] = cells.getChild(row).getChild(col).getAttributeIntThrows(kParamID);
+					m_World[row][col] = getTypeIDByName(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
 					if (m_World[row][col] > kEaterCell) {
 						++m_FoodCount;
 					}
@@ -98,6 +99,21 @@ public class World implements SimulationListener {
 		m_Logger.log("Map loaded.");
 		
 		// TODO: events
+	}
+	
+	public int getTypeIDByName(String name) throws Exception {
+		if (name.equalsIgnoreCase(kTypeWall)) {
+			return kWallCell;
+		} else if (name.equalsIgnoreCase(kTypeEmpty)) {
+			return kEmptyCell;			
+		} else {	
+			for (int i = 0; i < m_FoodInfo.length; ++i) {
+				if (m_FoodInfo[i].getName().equalsIgnoreCase(name)) {
+					return i + kReservedIDs;
+				}
+			}
+		}
+		throw new Exception("Invalid type name: " + name);
 	}
 	
 	public int getWidth() {
@@ -153,8 +169,8 @@ public class World implements SimulationListener {
 			if (info.location == null) {
 				// set random starting location
 				Random random = new Random();
-				
-				while (!isWall(info.location) && !isEater(info.location)) {
+				info.location = new Point(random.nextInt(m_WorldWidth), random.nextInt(m_WorldHeight));
+				while (isWall(info.location) || isEater(info.location)) {
 					info.location.x = random.nextInt(m_WorldWidth);
 					info.location.y = random.nextInt(m_WorldHeight);				
 				}
@@ -165,7 +181,7 @@ public class World implements SimulationListener {
 			
 			Eater eater = new Eater(info.agent, this, info.location);
 			m_Eaters.put(info.name, eater);
-		}
+		} 
 	}
 }
 

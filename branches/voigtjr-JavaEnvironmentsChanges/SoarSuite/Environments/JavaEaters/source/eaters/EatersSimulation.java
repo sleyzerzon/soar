@@ -117,6 +117,7 @@ public class EatersSimulation {
 		String mapFile = getMapPath() + m_DefaultMap;
 		m_Logger.log("Attempting to load " + mapFile);
 		m_World = new World(mapFile, this);	
+		addSimulationListener(m_World);
 		
 		// add initial eaters
 		if (initialEaters != null) {

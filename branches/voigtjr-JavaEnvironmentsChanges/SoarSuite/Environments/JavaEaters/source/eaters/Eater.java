@@ -66,8 +66,22 @@ public class Eater {
 		m_xWME = m_Agent.CreateIntWME(eater, kxID, m_Location.x);
 		m_yWME = m_Agent.CreateIntWME(eater, kyID, m_Location.y);
 		
+		for (int i = 0; i < m_Cells.length; ++i) {
+			for (int j = 0; j < m_Cells.length; ++j) {
+				m_Cells[i][j] = new Cell();
+			}
+		}
+		
 		m_Cells[kEaterVision][kEaterVision].me = m_Agent.CreateIdWME(m_Agent.GetInputLink(), kMyLocationID);
 		createView(kEaterVision, kEaterVision);
+	}
+	
+	public String getName() {
+		return m_Name;
+	}
+	
+	public Agent getAgent() {
+		return m_Agent;
 	}
 	
 	protected void createView(int x, int y) {

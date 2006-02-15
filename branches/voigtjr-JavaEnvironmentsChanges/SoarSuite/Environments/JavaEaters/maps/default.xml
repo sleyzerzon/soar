@@ -1,26 +1,26 @@
 <?xml version="1.0"?>
 <eaters-world>
   <food>
-    <food-type food-name="normal-food" food-value="5" food-shape="round" food-color="blue">
+    <food-type name="normal-food" value="5" shape="round" color="blue">
     </food-type>
-    <food-type food-name="bonus-food" food-value="10" food-shape="square" food-color="red">
+    <food-type name="bonus-food" value="10" shape="square" color="red">
     </food-type>
   </food>
   <cells world-width="5" world-height="5">
     <row>
-      <cell id="0"></cell><cell id="0"></cell><cell id="0"></cell><cell id="0"></cell><cell id="0"></cell>
+      <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell id="0"></cell><cell id="3"></cell><cell id="3"></cell><cell id="4"></cell><cell id="0"></cell>
+      <cell type="wall"></cell><cell type="normal-food"></cell><cell type="normal-food"></cell><cell type="bonus-food"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell id="0"></cell><cell id="3"></cell><cell id="4"></cell><cell id="3"></cell><cell id="0"></cell>
+      <cell type="wall"></cell><cell type="normal-food"></cell><cell type="bonus-food"></cell><cell type="normal-food"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell id="0"></cell><cell id="4"></cell><cell id="4"></cell><cell id="3"></cell><cell id="0"></cell>
+      <cell type="wall"></cell><cell type="bonus-food"></cell><cell type="bonus-food"></cell><cell type="normal-food"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell id="0"></cell><cell id="0"></cell><cell id="0"></cell><cell id="0"></cell><cell id="0"></cell>
+      <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>
     </row>
   </cells>
 </eaters-world>
