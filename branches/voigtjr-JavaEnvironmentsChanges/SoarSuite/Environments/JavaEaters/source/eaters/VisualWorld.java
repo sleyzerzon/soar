@@ -35,6 +35,8 @@ public class VisualWorld extends Canvas implements PaintListener {
 		gc.setLineWidth(1);
 
 		// Draw world
+		int fill1;
+		int fill2;
 		for(location.x = 0; location.x < world.getWidth(); ++location.x){
 			for(location.y = 0; location.y < world.getHeight(); ++location.y){
 				if (world.isWall(location)) {
@@ -49,28 +51,21 @@ public class VisualWorld extends Canvas implements PaintListener {
 				
 					FoodInfo info = world.getFoodInfo(location);
 					
-					// TODO: change color depending on info
-					gc.setBackground(EatersWindowManager.blue);
+					gc.setBackground(info.getColor());
 					
-					int fill1;
-					int fill2;
-					switch (info.getShape()) {
-					case FoodInfo.Round:
+					if (info.getShape().equalsIgnoreCase(FoodInfo.kRound)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillOval(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawOval(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
-						break;
-					case FoodInfo.Square:
+					} else if (info.getShape().equalsIgnoreCase(FoodInfo.kSquare)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillRectangle(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawRectangle(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2, m_CellSize - fill2);
-						break;
-					default:
+					} else {
 						m_Logger.log("Invalid food shape.");
 						System.exit(1);
-						break;
 					}
 				}
 			}

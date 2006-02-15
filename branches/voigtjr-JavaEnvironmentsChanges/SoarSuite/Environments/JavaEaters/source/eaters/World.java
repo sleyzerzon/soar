@@ -13,6 +13,7 @@ public class World {
 	public static final String kParamFoodName = "food-name";
 	public static final String kParamFoodValue = "food-value";
 	public static final String kParamFoodShape = "food-shape";
+	public static final String kParamFoodColor = "food-color";
 
 	public static final String kTagCells = "cells";
 	public static final String kParamWorldWidth = "world-width";
@@ -46,7 +47,8 @@ public class World {
 				m_FoodInfo[i] = new FoodInfo(
 						foodType.getAttributeThrows(kParamFoodName), 
 						foodType.getAttributeIntThrows(kParamFoodValue),
-						foodType.getAttributeIntThrows(kParamFoodShape));
+						foodType.getAttributeThrows(kParamFoodShape),
+						foodType.getAttributeThrows(kParamFoodColor));
 			}
 
 			// Create map

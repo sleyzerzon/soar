@@ -38,6 +38,34 @@ public class EatersWindowManager {
 		orange = new Color(d, 255, 127, 0);
 		black = d.getSystemColor(SWT.COLOR_BLACK);
 	}
+	
+	public static Color getColor(String color) {
+		if (color.equalsIgnoreCase("white")) {
+			return white;
+		}
+		if (color.equalsIgnoreCase("blue")) {
+			return blue;
+		}
+		if (color.equalsIgnoreCase("red")) {
+			return red;
+		}
+		if (color.equalsIgnoreCase("yellow")) {
+			return yellow;
+		}
+		if (color.equalsIgnoreCase("green")) {
+			return green;
+		}
+		if (color.equalsIgnoreCase("purple")) {
+			return purple;
+		}
+		if (color.equalsIgnoreCase("orange")) {
+			return orange;
+		}
+		if (color.equalsIgnoreCase("black")) {
+			return black;
+		}
+		return null;
+	}
 
 	public EatersWindowManager(EatersSimulation control) {
 		m_Display = new Display();

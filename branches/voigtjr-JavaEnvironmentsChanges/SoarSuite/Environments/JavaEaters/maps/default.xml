@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <eaters-world>
   <food>
-    <food-type food-name="normal food" food-value="5">
+    <food-type food-name="normal food" food-value="5" food-shape="round" food-color="blue">
     </food-type>
-    <food-type food-name="bonus food" food-value="10">
+    <food-type food-name="bonus food" food-value="10" food-shape="square" food-color="red">
     </food-type>
   </food>
   <cells world-width="5" world-height="5">
