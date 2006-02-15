@@ -3,6 +3,7 @@ package eaters;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import sml.Agent;
 import utilities.JavaElementXML;
 import utilities.Logger;
 import doc.Document;
@@ -39,7 +40,7 @@ public class EatersSimulation {
 		m_Logger.log("Settings file: " + settingsFile);
 
 		// Initialize Soar
-		m_Document = new Document();
+		m_Document = new Document(this);
 		m_Document.init();
 		
 		// Generate base path
@@ -76,9 +77,12 @@ public class EatersSimulation {
 					m_Eaters = new Eater[child.getNumberChildren()];
 					for (int j = 0; j < m_Eaters.length; ++j) {
 						JavaElementXML agent = child.getChild(j);
-						m_Eaters[j] = new Eater(
-								agent.getAttributeThrows(kParamName),
+						
+						Agent soarAgent = m_Document.createAgent(
+								agent.getAttributeThrows(kParamName), 
 								agent.getAttributeThrows(kParamProductions));
+						spawnDebugger(soarAgent.GetAgentName());
+						m_Eaters[j] = new Eater(soarAgent);
 					}
 				} else {
 					// Throw during development, but really we should just ignore this
@@ -109,10 +113,43 @@ public class EatersSimulation {
 		return m_World;
 	}
 	
+	public void spawnDebugger(String agentName) {
+		if (m_NoDebuggers) return;
+		
+		Runtime r = java.lang.Runtime.getRuntime();
+		try {
+			// TODO: manage the returned process a bit better.
+			r.exec("java -jar " + m_Document.getLibraryLocation() + System.getProperty("file.separator")
+					+ "bin" + System.getProperty("file.separator") 
+					+ "SoarJavaDebugger.jar -remote -agent " + agentName);
+		} catch (java.io.IOException e) {
+			m_Logger.log("IOException spawning debugger: " + e.getMessage());
+			shutdown(1);
+		}
+		
+		m_Logger.log("Spawned debugger for " + agentName);
+	}
+
 	public void shutdown(int exitCode) {
 		m_Logger.log("Shutdown called with code: " + new Integer(exitCode).toString());
-		m_Document.askToStop();
+		fireSimulationListenerEvent(SimulationListener.kShutdownEvent);
+		m_Document.askToShutdown();
 		System.exit(exitCode);
+	}
+	
+	public void startSimulation() {
+		fireSimulationListenerEvent(SimulationListener.kStartEvent);
+	}
+	
+	public void stopSimulation() {
+		fireSimulationListenerEvent(SimulationListener.kStopEvent);		
+	}
+
+	public void updateWorld() {
+		// Read eaters output links & move them
+		// Check for collisions
+		// Distribute food
+		// Update eaters input links
 	}
 	
 	public void addSimulationListener(SimulationListener listener) {
@@ -123,7 +160,7 @@ public class EatersSimulation {
 		m_RemoveSimulationListeners.add(listener);
 	}
 	
-	public void fireSimulationListenerEvent(int type) {
+	protected void fireSimulationListenerEvent(int type) {
 		updateSimulationListenerList();
 		Iterator iter = m_SimulationListeners.iterator();
 		while(iter.hasNext()){
@@ -131,7 +168,7 @@ public class EatersSimulation {
 		}		
 	}
 	
-	public void updateSimulationListenerList() {
+	protected void updateSimulationListenerList() {
 		Iterator iter = m_RemoveSimulationListeners.iterator();
 		while(iter.hasNext()){
 			m_SimulationListeners.remove(iter.next());

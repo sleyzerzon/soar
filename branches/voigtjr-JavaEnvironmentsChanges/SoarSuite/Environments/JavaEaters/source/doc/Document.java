@@ -1,5 +1,6 @@
 package doc;
 
+import sml.Agent;
 import sml.Kernel;
 import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
@@ -10,11 +11,14 @@ public class Document extends Thread implements Kernel.UpdateEventInterface, Ker
 	
 	protected Logger m_Logger = Logger.logger;
 	protected Kernel m_Kernel;
-	protected boolean m_AskedToStop = false;
+	protected boolean m_AskedToShutdown = false;
+	protected boolean m_StopSoar = false;
 	protected boolean m_Run = false;
 	protected boolean m_Step = false;	
+	protected EatersSimulation m_Simulation;
 	
-	public Document () {
+	public Document (EatersSimulation simulation) {
+		m_Simulation = simulation;
 	}
 	
 	public void init() {
@@ -44,38 +48,59 @@ public class Document extends Thread implements Kernel.UpdateEventInterface, Ker
 	}
 	
   	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
+  		if (m_StopSoar) {
+  			m_StopSoar = false;
+  			m_Kernel.StopAllAgents();
+  		}
+  		m_Simulation.updateWorld();
   	}
   	
     public void systemEventHandler(int eventID, Object data, Kernel kernel) {
   		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
   			// Start simulation
   			m_Logger.log("Start event received from kernel.");
+  			m_Simulation.startSimulation();
   		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
   			// Stop simulation
   			m_Logger.log("Stop event received from kernel.");
-  		}
+  			m_Simulation.stopSimulation();
+ 		}
 		m_Logger.log("Unknown system event received from kernel: " + new Integer(eventID).toString());
     }
     
+    public void stopSoar() {
+    	m_StopSoar = true;
+    }
+    
+    public Agent createAgent(String name, String productions) {
+    	Agent agent = m_Kernel.CreateAgent(name);
+    	boolean load = agent.LoadProductions(m_Simulation.getAgentPath() + productions);
+    	if (!load || agent.HadError()) {
+    		m_Logger.log("Error creating agent " + name + 
+    				" (" + m_Simulation.getAgentPath() + productions + 
+    				"): " + agent.GetLastErrorDescription());
+    		return null;
+    	}
+    	return agent;
+    }
+    
 	/** Ask this thread to halt */
-	public synchronized void askToStop() {
-		m_AskedToStop = true ;
+	public synchronized void askToShutdown() {
+		m_AskedToShutdown = true ;
 	}
 
-	/** Ask this thread to halt */
 	public synchronized void runSoar() {
 		m_Run = true ;
 		interrupt();
 	}
 
-	/** Ask this thread to halt */
 	public synchronized void stepSoar() {
 		m_Step = true ;
 		interrupt();
 	}
 
     public void run() {
-		while (!m_AskedToStop) {
+		while (!m_AskedToShutdown) {
 			if (m_Run) {
 				m_Run = false;
 				m_Kernel.RunAllAgentsForever();
@@ -86,6 +111,7 @@ public class Document extends Thread implements Kernel.UpdateEventInterface, Ker
 			try { Thread.sleep(10) ; } catch (InterruptedException e) { } 
 		}
 		m_Logger.log("Document exiting, deleting kernel.");
+		m_Kernel.Shutdown();
 		m_Kernel.delete();
 		m_Kernel = null;
     }

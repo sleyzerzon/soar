@@ -28,6 +28,7 @@ public class World {
 	protected int[][] m_World;
 	protected FoodInfo[] m_FoodInfo;
 	protected EatersSimulation m_Simulation;
+	protected int m_FoodCount;
 	
 	public World(String file, EatersSimulation simulation) {
 		m_Simulation = simulation;
@@ -63,11 +64,16 @@ public class World {
 			// Create map array
 			m_World = new int[m_WorldHeight][m_WorldWidth];
 			
+			// Keep track of food
+			m_FoodCount = 0;
 			for(int row = 0; row < m_WorldHeight; ++row) {
 				String rowString = new String();
 				for (int col = 0; col < m_WorldWidth; ++col) {
 					// TODO: create map					
 					m_World[row][col] = cells.getChild(row).getChild(col).getAttributeIntThrows(kParamID);
+					if (m_World[row][col] > 1) {
+						++m_FoodCount;
+					}
 					rowString += new Integer(m_World[row][col]).toString();
 				}
 				m_Logger.log(rowString);
@@ -120,6 +126,10 @@ public class World {
 		value -= 2;
 		if (value < 0) return null;
 		return m_FoodInfo[value];
+	}
+	
+	public int getFoodCount() {
+		return m_FoodCount;
 	}
 }
 
