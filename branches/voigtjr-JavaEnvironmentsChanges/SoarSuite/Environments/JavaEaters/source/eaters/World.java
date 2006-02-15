@@ -1,8 +1,5 @@
 package eaters;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 public class World {
 	public static final String kTagEatersWorld = "eaters-world";
 
@@ -18,14 +15,13 @@ public class World {
 	public static final String kTagCell = "cell";
 	public static final String kParamID = "id";
 
-	protected Logger m_Logger;
-	protected int m_MapWidth = 17;
-	protected int m_MapHeight = 17;
+	protected Logger m_Logger = EatersSimulation.logger;
+	protected int m_WorldWidth;
+	protected int m_WorldHeight;
 	protected int[][] m_World;
 	protected FoodInfo[] m_FoodInfo;
 	
-	public World(String file, Logger logger) {
-		m_Logger = logger;
+	public World(String file) {
 		
 		try {
 			// Open file
@@ -49,15 +45,15 @@ public class World {
 			JavaElementXML cells = root.findChildByNameThrows(kTagCells);
 			
 			// Get dimentions
-			m_MapWidth = cells.getAttributeIntThrows(kParamWorldWidth);
-			m_MapHeight = cells.getAttributeIntThrows(kParamWorldHeight);
+			m_WorldWidth = cells.getAttributeIntThrows(kParamWorldWidth);
+			m_WorldHeight = cells.getAttributeIntThrows(kParamWorldHeight);
 						
 			// Create map array
-			m_World = new int[m_MapHeight][m_MapWidth];
+			m_World = new int[m_WorldHeight][m_WorldWidth];
 			
-			for(int row = 0; row < m_MapHeight; ++row) {
+			for(int row = 0; row < m_WorldHeight; ++row) {
 				String rowString = new String();
-				for (int col = 0; col < m_MapWidth; ++col) {
+				for (int col = 0; col < m_WorldWidth; ++col) {
 					// TODO: create map					
 					m_World[row][col] = cells.getChild(row).getChild(col).getAttributeIntThrows(kParamID);
 					rowString += new Integer(m_World[row][col]).toString();

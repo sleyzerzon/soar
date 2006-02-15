@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 public class EatersWindowManager {
 	Display m_Display;
 	Shell m_Shell;
+	protected Logger m_Logger = EatersSimulation.logger;
 
 	public EatersWindowManager(EatersSimulation control) {
 		m_Display = new Display();

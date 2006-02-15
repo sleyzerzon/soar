@@ -3,7 +3,8 @@ package eaters;
 public class FoodInfo {
 	protected String m_Name;
 	protected int m_Value;
-	
+	protected Logger m_Logger = EatersSimulation.logger;
+
 	public FoodInfo(String name, int value) {
 		m_Name = name;
 		m_Value = value;

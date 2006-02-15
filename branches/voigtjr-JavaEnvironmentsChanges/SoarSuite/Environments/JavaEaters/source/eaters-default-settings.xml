@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
 <eaters>
   <simulation nodebuggers="false" default-map="default.xml"></simulation>
+  <agents>
+    <agent name="alpha" productions="tutorial/advanced.move.soar"></agent>
+    <agent name="bravo" productions="tutorial/jump-and-move.soar"></agent>
+  </agents>
 </eaters>
