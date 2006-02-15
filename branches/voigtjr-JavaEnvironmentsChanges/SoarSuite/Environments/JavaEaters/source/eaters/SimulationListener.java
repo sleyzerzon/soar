@@ -4,6 +4,7 @@ public interface SimulationListener {
 	public static final int kStartEvent = 0;
 	public static final int kStopEvent = 1;
 	public static final int kShutdownEvent = 2;
+	public static final int kNewEaterEvent = 3;
 	
-	public void simulationEventHandler(int type);
+	public void simulationEventHandler(int type, Object object);
 }

@@ -1,11 +1,16 @@
 package eaters;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
 import org.eclipse.swt.graphics.Point;
 
+import sml.Agent;
 import utilities.JavaElementXML;
 import utilities.Logger;
 
-public class World {
+public class World implements SimulationListener {
 	public static final String kTagEatersWorld = "eaters-world";
 
 	public static final String kTagFood = "food";
@@ -21,6 +26,11 @@ public class World {
 	public static final String kTagRow = "row";
 	public static final String kTagCell = "cell";
 	public static final String kParamID = "id";
+	
+	public static final int kWallCell = 0;
+	public static final int kEmptyCell = 1;
+	public static final int kEaterCell = 2;
+	public static final int kReservedIDs = 3;
 
 	protected Logger m_Logger = Logger.logger;
 	protected int m_WorldWidth;
@@ -29,10 +39,11 @@ public class World {
 	protected FoodInfo[] m_FoodInfo;
 	protected EatersSimulation m_Simulation;
 	protected int m_FoodCount;
+	protected HashMap m_Eaters = new HashMap();
 	
 	public World(String file, EatersSimulation simulation) {
 		m_Simulation = simulation;
-		
+
 		try {
 			// Open file
 			JavaElementXML root = JavaElementXML.ReadFromFile(file);
@@ -71,7 +82,7 @@ public class World {
 				for (int col = 0; col < m_WorldWidth; ++col) {
 					// TODO: create map					
 					m_World[row][col] = cells.getChild(row).getChild(col).getAttributeIntThrows(kParamID);
-					if (m_World[row][col] > 1) {
+					if (m_World[row][col] > kEaterCell) {
 						++m_FoodCount;
 					}
 					rowString += new Integer(m_World[row][col]).toString();
@@ -87,7 +98,6 @@ public class World {
 		m_Logger.log("Map loaded.");
 		
 		// TODO: events
-		//fireNewMapNotification(null);
 	}
 	
 	public int getWidth() {
@@ -99,37 +109,63 @@ public class World {
 	}
 	
 	public boolean isWall(Point location) {
-		return (m_World[location.y][location.x] == 0);
+		return isWall(location.x, location.y);
 	}
 	
 	public boolean isEmpty(Point location) {
-		return (m_World[location.y][location.x] == 1);
+		return isEmpty(location.x, location.y);
 	}
 	
-	public boolean isWall(int x, int y) {
-		return (m_World[y][x] == 0);
-	}
-	
-	public boolean isEmpty(int x, int y) {
-		return (m_World[y][x] == 1);
+	public boolean isEater(Point location) {
+		return isEater(location.x, location.y);
 	}
 	
 	public FoodInfo getFoodInfo(Point location) {
-		int value = m_World[location.y][location.x];
-		value -= 2;
-		if (value < 0) return null;
-		return m_FoodInfo[value];
+		return getFoodInfo(location.x, location.y);
 	}
 
+	public boolean isWall(int x, int y) {
+		return (m_World[y][x] == kWallCell);
+	}
+	
+	public boolean isEmpty(int x, int y) {
+		return (m_World[y][x] == kEmptyCell);
+	}
+	
+	public boolean isEater(int x, int y) {
+		return (m_World[y][x] == kEaterCell);
+	}
+	
 	public FoodInfo getFoodInfo(int x, int y) {
 		int value = m_World[y][x];
-		value -= 2;
+		value -= kReservedIDs;
 		if (value < 0) return null;
 		return m_FoodInfo[value];
 	}
 	
 	public int getFoodCount() {
 		return m_FoodCount;
+	}
+	
+	public void simulationEventHandler(int type, Object object) {
+		if (type == SimulationListener.kNewEaterEvent) {
+			EatersSimulation.EaterInfo info = (EatersSimulation.EaterInfo)object;
+			if (info.location == null) {
+				// set random starting location
+				Random random = new Random();
+				
+				while (!isWall(info.location) && !isEater(info.location)) {
+					info.location.x = random.nextInt(m_WorldWidth);
+					info.location.y = random.nextInt(m_WorldHeight);				
+				}
+			}
+			
+			m_World[info.location.y][info.location.x] = kEaterCell;
+			--m_FoodCount;
+			
+			Eater eater = new Eater(info.agent, this, info.location);
+			m_Eaters.put(info.name, eater);
+		}
 	}
 }
 

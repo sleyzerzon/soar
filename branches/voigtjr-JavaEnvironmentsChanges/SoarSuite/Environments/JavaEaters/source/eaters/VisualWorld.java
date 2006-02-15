@@ -12,8 +12,6 @@ import org.eclipse.swt.widgets.Display;
 import utilities.Logger;
 
 public class VisualWorld extends Canvas implements PaintListener {
-	public final static int kAgentVision = 1;
-	
 	protected Logger m_Logger = Logger.logger;
 	
 	protected Display m_Display;
@@ -44,20 +42,20 @@ public class VisualWorld extends Canvas implements PaintListener {
 		int fill1, fill2, xDraw, yDraw;
 		for(int x = 0; x < world.getWidth(); ++x){
 			if (m_AgentLocation != null) {
-				if ((x < m_AgentLocation.x - kAgentVision) || (x > m_AgentLocation.x + kAgentVision)) {
+				if ((x < m_AgentLocation.x - Eater.kEaterVision) || (x > m_AgentLocation.x + Eater.kEaterVision)) {
 					continue;
 				} 
-				xDraw = x + kAgentVision - m_AgentLocation.x;
+				xDraw = x + Eater.kEaterVision - m_AgentLocation.x;
 			} else {
 				xDraw = x;
 			}
 			
 			for(int y = 0; y < world.getHeight(); ++y){
 				if (m_AgentLocation != null) {
-					if ((y < m_AgentLocation.y - kAgentVision) || (y > m_AgentLocation.y + kAgentVision)) {
+					if ((y < m_AgentLocation.y - Eater.kEaterVision) || (y > m_AgentLocation.y + Eater.kEaterVision)) {
 						continue;
 					} 
-					yDraw = y + kAgentVision - m_AgentLocation.y;
+					yDraw = y + Eater.kEaterVision - m_AgentLocation.y;
 				} else {
 					yDraw = y;
 				}
@@ -68,6 +66,10 @@ public class VisualWorld extends Canvas implements PaintListener {
 					
 				} else if (world.isEmpty(x, y)) {
 					gc.setBackground(EatersWindowManager.widget_background);
+					gc.fillRectangle(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
+					
+				} else if (world.isEater(x, y)) {
+					gc.setBackground(EatersWindowManager.green);
 					gc.fillRectangle(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
 					
 				} else {

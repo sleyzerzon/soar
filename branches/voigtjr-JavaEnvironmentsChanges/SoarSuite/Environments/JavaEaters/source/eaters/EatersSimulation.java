@@ -3,6 +3,8 @@ package eaters;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.swt.graphics.Point;
+
 import sml.Agent;
 import utilities.JavaElementXML;
 import utilities.Logger;
@@ -24,16 +26,33 @@ public class EatersSimulation {
 	public static final String kMapFolder = "maps";
 	
 	protected boolean m_NoDebuggers = false;
+	protected boolean m_DebuggerSpawned = false;
 	protected String m_DefaultMap;
 	protected Logger m_Logger = Logger.logger;
 	protected Document m_Document;
 	protected String m_BasePath;
 	protected World m_World;
-	protected Eater[] m_Eaters;
 
 	protected ArrayList m_SimulationListeners = new ArrayList();
 	protected ArrayList m_AddSimulationListeners = new ArrayList();
 	protected ArrayList m_RemoveSimulationListeners = new ArrayList();
+	
+	public class EaterInfo {
+		public String name;
+		public String productions;
+		public Point location;
+		public Agent agent;
+		
+		public EaterInfo(String name, String productions) {
+			this.name = name;
+			this.productions = productions;
+		}
+		
+		public EaterInfo(String name, String productions, Point location) {
+			this(name, productions);
+			this.location = location;
+		}
+	}
 	
 	public EatersSimulation(String settingsFile) {		
 		// Log the settings file
@@ -52,6 +71,8 @@ public class EatersSimulation {
 		+ kProjectFolder + System.getProperty("file.separator");
 
 		m_Logger.log("Base path: " + m_BasePath);
+		
+		EaterInfo[] initialEaters = null;
 		
 		// Load settings file
 		try {
@@ -74,15 +95,12 @@ public class EatersSimulation {
 					m_Logger.log("Default map: " + m_DefaultMap);
 					
 				} else if (tagName.equalsIgnoreCase(kTagAgents)) {
-					m_Eaters = new Eater[child.getNumberChildren()];
-					for (int j = 0; j < m_Eaters.length; ++j) {
+					initialEaters = new EaterInfo[child.getNumberChildren()];
+					for (int j = 0; j < initialEaters.length; ++j) {
 						JavaElementXML agent = child.getChild(j);
 						
-						Agent soarAgent = m_Document.createAgent(
-								agent.getAttributeThrows(kParamName), 
+						initialEaters[j] = new EaterInfo(agent.getAttributeThrows(kParamName), 
 								agent.getAttributeThrows(kParamProductions));
-						spawnDebugger(soarAgent.GetAgentName());
-						m_Eaters[j] = new Eater(soarAgent);
 					}
 				} else {
 					// Throw during development, but really we should just ignore this
@@ -95,10 +113,23 @@ public class EatersSimulation {
 			shutdown(1);
 		}
 
-		// Load default map
+		// Load default world
 		String mapFile = getMapPath() + m_DefaultMap;
 		m_Logger.log("Attempting to load " + mapFile);
-		m_World = new World(mapFile, this);
+		m_World = new World(mapFile, this);	
+		
+		// add initial eaters
+		if (initialEaters != null) {
+			for (int i = 0; i < initialEaters.length; ++i) {
+				addEater(initialEaters[i]);
+			}
+		}
+	}
+	
+	public void addEater(EaterInfo info) {
+		info.agent = m_Document.createAgent(info.name, info.productions);
+		fireSimulationListenerEvent(SimulationListener.kNewEaterEvent, info);
+		spawnDebugger(info.name);		
 	}
 	
 	public String getAgentPath() {
@@ -115,6 +146,7 @@ public class EatersSimulation {
 	
 	public void spawnDebugger(String agentName) {
 		if (m_NoDebuggers) return;
+		if (m_DebuggerSpawned) return;
 		
 		Runtime r = java.lang.Runtime.getRuntime();
 		try {
@@ -122,14 +154,21 @@ public class EatersSimulation {
 			r.exec("java -jar " + m_Document.getLibraryLocation() + System.getProperty("file.separator")
 					+ "bin" + System.getProperty("file.separator") 
 					+ "SoarJavaDebugger.jar -remote -agent " + agentName);
+			
+			if (!m_Document.waitForDebugger()) {
+				m_Logger.log("Debugger spawn failed for agent: " + agentName);
+				return;
+			}
+			
 		} catch (java.io.IOException e) {
 			m_Logger.log("IOException spawning debugger: " + e.getMessage());
 			shutdown(1);
 		}
 		
 		m_Logger.log("Spawned debugger for " + agentName);
+		m_DebuggerSpawned = true;
 	}
-
+	
 	public void shutdown(int exitCode) {
 		m_Logger.log("Shutdown called with code: " + new Integer(exitCode).toString());
 		fireSimulationListenerEvent(SimulationListener.kShutdownEvent);
@@ -161,13 +200,17 @@ public class EatersSimulation {
 	}
 	
 	protected void fireSimulationListenerEvent(int type) {
+		fireSimulationListenerEvent(type, null);
+	}
+	
+	protected void fireSimulationListenerEvent(int type, Object object) {
 		updateSimulationListenerList();
 		Iterator iter = m_SimulationListeners.iterator();
 		while(iter.hasNext()){
-			((SimulationListener)iter.next()).simulationEventHandler(type);
+			((SimulationListener)iter.next()).simulationEventHandler(type, object);
 		}		
 	}
-	
+		
 	protected void updateSimulationListenerList() {
 		Iterator iter = m_RemoveSimulationListeners.iterator();
 		while(iter.hasNext()){

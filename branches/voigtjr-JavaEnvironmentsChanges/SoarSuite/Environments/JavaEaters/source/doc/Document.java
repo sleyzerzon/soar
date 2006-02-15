@@ -1,13 +1,17 @@
 package doc;
 
 import sml.Agent;
+import sml.ConnectionInfo;
 import sml.Kernel;
 import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
+import sml.sml_Names;
 import utilities.Logger;
 import eaters.EatersSimulation;
 
 public class Document extends Thread implements Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
+	
+	public static final int kDebuggerTimeoutSeconds = 15;
 	
 	protected Logger m_Logger = Logger.logger;
 	protected Kernel m_Kernel;
@@ -41,6 +45,27 @@ public class Document extends Thread implements Kernel.UpdateEventInterface, Ker
 		m_Kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
 		
 		this.start();
+	}
+
+	public boolean waitForDebugger() {
+		boolean ready = false;
+		for (int tries = 0; tries < Document.kDebuggerTimeoutSeconds; ++tries) {
+			m_Kernel.GetAllConnectionInfo();
+			if (m_Kernel.HasConnectionInfoChanged()) {
+				for (int i = 0; i < m_Kernel.GetNumberConnections(); ++i) {
+					ConnectionInfo info =  m_Kernel.GetConnectionInfo(i);
+					if (info.GetName().equalsIgnoreCase("java-debugger")) {
+						if (info.GetAgentStatus().equalsIgnoreCase(sml.sml_Names.getKStatusReady())) {
+							ready = true;
+							break;
+						}
+					}
+				}
+				if (ready) break;
+			}
+			try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+		}
+		return ready;
 	}
 	
 	public String getLibraryLocation() {

@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import sml.Agent;
 import utilities.Logger;
 
 public class EatersWindowManager {
@@ -113,5 +114,4 @@ public class EatersWindowManager {
 		}
 		m_Display.dispose();		
 	}
-	
 }
