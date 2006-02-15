@@ -1,5 +1,8 @@
 package eaters;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import utilities.JavaElementXML;
 import utilities.Logger;
 import doc.Document;
@@ -26,7 +29,10 @@ public class EatersSimulation {
 	protected String m_BasePath;
 	protected World m_World;
 	protected Eater[] m_Eaters;
-	
+
+	protected ArrayList m_SimulationListeners = new ArrayList();
+	protected ArrayList m_AddSimulationListeners = new ArrayList();
+	protected ArrayList m_RemoveSimulationListeners = new ArrayList();
 	
 	public EatersSimulation(String settingsFile) {		
 		// Log the settings file
@@ -82,13 +88,13 @@ public class EatersSimulation {
 			}				
 		} catch (Exception e) {
 			System.out.println("Error loading XML settings: " + e.getMessage());
-			System.exit(1);
+			shutdown(1);
 		}
 
 		// Load default map
 		String mapFile = getMapPath() + m_DefaultMap;
 		m_Logger.log("Attempting to load " + mapFile);
-		m_World = new World(mapFile);
+		m_World = new World(mapFile, this);
 	}
 	
 	public String getAgentPath() {
@@ -101,5 +107,41 @@ public class EatersSimulation {
 	
 	public World getWorld() {
 		return m_World;
+	}
+	
+	public void shutdown(int exitCode) {
+		m_Logger.log("Shutdown called with code: " + new Integer(exitCode).toString());
+		m_Document.askToStop();
+		System.exit(exitCode);
+	}
+	
+	public void addSimulationListener(SimulationListener listener) {
+		m_AddSimulationListeners.add(listener);
+	}
+	
+	public void removeSimulationListener(SimulationListener listener) {
+		m_RemoveSimulationListeners.add(listener);
+	}
+	
+	public void fireSimulationListenerEvent(int type) {
+		updateSimulationListenerList();
+		Iterator iter = m_SimulationListeners.iterator();
+		while(iter.hasNext()){
+			((SimulationListener)iter.next()).simulationEventHandler(type);
+		}		
+	}
+	
+	public void updateSimulationListenerList() {
+		Iterator iter = m_RemoveSimulationListeners.iterator();
+		while(iter.hasNext()){
+			m_SimulationListeners.remove(iter.next());
+		}
+		m_RemoveSimulationListeners.clear();
+		
+		iter = m_AddSimulationListeners.iterator();
+		while(iter.hasNext()){
+			m_SimulationListeners.add(iter.next());
+		}
+		m_AddSimulationListeners.clear();		
 	}
 }

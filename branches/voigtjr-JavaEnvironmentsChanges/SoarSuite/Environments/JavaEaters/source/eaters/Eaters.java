@@ -39,7 +39,7 @@ public class Eaters {
 			new EatersWindowManager(simulation);
 		}
 		
-		// TODO: Run simulation??!
+		simulation.shutdown(0);
 	}
 
 	private void Install(String file) throws IOException {	

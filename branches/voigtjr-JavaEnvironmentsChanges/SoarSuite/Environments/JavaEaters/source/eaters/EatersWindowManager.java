@@ -68,12 +68,14 @@ public class EatersWindowManager {
 		return null;
 	}
 
-	Display m_Display;
-	Shell m_Shell;
 	protected Logger m_Logger = Logger.logger;
+	protected Display m_Display;
+	protected Shell m_Shell;
+	protected EatersSimulation m_Simulation;
 
 	public EatersWindowManager(EatersSimulation simulation) {
 		m_Display = new Display();
+		m_Simulation = simulation;
 		initColors(m_Display);
 		
 		m_Shell = new Shell(m_Display);
@@ -90,7 +92,7 @@ public class EatersWindowManager {
 		exit.setText("Exit");
 		exit.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				System.exit(1);
+				m_Simulation.shutdown(0);
 			}
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
@@ -101,7 +103,7 @@ public class EatersWindowManager {
 		
 		m_Shell.setLayout(new FillLayout());
 		
-		VisualWorld vw = new VisualWorld(m_Shell, simulation, kMainMapCellSize);
+		new VisualWorld(m_Shell, simulation, kMainMapCellSize);
 		
 		m_Shell.open();
 		while (!m_Shell.isDisposed()) {

@@ -27,8 +27,10 @@ public class World {
 	protected int m_WorldHeight;
 	protected int[][] m_World;
 	protected FoodInfo[] m_FoodInfo;
+	protected EatersSimulation m_Simulation;
 	
-	public World(String file) {
+	public World(String file, EatersSimulation simulation) {
+		m_Simulation = simulation;
 		
 		try {
 			// Open file
@@ -73,7 +75,7 @@ public class World {
 			
 		} catch (Exception e) {
 			m_Logger.log("Error loading map: " + e.getMessage());
-			System.exit(1);
+			m_Simulation.shutdown(1);
 		}
 		
 		m_Logger.log("Map loaded.");
