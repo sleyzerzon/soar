@@ -109,6 +109,10 @@ public class Document extends Thread implements Kernel.UpdateEventInterface, Ker
     	return agent;
     }
     
+    public boolean destroyAgent(Agent agent) {
+    	return m_Kernel.DestroyAgent(agent);
+    }
+    
 	/** Ask this thread to halt */
 	public synchronized void askToShutdown() {
 		m_AskedToShutdown = true ;

@@ -5,6 +5,8 @@ import java.util.Random;
 
 import org.eclipse.swt.graphics.Point;
 
+import doc.Document;
+
 import sml.Agent;
 import utilities.JavaElementXML;
 import utilities.Logger;
@@ -42,9 +44,11 @@ public class World implements SimulationListener {
 	protected EatersSimulation m_Simulation;
 	protected int m_FoodCount;
 	protected HashMap m_Eaters = new HashMap();
+	protected Document m_Document;
 	
-	public World(String file, EatersSimulation simulation) {
+	public World(String file, EatersSimulation simulation, Document document) {
 		m_Simulation = simulation;
+		m_Document = document;
 
 		try {
 			// Open file
@@ -181,7 +185,14 @@ public class World implements SimulationListener {
 			
 			Eater eater = new Eater(info.agent, this, info.location);
 			m_Eaters.put(info.name, eater);
-		} 
+		} else if (type == SimulationListener.kShutdownEvent) {
+			Object[] objects = (Object[])m_Eaters.values().toArray();
+			for (int i = 0; i < objects.length; ++i) {
+				Eater eater = (Eater)objects[i];
+				m_Document.destroyAgent(eater.getAgent());
+				eater.getAgent().delete();
+			}
+		}
 	}
 }
 
