@@ -6,10 +6,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
+import utilities.Logger;
+
 public class EatersWindowManager {
 	Display m_Display;
 	Shell m_Shell;
-	protected Logger m_Logger = EatersSimulation.logger;
+	protected Logger m_Logger = Logger.logger;
 
 	public EatersWindowManager(EatersSimulation control) {
 		m_Display = new Display();

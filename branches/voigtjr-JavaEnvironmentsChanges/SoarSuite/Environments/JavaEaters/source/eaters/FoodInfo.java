@@ -1,9 +1,11 @@
 package eaters;
 
+import utilities.Logger;
+
 public class FoodInfo {
 	protected String m_Name;
 	protected int m_Value;
-	protected Logger m_Logger = EatersSimulation.logger;
+	protected Logger m_Logger = Logger.logger;
 
 	public FoodInfo(String name, int value) {
 		m_Name = name;

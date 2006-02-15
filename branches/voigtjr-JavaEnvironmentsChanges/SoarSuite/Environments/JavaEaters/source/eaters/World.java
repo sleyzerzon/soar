@@ -1,5 +1,8 @@
 package eaters;
 
+import utilities.JavaElementXML;
+import utilities.Logger;
+
 public class World {
 	public static final String kTagEatersWorld = "eaters-world";
 
@@ -15,7 +18,7 @@ public class World {
 	public static final String kTagCell = "cell";
 	public static final String kParamID = "id";
 
-	protected Logger m_Logger = EatersSimulation.logger;
+	protected Logger m_Logger = Logger.logger;
 	protected int m_WorldWidth;
 	protected int m_WorldHeight;
 	protected int[][] m_World;

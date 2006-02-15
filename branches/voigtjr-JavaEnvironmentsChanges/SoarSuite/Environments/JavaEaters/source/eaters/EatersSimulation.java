@@ -1,5 +1,7 @@
 package eaters;
 
+import utilities.JavaElementXML;
+import utilities.Logger;
 import doc.Document;
 
 public class EatersSimulation {
@@ -17,19 +19,18 @@ public class EatersSimulation {
 	public static final String kAgentFolder = "agents";
 	public static final String kMapFolder = "maps";
 	
-	public static Logger logger = new Logger();
-
 	protected boolean m_NoDebuggers = false;
 	protected String m_DefaultMap;
-	
+	protected Logger m_Logger = Logger.logger;
 	protected Document m_Document;
 	protected String m_BasePath;
 	protected World m_Map;
 	protected Eater[] m_Eaters;
 	
+	
 	public EatersSimulation(String settingsFile) {		
 		// Log the settings file
-		logger.log("Settings file: " + settingsFile);
+		m_Logger.log("Settings file: " + settingsFile);
 
 		// Initialize Soar
 		m_Document = new Document();
@@ -43,7 +44,7 @@ public class EatersSimulation {
 		+ kGroupFolder + System.getProperty("file.separator") 
 		+ kProjectFolder + System.getProperty("file.separator");
 
-		logger.log("Base path: " + m_BasePath);
+		m_Logger.log("Base path: " + m_BasePath);
 		
 		// Load settings file
 		try {
@@ -63,7 +64,7 @@ public class EatersSimulation {
 					m_NoDebuggers = child.getAttributeBooleanThrows(kParamNoDebuggers);
 					m_DefaultMap = child.getAttributeThrows(kParamDefaultMap);
 					
-					logger.log("Default map: " + m_DefaultMap);
+					m_Logger.log("Default map: " + m_DefaultMap);
 					
 				} else if (tagName.equalsIgnoreCase(kTagAgents)) {
 					m_Eaters = new Eater[child.getNumberChildren()];
@@ -86,7 +87,7 @@ public class EatersSimulation {
 
 		// Load default map
 		String mapFile = getMapPath() + m_DefaultMap;
-		logger.log("Attempting to load " + mapFile);
+		m_Logger.log("Attempting to load " + mapFile);
 		m_Map = new World(mapFile);
 	}
 	

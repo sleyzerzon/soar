@@ -3,13 +3,13 @@ package doc;
 import sml.Kernel;
 import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
+import utilities.Logger;
 import eaters.EatersSimulation;
-import eaters.Logger;
 
 public class Document implements Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
 	
 	Kernel m_Kernel;
-	protected Logger m_Logger = EatersSimulation.logger;
+	protected Logger m_Logger = Logger.logger;
 	
 	public Document () {
 	}

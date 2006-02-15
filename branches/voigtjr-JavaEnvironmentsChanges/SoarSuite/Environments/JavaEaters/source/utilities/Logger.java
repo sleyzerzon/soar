@@ -1,10 +1,12 @@
-package eaters;
+package utilities;
 
 import java.io.*;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class Logger {
+	public static Logger logger = new Logger();
+	
 	protected final String kDefaultFile = "EaterLog.txt";
 	protected Writer m_Output;
 

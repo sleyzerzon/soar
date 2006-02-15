@@ -6,7 +6,7 @@
  * @version			
  */
 
-package eaters;
+package utilities;
 
 import java.util.* ;
 import java.io.* ;
