@@ -98,8 +98,23 @@ public class World {
 		return (m_World[location.y][location.x] == 1);
 	}
 	
+	public boolean isWall(int x, int y) {
+		return (m_World[y][x] == 0);
+	}
+	
+	public boolean isEmpty(int x, int y) {
+		return (m_World[y][x] == 1);
+	}
+	
 	public FoodInfo getFoodInfo(Point location) {
 		int value = m_World[location.y][location.x];
+		value -= 2;
+		if (value < 0) return null;
+		return m_FoodInfo[value];
+	}
+
+	public FoodInfo getFoodInfo(int x, int y) {
+		int value = m_World[y][x];
 		value -= 2;
 		if (value < 0) return null;
 		return m_FoodInfo[value];

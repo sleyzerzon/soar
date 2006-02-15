@@ -4,15 +4,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 import utilities.Logger;
 
 public class EatersWindowManager {
+	public static final int kMainMapCellSize = 20;
+	
 	public static Color white;
 	public static Color blue;
 	public static Color red;
@@ -22,10 +27,6 @@ public class EatersWindowManager {
 	public static Color black;
 	public static Color green;
 	public static Color purple;
-
-	Display m_Display;
-	Shell m_Shell;
-	protected Logger m_Logger = Logger.logger;
 
 	public static void initColors(Display d) {
 	    white = d.getSystemColor(SWT.COLOR_WHITE);
@@ -67,7 +68,11 @@ public class EatersWindowManager {
 		return null;
 	}
 
-	public EatersWindowManager(EatersSimulation control) {
+	Display m_Display;
+	Shell m_Shell;
+	protected Logger m_Logger = Logger.logger;
+
+	public EatersWindowManager(EatersSimulation simulation) {
 		m_Display = new Display();
 		initColors(m_Display);
 		
@@ -96,7 +101,7 @@ public class EatersWindowManager {
 		
 		m_Shell.setLayout(new FillLayout());
 		
-		new VisualWorld(m_Shell, control);
+		VisualWorld vw = new VisualWorld(m_Shell, simulation, kMainMapCellSize);
 		
 		m_Shell.open();
 		while (!m_Shell.isDisposed()) {

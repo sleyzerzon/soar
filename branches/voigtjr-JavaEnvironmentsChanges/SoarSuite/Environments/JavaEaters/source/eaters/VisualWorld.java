@@ -12,57 +12,80 @@ import org.eclipse.swt.widgets.Display;
 import utilities.Logger;
 
 public class VisualWorld extends Canvas implements PaintListener {
-
+	public final static int kAgentVision = 1;
+	
 	protected Logger m_Logger = Logger.logger;
 	
 	protected Display m_Display;
 	protected EatersSimulation m_Simulation;
-	protected int m_CellSize = 20;
+	protected int m_CellSize;
 	
-	public VisualWorld(Composite parent, EatersSimulation simulation) {
+	protected Point m_AgentLocation;
+	
+	public VisualWorld(Composite parent, EatersSimulation simulation, int cellSize) {
 		super(parent, SWT.NONE);
 		m_Display = parent.getDisplay();
 		m_Simulation = simulation;
+		m_CellSize = cellSize;
 		addPaintListener(this);
+	}
+	
+	public void setAgentLocation(Point location) {
+		m_AgentLocation = location;
 	}
 
 	public void paintControl(PaintEvent e){
 		World world = m_Simulation.getWorld();
-		GC gc = e.gc;
-		Point location = new Point(0,0);
-		
+		GC gc = e.gc;		
         gc.setForeground(EatersWindowManager.black);
 		gc.setLineWidth(1);
 
 		// Draw world
-		int fill1;
-		int fill2;
-		for(location.x = 0; location.x < world.getWidth(); ++location.x){
-			for(location.y = 0; location.y < world.getHeight(); ++location.y){
-				if (world.isWall(location)) {
+		int fill1, fill2, xDraw, yDraw;
+		for(int x = 0; x < world.getWidth(); ++x){
+			if (m_AgentLocation != null) {
+				if ((x < m_AgentLocation.x - kAgentVision) || (x > m_AgentLocation.x + kAgentVision)) {
+					continue;
+				} 
+				xDraw = x + kAgentVision - m_AgentLocation.x;
+			} else {
+				xDraw = x;
+			}
+			
+			for(int y = 0; y < world.getHeight(); ++y){
+				if (m_AgentLocation != null) {
+					if ((y < m_AgentLocation.y - kAgentVision) || (y > m_AgentLocation.y + kAgentVision)) {
+						continue;
+					} 
+					yDraw = y + kAgentVision - m_AgentLocation.y;
+				} else {
+					yDraw = y;
+				}
+				
+				if (world.isWall(x, y)) {
 				    gc.setBackground(EatersWindowManager.black);
-				    gc.fillRectangle(m_CellSize*location.x + 1, m_CellSize*location.y + 1, m_CellSize - 2, m_CellSize - 2);
+				    gc.fillRectangle(m_CellSize*xDraw + 1, m_CellSize*yDraw + 1, m_CellSize - 2, m_CellSize - 2);
 					
-				} else if (world.isEmpty(location)) {
+				} else if (world.isEmpty(x, y)) {
 					gc.setBackground(EatersWindowManager.widget_background);
-					gc.fillRectangle(m_CellSize*location.x, m_CellSize*location.y, m_CellSize, m_CellSize);
+					gc.fillRectangle(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
 					
 				} else {
 				
-					FoodInfo info = world.getFoodInfo(location);
+					FoodInfo info = world.getFoodInfo(x, y);
 					
 					gc.setBackground(info.getColor());
 					
 					if (info.getShape().equalsIgnoreCase(FoodInfo.kRound)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
-						gc.fillOval(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2, m_CellSize - fill2);
-						gc.drawOval(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
+						gc.fillOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
+						gc.drawOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
 					} else if (info.getShape().equalsIgnoreCase(FoodInfo.kSquare)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
-						gc.fillRectangle(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2, m_CellSize - fill2);
-						gc.drawRectangle(m_CellSize*location.x + fill1, m_CellSize*location.y + fill1, m_CellSize - fill2, m_CellSize - fill2);
+						gc.fillRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
+						gc.drawRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 					} else {
 						m_Logger.log("Invalid food shape.");
 						System.exit(1);
