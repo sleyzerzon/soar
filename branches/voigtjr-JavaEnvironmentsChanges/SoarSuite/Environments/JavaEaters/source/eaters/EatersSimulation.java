@@ -186,10 +186,7 @@ public class EatersSimulation {
 	}
 
 	public void updateWorld() {
-		// Read eaters output links & move them
-		// Check for collisions
-		// Distribute food
-		// Update eaters input links
+		fireSimulationListenerEvent(SimulationListener.kUpdateEvent);
 	}
 	
 	public void addSimulationListener(SimulationListener listener) {

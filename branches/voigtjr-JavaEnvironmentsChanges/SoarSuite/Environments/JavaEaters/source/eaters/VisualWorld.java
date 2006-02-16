@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Display;
 
 import utilities.Logger;
 
-public class VisualWorld extends Canvas implements PaintListener {
+public class VisualWorld extends Canvas implements PaintListener, SimulationListener {
 	protected Logger m_Logger = Logger.logger;
 	
 	protected Display m_Display;
@@ -26,6 +26,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 		m_Simulation = simulation;
 		m_CellSize = cellSize;
 		addPaintListener(this);
+		m_Simulation.addSimulationListener(this);
 	}
 	
 	public void setAgentLocation(Point location) {
@@ -95,7 +96,15 @@ public class VisualWorld extends Canvas implements PaintListener {
 				}
 			}
 		}
-		
-		// TODO: Draw eaters
+	}
+	
+	public void simulationEventHandler(int type, Object object) {
+		if (type == SimulationListener.kUpdateEvent) {
+			m_Display.asyncExec(new Runnable() { 
+				public void run () { 
+					redraw(); 
+				} 
+			});
+		}
 	}
 }

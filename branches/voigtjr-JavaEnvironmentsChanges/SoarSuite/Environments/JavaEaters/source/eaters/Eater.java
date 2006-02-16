@@ -11,19 +11,21 @@ import utilities.Logger;
 public class Eater {
 	public final static int kEaterVision = 2;
 	
-	protected final String kEaterID = "eater";
-	protected final String kDirectionID = "direction";
-	protected final String kNameID = "name";
-	protected final String kScoreID = "score";
-	protected final String kxID = "x";
-	protected final String kyID = "y";
-	protected final String kMyLocationID = "my-location";
-	protected final String kContentID = "content";
+	public final static String kEaterID = "eater";
+	public final static String kDirectionID = "direction";
+	public final static String kNameID = "name";
+	public final static String kScoreID = "score";
+	public final static String kxID = "x";
+	public final static String kyID = "y";
+	public final static String kMyLocationID = "my-location";
+	public final static String kContentID = "content";
+	public final static String kMoveID = "move";
+	public final static String kJumpID = "jump";
 
-	protected final String kNorth = "north";
-	protected final String kEast = "east";
-	protected final String kSouth = "south";
-	protected final String kWest = "west";
+	public final static String kNorth = "north";
+	public final static String kEast = "east";
+	public final static String kSouth = "south";
+	public final static String kWest = "west";
 	
 	protected Logger m_Logger = Logger.logger;
 	protected Agent m_Agent;
@@ -127,7 +129,7 @@ public class Eater {
 		}	
 	}
 	
-	public void update() {
+	public void updateInput() {
 		int xView, yView;
 		for (int x = 0; x < m_Cells.length; ++x) {
 			xView = x - Eater.kEaterVision + m_Location.x;
@@ -138,6 +140,63 @@ public class Eater {
 			}
 		}
 		m_Agent.Commit();
+	}
+	
+	public class MoveInfo {
+		Eater eater;
+		String direction;
+		boolean jump;
+	}
+	
+	public void processOutput() {
+		final int kNumCommands = m_Agent.GetNumberCommands();
+
+		MoveInfo move = new MoveInfo();
+		move.eater = this;
+		
+		for (int i = 0; i < kNumCommands; ++i) {
+			Identifier commandId = m_Agent.GetCommand(i);
+			String commandName = commandId.GetAttribute();
+
+			if (commandName.equalsIgnoreCase(kMoveID)) {
+				move.jump = false;
+				move.direction = commandId.GetParameterValue(kDirectionID);
+				if (move.direction != null) {
+					if (m_World.moveEater(move)) {
+						commandId.AddStatusComplete();
+					}
+				} else {
+					m_Logger.log("Ignoring improperly formatted command: " + kMoveID);
+					continue;
+				}
+			} else if (commandName.equalsIgnoreCase(kJumpID)) {
+				move.jump = true;
+				move.direction = commandId.GetParameterValue(kDirectionID);
+				if (move.direction != null) {
+					if (m_World.moveEater(move)) {
+						commandId.AddStatusComplete();
+					}
+				} else {
+					m_Logger.log("Ignoring improperly formatted command: " + kDirectionID);
+					continue;
+				}
+			} else {
+				m_Logger.log("Ignoring unknown command: " + commandName);
+				continue;
+			}
+		}
+	}
+	
+	public Point getLocation() {
+		return m_Location;
+	}
+	
+	public void adjustScore(int delta) {
+		m_Score += delta;
+	}
+	
+	public void setLocation(Point location) {
+		m_Location = location;
 	}
 }
 

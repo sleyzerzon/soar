@@ -73,10 +73,12 @@ public class EatersWindowManager {
 	protected Display m_Display;
 	protected Shell m_Shell;
 	protected EatersSimulation m_Simulation;
+	protected VisualWorld m_VisualWorld;
 
 	public EatersWindowManager(EatersSimulation simulation) {
 		m_Display = new Display();
 		m_Simulation = simulation;
+
 		initColors(m_Display);
 		
 		m_Shell = new Shell(m_Display);
