@@ -30,6 +30,7 @@ public class World implements SimulationListener {
 	
 	public static final String kTypeWall = "wall";
 	public static final String kTypeEmpty = "empty";
+	public static final String kTypeEater = "eater";
 	
 	public static final int kWallCell = 0;
 	public static final int kEmptyCell = 1;
@@ -167,6 +168,27 @@ public class World implements SimulationListener {
 		return m_FoodCount;
 	}
 	
+	public String getContentNameByLocation(int x, int y) {
+		if (x < 0 || y < 0 || x >= m_WorldWidth || y >= m_WorldHeight) {
+			return kTypeEmpty;
+		}
+		
+		int value = m_World[y][x];
+		switch (value) {
+		case kWallCell:
+			return kTypeWall;
+		case kEmptyCell:
+			return kTypeEmpty;
+		case kEaterCell:
+			return kTypeEater;
+		default:
+			break;
+		}
+		
+		// TODO: risking null exception here
+		return getFoodInfo(x, y).getName();
+	}
+	
 	public void simulationEventHandler(int type, Object object) {
 		if (type == SimulationListener.kNewEaterEvent) {
 			EatersSimulation.EaterInfo info = (EatersSimulation.EaterInfo)object;
@@ -185,6 +207,8 @@ public class World implements SimulationListener {
 			
 			Eater eater = new Eater(info.agent, this, info.location);
 			m_Eaters.put(info.name, eater);
+			eater.update();
+			
 		} else if (type == SimulationListener.kShutdownEvent) {
 			Object[] objects = (Object[])m_Eaters.values().toArray();
 			for (int i = 0; i < objects.length; ++i) {

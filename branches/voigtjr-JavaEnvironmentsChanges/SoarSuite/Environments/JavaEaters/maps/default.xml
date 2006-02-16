@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <eaters-world>
   <food>
-    <food-type name="normal-food" value="5" shape="round" color="blue">
+    <food-type name="normalfood" value="5" shape="round" color="blue">
     </food-type>
-    <food-type name="bonus-food" value="10" shape="square" color="red">
+    <food-type name="bonusfood" value="10" shape="square" color="red">
     </food-type>
   </food>
   <cells world-width="5" world-height="5">
@@ -11,13 +11,13 @@
       <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell type="wall"></cell><cell type="normal-food"></cell><cell type="normal-food"></cell><cell type="bonus-food"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="bonusfood"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell type="wall"></cell><cell type="normal-food"></cell><cell type="bonus-food"></cell><cell type="normal-food"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="normalfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell type="wall"></cell><cell type="bonus-food"></cell><cell type="bonus-food"></cell><cell type="normal-food"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
     </row>
     <row>
       <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>

@@ -18,6 +18,7 @@ public class Eater {
 	protected final String kxID = "x";
 	protected final String kyID = "y";
 	protected final String kMyLocationID = "my-location";
+	protected final String kContentID = "content";
 
 	protected final String kNorth = "north";
 	protected final String kEast = "east";
@@ -74,6 +75,8 @@ public class Eater {
 		
 		m_Cells[kEaterVision][kEaterVision].me = m_Agent.CreateIdWME(m_Agent.GetInputLink(), kMyLocationID);
 		createView(kEaterVision, kEaterVision);
+		
+		m_Agent.Commit();
 	}
 	
 	public String getName() {
@@ -87,6 +90,8 @@ public class Eater {
 	protected void createView(int x, int y) {
 		if (x >= 0 && x <= 4 && y >=0 && y <= 4 && !m_Cells[x][y].iterated) {
 			m_Cells[x][y].iterated = true;
+			m_Cells[x][y].content = m_Agent.CreateStringWME(m_Cells[x][y].me, kContentID, World.kTypeEmpty);
+
 			if (x > 0) {
 				if (m_Cells[x - 1][y].me == null)
 					m_Cells[x - 1][y].me = m_Agent.CreateIdWME(m_Cells[x][y].me,"west");
@@ -120,6 +125,19 @@ public class Eater {
 			createView(x,y - 1);
 			createView(x,y + 1);
 		}	
+	}
+	
+	public void update() {
+		int xView, yView;
+		for (int x = 0; x < m_Cells.length; ++x) {
+			xView = x - Eater.kEaterVision + m_Location.x;
+			for (int y = 0; y < m_Cells[x].length; ++y) {
+				yView = y - Eater.kEaterVision + m_Location.y;
+				String content = m_World.getContentNameByLocation(xView, yView);
+				m_Agent.Update(m_Cells[x][y].content, content);
+			}
+		}
+		m_Agent.Commit();
 	}
 }
 
