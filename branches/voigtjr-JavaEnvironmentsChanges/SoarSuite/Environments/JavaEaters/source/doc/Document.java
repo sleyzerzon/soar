@@ -89,8 +89,9 @@ public class Document extends Thread implements Kernel.UpdateEventInterface, Ker
   			// Stop simulation
   			m_Logger.log("Stop event received from kernel.");
   			m_Simulation.stopSimulation();
+ 		} else {
+ 			m_Logger.log("Unknown system event received from kernel: " + new Integer(eventID).toString());
  		}
-		m_Logger.log("Unknown system event received from kernel: " + new Integer(eventID).toString());
     }
     
     public void stopSoar() {
