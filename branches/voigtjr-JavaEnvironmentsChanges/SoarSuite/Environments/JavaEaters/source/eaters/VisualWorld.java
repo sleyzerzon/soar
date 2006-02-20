@@ -1,13 +1,10 @@
 package eaters;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.*;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.layout.*;
 
 import utilities.Logger;
 
@@ -22,11 +19,22 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 	
 	public VisualWorld(Composite parent, EatersSimulation simulation, int cellSize) {
 		super(parent, SWT.NONE);
+		
 		m_Display = parent.getDisplay();
 		m_Simulation = simulation;
 		m_CellSize = cellSize;
 		addPaintListener(this);
 		m_Simulation.addSimulationListener(this);
+		
+		setLayoutData(new RowData(getWidth(), getHeight()));
+	}
+	
+	public int getWidth() {
+		return m_CellSize * m_Simulation.getWorld().getWidth();
+	}
+	
+	public int getHeight() {
+		return m_CellSize * m_Simulation.getWorld().getHeight();
 	}
 	
 	public void setAgentLocation(Point location) {
@@ -75,16 +83,16 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 					
 				} else {
 				
-					FoodInfo info = world.getFoodInfo(x, y);
+					World.FoodInfo info = world.getFoodInfo(x, y);
 					
 					gc.setBackground(info.getColor());
 					
-					if (info.getShape().equalsIgnoreCase(FoodInfo.kRound)) {
+					if (info.getShape().equalsIgnoreCase(World.FoodInfo.kRound)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
-					} else if (info.getShape().equalsIgnoreCase(FoodInfo.kSquare)) {
+					} else if (info.getShape().equalsIgnoreCase(World.FoodInfo.kSquare)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);

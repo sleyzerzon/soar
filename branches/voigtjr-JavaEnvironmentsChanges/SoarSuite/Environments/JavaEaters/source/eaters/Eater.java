@@ -1,12 +1,9 @@
 package eaters;
 
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.*;
 
-import sml.Agent;
-import sml.Identifier;
-import sml.IntElement;
-import sml.StringElement;
-import utilities.Logger;
+import sml.*;
+import utilities.*;
 
 public class Eater {
 	public final static int kEaterVision = 2;
@@ -27,21 +24,20 @@ public class Eater {
 	public final static String kSouth = "south";
 	public final static String kWest = "west";
 	
-	protected Logger m_Logger = Logger.logger;
-	protected Agent m_Agent;
-	protected World m_World;
-	protected String m_Name;
-	protected int m_Score = 0;
-	protected Point m_Location;
+	Logger m_Logger = Logger.logger;
+	Agent m_Agent;
+	String m_Name;
+	int m_Score = 0;
+	Point m_Location;
 	
-	protected StringElement m_DirectionWME;
-	protected StringElement m_NameWME;
-	protected IntElement m_ScoreWME;
-	protected IntElement m_xWME;
-	protected IntElement m_yWME;
-	protected Cell[][] m_Cells = new Cell[(kEaterVision * 2 ) + 1][(kEaterVision * 2 ) + 1];
+	StringElement m_DirectionWME;
+	StringElement m_NameWME;
+	IntElement m_ScoreWME;
+	IntElement m_xWME;
+	IntElement m_yWME;
+	Cell[][] m_Cells = new Cell[(kEaterVision * 2 ) + 1][(kEaterVision * 2 ) + 1];
 	
-	private class Cell {
+	class Cell {
 		Identifier me;
 		StringElement content;
 
@@ -53,9 +49,8 @@ public class Eater {
 		boolean iterated = false;
 	}
 	
-	public Eater(Agent agent, World world, Point location) {
+	public Eater(Agent agent, Point location) {
 		m_Agent = agent;
-		m_World = world;
 		m_Location = location;
 		
 		m_Name = m_Agent.GetAgentName();
@@ -89,7 +84,7 @@ public class Eater {
 		return m_Agent;
 	}
 	
-	protected void createView(int x, int y) {
+	void createView(int x, int y) {
 		if (x >= 0 && x <= 4 && y >=0 && y <= 4 && !m_Cells[x][y].iterated) {
 			m_Cells[x][y].iterated = true;
 			m_Cells[x][y].content = m_Agent.CreateStringWME(m_Cells[x][y].me, kContentID, World.kTypeEmpty);
@@ -129,13 +124,13 @@ public class Eater {
 		}	
 	}
 	
-	public void updateInput() {
+	public void updateInput(World world) {
 		int xView, yView;
 		for (int x = 0; x < m_Cells.length; ++x) {
 			xView = x - Eater.kEaterVision + m_Location.x;
 			for (int y = 0; y < m_Cells[x].length; ++y) {
 				yView = y - Eater.kEaterVision + m_Location.y;
-				String content = m_World.getContentNameByLocation(xView, yView);
+				String content = world.getContentNameByLocation(xView, yView);
 				m_Agent.Update(m_Cells[x][y].content, content);
 			}
 		}
@@ -148,43 +143,39 @@ public class Eater {
 		boolean jump;
 	}
 	
-	public void processOutput() {
-		final int kNumCommands = m_Agent.GetNumberCommands();
+	public MoveInfo getMove() {
+		if (m_Agent.GetNumberCommands() == 0) {
+			m_Logger.log(m_Name + " issued no command.");
+			return null;
+		}
+		
+		if (m_Agent.GetNumberCommands() > 1) {
+			m_Logger.log(m_Name + " issued more than one command, using first.");
+		}
 
 		MoveInfo move = new MoveInfo();
 		move.eater = this;
 		
-		for (int i = 0; i < kNumCommands; ++i) {
-			Identifier commandId = m_Agent.GetCommand(i);
-			String commandName = commandId.GetAttribute();
+		Identifier commandId = m_Agent.GetCommand(0);
+		String commandName = commandId.GetAttribute();
 
-			if (commandName.equalsIgnoreCase(kMoveID)) {
-				move.jump = false;
-				move.direction = commandId.GetParameterValue(kDirectionID);
-				if (move.direction != null) {
-					if (m_World.moveEater(move)) {
-						commandId.AddStatusComplete();
-					}
-				} else {
-					m_Logger.log("Ignoring improperly formatted command: " + kMoveID);
-					continue;
-				}
-			} else if (commandName.equalsIgnoreCase(kJumpID)) {
-				move.jump = true;
-				move.direction = commandId.GetParameterValue(kDirectionID);
-				if (move.direction != null) {
-					if (m_World.moveEater(move)) {
-						commandId.AddStatusComplete();
-					}
-				} else {
-					m_Logger.log("Ignoring improperly formatted command: " + kDirectionID);
-					continue;
-				}
-			} else {
-				m_Logger.log("Ignoring unknown command: " + commandName);
-				continue;
-			}
+		if (commandName.equalsIgnoreCase(kMoveID)) {
+			move.jump = false;
+		} else if (commandName.equalsIgnoreCase(kJumpID)) {
+			move.jump = true;
+		} else {
+			m_Logger.log("Unknown command: " + commandName);
+			return null;
 		}
+		
+		move.direction = commandId.GetParameterValue(kDirectionID);
+		if (move.direction != null) {
+			commandId.AddStatusComplete();
+			return move;
+		}
+		
+		m_Logger.log("Improperly formatted command: " + kMoveID);
+		return null;
 	}
 	
 	public Point getLocation() {

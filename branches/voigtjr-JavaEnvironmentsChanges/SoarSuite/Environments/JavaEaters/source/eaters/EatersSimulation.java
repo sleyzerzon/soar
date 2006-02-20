@@ -1,16 +1,12 @@
 package eaters;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
-import org.eclipse.swt.graphics.Point;
+import sml.*;
+import utilities.*;
 
-import sml.Agent;
-import utilities.JavaElementXML;
-import utilities.Logger;
-import doc.Document;
-
-public class EatersSimulation {
+public class EatersSimulation  extends Thread implements Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
+	public static final int kDebuggerTimeoutSeconds = 15;	
 	public static final String kTagEaters = "eaters";
 	public static final String kTagSimulation = "simulation";
 	public static final String kParamNoDebuggers = "nodebuggers";
@@ -25,46 +21,34 @@ public class EatersSimulation {
 	public static final String kAgentFolder = "agents";
 	public static final String kMapFolder = "maps";
 	
-	protected boolean m_NoDebuggers = false;
-	protected boolean m_DebuggerSpawned = false;
-	protected String m_DefaultMap;
-	protected Logger m_Logger = Logger.logger;
-	protected Document m_Document;
-	protected String m_BasePath;
-	protected World m_World;
+	boolean m_NoDebuggers = false;
+	boolean m_DebuggerSpawned = false;
+	String m_DefaultMap;
+	Logger m_Logger = Logger.logger;
+	String m_BasePath;
+	World m_World;
+	Kernel m_Kernel;
+	boolean m_AskedToShutdown = false;
+	boolean m_StopSoar = false;
+	boolean m_Run = false;
+	boolean m_Step = false;	
+	boolean m_ResetAfterStop = false;	
+	String m_CurrentMap;
 
-	protected ArrayList m_SimulationListeners = new ArrayList();
-	protected ArrayList m_AddSimulationListeners = new ArrayList();
-	protected ArrayList m_RemoveSimulationListeners = new ArrayList();
-	
-	public class EaterInfo {
-		public String name;
-		public String productions;
-		public Point location;
-		public Agent agent;
-		
-		public EaterInfo(String name, String productions) {
-			this.name = name;
-			this.productions = productions;
-		}
-		
-		public EaterInfo(String name, String productions, Point location) {
-			this(name, productions);
-			this.location = location;
-		}
-	}
+	ArrayList m_SimulationListeners = new ArrayList();
+	ArrayList m_AddSimulationListeners = new ArrayList();
+	ArrayList m_RemoveSimulationListeners = new ArrayList();
 	
 	public EatersSimulation(String settingsFile) {		
 		// Log the settings file
 		m_Logger.log("Settings file: " + settingsFile);
 
 		// Initialize Soar
-		m_Document = new Document(this);
-		m_Document.init();
+		initSoar();
 		
 		// Generate base path
 		// TODO: chop instead of using ..
-		m_BasePath = new String(m_Document.getLibraryLocation());
+		m_BasePath = new String(m_Kernel.GetLibraryLocation());
 		m_BasePath += System.getProperty("file.separator")
 		+ ".." + System.getProperty("file.separator") 
 		+ kGroupFolder + System.getProperty("file.separator") 
@@ -72,7 +56,8 @@ public class EatersSimulation {
 
 		m_Logger.log("Base path: " + m_BasePath);
 		
-		EaterInfo[] initialEaters = null;
+		String [] initialNames = null;
+		String [] initialProductions = null;
 		
 		// Load settings file
 		try {
@@ -95,12 +80,13 @@ public class EatersSimulation {
 					m_Logger.log("Default map: " + m_DefaultMap);
 					
 				} else if (tagName.equalsIgnoreCase(kTagAgents)) {
-					initialEaters = new EaterInfo[child.getNumberChildren()];
-					for (int j = 0; j < initialEaters.length; ++j) {
+					initialNames = new String[child.getNumberChildren()];
+					initialProductions = new String[child.getNumberChildren()];
+					for (int j = 0; j < initialNames.length; ++j) {
 						JavaElementXML agent = child.getChild(j);
 						
-						initialEaters[j] = new EaterInfo(agent.getAttributeThrows(kParamName), 
-								agent.getAttributeThrows(kParamProductions));
+						initialNames[j] = agent.getAttributeThrows(kParamName);
+						initialProductions[j] = agent.getAttributeThrows(kParamProductions);
 					}
 				} else {
 					// Throw during development, but really we should just ignore this
@@ -113,26 +99,128 @@ public class EatersSimulation {
 			shutdown(1);
 		}
 
+		m_CurrentMap = m_DefaultMap;
+
 		// Load default world
-		String mapFile = getMapPath() + m_DefaultMap;
-		m_Logger.log("Attempting to load " + mapFile);
-		m_World = new World(mapFile, this, m_Document);	
-		addSimulationListener(m_World);
+		m_World = new World(this);	
+		m_Logger.log("Attempting to load " + getCurrentMap());
+		m_World.load(getCurrentMap());
 		
 		// add initial eaters
-		if (initialEaters != null) {
-			for (int i = 0; i < initialEaters.length; ++i) {
-				addEater(initialEaters[i]);
+		if (initialNames != null) {
+			for (int i = 0; i < initialNames.length; ++i) {
+				Agent agent = createAgent(initialNames[i], initialProductions[i]);
+				m_World.createEater(agent);
+				spawnDebugger(initialNames[i]);		
 			}
 		}
 	}
 	
-	public void addEater(EaterInfo info) {
-		info.agent = m_Document.createAgent(info.name, info.productions);
-		fireSimulationListenerEvent(SimulationListener.kNewEaterEvent, info);
-		spawnDebugger(info.name);		
+	public String getCurrentMap() {
+		return getMapPath() + m_CurrentMap;
 	}
 	
+	void initSoar() {
+		// Create kernel
+		try {
+			m_Kernel = Kernel.CreateKernelInNewThread("SoarKernelSML", 12121);
+		} catch (Exception e) {
+			m_Logger.log("Exception while creating kernel: " + e.getMessage());
+			System.exit(1);
+		}
+
+		if (m_Kernel.HadError()) {
+			m_Logger.log("Error creating kernel: " + m_Kernel.GetLastErrorDescription());
+			System.exit(1);
+		}
+
+		// Register for events
+		m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
+		m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
+		m_Kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
+		
+		this.start();
+	}
+
+	public boolean waitForDebugger() {
+		boolean ready = false;
+		for (int tries = 0; tries < kDebuggerTimeoutSeconds; ++tries) {
+			m_Kernel.GetAllConnectionInfo();
+			if (m_Kernel.HasConnectionInfoChanged()) {
+				for (int i = 0; i < m_Kernel.GetNumberConnections(); ++i) {
+					ConnectionInfo info =  m_Kernel.GetConnectionInfo(i);
+					if (info.GetName().equalsIgnoreCase("java-debugger")) {
+						if (info.GetAgentStatus().equalsIgnoreCase(sml_Names.getKStatusReady())) {
+							ready = true;
+							break;
+						}
+					}
+				}
+				if (ready) break;
+			}
+			try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+		}
+		return ready;
+	}
+	
+  	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
+  		if (m_StopSoar) {
+  			m_StopSoar = false;
+  			m_Kernel.StopAllAgents();
+  			return;
+  		}
+		m_Logger.log("Update event received from kernel.");
+		fireSimulationListenerEvent(SimulationListener.kUpdateEvent);
+		m_World.update();
+  	}
+  	
+    public void systemEventHandler(int eventID, Object data, Kernel kernel) {
+  		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
+  			// Start simulation
+  			m_Logger.log("Start event received from kernel.");
+  			fireSimulationListenerEvent(SimulationListener.kStartEvent);
+  		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
+  			// Stop simulation
+  			m_Logger.log("Stop event received from kernel.");
+  			fireSimulationListenerEvent(SimulationListener.kStopEvent);	
+  			if (m_ResetAfterStop) {
+  				m_ResetAfterStop = false;
+  				m_World.load(getCurrentMap());
+  			}
+ 		} else {
+ 			m_Logger.log("Unknown system event received from kernel: " + new Integer(eventID).toString());
+ 		}
+    }
+        
+    public Agent createAgent(String name, String productions) {
+    	Agent agent = m_Kernel.CreateAgent(name);
+    	boolean load = agent.LoadProductions(getAgentPath() + productions);
+    	if (!load || agent.HadError()) {
+    		m_Logger.log("Error creating agent " + name + 
+    				" (" + getAgentPath() + productions + 
+    				"): " + agent.GetLastErrorDescription());
+    		return null;
+    	}
+    	return agent;
+    }
+        
+    public void run() {
+		while (!m_AskedToShutdown) {
+			if (m_Run) {
+				m_Run = false;
+				m_Kernel.RunAllAgentsForever();
+			} else if (m_Step) {
+				m_Step = false;
+				m_Kernel.RunAllAgents(1);
+			}
+			try { Thread.sleep(10) ; } catch (InterruptedException e) { } 
+		}
+		m_Logger.log("Document exiting, shutting down soar.");
+		m_Kernel.Shutdown();
+		m_Kernel.delete();
+		m_Kernel = null;
+    }
+    
 	public String getAgentPath() {
 		return m_BasePath + kAgentFolder + System.getProperty("file.separator");
 	}
@@ -152,11 +240,11 @@ public class EatersSimulation {
 		Runtime r = java.lang.Runtime.getRuntime();
 		try {
 			// TODO: manage the returned process a bit better.
-			r.exec("java -jar " + m_Document.getLibraryLocation() + System.getProperty("file.separator")
+			r.exec("java -jar " + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
 					+ "bin" + System.getProperty("file.separator") 
 					+ "SoarJavaDebugger.jar -remote -agent " + agentName);
 			
-			if (!m_Document.waitForDebugger()) {
+			if (!waitForDebugger()) {
 				m_Logger.log("Debugger spawn failed for agent: " + agentName);
 				return;
 			}
@@ -173,20 +261,33 @@ public class EatersSimulation {
 	public void shutdown(int exitCode) {
 		m_Logger.log("Shutdown called with code: " + new Integer(exitCode).toString());
 		fireSimulationListenerEvent(SimulationListener.kShutdownEvent);
-		m_Document.askToShutdown();
+		m_World.destroyAllEaters();
+		m_AskedToShutdown = true;
 		System.exit(exitCode);
 	}
 	
 	public void startSimulation() {
-		fireSimulationListenerEvent(SimulationListener.kStartEvent);
+		m_Run = true ;
+		interrupt();
+	}
+	
+	public void stepSimulation() {
+		m_Step = true ;
+		interrupt();
 	}
 	
 	public void stopSimulation() {
-		fireSimulationListenerEvent(SimulationListener.kStopEvent);		
+    	m_StopSoar = true;
 	}
 
-	public void updateWorld() {
-		fireSimulationListenerEvent(SimulationListener.kUpdateEvent);
+	public void resetSimulation() {
+    	m_StopSoar = true;
+    	m_ResetAfterStop = true;
+	}
+
+	public void destroyEater(Eater eater) {
+		m_Kernel.DestroyAgent(eater.getAgent());
+		eater.getAgent().delete();
 	}
 	
 	public void addSimulationListener(SimulationListener listener) {

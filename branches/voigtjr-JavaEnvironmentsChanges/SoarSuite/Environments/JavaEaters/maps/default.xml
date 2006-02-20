@@ -6,21 +6,36 @@
     <food-type name="bonusfood" value="10" shape="square" color="red">
     </food-type>
   </food>
-  <cells world-width="5" world-height="5">
+  <cells world-width="10" world-height="10">
     <row>
-      <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell type="wall"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="bonusfood"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell type="wall"></cell><cell type="normalfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="normalfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
     </row>
     <row>
-      <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>
+      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
+    </row>
+    <row>
+      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
+    </row>
+    <row>
+      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
+    </row>
+    <row>
+      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
+    </row>
+    <row>
+      <cell type="wall"></cell><cell type="bonusfood"></cell><cell type="bonusfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="normalfood"></cell><cell type="wall"></cell>
+    </row>
+    <row>
+      <cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell><cell type="wall"></cell>
     </row>
   </cells>
 </eaters-world>

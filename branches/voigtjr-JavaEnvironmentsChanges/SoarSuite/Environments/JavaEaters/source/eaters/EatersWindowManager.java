@@ -1,19 +1,13 @@
 package eaters;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import java.awt.Composite;
 
-import sml.Agent;
+import org.eclipse.swt.*;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.layout.*;
+
 import utilities.Logger;
 
 public class EatersWindowManager {
@@ -73,7 +67,6 @@ public class EatersWindowManager {
 	protected Display m_Display;
 	protected Shell m_Shell;
 	protected EatersSimulation m_Simulation;
-	protected VisualWorld m_VisualWorld;
 
 	public EatersWindowManager(EatersSimulation simulation) {
 		m_Display = new Display();
@@ -82,8 +75,27 @@ public class EatersWindowManager {
 		initColors(m_Display);
 		
 		m_Shell = new Shell(m_Display);
+		m_Shell.setLayout(new RowLayout(SWT.VERTICAL));
 		
-		Menu menu = new Menu(m_Shell, SWT.BAR);
+		createMenu();
+		
+		final SimButtons sb = new SimButtons(m_Shell, m_Simulation);
+		
+		final VisualWorld vw = new VisualWorld(m_Shell, m_Simulation, kMainMapCellSize);
+		
+		m_Shell.setSize(400,400);
+		m_Shell.open();
+		
+		while (!m_Shell.isDisposed()) {
+			if (!m_Display.readAndDispatch()) {
+				m_Display.sleep();
+			}
+		}
+		m_Display.dispose();		
+	}
+	
+	public void createMenu() {
+		final Menu menu = new Menu(m_Shell, SWT.BAR);
 		
 		final MenuItem file = new MenuItem(menu, SWT.CASCADE);		
 		file.setText("File");
@@ -102,18 +114,6 @@ public class EatersWindowManager {
 			}
 		});
 		
-		m_Shell.setMenuBar(menu);	
-		
-		m_Shell.setLayout(new FillLayout());
-		
-		new VisualWorld(m_Shell, simulation, kMainMapCellSize);
-		
-		m_Shell.open();
-		while (!m_Shell.isDisposed()) {
-			if (!m_Display.readAndDispatch()) {
-				m_Display.sleep();
-			}
-		}
-		m_Display.dispose();		
+		m_Shell.setMenuBar(menu);			
 	}
 }

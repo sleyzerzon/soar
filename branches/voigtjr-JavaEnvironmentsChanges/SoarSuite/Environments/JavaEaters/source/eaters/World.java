@@ -3,15 +3,15 @@ package eaters;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 
-import doc.Document;
 
 import sml.Agent;
 import utilities.JavaElementXML;
 import utilities.Logger;
 
-public class World implements SimulationListener {
+public class World {
 	public static final String kTagEatersWorld = "eaters-world";
 
 	public static final String kTagFood = "food";
@@ -39,23 +39,62 @@ public class World implements SimulationListener {
 	
 	public static final int kWallPenalty = -5;
 
-	protected Logger m_Logger = Logger.logger;
-	protected int m_WorldWidth;
-	protected int m_WorldHeight;
-	protected int[][] m_World;
-	protected FoodInfo[] m_FoodInfo;
-	protected EatersSimulation m_Simulation;
-	protected int m_FoodCount;
-	protected HashMap m_Eaters = new HashMap();
-	protected Document m_Document;
-	
-	public World(String file, EatersSimulation simulation, Document document) {
-		m_Simulation = simulation;
-		m_Document = document;
+	public class FoodInfo {
+		public static final String kRound = "round";
+		public static final String kSquare = "square";
+			
+		protected String m_Name;
+		protected int m_Value;
+		protected String m_Shape;
+		protected String m_ColorString;
+		protected Color m_Color;
+		
+		protected Logger m_Logger = Logger.logger;
 
+		public FoodInfo(String name, int value, String shape, String color) {
+			m_Name = name;
+			m_Value = value;
+			m_Shape = shape;
+			m_ColorString = color;
+		}
+		
+		public String getName() {
+			return m_Name;
+		}
+		
+		public int getValue() {
+			return m_Value;
+		}
+		
+		public String getShape() {
+			return m_Shape;
+		}
+		
+		public Color getColor() {
+			if (m_Color == null) {
+				m_Color = EatersWindowManager.getColor(m_ColorString);
+			}
+			return m_Color;
+		}
+	}
+
+	Logger m_Logger = Logger.logger;
+	int m_WorldWidth;
+	int m_WorldHeight;
+	int[][] m_World;
+	FoodInfo[] m_FoodInfo;
+	EatersSimulation m_Simulation;
+	int m_FoodCount;
+	HashMap m_Eaters = new HashMap();
+	
+	public World(EatersSimulation simulation) {
+		m_Simulation = simulation;
+	}
+	
+	public boolean load(String mapFile) {
 		try {
 			// Open file
-			JavaElementXML root = JavaElementXML.ReadFromFile(file);
+			JavaElementXML root = JavaElementXML.ReadFromFile(mapFile);
 			
 			if (!root.getTagName().equalsIgnoreCase(kTagEatersWorld)) {
 				throw new Exception("Not an eaters map!");
@@ -100,12 +139,11 @@ public class World implements SimulationListener {
 			
 		} catch (Exception e) {
 			m_Logger.log("Error loading map: " + e.getMessage());
-			m_Simulation.shutdown(1);
+			return false;
 		}
 		
-		m_Logger.log("Map loaded.");
-		
-		// TODO: events
+		m_Logger.log(mapFile + " loaded.");
+		return true;
 	}
 	
 	public int getTypeIDByName(String name) throws Exception {
@@ -205,42 +243,42 @@ public class World implements SimulationListener {
 		return getFoodInfo(x, y).getName();
 	}
 	
-	public void simulationEventHandler(int type, Object object) {
-		if (type == SimulationListener.kNewEaterEvent) {
-			EatersSimulation.EaterInfo info = (EatersSimulation.EaterInfo)object;
-			if (info.location == null) {
-				// set random starting location
-				Random random = new Random();
-				info.location = new Point(random.nextInt(m_WorldWidth), random.nextInt(m_WorldHeight));
-				while (isWall(info.location) || isEater(info.location)) {
-					info.location.x = random.nextInt(m_WorldWidth);
-					info.location.y = random.nextInt(m_WorldHeight);				
-				}
-			}
-			
-			if (getFoodInfo(info.location) != null) {
-				--m_FoodCount;
-			}
-			Eater eater = new Eater(info.agent, this, info.location);
-			m_Eaters.put(info.name, eater);
+	public void createEater(Agent agent) {
+		createEater(agent, null);
+	}
 
-			setEaterCells();
-
-			eater.updateInput();
-			
-		} else if (type == SimulationListener.kShutdownEvent) {
-			Object[] objects = (Object[])m_Eaters.values().toArray();
-			for (int i = 0; i < objects.length; ++i) {
-				Eater eater = (Eater)objects[i];
-				m_Document.destroyAgent(eater.getAgent());
-				eater.getAgent().delete();
+	public void createEater(Agent agent, Point location) {
+		if (location == null) {
+			// set random starting location
+			Random random = new Random();
+			location = new Point(random.nextInt(m_WorldWidth), random.nextInt(m_WorldHeight));
+			while (isWall(location) || isEater(location)) {
+				location.x = random.nextInt(m_WorldWidth);
+				location.y = random.nextInt(m_WorldHeight);				
 			}
-		} else if (type == SimulationListener.kUpdateEvent) {
-			update();
 		}
+		
+		if (getFoodInfo(location) != null) {
+			--m_FoodCount;
+		}
+		
+		Eater eater = new Eater(agent, location);
+		m_Eaters.put(agent.GetAgentName(), eater);
+
+		setEaterCells();
+
+		eater.updateInput(this);
 	}
 	
-	public boolean moveEater(Eater.MoveInfo move) {
+	public void destroyAllEaters() {
+		Object[] objects = (Object[])m_Eaters.values().toArray();
+		for (int i = 0; i < objects.length; ++i) {
+			m_Simulation.destroyEater((Eater)objects[i]);
+		}
+		m_Eaters = null;		
+	}
+	
+	void moveEater(Eater.MoveInfo move) {
 		Point oldLocation = move.eater.getLocation();
 		Point newLocation;
 		if (move.direction.equalsIgnoreCase(Eater.kNorth)) {
@@ -256,7 +294,7 @@ public class World implements SimulationListener {
 			
 		} else {
 			m_Logger.log("Invalid move direction: " + move.direction);
-			return false;
+			return;
 		}
 		
 		if (isEnterable(newLocation)) {
@@ -270,10 +308,9 @@ public class World implements SimulationListener {
 		} else {
 			move.eater.adjustScore(kWallPenalty);
 		}
-		return true;
 	}
 	
-	protected void setEaterCells() {
+	void setEaterCells() {
 		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
 		for (int i = 0; i < eaters.length; ++i) {
 			Point location = eaters[i].getLocation();
@@ -281,18 +318,28 @@ public class World implements SimulationListener {
 		}
 	}
 	
-	protected void update() {
+	void update() {
+		if (getFoodCount() <= 0) {
+			m_Logger.log("All of the food is gone.");
+			m_Simulation.stopSimulation();
+			return;
+		}
+		
 		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
 		for (int i = 0; i < eaters.length; ++i) {
-			eaters[i].processOutput();
+			moveEater(eaters[i].getMove());
 		}
 		setEaterCells();
 		
-		// TODO: collisions
+		handleCollisions();
 		
 		for (int i = 0; i < eaters.length; ++i) {
-			eaters[i].updateInput();
+			eaters[i].updateInput(this);
 		}
+	}
+	
+	void handleCollisions() {
+		// TODO
 	}
 }
 
