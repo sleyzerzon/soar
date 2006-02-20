@@ -32,13 +32,12 @@ public class Eaters {
 		}
 		
 		// Initialize the simulation
-		EatersSimulation simulation = new EatersSimulation(m_SettingsFile);
+		EatersSimulation simulation = new EatersSimulation(m_SettingsFile, m_Quiet);
 		
 		// Initialize the window manager, if applicable.
 		if(!m_Quiet) {
 			new EatersWindowManager(simulation);
 		}
-		
 		simulation.shutdown(0);
 	}
 

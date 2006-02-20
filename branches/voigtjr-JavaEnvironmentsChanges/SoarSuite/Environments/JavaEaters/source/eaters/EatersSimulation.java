@@ -36,7 +36,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	ArrayList m_AddSimulationListeners = new ArrayList();
 	ArrayList m_RemoveSimulationListeners = new ArrayList();
 	
-	public EatersSimulation(String settingsFile) {		
+	public EatersSimulation(String settingsFile, boolean quiet) {		
 		// Log the settings file
 		m_Logger.log("Settings file: " + settingsFile);
 
@@ -114,6 +114,11 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 				m_World.createEater(agent);
 				spawnDebugger(initialNames[i]);		
 			}
+		}
+		
+		// if in quiet mode, run!
+		if (quiet) {
+	    	m_Kernel.RunAllAgentsForever();
 		}
 	}
 	
@@ -262,9 +267,13 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		m_RunThread = null;
 		m_StopSoar = true;
 	}
+	
+	public boolean isRunning() {
+		return (m_RunThread != null);
+	}
 
 	public void resetSimulation() {
-		if (m_RunThread != null) {
+		if (isRunning()) {
 			stopSimulation();
 		}
 		m_World.load(this.getCurrentMap());

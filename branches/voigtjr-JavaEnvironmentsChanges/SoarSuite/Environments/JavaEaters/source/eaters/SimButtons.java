@@ -5,8 +5,12 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
-public class SimButtons extends Composite {
+public class SimButtons extends Composite implements SimulationListener {
 	EatersSimulation m_Simulation;
+	Button m_RunButton;
+	Button m_StopButton;
+	Button m_StepButton;
+	Button m_ResetButton;
 	
 	public SimButtons(Composite parent, EatersSimulation simulation) {
 		super(parent, SWT.NONE);
@@ -15,36 +19,59 @@ public class SimButtons extends Composite {
 		
 		setLayout(new FillLayout());
 		
-		final Button runButton = new Button(this, SWT.PUSH);
-		runButton.setText("Run");
-		runButton.addSelectionListener(new SelectionAdapter() {
+		m_RunButton = new Button(this, SWT.PUSH);
+		m_RunButton.setText("Run");
+		m_RunButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				m_Simulation.startSimulation();
 			}
 		});
 		
-		final Button stopButton = new Button(this, SWT.PUSH);
-		stopButton.setText("Stop");
-		stopButton.addSelectionListener(new SelectionAdapter() {
+		m_StopButton = new Button(this, SWT.PUSH);
+		m_StopButton.setText("Stop");
+		m_StopButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				m_Simulation.stopSimulation();
 			}
 		});
 		
-		final Button stepButton = new Button(this, SWT.PUSH);
-		stepButton.setText("Step");
-		stepButton.addSelectionListener(new SelectionAdapter() {
+		m_StepButton = new Button(this, SWT.PUSH);
+		m_StepButton.setText("Step");
+		m_StepButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				m_Simulation.stepSimulation();
 			}
 		});
 		
-		final Button resetButton = new Button(this, SWT.PUSH);
-		resetButton.setText("Reset");
-		resetButton.addSelectionListener(new SelectionAdapter() {
+		m_ResetButton = new Button(this, SWT.PUSH);
+		m_ResetButton.setText("Reset");
+		m_ResetButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				m_Simulation.resetSimulation();
 			}
 		});
+		
+		m_Simulation.addSimulationListener(this);
+		updateButtons();
+	}
+	
+	void updateButtons() {
+		boolean running = m_Simulation.isRunning();
+		boolean done = (m_Simulation.getWorld().getFoodCount() == 0);
+		
+        m_RunButton.setEnabled(!running && !done);
+        m_StopButton.setEnabled(running);
+        m_ResetButton.setEnabled(!running);
+        m_StepButton.setEnabled(!running && !done);
+	}
+
+	public void simulationEventHandler(int type, Object object) {
+		if (type == SimulationListener.kStartEvent || type == SimulationListener.kStopEvent || type == SimulationListener.kNewWorldEvent) {
+			this.getDisplay().asyncExec(new Runnable() { 
+				public void run () { 
+					updateButtons();
+				} 
+			});
+		}
 	}
 }
