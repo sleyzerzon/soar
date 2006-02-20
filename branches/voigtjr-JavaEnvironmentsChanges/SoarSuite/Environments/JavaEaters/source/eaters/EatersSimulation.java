@@ -5,7 +5,7 @@ import java.util.*;
 import sml.*;
 import utilities.*;
 
-public class EatersSimulation  extends Thread implements Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
+public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
 	public static final int kDebuggerTimeoutSeconds = 15;	
 	public static final String kTagEaters = "eaters";
 	public static final String kTagSimulation = "simulation";
@@ -21,6 +21,7 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
 	public static final String kAgentFolder = "agents";
 	public static final String kMapFolder = "maps";
 	
+    private Thread m_RunThread;
 	boolean m_NoDebuggers = false;
 	boolean m_DebuggerSpawned = false;
 	String m_DefaultMap;
@@ -28,11 +29,7 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
 	String m_BasePath;
 	World m_World;
 	Kernel m_Kernel;
-	boolean m_AskedToShutdown = false;
 	boolean m_StopSoar = false;
-	boolean m_Run = false;
-	boolean m_Step = false;	
-	boolean m_ResetAfterStop = false;	
 	String m_CurrentMap;
 
 	ArrayList m_SimulationListeners = new ArrayList();
@@ -104,7 +101,11 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
 		// Load default world
 		m_World = new World(this);	
 		m_Logger.log("Attempting to load " + getCurrentMap());
-		m_World.load(getCurrentMap());
+		if (!m_World.load(getCurrentMap())) {
+			shutdown(1);
+			return;
+		}
+		fireSimulationEvent(SimulationListener.kNewWorldEvent);
 		
 		// add initial eaters
 		if (initialNames != null) {
@@ -138,8 +139,6 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
 		m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
 		m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
 		m_Kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
-		
-		this.start();
 	}
 
 	public boolean waitForDebugger() {
@@ -167,10 +166,9 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
   		if (m_StopSoar) {
   			m_StopSoar = false;
   			m_Kernel.StopAllAgents();
-  			return;
   		}
 		m_Logger.log("Update event received from kernel.");
-		fireSimulationListenerEvent(SimulationListener.kUpdateEvent);
+		fireSimulationEvent(SimulationListener.kUpdateEvent);
 		m_World.update();
   	}
   	
@@ -178,15 +176,11 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
   		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
   			// Start simulation
   			m_Logger.log("Start event received from kernel.");
-  			fireSimulationListenerEvent(SimulationListener.kStartEvent);
+  			fireSimulationEvent(SimulationListener.kStartEvent);
   		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
   			// Stop simulation
   			m_Logger.log("Stop event received from kernel.");
-  			fireSimulationListenerEvent(SimulationListener.kStopEvent);	
-  			if (m_ResetAfterStop) {
-  				m_ResetAfterStop = false;
-  				m_World.load(getCurrentMap());
-  			}
+  			fireSimulationEvent(SimulationListener.kStopEvent);	
  		} else {
  			m_Logger.log("Unknown system event received from kernel: " + new Integer(eventID).toString());
  		}
@@ -205,20 +199,7 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
     }
         
     public void run() {
-		while (!m_AskedToShutdown) {
-			if (m_Run) {
-				m_Run = false;
-				m_Kernel.RunAllAgentsForever();
-			} else if (m_Step) {
-				m_Step = false;
-				m_Kernel.RunAllAgents(1);
-			}
-			try { Thread.sleep(10) ; } catch (InterruptedException e) { } 
-		}
-		m_Logger.log("Document exiting, shutting down soar.");
-		m_Kernel.Shutdown();
-		m_Kernel.delete();
-		m_Kernel = null;
+    	m_Kernel.RunAllAgentsForever();
     }
     
 	public String getAgentPath() {
@@ -260,29 +241,35 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
 	
 	public void shutdown(int exitCode) {
 		m_Logger.log("Shutdown called with code: " + new Integer(exitCode).toString());
-		fireSimulationListenerEvent(SimulationListener.kShutdownEvent);
+		fireSimulationEvent(SimulationListener.kShutdownEvent);
 		m_World.destroyAllEaters();
-		m_AskedToShutdown = true;
+		m_Kernel.Shutdown();
+		m_Kernel.delete();
 		System.exit(exitCode);
 	}
 	
 	public void startSimulation() {
-		m_Run = true ;
-		interrupt();
+        m_RunThread = new Thread(this);    
+        m_StopSoar = false;
+        m_RunThread.start();
 	}
 	
 	public void stepSimulation() {
-		m_Step = true ;
-		interrupt();
+        m_Kernel.RunAllAgents(1);
 	}
 	
 	public void stopSimulation() {
-    	m_StopSoar = true;
+		m_RunThread = null;
+		m_StopSoar = true;
 	}
 
 	public void resetSimulation() {
-    	m_StopSoar = true;
-    	m_ResetAfterStop = true;
+		if (m_RunThread != null) {
+			stopSimulation();
+		}
+		m_World.load(this.getCurrentMap());
+		m_World.resetEaters();
+		fireSimulationEvent(SimulationListener.kNewWorldEvent);
 	}
 
 	public void destroyEater(Eater eater) {
@@ -298,11 +285,11 @@ public class EatersSimulation  extends Thread implements Kernel.UpdateEventInter
 		m_RemoveSimulationListeners.add(listener);
 	}
 	
-	protected void fireSimulationListenerEvent(int type) {
-		fireSimulationListenerEvent(type, null);
+	protected void fireSimulationEvent(int type) {
+		fireSimulationEvent(type, null);
 	}
 	
-	protected void fireSimulationListenerEvent(int type, Object object) {
+	protected void fireSimulationEvent(int type, Object object) {
 		updateSimulationListenerList();
 		Iterator iter = m_SimulationListeners.iterator();
 		while(iter.hasNext()){

@@ -5,7 +5,8 @@ public interface SimulationListener {
 		kStartEvent = 0,
 		kStopEvent = 1,
 		kShutdownEvent = 2,
-		kUpdateEvent = 3;
+		kUpdateEvent = 3,
+		kNewWorldEvent = 4;
 	
 	public void simulationEventHandler(int type, Object object);
 }

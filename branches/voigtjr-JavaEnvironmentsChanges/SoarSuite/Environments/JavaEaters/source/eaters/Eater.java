@@ -35,9 +35,9 @@ public class Eater {
 	IntElement m_ScoreWME;
 	IntElement m_xWME;
 	IntElement m_yWME;
-	Cell[][] m_Cells = new Cell[(kEaterVision * 2 ) + 1][(kEaterVision * 2 ) + 1];
+	SoarCell[][] m_Cells = new SoarCell[(kEaterVision * 2 ) + 1][(kEaterVision * 2 ) + 1];
 	
-	class Cell {
+	class SoarCell {
 		Identifier me;
 		StringElement content;
 
@@ -66,7 +66,7 @@ public class Eater {
 		
 		for (int i = 0; i < m_Cells.length; ++i) {
 			for (int j = 0; j < m_Cells.length; ++j) {
-				m_Cells[i][j] = new Cell();
+				m_Cells[i][j] = new SoarCell();
 			}
 		}
 		
@@ -82,6 +82,10 @@ public class Eater {
 	
 	public Agent getAgent() {
 		return m_Agent;
+	}
+	
+	public void initSoar() {
+		m_Agent.InitSoar();
 	}
 	
 	void createView(int x, int y) {
@@ -184,6 +188,10 @@ public class Eater {
 	
 	public void adjustScore(int delta) {
 		m_Score += delta;
+	}
+	
+	public void clearScore() {
+		m_Score = 0;
 	}
 	
 	public void setLocation(Point location) {

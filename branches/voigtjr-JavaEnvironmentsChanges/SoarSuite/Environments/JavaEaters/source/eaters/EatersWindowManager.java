@@ -1,7 +1,5 @@
 package eaters;
 
-import java.awt.Composite;
-
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
@@ -10,8 +8,9 @@ import org.eclipse.swt.layout.*;
 
 import utilities.Logger;
 
-public class EatersWindowManager {
+public class EatersWindowManager implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
+	public static final String kFoodRemaining = "Food remaining: ";
 	
 	public static Color white;
 	public static Color blue;
@@ -63,11 +62,12 @@ public class EatersWindowManager {
 		return null;
 	}
 
-	protected Logger m_Logger = Logger.logger;
-	protected Display m_Display;
-	protected Shell m_Shell;
-	protected EatersSimulation m_Simulation;
-
+	Logger m_Logger = Logger.logger;
+	Display m_Display;
+	Shell m_Shell;
+	EatersSimulation m_Simulation;
+	final Label m_FoodCount;
+	
 	public EatersWindowManager(EatersSimulation simulation) {
 		m_Display = new Display();
 		m_Simulation = simulation;
@@ -79,10 +79,15 @@ public class EatersWindowManager {
 		
 		createMenu();
 		
-		final SimButtons sb = new SimButtons(m_Shell, m_Simulation);
+		new SimButtons(m_Shell, m_Simulation);
 		
-		final VisualWorld vw = new VisualWorld(m_Shell, m_Simulation, kMainMapCellSize);
+		new VisualWorld(m_Shell, m_Simulation, kMainMapCellSize);
 		
+		m_FoodCount = new Label(m_Shell, SWT.NONE);
+		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.m_World.getFoodCount()));
+
+		m_Simulation.addSimulationListener(this);
+
 		m_Shell.setSize(400,400);
 		m_Shell.open();
 		
@@ -115,5 +120,15 @@ public class EatersWindowManager {
 		});
 		
 		m_Shell.setMenuBar(menu);			
+	}
+
+	public void simulationEventHandler(int type, Object object) {
+		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
+			m_Display.asyncExec(new Runnable() { 
+				public void run () { 
+					m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.m_World.getFoodCount()));
+				} 
+			});
+		}
 	}
 }
