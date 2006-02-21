@@ -16,14 +16,18 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 	Point m_AgentLocation;
 	boolean m_Disabled = false;
 	
-	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
+	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize, boolean mini) {
 		super(parent, style);
 		
 		m_Display = parent.getDisplay();
 		m_Simulation = simulation;
 		m_CellSize = cellSize;
 
-		setLayoutData(new RowData(getWidth(), getHeight()));
+		if (mini) {
+			setLayoutData(new RowData(getMiniWidth(), getMiniHeight()));
+		} else {
+			setLayoutData(new RowData(getWidth(), getHeight()));
+		}
 
 		addPaintListener(this);		
 		m_Simulation.addSimulationListener(this);
@@ -58,15 +62,17 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 	}
 
 	public void paintControl(PaintEvent e){
-		if (m_Disabled) {
-			return;
-		}
-		
 		World world = m_Simulation.getWorld();
 		GC gc = e.gc;		
         gc.setForeground(EatersWindowManager.black);
 		gc.setLineWidth(1);
 
+		if (m_Disabled) {
+			gc.setBackground(EatersWindowManager.widget_background);
+			gc.fillRectangle(0,0, this.getWidth(), this.getHeight());
+			return;
+		}
+		
 		// Draw world
 		int fill1, fill2, xDraw, yDraw;
 		for(int x = 0; x < world.getWidth(); ++x){

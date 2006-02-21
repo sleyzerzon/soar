@@ -81,7 +81,7 @@ public class EatersWindowManager implements SimulationListener {
 		
 		new SimButtons(m_Shell, m_Simulation);
 		
-		new VisualWorld(m_Shell, SWT.NONE, m_Simulation, kMainMapCellSize);
+		new VisualWorld(m_Shell, SWT.NONE, m_Simulation, kMainMapCellSize, false);
 		
 		m_FoodCount = new Label(m_Shell, SWT.NONE);
 		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.m_World.getFoodCount()));
@@ -90,6 +90,7 @@ public class EatersWindowManager implements SimulationListener {
 		
 		m_Simulation.addSimulationListener(this);
 
+		m_Shell.setText("Java Eaters");
 		m_Shell.setSize(400,300);
 		m_Shell.open();
 		

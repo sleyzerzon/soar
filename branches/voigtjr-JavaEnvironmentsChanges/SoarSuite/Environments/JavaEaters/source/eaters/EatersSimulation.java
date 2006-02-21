@@ -121,6 +121,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 				Agent agent = createAgent(initialNames[i], initialProductions[i]);
 				m_World.createEater(agent, initialColors[i]);
 				spawnDebugger(initialNames[i]);		
+				fireSimulationEvent(SimulationListener.kAgentCreatedEvent);
 			}
 		}
 		
@@ -310,6 +311,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public void destroyEater(Eater eater) {
 		m_Kernel.DestroyAgent(eater.getAgent());
 		eater.getAgent().delete();
+		fireSimulationEvent(SimulationListener.kAgentDestroyedEvent);
 	}
 	
 	public void addSimulationListener(SimulationListener listener) {

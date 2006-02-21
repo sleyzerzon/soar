@@ -18,13 +18,39 @@ public class AgentDisplay extends Composite implements SimulationListener {
 	VisualWorld m_AgentWorld;
 	Eater m_SelectedEater;
 	Eater[] m_Eaters;
+	Composite m_AgentButtons;
+	Button m_NewAgentButton;
+	Button m_DestroyAgentButton;
 
 	public AgentDisplay(Composite parent, EatersSimulation simulation) {
 		super(parent, SWT.BORDER);
 		m_Simulation = simulation;
+		
+		setLayout(new RowLayout(SWT.VERTICAL));
 
+		m_AgentButtons = new Composite(this, SWT.NONE);
+		m_AgentButtons.setLayout(new FillLayout());
+		
+		m_NewAgentButton = new Button(m_AgentButtons, SWT.PUSH);
+		m_NewAgentButton.setText("New");
+		m_NewAgentButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+		
+		m_DestroyAgentButton = new Button(m_AgentButtons, SWT.PUSH);
+		m_DestroyAgentButton.setText("Destroy");
+		m_DestroyAgentButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (m_SelectedEater == null) {
+					return;
+				}
+				m_Simulation.destroyEater(m_SelectedEater);
+				deselect();
+			}
+		});
+				
 		m_AgentList = new List(this, SWT.SINGLE);
-		m_AgentList.setBounds(0,0,kListWidth,kListHeight);
 		m_AgentList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (m_Eaters == null) {
@@ -43,12 +69,18 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		});
 		updateEaterList();
 		
-		m_AgentWorld = new VisualWorld(AgentDisplay.this, SWT.BORDER, m_Simulation, kAgentMapCellSize);
-		m_AgentWorld.setBounds(kListWidth,0, m_AgentWorld.getMiniWidth() + 4, m_AgentWorld.getMiniHeight() + 4);
+		m_AgentWorld = new VisualWorld(AgentDisplay.this, SWT.BORDER, m_Simulation, kAgentMapCellSize, true);
 		m_AgentWorld.disable();
 
-		setLayoutData(new RowData(kListWidth + m_AgentWorld.getMiniWidth() + 4, m_AgentWorld.getMiniHeight() + 4));
+		setLayoutData(new RowData(kListWidth + m_AgentWorld.getMiniWidth() + 4, m_AgentWorld.getMiniHeight() + 4 + 75));
 		m_Simulation.addSimulationListener(this);
+	}
+	
+	void deselect() {
+		m_AgentList.deselectAll();
+		m_SelectedEater = null;
+		m_AgentWorld.disable();
+		m_AgentWorld.redraw();
 	}
 	
 	void updateEaterList() {
@@ -58,12 +90,14 @@ public class AgentDisplay extends Composite implements SimulationListener {
 			names[i] = m_Eaters[i].getName();
 		}
 		m_AgentList.setItems(names);
+		this.layout();
 	}
 	
 	public void simulationEventHandler(int type, Object object) {
 		if (type == SimulationListener.kAgentCreatedEvent || type == SimulationListener.kAgentDestroyedEvent) {
+			deselect();
 			updateEaterList();
-		} else if (type == SimulationListener.kUpdateEvent) {
+		} else if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
 			if (m_SelectedEater != null) {
 				m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
 			}
