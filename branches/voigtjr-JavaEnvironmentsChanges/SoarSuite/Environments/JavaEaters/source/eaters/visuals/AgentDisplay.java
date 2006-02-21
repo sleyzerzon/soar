@@ -26,7 +26,7 @@ public class AgentDisplay extends Composite implements SimulationListener {
 	Button m_NewAgentButton;
 	Button m_DestroyAgentButton;
 
-	public AgentDisplay(Composite parent, EatersSimulation simulation) {
+	public AgentDisplay(final Composite parent, EatersSimulation simulation) {
 		super(parent, SWT.BORDER);
 		m_Simulation = simulation;
 		
@@ -39,6 +39,7 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		m_NewAgentButton.setText("New");
 		m_NewAgentButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				new CreateEaterDialog(parent.getShell(), m_Simulation).open();
 			}
 		});
 		
@@ -100,7 +101,10 @@ public class AgentDisplay extends Composite implements SimulationListener {
 	void updateButtons() {
 		boolean running = m_Simulation.isRunning();
 		
+		// TODO: don't allow new agents when no colors remaining
 		m_NewAgentButton.setEnabled(!running);
+		
+		// TODO: don't allow destroy when no agents
 		m_DestroyAgentButton.setEnabled(!running);
  	}
 

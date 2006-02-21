@@ -14,6 +14,7 @@ import utilities.Logger;
 public class EatersWindowManager implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
 	public static final String kFoodRemaining = "Food remaining: ";
+	public static final String kColors[] = { "white", "blue", "red", "yellow", "orange", "black", "green", "purple" };
 	
 	public static Color white;
 	public static Color blue;

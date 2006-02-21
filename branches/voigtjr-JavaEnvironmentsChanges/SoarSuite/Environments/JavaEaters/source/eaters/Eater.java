@@ -104,6 +104,10 @@ public class Eater {
 		return m_Color;
 	}
 	
+	public String getColorString() {
+		return m_ColorString;
+	}
+	
 	public Agent getAgent() {
 		return m_Agent;
 	}
