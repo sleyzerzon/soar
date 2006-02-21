@@ -174,7 +174,7 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 	}
  	
 	public void simulationEventHandler(int type, Object object) {
-		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
+		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent || type == SimulationListener.kStopEvent) {
 			m_Display.asyncExec(new Runnable() { 
 				public void run () { 
 					redraw(); 
