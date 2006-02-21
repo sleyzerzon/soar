@@ -185,9 +185,9 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
   			m_Kernel.StopAllAgents();
   		}
 		m_Logger.log("Update event received from kernel.");
-		fireSimulationEvent(SimulationListener.kUpdateEvent);
 		m_World.update();
 		++m_WorldCount;
+		fireSimulationEvent(SimulationListener.kUpdateEvent);
   	}
   	
   	public int getWorldCount() {

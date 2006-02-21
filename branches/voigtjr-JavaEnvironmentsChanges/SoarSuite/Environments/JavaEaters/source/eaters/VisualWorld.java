@@ -6,28 +6,35 @@ import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 
-import utilities.Logger;
+import utilities.*;
 
 public class VisualWorld extends Canvas implements PaintListener, SimulationListener {
-	protected Logger m_Logger = Logger.logger;
+	Logger m_Logger = Logger.logger;
+	Display m_Display;
+	EatersSimulation m_Simulation;
+	int m_CellSize;
+	Point m_AgentLocation;
+	boolean m_Disabled = false;
 	
-	protected Display m_Display;
-	protected EatersSimulation m_Simulation;
-	protected int m_CellSize;
-	
-	protected Point m_AgentLocation;
-	
-	public VisualWorld(Composite parent, EatersSimulation simulation, int cellSize) {
-		super(parent, SWT.NONE);
+	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
+		super(parent, style);
 		
 		m_Display = parent.getDisplay();
 		m_Simulation = simulation;
 		m_CellSize = cellSize;
-		addPaintListener(this);
-		
-		m_Simulation.addSimulationListener(this);
 
 		setLayoutData(new RowData(getWidth(), getHeight()));
+
+		addPaintListener(this);		
+		m_Simulation.addSimulationListener(this);
+	}
+	
+	public void disable() {
+		m_Disabled = true;
+	}
+	
+	public void enable() {
+		m_Disabled = false;
 	}
 	
 	public int getWidth() {
@@ -38,11 +45,23 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 		return m_CellSize * m_Simulation.getWorld().getHeight();
 	}
 	
+	public int getMiniWidth() {
+		return m_CellSize * ((Eater.kEaterVision * 2) + 1);
+	}
+	
+	public int getMiniHeight() {
+		return m_CellSize * ((Eater.kEaterVision * 2) + 1);
+	}
+	
 	public void setAgentLocation(Point location) {
 		m_AgentLocation = location;
 	}
 
 	public void paintControl(PaintEvent e){
+		if (m_Disabled) {
+			return;
+		}
+		
 		World world = m_Simulation.getWorld();
 		GC gc = e.gc;		
         gc.setForeground(EatersWindowManager.black);

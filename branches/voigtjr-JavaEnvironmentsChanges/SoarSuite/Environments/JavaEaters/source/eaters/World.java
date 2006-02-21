@@ -432,5 +432,9 @@ public class World {
 			}
 		}
 	}
+	
+	public Eater[] getEaters() {
+		return m_Eaters;
+	}
 }
 

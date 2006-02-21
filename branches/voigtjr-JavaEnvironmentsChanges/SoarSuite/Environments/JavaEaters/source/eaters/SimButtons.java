@@ -63,10 +63,6 @@ public class SimButtons extends Composite implements SimulationListener {
 		boolean running = m_Simulation.isRunning();
 		boolean done = (m_Simulation.getWorld().getFoodCount() == 0);
 		
-		if (!running) {
-			m_Logger.log("Stop disabled.");
-		}
-		
         m_RunButton.setEnabled(!running && !done);
         m_StopButton.setEnabled(running);
         m_ResetButton.setEnabled(!running);
