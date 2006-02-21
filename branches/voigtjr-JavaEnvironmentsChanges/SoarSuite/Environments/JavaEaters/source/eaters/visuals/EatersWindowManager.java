@@ -1,10 +1,13 @@
-package eaters;
+package eaters.visuals;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.*;
+
+import eaters.EatersSimulation;
+import eaters.SimulationListener;
 
 import utilities.Logger;
 
@@ -84,7 +87,7 @@ public class EatersWindowManager implements SimulationListener {
 		new VisualWorld(m_Shell, SWT.NONE, m_Simulation, kMainMapCellSize, false);
 		
 		m_FoodCount = new Label(m_Shell, SWT.NONE);
-		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.m_World.getFoodCount()));
+		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.getWorld().getFoodCount()));
 
 		new AgentDisplay(m_Shell, m_Simulation);
 		
@@ -126,10 +129,14 @@ public class EatersWindowManager implements SimulationListener {
 	}
 
 	public void simulationEventHandler(int type, Object object) {
+		if (m_Display.isDisposed()) {
+			return;
+		}
+		
 		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
 			m_Display.asyncExec(new Runnable() { 
 				public void run () { 
-					m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.m_World.getFoodCount()));
+					m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.getWorld().getFoodCount()));
 				} 
 			});
 		}

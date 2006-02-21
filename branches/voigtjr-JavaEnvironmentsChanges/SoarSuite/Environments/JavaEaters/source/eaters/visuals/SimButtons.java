@@ -1,9 +1,12 @@
-package eaters;
+package eaters.visuals;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
+
+import eaters.EatersSimulation;
+import eaters.SimulationListener;
 
 import utilities.*;
 
@@ -70,6 +73,10 @@ public class SimButtons extends Composite implements SimulationListener {
 	}
 
 	public void simulationEventHandler(int type, Object object) {
+		if (isDisposed()) {
+			return;
+		}
+		
 		if (type == SimulationListener.kStartEvent || type == SimulationListener.kStopEvent || type == SimulationListener.kNewWorldEvent) {
 			this.getDisplay().asyncExec(new Runnable() { 
 				public void run () { 

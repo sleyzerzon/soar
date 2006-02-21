@@ -2,6 +2,8 @@ package eaters;
 
 import org.eclipse.swt.graphics.*;
 
+import eaters.visuals.EatersWindowManager;
+
 import sml.*;
 import utilities.*;
 

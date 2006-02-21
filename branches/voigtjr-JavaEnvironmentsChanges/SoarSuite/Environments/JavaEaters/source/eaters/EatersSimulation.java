@@ -308,7 +308,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);
 	}
 
-	public void destroyEater(Eater eater) {
+	void destroyEater(Eater eater) {
 		m_Kernel.DestroyAgent(eater.getAgent());
 		eater.getAgent().delete();
 		fireSimulationEvent(SimulationListener.kAgentDestroyedEvent);

@@ -1,9 +1,13 @@
-package eaters;
+package eaters.visuals;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
+
+import eaters.Eater;
+import eaters.EatersSimulation;
+import eaters.SimulationListener;
 
 import utilities.*;
 
@@ -45,7 +49,7 @@ public class AgentDisplay extends Composite implements SimulationListener {
 				if (m_SelectedEater == null) {
 					return;
 				}
-				m_Simulation.destroyEater(m_SelectedEater);
+				m_Simulation.getWorld().destroyEater(m_SelectedEater);
 				deselect();
 			}
 		});
@@ -94,6 +98,10 @@ public class AgentDisplay extends Composite implements SimulationListener {
 	}
 	
 	public void simulationEventHandler(int type, Object object) {
+		if (isDisposed()) {
+			return;
+		}
+		
 		if (type == SimulationListener.kAgentCreatedEvent || type == SimulationListener.kAgentDestroyedEvent) {
 			deselect();
 			updateEaterList();

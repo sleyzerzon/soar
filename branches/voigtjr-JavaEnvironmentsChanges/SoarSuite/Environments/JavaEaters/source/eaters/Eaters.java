@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import eaters.visuals.EatersWindowManager;
+
 public class Eaters {
 	
 	public static final String kDefaultXMLSettingsFile = "eaters-default-settings.xml";

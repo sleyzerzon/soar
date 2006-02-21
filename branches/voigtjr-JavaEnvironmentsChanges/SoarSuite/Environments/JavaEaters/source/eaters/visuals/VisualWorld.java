@@ -1,10 +1,17 @@
-package eaters;
+package eaters.visuals;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
+
+import eaters.Eater;
+import eaters.EatersSimulation;
+import eaters.SimulationListener;
+import eaters.World;
+import eaters.World.Cell;
+import eaters.World.Food;
 
 import utilities.*;
 
@@ -199,7 +206,15 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 	}
  	
 	public void simulationEventHandler(int type, Object object) {
-		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent || type == SimulationListener.kStopEvent) {
+		if (isDisposed()) {
+			return;
+		}
+		
+		if (type == SimulationListener.kAgentCreatedEvent 
+				|| type == SimulationListener.kAgentDestroyedEvent 
+				|| type == SimulationListener.kUpdateEvent 
+				|| type == SimulationListener.kNewWorldEvent 
+				|| type == SimulationListener.kStopEvent) {
 			m_Display.asyncExec(new Runnable() { 
 				public void run () { 
 					redraw(); 

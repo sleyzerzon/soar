@@ -2,6 +2,8 @@ package eaters;
 
 import java.util.*;
 import org.eclipse.swt.graphics.*;
+
+import eaters.visuals.EatersWindowManager;
 import sml.*;
 import utilities.*;
 
@@ -302,6 +304,31 @@ public class World {
 			m_Simulation.destroyEater(m_Eaters[i]);
 		}
 		m_Eaters = null;		
+	}
+	
+	public void destroyEater(Eater eater) {
+		if (m_Eaters == null) {
+			return;
+		}
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			if (eater == m_Eaters[i]) {
+				if (m_Eaters.length == 1) {
+					m_Eaters = null;
+				} else {
+					Eater[] original = m_Eaters;
+					m_Eaters = new Eater[original.length - 1];
+					for (int j = 0; j < m_Eaters.length; ++j) {
+						if (j < i) {
+							m_Eaters[j] = original[j];
+						} else {
+							m_Eaters[j] = original[j+1];
+						}
+					}
+				}
+				getCell(eater.getLocation()).setEmpty();
+				m_Simulation.destroyEater(eater);
+			}
+		}
 	}
 
 	public Point findStartingLocation() {
