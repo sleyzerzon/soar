@@ -11,6 +11,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public static final String kTagSimulation = "simulation";
 	public static final String kParamNoDebuggers = "nodebuggers";
 	public static final String kParamDefaultMap = "default-map";
+	public static final String kParamContinuous = "continuous";
 	public static final String kTagAgents = "agents";
 	public static final String kTagAgent = "agent";
 	public static final String kParamName = "name";
@@ -25,6 +26,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
     private Thread m_RunThread;
 	boolean m_NoDebuggers = false;
 	boolean m_DebuggerSpawned = false;
+	boolean m_Continuous = false;
 	String m_DefaultMap;
 	Logger m_Logger = Logger.logger;
 	String m_BasePath;
@@ -76,6 +78,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 				if (tagName.equalsIgnoreCase(kTagSimulation)) {
 					m_NoDebuggers = child.getAttributeBooleanThrows(kParamNoDebuggers);
 					m_DefaultMap = child.getAttributeThrows(kParamDefaultMap);
+					m_Continuous = child.getAttributeBooleanThrows(kParamContinuous);
 					
 					m_Logger.log("Default map: " + m_DefaultMap);
 					
@@ -125,6 +128,10 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		if (quiet) {
 	    	m_Kernel.RunAllAgentsForever();
 		}
+	}
+	
+	public void interactiveStop() {
+		m_Continuous = false;
 	}
 	
 	public String getCurrentMap() {
@@ -214,7 +221,13 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
     }
         
     public void run() {
-    	m_Kernel.RunAllAgentsForever();
+    	do {
+    		m_StopSoar = false;
+    		m_Kernel.RunAllAgentsForever();
+    		if (m_Continuous) {
+    			resetSimulation();
+    		}
+    	} while (m_Continuous);
     }
     
 	public String getAgentPath() {
@@ -278,7 +291,9 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 	
 	public void stopSimulation() {
-		m_RunThread = null;
+		if (!m_Continuous) {
+			m_RunThread = null;
+		}
 		m_StopSoar = true;
 	}
 	
@@ -287,11 +302,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 
 	public void resetSimulation() {
-		if (isRunning()) {
-			stopSimulation();
-		}
 		m_World.load(this.getCurrentMap());
-		m_World.resetEaters();
 		m_WorldCount = 0;
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);
 	}

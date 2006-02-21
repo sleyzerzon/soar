@@ -5,12 +5,15 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
+import utilities.*;
+
 public class SimButtons extends Composite implements SimulationListener {
 	EatersSimulation m_Simulation;
 	Button m_RunButton;
 	Button m_StopButton;
 	Button m_StepButton;
 	Button m_ResetButton;
+	Logger m_Logger = Logger.logger;
 	
 	public SimButtons(Composite parent, EatersSimulation simulation) {
 		super(parent, SWT.NONE);
@@ -31,6 +34,7 @@ public class SimButtons extends Composite implements SimulationListener {
 		m_StopButton.setText("Stop");
 		m_StopButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				m_Simulation.interactiveStop();
 				m_Simulation.stopSimulation();
 			}
 		});
@@ -58,6 +62,10 @@ public class SimButtons extends Composite implements SimulationListener {
 	void updateButtons() {
 		boolean running = m_Simulation.isRunning();
 		boolean done = (m_Simulation.getWorld().getFoodCount() == 0);
+		
+		if (!running) {
+			m_Logger.log("Stop disabled.");
+		}
 		
         m_RunButton.setEnabled(!running && !done);
         m_StopButton.setEnabled(running);

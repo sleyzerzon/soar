@@ -84,6 +84,17 @@ public class Eater {
 		return m_Name;
 	}
 	
+	public int getScore() {
+		return m_Score;
+	}
+	
+	public void setScore(int score) {
+		if (score < 0) {
+			score = 0;
+		}
+		m_Score = score;
+	}
+	
 	public Color getColor() {
 		if (m_Color == null) {
 			m_Color = EatersWindowManager.getColor(m_ColorString);
@@ -157,7 +168,6 @@ public class Eater {
 	}
 	
 	public class MoveInfo {
-		Eater eater;
 		String direction;
 		boolean jump;
 	}
@@ -173,7 +183,6 @@ public class Eater {
 		}
 
 		MoveInfo move = new MoveInfo();
-		move.eater = this;
 		
 		Identifier commandId = m_Agent.GetCommand(0);
 		String commandName = commandId.GetAttribute();

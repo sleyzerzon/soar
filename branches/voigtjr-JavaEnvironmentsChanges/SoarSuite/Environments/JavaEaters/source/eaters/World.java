@@ -1,15 +1,9 @@
 package eaters;
 
-import java.util.HashMap;
-import java.util.Random;
-
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
-
-
-import sml.Agent;
-import utilities.JavaElementXML;
-import utilities.Logger;
+import java.util.*;
+import org.eclipse.swt.graphics.*;
+import sml.*;
+import utilities.*;
 
 public class World {
 	public static final String kTagEatersWorld = "eaters-world";
@@ -152,13 +146,13 @@ public class World {
 			return m_Food[(m_Type - kReservedIDs)];
 		}
 		
-		public boolean eat() {
+		public Food eat() {
 			if (isFood()) {
 				--m_FoodCount;
 				m_Type = kEmptyCell;
-				return true;
+				return getFood();
 			}
-			return false;
+			return null;
 		}
 		
 		public String toString() {
@@ -173,7 +167,7 @@ public class World {
 	Food[] m_Food;
 	EatersSimulation m_Simulation;
 	int m_FoodCount;
-	HashMap m_Eaters = new HashMap();
+	Eater[] m_Eaters;
 	
 	public World(EatersSimulation simulation) {
 		m_Simulation = simulation;
@@ -228,6 +222,8 @@ public class World {
 			return false;
 		}
 		
+		resetEaters();
+		
 		m_Logger.log(mapFile + " loaded.");
 		return true;
 	}
@@ -255,14 +251,16 @@ public class World {
 		return kTypeEmpty;
 	}
 	
-	public void resetEaters() {
-		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
-		for (int i = 0; i < eaters.length; ++i) {
+	void resetEaters() {
+		if (m_Eaters == null) {
+			return;
+		}
+		for (int i = 0; i < m_Eaters.length; ++i) {
 			Point location = findStartingLocation();
 			getCell(location).eat();
-			eaters[i].setLocation(location);
-			eaters[i].clearScore();
-			eaters[i].initSoar();
+			m_Eaters[i].setLocation(location);
+			m_Eaters[i].clearScore();
+			m_Eaters[i].initSoar();
 		}
 		setEaterCells();
 	}
@@ -279,16 +277,29 @@ public class World {
 		getCell(location).eat();
 		
 		Eater eater = new Eater(agent, color, location);
-		m_Eaters.put(agent.GetAgentName(), eater);
+
+		if (m_Eaters == null) {
+			m_Eaters = new Eater[1];
+			m_Eaters[0] = eater;
+		} else {
+			Eater[] original = m_Eaters;
+			m_Eaters = new Eater[original.length + 1];
+			for (int i = 0; i < original.length; ++i) {
+				m_Eaters[i] = original[i];
+			}
+			m_Eaters[original.length] = eater;
+		}
 
 		setEaterCells();
 		updateEaterInput();
 	}
 	
 	public void destroyAllEaters() {
-		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
-		for (int i = 0; i < eaters.length; ++i) {
-			m_Simulation.destroyEater(eaters[i]);
+		if (m_Eaters == null) {
+			return;
+		}
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			m_Simulation.destroyEater(m_Eaters[i]);
 		}
 		m_Eaters = null;		
 	}
@@ -305,35 +316,38 @@ public class World {
 		return location;
 	}
 	
-	void moveEater(Eater.MoveInfo move) {
-		Point oldLocation = move.eater.getLocation();
-		Point newLocation;
-		if (move.direction.equalsIgnoreCase(Eater.kNorth)) {
-			newLocation = new Point(oldLocation.x, oldLocation.y - 1);
-		} else if (move.direction.equalsIgnoreCase(Eater.kEast)) {
-			newLocation = new Point(oldLocation.x + 1, oldLocation.y);
+	void moveEaters() {
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			Eater.MoveInfo move = m_Eaters[i].getMove();
 			
-		} else if (move.direction.equalsIgnoreCase(Eater.kSouth)) {
-			newLocation = new Point(oldLocation.x, oldLocation.y + 1);
-			
-		} else if (move.direction.equalsIgnoreCase(Eater.kWest)) {
-			newLocation = new Point(oldLocation.x - 1, oldLocation.y);
-			
-		} else {
-			m_Logger.log("Invalid move direction: " + move.direction);
-			return;
-		}
-		
-		if (isInBounds(newLocation) && !getCell(newLocation).isWall()) {
-			if (getCell(newLocation).isFood()) {
-				Food f = getCell(newLocation).getFood();
-				getCell(newLocation).eat();
-				move.eater.adjustScore(f.getValue());
+			Point oldLocation = m_Eaters[i].getLocation();
+			Point newLocation;
+			if (move.direction.equalsIgnoreCase(Eater.kNorth)) {
+				newLocation = new Point(oldLocation.x, oldLocation.y - 1);
+			} else if (move.direction.equalsIgnoreCase(Eater.kEast)) {
+				newLocation = new Point(oldLocation.x + 1, oldLocation.y);
+				
+			} else if (move.direction.equalsIgnoreCase(Eater.kSouth)) {
+				newLocation = new Point(oldLocation.x, oldLocation.y + 1);
+				
+			} else if (move.direction.equalsIgnoreCase(Eater.kWest)) {
+				newLocation = new Point(oldLocation.x - 1, oldLocation.y);
+				
+			} else {
+				m_Logger.log("Invalid move direction: " + move.direction);
+				return;
 			}
-			getCell(oldLocation).setEmpty();
-			move.eater.setLocation(newLocation);
-		} else {
-			move.eater.adjustScore(kWallPenalty);
+			
+			if (isInBounds(newLocation) && !getCell(newLocation).isWall()) {
+				Food f = getCell(newLocation).eat();
+				if (f != null) {
+					m_Eaters[i].adjustScore(f.getValue());
+				}
+				getCell(oldLocation).setEmpty();
+				m_Eaters[i].setLocation(newLocation);
+			} else {
+				m_Eaters[i].adjustScore(kWallPenalty);
+			}
 		}
 	}
 	
@@ -346,10 +360,9 @@ public class World {
 	}
 	
 	void setEaterCells() {
-		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
-		for (int i = 0; i < eaters.length; ++i) {
-			Point location = eaters[i].getLocation();
-			getCell(location).setEater(eaters[i]);
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			Point location = m_Eaters[i].getLocation();
+			getCell(location).setEater(m_Eaters[i]);
 		}
 	}
 	
@@ -362,9 +375,8 @@ public class World {
 	}
 	
 	void updateEaterInput() {
-		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
-		for (int i = 0; i < eaters.length; ++i) {
-			eaters[i].updateInput(this);
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			m_Eaters[i].updateInput(this);
 		}
 	}
 	
@@ -374,18 +386,51 @@ public class World {
 			m_Simulation.stopSimulation();
 			return;
 		}
-		
-		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
-		for (int i = 0; i < eaters.length; ++i) {
-			moveEater(eaters[i].getMove());
+
+		if (m_Eaters == null) {
+			m_Logger.log("Update called with no eaters.");
+			return;
 		}
+		
+		moveEaters();
 		setEaterCells();
 		handleCollisions();	
 		updateEaterInput();
 	}
 	
 	void handleCollisions() {
-		// TODO
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			for (int j = i+1; j < m_Eaters.length; ++j) {
+				if (m_Eaters[i].getLocation().equals(m_Eaters[j].getLocation())) {
+					
+					m_Logger.log("Handling collison at " + m_Eaters[i].getLocation());
+					
+					// Sum cash
+					int cash = m_Eaters[i].getScore();
+					cash += m_Eaters[j].getScore();
+					cash /= 2;
+					m_Eaters[i].setScore(cash);
+					m_Eaters[j].setScore(cash);
+					
+					// Teleport
+					getCell(m_Eaters[i].getLocation()).setEmpty();
+					m_Eaters[i].setLocation(findStartingLocation());
+					m_Eaters[j].setLocation(findStartingLocation());
+
+					// Consume
+					Food f = getCell(m_Eaters[i].getLocation()).eat();
+					if (f != null) {
+						// TODO
+						m_Eaters[i].adjustScore(f.getValue());
+					}
+					f = getCell(m_Eaters[j].getLocation()).eat();
+					if (f != null) {
+						// TODO
+						m_Eaters[j].adjustScore(f.getValue());
+					}					
+				}
+			}
+		}
 	}
 }
 
