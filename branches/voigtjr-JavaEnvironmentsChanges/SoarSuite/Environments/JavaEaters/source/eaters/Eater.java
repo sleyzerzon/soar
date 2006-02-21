@@ -29,6 +29,9 @@ public class Eater {
 	String m_Name;
 	int m_Score = 0;
 	Point m_Location;
+	String m_ColorString;
+	Color m_Color;
+	String m_Facing;
 	
 	StringElement m_DirectionWME;
 	StringElement m_NameWME;
@@ -49,10 +52,11 @@ public class Eater {
 		boolean iterated = false;
 	}
 	
-	public Eater(Agent agent, Point location) {
+	public Eater(Agent agent, String color, Point location) {
 		m_Agent = agent;
 		m_Location = location;
-		
+		m_ColorString = color;
+
 		m_Name = m_Agent.GetAgentName();
 		m_Logger.log("Created eater: " + m_Name);
 		
@@ -78,6 +82,13 @@ public class Eater {
 	
 	public String getName() {
 		return m_Name;
+	}
+	
+	public Color getColor() {
+		if (m_Color == null) {
+			m_Color = EatersWindowManager.getColor(m_ColorString);
+		}
+		return m_Color;
 	}
 	
 	public Agent getAgent() {
@@ -138,6 +149,10 @@ public class Eater {
 				m_Agent.Update(m_Cells[x][y].content, content);
 			}
 		}
+		m_Agent.Update(m_DirectionWME, m_Facing);
+		m_Agent.Update(m_xWME, m_Location.x);
+		m_Agent.Update(m_yWME, m_Location.y);
+		m_Agent.Update(m_ScoreWME, m_Score);
 		m_Agent.Commit();
 	}
 	
@@ -174,6 +189,7 @@ public class Eater {
 		
 		move.direction = commandId.GetParameterValue(kDirectionID);
 		if (move.direction != null) {
+			m_Facing = move.direction;
 			commandId.AddStatusComplete();
 			return move;
 		}
@@ -196,6 +212,10 @@ public class Eater {
 	
 	public void setLocation(Point location) {
 		m_Location = location;
+	}
+	
+	public String getFacing() {
+		return m_Facing;
 	}
 }
 

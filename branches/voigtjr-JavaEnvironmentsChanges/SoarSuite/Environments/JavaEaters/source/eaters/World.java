@@ -80,6 +80,7 @@ public class World {
 	
 	public class Cell {
 		int m_Type;
+		Eater m_Eater;
 
 		public Cell(String name) throws Exception {
 			if (name.equalsIgnoreCase(kTypeWall)) {
@@ -118,10 +119,16 @@ public class World {
 		
 		public void setEmpty() {
 			m_Type = kEmptyCell;
+			m_Eater = null;
 		}
 		
-		public void setEater() {
+		public void setEater(Eater eater) {
 			m_Type = kEaterCell;
+			m_Eater = eater;
+		}
+		
+		public Eater getEater() {
+			return m_Eater;
 		}
 		
 		public String getName() {
@@ -156,8 +163,7 @@ public class World {
 		
 		public String toString() {
 			return new Integer(m_Type).toString();
-		}
-		
+		}	
 	}
 
 	Logger m_Logger = Logger.logger;
@@ -261,18 +267,18 @@ public class World {
 		setEaterCells();
 	}
 
-	public void createEater(Agent agent) {
-		createEater(agent, null);
+	public void createEater(Agent agent, String color) {
+		createEater(agent, color, null);
 	}
 
-	public void createEater(Agent agent, Point location) {
+	public void createEater(Agent agent, String color, Point location) {
 		if (location == null) {
 			location = findStartingLocation();
 		}
 		
 		getCell(location).eat();
 		
-		Eater eater = new Eater(agent, location);
+		Eater eater = new Eater(agent, color, location);
 		m_Eaters.put(agent.GetAgentName(), eater);
 
 		setEaterCells();
@@ -343,7 +349,7 @@ public class World {
 		Eater[] eaters = (Eater[])m_Eaters.values().toArray(new Eater[0]);
 		for (int i = 0; i < eaters.length; ++i) {
 			Point location = eaters[i].getLocation();
-			getCell(location).setEater();
+			getCell(location).setEater(eaters[i]);
 		}
 	}
 	

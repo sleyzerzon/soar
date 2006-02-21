@@ -15,6 +15,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public static final String kTagAgent = "agent";
 	public static final String kParamName = "name";
 	public static final String kParamProductions = "productions";
+	public static final String kParamColor = "color";
 		
 	public static final String kGroupFolder = "Environments";
 	public static final String kProjectFolder = "JavaEaters";
@@ -31,6 +32,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	Kernel m_Kernel;
 	boolean m_StopSoar = false;
 	String m_CurrentMap;
+	int m_WorldCount = 0;
 
 	ArrayList m_SimulationListeners = new ArrayList();
 	ArrayList m_AddSimulationListeners = new ArrayList();
@@ -55,6 +57,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		
 		String [] initialNames = null;
 		String [] initialProductions = null;
+		String [] initialColors = null;
 		
 		// Load settings file
 		try {
@@ -79,11 +82,13 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 				} else if (tagName.equalsIgnoreCase(kTagAgents)) {
 					initialNames = new String[child.getNumberChildren()];
 					initialProductions = new String[child.getNumberChildren()];
+					initialColors = new String[child.getNumberChildren()];
 					for (int j = 0; j < initialNames.length; ++j) {
 						JavaElementXML agent = child.getChild(j);
 						
 						initialNames[j] = agent.getAttributeThrows(kParamName);
 						initialProductions[j] = agent.getAttributeThrows(kParamProductions);
+						initialColors[j] = agent.getAttributeThrows(kParamColor);
 					}
 				} else {
 					// Throw during development, but really we should just ignore this
@@ -111,7 +116,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		if (initialNames != null) {
 			for (int i = 0; i < initialNames.length; ++i) {
 				Agent agent = createAgent(initialNames[i], initialProductions[i]);
-				m_World.createEater(agent);
+				m_World.createEater(agent, initialColors[i]);
 				spawnDebugger(initialNames[i]);		
 			}
 		}
@@ -175,6 +180,11 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		m_Logger.log("Update event received from kernel.");
 		fireSimulationEvent(SimulationListener.kUpdateEvent);
 		m_World.update();
+		++m_WorldCount;
+  	}
+  	
+  	public int getWorldCount() {
+  		return m_WorldCount;
   	}
   	
     public void systemEventHandler(int eventID, Object data, Kernel kernel) {
@@ -247,9 +257,13 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public void shutdown(int exitCode) {
 		m_Logger.log("Shutdown called with code: " + new Integer(exitCode).toString());
 		fireSimulationEvent(SimulationListener.kShutdownEvent);
-		m_World.destroyAllEaters();
-		m_Kernel.Shutdown();
-		m_Kernel.delete();
+		if (m_World != null) {
+			m_World.destroyAllEaters();
+		}
+		if (m_Kernel != null) {
+			m_Kernel.Shutdown();
+			m_Kernel.delete();
+		}
 		System.exit(exitCode);
 	}
 	
@@ -278,6 +292,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		}
 		m_World.load(this.getCurrentMap());
 		m_World.resetEaters();
+		m_WorldCount = 0;
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);
 	}
 
