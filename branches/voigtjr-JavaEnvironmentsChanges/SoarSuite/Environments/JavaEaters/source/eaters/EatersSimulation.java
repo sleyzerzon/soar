@@ -118,10 +118,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		// add initial eaters
 		if (initialNames != null) {
 			for (int i = 0; i < initialNames.length; ++i) {
-				Agent agent = createAgent(initialNames[i], initialProductions[i]);
-				m_World.createEater(agent, initialColors[i]);
-				spawnDebugger(initialNames[i]);		
-				fireSimulationEvent(SimulationListener.kAgentCreatedEvent);
+				createEater(initialNames[i], getAgentPath() + initialProductions[i], initialColors[i]);
 			}
 		}
 		
@@ -208,13 +205,23 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
  			m_Logger.log("Unknown system event received from kernel: " + new Integer(eventID).toString());
  		}
     }
+    
+    public void createEater(String name, String productions, String color) {
+		Agent agent = createAgent(name, productions);
+		if (agent == null) {
+			return;
+		}
+		m_World.createEater(agent, color);
+		spawnDebugger(name);		
+		fireSimulationEvent(SimulationListener.kAgentCreatedEvent);   	
+    }
         
-    public Agent createAgent(String name, String productions) {
+    private Agent createAgent(String name, String productions) {
     	Agent agent = m_Kernel.CreateAgent(name);
-    	boolean load = agent.LoadProductions(getAgentPath() + productions);
+    	boolean load = agent.LoadProductions(productions);
     	if (!load || agent.HadError()) {
     		m_Logger.log("Error creating agent " + name + 
-    				" (" + getAgentPath() + productions + 
+    				" (" + productions + 
     				"): " + agent.GetLastErrorDescription());
     		return null;
     	}

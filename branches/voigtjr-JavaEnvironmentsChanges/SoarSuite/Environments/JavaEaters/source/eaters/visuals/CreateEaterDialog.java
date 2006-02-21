@@ -27,7 +27,7 @@ public class CreateEaterDialog extends Dialog {
 	public void open() {
 		Shell parent = getParent();
 		final Shell dialog = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		dialog.setSize(300,100);
+		dialog.setSize(300,160);
 		dialog.setText("Create Eater");
 		
 		GridLayout gl = new GridLayout();
@@ -35,19 +35,6 @@ public class CreateEaterDialog extends Dialog {
 		dialog.setLayout(gl);
 
 		GridData gd;
-		
-		final Label label1 = new Label(dialog, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalAlignment = GridData.BEGINNING;
-		label1.setLayoutData(gd);
-		label1.setText("Name:");
-		
-		m_Name = new Text(dialog, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		gd.widthHint = 150;
-		gd.grabExcessHorizontalSpace = true;
-		m_Name.setLayoutData(gd);
 		
 		final Label label2 = new Label(dialog, SWT.NONE);
 		gd = new GridData();
@@ -93,10 +80,37 @@ public class CreateEaterDialog extends Dialog {
 			m_Color.remove(eaters[i].getColorString());
 		}
 		m_Color.select(0);
-//		m_Color.addSelectionListener(new SelectionAdapter() {
-//			public void widgetSelected(SelectionEvent e) {
-//			}
-//		});
+		m_Color.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				m_Name.setText(m_Color.getText());
+			}
+		});
+		
+		final Label label1 = new Label(dialog, SWT.NONE);
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.BEGINNING;
+		label1.setLayoutData(gd);
+		label1.setText("Name:");
+		
+		m_Name = new Text(dialog, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		gd.widthHint = 150;
+		gd.grabExcessHorizontalSpace = true;
+		m_Name.setLayoutData(gd);
+		m_Name.setText(m_Color.getText());
+		
+		final Button createEater = new Button(dialog, SWT.PUSH);
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.END;
+		gd.horizontalSpan = 3;
+		createEater.setLayoutData(gd);
+		createEater.setText("Create Eater");
+		createEater.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				m_Simulation.createEater(m_Name.getText(), m_Productions, m_Color.getText());
+			}
+		});
 		
 		dialog.open();
 		Display display = parent.getDisplay();
