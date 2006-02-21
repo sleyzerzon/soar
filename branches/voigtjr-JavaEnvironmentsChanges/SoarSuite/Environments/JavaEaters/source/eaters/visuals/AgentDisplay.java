@@ -97,6 +97,13 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		this.layout();
 	}
 	
+	void updateButtons() {
+		boolean running = m_Simulation.isRunning();
+		
+		m_NewAgentButton.setEnabled(!running);
+		m_DestroyAgentButton.setEnabled(!running);
+ 	}
+
 	public void simulationEventHandler(int type, Object object) {
 		if (isDisposed()) {
 			return;
@@ -105,10 +112,20 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		if (type == SimulationListener.kAgentCreatedEvent || type == SimulationListener.kAgentDestroyedEvent) {
 			deselect();
 			updateEaterList();
-		} else if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
+		} 
+		
+		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
 			if (m_SelectedEater != null) {
 				m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
 			}
+		}
+		
+		if (type == SimulationListener.kStartEvent || type == SimulationListener.kStopEvent || type == SimulationListener.kNewWorldEvent) {
+			this.getDisplay().asyncExec(new Runnable() { 
+				public void run () { 
+					updateButtons();
+				} 
+			});
 		}
 	}
 }
