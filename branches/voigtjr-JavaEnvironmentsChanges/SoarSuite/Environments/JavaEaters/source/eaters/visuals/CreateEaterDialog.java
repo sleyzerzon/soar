@@ -123,16 +123,26 @@ public class CreateEaterDialog extends Dialog {
 			}
 		});
 		
-		m_CreateEater = new Button(dialog, SWT.PUSH);
+		Composite okCancel = new Composite(dialog, SWT.NONE);
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.END;
 		gd.horizontalSpan = 3;
-		m_CreateEater.setLayoutData(gd);
+		okCancel.setLayoutData(gd);
+		okCancel.setLayout(new FillLayout());
+		m_CreateEater = new Button(okCancel, SWT.PUSH);
 		m_CreateEater.setText("Create Eater");
 		m_CreateEater.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				m_CreateEater.setEnabled(false);
 				m_Simulation.createEater(m_Name.getText(), m_Productions, m_Color.getText());
+				dialog.dispose();
+			}
+		});
+
+		Button cancel = new Button(okCancel, SWT.PUSH);
+		cancel.setText("Cancel");
+		cancel.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
 				dialog.dispose();
 			}
 		});
