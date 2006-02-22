@@ -311,7 +311,9 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 
 	public void resetSimulation() {
-		m_World.load(this.getCurrentMap());
+		if (!m_World.load(getCurrentMap())) {
+			shutdown(1);
+		}
 		m_WorldCount = 0;
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);
 	}

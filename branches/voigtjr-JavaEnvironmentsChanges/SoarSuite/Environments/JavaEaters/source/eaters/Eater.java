@@ -220,11 +220,6 @@ public class Eater {
 	public void adjustScore(int delta) {
 		m_Score += delta;
 	}
-	
-	public void clearScore() {
-		m_Score = 0;
-	}
-	
 	public void setLocation(Point location) {
 		m_Location = location;
 	}

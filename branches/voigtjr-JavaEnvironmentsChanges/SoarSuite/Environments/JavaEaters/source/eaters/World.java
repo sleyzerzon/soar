@@ -34,6 +34,7 @@ public class World {
 	public static final int kReservedIDs = 3;
 	
 	public static final int kWallPenalty = -5;
+	public static final int kJumpPenalty = -5;
 
 	public class Food {
 		public static final String kRound = "round";
@@ -150,9 +151,10 @@ public class World {
 		
 		public Food eat() {
 			if (isFood()) {
+				Food f = getFood();
 				--m_FoodCount;
 				m_Type = kEmptyCell;
-				return getFood();
+				return f;
 			}
 			return null;
 		}
@@ -176,6 +178,7 @@ public class World {
 	}
 	
 	public boolean load(String mapFile) {
+		clearEaterCells();
 		try {
 			// Open file
 			JavaElementXML root = JavaElementXML.ReadFromFile(mapFile);
@@ -261,7 +264,7 @@ public class World {
 			Point location = findStartingLocation();
 			getCell(location).eat();
 			m_Eaters[i].setLocation(location);
-			m_Eaters[i].clearScore();
+			m_Eaters[i].setScore(0);
 			m_Eaters[i].initSoar();
 		}
 		setEaterCells();
@@ -378,6 +381,9 @@ public class World {
 				}
 				getCell(oldLocation).setEmpty();
 				m_Eaters[i].setLocation(newLocation);
+				if (move.jump) {
+					m_Eaters[i].adjustScore(kJumpPenalty);
+				}
 			} else {
 				m_Eaters[i].adjustScore(kWallPenalty);
 			}
@@ -396,6 +402,16 @@ public class World {
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			Point location = m_Eaters[i].getLocation();
 			getCell(location).setEater(m_Eaters[i]);
+		}
+	}
+	
+	void clearEaterCells() {
+		if (m_Eaters == null) {
+			return;
+		}
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			Point location = m_Eaters[i].getLocation();
+			getCell(location).setEmpty();
 		}
 	}
 	
