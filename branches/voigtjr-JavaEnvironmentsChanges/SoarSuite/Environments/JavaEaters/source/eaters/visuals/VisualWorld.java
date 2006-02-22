@@ -23,18 +23,12 @@ public class VisualWorld extends Canvas implements PaintListener {
 	Point m_AgentLocation;
 	boolean m_Disabled = false;
 	
-	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize, boolean mini) {
+	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
 		super(parent, style);
 		
 		m_Display = parent.getDisplay();
 		m_Simulation = simulation;
 		m_CellSize = cellSize;
-
-		if (mini) {
-			setLayoutData(new RowData(getMiniWidth(), getMiniHeight()));
-		} else {
-			setLayoutData(new RowData(getWidth(), getHeight()));
-		}
 
 		addPaintListener(this);		
 	}

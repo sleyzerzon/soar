@@ -15,7 +15,9 @@ import utilities.*;
 public class AgentDisplay extends Composite {
 	public static final int kAgentMapCellSize = 20;
 	public static final int kListWidth = 75;
+	public static final int kListHeight = 105;
 	
+	Group m_Group;
 	Logger m_Logger = Logger.logger;
 	EatersSimulation m_Simulation;
 	List m_AgentList;
@@ -27,13 +29,26 @@ public class AgentDisplay extends Composite {
 	Button m_DestroyAgentButton;
 
 	public AgentDisplay(final Composite parent, EatersSimulation simulation) {
-		super(parent, SWT.BORDER);
+		super(parent, SWT.NONE);
 		m_Simulation = simulation;
-		
-		setLayout(new RowLayout(SWT.VERTICAL));
 
-		m_AgentButtons = new Composite(this, SWT.NONE);
+		setLayout(new FillLayout());
+		
+		m_Group = new Group(this, SWT.NONE);
+		m_Group.setText("Agents");
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 2;
+		m_Group.setLayout(gl);
+		
+		
+		GridData gd;
+
+		m_AgentButtons = new Composite(m_Group, SWT.NONE);
 		m_AgentButtons.setLayout(new FillLayout());
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.BEGINNING;
+		gd.horizontalSpan = 2;
+		m_AgentButtons.setLayoutData(gd);
 		
 		m_NewAgentButton = new Button(m_AgentButtons, SWT.PUSH);
 		m_NewAgentButton.setText("New");
@@ -54,11 +69,11 @@ public class AgentDisplay extends Composite {
 			}
 		});
 				
-		m_AgentList = new List(this, SWT.SINGLE);
-		RowData rd = new RowData();
-		FontData fd = getFont().getFontData()[0];
-		rd.width = kListWidth;
-		rd.height = fd.getHeight() * EatersSimulation.kMaxEaters;
+		m_AgentList = new List(m_Group, SWT.SINGLE);
+		gd = new GridData();
+		gd.heightHint = kListHeight;
+		gd.widthHint = kListWidth;
+		m_AgentList.setLayoutData(gd);
 		m_AgentList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (m_Eaters == null) {
@@ -79,10 +94,13 @@ public class AgentDisplay extends Composite {
 		updateEaterList();
 		updateButtons();
 		
-		m_AgentWorld = new VisualWorld(AgentDisplay.this, SWT.BORDER, m_Simulation, kAgentMapCellSize, true);
+		m_AgentWorld = new VisualWorld(m_Group, SWT.BORDER, m_Simulation, kAgentMapCellSize);
+		gd = new GridData();
+		gd.heightHint = m_AgentWorld.getMiniHeight() + 4;
+		gd.widthHint = m_AgentWorld.getMiniWidth() + 4;		
+		m_AgentWorld.setLayoutData(gd);
 		m_AgentWorld.disable();
-
-		setLayoutData(new RowData(kListWidth + m_AgentWorld.getMiniWidth() + 4, m_AgentWorld.getMiniHeight() + 4 + 75));
+		
 	}
 	
 	void agentEvent() {

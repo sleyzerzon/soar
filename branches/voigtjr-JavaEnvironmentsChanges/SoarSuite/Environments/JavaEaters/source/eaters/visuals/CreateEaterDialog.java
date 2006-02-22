@@ -43,6 +43,7 @@ public class CreateEaterDialog extends Dialog {
 		final Label label2 = new Label(dialog, SWT.NONE);
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.BEGINNING;
+		label2.setLayoutData(gd);
 		label2.setText("Productions:");
 		
 		m_ProductionsLabel = new Label(dialog, SWT.NONE);
