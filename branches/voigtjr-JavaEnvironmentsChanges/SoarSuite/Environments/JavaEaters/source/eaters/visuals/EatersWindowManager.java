@@ -162,6 +162,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			
 		case SimulationListener.kAgentCreatedEvent:
 			m_VisualWorld.redraw();
+			updateFoodCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
 			return;

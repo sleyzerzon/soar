@@ -114,14 +114,23 @@ public class World {
 			return m_Type >= kReservedIDs;
 		}
 		
-		public void setEmpty() {
+		public void removeEater() {
+			if (m_Type != kEaterCell) {
+				m_Logger.log("Warning: tried to remove eater from cell it wasn't at.");
+				return;
+			}
 			m_Type = kEmptyCell;
 			m_Eater = null;
 		}
 		
-		public void setEater(Eater eater) {
+		public Food setEater(Eater eater) {
+			Food f = null;
+			if (isFood()) {
+				f = removeFood();
+			}
 			m_Type = kEaterCell;
 			m_Eater = eater;
+			return f;
 		}
 		
 		public Eater getEater() {
@@ -149,11 +158,11 @@ public class World {
 			return m_Food[(m_Type - kReservedIDs)];
 		}
 		
-		public Food eat() {
+		public Food removeFood() {
 			if (isFood()) {
 				Food f = getFood();
-				--m_FoodCount;
 				m_Type = kEmptyCell;
+				--m_FoodCount;
 				return f;
 			}
 			return null;
@@ -261,9 +270,9 @@ public class World {
 		}
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			Point location = findStartingLocation();
-			getCell(location).eat();
 			m_Eaters[i].setLocation(location);
-			getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
+			// Put eater on map, ignore food
+			getCell(location).setEater(m_Eaters[i]);
 			m_Eaters[i].setScore(0);
 			m_Eaters[i].initSoar();
 		}
@@ -278,9 +287,9 @@ public class World {
 			location = findStartingLocation();
 		}
 		
-		getCell(location).eat();
-		
 		Eater eater = new Eater(agent, productions, color, location);
+		// Put eater on map, ignore food
+		getCell(location).setEater(eater);
 
 		if (m_Eaters == null) {
 			m_Eaters = new Eater[1];
@@ -294,7 +303,6 @@ public class World {
 			m_Eaters[original.length] = eater;
 		}
 
-		setEaterCells();
 		updateEaterInput();
 	}
 	
@@ -327,7 +335,7 @@ public class World {
 						}
 					}
 				}
-				getCell(eater.getLocation()).setEmpty();
+				getCell(eater.getLocation()).removeEater();
 				m_Simulation.destroyEater(eater);
 				if (m_Eaters == null) {
 					break;
@@ -374,11 +382,7 @@ public class World {
 			}
 			
 			if (isInBounds(newLocation) && !getCell(newLocation).isWall()) {
-				Food f = getCell(newLocation).eat();
-				if (f != null) {
-					m_Eaters[i].adjustScore(f.getValue());
-				}
-				getCell(oldLocation).setEmpty();
+				getCell(oldLocation).removeEater();
 				m_Eaters[i].setLocation(newLocation);
 				if (move.jump) {
 					m_Eaters[i].adjustScore(kJumpPenalty);
@@ -397,9 +401,12 @@ public class World {
 		return m_World[y][x];
 	}
 	
-	void setEaterCells() {
+	void updateMapAndEatFood() {
 		for (int i = 0; i < m_Eaters.length; ++i) {
-			getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
+			Food f = getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
+			if (f != null) {
+				m_Eaters[i].adjustScore(f.getValue());
+			}
 		}
 	}
 	
@@ -430,7 +437,7 @@ public class World {
 		}
 		
 		moveEaters();
-		setEaterCells();
+		updateMapAndEatFood();
 		handleCollisions();	
 		updateEaterInput();
 	}
@@ -449,22 +456,22 @@ public class World {
 					m_Eaters[i].setScore(cash);
 					m_Eaters[j].setScore(cash);
 					
-					// Teleport
-					getCell(m_Eaters[i].getLocation()).setEmpty();
+					// Remove from former location
+					getCell(m_Eaters[i].getLocation()).removeEater();
+					
+					// Find new location for eater 1
 					m_Eaters[i].setLocation(findStartingLocation());
-					getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
-					m_Eaters[j].setLocation(findStartingLocation());
-					getCell(m_Eaters[j].getLocation()).setEater(m_Eaters[j]);
-
-					// Consume
-					Food f = getCell(m_Eaters[i].getLocation()).eat();
+					// Update map, consume as necesary
+					Food f = getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
 					if (f != null) {
-						// TODO
 						m_Eaters[i].adjustScore(f.getValue());
 					}
-					f = getCell(m_Eaters[j].getLocation()).eat();
+
+					// Find new location for eater 2
+					m_Eaters[j].setLocation(findStartingLocation());
+					// Update map, consume as necesary
+					f = getCell(m_Eaters[j].getLocation()).setEater(m_Eaters[j]);
 					if (f != null) {
-						// TODO
 						m_Eaters[j].adjustScore(f.getValue());
 					}					
 				}
