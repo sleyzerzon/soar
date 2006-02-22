@@ -178,7 +178,6 @@ public class World {
 	}
 	
 	public boolean load(String mapFile) {
-		clearEaterCells();
 		try {
 			// Open file
 			JavaElementXML root = JavaElementXML.ReadFromFile(mapFile);
@@ -264,10 +263,10 @@ public class World {
 			Point location = findStartingLocation();
 			getCell(location).eat();
 			m_Eaters[i].setLocation(location);
+			getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
 			m_Eaters[i].setScore(0);
 			m_Eaters[i].initSoar();
 		}
-		setEaterCells();
 	}
 
 	public void createEater(Agent agent, String productions, String color) {
@@ -400,18 +399,7 @@ public class World {
 	
 	void setEaterCells() {
 		for (int i = 0; i < m_Eaters.length; ++i) {
-			Point location = m_Eaters[i].getLocation();
-			getCell(location).setEater(m_Eaters[i]);
-		}
-	}
-	
-	void clearEaterCells() {
-		if (m_Eaters == null) {
-			return;
-		}
-		for (int i = 0; i < m_Eaters.length; ++i) {
-			Point location = m_Eaters[i].getLocation();
-			getCell(location).setEmpty();
+			getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
 		}
 	}
 	

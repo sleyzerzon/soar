@@ -94,6 +94,7 @@ public class AgentDisplay extends Composite {
 	void worldChangeEvent() {
 		if (m_SelectedEater != null) {
 			m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
+			m_AgentWorld.redraw();
 		}
 	}
 	
