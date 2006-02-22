@@ -4,6 +4,7 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.graphics.*;
 
 import eaters.Eater;
 import eaters.EatersSimulation;
@@ -14,7 +15,6 @@ import utilities.*;
 public class AgentDisplay extends Composite implements SimulationListener {
 	public static final int kAgentMapCellSize = 20;
 	public static final int kListWidth = 75;
-	public static final int kListHeight = 75;
 	
 	Logger m_Logger = Logger.logger;
 	EatersSimulation m_Simulation;
@@ -51,11 +51,14 @@ public class AgentDisplay extends Composite implements SimulationListener {
 					return;
 				}
 				m_Simulation.getWorld().destroyEater(m_SelectedEater);
-				deselect();
 			}
 		});
 				
 		m_AgentList = new List(this, SWT.SINGLE);
+		RowData rd = new RowData();
+		FontData fd = getFont().getFontData()[0];
+		rd.width = kListWidth;
+		rd.height = fd.getHeight() * EatersSimulation.kMaxEaters;
 		m_AgentList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (m_Eaters == null) {
@@ -70,9 +73,11 @@ public class AgentDisplay extends Composite implements SimulationListener {
 						m_AgentWorld.redraw();
 					}
 				}
+				updateButtons();
 			}
 		});
 		updateEaterList();
+		updateButtons();
 		
 		m_AgentWorld = new VisualWorld(AgentDisplay.this, SWT.BORDER, m_Simulation, kAgentMapCellSize, true);
 		m_AgentWorld.disable();
@@ -90,6 +95,10 @@ public class AgentDisplay extends Composite implements SimulationListener {
 	
 	void updateEaterList() {
 		m_Eaters = m_Simulation.getWorld().getEaters();
+		if (m_Eaters == null) {
+			m_AgentList.removeAll();
+			return;
+		}
 		String[] names = new String[m_Eaters.length];
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			names[i] = m_Eaters[i].getName();
@@ -100,12 +109,17 @@ public class AgentDisplay extends Composite implements SimulationListener {
 	
 	void updateButtons() {
 		boolean running = m_Simulation.isRunning();
+		boolean agentsFull = false;
+		boolean noAgents = false;
+		if (m_Eaters != null) {
+			agentsFull = (m_Eaters.length == EatersSimulation.kMaxEaters);
+		} else {
+			noAgents = true;
+		}
+		boolean selectedEater = (m_SelectedEater != null);
 		
-		// TODO: don't allow new agents when no colors remaining
-		m_NewAgentButton.setEnabled(!running);
-		
-		// TODO: don't allow destroy when no agents
-		m_DestroyAgentButton.setEnabled(!running);
+		m_NewAgentButton.setEnabled(!running && !agentsFull);
+		m_DestroyAgentButton.setEnabled(!running && !noAgents && selectedEater);
  	}
 
 	public void simulationEventHandler(int type, Object object) {
@@ -116,6 +130,7 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		if (type == SimulationListener.kAgentCreatedEvent || type == SimulationListener.kAgentDestroyedEvent) {
 			deselect();
 			updateEaterList();
+			updateButtons();
 		} 
 		
 		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {

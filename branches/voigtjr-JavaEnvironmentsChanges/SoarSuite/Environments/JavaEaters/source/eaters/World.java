@@ -327,6 +327,9 @@ public class World {
 				}
 				getCell(eater.getLocation()).setEmpty();
 				m_Simulation.destroyEater(eater);
+				if (m_Eaters == null) {
+					break;
+				}
 			}
 		}
 	}

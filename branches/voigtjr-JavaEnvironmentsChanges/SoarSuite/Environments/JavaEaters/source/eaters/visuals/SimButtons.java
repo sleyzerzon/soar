@@ -65,11 +65,12 @@ public class SimButtons extends Composite implements SimulationListener {
 	void updateButtons() {
 		boolean running = m_Simulation.isRunning();
 		boolean done = (m_Simulation.getWorld().getFoodCount() == 0);
+		boolean eaters = (m_Simulation.getWorld().getEaters() != null);
 		
-        m_RunButton.setEnabled(!running && !done);
+        m_RunButton.setEnabled(!running && !done && eaters);
         m_StopButton.setEnabled(running);
         m_ResetButton.setEnabled(!running);
-        m_StepButton.setEnabled(!running && !done);
+        m_StepButton.setEnabled(!running && !done && eaters);
 	}
 
 	public void simulationEventHandler(int type, Object object) {
@@ -77,7 +78,11 @@ public class SimButtons extends Composite implements SimulationListener {
 			return;
 		}
 		
-		if (type == SimulationListener.kStartEvent || type == SimulationListener.kStopEvent || type == SimulationListener.kNewWorldEvent) {
+		if (type == SimulationListener.kStartEvent 
+				|| type == SimulationListener.kStopEvent 
+				|| type == SimulationListener.kNewWorldEvent
+				|| type == SimulationListener.kAgentCreatedEvent
+				|| type == SimulationListener.kAgentDestroyedEvent) {
 			this.getDisplay().asyncExec(new Runnable() { 
 				public void run () { 
 					updateButtons();

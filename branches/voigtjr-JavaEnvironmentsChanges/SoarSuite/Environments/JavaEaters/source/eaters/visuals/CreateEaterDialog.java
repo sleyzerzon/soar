@@ -80,8 +80,10 @@ public class CreateEaterDialog extends Dialog {
 		m_Color.setItems(EatersWindowManager.kColors);
 		// remove taken colors
 		Eater[] eaters = m_Simulation.getWorld().getEaters();
-		for (int i = 0; i < eaters.length; ++i) {
-			m_Color.remove(eaters[i].getColorString());
+		if (eaters != null) {
+			for (int i = 0; i < eaters.length; ++i) {
+				m_Color.remove(eaters[i].getColorString());
+			}
 		}
 		m_Color.select(0);
 		m_Color.addSelectionListener(new SelectionAdapter() {
@@ -120,6 +122,7 @@ public class CreateEaterDialog extends Dialog {
 		m_CreateEater.setText("Create Eater");
 		m_CreateEater.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				m_CreateEater.setEnabled(false);
 				m_Simulation.createEater(m_Name.getText(), m_Productions, m_Color.getText());
 				dialog.dispose();
 			}

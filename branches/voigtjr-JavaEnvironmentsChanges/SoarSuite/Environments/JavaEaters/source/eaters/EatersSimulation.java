@@ -7,6 +7,7 @@ import utilities.*;
 
 public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
 	public static final int kDebuggerTimeoutSeconds = 15;	
+	public static final int kMaxEaters = 8;	
 	public static final String kTagEaters = "eaters";
 	public static final String kTagSimulation = "simulation";
 	public static final String kParamNoDebuggers = "nodebuggers";
