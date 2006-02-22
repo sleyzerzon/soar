@@ -129,6 +129,10 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		}
 	}
 	
+	public String getCurrentMap() {
+		return m_CurrentMap;
+	}
+	
 	public void interactiveStop() {
 		m_Continuous = false;
 	}

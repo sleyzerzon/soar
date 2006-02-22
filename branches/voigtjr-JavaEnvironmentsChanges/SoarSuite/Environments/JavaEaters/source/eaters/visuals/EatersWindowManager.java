@@ -73,6 +73,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 	final MapButtons m_MapButtons;
 	final VisualWorld m_VisualWorld;
 	final AgentDisplay m_AgentDisplay;
+	final Group m_WorldGroup;
 	
 	public EatersWindowManager(EatersSimulation simulation) {
 		m_Display = new Display();
@@ -87,12 +88,16 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		
 		GridData gd;
 		
-		m_VisualWorld = new VisualWorld(m_Shell, SWT.NONE, m_Simulation, kMainMapCellSize);
+		m_WorldGroup = new Group(m_Shell, SWT.NONE);
+		updateWorldGroupLabel();
+		m_WorldGroup.setLayout(new FillLayout());
+		m_VisualWorld = new VisualWorld(m_WorldGroup, SWT.NONE, m_Simulation, kMainMapCellSize);
+		m_VisualWorld.setSize(m_VisualWorld.getWidth(), m_VisualWorld.getHeight());
 		gd = new GridData();
 		gd.widthHint = m_VisualWorld.getWidth();
 		gd.heightHint = m_VisualWorld.getHeight();
 		gd.verticalSpan = 3;
-		m_VisualWorld.setLayoutData(gd);
+		m_WorldGroup.setLayoutData(gd);
 
 		Group group1 = new Group(m_Shell, SWT.NONE);
 		gd = new GridData();
@@ -131,6 +136,11 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		m_Display.dispose();		
 	}
 	
+	void updateWorldGroupLabel() {
+		String currentMap = m_Simulation.getCurrentMap();
+		m_WorldGroup.setText(currentMap.substring(currentMap.lastIndexOf(System.getProperty("file.separator")) + 1));		
+	}
+	
 	void dispatchEvent(int type) {
 		switch (type) {
 		case SimulationListener.kStartEvent:
@@ -156,6 +166,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			return;
 			
 		case SimulationListener.kNewWorldEvent:
+			updateWorldGroupLabel();
 			m_VisualWorld.redraw();
 			updateFoodCount();
 			m_SimButtons.updateButtons();
