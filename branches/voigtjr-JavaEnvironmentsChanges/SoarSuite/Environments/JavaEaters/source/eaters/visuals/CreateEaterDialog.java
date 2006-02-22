@@ -18,6 +18,7 @@ public class CreateEaterDialog extends Dialog {
 	Label m_ProductionsLabel;
 	Text m_Name;
 	Combo m_Color;
+	Button m_CreateEater;
 	
 	public CreateEaterDialog(Shell parent, EatersSimulation simulation) {
 		super(parent);
@@ -59,7 +60,10 @@ public class CreateEaterDialog extends Dialog {
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getAgentPath());
 				m_Productions = fd.open();
-				m_ProductionsLabel.setText(m_Productions.substring(m_Productions.lastIndexOf(System.getProperty("file.separator")) + 1));
+				if (m_Productions != null) {
+					m_ProductionsLabel.setText(m_Productions.substring(m_Productions.lastIndexOf(System.getProperty("file.separator")) + 1));
+				}
+				updateButtons();
 			}
 		});
 		
@@ -99,18 +103,29 @@ public class CreateEaterDialog extends Dialog {
 		gd.grabExcessHorizontalSpace = true;
 		m_Name.setLayoutData(gd);
 		m_Name.setText(m_Color.getText());
+		m_Name.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				updateButtons();
+				if (Character.isWhitespace(e.character)) {
+					e.doit = false;
+				}
+			}
+		});
 		
-		final Button createEater = new Button(dialog, SWT.PUSH);
+		m_CreateEater = new Button(dialog, SWT.PUSH);
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.END;
 		gd.horizontalSpan = 3;
-		createEater.setLayoutData(gd);
-		createEater.setText("Create Eater");
-		createEater.addSelectionListener(new SelectionAdapter() {
+		m_CreateEater.setLayoutData(gd);
+		m_CreateEater.setText("Create Eater");
+		m_CreateEater.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				m_Simulation.createEater(m_Name.getText(), m_Productions, m_Color.getText());
+				dialog.dispose();
 			}
 		});
+		
+		updateButtons();
 		
 		dialog.open();
 		Display display = parent.getDisplay();
@@ -119,5 +134,24 @@ public class CreateEaterDialog extends Dialog {
 				display.sleep();
 			}
 		}
+	}
+	
+	void updateButtons() {
+		boolean productions = (m_Productions != null);
+		boolean name = false;
+	
+		String nameText = m_Name.getText();
+		if (nameText != null) {
+			if (nameText.length() > 0) {
+				name = true;
+				for (int i = 0; i < nameText.length(); ++i) {
+					if (Character.isWhitespace(nameText.charAt(i))) {
+						name = false;
+					}
+				}			
+			}
+		}
+		
+		m_CreateEater.setEnabled(productions && name);
 	}
 }

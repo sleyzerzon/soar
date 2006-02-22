@@ -346,7 +346,10 @@ public class World {
 	void moveEaters() {
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			Eater.MoveInfo move = m_Eaters[i].getMove();
-			
+			if (move == null) {
+				continue;
+			}
+
 			Point oldLocation = m_Eaters[i].getLocation();
 			Point newLocation;
 			if (move.direction.equalsIgnoreCase(Eater.kNorth)) {
