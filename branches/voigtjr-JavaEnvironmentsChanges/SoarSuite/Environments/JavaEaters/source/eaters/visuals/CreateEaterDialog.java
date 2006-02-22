@@ -20,9 +20,12 @@ public class CreateEaterDialog extends Dialog {
 	Combo m_Color;
 	Button m_CreateEater;
 	
-	public CreateEaterDialog(Shell parent, EatersSimulation simulation) {
+	public CreateEaterDialog(Shell parent, EatersSimulation simulation, Eater selected) {
 		super(parent);
 		m_Simulation = simulation;
+		if (selected != null) {
+			m_Productions = selected.getProductions();
+		}
 	}
 	
 	public void open() {
@@ -47,7 +50,11 @@ public class CreateEaterDialog extends Dialog {
 		gd.grabExcessHorizontalSpace = true;
 		gd.widthHint = 150;
 		m_ProductionsLabel.setLayoutData(gd);
-		m_ProductionsLabel.setText("<choose productions>");
+		if (m_Productions == null) {
+			m_ProductionsLabel.setText("<choose productions>");
+		} else {
+			m_ProductionsLabel.setText(m_Productions.substring(m_Productions.lastIndexOf(System.getProperty("file.separator")) + 1));
+		}
 
 		final Button productionsBrowse = new Button(dialog, SWT.PUSH);
 		gd = new GridData();
@@ -59,8 +66,9 @@ public class CreateEaterDialog extends Dialog {
 				FileDialog fd = new FileDialog(dialog, SWT.OPEN);
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getAgentPath());
-				m_Productions = fd.open();
-				if (m_Productions != null) {
+				String productions = fd.open();
+				if (productions != null) {
+					m_Productions = productions;
 					m_ProductionsLabel.setText(m_Productions.substring(m_Productions.lastIndexOf(System.getProperty("file.separator")) + 1));
 				}
 				updateButtons();

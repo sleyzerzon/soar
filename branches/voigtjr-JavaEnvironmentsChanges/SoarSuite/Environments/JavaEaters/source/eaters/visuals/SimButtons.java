@@ -10,7 +10,7 @@ import eaters.SimulationListener;
 
 import utilities.*;
 
-public class SimButtons extends Composite implements SimulationListener {
+public class SimButtons extends Composite {
 	EatersSimulation m_Simulation;
 	Button m_RunButton;
 	Button m_StopButton;
@@ -58,7 +58,6 @@ public class SimButtons extends Composite implements SimulationListener {
 			}
 		});
 		
-		m_Simulation.addSimulationListener(this);
 		updateButtons();
 	}
 	
@@ -71,23 +70,5 @@ public class SimButtons extends Composite implements SimulationListener {
         m_StopButton.setEnabled(running);
         m_ResetButton.setEnabled(!running);
         m_StepButton.setEnabled(!running && !done && eaters);
-	}
-
-	public void simulationEventHandler(int type, Object object) {
-		if (isDisposed()) {
-			return;
-		}
-		
-		if (type == SimulationListener.kStartEvent 
-				|| type == SimulationListener.kStopEvent 
-				|| type == SimulationListener.kNewWorldEvent
-				|| type == SimulationListener.kAgentCreatedEvent
-				|| type == SimulationListener.kAgentDestroyedEvent) {
-			this.getDisplay().asyncExec(new Runnable() { 
-				public void run () { 
-					updateButtons();
-				} 
-			});
-		}
 	}
 }

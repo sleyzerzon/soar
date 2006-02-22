@@ -212,7 +212,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		if (agent == null) {
 			return;
 		}
-		m_World.createEater(agent, color);
+		m_World.createEater(agent, productions, color);
 		spawnDebugger(name);		
 		fireSimulationEvent(SimulationListener.kAgentCreatedEvent);   	
     }
@@ -333,14 +333,10 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 	
 	protected void fireSimulationEvent(int type) {
-		fireSimulationEvent(type, null);
-	}
-	
-	protected void fireSimulationEvent(int type, Object object) {
 		updateSimulationListenerList();
 		Iterator iter = m_SimulationListeners.iterator();
 		while(iter.hasNext()){
-			((SimulationListener)iter.next()).simulationEventHandler(type, object);
+			((SimulationListener)iter.next()).simulationEventHandler(type);
 		}		
 	}
 		

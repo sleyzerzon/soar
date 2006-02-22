@@ -34,6 +34,7 @@ public class Eater {
 	String m_ColorString;
 	Color m_Color;
 	String m_Facing;
+	String m_Productions;
 	
 	StringElement m_DirectionWME;
 	StringElement m_NameWME;
@@ -54,10 +55,11 @@ public class Eater {
 		boolean iterated = false;
 	}
 	
-	public Eater(Agent agent, String color, Point location) {
+	public Eater(Agent agent, String productions, String color, Point location) {
 		m_Agent = agent;
 		m_Location = location;
 		m_ColorString = color;
+		m_Productions = productions;
 
 		m_Name = m_Agent.GetAgentName();
 		m_Logger.log("Created eater: " + m_Name);
@@ -80,6 +82,10 @@ public class Eater {
 		createView(kEaterVision, kEaterVision);
 		
 		m_Agent.Commit();
+	}
+	
+	public String getProductions() {
+		return m_Productions;
 	}
 	
 	public String getName() {

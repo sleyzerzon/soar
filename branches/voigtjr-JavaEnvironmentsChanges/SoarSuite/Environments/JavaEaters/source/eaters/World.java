@@ -270,18 +270,18 @@ public class World {
 		setEaterCells();
 	}
 
-	public void createEater(Agent agent, String color) {
-		createEater(agent, color, null);
+	public void createEater(Agent agent, String productions, String color) {
+		createEater(agent, productions, color, null);
 	}
 
-	public void createEater(Agent agent, String color, Point location) {
+	public void createEater(Agent agent, String productions, String color, Point location) {
 		if (location == null) {
 			location = findStartingLocation();
 		}
 		
 		getCell(location).eat();
 		
-		Eater eater = new Eater(agent, color, location);
+		Eater eater = new Eater(agent, productions, color, location);
 
 		if (m_Eaters == null) {
 			m_Eaters = new Eater[1];

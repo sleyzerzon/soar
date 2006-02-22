@@ -12,7 +12,7 @@ import eaters.SimulationListener;
 
 import utilities.*;
 
-public class AgentDisplay extends Composite implements SimulationListener {
+public class AgentDisplay extends Composite {
 	public static final int kAgentMapCellSize = 20;
 	public static final int kListWidth = 75;
 	
@@ -39,7 +39,7 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		m_NewAgentButton.setText("New");
 		m_NewAgentButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				new CreateEaterDialog(parent.getShell(), m_Simulation).open();
+				new CreateEaterDialog(parent.getShell(), m_Simulation, m_SelectedEater).open();
 			}
 		});
 		
@@ -83,7 +83,18 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		m_AgentWorld.disable();
 
 		setLayoutData(new RowData(kListWidth + m_AgentWorld.getMiniWidth() + 4, m_AgentWorld.getMiniHeight() + 4 + 75));
-		m_Simulation.addSimulationListener(this);
+	}
+	
+	void agentEvent() {
+		deselect();
+		updateEaterList();
+		updateButtons();
+	}
+
+	void worldChangeEvent() {
+		if (m_SelectedEater != null) {
+			m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
+		}
 	}
 	
 	void deselect() {
@@ -121,30 +132,4 @@ public class AgentDisplay extends Composite implements SimulationListener {
 		m_NewAgentButton.setEnabled(!running && !agentsFull);
 		m_DestroyAgentButton.setEnabled(!running && !noAgents && selectedEater);
  	}
-
-	public void simulationEventHandler(int type, Object object) {
-		if (isDisposed()) {
-			return;
-		}
-		
-		if (type == SimulationListener.kAgentCreatedEvent || type == SimulationListener.kAgentDestroyedEvent) {
-			deselect();
-			updateEaterList();
-			updateButtons();
-		} 
-		
-		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
-			if (m_SelectedEater != null) {
-				m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
-			}
-		}
-		
-		if (type == SimulationListener.kStartEvent || type == SimulationListener.kStopEvent || type == SimulationListener.kNewWorldEvent) {
-			this.getDisplay().asyncExec(new Runnable() { 
-				public void run () { 
-					updateButtons();
-				} 
-			});
-		}
-	}
 }

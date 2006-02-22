@@ -3,13 +3,14 @@ package eaters;
 public interface SimulationListener {
 	// TODO: split update event out since it will slow things down
 	public static final int 
-		kStartEvent = 0,
-		kStopEvent = 1,
-		kShutdownEvent = 2,
-		kUpdateEvent = 3,
-		kNewWorldEvent = 4,
-		kAgentCreatedEvent = 5,
-		kAgentDestroyedEvent = 6;
+		kNoEvent = 0,
+		kStartEvent = 1,
+		kStopEvent = 2,
+		kShutdownEvent = 3,
+		kUpdateEvent = 4,
+		kNewWorldEvent = 5,
+		kAgentCreatedEvent = 6,
+		kAgentDestroyedEvent = 7;
 	
-	public void simulationEventHandler(int type, Object object);
+	public void simulationEventHandler(int type);
 }

@@ -6,12 +6,10 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.*;
 
-import eaters.EatersSimulation;
-import eaters.SimulationListener;
+import eaters.*;
+import utilities.*;
 
-import utilities.Logger;
-
-public class EatersWindowManager implements SimulationListener {
+public class EatersWindowManager extends Thread implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
 	public static final String kFoodRemaining = "Food remaining: ";
 	public static final String kColors[] = { "white", "blue", "red", "yellow", "orange", "black", "green", "purple" };
@@ -71,6 +69,9 @@ public class EatersWindowManager implements SimulationListener {
 	Shell m_Shell;
 	EatersSimulation m_Simulation;
 	final Label m_FoodCount;
+	final SimButtons m_SimButtons;
+	final VisualWorld m_VisualWorld;
+	final AgentDisplay m_AgentDisplay;
 	
 	public EatersWindowManager(EatersSimulation simulation) {
 		m_Display = new Display();
@@ -83,21 +84,22 @@ public class EatersWindowManager implements SimulationListener {
 		
 		createMenu();
 		
-		new SimButtons(m_Shell, m_Simulation);
+		m_SimButtons = new SimButtons(m_Shell, m_Simulation);
 		
-		new VisualWorld(m_Shell, SWT.NONE, m_Simulation, kMainMapCellSize, false);
+		m_VisualWorld = new VisualWorld(m_Shell, SWT.NONE, m_Simulation, kMainMapCellSize, false);
 		
 		m_FoodCount = new Label(m_Shell, SWT.NONE);
 		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.getWorld().getFoodCount()));
 
-		new AgentDisplay(m_Shell, m_Simulation);
+		m_AgentDisplay = new AgentDisplay(m_Shell, m_Simulation);
 		
 		m_Simulation.addSimulationListener(this);
 
 		m_Shell.setText("Java Eaters");
 		m_Shell.setSize(400,300);
-		m_Shell.open();
 		
+		m_Shell.open();
+
 		while (!m_Shell.isDisposed()) {
 			if (!m_Display.readAndDispatch()) {
 				m_Display.sleep();
@@ -128,18 +130,66 @@ public class EatersWindowManager implements SimulationListener {
 		
 		m_Shell.setMenuBar(menu);			
 	}
+	
+	void dispatchEvent(int type) {
+		switch (type) {
+		case SimulationListener.kStartEvent:
+			m_SimButtons.updateButtons();
+			m_AgentDisplay.updateButtons();
+			return;
+			
+		case SimulationListener.kStopEvent:
+			m_VisualWorld.redraw();
+			m_SimButtons.updateButtons();
+			m_AgentDisplay.updateButtons();
+			return;
+			
+		case SimulationListener.kShutdownEvent:
+			return;
+			
+		case SimulationListener.kUpdateEvent:
+			m_VisualWorld.redraw();
+			updateFoodCount();
+			m_AgentDisplay.worldChangeEvent();
+			return;
+			
+		case SimulationListener.kNewWorldEvent:
+			m_VisualWorld.redraw();
+			updateFoodCount();
+			m_SimButtons.updateButtons();
+			m_AgentDisplay.worldChangeEvent();
+			return;
+			
+		case SimulationListener.kAgentCreatedEvent:
+			m_VisualWorld.redraw();
+			m_SimButtons.updateButtons();
+			m_AgentDisplay.agentEvent();
+			return;
+			
+		case SimulationListener.kAgentDestroyedEvent:
+			m_VisualWorld.redraw();
+			m_SimButtons.updateButtons();
+			m_AgentDisplay.agentEvent();
+			return;
+			
+		default:
+			m_Logger.log("Invalid event type received: " + new Integer(type));
+			return;
+		}		
+	}
+	
+	void updateFoodCount() {
+		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.getWorld().getFoodCount()));
+	}
 
-	public void simulationEventHandler(int type, Object object) {
+	public void simulationEventHandler(final int type) {
 		if (m_Display.isDisposed()) {
 			return;
 		}
-		
-		if (type == SimulationListener.kUpdateEvent || type == SimulationListener.kNewWorldEvent) {
-			m_Display.asyncExec(new Runnable() { 
-				public void run () { 
-					m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.getWorld().getFoodCount()));
-				} 
-			});
-		}
+		m_Display.asyncExec(new Runnable() {
+			public void run() {
+				dispatchEvent(type);
+			}
+		});
 	}
 }

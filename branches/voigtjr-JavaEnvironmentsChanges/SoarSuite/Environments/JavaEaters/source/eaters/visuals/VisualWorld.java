@@ -15,7 +15,7 @@ import eaters.World.Food;
 
 import utilities.*;
 
-public class VisualWorld extends Canvas implements PaintListener, SimulationListener {
+public class VisualWorld extends Canvas implements PaintListener {
 	Logger m_Logger = Logger.logger;
 	Display m_Display;
 	EatersSimulation m_Simulation;
@@ -37,7 +37,6 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 		}
 
 		addPaintListener(this);		
-		m_Simulation.addSimulationListener(this);
 	}
 	
 	public void disable() {
@@ -204,22 +203,4 @@ public class VisualWorld extends Canvas implements PaintListener, SimulationList
 			}
 		}
 	}
- 	
-	public void simulationEventHandler(int type, Object object) {
-		if (isDisposed()) {
-			return;
-		}
-		
-		if (type == SimulationListener.kAgentCreatedEvent 
-				|| type == SimulationListener.kAgentDestroyedEvent 
-				|| type == SimulationListener.kUpdateEvent 
-				|| type == SimulationListener.kNewWorldEvent 
-				|| type == SimulationListener.kStopEvent) {
-			m_Display.asyncExec(new Runnable() { 
-				public void run () { 
-					redraw(); 
-				} 
-			});
-		}
-	}
-}
+ }
