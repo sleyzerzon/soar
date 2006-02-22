@@ -70,6 +70,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 	EatersSimulation m_Simulation;
 	final Label m_FoodCount;
 	final SimButtons m_SimButtons;
+	final MapButtons m_MapButtons;
 	final VisualWorld m_VisualWorld;
 	final AgentDisplay m_AgentDisplay;
 	
@@ -80,26 +81,45 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		initColors(m_Display);
 		
 		m_Shell = new Shell(m_Display);
-		m_Shell.setLayout(new RowLayout(SWT.VERTICAL));
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 2;
+		m_Shell.setLayout(gl);
 		
-		createMenu();
-		
-		m_SimButtons = new SimButtons(m_Shell, m_Simulation);
+		GridData gd;
 		
 		m_VisualWorld = new VisualWorld(m_Shell, SWT.NONE, m_Simulation, kMainMapCellSize);
-		m_VisualWorld.setLayoutData(new RowData(m_VisualWorld.getWidth(), m_VisualWorld.getHeight()));
+		gd = new GridData();
+		gd.widthHint = m_VisualWorld.getWidth();
+		gd.heightHint = m_VisualWorld.getHeight();
+		gd.verticalSpan = 3;
+		m_VisualWorld.setLayoutData(gd);
+
+		Group group1 = new Group(m_Shell, SWT.NONE);
+		gd = new GridData();
+		group1.setLayoutData(gd);
+		group1.setText("Simulation");
+		group1.setLayout(new FillLayout());
+		m_SimButtons = new SimButtons(group1, m_Simulation);
 		
-		m_FoodCount = new Label(m_Shell, SWT.NONE);
+		Group group2 = new Group(m_Shell, SWT.NONE);
+		gd = new GridData();
+		group2.setLayoutData(gd);
+		group2.setText("Map");
+		group2.setLayout(new RowLayout(SWT.VERTICAL));
+		m_FoodCount = new Label(group2, SWT.NONE);
+		m_FoodCount.setLayoutData(new RowData());
 		m_FoodCount.setText(kFoodRemaining + m_Simulation.getWorld().getFoodCount());
+		m_MapButtons = new MapButtons(group2, m_Simulation);
+		m_MapButtons.setLayoutData(new RowData());
 
 		m_AgentDisplay = new AgentDisplay(m_Shell, m_Simulation);
-		m_AgentDisplay.setLayoutData(new RowData());
+		gd = new GridData();
+		m_AgentDisplay.setLayoutData(gd);
 		
 		m_Simulation.addSimulationListener(this);
 
 		m_Shell.setText("Java Eaters");
-		//m_Shell.setSize(420,300);
-		m_Shell.setSize(m_Shell.computeSize(SWT.DEFAULT, 280));
+		m_Shell.setSize(m_Shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
 		m_Shell.open();
 
@@ -111,39 +131,18 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		m_Display.dispose();		
 	}
 	
-	public void createMenu() {
-		final Menu menu = new Menu(m_Shell, SWT.BAR);
-		
-		final MenuItem file = new MenuItem(menu, SWT.CASCADE);		
-		file.setText("File");
-		
-		final Menu filemenu = new Menu(m_Shell, SWT.DROP_DOWN);
-		file.setMenu(filemenu);
-		
-		final MenuItem exit = new MenuItem(filemenu, SWT.PUSH);
-		exit.setText("Exit");
-		exit.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				m_Simulation.shutdown(0);
-			}
-			public void widgetDefaultSelected(SelectionEvent e) {
-				
-			}
-		});
-		
-		m_Shell.setMenuBar(menu);			
-	}
-	
 	void dispatchEvent(int type) {
 		switch (type) {
 		case SimulationListener.kStartEvent:
 			m_SimButtons.updateButtons();
+			m_MapButtons.updateButtons();
 			m_AgentDisplay.updateButtons();
 			return;
 			
 		case SimulationListener.kStopEvent:
 			m_VisualWorld.redraw();
 			m_SimButtons.updateButtons();
+			m_MapButtons.updateButtons();
 			m_AgentDisplay.updateButtons();
 			return;
 			

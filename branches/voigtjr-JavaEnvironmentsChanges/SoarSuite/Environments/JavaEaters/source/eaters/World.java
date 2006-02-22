@@ -186,7 +186,7 @@ public class World {
 		m_Simulation = simulation;
 	}
 	
-	public boolean load(String mapFile) {
+	boolean load(String mapFile) {
 		try {
 			// Open file
 			JavaElementXML root = JavaElementXML.ReadFromFile(mapFile);

@@ -105,12 +105,12 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 			shutdown(1);
 		}
 
-		m_CurrentMap = m_DefaultMap;
+		m_CurrentMap = getMapPath() + m_DefaultMap;
 
 		// Load default world
 		m_World = new World(this);	
-		m_Logger.log("Attempting to load " + getCurrentMap());
-		if (!m_World.load(getCurrentMap())) {
+		m_Logger.log("Attempting to load " + m_CurrentMap);
+		if (!m_World.load(m_CurrentMap)) {
 			shutdown(1);
 			return;
 		}
@@ -131,10 +131,6 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	
 	public void interactiveStop() {
 		m_Continuous = false;
-	}
-	
-	public String getCurrentMap() {
-		return getMapPath() + m_CurrentMap;
 	}
 	
 	void initSoar() {
@@ -311,11 +307,17 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 
 	public void resetSimulation() {
-		if (!m_World.load(getCurrentMap())) {
+		if (!m_World.load(m_CurrentMap)) {
+			// TODO: this is not graceful error handling
 			shutdown(1);
 		}
 		m_WorldCount = 0;
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);
+	}
+
+	public void changeMap(String map) {
+		m_CurrentMap = map;
+		resetSimulation();
 	}
 
 	void destroyEater(Eater eater) {
