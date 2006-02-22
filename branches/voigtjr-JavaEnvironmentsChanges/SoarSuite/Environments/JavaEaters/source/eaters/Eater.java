@@ -35,6 +35,7 @@ public class Eater {
 	Color m_Color;
 	String m_Facing;
 	String m_Productions;
+	boolean m_Colliding;
 	
 	StringElement m_DirectionWME;
 	StringElement m_NameWME;
@@ -82,6 +83,14 @@ public class Eater {
 		createView(kEaterVision, kEaterVision);
 		
 		m_Agent.Commit();
+	}
+	
+	public boolean isColliding() {
+		return m_Colliding;
+	}
+	
+	public void setColliding(boolean colliding) {
+		m_Colliding = colliding;
 	}
 	
 	public String getProductions() {

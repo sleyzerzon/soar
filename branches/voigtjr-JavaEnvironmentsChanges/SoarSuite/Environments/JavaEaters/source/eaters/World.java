@@ -114,13 +114,13 @@ public class World {
 			return m_Type >= kReservedIDs;
 		}
 		
-		public void removeEater() {
+		public boolean removeEater() {
 			if (m_Type != kEaterCell) {
-				m_Logger.log("Warning: tried to remove eater from cell it wasn't at.");
-				return;
+				return false;
 			}
 			m_Type = kEmptyCell;
 			m_Eater = null;
+			return true;
 		}
 		
 		public Food setEater(Eater eater) {
@@ -382,7 +382,9 @@ public class World {
 			}
 			
 			if (isInBounds(newLocation) && !getCell(newLocation).isWall()) {
-				getCell(oldLocation).removeEater();
+				if (!getCell(oldLocation).removeEater()) {
+					m_Logger.log("Warning: moving eater " + m_Eaters[i].getName() + " not at old location " + oldLocation);
+				}
 				m_Eaters[i].setLocation(newLocation);
 				if (move.jump) {
 					m_Eaters[i].adjustScore(kJumpPenalty);
@@ -442,41 +444,93 @@ public class World {
 		updateEaterInput();
 	}
 	
+	ArrayList m_Collisions;
+	
 	void handleCollisions() {
+		// generate collision groups
+		ArrayList currentCollision = null;
+		
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			for (int j = i+1; j < m_Eaters.length; ++j) {
+				// only check eaters who aren't already colliding
+				if (m_Eaters[i].isColliding()) {
+					continue;
+				}
+				
 				if (m_Eaters[i].getLocation().equals(m_Eaters[j].getLocation())) {
 					
-					m_Logger.log("Handling collison at " + m_Eaters[i].getLocation());
-					
-					// Sum cash
-					int cash = m_Eaters[i].getScore();
-					cash += m_Eaters[j].getScore();
-					cash /= 2;
-					m_Eaters[i].setScore(cash);
-					m_Eaters[j].setScore(cash);
-					
-					// Remove from former location
-					getCell(m_Eaters[i].getLocation()).removeEater();
-					
-					// Find new location for eater 1
-					m_Eaters[i].setLocation(findStartingLocation());
-					// Update map, consume as necesary
-					Food f = getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
-					if (f != null) {
-						m_Eaters[i].adjustScore(f.getValue());
+					// Create data structures
+					if (m_Collisions == null) {
+						m_Collisions = new ArrayList();
 					}
+					if (currentCollision == null) {
+						currentCollision = new ArrayList();
+						
+						// Add first agent to current collision
+						currentCollision.add(m_Eaters[i]);
+						// Flipping collision flag unnecessary as first agent will not be traversed again
 
-					// Find new location for eater 2
-					m_Eaters[j].setLocation(findStartingLocation());
-					// Update map, consume as necesary
-					f = getCell(m_Eaters[j].getLocation()).setEater(m_Eaters[j]);
-					if (f != null) {
-						m_Eaters[j].adjustScore(f.getValue());
-					}					
+						m_Logger.log("Starting collision group at " + m_Eaters[i].getLocation());
+					}
+					
+					// Add second agent to current collision
+					currentCollision.add(m_Eaters[j]);
+
+					// Flip collision flag for second agent
+					m_Eaters[j].setColliding(true);
+				}
+			}
+			// add current collision to collisions
+			if (currentCollision != null) {
+				m_Collisions.add(currentCollision);
+				currentCollision = null;
+			}
+		}
+		
+		// if there are not collisions, we're done
+		if (m_Collisions == null) {
+			return;
+		}
+		
+		// process collision groups
+		for (int group = 0; group < m_Collisions.size(); ++group) {
+			// Retrieve collision group
+			currentCollision = (ArrayList)m_Collisions.get(group);
+			Eater[] collidees = (Eater[])currentCollision.toArray(new Eater[0]);
+			
+			m_Logger.log("Processing collision group " + group + " with " + collidees.length + " collidees.");
+			
+			// Redistribute wealth
+			int cash = 0;			
+			for (int i = 0; i < collidees.length; ++i) {
+				cash += collidees[i].getScore();
+			}			
+			cash /= collidees.length;
+			m_Logger.log("Cash to each: " + cash);
+			for (int i = 0; i < collidees.length; ++i) {
+				collidees[i].setScore(cash);
+			}
+			
+			// Remove from former location (only one of these for all eaters)
+			getCell(collidees[0].getLocation()).removeEater();
+
+			// Find new locations, update map and consume as necessary
+			for (int i = 0; i < collidees.length; ++i) {
+				collidees[i].setLocation(findStartingLocation());
+				Food f = getCell(collidees[i].getLocation()).setEater(collidees[i]);
+				if (f != null) {
+					collidees[i].adjustScore(f.getValue());
 				}
 			}
 		}
+		
+		// clear collision groups
+		m_Collisions = null;
+		
+		// clear colliding flags
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			m_Eaters[i].setColliding(false);
+		}		
 	}
 	
 	public Eater[] getEaters() {
