@@ -224,8 +224,12 @@ public class World {
 			for(int row = 0; row < m_WorldHeight; ++row) {
 				String rowString = new String();
 				for (int col = 0; col < m_WorldWidth; ++col) {
-					m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
-					rowString += m_World[row][col];
+					try {
+						m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
+						rowString += m_World[row][col];
+					} catch (Exception e) {
+						throw new Exception("Error on row: " + row + ", column: " + col);
+					}
 				}
 				m_Logger.log(rowString);
 			}

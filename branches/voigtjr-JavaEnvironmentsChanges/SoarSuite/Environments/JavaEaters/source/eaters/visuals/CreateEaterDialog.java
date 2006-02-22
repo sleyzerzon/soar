@@ -13,6 +13,7 @@ import utilities.*;
 
 public class CreateEaterDialog extends Dialog {
 
+	final int kNameCharacterLimit = 12;
 	EatersSimulation m_Simulation;
 	String m_Productions;
 	Label m_ProductionsLabel;
@@ -113,6 +114,7 @@ public class CreateEaterDialog extends Dialog {
 		gd.widthHint = 150;
 		gd.grabExcessHorizontalSpace = true;
 		m_Name.setLayoutData(gd);
+		m_Name.setTextLimit(kNameCharacterLimit);
 		m_Name.setText(m_Color.getText());
 		m_Name.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
