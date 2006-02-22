@@ -169,7 +169,7 @@ public class World {
 		}
 		
 		public String toString() {
-			return new Integer(m_Type).toString();
+			return Integer.toString(m_Type);
 		}	
 	}
 

@@ -27,6 +27,7 @@ public class AgentDisplay extends Composite {
 	Composite m_AgentButtons;
 	Button m_NewAgentButton;
 	Button m_DestroyAgentButton;
+	Label m_Score;
 
 	public AgentDisplay(final Composite parent, EatersSimulation simulation) {
 		super(parent, SWT.NONE);
@@ -83,6 +84,7 @@ public class AgentDisplay extends Composite {
 					String selected = m_AgentList.getSelection()[0];
 					if (m_Eaters[i].getName().equals(selected)) {
 						m_SelectedEater = m_Eaters[i];
+						m_Score.setText(Integer.toString(m_SelectedEater.getScore()));
 						m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
 						m_AgentWorld.enable();
 						m_AgentWorld.redraw();
@@ -101,6 +103,19 @@ public class AgentDisplay extends Composite {
 		m_AgentWorld.setLayoutData(gd);
 		m_AgentWorld.disable();
 		
+		Label m_ScoreLabel = new Label(m_Group, SWT.NONE);
+		gd = new GridData();
+		gd.horizontalAlignment = SWT.END;
+		m_ScoreLabel.setLayoutData(gd);
+		m_ScoreLabel.setText("Score:");
+		
+		m_Score = new Label(m_Group, SWT.NONE);
+		gd = new GridData();
+		gd.horizontalAlignment = SWT.BEGINNING;
+		gd.widthHint = m_AgentWorld.getMiniWidth() + 4;		
+		m_Score.setLayoutData(gd);
+		m_Score.setText("-");
+		
 	}
 	
 	void agentEvent() {
@@ -111,6 +126,7 @@ public class AgentDisplay extends Composite {
 
 	void worldChangeEvent() {
 		if (m_SelectedEater != null) {
+			m_Score.setText(Integer.toString(m_SelectedEater.getScore()));
 			m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
 			m_AgentWorld.redraw();
 		}
@@ -118,6 +134,7 @@ public class AgentDisplay extends Composite {
 	
 	void deselect() {
 		m_AgentList.deselectAll();
+		m_Score.setText("-");
 		m_SelectedEater = null;
 		m_AgentWorld.disable();
 		m_AgentWorld.redraw();

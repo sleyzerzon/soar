@@ -90,7 +90,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		m_VisualWorld.setLayoutData(new RowData(m_VisualWorld.getWidth(), m_VisualWorld.getHeight()));
 		
 		m_FoodCount = new Label(m_Shell, SWT.NONE);
-		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.getWorld().getFoodCount()));
+		m_FoodCount.setText(kFoodRemaining + m_Simulation.getWorld().getFoodCount());
 
 		m_AgentDisplay = new AgentDisplay(m_Shell, m_Simulation);
 		m_AgentDisplay.setLayoutData(new RowData());

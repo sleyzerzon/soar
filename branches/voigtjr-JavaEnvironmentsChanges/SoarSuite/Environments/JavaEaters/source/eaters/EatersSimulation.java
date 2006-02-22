@@ -203,7 +203,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
   			m_Logger.log("Stop event received from kernel.");
   			fireSimulationEvent(SimulationListener.kStopEvent);	
  		} else {
- 			m_Logger.log("Unknown system event received from kernel: " + new Integer(eventID).toString());
+ 			m_Logger.log("Unknown system event received from kernel: " + eventID);
  		}
     }
     
@@ -277,7 +277,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 	
 	public void shutdown(int exitCode) {
-		m_Logger.log("Shutdown called with code: " + new Integer(exitCode).toString());
+		m_Logger.log("Shutdown called with code: " + exitCode);
 		fireSimulationEvent(SimulationListener.kShutdownEvent);
 		if (m_World != null) {
 			m_World.destroyAllEaters();
