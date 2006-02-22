@@ -452,7 +452,9 @@ public class World {
 					// Teleport
 					getCell(m_Eaters[i].getLocation()).setEmpty();
 					m_Eaters[i].setLocation(findStartingLocation());
+					getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
 					m_Eaters[j].setLocation(findStartingLocation());
+					getCell(m_Eaters[j].getLocation()).setEater(m_Eaters[j]);
 
 					// Consume
 					Food f = getCell(m_Eaters[i].getLocation()).eat();
