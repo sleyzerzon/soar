@@ -8,34 +8,38 @@ import sml.*;
 import utilities.*;
 
 public class World {
-	public static final String kTagEatersWorld = "eaters-world";
+	static final String kTagEatersWorld = "eaters-world";
 
-	public static final String kTagFood = "food";
-	public static final String kTagFoodType = "food-type";
-	public static final String kParamName = "name";
-	public static final String kParamValue = "value";
-	public static final String kParamShape = "shape";
-	public static final String kParamColor = "color";
+	static final String kTagFood = "food";
+	static final String kTagFoodType = "food-type";
+	static final String kParamName = "name";
+	static final String kParamValue = "value";
+	static final String kParamShape = "shape";
+	static final String kParamColor = "color";
 
-	public static final String kTagCells = "cells";
-	public static final String kParamWorldWidth = "world-width";
-	public static final String kParamWorldHeight = "world-height";
-	public static final String kTagRow = "row";
-	public static final String kTagCell = "cell";
-	public static final String kParamType = "type";
+	static final String kTagCells = "cells";
+	static final String kParamWorldWidth = "world-width";
+	static final String kParamWorldHeight = "world-height";
+	static final String kParamRandom = "random";
+	static final String kTagRow = "row";
+	static final String kTagCell = "cell";
+	static final String kParamType = "type";
 	
-	public static final String kTypeWall = "wall";
-	public static final String kTypeEmpty = "empty";
-	public static final String kTypeEater = "eater";
+	static final String kTypeWall = "wall";
+	static final String kTypeEmpty = "empty";
+	static final String kTypeEater = "eater";
 	
-	public static final int kWallCell = 0;
-	public static final int kEmptyCell = 1;
-	public static final int kEaterCell = 2;
-	public static final int kReservedIDs = 3;
+	static final int kWallCell = 0;
+	static final int kEmptyCell = 1;
+	static final int kEaterCell = 2;
+	static final int kReservedIDs = 3;
 	
-	public static final int kWallPenalty = -5;
-	public static final int kJumpPenalty = -5;
+	static final int kWallPenalty = -5;
+	static final int kJumpPenalty = -5;
 
+	static final double kLowProbability = .15;
+	static final double kHigherProbability = .65;
+	
 	public class Food {
 		public static final String kRound = "round";
 		public static final String kSquare = "square";
@@ -78,6 +82,11 @@ public class World {
 	public class Cell {
 		int m_Type;
 		Eater m_Eater;
+		
+		public Cell(int foodIndex) {
+			m_Type = foodIndex + kReservedIDs;
+			++m_FoodCount;
+		}
 
 		public Cell(String name) throws Exception {
 			if (name.equalsIgnoreCase(kTypeWall)) {
@@ -214,6 +223,8 @@ public class World {
 			// Get dimentions
 			m_WorldWidth = cells.getAttributeIntThrows(kParamWorldWidth);
 			m_WorldHeight = cells.getAttributeIntThrows(kParamWorldHeight);
+			
+			boolean random = cells.getAttributeBooleanDefault(kParamRandom, false);
 						
 			// Create map array
 			m_World = new Cell[m_WorldHeight][m_WorldWidth];
@@ -221,17 +232,11 @@ public class World {
 			// Reset food
 			m_FoodCount = 0;
 			
-			for(int row = 0; row < m_WorldHeight; ++row) {
-				String rowString = new String();
-				for (int col = 0; col < m_WorldWidth; ++col) {
-					try {
-						m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
-						rowString += m_World[row][col];
-					} catch (Exception e) {
-						throw new Exception("Error on row: " + row + ", column: " + col);
-					}
-				}
-				m_Logger.log(rowString);
+			// generate
+			if (random) {
+				generateRandomMap();
+			} else {
+				generateMapFromXML(cells);
 			}
 			
 		} catch (Exception e) {
@@ -243,6 +248,127 @@ public class World {
 		
 		m_Logger.log(mapFile + " loaded.");
 		return true;
+	}
+	
+	private void generateMapFromXML(JavaElementXML cells) throws Exception {
+		for(int row = 0; row < m_WorldHeight; ++row) {
+			String rowString = new String();
+			for (int col = 0; col < m_WorldWidth; ++col) {
+				try {
+					m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
+					rowString += m_World[row][col];
+				} catch (Exception e) {
+					throw new Exception("Error on row: " + row + ", column: " + col);
+				}
+			}
+			m_Logger.log(rowString);
+		}
+	}
+	
+	private void generateRandomMap() throws Exception {
+		// Generate perimiter wall
+		for (int row = 0; row < m_WorldWidth; ++row) {
+			m_World[row][0] = m_World[row][m_WorldHeight - 1] = new Cell(kTypeWall);
+		}
+		for (int col = 1; col < m_WorldHeight - 1; ++col) {
+			m_World[0][col] = m_World[m_WorldWidth - 1][col] = new Cell(kTypeWall);
+		}
+		
+		Random random = new Random();
+		
+		double probability = kLowProbability;
+		for (int row = 2; row < m_WorldWidth - 2; ++row) {
+			for (int col = 2; col < m_WorldHeight - 2; ++col) {
+				if (noWallsOnCorners(row, col)) {
+					if (wallOnAnySide(row, col)) {
+						probability = kHigherProbability;					
+					}
+					if (random.nextDouble() < probability) {
+						m_World[row][col] = new Cell(kTypeWall);
+					} else {
+						m_World[row][col] = new Cell(kTypeEmpty);
+					}
+					probability = kLowProbability;
+				}
+			}
+		}
+		fillFood();
+	}
+	
+	private boolean noWallsOnCorners(int row, int col) {
+		Cell cell = m_World[row + 1][col + 1];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return false;
+			}
+		}
+		
+		cell = m_World[row - 1][col - 1];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return false;
+			}
+		}
+		
+		cell = m_World[row + 1][col - 1];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return false;
+			}
+		}
+		
+		cell = m_World[row - 1][col + 1];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean wallOnAnySide(int row, int col) {
+		Cell cell = m_World[row + 1][col];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return true;
+			}
+		}
+		
+		cell = m_World[row][col + 1];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return true;
+			}
+		}
+		
+		cell = m_World[row - 1][col];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return true;
+			}
+		}
+		
+		cell = m_World[row][col - 1];
+		if (cell != null) {
+			if (cell.isWall()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private void fillFood() {
+		Random random = new Random();
+		for (int row = 1; row < m_WorldWidth - 1; ++row) {
+			for (int col = 1; col < m_WorldHeight - 1; ++col) {
+				if (m_World[row][col] != null) {
+					if (!m_World[row][col].isEmpty()) {
+						continue;
+					}
+				}
+				m_World[row][col] = new Cell(random.nextInt(m_Food.length));
+			}
+		}		
 	}
 	
 	public int getWidth() {

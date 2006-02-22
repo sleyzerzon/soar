@@ -13,7 +13,7 @@ import utilities.*;
 public class MapButtons extends Composite {
 	EatersSimulation m_Simulation;
 	Button m_ChangeMapButton;
-	Button m_RandomMapButton;
+	//Button m_RandomMapButton;
 	Logger m_Logger = Logger.logger;
 	
 	public MapButtons(Composite parent, EatersSimulation simulation) {
@@ -37,12 +37,12 @@ public class MapButtons extends Composite {
 			}
 		});
 		
-		m_RandomMapButton = new Button(this, SWT.PUSH);
-		m_RandomMapButton.setText("Random Map");
-		m_RandomMapButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
+//		m_RandomMapButton = new Button(this, SWT.PUSH);
+//		m_RandomMapButton.setText("Random Map");
+//		m_RandomMapButton.addSelectionListener(new SelectionAdapter() {
+//			public void widgetSelected(SelectionEvent e) {
+//			}
+//		});
 		
 		updateButtons();
 	}
@@ -53,6 +53,6 @@ public class MapButtons extends Composite {
 		boolean eaters = (m_Simulation.getWorld().getEaters() != null);
 		
 		m_ChangeMapButton.setEnabled(!running);
-		m_RandomMapButton.setEnabled(!running);
+		//m_RandomMapButton.setEnabled(!running);
 	}
 }
