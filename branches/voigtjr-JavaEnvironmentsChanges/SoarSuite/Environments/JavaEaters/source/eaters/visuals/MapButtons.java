@@ -5,8 +5,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
-import eaters.EatersSimulation;
-import eaters.SimulationListener;
+import eaters.*;
 
 import utilities.*;
 
@@ -49,8 +48,6 @@ public class MapButtons extends Composite {
 	
 	void updateButtons() {
 		boolean running = m_Simulation.isRunning();
-		boolean done = (m_Simulation.getWorld().getFoodCount() == 0);
-		boolean eaters = (m_Simulation.getWorld().getEaters() != null);
 		
 		m_ChangeMapButton.setEnabled(!running);
 		//m_RandomMapButton.setEnabled(!running);

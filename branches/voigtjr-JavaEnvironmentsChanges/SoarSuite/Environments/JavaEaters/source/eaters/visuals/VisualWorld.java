@@ -1,18 +1,10 @@
 package eaters.visuals;
 
-import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.*;
 
-import eaters.Eater;
-import eaters.EatersSimulation;
-import eaters.SimulationListener;
-import eaters.World;
-import eaters.World.Cell;
-import eaters.World.Food;
-
+import eaters.*;
 import utilities.*;
 
 public class VisualWorld extends Canvas implements PaintListener {

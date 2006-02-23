@@ -5,11 +5,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
-import eaters.Eater;
-import eaters.EatersSimulation;
-import eaters.SimulationListener;
-
-import utilities.*;
+import eaters.*;
 
 public class CreateEaterDialog extends Dialog {
 

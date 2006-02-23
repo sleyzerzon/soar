@@ -5,8 +5,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
-import eaters.EatersSimulation;
-import eaters.SimulationListener;
+import eaters.*;
 
 import utilities.*;
 
