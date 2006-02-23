@@ -14,20 +14,21 @@ import utilities.*;
 
 public class AgentDisplay extends Composite {
 	public static final int kAgentMapCellSize = 20;
-	public static final int kListWidth = 75;
-	public static final int kListHeight = 105;
+	static final int kTableHeight = 120;
+	static final int kNameWidth = 75;
+	static final int kScoreWidth = 40;
 	
 	Group m_Group;
 	Logger m_Logger = Logger.logger;
 	EatersSimulation m_Simulation;
-	List m_AgentList;
+	Table m_AgentTable;
 	VisualWorld m_AgentWorld;
 	Eater m_SelectedEater;
+	TableItem[] m_Items;
 	Eater[] m_Eaters;
 	Composite m_AgentButtons;
 	Button m_NewAgentButton;
 	Button m_DestroyAgentButton;
-	Label m_Score;
 
 	public AgentDisplay(final Composite parent, EatersSimulation simulation) {
 		super(parent, SWT.NONE);
@@ -70,25 +71,27 @@ public class AgentDisplay extends Composite {
 			}
 		});
 				
-		m_AgentList = new List(m_Group, SWT.SINGLE);
+		m_AgentTable = new Table(m_Group, SWT.BORDER | SWT.FULL_SELECTION);
 		gd = new GridData();
-		gd.heightHint = kListHeight;
-		gd.widthHint = kListWidth;
-		m_AgentList.setLayoutData(gd);
-		m_AgentList.addSelectionListener(new SelectionAdapter() {
+		gd.heightHint = kTableHeight;
+		m_AgentTable.setLayoutData(gd);
+		TableColumn tc1 = new TableColumn(m_AgentTable, SWT.CENTER);
+		TableColumn tc2 = new TableColumn(m_AgentTable, SWT.CENTER);
+		tc1.setText("Name");
+		tc1.setWidth(kNameWidth);
+		tc2.setText("Score");
+		tc2.setWidth(kScoreWidth);
+		m_AgentTable.setHeaderVisible(true);
+		m_AgentTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (m_Eaters == null) {
 					return;
 				}
 				for (int i = 0; i < m_Eaters.length; ++i) {
-					String selected = m_AgentList.getSelection()[0];
-					if (m_Eaters[i].getName().equals(selected)) {
-						m_SelectedEater = m_Eaters[i];
-						m_Score.setText(Integer.toString(m_SelectedEater.getScore()));
-						m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
-						m_AgentWorld.enable();
-						m_AgentWorld.redraw();
-					}
+					m_SelectedEater = m_Eaters[m_AgentTable.getSelectionIndex()];
+					m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
+					m_AgentWorld.enable();
+					m_AgentWorld.redraw();
 				}
 				updateButtons();
 			}
@@ -102,20 +105,6 @@ public class AgentDisplay extends Composite {
 		gd.widthHint = m_AgentWorld.getMiniWidth() + 4;		
 		m_AgentWorld.setLayoutData(gd);
 		m_AgentWorld.disable();
-		
-		Label m_ScoreLabel = new Label(m_Group, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalAlignment = SWT.END;
-		m_ScoreLabel.setLayoutData(gd);
-		m_ScoreLabel.setText("Score:");
-		
-		m_Score = new Label(m_Group, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalAlignment = SWT.BEGINNING;
-		gd.widthHint = m_AgentWorld.getMiniWidth() + 4;		
-		m_Score.setLayoutData(gd);
-		m_Score.setText("-");
-		
 	}
 	
 	void agentEvent() {
@@ -126,15 +115,17 @@ public class AgentDisplay extends Composite {
 
 	void worldChangeEvent() {
 		if (m_SelectedEater != null) {
-			m_Score.setText(Integer.toString(m_SelectedEater.getScore()));
 			m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
 			m_AgentWorld.redraw();
+		}
+		
+		for (int i = 0; i < m_Items.length; ++i) {
+			m_Items[i].setText(1, Integer.toString(m_Eaters[i].getScore()));
 		}
 	}
 	
 	void deselect() {
-		m_AgentList.deselectAll();
-		m_Score.setText("-");
+		m_AgentTable.deselectAll();
 		m_SelectedEater = null;
 		m_AgentWorld.disable();
 		m_AgentWorld.redraw();
@@ -143,15 +134,20 @@ public class AgentDisplay extends Composite {
 	void updateEaterList() {
 		m_Eaters = m_Simulation.getWorld().getEaters();
 		if (m_Eaters == null) {
-			m_AgentList.removeAll();
+			m_Items = null;
 			return;
 		}
-		String[] names = new String[m_Eaters.length];
+		m_AgentTable.removeAll();
+		m_Items = new TableItem[m_Eaters.length];
 		for (int i = 0; i < m_Eaters.length; ++i) {
-			names[i] = m_Eaters[i].getName();
+			m_Items[i] = new TableItem(m_AgentTable, SWT.NONE);
+			m_Items[i].setText(new String[] {m_Eaters[i].getName(), Integer.toString(m_Eaters[i].getScore())});
 		}
-		m_AgentList.setItems(names);
-		this.layout();
+		//this.layout();
+	}
+	
+	void updateItemList() {
+		
 	}
 	
 	void updateButtons() {

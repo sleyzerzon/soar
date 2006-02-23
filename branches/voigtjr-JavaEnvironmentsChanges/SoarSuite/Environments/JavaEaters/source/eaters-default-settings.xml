@@ -2,7 +2,5 @@
 <eaters>
   <simulation nodebuggers="false" default-map="default.xml" continuous="true"></simulation>
   <agents>
-    <agent name="alpha" productions="tutorial/advanced-move.soar" color="red"></agent>
-    <agent name="bravo" productions="tutorial/jump-and-move.soar" color="blue"></agent>
   </agents>
 </eaters>
