@@ -80,8 +80,9 @@ public class World {
 	}
 	
 	public class Cell {
-		int m_Type;
-		Eater m_Eater;
+		private int m_Type;
+		private Eater m_Eater;
+		private boolean m_Modified = true;
 		
 		public Cell(int foodIndex) {
 			m_Type = foodIndex + kReservedIDs;
@@ -109,6 +110,14 @@ public class World {
 			throw new Exception("Invalid type name: " + name);
 		}
 		
+		public void clearModified() {
+			m_Modified = false;
+		}
+		
+		public boolean isModified() {
+			return m_Modified;
+		}
+		
 		public boolean isWall() {
 			return m_Type == kWallCell;
 		}
@@ -129,12 +138,14 @@ public class World {
 			if (m_Type != kEaterCell) {
 				return false;
 			}
+			m_Modified = true;
 			m_Type = kEmptyCell;
 			m_Eater = null;
 			return true;
 		}
 		
 		public Food setEater(Eater eater) {
+			m_Modified = true;
 			Food f = null;
 			if (isFood()) {
 				f = removeFood();
@@ -171,6 +182,7 @@ public class World {
 		
 		public Food removeFood() {
 			if (isFood()) {
+				m_Modified = true;
 				Food f = getFood();
 				m_Type = kEmptyCell;
 				--m_FoodCount;
@@ -277,10 +289,12 @@ public class World {
 	private void generateRandomMap() throws Exception {
 		// Generate perimiter wall
 		for (int row = 0; row < m_WorldWidth; ++row) {
-			m_World[row][0] = m_World[row][m_WorldHeight - 1] = new Cell(kTypeWall);
+			m_World[row][0] = new Cell(kTypeWall);
+			m_World[row][m_WorldHeight - 1] = new Cell(kTypeWall);
 		}
 		for (int col = 1; col < m_WorldHeight - 1; ++col) {
-			m_World[0][col] = m_World[m_WorldWidth - 1][col] = new Cell(kTypeWall);
+			m_World[0][col] = new Cell(kTypeWall);
+			m_World[m_WorldWidth - 1][col] = new Cell(kTypeWall);
 		}
 		
 		Random random = new Random();

@@ -186,6 +186,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			
 		case SimulationListener.kNewWorldEvent:
 			updateWorldGroupLabel();
+			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();

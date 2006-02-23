@@ -3,6 +3,7 @@ package eaters.visuals;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.*;
 
 import eaters.*;
 import utilities.*;
@@ -14,15 +15,20 @@ public class VisualWorld extends Canvas implements PaintListener {
 	int m_CellSize;
 	Point m_AgentLocation;
 	boolean m_Disabled = false;
+	boolean m_Painted = false;
 	
 	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
-		super(parent, style);
+		super(parent, style | SWT.NO_BACKGROUND);
 		
 		m_Display = parent.getDisplay();
 		m_Simulation = simulation;
 		m_CellSize = cellSize;
 
 		addPaintListener(this);		
+	}
+	
+	public void setRepaint() {
+		m_Painted = false;
 	}
 	
 	public void disable() {
@@ -59,10 +65,13 @@ public class VisualWorld extends Canvas implements PaintListener {
         gc.setForeground(EatersWindowManager.black);
 		gc.setLineWidth(1);
 
-		if (m_Disabled) {
+		if (m_Disabled || !m_Painted) {
+			m_Painted = true;
 			gc.setBackground(EatersWindowManager.widget_background);
 			gc.fillRectangle(0,0, this.getWidth(), this.getHeight());
-			return;
+			if (m_Disabled) {
+				return;
+			}
 		}
 		
 		// Draw world
@@ -88,6 +97,9 @@ public class VisualWorld extends Canvas implements PaintListener {
 				}
 				
 				World.Cell cell = world.getCell(x, y);
+				if (!cell.isModified()) {
+					continue;
+				}
 				
 				if (cell.isWall()) {
 				    gc.setBackground(EatersWindowManager.black);
@@ -123,6 +135,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 					
 					gc.setBackground(food.getColor());
 					
+					// TODO: this is a lot of string compares, should be integer switch
 					if (food.getShape().equalsIgnoreCase(World.Food.kRound)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
@@ -138,6 +151,8 @@ public class VisualWorld extends Canvas implements PaintListener {
 						m_Simulation.shutdown(1);
 					}
 				}
+				
+				cell.clearModified();
 			}
 		}
 	}
