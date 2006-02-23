@@ -194,12 +194,16 @@ public class World {
 	int m_FoodCount;
 	int m_ScoreCount;
 	Eater[] m_Eaters;
+	boolean m_PrintedStats = false;
 	
 	public World(EatersSimulation simulation) {
 		m_Simulation = simulation;
 	}
 	
 	boolean load(String mapFile) {
+		
+		m_PrintedStats = false;
+		
 		try {
 			// Open file
 			JavaElementXML root = JavaElementXML.ReadFromFile(mapFile);
@@ -569,8 +573,14 @@ public class World {
 	
 	void update() {
 		if (getFoodCount() <= 0) {
-			m_Logger.log("All of the food is gone.");
 			m_Simulation.stopSimulation();
+			if (!m_PrintedStats) {
+				m_PrintedStats = true;
+				m_Logger.log("All of the food is gone.");
+				for (int i = 0; i < m_Eaters.length; ++i) {
+					m_Logger.log(m_Eaters[i].getName() + ": " + m_Eaters[i].getScore());
+				}
+			}
 			return;
 		}
 
