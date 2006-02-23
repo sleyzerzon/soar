@@ -119,8 +119,10 @@ public class AgentDisplay extends Composite {
 			m_AgentWorld.redraw();
 		}
 		
-		for (int i = 0; i < m_Items.length; ++i) {
-			m_Items[i].setText(1, Integer.toString(m_Eaters[i].getScore()));
+		if (m_Items != null) {
+			for (int i = 0; i < m_Items.length; ++i) {
+				m_Items[i].setText(1, Integer.toString(m_Eaters[i].getScore()));
+			}
 		}
 	}
 	

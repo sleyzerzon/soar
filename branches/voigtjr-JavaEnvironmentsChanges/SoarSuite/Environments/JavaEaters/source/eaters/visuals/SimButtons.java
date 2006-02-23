@@ -41,6 +41,7 @@ public class SimButtons extends Composite {
 		m_StopButton.setText("Stop");
 		m_StopButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				m_Simulation.setContinuousMode(false);
 				m_Simulation.stopSimulation();
 			}
 		});

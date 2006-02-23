@@ -221,7 +221,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		if (m_Display.isDisposed()) {
 			return;
 		}
-		m_Display.asyncExec(new Runnable() {
+		m_Display.syncExec(new Runnable() {
 			public void run() {
 				dispatchEvent(type);
 			}
