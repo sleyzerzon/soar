@@ -415,6 +415,7 @@ public class World {
 			m_Eaters[i].setScore(0);
 			m_Eaters[i].initSoar();
 		}
+		updateEaterInput();
 	}
 
 	public void createEater(Agent agent, String productions, String color) {
@@ -504,16 +505,17 @@ public class World {
 
 			Point oldLocation = m_Eaters[i].getLocation();
 			Point newLocation;
+			int distance = move.jump ? 2 : 1;
 			if (move.direction.equalsIgnoreCase(Eater.kNorth)) {
-				newLocation = new Point(oldLocation.x, oldLocation.y - 1);
+				newLocation = new Point(oldLocation.x, oldLocation.y - distance);
 			} else if (move.direction.equalsIgnoreCase(Eater.kEast)) {
-				newLocation = new Point(oldLocation.x + 1, oldLocation.y);
+				newLocation = new Point(oldLocation.x + distance, oldLocation.y);
 				
 			} else if (move.direction.equalsIgnoreCase(Eater.kSouth)) {
-				newLocation = new Point(oldLocation.x, oldLocation.y + 1);
+				newLocation = new Point(oldLocation.x, oldLocation.y + distance);
 				
 			} else if (move.direction.equalsIgnoreCase(Eater.kWest)) {
-				newLocation = new Point(oldLocation.x - 1, oldLocation.y);
+				newLocation = new Point(oldLocation.x - distance, oldLocation.y);
 				
 			} else {
 				m_Logger.log("Invalid move direction: " + move.direction);
