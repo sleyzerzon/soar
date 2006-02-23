@@ -133,8 +133,12 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		return m_CurrentMap;
 	}
 	
-	public void interactiveStop() {
-		m_Continuous = false;
+	public void setContinuousMode(boolean mode) {
+		m_Continuous = mode;
+	}
+	
+	public boolean getContinuousMode() {
+		return m_Continuous;
 	}
 	
 	void initSoar() {

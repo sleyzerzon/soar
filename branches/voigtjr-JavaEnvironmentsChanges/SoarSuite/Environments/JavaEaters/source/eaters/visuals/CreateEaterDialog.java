@@ -32,7 +32,7 @@ public class CreateEaterDialog extends Dialog {
 	public void open() {
 		Shell parent = getParent();
 		final Shell dialog = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		dialog.setSize(300,160);
+		dialog.setSize(320,155);
 		dialog.setText("Create Eater");
 		
 		GridLayout gl = new GridLayout();
@@ -148,6 +148,13 @@ public class CreateEaterDialog extends Dialog {
 				dialog.dispose();
 			}
 		});
+		
+		Label tip = new Label(dialog, SWT.NONE);
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.CENTER;
+		gd.horizontalSpan = 3;
+		tip.setLayoutData(gd);
+		tip.setText("Tip: select an eater before pressing new to reuse productions.");
 		
 		updateButtons();
 		
