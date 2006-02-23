@@ -12,6 +12,7 @@ import utilities.*;
 public class EatersWindowManager extends Thread implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
 	public static final String kFoodRemaining = "Food remaining: ";
+	public static final String kScoreRemaining = "Score remaining: ";
 	public static final String kColors[] = { "white", "blue", "red", "yellow", "orange", "black", "green", "purple" };
 	
 	public static Color white;
@@ -69,6 +70,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 	Shell m_Shell;
 	EatersSimulation m_Simulation;
 	final Label m_FoodCount;
+	final Label m_ScoreCount;
 	final SimButtons m_SimButtons;
 	final MapButtons m_MapButtons;
 	final VisualWorld m_VisualWorld;
@@ -110,12 +112,30 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		gd = new GridData();
 		group2.setLayoutData(gd);
 		group2.setText("Map");
-		group2.setLayout(new RowLayout(SWT.VERTICAL));
+		gl = new GridLayout();
+		gl.numColumns = 2;
+		group2.setLayout(gl);
+		Label foodLabel = new Label(group2, SWT.NONE);
+		gd = new GridData();
+		foodLabel.setLayoutData(gd);
+		foodLabel.setText(kFoodRemaining);
 		m_FoodCount = new Label(group2, SWT.NONE);
-		m_FoodCount.setLayoutData(new RowData());
-		m_FoodCount.setText(kFoodRemaining + m_Simulation.getWorld().getFoodCount());
+		gd = new GridData();
+		gd.widthHint = 50;
+		m_FoodCount.setLayoutData(gd);
+		Label scoreLabel = new Label(group2, SWT.NONE);
+		gd = new GridData();
+		scoreLabel.setLayoutData(gd);
+		scoreLabel.setText(kScoreRemaining);
+		m_ScoreCount = new Label(group2, SWT.NONE);
+		gd = new GridData();
+		gd.widthHint = 50;
+		m_ScoreCount.setLayoutData(gd);
+		updateFoodAndScoreCount();
 		m_MapButtons = new MapButtons(group2, m_Simulation);
-		m_MapButtons.setLayoutData(new RowData());
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		m_MapButtons.setLayoutData(gd);
 
 		m_AgentDisplay = new AgentDisplay(m_Shell, m_Simulation);
 		gd = new GridData();
@@ -161,21 +181,21 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			
 		case SimulationListener.kUpdateEvent:
 			m_VisualWorld.redraw();
-			updateFoodCount();
+			updateFoodAndScoreCount();
 			m_AgentDisplay.worldChangeEvent();
 			return;
 			
 		case SimulationListener.kNewWorldEvent:
 			updateWorldGroupLabel();
 			m_VisualWorld.redraw();
-			updateFoodCount();
+			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.worldChangeEvent();
 			return;
 			
 		case SimulationListener.kAgentCreatedEvent:
 			m_VisualWorld.redraw();
-			updateFoodCount();
+			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
 			return;
@@ -192,8 +212,9 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		}		
 	}
 	
-	void updateFoodCount() {
-		m_FoodCount.setText(kFoodRemaining + new Integer(m_Simulation.getWorld().getFoodCount()));
+	void updateFoodAndScoreCount() {
+		m_FoodCount.setText(Integer.toString(m_Simulation.getWorld().getFoodCount()));
+		m_ScoreCount.setText(Integer.toString(m_Simulation.getWorld().getScoreCount()));
 	}
 
 	public void simulationEventHandler(final int type) {

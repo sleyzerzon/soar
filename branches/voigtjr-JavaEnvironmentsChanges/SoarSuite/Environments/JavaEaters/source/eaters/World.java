@@ -86,6 +86,7 @@ public class World {
 		public Cell(int foodIndex) {
 			m_Type = foodIndex + kReservedIDs;
 			++m_FoodCount;
+			m_ScoreCount += m_Food[foodIndex].getValue();
 		}
 
 		public Cell(String name) throws Exception {
@@ -100,6 +101,7 @@ public class World {
 					if (m_Food[i].getName().equalsIgnoreCase(name)) {
 						m_Type = i + kReservedIDs;
 						++m_FoodCount;
+						m_ScoreCount += m_Food[i].getValue();
 						return;
 					}
 				}
@@ -172,6 +174,7 @@ public class World {
 				Food f = getFood();
 				m_Type = kEmptyCell;
 				--m_FoodCount;
+				m_ScoreCount -= f.getValue();
 				return f;
 			}
 			return null;
@@ -189,6 +192,7 @@ public class World {
 	Food[] m_Food;
 	EatersSimulation m_Simulation;
 	int m_FoodCount;
+	int m_ScoreCount;
 	Eater[] m_Eaters;
 	
 	public World(EatersSimulation simulation) {
@@ -231,6 +235,7 @@ public class World {
 			
 			// Reset food
 			m_FoodCount = 0;
+			m_ScoreCount = 0;
 			
 			// generate
 			if (random) {
@@ -385,6 +390,10 @@ public class World {
 	
 	public int getFoodCount() {
 		return m_FoodCount;
+	}
+	
+	public int getScoreCount() {
+		return m_ScoreCount;
 	}
 	
 	public String getContentNameByLocation(int x, int y) {
