@@ -66,10 +66,10 @@ public class VisualWorld extends Canvas implements PaintListener {
 		gc.setLineWidth(1);
 
 		if (m_Disabled || !m_Painted) {
-			m_Painted = true;
 			gc.setBackground(EatersWindowManager.widget_background);
 			gc.fillRectangle(0,0, this.getWidth(), this.getHeight());
 			if (m_Disabled) {
+				m_Painted = true;
 				return;
 			}
 		}
@@ -97,7 +97,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 				}
 				
 				World.Cell cell = world.getCell(x, y);
-				if (!cell.isModified()) {
+				if (!cell.isModified() && m_Painted) {
 					continue;
 				}
 				
@@ -155,6 +155,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 				cell.clearModified();
 			}
 		}
+		m_Painted = true;
 	}
 	
 	void drawEaterMouth(int x, int y, int x_mult, int y_mult, int cx_mult, int cy_mult, GC gc){		

@@ -132,11 +132,11 @@ public class AgentDisplay extends Composite {
 	
 	void updateEaterList() {
 		m_Eaters = m_Simulation.getWorld().getEaters();
+		m_AgentTable.removeAll();
 		if (m_Eaters == null) {
 			m_Items = null;
 			return;
 		}
-		m_AgentTable.removeAll();
 		m_Items = new TableItem[m_Eaters.length];
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			m_Items[i] = new TableItem(m_AgentTable, SWT.NONE);
