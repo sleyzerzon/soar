@@ -12,7 +12,7 @@ import utilities.*;
 public class EatersWindowManager extends Thread implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
 	public static final String kFoodRemaining = "Food remaining: ";
-	public static final String kScoreRemaining = "Score remaining: ";
+	public static final String kScoreRemaining = "Points remaining: ";
 	public static final String kMapPrefix = "Map: ";
 	public static final String kColors[] = { "red", "blue", "purple", "yellow", "orange", "black", "green", "white" };
 	
