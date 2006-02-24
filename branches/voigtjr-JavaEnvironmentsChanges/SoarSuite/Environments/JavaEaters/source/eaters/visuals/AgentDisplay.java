@@ -25,6 +25,7 @@ public class AgentDisplay extends Composite {
 	Eater[] m_Eaters;
 	Composite m_AgentButtons;
 	Button m_NewAgentButton;
+	Button m_CloneAgentButton;
 	Button m_DestroyAgentButton;
 
 	public AgentDisplay(final Composite parent, EatersSimulation simulation) {
@@ -53,7 +54,32 @@ public class AgentDisplay extends Composite {
 		m_NewAgentButton.setText("New");
 		m_NewAgentButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				new CreateEaterDialog(parent.getShell(), m_Simulation, m_SelectedEater).open();
+				new CreateEaterDialog(parent.getShell(), m_Simulation).open();
+			}
+		});
+		
+		m_CloneAgentButton = new Button(m_AgentButtons, SWT.PUSH);
+		m_CloneAgentButton.setText("Clone");
+		m_CloneAgentButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String color = null;
+				// TODO: this probably isn't the most efficient way of doing this, but this is not a bottleneck point
+				for (int i = 0; i < EatersWindowManager.kColors.length; ++i) {
+					boolean notTaken = true;
+					for (int j = 0; j < m_Eaters.length; ++j) {
+						if (m_Eaters[j].getColorString().equalsIgnoreCase(EatersWindowManager.kColors[i])) {
+							notTaken = false;
+							break;
+						}
+					}
+					if (notTaken) {
+						color = EatersWindowManager.kColors[i];
+						break;
+					}
+				}
+				
+				// Risking null exception here, but that should not be possible ;)
+				m_Simulation.createEater(color, m_SelectedEater.getProductions(), color);
 			}
 		});
 		
@@ -161,6 +187,7 @@ public class AgentDisplay extends Composite {
 		boolean selectedEater = (m_SelectedEater != null);
 		
 		m_NewAgentButton.setEnabled(!running && !agentsFull);
+		m_CloneAgentButton.setEnabled(!running && !agentsFull && selectedEater);
 		m_DestroyAgentButton.setEnabled(!running && !noAgents && selectedEater);
  	}
 }

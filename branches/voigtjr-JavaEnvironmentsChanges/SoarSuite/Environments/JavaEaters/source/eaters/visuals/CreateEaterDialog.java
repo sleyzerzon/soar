@@ -17,18 +17,15 @@ public class CreateEaterDialog extends Dialog {
 	Combo m_Color;
 	Button m_CreateEater;
 	
-	public CreateEaterDialog(Shell parent, EatersSimulation simulation, Eater selected) {
+	public CreateEaterDialog(Shell parent, EatersSimulation simulation) {
 		super(parent);
 		m_Simulation = simulation;
-		if (selected != null) {
-			m_Productions = selected.getProductions();
-		}
 	}
 	
 	public void open() {
 		Shell parent = getParent();
 		final Shell dialog = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		dialog.setSize(320,155);
+		dialog.setSize(320,134);
 		dialog.setText("Create Eater");
 		
 		GridLayout gl = new GridLayout();
@@ -48,11 +45,7 @@ public class CreateEaterDialog extends Dialog {
 		gd.grabExcessHorizontalSpace = true;
 		gd.widthHint = 150;
 		m_ProductionsLabel.setLayoutData(gd);
-		if (m_Productions == null) {
-			m_ProductionsLabel.setText("<choose productions>");
-		} else {
-			m_ProductionsLabel.setText(m_Productions.substring(m_Productions.lastIndexOf(System.getProperty("file.separator")) + 1));
-		}
+		m_ProductionsLabel.setText("<choose productions>");
 
 		final Button productionsBrowse = new Button(dialog, SWT.PUSH);
 		gd = new GridData();
@@ -144,13 +137,6 @@ public class CreateEaterDialog extends Dialog {
 				dialog.dispose();
 			}
 		});
-		
-		Label tip = new Label(dialog, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalAlignment = GridData.CENTER;
-		gd.horizontalSpan = 3;
-		tip.setLayoutData(gd);
-		tip.setText("Tip: select an eater before pressing new to reuse productions.");
 		
 		updateButtons();
 		
