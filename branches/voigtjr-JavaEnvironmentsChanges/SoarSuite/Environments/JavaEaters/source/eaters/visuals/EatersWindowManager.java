@@ -184,6 +184,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 				m_Display.sleep();
 			}
 		}
+		m_Simulation.removeSimulationListener(this);
 		m_Simulation.shutdown();
 		m_Display.dispose();		
 	}
@@ -253,7 +254,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 	}
 
 	public void simulationEventHandler(final int type) {
-		if (m_Display.isDisposed()) {
+		if (m_Display.isDisposed() || m_Shell.isDisposed()) {
 			return;
 		}
 		m_Display.syncExec(new Runnable() {
