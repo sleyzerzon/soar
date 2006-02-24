@@ -92,6 +92,14 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 						
 						initialNames[j] = agent.getAttributeThrows(kParamName);
 						initialProductions[j] = agent.getAttributeThrows(kParamProductions);
+						
+						// Next two lines kind of a hack.  Convert / to \\ on windows, and vice versa
+						if (System.getProperty("file.separator").equalsIgnoreCase("\\")) {
+							initialProductions[j] = initialProductions[j].replaceAll("/", "\\\\");
+						} else if (System.getProperty("file.separator").equalsIgnoreCase("/")) {
+							initialProductions[j] = initialProductions[j].replaceAll("\\\\", "/");
+						}
+						
 						initialColors[j] = agent.getAttributeThrows(kParamColor);
 					}
 				} else {
