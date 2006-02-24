@@ -84,7 +84,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 
 		initColors(m_Display);
 		
-		m_Shell = new Shell(m_Display);
+		m_Shell = new Shell(m_Display, SWT.BORDER | SWT.CLOSE | SWT.MIN | SWT.TITLE);
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 2;
 		m_Shell.setLayout(gl);
@@ -154,6 +154,19 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 				m_VisualWorld.redraw();			
 			}
 			public void shellDeiconified(ShellEvent e) {
+				m_AgentDisplay.worldChangeEvent();			
+				m_VisualWorld.setRepaint();
+				m_VisualWorld.redraw();			
+			}
+		});
+		
+		m_Shell.addControlListener(new ControlAdapter() {
+			public void controlMoved(ControlEvent e) {
+				m_AgentDisplay.worldChangeEvent();			
+				m_VisualWorld.setRepaint();
+				m_VisualWorld.redraw();			
+			}
+			public void controlResized(ControlEvent e) {
 				m_AgentDisplay.worldChangeEvent();			
 				m_VisualWorld.setRepaint();
 				m_VisualWorld.redraw();			
