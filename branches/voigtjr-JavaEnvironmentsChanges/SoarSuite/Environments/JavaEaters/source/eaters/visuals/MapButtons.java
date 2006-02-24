@@ -29,7 +29,7 @@ public class MapButtons extends Composite {
 				FileDialog fd = new FileDialog(MapButtons.this.getShell(), SWT.OPEN);
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getMapPath());
-				fd.setFilterExtensions(new String[] {".emap", "*.*"});
+				fd.setFilterExtensions(new String[] {"*.emap", "*.*"});
 				String map = fd.open();
 				if (map != null) {
 					m_Simulation.changeMap(map);
