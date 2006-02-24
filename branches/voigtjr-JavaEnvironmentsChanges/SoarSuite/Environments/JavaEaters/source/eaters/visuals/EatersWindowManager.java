@@ -12,7 +12,8 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
 	public static final String kFoodRemaining = "Food remaining: ";
 	public static final String kScoreRemaining = "Score remaining: ";
-	public static final String kColors[] = { "white", "blue", "red", "yellow", "orange", "black", "green", "purple" };
+	public static final String kMapPrefix = "Map: ";
+	public static final String kColors[] = { "red", "blue", "purple", "yellow", "orange", "black", "green", "white" };
 	
 	public static Color white;
 	public static Color blue;
@@ -157,7 +158,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 	
 	void updateWorldGroupLabel() {
 		String currentMap = m_Simulation.getCurrentMap();
-		m_WorldGroup.setText(currentMap.substring(currentMap.lastIndexOf(System.getProperty("file.separator")) + 1));		
+		m_WorldGroup.setText(kMapPrefix + currentMap.substring(currentMap.lastIndexOf(System.getProperty("file.separator")) + 1));		
 	}
 	
 	void dispatchEvent(int type) {

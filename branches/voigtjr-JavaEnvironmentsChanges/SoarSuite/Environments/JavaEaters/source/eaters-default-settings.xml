@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <eaters>
-  <simulation nodebuggers="false" default-map="default.xml" continuous="true"></simulation>
+  <simulation nodebuggers="false" default-map="default.xml" continuous="false"></simulation>
   <agents>
   </agents>
 </eaters>
