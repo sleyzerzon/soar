@@ -27,6 +27,7 @@ public class AgentDisplay extends Composite {
 	Button m_NewAgentButton;
 	Button m_CloneAgentButton;
 	Button m_DestroyAgentButton;
+	Button m_SpawnDebuggersButton;
 
 	public AgentDisplay(final Composite parent, EatersSimulation simulation) {
 		super(parent, SWT.NONE);
@@ -94,6 +95,18 @@ public class AgentDisplay extends Composite {
 			}
 		});
 				
+		m_SpawnDebuggersButton = new Button(m_Group, SWT.CHECK);
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.BEGINNING;
+		gd.horizontalSpan = 2;
+		m_SpawnDebuggersButton.setLayoutData(gd);
+		m_SpawnDebuggersButton.setText("Spawn Debuggers");
+		m_SpawnDebuggersButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				m_Simulation.setSpawnDebuggers(m_SpawnDebuggersButton.getSelection());
+			}
+		});		
+
 		m_AgentTable = new Table(m_Group, SWT.BORDER | SWT.FULL_SELECTION);
 		gd = new GridData();
 		gd.heightHint = kTableHeight;
@@ -185,9 +198,11 @@ public class AgentDisplay extends Composite {
 			noAgents = true;
 		}
 		boolean selectedEater = (m_SelectedEater != null);
+		boolean spawnDebuggers = m_Simulation.getSpawnDebuggers();
 		
 		m_NewAgentButton.setEnabled(!running && !agentsFull);
 		m_CloneAgentButton.setEnabled(!running && !agentsFull && selectedEater);
 		m_DestroyAgentButton.setEnabled(!running && !noAgents && selectedEater);
+		m_SpawnDebuggersButton.setSelection(spawnDebuggers);
  	}
 }

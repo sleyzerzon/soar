@@ -141,6 +141,14 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		return m_Continuous;
 	}
 	
+	public void setSpawnDebuggers(boolean mode) {
+		m_Debuggers = mode;
+	}
+	
+	public boolean getSpawnDebuggers() {
+		return m_Debuggers;
+	}
+	
 	void initSoar() {
 		// Create kernel
 		try {
