@@ -4,6 +4,7 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.*;
+import org.eclipse.swt.events.*;
 
 import eaters.*;
 import utilities.*;
@@ -145,6 +146,17 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 
 		m_Shell.setText("Java Eaters");
 		m_Shell.setSize(m_Shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		
+		m_Shell.addShellListener(new ShellAdapter() {
+			public void shellActivated(ShellEvent e) {
+				m_VisualWorld.setRepaint();
+				m_VisualWorld.redraw();			
+			}
+			public void shellDeiconified(ShellEvent e) {
+				m_VisualWorld.setRepaint();
+				m_VisualWorld.redraw();			
+			}
+		});
 		
 		m_Shell.open();
 
