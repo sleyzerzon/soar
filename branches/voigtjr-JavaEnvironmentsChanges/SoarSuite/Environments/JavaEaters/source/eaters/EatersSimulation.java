@@ -279,7 +279,8 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		Runtime r = java.lang.Runtime.getRuntime();
 		try {
 			// TODO: manage the returned process a bit better.
-			r.exec("java -jar " + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
+			// BUGBUG: javaw not portable!
+			r.exec("javaw -jar " + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
 					+ "bin" + System.getProperty("file.separator") 
 					+ "SoarJavaDebugger.jar -remote -agent " + agentName);
 			
