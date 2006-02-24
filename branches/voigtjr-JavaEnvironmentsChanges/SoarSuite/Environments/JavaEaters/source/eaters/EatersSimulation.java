@@ -10,7 +10,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public static final int kMaxEaters = 8;	
 	public static final String kTagEaters = "eaters";
 	public static final String kTagSimulation = "simulation";
-	public static final String kParamNoDebuggers = "nodebuggers";
+	public static final String kParamDebuggers = "debuggers";
 	public static final String kParamDefaultMap = "default-map";
 	public static final String kParamContinuous = "continuous";
 	public static final String kTagAgents = "agents";
@@ -25,7 +25,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public static final String kMapFolder = "maps";
 	
     private Thread m_RunThread;
-	boolean m_NoDebuggers = false;
+	boolean m_Debuggers;
 	boolean m_DebuggerSpawned = false;
 	boolean m_Continuous = false;
 	String m_DefaultMap;
@@ -77,7 +77,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 				String tagName = child.getTagName() ;
 				
 				if (tagName.equalsIgnoreCase(kTagSimulation)) {
-					m_NoDebuggers = child.getAttributeBooleanThrows(kParamNoDebuggers);
+					m_Debuggers = child.getAttributeBooleanThrows(kParamDebuggers);
 					m_DefaultMap = child.getAttributeThrows(kParamDefaultMap);
 					m_Continuous = child.getAttributeBooleanThrows(kParamContinuous);
 					
@@ -256,7 +256,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 	
 	public void spawnDebugger(String agentName) {
-		if (m_NoDebuggers) return;
+		if (!m_Debuggers) return;
 		if (m_DebuggerSpawned) return;
 		
 		Runtime r = java.lang.Runtime.getRuntime();
