@@ -42,6 +42,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	ArrayList m_RemoveSimulationListeners = new ArrayList();
 	
 	public EatersSimulation(String settingsFile, boolean quiet) {		
+		
 		// Log the settings file
 		m_Logger.log("Settings file: " + settingsFile);
 

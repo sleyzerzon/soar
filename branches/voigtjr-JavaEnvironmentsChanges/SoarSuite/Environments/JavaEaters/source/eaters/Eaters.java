@@ -9,14 +9,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import utilities.*;
+
 import eaters.visuals.EatersWindowManager;
 
 public class Eaters {
 	
 	public static final String kDefaultXMLSettingsFile = "eaters-default-settings.xml";
 
-	protected boolean m_Quiet = false;
-	protected String m_SettingsFile;
+	private boolean m_Quiet;
+	private String m_SettingsFile;
+	private boolean m_Console;
+	private String m_LogFile;
 
 	public Eaters(String[] args) {
 		
@@ -31,6 +35,12 @@ public class Eaters {
 		// Deal with the command line
 		if (!parseCommandLine(args)) {
 			return;
+		}
+		
+		// Initialize logger
+		if (!m_Console) {
+			// Logger handles null file appropriately
+			Logger.logger.toFile(m_LogFile);
 		}
 		
 		// Initialize the simulation
@@ -102,6 +112,12 @@ public class Eaters {
 
 		m_Quiet = hasOption(args, "-quiet");
 		m_SettingsFile = getOptionValue(args, "-settings");
+		m_Console = hasOption(args, "-console");
+		m_LogFile = getOptionValue(args, "-log");
+	
+		if (m_LogFile != null) {
+			m_Console = false;
+		}
 		
 		if (m_SettingsFile == null) {
 			m_SettingsFile = kDefaultXMLSettingsFile;
@@ -112,6 +128,8 @@ public class Eaters {
 	
 	protected void printCommandLineHelp() {
 		System.out.println("Java Eaters help");
+		System.out.println("\t-console: Send all log messages to console, overridden by -log.");
+		System.out.println("\t-log: File name to log messages to (default: EaterLog.txt).");
 		System.out.println("\t-quiet: Disables all windows, runs simulation quietly.");
 		System.out.println("\t-settings: XML file with with run settings.");
 	}
