@@ -92,10 +92,9 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		GridData gd;
 		
 		m_WorldGroup = new Group(m_Shell, SWT.NONE);
-		updateWorldGroupLabel();
 		m_WorldGroup.setLayout(new FillLayout());
 		m_VisualWorld = new VisualWorld(m_WorldGroup, SWT.NONE, m_Simulation, kMainMapCellSize);
-		m_VisualWorld.setSize(m_VisualWorld.getWidth(), m_VisualWorld.getHeight());
+		updateWorldGroup();
 		gd = new GridData();
 		gd.widthHint = m_VisualWorld.getWidth();
 		gd.heightHint = m_VisualWorld.getHeight();
@@ -189,9 +188,16 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		m_Display.dispose();		
 	}
 	
-	void updateWorldGroupLabel() {
+	void updateWorldGroup() {
 		String currentMap = m_Simulation.getCurrentMap();
-		m_WorldGroup.setText(kMapPrefix + currentMap.substring(currentMap.lastIndexOf(System.getProperty("file.separator")) + 1));		
+		m_WorldGroup.setText(kMapPrefix + currentMap.substring(currentMap.lastIndexOf(System.getProperty("file.separator")) + 1));
+		m_VisualWorld.setSize(m_VisualWorld.getWidth(), m_VisualWorld.getHeight());
+		GridData gd = new GridData();
+		gd.widthHint = m_VisualWorld.getWidth();
+		gd.heightHint = m_VisualWorld.getHeight();
+		gd.verticalSpan = 3;
+		m_WorldGroup.setLayoutData(gd);
+		m_Shell.setSize(m_Shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 	
 	void dispatchEvent(int type) {
@@ -219,7 +225,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			return;
 			
 		case SimulationListener.kNewWorldEvent:
-			updateWorldGroupLabel();
+			updateWorldGroup();
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
 			updateFoodAndScoreCount();
