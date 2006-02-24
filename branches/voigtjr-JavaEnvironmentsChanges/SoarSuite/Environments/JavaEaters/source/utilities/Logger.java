@@ -6,20 +6,16 @@ import java.sql.*;
 public class Logger {
 	public static Logger logger = new Logger();
 	
-	protected final String kDefaultFile = "EaterLog.txt";
-	protected Writer m_Output;
+	private Writer m_Output;
 
-	public void toFile() {
-		toFile(null);
-	}
-	
-	public void toFile(String filename) {
+	public void toFile(String filename, boolean append) {
 		if (filename == null) {
-			filename = kDefaultFile;
+			System.out.println("Log filename null.");
+			return;
 		}
 		
 		try {
-			m_Output = new BufferedWriter(new FileWriter(new File(filename), false));
+			m_Output = new BufferedWriter(new FileWriter(new File(filename), append));
 		} catch (IOException e) {
 			System.out.println("Exception creating logger: " + e.getMessage());
 			System.exit(1);
@@ -32,6 +28,7 @@ public class Logger {
 	public void log(String message) {
 		if (m_Output == null) {
 			System.out.println(message);
+			return;
 		}
 		
 		try {

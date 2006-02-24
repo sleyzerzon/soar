@@ -16,11 +16,13 @@ import eaters.visuals.EatersWindowManager;
 public class Eaters {
 	
 	public static final String kDefaultXMLSettingsFile = "eaters-default-settings.xml";
+	private final String kDefaultFile = "EaterLog.txt";
 
 	private boolean m_Quiet;
 	private String m_SettingsFile;
 	private boolean m_Console;
 	private String m_LogFile;
+	private boolean m_Append;
 
 	public Eaters(String[] args) {
 		
@@ -39,8 +41,10 @@ public class Eaters {
 		
 		// Initialize logger
 		if (!m_Console) {
-			// Logger handles null file appropriately
-			Logger.logger.toFile(m_LogFile);
+			if (m_LogFile == null) {
+				m_LogFile = kDefaultFile;
+			}
+			Logger.logger.toFile(m_LogFile, m_Append);
 		}
 		
 		// Initialize the simulation
@@ -114,6 +118,7 @@ public class Eaters {
 		m_SettingsFile = getOptionValue(args, "-settings");
 		m_Console = hasOption(args, "-console");
 		m_LogFile = getOptionValue(args, "-log");
+		m_Append = hasOption(args, "-append");
 	
 		if (m_LogFile != null) {
 			m_Console = false;
@@ -130,6 +135,7 @@ public class Eaters {
 		System.out.println("Java Eaters help");
 		System.out.println("\t-console: Send all log messages to console, overridden by -log.");
 		System.out.println("\t-log: File name to log messages to (default: EaterLog.txt).");
+		System.out.println("\t-append: If logging to file, append.  Ignored if -console present.");
 		System.out.println("\t-quiet: Disables all windows, runs simulation quietly.");
 		System.out.println("\t-settings: XML file with with run settings.");
 	}

@@ -100,7 +100,7 @@ public class AgentDisplay extends Composite {
 		gd.horizontalAlignment = GridData.BEGINNING;
 		gd.horizontalSpan = 2;
 		m_SpawnDebuggersButton.setLayoutData(gd);
-		m_SpawnDebuggersButton.setText("Spawn Debuggers");
+		m_SpawnDebuggersButton.setText("Spawn debugger");
 		m_SpawnDebuggersButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				m_Simulation.setSpawnDebuggers(m_SpawnDebuggersButton.getSelection());
