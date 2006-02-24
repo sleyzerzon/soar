@@ -20,7 +20,8 @@ public class World {
 	static final String kTagCells = "cells";
 	static final String kParamWorldWidth = "world-width";
 	static final String kParamWorldHeight = "world-height";
-	static final String kParamRandom = "random";
+	static final String kParamRandomWalls = "random-walls";
+	static final String kParamRandomFood = "random-food";
 	static final String kTagRow = "row";
 	static final String kTagCell = "cell";
 	static final String kParamType = "type";
@@ -244,7 +245,8 @@ public class World {
 			m_WorldWidth = cells.getAttributeIntThrows(kParamWorldWidth);
 			m_WorldHeight = cells.getAttributeIntThrows(kParamWorldHeight);
 			
-			boolean random = cells.getAttributeBooleanDefault(kParamRandom, false);
+			boolean randomWalls = cells.getAttributeBooleanDefault(kParamRandomWalls, false);
+			boolean randomFood = cells.getAttributeBooleanDefault(kParamRandomFood, false);
 						
 			// Create map array
 			m_World = new Cell[m_WorldHeight][m_WorldWidth];
@@ -253,13 +255,22 @@ public class World {
 			m_FoodCount = 0;
 			m_ScoreCount = 0;
 			
-			// generate
-			if (random) {
-				generateRandomMap();
+			// generate walls
+			// empty is not a wall, it is a food!
+			// only generate empty cells in food stage!
+			if (randomWalls) {
+				generateRandomWalls();
 			} else {
-				generateMapFromXML(cells);
+				generateWallsFromXML(cells);
 			}
-			
+
+			// generate food
+			if (randomFood) {
+				generateRandomFood();
+			} else {
+				generateFoodFromXML(cells);
+			}
+
 		} catch (Exception e) {
 			m_Logger.log("Error loading map: " + e.getMessage());
 			return false;
@@ -271,22 +282,26 @@ public class World {
 		return true;
 	}
 	
-	private void generateMapFromXML(JavaElementXML cells) throws Exception {
+	private void generateWallsFromXML(JavaElementXML cells) throws Exception {
 		for(int row = 0; row < m_WorldHeight; ++row) {
-			String rowString = new String();
+			//String rowString = new String();
 			for (int col = 0; col < m_WorldWidth; ++col) {
 				try {
 					m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
-					rowString += m_World[row][col];
+					if (!m_World[row][col].isWall()) {
+						m_World[row][col].removeFood();
+						m_World[row][col] = null;
+					}
+					//rowString += m_World[row][col];
 				} catch (Exception e) {
 					throw new Exception("Error on row: " + row + ", column: " + col);
 				}
 			}
-			m_Logger.log(rowString);
+			//m_Logger.log(rowString);
 		}
 	}
 	
-	private void generateRandomMap() throws Exception {
+	private void generateRandomWalls() throws Exception {
 		// Generate perimiter wall
 		for (int row = 0; row < m_WorldWidth; ++row) {
 			m_World[row][0] = new Cell(kTypeWall);
@@ -308,43 +323,32 @@ public class World {
 					}
 					if (random.nextDouble() < probability) {
 						m_World[row][col] = new Cell(kTypeWall);
-					} else {
-						m_World[row][col] = new Cell(kTypeEmpty);
 					}
 					probability = kLowProbability;
 				}
 			}
 		}
-		fillFood();
 	}
 	
 	private boolean noWallsOnCorners(int row, int col) {
 		Cell cell = m_World[row + 1][col + 1];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return false;
-			}
+			return false;
 		}
 		
 		cell = m_World[row - 1][col - 1];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return false;
-			}
+			return false;
 		}
 		
 		cell = m_World[row + 1][col - 1];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return false;
-			}
+			return false;
 		}
 		
 		cell = m_World[row - 1][col + 1];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return false;
-			}
+			return false;
 		}
 		return true;
 	}
@@ -352,44 +356,50 @@ public class World {
 	private boolean wallOnAnySide(int row, int col) {
 		Cell cell = m_World[row + 1][col];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return true;
-			}
+			return true;
 		}
 		
 		cell = m_World[row][col + 1];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return true;
-			}
+			return true;
 		}
 		
 		cell = m_World[row - 1][col];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return true;
-			}
+			return true;
 		}
 		
 		cell = m_World[row][col - 1];
 		if (cell != null) {
-			if (cell.isWall()) {
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
 	
-	private void fillFood() {
+	private void generateFoodFromXML(JavaElementXML cells) throws Exception {
+		for(int row = 0; row < m_WorldHeight; ++row) {
+			//String rowString = new String();
+			for (int col = 0; col < m_WorldWidth; ++col) {
+				if (m_World[row][col] == null) {						
+					try {
+						m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
+						//rowString += m_World[row][col];
+					} catch (Exception e) {
+						throw new Exception("Error on row: " + row + ", column: " + col);
+					}
+				}
+			}
+			//m_Logger.log(rowString);
+		}
+	}
+	
+	private void generateRandomFood() {
 		Random random = new Random();
 		for (int row = 1; row < m_WorldWidth - 1; ++row) {
 			for (int col = 1; col < m_WorldHeight - 1; ++col) {
-				if (m_World[row][col] != null) {
-					if (!m_World[row][col].isEmpty()) {
-						continue;
-					}
+				if (m_World[row][col] == null) {
+					m_World[row][col] = new Cell(random.nextInt(m_Food.length));
 				}
-				m_World[row][col] = new Cell(random.nextInt(m_Food.length));
 			}
 		}		
 	}

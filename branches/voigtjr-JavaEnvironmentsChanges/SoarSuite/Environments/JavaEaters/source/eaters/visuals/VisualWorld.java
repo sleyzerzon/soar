@@ -16,6 +16,8 @@ public class VisualWorld extends Canvas implements PaintListener {
 	Point m_AgentLocation;
 	boolean m_Disabled = false;
 	boolean m_Painted = false;
+	int m_LastX = 0;
+	int m_LastY = 0;
 	
 	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
 		super(parent, style | SWT.NO_BACKGROUND);
@@ -60,7 +62,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 	}
 
 	public void paintControl(PaintEvent e){
-		if (m_AgentLocation != null) {
+		if (m_AgentLocation != null || m_LastX != e.x || m_LastY != e.y) {
 			setRepaint();
 		}
 		

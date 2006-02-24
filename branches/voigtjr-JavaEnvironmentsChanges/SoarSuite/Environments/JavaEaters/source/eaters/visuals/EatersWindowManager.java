@@ -148,6 +148,10 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		m_Shell.setSize(m_Shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
 		m_Shell.addShellListener(new ShellAdapter() {
+			public void shellDeactivated(ShellEvent e) {
+				m_AgentDisplay.worldChangeEvent();			
+				m_VisualWorld.redraw();			
+			}
 			public void shellActivated(ShellEvent e) {
 				m_AgentDisplay.worldChangeEvent();			
 				m_VisualWorld.setRepaint();
