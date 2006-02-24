@@ -54,7 +54,7 @@ public class Eaters {
 		if(!m_Quiet) {
 			new EatersWindowManager(simulation);
 		}
-		simulation.shutdown(0);
+		System.exit(0);
 	}
 
 	private void Install(String file) throws IOException {	

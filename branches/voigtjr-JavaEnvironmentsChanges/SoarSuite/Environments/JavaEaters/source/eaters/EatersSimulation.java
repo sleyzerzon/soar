@@ -111,7 +111,8 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 			}				
 		} catch (Exception e) {
 			System.out.println("Error loading XML settings: " + e.getMessage());
-			shutdown(1);
+			shutdown();
+			System.exit(1);
 		}
 
 		m_CurrentMap = getMapPath() + m_DefaultMap;
@@ -120,8 +121,8 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		m_World = new World(this);	
 		m_Logger.log("Attempting to load " + m_CurrentMap);
 		if (!m_World.load(m_CurrentMap)) {
-			shutdown(1);
-			return;
+			shutdown();
+			System.exit(1);
 		}
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);
 		
@@ -291,15 +292,16 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 			
 		} catch (java.io.IOException e) {
 			m_Logger.log("IOException spawning debugger: " + e.getMessage());
-			shutdown(1);
+			shutdown();
+			System.exit(1);
 		}
 		
 		m_Logger.log("Spawned debugger for " + agentName);
 		m_DebuggerSpawned = true;
 	}
 	
-	public void shutdown(int exitCode) {
-		m_Logger.log("Shutdown called with code: " + exitCode);
+	public void shutdown() {
+		m_Logger.log("Shutdown called.");
 		fireSimulationEvent(SimulationListener.kShutdownEvent);
 		if (m_World != null) {
 			m_World.destroyAllEaters();
@@ -308,7 +310,6 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 			m_Kernel.Shutdown();
 			m_Kernel.delete();
 		}
-		System.exit(exitCode);
 	}
 	
 	public void startSimulation() {
@@ -335,7 +336,8 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public void resetSimulation() {
 		if (!m_World.load(m_CurrentMap)) {
 			// TODO: this is not graceful error handling
-			shutdown(1);
+			shutdown();
+			System.exit(1);
 		}
 		m_WorldCount = 0;
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);

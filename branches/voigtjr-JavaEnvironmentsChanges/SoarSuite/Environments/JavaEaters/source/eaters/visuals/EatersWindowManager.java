@@ -184,6 +184,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 				m_Display.sleep();
 			}
 		}
+		m_Simulation.shutdown();
 		m_Display.dispose();		
 	}
 	
