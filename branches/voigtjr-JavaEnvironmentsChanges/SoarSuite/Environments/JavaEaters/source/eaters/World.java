@@ -110,7 +110,7 @@ public class World {
 			throw new Exception("Invalid type name: " + name);
 		}
 		
-		public void clearModified() {
+		void clearModified() {
 			m_Modified = false;
 		}
 		
@@ -586,6 +586,13 @@ public class World {
 	}
 	
 	void update() {
+		// reset modified flags, skipping edges
+		for (int y = 1; y < m_World.length - 1; ++y) {
+			for (int x = 1; x < m_World[y].length - 1; ++x) {
+				m_World[y][x].clearModified();
+			}
+		}			
+		
 		if (getFoodCount() <= 0) {
 			m_Simulation.stopSimulation();
 			if (!m_PrintedStats) {

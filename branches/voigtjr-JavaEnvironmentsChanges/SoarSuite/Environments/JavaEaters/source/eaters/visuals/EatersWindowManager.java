@@ -149,10 +149,12 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		
 		m_Shell.addShellListener(new ShellAdapter() {
 			public void shellActivated(ShellEvent e) {
+				m_AgentDisplay.worldChangeEvent();			
 				m_VisualWorld.setRepaint();
 				m_VisualWorld.redraw();			
 			}
 			public void shellDeiconified(ShellEvent e) {
+				m_AgentDisplay.worldChangeEvent();			
 				m_VisualWorld.setRepaint();
 				m_VisualWorld.redraw();			
 			}

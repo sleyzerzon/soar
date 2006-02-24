@@ -60,6 +60,10 @@ public class VisualWorld extends Canvas implements PaintListener {
 	}
 
 	public void paintControl(PaintEvent e){
+		if (m_AgentLocation != null) {
+			setRepaint();
+		}
+		
 		World world = m_Simulation.getWorld();
 		GC gc = e.gc;		
         gc.setForeground(EatersWindowManager.black);
@@ -151,8 +155,6 @@ public class VisualWorld extends Canvas implements PaintListener {
 						m_Simulation.shutdown(1);
 					}
 				}
-				
-				cell.clearModified();
 			}
 		}
 		m_Painted = true;
