@@ -9,6 +9,7 @@ import eaters.*;
 import utilities.*;
 
 public class VisualWorld extends Canvas implements PaintListener {
+	static boolean internalRepaint = false;
 	Logger m_Logger = Logger.logger;
 	Display m_Display;
 	EatersSimulation m_Simulation;
@@ -62,7 +63,9 @@ public class VisualWorld extends Canvas implements PaintListener {
 	}
 
 	public void paintControl(PaintEvent e){
-		if (m_AgentLocation != null || m_LastX != e.x || m_LastY != e.y) {
+		if (m_AgentLocation != null || m_LastX != e.x || m_LastY != e.y || internalRepaint) {
+			m_LastX = e.x;
+			m_LastY = e.y;
 			setRepaint();
 		}
 		

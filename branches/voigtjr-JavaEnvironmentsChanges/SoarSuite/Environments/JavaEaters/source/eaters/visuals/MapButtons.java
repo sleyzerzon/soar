@@ -30,7 +30,9 @@ public class MapButtons extends Composite {
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getMapPath());
 				fd.setFilterExtensions(new String[] {"*.emap", "*.*"});
+				VisualWorld.internalRepaint = true;
 				String map = fd.open();
+				VisualWorld.internalRepaint = false;
 				if (map != null) {
 					m_Simulation.changeMap(map);
 				}

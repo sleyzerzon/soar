@@ -57,7 +57,9 @@ public class CreateEaterDialog extends Dialog {
 				FileDialog fd = new FileDialog(dialog, SWT.OPEN);
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getAgentPath());
+				VisualWorld.internalRepaint = true;
 				String productions = fd.open();
+				VisualWorld.internalRepaint = false;
 				if (productions != null) {
 					m_Productions = productions;
 					m_ProductionsLabel.setText(m_Productions.substring(m_Productions.lastIndexOf(System.getProperty("file.separator")) + 1));
