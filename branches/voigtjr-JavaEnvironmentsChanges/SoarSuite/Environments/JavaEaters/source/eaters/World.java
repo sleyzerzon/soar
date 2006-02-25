@@ -238,14 +238,20 @@ public class World {
 			
 			// Read food types from file
 			JavaElementXML food = root.findChildByNameThrows(kTagFood);
+				
 			m_Food = new Food[food.getNumberChildren()];
 			for (int i = 0; i < m_Food.length; ++i) {
 				JavaElementXML foodType = food.getChild(i);
-				m_Food[i] = new Food(
-						foodType.getAttributeThrows(kParamName), 
-						foodType.getAttributeIntThrows(kParamValue),
-						foodType.getAttributeThrows(kParamShape),
-						foodType.getAttributeThrows(kParamColor));
+				
+				try {
+					m_Food[i] = new Food(
+							foodType.getAttributeThrows(kParamName), 
+							foodType.getAttributeIntThrows(kParamValue), 
+							foodType.getAttributeThrows(kParamShape), 
+							foodType.getAttributeThrows(kParamColor));
+				} catch (Exception e) {
+					throw new Exception("Badly formatted food (index " + i + "): " + e.getMessage()); 
+				}
 			}
 
 			// Create map
@@ -304,7 +310,7 @@ public class World {
 					}
 					//rowString += m_World[row][col];
 				} catch (Exception e) {
-					throw new Exception("Error on row: " + row + ", column: " + col);
+					throw new Exception("Error (generateWallsFromXML) on row: " + row + ", column: " + col);
 				}
 			}
 			//m_Logger.log(rowString);
@@ -395,7 +401,7 @@ public class World {
 						m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
 						//rowString += m_World[row][col];
 					} catch (Exception e) {
-						throw new Exception("Error on row: " + row + ", column: " + col);
+						throw new Exception("Error (generateFoodFromXML) on row: " + row + ", column: " + col);
 					}
 				}
 			}

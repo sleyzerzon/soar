@@ -6,7 +6,7 @@ public interface SimulationListener {
 		kNoEvent = 0,
 		kStartEvent = 1,
 		kStopEvent = 2,
-		kShutdownEvent = 3,
+		kErrorMessageEvent = 3,
 		kUpdateEvent = 4,
 		kNewWorldEvent = 5,
 		kAgentCreatedEvent = 6,

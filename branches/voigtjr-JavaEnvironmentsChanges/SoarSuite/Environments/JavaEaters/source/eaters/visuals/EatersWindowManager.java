@@ -215,7 +215,11 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			m_AgentDisplay.updateButtons();
 			return;
 			
-		case SimulationListener.kShutdownEvent:
+		case SimulationListener.kErrorMessageEvent:
+			MessageBox mb = new MessageBox(m_Shell, SWT.ICON_ERROR | SWT.OK | SWT.WRAP);
+			mb.setMessage(m_Simulation.getLastErrorMessage());
+			mb.setText("Eaters Error");
+			mb.open();
 			return;
 			
 		case SimulationListener.kUpdateEvent:

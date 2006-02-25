@@ -36,6 +36,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	boolean m_StopSoar = false;
 	String m_CurrentMap;
 	int m_WorldCount = 0;
+	String m_LastErrorMessage = "No error.";
 
 	ArrayList m_SimulationListeners = new ArrayList();
 	ArrayList m_AddSimulationListeners = new ArrayList();
@@ -78,9 +79,12 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 				String tagName = child.getTagName() ;
 				
 				if (tagName.equalsIgnoreCase(kTagSimulation)) {
-					m_Debuggers = child.getAttributeBooleanThrows(kParamDebuggers);
-					m_DefaultMap = child.getAttributeThrows(kParamDefaultMap);
-					m_Runs = child.getAttributeIntThrows(kParamRuns);
+					m_Debuggers = child.getAttributeBooleanDefault(kParamDebuggers, true);
+					m_DefaultMap = child.getAttribute(kParamDefaultMap);
+					if (m_DefaultMap == null) {
+						m_DefaultMap = "default.emap";
+					}
+					m_Runs = child.getAttributeIntDefault(kParamRuns, 0);
 					
 					m_Logger.log("Default map: " + m_DefaultMap);
 					
@@ -91,8 +95,8 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 					for (int j = 0; j < initialNames.length; ++j) {
 						JavaElementXML agent = child.getChild(j);
 						
-						initialNames[j] = agent.getAttributeThrows(kParamName);
-						initialProductions[j] = agent.getAttributeThrows(kParamProductions);
+						initialNames[j] = agent.getAttribute(kParamName);
+						initialProductions[j] = agent.getAttribute(kParamProductions);
 						
 						// Next two lines kind of a hack.  Convert / to \\ on windows, and vice versa
 						if (System.getProperty("file.separator").equalsIgnoreCase("\\")) {
@@ -101,7 +105,7 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 							initialProductions[j] = initialProductions[j].replaceAll("\\\\", "/");
 						}
 						
-						initialColors[j] = agent.getAttributeThrows(kParamColor);
+						initialColors[j] = agent.getAttribute(kParamColor);
 					}
 				} else {
 					// Throw during development, but really we should just ignore this
@@ -110,17 +114,18 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 				}
 			}				
 		} catch (Exception e) {
-			System.out.println("Error loading XML settings: " + e.getMessage());
+			fireErrorMessage("Error loading XML settings: " + e.getMessage());
 			shutdown();
 			System.exit(1);
+
 		}
 
 		m_CurrentMap = getMapPath() + m_DefaultMap;
 
 		// Load default world
 		m_World = new World(this);	
-		m_Logger.log("Attempting to load " + m_CurrentMap);
 		if (!m_World.load(m_CurrentMap)) {
+			fireErrorMessage("Error loading map: " + m_CurrentMap);
 			shutdown();
 			System.exit(1);
 		}
@@ -139,8 +144,18 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		}
 	}
 	
+	void fireErrorMessage(String errorMessage) {
+		m_LastErrorMessage = errorMessage;
+		fireSimulationEvent(SimulationListener.kErrorMessageEvent);
+		m_Logger.log(errorMessage);
+	}
+	
 	public String getCurrentMap() {
 		return m_CurrentMap;
+	}
+	
+	public String getLastErrorMessage() {
+		return m_LastErrorMessage;
 	}
 	
 	public void setRuns(int runs) {
@@ -167,12 +182,12 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		try {
 			m_Kernel = Kernel.CreateKernelInNewThread("SoarKernelSML", 12121);
 		} catch (Exception e) {
-			m_Logger.log("Exception while creating kernel: " + e.getMessage());
+			fireErrorMessage("Exception while creating kernel: " + e.getMessage());
 			System.exit(1);
 		}
 
 		if (m_Kernel.HadError()) {
-			m_Logger.log("Error creating kernel: " + m_Kernel.GetLastErrorDescription());
+			fireErrorMessage("Error creating kernel: " + m_Kernel.GetLastErrorDescription());
 			System.exit(1);
 		}
 
@@ -208,7 +223,6 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
   			m_StopSoar = false;
   			m_Kernel.StopAllAgents();
   		}
-		//m_Logger.log("Update event received from kernel.");
 		m_World.update();
 		++m_WorldCount;
 		fireSimulationEvent(SimulationListener.kUpdateEvent);
@@ -233,6 +247,11 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
     }
     
     public void createEater(String name, String productions, String color) {
+    	if (name == null || productions == null) {
+    		fireErrorMessage("Failed to create agent, name, productions or color null.");
+    		return;
+    	}
+    	
 		Agent agent = createAgent(name, productions);
 		if (agent == null) {
 			return;
@@ -246,9 +265,9 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
     	Agent agent = m_Kernel.CreateAgent(name);
     	boolean load = agent.LoadProductions(productions);
     	if (!load || agent.HadError()) {
-    		m_Logger.log("Error creating agent " + name + 
-    				" (" + productions + 
-    				"): " + agent.GetLastErrorDescription());
+			fireErrorMessage("Failed to create agent " + name + " (" + productions + "): " + agent.GetLastErrorDescription());
+			m_Kernel.DestroyAgent(agent);
+			agent.delete();
     		return null;
     	}
     	return agent;
@@ -294,12 +313,12 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 					+ "SoarJavaDebugger.jar -remote -agent " + agentName);
 			
 			if (!waitForDebugger()) {
-				m_Logger.log("Debugger spawn failed for agent: " + agentName);
+				fireErrorMessage("Debugger spawn failed for agent: " + agentName);
 				return;
 			}
 			
 		} catch (java.io.IOException e) {
-			m_Logger.log("IOException spawning debugger: " + e.getMessage());
+			fireErrorMessage("IOException spawning debugger: " + e.getMessage());
 			shutdown();
 			System.exit(1);
 		}
@@ -310,7 +329,6 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	
 	public void shutdown() {
 		m_Logger.log("Shutdown called.");
-		fireSimulationEvent(SimulationListener.kShutdownEvent);
 		if (m_World != null) {
 			m_World.destroyAllEaters();
 		}
@@ -343,9 +361,14 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 
 	public void resetSimulation() {
 		if (!m_World.load(m_CurrentMap)) {
-			// TODO: this is not graceful error handling
-			shutdown();
-			System.exit(1);
+			m_LastErrorMessage = "Error loading map, check log for more information. Loading default map.";
+			fireSimulationEvent(SimulationListener.kErrorMessageEvent);
+			// Fall back to default map
+			if (!m_World.load(getMapPath() + m_DefaultMap)) {
+				fireErrorMessage("Error loading default map, closing Eaters.");
+				shutdown();
+				System.exit(1);
+			}
 		}
 		m_WorldCount = 0;
 		fireSimulationEvent(SimulationListener.kNewWorldEvent);

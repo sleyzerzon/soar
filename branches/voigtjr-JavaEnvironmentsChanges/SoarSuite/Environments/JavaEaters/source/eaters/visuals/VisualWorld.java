@@ -156,9 +156,11 @@ public class VisualWorld extends Canvas implements PaintListener {
 						gc.fillRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 					} else {
-						m_Logger.log("Invalid food shape.");
-						m_Simulation.shutdown();
-						System.exit(1);
+						m_Logger.log("Invalid food shape '" + food.getShape() + "', using round.");
+						fill1 = (int)(m_CellSize/2.8);
+						fill2 = m_CellSize - fill1 + 1;
+						gc.fillOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
+						gc.drawOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
 					}
 				}
 				

@@ -57,6 +57,7 @@ public class CreateEaterDialog extends Dialog {
 				FileDialog fd = new FileDialog(dialog, SWT.OPEN);
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getAgentPath());
+				fd.setFilterExtensions(new String[] {"*.soar", "*.*"});
 				VisualWorld.internalRepaint = true;
 				String productions = fd.open();
 				VisualWorld.internalRepaint = false;
