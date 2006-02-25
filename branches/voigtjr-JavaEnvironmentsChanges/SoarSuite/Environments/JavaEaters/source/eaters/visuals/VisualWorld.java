@@ -161,9 +161,33 @@ public class VisualWorld extends Canvas implements PaintListener {
 						System.exit(1);
 					}
 				}
+				
+				if (cell.checkCollision()) {
+					drawExplosion(gc, xDraw, yDraw);
+				}
+				
 			}
 		}
 		m_Painted = true;
+	}
+	
+	void drawExplosion(GC gc, int x, int y) {
+		gc.setBackground(EatersWindowManager.red);
+		int offCenter = m_CellSize/4;
+		int xBase = m_CellSize*x;
+		int yBase = m_CellSize*y;
+		int halfCell = m_CellSize/2;
+		
+		Point center = new Point(xBase + halfCell, yBase + halfCell);
+		Point north = new Point(center.x, yBase);
+		Point east = new Point(xBase + m_CellSize, center.y);
+		Point south = new Point(center.x, yBase + m_CellSize);
+		Point west = new Point(xBase, center.y);
+		
+		gc.fillPolygon(new int[] {center.x, center.y, north.x, north.y, center.x + offCenter, center.y});
+		gc.fillPolygon(new int[] {center.x, center.y, east.x,  east.y,  center.x, center.y + offCenter});
+		gc.fillPolygon(new int[] {center.x, center.y, south.x, south.y, center.x - offCenter, center.y});
+		gc.fillPolygon(new int[] {center.x, center.y, west.x,  west.y,  center.x, center.y - offCenter});
 	}
 	
 	void drawEaterMouth(int x, int y, int x_mult, int y_mult, int cx_mult, int cy_mult, GC gc){		

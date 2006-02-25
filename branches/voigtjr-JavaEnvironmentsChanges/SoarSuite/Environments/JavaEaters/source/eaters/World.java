@@ -83,6 +83,7 @@ public class World {
 	public class Cell {
 		private int m_Type;
 		private Eater m_Eater;
+		private boolean m_Collision = false;
 		private boolean m_Modified = true;
 		
 		public Cell(int foodIndex) {
@@ -109,6 +110,15 @@ public class World {
 				}
 			}
 			throw new Exception("Invalid type name: " + name);
+		}
+		
+		void setCollision(boolean setting) {
+			m_Collision = setting;
+			m_Modified = true;
+		}
+		
+		public boolean checkCollision() {
+			return m_Collision;
 		}
 		
 		void clearModified() {
@@ -600,6 +610,9 @@ public class World {
 		for (int y = 1; y < m_World.length - 1; ++y) {
 			for (int x = 1; x < m_World[y].length - 1; ++x) {
 				m_World[y][x].clearModified();
+				if (m_World[y][x].checkCollision()) {
+					m_World[y][x].setCollision(false);
+				}
 			}
 		}			
 		
@@ -650,7 +663,11 @@ public class World {
 						
 						// Add first agent to current collision
 						currentCollision.add(m_Eaters[i]);
+						
 						// Flipping collision flag unnecessary as first agent will not be traversed again
+
+						// Flip collision flag for cell
+						getCell(m_Eaters[i].getLocation()).setCollision(true);
 
 						m_Logger.log("Starting collision group at " + m_Eaters[i].getLocation());
 					}
