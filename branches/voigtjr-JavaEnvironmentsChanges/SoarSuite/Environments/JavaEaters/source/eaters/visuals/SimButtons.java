@@ -15,7 +15,7 @@ public class SimButtons extends Composite {
 	Button m_StopButton;
 	Button m_StepButton;
 	Button m_ResetButton;
-	Button m_ContinuousButton;
+	Text m_RunsText;
 	Logger m_Logger = Logger.logger;
 	
 	public SimButtons(Composite parent, EatersSimulation simulation) {
@@ -40,7 +40,7 @@ public class SimButtons extends Composite {
 		m_StopButton.setText("Stop");
 		m_StopButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				m_Simulation.setContinuousMode(false);
+				m_Simulation.setRuns(0);
 				m_Simulation.stopSimulation();
 			}
 		});
@@ -61,11 +61,23 @@ public class SimButtons extends Composite {
 			}
 		});
 		
-		m_ContinuousButton = new Button(this, SWT.CHECK);
-		m_ContinuousButton.setText("Continuous mode");
-		m_ContinuousButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				m_Simulation.setContinuousMode(m_ContinuousButton.getSelection());
+		c = new Composite(this, SWT.NONE);
+		c.setLayout(new FillLayout());
+		RowData rd = new RowData();
+		rd.width = 100;
+		c.setLayoutData(rd);
+		
+		Label runsLabel = new Label(c, SWT.NONE);
+		runsLabel.setText("Runs:");
+		
+		m_RunsText = new Text(c, SWT.BORDER);
+		m_RunsText.addFocusListener(new FocusAdapter() {
+			public void focusLost(FocusEvent e) {
+				int input = Integer.valueOf(m_RunsText.getText()).intValue();
+				if (input < 0) {
+					input = -1;
+				}
+				m_Simulation.setRuns(input);
 			}
 		});		
 		
@@ -76,12 +88,11 @@ public class SimButtons extends Composite {
 		boolean running = m_Simulation.isRunning();
 		boolean done = (m_Simulation.getWorld().getFoodCount() == 0);
 		boolean eaters = (m_Simulation.getWorld().getEaters() != null);
-		boolean continuous = m_Simulation.getContinuousMode();
 		
         m_RunButton.setEnabled(!running && !done && eaters);
         m_StopButton.setEnabled(running);
         m_ResetButton.setEnabled(!running);
         m_StepButton.setEnabled(!running && !done && eaters);
-        m_ContinuousButton.setSelection(continuous);
+        m_RunsText.setText(Integer.toString(m_Simulation.getRuns()));
 	}
 }

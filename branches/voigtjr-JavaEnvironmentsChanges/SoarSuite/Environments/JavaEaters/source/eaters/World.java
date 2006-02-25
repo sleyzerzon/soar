@@ -604,8 +604,8 @@ public class World {
 		}			
 		
 		if (getFoodCount() <= 0) {
-			m_Simulation.stopSimulation();
 			if (!m_PrintedStats) {
+				m_Simulation.stopSimulation();
 				m_PrintedStats = true;
 				m_Logger.log("All of the food is gone.");
 				for (int i = 0; i < m_Eaters.length; ++i) {
