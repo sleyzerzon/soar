@@ -23,20 +23,39 @@ public class SimButtons extends Composite {
 		
 		m_Simulation = simulation;
 
-		setLayout(new RowLayout(SWT.VERTICAL));
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 4;
+		setLayout(gl);
+				
+		GridData gd;
 		
-		Composite c = new Composite(this, SWT.NONE);
-		c.setLayout(new FillLayout());
-		
-		m_RunButton = new Button(c, SWT.PUSH);
+		m_RunButton = new Button(this, SWT.PUSH);
+		gd = new GridData();
+		m_RunButton.setLayoutData(gd);
 		m_RunButton.setText("Run");
 		m_RunButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				int input = 0;
+				try {
+					input = Integer.valueOf(m_RunsText.getText()).intValue();
+				} catch (NumberFormatException exception) {
+					if (m_RunsText.getText().equalsIgnoreCase("forever")) {
+						m_RunsText.setText("-1");
+						input = -1;
+					}
+					m_RunsText.setText("0");
+				}
+				if (input < 0) {
+					input = -1;
+				}
+				m_Simulation.setRuns(input);
 				m_Simulation.startSimulation();
 			}
 		});
 		
-		m_StopButton = new Button(c, SWT.PUSH);
+		m_StopButton = new Button(this, SWT.PUSH);
+		gd = new GridData();
+		m_StopButton.setLayoutData(gd);
 		m_StopButton.setText("Stop");
 		m_StopButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -45,7 +64,9 @@ public class SimButtons extends Composite {
 			}
 		});
 		
-		m_StepButton = new Button(c, SWT.PUSH);
+		m_StepButton = new Button(this, SWT.PUSH);
+		gd = new GridData();
+		m_StepButton.setLayoutData(gd);
 		m_StepButton.setText("Step");
 		m_StepButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -53,7 +74,9 @@ public class SimButtons extends Composite {
 			}
 		});
 		
-		m_ResetButton = new Button(c, SWT.PUSH);
+		m_ResetButton = new Button(this, SWT.PUSH);
+		gd = new GridData();
+		m_ResetButton.setLayoutData(gd);
 		m_ResetButton.setText("Reset");
 		m_ResetButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -61,25 +84,20 @@ public class SimButtons extends Composite {
 			}
 		});
 		
-		c = new Composite(this, SWT.NONE);
-		c.setLayout(new FillLayout());
-		RowData rd = new RowData();
-		rd.width = 100;
-		c.setLayoutData(rd);
-		
-		Label runsLabel = new Label(c, SWT.NONE);
+		Label runsLabel = new Label(this, SWT.NONE);
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		gd.horizontalAlignment = SWT.END;
+		runsLabel.setLayoutData(gd);
 		runsLabel.setText("Runs:");
 		
-		m_RunsText = new Text(c, SWT.BORDER);
-		m_RunsText.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent e) {
-				int input = Integer.valueOf(m_RunsText.getText()).intValue();
-				if (input < 0) {
-					input = -1;
-				}
-				m_Simulation.setRuns(input);
-			}
-		});		
+		m_RunsText = new Text(this, SWT.BORDER);
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		gd.horizontalSpan = 2;
+		gd.widthHint = 67;
+		m_RunsText.setLayoutData(gd);
+		m_RunsText.setTextLimit(10);
 		
 		updateButtons();
 	}
