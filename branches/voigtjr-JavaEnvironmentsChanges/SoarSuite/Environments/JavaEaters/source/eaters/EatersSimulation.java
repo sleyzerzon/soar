@@ -256,9 +256,16 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
         
     public void run() {
     	do {
+    		if (m_Runs > 0) {
+    			--m_Runs;
+    		}
+    		
     		m_StopSoar = false;
     		m_Kernel.RunAllAgentsForever();
-			resetSimulation();
+    		
+    		if (m_Runs != 0) {
+    			resetSimulation();
+    		}
     	} while (m_Runs != 0);
     }
     
@@ -324,10 +331,6 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	}
 	
 	public void stopSimulation() {
-		if (m_Runs > 0) {
-			--m_Runs;
-		}
-		
 		if (m_Runs == 0) {
 			m_RunThread = null;
 		}
