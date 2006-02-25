@@ -132,19 +132,17 @@ public class AgentDisplay extends Composite {
 				updateButtons();
 			}
 		});
-		updateEaterList();
-		updateButtons();
-		
 		m_AgentWorld = new VisualWorld(m_Group, SWT.BORDER, m_Simulation, kAgentMapCellSize);
 		gd = new GridData();
 		gd.heightHint = m_AgentWorld.getMiniHeight() + 4;
 		gd.widthHint = m_AgentWorld.getMiniWidth() + 4;		
 		m_AgentWorld.setLayoutData(gd);
-		m_AgentWorld.disable();
+
+		updateEaterList();
+		updateButtons();		
 	}
 	
 	void agentEvent() {
-		deselect();
 		updateEaterList();
 		updateButtons();
 	}
@@ -162,26 +160,31 @@ public class AgentDisplay extends Composite {
 		}
 	}
 	
-	void deselect() {
-		m_AgentTable.deselectAll();
-		m_SelectedEater = null;
-		m_AgentWorld.disable();
-		m_AgentWorld.redraw();
-	}
-	
 	void updateEaterList() {
 		m_Eaters = m_Simulation.getWorld().getEaters();
 		m_AgentTable.removeAll();
+		boolean foundSelected = false;
+		
 		if (m_Eaters == null) {
 			m_Items = null;
-			return;
+		} else {
+			m_Items = new TableItem[m_Eaters.length];
+			for (int i = 0; i < m_Eaters.length; ++i) {
+				m_Items[i] = new TableItem(m_AgentTable, SWT.NONE);
+				m_Items[i].setText(new String[] {m_Eaters[i].getName(), Integer.toString(m_Eaters[i].getScore())});
+				if (m_SelectedEater == m_Eaters[i]) {
+					foundSelected = true;
+					m_AgentTable.setSelection(i);
+				}
+			}
 		}
-		m_Items = new TableItem[m_Eaters.length];
-		for (int i = 0; i < m_Eaters.length; ++i) {
-			m_Items[i] = new TableItem(m_AgentTable, SWT.NONE);
-			m_Items[i].setText(new String[] {m_Eaters[i].getName(), Integer.toString(m_Eaters[i].getScore())});
+		
+		if (!foundSelected) {
+			m_SelectedEater = null;			
+			m_AgentTable.deselectAll();
+			m_AgentWorld.disable();
+			m_AgentWorld.redraw();
 		}
-		//this.layout();
 	}
 	
 	void updateItemList() {
