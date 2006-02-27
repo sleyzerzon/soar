@@ -279,6 +279,7 @@ public class World implements WorldManager {
 		updateTankInput();
 	}
 	
+	////////////////// HERE
 	private void moveTanks() {
 		for (int i = 0; i < m_Tanks.length; ++i) {
 			Tank.MoveInfo move = m_Tanks[i].getMove();
