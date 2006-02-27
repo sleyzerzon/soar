@@ -154,7 +154,7 @@ public class EatersSimulation extends Simulation {
 	
 	public void changeMap(String map) {
 		m_CurrentMap = map;
-		resetSimulation();
+		resetSimulation(true);
 	}
 
 	public void destroyEater(Eater eater) {
