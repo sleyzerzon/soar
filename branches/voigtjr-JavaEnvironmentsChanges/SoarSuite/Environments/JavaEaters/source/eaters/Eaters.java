@@ -1,7 +1,3 @@
-/* File: Eaters.java
- * Jul 12, 2004
- */
-
 package eaters;
 
 import java.io.File;
