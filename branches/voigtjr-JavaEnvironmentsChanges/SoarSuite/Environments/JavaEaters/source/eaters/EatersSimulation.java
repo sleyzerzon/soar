@@ -6,16 +6,17 @@ import utilities.*;
 
 public class EatersSimulation extends Simulation {
 	public static final int kMaxEaters = 8;	
-	public static final String kTagEaters = "eaters";
-	public static final String kTagSimulation = "simulation";
-	public static final String kParamDebuggers = "debuggers";
-	public static final String kParamDefaultMap = "default-map";
-	public static final String kParamRuns = "runs";
-	public static final String kTagAgents = "agents";
-	public static final String kTagAgent = "agent";
-	public static final String kParamName = "name";
-	public static final String kParamProductions = "productions";
-	public static final String kParamColor = "color";
+	
+	private static final String kTagEaters = "eaters";
+	private static final String kTagSimulation = "simulation";
+	private static final String kParamDebuggers = "debuggers";
+	private static final String kParamDefaultMap = "default-map";
+	private static final String kParamRuns = "runs";
+	private static final String kTagAgents = "agents";
+	private static final String kParamName = "name";
+	private static final String kParamProductions = "productions";
+	private static final String kParamColor = "color";
+	private static final String kDefaultMap = "default.emap";
 		
 	private World m_World;
 	private String m_CurrentMap;
@@ -48,7 +49,7 @@ public class EatersSimulation extends Simulation {
 					setSpawnDebuggers(child.getAttributeBooleanDefault(kParamDebuggers, true));
 					m_DefaultMap = child.getAttribute(kParamDefaultMap);
 					if (m_DefaultMap == null) {
-						m_DefaultMap = "default.emap";
+						m_DefaultMap = kDefaultMap;
 					}
 					setRuns(child.getAttributeIntDefault(kParamRuns, 0));
 					
