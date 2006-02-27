@@ -1,11 +1,22 @@
 package tanksoar;
 
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.*;
 
 import simulation.*;
 import sml.*;
 
 public class World implements WorldManager {
+	static final String kTagTankSoarWorld = "tanksoar-world";
+
+	static final String kTagCells = "cells";
+	static final String kParamWorldWidth = "world-width";
+	static final String kParamWorldHeight = "world-height";
+	static final String kTagRow = "row";
+	static final String kTagCell = "cell";
+	static final String kParamType = "type";
+	
+	static final String kTypeWall = "wall";
+	static final String kTypeEmpty = "empty";
 
 	public World(TankSoarSimulation simulation) {
 		

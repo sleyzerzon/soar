@@ -44,11 +44,11 @@ public class TankSoar {
 		}
 		
 		// Initialize the simulation
-//		EatersSimulation simulation = new EatersSimulation(m_SettingsFile, m_Quiet);
+		TankSoarSimulation simulation = new TankSoarSimulation(m_SettingsFile, m_Quiet);
 		
 		// Initialize the window manager, if applicable.
 		if(!m_Quiet) {
-//			new EatersWindowManager(simulation);
+//			new TankSoarWindowManager(simulation);
 		}
 		System.exit(0);
 	}
