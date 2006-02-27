@@ -240,6 +240,9 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
   		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
   			// Stop simulation
   			m_Logger.log("Stop event received from kernel.");
+  			if (m_Runs == 0) {
+  				m_RunThread = null;
+  			}
   			fireSimulationEvent(SimulationListener.kStopEvent);	
  		} else {
  			m_Logger.log("Unknown system event received from kernel: " + eventID);
