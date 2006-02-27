@@ -2,6 +2,7 @@ package eaters.visuals;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
@@ -25,7 +26,7 @@ public class CreateEaterDialog extends Dialog {
 	public void open() {
 		Shell parent = getParent();
 		final Shell dialog = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		dialog.setSize(320,140);
+//		dialog.setSize(320,140);
 		dialog.setText("Create Eater");
 		
 		GridLayout gl = new GridLayout();
@@ -142,6 +143,8 @@ public class CreateEaterDialog extends Dialog {
 		});
 		
 		updateButtons();
+
+		dialog.setSize(dialog.computeSize(SWT.DEFAULT, SWT.DEFAULT, false));
 		
 		dialog.open();
 		Display display = parent.getDisplay();
