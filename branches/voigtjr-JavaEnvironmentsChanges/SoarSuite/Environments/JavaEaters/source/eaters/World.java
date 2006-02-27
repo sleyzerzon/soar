@@ -480,11 +480,11 @@ public class World implements WorldManager {
 		updateEaterInput();
 	}
 
-	public void createEater(Agent agent, String productions, String color) {
+	void createEater(Agent agent, String productions, String color) {
 		createEater(agent, productions, color, null);
 	}
 
-	public void createEater(Agent agent, String productions, String color, Point location) {
+	void createEater(Agent agent, String productions, String color, Point location) {
 		if (location == null) {
 			location = findStartingLocation();
 		}
