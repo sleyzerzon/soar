@@ -117,7 +117,8 @@ public class TankSoarSimulation extends Simulation {
 			if (fallBackToDefault) {
 				fireErrorMessage("Error loading map, check log for more information. Loading default map.");
 				// Fall back to default map
-				if (!m_World.load(getMapPath() + m_DefaultMap)) {
+				m_CurrentMap = getMapPath() + m_DefaultMap;
+				if (!m_World.load(m_CurrentMap)) {
 					fatalErrorMessage = "Error loading default map, closing Eaters.";
 				}
 			} else {
