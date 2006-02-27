@@ -92,12 +92,7 @@ public class TankSoarSimulation extends Simulation {
 		// Load default world
 		m_World = new World(this);
 		setWorldManager(m_World);
-		if (!m_World.load(m_CurrentMap)) {
-			fireErrorMessage("Error loading map: " + m_CurrentMap);
-			shutdown();
-			System.exit(1);
-		}
-		fireSimulationEvent(SimulationListener.kResetEvent);
+		resetSimulation(false);
 		
 		// add initial eaters
 		if (initialNames != null) {
@@ -116,15 +111,23 @@ public class TankSoarSimulation extends Simulation {
 		return m_CurrentMap;
 	}
 	
-	public void resetSimulation() {
+	public void resetSimulation(boolean fallBackToDefault) {
+		String fatalErrorMessage = null;
 		if (!m_World.load(m_CurrentMap)) {
-			fireErrorMessage("Error loading map, check log for more information. Loading default map.");
-			// Fall back to default map
-			if (!m_World.load(getMapPath() + m_DefaultMap)) {
-				fireErrorMessage("Error loading default map, closing Eaters.");
-				shutdown();
-				System.exit(1);
+			if (fallBackToDefault) {
+				fireErrorMessage("Error loading map, check log for more information. Loading default map.");
+				// Fall back to default map
+				if (!m_World.load(getMapPath() + m_DefaultMap)) {
+					fatalErrorMessage = "Error loading default map, closing Eaters.";
+				}
+			} else {
+				fatalErrorMessage = "Error loading map, check log for more information. Loading default map.";
 			}
+		}
+		if (fatalErrorMessage != null) {
+			fireErrorMessage(fatalErrorMessage);
+			shutdown();
+			System.exit(1);
 		}
 		super.resetSimulation();
 	}
