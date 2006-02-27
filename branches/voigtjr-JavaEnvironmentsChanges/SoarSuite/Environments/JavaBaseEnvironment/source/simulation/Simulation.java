@@ -14,6 +14,8 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 	
 	protected Logger m_Logger = Logger.logger;
 	
+	private String m_CurrentMap;
+	private String m_DefaultMap;
 	private boolean m_Debuggers;	
 	private Kernel m_Kernel;
 	private boolean m_StopSoar = false;
@@ -77,6 +79,22 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
   		return m_WorldCount;
   	}
   	
+	public void setCurrentMap(String map) {
+		m_CurrentMap = map;
+	}
+	
+	public String getCurrentMap() {
+		return m_CurrentMap;
+	}
+	
+	public void setDefaultMap(String map) {
+		m_DefaultMap = map;
+	}
+	
+	public String getDefaultMap() {
+		return m_DefaultMap;
+	}
+	
 	public String getAgentPath() {
 		return m_BasePath + kAgentFolder + System.getProperty("file.separator");
 	}
@@ -210,7 +228,25 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 		return (m_RunThread != null);
 	}
 
-	protected void resetSimulation() {
+	public void resetSimulation(boolean fallBackToDefault) {
+		String fatalErrorMessage = null;
+		if (!m_WorldManager.load(m_CurrentMap)) {
+			if (fallBackToDefault) {
+				fireErrorMessage("Error loading map, check log for more information. Loading default map.");
+				// Fall back to default map
+				m_CurrentMap = getMapPath() + m_DefaultMap;
+				if (!m_WorldManager.load(m_CurrentMap)) {
+					fatalErrorMessage = "Error loading default map, closing Eaters.";
+				}
+			} else {
+				fatalErrorMessage = "Error loading map, check log for more information. Loading default map.";
+			}
+		}
+		if (fatalErrorMessage != null) {
+			fireErrorMessage(fatalErrorMessage);
+			shutdown();
+			System.exit(1);
+		}
 		m_WorldCount = 0;
 		fireSimulationEvent(SimulationListener.kResetEvent);
 	}
@@ -225,7 +261,7 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
     		m_Kernel.RunAllAgentsForever();
     		
     		if (m_Runs != 0) {
-    			resetSimulation();
+    			resetSimulation(false);
     		}
     	} while (m_Runs != 0);
     }
