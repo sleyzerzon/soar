@@ -13,20 +13,20 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 	public static final int kDebuggerTimeoutSeconds = 15;	
 	
 	protected Logger m_Logger = Logger.logger;
-	Kernel m_Kernel;
-	boolean m_StopSoar = false;
-	int m_WorldCount = 0;
-	protected int m_Runs = 0;
-    private Thread m_RunThread;
-	String m_LastErrorMessage = "No error.";
-	String m_BasePath;
-	WorldManager m_WorldManager;
-	protected String m_CurrentMap;
-	protected boolean m_Debuggers;
-	boolean m_DebuggerSpawned = false;
-	ArrayList m_SimulationListeners = new ArrayList();
-	ArrayList m_AddSimulationListeners = new ArrayList();
-	ArrayList m_RemoveSimulationListeners = new ArrayList();
+	
+	private boolean m_Debuggers;	
+	private Kernel m_Kernel;
+	private boolean m_StopSoar = false;
+	private int m_WorldCount = 0;
+	private int m_Runs = 0;
+	private Thread m_RunThread;
+	private String m_LastErrorMessage = "No error.";
+	private String m_BasePath;
+	private WorldManager m_WorldManager;
+	private boolean m_DebuggerSpawned = false;
+	private ArrayList m_SimulationListeners = new ArrayList();
+	private ArrayList m_AddSimulationListeners = new ArrayList();
+	private ArrayList m_RemoveSimulationListeners = new ArrayList();
 	
 	protected Simulation() {
 		// Initialize Soar
@@ -65,10 +65,6 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 		m_WorldManager = worldManager;
 	}
 	
-	public String getCurrentMap() {
-		return m_CurrentMap;
-	}
-	
 	public String getLastErrorMessage() {
 		return m_LastErrorMessage;
 	}
@@ -101,6 +97,13 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
     	return agent;
     }
         
+	public void setRuns(int runs) {
+		if (runs < 0) {
+			runs = -1;
+		}
+		m_Runs = runs;
+	}
+	
     protected void destroyAgent(Agent agent) {
 		m_Kernel.DestroyAgent(agent);
 		agent.delete();
@@ -109,6 +112,14 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 		}
     }
         
+	public void setSpawnDebuggers(boolean mode) {
+		m_Debuggers = mode;
+	}
+	
+	public boolean getSpawnDebuggers() {
+		return m_Debuggers;
+	}
+	
 	public void spawnDebugger(String agentName) {
 		if (!m_Debuggers) return;
 		if (m_DebuggerSpawned) return;
@@ -142,7 +153,7 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 		m_DebuggerSpawned = true;
 	}
 	
-	boolean waitForDebugger() {
+	private boolean waitForDebugger() {
 		boolean ready = false;
 		for (int tries = 0; tries < kDebuggerTimeoutSeconds; ++tries) {
 			m_Kernel.GetAllConnectionInfo();
