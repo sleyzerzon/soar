@@ -1,5 +1,5 @@
 mkdir bin
-javac -d bin -classpath ..\..\SoarLibrary\bin\swt.jar;..\..\SoarLibrary\bin\sml.jar -sourcepath source source\eaters\Eaters.java
+javac -d bin -classpath ..\..\SoarLibrary\bin\swt.jar;..\..\SoarLibrary\bin\sml.jar;..\..\SoarLibrary\bin\JavaBaseEnvironment.jar -sourcepath source source\eaters\Eaters.java
 xcopy /y source\* bin
 
 jar cfm ..\..\SoarLibrary\bin\JavaEaters.jar JarManifest -C bin .
