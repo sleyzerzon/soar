@@ -513,13 +513,9 @@ public class World implements WorldManager {
 	}
 	
 	public void shutdown() {
-		if (m_Eaters == null) {
-			return;
+		while (m_Eaters != null) {
+			m_Simulation.destroyEater(m_Eaters[0]);
 		}
-		for (int i = 0; i < m_Eaters.length; ++i) {
-			m_Simulation.destroyEater(m_Eaters[i]);
-		}
-		m_Eaters = null;		
 	}
 	
 	void destroyEater(Eater eater) {

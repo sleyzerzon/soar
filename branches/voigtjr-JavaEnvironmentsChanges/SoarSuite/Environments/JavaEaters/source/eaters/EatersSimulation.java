@@ -1,7 +1,5 @@
 package eaters;
 
-import java.util.*;
-
 import simulation.*;
 import sml.*;
 import utilities.*;
@@ -19,8 +17,9 @@ public class EatersSimulation extends Simulation {
 	public static final String kParamProductions = "productions";
 	public static final String kParamColor = "color";
 		
-	String m_DefaultMap;
-	World m_World;
+	private World m_World;
+	private String m_CurrentMap;
+	private String m_DefaultMap;
 
 	public EatersSimulation(String settingsFile, boolean quiet) {		
 		
@@ -46,12 +45,12 @@ public class EatersSimulation extends Simulation {
 				String tagName = child.getTagName() ;
 				
 				if (tagName.equalsIgnoreCase(kTagSimulation)) {
-					m_Debuggers = child.getAttributeBooleanDefault(kParamDebuggers, true);
+					setSpawnDebuggers(child.getAttributeBooleanDefault(kParamDebuggers, true));
 					m_DefaultMap = child.getAttribute(kParamDefaultMap);
 					if (m_DefaultMap == null) {
 						m_DefaultMap = "default.emap";
 					}
-					m_Runs = child.getAttributeIntDefault(kParamRuns, 0);
+					setRuns(child.getAttributeIntDefault(kParamRuns, 0));
 					
 					m_Logger.log("Default map: " + m_DefaultMap);
 					
@@ -112,6 +111,10 @@ public class EatersSimulation extends Simulation {
 		}
 	}
 	
+	public String getCurrentMap() {
+		return m_CurrentMap;
+	}
+	
 	public void resetSimulation() {
 		if (!m_World.load(m_CurrentMap)) {
 			fireErrorMessage("Error loading map, check log for more information. Loading default map.");
@@ -125,21 +128,6 @@ public class EatersSimulation extends Simulation {
 		super.resetSimulation();
 	}
 
-	public void setRuns(int runs) {
-		if (runs < 0) {
-			runs = -1;
-		}
-		m_Runs = runs;
-	}
-	
-	public void setSpawnDebuggers(boolean mode) {
-		m_Debuggers = mode;
-	}
-	
-	public boolean getSpawnDebuggers() {
-		return m_Debuggers;
-	}
-	
     public void createEater(String name, String productions, String color) {
     	if (name == null || productions == null) {
     		fireErrorMessage("Failed to create agent, name, productions or color null.");
