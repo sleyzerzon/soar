@@ -139,6 +139,10 @@ public class VisualWorld extends Canvas implements PaintListener {
 					
 					String facing = eater.getFacing();
 					if (facing != null) {
+						// These string compares happen once a frame
+						// no matter what, so removing them here wouldn't
+						// really help much, they'd just be moved to
+						// a different part of the frame.
 						if (facing.equalsIgnoreCase(Eater.kNorth)) {
 							drawEaterMouth(xDraw, yDraw, 1, 0, 1, 1, gc);
 						} else if (facing.equalsIgnoreCase(Eater.kSouth)) {
@@ -156,22 +160,21 @@ public class VisualWorld extends Canvas implements PaintListener {
 					gc.setBackground(food.getColor());
 					
 					// TODO: this is a lot of string compares, should be integer switch
-					if (food.getShape().equalsIgnoreCase(World.Food.kRound)) {
+					switch (food.getShape()) {
+					default:
+						m_Logger.log("Invalid food shape '" + food.getShapeName() + "', using round.");
+					case World.Food.kRoundInt:
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
-					} else if (food.getShape().equalsIgnoreCase(World.Food.kSquare)) {
+						break;
+					case World.Food.kSquareInt:
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
-					} else {
-						m_Logger.log("Invalid food shape '" + food.getShape() + "', using round.");
-						fill1 = (int)(m_CellSize/2.8);
-						fill2 = m_CellSize - fill1 + 1;
-						gc.fillOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
-						gc.drawOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
+						break;
 					}
 				}
 				

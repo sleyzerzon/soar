@@ -45,9 +45,12 @@ public class World {
 		public static final String kRound = "round";
 		public static final String kSquare = "square";
 			
+		public static final int kRoundInt = 0;
+		public static final int kSquareInt = 1;
+			
 		String m_Name;
 		int m_Value;
-		String m_Shape;
+		int m_Shape;
 		String m_ColorString;
 		Color m_Color;
 		
@@ -56,7 +59,11 @@ public class World {
 		public Food(String name, int value, String shape, String color) {
 			m_Name = name;
 			m_Value = value;
-			m_Shape = shape;
+			if (shape.equalsIgnoreCase(kRound)) {
+				m_Shape = kRoundInt;
+			} else if (shape.equalsIgnoreCase(kSquare)) {
+				m_Shape = kSquareInt;
+			}
 			m_ColorString = color;
 		}
 		
@@ -68,8 +75,18 @@ public class World {
 			return m_Value;
 		}
 		
-		public String getShape() {
+		public int getShape() {
 			return m_Shape;
+		}
+		
+		public String getShapeName() {
+			switch (m_Shape) {
+			case kRoundInt:
+				return kRound;
+			case kSquareInt:
+				return kSquare;
+			}
+			return null;
 		}
 		
 		public Color getColor() {
