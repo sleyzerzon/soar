@@ -2,11 +2,11 @@ package eaters;
 
 import java.util.*;
 
+import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
-	public static final int kDebuggerTimeoutSeconds = 15;	
+public class EatersSimulation extends Simulation {
 	public static final int kMaxEaters = 8;	
 	public static final String kTagEaters = "eaters";
 	public static final String kTagSimulation = "simulation";
@@ -19,47 +19,14 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 	public static final String kParamProductions = "productions";
 	public static final String kParamColor = "color";
 		
-	public static final String kGroupFolder = "Environments";
-	public static final String kProjectFolder = "JavaEaters";
-	public static final String kAgentFolder = "agents";
-	public static final String kMapFolder = "maps";
-	
-    private Thread m_RunThread;
-	boolean m_Debuggers;
-	boolean m_DebuggerSpawned = false;
-	int m_Runs = 0;
 	String m_DefaultMap;
-	Logger m_Logger = Logger.logger;
-	String m_BasePath;
 	World m_World;
-	Kernel m_Kernel;
-	boolean m_StopSoar = false;
-	String m_CurrentMap;
-	int m_WorldCount = 0;
-	String m_LastErrorMessage = "No error.";
 
-	ArrayList m_SimulationListeners = new ArrayList();
-	ArrayList m_AddSimulationListeners = new ArrayList();
-	ArrayList m_RemoveSimulationListeners = new ArrayList();
-	
 	public EatersSimulation(String settingsFile, boolean quiet) {		
 		
 		// Log the settings file
 		m_Logger.log("Settings file: " + settingsFile);
 
-		// Initialize Soar
-		initSoar();
-		
-		// Generate base path
-		// TODO: chop instead of using ..
-		m_BasePath = new String(m_Kernel.GetLibraryLocation());
-		m_BasePath += System.getProperty("file.separator")
-		+ ".." + System.getProperty("file.separator") 
-		+ kGroupFolder + System.getProperty("file.separator") 
-		+ kProjectFolder + System.getProperty("file.separator");
-
-		m_Logger.log("Base path: " + m_BasePath);
-		
 		String [] initialNames = null;
 		String [] initialProductions = null;
 		String [] initialColors = null;
@@ -123,13 +90,14 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		m_CurrentMap = getMapPath() + m_DefaultMap;
 
 		// Load default world
-		m_World = new World(this);	
+		m_World = new World(this);
+		setWorldManager(m_World);
 		if (!m_World.load(m_CurrentMap)) {
 			fireErrorMessage("Error loading map: " + m_CurrentMap);
 			shutdown();
 			System.exit(1);
 		}
-		fireSimulationEvent(SimulationListener.kNewWorldEvent);
+		fireSimulationEvent(SimulationListener.kResetEvent);
 		
 		// add initial eaters
 		if (initialNames != null) {
@@ -140,33 +108,28 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		
 		// if in quiet mode, run!
 		if (quiet) {
-	    	m_Kernel.RunAllAgentsForever();
+	    	startSimulation(false);
 		}
 	}
 	
-	void fireErrorMessage(String errorMessage) {
-		m_LastErrorMessage = errorMessage;
-		fireSimulationEvent(SimulationListener.kErrorMessageEvent);
-		m_Logger.log(errorMessage);
+	public void resetSimulation() {
+		if (!m_World.load(m_CurrentMap)) {
+			fireErrorMessage("Error loading map, check log for more information. Loading default map.");
+			// Fall back to default map
+			if (!m_World.load(getMapPath() + m_DefaultMap)) {
+				fireErrorMessage("Error loading default map, closing Eaters.");
+				shutdown();
+				System.exit(1);
+			}
+		}
+		super.resetSimulation();
 	}
-	
-	public String getCurrentMap() {
-		return m_CurrentMap;
-	}
-	
-	public String getLastErrorMessage() {
-		return m_LastErrorMessage;
-	}
-	
+
 	public void setRuns(int runs) {
 		if (runs < 0) {
 			runs = -1;
 		}
 		m_Runs = runs;
-	}
-	
-	public int getRuns() {
-		return m_Runs;
 	}
 	
 	public void setSpawnDebuggers(boolean mode) {
@@ -177,78 +140,6 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		return m_Debuggers;
 	}
 	
-	void initSoar() {
-		// Create kernel
-		try {
-			m_Kernel = Kernel.CreateKernelInNewThread("SoarKernelSML", 12121);
-		} catch (Exception e) {
-			fireErrorMessage("Exception while creating kernel: " + e.getMessage());
-			System.exit(1);
-		}
-
-		if (m_Kernel.HadError()) {
-			fireErrorMessage("Error creating kernel: " + m_Kernel.GetLastErrorDescription());
-			System.exit(1);
-		}
-
-		// Register for events
-		m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
-		m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
-		m_Kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
-	}
-
-	public boolean waitForDebugger() {
-		boolean ready = false;
-		for (int tries = 0; tries < kDebuggerTimeoutSeconds; ++tries) {
-			m_Kernel.GetAllConnectionInfo();
-			if (m_Kernel.HasConnectionInfoChanged()) {
-				for (int i = 0; i < m_Kernel.GetNumberConnections(); ++i) {
-					ConnectionInfo info =  m_Kernel.GetConnectionInfo(i);
-					if (info.GetName().equalsIgnoreCase("java-debugger")) {
-						if (info.GetAgentStatus().equalsIgnoreCase(sml_Names.getKStatusReady())) {
-							ready = true;
-							break;
-						}
-					}
-				}
-				if (ready) break;
-			}
-			try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-		}
-		return ready;
-	}
-	
-  	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
-  		if (m_StopSoar) {
-  			m_StopSoar = false;
-  			m_Kernel.StopAllAgents();
-  		}
-		m_World.update();
-		++m_WorldCount;
-		fireSimulationEvent(SimulationListener.kUpdateEvent);
-  	}
-  	
-  	public int getWorldCount() {
-  		return m_WorldCount;
-  	}
-  	
-    public void systemEventHandler(int eventID, Object data, Kernel kernel) {
-  		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
-  			// Start simulation
-  			m_Logger.log("Start event received from kernel.");
-  			fireSimulationEvent(SimulationListener.kStartEvent);
-  		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
-  			// Stop simulation
-  			m_Logger.log("Stop event received from kernel.");
-  			if (m_Runs == 0) {
-  				m_RunThread = null;
-  			}
-  			fireSimulationEvent(SimulationListener.kStopEvent);	
- 		} else {
- 			m_Logger.log("Unknown system event received from kernel: " + eventID);
- 		}
-    }
-    
     public void createEater(String name, String productions, String color) {
     	if (name == null || productions == null) {
     		fireErrorMessage("Failed to create agent, name, productions or color null.");
@@ -264,166 +155,22 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		fireSimulationEvent(SimulationListener.kAgentCreatedEvent);   	
     }
         
-    private Agent createAgent(String name, String productions) {
-    	Agent agent = m_Kernel.CreateAgent(name);
-    	boolean load = agent.LoadProductions(productions);
-    	if (!load || agent.HadError()) {
-			fireErrorMessage("Failed to create agent " + name + " (" + productions + "): " + agent.GetLastErrorDescription());
-			m_Kernel.DestroyAgent(agent);
-			agent.delete();
-    		return null;
-    	}
-    	return agent;
-    }
-        
-    public void run() {
-    	do {
-    		if (m_Runs > 0) {
-    			--m_Runs;
-    		}
-    		
-    		m_StopSoar = false;
-    		m_Kernel.RunAllAgentsForever();
-    		
-    		if (m_Runs != 0) {
-    			resetSimulation();
-    		}
-    	} while (m_Runs != 0);
-    }
-    
-	public String getAgentPath() {
-		return m_BasePath + kAgentFolder + System.getProperty("file.separator");
-	}
-	
-	public String getMapPath() {
-		return m_BasePath + kMapFolder + System.getProperty("file.separator");
-	}
-	
 	public World getWorld() {
 		return m_World;
 	}
 	
-	public void spawnDebugger(String agentName) {
-		if (!m_Debuggers) return;
-		if (m_DebuggerSpawned) return;
-		
-		// Figure out whether to use java or javaw
-		String os = System.getProperty("os.name");
-		String javabin = "java";
-		if (os.matches(".+indows.*") || os.matches("INDOWS")) {
-			javabin = "javaw";
-		}
-		
-		Runtime r = java.lang.Runtime.getRuntime();
-		try {
-			// TODO: manage the returned process a bit better.
-			r.exec(javabin + " -jar \"" + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
-					+ "bin" + System.getProperty("file.separator") 
-					+ "SoarJavaDebugger.jar\" -remote -agent " + agentName);
-			
-			if (!waitForDebugger()) {
-				fireErrorMessage("Debugger spawn failed for agent: " + agentName);
-				return;
-			}
-			
-		} catch (java.io.IOException e) {
-			fireErrorMessage("IOException spawning debugger: " + e.getMessage());
-			shutdown();
-			System.exit(1);
-		}
-		
-		m_Logger.log("Spawned debugger for " + agentName);
-		m_DebuggerSpawned = true;
-	}
-	
-	public void shutdown() {
-		m_Logger.log("Shutdown called.");
-		if (m_World != null) {
-			m_World.destroyAllEaters();
-		}
-		if (m_Kernel != null) {
-			m_Kernel.Shutdown();
-			m_Kernel.delete();
-		}
-	}
-	
-	public void startSimulation() {
-        m_RunThread = new Thread(this);    
-        m_StopSoar = false;
-        m_RunThread.start();
-	}
-	
-	public void stepSimulation() {
-        m_Kernel.RunAllAgents(1);
-	}
-	
-	public void stopSimulation() {
-		if (m_Runs == 0) {
-			m_RunThread = null;
-		}
-		m_StopSoar = true;
-	}
-	
-	public boolean isRunning() {
-		return (m_RunThread != null);
-	}
-
-	public void resetSimulation() {
-		if (!m_World.load(m_CurrentMap)) {
-			m_LastErrorMessage = "Error loading map, check log for more information. Loading default map.";
-			fireSimulationEvent(SimulationListener.kErrorMessageEvent);
-			// Fall back to default map
-			if (!m_World.load(getMapPath() + m_DefaultMap)) {
-				fireErrorMessage("Error loading default map, closing Eaters.");
-				shutdown();
-				System.exit(1);
-			}
-		}
-		m_WorldCount = 0;
-		fireSimulationEvent(SimulationListener.kNewWorldEvent);
-	}
-
 	public void changeMap(String map) {
 		m_CurrentMap = map;
 		resetSimulation();
 	}
 
-	void destroyEater(Eater eater) {
-		m_Kernel.DestroyAgent(eater.getAgent());
-		eater.getAgent().delete();
-		if (m_World.getEaters() == null) {
-			m_DebuggerSpawned = false;
-		}
+	public void destroyEater(Eater eater) {
+		if (eater == null) {
+    		m_Logger.log("Asked to destroy null agent, ignoring.");
+    		return;
+		}	
+		m_World.destroyEater(eater);
 		fireSimulationEvent(SimulationListener.kAgentDestroyedEvent);
 	}
 	
-	public void addSimulationListener(SimulationListener listener) {
-		m_AddSimulationListeners.add(listener);
-	}
-	
-	public void removeSimulationListener(SimulationListener listener) {
-		m_RemoveSimulationListeners.add(listener);
-	}
-	
-	protected void fireSimulationEvent(int type) {
-		updateSimulationListenerList();
-		Iterator iter = m_SimulationListeners.iterator();
-		while(iter.hasNext()){
-			((SimulationListener)iter.next()).simulationEventHandler(type);
-		}		
-	}
-		
-	protected void updateSimulationListenerList() {
-		Iterator iter = m_RemoveSimulationListeners.iterator();
-		while(iter.hasNext()){
-			m_SimulationListeners.remove(iter.next());
-		}
-		m_RemoveSimulationListeners.clear();
-		
-		iter = m_AddSimulationListeners.iterator();
-		while(iter.hasNext()){
-			m_SimulationListeners.add(iter.next());
-		}
-		m_AddSimulationListeners.clear();		
-	}
 }

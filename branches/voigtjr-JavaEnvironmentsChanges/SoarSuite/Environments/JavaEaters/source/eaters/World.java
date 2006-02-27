@@ -3,11 +3,12 @@ package eaters;
 import java.util.*;
 import org.eclipse.swt.graphics.*;
 
-import eaters.visuals.EatersWindowManager;
+import eaters.visuals.*;
+import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class World {
+public class World implements WorldManager {
 	static final String kTagEatersWorld = "eaters-world";
 
 	static final String kTagFood = "food";
@@ -507,7 +508,11 @@ public class World {
 		updateEaterInput();
 	}
 	
-	public void destroyAllEaters() {
+	public boolean noAgents() {
+		return (m_Eaters == null);
+	}
+	
+	public void shutdown() {
 		if (m_Eaters == null) {
 			return;
 		}
@@ -517,7 +522,7 @@ public class World {
 		m_Eaters = null;		
 	}
 	
-	public void destroyEater(Eater eater) {
+	void destroyEater(Eater eater) {
 		if (m_Eaters == null) {
 			return;
 		}
@@ -537,7 +542,6 @@ public class World {
 					}
 				}
 				getCell(eater.getLocation()).removeEater();
-				m_Simulation.destroyEater(eater);
 				if (m_Eaters == null) {
 					break;
 				}
@@ -628,7 +632,7 @@ public class World {
 		}
 	}
 	
-	void update() {
+	public void update() {
 		// reset modified flags, skipping edges
 		for (int y = 1; y < m_World.length - 1; ++y) {
 			for (int x = 1; x < m_World[y].length - 1; ++x) {

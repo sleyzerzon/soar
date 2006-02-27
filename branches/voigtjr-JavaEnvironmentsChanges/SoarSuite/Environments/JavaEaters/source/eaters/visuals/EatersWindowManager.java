@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 
 import eaters.*;
+import simulation.SimulationListener;
 import utilities.*;
 
 public class EatersWindowManager extends Thread implements SimulationListener {
@@ -237,7 +238,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			m_AgentDisplay.worldChangeEvent();
 			return;
 			
-		case SimulationListener.kNewWorldEvent:
+		case SimulationListener.kResetEvent:
 			updateWorldGroup();
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();

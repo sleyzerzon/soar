@@ -91,7 +91,7 @@ public class AgentDisplay extends Composite {
 				if (m_SelectedEater == null) {
 					return;
 				}
-				m_Simulation.getWorld().destroyEater(m_SelectedEater);
+				m_Simulation.destroyEater(m_SelectedEater);
 			}
 		});
 				

@@ -49,7 +49,7 @@ public class SimButtons extends Composite {
 //					input = -1;
 //				}
 //				m_Simulation.setRuns(input);
-				m_Simulation.startSimulation();
+				m_Simulation.startSimulation(true);
 			}
 		});
 		
