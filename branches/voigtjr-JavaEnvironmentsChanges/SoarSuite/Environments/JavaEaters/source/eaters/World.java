@@ -9,38 +9,35 @@ import sml.*;
 import utilities.*;
 
 public class World implements WorldManager {
-	static final String kTagEatersWorld = "eaters-world";
+	private static final String kTagEatersWorld = "eaters-world";
 
-	static final String kTagFood = "food";
-	static final String kTagFoodType = "food-type";
-	static final String kParamName = "name";
-	static final String kParamValue = "value";
-	static final String kParamShape = "shape";
-	static final String kParamColor = "color";
+	private static final String kTagFood = "food";
+	private static final String kParamName = "name";
+	private static final String kParamValue = "value";
+	private static final String kParamShape = "shape";
+	private static final String kParamColor = "color";
 
-	static final String kTagCells = "cells";
-	static final String kParamWorldWidth = "world-width";
-	static final String kParamWorldHeight = "world-height";
-	static final String kParamRandomWalls = "random-walls";
-	static final String kParamRandomFood = "random-food";
-	static final String kTagRow = "row";
-	static final String kTagCell = "cell";
-	static final String kParamType = "type";
+	private static final String kTagCells = "cells";
+	private static final String kParamWorldWidth = "world-width";
+	private static final String kParamWorldHeight = "world-height";
+	private static final String kParamRandomWalls = "random-walls";
+	private static final String kParamRandomFood = "random-food";
+	private static final String kParamType = "type";
 	
 	static final String kTypeWall = "wall";
 	static final String kTypeEmpty = "empty";
 	static final String kTypeEater = "eater";
 	
-	static final int kWallCell = 0;
-	static final int kEmptyCell = 1;
-	static final int kEaterCell = 2;
-	static final int kReservedIDs = 3;
+	private static final int kWallCell = 0;
+	private static final int kEmptyCell = 1;
+	private static final int kEaterCell = 2;
+	private static final int kReservedIDs = 3;
 	
-	static final int kWallPenalty = -5;
-	static final int kJumpPenalty = -5;
+	private static final int kWallPenalty = -5;
+	private static final int kJumpPenalty = -5;
 
-	static final double kLowProbability = .15;
-	static final double kHigherProbability = .65;
+	private static final double kLowProbability = .15;
+	private static final double kHigherProbability = .65;
 	
 	public class Food {
 		public static final String kRound = "round";
@@ -226,16 +223,17 @@ public class World implements WorldManager {
 		}	
 	}
 
-	Logger m_Logger = Logger.logger;
-	int m_WorldWidth;
-	int m_WorldHeight;
-	Cell[][] m_World;
-	Food[] m_Food;
-	EatersSimulation m_Simulation;
-	int m_FoodCount;
-	int m_ScoreCount;
-	Eater[] m_Eaters;
-	boolean m_PrintedStats = false;
+	private Logger m_Logger = Logger.logger;
+	private int m_WorldWidth;
+	private int m_WorldHeight;
+	private Cell[][] m_World;
+	private Food[] m_Food;
+	private EatersSimulation m_Simulation;
+	private int m_FoodCount;
+	private int m_ScoreCount;
+	private Eater[] m_Eaters;
+	private boolean m_PrintedStats = false;
+	private ArrayList m_Collisions;
 	
 	public World(EatersSimulation simulation) {
 		m_Simulation = simulation;
@@ -545,7 +543,7 @@ public class World implements WorldManager {
 		}
 	}
 
-	public Point findStartingLocation() {
+	private Point findStartingLocation() {
 		// set random starting location
 		Random random = new Random();
 		Point location = new Point(random.nextInt(m_WorldWidth), random.nextInt(m_WorldHeight));
@@ -557,7 +555,7 @@ public class World implements WorldManager {
 		return location;
 	}
 	
-	void moveEaters() {
+	private void moveEaters() {
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			Eater.MoveInfo move = m_Eaters[i].getMove();
 			if (move == null) {
@@ -605,7 +603,7 @@ public class World implements WorldManager {
 		return m_World[y][x];
 	}
 	
-	void updateMapAndEatFood() {
+	private void updateMapAndEatFood() {
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			Food f = getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
 			if (f != null) {
@@ -614,15 +612,15 @@ public class World implements WorldManager {
 		}
 	}
 	
-	public boolean isInBounds(Point location) {
+	private boolean isInBounds(Point location) {
 		return isInBounds(location.x, location.y);
 	}
 
-	public boolean isInBounds(int x, int y) {
+	private boolean isInBounds(int x, int y) {
 		return (x >= 0) && (y >= 0) && (x < m_WorldWidth) && (y < m_WorldWidth);
 	}
 	
-	void updateEaterInput() {
+	private void updateEaterInput() {
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			m_Eaters[i].updateInput(this);
 		}
@@ -661,10 +659,8 @@ public class World implements WorldManager {
 		handleCollisions();	
 		updateEaterInput();
 	}
-	
-	ArrayList m_Collisions;
-	
-	void handleCollisions() {
+		
+	private void handleCollisions() {
 		// generate collision groups
 		ArrayList currentCollision = null;
 		
