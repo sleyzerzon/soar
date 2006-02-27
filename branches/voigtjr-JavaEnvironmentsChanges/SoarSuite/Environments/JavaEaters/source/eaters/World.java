@@ -28,9 +28,9 @@ public class World implements WorldManager {
 	static final String kTypeEmpty = "empty";
 	static final String kTypeEater = "eater";
 	
-	private static final int kWallCell = 0;
-	private static final int kEmptyCell = 1;
-	private static final int kEaterCell = 2;
+	private static final int kWallInt = 0;
+	private static final int kEmptyInt = 1;
+	private static final int kEaterInt = 2;
 	private static final int kReservedIDs = 3;
 	
 	private static final int kWallPenalty = -5;
@@ -109,10 +109,10 @@ public class World implements WorldManager {
 
 		public Cell(String name) throws Exception {
 			if (name.equalsIgnoreCase(kTypeWall)) {
-				m_Type = kWallCell;
+				m_Type = kWallInt;
 				return;
 			} else if (name.equalsIgnoreCase(kTypeEmpty)) {
-				m_Type = kEmptyCell;			
+				m_Type = kEmptyInt;			
 				return;
 			} else {	
 				for (int i = 0; i < m_Food.length; ++i) {
@@ -145,15 +145,15 @@ public class World implements WorldManager {
 		}
 		
 		public boolean isWall() {
-			return m_Type == kWallCell;
+			return m_Type == kWallInt;
 		}
 		
 		public boolean isEmpty() {
-			return m_Type == kEmptyCell;
+			return m_Type == kEmptyInt;
 		}
 		
 		public boolean isEater() {
-			return m_Type == kEaterCell;
+			return m_Type == kEaterInt;
 		}
 		
 		public boolean isFood() {
@@ -161,11 +161,11 @@ public class World implements WorldManager {
 		}
 		
 		public boolean removeEater() {
-			if (m_Type != kEaterCell) {
+			if (m_Type != kEaterInt) {
 				return false;
 			}
 			m_Modified = true;
-			m_Type = kEmptyCell;
+			m_Type = kEmptyInt;
 			m_Eater = null;
 			return true;
 		}
@@ -176,7 +176,7 @@ public class World implements WorldManager {
 			if (isFood()) {
 				f = removeFood();
 			}
-			m_Type = kEaterCell;
+			m_Type = kEaterInt;
 			m_Eater = eater;
 			return f;
 		}
@@ -187,11 +187,11 @@ public class World implements WorldManager {
 		
 		public String getName() {
 			switch (m_Type) {
-			case kWallCell:
+			case kWallInt:
 				return kTypeWall;
-			case kEmptyCell:
+			case kEmptyInt:
 				return kTypeEmpty;
-			case kEaterCell:
+			case kEaterInt:
 				return kTypeEater;
 			default:
 				break;
@@ -210,7 +210,7 @@ public class World implements WorldManager {
 			if (isFood()) {
 				m_Modified = true;
 				Food f = getFood();
-				m_Type = kEmptyCell;
+				m_Type = kEmptyInt;
 				--m_FoodCount;
 				m_ScoreCount -= f.getValue();
 				return f;
