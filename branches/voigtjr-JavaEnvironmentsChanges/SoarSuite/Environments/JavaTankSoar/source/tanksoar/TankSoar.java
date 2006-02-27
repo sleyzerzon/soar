@@ -11,8 +11,8 @@ import utilities.*;
 
 public class TankSoar {
 	
-	public static final String kDefaultXMLSettingsFile = "eaters-default-settings.xml";
-	private final String kDefaultFile = "EaterLog.txt";
+	public static final String kDefaultXMLSettingsFile = "tanksoar-default-settings.xml";
+	private final String kDefaultFile = "TankSoarLog.txt";
 
 	private boolean m_Quiet;
 	private String m_SettingsFile;
@@ -130,7 +130,7 @@ public class TankSoar {
 	protected void printCommandLineHelp() {
 		System.out.println("Java Eaters help");
 		System.out.println("\t-console: Send all log messages to console, overridden by -log.");
-		System.out.println("\t-log: File name to log messages to (default: EaterLog.txt).");
+		System.out.println("\t-log: File name to log messages to (default: " + kDefaultFile + ").");
 		System.out.println("\t-append: If logging to file, append.  Ignored if -console present.");
 		System.out.println("\t-quiet: Disables all windows, runs simulation quietly.");
 		System.out.println("\t-settings: XML file with with run settings.");
