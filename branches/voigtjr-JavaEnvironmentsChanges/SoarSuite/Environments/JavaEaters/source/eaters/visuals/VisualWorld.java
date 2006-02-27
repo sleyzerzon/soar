@@ -61,6 +61,17 @@ public class VisualWorld extends Canvas implements PaintListener {
 	public void setAgentLocation(Point location) {
 		m_AgentLocation = location;
 	}
+	
+	Eater getEaterAtPixel(int x, int y) {
+		x /= m_CellSize;
+		y /= m_CellSize;
+		World world = m_Simulation.getWorld();
+		World.Cell cell = world.getCell(x, y);
+		if (cell.isEater()) {
+			return cell.getEater();
+		}
+		return null;
+	}
 
 	public void paintControl(PaintEvent e){
 		if (m_AgentLocation != null || m_LastX != e.x || m_LastY != e.y || internalRepaint) {

@@ -124,7 +124,7 @@ public class AgentDisplay extends Composite {
 					return;
 				}
 				for (int i = 0; i < m_Eaters.length; ++i) {
-					m_SelectedEater = m_Eaters[m_AgentTable.getSelectionIndex()];
+					selectEater(m_Eaters[m_AgentTable.getSelectionIndex()]);
 					m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
 					m_AgentWorld.enable();
 					m_AgentWorld.redraw();
@@ -140,6 +140,19 @@ public class AgentDisplay extends Composite {
 
 		updateEaterList();
 		updateButtons();		
+	}
+	
+	void selectEater(Eater eater) {
+		m_SelectedEater = eater;
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			if (m_SelectedEater == m_Eaters[i]) {
+				m_AgentTable.setSelection(i);
+				break;
+			}
+		}
+		m_AgentWorld.setAgentLocation(m_SelectedEater.getLocation());
+		m_AgentWorld.enable();
+		m_AgentWorld.redraw();
 	}
 	
 	void agentEvent() {
@@ -185,10 +198,6 @@ public class AgentDisplay extends Composite {
 			m_AgentWorld.disable();
 			m_AgentWorld.redraw();
 		}
-	}
-	
-	void updateItemList() {
-		
 	}
 	
 	void updateButtons() {

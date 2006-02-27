@@ -100,6 +100,15 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		gd.heightHint = m_VisualWorld.getHeight();
 		gd.verticalSpan = 3;
 		m_WorldGroup.setLayoutData(gd);
+		m_VisualWorld.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				Eater eater = m_VisualWorld.getEaterAtPixel(e.x, e.y);
+				if (eater == null) {
+					return;
+				}
+				m_AgentDisplay.selectEater(eater);
+			}
+		});
 
 		Group group1 = new Group(m_Shell, SWT.NONE);
 		gd = new GridData();
