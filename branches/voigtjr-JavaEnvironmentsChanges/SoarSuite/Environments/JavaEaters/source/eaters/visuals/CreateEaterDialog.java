@@ -25,7 +25,7 @@ public class CreateEaterDialog extends Dialog {
 	public void open() {
 		Shell parent = getParent();
 		final Shell dialog = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		dialog.setSize(320,134);
+		dialog.setSize(320,140);
 		dialog.setText("Create Eater");
 		
 		GridLayout gl = new GridLayout();
