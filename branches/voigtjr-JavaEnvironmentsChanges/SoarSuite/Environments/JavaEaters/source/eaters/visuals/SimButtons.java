@@ -15,7 +15,7 @@ public class SimButtons extends Composite {
 	Button m_StopButton;
 	Button m_StepButton;
 	Button m_ResetButton;
-	Text m_RunsText;
+//	Text m_RunsText;
 	Logger m_Logger = Logger.logger;
 	
 	public SimButtons(Composite parent, EatersSimulation simulation) {
@@ -35,20 +35,20 @@ public class SimButtons extends Composite {
 		m_RunButton.setText("Run");
 		m_RunButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				int input = 0;
-				try {
-					input = Integer.valueOf(m_RunsText.getText()).intValue();
-				} catch (NumberFormatException exception) {
-					if (m_RunsText.getText().equalsIgnoreCase("forever")) {
-						m_RunsText.setText("-1");
-						input = -1;
-					}
-					m_RunsText.setText("0");
-				}
-				if (input < 0) {
-					input = -1;
-				}
-				m_Simulation.setRuns(input);
+//				int input = 0;
+//				try {
+//					input = Integer.valueOf(m_RunsText.getText()).intValue();
+//				} catch (NumberFormatException exception) {
+//					if (m_RunsText.getText().equalsIgnoreCase("forever")) {
+//						m_RunsText.setText("-1");
+//						input = -1;
+//					}
+//					m_RunsText.setText("0");
+//				}
+//				if (input < 0) {
+//					input = -1;
+//				}
+//				m_Simulation.setRuns(input);
 				m_Simulation.startSimulation();
 			}
 		});
@@ -84,20 +84,20 @@ public class SimButtons extends Composite {
 			}
 		});
 		
-		Label runsLabel = new Label(this, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		gd.horizontalAlignment = SWT.END;
-		runsLabel.setLayoutData(gd);
-		runsLabel.setText("Runs:");
-		
-		m_RunsText = new Text(this, SWT.BORDER);
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		gd.horizontalSpan = 2;
-		gd.widthHint = 67;
-		m_RunsText.setLayoutData(gd);
-		m_RunsText.setTextLimit(10);
+//		Label runsLabel = new Label(this, SWT.NONE);
+//		gd = new GridData();
+//		gd.horizontalSpan = 2;
+//		gd.horizontalAlignment = SWT.END;
+//		runsLabel.setLayoutData(gd);
+//		runsLabel.setText("Runs:");
+//		
+//		m_RunsText = new Text(this, SWT.BORDER);
+//		gd = new GridData();
+//		gd.horizontalSpan = 2;
+//		gd.horizontalSpan = 2;
+//		gd.widthHint = 67;
+//		m_RunsText.setLayoutData(gd);
+//		m_RunsText.setTextLimit(10);
 		
 		updateButtons();
 	}
@@ -111,6 +111,6 @@ public class SimButtons extends Composite {
         m_StopButton.setEnabled(running);
         m_ResetButton.setEnabled(!running);
         m_StepButton.setEnabled(!running && !done && eaters);
-        m_RunsText.setText(Integer.toString(m_Simulation.getRuns()));
+//        m_RunsText.setText(Integer.toString(m_Simulation.getRuns()));
 	}
 }
