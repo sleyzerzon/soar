@@ -1,3 +1,4 @@
+mkdir bin
 javac -d bin -classpath ..\..\SoarLibrary\bin\swt.jar;..\..\SoarLibrary\bin\sml.jar -sourcepath source source\eaters\Eaters.java
 xcopy /y source\* bin
 
