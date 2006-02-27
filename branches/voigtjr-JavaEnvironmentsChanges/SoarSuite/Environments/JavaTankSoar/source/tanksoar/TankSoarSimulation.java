@@ -19,8 +19,6 @@ public class TankSoarSimulation extends Simulation {
 	private static final String kDefaultMap = "default.tmap";
 		
 	private World m_World;
-	private String m_CurrentMap;
-	private String m_DefaultMap;
 
 	public TankSoarSimulation(String settingsFile, boolean quiet) {		
 		
@@ -47,13 +45,14 @@ public class TankSoarSimulation extends Simulation {
 				
 				if (tagName.equalsIgnoreCase(kTagSimulation)) {
 					setSpawnDebuggers(child.getAttributeBooleanDefault(kParamDebuggers, true));
-					m_DefaultMap = child.getAttribute(kParamDefaultMap);
-					if (m_DefaultMap == null) {
-						m_DefaultMap = kDefaultMap;
+					String defaultMap = child.getAttribute(kParamDefaultMap);
+					if (defaultMap == null) {
+						defaultMap = kDefaultMap;
 					}
+					setDefaultMap(defaultMap);
 					setRuns(child.getAttributeIntDefault(kParamRuns, 0));
 					
-					m_Logger.log("Default map: " + m_DefaultMap);
+					m_Logger.log("Default map: " + defaultMap);
 					
 				} else if (tagName.equalsIgnoreCase(kTagAgents)) {
 					initialNames = new String[child.getNumberChildren()];
@@ -87,7 +86,7 @@ public class TankSoarSimulation extends Simulation {
 
 		}
 
-		m_CurrentMap = getMapPath() + m_DefaultMap;
+		setCurrentMap(getMapPath() + getDefaultMap());
 
 		// Load default world
 		m_World = new World(this);
@@ -107,32 +106,6 @@ public class TankSoarSimulation extends Simulation {
 		}
 	}
 	
-	public String getCurrentMap() {
-		return m_CurrentMap;
-	}
-	
-	public void resetSimulation(boolean fallBackToDefault) {
-		String fatalErrorMessage = null;
-		if (!m_World.load(m_CurrentMap)) {
-			if (fallBackToDefault) {
-				fireErrorMessage("Error loading map, check log for more information. Loading default map.");
-				// Fall back to default map
-				m_CurrentMap = getMapPath() + m_DefaultMap;
-				if (!m_World.load(m_CurrentMap)) {
-					fatalErrorMessage = "Error loading default map, closing Eaters.";
-				}
-			} else {
-				fatalErrorMessage = "Error loading map, check log for more information. Loading default map.";
-			}
-		}
-		if (fatalErrorMessage != null) {
-			fireErrorMessage(fatalErrorMessage);
-			shutdown();
-			System.exit(1);
-		}
-		super.resetSimulation();
-	}
-
     public void createEater(String name, String productions, String color) {
     	if (name == null || productions == null) {
     		fireErrorMessage("Failed to create agent, name, productions or color null.");
@@ -153,8 +126,8 @@ public class TankSoarSimulation extends Simulation {
 	}
 	
 	public void changeMap(String map) {
-		m_CurrentMap = map;
-		resetSimulation();
+		setCurrentMap(map);
+		resetSimulation(true);
 	}
 
 	public void destroyTank(Tank tank) {
