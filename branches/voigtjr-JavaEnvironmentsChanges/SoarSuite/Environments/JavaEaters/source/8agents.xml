@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <eaters>
-  <simulation nodebuggers="true" default-map="default.xml" continuous="true"></simulation>
+  <simulation debuggers="true" default-map="random-walls.emap" runs="0"></simulation>
   <agents>
     <agent name="red" productions="tutorial/advanced-move.soar" color="red"></agent>
     <agent name="blue" productions="tutorial/advanced-move.soar" color="blue"></agent>
