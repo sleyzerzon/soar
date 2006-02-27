@@ -4,5 +4,6 @@
 	<classpathentry exported="true" kind="lib" path="/SoarLibrary/bin/swt.jar"/>
 	<classpathentry exported="true" kind="lib" path="/SoarLibrary/bin/sml.jar"/>
 	<classpathentry kind="src" path="source"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JavaBaseEnvironment"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
