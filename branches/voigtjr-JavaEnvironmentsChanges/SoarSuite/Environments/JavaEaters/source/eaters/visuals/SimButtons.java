@@ -80,7 +80,7 @@ public class SimButtons extends Composite {
 		m_ResetButton.setText("Reset");
 		m_ResetButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				m_Simulation.resetSimulation();
+				m_Simulation.resetSimulation(true);
 			}
 		});
 		
