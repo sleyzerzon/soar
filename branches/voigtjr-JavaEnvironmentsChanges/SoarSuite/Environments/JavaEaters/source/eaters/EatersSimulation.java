@@ -307,11 +307,17 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		if (!m_Debuggers) return;
 		if (m_DebuggerSpawned) return;
 		
+		// Figure out whether to use java or javaw
+		String os = System.getProperty("os.name");
+		String javabin = "java";
+		if (os.matches(".+indows.*") || os.matches("INDOWS")) {
+			javabin = "javaw";
+		}
+		
 		Runtime r = java.lang.Runtime.getRuntime();
 		try {
 			// TODO: manage the returned process a bit better.
-			// BUGBUG: javaw not portable!
-			r.exec("javaw -jar \"" + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
+			r.exec(javabin + " -jar \"" + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
 					+ "bin" + System.getProperty("file.separator") 
 					+ "SoarJavaDebugger.jar\" -remote -agent " + agentName);
 			
