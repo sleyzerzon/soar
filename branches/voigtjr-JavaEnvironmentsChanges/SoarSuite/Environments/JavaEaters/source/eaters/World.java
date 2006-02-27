@@ -239,7 +239,7 @@ public class World implements WorldManager {
 		m_Simulation = simulation;
 	}
 	
-	boolean load(String mapFile) {
+	public boolean load(String mapFile) {
 		
 		m_PrintedStats = false;
 		
