@@ -311,9 +311,9 @@ public class EatersSimulation  implements Runnable, Kernel.UpdateEventInterface,
 		try {
 			// TODO: manage the returned process a bit better.
 			// BUGBUG: javaw not portable!
-			r.exec("javaw -jar " + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
+			r.exec("javaw -jar \"" + m_Kernel.GetLibraryLocation() + System.getProperty("file.separator")
 					+ "bin" + System.getProperty("file.separator") 
-					+ "SoarJavaDebugger.jar -remote -agent " + agentName);
+					+ "SoarJavaDebugger.jar\" -remote -agent " + agentName);
 			
 			if (!waitForDebugger()) {
 				fireErrorMessage("Debugger spawn failed for agent: " + agentName);
