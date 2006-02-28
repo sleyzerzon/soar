@@ -209,7 +209,6 @@ public class EatersWorld extends World implements WorldManager {
 	private ArrayList m_Collisions;
 	
 	public EatersWorld(EatersSimulation simulation) {
-		super(simulation);
 		m_Simulation = simulation;
 	}
 	
