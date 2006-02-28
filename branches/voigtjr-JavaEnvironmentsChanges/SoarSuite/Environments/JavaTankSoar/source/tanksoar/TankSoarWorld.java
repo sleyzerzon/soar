@@ -8,7 +8,7 @@ import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class World implements WorldManager {
+public class TankSoarWorld implements WorldManager {
 	private static final String kTagTankSoarWorld = "tanksoar-world";
 
 	private static final String kTagCells = "cells";
@@ -101,7 +101,7 @@ public class World implements WorldManager {
 	private Tank[] m_Tanks;
 	private ArrayList m_Collisions;
 
-	public World(TankSoarSimulation simulation) {
+	public TankSoarWorld(TankSoarSimulation simulation) {
 		m_Simulation = simulation;
 	}
 	

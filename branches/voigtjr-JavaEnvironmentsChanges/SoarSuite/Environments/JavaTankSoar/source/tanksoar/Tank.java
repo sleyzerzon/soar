@@ -2,11 +2,12 @@ package tanksoar;
 
 import org.eclipse.swt.graphics.*;
 
+import simulation.*;
 import sml.*;
 import utilities.Logger;
 import tanksoar.visuals.*;
 
-public class Tank {
+public class Tank  extends WorldEntity {
 	
 	private final static String kBlockedID = "blocked";
 	private final static String kClockID = "clock";
@@ -89,16 +90,7 @@ public class Tank {
 		}
 	}
 	
-	private boolean m_Colliding = false;
-	private int m_Points = 0;
 	private MoveInfo m_LastMove = new MoveInfo();
-	private Agent m_Agent;
-	private Point m_Location;
-	private String m_ColorString;
-	private String m_Productions;
-	private String m_Name;
-	private Logger m_Logger = Logger.logger;
-	private Color m_Color;
 	
 	private final static int kInitialEnergy = 1000;
 	private final static int kInitialHealth = 1000;
@@ -137,15 +129,7 @@ public class Tank {
 	private IntElement m_yWME;
 	
 	public Tank(Agent agent, String productions, String color, Point location) {
-		m_Agent = agent;
-		m_Location = location;
-		m_ColorString = color;
-		m_Productions = productions;
-
-		m_Name = m_Agent.GetAgentName();
-		m_Logger.log("Created eater: " + m_Name);
-		
-		// Create input link
+		super(agent, productions, color, location);
 		
 		Identifier inputLink = m_Agent.GetInputLink();
 		
@@ -200,66 +184,18 @@ public class Tank {
 		m_Agent.Commit();		
 	}
 	
-	public void initSoar() {
-		m_Agent.InitSoar();
-	}
-	
-	public void setLocation(Point location) {
-		m_Location = location;
-	}
-	
-	public void updateInput(World world) {
+	public void updateInput(TankSoarWorld world) {
 		
-	}
-	
-	public String getProductions() {
-		return m_Productions;
-	}
-	
-	public Point getLocation() {
-		return m_Location;
 	}
 	
 	public Color getColor() {
 		if (m_Color == null) {
-			m_Color = TankSoarWindowManager.getColor(m_ColorString);
+			m_Color = TankSoarWindowManager.getColor(getColorString());
 		}
 		return m_Color;
-	}
-	
-	public String getColorString() {
-		return m_ColorString;
-	}
-	
-	public Agent getAgent() {
-		return m_Agent;
 	}
 	
 	public MoveInfo getMove() {
 		return m_LastMove;
 	}
-	
-	public String getName() {
-		return m_Name;
-	}	
-
-	public void setPoints(int score) {
-		m_Points = score;
-	}
-	
-	public void adjustPoints(int delta) {
-		m_Points += delta;
-	}
-	
-	public int getPoints() {
-		return m_Points;
-	}
-	
-	public boolean isColliding() {
-		return m_Colliding;
-	}
-	
-	public void setColliding(boolean colliding) {
-		m_Colliding = colliding;
-	}	
 }

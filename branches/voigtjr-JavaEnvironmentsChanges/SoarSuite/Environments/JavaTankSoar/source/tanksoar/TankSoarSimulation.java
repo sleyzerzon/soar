@@ -18,7 +18,7 @@ public class TankSoarSimulation extends Simulation {
 	private static final String kParamColor = "color";
 	private static final String kDefaultMap = "default.tmap";
 		
-	private World m_World;
+	private TankSoarWorld m_World;
 
 	public TankSoarSimulation(String settingsFile, boolean quiet) {		
 		
@@ -89,7 +89,7 @@ public class TankSoarSimulation extends Simulation {
 		setCurrentMap(getMapPath() + getDefaultMap());
 
 		// Load default world
-		m_World = new World(this);
+		m_World = new TankSoarWorld(this);
 		setWorldManager(m_World);
 		resetSimulation(false);
 		
@@ -121,7 +121,7 @@ public class TankSoarSimulation extends Simulation {
 		fireSimulationEvent(SimulationListener.kAgentCreatedEvent);   	
     }
         
-	public World getWorld() {
+	public TankSoarWorld getWorld() {
 		return m_World;
 	}
 	
