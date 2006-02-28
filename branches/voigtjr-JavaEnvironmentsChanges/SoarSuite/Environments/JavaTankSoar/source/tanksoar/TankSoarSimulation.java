@@ -131,6 +131,10 @@ public class TankSoarSimulation extends Simulation implements SimulationManager 
 		return getTankSoarWorld();
 	}
 	
+    public World getWorld() {
+		return getTankSoarWorld();
+	}
+	
 	public void changeMap(String map) {
 		setCurrentMap(map);
 		resetSimulation(true);
