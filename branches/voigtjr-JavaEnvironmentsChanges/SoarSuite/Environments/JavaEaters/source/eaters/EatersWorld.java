@@ -8,7 +8,7 @@ import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class EatersWorld implements WorldManager {
+public class EatersWorld extends World implements WorldManager {
 	private static final String kTagEatersWorld = "eaters-world";
 
 	private static final String kTagFood = "food";
@@ -95,19 +95,16 @@ public class EatersWorld implements WorldManager {
 		}
 	}
 	
-	public class Cell {
-		private int m_Type;
+	public class EatersCell extends Cell {
 		private Eater m_Eater;
-		private boolean m_Collision = false;
-		private boolean m_Modified = true;
 		
-		public Cell(int foodIndex) {
+		public EatersCell(int foodIndex) {
 			m_Type = foodIndex + kReservedIDs;
 			++m_FoodCount;
 			m_ScoreCount += m_Food[foodIndex].getValue();
 		}
 
-		public Cell(String name) throws Exception {
+		public EatersCell(String name) throws Exception {
 			if (name.equalsIgnoreCase(kTypeWall)) {
 				m_Type = kWallInt;
 				return;
@@ -125,23 +122,6 @@ public class EatersWorld implements WorldManager {
 				}
 			}
 			throw new Exception("Invalid type name: " + name);
-		}
-		
-		void setCollision(boolean setting) {
-			m_Collision = setting;
-			m_Modified = true;
-		}
-		
-		public boolean checkCollision() {
-			return m_Collision;
-		}
-		
-		void clearModified() {
-			m_Modified = false;
-		}
-		
-		public boolean isModified() {
-			return m_Modified;
 		}
 		
 		public boolean isWall() {
@@ -217,25 +197,19 @@ public class EatersWorld implements WorldManager {
 			}
 			return null;
 		}
-		
-		public String toString() {
-			return Integer.toString(m_Type);
-		}	
 	}
 
-	private Logger m_Logger = Logger.logger;
-	private int m_WorldWidth;
-	private int m_WorldHeight;
-	private Cell[][] m_World;
+	private EatersCell[][] m_World;
 	private Food[] m_Food;
-	private EatersSimulation m_Simulation;
 	private int m_FoodCount;
 	private int m_ScoreCount;
+	private EatersSimulation m_Simulation;
 	private Eater[] m_Eaters;
 	private boolean m_PrintedStats = false;
 	private ArrayList m_Collisions;
 	
 	public EatersWorld(EatersSimulation simulation) {
+		super(simulation);
 		m_Simulation = simulation;
 	}
 	
@@ -281,7 +255,7 @@ public class EatersWorld implements WorldManager {
 			boolean randomFood = cells.getAttributeBooleanDefault(kParamRandomFood, false);
 						
 			// Create map array
-			m_World = new Cell[m_WorldHeight][m_WorldWidth];
+			m_World = new EatersCell[m_WorldHeight][m_WorldWidth];
 			
 			// Reset food
 			m_FoodCount = 0;
@@ -319,7 +293,7 @@ public class EatersWorld implements WorldManager {
 			//String rowString = new String();
 			for (int col = 0; col < m_WorldWidth; ++col) {
 				try {
-					m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
+					m_World[row][col] = new EatersCell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
 					if (!m_World[row][col].isWall()) {
 						m_World[row][col].removeFood();
 						m_World[row][col] = null;
@@ -336,12 +310,12 @@ public class EatersWorld implements WorldManager {
 	private void generateRandomWalls() throws Exception {
 		// Generate perimiter wall
 		for (int row = 0; row < m_WorldWidth; ++row) {
-			m_World[row][0] = new Cell(kTypeWall);
-			m_World[row][m_WorldHeight - 1] = new Cell(kTypeWall);
+			m_World[row][0] = new EatersCell(kTypeWall);
+			m_World[row][m_WorldHeight - 1] = new EatersCell(kTypeWall);
 		}
 		for (int col = 1; col < m_WorldHeight - 1; ++col) {
-			m_World[0][col] = new Cell(kTypeWall);
-			m_World[m_WorldWidth - 1][col] = new Cell(kTypeWall);
+			m_World[0][col] = new EatersCell(kTypeWall);
+			m_World[m_WorldWidth - 1][col] = new EatersCell(kTypeWall);
 		}
 		
 		Random random = new Random();
@@ -354,7 +328,7 @@ public class EatersWorld implements WorldManager {
 						probability = kHigherProbability;					
 					}
 					if (random.nextDouble() < probability) {
-						m_World[row][col] = new Cell(kTypeWall);
+						m_World[row][col] = new EatersCell(kTypeWall);
 					}
 					probability = kLowProbability;
 				}
@@ -363,7 +337,7 @@ public class EatersWorld implements WorldManager {
 	}
 	
 	private boolean noWallsOnCorners(int row, int col) {
-		Cell cell = m_World[row + 1][col + 1];
+		EatersCell cell = m_World[row + 1][col + 1];
 		if (cell != null) {
 			return false;
 		}
@@ -386,7 +360,7 @@ public class EatersWorld implements WorldManager {
 	}
 	
 	private boolean wallOnAnySide(int row, int col) {
-		Cell cell = m_World[row + 1][col];
+		EatersCell cell = m_World[row + 1][col];
 		if (cell != null) {
 			return true;
 		}
@@ -414,7 +388,7 @@ public class EatersWorld implements WorldManager {
 			for (int col = 0; col < m_WorldWidth; ++col) {
 				if (m_World[row][col] == null) {						
 					try {
-						m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
+						m_World[row][col] = new EatersCell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
 						//rowString += m_World[row][col];
 					} catch (Exception e) {
 						throw new Exception("Error (generateFoodFromXML) on row: " + row + ", column: " + col);
@@ -430,18 +404,10 @@ public class EatersWorld implements WorldManager {
 		for (int row = 1; row < m_WorldWidth - 1; ++row) {
 			for (int col = 1; col < m_WorldHeight - 1; ++col) {
 				if (m_World[row][col] == null) {
-					m_World[row][col] = new Cell(random.nextInt(m_Food.length));
+					m_World[row][col] = new EatersCell(random.nextInt(m_Food.length));
 				}
 			}
 		}		
-	}
-	
-	public int getWidth() {
-		return this.m_WorldWidth;
-	}
-	
-	public int getHeight() {
-		return this.m_WorldHeight;
 	}
 	
 	public Food getFood(int x, int y) {
@@ -595,11 +561,11 @@ public class EatersWorld implements WorldManager {
 		}
 	}
 	
-	public Cell getCell(Point location) {
+	public EatersCell getCell(Point location) {
 		return m_World[location.y][location.x];
 	}
 	
-	public Cell getCell(int x, int y) {
+	public EatersCell getCell(int x, int y) {
 		return m_World[y][x];
 	}
 	
@@ -610,14 +576,6 @@ public class EatersWorld implements WorldManager {
 				m_Eaters[i].adjustPoints(f.getValue());
 			}
 		}
-	}
-	
-	private boolean isInBounds(Point location) {
-		return isInBounds(location.x, location.y);
-	}
-
-	private boolean isInBounds(int x, int y) {
-		return (x >= 0) && (y >= 0) && (x < m_WorldWidth) && (y < m_WorldWidth);
 	}
 	
 	private void updateEaterInput() {

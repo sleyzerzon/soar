@@ -66,7 +66,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 		x /= m_CellSize;
 		y /= m_CellSize;
 		EatersWorld world = m_Simulation.getWorld();
-		EatersWorld.Cell cell = world.getCell(x, y);
+		EatersWorld.EatersCell cell = world.getCell(x, y);
 		if (cell.isEater()) {
 			return cell.getEater();
 		}
@@ -116,7 +116,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 					yDraw = y;
 				}
 				
-				EatersWorld.Cell cell = world.getCell(x, y);
+				EatersWorld.EatersCell cell = world.getCell(x, y);
 				if (!cell.isModified() && m_Painted) {
 					continue;
 				}
