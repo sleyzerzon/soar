@@ -71,11 +71,11 @@ public class VisualWorld extends Canvas implements PaintListener {
 	}
 	
 	public int getWidth() {
-		return m_CellSize * m_Simulation.getWorld().getWidth();
+		return m_CellSize * m_Simulation.getEatersWorld().getWidth();
 	}
 	
 	public int getHeight() {
-		return m_CellSize * m_Simulation.getWorld().getHeight();
+		return m_CellSize * m_Simulation.getEatersWorld().getHeight();
 	}
 	
 	public int getMiniWidth() {
@@ -93,7 +93,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 	Eater getEaterAtPixel(int x, int y) {
 		x /= m_CellSize;
 		y /= m_CellSize;
-		EatersWorld world = m_Simulation.getWorld();
+		EatersWorld world = m_Simulation.getEatersWorld();
 		EatersWorld.EatersCell cell = world.getCell(x, y);
 		if (cell.isEater()) {
 			return cell.getEater();
@@ -108,7 +108,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 			setRepaint();
 		}
 		
-		EatersWorld world = m_Simulation.getWorld();
+		EatersWorld world = m_Simulation.getEatersWorld();
 		GC gc = e.gc;		
         gc.setForeground(EatersWindowManager.black);
 		gc.setLineWidth(1);

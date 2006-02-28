@@ -4,7 +4,7 @@ import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class EatersSimulation extends Simulation {
+public class EatersSimulation extends Simulation implements SimulationManager {
 	public static final int kMaxEaters = 8;	
 	
 	public static final String kProjectFolder = "JavaEaters";
@@ -19,7 +19,7 @@ public class EatersSimulation extends Simulation {
 	private static final String kParamColor = "color";
 	private static final String kDefaultMap = "default.emap";
 		
-	private EatersWorld m_World;
+	private EatersWorld m_EatersWorld;
 
 	public EatersSimulation(String settingsFile, boolean quiet) {	
 		super(kProjectFolder);
@@ -91,14 +91,14 @@ public class EatersSimulation extends Simulation {
 		setCurrentMap(getMapPath() + getDefaultMap());
 
 		// Load default world
-		m_World = new EatersWorld(this);
-		setWorldManager(m_World);
+		m_EatersWorld = new EatersWorld(this);
+		setWorldManager(m_EatersWorld);
 		resetSimulation(false);
 		
 		// add initial eaters
 		if (initialNames != null) {
 			for (int i = 0; i < initialNames.length; ++i) {
-				createEater(initialNames[i], getAgentPath() + initialProductions[i], initialColors[i]);
+				createEntity(initialNames[i], getAgentPath() + initialProductions[i], initialColors[i]);
 			}
 		}
 		
@@ -108,7 +108,7 @@ public class EatersSimulation extends Simulation {
 		}
 	}
 	
-    public void createEater(String name, String productions, String color) {
+    public void createEntity(String name, String productions, String color) {
     	if (name == null || productions == null) {
     		fireErrorMessage("Failed to create agent, name, productions or color null.");
     		return;
@@ -118,13 +118,17 @@ public class EatersSimulation extends Simulation {
 		if (agent == null) {
 			return;
 		}
-		m_World.createEater(agent, productions, color);
+		m_EatersWorld.createEater(agent, productions, color);
 		spawnDebugger(name);		
 		fireSimulationEvent(SimulationListener.kAgentCreatedEvent);   	
     }
         
-	public EatersWorld getWorld() {
-		return m_World;
+    public EatersWorld getEatersWorld() {
+    	return m_EatersWorld;
+    }
+    
+    public WorldManager getWorldManager() {
+		return getEatersWorld();
 	}
 	
 	public void changeMap(String map) {
@@ -137,7 +141,7 @@ public class EatersSimulation extends Simulation {
     		m_Logger.log("Asked to destroy null agent, ignoring.");
     		return;
 		}	
-		m_World.destroyEater(eater);
+		m_EatersWorld.destroyEater(eater);
 		fireSimulationEvent(SimulationListener.kAgentDestroyedEvent);
 	}
 	

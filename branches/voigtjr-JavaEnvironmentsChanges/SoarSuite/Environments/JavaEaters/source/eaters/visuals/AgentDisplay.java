@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.*;
 
 import eaters.*;
 
+import simulation.visuals.*;
 import utilities.*;
 
 public class AgentDisplay extends Composite {
@@ -55,7 +56,7 @@ public class AgentDisplay extends Composite {
 		m_NewAgentButton.setText("New");
 		m_NewAgentButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				new CreateEaterDialog(parent.getShell(), m_Simulation).open();
+				new CreateAgentDialog(parent.getShell(), m_Simulation).open();
 			}
 		});
 		
@@ -80,7 +81,7 @@ public class AgentDisplay extends Composite {
 				}
 				
 				// Risking null exception here, but that should not be possible ;)
-				m_Simulation.createEater(color, m_SelectedEater.getProductions(), color);
+				m_Simulation.createEntity(color, m_SelectedEater.getProductions(), color);
 			}
 		});
 		
@@ -174,7 +175,7 @@ public class AgentDisplay extends Composite {
 	}
 	
 	void updateEaterList() {
-		m_Eaters = m_Simulation.getWorld().getEaters();
+		m_Eaters = m_Simulation.getEatersWorld().getEaters();
 		m_AgentTable.removeAll();
 		boolean foundSelected = false;
 		

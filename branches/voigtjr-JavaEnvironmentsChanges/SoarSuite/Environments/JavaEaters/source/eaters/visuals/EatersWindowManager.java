@@ -93,8 +93,8 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		gd = new GridData();
 		m_AgentDisplay.setLayoutData(gd);
 		
-		VisualWorld.remapFoodColors(m_Simulation.getWorld().getFood());
-		VisualWorld.remapEaterColors(m_Simulation.getWorld().getEaters());
+		VisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
+		VisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
 
 		m_Simulation.addSimulationListener(this);
 
@@ -187,7 +187,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 			updateWorldGroup();
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			VisualWorld.remapFoodColors(m_Simulation.getWorld().getFood());
+			VisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.worldChangeEvent();
@@ -196,7 +196,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		case SimulationListener.kAgentCreatedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			VisualWorld.remapEaterColors(m_Simulation.getWorld().getEaters());
+			VisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
@@ -205,7 +205,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		case SimulationListener.kAgentDestroyedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			VisualWorld.remapEaterColors(m_Simulation.getWorld().getEaters());
+			VisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
 			return;
@@ -217,8 +217,8 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 	}
 	
 	void updateFoodAndScoreCount() {
-		m_FoodCount.setText(Integer.toString(m_Simulation.getWorld().getFoodCount()));
-		m_ScoreCount.setText(Integer.toString(m_Simulation.getWorld().getScoreCount()));
+		m_FoodCount.setText(Integer.toString(m_Simulation.getEatersWorld().getFoodCount()));
+		m_ScoreCount.setText(Integer.toString(m_Simulation.getEatersWorld().getScoreCount()));
 	}
 
 	public void simulationEventHandler(final int type) {

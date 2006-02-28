@@ -710,5 +710,9 @@ public class EatersWorld extends World implements WorldManager {
 	public Eater[] getEaters() {
 		return m_Eaters;
 	}
+	
+	public WorldEntity[] getEntities() {
+		return getEaters();
+	}
 }
 

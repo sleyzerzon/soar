@@ -15,8 +15,8 @@ public class EatersSimulationButtons extends SimulationButtons {
 	
 	void updateButtons() {
 		boolean running = m_Simulation.isRunning();
-		boolean done = (m_Simulation.getWorld().getFoodCount() == 0);
-		boolean eaters = (m_Simulation.getWorld().getEaters() != null);
+		boolean done = (m_Simulation.getEatersWorld().getFoodCount() == 0);
+		boolean eaters = (m_Simulation.getEatersWorld().getEaters() != null);
 		
         m_RunButton.setEnabled(!running && !done && eaters);
         m_StopButton.setEnabled(running);
