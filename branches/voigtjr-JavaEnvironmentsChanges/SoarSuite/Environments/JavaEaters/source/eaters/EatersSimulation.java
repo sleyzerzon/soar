@@ -138,15 +138,5 @@ public class EatersSimulation extends Simulation implements SimulationManager {
 	public void changeMap(String map) {
 		setCurrentMap(map);
 		resetSimulation(true);
-	}
-
-	public void destroyEntity(WorldEntity entity) {
-		if (entity == null) {
-    		m_Logger.log("Asked to destroy null entity, ignoring.");
-    		return;
-		}	
-		m_EatersWorld.destroyEntity(entity);
-		fireSimulationEvent(SimulationListener.kAgentDestroyedEvent);
-	}
-	
+	}	
 }

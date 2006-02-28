@@ -480,7 +480,7 @@ public class EatersWorld extends World implements WorldManager {
 		}
 	}
 	
-	void destroyEntity(WorldEntity entity) {
+	public void destroyEntity(WorldEntity entity) {
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			if (m_Eaters[i].getName() == entity.getName()) {
 				destroyEater(m_Eaters[i]);
