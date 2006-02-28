@@ -25,23 +25,23 @@ public class Eater {
 	public final static String kSouth = "south";
 	public final static String kWest = "west";
 	
-	Logger m_Logger = Logger.logger;
-	Agent m_Agent;
-	String m_Name;
-	int m_Score = 0;
-	Point m_Location;
-	String m_ColorString;
-	Color m_Color;
-	String m_Facing;
-	String m_Productions;
-	boolean m_Colliding;
+	private Logger m_Logger = Logger.logger;
+	private Agent m_Agent;
+	private String m_Name;
+	private int m_Points = 0;
+	private Point m_Location;
+	private String m_ColorString;
+	private Color m_Color;
+	private String m_Facing;
+	private String m_Productions;
+	private boolean m_Colliding = false;
 	
-	StringElement m_DirectionWME;
-	StringElement m_NameWME;
-	IntElement m_ScoreWME;
-	IntElement m_xWME;
-	IntElement m_yWME;
-	SoarCell[][] m_Cells = new SoarCell[(kEaterVision * 2 ) + 1][(kEaterVision * 2 ) + 1];
+	private StringElement m_DirectionWME;
+	private StringElement m_NameWME;
+	private IntElement m_ScoreWME;
+	private IntElement m_xWME;
+	private IntElement m_yWME;
+	private SoarCell[][] m_Cells = new SoarCell[(kEaterVision * 2 ) + 1][(kEaterVision * 2 ) + 1];
 	
 	class SoarCell {
 		Identifier me;
@@ -68,7 +68,7 @@ public class Eater {
 		
 		m_DirectionWME = m_Agent.CreateStringWME(eater, kDirectionID, kNorth);
 		m_NameWME = m_Agent.CreateStringWME(eater, kNameID, m_Name);
-		m_ScoreWME = m_Agent.CreateIntWME(eater, kScoreID, m_Score);
+		m_ScoreWME = m_Agent.CreateIntWME(eater, kScoreID, m_Points);
 		m_xWME = m_Agent.CreateIntWME(eater, kxID, m_Location.x);
 		m_yWME = m_Agent.CreateIntWME(eater, kyID, m_Location.y);
 		
@@ -100,15 +100,12 @@ public class Eater {
 		return m_Name;
 	}
 	
-	public int getScore() {
-		return m_Score;
+	public int getPoints() {
+		return m_Points;
 	}
 	
-	public void setScore(int score) {
-		if (score < 0) {
-			score = 0;
-		}
-		m_Score = score;
+	public void setPoints(int score) {
+		m_Points = score;
 	}
 	
 	public Color getColor() {
@@ -183,7 +180,7 @@ public class Eater {
 		m_Agent.Update(m_DirectionWME, m_Facing);
 		m_Agent.Update(m_xWME, m_Location.x);
 		m_Agent.Update(m_yWME, m_Location.y);
-		m_Agent.Update(m_ScoreWME, m_Score);
+		m_Agent.Update(m_ScoreWME, m_Points);
 		m_Agent.Commit();
 	}
 	
@@ -231,8 +228,8 @@ public class Eater {
 		return m_Location;
 	}
 	
-	public void adjustScore(int delta) {
-		m_Score += delta;
+	public void adjustPoints(int delta) {
+		m_Points += delta;
 	}
 	public void setLocation(Point location) {
 		m_Location = location;

@@ -472,7 +472,7 @@ public class World implements WorldManager {
 			m_Eaters[i].setLocation(location);
 			// Put eater on map, ignore food
 			getCell(location).setEater(m_Eaters[i]);
-			m_Eaters[i].setScore(0);
+			m_Eaters[i].setPoints(0);
 			m_Eaters[i].initSoar();
 		}
 		updateEaterInput();
@@ -587,10 +587,10 @@ public class World implements WorldManager {
 				}
 				m_Eaters[i].setLocation(newLocation);
 				if (move.jump) {
-					m_Eaters[i].adjustScore(kJumpPenalty);
+					m_Eaters[i].adjustPoints(kJumpPenalty);
 				}
 			} else {
-				m_Eaters[i].adjustScore(kWallPenalty);
+				m_Eaters[i].adjustPoints(kWallPenalty);
 			}
 		}
 	}
@@ -607,7 +607,7 @@ public class World implements WorldManager {
 		for (int i = 0; i < m_Eaters.length; ++i) {
 			Food f = getCell(m_Eaters[i].getLocation()).setEater(m_Eaters[i]);
 			if (f != null) {
-				m_Eaters[i].adjustScore(f.getValue());
+				m_Eaters[i].adjustPoints(f.getValue());
 			}
 		}
 	}
@@ -643,7 +643,7 @@ public class World implements WorldManager {
 				m_PrintedStats = true;
 				m_Logger.log("All of the food is gone.");
 				for (int i = 0; i < m_Eaters.length; ++i) {
-					m_Logger.log(m_Eaters[i].getName() + ": " + m_Eaters[i].getScore());
+					m_Logger.log(m_Eaters[i].getName() + ": " + m_Eaters[i].getPoints());
 				}
 			}
 			return;
@@ -721,12 +721,12 @@ public class World implements WorldManager {
 			// Redistribute wealth
 			int cash = 0;			
 			for (int i = 0; i < collidees.length; ++i) {
-				cash += collidees[i].getScore();
+				cash += collidees[i].getPoints();
 			}			
 			cash /= collidees.length;
 			m_Logger.log("Cash to each: " + cash);
 			for (int i = 0; i < collidees.length; ++i) {
-				collidees[i].setScore(cash);
+				collidees[i].setPoints(cash);
 			}
 			
 			// Remove from former location (only one of these for all eaters)
@@ -737,7 +737,7 @@ public class World implements WorldManager {
 				collidees[i].setLocation(findStartingLocation());
 				Food f = getCell(collidees[i].getLocation()).setEater(collidees[i]);
 				if (f != null) {
-					collidees[i].adjustScore(f.getValue());
+					collidees[i].adjustPoints(f.getValue());
 				}
 			}
 		}

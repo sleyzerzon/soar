@@ -168,7 +168,7 @@ public class AgentDisplay extends Composite {
 		
 		if (m_Items != null) {
 			for (int i = 0; i < m_Items.length; ++i) {
-				m_Items[i].setText(1, Integer.toString(m_Eaters[i].getScore()));
+				m_Items[i].setText(1, Integer.toString(m_Eaters[i].getPoints()));
 			}
 		}
 	}
@@ -184,7 +184,7 @@ public class AgentDisplay extends Composite {
 			m_Items = new TableItem[m_Eaters.length];
 			for (int i = 0; i < m_Eaters.length; ++i) {
 				m_Items[i] = new TableItem(m_AgentTable, SWT.NONE);
-				m_Items[i].setText(new String[] {m_Eaters[i].getName(), Integer.toString(m_Eaters[i].getScore())});
+				m_Items[i].setText(new String[] {m_Eaters[i].getName(), Integer.toString(m_Eaters[i].getPoints())});
 				if (m_SelectedEater == m_Eaters[i]) {
 					foundSelected = true;
 					m_AgentTable.setSelection(i);
