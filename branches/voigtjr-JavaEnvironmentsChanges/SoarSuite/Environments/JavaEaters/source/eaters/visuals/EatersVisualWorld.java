@@ -11,7 +11,6 @@ import simulation.visuals.*;
 
 public class EatersVisualWorld extends VisualWorld implements PaintListener {
 	static HashMap m_FoodColors;
-	static HashMap m_EaterColors;
 	
 	public static void remapFoodColors(EatersWorld.Food[] food) {
 		if (food == null) {
@@ -22,17 +21,6 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 		for (int i = 0; i < food.length; ++i) {
 			m_FoodColors.put(food[i], EatersWindowManager.getColor(food[i].getColor()));
 		}
-	}
-	
-	public static void remapEaterColors(Eater[] eaters) {
-		if (eaters == null) {
-			m_EaterColors = null;
-			return;
-		}
-		m_EaterColors = new HashMap();
-		for (int i = 0; i < eaters.length; ++i) {
-			m_EaterColors.put(eaters[i], EatersWindowManager.getColor(eaters[i].getColor()));
-		}		
 	}
 	
 	EatersSimulation m_Simulation;
@@ -129,7 +117,7 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 					
 					Eater eater = cell.getEater();
 					
-					gc.setBackground((Color)m_EaterColors.get(eater));
+					gc.setBackground((Color)m_EntityColors.get(eater));
 					gc.fillOval(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
 					gc.setBackground(EatersWindowManager.widget_background);
 					
