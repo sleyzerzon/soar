@@ -52,7 +52,7 @@ public class WorldEntity {
 		m_Points = score;
 	}
 	
-	public String getColorString() {
+	public String getColor() {
 		return m_ColorString;
 	}
 	
