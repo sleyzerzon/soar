@@ -7,6 +7,7 @@ import utilities.*;
 public class EatersSimulation extends Simulation {
 	public static final int kMaxEaters = 8;	
 	
+	public static final String kProjectFolder = "JavaEaters";
 	private static final String kTagEaters = "eaters";
 	private static final String kTagSimulation = "simulation";
 	private static final String kParamDebuggers = "debuggers";
@@ -20,7 +21,8 @@ public class EatersSimulation extends Simulation {
 		
 	private EatersWorld m_World;
 
-	public EatersSimulation(String settingsFile, boolean quiet) {		
+	public EatersSimulation(String settingsFile, boolean quiet) {	
+		super(kProjectFolder);
 		
 		// Log the settings file
 		m_Logger.log("Settings file: " + settingsFile);
