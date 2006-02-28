@@ -3,10 +3,10 @@ package eaters;
 import org.eclipse.swt.graphics.*;
 
 import eaters.visuals.*;
+import simulation.*;
 import sml.*;
-import utilities.*;
 
-public class Eater {
+public class Eater extends WorldEntity {
 	public final static int kEaterVision = 2;
 	
 	public final static String kEaterID = "eater";
@@ -25,19 +25,7 @@ public class Eater {
 	public final static String kSouth = "south";
 	public final static String kWest = "west";
 	
-	private Logger m_Logger = Logger.logger;
-	private Agent m_Agent;
-	private String m_Name;
-	private int m_Points = 0;
-	private Point m_Location;
-	private String m_ColorString;
-	private Color m_Color;
-	private String m_Facing;
-	private String m_Productions;
-	private boolean m_Colliding = false;
-	
 	private StringElement m_DirectionWME;
-	private StringElement m_NameWME;
 	private IntElement m_ScoreWME;
 	private IntElement m_xWME;
 	private IntElement m_yWME;
@@ -56,21 +44,15 @@ public class Eater {
 	}
 	
 	public Eater(Agent agent, String productions, String color, Point location) {
-		m_Agent = agent;
-		m_Location = location;
-		m_ColorString = color;
-		m_Productions = productions;
+		super(agent, productions, color, location);
 
-		m_Name = m_Agent.GetAgentName();
-		m_Logger.log("Created eater: " + m_Name);
-		
 		Identifier eater = m_Agent.CreateIdWME(m_Agent.GetInputLink(), kEaterID);
 		
 		m_DirectionWME = m_Agent.CreateStringWME(eater, kDirectionID, kNorth);
-		m_NameWME = m_Agent.CreateStringWME(eater, kNameID, m_Name);
-		m_ScoreWME = m_Agent.CreateIntWME(eater, kScoreID, m_Points);
-		m_xWME = m_Agent.CreateIntWME(eater, kxID, m_Location.x);
-		m_yWME = m_Agent.CreateIntWME(eater, kyID, m_Location.y);
+		m_Agent.CreateStringWME(eater, kNameID, getName());
+		m_ScoreWME = m_Agent.CreateIntWME(eater, kScoreID, getPoints());
+		m_xWME = m_Agent.CreateIntWME(eater, kxID, getLocation().x);
+		m_yWME = m_Agent.CreateIntWME(eater, kyID, getLocation().y);
 		
 		for (int i = 0; i < m_Cells.length; ++i) {
 			for (int j = 0; j < m_Cells.length; ++j) {
@@ -83,48 +65,13 @@ public class Eater {
 		
 		m_Agent.Commit();
 	}
-	
-	public boolean isColliding() {
-		return m_Colliding;
-	}
-	
-	public void setColliding(boolean colliding) {
-		m_Colliding = colliding;
-	}
-	
-	public String getProductions() {
-		return m_Productions;
-	}
-	
-	public String getName() {
-		return m_Name;
-	}
-	
-	public int getPoints() {
-		return m_Points;
-	}
-	
-	public void setPoints(int score) {
-		m_Points = score;
-	}
-	
+
+	// TODO: if window manager gets abstracted, this can go up a level
 	public Color getColor() {
 		if (m_Color == null) {
-			m_Color = EatersWindowManager.getColor(m_ColorString);
+			m_Color = EatersWindowManager.getColor(getColorString());
 		}
 		return m_Color;
-	}
-	
-	public String getColorString() {
-		return m_ColorString;
-	}
-	
-	public Agent getAgent() {
-		return m_Agent;
-	}
-	
-	public void initSoar() {
-		m_Agent.InitSoar();
 	}
 	
 	void createView(int x, int y) {
@@ -170,17 +117,17 @@ public class Eater {
 	public void updateInput(World world) {
 		int xView, yView;
 		for (int x = 0; x < m_Cells.length; ++x) {
-			xView = x - Eater.kEaterVision + m_Location.x;
+			xView = x - Eater.kEaterVision + getLocation().x;
 			for (int y = 0; y < m_Cells[x].length; ++y) {
-				yView = y - Eater.kEaterVision + m_Location.y;
+				yView = y - Eater.kEaterVision + getLocation().y;
 				String content = world.getContentNameByLocation(xView, yView);
 				m_Agent.Update(m_Cells[x][y].content, content);
 			}
 		}
 		m_Agent.Update(m_DirectionWME, m_Facing);
-		m_Agent.Update(m_xWME, m_Location.x);
-		m_Agent.Update(m_yWME, m_Location.y);
-		m_Agent.Update(m_ScoreWME, m_Points);
+		m_Agent.Update(m_xWME, getLocation().x);
+		m_Agent.Update(m_yWME, getLocation().y);
+		m_Agent.Update(m_ScoreWME, getPoints());
 		m_Agent.Commit();
 	}
 	
@@ -191,12 +138,12 @@ public class Eater {
 	
 	public MoveInfo getMove() {
 		if (m_Agent.GetNumberCommands() == 0) {
-			m_Logger.log(m_Name + " issued no command.");
+			m_Logger.log(getName() + " issued no command.");
 			return null;
 		}
 		
 		if (m_Agent.GetNumberCommands() > 1) {
-			m_Logger.log(m_Name + " issued more than one command, using first.");
+			m_Logger.log(getName() + " issued more than one command, using first.");
 		}
 
 		MoveInfo move = new MoveInfo();
@@ -222,21 +169,6 @@ public class Eater {
 		
 		m_Logger.log("Improperly formatted command: " + kMoveID);
 		return null;
-	}
-	
-	public Point getLocation() {
-		return m_Location;
-	}
-	
-	public void adjustPoints(int delta) {
-		m_Points += delta;
-	}
-	public void setLocation(Point location) {
-		m_Location = location;
-	}
-	
-	public String getFacing() {
-		return m_Facing;
 	}
 }
 
