@@ -1,7 +1,5 @@
 package simulation;
 
-import java.util.*;
-
 import org.eclipse.swt.graphics.*;
 
 import utilities.*;
@@ -10,12 +8,6 @@ public class World {
 	protected Logger m_Logger = Logger.logger;
 	protected int m_WorldWidth;
 	protected int m_WorldHeight;
-	
-	private Simulation m_Simulation;
-	
-	public World(Simulation simulation) {
-		m_Simulation = simulation;
-	}
 	
 	public int getWidth() {
 		return this.m_WorldWidth;
