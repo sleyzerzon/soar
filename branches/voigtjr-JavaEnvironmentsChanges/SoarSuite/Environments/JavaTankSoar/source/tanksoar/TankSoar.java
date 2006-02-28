@@ -1,13 +1,9 @@
 package tanksoar;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
+import tanksoar.visuals.*;
 import utilities.*;
-
-//import tanksoar.visuals.TankSoarWindowManager;
 
 public class TankSoar {
 	
@@ -48,7 +44,7 @@ public class TankSoar {
 		
 		// Initialize the window manager, if applicable.
 		if(!m_Quiet) {
-//			new TankSoarWindowManager(simulation);
+			new TankSoarWindowManager(simulation);
 		}
 		System.exit(0);
 	}
