@@ -2,14 +2,12 @@ package eaters.visuals;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 
 import eaters.*;
 import simulation.*;
 import simulation.visuals.*;
-import utilities.*;
 
 public class EatersWindowManager extends WindowManager implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
