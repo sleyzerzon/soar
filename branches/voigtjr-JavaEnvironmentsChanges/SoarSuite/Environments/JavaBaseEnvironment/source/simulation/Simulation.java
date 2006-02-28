@@ -7,7 +7,6 @@ import utilities.*;
 
 public abstract class Simulation implements Runnable, Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
 	public static final String kGroupFolder = "Environments";
-	public static final String kProjectFolder = "JavaEaters";
 	public static final String kAgentFolder = "agents";
 	public static final String kMapFolder = "maps";
 	public static final int kDebuggerTimeoutSeconds = 15;	
@@ -30,7 +29,7 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 	private ArrayList m_AddSimulationListeners = new ArrayList();
 	private ArrayList m_RemoveSimulationListeners = new ArrayList();
 	
-	protected Simulation() {
+	protected Simulation(String projectFolder) {
 		// Initialize Soar
 		// Create kernel
 		try {
@@ -56,7 +55,7 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 		m_BasePath += System.getProperty("file.separator")
 		+ ".." + System.getProperty("file.separator") 
 		+ kGroupFolder + System.getProperty("file.separator") 
-		+ kProjectFolder + System.getProperty("file.separator");
+		+ projectFolder + System.getProperty("file.separator");
 
 		m_Logger.log("Base path: " + m_BasePath);
 		
