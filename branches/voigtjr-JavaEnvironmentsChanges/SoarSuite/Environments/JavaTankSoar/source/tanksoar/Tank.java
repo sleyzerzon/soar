@@ -4,8 +4,7 @@ import org.eclipse.swt.graphics.*;
 
 import simulation.*;
 import sml.*;
-import utilities.Logger;
-import tanksoar.visuals.*;
+import utilities.*;
 
 public class Tank  extends WorldEntity {
 	
@@ -186,13 +185,6 @@ public class Tank  extends WorldEntity {
 	
 	public void updateInput(TankSoarWorld world) {
 		
-	}
-	
-	public Color getColor() {
-		if (m_Color == null) {
-			m_Color = TankSoarWindowManager.getColor(getColorString());
-		}
-		return m_Color;
 	}
 	
 	public MoveInfo getMove() {
