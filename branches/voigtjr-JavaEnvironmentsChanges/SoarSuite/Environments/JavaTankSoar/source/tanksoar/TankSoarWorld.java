@@ -8,7 +8,7 @@ import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class TankSoarWorld implements WorldManager {
+public class TankSoarWorld extends World implements WorldManager {
 	private static final String kTagTankSoarWorld = "tanksoar-world";
 
 	private static final String kTagCells = "cells";
@@ -27,13 +27,10 @@ public class TankSoarWorld implements WorldManager {
 	private static final int kWallPenalty = -100;
 	private static final int kWinningPoints = -100;
 
-	public class Cell {
-		private int m_Type;
-		private boolean m_Collision = false;
-		private boolean m_Modified = true;
+	public class TankSoarCell extends Cell {
 		private Tank m_Tank;
 		
-		public Cell(String name) throws Exception {
+		public TankSoarCell(String name) throws Exception {
 			if (name.equalsIgnoreCase(kTypeWall)) {
 				m_Type = kWallInt;
 				return;
@@ -45,19 +42,6 @@ public class TankSoarWorld implements WorldManager {
 			}
 		}
 
-		void setCollision(boolean setting) {
-			m_Collision = setting;
-			m_Modified = true;
-		}
-		
-		public boolean checkCollision() {
-			return m_Collision;
-		}
-		
-		void clearModified() {
-			m_Modified = false;
-		}
-		
 		public boolean removeTank() {
 			if (m_Type != kTankInt) {
 				return false;
@@ -92,12 +76,9 @@ public class TankSoarWorld implements WorldManager {
 		}
 	}
 	
-	private Logger m_Logger = Logger.logger;
 	private TankSoarSimulation m_Simulation;
-	private Cell[][] m_World;
+	private TankSoarCell[][] m_World;
 	private boolean m_PrintedStats;
-	private int m_WorldWidth;
-	private int m_WorldHeight;
 	private Tank[] m_Tanks;
 	private ArrayList m_Collisions;
 
@@ -125,7 +106,7 @@ public class TankSoarWorld implements WorldManager {
 			m_WorldHeight = cells.getAttributeIntThrows(kParamWorldHeight);
 			
 			// Create map array
-			m_World = new Cell[m_WorldHeight][m_WorldWidth];
+			m_World = new TankSoarCell[m_WorldHeight][m_WorldWidth];
 			
 			// generate world
 			generateWorldFromXML(cells);
@@ -146,7 +127,7 @@ public class TankSoarWorld implements WorldManager {
 			//String rowString = new String();
 			for (int col = 0; col < m_WorldWidth; ++col) {
 				try {
-					m_World[row][col] = new Cell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
+					m_World[row][col] = new TankSoarCell(cells.getChild(row).getChild(col).getAttributeThrows(kParamType));
 					//rowString += m_World[row][col];
 				} catch (Exception e) {
 					throw new Exception("Error (generateWorldFromXML) on row: " + row + ", column: " + col);
@@ -189,11 +170,11 @@ public class TankSoarWorld implements WorldManager {
 		}
 	}
 	
-	public Cell getCell(Point location) {
+	public TankSoarCell getCell(Point location) {
 		return m_World[location.y][location.x];
 	}
 	
-	public Cell getCell(int x, int y) {
+	public TankSoarCell getCell(int x, int y) {
 		return m_World[y][x];
 	}
 	
@@ -421,14 +402,6 @@ public class TankSoarWorld implements WorldManager {
 		for (int i = 0; i < m_Tanks.length; ++i) {
 			m_Tanks[i].setColliding(false);
 		}		
-	}
-	
-	private boolean isInBounds(Point location) {
-		return isInBounds(location.x, location.y);
-	}
-
-	private boolean isInBounds(int x, int y) {
-		return (x >= 0) && (y >= 0) && (x < m_WorldWidth) && (y < m_WorldWidth);
 	}
 	
 	public boolean noAgents() {
