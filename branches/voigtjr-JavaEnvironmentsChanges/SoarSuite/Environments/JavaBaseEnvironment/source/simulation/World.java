@@ -8,7 +8,7 @@ public class World {
 	protected Logger m_Logger = Logger.logger;
 	protected int m_WorldWidth;
 	protected int m_WorldHeight;
-	
+
 	public int getWidth() {
 		return this.m_WorldWidth;
 	}
