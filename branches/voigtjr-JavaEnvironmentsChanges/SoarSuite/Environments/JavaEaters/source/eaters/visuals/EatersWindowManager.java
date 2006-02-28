@@ -7,85 +7,27 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 
 import eaters.*;
-import simulation.SimulationListener;
+import simulation.*;
+import simulation.visuals.*;
 import utilities.*;
 
-public class EatersWindowManager extends Thread implements SimulationListener {
+public class EatersWindowManager extends WindowManager implements SimulationListener {
 	public static final int kMainMapCellSize = 20;
 	public static final String kFoodRemaining = "Food remaining: ";
 	public static final String kScoreRemaining = "Points remaining: ";
-	public static final String kMapPrefix = "Map: ";
-	public static final String kColors[] = { "red", "blue", "purple", "yellow", "orange", "black", "green", "white" };
-	
-	public static Color white;
-	public static Color blue;
-	public static Color red;
-	public static Color widget_background;
-	public static Color yellow;
-	public static Color orange;
-	public static Color black;
-	public static Color green;
-	public static Color purple;
 
-	public static void initColors(Display d) {
-	    white = d.getSystemColor(SWT.COLOR_WHITE);
-		widget_background = d.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		blue = d.getSystemColor(SWT.COLOR_BLUE);
-		red = d.getSystemColor(SWT.COLOR_RED);
-		yellow = d.getSystemColor(SWT.COLOR_YELLOW);
-		green = d.getSystemColor(SWT.COLOR_GREEN);
-		purple = d.getSystemColor(SWT.COLOR_DARK_MAGENTA);
-		orange = new Color(d, 255, 127, 0);
-		black = d.getSystemColor(SWT.COLOR_BLACK);
-	}
-	
-	public static Color getColor(String color) {
-		if (color.equalsIgnoreCase("white")) {
-			return white;
-		}
-		if (color.equalsIgnoreCase("blue")) {
-			return blue;
-		}
-		if (color.equalsIgnoreCase("red")) {
-			return red;
-		}
-		if (color.equalsIgnoreCase("yellow")) {
-			return yellow;
-		}
-		if (color.equalsIgnoreCase("green")) {
-			return green;
-		}
-		if (color.equalsIgnoreCase("purple")) {
-			return purple;
-		}
-		if (color.equalsIgnoreCase("orange")) {
-			return orange;
-		}
-		if (color.equalsIgnoreCase("black")) {
-			return black;
-		}
-		return null;
-	}
-
-	Logger m_Logger = Logger.logger;
-	Display m_Display;
-	Shell m_Shell;
 	EatersSimulation m_Simulation;
 	final Label m_FoodCount;
 	final Label m_ScoreCount;
-	final SimButtons m_SimButtons;
+	final EatersSimulationButtons m_SimButtons;
 	final MapButtons m_MapButtons;
 	final VisualWorld m_VisualWorld;
 	final AgentDisplay m_AgentDisplay;
 	final Group m_WorldGroup;
 	
 	public EatersWindowManager(EatersSimulation simulation) {
-		m_Display = new Display();
 		m_Simulation = simulation;
-
-		initColors(m_Display);
 		
-		m_Shell = new Shell(m_Display, SWT.BORDER | SWT.CLOSE | SWT.MIN | SWT.TITLE);
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 2;
 		m_Shell.setLayout(gl);
@@ -116,7 +58,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		group1.setLayoutData(gd);
 		group1.setText("Simulation");
 		group1.setLayout(new FillLayout());
-		m_SimButtons = new SimButtons(group1, m_Simulation);
+		m_SimButtons = new EatersSimulationButtons(group1, m_Simulation);
 		
 		Group group2 = new Group(m_Shell, SWT.NONE);
 		gd = new GridData();
