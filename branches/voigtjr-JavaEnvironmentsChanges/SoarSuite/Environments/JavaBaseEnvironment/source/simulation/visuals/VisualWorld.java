@@ -1,5 +1,7 @@
 package simulation.visuals;
 
+import java.util.HashMap;
+
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 
@@ -7,6 +9,19 @@ import utilities.*;
 import simulation.*;
 
 public class VisualWorld extends Canvas {
+	protected static HashMap m_EntityColors;
+	
+	public static void remapEaterColors(WorldEntity[] entities) {
+		if (entities == null) {
+			m_EntityColors = null;
+			return;
+		}
+		m_EntityColors = new HashMap();
+		for (int i = 0; i < entities.length; ++i) {
+			m_EntityColors.put(entities[i], WindowManager.getColor(entities[i].getColor()));
+		}		
+	}
+
 	public static boolean internalRepaint = false;
 	
 	protected Logger m_Logger = Logger.logger;
