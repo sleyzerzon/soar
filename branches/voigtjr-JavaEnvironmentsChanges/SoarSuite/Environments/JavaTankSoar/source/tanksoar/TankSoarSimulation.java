@@ -7,6 +7,7 @@ import utilities.*;
 public class TankSoarSimulation extends Simulation {
 	public static final int kMaxTanks = 8;
 	
+	public static final String kProjectFolder = "JavaTankSoar";
 	private static final String kTagTankSoar = "tanksoar";
 	private static final String kTagSimulation = "simulation";
 	private static final String kParamDebuggers = "debuggers";
@@ -21,6 +22,7 @@ public class TankSoarSimulation extends Simulation {
 	private TankSoarWorld m_World;
 
 	public TankSoarSimulation(String settingsFile, boolean quiet) {		
+		super(kProjectFolder);
 		
 		// Log the settings file
 		m_Logger.log("Settings file: " + settingsFile);
