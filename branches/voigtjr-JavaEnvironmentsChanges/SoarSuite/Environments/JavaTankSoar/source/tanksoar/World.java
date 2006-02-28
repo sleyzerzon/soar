@@ -23,6 +23,9 @@ public class World implements WorldManager {
 	private static final int kWallInt = 0;
 	private static final int kEmptyInt = 1;
 	private static final int kTankInt = 2;
+	
+	private static final int kWallPenalty = -100;
+	private static final int kWinningPoints = -100;
 
 	public class Cell {
 		private int m_Type;
@@ -83,6 +86,10 @@ public class World implements WorldManager {
 			m_Type = kTankInt;
 			m_Tank = tank;
 		}
+		
+		public Tank getTank() {
+			return m_Tank;
+		}
 	}
 	
 	private Logger m_Logger = Logger.logger;
@@ -92,6 +99,7 @@ public class World implements WorldManager {
 	private int m_WorldWidth;
 	private int m_WorldHeight;
 	private Tank[] m_Tanks;
+	private ArrayList m_Collisions;
 
 	public World(TankSoarSimulation simulation) {
 		m_Simulation = simulation;
@@ -157,7 +165,7 @@ public class World implements WorldManager {
 			m_Tanks[i].setLocation(location);
 			// Put tank on map
 			getCell(location).setTank(m_Tanks[i]);
-			m_Tanks[i].setScore(0);
+			m_Tanks[i].setPoints(0);
 			m_Tanks[i].initSoar();
 		}
 		updateTankInput();
@@ -255,18 +263,20 @@ public class World implements WorldManager {
 			}
 		}			
 		
-		// TODO: check goal condition
-//		if (getFoodCount() <= 0) {
-//			if (!m_PrintedStats) {
-//				m_Simulation.stopSimulation();
-//				m_PrintedStats = true;
-//				m_Logger.log("All of the food is gone.");
-//				for (int i = 0; i < m_Tanks.length; ++i) {
-//					m_Logger.log(m_Tanks[i].getName() + ": " + m_Tanks[i].getScore());
-//				}
-//			}
-//			return;
-//		}
+		for (int i = 0; i < m_Tanks.length; ++i) {
+			if (m_Tanks[i].getPoints() >= kWinningPoints) {
+				// Goal acheived
+				if (!m_PrintedStats) {
+					m_Simulation.stopSimulation();
+					m_PrintedStats = true;
+					m_Logger.log(m_Tanks[i].getName() + " is the winning tank.");
+					for (int j = 0; j < m_Tanks.length; ++j) {
+						m_Logger.log(m_Tanks[j].getName() + ": " + m_Tanks[j].getPoints());
+					}
+				}
+				return;
+			}
+		}
 
 		if (m_Tanks == null) {
 			m_Logger.log("Update called with no tanks.");
@@ -279,45 +289,146 @@ public class World implements WorldManager {
 		updateTankInput();
 	}
 	
-	////////////////// HERE
 	private void moveTanks() {
 		for (int i = 0; i < m_Tanks.length; ++i) {
 			Tank.MoveInfo move = m_Tanks[i].getMove();
 			if (move == null) {
 				continue;
 			}
-
-			Point oldLocation = m_Tanks[i].getLocation();
-			Point newLocation;
-			int distance = move.jump ? 2 : 1;
-			if (move.direction.equalsIgnoreCase(Eater.kNorth)) {
-				newLocation = new Point(oldLocation.x, oldLocation.y - distance);
-			} else if (move.direction.equalsIgnoreCase(Eater.kEast)) {
-				newLocation = new Point(oldLocation.x + distance, oldLocation.y);
-				
-			} else if (move.direction.equalsIgnoreCase(Eater.kSouth)) {
-				newLocation = new Point(oldLocation.x, oldLocation.y + distance);
-				
-			} else if (move.direction.equalsIgnoreCase(Eater.kWest)) {
-				newLocation = new Point(oldLocation.x - distance, oldLocation.y);
-				
-			} else {
-				m_Logger.log("Invalid move direction: " + move.direction);
-				return;
-			}
 			
-			if (isInBounds(newLocation) && !getCell(newLocation).isWall()) {
-				if (!getCell(oldLocation).removeEater()) {
-					m_Logger.log("Warning: moving eater " + m_Tanks[i].getName() + " not at old location " + oldLocation);
+			if (move.move) {
+				Point oldLocation = m_Tanks[i].getLocation();
+				Point newLocation;
+				if (move.moveDirection.equalsIgnoreCase(Tank.kNorth)) {
+					newLocation = new Point(oldLocation.x, oldLocation.y - 1);
+				} else if (move.moveDirection.equalsIgnoreCase(Tank.kEast)) {
+					newLocation = new Point(oldLocation.x + 1, oldLocation.y);
+					
+				} else if (move.moveDirection.equalsIgnoreCase(Tank.kSouth)) {
+					newLocation = new Point(oldLocation.x, oldLocation.y + 1);
+					
+				} else if (move.moveDirection.equalsIgnoreCase(Tank.kWest)) {
+					newLocation = new Point(oldLocation.x - 1, oldLocation.y);
+					
+				} else {
+					m_Logger.log("Invalid move direction: " + move.moveDirection);
+					return;
 				}
-				m_Tanks[i].setLocation(newLocation);
-				if (move.jump) {
-					m_Tanks[i].adjustScore(kJumpPenalty);
+				
+				if (isInBounds(newLocation) && !getCell(newLocation).isWall()) {
+					if (!getCell(oldLocation).removeTank()) {
+						m_Logger.log("Warning: moving tank " + m_Tanks[i].getName() + " not at old location " + oldLocation);
+					}
+					m_Tanks[i].setLocation(newLocation);
+				} else {
+					m_Tanks[i].adjustPoints(kWallPenalty);
 				}
-			} else {
-				m_Tanks[i].adjustScore(kWallPenalty);
 			}
 		}
+	}
+	
+	private void updateMap() {
+		for (int i = 0; i < m_Tanks.length; ++i) {
+			// TODO: Grab missiles
+			getCell(m_Tanks[i].getLocation()).setTank(m_Tanks[i]);
+		}
+	}
+	
+	private void handleCollisions() {
+		// generate collision groups
+		ArrayList currentCollision = null;
+		
+		for (int i = 0; i < m_Tanks.length; ++i) {
+			for (int j = i+1; j < m_Tanks.length; ++j) {
+				// only check eaters who aren't already colliding
+				if (m_Tanks[i].isColliding()) {
+					continue;
+				}
+				
+				if (m_Tanks[i].getLocation().equals(m_Tanks[j].getLocation())) {
+					
+					// Create data structures
+					if (m_Collisions == null) {
+						m_Collisions = new ArrayList();
+					}
+					if (currentCollision == null) {
+						currentCollision = new ArrayList();
+						
+						// Add first agent to current collision
+						currentCollision.add(m_Tanks[i]);
+						
+						// Flipping collision flag unnecessary as first agent will not be traversed again
+
+						// Flip collision flag for cell
+						getCell(m_Tanks[i].getLocation()).setCollision(true);
+
+						m_Logger.log("Starting collision group at " + m_Tanks[i].getLocation());
+					}
+					
+					// Add second agent to current collision
+					currentCollision.add(m_Tanks[j]);
+
+					// Flip collision flag for second agent
+					m_Tanks[j].setColliding(true);
+				}
+			}
+			// add current collision to collisions
+			if (currentCollision != null) {
+				m_Collisions.add(currentCollision);
+				currentCollision = null;
+			}
+		}
+		
+		// if there are not collisions, we're done
+		if (m_Collisions == null) {
+			return;
+		}
+		
+		// process collision groups
+		for (int group = 0; group < m_Collisions.size(); ++group) {
+			// Retrieve collision group
+			currentCollision = (ArrayList)m_Collisions.get(group);
+			Tank[] collidees = (Tank[])currentCollision.toArray(new Tank[0]);
+			
+			m_Logger.log("Processing collision group " + group + " with " + collidees.length + " collidees.");
+			
+			// Redistribute wealth
+			int cash = 0;			
+			for (int i = 0; i < collidees.length; ++i) {
+				cash += collidees[i].getPoints();
+			}			
+			cash /= collidees.length;
+			m_Logger.log("Cash to each: " + cash);
+			for (int i = 0; i < collidees.length; ++i) {
+				collidees[i].setPoints(cash);
+			}
+			
+			// Remove from former location (only one of these for all eaters)
+			getCell(collidees[0].getLocation()).removeTank();
+
+			// Find new locations, update map
+			for (int i = 0; i < collidees.length; ++i) {
+				collidees[i].setLocation(findStartingLocation());
+				// TODO: missiles
+				getCell(collidees[i].getLocation()).setTank(collidees[i]);
+			}
+		}
+		
+		// clear collision groups
+		m_Collisions = null;
+		
+		// clear colliding flags
+		for (int i = 0; i < m_Tanks.length; ++i) {
+			m_Tanks[i].setColliding(false);
+		}		
+	}
+	
+	private boolean isInBounds(Point location) {
+		return isInBounds(location.x, location.y);
+	}
+
+	private boolean isInBounds(int x, int y) {
+		return (x >= 0) && (y >= 0) && (x < m_WorldWidth) && (y < m_WorldWidth);
 	}
 	
 	public boolean noAgents() {

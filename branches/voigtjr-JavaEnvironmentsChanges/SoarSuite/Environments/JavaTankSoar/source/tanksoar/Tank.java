@@ -3,6 +3,8 @@ package tanksoar;
 import org.eclipse.swt.graphics.*;
 
 import sml.*;
+import utilities.Logger;
+import tanksoar.visuals.*;
 
 public class Tank {
 	
@@ -60,47 +62,204 @@ public class Tank {
 	private final static String kOff = "off";
 	private final static String kOn = "on";
 	
-	// The different types of commands
-	public final static int kFireInt = 0;
-	public final static int kMoveInt = 1;
-	public final static int kRadarInt = 2;
-	public final static int kRadarPowerInt = 3;
-	public final static int kRotateInt = 4;
-	public final static int kShieldsInt = 5;
-	
-	public Tank(Agent agent, String productions, String color, Point location) {
+	public class MoveInfo {
+		boolean move;
+		String moveDirection;
 		
+		boolean rotate;
+		String rotateDirection;
+		
+		boolean fire;
+		
+		boolean radar;
+		boolean radarSetting;
+		
+		boolean radarPower;
+		int radarPowerSetting;
+		
+		boolean shields;
+		boolean shieldsSetting;
+		
+		public MoveInfo() {
+			reset();
+		}
+		
+		public void reset() {
+			move = rotate = fire = radar = radarPower = shields = false;
+		}
 	}
 	
-	public void setScore(int newScore) {
+	private boolean m_Colliding = false;
+	private int m_Points = 0;
+	private MoveInfo m_LastMove = new MoveInfo();
+	private Agent m_Agent;
+	private Point m_Location;
+	private String m_ColorString;
+	private String m_Productions;
+	private String m_Name;
+	private Logger m_Logger = Logger.logger;
+	private Color m_Color;
+	
+	private final static int kInitialEnergy = 1000;
+	private final static int kInitialHealth = 1000;
+	private final static int kInitialMissiles = 15;
+	
+	private StringElement m_BlockedBackwardWME;
+	private StringElement m_BlockedForwardWME;
+	private StringElement m_BlockedLeftWME;
+	private StringElement m_BlockedRightWME;
+	private IntElement m_ClockWME;
+	private StringElement m_DirectionWME;
+	private IntElement m_EnergyWME;
+	private StringElement m_EnergyRechargerWME;
+	private IntElement m_HealthWME;
+	private StringElement m_HealthRechargerWME;
+	private StringElement m_IncomingBackwardWME;
+	private StringElement m_IncomingForwardWME;
+	private StringElement m_IncomingLeftWME;
+	private StringElement m_IncomingRightWME;
+	private IntElement m_MissilesWME;
+	private StringElement m_MyColorWME;
+	private Identifier m_RadarWME;
+	private IntElement m_RadarDistanceWME;
+	private IntElement m_RadarSettingWME;
+	private StringElement m_RadarStatusWME;
+	private FloatElement m_RandomWME;
+	private StringElement m_ResurrectWME;
+	private StringElement m_RWavesBackwardWME;
+	private StringElement m_RWavesForwardWME;
+	private StringElement m_RWavesLeftWME;
+	private StringElement m_RWavesRightWME;
+	private StringElement m_ShieldStatusWME;
+	private Identifier m_SmellWME;
+	private StringElement m_SoundWME;
+	private IntElement m_xWME;
+	private IntElement m_yWME;
+	
+	public Tank(Agent agent, String productions, String color, Point location) {
+		m_Agent = agent;
+		m_Location = location;
+		m_ColorString = color;
+		m_Productions = productions;
+
+		m_Name = m_Agent.GetAgentName();
+		m_Logger.log("Created eater: " + m_Name);
 		
+		// Create input link
+		
+		Identifier inputLink = m_Agent.GetInputLink();
+		
+		Identifier blocked = m_Agent.CreateIdWME(inputLink, kBlockedID);
+		m_BlockedBackwardWME = m_Agent.CreateStringWME(blocked, kBackwardID, kNo);
+		m_BlockedForwardWME = m_Agent.CreateStringWME(blocked, kForwardID, kNo);
+		m_BlockedLeftWME = m_Agent.CreateStringWME(blocked, kLeftID, kNo);
+		m_BlockedRightWME = m_Agent.CreateStringWME(blocked, kRightID, kNo);
+		
+		// TODO: initial clock setting depends on world count
+		m_ClockWME = m_Agent.CreateIntWME(inputLink, kClockID, 1);
+		// TODO: initial direction setting?
+		m_DirectionWME = m_Agent.CreateStringWME(inputLink, kDirectionID, kNorth); 
+		m_EnergyWME = m_Agent.CreateIntWME(inputLink, kEnergyID, kInitialEnergy);
+		m_EnergyRechargerWME = m_Agent.CreateStringWME(inputLink, kEnergyRechargerID, kNo);
+		m_HealthWME = m_Agent.CreateIntWME(inputLink, kHealthID, kInitialHealth);
+		m_HealthRechargerWME = m_Agent.CreateStringWME(inputLink, kHealthRechargerID, kNo);
+		
+		Identifier incoming = m_Agent.CreateIdWME(inputLink, kIncomingID);
+		m_IncomingBackwardWME = m_Agent.CreateStringWME(incoming, kBackwardID, kNo);
+		m_IncomingForwardWME = m_Agent.CreateStringWME(incoming, kForwardID, kNo);
+		m_IncomingLeftWME = m_Agent.CreateStringWME(incoming, kLeftID, kNo);
+		m_IncomingRightWME = m_Agent.CreateStringWME(incoming, kRightID, kNo);
+		
+		m_MissilesWME = m_Agent.CreateIntWME(inputLink, kMissilesID, kInitialMissiles);
+		m_MyColorWME = m_Agent.CreateStringWME(inputLink, kMyColorID, color);
+		
+		m_RadarWME = m_Agent.CreateIdWME(inputLink, kRadarID);
+		// TODO: Substructure depends on situation
+		
+		m_RadarDistanceWME = m_Agent.CreateIntWME(inputLink, kRadarDistanceID, 0);
+		m_RadarSettingWME = m_Agent.CreateIntWME(inputLink, kRadarSettingID, 0);
+		m_RadarStatusWME = m_Agent.CreateStringWME(inputLink, kRadarStatusID, kOff);
+		m_RandomWME = m_Agent.CreateFloatWME(inputLink, kRandomID, 0);
+		m_ResurrectWME = m_Agent.CreateStringWME(inputLink, kResurrectID, kNo);
+		
+		Identifier rwaves = m_Agent.CreateIdWME(inputLink, kRWavesID);
+		m_RWavesBackwardWME = m_Agent.CreateStringWME(rwaves, kBackwardID, kNo);
+		m_RWavesForwardWME = m_Agent.CreateStringWME(rwaves, kForwardID, kNo);
+		m_RWavesLeftWME = m_Agent.CreateStringWME(rwaves, kLeftID, kNo);
+		m_RWavesRightWME = m_Agent.CreateStringWME(rwaves, kRightID, kNo);
+		
+		m_ShieldStatusWME = m_Agent.CreateStringWME(inputLink, kShieldStatusID, kOff);
+		
+		m_SmellWME = m_Agent.CreateIdWME(inputLink, kSmellID);
+		// TODO: Substructure depends on situation
+
+		m_SoundWME = m_Agent.CreateStringWME(inputLink, kSoundID, kSilentID);
+		m_xWME = m_Agent.CreateIntWME(inputLink, kXID, location.x);
+		m_yWME = m_Agent.CreateIntWME(inputLink, kYID, location.y);
+						
+		m_Agent.Commit();		
 	}
 	
 	public void initSoar() {
-		
+		m_Agent.InitSoar();
 	}
 	
 	public void setLocation(Point location) {
-		
+		m_Location = location;
 	}
 	
 	public void updateInput(World world) {
 		
 	}
 	
+	public String getProductions() {
+		return m_Productions;
+	}
+	
 	public Point getLocation() {
-		return null;
+		return m_Location;
 	}
 	
-	public class MoveInfo {
-		int type;
-		String weapon; // fire (this is kind of unnecessary, missile only) 
-		String direction; // move, rotate
-		boolean toggle; // radar, shields
-		int setting; // radar-power
+	public Color getColor() {
+		if (m_Color == null) {
+			m_Color = TankSoarWindowManager.getColor(m_ColorString);
+		}
+		return m_Color;
 	}
 	
-	public MoveInfo[] getMoves() {
-		return null;
+	public String getColorString() {
+		return m_ColorString;
 	}
+	
+	public Agent getAgent() {
+		return m_Agent;
+	}
+	
+	public MoveInfo getMove() {
+		return m_LastMove;
+	}
+	
+	public String getName() {
+		return m_Name;
+	}	
+
+	public void setPoints(int score) {
+		m_Points = score;
+	}
+	
+	public void adjustPoints(int delta) {
+		m_Points += delta;
+	}
+	
+	public int getPoints() {
+		return m_Points;
+	}
+	
+	public boolean isColliding() {
+		return m_Colliding;
+	}
+	
+	public void setColliding(boolean colliding) {
+		m_Colliding = colliding;
+	}	
 }
