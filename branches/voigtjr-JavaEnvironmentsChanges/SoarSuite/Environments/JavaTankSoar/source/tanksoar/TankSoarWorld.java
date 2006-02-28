@@ -141,6 +141,16 @@ public class TankSoarWorld extends World implements WorldManager {
 		return m_Tanks;
 	}
 	
+	public void destroyEntity(WorldEntity entity) {
+		for (int i = 0; i < m_Tanks.length; ++i) {
+			if (m_Tanks[i].getName() == entity.getName()) {
+				destroyTank(m_Tanks[i]);
+				return;
+			}
+		}
+		m_Logger.log("Couldn't find entity name match for " + entity.getName() + ", ignoring.");
+	}
+	
 	public WorldEntity[] getEntities() {
 		return getTanks();
 	}
