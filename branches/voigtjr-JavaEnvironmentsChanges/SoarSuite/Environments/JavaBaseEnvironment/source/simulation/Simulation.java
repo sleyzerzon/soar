@@ -114,6 +114,16 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
     	return agent;
     }
         
+	public void destroyEntity(WorldEntity entity) {
+		if (entity == null) {
+    		m_Logger.log("Asked to destroy null entity, ignoring.");
+    		return;
+		}	
+		m_WorldManager.destroyEntity(entity);
+		m_Kernel.DestroyAgent(entity.getAgent());
+		fireSimulationEvent(SimulationListener.kAgentDestroyedEvent);
+	}
+	
 	public void setRuns(int runs) {
 		if (runs < 0) {
 			runs = -1;

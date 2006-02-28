@@ -6,4 +6,5 @@ public interface WorldManager {
 	public boolean noAgents();
 	public void shutdown();
 	public WorldEntity[] getEntities();
+	public void destroyEntity(WorldEntity entity);
 }
