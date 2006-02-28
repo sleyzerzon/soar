@@ -58,9 +58,9 @@ public class CreateAgentDialog extends Dialog {
 				fd.setFilterPath(m_Simulation.getAgentPath());
 				fd.setFilterExtensions(new String[] {"*.soar", "*.*"});
 				// TODO: these next commented out lines are going to cause a bug to reappear
-				//VisualWorld.internalRepaint = true;
+				VisualWorld.internalRepaint = true;
 				String productions = fd.open();
-				//VisualWorld.internalRepaint = false;
+				VisualWorld.internalRepaint = false;
 				if (productions != null) {
 					m_Productions = productions;
 					m_ProductionsLabel.setText(m_Productions.substring(m_Productions.lastIndexOf(System.getProperty("file.separator")) + 1));
