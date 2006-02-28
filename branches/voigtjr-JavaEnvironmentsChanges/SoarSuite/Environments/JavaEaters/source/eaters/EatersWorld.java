@@ -8,7 +8,7 @@ import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class World implements WorldManager {
+public class EatersWorld implements WorldManager {
 	private static final String kTagEatersWorld = "eaters-world";
 
 	private static final String kTagFood = "food";
@@ -235,7 +235,7 @@ public class World implements WorldManager {
 	private boolean m_PrintedStats = false;
 	private ArrayList m_Collisions;
 	
-	public World(EatersSimulation simulation) {
+	public EatersWorld(EatersSimulation simulation) {
 		m_Simulation = simulation;
 	}
 	

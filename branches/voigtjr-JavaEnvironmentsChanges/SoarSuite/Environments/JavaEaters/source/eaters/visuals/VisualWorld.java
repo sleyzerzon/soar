@@ -65,8 +65,8 @@ public class VisualWorld extends Canvas implements PaintListener {
 	Eater getEaterAtPixel(int x, int y) {
 		x /= m_CellSize;
 		y /= m_CellSize;
-		World world = m_Simulation.getWorld();
-		World.Cell cell = world.getCell(x, y);
+		EatersWorld world = m_Simulation.getWorld();
+		EatersWorld.Cell cell = world.getCell(x, y);
 		if (cell.isEater()) {
 			return cell.getEater();
 		}
@@ -80,7 +80,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 			setRepaint();
 		}
 		
-		World world = m_Simulation.getWorld();
+		EatersWorld world = m_Simulation.getWorld();
 		GC gc = e.gc;		
         gc.setForeground(EatersWindowManager.black);
 		gc.setLineWidth(1);
@@ -116,7 +116,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 					yDraw = y;
 				}
 				
-				World.Cell cell = world.getCell(x, y);
+				EatersWorld.Cell cell = world.getCell(x, y);
 				if (!cell.isModified() && m_Painted) {
 					continue;
 				}
@@ -155,7 +155,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 					}
 				} else {
 				
-					World.Food food = cell.getFood();
+					EatersWorld.Food food = cell.getFood();
 					
 					gc.setBackground(food.getColor());
 					
@@ -163,13 +163,13 @@ public class VisualWorld extends Canvas implements PaintListener {
 					switch (food.getShape()) {
 					default:
 						m_Logger.log("Invalid food shape '" + food.getShapeName() + "', using round.");
-					case World.Food.kRoundInt:
+					case EatersWorld.Food.kRoundInt:
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
 						break;
-					case World.Food.kSquareInt:
+					case EatersWorld.Food.kSquareInt:
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);

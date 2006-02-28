@@ -77,7 +77,7 @@ public class Eater extends WorldEntity {
 	void createView(int x, int y) {
 		if (x >= 0 && x <= 4 && y >=0 && y <= 4 && !m_Cells[x][y].iterated) {
 			m_Cells[x][y].iterated = true;
-			m_Cells[x][y].content = m_Agent.CreateStringWME(m_Cells[x][y].me, kContentID, World.kTypeEmpty);
+			m_Cells[x][y].content = m_Agent.CreateStringWME(m_Cells[x][y].me, kContentID, EatersWorld.kTypeEmpty);
 
 			if (x > 0) {
 				if (m_Cells[x - 1][y].me == null)
@@ -114,7 +114,7 @@ public class Eater extends WorldEntity {
 		}	
 	}
 	
-	public void updateInput(World world) {
+	public void updateInput(EatersWorld world) {
 		int xView, yView;
 		for (int x = 0; x < m_Cells.length; ++x) {
 			xView = x - Eater.kEaterVision + getLocation().x;

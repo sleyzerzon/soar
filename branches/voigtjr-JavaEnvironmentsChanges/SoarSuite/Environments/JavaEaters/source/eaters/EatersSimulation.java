@@ -18,7 +18,7 @@ public class EatersSimulation extends Simulation {
 	private static final String kParamColor = "color";
 	private static final String kDefaultMap = "default.emap";
 		
-	private World m_World;
+	private EatersWorld m_World;
 
 	public EatersSimulation(String settingsFile, boolean quiet) {		
 		
@@ -89,7 +89,7 @@ public class EatersSimulation extends Simulation {
 		setCurrentMap(getMapPath() + getDefaultMap());
 
 		// Load default world
-		m_World = new World(this);
+		m_World = new EatersWorld(this);
 		setWorldManager(m_World);
 		resetSimulation(false);
 		
@@ -121,7 +121,7 @@ public class EatersSimulation extends Simulation {
 		fireSimulationEvent(SimulationListener.kAgentCreatedEvent);   	
     }
         
-	public World getWorld() {
+	public EatersWorld getWorld() {
 		return m_World;
 	}
 	
