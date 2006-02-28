@@ -47,7 +47,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 				if (eater == null) {
 					return;
 				}
-				m_AgentDisplay.selectEater(eater);
+				m_AgentDisplay.selectEntity(eater);
 			}
 		});
 

@@ -476,8 +476,18 @@ public class EatersWorld extends World implements WorldManager {
 	
 	public void shutdown() {
 		while (m_Eaters != null) {
-			m_Simulation.destroyEater(m_Eaters[0]);
+			m_Simulation.destroyEntity(m_Eaters[0]);
 		}
+	}
+	
+	void destroyEntity(WorldEntity entity) {
+		for (int i = 0; i < m_Eaters.length; ++i) {
+			if (m_Eaters[i].getName() == entity.getName()) {
+				destroyEater(m_Eaters[i]);
+				return;
+			}
+		}
+		m_Logger.log("Couldn't find entity name match for " + entity.getName() + ", ignoring.");
 	}
 	
 	void destroyEater(Eater eater) {

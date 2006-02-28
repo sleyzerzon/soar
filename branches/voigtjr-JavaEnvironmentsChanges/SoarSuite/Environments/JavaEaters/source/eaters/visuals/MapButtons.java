@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.*;
 
 import eaters.*;
 
+import simulation.visuals.*;
 import utilities.*;
 
 public class MapButtons extends Composite {
@@ -29,9 +30,9 @@ public class MapButtons extends Composite {
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getMapPath());
 				fd.setFilterExtensions(new String[] {"*.emap", "*.*"});
-				EatersVisualWorld.internalRepaint = true;
+				VisualWorld.internalRepaint = true;
 				String map = fd.open();
-				EatersVisualWorld.internalRepaint = false;
+				VisualWorld.internalRepaint = false;
 				if (map != null) {
 					m_Simulation.changeMap(map);
 				}

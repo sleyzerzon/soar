@@ -5,13 +5,11 @@ import java.util.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.*;
 
 import eaters.*;
-import utilities.*;
+import simulation.visuals.*;
 
-public class EatersVisualWorld extends Canvas implements PaintListener {
-	static boolean internalRepaint = false;
+public class EatersVisualWorld extends VisualWorld implements PaintListener {
 	static HashMap m_FoodColors;
 	static HashMap m_EaterColors;
 	
@@ -37,45 +35,15 @@ public class EatersVisualWorld extends Canvas implements PaintListener {
 		}		
 	}
 	
-
-	Logger m_Logger = Logger.logger;
-	Display m_Display;
 	EatersSimulation m_Simulation;
-	int m_CellSize;
 	Point m_AgentLocation;
-	boolean m_Disabled = false;
-	boolean m_Painted = false;
-	int m_LastX = 0;
-	int m_LastY = 0;
 	
 	public EatersVisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
-		super(parent, style | SWT.NO_BACKGROUND);
+		super(parent, style, simulation, cellSize);
 		
-		m_Display = parent.getDisplay();
 		m_Simulation = simulation;
-		m_CellSize = cellSize;
 
 		addPaintListener(this);		
-	}
-	
-	public void setRepaint() {
-		m_Painted = false;
-	}
-	
-	public void disable() {
-		m_Disabled = true;
-	}
-	
-	public void enable() {
-		m_Disabled = false;
-	}
-	
-	public int getWidth() {
-		return m_CellSize * m_Simulation.getEatersWorld().getWidth();
-	}
-	
-	public int getHeight() {
-		return m_CellSize * m_Simulation.getEatersWorld().getHeight();
 	}
 	
 	public int getMiniWidth() {
