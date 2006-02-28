@@ -19,7 +19,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 	final Label m_ScoreCount;
 	final EatersSimulationButtons m_SimButtons;
 	final MapButtons m_MapButtons;
-	final VisualWorld m_VisualWorld;
+	final EatersVisualWorld m_VisualWorld;
 	final AgentDisplay m_AgentDisplay;
 	final Group m_WorldGroup;
 	
@@ -34,7 +34,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		
 		m_WorldGroup = new Group(m_Shell, SWT.NONE);
 		m_WorldGroup.setLayout(new FillLayout());
-		m_VisualWorld = new VisualWorld(m_WorldGroup, SWT.NONE, m_Simulation, kMainMapCellSize);
+		m_VisualWorld = new EatersVisualWorld(m_WorldGroup, SWT.NONE, m_Simulation, kMainMapCellSize);
 		updateWorldGroup();
 		gd = new GridData();
 		gd.widthHint = m_VisualWorld.getWidth();
@@ -91,8 +91,8 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		gd = new GridData();
 		m_AgentDisplay.setLayoutData(gd);
 		
-		VisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
-		VisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
+		EatersVisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
+		EatersVisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
 
 		m_Simulation.addSimulationListener(this);
 
@@ -185,7 +185,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 			updateWorldGroup();
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			VisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
+			EatersVisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.worldChangeEvent();
@@ -194,7 +194,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		case SimulationListener.kAgentCreatedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			VisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
+			EatersVisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
@@ -203,7 +203,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		case SimulationListener.kAgentDestroyedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			VisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
+			EatersVisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
 			return;

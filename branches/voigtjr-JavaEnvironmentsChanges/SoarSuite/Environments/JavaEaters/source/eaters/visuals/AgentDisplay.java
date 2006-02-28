@@ -20,7 +20,7 @@ public class AgentDisplay extends Composite {
 	Logger m_Logger = Logger.logger;
 	EatersSimulation m_Simulation;
 	Table m_AgentTable;
-	VisualWorld m_AgentWorld;
+	EatersVisualWorld m_AgentWorld;
 	Eater m_SelectedEater;
 	TableItem[] m_Items;
 	Eater[] m_Eaters;
@@ -133,7 +133,7 @@ public class AgentDisplay extends Composite {
 				updateButtons();
 			}
 		});
-		m_AgentWorld = new VisualWorld(m_Group, SWT.BORDER, m_Simulation, kAgentMapCellSize);
+		m_AgentWorld = new EatersVisualWorld(m_Group, SWT.BORDER, m_Simulation, kAgentMapCellSize);
 		gd = new GridData();
 		gd.heightHint = m_AgentWorld.getMiniHeight() + 4;
 		gd.widthHint = m_AgentWorld.getMiniWidth() + 4;		

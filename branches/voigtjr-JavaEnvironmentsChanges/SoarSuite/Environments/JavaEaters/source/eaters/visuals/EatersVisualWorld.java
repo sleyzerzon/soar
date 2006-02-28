@@ -10,7 +10,7 @@ import org.eclipse.swt.*;
 import eaters.*;
 import utilities.*;
 
-public class VisualWorld extends Canvas implements PaintListener {
+public class EatersVisualWorld extends Canvas implements PaintListener {
 	static boolean internalRepaint = false;
 	static HashMap m_FoodColors;
 	static HashMap m_EaterColors;
@@ -48,7 +48,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 	int m_LastX = 0;
 	int m_LastY = 0;
 	
-	public VisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
+	public EatersVisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
 		super(parent, style | SWT.NO_BACKGROUND);
 		
 		m_Display = parent.getDisplay();
