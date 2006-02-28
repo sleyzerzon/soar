@@ -151,6 +151,9 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		gd = new GridData();
 		m_AgentDisplay.setLayoutData(gd);
 		
+		VisualWorld.remapFoodColors(m_Simulation.getWorld().getFood());
+		VisualWorld.remapEaterColors(m_Simulation.getWorld().getEaters());
+
 		m_Simulation.addSimulationListener(this);
 
 		m_Shell.setText("Java Eaters");
@@ -242,6 +245,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 			updateWorldGroup();
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
+			VisualWorld.remapFoodColors(m_Simulation.getWorld().getFood());
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.worldChangeEvent();
@@ -250,6 +254,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		case SimulationListener.kAgentCreatedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
+			VisualWorld.remapEaterColors(m_Simulation.getWorld().getEaters());
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
@@ -258,6 +263,7 @@ public class EatersWindowManager extends Thread implements SimulationListener {
 		case SimulationListener.kAgentDestroyedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
+			VisualWorld.remapEaterColors(m_Simulation.getWorld().getEaters());
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
 			return;

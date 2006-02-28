@@ -2,7 +2,6 @@ package eaters;
 
 import org.eclipse.swt.graphics.*;
 
-import eaters.visuals.*;
 import simulation.*;
 import sml.*;
 
@@ -66,14 +65,6 @@ public class Eater extends WorldEntity {
 		m_Agent.Commit();
 	}
 
-	// TODO: if window manager gets abstracted, this can go up a level
-	public Color getColor() {
-		if (m_Color == null) {
-			m_Color = EatersWindowManager.getColor(getColorString());
-		}
-		return m_Color;
-	}
-	
 	void createView(int x, int y) {
 		if (x >= 0 && x <= 4 && y >=0 && y <= 4 && !m_Cells[x][y].iterated) {
 			m_Cells[x][y].iterated = true;

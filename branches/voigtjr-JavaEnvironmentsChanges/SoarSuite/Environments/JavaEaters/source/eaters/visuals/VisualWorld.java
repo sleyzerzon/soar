@@ -1,5 +1,7 @@
 package eaters.visuals;
 
+import java.util.*;
+
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
@@ -10,6 +12,32 @@ import utilities.*;
 
 public class VisualWorld extends Canvas implements PaintListener {
 	static boolean internalRepaint = false;
+	static HashMap m_FoodColors;
+	static HashMap m_EaterColors;
+	
+	public static void remapFoodColors(EatersWorld.Food[] food) {
+		if (food == null) {
+			m_FoodColors = null;
+			return;
+		}
+		m_FoodColors = new HashMap();
+		for (int i = 0; i < food.length; ++i) {
+			m_FoodColors.put(food[i], EatersWindowManager.getColor(food[i].getColor()));
+		}
+	}
+	
+	public static void remapEaterColors(Eater[] eaters) {
+		if (eaters == null) {
+			m_EaterColors = null;
+			return;
+		}
+		m_EaterColors = new HashMap();
+		for (int i = 0; i < eaters.length; ++i) {
+			m_EaterColors.put(eaters[i], EatersWindowManager.getColor(eaters[i].getColor()));
+		}		
+	}
+	
+
 	Logger m_Logger = Logger.logger;
 	Display m_Display;
 	EatersSimulation m_Simulation;
@@ -133,7 +161,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 					
 					Eater eater = cell.getEater();
 					
-					gc.setBackground(eater.getColor());
+					gc.setBackground((Color)m_EaterColors.get(eater));
 					gc.fillOval(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
 					gc.setBackground(EatersWindowManager.widget_background);
 					
@@ -157,7 +185,7 @@ public class VisualWorld extends Canvas implements PaintListener {
 				
 					EatersWorld.Food food = cell.getFood();
 					
-					gc.setBackground(food.getColor());
+					gc.setBackground((Color)m_FoodColors.get(food));
 					
 					// TODO: this is a lot of string compares, should be integer switch
 					switch (food.getShape()) {

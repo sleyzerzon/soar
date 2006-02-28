@@ -84,7 +84,7 @@ public class CreateEaterDialog extends Dialog {
 		Eater[] eaters = m_Simulation.getWorld().getEaters();
 		if (eaters != null) {
 			for (int i = 0; i < eaters.length; ++i) {
-				m_Color.remove(eaters[i].getColorString());
+				m_Color.remove(eaters[i].getColor());
 			}
 		}
 		m_Color.select(0);

@@ -68,7 +68,7 @@ public class AgentDisplay extends Composite {
 				for (int i = 0; i < EatersWindowManager.kColors.length; ++i) {
 					boolean notTaken = true;
 					for (int j = 0; j < m_Eaters.length; ++j) {
-						if (m_Eaters[j].getColorString().equalsIgnoreCase(EatersWindowManager.kColors[i])) {
+						if (m_Eaters[j].getColor().equalsIgnoreCase(EatersWindowManager.kColors[i])) {
 							notTaken = false;
 							break;
 						}

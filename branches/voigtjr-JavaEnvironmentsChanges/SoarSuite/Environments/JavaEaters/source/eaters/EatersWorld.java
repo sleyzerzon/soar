@@ -3,7 +3,6 @@ package eaters;
 import java.util.*;
 import org.eclipse.swt.graphics.*;
 
-import eaters.visuals.*;
 import simulation.*;
 import sml.*;
 import utilities.*;
@@ -50,7 +49,6 @@ public class EatersWorld extends World implements WorldManager {
 		int m_Value;
 		int m_Shape;
 		String m_ColorString;
-		Color m_Color;
 		
 		protected Logger m_Logger = Logger.logger;
 
@@ -63,6 +61,10 @@ public class EatersWorld extends World implements WorldManager {
 				m_Shape = kSquareInt;
 			}
 			m_ColorString = color;
+		}
+		
+		public String getColor() {
+			return m_ColorString;
 		}
 		
 		public String getName() {
@@ -85,13 +87,6 @@ public class EatersWorld extends World implements WorldManager {
 				return kSquare;
 			}
 			return null;
-		}
-		
-		public Color getColor() {
-			if (m_Color == null) {
-				m_Color = EatersWindowManager.getColor(m_ColorString);
-			}
-			return m_Color;
 		}
 	}
 	
@@ -407,6 +402,10 @@ public class EatersWorld extends World implements WorldManager {
 				}
 			}
 		}		
+	}
+	
+	public Food[] getFood() {
+		return m_Food;
 	}
 	
 	public Food getFood(int x, int y) {
