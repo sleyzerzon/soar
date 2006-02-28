@@ -4,7 +4,7 @@ import simulation.*;
 import sml.*;
 import utilities.*;
 
-public class TankSoarSimulation extends Simulation {
+public class TankSoarSimulation extends Simulation implements SimulationManager {
 	public static final int kMaxTanks = 8;
 	
 	public static final String kProjectFolder = "JavaTankSoar";
@@ -98,7 +98,7 @@ public class TankSoarSimulation extends Simulation {
 		// add initial eaters
 		if (initialNames != null) {
 			for (int i = 0; i < initialNames.length; ++i) {
-				createEater(initialNames[i], getAgentPath() + initialProductions[i], initialColors[i]);
+				createEntity(initialNames[i], getAgentPath() + initialProductions[i], initialColors[i]);
 			}
 		}
 		
@@ -108,7 +108,7 @@ public class TankSoarSimulation extends Simulation {
 		}
 	}
 	
-    public void createEater(String name, String productions, String color) {
+    public void createEntity(String name, String productions, String color) {
     	if (name == null || productions == null) {
     		fireErrorMessage("Failed to create agent, name, productions or color null.");
     		return;
@@ -123,8 +123,12 @@ public class TankSoarSimulation extends Simulation {
 		fireSimulationEvent(SimulationListener.kAgentCreatedEvent);   	
     }
         
-	public TankSoarWorld getWorld() {
+	public TankSoarWorld getTankSoarWorld() {
 		return m_World;
+	}
+	
+	public WorldManager getWorldManager() {
+		return getTankSoarWorld();
 	}
 	
 	public void changeMap(String map) {

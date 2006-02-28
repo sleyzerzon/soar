@@ -137,6 +137,14 @@ public class TankSoarWorld extends World implements WorldManager {
 		}
 	}
 	
+	public Tank[] getTanks() {
+		return m_Tanks;
+	}
+	
+	public WorldEntity[] getEntities() {
+		return getTanks();
+	}
+	
 	private void resetTanks() {
 		if (m_Tanks == null) {
 			return;
