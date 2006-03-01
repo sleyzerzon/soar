@@ -7,14 +7,11 @@ import org.eclipse.swt.widgets.*;
 
 import simulation.*;
 
-import utilities.*;
-
 public class MapButtons extends Composite {
 	private Simulation m_Simulation;
 	private Button m_ChangeMapButton;
-	private Logger m_Logger = Logger.logger;
 	
-	public MapButtons(Composite parent, Simulation simulation) {
+	public MapButtons(Composite parent, Simulation simulation, final String mapFilter) {
 		super(parent, SWT.NONE);
 		
 		m_Simulation = simulation;
@@ -28,7 +25,7 @@ public class MapButtons extends Composite {
 				FileDialog fd = new FileDialog(MapButtons.this.getShell(), SWT.OPEN);
 				fd.setText("Open");
 				fd.setFilterPath(m_Simulation.getMapPath());
-				fd.setFilterExtensions(new String[] {"*.emap", "*.*"});
+				fd.setFilterExtensions(new String[] {mapFilter, "*.*"});
 				VisualWorld.internalRepaint = true;
 				String map = fd.open();
 				VisualWorld.internalRepaint = false;
