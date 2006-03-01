@@ -134,9 +134,4 @@ public class EatersSimulation extends Simulation implements SimulationManager {
     public World getWorld() {
 		return getEatersWorld();
 	}
-	
-	public void changeMap(String map) {
-		setCurrentMap(map);
-		resetSimulation(true);
-	}	
 }
