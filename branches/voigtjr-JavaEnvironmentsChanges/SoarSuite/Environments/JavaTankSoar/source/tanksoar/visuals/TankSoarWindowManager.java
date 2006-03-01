@@ -16,7 +16,7 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 
 	TankSoarSimulation m_Simulation;
 	final TankSoarSimulationButtons m_SimButtons;
-//	final MapButtons m_MapButtons;
+	final MapButtons m_MapButtons;
 	final TankSoarVisualWorld m_VisualWorld;
 //	final AgentDisplay m_AgentDisplay;
 	final Group m_WorldGroup;
@@ -55,36 +55,14 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 		group1.setText("Simulation");
 		group1.setLayout(new FillLayout());
 		m_SimButtons = new TankSoarSimulationButtons(group1, m_Simulation);
-//		
-//		Group group2 = new Group(m_Shell, SWT.NONE);
-//		gd = new GridData();
-//		group2.setLayoutData(gd);
-//		group2.setText("Map");
-//		gl = new GridLayout();
-//		gl.numColumns = 2;
-//		group2.setLayout(gl);
-//		Label foodLabel = new Label(group2, SWT.NONE);
-//		gd = new GridData();
-//		foodLabel.setLayoutData(gd);
-//		foodLabel.setText(kFoodRemaining);
-//		m_FoodCount = new Label(group2, SWT.NONE);
-//		gd = new GridData();
-//		gd.widthHint = 50;
-//		m_FoodCount.setLayoutData(gd);
-//		Label scoreLabel = new Label(group2, SWT.NONE);
-//		gd = new GridData();
-//		scoreLabel.setLayoutData(gd);
-//		scoreLabel.setText(kScoreRemaining);
-//		m_ScoreCount = new Label(group2, SWT.NONE);
-//		gd = new GridData();
-//		gd.widthHint = 50;
-//		m_ScoreCount.setLayoutData(gd);
-//		updateFoodAndScoreCount();
-//		m_MapButtons = new MapButtons(group2, m_Simulation);
-//		gd = new GridData();
-//		gd.horizontalSpan = 2;
-//		m_MapButtons.setLayoutData(gd);
-//
+		
+		Group group2 = new Group(m_Shell, SWT.NONE);
+		gd = new GridData();
+		group2.setLayoutData(gd);
+		group2.setText("Map");
+		group2.setLayout(new FillLayout());
+		m_MapButtons = new MapButtons(group2, m_Simulation);
+
 //		m_AgentDisplay = new AgentDisplay(m_Shell, m_Simulation);
 //		gd = new GridData();
 //		m_AgentDisplay.setLayoutData(gd);
