@@ -251,6 +251,9 @@ public class TankSoarWorld extends World implements WorldManager {
 		}
 	}
 	
+	public boolean getVictoryCondition() {
+		return m_PrintedStats;
+	}
 	public void update() {
 		// reset modified flags, skipping edges
 		for (int y = 1; y < m_World.length - 1; ++y) {

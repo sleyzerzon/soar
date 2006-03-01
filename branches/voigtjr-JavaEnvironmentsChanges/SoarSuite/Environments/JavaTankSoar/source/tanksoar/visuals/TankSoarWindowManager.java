@@ -15,7 +15,7 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 	public static final String kScoreRemaining = "Points remaining: ";
 
 	TankSoarSimulation m_Simulation;
-//	final TankSoarSimulationButtons m_SimButtons;
+	final TankSoarSimulationButtons m_SimButtons;
 //	final MapButtons m_MapButtons;
 	final TankSoarVisualWorld m_VisualWorld;
 //	final AgentDisplay m_AgentDisplay;
@@ -49,12 +49,12 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 //			}
 //		});
 //
-//		Group group1 = new Group(m_Shell, SWT.NONE);
-//		gd = new GridData();
-//		group1.setLayoutData(gd);
-//		group1.setText("Simulation");
-//		group1.setLayout(new FillLayout());
-//		m_SimButtons = new EatersSimulationButtons(group1, m_Simulation);
+		Group group1 = new Group(m_Shell, SWT.NONE);
+		gd = new GridData();
+		group1.setLayoutData(gd);
+		group1.setText("Simulation");
+		group1.setLayout(new FillLayout());
+		m_SimButtons = new TankSoarSimulationButtons(group1, m_Simulation);
 //		
 //		Group group2 = new Group(m_Shell, SWT.NONE);
 //		gd = new GridData();
