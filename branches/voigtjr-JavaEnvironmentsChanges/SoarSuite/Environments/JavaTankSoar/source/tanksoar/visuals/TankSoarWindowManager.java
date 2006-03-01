@@ -133,14 +133,14 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 		switch (type) {
 		case SimulationListener.kStartEvent:
 //			m_SimButtons.updateButtons();
-//			m_MapButtons.updateButtons();
+			m_MapButtons.updateButtons();
 //			m_AgentDisplay.updateButtons();
 			return;
 			
 		case SimulationListener.kStopEvent:
 			m_VisualWorld.redraw();
 //			m_SimButtons.updateButtons();
-//			m_MapButtons.updateButtons();
+			m_MapButtons.updateButtons();
 //			m_AgentDisplay.updateButtons();
 			return;
 			
@@ -190,11 +190,6 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 		}		
 	}
 	
-//	void updateFoodAndScoreCount() {
-//		m_FoodCount.setText(Integer.toString(m_Simulation.getEatersWorld().getFoodCount()));
-//		m_ScoreCount.setText(Integer.toString(m_Simulation.getEatersWorld().getScoreCount()));
-//	}
-
 	public void simulationEventHandler(final int type) {
 		if (m_Display.isDisposed() || m_Shell.isDisposed()) {
 			return;
