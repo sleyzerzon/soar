@@ -6,10 +6,21 @@ import sml.*;
 import utilities.*;
 
 public class WorldEntity {
+	public final static String kNorth = "north";
+	public final static String kEast = "east";
+	public final static String kSouth = "south";
+	public final static String kWest = "west";
+	
+	public final static int kNorthInt = 0;
+	public final static int kEastInt = 1;
+	public final static int kSouthInt = 2;
+	public final static int kWestInt = 3;
+	
 	protected Logger m_Logger = Logger.logger;
 	protected Agent m_Agent;	
 	protected Color m_Color;
 	protected String m_Facing;
+	protected int m_FacingInt;
 	
 	private String m_Name;
 	private int m_Points = 0;
@@ -77,5 +88,25 @@ public class WorldEntity {
 	
 	public String getFacing() {
 		return m_Facing;
+	}
+	
+	protected void setFacingInt() {
+		if (m_Facing == null) {
+			m_FacingInt = 0;
+		}
+		
+		if (m_Facing.equalsIgnoreCase(WorldEntity.kNorth)) {
+			m_FacingInt = kNorthInt;
+		} else if (m_Facing.equalsIgnoreCase(WorldEntity.kSouth)) {
+			m_FacingInt = kSouthInt;
+		} else if (m_Facing.equalsIgnoreCase(WorldEntity.kEast)) {
+			m_FacingInt = kEastInt;
+		} else if (m_Facing.equalsIgnoreCase(WorldEntity.kWest)) {
+			m_FacingInt = kWestInt;
+		}					
+	}
+
+	public int getFacingInt() {
+		return m_FacingInt;
 	}
 }
