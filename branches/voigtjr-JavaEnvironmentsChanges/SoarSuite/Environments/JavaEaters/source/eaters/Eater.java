@@ -19,11 +19,6 @@ public class Eater extends WorldEntity {
 	public final static String kMoveID = "move";
 	public final static String kJumpID = "jump";
 
-	public final static String kNorth = "north";
-	public final static String kEast = "east";
-	public final static String kSouth = "south";
-	public final static String kWest = "west";
-	
 	private StringElement m_DirectionWME;
 	private IntElement m_ScoreWME;
 	private IntElement m_xWME;
@@ -154,6 +149,7 @@ public class Eater extends WorldEntity {
 		move.direction = commandId.GetParameterValue(kDirectionID);
 		if (move.direction != null) {
 			m_Facing = move.direction;
+			setFacingInt();
 			commandId.AddStatusComplete();
 			return move;
 		}

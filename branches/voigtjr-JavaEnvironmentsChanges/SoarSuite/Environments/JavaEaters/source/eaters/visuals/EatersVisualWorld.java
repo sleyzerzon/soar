@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 
 import eaters.*;
+import simulation.*;
 import simulation.visuals.*;
 
 public class EatersVisualWorld extends VisualWorld implements PaintListener {
@@ -19,17 +20,19 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 		}
 		m_FoodColors = new HashMap();
 		for (int i = 0; i < food.length; ++i) {
-			m_FoodColors.put(food[i], EatersWindowManager.getColor(food[i].getColor()));
+			m_FoodColors.put(food[i], WindowManager.getColor(food[i].getColor()));
 		}
 	}
 	
 	EatersSimulation m_Simulation;
+	EatersWorld m_World;
 	Point m_AgentLocation;
 	
 	public EatersVisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
 		super(parent, style, simulation, cellSize);
 		
 		m_Simulation = simulation;
+		m_World = m_Simulation.getEatersWorld();
 
 		addPaintListener(this);		
 	}
@@ -49,8 +52,7 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 	Eater getEaterAtPixel(int x, int y) {
 		x /= m_CellSize;
 		y /= m_CellSize;
-		EatersWorld world = m_Simulation.getEatersWorld();
-		EatersWorld.EatersCell cell = world.getCell(x, y);
+		EatersWorld.EatersCell cell = m_World.getCell(x, y);
 		if (cell.isEater()) {
 			return cell.getEater();
 		}
@@ -64,13 +66,12 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 			setRepaint();
 		}
 		
-		EatersWorld world = m_Simulation.getEatersWorld();
 		GC gc = e.gc;		
-        gc.setForeground(EatersWindowManager.black);
+        gc.setForeground(WindowManager.black);
 		gc.setLineWidth(1);
 
 		if (m_Disabled || !m_Painted) {
-			gc.setBackground(EatersWindowManager.widget_background);
+			gc.setBackground(WindowManager.widget_background);
 			gc.fillRectangle(0,0, this.getWidth(), this.getHeight());
 			if (m_Disabled) {
 				m_Painted = true;
@@ -80,7 +81,7 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 		
 		// Draw world
 		int fill1, fill2, xDraw, yDraw;
-		for(int x = 0; x < world.getWidth(); ++x){
+		for(int x = 0; x < m_World.getWidth(); ++x){
 			if (m_AgentLocation != null) {
 				if ((x < m_AgentLocation.x - Eater.kEaterVision) || (x > m_AgentLocation.x + Eater.kEaterVision)) {
 					continue;
@@ -90,7 +91,7 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 				xDraw = x;
 			}
 			
-			for(int y = 0; y < world.getHeight(); ++y){
+			for(int y = 0; y < m_World.getHeight(); ++y){
 				if (m_AgentLocation != null) {
 					if ((y < m_AgentLocation.y - Eater.kEaterVision) || (y > m_AgentLocation.y + Eater.kEaterVision)) {
 						continue;
@@ -100,17 +101,17 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 					yDraw = y;
 				}
 				
-				EatersWorld.EatersCell cell = world.getCell(x, y);
+				EatersWorld.EatersCell cell = m_World.getCell(x, y);
 				if (!cell.isModified() && m_Painted) {
 					continue;
 				}
 				
 				if (cell.isWall()) {
-				    gc.setBackground(EatersWindowManager.black);
+				    gc.setBackground(WindowManager.black);
 				    gc.fillRectangle(m_CellSize*xDraw + 1, m_CellSize*yDraw + 1, m_CellSize - 2, m_CellSize - 2);
 					
 				} else if (cell.isEmpty()) {
-					gc.setBackground(EatersWindowManager.widget_background);
+					gc.setBackground(WindowManager.widget_background);
 					gc.fillOval(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
 					
 				} else if (cell.isEater()) {
@@ -119,23 +120,24 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 					
 					gc.setBackground((Color)m_EntityColors.get(eater));
 					gc.fillOval(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
-					gc.setBackground(EatersWindowManager.widget_background);
+					gc.setBackground(WindowManager.widget_background);
 					
-					String facing = eater.getFacing();
-					if (facing != null) {
-						// These string compares happen once a frame
-						// no matter what, so removing them here wouldn't
-						// really help much, they'd just be moved to
-						// a different part of the frame.
-						if (facing.equalsIgnoreCase(Eater.kNorth)) {
-							drawEaterMouth(xDraw, yDraw, 1, 0, 1, 1, gc);
-						} else if (facing.equalsIgnoreCase(Eater.kSouth)) {
-							drawEaterMouth(xDraw, yDraw + 1, 1, 0, 1, -1, gc);
-						} else if (facing.equalsIgnoreCase(Eater.kEast)) {
-							drawEaterMouth(xDraw + 1, yDraw, 0, 1, -1, 1, gc);
-						} else if (facing.equalsIgnoreCase(Eater.kWest)) {
-							drawEaterMouth(xDraw, yDraw, 0, 1, 1, 1, gc);
-						}					
+					
+					switch (eater.getFacingInt()) {
+					case WorldEntity.kNorthInt:
+						drawEaterMouth(xDraw, yDraw, 1, 0, 1, 1, gc);
+						break;
+					case WorldEntity.kEastInt:
+						drawEaterMouth(xDraw + 1, yDraw, 0, 1, -1, 1, gc);
+						break;
+					case WorldEntity.kSouthInt:
+						drawEaterMouth(xDraw, yDraw + 1, 1, 0, 1, -1, gc);
+						break;
+					case WorldEntity.kWestInt:
+						drawEaterMouth(xDraw, yDraw, 0, 1, 1, 1, gc);
+						break;
+					default:
+						break;
 					}
 				} else {
 				
@@ -172,7 +174,7 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 	}
 	
 	void drawExplosion(GC gc, int x, int y) {
-		gc.setBackground(EatersWindowManager.red);
+		gc.setBackground(WindowManager.red);
 		int offCenter = m_CellSize/4;
 		int xBase = m_CellSize*x;
 		int yBase = m_CellSize*y;

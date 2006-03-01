@@ -92,7 +92,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		m_AgentDisplay.setLayoutData(gd);
 		
 		EatersVisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
-		EatersVisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
+		VisualWorld.remapEntityColors(m_Simulation.getEatersWorld().getEaters());
 
 		m_Simulation.addSimulationListener(this);
 
@@ -194,7 +194,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		case SimulationListener.kAgentCreatedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			EatersVisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
+			EatersVisualWorld.remapEntityColors(m_Simulation.getEatersWorld().getEaters());
 			updateFoodAndScoreCount();
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
@@ -203,7 +203,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		case SimulationListener.kAgentDestroyedEvent:
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-			EatersVisualWorld.remapEaterColors(m_Simulation.getEatersWorld().getEaters());
+			EatersVisualWorld.remapEntityColors(m_Simulation.getEatersWorld().getEaters());
 			m_SimButtons.updateButtons();
 			m_AgentDisplay.agentEvent();
 			return;
