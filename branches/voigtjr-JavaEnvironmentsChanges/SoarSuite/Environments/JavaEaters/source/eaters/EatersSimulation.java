@@ -6,6 +6,7 @@ import utilities.*;
 
 public class EatersSimulation extends Simulation implements SimulationManager {
 	public static final int kMaxEaters = 8;	
+	public static final String kMapFilter = "*.emap";
 	
 	public static final String kProjectFolder = "JavaEaters";
 	private static final String kTagEaters = "eaters";

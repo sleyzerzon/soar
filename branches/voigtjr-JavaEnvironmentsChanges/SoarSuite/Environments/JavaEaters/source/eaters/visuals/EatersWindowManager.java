@@ -82,7 +82,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		gd.widthHint = 50;
 		m_ScoreCount.setLayoutData(gd);
 		updateFoodAndScoreCount();
-		m_MapButtons = new MapButtons(group2, m_Simulation);
+		m_MapButtons = new MapButtons(group2, m_Simulation, EatersSimulation.kMapFilter);
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		m_MapButtons.setLayoutData(gd);
