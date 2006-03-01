@@ -131,7 +131,12 @@ public abstract class Simulation implements Runnable, Kernel.UpdateEventInterfac
 		m_Runs = runs;
 	}
 	
-    protected void destroyAgent(Agent agent) {
+	public void changeMap(String map) {
+		setCurrentMap(map);
+		resetSimulation(true);
+	}	
+
+	protected void destroyAgent(Agent agent) {
 		m_Kernel.DestroyAgent(agent);
 		agent.delete();
 		if (m_WorldManager.noAgents()) {
