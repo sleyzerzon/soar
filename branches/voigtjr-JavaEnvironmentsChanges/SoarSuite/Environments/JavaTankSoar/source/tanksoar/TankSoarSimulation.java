@@ -6,6 +6,7 @@ import utilities.*;
 
 public class TankSoarSimulation extends Simulation implements SimulationManager {
 	public static final int kMaxTanks = 8;
+	public static final String kMapFilter = "*.tmap";
 	
 	public static final String kProjectFolder = "JavaTankSoar";
 	private static final String kTagTankSoar = "tanksoar";

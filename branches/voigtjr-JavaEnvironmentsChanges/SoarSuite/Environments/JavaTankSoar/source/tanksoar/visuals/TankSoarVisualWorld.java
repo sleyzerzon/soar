@@ -28,6 +28,7 @@ public class TankSoarVisualWorld extends VisualWorld implements PaintListener {
 	private TankSoarWorld m_World;
 	private Point m_AgentLocation;
 	private Random m_Random;
+	private Image[][] m_Background;
 	
 	public TankSoarVisualWorld(Composite parent, int style, TankSoarSimulation simulation, int cellSize) {
 		super(parent, style, simulation, cellSize);
@@ -62,6 +63,28 @@ public class TankSoarVisualWorld extends VisualWorld implements PaintListener {
 	private void loadNumberedImage(Display display, Image[] images, String name){
 		for(int i = 0; i < images.length; i++){
 			images[i] = new Image(display, TankSoar.class.getResourceAsStream("/images/" + name + (i+1) + ".gif"));
+		}
+	}
+	
+	void generateBackground() {
+		m_Background = new Image[m_World.getWidth()][m_World.getHeight()];
+		for(int x = 0; x < m_World.getWidth(); ++x){
+			for(int y = 0; y < m_World.getHeight(); ++y){
+				TankSoarWorld.TankSoarCell cell = m_World.getCell(x, y);
+				if (cell.isWall()) {
+					if ((x == 0) || (x == m_World.getWidth() - 1) || (y == 0) || (y == m_World.getHeight() - 1)) {
+						// Rocks on outer edge
+						m_Background[x][y] = kRocks[m_Random.nextInt(kRocks.length)];
+					} else {
+						m_Background[x][y] = kTrees[m_Random.nextInt(kTrees.length)];
+					}
+				} else if (cell.isEmpty()) {
+					m_Background[x][y] = kGrass[m_Random.nextInt(kGrass.length)];
+				} else {
+					m_Logger.log("Unknown cell at " + x + "," + y);
+					m_Background[x][y] = kWTF;
+				}
+			}
 		}
 	}
 	
@@ -103,18 +126,12 @@ public class TankSoarVisualWorld extends VisualWorld implements PaintListener {
 					continue;
 				}
 				
-				if (cell.isWall()) {
-					if (!m_Painted && ((x == 0) || (x == m_World.getWidth() - 1) || (y == 0) || (y == m_World.getHeight() - 1))) {
-						gc.drawImage(kRocks[m_Random.nextInt(kTrees.length)], x*m_CellSize, y*m_CellSize);						
-					} else {
-						gc.drawImage(kTrees[m_Random.nextInt(kTrees.length)], x*m_CellSize, y*m_CellSize);
-					}
-				} else if (cell.isEmpty()) {
-					gc.drawImage(kGrass[m_Random.nextInt(kGrass.length)], x*m_CellSize, y*m_CellSize);
-				} else if (cell.isTank()) {
+				
+				// Check for interesting foreground, otherwise draw background
+				if (cell.isTank()) {
 					gc.drawImage(kTanks[m_Random.nextInt(kTanks.length)], x*m_CellSize, y*m_CellSize);
 				} else {
-					m_Logger.log("Unknown cell at " + x + "," + y);
+					gc.drawImage(m_Background[x][y], x*m_CellSize, y*m_CellSize);
 				}
 			}
 		}

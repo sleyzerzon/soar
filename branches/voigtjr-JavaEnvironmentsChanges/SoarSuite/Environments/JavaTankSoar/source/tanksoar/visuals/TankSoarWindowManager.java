@@ -39,16 +39,16 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 		gd.heightHint = m_VisualWorld.getHeight();
 		gd.verticalSpan = 3;
 		m_WorldGroup.setLayoutData(gd);
-//		m_VisualWorld.addMouseListener(new MouseAdapter() {
-//			public void mouseDown(MouseEvent e) {
-//				Eater eater = m_VisualWorld.getEaterAtPixel(e.x, e.y);
-//				if (eater == null) {
-//					return;
-//				}
-//				m_AgentDisplay.selectEntity(eater);
-//			}
-//		});
-//
+		m_VisualWorld.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				Tank tank = m_VisualWorld.getTankAtPixel(e.x, e.y);
+				if (tank == null) {
+					return;
+				}
+//				m_AgentDisplay.selectEntity(tank);
+			}
+		});
+
 		Group group1 = new Group(m_Shell, SWT.NONE);
 		gd = new GridData();
 		group1.setLayoutData(gd);
@@ -61,17 +61,17 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 		group2.setLayoutData(gd);
 		group2.setText("Map");
 		group2.setLayout(new FillLayout());
-		m_MapButtons = new MapButtons(group2, m_Simulation);
+		m_MapButtons = new MapButtons(group2, m_Simulation, TankSoarSimulation.kMapFilter);
 
 //		m_AgentDisplay = new AgentDisplay(m_Shell, m_Simulation);
 //		gd = new GridData();
 //		m_AgentDisplay.setLayoutData(gd);
-//		
-//		EatersVisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
+		
 		VisualWorld.remapEntityColors(m_Simulation.getWorldManager().getEntities());
-//
+		m_VisualWorld.generateBackground();
+
 //		m_Simulation.addSimulationListener(this);
-//
+
 		m_Shell.setText("Java TankSoar");
 		m_Shell.setSize(m_Shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
@@ -159,9 +159,9 @@ public class TankSoarWindowManager extends WindowManager implements SimulationLi
 			
 		case SimulationListener.kResetEvent:
 			updateWorldGroup();
+			m_VisualWorld.generateBackground();
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
-//			EatersVisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
 //			updateFoodAndScoreCount();
 //			m_SimButtons.updateButtons();
 //			m_AgentDisplay.worldChangeEvent();
