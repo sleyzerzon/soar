@@ -197,6 +197,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\Cluster.cpp">
+			</File>
+			<File
 				RelativePath=".\src\consistency.cpp">
 				<FileConfiguration
 					Name="Release|Win32">
@@ -565,6 +568,9 @@
 			</File>
 			<File
 				RelativePath=".\include\chunk.h">
+			</File>
+			<File
+				RelativePath=".\include\Cluster.h">
 			</File>
 			<File
 				RelativePath=".\src\consistency.h">
