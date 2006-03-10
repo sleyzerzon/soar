@@ -98,6 +98,7 @@ namespace cli {
 			kInvalidBackslashEscapeCharacter	= 83, 
 			kInitSoarFailed						= 84, 
 			kPreferencesError					= 85, // FIXME: document in wiki
+			kFloatExpected                      = 86, // FIXME: document in wiki
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -124,7 +125,7 @@ namespace cli {
 				case kKernelRequired:					return "A kernel is required for this command.";
 				case kAliasNotFound:					return "Alias not found.";
 				case kAliasExists:						return "Alias exists, remove to overwrite.";
-				case kNoHelpFile:						return "Could not find help files.  Check the library location using the 'set-library-location' command.  The library location should be set to SoarLibrary.";
+				case kNoHelpFile:						return "Could not find help files.  Check the library location using the 'set-library-location' command.  The library location should be set to the folder containing the help/ subfolder.";
 				case kIntegerExpected:					return "Integer argument expected.";
 				case kIntegerMustBePositive:			return "Integer argument must be positive.";
 				case kIntegerMustBeNonNegative:			return "Integer argument must be non-negative.";
@@ -181,6 +182,7 @@ namespace cli {
 				case kInvalidBackslashEscapeCharacter:	return "Invalid backslash escape character, see documentation.";
 				case kInitSoarFailed:					return "Agent could not be reinitialized.  Probably due to an internal memory leak." ;
 				case kPreferencesError:					return "Preferences command failed." ;
+				case kFloatExpected:					return "Floating point argument expected.";
 				default:								return "Unknown error code.";
 			}
 		}

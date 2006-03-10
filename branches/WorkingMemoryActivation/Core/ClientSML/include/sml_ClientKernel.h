@@ -44,8 +44,6 @@ class SystemEventHandlerPlusData : public EventHandlerPlusData
 public:
 	SystemEventHandler  m_Handler ;
 
-	SystemEventHandlerPlusData() {}
-
 	SystemEventHandlerPlusData(int eventID, SystemEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
 		m_Handler = handler ;
@@ -56,8 +54,6 @@ class UpdateEventHandlerPlusData : public EventHandlerPlusData
 {
 public:
 	UpdateEventHandler  m_Handler ;
-
-	UpdateEventHandlerPlusData() {}
 
 	UpdateEventHandlerPlusData(int eventID, UpdateEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
@@ -70,8 +66,6 @@ class StringEventHandlerPlusData : public EventHandlerPlusData
 public:
 	StringEventHandler  m_Handler ;
 
-	StringEventHandlerPlusData() {}
-
 	StringEventHandlerPlusData(int eventID, StringEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
 		m_Handler = handler ;
@@ -82,8 +76,6 @@ class AgentEventHandlerPlusData : public EventHandlerPlusData
 {
 public:
 	AgentEventHandler m_Handler ;
-
-	AgentEventHandlerPlusData() {}
 
 	AgentEventHandlerPlusData(int eventID, AgentEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
@@ -96,8 +88,6 @@ class RhsEventHandlerPlusData : public EventHandlerPlusData
 public:
 	RhsEventHandler	m_Handler ;
 	std::string		m_FunctionName ;
-
-	RhsEventHandlerPlusData() {}
 
 	RhsEventHandlerPlusData(int eventID, char const* pFunctionName, RhsEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
@@ -429,17 +419,13 @@ public:
 	/*************************************************************
 	* @brief   Run Soar for the specified number of decisions
 	*
-	* @param numberSteps	The number of decisions (or steps) to run the agent
-	* @param stepSize		The size of step we're running (e.g. phases, decisions, outputs)
-	* @param interleaveStepSize	 How much to run each agent before running the next agent.
-	*
 	* This command will run all agents.
 	*
 	* @returns The result of executing the run command.
 	*		   The output from during the run is sent to a different callback.
 	*************************************************************/
-	char const* RunAllAgents(unsigned long numberSteps, smlRunStepSize stepSize = sml_DECISION, smlInterleaveStepSize interleaveStepSize = sml_INTERLEAVE_PHASE) ;
-	char const* RunAllAgentsForever(smlInterleaveStepSize interleaveStepSize = sml_INTERLEAVE_PHASE) ;
+	char const* RunAllAgents(unsigned long numberSteps, smlRunStepSize stepSize = sml_DECISION) ;
+	char const* RunAllAgentsForever() ;
 
 	/*************************************************************
 	* @brief   Run Soar until either output is generated or
@@ -458,7 +444,7 @@ public:
 	* before then that agent will stop running.  (This value can be changed with the
 	* max-nil-output-cycles command).
 	*************************************************************/
-	char const* RunAllTilOutput(smlInterleaveStepSize interleaveStepSize = sml_INTERLEAVE_PHASE) ;
+	char const* RunAllTilOutput() ;
 
 	/*************************************************************
 	* @brief Interrupt the currently running Soar agent.
@@ -841,10 +827,6 @@ public:
 	*
 	* This points to the location where the kernelSML library was loaded
 	* (unless it has been changed since the load).
-	*
-	* The latest folder structure has "SoarLibrary"
-	* with a "bin" subfolder that contains the actual kernel DLL that we load.
-	* This function returns the parent "SoarLibrary" folder.
 	*************************************************************/
 	std::string GetLibraryLocation() ;
 

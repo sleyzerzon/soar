@@ -387,8 +387,6 @@ public:
 	static char const* const kCommand_GetRunState ;
 	static char const* const kCommand_IsProductionLoaded	;
 	static char const* const kCommand_SendClientMessage	;
-	static char const* const kCommand_WasAgentOnRunList	;
-	static char const* const kCommand_GetResultOfLastRun ;
 
 	// Command line interface
 	static char const* const kCommand_CommandLine ;

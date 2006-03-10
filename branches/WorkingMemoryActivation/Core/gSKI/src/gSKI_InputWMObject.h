@@ -308,7 +308,7 @@ namespace gSKI {
      tIWMObjectIterator* GetObjectsReferencedByAttribute(const std::string& attr) const;
 
      // TODO: Document these methods
-     void Update(std::set<InputWMObject*>& processedObjects, bool forceAdds, bool forceRemoves);
+     void Update(std::set<InputWMObject*>& processedObjects);
      Symbol* GetSoarSymbol() { return m_sym; }
      
    private:

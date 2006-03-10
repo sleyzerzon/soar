@@ -127,6 +127,7 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_LoadProductions]	= &sml::KernelSML::HandleLoadProductions ;
 	m_CommandMap[sml_Names::kCommand_GetInputLink]		= &sml::KernelSML::HandleGetInputLink ;
 	m_CommandMap[sml_Names::kCommand_Input]				= &sml::KernelSML::HandleInput ;
+	m_CommandMap[sml_Names::kCommand_StopOnOutput]		= &sml::KernelSML::HandleStopOnOutput ;
 	m_CommandMap[sml_Names::kCommand_CommandLine]		= &sml::KernelSML::HandleCommandLine ;
 	m_CommandMap[sml_Names::kCommand_ExpandCommandLine]	= &sml::KernelSML::HandleExpandCommandLine ;
 	m_CommandMap[sml_Names::kCommand_CheckForIncomingCommands] = &sml::KernelSML::HandleCheckForIncomingCommands ;
@@ -146,8 +147,6 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_GetRunState]		= &sml::KernelSML::HandleGetRunState ;
 	m_CommandMap[sml_Names::kCommand_IsProductionLoaded]= &sml::KernelSML::HandleIsProductionLoaded ;
 	m_CommandMap[sml_Names::kCommand_SendClientMessage] = &sml::KernelSML::HandleSendClientMessage ;
-	m_CommandMap[sml_Names::kCommand_WasAgentOnRunList] = &sml::KernelSML::HandleWasAgentOnRunList ;
-	m_CommandMap[sml_Names::kCommand_GetResultOfLastRun]= &sml::KernelSML::HandleGetResultOfLastRun ;
 }
 
 /*************************************************************
@@ -528,24 +527,6 @@ bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName
 	return this->ReturnResult(pConnection, pResponse, bufferCString) ;
 }
 
-// Return information about the current runtime state of the agent (e.g. phase, decision cycle count etc.)
-bool KernelSML::HandleWasAgentOnRunList(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
-{
-	unused(pCommandName) ; unused(pIncoming) ; unused(pError) ;
-
-	bool wasRun = GetAgentSML(pAgent)->WasAgentOnRunList() ;
-	return this->ReturnBoolResult(pConnection, pResponse, wasRun) ;
-}
-
-// Return information about the current runtime state of the agent (e.g. phase, decision cycle count etc.)
-bool KernelSML::HandleGetResultOfLastRun(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
-{
-	unused(pCommandName) ; unused(pIncoming) ; unused(pError) ;
-
-	egSKIRunResult runResult = GetAgentSML(pAgent)->GetResultOfLastRun() ;
-	return this->ReturnIntResult(pConnection, pResponse, runResult) ;
-}
-
 // Returns true if the production name is currently loaded
 bool KernelSML::HandleIsProductionLoaded(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
@@ -647,6 +628,21 @@ bool KernelSML::HandleSetInterruptCheckRate(gSKI::IAgent* pAgent, char const* pC
 	GetKernel()->SetInterruptCheckRate(newRate) ;
 
 	return true ;
+}
+
+// Set a flag so Soar will break when it next generates output.  This allows us to
+// run for "n decisions" OR "until output" which we can't do with raw gSKI calls.
+bool KernelSML::HandleStopOnOutput(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+{
+	unused(pCommandName) ; unused(pResponse) ; unused(pConnection) ; unused(pError) ;
+
+	// Get the parameters
+	bool state = pIncoming->GetArgBool(sml_Names::kParamValue, true) ;
+
+	// Make the call.
+	bool ok = GetAgentSML(pAgent)->SetStopOnOutput(state) ;
+
+	return ok ;
 }
 
 // Fire a particular event at the request of the client.
@@ -927,13 +923,6 @@ bool KernelSML::RemoveInputWME(gSKI::IAgent* pAgent, char const* pTimeTag, gSKI:
 		// Get the kernel-side identifier
 		std::string id = pWME->GetValue()->GetString() ;
 
-		// Look up the wmobject for this id
-		//IWMObject* pObject = NULL ;
-		//pInputWM->GetObjectById(id.c_str(), &pObject, pError) ;
-
-		//assert(!pError || !gSKI::isError(*pError)) ;
-		//pInputWM->RemoveObject(pObject) ;
-
 		// Remove it from the id mapping table
 		pAgentSML->RemoveID(id.c_str()) ;
 	}
@@ -970,7 +959,7 @@ static char const* GetValueType(egSKISymbolType type)
 	}
 }
 
-static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, std::list<IWMObject*> *pTraversedList)
+static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult)
 {
 	if (!pRoot || !pTagResult)
 		return false ;
@@ -980,18 +969,6 @@ static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, 
 	while (iter->IsValid())
 	{
 		gSKI::IWme* pWME = iter->GetVal() ;
-
-		// In some cases, wmes either haven't been added yet or have already been removed from the kernel
-		// but still exist in gSKI.  In both cases, we can't (naturally) get a correct time tag for the wme
-		// so I think we should skip these wmes.  That's clearly correct if the wme has been removed, but I'm
-		// less sure if it's in the process of getting added.
-		if (pWME->HasBeenRemoved())
-		{
-			pWME->Release() ;
-			iter->Next() ;
-
-			continue ;
-		}
 
 		TagWme* pTagWme = new TagWme() ;
 
@@ -1014,14 +991,7 @@ static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, 
 		if (pWME->GetValue()->GetType() == gSKI_OBJECT)
 		{
 			gSKI::IWMObject* pChild = pWME->GetValue()->GetObject() ;
-
-			// Check that we haven't already added this identifier before
-			// (there can be cycles).
-			if (std::find(pTraversedList->begin(), pTraversedList->end(), pChild) == pTraversedList->end())
-			{
-				pTraversedList->push_back(pChild) ;
-				AddWmeChildrenToXML(pChild, pTagResult, pTraversedList) ;
-			}
+			AddWmeChildrenToXML(pChild, pTagResult) ;
 		}
 
 		pWME->Release() ;
@@ -1045,12 +1015,8 @@ bool KernelSML::HandleGetAllInput(gSKI::IAgent* pAgent, char const* pCommandName
 	gSKI::IWMObject* pRootObject = NULL ;
 	pAgent->GetInputLink()->GetRootObject(&pRootObject, pError) ;
 
-	// We need to keep track of which identifiers we've already added
-	// because this is a graph, so we may cycle back.
-	std::list<IWMObject*> traversedList ;
-
 	// Add this wme's children to XML
-	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
+	AddWmeChildrenToXML(pRootObject, pTagResult) ;
 
 	// Add the result tag to the response
 	pResponse->AddChild(pTagResult) ;
@@ -1088,12 +1054,8 @@ bool KernelSML::HandleGetAllOutput(gSKI::IAgent* pAgent, char const* pCommandNam
 	// Add this wme into the result
 	pTagResult->AddChild(pTagWme) ;
 
-	// We need to keep track of which identifiers we've already added
-	// because this is a graph, so we may cycle back.
-	std::list<IWMObject*> traversedList ;
-
 	// Add this wme's children to XML
-	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
+	AddWmeChildrenToXML(pRootObject, pTagResult) ;
 
 	// Add the message to the response
 	pResponse->AddChild(pTagResult) ;

@@ -39,7 +39,6 @@ bool CommandLineInterface::DoSetLibraryLocation(const std::string* pLocation) {
 		}
 	} else {
 		m_LibraryDirectory = *pLocation;
-		StripQuotes(m_LibraryDirectory);
 	}
 	return true;
 }

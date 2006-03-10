@@ -103,9 +103,6 @@ public:
 
 	bool			DestroyWME(WMElement* pWME) ;
 
-	bool			TryToAttachOrphanedChildren(Identifier* pPossibleParent) ;
-	bool			ReceivedOutputRemoval(ElementXML* pWmeXML, bool tracing) ;
-	bool			ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing) ;
 	bool			ReceivedOutput(AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 
 	bool			SynchronizeInputLink() ;
@@ -116,7 +113,6 @@ public:
 
 	void			Refresh() ;
 
-	bool			IsCommitRequired() ;
 	bool			Commit() ;
 };
 
