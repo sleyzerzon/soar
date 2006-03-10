@@ -34,6 +34,8 @@ class RunEventHandlerPlusData : public EventHandlerPlusData
 {
 public:
 	RunEventHandler m_Handler ;
+	
+	RunEventHandlerPlusData() {}
 
 	RunEventHandlerPlusData(int eventID, RunEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
@@ -45,6 +47,8 @@ class ProductionEventHandlerPlusData : public EventHandlerPlusData
 {
 public:
 	ProductionEventHandler m_Handler ;
+
+	ProductionEventHandlerPlusData() {}
 
 	ProductionEventHandlerPlusData(int eventID, ProductionEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
@@ -58,6 +62,11 @@ public:
 	PrintEventHandler m_Handler ;
 	bool m_IgnoreOwnEchos ;
 
+	PrintEventHandlerPlusData() 
+	{
+		m_IgnoreOwnEchos = true;
+	}
+
 	PrintEventHandlerPlusData(int eventID, PrintEventHandler handler, void* userData, bool ignoreOwnEchos, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
 		m_Handler = handler ;
@@ -70,6 +79,8 @@ class XMLEventHandlerPlusData : public EventHandlerPlusData
 public:
 	XMLEventHandler m_Handler ;
 
+	XMLEventHandlerPlusData() {}
+
 	XMLEventHandlerPlusData(int eventID, XMLEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
 		m_Handler = handler ;
@@ -81,6 +92,8 @@ class OutputEventHandlerPlusData : public EventHandlerPlusData
 public:
 	OutputEventHandler	m_Handler ;
 	std::string			m_AttributeName ;
+
+	OutputEventHandlerPlusData() {}
 
 	OutputEventHandlerPlusData(int eventID, char const* pAttributeName, OutputEventHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
@@ -95,6 +108,8 @@ class OutputNotificationHandlerPlusData : public EventHandlerPlusData
 {
 public:
 	OutputNotificationHandler	m_Handler ;
+
+	OutputNotificationHandlerPlusData() {}
 
 	OutputNotificationHandlerPlusData(int eventID, OutputNotificationHandler handler, void* userData, int callbackID) : EventHandlerPlusData(eventID, userData, callbackID)
 	{
@@ -316,8 +331,11 @@ public:
 	* @brief Schedules a WME from deletion from the input link and removes
 	*		 it from the client's model of working memory.
 	*
+	*		 If this is an identifier then all of its children will be
+	*		 deleted too (assuming it's the only parent -- i.e. part of a tree not a full graph).
+	*
 	*		 The caller should not access this WME after calling
-	*		 DestroyWME().
+	*		 DestroyWME() or any of its children if this is an identifier.
 	*		 The WME is not removed from the input link until
 	*		 the client calls "Commit"
 	*************************************************************/
@@ -567,12 +585,25 @@ public:
 	char const* RunSelfForever() ;
 
 	/*************************************************************
+	* @brief Returns true if this agent was part of the last set
+	*		 of agents that was run.
+	*************************************************************/
+	bool WasAgentOnRunList() ;
+
+	/*************************************************************
+	* @brief Returns whether the last run for this agent was
+	*		 interrupted (by a stop call) or completed normally.
+	*************************************************************/
+	smlRunResult GetResultOfLastRun() ;
+
+	/*************************************************************
 	* @brief Interrupt the currently running Soar agent.
 	*
 	* Call this after calling "Run" in order to stop a Soar agent.
 	* The usual way to do this is to register for an event (e.g. AFTER_DECISION_CYCLE)
 	* and in that event handler decide if the user wishes to stop soar.
-	* If so, call to this method inside that handler.
+	* If so, call to this method inside that handler (this ensures you're calling on the same
+	* thread that Soar is running on so you don't get blocked).
 	*
 	* The request to Stop may not be honored immediately.
 	* Soar will stop at the next point it is considered safe to do so.

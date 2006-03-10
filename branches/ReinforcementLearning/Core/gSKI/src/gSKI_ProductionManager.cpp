@@ -452,38 +452,6 @@ _|___/    __         _    _             ____  _               _
       return true;
    }
 
-   bool ProductionManager::RemoveAllRLProductions(int& exciseCount, Error* err) const
-   {
-	   agent * a;
-	   ClearError(err);
-	   a = m_agent->GetSoarAgent();
-	  
-	   for (production* prod=a->all_productions_of_type[DEFAULT_PRODUCTION_TYPE]; prod != NIL; prod = prod->next)
-		{
-			if (prod->RL){
-				exciseCount++;
-				excise_production (a, prod, a->sysparams[TRACE_LOADING_SYSPARAM]);
-  			}
-		}
-       for (production* prod=a->all_productions_of_type[USER_PRODUCTION_TYPE]; prod != NIL; prod = prod->next)
-		{
-			if (prod->RL){
-				exciseCount++;
-				excise_production (a, prod,a->sysparams[TRACE_LOADING_SYSPARAM]);
-			}
-		}
-       for (production* prod=a->all_productions_of_type[CHUNK_PRODUCTION_TYPE];	prod != NIL; prod = prod->next)
-		{
-			if (prod->RL){
-				exciseCount++;
-				excise_production (a, prod,a->sysparams[TRACE_LOADING_SYSPARAM]);
-			}
-		}
-
-		a->RL_count = 1;
-		return true;
-   }
-
    bool ProductionManager::RemoveAllChunks(int& exciseCount, Error* err) const
    {
       agent * a;
@@ -643,6 +611,9 @@ _|___/    __         _    _             ____  _               _
    /*
 WARNING!!!  All of the Get*Production(s) methods appear to leak symbol ref counts in
 the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
+DJP: I believe we've isolated this so that the leaks are only a risk when "includeConditions" is true and in practice
+there has not yet been a case where we've ever needed to set includeConditions to true (i.e. you want to examine the conditions not just work
+with the production names).
    */
 
    tIProductionIterator* ProductionManager::GetProduction(const char* pattern, bool includeConditions, Error* err) const
@@ -658,7 +629,8 @@ the kernel under certain circumstances.  See Bug 536.  Use at your own risk.
 
          for(; currentProdList != 0; currentProdList = currentProdList->next)
          {
-            if(strcmp(pattern, currentProdList->name->sc.name) == 0)
+			char const* pName = currentProdList->name->sc.name ;
+            if(strcmp(pattern, pName) == 0)
             {
                userProds.push_back(new Production(currentProdList, includeConditions, a));
             }

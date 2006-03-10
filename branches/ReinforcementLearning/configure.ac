@@ -5,7 +5,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT([SoarSuite], [8.6.2], [soar-group@lists.sourceforge.net])
-AC_CONFIG_SRCDIR([Core/Kernel/include/soarkernel.h])
+AC_CONFIG_SRCDIR([Core/SoarKernel/include/soarkernel.h])
 AM_INIT_AUTOMAKE([foreign])
 AC_REVISION($Revision$)
 AC_CONFIG_HEADERS([config.h])
@@ -393,8 +393,8 @@ fi
 AC_OUTPUT([
 	Makefile
 	Core/Makefile
-	Core/Kernel/Makefile
-	Core/Kernel/src/Makefile
+	Core/SoarKernel/Makefile
+	Core/SoarKernel/src/Makefile
 	Core/gSKI/Makefile
 	Core/gSKI/src/Makefile
 	Core/ConnectionSML/Makefile
@@ -410,16 +410,25 @@ AC_OUTPUT([
 	Core/ClientSMLSWIG/Tcl/Makefile
 	Core/KernelSML/Makefile
 	Core/KernelSML/src/Makefile
-	Applications/Makefile
-	Applications/TestCLI/Makefile
-	Applications/TestClientSML/Makefile
-	Applications/TOHSML/Makefile
-	Applications/TestSoarPerformance/Makefile
-	Applications/TestSMLEvents/Makefile
-	Applications/JavaBaseEnvironment/Makefile
-	Applications/JavaEaters/Makefile
-	Applications/JavaMissionaries/Makefile
-	Applications/JavaTOH/Makefile
-	Applications/JavaTankSoar/Makefile
-	Applications/SoarJavaDebugger/Makefile
+	Environments/Makefile
+	Environments/JavaBaseEnvironment/Makefile
+	Environments/JavaEaters/Makefile
+	Environments/JavaMissionaries/Makefile
+	Environments/JavaTOH/Makefile
+	Environments/JavaTankSoar/Makefile
+	Tools/Makefile
+	Tools/LoggerJava/Makefile
+	Tools/QuickLink/Makefile
+	Tools/QuickLink/src/Makefile
+	Tools/SoarJavaDebugger/Makefile
+	Tools/SoarTextIO/Makefile
+	Tools/SoarTextIO/src/Makefile
+	Tools/TOHSML/Makefile
+	Tools/TestCLI/Makefile
+	Tools/TestClientSML/Makefile
+	Tools/TestConnectionSML/Makefile
+	Tools/TestJavaSML/Makefile
+	Tools/TestSMLEvents/Makefile
+	Tools/TestSoarPerformance/Makefile
+	Tools/VisualSoar/Makefile
 	])

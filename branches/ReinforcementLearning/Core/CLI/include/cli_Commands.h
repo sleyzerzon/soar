@@ -18,7 +18,8 @@ namespace cli {
 		static char const* kCLIAttributePreferencesMode;
 		static char const* kCLICD;
 		static char const* kCLIChunkNameFormat;
-		static char const* kCLIDecay;
+		static char const* kCLICLog;
+		static char const* kCLICommandToFile;
 		static char const* kCLIDefaultWMEDepth;
 		static char const* kCLIDirs;
 		static char const* kCLIEcho;
@@ -26,7 +27,6 @@ namespace cli {
 		static char const* kCLIEditProduction;
 		static char const* kCLIExcise;
 		static char const* kCLIExplainBacktraces;
-		static char const* kCLIExploration;
 		static char const* kCLIFiringCounts;
 		static char const* kCLIGDSPrint;
 		static char const* kCLIHelp;
@@ -35,7 +35,6 @@ namespace cli {
 		static char const* kCLIInputPeriod;
 		static char const* kCLIInternalSymbols;
 		static char const* kCLILearn;
-		static char const* kCLILog;
 		static char const* kCLILS;
 		static char const* kCLIMatches;
 		static char const* kCLIMaxChunks;
@@ -55,7 +54,6 @@ namespace cli {
 		static char const* kCLIQuit;
 		static char const* kCLIRemoveWME;
 		static char const* kCLIReteNet;
-		static char const* kCLIRL;
 		static char const* kCLIRun;
 		static char const* kCLISaveBacktraces;
 		static char const* kCLISetLibraryLocation;

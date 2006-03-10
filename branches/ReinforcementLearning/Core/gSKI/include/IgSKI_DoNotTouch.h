@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /********************************************************************
@@ -8,7 +8,7 @@
 *********************************************************************
 * created:	   6/27/2002   10:44
 *
-* purpose:
+* purpose: 
 *********************************************************************/
 #ifndef IGSKI_DONOTTOUCH_H
 #define IGSKI_DONOTTOUCH_H
@@ -27,17 +27,17 @@ namespace gSKI
 {
    class IAgent;
    class IKernel;
-   namespace EvilBackDoor
+   namespace EvilBackDoor 
    {
       class ITgDWorkArounds
       {
       public:
-
+         
       /**
           * @brief
           */
          virtual ~ITgDWorkArounds(){}
-
+         
          /**
           * @brief
           */
@@ -47,7 +47,7 @@ namespace gSKI
           * @brief
           */
          virtual void SetSysparam (IAgent* agent, int param_number, long new_value) = 0;
-
+         
          /**
           * @brief
           */
@@ -66,7 +66,7 @@ namespace gSKI
          /**
          * @brief
          */
-         virtual void PrintPartialMatchInformation(IAgent* thisAgent,
+         virtual void PrintPartialMatchInformation(IAgent* thisAgent, 
                                                    struct rete_node_struct *p_node,
                                                    wme_trace_type wtt) = 0;
          /**
@@ -75,23 +75,23 @@ namespace gSKI
         virtual void PrintMatchSet(IAgent* thisAgent, wme_trace_type wtt, ms_trace_type  mst) = 0;
 
         /**
-         * @brief
+         * @brief 
          */
         virtual void PrintStackTrace(IAgent* thisAgent, bool print_states, bool print_operators) = 0;
 
         /**
-         * @brief
+         * @brief 
          */
-        virtual void PrintSymbol(IAgent*     thisAgent,
-                                 char*       arg,
-                                 bool        name_only,
-                                 bool        print_filename,
+        virtual void PrintSymbol(IAgent*     thisAgent, 
+                                 char*       arg, 
+                                 bool        name_only, 
+                                 bool        print_filename, 
                                  bool        internal,
                                  bool        full_prod,
                                  int         depth) = 0;
 
         /**
-         * @brief
+         * @brief 
          */
         virtual void PrintUser(IAgent*       thisAgent,
                                char*         arg,
@@ -101,21 +101,12 @@ namespace gSKI
                                unsigned int  prodType) = 0;
 
         /**
-		* @brief
-		*/
-		virtual void PrintRL(IAgent*       thisAgent,
-	                         char*         arg,
-	                         bool          internal,
-	                         bool          print_filename,
-                             bool          full_prod) = 0;
-
-        /**
-         * @brief
+         * @brief 
          */
         virtual bool Preferences(IAgent* thisAgent, int detail, const char* idString, const char* attrString)=0;
 
         /**
-         * @brief
+         * @brief 
          */
         virtual bool ProductionFind(IAgent*     thisAgent,
                                     agent*      agnt,
@@ -127,7 +118,7 @@ namespace gSKI
                                     bool        just_chunks,
                                     bool        no_chunks)=0;
         /**
-         * @brief
+         * @brief 
          */
         virtual bool GDSPrint(IAgent* thisAgent) = 0;
 
@@ -144,7 +135,7 @@ namespace gSKI
 		virtual int RemoveWmeByTimetag(IAgent* pIAgent, int num) = 0;
 
         virtual void PrintInternalSymbols(IAgent* pIAgent) = 0;
-
+		 
 		virtual int AddWMEFilter(IAgent* pIAgent, const char *pIdString, const char *pAttrString, const char *pValueString, bool adds, bool removes) = 0;
 		virtual int RemoveWMEFilter(IAgent* pIAgent, const char *pIdString, const char *pAttrString, const char *pValueString, bool adds, bool removes) = 0;
 		virtual bool ResetWMEFilters(IAgent* pIAgent, bool adds, bool removes) = 0;
@@ -159,13 +150,7 @@ namespace gSKI
 		virtual unsigned long GetChunkCount(IAgent* pIAgent) = 0;
 		virtual void SetChunkCount(IAgent* pIAgent, unsigned long count) = 0;
 
-		virtual void ResetRL(IAgent* pIAgent) = 0;
-
 		virtual void SeedRandomNumberGenerator(unsigned long int* pSeed) = 0;
-#ifdef SOAR_WMEM_ACTIVATION
-		virtual void DecayInit(IAgent* pIAgent) = 0;
-		virtual void DecayDeInit(IAgent* pIAgent) = 0;
-#endif
 	  };
    }
 }
@@ -175,7 +160,7 @@ namespace gSKI
 //////////////////////////////////////////////////////////////////////////////
 ////                                                                      ////
 ////  These defines are a total HACK!!  They are copied from the          ////
-////  gsysparams.h file.                                                  ////
+////  gsysparams.h file.                                                  //// 
 ////                                                                      ////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -188,9 +173,8 @@ namespace gSKI
 #define DEFAULT_PRODUCTION_TYPE 1
 #define CHUNK_PRODUCTION_TYPE 2
 #define JUSTIFICATION_PRODUCTION_TYPE 3
-#define TEMPLATE_PRODUCTION_TYPE 4
 
-#define NUM_PRODUCTION_TYPES 5
+#define NUM_PRODUCTION_TYPES 4
 
 /* ---------------------------------------
     Match Set print parameters
@@ -231,92 +215,70 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define TRACE_FIRINGS_OF_DEFAULT_PRODS_SYSPARAM   4
 #define TRACE_FIRINGS_OF_CHUNKS_SYSPARAM          5
 #define TRACE_FIRINGS_OF_JUSTIFICATIONS_SYSPARAM  6
-#define TRACE_FIRINGS_OF_TEMPLATE_SYSPARAM		  7
 
-#define TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM     8
-#define TRACE_FIRINGS_PREFERENCES_SYSPARAM        9
-#define TRACE_WM_CHANGES_SYSPARAM                10
-#define TRACE_CHUNK_NAMES_SYSPARAM               11
-#define TRACE_JUSTIFICATION_NAMES_SYSPARAM       12
-#define TRACE_CHUNKS_SYSPARAM                    13
-#define TRACE_JUSTIFICATIONS_SYSPARAM            14
-#define TRACE_BACKTRACING_SYSPARAM               15
+#define TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM     7
+#define TRACE_FIRINGS_PREFERENCES_SYSPARAM        8
+#define TRACE_WM_CHANGES_SYSPARAM                 9
+#define TRACE_CHUNK_NAMES_SYSPARAM               10
+#define TRACE_JUSTIFICATION_NAMES_SYSPARAM       11
+#define TRACE_CHUNKS_SYSPARAM                    12
+#define TRACE_JUSTIFICATIONS_SYSPARAM            13
+#define TRACE_BACKTRACING_SYSPARAM               14
 /* ===== watch loading flag =====  KJC 7/96 */
-#define TRACE_LOADING_SYSPARAM                   16
+#define TRACE_LOADING_SYSPARAM                   15
 
 /* ====== Max Elaborations === */
-#define MAX_ELABORATIONS_SYSPARAM                17
+#define MAX_ELABORATIONS_SYSPARAM                16
 
 /* ====== Max Chunks === */
-#define MAX_CHUNKS_SYSPARAM                      18
+#define MAX_CHUNKS_SYSPARAM                      17
 
-#define RESPOND_TO_LOAD_ERRORS_SYSPARAM          19
+#define RESPOND_TO_LOAD_ERRORS_SYSPARAM          18
 
 /* ====== Sysparams for control of learning === */
-#define LEARNING_ON_SYSPARAM                     20
-#define LEARNING_ONLY_SYSPARAM                   21
-#define LEARNING_EXCEPT_SYSPARAM                 22
-#define LEARNING_ALL_GOALS_SYSPARAM              23
+#define LEARNING_ON_SYSPARAM                     19
+#define LEARNING_ONLY_SYSPARAM                   20
+#define LEARNING_EXCEPT_SYSPARAM                 21
+#define LEARNING_ALL_GOALS_SYSPARAM              22
 
 /* ====== User Select === */
-#define USER_SELECT_MODE_SYSPARAM                24
+#define USER_SELECT_MODE_SYSPARAM                23
 
 /* ====== Print Warnings === */
-#define PRINT_WARNINGS_SYSPARAM                  25
+#define PRINT_WARNINGS_SYSPARAM                  24
 
 /* AGR 627 begin */
 /* ====== Whether to print out aliases as they're defined === */
-#define PRINT_ALIAS_SYSPARAM                     26
+#define PRINT_ALIAS_SYSPARAM                     25
 /* AGR 627 end */
 
 /* ===== explain_flag =====  KJC 7/96 */
-#define EXPLAIN_SYSPARAM                         27
+#define EXPLAIN_SYSPARAM                         26
 
 /* kjh(B14) */
-#define USE_LONG_CHUNK_NAMES                     28
+#define USE_LONG_CHUNK_NAMES                     27
 
 /* REW:  10.22.97 */
-#define TRACE_OPERAND2_REMOVALS_SYSPARAM         29
+#define TRACE_OPERAND2_REMOVALS_SYSPARAM         28
 
 /* RMJ */
-#define REAL_TIME_SYSPARAM         		          30
+#define REAL_TIME_SYSPARAM         		          29
 
 /* RMJ */
-#define ATTENTION_LAPSE_ON_SYSPARAM              31
+#define ATTENTION_LAPSE_ON_SYSPARAM              30
 
 /* KJC 3/01 limit number of cycles in run_til_output */
-#define MAX_NIL_OUTPUT_CYCLES_SYSPARAM           32
+#define MAX_NIL_OUTPUT_CYCLES_SYSPARAM           31
 
 /* SAN (??) */
 //NUMERIC_INDIFFERENCE
-#define TRACE_INDIFFERENT_SYSPARAM               33
+#define TRACE_INDIFFERENT_SYSPARAM               32
 
 /* rmarinie 11/04 */
-#define TIMERS_ENABLED                           34
-
-/* SAN */
-#define RL_ON_SYSPARAM							 35
-
-#ifdef SOAR_WMEM_ACTIVATION
-
-//The following constants are used by SOAR_WMEM_ACTIVATION
-#define WME_DECAY_SYSPARAM                       36
-#define WME_DECAY_EXPONENT_SYSPARAM              37
-#define WME_DECAY_WME_CRITERIA_SYSPARAM          38
-#define WME_DECAY_ALLOW_FORGETTING_SYSPARAM      39
-#define WME_DECAY_I_SUPPORT_MODE_SYSPARAM        40
-#define WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM 41
-#define WME_DECAY_PRECISION_SYSPARAM             42
-#define WME_DECAY_LOGGING_SYSPARAM               43
-
-#define HIGHEST_SYSPARAM_NUMBER                  43
-
-#else
+#define TIMERS_ENABLED                           33
 
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  35
-
-#endif
+#define HIGHEST_SYSPARAM_NUMBER                  33
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024   /* AGR 536  - from sys/param.h */
@@ -331,7 +293,7 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 //////////////////////////////////////////////////////////////////////////////
 ////                                                                      ////
 ////  These defines are a total HACK!!  They are copied from the          ////
-////  lexer.h file.                                                       ////
+////  lexer.h file.                                                       //// 
 ////                                                                      ////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

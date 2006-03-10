@@ -14,27 +14,12 @@
 
 namespace cli {
 
-	enum eDecayOptions {
-        DECAY_REPORT_SETTINGS,
-        DECAY_ON,
-        DECAY_OFF,
-        DECAY_ACTIVATION,
-        DECAY_I_SUPPORT_MODE,
-        DECAY_FORGETTING,
-        DECAY_WME_CRITERIA,
-        DECAY_PRECISION,
-        DECAY_LOG,
-        DECAY_EXPONENT,
-		DECAY_NUM_OPTIONS, // must be last
-	};
-
 	enum eExciseOptions {
 		EXCISE_ALL,
 		EXCISE_CHUNKS,
 		EXCISE_DEFAULT,
 		EXCISE_TASK,
 		EXCISE_USER,
-		EXCISE_RL,
 		EXCISE_NUM_OPTIONS, // must be last
 	};
 
@@ -57,7 +42,7 @@ namespace cli {
 		LEARN_NUM_OPTIONS, // must be last
 	};
 
-	enum eLogMode {
+	enum eLogMode { 
 		LOG_QUERY,
 		LOG_NEW,
 		LOG_NEWAPPEND,
@@ -92,13 +77,6 @@ namespace cli {
 		NUMERIC_INDIFFERENT_SUM,
 	};
 
-	enum eExplorationMode {
-			EXPLORATION_QUERY,
-			BOLTZMANN_EXPLORATION,
-			EPSILON_GREEDY_EXPLORATION,
-			NO_EXPLORATION,
-	};
-
 	enum ePreferencesDetail {
 		PREFERENCES_ONLY,
 		PREFERENCES_NAMES,
@@ -120,7 +98,7 @@ namespace cli {
 		PRINT_STACK,
 		PRINT_STATES,
 		PRINT_USER,
-		PRINT_RL,
+		PRINT_VARPRINT,
 		PRINT_NUM_OPTIONS, // must be last
 	};
 
@@ -145,10 +123,10 @@ namespace cli {
 		RUN_NUM_OPTIONS, // must be last
 	};
 
-	enum eSourceMode {
-		SOURCE_DISABLE,
-		SOURCE_DEFAULT,
-		SOURCE_ALL,
+	enum eSourceMode { 
+		SOURCE_DISABLE, 
+		SOURCE_DEFAULT, 
+		SOURCE_ALL, 
 	};
 
 	enum eStatsOptions {
@@ -165,7 +143,6 @@ namespace cli {
 		WATCH_USER,
 		WATCH_CHUNKS,
 		WATCH_JUSTIFICATIONS,
-		WATCH_TEMPLATES,
 		WATCH_WMES,
 		WATCH_PREFERENCES,
 		WATCH_WME_DETAIL,

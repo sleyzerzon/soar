@@ -1,14 +1,14 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /********************************************************************
-* @file igski_agent.h
+* @file igski_agent.h 
 *********************************************************************
 * created:	   6/13/2002   12:18
 *
-* purpose:
+* purpose: 
 *********************************************************************/
 #ifndef IGSKI_AGENT_H
 #define IGSKI_AGENT_H
@@ -47,8 +47,8 @@ namespace gSKI {
    */
    class IAgent : public gSKI::IRunListener {
    public:
-
-      /**
+    
+      /** 
        * @brief Destructor for an agent
        *
        * The agent destructor cleans up memory used by the agent
@@ -57,13 +57,13 @@ namespace gSKI {
        * @li Working memory pools
        * @li Rete memory
        * @li Production memory
-       *
+       * 
        * It also cleans up all sub-objects (such as the i/o links).
        *
        */
       virtual ~IAgent() { };
-
-      /**
+ 
+      /** 
        * @brief Reinitializes the agent
        *
        * Agents are initialized when added to the agent manager.  Call this
@@ -78,7 +78,7 @@ namespace gSKI {
        * Agents can be running when you call Reinitialize.  In this case the
        *  agent will be reinitialized at the next available stop time
        *  (see IAgentThreadGroup::Stop).  During reinitialization, the thread
-       *  group running the agent is paused.  After reinitialization, the
+       *  group running the agent is paused.  After reinitialization, the 
        *  agent begins executing (assuming it is active, see IAgent::SetActive)
        *  again along with other agents in its thread group.
        *
@@ -86,7 +86,7 @@ namespace gSKI {
        *   @li Any error returned by IProductionManager::LoadSoarFile if a production filename
        *         is supplied and the file doesn't exist or is somehow not usable (e.g. bad format)
        *
-       * @param prodFileName (Optional) Name of a soar production file to load with the agent.
+       * @param prodFileName (Optional) Name of a soar production file to load with the agent.  
        *                      If you don't want to load a production file with the agent, set
        *                      this parameter to 0.
        * @param learningOn  Pass true to initialize learning to on for this agent
@@ -95,7 +95,7 @@ namespace gSKI {
        *                     is created (even while it is running).
        * @param  oSupportMode O support mode to use for this agent.  The o-support
        *                      mode determines how o-support is calculated for
-       *                      wmes.  You can only set the o-support mode when
+       *                      wmes.  You can only set the o-support mode when 
        *                      initializing agents. See egSKIOSupportMode for mode details.
        * @param  err Pointer to client-owned error structure.  If the pointer
        *               is not 0 this structure is filled with extended error
@@ -105,12 +105,12 @@ namespace gSKI {
        * @return true if the agent was reinitialized successfully, false if there
        *           was an error and the agent could not be completely reinitialized.
        */
-      virtual bool Reinitialize(const char*       productionFileName = 0,
+      virtual bool Reinitialize(const char*       productionFileName = 0, 
                                 bool              learningOn         = false,
                                 egSKIOSupportMode oSupportMode       = gSKI_O_SUPPORT_MODE_4,
                                 Error*            err                = 0) = 0;
 
-      /**
+      /** 
        * @brief Reinitializes the agent using the current productions and settings
        *
        * This method is very similar to IAgent::Reinitialize except it does
@@ -144,7 +144,7 @@ namespace gSKI {
        *
        * @see egSKIRunType
        *
-       * @param runLength How long to run the system.  Choices are
+       * @param runLength How long to run the system.  Choices are       
        *          gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
        *          gSKI_RUN_DECISION_CYCLE, gSKI_RUN_UNTIL_OUTPUT, and
        *          gSKI_RUN_FOREVER.  See egSKIRunType for details.
@@ -161,17 +161,17 @@ namespace gSKI {
        * @return An egSKIRunResult value indicating how the state of the system
        *            after continuation executed. @see egSKIRunResult
        */
-      virtual egSKIRunResult RunInSeparateThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER,
+      virtual egSKIRunResult RunInSeparateThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
                                                  unsigned long       count         = 1,
                                                  Error*              err           = 0) = 0;
 
-      /**
+      /** 
        * @brief Runs this agent in a client owned thread.
        *
        * Call this method to execute an agent in a client-owned thread.  Typical
        *  reasons for doing this include running agents in a single threaded
        *  application, and managing threading and agent scheduling in the client.
-       *
+       *  
        * This method will only work if the agent is currently stopped (not
        *  interrupted or running).
        *
@@ -186,7 +186,7 @@ namespace gSKI {
        *
        * @see egSKIRunType
        *
-       * @param runLength How long to run the system.  Choices are
+       * @param runLength How long to run the system.  Choices are       
        *          gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
        *          gSKI_RUN_DECISION_CYCLE, gSKI_RUN_UNTIL_OUTPUT, and
        *          gSKI_RUN_FOREVER.  See egSKIRunType for details.
@@ -202,14 +202,14 @@ namespace gSKI {
        *
        * @return An egSKIRunResult value indicating how the state of the system
        *            after continuation executed. @see egSKIRunResult  This method
-       *            will never return gSKI_RUN_INTERRUPTED or
+       *            will never return gSKI_RUN_INTERRUPTED or 
        *            gSKI_RUN_COMPLETED_AND_INTERRUPTED because it returns before
        *            any interrupt can occur.
        */
-      virtual egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER,
+      virtual egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
                                                unsigned long       count         = 1,
                                                Error*              err           = 0) = 0;
-      virtual egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE,
+      virtual egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE, 
                                                 unsigned long  stepCount         = 1,
                                                 Error*         err               = 0) = 0;
       /**
@@ -219,9 +219,9 @@ namespace gSKI {
        *  nothing happens.
        *
        * Agents do not stop immediately upon being notified to interrupt. They stop
-       *  at one of the safe stopping points listed in the egSKIStopLocation
+       *  at one of the safe stopping points listed in the egSKIStopLocation 
        *  enumeration.  Essentially this Interrupt method is a request to the agents
-       *  to stop processing.  It will stop when it gets a chance.
+       *  to stop processing.  It will stop when it gets a chance.  
        *
        * Be careful when calling Interrupt from a single threaded application.   If
        *  you call interrupt in a single threaded app with stopType = gSKI_STOP_BY_SUSPEND
@@ -236,12 +236,12 @@ namespace gSKI {
        *         from the client-owned thread that created the agents. (Only
        *         applicable when running agents using IAgentManager::RunInClientThread
        *         or IAgent::RunInClientThread).
-       *   @li gSKIERR_CANNOT_STOP_FOR_CALLBACKS if you specify
+       *   @li gSKIERR_CANNOT_STOP_FOR_CALLBACKS if you specify 
        *           gSKI_STOP_ON_CALLBACK_RETURN or gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN
-       *           together with gSKI_STOP_BY_RETURNING.  These settings are
+       *           together with gSKI_STOP_BY_RETURNING.  These settings are 
        *           incompatible because the system cannot safely return after
        *           callbacks (it can suspend, however).
-       *
+       * 
        * @see egSKIStopLocation
        * @see egSKIStopType
        *
@@ -259,20 +259,20 @@ namespace gSKI {
        *               information is not returned.
        *
        * @return true if the agent could be stopped.  false if there was an
-       *           error preventing it from being stopped.  See err for
+       *           error preventing it from being stopped.  See err for 
        *           detailed error information.
        */
-      virtual bool Interrupt(egSKIStopLocation    stopLoc,
+      virtual bool Interrupt(egSKIStopLocation    stopLoc, 
                              egSKIStopType        stopType,
                              Error*               err   = 0) = 0;
 	  virtual unsigned long GetInterruptFlags (Error* err = 0) = 0;
 
-      /**
+      /** 
        * @brief Clears any interrupts currently set for this agent
        *
        * Call to cause an agent to clear any currently set interrupts.
        *  After calling this method the runstate of the agent is
-       *  set to gSKI_RUNSTATE_STOPPED.
+       *  set to gSKI_RUNSTATE_STOPPED.  
        *
        * If the agent was stopped by suspending the thread, this method
        *  will wake the thread and it will begin processing again
@@ -287,7 +287,7 @@ namespace gSKI {
        */
       virtual void ClearInterrupts(Error* err = 0) = 0;
 
-      /**
+      /** 
        * @brief Halts an agent permanently
        *
        * Call this method to immediately halt the agent permanently. A halted
@@ -316,11 +316,12 @@ namespace gSKI {
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns an enumerated value indicating the current state of execution
        *           for this agent.
        */
       virtual egSKIRunState GetRunState(Error* err = 0) = 0;
+	  virtual void          SetRunState(egSKIRunState state, Error* err = 0) = 0;
 
 
       /**
@@ -330,12 +331,12 @@ namespace gSKI {
        *  agent is added to the agent manager and must be unique
        *  within the scope of the agent manager that created the
        *  agent.
-       *
+       * 
        * @param  err Pointer to client-owned error structure.  If the pointer
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns A pointer to a C style string containing the name
        *            of the agent.  The pointer may be 0 if an
        *            error occurs.
@@ -352,7 +353,7 @@ namespace gSKI {
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns A pointer to the production manager for this agent.  This
        *           pointer may be 0 if the function fails.
        */
@@ -365,13 +366,13 @@ namespace gSKI {
        *  link memory.  The input link is a form of working memory so it can
        *  be manipulated the same way other working memory is manipulated.
        *
-       * @see IInputLink
+       * @see IInputLink 
        *
        * @param  err Pointer to client-owned error structure.  If the pointer
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns A pointer to the input link for this agent.  This pointer
        *             may be 0 if the function fails.
        */
@@ -394,7 +395,7 @@ namespace gSKI {
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns A pointer to the output link for this agent.  This pointer
        *             may be 0 if the function fails.
        */
@@ -413,14 +414,14 @@ namespace gSKI {
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns A pointer to the main memory object for this agent.  This pointer
        *             may be 0 if the function fails.
        */
       virtual IWorkingMemory* GetWorkingMemory(Error* err = 0) = 0;
 
-      /**
-       * @brief Get the agent's top state.
+      /** 
+       * @brief Get the agent's top state. 
        *
        * Call this method to get the agent's top state.  The top state has
        *  limitted functionality since you cannot traverse to substates
@@ -436,13 +437,13 @@ namespace gSKI {
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns A pointer to the top state of this object. This pointer may
        *           be 0 if an error occurs.
        */
       virtual IState* GetTopState(Error* err = 0) = 0;
 
-      /**
+      /** 
        * @brief Get the agent's bottom state
        *
        * The bottom state is the agent's lowest substate.  This state is a
@@ -464,7 +465,7 @@ namespace gSKI {
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns A pointer to the bottom state of this object. This pointer may
        *           be 0 if an error occurs.
        */
@@ -473,7 +474,7 @@ namespace gSKI {
       /**
        * @brief  Gets whether or not learning is turned on for this agent
        *
-       * Learning can be either on or off.  When learning is turned on, chunks
+       * Learning can be either on or off.  When learning is turned on, chunks 
        *  (special productions) are created when impasses are resolved by
        *  a working memory element being returned from a substate.
        *
@@ -481,7 +482,7 @@ namespace gSKI {
        *              is not NULL this structure is filled with extended error
        *              information.  If it is NULL (the default) extended error
        *              information is not returned.
-       *
+       * 
        * @returns true if learning is currently turned on, false if it is currently
        *            turned off.
        */
@@ -494,7 +495,7 @@ namespace gSKI {
        * Learning can be either on or off.  You can set learning on
        *  and off at runtime.  After learning is turned on, chunks will
        *  be created until learning is turned off.  Turning learning off
-       *  does not excise chunks already created.
+       *  does not excise chunks already created.  
        *
        * Learning can also be turned on and off from productions by using
        *  the built-in RHS function: learning.  This technique is used to
@@ -665,7 +666,7 @@ namespace gSKI {
        */
       virtual unsigned long GetNumSmallestStepsExecuted(Error* err = 0) = 0;
 
-
+      
       /**
        * @brief Gets the current phase count for this agent
        *
@@ -762,7 +763,7 @@ namespace gSKI {
        *     @li gSKIERR_RHS_FUNCTION_ALREADY_EXISTS -- If a rhs function of the same name
        *                      was already added to this agent.
        *
-       * @param rhsFunction Pointer to a RHS function object.  This object has its Execute method
+       * @param rhsFunction Pointer to a RHS function object.  This object has its Execute method 
        *                      called back whenever a soar production fires that calls this function
        *                      in its RHS actions.  This pointer should not be 0 (will generate
        *                      an assertion in debug mode).  In release mode nothing happens
@@ -775,7 +776,7 @@ namespace gSKI {
        * @returns true if the RHS function was added.  False if there is already a RHS function
        *             with the given name or if there is another failure.
        */
-      virtual bool AddClientRhsFunction(IRhsFunction* rhsFunction,
+      virtual bool AddClientRhsFunction(IRhsFunction* rhsFunction, 
                                   Error*        err = 0) = 0;
 
       /**
@@ -783,7 +784,7 @@ namespace gSKI {
        *
        *  You can only remove client-defined rhs functions.  Built in RHS functions
        *   cannot be removed.
-       *
+       *  
        *  Possible Errors:
        *     @li gSKIERROR_NO_SUCH_RHS_FUNCTION
        *     @li gSKIERR_RHS_FUNCTION_IN_USE
@@ -803,8 +804,8 @@ namespace gSKI {
        *  @brief Remove all client-defined RHS functions from this agent
        *
        *  Call this method tor remove ALL client-defined RHS functions from this
-       *   agent.
-       *
+       *   agent.  
+       *  
        *  @param  err Pointer to client-owned error structure.  If the pointer
        *               is not 0 this structure is filled with extended error
        *               information.  If it is 0 (the default) extended error
@@ -853,8 +854,8 @@ namespace gSKI {
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
       */
-      virtual void AddRunListener(egSKIRunEventId     eventId,
-                                  IRunListener*       listener,
+      virtual void AddRunListener(egSKIRunEventId     eventId, 
+                                  IRunListener*       listener, 
                                   bool                allowAsynch = false,
                                   Error*              err         = 0) = 0;
 
@@ -928,8 +929,8 @@ namespace gSKI {
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
       */
-      virtual void AddRhsFunctionChangeListener(egSKISystemEventId           eventId,
-                                                IRhsFunctionChangeListener*  listener,
+      virtual void AddRhsFunctionChangeListener(egSKISystemEventId           eventId, 
+                                                IRhsFunctionChangeListener*  listener, 
                                                 bool                         allowAsynch = false,
                                                 Error*                       err         = 0) = 0;
 
@@ -993,8 +994,8 @@ namespace gSKI {
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
        */
-      virtual void AddRhsFunctionListener(egSKISystemEventId    eventId,
-                                          IRhsFunctionListener* listener,
+      virtual void AddRhsFunctionListener(egSKISystemEventId    eventId, 
+                                          IRhsFunctionListener* listener, 
                                           bool                  allowAsynch = false,
                                           Error*                err         = 0) = 0;
 
@@ -1002,13 +1003,13 @@ namespace gSKI {
       * @brief Adds a name filter to a given RHS function execution event
       *
       * Call this method when you want to recieve RHS function execution event
-      *  callbacks for a particular set of functions (possibly only 1).
+      *  callbacks for a particular set of functions (possibly only 1).  
       *
       * The given listener will only recieve event notifications for RHS
       *  functions that match the given name pattern (regular expression).
       *
       *  All listener filters are conjuncted or "ANDed" together.  This means that
-      *   an event must pass successfully through all of the filters for a listener
+      *   an event must pass successfully through all of the filters for a listener 
       *   or it will not be sent to that listener.
       *
       *  E.g. Calling this method with szRhsFuncNamePattern = "^max$" results in the
@@ -1025,7 +1026,7 @@ namespace gSKI {
       *     @li gSKIERR_INVALID_PTR -- If you pass an invalid pointer for a listener or name pattern.
       *
       *  @param eventId  One of the valid event ids listed above
-      *  @param listener The listener for which to filter events.
+      *  @param listener The listener for which to filter events. 
       *  @param rhsFuncNamePattern Name pattern (regular expression) for the RHS function(s)
       *                               for which you would like to recieve event callbacks.
       *                               Passing in 0 results in no filter being created.
@@ -1041,7 +1042,7 @@ namespace gSKI {
                                                     const char*           rhsFuncNamePattern,
                                                     bool                  negate      = false,
                                                     Error*                err         = 0) = 0;
-
+      
       /**
       *  @brief Removes a Rhs function execution event listener
       *
@@ -1083,7 +1084,7 @@ namespace gSKI {
       *     @li gSKIEVENT_RHS_FUNCTION_EXECUTED
       *
       *  @param eventId  One of the valid system event ids listed above
-      *  @param listener A pointer to the listener for which you would like to remove filters.
+      *  @param listener A pointer to the listener for which you would like to remove filters.  
       *                     Passing a 0 pointer causes nothing to happen except an error
       *                     being recorded to err.
       *  @param  err Pointer to client-owned error structure.  If the pointer
@@ -1125,8 +1126,8 @@ namespace gSKI {
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
       */
-	  virtual void AddXMLListener(egSKIXMLEventId	 eventId,
-                            IXMLListener*            listener,
+	  virtual void AddXMLListener(egSKIXMLEventId	 eventId, 
+                            IXMLListener*            listener, 
                             bool                     allowAsynch = false,
                             Error*                   err         = 0) = 0;
 
@@ -1160,13 +1161,13 @@ namespace gSKI {
                                IXMLListener*			listener,
                                Error*					err = 0) = 0;
 
-      /**
+      /** 
        * @brief Print callback support
        *
        * These are deprecated.  Do not use them.
-       */
-      virtual void AddPrintListener(egSKIPrintEventId        eventId,
-                                    IPrintListener*          listener,
+       */ 
+      virtual void AddPrintListener(egSKIPrintEventId        eventId, 
+                                    IPrintListener*          listener, 
                                     bool                     allowAsynch = false,
                                     Error*                   err         = 0) = 0;
 
@@ -1182,9 +1183,9 @@ namespace gSKI {
 
 	  // Called when a "RunEvent" occurs in the kernel
 	  virtual void HandleEvent(egSKIRunEventId eventId, gSKI::IAgent* agentPtr, egSKIPhaseType phase) = 0 ;
-
+	  
 	  // Multi-attribute related methods
-
+   
       /**
          Returns a list of all multi-attributes that have been set with the
          SetMultiAttribute method.
@@ -1212,7 +1213,7 @@ namespace gSKI {
          @param priority The RETE matching priority
          @param pErr Receives error info
       */
-      virtual void SetMultiAttribute(const char* attribute,
+      virtual void SetMultiAttribute(const char* attribute, 
                                      int priority,
                                      Error* pErr = 0) = 0;
 
@@ -1231,24 +1232,6 @@ namespace gSKI {
          @param pErr Receives error info
       */
       virtual void SetNumericIndifferentMode(egSKINumericIndifferentMode m, Error* pErr = 0) = 0;
-
-	  virtual void SetExplorationMode(egSKIExplorationMode m, Error* pErr = 0) = 0;
-	  virtual egSKIExplorationMode GetExplorationMode(Error* pErr = 0) = 0;
-
-	  virtual void SetTemperature(double d, Error* pErr = 0) = 0;
-	  virtual double GetTemperature(Error* pErr = 0) = 0;
-
-	  virtual void SetEpsilon(double d, Error* pErr = 0) = 0;
-	  virtual double GetEpsilon(Error* pErr = 0) = 0;
-
-	  virtual void SetAlpha(double d, Error* pErr = 0) = 0;
-	  virtual double GetAlpha(Error* pErr = 0) = 0;
-
-	  virtual void SetGamma(double d, Error* pErr = 0) = 0;
-	  virtual double GetGamma(Error* pErr = 0) = 0;
-
-	  virtual bool IsRLOn(Error* err = 0) = 0;
-      virtual void SetRL(bool on, Error* err = 0) = 0;
 
 	  virtual bool GetOperand2Mode() = 0;
 	  virtual void SetOperand2Mode(bool mode) = 0;

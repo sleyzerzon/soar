@@ -13,7 +13,8 @@ cli_alias.cpp\
 cli_attributepreferencesmode.cpp\
 cli_cd.cpp\
 cli_chunknameformat.cpp\
-cli_decay.cpp\
+cli_clog.cpp\
+cli_commandtofile.cpp\
 cli_defaultwmedepth.cpp\
 cli_dirs.cpp\
 cli_echo.cpp\
@@ -21,7 +22,6 @@ cli_echocommands.cpp\
 cli_editproduction.cpp\
 cli_excise.cpp\
 cli_explainbacktraces.cpp\
-cli_exploration.cpp\
 cli_firingcounts.cpp\
 cli_gdsprint.cpp\
 cli_help.cpp\
@@ -30,7 +30,6 @@ cli_initsoar.cpp\
 cli_inputperiod.cpp\
 cli_internalsymbols.cpp\
 cli_learn.cpp\
-cli_log.cpp\
 cli_ls.cpp\
 cli_matches.cpp\
 cli_maxchunks.cpp\
@@ -50,7 +49,6 @@ cli_pwd.cpp\
 cli_quit.cpp\
 cli_removewme.cpp\
 cli_retenet.cpp\
-cli_RL.cpp\
 cli_run.cpp\
 cli_savebacktraces.cpp\
 cli_setlibrarylocation.cpp\

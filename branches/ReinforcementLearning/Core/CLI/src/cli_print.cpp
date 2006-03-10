@@ -38,7 +38,7 @@ bool CommandLineInterface::ParsePrint(gSKI::IAgent* pAgent, std::vector<std::str
 		{'s', "stack",			0},
 		{'S', "states",			0},
 		{'u', "user",			0},
-		{'R', "RL" , 			0},
+		{'v', "varprint",		0},
 		{0, 0, 0}
 	};
 
@@ -95,9 +95,8 @@ bool CommandLineInterface::ParsePrint(gSKI::IAgent* pAgent, std::vector<std::str
 				break;
 			case 'u':
 				options.set(PRINT_USER);
-				break;
-			case 'R':
-				options.set(PRINT_RL);
+			case 'v':
+				options.set(PRINT_VARPRINT);
 				break;
 			default:
 				return SetError(CLIError::kGetOptError);
@@ -115,15 +114,14 @@ bool CommandLineInterface::ParsePrint(gSKI::IAgent* pAgent, std::vector<std::str
 			if (options.test(PRINT_INTERNAL) || options.test(PRINT_DEPTH)) return SetError(CLIError::kTooFewArgs);
 			return DoPrint(pAgent, options, depth);
 
-		case 1:
+		case 1: 
 			// the acDjus options don't allow an argument
-			if (options.test(PRINT_ALL)
-				|| options.test(PRINT_CHUNKS)
-				|| options.test(PRINT_DEFAULTS)
-				|| options.test(PRINT_JUSTIFICATIONS)
-				|| options.test(PRINT_USER)
-				|| options.test(PRINT_RL)
-				|| options.test(PRINT_STACK))
+			if (options.test(PRINT_ALL) 
+				|| options.test(PRINT_CHUNKS) 
+				|| options.test(PRINT_DEFAULTS) 
+				|| options.test(PRINT_JUSTIFICATIONS) 
+				|| options.test(PRINT_USER) 
+				|| options.test(PRINT_STACK)) 
 			{
 				SetErrorDetail("No argument allowed when printing all/chunks/defaults/justifications/user/stack.");
 				return SetError(CLIError::kTooManyArgs);
@@ -183,7 +181,6 @@ bool CommandLineInterface::DoPrint(gSKI::IAgent* pAgent, PrintBitset options, in
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, USER_PRODUCTION_TYPE);
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
-		pKernelHack->PrintUser(pAgent, 0, internal, filename, full, TEMPLATE_PRODUCTION_TYPE);
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
@@ -211,15 +208,12 @@ bool CommandLineInterface::DoPrint(gSKI::IAgent* pAgent, PrintBitset options, in
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
-	if (options.test(PRINT_RL)) {
-		AddListenerAndDisableCallbacks(pAgent);
-		pKernelHack->PrintRL(pAgent, 0, internal, filename, full);
-		RemoveListenerAndEnableCallbacks(pAgent);
-		return true;
-	}
 
 	// Default to symbol print if there is an arg, otherwise print all
 	AddListenerAndDisableCallbacks(pAgent);
+	if (options.test(PRINT_VARPRINT)) {
+		m_VarPrint = true;
+	}
 	if (pArg) {
 		pKernelHack->PrintSymbol(pAgent, const_cast<char*>(pArg->c_str()), name, filename, internal, full, depth);
 	} else {
@@ -227,8 +221,8 @@ bool CommandLineInterface::DoPrint(gSKI::IAgent* pAgent, PrintBitset options, in
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, USER_PRODUCTION_TYPE);
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, TEMPLATE_PRODUCTION_TYPE);
 	}
+	m_VarPrint = false;
 	RemoveListenerAndEnableCallbacks(pAgent);
 
 	// put the result into a message(string) arg tag

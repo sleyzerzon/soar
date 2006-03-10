@@ -1,14 +1,14 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /********************************************************************
-* @file gSKI_Enumerations.h
+* @file gSKI_Enumerations.h 
 *********************************************************************
 * created:	   6/19/2002   15:00
 *
-* purpose:
+* purpose: 
 *********************************************************************/
 
 #ifndef GSKI_ENUMERATIONS_H
@@ -20,9 +20,9 @@
       /** These are their types:
 	  egSKISystemEventId
 	  egSKIRunEventId
-	  egSKIProductionEventId
+	  egSKIProductionEventId 
 	  egSKIAgentEventId
-	  egSKIWorkingMemoryEventId
+	  egSKIWorkingMemoryEventId 
 	  egSKIPrintEventId
 	  egSKIRhsEventId
 	  egSKIGenericEventId
@@ -31,6 +31,7 @@
    typedef enum {
       // Kernel events
       gSKIEVENT_BEFORE_SHUTDOWN            = 1,
+	  gSKIEVENT_AFTER_CONNECTION,
       gSKIEVENT_AFTER_CONNECTION_LOST,
       gSKIEVENT_BEFORE_RESTART,
       gSKIEVENT_AFTER_RESTART,
@@ -49,10 +50,10 @@
 
     static inline bool IsSystemEventID (int id)
     {
- 	   return (id >= gSKIEVENT_BEFORE_SHUTDOWN &&
+ 	   return (id >= gSKIEVENT_BEFORE_SHUTDOWN && 
  		id <= gSKIEVENT_LAST_SYSTEM_EVENT) ;
     }
-
+ 
     typedef enum {
       // Agent (Run)Events
       gSKIEVENT_BEFORE_SMALLEST_STEP = gSKIEVENT_LAST_SYSTEM_EVENT + 1,
@@ -89,22 +90,22 @@
 
     static inline bool IsRunEventID (int id)
     {
- 	   return (id >= gSKIEVENT_BEFORE_SMALLEST_STEP &&
+ 	   return (id >= gSKIEVENT_BEFORE_SMALLEST_STEP && 
  		id <= gSKIEVENT_LAST_RUN_EVENT) ;
     }
      static inline bool IsPhaseEventID (int id)
     {
- 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED &&
+ 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
  		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
     }
       static inline bool IsBEFOREPhaseEventID (int id)
     {
- 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED &&
+ 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
  		id <= gSKIEVENT_BEFORE_WM_PHASE) ;
     }
      static inline bool IsAFTERPhaseEventID (int id)
     {
- 	   return (id >= gSKIEVENT_AFTER_INPUT_PHASE &&
+ 	   return (id >= gSKIEVENT_AFTER_INPUT_PHASE && 
  		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
     }
 
@@ -118,10 +119,10 @@
       gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
       gSKIEVENT_LAST_PRODUCTION_EVENT = gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
     } egSKIProductionEventId;
-
+    
     static inline bool IsProductionEventID (int id)
     {
- 	   return (id >= gSKIEVENT_AFTER_PRODUCTION_ADDED &&
+ 	   return (id >= gSKIEVENT_AFTER_PRODUCTION_ADDED && 
  		id <= gSKIEVENT_LAST_PRODUCTION_EVENT ) ;
     }
 
@@ -134,10 +135,10 @@
       gSKIEVENT_AFTER_AGENT_REINITIALIZED,
       gSKIEVENT_LAST_AGENT_EVENT = gSKIEVENT_AFTER_AGENT_REINITIALIZED,
     } egSKIAgentEventId;
-
+     
     static inline bool IsAgentEventID (int id)
     {
- 	   return (id >= gSKIEVENT_AFTER_AGENT_CREATED &&
+ 	   return (id >= gSKIEVENT_AFTER_AGENT_CREATED && 
  		id <= gSKIEVENT_LAST_AGENT_EVENT) ;
     }
 
@@ -149,10 +150,10 @@
 
     static inline bool IsWorkingMemoryEventID (int id)
     {
- 	   return (id >= gSKIEVENT_OUTPUT_PHASE_CALLBACK &&
+ 	   return (id >= gSKIEVENT_OUTPUT_PHASE_CALLBACK && 
  		id <= gSKIEVENT_LAST_WM_EVENT) ;
     }
-
+ 
 
     typedef enum {
       // Error and print callbacks
@@ -168,11 +169,11 @@
 
     static inline bool IsPrintEventID (int id)
     {
- 	   return (id >= gSKIEVENT_LOG_ERROR &&
+ 	   return (id >= gSKIEVENT_LOG_ERROR && 
  		id <= gSKIEVENT_LAST_PRINT_EVENT) ;
     }
-
-    typedef enum {
+ 
+    typedef enum { 
  	 // Used to provide user handler functions for RHS (right hand side) functions
    	 // fired within Soar productions.  This is different from normal events in that
  	 // the handler is executing the function and returning a value, not just being notified
@@ -181,14 +182,14 @@
 	 gSKIEVENT_CLIENT_MESSAGE,
 	 gSKIEVENT_LAST_RHS_EVENT = gSKIEVENT_CLIENT_MESSAGE,
     } egSKIRhsEventId;
-
+ 
     static inline bool IsRhsEventID (int id)
     {
- 	   return (id >= gSKIEVENT_RHS_USER_FUNCTION &&
+ 	   return (id >= gSKIEVENT_RHS_USER_FUNCTION && 
  		id <= gSKIEVENT_LAST_RHS_EVENT) ;
     }
 
-	 typedef enum {
+	 typedef enum { 
  	 // This is directly implemented in gSKI, but is not really the same event as the SML side.
 	 // On the gSKI side this is used to signal the generation of XML trace events.
 	 // On the client side it is used send complete XML objects.
@@ -206,7 +207,7 @@
 
 	static inline bool IsXMLEventID (int id)
     {
- 	   return (id >= gSKIEVENT_XML_TRACE_OUTPUT &&
+ 	   return (id >= gSKIEVENT_XML_TRACE_OUTPUT && 
  		id <= gSKIEVENT_LAST_XML_EVENT) ;
     }
 
@@ -243,13 +244,13 @@
 
    /** End of Event Id enumerations.  **/
 
-   /** Types of threading models
+   /** Types of threading models 
 		@li SINGLE_THREADED  Does not synchronize multi-threaded access.
 		@li MULTI_THREADED   Synchronizes multi-threaded access (multiple threads can access at same time)
    */
-   typedef enum  {
-      gSKI_SINGLE_THREAD,
-      gSKI_MULTI_THREAD
+   typedef enum  { 
+      gSKI_SINGLE_THREAD, 
+      gSKI_MULTI_THREAD 
    } egSKIThreadingModel;
 
    /** Types of working memory changes
@@ -264,34 +265,34 @@
    } egSKIWorkingMemoryChange ;
 
    /**
-      Types of processes in which the kernel can be housed.
+      Types of processes in which the kernel can be housed.  
 
       Used as a paramter passed to the kernel factory's create method and as a return
         type for IInstanceInfo::GetProcessType.
-
+      
       @li IN_PROCESS:             In the client's process
       @li LOCAL_OUT_OF_PROCESS:   On the same machine, but different process than client
       @li REMOTE_OUT_OF_PROCESS:  On a different machine and different process than client
       @li ANY_OUT_OF_PROCESS:     Either LOCAL_OUT_OF_PROCESS or REMOTE_OUT_OF_PROCESS
       @li ANY_PROCESS:            Any of IN/LOCAL_OUT_OF/REMOTE_OUT_OF PROCESS.
    */
-   typedef enum  {
-      gSKI_IN_PROCESS,
-      gSKI_LOCAL_OUT_OF_PROCESS,
-      gSKI_REMOTE_OUT_OF_PROCESS,
-      gSKI_ANY_OUT_OF_PROCESS,
-      gSKI_ANY_PROCESS
+   typedef enum  { 
+      gSKI_IN_PROCESS, 
+      gSKI_LOCAL_OUT_OF_PROCESS, 
+      gSKI_REMOTE_OUT_OF_PROCESS, 
+      gSKI_ANY_OUT_OF_PROCESS, 
+      gSKI_ANY_PROCESS 
    } egSKIProcessType;
 
    /**
-      Types of debug logging allowed.
-
+      Types of debug logging allowed.  
+     
       @li LOG_NONE:             No debug logging occurs
       @li LOG_ERRORS:           Only errors are logged
       @li LOG_ALL_EXCEPT_DEBUG: Everything but pure debug messages logged
       @li LOG_ALL:              Everything is logged
    */
-   typedef enum  {
+   typedef enum  { 
       gSKI_LOG_NONE,
       gSKI_LOG_ERRORS,
       gSKI_LOG_ALL,
@@ -306,7 +307,7 @@
     * checked before any Get methods are called as the return data
     * is undefined if the type is not the same as the one retrieved.
     *
-    * @li DOUBLE:    Floating point, double precision number
+    * @li DOUBLE:    Floating point, double precision number  
     * @li INT:       Integer number
     * @li STRING:    A simple string
     * @li OBJECT:    A Working memory ObjectSoar identifier
@@ -322,8 +323,8 @@
    } egSKISymbolType;
 
 
-
-   /**
+   
+   /** 
     * @brief Definition of the build in working memory object types
     *
     * This type is returned from IWMObject::GetObjectType.  The object
@@ -343,7 +344,7 @@
       gSKI_STATE_OBJECT
    } egSKIWMObjectType;
 
-   /**
+   /** 
     * @brief Definition of the types of impasses possible in soar
     *
     * Impasses are roadblocks in decisoin making such as inability
@@ -372,9 +373,9 @@
       gSKI_OPERATOR_CONSTRAINT_FAILURE_IMPASSE
    } egSKIImpasseType;
 
-   /**
+   /** 
     * @brief Defines types of unary preferences in soar
-    *
+    * 
     * Operators (and wmes) must be acceptable or required to be chosen.
     *  The reject and prohibit preference have precidence over accept and
     *  best.  However, require has precidence over reject.  For more information
@@ -415,8 +416,8 @@
    } egSKIPreferenceType;
 
 
-
-   /**
+   
+   /** 
    * @brief Definition of the types of decision phases for Soar
    *
    * This enumeration lists all of the decision phase types for the
@@ -457,13 +458,13 @@
    /**
    * @brief Agent run step definitions.
    *
-   * This enumeration is used for the agent manager and agent thread group
+   * This enumeration is used for the agent manager and agent thread group 
    *  run methods to describe how long the agent should run before stopping.
    *
    * @see egSKIDecisionPhaseType
    *
    * @li RUN_SMALLEST_STEP:     Run the smallest step possible before returning.  For
-   *                             the INPUT_PHASE, OUTPUT_PHASE and SELECTION_PHASE
+   *                             the INPUT_PHASE, OUTPUT_PHASE and SELECTION_PHASE 
    *                             the decision phase is the smallest step.  For
    *                             PROPOSAL_PHASE and APPLY_PHASE the smallest step
    *                             is an elaboration cycle (a single pass of parallel
@@ -483,14 +484,14 @@
    typedef enum {
       gSKI_RUN_SMALLEST_STEP,
       gSKI_RUN_PHASE,
-	  gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step
+	  gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step 
       gSKI_RUN_DECISION_CYCLE,
       gSKI_RUN_UNTIL_OUTPUT,
       gSKI_RUN_FOREVER,
       gSKI_NUM_RUN_TYPES
    } egSKIRunType;
 
-   /**
+   /** 
    * @brief Agent run interleaving definitions
    *
    * Agent interleave definitions are used to tell the system how long
@@ -504,10 +505,10 @@
    *      INPUT, OUTPUT and DECISION phases, the smallest step is the
    *      decision phase.  For PROPOSAL and APPLY phases, the smallest
    *      step is the elaboration phase (a single pass of parallel rule
-   *      firings).
+   *      firings).  
    *      In Soar 7 mode, the smallest step is the same as a PHASE, but
    *	  users should be allowed to interleave by ELABORATION if they want to.
-   *      A Soar 7 ELABORATION is once thru input-preference-wm-output,
+   *      A Soar 7 ELABORATION is once thru input-preference-wm-output, 
    *	  until mini-quiescence.
    * @li INTERLEAVE_PHASE: Run each agent one phase before
    *      moving to the next agent.  A phase is one of
@@ -527,7 +528,7 @@
    } egSKIInterleaveType;
 
 
-   /**
+   /** 
     * @brief Definitions for the agent running states
     *
     * @li RUNSTATE_STOPPED - the agent is currently not running at all.
@@ -549,10 +550,10 @@
       gSKI_RUNSTATE_HALTED
    } egSKIRunState;
 
-   /**
+   /** 
     * @brief Definition of the ways in which runs can complete
     *
-    * @li RUN_ERROR - an error occured and the run could not complete.
+    * @li RUN_ERROR - an error occured and the run could not complete.  
     *     The state of the system depends on the particular error.
     * @li RUN_EXECUTING - if the run is still executing after the method
     *      returns.
@@ -573,7 +574,7 @@
       gSKI_RUN_COMPLETED,
       gSKI_RUN_COMPLETED_AND_INTERRUPTED
    } egSKIRunResult;
-
+   
    /**
    *  Agent stop points definition.
    *
@@ -589,8 +590,8 @@
    *  @see egSKIStopType
    *
    *  @li STOP_ON_CALLBACK_RETURN:  Stop immediately after the next callback return event.
-   *        If Stop(gSKI_STOP_ON_CALLBACK_RETURN) is called from within a
-   *        callback, the agent(s) will stop after that callback returns.
+   *        If Stop(gSKI_STOP_ON_CALLBACK_RETURN) is called from within a 
+   *        callback, the agent(s) will stop after that callback returns.  
    *        If it is called outside of a callback, the agent(s) will stop after
    *        the next callback returns.
    *  @li STOP_AFTER_ALL_CALLBACKS_RETURN: Stop after the next set of callbacks
@@ -601,7 +602,7 @@
    *       for the current phase. The phase is either an elaboration phase
    *       or a decision phase, whichever the system is executing when the
    *       stop method is called.
-   *  @li STOP_NEXT_ELABORATION_PHASE: Stop at the beginning of the next
+   *  @li STOP_NEXT_ELABORATION_PHASE: Stop at the beginning of the next 
    *       elaboration phase.
    *  @li STOP_NEXT_DECISION_PHASE: Stop at the beginning of the next decision
    *       phase.
@@ -615,17 +616,17 @@
       gSKI_STOP_AFTER_DECISION_CYCLE		= 1 << 4
    } egSKIStopLocation;
 
-   /**
+   /** 
    *  @brief Ways you can stop the agents from running.
    *
    *  @see egSKIStopLocation
    *
-   *  @li gSKI_STOP_BY_RETURNING: Stop the agent by returning from the Run
+   *  @li gSKI_STOP_BY_RETURNING: Stop the agent by returning from the Run 
    *       function.  If the agent is running in a threadgroup, this will
    *       effectively kill the agent thread.  This type of stop does not
    *       work for gSKI_STOP_ON_CALLBACK_RETURN and gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN,
    *       stop locations.
-   *  @li gSKI_STOP_BY_SUSPENDING: Stop the agent thread by suspending thread
+   *  @li gSKI_STOP_BY_SUSPENDING: Stop the agent thread by suspending thread  
    *       execution.  If you stop a single threaded application this way, you
    *       effectively stop the entire application.  The thread remains
    *       suspended until Run is called on that thread group again.
@@ -658,14 +659,14 @@
       // Note that these are purposely the same values as used by the soar kernel
      gSKI_UNKNOWN_SUPPORT = 0,
      gSKI_O_SUPPORT = 1,
-     gSKI_I_SUPPORT = 2
+     gSKI_I_SUPPORT = 2    
    } egSKISupportType;
 
-   /**
+   /** 
    * @brief Definition of all allowed o-support modes in Soar
    *
    * @li gSKI_O_SUPPORT_MODE_0: Mode 0 is the base mode.  O-support is calculated
-   *       based on the structure of working memory that is tested and
+   *       based on the structure of working memory that is tested and 
    *       modified.  Testing an operator or operator acceptable preference
    *       results in state or operator augmentations being o-supported.
    *       The support computation is very complex (see soar manual).
@@ -676,7 +677,7 @@
    *       o-supported.
    * @li gSKI_O_SUPPORT_MODE_3: Mode 3 is the same as mode 2 except that
    *       operator elaborations (adding attributes to operators) now get
-   *       i-support even though you have to test the operator to
+   *       i-support even though you have to test the operator to 
    *       elaborate an operator.  This is the default mode in Soar 8.
    * @li gSKI_O_SUPPORT_MODE_4: The new default, TODO
    */
@@ -737,7 +738,7 @@
       gSKI_NUM_PRODUCTION_TYPES, /// End marker for iteration
    } egSKIProdType;
 
-   /**
+   /** 
     * @brief Definition of a special value for rhs function parameter number
     *
     * This defines special RHS function parameter number values.
@@ -761,12 +762,5 @@
       gSKI_NUMERIC_INDIFFERENT_MODE_SUM,  /// do numeric indifference by summing all values asserted by the rules.  Indifferent prefferences with no explicit value are assigned the numeric weight of 0.
       gSKI_NUMERIC_INDIFFERENT_MODE_AVG,  /// do numeric indiffernce by averaging all values asserted by the rules.  Indifferent preferrences with no explicit value are assigned the numeric weight of 50.
    } egSKINumericIndifferentMode;
-
-   typedef enum
-   {
-   	   gSKI_BOLTZMANN_EXPLORATION,
-   	   gSKI_EPSILON_GREEDY_EXPLORATION,
-   	   gSKI_NO_EXPLORATION,
-   } egSKIExplorationMode;
 
 #endif
