@@ -105,9 +105,6 @@ namespace gSKI
 		 void SetChunkCount(IAgent* pIAgent, unsigned long count);
 
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
-
-         void DecayInit(IAgent* pIAgent);
-         void DecayDeInit(IAgent* pIAgent);
 	  };
    }
 }

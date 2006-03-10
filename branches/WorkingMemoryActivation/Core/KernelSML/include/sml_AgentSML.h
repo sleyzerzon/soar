@@ -116,7 +116,10 @@ public:
 
 	// Release all of the WMEs that we currently have references to
 	// It's a little less severe than clear() which releases everything we own, not just wmes.
-	void ReleaseAllWmes() ;
+	// If flushPendingRemoves is true, make sure gSKI removes all wmes from Soar's working memory
+	// that have been marked for removal but are still waiting for the next input phase to actually
+	// be removed (this should generally be correct so we'll default to true for it).
+	void ReleaseAllWmes(bool flushPendingRemoves = true) ;
 
 	gSKI::IAgent* GetIAgent() { return m_pIAgent ; }
 
@@ -130,8 +133,6 @@ public:
 	OutputListener* GetOutputListener()							{ return m_pOutputListener ; }
 
 	void SetInputProducer(gSKI::IInputProducer* pInputProducer)	{ m_pInputProducer = pInputProducer ; }
-
-	bool SetStopOnOutput(bool state) ;
 
 	void SetSuppressRunEndsEvent(bool state) { m_SuppressRunEndsEvent = state ; }
 	bool GetSuppressRunEndsEvent()			 { return m_SuppressRunEndsEvent ; }
