@@ -267,12 +267,28 @@ typedef enum
 
 typedef enum
 {
+	sml_INTERLEAVE_ELABORATION,
+	sml_INTERLEAVE_PHASE,
+	sml_INTERLEAVE_DECISION,
+	sml_INTERLEAVE_UNTIL_OUTPUT,
+} smlInterleaveStepSize ;
+
+typedef enum
+{
 	sml_NONE				=  0,		// No special flags set
 	sml_RUN_SELF			=  1 << 0,	// User included --self flag when running agent
 	sml_RUN_ALL				=  1 << 1,	// User ran all agents
 	sml_UPDATE_WORLD		=  1 << 2,	// User explicitly requested world to update
 	sml_DONT_UPDATE_WORLD	=  1 << 3,	// User explicitly requested world to not update
 } smlRunFlags ;
+
+typedef enum {
+    sml_RUN_ERROR,
+    sml_RUN_EXECUTING,
+    sml_RUN_INTERRUPTED,
+    sml_RUN_COMPLETED,
+    sml_RUN_COMPLETED_AND_INTERRUPTED	// Stop was requested but run completed before agent was interrupted.
+} smlRunResult;
 
 // These typedefs all define types of functions.
 // For example: typedef void (*X)(type1 arg1, type2 arg2) means we're defining function "X" to take (type1 arg1, type2 arg2) and return void.
