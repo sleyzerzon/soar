@@ -1,3 +1,9 @@
+/* QL_Interface.h
+*
+* This is the main library of QuickLink.  Interface with this if you would like to 
+* write your own QL application.
+*
+*/
 
 #ifndef QL_INTERFACE
 #define QL_INTERFACE
@@ -67,8 +73,7 @@ public:
 	/*************************************************************
 	* @brief Call this function before exiting the program
 	*************************************************************/
-	void QL_Shutdown()
-	{ prepare_for_new_connection(); }
+	void QL_Shutdown();
 
 	/*************************************************************
 	* @brief This returns the name of the agent
@@ -90,6 +95,17 @@ public:
 	*					changes (adds, deletes, etc.) need to be made to it.
 	*************************************************************/
 	void add_identifier(const std::string& parent_id, const std::string& attribute, const std::string& id_name);
+
+	/*************************************************************
+	* @brief This function creates a loop or a 'shared id' between to identifiers
+	*
+	* @param loop_start  This is the case-insensitive QL-unique identifier of an id that already exists
+						that will be the "start" of the loop
+	* @param attribute  This is the attribute value of the shared id
+	* @param loop_end	This is the case-insensitive QL-unique identifier of an id that already exists
+						and is different from parent_id where the loop should be created "to"
+	*************************************************************/
+	void add_shared_id(const std::string& loop_start, const std::string& attribute, const std::string& loop_end);
 
 	/*************************************************************
 	* @brief This function deletes an identifier to the input-link in the form 
@@ -216,12 +232,6 @@ public:
 	void save_input_link(const std::string& filename);
 
 	/*************************************************************
-	* @brief Commit the changes you have made to the input-link by adds, updates and deletes
-	*************************************************************/
-	void commit()
-	{ m_pAgent->Commit(); }
-
-	/*************************************************************
 	* @brief This will spawn the JavaDebugger
 	*************************************************************/
 	void spawn_debugger();
@@ -249,6 +259,9 @@ public:
 	// TODO: encapsulate this somehow
 	sml::Agent* get_agent_ptr()
 	{ return m_pKernel->GetAgent(m_pAgent->GetAgentName()); }
+
+	void remove_identifier(const std::string& name)
+	{ m_id_container.erase(name); }
 
 private:
 
@@ -286,6 +299,12 @@ private:
 	void update_views();
 	void update_views(std::string info);
 
+	/*************************************************************
+	* @brief Commit the changes you have made to the input-link by adds, updates and deletes
+	*************************************************************/
+	void commit()
+	{ m_pAgent->Commit(); }
+
 };
 
 template <typename T>
@@ -302,6 +321,7 @@ void QL_Interface::delete_value_wme(const std::string& identifier, const std::st
 	Smart_Pointer<WME_Id> parent = get_identifier(identifier);
 	parent->remove_wme_child(attribute, value, m_pAgent);
 
+	commit();
 	update_views();
 }
 
@@ -311,6 +331,7 @@ void QL_Interface::update_value_wme(const std::string& identifier, const std::st
 	Smart_Pointer<WME_Id> parent = get_identifier(identifier);
 	parent->update_wme_child(attribute, old_value, new_value,  m_pAgent);
 
+	commit();
 	update_views();
 }
 

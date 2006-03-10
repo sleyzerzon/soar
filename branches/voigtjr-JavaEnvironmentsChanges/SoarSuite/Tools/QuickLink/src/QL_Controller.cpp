@@ -1,3 +1,9 @@
+/* QL_Controller.cpp
+*
+* This file represents the command line interface to QL.  This is the model for how to
+* interface with QL_Interface.
+*
+*/
 
 #include "Utilities.h"
 #include "QL_Interface.h"
@@ -14,6 +20,22 @@
 #include <vector>
 #include <fstream>
 #include <iterator>
+
+/* this is for VS's memory checking functionality */
+//#define MEM_LEAK_DEBUG // uncomment this for functionality
+#ifdef MEM_LEAK_DEBUG
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif // HAVE_CONFIG_H
+
+#ifdef _MSC_VER
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _MSC_VER
+#endif MEM_LEAK_DEBUG
+
+/* end mem check */
 
 using std::map; using std::string; using std::list;
 using std::endl; using std::cout; using std::copy;
@@ -35,7 +57,6 @@ void clear_input_link(istringstream& command);
 void save_input_link(istringstream& command);
 void load_input_file(istringstream& command);
 void run_til_output(istringstream& command);
-void commit(istringstream& command);
 void save_process(istringstream& command);
 void clear_process_mem(istringstream& command);
 void pause_process(istringstream& command);
@@ -46,7 +67,6 @@ void display_input_link(istringstream& command);
 void spawn_debugger(istringstream& command);
 void connect_remotely(istringstream& command);
 void create_local_kernel(istringstream& command);
-void catch_init_call(istringstream& command);
 
 // helper functions
 void create_identifier(const string& id, const string& att, string value);
@@ -73,59 +93,97 @@ bool acquiring_new_connection = false;
 
 int main()
 {
-	command_map_t command_map;
-	load_command_map(command_map);
-
-	
-	Input_Controller& input = Input_Controller::instance();
-	QL_Interface& ql_interface = QL_Interface::instance();
-
-	ql_interface.create_new_kernel();
-	ql_interface.attach_view(View_Console::create());
-	ql_interface.setup_input_link("IL");
-	
-
-	while(true)  // do not leave command loop unless a break is encountered
+#ifdef MEM_LEAK_DEBUG
+	// When we have a memory leak, set this variable to
+	// the allocation number (e.g. 122) and then we'll break
+	// when that allocation occurs.
+	//_crtBreakAlloc = 112;
+	// we put everything in its own scope so memory leak detection can be done
 	{
-		try
+#endif MEM_LEAK_DEBUG
+		
+		// create and load the command map
+		command_map_t command_map;
+		load_command_map(command_map);
+
+		// create instances of the input controller and ql interface		
+		Input_Controller& input = Input_Controller::instance();
+		QL_Interface& ql_interface = QL_Interface::instance();
+
+		// the following three things should always be done in the specified order
+		// 1. ALWAYS create the kernel
+		// 2. (optional) attach all views
+		// 3. ALWAYS setup the input link, the parameter string is the name the client (this)
+		//    will refer to the input link as
+		ql_interface.create_new_kernel();
+		ql_interface.attach_view(View_Console::create());
+		ql_interface.setup_input_link("IL");
+		
+
+		while(true)  // do not leave command loop unless a break is encountered
 		{
-			istringstream command_line;
-			if(process_paused)
-				command_line.str(input.force_command_line_input());
-			else // get the command and check to see if it is a valid command
-				command_line.str(input.get_command());
-			Input_Controller::instance().should_print_prompt = false;
-			// save the string into the process memory
-			process_memory.push_back(command_line.str());
-			string command;
-			command_line >> command; // get the command from the string
-			command = string_upper(command);
-
-			if(command == "QUIT" || command == "EXIT")
-				break;
-			if(acquiring_new_connection && command != "REMOTE" && command != "LOCAL")
-				throw Error("Please use \"remote\" or \"local\" to create a new connection before proceeding");
-
-			command_fp_t ptr = command_map[command]; // get the function that corresponds to the command string
-
-			if(ptr)  // if there is a valid function, call it
-				ptr(command_line);
-			else
+			try
 			{
-				ql_interface.soar_command_line(command_line.str());
-				command_map.erase(command);
-			}
-			Input_Controller::instance().should_print_prompt = true;
+				istringstream command_line;
+				if(process_paused)
+					command_line.str(input.force_command_line_input());
+				else // get the command and check to see if it is a valid command
+					command_line.str(input.get_command());
+				Input_Controller::instance().should_print_prompt = false;
+				// save the string into the process memory
+				process_memory.push_back(command_line.str());
+				string command;
+				command_line >> command; // get the command from the string
+				command = string_upper(command);
 
+				if(command == "QUIT" || command == "EXIT")
+					break;
+				// this will be true when a command to create a new kernel or connect to a remote one has
+				// failed, and we cannot continue until a connection has been established
+				if(acquiring_new_connection && command != "REMOTE" && command != "LOCAL")
+					throw Error("Please use \"remote\" or \"local\" to create a new connection before proceeding");
+
+				command_fp_t ptr = command_map[command]; // get the function that corresponds to the command string
+
+				if(ptr)  // if there is a valid function, call it
+					ptr(command_line);
+				else // not valid
+				{
+					ql_interface.soar_command_line(command_line.str()); // try to execute it on the CLI
+					command_map.erase(command); // erase the command from the command map, this must be done
+				}
+				
+				Input_Controller::instance().should_print_prompt = true;
+
+			}
+			catch (Error& error)
+			{
+				cout << error.msg << endl;
+			}
 		}
-		catch (Error& error)
-		{
-			cout << error.msg << endl;
-		}
+
+		process_memory.clear();
+		input.IC_Shutdown();
+		ql_interface.QL_Shutdown();
+#ifdef MEM_LEAK_DEBUG
 	}
 
-	input.IC_Shutdown();
-	ql_interface.QL_Shutdown();
+#ifdef _MSC_VER
+	printf("\nNow checking memory.  Any leaks will appear below.\nNothing indicates no leaks detected.\n") ;
+	printf("\nIf no leaks appear here, but some appear in the output\nwindow in the debugger, they have been leaked from a DLL.\nWhich is reporting when it's unloaded.\n\n") ;
+
+	// Set the memory checking output to go to Visual Studio's debug window (so we have a copy to keep)
+	// and to stdout so we can see it immediately.
+	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
+	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
+
+	// Now check for memory leaks.
+	// This will only detect leaks in objects that we allocate within this executable and static libs.
+	// If we allocate something in a DLL then this call won't see it because it works by overriding the
+	// local implementation of malloc.
+	_CrtDumpMemoryLeaks();
+#endif // _MSC_VER
+#endif MEM_LEAK_DEBUG
 }
 
 void load_command_map(command_map_t& command_map)
@@ -143,7 +201,6 @@ void load_command_map(command_map_t& command_map)
 	command_map["L"] = load_input_file;
 	command_map["GO"] = run_til_output;
 	command_map["G"] = run_til_output;
-	command_map["COMMIT"] = commit;
 	command_map["SAVEP"] = save_process;
 	command_map["SP"] = save_process;
 	command_map["CLEARP"] = clear_process_mem;
@@ -159,7 +216,6 @@ void load_command_map(command_map_t& command_map)
 	command_map["DEBUG"] = spawn_debugger;
 	command_map["REMOTE"] = connect_remotely;
 	command_map["LOCAL"] = create_local_kernel;
-	command_map["INIT"] = catch_init_call;
 }
 
 // command map functions
@@ -198,9 +254,10 @@ void delete_object(istringstream& command)
 	// there are 3 things left in the stream command: identifier, attribute and value
 	string id, att, value;
 
+	// this returns true if it is an id
 	if(setup_id_att_value(command, id, att, value, c_delete_usage_error)) 
 		QL_Interface::instance().delete_identifier(id, att, value);
-	else
+	else // some type of value wme
 	{
 		value_type type = decipher_type(value);
 		switch(type) {
@@ -224,11 +281,27 @@ void update_object(istringstream& command)
 {
 	string id, att, old_value, new_value;
 
+	// we can ignore the return type here because a ID cannot be updated
 	setup_id_att_value(command, id, att, old_value, c_change_usage_error);
 	if(!(command >> new_value))
 		throw Error(c_change_usage_error);
 
-	change_value_wme(id, att, old_value, new_value);
+	value_type type = decipher_type(old_value);
+	switch(type) {
+			case e_STRING :
+				change_value_wme(id, att, old_value, new_value);
+				break;
+			case e_INT :
+				change_value_wme(id, att, atoi(old_value.c_str()), atoi(new_value.c_str()));
+				break;
+			case e_FLOAT :
+				change_value_wme(id, att, atof(old_value.c_str()), atof(new_value.c_str()));
+				break;
+			default :
+				assert(false && "Bad value_type in delete_object");
+	}
+
+	
 }
 
 // clear the input-link
@@ -254,6 +327,8 @@ void load_input_file(istringstream& command)
 	if(!(command >> filename))
 		throw Error(c_load_usage_error);
 
+	// notify input controller to create a new input file object and make it
+	// the current source
 	Input_Controller::instance().generate_new_input(INPUT_FILE_T, filename);
 }
 
@@ -263,19 +338,13 @@ void run_til_output(istringstream& command)
 	QL_Interface::instance().run_til_output();
 }
 
-// commit the changes we have made to the input-link
-void commit(istringstream& command)
-{
-	QL_Interface::instance().commit();
-}
-
 // save the current process memory to a file
 void save_process(istringstream& command)
 {
 	process_memory.pop_back(); // we do not want this command to end up in the process mem file
 
 	string filename;
-	if(!(command >> filename))
+	if(!(command >> filename)) // check to make sure filename is present
 		throw Error(c_savep_usage_error);
 	ofstream outfile(filename.c_str());
 	if(!outfile)
@@ -338,8 +407,10 @@ void spawn_debugger(istringstream& command)
 // make a remote connection
 void connect_remotely(istringstream& command)
 {
-	acquiring_new_connection = true;
+	acquiring_new_connection = true; // set this true so we can detect what state we are in
+									 // if an error is thrown within this code
 	
+	// establish remote connection returns a string of the possible agents
 	string agents = QL_Interface::instance().establish_remote_connection();
 	string agent_name;
 
@@ -356,6 +427,7 @@ void connect_remotely(istringstream& command)
 		getline(cin, junk);
 	}
 
+	// always setup the input-link after establishing a remote connection
 	QL_Interface::instance().setup_input_link("IL");
 
 	acquiring_new_connection = false;
@@ -370,14 +442,6 @@ void create_local_kernel(istringstream& command)
 	acquiring_new_connection = false;
 }
 
-// we must do this to avoid an assertion
-void catch_init_call(istringstream& command)
-{
-	QL_Interface::instance().commit();
-	QL_Interface::instance().soar_command_line("init");
-}
-
-
 
 
 
@@ -389,11 +453,10 @@ void catch_init_call(istringstream& command)
 void create_identifier(const string& id, const string& att, string value)
 {
 	QL_Interface& inst = QL_Interface::instance();
-	if(inst.id_exists(value))
-		throw Error("The identifier name " + value + " already exists.");
-
-	// otherwise, create it
-	inst.add_identifier(id, att, value);
+	if(inst.id_exists(value)) // this should be a shared id
+		inst.add_shared_id(id, att, value);
+	else // otherwise, create it
+		inst.add_identifier(id, att, value);
 }
 
 // check to see if the wme exists, if it doesn't, add it
@@ -402,6 +465,7 @@ void create_value_wme(string id, string att, T value)
 {
 	QL_Interface& inst = QL_Interface::instance();
 
+	// make sure the wme doesn't already exist
 	if(inst.wme_exists(id, att, value))
 		throw Error("The WME " + id + " ^" + att + " " + string_make(value) + " already exists");
 

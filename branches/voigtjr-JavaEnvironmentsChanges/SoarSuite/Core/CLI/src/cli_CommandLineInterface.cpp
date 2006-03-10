@@ -16,6 +16,9 @@
 #include <direct.h>
 #include <Windows.h>
 #define getcwd _getcwd
+#include "pcreposix.h"
+#else //WIN32
+#include <regex.h>
 #endif // WIN32
 
 #include <assert.h>
@@ -34,6 +37,7 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 
+
 using namespace cli;
 using namespace sml;
 
@@ -48,6 +52,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLICD]							= &cli::CommandLineInterface::ParseCD;
 	m_CommandMap[Commands::kCLIChunkNameFormat]				= &cli::CommandLineInterface::ParseChunkNameFormat;
 	m_CommandMap[Commands::kCLICLog]						= &cli::CommandLineInterface::ParseCLog;
+	m_CommandMap[Commands::kCLICommandToFile]				= &cli::CommandLineInterface::ParseCommandToFile;
 	m_CommandMap[Commands::kCLIDefaultWMEDepth]				= &cli::CommandLineInterface::ParseDefaultWMEDepth;
 	m_CommandMap[Commands::kCLIDirs]						= &cli::CommandLineInterface::ParseDirs;
 	m_CommandMap[Commands::kCLIEcho]						= &cli::CommandLineInterface::ParseEcho;
@@ -109,6 +114,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLICD]							= true ;
 	m_EchoMap[Commands::kCLIChunkNameFormat]			= true ;
 	m_EchoMap[Commands::kCLICLog]						= true ;
+	m_EchoMap[Commands::kCLICommandToFile]				= true ;
 	m_EchoMap[Commands::kCLIDefaultWMEDepth]			= true ;
 	m_EchoMap[Commands::kCLIEcho]						= true ;
 	m_EchoMap[Commands::kCLIEchoCommands]				= true ;
@@ -155,6 +161,8 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_PrintEventToResult = false;
 	m_EchoResult = false ;
 	m_pAgentSML = 0 ;
+	m_CloseLogAfterOutput = false;
+	m_VarPrint = false;
 }
 
 EXPORT CommandLineInterface::~CommandLineInterface() {
@@ -216,6 +224,12 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, gSKI::IAgen
 	DoCommandInternal(pAgent, pCommandLine);
 
 	GetLastResultSML(pConnection, pResponse);
+
+	// Close log if asked to
+	if (m_CloseLogAfterOutput) {
+		m_CloseLogAfterOutput = false;
+		DoCLog(pAgent, LOG_CLOSE);
+	}
 
 	// Always returns true to indicate that we've generated any needed error message already
 	return true;
@@ -938,4 +952,31 @@ bool CommandLineInterface::Trim(std::string& line) {
 	return true;
 }
 
+void CommandLineInterface::HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) {
+	if (m_PrintEventToResult) {
+		if (m_VarPrint) {
+			// Transform if varprint, see print command
+			std::string message(msg);
+
+			regex_t comp;
+			regcomp(&comp, "[A-Z][0-9]+", REG_EXTENDED);
+
+			regmatch_t match;
+			memset(&match, 0, sizeof(regmatch_t));
+
+			while (regexec(&comp, message.substr(match.rm_eo, message.size() - match.rm_eo).c_str(), 1, &match, 0) == 0) {
+				message.insert(match.rm_so, "<");
+				message.insert(match.rm_eo + 1, ">");
+				match.rm_eo += 2;
+			}  
+
+			regfree(&comp);
+
+			// Simply append to message result
+			CommandLineInterface::m_Result << message;
+		} else {
+			CommandLineInterface::m_Result << msg;
+		}
+	}
+}
 

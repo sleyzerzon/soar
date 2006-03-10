@@ -17,6 +17,7 @@ import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
 import sml.smlSystemEventId;
+import sml.smlUpdateEventId;
 
 
 /**
@@ -73,7 +74,7 @@ public class Game implements Runnable, Kernel.UpdateEventInterface {
 
         // Register for the event we'll use to update the world
         // We update the environment when this event fires.  This allows us to either run the environment directly or from a debugger and get correct behavior
-        int updateCallback = kernel.RegisterForUpdateEvent(sml.smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null) ;
+        int updateCallback = kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null) ;
 
         this.diskCount = diskCount;
         
@@ -249,7 +250,7 @@ public class Game implements Runnable, Kernel.UpdateEventInterface {
         agent.Commit();
         
         // should allow us to run again.
-        agent.InitSoar(); // causes near-infinite recusion in Kernel!
+        agent.InitSoar();
     }
     
     /**
@@ -315,7 +316,6 @@ public class Game implements Runnable, Kernel.UpdateEventInterface {
     public void detachSoar() {
     	kernel.DestroyAgent(agent);
     	kernel.Shutdown();
-        kernel.delete();
     	System.out.println("All done") ;
     }
     
