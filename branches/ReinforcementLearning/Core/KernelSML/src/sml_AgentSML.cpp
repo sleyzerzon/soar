@@ -26,8 +26,6 @@
 #include "IgSKI_Symbol.h"
 #include "IgSKI_AgentManager.h"
 #include "IgSKI_Kernel.h"
-#include "IgSKI_InputLink.h"
-#include "IgSKI_WorkingMemory.h"
 
 #include <assert.h>
 
@@ -85,8 +83,7 @@ AgentSML::~AgentSML()
 void AgentSML::Clear()
 {
 	// Release any WME objects we still own.
-	// (Don't flush removes in this case as we're shutting down rather than just doing an init-soar).
-	ReleaseAllWmes(false) ;
+	ReleaseAllWmes() ;
 
 	m_ProductionListener.Clear();
 	m_RunListener.Clear();
@@ -95,20 +92,8 @@ void AgentSML::Clear()
 	m_XMLListener.Clear() ;
 }
 
-// Release all of the WMEs that we currently have references to
-// It's a little less severe than clear() which releases everything we own, not just wmes.
-// If flushPendingRemoves is true, make sure gSKI removes all wmes from Soar's working memory
-// that have been marked for removal but are still waiting for the next input phase to actually
-// be removed (this should generally be correct so we'll default to true for it).
-void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
+void AgentSML::ReleaseAllWmes()
 {
-	if (flushPendingRemoves)
-	{
-		bool forceAdds = false ;	// It doesn't matter if we do these or not as we're about to release everything.  Seems best to not start things up.
-		bool forceRemoves = true ;	// SML may have deleted a wme but gSKI has yet to act on this.  As SML has removed its object we have no way to free the gSKI object w/o doing this update.
-		this->GetIAgent()->GetInputLink()->GetInputLinkMemory()->Update(forceAdds, forceRemoves) ;
-	}
-
 	// Release any WME objects we still own.
 	for (TimeTagMapIter mapIter = m_TimeTagMap.begin() ; mapIter != m_TimeTagMap.end() ; mapIter++)
 	{
@@ -200,6 +185,20 @@ void AgentSML::ScheduleAgentToRun(bool state)
 }
 
 /*************************************************************
+* @brief	When set, this flag will cause Soar to break when
+*			output is next generated during a run.
+*************************************************************/
+bool AgentSML::SetStopOnOutput(bool state)
+{
+	if (!m_pOutputListener)
+		return false ;
+
+	m_pOutputListener->SetStopOnOutput(state) ;
+
+	return true ;
+}
+
+/*************************************************************
 * @brief	Converts an id from a client side value to a kernel side value.
 *			We need to be able to do this because the client is adding a collection
 *			of wmes at once, so it makes up the ids for those objects.
@@ -285,8 +284,6 @@ void AgentSML::RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWME)
 	// so I'm including this assert.  However, it's possible this assumption is wrong (in particular after an init-soar?)
 	// so I'm only including it in debug builds and if the assert fails, check the context and make sure that this re-use
 	// in indeed a mistake.
-	// If you fail to call commit() after creating a new input wme and then issue an init-soar this assert may fire.
-	// If so, the fix is to call commit().
 	assert (m_TimeTagMap.find(pTimeTag) == m_TimeTagMap.end()) ;
 #endif
 

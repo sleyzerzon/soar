@@ -74,7 +74,7 @@ namespace cli {
 			kInvalidOSupportMode				= 58,
 			kInvalidWMEFilterType				= 59,
 			kFilterExpected						= 60,
-			kDuplicateWMEFilter					= 61, 
+			kDuplicateWMEFilter					= 61,
 			kInvalidMode						= 62,
 			kTypeRequired						= 63,
 			kWMEFilterNotFound					= 64,
@@ -92,12 +92,18 @@ namespace cli {
             kRunFailed                          = 77,
 			kNoPreferences						= 78, // FIXME: remove
 			kAmbiguousCommand					= 79,
-			kAmbiguousOption					= 80, 
-			kProductionMemoryNotEmpty			= 81, 
-			kSoar7Command						= 82, 
-			kInvalidBackslashEscapeCharacter	= 83, 
-			kInitSoarFailed						= 84, 
-			kPreferencesError					= 85, // FIXME: document in wiki
+			kAmbiguousOption					= 80,
+			kProductionMemoryNotEmpty			= 81,
+			kInvalidExplorationSetting		    = 82, 
+			kTempMustBePositive				    = 83,
+			kEpsilonOutsideUnitInterval		    = 84,
+			kAlphaMustBeNonNegative			    = 85,
+			kGammaOutsideUnitInterval			= 86,
+			kSoar7Command						= 87,
+			kInvalidBackslashEscapeCharacter	= 88,
+			kInitSoarFailed						= 89,
+			kPreferencesError					= 90, // FIXME: document in wiki
+			kFloatExpected                      = 91, // FIXME: document in wiki
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -124,7 +130,7 @@ namespace cli {
 				case kKernelRequired:					return "A kernel is required for this command.";
 				case kAliasNotFound:					return "Alias not found.";
 				case kAliasExists:						return "Alias exists, remove to overwrite.";
-				case kNoHelpFile:						return "Could not find help files.  Check the library location using the 'set-library-location' command.  The library location should be set to SoarLibrary.";
+				case kNoHelpFile:						return "Could not find help files.  Check the library location using the 'set-library-location' command.  The library location should be set to the folder containing the help/ subfolder.";
 				case kIntegerExpected:					return "Integer argument expected.";
 				case kIntegerMustBePositive:			return "Integer argument must be positive.";
 				case kIntegerMustBeNonNegative:			return "Integer argument must be non-negative.";
@@ -176,15 +182,21 @@ namespace cli {
                 case kNoPreferences:                    return "No preferences found.";
 				case kAmbiguousCommand:					return "Received command is ambiguous, try adding more letters.";
 				case kAmbiguousOption:					return "Ambiguous option.";
-				case kProductionMemoryNotEmpty:			return "Can't change modes unless production memory is empty."; 
+				case kProductionMemoryNotEmpty:			return "Can't change modes unless production memory is empty.";
+				case kInvalidExplorationSetting:		return "Invalid exploration mode.";
+				case kTempMustBePositive:				return "Temperature parameter must be positive.";
+				case kEpsilonOutsideUnitInterval:		return "Epsilon parameter must be in [0,1].";
+				case kAlphaMustBeNonNegative:			return "Alpha parameter must be non-negative.";
+				case kGammaOutsideUnitInterval:			return "Gamma parameter must be in [0,1].";
 				case kSoar7Command:						return "Command valid in Soar 7 mode only.";
 				case kInvalidBackslashEscapeCharacter:	return "Invalid backslash escape character, see documentation.";
 				case kInitSoarFailed:					return "Agent could not be reinitialized.  Probably due to an internal memory leak." ;
 				case kPreferencesError:					return "Preferences command failed." ;
+				case kFloatExpected:					return "Floating point argument expected.";
 				default:								return "Unknown error code.";
 			}
 		}
 	}; // class
-} // namespace 
+} // namespace
 
 #endif // CLI_CLIERROR_H

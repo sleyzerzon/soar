@@ -1,0 +1,10 @@
+sp {reward*for*action
+  (state <s> ^reward-link <r>)
+-->
+  (<r> ^reward.value -1)}
+  
+sp {reward*success
+  (state <s> ^reward-link <r> ^info-link <i>)
+  (<i> ^passenger <p> ^destination <p>)
+ -->
+  (<r> ^reward.value 20)}

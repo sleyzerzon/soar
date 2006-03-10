@@ -15,10 +15,6 @@
 #ifdef WIN32
 #include <direct.h>
 #include <Windows.h>
-#define getcwd _getcwd
-#include "pcreposix.h"
-#else //WIN32
-#include <regex.h>
 #endif // WIN32
 
 #include <assert.h>
@@ -37,11 +33,10 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 
-
 using namespace cli;
 using namespace sml;
 
-std::ostringstream CommandLineInterface::m_Result;	
+std::ostringstream CommandLineInterface::m_Result;
 
 EXPORT CommandLineInterface::CommandLineInterface() {
 
@@ -51,8 +46,9 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIAttributePreferencesMode]	= &cli::CommandLineInterface::ParseAttributePreferencesMode;
 	m_CommandMap[Commands::kCLICD]							= &cli::CommandLineInterface::ParseCD;
 	m_CommandMap[Commands::kCLIChunkNameFormat]				= &cli::CommandLineInterface::ParseChunkNameFormat;
-	m_CommandMap[Commands::kCLICLog]						= &cli::CommandLineInterface::ParseCLog;
-	m_CommandMap[Commands::kCLICommandToFile]				= &cli::CommandLineInterface::ParseCommandToFile;
+#ifdef SOAR_WMEM_ACTIVATION
+	m_CommandMap[Commands::kCLIDecay]                       = &cli::CommandLineInterface::ParseDecay;
+#endif
 	m_CommandMap[Commands::kCLIDefaultWMEDepth]				= &cli::CommandLineInterface::ParseDefaultWMEDepth;
 	m_CommandMap[Commands::kCLIDirs]						= &cli::CommandLineInterface::ParseDirs;
 	m_CommandMap[Commands::kCLIEcho]						= &cli::CommandLineInterface::ParseEcho;
@@ -60,6 +56,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIEditProduction]				= &cli::CommandLineInterface::ParseEditProduction;
 	m_CommandMap[Commands::kCLIExcise]						= &cli::CommandLineInterface::ParseExcise;
 	m_CommandMap[Commands::kCLIExplainBacktraces]			= &cli::CommandLineInterface::ParseExplainBacktraces;
+	m_CommandMap[Commands::kCLIExploration]			 	    = &cli::CommandLineInterface::ParseExploration;
 	m_CommandMap[Commands::kCLIFiringCounts]				= &cli::CommandLineInterface::ParseFiringCounts;
 	m_CommandMap[Commands::kCLIGDSPrint]					= &cli::CommandLineInterface::ParseGDSPrint;
 	m_CommandMap[Commands::kCLIHelp]						= &cli::CommandLineInterface::ParseHelp;
@@ -68,6 +65,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIInputPeriod]					= &cli::CommandLineInterface::ParseInputPeriod;
 	m_CommandMap[Commands::kCLIInternalSymbols]				= &cli::CommandLineInterface::ParseInternalSymbols;
 	m_CommandMap[Commands::kCLILearn]						= &cli::CommandLineInterface::ParseLearn;
+	m_CommandMap[Commands::kCLILog]							= &cli::CommandLineInterface::ParseLog;
 	m_CommandMap[Commands::kCLILS]							= &cli::CommandLineInterface::ParseLS;
 	m_CommandMap[Commands::kCLIMatches]						= &cli::CommandLineInterface::ParseMatches;
 	m_CommandMap[Commands::kCLIMaxChunks]					= &cli::CommandLineInterface::ParseMaxChunks;
@@ -87,6 +85,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIQuit]						= &cli::CommandLineInterface::ParseQuit;
 	m_CommandMap[Commands::kCLIRemoveWME]					= &cli::CommandLineInterface::ParseRemoveWME;
 	m_CommandMap[Commands::kCLIReteNet]						= &cli::CommandLineInterface::ParseReteNet;
+	m_CommandMap[Commands::kCLIRL]						    = &cli::CommandLineInterface::ParseRL;
 	m_CommandMap[Commands::kCLIRun]							= &cli::CommandLineInterface::ParseRun;
 	m_CommandMap[Commands::kCLISaveBacktraces]				= &cli::CommandLineInterface::ParseSaveBacktraces;
 	m_CommandMap[Commands::kCLISetLibraryLocation]			= &cli::CommandLineInterface::ParseSetLibraryLocation;
@@ -113,8 +112,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIAttributePreferencesMode]	= true ;
 	m_EchoMap[Commands::kCLICD]							= true ;
 	m_EchoMap[Commands::kCLIChunkNameFormat]			= true ;
-	m_EchoMap[Commands::kCLICLog]						= true ;
-	m_EchoMap[Commands::kCLICommandToFile]				= true ;
+	m_EchoMap[Commands::kCLIDecay]                      = true ;
 	m_EchoMap[Commands::kCLIDefaultWMEDepth]			= true ;
 	m_EchoMap[Commands::kCLIEcho]						= true ;
 	m_EchoMap[Commands::kCLIEchoCommands]				= true ;
@@ -123,6 +121,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIInitSoar]					= true ;
 	m_EchoMap[Commands::kCLIInputPeriod]				= true ;
 	m_EchoMap[Commands::kCLILearn]						= true ;
+	m_EchoMap[Commands::kCLILog]						= true ;
 	m_EchoMap[Commands::kCLIMaxChunks]					= true ;
 	m_EchoMap[Commands::kCLIMaxElaborations]			= true ;
 	m_EchoMap[Commands::kCLIMaxNilOutputCycles]			= true ;
@@ -148,6 +147,9 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIWatch]						= true ;
 	m_EchoMap[Commands::kCLIWatchWMEs]					= true ;
 
+	// Set library directory to sane default value
+	GetCurrentWorkingDirectory(m_LibraryDirectory);
+
 	// Initialize other members
 	m_pKernel = 0;
 	m_SourceError = false;
@@ -161,8 +163,6 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_PrintEventToResult = false;
 	m_EchoResult = false ;
 	m_pAgentSML = 0 ;
-	m_CloseLogAfterOutput = false;
-	m_VarPrint = false;
 }
 
 EXPORT CommandLineInterface::~CommandLineInterface() {
@@ -224,12 +224,6 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, gSKI::IAgen
 	DoCommandInternal(pAgent, pCommandLine);
 
 	GetLastResultSML(pConnection, pResponse);
-
-	// Close log if asked to
-	if (m_CloseLogAfterOutput) {
-		m_CloseLogAfterOutput = false;
-		DoCLog(pAgent, LOG_CLOSE);
-	}
 
 	// Always returns true to indicate that we've generated any needed error message already
 	return true;
@@ -309,16 +303,16 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 
 	// reset state
 	m_Result.str("");
-	m_ResponseTags.clear();	
-	m_LastError = CLIError::kNoError;	
-	m_LastErrorDetail.clear();			
+	m_ResponseTags.clear();
+	m_LastError = CLIError::kNoError;
+	m_LastErrorDetail.clear();
 	gSKI::ClearError(&m_gSKIError);
 }
 
-/************************************************************* 	 
+/*************************************************************
 * @brief Echo the given string through the smlEVENT_ECHO event
 *		 if the call requested that commands be echoed.
-*************************************************************/ 	 
+*************************************************************/
 void CommandLineInterface::EchoString(sml::Connection* pConnection, char const* pString)
 {
 	if (!m_EchoResult)
@@ -351,7 +345,7 @@ EXPORT bool CommandLineInterface::ExpandCommand(sml::Connection* pConnection, co
 	if (!argv.empty())
 	{
 		m_Aliases.Translate(argv);
-		
+
 		// 3) Reassemble the command line
 		for (unsigned int i = 0 ; i < argv.size() ; i++)
 		{
@@ -438,7 +432,7 @@ bool CommandLineInterface::DoCommandInternal(gSKI::IAgent* pAgent, vector<string
 				SetErrorDetail("(No such command: " + argv[0] + ")");
 				return SetError(CLIError::kCommandNotImplemented);
 
-			} 
+			}
 		}
 
 		if (!exactMatch) {
@@ -462,14 +456,14 @@ bool CommandLineInterface::DoCommandInternal(gSKI::IAgent* pAgent, vector<string
 
 	// Show help if requested
 	if (helpFlag) {
-		std::string helpFile = m_LibraryDirectory + "/CLIHelp/" + argv[0];
+		std::string helpFile = m_LibraryDirectory + "../CLIHelp/" + argv[0];
 		return GetHelpString(helpFile);
 	}
 
 	// Process command
 	CommandFunction pFunction = m_CommandMap[argv[0]];
 	assert(pFunction);
-	
+
 	// Initialize option parsing each call
 	ResetOptions();
 
@@ -499,7 +493,7 @@ int CommandLineInterface::Tokenize(string cmdline, vector<string>& argumentVecto
 			cmdline.erase(iter);
 
 			if (!cmdline.length()) break; //Nothing but space left
-			
+
 			// Next character
 			iter = cmdline.begin();
 		}
@@ -588,29 +582,15 @@ EXPORT void CommandLineInterface::SetKernel(gSKI::IKernel* pKernel, gSKI::Versio
 	m_KernelVersion = kernelVersion;
 	m_pKernelSML = pKernelSML;
 
-	// Now that we have the kernel, set the home directory to the location of SoarKernelSML's parent directory,
-	// SoarLibrary
+	// Now that we have the kernel, set the home directory to the location of SoarKernelSML
 #ifdef WIN32
 	char dllpath[256];
 	GetModuleFileName(static_cast<HMODULE>(m_pKernelSML->GetModuleHandle()), dllpath, 256);
-
-	// This sets it to the path + the dll
 	m_LibraryDirectory = dllpath;
-
-	// This chops off the dll part to get just the path (...SoarLibrary/bin)
 	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.find_last_of("\\"));
-
-	// This takes the parent directory to get ...SoarLibrary
-	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.find_last_of("\\"));
-
 #else // WIN32
-	// Hopefully ...SoarLibrary/bin
 	GetCurrentWorkingDirectory(m_LibraryDirectory);
-
-	// This takes the parent directory to get ...SoarLibrary
-	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.find_last_of("/"));
-
-#endif // WIN32
+#endif
 }
 
 bool CommandLineInterface::GetCurrentWorkingDirectory(string& directory) {
@@ -628,7 +608,7 @@ bool CommandLineInterface::GetCurrentWorkingDirectory(string& directory) {
 
 bool CommandLineInterface::IsInteger(const string& s) {
 	string::const_iterator iter = s.begin();
-	
+
 	// Allow negatives
 	if (s.length() > 1) {
 		if (*iter == '-') {
@@ -643,6 +623,32 @@ bool CommandLineInterface::IsInteger(const string& s) {
 		++iter;
 	}
 	return true;
+}
+
+bool CommandLineInterface::IsFloat(const string& s) {
+	string::const_iterator iter = s.begin();
+    bool bDecimal = false;
+
+	// Allow negatives
+	if (s.length() > 1) {
+		if (*iter == '-') {
+			++iter;
+		}
+	}
+
+	while (iter != s.end()) {
+		if (!isdigit(*iter)) {
+            if ((*iter == '.') && (!bDecimal)) {
+                bDecimal = true;
+            }
+            else {
+                return false;
+            }
+		}
+		++iter;
+	}
+
+	return bDecimal;
 }
 
 bool CommandLineInterface::RequireAgent(gSKI::IAgent* pAgent) {
@@ -725,7 +731,7 @@ bool CommandLineInterface::StripQuotes(std::string& str) {
 
 void CommandLineInterface::ResetOptions() {
 	m_Argument = 0;
-	m_NonOptionArguments = 0;	
+	m_NonOptionArguments = 0;
 }
 
 bool CommandLineInterface::ProcessOptions(std::vector<std::string>& argv, Options* options) {
@@ -790,7 +796,7 @@ bool CommandLineInterface::ProcessOptions(std::vector<std::string>& argv, Option
 						if (!possibilities.size()) {
 							SetErrorDetail("No such m_Option: " + longOption);
 							return SetError(CLIError::kUnrecognizedOption);
-						} 
+						}
 					}
 
 					if (possibilities.size() != 1) {
@@ -858,10 +864,11 @@ void CommandLineInterface::MoveBack(std::vector<std::string>& argv, int what, in
 		return;
 	}
 
+	std::vector<std::string>::iterator dest = argv.begin();
 	std::vector<std::string>::iterator target = argv.begin();
-	target += what;
 
-	std::vector<std::string>::iterator dest = target - howFar;
+	dest += howFar;
+	target += what;
 
 	argv.insert(dest, *target);
 
@@ -893,7 +900,7 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 					if (argv[m_Argument][0] != '-') {
 						m_OptionArgument = argv[m_Argument];
 						MoveBack(argv, m_Argument, m_NonOptionArguments);
-					} 
+					}
 				}
 			}
 			if (!m_OptionArgument.size()) {
@@ -952,31 +959,4 @@ bool CommandLineInterface::Trim(std::string& line) {
 	return true;
 }
 
-void CommandLineInterface::HandleEvent(egSKIPrintEventId, gSKI::IAgent*, const char* msg) {
-	if (m_PrintEventToResult) {
-		if (m_VarPrint) {
-			// Transform if varprint, see print command
-			std::string message(msg);
-
-			regex_t comp;
-			regcomp(&comp, "[A-Z][0-9]+", REG_EXTENDED);
-
-			regmatch_t match;
-			memset(&match, 0, sizeof(regmatch_t));
-
-			while (regexec(&comp, message.substr(match.rm_eo, message.size() - match.rm_eo).c_str(), 1, &match, 0) == 0) {
-				message.insert(match.rm_so, "<");
-				message.insert(match.rm_eo + 1, ">");
-				match.rm_eo += 2;
-			}  
-
-			regfree(&comp);
-
-			// Simply append to message result
-			CommandLineInterface::m_Result << message;
-		} else {
-			CommandLineInterface::m_Result << msg;
-		}
-	}
-}
 

@@ -157,10 +157,7 @@
 					RelativePath=".\src\cli_chunknameformat.cpp">
 				</File>
 				<File
-					RelativePath=".\src\cli_clog.cpp">
-				</File>
-				<File
-					RelativePath=".\src\cli_commandtofile.cpp">
+					RelativePath=".\src\cli_decay.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_defaultwmedepth.cpp">
@@ -182,6 +179,9 @@
 				</File>
 				<File
 					RelativePath=".\src\cli_explainbacktraces.cpp">
+				</File>
+				<File
+					RelativePath=".\src\cli_exploration.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_firingcounts.cpp">
@@ -206,6 +206,9 @@
 				</File>
 				<File
 					RelativePath=".\src\cli_learn.cpp">
+				</File>
+				<File
+					RelativePath=".\src\cli_log.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_ls.cpp">
@@ -263,6 +266,9 @@
 				</File>
 				<File
 					RelativePath=".\src\cli_retenet.cpp">
+				</File>
+				<File
+					RelativePath=".\src\cli_RL.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_run.cpp">

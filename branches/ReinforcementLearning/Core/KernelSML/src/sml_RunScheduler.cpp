@@ -112,13 +112,7 @@ bool RunScheduler::VerifyStepSizeForRunType(egSKIRunType runStepSize, egSKIInter
 			   gSKI_INTERLEAVE_ELABORATION_PHASE == interleave || 
 			   gSKI_INTERLEAVE_DECISION_CYCLE == interleave ||
 			   gSKI_INTERLEAVE_OUTPUT == interleave) ;
-	case gSKI_RUN_FOREVER:
-		// can interleave by any egSKIInterleaveType
-		assert(gSKI_INTERLEAVE_PHASE == interleave || 
-			   gSKI_INTERLEAVE_ELABORATION_PHASE == interleave || 
-			   gSKI_INTERLEAVE_DECISION_CYCLE == interleave ||
-			   gSKI_INTERLEAVE_OUTPUT == interleave) ;
-		return true;
+
 	default:
 		return false;
 	}
@@ -489,17 +483,6 @@ void RunScheduler::CheckStopBeforePhase(egSKIRunType runStepSize)
 				gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;			
 				egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
 				egSKIRunResult runResult = pAgentSML->GetResultOfLastRun() ;
-				if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
-
-				// as in Bug 648, it's possible that a client has requested STOP_AFTER_DECISION
-				// while the agent was stopped at the m_StopBeforePhase, yet the agent run logic has
-				// dropped thru to this point without generating the interrupt yet.
-				if ((m_StopBeforePhase == phase) && (pAgent->GetRunState() == gSKI_RUNSTATE_STOPPED) &&
-					(pAgent->GetInterruptFlags() & gSKI_STOP_AFTER_DECISION_CYCLE))
-				{
-					pAgent->SetRunState(gSKI_RUNSTATE_INTERRUPTED);
-					runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, 1) ; // force interrupt
-				}					
 
 				while ((phase != m_StopBeforePhase) && (gSKI_RUN_COMPLETED == runResult))
 				{
@@ -533,8 +516,6 @@ void RunScheduler::CheckStopBeforePhase(egSKIRunType runStepSize)
 				gSKI::IAgent* pAgent = pAgentSML->GetIAgent() ;			
 				egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
 				egSKIRunResult runResult = pAgentSML->GetResultOfLastRun() ;
-				if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
- 
 				while ((phase != m_StopBeforePhase) && (gSKI_RUN_COMPLETED == runResult))
 				{
 					runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, 1) ;
@@ -585,9 +566,8 @@ void RunScheduler::TestForFiringGeneratedOutputEvent()
 {
 	// If the event has already been fired (for this step of the run) nothing to do.
 	// This could happen if the last agent generates output and then stops running.
-	// This is commented out to work around bug 651
-	//if (m_AllGeneratedOutputEventFired)
-	//	return ;
+	if (m_AllGeneratedOutputEventFired)
+		return ;
 
 	// See if this was the last agent to generate output
 	if (HaveAllGeneratedOutput())

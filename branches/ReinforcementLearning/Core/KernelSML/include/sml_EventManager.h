@@ -25,8 +25,6 @@
 #pragma warning (default : 4702)
 #endif
 
-#include <assert.h>
-
 namespace sml {
 
 class KernelSML ;
@@ -153,11 +151,6 @@ public:
 		}
 	}
 
-	virtual bool HasEvents(EventType eventID)
-	{
-		return GetListeners(eventID) ? true : false;
-	}
-
 	virtual ConnectionListIter	GetBegin(EventType eventID)
 	{
 		ConnectionList* pList = GetListeners(eventID) ;
@@ -165,11 +158,8 @@ public:
 		// If nobody is listening return NULL.
 		// Key is that this must match the value returned by GetEnd()
 		// in the same situation.
-
-		// voigtjr VS2005 workaround
-		//if (!pList)
-		//	return NULL ;
-		assert(pList);
+		if (!pList)
+			return NULL ;
 
 		return pList->begin() ;
 	}
@@ -178,10 +168,8 @@ public:
 	{
 		ConnectionList* pList = GetListeners(eventID) ;
 
-		// voigtjr VS2005 workaround
-		//if (!pList)
-		//	return NULL ;
-		assert(pList);
+		if (!pList)
+			return NULL ;
 
 		return pList->end() ;
 	}

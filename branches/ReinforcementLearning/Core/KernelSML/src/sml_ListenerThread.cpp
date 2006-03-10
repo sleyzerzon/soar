@@ -68,7 +68,7 @@ void ListenerThread::Run()
 			pConnection->SetTraceCommunications(KernelSML::GetKernelSML()->IsTracingCommunications()) ;
 
 			// Record the new connection in our list of connections
-			KernelSML::GetKernelSML()->AddConnection(pConnection) ;
+			m_Parent->AddConnection(pConnection) ;
 		}
 
 		// Sleep for a little before checking for a new connection

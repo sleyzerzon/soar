@@ -5,7 +5,7 @@
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION. 
+ * FOR LICENSE AND COPYRIGHT INFORMATION.
  *************************************************************************/
 
 /********************************************************************
@@ -13,7 +13,7 @@
 *********************************************************************
 * created:	   6/27/2002   10:44
 *
-* purpose: 
+* purpose:
 *********************************************************************/
 #include "gSKI_Agent.h"
 #include "gSKI_Error.h"
@@ -46,7 +46,7 @@
 // Private namespace for the workaround for callbacks
 namespace {
 
-   /** 
+   /**
     * @brief Creates a Soar symbol based on a gSKI::ISymbol that is passed in
     *
     * This function is used as a helper for the function below to convert values
@@ -80,7 +80,7 @@ namespace {
       return NIL;
    }
 
-   /** 
+   /**
     * @brief Interfaces with Soar to map kernel rhs functions to gSKI rhs functions
     *
     *  This method gets registered with the underlying kernel and recieves callbacks
@@ -118,7 +118,7 @@ namespace {
 
       Symbol* pSoarReturn = 0;
 
-      // Check to make sure we have the right number of arguments.   
+      // Check to make sure we have the right number of arguments.
       if( (rhsFunction->GetNumExpectedParameters() == gSKI_PARAM_NUM_VARIABLE) ||
           ((int)symVector.size() == rhsFunction->GetNumExpectedParameters()) )
       {
@@ -175,7 +175,7 @@ namespace {
    }
 }
 
-namespace gSKI 
+namespace gSKI
 {
 
    /*
@@ -188,9 +188,9 @@ namespace gSKI
         |___/
    =============================
    */
-   Agent::Agent(const char *agentName, Kernel *kernel): 
-      m_productionManager(0), 
-      m_agent(0), 
+   Agent::Agent(const char *agentName, Kernel *kernel):
+      m_productionManager(0),
+      m_agent(0),
       m_active(true),
       m_kernel(kernel),
       m_ConcatRhs(),
@@ -205,7 +205,7 @@ namespace gSKI
       // Why doesn't this call one of the initialize functions????
       initializeRuntimeState();
 
-      m_agent = create_soar_agent(m_kernel->GetSoarKernel(), const_cast<char *>(agentName));     
+      m_agent = create_soar_agent(m_kernel->GetSoarKernel(), const_cast<char *>(agentName));
       MegaAssert(m_agent != 0, "Unable to create soar agent!");
 
       if(m_agent)
@@ -215,13 +215,13 @@ namespace gSKI
 
          // Creating the output link
          // NOTE: THE OUTPUT LINK CREATION MUST COME BEFORE THE INITIALIZE CALL
-         // FOR THE OUTPUT LINK CALLBACK TO BE PROPERLY REGISTERED (see io.cpp for more 
+         // FOR THE OUTPUT LINK CALLBACK TO BE PROPERLY REGISTERED (see io.cpp for more
          // details in the update_for_top_state_wme_addition function)
          m_outputlink = new OutputLink(this);
 
          // Initializing the soar agent
          initialize_soar_agent(m_kernel->GetSoarKernel(), m_agent);
-         
+
          m_inputlink = new InputLink(this);
          m_workingMemory = new WorkingMemory(this);
      }
@@ -237,8 +237,8 @@ namespace gSKI
 
      m_pPerfMon = new AgentPerformanceMonitor(this);
 
-	 
-	 // These need to be registered in gSKI RunListener because 
+
+	 // These need to be registered in gSKI RunListener because
 	 // the gSKI event handler has to increment counters on these events.
 	 this->AddRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
@@ -247,8 +247,8 @@ namespace gSKI
 	 this->AddRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
-	 this->AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only     
-	 
+	 this->AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only
+
    }
 
    /*
@@ -282,7 +282,7 @@ namespace gSKI
       delete m_outputlink;
       delete m_workingMemory;
       delete m_productionManager;
-   
+
       destroy_soar_agent(m_kernel->GetSoarKernel(), m_agent);
    }
 
@@ -322,7 +322,7 @@ namespace gSKI
 |_| \_\___|_|_| |_|_|\__|_|\__,_|_|_/___\___|
    =============================
    */
-   bool Agent::Reinitialize(const char*       productionFileName, 
+   bool Agent::Reinitialize(const char*       productionFileName,
                             bool              learningOn,
                             egSKIOSupportMode oSupportMode,
                             Error*            err)
@@ -333,10 +333,10 @@ namespace gSKI
       // Notify the agent manager
       AgentManager* am = (AgentManager*)(m_kernel->GetAgentManager());
       MegaAssert(am != 0, "Agent manager is not AgentManager!");
-      
+
       // Tell listeners about his
       am->FireBeforeAgentReinitialized(this);
-         
+
       /// INITIALIZATION HERE
       initializeRuntimeState();
 
@@ -353,7 +353,7 @@ namespace gSKI
 
       // !! remember tgd clears all interrupts each time it calls run
 
-      // reinitialize_soar cleans out the agents memory the 
+      // reinitialize_soar cleans out the agents memory the
       // init_agent_memory call adds back in the top state and
       // other misc. objects and wmes.
       bool ok = reinitialize_soar( m_agent );
@@ -396,7 +396,7 @@ namespace gSKI
 
    =============================
    */
-   egSKIRunResult Agent::RunInSeparateThread(egSKIRunType        runLength, 
+   egSKIRunResult Agent::RunInSeparateThread(egSKIRunType        runLength,
                                              unsigned long       count,
                                              Error*              err)
    {
@@ -410,7 +410,7 @@ namespace gSKI
 
    =============================
    */
-   egSKIRunResult Agent::RunInClientThread(egSKIRunType        runLength, 
+   egSKIRunResult Agent::RunInClientThread(egSKIRunType        runLength,
                                            unsigned long       count,
                                            Error*              err)
    {
@@ -439,7 +439,7 @@ namespace gSKI
       return run(runLength, count);
    }
 
-   egSKIRunResult Agent::StepInClientThread(egSKIInterleaveType  stepSize, 
+   egSKIRunResult Agent::StepInClientThread(egSKIInterleaveType  stepSize,
                                                   unsigned long  stepCount,
                                                          Error*  err)
    {
@@ -473,7 +473,7 @@ namespace gSKI
 
    =============================
    */
-   bool Agent::Interrupt(egSKIStopLocation    stopLoc, 
+   bool Agent::Interrupt(egSKIStopLocation    stopLoc,
                          egSKIStopType        stopType,
                          Error*               err)
    {
@@ -484,7 +484,7 @@ namespace gSKI
       if((stopType == gSKI_STOP_BY_SUSPENDING) ||
          (stopLoc  == gSKI_STOP_ON_CALLBACK_RETURN) ||
          (stopLoc  == gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN))
-      { 
+      {
          SetError(err, gSKIERR_NOT_IMPLEMENTED);
          return false;
       }
@@ -495,11 +495,11 @@ namespace gSKI
       // Tell the agent where to stop
       m_interruptFlags = stopLoc;
 
-	  // If the request for interrupt is gSKI_STOP_AFTER_DECISION_CYCLE, then it 
+	  // If the request for interrupt is gSKI_STOP_AFTER_DECISION_CYCLE, then it
 	  // will be caught in the RunScheduler::CompletedRunType() and/or IsAgentFinished().
-	  // We don't want to interrupt agents until the appropriate time if the request is  
+	  // We don't want to interrupt agents until the appropriate time if the request is
 	  // gSKI_STOP_AFTER_DECISION_CYCLE.
-	  
+
       // These are immediate requests for interrupt, such as from RHS or application
 	  if ((gSKI_STOP_AFTER_SMALLEST_STEP == stopLoc) || (gSKI_STOP_AFTER_PHASE == stopLoc)) {
 		  m_agent->stop_soar = TRUE;
@@ -512,7 +512,7 @@ namespace gSKI
 		  // Because we set m_agent->stop_soar == TRUE above, any running agents should return to
 		  // gSKI at the end of the current phase, even if interleaving by larger steps.  KJC
 	  }
- 
+
       // If  we implement suspend, it goes in the run method, not
       //  here.
       m_suspendOnInterrupt = (stopType == gSKI_STOP_BY_SUSPENDING)? true: false;
@@ -576,7 +576,7 @@ namespace gSKI
       // If we are not running, set the run state to halted
       // If we are running, the run method will set the
       //   state to halted.
-	  if(m_runState != gSKI_RUNSTATE_RUNNING) 
+	  if(m_runState != gSKI_RUNSTATE_RUNNING)
 	  {
 		  m_runState = gSKI_RUNSTATE_HALTED;
 
@@ -602,13 +602,6 @@ namespace gSKI
       ClearError(err);
       return m_runState;
    }
-   	  
-   void Agent::SetRunState(egSKIRunState state,Error* err)
-   { 
-      ClearError(err);
-	  m_runState = state; 
-   }
-
 
       /*
    =========================
@@ -619,7 +612,7 @@ namespace gSKI
 /_/   \_\__,_|\__,_|_| \_\_| |_|___/_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|
    =========================
    */
-   bool Agent::AddClientRhsFunction(IRhsFunction* rhsFunction, 
+   bool Agent::AddClientRhsFunction(IRhsFunction* rhsFunction,
                                     Error*        err)
    {
       ClearError(err);
@@ -652,7 +645,7 @@ namespace gSKI
 
       // Tell Soar about it
       std::vector<char> tmpBuffer(rhsFunction->GetName(), rhsFunction->GetName() + strlen(rhsFunction->GetName()) + 1);
-      add_rhs_function (m_agent, 
+      add_rhs_function (m_agent,
                         make_sym_constant(m_agent, &tmpBuffer[0]),
                         rhsFunctionProxy,
                         rhsFunction->GetNumExpectedParameters(),
@@ -675,7 +668,7 @@ namespace gSKI
    bool Agent::RemoveClientRhsFunction(const char* szName, Error* err)
    {
       ClearError(err);
-   
+
       MegaAssert(szName != 0, "0 pointer to a name passed in to RemoveRhsFunction");
       if(szName == 0)
       {
@@ -849,7 +842,7 @@ namespace gSKI
       ClearError(err);
       m_agent->sysparams[LEARNING_ON_SYSPARAM] = on;
    }
- 
+
    int Agent::GetMaxChunks(Error* err /*= 0*/)
    {
       ClearError(err);
@@ -925,10 +918,10 @@ namespace gSKI
       return m;
    }
 
-   void Agent::SetOSupportMode(egSKIOSupportMode mode, Error* err) 
+   void Agent::SetOSupportMode(egSKIOSupportMode mode, Error* err)
    {
       ClearError(err);
-	  switch (mode) 
+	  switch (mode)
 	  {
 		  case gSKI_O_SUPPORT_MODE_0:
 			  m_agent->o_support_calculation_type = 0;
@@ -1008,7 +1001,7 @@ namespace gSKI
    {
       ClearError(err);
       // return m_nextPhase;
-	  // KJC:  shouldn't this really be 
+	  // KJC:  shouldn't this really be
 	  return EnumRemappings::ReMapPhaseType(m_agent->current_phase,0);
 	  // should we also set m_lastPhase??
    }
@@ -1023,7 +1016,7 @@ namespace gSKI
       ClearError(err);
       return m_smallestStepCount;
    }
-   
+
    /*
    =============================
    This is a local gSKI counter, not from Kernel
@@ -1055,7 +1048,7 @@ namespace gSKI
    unsigned long Agent::GetNumElaborationsExecuted(Error* err)
    {
       ClearError(err);
-      return m_elaborationCount;  
+      return m_elaborationCount;
    }
 
    /*
@@ -1077,7 +1070,7 @@ namespace gSKI
    */
    unsigned long Agent::GetNumOutputsExecuted(Error* err)
    {
-	   // This variable is the number of output phases that 
+	   // This variable is the number of output phases that
 	   // actually had a modified output-link.
       ClearError(err);
       return m_outputCount;
@@ -1111,13 +1104,13 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		// do nothing.  gSKI gets d_cycles from SoarKernel
 		return;
 	case gSKI_INTERLEAVE_OUTPUT:
-		 m_outputCount++;				
+		 m_outputCount++;
 		 m_nilOutputCycles = 0;
 
 	default:
 		return;
 	}
-}  
+}
       /*
    =========================
     _       _     _ ____  _         _____                 _   _
@@ -1132,13 +1125,13 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
                          |___/
       =========================
       */
-      void Agent::AddRhsFunctionChangeListener(egSKISystemEventId    nEventId, 
-                                        IRhsFunctionChangeListener*  pListener, 
+      void Agent::AddRhsFunctionChangeListener(egSKISystemEventId    nEventId,
+                                        IRhsFunctionChangeListener*  pListener,
                                         bool                         bAllowAsynch,
                                         Error*                       err)
       {
          ClearError(err);
-      
+
       }
 
 
@@ -1161,7 +1154,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
                                            Error*                       err)
       {
          ClearError(err);
-      
+
       }
 
 
@@ -1178,13 +1171,13 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 |_____|_|___/\__\___|_| |_|\___|_|
       =========================
       */
-      void Agent::AddRhsFunctionListener(egSKISystemEventId  nEventId, 
-                                  IRhsFunctionListener* pListener, 
+      void Agent::AddRhsFunctionListener(egSKISystemEventId  nEventId,
+                                  IRhsFunctionListener* pListener,
                                   bool                  bAllowAsynch,
                                   Error*                err)
       {
          ClearError(err);
-      
+
       }
 
 
@@ -1208,7 +1201,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
                                             Error*                err)
       {
          ClearError(err);
-      
+
       }
 
    /*
@@ -1250,7 +1243,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
                                                     IRhsFunctionListener* pListener,
                                                     Error*                err)
       {
-      
+
       }
 
 	  /*
@@ -1258,8 +1251,8 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	AddXMLListener
    =========================
 	  */
-	  void Agent::AddXMLListener(egSKIXMLEventId	 eventId, 
-							IXMLListener*            listener, 
+	  void Agent::AddXMLListener(egSKIXMLEventId	 eventId,
+							IXMLListener*            listener,
 							bool                     allowAsynch,
 							Error*                   err)
 	  {
@@ -1280,7 +1273,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		  {
 			  // This is a kernel call (not part of gSKI)
 			  // Must convert gSKI event to Kernel event
-			  gSKI_SetAgentCallback(GetSoarAgent(), 
+			  gSKI_SetAgentCallback(GetSoarAgent(),
 				  EnumRemappings::RemapXMLEventType(eventId),
 				  static_cast<void*>(this),
 				  HandleKernelXMLCallback);
@@ -1314,7 +1307,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		 // Must convert gSKI event to Kernel event
          // Setting the callback to 0 causes the kernel
          //   not to fire the event
-         gSKI_SetAgentCallback(GetSoarAgent(), 
+         gSKI_SetAgentCallback(GetSoarAgent(),
 			 				     EnumRemappings::RemapXMLEventType(eventId),
                                  static_cast<void*>(this),
 								 HandleKernelXMLCallback);
@@ -1330,9 +1323,9 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 /_/   \_\__,_|\__,_|_|   |_|  |_|_| |_|\__|_____|_|___/\__\___|_| |_|\___|_|
    ==========================
    */
-   void Agent::AddPrintListener(egSKIPrintEventId         eventId, 
-                                 IPrintListener*          listener, 
-                                 bool                     allowAsynch, 
+   void Agent::AddPrintListener(egSKIPrintEventId         eventId,
+                                 IPrintListener*          listener,
+                                 bool                     allowAsynch,
                                  Error*                   err)
    {
       MegaAssert(listener, "Cannot add a 0 listener pointer.");
@@ -1352,7 +1345,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       {
          // This is a kernel call (not part of gSKI)
 		 // Must convert gSKI event to Kernel event
-         gSKI_SetAgentCallback(GetSoarAgent(), 
+         gSKI_SetAgentCallback(GetSoarAgent(),
 							   EnumRemappings::RemapPrintEventType(eventId),
                                static_cast<void*>(this),
                                HandleKernelPrintCallback);
@@ -1390,13 +1383,13 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		 // Must convert gSKI event to Kernel event
          // Setting the callback to 0 causes the kernel
          //   not to fire the event
-         gSKI_SetAgentCallback(GetSoarAgent(), 
+         gSKI_SetAgentCallback(GetSoarAgent(),
 			 				     EnumRemappings::RemapPrintEventType(eventId),
                                  0, 0);
       }
    }
 
-   /* 
+   /*
    ==========================
  _   _                 _ _      _  __                    _
 | | | | __ _ _ __   __| | | ___| |/ /___ _ __ _ __   ___| |
@@ -1409,10 +1402,10 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 |_|   |_|  |_|_| |_|\__|\____\__,_|_|_|_.__/ \__,_|\___|_|\_\
    ==========================
    */
-   void Agent::HandleKernelPrintCallback(unsigned long         eventId, 
+   void Agent::HandleKernelPrintCallback(unsigned long         eventId,
                                          unsigned char         eventOccured,
-                                         void*                 object, 
-                                         agent*                soarAgent, 
+                                         void*                 object,
+                                         agent*                soarAgent,
                                          void*                 data)
    {
       Agent*        a = static_cast<Agent*>(object);
@@ -1429,10 +1422,10 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	HandleKernelXMLCallback
    =========================
    */
-   void Agent::HandleKernelXMLCallback(unsigned long			  eventId, 
+   void Agent::HandleKernelXMLCallback(unsigned long			  eventId,
                                             unsigned char         eventOccured,
-                                            void*                 object, 
-                                            agent*                soarAgent, 
+                                            void*                 object,
+                                            agent*                soarAgent,
                                             void*                 data)
    {
 	  Agent* a = static_cast<Agent*>(object);
@@ -1445,13 +1438,13 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    }
 
 
-   /* 
+   /*
    ==========================
 	AddRunListener
    ==========================
-   */   
-   void Agent::AddRunListener(egSKIRunEventId  eventId, 
-                              IRunListener*    listener, 
+   */
+   void Agent::AddRunListener(egSKIRunEventId  eventId,
+                              IRunListener*    listener,
                               bool             allowAsynch,
                               Error*           err)
    {
@@ -1464,7 +1457,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
       ClearError(err);
       bool added = m_runListeners.AddListener(eventId, listener);
- 
+
       // If we have added our first listener, we tell the kernel
       //  we want to recieve these events.
       if (added && m_runListeners.GetNumListeners(eventId) == 1)
@@ -1472,55 +1465,55 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		  switch (eventId)   // temporary, til all are moved to kernel. KJC
 		  {
 		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
-		  case gSKIEVENT_AFTER_PHASE_EXECUTED:      		
+		  case gSKIEVENT_AFTER_PHASE_EXECUTED:
 			  // events above are generated by each phase, so don't add again.
 			  break;
 		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
-		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
-			  // This is a kernel call (not part of gSKI)	
-              // Must convert gSKI event to Kernel event     			
-			  gSKI_SetAgentCallback(GetSoarAgent(), 
+		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:
+			  // This is a kernel call (not part of gSKI)
+              // Must convert gSKI event to Kernel event
+			  gSKI_SetAgentCallback(GetSoarAgent(),
 							   EnumRemappings::RemapRunEventType(eventId),
                                static_cast<void*>(this),
                                HandleRunEventCallback);
-			 
+
 			  break;
-    	  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
-		  case gSKIEVENT_AFTER_DECISION_CYCLE:			  
+    	  case gSKIEVENT_BEFORE_DECISION_CYCLE:
+		  case gSKIEVENT_AFTER_DECISION_CYCLE:
 			  { RunEventCallbackData * eventInfo = new RunEventCallbackData();
 			    eventInfo->a = this;
 		        eventInfo->eventId = eventId;
 			  soar_add_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
-							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)),
 								 HandleKernelRunEventCallback,
-								 static_cast <void*> (eventInfo), 0, 
+								 static_cast <void*> (eventInfo), 0,
 								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
 			  }
-			  break; 
+			  break;
 		  default:
 			  ; // do nothing
 		  }
 
-		  if (IsPhaseEventID(eventId)) 
-		  {		 
+		  if (IsPhaseEventID(eventId))
+		  {
 		      RunEventCallbackData * eventInfo = new RunEventCallbackData();
 			  eventInfo->a = this;
 		      eventInfo->eventId = eventId;
 			  soar_add_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
-							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 
+							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)),
 								 HandleKernelRunEventCallback,
-								 static_cast <void*> (eventInfo), 0, 
+								 static_cast <void*> (eventInfo), 0,
 								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
 		  }
 
       }
    }
 
-   /* 
+   /*
    ==========================
 	RemoveRunListener
    ==========================
-   */   
+   */
    void Agent::RemoveRunListener(egSKIRunEventId   eventId,
                                  IRunListener*     listener,
                                  Error*            err)
@@ -1538,35 +1531,35 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	  // If we have no more listeners, stop asking kernel to
       //  notify us
       if(removed && m_runListeners.GetNumListeners(eventId) == 0)
-      {		 
+      {
 		  switch (eventId)   // temporary, til all are moved to kernel. KJC
 		  {
 		  case gSKIEVENT_BEFORE_PHASE_EXECUTED:
-		  case gSKIEVENT_AFTER_PHASE_EXECUTED:     
+		  case gSKIEVENT_AFTER_PHASE_EXECUTED:
 			  // These are no longer added, since phases generate above events.
 			  break;
 		  case gSKIEVENT_BEFORE_ELABORATION_CYCLE:
-		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:  
-			  // This is a kernel call (not part of gSKI)	
-              // Must convert gSKI event to Kernel event     			
-			  // Setting the callback to 0 causes the kernel        
+		  case gSKIEVENT_AFTER_ELABORATION_CYCLE:
+			  // This is a kernel call (not part of gSKI)
+              // Must convert gSKI event to Kernel event
+			  // Setting the callback to 0 causes the kernel
 			  //   not to fire the event
-			  gSKI_SetAgentCallback(GetSoarAgent(), 
+			  gSKI_SetAgentCallback(GetSoarAgent(),
 							   EnumRemappings::RemapRunEventType(eventId),
                                0,0);
 			  break;
-		  case gSKIEVENT_BEFORE_DECISION_CYCLE:  
+		  case gSKIEVENT_BEFORE_DECISION_CYCLE:
 		  case gSKIEVENT_AFTER_DECISION_CYCLE:
 			  soar_remove_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
 							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)),
 								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
-			  break; 
+			  break;
 		  default:
 			  ; // do nothing
 		  }
 
-		  if (IsPhaseEventID(eventId)) 
-		  {		 
+		  if (IsPhaseEventID(eventId))
+		  {
 			  soar_remove_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
 							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)),
 								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
@@ -1606,7 +1599,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		if ((gSKIEVENT_AFTER_INPUT_PHASE  == eventId) ||
             (gSKIEVENT_AFTER_OUTPUT_PHASE == eventId) ||
 			(gSKIEVENT_AFTER_DECISION_PHASE == eventId))
-		{	
+		{
 			a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
 		}
 		if (gSKIEVENT_AFTER_OUTPUT_PHASE == eventId) {
@@ -1620,7 +1613,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 			}
 		}
 	}
-    if (gSKIEVENT_AFTER_ELABORATION_CYCLE == eventId) 
+    if (gSKIEVENT_AFTER_ELABORATION_CYCLE == eventId)
 	{
 		a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
 	} /* */
@@ -1637,19 +1630,19 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		(IsAFTERPhaseEventID(eventId)))
 	{
 		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
-	} 
-	
+	}
+
    }
 
    void Agent::DeleteRunEventCallbackData (soar_callback_data data)
    {
-	   delete static_cast <Agent::RunEventCallbackData*>  (data); 
+	   delete static_cast <Agent::RunEventCallbackData*>  (data);
    }
 
-   void Agent::HandleRunEventCallback(unsigned long         eventId, 
+   void Agent::HandleRunEventCallback(unsigned long         eventId,
                                       unsigned char         eventOccured,
-                                      void*                 object, 
-                                      agent*                soarAgent, 
+                                      void*                 object,
+                                      agent*                soarAgent,
                                       void*                 data)
    {
       Agent*        a = static_cast<Agent*>(object);
@@ -1658,7 +1651,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	  // have to map to a gSKI event enum
  	// Only elaboration events should be going thru here.  Everything else is a
     // KernelEvent now.
-	if (gSKIEVENT_AFTER_ELABORATION_CYCLE == EnumRemappings::Map_Kernel_to_gSKI_RunEventId(eventId,eventOccured)) 
+	if (gSKIEVENT_AFTER_ELABORATION_CYCLE == EnumRemappings::Map_Kernel_to_gSKI_RunEventId(eventId,eventOccured))
 	{
 		a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
 	} /* */
@@ -1668,11 +1661,11 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       a->m_runListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_RunEventId(eventId,eventOccured), rn);
    }
 
-   // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events 
+   // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events
    void Agent::HandleEventStatic(egSKIRunEventId eventId, Agent* a, egSKIPhaseType phase)
    {
 	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
- 
+
 	// KJC 12/1/05:  everything should be going thru HandleKernelRunEventCallback
 	//  or HandleRunEventCallback (for Elaborations only).
 	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
@@ -1684,13 +1677,13 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		(IsAFTERPhaseEventID(eventId)))
 	{
 		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
-	} 
+	}
 }
 
 
    /*
    =========================
-	
+
    =========================
    */
    // TODO: Flesh out this function (dummy body allows compilation)
@@ -1705,7 +1698,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    IState* Agent::GetBottomState(Error* err)
    {
       ClearError(err);
-      
+
       return 0;
    }
 
@@ -1713,14 +1706,14 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    {
       typedef FwdContainerType< std::vector<IMultiAttribute * > >  tVec;
       typedef IteratorWithRelease<tVec::V, tVec::t>  tIter;
-      
+
       tVec::t attrs;
       multi_attribute* m = m_agent->multi_attributes;
       while(m)
       {
          char tmp[1024];
-         attrs.push_back(new MultiAttribute(this, 
-                                            symbol_to_string(m_agent, m->symbol, TRUE, tmp, 1024), 
+         attrs.push_back(new MultiAttribute(this,
+                                            symbol_to_string(m_agent, m->symbol, TRUE, tmp, 1024),
                                             m->value));
          m = m->next;
       }
@@ -1733,9 +1726,9 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       std::vector<char> tmp(attribute, attribute + strlen(attribute) + 1);
       Symbol* s = make_sym_constant(m_agent, &tmp[0]);
 
-      while (m) 
+      while (m)
       {
-         if (m->symbol == s) 
+         if (m->symbol == s)
          {
             symbol_remove_ref(m_agent, s);
             return new MultiAttribute(this, attribute, m->value);
@@ -1746,7 +1739,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       return 0;
    }
 
-   void Agent::SetMultiAttribute(const char* attribute, 
+   void Agent::SetMultiAttribute(const char* attribute,
                                     int priority,
                                     Error* pErr /*= 0*/)
    {
@@ -1754,9 +1747,9 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       std::vector<char> tmp(attribute, attribute + strlen(attribute) + 1);
       Symbol* s = make_sym_constant(m_agent, &tmp[0]);
 
-      while (m) 
+      while (m)
       {
-         if (m->symbol == s) 
+         if (m->symbol == s)
          {
             m->value = priority;
             symbol_remove_ref(m_agent, s);
@@ -1805,28 +1798,130 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       }
    }
 
-   int Agent::GetAttributePreferencesMode(Error* err) 
+/*******************************************
+Exploration
+*********************************************/
+
+   void Agent::SetExplorationMode(egSKIExplorationMode m, Error* pErr) {
+	   switch(m) {
+		   case gSKI_BOLTZMANN_EXPLORATION:
+			   GetSoarAgent()->exploration_mode = BOLTZMANN_EXPLORATION;
+			   return;
+		   case gSKI_EPSILON_GREEDY_EXPLORATION:
+			   GetSoarAgent()->exploration_mode = EPSILON_GREEDY_EXPLORATION;
+			   return;
+		   case gSKI_NO_EXPLORATION:
+			   GetSoarAgent()->exploration_mode = NO_EXPLORATION;
+			   return;
+		   default:
+			   MegaAssert(false, "Invalid exploration mode");
+	   }
+   }
+
+
+   egSKIExplorationMode Agent::GetExplorationMode(Error* pErr/* = 0*/) {
+
+      egSKIExplorationMode m = gSKI_BOLTZMANN_EXPLORATION;
+
+      switch(GetSoarAgent()->exploration_mode) {
+         case BOLTZMANN_EXPLORATION:
+            m = gSKI_BOLTZMANN_EXPLORATION;
+            break;
+         case EPSILON_GREEDY_EXPLORATION:
+            m = gSKI_EPSILON_GREEDY_EXPLORATION;
+            break;
+		 case NO_EXPLORATION:
+			 m = gSKI_NO_EXPLORATION;
+			 break;
+         default:
+            MegaAssert(false, "Invalid exploration mode");
+            break;
+      }
+
+      return m;
+   }
+
+   void Agent::SetTemperature(double Temp, Error* pErr) {
+	   GetSoarAgent()->Temperature = Temp;
+   }
+
+   void Agent::SetEpsilon(double epsilon, Error* pErr) {
+	   GetSoarAgent()->epsilon = epsilon;
+   }
+
+   double Agent::GetTemperature(Error* pErr) {
+	   return GetSoarAgent()->Temperature;
+   }
+
+   double Agent::GetEpsilon(Error* pErr) {
+	   return GetSoarAgent()->epsilon;
+   }
+
+   /****************************************************
+
+   Reinforcement Learning
+
+   ****************************************************/
+
+   void Agent::SetAlpha(double alpha, Error* pErr) {
+	   GetSoarAgent()->alpha = alpha;
+   }
+
+   void Agent::SetGamma(double gamma, Error* pErr) {
+	   GetSoarAgent()->gamma = gamma;
+  }
+
+  double Agent::GetAlpha(Error* pErr) {
+	   return GetSoarAgent()->alpha;
+   }
+
+  double Agent::GetGamma(Error* pErr) {
+	   return GetSoarAgent()->gamma;
+   }
+
+ void Agent::SetRL(bool on, Error* err)
+   {
+      ClearError(err);
+      m_agent->sysparams[RL_ON_SYSPARAM] = on;
+   }
+
+  bool Agent::IsRLOn(Error* err)
+   {
+      ClearError(err);
+      return m_agent->sysparams[RL_ON_SYSPARAM] ? true : false;
+   }
+
+
+
+
+
+
+
+
+
+
+   int Agent::GetAttributePreferencesMode(Error* err)
    {
 	   return GetSoarAgent()->attribute_preferences_mode;
    }
-	
-   void Agent::SetAttributePreferencesMode(int mode, Error* err) 
+
+   void Agent::SetAttributePreferencesMode(int mode, Error* err)
    {
 	   MegaAssert((mode >= 0) && (mode <= 2), "Attribute preferences mode must be 0, 1, or 2");
 	   GetSoarAgent()->attribute_preferences_mode = mode;
    }
-      
-   int Agent::GetInputPeriod(Error* err) 
+
+   int Agent::GetInputPeriod(Error* err)
    {
 	   return GetSoarAgent()->input_period;
    }
-	
-   void Agent::SetInputPeriod(int period, Error* err) 
+
+   void Agent::SetInputPeriod(int period, Error* err)
    {
 	   MegaAssert(period >= 0, "Input period must be non-negative");
 	   GetSoarAgent()->input_period = period;
    }
-      
+
    //////////////////////////////////////////////////// PRIVATES /////////////
    /*
    =============================
@@ -1834,12 +1929,12 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    =============================
    */
    egSKIRunResult Agent::step(egSKIInterleaveType stepSize, unsigned long count)
-   {    
+   {
 	   // This method runs a single agent.  count typically will equal 1.
-    
+
 	   unsigned long*  startCount        = getReleventCounter(stepSize);
 	   const unsigned long  END_COUNT    = (startCount)? ((*startCount) + count): 0;
-  
+
    	   bool interrupted  = (m_runState == gSKI_RUNSTATE_INTERRUPTED)? true: false;
 
 	   MegaAssert((count >= 0), "Cannot step for fewer than one count.");
@@ -1849,44 +1944,44 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		   // Notify that agent is about to execute. (NOT the start of a run, just a step)
 		   RunNotifier nfBeforeRunning(this,EnumRemappings::ReMapPhaseType(m_agent->current_phase,0));
 		   m_runListeners.Notify(gSKIEVENT_BEFORE_RUNNING, nfBeforeRunning);
-    
-		   switch (stepSize) 
+
+		   switch (stepSize)
 		   {
 		   case  gSKI_INTERLEAVE_SMALLEST_STEP:     run_for_n_elaboration_cycles(m_agent, count); break;
 		   case  gSKI_INTERLEAVE_ELABORATION_PHASE: run_for_n_elaboration_cycles(m_agent, count); break;
 		   case  gSKI_INTERLEAVE_PHASE:             run_for_n_phases(m_agent, count);             break;
 		   case  gSKI_INTERLEAVE_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);    break;
-		   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count); 
-//			                                        if (m_agent->stop_soar) 
+		   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count);
+//			                                        if (m_agent->stop_soar)
 //														this->IncrementgSKIStepCounter(gSKI_INTERLEAVE_OUTPUT);
 													break;
 		   }
 	   }
 
-       if ((m_interruptFlags & gSKI_STOP_AFTER_SMALLEST_STEP) || 
+       if ((m_interruptFlags & gSKI_STOP_AFTER_SMALLEST_STEP) ||
 		   (m_interruptFlags & gSKI_STOP_AFTER_PHASE))
 	   {
 		   interrupted = true;
 	   }
-  
+
 	   // KJC: If a gSKI_STOP_AFTER_DECISION_CYCLE has been requested, need to
 	   // check that agent phase is at the proper stopping point before interrupting.
 	   // If not at the right phase, but interrupt was requested, then the SML scheduler
 	   // method IsAgentFinished will return true and CheckStopBeforePhase will
 	   // step the agent by phases until this test is satisfied.
-       if ((m_interruptFlags & gSKI_STOP_AFTER_DECISION_CYCLE) && 
+       if ((m_interruptFlags & gSKI_STOP_AFTER_DECISION_CYCLE) &&
 		   (m_agent->current_phase == m_kernel->GetStopPoint()))
 	   {
 		   interrupted = true;
 	   }
 
-	   		   
-	   if (interrupted) 
+
+	   if (interrupted)
 	   {
 	       // Notify of the interrupt
            RunNotifier nfAfterInt(this, m_lastPhase);
            m_runListeners.Notify(gSKIEVENT_AFTER_INTERRUPT, nfAfterInt);
- 
+
 		   /* This is probably redundant with the event above, which clients can listen for... */
 		   PrintNotifier nfIntr(this, "Interrupt received.");
 		   m_printListeners.Notify(gSKIEVENT_PRINT, nfIntr);
@@ -1899,9 +1994,9 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		   /* */
 	   }
 
-     
+
 	   egSKIRunResult retVal;
-  
+
 	   // We've exited the run loop so we see what we should return
 	   if(m_agent->system_halted)
 	   {
@@ -1919,7 +2014,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
 		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
 	   }
-	   else if(maxStepsReached(startCount, END_COUNT)) 
+	   else if(maxStepsReached(startCount, END_COUNT))
 	   {
 		   if(interrupted)
 		   {
@@ -1933,14 +2028,14 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 			   retVal     = gSKI_RUN_COMPLETED;
 		   }
 	   }
-	   else 
-	   {  
+	   else
+	   {
 		   // We were interrupted before we could complete
 		   MegaAssert(interrupted, "Should never get here if we aren't interrupted");
 
 		   m_runState    = gSKI_RUNSTATE_INTERRUPTED;
 		   retVal        = gSKI_RUN_INTERRUPTED;
-	   }    
+	   }
 
 	   // Notify that agent stopped. (NOT the end of a run, just a step)
 	   // Use AFTER_RUN_ENDS if you want to trap the end of the complete run.
@@ -1949,7 +2044,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
 	   return retVal;
    }
- 
+
    /*
    =============================
 
@@ -1966,7 +2061,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       //  run forever
       unsigned long*       steps           = getReleventCounter(runType);
       const unsigned long  MAX_STEPS       = (steps)? ((*steps) + maxSteps): 0;
-      
+
       // Tells the run loop if an interrupt has occured
       bool interrupted  = (m_runState == gSKI_RUNSTATE_INTERRUPTED)? true: false;
 
@@ -1994,7 +2089,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
          ///////////////////////////////////////////////////////////////////
          // Execute the next step
- 
+
 		 if (runType == gSKI_RUN_ELABORATION_CYCLE) {
 			 run_for_n_elaboration_cycles(m_agent, 1);
 		 } else {
@@ -2005,7 +2100,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
          m_lastPhase = m_nextPhase;
 
 		 // the current_phase in SoarKernel is the phase to be run next.
-         m_nextPhase = EnumRemappings::ReMapPhaseType((unsigned short)m_agent->current_phase, 
+         m_nextPhase = EnumRemappings::ReMapPhaseType((unsigned short)m_agent->current_phase,
                                                       (m_agent->applyPhase)? true: false);
 		 // boolean above is no longer used to determine Propose or Apply, should remove
 
@@ -2025,7 +2120,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
          {
            // Notify of the interrupt
            RunNotifier nfAfterInt(this, m_lastPhase);
-           m_runListeners.Notify(gSKIEVENT_AFTER_INTERRUPT, nfAfterInt);		
+           m_runListeners.Notify(gSKIEVENT_AFTER_INTERRUPT, nfAfterInt);
 		   /* This is probably redundant with the event above, which clients can listen for... */
 		   PrintNotifier nfIntr(this, "Interrupt received.");
 		   m_printListeners.Notify(gSKIEVENT_PRINT, nfIntr);
@@ -2057,7 +2152,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
          m_runState    = gSKI_RUNSTATE_HALTED;
          retVal        = gSKI_RUN_COMPLETED;
       }
-      else if(maxStepsReached(steps, MAX_STEPS)) 
+      else if(maxStepsReached(steps, MAX_STEPS))
       {
          // If we ran the required steps, we completed, but we
          //  may still be interrupted.
@@ -2079,7 +2174,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
          m_runState    = gSKI_RUNSTATE_INTERRUPTED;
          retVal        = gSKI_RUN_INTERRUPTED;
-      }    
+      }
 
       // Notify that we stopped
 	  // This is "AFTER_RUNNING_A_PHASE" (or other chunk) not after the end of the complete run.
@@ -2125,7 +2220,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       case gSKI_RUN_PHASE:
          return &m_phaseCount;
       case gSKI_RUN_ELABORATION_CYCLE:
-		 return &m_elaborationCount; 
+		 return &m_elaborationCount;
 		 /***********
 		 if (m_agent->operand2_mode) {
  			//      count only true Soar Elaboration cycles
@@ -2136,7 +2231,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 			// m_elaborationCount increments for an elaboration,
 			// or a phase, but not both, in the same agent::run.
 			// this is consistent with SoarKernel in Soar7 mode
-			return &m_elaborationCount; 
+			return &m_elaborationCount;
 		 }  ***********/
       case gSKI_RUN_DECISION_CYCLE:
 		 return &m_agent->d_cycle_count;
@@ -2148,7 +2243,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       }
    }
 
-      
+
    unsigned long* Agent::getReleventCounter(egSKIInterleaveType stepType)
    {
       // Returns a pointer to the counter that is relevant
@@ -2160,7 +2255,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       case gSKI_INTERLEAVE_PHASE:
          return &m_phaseCount;
       case gSKI_INTERLEAVE_ELABORATION_PHASE:
-		 return &m_elaborationCount; 
+		 return &m_elaborationCount;
       case gSKI_INTERLEAVE_DECISION_CYCLE:
 		 return &m_agent->d_cycle_count;
       case  gSKI_INTERLEAVE_OUTPUT:
@@ -2179,7 +2274,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    {
        // KJC:  These can all go away if we use the gSKI events in SoarKernel
 	   // where they are all in the proper part of respective phases.
-	   
+
 	 /*  // KJC removing agent RunEvents from schedulers
 
       // Input phase is the beginning of the decision cycle
@@ -2195,7 +2290,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
          RunNotifier nfBeforePhase(this, m_nextPhase);
          m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED, nfBeforePhase);
       }
-	
+
 
       // See if this is an elaboration cycle   <<-- won't work for Soar 7 mode
       if((m_nextPhase == gSKI_PROPOSAL_PHASE) || (m_nextPhase == gSKI_APPLY_PHASE))
@@ -2218,7 +2313,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	   // where they are all in the proper part of respective phases.
 
 	  /*  // KJC removing agent RunEvents from schedulers
-	   
+
       // Input phase is the beginning of an elaboration phase
       if(m_nextPhase == gSKI_INPUT_PHASE)
       {
@@ -2230,12 +2325,12 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
  			 RunNotifier nfBeforeDC(this, m_nextPhase);
  			 m_runListeners.Notify(gSKIEVENT_BEFORE_DECISION_CYCLE, nfBeforeDC);
 		 }
-      } 
+      }
 
       // Soar 7 is always starting a new phase
       RunNotifier nfBeforePhase(this, m_nextPhase);
       m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED, nfBeforePhase);
- 
+
 	  */
 
 	  //  KJC: not sure this is needed for Soar 7 (or Soar 8) because always new phase
@@ -2261,19 +2356,19 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       // Notify listeners about the end of the phase
 	  /* // KJC removing agent RunEvents from schedulers
          //   RunNotifier nfAfterStep(this, m_lastPhase);
-         //   m_runListeners.Notify(gSKIEVENT_AFTER_SMALLEST_STEP, nfAfterStep); 
+         //   m_runListeners.Notify(gSKIEVENT_AFTER_SMALLEST_STEP, nfAfterStep);
        */
       // Increment smallest step
       //  deprecated as of 8.6.2   ++m_smallestStepCount;
  	  // see GetRelevantCounter if only want to count actual Soar e_cycles.
-      // moved to HandleKernelRunEvent   ++m_elaborationCount;   
- 
+      // moved to HandleKernelRunEvent   ++m_elaborationCount;
+
       // Check an interrupt
       if(m_interruptFlags & gSKI_STOP_AFTER_SMALLEST_STEP)
          interrupted = true;
 
 	  /* // KJC removing agent RunEvents from schedulers
-         // See if this was an elaboration cycle 
+         // See if this was an elaboration cycle
          if((m_lastPhase == gSKI_PROPOSAL_PHASE) || (m_lastPhase == gSKI_APPLY_PHASE))
          {
             RunNotifier nfAfterElab(this, m_lastPhase);
@@ -2286,7 +2381,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       {
          // Increment the number of outputs that have occured
 		 // (Do this before notify listeners so they can see the updated counter)
-         // moved to HandleKernelRunEvent    
+         // moved to HandleKernelRunEvent
 		  /*if((m_lastPhase == gSKI_OUTPUT_PHASE) && m_agent->output_link_changed)
             ++m_outputCount; */
 
@@ -2332,12 +2427,12 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	   */
 
       // Increment smallest step
-      //  deprecated as of 8.6.2   ++m_smallestStepCount;   
- 	  // Increment the elaboration count  
+      //  deprecated as of 8.6.2   ++m_smallestStepCount;
+ 	  // Increment the elaboration count
 	  // see GetRelevantCounter if only want to count actual Soar e_cycles.
 	  // ++m_elaborationCount;    // works for Soar 7, since gSKI now calls
 	                           // run_for_n_elaboration_cycles
- 
+
 
       // Check an interrupt
       if(m_interruptFlags & gSKI_STOP_AFTER_SMALLEST_STEP)
@@ -2351,7 +2446,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
 	     /*   // KJC these were all moved to HandleKernelRunEvent
          // Increment the phase count
-         ++m_phaseCount;  
+         ++m_phaseCount;
 
          // Increment the number of outputs that have occured
          if((m_lastPhase == gSKI_OUTPUT_PHASE) && m_agent->output_link_changed)
@@ -2361,9 +2456,9 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
          // Check an interrupt
          if(m_interruptFlags & gSKI_STOP_AFTER_PHASE)
             interrupted = true;
-     
+
 	  /* // KJC removing agent RunEvents from schedulers
-	  // See if this was an elaboration cycle 
+	  // See if this was an elaboration cycle
       if(m_lastPhase == gSKI_OUTPUT_PHASE)
       {
          RunNotifier nfAfterElab(this, m_lastPhase);

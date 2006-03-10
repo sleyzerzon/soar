@@ -1,56 +1,40 @@
 /* File : sml_ClientInterface.i */
 
-//
-// SWIG support for std::string
-//
 %include std_string.i
 
-//
-// These functions need to be renamed because they only differ by a const type, which isn't enough to distinguish them
-//
 %rename(SetTagNameConst) sml::ElementXML::SetTagName(char const* tagName);
 %rename(AddAttributeConst) sml::ElementXML::AddAttribute(char const* attributeName, char* attributeValue);
 %rename(AddAttributeConstConst) sml::ElementXML::AddAttribute(char const* attributeName, char const* attributeValue);
 %rename(SetCharacterDataConst) sml::ElementXML::SetCharacterData(char const* characterData);
 %rename(SetBinaryCharacterDataConst) sml::ElementXML::SetBinaryCharacterData(char const* characterData, int length);
 
-//
-// These static functions create a new Kernel object that should be destroyed later
-//
+// These static function create a new Kernel object which should be destroyed later
+// We need to let SWIG know this
 %newobject sml::Kernel::CreateKernelInCurrentThread;
 %newobject sml::Kernel::CreateKernelInNewThread;
 %newobject sml::Kernel::CreateRemoteConnection;
 
-//
-// These static functions generate a new char* object that should be destroyed later
-// We also need to tell SWIG how to delete the object (hence the typemaps)
-//
-%newobject sml::ClientXML::GenerateXMLString(bool) const ;
-%newobject sml::ElementXML::GenerateXMLString(bool) const ;
-%newobject sml::AnalyzeXML::GenerateXMLString(bool) const ;
-%newobject sml::ClientAnalyzedXML::GenerateXMLString(bool) const ;
-
-%typemap(newfree) char* sml::ClientXML::GenerateXMLString {
+// This function also creates a new object, but we need to tell SWIG how to delete it
+%typemap(newfree) char* GenerateXMLString {
     sml::ClientXML::DeleteString($1);
 }
+%newobject sml::ClientXML::GenerateXMLString(bool) const ;
+
 %typemap(newfree) char* GenerateXMLString {
     sml::ElementXML::DeleteString($1);
 }
-%typemap(newfree) char* sml::AnalyzeXML::GenerateXMLString {
+%newobject sml::ElementXML::GenerateXMLString(bool) const ;
+
+// This function also creates a new object, but we need to tell SWIG how to delete it
+%typemap(newfree) char* GenerateXMLString {
     sml::AnalyzeXML::DeleteString($1);
 }
-%typemap(newfree) char* sml::ClientAnalyzedXML::GenerateXMLString {
-    sml::ClientAnalyzedXML::DeleteString($1);
-}
+%newobject sml::AnalyzeXML::GenerateXMLString(bool) const ;
 
-//
-// This parsing method returns a new ElementXML object that should be destroyed later
-//
+// This parsing method returns a new ElementXML object
 %newobject sml::ElementXML::ParseXMLFromString;
 
-//
-// Don't wrap the code for registering callbacks because we need to provide some custom code to make it work
-//
+// don't wrap the code for registering callbacks because we need to provide some custom code to make it work
 %ignore sml::Agent::RegisterForProductionEvent(smlProductionEventId, ProductionEventHandler, void*, bool addToBack = true);
 %ignore sml::Agent::RegisterForRunEvent(smlRunEventId, RunEventHandler, void*, bool addToBack = true);
 %ignore sml::Agent::RegisterForPrintEvent(smlPrintEventId, PrintEventHandler, void*, bool ignoreOwnEchos = true,  bool addToBack = true);
@@ -64,9 +48,6 @@
 %ignore sml::Kernel::AddRhsFunction(char const*, RhsEventHandler, void*, bool addToBack = true);
 %ignore sml::Kernel::RegisterForClientMessageEvent(char const*, RhsEventHandler, void*, bool addToBack = true);
 
-//
-// Tell SWIG to include these files in the generated wrapper code
-//
 %{
 #include "sml_Names.h"
 #include "sml_ElementXML.h"
@@ -85,9 +66,6 @@
 #include "sml_ClientAnalyzedXML.h"
 %}
 
-//
-// Tell SWIG to wrap these files
-//
 %include "sml_Names.h"
 %include "sml_ElementXML.h"
 %include "sml_AnalyzeXML.h"
@@ -103,3 +81,4 @@
 %include "sml_ClientXML.h"
 %include "sml_ClientTraceXML.h"
 %include "sml_ClientAnalyzedXML.h"
+

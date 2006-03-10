@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION. 
+ * FOR LICENSE AND COPYRIGHT INFORMATION.
  *************************************************************************/
 
 /********************************************************************
@@ -8,7 +8,7 @@
 *********************************************************************
 * created:	   6/27/2002   10:44
 *
-* purpose: 
+* purpose:
 *********************************************************************/
 #ifndef GSKI_DONOTTOUCH_H
 #define GSKI_DONOTTOUCH_H
@@ -20,7 +20,7 @@
 namespace gSKI
 {
    class IAgent;
-   namespace EvilBackDoor 
+   namespace EvilBackDoor
    {
       class TgDWorkArounds : public ITgDWorkArounds
       {
@@ -44,14 +44,14 @@ namespace gSKI
 		 const long* GetSysparams(IAgent* agent);
 
          rete_node* NameToProduction(IAgent* agent, char* string_to_test);
-         void PrintPartialMatchInformation(IAgent* thisAgent, 
+         void PrintPartialMatchInformation(IAgent* thisAgent,
          struct rete_node_struct *p_node, wme_trace_type wtt);
          void PrintMatchSet(IAgent* thisAgent, wme_trace_type wtt, ms_trace_type  mst);
          void PrintStackTrace(IAgent* thisAgent, bool print_states, bool print_operators);
-         void PrintSymbol(IAgent*     thisAgent, 
-                          char*       arg, 
-                          bool        name_only, 
-                          bool        print_filename, 
+         void PrintSymbol(IAgent*     thisAgent,
+                          char*       arg,
+                          bool        name_only,
+                          bool        print_filename,
                           bool        internal,
                           bool        full_prod,
                           int         depth);
@@ -61,7 +61,13 @@ namespace gSKI
                         bool          print_filename,
                         bool          full_prod,
                         unsigned int  productionType);
-                     
+
+         void PrintRL(IAgent*		thisAgent,
+		 			  char*			arg,
+		 			  bool			internal,
+		 			  bool			print_filename,
+					  bool			full_prod);
+
          bool Preferences(IAgent* thisAgent, int detail, const char* idString, const char* attrString);
 
          bool ProductionFind(IAgent*     thisAgent,
@@ -104,7 +110,12 @@ namespace gSKI
 		 unsigned long GetChunkCount(IAgent* pIAgent);
 		 void SetChunkCount(IAgent* pIAgent, unsigned long count);
 
+		 void ResetRL(IAgent* pIAgent);
+
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
+
+         void DecayInit(IAgent* pIAgent);
+         void DecayDeInit(IAgent* pIAgent);
 	  };
    }
 }

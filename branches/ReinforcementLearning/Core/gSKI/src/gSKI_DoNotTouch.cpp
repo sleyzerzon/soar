@@ -5,7 +5,7 @@
 
 /*************************************************************************
 * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
-* FOR LICENSE AND COPYRIGHT INFORMATION. 
+* FOR LICENSE AND COPYRIGHT INFORMATION.
 *************************************************************************/
 
 /********************************************************************
@@ -13,7 +13,7 @@
 *********************************************************************
 * created:	   6/27/2002   10:44
 *
-* purpose: 
+* purpose:
 *********************************************************************/
 #include "gSKI_DoNotTouch.h"
 #include "gSKI_Agent.h"
@@ -31,14 +31,15 @@
 #include "decide.h"
 #include "explain.h"
 #include "soar_rand.h"
+#include "reinforcement_learning.h"
 
 //#include "../../SoarIO/ConnectionSML/include/sock_Debug.h"
 
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
 
-namespace gSKI 
+namespace gSKI
 {
-	namespace EvilBackDoor 
+	namespace EvilBackDoor
 	{
 		typedef struct wme_filter_struct {
 			Symbol *id;
@@ -48,7 +49,7 @@ namespace gSKI
 			bool removes;
 		} wme_filter;
 
-		void TgDWorkArounds::SetSysparam (IAgent* agent, int param_number, long new_value) 
+		void TgDWorkArounds::SetSysparam (IAgent* agent, int param_number, long new_value)
 		{
 			//agnt->sysparams[param_number] = new_value;
 			Agent* internalAgent = (Agent*)(agent);
@@ -86,7 +87,7 @@ namespace gSKI
 		}
 
 
-		void TgDWorkArounds::PrintPartialMatchInformation(IAgent* thisAgent, 
+		void TgDWorkArounds::PrintPartialMatchInformation(IAgent* thisAgent,
 		struct rete_node_struct *p_node,
 			wme_trace_type wtt)
 		{
@@ -114,7 +115,7 @@ namespace gSKI
 			const int maxStates = 500 ;
 			int stateCount = 0 ;
 
-			for (g = internalAgent->GetSoarAgent()->top_goal; g != NIL; g = g->id.lower_goal) 
+			for (g = internalAgent->GetSoarAgent()->top_goal; g != NIL; g = g->id.lower_goal)
 			{
 				stateCount++ ;
 
@@ -126,7 +127,7 @@ namespace gSKI
 					print_stack_trace (internalAgent->GetSoarAgent(),g, g, FOR_STATES_TF, false);
 					print (internalAgent->GetSoarAgent(), "\n");
 				}
-				if (print_operators && g->id.operator_slot->wmes) 
+				if (print_operators && g->id.operator_slot->wmes)
 				{
 					print_stack_trace (internalAgent->GetSoarAgent(), g->id.operator_slot->wmes->value,
 						g, FOR_OPERATORS_TF, false);
@@ -144,7 +145,7 @@ namespace gSKI
 			Symbol **dest_attr_of_slot,
 			Symbol **dest_current_value);
 
-		Symbol *read_identifier_or_context_variable (agent* agnt) 
+		Symbol *read_identifier_or_context_variable (agent* agnt)
 		{
 			Symbol *id;
 			Symbol *g, *attr, *value;
@@ -159,7 +160,7 @@ namespace gSKI
 				}
 				return id;
 			}
-			if (agnt->lexeme.type==VARIABLE_LEXEME) 
+			if (agnt->lexeme.type==VARIABLE_LEXEME)
 			{
 				get_context_var_info (agnt, &g, &attr, &value);
 				if (!attr) {
@@ -183,39 +184,40 @@ namespace gSKI
 			print (agnt, "Expected identifier (or context variable)\n");
 			print_location_of_most_recent_lexeme(agnt);
 			return NIL;
-		}		
+		}
 
-		void do_print_for_production (agent* agnt, 
-			production *prod, 
-			bool internal, 
-			bool print_filename, 
-			bool full_prod) 
+		void do_print_for_production (agent* agnt,
+			production *prod,
+			bool internal,
+			bool print_filename,
+			bool full_prod)
 		{
-			if (!full_prod) 
+			if (!full_prod)
 			{
 				print_with_symbols(agnt, "%y  ",prod->name);
+				if (prod->RL) print_with_symbols(agnt, "%y", rhs_value_to_symbol(prod->action_list->referent));
 			}
-			if (print_filename) 
+			if (print_filename)
 			{
 				print_string(agnt, "# sourcefile : ");
-				if (prod->filename) 
+				if (prod->filename)
 				{
 					print_string(agnt, prod->filename);
-				} 
-				else 
+				}
+				else
 				{
 					print_string(agnt, " _unknown_ ");
 				}
 			}
 			print(agnt, "\n");
-			if (full_prod) 
+			if (full_prod)
 			{
 				print_production (agnt, prod, internal);
 				print(agnt, "\n");
 			}
 		}
 
-		char *stringToEscapedString (char *s, char first_and_last_char, char *dest) 
+		char *stringToEscapedString (char *s, char first_and_last_char, char *dest)
 		{
 			char *ch;
 
@@ -231,15 +233,15 @@ namespace gSKI
 		}
 
 
-		char *symbolToString (Symbol *sym, 
-			Bool rereadable, 
-			char *dest) 
+		char *symbolToString (Symbol *sym,
+			Bool rereadable,
+			char *dest)
 		{
 			Bool possible_id, possible_var, possible_sc, possible_ic, possible_fc;
 			Bool is_rereadable;
 			Bool has_angle_bracket;
 
-			switch(sym->common.symbol_type) 
+			switch(sym->common.symbol_type)
 			{
 			case VARIABLE_SYMBOL_TYPE:
 				strcpy (dest, sym->var.name);
@@ -297,7 +299,7 @@ namespace gSKI
 					return dest;
 
 			default:
-				{ 
+				{
 					//                  char msg[128];
 					//                  strcpy(msg,
 					//                     "Internal Soar Error:  symbol_to_string called on bad symbol\n");
@@ -345,11 +347,11 @@ namespace gSKI
 		}
 
 		void print_augs_of_id (agent* agnt,
-			Symbol *id, 
-			int depth, 
+			Symbol *id,
+			int depth,
 			bool internal,
-			int indent, 
-			tc_number tc) 
+			int indent,
+			tc_number tc)
 		{
 			slot *s;
 			wme *w;
@@ -389,7 +391,7 @@ namespace gSKI
 				for (w=s->acceptable_preference_wmes; w!=NIL; w=w->next)
 					list[attr++] = w;
 			}
-			qsort (list, num_attr, sizeof (wme *), compare_attr); 
+			qsort (list, num_attr, sizeof (wme *), compare_attr);
 
 			/* --- finally, print the sorted wmes and deallocate the array --- */
 			if (internal) {
@@ -443,10 +445,10 @@ namespace gSKI
 		}
 
 		void do_print_for_production_name (agent* agnt,
-			char *prod_name, 
+			char *prod_name,
 			bool internal,
-			bool print_filename, 
-			bool full_prod) 
+			bool print_filename,
+			bool full_prod)
 		{
 			Symbol *sym;
 
@@ -454,7 +456,7 @@ namespace gSKI
 			if (sym && sym->sc.production) {
 				/* kjh CUSP(B11) begin */  /* also Soar-Bugs #161 */
 				if (print_filename) {
-					if (full_prod) 
+					if (full_prod)
 						print_string(agnt, "# sourcefile : ");
 					print (agnt, "%s\n", sym->sc.production->filename);
 				}
@@ -506,7 +508,7 @@ namespace gSKI
 				else
 				{
 					agnt->lexeme.string[i] = *c;
-				} 
+				}
 			}
 
 			agnt->lexeme.string[i] = '\0'; /* Null terminate lexeme string */
@@ -517,7 +519,7 @@ namespace gSKI
 			{
 				agnt->lexeme.type = SYM_CONSTANT_LEXEME;
 			}
-			else 
+			else
 			{
 				determine_type_of_constituent_string(agnt);
 			}
@@ -525,10 +527,10 @@ namespace gSKI
 
 		/* --- Read and consume one pattern element.  Return 0 if error, 1 if "*",
 		otherwise return 2 and set dest_sym to find_symbol() result. --- */
-		int read_pattern_component (agent* agnt, Symbol **dest_sym) 
+		int read_pattern_component (agent* agnt, Symbol **dest_sym)
 		{
 			if (strcmp(agnt->lexeme.string,"*") == 0) return 1;
-			switch (agnt->lexeme.type) 
+			switch (agnt->lexeme.type)
 			{
 			case SYM_CONSTANT_LEXEME:
 				*dest_sym = find_sym_constant (agnt, agnt->lexeme.string); return 2;
@@ -551,7 +553,7 @@ namespace gSKI
 
 		void get_context_var_info ( agent* agnt, Symbol **dest_goal,
 			Symbol **dest_attr_of_slot,
-			Symbol **dest_current_value) 
+			Symbol **dest_current_value)
 		{
 			Symbol *v, *g;
 			int levels_up;
@@ -611,7 +613,7 @@ namespace gSKI
 
 
 
-		list *read_pattern_and_get_matching_wmes (agent* agnt) 
+		list *read_pattern_and_get_matching_wmes (agent* agnt)
 		{
 			int parentheses_level;
 			list *wmes;
@@ -621,7 +623,7 @@ namespace gSKI
 			bool acceptable;
 
 			if (agnt->lexeme.type!=L_PAREN_LEXEME) {
-				print (agnt, "Expected '(' to begin wme pattern not string '%s' or char '%c'\n", 
+				print (agnt, "Expected '(' to begin wme pattern not string '%s' or char '%c'\n",
 					agnt->lexeme.string, agnt->current_char);
 				print_location_of_most_recent_lexeme(agnt);
 				return NIL;
@@ -675,13 +677,13 @@ namespace gSKI
 							if (acceptable == (w->acceptable == TRUE))
 								push (agnt, w, wmes);
 			}
-			return wmes;  
+			return wmes;
 		}
 
 
 		void  soar_alternate_input(agent *ai_agent,
-			char  *ai_string, 
-			char  *ai_suffix, 
+			char  *ai_string,
+			char  *ai_suffix,
 			bool   ai_exit   )
 		{
 			ai_agent->alternate_input_string = ai_string;
@@ -693,9 +695,9 @@ namespace gSKI
 
 
 		void TgDWorkArounds::PrintSymbol(IAgent*     thisAgent,
-			char*       arg, 
-			bool        name_only, 
-			bool        print_filename, 
+			char*       arg,
+			bool        name_only,
+			bool        print_filename,
 			bool        internal,
 			bool        full_prod,
 			int         depth)
@@ -713,16 +715,16 @@ namespace gSKI
 
 			get_lexeme_from_string(agnt, arg);
 
-			switch (agnt->lexeme.type) 
+			switch (agnt->lexeme.type)
 			{
 			case SYM_CONSTANT_LEXEME:
 				output_arg = true; /* Soar-Bugs #161 */
-				if (!name_only || print_filename) 
+				if (!name_only || print_filename)
 				{
 					/* kjh CUSP(B11) begin */
-					do_print_for_production_name (agnt, arg, internal, 
+					do_print_for_production_name (agnt, arg, internal,
 						print_filename, full_prod);
-				} else 
+				} else
 				{
 					print(agnt, "%s\n",arg);
 				}
@@ -733,12 +735,12 @@ namespace gSKI
 				for (w=internalAgent->GetSoarAgent()->all_wmes_in_rete; w!=NIL; w=w->rete_next)
 					// RDF (08282002) Added the following cast to get rid of warning
 					// message
-					if (w->timetag == (unsigned long) internalAgent->GetSoarAgent()->lexeme.int_val) 
+					if (w->timetag == (unsigned long) internalAgent->GetSoarAgent()->lexeme.int_val)
 						break;
-				if (w) 
+				if (w)
 				{
 					do_print_for_wme (agnt, w, depth, internal);
-				} else 
+				} else
 				{
 					print(agnt, "No wme %ld in working memory.", agnt->lexeme.int_val);
 					return;
@@ -749,7 +751,7 @@ namespace gSKI
 			case VARIABLE_LEXEME:
 				output_arg = true; /* Soar-Bugs #161 */
 				id = read_identifier_or_context_variable(agnt);
-				if (id) 
+				if (id)
 					do_print_for_identifier (agnt, id, depth, internal);
 				break;
 
@@ -762,7 +764,7 @@ namespace gSKI
 				*/
 				get_lexeme(agnt);
 				wmes = read_pattern_and_get_matching_wmes (agnt);
-				soar_alternate_input(agnt, NIL, NIL, FALSE); 
+				soar_alternate_input(agnt, NIL, NIL, FALSE);
 				agnt->current_char = ' ';
 				for (c = wmes; c != NIL; c = c->rest)
 					do_print_for_wme (agnt, (wme *)c->first, depth, internal);
@@ -790,7 +792,7 @@ namespace gSKI
 			MegaAssert(internalAgent != 0, "Bad agent pointer passed to set_sysparams.");
 
 			//bool output_arg = true; /* TEST for Soar-Bugs #161 */
-			for (production* prod=internalAgent->GetSoarAgent()->all_productions_of_type[productionType];  
+			for (production* prod=internalAgent->GetSoarAgent()->all_productions_of_type[productionType];
 				prod != NIL; prod = prod->next)
 			{
 				/* CUSP B11 kjh */
@@ -799,8 +801,37 @@ namespace gSKI
 			}
 		}
 
+		void TgDWorkArounds::PrintRL(IAgent*	thisAgent,
+					char* arg,
+					bool internal,
+					bool print_filename,
+					bool full_prod)
+				{
+					Agent* internalAgent = (Agent*) (thisAgent);
+					MegaAssert(internalAgent != 0, "Bad agent pointer passed to set_sysparams.");
 
-		slot *find_slot (Symbol *id, Symbol *attr) 
+					for (production* prod=internalAgent->GetSoarAgent()->all_productions_of_type[DEFAULT_PRODUCTION_TYPE];
+						prod != NIL; prod = prod->next)
+					{
+						if (prod->RL)		do_print_for_production(internalAgent->GetSoarAgent(),prod,internal, print_filename,full_prod);
+					}
+
+					for (production* prod=internalAgent->GetSoarAgent()->all_productions_of_type[USER_PRODUCTION_TYPE];
+						prod != NIL; prod = prod->next)
+					{
+						if (prod->RL) do_print_for_production(internalAgent->GetSoarAgent(),prod,internal,print_filename,full_prod);
+					}
+
+					for (production* prod=internalAgent->GetSoarAgent()->all_productions_of_type[CHUNK_PRODUCTION_TYPE];
+						prod != NIL; prod = prod->next)
+					{
+						if (prod->RL) do_print_for_production(internalAgent->GetSoarAgent(),prod,internal,print_filename,full_prod);
+			 		}
+
+		}
+
+
+		slot *find_slot (Symbol *id, Symbol *attr)
 		{
 			slot *s;
 
@@ -833,7 +864,7 @@ namespace gSKI
 
 			get_lexeme_from_string(agnt, the_lexeme);
 
-			switch (agnt->lexeme.type) 
+			switch (agnt->lexeme.type)
 			{
 			case SYM_CONSTANT_LEXEME:
 				attr_tmp = find_sym_constant (agnt, agnt->lexeme.string);
@@ -880,7 +911,7 @@ namespace gSKI
 		*/
 		void print_preference_and_source (agent* agnt, preference *pref,
 			bool print_source,
-			wme_trace_type wtt) 
+			wme_trace_type wtt)
 		{
 			print_string (agnt, "  ");
 			print_object_trace (agnt, pref->value);
@@ -899,14 +930,14 @@ namespace gSKI
 		/*
 		*	This procedure parses a string to determine if it is a
 		*      lexeme for an identifier or context variable.
-		* 
-		*      Many interface routines take identifiers as arguments.  
-		*      These ids can be given as normal ids, or as special variables 
-		*      such as <s> for the current state, etc.  This routine reads 
-		*      (without consuming it) an identifier or context variable, 
-		*      and returns a pointer (Symbol *) to the id.  (In the case of 
-		*      context variables, the instantiated variable is returned.  If 
-		*      any error occurs (e.g., no such id, no instantiation of the 
+		*
+		*      Many interface routines take identifiers as arguments.
+		*      These ids can be given as normal ids, or as special variables
+		*      such as <s> for the current state, etc.  This routine reads
+		*      (without consuming it) an identifier or context variable,
+		*      and returns a pointer (Symbol *) to the id.  (In the case of
+		*      context variables, the instantiated variable is returned.  If
+		*      any error occurs (e.g., no such id, no instantiation of the
 		*      variable), an error message is printed and NIL is returned.
 		*
 		* Results:
@@ -918,17 +949,17 @@ namespace gSKI
 		===============================
 		*/
 		bool read_id_or_context_var_from_string (agent* agnt, char * the_lexeme,
-			Symbol * * result_id) 
+			Symbol * * result_id)
 		{
 			Symbol *id;
 			Symbol *g, *attr, *value;
 
 			get_lexeme_from_string(agnt, the_lexeme);
 
-			if (agnt->lexeme.type == IDENTIFIER_LEXEME) 
+			if (agnt->lexeme.type == IDENTIFIER_LEXEME)
 			{
 				id = find_identifier(agnt, agnt->lexeme.id_letter, agnt->lexeme.id_number);
-				if (!id) 
+				if (!id)
 				{
 					return false;
 				}
@@ -939,7 +970,7 @@ namespace gSKI
 				}
 			}
 
-			if (agnt->lexeme.type==VARIABLE_LEXEME) 
+			if (agnt->lexeme.type==VARIABLE_LEXEME)
 			{
 				get_context_var_info (agnt, &g, &attr, &value);
 
@@ -948,7 +979,7 @@ namespace gSKI
 					return false;
 				}
 
-				if (value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE) 
+				if (value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE)
 				{
 					return false;
 				}
@@ -965,16 +996,16 @@ namespace gSKI
 			if ((string1 == NULL) && (string2 == NULL))
 				return true;
 
-			if (   (string1 != NULL) 
-				&& (string2 != NULL) 
+			if (   (string1 != NULL)
+				&& (string2 != NULL)
 				&& !(strcmp(string1, string2)))
 				return true;
 			else
 				return false;
 		}
 
-		bool string_match_up_to (char * string1, 
-			char * string2, 
+		bool string_match_up_to (char * string1,
+			char * string2,
 			unsigned int positions)
 		{
 			unsigned int i,num;
@@ -992,7 +1023,7 @@ namespace gSKI
 					return false;
 			}
 
-			return true;  
+			return true;
 		}
 
 
@@ -1013,37 +1044,37 @@ namespace gSKI
 			bool *print_productions,
 			wme_trace_type *wtt)
 		{
-			if (string_match_up_to(the_lexeme, "-none", 3) || string_match(the_lexeme, "0")) 
+			if (string_match_up_to(the_lexeme, "-none", 3) || string_match(the_lexeme, "0"))
 			{
 				*print_productions = FALSE;
 				*wtt               = NONE_WME_TRACE;
-			} 
-			else if (string_match_up_to(the_lexeme, "-names", 3) || string_match(the_lexeme, "1")) 
+			}
+			else if (string_match_up_to(the_lexeme, "-names", 3) || string_match(the_lexeme, "1"))
 			{
 				*print_productions = TRUE;
 				*wtt               = NONE_WME_TRACE;
-			} 
-			else if (string_match_up_to(the_lexeme, "-timetags", 2) || string_match(the_lexeme, "2")) 
+			}
+			else if (string_match_up_to(the_lexeme, "-timetags", 2) || string_match(the_lexeme, "2"))
 			{
 				*print_productions = TRUE;
 				*wtt               = TIMETAG_WME_TRACE;
-			} 
-			else if (string_match_up_to(the_lexeme, "-wmes", 2) || string_match(the_lexeme, "3")) 
+			}
+			else if (string_match_up_to(the_lexeme, "-wmes", 2) || string_match(the_lexeme, "3"))
 			{
 				*print_productions = TRUE;
 				*wtt               = FULL_WME_TRACE;
-			} 
-			else 
+			}
+			else
 			{
 				return false;
 			}
 			return true;
 		}
 
-
+#ifdef NUMERIC_INDIFFERENCE
 
 		char * pref_names[] =
-		{  
+		{
 			"acceptable",
 				"require",
 				"reject",
@@ -1056,8 +1087,28 @@ namespace gSKI
 				"binary indifferent",
 				"binary parallel",
 				"better",
-				"worse" 
+				"worse" ,
+				"numeric indifferent",
+				"template"
 		};
+#else
+     char * pref_names[] =
+	 		{
+	 			"acceptable",
+	 				"require",
+	 				"reject",
+	 				"prohibit",
+	 				"reconsider",
+	 				"unary indifferent",
+	 				"unary parallel",
+	 				"best",
+	 				"worst",
+	 				"binary indifferent",
+	 				"binary parallel",
+	 				"better",
+	 				"worse"
+		};
+#endif
 
 		int soar_ecPrintPreferences(agent* soarAgent, char *szId, char *szAttr, bool print_prod, wme_trace_type wtt)
 		{
@@ -1157,11 +1208,11 @@ namespace gSKI
 		} Binding;
 
 
-		Symbol *get_binding (Symbol *f, list *bindings) 
+		Symbol *get_binding (Symbol *f, list *bindings)
 		{
 			cons *c;
 
-			for (c=bindings;c!=NIL;c=c->rest) 
+			for (c=bindings;c!=NIL;c=c->rest)
 			{
 				if (((Binding *) c->first)->from == f)
 					return ((Binding *) c->first)->to;
@@ -1169,7 +1220,7 @@ namespace gSKI
 			return NIL;
 		}
 
-		bool symbols_are_equal_with_bindings (agent* agnt, Symbol *s1, Symbol *s2, list **bindings) 
+		bool symbols_are_equal_with_bindings (agent* agnt, Symbol *s1, Symbol *s2, list **bindings)
 		{
 			Binding *b;
 			Symbol *bvar;
@@ -1203,14 +1254,14 @@ namespace gSKI
 			else return FALSE;
 		}
 
-		bool actions_are_equal_with_bindings (agent* agnt, action *a1, action *a2, list **bindings) 
+		bool actions_are_equal_with_bindings (agent* agnt, action *a1, action *a2, list **bindings)
 		{
-			//         if (a1->type == FUNCALL_ACTION) 
+			//         if (a1->type == FUNCALL_ACTION)
 			//         {
-			//            if ((a2->type == FUNCALL_ACTION)) 
+			//            if ((a2->type == FUNCALL_ACTION))
 			//            {
 			//               if (funcalls_match(rhs_value_to_funcall_list(a1->value),
-			//                  rhs_value_to_funcall_list(a2->value))) 
+			//                  rhs_value_to_funcall_list(a2->value)))
 			//               {
 			//                     return TRUE;
 			//               }
@@ -1228,15 +1279,15 @@ namespace gSKI
 				rhs_value_to_symbol(a2->id),
 				bindings)) return FALSE;
 
-			if ((rhs_value_is_symbol(a1->attr)) && (rhs_value_is_symbol(a2->attr))) 
+			if ((rhs_value_is_symbol(a1->attr)) && (rhs_value_is_symbol(a2->attr)))
 			{
 				if (!symbols_are_equal_with_bindings(agnt, rhs_value_to_symbol(a1->attr),
-					rhs_value_to_symbol(a2->attr), bindings)) 
+					rhs_value_to_symbol(a2->attr), bindings))
 				{
 					return FALSE;
 				}
 			} else {
-				//            if ((rhs_value_is_funcall(a1->attr)) && (rhs_value_is_funcall(a2->attr))) 
+				//            if ((rhs_value_is_funcall(a1->attr)) && (rhs_value_is_funcall(a2->attr)))
 				//            {
 				//               if (!funcalls_match(rhs_value_to_funcall_list(a1->attr),
 				//                  rhs_value_to_funcall_list(a2->attr)))
@@ -1248,26 +1299,26 @@ namespace gSKI
 
 			/* Values are different. They are rhs_value's. */
 
-			if ((rhs_value_is_symbol(a1->value)) && (rhs_value_is_symbol(a2->value))) 
+			if ((rhs_value_is_symbol(a1->value)) && (rhs_value_is_symbol(a2->value)))
 			{
 				if (symbols_are_equal_with_bindings(agnt, rhs_value_to_symbol(a1->value),
-					rhs_value_to_symbol(a2->value), bindings)) 
+					rhs_value_to_symbol(a2->value), bindings))
 				{
 					return TRUE;
 				}
-				else 
+				else
 				{
 					return FALSE;
 				}
 			}
-			if ((rhs_value_is_funcall(a1->value)) && (rhs_value_is_funcall(a2->value))) 
+			if ((rhs_value_is_funcall(a1->value)) && (rhs_value_is_funcall(a2->value)))
 			{
 				//            if (funcalls_match(rhs_value_to_funcall_list(a1->value),
 				//               rhs_value_to_funcall_list(a2->value)))
 				//            {
 				//               return TRUE;
 				//            }
-				//            else 
+				//            else
 				{
 					return FALSE;
 				}
@@ -1276,7 +1327,7 @@ namespace gSKI
 		}
 
 
-		void reset_old_binding_point(agent* agnt, list **bindings, list **current_binding_point) 
+		void reset_old_binding_point(agent* agnt, list **bindings, list **current_binding_point)
 		{
 			cons *c,*c_next;
 
@@ -1291,7 +1342,7 @@ namespace gSKI
 			bindings = current_binding_point;
 		}
 
-		void free_binding_list (agent* agnt, list *bindings) 
+		void free_binding_list (agent* agnt, list *bindings)
 		{
 			cons *c;
 
@@ -1300,7 +1351,7 @@ namespace gSKI
 			free_list(agnt, bindings);
 		}
 
-		void print_binding_list (agent* agnt, list *bindings) 
+		void print_binding_list (agent* agnt, list *bindings)
 		{
 			cons *c;
 
@@ -1312,17 +1363,17 @@ namespace gSKI
 
 		void read_rhs_pattern_and_get_matching_productions (agent* agnt,
 			kernel* krnl,
-			list **current_pf_list, 
+			list **current_pf_list,
 			bool show_bindings,
-			bool just_chunks, 
-			bool no_chunks) 
+			bool just_chunks,
+			bool no_chunks)
 		{
 			action *a, *alist, *pa;
 			int i;
 			production *prod;
 			list *bindings, *current_binding_point;
 			bool match, match_this_a, parsed_ok;
-			action *rhs; 
+			action *rhs;
 			condition *top_cond, *bottom_cond;
 
 			bindings = NIL;
@@ -1346,7 +1397,7 @@ namespace gSKI
 			{
 				if ((i == CHUNK_PRODUCTION_TYPE && !no_chunks) || (i != CHUNK_PRODUCTION_TYPE && !just_chunks))
 				{
-					for (prod=agnt->all_productions_of_type[i]; prod!=NIL; prod=prod->next) 
+					for (prod=agnt->all_productions_of_type[i]; prod!=NIL; prod=prod->next)
 					{
 						match = TRUE;
 
@@ -1356,37 +1407,37 @@ namespace gSKI
 						p_node_to_conditions_and_nots (agnt, prod->p_node, NIL, NIL, &top_cond,
 							&bottom_cond, NIL, &rhs);
 						deallocate_condition_list (agnt, top_cond);
-						for (a=alist;a!=NIL;a=a->next) 
+						for (a=alist;a!=NIL;a=a->next)
 						{
 							match_this_a= FALSE;
 							current_binding_point = bindings;
 
-							for (pa = rhs; pa != NIL; pa=pa->next) 
+							for (pa = rhs; pa != NIL; pa=pa->next)
 							{
-								if (actions_are_equal_with_bindings(agnt, a,pa,&bindings)) 
+								if (actions_are_equal_with_bindings(agnt, a,pa,&bindings))
 								{
 									match_this_a = TRUE;
 									break;
 								}
-								else 
+								else
 								{
 									/* Remove new, incorrect bindings. */
 									reset_old_binding_point(agnt, &bindings,&current_binding_point);
 									bindings= current_binding_point;
 								}
 							}
-							if (!match_this_a) 
+							if (!match_this_a)
 							{
-								match = FALSE; 
+								match = FALSE;
 								break;
 							}
 						}
 
 						deallocate_action_list (agnt, rhs);
-						if (match) 
+						if (match)
 						{
 							push(agnt,prod,(*current_pf_list));
-							if (show_bindings) 
+							if (show_bindings)
 							{
 								print_with_symbols(agnt, "%y, with bindings:\n",prod->name);
 								print_binding_list(agnt,bindings);
@@ -1396,10 +1447,10 @@ namespace gSKI
 								print_with_symbols(agnt,"%y\n",prod->name);
 							}
 						}
-					}      
+					}
 				}
 			}
-			if (bindings) 
+			if (bindings)
 			{
 				free_binding_list(agnt, bindings); /* DJP 4/3/96 -- To catch the last production */
 			}
@@ -1422,14 +1473,14 @@ namespace gSKI
 			test t2;
 
 			/* t1 is from the pattern given to "pf"; t2 is from a production's condition list. */
-			if (test_is_blank_test(t1)) 
+			if (test_is_blank_test(t1))
 				return(test_is_blank_test(test2) == 0);
 
 			/* If the pattern doesn't include "(state", but the test from the
-			* production does, strip it out of the production's. 
+			* production does, strip it out of the production's.
 			*/
 			if ((!test_includes_goal_or_impasse_id_test(t1,TRUE,FALSE)) &&
-				test_includes_goal_or_impasse_id_test(test2,TRUE,FALSE)) 
+				test_includes_goal_or_impasse_id_test(test2,TRUE,FALSE))
 			{
 				goal_test = FALSE;
 				impasse_test = FALSE;
@@ -1440,13 +1491,13 @@ namespace gSKI
 				t2 = copy_test(agnt,test2) ; /* DJP 4/3/96 -- Always make t2 into a copy */
 			}
 
-			if (test_is_blank_or_equality_test(t1)) 
+			if (test_is_blank_or_equality_test(t1))
 			{
 				if (!(test_is_blank_or_equality_test(t2) && !(test_is_blank_test(t2))))
 				{
 					dealloc_and_return(agnt, t2,FALSE);
 				}
-				else 
+				else
 				{
 					if (symbols_are_equal_with_bindings(agnt, referent_of_equality_test(t1),
 						referent_of_equality_test(t2),
@@ -1464,17 +1515,17 @@ namespace gSKI
 			ct1 = complex_test_from_test(t1);
 			ct2 = complex_test_from_test(t2);
 
-			if (ct1->type != ct2->type) 
+			if (ct1->type != ct2->type)
 			{
 				dealloc_and_return(agnt, t2,FALSE);
 			}
 
-			switch(ct1->type) 
+			switch(ct1->type)
 			{
-			case GOAL_ID_TEST: 
+			case GOAL_ID_TEST:
 				dealloc_and_return(agnt, t2,TRUE);
 				break;
-			case IMPASSE_ID_TEST: 
+			case IMPASSE_ID_TEST:
 				dealloc_and_return(agnt, t2,TRUE);
 				break;
 
@@ -1482,12 +1533,12 @@ namespace gSKI
 				for (c1 = ct1->data.disjunction_list, c2=ct2->data.disjunction_list;
 					((c1!=NIL)&&(c2!=NIL)); c1=c1->rest, c2=c2->rest)
 				{
-					if (c1->first != c2->first) 
+					if (c1->first != c2->first)
 					{
 						dealloc_and_return(agnt, t2,FALSE)
 					}
 				}
-				if (c1==c2) 
+				if (c1==c2)
 				{
 					dealloc_and_return(agnt, t2,TRUE);  /* make sure they both hit end-of-list */
 				}
@@ -1500,14 +1551,14 @@ namespace gSKI
 				for (c1=ct1->data.conjunct_list, c2=ct2->data.conjunct_list;
 					((c1!=NIL)&&(c2!=NIL)); c1=c1->rest, c2=c2->rest)
 				{
-					if (! tests_are_equal_with_bindings(agnt, (test)c1->first, (test)c2->first, bindings)) 
+					if (! tests_are_equal_with_bindings(agnt, (test)c1->first, (test)c2->first, bindings))
 						dealloc_and_return(agnt, t2,FALSE)
 				}
-				if (c1==c2) 
+				if (c1==c2)
 				{
 					dealloc_and_return(agnt, t2,TRUE);  /* make sure they both hit end-of-list */
 				}
-				else 
+				else
 				{
 					dealloc_and_return(agnt, t2,FALSE);
 				}
@@ -1526,7 +1577,7 @@ namespace gSKI
 
 		bool conditions_are_equal_with_bindings (agent* agnt, condition *c1, condition *c2, list **bindings) {
 			if (c1->type != c2->type) return FALSE;
-			switch (c1->type) 
+			switch (c1->type)
 			{
 			case POSITIVE_CONDITION:
 			case NEGATIVE_CONDITION:
@@ -1557,10 +1608,10 @@ namespace gSKI
 
 		void read_pattern_and_get_matching_productions (agent* agnt,
 			kernel* krnl,
-			list **current_pf_list, 
+			list **current_pf_list,
 			bool show_bindings,
 			bool just_chunks,
-			bool no_chunks) 
+			bool no_chunks)
 		{
 			condition *c, *clist, *top, *bottom, *pc;
 			int i;
@@ -1664,7 +1715,7 @@ namespace gSKI
 
 
 
-			if (lhs) 
+			if (lhs)
 			{
 				/* this patch failed for -rhs, so I removed altogether.  KJC 3/99 */
 				/* Soar-Bugs #54 TMH */
@@ -1672,11 +1723,11 @@ namespace gSKI
 				agnt->alternate_input_suffix = ") ";
 
 				get_lexeme(agnt);
-				read_pattern_and_get_matching_productions (agnt, 
-					internalKernel->GetSoarKernel(), 
+				read_pattern_and_get_matching_productions (agnt,
+					internalKernel->GetSoarKernel(),
 					&current_pf_list,
 					show_bindings,
-					just_chunks, 
+					just_chunks,
 					no_chunks);
 				agnt->current_char = ' ';
 			}
@@ -1690,11 +1741,11 @@ namespace gSKI
 				get_lexeme(agnt);
 				read_rhs_pattern_and_get_matching_productions (agnt, internalKernel->GetSoarKernel(), &current_pf_list,
 					show_bindings,
-					just_chunks, 
+					just_chunks,
 					no_chunks);
 				agnt->current_char = ' ';
 			}
-			if (current_pf_list == NIL) 
+			if (current_pf_list == NIL)
 			{
 				print(agnt, "No matches.\n");
 			}
@@ -1715,21 +1766,21 @@ namespace gSKI
 
 			print(agnt, "********************* Current GDS **************************\n");
 			print(agnt, "stepping thru all wmes in rete, looking for any that are in a gds...\n");
-			for (w=agnt->all_wmes_in_rete; w!=NIL; w=w->rete_next) 
+			for (w=agnt->all_wmes_in_rete; w!=NIL; w=w->rete_next)
 			{
 				if (w->gds)
 				{
-					if (w->gds->goal) 
+					if (w->gds->goal)
 					{
 						print_with_symbols (agnt, "  For Goal  %y  ", w->gds->goal);
-					} 
-					else 
+					}
+					else
 					{
 						print(agnt, "  Old GDS value ");
 					}
 					print (agnt, "(%lu: ", w->timetag);
 					print_with_symbols (agnt, "%y ^%y %y", w->id, w->attr, w->value);
-					if (w->acceptable) 
+					if (w->acceptable)
 					{
 						print_string (agnt, " +");
 					}
@@ -1748,7 +1799,7 @@ namespace gSKI
 					{
 						print (agnt, "                (%lu: ", w->timetag);
 						print_with_symbols (agnt, "%y ^%y %y", w->id, w->attr, w->value);
-						if (w->acceptable) 
+						if (w->acceptable)
 						{
 							print_string (agnt, " +");
 						}
@@ -1756,8 +1807,8 @@ namespace gSKI
 						print (agnt, "\n");
 					}
 
-				} 
-				else 
+				}
+				else
 				{
 					print(agnt, ": No GDS for this goal.\n");
 				}
@@ -1912,12 +1963,16 @@ namespace gSKI
 			}
 
 			// now create and add the wme
-			wme* pWme = make_wme(pSoarAgent, pId, pAttr, pValue, acceptable);			
+			wme* pWme = make_wme(pSoarAgent, pId, pAttr, pValue, acceptable);
 
 			symbol_remove_ref(pSoarAgent, pWme->attr);
 			symbol_remove_ref(pSoarAgent, pWme->value);
 			insert_at_head_of_dll(pWme->id->id.input_wmes, pWme, next, prev);
 			add_wme_to_wm(pSoarAgent, pWme);
+
+#ifdef SOAR_WMEM_ACTIVATION
+            decay_update_new_wme(pSoarAgent, pWme, 1);
+#endif //SOAR_WMEM_ACTIVATION
 
 #ifdef USE_CAPTURE_REPLAY
 			// TODO
@@ -1932,19 +1987,19 @@ namespace gSKI
 			the kernel timers before the call to the low-level function:
 			do_buffered_wm_and_ownership_changes.
 
-			This assumption is problematic because anytime add-wme is called 
+			This assumption is problematic because anytime add-wme is called
 			from some place other than the input function, there is a potential
-			to get some erroneous (if start_kernel_tv wasn't set for the 
+			to get some erroneous (if start_kernel_tv wasn't set for the
 			input function) or just bad (if start_kernel_tv isn't defined)
-			timing data.   The real problem is that this very high-level 
+			timing data.   The real problem is that this very high-level
 			routine is going deep into the kernel.  We can either ignore
 			this and just call the time spent doing wm changes here time
 			spent outside the kernel or we can try to do the accounting,
-			what this hack is a first-attempt at doing.  
+			what this hack is a first-attempt at doing.
 
 			However, my testing turned up no problems -- I was able to add
-			and remove WMEs without messing up the timers.  So it`s a 
-			hack that seems to work.  For now.  (there is a plan to 
+			and remove WMEs without messing up the timers.  So it`s a
+			hack that seems to work.  For now.  (there is a plan to
 			add routines for specifically adding and deleting input
 			WMEs which should help clear up this isse)               REW */
 
@@ -1963,13 +2018,13 @@ namespace gSKI
 #endif // NO_TIMING_STUFF
 			/* REW: end 28.07.96 */
 
-			/* note: 
+			/* note:
 			* I don't completely understand this:
 			* The deal seems to be that when NO_TOP_LEVEL_REFS is used, wmes on the i/o
 			* link (obviously) have fewer references than thy would otherwise.
 			* Although calling this here (in soar_cAddWme) doesn't seem to matter
-			* one way or the other, calling it in soar_cRemoveWme really leads to 
-			* problems.  What happens is that the i/o wme is removed prior to 
+			* one way or the other, calling it in soar_cRemoveWme really leads to
+			* problems.  What happens is that the i/o wme is removed prior to
 			* fully figuring out the match set.  This means that productions which
 			* should have fired, dont.  However, if we comment this out for the
 			* NO_TOP_LEVEL_REFS fix we don't seem to get this problem.  There might be
@@ -1980,7 +2035,7 @@ namespace gSKI
 			*
 			* an interesting aside seems to be that we don't need to do buffered
 			* wme and own changes here regardless of whether or not L1R is used
-			* so long as we test to make sure we're in the INPUT_PHASE.  I will 
+			* so long as we test to make sure we're in the INPUT_PHASE.  I will
 			* look into this more later.
 			*/
 
@@ -2093,7 +2148,7 @@ namespace gSKI
 #endif // NO_TIMING_STUFF
 			}
 
-			/* note: 
+			/* note:
 			*  See note at the NO_TOP_LEVEL_REFS flag in soar_cAddWme
 			*/
 
@@ -2147,7 +2202,7 @@ namespace gSKI
 			} else {
 				*sym = make_symbol_for_current_lexeme(pSoarAgent);
 			}
-			// Added by voigtjr because if this function can 
+			// Added by voigtjr because if this function can
 			// legally return success with *sym == 0, my logic in AddWmeFilter will be broken.
 			assert(*sym);
 			return true;
@@ -2184,11 +2239,11 @@ namespace gSKI
 				existing_wf = static_cast<wme_filter*>(c->first);
 
 				// check for duplicate
-				if ((existing_wf->adds == adds) 
+				if ((existing_wf->adds == adds)
 					&& (existing_wf->removes == removes)
-					&& (existing_wf->id == pId) 
+					&& (existing_wf->id == pId)
 					&& (existing_wf->attr == pAttr)
-					&& (existing_wf->value == pValue)) 
+					&& (existing_wf->value == pValue))
 				{
 					symbol_remove_ref(pSoarAgent, pId);
 					symbol_remove_ref(pSoarAgent, pAttr);
@@ -2204,12 +2259,12 @@ namespace gSKI
 			wf->adds = adds;
 			wf->removes = removes;
 
-			/* Rather than add refs for the new filter symbols and then remove refs 
+			/* Rather than add refs for the new filter symbols and then remove refs
 			* for the identical symbols created from the string parameters, skip
 			* the two nullifying steps altogether and just return immediately
 			* after pushing the new filter:
 			*/
-			push(pSoarAgent, wf, pSoarAgent->wme_filter_list);     
+			push(pSoarAgent, wf, pSoarAgent->wme_filter_list);
 			return 0;
 		}
 
@@ -2242,11 +2297,11 @@ namespace gSKI
 				wme_filter* wf = static_cast<wme_filter*>(c->first);
 
 				// check for duplicate
-				if ((wf->adds == adds) 
+				if ((wf->adds == adds)
 					&& (wf->removes == removes)
-					&& (wf->id == pId) 
+					&& (wf->id == pId)
 					&& (wf->attr == pAttr)
-					&& (wf->value == pValue)) 
+					&& (wf->value == pValue))
 				{
 					*prev_cons_rest = c->rest;
 					symbol_remove_ref(pSoarAgent, pId);
@@ -2338,7 +2393,7 @@ namespace gSKI
 			// mode > 0 condition
 
 			get_lexeme_from_string(pSoarAgent, const_cast<char*>(pProduction));
-	
+
 			if (pSoarAgent->lexeme.type != SYM_CONSTANT_LEXEME) {
 				return false; // invalid production
 			}
@@ -2432,6 +2487,13 @@ namespace gSKI
 			pSoarAgent->chunk_count = count;
 		}
 
+		void TgDWorkArounds::ResetRL(IAgent* pIAgent)
+				{
+					Agent* pAgent = (Agent*) (pIAgent);
+					agent* pSoarAgent = pAgent->GetSoarAgent();
+					reset_RL(pSoarAgent);
+				}
+
 		void TgDWorkArounds::SeedRandomNumberGenerator(unsigned long int* pSeed)
 		{
 			if (pSeed) {
@@ -2440,5 +2502,23 @@ namespace gSKI
 			}
 			SoarSeedRNG();
 		}
+#ifdef SOAR_WMEM_ACTIVATION
+        void TgDWorkArounds::DecayInit(IAgent* pIAgent)
+        {
+			Agent* pAgent = (Agent*)(pIAgent);
+			agent* pSoarAgent = pAgent->GetSoarAgent();
+
+            decay_init(pSoarAgent);
+        }
+
+        void TgDWorkArounds::DecayDeInit(IAgent* pIAgent)
+        {
+			Agent* pAgent = (Agent*)(pIAgent);
+			agent* pSoarAgent = pAgent->GetSoarAgent();
+
+            decay_deinit(pSoarAgent);
+        }
+#endif
+
 	}// class
 }// namespace
