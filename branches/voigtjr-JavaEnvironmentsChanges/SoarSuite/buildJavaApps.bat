@@ -17,6 +17,4 @@ cd ..\TestJavaSML
 call build.bat --nopause
 cd ..\VisualSoar
 call build.bat --nopause
-cd ..\..\Tools\LoggerJava
-call build.bat --nopause
 cd ..\..

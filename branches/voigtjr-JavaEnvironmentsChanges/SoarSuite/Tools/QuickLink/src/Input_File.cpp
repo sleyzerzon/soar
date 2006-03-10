@@ -9,15 +9,12 @@
 
 using std::string;
 
-// named constructor
 Smart_Pointer<Input_Type> Input_File::create(const string& filename)
 {
 	Smart_Pointer<Input_File> ptr = new Input_File(filename);
 	return ptr;
 }
 
-// called by named constructor, opens file and turns off QL updates so that all
-// of the file commands do not generate output
 Input_File::Input_File(string filename) 
 : infile(filename.c_str())
 {
@@ -26,7 +23,6 @@ Input_File::Input_File(string filename)
 	QL_Interface::instance().turn_off_updates(); // turn off view updates
 }
 
-// destructor
 Input_File::~Input_File()
 {
 	if(!Input_Controller::instance().is_shutting_down())
@@ -36,8 +32,6 @@ Input_File::~Input_File()
 	}
 }
 
-
-// returns the next line of command in the file
 string Input_File::get_command()
 {
 	string command;

@@ -298,6 +298,7 @@ Agent* Kernel::IsXMLTraceEvent(ElementXML* pIncomingMsg)
 		// (must have been flushed after the agent was destroyed).
 		// Returning null is probably as good as we do here so
 		// always return pAgent (even if it's null).
+		assert(pAgent) ;
 		return pAgent ;
 	}
 
@@ -1113,12 +1114,12 @@ void Kernel::CommitAll()
 * @returns The result of executing the run command.
 *		   The output from during the run is sent to a different callback.
 *************************************************************/
-char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepSize, smlInterleaveStepSize interleaveStepSize)
+char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepSize)
 {
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, false, stepSize, interleaveStepSize, (int)numberSteps) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, false, stepSize, (int)numberSteps) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1128,17 +1129,7 @@ char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepS
 	ostr << numberSteps ;
 
 	// Create the command line for the run command
-	std::string step ;
-	
-	switch (stepSize)
-	{
-		case sml_DECISION:		step = "-d" ; break ;
-		case sml_PHASE:			step = "-p" ; break ;
-		case sml_ELABORATION:	step = "-e" ; break ;
-		case sml_UNTIL_OUTPUT:	step = "-o" ; break ;
-		default: return "Unrecognized step size parameter passed to RunAllAgents" ;
-	}
-
+	std::string step = (stepSize == sml_DECISION) ? "-d" : (stepSize == sml_PHASE) ? "-p" : "-e" ;
 	std::string cmd = "run " + step + " " + ostr.str() ;
 
 	// The command line currently requires an agent in order
@@ -1153,12 +1144,12 @@ char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepS
 	return pResult ;
 }
 
-char const* Kernel::RunAllAgentsForever(smlInterleaveStepSize interleaveStepSize)
+char const* Kernel::RunAllAgentsForever()
 {
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, true, sml_DECISION, interleaveStepSize, 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, true, sml_DECISION, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1194,12 +1185,12 @@ char const* Kernel::RunAllAgentsForever(smlInterleaveStepSize interleaveStepSize
 * before then that agent will stop running.  (This value can be changed with the
 * max-nil-output-cycles command).
 *************************************************************/
-char const* Kernel::RunAllTilOutput(smlInterleaveStepSize interleaveStepSize)
+char const* Kernel::RunAllTilOutput()
 {
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, false, sml_UNTIL_OUTPUT, interleaveStepSize, 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(NULL, false, sml_UNTIL_OUTPUT, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif

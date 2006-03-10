@@ -1204,11 +1204,8 @@ Identifier*	Agent::FindIdentifier(char const* pID, bool searchInput, bool search
 * @brief Schedules a WME from deletion from the input link and removes
 *		 it from the client's model of working memory.
 *
-*		 If this is an identifier then all of its children will be
-*		 deleted too (assuming it's the only parent -- i.e. part of a tree not a full graph).
-*
 *		 The caller should not access this WME after calling
-*		 DestroyWME() or any of its children if this is an identifier.
+*		 DestroyWME().
 *		 The WME is not removed from the input link until
 *		 the client calls "Commit"
 *************************************************************/
@@ -1237,9 +1234,6 @@ bool Agent::Commit()
 *************************************************************/
 char const* Agent::InitSoar()
 {
-	// Must commit everything before doing an init-soar.
-	assert(!GetWM()->IsCommitRequired()) ;
-
 	std::string cmd = "init-soar" ;
 
 	// Execute the command.
@@ -1258,8 +1252,6 @@ char const* Agent::InitSoar()
 * The usual way to do this is to register for an event (e.g. AFTER_DECISION_CYCLE)
 * and in that event handler decide if the user wishes to stop soar.
 * If so, call to this method inside that handler.
-* If so, call to this method inside that handler (this ensures you're calling on the same
-* thread that Soar is running on so you don't get blocked).
 *
 * The request to Stop may not be honored immediately.
 * Soar will stop at the next point it is considered safe to do so.
@@ -1282,7 +1274,7 @@ char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, stepSize, sml_INTERLEAVE_PHASE, (int)numberSteps) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, stepSize, (int)numberSteps) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1292,18 +1284,7 @@ char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
 	ostr << numberSteps ;
 
 	// Create the command line for the run command
-	// Create the command line for the run command
-	std::string step ;
-	
-	switch (stepSize)
-	{
-		case sml_DECISION:		step = "-d" ; break ;
-		case sml_PHASE:			step = "-p" ; break ;
-		case sml_ELABORATION:	step = "-e" ; break ;
-		case sml_UNTIL_OUTPUT:	step = "-o" ; break ;
-		default: return "Unrecognized step size parameter passed to RunSelf" ;
-	}
-
+	std::string step = (stepSize == sml_DECISION) ? "-d" : (stepSize == sml_PHASE) ? "-p" : "-e" ;
 	std::string cmd = "run --self " + step + " " + ostr.str() ;
 
 	// Execute the run command.
@@ -1316,7 +1297,7 @@ char const* Agent::RunSelfForever()
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), true, sml_DECISION, sml_INTERLEAVE_PHASE, 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), true, sml_DECISION, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1327,41 +1308,6 @@ char const* Agent::RunSelfForever()
 	// Execute the run command.
 	char const* pResult = ExecuteCommandLine(cmd.c_str()) ;
 	return pResult ;
-}
-
-/*************************************************************
-* @brief Returns true if this agent was part of the last set
-*		 of agents that was run.
-*************************************************************/
-bool Agent::WasAgentOnRunList()
-{
-	AnalyzeXML response ;
-
-	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_WasAgentOnRunList, GetAgentName()) ;
-
-	if (!ok)
-		return false ;
-
-	bool wasRun = response.GetResultBool(false) ;
-	return wasRun ;
-}
-
-/*************************************************************
-* @brief Returns whether the last run for this agent was
-*		 interrupted (by a stop call) or completed normally.
-*************************************************************/
-smlRunResult Agent::GetResultOfLastRun()
-{
-	AnalyzeXML response ;
-
-	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_GetResultOfLastRun, GetAgentName()) ;
-
-	if (!ok)
-		return sml_RUN_ERROR ;
-
-	smlRunResult result = (smlRunResult)response.GetResultInt((int)sml_RUN_ERROR) ;
-
-	return result ;
 }
 
 /*************************************************************
@@ -1405,7 +1351,7 @@ char const* Agent::RunSelfTilOutput()
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, sml_UNTIL_OUTPUT, sml_INTERLEAVE_PHASE, 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, sml_UNTIL_OUTPUT, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif

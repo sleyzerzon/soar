@@ -45,7 +45,6 @@ public:
 	// reports whether or not the IC is shutting down
 	bool is_shutting_down();
 
-	// public boolean variable controls whether or not '>' should be printed
 	bool should_print_prompt;
 
 private:
@@ -59,7 +58,6 @@ private:
 	// input source queue
 	std::list<Smart_Pointer<Input_Type> > input_stack;
 
-	// true after IC_Shutdown is called
 	bool shutting_down;
 };
 

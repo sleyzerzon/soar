@@ -160,9 +160,6 @@
 					RelativePath=".\src\cli_clog.cpp">
 				</File>
 				<File
-					RelativePath=".\src\cli_commandtofile.cpp">
-				</File>
-				<File
 					RelativePath=".\src\cli_defaultwmedepth.cpp">
 				</File>
 				<File

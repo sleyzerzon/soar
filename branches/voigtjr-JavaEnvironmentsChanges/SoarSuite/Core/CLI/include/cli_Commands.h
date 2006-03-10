@@ -19,7 +19,6 @@ namespace cli {
 		static char const* kCLICD;
 		static char const* kCLIChunkNameFormat;
 		static char const* kCLICLog;
-		static char const* kCLICommandToFile;
 		static char const* kCLIDefaultWMEDepth;
 		static char const* kCLIDirs;
 		static char const* kCLIEcho;

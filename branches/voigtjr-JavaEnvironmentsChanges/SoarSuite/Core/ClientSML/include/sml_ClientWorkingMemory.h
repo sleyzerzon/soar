@@ -116,7 +116,6 @@ public:
 
 	void			Refresh() ;
 
-	bool			IsCommitRequired() ;
 	bool			Commit() ;
 };
 

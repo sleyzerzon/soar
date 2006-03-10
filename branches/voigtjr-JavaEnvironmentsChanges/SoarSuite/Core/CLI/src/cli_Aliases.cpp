@@ -50,13 +50,6 @@ Aliases::Aliases() {
 		substitution.push_back(string("cd"));
 		NewAlias(substitution, commandToSubstitute);
 	}
-	// command-to-file ctf
-	{
-		string commandToSubstitute("ctf");
-		std::vector<std::string> substitution;
-		substitution.push_back(string("command-to-file"));
-		NewAlias(substitution, commandToSubstitute);
-	}
 	// default-wme-depth set-default-depth
 	{
 		string commandToSubstitute("set-default-depth");
@@ -298,16 +291,6 @@ Aliases::Aliases() {
 		std::vector<std::string> substitution;
 		substitution.push_back(string("print"));
 		substitution.push_back(string("-i"));
-		NewAlias(substitution, commandToSubstitute);
-	}
-	// print -v -d 100 varprint
-	{
-		string commandToSubstitute("varprint");
-		std::vector<std::string> substitution;
-		substitution.push_back(string("print"));
-		substitution.push_back(string("-v"));
-		substitution.push_back(string("-d"));
-		substitution.push_back(string("100"));
 		NewAlias(substitution, commandToSubstitute);
 	}
 }

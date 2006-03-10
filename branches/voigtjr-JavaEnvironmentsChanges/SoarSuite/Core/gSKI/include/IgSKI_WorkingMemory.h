@@ -522,11 +522,6 @@ namespace gSKI {
 	  virtual void RemoveWorkingMemoryListener(egSKIWorkingMemoryEventId            eventId, 
 											   IWorkingMemoryListener* listener, 
 											   Error*                  err = 0) = 0 ;
-
-	  /**
-       * @brief Handles updating working memory
-       */
-      virtual void Update(bool forceAdds, bool forceRemoves) = 0 ;
    };
 }
 

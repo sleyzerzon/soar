@@ -98,7 +98,6 @@ namespace cli {
 		PRINT_STACK,
 		PRINT_STATES,
 		PRINT_USER,
-		PRINT_VARPRINT,
 		PRINT_NUM_OPTIONS, // must be last
 	};
 

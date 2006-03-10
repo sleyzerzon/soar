@@ -18,21 +18,19 @@ using std::cout; using std::for_each;
 using std::bind2nd; using std::mem_fun;
 using std::ofstream; using std::endl;
 
-// actually creates the sml object
 WME_Id::WME_Id(const string& in_parent, const string& in_attribute, const string& in_value, Agent* pAgent, Identifier* in_id)
 : WME_Type(in_parent, in_attribute), m_value(in_value)
 {
 	if(in_id)	
 		m_object = pAgent->CreateIdWME(in_id, in_attribute.c_str());
-	else // this is the input-link
+	else
 	{
 		pAgent->SynchronizeInputLink();
 		m_object = pAgent->GetInputLink();
-		build_children(); // build any children already existing
+		build_children();
 	}
 }
 
-// sml object is already created
 WME_Id::WME_Id(const string& in_id_name, const string& in_attribute, Identifier* in_object)
 : WME_Type(in_id_name, in_attribute)
 {
@@ -42,22 +40,17 @@ WME_Id::WME_Id(const string& in_id_name, const string& in_attribute, Identifier*
 	QL_Interface::instance().add_created_identifier(this);
 }
 
-// clean up
 WME_Id::~WME_Id()
-{	
+{
 	Agent* pAgent = QL_Interface::instance().get_agent_ptr();
-	remove_all_children(pAgent);
 	destroy_sml_object(pAgent);
 }
-
-// creates sml object
 Smart_Pointer<WME_Id> WME_Id::create(const string& in_parent, const string& in_attribute, const string& in_value, Agent* pAgent, Identifier* in_id)
 {
 	Smart_Pointer<WME_Id> ptr = new WME_Id(in_parent, in_attribute, in_value, pAgent, in_id);
 	return ptr;
 }
 
-// sml object already created
 Smart_Pointer<WME_Id> WME_Id::create_from_sml_object(const string& in_id_name, Identifier* object)
 {
 	Smart_Pointer<WME_Id> ptr = new WME_Id(in_id_name, object->GetAttribute(), object);
@@ -94,14 +87,6 @@ void WME_Id::add_child(Smart_Pointer<WME_Id> in_child)
 	// key will consist of attribute name followed by value name so that fast identity lookups
 	// can be done
 	m_id_children.insert(make_pair(make_key(in_child->get_attribute(), in_child->get_value()) , in_child));
-	m_all_children.insert(in_child);
-}
-
-void WME_Id::add_child(Smart_Pointer<WME_Shared> in_child)
-{
-	// key will consist of attribute name followed by value name so that fast identity lookups
-	// can be done
-	m_shared_children.insert(make_pair(make_key(in_child->get_attribute(), in_child->get_value()) , in_child));
 	m_all_children.insert(in_child);
 }
 
@@ -149,13 +134,10 @@ void WME_Id::remove_id_child(const string& att, const string& value, Agent* pAge
 {
 	string key = make_key(att, value);
 	Smart_Pointer<WME_Id> child = m_id_children[key];
-	if(!child.get_raw_ptr()) // this is a shared id
-	{
-		m_shared_children.erase(key);
-		m_all_children.erase(child);
-	}
+	assert(child.get_raw_ptr());
 	m_id_children.erase(key);
 	m_all_children.erase(child);
+	child->destroy_sml_object(pAgent);
 }
 
 void WME_Id::remove_wme_child(const string& att, double value, Agent* pAgent)
@@ -190,16 +172,13 @@ void WME_Id::remove_wme_child(const string& att, const string& value, Agent* pAg
 
 void WME_Id::remove_all_children(Agent* pAgent)
 {
+	// go through and have all of the children delete their sml objects
+	//for_each(m_all_children.begin(), m_all_children.end(), bind2nd(mem_fun(&WME_Type::destroy_sml_object), pAgent));
 	// clear each of the containers
 	m_all_children.clear();
 	m_float_children.clear();
 	m_string_children.clear();
 	m_int_children.clear();
-	m_shared_children.clear();
-	for(id_children_t::iterator it = m_id_children.begin(); it != m_id_children.end(); it++)
-	{
-		QL_Interface::instance().remove_identifier((*it).second->get_value());
-	}
 	m_id_children.clear();
 }
 
@@ -209,9 +188,6 @@ void WME_Id::update_wme_child(const string& att, double old_value, double new_va
 	Smart_Pointer<WME_Float> child = m_float_children[key];
 	assert(child.get_raw_ptr());
 	child->update_sml_object(new_value, pAgent);
-	m_float_children.erase(key);
-	key = make_key(att, string_make(new_value));
-	m_float_children[key] = child;
 }
 
 void WME_Id::update_wme_child(const string& att, int old_value, int new_value, Agent* pAgent)
@@ -220,9 +196,6 @@ void WME_Id::update_wme_child(const string& att, int old_value, int new_value, A
 	Smart_Pointer<WME_Int> child = m_int_children[key];
 	assert(child.get_raw_ptr());
 	child->update_sml_object(new_value, pAgent);
-	m_int_children.erase(key);
-	key = make_key(att, string_make(new_value));
-	m_int_children[key] = child;
 }
 
 void WME_Id::update_wme_child(const string& att, const string& old_value, const string& new_value, Agent* pAgent)
@@ -231,9 +204,6 @@ void WME_Id::update_wme_child(const string& att, const string& old_value, const 
 	Smart_Pointer<WME_String> child = m_string_children[key];
 	assert(child.get_raw_ptr());
 	child->update_sml_object(new_value, pAgent);
-	m_string_children.erase(key);
-	key = make_key(att, string_make(new_value));
-	m_string_children[key] = child;
 }
 
 // get a const set of all the children

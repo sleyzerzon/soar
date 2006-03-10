@@ -6,8 +6,6 @@
 
 package edu.umich.toh;
 
-import sml.Kernel;
-
 
 /**
  * The <code>GameListener</code> interface provides delegation for two common events
@@ -19,7 +17,7 @@ import sml.Kernel;
  * 
  * @see Game
  */
-public interface GameListener extends Kernel.SystemEventInterface {
+public interface GameListener extends sml.Kernel.SystemEventInterface {
     /**
      * Whenever a disk is moved from one tower to another, this method is called to
      * inform this listener where the disk was moved from and where it was moved to

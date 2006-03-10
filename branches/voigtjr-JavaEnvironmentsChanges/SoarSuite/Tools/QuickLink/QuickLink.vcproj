@@ -60,7 +60,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="build"
-			IntermediateDirectory="$(OutDir)\Release"
+			IntermediateDirectory="$(OutDir)\Debug"
 			ConfigurationType="1"
 			CharacterSet="2"
 			ManagedExtensions="TRUE">
@@ -147,9 +147,6 @@
 				RelativePath=".\src\WME_Int.cpp">
 			</File>
 			<File
-				RelativePath=".\src\WME_Shared.cpp">
-			</File>
-			<File
 				RelativePath=".\src\WME_String.cpp">
 			</File>
 			<File
@@ -195,9 +192,6 @@
 			</File>
 			<File
 				RelativePath=".\include\WME_Int.h">
-			</File>
-			<File
-				RelativePath=".\include\WME_Shared.h">
 			</File>
 			<File
 				RelativePath=".\include\WME_String.h">

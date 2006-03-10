@@ -1,7 +1,3 @@
-/********************
-* This class inherits from the Input_Type abstract base class.  Its purpose
-* is to represent input from the console
-*********************/
 
 #ifndef INPUT_CONSOLE
 #define INPUT_CONSOLE
@@ -23,8 +19,6 @@ public:
 	virtual bool pausible()
 	{ return false; }
 
-	// return true if it is okay to kill this input type, there should be only one
-	// console input, and thus it is unkillable
 	virtual bool killable()
 	{ return false; }
 

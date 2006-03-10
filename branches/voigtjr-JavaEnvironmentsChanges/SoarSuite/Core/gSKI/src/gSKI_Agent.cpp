@@ -602,13 +602,6 @@ namespace gSKI
       ClearError(err);
       return m_runState;
    }
-   	  
-   void Agent::SetRunState(egSKIRunState state,Error* err)
-   { 
-      ClearError(err);
-	  m_runState = state; 
-   }
-
 
       /*
    =========================

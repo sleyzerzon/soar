@@ -1,10 +1,3 @@
-/* Input_File.h
-*
-* This class inherits from the Input_Type abstract base class.
-* An Input_File object should be created for any file read that will
-* read properly formatted QL commands such as a 'load' or a 'loadp' call
-*
-*/
 
 #ifndef INPUT_FILE
 #define INPUT_FILE
@@ -28,7 +21,6 @@ public:
 	virtual bool pausible()
 	{ return true; }
 
-	// return true if this can be terminated before it finishes, this is true for file inputs.
 	virtual bool killable()
 	{ return true; }
 
@@ -38,8 +30,8 @@ private:
 
 	// keep constructor private to guarantee use of named constructor
 	Input_File(std::string filename);
-	
-	// the source of the input
+
+
 	std::ifstream infile;
 };
 

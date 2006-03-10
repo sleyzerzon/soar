@@ -1,8 +1,3 @@
-/* View_Console.h
-*
-* This class inherits from View_Type and represents the console view
-*
-*/
 
 #ifndef VIEW_CONSOLE_H
 #define VIEW_CONSOLE_H
@@ -15,7 +10,6 @@
 class View_Console : public View_Type
 {
 public:
-	// named constructor
 	static Smart_Pointer<View_Console> create();
 
 	// call this function when update for soar modifications needs to happen
