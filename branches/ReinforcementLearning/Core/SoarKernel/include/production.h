@@ -1,19 +1,19 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /* -------------------------------------------------------------------
                             production.h
 
    Fields in a production:
-
+ 
       name:  points to the name of the production (a symbol)
 
       documentation:  points to a string (a memory_block_for_string) giving
         user-provided documentation about the production, or NIL if the
         user didn't give any documentation for it.
-
+    
       reference_count:  (see below)
 
       firing_count:  the number of times this production has ever fired
@@ -146,11 +146,11 @@ extern void deallocate_symbol_list_removing_references (agent* thisAgent, list *
 /* Utilities for tests */
 /* ------------------- */
 
-extern void add_all_variables_in_action (agent* thisAgent, action *a, tc_number tc,
+extern void add_all_variables_in_action (agent* thisAgent, action *a, tc_number tc, 
 					 list **var_list);
-extern void add_bound_variables_in_test (agent* thisAgent, test t, tc_number tc,
+extern void add_bound_variables_in_test (agent* thisAgent, test t, tc_number tc, 
 					 list **var_list);
-extern void add_bound_variables_in_condition (agent* thisAgent, condition *c, tc_number tc,
+extern void add_bound_variables_in_condition (agent* thisAgent, condition *c, tc_number tc, 
 					      list **var_list);
 extern void unmark_variables_and_free_list (agent* thisAgent, list *var_list);
 
@@ -170,7 +170,7 @@ extern void deallocate_test (agent* thisAgent, test t);
 /* --- Destructively modifies the first test (t) by adding the second
    one (add_me) to it (usually as a new conjunct).  The first test
    need not be a conjunctive test. --- */
-extern void add_new_test_to_test (agent* thisAgent, test *t, test add_me);
+extern void add_new_test_to_test (agent* thisAgent, test *t, test add_me); 
 
 /* --- Same as above, only has no effect if the second test is already
    included in the first one. --- */
@@ -264,14 +264,14 @@ extern void deallocate_list_of_nots (agent* thisAgent, not_struct *nots);
 
        Transitive Closure Calculations for Conditions and Actions
 
-   Usage:
+   Usage: 
      1. Set my_tc = get_new_tc_number() to start a new TC
      2. (optional) If you want linked lists of symbols in the TC, initialize
         id_list=NIL and var_list=NIL.
         If you're not using id_list and/or var_list, give NIL for "&id_list"
         and/or "&var_list" in the function calls below.
      3. (optional) setup any id's or var's that you want to include in the
-        initial TC, by calling
+        initial TC, by calling 
            add_symbol_to_tc (sym, my_tc, &id_list, &var_list)
         (If not using id_list or var_list, you can just mark
          sym->{id,var}.tc_num = my_tc instead.)
@@ -306,7 +306,7 @@ extern Bool action_is_in_tc (action *a, tc_number tc);
    overlap with those already used in a *certain* production--for instance,
    when variablizing a chunk, we don't want to introduce a new variable that
    conincides with the name of a variable already in an NCC in the chunk.
-
+   
    To use these routines, first call reset_variable_generator(), giving
    it lists of conditions and actions whose variables should not be
    used.  Then call generate_new_variable() any number of times; each
@@ -314,14 +314,14 @@ extern Bool action_is_in_tc (action *a, tc_number tc);
    name.  The prefix string should not include the opening "<".
 -------------------------------------------------------------------- */
 
-extern void reset_variable_generator (agent* thisAgent,
+extern void reset_variable_generator (agent* thisAgent, 
 									  condition *conds_with_vars_to_avoid,
                                       action *actions_with_vars_to_avoid);
 extern Symbol *generate_new_variable (agent* thisAgent, char *prefix);
 
 /* -------------------------------------------------------------------
                          Production Management
-
+ 
     For each type of production, we maintain a doubly-linked list of
     all productions of that type.  The headers of these dll's are
     stored in the array all_productions_of_type[].  Another array,
@@ -332,7 +332,7 @@ extern Symbol *generate_new_variable (agent* thisAgent, char *prefix);
     incrementing and decrementing the reference count on a production.
     Production_remove_ref() also deallocates the production if the
     count goes to 0.
-
+    
     Make_production() does reordering, compile-time o-support calc's,
     and builds and returns a production structure for a new production.
     It does not enter the production into the Rete net, however.
@@ -348,7 +348,7 @@ extern Symbol *generate_new_variable (agent* thisAgent, char *prefix);
     the production_remove_ref() macro.
 ------------------------------------------------------------------- */
 
-extern production *make_production (agent* thisAgent,
+extern production *make_production (agent* thisAgent, 
 									byte type,
                                     Symbol *name,
                                     condition **lhs_top,
@@ -360,7 +360,7 @@ extern void excise_production (agent* thisAgent, production *prod, Bool print_sh
 extern void excise_all_productions_of_type(agent* thisAgent,
                                            byte type,
                                            Bool print_sharp_sign);
-extern void excise_all_productions(agent* thisAgent,
+extern void excise_all_productions(agent* thisAgent,       
                                    Bool print_sharp_sign);
 
 extern Bool canonical_cond_greater(condition *c1, condition *c2);

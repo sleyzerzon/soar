@@ -39,6 +39,7 @@ bool CommandLineInterface::ParsePrint(gSKI::IAgent* pAgent, std::vector<std::str
 		{'S', "states",			0},
 		{'u', "user",			0},
 		{'R', "RL" , 			0},
+		{'v', "varprint",		0},
 		{0, 0, 0}
 	};
 
@@ -95,6 +96,8 @@ bool CommandLineInterface::ParsePrint(gSKI::IAgent* pAgent, std::vector<std::str
 				break;
 			case 'u':
 				options.set(PRINT_USER);
+			case 'v':
+				options.set(PRINT_VARPRINT);
 				break;
 			case 'R':
 				options.set(PRINT_RL);
@@ -220,6 +223,9 @@ bool CommandLineInterface::DoPrint(gSKI::IAgent* pAgent, PrintBitset options, in
 
 	// Default to symbol print if there is an arg, otherwise print all
 	AddListenerAndDisableCallbacks(pAgent);
+	if (options.test(PRINT_VARPRINT)) {
+		m_VarPrint = true;
+	}
 	if (pArg) {
 		pKernelHack->PrintSymbol(pAgent, const_cast<char*>(pArg->c_str()), name, filename, internal, full, depth);
 	} else {
@@ -229,6 +235,7 @@ bool CommandLineInterface::DoPrint(gSKI::IAgent* pAgent, PrintBitset options, in
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
         pKernelHack->PrintUser(pAgent, 0, internal, filename, full, TEMPLATE_PRODUCTION_TYPE);
 	}
+	m_VarPrint = false;
 	RemoveListenerAndEnableCallbacks(pAgent);
 
 	// put the result into a message(string) arg tag

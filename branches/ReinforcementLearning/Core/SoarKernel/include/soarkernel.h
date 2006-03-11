@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /*************************************************************************
@@ -121,7 +121,7 @@ extern "C"
 
 #include "explain.h"
 #include "agent.h"
-
+                              
 /*=====================================================================*/
 
 #ifdef __cplusplus

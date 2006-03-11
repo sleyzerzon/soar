@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /* gsysparam.h */
@@ -17,7 +17,7 @@
 
    Most of the parameters are of type "long".  A few parameters are more
    naturally handled as lists; for these, the array value is just a dummy,
-   and callback routines must inspect a global variable to get the real
+   and callback routines must inspect a global variable to get the real 
    value.  Chunk_free_problem_spaces is an example of this.
 
    The array of sysparams[] can be read directly, but should be modified
@@ -176,7 +176,7 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define HIGHEST_SYSPARAM_NUMBER                  43
 
 #else
-
+    
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
 #define HIGHEST_SYSPARAM_NUMBER                  35
 

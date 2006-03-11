@@ -5,7 +5,7 @@
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /*************************************************************************
@@ -13,7 +13,7 @@
  *  file:  symtab.cpp
  *
  * =======================================================================
- *
+ *  
  *                 Symbol Table Routines for Soar 6
  *
  * Soar 6 uses five kinds of symbols:  symbolic constants, integer
@@ -47,7 +47,7 @@
    Compress() takes a 32-bit hash value and compresses it down to a few
    bits, xor-ing pieces of the 32-bit value to avoid throwing away bits
    that might be important for the hash function to be effective.
-
+   
    Hash_string() produces a hash value for a string of characters.
 
    Hash_xxx_raw_info() are the hash functions for the five kinds of
@@ -77,13 +77,13 @@ unsigned long hash_string (const char *s) {   /* AGR 600 */
   h = 0;
   while (*s != 0) {
     h = ((h << 8) | (h >> 24)) ^ (*s);
-    s++;
+    s++; 
   }
   return h;
 }
 
 /* -----------------------------------------
-   Hashing symbols using their basic info
+   Hashing symbols using their basic info 
 ----------------------------------------- */
 
 unsigned long hash_variable_raw_info (char *name, short num_bits) {
@@ -149,7 +149,7 @@ unsigned long hash_float_constant (void *item, short num_bits) {
 ------------------------------------------------------------------- */
 
 //#define get_next_symbol_hash_id() (thisAgent->current_symbol_hash_id += 137)
-inline unsigned long get_next_symbol_hash_id(agent* thisAgent)
+inline unsigned long get_next_symbol_hash_id(agent* thisAgent) 
 {
   return (thisAgent->current_symbol_hash_id += 137);
 }
@@ -306,9 +306,9 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
 /* REW: end   09.15.96 */
 /* REW: begin 08.20.97 */
   sym->id.saved_firing_type = NO_SAVED_PRODS;
-  sym->id.ms_o_assertions = NIL;
-  sym->id.ms_i_assertions = NIL;
-  sym->id.ms_retractions = NIL;
+  sym->id.ms_o_assertions = NIL; 
+  sym->id.ms_i_assertions = NIL; 
+  sym->id.ms_retractions = NIL;  
 /* REW: end   08.20.97 */
   sym->id.lower_goal = NIL;
   sym->id.operator_slot = NIL;
@@ -380,7 +380,7 @@ Symbol *make_float_constant (agent* thisAgent, float value) {
 
 void deallocate_symbol (agent* thisAgent, Symbol *sym) {
 
-#ifdef DEBUG_SYMBOLS
+#ifdef DEBUG_SYMBOLS  
   print_with_symbols (thisAgent, "\nDeallocating Symbol %y", sym);
 #endif
 
@@ -444,13 +444,13 @@ Bool print_identifier_ref_info(agent* thisAgent, void* item, FILE* f) {
    Symbol* sym;
    char msg[256];
    sym = static_cast<symbol_union *>(item);
-
+   
    if ( sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) {
       if ( sym->common.reference_count > 0 ) {
-         snprintf( msg, 256,
-                  "\t%c%lu --> %lu\n",
-                  sym->id.name_letter,
-                  sym->id.name_number,
+         snprintf( msg, 256, 
+                  "\t%c%lu --> %lu\n", 
+                  sym->id.name_letter, 
+                  sym->id.name_number, 
                   sym->common.reference_count);
 		 msg[255] = 0; /* ensure null termination */
          print (thisAgent, msg);
@@ -476,7 +476,7 @@ bool reset_id_counters (agent* thisAgent) {
     do_for_all_items_in_hash_table( thisAgent, thisAgent->identifier_hash_table, print_identifier_ref_info, 0);
     return false;
   }
-  for (i=0; i<26; i++) thisAgent->id_counter[i]=1;
+  for (i=0; i<26; i++) thisAgent->id_counter[i]=1;  
   return true ;
 }
 
@@ -527,7 +527,7 @@ void print_internal_symbols (agent* thisAgent) {
 
 Symbol *generate_new_sym_constant (agent* thisAgent, char *prefix, unsigned long *counter) {
 #define GENERATE_NEW_SYM_CONSTANT_BUFFER_SIZE 2000 /* that ought to be long enough! */ /* and what if it's not!? -voigtjr */
-  char name[GENERATE_NEW_SYM_CONSTANT_BUFFER_SIZE];
+  char name[GENERATE_NEW_SYM_CONSTANT_BUFFER_SIZE];  
   Symbol *New;
 
   while (TRUE) {
@@ -540,7 +540,7 @@ Symbol *generate_new_sym_constant (agent* thisAgent, char *prefix, unsigned long
 }
 
 /* --------------------------------------------------------------------
-
+   
                          Predefined Symbols
 
 -------------------------------------------------------------------- */

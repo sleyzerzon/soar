@@ -171,7 +171,7 @@
 #include"gsysparam.h"
 #endif
 
-#include "kernel.h"
+ #include "kernel.h"
 #include "agent.h"
 #include "explain.h"
 #include "rete.h"

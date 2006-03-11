@@ -5,7 +5,7 @@
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /*************************************************************************
@@ -14,7 +14,7 @@
  *
  * =======================================================================
  *  These are the routines that support printing Soar data structures.
- *
+ *  
  *  Everything eventually ends up in print_string which calls the Tcl
  *  interface routine Soar_LogAndPrint.  Logging and I/O redirection are
  *  now done through Tcl.  There's also one odd piece of user i/o done
@@ -71,13 +71,13 @@ using namespace xmlTraceNames;
    Print() is exactly like printf() in C, except it prints to both
    the screen and log file (if there is one).  Print_with_symbols()
    is sort of like print, but only takes two kinds of escape sequences
-   in the format string:
+   in the format string: 
        %y  -- print a symbol
        %%  -- print a "%" sign
 
    Sometimes we need to know the current output column so we can put
    a line break in the right place.  Get_printer_output_column() returns
-   the current column number (1 means the start of the line).
+   the current column number (1 means the start of the line). 
    Tell_printer_that_output_column_has_been_reset () is called from the
    lexer every time it reads a line from the keyboard--since after the
    user types a line (and hits return) the output column is reset.
@@ -94,7 +94,7 @@ void start_log_file (agent* thisAgent, char *filename, Bool append) {
 
   chdir(thisAgent->top_dir_stack->directory);
   thisAgent->log_file = fopen (filename, (append ? "a" : "w") );
-
+  
   if (thisAgent->log_file) {
     thisAgent->logging_to_file = TRUE;
     thisAgent->log_file_name = make_memory_block_for_string (thisAgent, filename);
@@ -143,7 +143,7 @@ void stop_redirection_to_file (agent* thisAgent) {
 /* -----------------------------------------------------------------------
                              Print_string
 
-   This routine prints the given string, and updates printer_output_column.
+   This routine prints the given string, and updates printer_output_column.  
    (This routine is called from the other print(), etc. routines.)
 ----------------------------------------------------------------------- */
 
@@ -198,7 +198,7 @@ void print_string (agent* thisAgent, char *s) {
   if (thisAgent->redirecting_to_file) {
     fputs (s, thisAgent->redirection_file);
   } else {
-    if (thisAgent->using_output_string)
+    if (thisAgent->using_output_string) 
       strcat(thisAgent->output_string,s);
     else {
 //#ifdef USE_X_DISPLAY
@@ -234,16 +234,16 @@ void print_string (agent* thisAgent, char *s) {
   //      fputs(s, thisAgent->redirection_file);
   //  } else {
   //      /* this code is never executed since using_output_string is never true
-  //         if (current_agent(using_output_string))
+  //         if (current_agent(using_output_string)) 
   //         strcat(current_agent(output_string),s);
   //         else {
   //       */
-  //      /*
+  //      /* 
   //         A bunch of crazy, interface dependent functions used to be called
   //         here.  I am removing all of that, and using the Tcl interface
   //         as a model of what the generalized behavior should in fact be.
   //         The old version, which used the Tcl interface simply made a function
-  //         call to the interface layer which then simply invoked the
+  //         call to the interface layer which then simply invoked the 
   //         LOG and PRINT callbacks, which seems like the way to go.
 
   //         081699 SW
@@ -260,7 +260,7 @@ void print_string (agent* thisAgent, char *s) {
 
 /* ---------------------------------------------------------------
                Print, Print_with_symbols, Print_spaces
-
+  
    These are the main printing routines.  (The code is ugly because
    it has to take a variable number of arguments, and there are two
    ways to do this, depending on whether we're using a fully ANSI
@@ -291,19 +291,19 @@ void print (va_list va_alist) {
 }
 
 #ifdef USE_STDARGS
-void print_with_symbols (agent* thisAgent,
+void print_with_symbols (agent* thisAgent, 
 						 char *format, ...) {
   va_list args;
   char buf[PRINT_BUFSIZE];
   char *ch;
-
+  
   va_start (args, format);
 #else
 void print_with_symbols (thisAgent, va_alist) va_dcl {
   va_list args;
   char buf[PRINT_BUFSIZE];
   char *ch, *format;
-
+  
   va_start (args);
   format = va_arg(args, char *);
 #endif
@@ -358,7 +358,7 @@ void print_spaces (agent* thisAgent, int n) {
    For example, input 'ab"c' with first/last character '"' yields
    '"ab\"c"'.  This is used for printing quoted strings and for printing
    symbols using |vbar| notation.
-
+ 
    Symbol_to_string() converts a symbol to a string.  The "rereadable"
    parameter indicates whether a rereadable representation is desired.
    Normally symbols are printed rereadably, but for (write) and Text I/O,
@@ -369,7 +369,7 @@ void print_spaces (agent* thisAgent, int n) {
    representation.  The rhs_value MUST NOT be a reteloc.
 ----------------------------------------------------------------------- */
 
-char *string_to_escaped_string (agent* thisAgent, char *s,
+char *string_to_escaped_string (agent* thisAgent, char *s, 
 								char first_and_last_char, char *dest) {
   char *ch;
 
@@ -388,7 +388,7 @@ char *string_to_escaped_string (agent* thisAgent, char *s,
 
 
 
-char *symbol_to_string (agent* thisAgent, Symbol *sym,
+char *symbol_to_string (agent* thisAgent, Symbol *sym, 
 						Bool rereadable, char *dest, size_t dest_size) {
   Bool possible_id, possible_var, possible_sc, possible_ic, possible_fc;
   Bool is_rereadable;
@@ -418,7 +418,7 @@ char *symbol_to_string (agent* thisAgent, Symbol *sym,
     snprintf (dest, dest_size, "%ld", sym->ic.value);
 	dest[dest_size - 1] = 0; /* ensure null termination */
     return dest;
-
+    
   case FLOAT_CONSTANT_SYMBOL_TYPE:
 	if (!dest) {
 	  dest=thisAgent->printed_output_string;
@@ -439,7 +439,7 @@ char *symbol_to_string (agent* thisAgent, Symbol *sym,
       *end_of_mantissa = 0;
     }
     return dest;
-
+    
   case SYM_CONSTANT_SYMBOL_TYPE:
     if (!rereadable) {
       if (!dest) return sym->sc.name;
@@ -468,9 +468,9 @@ char *symbol_to_string (agent* thisAgent, Symbol *sym,
     if (!dest) return sym->sc.name;
     strncpy (dest, sym->sc.name, dest_size);
     return dest;
-
+    
   default:
-    {
+    { 
 	  char msg[BUFFER_MSG_SIZE];
       strncpy(msg, "Internal Soar Error:  symbol_to_string called on bad symbol\n", BUFFER_MSG_SIZE);
       msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
@@ -505,51 +505,51 @@ char *test_to_string (agent* thisAgent, test t, char *dest, size_t dest_size) {
   }
   ch = dest;
   ct = complex_test_from_test(t);
-
+  
   switch (ct->type) {
   case NOT_EQUAL_TEST:
-    strncpy (ch, "<> ", dest_size - (ch - dest));
+    strncpy (ch, "<> ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
-	while (*ch)
+	while (*ch) 
 		ch++;
     symbol_to_string (thisAgent, ct->data.referent, TRUE, ch, dest_size - (ch - dest));
     break;
   case LESS_TEST:
-    strncpy (ch, "< ", dest_size - (ch - dest));
+    strncpy (ch, "< ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
     symbol_to_string (thisAgent, ct->data.referent, TRUE, ch, dest_size - (ch - dest));
     break;
   case GREATER_TEST:
-    strncpy (ch, "> ", dest_size - (ch - dest));
+    strncpy (ch, "> ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
     symbol_to_string (thisAgent, ct->data.referent, TRUE, ch, dest_size - (ch - dest));
     break;
   case LESS_OR_EQUAL_TEST:
-    strncpy (ch, "<= ", dest_size - (ch - dest));
+    strncpy (ch, "<= ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
     symbol_to_string (thisAgent, ct->data.referent, TRUE, ch, dest_size - (ch - dest));
     break;
   case GREATER_OR_EQUAL_TEST:
-    strncpy (ch, ">= ", dest_size - (ch - dest));
+    strncpy (ch, ">= ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
     symbol_to_string (thisAgent, ct->data.referent, TRUE, ch, dest_size - (ch - dest));
     break;
   case SAME_TYPE_TEST:
-    strncpy (ch, "<=> ", dest_size - (ch - dest));
+    strncpy (ch, "<=> ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
     symbol_to_string (thisAgent, ct->data.referent, TRUE, ch, dest_size - (ch - dest));
     break;
   case DISJUNCTION_TEST:
-    strncpy (ch, "<< ", dest_size - (ch - dest));
+    strncpy (ch, "<< ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
     for (c=ct->data.disjunction_list; c!=NIL; c=c->rest) {
-      symbol_to_string (thisAgent, static_cast<symbol_union *>(c->first), TRUE, ch, dest_size - (ch - dest));
+      symbol_to_string (thisAgent, static_cast<symbol_union *>(c->first), TRUE, ch, dest_size - (ch - dest)); 
 	  while (*ch) ch++;
       *(ch++) = ' ';
     }
@@ -557,11 +557,11 @@ char *test_to_string (agent* thisAgent, test t, char *dest, size_t dest_size) {
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
     break;
   case CONJUNCTIVE_TEST:
-    strncpy (ch, "{ ", dest_size - (ch - dest));
+    strncpy (ch, "{ ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
     for (c=ct->data.conjunct_list; c!=NIL; c=c->rest) {
-      test_to_string (thisAgent, static_cast<char *>(c->first), ch, dest_size - (ch - dest));
+      test_to_string (thisAgent, static_cast<char *>(c->first), ch, dest_size - (ch - dest)); 
 	  while (*ch) ch++;
       *(ch++) = ' ';
     }
@@ -583,7 +583,7 @@ char *test_to_string (agent* thisAgent, test t, char *dest, size_t dest_size) {
 char *rhs_value_to_string (agent* thisAgent, rhs_value rv, char *dest, size_t dest_size) {
   cons *c;
   list *fl;
-  rhs_function *rf;
+  rhs_function *rf;  
   char *ch;
 
   if (rhs_value_is_reteloc(rv)) {
@@ -592,21 +592,21 @@ char *rhs_value_to_string (agent* thisAgent, rhs_value rv, char *dest, size_t de
     msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
     abort_with_fatal_error(thisAgent, msg);
   }
-
+  
   if (rhs_value_is_symbol(rv)) {
     return symbol_to_string (thisAgent, rhs_value_to_symbol(rv), TRUE, dest, dest_size);
   }
 
   fl = rhs_value_to_funcall_list(rv);
   rf = static_cast<rhs_function_struct *>(fl->first);
-
+  
   if (!dest) {
  	dest=thisAgent->printed_output_string;
 	dest_size = MAX_LEXEME_LENGTH*2+10; /* from agent.h */
   }
   ch = dest;
 
-  strncpy (ch, "(", dest_size);
+  strncpy (ch, "(", dest_size); 
   ch[dest_size - 1] = 0;
   while (*ch) ch++;
 
@@ -622,12 +622,12 @@ char *rhs_value_to_string (agent* thisAgent, rhs_value rv, char *dest, size_t de
 
   while (*ch) ch++;
   for (c=fl->rest; c!=NIL; c=c->rest) {
-    strncpy (ch, " ", dest_size - (ch - dest));
+    strncpy (ch, " ", dest_size - (ch - dest)); 
 	ch[dest_size - (ch - dest) - 1] = 0;
-	while (*ch)
+	while (*ch) 
 		ch++;
-    rhs_value_to_string (thisAgent, static_cast<char *>(c->first), ch, dest_size - (ch - dest));
-	while (*ch)
+    rhs_value_to_string (thisAgent, static_cast<char *>(c->first), ch, dest_size - (ch - dest)); 
+	while (*ch) 
 		ch++;
   }
   strncpy (ch, ")", dest_size - (ch - dest));
@@ -660,14 +660,14 @@ Bool pick_conds_with_matching_id_test (dl_cons *dc, agent* thisAgent) {
 ==============================
 */
 #define PRINT_CONDITION_LIST_TEMP_SIZE 10000
-void print_condition_list (agent* thisAgent, condition *conds,
+void print_condition_list (agent* thisAgent, condition *conds, 
 						   int indent, Bool internal) {
    dl_list *conds_not_yet_printed, *tail_of_conds_not_yet_printed;
    dl_list *conds_for_this_id;
    dl_cons *dc;
    condition *c;
    Bool removed_goal_test, removed_impasse_test;
-   test id_test;
+   test id_test;  
 
    if (!conds) return;
 
@@ -675,15 +675,15 @@ void print_condition_list (agent* thisAgent, condition *conds,
    conds_not_yet_printed = NIL;
    tail_of_conds_not_yet_printed = NIL;
 
-   for (c=conds; c!=NIL; c=c->next)
+   for (c=conds; c!=NIL; c=c->next) 
    {
       allocate_with_pool (thisAgent, &thisAgent->dl_cons_pool, &dc);
       dc->item = c;
-      if (conds_not_yet_printed)
+      if (conds_not_yet_printed) 
       {
          tail_of_conds_not_yet_printed->next = dc;
       }
-      else
+      else 
       {
          conds_not_yet_printed = dc;
       }
@@ -694,14 +694,14 @@ void print_condition_list (agent* thisAgent, condition *conds,
 
    /* --- main loop: find all conds for first id, print them together --- */
    Bool did_one_line_already = FALSE;
-   while (conds_not_yet_printed)
+   while (conds_not_yet_printed) 
    {
-      if (did_one_line_already)
+      if (did_one_line_already) 
       {
          print (thisAgent, "\n");
          print_spaces (thisAgent, indent);
-      }
-      else
+      } 
+      else 
       {
          did_one_line_already = TRUE;
       }
@@ -709,7 +709,7 @@ void print_condition_list (agent* thisAgent, condition *conds,
       dc = conds_not_yet_printed;
       remove_from_dll (conds_not_yet_printed, dc, next, prev);
       c = static_cast<condition_struct *>(dc->item);
-      if (c->type==CONJUNCTIVE_NEGATION_CONDITION)
+      if (c->type==CONJUNCTIVE_NEGATION_CONDITION) 
       {
          free_with_pool (&thisAgent->dl_cons_pool, dc);
          print_string (thisAgent, "-{");
@@ -722,19 +722,19 @@ void print_condition_list (agent* thisAgent, condition *conds,
 
       /* --- normal pos/neg conditions --- */
       removed_goal_test = removed_impasse_test = FALSE;
-      id_test = copy_test_removing_goal_impasse_tests(thisAgent, c->data.tests.id_test,
-         &removed_goal_test,
+      id_test = copy_test_removing_goal_impasse_tests(thisAgent, c->data.tests.id_test, 
+         &removed_goal_test, 
          &removed_impasse_test);
       thisAgent->id_test_to_match = copy_of_equality_test_found_in_test (thisAgent, id_test);
 
       /* --- collect all cond's whose id test matches this one --- */
       conds_for_this_id = dc;
       dc->prev = NIL;
-      if (internal)
+      if (internal) 
       {
          dc->next = NIL;
-      }
-      else
+      } 
+      else 
       {
          dc->next = extract_dl_list_elements (thisAgent, &conds_not_yet_printed,
                                                pick_conds_with_matching_id_test);
@@ -744,14 +744,14 @@ void print_condition_list (agent* thisAgent, condition *conds,
       print_string (thisAgent, " (");
       gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCondition);
 
-      if (removed_goal_test)
+      if (removed_goal_test) 
       {
          print_string (thisAgent, "state ");
          gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionTest, kConditionTestState);
 
       }
 
-      if (removed_impasse_test)
+      if (removed_impasse_test) 
       {
          print_string (thisAgent, "impasse ");
          gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionTest, kConditionTestImpasse);
@@ -763,7 +763,7 @@ void print_condition_list (agent* thisAgent, condition *conds,
       deallocate_test (thisAgent, id_test);
 
       growable_string gs = make_blank_growable_string(thisAgent);
-      while (conds_for_this_id)
+      while (conds_for_this_id) 
       {
          dc = conds_for_this_id;
          conds_for_this_id = conds_for_this_id->next;
@@ -776,26 +776,26 @@ void print_condition_list (agent* thisAgent, condition *conds,
 			memset(temp,0,PRINT_CONDITION_LIST_TEMP_SIZE);
             ch = temp;
             strncpy (ch, " ", PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp));
-            if (c->type==NEGATIVE_CONDITION)
+            if (c->type==NEGATIVE_CONDITION) 
             {
                strncat (ch, "-", PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp));
             }
 
             strncat (ch, "^", PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp)); while (*ch) ch++;
-            test_to_string (thisAgent, c->data.tests.attr_test, ch, PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp));
+            test_to_string (thisAgent, c->data.tests.attr_test, ch, PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp)); 
 			while (*ch) ch++;
-            if (! test_is_blank_test(c->data.tests.value_test))
+            if (! test_is_blank_test(c->data.tests.value_test)) 
             {
                *(ch++) = ' ';
-               test_to_string (thisAgent, c->data.tests.value_test, ch, PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp));
+               test_to_string (thisAgent, c->data.tests.value_test, ch, PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp)); 
 			   while (*ch) ch++;
-               if (c->test_for_acceptable_preference)
+               if (c->test_for_acceptable_preference) 
                {
                   strncpy (ch, " +", PRINT_CONDITION_LIST_TEMP_SIZE - (ch - temp)); while (*ch) ch++;
                }
             }
             *ch = 0;
-            if (thisAgent->printer_output_column + (ch - temp) >= COLUMNS_PER_LINE)
+            if (thisAgent->printer_output_column + (ch - temp) >= COLUMNS_PER_LINE) 
             {
                print_string (thisAgent, "\n");
                print_spaces (thisAgent, indent+6);
@@ -832,7 +832,7 @@ Bool pick_actions_with_matching_id (dl_cons *dc, agent* thisAgent) {
 }
 
 #define PRINT_ACTION_LIST_TEMP_SIZE 10000
-void print_action_list (agent* thisAgent, action *actions,
+void print_action_list (agent* thisAgent, action *actions, 
 						int indent, Bool internal) {
   Bool did_one_line_already;
   dl_list *actions_not_yet_printed, *tail_of_actions_not_yet_printed;
@@ -841,7 +841,7 @@ void print_action_list (agent* thisAgent, action *actions,
   action *a;
 
   if (!actions) return;
-
+  
   did_one_line_already = FALSE;
 
   /* --- build dl_list of all the actions --- */
@@ -905,16 +905,16 @@ void print_action_list (agent* thisAgent, action *actions,
 
         ch = temp;
         strncpy (ch, " ^", PRINT_ACTION_LIST_TEMP_SIZE - (ch - temp)); while (*ch) ch++;
-        rhs_value_to_string (thisAgent, a->attr, ch, PRINT_ACTION_LIST_TEMP_SIZE - (ch - temp));
+        rhs_value_to_string (thisAgent, a->attr, ch, PRINT_ACTION_LIST_TEMP_SIZE - (ch - temp)); 
 		while (*ch) ch++;
         *(ch++) = ' ';
-        rhs_value_to_string (thisAgent, a->value, ch, PRINT_ACTION_LIST_TEMP_SIZE - (ch - temp));
+        rhs_value_to_string (thisAgent, a->value, ch, PRINT_ACTION_LIST_TEMP_SIZE - (ch - temp)); 
 		while (*ch) ch++;
         *(ch++) = ' ';
         *(ch++) = preference_type_indicator (thisAgent, a->preference_type);
         if (preference_is_binary (a->preference_type)) {
           *(ch++) = ' ';
-          rhs_value_to_string (thisAgent, a->referent, ch, PRINT_ACTION_LIST_TEMP_SIZE - (ch - temp));
+          rhs_value_to_string (thisAgent, a->referent, ch, PRINT_ACTION_LIST_TEMP_SIZE - (ch - temp)); 
 		  while (*ch) ch++;
         }
         *ch = 0;
@@ -945,38 +945,38 @@ void print_production (agent* thisAgent, production *p, Bool internal) {
   condition *top, *bottom;
   action *rhs;
 
-  /*
-  --- print "sp" and production name ---
+  /* 
+  --- print "sp" and production name --- 
   */
   print_with_symbols (thisAgent, "sp {%y\n", p->name);
 
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, symbol_to_string (thisAgent, p->name, TRUE, 0, 0));
-
-  /*
-  --- print optional documention string ---
+  
+  /* 
+  --- print optional documention string --- 
   */
-  if (p->documentation)
+  if (p->documentation) 
   {
     char temp[MAX_LEXEME_LENGTH*2+10];
     string_to_escaped_string (thisAgent, p->documentation, '"', temp);
     print (thisAgent, "    %s\n", temp);
 	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDocumentation, temp);
   }
-
-  /*
-  --- print any flags ---
+  
+  /* 
+  --- print any flags --- 
   */
-  switch (p->type)
+  switch (p->type) 
   {
-  case DEFAULT_PRODUCTION_TYPE:
+  case DEFAULT_PRODUCTION_TYPE: 
      print_string (thisAgent, "    :default\n");
      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeDefault);
      break;
-  case USER_PRODUCTION_TYPE:
+  case USER_PRODUCTION_TYPE: 
      break;
-  case CHUNK_PRODUCTION_TYPE:
-     print_string (thisAgent, "    :chunk\n");
+  case CHUNK_PRODUCTION_TYPE: 
+     print_string (thisAgent, "    :chunk\n"); 
      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeChunk);
      break;
   case JUSTIFICATION_PRODUCTION_TYPE:
@@ -1003,18 +1003,18 @@ void print_production (agent* thisAgent, production *p, Bool internal) {
     gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDeclaredSupport, kProductionDeclaredISupport);
   }
 
-  /*
-  --- print the LHS and RHS ---
+  /* 
+  --- print the LHS and RHS --- 
   */
-  p_node_to_conditions_and_nots (thisAgent, p->p_node, NIL, NIL,
+  p_node_to_conditions_and_nots (thisAgent, p->p_node, NIL, NIL, 
 								 &top, &bottom, NIL,&rhs);
   print_string (thisAgent, "   ");
-
+  
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagConditions);
   print_condition_list (thisAgent, top, 3, internal);
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagConditions);
   deallocate_condition_list (thisAgent, top);
-
+  
   print_string (thisAgent, "\n    -->\n  ");
   print_string (thisAgent, "  ");
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActions);
@@ -1022,7 +1022,7 @@ void print_production (agent* thisAgent, production *p, Bool internal) {
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActions);
   print_string (thisAgent, "\n}\n");
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
-
+  
   deallocate_action_list (thisAgent, rhs);
 }
 
@@ -1118,7 +1118,7 @@ void print_preference (agent* thisAgent, preference *pref) {
   buf[0] = pref_type;
   buf[1] = 0;
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPreference_Type, (char*)buf);
-
+  
   if (preference_is_binary(pref->type)) {
 	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kReferent, symbol_to_string (thisAgent, pref->referent, true, 0, 0));
   }
@@ -1126,7 +1126,7 @@ void print_preference (agent* thisAgent, preference *pref) {
 	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kOSupported, ":O");
   }
   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPreference);
-
+			
 }
 //#ifdef USE_TCL
 
@@ -1135,7 +1135,7 @@ void print_preference (agent* thisAgent, preference *pref) {
 extern "C" Bool passes_wme_filtering(agent* thisAgent, wme *w, Bool isAdd);
 void
 filtered_print_wme_add(agent* thisAgent, wme *w) {
-  if (passes_wme_filtering(thisAgent, w,TRUE))
+  if (passes_wme_filtering(thisAgent, w,TRUE)) 
   {
     print (thisAgent, "=>WM: ");
 	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWMEAdd);
@@ -1144,9 +1144,9 @@ filtered_print_wme_add(agent* thisAgent, wme *w) {
   }
 }
 
-void filtered_print_wme_remove(agent* thisAgent, wme *w)
+void filtered_print_wme_remove(agent* thisAgent, wme *w) 
 {
-  if (passes_wme_filtering(thisAgent, w,FALSE))
+  if (passes_wme_filtering(thisAgent, w,FALSE)) 
   {
     print (thisAgent, "<=WM: ");
 	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWMERemove);
@@ -1177,7 +1177,7 @@ void print_wme (agent* thisAgent, wme *w) {
 }
 
 //#ifdef USE_TCL
-void print_wme_for_tcl (agent* thisAgent, wme *w)
+void print_wme_for_tcl (agent* thisAgent, wme *w) 
 {
   print (thisAgent, "%lu: ", w->timetag);
   print_with_symbols (thisAgent, "%y ^%y %y", w->id, w->attr, w->value);
@@ -1185,8 +1185,8 @@ void print_wme_for_tcl (agent* thisAgent, wme *w)
 }
 //#endif /* USE_TCL */
 
-void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
-									wme_trace_type wtt, int action)
+void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst, 
+									wme_trace_type wtt, int action) 
 {
   int PRINTING = -1;
   int FIRING = 0;
@@ -1245,7 +1245,7 @@ void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
         break;
       }
     }
-
+	
 	if (action == PRINTING) {
 		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
 	} else if (action == FIRING) {
@@ -1348,15 +1348,15 @@ void Soar_LogAndPrint (agent* thisAgent, agent * the_agent, char * str)
 void Soar_Print (agent* thisAgent, agent * the_agent, char * str)
 {
    gSKI_MakeAgentCallback(gSKI_K_EVENT_PRINT_CALLBACK, 0, thisAgent, static_cast<void*>(str));
-   soar_invoke_first_callback(thisAgent, the_agent,
+   soar_invoke_first_callback(thisAgent, the_agent, 
 	                          PRINT_CALLBACK, /*(ClientData)*/ static_cast<void*>(str));
 }
 
 void Soar_Log (agent* thisAgent, agent * the_agent, char * str)
 {
-   soar_invoke_first_callback(thisAgent, the_agent,
+   soar_invoke_first_callback(thisAgent, the_agent, 
 	                          LOG_CALLBACK, /*(ClientData)*/ static_cast<void*>(str));
-}
+} 
 
 /*
 ===========================
@@ -1365,7 +1365,7 @@ void Soar_Log (agent* thisAgent, agent * the_agent, char * str)
 */
 Bool wme_filter_component_match(Symbol *filterComponent, Symbol *wmeComponent) {
 //  if ((filterComponent->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE) &&
-//      (!strcmp(filterComponent->sc.name,"*")))
+//      (!strcmp(filterComponent->sc.name,"*"))) 
 //    return TRUE;
 //  else
 //    return(filterComponent == wmeComponent);
@@ -1382,7 +1382,7 @@ Bool passes_wme_filtering(agent* thisAgent, wme *w, Bool isAdd) {
 //  wme_filter *wf;
 //
 //  /*  print ("testing wme for filtering: ");  print_wme(w); */
-//
+//  
 //  if (!thisAgent->wme_filter_list)
 //    return TRUE; /* no filters defined -> everything passes */
 //  for (c=thisAgent->wme_filter_list; c!=NIL; c=c->rest) {

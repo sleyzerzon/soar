@@ -5,7 +5,7 @@
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /*************************************************************************
@@ -13,7 +13,7 @@
  *  file:  recmem.cpp
  *
  * =======================================================================
- *
+ *  
  *             Recognition Memory (Firer and Chunker) Routines
  *                 (Does not include the Rete net)
  *
@@ -55,10 +55,10 @@ using namespace xmlTraceNames;
 /* #define DEBUG_INSTANTIATIONS */
 
 /* TEMPORARY HACK (Ideally this should be doable through
-   the external kernel interface but for now using a
+   the external kernel interface but for now using a 
    couple of global STL lists to get this information
    from the rhs function to this prefference adding code)*/
-wme* glbDeepCopyWMEs = NULL;
+wme* glbDeepCopyWMEs = NULL;   
 
 /* mvp 5-17-94 */
 /* --------------------------------------------------------------------------
@@ -127,7 +127,7 @@ preference *find_clone_for_level (preference *p, goal_stack_level level) {
   /* --- if none was at the right level, we can't backtrace at all --- */
   return NIL;
 }
-
+  
 /* =======================================================================
 
                            Firer Utilities
@@ -149,7 +149,7 @@ void find_match_goal (instantiation *inst) {
   goal_stack_level lowest_level_so_far;
   condition *cond;
   Symbol *id;
-
+  
   lowest_goal_so_far = NIL;
   lowest_level_so_far = -1;
   for (cond=inst->top_of_instantiated_conditions; cond!=NIL; cond=cond->next)
@@ -161,7 +161,7 @@ void find_match_goal (instantiation *inst) {
           lowest_level_so_far = cond->bt.level;
         }
     }
-
+  
   inst->match_goal = lowest_goal_so_far;
   if (lowest_goal_so_far)
     inst->match_goal_level = lowest_level_so_far;
@@ -190,7 +190,7 @@ void find_match_goal (instantiation *inst) {
 ----------------------------------------------------------------------- */
 
 
-Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
+Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv, 
 			       goal_stack_level new_id_level,
                                char new_id_letter,
                                struct token_struct *tok, wme *w) {
@@ -200,7 +200,7 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
   rhs_function *rf;
   Symbol *result;
   Bool nil_arg_found;
-
+  
   if (rhs_value_is_symbol(rv)) {
     result = rhs_value_to_symbol(rv);
     symbol_add_ref (result);
@@ -248,8 +248,8 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
   arglist = NIL; /* unnecessary, but gcc -Wall warns without it */
   for (arg_cons=fl->rest; arg_cons!=NIL; arg_cons=arg_cons->rest) {
     allocate_cons (thisAgent, &c);
-    c->first = instantiate_rhs_value (thisAgent,
-									  static_cast<char *>(arg_cons->first),
+    c->first = instantiate_rhs_value (thisAgent, 
+									  static_cast<char *>(arg_cons->first), 
 									  new_id_level, new_id_letter, tok, w);
     if (! c->first) nil_arg_found = TRUE;
     if (prev_c) prev_c->rest = c; else arglist = c;
@@ -278,7 +278,7 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
 
   } else
     result = NIL;
-
+  
   /* --- scan through arglist, dereference symbols and deallocate conses --- */
   for (c=arglist; c!=NIL; c=c->rest)
     if (c->first) symbol_remove_ref (thisAgent, (Symbol *)(c->first));
@@ -290,7 +290,7 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
 preference *execute_action (agent* thisAgent, action *a, struct token_struct *tok, wme *w) {
   Symbol *id, *attr, *value, *referent;
   char first_letter;
-
+  
   if (a->type==FUNCALL_ACTION) {
     value = instantiate_rhs_value (thisAgent, a->value, -1, 'v', tok, w);
     if (value) symbol_remove_ref (thisAgent, value);
@@ -300,19 +300,19 @@ preference *execute_action (agent* thisAgent, action *a, struct token_struct *to
   attr = NIL;
   value = NIL;
   referent = NIL;
-
+  
   id = instantiate_rhs_value (thisAgent, a->id, -1, 's', tok, w);
   if (!id) goto abort_execute_action;
   if (id->common.symbol_type!=IDENTIFIER_SYMBOL_TYPE) {
     print_with_symbols (thisAgent, "Error: RHS makes a preference for %y (not an identifier)\n", id);
     goto abort_execute_action;
   }
-
+  
   attr = instantiate_rhs_value (thisAgent, a->attr, id->id.level, 'a', tok, w);
   if (!attr) goto abort_execute_action;
 
   first_letter = first_letter_from_symbol (attr);
-
+  
   value = instantiate_rhs_value (thisAgent, a->value, id->id.level,
                                  first_letter, tok, w);
   if (!value) goto abort_execute_action;
@@ -343,15 +343,15 @@ preference *execute_action (agent* thisAgent, action *a, struct token_struct *to
 		GenerateWarningXML(thisAgent, text_of_growable_string(gs));
 		free_growable_string(thisAgent, gs);
 
-     }
+     }  
   }
 
   return make_preference (thisAgent, a->preference_type, id, attr, value, referent);
 
   abort_execute_action:   /* control comes here when some error occurred */
-  if (id) symbol_remove_ref (thisAgent, id);
-  if (attr) symbol_remove_ref (thisAgent, attr);
-  if (value) symbol_remove_ref (thisAgent, value);
+  if (id) symbol_remove_ref (thisAgent, id);  
+  if (attr) symbol_remove_ref (thisAgent, attr);  
+  if (value) symbol_remove_ref (thisAgent, value);  
   if (referent) symbol_remove_ref (thisAgent, referent);
   return NIL;
 }
@@ -361,7 +361,7 @@ preference *execute_action (agent* thisAgent, action *a, struct token_struct *to
 
    This routine fills in a newly created instantiation structure with
    various information.   At input, the instantiation should have:
-     - preferences_generated filled in;
+     - preferences_generated filled in; 
      - instantiated conditions filled in;
      - top-level positive conditions should have bt.wme_, bt.level, and
        bt.trace filled in, but bt.wme_ and bt.trace shouldn't have their
@@ -375,7 +375,7 @@ preference *execute_action (agent* thisAgent, action *a, struct token_struct *to
          updates reference counts on bt.pref and bt.wmetraces and wmes
      - for each preference_generated, adds that pref to the list of all
        pref's for the match goal
-     - fills in backtrace_number;
+     - fills in backtrace_number;   
      - if "need_to_do_support_calculations" is TRUE, calculates o-support
        for preferences_generated;
 ----------------------------------------------------------------------- */
@@ -387,7 +387,7 @@ void fill_in_new_instantiation_stuff (agent* thisAgent, instantiation *inst,
   goal_stack_level level;
 
   production_add_ref (inst->prod);
-
+  
   find_match_goal (inst);
 
   level = inst->match_goal_level;
@@ -404,9 +404,9 @@ void fill_in_new_instantiation_stuff (agent* thisAgent, instantiation *inst,
 
   /* KJC 6/00:  maintaining all the top level ref cts does have a big
      impact on memory pool usage and also performance (due to malloc).
-	 (See tests done by Scott Wallace Fall 99.)	 Therefore added
-	 preprocessor macro so that by unsetting macro the top level ref cts are not
-	 incremented.  It's possible that in some systems, these ref cts may
+	 (See tests done by Scott Wallace Fall 99.)	 Therefore added 
+	 preprocessor macro so that by unsetting macro the top level ref cts are not 
+	 incremented.  It's possible that in some systems, these ref cts may 
 	 be desireable: they can be added by defining DO_TOP_LEVEL_REF_CTS
 	 */
 
@@ -419,13 +419,13 @@ void fill_in_new_instantiation_stuff (agent* thisAgent, instantiation *inst,
         #endif
 		/* --- if trace is for a lower level, find one for this level --- */
       if (cond->bt.trace) {
-        if (cond->bt.trace->inst->match_goal_level > level) {
+        if (cond->bt.trace->inst->match_goal_level > level) { 
           cond->bt.trace = find_clone_for_level (cond->bt.trace, level);
-		}
+		} 
         #ifdef DO_TOP_LEVEL_REF_CTS
 		if (cond->bt.trace) preference_add_ref (cond->bt.trace);
         #else
-		if ((cond->bt.trace) && (level > TOP_GOAL_LEVEL))
+		if ((cond->bt.trace) && (level > TOP_GOAL_LEVEL)) 
 			preference_add_ref (cond->bt.trace);
         #endif
       }
@@ -445,7 +445,7 @@ void fill_in_new_instantiation_stuff (agent* thisAgent, instantiation *inst,
   if ((thisAgent->o_support_calculation_type == 0) ||
 	  (thisAgent->o_support_calculation_type == 3) ||
 	  (thisAgent->o_support_calculation_type == 4))  {
-    /* --- do calc's the normal Soar 6 way --- */
+    /* --- do calc's the normal Soar 6 way --- */  
     if (need_to_do_support_calculations)
       calculate_support_for_instantiation_preferences (thisAgent, inst);
   } else if (thisAgent->o_support_calculation_type == 1) {
@@ -501,11 +501,11 @@ void fill_in_new_instantiation_stuff (agent* thisAgent, instantiation *inst,
    their instantiations are stored on the list newly_created_instantiations,
    linked via the "next" fields in the instantiation structure.  No
    preferences are actually asserted yet.
-
+   
    (2) Instantiations are retracted; their preferences are retracted.
 
    (3) Preferences (except o-rejects) from newly_created_instantiations
-   are asserted, and these instantiations are removed from the
+   are asserted, and these instantiations are removed from the 
    newly_created_instantiations list and moved over to the per-production
    lists of instantiations of that production.
 
@@ -616,7 +616,7 @@ void create_instantiation (agent* thisAgent, production *prod,
       if (get_printer_output_column(thisAgent)!=1) print (thisAgent, "\n");  /* AGR 617/634 */
       print (thisAgent, "Firing ");
       print_instantiation_with_wmes
-         (thisAgent, inst,
+         (thisAgent, inst, 
 		 (wme_trace_type)(thisAgent->sysparams[TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM]), 0);
    }
 
@@ -646,16 +646,16 @@ void create_instantiation (agent* thisAgent, production *prod,
    for (a=prod->action_list; a!=NIL; a=a->next) {
       pref = execute_action (thisAgent, a, tok, w);
 	  /* SoarTech changed from an IF stmt to a WHILE loop to support GlobalDeepCpy */
-      while (pref) {
+      while (pref) {   
          pref->inst = inst;
          insert_at_head_of_dll (inst->preferences_generated, pref,
                inst_next, inst_prev);
         if ((inst->prod->type == TEMPLATE_PRODUCTION_TYPE) && (pref->type == NUMERIC_INDIFFERENT_PREFERENCE_TYPE))
 			 pref->type = TEMPLATE_PREFERENCE_TYPE;
-        if (inst->prod->declared_support==DECLARED_O_SUPPORT)
+         if (inst->prod->declared_support==DECLARED_O_SUPPORT)
             pref->o_supported = TRUE;
          else if (inst->prod->declared_support==DECLARED_I_SUPPORT)
-         {
+         {  
             pref->o_supported = FALSE;
          }
          else {
@@ -682,18 +682,18 @@ void create_instantiation (agent* thisAgent, production *prod,
          }
 
          /* TEMPORARY HACK (Ideally this should be doable through
-            the external kernel interface but for now using a
+            the external kernel interface but for now using a 
             couple of global STL lists to get this information
             from the rhs function to this prefference adding code)
 
-            Getting the next pref from the set of possible prefs
+            Getting the next pref from the set of possible prefs 
             added by the deep copy rhs function */
            if ( glbDeepCopyWMEs != 0 ) {
             wme* tempwme = glbDeepCopyWMEs;
-            pref = make_preference(thisAgent,
-                                   a->preference_type,
-                                   tempwme->id,
-                                   tempwme->attr,
+            pref = make_preference(thisAgent, 
+                                   a->preference_type, 
+                                   tempwme->id, 
+                                   tempwme->attr, 
                                    tempwme->value, 0);
             glbDeepCopyWMEs = tempwme->next;
             deallocate_wme(thisAgent, tempwme);
@@ -732,12 +732,12 @@ void create_instantiation (agent* thisAgent, production *prod,
     /* MVP 6-8-94 */
    if (!thisAgent->system_halted) {
       /* --- invoke callback function --- */
-      soar_invoke_callbacks(thisAgent, thisAgent,
+      soar_invoke_callbacks(thisAgent, thisAgent, 
             FIRING_CALLBACK,
             (soar_call_data) inst);
 
    }
-
+ 
 
    /* JC ADDED: Need to tell gSKI that a production was fired */
    gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_FIRED, 1, thisAgent, static_cast<void*>(inst));
@@ -757,9 +757,9 @@ void deallocate_instantiation (agent* thisAgent, instantiation *inst) {
   list *c, *c_old;
   preference *pref;
   goal_stack_level level;
-
+  
   level = inst->match_goal_level;
-
+ 
 #ifdef DEBUG_INSTANTIATIONS
   if (inst->prod)
     print_with_symbols (thisAgent, "\nDeallocate instantiation of %y",inst->prod->name);
@@ -812,16 +812,16 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
   Bool trace_it;
 
   /* --- invoke callback function --- */
-  soar_invoke_callbacks(thisAgent, thisAgent,
+  soar_invoke_callbacks(thisAgent, thisAgent, 
 			RETRACTION_CALLBACK,
 			(soar_call_data) inst);
-
+   
   /* JC ADDED: tell gSKI that we've retracted a production instantiation */
   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_RETRACTED, 0, thisAgent, static_cast<void*>(inst));
 
 
   retracted_a_preference = FALSE;
-
+  
   trace_it = trace_firings_of_inst (thisAgent, inst);
 
 #ifdef SOAR_WMEM_ACTIVATION
@@ -839,7 +839,7 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
         if (!retracted_a_preference) {
 			if (get_printer_output_column(thisAgent)!=1) print (thisAgent, "\n");  /* AGR 617/634 */
 			print (thisAgent, "Retracting ");
-            print_instantiation_with_wmes (thisAgent, inst,
+            print_instantiation_with_wmes (thisAgent, inst, 
 				(wme_trace_type)thisAgent->sysparams[TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM],1);
 			if (thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM]) {
 				print (thisAgent, " -->");
@@ -871,7 +871,7 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
   if (inst->prod->type==JUSTIFICATION_PRODUCTION_TYPE &&
       inst->prod->reference_count > 1)
     excise_production (thisAgent, inst->prod, FALSE);
-
+  
   /* --- mark as no longer in MS, and possibly deallocate  --- */
   inst->in_ms = FALSE;
   possibly_deallocate_instantiation (thisAgent, inst);
@@ -892,15 +892,15 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
    and throw away the rest.
 ----------------------------------------------------------------------- */
 
-void assert_new_preferences (agent* thisAgent)
+void assert_new_preferences (agent* thisAgent) 
 {
    instantiation *inst, *next_inst;
    preference *pref, *next_pref;
    preference *o_rejects;
-
-   o_rejects = NIL;
-
-
+   
+   o_rejects = NIL;  
+   
+   
    /* REW: begin 09.15.96 */
    if ((thisAgent->operand2_mode == TRUE) &&
        (thisAgent->soar_verbose_flag == TRUE)) {
@@ -908,7 +908,7 @@ void assert_new_preferences (agent* thisAgent)
            GenerateVerboseXML(thisAgent, "in assert_new_preferences:");
        }
    /* REW: end   09.15.96 */
-
+   
 #ifdef O_REJECTS_FIRST
     {
 
@@ -942,17 +942,17 @@ void assert_new_preferences (agent* thisAgent)
         }
     }
 #endif
-
+   
    for (inst=thisAgent->newly_created_instantiations;
         inst!=NIL;
-        inst=next_inst)
+        inst=next_inst) 
    {
       next_inst = inst->next;
       if (inst->in_ms)
          insert_at_head_of_dll (inst->prod->instantiations, inst, next, prev);
-
+      
       /* REW: begin 09.15.96 */
-      if (thisAgent->operand2_mode == TRUE)
+      if (thisAgent->operand2_mode == TRUE) 
       {
           if (thisAgent->soar_verbose_flag == TRUE) {
             print_with_symbols(thisAgent, "\n      asserting instantiation: %y\n",
@@ -963,50 +963,50 @@ void assert_new_preferences (agent* thisAgent)
           }
       }
       /* REW: end   09.15.96 */
-
-      for (pref=inst->preferences_generated; pref!=NIL; pref=next_pref)
+      
+      for (pref=inst->preferences_generated; pref!=NIL; pref=next_pref) 
       {
          next_pref = pref->inst_next;
-         if ((pref->type==REJECT_PREFERENCE_TYPE) && (pref->o_supported))
+         if ((pref->type==REJECT_PREFERENCE_TYPE) && (pref->o_supported)) 
          {
 #ifndef O_REJECTS_FIRST
             /* --- o-reject: just put it in the buffer for later --- */
             pref->next = o_rejects;
             o_rejects = pref;
-#endif
-
+#endif            
+            
             /* REW: begin 09.15.96 */
             /* No knowledge retrieval necessary in Operand2 */
             /* REW: end   09.15.96 */
-
-         }
-         else if (inst->in_ms || pref->o_supported)
+            
+         } 
+         else if (inst->in_ms || pref->o_supported) 
          {
             /* --- normal case --- */
             add_preference_to_tm (thisAgent, pref);
-
-
+            
+            
             /* REW: begin 09.15.96 */
             /* No knowledge retrieval necessary in Operand2 */
             /* REW: end   09.15.96 */
-
-
-         }
-         else
+            
+            
+         } 
+         else 
          {
          /* --- inst. is refracted chunk, and pref. is not o-supported:
             remove the preference --- */
-
+            
             /* --- first splice it out of the clones list--otherwise we might
             accidentally deallocate some clone that happens to have refcount==0
             just because it hasn't been asserted yet --- */
-
-            if (pref->next_clone)
+            
+            if (pref->next_clone) 
                pref->next_clone->prev_clone = pref->prev_clone;
-            if (pref->prev_clone)
+            if (pref->prev_clone) 
                pref->prev_clone->next_clone = pref->next_clone;
             pref->next_clone = pref->prev_clone = NIL;
-
+            
             /* --- now add then remove ref--this should result in deallocation */
             preference_add_ref (pref);
             preference_remove_ref (thisAgent, pref);
@@ -1015,12 +1015,12 @@ void assert_new_preferences (agent* thisAgent)
 #ifdef SOAR_WMEM_ACTIVATION
          activate_wmes_in_pref(thisAgent, pref);
 #endif  //SOAR_WMEM_ACTIVATION
-
+         
       }
    }
-
+   
 #ifndef O_REJECTS_FIRST
-   if (o_rejects)
+   if (o_rejects) 
       process_o_rejects_and_deallocate_them (thisAgent, o_rejects);
 #endif
 }
@@ -1082,7 +1082,7 @@ void do_preference_phase (agent* thisAgent) {
     if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM])
     {
         decay_update_wmes_tested_in_prods(thisAgent);
-    }
+    } 
 #endif //SOAR_WMEM_ACTIVATION
 
   thisAgent->newly_created_instantiations = NIL;
@@ -1103,14 +1103,14 @@ void do_preference_phase (agent* thisAgent) {
 
 /* REW: begin 08.20.97 */
 
-  /*  In Waterfall, if there are nil goal retractions, then we want to
+  /*  In Waterfall, if there are nil goal retractions, then we want to 
       retract them as well, even though they are not associated with any
-      particular goal (because their goal has been deleted). The
-      functionality of this separate routine could have been easily
-      combined in get_next_retraction but I wanted to highlight the
-      distinction between regualr retractions (those that can be
+      particular goal (because their goal has been deleted). The 
+      functionality of this separate routine could have been easily 
+      combined in get_next_retraction but I wanted to highlight the 
+      distinction between regualr retractions (those that can be 
       mapped onto a goal) and nil goal retractions that require a
-      special data strucutre (because they don't appear on any goal)
+      special data strucutre (because they don't appear on any goal) 
       REW.  */
 
   if (thisAgent->operand2_mode && thisAgent->nil_goal_retractions) {

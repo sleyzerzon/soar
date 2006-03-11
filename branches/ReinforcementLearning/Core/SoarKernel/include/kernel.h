@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION.
+ * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
 /* kernel.h */
@@ -17,7 +17,7 @@ extern "C"
 {
 #endif
 
-/* When the Soar Kernel was moved to a C++ compiler, the
+/* When the Soar Kernel was moved to a C++ compiler, the 
  * C precompiler macros were converted to inline functions
  * The macros still work, but can make it confusing to step
  * through a debugger during code execution.  However it's
@@ -121,9 +121,9 @@ typedef union symbol_union Symbol;
    have DETAILED_TIMING_STATS defined, you must NOT define NO_TIMING_STUFF */
 /* #define DETAILED_TIMING_STATS */
 
-/* UNcomment the following line to have Soar maintain reference counts
+/* UNcomment the following line to have Soar maintain reference counts 
    on wmes and prefs at the top level.  This can result in larger
-   memory growth due to top-level objects that never get deallocated
+   memory growth due to top-level objects that never get deallocated 
    because the ref counts never drop to 0.  The default for Soar v6 - v8.6.1
    was to maintain the ref cts.  It's possible that in your particular
    application, weird things could happen if you don't do these ref cts,
@@ -148,6 +148,8 @@ typedef union symbol_union Symbol;
 /* UnComment the following line to enable numeric indifference preferences */
 #define NUMERIC_INDIFFERENCE
 
+#ifdef NUMERIC_INDIFFERENCE
+
 /* UnComment the following line to enable reinforcement learning */
 
 #define REINFORCEMENT_LEARNING
@@ -157,6 +159,7 @@ enum ni_mode {
     NUMERIC_INDIFFERENT_MODE_AVG,
     NUMERIC_INDIFFERENT_MODE_SUM,
 };
+#endif 
 
 /* Possible exploration policies. */
 
@@ -173,12 +176,12 @@ enum exp_mode {
 /* Comment the following line to disable workaround for bug 139 */
 #define BUG_139_WORKAROUND
 
-/* UnComment the following to print a warning whenever we
+/* UnComment the following to print a warning whenever we 
    are ignoring a situation when there's no instance to retract for a justification */
 /*#define BUG_139_WORKAROUND_WARNING*/
 
-/* UnComment the following to enable Soar to deal with certain productions in a more
-   intuitive manner.  In particular, productions that modify a wme value by reject
+/* UnComment the following to enable Soar to deal with certain productions in a more 
+   intuitive manner.  In particular, productions that modify a wme value by reject 
    its current value and asserting its new value need to ensure that the current and
    new values differ.  This option may add a small run time cost, since two loops are made
    through the preferences list. */
@@ -186,19 +189,19 @@ enum exp_mode {
 
 /**
  *  \def AGRESSIVE_ONC
- *
+ * 
  *       Setting this option enables Soar to generate operator no changes
  *       without requring a dedicated decision cycle.  This occurs when
  *       Soar recognizes that no productions will fire the the PE phase.
- *       This is the standard behavior in Soar 8.3.5 and Soar 8.4.5, but
+ *       This is the standard behavior in Soar 8.3.5 and Soar 8.4.5, but 
  *       is no longer standard as of Soar 8.5
  */
 //#define AGRESSIVE_ONC
 
 
 // #define SOAR_WMEM_ACTIVATION    // compile switch
-
-
+    
+    
 /* --------------------------- */
 /* Current Soar version number */
 /* --------------------------- */
