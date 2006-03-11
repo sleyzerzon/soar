@@ -18,7 +18,7 @@
 //     must not intersect with any of the values in smlRunEventId (e.g.)
 //     This is generally achieved by making the first value of one enum
 //     equal the last value of the previous enum + 1.
-//     (e.g. smlEVENT_BEFORE_SMALLEST_STEP = smlEVENT_AFTER_RHS_FUNCTION_EXECUTED + 1)
+//     (e.g. smlEVENT_BEFORE_SMALLEST_STEP = smlEVENT_LAST_SYSTEM_EVENT + 1)
 //
 // Second, if you change the list of events in an enum, make sure that the
 //    related test function (e.g. IsSystemEventID()) is still valid.
@@ -60,11 +60,12 @@ class ClientXML ;
 
 typedef enum {
     smlEVENT_BEFORE_SHUTDOWN            = 1,
+	smlEVENT_AFTER_CONNECTION,
     smlEVENT_AFTER_CONNECTION_LOST,
     smlEVENT_BEFORE_RESTART,
     smlEVENT_AFTER_RESTART,
-	smlEVENT_SYSTEM_START,						// The simulation (if any) should start running
-	smlEVENT_SYSTEM_STOP,						// The simulation (if any) should stop running
+	smlEVENT_SYSTEM_START,
+	smlEVENT_SYSTEM_STOP,
 	smlEVENT_INTERRUPT_CHECK,					// Chance for client to interrupt a run (designed to be low bandwidth)
 	smlEVENT_SYSTEM_PROPERTY_CHANGED,			// A sysparam or other value has been changed 
     smlEVENT_BEFORE_RHS_FUNCTION_ADDED,
@@ -266,12 +267,28 @@ typedef enum
 
 typedef enum
 {
+	sml_INTERLEAVE_ELABORATION,
+	sml_INTERLEAVE_PHASE,
+	sml_INTERLEAVE_DECISION,
+	sml_INTERLEAVE_UNTIL_OUTPUT,
+} smlInterleaveStepSize ;
+
+typedef enum
+{
 	sml_NONE				=  0,		// No special flags set
 	sml_RUN_SELF			=  1 << 0,	// User included --self flag when running agent
 	sml_RUN_ALL				=  1 << 1,	// User ran all agents
 	sml_UPDATE_WORLD		=  1 << 2,	// User explicitly requested world to update
 	sml_DONT_UPDATE_WORLD	=  1 << 3,	// User explicitly requested world to not update
 } smlRunFlags ;
+
+typedef enum {
+    sml_RUN_ERROR,
+    sml_RUN_EXECUTING,
+    sml_RUN_INTERRUPTED,
+    sml_RUN_COMPLETED,
+    sml_RUN_COMPLETED_AND_INTERRUPTED	// Stop was requested but run completed before agent was interrupted.
+} smlRunResult;
 
 // These typedefs all define types of functions.
 // For example: typedef void (*X)(type1 arg1, type2 arg2) means we're defining function "X" to take (type1 arg1, type2 arg2) and return void.
@@ -308,7 +325,7 @@ typedef void (*OutputNotificationHandler)(void* pUserData, Agent* pAgent) ;
 typedef void (*UpdateEventHandler)(smlUpdateEventId id, void* pUserData, Kernel* pKernel, smlRunFlags runFlags) ;
 
 // Handler for string based events.
-typedef void (*StringEventHandler)(smlStringEventId id, void* pUserData, Kernel* pKernel, char const* pData) ;
+typedef void (*StringEventHandler)(smlStringEventId id, void* pUserData, Kernel* pKernel, char const* pString) ;
 
 // Handler for XML events.  The data for the event is passed back in pXML.
 // NOTE: To keep a copy of the ClientXML* you are passed use ClientXML* pMyXML = new ClientXML(pXML) to create
@@ -342,6 +359,14 @@ public:
 	int				m_CallbackID ;	// A unique identifier for this callback (used to unregister)
 
 public:
+	
+	EventHandlerPlusData()
+	{
+		m_EventID = 0;
+		m_UserData = 0;
+		m_CallbackID = 0;
+	}
+
 	EventHandlerPlusData(int eventID, void* pData, int callbackID)
 	{
 		m_EventID    = eventID ;
