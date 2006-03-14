@@ -149,9 +149,14 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->association_rule_counter			=0; // YJ's rule counter, old for rec_link
   newAgent->semantic_memory = new SemanticMemory();
   newAgent->retrieve_ready = true;
+  newAgent->cluster_ready = true;
   newAgent->to_be_saved_wmes = new set<LME>;
   newAgent->prohibited_ids = new set<string>;
   newAgent->gold_level_to_smem_links = new vector<vector<wme*> >();
+
+  // 100 Units, 300 max dimensions
+  newAgent->clusterNet = new NetWork(100,300);
+
   //End YJ
 #endif SEMANTIC_MEMORY
 
@@ -420,6 +425,8 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   //YJ's stuff
  // delete_agent->semantic_memory->clear();
   delete delete_agent->semantic_memory;
+  delete delete_agent->clusterNet;
+
   delete delete_agent->to_be_saved_wmes;
   delete delete_agent->prohibited_ids;
   delete delete_agent->gold_level_to_smem_links;

@@ -35,6 +35,7 @@
 //#ifdef SEMANTIC_MEMORY
 // For header, better always include, gSKI need this compile argument too
 #include "semantic_memory.h"
+#include "Cluster.h"
 //#endif SEMANTIC_MEMORY
 /* JC ADDED: Included to allow gski callbacks */
 #include "gski_event_system_data.h"
@@ -149,12 +150,15 @@ typedef struct agent_struct {
 	
 	//Semantic Memory
 	SemanticMemory* semantic_memory;
+	NetWork* clusterNet;
 	bool retrieve_ready;
+	bool cluster_ready;
 	// For automatically save wmes - all new wmes in every cycle
 	set<LME>* to_be_saved_wmes;
 	set<string>* prohibited_ids;
 	vector<vector<wme*> >* gold_level_to_smem_links;
 	
+
 	unsigned long association_rule_counter;
 	// YJ's stuff
 	//#endif SEMANTIC_MEMORY

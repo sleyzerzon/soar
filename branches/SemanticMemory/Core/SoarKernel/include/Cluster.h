@@ -61,7 +61,7 @@ public:
 	int train_input_one_cycle(vector<double>& input, vector<double>& new_input, vector<int> inhibit=vector<int>(), bool update=true);
 	
 	vector<int> cluster_input(vector<double> input, bool update=true);
-
+	vector<int> cluster_input(vector<pair<string, string> >& attr_val_pairs, bool update=true);
 	//void Cluster(vector<pair<string, string>& attr_val_pairs);
 	
 };

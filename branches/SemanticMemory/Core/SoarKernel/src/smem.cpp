@@ -62,7 +62,18 @@ Symbol* find_retrieve_link_id(agent* thisAgent){
 	return NIL;
 }
 
-
+Symbol* find_cluster_link_id(agent* thisAgent){
+	Symbol* smem_link_id = find_smem_link_id(thisAgent);
+	if(smem_link_id == NIL){
+		return NIL;
+	}
+	for(wme* w = smem_link_id->id.input_wmes; w != NIL; w=w->next){
+		if(strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "cluster") == 0){
+			return w->value;
+		}
+	}
+	return NIL;
+}
 
 int StringToInt(string str){
 	int n = 0;
@@ -71,6 +82,14 @@ int StringToInt(string str){
 		 str2int >> n;
 	}
 	return n;
+}
+
+string IntToString(int x){
+	ostringstream int2str;
+	if (int2str.good()) {
+		 int2str << x;
+	}
+	return int2str.str();
 }
 
 long StringToLong(string str){
@@ -610,15 +629,19 @@ void append_smem_links(agent* thisAgent){
 	Symbol* smem_id = make_new_identifier(thisAgent, 'M', goal_level); // get_new_io_identifier assumes TOP_GOAL_LEVEL !
 	Symbol* save_id = make_new_identifier(thisAgent, 'E', goal_level);
 	Symbol* retrieve_id = make_new_identifier(thisAgent, 'R', goal_level);
+	Symbol* cluster_id = make_new_identifier(thisAgent, 'C', goal_level);
 
 	wme* smem_wme = add_input_wme(thisAgent, goal_id, make_sym_constant(thisAgent, "smem"), smem_id);	 
 	wme* retrieve_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "retrieve"), retrieve_id);		
 	wme* save_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "save"), save_id);
+	wme* cluster_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "cluster"), cluster_id);
+
 	vector<wme*> wmes;
 	
 	wmes.push_back(retrieve_wme);
 	wmes.push_back(save_wme);
 	wmes.push_back(smem_wme);
+	wmes.push_back(cluster_wme);
 	thisAgent->gold_level_to_smem_links->push_back(wmes);
 
 	//thisAgent->gold_to_smem_links
@@ -681,12 +704,15 @@ void smem_routine(agent* thisAgent){
 		save_wmes_12_21(thisAgent);
 		//retrieve(thisAgent);
 		retrieve_1_20(thisAgent);
+		cluster(thisAgent);
 	}
-	else if(thisAgent->sysparams[SMEM_SYSPARAM] == 0){
+	else if(thisAgent->sysparams[SMEM_SYSPARAM] == 0){// deliberate saving
 		print(thisAgent, "\nSMEM Disabled (%d)\n",thisAgent->sysparams[SMEM_SYSPARAM]);
-		save_wmes_old(thisAgent);
+		//save_wmes_old(thisAgent);
+		save_wmes_deliberate_merge_identical(thisAgent);
 		//retrieve(thisAgent); // should still return failure anyway
 		retrieve_1_20(thisAgent);
+		cluster(thisAgent);
 	}
 	//print(thisAgent, "\nCurrent cycle %d\n", thisAgent->d_cycle_count);
 	//thisAgent->semantic_memory.dump(std::cout);
@@ -930,6 +956,126 @@ void retrieve_1_20(agent* thisAgent){
 							print(thisAgent, "Retrieval Failure\n");
 					}*/
 
+					break; // only consider the first cue, even if there are mulitple cues.
+				}	
+			}
+		}
+	}
+
+
+	if(!find_cue){//no cue structure, ready for new retrieval
+		thisAgent->retrieve_ready = true;
+		// Should automatically clear 'retrieved' link if it exists.
+		for(wme* w=retrieve_link_id->id.input_wmes; w != NIL; w=w->next){ // clear retrieved result, which are input_wmes
+			// 'cue' is regular wme.., 'save' should be regular too.
+			// Only input_wme under smem link is retrieve link, only input_wme under 'retrieve' link is 'retrieved' link
+			// S1 ^smem M1
+			//		M1 ^retrieve R1
+			//			R1 ^cue ?? ^retrieved ??
+			// Better still check the attribute
+			if(strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "retrieved") == 0){
+				remove_input_wme(thisAgent, w); 
+				// Just need to remove the link (retrieved).
+				// substructures should be automatically taken care of.
+			}
+		}
+	}
+
+}
+
+
+// This version of retrieval intends to summarize the target attribute, and return the meta-information about the 
+//  retrieved value.
+// Currently, seems 2 things are useful: 
+// a. The percentage of the retrieved value (with the highest percentage of course): for categorical attribute. 
+// For example, 80% percent of such mushrooms are edible (20% percent are other types, here only poisonous, for example)
+//		For numerical ones, the average/mean might be wanted. But in some situations, average is not informative,
+//		such as a distribution with multiple peaks.
+// b. The experience with the query: how many times such chunks have been seen
+//		This reflects the confidence about the retrieval.
+//		For example, this type of muchroom have been observed 100 times, so it's pretty confident. If only 1 instances 
+//		have been observed, it might not generalize well
+// At different specificity level, the decision based on confidence should be different.
+// For example, at the first level, the edibility might not generalize as well as for the second level given the same number of observations
+// 
+// It's hard to define, in general, what are the types of meta-info required.
+
+void retrieve_3_13(agent* thisAgent){
+	slot *retrieve_s;
+	Symbol* retrieve_link_id = find_retrieve_link_id(thisAgent);
+	wme *retrieve_w;
+	Symbol* cue_id = NIL;
+
+	bool find_cue = false;
+	for (retrieve_s = retrieve_link_id->id.slots; retrieve_s != NIL; retrieve_s = retrieve_s->next) {
+		// The slots can potentially have any structure
+		for (retrieve_w = retrieve_s->wmes; retrieve_w != NIL; retrieve_w = retrieve_w->next){ 
+
+			if(strcmp(symbol_constant_to_string(thisAgent, retrieve_w->attr).c_str(), "cue") == 0){
+				find_cue = true;
+				// Do retrieve only if ready mark is set on
+				if(!thisAgent->retrieve_ready){
+					print(thisAgent, "Retrieve is not ready\n");
+					break;
+				}
+				// Set ready mark off after the retrieval
+				else if(retrieve_w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){ // cue must be an identifier, as the chunk name. Constant cue is not an option
+					thisAgent->retrieve_ready = false;
+					
+					cue_id = retrieve_w->value;
+					slot *s;
+					wme *w;
+					string picked_id = "";
+					Symbol* picked_id_sym = NIL;
+					set<CueTriplet> cue_set;
+					for (s = cue_id->id.slots; s != NIL; s = s->next){ // collect the cue WMEs
+						for(w = s->wmes; w != NIL; w = w->next){
+							string id = symbol_constant_to_string(thisAgent, w->id); // ID must be SYM_CONSTANT_SYMBOL_TYPE
+							string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
+							string value = symbol_constant_to_string(thisAgent, w->value);
+							int value_type = w->value->common.symbol_type;
+							cue_set.insert(CueTriplet(id, attr, value, value_type));
+							if(YJ_debug)
+								print(thisAgent, "\nCue WME<%s, %s,%s, %d>\n", id.c_str(), attr.c_str(), value.c_str(),value_type);
+						}
+					}
+
+					// The following is the retrieval code given the cue collected
+					
+					set<CueTriplet> result = thisAgent->semantic_memory->match_retrieve_single_level_2006_1_22(cue_set, picked_id);
+					// this may duplicate what is already in working memory
+					// If it's already in WM, just return that pointer and put the extra attributes there
+					// By current code, the existing wme is removed!
+					picked_id_sym = make_identifier_from_str(thisAgent, picked_id);
+
+					wme* retrieved_wme = add_input_wme_with_history(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "retrieved"), picked_id_sym);
+					for(set<CueTriplet>::const_iterator itr = result.begin(); itr != result.end(); ++itr){
+						string id = itr->id; // this id must == picked_id
+						string attr = itr->attr;
+						string value = itr->value;
+						int value_type = itr->value_type;
+						CueTriplet current_wme = CueTriplet(id, attr, value, value_type);
+						Symbol* attr_sym = make_sym_constant(thisAgent, (char*)attr.c_str());
+						Symbol* value_sym = NIL; 
+						if(value_type == IDENTIFIER_SYMBOL_TYPE){
+							value_sym = make_identifier_from_str(thisAgent, value);
+						}
+						else{
+							if(value_type == SYM_CONSTANT_SYMBOL_TYPE){
+								value = StringToSym(value);
+								value_sym = make_sym_constant(thisAgent, (char*)value.c_str()); 
+							}
+							else if(value_type == INT_CONSTANT_SYMBOL_TYPE){
+								value_sym = make_int_constant(thisAgent, StringToLong(value)); 
+							}
+							else if(value_type == FLOAT_CONSTANT_SYMBOL_TYPE){
+								value_sym = make_float_constant(thisAgent, StringToFloat(value)); 
+							}
+						}
+						if(YJ_debug)
+							print(thisAgent, "\nAdding <%s(%s), %s,%s, %d> as input_wme\n", picked_id.c_str(),id.c_str(), attr.c_str(), value.c_str(), value_type);
+						add_input_wme_with_history(thisAgent, picked_id_sym, attr_sym, value_sym);
+					}
 					break; // only consider the first cue, even if there are mulitple cues.
 				}	
 			}
@@ -1247,7 +1393,8 @@ void retrieve(agent* thisAgent){
 // id_str is assumed to have the format [A-Z][0-9]+, as it's saved from WMEs
 Symbol *make_identifier_from_str (agent* thisAgent, string id_str, goal_stack_level level) {
   Symbol *sym;
-
+  
+  level = thisAgent->bottom_goal->id.level;
 //  if (isalpha(name_letter)) {
 //	  if (islower(name_letter)) name_letter = toupper(name_letter);
 //  } else {
@@ -1377,6 +1524,7 @@ void save_wmes(agent* thisAgent){
 	}
 }
 
+// Just deliberately save one level
 void save_wmes_old(agent* thisAgent){
 
 	set<std::string> saved_ids;
@@ -1401,8 +1549,37 @@ void save_wmes_old(agent* thisAgent){
 			cout << "Not long term values" << endl;
 		}
 	}
+
 }
 
+void save_wmes_deliberate_merge_identical(agent* thisAgent){
+	
+	set<LME> final_lmes;
+	set<std::string> saved_ids;
+	set<LME> saved_wmes;
+	find_save_ids(thisAgent, saved_ids); // figure out the new ids to be saved
+	//cout << "To be saved ids " << saved_ids << endl;
+	find_save_wmes(thisAgent, saved_wmes); // figure out the wmes whose identifier is being pointed by save link.
+	//find_save_wmes_all(thisAgent, saved_wmes);
+
+	// Then find out from entire WM that which wmes need to be saved
+	// save_wmes + newly added wmes whose  value is either constant or saved_identifiers (in long-term memory or among saved ids for this cycle)
+	// newly added, or just consider all WMEs ?
+	
+	for(set<LME>::iterator itr = saved_wmes.begin(); itr != saved_wmes.end(); ++itr){
+		cout << *itr << endl;
+		if(long_term_value(thisAgent, saved_ids, itr->id, IDENTIFIER_SYMBOL_TYPE) && 
+			long_term_value(thisAgent, saved_ids, itr->value, itr->value_type)){
+
+				//thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
+				final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
+			}
+		else{
+			cout << "Not long term values" << endl;
+		}
+	}
+	thisAgent->semantic_memory->merge_LMEs(final_lmes, thisAgent->d_cycle_count);
+}
 
 
 void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
@@ -1495,6 +1672,110 @@ void find_save_ids(agent* thisAgent, set<std::string>& id_set){
 				id_set.insert(value);
 			}
 		}
+	}
+}
+
+// The input shoul be: state <s> ^smem.cluster.input
+// It only check one level, so make sure the structure is flattened appropriately
+// The output shoul be: state <s> ^smem.cluster.output
+void cluster(agent* thisAgent){
+	Symbol* cluster_link_id = find_cluster_link_id(thisAgent);
+	vector<pair<string, string> > input_attr_val_pairs;
+	vector<pair<string, string> > training_attr_val_pairs;
+	wme* cluster_training_link = NIL;
+	
+	// 1. Cluster Train Link: Training doesn't need to wait for output, so the training link is automatically cleared after taking each instance
+	// 2. Cluster Input Link: While for input, it needs to wait to see the output, and output won't be touched unless cluster_input_link is cleared by rule
+	for (slot* cluster_s = cluster_link_id->id.slots; cluster_s != NIL; cluster_s = cluster_s->next) {
+		if(strcmp(symbol_constant_to_string(thisAgent, cluster_s->attr).c_str(), "train") == 0){
+			for(wme* cluster_w = cluster_s->wmes; cluster_w != NIL; cluster_w = cluster_w->next){
+				cluster_training_link = cluster_w;
+				string id = symbol_constant_to_string(thisAgent, cluster_w->id);
+				string attr = symbol_constant_to_string(thisAgent, cluster_w->attr);
+				string value = symbol_constant_to_string(thisAgent, cluster_w->value);
+				int value_type = cluster_w->value->common.symbol_type;
+				// All values are treated as strings
+				// Assume sensory inputs are binary detector for symbolic values
+				// This is more realistic at neuron level, where firing/non-firing is just binary
+				training_attr_val_pairs.push_back(pair<string, string>(attr, value));
+			}
+			break;
+		}		
+	}
+
+	
+	bool find_input = false;
+	for (slot* cluster_s = cluster_link_id->id.slots; cluster_s != NIL; cluster_s = cluster_s->next) {
+		if(strcmp(symbol_constant_to_string(thisAgent, cluster_s->attr).c_str(), "input") == 0){
+			for(wme* cluster_w = cluster_s->wmes; cluster_w != NIL; cluster_w = cluster_w->next){
+				find_input = true;
+				string id = symbol_constant_to_string(thisAgent, cluster_w->id);
+				string attr = symbol_constant_to_string(thisAgent, cluster_w->attr);
+				string value = symbol_constant_to_string(thisAgent, cluster_w->value);
+				int value_type = cluster_w->value->common.symbol_type;
+				// All values are treated as strings
+				// Assume sensory inputs are binary detector for symbolic values
+				// This is more realistic at neuron level, where firing/non-firing is just binary
+				input_attr_val_pairs.push_back(pair<string, string>(attr, value));
+			}
+			break;
+		}		
+	}
+	
+
+	if(!find_input){
+		thisAgent->cluster_ready = true;
+		// clear all output: should just be one real output
+		for(wme* cluster_w = cluster_link_id->id.input_wmes; cluster_w != NIL; cluster_w = cluster_w->next){
+		if(strcmp(symbol_constant_to_string(thisAgent, cluster_w->attr).c_str(), "output") == 0){
+				remove_input_wme(thisAgent, cluster_w);
+			}
+		}
+	}
+	// cluster_ready && find_input must take another cycle
+	// If cluster_read is ture, which means old input has been cleared in some cycle before current input is placed, 
+	// then take the current input and generate new output
+	if(thisAgent->cluster_ready && !input_attr_val_pairs.empty()){ // If there is input, performe the clustering
+		// generate outpu and set ready state to false
+		// Won't be ready unless input is cleared
+		thisAgent->cluster_ready = false;
+		// First remove previous outputs
+		
+		vector<int> winners = thisAgent->clusterNet->cluster_input(input_attr_val_pairs, false);
+		goal_stack_level goal_level = thisAgent->bottom_goal->id.level;
+		Symbol* output_id = make_new_identifier(thisAgent, 'C', goal_level);
+		add_input_wme_with_history(thisAgent, cluster_link_id , make_sym_constant(thisAgent,"output"), output_id);
+		
+		for(int i=0; i< winners.size(); ++i){
+			
+			string attr = string("level")+IntToString((i+1));
+			string value = string("C")+IntToString(winners[i]);
+			add_input_wme_with_history(thisAgent, output_id , make_sym_constant(thisAgent,(char*)attr.c_str()), make_sym_constant(thisAgent,(char*)value.c_str()));
+			print(thisAgent, "%s, %s\n", attr.c_str(), value.c_str());
+		}
+		print(thisAgent, "Recognizing input\n");
+	}
+	
+	bool trained = false;
+	//for(wme* cluster_w = cluster_link_id->id.input_wmes; cluster_w != NIL; cluster_w = cluster_w->next){
+	//	if(strcmp(symbol_constant_to_string(thisAgent, cluster_w->attr).c_str(), "train-status") == 0){
+	//		trained = true; // Don't look at the value. Should remove this flag to train new instance.
+	//	}
+	//}
+	// Don't generate any flag
+	// Rules are responsible to flag cluster input and remove the cluster input link on next cycle.
+	// If a input is there for 3 cycles, it'll be trained for 3 times
+	if(cluster_training_link != NIL){
+		if(!trained && !training_attr_val_pairs.empty()){ // Train it
+			// Actually don't care about winners, just training
+			vector<int> winners = thisAgent->clusterNet->cluster_input(input_attr_val_pairs, true);
+		//	add_input_wme_with_history(thisAgent, cluster_link_id , make_sym_constant(thisAgent,"train-status"), make_sym_constant(thisAgent,"trained"));
+			print(thisAgent, "Training\n");
+		}
+		// How to automatically clear training link, so that it is just trained once ?
+		// Input is automatically cleared
+		// Only leave output there
+		//remove_input_wme(thisAgent, cluster_input_link); // cluster_input_link is not input_wme, it's added by rules
 	}
 }
 #endif SEMANTIC_MEMORY

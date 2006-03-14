@@ -203,7 +203,10 @@ vector<int> NetWork::cluster_input(vector<double> input, bool update){
 	}
 	return winners;
 }
-
+vector<int> NetWork::cluster_input(vector<pair<string, string> >& attr_val_pairs, bool update){
+	vector<double> input = this->translate_input(attr_val_pairs);
+	return this->cluster_input(input, update);
+}
 
 int NetWork::winner(vector<double> input, vector<int> inhibit){
 	
