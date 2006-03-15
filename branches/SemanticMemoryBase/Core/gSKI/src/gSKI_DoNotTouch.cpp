@@ -2440,5 +2440,115 @@ namespace gSKI
 			}
 			SoarSeedRNG();
 		}
+		// used by Semantic Memory loadMemory commandline
+		// SEMANTIC_MEMORY
+		void TgDWorkArounds::load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type){
+			
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			
+			char id_letter = id[0];
+			unsigned long id_number = StringToUnsignedLong(id.substr(1));
+			//AddListenerAndDisableCallbacks(pAgent);
+			//print(thisAgent, "%c counter %d, number%d\n", id_letter, 
+			//	 thisAgent->id_counter[id_letter-'A'], id_number);
+			//RemoveListenerAndEnableCallbacks(pAgent);
+
+			if(id_number >= thisAgent->id_counter[id_letter-'A']){
+				thisAgent->id_counter[id_letter-'A'] = id_number+1;//start from the next number
+				//AddListenerAndDisableCallbacks(pAgent);
+				//print(thisAgent, "%c counter %d\n", id_letter, id_number);
+				//RemoveListenerAndEnableCallbacks(pAgent);
+
+			}
+
+			// get rid of leading zeros of the id number, kind of preprocessing
+			char new_id[32];
+			sprintf(new_id, "%c%d", id_letter, id_number);
+			id = string(new_id);
+			thisAgent->semantic_memory->insert_LME(id, attr, value, type);
+		}
+
+		void TgDWorkArounds::print_semantic_memory(IAgent* pIAgent){
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			//thisAgent->semantic_memory->insert_LME(id, attr, value, type);
+
+			vector<LME*> content;
+			thisAgent->semantic_memory->dump(content);
+			for(vector<LME*>::iterator itr = content.begin(); itr != content.end(); ++itr){
+				
+				//mResult << std::endl;
+				//AddListenerAndDisableCallbacks(pIAgent);
+				//print(thisAgent, "<%s, %s, %s, %d>\n",(*itr)->id.c_str(), (*itr)->attr.c_str(), (*itr)->value.c_str(), (*itr)->value_type);
+				//RemoveListenerAndEnableCallbacks(pIAgent);
+			}
+
+			HASH_S_HASH_S_HASH_S_LP id_attr_hash = thisAgent->semantic_memory->get_id_attr_hash();
+			for(HASH_S_HASH_S_HASH_S_LP::iterator itr = id_attr_hash.begin(); itr != id_attr_hash.end(); ++itr){
+				string id = itr->first;
+				print(thisAgent, "\n");
+				HASH_S_HASH_S_LP attr_hash = itr->second;
+				for(HASH_S_HASH_S_LP::iterator itr2 = attr_hash.begin(); itr2 != attr_hash.end(); ++itr2){
+					string attr = itr2->first;
+					HASH_S_LP value_hash = itr2->second;
+					for(HASH_S_LP::iterator itr3 = value_hash.begin(); itr3 != value_hash.end(); ++itr3){
+						string value = itr3->first;
+						int lme_index = itr3->second;
+						LME * lme_ptr = thisAgent->semantic_memory->getLME_ptr(lme_index);
+						
+
+						print(thisAgent, "<%s, %s, %s> ",id.c_str(), attr.c_str(), value.c_str());
+						print(thisAgent, "[");
+						for(int i=0; i<lme_ptr->boost_history.size(); ++i){
+							print(thisAgent, "%d, ",lme_ptr->boost_history[i]);
+						}
+						print(thisAgent, "]\n");
+					}
+				}
+				
+			}
+
+		}
+		int TgDWorkArounds::clear_semantic_memory(IAgent* pIAgent){
+
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			//thisAgent->semantic_memory->insert_LME(id, attr, value, type);
+			print(thisAgent, "Clearing smematic memory\n");
+			int size = thisAgent->semantic_memory->clear();
+			//AddListenerAndDisableCallbacks(pAgent);
+			print(thisAgent, "%d LMEs cleared\n",size);
+			//RemoveListenerAndEnableCallbacks(pAgent);
+			return size;
+		}
+		int TgDWorkArounds::semantic_memory_chunk_count(IAgent* pIAgent){
+
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			return thisAgent->semantic_memory->get_chunk_count();
+		}
+
+		int TgDWorkArounds::semantic_memory_lme_count(IAgent* pIAgent){
+
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			return thisAgent->semantic_memory->get_lme_count();
+		}
+
+		int TgDWorkArounds::semantic_memory_set_parameter(IAgent* pIAgent, long parameter){
+
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			if(parameter == 2){ // display
+				
+			}
+			else if(parameter == 0 || parameter == 1){
+				thisAgent->sysparams[SMEM_SYSPARAM] = parameter;
+			}
+			return thisAgent->sysparams[SMEM_SYSPARAM];	
+		}
+		
+		// SEMANTIC_MEMORY
 	}// class
 }// namespace

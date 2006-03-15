@@ -76,3 +76,10 @@ char const* Commands::kCLIWaitSNC					= "waitsnc";
 char const* Commands::kCLIWarnings					= "warnings";
 char const* Commands::kCLIWatch						= "watch";
 char const* Commands::kCLIWatchWMEs					= "watch-wmes";
+#ifdef SEMANTIC_MEMORY
+char const* Commands::kCLILoadMemory				= "load-memory"; // YJ
+char const* Commands::kCLIPrintMemory				= "print-memory"; // YJ
+char const* Commands::kCLIClearMemory				= "clear-memory"; // YJ
+char const* Commands::kCLISummarizeMemory			= "summarize-memory"; // YJ
+char const* Commands::kCLISmemOption				= "smem-option"; // YJ
+#endif

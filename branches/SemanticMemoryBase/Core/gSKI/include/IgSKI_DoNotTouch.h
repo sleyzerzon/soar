@@ -151,6 +151,16 @@ namespace gSKI
 		virtual void SetChunkCount(IAgent* pIAgent, unsigned long count) = 0;
 
 		virtual void SeedRandomNumberGenerator(unsigned long int* pSeed) = 0;
+		// used by Semantic Memory loadMemory commandline
+		// SEMANTIC_MEMORY
+		virtual void load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type) = 0;
+		virtual void print_semantic_memory(IAgent* pIAgent) = 0;
+		virtual int clear_semantic_memory(IAgent* pIAgent) = 0;
+		virtual int semantic_memory_chunk_count (IAgent* pIAgent) = 0;
+		virtual int semantic_memory_lme_count (IAgent* pIAgent) = 0;
+		virtual int semantic_memory_set_parameter (IAgent* pIAgent, long parameter) = 0;
+
+		// SEMANTIC_MEMORY
 	  };
    }
 }
@@ -277,8 +287,13 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 /* rmarinie 11/04 */
 #define TIMERS_ENABLED                           33
 
+// SEMANTIC_MEMORY
+/* semantic memory option parameter*/
+#define SMEM_SYSPARAM							 34
+// SEMANTIC_MEMORY
+
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  33
+#define HIGHEST_SYSPARAM_NUMBER                  34
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024   /* AGR 536  - from sys/param.h */

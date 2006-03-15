@@ -105,6 +105,15 @@ namespace gSKI
 		 void SetChunkCount(IAgent* pIAgent, unsigned long count);
 
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
+		// used by Semantic Memory loadMemory commandline
+		// SEMANTIC_MEMORY
+		 void load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type);
+		 void print_semantic_memory(IAgent* pIAgent);
+		 int clear_semantic_memory(IAgent* pIAgent);
+		 int semantic_memory_chunk_count(IAgent* pIAgent);
+		 int semantic_memory_lme_count(IAgent* pIAgent);
+		 int semantic_memory_set_parameter(IAgent* pIAgent, long parameter);
+		// SEMANTIC_MEMORY
 	  };
    }
 }
