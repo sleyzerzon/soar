@@ -614,6 +614,145 @@ set<CueTriplet> SemanticMemory::match_retrieve_single_level_2006_1_22(const set<
 	//return matched_ids_intersection;
 	return retrieved;
 }
+
+
+// For categorical values, confidence is the percentage of the retrieved value, and experience is the number of observation
+// For numerical values, we may need more complex description of the result.
+// Maybe it need to answer some generic summarizing queries like: mean, var, counts, density ...
+// Another possible hypothesis is that numerical values are 'binned' into ordinal categories.
+// The way to get finer discriminated description is to go down levels.
+// So the general strategy should be trusting lower level more than higher level.
+
+bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>& cue_set, string& retrieved_id, 
+														   set<CueTriplet>& retrieved, float& confidence, float& experience){
+	
+	map<string, int> value_counter;
+	map<string, int> value_lme_mapping;
+
+	bool start = false;
+	set<string> matched_ids_intersection;
+	string target_attr = "";
+	for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+		string id = itr->id;
+		string attr = itr->attr;
+		string value = itr->value;
+		int value_type = itr->value_type;
+		set<string> current_matched_ids = this->match_attr_value(attr, value, value_type);
+		if(value_type == IDENTIFIER_SYMBOL_TYPE && !this->test_id(value)){ // Current attr is the target attribute
+			target_attr = attr;
+		}
+
+		if(!start){
+			matched_ids_intersection.insert(current_matched_ids.begin(), current_matched_ids.end());
+		}
+		else{
+			matched_ids_intersection = set_intersect(matched_ids_intersection, current_matched_ids);
+			
+
+			if(matched_ids_intersection.size() == 0){
+				break;
+			}
+		}
+		cout << "Current matched ids" << endl;
+		cout << matched_ids_intersection << endl;
+
+		start = true;
+	}
+	
+	if(matched_ids_intersection.empty()){ // no matches
+		retrieved_id = "F0";
+		retrieved.clear();
+		retrieved.insert(CueTriplet("F0", "status", "failure", 2));
+		confidence = 0;
+		experience = 0;
+
+		return false;
+	}
+	
+
+	// summarize target value
+	for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
+		string candidate_id = *itr;
+		//cout << "###" << endl;
+		//cout << candidate_id << endl;
+		//cout << target_attr << endl;
+		set<int> candidate_lme_index = this->match_id_attr(candidate_id, target_attr);
+		// Assume single valued attributes, or just pick the first value
+
+		if(candidate_lme_index.empty()){
+			cout << "No target attribute" << endl;
+			// This should not happen
+			break;
+		}
+		int target_lme_index = *(candidate_lme_index.begin());
+		string target_value = (LME_Array[target_lme_index])->value;
+		int target_value_type = (LME_Array[target_lme_index])->value_type;
+
+		// calculate weight for each instance based on its reference history
+		float weight = (LME_Array[target_lme_index])->boost_history.size();
+		if(weight == 0){
+			weight = 1;
+		}
+		if(value_counter.find(target_value) == value_counter.end()){
+			value_counter[target_value] = weight;
+		}
+		else{
+			value_counter[target_value] += weight;
+		}
+
+		// The first id is picked
+		// matched Ids should be ordered in some way, e.g, by activation, so that in case of tie, the highest activated chunk is retrieved
+		if(value_lme_mapping.find(target_value) == value_lme_mapping.end()){
+			value_lme_mapping[target_value] = target_lme_index;
+		}
+	}
+
+
+	int total_count = 0;
+	int max_count = 0;
+	string max_counted_value = "";
+	// May be counts need to be biased by activation. So that too long ago counts doesn't affect retrieval.
+	for(map<string, int>::iterator itr = value_counter.begin(); itr != value_counter.end(); ++itr){
+		string current_value = itr->first;
+		int current_value_count = itr->second;
+		total_count += current_value_count;
+		if(current_value_count > max_count){
+			max_count = current_value_count;
+			max_counted_value = current_value;
+		}
+		//cout << itr->first<<", " << itr->second << endl;
+	}
+
+	experience = total_count;
+	confidence = value_counter[max_counted_value]*1.0 / total_count;
+	int retrieved_lme_index = value_lme_mapping[max_counted_value];
+	string retrieved_value = (LME_Array[retrieved_lme_index])->value;
+	int retrieved_value_type = (LME_Array[retrieved_lme_index])->value_type;
+	retrieved_id = (LME_Array[retrieved_lme_index])->id;
+
+	//cout << "Confidence: " << confidence << endl;
+	//cout << "Experience: " << experience << endl;
+	//cout << "Index: " << retrieved_lme_index << endl;
+
+	for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+		string attr = itr->attr;
+		string value = itr->value;
+		int value_type = itr->value_type;
+
+		if(attr == target_attr){
+			value = retrieved_value;
+			value_type = retrieved_value_type;
+		}
+		retrieved.insert(CueTriplet(retrieved_id, attr, value, value_type));
+	}
+
+	
+	return true;
+	//return matched_ids_intersection;
+	//return retrieved;
+
+}
+
 // given id and attribute, retrieve the index for corresponding LMEs
 set<int> SemanticMemory::match_id_attr(const string id, const string attr){
 	set<int> index;

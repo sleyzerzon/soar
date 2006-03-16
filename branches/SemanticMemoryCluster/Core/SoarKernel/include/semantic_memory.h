@@ -13,6 +13,7 @@
 #include <string>
 #include <iostream>
 
+using std::map;
 using std::set;
 using std::vector;
 using std::string;
@@ -121,7 +122,8 @@ class SemanticMemory
 		
 		set<CueTriplet> match_retrieve_single_level_2006_1_22(const set<CueTriplet>&, string&);
 		set<CueTriplet> match_retrieve_single_level_2006_1_31(const set<CueTriplet>&, string&);
-		
+		bool match_retrieve_single_level_2006_3_15(const set<CueTriplet>&, string&, set<CueTriplet>& result, float& confidence, float& experience);
+
 		// Given the id, expands other attributes according to the given cue (optional)
 		// If the attribute is in the cue, then expand that attribute regardless of activation
 		set<LME> expand_id(string id, set<CueTriplet>& cue = set<CueTriplet>());

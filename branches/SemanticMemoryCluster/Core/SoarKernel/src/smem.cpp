@@ -119,8 +119,16 @@ float StringToFloat(string str){
 	return n;
 }
 string StringToSym(string str){ // get rid of quoting marks '||'
-	return str;
-	//return str.substr(1, str.length()-2);
+	
+	string ret = "";
+	if(str[0] == '|' && str[str.length()-1] == '|'){
+		ret = str.substr(1, str.length()-2);
+	}
+	else{
+		ret = str;
+	}
+	cout << "Changed value " << str << endl;
+	return ret;
 }
 
 
@@ -703,7 +711,8 @@ void smem_routine(agent* thisAgent){
 		print(thisAgent, "\nSMEM Enabled (%d)\n",thisAgent->sysparams[SMEM_SYSPARAM]);
 		save_wmes_12_21(thisAgent);
 		//retrieve(thisAgent);
-		retrieve_1_20(thisAgent);
+		//retrieve_1_20(thisAgent);
+		retrieve_3_13(thisAgent);
 		cluster(thisAgent);
 	}
 	else if(thisAgent->sysparams[SMEM_SYSPARAM] == 0){// deliberate saving
@@ -711,7 +720,8 @@ void smem_routine(agent* thisAgent){
 		//save_wmes_old(thisAgent);
 		save_wmes_deliberate_merge_identical(thisAgent);
 		//retrieve(thisAgent); // should still return failure anyway
-		retrieve_1_20(thisAgent);
+		//retrieve_1_20(thisAgent);
+		retrieve_3_13(thisAgent);
 		cluster(thisAgent);
 	}
 	//print(thisAgent, "\nCurrent cycle %d\n", thisAgent->d_cycle_count);
@@ -850,6 +860,9 @@ void retrieve_1_20(agent* thisAgent){
 							string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
 							string value = symbol_constant_to_string(thisAgent, w->value);
 							int value_type = w->value->common.symbol_type;
+							if(value_type == SYM_CONSTANT_SYMBOL_TYPE){
+								value = StringToSym(value);
+							}
 							cue_set.insert(CueTriplet(id, attr, value, value_type));
 							if(YJ_debug)
 								print(thisAgent, "\nCue WME<%s, %s,%s, %d>\n", id.c_str(), attr.c_str(), value.c_str(),value_type);
@@ -1009,9 +1022,9 @@ void retrieve_3_13(agent* thisAgent){
 	bool find_cue = false;
 	for (retrieve_s = retrieve_link_id->id.slots; retrieve_s != NIL; retrieve_s = retrieve_s->next) {
 		// The slots can potentially have any structure
-		for (retrieve_w = retrieve_s->wmes; retrieve_w != NIL; retrieve_w = retrieve_w->next){ 
-
-			if(strcmp(symbol_constant_to_string(thisAgent, retrieve_w->attr).c_str(), "cue") == 0){
+		if(strcmp(symbol_constant_to_string(thisAgent, retrieve_link_id->id.slots->attr).c_str(), "cue") == 0){
+			
+			for (retrieve_w = retrieve_s->wmes; retrieve_w != NIL; retrieve_w = retrieve_w->next){ 
 				find_cue = true;
 				// Do retrieve only if ready mark is set on
 				if(!thisAgent->retrieve_ready){
@@ -1034,6 +1047,9 @@ void retrieve_3_13(agent* thisAgent){
 							string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
 							string value = symbol_constant_to_string(thisAgent, w->value);
 							int value_type = w->value->common.symbol_type;
+							if(value_type == SYM_CONSTANT_SYMBOL_TYPE){
+								value = StringToSym(value);
+							}
 							cue_set.insert(CueTriplet(id, attr, value, value_type));
 							if(YJ_debug)
 								print(thisAgent, "\nCue WME<%s, %s,%s, %d>\n", id.c_str(), attr.c_str(), value.c_str(),value_type);
@@ -1041,15 +1057,16 @@ void retrieve_3_13(agent* thisAgent){
 					}
 
 					// The following is the retrieval code given the cue collected
-					
-					set<CueTriplet> result = thisAgent->semantic_memory->match_retrieve_single_level_2006_1_22(cue_set, picked_id);
+					set<CueTriplet> retrieved;
+					float confidence, experience;
+					bool retrieve_status = thisAgent->semantic_memory->match_retrieve_single_level_2006_3_15(cue_set, picked_id, retrieved, confidence, experience);
 					// this may duplicate what is already in working memory
 					// If it's already in WM, just return that pointer and put the extra attributes there
-					// By current code, the existing wme is removed!
+					// By current code, the existing wme is removed! ???
 					picked_id_sym = make_identifier_from_str(thisAgent, picked_id);
 
 					wme* retrieved_wme = add_input_wme_with_history(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "retrieved"), picked_id_sym);
-					for(set<CueTriplet>::const_iterator itr = result.begin(); itr != result.end(); ++itr){
+					for(set<CueTriplet>::const_iterator itr = retrieved.begin(); itr != retrieved.end(); ++itr){
 						string id = itr->id; // this id must == picked_id
 						string attr = itr->attr;
 						string value = itr->value;
@@ -1076,6 +1093,13 @@ void retrieve_3_13(agent* thisAgent){
 							print(thisAgent, "\nAdding <%s(%s), %s,%s, %d> as input_wme\n", picked_id.c_str(),id.c_str(), attr.c_str(), value.c_str(), value_type);
 						add_input_wme_with_history(thisAgent, picked_id_sym, attr_sym, value_sym);
 					}
+					if(retrieve_status){ // success, need to put the meta-status
+						add_input_wme_with_history
+							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-confidence"), make_float_constant(thisAgent, confidence));
+						add_input_wme_with_history
+							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-experience"), make_float_constant(thisAgent, experience));
+
+					}
 					break; // only consider the first cue, even if there are mulitple cues.
 				}	
 			}
@@ -1093,7 +1117,9 @@ void retrieve_3_13(agent* thisAgent){
 			//		M1 ^retrieve R1
 			//			R1 ^cue ?? ^retrieved ??
 			// Better still check the attribute
-			if(strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "retrieved") == 0){
+			if(strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "retrieved") == 0 ||
+				strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "target-confidence") == 0 ||
+				strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "target-experience") == 0){
 				remove_input_wme(thisAgent, w); 
 				// Just need to remove the link (retrieved).
 				// substructures should be automatically taken care of.

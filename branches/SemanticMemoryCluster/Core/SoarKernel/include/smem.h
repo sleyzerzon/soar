@@ -13,6 +13,7 @@ using namespace std;
 
 static YJ_debug = 1;
 
+void retrieve_3_13(agent* thisAgent);
 void retrieve_1_20(agent* thisAgent);
 void retrieve(agent* thisAgent);
 void smem_save_wme (agent* thisAgent, wme* w);
