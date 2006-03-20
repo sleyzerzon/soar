@@ -22,6 +22,9 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_MAKE_SET
 
+# Necessary for Semantic Memory
+AC_DEFINE([SEMANTIC_MEMORY], [1], [Used by Semantic Memory])
+
 # Tcl and Java switches for SWIG
 AC_ARG_ENABLE(tcl,
      [  --enable-tcl        Turn on tcl support (needs swig >= 1.3.24 and Tcl 8.4)],
