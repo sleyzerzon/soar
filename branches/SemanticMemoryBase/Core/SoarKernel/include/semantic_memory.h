@@ -9,9 +9,15 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <hash_map>
 #include <string>
 #include <iostream>
+
+#ifdef _MSC_VER
+#include <hash_map>
+#else
+#include <ext/hash_map>
+namespace stdext = ::__gnu_cxx; 
+#endif
 
 using std::set;
 using std::vector;
@@ -20,10 +26,10 @@ using std::cout;
 using std::ostream;
 using std::endl;
 using std::pair;
-using stdext::hash_map;
-using stdext::hash_compare;
 using std::less;
 using std::allocator;
+using stdext::hash_map;
+//using stdext::hash_compare;  // not linux compatible
 
 unsigned long StringToUnsignedLong(string str);
 
@@ -124,7 +130,7 @@ class SemanticMemory
 		
 		// Given the id, expands other attributes according to the given cue (optional)
 		// If the attribute is in the cue, then expand that attribute regardless of activation
-		set<LME> expand_id(string id, set<CueTriplet>& cue = set<CueTriplet>());
+		set<LME> expand_id(string id, set<CueTriplet> cue = set<CueTriplet>());
 
 		void dump(ostream& out);
 		void dump(vector<LME*>& out);

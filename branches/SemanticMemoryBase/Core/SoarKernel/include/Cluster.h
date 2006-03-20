@@ -3,9 +3,15 @@
 
 //#include <map>
 #include <vector>
-#include <hash_map>
 #include <string>
 #include <iostream>
+
+#ifdef _MSC_VER
+#include <hash_map>
+#else
+#include <ext/hash_map>
+namespace stdext = ::__gnu_cxx;
+#endif
 
 using std::vector;
 using std::string;
@@ -14,7 +20,7 @@ using std::ostream;
 using std::endl;
 using std::pair;
 using stdext::hash_map;
-using stdext::hash_compare;
+//using stdext::hash_compare; // not linux compatible
 using std::less;
 using std::allocator;
 
