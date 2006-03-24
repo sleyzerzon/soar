@@ -108,6 +108,9 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIClearMemory]			= &cli::CommandLineInterface::ParseClearMemory; // YJ
 	m_CommandMap[Commands::kCLISummarizeMemory]			= &cli::CommandLineInterface::ParseSummarizeMemory; // YJ
 	m_CommandMap[Commands::kCLISmemOption]			= &cli::CommandLineInterface::ParseSmemOption; // YJ
+	m_CommandMap[Commands::kCLICluster]			= &cli::CommandLineInterface::ParseCluster; // YJ
+	m_CommandMap[Commands::kCLIClusterTrain]			= &cli::CommandLineInterface::ParseClusterTrain; // YJ
+	m_CommandMap[Commands::kCLIClusterRecognize]			= &cli::CommandLineInterface::ParseClusterRecognize; // YJ
 #endif
 
 	// Indicate which commands should be echoed so that all users can see them when doing a shared debugging session

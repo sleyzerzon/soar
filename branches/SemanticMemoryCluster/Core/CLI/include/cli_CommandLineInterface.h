@@ -692,6 +692,10 @@ protected:
 	bool ParseClearMemory(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseSummarizeMemory(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseSmemOption(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+
+	bool ParseCluster(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseClusterTrain(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseClusterRecognize(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 #endif
 	bool DoWatchWMEs(gSKI::IAgent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
 

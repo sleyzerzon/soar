@@ -121,6 +121,17 @@ NetWork::NetWork(int n_units, int max_dim){
 	for(int i=0; i<n_units; ++i){
 		units.push_back(Unit(max_dim));
 	}
+	_n_units = n_units;
+	_max_dim = max_dim;
+}
+
+void NetWork::reset(){
+	
+	//units = vector<Unit>(n_units, Unit(max_dim));
+	units.clear();
+	for(int i=0; i<_n_units; ++i){
+		units.push_back(Unit(_max_dim));
+	}
 }
 // Raw input is vector of attribute value pairs
 // They will be treated as symbols (assume sensor is binary, with a threshold to translate numerical values) 
@@ -205,6 +216,10 @@ vector<int> NetWork::cluster_input(vector<double> input, bool update){
 }
 vector<int> NetWork::cluster_input(vector<pair<string, string> >& attr_val_pairs, bool update){
 	vector<double> input = this->translate_input(attr_val_pairs);
+	for(int i=0; i<input.size(); ++i){
+		cout << input[i] << ", ";
+	}
+	cout << endl;
 	return this->cluster_input(input, update);
 }
 

@@ -292,4 +292,247 @@ bool CommandLineInterface::ParseSmemOption(gSKI::IAgent* pAgent, std::vector<std
 	return true;
 }
 
+// Preload Cluster file
+bool CommandLineInterface::ParseCluster(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+	
+	// Attain the evil back door of doom, even though we aren't the TgD
+	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	for(std::vector<string>::iterator itr = argv.begin(); itr != argv.end(); ++itr){
+		cout << *itr << endl;
+	}
+	
+	if(argv.size() < 2){
+		cout << "Printing Cluster Weights\n";
+		AddListenerAndDisableCallbacks(pAgent);
+		pKernelHack->clustering(pAgent, std::vector<std::vector<double> >(), true, false);
+		AddListenerAndDisableCallbacks(pAgent);
+		return false;
+	}
+
+	if(argv[1] == "clear"){
+		pKernelHack->clustering(pAgent, std::vector<std::vector<double> >(), false, true);
+	}
+
+	// Quit needs no help
+	return true;
+}
+
+
+bool CommandLineInterface::ParseClusterTrain(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+	
+	// Attain the evil back door of doom, even though we aren't the TgD
+	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	for(std::vector<string>::iterator itr = argv.begin(); itr != argv.end(); ++itr){
+		cout << *itr << endl;
+	}
+	
+	if(argv.size() < 2){
+		cout << "No filename specified\n";
+		return false;
+	}
+
+	string filename = argv[1];
+
+	StripQuotes(filename);
+
+    // Separate the path out of the filename if any
+	// Code Copied from cli_source.cpp
+	std::string path;
+	unsigned int separator1 = filename.rfind('/');
+	if (separator1 != std::string::npos) {
+		++separator1;
+		if (separator1 < filename.length()) {
+			path = filename.substr(0, separator1);
+			filename = filename.substr(separator1, filename.length() - separator1);
+			if (!DoPushD(path)) return false;
+		}
+	}
+	unsigned int separator2 = filename.rfind('\\');
+	if (separator2 != std::string::npos) {
+		++separator2;
+		if (separator2 < filename.length()) {
+			path = filename.substr(0, separator2);
+			filename = filename.substr(separator2, filename.length() - separator2);
+			if (!DoPushD(path)) return false;
+		}
+	}
+
+	// Open the file
+	std::ifstream soarFile(filename.c_str());
+	if (!soarFile) {
+		if (path.length()) DoPopD();
+		return SetError(CLIError::kOpenFileFail);
+	}
+	
+	//cout << "Path: " << path << endl;
+	//cout << "Filename: " << filename << endl;
+	
+
+ 	m_Result << "Cluster Training File\nPath: " << path << "\nFilename: " << filename << std::endl;
+	//AddListenerAndDisableCallbacks(pAgent);
+	//print(thisAgent, "Loading Memory\nPath: %s\nFilename: %s\n", path.c_str(), filename.c_str());
+	//RemoveListenerAndEnableCallbacks(pAgent);
+
+	std::string line;
+	int lineCount = 0;
+	
+	
+	std::vector<std::vector<std::pair<std::string, std::string> > > instances;
+
+	while (getline(soarFile, line)) {
+		
+		// Increment line count
+		++lineCount;
+
+		// Trim whitespace and comments
+		if (!Trim(line)) {
+		//	HandleSourceError(lineCount, filename); Interface changed
+			if (path.length()) DoPopD();
+			return false;
+		}
+	//	mResult << line << std::endl;
+		//cout << line << endl;
+		//AddListenerAndDisableCallbacks(pAgent);
+		//print(thisAgent, "%s\n", line.c_str());
+		//RemoveListenerAndEnableCallbacks(pAgent);
+		if(line.size() == 0 || line[0] == '#'){
+			continue;
+		}
+		istringstream isstr(line);
+		
+		vector<pair<string, string> > one_instance;
+		string attr, value;
+		while(isstr >> attr >> value){
+			one_instance.push_back(pair<string, string>(attr, value));
+		}
+		instances.push_back(one_instance);
+	}
+	int train_times = 1;
+	if(argv.size() >= 3){
+		istringstream isstr(argv[2]);
+		isstr >> train_times;
+		//if(!isstr.good()){
+		//	train_times = 1;
+		//}
+	}
+	m_Result << "Training " << train_times << " Times" << endl;
+	for(int i=0; i<train_times; ++i){
+		pKernelHack->cluster_train(pAgent,instances);
+	}
+	
+
+	soarFile.close();
+	if (path.length()) DoPopD();
+
+	// Quit needs no help
+	return true;
+}
+
+bool CommandLineInterface::ParseClusterRecognize(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+	
+	// Attain the evil back door of doom, even though we aren't the TgD
+	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	for(std::vector<string>::iterator itr = argv.begin(); itr != argv.end(); ++itr){
+		cout << *itr << endl;
+	}
+	
+	if(argv.size() < 2){
+		cout << "No filename specified\n";
+		return false;
+	}
+
+	string filename = argv[1];
+
+	StripQuotes(filename);
+
+    // Separate the path out of the filename if any
+	// Code Copied from cli_source.cpp
+	std::string path;
+	unsigned int separator1 = filename.rfind('/');
+	if (separator1 != std::string::npos) {
+		++separator1;
+		if (separator1 < filename.length()) {
+			path = filename.substr(0, separator1);
+			filename = filename.substr(separator1, filename.length() - separator1);
+			if (!DoPushD(path)) return false;
+		}
+	}
+	unsigned int separator2 = filename.rfind('\\');
+	if (separator2 != std::string::npos) {
+		++separator2;
+		if (separator2 < filename.length()) {
+			path = filename.substr(0, separator2);
+			filename = filename.substr(separator2, filename.length() - separator2);
+			if (!DoPushD(path)) return false;
+		}
+	}
+
+	// Open the file
+	std::ifstream soarFile(filename.c_str());
+	if (!soarFile) {
+		if (path.length()) DoPopD();
+		return SetError(CLIError::kOpenFileFail);
+	}
+	
+	//cout << "Path: " << path << endl;
+	//cout << "Filename: " << filename << endl;
+	
+
+ 	m_Result << "Cluster Training File\nPath: " << path << "\nFilename: " << filename << std::endl;
+	//AddListenerAndDisableCallbacks(pAgent);
+	//print(thisAgent, "Loading Memory\nPath: %s\nFilename: %s\n", path.c_str(), filename.c_str());
+	//RemoveListenerAndEnableCallbacks(pAgent);
+
+	std::string line;
+	int lineCount = 0;
+	
+	
+	std::vector<std::vector<std::pair<std::string, std::string> > > instances;
+
+	while (getline(soarFile, line)) {
+		
+		// Increment line count
+		++lineCount;
+
+		// Trim whitespace and comments
+		if (!Trim(line)) {
+		//	HandleSourceError(lineCount, filename); Interface changed
+			if (path.length()) DoPopD();
+			return false;
+		}
+	//	mResult << line << std::endl;
+		//cout << line << endl;
+		//AddListenerAndDisableCallbacks(pAgent);
+		//print(thisAgent, "%s\n", line.c_str());
+		//RemoveListenerAndEnableCallbacks(pAgent);
+		if(line.size() == 0 || line[0] == '#'){
+			continue;
+		}
+		istringstream isstr(line);
+		
+		vector<pair<string, string> > one_instance;
+		string attr, value;
+		while(isstr >> attr >> value){
+			one_instance.push_back(pair<string, string>(attr, value));
+		}
+		instances.push_back(one_instance);
+	}
+	
+	std::vector<std::vector<int> > clusters = pKernelHack->cluster_recognize(pAgent,instances);
+	//m_Result << clusters.size() << endl;
+	for(int i=0; i<clusters.size(); ++i){
+		//m_Result << clusters[i].size() << endl;
+		for(int j=0; j<clusters[i].size(); ++j){
+			m_Result << clusters[i][j] << ",";
+		}
+		m_Result << endl;
+	}
+	
+
+	soarFile.close();
+	if (path.length()) DoPopD();
+
+	// Quit needs no help
+	return true;
+}
 #endif

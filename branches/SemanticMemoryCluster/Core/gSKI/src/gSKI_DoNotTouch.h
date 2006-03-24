@@ -113,6 +113,9 @@ namespace gSKI
 		 int semantic_memory_chunk_count(IAgent* pIAgent);
 		 int semantic_memory_lme_count(IAgent* pIAgent);
 		 int semantic_memory_set_parameter(IAgent* pIAgent, long parameter);
+		 int clustering (IAgent* pIAgent, std::vector<std::vector<double> > weights, bool print_flag=false, bool load_flag=false);
+		 int cluster_train (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
+		 std::vector<std::vector<int> > cluster_recognize (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
 		// SEMANTIC_MEMORY
 	  };
    }

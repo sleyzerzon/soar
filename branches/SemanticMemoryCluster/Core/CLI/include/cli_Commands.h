@@ -79,6 +79,11 @@ namespace cli {
 		static char const* kCLIClearMemory; //YJ
 		static char const* kCLISummarizeMemory; //YJ
 		static char const* kCLISmemOption; //YJ
+
+		static char const* kCLICluster; //YJ
+
+		static char const* kCLIClusterTrain; //YJ
+		static char const* kCLIClusterRecognize; //YJ
 		#endif 
 	}; // struct
 } // namespace cli

@@ -123,7 +123,12 @@ class SemanticMemory
 		set<CueTriplet> match_retrieve_single_level_2006_1_22(const set<CueTriplet>&, string&);
 		set<CueTriplet> match_retrieve_single_level_2006_1_31(const set<CueTriplet>&, string&);
 		bool match_retrieve_single_level_2006_3_15(const set<CueTriplet>&, string&, set<CueTriplet>& result, float& confidence, float& experience);
-
+		
+		// I'll need a partial match function (on exemplars) to compare with clustering approach
+		// The threshold can be varied so that it can achieve hierachical clustering by exemplars.
+		// However, exemplars won't have much useful meta-information available, which has to be achieved by reducing the dimension of represetnation - prototype
+		bool partial_match(const set<CueTriplet>&, string&, set<CueTriplet>& result, float& threshold, float& confidence, float& experience);
+		
 		// Given the id, expands other attributes according to the given cue (optional)
 		// If the attribute is in the cue, then expand that attribute regardless of activation
 		set<LME> expand_id(string id, set<CueTriplet>& cue = set<CueTriplet>());

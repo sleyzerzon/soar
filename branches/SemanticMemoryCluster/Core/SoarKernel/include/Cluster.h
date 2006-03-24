@@ -45,14 +45,18 @@ class NetWork
 {
 private:
 	
-	HASH_S_S_INT attr_val_pair_to_index;
+	
 	int winner(vector<double> input, vector<int> inhibit=vector<int>());
 	double activation(vector<double> input, int index);
-	
+	int _n_units;
+	int _max_dim;
 
 public:
+	void reset();
 	vector<Unit> units;
 	vector<pair<string, string> > index_to_attr_val_pair;
+
+	HASH_S_S_INT attr_val_pair_to_index;
 
 	NetWork(int n_units, int max_dim);
 	// raw input

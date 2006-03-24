@@ -755,8 +755,8 @@ string symbol_constant_to_string(agent* thisAgent, Symbol* s){
 		return "bad symbol";
 	}
 
-	char sym_char[255];
-	symbol_to_string (thisAgent, s, TRUE, sym_char, 255);
+	char sym_char[1000];
+	symbol_to_string (thisAgent, s, TRUE, sym_char, 1000);
 	return string(sym_char);
 }
 /*
@@ -1058,8 +1058,16 @@ void retrieve_3_13(agent* thisAgent){
 
 					// The following is the retrieval code given the cue collected
 					set<CueTriplet> retrieved;
-					float confidence, experience;
-					bool retrieve_status = thisAgent->semantic_memory->match_retrieve_single_level_2006_3_15(cue_set, picked_id, retrieved, confidence, experience);
+					float confidence = 0, experience = 0;
+					
+					// Clustering with summarization
+					//bool retrieve_status = thisAgent->semantic_memory->match_retrieve_single_level_2006_3_15(cue_set, picked_id, retrieved, confidence, experience);
+
+					// Exemplar without summarization
+					float threshold = 0;
+					bool retrieve_status = thisAgent->semantic_memory->partial_match(cue_set, picked_id, retrieved, threshold, confidence, experience);
+
+
 					// this may duplicate what is already in working memory
 					// If it's already in WM, just return that pointer and put the extra attributes there
 					// By current code, the existing wme is removed! ???
@@ -1701,6 +1709,17 @@ void find_save_ids(agent* thisAgent, set<std::string>& id_set){
 	}
 }
 
+
+vector<pair<string, string> > parse_cluster_input_str(string input_str){
+	istringstream isstr(input_str);	
+	vector<pair<string, string> > one_instance;
+	string attr, value;
+	while(isstr >> attr >> value){
+		one_instance.push_back(pair<string, string>(attr, value));
+	}
+	return one_instance;
+}
+
 // The input shoul be: state <s> ^smem.cluster.input
 // It only check one level, so make sure the structure is flattened appropriately
 // The output shoul be: state <s> ^smem.cluster.output
@@ -1710,10 +1729,15 @@ void cluster(agent* thisAgent){
 	vector<pair<string, string> > training_attr_val_pairs;
 	wme* cluster_training_link = NIL;
 	
+	if(YJ_debug){
+		print_with_symbols(thisAgent, "cluster link id: <%y>\n", cluster_link_id);
+	}
+
 	// 1. Cluster Train Link: Training doesn't need to wait for output, so the training link is automatically cleared after taking each instance
 	// 2. Cluster Input Link: While for input, it needs to wait to see the output, and output won't be touched unless cluster_input_link is cleared by rule
 	for (slot* cluster_s = cluster_link_id->id.slots; cluster_s != NIL; cluster_s = cluster_s->next) {
 		if(strcmp(symbol_constant_to_string(thisAgent, cluster_s->attr).c_str(), "train") == 0){
+			
 			for(wme* cluster_w = cluster_s->wmes; cluster_w != NIL; cluster_w = cluster_w->next){
 				cluster_training_link = cluster_w;
 				string id = symbol_constant_to_string(thisAgent, cluster_w->id);
@@ -1723,9 +1747,20 @@ void cluster(agent* thisAgent){
 				// All values are treated as strings
 				// Assume sensory inputs are binary detector for symbolic values
 				// This is more realistic at neuron level, where firing/non-firing is just binary
-				training_attr_val_pairs.push_back(pair<string, string>(attr, value));
+				// Not sure about continuous numerical values ...
+				
+				//training_attr_val_pairs.push_back(pair<string, string>(attr, value));
+				
+				training_attr_val_pairs = parse_cluster_input_str(value);
+				cout << "Cluster Training " << value << endl;
+				if(YJ_debug){
+					print_with_symbols(thisAgent, "Cluster Training WME\n");
+					print_wme(thisAgent, cluster_w);
+				}
+				
+				break;
 			}
-			break;
+			
 		}		
 	}
 
@@ -1742,9 +1777,16 @@ void cluster(agent* thisAgent){
 				// All values are treated as strings
 				// Assume sensory inputs are binary detector for symbolic values
 				// This is more realistic at neuron level, where firing/non-firing is just binary
-				input_attr_val_pairs.push_back(pair<string, string>(attr, value));
+				//input_attr_val_pairs.push_back(pair<string, string>(attr, value));
+				input_attr_val_pairs = parse_cluster_input_str(value);
+				cout << "Cluster Input " <<  value << endl;
+				if(YJ_debug){
+					print_with_symbols(thisAgent, "Cluster Input WME\n");
+					print_wme(thisAgent, cluster_w);
+				}
+				break;
 			}
-			break;
+			
 		}		
 	}
 	

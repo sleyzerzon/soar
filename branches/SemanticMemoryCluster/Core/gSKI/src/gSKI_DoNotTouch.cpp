@@ -2549,6 +2549,56 @@ namespace gSKI
 			return thisAgent->sysparams[SMEM_SYSPARAM];	
 		}
 		
+		int TgDWorkArounds::clustering (IAgent* pIAgent, std::vector<std::vector<double> > weights, bool print_flag, bool reset_flag){
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			int used_dim = thisAgent->clusterNet->attr_val_pair_to_index.size();
+			print(thisAgent, "Used DIM: %d\n", used_dim);
+			
+			//for(int i=0; i<thisAgent->clusterNet->units.size(); ++i){
+			if(print_flag){
+				for(int i=0; i< 20; ++i){
+					for(int j=0; j<10; ++j){
+						print(thisAgent, "%f ", thisAgent->clusterNet->units[i].weights[j]);
+					}
+					print(thisAgent,"\n");
+				}
+			}
+			//if(load_flag){
+			//	for(int i=0; i<weights.size(); ++i){
+			//		for(int j=0; j<weights[i].size(); ++j){
+			//			thisAgent->clusterNet->units[i].weights[j] = weights[i][j];
+			//		}
+			//	}
+			//}
+			if(reset_flag){
+				thisAgent->clusterNet->reset();
+			}
+
+			
+			return 1;
+		}
+
+		int TgDWorkArounds::cluster_train (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances){
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			for(int i=0; i<instances.size(); ++i){
+				thisAgent->clusterNet->cluster_input(instances[i], true);
+			}
+
+			return 1;
+		}
+
+		std::vector<std::vector<int> > TgDWorkArounds::cluster_recognize (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances){
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			
+			std::vector<std::vector<int> > clusters;
+			for(int i=0; i<instances.size(); ++i){
+				clusters.push_back(thisAgent->clusterNet->cluster_input(instances[i], false));
+			}
+			return clusters;
+		}
 		// SEMANTIC_MEMORY
 	}// class
 }// namespace

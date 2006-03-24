@@ -689,6 +689,7 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 		int target_value_type = (LME_Array[target_lme_index])->value_type;
 
 		// calculate weight for each instance based on its reference history
+		// Total count does include repeated experiences
 		float weight = (LME_Array[target_lme_index])->boost_history.size();
 		if(weight == 0){
 			weight = 1;
@@ -751,6 +752,92 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 	//return matched_ids_intersection;
 	//return retrieved;
 
+}
+
+
+bool SemanticMemory::partial_match(const set<CueTriplet>& cue_set, string& retrieved_id, 
+														   set<CueTriplet>& retrieved, float& threshold, float& confidence, float& experience){
+	
+	
+	map<string, int> chunk_counter; // hash for mathcing counts for each 'chunk'
+	
+	string target_attr = "";
+
+	int cue_component_count = 0;
+	for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+		string id = itr->id;
+		string attr = itr->attr;
+		string value = itr->value;
+		int value_type = itr->value_type;
+		
+		
+		if(value_type == IDENTIFIER_SYMBOL_TYPE && !this->test_id(value)){ // Current attr is the target attribute
+			target_attr = attr;
+		}
+		else{
+			set<string> current_matched_ids = this->match_attr_value(attr, value, value_type);
+			++ cue_component_count; // target attribute shouldn't be part of it
+			cout << "Current matched ids" << endl;
+			cout << current_matched_ids << endl;
+			for(set<string>::iterator itr2 = current_matched_ids.begin(); itr2 != current_matched_ids.end(); ++itr2){
+				string matched_id = *itr2;
+				if(chunk_counter.find(matched_id) == chunk_counter.end()){
+					chunk_counter[matched_id] = 1;
+				}
+				else{
+					++ chunk_counter[matched_id];
+				}
+			}
+		}
+	}
+	int max_match_count = 0;
+	string max_match_id = "";
+	for(map<string, int>::iterator itr = chunk_counter.begin(); itr != chunk_counter.end(); ++itr){
+		string chunk_id = itr->first;
+		int match_count = itr->second;
+		cout << chunk_id << ", " << match_count << endl;
+		if(match_count > max_match_count){
+			max_match_count = match_count;
+			max_match_id = chunk_id;
+		}
+	}
+	
+	cout << "Max Count" << max_match_count << endl;
+	if(max_match_count == 0 || max_match_count < cue_component_count * threshold){ // no matches or below threshold
+		retrieved_id = "F0";
+		retrieved.insert(CueTriplet("F0", "status", "failure", 2));
+		return false;
+	}
+	else{
+		// This notion of confidence is totally different from the summarization about target attribute.
+		confidence = (float)max_match_count / (float)cue_component_count;
+
+	//	cout << max_match_count << ", " << cue_component_count << endl;
+	//	cout << "Confidence " << confidence << endl;
+		retrieved_id = max_match_id;
+		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+			string id = itr->id;
+			string attr = itr->attr;
+			string value = itr->value;
+			int value_type = itr->value_type;
+			
+			// LME under the matched id
+			// Have to rematch everything again, since it's not exact match.
+			set<int> candidate_index = this->match_id_attr(retrieved_id, attr);
+			int target_index = *(candidate_index.begin());
+			cout << retrieved_id << "," << attr << ", " <<target_index << endl;
+			string retrieved_value = (LME_Array[target_index])->value;
+			int retrieved_value_type = (LME_Array[target_index])->value_type;
+			retrieved.insert(CueTriplet(retrieved_id, attr, retrieved_value, retrieved_value_type));
+
+			if(attr == target_attr){
+				experience = (LME_Array[target_index])->boost_history.size();
+			}
+			
+		}
+	}
+	cout << "Confidence " << confidence << endl;
+	return true;
 }
 
 // given id and attribute, retrieve the index for corresponding LMEs

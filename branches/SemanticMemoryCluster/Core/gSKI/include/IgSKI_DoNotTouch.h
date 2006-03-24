@@ -22,6 +22,8 @@ typedef struct agent_struct agent;
 typedef void * soar_callback_agent;
 
 #include <string>
+#include <vector>
+#include <map>
 
 namespace gSKI
 {
@@ -159,6 +161,10 @@ namespace gSKI
 		virtual int semantic_memory_chunk_count (IAgent* pIAgent) = 0;
 		virtual int semantic_memory_lme_count (IAgent* pIAgent) = 0;
 		virtual int semantic_memory_set_parameter (IAgent* pIAgent, long parameter) = 0;
+
+		virtual int clustering (IAgent* pIAgent, std::vector<std::vector<double> > weights, bool print_flag=false, bool load_flag=false) = 0;
+		virtual int cluster_train (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances) = 0;
+		virtual std::vector<std::vector<int> > cluster_recognize (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances) = 0;
 
 		// SEMANTIC_MEMORY
 	  };

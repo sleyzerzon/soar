@@ -2258,7 +2258,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   #ifdef SEMANTIC_MEMORY
   vector<wme*> this_level_links = thisAgent->gold_level_to_smem_links->at(goal->id.level-1);
   for(int i=0; i<this_level_links.size();++i){
-	  remove_input_wme(thisAgent, this_level_links[i]);
+	 // remove_input_wme(thisAgent, this_level_links[i]);
   }
   
 #endif
