@@ -1061,11 +1061,11 @@ void retrieve_3_13(agent* thisAgent){
 					float confidence = 0, experience = 0;
 					
 					// Clustering with summarization
-					//bool retrieve_status = thisAgent->semantic_memory->match_retrieve_single_level_2006_3_15(cue_set, picked_id, retrieved, confidence, experience);
+					bool retrieve_status = thisAgent->semantic_memory->match_retrieve_single_level_2006_3_15(cue_set, picked_id, retrieved, confidence, experience);
 
 					// Exemplar without summarization
-					float threshold = 0;
-					bool retrieve_status = thisAgent->semantic_memory->partial_match(cue_set, picked_id, retrieved, threshold, confidence, experience);
+					//float threshold = 0;
+					//bool retrieve_status = thisAgent->semantic_memory->partial_match(cue_set, picked_id, retrieved, threshold, confidence, experience);
 
 
 					// this may duplicate what is already in working memory
@@ -1101,13 +1101,13 @@ void retrieve_3_13(agent* thisAgent){
 							print(thisAgent, "\nAdding <%s(%s), %s,%s, %d> as input_wme\n", picked_id.c_str(),id.c_str(), attr.c_str(), value.c_str(), value_type);
 						add_input_wme_with_history(thisAgent, picked_id_sym, attr_sym, value_sym);
 					}
-					if(retrieve_status){ // success, need to put the meta-status
-						add_input_wme_with_history
-							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-confidence"), make_float_constant(thisAgent, confidence));
-						add_input_wme_with_history
-							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-experience"), make_float_constant(thisAgent, experience));
-
+					if(!retrieve_status){ // success, need to put the meta-status
+						// What are the meta-info for failure ? How confident is it to be fail? Doesn't make sense
 					}
+					add_input_wme_with_history
+							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-confidence"), make_float_constant(thisAgent, confidence));
+					add_input_wme_with_history
+							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-experience"), make_float_constant(thisAgent, experience));
 					break; // only consider the first cue, even if there are mulitple cues.
 				}	
 			}

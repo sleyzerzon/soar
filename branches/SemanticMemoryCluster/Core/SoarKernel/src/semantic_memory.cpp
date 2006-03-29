@@ -14,6 +14,19 @@
 // and not in this file
 
 
+string remove_quote(string str){ // get rid of quoting marks '||'
+	
+	string ret = "";
+	if(str[0] == '|' && str[str.length()-1] == '|'){
+		ret = str.substr(1, str.length()-2);
+	}
+	else{
+		ret = str;
+	}
+	cout << "Changed value " << str << endl;
+	return ret;
+}
+
 bool LME::operator < (const LME lme) const{
 		if(id < lme.id){
 			return true;
@@ -266,7 +279,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 	// It must be resolve globally, via searching through all potential bindings
 
 	string final_chunk_id;
-	bool need_insert = true;
+	//bool need_insert = true;
 	if(this->test_id(id)){ // existing id, no need to find identical chunk
 							// need to insert the new attribute values
 		final_chunk_id = id;
@@ -280,7 +293,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 
 		if(result){// If there is the identical chunk already, update the counter
 			cout << "Find identical exsiting chunk " << final_chunk_id << endl;
-			need_insert = false;
+			//need_insert = false;
 			// Update counter here ...
 
 		}
@@ -356,7 +369,6 @@ bool SemanticMemory::find_identical_chunk (string& chunk_id, HASH_S_HASH_S_HASH_
 void SemanticMemory::insert_LME(string id, string attr, string value, int value_type, const vector<int>& history){
 	
 	int lme_index = LME_Array.size();
-	
 
 	int inserted_index = insert_LME_hash (memory_id_attr_hash, id, attr, value, lme_index, value_type);
 	if(inserted_index == lme_index){//new structure
@@ -1115,6 +1127,7 @@ int SemanticMemory::reset_history(){
 	return size;
 
 }
+
 
 
 SemanticMemory::~SemanticMemory(){

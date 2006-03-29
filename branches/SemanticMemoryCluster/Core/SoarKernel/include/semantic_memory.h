@@ -45,6 +45,7 @@ template<class T>
 set<T> set_intersect(const set<T>&, const set<T>&);
 
 
+string remove_quote(string str);
 
 class LME
 {
@@ -58,7 +59,7 @@ public:
 		int input_value_type, const vector<int>& history = vector<int>()){
 		id = input_id;
 		attr = input_attr;
-		value = input_value;
+		value = remove_quote(input_value);
 		value_type = input_value_type;
 		boost_history = history;
 	}
@@ -82,7 +83,7 @@ public:
 	CueTriplet(string input_id, string input_attr, string input_value, int input_value_type){
 		id = input_id;
 		attr = input_attr;
-		value = input_value;
+		value = remove_quote(input_value);
 		value_type = input_value_type;
 	}
 	// this determines the uniqueness of a LME
@@ -174,7 +175,7 @@ class SemanticMemory
 		HASH_S_HASH_S_HASH_S_LP memory_attr_value_hash;
 		
 		vector<LME*> LME_Array;
-
+		
 	
 };
 
