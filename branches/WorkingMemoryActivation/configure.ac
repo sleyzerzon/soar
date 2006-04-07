@@ -4,11 +4,11 @@
 ###########################################
 
 AC_PREREQ(2.57)
-AC_INIT([SoarSuite], [8.6.2], [soar-group@lists.sourceforge.net])
+AC_INIT([SoarSuite], [8.6.2-r2], [soar-group@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([Core/SoarKernel/include/soarkernel.h])
 AM_INIT_AUTOMAKE([foreign])
 AC_REVISION($Revision$)
-AC_CONFIG_HEADERS([config.h])
+AM_CONFIG_HEADER([config.h])
 AC_PREFIX_DEFAULT([/usr/local/soar])
 AC_LIBTOOL_DLOPEN
 
@@ -24,7 +24,7 @@ AC_PROG_MAKE_SET
 
 # Tcl and Java switches for SWIG
 AC_ARG_ENABLE(tcl,
-     [  --enable-tcl        Turn on tcl support (needs swig >= 1.3.24 and Tcl 8.4)],
+     [  --enable-tcl        Turn on tcl support (needs swig >= 1.3.24 but not 1.3.28 and Tcl 8.4)],
      [case "${enableval}" in
 	yes) tcl=true ;;
 	no)  tcl=false ;;
@@ -36,7 +36,7 @@ if test "$tcl" = "true"
 then
   AC_PROG_SWIG(1.3.24)
   SWIG_ENABLE_CXX
-  AC_CHECK_HEADER([tcl.h],,[AC_MSG_ERROR([*** Cannot find required header!  See previous line.])])
+  AC_CHECK_HEADER([tcl.h],,[AC_MSG_ERROR([*** Cannot find required header!  See previous line. Debian users: please see the following URL for a workaround: https://winter.eecs.umich.edu/soar-bugzilla/show_bug.cgi?id=543])])
   AC_PATH_PROG(TCLSH,tclsh,[AC_MSG_ERROR([*** Cannot find required program!  See previous line.])])
 fi
 
@@ -411,24 +411,15 @@ AC_OUTPUT([
 	Core/KernelSML/Makefile
 	Core/KernelSML/src/Makefile
 	Environments/Makefile
-	Environments/JavaBaseEnvironment/Makefile
-	Environments/JavaEaters/Makefile
-	Environments/JavaMissionaries/Makefile
-	Environments/JavaTOH/Makefile
-	Environments/JavaTankSoar/Makefile
 	Tools/Makefile
-	Tools/LoggerJava/Makefile
 	Tools/QuickLink/Makefile
 	Tools/QuickLink/src/Makefile
-	Tools/SoarJavaDebugger/Makefile
 	Tools/SoarTextIO/Makefile
 	Tools/SoarTextIO/src/Makefile
 	Tools/TOHSML/Makefile
 	Tools/TestCLI/Makefile
 	Tools/TestClientSML/Makefile
 	Tools/TestConnectionSML/Makefile
-	Tools/TestJavaSML/Makefile
 	Tools/TestSMLEvents/Makefile
 	Tools/TestSoarPerformance/Makefile
-	Tools/VisualSoar/Makefile
 	])
