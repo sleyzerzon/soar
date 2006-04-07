@@ -903,10 +903,14 @@ void Agent::ReceivedXMLTraceEvent(smlXMLEventId id, ElementXML* pIncoming, Eleme
 		return ;
 
 	// Go through the list of event handlers calling each in turn
-	for (XMLEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ; iter++)
+	for (XMLEventMap::ValueListIter iter = pHandlers->begin() ; iter != pHandlers->end() ;)
 	{
 		XMLEventHandlerPlusData handlerPlus = *iter ;
 		XMLEventHandler handler = handlerPlus.m_Handler ;
+
+		// Advance to the next handler before we make the callback, in case
+		// the callback deletes the current handler from the list, invalidating the iterator.
+		iter++ ;
 
 		void* pUserData = handlerPlus.m_UserData ;
 
@@ -1230,6 +1234,24 @@ bool Agent::Commit()
 }
 
 /*************************************************************
+* @brief Returns true if this agent has uncommitted changes.
+*************************************************************/
+bool Agent::IsCommitRequired()
+{
+	return GetWM()->IsCommitRequired() ;
+}
+
+/*************************************************************
+* @brief Returns true if changes to i/o links should be
+*		 committed (sent to kernelSML) immediately when they
+*		 occur, so the client doesn't need to remember to call commit.
+*************************************************************/
+bool Agent::IsAutoCommitEnabled()
+{
+	return m_Kernel->IsAutoCommitEnabled() ;
+}
+
+/*************************************************************
 * @brief Reinitialize this Soar agent.
 *		 This will also cause the output link structures stored
 *		 here to be erased and the current input link to be sent over
@@ -1279,6 +1301,12 @@ char const*	Agent::StopSelf()
 *************************************************************/
 char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
 {
+	if (IsCommitRequired())
+	{
+		assert(false) ;
+		return "Need to commit changes before calling a run method" ;
+	}	
+
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
@@ -1313,6 +1341,12 @@ char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
 
 char const* Agent::RunSelfForever()
 {
+	if (IsCommitRequired())
+	{
+		assert(false) ;
+		return "Need to commit changes before calling a run method" ;
+	}
+
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
@@ -1402,6 +1436,12 @@ bool Agent::SetStopSelfOnOutput(bool state)
 *************************************************************/
 char const* Agent::RunSelfTilOutput()
 {
+	if (IsCommitRequired())
+	{
+		assert(false) ;
+		return "Need to commit changes before calling a run method" ;
+	}
+
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
@@ -1426,6 +1466,12 @@ char const* Agent::RunSelfTilOutput()
 *************************************************************/
 void Agent::Refresh()
 {
+	// If this asserts fails, we had some changes to working memory that were
+	// not committed and then an init-soar came in.  This is a programming error
+	// as all working memory changes should be committed before other user-input (e.g. init-soar)
+	// can be called.
+	assert(!IsCommitRequired()) ;
+
 	GetWM()->Refresh() ;
 }
 
@@ -1467,11 +1513,12 @@ int Agent::GetDecisionCycleCounter()
 *
 * @param pCommandLine Command line string to process.
 * @param echoResults  If true the results are also echoed through the smlEVENT_ECHO event, so they can appear in a debugger (or other listener)
+* @param noFilter	  If true this command line by-passes any external filters that have been registered (this is not common) and is executed immediately.
 * @returns The string form of output from the command.
 *************************************************************/
-char const* Agent::ExecuteCommandLine(char const* pCommandLine, bool echoResults)
+char const* Agent::ExecuteCommandLine(char const* pCommandLine, bool echoResults, bool noFilter)
 {
-	return GetKernel()->ExecuteCommandLine(pCommandLine, GetAgentName(), echoResults) ;
+	return GetKernel()->ExecuteCommandLine(pCommandLine, GetAgentName(), echoResults, noFilter) ;
 }
 
 /*************************************************************

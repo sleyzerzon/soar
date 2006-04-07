@@ -153,6 +153,7 @@ typedef enum {
 	// the handler is executing the function and returning a value, not just being notified
 	// that something has happened.
 	smlEVENT_RHS_USER_FUNCTION = smlEVENT_LAST_PRINT_EVENT + 1,
+	smlEVENT_FILTER,				// This event can be used to filter (modify) command lines before they are processed by the kernel
 	smlEVENT_CLIENT_MESSAGE,		// A generic message from one client to another (not really involving Soar/kernel directly)
 	smlEVENT_LAST_RHS_EVENT = smlEVENT_CLIENT_MESSAGE
 } smlRhsEventId ;
@@ -254,7 +255,7 @@ typedef enum {
     sml_APPLY_PHASE,
     sml_OUTPUT_PHASE,
 	sml_PREFERENCE_PHASE,	// Soar 7 mode only
-	sml_WM_PHASE,			// Soar 7 mode only
+	sml_WM_PHASE			// Soar 7 mode only
 } smlPhase;
 
 typedef enum
@@ -262,7 +263,7 @@ typedef enum
 	sml_ELABORATION,
 	sml_PHASE,
 	sml_DECISION,
-	sml_UNTIL_OUTPUT,
+	sml_UNTIL_OUTPUT
 } smlRunStepSize ;
 
 typedef enum
@@ -270,7 +271,7 @@ typedef enum
 	sml_INTERLEAVE_ELABORATION,
 	sml_INTERLEAVE_PHASE,
 	sml_INTERLEAVE_DECISION,
-	sml_INTERLEAVE_UNTIL_OUTPUT,
+	sml_INTERLEAVE_UNTIL_OUTPUT
 } smlInterleaveStepSize ;
 
 typedef enum
@@ -279,7 +280,7 @@ typedef enum
 	sml_RUN_SELF			=  1 << 0,	// User included --self flag when running agent
 	sml_RUN_ALL				=  1 << 1,	// User ran all agents
 	sml_UPDATE_WORLD		=  1 << 2,	// User explicitly requested world to update
-	sml_DONT_UPDATE_WORLD	=  1 << 3,	// User explicitly requested world to not update
+	sml_DONT_UPDATE_WORLD	=  1 << 3	// User explicitly requested world to not update
 } smlRunFlags ;
 
 typedef enum {
@@ -379,6 +380,6 @@ public:
 	int		getCallbackID() { return m_CallbackID ; }
 } ;
 
-} ;	// End of namespace
+} 	// End of namespace
 
 #endif	// Header

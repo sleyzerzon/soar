@@ -560,8 +560,10 @@ protected:
 	* @param pAgent The pointer to the gSKI agent interface
 	* @param options Options for the run command, see cli_CommandData.h
 	* @param count The count, units or applicability depends on options
+	* @param interleave Support for round robin execution across agents 
+	*		 at a finer grain than the run-size parameter.
 	*************************************************************/
-	bool DoRun(gSKI::IAgent* pAgent, const RunBitset& options, int count = 0);
+	bool DoRun(gSKI::IAgent* pAgent, const RunBitset& options, int count = 0, eRunInterleaveMode interleave = RUN_INTERLEAVE_DEFAULT);
 
 	/*************************************************************
 	* @brief save-backtraces command
@@ -732,6 +734,7 @@ protected:
 	int ParseLearningOptarg();
 	bool CheckOptargRemoveOrZero();
 	bool ProcessWatchLevelSettings(const int level, WatchBitset& options, WatchBitset& settings, int& wmeSetting, int& learnSetting);
+	eRunInterleaveMode ParseRunInterleaveOptarg();
 
 	/************************************************************* 	 
 	* @brief Prints the current WM activation settings

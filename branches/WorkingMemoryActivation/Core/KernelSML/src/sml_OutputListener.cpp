@@ -46,28 +46,11 @@ void OutputListener::RegisterForKernelSMLEvents()
 {
 	// Listen for output callback events so we can send this output over to the clients
 	m_Agent->GetOutputLink()->GetOutputMemory()->AddWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
-
-	// Only register for the first agent added
-	if (m_KernelSML->GetNumberAgents() == 0)
-	{
-		// Listen for "before" init-soar events (we need to know when these happen so we can release all WMEs on the input link, otherwise gSKI will fail to re-init the kernel correctly.)
-		m_KernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_BEFORE_AGENT_REINITIALIZED, this, false) ;
-
-		// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
-		m_KernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_AFTER_AGENT_REINITIALIZED, this, false) ;
-	}
 }
 
 void OutputListener::UnRegisterForKernelSMLEvents()
 {
 	m_Agent->GetOutputLink()->GetOutputMemory()->RemoveWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
-
-	// Only unregister for the last agent
-	if (m_KernelSML->GetNumberAgents() == 1)
-	{
-		m_KernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_REINITIALIZED, this, false) ;
-		m_KernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_AFTER_AGENT_REINITIALIZED, this, false) ;
-	}
 }
 
 // Returns true if this is the first connection listening for this event
@@ -108,15 +91,9 @@ void OutputListener::HandleEvent(egSKIWorkingMemoryEventId eventId, gSKI::IAgent
 	if (wmelist->GetNumElements() == 0)
 		return ;
 
-	// BADBAD: voigtjr VS2005 workaround
-	if (!HasEvents(gSKIEVENT_OUTPUT_PHASE_CALLBACK)) 
-		return;
-
-	ConnectionListIter connectionIter = GetBegin(gSKIEVENT_OUTPUT_PHASE_CALLBACK) ;
-
-	// Check if nobody is listening to this event and if so we're done.
-	// We can't unregister it from the kernel, or "stop on output" would stop working.
-	if (connectionIter == GetEnd(gSKIEVENT_OUTPUT_PHASE_CALLBACK))
+	// Get the first listener for this event (or return if there are none)
+	ConnectionListIter connectionIter ;
+	if (!EventManager<egSKIWorkingMemoryEventId>::GetBegin(eventId, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that

@@ -226,6 +226,13 @@ protected:
 	void ReceivedOutputEvent(WMElement* pWmeAdded) ;
 	bool IsRegisteredForOutputEvent() ;
 
+	/*************************************************************
+	* @brief Returns true if changes to i/o links should be
+	*		 committed (sent to kernelSML) immediately when they
+	*		 occur, so the client doesn't need to remember to call commit.
+	*************************************************************/
+	bool IsAutoCommitEnabled() ;
+
 public:
 	/*************************************************************
 	* @brief Returns this agent's name.
@@ -285,8 +292,9 @@ public:
 	*		 The agent retains ownership of this object.
 	*		 The returned object is valid until the caller
 	*		 deletes the parent identifier.
-	*		 The WME is not added to Soar's input link until the
-	*		 client calls "Commit".
+	*		 If "auto commimt" is turned off in ClientKernel,
+	*		 the WME is not added to Soar's input link until the
+	*		 client calls "Commit" 
 	*************************************************************/
 	StringElement* CreateStringWME(Identifier* parent, char const* pAttribute, char const* pValue);
 
@@ -320,7 +328,8 @@ public:
 
 	/*************************************************************
 	* @brief Update the value of an existing WME.
-	*		 The value is not actually sent to the kernel
+	*		 If "auto commimt" is turned off in ClientKernel,
+	*		 the value is not actually sent to the kernel
 	*		 until "Commit" is called.
 	*************************************************************/
 	void	Update(StringElement* pWME, char const* pValue) ;
@@ -336,7 +345,8 @@ public:
 	*
 	*		 The caller should not access this WME after calling
 	*		 DestroyWME() or any of its children if this is an identifier.
-	*		 The WME is not removed from the input link until
+	*		 If "auto commimt" is turned off in ClientKernel,
+	*		 the WME is not removed from the input link until
 	*		 the client calls "Commit"
 	*************************************************************/
 	bool	DestroyWME(WMElement* pWME) ;
@@ -576,6 +586,11 @@ public:
 	bool Commit() ;
 
 	/*************************************************************
+	* @brief Returns true if this agent has uncommitted changes.
+	*************************************************************/
+	bool IsCommitRequired() ;
+
+	/*************************************************************
 	* @brief   Run one Soar agent for the specified number of decisions
 	*
 	* @returns The result of executing the run command.
@@ -583,6 +598,26 @@ public:
 	*************************************************************/
 	char const* RunSelf(unsigned long numberSteps, smlRunStepSize stepSize = sml_DECISION) ;
 	char const* RunSelfForever() ;
+
+	/*************************************************************
+	* @brief   Run Soar until either output is generated or
+	*		   the maximum number of decisions is reached.
+	*
+	* This function also calls "ClearOutputLinkChanges" so methods
+	* like "IsJustAdded" will refer to the changes that occur as a result of
+	* this run.
+	*
+	* This function also calls "Commit" to make sure any pending input
+	* link changes have been sent to Soar.
+	*
+	* We don't generally want Soar to just run until it generates
+	* output without any limit as an error in the AI logic might cause
+	* it to never return control to the environment, so there is a maximum
+	* decision count (currently 15) and if the agent fails to produce output
+	* before then this command returns.  (This value can be changed with the
+	* max-nil-output-cycles command).
+	*************************************************************/
+	char const* RunSelfTilOutput() ;
 
 	/*************************************************************
 	* @brief Returns true if this agent was part of the last set
@@ -612,36 +647,6 @@ public:
 	char const*	StopSelf() ;
 
 	/*************************************************************
-	* @brief   Controls whether Soar will break when it next generates
-	*		   output while running.
-	*
-	*		   Now deprecated.  Use RunSelfTilOutput instead.
-	*
-	* @param state	If true, causes Soar to break on output.  If false, Soar will not break.
-	*************************************************************/
-	// bool SetStopSelfOnOutput(bool state) ;
-
-	/*************************************************************
-	* @brief   Run Soar until either output is generated or
-	*		   the maximum number of decisions is reached.
-	*
-	* This function also calls "ClearOutputLinkChanges" so methods
-	* like "IsJustAdded" will refer to the changes that occur as a result of
-	* this run.
-	*
-	* This function also calls "Commit" to make sure any pending input
-	* link changes have been sent to Soar.
-	*
-	* We don't generally want Soar to just run until it generates
-	* output without any limit as an error in the AI logic might cause
-	* it to never return control to the environment, so there is a maximum
-	* decision count (currently 15) and if the agent fails to produce output
-	* before then this command returns.  (This value can be changed with the
-	* max-nil-output-cycles command).
-	*************************************************************/
-	char const* RunSelfTilOutput() ;
-
-	/*************************************************************
 	* @brief Resend the complete input link to the kernel
 	*		 and remove our output link structures.
 	*		 We do this when the user issues an "init-soar" event.
@@ -665,9 +670,10 @@ public:
 	*
 	* @param pCommandLine Command line string to process.
 	* @param echoResults  If true the results are also echoed through the smlEVENT_ECHO event, so they can appear in a debugger (or other listener)
+	* @param noFilter	  If true this command line by-passes any external filters that have been registered (this is not common) and is executed immediately.
 	* @returns The string form of output from the command.
 	*************************************************************/
-	char const* ExecuteCommandLine(char const* pCommandLine, bool echoResults = false) ;
+	char const* ExecuteCommandLine(char const* pCommandLine, bool echoResults = false, bool noFilter = false) ;
 
 	/*************************************************************
 	* @brief Execute a command line command and return the result

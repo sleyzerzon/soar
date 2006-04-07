@@ -98,7 +98,8 @@ namespace cli {
 			kInvalidBackslashEscapeCharacter	= 83, 
 			kInitSoarFailed						= 84, 
 			kPreferencesError					= 85, // FIXME: document in wiki
-			kFloatExpected                      = 86, // FIXME: document in wiki
+			kInvalidRunInterleaveSetting		= 86,
+			kFloatExpected                      = 87, // FIXME: document in wiki
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -183,6 +184,7 @@ namespace cli {
 				case kInitSoarFailed:					return "Agent could not be reinitialized.  Probably due to an internal memory leak." ;
 				case kPreferencesError:					return "Preferences command failed." ;
 				case kFloatExpected:					return "Floating point argument expected.";
+				case kInvalidRunInterleaveSetting:		return "Invalid setting for run interleave option." ;
 				default:								return "Unknown error code.";
 			}
 		}
