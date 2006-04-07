@@ -59,7 +59,7 @@ public class MacEnvironment implements Runnable, Kernel.SystemEventInterface, Ke
         }
         
         agent = kernel.CreateAgent("MAC");
-        boolean load = agent.LoadProductions("mac/mac.soar");
+        boolean load = agent.LoadProductions("mac.soar");
         if (!load || agent.HadError()) {
             throw new IllegalStateException("Error loading productions: "
                     + agent.GetLastErrorDescription());
@@ -141,7 +141,7 @@ public class MacEnvironment implements Runnable, Kernel.SystemEventInterface, Ke
         leftBank.setCounts(3, 3, 1);
         rightBank.setCounts(0, 0, 0);
         fireBoatMoved(rightBank, missionaries, cannibals, boat);
-        
+	
         agent.InitSoar();
     }
     
@@ -199,7 +199,7 @@ public class MacEnvironment implements Runnable, Kernel.SystemEventInterface, Ke
             }
         }
         
-        agent.Commit();
+        //NOTE: Don't have to explicitly commit changes because autocommit is on by default (and we didn't turn it off)
         agent.ClearOutputLinkChanges();
     }
     
