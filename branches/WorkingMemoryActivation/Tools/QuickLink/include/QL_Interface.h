@@ -249,7 +249,8 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 
 	// this is called internally by the agent reinitialized event
-	void respond_to_init_soar();
+	void respond_to_init_soar_before();
+	void respond_to_init_soar_after();
 
 	// this function takes a pre-made smart_pointer to an identifier.  This should only be called
 	// from the WME_Id class
@@ -260,8 +261,12 @@ public:
 	sml::Agent* get_agent_ptr()
 	{ return m_pKernel->GetAgent(m_pAgent->GetAgentName()); }
 
-	void remove_identifier(const std::string& name)
-	{ m_id_container.erase(name); }
+	void remove_identifier(const std::string& name);
+
+	// get the input-link name
+	std::string get_ilink_name()
+	{ return m_input_link_name; }
+	
 
 private:
 

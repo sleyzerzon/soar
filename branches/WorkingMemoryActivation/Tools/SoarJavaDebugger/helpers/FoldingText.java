@@ -553,6 +553,7 @@ public class FoldingText
 		// The icon bar is used to paint the "+" signs.  It is double-buffered or we'll get a little flicker effect because we repaint it on a timer.
 		m_IconBar	= new Canvas(m_Container, SWT.DOUBLE_BUFFERED) ;
 		m_Text      = new Text(m_Container, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.READ_ONLY) ;
+		
 		m_DrawingDisabled = false ;
 		
 		GridLayout layout = new GridLayout() ;

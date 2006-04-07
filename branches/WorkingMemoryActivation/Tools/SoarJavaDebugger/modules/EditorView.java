@@ -149,8 +149,13 @@ public class EditorView extends AbstractView
 			layoutComboBar(m_ComboAtTop) ;
 		}
 		
+		// Lots of attempts to make sure the size is computed correctly
+		m_Container.pack(true) ;
 		m_Container.layout() ;
+		m_ComboContainer.pack(true) ;
 		m_ComboContainer.layout() ;
+		m_Container.getParent().pack(true) ;
+		m_Container.getParent().layout() ;
 		
 		// Create a context menu for m_Text.
 		// It will be filled in via a call to fillInContextMenu when the menu is popped up
@@ -168,6 +173,7 @@ public class EditorView extends AbstractView
 	protected void createDisplayControl(Composite parent)
 	{
 		m_Text = new Text(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP) ;
+		m_Text.pack() ;
 		
 		// Listen for Ctrl-Return to load the production immediately
 		m_Text.addKeyListener(new KeyAdapter() { public void keyPressed(KeyEvent e) { textKeyPressed(e) ; } } ) ;
