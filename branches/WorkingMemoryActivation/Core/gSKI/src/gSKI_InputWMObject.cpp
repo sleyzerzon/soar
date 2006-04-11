@@ -32,6 +32,10 @@
 
 #include "symtab.h"
 
+#ifdef DEBUG_UPDATE
+#include "..\..\ConnectionSML\include\sock_Debug.h"	// For PrintDebugFormat
+#endif
+
 //
 // Explicit Export for this file.
 //#include "MegaUnitTest.h"
@@ -269,8 +273,10 @@ namespace gSKI
    void InputWMObject::ReInitialize() 
    {
       m_vwmes.clear();
-      m_parentmap.clear();
       m_childmap.clear();
+	  m_vwmesInOrder.clear() ;
+	  m_childmapInOrder.clear() ;
+      //m_parentmap.clear();
    }
 
    /*
@@ -284,6 +290,8 @@ namespace gSKI
       if ( wme == 0 ) return;
 
       m_vwmes.insert(wme);
+	  m_vwmesInOrder.push_back(wme) ;
+
       wme->SetOwningObject(this);
 
       // If the value of this wme is an identifier then add the object
@@ -293,7 +301,12 @@ namespace gSKI
          InputWMObject* iobj = 
           m_manager->GetOrCreateObjectFromInterface(wme->GetValue()->GetObject());
         
-         m_childmap.insert(std::pair<InputWme*, InputWMObject*>(wme,iobj));
+         std::pair<tWmeObjIt,bool> done = m_childmap.insert(std::pair<InputWme*, InputWMObject*>(wme,iobj));
+
+		 // If the pair was added to the map (i.e. this is not a duplicate) then add the wme into the list
+		 // that we keep, so that the order is consistent between runs of Soar (if input wme order is consistent).
+		 if (done.second)
+			 m_childmapInOrder.push_back(wme) ;
       }
 
    }
@@ -310,13 +323,15 @@ namespace gSKI
       if ( it != m_vwmes.end() ) {
          // Removing the wme from the internal data structures
          m_vwmes.erase(it);
+		 m_vwmesInOrder.remove(wme) ;
          
          // Checking in the child map if this wme references an object
          tWmeObjIt it2 = m_childmap.find(wme);
          if ( it2 != m_childmap.end() ) {
 
-            // If it does then remove the entry from the map
+            // If it does then remove the entry from the map and the ordered list
             m_childmap.erase(it2);
+			m_childmapInOrder.remove(wme) ;
          }
 
       }
@@ -333,7 +348,12 @@ namespace gSKI
       MegaAssert( wme != 0, "Can't use a null wme to add a null input object!");
       if ( obj == 0 || wme == 0 ) return;
 
-      m_childmap.insert(std::pair<InputWme*,InputWMObject*>(wme, obj));
+      std::pair<tWmeObjIt,bool> done = m_childmap.insert(std::pair<InputWme*, InputWMObject*>(wme,obj));
+
+	  // If the pair was added to the map (i.e. this is not a duplicate) then add the wme into the list
+	  // that we keep, so that the order is consistent between runs of Soar (if input wme order is consistent).
+	  if (done.second)
+		 m_childmapInOrder.push_back(wme) ;
    }
 
    /*
@@ -350,7 +370,9 @@ namespace gSKI
          // If the object and wme are referenced by this object then remove them
          if ( tobj == obj ) {
             m_vwmes.erase(wme);
+			m_vwmesInOrder.remove(wme) ;
             m_childmap.erase(it);
+			m_childmapInOrder.remove(wme) ;
          }
 
       }
@@ -367,7 +389,7 @@ namespace gSKI
       MegaAssert( wme != 0, "Can't use a null wme to add a null input object!");
       if (obj == 0 || wme == 0 ) return;
 
-      m_parentmap.insert(std::pair<InputWme*,InputWMObject*>(wme, obj));
+//      m_parentmap.insert(std::pair<InputWme*,InputWMObject*>(wme, obj));
    }
 
    /*
@@ -380,16 +402,22 @@ namespace gSKI
    {
       std::vector<IWMObject*> matchingObjects;
 
+//      for ( std::map<InputWme*,InputWMObject*>::const_iterator it = m_childmap.begin();
+//            it != m_childmap.end();
+//            ++it ) {
       // Iterating over the referenced objects
-      for ( std::map<InputWme*,InputWMObject*>::const_iterator it = m_childmap.begin();
-            it != m_childmap.end();
-            ++it ) {
-
-         InputWme* wme = it->first;
+	  // DJP: Now doing this in a consistent order
+	  for (std::list<InputWme*>::const_iterator it = m_childmapInOrder.begin() ; it != m_childmapInOrder.end() ; ++it)
+	  {
+         //InputWme* wme = it->first;
+		  InputWme* wme = *it ;
          if ( wme->AttributeEquals( attr )) {
-            MegaAssert(it->second, "Input wme pointing to a null wmo!");
-            it->second->AddRef();
-            matchingObjects.push_back(it->second);
+			
+			 ctWmeObjIt itmap = m_childmap.find(wme);
+			 MegaAssert(itmap != m_childmap.end(), "m_childmap and m_childmapInOrder are out of sync") ;
+             MegaAssert(itmap->second, "Input wme pointing to a null wmo!");
+             itmap->second->AddRef();
+             matchingObjects.push_back(itmap->second);
          }
       
       }
@@ -446,11 +474,21 @@ namespace gSKI
    */
   void InputWMObject::Update(std::set<InputWMObject*>& processedObjects, bool forceAdds, bool forceRemoves)
   {
-    // First checking that this object hasn't already been added to the set of 
+#ifdef DEBUG_UPDATE
+	std::string id = this->GetId()->GetString() ;
+	PrintDebugFormat("Calling InputWMObject::Update on %s", id.c_str()) ;
+#endif
+
+	// First checking that this object hasn't already been added to the set of 
     // processed objects ( adding it and processing it if it hasn't; returning
     // if it has already been processed )
     std::set<InputWMObject*>::iterator it = processedObjects.find(this);
     if ( it != processedObjects.end() ) {
+
+#ifdef DEBUG_UPDATE
+	PrintDebugFormat("Already processed %s", id.c_str()) ;
+#endif
+
       return;
     } else {
       processedObjects.insert(this);
@@ -476,49 +514,75 @@ namespace gSKI
 
     }
 
-	InputWme* next = (m_vwmes.empty() ? NULL : *m_vwmes.begin()) ;
+    // DJP: When doing cleanup of objects prior to an init-soar, some of the children aren't
+	// released because the parent is destroyed first.
+    // Changing the order to release the children first resolves this.
+    // It may be safe to move all updates of children to here before updating the parent
+    // but because we're close to a release I'm only moving the ones known to cause
+    // a problem which is the "forceRemoves" case.  (Quick tests for always updating children
+    // before parents suggest it's safe).
+	if (forceRemoves)
+	{
+		UpdateWMObjectChildren(processedObjects, forceAdds, forceRemoves) ;
+	}
+
+	// DJP: We'll use the InOrder list of wmes so that this sequence is consistent between different runs
+	// (i.e. wme A is already created before wme B if you called to add wme A first, so variability is
+	//  up to the client rather than being injected here).
+	InputWme* next = (m_vwmesInOrder.empty() ? NULL : *m_vwmesInOrder.begin()) ;
 
     // Now updating all the input wmes of this object
 	// DJP: We have to be careful walking this list because the "Update()" call can
 	// cause m_vwmes to erase this wme from the list (if we're deleting the wme).
 	// Doing that invalidates the iterator, so we'll maintain an explicit "next" pointer which
 	// keeps the iterator valid (because it's moved on before the erasure occurs).
-    for ( std::set<InputWme*>::iterator it = m_vwmes.begin();
-	  it != m_vwmes.end();
-	  ) {
-
+    for ( std::list<InputWme*>::iterator it = m_vwmesInOrder.begin(); it != m_vwmesInOrder.end(); )
+	{
 	  // Moving carefully through the list so 'it' never becomes invalid
       InputWme* iwme = next ;
 	  ++it ;
-	  next = (it != m_vwmes.end()) ? (*it) : NULL ;
+	  next = (it != m_vwmesInOrder.end()) ? (*it) : NULL ;
 
       // Updating these wmes ( which creates raw kernel wmes from gSKI InputWmes
       // if they haven't already been created )
       if ( iwme != 0 ) {
-	iwme->Update(forceAdds, forceRemoves);
+		iwme->Update(forceAdds, forceRemoves);
       } else {
-	MegaAssert( false, "Null InputWme registered with InputWMObject!" );
+		MegaAssert( false, "Null InputWme registered with InputWMObject!" );
       }
-
     }
 
-    // Now updating all the child objects
-    for ( std::map<InputWme*, InputWMObject*>::iterator it = m_childmap.begin();
-	  it != m_childmap.end();
-	  ++it ) {
-
-      // Updating the child objects (and remembering to pass the set of processed
-      // objects to avoid being caught in cycles
-      InputWMObject* obj = it->second;
-      if ( obj != 0 ) {
-	obj->Update(processedObjects, forceAdds, forceRemoves);
-      } else {
-	MegaAssert( false, 
-		    "Null InputWMObject registered as child of another InputWMObject!");
-      }
-    
-    }
-
+    // DJP: The normal case is that we're not doing forced removes just prior to an init-soar
+    // and so we'll do this in the order originally designed into gSKI where the children
+    // are updated after the parent.  See my comment up above about possibly moving this update children
+    // call to occur before the parent in all cases (it may be better).
+    if (!forceRemoves)
+	{
+		UpdateWMObjectChildren(processedObjects, forceAdds, forceRemoves) ;
+	}
   }
+
+	void InputWMObject::UpdateWMObjectChildren(std::set<InputWMObject*>& processedObjects, bool forceAdds, bool forceRemoves)
+	{
+		// Now updating all the child objects
+		//for ( std::map<InputWme*, InputWMObject*>::iterator it = m_childmap.begin(); it != m_childmap.end(); ++it )
+		// DJP: Do this in a constistent order by using childmapInOrder.  If we walk m_childmap the order will
+		// vary with the memory location of the InputWme*'s used as keys.
+		for (std::list<InputWme*>::iterator it = m_childmapInOrder.begin() ; it != m_childmapInOrder.end() ; ++it)
+		{
+		// Updating the child objects (and remembering to pass the set of processed
+		// objects to avoid being caught in cycles
+			InputWme* wme = *it ;
+			tWmeObjIt it2 = m_childmap.find(wme);
+			MegaAssert(it2 != m_childmap.end(), "Childmap and childmapInOrder are out of synch in updateWMObjectChildren") ;
+
+			InputWMObject* obj = it2->second;
+			if ( obj != 0 ) {
+				obj->Update(processedObjects, forceAdds, forceRemoves);
+			} else {
+				MegaAssert( false, "Null InputWMObject registered as child of another InputWMObject!");
+			}
+		}
+	}
 
 }
