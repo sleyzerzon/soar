@@ -2469,7 +2469,7 @@ namespace gSKI
 			thisAgent->semantic_memory->insert_LME(id, attr, value, type);
 		}
 
-		void TgDWorkArounds::print_semantic_memory(IAgent* pIAgent){
+		void TgDWorkArounds::print_semantic_memory(IAgent* pIAgent, string attr, string value){
 			Agent* pAgent2 = (Agent*)(pIAgent);
 			agent* thisAgent = pAgent2->GetSoarAgent();
 			//thisAgent->semantic_memory->insert_LME(id, attr, value, type);
@@ -2483,10 +2483,21 @@ namespace gSKI
 				//print(thisAgent, "<%s, %s, %s, %d>\n",(*itr)->id.c_str(), (*itr)->attr.c_str(), (*itr)->value.c_str(), (*itr)->value_type);
 				//RemoveListenerAndEnableCallbacks(pIAgent);
 			}
+			
+			set<string> filtered_id_set;
+			bool filter = false;
+			if(attr != "" && value != ""){
+				// At this time, matching doesn't check value type yet, i.e 1 is the same as |1|
+				filtered_id_set = thisAgent->semantic_memory->match_attr_value(attr, value, -1);
+				filter = true;
+			}
 
 			HASH_S_HASH_S_HASH_S_LP id_attr_hash = thisAgent->semantic_memory->get_id_attr_hash();
 			for(HASH_S_HASH_S_HASH_S_LP::iterator itr = id_attr_hash.begin(); itr != id_attr_hash.end(); ++itr){
 				string id = itr->first;
+				if(filter && filtered_id_set.find(id) == filtered_id_set.end()){
+					continue;
+				}
 				print(thisAgent, "\n");
 				HASH_S_HASH_S_LP attr_hash = itr->second;
 				for(HASH_S_HASH_S_LP::iterator itr2 = attr_hash.begin(); itr2 != attr_hash.end(); ++itr2){

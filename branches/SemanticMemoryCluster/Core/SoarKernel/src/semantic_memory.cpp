@@ -23,7 +23,8 @@ string remove_quote(string str){ // get rid of quoting marks '||'
 	else{
 		ret = str;
 	}
-	cout << "Changed value " << str << endl;
+	
+	//cout << "Changed value " << str << endl;
 	return ret;
 }
 
@@ -224,34 +225,37 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 								vector<set<LME>::iterator>& all_new_lmes,
 								set<string>& merging_path, long& current_cycle)
 {
-	cout << "Merging " << id << endl;
+	if(debug_output)
+	if(debug_output) cout << "Merging " << id << endl;
 	merging_path.insert(id);
 	if(id_attr_value_hash.find(id) == id_attr_value_hash.end()){
-		cout << "No Value Hash" << endl;
+		if(debug_output)
+		if(debug_output) cout << "No Value Hash" << endl;
 		return id;
 	}
 	HASH_S_HASH_S_LP chunk_attr_value_hash = id_attr_value_hash.find(id)->second;
-	cout << "found value hash " << endl;
+	if(debug_output)
+	if(debug_output) cout << "found value hash " << endl;
 	for(HASH_S_HASH_S_LP::iterator itr = chunk_attr_value_hash.begin(); itr != chunk_attr_value_hash.end(); ++itr){
 		string attr = itr->first;
-		cout << "Branching attr " << attr << endl;
+		if(debug_output) if(debug_output) cout << "Branching attr " << attr << endl;
 		HASH_S_LP value_hash = itr->second;
 		for(HASH_S_LP::iterator itr2 = value_hash.begin(); itr2 != value_hash.end(); ++itr2){
 			string value = itr2->first;
 			int lme_index = itr2->second;
 			int value_type = all_new_lmes[lme_index]->value_type;
 			if (value_type == IDENTIFIER_SYMBOL_TYPE){ // need to merge this value which is identifier
-				cout << "Identifier value " << value << endl;
+				if(debug_output) if(debug_output) cout << "Identifier value " << value << endl;
 				string merged_id;
 				// first try to find it in merging hash for whether it has been merged already
 				hash_map<string, string>::iterator itr3 = merging_hash.find(value);
 				if(itr3 != merging_hash.end()){
 					merged_id = itr3->second;
-					cout << "Already Merged with " << merged_id << endl;
+					if(debug_output) if(debug_output) cout << "Already Merged with " << merged_id << endl;
 				}
 				else{ // call this routine recursively to find identical chunks to merge
 					if(merging_path.find(value) != merging_path.end()){ // loop detected
-						cout << "Loop structure dected! " << endl;
+						if(debug_output) if(debug_output) cout << "Loop structure dected! " << endl;
 						merged_id = value;
 						// keep the value as it was
 						// but don't update the merging_hash yet?
@@ -261,7 +265,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 					}
 					else{
 						merged_id = merge_id(value, id_attr_value_hash, merging_hash, all_new_lmes, merging_path, current_cycle);
-						cout << "Just Merged with " << merged_id << endl;
+						if(debug_output) if(debug_output) cout << "Just Merged with " << merged_id << endl;
 						merging_hash.insert(pair<string,string>(value, merged_id));
 					}
 				}
@@ -283,7 +287,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 	if(this->test_id(id)){ // existing id, no need to find identical chunk
 							// need to insert the new attribute values
 		final_chunk_id = id;
-		cout << "Updating existing chunk " << final_chunk_id << endl;
+		if(debug_output) if(debug_output) cout << "Updating existing chunk " << final_chunk_id << endl;
 	}
 	else{ // short term id, find identical chunk to merge.
 		
@@ -292,7 +296,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 		bool result =  find_identical_chunk(id, id_attr_value_hash, final_chunk_id, all_new_lmes);
 
 		if(result){// If there is the identical chunk already, update the counter
-			cout << "Find identical exsiting chunk " << final_chunk_id << endl;
+			if(debug_output) if(debug_output) cout << "Find identical exsiting chunk " << final_chunk_id << endl;
 			//need_insert = false;
 			// Update counter here ...
 
@@ -303,7 +307,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 	//if(need_insert){// Otherwise insert the new chunk here...
 	// Now just always insert the element, if already exist, update the reference history
 
-	//		cout << "Insert new chunk " << final_chunk_id << endl;
+	//		if(debug_output) cout << "Insert new chunk " << final_chunk_id << endl;
 			for(HASH_S_HASH_S_LP::iterator itr = chunk_attr_value_hash.begin(); itr != chunk_attr_value_hash.end(); ++itr){
 				string attr = itr->first;
 
@@ -312,7 +316,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 					string value = itr2->first;
 					int lme_index = itr2->second;
 					int value_type = all_new_lmes[lme_index]->value_type;
-					cout << " ^" << attr <<" " << value << "("<< value_type<< ")"<< endl;
+					if(debug_output) if(debug_output) cout << " ^" << attr <<" " << value << "("<< value_type<< ")"<< endl;
 
 					vector<int> current_history;
 					current_history.push_back(current_cycle);
@@ -465,8 +469,8 @@ set<string> SemanticMemory::match_retrieve_single_level(const set<CueTriplet>& c
 				break;
 			}
 		}
-		cout << "Current matched ids" << endl;
-		cout << matched_ids_intersection << endl;
+		if(debug_output) if(debug_output) cout << "Current matched ids" << endl;
+		if(debug_output) if(debug_output) cout << matched_ids_intersection << endl;
 
 		start = true;
 	}
@@ -530,8 +534,8 @@ set<CueTriplet> SemanticMemory::match_retrieve_single_level_2006_1_31(const set<
 				break;
 			}
 		}
-		cout << "Current matched ids" << endl;
-		cout << matched_ids_intersection << endl;
+		if(debug_output) cout << "Current matched ids" << endl;
+		if(debug_output) cout << matched_ids_intersection << endl;
 
 		start = true;
 	}
@@ -591,8 +595,8 @@ set<CueTriplet> SemanticMemory::match_retrieve_single_level_2006_1_22(const set<
 				break;
 			}
 		}
-		cout << "Current matched ids" << endl;
-		cout << matched_ids_intersection << endl;
+		if(debug_output) cout << "Current matched ids" << endl;
+		if(debug_output) cout << matched_ids_intersection << endl;
 
 		start = true;
 	}
@@ -665,8 +669,8 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 				break;
 			}
 		}
-		cout << "Current matched ids" << endl;
-		cout << matched_ids_intersection << endl;
+		if(debug_output) cout << "Current matched ids" << endl;
+		if(debug_output) cout << matched_ids_intersection << endl;
 
 		start = true;
 	}
@@ -685,14 +689,14 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 	// summarize target value
 	for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
 		string candidate_id = *itr;
-		//cout << "###" << endl;
-		//cout << candidate_id << endl;
-		//cout << target_attr << endl;
+		//if(debug_output) cout << "###" << endl;
+		//if(debug_output) cout << candidate_id << endl;
+		//if(debug_output) cout << target_attr << endl;
 		set<int> candidate_lme_index = this->match_id_attr(candidate_id, target_attr);
 		// Assume single valued attributes, or just pick the first value
 
 		if(candidate_lme_index.empty()){
-			cout << "No target attribute" << endl;
+			if(debug_output) cout << "No target attribute" << endl;
 			// This should not happen
 			break;
 		}
@@ -733,7 +737,7 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 			max_count = current_value_count;
 			max_counted_value = current_value;
 		}
-		//cout << itr->first<<", " << itr->second << endl;
+		//if(debug_output) cout << itr->first<<", " << itr->second << endl;
 	}
 
 	experience = total_count;
@@ -743,9 +747,9 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 	int retrieved_value_type = (LME_Array[retrieved_lme_index])->value_type;
 	retrieved_id = (LME_Array[retrieved_lme_index])->id;
 
-	//cout << "Confidence: " << confidence << endl;
-	//cout << "Experience: " << experience << endl;
-	//cout << "Index: " << retrieved_lme_index << endl;
+	//if(debug_output) cout << "Confidence: " << confidence << endl;
+	//if(debug_output) cout << "Experience: " << experience << endl;
+	//if(debug_output) cout << "Index: " << retrieved_lme_index << endl;
 
 	for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
 		string attr = itr->attr;
@@ -789,8 +793,8 @@ bool SemanticMemory::partial_match(const set<CueTriplet>& cue_set, string& retri
 		else{
 			set<string> current_matched_ids = this->match_attr_value(attr, value, value_type);
 			++ cue_component_count; // target attribute shouldn't be part of it
-			cout << "Current matched ids" << endl;
-			cout << current_matched_ids << endl;
+			if(debug_output) cout << "Current matched ids" << endl;
+			if(debug_output) cout << current_matched_ids << endl;
 			for(set<string>::iterator itr2 = current_matched_ids.begin(); itr2 != current_matched_ids.end(); ++itr2){
 				string matched_id = *itr2;
 				if(chunk_counter.find(matched_id) == chunk_counter.end()){
@@ -807,14 +811,14 @@ bool SemanticMemory::partial_match(const set<CueTriplet>& cue_set, string& retri
 	for(map<string, int>::iterator itr = chunk_counter.begin(); itr != chunk_counter.end(); ++itr){
 		string chunk_id = itr->first;
 		int match_count = itr->second;
-		cout << chunk_id << ", " << match_count << endl;
+		if(debug_output) cout << chunk_id << ", " << match_count << endl;
 		if(match_count > max_match_count){
 			max_match_count = match_count;
 			max_match_id = chunk_id;
 		}
 	}
 	
-	cout << "Max Count" << max_match_count << endl;
+	if(debug_output) cout << "Max Count" << max_match_count << endl;
 	if(max_match_count == 0 || max_match_count < cue_component_count * threshold){ // no matches or below threshold
 		retrieved_id = "F0";
 		retrieved.insert(CueTriplet("F0", "status", "failure", 2));
@@ -824,8 +828,8 @@ bool SemanticMemory::partial_match(const set<CueTriplet>& cue_set, string& retri
 		// This notion of confidence is totally different from the summarization about target attribute.
 		confidence = (float)max_match_count / (float)cue_component_count;
 
-	//	cout << max_match_count << ", " << cue_component_count << endl;
-	//	cout << "Confidence " << confidence << endl;
+	//	if(debug_output) cout << max_match_count << ", " << cue_component_count << endl;
+	//	if(debug_output) cout << "Confidence " << confidence << endl;
 		retrieved_id = max_match_id;
 		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
 			string id = itr->id;
@@ -837,7 +841,7 @@ bool SemanticMemory::partial_match(const set<CueTriplet>& cue_set, string& retri
 			// Have to rematch everything again, since it's not exact match.
 			set<int> candidate_index = this->match_id_attr(retrieved_id, attr);
 			int target_index = *(candidate_index.begin());
-			cout << retrieved_id << "," << attr << ", " <<target_index << endl;
+			if(debug_output) cout << retrieved_id << "," << attr << ", " <<target_index << endl;
 			string retrieved_value = (LME_Array[target_index])->value;
 			int retrieved_value_type = (LME_Array[target_index])->value_type;
 			retrieved.insert(CueTriplet(retrieved_id, attr, retrieved_value, retrieved_value_type));
@@ -848,7 +852,7 @@ bool SemanticMemory::partial_match(const set<CueTriplet>& cue_set, string& retri
 			
 		}
 	}
-	cout << "Confidence " << confidence << endl;
+	if(debug_output) cout << "Confidence " << confidence << endl;
 	return true;
 }
 
@@ -869,7 +873,7 @@ set<int> SemanticMemory::match_id_attr(const string id, const string attr){
 	else{
 		HASH_S_LP& value_hash = itr2->second;
 		for(HASH_S_LP::iterator itr3 = value_hash.begin(); itr3 != value_hash.end(); ++itr3){
-			//cout << "Attr-Value matched: " << itr3->first << endl;
+			//if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
 			//returned_ids_set.insert(itr3->first);
 			index.insert(itr3->second);
 		}
@@ -908,9 +912,9 @@ int SemanticMemory::insert_LME_hash (HASH_S_HASH_S_HASH_S_LP& hash, string key1,
 		return lme_index;
 	}
 	else{// already exsist, update activation...
-		cout << "Already exisits!" << endl;
-		cout << key1 << ", " << key2 << ", " << key3 << endl;
-		//cout << *(LME_Array[lme_index]) << endl;
+		if(debug_output) cout << "Already exisits!" << endl;
+		if(debug_output) cout << key1 << ", " << key2 << ", " << key3 << endl;
+		//if(debug_output) cout << *(LME_Array[lme_index]) << endl;
 		return itr3->second;
 	}
 	return lme_index;
@@ -921,11 +925,11 @@ int SemanticMemory::insert_LME_hash (HASH_S_HASH_S_HASH_S_LP& hash, string key1,
 bool SemanticMemory::test_id(const string id){
 	HASH_S_HASH_S_HASH_S_LP::iterator itr = memory_id_attr_hash.find(id);
 	if(itr == memory_id_attr_hash.end()){
-		cout << "ID "<< id << " Not found";
+		if(debug_output) cout << "ID "<< id << " Not found";
 		return false;
 	}
 	else{
-		cout << "ID "<< id << " found as Long term" << endl;
+		if(debug_output) cout << "ID "<< id << " found as Long term" << endl;
 		return true;
 	}
 }
@@ -949,7 +953,7 @@ void SemanticMemory::dump(ostream& out){
 			while(itr3 != value_hash.end()){
 				int lme_index = itr3->second;
 				LME* lme_ptr = LME_Array[lme_index]; 
-				cout << *lme_ptr<<endl;
+				if(debug_output) cout << *lme_ptr<<endl;
 				++itr3;
 			}
 
@@ -977,7 +981,7 @@ void SemanticMemory::dump(vector<LME*>& out){
 			while(itr3 != value_hash.end()){
 				int lme_index = itr3->second;
 				LME* lme_ptr = LME_Array[lme_index];
-				//cout << lme_ptr<<endl;
+				//if(debug_output) cout << lme_ptr<<endl;
 				out.push_back(lme_ptr);
 				++itr3;
 			}
@@ -1026,7 +1030,7 @@ set<int> SemanticMemory::exact_match_attr_value(const string attr, const string 
 				// Since there is no way to specify that via the cue link.
 				HASH_S_LP& id_hash = itr2->second;
 				for(HASH_S_LP::iterator itr3 = id_hash.begin(); itr3 != id_hash.end(); ++itr3){
-					cout << "Attr-Value matched: " << itr3->first << endl;
+					if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
 					returned_index_set.insert(itr3->second);
 				}
 
@@ -1042,7 +1046,7 @@ set<int> SemanticMemory::exact_match_attr_value(const string attr, const string 
 		else{
 			HASH_S_LP& id_hash = itr2->second;
 			for(HASH_S_LP::iterator itr3 = id_hash.begin(); itr3 != id_hash.end(); ++itr3){
-				cout << "Attr-Value matched: " << itr3->first << endl;
+				if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
 				returned_index_set.insert(itr3->second);
 			}
 		}
@@ -1077,7 +1081,7 @@ set<string> SemanticMemory::match_attr_value(const string attr, const string val
 				// Since there is no way to specify that via the cue link.
 				HASH_S_LP& id_hash = itr2->second;
 				for(HASH_S_LP::iterator itr3 = id_hash.begin(); itr3 != id_hash.end(); ++itr3){
-					cout << "Attr-Value matched: " << itr3->first << endl;
+					if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
 					returned_ids_set.insert(itr3->first);
 				}
 
@@ -1093,7 +1097,7 @@ set<string> SemanticMemory::match_attr_value(const string attr, const string val
 		else{
 			HASH_S_LP& id_hash = itr2->second;
 			for(HASH_S_LP::iterator itr3 = id_hash.begin(); itr3 != id_hash.end(); ++itr3){
-				cout << "Attr-Value matched: " << itr3->first << endl;
+				if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
 				returned_ids_set.insert(itr3->first);
 			}
 		}
@@ -1131,7 +1135,8 @@ int SemanticMemory::reset_history(){
 
 
 SemanticMemory::~SemanticMemory(){
-	cout << "Calling SemanticMemory destructor" <<endl;
+	if(debug_output)
+	if(debug_output) cout << "Calling SemanticMemory destructor" <<endl;
 	this->clear();
 /*	
 	HASH_S_HASH_S_HASH_S_LP::iterator itr = memory_id_attr_hash.begin();
@@ -1148,7 +1153,7 @@ SemanticMemory::~SemanticMemory(){
 			while(itr3 != value_hash.end()){
 				int lme_index = itr3->second;
 				LME* lme_ptr = LME_Array[lme_index];
-				cout << *lme_ptr<<endl;
+				if(debug_output) cout << *lme_ptr<<endl;
 				//delete lme_ptr;
 				++itr3;
 			}

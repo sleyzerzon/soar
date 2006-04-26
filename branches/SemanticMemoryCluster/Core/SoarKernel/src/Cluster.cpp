@@ -217,9 +217,9 @@ vector<int> NetWork::cluster_input(vector<double> input, bool update){
 vector<int> NetWork::cluster_input(vector<pair<string, string> >& attr_val_pairs, bool update){
 	vector<double> input = this->translate_input(attr_val_pairs);
 	for(int i=0; i<input.size(); ++i){
-		cout << input[i] << ", ";
+		//cout << input[i] << ", ";
 	}
-	cout << endl;
+	//cout << endl;
 	return this->cluster_input(input, update);
 }
 

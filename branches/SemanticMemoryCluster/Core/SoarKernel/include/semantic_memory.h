@@ -67,7 +67,8 @@ public:
 	bool operator < (const LME lme) const;
 	//... all required data structure
 	~LME(){
-		cout << id<<","<<attr<<","<<value<<","<<value_type<<"being destroied\n";
+		
+		//cout << id<<","<<attr<<","<<value<<","<<value_type<<"being destroied\n";
 	}
 };
 
@@ -100,6 +101,8 @@ typedef stdext::hash_map<string, HASH_S_HASH_S_LP> HASH_S_HASH_S_HASH_S_LP;
 class SemanticMemory
 {
 	public:
+		bool debug_output;
+		SemanticMemory(){debug_output = false;};
 		void insert_LME (string id, string attr, string value, 
 			int value_type, const vector<int>& history = vector<int>());
 
@@ -150,10 +153,10 @@ class SemanticMemory
 								// On the other hand, decidion cycle number is restarted as well.
 
 		~SemanticMemory();
-	private:
+//	private:
 		// given attribute and value, find the id with the matching attr-value pair
 		set<string> match_attr_value(const string attr, const string value, int value_type);
-		
+	private:		
 		// given attribute and value, find the indexes of LME with the matching attr-value pair
 		// value must be either constant or long-term identifier and shouldn't be temporary identifier
 		set<int> exact_match_attr_value(const string attr, const string value, int value_type);

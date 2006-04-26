@@ -167,7 +167,15 @@ bool CommandLineInterface::ParsePrintMemory(gSKI::IAgent* pAgent, std::vector<st
 	
 	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 	AddListenerAndDisableCallbacks(pAgent);
-	pKernelHack->print_semantic_memory(pAgent);
+	
+	string attr = "", value = "";
+	if(argv.size() >= 3){
+		attr = argv[1];
+		value = argv[2];
+	}
+	// print the chunks with the specified attr-value
+	// Only support one pair, should be able to support more complex regex in the future.
+	pKernelHack->print_semantic_memory(pAgent, attr, value);
 	
 	int count_size = pKernelHack->semantic_memory_chunk_count(pAgent);
 	int lme_size = pKernelHack->semantic_memory_lme_count(pAgent);

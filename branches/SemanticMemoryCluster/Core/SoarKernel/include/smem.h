@@ -11,7 +11,7 @@
 #include <sstream> // for StringToInt
 using namespace std;
 
-static YJ_debug = 1;
+static bool YJ_debug = false;
 
 void retrieve_3_13(agent* thisAgent);
 void retrieve_1_20(agent* thisAgent);

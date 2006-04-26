@@ -127,7 +127,7 @@ string StringToSym(string str){ // get rid of quoting marks '||'
 	else{
 		ret = str;
 	}
-	cout << "Changed value " << str << endl;
+	if(YJ_debug) cout << "Changed value " << str << endl;
 	return ret;
 }
 
@@ -702,10 +702,10 @@ void smem_routine(agent* thisAgent){
 	
 	//create_subgoal_links(thisAgent); // this is done automatically now
 	//print(thisAgent, "\nprinting\n");
-	//thisAgent->semantic_memory->dump(std::cout);
+	//thisAgent->semantic_memory->dump(std::if(YJ_debug) cout);
 	
 	//save_wmes(thisAgent);
-	//thisAgent->semantic_memory->dump(std::cout);
+	//thisAgent->semantic_memory->dump(std::if(YJ_debug) cout);
 	
 	if(thisAgent->sysparams[SMEM_SYSPARAM] == 1){
 		print(thisAgent, "\nSMEM Enabled (%d)\n",thisAgent->sysparams[SMEM_SYSPARAM]);
@@ -725,9 +725,9 @@ void smem_routine(agent* thisAgent){
 		cluster(thisAgent);
 	}
 	//print(thisAgent, "\nCurrent cycle %d\n", thisAgent->d_cycle_count);
-	//thisAgent->semantic_memory.dump(std::cout);
+	//thisAgent->semantic_memory.dump(std::if(YJ_debug) cout);
 	//thisAgent->semantic_memory->print();
-	//thisAgent->semantic_memory.dump(std::cout);
+	//thisAgent->semantic_memory.dump(std::if(YJ_debug) cout);
 	//stdext::hash_map<std::string, std::string, std::hash_compare<std::string, std::string>,
 	//	SoarMemoryPoolAllocator<pair<std::string, std::string> > >::iterator itr = thisAgent->test_hash->begin();
 
@@ -763,7 +763,7 @@ string symbol_constant_to_string(agent* thisAgent, Symbol* s){
 void save_wmes_old(agent* thisAgent){
 
 	
-	//thisAgent->semantic_memory->dump(cout);
+	//thisAgent->semantic_memory->dump(if(YJ_debug) cout);
 
 	slot *s;
 	wme *w;
@@ -791,28 +791,28 @@ void save_wmes_old(agent* thisAgent){
 			print(thisAgent, "\n");
 			print_wme(thisAgent, w);
 			print_with_symbols(thisAgent, "%y, %y,%y\n", w->id, w->attr, w->value);
-			//cout << id<<"?"<<attr<<"?"<<value<<endl;
+			//if(YJ_debug) cout << id<<"?"<<attr<<"?"<<value<<endl;
 			print(thisAgent, "\n");
 			
 			thisAgent->semantic_memory->insert_LME(id,attr,value,value_type);
 		}
 	}
-	thisAgent->semantic_memory->dump(std::cout);
+	thisAgent->semantic_memory->dump(std::if(YJ_debug) cout);
 	
 }
 */
 bool long_term_value(agent* thisAgent, const set<std::string>& saved_ids, string value, int value_type){
-	cout << value <<"," << value_type<<endl;
+	if(YJ_debug) cout << value <<"," << value_type<<endl;
 	if(value_type == INT_CONSTANT_SYMBOL_TYPE || value_type == FLOAT_CONSTANT_SYMBOL_TYPE || value_type == SYM_CONSTANT_SYMBOL_TYPE
 		|| 
 		(value_type == IDENTIFIER_SYMBOL_TYPE && (saved_ids.find(value) !=saved_ids.end() || thisAgent->semantic_memory->test_id(value)))
 		)
 	{
-		cout << "YES"<<endl;
+		if(YJ_debug) cout << "YES"<<endl;
 		return true;
 	}
 	else{
-		cout << "NO" << endl;
+		if(YJ_debug) cout << "NO" << endl;
 		return false;
 	}
 }
@@ -909,8 +909,8 @@ void retrieve_1_20(agent* thisAgent){
 
 					/*
 					set<string> ids = thisAgent->semantic_memory->match_retrieve_single_level(cue_set);// retrieving
-					cout << "Matched IDS:" << endl;
-					cout << ids << endl;
+					if(YJ_debug) cout << "Matched IDS:" << endl;
+					if(YJ_debug) cout << ids << endl;
 					if(ids.size() > 0){ // should never return empty set, may need to set a long-term-id for FAILURE chunk
 
 						picked_id = *(ids.begin()); // just pick the 1st for the moment, This must be a long term id
@@ -1107,7 +1107,7 @@ void retrieve_3_13(agent* thisAgent){
 					add_input_wme_with_history
 							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-confidence"), make_float_constant(thisAgent, confidence));
 					add_input_wme_with_history
-							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-experience"), make_float_constant(thisAgent, experience));
+							(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-experience"), make_int_constant(thisAgent, (int)experience));
 					break; // only consider the first cue, even if there are mulitple cues.
 				}	
 			}
@@ -1230,8 +1230,8 @@ void retrieve(agent* thisAgent){
 						// there won't be a 'retrieved' slot (old retrieved will be removed since there is no new retrieve)
 
 						set<string> ids = thisAgent->semantic_memory->match_retrieve_single_level(cue_set);// retrieving
-						cout << "Matched IDS:" << endl;
-						cout << ids << endl;
+						if(YJ_debug) cout << "Matched IDS:" << endl;
+						if(YJ_debug) cout << ids << endl;
 						if(ids.size() > 0){ // should never return empty set, may need to set a long-term-id for FAILURE chunk
 							
 							picked_id = *(ids.begin()); // just pick the 1st for the moment, This must be a long term id
@@ -1476,13 +1476,13 @@ void smem_save_wme (agent* thisAgent, wme* w){ // collect new wmes for later add
 		return;
 	}
 		//return;
-		//cout << "ID " << w->id->common.symbol_type << endl;
+		//if(YJ_debug) cout << "ID " << w->id->common.symbol_type << endl;
 		string id = symbol_constant_to_string(thisAgent, w->id); // ID must be SYM_CONSTANT_SYMBOL_TYPE
 		
-		//cout << "ATTR " << w->attr->common.symbol_type << endl;
+		//if(YJ_debug) cout << "ATTR " << w->attr->common.symbol_type << endl;
 		string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
 		
-		//cout << "VALUE " << w->value->common.symbol_type << endl;
+		//if(YJ_debug) cout << "VALUE " << w->value->common.symbol_type << endl;
 		string value = symbol_constant_to_string(thisAgent, w->value);
 		int value_type = w->value->common.symbol_type;
 			
@@ -1542,7 +1542,7 @@ void save_wmes(agent* thisAgent){
 	set<std::string> saved_ids;
 	set<LME> saved_wmes;
 	//find_save_ids(thisAgent, saved_ids); // figure out the new ids to be saved
-	//cout << "To be saved ids " << saved_ids << endl;
+	//if(YJ_debug) cout << "To be saved ids " << saved_ids << endl;
 	//find_save_wmes(thisAgent, saved_wmes); // figure out the wmes whose identifier is being pointed by save link.
 	find_save_wmes_all(thisAgent, saved_wmes);
 
@@ -1551,7 +1551,7 @@ void save_wmes(agent* thisAgent){
 	// newly added, or just consider all WMEs ?
 	
 	for(set<LME>::iterator itr = saved_wmes.begin(); itr != saved_wmes.end(); ++itr){
-		cout << *itr << endl;
+		if(YJ_debug) cout << *itr << endl;
 		
 		thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
 		
@@ -1564,7 +1564,7 @@ void save_wmes_old(agent* thisAgent){
 	set<std::string> saved_ids;
 	set<LME> saved_wmes;
 	find_save_ids(thisAgent, saved_ids); // figure out the new ids to be saved
-	//cout << "To be saved ids " << saved_ids << endl;
+	//if(YJ_debug) cout << "To be saved ids " << saved_ids << endl;
 	find_save_wmes(thisAgent, saved_wmes); // figure out the wmes whose identifier is being pointed by save link.
 	//find_save_wmes_all(thisAgent, saved_wmes);
 
@@ -1573,14 +1573,14 @@ void save_wmes_old(agent* thisAgent){
 	// newly added, or just consider all WMEs ?
 	
 	for(set<LME>::iterator itr = saved_wmes.begin(); itr != saved_wmes.end(); ++itr){
-		cout << *itr << endl;
+		if(YJ_debug) cout << *itr << endl;
 		if(long_term_value(thisAgent, saved_ids, itr->id, IDENTIFIER_SYMBOL_TYPE) && 
 			long_term_value(thisAgent, saved_ids, itr->value, itr->value_type)){
 
 				thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
 			}
 		else{
-			cout << "Not long term values" << endl;
+			if(YJ_debug) cout << "Not long term values" << endl;
 		}
 	}
 
@@ -1592,7 +1592,7 @@ void save_wmes_deliberate_merge_identical(agent* thisAgent){
 	set<std::string> saved_ids;
 	set<LME> saved_wmes;
 	find_save_ids(thisAgent, saved_ids); // figure out the new ids to be saved
-	//cout << "To be saved ids " << saved_ids << endl;
+	//if(YJ_debug) cout << "To be saved ids " << saved_ids << endl;
 	find_save_wmes(thisAgent, saved_wmes); // figure out the wmes whose identifier is being pointed by save link.
 	//find_save_wmes_all(thisAgent, saved_wmes);
 
@@ -1601,7 +1601,7 @@ void save_wmes_deliberate_merge_identical(agent* thisAgent){
 	// newly added, or just consider all WMEs ?
 	
 	for(set<LME>::iterator itr = saved_wmes.begin(); itr != saved_wmes.end(); ++itr){
-		cout << *itr << endl;
+		if(YJ_debug) cout << *itr << endl;
 		if(long_term_value(thisAgent, saved_ids, itr->id, IDENTIFIER_SYMBOL_TYPE) && 
 			long_term_value(thisAgent, saved_ids, itr->value, itr->value_type)){
 
@@ -1609,7 +1609,7 @@ void save_wmes_deliberate_merge_identical(agent* thisAgent){
 				final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
 			}
 		else{
-			cout << "Not long term values" << endl;
+			if(YJ_debug) cout << "Not long term values" << endl;
 		}
 	}
 	thisAgent->semantic_memory->merge_LMEs(final_lmes, thisAgent->d_cycle_count);
@@ -1619,7 +1619,7 @@ void save_wmes_deliberate_merge_identical(agent* thisAgent){
 void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 
 	
-	//thisAgent->semantic_memory->dump(cout);
+	//thisAgent->semantic_memory->dump(if(YJ_debug) cout);
 
 	slot *save_s;
 	wme *save_w;
@@ -1680,7 +1680,7 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 			}
 		}
 	}
-	//thisAgent->semantic_memory->dump(std::cout);
+	//thisAgent->semantic_memory->dump(std::if(YJ_debug) cout);
 	
 }
 
@@ -1752,7 +1752,7 @@ void cluster(agent* thisAgent){
 				//training_attr_val_pairs.push_back(pair<string, string>(attr, value));
 				
 				training_attr_val_pairs = parse_cluster_input_str(value);
-				cout << "Cluster Training " << value << endl;
+				if(YJ_debug) cout << "Cluster Training " << value << endl;
 				if(YJ_debug){
 					print_with_symbols(thisAgent, "Cluster Training WME\n");
 					print_wme(thisAgent, cluster_w);
@@ -1779,7 +1779,7 @@ void cluster(agent* thisAgent){
 				// This is more realistic at neuron level, where firing/non-firing is just binary
 				//input_attr_val_pairs.push_back(pair<string, string>(attr, value));
 				input_attr_val_pairs = parse_cluster_input_str(value);
-				cout << "Cluster Input " <<  value << endl;
+				if(YJ_debug) cout << "Cluster Input " <<  value << endl;
 				if(YJ_debug){
 					print_with_symbols(thisAgent, "Cluster Input WME\n");
 					print_wme(thisAgent, cluster_w);
@@ -1814,6 +1814,9 @@ void cluster(agent* thisAgent){
 		Symbol* output_id = make_new_identifier(thisAgent, 'C', goal_level);
 		add_input_wme_with_history(thisAgent, cluster_link_id , make_sym_constant(thisAgent,"output"), output_id);
 		
+		if(winners.size() == 0){ // Actually impossible unless there is not input
+			
+		}
 		for(int i=0; i< winners.size(); ++i){
 			
 			string attr = string("level")+IntToString((i+1));
