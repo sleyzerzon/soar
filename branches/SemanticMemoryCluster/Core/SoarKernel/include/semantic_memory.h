@@ -34,7 +34,7 @@ using stdext::hash_map;
 using std::less;
 using std::allocator;
 
-
+#ifndef _MSC_VER
 #ifndef HASH_MAP_DEF
 #define HASH_MAP_DEF
 //this was lifted from a reply to a porting question found by googling...
@@ -49,7 +49,7 @@ namespace __gnu_cxx
   };
 }
 #endif
-
+#endif
 
 
 unsigned long StringToUnsignedLong(string str);

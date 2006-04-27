@@ -25,7 +25,7 @@ using stdext::hash_map;
 using std::less;
 using std::allocator;
 
-#if (1)
+#ifndef _MSC_VER
 #ifndef HASH_MAP_DEF
 #define HASH_MAP_DEF
 
