@@ -1,11 +1,14 @@
 // Cluster.cpp : Defines the entry point for the console application.
 //
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include "portability.h"
+
+
 //#include "stdafx.h"
 #include "Cluster.h"
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include <stdio.h>
+
 
 float ranf(){
 	float  randf = rand()%10000*1.0/10000;
@@ -75,7 +78,7 @@ vector<double> Unit::hypersphere(int dim){
 
 double Unit::activation(vector<double> input){
 	double total_activation = 0;
-	for(int i=0; i<input.size(); ++i){
+	for(int i=0; i<(int)(input.size()); ++i){
 		if(i >= this->max_dim){
 			cout << "input " << input.size() << " exceeds maximum dimension " << this->max_dim << endl;
 			exit(1);
@@ -89,7 +92,7 @@ void Unit::update(vector<double> input){
 	double base_rate = 0.2;
 	double learn_rate = base_rate * pow((float)(this->counter+1), (float)-0.5);
 	//cout << learn_rate << endl;
-	for(int i=0; i<this->max_dim; ++i){
+	for(int i=0; i<(int)(this->max_dim); ++i){
 	//	cout << this->weights[i]<<" ";
 		double current_bit = 0;
 		if(i < input.size()){
@@ -105,7 +108,7 @@ void Unit::update(vector<double> input){
 
 vector<double> Unit::subtract_input(vector<double>& input){
 	vector<double> new_input = vector<double>();
-	for(int i=0; i<input.size(); ++i){
+	for(int i=0; i<(int)(input.size()); ++i){
 		new_input.push_back(input[i] - this->weights[i]);
 	}
 	return new_input;
@@ -216,7 +219,7 @@ vector<int> NetWork::cluster_input(vector<double> input, bool update){
 }
 vector<int> NetWork::cluster_input(vector<pair<string, string> >& attr_val_pairs, bool update){
 	vector<double> input = this->translate_input(attr_val_pairs);
-	for(int i=0; i<input.size(); ++i){
+	for(int i=0; i<(int)(input.size()); ++i){
 		//cout << input[i] << ", ";
 	}
 	//cout << endl;
@@ -232,7 +235,7 @@ int NetWork::winner(vector<double> input, vector<int> inhibit){
 
 	double max_activation = -100;
 	int current_winner = -1;
-	for(int i=0; i < this->units.size(); ++i){
+	for(int i=0; i < (int)(this->units.size()); ++i){
 		if(competing_nodes[i] == -1){ // being inhibited
 			continue;
 		}

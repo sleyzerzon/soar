@@ -2,7 +2,7 @@
 # Author: Jonathan Voigt, voigtjr@gmail.com
 # Date: 2006
 ###########################################
-SUBDIRS = TOHSML TestCLI TestClientSML TestConnectionSML TestSMLEvents TestSoarPerformance QuickLink
+SUBDIRS = TOHSML TestCLI TestClientSML TestConnectionSML TestSMLEvents TestSoarPerformance
 
 java:
 	cd LoggerJava && $(MAKE) $(MAKEOPTS) java

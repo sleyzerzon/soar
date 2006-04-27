@@ -5,11 +5,20 @@
 #include "agent.h"
 #include "Cluster.h"
 #include <map>
+//#include <hash_map>
+
+#ifdef _MSC_VER
 #include <hash_map>
+#else
+#include <ext/hash_map>
+namespace sdtext = ::__gnu_cxx;
+#endif
+
 #include <iostream>
 #include <string>
 #include <sstream> // for StringToInt
 using namespace std;
+
 
 static bool YJ_debug = false;
 
@@ -31,3 +40,4 @@ string symbol_constant_to_string(agent* thisAgent, Symbol* s);
 void cluster(agent* thisAgent);
 
 #endif /* _SMEM_H_ */
+

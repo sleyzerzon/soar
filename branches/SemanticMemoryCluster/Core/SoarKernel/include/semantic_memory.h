@@ -4,14 +4,22 @@
 #ifndef _SMEM_
 #define _SMEM_
 
-#pragma warning (disable : 4503)
+
 
 #include <map>
 #include <set>
 #include <vector>
-#include <hash_map>
+//#include <ext/hash_map>
 #include <string>
 #include <iostream>
+
+#ifdef _MSC_VER
+#pragma warning (disable : 4503)
+#include <hash_map>
+#else
+#include <ext/hash_map>
+namespace stdext= ::__gnu_cxx;
+#endif
 
 using std::map;
 using std::set;
@@ -22,9 +30,27 @@ using std::ostream;
 using std::endl;
 using std::pair;
 using stdext::hash_map;
-using stdext::hash_compare;
+//using stdext::hash_compare;
 using std::less;
 using std::allocator;
+
+
+#ifndef HASH_MAP_DEF
+#define HASH_MAP_DEF
+//this was lifted from a reply to a porting question found by googling...
+namespace __gnu_cxx
+{
+  template <> struct hash<string>
+  {
+    size_t operator () (const string& x ) const
+    {
+      return hash<char const*>()(x.c_str());
+    }
+  };
+}
+#endif
+
+
 
 unsigned long StringToUnsignedLong(string str);
 
@@ -108,15 +134,15 @@ class SemanticMemory
 
 		// This one should be the external insert function called.
 		// Need to merge identical chunks recursively
-		void merge_LMEs(set<LME>& lmes, long current_cycle);
+		void merge_LMEs(vector<LME>& lmes, long current_cycle);
 
 		string merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_atrr_value_hash, 
 			hash_map<string, string>& merging_hash,
-			vector<set<LME>::iterator>& all_new_lmes,
+			vector<LME>& all_new_lmes,
 			set<string>& merging_path, long& current_cycle);
 		
 		bool find_identical_chunk (string& chunk_id, HASH_S_HASH_S_HASH_S_LP& id_attr_value_hash,
-			string& new_chunk_id, vector<set<LME>::iterator>& all_new_lmes);
+			string& new_chunk_id, vector<LME>& all_new_lmes);
 
 		bool test_id(const string id);
 		
@@ -135,7 +161,7 @@ class SemanticMemory
 		
 		// Given the id, expands other attributes according to the given cue (optional)
 		// If the attribute is in the cue, then expand that attribute regardless of activation
-		set<LME> expand_id(string id, set<CueTriplet>& cue = set<CueTriplet>());
+		//		set<LME> expand_id(string id, set<CueTriplet>& cue = set<CueTriplet>());
 
 		void dump(ostream& out);
 		void dump(vector<LME*>& out);

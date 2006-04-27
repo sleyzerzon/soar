@@ -3,9 +3,17 @@
 
 //#include <map>
 #include <vector>
-#include <hash_map>
+//#include <hash_map>
 #include <string>
 #include <iostream>
+
+#ifdef _MSC_VER
+#include <hash_map>
+#else
+#include <ext/hash_map>
+namespace stdext= ::__gnu_cxx;
+namespace Sgi= ::__gnu_cxx;
+#endif
 
 using std::vector;
 using std::string;
@@ -14,9 +22,29 @@ using std::ostream;
 using std::endl;
 using std::pair;
 using stdext::hash_map;
-using stdext::hash_compare;
 using std::less;
 using std::allocator;
+
+#if (1)
+#ifndef HASH_MAP_DEF
+#define HASH_MAP_DEF
+
+// this was lifted from a reply to a porting question found by googling...
+namespace __gnu_cxx
+{
+  template <> struct hash<std::string>
+  {
+    public:
+    size_t operator () (const std::string& x ) const
+    {
+      return hash<const char*>()( x.c_str());
+    }
+  };
+}
+
+#endif
+#endif
+
 
 // This is a single unit in the network
 // This class should support unit based operations: activation = unit*input, input2=input1-unit

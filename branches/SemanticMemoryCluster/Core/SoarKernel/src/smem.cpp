@@ -1,11 +1,10 @@
-
-
-#ifdef SEMANTIC_MEMORY
 // testings
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
 #include "portability.h"
+
+#ifdef SEMANTIC_MEMORY
 
 
 #include "smem.h"
@@ -816,7 +815,7 @@ bool long_term_value(agent* thisAgent, const set<std::string>& saved_ids, string
 		return false;
 	}
 }
-
+#if (0)
 // Don't do retrieve every cycle as the older version - need to reset the retrieve ready mark
 // Every time the cue structure is not dectected or as empty, the retrieve ready mark is set on
 // Only when it's ready and there is a non-empty cue strcuture, does it performe the actual retrieval.
@@ -995,7 +994,7 @@ void retrieve_1_20(agent* thisAgent){
 	}
 
 }
-
+#endif
 
 // This version of retrieval intends to summarize the target attribute, and return the meta-information about the 
 //  retrieved value.
@@ -1137,6 +1136,7 @@ void retrieve_3_13(agent* thisAgent){
 
 }
 
+#if (0)
 void retrieve(agent* thisAgent){
 	slot *retrieve_s;
 	wme *retrieve_w;
@@ -1421,6 +1421,7 @@ void retrieve(agent* thisAgent){
 	}
 
 }
+#endif
 
 
 // when retrieve LMEs from semantic memory, need to make identifiers from information saved in semantic memory
@@ -1511,15 +1512,17 @@ void smem_save_wme (agent* thisAgent, wme* w){ // collect new wmes for later add
 		thisAgent->to_be_saved_wmes->insert(LME(id,attr,value,value_type)); // they need to be examined
 }
 
-void save_wmes_12_21(agent* thisAgent){
-	set<LME> final_lmes;
+void save_wmes_12_21(agent* thisAgent) {
+        //set<LME> final_lmes;
+	vector<LME> final_lmes;
 	for(set<LME>::iterator itr = thisAgent->to_be_saved_wmes->begin(); itr != thisAgent->to_be_saved_wmes->end(); ++itr){
 		if (thisAgent->prohibited_ids->find(itr->id) == thisAgent->prohibited_ids->end()){
 			if(YJ_debug){
 				print(thisAgent, "\nSaving (%s ^%s %s)\n", itr->id.c_str(), itr->attr.c_str(), itr->value.c_str());
 			}
 			//thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
-			final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
+			// final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
+			final_lmes.push_back(LME(itr->id,itr->attr,itr->value,itr->value_type));
 		}
 		else{
 			if(YJ_debug){
@@ -1534,6 +1537,8 @@ void save_wmes_12_21(agent* thisAgent){
 	thisAgent->to_be_saved_wmes->clear();
 	thisAgent->prohibited_ids->clear();
 }
+
+
 
 void save_wmes(agent* thisAgent){
 	
@@ -1588,7 +1593,8 @@ void save_wmes_old(agent* thisAgent){
 
 void save_wmes_deliberate_merge_identical(agent* thisAgent){
 	
-	set<LME> final_lmes;
+	//set<LME> final_lmes;
+	vector<LME> final_lmes;
 	set<std::string> saved_ids;
 	set<LME> saved_wmes;
 	find_save_ids(thisAgent, saved_ids); // figure out the new ids to be saved
@@ -1606,7 +1612,8 @@ void save_wmes_deliberate_merge_identical(agent* thisAgent){
 			long_term_value(thisAgent, saved_ids, itr->value, itr->value_type)){
 
 				//thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
-				final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
+				//final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
+				final_lmes.push_back(LME(itr->id,itr->attr,itr->value,itr->value_type));
 			}
 		else{
 			if(YJ_debug) cout << "Not long term values" << endl;

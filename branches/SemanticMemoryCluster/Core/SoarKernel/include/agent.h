@@ -34,8 +34,9 @@
 // YJ's stuff
 //#ifdef SEMANTIC_MEMORY
 // For header, better always include, gSKI need this compile argument too
-#include "semantic_memory.h"
 #include "Cluster.h"
+#include "semantic_memory.h"
+//#include "Cluster.h"
 //#endif SEMANTIC_MEMORY
 /* JC ADDED: Included to allow gski callbacks */
 #include "gski_event_system_data.h"

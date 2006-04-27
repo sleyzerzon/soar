@@ -59,7 +59,7 @@ extern void smem_routine(agent* thisAgent);
 extern void YJ_input_phase_call(agent* thisAgent);
 extern void YJ_decision_phase_call(agent* thisAgent);
 extern void YJ_application_phase_call(agent* thisAgent);
-#endif SEMANTIC_MEMORY
+#endif // SEMANTIC_MEMORY
 
 /* REW: begin 08.20.97   these defined in consistency.c  */
 extern void determine_highest_active_production_level_in_stack_propose(agent* thisAgent);
@@ -771,7 +771,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  // YJ
 		YJ_input_phase_call(thisAgent);
 	  // YJ
-#endif SEMANTIC_MEMORY
+#endif /* SEMANTIC_MEMORY */
 
 	 if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
          print_phase (thisAgent, "\n--- Input Phase --- \n",0);
@@ -1003,7 +1003,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  //YJ	
 	  YJ_application_phase_call(thisAgent);
 	//YJ
-#endif SEMANTIC_MEMORY
+#endif /* SEMANTIC_MEMORY */
 
       #ifndef NO_TIMING_STUFF
       start_timer (thisAgent, &thisAgent->start_phase_tv);
@@ -1107,7 +1107,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  // YJ's stuff
 	  smem_routine(thisAgent);
 	  //
-#endif SEMANTIC_MEMORY
+#endif /* SEMANTIC_MEMORY */
 
        /* JC ADDED: Tell gski about output phase beginning */
        gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_PHASE, gSKI_K_OUTPUT_PHASE, 0);

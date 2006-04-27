@@ -1,8 +1,9 @@
-#ifdef SEMANTIC_MEMORY
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
 #include "portability.h"
+
+#ifdef SEMANTIC_MEMORY
 
 // stdafx.cpp : source file that includes just the standard includes
 // smem_test.pch will be the pre-compiled header
@@ -167,7 +168,7 @@ ostream& operator << (ostream &out, const set<CueTriplet>& s){
 }
 
 
-void SemanticMemory::merge_LMEs(set<LME>& lmes, long current_cycle){
+void SemanticMemory::merge_LMEs(vector<LME>& lmes, long current_cycle){
 	hash_map<string, string>merging_hash;
 	// this hash mapping all merged id to the unified id
 	
@@ -176,15 +177,20 @@ void SemanticMemory::merge_LMEs(set<LME>& lmes, long current_cycle){
 	set<string> all_ids;
 
 	HASH_S_HASH_S_HASH_S_LP id_attr_value_hash;
-	vector<set<LME>::iterator> all_new_lmes;
+	//vector<set<LME>::iterator> all_new_lmes;
+	vector<int> all_new_lmes;
 	
 	// build up indexed hash for new lmes
 	// These data structures are for current cycle
-	for (set<LME>::iterator itr = lmes.begin(); itr != lmes.end(); ++itr){
-		all_new_lmes.push_back(itr);
+	//for (set<LME>::iterator itr = lmes.begin(); itr != lmes.end(); ++itr){
+	for (int i=0; i<lmes.size(); ++i){
+		//all_new_lmes.push_back(itr);
+		all_new_lmes.push_back(i);
 		int lme_index = all_new_lmes.size()-1;
-		insert_LME_hash (id_attr_value_hash, itr->id, itr->attr, itr->value, lme_index, itr->value_type);
-		all_ids.insert(itr->id);
+		//insert_LME_hash (id_attr_value_hash, itr->id, itr->attr, itr->value, lme_index, itr->value_type);
+		insert_LME_hash (id_attr_value_hash, lmes[i].id, lmes[i].attr, lmes[i].value, lme_index, lmes[i].value_type);
+		//all_ids.insert(itr->id);
+		all_ids.insert(lmes[i].id);
 	}
 	//hash_map::kk
 	for (set<string>::iterator itr = all_ids.begin(); itr != all_ids.end(); ++itr){
@@ -208,7 +214,7 @@ void SemanticMemory::merge_LMEs(set<LME>& lmes, long current_cycle){
 			// Smaller loops will be merged with biger loops (super-set loop), though the structure could be different
 
 
-			merged_id = merge_id(chunk_id, id_attr_value_hash, merging_hash, all_new_lmes, merging_path, current_cycle);
+			merged_id = merge_id(chunk_id, id_attr_value_hash, merging_hash, lmes, merging_path, current_cycle);
 			merging_hash.insert(pair<string,string>(chunk_id, merged_id));
 		}
 
@@ -222,7 +228,7 @@ void SemanticMemory::merge_LMEs(set<LME>& lmes, long current_cycle){
 // Actual merging operation happens at the end of this sub
 string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_value_hash, 
 								hash_map<string, string >& merging_hash,
-								vector<set<LME>::iterator>& all_new_lmes,
+								vector<LME>& lmes,
 								set<string>& merging_path, long& current_cycle)
 {
 	if(debug_output)
@@ -243,7 +249,8 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 		for(HASH_S_LP::iterator itr2 = value_hash.begin(); itr2 != value_hash.end(); ++itr2){
 			string value = itr2->first;
 			int lme_index = itr2->second;
-			int value_type = all_new_lmes[lme_index]->value_type;
+			//int value_type = all_new_lmes[lme_index]->value_type;
+			int value_type = lmes[lme_index].value_type;
 			if (value_type == IDENTIFIER_SYMBOL_TYPE){ // need to merge this value which is identifier
 				if(debug_output) if(debug_output) cout << "Identifier value " << value << endl;
 				string merged_id;
@@ -264,14 +271,18 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 						// update the hash, so that avoiding every node on the loop need to go a full round!
 					}
 					else{
-						merged_id = merge_id(value, id_attr_value_hash, merging_hash, all_new_lmes, merging_path, current_cycle);
+						merged_id = merge_id(value, id_attr_value_hash, merging_hash,lmes, merging_path, current_cycle);
 						if(debug_output) if(debug_output) cout << "Just Merged with " << merged_id << endl;
 						merging_hash.insert(pair<string,string>(value, merged_id));
 					}
 				}
 
 				// update the value of this wme
-				all_new_lmes[lme_index]->value = merged_id;
+				//all_new_lmes[lme_index]->value = merged_id;
+				//set<LME>::iterator itr_lme_index = all_new_lmes[lme_index];
+				//itr_lme_index->value = merged_id;
+				lmes[lme_index].value = merged_id;
+
 			}
 		}
 	}
@@ -293,7 +304,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 		
 		// This function determines whether current chunk_id have identical matches in long term memory already,
 		// given that all values have been recursively merged.
-		bool result =  find_identical_chunk(id, id_attr_value_hash, final_chunk_id, all_new_lmes);
+		bool result =  find_identical_chunk(id, id_attr_value_hash, final_chunk_id, lmes);
 
 		if(result){// If there is the identical chunk already, update the counter
 			if(debug_output) if(debug_output) cout << "Find identical exsiting chunk " << final_chunk_id << endl;
@@ -315,7 +326,8 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 				for(HASH_S_LP::iterator itr2 = value_hash.begin(); itr2 != value_hash.end(); ++itr2){
 					string value = itr2->first;
 					int lme_index = itr2->second;
-					int value_type = all_new_lmes[lme_index]->value_type;
+					//int value_type = all_new_lmes[lme_index]->value_type;
+					int value_type = lmes[lme_index].value_type;
 					if(debug_output) if(debug_output) cout << " ^" << attr <<" " << value << "("<< value_type<< ")"<< endl;
 
 					vector<int> current_history;
@@ -336,7 +348,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 // If there is the identical chunk, return true, and new_chunk_id should be different
 // Other wise, return false, new_chunk_id is the same as input chunk_id
 bool SemanticMemory::find_identical_chunk (string& chunk_id, HASH_S_HASH_S_HASH_S_LP& id_attr_value_hash,
-										   string& new_chunk_id, vector<set<LME>::iterator>& all_new_lmes){
+										   string& new_chunk_id, vector<LME>& all_new_lmes){
 	
 	set<CueTriplet> chunk_cue;
 	HASH_S_HASH_S_LP chunk_attr_value_hash = id_attr_value_hash.find(chunk_id)->second;
@@ -347,7 +359,7 @@ bool SemanticMemory::find_identical_chunk (string& chunk_id, HASH_S_HASH_S_HASH_
 		for(HASH_S_LP::iterator itr2 = value_hash.begin(); itr2 != value_hash.end(); ++itr2){
 			string value = itr2->first;
 			int lme_index = itr2->second;
-			int value_type = all_new_lmes[lme_index]->value_type;
+			int value_type = all_new_lmes[lme_index].value_type;
 			chunk_cue.insert(CueTriplet(chunk_id, attr, value, value_type));
 		}
 	}
@@ -389,7 +401,7 @@ void SemanticMemory::insert_LME(string id, string attr, string value, int value_
 }
 
 
-
+/***************
 set<LME> SemanticMemory::expand_id(string id, set<CueTriplet>& cue){
 
 
@@ -420,7 +432,7 @@ set<LME> SemanticMemory::expand_id(string id, set<CueTriplet>& cue){
 	}
 	return attributes;
 }
-/*
+
 // Expand a given id
 set<LME> SemanticMemory::expand_id(string id, set<CueTriplet>& cue){
 	
@@ -445,7 +457,7 @@ set<LME> SemanticMemory::expand_id(string id, set<CueTriplet>& cue){
 	}
 	return attributes;
 }
-*/
+************/
 
 // Single level match. Use this for the moment to make the entire system work
 //

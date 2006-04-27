@@ -158,7 +158,7 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->clusterNet = new NetWork(100,300);
 
   //End YJ
-#endif SEMANTIC_MEMORY
+#endif //SEMANTIC_MEMORY
 
   newAgent->using_output_string                = FALSE;
   newAgent->using_input_string                 = FALSE;
