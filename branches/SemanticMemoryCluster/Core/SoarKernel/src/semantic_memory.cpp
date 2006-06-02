@@ -660,14 +660,20 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 	bool start = false;
 	set<string> matched_ids_intersection;
 	string target_attr = "";
+	set<string> queried_attrs;
 	for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
 		string id = itr->id;
 		string attr = itr->attr;
 		string value = itr->value;
 		int value_type = itr->value_type;
 		set<string> current_matched_ids = this->match_attr_value(attr, value, value_type);
-		if(value_type == IDENTIFIER_SYMBOL_TYPE && !this->test_id(value)){ // Current attr is the target attribute
-			target_attr = attr;
+		if(value_type == IDENTIFIER_SYMBOL_TYPE && !this->test_id(value)){ // thie value is being queried
+			
+			if(target_attr == ""){//The 'first' will be the target
+				target_attr = attr;
+			}
+			queried_attrs.insert(attr);
+
 		}
 
 		if(!start){
@@ -712,6 +718,10 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 			// This should not happen
 			break;
 		}
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// What if there is multi-valued attributes?
+		// Current code just check the 'first' value
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		int target_lme_index = *(candidate_lme_index.begin());
 		string target_value = (LME_Array[target_lme_index])->value;
 		int target_value_type = (LME_Array[target_lme_index])->value_type;
@@ -772,6 +782,17 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 			value = retrieved_value;
 			value_type = retrieved_value_type;
 		}
+		
+		// Code to make multiple retrieval
+		else if(queried_attrs.find(attr) != queried_attrs.end()){ // This value is being queried
+			
+			set<int> matched_lme_index = this->match_id_attr(retrieved_id, attr); // get all matched wmes/lems
+			int queried_lme_index = *(matched_lme_index.begin());
+			value = (LME_Array[queried_lme_index])->value;
+			value_type = (LME_Array[queried_lme_index])->value_type;
+
+		}
+		
 		retrieved.insert(CueTriplet(retrieved_id, attr, value, value_type));
 	}
 
