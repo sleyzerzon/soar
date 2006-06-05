@@ -61,6 +61,8 @@ using namespace xmlTraceNames;
 #ifdef NUMERIC_INDIFFERENCE
 /* REW: 2003-01-02 Behavior Variability Kernel Experiments */
 preference *probabilistically_select(agent* thisAgent, slot * s, preference * candidates);
+preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates);
+// preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates, int times_state_visited);
 unsigned int count_candidates(preference * candidates);
 void compute_value_of_candidate(preference *cand, slot *s, float);
 
@@ -1087,8 +1089,8 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     /* REW: 2003-01-02 Behavior Variability Kernel Experiments */
 	for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
 	   p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
-	for (p=s->preferences[TEMPLATE_PREFERENCE_TYPE]; p ; p=p->next)
-		p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
+/*	for (p=s->preferences[TEMPLATE_PREFERENCE_TYPE]; p ; p=p->next)
+		p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;*/
 
   /* END: 2003-01-02 Behavior Variability Kernel Experiments  */
 
@@ -1543,8 +1545,8 @@ byte run_preference_semantics_for_consistency_check (agent* thisAgent, slot *s, 
  /* REW: 2003-01-26 Behavior Variability Kernel Experiments */
     for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
 		p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
-	for (p=s->preferences[TEMPLATE_PREFERENCE_TYPE]; p ; p=p->next)
-		p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
+/*	for (p=s->preferences[TEMPLATE_PREFERENCE_TYPE]; p ; p=p->next)
+		p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;*/
   /* END: 2003-01-02 Behavior Variability Kernel Experiments  */
 #endif
 
@@ -2469,6 +2471,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   // id->id.RL_data->productions_to_be_updated = NIL;
   id->id.RL_data->reward = 0;
   id->id.RL_data->step = 0;
+  id->id.RL_data->previous_Q = 0;
   id->id.RL_data->impasse_type = NONE_IMPASSE_TYPE;
 #endif
 
@@ -3640,103 +3643,23 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 	   			//		}
 	   			//	}
 		}
+	
+		/* experimental exploration implemented for Soar workshop */
 
-        if (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION){
+//		int times_state_visited = 1;
+//		for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
+//			if(pref->inst->prod->RL) times_state_visited += pref->inst->prod->RL_times_tried;
+//		}
+//	
+//		if (!s->id->id.higher_goal) thisAgent->epsilon = 0.97;
+//		else thisAgent->epsilon = 0.9;
+//		return choose_according_to_exploration_mode(thisAgent, candidates, numCandidates, times_state_visited);
 
-			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
-				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
-					print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-					print(thisAgent, "Value (Sum) = %f", exp(cand->numeric_value / thisAgent->Temperature));
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->numeric_value / thisAgent->Temperature));
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
-				}
-			}
-					total_probability = 0.0;
-					for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+		/* End experiment */
 
-						/*  Total Probability represents the range of values, we expect
-						*  the use of negative valued preferences, so its possible the
-						*  sum is negative, here that means a fractional probability
-						*/
-						total_probability += exp(cand->numeric_value / thisAgent->Temperature);
-						/* print("\n   Total (Sum) Probability = %f", total_probability ); */
-			}
-
-	    /* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
-		//rn = rand();
-		rn = SoarRand(); // generates a number in [0,1]
-		//selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
-		selectedProbability = rn * total_probability;
-        currentSumOfValues = 0;
-
-        for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-
-				        currentSumOfValues += exp(cand->numeric_value / thisAgent->Temperature);
-
-				        if (selectedProbability <= currentSumOfValues) {
-					        /*
-						       print_with_symbols("\n    Returning (Sum) candidate %y", cand->value);
-							 */
-
-				            return cand;
-					    }
-			}
-
-	    } else {
-
-			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
-				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
-					print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-					print(thisAgent, "Value (Sum) = %f", cand->numeric_value);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, cand->numeric_value);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
-				}
-			}
-
-			if ((thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION) &&
-				(SoarRand() <= thisAgent->epsilon))	{
-
-						int   chosen_num;
-						chosen_num = floor(SoarRand()*numCandidates); // bug - what if SoarRand returns 1 exactly?
-						cand = candidates;
-						while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
-					    return cand;
-			}
-
-			preference *top_cand = candidates;
-			float top_value = candidates->numeric_value;
-			int num_max_cand = 0;
-
-			for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
-				if (cand->numeric_value > top_value) {
-					top_value = cand->numeric_value;
-					top_cand = cand;
-					num_max_cand = 1;
-				} else if (cand->numeric_value == top_value) num_max_cand++;
-			}
-
-
-			if (num_max_cand == 1)	return top_cand;
-			else {
-				int chosen_num;
-				chosen_num = floor(SoarRand()*num_max_cand);
-				cand = candidates;
-				while (cand->numeric_value != top_value) cand = cand->next_candidate;
-				while (chosen_num) {
-					cand=cand->next_candidate;
-					chosen_num--;
-					while (cand->numeric_value != top_value) cand = cand->next_candidate;
-				}
-				return cand;
-			}
-		 }
-}  else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_AVG) {
+		return choose_according_to_exploration_mode(thisAgent, candidates, numCandidates);
+         
+	}  else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_AVG) {
 
          		if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 					for (cand = candidates; cand != NIL; cand = cand->next_candidate){
@@ -3858,4 +3781,115 @@ unsigned int count_candidates(preference * candidates)
     return numCandidates;
 }
 
-		 #endif
+
+// preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates, int times_state_visited){
+preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates){
+
+	preference *cand = 0;
+	float total_probability = 0;
+	float selectedProbability = 0;
+	double rn = 0;
+	float currentSumOfValues = 0;
+
+	if (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION){
+
+			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
+				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
+					print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
+					print(thisAgent, "Value (Sum) = %f", exp(cand->numeric_value / thisAgent->Temperature));
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->numeric_value / thisAgent->Temperature));
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+				}
+			}
+					total_probability = 0.0;
+					for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+
+						/*  Total Probability represents the range of values, we expect
+						*  the use of negative valued preferences, so its possible the
+						*  sum is negative, here that means a fractional probability
+						*/
+						total_probability += exp(cand->numeric_value / thisAgent->Temperature);
+						/* print("\n   Total (Sum) Probability = %f", total_probability ); */
+			}
+
+	    /* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
+		//rn = rand();
+		rn = SoarRand(); // generates a number in [0,1]
+		//selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
+		selectedProbability = rn * total_probability;
+      currentSumOfValues = 0;
+
+      for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+
+				        currentSumOfValues += exp(cand->numeric_value / thisAgent->Temperature);
+
+				        if (selectedProbability <= currentSumOfValues) {
+					        /*
+						       print_with_symbols("\n    Returning (Sum) candidate %y", cand->value);
+							 */
+
+				            return cand;
+					    }
+			}
+
+	    } else {
+
+			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
+				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
+					print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
+					print(thisAgent, "Value (Sum) = %f", cand->numeric_value);
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, cand->numeric_value);
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+				}
+			}
+	/* Experimental exploration implemented for Soar workshop */
+	//		if (thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION){
+	//			if (SoarRand() <= (pow(thisAgent->epsilon, times_state_visited) + (1 / times_state_visited))){
+	/* End Experiment */
+
+			if ((thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION) &&
+				(SoarRand() <= thisAgent->epsilon))	{ 
+
+						int   chosen_num;
+						chosen_num = floor(SoarRand()*numCandidates); // bug - what if SoarRand returns 1 exactly?
+						cand = candidates;
+						while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
+					    return cand;
+				} 
+			
+			preference *top_cand = candidates;
+			float top_value = candidates->numeric_value;
+			int num_max_cand = 0;
+
+			for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
+				if (cand->numeric_value > top_value) {
+					top_value = cand->numeric_value;
+					top_cand = cand;
+					num_max_cand = 1;
+				} else if (cand->numeric_value == top_value) num_max_cand++;
+			}
+
+
+			if (num_max_cand == 1)	return top_cand;
+			else {
+				int chosen_num;
+				chosen_num = floor(SoarRand()*num_max_cand);
+				cand = candidates;
+				while (cand->numeric_value != top_value) cand = cand->next_candidate;
+				while (chosen_num) {
+					cand=cand->next_candidate;
+					chosen_num--;
+					while (cand->numeric_value != top_value) cand = cand->next_candidate;
+				}
+				return cand;
+			}
+		 }
+}
+
+#endif

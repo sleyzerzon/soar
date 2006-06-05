@@ -1562,9 +1562,8 @@ production *make_production (agent* thisAgent,
   p->rhs_unbound_variables = NIL; /* the Rete fills this in */
   p->instantiations = NIL;
   p->interrupt = FALSE;
-  p->copies_awaiting_updates = 0;
-
-#ifdef NUMERIC_INDIFFERENCE
+ #ifdef NUMERIC_INDIFFERENCE
+ p->copies_awaiting_updates = 0;
   if (type == TEMPLATE_PRODUCTION_TYPE){
 	  if (!check_template_for_RL(p)){
 		  print (thisAgent, "Template rule must have single, potentially numeric, preference.\n");
@@ -1604,20 +1603,7 @@ void excise_production (agent* thisAgent, production *prod, Bool print_sharp_sig
   if (prod->trace_firings) remove_pwatch (thisAgent, prod);
   remove_from_dll (thisAgent->all_productions_of_type[prod->type], prod, next, prev);
 #ifdef NUMERIC_INDIFFERENCE
-  if (prod->copies_awaiting_updates){  // SAN - could stop after finding copies_awaiting_updates number of copies
-    for (Symbol* state = thisAgent->top_state ; state ; state = state->id.lower_goal){
-		eligibility_trace_element *traces = state->id.RL_data->current_eligibility_element;
-		for (int i = 0 ; i<state->id.RL_data->number_in_list ; i++){
-			 for (cons* c = traces->prods_to_update ; c ; c = c->rest){
-				 if ((production *) c->first == prod){
-					 c->first = NIL;
-					 traces->num_prods--;
-				 }
-			 }
-			 traces = traces->next;
-		}
-	}
-  }
+  if (prod->copies_awaiting_updates) remove_update_refs_for_prod(thisAgent, prod); // SAN - could stop after finding copies_awaiting_updates number of copies
 #endif
   thisAgent->num_productions_of_type[prod->type]--;
   if (print_sharp_sign) print (thisAgent, "#");

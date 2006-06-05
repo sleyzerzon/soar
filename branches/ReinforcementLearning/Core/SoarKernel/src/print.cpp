@@ -1083,7 +1083,7 @@ char preference_type_indicator (agent* thisAgent, byte type) {
   case WORSE_PREFERENCE_TYPE: return '<';
 #ifdef NUMERIC_INDIFFERENCE
   case NUMERIC_INDIFFERENT_PREFERENCE_TYPE: return '=';
-  case TEMPLATE_PREFERENCE_TYPE: return '=';
+//  case TEMPLATE_PREFERENCE_TYPE: return '=';
 #endif
   default:
     { char msg[BUFFER_MSG_SIZE];
@@ -1354,7 +1354,7 @@ void Soar_Print (agent* thisAgent, agent * the_agent, char * str)
 
 void Soar_Log (agent* thisAgent, agent * the_agent, char * str)
 {
-   soar_invoke_first_callback(thisAgent, the_agent, 
+	 soar_invoke_first_callback(thisAgent, the_agent, 
 	                          LOG_CALLBACK, /*(ClientData)*/ static_cast<void*>(str));
 } 
 

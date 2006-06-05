@@ -1,7 +1,6 @@
 #ifndef REINFORCEMENT_H
 #define REINFORCEMENT_H
 
-
 #include "agent.h"
 #include "mem.h"
 #include "gdatastructs.h"
@@ -48,6 +47,7 @@ extern void reset_RL(agent *thisAgent);
 extern production *build_production(agent *thisAgent, condition *top_cond, not_struct *nots, preference *pref);
 extern void check_prefs_for_RL(production *prod);
 extern Bool check_template_for_RL(production *prod);
+extern void remove_update_refs_for_prod(agent *thisAgent, production *prod);
 
 /* Eligibility trace */
 #define TOLERANCE 0.01

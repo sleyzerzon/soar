@@ -3532,7 +3532,7 @@ byte add_production_to_rete (agent* thisAgent,
   for (p_node=bottom_node->first_child; p_node!=NIL;
        p_node=p_node->next_sibling) {
     if (p_node->node_type != P_BNODE) continue;
-    if (!p->RL){
+    if (!p->RL || !p_node->b.p.prod->RL){
 	    if (! same_rhs (p_node->b.p.prod->action_list, p->action_list)) continue;
 	}
     /* --- duplicate production found --- */

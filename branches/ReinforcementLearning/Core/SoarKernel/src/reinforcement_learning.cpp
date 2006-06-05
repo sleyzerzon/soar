@@ -1,4 +1,5 @@
 #include <math.h>
+
 #include "portability.h"
 #include "reinforcement_learning.h"
 #include "rhsfun.h"
@@ -49,8 +50,18 @@ void tabulate_reward_value_for_goal(agent *thisAgent, Symbol *goal){
 						for (wme *x = t->wmes ; x ; x = x->next){
 							if (x->value->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
 								reward = reward + x->value->fc.value;
+								if (x->preference->o_supported){
+									wme *new_wme = make_wme(thisAgent, x->id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "read"), FALSE);
+									insert_at_head_of_dll (x->id->id.input_wmes, new_wme, next, prev);
+									add_wme_to_wm (thisAgent, new_wme);
+								}
 							} else if (x->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
 								reward = reward + x->value->ic.value;
+								if (x->preference->o_supported){
+									wme *new_wme = make_wme(thisAgent, x->id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent,"read"), FALSE);
+									insert_at_head_of_dll (x->id->id.input_wmes, new_wme, next, prev);
+									add_wme_to_wm (thisAgent, new_wme);
+								}
 							}
 						}
 					}
@@ -124,7 +135,7 @@ void perform_Bellman_update(agent *thisAgent, float op_value, Symbol *goal){
 /* Eligibility trace */
 	if (trace){
     float sum = 0;
-	for (c = trace->prods_to_update ; c ; c = c->rest) {            // Iterate over most recently fired RL rules 
+	/*for (c = trace->prods_to_update ; c ; c = c->rest) {            // Iterate over most recently fired RL rules 
 		production *prod = (production *) c->first;
 		if (!prod) continue;
 		Symbol *s = rhs_value_to_symbol(prod->action_list->referent);
@@ -137,7 +148,7 @@ void perform_Bellman_update(agent *thisAgent, float op_value, Symbol *goal){
 					continue;
 				}
 			}
-	data->previous_Q = sum;
+	data->previous_Q = sum;*/
 
 	float update = compute_temp_diff(thisAgent, data, op_value);
 
@@ -161,8 +172,6 @@ void perform_Bellman_update(agent *thisAgent, float op_value, Symbol *goal){
 		
 					if (!prod) continue;
 	
-					prod->copies_awaiting_updates--;
-	  			 		
 					float temp;
 					if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
 						temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
@@ -329,7 +338,7 @@ void store_RL_data(agent *thisAgent, Symbol *goal, preference *cand)
 {
 	RL_data *data = goal->id.RL_data;
 	Symbol *op = cand->value;
-    // data->previous_Q = cand->numeric_value;
+    data->previous_Q = cand->numeric_value;
 
 /* Eligibility trace */
 	if (data->number_in_list == 0){ // Eligibility trace list is empty
@@ -387,11 +396,18 @@ void store_RL_data(agent *thisAgent, Symbol *goal, preference *cand)
 					  push(thisAgent, prod, data->current_eligibility_element->prods_to_update);
 					  data->current_eligibility_element->num_prods++;
 					  prod->copies_awaiting_updates++;
-				  } 
-			  }
+				  } else if (prod->type == TEMPLATE_PRODUCTION_TYPE){
+					  production *new_prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
+					  if (new_prod){
+						push(thisAgent, new_prod, data->current_eligibility_element->prods_to_update);
+						data->current_eligibility_element->num_prods++;
+						new_prod->copies_awaiting_updates++;
+					  }
+				  }
+			}
 	}
-
-	for (preference *pref = goal->id.operator_slot->preferences[TEMPLATE_PREFERENCE_TYPE]; pref ; pref = pref->next){
+		  
+/*	for (preference *pref = goal->id.operator_slot->preferences[TEMPLATE_PREFERENCE_TYPE]; pref ; pref = pref->next){
 		if (op == pref->value){
           production *prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
 			if (prod){
@@ -400,7 +416,7 @@ void store_RL_data(agent *thisAgent, Symbol *goal, preference *cand)
 				prod->copies_awaiting_updates++;
 			}
 		}
-	}
+	}*/
 
 
 
@@ -455,6 +471,7 @@ void reset_RL(agent *thisAgent){
 		  /* End Eligibility trace */
 		  data->reward = 0;
 		  data->step = 0;
+		  data->previous_Q = 0;
 		  data->impasse_type = NONE_IMPASSE_TYPE;
 		  goal = goal->id.lower_goal;
 	}
@@ -631,3 +648,19 @@ action *copy_and_variablize_pref_list (agent* thisAgent, preference *pref) {
   return a;  
 }
 
+void remove_update_refs_for_prod(agent *thisAgent, production *prod){
+    int refs_remaining = prod->copies_awaiting_updates;
+	for (Symbol* state = thisAgent->top_state ; state ; state = state->id.lower_goal){
+		eligibility_trace_element *traces = state->id.RL_data->current_eligibility_element;
+		for (int i = 0 ; i<state->id.RL_data->number_in_list ; i++){
+			 for (cons* c = traces->prods_to_update ; c ; c = c->rest){
+				 if ((production *) c->first == prod){
+					 c->first = NIL;
+					 traces->num_prods--;
+					 refs_remaining--;
+					 if (!refs_remaining) return;
+				 }
+			 }
+			 traces = traces->next;
+		}
+	}}
