@@ -1540,28 +1540,7 @@ void save_wmes_12_21(agent* thisAgent) {
 
 
 
-void save_wmes(agent* thisAgent){
-	
-	return; // this now happens in the do_buffered_wm_changes automatically
 
-	set<std::string> saved_ids;
-	set<LME> saved_wmes;
-	//find_save_ids(thisAgent, saved_ids); // figure out the new ids to be saved
-	//if(YJ_debug) cout << "To be saved ids " << saved_ids << endl;
-	//find_save_wmes(thisAgent, saved_wmes); // figure out the wmes whose identifier is being pointed by save link.
-	find_save_wmes_all(thisAgent, saved_wmes);
-
-	// Then find out from entire WM that which wmes need to be saved
-	// save_wmes + newly added wmes whose  value is either constant or saved_identifiers (in long-term memory or among saved ids for this cycle)
-	// newly added, or just consider all WMEs ?
-	
-	for(set<LME>::iterator itr = saved_wmes.begin(); itr != saved_wmes.end(); ++itr){
-		if(YJ_debug) cout << *itr << endl;
-		
-		thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
-		
-	}
-}
 
 // Just deliberately save one level
 void save_wmes_old(agent* thisAgent){
@@ -1856,4 +1835,32 @@ void cluster(agent* thisAgent){
 		//remove_input_wme(thisAgent, cluster_input_link); // cluster_input_link is not input_wme, it's added by rules
 	}
 }
+
+// Unused Code
+// They are not used any more, just keep the history
+void save_wmes(agent* thisAgent){
+	
+	return; // this now happens in the do_buffered_wm_changes automatically
+
+	set<std::string> saved_ids;
+	set<LME> saved_wmes;
+	//find_save_ids(thisAgent, saved_ids); // figure out the new ids to be saved
+	//if(YJ_debug) cout << "To be saved ids " << saved_ids << endl;
+	//find_save_wmes(thisAgent, saved_wmes); // figure out the wmes whose identifier is being pointed by save link.
+	//find_save_wmes_all(thisAgent, saved_wmes);
+
+	// Then find out from entire WM that which wmes need to be saved
+	// save_wmes + newly added wmes whose  value is either constant or saved_identifiers (in long-term memory or among saved ids for this cycle)
+	// newly added, or just consider all WMEs ?
+	
+	for(set<LME>::iterator itr = saved_wmes.begin(); itr != saved_wmes.end(); ++itr){
+		if(YJ_debug) cout << *itr << endl;
+		
+		thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
+		
+	}
+}
+
+//
+
 #endif SEMANTIC_MEMORY
