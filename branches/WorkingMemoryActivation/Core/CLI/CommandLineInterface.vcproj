@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="include;..\gSKI\include;..\ElementXML\include;..\ConnectionSML\include;..\KernelSML\include;..\ClientSML\include"
+				AdditionalIncludeDirectories="include;..\gSKI\include;..\ElementXML\include;..\ConnectionSML\include;..\KernelSML\include;..\shared\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;KERNELSML_EXPORTS;DEBUG;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -73,7 +73,7 @@
 				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="2"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="include;..\gSKI\include;..\ElementXML\include;..\ConnectionSML\include;..\KernelSML\include;..\ClientSML\include"
+				AdditionalIncludeDirectories="include;..\gSKI\include;..\ElementXML\include;..\ConnectionSML\include;..\KernelSML\include;..\shared\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;KERNELSML_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -109,20 +109,58 @@
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
+		<Configuration
+			Name="Distribution|Win32"
+			OutputDirectory="build"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2"
+			ManagedExtensions="FALSE"
+			WholeProgramOptimization="TRUE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories="include;..\gSKI\include;..\ElementXML\include;..\ConnectionSML\include;..\KernelSML\include;..\shared\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;KERNELSML_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
+				StringPooling="TRUE"
+				MinimalRebuild="FALSE"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="TRUE"
+				UsePrecompiledHeader="0"
+				AssemblerListingLocation="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\$(ProjectName).lib"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
 	</Configurations>
 	<References>
-		<ProjectReference
-			ReferencedProjectIdentifier="{161DC1AD-FB4B-4370-9FD5-B02E2A0D8A36}"
-			Name="ConnectionSML"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{E9AB0B6E-F1CA-4A63-817B-AB47F7E5417E}"
-			Name="ElementXML"/>
-		<AssemblyReference
-			RelativePath="mscorlib.dll"/>
-		<AssemblyReference
-			RelativePath="System.dll"/>
-		<AssemblyReference
-			RelativePath="System.Data.dll"/>
 	</References>
 	<Files>
 		<Filter
@@ -344,6 +382,9 @@
 			</File>
 			<File
 				RelativePath=".\include\cli_Commands.h">
+			</File>
+			<File
+				RelativePath="..\shared\include\Export.h">
 			</File>
 		</Filter>
 		<Filter
