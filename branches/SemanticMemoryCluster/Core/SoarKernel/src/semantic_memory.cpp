@@ -661,11 +661,13 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 	set<string> matched_ids_intersection;
 	string target_attr = "";
 	set<string> queried_attrs;
+	set<string> cue_attrs;
 	for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
 		string id = itr->id;
 		string attr = itr->attr;
 		string value = itr->value;
 		int value_type = itr->value_type;
+		cue_attrs.insert(attr);
 		set<string> current_matched_ids = this->match_attr_value(attr, value, value_type);
 		if(value_type == IDENTIFIER_SYMBOL_TYPE && !this->test_id(value)){ // thie value is being queried
 			
@@ -705,6 +707,7 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 	
 
 	// summarize target value
+	// All candidate matches are 'sanned', but if there is a tie, the first one will always be picked.
 	for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
 		string candidate_id = *itr;
 		//if(debug_output) cout << "###" << endl;
@@ -720,9 +723,9 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// What if there is multi-valued attributes?
-		// Current code just check the 'first' value
+		// Current code just check the 'first' value for the target attribute
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		int target_lme_index = *(candidate_lme_index.begin());
+		int target_lme_index = *(candidate_lme_index.begin()); 
 		string target_value = (LME_Array[target_lme_index])->value;
 		int target_value_type = (LME_Array[target_lme_index])->value_type;
 
@@ -755,7 +758,7 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 		string current_value = itr->first;
 		int current_value_count = itr->second;
 		total_count += current_value_count;
-		if(current_value_count > max_count){
+		if(current_value_count > max_count){// Always get the first max_count id, radonmess could be implemented here
 			max_count = current_value_count;
 			max_counted_value = current_value;
 		}
@@ -787,7 +790,7 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 		else if(queried_attrs.find(attr) != queried_attrs.end()){ // This value is being queried
 			
 			set<int> matched_lme_index = this->match_id_attr(retrieved_id, attr); // get all matched wmes/lems
-			int queried_lme_index = *(matched_lme_index.begin());
+			int queried_lme_index = *(matched_lme_index.begin()); // get the first value
 			value = (LME_Array[queried_lme_index])->value;
 			value_type = (LME_Array[queried_lme_index])->value_type;
 
@@ -795,7 +798,21 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 		
 		retrieved.insert(CueTriplet(retrieved_id, attr, value, value_type));
 	}
-
+	
+	// retrieve other attributes
+	HASH_S_HASH_S_HASH_S_LP::iterator itr1 = memory_id_attr_hash.find(retrieved_id);
+	HASH_S_HASH_S_LP attr_value_hash = itr1->second;
+	for(HASH_S_HASH_S_LP::iterator itr2 = attr_value_hash.begin(); itr2 != attr_value_hash.end(); ++itr2){
+		string each_attr = itr2->first;
+		if(cue_attrs.find(each_attr) == cue_attrs.end()){//Not in cue
+			set<int> matched_lme_index = this->match_id_attr(retrieved_id, each_attr); // get all matched wmes/lems
+			int queried_lme_index = *(matched_lme_index.begin());// get the first value
+			string value = (LME_Array[queried_lme_index])->value;
+			int value_type = (LME_Array[queried_lme_index])->value_type;
+			retrieved.insert(CueTriplet(retrieved_id, each_attr, value, value_type));
+		}
+	}
+	
 	
 	return true;
 	//return matched_ids_intersection;
