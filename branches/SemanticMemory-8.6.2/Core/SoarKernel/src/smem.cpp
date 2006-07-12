@@ -632,17 +632,13 @@ void append_smem_links(agent* thisAgent){
 	wme* save_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "save"), save_id);
 	wme* cluster_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "cluster"), cluster_id);
 
-	// The id's created above are leaked on init-soar.  I think if we do a
-	// symbol_remove_ref() here on each of them, they will no longer leak.  The wme's
-	// themselves get cleaned up when the state is removed.  KJC 06/06
+	// The id's created above are leaked on init-soar.  If we do a
+	// symbol_remove_ref() here on each of them, they will no longer leak.  
+	// The wme's themselves get cleaned up when the state is removed.  KJC 06/06
     symbol_remove_ref(thisAgent, smem_id);
     symbol_remove_ref(thisAgent, save_id);
     symbol_remove_ref(thisAgent, retrieve_id);
     symbol_remove_ref(thisAgent, cluster_id);
-	// This is a hack.  When (<s> ^smem M1) is created on the state, the id <s> ref count 
-	// is incremented and the symbol leaks.  If we record the pointer, we can release it later.
-	if (thisAgent->top_goal == thisAgent->bottom_goal)  //then we are creating the top state
-		thisAgent->smem_header = smem_id;
 
 
 	vector<wme*> wmes;
