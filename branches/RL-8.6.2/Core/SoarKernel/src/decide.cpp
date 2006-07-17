@@ -841,7 +841,6 @@ byte require_preference_semantics (agent* thisAgent, slot *s, preference **resul
   if (thisAgent->sysparams[RL_ON_SYSPARAM]){
 	  compute_value_of_candidate(candidates, s, 0);
 	  perform_Bellman_update(thisAgent, candidates->numeric_value, s->id);
-  	  // RL_update_symbolically_chosen(thisAgent, s, candidates);
   }
 #endif
   return NONE_IMPASSE_TYPE;
@@ -903,7 +902,6 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     if (thisAgent->sysparams[RL_ON_SYSPARAM]){
 	  compute_value_of_candidate(candidates, s, 0);
 	  perform_Bellman_update(thisAgent, candidates->numeric_value, s->id);
-  	  // RL_update_symbolically_chosen(thisAgent, s, candidates);
     }
 #endif
     return NONE_IMPASSE_TYPE;
@@ -1071,7 +1069,6 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     if (thisAgent->sysparams[RL_ON_SYSPARAM]){
 	  compute_value_of_candidate(candidates, s, 0);
 	  perform_Bellman_update(thisAgent, candidates->numeric_value, s->id);
-  	  // RL_update_symbolically_chosen(thisAgent, s, candidates);
     }
 #endif
     return NONE_IMPASSE_TYPE;
@@ -1096,10 +1093,10 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     if (cand->value->common.decider_flag==UNARY_INDIFFERENT_DECIDER_FLAG)
       continue;
     
-	#ifdef NUMERIC_INDIFFERENCE
+#ifdef NUMERIC_INDIFFERENCE
 	else if ( cand->value->common.decider_flag==UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG )
 	  continue;
-	#endif
+#endif
 
     /* --- check whether cand is binary indifferent to each other one --- */
     for (p=candidates; p!=NIL; p=p->next_candidate) {
@@ -1229,19 +1226,19 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     case USER_SELECT_RANDOM: {
 
 #ifdef NUMERIC_INDIFFERENCE
-                /* REW: 2003-01-02 Behavior Variability Kernel Experiments */
-                cand = probabilistically_select(thisAgent, s, candidates);
-                if (!cand) {
-                    *result_candidates = candidates;
-                    return TIE_IMPASSE_TYPE;
-                }
+		/* REW: 2003-01-02 Behavior Variability Kernel Experiments */
+		cand = probabilistically_select(thisAgent, s, candidates);
+		if (!cand) {
+			*result_candidates = candidates;
+			return TIE_IMPASSE_TYPE;
+		}
 
+		// If RL is on-policy (ie, SARSA), must perform Bellman update after selecting operator.
+		if (thisAgent->sysparams[RL_ON_SYSPARAM] && thisAgent->sysparams[RL_ONPOLICY_SYSPARAM])
+			perform_Bellman_update(thisAgent, cand->numeric_value, s->id);
 
-		if (thisAgent->sysparams[RL_ON_SYSPARAM] &&
-		    thisAgent->sysparams[RL_ONPOLICY_SYSPARAM])
-		  perform_Bellman_update(thisAgent, cand->numeric_value, s->id);
-                *result_candidates = cand;
-                break;
+		*result_candidates = cand;
+		break;
 #else
       int num_candidates, chosen_num;
       num_candidates = 0;
@@ -1552,10 +1549,8 @@ byte run_preference_semantics_for_consistency_check (agent* thisAgent, slot *s, 
       continue;
 
 #ifdef NUMERIC_INDIFFERENCE
-		else if ( cand->value->common.decider_flag==UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG )  {
-      /* print("\n Ignoring this candidate because it has a constant value for the second pref"); */
-      continue;
-		}
+		else if ( cand->value->common.decider_flag==UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG )
+			continue;
 #endif
 
 	/* --- check whether cand is binary indifferent to each other one --- */
@@ -2645,7 +2640,7 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
 #ifdef NUMERIC_INDIFFERENCE
       /* Note - We only store RL data when an operator has been selected. */
       if (thisAgent->sysparams[RL_ON_SYSPARAM])
-	store_RL_data(thisAgent, goal, candidates);
+		  store_RL_data(thisAgent, goal, candidates);
 #endif  
 
       /* JC ADDED: Notify gSKI of an operator selection  */
@@ -2655,16 +2650,17 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
       return TRUE;
    } 
 
+   /* --- no winner; if an impasse of the right type already existed, just
+   update the ^item set on it --- */
+
 #ifdef NUMERIC_INDIFFERENCE
+   /* For hierarchical RL, an impassed state needs to know what type of impasse it has. 
+      Impasse type is stored with the state's RL data. */
    if (impasse_type != NO_CHANGE_IMPASSE_TYPE) goal->id.RL_data->impasse_type = impasse_type;
    else if (s->wmes) goal->id.RL_data->impasse_type = OP_NO_CHANGE_IMPASSE_TYPE;
    else goal->id.RL_data->impasse_type = STATE_NO_CHANGE_IMPASSE_TYPE;
 #endif
- 
 
-   
-   /* --- no winner; if an impasse of the right type already existed, just
-   update the ^item set on it --- */
    if ((impasse_type == type_of_existing_impasse(thisAgent, goal)) &&
       (attribute_of_impasse == attribute_of_existing_impasse(thisAgent, goal))) 
    {
@@ -3557,38 +3553,13 @@ void create_gds_for_goal( agent* thisAgent, Symbol *goal){
    appropriate numeric-indifferent-mode 
 */
 
-/*void initialize_indifferent_candidates_for_probability_selection(slot *s, preference *candidates)*/
-void initialize_indifferent_candidates_for_probability_selection(preference * candidates)
-{
-    preference *cand = 0;
-
-    for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-        /* print_with_symbols("\nInitializing candidate %y",cand->value); 
-         */
-        /* next three lines were removed from reinforcement_learning version...  ?
-        cand->value->common.decider_flag = CANDIDATE_DECIDER_FLAG;
-        cand->total_preferences_for_candidate = 0;
-      		cand->sum_of_probability = 0;
-         */
-    }
-}
 
 preference *probabilistically_select(agent* thisAgent, slot * s, preference * candidates)
 {
     preference *cand = 0;
     preference *pref = 0;
-    double total_probability = 0;
     unsigned int numCandidates = 0;
-    double selectedProbability = 0;
-    double currentSumOfValues = 0;
-    //static int initialized_rand = 0;
-    //unsigned long rn = 0;
-    double rn = 0;
-    double default_ni;
-
-    /* initialized, but not referenced, so i commented them out:
-       preference*    selectedCandidate=0;
-       unsigned int   currentCandidate=0; */
+    double default_cand_value;
 
     assert(s != 0);
     assert(candidates != 0);
@@ -3599,63 +3570,37 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 //        initialized_rand = 1;
 //    }
 
-    /*
-       print("\nCandidates at top of probabilistically_select"); 
-       print_candidates(candidates);  
-     */
-
-    /* s param uneccesary, commented out to quell compiler warning.  see comment
-       block above the following function definitions
-       initialize_indifferent_candidates_for_probability_selection(s, candidates);
-       numCandidates = count_candidates(s,candidates); */
-
-    initialize_indifferent_candidates_for_probability_selection(candidates);
     numCandidates = count_candidates(candidates);
-
-    /*
-       print("\n numCandidates = %d", numCandidates);
-       print("\nCandidates before unary indifferent loop");
-       print_candidates(candidates); 
-     */
-
-
+	
 	switch (thisAgent->numeric_indifferent_mode) {
 	case NUMERIC_INDIFFERENT_MODE_AVG:
-		default_ni = 50;
+		default_cand_value = 50;
 		break;
 
 	case NUMERIC_INDIFFERENT_MODE_SUM:
 	default:
-		default_ni = 0;
+		default_cand_value = 0;
 		break;
 	}
-    /*
-       BUGBUGBUG 
-       Next some error checking here to ensure that the binary preference
-       is indeed really an indifferent+value preference....
-       someday.
-
-       also, precision loss (long to float conversion) here:
-       value = (float)pref->referent->ic.value;
-     */
-
-
+  
 	for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-	  compute_value_of_candidate(cand, s, default_ni);
-	}
-
-    if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM) {
-      if (thisAgent->sysparams[RL_ON_SYSPARAM] && !thisAgent->sysparams[RL_ONPOLICY_SYSPARAM]) {
- 		
-	/* When doing Q-learning, we need to identify the max Q-value now. */
-	float top_value = candidates->numeric_value;
-
-	for (cand=candidates; cand!=NIL; cand=cand->next_candidate) {
-	  if (cand->numeric_value > top_value)
-	    top_value = cand->numeric_value;
+	  compute_value_of_candidate(cand, s, default_cand_value);
 	}
 	
-	perform_Bellman_update(thisAgent, top_value, s->id); // If the Bellman update changed current prefs, recompute operator values.
+	
+	if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM) {
+		
+		// If RL is off-policy (ie, Q-learning), we perform a Bellman update now, after identifying the max Q-value.
+		if (thisAgent->sysparams[RL_ON_SYSPARAM] && !thisAgent->sysparams[RL_ONPOLICY_SYSPARAM]) {
+			float top_value = candidates->numeric_value;
+			for (cand=candidates; cand!=NIL; cand=cand->next_candidate) {
+				if (cand->numeric_value > top_value)
+					top_value = cand->numeric_value;
+			}
+			
+			perform_Bellman_update(thisAgent, top_value, s->id); 
+			
+			// If the Bellman update changed current prefs, recompute operator values.
 	//	initialize_indifferent_candidates_for_probability_selection(candidates);
 	//	for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
 	//		/*print_with_symbols("\nPreference for %y", pref->value); */
@@ -3677,25 +3622,16 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 	//			}
 	//		}
 	//	}
-      }
- 	
+		}
+		
+		return choose_according_to_exploration_mode(thisAgent, candidates, numCandidates);
 
-      /* experimental exploration implemented for Soar workshop */
- 
-      //     int times_state_visited = 1;
-      //     	for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
-      //        	if(pref->inst->prod->RL) times_state_visited += pref->inst->prod->RL_times_tried;
-      //       	}
-      //    
-      //     if (!s->id->id.higher_goal) thisAgent->epsilon = 0.97;
-      //     else thisAgent->epsilon = 0.9;
-      //     return choose_according_to_exploration_mode(thisAgent, candidates, numCandidates, times_state_visited);
-
-      /* End experiment */
- 
-      return choose_according_to_exploration_mode(thisAgent, candidates, numCandidates);
-
+		// Reinforcement learning not supported for NUMERIC_INDIFFERENT_MODE_AVG
     } else if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_AVG) {
+		double total_probability = 0;
+		double selectedProbability = 0;
+		double currentSumOfValues = 0;
+		double rn = 0;
 
 		if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate){
@@ -3708,8 +3644,6 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 			}
 		}
-
-      total_probability = 0.0;
 
         for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
 
@@ -3733,15 +3667,10 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
             }
             /* print("\n   Total (Avg) Probability = %f", total_probability ); */
         }
-
-        /* Now select the candidate */
-
-
-	//print(thisAgent, "\n");
-
-	/* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
+		
+		/* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
         //rn = rand();
-	rn = SoarRand(); 
+		rn = SoarRand(); 
         selectedProbability = rn * total_probability;
         currentSumOfValues = 0;
 
@@ -3754,8 +3683,8 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
                 return cand;
             }
         }
-
-    } else {
+	
+	} else {
         print(thisAgent, "\nERROR: Invalid Numeric Indifferent Mode!\n");
     }
 
@@ -3763,6 +3692,8 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
     return NIL;
 
 }
+
+
 void compute_value_of_candidate(preference *cand, slot *s, float default_value)
 {
 	preference *pref;
@@ -3771,13 +3702,18 @@ void compute_value_of_candidate(preference *cand, slot *s, float default_value)
     cand->total_preferences_for_candidate = 0;
 	cand->numeric_value = 0;
 	
+	  /*
+       BUGBUGBUG 
+	   precision loss (long to float conversion) here:
+       value = (float)pref->referent->ic.value;
+     */
+	
 	for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
-        /*print_with_symbols("\nPreference for %y", pref->value); */
-        float value;
+        float numeric_value;
         if (pref->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
-            value = pref->referent->fc.value;
+            numeric_value = pref->referent->fc.value;
         } else if (pref->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
-            value = (float) pref->referent->ic.value;
+            numeric_value = (float) pref->referent->ic.value;
         } else {
 			/* This should never happen. */
             continue;
@@ -3785,7 +3721,7 @@ void compute_value_of_candidate(preference *cand, slot *s, float default_value)
     
 		if (cand->value == pref->value) {
                 cand->total_preferences_for_candidate += 1;
-                cand->numeric_value += value;
+                cand->numeric_value += numeric_value;
             }
         }
 	
@@ -3796,7 +3732,6 @@ void compute_value_of_candidate(preference *cand, slot *s, float default_value)
    
 }
 
-/*unsigned int count_candidates(slot *s, preference *candidates)*/
 unsigned int count_candidates(preference * candidates)
 {
     unsigned int numCandidates = 0;
@@ -3818,7 +3753,6 @@ unsigned int count_candidates(preference * candidates)
 }
 
 
-// preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates, int times_state_visited){
 preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates){
 
 	preference *cand = 0;
@@ -3840,38 +3774,32 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 				}
 			}
-					total_probability = 0.0;
-					for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+
+			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
 
 						/*  Total Probability represents the range of values, we expect
 						*  the use of negative valued preferences, so its possible the
 						*  sum is negative, here that means a fractional probability
 						*/
-						total_probability += exp(cand->numeric_value / thisAgent->Temperature);
+				total_probability += exp(cand->numeric_value / thisAgent->Temperature);
 						/* print("\n   Total (Sum) Probability = %f", total_probability ); */
 			}
 
-	    /* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
-		//rn = rand();
-		rn = SoarRand(); // generates a number in [0,1]
-		//selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
-		selectedProbability = rn * total_probability;
-      currentSumOfValues = 0;
+			/* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
+			//rn = rand();
+			rn = SoarRand(); // generates a number in [0,1]
+			//selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
+			selectedProbability = rn * total_probability;
+			currentSumOfValues = 0;
 
-      for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-
-				        currentSumOfValues += exp(cand->numeric_value / thisAgent->Temperature);
-
-				        if (selectedProbability <= currentSumOfValues) {
-					        /*
-						       print_with_symbols("\n    Returning (Sum) candidate %y", cand->value);
-							 */
-
-				            return cand;
-					    }
+			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+				currentSumOfValues += exp(cand->numeric_value / thisAgent->Temperature);
+				if (selectedProbability <= currentSumOfValues) {
+					return cand;
+				}
 			}
 
-	    } else {
+	    } else { // epsilon-greedy or no exploration
 
 			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
@@ -3884,48 +3812,48 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 				}
 			}
-	/* Experimental exploration implemented for Soar workshop */
-	//		if (thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION){
-	//			if (SoarRand() <= (pow(thisAgent->epsilon, times_state_visited) + (1 / times_state_visited))){
-	/* End Experiment */
+	
 
-			if ((thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION) &&
-				(SoarRand() <= thisAgent->epsilon))	{ 
-
-						int   chosen_num;
-						chosen_num = floor(SoarRand()*numCandidates); // bug - what if SoarRand returns 1 exactly?
-						cand = candidates;
-						while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
-					    return cand;
-				} 
-			
-			preference *top_cand = candidates;
-			float top_value = candidates->numeric_value;
-			int num_max_cand = 0;
-
-			for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
-				if (cand->numeric_value > top_value) {
-					top_value = cand->numeric_value;
-					top_cand = cand;
-					num_max_cand = 1;
-				} else if (cand->numeric_value == top_value) num_max_cand++;
-			}
-
-
-			if (num_max_cand == 1)	return top_cand;
-			else {
-				int chosen_num;
-				chosen_num = floor(SoarRand()*num_max_cand);
+			if ((thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION) && (SoarRand() <= thisAgent->epsilon))	{
+				// select at random 
+				
+				int   chosen_num;
+				chosen_num = floor(SoarRand()*numCandidates); // bug - what if SoarRand returns 1 exactly?
 				cand = candidates;
-				while (cand->numeric_value != top_value) cand = cand->next_candidate;
-				while (chosen_num) {
-					cand=cand->next_candidate;
-					chosen_num--;
-					while (cand->numeric_value != top_value) cand = cand->next_candidate;
-				}
+				while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
 				return cand;
-			}
-		 }
- }
 
+			} else { 
+				// select the highest Q-value operator 
+			
+				preference *top_cand = candidates;
+				float top_value = candidates->numeric_value;
+				int num_max_cand = 0;
+	
+				for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
+					if (cand->numeric_value > top_value) {
+						top_value = cand->numeric_value;
+						top_cand = cand;
+						num_max_cand = 1;
+					} else if (cand->numeric_value == top_value) num_max_cand++;
+				}
+
+				if (num_max_cand == 1)	return top_cand;
+				else {
+					// If operators tied for highest Q-value, select among tied set at random
+
+					int chosen_num;
+					chosen_num = floor(SoarRand()*num_max_cand);
+					cand = candidates;
+					while (cand->numeric_value != top_value) cand = cand->next_candidate;
+					while (chosen_num) {
+						cand=cand->next_candidate;
+						chosen_num--;
+						while (cand->numeric_value != top_value) cand = cand->next_candidate;
+					}
+					return cand;
+				}
+			}
+	}
+}
 #endif

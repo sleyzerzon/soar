@@ -247,8 +247,8 @@ extern Bool remove_preference_from_clones (agent* thisAgent, preference *pref);
 #define CONFLICT_IMPASSE_TYPE 2
 #define TIE_IMPASSE_TYPE 3
 #define NO_CHANGE_IMPASSE_TYPE 4
-#define STATE_NO_CHANGE_IMPASSE_TYPE 5		/* for RL */
-#define OP_NO_CHANGE_IMPASSE_TYPE 6		/* for RL */
+#define STATE_NO_CHANGE_IMPASSE_TYPE 5		/* for hierarchical RL */
+#define OP_NO_CHANGE_IMPASSE_TYPE 6		/* for hierarchical RL */
 /* ------------------------------------------------------------------------
                                 Slots
 
