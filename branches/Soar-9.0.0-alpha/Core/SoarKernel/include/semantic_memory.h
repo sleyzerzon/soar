@@ -61,7 +61,7 @@ unsigned long StringToUnsignedLong(string str);
 #define INT_CONSTANT_SYMBOL_TYPE 3
 #define FLOAT_CONSTANT_SYMBOL_TYPE 4
 #define NUM_SYMBOL_TYPES 5
-#define NUM_PRODUCTION_TYPES 4
+#define NUM_PRODUCTION_TYPES 5
 
 
 // long term memory element
