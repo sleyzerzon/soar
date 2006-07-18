@@ -178,6 +178,7 @@
 #include "decide.h"
 #include "prefmem.h"
 #include "print.h"
+#include "production.h"
 #include "activate.h"
 
 #ifdef SOAR_WMEM_ACTIVATION
@@ -831,6 +832,11 @@ void decay_update_new_wme(agent *thisAgent, wme *w, int num_refs)
     w->decay_element = temp_el;
     w->has_decay_element = TRUE;
 
+    log_activation("\nNew WME:    (%y ^%y %y) ", w->id, w->attr, w->value);
+#ifdef DECAY_DEBUG
+    print(thisAgent, "%d refs", num_refs);
+#endif
+    
     stop_timer(thisAgent, &(thisAgent->decay_tv), &(thisAgent->total_decay_time));
     stop_timer(thisAgent, &(thisAgent->decay_new_wme_tv), &(thisAgent->total_decay_new_wme_time));
     
@@ -1719,10 +1725,10 @@ void decay_write_log(agent *thisAgent, wme *w)
     print(thisAgent, "(%ul: ", w->timetag);
     print_with_symbols(thisAgent, "%y ^%y %y)\t", w->id, w->attr, w->value);
 
-    //Print a baseline activation for all cycles before this WME existed
+    //Print a tab for each cycle that transpired before this WME existed
     for(i = 1; i < el->log->start; i++)
     {
-        fprintf(f, "%f\t", DECAY_ACTIVATION_CUTOFF);
+        fprintf(f, "\t");
     }
 
     //Print the activation for every previous cycle that this WME has existed
