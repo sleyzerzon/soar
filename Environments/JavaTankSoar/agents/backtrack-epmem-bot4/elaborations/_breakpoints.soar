@@ -1,0 +1,29 @@
+##These are for the chunky2 map file.
+#
+#
+##Position just east or west of the charger
+#sp {breakpoint-1
+#   (state <s> ^superstate nil
+#              ^io.input-link <il>)
+#   (<il> ^energy < 100
+#         ^x << 14  10 >>
+#         ^y 9)
+#-->
+#   (interrupt)
+#}
+#
+##Position one step away from just west
+##of the charger
+#sp {breakpoint-2
+#   (state <s> ^superstate nil
+#              ^io.input-link <il>)
+#   (<il> ^energy < 100
+#         ^y <y>
+#         ^x 10)
+#-->
+#   (interrupt)
+#}
+#
+#
+#
+#
