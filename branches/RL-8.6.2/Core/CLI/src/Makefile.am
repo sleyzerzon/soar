@@ -49,6 +49,7 @@ cli_pwd.cpp\
 cli_quit.cpp\
 cli_removewme.cpp\
 cli_retenet.cpp\
+cli_RL.cpp\
 cli_run.cpp\
 cli_savebacktraces.cpp\
 cli_setlibrarylocation.cpp\
