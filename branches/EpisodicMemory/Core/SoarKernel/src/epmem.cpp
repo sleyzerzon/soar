@@ -244,6 +244,12 @@ typedef struct epmem_command_struct
  *  cmd             - The current command given by the agent
  *  metadata        - a list of wme* that have been placed in WM that
  *                    provide metadata about the match.
+ *  next_cmd        - If the agent has issued the "^command next" command
+ *                    this flag is set to TRUE
+ *  temporal_cmd    - This structure holds details of a "before" or "after"
+ *                    command issued by the agent
+ *  prohibit_list   - This arraylist stores ids the memories ^prohibit-ed
+ *                    by the agent
  *  last_cue_size   - size of the last cue given to this header
  *  last_match_size - number of items that matched the cue in the last match
  *  last_match_score- the raw match score of the last match
@@ -262,7 +268,9 @@ typedef struct epmem_header_struct
     wme *negquery_wme;
     Symbol *retrieved;
     wme *retrieved_wme;
-    epmem_command *cmd;
+    int next_cmd;
+    epmem_command *temporal_cmd;
+    arraylist *prohibit_list;
     episodic_memory *curr_memory;
     arraylist *metadata;
     int last_cue_size;
@@ -1228,12 +1236,12 @@ epmem_header *make_epmem_header(agent *thisAgent, Symbol *s)
     h->state = s;
     h->curr_memory = NULL;
     h->metadata = make_arraylist(thisAgent, 5);
+    h->next_cmd = 0;
+    h->temporal_cmd = make_epmem_command(thisAgent);
+    h->prohibit_list = make_arraylist(thisAgent, 5);
     h->last_cue_size = 0;
     h->last_match_size = 0;
     h->last_match_score = 0;
-
-    //Allocate and init the command struct
-    h->cmd = make_epmem_command(thisAgent);
     
     //Find the superstate wme
     h->ss_wme = get_aug_of_id(thisAgent, s, "superstate", NULL);
@@ -1290,8 +1298,10 @@ void destroy_epmem_header(agent *thisAgent, epmem_header *h)
     //Remove any active memory (or a "no-retrieval" WME) from WM
     epmem_clear_curr_mem(thisAgent, h);
 
-    //Cleanup the current command
-    destroy_epmem_command(thisAgent, h->cmd);
+    //Cleanup attached data structures
+    destroy_epmem_command(thisAgent, h->temporal_cmd);
+    destroy_arraylist(thisAgent, h->metadata);
+    destroy_arraylist(thisAgent, h->prohibit_list);
     
     //Remove the ^epmem header WMEs
     remove_input_wme(thisAgent, h->epmem_wme);
@@ -2788,7 +2798,7 @@ int record_cue_element_match(agent *thisAgent,
                              episodic_memory **best_mem_via_score,
                              episodic_memory **best_mem_via_cardinality)
 {
-    int i;
+    int i,j;
     int comp_count = 0;
     int negcue = negcue_cardinality < 0; // boolean
     
@@ -2808,21 +2818,40 @@ int record_cue_element_match(agent *thisAgent,
     
         //If the agent as asked for a memory that occurs before or after a
         //particular point, handle that here
-        if (h->cmd->name != NULL)
+        if (h->temporal_cmd->name != NULL)
         {
-            if ((strcmp(h->cmd->name, "before") == 0)
-                && (h->cmd->arg_type == INT_CONSTANT_SYMBOL_TYPE)
-                && (epmem->index >= h->cmd->arg.intval))
+            if ((strcmp(h->temporal_cmd->name, "before") == 0)
+                && (h->temporal_cmd->arg_type == INT_CONSTANT_SYMBOL_TYPE)
+                && (epmem->index >= h->temporal_cmd->arg.intval))
             {
                 continue;
             }
-            else if ((strcmp(h->cmd->name, "after") == 0)
-                     && (h->cmd->arg_type == INT_CONSTANT_SYMBOL_TYPE)
-                     && (epmem->index <= h->cmd->arg.intval))
+            else if ((strcmp(h->temporal_cmd->name, "after") == 0)
+                     && (h->temporal_cmd->arg_type == INT_CONSTANT_SYMBOL_TYPE)
+                     && (epmem->index <= h->temporal_cmd->arg.intval))
             {
                 continue;
             }
                 
+        }//if
+
+        //If the agent is probiting any memories, handle that here
+        if (h->prohibit_list->size > 0)
+        {
+            int bProhibited = FALSE;
+            
+            for(j = 0; j < h->prohibit_list->size; j++)
+            {
+                long nProbID = (long)get_arraylist_entry(thisAgent,
+                                                         h->prohibit_list,
+                                                         j);
+                if (nProbID == epmem->index)
+                {
+                    bProhibited = TRUE;
+                    break;
+                }
+            }
+            if (bProhibited) continue;
         }//if
             
         //Record that there was a match
@@ -3893,78 +3922,123 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
 }//respond_to_query
 
 /* ===================================================================
-   epmem_retrieve_command() 
+   epmem_retrieve_commands() 
 
-   This routine examines the ^epmem link for a command.  Commands are
-   always of the form (<s> ^epmem.query.command <cmd>) where <cmd>
-   has a ^name and an optional ^argument.  The given epmem_command
-   struct is populated with the values retrieved from WM.  If there
-   is no command (or an error occurs) then the command's name is set
-   to NULL.
+   This routine examines the ^epmem link for commands.  Commands are
+   always of the form (<s> ^epmem.query.command <cmd>) where <cmd> has
+   a ^name and an optional ^argument.  The given given command is
+   stored in the appropriate place in the epmem_header.  If an error
+   occurs then the command's name is set to NULL.
 
-   CAVEAT: The cmd->cmd_wme pointer is a direct reference to the WME
-   so the pointer may not be valid on subsequent cycles.
+   CAVEAT: The cmd->cmd_wme pointer in the epmem_command struct is a
+   direct reference to the WME so the pointer may not be valid on
+   subsequent cycles.
    
    Created: 27 Jan 2004
    Changed: 19 Oct 2004 - moved the loop to a general purpose function
-   Changed: 13 July 2006 - overhauled as new commands added
+   Changed: 13 & 25 July 2006 - overhauled as new commands added
    =================================================================== */
-void epmem_retrieve_command(agent *thisAgent, epmem_header *h)
+void epmem_retrieve_commands(agent *thisAgent, epmem_header *h)
 {
-    wme *w;
+    wme **wmes;
+    int len = 0;
+    int i;
+    tc_number tc;
+    wme *cmd_wme = NULL;
+    wme *name_wme = NULL;
+    wme *arg_wme = NULL;
 
     //Clean up any old commands
-    cleanup_epmem_command(thisAgent, h->cmd);
+    h->next_cmd = FALSE;
+    cleanup_epmem_command(thisAgent, h->temporal_cmd);
+    h->prohibit_list->size = 0;
 
-    //Get the command WME root
-    h->cmd->cmd_wme = get_aug_of_id(thisAgent, h->query, "command", NULL);
-    if ( (h->cmd->cmd_wme == NULL) || (h->cmd->cmd_wme->value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE) )
-    {
-        return;
-    }
-    
-    //Get the command name
-    w = get_aug_of_id(thisAgent, h->cmd->cmd_wme->value, "name", NULL);
-    if ( (w != NULL) && (w->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE) )
-    {
-        h->cmd->name = (char *)allocate_memory(thisAgent,
-                                            sizeof(char)*strlen(w->value->sc.name) + 1,
-                                            MISCELLANEOUS_MEM_USAGE);
-        strcpy(h->cmd->name, w->value->sc.name);
-    }
+    //Retrieve all the WMEs on the ^query link
+    tc = h->query->id.tc_num + 1;
+    wmes = epmem_get_augs_of_id(thisAgent, h->query, tc, &len);
+    h->query->id.tc_num = tc - 1;
+    if (wmes == NULL) return;
 
-    //Get the command argument (which is optional and may not be present)
-    h->cmd->arg.strval = NULL;
-    h->cmd->arg_type = -1;
-    w = get_aug_of_id(thisAgent, h->cmd->cmd_wme->value, "argument", NULL);
-    if (w != NULL)
+    //Search those WMEs for commands
+    for(i = 0; i < len; i++)
     {
-        switch(w->value->common.symbol_type)
+        //See if the WME is a command
+        cmd_wme = NULL;
+        if (wme_has_value(wmes[i], "command", NULL))
         {
-            case SYM_CONSTANT_SYMBOL_TYPE:
-                h->cmd->arg.strval = w->value->sc.name;
-                h->cmd->arg_type = SYM_CONSTANT_SYMBOL_TYPE;
-                h->cmd->arg.strval =
-                    (char *)allocate_memory(thisAgent, sizeof(char)*strlen(w->value->sc.name) + 1,
-                                            MISCELLANEOUS_MEM_USAGE);
-                strcpy(h->cmd->arg.strval, w->value->sc.name);
-                break;
+            cmd_wme = wmes[i];
+        }
 
-            case INT_CONSTANT_SYMBOL_TYPE:
-                h->cmd->arg_type = INT_CONSTANT_SYMBOL_TYPE;
-                h->cmd->arg.intval = w->value->ic.value;
-                break;
+        //If a command was found, parse it and store it
+        if ( (cmd_wme)
+             && (cmd_wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE) )
+        {
+            //Get the command name and argument
+            name_wme = get_aug_of_id(thisAgent, cmd_wme->value,
+                                     "name", NULL);
+            arg_wme = get_aug_of_id(thisAgent, cmd_wme->value,
+                                    "argument", NULL);
 
-            case FLOAT_CONSTANT_SYMBOL_TYPE:
-                h->cmd->arg_type = FLOAT_CONSTANT_SYMBOL_TYPE;
-                h->cmd->arg.floatval = w->value->fc.value;
-                break;
-        }//switch
-    }//if
-    
+            //Parse the command
+            if ( (name_wme != NULL)
+                 && (name_wme->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE) )
+            {
+                char *name = name_wme->value->sc.name;
+                switch(name[0])
+                {
+                    case 'a':
+                        if ((strcmp(name, "after") == 0)
+                            && (arg_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
+                        {
+                            h->temporal_cmd->name =
+                                (char *)allocate_memory(thisAgent,
+                                                        sizeof(char)*strlen(name) + 1,
+                                                        MISCELLANEOUS_MEM_USAGE);
+                            strcpy(h->temporal_cmd->name, name);
+                            
+                            h->temporal_cmd->arg.intval = arg_wme->value->ic.value;
+                        }
+                        break;
+                    case 'b':
+                        if ((strcmp(name, "before") == 0)
+                            && (arg_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
+                        {
+                            h->temporal_cmd->name =
+                                (char *)allocate_memory(thisAgent,
+                                                        sizeof(char)*strlen(name) + 1,
+                                                        MISCELLANEOUS_MEM_USAGE);
+                            strcpy(h->temporal_cmd->name, name);
+                            
+                            h->temporal_cmd->arg.intval = arg_wme->value->ic.value;
+                        }
+                        break;
+                    case 'n':
+                        if (strcmp(name, "next") == 0)
+                        {
+                            h->next_cmd = TRUE;
+                        }
+                        break;
+                    case 'p':
+                        if ((strcmp(name, "prohibit") == 0)
+                            && (arg_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
+                        {
+                            append_entry_to_arraylist(thisAgent,
+                                                      h->prohibit_list,
+                                                      (void *)arg_wme->value->ic.value);
+                        }
+                        break;
+                    default:
+                        fprintf(stderr, "\nINVALID COMMAND: %s!\n", name);
+                }//switch                            
 
+                            
+            }//if
+        }//if
+    }//for
 
-}//epmem_retrieve_command
+    free_memory(thisAgent, wmes, MISCELLANEOUS_MEM_USAGE);
+
+}//epmem_retrieve_commands
 
 /* ===================================================================
    increment_retrieval_count
@@ -4075,38 +4149,6 @@ void respond_to_command_next(agent *thisAgent, epmem_header *h)
     increment_retrieval_count(thisAgent, h, 1);
 
 }//respond_to_command_next
-
-/* ===================================================================
-   respond_to_command() 
-
-   This routine responds to agent commands given on the ^epmem link.
-   The following commands are supported:
-       "next" - populate ^epmem.retrieved with the next memory
-                in the sequence
-       "before" or "after" - These specify that a retrieved memory
-                             has to occur before or after a given
-                             memory.  (NOTE: These can't be responded
-                             to here and so aren't handled here.)
-
-   This function returns TRUE if the command was handled and FALSE
-   otherwise. 
-
-   h - the epmem header where the command was found
-
-   Created: 27 Jan 2004
-   Updated: 13 Jul 2006 - moved bulk of content to respond_to_command_next
-   =================================================================== */
-int respond_to_command(agent *thisAgent, epmem_header *h)
-{
-    if (strcmp(h->cmd->name, "next") == 0)
-    {
-        respond_to_command_next(thisAgent, h);
-        return TRUE;
-    }
-
-    return FALSE;
-    
-}//respond_to_command
 
 /* ===================================================================
    find_superstate()
@@ -5253,7 +5295,6 @@ void epmem_update(agent *thisAgent)
     arraylist *epmem = NULL;
     static int count = 0;
     int i;
-    int cmd_handled = 0;
 
     count++;
 
@@ -5278,34 +5319,29 @@ void epmem_update(agent *thisAgent)
     {
         epmem_header *h = (epmem_header *)get_arraylist_entry(thisAgent, g_header_stack, i);
 
-        //Look for a command
-        epmem_retrieve_command(thisAgent, h);
-        if (h->cmd->name != NULL)
+        //Retrieve any commands
+        epmem_retrieve_commands(thisAgent, h);
+
+        //Special Case:  the "next" command
+        if (h->next_cmd) 
         {
-            cmd_handled = respond_to_command(thisAgent, h);
+            respond_to_command_next(thisAgent, h);
+            continue;
         }
 
-        if (!cmd_handled)
+        //Handle any queries on the input link
+        epmem = respond_to_query(thisAgent, h);
+        
+        if (epmem != NULL)
         {
-            //Look for a new cue on the query link
-        
-            //%%%DEBUGGING
-            //decay_print_most_activated_wmes(50);
-        
-            epmem = respond_to_query(thisAgent, h);
-
-            if (epmem != NULL)
-            {
-                //New retrieval:  reset count to zero
-                increment_retrieval_count(thisAgent, h, 0);
-            }
-            else
-            {
-                //No retrieval:  remove count from working memory
-                increment_retrieval_count(thisAgent, h, -1);
-            }
-        }//if
-
+            //New retrieval:  reset count to zero
+            increment_retrieval_count(thisAgent, h, 0);
+        }
+        else
+        {
+            //No retrieval:  remove count from working memory
+            increment_retrieval_count(thisAgent, h, -1);
+        }
         
 //          //%%%DEBUGGING
 //          if (h->curr_memory != NULL)
