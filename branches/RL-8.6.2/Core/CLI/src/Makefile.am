@@ -22,6 +22,7 @@ cli_echocommands.cpp\
 cli_editproduction.cpp\
 cli_excise.cpp\
 cli_explainbacktraces.cpp\
+cli_exploration.cpp\
 cli_firingcounts.cpp\
 cli_gdsprint.cpp\
 cli_help.cpp\
