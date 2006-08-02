@@ -516,6 +516,16 @@ _|___/    __         _    _             ____  _               _
  	  return true;
    }
 
+      bool ProductionManager::RemoveAllTemplateProductions(int& exciseCount, Error* err) const
+   {
+      agent * a;
+	  ClearError(err);
+	  a = m_agent->GetSoarAgent();
+	  exciseCount = exciseCount + a->num_productions_of_type[TEMPLATE_PRODUCTION_TYPE];
+      excise_all_productions_of_type(m_agent->GetSoarAgent(), TEMPLATE_PRODUCTION_TYPE, false);
+ 	  return true;
+   }
+
    /*
    ===============================
  _                    _ ____      _

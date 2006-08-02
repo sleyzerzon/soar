@@ -1896,19 +1896,17 @@ Exploration
    void Agent::SetRLParameter(egSKIRLParameter m, double value, Error* pErr){
 	   switch(m) {
 		   case ALPHA:
-			   GetSoarAgent()->alpha = value;
+			   // GetSoarAgent()->alpha = value;
+			   m_agent->alpha = value;
 			   break;
 		   case GAMMA:
-			   GetSoarAgent()->gamma = value;
+			   // GetSoarAgent()->gamma = value;
+			   m_agent->gamma = value;
 			   break;
 		   case LAMBDA:
-			   GetSoarAgent()->lambda = value;
-			   if (value == 0){
-				   GetSoarAgent()->num_traces = 1;
-			   } else {
-				   GetSoarAgent()->num_traces = ceil( log(0.01) / log(value) );
-			   }
-			   break;
+				   // GetSoarAgent()->lambda = value;
+				   m_agent->lambda = value;
+				   break;
 		   default:
 			   MegaAssert(false, "Invalid RL parameter.");
 			   break;

@@ -161,6 +161,11 @@ namespace gSKI {
        */
        virtual bool RemoveAllUserProductions(int& i, Error *pErr = 0) const = 0;
 	   /*********************************************/
+
+	   virtual bool RemoveAllTemplateProductions(int& i, Error *pErr = 0) const = 0;
+
+	   /*********************************************/
+
 	   virtual bool RemoveAllRLProductions(int& i, Error *pErr = 0) const = 0;
 
 
