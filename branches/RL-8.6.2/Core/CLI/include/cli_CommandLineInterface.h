@@ -240,8 +240,8 @@ protected:
 	bool ParseWarnings(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatch(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatchWMEs(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
-	bool ParseExploration(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
-	bool ParseRL(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+	bool ParseExploration(gSKI::IAgent* pAgent, std::vector<std::string>& argv);		// NUMERIC_INDIFFERENCE
+	bool ParseRL(gSKI::IAgent* pAgent, std::vector<std::string>& argv);					// NUMERIC_INDIFFERENCE
 
 	/*************************************************************
 	* @brief add-wme command
@@ -549,17 +549,24 @@ protected:
 
 	/****************************************************************
 	* @brief RL command
-	* @param pConnection Pointer to connection
-	* @param pResponse Pointer to XML response
 	* @param pAgent The pointer to the gSKI agent interface
 	* @param RLSetting RL on/off
+	* @param algSetting on-policy/off-policy
 	* @param Temp Assignment to the alpha parameter
-	* @param epsilon Assignment to the gamma parameter
+	* @param gamma Assignment to the gamma parameter
+	* @param lambda Assignment to the lambda parameter
 	*****************************************************************/
 
 	bool DoRL(gSKI::IAgent* pAgent, const int RLSetting, const int algSetting, const double alpha, const double gamma, const double lambda);
 
-	/*****************************************************************/
+	/*****************************************************************
+	* @brief Exploration command
+	* @param pAgent The pointer to the gSKI agent interface
+	* @param mode Exploration mode
+	* @param Temp Assignment to the Temperature parameter
+	* @param epsilon Assignment to the epsilon parameter
+	******************************************************************/
+
 	bool DoExploration(gSKI::IAgent* pAgent, const int mode, const double Temp, const double epsilon);
 
 	/*************************************************************
@@ -739,7 +746,7 @@ protected:
 	*************************************************************/
 	int ParseLevelOptarg();
 	int ParseLearningOptarg();
-	int ParseExplorationOptarg();
+	int ParseExplorationOptarg();				//  NUMERIC_INDIFFERENCE
 	bool CheckOptargRemoveOrZero();
 	bool ProcessWatchLevelSettings(const int level, WatchBitset& options, WatchBitset& settings, int& wmeSetting, int& learnSetting);
 

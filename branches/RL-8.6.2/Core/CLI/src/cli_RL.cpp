@@ -1,3 +1,4 @@
+// #ifdef NUMERIC_INDIFFERENCE
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif // HAVE_CONFIG_H
@@ -64,13 +65,13 @@ bool CommandLineInterface::ParseRL(gSKI::IAgent* pAgent, std::vector<std::string
 	case 'g'://gamma
 		if (m_OptionArgument.size()) {
 			gamma = strtod(m_OptionArgument.c_str(),0);
-			if ((gamma < 0) || (gamma > 1)) return SetError(CLIError::kGammaOutsideUnitInterval);
+			if ((gamma < 0) || (gamma > 1)) return SetError(CLIError::kParameterOutsideUnitInterval);
 		}
 		break;
 	case 'l'://lambda
 		if (m_OptionArgument.size()) {
 			lambda = strtod(m_OptionArgument.c_str(),0);
-			if ((lambda < 0) || (lambda >= 1)) return SetError(CLIError::kGammaOutsideUnitInterval);
+			if ((lambda < 0) || (lambda > 1)) return SetError(CLIError::kParameterOutsideUnitInterval);
 		}
 		break;		
 	default:
@@ -99,6 +100,7 @@ bool CommandLineInterface::DoRL(gSKI::IAgent* pAgent, const int RLSetting, const
 		return true;
 	}
 	if (lambda >= 0){
+		if (!pKernelHack->GetSysparam(pAgent, RL_ONPOLICY_SYSPARAM) && (lambda > 0)) return SetError(CLIError::kETRequiresOnPolicy);
 		pAgent->SetRLParameter(LAMBDA, lambda);
 		return true;
 	}
@@ -116,6 +118,7 @@ bool CommandLineInterface::DoRL(gSKI::IAgent* pAgent, const int RLSetting, const
 		return true;
 	}
 	if (algSetting == 2) {
+		if (pAgent->GetRLParameter(LAMBDA) > 0) return SetError(CLIError::kOffPolicyDisallowsET);
 		pKernelHack->SetSysparam(pAgent, RL_ONPOLICY_SYSPARAM, false);
 		return true;
 	}	
@@ -133,3 +136,5 @@ bool CommandLineInterface::DoRL(gSKI::IAgent* pAgent, const int RLSetting, const
 		}
 	return true;	
 }
+
+// #endif

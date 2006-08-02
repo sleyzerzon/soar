@@ -27,7 +27,7 @@ namespace cli {
 		static char const* kCLIEditProduction;
 		static char const* kCLIExcise;
 		static char const* kCLIExplainBacktraces;
-		static char const* kCLIExploration;
+		static char const* kCLIExploration;					// NUMERIC_INDIFFERENCE
 		static char const* kCLIFiringCounts;
 		static char const* kCLIGDSPrint;
 		static char const* kCLIHelp;
@@ -55,7 +55,7 @@ namespace cli {
 		static char const* kCLIQuit;
 		static char const* kCLIRemoveWME;
 		static char const* kCLIReteNet;
-		static char const* kCLIRL;
+		static char const* kCLIRL;			//  NUMERIC_INDIFFERENCE
 		static char const* kCLIRLcaps;
 		static char const* kCLIRun;
 		static char const* kCLISaveBacktraces;

@@ -94,17 +94,19 @@ namespace cli {
 		  kAmbiguousCommand					= 79,
 		  kAmbiguousOption					= 80, 
 		  kProductionMemoryNotEmpty			= 81, 
-		  kInvalidExplorationSetting		                = 82, 
-		  kTempMustBePositive				        = 83,
-		  kEpsilonOutsideUnitInterval		                = 84,
-		  kAlphaMustBeNonNegative			        = 85,
-		  kGammaOutsideUnitInterval			        = 86,
+		  kInvalidExplorationSetting		                = 82, // NUMERIC_INDIFFERENCE
+		  kTempMustBePositive				        = 83,		  // NUMERIC_INDIFFERENCE
+		  kEpsilonOutsideUnitInterval		                = 84,  // NUMERIC_INDIFFERENCE
+		  kAlphaMustBeNonNegative			        = 85,			// NUMERIC_INDIFFERENCE
+		  kParameterOutsideUnitInterval			        = 86,      // NUMERIC_INDIFFERENCE
 		  kSoar7Command						= 87, 
 		  kInvalidBackslashEscapeCharacter	= 88, 
 		  kInitSoarFailed						= 89, 
 		  kPreferencesError					= 90, // FIXME: document in wiki
 		  kFloatExpected                        = 91, // FIXME: document in wiki
 		  kInvalidRunInterleaveSetting		= 92,
+		  kETRequiresOnPolicy				= 93,    // NUMERIC_INDIFFERENCE
+		  kOffPolicyDisallowsET				= 94,    // NUMERIC_INDIFFERENCE
 		};
 
 	
@@ -189,13 +191,15 @@ namespace cli {
 	  case kTempMustBePositive:			return "Temperature parameter must be positive.";
 	  case kEpsilonOutsideUnitInterval:		return "Epsilon parameter must be in [0,1].";
 	  case kAlphaMustBeNonNegative:			return "Alpha parameter must be non-negative.";
-	  case kGammaOutsideUnitInterval:		return "Gamma parameter must be in [0,1].";
+	  case kParameterOutsideUnitInterval:		return "Parameter must be in [0,1].";
 	  case kSoar7Command:				return "Command valid in Soar 7 mode only.";
 	  case kInvalidBackslashEscapeCharacter:	return "Invalid backslash escape character, see documentation.";
 	  case kInitSoarFailed:				return "Agent could not be reinitialized.  Probably due to an internal memory leak." ;
 	  case kPreferencesError:			return "Preferences command failed." ;
 	  case kFloatExpected:				return "Floating point argument expected.";
 	  case kInvalidRunInterleaveSetting:		return "Invalid setting for run interleave option." ;
+	  case kETRequiresOnPolicy:			return "Lambda > 0 requires RL --on-policy.";
+	  case kOffPolicyDisallowsET:		return "Off-policy requires RL --lambda 0.";
 	  default:								return "Unknown error code.";
 	  }
 	}

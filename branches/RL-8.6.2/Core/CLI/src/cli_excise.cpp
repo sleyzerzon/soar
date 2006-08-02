@@ -31,7 +31,8 @@ bool CommandLineInterface::ParseExcise(gSKI::IAgent* pAgent, std::vector<std::st
 		{'d', "default",	0},
 		{'t', "task",		0},
 		{'u', "user",		0},
-		{'r', "RL",             0},
+		{'T', "template",   0},			// NUMERIC_INDIFFERENCE
+		{'r', "RL",             0},		// NUMERIC_INDIFFERENCE
 		{0, 0, 0}
 	};
 
@@ -57,7 +58,10 @@ bool CommandLineInterface::ParseExcise(gSKI::IAgent* pAgent, std::vector<std::st
 			case 'u':
 				options.set(EXCISE_USER);
 				break;
-			case 'r':
+			case 'T':								// NUMERIC_INDIFFERENCE
+				options.set(EXCISE_TEMPLATE);
+				break;
+			case 'r':								// NUMERIC_INDIFFERENCE
 				options.set(EXCISE_RL);
 				break;
 			default:
@@ -128,7 +132,10 @@ bool CommandLineInterface::DoExcise(gSKI::IAgent* pAgent, const ExciseBitset& op
 		pProductionManager->RemoveAllUserProductions(exciseCount);
 		//ExciseInternal(pProductionManager->GetUserProductions(), exciseCount);
 	}
-	if (options.test(EXCISE_RL)) {
+	if (options.test(EXCISE_TEMPLATE)) {			// NUMERIC_INDIFFERENCE
+		pProductionManager->RemoveAllTemplateProductions(exciseCount);
+	}
+	if (options.test(EXCISE_RL)) {					// NUMERIC_INDIFFERENCE
 		pProductionManager->RemoveAllRLProductions(exciseCount);
 	}
 
