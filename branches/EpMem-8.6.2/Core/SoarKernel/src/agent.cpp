@@ -44,6 +44,7 @@
 #include "callback.h"
 #include "io.h"
 #include "kernel_struct.h"
+#include "epmem.h"
 
 /* JC ADDED: Need to initialize gski callbacks */
 #include "gski_event_system_functions.h"
@@ -90,13 +91,16 @@ void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
 
 #ifdef SOAR_WMEM_ACTIVATION
     decay_init(thisAgent);
+#ifdef EPISODIC_MEMORY
+    /* See epmem.cpp */
+    init_epmem(thisAgent);
 #endif
-  
+#endif
+
 #ifdef REAL_TIME_BEHAVIOR
   /* RMJ */
   init_real_time(thisAgent);
 #endif
-
 
   /* --- add default object trace formats --- */
   add_trace_format (thisAgent, FALSE, FOR_ANYTHING_TF, NIL,

@@ -824,7 +824,7 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
 
 #ifdef SOAR_WMEM_ACTIVATION
   if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM]) {
-		  decay_update_wmes_in_retracted_inst(thisAgent, inst);
+    decay_update_wmes_in_retracted_inst(thisAgent, inst);
   }
 #endif //SOAR_WMEM_ACTIVATION
 
@@ -1013,9 +1013,9 @@ void assert_new_preferences (agent* thisAgent)
          }
 
 #ifdef SOAR_WMEM_ACTIVATION
-		 if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM]) {
-			 activate_wmes_in_pref(thisAgent, pref);
-		 }
+	 if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM]) {
+	   activate_wmes_in_pref(thisAgent, pref);
+	 }
 #endif  //SOAR_WMEM_ACTIVATION
          
       }

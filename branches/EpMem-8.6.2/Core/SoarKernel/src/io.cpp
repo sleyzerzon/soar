@@ -182,7 +182,6 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   add_wme_to_wm (thisAgent, w);
 
 #ifdef SOAR_WMEM_ACTIVATION
-   // shouldn't we e checking the sysparam?  
   if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM]) {
 	  decay_update_new_wme(thisAgent, w, 1);
   }
@@ -203,8 +202,10 @@ Bool remove_input_wme (agent* thisAgent, wme *w) {
    for (temp=w->id->id.input_wmes; temp!=NIL; temp=temp->next)
       if (temp==w) break;
    if (!temp) {
+      #ifndef SOAR_WMEM_ACTIVATION
       print (thisAgent, "Error: an input routine called remove_input_wme on a wme that\n");
       print (thisAgent, "isn't one of the input wmes currently in working memory.\n");
+      #endif
       return FALSE;
    }
    /* Note: for efficiency, it might be better to use a hash table for the

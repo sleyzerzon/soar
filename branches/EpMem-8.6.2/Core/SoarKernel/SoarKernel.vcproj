@@ -324,6 +324,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\epmem.cpp">
+			</File>
+			<File
 				RelativePath=".\src\explain.cpp">
 				<FileConfiguration
 					Name="Release|Win32">
@@ -791,6 +794,9 @@
 			</File>
 			<File
 				RelativePath=".\include\decide.h">
+			</File>
+			<File
+				RelativePath=".\src\epmem.h">
 			</File>
 			<File
 				RelativePath=".\include\explain.h">

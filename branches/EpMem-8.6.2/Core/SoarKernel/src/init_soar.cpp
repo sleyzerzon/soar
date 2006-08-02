@@ -43,6 +43,7 @@
 #include "wmem.h"
 #include "io.h"
 #include "rete.h"
+#include "epmem.h"
 #include "gdatastructs.h"
 #include "kernel_struct.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
@@ -1117,6 +1118,9 @@ void do_one_top_level_phase (agent* thisAgent)
      {
          decay_move_and_remove_wmes(thisAgent);
      }
+#ifdef EPISODIC_MEMORY
+     epmem_update(thisAgent);
+#endif /* EPISODIC_MEMORY */
 #endif /*SOAR_WMEM_ACTIVATION*/
 
       
@@ -1175,128 +1179,132 @@ void do_one_top_level_phase (agent* thisAgent)
   case DECISION_PHASE:
       /* not yet cleaned up for 8.6.0 release */
 
-	  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
-		  print_phase (thisAgent, "\n--- Decision Phase ---\n",0);
-	  	 
-      #ifndef NO_TIMING_STUFF   /* REW:  28.07.96 */
-	  start_timer (thisAgent, &thisAgent->start_phase_tv);
-      #endif
+    if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
+      print_phase (thisAgent, "\n--- Decision Phase ---\n",0);
+    
+    #ifndef NO_TIMING_STUFF   /* REW:  28.07.96 */
+    start_timer (thisAgent, &thisAgent->start_phase_tv);
+    #endif
 
-      /* d_cycle_count moved to input phase for Soar 8 new decision cycle */
-      if (thisAgent->operand2_mode == FALSE) 
-         thisAgent->d_cycle_count++;
-	  thisAgent->decision_phases_count++;  /* counts decisions, not cycles, for more accurate stats */
-
-#ifdef SOAR_WMEM_ACTIVATION
-      if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM])
+    thisAgent->decision_phases_count++;   /* counts decision PHASES, not cycles */
+    /* d_cycle_count moved to input phase for Soar 8 new decision cycle */
+    if (thisAgent->operand2_mode == FALSE) 
       {
-          decay_move_and_remove_wmes(thisAgent);
-      }
+	thisAgent->d_cycle_count++;
+	
+#ifdef SOAR_WMEM_ACTIVATION
+	//IMPORTANT:  This code needs to be inside the if-statement
+	//            above [if (thisAgent->operand2_mode == FALSE)]
+	if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM])
+	  {
+	    decay_move_and_remove_wmes(thisAgent);
+	  }
 #endif
-      
-      /* AGR REW1 begin */
-	  if (!thisAgent->input_period) 
-		  thisAgent->input_cycle_flag = TRUE;
-	  else if ((thisAgent->d_cycle_count % thisAgent->input_period) == 0)
-		  thisAgent->input_cycle_flag = TRUE;
-      /* AGR REW1 end */
- 
-       soar_invoke_callbacks(thisAgent, thisAgent, 
-	 		 BEFORE_DECISION_PHASE_CALLBACK,
-			 (soar_call_data) NULL);
- 
-	  do_decision_phase(thisAgent);
-
-	  soar_invoke_callbacks(thisAgent, thisAgent, 
-			 AFTER_DECISION_PHASE_CALLBACK,
-			 (soar_call_data) NULL);
-
-	  if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) {
-     //     #ifdef USE_TCL
-		  print_string (thisAgent, "\n");
-    //      #else
-		  //if(thisAgent->printer_output_column != 1)
-			 // print_string ("\n");
-    //      #endif /* USE_TCL */
-		  print_lowest_slot_in_context_stack (thisAgent);
-	  }
-
-	  if (thisAgent->operand2_mode == FALSE) {
-          /* KJC June 05: Soar8 - moved AFTER_DECISION_CYCLE_CALLBACK to proper spot in OUTPUT */
- 	      soar_invoke_callbacks(thisAgent, thisAgent, 
-		                    	AFTER_DECISION_CYCLE_CALLBACK,
-		 	                    (soar_call_data) NULL);
-		  thisAgent->chunks_this_d_cycle = 0;
-		  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
-			  print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
-    	  thisAgent->current_phase = INPUT_PHASE;
- 	  }
-	  /* reset elaboration counter */
-      thisAgent->e_cycles_this_d_cycle = 0;
-      thisAgent->pe_cycles_this_d_cycle = 0;
-
-	  /* REW: begin 09.15.96 */
-	  if (thisAgent->operand2_mode == TRUE) 
-     {
+      }
+    
+    /* AGR REW1 begin */
+    if (!thisAgent->input_period) 
+      thisAgent->input_cycle_flag = TRUE;
+    else if ((thisAgent->d_cycle_count % thisAgent->input_period) == 0)
+      thisAgent->input_cycle_flag = TRUE;
+    /* AGR REW1 end */
+    
+    soar_invoke_callbacks(thisAgent, thisAgent, 
+			  BEFORE_DECISION_PHASE_CALLBACK,
+			  (soar_call_data) NULL);
+    
+    do_decision_phase(thisAgent);
+    
+    soar_invoke_callbacks(thisAgent, thisAgent, 
+			  AFTER_DECISION_PHASE_CALLBACK,
+			  (soar_call_data) NULL);
+    
+    if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) {
+      //     #ifdef USE_TCL
+      print_string (thisAgent, "\n");
+      //      #else
+      //if(thisAgent->printer_output_column != 1)
+      // print_string ("\n");
+      //      #endif /* USE_TCL */
+      print_lowest_slot_in_context_stack (thisAgent);
+    }
+    
+    if (thisAgent->operand2_mode == FALSE) {
+      /* KJC June 05: Soar8 - moved AFTER_DECISION_CYCLE_CALLBACK to proper spot in OUTPUT */
+      soar_invoke_callbacks(thisAgent, thisAgent, 
+			    AFTER_DECISION_CYCLE_CALLBACK,
+			    (soar_call_data) NULL);
+      thisAgent->chunks_this_d_cycle = 0;
+      if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
+	print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
+      thisAgent->current_phase = INPUT_PHASE;
+    }
+    /* reset elaboration counter */
+    thisAgent->e_cycles_this_d_cycle = 0;
+    thisAgent->pe_cycles_this_d_cycle = 0;
+    
+    /* REW: begin 09.15.96 */
+    if (thisAgent->operand2_mode == TRUE) 
+      {
 #ifdef AGRESSIVE_ONC
-		  /* test for Operator NC, if TRUE, generate substate and go to OUTPUT */
-		  if ((thisAgent->ms_o_assertions == NIL) &&
-			  (thisAgent->bottom_goal->id.operator_slot->wmes != NIL)) 
-        {
+	/* test for Operator NC, if TRUE, generate substate and go to OUTPUT */
+	if ((thisAgent->ms_o_assertions == NIL) &&
+	    (thisAgent->bottom_goal->id.operator_slot->wmes != NIL)) 
+	  {
 
- 			  soar_invoke_callbacks(thisAgent, thisAgent, 
-				                    BEFORE_DECISION_PHASE_CALLBACK,
-				                    (soar_call_data) NULL);
- 
-			  do_decision_phase(thisAgent);
-     
-			  soar_invoke_callbacks(thisAgent, thisAgent, AFTER_DECISION_PHASE_CALLBACK,
-                                    (soar_call_data) NULL);
-
-			  if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) {
-//                  #ifdef USE_TCL
-				  print_string (thisAgent, "\n");
-//                  #else
-//				  if(thisAgent->printer_output_column != 1) print_string ("\n");
-//                  #endif /* USE_TCL */
-				  print_lowest_slot_in_context_stack (thisAgent);
-			  }
-			  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])			 
-				  print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
-
-			  /* set phase to OUTPUT */
-			  thisAgent->current_phase = OUTPUT_PHASE;
-
-			  /* REW: begin 28.07.96 */
-              #ifndef NO_TIMING_STUFF
-              stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-				  &thisAgent->decision_cycle_phase_timers[DECISION_PHASE]);
-              #endif
-	          /* REW: end 28.07.96 */
-
-			  break;
-   
-		  } else 
+	    soar_invoke_callbacks(thisAgent, thisAgent, 
+				  BEFORE_DECISION_PHASE_CALLBACK,
+				  (soar_call_data) NULL);
+	    
+	    do_decision_phase(thisAgent);
+	    
+	    soar_invoke_callbacks(thisAgent, thisAgent, AFTER_DECISION_PHASE_CALLBACK,
+				  (soar_call_data) NULL);
+	    
+	    if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) {
+	      //   #ifdef USE_TCL
+	      print_string (thisAgent, "\n");
+	      //    #else
+	      //	  if(thisAgent->printer_output_column != 1) print_string ("\n");
+	      //    #endif /* USE_TCL */
+	      print_lowest_slot_in_context_stack (thisAgent);
+	    }
+	    if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])			 
+	      print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
+			  
+	    /* set phase to OUTPUT */
+	    thisAgent->current_phase = OUTPUT_PHASE;
+	    
+	    /* REW: begin 28.07.96 */
+            #ifndef NO_TIMING_STUFF
+	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+			&thisAgent->decision_cycle_phase_timers[DECISION_PHASE]);
+            #endif
+	    /* REW: end 28.07.96 */
+	    
+	    break;
+	    
+	  } else 
 #endif //AGRESSIVE_ONC
-		  {
-			  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])			 
-				  print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
-
-			  /* printf("\nSetting next phase to APPLY following a decision...."); */
-			  thisAgent->applyPhase = TRUE;
-			  thisAgent->FIRING_TYPE = PE_PRODS;
-			  thisAgent->current_phase = APPLY_PHASE;
-		  }
+	  {
+	    if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])			 
+	      print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
+	    
+	    /* printf("\nSetting next phase to APPLY following a decision...."); */
+	    thisAgent->applyPhase = TRUE;
+	    thisAgent->FIRING_TYPE = PE_PRODS;
+	    thisAgent->current_phase = APPLY_PHASE;
 	  }
+      }
  
 	  /* REW: begin 28.07.96 */
       #ifndef NO_TIMING_STUFF
-	  stop_timer (thisAgent, &thisAgent->start_phase_tv, 
+      stop_timer (thisAgent, &thisAgent->start_phase_tv, 
 		  &thisAgent->decision_cycle_phase_timers[DECISION_PHASE]);
       #endif
 	  /* REW: end 28.07.96 */
 
-	  break;  /* end DECISION phase */
+      break;  /* end DECISION phase */
 	  
   /////////////////////////////////////////////////////////////////////////////////
 
@@ -1682,6 +1690,11 @@ void init_agent_memory(agent* thisAgent)
                  make_sym_constant(thisAgent, "output-link"),
                  thisAgent->io_header_output);
 
+#ifdef EPISODIC_MEMORY
+  //Create the ^epmem buffer
+  epmem_create_buffer(thisAgent, thisAgent->top_state);
+#endif //EPISODIC_MEMORY
+  
   do_buffered_wm_and_ownership_changes(thisAgent);
 
   // This is an important part of the state of the agent for io purposes

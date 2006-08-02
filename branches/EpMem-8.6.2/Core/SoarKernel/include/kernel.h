@@ -181,9 +181,13 @@ enum ni_mode {
  */
 //#define AGRESSIVE_ONC
 
-
+/* UnComment the following to enable maintenance of activation on WMEs */
 #define SOAR_WMEM_ACTIVATION    // compile switch
-    
+
+#ifdef SOAR_WMEM_ACTIVATION 
+/* UnComment the following to enable Soar to store and recall episodic memory */
+#define EPISODIC_MEMORY         // compile switch
+#endif
     
 /* --------------------------- */
 /* Current Soar version number */
