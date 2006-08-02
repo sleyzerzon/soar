@@ -142,7 +142,7 @@ typedef struct gds_struct {
 
 /* WARNING: preference types must be numbered 0..(NUM_PREFERENCE_TYPES-1),
    because the slot structure contains an array using these indices. */
-#define NUM_PREFERENCE_TYPES 15  /* number of different preference types */
+#define NUM_PREFERENCE_TYPES 14  /* number of different preference types */
 
 #define ACCEPTABLE_PREFERENCE_TYPE 0
 #define REQUIRE_PREFERENCE_TYPE 1
@@ -157,8 +157,8 @@ typedef struct gds_struct {
 #define BINARY_PARALLEL_PREFERENCE_TYPE 10
 #define BETTER_PREFERENCE_TYPE 11
 #define WORSE_PREFERENCE_TYPE 12
-#define NUMERIC_INDIFFERENT_PREFERENCE_TYPE 13 
- // #define TEMPLATE_PREFERENCE_TYPE 14
+#define NUMERIC_INDIFFERENT_PREFERENCE_TYPE 13   // NUMERIC_INDIFFERENCE
+// #define TEMPLATE_PREFERENCE_TYPE 14				 // NUMERIC_INDIFFERENCE
 
 #ifdef USE_MACROS
 
@@ -218,7 +218,7 @@ typedef struct preference_struct {
   struct preference_struct *next_candidate;
   struct preference_struct *next_result;
 
-  /////#ifdef NUMERIC_INDIFFERENCE
+  //#ifdef NUMERIC_INDIFFERENCE
   //   These members used only when #def'd NUMERIC_INDIFFERENCE
   //   in kernel.h but always compiled for clarity.
     /* REW: 2003-01-08 Behavior Variability Kernel Experiements
@@ -227,7 +227,7 @@ typedef struct preference_struct {
        what we really want from these changes.
      */
   int total_preferences_for_candidate;
-  float numeric_value;  /* RL.  snason */
+  float numeric_value;
     /* END: REW: 2003-01-08 */
   /////#endif
 

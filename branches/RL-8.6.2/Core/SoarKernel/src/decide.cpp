@@ -65,6 +65,9 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 unsigned int count_candidates(preference * candidates);
 void compute_value_of_candidate(preference *cand, slot *s, float);
 
+const double DEFAULT_CAND_VALUE_AVG = 50;
+const double DEFAULT_CAND_VALUE_SUM = 0;
+
 /* REW: 2003-01-06 A temporary helper function */
 
 void print_candidates(agent* thisAgent, preference * candidates)
@@ -838,8 +841,8 @@ byte require_preference_semantics (agent* thisAgent, slot *s, preference **resul
   
   /* --- the lone require is the winner --- */
 #ifdef NUMERIC_INDIFFERENCE
-  if (thisAgent->sysparams[RL_ON_SYSPARAM]){
-	  compute_value_of_candidate(candidates, s, 0);
+  if (thisAgent->sysparams[RL_ON_SYSPARAM] && candidates){
+	  compute_value_of_candidate(candidates, s, DEFAULT_CAND_VALUE_SUM);
 	  perform_Bellman_update(thisAgent, candidates->numeric_value, s->id);
   }
 #endif
@@ -899,8 +902,8 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
 #ifdef NUMERIC_INDIFFERENCE
-    if (thisAgent->sysparams[RL_ON_SYSPARAM]){
-	  compute_value_of_candidate(candidates, s, 0);
+    if (thisAgent->sysparams[RL_ON_SYSPARAM] && candidates){
+	  compute_value_of_candidate(candidates, s, DEFAULT_CAND_VALUE_SUM);
 	  perform_Bellman_update(thisAgent, candidates->numeric_value, s->id);
     }
 #endif
@@ -1066,8 +1069,8 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
 #ifdef NUMERIC_INDIFFERENCE
-    if (thisAgent->sysparams[RL_ON_SYSPARAM]){
-	  compute_value_of_candidate(candidates, s, 0);
+    if (thisAgent->sysparams[RL_ON_SYSPARAM] && candidates){
+	  compute_value_of_candidate(candidates, s, DEFAULT_CAND_VALUE_SUM);
 	  perform_Bellman_update(thisAgent, candidates->numeric_value, s->id);
     }
 #endif
@@ -1081,10 +1084,9 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
     p->value->common.decider_flag = UNARY_INDIFFERENT_DECIDER_FLAG;
 	
 #ifdef NUMERIC_INDIFFERENCE
-  /* REW: 2003-01-02 Behavior Variability Kernel Experiments  */
+  // Numeric indifferents count as unary indifferents for preventing tie impasses
   for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
       p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
-  /* END: 2003-01-02 Behavior Variability Kernel Experiments  */
 #endif
 
   not_all_indifferent = FALSE;
@@ -1536,10 +1538,9 @@ byte run_preference_semantics_for_consistency_check (agent* thisAgent, slot *s, 
     p->value->common.decider_flag = UNARY_INDIFFERENT_DECIDER_FLAG;
 
 #ifdef NUMERIC_INDIFFERENCE
-  /* REW: 2003-01-26 Behavior Variability Kernel Experiments  */
+  // Numeric indifferents count as unary indifferents for preventing tie impasses
   for (p=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; p; p=p->next)
       p->value->common.decider_flag = UNARY_INDIFFERENT_CONSTANT_DECIDER_FLAG;
-  /* END: 2003-01-02 Behavior Variability Kernel Experiments  */
 #endif
 
   not_all_indifferent = FALSE;
@@ -1692,14 +1693,11 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
   if (isa_goal)
     {
       add_impasse_wme (thisAgent, id, thisAgent->superstate_symbol, object, NIL);
-      #ifdef NUMERIC_INDIFFERENCE
-      if (level!=TOP_GOAL_LEVEL){
-	Symbol *temp = make_new_identifier(thisAgent, 'R', level);
-	add_impasse_wme (thisAgent, id, thisAgent->reward_symbol, temp, NIL);
-	id->id.reward_header = temp;
-	symbol_remove_ref(thisAgent,temp);
-      }
-      #endif
+#ifdef NUMERIC_INDIFFERENCE
+	  /* Add reward-link to state */
+	  id->id.reward_header = make_new_identifier(thisAgent, 'R', level);	
+	  add_impasse_wme (thisAgent, id, thisAgent->reward_symbol, id->id.reward_header, NIL);
+#endif
    }
   else
     add_impasse_wme (thisAgent, id, thisAgent->object_symbol, object, NIL);
@@ -2318,10 +2316,10 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
 
 #ifdef NUMERIC_INDIFFERENCE
   if (thisAgent->sysparams[RL_ON_SYSPARAM]){
-    if (goal->id.higher_goal){   // +1 reward for completing tie or state no-change impasse
+/*    if (goal->id.higher_goal){   // +1 reward for completing tie or state no-change impasse
       if (goal->id.higher_goal->id.RL_data->impasse_type != OP_NO_CHANGE_IMPASSE_TYPE)
 	goal->id.RL_data->reward += pow(thisAgent->gamma, goal->id.RL_data->step);
-    }
+    }*/
     tabulate_reward_value_for_goal(thisAgent, goal);
     perform_Bellman_update(thisAgent, 0, goal); /* this update only sees reward - there is no next state */
   }
@@ -2371,23 +2369,12 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   }
 
 #ifdef NUMERIC_INDIFFERENCE
-  /* Eligibility trace */
-  eligibility_trace_element *traces = goal->id.RL_data->current_eligibility_element;
-  for (int i = 0 ; i<goal->id.RL_data->number_in_list ; i++)
-    {
-      for (cons *c = traces->prods_to_update ; c ; c=c->rest)
-	{
-	if (c->first)	((production *) c->first)->copies_awaiting_updates--;
-	}
-      free_list(thisAgent, traces->prods_to_update);
-      eligibility_trace_element *temp = traces;
-      traces = traces->next;
-      free_memory(thisAgent, temp, MISCELLANEOUS_MEM_USAGE);
-    }
+ 
+  // goal->id.RL_data->eligibility_traces.clear();
+  // goal->id.RL_data->eligibility_traces.~map<production *, double>();
+	delete goal->id.RL_data->eligibility_traces;
 
-  //	goal->id.RL_data->number_in_list = 0;
-  /* End eligibility trace */
-  // free_list(thisAgent, goal->id.RL_data->productions_to_be_updated);
+  symbol_remove_ref(thisAgent,goal->id.reward_header);
   free_memory(thisAgent, goal->id.RL_data, MISCELLANEOUS_MEM_USAGE);
 #endif
 
@@ -2465,14 +2452,11 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
 #ifdef NUMERIC_INDIFFERENCE
   id->id.RL_data = static_cast<RL_data_struct *>(allocate_memory(thisAgent, sizeof(RL_data_struct),
 												   MISCELLANEOUS_MEM_USAGE));
-  /* Eligibility trace */
-  id->id.RL_data->current_eligibility_element = NIL;
-  id->id.RL_data->number_in_list = 0;
-  /* End Eligibility trace */
-  // id->id.RL_data->productions_to_be_updated = NIL;
-  id->id.RL_data->reward = 0;
-  id->id.RL_data->step = 0;
+  //new (&(id->id.RL_data->eligibility_traces)) std::map<production *, double>;
+  id->id.RL_data->eligibility_traces = new SoarSTLETMap(std::less<production*>(), SoarMemoryAllocator<std::pair<production *, double>>(thisAgent, MISCELLANEOUS_MEM_USAGE));
   id->id.RL_data->previous_Q = 0;
+  id->id.RL_data->reward = 0;
+  id->id.RL_data->step = 0;  
   id->id.RL_data->impasse_type = NONE_IMPASSE_TYPE;
 #endif
 
@@ -3534,62 +3518,31 @@ void create_gds_for_goal( agent* thisAgent, Symbol *goal){
 
 #ifdef NUMERIC_INDIFFERENCE
 
-/* REW: 2003-01-06 */
-/* This a helper function that sets the decider flag to candidate for
-   all the items on the candidate list and initializes the counters 
-   that will track the total probability distributions to zero.
+/***********************************
+	Probabilistically select
 
-   It's okay to muck with the 
-   decider flags here because this will be called after the decision
-   has been determined to be a choice among indifferent candidates.
+Use candidate numeric preferences to probabilistically select an operator.
+Choose according to numeric_indifferent_mode sum or average.
 
-   Note: the slot is only needed for debugging/data verification
-
-   Note: slot parameter removed by voigtjr to quell compiler warnings
-*/
-
-/* SAN: 2003-10-30 */
-/* Revised - this function also initializes candidate's value to default value for
-   appropriate numeric-indifferent-mode 
-*/
-
-
+***********************************/
 preference *probabilistically_select(agent* thisAgent, slot * s, preference * candidates)
 {
     preference *cand = 0;
     preference *pref = 0;
     unsigned int numCandidates = 0;
-    double default_cand_value;
 
     assert(s != 0);
     assert(candidates != 0);
 
-// RPM 12/05 The seed shouldn't be set here (see bug 593) and we aren't using srand and rand anymore (see bug 595)
-//    if (!initialized_rand) {
-//        srand((unsigned) time(NULL));
-//        initialized_rand = 1;
-//    }
-
     numCandidates = count_candidates(candidates);
-	
-	switch (thisAgent->numeric_indifferent_mode) {
-	case NUMERIC_INDIFFERENT_MODE_AVG:
-		default_cand_value = 50;
-		break;
-
-	case NUMERIC_INDIFFERENT_MODE_SUM:
-	default:
-		default_cand_value = 0;
-		break;
-	}
-  
-	for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-	  compute_value_of_candidate(cand, s, default_cand_value);
-	}
-	
-	
+		
 	if (thisAgent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_SUM) {
 		
+
+		for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+			compute_value_of_candidate(cand, s, DEFAULT_CAND_VALUE_SUM);
+		}
+
 		// If RL is off-policy (ie, Q-learning), we perform a Bellman update now, after identifying the max Q-value.
 		if (thisAgent->sysparams[RL_ON_SYSPARAM] && !thisAgent->sysparams[RL_ONPOLICY_SYSPARAM]) {
 			float top_value = candidates->numeric_value;
@@ -3599,29 +3552,6 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 			}
 			
 			perform_Bellman_update(thisAgent, top_value, s->id); 
-			
-			// If the Bellman update changed current prefs, recompute operator values.
-	//	initialize_indifferent_candidates_for_probability_selection(candidates);
-	//	for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
-	//		/*print_with_symbols("\nPreference for %y", pref->value); */
-	//	//	if (pref->inst->prod->type == TEMPLATE_PRODUCTION_TYPE) continue;
-	//		float value;
-	//		if (pref->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
-	//			value = pref->referent->fc.value;
-	//		} else if (pref->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
-	//			value = pref->referent->ic.value;
-	//		} else {
-	//			/* This should never happen. */
-	//			continue;
-	//		}
-	//		for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-	//			/*print_with_symbols("\nConsidering candidate %y", cand->value); */
-	//			if (cand->value == pref->value) {
-	//				cand->total_preferences_for_candidate += 1;
-	//				cand->numeric_value += value;
-	//			}
-	//		}
-	//	}
 		}
 		
 		return choose_according_to_exploration_mode(thisAgent, candidates, numCandidates);
@@ -3632,6 +3562,10 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 		double selectedProbability = 0;
 		double currentSumOfValues = 0;
 		double rn = 0;
+
+		for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
+		 compute_value_of_candidate(cand, s, DEFAULT_CAND_VALUE_AVG);
+		}
 
 		if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate){
@@ -3693,13 +3627,24 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 
 }
 
+/**************************************************************************
+	Compute value of candidate
+
+	For a given candidate, compute the number of numeric preferences and the sum over numeric preference.
+	Store this data in the candidate preference. If no numeric preferences, use default values.
+
+*************************************************************************/
 
 void compute_value_of_candidate(preference *cand, slot *s, float default_value)
 {
+	if (!cand) return;
+
 	preference *pref;
 	
-	cand->value->common.decider_flag = CANDIDATE_DECIDER_FLAG;
-    cand->total_preferences_for_candidate = 0;
+	cand->value->common.decider_flag = CANDIDATE_DECIDER_FLAG;  //    It's okay to muck with the decider flags here because this will be called after the decision
+																//    has been determined to be a choice among indifferent candidates.
+    
+	cand->total_preferences_for_candidate = 0;
 	cand->numeric_value = 0;
 	
 	  /*
@@ -3709,21 +3654,11 @@ void compute_value_of_candidate(preference *cand, slot *s, float default_value)
      */
 	
 	for (pref = s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
-        float numeric_value;
-        if (pref->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
-            numeric_value = pref->referent->fc.value;
-        } else if (pref->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
-            numeric_value = (float) pref->referent->ic.value;
-        } else {
-			/* This should never happen. */
-            continue;
-		}
-    
-		if (cand->value == pref->value) {
-                cand->total_preferences_for_candidate += 1;
-                cand->numeric_value += numeric_value;
-            }
+		if (cand->value == pref->value){
+			cand->total_preferences_for_candidate += 1;
+			cand->numeric_value += get_number_from_symbol(pref->referent);
         }
+	}
 	
 	if (cand->total_preferences_for_candidate == 0) {
 			cand->numeric_value = default_value;
@@ -3752,6 +3687,14 @@ unsigned int count_candidates(preference * candidates)
     return numCandidates;
 }
 
+/*************************************************************************
+			Choose according to exploration mode
+
+At this point, Q-values have been computed for all candidate operators.
+This function uses these Q-value and the current exploration mode to select
+an operator.
+This function is only called in numeric_indifferent_mode Sum.
+*************************************************************************/
 
 preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates){
 
@@ -3785,10 +3728,7 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 						/* print("\n   Total (Sum) Probability = %f", total_probability ); */
 			}
 
-			/* RPM 12/05 replacing calls to rand() with calls to SoarRand; see bug 595 */
-			//rn = rand();
 			rn = SoarRand(); // generates a number in [0,1]
-			//selectedProbability = ((double) rn / (double) RAND_MAX) * total_probability;
 			selectedProbability = rn * total_probability;
 			currentSumOfValues = 0;
 
@@ -3818,7 +3758,7 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 				// select at random 
 				
 				int   chosen_num;
-				chosen_num = floor(SoarRand()*numCandidates); // bug - what if SoarRand returns 1 exactly?
+				chosen_num = SoarRandInt(numCandidates-1);
 				cand = candidates;
 				while (chosen_num) { cand=cand->next_candidate; chosen_num--; }
 				return cand;
@@ -3843,7 +3783,7 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 					// If operators tied for highest Q-value, select among tied set at random
 
 					int chosen_num;
-					chosen_num = floor(SoarRand()*num_max_cand);
+					chosen_num = SoarRandInt(num_max_cand-1);
 					cand = candidates;
 					while (cand->numeric_value != top_value) cand = cand->next_candidate;
 					while (chosen_num) {

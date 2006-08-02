@@ -906,6 +906,7 @@ void assert_new_preferences (agent* thisAgent)
            GenerateVerboseXML(thisAgent, "in assert_new_preferences:");
        }
    /* REW: end   09.15.96 */
+
    
 #ifdef O_REJECTS_FIRST
     {
@@ -947,7 +948,9 @@ void assert_new_preferences (agent* thisAgent)
    {
       next_inst = inst->next;
       if (inst->in_ms)
-         insert_at_head_of_dll (inst->prod->instantiations, inst, next, prev);
+		 
+		  insert_at_head_of_dll (inst->prod->instantiations, inst, next, prev);
+
       
       /* REW: begin 09.15.96 */
       if (thisAgent->operand2_mode == TRUE) 

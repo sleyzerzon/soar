@@ -259,7 +259,7 @@ typedef struct agent_struct {
   Symbol            * ts_context_variable;
   Symbol            * type_symbol;
   Symbol            * wait_symbol;   /* REW:  10.24.97 */
-  Symbol            * reward_symbol; /* snason, reinforcement learning */
+  Symbol            * reward_symbol; /* NUMERIC_INDIFFERENCE */
   
   /* ----------------------- Symbol table stuff -------------------------- */
 
@@ -732,19 +732,15 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   /* JC ADDED: Need to store RHS functions here so that agent's don't step on each other */
   rhs_function* rhs_functions;
 
-/* Stuff for numeric indifference and reinforcement learning */
+/* NUMERIC_INDIFFERENCE - Stuff for numeric indifference and reinforcement learning */
   enum ni_mode numeric_indifferent_mode;      /* SW 08.19.2003 */
   enum exp_mode exploration_mode;
-  float Temperature;            /* Parameter for Boltzmann exploration */
-  double epsilon;               /* Parameter for epsilon-greedy exploration */
-  float gamma;                  /* Discount rate */
-  float alpha;                  /* Learning rate */
-  /* Eligibility trace */
-  float lambda;
-  int num_traces;
-  /* End Eligibility trace */
-  Symbol * reward_header; /* top state reward id */
-  unsigned long RL_count;
+  float Temperature;            // Parameter for Boltzmann exploration
+  double epsilon;               // Parameter for epsilon-greedy exploration
+  float gamma;                  // Discount rate
+  float alpha;                  // Learning rate
+  float lambda;					// Eligibility traces
+  unsigned long RL_count;   // Used for naming RL rules - RL-1, RL-2, etc.
 
 } agent;
 /*************** end of agent struct *****/

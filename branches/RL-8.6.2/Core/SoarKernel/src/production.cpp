@@ -1552,9 +1552,7 @@ production *make_production (agent* thisAgent,
   p->filename = NIL;	  
   p->firing_count = 0;
   p->reference_count = 1;
-  insert_at_head_of_dll (thisAgent->all_productions_of_type[type], p, next, prev);
-  thisAgent->num_productions_of_type[type]++;
-  p->type = type;
+  
   p->declared_support = UNDECLARED_SUPPORT;
   p->trace_firings = FALSE;
   p->p_node = NIL;               /* it's not in the Rete yet */
@@ -1564,21 +1562,26 @@ production *make_production (agent* thisAgent,
   p->interrupt = FALSE;
 
 #ifdef NUMERIC_INDIFFERENCE
-  p->copies_awaiting_updates = 0;
-  if (type == TEMPLATE_PRODUCTION_TYPE){
-    if (!check_template_for_RL(p)){
-      print (thisAgent, "Template rule must have single, potentially numeric, preference.\n");
-      return 0;
-    }
-    p->RL = FALSE;
-  }
-  else if (type == JUSTIFICATION_PRODUCTION_TYPE) {
-    p->RL = FALSE;
-  }
-  else {
-    check_prefs_for_RL(p);
+  // Is this production an RL rule? Is it a template rule?
+  if (type == JUSTIFICATION_PRODUCTION_TYPE) {
+	  p->RL = FALSE;
+  } else {
+	  p->RL = check_prefs_for_RL(p);
+	  if (type == TEMPLATE_PRODUCTION_TYPE){
+		  if (!p->RL){
+			  print_with_symbols (thisAgent, "Template rule must have single numeric preference. Removing template flag from %y.\n", p->name);
+			  type = USER_PRODUCTION_TYPE;
+		  } else if (get_number_from_symbol(rhs_value_to_symbol(p->action_list->referent)) != 0){
+			  print_with_symbols (thisAgent, "Template rule must have zero-valued preference. Removing template flag from %y.\n", p->name);
+			  type = USER_PRODUCTION_TYPE;
+		  } else p->RL = FALSE;		// Template rules should not be updated.
+	  }
   }
 #endif
+
+  insert_at_head_of_dll (thisAgent->all_productions_of_type[type], p, next, prev);
+  thisAgent->num_productions_of_type[type]++;
+  p->type = type;
 
   return p;
 }
@@ -1604,7 +1607,7 @@ void excise_production (agent* thisAgent, production *prod, Bool print_sharp_sig
   if (prod->trace_firings) remove_pwatch (thisAgent, prod);
   remove_from_dll (thisAgent->all_productions_of_type[prod->type], prod, next, prev);
 #ifdef NUMERIC_INDIFFERENCE
-  if (prod->copies_awaiting_updates) remove_update_refs_for_prod(thisAgent, prod); // SAN - could stop after finding copies_awaiting_updates number of copies
+   remove_RL_refs_for_prod(thisAgent, prod); // Remove RL-related pointers to this production.
 #endif
   thisAgent->num_productions_of_type[prod->type]--;
   if (print_sharp_sign) print (thisAgent, "#");

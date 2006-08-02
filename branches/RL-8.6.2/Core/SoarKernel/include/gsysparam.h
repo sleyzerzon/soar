@@ -44,7 +44,7 @@ typedef struct agent_struct agent;
 #define DEFAULT_PRODUCTION_TYPE 1
 #define CHUNK_PRODUCTION_TYPE 2
 #define JUSTIFICATION_PRODUCTION_TYPE 3
-#define TEMPLATE_PRODUCTION_TYPE 4           // change for RL
+#define TEMPLATE_PRODUCTION_TYPE 4           // NUMERIC_INDIFFERENCE
 
 #define NUM_PRODUCTION_TYPES 5
 
@@ -94,7 +94,7 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define TRACE_FIRINGS_OF_DEFAULT_PRODS_SYSPARAM   4
 #define TRACE_FIRINGS_OF_CHUNKS_SYSPARAM          5
 #define TRACE_FIRINGS_OF_JUSTIFICATIONS_SYSPARAM  6
-#define TRACE_FIRINGS_OF_TEMPLATE_SYSPARAM        7
+#define TRACE_FIRINGS_OF_TEMPLATE_SYSPARAM        7		// NUMERIC_INDIFFERENCE
 
 #define TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM     8
 #define TRACE_FIRINGS_PREFERENCES_SYSPARAM        9
@@ -150,7 +150,6 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 /* KJC 3/01 limit number of cycles in run_til_output */
 #define MAX_NIL_OUTPUT_CYCLES_SYSPARAM           32
 
-/* SAN (??) */
 //NUMERIC_INDIFFERENCE
 #define TRACE_INDIFFERENT_SYSPARAM               33
 
@@ -159,7 +158,7 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 
 #define MAX_GOAL_DEPTH			       	 35
 
- /* SAN: for Reinforcement Learning */
+ /* NUMERIC_INDIFFERENCE */
 #define RL_ON_SYSPARAM                           36
 #define RL_ONPOLICY_SYSPARAM			 37
 

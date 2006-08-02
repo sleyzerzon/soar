@@ -22,7 +22,8 @@ action *make_simple_action(agent *thisAgent, Symbol *id_sym, Symbol *attr_sym, S
 extern void variablize_condition_list (agent* thisAgent, condition *cond);
 extern void variablize_nots_and_insert_into_conditions (agent* thisAgent, not_struct *nots, condition *conds);
 extern void variablize_symbol (agent* thisAgent, Symbol **sym);
-action *copy_and_variablize_pref_list (agent* thisAgent, preference *pref);
+extern void add_impasse_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value, preference *p);
+
 
 /**************************************************
 	Tabulate reward value for goal
@@ -34,15 +35,16 @@ been installed at the goal, so if there is an op no-change, data->step > 1
 and the new reward is discounted and added to reward accumulated on 
 previous decision cycles.
 
-This function is called for a goal right before it is destroyed and is called
-for the top state right before a 'halt'. It is also called once for each goal 
-in the goal stack at the beginning of the decision phase.
+This function is called for a goal right before it is destroyed. It is also called once for each goal 
+in the goal stack 
+- at the beginning of the decision phase
+- right after a 'halt' command.
 
 **************************************************/
 void tabulate_reward_value_for_goal(agent *thisAgent, Symbol *goal){
 	RL_data *data = goal->id.RL_data;
-	if (data->impasse_type == NONE_IMPASSE_TYPE) {} /* Only count rewards at top state or for op no-change impasses. */
-	else if (data->impasse_type == OP_NO_CHANGE_IMPASSE_TYPE) {}
+	if (data->impasse_type == NONE_IMPASSE_TYPE) {} // Only count rewards at top state... 
+	else if (data->impasse_type == OP_NO_CHANGE_IMPASSE_TYPE) {} // or for op no-change impasses. 
 	else return;
 	slot *s = goal->id.reward_header->id.slots;
 	float reward = 0.0;
@@ -52,21 +54,7 @@ void tabulate_reward_value_for_goal(agent *thisAgent, Symbol *goal){
 				 if (w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){
 					for (slot *t = w->value->id.slots ; t ; t = t->next){
 						for (wme *x = t->wmes ; x ; x = x->next){
-							if (x->value->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
-								reward = reward + x->value->fc.value;
-								if (x->preference->o_supported){
-									wme *new_wme = make_wme(thisAgent, x->id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "read"), FALSE);
-									insert_at_head_of_dll (x->id->id.input_wmes, new_wme, next, prev);
-									add_wme_to_wm (thisAgent, new_wme);
-								}
-							} else if (x->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
-								reward = reward + x->value->ic.value;
-								if (x->preference->o_supported){
-									wme *new_wme = make_wme(thisAgent, x->id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent,"read"), FALSE);
-									insert_at_head_of_dll (x->id->id.input_wmes, new_wme, next, prev);
-									add_wme_to_wm (thisAgent, new_wme);
-								}
-							}
+							reward = reward + get_number_from_symbol(x->value);
 						}
 					}
 				}
@@ -95,12 +83,13 @@ void tabulate_reward_values(agent *thisAgent){
 /**************************************************
 		Compute temp diff
 
-Computes a TD update. Takes as input the current reward (r_t+1),
-max Q at the current time step (Q_t+1) , and the estimate of the
-Q-value of the last operator selected (Q_t). 
+Computes a TD update. Takes as input the current reward (r_t)
+and estimate of the Q-value of the last operator selected (Q_t-1), 
+[both stored in RL_data]
+and the Q-value at the current time step (Q_t). [stored in op_value]
 Discounting uses the gamma parameter and a count of the
 time steps since the last operator was selected.
-Returns r_t+1 + gamma*Q_t+1 - Q_t.
+Returns r_t + gamma*Q_t - Q_t-1.
 **************************************************/
 
 float compute_temp_diff(agent *thisAgent, RL_data* r, float op_value){
@@ -131,34 +120,43 @@ the next operator.
 
 void perform_Bellman_update(agent *thisAgent, float op_value, Symbol *goal){
 	
-	cons *c;
 	RL_data *data = goal->id.RL_data;
-	eligibility_trace_element *trace = data->current_eligibility_element;
- //	bool current_pref_changed = FALSE;
-
-/* Eligibility trace */
-	if (trace){
-    float sum = 0;
-	/*for (c = trace->prods_to_update ; c ; c = c->rest) {            // Iterate over most recently fired RL rules 
-		production *prod = (production *) c->first;
-		if (!prod) continue;
-		Symbol *s = rhs_value_to_symbol(prod->action_list->referent);
-				if (s->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
-					sum += s->fc.value;
-				} else if (s->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
-					sum += s->ic.value;
-				} else {
-					// this should never happen
-					continue;
-				}
-			}
-	data->previous_Q = sum;*/
+	SoarSTLETMap::iterator iter;
 
 	float update = compute_temp_diff(thisAgent, data, op_value);
-
 	
+	/* For each prod in map, add alpha*delta*trace to value */
 
-	for (int i = 0 ; i<data->number_in_list ; i++){
+	/* Eligibility trace */
+	/* Iterate through eligibility_traces, decay traces. If less than TOLERANCE, remove from map. */
+	
+	for (iter = data->eligibility_traces->begin() ; iter != data->eligibility_traces->end() ; iter++){
+		
+		production *prod = iter->first;
+		float temp = get_number_from_symbol(rhs_value_to_symbol(prod->action_list->referent));
+		temp += update*thisAgent->alpha*iter->second;
+
+		/* Change value of rule. */
+		symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
+		prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
+
+		/* Change value of preferences generated by current instantiations of this rule. */
+		if (prod->instantiations){
+			for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
+				for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
+					symbol_remove_ref(thisAgent, pref->referent);
+					pref->referent = make_float_constant(thisAgent, temp);
+					}
+			}
+		}	
+	}
+	data->reward = 0.0;
+	data->step = 0;
+	data->impasse_type = NONE_IMPASSE_TYPE;
+}
+
+
+//	for (int i = 0 ; i<data->number_in_list ; i++){
 
 		// int num_prods = 0;
 		// for (c = trace->prods_to_update; c ; c = c->rest){
@@ -166,164 +164,55 @@ void perform_Bellman_update(agent *thisAgent, float op_value, Symbol *goal){
 		//		num_prods++;
 		//}
 		
-		if (trace->num_prods > 0){
-			float increment = thisAgent->alpha*(update / trace->num_prods)*pow(thisAgent->lambda, i)*pow(thisAgent->gamma, i);
-			c = trace->prods_to_update;
-			while(c){
-			
-					production *prod = (production *) c->first;
-					c = c->rest;
-		
-					if (!prod) continue;
-	
-					float temp;
-					if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
-						temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
-					} else if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
-						temp = rhs_value_to_symbol(prod->action_list->referent)->ic.value;
-					} else {
-					// We should never get here. Need to return an error here.
-					}
-				
-					temp += increment;
-	
-					/* Change value of rule. */
-					symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
-					prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
-				
-					/* Change value of preferences generated by current instantiations of this rule. */
-					if (prod->instantiations){
-						// current_pref_changed = TRUE;
-						for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
-							for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
-								symbol_remove_ref(thisAgent, pref->referent);
-								pref->referent = make_float_constant(thisAgent, temp);
-							}
-						}
-					}	 
-			}
-		}
-
-		trace = trace->previous;
-	}
-}
-	
-	data->reward = 0.0;
-	data->step = 0;
-	data->impasse_type = NONE_IMPASSE_TYPE;
-
-
-/* End Eligibility trace */
-
-
-	
-
-
-
-//	int num_prods = 0;
-//	for (c = data->productions_to_be_updated; c ; c = c->rest){
-//		if (c->first)
-//			num_prods++;
-//	}
-// 	
-//	
-//	if (num_prods > 0){  // if there are productions to update
-//		/* Compute Q-value of previous operator based on the current values of rules that fired for it. */
-//		// if (data->impasse_type != NONE_IMPASSE_TYPE){
-//			float sum = 0;
-//			for (c = data->productions_to_be_updated ; c ; c = c->rest){
-//				Symbol *s = rhs_value_to_symbol(((production *) c->first)->action_list->referent);
-//				if (s->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
-//					sum += s->fc.value;
-//				} else if (s->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
-//					sum += s->ic.value;
-//				} else {
-//					// this should never happen
-//					continue;
-//				}
-//			}
-//			data->previous_Q = sum;
-//		// }
-//
-//		float update = compute_temp_diff(thisAgent, data, op_value);
-//		float increment = thisAgent->alpha*(update / num_prods);
-//		c = data->productions_to_be_updated;
+//		if (trace->num_prods > 0){
+//			float increment = thisAgent->alpha*(update / trace->num_prods)*pow(thisAgent->lambda, i)*pow(thisAgent->gamma, i);
+//			c = trace->prods_to_update;
 //			while(c){
-//		 
-//				production *prod = (production *) c->first;
-//				c = c->rest;
-//	 
-//				if (!prod) continue;
-//
-//				prod->copies_awaiting_updates--;
-//	  		 		
-//				float temp;
-//				if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
-//					temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
-//				} else if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
-//					temp = rhs_value_to_symbol(prod->action_list->referent)->ic.value;
-//				} else {
-//				 // We should never get here. Need to return an error here.
-//				}
-//			 
-//				temp += increment;
-//
-//				/* Change value of rule. */
-//				symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
-//				prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
-//			 
-//				/* Change value of preferences generated by current instantiations of this rule. */
-//				if (prod->instantiations){
-//					// current_pref_changed = TRUE;
-//					for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
-//						for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
-//							symbol_remove_ref(thisAgent, pref->referent);
-//							pref->referent = make_float_constant(thisAgent, temp);
-//						}
+//			
+//					production *prod = (production *) c->first;
+//					c = c->rest;
+//		
+//					if (!prod) continue;
+//	
+//					float temp;
+//					if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
+//						temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
+//					} else if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
+//						temp = rhs_value_to_symbol(prod->action_list->referent)->ic.value;
+//					} else {
+//					// We should never get here. Need to return an error here.
 //					}
-//				}	 
+//				
+//					temp += increment;
+//	
+//					/* Change value of rule. */
+//					symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
+//					prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
+//				
+//					/* Change value of preferences generated by current instantiations of this rule. */
+//					if (prod->instantiations){
+//						// current_pref_changed = TRUE;
+//						for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
+//							for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
+//								symbol_remove_ref(thisAgent, pref->referent);
+//								pref->referent = make_float_constant(thisAgent, temp);
+//							}
+//						}
+//					}	 
+//			}
 //		}
-//	}
 //
+//		trace = trace->previous;
+//	}
+//}
+//	
 //	data->reward = 0.0;
 //	data->step = 0;
-//	// data->previous_Q = 0;
 //	data->impasse_type = NONE_IMPASSE_TYPE;
-//	free_list(thisAgent, data->productions_to_be_updated);
-//	data->productions_to_be_updated = NIL;
-//	
-//	// return current_pref_changed;
-//	return TRUE;
-}
+//
+//
+/* End Eligibility trace */
 
-/*************************************************************
-       RL update symbolically chosen
-
-When an operator is chosen probabilistically, we perform a TD
-update with max Q (since we do Q-learning). But when the operator
-is chosen with symbolic preferences, we always update with the
-value of the selected operator. That value is computed here and
-used in a call to perform_Bellman_update.
-*************************************************************/
-
-void RL_update_symbolically_chosen(agent *thisAgent, slot *s, preference *candidates){
-	if (!candidates) return;
-	float temp_Q = 0;   // DEFAULT_INDIFFERENT_VALUE;
-	
-	for (preference *temp=s->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; temp!=NIL; temp=temp->next){
-		if (candidates->value == temp->value){
-			if (temp->referent->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
-				temp_Q += temp->referent->fc.value;
-			} else if (temp->referent->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
-				temp_Q += temp->referent->ic.value;
-			} else {
-				/* This shhould never happen. */
-			}
-		}
-	}
-	candidates->numeric_value = temp_Q; // store estimate of Q-value to be used to update this operator on the next decision cycle
-	perform_Bellman_update(thisAgent, temp_Q, s->id);
-}
 
 /***************************************************************
 		Store RL data
@@ -343,108 +232,56 @@ void store_RL_data(agent *thisAgent, Symbol *goal, preference *cand)
 	RL_data *data = goal->id.RL_data;
 	Symbol *op = cand->value;
     data->previous_Q = cand->numeric_value;
+	SoarSTLETMap::iterator iter;
+	list *prods_to_update = NIL;
 
-/* Eligibility trace */
-	if (data->number_in_list == 0){ // Eligibility trace list is empty
-		data->number_in_list++;
-		eligibility_trace_element *ete = static_cast<eligibility_trace_element_struct *>(allocate_memory(thisAgent, sizeof(eligibility_trace_element_struct),
-												   MISCELLANEOUS_MEM_USAGE));
-		ete->prods_to_update = NIL;
-		ete->num_prods = 0;
-		// data->productions_to_be_updated = dc;
-		// if (data->number_in_list == thisAgent->num_traces){
-		ete->next = ete;
-		ete->previous = ete;
-		// } else dc->next = NIL;
-		data->current_eligibility_element = ete;
-	} else if (data->number_in_list < thisAgent->num_traces) {	// Add a new element to the end of productions_to_be_updated
-		data->number_in_list++;
-		eligibility_trace_element *ete = static_cast<eligibility_trace_element_struct *>(allocate_memory(thisAgent, sizeof(eligibility_trace_element_struct),
-												   MISCELLANEOUS_MEM_USAGE));;
-		ete->prods_to_update = NIL;
-		ete->num_prods = 0;
-    	ete->next = data->current_eligibility_element->next;
-		data->current_eligibility_element->next = ete;
-		ete->previous = data->current_eligibility_element;
-		ete->next->previous = ete;
-		data->current_eligibility_element = ete;
-	} else {
-		data->current_eligibility_element = data->current_eligibility_element->next;
-		while (data->number_in_list > thisAgent->num_traces) {
-			eligibility_trace_element *temp = data->current_eligibility_element;
-			for (cons *c = temp->prods_to_update ; c ; c=c->rest){
-				if (c->first)
-				((production *) c->first)->copies_awaiting_updates--;
-			}
-			free_list(thisAgent, temp->prods_to_update);
-			temp->previous->next = temp->next;
-			temp->next->previous = temp->previous;
-			data->current_eligibility_element = temp->next;
-			free_memory(thisAgent, temp, MISCELLANEOUS_MEM_USAGE);
-			data->number_in_list--;
-		}
-		for (cons *c = data->current_eligibility_element->prods_to_update ; c ; c=c->rest){
-			if (c->first)
-				((production *) c->first)->copies_awaiting_updates--;
-		}
-		free_list(thisAgent, data->current_eligibility_element->prods_to_update);
-		data->current_eligibility_element->num_prods = 0;
-		data->current_eligibility_element->prods_to_update = NIL;
+	/* Eligibility trace */
+	/* Iterate through eligibility_traces, decay traces. If less than TOLERANCE, remove from map. */
+	
+	for (iter = data->eligibility_traces->begin() ; iter != data->eligibility_traces->end() ; ){
+		iter->second *= thisAgent->alpha*thisAgent->lambda;
+		if (iter->second < LAMBDA_TOLERANCE) data->eligibility_traces->erase(iter++);
+		else ++iter;
 	}
 
+	/* Count numeric_indifferent_preferences, trace_increment = 1/this number */
+	
+	int num_prods = 0;
+ 
+	
+		/* Make list of just-fired prods */
+	
 	for (preference *pref = goal->id.operator_slot->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref ; pref = pref->next){
-			  if (op == pref->value){
-				  instantiation *ist = pref->inst;
-				  production *prod = ist->prod;
-				  if (prod->RL) {
-					  push(thisAgent, prod, data->current_eligibility_element->prods_to_update);
-					  data->current_eligibility_element->num_prods++;
-					  prod->copies_awaiting_updates++;
-				  } else if (prod->type == TEMPLATE_PRODUCTION_TYPE){
-					  production *new_prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
-					  if (new_prod){
-						push(thisAgent, new_prod, data->current_eligibility_element->prods_to_update);
-						data->current_eligibility_element->num_prods++;
-						new_prod->copies_awaiting_updates++;
-					  }
+		  if (op == pref->value){
+			  instantiation *ist = pref->inst;
+			  production *prod = ist->prod;
+			  if (prod->RL) {
+				  push(thisAgent, prod, prods_to_update);
+				  num_prods++;
+			  } else if (prod->type == TEMPLATE_PRODUCTION_TYPE){
+				  production *new_prod = build_production(thisAgent, pref);
+				  if (new_prod){
+					  push(thisAgent, new_prod, prods_to_update);
+					  num_prods++;
 				  }
-			}
+			  }
+		  }
 	}
-		  
-/*	for (preference *pref = goal->id.operator_slot->preferences[TEMPLATE_PREFERENCE_TYPE]; pref ; pref = pref->next){
-		if (op == pref->value){
-          production *prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
-			if (prod){
-				push(thisAgent, prod, data->current_eligibility_element->prods_to_update);
-				data->current_eligibility_element->num_prods++;
-				prod->copies_awaiting_updates++;
+
+			/* Update trace for just fired prods */
+
+			if (num_prods){
+				double trace_increment = 1.0 / num_prods;
+				for (cons *c = prods_to_update ; c ; c = c->rest){
+					iter = data->eligibility_traces->find((production *) c->first);
+					if (iter!=data->eligibility_traces->end()) iter->second += trace_increment;
+					else (*data->eligibility_traces)[(production *) c->first] = trace_increment;
+				}
 			}
-		}
-	}*/
 
-
-
-//	for (preference *pref = goal->id.operator_slot->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref ; pref = pref->next){
-//			  if (op == pref->value){
-//				  instantiation *ist = pref->inst;
-//				  production *prod = ist->prod;
-//				  if (prod->RL) {
-//					  push(thisAgent, prod, data->productions_to_be_updated);
-//					  prod->copies_awaiting_updates++;
-//				  } 
-//			  }
-//	}
-
-//	for (preference *pref = goal->id.operator_slot->preferences[TEMPLATE_PREFERENCE_TYPE]; pref ; pref = pref->next){
-//		if (op == pref->value){
-//          production *prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
-//			if (prod){
-//				prod->copies_awaiting_updates++;
-//				push(thisAgent, prod, data->productions_to_be_updated);
-//			}
-//		}
-//	}
+			free_list(thisAgent, prods_to_update);
 }
+	
 
 /*****************************************************************
 	Reset RL
@@ -456,23 +293,9 @@ void reset_RL(agent *thisAgent){
 	Symbol *goal = thisAgent->top_goal;
 	while(goal){
 		  RL_data *data = goal->id.RL_data;
-		//  free_list(thisAgent, data->productions_to_be_updated);
-		  // data->productions_to_be_updated = NIL;
-		  /* Eligibility trace */
-			eligibility_trace_element *traces = data->current_eligibility_element;
-		  	for (int i = 0 ; i<data->number_in_list ; i++){
-				for (cons *c = traces->prods_to_update ; c ; c=c->rest){
-					if (c->first)
-						((production *) c->first)->copies_awaiting_updates--;
-				}
-				free_list(thisAgent, traces->prods_to_update);
-				eligibility_trace_element *temp = traces;
-				traces = traces->next;
-				free_memory(thisAgent, temp, MISCELLANEOUS_MEM_USAGE);
-			}
-		  data->current_eligibility_element = NIL;
-		  data->number_in_list = 0;
-		  /* End Eligibility trace */
+		
+		  data->eligibility_traces->clear(); 
+ 
 		  data->reward = 0;
 		  data->step = 0;
 		  data->previous_Q = 0;
@@ -481,19 +304,32 @@ void reset_RL(agent *thisAgent){
 	}
 }
 
-production *build_production(agent *thisAgent, condition *top_cond, not_struct *nots, preference *pref)
+/*********************************************
+	Build production
+
+Used to build RL rules from template rules. 
+Takes a numeric preference generated by a 
+template rule, builds an RL rule with constants
+taken from the instantiation that generated the
+preference.
+If RL rule built already exists in rete, returns NIL.
+
+************************************************/
+
+production *build_production(agent *thisAgent, preference *pref)
 {
 
 	action *a;
 	Symbol *prod_name;
 	production *prod;
 	Bool chunk_var;
+	instantiation *inst = pref->inst;
 
 
 	if ((pref->referent->common.symbol_type != INT_CONSTANT_SYMBOL_TYPE) && (pref->referent->common.symbol_type != FLOAT_CONSTANT_SYMBOL_TYPE)) return NIL;
 
 	condition *cond_top, *cond_bottom;
-	copy_condition_list(thisAgent, top_cond, &cond_top, &cond_bottom);
+	copy_condition_list(thisAgent, inst->top_of_instantiated_conditions, &cond_top, &cond_bottom);
 	
 	add_goal_or_impasse_tests_to_conds(thisAgent, cond_top);
 
@@ -503,9 +339,7 @@ production *build_production(agent *thisAgent, condition *top_cond, not_struct *
 	reset_variable_generator(thisAgent, cond_top, NIL);
 	thisAgent->variablization_tc = get_new_tc_number(thisAgent);
 	variablize_condition_list(thisAgent, cond_top);
-	variablize_nots_and_insert_into_conditions(thisAgent, nots, cond_top);
-	// a = copy_and_variablize_pref_list (thisAgent, pref);
-
+	variablize_nots_and_insert_into_conditions(thisAgent, inst->nots, cond_top);
 	
 
 	// Make action list
@@ -526,6 +360,7 @@ production *build_production(agent *thisAgent, condition *top_cond, not_struct *
 	return prod;
 }
 
+/* Utility function for build_production */
 void add_goal_or_impasse_tests_to_conds(agent *thisAgent, condition * all_conds)
 {
     condition *cond;
@@ -550,7 +385,7 @@ void add_goal_or_impasse_tests_to_conds(agent *thisAgent, condition * all_conds)
     }
 }
 
-
+/* Utility function for build_production. */
 action *make_simple_action(agent *thisAgent, Symbol *id_sym, Symbol *attr_sym, Symbol *val_sym, Symbol *ref_sym)
 {
     action *rhs;
@@ -589,7 +424,16 @@ action *make_simple_action(agent *thisAgent, Symbol *id_sym, Symbol *attr_sym, S
 
 }//make_simple_action
 
-void check_prefs_for_RL(production *prod){
+
+/***********************************************************
+	Check prefs for RL
+
+Checks production RHS to see if rule could be an RL rule.
+Returns true if production has a single numeric indifferent preference.
+
+*************************************************************/
+
+bool check_prefs_for_RL(production *prod){
 	bool numeric_prefs = FALSE;
 	int num_actions = 0;
 
@@ -599,12 +443,13 @@ void check_prefs_for_RL(production *prod){
 		if (a->preference_type == NUMERIC_INDIFFERENT_PREFERENCE_TYPE) numeric_prefs = TRUE;
 	}
 
-	if (!numeric_prefs) prod->RL = FALSE;
-	else if (num_actions > 1) prod->RL = FALSE;
-	else prod->RL = TRUE;
+    if (!numeric_prefs) return FALSE;	
+	else if (num_actions > 1) return FALSE;
+	else return TRUE;
 
 }
 
+/* Currently unused function */
 Bool check_template_for_RL(production *prod){
 	int num_actions = 0;
 
@@ -615,56 +460,58 @@ Bool check_template_for_RL(production *prod){
 
 	return TRUE;
 }
+ 
+/********************************************************
+		remove RL refs for prod
 
-action *copy_and_variablize_pref_list (agent* thisAgent, preference *pref) {
-  action *a;
-  Symbol *temp;
-  
-  if (!pref) return NIL;
-  allocate_with_pool (thisAgent, &thisAgent->action_pool, &a);
-  a->type = MAKE_ACTION;
+Pointers to RL rules that are scheduled to be updated are
+kept in the eligibility traces map. When a rule is excised,
+these pointers must be removed.
+********************************************************/
 
-  temp = pref->id;
-  symbol_add_ref (temp);
-  variablize_symbol (thisAgent, &temp);
-  a->id = symbol_to_rhs_value (temp);
-
-  temp = pref->attr;
-  symbol_add_ref (temp);
-  variablize_symbol (thisAgent, &temp);
-  a->attr = symbol_to_rhs_value (temp);
-
-  temp = pref->value;
-  symbol_add_ref (temp);
-  variablize_symbol (thisAgent, &temp);
-  a->value = symbol_to_rhs_value (temp);
-
-  a->preference_type = pref->type;
-
-  if (preference_is_binary(pref->type)) {
-    temp = pref->referent;
-    symbol_add_ref (temp);
-    variablize_symbol (thisAgent, &temp);
-    a->referent = symbol_to_rhs_value (temp);
-  }
-  
-  a->next = copy_and_variablize_pref_list (thisAgent, pref->inst_next);
-  return a;  
+void remove_RL_refs_for_prod(agent *thisAgent, production *prod){
+	for (Symbol* state = thisAgent->top_state ; state ; state = state->id.lower_goal)
+		state->id.RL_data->eligibility_traces->erase(prod);
 }
 
-void remove_update_refs_for_prod(agent *thisAgent, production *prod){
-    int refs_remaining = prod->copies_awaiting_updates;
-	for (Symbol* state = thisAgent->top_state ; state ; state = state->id.lower_goal){
-		eligibility_trace_element *traces = state->id.RL_data->current_eligibility_element;
-		for (int i = 0 ; i<state->id.RL_data->number_in_list ; i++){
-			 for (cons* c = traces->prods_to_update ; c ; c = c->rest){
-				 if ((production *) c->first == prod){
-					 c->first = NIL;
-					 traces->num_prods--;
-					 refs_remaining--;
-					 if (!refs_remaining) return;
-				 }
-			 }
-			 traces = traces->next;
+
+ 
+
+/*
+void modify_corresponding_template_pref(instantiation *RL_inst){
+	production *template_prod = RL_inst->prod->template_parent;
+	if (!template_prod) return;
+	
+	for (instantiation *template_inst = template_prod->instantiations ; template_inst ; template_inst = template_inst->next){
+		// Does this inst of the template correspond to the RL rule?
+		bool insts_same = true;
+		condition *RL_cond = RL_inst->top_of_instantiated_conditions;
+		condition *template_cond = template_inst->top_of_instantiated_conditions;
+
+		while (RL_cond){
+			if (conditions_are_equal(RL_cond, template_cond)){
+				RL_cond = RL_cond->next;
+				template_cond = template_cond->next;
+			} else {
+				insts_same = false;
+				break;
+			}
 		}
-	}}
+
+		if (insts_same){
+			template_inst->preferences_generated->type = TEMPLATE_PREFERENCE_TYPE;
+			break;
+		}
+	}
+}*/
+
+
+float get_number_from_symbol(Symbol *sym){
+	if (sym->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
+			return sym->fc.value;
+		} else if (sym->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
+			return sym->ic.value;
+		}  
+	// Generally shouldn't get here
+	return 0;
+}

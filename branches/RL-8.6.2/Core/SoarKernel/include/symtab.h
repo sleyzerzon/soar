@@ -96,7 +96,7 @@
        RL_data: (RL) for goals, stores info between cycles
          needed to perform Bellman update at this goal level
        reward_header: (RL) for goals, pointer to reward-link identifier,
- 	 used to find rewards placed in WM
+ 			used to find rewards placed in WM
 
        gds: pointer to a goal's dependency set
        saved_firing_type: the firing type that must be restored if
@@ -230,9 +230,9 @@ typedef struct identifier_struct {
   struct slot_struct *operator_slot;
   struct preference_struct *preferences_from_goal;
 
-  /* --- fields used for reinforcement learning - only on goals --- */
-  struct RL_data_struct *RL_data;
-  union symbol_union *reward_header;
+  /* --- NUMERIC_INDIFFERENCE - fields used for reinforcement learning - only on goals --- */
+  struct RL_data_struct *RL_data;			// data required for Bellman updates at this state
+  union symbol_union *reward_header;		// pointer to reward_link
 
   /* REW: begin 09.15.96 */
   struct gds_struct *gds;    /* Pointer to a goal's dependency set */

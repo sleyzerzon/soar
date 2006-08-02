@@ -7161,7 +7161,7 @@ void reteload_node_and_children (Kernel* thisKernel, agent* thisAgent, rete_node
     prod->p_node = NIL;
     
 #ifdef NUMERIC_INDIFFERENCE
-    prod->copies_awaiting_updates = 0;
+//    prod->copies_awaiting_updates = 0;
 #endif
 
     sym = reteload_symbol_from_index (thisAgent,f);

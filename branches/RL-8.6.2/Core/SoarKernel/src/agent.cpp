@@ -307,17 +307,10 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
                                     * within a reasonable range, since they will be used as
 				    * an exponent to the number 10, and must be stored 
                                     * in a 64 bit double */
-  newAgent->epsilon = 0.1;     /* proportion of the time an exploratory action is taken */
-  newAgent->gamma = 0.9;       /* discount factor */
-  newAgent->alpha = 0.3;       /* learning rate */
-  /* Eligibility trace */
-  newAgent->lambda = 0;
-  if (newAgent->lambda == 0){
-	  newAgent->num_traces = 1;
-  } else {
-	  newAgent->num_traces = ceil( log(0.01) / log(newAgent->lambda) );
-  }
-  /* End Eligibility trace */
+  newAgent->epsilon = 0.1;     // proportion of the time an exploratory action is taken
+  newAgent->gamma = 0.9;       // discount factor
+  newAgent->alpha = 0.3;       // learning rate 
+  newAgent->lambda = 0;		   // eligibility traces	
   newAgent->RL_count = 1;
 #endif   // NUMERIC_INDIFFERENCE
 

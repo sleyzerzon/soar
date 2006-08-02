@@ -114,9 +114,7 @@ typedef struct production_struct {
   int OPERAND_which_assert_list;          /* RCHONG: 10.11 */
   byte interrupt;			  /* SW: 7.31.03 */
   bool already_fired;                     /* RPM test workaround for bug #139 */
-  Bool RL;                                /* is this an RL rule */
-  int copies_awaiting_updates;          /* how many copies of rule await Bellman updates */
-
+  Bool RL;                                /* NUMERIC_INDIFFERENCE - is this an RL rule */
 } production;
 
 /* ========================================================================

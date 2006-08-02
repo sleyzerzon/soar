@@ -641,6 +641,11 @@ bool reinitialize_soar (agent* thisAgent) {
   set_sysparam(thisAgent, TRACE_WM_CHANGES_SYSPARAM,               FALSE);
   /* kjh (CUSP-B4) end */
 
+#ifdef NUMERIC_INDIFFERENCE
+  // reset_RL must happen before clear_goal_stack, otherwise we get unwanted Bellman updates while clearing goal stack
+  reset_RL(thisAgent);
+ #endif
+ 
   clear_goal_stack (thisAgent);
 
   if (thisAgent->operand2_mode == TRUE) {
@@ -1291,11 +1296,10 @@ void do_one_top_level_phase (agent* thisAgent)
 		  AFTER_HALT_SOAR_CALLBACK,
 		  (soar_call_data) NULL);
 #ifdef NUMERIC_INDIFFERENCE
+	  // To model episodic task, after halt, perform RL update with next-state value 0
 	  if (thisAgent->sysparams[RL_ON_SYSPARAM]){
 	    for (Symbol* g = thisAgent->bottom_goal ; g ; g = g->id.higher_goal){
-	      //  tabulate_reward_value_for_goal(thisAgent,thisAgent->top_state);
 	      tabulate_reward_value_for_goal(thisAgent,g);
-	      // perform_Bellman_update(thisAgent, 0, thisAgent->top_state);
 	      perform_Bellman_update(thisAgent, 0, g);
 	    }
 	  }
@@ -1640,10 +1644,6 @@ void init_agent_memory(agent* thisAgent)
   thisAgent->io_header_input = get_new_io_identifier (thisAgent, 'I');
   thisAgent->io_header_output = get_new_io_identifier (thisAgent, 'I');
 
-#ifdef NUMERIC_INDIFFERENCE
-  thisAgent->reward_header = get_new_io_identifier (thisAgent, 'R');
-#endif
-
   create_top_goal(thisAgent);
   if (thisAgent->sysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM]) 
     {
@@ -1667,13 +1667,6 @@ void init_agent_memory(agent* thisAgent)
   add_input_wme (thisAgent, thisAgent->io_header,
                  make_sym_constant(thisAgent, "output-link"),
                  thisAgent->io_header_output);
-
-#ifdef NUMERIC_INDIFFERENCE
-   add_input_wme (thisAgent, thisAgent->top_state,
- 	  thisAgent->reward_symbol,
- 	  thisAgent->reward_header);
-   thisAgent->top_state->id.reward_header = thisAgent->reward_header;
-#endif
 
   do_buffered_wm_and_ownership_changes(thisAgent);
 
