@@ -150,10 +150,17 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->semantic_memory = new SemanticMemory();
   newAgent->retrieve_ready = true;
   newAgent->cluster_ready = true;
+  
   newAgent->to_be_saved_wmes = new set<LME>;
   newAgent->prohibited_ids = new set<string>;
   newAgent->gold_level_to_smem_links = new vector<vector<wme*> >();
-
+  
+  newAgent->smem_structures = new vector<smem_accessary>();
+ /* newAgent->last_cue_id = new string();
+  newAgent->last_retrieved = NIL;
+  newAgent->last_experience = NIL;
+  newAgent->last_confidence = NIL;
+  */
   // 100 Units, 300 max dimensions
   newAgent->clusterNet = new NetWork(100,300);
 
@@ -430,6 +437,9 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   delete delete_agent->to_be_saved_wmes;
   delete delete_agent->prohibited_ids;
   delete delete_agent->gold_level_to_smem_links;
+  
+  //delete delete_agent->last_cue_id;
+  delete delete_agent->smem_structures;
   //delete_agent->top_goal->id.common_symbol_info.reference_count --;
   //print_with_symbols(delete_agent, "%f being dereferenced", delete_agent->top_goal);
   // YJ's tuff

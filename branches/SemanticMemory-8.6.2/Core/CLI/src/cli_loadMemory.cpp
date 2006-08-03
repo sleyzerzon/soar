@@ -122,13 +122,26 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::IAgent* pAgent, std::vector<std
 		}
 		istringstream isstr(line);
 		string id, attr, value;
+		vector<int> history;
+		char ch;
 		int type;
 
 		isstr >> id >> attr >> value >> type;
+		// id attr value type [2 3 4 ]
+		if(isstr >> ch){
+			if(ch == '['){
+				int num;
+				while(isstr >> num){
+					history.push_back(num);
+					//cout << num << endl;
+				}
+			}
+		}
+		
 
 		// Attain the evil back door of doom, even though we aren't the TgD
 		gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
-		pKernelHack->load_semantic_memory_data(pAgent, id, attr, value, type);
+		pKernelHack->load_semantic_memory_data(pAgent, id, attr, value, type, history);
 		
 		/* This part in (I)gSKI_DoNotTouch, 
 		char id_letter = id[0];
@@ -169,13 +182,26 @@ bool CommandLineInterface::ParsePrintMemory(gSKI::IAgent* pAgent, std::vector<st
 	AddListenerAndDisableCallbacks(pAgent);
 	
 	string attr = "", value = "";
+	string outputfile;
 	if(argv.size() >= 3){
-		attr = argv[1];
-		value = argv[2];
+		if(argv[1] == "-f"){
+			outputfile = argv[2];
+			if(argv.size() >= 5){
+				attr = argv[3];
+				value = argv[4];
+			}
+			
+		}
+		else{
+			attr = argv[1];
+			value = argv[2];
+		}
+
+		
 	}
 	// print the chunks with the specified attr-value
 	// Only support one pair, should be able to support more complex regex in the future.
-	pKernelHack->print_semantic_memory(pAgent, attr, value);
+	pKernelHack->print_semantic_memory(pAgent, attr, value, outputfile);
 	
 	int count_size = pKernelHack->semantic_memory_chunk_count(pAgent);
 	int lme_size = pKernelHack->semantic_memory_lme_count(pAgent);

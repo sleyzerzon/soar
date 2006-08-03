@@ -153,6 +153,7 @@ class SemanticMemory
 		set<CueTriplet> match_retrieve_single_level_2006_1_22(const set<CueTriplet>&, string&);
 		set<CueTriplet> match_retrieve_single_level_2006_1_31(const set<CueTriplet>&, string&);
 		bool match_retrieve_single_level_2006_3_15(const set<CueTriplet>&, string&, set<CueTriplet>& result, float& confidence, float& experience);
+		bool match_retrieve_single_level_2006_7_18(const string& cue_id, const set<CueTriplet>&, string&, set<CueTriplet>& result, float& confidence, float& experience);
 		
 		// I'll need a partial match function (on exemplars) to compare with clustering approach
 		// The threshold can be varied so that it can achieve hierachical clustering by exemplars.

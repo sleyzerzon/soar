@@ -20,8 +20,9 @@ namespace sdtext = ::__gnu_cxx;
 using namespace std;
 
 
-static bool YJ_debug = false;
+static bool YJ_debug = true;
 
+void retrieve_7_17(agent* thisAgent);
 void retrieve_3_13(agent* thisAgent);
 void retrieve_1_20(agent* thisAgent);
 void retrieve(agent* thisAgent);

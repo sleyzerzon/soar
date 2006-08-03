@@ -107,8 +107,8 @@ namespace gSKI
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
 		// used by Semantic Memory loadMemory commandline
 		// SEMANTIC_MEMORY
-		 void load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type);
-		 void print_semantic_memory(IAgent* pIAgent, std::string, std::string);
+		 void load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type, std::vector<int> history=std::vector<int>());
+		 void print_semantic_memory(IAgent* pIAgent, std::string, std::string, std::string);
 		 int clear_semantic_memory(IAgent* pIAgent);
 		 int semantic_memory_chunk_count(IAgent* pIAgent);
 		 int semantic_memory_lme_count(IAgent* pIAgent);

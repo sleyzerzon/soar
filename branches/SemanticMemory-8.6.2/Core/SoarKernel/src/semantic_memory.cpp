@@ -350,6 +350,11 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 bool SemanticMemory::find_identical_chunk (string& chunk_id, HASH_S_HASH_S_HASH_S_LP& id_attr_value_hash,
 										   string& new_chunk_id, vector<LME>& all_new_lmes){
 	
+   new_chunk_id = chunk_id;
+   return false;
+   // It's easy to check exact matches though, by just comparing the number of matched chunk withe current chunk
+
+
 	set<CueTriplet> chunk_cue;
 	HASH_S_HASH_S_LP chunk_attr_value_hash = id_attr_value_hash.find(chunk_id)->second;
 	
@@ -705,76 +710,86 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 		return false;
 	}
 	
+	string retrieved_value;
+	int retrieved_value_type;
 
-	// summarize target value
-	// All candidate matches are 'sanned', but if there is a tie, the first one will always be picked.
-	for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
-		string candidate_id = *itr;
-		//if(debug_output) cout << "###" << endl;
-		//if(debug_output) cout << candidate_id << endl;
-		//if(debug_output) cout << target_attr << endl;
-		set<int> candidate_lme_index = this->match_id_attr(candidate_id, target_attr);
-		// Assume single valued attributes, or just pick the first value
-
-		if(candidate_lme_index.empty()){
-			if(debug_output) cout << "No target attribute" << endl;
-			// This should not happen
-			break;
-		}
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// What if there is multi-valued attributes?
-		// Current code just check the 'first' value for the target attribute
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		int target_lme_index = *(candidate_lme_index.begin()); 
-		string target_value = (LME_Array[target_lme_index])->value;
-		int target_value_type = (LME_Array[target_lme_index])->value_type;
-
-		// calculate weight for each instance based on its reference history
-		// Total count does include repeated experiences
-		float weight = (LME_Array[target_lme_index])->boost_history.size();
-		if(weight == 0){
-			weight = 1;
-		}
-		if(value_counter.find(target_value) == value_counter.end()){
-			value_counter[target_value] = weight;
-		}
-		else{
-			value_counter[target_value] += weight;
-		}
-
-		// The first id is picked
-		// matched Ids should be ordered in some way, e.g, by activation, so that in case of tie, the highest activated chunk is retrieved
-		if(value_lme_mapping.find(target_value) == value_lme_mapping.end()){
-			value_lme_mapping[target_value] = target_lme_index;
-		}
+	if(target_attr == ""){ // No target attribute, then no need to scan all candidates, just return a 'random' one
+		experience = 0;
+		confidence = 0;
+		retrieved_id = *(matched_ids_intersection.begin());
 	}
+	
+	else{
+		// summarize target value
+		// All candidate matches are 'sanned', but if there is a tie, the first one will always be picked.
+		for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
+			string candidate_id = *itr;
+			//if(debug_output) cout << "###" << endl;
+			//if(debug_output) cout << candidate_id << endl;
+			//if(debug_output) cout << target_attr << endl;
+			set<int> candidate_lme_index = this->match_id_attr(candidate_id, target_attr);
+			// Assume single valued attributes, or just pick the first value
 
+			if(candidate_lme_index.empty()){
+				if(debug_output) cout << "No target attribute" << endl;
+				// This should not happen
+				break;
+			}
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			// What if there is multi-valued attributes?
+			// Current code just check the 'first' value for the target attribute
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			int target_lme_index = *(candidate_lme_index.begin()); 
+			string target_value = (LME_Array[target_lme_index])->value;
+			int target_value_type = (LME_Array[target_lme_index])->value_type;
 
-	int total_count = 0;
-	int max_count = 0;
-	string max_counted_value = "";
-	// May be counts need to be biased by activation. So that too long ago counts doesn't affect retrieval.
-	for(map<string, int>::iterator itr = value_counter.begin(); itr != value_counter.end(); ++itr){
-		string current_value = itr->first;
-		int current_value_count = itr->second;
-		total_count += current_value_count;
-		if(current_value_count > max_count){// Always get the first max_count id, radonmess could be implemented here
-			max_count = current_value_count;
-			max_counted_value = current_value;
+			// calculate weight for each instance based on its reference history
+			// Total count does include repeated experiences
+			float weight = (LME_Array[target_lme_index])->boost_history.size();
+			if(weight == 0){
+				weight = 1;
+			}
+			if(value_counter.find(target_value) == value_counter.end()){
+				value_counter[target_value] = weight;
+			}
+			else{
+				value_counter[target_value] += weight;
+			}
+
+			// The first id is picked
+			// matched Ids should be ordered in some way, e.g, by activation, so that in case of tie, the highest activated chunk is retrieved
+			if(value_lme_mapping.find(target_value) == value_lme_mapping.end()){
+				value_lme_mapping[target_value] = target_lme_index;
+			}
 		}
-		//if(debug_output) cout << itr->first<<", " << itr->second << endl;
+
+
+		int total_count = 0;
+		int max_count = 0;
+		string max_counted_value = "";
+		// May be counts need to be biased by activation. So that too long ago counts doesn't affect retrieval.
+		for(map<string, int>::iterator itr = value_counter.begin(); itr != value_counter.end(); ++itr){
+			string current_value = itr->first;
+			int current_value_count = itr->second;
+			total_count += current_value_count;
+			if(current_value_count > max_count){// Always get the first max_count id, radonmess could be implemented here
+				max_count = current_value_count;
+				max_counted_value = current_value;
+			}
+			//if(debug_output) cout << itr->first<<", " << itr->second << endl;
+		}
+
+		experience = total_count;
+		confidence = value_counter[max_counted_value]*1.0 / total_count;
+		int retrieved_lme_index = value_lme_mapping[max_counted_value];
+		retrieved_value = (LME_Array[retrieved_lme_index])->value;
+		retrieved_value_type = (LME_Array[retrieved_lme_index])->value_type;
+		retrieved_id = (LME_Array[retrieved_lme_index])->id;
+
+		//if(debug_output) cout << "Confidence: " << confidence << endl;
+		//if(debug_output) cout << "Experience: " << experience << endl;
+		//if(debug_output) cout << "Index: " << retrieved_lme_index << endl;
 	}
-
-	experience = total_count;
-	confidence = value_counter[max_counted_value]*1.0 / total_count;
-	int retrieved_lme_index = value_lme_mapping[max_counted_value];
-	string retrieved_value = (LME_Array[retrieved_lme_index])->value;
-	int retrieved_value_type = (LME_Array[retrieved_lme_index])->value_type;
-	retrieved_id = (LME_Array[retrieved_lme_index])->id;
-
-	//if(debug_output) cout << "Confidence: " << confidence << endl;
-	//if(debug_output) cout << "Experience: " << experience << endl;
-	//if(debug_output) cout << "Index: " << retrieved_lme_index << endl;
 
 	for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
 		string attr = itr->attr;
@@ -786,7 +801,7 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 			value_type = retrieved_value_type;
 		}
 		
-		// Code to make multiple retrieval
+		// Code to retrieve multiple queried attributes
 		else if(queried_attrs.find(attr) != queried_attrs.end()){ // This value is being queried
 			
 			set<int> matched_lme_index = this->match_id_attr(retrieved_id, attr); // get all matched wmes/lems
@@ -820,6 +835,204 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 
 }
 
+// This should also do the proper multiple-value attribute match
+// If there are multiple values, only the first is matched. I.O.W., if the lastest value is not the same with the cue, then it's not a match.
+// Then better keep an array data structure than a hash for the last level, but currently that's ok
+bool SemanticMemory::match_retrieve_single_level_2006_7_18(const string& cue_id, const set<CueTriplet>& cue_set, string& retrieved_id, 
+														   set<CueTriplet>& retrieved, float& confidence, float& experience){
+															 
+	map<string, int> value_counter;
+	map<string, int> value_lme_mapping;
+	retrieved_id = "";
+
+	bool start = false;
+	set<string> matched_ids_intersection;
+	string target_attr = "";
+	set<string> queried_attrs;
+	set<string> cue_attrs;
+	if(cue_set.empty()){
+		if(this->test_id(cue_id)){ // expand
+			retrieved_id = cue_id;
+			experience = 0;
+			confidence = 0;
+		}
+		else{ // return error
+			retrieved_id = "E0";
+			retrieved.clear();
+			retrieved.insert(CueTriplet("E0", "error", "empty-cue", 2));
+			confidence = 0;
+			experience = 0;
+			return false;
+		}
+	}
+	else{
+		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+			string id = itr->id;
+			string attr = itr->attr;
+			string value = itr->value;
+			int value_type = itr->value_type;
+			cue_attrs.insert(attr);
+			set<string> current_matched_ids = this->match_attr_value(attr, value, value_type);
+			if(value_type == IDENTIFIER_SYMBOL_TYPE && !this->test_id(value)){ // thie value is being queried
+
+				if(target_attr == ""){//The 'first' will be the target
+					target_attr = attr;
+				}
+				queried_attrs.insert(attr);
+
+			}
+
+			if(!start){
+				matched_ids_intersection.insert(current_matched_ids.begin(), current_matched_ids.end());
+			}
+			else{
+				matched_ids_intersection = set_intersect(matched_ids_intersection, current_matched_ids);
+
+
+				if(matched_ids_intersection.size() == 0){
+					break;
+				}
+			}
+			if(debug_output) cout << "Current matched ids" << endl;
+			if(debug_output) cout << matched_ids_intersection << endl;
+
+			start = true;
+		}
+
+		if(matched_ids_intersection.empty()){ // no matches
+			retrieved_id = "F0";
+			retrieved.clear();
+			retrieved.insert(CueTriplet("F0", "status", "failure", 2));
+			confidence = 0;
+			experience = 0;
+
+			return false;
+		}
+
+		string retrieved_value;
+		int retrieved_value_type;
+
+		if(target_attr == ""){ // No target attribute, then no need to scan all candidates, just return a 'random' one
+			experience = 0;
+			confidence = 0;
+			retrieved_id = *(matched_ids_intersection.begin());
+		}
+
+		else if(retrieved_id == ""){ // If it's a expand, then the retrieved_id is already known, no need to summarize candidates at all
+			// summarize target value
+			// All candidate matches are 'sanned', but if there is a tie, the first one will always be picked.
+			for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
+				string candidate_id = *itr;
+				//if(debug_output) cout << "###" << endl;
+				//if(debug_output) cout << candidate_id << endl;
+				//if(debug_output) cout << target_attr << endl;
+				set<int> candidate_lme_index = this->match_id_attr(candidate_id, target_attr);
+				// Assume single valued attributes, or just pick the first value
+
+				if(candidate_lme_index.empty()){
+					if(debug_output) cout << "No target attribute" << endl;
+					// This should not happen
+					break;
+				}
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				// What if there is multi-valued attributes?
+				// Current code just check the 'first' value for the target attribute
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				int target_lme_index = *(candidate_lme_index.begin()); 
+				string target_value = (LME_Array[target_lme_index])->value;
+				int target_value_type = (LME_Array[target_lme_index])->value_type;
+
+				// calculate weight for each instance based on its reference history
+				// Total count does include repeated experiences
+				float weight = (LME_Array[target_lme_index])->boost_history.size();
+				if(weight == 0){
+					weight = 1;
+				}
+				if(value_counter.find(target_value) == value_counter.end()){
+					value_counter[target_value] = weight;
+				}
+				else{
+					value_counter[target_value] += weight;
+				}
+
+				// The first id is picked
+				// matched Ids should be ordered in some way, e.g, by activation, so that in case of tie, the highest activated chunk is retrieved
+				if(value_lme_mapping.find(target_value) == value_lme_mapping.end()){
+					value_lme_mapping[target_value] = target_lme_index;
+				}
+			}
+
+
+			int total_count = 0;
+			int max_count = 0;
+			string max_counted_value = "";
+			// May be counts need to be biased by activation. So that too long ago counts doesn't affect retrieval.
+			for(map<string, int>::iterator itr = value_counter.begin(); itr != value_counter.end(); ++itr){
+				string current_value = itr->first;
+				int current_value_count = itr->second;
+				total_count += current_value_count;
+				if(current_value_count > max_count){// Always get the first max_count id, radonmess could be implemented here
+					max_count = current_value_count;
+					max_counted_value = current_value;
+				}
+				//if(debug_output) cout << itr->first<<", " << itr->second << endl;
+			}
+
+			experience = total_count;
+			confidence = value_counter[max_counted_value]*1.0 / total_count;
+			int retrieved_lme_index = value_lme_mapping[max_counted_value];
+			retrieved_value = (LME_Array[retrieved_lme_index])->value;
+			retrieved_value_type = (LME_Array[retrieved_lme_index])->value_type;
+			retrieved_id = (LME_Array[retrieved_lme_index])->id;
+
+			//if(debug_output) cout << "Confidence: " << confidence << endl;
+			//if(debug_output) cout << "Experience: " << experience << endl;
+			//if(debug_output) cout << "Index: " << retrieved_lme_index << endl;
+		}
+
+		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+			string attr = itr->attr;
+			string value = itr->value;
+			int value_type = itr->value_type;
+
+			if(attr == target_attr){
+				value = retrieved_value;
+				value_type = retrieved_value_type;
+			}
+
+			// Code to retrieve multiple queried attributes
+			else if(queried_attrs.find(attr) != queried_attrs.end()){ // This value is being queried
+
+				set<int> matched_lme_index = this->match_id_attr(retrieved_id, attr); // get all matched wmes/lems
+				int queried_lme_index = *(matched_lme_index.begin()); // get the first value
+				value = (LME_Array[queried_lme_index])->value;
+				value_type = (LME_Array[queried_lme_index])->value_type;
+
+			}
+
+			retrieved.insert(CueTriplet(retrieved_id, attr, value, value_type));
+		}
+	}
+	// retrieve other attributes
+	HASH_S_HASH_S_HASH_S_LP::iterator itr1 = memory_id_attr_hash.find(retrieved_id);
+	HASH_S_HASH_S_LP attr_value_hash = itr1->second;
+	for(HASH_S_HASH_S_LP::iterator itr2 = attr_value_hash.begin(); itr2 != attr_value_hash.end(); ++itr2){
+		string each_attr = itr2->first;
+		if(cue_attrs.find(each_attr) == cue_attrs.end()){//Not in cue
+			set<int> matched_lme_index = this->match_id_attr(retrieved_id, each_attr); // get all matched wmes/lems
+			int queried_lme_index = *(matched_lme_index.begin());// get the first value
+			string value = (LME_Array[queried_lme_index])->value;
+			int value_type = (LME_Array[queried_lme_index])->value_type;
+			retrieved.insert(CueTriplet(retrieved_id, each_attr, value, value_type));
+		}
+	}
+	
+	
+	return true;
+	//return matched_ids_intersection;
+	//return retrieved;
+
+}
 
 bool SemanticMemory::partial_match(const set<CueTriplet>& cue_set, string& retrieved_id, 
 														   set<CueTriplet>& retrieved, float& threshold, float& confidence, float& experience){
@@ -922,11 +1135,23 @@ set<int> SemanticMemory::match_id_attr(const string id, const string attr){
 	}
 	else{
 		HASH_S_LP& value_hash = itr2->second;
+		int most_recent_time = 0;
+		int most_recent_value_lme_index;
+		
+		// These code makes it retrieve the single most recent value
 		for(HASH_S_LP::iterator itr3 = value_hash.begin(); itr3 != value_hash.end(); ++itr3){
 			//if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
 			//returned_ids_set.insert(itr3->first);
-			index.insert(itr3->second);
+			int lme_index = itr3->second;
+			vector<int>& history =  LME_Array[lme_index]->boost_history;
+			int lme_time = history[history.size()-1];
+			if(most_recent_time < lme_time){
+				most_recent_time = lme_time;
+				most_recent_value_lme_index = lme_index;
+			}
+			//index.insert(itr3->second);
 		}
+		index.insert(most_recent_value_lme_index);
 	}
 	
 	return index;
@@ -1147,8 +1372,15 @@ set<string> SemanticMemory::match_attr_value(const string attr, const string val
 		else{
 			HASH_S_LP& id_hash = itr2->second;
 			for(HASH_S_LP::iterator itr3 = id_hash.begin(); itr3 != id_hash.end(); ++itr3){
-				if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
-				returned_ids_set.insert(itr3->first);
+				// Check whether the value is the most recent value for current id-attr pair.
+				set<int> most_recent_lme = this->match_id_attr(itr3->first, attr); // this function now only return the lme_index with the most recent value for id-attr pair
+				if(*(most_recent_lme.begin()) == itr3->second){
+					if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
+					returned_ids_set.insert(itr3->first);
+				}
+				else{
+					if(debug_output) cout << "Although Attr-Value matched, this is an older value " << itr3->first << endl;
+				}
 			}
 		}
 	}

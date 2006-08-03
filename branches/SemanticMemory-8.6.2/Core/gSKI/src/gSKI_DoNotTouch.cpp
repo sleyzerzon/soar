@@ -32,6 +32,8 @@
 #include "explain.h"
 #include "soar_rand.h"
 
+#include <fstream>
+
 //#include "../../SoarIO/ConnectionSML/include/sock_Debug.h"
 
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
@@ -2442,7 +2444,7 @@ namespace gSKI
 		}
 		// used by Semantic Memory loadMemory commandline
 		// SEMANTIC_MEMORY
-		void TgDWorkArounds::load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type){
+		void TgDWorkArounds::load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type, vector<int> history){
 			
 			Agent* pAgent2 = (Agent*)(pIAgent);
 			agent* thisAgent = pAgent2->GetSoarAgent();
@@ -2466,13 +2468,19 @@ namespace gSKI
 			char new_id[32];
 			sprintf(new_id, "%c%d", id_letter, id_number);
 			id = string(new_id);
-			thisAgent->semantic_memory->insert_LME(id, attr, value, type);
+			thisAgent->semantic_memory->insert_LME(id, attr, value, type, history);
 		}
 
-		void TgDWorkArounds::print_semantic_memory(IAgent* pIAgent, string attr, string value){
+		void TgDWorkArounds::print_semantic_memory(IAgent* pIAgent, string attr, string value, string outputfile){
 			Agent* pAgent2 = (Agent*)(pIAgent);
 			agent* thisAgent = pAgent2->GetSoarAgent();
 			//thisAgent->semantic_memory->insert_LME(id, attr, value, type);
+			
+			std::ofstream soarFile;
+			if(outputfile != ""){
+				soarFile.open(outputfile.c_str());
+				print(thisAgent, "Output to file %s\n", outputfile.c_str());
+			}
 
 			vector<LME*> content;
 			thisAgent->semantic_memory->dump(content);
@@ -2496,7 +2504,7 @@ namespace gSKI
 			for(HASH_S_HASH_S_HASH_S_LP::iterator itr = id_attr_hash.begin(); itr != id_attr_hash.end(); ++itr){
 				string id = itr->first;
 				if(filter && filtered_id_set.find(id) == filtered_id_set.end()){
-					continue;
+					continue;	
 				}
 				print(thisAgent, "\n");
 				HASH_S_HASH_S_LP attr_hash = itr->second;
@@ -2507,17 +2515,34 @@ namespace gSKI
 						string value = itr3->first;
 						int lme_index = itr3->second;
 						LME * lme_ptr = thisAgent->semantic_memory->getLME_ptr(lme_index);
-						
-
-						print(thisAgent, "<%s, %s, %s> ",id.c_str(), attr.c_str(), value.c_str());
-						print(thisAgent, "[");
-						for(int i=0; i<lme_ptr->boost_history.size(); ++i){
-							print(thisAgent, "%d, ",lme_ptr->boost_history[i]);
+						int value_type = lme_ptr->value_type;
+						if(outputfile != ""){
+							soarFile << id << " " << attr << " " << value << " " << value_type << "[";
 						}
-						print(thisAgent, "]\n");
+						else{
+							print(thisAgent, "<%s, %s, %s> ",id.c_str(), attr.c_str(), value.c_str());
+							print(thisAgent, "[");
+						}
+						for(int i=0; i<lme_ptr->boost_history.size(); ++i){
+							if(outputfile != ""){
+								soarFile << lme_ptr->boost_history[i] << " ";
+							}
+							else{
+								print(thisAgent, "%d, ",lme_ptr->boost_history[i]);
+							}
+						}
+						if(outputfile != ""){
+							soarFile << "]\n";
+						}
+						else{
+							print(thisAgent, "]\n");
+						}
 					}
 				}
 				
+			}
+			if(outputfile != ""){
+				soarFile.close();
 			}
 
 		}

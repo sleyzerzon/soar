@@ -128,7 +128,13 @@ typedef signed short goal_stack_level;
 typedef struct alpha_mem_struct alpha_mem;
 typedef struct token_struct token;
 typedef char * test;
-
+class smem_accessary{
+public:
+	smem_accessary(){last_cue_id=""; last_retrieved = NIL; last_confidence = NIL; last_experience = NIL;}
+	string last_cue_id;
+	wme *last_retrieved, *last_confidence, *last_experience;
+	vector<Symbol*> arch_symbols;//these symbols have to de derefed mannually, deleting the substate is not enough, I don't know why
+};
 typedef struct agent_struct {
 	//#ifdef SEMANTIC_MEMORY
 	// Better not use directive for this, since other projects (gSKI) refers to it.
@@ -155,6 +161,11 @@ typedef struct agent_struct {
 	NetWork* clusterNet;
 	bool retrieve_ready;
 	bool cluster_ready;
+	
+	vector<smem_accessary>* smem_structures;
+	//string* last_cue_id; // global variable to keep track of last cue so that whenever the cue changed, do a new retrieval.
+	//wme *last_retrieved, *last_confidence, *last_experience;
+
 	// For automatically save wmes - all new wmes in every cycle
 	set<LME>* to_be_saved_wmes;
 	set<string>* prohibited_ids;
