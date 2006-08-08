@@ -29,10 +29,10 @@ use File::Path;
 # Variables
 
 # SVN url
-my $soarurl = "https://winter.eecs.umich.edu/svn/soar/trunk/SoarSuite";
+my $soarurl = "https://winter.eecs.umich.edu/svn/soar/tags/SoarRL-8.6.2-alpha/SoarSuite";
 
 # Name and version
-my $nameandversion = "Soar Suite 8.6.2";
+my $nameandversion = "Soar Suite 8.6.2 RL alpha";
 
 # File globs to completely remove from the tree
 my @remove = qw/Makefile.in 8.6.2.nsi.in INSTALL README .project .cvsignore .svn *.xcodeproj *.so *.so.1 *.so.2 *.jnilib java_swt *.sh *.plist *.doc *.ppt *.pl *.am *.ac *.m4 ManualSource Old *.tex Scripts/;
@@ -206,8 +206,8 @@ sub move_step {
 	print "removing tree $core/SoarLibrary/lib\n";
 	rmtree("$core/SoarLibrary/lib") or die $!;
 	
-	print "removing tree $core/Tools/TestCSharpSML\n";
-	rmtree("$core/Tools/TestCSharpSML") or die $!;
+	#print "removing tree $core/Tools/TestCSharpSML\n";
+	#rmtree("$core/Tools/TestCSharpSML") or die $!;
 	
 	print "moving: $core/SoarLibrary/bin/makeTclSMLPackage.tcl\n";
 	mkdir("$source/SoarLibrary/bin");
