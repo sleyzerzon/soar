@@ -26,6 +26,7 @@ has an RL_data_struct.
 Fields in an RL_data_struct:
 	eligibility_traces: Contains pointers to RL rules, and the degree to which each rule's numeric value
 						should be affected by the Bellman update on a subsequent decision cycle.
+	prev_op_RL_rules: A list of RL rules that fired for the last selected operator.
     previous_Q: The Q-value computed for the previously selected operator.
  	reward: Reward accumulated for operator currently selected at this goal.
 	step: The number of decision cycles an operator has been active. (will be > 1 only for op no-change)
@@ -33,6 +34,7 @@ Fields in an RL_data_struct:
 --------------------------------------------------------------------------*/
 typedef struct RL_data_struct {
  	SoarSTLETMap *eligibility_traces;
+	list *prev_op_RL_rules;
 	float previous_Q;
 	float reward;
 	int step;

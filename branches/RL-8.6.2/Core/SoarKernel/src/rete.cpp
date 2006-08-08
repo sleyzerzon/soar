@@ -153,10 +153,6 @@
 
 
 
-
-
-
-
 /* **********************************************************************
 
    SECTION 1:  Rete Net Structures and Declarations
@@ -3400,6 +3396,38 @@ Bool same_rhs (action *rhs1, action *rhs2) {
   return TRUE;
 }
 
+#ifdef NUMERIC_INDIFFERENCE
+/**********************************************
+	Productions equivalent
+
+RL rules and template rules have slightly different
+criteria for DUPLICATE_PRODUCTION, namely
+1. A template rule is not a duplicate of an RL rule
+  even if they are exactly the same.
+2. Two template or two RL rules are duplicates if they
+   differ only in the referent of their numeric preferences.
+This function decides whether two productions with the same
+LHS are duplicates.
+**************************************************/
+
+Bool productions_equivalent(production *p1, production *p2){
+	
+	// One of p1 or p2 is not an RL rule or a template rule, so duplicate iff match on rhs.
+	if ((!p1->RL && (p1->type != TEMPLATE_PRODUCTION_TYPE)) || (!p2->RL && (p2->type != TEMPLATE_PRODUCTION_TYPE))) return same_rhs(p1->action_list, p2->action_list);
+	
+	// One is an RL rule, one is a template rule, so they are not duplicates.
+	else if (p1->RL != p2->RL) return false;
+	
+	// Either both RL rules or both template rules. So duplicates if everything but referent is equivalent.
+	// Can assume single numeric preference here.
+	else {
+		if (p1->action_list->id != p2->action_list->id) return false;
+		if (p1->action_list->attr != p2->action_list->attr) return false;
+		if (p1->action_list->value != p2->action_list->value) return false;
+		return true;
+	}
+}
+#endif
 /* ---------------------------------------------------------------------
                     Fixup RHS-Value Variable References
 
@@ -3557,10 +3585,11 @@ byte add_production_to_rete (agent* thisAgent,
   for (p_node=bottom_node->first_child; p_node!=NIL;
        p_node=p_node->next_sibling) {
     if (p_node->node_type != P_BNODE) continue;
-    if (!p->RL || !p_node->b.p.prod->RL){
-      if (! same_rhs (p_node->b.p.prod->action_list, p->action_list)) continue;
-    }
-//    if (! same_rhs (p_node->b.p.prod->action_list, p->action_list)) continue;
+#ifdef NUMERIC_INDIFFERENCE
+	if (! productions_equivalent(p_node->b.p.prod, p)) continue;
+#else
+	if (! same_rhs (p_node->b.p.prod->action_list, p->action_list)) continue;
+#endif
     /* --- duplicate production found --- */
     if (warn_on_duplicates)
       print_with_symbols (thisAgent, "\nIgnoring %y because it is a duplicate of %y ",
@@ -8181,3 +8210,4 @@ void init_rete (agent* thisAgent) {
                      RELATIONAL_SAME_TYPE_RETE_TEST] =
                        variable_same_type_rete_test_routine;
 }
+

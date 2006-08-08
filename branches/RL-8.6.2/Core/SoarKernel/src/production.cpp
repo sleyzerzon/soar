@@ -1607,7 +1607,7 @@ void excise_production (agent* thisAgent, production *prod, Bool print_sharp_sig
   if (prod->trace_firings) remove_pwatch (thisAgent, prod);
   remove_from_dll (thisAgent->all_productions_of_type[prod->type], prod, next, prev);
 #ifdef NUMERIC_INDIFFERENCE
-   remove_RL_refs_for_prod(thisAgent, prod); // Remove RL-related pointers to this production.
+   if (prod->RL && prod->firing_count) remove_RL_refs_for_prod(thisAgent, prod); // Remove RL-related pointers to this production (unnecessary if rule never fired).
 #endif
   thisAgent->num_productions_of_type[prod->type]--;
   if (print_sharp_sign) print (thisAgent, "#");

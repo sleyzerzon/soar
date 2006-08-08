@@ -2370,12 +2370,11 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
 
 #ifdef NUMERIC_INDIFFERENCE
  
-  // goal->id.RL_data->eligibility_traces.clear();
-  // goal->id.RL_data->eligibility_traces.~map<production *, double>();
 	delete goal->id.RL_data->eligibility_traces;
+	free_list(thisAgent, goal->id.RL_data->prev_op_RL_rules);
+	symbol_remove_ref(thisAgent,goal->id.reward_header);
+	free_memory(thisAgent, goal->id.RL_data, MISCELLANEOUS_MEM_USAGE);
 
-  symbol_remove_ref(thisAgent,goal->id.reward_header);
-  free_memory(thisAgent, goal->id.RL_data, MISCELLANEOUS_MEM_USAGE);
 #endif
 
   /* REW: BUG
@@ -2452,8 +2451,8 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
 #ifdef NUMERIC_INDIFFERENCE
   id->id.RL_data = static_cast<RL_data_struct *>(allocate_memory(thisAgent, sizeof(RL_data_struct),
 												   MISCELLANEOUS_MEM_USAGE));
-  //new (&(id->id.RL_data->eligibility_traces)) std::map<production *, double>;
   id->id.RL_data->eligibility_traces = new SoarSTLETMap(std::less<production*>(), SoarMemoryAllocator<std::pair<production *, double>>(thisAgent, MISCELLANEOUS_MEM_USAGE));
+  id->id.RL_data->prev_op_RL_rules = NIL;
   id->id.RL_data->previous_Q = 0;
   id->id.RL_data->reward = 0;
   id->id.RL_data->step = 0;  
