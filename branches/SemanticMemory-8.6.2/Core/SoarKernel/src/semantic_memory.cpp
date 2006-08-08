@@ -1144,6 +1144,9 @@ set<int> SemanticMemory::match_id_attr(const string id, const string attr){
 			//returned_ids_set.insert(itr3->first);
 			int lme_index = itr3->second;
 			vector<int>& history =  LME_Array[lme_index]->boost_history;
+			if(history.size() == 0){
+				history.push_back(1);
+			}
 			int lme_time = history[history.size()-1];
 			if(most_recent_time < lme_time){
 				most_recent_time = lme_time;
