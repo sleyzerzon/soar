@@ -3708,11 +3708,12 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
 					print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-					print(thisAgent, "Value (Sum) = %f", exp(cand->numeric_value / thisAgent->Temperature));
+					print(thisAgent, "Value (Sum) = %f, (Exp) = %f", cand->numeric_value, exp(cand->numeric_value / thisAgent->Temperature));
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->numeric_value / thisAgent->Temperature));
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, cand->numeric_value);
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateExpValue, exp(cand->numeric_value / thisAgent->Temperature));
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 				}
 			}
