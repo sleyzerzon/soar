@@ -62,18 +62,18 @@ void SoarGameObject::identifyBehaviors() {
       registerBehavior(moveBehavior);
       FSM* attackBehavior = new AttackFSM(this);
       registerBehavior(attackBehavior);
-      FSM* attackNear = new AttackNearFSM(this);
-      registerBehavior(attackNear);
-      defaultBehaviors.push_back(attackNear);
+//      FSM* attackNear = new AttackNearFSM(this);
+//      registerBehavior(attackNear);
+//      defaultBehaviors.push_back(attackNear);
      }
     else if (name == "tank") {
       FSM* moveBehavior = new PersistentMoveFSM(gob);
       registerBehavior(moveBehavior);
       FSM* attackBehavior = new AttackFSM(this);
       registerBehavior(attackBehavior);
-      FSM* attackNear = new AttackNearFSM(this);
-      registerBehavior(attackNear);
-      defaultBehaviors.push_back(attackNear);
+//      FSM* attackNear = new AttackNearFSM(this);
+//      registerBehavior(attackNear);
+//      defaultBehaviors.push_back(attackNear);
     }
     else if (name == "controlCenter") {
       FSM* trainBehavior = new TrainFSM(gob);

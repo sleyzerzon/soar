@@ -1,0 +1,9 @@
+sp {propose*attack-base
+   (state <s> ^name rl-tank
+              ^my-tank-health <mth> # just so that the subgoal will be retracted after this changes
+              ^my-base-health <mbh>
+              ^enemy-base-health <ebh>
+              ^my-tank-taking-damage <d>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name attack-base)}

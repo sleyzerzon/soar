@@ -1,0 +1,38 @@
+########################################################################
+#                                                                      #
+#               This file was generated automatically                  #
+#                                                                      #
+########################################################################
+
+sp {propose*bin-my-tank-health-low
+   (state <s> ^name rl-tank
+              ^my-pid <pid>
+              ^io.input-link.groups.group <g>)
+   (<g> ^owner <pid>
+        ^type tank)
+  -(<g> ^health <= 0)
+  -(<g> ^health >= 50)
+-->
+   (<s> ^my-tank-health low)}
+
+sp {propose*bin-my-tank-health-med
+   (state <s> ^name rl-tank
+              ^my-pid <pid>
+              ^io.input-link.groups.group <g>)
+   (<g> ^owner <pid>
+        ^type tank)
+  -(<g> ^health < 50)
+  -(<g> ^health >= 100)
+-->
+   (<s> ^my-tank-health med)}
+
+sp {propose*bin-my-tank-health-high
+   (state <s> ^name rl-tank
+              ^my-pid <pid>
+              ^io.input-link.groups.group <g>)
+   (<g> ^owner <pid>
+        ^type tank)
+  -(<g> ^health < 100)
+  -(<g> ^health > 150)
+-->
+   (<s> ^my-tank-health high)}

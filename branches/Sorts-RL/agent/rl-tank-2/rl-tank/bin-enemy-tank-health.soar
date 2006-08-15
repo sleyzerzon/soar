@@ -1,0 +1,26 @@
+########################################################################
+#                                                                      #
+#               This file was generated automatically                  #
+#                                                                      #
+########################################################################
+
+sp {propose*bin-enemy-tank-health-dead
+   (state <s> ^name rl-tank
+              ^enemy-pid <pid>
+              ^io.input-link.groups <gs>)
+  -{(<gs> ^group <g>)
+    (<g> ^owner <pid>
+         ^type marine)}
+-->
+   (<s> ^enemy-tank-health dead)}
+
+sp {propose*bin-enemy-tank-health-alive
+   (state <s> ^name rl-tank
+              ^enemy-pid <pid>
+              ^io.input-link <in>)
+  -{(<in> ^groups <gs>)
+   -{(<gs> ^group <g>)
+     (<g> ^owner <pid>
+          ^type marine)}}
+-->
+   (<s> ^enemy-tank-health alive)}
