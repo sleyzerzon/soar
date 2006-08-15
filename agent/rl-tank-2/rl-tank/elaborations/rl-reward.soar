@@ -1,0 +1,16 @@
+#sp {elaborate*rl-reward
+#   (state <s> ^name rl-tank
+#              ^reward-link <r>
+#              ^io.input-link.watch <w>)
+#   (<w> ^mytank-watch <mtd>
+#        ^mybase-watch <mbd>
+#        ^etank-watch <etd>
+#        ^ebase-watch <ebd>)
+#-->
+#   (<r> ^reward.value (+ (* -1 (+ <etd> <ebd>)) (+ <mtd> <mbd>)))}
+
+sp {elaborate*rl-reward
+   (state <s> ^name rl-tank
+              ^reward-link <r>)
+-->
+   (<r> ^reward.value 0)}

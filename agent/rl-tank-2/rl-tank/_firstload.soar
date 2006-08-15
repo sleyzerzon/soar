@@ -1,0 +1,5 @@
+RL --gamma 0.99999
+exploration --epsilon 0.9
+source "/home/jzxu/orts3/rl-rules"
+
+watch 3

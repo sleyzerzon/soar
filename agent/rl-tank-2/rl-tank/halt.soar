@@ -1,0 +1,72 @@
+sp {halt-win
+   (state <s> ^name rl-tank
+              ^enemy-pid <epid>
+              ^io.input-link <in>
+              ^my-tank-health <mth>
+              ^my-base-health <mbh>
+              ^enemy-tank-health <eth>
+              ^reward-link <r>)
+   (<in> ^game-info.view-frame <vf>
+         ^groups <gs>)
+  -{(<gs> ^group <g>)
+    (<g> ^owner <epid>
+         ^type |controlCenter|)}
+-->
+   (exec filewrite |-a game-log.txt win | <vf> | | <mth> | | <mbh> | | <eth> | dead| (crlf))
+   (<r> ^reward.value 5000)
+   (halt)}
+
+sp {halt-lose
+   (state <s> ^name rl-tank
+              ^my-pid <mpid>
+              ^io.input-link <in>
+              ^my-tank-health <mth>
+              ^enemy-tank-health <eth>
+              ^enemy-base-health <ebh>
+              ^reward-link <r>)
+   (<in> ^game-info.view-frame <vf>
+         ^groups <gs>)
+  -{(<gs> ^group <g>)
+    (<g> ^owner <mpid>
+         ^type |controlCenter|)}
+-->
+   (exec filewrite |-a game-log.txt lose | <vf> | | <mth> | dead | <eth> | | <ebh> (crlf))
+   (<r> ^reward.value -5000)
+   (halt)}
+
+sp {halt-lose-1
+   (state <s> ^name rl-tank
+              ^my-pid <mpid>
+              ^io.input-link <in>
+              ^my-base-health <mbh>
+              ^enemy-tank-health { <eth> <> dead }
+              ^enemy-base-health <ebh>
+              ^reward-link <r>)
+   (<in> ^game-info.view-frame <vf>
+         ^groups <gs>)
+  -{(<gs> ^group <g>)
+    (<g> ^owner <mpid>
+         ^type tank)}
+-->
+   (exec filewrite |-a game-log.txt lose | <vf> | dead | <mbh> | |  <eth> | | <ebh> (crlf))
+   (<r> ^reward.value -5000)
+   (halt)}
+
+sp {halt-tie
+   (state <s> ^name rl-tank
+              ^my-pid <mpid>
+              ^enemy-pid <epid>
+              ^io.input-link <in>
+              ^my-base-health <mbh>
+              ^enemy-base-health <ebh>)
+   (<in> ^game-info.view-frame <vf>
+         ^groups <gs>)
+  -{(<gs> ^group <g1>)
+    (<g1> ^owner <mpid>
+          ^type tank)}
+  -{(<gs> ^group <g2>)
+    (<g2> ^owner <epid>
+          ^type marine)}
+-->
+   (exec filewrite |-a game-log.txt tie | <vf> | dead | <mbh> | dead | <ebh> (crlf))
+   (halt)}

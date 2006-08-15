@@ -1,0 +1,38 @@
+########################################################################
+#                                                                      #
+#               This file was generated automatically                  #
+#                                                                      #
+########################################################################
+
+sp {propose*bin-my-base-health-low
+   (state <s> ^name rl-tank
+              ^my-pid <pid>
+              ^io.input-link.groups.group <g>)
+   (<g> ^owner <pid>
+        ^type |controlCenter|)
+  -(<g> ^health <= 0)
+  -(<g> ^health >= 150)
+-->
+   (<s> ^my-base-health low)}
+
+sp {propose*bin-my-base-health-med
+   (state <s> ^name rl-tank
+              ^my-pid <pid>
+              ^io.input-link.groups.group <g>)
+   (<g> ^owner <pid>
+        ^type |controlCenter|)
+  -(<g> ^health < 150)
+  -(<g> ^health >= 350)
+-->
+   (<s> ^my-base-health med)}
+
+sp {propose*bin-my-base-health-high
+   (state <s> ^name rl-tank
+              ^my-pid <pid>
+              ^io.input-link.groups.group <g>)
+   (<g> ^owner <pid>
+        ^type |controlCenter|)
+  -(<g> ^health < 350)
+  -(<g> ^health > 500)
+-->
+   (<s> ^my-base-health high)}

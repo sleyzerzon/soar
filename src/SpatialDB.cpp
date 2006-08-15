@@ -504,7 +504,7 @@ bool SpatialDB::hasObjectCollisionInt
   // check for terrain collisions
   Circle cc(c.x, c.y, radius);
   if (hasTerrainCollision(cc)) {
-    Sorts::canvas.makeTempCircle(c.x, c.y, radius, 9999)->setShapeColor(255, 255, 255);
+    //Sorts::canvas.makeTempCircle(c.x, c.y, radius, 9999)->setShapeColor(255, 255, 255);
     return true;
   }
 
