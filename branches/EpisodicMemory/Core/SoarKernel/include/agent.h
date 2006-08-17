@@ -519,6 +519,49 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 #endif //SOAR_WMEM_ACTIVATION
 
 #ifdef EPISODIC_MEMORY
+/*
+    These variables contains the agent's episodic memory store and related info
+
+   epmem_curr_active_wmes  - the n most active wmes in working memory
+   epmem_prev_active_wmes - the n most active wmes in working memory
+                            when the last memory was recorded
+   epmem_wmetree              - The head of a giant wmetree used to represent all
+                            the states that that agent has seen so far.  This is,
+                            in effect, the episodic store of the agent.
+   epmem_wmetree_size         - The number of nodes in epmem_wmetree
+   epmem_memories             - This is an array of all the memories that the
+                            agent has.  Each memory is an index into epmem_wmetree
+   epmem_last_tag             - The timetag of the last command on the output-link
+   epmem_last_ret_id          - This value gets incremeted at each retrieval. It's
+                            currently used by the matcher to keep track of the
+                            best match for this retrieval in wmetree->last_usage
+   epmem_num_queries          - Total number of queries that have been performed so far
+   epmem_header_stack         - A stack of epmem_header structs used to mirror the
+                            current state stack in WM and keep track of the
+                            ^epmem link attached to each one.
+   epmem_save_filename        - set this to a string containing a legit filename
+                            and the code will save episodic memories
+   epmem_load_filename        - set this to a string containing a legit filename
+                            and the code will load episodic memories
+   
+*/
+    typedef struct wmetree_struct wmetree;
+    typedef struct arraylist_struct arraylist;
+
+    
+    wme **epmem_curr_active_wmes;
+    wme **epmem_prev_active_wmes;
+    wmetree *epmem_wmetree;
+    int epmem_wmetree_size;
+    arraylist *epmem_memories;
+    unsigned long epmem_last_tag;
+    long epmem_last_ret_id;
+    long epmem_num_queries;
+    arraylist *epmem_header_stack;
+    char epmem_save_filename[1024];
+    char epmem_load_filename[1024];
+
+    //These timers are used for analyzing epmem performance
     struct timeval epmem_start_time;
     struct timeval epmem_total_time;
 
