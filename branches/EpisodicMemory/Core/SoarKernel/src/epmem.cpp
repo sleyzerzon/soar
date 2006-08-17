@@ -43,6 +43,8 @@
 extern unsigned long compress(unsigned long h, short num_bits);
 extern unsigned long hash_string(const char *s);
 
+//Uncomment this to make epmem a no-op
+//#define DISABLE_EPMEM
 
 /* EpMem constants
    
@@ -51,7 +53,7 @@ extern unsigned long hash_string(const char *s);
    num_wmes_changed - number of wmes in the current list that must be
                       different from the previous list to trigger
                       a new memory.
-   memories_init_size  - starting size for the g_memories array
+   memories_init_size  - starting size for the thisAgent->epmem_memories array
    memory_match_wait   - How long to wait before memories can be recalled.  This
                          value is expressed in the number of newer memories that
                          must exist before this one is retrievable.
@@ -89,7 +91,7 @@ extern unsigned long hash_string(const char *s);
  *             benefit from this struct and its related routines.
  *
  *             I use an arraylist to store each episodic memory (as a list of
- *             pointers into g_wmetree).  I also use it in the wmetree stuct to
+ *             pointers into thisAgent->epmem_wmetree_size).  I also use it in the wmetree stuct to
  *             store a list of pointers to memories that use that node.
  *
  *             array - an array of void pointers
@@ -186,7 +188,7 @@ typedef struct actwme_struct
  * episodic_memory - This data structure contains a single episodic memory.
  *
  *         content     - a list of actwme structs.
- *         index       - this memory's index in the g_memories arraylist
+ *         index       - this memory's index in the thisAgent->epmem_memories arraylist
  *         last_usage  - the number of the last retrieval that partially
  *                       matched this memory
  *         match_score - the total match score from the last partial match
@@ -230,7 +232,7 @@ typedef struct epmem_command_struct
  * epmem_header     - An arraylist of these is used to keep track of the
  *                    ^epmem link attached to each state in working memory
  *
- *  index           - the index of this header in g_header_stack.  This
+ *  index           - the index of this header in thisAgent->epmem_header_stack.  This
  *                    index is used to reference the assoc_wmes arraylist
  *                    in a wmetree node
  *  state           - the state that ^epmem is attached to
@@ -281,53 +283,11 @@ typedef struct epmem_header_struct
 
 
 /*======================================================================
- * EpMem globals
- *----------------------------------------------------------------------
- */
-
-/*
-
-   g_current_active_wmes  - the n most active wmes in working memory
-   g_previous_active_wmes - the n most active wmes in working memory
-                            when the last memory was recorded
-   g_wmetree              - The head of a giant wmetree used to represent all
-                            the states that that agent has seen so far.  This is,
-                            in effect, the episodic store of the agent.
-   g_wmetree_size         - The number of nodes in g_wmetree
-   g_memories             - This is an array of all the memories that the
-                            agent has.  Each memory is an index into g_wmetree
-   g_last_tag             - The timetag of the last command on the output-link
-   g_last_ret_id          - This value gets incremeted at each retrieval. It's
-                            currently used by the matcher to keep track of the
-                            best match for this retrieval in wmetree->last_usage
-   g_num_queries          - Total number of queries that have been performed so far
-   g_header_stack         - A stack of epmem_header structs used to mirror the
-                            current state stack in WM and keep track of the
-                            ^epmem link attached to each one.
-   g_save_filename        - set this to a string containing a legit filename
-                            and the code will save episodic memories
-   g_load_filename        - set this to a string containing a legit filename
-                            and the code will load episodic memories
-   
-*/
-
-//%%%FIXME:  move these globals to current_agent()
-wme **g_current_active_wmes;
-wme **g_previous_active_wmes;
-wmetree g_wmetree;
-int g_wmetree_size;
-arraylist *g_memories;
-unsigned long g_last_tag = 0;
-long g_last_ret_id = 0;
-long g_num_queries = 0;
-arraylist *g_header_stack;
-char *g_save_filename = NULL; //"c:\\temp\\epmems_save.txt";
-char *g_load_filename = NULL; //"c:\\temp\\epmems_15000cycles_modsimplebot_chunky2map.txt"; //NULL; 
-
-/* EpMem macros
+  EpMem macros
 
    IS_LEAF_WME(w) - is w a leaf WME? (i.e., value is not an identifier)
    
+ *----------------------------------------------------------------------
 */
 #define IS_LEAF_WME(w) ((w)->value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE)
 
@@ -1405,6 +1365,12 @@ int wme_equals_node(wme *w, wmetree *node)
         return FALSE;
     }
 
+    //Ensure values are of the same type
+    if (w->value->common.symbol_type != node->val_type)
+    {
+        return FALSE;
+    }
+
     //Compare value
     switch(node->val_type)
     {
@@ -1489,7 +1455,7 @@ void print_wmetree(agent *thisAgent, wmetree *node, int indent, int depth)
    epmem_find_wmetree_entry
 
    Finds a descendent entry that has a particular id and attribute in a
-   given memory.  If the given parent is &g_wmetree then it is assumed
+   given memory.  If the given parent is thisAgent->epmem_wmetree then it is assumed
    to be a wildcard match.
 
    Returns NULL if not found.
@@ -1505,7 +1471,7 @@ wmetree *epmem_find_wmetree_entry(agent *thisAgent, arraylist *epmem, wmetree *i
     for(i = 0; i < epmem->size; i++)
     {
         wmetree *node = ((actwme *)get_arraylist_entry(thisAgent, epmem, i))->node;
-        if ( (id == &g_wmetree) || (id == node->parent) )
+        if ( (id == thisAgent->epmem_wmetree) || (id == node->parent) )
         { 
             if (strcmp(node->attr, s) == 0)
             {
@@ -1549,7 +1515,7 @@ actwme *epmem_find_actwme_entry(agent *thisAgent, arraylist *epmem, wmetree *tar
 
    thisAgent - duh
    epmem - an arraylist containing the epmem
-   node - the wmetree this memory is drawn from (probably &g_wmetree)
+   node - the wmetree this memory is drawn from (probably thisAgent->epmem_wmetree)
    indent - number of space to indent
    depth - how deep to traverse the tree
    attrs - an optional string containing a list of attributes that
@@ -1662,12 +1628,12 @@ void print_memory_graphically(agent *thisAgent, arraylist *epmem)
     char dir_char = '?';
 
     //Find the direction of movement
-    ol = epmem_find_wmetree_entry(thisAgent, epmem, &g_wmetree, "output-link");
+    ol = epmem_find_wmetree_entry(thisAgent, epmem, thisAgent->epmem_wmetree, "output-link");
     move = epmem_find_wmetree_entry(thisAgent, epmem, ol, "move");
     direction = epmem_find_wmetree_entry(thisAgent, epmem, move, "direction");
 
     //Find the current score
-    il = epmem_find_wmetree_entry(thisAgent, epmem, &g_wmetree, "input-link");
+    il = epmem_find_wmetree_entry(thisAgent, epmem, thisAgent->epmem_wmetree, "input-link");
     eater = epmem_find_wmetree_entry(thisAgent, epmem, il, "eater");
     score = epmem_find_wmetree_entry(thisAgent, epmem, eater, "score");
     
@@ -1865,7 +1831,7 @@ Symbol *update_wmetree(agent *thisAgent,
                 if (childnode == NULL)
                 {
                     childnode = make_wmetree_node(thisAgent, wmes[i]);
-                    childnode->id = g_wmetree_size++;
+                    childnode->id = thisAgent->epmem_wmetree_size++;
                     childnode->parent = node;
                     childnode->depth = node->depth + 1;
                     add_to_hash_table(thisAgent, node->children, childnode);
@@ -2000,7 +1966,7 @@ void record_epmem(agent *thisAgent)
         curr_state = next_state;
 
         tc = sym->id.tc_num + 1;
-        sym = update_wmetree(thisAgent, &g_wmetree, sym, curr_state, tc);
+        sym = update_wmetree(thisAgent, thisAgent->epmem_wmetree, sym, curr_state, tc);
 
         //Update the assoc_memories link on each wmetree node in curr_state
         for(i = 0; i < curr_state->size; i++)
@@ -2022,10 +1988,10 @@ void record_epmem(agent *thisAgent)
                 //Test to see if the new arraylist has too many entries.
                 //If so, this node has become too ubiquitous and will no
                 //longer be used in mat ching
-                if (g_memories->size > ubiquitous_max)
+                if (thisAgent->epmem_memories->size > ubiquitous_max)
                 {
                     float ubiquity =
-                        ((float)node->assoc_memories->size) / ((float)g_memories->size);
+                        ((float)node->assoc_memories->size) / ((float)thisAgent->epmem_memories->size);
                     if (ubiquity > ubiquitous_threshold)
                     {
                         node->ubiquitous = TRUE;
@@ -2043,14 +2009,14 @@ void record_epmem(agent *thisAgent)
     new_epmem->content = curr_state;
 
     //Store the recorded memory
-    new_epmem->index = g_memories->size;
-    append_entry_to_arraylist(thisAgent, g_memories, (void *)new_epmem);
+    new_epmem->index = thisAgent->epmem_memories->size;
+    append_entry_to_arraylist(thisAgent, thisAgent->epmem_memories, (void *)new_epmem);
 
 //      //%%%DEBUGGING
-//      print(thisAgent, "\nRECORDED MEMORY %d:\n", g_memories->size - 1);
+//      print(thisAgent, "\nRECORDED MEMORY %d:\n", thisAgent->epmem_memories->size - 1);
 //      print_memory(thisAgent,
-//                   ((episodic_memory *)get_arraylist_entry(thisAgent, g_memories,g_memories->size - 1))->content,
-//                   &g_wmetree, 0, 5);
+//                   ((episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories,thisAgent->epmem_memories->size - 1))->content,
+//                   thisAgent->epmem_wmetree, 0, 5);
     
 }//record_epmem
 
@@ -2310,10 +2276,10 @@ void consider_new_epmem_via_output(agent *thisAgent)
     {
         for (w = s->wmes; w != NIL; w = w->next)
         {
-            if (w->timetag > g_last_tag)
+            if (w->timetag > thisAgent->epmem_last_tag)
             {
                 bNewMemory = TRUE;
-                g_last_tag = w->timetag;
+                thisAgent->epmem_last_tag = w->timetag;
             }
         }
     }
@@ -2340,7 +2306,10 @@ void consider_new_epmem_via_activation(agent *thisAgent)
 {
     int i;
 
-    i = get_most_activated_wmes(thisAgent, g_current_active_wmes, num_active_wmes, MAX_DECAY);
+    i = get_most_activated_wmes(thisAgent,
+                                thisAgent->epmem_curr_active_wmes,
+                                num_active_wmes,
+                                MAX_DECAY);
     if (i < num_active_wmes)
     {
         // no WMEs are activated right now
@@ -2348,8 +2317,8 @@ void consider_new_epmem_via_activation(agent *thisAgent)
     }
 
     //See if enough of these WMEs have changed
-    qsort( (void *)g_current_active_wmes, (size_t)num_active_wmes, sizeof( wme * ),compare_ptr );
-    i = wme_array_diff(g_current_active_wmes, g_previous_active_wmes, num_active_wmes);
+    qsort( (void *)thisAgent->epmem_curr_active_wmes, (size_t)num_active_wmes, sizeof( wme * ),compare_ptr );
+    i = wme_array_diff(thisAgent->epmem_curr_active_wmes, thisAgent->epmem_prev_active_wmes, num_active_wmes);
     
     if ( i >= num_wmes_changed )
     {
@@ -2357,7 +2326,7 @@ void consider_new_epmem_via_activation(agent *thisAgent)
         //the next memory
         for(i = 0; i < num_active_wmes; i++)
         {
-            g_previous_active_wmes[i] = g_current_active_wmes[i];
+            thisAgent->epmem_prev_active_wmes[i] = thisAgent->epmem_curr_active_wmes[i];
         }
         
         record_epmem(thisAgent);         // The big one
@@ -2424,7 +2393,7 @@ void install_match_metadata(agent *thisAgent, epmem_header *h)
     //is roughly equivalent to the present (as opposed to the the past).
     new_wme = add_input_wme(thisAgent, h->epmem,
                             make_sym_constant(thisAgent, "present-id"),
-                            make_int_constant(thisAgent, g_memories->size));
+                            make_int_constant(thisAgent, thisAgent->epmem_memories->size));
     append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
@@ -2480,14 +2449,14 @@ void epmem_clear_curr_mem(agent *thisAgent, epmem_header *h)
     wme *w;
 
     //Check for "no-retrieval" wme
-   if (get_arraylist_entry(thisAgent, g_wmetree.assoc_wmes,h->index) != NULL)
+   if (get_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes,h->index) != NULL)
     {
-        w = (wme *)get_arraylist_entry(thisAgent, g_wmetree.assoc_wmes,h->index);
+        w = (wme *)get_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes,h->index);
 
         remove_fake_preference_for_epmem_wme(thisAgent, w);
         remove_input_wme(thisAgent, w);
         wme_remove_ref(thisAgent, w);
-        set_arraylist_entry(thisAgent, g_wmetree.assoc_wmes, h->index, NULL);
+        set_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes, h->index, NULL);
 
         return;
     }
@@ -2600,10 +2569,10 @@ int compare_memories_ideal(agent *thisAgent, arraylist *epmem1, arraylist *epmem
     char *direction = NULL;
 
     //Compare the direction eater is travelling
-    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, &g_wmetree, "output-link");
+    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, thisAgent->epmem_wmetree, "output-link");
     node1 = epmem_find_wmetree_entry(thisAgent, epmem1, node1, "move");
     node1 = epmem_find_wmetree_entry(thisAgent, epmem1, node1, "direction");
-    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, &g_wmetree, "output-link");
+    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, thisAgent->epmem_wmetree, "output-link");
     node2 = epmem_find_wmetree_entry(thisAgent, epmem2, node2, "move");
     node2 = epmem_find_wmetree_entry(thisAgent, epmem2, node2, "direction");
     if ( (node1 != NULL) && (node1 == node2) )
@@ -2617,9 +2586,9 @@ int compare_memories_ideal(agent *thisAgent, arraylist *epmem1, arraylist *epmem
     }
 
     //Find the eater's cell
-    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, &g_wmetree, "input-link");
+    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, thisAgent->epmem_wmetree, "input-link");
     node1 = epmem_find_wmetree_entry(thisAgent, epmem1, node1, "my-location");
-    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, &g_wmetree, "input-link");
+    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, thisAgent->epmem_wmetree, "input-link");
     node2 = epmem_find_wmetree_entry(thisAgent, epmem2, node2, "my-location");
 
     //Compare destination cell content
@@ -2855,10 +2824,10 @@ int record_cue_element_match(agent *thisAgent,
         }//if
             
         //Record that there was a match
-        if (epmem->last_usage != g_last_ret_id)
+        if (epmem->last_usage != thisAgent->epmem_last_ret_id)
         {
             //Reinit the match data from last time
-            epmem->last_usage = g_last_ret_id;
+            epmem->last_usage = thisAgent->epmem_last_ret_id;
             comp_count++;
             epmem->match_score = 0;
             if (negcue)  //**See CAVEAT above
@@ -2909,7 +2878,7 @@ int record_cue_element_match(agent *thisAgent,
 //                        epmem->index,
 //                        epmem->match_score,
 //                        epmem->num_matches);
-//                  print_memory(thisAgent, epmem->content, &g_wmetree, 2, 5,
+//                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 5,
 //                               "io input-link x y direction radar-setting radar-status");
             }//if
         }//if
@@ -2937,7 +2906,7 @@ int record_cue_element_match(agent *thisAgent,
 /* ===================================================================
    find_best_match
 
-   Finds the index of the episodic memory in g_memories that most closely
+   Finds the index of the episodic memory in thisAgent->epmem_memories that most closely
    matches the cue given to the function.  Meta information about the
    match is placed in the given epmem_header.
 
@@ -2960,21 +2929,21 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
     //%%%DEBUGGING
     print(thisAgent, "\nRECEIVED THIS CUE");
     print(thisAgent, "\n(negative)");
-    print_memory(thisAgent, negcue, &g_wmetree, 2, 5);
+    print_memory(thisAgent, negcue, thisAgent->epmem_wmetree, 2, 5);
     print(thisAgent, "(positive)");
-    print_memory(thisAgent, cue, &g_wmetree, 2, 5);
+    print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
 
     start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
 
     //If there aren't enough memories to examine just return
     //the first one
-    if (g_memories->size <= memory_match_wait)
+    if (thisAgent->epmem_memories->size <= memory_match_wait)
     {
         return 0;
     }
 
     //Give this match a unique id
-    g_last_ret_id++;
+    thisAgent->epmem_last_ret_id++;
 
     /*
      * Step 1:  Process the negative cue.
@@ -3100,7 +3069,7 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
     //%%%DEBUGGING
     stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
     stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
-    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, g_memories->size);
+    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
     if (best_mem_via_score != NULL) print(thisAgent, "\nbest match score=%d\n", best_mem_via_score->match_score);
     if (best_mem_via_cardinality != NULL) print(thisAgent, "\nbest match cardinality=%d of %d\n", best_mem_via_cardinality->num_matches, total_cardinality);
     start_timer(thisAgent, &(thisAgent->epmem_start_time));
@@ -3122,7 +3091,7 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
               selected_mem->index,
               selected_mem->match_score,
               selected_mem->num_matches);
-        print_memory(thisAgent, selected_mem->content, &g_wmetree, 2, 5,
+        print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 5,
                      "io input-link x y direction radar-setting radar-status");
     }
     
@@ -3247,19 +3216,19 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 
 //      //%%%DEBUGGING
 //      print(thisAgent, "\nRECEIVED THIS CUE", best_score);
-//      print_memory(thisAgent, cue, &g_wmetree, 2, 5);
+//      print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
     
     start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
 
     //If there aren't enough memories to examine just return
     //the first one
-    if (g_memories->size <= memory_match_wait)
+    if (thisAgent->epmem_memories->size <= memory_match_wait)
     {
         return 0;
     }
 
     //Give this match a unique id
-    g_last_ret_id++;
+    thisAgent->epmem_last_ret_id++;
 
     //Every memory gets a match score boost if it contains a memory
     //that's in the cue.  So we need to loop over the assoc_memories
@@ -3294,10 +3263,10 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
                 (episodic_memory *)get_arraylist_entry(thisAgent, aw_cue->node->assoc_memories,j);
 
             //Record that there was a match
-            if (epmem->last_usage != g_last_ret_id)
+            if (epmem->last_usage != thisAgent->epmem_last_ret_id)
             {
                 //Reinit the match data from last time
-                epmem->last_usage = g_last_ret_id;
+                epmem->last_usage = thisAgent->epmem_last_ret_id;
                 comp_count++;
                 epmem->match_score = 0;
                 epmem->num_matches = 1;
@@ -3329,7 +3298,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 //                            "\nRejected the following memory (#%d) with match score %d:",
 //                            best_mem_via_score->index,
 //                            best_score);
-//                      print_memory(thisAgent, best_mem_via_score->content, &g_wmetree, 2, 5,
+//                      print_memory(thisAgent, best_mem_via_score->content, thisAgent->epmem_wmetree, 2, 5,
 //                                   "io input-link x y direction radar-setting");
 //                  }
                 
@@ -3342,7 +3311,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 //                  print(thisAgent,
 //                        "\nRejected matching memory (#%d) with match score %d:",
 //                        epmem->index, epmem->match_score);
-//                  print_memory(thisAgent, epmem->content, &g_wmetree, 2, 6,
+//                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 6,
 //                               "io input-link x y radar radar position radar radar position");
 //              }
             
@@ -3378,7 +3347,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
     //%%%DEBUGGING
     stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
     stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
-    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, g_memories->size);
+    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
     print(thisAgent, "\nbest match score=%d\n", best_score);
     print(thisAgent, "\nbest match cardinality=%d of %d\n", best_cardinality, cue_cardinality);
     start_timer(thisAgent, &(thisAgent->epmem_start_time));
@@ -3399,7 +3368,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 //                    "\nSelected INCORRECT memory (#%d) with match score %d:",
 //                    selected_mem->index, best_score);
 //          }             
-//          print_memory(thisAgent, selected_mem->content, &g_wmetree, 2, 6,
+//          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 6,
 //                       "io input-link x y direction radar radar position radar radar radar-distance radar-setting radar-status");
 //      }
 
@@ -3582,19 +3551,19 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 
 //      //%%%DEBUGGING
 //      print(thisAgent, "\nRECEIVED THIS CUE", best_score);
-//      print_memory(thisAgent, cue, &g_wmetree, 2, 5);
+//      print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
     
     start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
 
     //If there aren't enough memories to examine just return
     //the first one
-    if (g_memories->size <= memory_match_wait)
+    if (thisAgent->epmem_memories->size <= memory_match_wait)
     {
         return 0;
     }
 
     //Give this match a unique id
-    g_last_ret_id++;
+    thisAgent->epmem_last_ret_id++;
 
     //Every memory gets a match score boost if it contains a memory
     //that's in the cue.  So we need to loop over the assoc_memories
@@ -3629,10 +3598,10 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
                 (episodic_memory *)get_arraylist_entry(thisAgent, aw_cue->node->assoc_memories,j);
 
             //Record that there was a match
-            if (epmem->last_usage != g_last_ret_id)
+            if (epmem->last_usage != thisAgent->epmem_last_ret_id)
             {
                 //Reinit the match data from last time
-                epmem->last_usage = g_last_ret_id;
+                epmem->last_usage = thisAgent->epmem_last_ret_id;
                 comp_count++;
                 epmem->match_score = 0;
                 epmem->num_matches = 1;
@@ -3664,7 +3633,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 //                            "\nRejected the following memory (#%d) with match score %d:",
 //                            best_mem_via_score->index,
 //                            best_score);
-//                      print_memory(thisAgent, best_mem_via_score->content, &g_wmetree, 2, 5,
+//                      print_memory(thisAgent, best_mem_via_score->content, thisAgent->epmem_wmetree, 2, 5,
 //                                   "io input-link x y radar energy position");
 //                  }
                 
@@ -3677,7 +3646,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 //                  print(thisAgent,
 //                        "\nRejected matching memory (#%d) with match score %d:",
 //                        epmem->index, epmem->match_score);
-//                  print_memory(thisAgent, epmem->content, &g_wmetree, 2, 6,
+//                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 6,
 //                               "io input-link x y radar energy position radar energy position");
 //              }
             
@@ -3713,7 +3682,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
     //%%%DEBUGGING
     stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
     stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
-    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, g_memories->size);
+    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
     print(thisAgent, "\nbest match score=%d\n", best_score);
     print(thisAgent, "\nbest match cardinality=%d of %d\n", best_cardinality, cue_cardinality);
     start_timer(thisAgent, &(thisAgent->epmem_start_time));
@@ -3734,7 +3703,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 //                    "\nSelected INCORRECT memory (#%d) with match score %d:",
 //                    selected_mem->index, best_score);
 //          }             
-//          print_memory(thisAgent, selected_mem->content, &g_wmetree, 2, 6,
+//          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 6,
 //                       "io input-link x y direction radar energy position radar energy radar-distance radar-setting radar-status");
 //      }
 
@@ -3867,12 +3836,12 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
     //Create an arraylist representing the current query
     al_query = make_arraylist(thisAgent, 32);
     tc = h->query->id.tc_num + 1;
-    update_wmetree(thisAgent, &g_wmetree, h->query, al_query, tc);
+    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query, al_query, tc);
 
     //Create an arraylist representing the current negative query
     al_negquery = make_arraylist(thisAgent, 32);
     tc = h->negquery->id.tc_num + 1;
-    update_wmetree(thisAgent, &g_wmetree, h->negquery, al_negquery, tc);
+    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery, al_negquery, tc);
 
     //If both queries are empty then we're done
     if ( (al_query->size == 0) && (al_negquery->size == 0) )
@@ -3883,7 +3852,7 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
     }
 
     //Diagnostic Counter
-    g_num_queries++;
+    thisAgent->epmem_num_queries++;
 
     //Match query to current memories list
     h->curr_memory = find_best_match(thisAgent, h, al_query, al_negquery);
@@ -3912,7 +3881,7 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
         new_wme = add_input_wme(thisAgent, h->retrieved,
                                 make_sym_constant(thisAgent, "no-retrieval"),
                                 make_sym_constant(thisAgent, "true"));
-        set_arraylist_entry(thisAgent, g_wmetree.assoc_wmes, h->index, new_wme);
+        set_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes, h->index, new_wme);
         wme_add_ref(new_wme);
         new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
     }
@@ -4123,11 +4092,11 @@ void respond_to_command_next(agent *thisAgent, epmem_header *h)
 
     //Check that there is a next memory available
     if ( (h->curr_memory != NULL)
-         && (h->curr_memory->index < g_memories->size - memory_match_wait) )
+         && (h->curr_memory->index < thisAgent->epmem_memories->size - memory_match_wait) )
     {
         //Update the current memory pointer to point to the next epmem
         h->curr_memory =
-            (episodic_memory *)get_arraylist_entry(thisAgent, g_memories,
+            (episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories,
                                                    h->curr_memory->index + 1);
             
         //Install the new memory
@@ -4141,7 +4110,7 @@ void respond_to_command_next(agent *thisAgent, epmem_header *h)
         wme *w = add_input_wme(thisAgent, h->retrieved,
                                make_sym_constant(thisAgent, "no-retrieval"),
                                make_sym_constant(thisAgent, "true"));
-        set_arraylist_entry(thisAgent, g_wmetree.assoc_wmes, h->index, w);
+        set_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes, h->index, w);
         wme_add_ref(w);
         w->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, w);
     }
@@ -4210,7 +4179,7 @@ void epmem_update_header_stack(agent *thisAgent)
 
 
     /*
-     * Find the lowest state in g_header_stack that has an analog
+     * Find the lowest state in thisAgent->epmem_header_stack that has an analog
      * in working memory.  As we do the search, record any states
      * that are lower than this in the new_states list.
      */
@@ -4219,19 +4188,19 @@ void epmem_update_header_stack(agent *thisAgent)
     sym = (thisAgent->bottom_goal);
     while(sym != (thisAgent->top_goal))
     {
-        //Search for an analog to the state in g_header_stack
-        for(i = g_header_stack->size - 1; i >= 0; i--)
+        //Search for an analog to the state in thisAgent->epmem_header_stack
+        for(i = thisAgent->epmem_header_stack->size - 1; i >= 0; i--)
         {
-            h = (epmem_header *)get_arraylist_entry(thisAgent, g_header_stack,i);
+            h = (epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack,i);
             if (h->state == sym)
             {
                 //An analog was found, remove any of its children and break
                 int j;
-                for(j = g_header_stack->size - 1; j > i; j--)
+                for(j = thisAgent->epmem_header_stack->size - 1; j > i; j--)
                 {
                     destroy_epmem_header(
                         thisAgent, 
-                        (epmem_header *)remove_entry_from_arraylist(g_header_stack, j));
+                        (epmem_header *)remove_entry_from_arraylist(thisAgent->epmem_header_stack, j));
                 }
 
                 bFound = TRUE;
@@ -4253,21 +4222,21 @@ void epmem_update_header_stack(agent *thisAgent)
 
     /*
      * The states in new_states need an ^epmem link and a corresponding
-     * entry in the g_header_stack list.
+     * entry in the thisAgent->epmem_header_stack list.
      */
     for(i = new_states->size - 1; i >= 0; i--)
     {
         h = make_epmem_header(thisAgent, (Symbol *)get_arraylist_entry(thisAgent, new_states,i));
-        h->index = g_header_stack->size;
-        append_entry_to_arraylist(thisAgent, g_header_stack, (void *)h);
+        h->index = thisAgent->epmem_header_stack->size;
+        append_entry_to_arraylist(thisAgent, thisAgent->epmem_header_stack, (void *)h);
     }
 
 //      //%%%DEBUGGING:  Print the current header stack
 //      print(thisAgent, "\nEpMem Header Stack: ");
-//      for(i = 0; i < g_header_stack->size; i++)
+//      for(i = 0; i < thisAgent->epmem_header_stack->size; i++)
 //      {
 //          print_with_symbols("%y ",
-//                             ((epmem_header *)get_arraylist_entry(thisAgent, g_header_stack,i))->state);
+//                             ((epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack,i))->state);
 //      }
 //      print(thisAgent, "\n");
     
@@ -4291,7 +4260,7 @@ void epmem_print_curr_memory(agent *thisAgent, epmem_header *h)
     }
     
     //Print the current memory
-    print(thisAgent, "\nCURRENT MEMORY:  %d of %d\t\t", h->curr_memory->index, g_memories->size);
+    print(thisAgent, "\nCURRENT MEMORY:  %d of %d\t\t", h->curr_memory->index, thisAgent->epmem_memories->size);
     print_memory_graphically(thisAgent, h->curr_memory->content);
 
 }//epmem_print_curr_memory
@@ -4328,7 +4297,7 @@ int epmem_calc_wmetree_size(wmetree *node)
 /* ===================================================================
    epmem_print_detailed_usage_memories
 
-   Prints a memory usage trace for g_memories to a given file handle.
+   Prints a memory usage trace for thisAgent->epmem_memories to a given file handle.
 
    Created: 15 June 2004
    =================================================================== */
@@ -4349,9 +4318,9 @@ void epmem_print_detailed_usage_memories(agent *thisAgent, FILE *f)
         histogram[i] = 0;
     }
 
-    for(i = 0; i < g_memories->size; i++)
+    for(i = 0; i < thisAgent->epmem_memories->size; i++)
     {
-        int memsize =  ((arraylist *)get_arraylist_entry(thisAgent, g_memories,i))->size;
+        int memsize =  ((arraylist *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories,i))->size;
         if (memsize > HISTOGRAM_SIZE)
         {
             fprintf(f, "ERROR!  Memories are too large.\n");
@@ -4454,7 +4423,7 @@ void epmem_print_detailed_usage_wmetree(FILE *f, wmetree *node)
    =================================================================== */
 void epmem_print_mem_usage(agent *thisAgent)
 {
-    wmetree *parent = &g_wmetree;
+    wmetree *parent = thisAgent->epmem_wmetree;
     wmetree *child;
     arraylist *queue = make_arraylist(thisAgent, 32);
     int qpos = 0;                // current position in the queue
@@ -4463,7 +4432,7 @@ void epmem_print_mem_usage(agent *thisAgent)
     int num_am_ptrs = 0;
     int num_strings = 0;
     int total_strlen = 0;
-    int num_epmems = g_memories->size;
+    int num_epmems = thisAgent->epmem_memories->size;
     int num_actwmes = 0;
     int i;
     episodic_memory *epmem;
@@ -4502,9 +4471,9 @@ void epmem_print_mem_usage(agent *thisAgent)
 
     destroy_arraylist(thisAgent, queue);
 
-    for(i = 1; i < g_memories->size; i++)
+    for(i = 1; i < thisAgent->epmem_memories->size; i++)
     {
-        epmem = (episodic_memory *)get_arraylist_entry(thisAgent, g_memories, i);
+        epmem = (episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories, i);
         if (epmem->content != NULL)
         {
             num_actwmes += epmem->content->size;
@@ -4645,7 +4614,7 @@ void epmem_print_query_usage_wmetree(agent *thisAgent)
         num_nodes[i] = 0;
     }
 
-    epquw_helper(thisAgent, &g_wmetree, total_queries, num_nodes, &largest);
+    epquw_helper(thisAgent, thisAgent->epmem_wmetree, total_queries, num_nodes, &largest);
     
     if (num_nodes[2] == 0)
     {
@@ -4773,7 +4742,7 @@ int epmem_save_wmetree_to_file(agent *thisAgent,
    epmem_save_epmems_to_file()
 
    This routine saves all all entries in a given arraylist of
-   episodic_memory structs (usually g_memories).
+   episodic_memory structs (usually thisAgent->epmem_memories).
    
    f - file to write to
    node - root of tree to write
@@ -4794,7 +4763,7 @@ int epmem_save_epmems_to_file(agent *thisAgent,
     for(i = 1; i < memlist->size; i++)
     {
         episodic_memory *epmem =
-            (episodic_memory *)get_arraylist_entry(thisAgent, g_memories, i);
+            (episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories, i);
         
         //Write index
         fprintf(f, "%i ", i);
@@ -4838,18 +4807,18 @@ void epmem_save_episodic_memory_to_file(agent *thisAgent)
 {
     FILE *f;
 
-    if (g_save_filename == NULL) return;
+    if (strlen(thisAgent->epmem_save_filename) == 0) return;
     
-    f = fopen(g_save_filename, "w");
+    f = fopen(thisAgent->epmem_save_filename, "w");
     if (f == NULL)
     {
         print(thisAgent, "\nERROR:  could not save episodes to file: ");
-        print(thisAgent, g_save_filename);
+        print(thisAgent, thisAgent->epmem_save_filename);
         return;
     }//if
 
-    epmem_save_wmetree_to_file(thisAgent, f, &g_wmetree, 0, 0);
-    epmem_save_epmems_to_file(thisAgent, f, g_memories);
+    epmem_save_wmetree_to_file(thisAgent, f, thisAgent->epmem_wmetree, 0, 0);
+    epmem_save_epmems_to_file(thisAgent, f, thisAgent->epmem_memories);
 
     fclose(f);
     
@@ -4874,18 +4843,18 @@ void epmem_clear_all_memories(agent *thisAgent)
     /*
      * Step 1: Remove all currently retreived epmems from WM
      */
-    for(i = 0; i < g_header_stack->size; i++)
+    for(i = 0; i < thisAgent->epmem_header_stack->size; i++)
     {
-        epmem_header *h = (epmem_header *)get_arraylist_entry(thisAgent, g_header_stack, i);
+        epmem_header *h = (epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack, i);
         epmem_clear_curr_mem(thisAgent, h);
     }
     
     /*
      * Step 2: Remove all episodic memories
      */
-    for(i = 0; i < g_memories->size; i++)
+    for(i = 0; i < thisAgent->epmem_memories->size; i++)
     {
-        epmem = (episodic_memory *)get_arraylist_entry(thisAgent, g_memories, i);
+        epmem = (episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories, i);
 
         //Clean up the actwme list (but not the associated wmetree nodes)
         for(j = 0; j < epmem->content->size; j++)
@@ -4898,29 +4867,29 @@ void epmem_clear_all_memories(agent *thisAgent)
 
         destroy_arraylist(thisAgent, epmem->content);
         free_memory(thisAgent, epmem, MISCELLANEOUS_MEM_USAGE);
-        set_arraylist_entry(thisAgent, g_memories, i, NULL);
+        set_arraylist_entry(thisAgent, thisAgent->epmem_memories, i, NULL);
     }//for
-    g_memories->size = 0;
+    thisAgent->epmem_memories->size = 0;
     
     /*
      * Step 3: Remove all nodes from the wmetree
      */
-    for (hash_value = 0; hash_value < g_wmetree.children->size; hash_value++)
+    for (hash_value = 0; hash_value < thisAgent->epmem_wmetree->children->size; hash_value++)
     {
-        child = (wmetree *) (*(g_wmetree.children->buckets + hash_value));
+        child = (wmetree *) (*(thisAgent->epmem_wmetree->children->buckets + hash_value));
         while (child != NULL)
         {
             next_child = child->next;
-            remove_from_hash_table(thisAgent, g_wmetree.children, child);
+            remove_from_hash_table(thisAgent, thisAgent->epmem_wmetree->children, child);
             destroy_wmetree(thisAgent, child);
             child = next_child;
         }//while
     }//for
 
     //Sanity check for lost retrieved memories
-    for(i = 0; i < g_wmetree.assoc_wmes->size; i++)
+    for(i = 0; i < thisAgent->epmem_wmetree->assoc_wmes->size; i++)
     {
-        w = (wme *)get_arraylist_entry(thisAgent, g_wmetree.assoc_wmes, i);
+        w = (wme *)get_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes, i);
         if (w != NULL)
         {
             print(thisAgent, "ERROR!:  ROOT  wmetree node still has associated WMEs.");
@@ -4928,15 +4897,15 @@ void epmem_clear_all_memories(agent *thisAgent)
     }//for
 
     //Remove and recreate the children (probably overkill)
-    free_memory(thisAgent, g_wmetree.children->buckets, HASH_TABLE_MEM_USAGE);
-    free_memory (thisAgent, g_wmetree.children, HASH_TABLE_MEM_USAGE);
-    g_wmetree.children = make_hash_table(thisAgent, 0, hash_wmetree);;
+    free_memory(thisAgent, thisAgent->epmem_wmetree->children->buckets, HASH_TABLE_MEM_USAGE);
+    free_memory (thisAgent, thisAgent->epmem_wmetree->children, HASH_TABLE_MEM_USAGE);
+    thisAgent->epmem_wmetree->children = make_hash_table(thisAgent, 0, hash_wmetree);;
 
 
     //Remove and recreate the assoc_wmes list (probably overkill)
-    destroy_arraylist(thisAgent, g_wmetree.assoc_wmes);
-    g_wmetree.assoc_wmes = make_arraylist(thisAgent, 20);
-    g_wmetree_size = 0;
+    destroy_arraylist(thisAgent, thisAgent->epmem_wmetree->assoc_wmes);
+    thisAgent->epmem_wmetree->assoc_wmes = make_arraylist(thisAgent, 20);
+    thisAgent->epmem_wmetree_size = 0;
     
     
     
@@ -4987,7 +4956,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
     nodelist = make_arraylist(thisAgent, 100);
 
     //Set the first entry to the root node
-    set_arraylist_entry(thisAgent, nodelist, 0, &g_wmetree);
+    set_arraylist_entry(thisAgent, nodelist, 0, thisAgent->epmem_wmetree);
     
     //Init node pointer to the root
     node = root_node;
@@ -5067,7 +5036,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
         }
         add_to_hash_table(thisAgent, parent_node->children, node);
         node->parent = parent_node;
-        g_wmetree_size++;
+        thisAgent->epmem_wmetree_size++;
 
         //Read depth
         str = strtok(NULL, " ");
@@ -5090,7 +5059,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
         {
             episodic_memory *epmem =
                 (episodic_memory *)get_arraylist_entry(thisAgent,
-                                                       g_memories,
+                                                       thisAgent->epmem_memories,
                                                        mem_id);
             if (epmem == NULL)
             {
@@ -5104,7 +5073,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                 epmem->index = mem_id;
 
                 //Add the structure to the global memories list
-                set_arraylist_entry(thisAgent, g_memories, mem_id, (void *)epmem);
+                set_arraylist_entry(thisAgent, thisAgent->epmem_memories, mem_id, (void *)epmem);
             }//if
 
             //Add the structure to the assoc_memories list
@@ -5142,7 +5111,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
    This routine loads a list of episodic_memory structs (and their
    associated actwme lists) from a file.
 
-   NOTE:  The g_memories list is assumed to already contain init'd
+   NOTE:  The thisAgent->epmem_memories list is assumed to already contain init'd
           entries for all of these epmems (which is a side effect of
           epmem_load_wmetree_from_file() above).
    
@@ -5182,7 +5151,7 @@ int epmem_load_epmems_from_file(agent *thisAgent,
         str = strtok(buf, " ");
         my_index = atoi(str);
         epmem = (episodic_memory *)get_arraylist_entry(thisAgent,
-                                                       g_memories,
+                                                       thisAgent->epmem_memories,
                                                        my_index);
         if (epmem == NULL)
         {
@@ -5258,14 +5227,14 @@ void epmem_load_episodic_memory_from_file(agent *thisAgent)
     FILE *f;
     arraylist *nodelist;
 
-    if (g_load_filename == NULL) return;
+    if (strlen(thisAgent->epmem_load_filename) == 0) return;
 
     //Check for a good file
-    f = fopen(g_load_filename, "r");
+    f = fopen(thisAgent->epmem_load_filename, "r");
     if (f == NULL)
     {
         print(thisAgent, "\nERROR:  could not load episodes from file: ");
-        print(thisAgent, g_load_filename);
+        print(thisAgent, thisAgent->epmem_load_filename);
         return;
     }//if
 
@@ -5273,7 +5242,7 @@ void epmem_load_episodic_memory_from_file(agent *thisAgent)
     epmem_clear_all_memories(thisAgent);
 
     //Load the new memories
-    nodelist = epmem_load_wmetree_from_file(thisAgent, f, &g_wmetree, 0);
+    nodelist = epmem_load_wmetree_from_file(thisAgent, f, thisAgent->epmem_wmetree, 0);
     epmem_load_epmems_from_file(thisAgent, f, nodelist);
     
     fclose(f);
@@ -5298,6 +5267,10 @@ void epmem_update(agent *thisAgent)
 
     count++;
 
+#ifdef DISABLE_EPMEM
+    return;
+#endif
+    
     start_timer(thisAgent, &(thisAgent->epmem_start_time));
 
     //Update the stack of epmem_header structs
@@ -5315,9 +5288,9 @@ void epmem_update(agent *thisAgent)
      * Update the ^retrieved link on each epmem header as necessary
      */
 
-    for(i = 0; i < g_header_stack->size; i++)
+    for(i = 0; i < thisAgent->epmem_header_stack->size; i++)
     {
-        epmem_header *h = (epmem_header *)get_arraylist_entry(thisAgent, g_header_stack, i);
+        epmem_header *h = (epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack, i);
 
         //Retrieve any commands
         epmem_retrieve_commands(thisAgent, h);
@@ -5352,7 +5325,7 @@ void epmem_update(agent *thisAgent)
     }//for
 
     //Save the current epmem store at regular intervals
-    if ((count % epmem_save_freq == 0) && (g_save_filename != NULL))
+    if ((count % epmem_save_freq == 0) && (strlen(thisAgent->epmem_save_filename) != 0))
     {
         epmem_save_episodic_memory_to_file(thisAgent);
     }
@@ -5374,7 +5347,7 @@ void epmem_update(agent *thisAgent)
 //      if (count % 100 == 0)
 //      {
 //          epmem_print_query_usage_wmetree();
-//          print(thisAgent, "\n%d queries and %d memories\n", g_num_queries, g_memories->size);
+//          print(thisAgent, "\n%d queries and %d memories\n", thisAgent->epmem_num_queries, thisAgent->epmem_memories->size);
 //      }
 
     
@@ -5397,10 +5370,14 @@ void epmem_update(agent *thisAgent)
 void epmem_create_buffer(agent *thisAgent, Symbol *s)
 {
     epmem_header *top_state_header;
+
+#ifdef DISABLE_EPMEM
+    return;
+#endif
     
     top_state_header = make_epmem_header(thisAgent, s);
     top_state_header->index = 0;
-    append_entry_to_arraylist(thisAgent, g_header_stack, (void *)top_state_header);
+    append_entry_to_arraylist(thisAgent, thisAgent->epmem_header_stack, (void *)top_state_header);
     
 }//epmem_create_buffer
 
@@ -5415,29 +5392,45 @@ void epmem_create_buffer(agent *thisAgent, Symbol *s)
 
 void init_epmem(agent *thisAgent) 
 {
+#ifdef DISABLE_EPMEM
+    return;
+#endif
+
     //Allocate the active wmes arrays
-    g_current_active_wmes = (wme **)calloc(num_active_wmes, sizeof(wme *));
-    g_previous_active_wmes = (wme **)calloc(num_active_wmes, sizeof(wme *));
+    thisAgent->epmem_curr_active_wmes = (wme **)calloc(num_active_wmes, sizeof(wme *));
+    thisAgent->epmem_prev_active_wmes = (wme **)calloc(num_active_wmes, sizeof(wme *));
 
-    //Initialize the wmetree
-    g_wmetree.next = NULL;
-    g_wmetree.attr = NULL;
-    g_wmetree.val.intval = 0;
-    g_wmetree.val_type = IDENTIFIER_SYMBOL_TYPE;
-    g_wmetree.children = make_hash_table(thisAgent, 0, hash_wmetree);;
-    g_wmetree.parent = NULL;
-    g_wmetree.depth = 0;
-    g_wmetree.assoc_wmes = make_arraylist(thisAgent, 20);
-    g_wmetree_size = 1;
+    //Allocate and initialize the wmetree
+    thisAgent->epmem_wmetree =
+        (wmetree *)allocate_memory(thisAgent, sizeof(wmetree), MISCELLANEOUS_MEM_USAGE);
+    thisAgent->epmem_wmetree->next = NULL;
+    thisAgent->epmem_wmetree->attr = NULL;
+    thisAgent->epmem_wmetree->val.intval = 0;
+    thisAgent->epmem_wmetree->val_type = IDENTIFIER_SYMBOL_TYPE;
+    thisAgent->epmem_wmetree->children = make_hash_table(thisAgent, 0, hash_wmetree);;
+    thisAgent->epmem_wmetree->parent = NULL;
+    thisAgent->epmem_wmetree->depth = 0;
+    thisAgent->epmem_wmetree->assoc_wmes = make_arraylist(thisAgent, 20);
+    thisAgent->epmem_wmetree_size = 1;
 
+    //Initialize tracking variables used by the match routine
+    thisAgent->epmem_last_tag = 0;
+    thisAgent->epmem_last_ret_id = 0;
+    thisAgent->epmem_num_queries = 0;
+    
+    
     //Initialize the memories array
-    g_memories = make_arraylist(thisAgent, 512);
+    thisAgent->epmem_memories = make_arraylist(thisAgent, 512);
 
-    //Initialize the g_header_stack array
-    g_header_stack = make_arraylist(thisAgent, 20);
+    //Initialize the thisAgent->epmem_header_stack array
+    thisAgent->epmem_header_stack = make_arraylist(thisAgent, 20);
 
     //Load pre-recorded episodic memories
-    if (g_load_filename != NULL)
+    sprintf(thisAgent->epmem_save_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
+    strcpy(thisAgent->epmem_load_filename, "c:\\temp\\epmems_15000cycles_modsimplebot_chunky2map.txt");
+//      thisAgent->epmem_save_filename[0] = '\0'; // Uncomment to turn on the above
+//      thisagent->epmem_load_filename[0] = '\0'; // Uncomment to turn on the above
+    if (strlen(thisAgent->epmem_load_filename) > 0)
     {
         epmem_load_episodic_memory_from_file(thisAgent);
     }
