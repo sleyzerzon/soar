@@ -130,9 +130,9 @@ typedef struct token_struct token;
 typedef char * test;
 class smem_accessary{
 public:
-	smem_accessary(){last_cue_id=""; last_retrieved = NIL; last_confidence = NIL; last_experience = NIL;}
+	smem_accessary(){last_cue_id=""; last_retrieved = NIL; last_confidence = NIL; last_experience = NIL;last_status = NIL;}
 	string last_cue_id;
-	wme *last_retrieved, *last_confidence, *last_experience;
+	wme *last_retrieved, *last_confidence, *last_experience, *last_status;
 	vector<Symbol*> arch_symbols;//these symbols have to de derefed mannually, deleting the substate is not enough, I don't know why
 };
 typedef struct agent_struct {

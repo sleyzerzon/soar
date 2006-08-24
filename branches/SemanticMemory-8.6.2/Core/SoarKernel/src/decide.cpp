@@ -2261,6 +2261,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
  // for(int i=0; i<this_level_links.size();++i){
 	 // remove_input_wme(thisAgent, this_level_links[i]);
  // }
+
   // SEMANTIC_MEMORY - YJW
   clear_smem_structs(thisAgent);
   // SEMANTIC_MEMORY - YJW
@@ -3136,7 +3137,20 @@ void elaborate_gds (agent* thisAgent) {
                         wme *fake_inst_wme_cond;
 
                         fake_inst_wme_cond = pref_for_this_wme->inst->top_of_instantiated_conditions->bt.wme_;
-                        if (fake_inst_wme_cond->gds != NIL)
+						
+						// YJ ADDED 2006 8-17
+						// - should check local o-supported first, right?
+						// If o-supported, then ignore this wme since it's dependency has been backtraced through
+						// When should a wme have a gds pointer? o-supported wmes, i-supported? Shouldn't every wme have a pointer to GDS?
+						// Why R3 ^cue doesn't have the pointer to gds?. Is this wrong?
+						// R3 ^cue shouldn't be in GDS, the following line makes it work
+						//if(fake_inst_wme_cond->preference->o_supported == TRUE){
+						//	continue;
+						//}
+						// Note: this does break things, for test-save-retrieve-expand test case, it crashes.
+						// YJ ADDED 2006 8-17
+
+						if (fake_inst_wme_cond->gds != NIL)
                         {
                            /* Then we want to check and see if the old GDS
                            * value should be changed */

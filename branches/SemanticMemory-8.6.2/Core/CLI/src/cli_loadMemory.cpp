@@ -19,6 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <hash_map>
 #include "IgSKI_Agent.h"
 //#include "agent.h"
 //#include "print.h"
@@ -37,6 +38,22 @@ using namespace cli;
 using namespace sml;
 using namespace std;
 using namespace gSKI;
+
+class memory_elem{
+public:
+	memory_elem(string i, string a, string v, int t, int h){
+		id = i;
+		attr = a;
+		value = v;
+		value_type = t;
+		most_recent_history = h;
+	}
+	string id;
+	string attr;
+	string value;
+	int value_type;
+	int most_recent_history;
+};
 
 // Preload semantic memory from file
 bool CommandLineInterface::ParseLoadMemory(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
@@ -100,7 +117,13 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::IAgent* pAgent, std::vector<std
 	int lineCount = 0;
 	
 	
+	
 
+	// Should only hold most recent values
+	// If there is a tie, could have multiple value
+	stdext::hash_map<string, vector<memory_elem> > processed_memory;
+
+	
 	while (getline(soarFile, line)) {
 		
 		// Increment line count
@@ -137,39 +160,76 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::IAgent* pAgent, std::vector<std
 				}
 			}
 		}
-		
-
-		// Attain the evil back door of doom, even though we aren't the TgD
-		gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
-		pKernelHack->load_semantic_memory_data(pAgent, id, attr, value, type, history);
-		
-		/* This part in (I)gSKI_DoNotTouch, 
-		char id_letter = id[0];
-		unsigned long id_number = StringToUnsignedLong(id.substr(1));
-		//AddListenerAndDisableCallbacks(pAgent);
-		//print(thisAgent, "%c counter %d, number%d\n", id_letter, 
-		//	 thisAgent->id_counter[id_letter-'A'], id_number);
-		//RemoveListenerAndEnableCallbacks(pAgent);
-		
-		if(id_number >= thisAgent->id_counter[id_letter-'A']){
-			thisAgent->id_counter[id_letter-'A'] = id_number+1;//start from the next number
-			//AddListenerAndDisableCallbacks(pAgent);
-			//print(thisAgent, "%c counter %d\n", id_letter, id_number);
-			//RemoveListenerAndEnableCallbacks(pAgent);
-
+		if(history.size() == 0){ // no history
+			history.push_back(0);
+		}
+		stdext::hash_map<string, vector<memory_elem> >::iterator mem_itr = processed_memory.find(id+","+attr);
+		if(mem_itr == processed_memory.end()){
+			vector<memory_elem> multi_value_elemes;
+			multi_value_elemes.push_back(memory_elem(id, attr, value, type, history.back()));
+			processed_memory.insert(pair<string, vector<memory_elem> >(id+","+attr, multi_value_elemes));
+		}
+		else{
+			mem_itr->second.push_back(memory_elem(id, attr, value, type, history.back()));
 		}
 
-		// get rid of leading zeros of the id number, kind of preprocessing
-		char new_id[32];
-		sprintf(new_id, "%c%d", id_letter, id_number);
-		id = string(new_id);
-		thisAgent->semantic_memory->insert_LME(id, attr, value, type);
-		*/
+
+		// Attain the evil back door of doom, even though we aren't the TgD
+		//gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+		//pKernelHack->load_semantic_memory_data(pAgent, id, attr, value, type, history);
+		
 	}
 
 
 	soarFile.close();
 	if (path.length()) DoPopD();
+	
+	// Need to update history reference number
+	// For multi valued attributes, only keep the most recent one, unless there is a tie
+	for(stdext::hash_map<string, vector<memory_elem> >::iterator mem_itr = processed_memory.begin(); mem_itr != processed_memory.end(); ++ mem_itr){
+		vector<memory_elem> multi_value_elems = mem_itr->second;
+		if(multi_value_elems.size() == 1){ // just single value
+			vector<int> h;
+			h.push_back(0);
+			string id = multi_value_elems[0].id;
+			string attr = multi_value_elems[0].attr;
+			string value = multi_value_elems[0].value;
+			int type = multi_value_elems[0].value_type;
+			
+			gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+			pKernelHack->load_semantic_memory_data(pAgent, id, attr, value, type, h);
+		}
+		else{ // multiple values, keep the most recent ones (could be tie)
+			vector <memory_elem> final_values;
+			vector<memory_elem> multi_value_elems = mem_itr->second;
+			int most_recent_history = 0;
+			for(int i=0; i<multi_value_elems.size(); ++i){
+				string id = multi_value_elems[i].id;
+				string attr = multi_value_elems[i].attr;
+				string value = multi_value_elems[i].value;
+				int type = multi_value_elems[i].value_type;
+				int history = multi_value_elems[i].most_recent_history;
+				if(history >= most_recent_history){
+					if(history > most_recent_history){
+						most_recent_history = history;
+						final_values.clear();
+					}
+					final_values.push_back(memory_elem(id, attr, value, type, history));
+				}
+			}
+			for(int i=0; i<final_values.size(); ++i){
+				string id = final_values[i].id;
+				string attr = final_values[i].attr;
+				string value = final_values[i].value;
+				int type = final_values[i].value_type;
+				vector<int> h;
+				h.push_back(0);
+				gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+				pKernelHack->load_semantic_memory_data(pAgent, id, attr, value, type, h);
+			}
+		}
+	}
+	
 
 	// Quit needs no help
 	return true;

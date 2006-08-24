@@ -1,3 +1,7 @@
+// 8-23-2006
+// To comply with the design doc
+// Cluster link is not included since not sure about it
+
 // testings
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -9,15 +13,88 @@
 
 #include "smem.h"
 
+static bool use_pref = false;
+
+// Start from an identifier
+// Should start from bottom goal which should have links to all wm structures, a superstate doesn't have pointer to substate.
+// searched set records which identifier has been searched
+Symbol* find_identifier_from_wm(agent* thisAgent, Symbol* id,string target_id, set<string>& searched){
+	slot *s;
+    wme *w;
+
+    if (id->common.symbol_type != IDENTIFIER_SYMBOL_TYPE)
+        return NIL;
+
+	string id_str = symbol_constant_to_string(thisAgent,id);
+	
+	print(thisAgent,"%s, %s\n", id_str.c_str(), target_id.c_str());
+	if(id_str == target_id){
+		return id;
+	}
+	else if(searched.find(id_str) != searched.end()){ // already traversed this node
+		return NIL;
+	}
+	
+	searched.insert(id_str);
+
+	// build list of wmes
+	for (w = id->id.impasse_wmes; w != NIL; w = w->next){
+		if(w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){
+			Symbol* found = find_identifier_from_wm(thisAgent, w->value, target_id, searched);
+			if(found != NIL){
+				return found;
+			} // otherwise, try other slots
+		}
+		
+
+	}
+        
+    for (w = id->id.input_wmes; w != NIL; w = w->next){
+		if(w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){
+			Symbol* found = find_identifier_from_wm(thisAgent, w->value, target_id, searched);
+			if(found != NIL){
+				return found;
+			} // otherwise, try other slots
+		}
+	}
+     
+    for (s = id->id.slots; s != NIL; s = s->next) {
+        for (w = s->wmes; w != NIL; w = w->next){
+			if(w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){
+				Symbol* found = find_identifier_from_wm(thisAgent, w->value, target_id, searched);
+				if(found != NIL){
+					return found;
+				} // otherwise, try other slots
+			}
+		}
+    }
+	return NIL;
+}
 
 wme *add_input_wme_with_history(agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value){
 	wme* w = add_input_wme(thisAgent, id, attr, value);
 	return w;
 }
 
+
+
+
 Symbol* find_smem_link_id(agent* thisAgent){
 	for(wme* w = thisAgent->bottom_goal->id.input_wmes; w != NIL; w=w->next){
 		if(strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "smem") == 0){
+			return w->value;
+		}
+	}
+	return NIL;
+}
+
+Symbol* find_smem_arch_link_id(agent* thisAgent, string name){
+	Symbol* smem_link_id = find_smem_link_id(thisAgent);
+	if(smem_link_id == NIL){
+		return NIL;
+	}
+	for(wme* w = smem_link_id->id.input_wmes; w != NIL; w=w->next){
+		if(strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), name.c_str()) == 0){
 			return w->value;
 		}
 	}
@@ -623,59 +700,25 @@ void append_smem_links(agent* thisAgent){
 	Symbol* goal_id = thisAgent->bottom_goal;
 	goal_stack_level goal_level = goal_id->id.level;
 	Symbol* smem_id = make_new_identifier(thisAgent, 'M', goal_level); // get_new_io_identifier assumes TOP_GOAL_LEVEL !
-	Symbol* save_id = make_new_identifier(thisAgent, 'E', goal_level);
-	Symbol* retrieve_id = make_new_identifier(thisAgent, 'R', goal_level);
-	Symbol* cluster_id = make_new_identifier(thisAgent, 'C', goal_level);
+	Symbol* command_id = make_new_identifier(thisAgent, 'C', goal_level);
+	Symbol* result_id = make_new_identifier(thisAgent, 'R', goal_level);
 
 	wme* smem_wme = add_input_wme(thisAgent, goal_id, make_sym_constant(thisAgent, "smem"), smem_id);	 
-	wme* retrieve_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "retrieve"), retrieve_id);		
-	wme* save_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "save"), save_id);
-	wme* cluster_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "cluster"), cluster_id);
-
-	// The id's created above are leaked on init-soar.  If we do a
-	// symbol_remove_ref() here on each of them, they will no longer leak.  
-	// The wme's themselves get cleaned up when the state is removed.  KJC 06/06
-   
-	// Dereferrencing will be done in delete context
-	//symbol_remove_ref(thisAgent, smem_id);
-    //symbol_remove_ref(thisAgent, save_id);
-    //symbol_remove_ref(thisAgent, retrieve_id);
-    //symbol_remove_ref(thisAgent, cluster_id);
-
-
-	vector<wme*> wmes;
+	wme* result_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "result"), result_id);		
+	wme* command_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "command"), command_id);
 	
-	wmes.push_back(retrieve_wme);
-	wmes.push_back(save_wme);
-	wmes.push_back(smem_wme);
-	wmes.push_back(cluster_wme);
-	thisAgent->gold_level_to_smem_links->push_back(wmes);
+	//wme* cluster_wme = add_input_wme(thisAgent, smem_id, make_sym_constant(thisAgent, "cluster"), cluster_id);
 
-	//thisAgent->gold_to_smem_links
-	
-	// SEMANTIC_MEMORY
-  print(thisAgent, "!!!!!!!Resetting last retrieval records!!!!!!!!!\n");
-  /**(thisAgent->last_cue_id) = "";
-  thisAgent->last_retrieved = NIL;
-  thisAgent->last_experience = NIL;
-  thisAgent->last_confidence = NIL;
-*/
+
   //Not sure whether goal_level start from 0 or 1, so it the same with the index
   while(thisAgent->smem_structures->size() < goal_level+1){
 	  thisAgent->smem_structures->push_back(smem_accessary());
   }
   thisAgent->smem_structures->at(goal_level).arch_symbols.push_back(smem_id);
-  thisAgent->smem_structures->at(goal_level).arch_symbols.push_back(save_id);
-  thisAgent->smem_structures->at(goal_level).arch_symbols.push_back(retrieve_id);
-  thisAgent->smem_structures->at(goal_level).arch_symbols.push_back(cluster_id);
-
-  //if(thisAgent->smem_structures->at(goal_level).last_cue_id == ""){//there could be old existing cue_id
-	//thisAgent->smem_structures->at(goal_level).last_cue_id = "";
-//	thisAgent->smem_structures->at(goal_level).last_retrieved = NIL;
-//	thisAgent->smem_structures->at(goal_level).last_experience = NIL;
-//	thisAgent->smem_structures->at(goal_level).last_confidence = NIL;
- // }
-
+  thisAgent->smem_structures->at(goal_level).arch_symbols.push_back(command_id);
+  thisAgent->smem_structures->at(goal_level).arch_symbols.push_back(result_id);
+  
+  //thisAgent->smem_structures->at(goal_level).arch_symbols.push_back(cluster_id);
 
 }
 
@@ -698,6 +741,19 @@ void clear_smem_structs(agent* thisAgent){
 	  if(last_experience != NIL)
 		  remove_input_wme(thisAgent, last_experience);
 	*/
+		
+	
+	  if(use_pref){
+		  wme *last_retrieved = thisAgent->smem_structures->back().last_retrieved;
+		  if(last_retrieved != NIL)
+			  preference_remove_ref (thisAgent, last_retrieved->preference);
+			// Must deref preference here to avoid memory leak
+
+		  wme *last_status = thisAgent->smem_structures->back().last_status;
+		  if(last_status != NIL)
+			  preference_remove_ref (thisAgent, last_status->preference);
+	  }
+
 	  vector<Symbol*> arch_symbols = thisAgent->smem_structures->back().arch_symbols;
 	  for(int i=0; i<arch_symbols.size(); ++i){
 		  symbol_remove_ref(thisAgent, arch_symbols.at(i));
@@ -766,7 +822,8 @@ void smem_routine(agent* thisAgent){
 		//retrieve(thisAgent);
 		//retrieve_1_20(thisAgent);
 		retrieve_7_17(thisAgent);
-		cluster(thisAgent);
+		
+		//cluster(thisAgent);
 	}
 	else if(thisAgent->sysparams[SMEM_SYSPARAM] == 0){// deliberate saving
 	  //print(thisAgent, "\nSMEM Disabled (%d)\n",thisAgent->sysparams[SMEM_SYSPARAM]);
@@ -775,7 +832,8 @@ void smem_routine(agent* thisAgent){
 		//retrieve(thisAgent); // should still return failure anyway
 		//retrieve_1_20(thisAgent);
 		retrieve_7_17(thisAgent);
-		cluster(thisAgent);
+		
+		//cluster(thisAgent);
 	}
 	//print(thisAgent, "\nCurrent cycle %d\n", thisAgent->d_cycle_count);
 	//thisAgent->semantic_memory.dump(std::if(YJ_debug) cout);
@@ -880,37 +938,44 @@ void retrieve_7_17(agent* thisAgent){
 
 	int goal_level = thisAgent->bottom_goal->id.level;
 	slot *retrieve_s;
-	Symbol* retrieve_link_id = find_retrieve_link_id(thisAgent);
+	
+	//Symbol* retrieve_link_id = find_retrieve_link_id(thisAgent);
+	Symbol* command_link_id = find_smem_arch_link_id(thisAgent, "command");
+	Symbol* result_link_id = find_smem_arch_link_id(thisAgent, "result");
+	
 	wme *retrieve_w;
 	Symbol* cue_id = NIL;
 	string picked_id = "";
+	
+	bool reuse_identifier = true;
 
 	string current_cue_id = "";
-	wme *current_retrieved = NIL, *current_confidence = NIL, *current_experience = NIL;
+	wme *current_retrieved = NIL, *current_confidence = NIL, *current_experience = NIL, *current_status = NIL;
 
-	for (retrieve_s = retrieve_link_id->id.slots; retrieve_s != NIL; retrieve_s = retrieve_s->next) {
+	for (retrieve_s = command_link_id->id.slots; retrieve_s != NIL; retrieve_s = retrieve_s->next) {
 		// The slots can potentially have any structure
-		if(strcmp(symbol_constant_to_string(thisAgent, retrieve_link_id->id.slots->attr).c_str(), "cue") == 0){
+		if(strcmp(symbol_constant_to_string(thisAgent, retrieve_s->attr).c_str(), "query") == 0){
 			
 			retrieve_w = retrieve_s->wmes;
 			// Do not retrieve if there are multiple cues
 			// Multiple cues
 			// Return an error !
-			if(retrieve_w->next != NIL){
-				//(M0 ^status multiple-cues)
-				Symbol* picked_id_sym = make_identifier_from_str(thisAgent, "M0");
-				current_retrieved = add_input_wme_with_history(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "retrieved"), picked_id_sym);
-				add_input_wme_with_history(thisAgent, picked_id_sym, make_sym_constant(thisAgent, "error"), make_sym_constant(thisAgent, "multiple-cues"));
+			if(retrieve_w->next != NIL ){
+				current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "multiple-queries"));
 				current_cue_id = "1"; // this is not a valid identifier, so can be used to track status
 				break;
 
 			}
 			// Do not retrieve if the cue value is not an identifier
 			if(retrieve_w->value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE){
-				Symbol* picked_id_sym = make_identifier_from_str(thisAgent, "C0");
-				current_retrieved = add_input_wme_with_history(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "retrieved"), picked_id_sym);
-				add_input_wme_with_history(thisAgent, picked_id_sym, make_sym_constant(thisAgent, "error"), make_sym_constant(thisAgent, "cue-value-being-constant"));
+				current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "constant-value-query"));
 				current_cue_id = "2"; // this is not a valid identifier, so can be used to track status
+				break;
+			}
+			else if(retrieve_w->value->id.slots == NIL){
+
+				current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "empty-query"));
+				current_cue_id = "3"; // this is not a valid identifier, so can be used to track status
 				break;
 			}
 
@@ -968,6 +1033,10 @@ void retrieve_7_17(agent* thisAgent){
 			*/
 
 				thisAgent->semantic_memory->match_retrieve_single_level_2006_7_18(current_cue_id, cue_set, picked_id, retrieved, confidence, experience);
+				if(picked_id == "F0"){
+					current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "failure"));
+					break;
+				}
 
 				// Exemplar without summarization
 				//float threshold = 0;
@@ -984,24 +1053,54 @@ void retrieve_7_17(agent* thisAgent){
 				}
 				else{
 
-				//p R1
-					char picked_id_name_letter = picked_id[0]; // name_letter;
-				//	int picked_id_name_number = StringToInt(picked_id.substr(1));
-				//	picked_id_sym = find_identifier(thisAgent, picked_id_name_letter, picked_id_name_number);
-				//	if(picked_id_sym == NIL
-						//|| picked_id_sym->id.link_count <= 0
-				//		){// Still not enough, it could be in the middle of a big structure that is detached.
+					
+					if(reuse_identifier){
+						//Reuse identifier code
+						char picked_id_name_letter = picked_id[0]; // name_letter;
+						int picked_id_name_number = StringToInt(picked_id.substr(1));
+						//picked_id_sym = find_identifier(thisAgent, picked_id_name_letter, picked_id_name_number);
+						set<string> searched;
+						picked_id_sym = find_identifier_from_wm(thisAgent, thisAgent->bottom_goal, picked_id, searched);
+						if(picked_id_sym == NIL){
+							picked_id_sym = make_identifier_from_str(thisAgent, picked_id);
+							print(thisAgent, "\nNot found id: <%s> \n",picked_id.c_str());
+						}
+						else{
+							print(thisAgent, "\nFound existing id: <%s> \n",picked_id.c_str());
+						
+						}
+						//END Reuse identifier code
+					}
+					else{
 						picked_id_sym = make_identifier_from_str(thisAgent, picked_id);
-				//	}
-				//	else{
-				//		print(thisAgent, "\nFound existing id: <%s> \n",picked_id.c_str());
-				//	}
+					}
 				
 				}
 
-				current_retrieved = add_input_wme_with_history(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "retrieved"), picked_id_sym);
+				current_retrieved = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "retrieved"), picked_id_sym);
+				
+				// retrieve_w is the query wme
+				if(use_pref){
+					current_retrieved->preference = make_fake_pref_for_smem_query_retrieved(thisAgent, thisAgent->bottom_goal, retrieve_w, current_retrieved);
+				}
+				
+				// May need to add pref to meta-data wmes as well
+				current_confidence = 
+				add_input_wme_with_history
+					(thisAgent, result_link_id, make_sym_constant(thisAgent, "consistency"), make_float_constant(thisAgent, confidence));
+				current_experience = 
+				add_input_wme_with_history
+					(thisAgent, result_link_id, make_sym_constant(thisAgent, "experience"), make_int_constant(thisAgent, (int)experience));
+
+				current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "success"));
 				
 
+				if(picked_id_sym->id.slots == NIL){// Need to check whether this identifier has slots attached, if so don't do retrieval.
+				}
+				else{
+					break;
+				}
+						
 				//symbol_remove_ref(thisAgent, picked_id_sym);  // once it's a value, refct should = 1, not 2
 				for(set<CueTriplet>::const_iterator itr = retrieved.begin(); itr != retrieved.end(); ++itr){
 					string id = itr->id; // this id must == picked_id
@@ -1010,17 +1109,30 @@ void retrieve_7_17(agent* thisAgent){
 					int value_type = itr->value_type;
 					CueTriplet current_wme = CueTriplet(id, attr, value, value_type);
 					Symbol* attr_sym = make_sym_constant(thisAgent, (char*)attr.c_str());
-					Symbol* value_sym = NIL; 
+					Symbol* value_sym = NIL;
+
+					
 					if(value_type == IDENTIFIER_SYMBOL_TYPE){
-					//	char value_name_letter = value[0]; // name_letter;
-					//	int value_name_number = StringToInt(value.substr(1));
-					//	value_sym = find_identifier(thisAgent, value_name_letter, value_name_number);
-					//	if(value_sym == NIL){
+						
+						if(reuse_identifier){
+							//Reuse identifier code
+							char value_name_letter = value[0]; // name_letter;
+							int value_name_number = StringToInt(value.substr(1));
+							//value_sym = find_identifier(thisAgent, value_name_letter, value_name_number);
+							set<string> searched;
+							value_sym = find_identifier_from_wm(thisAgent, thisAgent->bottom_goal, value, searched);
+							if(value_sym == NIL){
+								value_sym = make_identifier_from_str(thisAgent, value);
+								print(thisAgent, "\nNot found id: <%s> \n",value.c_str());
+							}
+							else{
+								print(thisAgent, "\nFound existing id: <%s> \n",value.c_str());
+							}
+							//END Reuse identifier code
+						}
+						else{
 							value_sym = make_identifier_from_str(thisAgent, value);
-					//	}
-					//	else{
-					//		print(thisAgent, "\nFound existing id: <%s> \n",value.c_str());
-					//	}
+						}
 						
 					}
 					else{
@@ -1042,12 +1154,7 @@ void retrieve_7_17(agent* thisAgent){
 					//symbol_remove_ref(thisAgent, value_sym); // must call remove_ref AFTER adding wme
 				}
 				
-				current_confidence = 
-				add_input_wme_with_history
-					(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-confidence"), make_float_constant(thisAgent, confidence));
-				current_experience = 
-				add_input_wme_with_history
-					(thisAgent, retrieve_link_id, make_sym_constant(thisAgent, "target-experience"), make_int_constant(thisAgent, (int)experience));
+				
 			}	
 		}
 		
@@ -1080,6 +1187,9 @@ void retrieve_7_17(agent* thisAgent){
 		//if(thisAgent->last_confidence != NIL) remove_input_wme(thisAgent, thisAgent->last_confidence);
 		if(thisAgent->smem_structures->size() > goal_level &&
 			thisAgent->smem_structures->at(goal_level).last_confidence != NIL) remove_input_wme(thisAgent, thisAgent->smem_structures->at(goal_level).last_confidence);
+
+		if(thisAgent->smem_structures->size() > goal_level &&
+			thisAgent->smem_structures->at(goal_level).last_status != NIL) remove_input_wme(thisAgent, thisAgent->smem_structures->at(goal_level).last_status);
 	
 		/*	
 		//Avoid removing the same wme
@@ -1119,6 +1229,11 @@ void retrieve_7_17(agent* thisAgent){
 			thisAgent->smem_structures->at(goal_level).last_retrieved = current_retrieved;
 			thisAgent->smem_structures->at(goal_level).last_experience = current_experience;
 			thisAgent->smem_structures->at(goal_level).last_confidence = current_confidence;
+			thisAgent->smem_structures->at(goal_level).last_status = current_status;
+
+			if(use_pref){
+				current_status->preference = make_fake_pref_for_smem_query_retrieved(thisAgent, thisAgent->bottom_goal, retrieve_w, current_status);
+			}
 		}
 		//do_buffered_wm_and_ownership_changes(thisAgent);
 	}
@@ -1542,26 +1657,15 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 
 
 
-	slot *save_s;
-
-	wme *save_w;
-
+/*
 	Symbol* smem_link_id = find_smem_link_id(thisAgent);
-
 	Symbol* save_link_id = find_save_link_id(thisAgent);
 
-
-
 	if(smem_link_id == NIL){
-
 		if(YJ_debug)
-
 			print (thisAgent, "No retrieve link\n");
-
 		return;
-
 	}
-
 
 
 	if(save_link_id == NIL){
@@ -1573,6 +1677,8 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 		return;
 
 	}
+
+
 
 	// Only for the first level
 
@@ -1593,71 +1699,92 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 
 
 	}
+	*/
+	Symbol* command_link_id = find_smem_arch_link_id(thisAgent, "command");
 
-	for (save_s = save_link_id->id.slots; save_s != NIL; save_s = save_s->next) { // save link id is the to-be-saved id
+	for (slot* command_s = command_link_id->id.slots; command_s != NIL; command_s = command_s->next) { // save link id is the to-be-saved id
 
-			for (save_w = save_s->wmes; save_w != NIL; save_w = save_w->next){ // slots should be holding unique values in WM
+			for (wme* command_w = command_s->wmes; command_w != NIL; command_w = command_w->next){ // slots should be holding unique values in WM
 
 
 
-					if(strcmp(symbol_constant_to_string(thisAgent, save_w->attr).c_str(), "save") == 0
+					if(strcmp(symbol_constant_to_string(thisAgent, command_w->attr).c_str(), "save") == 0
 						&&
-						save_w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){ // if it's constant under save link, no need to save it.
+						command_w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){ // if it's constant under save link, no need to save it.
 
-								slot *s;
+							
 
-							wme *w;
+							
 							set<LME> current_save_chunk;
 							bool save_complete = false;
-							for (w = save_w->value->id.input_wmes; w != NIL; w = w->next){
+
+							// ^save.status
+							for (wme* w = command_w->value->id.input_wmes; w != NIL; w = w->next){
 								string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
 
 									string value = symbol_constant_to_string(thisAgent, w->value);
-								if(attr == "smem-saved" && value == "complete"){
-									save_complete = true;                                                 continue;
+								if(attr == "status" && value == "complete"){
+									save_complete = true;                                              
+									continue;
+								}
+							}
+							
+							// ^command.save.data.
+							for (slot* slot_s = command_w->value->id.slots; slot_s != NIL; slot_s = slot_s->next){
+
+								for (wme* slot_w = slot_s->wmes; slot_w != NIL; slot_w = slot_w->next){
+
+									if(strcmp(symbol_constant_to_string(thisAgent, slot_w->attr).c_str(), "data") == 0
+										&&
+										slot_w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){
+
+											for (slot* s = slot_w->value->id.slots; s != NIL; s = s->next){
+
+												for (wme* w = s->wmes; w != NIL; w = w->next){
+
+
+
+													string id = symbol_constant_to_string(thisAgent, w->id); // ID must be SYM_CONSTANT_SYMBOL_TYPE
+
+													string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
+
+													string value = symbol_constant_to_string(thisAgent, w->value);
+
+													int value_type = w->value->common.symbol_type;
+
+
+													//if(value_type == SYM_CONSTANT_SYMBOL_TYPE){
+
+													//        value = value.substr(1, value.length()-2); // get rif of quting marks
+
+													//}
+
+													if(YJ_debug)
+
+														print_with_symbols(thisAgent, "\n%y, %y, %y\n", w->id, w->attr, w->value);
+
+													//saved_wmes.insert(LME(id, attr, value, value_type));
+
+
+													current_save_chunk.insert(LME(id, attr, value, value_type));
+
+													//thisAgent->semantic_memory->insert_LME(id,attr,value,value_type);
+
+												}
+
+											}
+											
+
+									} // If data
+								
 								}
 							}
 
-							for (s = save_w->value->id.slots; s != NIL; s = s->next){
-
-								for (w = s->wmes; w != NIL; w = w->next){
-
-
-
-									string id = symbol_constant_to_string(thisAgent, w->id); // ID must be SYM_CONSTANT_SYMBOL_TYPE
-
-										string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
-
-										string value = symbol_constant_to_string(thisAgent, w->value);
-
-									int value_type = w->value->common.symbol_type;
-
-
-									//if(value_type == SYM_CONSTANT_SYMBOL_TYPE){
-
-									//        value = value.substr(1, value.length()-2); // get rif of quting marks
-
-									//}
-
-									if(YJ_debug)
-
-										print_with_symbols(thisAgent, "\n%y, %y, %y\n", w->id, w->attr, w->value);
-
-									//saved_wmes.insert(LME(id, attr, value, value_type));
-
-
-									current_save_chunk.insert(LME(id, attr, value, value_type));
-
-									//thisAgent->semantic_memory->insert_LME(id,attr,value,value_type);
-
-								}
-
-							}
 							if(!save_complete && !current_save_chunk.empty()){
 								saved_wmes.insert(current_save_chunk.begin(), current_save_chunk.end());
-
-								add_input_wme_with_history(thisAgent, save_w->value, 
-									make_sym_constant(thisAgent,"smem-saved"), make_sym_constant(thisAgent,"complete"));
+								// command.save.status complete
+								add_input_wme_with_history(thisAgent, command_w->value, 
+									make_sym_constant(thisAgent,"status"), make_sym_constant(thisAgent,"complete"));
 
 
 							}
@@ -1668,8 +1795,8 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 
 						if(YJ_debug)
 
-							print_with_symbols(thisAgent, "\nOther smem WME <%y, %y,%y>\n", save_w->id, 
-							save_w->attr, save_w->value);
+							print_with_symbols(thisAgent, "\nOther smem Command WME <%y, %y,%y>\n", command_w->id, 
+							command_w->attr, command_w->value);
 
 					}
 
@@ -1691,18 +1818,28 @@ void find_save_ids(agent* thisAgent, set<std::string>& id_set){
 	// This way it will not work for pointers, but have to copy every attribute under the save link identifier
 	// So, no need to create save link wme at all, just leave it to check for the attribute 'save'
 	// How about multiple save attribute slots? -- allow it for now...
-	Symbol* save_link_id = find_save_link_id(thisAgent);
+	//Symbol* save_link_id = find_save_link_id(thisAgent);
+	Symbol* command_link_id = find_smem_arch_link_id(thisAgent, "command");
 	//for (s = thisAgent->save_link_id->id.slots; s != NIL; s = s->next) { // save link id is the to-be-saved id
-	for (s = save_link_id->id.slots; s != NIL; s = s->next) { // save link id is the to-be-saved id
+	for (s = command_link_id->id.slots; s != NIL; s = s->next) { // save link id is the to-be-saved id
 		for (w = s->wmes; w != NIL; w = w->next){ // slots should be holding unique values in WM 
 			if(strcmp(symbol_constant_to_string(thisAgent, w->attr).c_str(), "save") == 0){
 				//Symbol* save_id = w->value;
-				print_with_symbols(thisAgent, "Saving %y\n", w->value);
+				for(slot* save_s = w->value->id.slots; save_s != NIL; save_s = save_s->next){
+					for (wme* data_wme = save_s->wmes; data_wme != NIL; data_wme = data_wme->next){
+						if(strcmp(symbol_constant_to_string(thisAgent, data_wme->attr).c_str(), "data") == 0){
+							print_with_symbols(thisAgent, "Saving %y\n", data_wme->value);
+
+							string value = symbol_constant_to_string(thisAgent, data_wme->value);
+							if(data_wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){ // save only identifier types, constant types are considered long-term
+								id_set.insert(value);
+							}
+
+						}
+					}
+				}
 			}
-			string value = symbol_constant_to_string(thisAgent, w->value);
-			if(w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){ // save only identifier types, constant types are considered long-term
-				id_set.insert(value);
-			}
+			
 		}
 	}
 }
@@ -1875,5 +2012,66 @@ void save_wmes(agent* thisAgent){
 }
 
 //
+
+preference * make_fake_pref_for_smem_query_retrieved(agent* thisAgent, Symbol* goal, wme* query, wme* retrieved){
+	instantiation *inst;
+    preference *pref;
+    condition *cond;
+	pref = make_preference(thisAgent, ACCEPTABLE_PREFERENCE_TYPE, retrieved->id, retrieved->attr,retrieved->value, NIL);
+	
+	pref->o_supported = TRUE;
+
+	// need to deref when the wme is being removed
+    
+	//symbol_add_ref(retrieved->id);
+    //symbol_add_ref(retrieved->attr);
+    //symbol_add_ref(retrieved->value);
+	
+	//This may not be necessary??
+    insert_at_head_of_dll(goal->id.preferences_from_goal, pref, all_of_goal_next, all_of_goal_prev);
+    pref->on_goal_list = TRUE;
+
+	// This will cause memory leak, must remove_ref when the state is destroied
+	preference_add_ref(pref);
+
+	 /*
+     * make the fake instantiation
+     */
+    allocate_with_pool(thisAgent, &(thisAgent->instantiation_pool), &inst);
+    pref->inst = inst;
+    pref->inst_next = pref->inst_prev = NIL;
+    inst->preferences_generated = pref;
+    inst->prod = NIL;
+    inst->next = inst->prev = NIL;
+    inst->rete_token = NIL;
+    inst->rete_wme = NIL;
+    inst->match_goal = goal;
+    inst->match_goal_level = goal->id.level;
+    inst->okay_to_variablize = TRUE;
+    inst->backtrace_number = 0;
+    inst->in_ms = FALSE;
+	
+	 /* --- make the fake condition --- */
+  allocate_with_pool (thisAgent, &thisAgent->condition_pool, &cond);
+  cond->type = POSITIVE_CONDITION;
+  cond->next = cond->prev = NIL;
+  inst->top_of_instantiated_conditions = cond;
+  inst->bottom_of_instantiated_conditions = cond;
+  inst->nots = NIL;
+  cond->data.tests.id_test = make_equality_test (query->id);
+  cond->data.tests.attr_test = make_equality_test (query->attr);
+  cond->data.tests.value_test = make_equality_test (query->value);
+  cond->test_for_acceptable_preference = TRUE;
+  cond->bt.wme_ = query;
+  
+  //wme_add_ref(query);  //to avoid crash?
+
+  cond->bt.level = query->id->id.level;
+  cond->bt.trace = NIL;
+  cond->bt.prohibits = NIL;
+
+  return pref;
+
+}
 
 //#endif SEMANTIC_MEMORY

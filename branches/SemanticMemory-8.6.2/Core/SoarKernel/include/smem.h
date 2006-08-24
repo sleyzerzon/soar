@@ -17,11 +17,14 @@ namespace sdtext = ::__gnu_cxx;
 #include <iostream>
 #include <string>
 #include <sstream> // for StringToInt
+#include "prefmem.h"
 using namespace std;
 
 
 static bool YJ_debug = true;
-
+Symbol *find_identifier_from_wm(agent* thisAgent, Symbol* id,string target_id, set<string>& searched);
+preference *make_fake_pref_for_smem_query_retrieved(agent* thisAgent, Symbol* goal, wme* query, wme* retrieved);
+void retrieve_8_14(agent* thisAgent);
 void retrieve_7_17(agent* thisAgent);
 void retrieve_3_13(agent* thisAgent);
 void retrieve_1_20(agent* thisAgent);
