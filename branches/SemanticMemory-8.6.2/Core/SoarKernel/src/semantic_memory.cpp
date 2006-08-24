@@ -866,6 +866,8 @@ bool SemanticMemory::match_retrieve_single_level_2006_7_18(const string& cue_id,
 		}
 	}
 	else{
+		// If this iteration is done in the order of matched candidates, it could be more efficient when there exist a rather unique feature.
+		// Non-unique features are always expensive
 		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
 			string id = itr->id;
 			string attr = itr->attr;
@@ -1135,7 +1137,7 @@ set<int> SemanticMemory::match_id_attr(const string id, const string attr){
 	}
 	else{
 		HASH_S_LP& value_hash = itr2->second;
-		int most_recent_time = 0;
+		int most_recent_time = -1;
 		int most_recent_value_lme_index;
 		
 		// These code makes it retrieve the single most recent value
@@ -1144,8 +1146,10 @@ set<int> SemanticMemory::match_id_attr(const string id, const string attr){
 			//returned_ids_set.insert(itr3->first);
 			int lme_index = itr3->second;
 			vector<int>& history =  LME_Array[lme_index]->boost_history;
+			// history could be empty if loaded up as such
+			// This should be prvented after the new load_memory
 			if(history.size() == 0){
-				history.push_back(1);
+				history.push_back(0);
 			}
 			int lme_time = history[history.size()-1];
 			if(most_recent_time < lme_time){
