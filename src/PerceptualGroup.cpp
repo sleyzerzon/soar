@@ -684,6 +684,7 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
     case OA_ATTACK: {
       currentCommand = "attack";
       int managerId = Sorts::amr->assignManager(targets, members.size());
+      AttackManager* atkMan = Sorts::amr->getManager(managerId);
       tempVec.clear();
       tempVec.push_back(managerId);
 
@@ -694,7 +695,9 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
           i != members.end();
           i++)
       {
-        (*i)->assignAction(type, tempVec);
+        if (!(*i)->assignAction(type, tempVec)) {
+          atkMan->decNewAttackers();
+        }
       }
       break;
     }
