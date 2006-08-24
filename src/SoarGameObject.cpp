@@ -167,6 +167,12 @@ void SoarGameObject::assignAction(ObjectActionType cmd, Vector<sint4> prms)
   msg << "assigning action: " << (int)cmd << endl;
 
   if (assignedBehavior != NULL) {
+    // we don't want hiccups if the command is issued twice
+    map<ObjectActionType, FSM*>::iterator i = behaviors.find(cmd);
+    if (i->second == assignedBehavior && i->second->usingParams(prms)) {
+      return;
+    }
+    // otherwise stop the old command
     assignedBehavior->stop();
   }
   
