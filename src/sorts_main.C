@@ -36,6 +36,7 @@
 #include "GameActionManager.h"
 #include "Sorts.h"
 #include "RLDeltaUpdater.h"
+#include "WMIdentifierCounter.h"
 
 #include "TerrainModule.H"
 #include "Demo_SimpleTerrain.H"
@@ -422,8 +423,10 @@ int main(int argc, char *argv[]) {
  
   // special delta updater for RL
   RLDeltaUpdater *rlUpdater = 0;
+  WMIdentifierCounter *rlCounter = 0;
   if (useRL) {
     rlUpdater = new RLDeltaUpdater(pAgent);
+    rlCounter = new WMIdentifierCounter(pAgent);
   }
 
   // start Soar in a different thread
@@ -451,6 +454,7 @@ int main(int argc, char *argv[]) {
   msg << "ORTS client exited" << endl;
 
   if (rlUpdater) { delete rlUpdater; }
+  if (rlCounter) { delete rlCounter; }
   
   if (soar_log) {
     soar_log->close();
