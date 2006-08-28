@@ -79,7 +79,7 @@ extern unsigned long hash_string(const char *s);
 #define ubiquitous_threshold 1.0
 #define ubiquitous_max 25
 #define fraction_to_trim 0.0
-#define epmem_save_freq 1000
+#define epmem_save_freq 500
 
 /*======================================================================
  * Data structures
@@ -602,8 +602,8 @@ void set_arraylist_entry(agent *thisAgent, arraylist *al, int index, void *newva
     if (index < 0) return;
     if (index >= al->size)
     {
-        al->size = index+1;
         grow_arraylist(thisAgent, al, index + 1);
+        al->size = index+1;
     }
 
     al->array[index] = newval;
@@ -4103,6 +4103,9 @@ void respond_to_command_next(agent *thisAgent, epmem_header *h)
         start_timer(thisAgent, &(thisAgent->epmem_installmem_start_time));
         install_epmem_in_wm(thisAgent, h, h->curr_memory->content);
         stop_timer(thisAgent, &(thisAgent->epmem_installmem_start_time), &(thisAgent->epmem_installmem_total_time));
+
+        //Provide meta-data on the match
+        install_match_metadata(thisAgent, h);
     }
     else
     {
@@ -5155,9 +5158,25 @@ int epmem_load_epmems_from_file(agent *thisAgent,
                                                        my_index);
         if (epmem == NULL)
         {
-            print(thisAgent, "ERROR: File improperly formatted.  Illegal index loaded. Memories not loaded.");
-            return 0;
+            //I've encountered an epmem that's never referenced by any
+            //node in the WME tree.  This should not occur.
+            //Handle it by going ahead and loading the epmem but
+            //give a warning to the user
+            epmem = (episodic_memory *)allocate_memory(thisAgent,
+                                                       sizeof(episodic_memory),
+                                                       MISCELLANEOUS_MEM_USAGE);
+            epmem->content = NULL;
+            epmem->last_usage = -1;
+            epmem->match_score = 0;
+            epmem->index = my_index;
+            
+            //Add the structure to the global memories list
+            set_arraylist_entry(thisAgent, thisAgent->epmem_memories, my_index, (void *)epmem);
+
+            //Notify the user
+            print(thisAgent, "WARNING: Encountered unreferenced epmem (#%d) in load file.", my_index);
         }
+        
         if (epmem->content != NULL)
         {
             print(thisAgent, "ERROR: File improperly formatted.  Duplicate index found.  Memory skipped.");
@@ -5299,11 +5318,25 @@ void epmem_update(agent *thisAgent)
         if (h->next_cmd) 
         {
             respond_to_command_next(thisAgent, h);
+
+            //%%%DEBUGGING
+            if (h->curr_memory != NULL)
+            {
+                print(thisAgent, "\nRetrieved NEXT memory (%d)",
+                      h->curr_memory->index);
+            }
             continue;
         }
 
         //Handle any queries on the input link
         epmem = respond_to_query(thisAgent, h);
+
+        //%%%DEBUGGING
+        if (h->curr_memory != NULL)
+        {
+            print(thisAgent, "\nRetrieved memory %d",
+                  h->curr_memory->index);
+        }
         
         if (epmem != NULL)
         {
@@ -5405,6 +5438,7 @@ void init_epmem(agent *thisAgent)
         (wmetree *)allocate_memory(thisAgent, sizeof(wmetree), MISCELLANEOUS_MEM_USAGE);
     thisAgent->epmem_wmetree->next = NULL;
     thisAgent->epmem_wmetree->attr = NULL;
+    thisAgent->epmem_wmetree->id = 0;
     thisAgent->epmem_wmetree->val.intval = 0;
     thisAgent->epmem_wmetree->val_type = IDENTIFIER_SYMBOL_TYPE;
     thisAgent->epmem_wmetree->children = make_hash_table(thisAgent, 0, hash_wmetree);;
@@ -5427,12 +5461,17 @@ void init_epmem(agent *thisAgent)
 
     //Load pre-recorded episodic memories
     sprintf(thisAgent->epmem_save_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
-    strcpy(thisAgent->epmem_load_filename, "c:\\temp\\epmems_15000cycles_modsimplebot_chunky2map.txt");
-//      thisAgent->epmem_save_filename[0] = '\0'; // Uncomment to turn on the above
-//      thisagent->epmem_load_filename[0] = '\0'; // Uncomment to turn on the above
+    sprintf(thisAgent->epmem_load_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
+    //thisAgent->epmem_save_filename[0] = '\0'; // Comment out to turn on the above
+    //thisAgent->epmem_load_filename[0] = '\0'; // Comment out to turn on the above
     if (strlen(thisAgent->epmem_load_filename) > 0)
     {
         epmem_load_episodic_memory_from_file(thisAgent);
+
+        //%%%DEBUGGING
+        sprintf(thisAgent->epmem_save_filename, "c:\\temp\\sanity_%s_epmems.txt", thisAgent->name);
+        epmem_save_episodic_memory_to_file(thisAgent);
+        sprintf(thisAgent->epmem_save_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
     }
    
     //Reset the timers
