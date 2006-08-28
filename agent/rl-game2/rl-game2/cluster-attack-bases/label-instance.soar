@@ -1,0 +1,13 @@
+sp {cluster-attack-bases*propose*label-instance
+   (state <s> ^name cluster-attack-bases
+             -^instance)
+-->
+   (<s> ^operator <o> + >)
+   (<o> ^name label-instance)}
+
+sp {cluster-attack-bases*apply*label-instance
+   (state <s> ^name cluster-attack-bases
+              ^operator <o>)
+   (<o> ^name label-instance)
+-->
+   (<s> ^instance (make-constant-symbol))}

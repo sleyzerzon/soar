@@ -1,0 +1,8 @@
+sp {rl-game2*scatter-attack-tanks
+   (state <s> ^name rl-game2
+              ^io.input-link.match-counts <mc>)
+   (<s> ^false <f>)
+   # some other conditions
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name scatter-attack-tanks)}

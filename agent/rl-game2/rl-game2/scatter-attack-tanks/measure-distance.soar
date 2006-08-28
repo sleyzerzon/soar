@@ -1,0 +1,42 @@
+sp {scatter-attack-tanks*propose*measure-distance
+   (state <s> ^name scatter-attack-tanks
+              ^my-pid <mpid>
+              ^enemy-pid <epid>
+              ^io.input-link.groups <gs>)
+   (<gs> ^group <my-tanks>
+         ^group <enemy-tanks>)
+   (<my-tanks> ^owner <mpid>
+               ^type tank
+               ^id <mtid>)
+   (<enemy-tanks> ^owner <epid>
+                  ^type tank
+                  ^id <etid>)
+  -{(<s> ^distance-measure <dm>)
+    (<dm> ^my-tank-id <mtid>
+          ^enemy-tank-id <etid>)}
+-->
+   (<s> ^operator <o> + > =)
+   (<o> ^name measure-distance
+        ^my-tanks <my-tanks>
+        ^enemy-tanks <enemy-tanks>)}
+
+sp {scatter-attack-tanks*apply*measure-distance
+   (state <s> ^name scatter-attack-tanks
+              ^my-pid <mpid>
+              ^enemy-pid <epid>
+              ^operator <o>)
+   (<o> ^name measure-distance
+        ^my-tanks <my-tanks>
+        ^enemy-tanks <enemy-tanks>)
+   (<my-tanks> ^id <mtid>
+               ^x-pos <mtx>
+               ^y-pos <mty>)
+   (<enemy-tanks> ^id <etid>
+                  ^x-pos <etx>
+                  ^y-pos <ety>)
+-->
+   (<s> ^distance-measure <dm>)
+   (<dm> ^my-tank-id <mtid>
+         ^enemy-tank-id <etid>
+         ^distance (+ (* (- <mtx> <etx>) (- <mtx> <etx>)) (* (- <mty> <ety>) (- <mty> <ety>))))}
+   

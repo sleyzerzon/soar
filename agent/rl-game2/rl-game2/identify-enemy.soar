@@ -1,0 +1,25 @@
+sp {propose*identify-enemy-1
+   (state <s> ^name rl-game2
+              ^my-pid 0
+             -^enemy-pid)
+-->
+   (<s> ^operator <o> + > =)
+   (<o> ^name identify-enemy
+        ^enemy-pid 1)}
+
+sp {propose*identify-enemy-0
+   (state <s> ^name rl-game2
+              ^my-pid 1
+             -^enemy-pid)
+-->
+   (<s> ^operator <o> + > =)
+   (<o> ^name identify-enemy
+        ^enemy-pid 0)}
+
+sp {apply*identify-enemy
+   (state <s> ^name rl-game2
+              ^operator <o>)
+   (<o> ^name identify-enemy
+        ^enemy-pid <eid>)
+-->
+   (<s> ^enemy-pid <eid>)}

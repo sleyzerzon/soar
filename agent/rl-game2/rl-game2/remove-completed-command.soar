@@ -1,0 +1,7 @@
+sp {apply*remove-completed-command
+   (state <s> ^io.output-link.sorts <cmd>
+              ^operator <o>)
+   (<cmd> ^<cname> <c>)
+   (<c> ^status complete)
+-->
+   (<cmd> ^<cname> <c> -)}

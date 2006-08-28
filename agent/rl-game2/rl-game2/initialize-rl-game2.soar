@@ -1,0 +1,31 @@
+sp {propose*initialize-rl-game2
+   (state <s> ^superstate nil
+             -^name)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name initialize-rl-game2)}
+
+sp {apply*initialize-rl-game2
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-rl-game2)
+-->
+   (<s> ^name rl-game2)}
+
+sp {apply*initialize-rl-game2*cmd-link
+   (state <s> ^operator <op>
+              ^io.output-link <out>)
+   (<op> ^name initialize-rl-game2)
+-->
+   (<out> ^sorts <cmd-link>)}
+
+sp {apply*initialize-rl-game2*default-grouping-radius
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-rl-game2)
+-->
+   (<s> ^default-grouping-radius 64)}
+
+sp {apply*initialize-rl-game2*cluster-attack-bases-memory
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-rl-game2)
+-->
+   (<s> ^cluster-attack-bases-memory <m>)}

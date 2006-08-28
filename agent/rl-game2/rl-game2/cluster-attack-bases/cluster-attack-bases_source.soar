@@ -1,0 +1,14 @@
+source elaborations.soar
+source attack-base.soar
+pushd attack-base
+source attack-base_source.soar
+popd
+source create-memory-instance.soar
+source find-cog.soar
+pushd find-cog
+source find-cog_source.soar
+popd
+source free-tanks.soar
+source label-instance.soar
+source move-tanks.soar
+source set-cluster-radius.soar

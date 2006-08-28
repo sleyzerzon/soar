@@ -1,0 +1,8 @@
+sp {cluster-attack-bases*propose*find-cog
+   (state <s> ^name cluster-attack-bases
+              ^instance <si>
+             -^find-cog-complete
+             -^tanks-clustered)
+-->
+   (<s> ^operator <o> + >)
+   (<o> ^name find-cog)}
