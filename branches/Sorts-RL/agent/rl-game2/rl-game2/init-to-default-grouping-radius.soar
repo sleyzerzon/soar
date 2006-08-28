@@ -1,0 +1,19 @@
+sp {propose*init-to-default-grouping-radius
+   (state <s> ^name rl-game2
+              ^default-grouping-radius <dgr>
+             -^default-grouping-radius-init)
+-->
+   (<s> ^operator <o> + > =)
+   (<o> ^name init-to-default-grouping-radius
+        ^radius <dgr>)}
+
+sp {apply*init-to-default-grouping-radius
+   (state <s> ^name rl-game2
+              ^io.output-link.sorts <cmd-link>
+              ^operator <o>)
+   (<o> ^name init-to-default-grouping-radius
+        ^radius <r>)
+-->
+   (<s> ^default-grouping-radius-init 0)
+   (<cmd-link> ^grouping-radius <gr-cmd>)
+   (<gr-cmd> ^value <r>)}

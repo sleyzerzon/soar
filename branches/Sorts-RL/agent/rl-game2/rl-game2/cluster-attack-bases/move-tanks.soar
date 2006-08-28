@@ -1,0 +1,39 @@
+sp {cluster-attack-bases*propose*move-tanks
+   (state <s> ^name cluster-attack-bases
+              ^my-pid <mpid>
+             -^tanks-clustered
+              ^instance <si>
+              ^top-state.cluster-attack-bases-memory.instance <mi>
+              ^io.input-link.groups.group <g>)
+   (<g> ^id <id>
+        ^owner <mpid>
+        ^type tank)
+   (<mi> ^label <si>
+         ^cog <cog>
+        -^already-moved <id>)
+   (<cog> ^x <x>
+          ^y <y>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name move-tanks
+        ^x <x>
+        ^y <y>
+        ^id <id>)}
+
+sp {cluster-attack-bases*apply*move-tanks
+   (state <s> ^name cluster-attack-bases
+              ^instance <si>
+              ^io.output-link.sorts <cmd>
+              ^top-state.cluster-attack-bases-memory.instance <mi>
+              ^operator <o>)
+   (<mi> ^label <si>)
+   (<o> ^name move-tanks
+        ^x <x>
+        ^y <y>
+        ^id <id>)
+-->
+   (<cmd> ^move <m>)
+   (<m> ^group0 <id>
+        ^param0 <x>
+        ^param1 <y>)
+   (<mi> ^already-moved <id>)}

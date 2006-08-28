@@ -1,0 +1,20 @@
+sp {find-cog*propose*see-single-tank-group
+   (state <s> ^name find-cog
+              ^superstate.instance <si>
+              ^top-state.cluster-attack-bases-memory.instance <mi>
+             -^grouping-radius-exploded)
+   (<mi> ^label <si>
+        -^cog)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name see-single-tank-group)}
+
+sp {find-cog*apply*see-single-tank-group
+   (state <s> ^name find-cog
+              ^io.output-link.sorts <cmd>
+              ^operator <o>)
+   (<o> ^name see-single-tank-group)
+-->
+   (<cmd> ^grouping-radius <gr-cmd>)
+   (<gr-cmd> ^value 1000)
+   (<s> ^grouping-radius-exploded t)}

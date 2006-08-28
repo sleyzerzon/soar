@@ -1,0 +1,17 @@
+sp {cluster-attack-bases*propose*attack-base
+   (state <s> ^name cluster-attack-bases
+              ^my-pid <mpid>
+              ^enemy-pid <epid>
+              ^tanks-clustered t
+              ^io.input-link.groups <gs>)
+   (<gs> ^group <my-tanks>
+         ^group <enemy-base>)
+   (<my-tanks> ^owner <mpid>
+               ^type tank)
+   (<enemy-base> ^owner <epid>
+                 ^type |controlCenter|)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name attack-base
+        ^my-tanks <my-tanks>
+        ^enemy-base <enemy-base>)}

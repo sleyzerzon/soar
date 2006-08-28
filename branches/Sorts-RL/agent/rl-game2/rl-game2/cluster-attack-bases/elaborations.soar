@@ -1,0 +1,33 @@
+sp {cluster-attack-bases*elaborate*label-instance-first
+   (state <s> ^name cluster-attack-bases
+              ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name label-instance)
+   (<o2> ^name <> label-instance)
+-->
+   (<s> ^operator <o1> > <o2>)}
+
+sp {cluster-attack-bases*elaborate*set-cluster-radius-first
+   (state <s> ^name cluster-attack-bases
+              ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name set-cluster-radius)
+   (<o2> ^name <> set-cluster-radius)
+-->
+   (<s> ^operator <o1> > <o2>)}
+
+sp {cluster-attack-bases*elaborate*tanks-clustered
+   (state <s> ^name cluster-attack-bases
+              ^my-pid <mpid>
+              ^cluster-radius <cr>
+              ^io.input-link <in>)
+   (<in> ^groups <gs>
+         ^vision-state.grouping-radius <cr>)
+   (<gs> ^group <g>)
+   (<g> ^owner <mpid>
+        ^type tank)
+  -{(<gs> ^group { <g1> <> <g> })
+    (<g1> ^owner <mpid>
+          ^type tank)}
+-->
+   (<s> ^tanks-clustered 0)}

@@ -1,0 +1,25 @@
+source _firstload.soar
+pushd all
+source all_source.soar
+popd
+pushd elaborations
+source elaborations_source.soar
+popd
+source identify-enemy.soar
+source identify-self.soar
+source init-to-default-grouping-radius.soar
+source cluster-attack-bases.soar
+pushd cluster-attack-bases
+source cluster-attack-bases_source.soar
+popd
+source initialize-rl-game2.soar
+source remove-completed-command.soar
+source scatter-attack-bases.soar
+pushd scatter-attack-bases
+source scatter-attack-bases_source.soar
+popd
+source scatter-attack-tanks.soar
+pushd scatter-attack-tanks
+source scatter-attack-tanks_source.soar
+popd
+source wait.soar
