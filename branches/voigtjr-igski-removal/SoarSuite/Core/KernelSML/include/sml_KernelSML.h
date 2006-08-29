@@ -20,7 +20,7 @@
 
 // Forward declarations
 namespace gSKI {
-	class IKernelFactory ;
+	class KernelFactory ;
 	class Kernel ;
 	class Agent ;
 	class IInputProducer ;
@@ -116,7 +116,7 @@ protected:
 	cli::CommandLineInterface m_CommandLineInterface ;
 
 	// The gSKI kernel objects
-	gSKI::IKernelFactory*	m_pKernelFactory ;   
+	gSKI::KernelFactory*	m_pKernelFactory ;   
 	gSKI::Kernel*			m_pIKernel ;
 
 	// A listener socket and the list of connections to the kernel
@@ -429,7 +429,7 @@ protected:
 	/*************************************************************
 	* @brief	Get the kernel factory object.
 	*************************************************************/
-	gSKI::IKernelFactory* GetKernelFactory() { return m_pKernelFactory ; }
+	gSKI::KernelFactory* GetKernelFactory() { return m_pKernelFactory ; }
 
 	/*************************************************************
 	* @brief	Return an object* to the caller.

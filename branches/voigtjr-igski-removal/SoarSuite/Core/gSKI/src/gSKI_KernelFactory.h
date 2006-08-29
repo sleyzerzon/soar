@@ -14,7 +14,7 @@
 #ifndef GSKI_KERNELFACTORY_H
 #define GSKI_KERNELFACTORY_H
 
-#include "IgSKI_KernelFactory.h"
+#include "gSKI_KernelFactory.h"
 #include "IterUtils.h"
 #include "gSKI_Iterator.h"
 
@@ -33,7 +33,7 @@ namespace gSKI {
     * The interface provides methods for discovering what type of instance the kernel can
     * create or attach to, as well as the usual creation method and an attach method.
     */
-   class KernelFactory : public IKernelFactory
+   class KernelFactory
    {
    public:
 

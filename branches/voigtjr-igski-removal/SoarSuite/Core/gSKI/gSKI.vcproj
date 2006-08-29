@@ -852,10 +852,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_KernelFactory.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_Match.h"
 				>
 			</File>

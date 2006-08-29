@@ -1192,7 +1192,7 @@ void prodTest(){
    out << "source \"../../test3.soar\""<<endl;
    out<<makeDummyProd("test4")<<endl;
    out.close();
-   IKernelFactory*      kF    = gSKI_CreateKernelFactory();
+   KernelFactory*      kF    = gSKI_CreateKernelFactory();
    VALIDATE(kF != 0);
 
    Kernel*             k     = kF->Create();

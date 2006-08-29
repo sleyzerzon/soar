@@ -18,7 +18,7 @@
 #include "IgSKI_AgentThreadGroup.h"
 #include "IgSKI_AgentRunControl.h"
 #include "IgSKI_WorkingMemory.h"
-#include "IgSKI_KernelFactory.h"
+#include "gSKI_KernelFactory.h"
 #include "IgSKI_EventManager.h"
 #include "gSKI_InstanceInfo.h"
 #include "IgSKI_Iterator.h"

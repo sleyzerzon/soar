@@ -34,7 +34,7 @@
 #include <map>
 #include <stdlib.h>
 
-#include "IgSKI_KernelFactory.h"
+#include "gSKI_KernelFactory.h"
 #include "gSKI_Stub.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_Error.h"

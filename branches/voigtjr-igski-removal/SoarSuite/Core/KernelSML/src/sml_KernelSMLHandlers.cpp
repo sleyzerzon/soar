@@ -41,7 +41,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "IgSKI_KernelFactory.h"
+#include "gSKI_KernelFactory.h"
 #include "gSKI_Stub.h"
 #include "gSKI_Kernel.h"
 

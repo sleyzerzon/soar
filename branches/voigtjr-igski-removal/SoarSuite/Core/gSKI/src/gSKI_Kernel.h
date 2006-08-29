@@ -26,7 +26,7 @@ namespace gSKI
    class InstanceInfo;
    class AgentManager;
    class Log;
-   class IKernelFactory;
+   class KernelFactory;
    class AgentManager;
    class IPerformanceMonitor;
 
@@ -42,7 +42,7 @@ namespace gSKI
        /**
         * @brief: Constructor of Kernel.
         */
-       Kernel(const IKernelFactory* kf);
+       Kernel(const KernelFactory* kf);
 
       /**
        * @brief Destructor for the kernel.
@@ -58,7 +58,7 @@ namespace gSKI
         *
         * @returns The pointer to the creating Kernel Factory.
         */
-       const IKernelFactory* GetKernelFactory(Error* err = 0) const ;
+       const KernelFactory* GetKernelFactory(Error* err = 0) const ;
 
       /**
        * @brief  Returns the agent manager for this kernel.
@@ -606,7 +606,7 @@ namespace gSKI
          kernel*                     m_soarKernel;
 
          /** */
-         const IKernelFactory*       m_kF;
+         const KernelFactory*       m_kF;
 
 		 /** Controls how frequently the gSKIEVENT_INTERRUPT_CHECK event fires, measured in phases.  Must be >= 1 */
 		 int						 m_InterruptCheckRate ;

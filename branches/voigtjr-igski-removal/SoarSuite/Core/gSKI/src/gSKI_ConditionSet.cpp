@@ -401,7 +401,7 @@ void processProduction(const char* prodName,
 */
 DEF_TEST_INSUITE(ConditionTesting, Start)
 {
-   IKernelFactory*      kF    = gSKI_CreateKernelFactory();
+   KernelFactory*      kF    = gSKI_CreateKernelFactory();
    VALIDATE(kF != 0);
 
    Kernel*             k     = kF->Create();

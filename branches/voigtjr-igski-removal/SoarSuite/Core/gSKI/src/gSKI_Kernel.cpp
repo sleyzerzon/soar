@@ -43,7 +43,7 @@ namespace gSKI
 |_|\_\___|_|  |_| |_|\___|_|
    =========================
    */
-   Kernel::Kernel(const IKernelFactory* kf) : m_log(0), m_kF(kf)
+   Kernel::Kernel(const KernelFactory* kf) : m_log(0), m_kF(kf)
    {
       m_soarKernel   = create_kernel();
 	  m_InterruptCheckRate = 10 ;
@@ -99,7 +99,7 @@ namespace gSKI
                                                                         |___/
    =========================
    */
-   const IKernelFactory* Kernel::GetKernelFactory(Error* err) const
+   const KernelFactory* Kernel::GetKernelFactory(Error* err) const
    {
       return m_kF;
    }
