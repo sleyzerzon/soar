@@ -13,7 +13,7 @@
 #ifndef IGSKI_MATCH_H
 #define IGSKI_MATCH_H
 
-#include "IgSKI_ConditionSet.h"
+#include "gSKI_ConditionSet.h"
 
 namespace gSKI{
 

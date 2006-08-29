@@ -824,10 +824,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_ConditionSet.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_EventManager.h"
 				>
 			</File>

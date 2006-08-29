@@ -154,7 +154,7 @@ namespace gSKI {
        * @returns The conditions that make up the LHS of the
        *          production.
        */
-      IConditionSet* GetConditions(Error *pErr = 0) const; 
+      ConditionSet* GetConditions(Error *pErr = 0) const; 
 
       /**
        * @brief Get the actions for this production that make wme preferences.

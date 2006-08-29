@@ -16,7 +16,7 @@
 namespace gSKI {
 
    class Condition;
-   class IConditionSet;
+   class ConditionSet;
    struct Error;
 
    /**
@@ -26,7 +26,7 @@ namespace gSKI {
     * needs to be represented in much the same way as the Condition
     * structure.
     *
-    * @see IConditionSet
+    * @see ConditionSet
     *
     * The recursive nature of this definition of IMatchSet is due to
     * negated Match sets which can contain negated Match sets which
@@ -153,7 +153,7 @@ namespace gSKI {
       *          returned if there is an error.
       *
       */
-      virtual IConditionSet *GetConditionSet(Error* err = 0) = 0; \
+      virtual ConditionSet *GetConditionSet(Error* err = 0) = 0; \
    };
 }
 #endif

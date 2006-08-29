@@ -20,7 +20,7 @@ namespace gSKI {
 
    class IAction;     /**< @see GetActions    */
    class Condition;  /**< @see GetConditions */
-   class IConditionSet;
+   class ConditionSet;
    class IMatch;      /**< @see GetMatches    */
    struct Error;      /**< @see Error         */
 
@@ -132,7 +132,7 @@ namespace gSKI {
        * @returns The conditions that make up the LHS of the
        *          production.
        */
-      virtual IConditionSet* GetConditions(Error *pErr = 0) const = 0; 
+      virtual ConditionSet* GetConditions(Error *pErr = 0) const = 0; 
 
       /**
        * @brief Get the actions for this production that make wme preferences.

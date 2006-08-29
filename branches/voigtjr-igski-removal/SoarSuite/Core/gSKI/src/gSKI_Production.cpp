@@ -281,7 +281,7 @@ namespace gSKI
    ===============================
    */
 
-   IConditionSet* Production::GetConditions(Error *err) const
+   ConditionSet* Production::GetConditions(Error *err) const
    {
       // If this is NULL, you should ask to includeConditions when building the production object.
       assert(m_conditionSet) ;

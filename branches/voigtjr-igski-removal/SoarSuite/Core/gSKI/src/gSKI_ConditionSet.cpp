@@ -310,7 +310,7 @@ std::string printtablevel(int tablevel)
                       |_|
 ==================================
 */
-std::string dumpConditions(IConditionSet* cset, int &tablevel)
+std::string dumpConditions(ConditionSet* cset, int &tablevel)
 {
    std::string out;
    //
@@ -335,7 +335,7 @@ std::string dumpConditions(IConditionSet* cset, int &tablevel)
    tIConditionSetIterator *cSetIter = cset->GetConditionSets();
    for( ; cSetIter->IsValid() ; cSetIter->Next())
    {
-     IConditionSet* nextCSet = cSetIter->GetVal();
+     ConditionSet* nextCSet = cSetIter->GetVal();
      out += printtablevel(tablevel);
       if(nextCSet->IsNegated()) 
          out +=   "-{\n";
@@ -371,7 +371,7 @@ void processProduction(const char* prodName,
    MegaAssert(prodIter->IsValid(), "Could not find production.");
    IProduction* ip = prodIter->GetVal();
 
-   IConditionSet* cSet = ip->GetConditions();
+   ConditionSet* cSet = ip->GetConditions();
 
    int junk=0;
    std::string result = dumpConditions(cSet, junk);
