@@ -41,6 +41,7 @@
 
 using namespace cli;
 using namespace sml;
+using namespace std;
 
 std::ostringstream CommandLineInterface::m_Result;	
 

@@ -648,10 +648,6 @@
 					RelativePath="src\InterruptRhsFunction.h"
 					>
 				</File>
-				<File
-					RelativePath="src\TestEvents.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Misc"
@@ -710,10 +706,6 @@
 				</File>
 				<File
 					RelativePath=".\src\gSKI_ReleaseImpl.h"
-					>
-				</File>
-				<File
-					RelativePath="src\gSKI_SetActiveAgent.h"
 					>
 				</File>
 				<File
@@ -897,14 +889,6 @@
 			</File>
 			<File
 				RelativePath="include\IgSKI_Symbol.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_Test.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_TestSet.h"
 				>
 			</File>
 			<File

@@ -110,7 +110,7 @@ namespace gSKI {
        *              information is not returned.
        *
        */
-      ITestSet* GetIdTest(Error* err = 0);
+      TestSet* GetIdTest(Error* err = 0);
 
       /**
        * @brief Returns the Test for the Attribute.
@@ -121,7 +121,7 @@ namespace gSKI {
        *              information is not returned.
        *
        */
-      ITestSet* GetAttrTest(Error* err = 0);
+      TestSet* GetAttrTest(Error* err = 0);
 
       /**
        * @brief Returns the Test for the Value.
@@ -132,7 +132,7 @@ namespace gSKI {
        *              information is not returned.
        *
        */
-      ITestSet* GetValTest(Error* err = 0);
+      TestSet* GetValTest(Error* err = 0);
 
 
    private:

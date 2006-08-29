@@ -157,8 +157,8 @@ namespace gSKI {
    class IAgentThreadGroup;
    class IActionElement;
    class IRhsFunctionAction;
-   class ITestSet;
-   class ITest;
+   class TestSet;
+   class Test;
    class IMultiAttribute;
 
    /** Typedefs for iterator instantiations */
@@ -174,11 +174,11 @@ namespace gSKI {
    typedef IIterator<IRhsAction *>               tIRhsActionIterator;
    typedef IIterator<IWMObject *>                tIWMObjectIterator;
    typedef IIterator<IMatchSet *>                tIMatchSetIterator;
-   typedef IIterator<ITestSet *>                 tITestSetIterator;
+   typedef IIterator<TestSet *>                 tITestSetIterator;
    typedef IIterator<ISymbol*>                   tISymbolIterator;
    typedef IIterator<IMatch *>                   tIMatchIterator;
    typedef IIterator<Agent*>                    tIAgentIterator;
-   typedef IIterator<ITest *>                    tITestIterator;
+   typedef IIterator<Test *>                    tITestIterator;
    typedef IIterator<IWme *>                     tIWmeIterator;
    typedef IIterator<IMultiAttribute *>          tIMultiAttributeIterator;
 }

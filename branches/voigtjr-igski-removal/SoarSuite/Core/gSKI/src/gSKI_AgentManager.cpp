@@ -19,7 +19,7 @@
 #include "gSKI_Error.h"
 #include "gSKI_Agent.h"
 #include "gSKI_Enumerations.h"
-#include "gSKI_SetActiveAgent.h"
+//#include "gSKI_SetActiveAgent.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_ProductionManager.h"
 

@@ -16,7 +16,7 @@
 namespace gSKI {
 
    struct Error;
-   class ITestSet;
+   class TestSet;
 
    /**
     * @brief The abstract base class for Conditions
@@ -99,7 +99,7 @@ namespace gSKI {
        *              information is not returned.
        *
        */
-      virtual ITestSet* GetIdTest(Error* err = 0) = 0;
+      virtual TestSet* GetIdTest(Error* err = 0) = 0;
 
       /**
        * @brief Returns the Test for the Attribute.
@@ -110,7 +110,7 @@ namespace gSKI {
        *              information is not returned.
        *
        */
-      virtual ITestSet* GetAttrTest(Error* err = 0) = 0;
+      virtual TestSet* GetAttrTest(Error* err = 0) = 0;
 
       /**
        * @brief Returns the Test for the Value.
@@ -121,7 +121,7 @@ namespace gSKI {
        *              information is not returned.
        *
        */
-      virtual ITestSet* GetValTest(Error* err = 0) = 0;
+      virtual TestSet* GetValTest(Error* err = 0) = 0;
    };
 }
 #endif

@@ -22,7 +22,7 @@
 #include "gSKI_ProductionManager.h"
 #include "gSKI_Error.h"
 #include "gSKI_Enumerations.h"
-#include "gSKI_SetActiveAgent.h"
+//#include "gSKI_SetActiveAgent.h"
 #include "gSKI_Production.h"
 #include "IgSKI_Iterator.h"
 #include "gSKI_EnumRemapping.h"

@@ -264,7 +264,7 @@ char testProduction2Result[] =                                 \
                       |_|
 ==================================
 */
-std::string dumpTests(ITestSet* ts)
+std::string dumpTests(TestSet* ts)
 {
    std::string out;
    //
@@ -274,7 +274,7 @@ std::string dumpTests(ITestSet* ts)
    tITestIterator *titer = ts->GetTests();
    for( ; titer->IsValid() ; titer->Next() )
    {
-      ITest* t = titer->GetVal();
+      Test* t = titer->GetVal();
       std::string s = dynamic_cast<Test*>(t)->GetText();
       out += " ";
       out += s;
