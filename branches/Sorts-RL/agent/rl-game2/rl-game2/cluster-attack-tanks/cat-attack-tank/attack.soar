@@ -1,18 +1,18 @@
-sp {attack-base*propose*attack
-   (state <s> ^name attack-base)
+sp {cluster-attack-tanks*attack-base*propose*attack
+   (state <s> ^name cat-attack-tank)
 -->
    (<s> ^operator <o> +)
    (<o> ^name attack)}
 
-sp {attack-base*apply*attack
-   (state <s> ^name attack-base
+sp {cluster-attack-tanks*attack-base*apply*attack
+   (state <s> ^name cat-attack-tank
               ^superstate <ss>
               ^io.output-link.sorts <cmd-link>
               ^operator <o>)
    (<ss> ^my-tanks.id <mtid>
-         ^enemy-base.id <ebid>)
+         ^enemy-tanks.id <etid>)
    (<o> ^name attack)
 -->
    (<cmd-link> ^attack <a>)
    (<a> ^group0 <mtid>
-        ^group1 <ebid>)}
+        ^group1 <etid>)}

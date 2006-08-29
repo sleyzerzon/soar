@@ -1,0 +1,15 @@
+sp {cluster-attack-tanks*propose*set-cluster-radius
+   (state <s> ^name cluster-attack-tanks
+              ^instance <si>
+              ^memory <m>
+             -^cluster-radius)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name set-cluster-radius)}
+
+sp {cluster-attack-tanks*apply*set-cluster-radius
+   (state <s> ^name cluster-attack-tanks
+              ^operator <o>)
+   (<o> ^name set-cluster-radius)
+-->
+   (<s> ^cluster-radius 40)}

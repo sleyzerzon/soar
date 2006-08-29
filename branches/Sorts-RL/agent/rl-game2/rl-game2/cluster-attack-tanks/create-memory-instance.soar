@@ -1,0 +1,17 @@
+sp {cluster-attack-tanks*propose*create-memory-instance
+   (state <s> ^name cluster-attack-tanks
+              ^instance <si>
+             -^top-state.cluster-attack-tanks-memory.instance.label <si>)
+-->
+   (<s> ^operator <o> + >)
+   (<o> ^name create-memory-instance)}
+              
+sp {cluster-attack-tanks*apply*create-memory-instance
+   (state <s> ^name cluster-attack-tanks
+              ^instance <si>
+              ^top-state.cluster-attack-tanks-memory <m>
+              ^operator <o>)
+   (<o> ^name create-memory-instance)
+-->
+   (<m> ^instance <mi>)
+   (<mi> ^label <si>)}
