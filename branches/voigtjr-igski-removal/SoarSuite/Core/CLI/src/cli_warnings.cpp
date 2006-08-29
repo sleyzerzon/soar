@@ -18,7 +18,7 @@
 
 #include "gSKI_Agent.h"
 #include "gSKI_DoNotTouch.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "gsysparam.h"
 
 using namespace cli;

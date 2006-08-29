@@ -795,7 +795,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 	// Record initial counts and zero the local "run" counter (that we're about to be incrementing)
  	InitializeRunCounters(runStepSize,interleaveStepSize) ;
 
- 	gSKI::IKernel* pKernel = m_pKernelSML->GetKernel() ;
+ 	gSKI::Kernel* pKernel = m_pKernelSML->GetKernel() ;
 
 	// Depending on RunType, set the stop location for gSKI_STOP_AFTER_DECISION_CYCLE interrupts
 	pKernel->SetStopPoint(runStepSize, m_StopBeforePhase);

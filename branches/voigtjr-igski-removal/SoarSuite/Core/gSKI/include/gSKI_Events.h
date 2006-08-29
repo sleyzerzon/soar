@@ -35,7 +35,7 @@ namespace gSKI {
 
 
    class Agent;
-   class IKernel;
+   class Kernel;
    class IProduction;
    class IProductionInstance;
 
@@ -205,7 +205,7 @@ namespace gSKI {
       /** 
        *
        */
-      virtual void HandleEvent(egSKISystemEventId eventId, IKernel* kernel) = 0;
+      virtual void HandleEvent(egSKISystemEventId eventId, Kernel* kernel) = 0;
    };
 
 
@@ -237,7 +237,7 @@ namespace gSKI {
           * @brief: 
           */
          virtual void HandleEvent(egSKIPrintEventId  eventID, 
-                                  IKernel*      kernel, 
+                                  Kernel*      kernel, 
                                   const char*   msg) = 0;
    };
 }

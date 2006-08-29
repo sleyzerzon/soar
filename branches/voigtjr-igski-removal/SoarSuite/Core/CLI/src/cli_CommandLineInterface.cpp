@@ -606,7 +606,7 @@ bool CommandLineInterface::CheckForHelp(std::vector<std::string>& argv) {
 	return false;
 }
 
-EXPORT void CommandLineInterface::SetKernel(gSKI::IKernel* pKernel, gSKI::Version kernelVersion, sml::KernelSML* pKernelSML) {
+EXPORT void CommandLineInterface::SetKernel(gSKI::Kernel* pKernel, gSKI::Version kernelVersion, sml::KernelSML* pKernelSML) {
 	m_pKernel = pKernel;
 	m_KernelVersion = kernelVersion;
 	m_pKernelSML = pKernelSML;

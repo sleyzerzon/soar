@@ -14,7 +14,7 @@
 
 #include "cli_Commands.h"
 
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 
 using namespace cli;

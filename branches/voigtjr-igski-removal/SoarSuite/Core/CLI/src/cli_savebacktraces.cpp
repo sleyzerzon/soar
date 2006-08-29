@@ -16,7 +16,7 @@
 #include "sml_StringOps.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "IgSKI_ProductionManager.h"
 #include "IgSKI_Production.h"

@@ -860,10 +860,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_Kernel.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_KernelFactory.h"
 				>
 			</File>

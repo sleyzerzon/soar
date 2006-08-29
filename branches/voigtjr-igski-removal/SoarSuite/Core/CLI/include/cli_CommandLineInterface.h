@@ -51,7 +51,7 @@
 // Forward Declarations
 namespace gSKI {
 	class Agent;
-	class IKernel;
+	class Kernel;
 	class IProductionManager;
 }
 namespace sml {
@@ -121,7 +121,7 @@ public:
 	* @param kernelVersion The gSKI version, available from the KernelFactory
 	* @param pKernelSML The pointer to the KernelSML object, optional, used to disable print callbacks
 	*************************************************************/
-	EXPORT void SetKernel(gSKI::IKernel* pKernel, gSKI::Version kernelVersion, sml::KernelSML* pKernelSML = 0);
+	EXPORT void SetKernel(gSKI::Kernel* pKernel, gSKI::Version kernelVersion, sml::KernelSML* pKernelSML = 0);
 
 	/*************************************************************
 	* @brief Set the output style to raw or structured.
@@ -864,7 +864,7 @@ protected:
 
 	Aliases				m_Aliases;				// Alias management object
 	CommandMap			m_CommandMap;			// Mapping of command names to function pointers
-	gSKI::IKernel*		m_pKernel;				// Pointer to the current gSKI kernel
+	gSKI::Kernel*		m_pKernel;				// Pointer to the current gSKI kernel
 	sml::KernelSML*		m_pKernelSML;
 	sml::AgentSML*		m_pAgentSML;			// Agent we're currently working with
 	gSKI::Version		m_KernelVersion;		// Kernel version number

@@ -1682,7 +1682,7 @@ namespace gSKI
 
 		bool TgDWorkArounds::ProductionFind(Agent*     thisAgent,
 			agent*      agnt2,
-			IKernel*    kernel,
+			Kernel*    kernel,
 			bool        lhs,
 			bool        rhs,
 			char*       arg,

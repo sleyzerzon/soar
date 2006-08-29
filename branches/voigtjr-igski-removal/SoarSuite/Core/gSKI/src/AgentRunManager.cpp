@@ -208,7 +208,7 @@ namespace gSKI
          m_runningAgents.erase(it);
    }
 
-   IKernel* AgentRunManager::getKernel()
+   Kernel* AgentRunManager::getKernel()
    {
 		return m_pKernel ;
    }

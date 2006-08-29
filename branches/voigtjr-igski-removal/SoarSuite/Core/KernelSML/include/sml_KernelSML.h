@@ -21,7 +21,7 @@
 // Forward declarations
 namespace gSKI {
 	class IKernelFactory ;
-	class IKernel ;
+	class Kernel ;
 	class Agent ;
 	class IInputProducer ;
 	class IOutputProcessor ;
@@ -117,7 +117,7 @@ protected:
 
 	// The gSKI kernel objects
 	gSKI::IKernelFactory*	m_pKernelFactory ;   
-	gSKI::IKernel*			m_pIKernel ;
+	gSKI::Kernel*			m_pIKernel ;
 
 	// A listener socket and the list of connections to the kernel
 	ConnectionManager* m_pConnectionManager ;
@@ -357,7 +357,7 @@ public:
 	/*************************************************************
 	* @brief	Get the kernel object.
 	*************************************************************/
-	gSKI::IKernel* GetKernel() { return m_pIKernel ; }
+	gSKI::Kernel* GetKernel() { return m_pIKernel ; }
 
 	/*************************************************************
 	* @brief	Look up our additional SML information for a specific agent.

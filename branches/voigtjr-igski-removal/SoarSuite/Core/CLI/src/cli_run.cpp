@@ -20,7 +20,7 @@
 #include "sml_RunScheduler.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "IgSKI_AgentManager.h"
 
 using namespace cli;

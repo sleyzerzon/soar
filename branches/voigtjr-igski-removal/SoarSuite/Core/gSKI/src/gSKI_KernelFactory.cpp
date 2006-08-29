@@ -247,7 +247,7 @@ namespace gSKI {
  \____|_|  \___|\__,_|\__\___|
    =========================
    */
-   IKernel* KernelFactory::Create(const char*           szInstanceName,
+   Kernel* KernelFactory::Create(const char*           szInstanceName,
                                   egSKIThreadingModel   eTModel, 
                                   egSKIProcessType      ePType, 
                                   const char*           szLocation, 
@@ -257,9 +257,9 @@ namespace gSKI {
    {
       ClearError(err);
 
-      IKernel* newKernel = new Kernel(this);
+      Kernel* newKernel = new Kernel(this);
 
-      m_kernels.push_back(const_cast<const IKernel *>(newKernel));
+      m_kernels.push_back(const_cast<const Kernel *>(newKernel));
       m_instances.push_back(newKernel->GetInstanceInformation());
 
       return newKernel;
@@ -275,7 +275,7 @@ namespace gSKI {
                               |___/
    ==================================
    */
-   void KernelFactory::DestroyKernel(IKernel *krnl, Error *err)
+   void KernelFactory::DestroyKernel(Kernel *krnl, Error *err)
    {
       m_instances.erase(std::find(m_instances.begin(), m_instances.end(), krnl->GetInstanceInformation()));
       m_kernels.erase(std::find(m_kernels.begin(), m_kernels.end(), krnl));
@@ -301,7 +301,7 @@ namespace gSKI {
 /_/   \_\__|\__\__,_|\___|_| |_|
    =========================
    */
-   IKernel* KernelFactory::Attach(const IInstanceInfo* pInstanceInfo, 
+   Kernel* KernelFactory::Attach(const IInstanceInfo* pInstanceInfo, 
                                   Error* err) const 
    {
       ClearError(err);

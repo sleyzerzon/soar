@@ -13,9 +13,11 @@
 #ifndef GSKI_KERNEL_H
 #define GSKI_KERNEL_H
 
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "gSKI_Events.h"
 #include "EventManagementTemplates.h"
+#include "gSKI_DoNotTouch.h"
+
 
 typedef struct kernel_struct kernel;
 
@@ -25,6 +27,8 @@ namespace gSKI
    class AgentManager;
    class Log;
    class IKernelFactory;
+   class IAgentManager;
+   class IPerformanceMonitor;
 
    /**
     * @brief: The implementation of the kernel interface.  This class is used
@@ -32,7 +36,7 @@ namespace gSKI
     *         normally be only one of these per system, but the is not 
     *         required.
     */
-   class Kernel : public IKernel
+   class Kernel
    {
     public:
        /**
@@ -500,7 +504,7 @@ namespace gSKI
          */
          class SystemNotifier {
          public:
-            SystemNotifier(IKernel* kernel): m_kernel(kernel){}
+            SystemNotifier(Kernel* kernel): m_kernel(kernel){}
 
             void operator()(egSKISystemEventId eventId, 
                             ISystemListener* listener) const
@@ -508,7 +512,7 @@ namespace gSKI
                listener->HandleEvent(eventId, m_kernel);
             }
          private:
-            IKernel*          m_kernel;
+            Kernel*          m_kernel;
          };
 
          /** 
@@ -516,7 +520,7 @@ namespace gSKI
          */
          class LogNotifier {
          public:
-            LogNotifier(IKernel* kernel, const char* msg): m_msg(msg), m_kernel(kernel){}
+            LogNotifier(Kernel* kernel, const char* msg): m_msg(msg), m_kernel(kernel){}
 
             void operator()(egSKIPrintEventId eventId, 
                             ILogListener* listener) const
@@ -525,7 +529,7 @@ namespace gSKI
             }
          private:
             const char *      m_msg;
-            IKernel*          m_kernel;
+            Kernel*          m_kernel;
          };
 
 		 // When using this should call NotifyGetResult() not just Notify().
@@ -609,7 +613,7 @@ namespace gSKI
 		 egSKIPhaseType              m_stopPoint ;
 
 
-	  private:
+	  public:
          EvilBackDoor::TgDWorkArounds* getWorkaroundObject();
 
    };

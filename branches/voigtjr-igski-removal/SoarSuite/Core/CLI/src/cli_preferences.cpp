@@ -16,7 +16,7 @@
 
 #include "sml_Names.h"
 
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 
 using namespace cli;
 using namespace sml;

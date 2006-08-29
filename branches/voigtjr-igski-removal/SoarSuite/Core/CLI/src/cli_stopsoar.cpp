@@ -16,7 +16,7 @@
 
 #include "gSKI_Agent.h"
 #include "IgSKI_AgentManager.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 
 using namespace cli;

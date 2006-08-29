@@ -1195,7 +1195,7 @@ void prodTest(){
    IKernelFactory*      kF    = gSKI_CreateKernelFactory();
    VALIDATE(kF != 0);
 
-   IKernel*             k     = kF->Create();
+   Kernel*             k     = kF->Create();
    VALIDATE(k != 0);
 
    IAgentManager*       IAM   = k->GetAgentManager();

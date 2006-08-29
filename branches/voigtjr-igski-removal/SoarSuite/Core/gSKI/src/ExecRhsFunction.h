@@ -13,16 +13,16 @@
 */
 
 #include "IgSKI_RhsFunction.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 
 class ExecRhsFunction: public gSKI::IRhsFunction
 {
 private:
-	gSKI::IKernel* m_Kernel ;
+	gSKI::Kernel* m_Kernel ;
 	gSKI::Agent*  m_Agent ;
 
  public:
-	 ExecRhsFunction(gSKI::IKernel* kernel):m_Kernel(kernel), m_Agent(0) { }
+	 ExecRhsFunction(gSKI::Kernel* kernel):m_Kernel(kernel), m_Agent(0) { }
 
    void SetAgent(gSKI::Agent* pAgent) { m_Agent = pAgent ; }
    const char* GetName() const { return "exec"; }

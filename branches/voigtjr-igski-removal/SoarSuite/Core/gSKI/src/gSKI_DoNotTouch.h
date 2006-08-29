@@ -26,7 +26,7 @@ typedef void * soar_callback_agent;
 namespace gSKI
 {
    class Agent;
-   class IKernel;
+   class Kernel;
    namespace EvilBackDoor 
    {
       class TgDWorkArounds
@@ -78,7 +78,7 @@ namespace gSKI
 
          bool ProductionFind(Agent*     thisAgent,
                              agent*      agnt,
-                             IKernel*    kernel,
+                             Kernel*    kernel,
                              bool        lhs,
                              bool        rhs,
                              char*       arg,

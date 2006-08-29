@@ -19,7 +19,7 @@
 #include "gSKI_Enumerations.h"
 #include "IgSKI_Iterator.h"
 #include "gSKI_Agent.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "sml_EventManager.h"
 #include "sml_AgentOutputFlusher.h"
 

@@ -229,7 +229,7 @@ namespace gSKI {
       *                            debug logs should be kept.  If this is 0, no debug log files are 
       *                            generated (though a client can still listen for log messages).  The
       *                            debug log location cannot be moved once the kernel is instantiated.
-      * @param eLogActivity       The types of errors to log.  See IKernel::SetLogActivity for possible
+      * @param eLogActivity       The types of errors to log.  See Kernel::SetLogActivity for possible
       *                            values.
       * @param  err Pointer to client-owned error structure.  If the pointer
       *               is not 0 this structure is filled with extended error
@@ -241,7 +241,7 @@ namespace gSKI {
 	   *           exists and the factory does not support multi-instance
 	   *           creation), the method returns 0.
       */
-      IKernel* Create(const char*           szInstanceName     = 0,
+      Kernel* Create(const char*           szInstanceName     = 0,
                       egSKIThreadingModel   eTModel            = gSKI_MULTI_THREAD, 
                       egSKIProcessType      ePType             = gSKI_ANY_PROCESS, 
                       const char*           szLocation         = 0, 
@@ -254,7 +254,7 @@ namespace gSKI {
        *
        * @param krnl The kernel to be destroyed.
        */
-      void DestroyKernel(IKernel *krnl, Error *err=0);
+      void DestroyKernel(Kernel *krnl, Error *err=0);
 
       /**
       * @brief Attaches this instance of gSKI to an existing instance
@@ -281,7 +281,7 @@ namespace gSKI {
 	   *           or if this factory does not support attaching to running
 	   *           instances, the return value is 0.
       */
-      IKernel* Attach(const IInstanceInfo* pInstanceInfo, Error* err = 0) const;
+      Kernel* Attach(const IInstanceInfo* pInstanceInfo, Error* err = 0) const;
 
       
       /**
@@ -303,7 +303,7 @@ namespace gSKI {
        * @brief: The Typedefs for a std vector of IInstanceInfo pointers.
        */
       typedef FwdContainerType< std::vector<IInstanceInfo * > >  tInstanceInfoVec;
-      typedef FwdContainerType< std::vector< const IKernel *> >          tKernelVec;
+      typedef FwdContainerType< std::vector< const Kernel *> >          tKernelVec;
 
       /**
        * @brief: The iterator that will hold the container of IInstanceInfo pointers.

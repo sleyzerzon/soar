@@ -63,7 +63,7 @@ namespace gSKI
       /** 
        * @brief
        */
-      AgentRunManager(IKernel* pKernel): m_groupRunning(false), m_pKernel(pKernel) {}
+      AgentRunManager(Kernel* pKernel): m_groupRunning(false), m_pKernel(pKernel) {}
 
       /** 
        *@brief
@@ -149,7 +149,7 @@ namespace gSKI
       void initializeForRun(egSKIRunType  runLength, unsigned long steps);
 
 	  /** Look up the kernel for this run manager **/
-	  IKernel* getKernel() ;
+	  Kernel* getKernel() ;
 
 	  /** Notify listeners that agents in the run list are starting or finishing their runs **/
 	  void FireBeforeRunStartsEvents() ;
@@ -170,7 +170,7 @@ namespace gSKI
       bool            m_groupRunning;
 
 	  /** Pointer to the kernel */
-	  IKernel*		   m_pKernel ;
+	  Kernel*		   m_pKernel ;
    };
 }
 

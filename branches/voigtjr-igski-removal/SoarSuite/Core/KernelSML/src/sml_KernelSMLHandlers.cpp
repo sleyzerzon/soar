@@ -43,7 +43,7 @@
 
 #include "IgSKI_KernelFactory.h"
 #include "gSKI_Stub.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 
 // BADBAD: I think we should be using an error class instead to work with error objects.
 #include "../../gSKI/src/gSKI_Error.h"
@@ -462,7 +462,7 @@ class KernelSML::OnSystemStopDeleteAll: public gSKI::ISystemListener
 public:
 	// This handler is called right before the agent is actually deleted
 	// inside gSKI.  We need to clean up any object we own now.
-	virtual void HandleEvent(egSKISystemEventId, gSKI::IKernel* pKernel)
+	virtual void HandleEvent(egSKISystemEventId, gSKI::Kernel* pKernel)
 	{
 		unused(pKernel) ;
 

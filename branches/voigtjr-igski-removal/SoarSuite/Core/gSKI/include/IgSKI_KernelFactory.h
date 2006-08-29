@@ -22,7 +22,7 @@ namespace gSKI {
 
 	/** Forward declarations */
 	class IInstanceInfo;
-   class IKernel;
+   class Kernel;
    struct Error;
 
    /**
@@ -234,7 +234,7 @@ namespace gSKI {
       *                            debug logs should be kept.  If this is 0, no debug log files are 
       *                            generated (though a client can still listen for log messages).  The
       *                            debug log location cannot be moved once the kernel is instantiated.
-      * @param logActivity       The types of errors to log.  See IKernel::SetLogActivity for possible
+      * @param logActivity       The types of errors to log.  See Kernel::SetLogActivity for possible
       *                            values.
       * @param  err Pointer to client-owned error structure.  If the pointer
       *               is not 0 this structure is filled with extended error
@@ -246,7 +246,7 @@ namespace gSKI {
 	   *           exists and the factory does not support multi-instance
 	   *           creation), the method returns 0.
       */
-      virtual IKernel* Create(const char*           instanceName     = 0,
+      virtual Kernel* Create(const char*           instanceName     = 0,
                               egSKIThreadingModel   tModel            = gSKI_MULTI_THREAD, 
                               egSKIProcessType      pType             = gSKI_ANY_PROCESS, 
                               const char*           location         = 0, 
@@ -264,7 +264,7 @@ namespace gSKI {
        *               information.  If it is 0 (the default) extended error
        *               information is not returned.
        */
-      virtual void DestroyKernel(IKernel *krnl, Error *err=0) = 0;
+      virtual void DestroyKernel(Kernel *krnl, Error *err=0) = 0;
 
 
       /**
@@ -292,7 +292,7 @@ namespace gSKI {
 	   *           or if this factory does not support attaching to running
 	   *           instances, the return value is 0.
       */
-      virtual IKernel* Attach(const IInstanceInfo* instanceInfo, Error* err = 0) const  = 0;
+      virtual Kernel* Attach(const IInstanceInfo* instanceInfo, Error* err = 0) const  = 0;
   };
 }
 

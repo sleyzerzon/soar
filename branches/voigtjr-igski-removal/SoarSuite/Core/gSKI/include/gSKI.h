@@ -37,7 +37,7 @@
 #include "IgSKI_MatchSet.h"
 #include "IgSKI_Release.h"
 #include "IgSKI_Parser.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_SymbolFactory.h"
 #include "gSKI_Agent.h"

@@ -17,7 +17,7 @@
 #include "sml_Names.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_Kernel.h"
+#include "gSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 
 using namespace cli;
