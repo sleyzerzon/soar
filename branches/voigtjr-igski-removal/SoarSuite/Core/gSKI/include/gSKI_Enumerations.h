@@ -642,7 +642,7 @@
     * Support types for IWME instances.
     *
     * Returned from IWME's GetSupportType() method, and from the
-    *  IRhsAction::GetSupportType() method, this defines the
+    *  RhsAction::GetSupportType() method, this defines the
     *  type of support that a WME (or a wme that will be created
     *  by an action) has. Currently the types of support are
     *  as follows:

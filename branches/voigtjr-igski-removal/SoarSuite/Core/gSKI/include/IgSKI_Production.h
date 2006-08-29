@@ -143,7 +143,7 @@ namespace gSKI {
        *  wme preferences.  Call IProduction::GetStandAloneFunctions to get
        *  an iterator to all of the actions that are stand alone functions.
        *
-       * @see IRhsAction
+       * @see RhsAction
        *
        * @param  pErr Pointer to client-owned error structure.  If the pointer
        *              is not NULL this structure is filled with extended error

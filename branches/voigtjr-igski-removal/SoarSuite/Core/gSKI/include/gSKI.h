@@ -48,9 +48,9 @@
 #include "IgSKI_WMObject.h"
 #include "IgSKI_WMStaticView.h"
 #include "IgSKI_WorkingMemoryView.h"
-#include "IgSKI_RhsAction.h"
-#include "IgSKI_ActionElement.h"
-#include "IgSKI_RhsFunctionAction.h"
+#include "gSKI_RhsAction.h"
+#include "gSKI_ActionElement.h"
+#include "gSKI_RhsFunctionAction.h"
 
 #include "Win32LinuxDefines.h"
 

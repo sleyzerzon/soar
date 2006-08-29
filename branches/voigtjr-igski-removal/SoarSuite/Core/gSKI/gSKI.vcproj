@@ -549,6 +549,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\gSKI_RhsFunction.h"
+					>
+				</File>
+				<File
 					RelativePath="src\gSKI_RhsFunctionAction.cpp"
 					>
 				</File>
@@ -857,10 +861,6 @@
 			</File>
 			<File
 				RelativePath="include\IgSKI_Release.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_RhsFunction.h"
 				>
 			</File>
 			<File

@@ -145,7 +145,7 @@ namespace gSKI {
    class IProduction;
    class Condition;
    class MatchSet;
-   class IRhsAction;
+   class RhsAction;
    class Match;
    class IProductionMatch;
    class IWme;
@@ -155,23 +155,23 @@ namespace gSKI {
    class IAction;
    class Agent;
    class IAgentThreadGroup;
-   class IActionElement;
-   class IRhsFunctionAction;
+   class ActionElement;
+   class RhsFunctionAction;
    class TestSet;
    class Test;
    class IMultiAttribute;
 
    /** Typedefs for iterator instantiations */
-   typedef IIterator<IRhsFunctionAction*>        tIRhsFunctionActionIterator;
+   typedef IIterator<RhsFunctionAction*>        tIRhsFunctionActionIterator;
    typedef IIterator<IAgentThreadGroup*>         tIAgentThreadGroupIterator;
    typedef IIterator<IProductionMatch *>         tIProductionMatchIterator;
-   typedef IIterator<IActionElement*>            tIActionElementIterator;
+   typedef IIterator<ActionElement*>            tIActionElementIterator;
    typedef IIterator<egSKIPreferenceType>        tPreferenceTypeIterator;
    typedef IIterator<InstanceInfo*>	         tIInstanceInfoIterator;
    typedef IIterator<ConditionSet *>            tIConditionSetIterator;
    typedef IIterator<IProduction *>              tIProductionIterator;
    typedef IIterator<Condition *>               tIConditionIterator;
-   typedef IIterator<IRhsAction *>               tIRhsActionIterator;
+   typedef IIterator<RhsAction *>               tIRhsActionIterator;
    typedef IIterator<IWMObject *>                tIWMObjectIterator;
    typedef IIterator<MatchSet *>                tIMatchSetIterator;
    typedef IIterator<TestSet *>                 tITestSetIterator;

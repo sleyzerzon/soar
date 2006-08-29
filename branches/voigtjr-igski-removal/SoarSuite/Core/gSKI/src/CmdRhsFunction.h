@@ -12,10 +12,10 @@
   where the implementation of the function is within the client (not gSKI or the kernel).
 */
 
-#include "IgSKI_RhsFunction.h"
+#include "gSKI_RhsFunction.h"
 #include "gSKI_Kernel.h"
 
-class CmdRhsFunction: public gSKI::IRhsFunction
+class CmdRhsFunction: public gSKI::RhsFunction
 {
 private:
 	gSKI::Kernel* m_Kernel ;

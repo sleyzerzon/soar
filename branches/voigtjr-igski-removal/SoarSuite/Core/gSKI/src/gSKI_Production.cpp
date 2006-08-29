@@ -305,7 +305,7 @@ namespace gSKI
       assert(m_conditionSet) ;
 
 	  ClearError(err);
-      return new Iterator<IRhsAction*, tRhsActionVec>(m_actions);
+      return new Iterator<RhsAction*, tRhsActionVec>(m_actions);
    }
 
    /*
@@ -327,7 +327,7 @@ namespace gSKI
       assert(m_conditionSet) ;
 
       ClearError(err);
-      return new Iterator<IRhsFunctionAction*, tRhsFunctionVec>(m_functions);
+      return new Iterator<RhsFunctionAction*, tRhsFunctionVec>(m_functions);
    }
 
    /*

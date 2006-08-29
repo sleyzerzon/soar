@@ -773,7 +773,7 @@ namespace gSKI
 		* @returns true if the RHS function was added.  False if there is already a RHS function
 		*             with the given name or if there is another failure.
 		*/
-		virtual bool AddClientRhsFunction(IRhsFunction* rhsFunction, 
+		virtual bool AddClientRhsFunction(RhsFunction* rhsFunction, 
 			Error*        err = 0);
 
 		/**
@@ -1413,7 +1413,7 @@ namespace gSKI
 
 		/** Defines a map of rhs function */
 		//{
-		typedef std::map<std::string, IRhsFunction*> tRhsFunctionMap;
+		typedef std::map<std::string, RhsFunction*> tRhsFunctionMap;
 		typedef tRhsFunctionMap::iterator            tRhsFunctionMapIt;
 		typedef tRhsFunctionMap::const_iterator      tRhsFunctionMapCIt;
 		//}
