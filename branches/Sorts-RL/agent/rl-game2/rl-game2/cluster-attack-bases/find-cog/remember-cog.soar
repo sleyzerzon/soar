@@ -2,12 +2,10 @@ sp {find-cog*propose*remember-cog
    (state <s> ^name find-cog
               ^grouping-radius-exploded t
               ^superstate.instance <si>
-              ^top-state.cluster-attack-bases-memory.instance <mi>
+             -^memory.cog
               ^my-pid <mpid>
               ^io.input-link <in>)
-   (<mi> ^instance <si>
-        -^cog)
-   (<in> ^vision-state.grouping-radius 1000000
+   (<in> ^vision-state.grouping-radius 1000
          ^groups.group <single-tank-group>)
    (<single-tank-group> ^owner <mpid>
                         ^type tank
@@ -22,14 +20,12 @@ sp {find-cog*propose*remember-cog
 sp {find-cog*apply*remember-cog
    (state <s> ^name find-cog
               ^superstate.instance <si>
-              ^top-state <ts>
+              ^memory <m>
               ^operator <o>)
-   (<ts> ^cluster-attack-bases-memory.instance <mi>)
-   (<mi> ^label <si>)
    (<o> ^name remember-cog
         ^cog-x <x>
         ^cog-y <y>)
 -->
-   (<mi> ^cog <cog>)
+   (<m> ^cog <cog>)
    (<cog> ^x <x>
           ^y <y>)}

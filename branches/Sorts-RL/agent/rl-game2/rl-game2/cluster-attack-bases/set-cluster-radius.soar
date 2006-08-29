@@ -1,6 +1,7 @@
 sp {cluster-attack-bases*propose*set-cluster-radius
    (state <s> ^name cluster-attack-bases
               ^instance <si>
+              ^memory <m>
              -^cluster-radius)
 -->
    (<s> ^operator <o> +)
@@ -11,4 +12,4 @@ sp {cluster-attack-bases*apply*set-cluster-radius
               ^operator <o>)
    (<o> ^name set-cluster-radius)
 -->
-   (<s> ^cluster-radius 32)}
+   (<s> ^cluster-radius 40)}

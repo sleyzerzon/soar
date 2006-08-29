@@ -5,13 +5,13 @@ popd
 pushd elaborations
 source elaborations_source.soar
 popd
-source identify-enemy.soar
-source identify-self.soar
-source init-to-default-grouping-radius.soar
 source cluster-attack-bases.soar
 pushd cluster-attack-bases
 source cluster-attack-bases_source.soar
 popd
+source identify-enemy.soar
+source identify-self.soar
+source init-to-default-grouping-radius.soar
 source initialize-rl-game2.soar
 source remove-completed-command.soar
 source scatter-attack-bases.soar

@@ -1,12 +1,11 @@
 sp {cluster-attack-bases*propose*create-memory-instance
    (state <s> ^name cluster-attack-bases
               ^instance <si>
-              ^top-state.cluster-attack-bases-memory <m>)
-   (<m> -^instance.label <si>)
+             -^top-state.cluster-attack-bases-memory.instance.label <si>)
 -->
-   (<s> ^operator <o> +)
+   (<s> ^operator <o> + >)
    (<o> ^name create-memory-instance)}
-
+              
 sp {cluster-attack-bases*apply*create-memory-instance
    (state <s> ^name cluster-attack-bases
               ^instance <si>
