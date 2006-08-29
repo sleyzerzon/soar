@@ -19,7 +19,8 @@
 
 #include "IgSKI_Agent.h"
 #include "IgSKI_Kernel.h"
-#include "IgSKI_DoNotTouch.h"
+#include "gSKI_DoNotTouch.h"
+#include "gsysparam.h"
 
 using namespace cli;
 using namespace sml;
@@ -82,7 +83,7 @@ bool CommandLineInterface::DoChunkNameFormat(gSKI::IAgent* pAgent, const bool* p
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
-	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 
 	if (!pLongFormat && !pCount && !pPrefix) {
 		if (m_RawOutput) {

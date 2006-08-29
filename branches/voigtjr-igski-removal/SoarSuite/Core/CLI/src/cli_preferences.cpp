@@ -78,7 +78,7 @@ bool CommandLineInterface::DoPreferences(gSKI::IAgent* pAgent, const ePreference
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll need it
-	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 
 	AddListenerAndDisableCallbacks(pAgent);
 	bool ret = pKernelHack->Preferences(pAgent, static_cast<int>(detail), pId ? pId->c_str() : 0, pAttribute ? pAttribute->c_str() : 0);

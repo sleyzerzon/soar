@@ -13,7 +13,7 @@
 #include "cli_CommandLineInterface.h"
 
 #include "cli_Commands.h"
-#include "IgSKI_DoNotTouch.h"
+#include "gSKI_DoNotTouch.h"
 #include "IgSKI_Kernel.h"
 
 using namespace cli;
@@ -34,7 +34,7 @@ bool CommandLineInterface::ParseSRand(gSKI::IAgent* pAgent, std::vector<std::str
 
 bool CommandLineInterface::DoSRand(unsigned long int* pSeed) {
 
-	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 
 	pKernelHack->SeedRandomNumberGenerator(pSeed);
 	return true;

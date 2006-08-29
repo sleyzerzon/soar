@@ -848,10 +848,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_DoNotTouch.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_EventManager.h"
 				>
 			</File>

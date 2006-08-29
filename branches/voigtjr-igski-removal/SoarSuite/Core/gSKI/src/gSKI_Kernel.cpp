@@ -472,7 +472,7 @@ namespace gSKI
    
    ==================================
    */
-  EvilBackDoor::ITgDWorkArounds* Kernel::getWorkaroundObject()
+  EvilBackDoor::TgDWorkArounds* Kernel::getWorkaroundObject()
   {
     static  EvilBackDoor::TgDWorkArounds evilBackDoor;
     return &evilBackDoor;

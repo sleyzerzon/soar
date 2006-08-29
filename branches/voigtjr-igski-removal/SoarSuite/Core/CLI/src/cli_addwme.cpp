@@ -20,7 +20,7 @@
 #include "IgSKI_WorkingMemory.h"
 #include "IgSKI_Agent.h"
 #include "IgSKI_Kernel.h"
-#include "IgSKI_DoNotTouch.h"
+#include "gSKI_DoNotTouch.h"
 
 using namespace cli;
 using namespace sml;
@@ -50,7 +50,7 @@ bool CommandLineInterface::DoAddWME(gSKI::IAgent* pAgent, const std::string& id,
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 
 	unsigned long timetag = pKernelHack->AddWme(pAgent, id.c_str(), attribute.c_str(), value.c_str(), acceptable);
 	if (timetag < 0) {

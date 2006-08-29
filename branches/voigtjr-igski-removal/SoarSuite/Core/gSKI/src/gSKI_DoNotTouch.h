@@ -13,16 +13,23 @@
 #ifndef GSKI_DONOTTOUCH_H
 #define GSKI_DONOTTOUCH_H
 
-#include "IgSKI_DoNotTouch.h"
+typedef struct production_struct production;
+typedef unsigned char wme_trace_type;
+typedef struct rete_node_struct rete_node;
+typedef unsigned char ms_trace_type;
+typedef struct agent_struct agent;
+
+typedef void * soar_callback_agent;
 
 #include <string>
 
 namespace gSKI
 {
    class IAgent;
+   class IKernel;
    namespace EvilBackDoor 
    {
-      class TgDWorkArounds : public ITgDWorkArounds
+      class TgDWorkArounds
       {
       public:
 

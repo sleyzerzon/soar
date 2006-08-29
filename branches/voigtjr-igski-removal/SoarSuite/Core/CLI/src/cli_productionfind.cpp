@@ -17,7 +17,7 @@
 
 #include "IgSKI_Agent.h"
 #include "IgSKI_Kernel.h"
-#include "IgSKI_DoNotTouch.h"
+#include "gSKI_DoNotTouch.h"
 
 using namespace cli;
 using namespace sml;
@@ -83,7 +83,7 @@ bool CommandLineInterface::DoProductionFind(gSKI::IAgent* pAgent, const Producti
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of damnation, even though we aren't the TgD
-	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 
 	AddListenerAndDisableCallbacks(pAgent);
 

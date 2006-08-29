@@ -16,7 +16,7 @@
 
 #include "gSKI_Enumerations.h"
 #include "IgSKI_Iterator.h"
-#include "IgSKI_DoNotTouch.h"
+#include "gSKI_DoNotTouch.h"
 #include "gSKI_Events.h"
 
 namespace TgD {
@@ -531,7 +531,7 @@ namespace gSKI {
          // that are used by a preliminary Tcl gSKI Debugger Interface.
          //
 
-      virtual EvilBackDoor::ITgDWorkArounds* getWorkaroundObject() = 0;
+      virtual EvilBackDoor::TgDWorkArounds* getWorkaroundObject() = 0;
 
       friend class TgD::TgD;
 	  friend class cli::CommandLineInterface;

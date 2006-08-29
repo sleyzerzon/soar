@@ -18,7 +18,8 @@
 
 #include "IgSKI_Agent.h"
 #include "IgSKI_Kernel.h"
-#include "IgSKI_DoNotTouch.h"
+#include "gSKI_DoNotTouch.h"
+#include "gsysparam.h"
 
 using namespace cli;
 using namespace sml;
@@ -150,7 +151,7 @@ bool CommandLineInterface::DoPrint(gSKI::IAgent* pAgent, PrintBitset options, in
 	*/
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 
 	// Check for stack print
 	if (options.test(PRINT_STACK)) {

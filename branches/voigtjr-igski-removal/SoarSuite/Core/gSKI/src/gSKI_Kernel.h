@@ -610,7 +610,7 @@ namespace gSKI
 
 
 	  private:
-         EvilBackDoor::ITgDWorkArounds* getWorkaroundObject();
+         EvilBackDoor::TgDWorkArounds* getWorkaroundObject();
 
    };
 }
