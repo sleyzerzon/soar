@@ -1,6 +1,6 @@
 sp {rl-game2*cluster-attack-bases
-   (state <s> ^name rl-game2)
-   # some other conditions
+   (state <s> ^name rl-game2
+              ^false <false>)
 -->
    (<s> ^operator <o> +)
    (<o> ^name cluster-attack-bases)}

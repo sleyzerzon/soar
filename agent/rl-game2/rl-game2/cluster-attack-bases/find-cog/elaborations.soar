@@ -1,5 +1,0 @@
-sp {find-cog*elaborate*copy-memory-link
-   (state <s> ^name find-cog
-              ^superstate.memory <m>)
--->
-   (<s> ^memory <m>)}

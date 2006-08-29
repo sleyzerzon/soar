@@ -1,4 +1,4 @@
-80
+113
 SOAR_ID 0
 SOAR_ID 1
 SOAR_ID 2
@@ -31,7 +31,7 @@ ENUMERATION 28 1 cluster-attack-bases
 SOAR_ID 29
 ENUMERATION 30 1 state
 ENUMERATION 31 1 cluster-attack-bases
-ENUMERATION 32 1 find-cog
+ENUMERATION 32 1 cab-find-cog
 SOAR_ID 33
 SOAR_ID 34
 ENUMERATION 35 1 state
@@ -64,7 +64,7 @@ SOAR_ID 61
 ENUMERATION 62 1 wait
 ENUMERATION 63 1 set-cluster-radius
 SOAR_ID 64
-ENUMERATION 65 1 attack-base
+ENUMERATION 65 1 cab-attack-base
 SOAR_ID 66
 SOAR_ID 67
 ENUMERATION 68 1 state
@@ -79,7 +79,40 @@ ENUMERATION 76 1 link-to-memory-instance
 SOAR_ID 77
 ENUMERATION 78 1 label-instance
 SOAR_ID 79
-85
+SOAR_ID 80
+ENUMERATION 81 1 cluster-attack-tanks
+SOAR_ID 82
+ENUMERATION 83 1 state
+ENUMERATION 84 1 cluster-attack-tanks
+ENUMERATION 85 1 cat-attack-tank
+SOAR_ID 86
+ENUMERATION 87 1 create-memory-instance
+SOAR_ID 88
+ENUMERATION 89 1 cat-find-cog
+SOAR_ID 90
+ENUMERATION 91 1 free-tanks
+SOAR_ID 92
+ENUMERATION 93 1 label-instance
+SOAR_ID 94
+ENUMERATION 95 1 move-tanks
+SOAR_ID 96
+ENUMERATION 97 1 set-cluster-radius
+SOAR_ID 98
+SOAR_ID 99
+ENUMERATION 100 1 state
+ENUMERATION 101 1 find-cog
+ENUMERATION 102 1 remember-cog
+SOAR_ID 103
+ENUMERATION 104 1 restore-grouping-radius
+SOAR_ID 105
+ENUMERATION 106 1 see-single-tank-group
+SOAR_ID 107
+SOAR_ID 108
+ENUMERATION 109 1 state
+ENUMERATION 110 1 attack-tank
+ENUMERATION 111 1 attack
+SOAR_ID 112
+121
 0 io 1
 0 name 7
 0 operator 4
@@ -93,6 +126,7 @@ SOAR_ID 79
 0 operator 55
 0 operator 57
 0 operator 61
+0 operator 80
 0 superstate 6
 0 top-state 0
 0 type 5
@@ -165,3 +199,38 @@ SOAR_ID 79
 75 name 74
 77 name 76
 79 name 78
+80 name 81
+82 name 84
+82 operator 86
+82 operator 88
+82 operator 90
+82 operator 92
+82 operator 94
+82 operator 96
+82 operator 98
+82 superstate 0
+82 top-state 0
+82 type 83
+86 name 85
+88 name 87
+90 name 89
+92 name 91
+94 name 93
+96 name 95
+98 name 97
+99 name 101
+99 operator 103
+99 operator 105
+99 operator 107
+99 superstate 82
+99 top-state 0
+99 type 100
+103 name 102
+105 name 104
+107 name 106
+108 name 110
+108 operator 112
+108 superstate 82
+108 top-state 0
+108 type 109
+112 name 111

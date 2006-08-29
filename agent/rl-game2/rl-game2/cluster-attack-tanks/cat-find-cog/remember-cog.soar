@@ -1,5 +1,5 @@
-sp {find-cog*propose*remember-cog
-   (state <s> ^name find-cog
+sp {cat-find-cog*propose*remember-cog
+   (state <s> ^name cat-find-cog
               ^grouping-radius-exploded t
               ^superstate.instance <si>
              -^memory.cog
@@ -17,8 +17,8 @@ sp {find-cog*propose*remember-cog
         ^cog-x <x>
         ^cog-y <y>)}
 
-sp {find-cog*apply*remember-cog
-   (state <s> ^name find-cog
+sp {cat-find-cog*apply*remember-cog
+   (state <s> ^name cat-find-cog
               ^superstate.instance <si>
               ^memory <m>
               ^operator <o>)

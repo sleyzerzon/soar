@@ -1,0 +1,24 @@
+sp {cluster-attack-tanks*propose*free-tanks
+   (state <s> ^name cluster-attack-tanks
+              ^instance <si>
+              ^memory <m>
+             -^tanks-clustered)
+   (<m> ^already-moved <id>
+       -^free <id>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name free-tanks
+        ^id <id>)}
+
+sp {cluster-attack-tanks*apply*free-tanks
+   (state <s> ^name cluster-attack-tanks
+              ^instance <si>
+              ^memory <m>
+              ^io.output-link.sorts <cmd-link>
+              ^operator <o>)
+   (<o> ^name free-tanks
+        ^id <id>)
+-->
+   (<cmd-link> ^free <free-cmd>)
+   (<free-cmd> ^group0 <id>)
+   (<m> ^free <id>)}

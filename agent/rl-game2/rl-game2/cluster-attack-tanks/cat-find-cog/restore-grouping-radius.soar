@@ -1,5 +1,5 @@
-sp {find-cog*propose*restore-grouping-radius
-   (state <s> ^name find-cog
+sp {cat-find-cog*propose*restore-grouping-radius
+   (state <s> ^name cat-find-cog
               ^superstate.instance <si>
               ^memory.cog <cog>
               ^grouping-radius-exploded t)
@@ -7,8 +7,8 @@ sp {find-cog*propose*restore-grouping-radius
    (<s> ^operator <o> +)
    (<o> ^name restore-grouping-radius)}
 
-sp {find-cog*apply*restore-grouping-radius
-   (state <s> ^name find-cog
+sp {cat-find-cog*apply*restore-grouping-radius
+   (state <s> ^name cat-find-cog
               ^superstate <ss>
               ^io.output-link.sorts <cmd>
               ^grouping-radius-exploded <e>

@@ -1,5 +1,5 @@
-sp {find-cog*propose*see-single-tank-group
-   (state <s> ^name find-cog
+sp {cat-find-cog*propose*see-single-tank-group
+   (state <s> ^name cat-find-cog
               ^superstate.instance <si>
              -^memory.cog
              -^grouping-radius-exploded)
@@ -7,8 +7,8 @@ sp {find-cog*propose*see-single-tank-group
    (<s> ^operator <o> +)
    (<o> ^name see-single-tank-group)}
 
-sp {find-cog*apply*see-single-tank-group
-   (state <s> ^name find-cog
+sp {cat-find-cog*apply*see-single-tank-group
+   (state <s> ^name cat-find-cog
               ^io.output-link.sorts <cmd>
               ^operator <o>)
    (<o> ^name see-single-tank-group)
