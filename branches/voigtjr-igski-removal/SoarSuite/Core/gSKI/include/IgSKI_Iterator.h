@@ -144,9 +144,9 @@ namespace gSKI {
    class InstanceInfo;
    class IProduction;
    class Condition;
-   class IMatchSet;
+   class MatchSet;
    class IRhsAction;
-   class IMatch;
+   class Match;
    class IProductionMatch;
    class IWme;
    class IWMObject;
@@ -173,10 +173,10 @@ namespace gSKI {
    typedef IIterator<Condition *>               tIConditionIterator;
    typedef IIterator<IRhsAction *>               tIRhsActionIterator;
    typedef IIterator<IWMObject *>                tIWMObjectIterator;
-   typedef IIterator<IMatchSet *>                tIMatchSetIterator;
+   typedef IIterator<MatchSet *>                tIMatchSetIterator;
    typedef IIterator<TestSet *>                 tITestSetIterator;
    typedef IIterator<ISymbol*>                   tISymbolIterator;
-   typedef IIterator<IMatch *>                   tIMatchIterator;
+   typedef IIterator<Match *>                   tIMatchIterator;
    typedef IIterator<Agent*>                    tIAgentIterator;
    typedef IIterator<Test *>                    tITestIterator;
    typedef IIterator<IWme *>                     tIWmeIterator;

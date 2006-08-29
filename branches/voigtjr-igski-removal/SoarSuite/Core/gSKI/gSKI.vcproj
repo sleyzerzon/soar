@@ -836,14 +836,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_Match.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_MatchSet.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\IgSKI_MultiAttribute.h"
 				>
 			</File>
@@ -860,7 +852,7 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_ProductionManager.h"
+				RelativePath=".\include\IgSKI_ProductionManager.h"
 				>
 			</File>
 			<File

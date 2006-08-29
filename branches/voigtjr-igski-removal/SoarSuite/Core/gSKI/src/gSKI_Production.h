@@ -34,7 +34,7 @@ namespace gSKI {
 
    class IAction;     /**< @see GetActions    */
    class Condition;  /**< @see GetConditions */
-   class IMatch;      /**< @see GetMatches    */
+   class Match;      /**< @see GetMatches    */
    struct Error;      /**< @see Error         */
    class ConditionSet;/**< @see ConditionSet  */
 

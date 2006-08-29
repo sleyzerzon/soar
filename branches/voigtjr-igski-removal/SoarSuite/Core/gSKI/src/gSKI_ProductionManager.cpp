@@ -572,7 +572,7 @@ _|___/    __         _    _             ____  _               _
  \____|\___|\__|_|  |_|\__,_|\__\___|_| |_|____/ \___|\__|___/
    ===============================
    */
-   IMatchSet* ProductionManager::GetMatchSets(const IProduction* prod, Error* err) const
+   MatchSet* ProductionManager::GetMatchSets(const IProduction* prod, Error* err) const
    {
    
       return 0;

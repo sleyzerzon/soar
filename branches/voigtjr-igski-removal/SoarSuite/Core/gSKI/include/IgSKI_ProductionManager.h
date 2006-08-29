@@ -20,7 +20,7 @@
 namespace gSKI {
    
    class IProduction;
-   class IMatchSet;
+   class MatchSet;
    class IProductionMatch;
    class IProductionListener;
    class IWME;
@@ -288,7 +288,7 @@ namespace gSKI {
        *
        * @returns The set of matches to the given production.
        */
-      virtual IMatchSet* GetMatchSets(const IProduction* prod, Error* err = 0) const  = 0;
+      virtual MatchSet* GetMatchSets(const IProduction* prod, Error* err = 0) const  = 0;
 
 
       /**

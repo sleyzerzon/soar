@@ -31,7 +31,7 @@ typedef std::set<std::string> tStringSet;
 namespace gSKI {
    
    class IProduction;
-   class IMatchSet;
+   class MatchSet;
    class IProductionMatch;
    class IProductionInstance;
    class IWME;
@@ -294,7 +294,7 @@ namespace gSKI {
        *
        * @returns The set of matches to the given production.
        */
-     IMatchSet* GetMatchSets(const IProduction* prod, Error* err = 0) const;
+     MatchSet* GetMatchSets(const IProduction* prod, Error* err = 0) const;
 
 
       /**

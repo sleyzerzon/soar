@@ -16,7 +16,7 @@ namespace gSKI {
    class IProductionMatch {
    public:
      /**
-      * @brief Destructor for the IMatchSet
+      * @brief Destructor for the MatchSet
       *
       * This function insures that the destructor in the most derived
       * class is called when it is destroyed.  This will always be 
@@ -34,7 +34,7 @@ namespace gSKI {
       *
       * @returns The MatchSet for this ProductionMatch.
       */
-      virtual IMatchSet* GetMatchSet(Error* err = 0) = 0;
+      virtual MatchSet* GetMatchSet(Error* err = 0) = 0;
 
 
       /**
