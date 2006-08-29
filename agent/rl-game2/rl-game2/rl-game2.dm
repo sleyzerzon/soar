@@ -1,4 +1,4 @@
-76
+80
 SOAR_ID 0
 SOAR_ID 1
 SOAR_ID 2
@@ -58,7 +58,7 @@ SOAR_ID 55
 ENUMERATION 56 1 identify-self
 SOAR_ID 57
 ENUMERATION 58 1 identify-enemy
-ENUMERATION 59 1 label-instance
+ENUMERATION 59 1 create-memory-instance
 SOAR_ID 60
 SOAR_ID 61
 ENUMERATION 62 1 wait
@@ -75,7 +75,11 @@ ENUMERATION 72 1 free-tanks
 SOAR_ID 73
 ENUMERATION 74 1 create-memory-instance
 SOAR_ID 75
-81
+ENUMERATION 76 1 link-to-memory-instance
+SOAR_ID 77
+ENUMERATION 78 1 label-instance
+SOAR_ID 79
+85
 0 io 1
 0 name 7
 0 operator 4
@@ -122,6 +126,8 @@ SOAR_ID 75
 29 operator 66
 29 operator 73
 29 operator 75
+29 operator 77
+29 operator 79
 29 superstate 0
 29 top-state 0
 29 type 30
@@ -157,3 +163,5 @@ SOAR_ID 75
 71 name 70
 73 name 72
 75 name 74
+77 name 76
+79 name 78

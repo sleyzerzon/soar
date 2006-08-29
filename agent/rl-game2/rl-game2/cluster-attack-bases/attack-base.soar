@@ -11,7 +11,7 @@ sp {cluster-attack-bases*propose*attack-base
    (<enemy-base> ^owner <epid>
                  ^type |controlCenter|)
 -->
-   (<s> ^operator <o> +)
-   (<o> ^name attack-base
-        ^my-tanks <my-tanks>
-        ^enemy-base <enemy-base>)}
+   (<s> ^my-tanks <my-tanks>
+        ^enemy-base <enemy-base>
+        ^operator <o> + =)
+   (<o> ^name attack-base)}

@@ -7,12 +7,30 @@ sp {cluster-attack-bases*elaborate*label-instance-first
 -->
    (<s> ^operator <o1> > <o2>)}
 
+sp {cluster-attack-bases*elaborate*create-memory-instance-first
+   (state <s> ^name cluster-attack-bases
+              ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name create-memory-instance)
+   (<o2> ^name <> create-memory-instance)
+-->
+   (<s> ^operator <o1> > <o2>)}
+
 sp {cluster-attack-bases*elaborate*set-cluster-radius-first
    (state <s> ^name cluster-attack-bases
               ^operator <o1> +
               ^operator <o2> +)
    (<o1> ^name set-cluster-radius)
    (<o2> ^name <> set-cluster-radius)
+-->
+   (<s> ^operator <o1> > <o2>)}
+
+sp {cluster-attack-bases*elaborate*free-tanks-first
+   (state <s> ^name cluster-attack-bases
+              ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name free-tanks)
+   (<o2> ^name move-tanks)
 -->
    (<s> ^operator <o1> > <o2>)}
 
@@ -26,8 +44,17 @@ sp {cluster-attack-bases*elaborate*tanks-clustered
    (<gs> ^group <g>)
    (<g> ^owner <mpid>
         ^type tank)
-  -{(<gs> ^group { <g1> <> <g> })
+  -{(<gs> ^group { <> <g> <g1> })
     (<g1> ^owner <mpid>
           ^type tank)}
 -->
-   (<s> ^tanks-clustered 0)}
+   (<s> ^tanks-clustered t)}
+
+sp {cluster-attack-bases*elaborate*link-memory-instance
+   (state <s> ^name cluster-attack-bases
+              ^instance <si>
+              ^top-state.cluster-attack-bases-memory.instance <mi>)
+   (<mi> ^label <si>)
+-->
+   (<s> ^memory <mi>)}
+   

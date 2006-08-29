@@ -1,10 +1,8 @@
 sp {find-cog*propose*restore-grouping-radius
    (state <s> ^name find-cog
               ^superstate.instance <si>
-              ^top-state.cluster-attack-bases-memory.instance <mi>
+              ^memory.cog <cog>
               ^grouping-radius-exploded t)
-   (<mi> ^label <si>
-         ^cog <cog>)
 -->
    (<s> ^operator <o> +)
    (<o> ^name restore-grouping-radius)}
