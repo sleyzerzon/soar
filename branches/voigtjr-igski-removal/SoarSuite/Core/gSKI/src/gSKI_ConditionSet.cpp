@@ -362,7 +362,7 @@ std::string dumpConditions(ConditionSet* cset, int &tablevel)
 void processProduction(const char* prodName, 
                        const char* production,
                        const char* expectedResult, 
-                       IProductionManager*  IPM)
+                       ProductionManager*  IPM)
 {
    IPM->AddProduction(const_cast<char *>(production));
 
@@ -413,7 +413,7 @@ DEF_TEST_INSUITE(ConditionTesting, Start)
    Agent*              agent = IAM->AddAgent("ProductionTestAgent");
    VALIDATE(agent != 0);
 
-   IProductionManager*  IPM   = agent->GetProductionManager();
+   ProductionManager*  IPM   = agent->GetProductionManager();
    VALIDATE(IPM != 0);
 
    std::cout << "***********************************************************" << std::endl;

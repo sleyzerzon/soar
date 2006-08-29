@@ -20,7 +20,7 @@
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 
 using namespace cli;
@@ -67,7 +67,7 @@ bool CommandLineInterface::DoPWatch(gSKI::Agent* pAgent, bool query, const std::
 	// Attain the evil back door of doom, even though we aren't the TgD
 	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
 
-	gSKI::IProductionManager* pProductionManager = pAgent->GetProductionManager();
+	gSKI::ProductionManager* pProductionManager = pAgent->GetProductionManager();
 	gSKI::tIProductionIterator* pIter = 0;
 	gSKI::IProduction* pProd = 0;
 

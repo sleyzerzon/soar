@@ -15,7 +15,7 @@
 #include "cli_Commands.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 
 using namespace cli;
@@ -65,7 +65,7 @@ bool CommandLineInterface::DoReteNet(gSKI::Agent* pAgent, bool save, std::string
 
 	if (!filename.size()) return SetError(CLIError::kMissingFilenameArg);
 
-	gSKI::IProductionManager* pProductionManager = pAgent->GetProductionManager();
+	gSKI::ProductionManager* pProductionManager = pAgent->GetProductionManager();
 	gSKI::tIProductionIterator* pIter = 0;
 
 	pIter = save ? pProductionManager->GetJustifications() : pProductionManager->GetAllProductions();

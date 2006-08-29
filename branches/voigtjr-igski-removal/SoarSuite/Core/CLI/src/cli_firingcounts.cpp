@@ -20,7 +20,7 @@
 #include "sml_StringOps.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 
 #ifdef _MSC_VER
@@ -66,7 +66,7 @@ bool CommandLineInterface::DoFiringCounts(gSKI::Agent* pAgent, const int numberT
 	if (!RequireAgent(pAgent)) return false;
 
 	// get the production stuff
-	gSKI::IProductionManager* pProductionManager = pAgent->GetProductionManager();
+	gSKI::ProductionManager* pProductionManager = pAgent->GetProductionManager();
 	gSKI::tIProductionIterator* pIter = 0;
 	gSKI::IProduction* pProd = 0;
 	std::vector< std::pair< std::string, unsigned long > > firings;

@@ -852,10 +852,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\IgSKI_ProductionManager.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_ProductionMatch.h"
 				>
 			</File>

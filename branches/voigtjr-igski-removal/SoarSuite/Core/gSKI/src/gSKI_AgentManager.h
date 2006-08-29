@@ -78,7 +78,7 @@ namespace gSKI
       * Possible Errors:
       *   @li gSKIERR_INVALID_PTR if name is 0
       *   @li gSKIERR_AGENT_EXISTS if an agent by the given name already exists
-      *   @li Any error returned by IProductionManager::LoadSoarFile if a production filename
+      *   @li Any error returned by ProductionManager::LoadSoarFile if a production filename
       *         is supplied and the file doesn't exist or is somehow not usable (e.g. bad format)
       *
       * @param name Name of the Agent to add.  This name must be unique for this instance of the

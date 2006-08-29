@@ -18,7 +18,7 @@
 #include "sml_Names.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 
 using namespace cli;
@@ -85,7 +85,7 @@ bool CommandLineInterface::DoExcise(gSKI::Agent* pAgent, const ExciseBitset& opt
 	if (!RequireAgent(pAgent)) return false;
 
 	// Acquire production manager
-	gSKI::IProductionManager *pProductionManager = pAgent->GetProductionManager();
+	gSKI::ProductionManager *pProductionManager = pAgent->GetProductionManager();
 	if (!pProductionManager) {
 		SetErrorDetail("Failed to get production manager.");
 		return SetError(CLIError::kgSKIError);

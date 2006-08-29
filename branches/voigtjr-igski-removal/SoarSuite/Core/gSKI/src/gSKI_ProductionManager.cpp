@@ -1204,7 +1204,7 @@ void prodTest(){
    Agent*              agent = IAM->AddAgent("ProductionTestAgent");
    VALIDATE(agent != 0);
 
-   IProductionManager*  IPM   = agent->GetProductionManager();
+   ProductionManager*  IPM   = agent->GetProductionManager();
    VALIDATE(IPM != 0);
 
    VALIDATE(IPM->LoadSoarFile("test1.soar"));

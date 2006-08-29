@@ -16,7 +16,7 @@
 #include "sml_Names.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 
 using namespace cli;
 using namespace sml;
@@ -85,7 +85,7 @@ bool CommandLineInterface::DoSoar8(gSKI::Agent* pAgent, bool* pSoar8) {
 	// }
 
 	// Check that production memory is empty
-	gSKI::IProductionManager* pProductionManager = pAgent->GetProductionManager(&m_gSKIError);
+	gSKI::ProductionManager* pProductionManager = pAgent->GetProductionManager(&m_gSKIError);
 	if (gSKI::isError(m_gSKIError)) {
 		SetErrorDetail("Unable to get production manager.");
 		return SetError(CLIError::kgSKIError);

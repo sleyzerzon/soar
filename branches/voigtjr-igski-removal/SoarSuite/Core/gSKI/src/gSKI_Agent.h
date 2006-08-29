@@ -41,7 +41,7 @@ typedef struct agent_struct agent;
 
 namespace gSKI
 {
-	class IProductionManager;
+	class ProductionManager;
 	class WorkingMemory;
 	class Kernel;
 	class InputLink;
@@ -93,7 +93,7 @@ namespace gSKI
 		* Agents are initialized to the STOP state.  @see gSKIRunState
 		*
 		* Possible Errors:
-		*   @li Any error returned by IProductionManager::LoadSoarFile if a production filename
+		*   @li Any error returned by ProductionManager::LoadSoarFile if a production filename
 		*         is supplied and the file doesn't exist or is somehow not usable (e.g. bad format)
 		*
 		* @param prodFileName (Optional) Name of a soar production file to load with the agent.  
@@ -369,7 +369,7 @@ namespace gSKI
 		* @returns A pointer to the production manager for this agent.  This
 		*           pointer may be 0 if the function fails.
 		*/
-		IProductionManager* GetProductionManager(Error* err = 0);
+		ProductionManager* GetProductionManager(Error* err = 0);
 
 		/**
 		* @brief Returns a pointer to the input link for this agent
@@ -1418,7 +1418,7 @@ namespace gSKI
 		typedef tRhsFunctionMap::const_iterator      tRhsFunctionMapCIt;
 		//}
 
-		IProductionManager*   m_productionManager; /**< The production manager for this agent. */
+		ProductionManager*   m_productionManager; /**< The production manager for this agent. */
 
 		agent*                m_agent;             /**< the Soar agent pointer. */
 

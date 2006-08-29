@@ -15,7 +15,7 @@
 #include "cli_Commands.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 
 using namespace cli;
 
@@ -42,7 +42,7 @@ bool CommandLineInterface::DoSP(gSKI::Agent* pAgent, const std::string& producti
 	if (!RequireAgent(pAgent)) return false;
 
 	// Acquire production manager
-	gSKI::IProductionManager *pProductionManager = pAgent->GetProductionManager();
+	gSKI::ProductionManager *pProductionManager = pAgent->GetProductionManager();
 
 	// Load the production
 	this->AddListenerAndDisableCallbacks(pAgent);

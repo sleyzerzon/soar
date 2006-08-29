@@ -52,7 +52,7 @@
 namespace gSKI {
 	class Agent;
 	class Kernel;
-	class IProductionManager;
+	class ProductionManager;
 }
 namespace sml {
 	class ElementXML;
@@ -766,7 +766,7 @@ protected:
 	/*************************************************************
 	* @brief 
 	*************************************************************/
-	void HandleSourceError(int errorLine, const std::string& filename, gSKI::IProductionManager* pProductionManager);
+	void HandleSourceError(int errorLine, const std::string& filename, gSKI::ProductionManager* pProductionManager);
 
 	/*************************************************************
 	* @brief 

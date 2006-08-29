@@ -24,7 +24,7 @@
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
 #include "IgSKI_Production.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "sml_KernelSML.h"
 
 #include "assert.h"

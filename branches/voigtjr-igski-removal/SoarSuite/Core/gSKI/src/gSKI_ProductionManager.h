@@ -14,7 +14,6 @@
 #define GSKI_PRODUCTIONMANAGER_H
 
 #include "IgSKI_Iterator.h"
-#include "IgSKI_ProductionManager.h"
 #include "IterUtils.h"
 #include "gSKI_Iterator.h"
 
@@ -57,7 +56,7 @@ namespace gSKI {
     *    These methods are not specific to a particular production at every
     *    point in time.
     */
-   class ProductionManager : public IProductionManager
+   class ProductionManager
    {
    public:
 
@@ -148,7 +147,7 @@ namespace gSKI {
        *
        * @returns Success or failure of the operation.
        */
-       bool RemoveAllProductions(int& i, Error *pErr ) const;
+       bool RemoveAllProductions(int& i, Error *pErr = 0 ) const;
 
 	  /**
        * @brief Remove all UserProductions
@@ -164,7 +163,7 @@ namespace gSKI {
        *
        * @returns Success or failure of the operation.
        */
-       bool RemoveAllUserProductions(int& i, Error *pErr ) const;
+       bool RemoveAllUserProductions(int& i, Error *pErr = 0) const;
 
 	  /**
        * @brief Remove all Chunks and Justifications
@@ -180,7 +179,7 @@ namespace gSKI {
        *
        * @returns Success or failure of the operation.
        */
-       bool RemoveAllChunks (int& i, Error *pErr ) const;
+       bool RemoveAllChunks (int& i, Error *pErr = 0) const;
 
 	  /**
        * @brief Remove all DefaultProductions
@@ -196,7 +195,7 @@ namespace gSKI {
        *
        * @returns Success or failure of the operation.
        */
-       bool RemoveAllDefaultProductions(int& i, Error *pErr ) const;
+       bool RemoveAllDefaultProductions(int& i, Error *pErr = 0 ) const;
 
       /**
        * @brief Deletes a set of Productions
@@ -412,7 +411,7 @@ namespace gSKI {
        */
      tIProductionIterator* GetDefaultProductions(Error* err = 0) const;
 
-   private:
+   public:
       /**
        * @brief: Helper function to load in a Soar File without repeats
        *
@@ -600,7 +599,7 @@ namespace gSKI {
      std::string getCurrentWorkingDirectory();
 
   
-   private:
+   public:
         /**
          * @brief: A vector of productions.
          */

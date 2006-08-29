@@ -754,7 +754,7 @@ namespace gSKI
                           |___/
    =============================
    */
-   IProductionManager* Agent::GetProductionManager(Error* err)
+   ProductionManager* Agent::GetProductionManager(Error* err)
    {
       ClearError(err);
 

@@ -19,7 +19,7 @@
 #include "sml_Names.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 
 #include <assert.h>
@@ -138,7 +138,7 @@ bool CommandLineInterface::DoSource(gSKI::Agent* pAgent, std::string filename) {
 	static int numTotalProductionsSourced;
 	static int numTotalProductionsExcised;
 
-	gSKI::IProductionManager* pProductionManager = pAgent->GetProductionManager();
+	gSKI::ProductionManager* pProductionManager = pAgent->GetProductionManager();
 
 	if (m_SourceDepth == 0) {				// Check for top-level source call
 		m_SourceDirDepth = 0;				// Set directory depth to zero on first call to source, even though it should be zero anyway
@@ -370,7 +370,7 @@ bool CommandLineInterface::DoSource(gSKI::Agent* pAgent, std::string filename) {
 	return true;
 }
 
-void CommandLineInterface::HandleSourceError(int errorLine, const std::string& filename, gSKI::IProductionManager* pProductionManager) {
+void CommandLineInterface::HandleSourceError(int errorLine, const std::string& filename, gSKI::ProductionManager* pProductionManager) {
 	if (!m_SourceError) {
 
 		// Remove listener

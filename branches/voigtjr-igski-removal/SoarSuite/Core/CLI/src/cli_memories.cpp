@@ -19,7 +19,7 @@
 #include "sml_StringOps.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 
 #ifdef _MSC_VER
@@ -99,7 +99,7 @@ bool CommandLineInterface::ParseMemories(gSKI::Agent* pAgent, std::vector<std::s
 bool CommandLineInterface::DoMemories(gSKI::Agent* pAgent, const MemoriesBitset options, int n, const std::string* pProduction) {
 	if (!RequireAgent(pAgent)) return false;
 
-	gSKI::IProductionManager* pProductionManager = pAgent->GetProductionManager();
+	gSKI::ProductionManager* pProductionManager = pAgent->GetProductionManager();
 	gSKI::tIProductionIterator* pIter = 0;
 	gSKI::IProduction* pProd = 0;
 	std::vector< std::pair< std::string, unsigned long > > memories;

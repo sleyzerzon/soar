@@ -14,7 +14,7 @@
 #ifndef GSKI_HEADER
 #define GSKI_HEADER
 
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_AgentThreadGroup.h"
 #include "IgSKI_AgentRunControl.h"
 #include "IgSKI_WorkingMemory.h"

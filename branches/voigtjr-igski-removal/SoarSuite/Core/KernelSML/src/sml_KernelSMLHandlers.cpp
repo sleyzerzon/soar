@@ -51,7 +51,7 @@
 #include "gSKI_Events.h"
 #include "gSKI_AgentManager.h"
 #include "gSKI_Agent.h"
-#include "IgSKI_ProductionManager.h"
+#include "gSKI_ProductionManager.h"
 #include "IgSKI_OutputProcessor.h"
 #include "IgSKI_OutputLink.h"
 #include "IgSKI_InputProducer.h"
