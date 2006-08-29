@@ -108,7 +108,7 @@ namespace gSKI
        *           this kernel instance.  This pointer may be 0 if there is
        *           a failure.
        */
-      IInstanceInfo* GetInstanceInformation(Error* err = 0);
+      InstanceInfo* GetInstanceInformation(Error* err = 0);
 
       /**
        * @brief    Get the current log location

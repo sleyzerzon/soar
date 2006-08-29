@@ -141,7 +141,7 @@ namespace gSKI {
    /* Forward declarations for particular instantiations of the iterator */
    class IProductionMatch;
    class IConditionSet;
-   class IInstanceInfo;
+   class InstanceInfo;
    class IProduction;
    class ICondition;
    class IMatchSet;
@@ -150,7 +150,7 @@ namespace gSKI {
    class IProductionMatch;
    class IWme;
    class IWMObject;
-   class IInstanceInfo;
+   class InstanceInfo;
    class ISymbol;
    class IAction;
    class Agent;
@@ -167,7 +167,7 @@ namespace gSKI {
    typedef IIterator<IProductionMatch *>         tIProductionMatchIterator;
    typedef IIterator<IActionElement*>            tIActionElementIterator;
    typedef IIterator<egSKIPreferenceType>        tPreferenceTypeIterator;
-   typedef IIterator<IInstanceInfo*>	         tIInstanceInfoIterator;
+   typedef IIterator<InstanceInfo*>	         tIInstanceInfoIterator;
    typedef IIterator<IConditionSet *>            tIConditionSetIterator;
    typedef IIterator<IProduction *>              tIProductionIterator;
    typedef IIterator<ICondition *>               tIConditionIterator;

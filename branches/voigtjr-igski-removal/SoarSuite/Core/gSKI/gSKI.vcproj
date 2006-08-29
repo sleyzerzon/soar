@@ -848,10 +848,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_InstanceInfo.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_Iterator.h"
 				>
 			</File>

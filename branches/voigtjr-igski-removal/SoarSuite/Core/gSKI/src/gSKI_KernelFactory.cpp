@@ -301,7 +301,7 @@ namespace gSKI {
 /_/   \_\__|\__\__,_|\___|_| |_|
    =========================
    */
-   Kernel* KernelFactory::Attach(const IInstanceInfo* pInstanceInfo, 
+   Kernel* KernelFactory::Attach(const InstanceInfo* pInstanceInfo, 
                                   Error* err) const 
    {
       ClearError(err);

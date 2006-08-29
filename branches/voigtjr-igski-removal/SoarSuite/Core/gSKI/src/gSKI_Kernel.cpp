@@ -138,7 +138,7 @@ namespace gSKI
 |___|_| |_|_|  \___/|_|  |_| |_| |_|\__,_|\__|_|\___/|_| |_|
       =========================
    */
-   IInstanceInfo* Kernel::GetInstanceInformation(Error* err)
+   InstanceInfo* Kernel::GetInstanceInformation(Error* err)
    {
       ClearError(err);
    

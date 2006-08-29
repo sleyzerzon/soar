@@ -23,7 +23,7 @@
 
 namespace gSKI {
 
-   class IInstanceInfo;
+   class InstanceInfo;
    class Kernel;
 
    /**
@@ -281,7 +281,7 @@ namespace gSKI {
 	   *           or if this factory does not support attaching to running
 	   *           instances, the return value is 0.
       */
-      Kernel* Attach(const IInstanceInfo* pInstanceInfo, Error* err = 0) const;
+      Kernel* Attach(const InstanceInfo* pInstanceInfo, Error* err = 0) const;
 
       
       /**
@@ -300,13 +300,13 @@ namespace gSKI {
 
    private:
       /**
-       * @brief: The Typedefs for a std vector of IInstanceInfo pointers.
+       * @brief: The Typedefs for a std vector of InstanceInfo pointers.
        */
-      typedef FwdContainerType< std::vector<IInstanceInfo * > >  tInstanceInfoVec;
+      typedef FwdContainerType< std::vector<InstanceInfo * > >  tInstanceInfoVec;
       typedef FwdContainerType< std::vector< const Kernel *> >          tKernelVec;
 
       /**
-       * @brief: The iterator that will hold the container of IInstanceInfo pointers.
+       * @brief: The iterator that will hold the container of InstanceInfo pointers.
        */
       typedef Iterator<tInstanceInfoVec::V, tInstanceInfoVec::t>  tInstanceInfoIter;
 

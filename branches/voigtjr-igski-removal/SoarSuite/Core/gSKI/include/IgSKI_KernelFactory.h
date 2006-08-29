@@ -21,7 +21,7 @@
 namespace gSKI {
 
 	/** Forward declarations */
-	class IInstanceInfo;
+	class InstanceInfo;
    class Kernel;
    struct Error;
 
@@ -292,7 +292,7 @@ namespace gSKI {
 	   *           or if this factory does not support attaching to running
 	   *           instances, the return value is 0.
       */
-      virtual Kernel* Attach(const IInstanceInfo* instanceInfo, Error* err = 0) const  = 0;
+      virtual Kernel* Attach(const InstanceInfo* instanceInfo, Error* err = 0) const  = 0;
   };
 }
 

@@ -270,7 +270,7 @@
       Types of processes in which the kernel can be housed.  
 
       Used as a paramter passed to the kernel factory's create method and as a return
-        type for IInstanceInfo::GetProcessType.
+        type for InstanceInfo::GetProcessType.
       
       @li IN_PROCESS:             In the client's process
       @li LOCAL_OUT_OF_PROCESS:   On the same machine, but different process than client

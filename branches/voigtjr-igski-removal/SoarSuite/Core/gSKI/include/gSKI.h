@@ -20,7 +20,7 @@
 #include "IgSKI_WorkingMemory.h"
 #include "IgSKI_KernelFactory.h"
 #include "IgSKI_EventManager.h"
-#include "IgSKI_InstanceInfo.h"
+#include "gSKI_InstanceInfo.h"
 #include "IgSKI_Iterator.h"
 #include "gSKI_Enumerations.h"
 #include "gSKI_AgentManager.h"
