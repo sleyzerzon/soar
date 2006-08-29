@@ -880,10 +880,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_PerformanceManager.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_Production.h"
 				>
 			</File>
