@@ -1,0 +1,18 @@
+sp {cab-find-cog*propose*see-single-tank-group
+   (state <s> ^name cab-find-cog
+              ^superstate.instance <si>
+             -^memory.cog
+             -^grouping-radius-exploded)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name see-single-tank-group)}
+
+sp {cab-find-cog*apply*see-single-tank-group
+   (state <s> ^name cab-find-cog
+              ^io.output-link.sorts <cmd>
+              ^operator <o>)
+   (<o> ^name see-single-tank-group)
+-->
+   (<cmd> ^grouping-radius <gr-cmd>)
+   (<gr-cmd> ^value 1000)
+   (<s> ^grouping-radius-exploded t)}

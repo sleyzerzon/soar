@@ -1,0 +1,31 @@
+sp {cab-find-cog*propose*remember-cog
+   (state <s> ^name cab-find-cog
+              ^grouping-radius-exploded t
+              ^superstate.instance <si>
+             -^memory.cog
+              ^my-pid <mpid>
+              ^io.input-link <in>)
+   (<in> ^vision-state.grouping-radius 1000
+         ^groups.group <single-tank-group>)
+   (<single-tank-group> ^owner <mpid>
+                        ^type tank
+                        ^x-pos <x>
+                        ^y-pos <y>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name remember-cog
+        ^cog-x <x>
+        ^cog-y <y>)}
+
+sp {cab-find-cog*apply*remember-cog
+   (state <s> ^name cab-find-cog
+              ^superstate.instance <si>
+              ^memory <m>
+              ^operator <o>)
+   (<o> ^name remember-cog
+        ^cog-x <x>
+        ^cog-y <y>)
+-->
+   (<m> ^cog <cog>)
+   (<cog> ^x <x>
+          ^y <y>)}
