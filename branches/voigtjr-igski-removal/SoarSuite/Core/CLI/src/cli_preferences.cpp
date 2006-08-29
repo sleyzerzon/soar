@@ -21,7 +21,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParsePreferences(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParsePreferences(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'0', "none",		0},
 		{'1', "names",		0},
@@ -74,7 +74,7 @@ bool CommandLineInterface::ParsePreferences(gSKI::IAgent* pAgent, std::vector<st
 	return DoPreferences(pAgent, detail);
 }
 
-bool CommandLineInterface::DoPreferences(gSKI::IAgent* pAgent, const ePreferencesDetail detail, const std::string* pId, const std::string* pAttribute) {
+bool CommandLineInterface::DoPreferences(gSKI::Agent* pAgent, const ePreferencesDetail detail, const std::string* pId, const std::string* pAttribute) {
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll need it

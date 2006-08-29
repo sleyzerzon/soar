@@ -40,7 +40,7 @@
 #include "IgSKI_Kernel.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_SymbolFactory.h"
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Match.h"
 #include "IgSKI_Test.h"
 #include "IgSKI_TestSet.h"

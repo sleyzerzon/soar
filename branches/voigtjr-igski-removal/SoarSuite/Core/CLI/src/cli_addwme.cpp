@@ -18,14 +18,14 @@
 #include "sml_StringOps.h"
 
 #include "IgSKI_WorkingMemory.h"
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseAddWME(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseAddWME(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	if (argv.size() < 4) return SetError(CLIError::kTooFewArgs);
 
 	unsigned attributeIndex = (argv[2] == "^") ? 3 : 2;
@@ -45,7 +45,7 @@ bool CommandLineInterface::ParseAddWME(gSKI::IAgent* pAgent, std::vector<std::st
 	return DoAddWME(pAgent, argv[1], argv[attributeIndex], argv[attributeIndex + 1], acceptable);
 }
 
-bool CommandLineInterface::DoAddWME(gSKI::IAgent* pAgent, const std::string& id, const std::string& attribute, const std::string& value, bool acceptable) {
+bool CommandLineInterface::DoAddWME(gSKI::Agent* pAgent, const std::string& id, const std::string& attribute, const std::string& value, bool acceptable) {
 	// Need agent pointer for function calls
 	if (!RequireAgent(pAgent)) return false;
 

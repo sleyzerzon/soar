@@ -66,7 +66,7 @@ bool RunListener::RemoveListener(egSKIRunEventId eventID, Connection* pConnectio
 }
 
 // Called when a "RunEvent" occurs in the kernel
-void RunListener::HandleEvent(egSKIRunEventId eventID, gSKI::IAgent* agentPtr, egSKIPhaseType phase)
+void RunListener::HandleEvent(egSKIRunEventId eventID, gSKI::Agent* agentPtr, egSKIPhaseType phase)
 {
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;

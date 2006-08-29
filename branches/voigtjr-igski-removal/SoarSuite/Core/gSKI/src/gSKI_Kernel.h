@@ -282,7 +282,7 @@ namespace gSKI
 	   * rather than a generic user function that the user provides.
 	   *
 	   **************************************************/
-	  virtual bool FireRhsNotification(IAgent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+	  virtual bool FireRhsNotification(Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 									   int maxReturnValueLength, char* pReturnValue) ;
 
       /**
@@ -531,7 +531,7 @@ namespace gSKI
 		 // When using this should call NotifyGetResult() not just Notify().
 		 class RhsNotifier {
          public:
-            RhsNotifier(IAgent* agent, bool commandLine, char const* pFunctionName, char const* pArgument,
+            RhsNotifier(Agent* agent, bool commandLine, char const* pFunctionName, char const* pArgument,
 					    int maxLengthReturnValue, char* pReturnValue):
 						m_Agent(agent), m_CommandLine(commandLine), m_FunctionName(pFunctionName), m_Argument(pArgument),
 						m_MaxLength(maxLengthReturnValue), m_ReturnValue(pReturnValue)
@@ -544,7 +544,7 @@ namespace gSKI
 				return haveResult ;
             }
          private:
-			IAgent*			m_Agent ;
+			Agent*			m_Agent ;
 			bool			m_CommandLine ;
 			char const*		m_FunctionName ;
 			char const*		m_Argument ;

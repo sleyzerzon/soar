@@ -410,7 +410,7 @@ DEF_TEST_INSUITE(ConditionTesting, Start)
    IAgentManager*       IAM   = k->GetAgentManager();
    VALIDATE(IAM != 0);
 
-   IAgent*              agent = IAM->AddAgent("ProductionTestAgent");
+   Agent*              agent = IAM->AddAgent("ProductionTestAgent");
    VALIDATE(agent != 0);
 
    IProductionManager*  IPM   = agent->GetProductionManager();

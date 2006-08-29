@@ -316,7 +316,7 @@ namespace gSKI
 	   * rather than a generic user function that the user provides.
 	   *
 	   **************************************************/
-	  bool Kernel::FireRhsNotification(IAgent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+	  bool Kernel::FireRhsNotification(Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 									   int maxReturnValueLength, char* pReturnValue)
 	  {
 			RhsNotifier rhs(pAgent, commandLine, pFunctionName, pArgument, maxReturnValueLength, pReturnValue) ;

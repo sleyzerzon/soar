@@ -51,7 +51,7 @@
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
 #include "IgSKI_AgentManager.h"
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_ProductionManager.h"
 #include "IgSKI_OutputProcessor.h"
 #include "IgSKI_OutputLink.h"
@@ -173,7 +173,7 @@ void KernelSML::BuildCommandMap()
 * @returns False if we had an error and wish to generate a generic error message (based on the incoming call + pError)
 *          True if the call succeeded or we generated another more specific error already.
 *************************************************************/
-bool KernelSML::HandleCreateAgent(gSKI::IAgent* pAgentPtr, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pAgentPtr) ; unused(pResponse) ;
 
@@ -186,7 +186,7 @@ bool KernelSML::HandleCreateAgent(gSKI::IAgent* pAgentPtr, char const* pCommandN
 	}
 
 	// Make the call.
-	IAgent* pAgent = GetKernel()->GetAgentManager()->AddAgent(pName, NULL, false, gSKI_O_SUPPORT_MODE_4, pError) ;
+	Agent* pAgent = GetKernel()->GetAgentManager()->AddAgent(pName, NULL, false, gSKI_O_SUPPORT_MODE_4, pError) ;
 
 	// Register for output from this agent
 	if (pAgent)
@@ -218,7 +218,7 @@ bool KernelSML::HandleCreateAgent(gSKI::IAgent* pAgentPtr, char const* pCommandN
 }
 
 // Handle registering and unregistering for kernel events
-bool KernelSML::HandleRegisterForEvent(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pError) ;
 
@@ -359,7 +359,7 @@ bool KernelSML::HandleRegisterForEvent(gSKI::IAgent* pAgent, char const* pComman
 	return true ;
 }
 
-bool KernelSML::HandleSetConnectionInfo(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleSetConnectionInfo(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pAgent) ; unused(pCommandName) ; unused(pError) ;
 
@@ -391,7 +391,7 @@ bool KernelSML::HandleSetConnectionInfo(gSKI::IAgent* pAgent, char const* pComma
 	return true ;
 }
 
-bool KernelSML::HandleGetConnections(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pCallingConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetConnections(gSKI::Agent* pAgent, char const* pCommandName, Connection* pCallingConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pAgent) ; unused(pCommandName) ; unused(pIncoming) ; unused(pCallingConnection) ; unused(pError) ;
 
@@ -432,7 +432,7 @@ bool KernelSML::HandleGetConnections(gSKI::IAgent* pAgent, char const* pCommandN
 
 }
 
-bool KernelSML::HandleDestroyAgent(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleDestroyAgent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pResponse) ; unused(pConnection) ; unused(pIncoming) ;
 
@@ -475,7 +475,7 @@ public:
 };
 
 // Shutdown is an irrevocal request to delete all agents and prepare for kernel deletion.
-bool KernelSML::HandleShutdown(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleShutdown(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pAgent) ; unused(pCommandName) ; unused(pConnection) ; unused(pIncoming) ; unused(pResponse) ; unused(pError) ;
 
@@ -492,7 +492,7 @@ bool KernelSML::HandleShutdown(gSKI::IAgent* pAgent, char const* pCommandName, C
 }
 
 // Return information about the current runtime state of the agent (e.g. phase, decision cycle count etc.)
-bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetRunState(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ;
 
@@ -527,7 +527,7 @@ bool KernelSML::HandleGetRunState(gSKI::IAgent* pAgent, char const* pCommandName
 }
 
 // Return information about the current runtime state of the agent (e.g. phase, decision cycle count etc.)
-bool KernelSML::HandleWasAgentOnRunList(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleWasAgentOnRunList(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pIncoming) ; unused(pError) ;
 
@@ -536,7 +536,7 @@ bool KernelSML::HandleWasAgentOnRunList(gSKI::IAgent* pAgent, char const* pComma
 }
 
 // Return information about the current runtime state of the agent (e.g. phase, decision cycle count etc.)
-bool KernelSML::HandleGetResultOfLastRun(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetResultOfLastRun(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pIncoming) ; unused(pError) ;
 
@@ -545,7 +545,7 @@ bool KernelSML::HandleGetResultOfLastRun(gSKI::IAgent* pAgent, char const* pComm
 }
 
 // Returns true if the production name is currently loaded
-bool KernelSML::HandleIsProductionLoaded(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleIsProductionLoaded(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pIncoming) ;
 
@@ -564,7 +564,7 @@ bool KernelSML::HandleIsProductionLoaded(gSKI::IAgent* pAgent, char const* pComm
 	return ReturnBoolResult(pConnection, pResponse, found) ;
 }
 
-bool KernelSML::HandleGetVersion(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetVersion(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pAgent) ; unused(pCommandName) ;	unused(pIncoming) ;
 
@@ -582,7 +582,7 @@ bool KernelSML::HandleGetVersion(gSKI::IAgent* pAgent, char const* pCommandName,
 	return this->ReturnResult(pConnection, pResponse, bufferCString) ;
 }
 
-bool KernelSML::HandleIsSoarRunning(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleIsSoarRunning(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pAgent) ; unused(pCommandName) ; unused(pIncoming) ; unused(pError) ;
 
@@ -591,7 +591,7 @@ bool KernelSML::HandleIsSoarRunning(gSKI::IAgent* pAgent, char const* pCommandNa
 	return this->ReturnBoolResult(pConnection, pResponse, isRunning) ;
 }
 
-bool KernelSML::HandleGetAgentList(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetAgentList(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pAgent) ; unused(pCommandName) ; unused(pConnection) ; unused(pIncoming) ;
 
@@ -611,7 +611,7 @@ bool KernelSML::HandleGetAgentList(gSKI::IAgent* pAgent, char const* pCommandNam
 	// Walk the list of agents and return their names
 	while (iter->IsValid())
 	{
-		IAgent* pAgent = iter->GetVal() ;
+		Agent* pAgent = iter->GetVal() ;
 
 		// Add a name tag to the output
 		TagName* pTagName = new TagName() ;
@@ -634,7 +634,7 @@ bool KernelSML::HandleGetAgentList(gSKI::IAgent* pAgent, char const* pCommandNam
 }
 
 // Controls the frequency of the smlEVENT_INTERRUPT_CHECK event
-bool KernelSML::HandleSetInterruptCheckRate(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleSetInterruptCheckRate(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pResponse) ; unused(pConnection) ; unused(pError) ; unused(pAgent) ;
 
@@ -648,7 +648,7 @@ bool KernelSML::HandleSetInterruptCheckRate(gSKI::IAgent* pAgent, char const* pC
 }
 
 // Fire a particular event at the request of the client.
-bool KernelSML::HandleFireEvent(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleFireEvent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pError) ; unused(pAgent) ;
 
@@ -673,7 +673,7 @@ bool KernelSML::HandleFireEvent(gSKI::IAgent* pAgent, char const* pCommandName, 
 	return true ;
 }
 
-bool KernelSML::HandleSendClientMessage(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleSendClientMessage(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pError) ;
 
@@ -692,7 +692,7 @@ bool KernelSML::HandleSendClientMessage(gSKI::IAgent* pAgent, char const* pComma
 }
 
 // Prevent a particular event from firing when it next would normally do so
-bool KernelSML::HandleSuppressEvent(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleSuppressEvent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pResponse) ; unused(pConnection) ; unused(pError) ; unused(pAgent) ;
 
@@ -718,7 +718,7 @@ bool KernelSML::HandleSuppressEvent(gSKI::IAgent* pAgent, char const* pCommandNa
 }
 
 // Check if anyone has sent us a command (e.g. over a socket from a remote debugger)
-bool KernelSML::HandleCheckForIncomingCommands(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleCheckForIncomingCommands(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pAgent) ; unused(pCommandName) ; unused(pError) ; unused(pIncoming) ;
 
@@ -732,7 +732,7 @@ bool KernelSML::HandleCheckForIncomingCommands(gSKI::IAgent* pAgent, char const*
 	return this->ReturnBoolResult(pConnection, pResponse, receivedOneMessage) ;
 }
 
-bool KernelSML::HandleLoadProductions(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleLoadProductions(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pResponse) ;
 
@@ -753,7 +753,7 @@ bool KernelSML::HandleLoadProductions(gSKI::IAgent* pAgent, char const* pCommand
 	return ok ;
 }
 
-bool KernelSML::HandleGetInputLink(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetInputLink(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pConnection) ; unused(pIncoming) ;
 
@@ -797,7 +797,7 @@ bool KernelSML::HandleGetInputLink(gSKI::IAgent* pAgent, char const* pCommandNam
 	return (id != NULL) ;
 }
 
-bool KernelSML::AddInputWME(gSKI::IAgent* pAgent, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag, gSKI::Error* pError)
+bool KernelSML::AddInputWME(gSKI::Agent* pAgent, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag, gSKI::Error* pError)
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
 	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
@@ -905,7 +905,7 @@ bool KernelSML::AddInputWME(gSKI::IAgent* pAgent, char const* pID, char const* p
 	return true ;
 }
 
-bool KernelSML::RemoveInputWME(gSKI::IAgent* pAgent, char const* pTimeTag, gSKI::Error* pError)
+bool KernelSML::RemoveInputWME(gSKI::Agent* pAgent, char const* pTimeTag, gSKI::Error* pError)
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
 	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
@@ -1032,7 +1032,7 @@ static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, 
 }
 
 // Send the current state of the input link back to the caller.  (This is not a commonly used method).
-bool KernelSML::HandleGetAllInput(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetAllInput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pIncoming) ; unused(pConnection) ;
 
@@ -1061,7 +1061,7 @@ bool KernelSML::HandleGetAllInput(gSKI::IAgent* pAgent, char const* pCommandName
 }
 
 // Send the current state of the output link back to the caller.  (This is not a commonly used method).
-bool KernelSML::HandleGetAllOutput(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pIncoming) ; unused(pConnection) ;
 
@@ -1110,7 +1110,7 @@ bool KernelSML::HandleGetAllOutput(gSKI::IAgent* pAgent, char const* pCommandNam
 }
 
 // Add or remove a list of wmes we've been sent
-bool KernelSML::HandleInput(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ; unused(pResponse) ; unused(pConnection) ;
 
@@ -1209,7 +1209,7 @@ bool KernelSML::HandleInput(gSKI::IAgent* pAgent, char const* pCommandName, Conn
 }
 
 // Executes a generic command line for a specific agent
-bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ;
 	unused(pError);
@@ -1344,7 +1344,7 @@ bool KernelSML::HandleCommandLine(gSKI::IAgent* pAgent, char const* pCommandName
 }
 
 // Expands a command line's aliases and returns it without executing it.
-bool KernelSML::HandleExpandCommandLine(gSKI::IAgent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
+bool KernelSML::HandleExpandCommandLine(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ;
 	unused(pAgent) ; 	// Agent should be NULL

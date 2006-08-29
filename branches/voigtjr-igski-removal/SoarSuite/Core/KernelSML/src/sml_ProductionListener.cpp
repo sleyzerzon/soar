@@ -61,7 +61,7 @@ bool ProductionListener::RemoveListener(egSKIProductionEventId eventID, Connecti
 }
 
 // Called when a "ProductionEvent" occurs in the kernel
-void ProductionListener::HandleEvent(egSKIProductionEventId eventID, gSKI::IAgent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match)
+void ProductionListener::HandleEvent(egSKIProductionEventId eventID, gSKI::Agent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match)
 {
 	// This class isn't implemented in gSKI yet.
 	unused(match) ;

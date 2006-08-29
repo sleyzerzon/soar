@@ -1591,7 +1591,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    }
 
 	// Called when a "RunEvent" occurs in the kernel
-   void Agent::HandleEvent(egSKIRunEventId eventId, gSKI::IAgent* agentPtr, egSKIPhaseType phase)
+   void Agent::HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase)
    {
    }
 
@@ -2442,7 +2442,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    //  KJC, June 05:  it's used all over in gSKI...
    ==================================
    */
-   extern agent* GetSoarAgentPtr(IAgent* agent)
+   extern agent* GetSoarAgentPtr(Agent* agent)
    {
       return ((Agent*)agent)->GetSoarAgent();
    }

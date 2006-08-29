@@ -508,7 +508,7 @@ namespace gSKI {
          /**
           * @brief 
           */
-         ProductionNotifier(IAgent* a, IProduction* p, IProductionInstance* m) : 
+         ProductionNotifier(Agent* a, IProduction* p, IProductionInstance* m) : 
                                                                     m_agent(a), 
                                                                     m_prod(p), 
                                                                     m_match(m) 
@@ -524,7 +524,7 @@ namespace gSKI {
             listener->HandleEvent(eventId, m_agent, m_prod, m_match);
          }
       private:
-         IAgent*               m_agent;
+         Agent*               m_agent;
          IProduction*          m_prod;
          IProductionInstance*  m_match;
       };

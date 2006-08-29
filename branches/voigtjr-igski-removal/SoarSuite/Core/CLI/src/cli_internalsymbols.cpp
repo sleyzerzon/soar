@@ -16,19 +16,19 @@
 
 #include "sml_Names.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseInternalSymbols(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseInternalSymbols(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	unused(argv);
 	return DoInternalSymbols(pAgent);
 }
 
-bool CommandLineInterface::DoInternalSymbols(gSKI::IAgent* pAgent) {
+bool CommandLineInterface::DoInternalSymbols(gSKI::Agent* pAgent) {
 
 	// Need agent pointer for function calls
 	if (!RequireAgent(pAgent)) return false;

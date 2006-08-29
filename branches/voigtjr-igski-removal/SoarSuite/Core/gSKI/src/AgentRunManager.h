@@ -35,7 +35,7 @@ namespace gSKI
       struct AgentRunData
       {
          /** Pointer to the agent */
-         IAgent*           a;
+         Agent*           a;
       
          /** Number of steps left to execute */
          unsigned long     steps;
@@ -44,7 +44,7 @@ namespace gSKI
          unsigned long     maxSteps;
 
          /** Initialize members */
-         AgentRunData(IAgent* _a, unsigned long _steps, unsigned long _maxSteps);
+         AgentRunData(Agent* _a, unsigned long _steps, unsigned long _maxSteps);
       };
 
       /** 
@@ -55,7 +55,7 @@ namespace gSKI
       typedef tAgentRunList::iterator             tAgentRunListIt;
       //}
 
-      typedef std::vector<IAgent*>                tAgentList;
+      typedef std::vector<Agent*>                tAgentList;
       typedef tAgentList::iterator                tAgentListIt;
 
    public:
@@ -73,7 +73,7 @@ namespace gSKI
       /** 
        * @brief  Adds an agent to the buffer of agents that can be run next cycle
        */ 
-      void AddAgentToRunList(IAgent* a);
+      void AddAgentToRunList(Agent* a);
 
       /** 
        * @brief Removes an agent from the run list
@@ -81,7 +81,7 @@ namespace gSKI
        * This will take effect at the end of the current cycle in multi-agent
        *  running (when SynchronizeRunList is called).
        */
-      void RemoveAgentFromRunList(IAgent* a);
+      void RemoveAgentFromRunList(Agent* a);
 
       /** 
        * @brief runs the agents in the run list.
@@ -101,7 +101,7 @@ namespace gSKI
 	   *  KJC:  2/21  Actually the only event is for an egSKIAgentEvent, 
 	   *   gSKIEVENT_BEFORE_AGENT_DESTROYED, so it's not really a RunEvent.
        */
-      virtual void HandleEvent(egSKIAgentEventId eventId, IAgent* agentPtr);
+      virtual void HandleEvent(egSKIAgentEventId eventId, Agent* agentPtr);
 
    private:
 
@@ -111,7 +111,7 @@ namespace gSKI
        *  If it is not in the removed list, it is valid. This is called
        *   from RunAllInClientThread
        */
-      bool isValidAgent(IAgent* a);
+      bool isValidAgent(Agent* a);
 
       /** 
        * @brief Puts new agents in the run list and removes old ones
@@ -128,19 +128,19 @@ namespace gSKI
        *
        * The runLength and steps are used to initialize newly added agents.
        */ 
-      void addToRunList(IAgent* a, egSKIRunType runLength, unsigned long steps);
+      void addToRunList(Agent* a, egSKIRunType runLength, unsigned long steps);
 
       /** 
        * @brief Removes an agent from our run list
        */
-      void removeFromRunList(IAgent* a);
+      void removeFromRunList(Agent* a);
 
       /** 
        * @brief Gets the run counter relevant to the given runType
        *
        * Used by RunInClientThread.
        */
-      unsigned long getReleventStepCount(IAgent* a, egSKIRunType runType);
+      unsigned long getReleventStepCount(Agent* a, egSKIRunType runType);
 
       /** 
        * @brief called by synchronizeRunList when it needs to reinitialize

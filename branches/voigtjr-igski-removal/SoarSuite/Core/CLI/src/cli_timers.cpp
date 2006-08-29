@@ -16,7 +16,7 @@
 
 #include "sml_Names.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "gsysparam.h"
@@ -24,7 +24,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseTimers(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseTimers(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'e', "enable",		0},
 		{'d', "disable",	0},
@@ -60,7 +60,7 @@ bool CommandLineInterface::ParseTimers(gSKI::IAgent* pAgent, std::vector<std::st
 	return DoTimers(pAgent, print ? 0 : &setting);
 }
 
-bool CommandLineInterface::DoTimers(gSKI::IAgent* pAgent, bool* pSetting) {
+bool CommandLineInterface::DoTimers(gSKI::Agent* pAgent, bool* pSetting) {
 	// Need agent pointer and kernel pointer for sysparam
 	if (!RequireAgent(pAgent)) return false;
 

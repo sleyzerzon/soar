@@ -19,12 +19,12 @@ class CmdRhsFunction: public gSKI::IRhsFunction
 {
 private:
 	gSKI::IKernel* m_Kernel ;
-	gSKI::IAgent*  m_Agent ;
+	gSKI::Agent*  m_Agent ;
 
  public:
    CmdRhsFunction(gSKI::IKernel* kernel):m_Kernel(kernel), m_Agent(0) { }
 
-   void SetAgent(gSKI::IAgent* pAgent) { m_Agent = pAgent ; }
+   void SetAgent(gSKI::Agent* pAgent) { m_Agent = pAgent ; }
    const char* GetName() const { return "cmd"; }
    int GetNumExpectedParameters() const { return (gSKI_PARAM_NUM_VARIABLE); }
    bool IsValueReturned() const { return true; }

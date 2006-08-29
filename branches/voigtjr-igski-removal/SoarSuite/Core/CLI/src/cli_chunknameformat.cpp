@@ -17,7 +17,7 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "gsysparam.h"
@@ -25,7 +25,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseChunkNameFormat(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseChunkNameFormat(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'c', "count",		2},
 		{'l', "long",		0},
@@ -78,7 +78,7 @@ bool CommandLineInterface::ParseChunkNameFormat(gSKI::IAgent* pAgent, std::vecto
 	return DoChunkNameFormat(pAgent, changeFormat ? &longFormat : 0, countFlag ? &count : 0, patternFlag ? &pattern : 0);
 }
 
-bool CommandLineInterface::DoChunkNameFormat(gSKI::IAgent* pAgent, const bool* pLongFormat, const int* pCount, const std::string* pPrefix) {
+bool CommandLineInterface::DoChunkNameFormat(gSKI::Agent* pAgent, const bool* pLongFormat, const int* pCount, const std::string* pPrefix) {
 	// Need agent pointer for function calls
 	if (!RequireAgent(pAgent)) return false;
 

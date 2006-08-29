@@ -17,7 +17,7 @@
 #include "sml_Names.h"
 #include "sml_StringOps.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "IgSKI_ProductionManager.h"
@@ -26,7 +26,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParsePWatch(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParsePWatch(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'d', "disable",	0},
 		{'e', "enable",		0},
@@ -60,7 +60,7 @@ bool CommandLineInterface::ParsePWatch(gSKI::IAgent* pAgent, std::vector<std::st
 	return DoPWatch(pAgent, query, 0);
 }
 
-bool CommandLineInterface::DoPWatch(gSKI::IAgent* pAgent, bool query, const std::string* pProduction, bool setting) {
+bool CommandLineInterface::DoPWatch(gSKI::Agent* pAgent, bool query, const std::string* pProduction, bool setting) {
 
 	if (!RequireAgent(pAgent)) return false;
 

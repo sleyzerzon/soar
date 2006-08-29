@@ -16,7 +16,7 @@
 
 #include "sml_Names.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "gsysparam.h"
@@ -24,7 +24,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParsePrint(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'a', "all",			0},
 		{'c', "chunks",			0},
@@ -136,7 +136,7 @@ bool CommandLineInterface::ParsePrint(gSKI::IAgent* pAgent, std::vector<std::str
 	return SetError(CLIError::kTooManyArgs);
 }
 
-bool CommandLineInterface::DoPrint(gSKI::IAgent* pAgent, PrintBitset options, int depth, const std::string* pArg) {
+bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int depth, const std::string* pArg) {
 	// Need agent pointer for function calls
 	if (!RequireAgent(pAgent)) return false;
 

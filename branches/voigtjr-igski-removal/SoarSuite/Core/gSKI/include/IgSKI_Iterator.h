@@ -153,7 +153,7 @@ namespace gSKI {
    class IInstanceInfo;
    class ISymbol;
    class IAction;
-   class IAgent;
+   class Agent;
    class IAgentThreadGroup;
    class IActionElement;
    class IRhsFunctionAction;
@@ -177,7 +177,7 @@ namespace gSKI {
    typedef IIterator<ITestSet *>                 tITestSetIterator;
    typedef IIterator<ISymbol*>                   tISymbolIterator;
    typedef IIterator<IMatch *>                   tIMatchIterator;
-   typedef IIterator<IAgent*>                    tIAgentIterator;
+   typedef IIterator<Agent*>                    tIAgentIterator;
    typedef IIterator<ITest *>                    tITestIterator;
    typedef IIterator<IWme *>                     tIWmeIterator;
    typedef IIterator<IMultiAttribute *>          tIMultiAttributeIterator;

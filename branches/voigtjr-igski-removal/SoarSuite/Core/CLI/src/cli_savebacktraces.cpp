@@ -15,7 +15,7 @@
 #include "sml_Names.h"
 #include "sml_StringOps.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "IgSKI_ProductionManager.h"
@@ -25,7 +25,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseSaveBacktraces(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseSaveBacktraces(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'d', "disable",	0},
 		{'e', "enable",		0},
@@ -58,7 +58,7 @@ bool CommandLineInterface::ParseSaveBacktraces(gSKI::IAgent* pAgent, std::vector
 	return DoSaveBacktraces(pAgent, query ? 0 : &setting);
 }
 
-bool CommandLineInterface::DoSaveBacktraces(gSKI::IAgent* pAgent, bool* pSetting) {
+bool CommandLineInterface::DoSaveBacktraces(gSKI::Agent* pAgent, bool* pSetting) {
 
 	if (!RequireAgent(pAgent)) return false;
 

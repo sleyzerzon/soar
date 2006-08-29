@@ -319,7 +319,7 @@ namespace gSKI {
 	   * rather than a generic user function that the user provides.
 	   *
 	   **************************************************/
-	  virtual bool FireRhsNotification(IAgent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+	  virtual bool FireRhsNotification(Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 									   int maxReturnValueLength, char* pReturnValue) = 0 ;
 
       /**

@@ -542,7 +542,7 @@
     * @li RUNSTATE_HALTED  - the agent has completed execution and cannot
     *                           be run again until reinitialized.  This is
     *                           caused by the (halt) rhs function and by
-    *                           the IAgent::Halt method or the IAgentManager::HaltAll
+    *                           the Agent::Halt method or the IAgentManager::HaltAll
     *                           method.
     */
    typedef enum {

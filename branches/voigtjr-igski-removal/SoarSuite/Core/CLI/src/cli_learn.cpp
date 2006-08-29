@@ -16,7 +16,7 @@
 
 #include "sml_Names.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "gsysparam.h"
@@ -24,7 +24,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseLearn(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseLearn(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'a', "all-levels",	0},
 		{'b', "bottom-up",	0},
@@ -77,7 +77,7 @@ bool CommandLineInterface::ParseLearn(gSKI::IAgent* pAgent, std::vector<std::str
 	return DoLearn(pAgent, options);
 }
 
-bool CommandLineInterface::DoLearn(gSKI::IAgent* pAgent, const LearnBitset& options) {
+bool CommandLineInterface::DoLearn(gSKI::Agent* pAgent, const LearnBitset& options) {
 	// Need agent pointer for function calls
 	if (!RequireAgent(pAgent)) return false;
 

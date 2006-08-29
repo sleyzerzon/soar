@@ -17,14 +17,14 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseWatchWMEs(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseWatchWMEs(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'a', "add-filter",		0},
 		{'r', "remove-filter",	0},
@@ -93,7 +93,7 @@ bool CommandLineInterface::ParseWatchWMEs(gSKI::IAgent* pAgent, std::vector<std:
 	return DoWatchWMEs(pAgent, mode, type);
 }
 
-bool CommandLineInterface::DoWatchWMEs(gSKI::IAgent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString, const std::string* pAttributeString, const std::string* pValueString) {
+bool CommandLineInterface::DoWatchWMEs(gSKI::Agent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString, const std::string* pAttributeString, const std::string* pValueString) {
 
 	if (!RequireAgent(pAgent)) return false;
 

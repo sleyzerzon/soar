@@ -14,12 +14,12 @@
 
 #include "cli_Commands.h"
 
-#include "IgSKI_Agent.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_ProductionManager.h"
 
 using namespace cli;
 
-bool CommandLineInterface::ParseSP(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseSP(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	// One argument (in brackets)
 	if (argv.size() < 2) return SetError(CLIError::kTooFewArgs);
 	if (argv.size() > 2) {
@@ -37,7 +37,7 @@ bool CommandLineInterface::ParseSP(gSKI::IAgent* pAgent, std::vector<std::string
 	return DoSP(pAgent, production);
 }
 
-bool CommandLineInterface::DoSP(gSKI::IAgent* pAgent, const std::string& production) {
+bool CommandLineInterface::DoSP(gSKI::Agent* pAgent, const std::string& production) {
 	// Must have agent to give production to
 	if (!RequireAgent(pAgent)) return false;
 
