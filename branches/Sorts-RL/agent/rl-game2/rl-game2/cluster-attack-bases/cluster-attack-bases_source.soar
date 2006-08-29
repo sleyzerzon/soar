@@ -3,11 +3,11 @@ source cab-attack-base.soar
 pushd cab-attack-base
 source cab-attack-base_source.soar
 popd
-source create-memory-instance.soar
 source cab-find-cog.soar
 pushd cab-find-cog
 source cab-find-cog_source.soar
 popd
+source create-memory-instance.soar
 source free-tanks.soar
 source label-instance.soar
 source move-tanks.soar
