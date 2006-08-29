@@ -15,7 +15,7 @@
 
 namespace gSKI {
 
-   class ICondition;
+   class Condition;
    class IConditionSet;
    struct Error;
 

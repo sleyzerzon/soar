@@ -17,7 +17,7 @@
 
 namespace gSKI{
 
-   class ICondition;
+   class Condition;
    class IWme;
    struct Error;
 
@@ -29,7 +29,7 @@ namespace gSKI{
     * that it is matching.  This is just another layer allowing
     * condition access.
     */
-   class IMatch /*: public ICondition */{
+   class IMatch /*: public Condition */{
    public:
       /**
       * @brief
@@ -48,7 +48,7 @@ namespace gSKI{
       *
       * @returns The Condition, or 0 on error.
       */
-      virtual ICondition *GetCondition(Error *e) const = 0;
+      virtual Condition *GetCondition(Error *e) const = 0;
 
 
       /**

@@ -29,7 +29,7 @@
 #include "IgSKI_ProductionMatch.h"
 #include "IgSKI_OutputLink.h"
 #include "IgSKI_OutputProcessor.h"
-#include "IgSKI_Condition.h"
+#include "gSKI_Condition.h"
 #include "IgSKI_ConditionSet.h"
 #include "IgSKI_InputLink.h"
 #include "IgSKI_InputProducer.h"

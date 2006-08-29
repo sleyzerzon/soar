@@ -25,7 +25,7 @@ namespace gSKI {
    typedef ConditionSet MatchSet;
 
    struct Error;
-   class ICondition;
+   class Condition;
    class IWme;
    /**
     * @brief Holds information about a specific condition match.
@@ -64,7 +64,7 @@ namespace gSKI {
       *
       * @returns The Condition, or 0 on error.
       */
-     ICondition *GetCondition(Error *e) const;
+     Condition *GetCondition(Error *e) const;
 
 
       /**

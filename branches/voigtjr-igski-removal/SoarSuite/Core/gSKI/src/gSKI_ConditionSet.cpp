@@ -55,10 +55,10 @@ namespace gSKI
    */
    ConditionSet::~ConditionSet()
    {
-      std::vector<ICondition*>::iterator condIt = m_conditions.begin();
+      std::vector<Condition*>::iterator condIt = m_conditions.begin();
       for( ; condIt != m_conditions.end(); ++condIt)
       {
-         ICondition* c = *condIt;
+         Condition* c = *condIt;
          delete(c);
       }
    }
@@ -76,7 +76,7 @@ namespace gSKI
    tIConditionIterator* ConditionSet::GetConditions(Error *pErr) 
    {
       //return new tConditionIterator(m_conditions);
-      return new Iterator<ICondition *, tConditionVec>(m_conditions);
+      return new Iterator<Condition *, tConditionVec>(m_conditions);
    }
 
    /*
@@ -318,7 +318,7 @@ std::string dumpConditions(IConditionSet* cset, int &tablevel)
    tIConditionIterator *iters = cset->GetConditions();
    for( ; iters->IsValid() ; iters->Next())
    {
-      ICondition* set = iters->GetVal();
+      Condition* set = iters->GetVal();
       out += printtablevel(tablevel);
       if(set->IsNegated())
          out += "-(";

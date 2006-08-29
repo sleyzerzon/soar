@@ -24,7 +24,7 @@ namespace gSKI {
    class IProductionMatch;
    class IProductionListener;
    class IWME;
-   class ICondition;
+   class Condition;
    struct Error;
 
    /**
@@ -311,7 +311,7 @@ namespace gSKI {
        * 
        * @returns A set of WMEs that match the given Condition
        */
-      virtual tIWmeIterator* GetConditionMatches(const ICondition* condition, Error* err = 0) const = 0;
+      virtual tIWmeIterator* GetConditionMatches(const Condition* condition, Error* err = 0) const = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 

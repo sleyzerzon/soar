@@ -591,7 +591,7 @@ _|___/    __         _    _             ____  _               _
 |_|  |_|\__,_|\__\___|_| |_|\___|___/___/
    ===============================
    */
-   tIWmeIterator* ProductionManager::GetConditionMatches(const ICondition* condition, Error* err) const
+   tIWmeIterator* ProductionManager::GetConditionMatches(const Condition* condition, Error* err) const
    {
    
       return 0;

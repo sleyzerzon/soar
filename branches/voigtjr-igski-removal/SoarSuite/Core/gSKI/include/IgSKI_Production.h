@@ -19,7 +19,7 @@
 namespace gSKI {
 
    class IAction;     /**< @see GetActions    */
-   class ICondition;  /**< @see GetConditions */
+   class Condition;  /**< @see GetConditions */
    class IConditionSet;
    class IMatch;      /**< @see GetMatches    */
    struct Error;      /**< @see Error         */

@@ -149,7 +149,7 @@ namespace gSKI {
   private:
      agent*          m_agent;
 
-     typedef std::vector<ICondition*>    tConditionVec;
+     typedef std::vector<Condition*>    tConditionVec;
      typedef tConditionVec::iterator     tConditionVecIt;
 
      //typedef std::vector<IConditionSet*> tConditionSetVec;

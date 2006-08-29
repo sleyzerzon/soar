@@ -13,8 +13,6 @@
 #ifndef GSKI_CONDITION_H
 #define GSKI_CONDITION_H
 
-#include "IgSKI_Condition.h"
-
 typedef struct condition_struct condition;
 typedef struct agent_struct agent;
 typedef char * test;
@@ -31,7 +29,7 @@ namespace gSKI {
     * access to the text of a condition and whether or
     * not it is negated.
     */
-   class Condition : public ICondition
+   class Condition
    {
    public:
       /**

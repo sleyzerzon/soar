@@ -33,7 +33,7 @@ typedef struct agent_struct agent;
 namespace gSKI {
 
    class IAction;     /**< @see GetActions    */
-   class ICondition;  /**< @see GetConditions */
+   class Condition;  /**< @see GetConditions */
    class IMatch;      /**< @see GetMatches    */
    struct Error;      /**< @see Error         */
    class ConditionSet;/**< @see ConditionSet  */
