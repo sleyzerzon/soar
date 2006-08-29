@@ -24,7 +24,7 @@
 #include "IgSKI_InputProducer.h"
 #include "IgSKI_WMObject.h"
 #include "IgSKI_Symbol.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_AgentManager.h"
 #include "gSKI_Kernel.h"
 #include "IgSKI_InputLink.h"
 #include "IgSKI_WorkingMemory.h"

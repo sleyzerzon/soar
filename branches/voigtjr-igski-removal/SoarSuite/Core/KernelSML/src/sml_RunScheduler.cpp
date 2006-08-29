@@ -20,8 +20,8 @@
 #include "sml_AgentSML.h"
 #include "sml_Events.h"
 
-#include "../../gSKI/src/gSKI_Error.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_Error.h"
+#include "gSKI_AgentManager.h"
 
 #include <assert.h>
 

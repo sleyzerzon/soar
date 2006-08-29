@@ -832,10 +832,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_AgentManager.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_Condition.h"
 				>
 			</File>

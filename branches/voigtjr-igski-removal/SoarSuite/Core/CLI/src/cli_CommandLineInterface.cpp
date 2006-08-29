@@ -26,7 +26,7 @@
 #include "cli_Commands.h"
 #include "cli_Aliases.h"
 
-#include "../../gSKI/src/gSKI_Error.h"
+#include "gSKI_Error.h"
 #include "gSKI_Agent.h"
 
 // SML includes

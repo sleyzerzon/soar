@@ -24,7 +24,7 @@
 #include "IgSKI_InstanceInfo.h"
 #include "IgSKI_Iterator.h"
 #include "gSKI_Enumerations.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_AgentManager.h"
 #include "IgSKI_ConditionSet.h"
 #include "IgSKI_Production.h"
 #include "IgSKI_ProductionMatch.h"

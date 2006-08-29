@@ -22,7 +22,7 @@
 #include "IgSKI_Symbol.h"
 #include "IgSKI_WMObject.h"
 #include "IgSKI_OutputLink.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_AgentManager.h"
 #include "IgSKI_WorkingMemory.h"
 
 #ifdef _DEBUG

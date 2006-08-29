@@ -87,7 +87,7 @@ namespace gSKI
        * @brief runs the agents in the run list.
        *
        * The parameters are the same as those for RunInClientThread.
-       * IAgentManager::RunInClientThread calls this method to execute
+       * AgentManager::RunInClientThread calls this method to execute
        *  agent running.
        */
       virtual egSKIRunResult Run(egSKIRunType        runLength, 

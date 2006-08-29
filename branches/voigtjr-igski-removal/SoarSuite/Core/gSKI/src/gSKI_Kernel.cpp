@@ -81,7 +81,7 @@ namespace gSKI
                        |___/                                         |___/
    =========================
    */
-   IAgentManager* Kernel::GetAgentManager(Error* err)
+   AgentManager* Kernel::GetAgentManager(Error* err)
    {
       ClearError(err);
 

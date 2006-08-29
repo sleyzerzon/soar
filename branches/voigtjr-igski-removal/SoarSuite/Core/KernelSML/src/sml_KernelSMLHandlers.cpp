@@ -45,12 +45,11 @@
 #include "gSKI_Stub.h"
 #include "gSKI_Kernel.h"
 
-// BADBAD: I think we should be using an error class instead to work with error objects.
-#include "../../gSKI/src/gSKI_Error.h"
+#include "gSKI_Error.h"
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_AgentManager.h"
 #include "gSKI_Agent.h"
 #include "IgSKI_ProductionManager.h"
 #include "IgSKI_OutputProcessor.h"
@@ -596,7 +595,7 @@ bool KernelSML::HandleGetAgentList(gSKI::Agent* pAgent, char const* pCommandName
 	unused(pAgent) ; unused(pCommandName) ; unused(pConnection) ; unused(pIncoming) ;
 
 	// Make the call.
-	IAgentManager* pManager = GetKernel()->GetAgentManager() ;
+	AgentManager* pManager = GetKernel()->GetAgentManager() ;
 
 	// Get the list of agents
 	tIAgentIterator* iter = pManager->GetAgentIterator(pError) ;

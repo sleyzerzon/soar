@@ -81,7 +81,7 @@ namespace gSKI
 		* The initialization process erases all current working memory and
 		*  all current production memory.  If you only want to erase working
 		*  memory and keep production memory and any old settings, use
-		*  the IAgentManager::ReinitializeWithOldSettings method.
+		*  the AgentManager::ReinitializeWithOldSettings method.
 		*
 		* Agents can be running when you call Reinitialize.  In this case the
 		*  agent will be reinitialized at the next available stop time
@@ -245,7 +245,7 @@ namespace gSKI
 		* Possible Errors:
 		*   @li gSKIERR_CANNOT_SUSPEND if you specify gSKI_STOP_BY_SUSPEND
 		*         from the client-owned thread that created the agents. (Only
-		*         applicable when running agents using IAgentManager::RunInClientThread
+		*         applicable when running agents using AgentManager::RunInClientThread
 		*         or Agent::RunInClientThread).
 		*   @li gSKIERR_CANNOT_STOP_FOR_CALLBACKS if you specify 
 		*           gSKI_STOP_ON_CALLBACK_RETURN or gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN
@@ -577,7 +577,7 @@ namespace gSKI
 		*  each of the modes.
 		*
 		* You cannot set o-support mode at runtime.  You have to set it
-		*  when you create the agent (see IAgentManager::AddAgent) or when
+		*  when you create the agent (see AgentManager::AddAgent) or when
 		*  your initialize it (Agent::Reinitialize).
 		*
 		* @param err  Pointer to client-owned error structure.  If the pointer

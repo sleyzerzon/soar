@@ -35,7 +35,7 @@
 
 // gSKI includes
 #include "gSKI_Events.h"
-#include "../../gSKI/src/gSKI_Error.h"	// this is rediculous
+#include "gSKI_Error.h"
 #include "IgSKI_KernelFactory.h"
 
 // For test

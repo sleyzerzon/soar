@@ -27,7 +27,7 @@ namespace gSKI
    class AgentManager;
    class Log;
    class IKernelFactory;
-   class IAgentManager;
+   class AgentManager;
    class IPerformanceMonitor;
 
    /**
@@ -74,7 +74,7 @@ namespace gSKI
        * @return A pointer to the agent manager.  The pointer may be 0 if there
        *          is a failure.
        */
-      IAgentManager* GetAgentManager(Error* err = 0);
+      AgentManager* GetAgentManager(Error* err = 0);
 
       /**
        * @brief Returns the performance monitor for this kernel

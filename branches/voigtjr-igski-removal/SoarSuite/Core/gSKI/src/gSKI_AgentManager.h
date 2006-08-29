@@ -14,7 +14,7 @@
 #define GSKI_AGENTMANGER_H
 
 #include "IgSKI_Iterator.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_AgentManager.h"
 
 #include "gSKI_Enumerations.h"
 #include "EventManagementTemplates.h"
@@ -50,7 +50,7 @@ namespace gSKI
    * @see IAgentRunControl
    * @see IAgentThreadGroup
    */
-   class AgentManager: public IAgentManager
+   class AgentManager
    {
    public:
       /**
@@ -135,9 +135,9 @@ namespace gSKI
       * @brief Removes an agent from this agent manager given the agent's name.
       *
       * Call this method to remove an agent from the agent manager using only 
-      *  its name.  See IAgentManager::RemoveAgent for details.
+      *  its name.  See AgentManager::RemoveAgent for details.
       *
-      * @see IAgentManager::RemoveAgent
+      * @see AgentManager::RemoveAgent
       *
       * @param  name Name of the agent to remove.  
       * @param  err Pointer to client-owned error structure.  If the pointer
@@ -190,7 +190,7 @@ namespace gSKI
        * @brief Adds an agent to the list of agents run when a RunXXX function is called
        *
        * Call this method to add an agent to the list of agents to run when
-       *  IAgentManager::RunInClientThread or IAgentManager::RunInSeparateThread 
+       *  AgentManager::RunInClientThread or AgentManager::RunInSeparateThread 
        *  are called.  
        *
        * If the agent manager is currently running agents in the run list, the
@@ -212,7 +212,7 @@ namespace gSKI
        * @brief Adds all agents to the list of agents run when a RunXXX function is called
        *
        * Call this method to add all agents to the list of agents to run when
-       *  IAgentManager::RunInClientThread or IAgentManager::RunInSeparateThread 
+       *  AgentManager::RunInClientThread or AgentManager::RunInSeparateThread 
        *  are called.  
        *
        * If the agent manager is currently running agents in the run list, the
@@ -234,7 +234,7 @@ namespace gSKI
        * @brief Removes an agent from the list of agents run when a RunXXX function is called
        *
        * Call this method to remove an agent from the list of agents to run when
-       *  IAgentManager::RunInClientThread or IAgentManager::RunInSeparateThread 
+       *  AgentManager::RunInClientThread or AgentManager::RunInSeparateThread 
        *  are called.  Agents are automatically removed from the run list when
        *  they are removed from the agent manager.
        *
@@ -256,7 +256,7 @@ namespace gSKI
        * @brief Removes all agents from this manager's run list
        *
        * Call this method to remove all agents from the list of agents to run when
-       *  IAgentManager::RunInClientThread or IAgentManager::RunInSeparateThread 
+       *  AgentManager::RunInClientThread or AgentManager::RunInSeparateThread 
        *  are called.  Agents are automatically removed from the run list when
        *  they are removed from the agent manager.
        *
@@ -291,9 +291,9 @@ namespace gSKI
        *                 does not contain any agents.
        *
        * @see egSKIRunType
-       * @see IAgentManager::AddAgentToRunList
-       * @see IAgentManager::AddAllAgentsToRunList
-       * @see IAgentManager::RemoveAgentFromRunList
+       * @see AgentManager::AddAgentToRunList
+       * @see AgentManager::AddAllAgentsToRunList
+       * @see AgentManager::RemoveAgentFromRunList
        *
        * @param runLength How long to run the system.  Choices are       
        *          gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUNPHASE,
@@ -338,9 +338,9 @@ namespace gSKI
        *                 does not contain any agents.
        *
        * @see egSKIRunType
-       * @see IAgentManager::AddAgentToRunList
-       * @see IAgentManager::AddAllAgentsToRunList
-       * @see IAgentManager::RemoveAgentFromRunList
+       * @see AgentManager::AddAgentToRunList
+       * @see AgentManager::AddAllAgentsToRunList
+       * @see AgentManager::RemoveAgentFromRunList
        *
        * @param runLength How long to run the system.  Choices are       
        *          gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,

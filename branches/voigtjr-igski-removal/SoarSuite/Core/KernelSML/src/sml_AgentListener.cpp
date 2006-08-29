@@ -24,7 +24,7 @@
 #include "sml_OutputListener.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_AgentManager.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 

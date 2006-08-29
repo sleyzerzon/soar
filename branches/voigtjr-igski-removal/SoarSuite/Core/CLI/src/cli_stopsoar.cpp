@@ -15,7 +15,7 @@
 #include "cli_Commands.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_AgentManager.h"
+#include "gSKI_AgentManager.h"
 #include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 

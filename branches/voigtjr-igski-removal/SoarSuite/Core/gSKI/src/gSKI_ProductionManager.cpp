@@ -1198,7 +1198,7 @@ void prodTest(){
    Kernel*             k     = kF->Create();
    VALIDATE(k != 0);
 
-   IAgentManager*       IAM   = k->GetAgentManager();
+   AgentManager*       IAM   = k->GetAgentManager();
    VALIDATE(IAM != 0);
 
    Agent*              agent = IAM->AddAgent("ProductionTestAgent");
