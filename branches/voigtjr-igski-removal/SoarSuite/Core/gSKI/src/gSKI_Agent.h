@@ -46,7 +46,7 @@ namespace gSKI
 	class Kernel;
 	class InputLink;
 	class OutputLink;
-	class IAgentPerformanceMonitor;
+	class AgentPerformanceMonitor;
 
 	class Agent : public gSKI::IRunListener
 	{
@@ -729,7 +729,7 @@ namespace gSKI
 		void          ResetNumOutputsExecuted(Error* err = 0);
 		void          ResetNilOutputCounter(Error* err = 0);
 
-		virtual IAgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)
+		virtual AgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)
 		{ 
 			// unreferenced formal parameters
 			(void)(err);
@@ -1472,7 +1472,7 @@ namespace gSKI
 		unsigned long			m_nilOutputCycles ;
 		//}
 
-		IAgentPerformanceMonitor* m_pPerfMon;
+		AgentPerformanceMonitor* m_pPerfMon;
 	};
 }
 #endif

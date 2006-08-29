@@ -17,7 +17,7 @@
 #include "sml_StringOps.h"
 
 #include "gSKI_Agent.h"
-#include "IgSKI_AgentPerformanceMonitor.h"
+#include "gSKI_AgentPerformanceMonitor.h"
 
 using namespace cli;
 using namespace sml;
@@ -64,7 +64,7 @@ bool CommandLineInterface::DoStats(gSKI::Agent* pAgent, const StatsBitset& optio
 	// Need agent pointer for function calls
 	if (!RequireAgent(pAgent)) return false;
 
-	gSKI::IAgentPerformanceMonitor* pPerfMon = pAgent->GetPerformanceMonitor();
+	gSKI::AgentPerformanceMonitor* pPerfMon = pAgent->GetPerformanceMonitor();
 
 	if (m_RawOutput) {
 		const char* _stats = "stats";
