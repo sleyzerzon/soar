@@ -1,0 +1,21 @@
+sp {cab-find-cog*propose*restore-grouping-radius
+   (state <s> ^name cab-find-cog
+              ^superstate.instance <si>
+              ^memory.cog <cog>
+              ^grouping-radius-exploded t)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name restore-grouping-radius)}
+
+sp {cab-find-cog*apply*restore-grouping-radius
+   (state <s> ^name cab-find-cog
+              ^superstate <ss>
+              ^io.output-link.sorts <cmd>
+              ^grouping-radius-exploded <e>
+              ^operator <o>)
+   (<ss> ^cluster-radius <cr>)
+   (<o> ^name restore-grouping-radius)
+-->
+   (<cmd> ^grouping-radius <gr-cmd>)
+   (<gr-cmd> ^value <cr>)
+   (<ss> ^find-cog-complete t)}

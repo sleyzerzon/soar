@@ -1,0 +1,5 @@
+sp {cluster-attack-tanks*find-cog*elaborate*copy-memory-link
+   (state <s> ^name cab-find-cog
+              ^superstate.memory <m>)
+-->
+   (<s> ^memory <m>)}
