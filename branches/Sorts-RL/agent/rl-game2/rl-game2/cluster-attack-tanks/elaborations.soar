@@ -1,21 +1,3 @@
-sp {cluster-attack-tanks*elaborate*label-instance-first
-   (state <s> ^name cluster-attack-tanks
-              ^operator <o1> +
-              ^operator <o2> +)
-   (<o1> ^name label-instance)
-   (<o2> ^name <> label-instance)
--->
-   (<s> ^operator <o1> > <o2>)}
-
-sp {cluster-attack-tanks*elaborate*create-memory-instance-first
-   (state <s> ^name cluster-attack-tanks
-              ^operator <o1> +
-              ^operator <o2> +)
-   (<o1> ^name create-memory-instance)
-   (<o2> ^name <> create-memory-instance)
--->
-   (<s> ^operator <o1> > <o2>)}
-
 sp {cluster-attack-tanks*elaborate*set-cluster-radius-first
    (state <s> ^name cluster-attack-tanks
               ^operator <o1> +
@@ -49,12 +31,4 @@ sp {cluster-attack-tanks*elaborate*tanks-clustered
           ^type tank)}
 -->
    (<s> ^tanks-clustered t)}
-
-sp {cluster-attack-tanks*elaborate*link-memory-instance
-   (state <s> ^name cluster-attack-tanks
-              ^instance <si>
-              ^top-state.cluster-attack-tanks-memory.instance <mi>)
-   (<mi> ^label <si>)
--->
-   (<s> ^memory <mi>)}
    

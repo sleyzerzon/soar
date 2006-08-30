@@ -1,6 +1,6 @@
 sp {cluster-attack-bases*propose*find-cog
    (state <s> ^name cluster-attack-bases
-              ^instance <si>
+              ^memory <m>
              -^find-cog-complete
              -^tanks-clustered)
 -->

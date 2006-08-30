@@ -1,6 +1,5 @@
 sp {cab-find-cog*propose*restore-grouping-radius
    (state <s> ^name cab-find-cog
-              ^superstate.instance <si>
               ^memory.cog <cog>
               ^grouping-radius-exploded t)
 -->

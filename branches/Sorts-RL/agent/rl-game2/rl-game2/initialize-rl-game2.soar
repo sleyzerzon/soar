@@ -24,14 +24,8 @@ sp {apply*initialize-rl-game2*default-grouping-radius
 -->
    (<s> ^default-grouping-radius 64)}
 
-sp {apply*initialize-rl-game2*cluster-attack-bases-memory
+sp {apply*initialize-rl-game2*create-substate-memory
    (state <s> ^operator <op>)
    (<op> ^name initialize-rl-game2)
 -->
-   (<s> ^cluster-attack-bases-memory <m>)}
-
-sp {apply*initialize-rl-game2*cluster-attack-tanks-memory
-   (state <s> ^operator <op>)
-   (<op> ^name initialize-rl-game2)
--->
-   (<s> ^cluster-attack-tanks-memory <m>)}
+   (<s> ^substate-memory <m>)}

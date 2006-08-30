@@ -1,7 +1,6 @@
 sp {cab-find-cog*propose*remember-cog
    (state <s> ^name cab-find-cog
               ^grouping-radius-exploded t
-              ^superstate.instance <si>
              -^memory.cog
               ^my-pid <mpid>
               ^io.input-link <in>)
@@ -19,7 +18,6 @@ sp {cab-find-cog*propose*remember-cog
 
 sp {cab-find-cog*apply*remember-cog
    (state <s> ^name cab-find-cog
-              ^superstate.instance <si>
               ^memory <m>
               ^operator <o>)
    (<o> ^name remember-cog

@@ -1,6 +1,5 @@
 sp {cluster-attack-tanks*propose*set-cluster-radius
    (state <s> ^name cluster-attack-tanks
-              ^instance <si>
               ^memory <m>
              -^cluster-radius)
 -->
@@ -13,3 +12,13 @@ sp {cluster-attack-tanks*apply*set-cluster-radius
    (<o> ^name set-cluster-radius)
 -->
    (<s> ^cluster-radius 40)}
+
+sp {cluster-attack-tanks*apply*set-cluster-radius*set-grouping-radius
+   (state <s> ^name cluster-attack-tanks
+              ^io.input-link.vision-state.grouping-radius <> 40
+              ^io.output-link.sorts <cmd-link>
+              ^operator <o>)
+   (<o> ^name set-cluster-radius)
+-->
+   (<cmd-link> ^grouping-radius <gr-cmd>)
+   (<gr-cmd> ^value 40)}

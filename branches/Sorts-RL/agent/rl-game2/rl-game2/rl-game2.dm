@@ -1,4 +1,4 @@
-113
+119
 SOAR_ID 0
 SOAR_ID 1
 SOAR_ID 2
@@ -112,7 +112,13 @@ ENUMERATION 109 1 state
 ENUMERATION 110 1 attack-tank
 ENUMERATION 111 1 attack
 SOAR_ID 112
-121
+ENUMERATION 113 1 wipe-old-memory
+SOAR_ID 114
+ENUMERATION 115 1 wipe-old-memory
+SOAR_ID 116
+SOAR_ID 117
+ENUMERATION 118 1 substate-memory
+127
 0 io 1
 0 name 7
 0 operator 4
@@ -127,6 +133,7 @@ SOAR_ID 112
 0 operator 57
 0 operator 61
 0 operator 80
+0 operator 117
 0 superstate 6
 0 top-state 0
 0 type 5
@@ -162,6 +169,7 @@ SOAR_ID 112
 29 operator 75
 29 operator 77
 29 operator 79
+29 operator 114
 29 superstate 0
 29 top-state 0
 29 type 30
@@ -208,6 +216,7 @@ SOAR_ID 112
 82 operator 94
 82 operator 96
 82 operator 98
+82 operator 116
 82 superstate 0
 82 top-state 0
 82 type 83
@@ -234,3 +243,6 @@ SOAR_ID 112
 108 top-state 0
 108 type 109
 112 name 111
+114 name 113
+116 name 115
+117 name 118
