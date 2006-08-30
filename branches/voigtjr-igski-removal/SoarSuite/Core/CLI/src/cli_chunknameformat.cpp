@@ -17,9 +17,8 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
-#include "gSKI_Agent.h"
-#include "gSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
+#include "gSKI_Kernel.h"
 #include "gsysparam.h"
 
 using namespace cli;

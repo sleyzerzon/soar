@@ -35,8 +35,7 @@
 
 // gSKI includes
 #include "gSKI_Events.h"
-#include "gSKI_Error.h"
-#include "gSKI_KernelFactory.h"
+#include "gSKI_Structures.h"
 
 // For test
 //#define WIN_STATIC_LINK

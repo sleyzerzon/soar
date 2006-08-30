@@ -13,8 +13,8 @@
 #include "cli_CommandLineInterface.h"
 
 #include "cli_Commands.h"
-#include "gSKI_DoNotTouch.h"
 #include "gSKI_Kernel.h"
+#include "gSKI_DoNotTouch.h"
 
 using namespace cli;
 using namespace sml;

@@ -13,11 +13,8 @@
 #ifndef GSKI_KERNEL_H
 #define GSKI_KERNEL_H
 
-#include "gSKI_Kernel.h"
 #include "gSKI_Events.h"
 #include "EventManagementTemplates.h"
-#include "gSKI_DoNotTouch.h"
-
 
 typedef struct kernel_struct kernel;
 
@@ -29,6 +26,10 @@ namespace gSKI
    class KernelFactory;
    class AgentManager;
    class IPerformanceMonitor;
+   namespace EvilBackDoor 
+   {
+	   class TgDWorkArounds;
+   }
 
    /**
     * @brief: The implementation of the kernel interface.  This class is used
