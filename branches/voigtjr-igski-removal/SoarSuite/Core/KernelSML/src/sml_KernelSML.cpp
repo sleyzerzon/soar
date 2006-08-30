@@ -28,7 +28,6 @@
 #include "thread_Lock.h"
 #include "thread_Thread.h"
 
-#include "gSKI.h"
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -48,6 +47,7 @@
 #include "IgSKI_InputProducer.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_Wme.h"
+#include "IgSKI_WorkingMemory.h"
 
 using namespace sml ;
 using namespace gSKI ;

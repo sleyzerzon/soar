@@ -657,14 +657,6 @@
 				Name="Misc"
 				>
 				<File
-					RelativePath="src\gSKI.cpp"
-					>
-				</File>
-				<File
-					RelativePath="include\gSKI.h"
-					>
-				</File>
-				<File
 					RelativePath="src\gSKI_DoNotTouch.cpp"
 					>
 				</File>
@@ -828,10 +820,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_EventManager.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_InputLink.h"
 				>
 			</File>
@@ -853,10 +841,6 @@
 			</File>
 			<File
 				RelativePath="include\IgSKI_Production.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_ProductionMatch.h"
 				>
 			</File>
 			<File

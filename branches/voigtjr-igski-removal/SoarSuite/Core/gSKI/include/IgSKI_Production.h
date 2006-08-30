@@ -173,18 +173,6 @@ namespace gSKI {
       virtual tIRhsFunctionActionIterator* GetStandAloneFunctions(Error* err = 0) = 0;
 
       /**
-       * @brief returns the matches for this production.  @see MatchSet
-       *
-       * @param  pErr Pointer to client-owned error structure.  If the pointer
-       *              is not NULL this structure is filled with extended error
-       *              information.  If it is NULL (the default) extended error
-       *              information is not returned.
-       *
-       * @brief returns an iterator to the list of matches.
-       */
-      virtual tIMatchIterator* GetMatches(Error *pErr = 0) = 0;
-
-      /**
        * @brief Removes this production from the kernel and then deletes this
        *        object
        *

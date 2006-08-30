@@ -17,7 +17,6 @@
 *********************************************************************/
 #include "gSKI_KernelFactory.h"
 #include "gSKI_Error.h"
-#include "gSKI.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_Iterator.h"
 

@@ -23,6 +23,10 @@
 
 namespace gSKI {
 
+   const unsigned short MajorVersionNumber = 0;
+   const unsigned short MinorVersionNumber = 1;
+   const unsigned short MicroVersionNumber = 0;
+
    class InstanceInfo;
    class Kernel;
 
