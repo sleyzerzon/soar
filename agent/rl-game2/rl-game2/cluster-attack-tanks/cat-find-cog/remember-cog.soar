@@ -1,7 +1,7 @@
 sp {cat-find-cog*propose*remember-cog
    (state <s> ^name cat-find-cog
               ^grouping-radius-exploded t
-             -^memory.cog
+             -^superstate.memory.cog
               ^my-pid <mpid>
               ^io.input-link <in>)
    (<in> ^vision-state.grouping-radius 1000
@@ -18,7 +18,7 @@ sp {cat-find-cog*propose*remember-cog
 
 sp {cat-find-cog*apply*remember-cog
    (state <s> ^name cat-find-cog
-              ^memory <m>
+              ^superstate.memory <m>
               ^operator <o>)
    (<o> ^name remember-cog
         ^cog-x <x>

@@ -1,6 +1,7 @@
 sp {rl-game2*cluster-attack-bases
    (state <s> ^name rl-game2
               ^io.input-link.match-counts <mc>)
+   (<s> ^false <false>)
    (<mc> ^eBaseAlive <num_alive>)
 -->
    (<s> ^operator <o> +)
