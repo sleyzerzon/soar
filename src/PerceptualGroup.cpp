@@ -622,13 +622,13 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
 
     case OA_FREE:
       sticky = false;
-      currentCommand = "none";
       hasStaleMembers = true;
-      for (currentObject = members.begin();
-           currentObject != members.end();
-           currentObject++) {
-        (*currentObject)->endCommand();
-      }
+//      currentCommand = "none";
+//      for (currentObject = members.begin();
+//           currentObject != members.end();
+//           currentObject++) {
+//        (*currentObject)->endCommand();
+//      }
       break;
     case OA_STICK:
       sticky = true;

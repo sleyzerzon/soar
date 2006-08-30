@@ -172,7 +172,10 @@ void SoarOutputEventHandler
 ( smlRunEventId id, 
   void*         pUserData, 
   Agent*        agent, 
-  smlPhase      phase ) {
+  smlPhase      phase )
+{
+  static int cycles = 0;
+
   unsigned long st = gettime();
   if (Sorts::cyclesSoarAhead > 5) {
     Sorts::SoarIO->stopSoar();
@@ -205,6 +208,11 @@ void SoarOutputEventHandler
   cout << "SOAR EVENT }" << endl;
  // msg << "TIME " << (gettime() - st) / 1000 << endl;
   pthread_mutex_unlock(Sorts::mutex);
+  
+  ++cycles;
+//  if (cycles == 150) {
+//    agent->ExecuteCommandLine("exit");
+//  }
 }
 
 // the function that is executed by a separate thread to
@@ -231,6 +239,9 @@ void* RunSoar(void* ptr) {
     // to be unlocked upon the start event
     ((Agent*) ptr)->Commit();
     ((Agent*) ptr)->RunSelfForever();
+    while (1) {
+      sleep(1);
+    }
   }
 }
 
@@ -452,7 +463,7 @@ int main(int argc, char *argv[]) {
   msg << "Soar exited" << endl;
   pthread_join(ortsThread, NULL);
   msg << "ORTS client exited" << endl;
-
+ 
   if (rlUpdater) { delete rlUpdater; }
   if (rlCounter) { delete rlCounter; }
   
@@ -460,6 +471,10 @@ int main(int argc, char *argv[]) {
     soar_log->close();
     delete soar_log;
   }
+
+#ifdef USE_CANVAS
+  Sorts::canvas.quit();
+#endif
 
   exit(0);
 }

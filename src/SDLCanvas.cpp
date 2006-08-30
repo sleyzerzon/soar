@@ -53,6 +53,11 @@ int SDLCanvas::init(double worldWidth, double worldHeight, double scale) {
   return 0;
 }
 
+void SDLCanvas::quit() {
+  SDL_FreeSurface(screen);
+  SDL_Quit();
+}
+
 int SDLCanvas::redraw() {
   if (SDL_MUSTLOCK(screen)) {
     if (SDL_LockSurface(screen) < 0) {
@@ -61,7 +66,8 @@ int SDLCanvas::redraw() {
   }
 
   // background
-  boxRGBA(screen, 0, 0, canvasw, canvash, 0, 0, 0, 255);
+  SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+  //boxRGBA(screen, 0, 0, canvasw, canvash, 0, 0, 0, 255);
   
   for(list<SDLCanvasShape*>::iterator
       i  = shapes.begin();
@@ -89,6 +95,38 @@ int SDLCanvas::redraw() {
   }
 
   SDL_UpdateRect(screen, 0, 0, canvasw, canvash);
+  return 0;
+}
+
+int SDLCanvas::redraw(double x1, double y1, double x2, double y2, list<SDLCanvasShape*> toUpdate) {
+  if (SDL_MUSTLOCK(screen)) {
+    if (SDL_LockSurface(screen) < 0) {
+      return 1;
+    }
+  }
+
+  // background
+  SDL_Rect updateArea;
+  updateArea.x = space.toCS(x1);
+  updateArea.y = space.toCS(y1);
+  updateArea.w = space.toCS(x2) - updateArea.x;
+  updateArea.h = space.toCS(y2) - updateArea.y;
+
+  SDL_FillRect(screen, &updateArea, SDL_MapRGB(screen->format, 0, 0, 0));
+  
+  for(list<SDLCanvasShape*>::iterator
+      i  = toUpdate.begin();
+      i != toUpdate.end();
+      ++i)
+  {
+    (*i)->draw();
+  }
+  
+  if (SDL_MUSTLOCK(screen)) {
+    SDL_UnlockSurface(screen);
+  }
+
+  SDL_UpdateRect(screen, space.toCS(x1), space.toCS(y1), space.toCS(x2), space.toCS(y2));
   return 0;
 }
 

@@ -578,7 +578,7 @@ void SoarInterface::updateVisionState(VisionParameterStruct& vps) {
   agent->Update(visionParamRep.focusYWME, vps.focusY);
   agent->Update(visionParamRep.ownerGroupingWME, (int) vps.ownerGrouping);
   agent->Update(visionParamRep.numObjectsWME, vps.numObjects);
-  agent->Update(visionParamRep.groupingRadiusWME, vps.groupingRadius);
+  agent->Update(visionParamRep.groupingRadiusWME, sqrt(vps.groupingRadius));
   
 }
 

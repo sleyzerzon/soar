@@ -24,19 +24,22 @@ public:
   IdPattern() { }
 
   IdPattern(const IdPattern& other)
-  : prefix(other.prefix), restrictions(other.restrictions)
+  : prefix(other.prefix), restrictions(other.restrictions),
+    countAttrib(other.countAttrib)
   { }
 
   IdPattern
   ( const vector<string>& _prefix,  
-    const map<string, WMAttribValueSet*>& _restrictions )
-  : prefix(_prefix), restrictions(_restrictions)
+    const map<string, WMAttribValueSet*>& _restrictions,
+    const string& _countAttrib)
+  : prefix(_prefix), restrictions(_restrictions), countAttrib(_countAttrib)
   { }
 
   IdPattern
   ( const string& prefixStr,  
-    const map<string, WMAttribValueSet*>& _restrictions )
-  : restrictions(_restrictions)
+    const map<string, WMAttribValueSet*>& _restrictions,
+    const string& _countAttrib)
+  : restrictions(_restrictions), countAttrib(_countAttrib)
   {
     split(prefix, prefixStr, is_any_of("."));
   }
@@ -80,7 +83,20 @@ private: // functions
         }
       }
       // all restrictions met, this ID is a match
-      return 1;
+      if (countAttrib.length() == 0) {
+        // count each instance as 1
+        return 1;
+      }
+      else {
+        WMElement* c = root->FindByAttribute(countAttrib.c_str(), 0);
+        if (c) {
+          IntElement* m = c->ConvertToIntElement();
+          if (m) {
+            return m->GetValue();
+          }
+        }
+        return 1;
+      }
     }
     else {
       // here, we still have to traverse further down the line
@@ -101,6 +117,7 @@ private: // functions
 private: // variables
   vector<string> prefix;
   map<string, WMAttribValueSet*> restrictions;
+  string countAttrib;
 };
 
 #endif

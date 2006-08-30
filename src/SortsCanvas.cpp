@@ -25,15 +25,20 @@
 #define DEBUG_OUTPUT false 
 #include "OutputDefinitionsUnique.h"
 
+#define STATUS_BOX_Y 60
+
 SortsCanvas::SortsCanvas() { 
   updateCounter = 0;
 }
 
-void SortsCanvas::init(double ww, double wh, double scale) {
+void SortsCanvas::init(double _ww, double _wh, double scale) 
+{
+  ww = _ww;
+  wh = _wh;
   int status = canvas.init(ww, wh, scale);
   assert(status == 0);
   statusObj.compound = canvas.makeCompound(10,10);
-  statusObj.mainShape = canvas.makeCircle(10,5,1);
+  statusObj.mainShape = canvas.makeCircle(10,10,1);
   statusObj.mainShape->setLabel("initted");
   statusObj.mainShape->setShapeColor(198,226,255);
   statusObj.origColor = statusObj.mainShape->getShapeColor();
@@ -50,6 +55,10 @@ void SortsCanvas::init(double ww, double wh, double scale) {
   commandStatObj.mainShape->setShapeColor(198,226,255);
   commandStatObj.origColor = commandStatObj.mainShape->getShapeColor();
   commandStatObj.compound->addShape(commandStatObj.mainShape);
+}
+
+void SortsCanvas::quit() {
+  canvas.quit();
 }
 
 bool SortsCanvas::initted() {
@@ -259,17 +268,25 @@ void SortsCanvas::drawLine(double x1, double y1, double x2, double y2) {
 
 void SortsCanvas::setStatus(string status) {
   statusObj.mainShape->setLabel(status);
-  canvas.redraw();
+  list<SDLCanvasShape*> toUpdate;
+  toUpdate.push_back(statusObj.mainShape);
+  canvas.redraw(0, 0, ww, STATUS_BOX_Y, toUpdate);
 }
 void SortsCanvas::clearStatus() {
   statusObj.mainShape->setLabel("");
-  canvas.redraw();
+  list<SDLCanvasShape*> toUpdate;
+  toUpdate.push_back(statusObj.mainShape);
+  canvas.redraw(0, 0, ww, STATUS_BOX_Y, toUpdate);
 }
 void SortsCanvas::setSoarStatus(string status) {
   soarStatObj.mainShape->setLabel(status);
-  canvas.redraw();
+  list<SDLCanvasShape*> toUpdate;
+  toUpdate.push_back(soarStatObj.mainShape);
+  canvas.redraw(0, 0, ww, STATUS_BOX_Y, toUpdate);
 }
 void SortsCanvas::setCommandStatus(string status) {
   commandStatObj.mainShape->setLabel(status);
-  canvas.redraw();
+  list<SDLCanvasShape*> toUpdate;
+  toUpdate.push_back(commandStatObj.mainShape);
+  canvas.redraw(0, 0, ww, STATUS_BOX_Y, toUpdate);
 }

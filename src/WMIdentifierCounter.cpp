@@ -1,6 +1,7 @@
 #include "WMIdentifierCounter.h"
 
 #include <iostream>
+#include <utility>
 #include <map>
 #include <boost/algorithm/string.hpp>
 #include <sml_Client.h>
@@ -15,10 +16,10 @@ using std::endl;
 using std::vector;
 using std::map;
 using std::string;
+using std::pair;
 
 using boost::algorithm::split;
 using boost::algorithm::is_any_of;
-
 
 WMIdentifierCounter::WMIdentifierCounter(Agent* _agent) {
   agent = _agent;
@@ -32,18 +33,20 @@ WMIdentifierCounter::WMIdentifierCounter(Agent* _agent) {
 
 void WMIdentifierCounter::addPattern(string name, const IdPattern& p) {
   IntElement* pCountLink = agent->CreateIntWME(countLink, name.c_str(), -1);
-  patterns[pCountLink] = p;
+  patterns.insert(pair<IntElement*,IdPatternCached>(pCountLink, IdPatternCached(p)));
 }
 
-void WMIdentifierCounter::updateCounts() const {
-  cout << "MARBLES" << endl;
-  for(map<IntElement*, IdPattern>::const_iterator
+void WMIdentifierCounter::updateCounts() {
+  for(map<IntElement*, IdPatternCached>::iterator
       i  = patterns.begin();
       i != patterns.end();
       ++i) 
   {
-    int count = i->second.count(inputLink);
-    agent->Update(i->first, count);
+    int count = i->second.pattern.count(inputLink);
+    if (count != i->second.lastVal) {
+      agent->Update(i->first, count);
+      i->second.lastVal = count;
+    }
   }
 }
 

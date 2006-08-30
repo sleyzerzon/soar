@@ -59,7 +59,8 @@ class SortsCanvas {
 public:
   SortsCanvas();
 
-  void init(double ww, double wh, double scale);
+  void init(double _ww, double _wh, double scale);
+  void quit();
   bool initted();
   void clear();
   void registerSGO(SoarGameObject* sgo);
@@ -94,6 +95,8 @@ private:
   CanvasObjInfo statusObj;
   CanvasObjInfo soarStatObj;
   CanvasObjInfo commandStatObj;
+  double ww;
+  double wh;
 public:
   map<SoarGameObject*, CanvasObjInfo> canvasObjs;
   map<PerceptualGroup*, CanvasGroupInfo> canvasGroups;

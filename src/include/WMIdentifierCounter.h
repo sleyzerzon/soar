@@ -14,6 +14,15 @@ using std::string;
 using boost::algorithm::split;
 using boost::algorithm::is_any_of;
 
+struct IdPatternCached {
+  IdPattern pattern;
+  int lastVal;
+
+  IdPatternCached(const IdPattern& _pattern)
+  : pattern(_pattern), lastVal(-1)
+  { }
+};
+
 void updateCountsEventHandler
 ( smlRunEventId id,
     void*         userData,
@@ -28,13 +37,13 @@ public:
   
   void setup();
 
-  void updateCounts() const;
+  void updateCounts();
 
 private:
   Agent* agent;
   Identifier* inputLink;
   Identifier* countLink;
-  map<IntElement*, IdPattern> patterns;
+  map<IntElement*, IdPatternCached> patterns;
 };
 
 
