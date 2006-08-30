@@ -25,7 +25,7 @@ public:
 
   bool contains(WMElement* attrib) {
     string s = attrib->GetValueAsString();
-    return stringSet.find(s) == stringSet.end();
+    return stringSet.find(s) != stringSet.end();
   }
 
 private:

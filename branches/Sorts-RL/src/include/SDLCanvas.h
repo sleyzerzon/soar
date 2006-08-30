@@ -44,7 +44,9 @@ public:
   ~SDLCanvas(); 
 
   int init(double worldWidth, double worldHeight, double scale);
+  void quit();
   int redraw();
+  int redraw(double x1, double y1, double x2, double y2, list<SDLCanvasShape*> toUpdate);
 
   SDLCanvasCircle*    makeCircle(double cx, double cy, double r);
   SDLCanvasDirCircle* makeDirCircle(double cx, double cy, double r, double a);
