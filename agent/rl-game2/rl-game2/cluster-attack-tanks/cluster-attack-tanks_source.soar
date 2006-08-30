@@ -7,8 +7,6 @@ source cat-find-cog.soar
 pushd cat-find-cog
 source cat-find-cog_source.soar
 popd
-source create-memory-instance.soar
 source free-tanks.soar
-source label-instance.soar
 source move-tanks.soar
 source set-cluster-radius.soar

@@ -2,7 +2,6 @@ sp {cluster-attack-tanks*propose*move-tanks
    (state <s> ^name cluster-attack-tanks
               ^my-pid <mpid>
              -^tanks-clustered
-              ^instance <si>
               ^memory <m>
               ^io.input-link.groups.group <g>)
    (<g> ^id <id>
@@ -21,7 +20,6 @@ sp {cluster-attack-tanks*propose*move-tanks
 
 sp {cluster-attack-tanks*apply*move-tanks
    (state <s> ^name cluster-attack-tanks
-              ^instance <si>
               ^io.output-link.sorts <cmd>
               ^memory <m>
               ^operator <o>)

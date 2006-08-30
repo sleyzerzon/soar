@@ -1,6 +1,5 @@
 sp {cat-find-cog*propose*see-single-tank-group
    (state <s> ^name cat-find-cog
-              ^superstate.instance <si>
              -^memory.cog
              -^grouping-radius-exploded)
 -->

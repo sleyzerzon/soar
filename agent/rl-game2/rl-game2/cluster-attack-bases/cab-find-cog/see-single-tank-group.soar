@@ -1,6 +1,5 @@
 sp {cab-find-cog*propose*see-single-tank-group
    (state <s> ^name cab-find-cog
-              ^superstate.instance <si>
              -^memory.cog
              -^grouping-radius-exploded)
 -->

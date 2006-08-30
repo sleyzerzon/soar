@@ -13,6 +13,7 @@ source cluster-attack-tanks.soar
 pushd cluster-attack-tanks
 source cluster-attack-tanks_source.soar
 popd
+source substate-memory.soar
 source identify-enemy.soar
 source identify-self.soar
 source init-to-default-grouping-radius.soar
