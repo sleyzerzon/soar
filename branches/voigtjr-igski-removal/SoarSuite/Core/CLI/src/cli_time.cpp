@@ -25,8 +25,6 @@
 #include "sml_Names.h"
 #include "sml_StringOps.h"
 
-#include "gSKI_Agent.h"
-
 using namespace cli;
 using namespace sml;
 

@@ -19,10 +19,6 @@
 #include "sml_Events.h"
 #include "sml_RunScheduler.h"
 
-#include "gSKI_Agent.h"
-#include "gSKI_Kernel.h"
-#include "gSKI_AgentManager.h"
-
 using namespace cli;
 using namespace sml;
 

@@ -757,10 +757,6 @@
 			>
 		</Filter>
 		<Filter
-			Name="Logger"
-			>
-		</Filter>
-		<Filter
 			Name="Abstract Interface"
 			>
 			<File
