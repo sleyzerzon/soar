@@ -139,44 +139,6 @@ namespace gSKI
 		*/
 		bool ReinitializeWithOldSettings(Error* err = 0);
 
-		/**
-		* @brief Runs this agent in a separate thread
-		*
-		* This method creates a separate thread and calls RunInClientThread
-		*  from within the new thread.
-		*
-		* This method will only work if the agent is currently stopped (not
-		*  interrupted or running).
-		*
-		* This method returns immediately after starting the agents running.
-		*  It does not block until run completion.
-		*
-		* Possible Errors:
-		*   @li gSKIERR_AGENT_RUNNING if the agents is running or interrupted
-		*
-		* @see egSKIRunType
-		*
-		* @param runLength How long to run the system.  Choices are       
-		*          gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUNPHASE,
-		*          gSKI_RUN_DECISION_CYCLE, gSKI_RUN_UNTIL_OUTPUT, and
-		*          gSKI_RUN_FOREVER.  See egSKIRunType for details.
-		* @param  count For gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
-		*          and gSKI_RUN_DECISION_CYCLE this parameter tells the method
-		*          how many elaboration phases, decision phase or decision cycles
-		*          to run before the thread groups return. For other run types
-		*          this parameter is ignored.
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*
-		* @return An egSKIRunResult value indicating how the state of the system
-		*            after continuation executed. @see egSKIRunResult
-		*/
-		egSKIRunResult RunInSeparateThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
-			unsigned long       count         = 1,
-			Error*              err           = 0);
-
 		/** 
 		* @brief Runs this agent in a client owned thread.
 		*

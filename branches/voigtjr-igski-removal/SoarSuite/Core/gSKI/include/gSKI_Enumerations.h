@@ -287,21 +287,6 @@
    } egSKIProcessType;
 
    /**
-      Types of debug logging allowed.  
-     
-      @li LOG_NONE:             No debug logging occurs
-      @li LOG_ERRORS:           Only errors are logged
-      @li LOG_ALL_EXCEPT_DEBUG: Everything but pure debug messages logged
-      @li LOG_ALL:              Everything is logged
-   */
-   typedef enum  { 
-      gSKI_LOG_NONE,
-      gSKI_LOG_ERRORS,
-      gSKI_LOG_ALL,
-      gSKI_LOG_ALL_EXCEPT_DEBUG
-   } egSKILogActivityLevel;
-
-   /**
     * Symbol types for the ISymbol interface.
     *
     * Returned from ISymbol's GetType() method, this defines the type

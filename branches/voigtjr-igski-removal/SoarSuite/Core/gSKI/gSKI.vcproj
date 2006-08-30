@@ -757,48 +757,8 @@
 			>
 		</Filter>
 		<Filter
-			Name="Documentation"
-			>
-			<File
-				RelativePath="..\..\Documentation\gSKI -- Design Document.doc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Documentation\gSKI -- gSKI Summary Document.doc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Documentation\gSki -- Use cases for gSKI core system design.doc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Documentation\gSKI Build Types.doc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Documentation\gSKI.doc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Documentation\Requirements Document with Goals.doc"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Logger"
 			>
-			<File
-				RelativePath="src\ILog.h"
-				>
-			</File>
-			<File
-				RelativePath="src\Log.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\Log.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Abstract Interface"
@@ -833,10 +793,6 @@
 			</File>
 			<File
 				RelativePath="include\IgSKI_OutputLink.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_Parser.h"
 				>
 			</File>
 			<File

@@ -396,20 +396,6 @@ namespace gSKI
 
    =============================
    */
-   egSKIRunResult Agent::RunInSeparateThread(egSKIRunType        runLength, 
-                                             unsigned long       count,
-                                             Error*              err)
-   {
-      MegaAssert(false, "Not implemented yet.");
-      SetError(err, gSKIERR_NOT_IMPLEMENTED);
-      return gSKI_RUN_ERROR;
-   }
-
-   /*
-   =============================
-
-   =============================
-   */
    egSKIRunResult Agent::RunInClientThread(egSKIRunType        runLength, 
                                            unsigned long       count,
                                            Error*              err)

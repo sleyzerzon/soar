@@ -110,61 +110,6 @@ namespace gSKI
        */
       InstanceInfo* GetInstanceInformation(Error* err = 0);
 
-      /**
-       * @brief    Get the current log location
-       *
-       * @param  err Pointer to client-owned error structure.  If the pointer
-       *               is not 0 this structure is filled with extended error
-       *               information.  If it is 0 (the default) extended error
-       *               information is not returned.
-       *
-       * @returns  A c-style string with the path where debug logs are being kept.
-       *            The format of the path follows the format of file paths on the server
-       *            machine.  If there are no debug logs or an unrecoverable
-       *            error occurs, 0 is returned.
-       */
-      const char* GetLogLocation(Error* err = 0) const;
-
-      /**
-       * @brief    Sets the activity level of the debug log output
-       *
-       * The following are all possible debug log activity settings:
-       *
-       *  @li gSKI_LOG_NONE     : No logs are generated
-       *  @li gSKI_LOG_ERRORS   : Only errors are logged
-       *  @li gSKI_LOG_ALL      : Everything is logged (errors, warnings, info, debug)
-       *  @li gSKI_LOG_ALL_EXCEPT_DEBUG : Everything except debug-only messages are logged
-       *
-       * The debug logs files are named as follows:
-       *     @li gSKIError.txt   : for errors (critical problems)
-       *     @li gSKIWarning.txt : for warnings (non-critical problems)
-       *     @li gSKIInfo.txt    : for general information
-       *     @li gSKIDebug.txt   : for debug information
-       *
-       * @param eALevel The desired debug log activity level.  This setting will effect
-       *                  both the output file logs and the debug log messages routed
-       *                  through the event system.
-       * @param  err Pointer to client-owned error structure.  If the pointer
-       *               is not 0 this structure is filled with extended error
-       *               information.  If it is 0 (the default) extended error
-       *               information is not returned.
-       */
-      void SetLogActivityLevel(egSKILogActivityLevel eALevel,
-                                    Error*                err = 0);
-
-      /**
-       * @brief Gets the current debug log activity level
-       *
-       * @param  err Pointer to client-owned error structure.  If the pointer
-       *               is not 0 this structure is filled with extended error
-       *               information.  If it is 0 (the default) extended error
-       *               information is not returned.
-       *
-       * @returns The current debug log activity level.  If there is a connection
-       *            failure, the return value is undefined.
-       */
-      egSKILogActivityLevel GetLogActivityLevel(Error* err) const;
-
       /********************** LISTENERS ***********************************/
 
       /**
@@ -320,76 +265,6 @@ namespace gSKI
                                      Error*            err = 0) ;
 
       /**
-      *  @brief Adds a listener for debug log events
-      *
-      *  Call this method to register a listener to recieve debug log events.
-      *  Debug Log events are:
-      *     @li gSKIEVENT_LOG_ERROR
-      *     @li gSKIEVENT_LOG_WARNING
-      *     @li gSKIEVENT_LOG_INFO
-      *     @li gSKIEVENT_LOG_DEBUG
-      *
-      *  If this listener has already been added for the given event, nothing happens
-      *
-      *  Possible Errors:
-      *    @li gSKIERR_INVALID_PTR -- If you pass an invalid pointer for a listener.
-      *
-      *  @param eventId  One of the valid system ids listed above
-      *  @param listener A pointer to a client owned listener that will be called back when
-      *                      an event occurs.  Because the listener is client owned, it is not
-      *                      cleaned up by the kernel when it shuts down.  The same listener
-      *                      can be registered to recieve multiple events.  If this listener
-      *                      is 0, no listener is added and an error is recored in err.
-      *  @param allowAsynch A flag indicating whether or not it is ok for the listener to be
-      *                         notified asynchonously of system operation.  If you specify "true"
-      *                         the system may not callback the listener until some time after
-      *                         the event occurs. This flag is only a hint, the system may callback
-      *                         your listener synchronously.  The main purpose of this flag is to
-      *                         allow for efficient out-of-process implementation of event callbacks
-      *  @param  err Pointer to client-owned error structure.  If the pointer
-      *               is not 0 this structure is filled with extended error
-      *               information.  If it is 0 (the default) extended error
-      *               information is not returned.
-       */
-      void AddLogListener(egSKIPrintEventId   eventId, 
-                          ILogListener*  listener, 
-                          bool           allowAsynch = false,
-                          Error*         err         = 0);
-   
-      /**
-      *  @brief Removes a debug log event listener
-      *
-      *  Call this method to remove a previously added event listener.
-      *  The system will automatically remove all listeners when the kernel shutsdown;
-      *   however, since all listeners are client owned, the client is responsible for
-      *   cleaning up memory used by listeners.
-      *
-      *  If the given listener is not registered to recieve the given event, this
-      *     function will do nothing (but a warning is logged).
-      *
-      *  Debug Log events are:
-      *     @li gSKIEVENT_LOG_ERROR
-      *     @li gSKIEVENT_LOG_WARNING
-      *     @li gSKIEVENT_LOG_INFO
-      *     @li gSKIEVENT_LOG_DEBUG
-      *
-      *  Possible Errors:
-      *     @li gSKIERR_INVALID_PTR -- If you pass an invalid pointer for a listener.
-      *
-      *  @param eventId  One of the valid event ids listed above
-      *  @param listener A pointer to the listener you would like to remove.  Passing a 0
-      *                     pointer causes nothing to happen except an error being recorded
-      *                     to err.
-      *  @param  err Pointer to client-owned error structure.  If the pointer
-      *               is not 0 this structure is filled with extended error
-      *               information.  If it is 0 (the default) extended error
-      *               information is not returned.
-      */
-      void RemoveLogListener(egSKIPrintEventId   eventId,
-                             ILogListener*  listener,
-                             Error*         err = 0);
-
-      /**
       *  @brief Adds a listener for connection lost events
       *
       *  Call this method to register a listener to recieve connection lost events.
@@ -491,14 +366,6 @@ namespace gSKI
 		  may not have changed). */
 		void FireSystemPropertyChangedEvent() ;
 
-         /**
-          * @brief: Fetch the logger.
-          */
-         Log* GetLogger()
-         {
-            return m_log;
-         }
-
 		 /** 
          * @brief Event notifier for system callbacks
          */
@@ -559,7 +426,6 @@ namespace gSKI
          /** 
           * @brief Listener manager definitions 
           */
-         typedef ListenerManager<egSKIPrintEventId, ILogListener, LogNotifier>   tLogListenerManager;
          typedef ListenerManager<egSKIRhsEventId, IRhsListener, RhsNotifier>   tRhsListenerManager;
          typedef ListenerManager<egSKISystemEventId, ISystemListener, SystemNotifier>   tSystemListenerManager;
 
@@ -587,20 +453,11 @@ namespace gSKI
          /** */
          AgentManager*               m_agentMgr;
 
-         /** */
-         tLogListenerManager         m_logListeners;
-
 		 /** */
          tRhsListenerManager         m_rhsListeners;
 
 		 /** */
 		 tSystemListenerManager		 m_systemListeners ;
-
-         /** */
-         Log*                        m_log;            /**< The log file nanager */
-         
-         /** */
-	      egSKILogActivityLevel       m_logLevel;       /**< The level of current debugging. */
 
          /** */
          kernel*                     m_soarKernel;

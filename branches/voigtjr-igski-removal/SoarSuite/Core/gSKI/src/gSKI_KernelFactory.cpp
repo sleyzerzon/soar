@@ -251,7 +251,6 @@ namespace gSKI {
                                   egSKIProcessType      ePType, 
                                   const char*           szLocation, 
                                   const char*           szLogLocation,
-                                  egSKILogActivityLevel eLogActivity,
                                   Error*                err) const
    {
       ClearError(err);

@@ -49,8 +49,6 @@ namespace gSKI {
       *
       */
      InputWme( InputWorkingMemory* manager, 
-               wme* wme);
-     InputWme( InputWorkingMemory* manager, 
                InputWMObject* iobj, 
                gSymbol* attr, 
                gSymbol* value);

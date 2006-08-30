@@ -250,7 +250,6 @@ namespace gSKI {
                       egSKIProcessType      ePType             = gSKI_ANY_PROCESS, 
                       const char*           szLocation         = 0, 
                       const char*           szLogLocation = 0,
-                      egSKILogActivityLevel eLogActivity       = gSKI_LOG_ERRORS,
                       Error*                err                = 0) const;
 
       /**

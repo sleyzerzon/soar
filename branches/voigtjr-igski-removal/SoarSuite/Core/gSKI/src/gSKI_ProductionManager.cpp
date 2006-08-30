@@ -43,7 +43,6 @@
 //
 // Utility Headers
 #include "MegaAssert.h"
-#include "Log.h"
 
 //
 // std Headers
