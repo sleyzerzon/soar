@@ -1,17 +1,15 @@
 sp {scatter-attack-tanks*propose*attack
    (state <s> ^name scatter-attack-tanks
+              ^memory <m>
               ^my-pid <mpid>
               ^enemy-pid <epid>
-              ^io.input-link.groups <gs>)
-   (<gs> ^group <my-tanks>
-         ^group <enemy-tanks>)
-   (<my-tanks> ^owner <mpid>
-               ^type tank
-               ^id <mtid>)
+              ^can-use <my-tanks>
+              ^io.input-link.groups.group <enemy-tanks>)
+   (<my-tanks> ^id <mtid>)
    (<enemy-tanks> ^owner <epid>
                   ^type tank
                   ^id <etid>)
-   (<s> ^distance-measure <dm>)
+   (<m> ^distance-measure <dm>)
    (<dm> ^my-tank-id <mtid>
          ^enemy-tank-id <etid>
          ^distance <d>)
@@ -19,26 +17,26 @@ sp {scatter-attack-tanks*propose*attack
     (<closer-target> ^owner <epid>
                      ^type tank
                      ^id <ctid>)
-    (<s> ^distance-measure <dm1>)
+    (<m> ^distance-measure <dm1>)
     (<dm1> ^my-tank-id <mtid>
            ^enemy-tank-id <ctid>
            ^distance < <d>)}
 -->
    (<s> ^operator <o> + =)
    (<o> ^name attack
-        ^my-tanks <my-tanks>
-        ^enemy-tanks <enemy-tanks>)}
+        ^my-tanks-id <mtid>
+        ^enemy-tanks-id <etid>)}
 
 sp {scatter-attack-tanks*apply*attack
    (state <s> ^name scatter-attack-tanks
+              ^memory <m>
               ^io.output-link.sorts <cmd>
               ^operator <o>)
    (<o> ^name attack
-        ^my-tanks <my-tanks>
-        ^enemy-tanks <enemy-tanks>)
-   (<my-tanks> ^id <mtid>)
-   (<enemy-tanks> ^id <etid>)
+        ^my-tanks-id <mtid>
+        ^enemy-tanks-id <etid>)
 -->
    (<cmd> ^attack <a>)
    (<a> ^group0 <mtid>
-        ^group1 <etid>)}
+        ^group1 <etid>)
+   (<m> ^already-commanded <mtid>)}

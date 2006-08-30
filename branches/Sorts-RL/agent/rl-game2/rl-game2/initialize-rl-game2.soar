@@ -22,7 +22,7 @@ sp {apply*initialize-rl-game2*default-grouping-radius
    (state <s> ^operator <op>)
    (<op> ^name initialize-rl-game2)
 -->
-   (<s> ^default-grouping-radius 64)}
+   (<s> ^default-grouping-radius 32)}
 
 sp {apply*initialize-rl-game2*create-substate-memory
    (state <s> ^operator <op>)

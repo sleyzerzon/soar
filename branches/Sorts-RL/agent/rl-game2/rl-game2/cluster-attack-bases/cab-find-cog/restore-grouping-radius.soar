@@ -1,6 +1,6 @@
 sp {cab-find-cog*propose*restore-grouping-radius
    (state <s> ^name cab-find-cog
-              ^memory.cog <cog>
+              ^superstate.memory.cog <cog>
               ^grouping-radius-exploded t)
 -->
    (<s> ^operator <o> +)

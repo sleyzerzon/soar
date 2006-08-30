@@ -13,7 +13,6 @@ source cluster-attack-tanks.soar
 pushd cluster-attack-tanks
 source cluster-attack-tanks_source.soar
 popd
-source substate-memory.soar
 source identify-enemy.soar
 source identify-self.soar
 source init-to-default-grouping-radius.soar
@@ -27,4 +26,5 @@ source scatter-attack-tanks.soar
 pushd scatter-attack-tanks
 source scatter-attack-tanks_source.soar
 popd
+source substate-memory.soar
 source wait.soar

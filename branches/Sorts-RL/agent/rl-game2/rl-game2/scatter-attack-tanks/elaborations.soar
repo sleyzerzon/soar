@@ -1,0 +1,18 @@
+# this tank can be used if it is still running
+# a command not related to scatter-attack-bases
+# (so there shouldn't be ^already-commanded <mtid>)
+# or it is done running a command from scatter-attack-bases
+
+sp {scatter-attack-tanks*elaborate*can-use-tank
+   (state <s> ^name scatter-attack-tanks
+              ^memory <m>
+              ^my-pid <mpid>
+              ^io.input-link.groups.group <g>)
+   (<g> ^owner <mpid>
+        ^type tank
+        ^id <mtid>)
+  -{(<m> ^already-commanded <mtid>)
+    (<g> ^command-running > 0)}
+-->
+   (<s> ^can-use <g>)}
+   

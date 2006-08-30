@@ -16,35 +16,35 @@ VERSION 4
 13	11	OPERATOR remember-cog remember-cog.soar 14
 14	11	OPERATOR restore-grouping-radius restore-grouping-radius.soar 15
 15	11	OPERATOR see-single-tank-group see-single-tank-group.soar 16
-16	6	OPERATOR free-tanks free-tanks.soar 18
-17	6	OPERATOR move-tanks move-tanks.soar 20
-18	6	OPERATOR set-cluster-radius set-cluster-radius.soar 21
-19	0	HLOPERATOR cluster-attack-tanks cluster-attack-tanks.soar cluster-attack-tanks 82 22
-20	19	FOPERATOR elaborations elaborations.soar 23
-21	19	HLOPERATOR cat-attack-tank cat-attack-tank.soar cat-attack-tank 108 24
-22	21	FOPERATOR elaborations elaborations.soar 25
-23	21	OPERATOR attack attack.soar 26
-24	19	HLOPERATOR cat-find-cog cat-find-cog.soar cat-find-cog 99 27
-25	24	FOPERATOR elaborations elaborations.soar 28
-26	24	OPERATOR remember-cog remember-cog.soar 29
-27	24	OPERATOR restore-grouping-radius restore-grouping-radius.soar 30
-28	24	OPERATOR see-single-tank-group see-single-tank-group.soar 31
-29	19	OPERATOR free-tanks free-tanks.soar 33
-30	19	OPERATOR move-tanks move-tanks.soar 35
-31	19	OPERATOR set-cluster-radius set-cluster-radius.soar 36
-32	0	OPERATOR substate-memory substate-memory.soar 53
-33	0	OPERATOR identify-enemy identify-enemy.soar 37
-34	0	OPERATOR identify-self identify-self.soar 38
-35	0	OPERATOR init-to-default-grouping-radius init-to-default-grouping-radius.soar 39
-36	0	OPERATOR initialize-rl-game2 initialize-rl-game2.soar 40
-37	0	OPERATOR remove-completed-command remove-completed-command.soar 41
-38	0	HLOPERATOR scatter-attack-bases scatter-attack-bases.soar scatter-attack-bases 20 42
-39	38	FOPERATOR elaborations elaborations.soar 43
-40	38	OPERATOR attack attack.soar 44
-41	38	OPERATOR measure-distance measure-distance.soar 45
-42	0	HLOPERATOR scatter-attack-tanks scatter-attack-tanks.soar scatter-attack-tanks 11 46
-43	42	FOPERATOR elaborations elaborations.soar 47
-44	42	OPERATOR attack attack.soar 48
-45	42	OPERATOR measure-distance measure-distance.soar 49
-46	0	OPERATOR wait wait.soar 50
+16	6	OPERATOR free-tanks free-tanks.soar 17
+17	6	OPERATOR move-tanks move-tanks.soar 18
+18	6	OPERATOR set-cluster-radius set-cluster-radius.soar 19
+19	0	HLOPERATOR cluster-attack-tanks cluster-attack-tanks.soar cluster-attack-tanks 82 20
+20	19	FOPERATOR elaborations elaborations.soar 21
+21	19	HLOPERATOR cat-attack-tank cat-attack-tank.soar cat-attack-tank 108 22
+22	21	FOPERATOR elaborations elaborations.soar 23
+23	21	OPERATOR attack attack.soar 24
+24	19	HLOPERATOR cat-find-cog cat-find-cog.soar cat-find-cog 99 25
+25	24	FOPERATOR elaborations elaborations.soar 26
+26	24	OPERATOR remember-cog remember-cog.soar 27
+27	24	OPERATOR restore-grouping-radius restore-grouping-radius.soar 28
+28	24	OPERATOR see-single-tank-group see-single-tank-group.soar 29
+29	19	OPERATOR free-tanks free-tanks.soar 30
+30	19	OPERATOR move-tanks move-tanks.soar 31
+31	19	OPERATOR set-cluster-radius set-cluster-radius.soar 32
+32	0	OPERATOR identify-enemy identify-enemy.soar 34
+33	0	OPERATOR identify-self identify-self.soar 35
+34	0	OPERATOR init-to-default-grouping-radius init-to-default-grouping-radius.soar 36
+35	0	OPERATOR initialize-rl-game2 initialize-rl-game2.soar 37
+36	0	OPERATOR remove-completed-command remove-completed-command.soar 38
+37	0	HLOPERATOR scatter-attack-bases scatter-attack-bases.soar scatter-attack-bases 20 39
+38	37	FOPERATOR elaborations elaborations.soar 40
+39	37	OPERATOR attack attack.soar 41
+40	37	OPERATOR measure-distance measure-distance.soar 42
+41	0	HLOPERATOR scatter-attack-tanks scatter-attack-tanks.soar scatter-attack-tanks 11 43
+42	41	FOPERATOR elaborations elaborations.soar 44
+43	41	OPERATOR attack attack.soar 45
+44	41	OPERATOR measure-distance measure-distance.soar 46
+45	0	OPERATOR substate-memory substate-memory.soar 33
+46	0	OPERATOR wait wait.soar 47
 END

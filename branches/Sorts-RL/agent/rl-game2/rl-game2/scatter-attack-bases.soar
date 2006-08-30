@@ -1,7 +1,7 @@
 sp {rl-game2*scatter-attack-bases
    (state <s> ^name rl-game2 
               ^io.input-link.match-counts <mc>)
-   (<s> ^false <f>)
+   (<s> ^false <false>)
    # some other conditions
 -->
    (<s> ^operator <o> +)
