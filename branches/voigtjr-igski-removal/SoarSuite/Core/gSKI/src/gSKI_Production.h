@@ -42,7 +42,7 @@ namespace gSKI {
     * @brief This is the interface definition for Productions.
     *
     */
-  class Production : public RefCountedReleaseImpl<IProduction, true>
+  class Production : public RefCountedReleaseImpl<IProduction>
    {
    public:
       /**
@@ -51,7 +51,7 @@ namespace gSKI {
       //{
       Production(production *prod, bool includeConditions, agent* agent);
       Production(const Production& old): 
-         RefCountedReleaseImpl<IProduction, true>(old),
+         RefCountedReleaseImpl<IProduction>(old),
          m_soarProduction(0), m_agent(0), m_conditionSet(0)
       {
          *this = old;

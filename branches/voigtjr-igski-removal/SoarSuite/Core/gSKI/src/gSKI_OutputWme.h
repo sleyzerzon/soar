@@ -35,7 +35,7 @@ namespace gSKI {
     */
    // TODO: Is it appropriate to keep WME preferences inside the WME interface
    // or is this only needed when adding WME's.
-  class OutputWme: public RefCountedReleaseImpl<IWme, false> {
+  class OutputWme: public RefCountedReleaseImpl<IWme> {
   public:
 
      /**

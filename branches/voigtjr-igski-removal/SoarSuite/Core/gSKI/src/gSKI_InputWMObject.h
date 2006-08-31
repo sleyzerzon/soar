@@ -65,7 +65,7 @@ namespace gSKI {
     *  should not cause memory bloat.
     *
     */
-   class InputWMObject: public RefCountedReleaseImpl<IWMObject, false> {
+   class InputWMObject: public RefCountedReleaseImpl<IWMObject> {
    public:
       
       /**

@@ -325,13 +325,6 @@ namespace gSKI
       delete(this);
    }
 
-   // TODO: Properly implement this function
-   bool Kernel::IsClientOwned(Error* err) const
-   { 
-      MegaAssert(false, "Properly implement this function!");
-      return false;
-   }
-
    /*
    ==================================
    

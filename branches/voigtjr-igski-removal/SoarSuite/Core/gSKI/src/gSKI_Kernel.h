@@ -443,9 +443,6 @@ namespace gSKI
          */
          void Release(Error* err = 0);
 
-         // TODO: Properly implement this function
-         bool IsClientOwned(Error* err = 0) const;
-
       private: 
 
          /** */

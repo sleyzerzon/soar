@@ -301,7 +301,6 @@ namespace gSKI {
 
      // TODO: Document these methods
      bool Release(Error* err=0);
-     bool IsClientOwned(Error* err=0) const;
      
    private:
      gSymbol* m_gsym;

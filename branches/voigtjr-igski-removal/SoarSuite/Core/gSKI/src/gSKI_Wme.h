@@ -204,8 +204,7 @@ namespace gSKI {
      // or is it more appropriate in IWorkingMemory or ProductionManager?
 
      bool Release(Error* err=0);
-     bool IsClientOwned(Error* err=0) const;
-     // TODO: Comment the above two functions
+     // TODO: Comment the above function
 
 
      /**

@@ -295,12 +295,6 @@ namespace gSKI {
       */
       bool Release(Error* err = 0);
 
-      /**
-       * @brief Required by the IRelease interface
-       */
-      // TODO: Properly implement and document this method
-      bool IsClientOwned(Error* err = 0) const;
-
    private:
       /**
        * @brief: The Typedefs for a std vector of InstanceInfo pointers.
