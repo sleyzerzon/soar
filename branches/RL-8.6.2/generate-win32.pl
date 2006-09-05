@@ -206,8 +206,8 @@ sub move_step {
 	print "removing tree $core/SoarLibrary/lib\n";
 	rmtree("$core/SoarLibrary/lib") or die $!;
 	
-	print "removing tree $core/Tools/TestCSharpSML\n";
-	rmtree("$core/Tools/TestCSharpSML") or die $!;
+#	print "removing tree $core/Tools/TestCSharpSML\n";
+#	rmtree("$core/Tools/TestCSharpSML") or die $!;
 	
 	print "moving: $core/SoarLibrary/bin/makeTclSMLPackage.tcl\n";
 	mkdir("$source/SoarLibrary/bin");
