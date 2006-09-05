@@ -432,6 +432,7 @@ Global
 		{5C50C198-2197-4ABC-9761-79A007CBBADA}.Debug-DLL|Win32.ActiveCfg = Debug|Win32
 		{5C50C198-2197-4ABC-9761-79A007CBBADA}.Debug-DLL|Win32.Build.0 = Debug|Win32
 		{5C50C198-2197-4ABC-9761-79A007CBBADA}.Distribution|Win32.ActiveCfg = Distribution|Win32
+		{5C50C198-2197-4ABC-9761-79A007CBBADA}.Distribution|Win32.Build.0 = Distribution|Win32
 		{5C50C198-2197-4ABC-9761-79A007CBBADA}.Distribution-libs|Win32.ActiveCfg = Distribution|Win32
 		{5C50C198-2197-4ABC-9761-79A007CBBADA}.Release (Core)|Win32.ActiveCfg = Release|Win32
 		{5C50C198-2197-4ABC-9761-79A007CBBADA}.Release (gSKI DLL)|Win32.ActiveCfg = Release|Win32
@@ -446,6 +447,7 @@ Global
 		{846581B8-9509-4AB4-9638-45E344B14F3A}.Debug-DLL|Win32.ActiveCfg = Debug|Win32
 		{846581B8-9509-4AB4-9638-45E344B14F3A}.Debug-DLL|Win32.Build.0 = Debug|Win32
 		{846581B8-9509-4AB4-9638-45E344B14F3A}.Distribution|Win32.ActiveCfg = Distribution|Win32
+		{846581B8-9509-4AB4-9638-45E344B14F3A}.Distribution|Win32.Build.0 = Distribution|Win32
 		{846581B8-9509-4AB4-9638-45E344B14F3A}.Distribution-libs|Win32.ActiveCfg = Distribution|Win32
 		{846581B8-9509-4AB4-9638-45E344B14F3A}.Release (Core)|Win32.ActiveCfg = Release|Win32
 		{846581B8-9509-4AB4-9638-45E344B14F3A}.Release (gSKI DLL)|Win32.ActiveCfg = Release|Win32
