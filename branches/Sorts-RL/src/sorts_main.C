@@ -18,14 +18,16 @@
 */
 #include<iostream>
 #include<fstream>
+#include<time.h>
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
 #include<pthread.h>
+#include<sched.h>
 
 #include <SDL/SDL.h>
 
-#include "sml_Client.h"
+#include <sml_Client.h>
 
 // our includes
 #include "SoarInterface.h"
@@ -97,6 +99,19 @@ string fileWrite
   return "";
 }
 
+string RLHalt
+( smlRhsEventId id, 
+  void*         pUserData, 
+  Agent*        pAgent,
+  char const*   pFunctionName, 
+  char const*   pArgument )
+{
+  cout << "RUN HAS ENDED" << endl;
+  pAgent->ExecuteCommandLine("command-to-file rl-rules print --RL --full");
+  pAgent->ExecuteCommandLine("command-to-file rl-scores print --RL");
+  
+  *((bool*) pUserData) = true; // set soarHalted to true
+}
 
 void printOutput
 ( smlPrintEventId id,
@@ -105,7 +120,8 @@ void printOutput
   const char*     pMessage)
 {
   ofstream& file = *((ofstream*) pUserData);
-  file << pMessage << endl;
+  file << time(NULL) << "| " << pMessage << endl;
+  //file << pMessage << endl;
 
 #ifdef USE_CANVAS
   // enable this block to print the soar decision in the canvas,
@@ -133,12 +149,22 @@ void printOutput
     refresh Soar's view of the world (but don't commit)
 */
 
+void testHandler
+( smlRunEventId id, 
+  void*         pUserData, 
+  Agent*        agent, 
+  smlPhase      phase ) 
+{
+  cout << "SOAR GOES BUMP" << endl;
+}
+
 
 void SoarStartRunEventHandler
 ( smlRunEventId id, 
   void*         pUserData, 
   Agent*        agent, 
-  smlPhase      phase ) {
+  smlPhase      phase ) 
+{
   pthread_mutex_unlock(Sorts::mutex);
 }
 
@@ -155,18 +181,6 @@ void SoarAfterDecisionCycleEventHandler
   }
 }
 
-void SoarHaltEventHandler
-( smlRunEventId id, 
-  void*         pUserData, 
-  Agent*        agent, 
-  smlPhase      phase ) 
-{
-  if (useRL) {
-    agent->ExecuteCommandLine("command-to-file rl-rules print --RL --full");
-    agent->ExecuteCommandLine("command-to-file rl-scores print --RL");
-    soarHalted = true;
-  }
-}
 
 void SoarOutputEventHandler
 ( smlRunEventId id, 
@@ -182,8 +196,9 @@ void SoarOutputEventHandler
   }
   Sorts::cyclesSoarAhead++;
 
+  cout << "SOAR TRYING TO LOCK MUTEX" << endl;
   pthread_mutex_lock(Sorts::mutex);
-  std::cout << "SOAR EVENT {\n";
+  cout << "SOAR EVENT {\n";
   
   if (Sorts::catchup == true) {
     msg << "ignoring Soar event, ORTS is behind.\n";
@@ -221,7 +236,7 @@ void* RunSoar(void* ptr) {
   /* For some reason if this delay isn't here, this thread will
    * grab the CPU and never let it go
    */
-  sleep(1);
+  sleep(3);
 
   if (useSoarStops) {
     while (!soarHalted) {
@@ -230,6 +245,7 @@ void* RunSoar(void* ptr) {
       ((Agent*) ptr)->RunSelfForever();
       // spin until Soar gets started again
       while (!Sorts::SoarIO->isSoarRunning()) {
+        sched_yield();
         usleep(60000); // assuming 8 fps from server
       }
     }
@@ -238,10 +254,9 @@ void* RunSoar(void* ptr) {
     pthread_mutex_lock(Sorts::mutex);
     // to be unlocked upon the start event
     ((Agent*) ptr)->Commit();
+    cout << "SOAR GOES IN" << endl;
     ((Agent*) ptr)->RunSelfForever();
-    while (1) {
-      sleep(1);
-    }
+    cout << "SOAR GOES OUT" << endl;
   }
 }
 
@@ -250,12 +265,95 @@ void* RunOrts(void* ptr) {
 
   while(!soarHalted) {
     if (!gsm->recv_view()) {
-      usleep(30000);
+      sched_yield();
+      //usleep(30000);
     }
   }
 }
 
 typedef Demo_SimpleTerrain::ST_Terrain Terrain;
+
+Agent* initSoarRemote() {
+   Kernel* pKernel = Kernel::CreateRemoteConnection(true, "127.0.0.1", 12121);
+
+  if (!pKernel) {
+    cout << "Can't connect to remote kernel" << endl;
+    return NULL;
+  }
+
+  pKernel->AddRhsFunction("filewrite", &fileWrite, NULL);
+  pKernel->AddRhsFunction("rlhalt", &RLHalt, &soarHalted);
+
+  // Check that nothing went wrong.  We will always get back a kernel object
+  // even if something went wrong and we have to abort.
+  if (pKernel->HadError()) {
+    cout << pKernel->GetLastErrorDescription() << std::endl;
+    return NULL;
+  }
+
+  // Create a Soar agent named test
+  // NOTE: We don't delete the agent pointer.  It's owned by the kernel
+//  Agent* pAgent = pKernel->CreateAgent("orts_agent") ;
+  Agent* pAgent = pKernel->GetAgentByIndex(0);
+
+  if (!pAgent) {
+    cout << "Remote kernel doesn't have an agent" << endl;
+    return NULL;
+  }
+
+  // Check that nothing went wrong
+  // NOTE: No agent gets created if thereâs a problem, so we have to check foor
+  // errors through the kernel object.
+  if (pKernel->HadError()) {
+    cout << pKernel->GetLastErrorDescription() << std::endl ;
+    return NULL;
+  }
+
+  pKernel->SetAutoCommit(false);
+
+  return pAgent;
+}
+
+Agent* initSoarLocal(int soarPort, char* productions) {
+
+  Kernel* pKernel = Kernel::CreateKernelInCurrentThread("SoarKernelSML", soarPort) ;
+  std::cout << "done\n";
+
+  pKernel->AddRhsFunction("filewrite", &fileWrite, NULL);
+  pKernel->AddRhsFunction("rlhalt", &RLHalt, &soarHalted);
+
+  // Check that nothing went wrong.  We will always get back a kernel object
+  // even if something went wrong and we have to abort.
+  if (pKernel->HadError()) {
+    std::cout << pKernel->GetLastErrorDescription() << std::endl;
+    return NULL;
+  }
+
+  // Create a Soar agent named test
+  // NOTE: We don't delete the agent pointer.  It's owned by the kernel
+  Agent* pAgent = pKernel->CreateAgent("sorts") ;
+
+  // Check that nothing went wrong
+  // NOTE: No agent gets created if thereâs a problem, so we have to check foor
+  // errors through the kernel object.
+  if (pKernel->HadError()) {
+    std::cout << pKernel->GetLastErrorDescription() << std::endl ;
+    return NULL;
+  }
+
+  // Load some productions
+  pAgent->LoadProductions(productions) ;
+
+  if (pAgent->HadError()) {
+    cout << "Soar agent reported an error:\n";
+    cout << pAgent->GetLastErrorDescription() << endl ;
+    return NULL;
+  }
+
+  pKernel->SetAutoCommit(false);
+
+  return pAgent;
+}
 
 int main(int argc, char *argv[]) {
 #ifdef USE_CANVAS
@@ -271,6 +369,7 @@ int main(int argc, char *argv[]) {
   useSoarStops = true;
   useRL = false;
   bool printSoar = false;
+  bool remote_kernel = false;
 
   for(int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-port") == 0) {
@@ -301,55 +400,34 @@ int main(int argc, char *argv[]) {
     else if (strcmp(argv[i], "-rl") == 0) {
       useRL = true;
     }
+    else if (strcmp(argv[i], "-remote-kernel") == 0) {
+      remote_kernel = true;
+    }
   }
-
+  
   srand(seed);
   
   pthread_mutex_t sortsMutex = PTHREAD_MUTEX_INITIALIZER;
-  std::cout << "about to init sml\n";
-
-  /*******************
-   * Init sml client *
-   *******************/
-  Kernel* pKernel = Kernel::CreateKernelInNewThread("SoarKernelSML", soarPort) ;
-  std::cout << "done\n";
-
-  pKernel->AddRhsFunction("filewrite", &fileWrite, NULL);
-  // Check that nothing went wrong.  We will always get back a kernel object
-  // even if something went wrong and we have to abort.
-  if (pKernel->HadError()) {
-    std::cout << pKernel->GetLastErrorDescription() << std::endl;
-    return 1;
-  }
-
-  // Create a Soar agent named test
-  // NOTE: We don't delete the agent pointer.  It's owned by the kernel
-  Agent* pAgent = pKernel->CreateAgent("orts_agent") ;
-
-  // Check that nothing went wrong
-  // NOTE: No agent gets created if thereâs a problem, so we have to check foor
-  // errors through the kernel object.
-  if (pKernel->HadError()) {
-    std::cout << pKernel->GetLastErrorDescription() << std::endl ;
-    return 1;
-  }
 
   // Load some productions
-  if (productions != NULL) {
-    pAgent->LoadProductions(productions) ;
-  }
-  else {
+  if (productions == NULL) {
     cout << "ERROR: No productions specified. Use -p or -productions.\n";
     exit(1);
   }
 
-  if (pAgent->HadError()) {
-    cout << "Soar agent reported an error:\n";
-    cout << pAgent->GetLastErrorDescription() << endl ;
-    return 1;
+  Agent* pAgent;
+
+  if (remote_kernel) {
+    pAgent = initSoarRemote();
+  }
+  else {
+    pAgent = initSoarLocal(soarPort, productions);
   }
 
-  pKernel->SetAutoCommit(false);
+  if (!pAgent) {
+    cout << "Could not start the Soar agent" << endl;
+    exit(1);
+  }
 
   /*********************************
    * Set up the connection to ORTS *
@@ -416,9 +494,10 @@ int main(int argc, char *argv[]) {
 
   pAgent->RegisterForRunEvent(smlEVENT_BEFORE_RUN_STARTS, SoarStartRunEventHandler, NULL);
   pAgent->RegisterForRunEvent(smlEVENT_AFTER_OUTPUT_PHASE, SoarOutputEventHandler, NULL);
-  pAgent->RegisterForRunEvent(smlEVENT_AFTER_RUN_ENDS, SoarHaltEventHandler, NULL);
   pAgent->RegisterForRunEvent(smlEVENT_AFTER_DECISION_CYCLE, SoarAfterDecisionCycleEventHandler, NULL);
  // pAgent->RegisterForRunEvent(smlEVENT_BEFORE_INPUT_PHASE, SoarInputEventHandler, &sorts);
+
+  pAgent->RegisterForRunEvent(smlEVENT_AFTER_RUNNING, testHandler, NULL);
 
   ofstream* soar_log = 0;
   if (printSoar) {
@@ -443,26 +522,21 @@ int main(int argc, char *argv[]) {
   // start Soar in a different thread
   soarHalted = false;
 
-  pthread_attr_t soarThreadAttribs;
-  pthread_attr_init(&soarThreadAttribs);
   pthread_t soarThread;
- 
-  //pthread_create(&soarThread, &soarThreadAttribs, RunSoar, (void*) pAgent);
-  pthread_create(&soarThread, NULL, RunSoar, (void*) pAgent);
-  msg << "Soar is running" << std::endl;
+  if (!remote_kernel) {
+    pthread_create(&soarThread, NULL, RunSoar, (void*) pAgent);
+    msg << "Soar is running" << std::endl;
+  }
 
-  // this drives the orts interrupt, which drives the middleware
-  pthread_attr_t ortsThreadAttribs;
-  pthread_attr_init(&ortsThreadAttribs);
-  pthread_t ortsThread;
-  //pthread_create(&ortsThread, &ortsThreadAttribs, RunOrts, (void*) &gsm);
-  pthread_create(&ortsThread, NULL, RunOrts, (void*) &gsm);
-  msg << "ORTS client is running" << std::endl;
+  RunOrts(&gsm);
 
-  pthread_join(soarThread, NULL);
-  msg << "Soar exited" << endl;
-  pthread_join(ortsThread, NULL);
-  msg << "ORTS client exited" << endl;
+  if (!remote_kernel) {
+    pthread_join(soarThread, NULL);
+    msg << "Everything finished" << endl;
+  }
+
+//  pthread_join(ortsThread, NULL);
+//  msg << "ORTS client exited" << endl;
  
   if (rlUpdater) { delete rlUpdater; }
   if (rlCounter) { delete rlCounter; }
