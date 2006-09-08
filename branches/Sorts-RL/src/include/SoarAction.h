@@ -46,6 +46,7 @@ enum ObjectActionType {
 
 struct ObjectAction {
   ObjectActionType type;
+  bool stick;
   list<PerceptualGroup*> groups;
   list<int> params;
 };

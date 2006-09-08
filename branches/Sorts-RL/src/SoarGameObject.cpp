@@ -178,6 +178,9 @@ bool SoarGameObject::assignAction(ObjectActionType cmd, Vector<sint4> prms)
   }
   
   if (cmd == OA_STOP) {
+    // we have to set it here rather than in update(). This is an
+    // explicit stop rather than just a natural finish to a command
+    status = OBJ_IDLE;
     assignedBehavior = NULL;
   }
   else {

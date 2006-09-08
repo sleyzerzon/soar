@@ -98,7 +98,13 @@ int SDLCanvas::redraw() {
   return 0;
 }
 
-int SDLCanvas::redraw(double x1, double y1, double x2, double y2, list<SDLCanvasShape*> toUpdate) {
+int SDLCanvas::redraw
+( double x1, 
+  double y1, 
+  double x2, 
+  double y2, 
+  list<SDLCanvasShape*> toUpdate ) 
+{
   if (SDL_MUSTLOCK(screen)) {
     if (SDL_LockSurface(screen) < 0) {
       return 1;

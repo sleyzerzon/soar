@@ -333,6 +333,10 @@ void SoarInterface::processObjectAction
   // append all the group parameters
   int groupCounter = 0;
   int groupId;
+
+  // check if we want this action to stick the group
+  newAction.stick = (cmdPtr->GetParameterValue("no-stick") == NULL);
+
   while(true) {
     const char* paramValue 
     = cmdPtr->GetParameterValue(catStrInt("group", groupCounter++).c_str());
