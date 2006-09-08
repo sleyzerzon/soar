@@ -47,8 +47,10 @@ class PerceptualGroup {
     void addUnit(SoarGameObject* unit);
     bool removeUnit(SoarGameObject* unit);
     void generateData();
-    bool assignAction(ObjectActionType type, list<int> params,
-                      list<PerceptualGroup*> targets);
+    bool assignAction ( ObjectActionType       type, 
+                        list<int>              params,
+                        list<PerceptualGroup*> targets,
+                        bool                   stick);
     bool isEmpty();
 
     void getMembers(list<SoarGameObject*>& memberList); 

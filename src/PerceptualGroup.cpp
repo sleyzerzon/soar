@@ -570,8 +570,12 @@ void PerceptualGroup::mergeTo(PerceptualGroup* target) {
   return;
 }
 
-bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
-                                 list<PerceptualGroup*> targets) { 
+bool PerceptualGroup::assignAction
+( ObjectActionType       type, 
+  list<int>              params,
+  list<PerceptualGroup*> targets,
+  bool                   stick ) 
+{ 
   bool result = true;
 
   set<SoarGameObject*>::iterator currentObject;
@@ -580,7 +584,7 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
   list<PerceptualGroup*>::iterator targetGroupIt;  
   Vector<sint4> tempVec;
   list<SoarGameObject*> sgoList;
-  
+
   switch (type) {
     case OA_MOVE:
       // the third param is precision
@@ -592,7 +596,7 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
       }
 
       currentCommand = "move";
-      sticky = true;
+      sticky = stick;
       // this group is stuck together from now on,
       // until Soar issues an unstick action
       for (currentObject = members.begin();
@@ -606,7 +610,7 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
       assert(targets.size() == 0);
       currentCommand = "mine";
       tempVec.clear();
-      sticky = true;
+      sticky = stick;
       // this group is stuck together from now on,
       // until Soar issues an unstick action
       
@@ -688,7 +692,7 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
       tempVec.clear();
       tempVec.push_back(managerId);
 
-      sticky = true;
+      sticky = stick;
 
       for(set<SoarGameObject*>::iterator
           i =  members.begin();
@@ -714,7 +718,7 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
       tempVec.push_back(*intIt);
       ++intIt;
       tempVec.push_back(*intIt);
-      sticky = true;
+      sticky = stick;
       
       for (currentObject = members.begin();
            currentObject != members.end();
@@ -734,7 +738,7 @@ bool PerceptualGroup::assignAction(ObjectActionType type, list<int> params,
       tempVec.push_back(*intIt);
       ++intIt;
       tempVec.push_back(*intIt);
-      sticky = true;
+      sticky = stick;
       for (currentObject = members.begin();
            currentObject != members.end();
            currentObject++) {
