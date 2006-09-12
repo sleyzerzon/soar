@@ -14,7 +14,7 @@
 
  
 const double LAMBDA_TOLERANCE = 0.001; // Determines what eligibility traces considered non-negligible.
-typedef std::map<production *, double, std::less<production*>, SoarMemoryAllocator<std::pair<production*, double>>> SoarSTLETMap;
+typedef std::map<production *, double, std::less<production*>, SoarMemoryAllocator<std::pair<production* const, double> > > SoarSTLETMap;
  
 
 /*-------------------------------------------------------------------------
