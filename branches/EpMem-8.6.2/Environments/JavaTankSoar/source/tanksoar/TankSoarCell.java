@@ -1,7 +1,6 @@
 package tanksoar;
 
 import simulation.*;
-import utilities.*;
 
 public class TankSoarCell extends Cell {
 	// background
@@ -19,8 +18,8 @@ public class TankSoarCell extends Cell {
 	private int m_Contents = 0;
 	
 	// used in path searching
-	private boolean m_Explored = false;
-	private MapPoint m_Parent = null;
+	private java.awt.Point m_Parent = null;
+	private int distance = -1;
 	
 	private boolean m_Explosion = false;
 	protected boolean m_RadarTouch = false;
@@ -28,39 +27,43 @@ public class TankSoarCell extends Cell {
 	static boolean s_HealthChargerCreated = false;
 	private boolean m_Modified = false;
 
-	public TankSoarCell(String name) throws Exception {
+	public TankSoarCell() {
+		m_Type = kOpenInt;
+	}
+
+	public boolean setType(String name) {
 		if (name.equalsIgnoreCase(TankSoarWorld.kTypeWall)) {
 			m_Type = kWallInt;
-			return;
 		} else if (name.equalsIgnoreCase(TankSoarWorld.kTypeEmpty)) {
 			m_Type = kOpenInt;			
-			return;
 		} else if (name.equalsIgnoreCase(TankSoarWorld.kTypeEnergyRecharger)) {
 			m_Type = kEnergyInt;	
 			s_EnergyChargerCreated = true;
-			return;
 		} else if (name.equalsIgnoreCase(TankSoarWorld.kTypeHealthRecharger)) {
 			m_Type = kHealthInt;	
 			s_HealthChargerCreated = true;
-			return;
 		} else {	
-			throw new Exception("Invalid type name: " + name);
+			return false;
 		}
+		return true;
 	}
 
-	boolean isExplored() {
-		return m_Explored;
+	int getDistance() {
+		return distance;
 	}
 	
-	void setExplored(boolean setting) {
-		m_Explored = setting;
+	void setDistance(int distance) {
+		this.distance = distance;
+		if (distance < 0) {
+			m_Parent = null;
+		}
 	}
 	
-	MapPoint getParent() {
+	java.awt.Point getParent() {
 		return m_Parent;
 	}
 	
-	void setParent(MapPoint parent) {
+	void setParent(java.awt.Point parent) {
 		m_Parent = parent;
 	}
 	
@@ -112,15 +115,15 @@ public class TankSoarCell extends Cell {
 		return m_Tank;
 	}
 	
-	public boolean removeTank() {
-		if (m_Contents != kTankInt) {
-			return false;
+	public void removeTank(Tank tankToRemove) {
+		if ((m_Contents != kTankInt) || (!tankToRemove.equals(m_Tank))) {
+			return;
 		}
 		m_Redraw = true;
 		m_Contents = kNothingInt;
 		m_Tank = null;
 		setModified();
-		return true;
+		return;
 	}
 	
 	public boolean containsMissilePack() {

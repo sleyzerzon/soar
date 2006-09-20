@@ -9,7 +9,6 @@ import tanksoar.*;
 
 import simulation.*;
 import simulation.visuals.*;
-import utilities.*;
 
 public class AgentDisplay extends Composite {
 	public static final int kAgentMapCellSize = 20;
@@ -20,7 +19,6 @@ public class AgentDisplay extends Composite {
 	static final int kHealthWidth = 58;
 	static final int kEnergyWidth = 60;
 	
-	Logger m_Logger = Logger.logger;
 	TankSoarSimulation m_Simulation;
 	Table m_AgentTable;
 	WorldEntity m_SelectedEntity;
@@ -30,6 +28,7 @@ public class AgentDisplay extends Composite {
 	Button m_CloneAgentButton;
 	Button m_DestroyAgentButton;
 	Button m_ReloadProductionsButton;
+	Button m_HumanAgentButton;
 	TankSoarAgentWorld m_AgentWorld;
 	ProgressBar m_Smell;
 	ProgressBar m_Radar;
@@ -60,6 +59,36 @@ public class AgentDisplay extends Composite {
 			}
 		});
 		
+		m_HumanAgentButton = new Button(row1, SWT.PUSH);
+		m_HumanAgentButton.setText("Human");
+		m_HumanAgentButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String color = null;
+				// TODO: this probably isn't the most efficient way of doing this, but this is not a bottleneck point
+				if (m_Tanks != null) {
+					for (int i = 0; i < TankSoarWindowManager.kColors.length; ++i) {
+						boolean notTaken = true;
+						for (int j = 0; j < m_Tanks.length; ++j) {
+							if (m_Tanks[j].getColor().equalsIgnoreCase(TankSoarWindowManager.kColors[i])) {
+								notTaken = false;
+								break;
+							}
+						}
+						if (notTaken) {
+							color = TankSoarWindowManager.kColors[i];
+							break;
+						}
+					}
+				} else {
+					color = TankSoarWindowManager.kColors[0];
+				}
+				boolean spawnDebuggers = m_Simulation.getSpawnDebuggers();
+				m_Simulation.setSpawnDebuggers(false);
+				m_Simulation.createEntity(color + "-human", null, color, null, null, -1, -1, -1);
+				m_Simulation.setSpawnDebuggers(spawnDebuggers);
+			}
+		});
+				
 		m_CloneAgentButton = new Button(row1, SWT.PUSH);
 		m_CloneAgentButton.setText("Clone");
 		m_CloneAgentButton.addSelectionListener(new SelectionAdapter() {
@@ -215,8 +244,11 @@ public class AgentDisplay extends Composite {
 	
 	void selectEntity(WorldEntity entity) {
 		m_SelectedEntity = entity;
+		if (m_SelectedEntity == null) {
+			return;
+		}
 		for (int i = 0; i < m_Tanks.length; ++i) {
-			if (m_SelectedEntity == m_Tanks[i]) {
+			if (m_SelectedEntity.equals(m_Tanks[i])) {
 				m_AgentTable.setSelection(i);
 				break;
 			}
@@ -230,6 +262,9 @@ public class AgentDisplay extends Composite {
 		m_Radar.setToolTipText(Integer.toString(m_Radar.getSelection()));
 		m_Smell.setSelection(m_Tanks[m_AgentTable.getSelectionIndex()].getSmellDistance());
 		m_Smell.setToolTipText(Integer.toString(m_Smell.getSelection()));
+		if (m_Smell.getSelection() > 0) {
+			m_Smell.setForeground(TankSoarWindowManager.getColor(m_Tanks[m_AgentTable.getSelectionIndex()].getSmellColor()));
+		}
 		m_AgentWorld.enable();
 		m_AgentWorld.redraw();
 		m_Blocked.redraw();
@@ -255,6 +290,9 @@ public class AgentDisplay extends Composite {
 			m_Radar.setToolTipText(Integer.toString(m_Radar.getSelection()));
 			m_Smell.setSelection(m_Tanks[m_AgentTable.getSelectionIndex()].getSmellDistance());
 			m_Smell.setToolTipText(Integer.toString(m_Smell.getSelection()));
+			if (m_Smell.getSelection() > 0) {
+				m_Smell.setForeground(TankSoarWindowManager.getColor(m_Tanks[m_AgentTable.getSelectionIndex()].getSmellColor()));
+			}
 			m_AgentWorld.redraw();
 			m_Blocked.redraw();
 			m_RWaves.redraw();
@@ -293,7 +331,7 @@ public class AgentDisplay extends Composite {
 				m_Items[i].setText(2, Integer.toString(m_Tanks[i].getMissiles()));
 				m_Items[i].setText(3, Integer.toString(m_Tanks[i].getHealth()));
 				m_Items[i].setText(4, Integer.toString(m_Tanks[i].getEnergy()));
-				if (m_SelectedEntity == m_Tanks[i]) {
+				if (m_SelectedEntity != null && m_SelectedEntity.equals(m_Tanks[i])) {
 					foundSelected = true;
 					m_AgentTable.setSelection(i);
 				}
@@ -330,10 +368,11 @@ public class AgentDisplay extends Composite {
 			noAgents = true;
 		}
 		boolean selectedEater = (m_SelectedEntity != null);
+		boolean selectedIsHuman = selectedEater ? (m_SelectedEntity.getAgent() == null) : false;
 		
 		m_NewAgentButton.setEnabled(!running && !agentsFull);
-		m_CloneAgentButton.setEnabled(!running && !agentsFull && selectedEater);
+		m_CloneAgentButton.setEnabled(!running && !agentsFull && selectedEater && !selectedIsHuman);
 		m_DestroyAgentButton.setEnabled(!running && !noAgents && selectedEater);
-		m_ReloadProductionsButton.setEnabled(!running && !noAgents && selectedEater);
+		m_ReloadProductionsButton.setEnabled(!running && !noAgents && selectedEater && !selectedIsHuman);
  	}
 }

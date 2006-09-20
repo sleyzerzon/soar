@@ -1,16 +1,15 @@
 package simulation;
 
-import utilities.*;
+import java.awt.Point;
 
 public class World {
-	protected Logger m_Logger = Logger.logger;
 	protected int m_WorldSize;
 
 	public int getSize() {
 		return this.m_WorldSize;
 	}
 	
-	protected boolean isInBounds(MapPoint location) {
+	protected boolean isInBounds(Point location) {
 		return isInBounds(location.x, location.y);
 	}
 

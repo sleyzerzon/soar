@@ -4,23 +4,24 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.*;
 
 import utilities.*;
 
 import eaters.visuals.EatersWindowManager;
 
 public class Eaters {
+	private static Logger logger = Logger.getLogger("simulation");
 	
 	public static final String kDefaultXMLSettingsFile = "eaters-default-settings.xml";
-	private final String kDefaultFile = "EaterLog.txt";
+	private final String kDefaultLogFilename = "EaterLog.txt";
 
-	private boolean m_Quiet;
-	private String m_SettingsFile;
-	private boolean m_Console;
-	private String m_LogFile;
-	private boolean m_Append;
-	private boolean m_NotRandom;
-
+	private boolean quietSwitch;
+	private String settingsFilename;
+	private String logFilename;
+	//private boolean appendSwitch;
+	private boolean notRandomSwitch;
+	
 	public Eaters(String[] args) {
 		
 		// Install default settings file
@@ -37,18 +38,34 @@ public class Eaters {
 		}
 		
 		// Initialize logger
-		if (!m_Console) {
-			if (m_LogFile == null) {
-				m_LogFile = kDefaultFile;
-			}
-			Logger.logger.toFile(m_LogFile, m_Append);
+		// TODO: Append switch
+		if (logFilename == null) {
+			logFilename = kDefaultLogFilename;
 		}
+		try {
+			FileHandler handler = new FileHandler(logFilename);
+			handler.setFormatter(new JonsFormatter());
+			logger.addHandler(handler);
+		} catch (IOException e) {
+			System.err.println("Failed to create " + logFilename + ": " + e.getMessage());
+			System.exit(1);
+		}
+//		// Console handler
+//		ConsoleHandler handler = new ConsoleHandler();
+//		handler.setLevel(Level.ALL);
+//		rootLogger.addHandler(handler);
+		
+		// TODO: set log level via command line
+		logger.setUseParentHandlers(false);
+		logger.setLevel(Level.INFO);
+		logger.info("Java Eaters started.");
 		
 		// Initialize the simulation
-		EatersSimulation simulation = new EatersSimulation(m_SettingsFile, m_Quiet, m_NotRandom);
+		if (logger.isLoggable(Level.FINE)) logger.fine("Initializing simulation.");
+		EatersSimulation simulation = new EatersSimulation(settingsFilename, quietSwitch, notRandomSwitch);
 		
 		// Initialize the window manager, if applicable.
-		if(!m_Quiet) {
+		if(!quietSwitch) {
 			new EatersWindowManager(simulation);
 		}
 		System.exit(0);
@@ -111,19 +128,14 @@ public class Eaters {
 			return false;
 		}
 
-		m_Quiet = hasOption(args, "-quiet");
-		m_SettingsFile = getOptionValue(args, "-settings");
-		m_Console = hasOption(args, "-console");
-		m_LogFile = getOptionValue(args, "-log");
-		m_Append = hasOption(args, "-append");
-		m_NotRandom = hasOption(args, "-notrandom");
+		quietSwitch = hasOption(args, "-quiet");
+		settingsFilename = getOptionValue(args, "-settings");
+		logFilename = getOptionValue(args, "-log");
+		//appendSwitch = hasOption(args, "-append");
+		notRandomSwitch = hasOption(args, "-notrandom");
 	
-		if (m_LogFile != null) {
-			m_Console = false;
-		}
-		
-		if (m_SettingsFile == null) {
-			m_SettingsFile = kDefaultXMLSettingsFile;
+		if (settingsFilename == null) {
+			settingsFilename = kDefaultXMLSettingsFile;
 		}
 		
 		return true;
@@ -131,9 +143,8 @@ public class Eaters {
 	
 	protected void printCommandLineHelp() {
 		System.out.println("Java Eaters help");
-		System.out.println("\t-console: Send all log messages to console, overridden by -log.");
-		System.out.println("\t-log: File name to log messages to (default: " + kDefaultFile + ").");
-		System.out.println("\t-append: If logging to file, append.  Ignored if -console present.");
+		System.out.println("\t-log: File name to log messages to (default: " + kDefaultLogFilename + ").");
+		//System.out.println("\t-append: If logging to file, append.  Ignored if -console present.");
 		System.out.println("\t-quiet: Disables all windows, runs simulation quietly.");
 		System.out.println("\t-settings: XML file with with run settings.");
 		System.out.println("\t-notrandom: Disable randomness by seeding the generator with 0.");

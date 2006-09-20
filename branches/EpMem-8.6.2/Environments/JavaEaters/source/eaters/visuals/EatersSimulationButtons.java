@@ -5,6 +5,7 @@ import eaters.*;
 import simulation.visuals.*;
 
 public class EatersSimulationButtons extends SimulationButtons {
+	
 	EatersSimulation m_Simulation;
 	
 	public EatersSimulationButtons(Composite parent, EatersSimulation simulation) {
@@ -15,8 +16,8 @@ public class EatersSimulationButtons extends SimulationButtons {
 	
 	void updateButtons() {
 		boolean running = m_Simulation.isRunning();
-		boolean done = (m_Simulation.getEatersWorld().getFoodCount() == 0);
-		boolean eaters = (m_Simulation.getEatersWorld().getEaters() != null);
+		boolean done = (EatersCell.getFoodCount() == 0);
+		boolean eaters = (m_Simulation.getEatersWorld().getEaters().length > 0);
 		
         m_RunButton.setEnabled(!running && !done && eaters);
         m_StopButton.setEnabled(running);

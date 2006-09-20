@@ -1,5 +1,7 @@
 package eaters.visuals;
 
+import java.util.logging.*;
+
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
@@ -10,6 +12,7 @@ import simulation.*;
 import simulation.visuals.*;
 
 public class EatersWindowManager extends WindowManager implements SimulationListener {
+	private static Logger logger = Logger.getLogger("simulation");
 	public static final int kMainMapCellSize = 20;
 	public static final String kFoodRemaining = "Food remaining: ";
 	public static final String kScoreRemaining = "Points remaining: ";
@@ -91,7 +94,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 		gd = new GridData();
 		m_AgentDisplay.setLayoutData(gd);
 		
-		EatersVisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
+		EatersVisualWorld.remapFoodColors();
 		VisualWorld.remapEntityColors(m_Simulation.getEatersWorld().getEaters());
 
 		m_Simulation.addSimulationListener(this);
@@ -184,7 +187,7 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 			
 		case SimulationListener.kResetEvent:
 			updateWorldGroup();
-			EatersVisualWorld.remapFoodColors(m_Simulation.getEatersWorld().getFood());
+			EatersVisualWorld.remapFoodColors();
 			m_VisualWorld.setRepaint();
 			m_VisualWorld.redraw();
 			updateFoodAndScoreCount();
@@ -210,13 +213,13 @@ public class EatersWindowManager extends WindowManager implements SimulationList
 			return;
 			
 		default:
-			m_Logger.log("Invalid event type received: " + new Integer(type));
+			logger.warning("Invalid event type received: " + new Integer(type));
 			return;
 		}		
 	}
 	
 	void updateFoodAndScoreCount() {
-		m_FoodCount.setText(Integer.toString(m_Simulation.getEatersWorld().getFoodCount()));
+		m_FoodCount.setText(Integer.toString(EatersCell.getFoodCount()));
 		m_ScoreCount.setText(Integer.toString(m_Simulation.getEatersWorld().getScoreCount()));
 	}
 

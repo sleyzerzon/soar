@@ -1,42 +1,39 @@
 package simulation;
 
-import org.eclipse.swt.graphics.*;
+import java.util.logging.*;
 
 import sml.*;
-import utilities.*;
 
 public class WorldEntity {
-	public final static String kNorth = "north";
-	public final static String kEast = "east";
-	public final static String kSouth = "south";
-	public final static String kWest = "west";
-	
-	public final static int kNorthInt = 1;
-	public final static int kEastInt = 2;
-	public final static int kSouthInt = 4;
-	public final static int kWestInt = 8;
-	
-	protected Logger m_Logger = Logger.logger;
+	private static Logger logger = Logger.getLogger("simulation");
 	protected Agent m_Agent;	
-	protected Color m_Color;
-	protected String m_Facing;
+	protected org.eclipse.swt.graphics.Color m_Color;
 	protected int m_FacingInt;
 	
 	private String m_Name;
 	private int m_Points = 0;
-	private MapPoint m_Location;
+	private boolean m_PointsChanged = true;
+	private java.awt.Point m_Location = new java.awt.Point(-1,-1);
+	private java.awt.Point m_InitialLocation;
 	private String m_ColorString;
 	private String m_Productions;
 	private boolean m_Colliding = false;
 
-	public WorldEntity(Agent agent, String productions, String color, MapPoint location) {
+	public WorldEntity(Agent agent, String productions, String color, java.awt.Point initialLocation) {
 		m_Agent = agent;
-		m_Location = location;
+		
+		if (initialLocation != null) {
+			m_InitialLocation = initialLocation;
+		}
 		m_ColorString = color;
 		m_Productions = productions;
 
-		m_Name = m_Agent.GetAgentName();
-		m_Logger.log("Created agent: " + m_Name);
+		if (m_Agent == null) {
+			m_Name = m_Productions;
+		} else {
+			m_Name = m_Agent.GetAgentName();
+		}
+		if (logger.isLoggable(Level.FINE)) logger.fine("Created agent: " + m_Name);
 	}
 	
 	public String getProductions() {
@@ -44,6 +41,9 @@ public class WorldEntity {
 	}
 	
 	public void reloadProductions() {
+		if (m_Agent == null) {
+			return;
+		}
 		m_Agent.LoadProductions(m_Productions, true);
 	}
 	
@@ -51,11 +51,20 @@ public class WorldEntity {
 		return m_Name;
 	}
 	
+	public boolean pointsChanged() {
+		return m_PointsChanged;
+	}
+	
 	public int getPoints() {
 		return m_Points;
 	}
 	
+	public void clearPointsChanged() {
+		m_PointsChanged = false;
+	}
+	
 	public void setPoints(int score) {
+		m_PointsChanged = true;
 		m_Points = score;
 	}
 	
@@ -68,40 +77,31 @@ public class WorldEntity {
 	}
 	
 	public void initSoar() {
+		if (m_Agent == null) {
+			return;
+		}
 		m_Agent.InitSoar();
 	}
 	
-	public MapPoint getLocation() {
+	public java.awt.Point getLocation() {
 		return m_Location;
 	}
 	
-	public void adjustPoints(int delta) {
+	public void adjustPoints(int delta, String comment) {
+		m_PointsChanged = true;
+		int previous = m_Points;
 		m_Points += delta;
+		logger.info(getName() + " score: " + Integer.toString(previous) + " -> " + Integer.toString(m_Points) + " (" + comment + ")");
 	}
-	public void setLocation(MapPoint location) {
-		m_Location = location;
-	}
-	
-	public String getFacing() {
-		return m_Facing;
+	public void setLocation(java.awt.Point location) {
+		m_Location.x = location.x;
+		m_Location.y = location.y;
 	}
 	
-	protected void setFacingInt() {
-		if (m_Facing == null) {
-			m_FacingInt = 0;
-		}
-		
-		if (m_Facing.equalsIgnoreCase(WorldEntity.kNorth)) {
-			m_FacingInt = kNorthInt;
-		} else if (m_Facing.equalsIgnoreCase(WorldEntity.kSouth)) {
-			m_FacingInt = kSouthInt;
-		} else if (m_Facing.equalsIgnoreCase(WorldEntity.kEast)) {
-			m_FacingInt = kEastInt;
-		} else if (m_Facing.equalsIgnoreCase(WorldEntity.kWest)) {
-			m_FacingInt = kWestInt;
-		}					
+	public java.awt.Point getInitialLocation() {
+		return m_InitialLocation;
 	}
-
+	
 	public int getFacingInt() {
 		return m_FacingInt;
 	}

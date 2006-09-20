@@ -1,6 +1,6 @@
 package tanksoar;
 
-import java.util.Random;
+//import java.util.logging.*;
 
 import simulation.Simulation;
 import sml.Agent;
@@ -9,8 +9,7 @@ import sml.Identifier;
 import sml.IntElement;
 import sml.StringElement;
 import sml.WMElement;
-import utilities.Logger;
-import utilities.MapPoint;
+import utilities.*;
 
 public class InputLinkManager {
 
@@ -25,6 +24,7 @@ public class InputLinkManager {
 	private final static String kBlockedID = "blocked";
 	private final static String kClockID = "clock";
 	private final static String kColorID = "color";
+	private final static String kCurrentScoreID = "current-score";
 	private final static String kDirectionID = "direction";
 	private final static String kDistanceID = "distance";
 	private final static String kEnergyRechargerID = "energyrecharger";
@@ -72,6 +72,16 @@ public class InputLinkManager {
 	private StringElement m_BlockedLeftWME;
 	private StringElement m_BlockedRightWME;
 	private IntElement m_ClockWME;
+	private Identifier m_CurrentScoreWME;
+	
+	private IntElement m_BlueScore;
+	private IntElement m_RedScore;
+	private IntElement m_YellowScore;
+	private IntElement m_GreenScore;
+	private IntElement m_PurpleScore;
+	private IntElement m_OrangeScore;
+	private IntElement m_BlackScore;
+	
 	private StringElement m_DirectionWME;
 	private IntElement m_EnergyWME;
 	private StringElement m_EnergyRechargerWME;
@@ -83,6 +93,7 @@ public class InputLinkManager {
 	private StringElement m_IncomingLeftWME;
 	private StringElement m_IncomingRightWME;
 	private IntElement m_MissilesWME;
+	private StringElement m_MyColorWME;
 	private StringElement m_RadarStatusWME;
 	private IntElement m_RadarDistanceWME;
 	private IntElement m_RadarSettingWME;
@@ -103,11 +114,12 @@ public class InputLinkManager {
 	private IntElement m_xWME;
 	private IntElement m_yWME;			
 
-	private Logger m_Logger = Logger.logger;
+	//private static Logger logger = Logger.getLogger("simulation");
 	
 	private Identifier[][] radarCellIDs = new Identifier[Tank.kRadarWidth][Tank.kRadarHeight];
 	private StringElement[][] radarColors = new StringElement[Tank.kRadarWidth][Tank.kRadarHeight];
 	
+	private float random = 0;
 	private Agent m_Agent;
 	private Tank m_Tank;
 	private TankSoarWorld m_World;
@@ -124,7 +136,6 @@ public class InputLinkManager {
 	private void DestroyWME(WMElement wme) {
 		assert wme != null;
 		m_Agent.DestroyWME(wme);
-		wme = null;
 	}
 
 	private void Update(StringElement wme, String value) {
@@ -168,28 +179,82 @@ public class InputLinkManager {
 		}
 		
 		DestroyWME(m_BlockedWME);
+		m_BlockedWME = null;
+		
 		DestroyWME(m_ClockWME);
+		m_ClockWME = null;
+		
+		DestroyWME(m_CurrentScoreWME);
+		m_CurrentScoreWME = null;
+		m_BlueScore = null;
+		m_RedScore = null;
+		m_YellowScore = null;
+		m_GreenScore = null;
+		m_PurpleScore = null;
+		m_OrangeScore = null;
+		m_BlackScore = null;
+
 		DestroyWME(m_DirectionWME);
+		m_DirectionWME = null;
+		
 		DestroyWME(m_EnergyWME);
+		m_EnergyWME = null;
+		
 		DestroyWME(m_EnergyRechargerWME);
+		m_EnergyRechargerWME = null;
+		
 		DestroyWME(m_HealthWME);
+		m_HealthWME = null;
+		
 		DestroyWME(m_HealthRechargerWME);
+		m_HealthRechargerWME = null;
+		
 		DestroyWME(m_IncomingWME);
+		m_IncomingWME = null;
+		
 		DestroyWME(m_MissilesWME);
+		m_MissilesWME = null;
+		
+		DestroyWME(m_MyColorWME);
+		m_MyColorWME = null;
+		
 		DestroyWME(m_RadarStatusWME);
+		m_RadarStatusWME = null;
+		
 		DestroyWME(m_RadarDistanceWME);
+		m_RadarDistanceWME = null;
+		
 		DestroyWME(m_RadarSettingWME);
+		m_RadarSettingWME = null;
+		
 		if (m_RadarWME != null) {
 			DestroyWME(m_RadarWME);
+			m_RadarWME = null;
 		}
 		DestroyWME(m_RandomWME);
+		m_RandomWME = null;
+		
 		DestroyWME(m_ResurrectWME);
+		m_ResurrectWME = null;
+		
 		DestroyWME(m_RWavesWME);
+		m_RWavesWME = null;
+		
 		DestroyWME(m_ShieldStatusWME);
+		m_ShieldStatusWME = null;
+		
 		DestroyWME(m_SmellWME);
+		m_SmellWME = null;
+		
 		DestroyWME(m_SoundWME);
+		m_SoundWME = null;
+		
 		DestroyWME(m_xWME);
+		m_xWME = null;
+		
 		DestroyWME(m_yWME);
+		m_yWME = null;
+		
 		m_Agent.Commit();
 
 		clearRadar();
@@ -197,8 +262,105 @@ public class InputLinkManager {
 		m_Reset = true;
 	}
 	
+	void initScoreWMEs() {
+		if (m_CurrentScoreWME == null) {
+			return;
+		}
+		
+		boolean blueSeen = false;
+		boolean redSeen = false;
+		boolean yellowSeen = false;
+		boolean greenSeen = false;
+		boolean purpleSeen = false;
+		boolean orangeSeen = false;
+		boolean blackSeen = false;
+		
+		Tank[] tanks = m_World.getTanks();
+		for (int i = 0; i < tanks.length; ++i) {
+			if (tanks[i].getColor().equals("blue")) {
+				blueSeen = true;
+				if (m_BlueScore == null) {
+					m_BlueScore = m_Agent.CreateIntWME(m_CurrentScoreWME, "blue", tanks[i].getPoints());
+				}
+			} else if (tanks[i].getColor().equals("red")) {
+				redSeen = true;
+				if (m_RedScore == null) {
+					m_RedScore = m_Agent.CreateIntWME(m_CurrentScoreWME, "red", tanks[i].getPoints());
+				}
+			} else if (tanks[i].getColor().equals("yellow")) {
+				yellowSeen = true;
+				if (m_YellowScore == null) {
+					m_YellowScore = m_Agent.CreateIntWME(m_CurrentScoreWME, "yellow", tanks[i].getPoints());
+				}
+			} else if (tanks[i].getColor().equals("green")) {
+				greenSeen = true;
+				if (m_GreenScore == null) {
+					m_GreenScore = m_Agent.CreateIntWME(m_CurrentScoreWME, "green", tanks[i].getPoints());
+				}
+			} else if (tanks[i].getColor().equals("purple")) {
+				purpleSeen = true;
+				if (m_PurpleScore == null) {
+					m_PurpleScore = m_Agent.CreateIntWME(m_CurrentScoreWME, "purple", tanks[i].getPoints());
+				}
+			} else if (tanks[i].getColor().equals("orange")) {
+				orangeSeen = true;
+				if (m_OrangeScore == null) {
+					m_OrangeScore = m_Agent.CreateIntWME(m_CurrentScoreWME, "orange", tanks[i].getPoints());
+				}
+			} else if (tanks[i].getColor().equals("black")) {
+				blackSeen = true;
+				if (m_BlackScore == null) {
+					m_BlackScore = m_Agent.CreateIntWME(m_CurrentScoreWME, "black", tanks[i].getPoints());
+				}
+			}
+		}
+		
+		if (blueSeen == false) {
+			if (m_BlueScore != null) {
+				DestroyWME(m_BlueScore);
+				m_BlueScore = null;
+			}
+		}
+		if (redSeen == false) {
+			if (m_RedScore != null) {
+				DestroyWME(m_RedScore);
+				m_RedScore = null;
+			}
+		}
+		if (yellowSeen == false) {
+			if (m_YellowScore != null) {
+				DestroyWME(m_YellowScore);
+				m_YellowScore = null;
+			}
+		}
+		if (greenSeen == false) {
+			if (m_GreenScore != null) {
+				DestroyWME(m_GreenScore);
+				m_GreenScore = null;
+			}
+		}
+		if (purpleSeen == false) {
+			if (m_PurpleScore != null) {
+				DestroyWME(m_PurpleScore);
+				m_PurpleScore = null;
+			}
+		}
+		if (orangeSeen == false) {
+			if (m_OrangeScore != null) {
+				DestroyWME(m_OrangeScore);
+				m_OrangeScore = null;
+			}
+		}
+		if (blackSeen == false) {
+			if (m_BlackScore != null) {
+				DestroyWME(m_BlackScore);
+				m_BlackScore = null;
+			}
+		}
+	}
+	
 	void write() {
-		MapPoint location = m_Tank.getLocation();
+		java.awt.Point location = m_Tank.getLocation();
 		TankSoarCell cell = m_World.getCell(location);
 		
 		String energyRecharger = cell.isEnergyRecharger() ? kYes : kNo;
@@ -244,7 +406,7 @@ public class InputLinkManager {
 			}
 		}
 		
-		String facing = m_Tank.getFacing();
+		String facing = Direction.stringOf[m_Tank.getFacingInt()];
 		if (m_Reset) {
 			m_DirectionWME = CreateStringWME(m_InputLink, kDirectionID, facing);
 		} else {
@@ -255,10 +417,10 @@ public class InputLinkManager {
 				
 		int blocked = m_World.getBlockedByLocation(m_Tank);
 		
-		String blockedForward = ((blocked & m_Tank.forward()) > 0) ? kYes : kNo;
-		String blockedBackward = ((blocked & m_Tank.backward()) > 0) ? kYes : kNo;
-		String blockedLeft = ((blocked & m_Tank.left()) > 0) ? kYes : kNo;
-		String blockedRight = ((blocked & m_Tank.right()) > 0) ? kYes : kNo;
+		String blockedForward = ((blocked & Direction.indicators[m_Tank.getFacingInt()]) > 0) ? kYes : kNo;
+		String blockedBackward = ((blocked & Direction.indicators[Direction.backwardOf[m_Tank.getFacingInt()]]) > 0) ? kYes : kNo;
+		String blockedLeft = ((blocked & Direction.indicators[Direction.leftOf[m_Tank.getFacingInt()]]) > 0) ? kYes : kNo;
+		String blockedRight = ((blocked & Direction.indicators[Direction.rightOf[m_Tank.getFacingInt()]]) > 0) ? kYes : kNo;
 		
 		if (m_Reset) {
 			m_BlockedWME = m_Agent.CreateIdWME(m_InputLink, kBlockedID);
@@ -281,11 +443,38 @@ public class InputLinkManager {
 			}
 		}
 		
+		
+		if (m_Reset) {
+			m_CurrentScoreWME = m_Agent.CreateIdWME(m_InputLink, kCurrentScoreID);
+			initScoreWMEs();
+		} else {
+			Tank[] tanks = m_World.getTanks();
+			for (int i = 0; i < tanks.length; ++i) {
+				if (tanks[i].pointsChanged()) {
+					if (tanks[i].getColor().equals("blue")) {
+						Update(m_BlueScore, tanks[i].getPoints());
+					} else if (tanks[i].getColor().equals("red")) {
+						Update(m_RedScore, tanks[i].getPoints());
+					} else if (tanks[i].getColor().equals("yellow")) {
+						Update(m_YellowScore, tanks[i].getPoints());
+					} else if (tanks[i].getColor().equals("green")) {
+						Update(m_GreenScore, tanks[i].getPoints());
+					} else if (tanks[i].getColor().equals("purple")) {
+						Update(m_PurpleScore, tanks[i].getPoints());
+					} else if (tanks[i].getColor().equals("orange")) {
+						Update(m_OrangeScore, tanks[i].getPoints());
+					} else if (tanks[i].getColor().equals("black")) {
+						Update(m_BlackScore, tanks[i].getPoints());
+					}
+				}
+			}
+		}
+		
 		int incoming = m_World.getIncomingByLocation(location);
-		String incomingForward = ((incoming & m_Tank.forward()) > 0) ? kYes : kNo;
-		String incomingBackward = ((incoming & m_Tank.backward()) > 0) ? kYes : kNo;
-		String incomingLeft = ((incoming & m_Tank.left()) > 0) ? kYes : kNo;
-		String incomingRight = ((incoming & m_Tank.right()) > 0) ? kYes : kNo;
+		String incomingForward = ((incoming & Direction.indicators[m_Tank.getFacingInt()]) > 0) ? kYes : kNo;
+		String incomingBackward = ((incoming & Direction.indicators[Direction.backwardOf[m_Tank.getFacingInt()]]) > 0) ? kYes : kNo;
+		String incomingLeft = ((incoming & Direction.indicators[Direction.leftOf[m_Tank.getFacingInt()]]) > 0) ? kYes : kNo;
+		String incomingRight = ((incoming & Direction.indicators[Direction.rightOf[m_Tank.getFacingInt()]]) > 0) ? kYes : kNo;
 		
 		if (m_Reset) {
 			m_IncomingWME = m_Agent.CreateIdWME(m_InputLink, kIncomingID);
@@ -309,36 +498,11 @@ public class InputLinkManager {
 			}
 		}
 
-		// Sound
-		int sound = m_World.getSoundNear(m_Tank);
-		String soundString;
-		if (sound == m_Tank.forward()) {
-			soundString = kForwardID;
-		} else if (sound == m_Tank.backward()) {
-			soundString = kBackwardID;
-		} else if (sound == m_Tank.left()) {
-			soundString = kLeftID;
-		} else if (sound == m_Tank.right()) {
-			soundString = kRightID;
-		} else {
-			if (sound > 0) {
-				m_Logger.log("Warning: sound reported as more than one direction.");
-			}
-			soundString = kSilentID;
-		}
-		if (m_Reset) {
-			m_SoundWME = CreateStringWME(m_InputLink, kSoundID, soundString);			
-		} else {
-			if (!m_SoundWME.GetValue().equalsIgnoreCase(soundString)) {
-				Update(m_SoundWME, soundString);
-			}
-		}
-		
 		// Smell
 		Tank closestTank = m_World.getStinkyTankNear(m_Tank);
 		String closestTankColor = (closestTank == null) ? kNone : closestTank.getColor();
-		int distance = (closestTank == null) ? 0 : location.getManhattanDistanceTo(closestTank.getLocation());
-		m_Tank.setSmellDistance(distance);
+		int distance = (closestTank == null) ? 0 : m_World.getManhattanDistanceTo(location, closestTank.getLocation());
+		m_Tank.setSmell(distance, distance == 0 ? null : closestTankColor);
 		if (m_Reset) {
 			m_SmellWME = m_Agent.CreateIdWME(m_InputLink, kSmellID);
 			m_SmellColorWME = CreateStringWME(m_SmellWME, kColorID, closestTankColor);
@@ -376,6 +540,33 @@ public class InputLinkManager {
 			}
 		}
 
+		// Sound
+		// if the closest tank is greater than 7 away, there is no
+		// possibility of hearing anything
+		int sound = 0;
+		if ((closestTank != null) && m_World.getManhattanDistanceTo(closestTank.getLocation(), m_Tank.getLocation()) <= TankSoarWorld.kMaxSmellDistance) {
+			sound = m_World.getSoundNear(m_Tank);
+		}
+		String soundString;
+		if (sound == m_Tank.getFacingInt()) {
+			soundString = kForwardID;
+		} else if (sound == Direction.backwardOf[m_Tank.getFacingInt()]) {
+			soundString = kBackwardID;
+		} else if (sound == Direction.leftOf[m_Tank.getFacingInt()]) {
+			soundString = kLeftID;
+		} else if (sound == Direction.rightOf[m_Tank.getFacingInt()]) {
+			soundString = kRightID;
+		} else {
+			soundString = kSilentID;
+		}
+		if (m_Reset) {
+			m_SoundWME = CreateStringWME(m_InputLink, kSoundID, soundString);			
+		} else {
+			if (!m_SoundWME.GetValue().equalsIgnoreCase(soundString)) {
+				Update(m_SoundWME, soundString);
+			}
+		}
+		
 		// Missiles
 		int missiles = m_Tank.getMissiles();
 		if (m_Reset) {
@@ -388,7 +579,7 @@ public class InputLinkManager {
 		
 		// Color
 		if (m_Reset) {
-			CreateStringWME(m_InputLink, kMyColorID, m_Tank.getColor());
+			m_MyColorWME = CreateStringWME(m_InputLink, kMyColorID, m_Tank.getColor());
 		}
 		
 		int worldCount = m_World.getWorldCount();
@@ -450,7 +641,11 @@ public class InputLinkManager {
 		}
 		
 		// Random
-		float random = m_World.m_Random.nextFloat();
+		float oldrandom = random;
+		do {
+			random = Simulation.random.nextFloat();
+		} while (random == oldrandom);
+		
 		if (m_Reset) {
 			m_RandomWME = CreateFloatWME(m_InputLink, kRandomID, random);
 		} else {
@@ -459,10 +654,10 @@ public class InputLinkManager {
 
 		// RWaves
 		int rwaves = m_Tank.getRWaves();
-		String rwavesForward = (rwaves & m_Tank.forward()) > 0 ? kYes : kNo;
-		String rwavesBackward = (rwaves & m_Tank.backward()) > 0 ? kYes : kNo;;
-		String rwavesLeft = (rwaves & m_Tank.left()) > 0 ? kYes : kNo;
-		String rwavesRight = (rwaves & m_Tank.right()) > 0 ? kYes : kNo;
+		String rwavesForward = (rwaves & m_Tank.getFacingInt()) > 0 ? kYes : kNo;
+		String rwavesBackward = (rwaves & Direction.indicators[Direction.backwardOf[m_Tank.getFacingInt()]]) > 0 ? kYes : kNo;;
+		String rwavesLeft = (rwaves & Direction.indicators[Direction.leftOf[m_Tank.getFacingInt()]]) > 0 ? kYes : kNo;
+		String rwavesRight = (rwaves & Direction.indicators[Direction.rightOf[m_Tank.getFacingInt()]]) > 0 ? kYes : kNo;
 		
 		if (m_Reset) {
 			m_RWavesWME = m_Agent.CreateIdWME(m_InputLink, kRWavesID);
@@ -491,7 +686,7 @@ public class InputLinkManager {
 	}
 	
 	private void generateNewRadar() {
-//		m_Logger.log("generateNewRadar()");
+//		if (logger.isLoggable(Level.FINEST)) logger.finest("generateNewRadar()");
 		TankSoarCell[][] radarCells = m_Tank.getRadarCells();
 		for (int j = 0; j < Tank.kRadarHeight; ++j) {
 			boolean done = false;
@@ -508,7 +703,7 @@ public class InputLinkManager {
 //						outstring += "d";
 						done = true;
 						break;
-					} else {
+//					} else {
 //						outstring += ".";
 					}
 				} else {
@@ -519,12 +714,12 @@ public class InputLinkManager {
 					if (radarCells[i][j].containsTank()) {
 						radarColors[i][j] = CreateStringWME(radarCellIDs[i][j], kColorID, radarCells[i][j].getTank().getColor());
 //						outstring += "t";
-					} else {
+//					} else {
 //						outstring += "n";
 					}
 				}
 			}
-//			m_Logger.log(outstring);
+//			if (logger.isLoggable(Level.FINEST)) logger.finest(outstring);
 			if (done == true) {
 				break;
 			}
@@ -532,7 +727,7 @@ public class InputLinkManager {
 	}
 	
 	private void updateRadar() {
-//		m_Logger.log("updateRadar()");
+//		if (logger.isLoggable(Level.FINEST)) logger.finest("updateRadar()");
 		TankSoarCell[][] radarCells = m_Tank.getRadarCells();
 		for (int i = 0; i < Tank.kRadarWidth; ++i) {
 //			String outstring = new String();
@@ -549,7 +744,7 @@ public class InputLinkManager {
 						DestroyWME(radarCellIDs[i][j]);
 						radarCellIDs[i][j] = null;
 						radarColors[i][j] = null;
-					} else {
+//					} else {
 //						outstring += "-";
 					}
 					
@@ -563,7 +758,7 @@ public class InputLinkManager {
 						if (radarCells[i][j].containsTank()) {
 							radarColors[i][j] = CreateStringWME(radarCellIDs[i][j], kColorID, radarCells[i][j].getTank().getColor());
 //							outstring += "t";
-						} else {
+//						} else {
 //							outstring += "n";
 						}
 					} else {
@@ -578,21 +773,21 @@ public class InputLinkManager {
 								//tank.setRWaves(m_Tank.backward());
 								radarColors[i][j] = CreateStringWME(radarCellIDs[i][j], kColorID, radarCells[i][j].getTank().getColor());
 //								outstring += "U";
-							} else {
+//							} else {
 //								outstring += "u";								
 							}
-						} else {
+//						} else {
 //							outstring += ".";							
 						}
 					}
 				}
 			}
-//			m_Logger.log(outstring);
+//			if (logger.isLoggable(Level.FINEST)) logger.finest(outstring);
 		}
 	}
 
 	private void clearRadar() {
-//		m_Logger.log("clearRadar()");
+//		logger.finest("clearRadar()");
 		for (int i = 0; i < Tank.kRadarWidth; ++i) {
 			for (int j = 0; j < Tank.kRadarHeight; ++j) {
 				radarCellIDs[i][j] = null;

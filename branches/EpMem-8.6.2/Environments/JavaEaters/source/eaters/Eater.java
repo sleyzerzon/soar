@@ -1,10 +1,14 @@
 package eaters;
 
+import java.util.logging.*;
+
 import simulation.*;
 import sml.*;
 import utilities.*;
 
 public class Eater extends WorldEntity {
+	private static Logger logger = Logger.getLogger("simulation");
+	
 	public final static int kEaterVision = 2;
 	
 	public final static String kEaterID = "eater";
@@ -19,14 +23,18 @@ public class Eater extends WorldEntity {
 	public final static String kJumpID = "jump";
 	public final static String kDontEatID = "dont-eat";
 	public final static String kTrue = "true";
+	public final static String kEater = "eater";
+	public final static String kRandomID = "random";
 
 	private StringElement m_DirectionWME;
 	private IntElement m_ScoreWME;
 	private IntElement m_xWME;
 	private IntElement m_yWME;
+	private FloatElement m_RandomWME;
 	private SoarCell[][] m_Cells = new SoarCell[(kEaterVision * 2 ) + 1][(kEaterVision * 2 ) + 1];
 	private boolean m_Hungry = true;
 	private boolean m_Moved = true;
+	private float random = 0;
 
 	class SoarCell {
 		Identifier me;
@@ -40,12 +48,12 @@ public class Eater extends WorldEntity {
 		boolean iterated = false;
 	}
 	
-	public Eater(Agent agent, String productions, String color, MapPoint location) {
-		super(agent, productions, color, location);
+	public Eater(Agent agent, String productions, String color, java.awt.Point initialLocation) {
+		super(agent, productions, color, initialLocation);
 
 		Identifier eater = m_Agent.CreateIdWME(m_Agent.GetInputLink(), kEaterID);
 		
-		m_DirectionWME = m_Agent.CreateStringWME(eater, kDirectionID, kNorth);
+		m_DirectionWME = m_Agent.CreateStringWME(eater, kDirectionID, Direction.kNorthString);
 		m_Agent.CreateStringWME(eater, kNameID, getName());
 		m_ScoreWME = m_Agent.CreateIntWME(eater, kScoreID, getPoints());
 		m_xWME = m_Agent.CreateIntWME(eater, kxID, getLocation().x);
@@ -60,13 +68,15 @@ public class Eater extends WorldEntity {
 		m_Cells[kEaterVision][kEaterVision].me = m_Agent.CreateIdWME(m_Agent.GetInputLink(), kMyLocationID);
 		createView(kEaterVision, kEaterVision);
 		
+		m_RandomWME = m_Agent.CreateFloatWME(m_Agent.GetInputLink(), kRandomID, random);
+		
 		m_Agent.Commit();
 	}
 
 	void createView(int x, int y) {
 		if (x >= 0 && x <= 4 && y >=0 && y <= 4 && !m_Cells[x][y].iterated) {
 			m_Cells[x][y].iterated = true;
-			m_Cells[x][y].content = m_Agent.CreateStringWME(m_Cells[x][y].me, kContentID, EatersWorld.kEmptyID);
+			m_Cells[x][y].content = m_Agent.CreateStringWME(m_Cells[x][y].me, kContentID, CellType.EMPTY.toString());
 
 			if (x > 0) {
 				if (m_Cells[x - 1][y].me == null)
@@ -109,15 +119,36 @@ public class Eater extends WorldEntity {
 	
 	public void updateInput(EatersWorld world) {
 		// Anything you want to log about each eater each frame can go here:
-		//m_Logger.log(getName() + " at " + getLocation() + " score " + getPoints());
+		//logger.info(getName() + " at " + getLocation() + " score " + getPoints());
 		
 
 		int xView, yView;
+		int worldSize = world.getSize();
 		for (int x = 0; x < m_Cells.length; ++x) {
 			xView = x - Eater.kEaterVision + getLocation().x;
+			if (xView < 0) {
+				continue;
+			} else if (xView >= worldSize) {
+				break;
+			}
 			for (int y = 0; y < m_Cells[x].length; ++y) {
 				yView = y - Eater.kEaterVision + getLocation().y;
-				String content = world.getContentNameByLocation(xView, yView);
+				if (yView < 0) {
+					continue;
+				} else if (yView >= worldSize) {
+					break;
+				}
+				EatersCell cell = world.getCell(xView, yView);
+				String content = null;
+				if (cell.getEater() != null) {
+					content = kEater;
+					
+				} else if (cell.getFood() != null) {
+					content = cell.getFood().name();
+			
+				} else {
+					content = cell.getType().name();
+				}
 				if (m_Moved || !m_Cells[x][y].content.GetValue().equalsIgnoreCase(content)) {
 					m_Agent.Update(m_Cells[x][y].content, content);
 				}
@@ -128,14 +159,21 @@ public class Eater extends WorldEntity {
 			m_Agent.Update(m_ScoreWME, getPoints());
 		}
 		
-		if (!m_DirectionWME.GetValue().equalsIgnoreCase(m_Facing)) {
-			m_Agent.Update(m_DirectionWME, m_Facing);
+		if (!m_DirectionWME.GetValue().equalsIgnoreCase(Direction.stringOf[m_FacingInt])) {
+			m_Agent.Update(m_DirectionWME, Direction.stringOf[m_FacingInt]);
 		}
 
 		if (m_Moved) {
 			m_Agent.Update(m_xWME, getLocation().x);
 			m_Agent.Update(m_yWME, getLocation().y);
 		}
+		
+		// Random
+		float oldrandom = random;
+		do {
+			random = Simulation.random.nextFloat();
+		} while (random == oldrandom);
+		m_Agent.Update(m_RandomWME, random);
 		
 		m_Agent.Commit();
 
@@ -149,12 +187,12 @@ public class Eater extends WorldEntity {
 	
 	public MoveInfo getMove() {
 		if (m_Agent.GetNumberCommands() == 0) {
-			m_Logger.log(getName() + " issued no command.");
+			if (logger.isLoggable(Level.FINE)) logger.fine(getName() + " issued no command.");
 			return null;
 		}
 		
 		if (m_Agent.GetNumberCommands() > 1) {
-			m_Logger.log(getName() + " issued more than one command, using first.");
+			if (logger.isLoggable(Level.FINE)) logger.fine(getName() + " issued more than one command, using first.");
 		}
 
 		Identifier commandId = m_Agent.GetCommand(0);
@@ -166,10 +204,9 @@ public class Eater extends WorldEntity {
 		} else if (commandName.equalsIgnoreCase(kJumpID)) {
 			move.jump = true;
 		} else {
-			m_Logger.log("Unknown command: " + commandName);
+			logger.warning("Unknown command: " + commandName);
 			return null;
 		}
-		m_Moved = true;
 		
 		String donteat = commandId.GetParameterValue(kDontEatID);
 		if (donteat == null) {
@@ -180,15 +217,14 @@ public class Eater extends WorldEntity {
 		
 		move.direction = commandId.GetParameterValue(kDirectionID);
 		if (move.direction != null) {
-			m_Facing = move.direction;
-			setFacingInt();
+			m_FacingInt = Direction.getInt(move.direction);
 			commandId.AddStatusComplete();
 			m_Agent.ClearOutputLinkChanges();
 			m_Agent.Commit();
 			return move;
 		}
 		
-		m_Logger.log("Improperly formatted command: " + kMoveID);
+		logger.warning("Improperly formatted command: " + kMoveID);
 		return null;
 	}
 	

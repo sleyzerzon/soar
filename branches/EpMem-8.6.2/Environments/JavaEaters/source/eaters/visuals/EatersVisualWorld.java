@@ -1,33 +1,47 @@
 package eaters.visuals;
 
-import java.util.*;
-
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 
 import eaters.*;
-import simulation.*;
 import simulation.visuals.*;
 import utilities.*;
 
 public class EatersVisualWorld extends VisualWorld implements PaintListener {
-	static HashMap m_FoodColors;
 	
-	public static void remapFoodColors(EatersWorld.Food[] food) {
-		if (food == null) {
-			m_FoodColors = null;
-			return;
-		}
-		m_FoodColors = new HashMap();
-		for (int i = 0; i < food.length; ++i) {
-			m_FoodColors.put(food[i], WindowManager.getColor(food[i].getColor()));
+	static Color[] foodColors = new Color[0];
+	
+	/**
+	* Reallocates an array with a new size, and copies the contents
+	* of the old array to the new array.
+	* @param oldArray  the old array, to be reallocated.
+	* @param newSize   the new array size.
+	* @return          A new array with the same contents.
+	*/
+	private static Object resizeArray(Object oldArray, int newSize) {
+	   int oldSize = java.lang.reflect.Array.getLength(oldArray);
+	   Class elementType = oldArray.getClass().getComponentType();
+	   Object newArray = java.lang.reflect.Array.newInstance(elementType,newSize);
+	   int preserveLength = Math.min(oldSize,newSize);
+	   if (preserveLength > 0) {
+	      System.arraycopy (oldArray,0,newArray,0,preserveLength);
+	   }
+	   return newArray; 
+	}
+	
+	public static void remapFoodColors() {
+		
+		foodColors = (Color[])resizeArray(foodColors, Food.foodTypeCount());
+		for (int i = 0; i < Food.foodTypeCount(); ++i) {
+			Food f = Food.getFood(i);
+			foodColors[i] = WindowManager.getColor(f.color());
 		}
 	}
 	
 	EatersSimulation m_Simulation;
 	EatersWorld m_World;
-	MapPoint m_AgentLocation;
+	java.awt.Point m_AgentLocation;
 	
 	public EatersVisualWorld(Composite parent, int style, EatersSimulation simulation, int cellSize) {
 		super(parent, style, simulation, cellSize);
@@ -46,15 +60,15 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 		return m_CellSize * ((Eater.kEaterVision * 2) + 1);
 	}
 	
-	public void setAgentLocation(MapPoint location) {
+	public void setAgentLocation(java.awt.Point location) {
 		m_AgentLocation = location;
 	}
 	
 	Eater getEaterAtPixel(int x, int y) {
 		x /= m_CellSize;
 		y /= m_CellSize;
-		EatersWorld.EatersCell cell = m_World.getCell(x, y);
-		if (cell.isEater()) {
+		EatersCell cell = m_World.getCell(x, y);
+		if (cell.getEater() != null) {
 			return cell.getEater();
 		}
 		return null;
@@ -102,20 +116,12 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 					yDraw = y;
 				}
 				
-				EatersWorld.EatersCell cell = m_World.getCell(x, y);
-				if (!cell.needsRedraw() && m_Painted) {
+				EatersCell cell = m_World.getCell(x, y);
+				if (!cell.checkDraw() && m_Painted) {
 					continue;
 				}
-				
-				if (cell.isWall()) {
-				    gc.setBackground(WindowManager.black);
-				    gc.fillRectangle(m_CellSize*xDraw + 1, m_CellSize*yDraw + 1, m_CellSize - 2, m_CellSize - 2);
-					
-				} else if (cell.isEmpty()) {
-					gc.setBackground(WindowManager.widget_background);
-					gc.fillRectangle(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
-					
-				} else if (cell.isEater()) {
+
+				if (cell.getEater() != null) {
 					
 					Eater eater = cell.getEater();
 					
@@ -125,53 +131,53 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 					
 					
 					switch (eater.getFacingInt()) {
-					case WorldEntity.kNorthInt:
+					case Direction.kNorthInt:
 						drawEaterMouth(xDraw, yDraw, 1, 0, 1, 1, gc);
 						break;
-					case WorldEntity.kEastInt:
+					case Direction.kEastInt:
 						drawEaterMouth(xDraw + 1, yDraw, 0, 1, -1, 1, gc);
 						break;
-					case WorldEntity.kSouthInt:
+					case Direction.kSouthInt:
 						drawEaterMouth(xDraw, yDraw + 1, 1, 0, 1, -1, gc);
 						break;
-					case WorldEntity.kWestInt:
+					case Direction.kWestInt:
 						drawEaterMouth(xDraw, yDraw, 0, 1, 1, 1, gc);
 						break;
 					default:
 						break;
 					}
-				} else {
-				
-					EatersWorld.Food food = cell.getFood();
+				} else if (cell.isWall()) {
+				    gc.setBackground(WindowManager.black);
+				    gc.fillRectangle(m_CellSize*xDraw + 1, m_CellSize*yDraw + 1, m_CellSize - 2, m_CellSize - 2);
+					
+				} else if (cell.getFood() != null) {
+					Food food = cell.getFood();
 					
 				    gc.setBackground(WindowManager.widget_background);
 				    gc.fillRectangle(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
 				    
-					gc.setBackground((Color)m_FoodColors.get(food));
+					gc.setBackground(foodColors[food.id()]);
 					
-					// TODO: this is a lot of string compares, should be integer switch
-					switch (food.getShape()) {
-					default:
-						m_Logger.log("Invalid food shape '" + food.getShapeName() + "', using round.");
-					case EatersWorld.Food.kRoundInt:
+					if (food.shape().equals(Shape.ROUND)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawOval(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2 - 1, m_CellSize - fill2 - 1);
-						break;
-					case EatersWorld.Food.kSquareInt:
+					} else if (food.shape().equals(Shape.SQUARE)) {
 						fill1 = (int)(m_CellSize/2.8);
 						fill2 = m_CellSize - fill1 + 1;
 						gc.fillRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
 						gc.drawRectangle(m_CellSize*xDraw + fill1, m_CellSize*yDraw + fill1, m_CellSize - fill2, m_CellSize - fill2);
-						break;
 					}
+
+				} else {
+					gc.setBackground(WindowManager.widget_background);
+					gc.fillRectangle(m_CellSize*xDraw, m_CellSize*yDraw, m_CellSize, m_CellSize);
 				}
 				
 				if (cell.checkCollision()) {
 					drawExplosion(gc, xDraw, yDraw);
 				}
-				
 			}
 		}
 		m_Painted = true;
@@ -184,11 +190,11 @@ public class EatersVisualWorld extends VisualWorld implements PaintListener {
 		int yBase = m_CellSize*y;
 		int halfCell = m_CellSize/2;
 		
-		MapPoint center = new MapPoint(xBase + halfCell, yBase + halfCell);
-		MapPoint north = new MapPoint(center.x, yBase);
-		MapPoint east = new MapPoint(xBase + m_CellSize, center.y);
-		MapPoint south = new MapPoint(center.x, yBase + m_CellSize);
-		MapPoint west = new MapPoint(xBase, center.y);
+		java.awt.Point center = new java.awt.Point(xBase + halfCell, yBase + halfCell);
+		java.awt.Point north = new java.awt.Point(center.x, yBase);
+		java.awt.Point east = new java.awt.Point(xBase + m_CellSize, center.y);
+		java.awt.Point south = new java.awt.Point(center.x, yBase + m_CellSize);
+		java.awt.Point west = new java.awt.Point(xBase, center.y);
 		
 		gc.fillPolygon(new int[] {center.x, center.y, north.x, north.y, center.x + offCenter, center.y});
 		gc.fillPolygon(new int[] {center.x, center.y, east.x,  east.y,  center.x, center.y + offCenter});

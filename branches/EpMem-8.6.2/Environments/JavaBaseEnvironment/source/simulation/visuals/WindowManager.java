@@ -5,21 +5,19 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import utilities.Logger;
-
 public class WindowManager {
 	public static final String kMapPrefix = "Map: ";
 	public static final String kColors[] = { "red", "blue", "purple", "yellow", "orange", "black", "green" };
 	
-	public static Color white;
-	public static Color blue;
-	public static Color red;
-	public static Color widget_background;
-	public static Color yellow;
-	public static Color orange;
-	public static Color black;
-	public static Color green;
-	public static Color purple;
+	public static Color white = null;
+	public static Color blue = null;
+	public static Color red = null;
+	public static Color widget_background = null;
+	public static Color yellow = null;
+	public static Color orange = null;
+	public static Color black = null;
+	public static Color green = null;
+	public static Color purple = null;
 
 	public static void initColors(Display d) {
 	    white = d.getSystemColor(SWT.COLOR_WHITE);
@@ -61,7 +59,6 @@ public class WindowManager {
 		return null;
 	}
 
-	protected Logger m_Logger = Logger.logger;
 	protected Display m_Display;
 	protected Shell m_Shell;
 
