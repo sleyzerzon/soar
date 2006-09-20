@@ -525,7 +525,7 @@ void decay_reference_wme(agent *thisAgent, wme *w, int depth = 0)
         return;
     }
     //Architectural WMEs without decay elements are ignored
-    else if (pref == NIL)
+    else if ( (pref == NIL) || (pref->reference_count == 0) )
     {
         return;
     }
@@ -636,8 +636,16 @@ int dcah_helper(wme *w, wme_decay_element *el, int depth = 0)
              {
                  num_cond_wmes += dcah_helper(cond_wme, el, depth +1);
              }//else
+
         }//if
         
+        //Catch end of list and break out
+        if (cond == inst->bottom_of_instantiated_conditions)
+        {
+            break;
+        }
+
+        //Repeat for next condition
         cond = cond->next;
     }//while
 

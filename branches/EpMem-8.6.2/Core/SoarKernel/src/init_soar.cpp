@@ -1118,11 +1118,11 @@ void do_one_top_level_phase (agent* thisAgent)
      {
          decay_move_and_remove_wmes(thisAgent);
      }
+#endif /*SOAR_WMEM_ACTIVATION*/
+
 #ifdef EPISODIC_MEMORY
      epmem_update(thisAgent);
 #endif /* EPISODIC_MEMORY */
-#endif /*SOAR_WMEM_ACTIVATION*/
-
       
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_OUTPUT_PHASE_CALLBACK,
