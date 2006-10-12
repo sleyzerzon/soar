@@ -1930,6 +1930,10 @@ arraylist *trim_epmem(arraylist *epmem)
    Once it has been determined that an epmem needs to be recorded,
    this routine manages all the steps for recording it.
 
+   Note:  I had epmems with missing WMEs when I just incremented
+          the tc number by one.  I found it had to be at least 3
+          to work reliably.  Don't ask me why.
+   
    Created: 12 Jan 2004
    =================================================================== */
 void record_epmem(agent *thisAgent)
@@ -1965,7 +1969,8 @@ void record_epmem(agent *thisAgent)
         next_state->next = curr_state;
         curr_state = next_state;
 
-        tc = sym->id.tc_num + 1;
+        tc = sym->id.tc_num + 3;//how much is enough?? (see note above)
+        
         sym = update_wmetree(thisAgent, thisAgent->epmem_wmetree, sym, curr_state, tc);
 
         //Update the assoc_memories link on each wmetree node in curr_state
@@ -1999,8 +2004,8 @@ void record_epmem(agent *thisAgent)
                         node->assoc_memories = make_arraylist(thisAgent, 1);
                     }
                     
-                }                
-            }
+                }
+            }//if
         }//for
     }//while
 
@@ -2012,7 +2017,7 @@ void record_epmem(agent *thisAgent)
     new_epmem->index = thisAgent->epmem_memories->size;
     append_entry_to_arraylist(thisAgent, thisAgent->epmem_memories, (void *)new_epmem);
 
-//      //%%%DEBUGGING
+    //%%%DEBUGGING
 //      print(thisAgent, "\nRECORDED MEMORY %d:\n", thisAgent->epmem_memories->size - 1);
 //      print_memory(thisAgent,
 //                   ((episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories,thisAgent->epmem_memories->size - 1))->content,
@@ -3083,18 +3088,18 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
         h->last_match_score = selected_mem->match_score;
     }
 
-    //%%%DEBUGGING
-    if (selected_mem != NULL)
-    {
-        print(thisAgent,
-              "\nSelected the following memory (#%d) with match score %d and cardinality %d:",
-              selected_mem->index,
-              selected_mem->match_score,
-              selected_mem->num_matches);
-        print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 5,
-                     NULL);
-                     //"io input-link x y direction radar-setting radar-status");
-    }
+//      //%%%DEBUGGING
+//      if (selected_mem != NULL)
+//      {
+//          print(thisAgent,
+//                "\nSelected the following memory (#%d) with match score %d and cardinality %d:",
+//                selected_mem->index,
+//                selected_mem->match_score,
+//                selected_mem->num_matches);
+//          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 5,
+//                       NULL);
+//                       //"io input-link x y direction radar-setting radar-status");
+//      }
     
     
     return selected_mem;
