@@ -67,6 +67,8 @@ extern unsigned long hash_string(const char *s);
    fraction_to_trim     - fraction of a new memory to trim before recording it
    epmem_save_freq      - the episodic memory is saved to disk every N cycles.  
                           This specifies N.
+   card_act_ratio       - Specifies the ratio of match score weighting
+                          between match cardinality and match activation.
                           
    %%%TODO:  Made these values command line configurable
 
@@ -80,6 +82,7 @@ extern unsigned long hash_string(const char *s);
 #define ubiquitous_max 25
 #define fraction_to_trim 0.0
 #define epmem_save_freq 500
+float card_act_ratio=1.5;
 
 /*======================================================================
  * Data structures
@@ -200,7 +203,7 @@ typedef struct episodic_memory_struct
     arraylist *content;
     int index;
     int last_usage;
-    int match_score;
+    float match_score;
     int num_matches;
 } episodic_memory;
 
@@ -277,7 +280,7 @@ typedef struct epmem_header_struct
     arraylist *metadata;
     int last_cue_size;
     int last_match_size;
-    int last_match_score;
+    float last_match_score;
 } epmem_header;
 
 
@@ -926,8 +929,6 @@ wme **epmem_get_augs_of_id(agent* thisAgent, Symbol * id, tc_number tc, int *num
 
    *num_attr = n;
    return list;
-
-
 }
 
 
@@ -1170,7 +1171,7 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
 void remove_fake_preference_for_epmem_wme(agent *thisAgent, wme *w)
 {
 
-//%%%    preference_remove_ref(thisAgent, w->preference);
+    preference_remove_ref(thisAgent, w->preference);
     
 
 }//remove_fake_preference_for_epmem_wme
@@ -1201,7 +1202,7 @@ epmem_header *make_epmem_header(agent *thisAgent, Symbol *s)
     h->prohibit_list = make_arraylist(thisAgent, 5);
     h->last_cue_size = 0;
     h->last_match_size = 0;
-    h->last_match_score = 0;
+    h->last_match_score = 0.0;
     
     //Find the superstate wme
     h->ss_wme = get_aug_of_id(thisAgent, s, "superstate", NULL);
@@ -1766,6 +1767,33 @@ int handle_relation(agent *thisAgent, wmetree *node, wme *w)
     
 }//handle_relation
 
+/* ===================================================================
+   wme_to_ignore   %%%PLATFORM SPECIFIC%%%
+
+   The function returns TRUE if a given WME has a useless but memory
+   hogging value (specific to heurall-epmem-bot in tanksoar)
+   
+   Created: 30 Oct 2006
+   =================================================================== */
+int wme_to_ignore(wme *w)
+{
+    //Check for a relation
+    if (wme_has_value(w, "meta-eval-time", NULL))
+    {
+        return TRUE;
+    }
+    else if (wme_has_value(w, "random", NULL))
+    {
+        return TRUE;
+    }
+    else if (wme_has_value(w, "clock", NULL))
+    {
+        return TRUE;
+    }
+
+    return FALSE;              
+    
+}//wme_to_ignore
 
 /* ===================================================================
    update_wmetree
@@ -1804,7 +1832,6 @@ Symbol *update_wmetree(agent *thisAgent,
     int pos = 0;
 
     start_timer(thisAgent, &(thisAgent->epmem_updatewmetree_start_time));
-
     
     while(pos <= epmem->size)
     {
@@ -1816,6 +1843,12 @@ Symbol *update_wmetree(agent *thisAgent,
         {
             for(i = 0; i < len; i++)
             {
+                //%%%KLUDGE: ignore prolific tanksoar WMEs
+                if (wme_to_ignore(wmes[i]))
+                {
+                    continue;
+                }
+
                 //Check for special case: relation specification
                 if (handle_relation(thisAgent, node, wmes[i]))
                 {
@@ -1950,7 +1983,7 @@ void record_epmem(agent *thisAgent)
                                                    sizeof(episodic_memory),
                                                    MISCELLANEOUS_MEM_USAGE);
     new_epmem->last_usage = -1;
-    new_epmem->match_score = 0;
+    new_epmem->match_score = 0.0;
     new_epmem->num_matches = 0;
 
     //Starting with bottom_goal and moving toward top_goal, add all
@@ -2018,7 +2051,7 @@ void record_epmem(agent *thisAgent)
     append_entry_to_arraylist(thisAgent, thisAgent->epmem_memories, (void *)new_epmem);
 
     //%%%DEBUGGING
-//      print(thisAgent, "\nRECORDED MEMORY %d:\n", thisAgent->epmem_memories->size - 1);
+    print(thisAgent, "\nRECORDED MEMORY %d:\n", thisAgent->epmem_memories->size - 1);
 //      print_memory(thisAgent,
 //                   ((episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories,thisAgent->epmem_memories->size - 1))->content,
 //                   thisAgent->epmem_wmetree, 0, 5);
@@ -2289,6 +2322,11 @@ void consider_new_epmem_via_output(agent *thisAgent)
         }
     }
 
+    //%%%KLUDGE:  Don't record an epmem if I can find a ^wander WME
+    w = get_aug_of_id(thisAgent, thisAgent->top_goal, "wander", "yes");
+    if (w != NULL) return;
+
+
     //If there's a new command record a new memory
     if (bNewMemory)
     {
@@ -2357,7 +2395,7 @@ void install_match_metadata(agent *thisAgent, epmem_header *h)
     //Match score
     new_wme = add_input_wme(thisAgent, h->epmem,
                             make_sym_constant(thisAgent, "match-score"),
-                            make_int_constant(thisAgent, h->last_match_score));
+                            make_float_constant(thisAgent, h->last_match_score));
     append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
@@ -2373,7 +2411,7 @@ void install_match_metadata(agent *thisAgent, epmem_header *h)
     //Normalized Match Score
     new_wme = add_input_wme(thisAgent, h->epmem,
                             make_sym_constant(thisAgent, "normalized-match-score"),
-                            make_float_constant(thisAgent, (float)h->last_match_score / (float)h->last_cue_size));
+                            make_float_constant(thisAgent, h->last_match_score / (float)h->last_cue_size));
     append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
@@ -2742,11 +2780,10 @@ int meets_relation(wmetree *candidate, wmetree *archetype)
             thisAgent - duh
                     h - epmem header for the associated state
                  node - the node to find matching memories for
-   negcue_cardinality - if this value is non-negative, then the given
-                        node is part of a positive cue and is handled
-                        as such.  If this value is negative, then the
-                        given node is part of a negative cue and is
-                        handled as such.
+               negcue - (boolean) specifies whether this is a negative
+                        cue match.  Otherwise it's positive.
+   negcue_cardinality - specifies the size of the negative cue.  
+   poscue_cardinality - specifies the size of the positive cue.  
    best_mem_via_score - the best epmem found so far via match score
                         (a NULL value indicates this does not need to
                          be calculated)
@@ -2754,27 +2791,44 @@ int meets_relation(wmetree *candidate, wmetree *archetype)
                         (a NULL value indicates this does not need to
                          be calculated)
 
-   CAVEAT:  The negcue_cardinality is added to the num_matches only for
+   CAVEAT: The negcue_cardinality is added to the num_matches only for
             epmems that matched none of the entries in the negative
             cue.  This means that epmems that matched some of the
             entries in the negative cue are treated as if they had
-            matched all of them.  This is fine as long only an exact
-            match overrides the best match score but will have to be
-            changed if lesser cardinality matches need to be taken
-            into consideration.
+            matched all of them.  (Match is *not* treated in this way,
+            just the cardinality calculation.)  This is fine as long
+            only an exact match overrides the best match score but
+            will have to be changed if lesser cardinality matches need
+            to be taken into consideration.
 
    Created:  18 Jul 2006
+   Updated:  12 Oct 2006 - support bias between match cardinality
+                           vs. match activation in match score
    =================================================================== */
 int record_cue_element_match(agent *thisAgent,
                              epmem_header *h,
                              wmetree *node,
+                             int negcue,
                              int negcue_cardinality,
+                             int poscue_cardinality,
                              episodic_memory **best_mem_via_score,
                              episodic_memory **best_mem_via_cardinality)
 {
     int i,j;
     int comp_count = 0;
-    int negcue = negcue_cardinality < 0; // boolean
+    
+    // card_adjust specifies how much to adjust the match score due to a
+    // cardinality match
+    float card_adjust = ((float)card_act_ratio / (float)(negcue_cardinality + poscue_cardinality));
+
+    // act_adjust specifies what to multiply the activation by to get
+    // the correct activation adjustment  for the match score
+    float act_adjust = 1.0;     // default
+    if (card_act_ratio != 0.0)
+    {
+        act_adjust = (float)((1.0 / card_act_ratio) / MAX_DECAY);
+    }
+    
     
 //      //%%%DEBUGGING
 //      print(thisAgent, "\n\tMatches for %s cue entry %s: ",
@@ -2834,7 +2888,7 @@ int record_cue_element_match(agent *thisAgent,
             //Reinit the match data from last time
             epmem->last_usage = thisAgent->epmem_last_ret_id;
             comp_count++;
-            epmem->match_score = 0;
+            epmem->match_score = 0.0;
             if (negcue)  //**See CAVEAT above
             {
                 epmem->num_matches = 0;
@@ -2861,11 +2915,13 @@ int record_cue_element_match(agent *thisAgent,
             //Adjust the match score
             if (negcue)
             {
-                epmem->match_score -= aw_mem->activation;
+                epmem->match_score -= (float)aw_mem->activation * act_adjust;
+                epmem->match_score -=  card_adjust;
             }
             else
             {
-                epmem->match_score += aw_mem->activation;
+                epmem->match_score += (float)aw_mem->activation * act_adjust;
+                epmem->match_score +=  card_adjust;
             }
         }//if
 
@@ -2879,7 +2935,7 @@ int record_cue_element_match(agent *thisAgent,
                 
 //                  //%%%DEBUGGING
 //                  print(thisAgent,
-//                        "\nBest memory so far is #%d with match score %d and cardinality %d:",
+//                        "\nBest memory so far is #%d with match score %f and cardinality %d:",
 //                        epmem->index,
 //                        epmem->match_score,
 //                        epmem->num_matches);
@@ -2951,7 +3007,41 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
     thisAgent->epmem_last_ret_id++;
 
     /*
-     * Step 1:  Process the negative cue.
+     * Step 1:  Determine cue cardinality
+     *
+     * Loop through both cues and count the leaf WMEs in each
+     *
+     */
+    for(i = 0; i < negcue->size; i++)
+    {
+        //pull an entry out of the negative cue
+        actwme *aw_cue = (actwme *)get_arraylist_entry(thisAgent, negcue, i);
+
+        //If the entry is a leaf node then add it to the negative 
+        //cue cardinality used for detecting an exact match
+        if (aw_cue->node->children->count == 0)
+        {
+            negcue_cardinality++;
+        }
+    }//for
+
+    for(i = 0; i < cue->size; i++)
+    {
+        //pull an entry out of the cue
+        actwme *aw_cue = (actwme *)get_arraylist_entry(thisAgent, cue,i);
+
+        //If the entry is a leaf node then add it to the cue cardinality
+        //used for detecting an exact match
+        if (aw_cue->node->children->count == 0)
+        {
+            cue_cardinality++;
+        }
+    }//for
+    
+    total_cardinality = cue_cardinality + negcue_cardinality;
+
+    /*
+     * Step 2:  Process the negative cue.
      *
      * Each memory that matches an entry in the negative cue has its
      * match score decreased by that WME's activation.  In addition,
@@ -2967,20 +3057,19 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
         //pull an entry out of the negative cue
         actwme *aw_cue = (actwme *)get_arraylist_entry(thisAgent, negcue, i);
 
-        //If the entry is a leaf node then add it to the negative 
-        //cue cardinality used for detecting an exact match
-        if (aw_cue->node->children->count == 0)
-        {
-            negcue_cardinality++;
-        }
-
-        comp_count += record_cue_element_match(thisAgent, h, aw_cue->node,
-                                               -1, NULL, NULL);
+        comp_count += record_cue_element_match(thisAgent,
+                                               h,
+                                               aw_cue->node,
+                                               TRUE,
+                                               negcue_cardinality,
+                                               cue_cardinality,
+                                               NULL,
+                                               NULL);
 
     }//for
 
     /*
-     * Step 2:  Process the positive cue.
+     * Step 3:  Process the positive cue.
      *
      * Each memory that matches an entry in the positive cue has its
      * match score decreased by that WME's activation.  In addition,
@@ -3004,13 +3093,6 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
             aw_cue->node->query_count++;
         }
 
-        //If the entry is a leaf node then add it to the cue cardinality
-        //used for detecting an exact match
-        if (aw_cue->node->children->count == 0)
-        {
-            cue_cardinality++;
-        }
-
         //Check for special case:  a relation specification
         if (aw_cue->node->relation != NONE)
         {
@@ -3027,9 +3109,12 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
                 if (meets_relation(child, aw_cue->node))
                 {
                     comp_count +=
-                        record_cue_element_match(thisAgent, h,
+                        record_cue_element_match(thisAgent,
+                                                 h,
                                                  child,
+                                                 FALSE,
                                                  negcue_cardinality,
+                                                 cue_cardinality,
                                                  &best_mem_via_score,
                                                  &best_mem_via_cardinality);
                 }
@@ -3038,16 +3123,19 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
         else
         {
             comp_count +=
-                record_cue_element_match(thisAgent, h,
+                record_cue_element_match(thisAgent,
+                                         h,
                                          aw_cue->node,
+                                         FALSE,
                                          negcue_cardinality,
+                                         cue_cardinality,
                                          &best_mem_via_score,
                                          &best_mem_via_cardinality);
         }
     }//for
 
     /*
-     * Step 3:  Select the final match
+     * Step 4:  Select the final match
      *
      * At this point, best_mem_via_score is a pointer to the epmem
      * with the highest match score.  best_mem_via_cardinality is
@@ -3058,7 +3146,6 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
 
     //The selected memory is the exact match.  If there is no exact match, then
     //the epmem with the best match score is returned.
-    total_cardinality = cue_cardinality + negcue_cardinality;
     if ( (best_mem_via_cardinality != NULL)
          && (best_mem_via_cardinality->num_matches == total_cardinality) )
     {
@@ -3068,14 +3155,14 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
     {
         selected_mem = best_mem_via_score;
     }
-    
+
     stop_timer(thisAgent, &(thisAgent->epmem_match_start_time), &(thisAgent->epmem_match_total_time));
 
 //      //%%%DEBUGGING
 //      stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
 //      stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
 //      print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
-//      if (best_mem_via_score != NULL) print(thisAgent, "\nbest match score=%d\n", best_mem_via_score->match_score);
+//      if (best_mem_via_score != NULL) print(thisAgent, "\nbest match score=%f\n", best_mem_via_score->match_score);
 //      if (best_mem_via_cardinality != NULL) print(thisAgent, "\nbest match cardinality=%d of %d\n", best_mem_via_cardinality->num_matches, total_cardinality);
 //      start_timer(thisAgent, &(thisAgent->epmem_start_time));
 //      start_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time));
@@ -3092,7 +3179,7 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
 //      if (selected_mem != NULL)
 //      {
 //          print(thisAgent,
-//                "\nSelected the following memory (#%d) with match score %d and cardinality %d:",
+//                "\nSelected the following memory (#%d) with match score %f and cardinality %d:",
 //                selected_mem->index,
 //                selected_mem->match_score,
 //                selected_mem->num_matches);
@@ -3210,7 +3297,7 @@ int is_radar_tank_match(arraylist *cue, arraylist *mem)
    =================================================================== */
 episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, arraylist *cue)
 {
-    int best_score = 0;
+    float best_score = 0.0;
     episodic_memory *best_mem_via_score = NULL;
     int cue_cardinality = 0;
     int best_cardinality = 0;
@@ -3221,7 +3308,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
     int comp_count = 0;         // number of epmems that were examined
 
 //      //%%%DEBUGGING
-//      print(thisAgent, "\nRECEIVED THIS CUE", best_score);
+//      print(thisAgent, "\nRECEIVED THIS CUE");
 //      print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
     
     start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
@@ -3274,7 +3361,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
                 //Reinit the match data from last time
                 epmem->last_usage = thisAgent->epmem_last_ret_id;
                 comp_count++;
-                epmem->match_score = 0;
+                epmem->match_score = 0.0;
                 epmem->num_matches = 1;
             }
             else
@@ -3291,7 +3378,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 //                  print(thisAgent, "%d, ", epmem->index);
                 
                 //Increment the match score
-                epmem->match_score += aw_mem->activation;
+                epmem->match_score += (float)aw_mem->activation;
             }
 
             //Check to see if this mem has the best match score so far
@@ -3301,7 +3388,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 //                  if (best_mem_via_score != NULL)
 //                  {
 //                      print(thisAgent,
-//                            "\nRejected the following memory (#%d) with match score %d:",
+//                            "\nRejected the following memory (#%d) with match score %f:",
 //                            best_mem_via_score->index,
 //                            best_score);
 //                      print_memory(thisAgent, best_mem_via_score->content, thisAgent->epmem_wmetree, 2, 5,
@@ -3315,7 +3402,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 //              else if (is_radar_tank_match(cue, epmem->content))
 //              {
 //                  print(thisAgent,
-//                        "\nRejected matching memory (#%d) with match score %d:",
+//                        "\nRejected matching memory (#%d) with match score %f:",
 //                        epmem->index, epmem->match_score);
 //                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 6,
 //                               "io input-link x y radar radar position radar radar position");
@@ -3354,7 +3441,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
     stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
     stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
     print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
-    print(thisAgent, "\nbest match score=%d\n", best_score);
+    print(thisAgent, "\nbest match score=%f\n", best_score);
     print(thisAgent, "\nbest match cardinality=%d of %d\n", best_cardinality, cue_cardinality);
     start_timer(thisAgent, &(thisAgent->epmem_start_time));
     start_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time));
@@ -3365,13 +3452,13 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
 //          if (is_radar_tank_match(cue, selected_mem->content))
 //          {
 //              print(thisAgent,
-//                    "\nSelected CORRECT memory (#%d) with match score %d:",
+//                    "\nSelected CORRECT memory (#%d) with match score %f:",
 //                    selected_mem->index, best_score);
 //          }
 //          else
 //          {
 //              print(thisAgent,
-//                    "\nSelected INCORRECT memory (#%d) with match score %d:",
+//                    "\nSelected INCORRECT memory (#%d) with match score %f:",
 //                    selected_mem->index, best_score);
 //          }             
 //          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 6,
@@ -3391,7 +3478,7 @@ episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, ar
     
     //%%%Currently hard coded for tanksoar
     //Disable chunking if we are not confident in the result
-//      if (best_score < 280)
+//      if (best_score < 280.0)
 //      {
 //          thisAgent->sysparams[LEARNING_ON_SYSPARAM] = FALSE;
 //      }
@@ -3545,7 +3632,7 @@ int is_energy_tank_match(arraylist *cue, arraylist *mem)
    =================================================================== */
 episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, arraylist *cue)
 {
-    int best_score = 0;
+    float best_score = 0;
     episodic_memory *best_mem_via_score = NULL;
     int cue_cardinality = 0;
     int best_cardinality = 0;
@@ -3556,7 +3643,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
     int comp_count = 0;         // number of epmems that were examined
 
 //      //%%%DEBUGGING
-//      print(thisAgent, "\nRECEIVED THIS CUE", best_score);
+//      print(thisAgent, "\nRECEIVED THIS CUE");
 //      print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
     
     start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
@@ -3609,7 +3696,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
                 //Reinit the match data from last time
                 epmem->last_usage = thisAgent->epmem_last_ret_id;
                 comp_count++;
-                epmem->match_score = 0;
+                epmem->match_score = 0.0;
                 epmem->num_matches = 1;
             }
             else
@@ -3626,7 +3713,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 //                  print(thisAgent, "%d, ", epmem->index);
                 
                 //Increment the match score
-                epmem->match_score += aw_mem->activation;
+                epmem->match_score += (float)aw_mem->activation;
             }
 
             //Check to see if this mem has the best match score so far
@@ -3636,7 +3723,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 //                  if (best_mem_via_score != NULL)
 //                  {
 //                      print(thisAgent,
-//                            "\nRejected the following memory (#%d) with match score %d:",
+//                            "\nRejected the following memory (#%d) with match score %f:",
 //                            best_mem_via_score->index,
 //                            best_score);
 //                      print_memory(thisAgent, best_mem_via_score->content, thisAgent->epmem_wmetree, 2, 5,
@@ -3650,7 +3737,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 //              else if (is_energy_tank_match(cue, epmem->content))
 //              {
 //                  print(thisAgent,
-//                        "\nRejected matching memory (#%d) with match score %d:",
+//                        "\nRejected matching memory (#%d) with match score %f:",
 //                        epmem->index, epmem->match_score);
 //                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 6,
 //                               "io input-link x y radar energy position radar energy position");
@@ -3689,7 +3776,7 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
     stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
     stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
     print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
-    print(thisAgent, "\nbest match score=%d\n", best_score);
+    print(thisAgent, "\nbest match score=%f\n", best_score);
     print(thisAgent, "\nbest match cardinality=%d of %d\n", best_cardinality, cue_cardinality);
     start_timer(thisAgent, &(thisAgent->epmem_start_time));
     start_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time));
@@ -3700,13 +3787,13 @@ episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, a
 //          if (is_energy_tank_match(cue, selected_mem->content))
 //          {
 //              print(thisAgent,
-//                    "\nSelected CORRECT memory (#%d) with match score %d:",
+//                    "\nSelected CORRECT memory (#%d) with match score %f:",
 //                    selected_mem->index, best_score);
 //          }
 //          else
 //          {
 //              print(thisAgent,
-//                    "\nSelected INCORRECT memory (#%d) with match score %d:",
+//                    "\nSelected INCORRECT memory (#%d) with match score %f:",
 //                    selected_mem->index, best_score);
 //          }             
 //          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 6,
@@ -3970,7 +4057,8 @@ void epmem_retrieve_commands(agent *thisAgent, epmem_header *h)
                                                         sizeof(char)*strlen(name) + 1,
                                                         MISCELLANEOUS_MEM_USAGE);
                             strcpy(h->temporal_cmd->name, name);
-                            
+
+                            h->temporal_cmd->arg_type = INT_CONSTANT_SYMBOL_TYPE;
                             h->temporal_cmd->arg.intval = arg_wme->value->ic.value;
                         }
                         break;
@@ -3984,6 +4072,7 @@ void epmem_retrieve_commands(agent *thisAgent, epmem_header *h)
                                                         MISCELLANEOUS_MEM_USAGE);
                             strcpy(h->temporal_cmd->name, name);
                             
+                            h->temporal_cmd->arg_type = INT_CONSTANT_SYMBOL_TYPE;
                             h->temporal_cmd->arg.intval = arg_wme->value->ic.value;
                         }
                         break;
@@ -4782,7 +4871,7 @@ int epmem_save_epmems_to_file(agent *thisAgent,
         //Write beginning of actwme list
         fputs("[ ", f);
 
-        //Print the id and activation of each actwme
+       //Print the id and activation of each actwme
         for(j = 0; j < epmem->content->size; j++)
         {
             actwme *aw = (actwme *)get_arraylist_entry(thisAgent,
@@ -4938,13 +5027,14 @@ void epmem_clear_all_memories(agent *thisAgent)
 
    Created: 23 Mar 2006
    =================================================================== */
-#define EPMEM_BUFLEN 166912
+//#define EPMEM_BUFLEN 262143 (this is too big!  why?)
+#define EPMEM_BUFLEN 200000
 arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                                         FILE *f,
                                         wmetree *root_node,
                                         int parent_index)
 {
-    char buf[EPMEM_BUFLEN];
+    char *buf;
     char *str = NULL;
     char *str2 = NULL;
     int mem_id;
@@ -4953,11 +5043,14 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
     wmetree *parent_node;
     wmetree *node;
 
+    buf = (char *)malloc(sizeof(char)*EPMEM_BUFLEN);
+
     //Check for the appropriate file format for the first node
     fgets(buf, EPMEM_BUFLEN, f);
     if (strcmp(buf, "ROOT\n") != 0)
     {
         print(thisAgent, "ERROR: File improperly formatted.  \"ROOT\" node not found. Episodes not loaded.");
+        free(buf);
         return NULL;
     }
 
@@ -5025,6 +5118,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                     print(thisAgent, "ERROR: File improperly formatted.  Expected \"<id>\" but found %s. Episodes not loaded.", str);
                     //%%%Clean up already loaded data here
                     destroy_arraylist(thisAgent, nodelist);
+                    free(buf);
                     return NULL;
                 }
                 break;
@@ -5041,6 +5135,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
             print(thisAgent, "ERROR: File improperly formatted.  Child node references nonexistant parent. Episode load aborted.", str);
             //%%%Clean up already loaded data here
             destroy_arraylist(thisAgent, nodelist);
+            free(buf);
             return NULL;
         }
         add_to_hash_table(thisAgent, parent_node->children, node);
@@ -5058,6 +5153,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
             print(thisAgent, "ERROR: File improperly formatted.  Expected '[' but found %s. Episode load aborted.", str);
             //%%%Clean up already loaded data here
             destroy_arraylist(thisAgent, nodelist);
+            free(buf);
             return NULL;
         }
 
@@ -5078,7 +5174,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                                                            MISCELLANEOUS_MEM_USAGE);
                 epmem->content = NULL;
                 epmem->last_usage = -1;
-                epmem->match_score = 0;
+                epmem->match_score = 0.0;
                 epmem->index = mem_id;
 
                 //Add the structure to the global memories list
@@ -5094,6 +5190,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                 print(thisAgent, "ERROR: File improperly formatted.  Expected a node id but reached end-of-string.  Could this be a buffer overrun? Episode load aborted.", str);
                 //%%%Clean up already loaded data here
                 destroy_arraylist(thisAgent, nodelist);
+                free(buf);
                 return NULL;
             }
             mem_id = atoi(str);
@@ -5110,6 +5207,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
 
     }//while
 
+    free(buf);
     return nodelist;
     
 }//epmem_load_wmetree_from_file
@@ -5173,7 +5271,7 @@ int epmem_load_epmems_from_file(agent *thisAgent,
                                                        MISCELLANEOUS_MEM_USAGE);
             epmem->content = NULL;
             epmem->last_usage = -1;
-            epmem->match_score = 0;
+            epmem->match_score = 0.0;
             epmem->index = my_index;
             
             //Add the structure to the global memories list
@@ -5295,6 +5393,11 @@ void epmem_update(agent *thisAgent)
 #ifdef DISABLE_EPMEM
     return;
 #endif
+
+#ifdef SILENT_CRASH
+    __try
+    {
+#endif
     
     start_timer(thisAgent, &(thisAgent->epmem_start_time));
 
@@ -5303,6 +5406,7 @@ void epmem_update(agent *thisAgent)
     
     start_timer(thisAgent, &(thisAgent->epmem_record_start_time));
 
+    
     //Consider recording a new epmem
     consider_new_epmem_via_output(thisAgent);
 
@@ -5389,6 +5493,23 @@ void epmem_update(agent *thisAgent)
 //          print(thisAgent, "\n%d queries and %d memories\n", thisAgent->epmem_num_queries, thisAgent->epmem_memories->size);
 //      }
 
+    
+#ifdef SILENT_CRASH
+    }
+    __except(1)
+    {
+        print(thisAgent, "\nENCOUNTERED EPMEM CRASH!  Exiting quietly. (log message)\n");
+        stop_log_file (thisAgent);
+
+        fprintf(stderr, "\nENCOUNTERED EPMEM CRASH!  Exiting quietly. (stderr message)\n");
+        fflush(stderr);
+        
+        _set_abort_behavior( 0, _WRITE_ABORT_MSG);
+//        abort();
+
+        TerminateProcess(GetCurrentProcess(), 0); 
+    }
+#endif //SILENT_CRASH    
     
 }//epmem_update
 
@@ -5484,7 +5605,6 @@ void init_epmem(agent *thisAgent)
    
     //Reset the timers
     epmem_reset_cpu_usage_timers(thisAgent);
-
 
     
 }/*init_epmem*/
