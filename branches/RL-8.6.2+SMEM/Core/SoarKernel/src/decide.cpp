@@ -58,6 +58,13 @@
 
 using namespace xmlTraceNames;
 
+#ifdef SEMANTIC_MEMORY
+//YJ
+extern void append_smem_links(agent* thisAgent);
+extern void clear_smem_structs(agent* thisAgent);
+//YJ end
+#endif SEMANTIC_MEMORY
+
 #ifdef NUMERIC_INDIFFERENCE
 /* REW: 2003-01-02 Behavior Variability Kernel Experiments */
 preference *probabilistically_select(agent* thisAgent, slot * s, preference * candidates);
@@ -2265,6 +2272,17 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   if (goal->id.lower_goal)
     remove_existing_context_and_descendents (thisAgent, goal->id.lower_goal);
 
+ // #ifdef SEMANTIC_MEMORY
+ // vector<wme*> this_level_links = thisAgent->gold_level_to_smem_links->at(goal->id.level-1);
+ // for(int i=0; i<this_level_links.size();++i){
+	 // remove_input_wme(thisAgent, this_level_links[i]);
+ // }
+
+  // SEMANTIC_MEMORY - YJW
+  clear_smem_structs(thisAgent);
+  // SEMANTIC_MEMORY - YJW
+
+//#endif
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, thisAgent, 
                        POP_CONTEXT_STACK_CALLBACK, 
@@ -2447,6 +2465,13 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.isa_goal = TRUE;
   id->id.operator_slot = make_slot (thisAgent, id, thisAgent->operator_symbol);
   id->id.allow_bottom_up_chunks = TRUE;
+  	
+#ifdef SEMANTIC_MEMORY
+  // YJ
+  append_smem_links(thisAgent); //append smem WMEs without checking
+  //END YJ
+#endif SEMANTIC_MEMORY
+
 
 #ifdef NUMERIC_INDIFFERENCE
   id->id.RL_data = static_cast<RL_data_struct *>(allocate_memory(thisAgent, sizeof(RL_data_struct),

@@ -162,8 +162,13 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define RL_ON_SYSPARAM                           36
 #define RL_ONPOLICY_SYSPARAM			 37
 
+// SEMANTIC_MEMORY
+/* semantic memory option parameter*/
+#define SMEM_SYSPARAM				 38
+// SEMANTIC_MEMORY
+
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  37
+#define HIGHEST_SYSPARAM_NUMBER                  38
 
 
 /* -----------------------------------------

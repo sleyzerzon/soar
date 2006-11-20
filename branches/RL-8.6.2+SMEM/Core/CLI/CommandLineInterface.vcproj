@@ -347,6 +347,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\cli_loadMemory.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\cli_ls.cpp"
 					>
 				</File>

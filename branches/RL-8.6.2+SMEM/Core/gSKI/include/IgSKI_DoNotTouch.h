@@ -22,6 +22,8 @@ typedef struct agent_struct agent;
 typedef void * soar_callback_agent;
 
 #include <string>
+#include <vector>
+#include <map>
 
 namespace gSKI
 {
@@ -161,6 +163,20 @@ namespace gSKI
 		virtual void ResetRL(IAgent* pIAgent) = 0;
 
 		virtual void SeedRandomNumberGenerator(unsigned long int* pSeed) = 0;
+		// used by Semantic Memory loadMemory commandline
+		// SEMANTIC_MEMORY
+		virtual void load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type, std::vector<int> history=std::vector<int>()) = 0;
+		virtual void print_semantic_memory(IAgent* pIAgent, std::string, std::string, std::string) = 0;
+		virtual int clear_semantic_memory(IAgent* pIAgent) = 0;
+		virtual int semantic_memory_chunk_count (IAgent* pIAgent) = 0;
+		virtual int semantic_memory_lme_count (IAgent* pIAgent) = 0;
+		virtual int semantic_memory_set_parameter (IAgent* pIAgent, long parameter) = 0;
+
+		virtual int clustering (IAgent* pIAgent, std::vector<std::vector<double> > weights, bool print_flag=false, bool load_flag=false) = 0;
+		virtual int cluster_train (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances) = 0;
+		virtual std::vector<std::vector<int> > cluster_recognize (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances) = 0;
+
+		// SEMANTIC_MEMORY
 	  };
    }
 }
@@ -296,8 +312,12 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define RL_ON_SYSPARAM                           36
 #define RL_ONPOLICY_SYSPARAM			 37
 
+// SEMANTIC_MEMORY
+/* semantic memory option parameter*/
+#define SMEM_SYSPARAM				 38
+// SEMANTIC_MEMORY
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  37
+#define HIGHEST_SYSPARAM_NUMBER                  38
 
 
 #ifndef MAXPATHLEN

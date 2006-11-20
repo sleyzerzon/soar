@@ -53,6 +53,14 @@
 #include "gski_event_system_functions.h"
 
 #define INIT_FILE       "init.soar"
+#ifdef SEMANTIC_MEMORY
+// YJ's stuff
+
+extern void smem_routine(agent* thisAgent);
+extern void YJ_input_phase_call(agent* thisAgent);
+extern void YJ_decision_phase_call(agent* thisAgent);
+extern void YJ_application_phase_call(agent* thisAgent);
+#endif // SEMANTIC_MEMORY
 
 /* REW: begin 08.20.97   these defined in consistency.c  */
 extern void determine_highest_active_production_level_in_stack_propose(agent* thisAgent);
@@ -484,6 +492,13 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[RL_ONPOLICY_SYSPARAM] = TRUE;
 #endif
 
+
+  // SEMANTIC_MEMORY
+  thisAgent->sysparams[SMEM_SYSPARAM] = 0;
+  // 0 all off
+  // 1 deliberate saving is on, automatic saving is off
+  // 2 automatic saving is on, deliberate saving is off
+  // SEMANTIC_MEMORY
 }
 
 /* ===================================================================
@@ -1107,7 +1122,13 @@ void do_one_top_level_phase (agent* thisAgent)
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_OUTPUT_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
- 
+
+	 #ifdef SEMANTIC_MEMORY
+	  // YJ's stuff
+	  smem_routine(thisAgent);
+	  //
+	#endif /* SEMANTIC_MEMORY */
+
       /* REW: begin 09.15.96 */
       if (thisAgent->operand2_mode == TRUE) {
 		  /* KJC June 05:  moved here from DECISION Phase */

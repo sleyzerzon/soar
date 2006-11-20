@@ -113,6 +113,18 @@ namespace gSKI
 		 void ResetRL(IAgent* pIAgent);
 
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
+		// used by Semantic Memory loadMemory commandline
+		// SEMANTIC_MEMORY
+		 void load_semantic_memory_data(IAgent* pIAgent, std::string id, std::string attr, std::string value, int type, std::vector<int> history=std::vector<int>());
+		 void print_semantic_memory(IAgent* pIAgent, std::string, std::string, std::string);
+		 int clear_semantic_memory(IAgent* pIAgent);
+		 int semantic_memory_chunk_count(IAgent* pIAgent);
+		 int semantic_memory_lme_count(IAgent* pIAgent);
+		 int semantic_memory_set_parameter(IAgent* pIAgent, long parameter);
+		 int clustering (IAgent* pIAgent, std::vector<std::vector<double> > weights, bool print_flag=false, bool load_flag=false);
+		 int cluster_train (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
+		 std::vector<std::vector<int> > cluster_recognize (IAgent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
+		// SEMANTIC_MEMORY
 	  };
    }
 }
