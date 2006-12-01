@@ -181,6 +181,13 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   insert_at_head_of_dll (id->id.input_wmes, w, next, prev);
   add_wme_to_wm (thisAgent, w);
 
+#ifdef SOAR_WMEM_ACTIVATION
+   // shouldn't we e checking the sysparam?  
+  if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM]) {
+	  decay_update_new_wme(thisAgent, w, 1);
+  }
+#endif //SOAR_WMEM_ACTIVATION
+
 
   return w;
 }

@@ -211,8 +211,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\cli_defaultwmedepth.cpp"
-					>
+					RelativePath=".\src\cli_decay.cpp">
+				</File>
+				<File
+
+					RelativePath=".\src\cli_defaultwmedepth.cpp">
 				</File>
 				<File
 					RelativePath=".\src\cli_dirs.cpp"

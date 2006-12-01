@@ -185,8 +185,26 @@
 			Filter=".cpp"
 			>
 			<File
-				RelativePath=".\src\agent.cpp"
-				>
+				RelativePath=".\src\activate.cpp">
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\agent.cpp">
 				<FileConfiguration
 					Name="Release|Win32"
 					>
@@ -740,6 +758,10 @@
 			<File
 				RelativePath=".\include\agent.h"
 				>
+			</File>
+			<File
+				RelativePath=".\include\activate.h"
+                                >
 			</File>
 			<File
 				RelativePath=".\src\backtrace.h"

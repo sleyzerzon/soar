@@ -27,6 +27,8 @@
 #ifndef GSYSPARAM_H
 #define GSYSPARAM_H
 
+#define SOAR_WMEM_ACTIVATION
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -155,14 +157,25 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 /* rmarinie 11/04 */
 #define TIMERS_ENABLED                           33
 
-#define MAX_GOAL_DEPTH							 34
+#define MAX_GOAL_DEPTH			       	 34
 
 /* KJC 8/06:  generate warning and event if memory usage exceeds this value */
 #define MAX_MEMORY_USAGE_SYSPARAM                35
 
-/* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  35
+#define WME_DECAY_SYSPARAM                       36
+#define WME_DECAY_EXPONENT_SYSPARAM              37
+#define WME_DECAY_WME_CRITERIA_SYSPARAM          38
+#define WME_DECAY_ALLOW_FORGETTING_SYSPARAM      39
+#define WME_DECAY_I_SUPPORT_MODE_SYSPARAM        40
+#define WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM 41
+#define WME_DECAY_PRECISION_SYSPARAM             42
+#define WME_DECAY_LOGGING_SYSPARAM               43
 
+
+/* --- Warning: if you add sysparams, be sure to update the next line! --- */
+#define HIGHEST_SYSPARAM_NUMBER                  43
+
+ 
 /* -----------------------------------------
    Sysparams[] stores the parameters; set_sysparam()
    should be used to modify them.
