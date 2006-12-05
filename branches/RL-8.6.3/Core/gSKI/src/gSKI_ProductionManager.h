@@ -165,6 +165,14 @@ namespace gSKI {
        */
        bool RemoveAllUserProductions(int& i, Error *pErr = 0) const;
 
+	   /***********************************************************/
+
+	   bool RemoveAllTemplateProductions(int& i, Error *pErr = 0) const;
+
+	   /***********************************************************/
+
+       bool RemoveAllRLProductions(int& i, Error *pErr = 0) const;
+
 	  /**
        * @brief Remove all Chunks and Justifications
        *

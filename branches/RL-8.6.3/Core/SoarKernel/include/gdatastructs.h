@@ -142,7 +142,7 @@ typedef struct gds_struct {
 
 /* WARNING: preference types must be numbered 0..(NUM_PREFERENCE_TYPES-1),
    because the slot structure contains an array using these indices. */
-#define NUM_PREFERENCE_TYPES 13  /* number of different preference types */
+#define NUM_PREFERENCE_TYPES 14  /* number of different preference types */
 
 #define ACCEPTABLE_PREFERENCE_TYPE 0
 #define REQUIRE_PREFERENCE_TYPE 1
@@ -157,7 +157,8 @@ typedef struct gds_struct {
 #define BINARY_PARALLEL_PREFERENCE_TYPE 10
 #define BETTER_PREFERENCE_TYPE 11
 #define WORSE_PREFERENCE_TYPE 12
-#define NUM_PREFERENCE_TYPES 13
+#define NUMERIC_INDIFFERENT_PREFERENCE_TYPE 13   // NUMERIC_INDIFFERENCE
+// #define TEMPLATE_PREFERENCE_TYPE 14				 // NUMERIC_INDIFFERENCE
 
 #ifdef USE_MACROS
 
@@ -217,7 +218,7 @@ typedef struct preference_struct {
   struct preference_struct *next_candidate;
   struct preference_struct *next_result;
 
-  /////#ifdef NUMERIC_INDIFFERENCE
+  //#ifdef NUMERIC_INDIFFERENCE
   //   These members used only when #def'd NUMERIC_INDIFFERENCE
   //   in kernel.h but always compiled for clarity.
     /* REW: 2003-01-08 Behavior Variability Kernel Experiements
@@ -226,7 +227,7 @@ typedef struct preference_struct {
        what we really want from these changes.
      */
   int total_preferences_for_candidate;
-  double sum_of_probability;
+  float numeric_value;
     /* END: REW: 2003-01-08 */
   /////#endif
 
@@ -246,7 +247,8 @@ extern Bool remove_preference_from_clones (agent* thisAgent, preference *pref);
 #define CONFLICT_IMPASSE_TYPE 2
 #define TIE_IMPASSE_TYPE 3
 #define NO_CHANGE_IMPASSE_TYPE 4
-
+#define STATE_NO_CHANGE_IMPASSE_TYPE 5		/* for hierarchical RL */
+#define OP_NO_CHANGE_IMPASSE_TYPE 6		/* for hierarchical RL */
 /* ------------------------------------------------------------------------
                                 Slots
 
@@ -455,7 +457,7 @@ enum ComplexTextTypes {
 #define INT_CONSTANT_SYMBOL_TYPE 3
 #define FLOAT_CONSTANT_SYMBOL_TYPE 4
 #define NUM_SYMBOL_TYPES 5
-#define NUM_PRODUCTION_TYPES 4
+#define NUM_PRODUCTION_TYPES 5
 
 
 /* -------------------------------------------------------------------

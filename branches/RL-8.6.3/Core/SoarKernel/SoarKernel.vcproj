@@ -544,6 +544,26 @@
 					/>
 				</FileConfiguration>
 			</File>
+                        <File
+				RelativePath=".\src\reinforcement_learning.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+			</File>
 			<File
 				RelativePath=".\src\reorder.cpp"
 				>
@@ -839,6 +859,10 @@
 			</File>
 			<File
 				RelativePath=".\src\reorder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\reinforcement_learning.h"
 				>
 			</File>
 			<File
