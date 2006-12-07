@@ -1,0 +1,25 @@
+sp {propose*save
+   (state <s> ^name test-save
+             -^saved yes)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name save)
+}
+
+sp {apply*save
+   (state <s> ^smem.save <save>
+              ^operator <op>)
+   (<op> ^name save)
+-->
+   (<s> ^saved yes)
+   (<save> ^save <sa1> <sa2>)
+   (<sa1> ^a1 v1
+          ^a2 v2
+          ^a3 v3
+          ^a4 <id>)
+   (<sa2> ^a1 v1
+          ^a2 v2
+          ^a3 v3)
+         #attribute with value being unsaved id won't be saved
+   #save only values of constant, or identifers already been saved
+}

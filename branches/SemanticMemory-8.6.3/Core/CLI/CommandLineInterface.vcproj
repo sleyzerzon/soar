@@ -270,7 +270,11 @@
 					RelativePath=".\src\cli_learn.cpp"
 					>
 				</File>
-				<File
+                                <File
+					RelativePath=".\src\cli_loadMemory.cpp"
+                                        >
+				</File>
+                                <File
 					RelativePath=".\src\cli_ls.cpp"
 					>
 				</File>

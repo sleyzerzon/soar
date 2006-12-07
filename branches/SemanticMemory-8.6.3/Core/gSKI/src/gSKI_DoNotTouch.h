@@ -22,6 +22,8 @@ typedef struct agent_struct agent;
 typedef void * soar_callback_agent;
 
 #include <string>
+#include <vector>
+#include <map>
 
 namespace gSKI
 {
@@ -117,6 +119,18 @@ namespace gSKI
 		 void SetChunkCount(Agent* pIAgent, unsigned long count);
 
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
+		// used by Semantic Memory loadMemory commandline
+		// SEMANTIC_MEMORY
+		 void load_semantic_memory_data(Agent* pIAgent, std::string id, std::string attr, std::string value, int type, std::vector<int> history=std::vector<int>());
+		 void print_semantic_memory(Agent* pIAgent, std::string, std::string, std::string);
+		 int clear_semantic_memory(Agent* pIAgent);
+		 int semantic_memory_chunk_count(Agent* pIAgent);
+		 int semantic_memory_lme_count(Agent* pIAgent);
+		 int semantic_memory_set_parameter(Agent* pIAgent, long parameter);
+		 int clustering (Agent* pIAgent, std::vector<std::vector<double> > weights, bool print_flag=false, bool load_flag=false);
+		 int cluster_train (Agent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
+		 std::vector<std::vector<int> > cluster_recognize (Agent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
+		// SEMANTIC_MEMORY
 	  };
    }
 }

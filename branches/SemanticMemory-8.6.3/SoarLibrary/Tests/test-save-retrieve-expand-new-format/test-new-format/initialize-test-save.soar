@@ -1,0 +1,15 @@
+sp {propose*initialize-test-save
+   (state <s> ^superstate nil
+             -^name)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name initialize-test-save)
+}
+
+sp {apply*initialize-test-save
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-test-save)
+-->
+   (<s> ^name test-save)
+}
+

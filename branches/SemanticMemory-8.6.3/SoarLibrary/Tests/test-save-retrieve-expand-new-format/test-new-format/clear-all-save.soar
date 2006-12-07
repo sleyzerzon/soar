@@ -1,0 +1,19 @@
+
+sp {propose*clear-all-save
+   (state <s> ^name test-save
+              ^smem.command.save.status complete)
+-->
+   (<s> ^operator <o> + > =)
+   (<o> ^name clear-all-save)
+}
+
+#Don't clear, see whether retrieve will be affected
+sp {apply*clear-all-save
+   (state <s> ^operator.name clear-all-save
+              ^smem.command <cmd>)
+   (<cmd> ^save <save>)
+   (<save> ^data
+           ^status complete)
+-->
+   (<cmd> ^save <save> -)
+}

@@ -98,6 +98,8 @@ typedef std::bitset<STATS_NUM_OPTIONS> StatsBitset;
 typedef std::bitset<WATCH_NUM_OPTIONS> WatchBitset;
 typedef std::bitset<WATCH_WMES_TYPE_NUM_OPTIONS> WatchWMEsTypeBitset;
 
+// Semantic Memory
+typedef std::bitset<10> SmemBitset;
 // For option parsing
 typedef struct {
 	int shortOpt;
@@ -710,7 +712,21 @@ protected:
 	* @brief watch-wmes command
 	* @param pAgent The pointer to the gSKI agent interface
 	*************************************************************/
+
 	bool DoWatchWMEs(gSKI::Agent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
+
+//#ifdef SEMANTIC_MEMORY
+	// YJ's function
+	bool ParseLoadMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParsePrintMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseClearMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseSummarizeMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseSmemOption(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+
+	bool ParseCluster(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseClusterTrain(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseClusterRecognize(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+//#endif
 
 	// Print callback events go here
 	virtual void HandleEvent(egSKIPrintEventId, gSKI::Agent*, const char* msg);

@@ -35,11 +35,11 @@
 /* #define DEBUG_GDS_HIGH */
 /* REW: end   09.15.96 */
 
+#include "kernel.h"
 #include "decide.h"
 #include "gdatastructs.h"
 #include "instantiations.h"
 #include "mem.h"
-#include "kernel.h"
 #include "agent.h"
 #include "symtab.h"
 #include "wmem.h"
@@ -56,6 +56,13 @@
 #include "gski_event_system_functions.h"
 
 using namespace xmlTraceNames;
+
+#ifdef SEMANTIC_MEMORY
+//YJ
+extern void append_smem_links(agent* thisAgent);
+extern void clear_smem_structs(agent* thisAgent);
+//YJ end
+#endif SEMANTIC_MEMORY
 
 #ifdef NUMERIC_INDIFFERENCE
 /* REW: 2003-01-02 Behavior Variability Kernel Experiments */
@@ -2249,6 +2256,17 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   if (goal->id.lower_goal)
     remove_existing_context_and_descendents (thisAgent, goal->id.lower_goal);
 
+ // #ifdef SEMANTIC_MEMORY
+ // vector<wme*> this_level_links = thisAgent->gold_level_to_smem_links->at(goal->id.level-1);
+ // for(int i=0; i<this_level_links.size();++i){
+	 // remove_input_wme(thisAgent, this_level_links[i]);
+ // }
+
+  // SEMANTIC_MEMORY - YJW
+  clear_smem_structs(thisAgent);
+  // SEMANTIC_MEMORY - YJW
+
+//#endif
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, thisAgent, 
                        POP_CONTEXT_STACK_CALLBACK, 
@@ -2411,6 +2429,12 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.isa_goal = TRUE;
   id->id.operator_slot = make_slot (thisAgent, id, thisAgent->operator_symbol);
   id->id.allow_bottom_up_chunks = TRUE;
+	
+#ifdef SEMANTIC_MEMORY
+  // YJ
+  append_smem_links(thisAgent); //append smem WMEs without checking
+  //END YJ
+#endif SEMANTIC_MEMORY
 
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, thisAgent, 
@@ -3126,7 +3150,20 @@ void elaborate_gds (agent* thisAgent) {
                         wme *fake_inst_wme_cond;
 
                         fake_inst_wme_cond = pref_for_this_wme->inst->top_of_instantiated_conditions->bt.wme_;
-                        if (fake_inst_wme_cond->gds != NIL)
+						
+						// YJ ADDED 2006 8-17
+						// - should check local o-supported first, right?
+						// If o-supported, then ignore this wme since it's dependency has been backtraced through
+						// When should a wme have a gds pointer? o-supported wmes, i-supported? Shouldn't every wme have a pointer to GDS?
+						// Why R3 ^cue doesn't have the pointer to gds?. Is this wrong?
+						// R3 ^cue shouldn't be in GDS, the following line makes it work
+						//if(fake_inst_wme_cond->preference->o_supported == TRUE){
+						//	continue;
+						//}
+						// Note: this does break things, for test-save-retrieve-expand test case, it crashes.
+						// YJ ADDED 2006 8-17
+
+						if (fake_inst_wme_cond->gds != NIL)
                         {
                            /* Then we want to check and see if the old GDS
                            * value should be changed */

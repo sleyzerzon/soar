@@ -1,0 +1,14 @@
+VERSION 4
+\test-new-format\test-new-format.dm
+0	ROOT test-new-format test-new-format 1
+1	0	FOPERATOR _firstload _firstload.soar 2
+2	0	FOLDER all all 3
+3	0	FOLDER elaborations elaborations 4
+4	3	FOPERATOR _all _all.soar 5
+5	3	FOPERATOR top-state top-state.soar 6
+6	0	OPERATOR clear-all-save clear-all-save.soar 7
+7	0	OPERATOR deliberate-save deliberate-save.soar 8
+8	0	OPERATOR initialize-test-save initialize-test-save.soar 9
+9	0	OPERATOR retrive-multi-level retrive-multi-level.soar 10
+10	0	OPERATOR stop stop.soar 11
+END
