@@ -1106,11 +1106,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
           print_phase (thisAgent, "\n--- Output Phase ---\n",0);
 	
-#ifdef SEMANTIC_MEMORY
-	  // YJ's stuff
-	  smem_routine(thisAgent);
-	  //
-#endif /* SEMANTIC_MEMORY */
+
 
        /* JC ADDED: Tell gski about output phase beginning */
        gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_PHASE, gSKI_K_OUTPUT_PHASE, 0);
@@ -1130,7 +1126,13 @@ void do_one_top_level_phase (agent* thisAgent)
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_OUTPUT_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
- 
+
+	 #ifdef SEMANTIC_MEMORY
+	  // YJ's stuff
+	  smem_routine(thisAgent);
+	  //
+	#endif /* SEMANTIC_MEMORY */
+
       /* REW: begin 09.15.96 */
       if (thisAgent->operand2_mode == TRUE) {
 		  /* KJC June 05:  moved here from DECISION Phase */

@@ -120,6 +120,7 @@ typedef union symbol_union Symbol;
    have DETAILED_TIMING_STATS defined, you must NOT define NO_TIMING_STUFF */
 /* #define DETAILED_TIMING_STATS */
 
+
 /* UNcomment the following line to have Soar maintain reference counts 
    on wmes and prefs at the top level.  This can result in larger
    memory growth due to top-level objects that never get deallocated 

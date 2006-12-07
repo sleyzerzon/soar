@@ -757,6 +757,7 @@ void clear_smem_structs(agent* thisAgent){
 	  vector<Symbol*> arch_symbols = thisAgent->smem_structures->back().arch_symbols;
 	  for(int i=0; i<arch_symbols.size(); ++i){
 		  symbol_remove_ref(thisAgent, arch_symbols.at(i));
+		  // To avoid memory leak
 	  }
 	  thisAgent->smem_structures->pop_back();
   }
@@ -950,13 +951,17 @@ void retrieve_7_17(agent* thisAgent){
 	bool reuse_identifier = true;
 
 	string current_cue_id = "";
-	wme *current_retrieved = NIL, *current_confidence = NIL, *current_experience = NIL, *current_status = NIL;
+	wme *current_retrieved = NIL, *current_confidence = NIL, *current_experience = NIL, *current_status = NIL, *current_link_to_query = NIL;
+	Symbol *query_id_symbol = NIL;
 
 	for (retrieve_s = command_link_id->id.slots; retrieve_s != NIL; retrieve_s = retrieve_s->next) {
 		// The slots can potentially have any structure
 		if(strcmp(symbol_constant_to_string(thisAgent, retrieve_s->attr).c_str(), "query") == 0){
 			
 			retrieve_w = retrieve_s->wmes;
+			current_cue_id = symbol_constant_to_string(thisAgent, retrieve_w->value);
+			query_id_symbol = retrieve_w->value;
+			
 			// Do not retrieve if there are multiple cues
 			// Multiple cues
 			// Return an error !
@@ -972,14 +977,14 @@ void retrieve_7_17(agent* thisAgent){
 				current_cue_id = "2"; // this is not a valid identifier, so can be used to track status
 				break;
 			}
-			else if(retrieve_w->value->id.slots == NIL){
+			else if(!thisAgent->semantic_memory->test_id(current_cue_id) && retrieve_w->value->id.slots == NIL){
 
 				current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "empty-query"));
 				current_cue_id = "3"; // this is not a valid identifier, so can be used to track status
 				break;
 			}
 
-			current_cue_id = symbol_constant_to_string(thisAgent, retrieve_w->value);
+			
 
 			// Do retrieve only if the cue_id is the same with previous one
 			//if(current_cue_id == *(thisAgent->last_cue_id)){
@@ -1032,9 +1037,14 @@ void retrieve_7_17(agent* thisAgent){
 				}
 			*/
 
-				thisAgent->semantic_memory->match_retrieve_single_level_2006_7_18(current_cue_id, cue_set, picked_id, retrieved, confidence, experience);
+				//thisAgent->semantic_memory->match_retrieve_single_level_2006_7_18(current_cue_id, cue_set, picked_id, retrieved, confidence, experience);
+				thisAgent->semantic_memory->match_retrieve_single_level_2006_10_30(current_cue_id, cue_set, picked_id, retrieved, confidence, experience);
 				if(picked_id == "F0"){
 					current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "failure"));
+					break;
+				}
+				else if(picked_id == "V0"){
+					current_status = add_input_wme_with_history(thisAgent, result_link_id, make_sym_constant(thisAgent, "status"), make_sym_constant(thisAgent, "all-variables-cue"));
 					break;
 				}
 
@@ -1164,6 +1174,11 @@ void retrieve_7_17(agent* thisAgent){
 	//if(current_cue_id != *(thisAgent->last_cue_id)){
 	if(current_cue_id != thisAgent->smem_structures->at(goal_level).last_cue_id){
 		
+		// This can be tested by rule to make sure status and query are synchronized
+				current_link_to_query =
+					add_input_wme_with_history
+					(thisAgent, result_link_id, make_sym_constant(thisAgent, "query"), query_id_symbol);
+
 		
 		//if(thisAgent->last_retrieved != NIL) {
 		if(thisAgent->smem_structures->at(goal_level).last_retrieved != NIL){
@@ -1190,6 +1205,9 @@ void retrieve_7_17(agent* thisAgent){
 
 		if(thisAgent->smem_structures->size() > goal_level &&
 			thisAgent->smem_structures->at(goal_level).last_status != NIL) remove_input_wme(thisAgent, thisAgent->smem_structures->at(goal_level).last_status);
+		
+		if(thisAgent->smem_structures->size() > goal_level &&
+			thisAgent->smem_structures->at(goal_level).last_link_to_query != NIL) remove_input_wme(thisAgent, thisAgent->smem_structures->at(goal_level).last_link_to_query);
 	
 		/*	
 		//Avoid removing the same wme
@@ -1230,6 +1248,7 @@ void retrieve_7_17(agent* thisAgent){
 			thisAgent->smem_structures->at(goal_level).last_experience = current_experience;
 			thisAgent->smem_structures->at(goal_level).last_confidence = current_confidence;
 			thisAgent->smem_structures->at(goal_level).last_status = current_status;
+			thisAgent->smem_structures->at(goal_level).last_link_to_query = current_link_to_query;
 
 			if(use_pref){
 				current_status->preference = make_fake_pref_for_smem_query_retrieved(thisAgent, thisAgent->bottom_goal, retrieve_w, current_status);
@@ -1242,6 +1261,9 @@ void retrieve_7_17(agent* thisAgent){
 
 	}
 	
+	// Update working memory here
+	do_buffered_wm_and_ownership_changes(thisAgent);
+
 }
 
 // This version of retrieval intends to summarize the target attribute, and return the meta-information about the 
@@ -1703,13 +1725,16 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 	Symbol* command_link_id = find_smem_arch_link_id(thisAgent, "command");
 
 	for (slot* command_s = command_link_id->id.slots; command_s != NIL; command_s = command_s->next) { // save link id is the to-be-saved id
+			
+		if(strcmp(symbol_constant_to_string(thisAgent, command_s->attr).c_str(), "save") == 0){
 
 			for (wme* command_w = command_s->wmes; command_w != NIL; command_w = command_w->next){ // slots should be holding unique values in WM
 
 
 
-					if(strcmp(symbol_constant_to_string(thisAgent, command_w->attr).c_str(), "save") == 0
-						&&
+					if(
+						//strcmp(symbol_constant_to_string(thisAgent, command_w->attr).c_str(), "save") == 0
+						//&&
 						command_w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){ // if it's constant under save link, no need to save it.
 
 							
@@ -1801,6 +1826,7 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 					}
 
 			}
+		}
 
 	}
 
