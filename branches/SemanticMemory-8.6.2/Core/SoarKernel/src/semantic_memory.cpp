@@ -10,6 +10,7 @@
 // stdafx.obj will contain the pre-compiled type information
 //#include "stdafx.h"
 #include "semantic_memory.h"
+#include <algorithm>
 
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
@@ -307,7 +308,7 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 		bool result =  find_identical_chunk(id, id_attr_value_hash, final_chunk_id, lmes);
 
 		if(result){// If there is the identical chunk already, update the counter
-			if(debug_output) if(debug_output) cout << "Find identical exsiting chunk " << final_chunk_id << endl;
+			if(debug_output) cout << "Find identical exsiting chunk " << final_chunk_id << endl;
 			//need_insert = false;
 			// Update counter here ...
 
@@ -326,6 +327,10 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 				for(HASH_S_LP::iterator itr2 = value_hash.begin(); itr2 != value_hash.end(); ++itr2){
 					string value = itr2->first;
 					int lme_index = itr2->second;
+					// Fix Bug 9-12 2006 YJ: Merging is alright now
+					value = lmes[lme_index].value; // value could have been merged, so will be different
+					//
+
 					//int value_type = all_new_lmes[lme_index]->value_type;
 					int value_type = lmes[lme_index].value_type;
 					if(debug_output) if(debug_output) cout << " ^" << attr <<" " << value << "("<< value_type<< ")"<< endl;
@@ -350,8 +355,8 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 bool SemanticMemory::find_identical_chunk (string& chunk_id, HASH_S_HASH_S_HASH_S_LP& id_attr_value_hash,
 										   string& new_chunk_id, vector<LME>& all_new_lmes){
 	
-   new_chunk_id = chunk_id;
-   return false;
+  // new_chunk_id = chunk_id;
+  // return false;
    // It's easy to check exact matches though, by just comparing the number of matched chunk withe current chunk
 
 
@@ -377,13 +382,33 @@ bool SemanticMemory::find_identical_chunk (string& chunk_id, HASH_S_HASH_S_HASH_
 		return false;
 	}
 	else{
-		new_chunk_id =*(matched_ids.begin());
+		for(set<string>::iterator itr = matched_ids.begin(); itr != matched_ids.end(); ++itr){
+			string matched_id = *itr;
+			
+			if(this->memory_id_attr_hash.find(matched_id) == memory_id_attr_hash.end()){
+				new_chunk_id = chunk_id;
+				return  false;
+			}
+			HASH_S_HASH_S_LP attr_value_hash = this->memory_id_attr_hash.find(matched_id)->second;
+			
+			if(attr_value_hash.size() == chunk_cue.size()){
+				new_chunk_id = matched_id;
+				return true;
+				
+			}
+			
+		}
+	
+		
+		//new_chunk_id =*(matched_ids.begin());
 		// the firs super set chunk
 		// If a super set chunk is inserted later, there will be separate chunks.
 		// And could emerged multiple super-chunks for a later query
-		return true;
+		//return true;
 
 	}
+	new_chunk_id = chunk_id;
+	return false;
 	//return new_chunk_id;
 }
 
@@ -721,7 +746,7 @@ bool SemanticMemory::match_retrieve_single_level_2006_3_15(const set<CueTriplet>
 	
 	else{
 		// summarize target value
-		// All candidate matches are 'sanned', but if there is a tie, the first one will always be picked.
+		// All candidate matches are 'scanned', but if there is a tie, the first one will always be picked.
 		for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
 			string candidate_id = *itr;
 			//if(debug_output) cout << "###" << endl;
@@ -867,13 +892,38 @@ bool SemanticMemory::match_retrieve_single_level_2006_7_18(const string& cue_id,
 	}
 	else{
 		// If this iteration is done in the order of matched candidates, it could be more efficient when there exist a rather unique feature.
+		// Do something to pre-sort the cue_set....
+		// The number of matches can be identified without enumerating. Shouldn't do this for identifier value, as it require summing those for all values
+		// For constant values, just need to go down the hash to figure out the number of ids
+		
 		// Non-unique features are always expensive
+
+
+		vector<cue_count> sorted_cues;
+		// id is not useful for this branch
 		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
 			string id = itr->id;
 			string attr = itr->attr;
 			string value = itr->value;
 			int value_type = itr->value_type;
+			int current_matched_ids_count = this->match_attr_value_count(attr, value, value_type);
+			sorted_cues.push_back(cue_count(attr, value, value_type, current_matched_ids_count));
+		}
+
+		sort(sorted_cues.begin(), sorted_cues.end());
+
+		//for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+		for(vector<cue_count>::const_iterator itr = sorted_cues.begin(); itr != sorted_cues.end(); ++itr){
+			//string id = itr->id;
+			string attr = itr->attr;
+			string value = itr->value;
+			int value_type = itr->value_type;
 			cue_attrs.insert(attr);
+
+			// This algorithm should return the hash to ids directly
+			// Otherwise, itself will take linear time !
+			// Then at this point, the old value issue is not resolved until later finding the intersection - which is bound the complexity of the algorithm to the smaller set.
+			// Need to rewrite the algorithm
 			set<string> current_matched_ids = this->match_attr_value(attr, value, value_type);
 			if(value_type == IDENTIFIER_SYMBOL_TYPE && !this->test_id(value)){ // thie value is being queried
 
@@ -888,6 +938,8 @@ bool SemanticMemory::match_retrieve_single_level_2006_7_18(const string& cue_id,
 				matched_ids_intersection.insert(current_matched_ids.begin(), current_matched_ids.end());
 			}
 			else{
+				// complexity of set_intersection is bounded by the smaller set, and depends on the searching algorithm
+				// In tree set
 				matched_ids_intersection = set_intersect(matched_ids_intersection, current_matched_ids);
 
 
@@ -900,6 +952,283 @@ bool SemanticMemory::match_retrieve_single_level_2006_7_18(const string& cue_id,
 
 			start = true;
 		}
+
+		if(matched_ids_intersection.empty()){ // no matches
+			retrieved_id = "F0";
+			retrieved.clear();
+			retrieved.insert(CueTriplet("F0", "status", "failure", 2));
+			confidence = 0;
+			experience = 0;
+
+			return false;
+		}
+
+		string retrieved_value;
+		int retrieved_value_type;
+
+		if(target_attr == ""){ // No target attribute, then no need to scan all candidates, just return a 'random' one
+			experience = 0;
+			confidence = 0;
+			retrieved_id = *(matched_ids_intersection.begin());
+		}
+
+		else if(retrieved_id == ""){ // If it's a expand, then the retrieved_id is already known, no need to summarize candidates at all
+			// summarize target value
+			// All candidate matches are 'sanned', but if there is a tie, the first one will always be picked.
+			for(set<string>::iterator itr = matched_ids_intersection.begin(); itr != matched_ids_intersection.end(); ++itr){
+				string candidate_id = *itr;
+				//if(debug_output) cout << "###" << endl;
+				//if(debug_output) cout << candidate_id << endl;
+				//if(debug_output) cout << target_attr << endl;
+				set<int> candidate_lme_index = this->match_id_attr(candidate_id, target_attr);
+				// Assume single valued attributes, or just pick the first value
+
+				if(candidate_lme_index.empty()){
+					if(debug_output) cout << "No target attribute" << endl;
+					// This should not happen
+					break;
+				}
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				// What if there is multi-valued attributes?
+				// Current code just check the 'first' value for the target attribute
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				int target_lme_index = *(candidate_lme_index.begin()); 
+				string target_value = (LME_Array[target_lme_index])->value;
+				int target_value_type = (LME_Array[target_lme_index])->value_type;
+
+				// calculate weight for each instance based on its reference history
+				// Total count does include repeated experiences
+				float weight = (LME_Array[target_lme_index])->boost_history.size();
+				if(weight == 0){
+					weight = 1;
+				}
+				if(value_counter.find(target_value) == value_counter.end()){
+					value_counter[target_value] = weight;
+				}
+				else{
+					value_counter[target_value] += weight;
+				}
+
+				// The first id is picked
+				// matched Ids should be ordered in some way, e.g, by activation, so that in case of tie, the highest activated chunk is retrieved
+				if(value_lme_mapping.find(target_value) == value_lme_mapping.end()){
+					value_lme_mapping[target_value] = target_lme_index;
+				}
+			}
+
+
+			int total_count = 0;
+			int max_count = 0;
+			string max_counted_value = "";
+			// May be counts need to be biased by activation. So that too long ago counts doesn't affect retrieval.
+			for(map<string, int>::iterator itr = value_counter.begin(); itr != value_counter.end(); ++itr){
+				string current_value = itr->first;
+				int current_value_count = itr->second;
+				total_count += current_value_count;
+				if(current_value_count > max_count){// Always get the first max_count id, radonmess could be implemented here
+					max_count = current_value_count;
+					max_counted_value = current_value;
+				}
+				//if(debug_output) cout << itr->first<<", " << itr->second << endl;
+			}
+
+			experience = total_count;
+			confidence = value_counter[max_counted_value]*1.0 / total_count;
+			int retrieved_lme_index = value_lme_mapping[max_counted_value];
+			retrieved_value = (LME_Array[retrieved_lme_index])->value;
+			retrieved_value_type = (LME_Array[retrieved_lme_index])->value_type;
+			retrieved_id = (LME_Array[retrieved_lme_index])->id;
+
+			//if(debug_output) cout << "Confidence: " << confidence << endl;
+			//if(debug_output) cout << "Experience: " << experience << endl;
+			//if(debug_output) cout << "Index: " << retrieved_lme_index << endl;
+		}
+
+		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+			string attr = itr->attr;
+			string value = itr->value;
+			int value_type = itr->value_type;
+
+			if(attr == target_attr){
+				value = retrieved_value;
+				value_type = retrieved_value_type;
+			}
+
+			// Code to retrieve multiple queried attributes
+			else if(queried_attrs.find(attr) != queried_attrs.end()){ // This value is being queried
+
+				set<int> matched_lme_index = this->match_id_attr(retrieved_id, attr); // get all matched wmes/lems
+				int queried_lme_index = *(matched_lme_index.begin()); // get the first value
+				value = (LME_Array[queried_lme_index])->value;
+				value_type = (LME_Array[queried_lme_index])->value_type;
+
+			}
+
+			retrieved.insert(CueTriplet(retrieved_id, attr, value, value_type));
+		}
+	}
+	// retrieve other attributes
+	HASH_S_HASH_S_HASH_S_LP::iterator itr1 = memory_id_attr_hash.find(retrieved_id);
+	HASH_S_HASH_S_LP attr_value_hash = itr1->second;
+	for(HASH_S_HASH_S_LP::iterator itr2 = attr_value_hash.begin(); itr2 != attr_value_hash.end(); ++itr2){
+		string each_attr = itr2->first;
+		if(cue_attrs.find(each_attr) == cue_attrs.end()){//Not in cue
+			set<int> matched_lme_index = this->match_id_attr(retrieved_id, each_attr); // get all matched wmes/lems
+			int queried_lme_index = *(matched_lme_index.begin());// get the first value
+			string value = (LME_Array[queried_lme_index])->value;
+			int value_type = (LME_Array[queried_lme_index])->value_type;
+			retrieved.insert(CueTriplet(retrieved_id, each_attr, value, value_type));
+		}
+	}
+	
+	
+	return true;
+	//return matched_ids_intersection;
+	//return retrieved;
+
+}
+
+
+bool SemanticMemory::match_retrieve_single_level_2006_10_30(const string& cue_id, const set<CueTriplet>& cue_set, string& retrieved_id, 
+														   set<CueTriplet>& retrieved, float& confidence, float& experience){
+															 
+	map<string, int> value_counter;
+	map<string, int> value_lme_mapping;
+	retrieved_id = "";
+
+	bool start = false;
+	set<string> matched_ids_intersection;
+	string target_attr = "";
+	set<string> queried_attrs;
+	set<string> cue_attrs;
+	if(cue_set.empty()){
+		if(this->test_id(cue_id)){ // expand
+			retrieved_id = cue_id;
+			experience = 0;
+			confidence = 0;
+		}
+		else{ // return error
+			retrieved_id = "E0";
+			retrieved.clear();
+			retrieved.insert(CueTriplet("E0", "error", "empty-cue", 2));
+			confidence = 0;
+			experience = 0;
+			return false;
+		}
+	}
+	else{
+		// If this iteration is done in the order of matched candidates, it could be more efficient when there exist a rather unique feature.
+		// Do something to pre-sort the cue_set....
+		// The number of matches can be identified without enumerating. Shouldn't do this for identifier value, as it require summing those for all values
+		// For constant values, just need to go down the hash to figure out the number of ids
+		
+		// Non-unique features are always expensive
+
+
+		string most_specific_pair_attr;
+		string most_specific_pair_value;
+		int most_specific_pair_value_type;
+		int most_specific_pair_count = -1;
+		HASH_S_LP* most_specific_id_hash_ptr;
+		for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+			string id = itr->id;
+			string attr = itr->attr;
+			string value = itr->value;
+			int value_type = itr->value_type;
+			if(value_type == IDENTIFIER_SYMBOL_TYPE){
+				continue;
+			}
+			//int current_matched_ids_count = this->match_attr_value_count(attr, value, value_type);
+			HASH_S_LP* id_hash_ptr = this->match_attr_value_ret_id_hash(attr, value, value_type);
+			int current_matched_ids_count = id_hash_ptr->size();
+
+			if(current_matched_ids_count == 0){
+				retrieved_id = "F0";
+				retrieved.clear();
+				retrieved.insert(CueTriplet("F0", "status", "failure", 2));
+				confidence = 0;
+				experience = 0;
+				return false;
+			}
+
+			if(most_specific_pair_count == -1 || current_matched_ids_count < most_specific_pair_count){
+				most_specific_pair_attr = attr;
+				most_specific_pair_value = value;
+				most_specific_pair_value_type = value_type;
+				most_specific_pair_count = current_matched_ids_count;
+				most_specific_id_hash_ptr = id_hash_ptr;
+			}
+		}
+		
+		if(most_specific_pair_count == -1){
+			retrieved_id = "V0";
+			retrieved.clear();
+			retrieved.insert(CueTriplet("V0", "status", "all-variables-cue", 2));
+			confidence = 0;
+			experience = 0;
+			return false;
+		}
+		// If there is no constant feature in the cue, in other words all featues are variable based, need to query all ids contaning the attribute
+		// May need such a hash - attribute-id-value hash???, or such query is simply illegal!!!
+		
+		//set<string>most_specific_id_set = this->match_attr_value(most_specific_pair_attr,most_specific_pair_value, most_specific_pair_value_type);
+		// Verify each id for all cues
+		//for(set<string>::iterator id_itr = most_specific_id_set.begin(); id_itr != most_specific_id_set.end(); ++ id_itr){
+		for(HASH_S_LP::iterator id_itr = most_specific_id_hash_ptr->begin(); id_itr != most_specific_id_hash_ptr->end(); ++ id_itr){
+			//string current_id = *id_itr;
+			string current_id = id_itr->first;
+			bool current_id_mismatch = false;
+			for(set<CueTriplet>::const_iterator cue_itr = cue_set.begin(); cue_itr != cue_set.end(); ++ cue_itr){
+				string attr = cue_itr->attr;
+				string value = cue_itr->value;
+				int value_type = cue_itr->value_type;
+				if(attr == most_specific_pair_attr && value == most_specific_pair_value && value_type == most_specific_pair_value_type){
+					continue;
+				}
+				// Verify id, attr, value, value_type for constant value_type
+				// Verify id, attr for variable value_type
+				HASH_S_HASH_S_HASH_S_LP::iterator attr_value_hash_itr = this->memory_id_attr_hash.find(current_id);
+				HASH_S_HASH_S_LP &attr_value_hash = attr_value_hash_itr->second;
+
+				HASH_S_HASH_S_LP::iterator value_hash_itr = attr_value_hash.find(attr);
+				if(value_hash_itr == attr_value_hash.end()){
+					current_id_mismatch = true;
+					break; // current_id fails to be verified
+				}
+				else{
+					HASH_S_LP &value_hash = value_hash_itr->second;
+					if(value_type == IDENTIFIER_SYMBOL_TYPE){
+						continue;
+					}
+					else{
+						HASH_S_LP::iterator value_index_itr = value_hash.find(value);
+						if(value_index_itr == value_hash.end()){
+							current_id_mismatch = true;
+							break; // current_id fails to be verified at the value
+						}
+						set<int> most_recent_lme = this->match_id_attr(current_id, attr); // this function now only return the lme_index with the most recent value for id-attr pair
+						if(*(most_recent_lme.begin()) == value_index_itr->second){
+							if(debug_output) cout << "Attr-Value matched: " << current_id << endl;
+						}
+						else{
+							if(debug_output) cout << "Although Attr-Value matched, this is an older value " << current_id << endl;
+							current_id_mismatch = true;
+							break; // current_id fails to be verified at the value
+						}
+					}
+
+				}
+			}
+			// After enumerating through all cue feature pairs.
+			// Any single mismatch eliminate the potential id
+			if(current_id_mismatch == false){
+				matched_ids_intersection.insert(current_id);
+			}
+		}
+
+
+		//for(set<CueTriplet>::const_iterator itr = cue_set.begin(); itr != cue_set.end(); ++itr){
+	
 
 		if(matched_ids_intersection.empty()){ // no matches
 			retrieved_id = "F0";
@@ -1387,6 +1716,9 @@ set<string> SemanticMemory::match_attr_value(const string attr, const string val
 				}
 				else{
 					if(debug_output) cout << "Although Attr-Value matched, this is an older value " << itr3->first << endl;
+
+					// Can do something like removing the id from the attr-value hashed set, since it's the old value, and shouldn't match again.
+					// May also need some way to get access to these obsolete lmes
 				}
 			}
 		}
@@ -1395,6 +1727,69 @@ set<string> SemanticMemory::match_attr_value(const string attr, const string val
 
 }
 
+HASH_S_LP* SemanticMemory::match_attr_value_ret_id_hash(const string attr, const string value, int value_type){
+	HASH_S_HASH_S_HASH_S_LP::iterator itr = this->memory_attr_value_hash.find(attr);
+	if(itr == memory_attr_value_hash.end()){// no such attribute, return empty set
+		return NULL;
+	}
+	else if(value_type == IDENTIFIER_SYMBOL_TYPE){ //identifier - representing variable in the cue, should has lowest priority
+		return NULL;
+	}
+	else{
+		HASH_S_HASH_S_LP& value_hash = itr->second;
+		HASH_S_HASH_S_LP::iterator itr2 = value_hash.find(value);
+		if(itr2 == value_hash.end()){//no such value for the given attribute, return empty set
+			return NULL;
+		}
+		else{
+			HASH_S_LP& id_hash = itr2->second;
+			return &id_hash;
+		}
+	}
+	return NULL;
+
+}
+
+int SemanticMemory::match_attr_value_count(const string attr, const string value, int value_type){
+	
+	
+	HASH_S_HASH_S_HASH_S_LP::iterator itr = this->memory_attr_value_hash.find(attr);
+	if(itr == memory_attr_value_hash.end()){// no such attribute, return empty set
+		return 0;
+	}
+	else if(value_type == IDENTIFIER_SYMBOL_TYPE){ //identifier - representing variable in the cue, should has lowest priority
+		return 999999;
+	}
+	else{
+		HASH_S_HASH_S_LP& value_hash = itr->second;
+		HASH_S_HASH_S_LP::iterator itr2 = value_hash.find(value);
+		if(itr2 == value_hash.end()){//no such value for the given attribute, return empty set
+			return 0;
+		}
+		else{
+			HASH_S_LP& id_hash = itr2->second;
+			return id_hash.size(); // It could be older values that doesn't count as a match, but current algorithm doesn depends on size of this hash!
+			
+			/*for(HASH_S_LP::iterator itr3 = id_hash.begin(); itr3 != id_hash.end(); ++itr3){
+				// Check whether the value is the most recent value for current id-attr pair.
+				set<int> most_recent_lme = this->match_id_attr(itr3->first, attr); // this function now only return the lme_index with the most recent value for id-attr pair
+				if(*(most_recent_lme.begin()) == itr3->second){
+					if(debug_output) cout << "Attr-Value matched: " << itr3->first << endl;
+					returned_ids_set.insert(itr3->first);
+				}
+				else{
+					if(debug_output) cout << "Although Attr-Value matched, this is an older value " << itr3->first << endl;
+
+					// Can do something like removing the id from the attr-value hashed set, since it's the old value, and shouldn't match again.
+					// May also need some way to get access to these obsolete lmes
+				}
+			}*/
+
+		}
+	}
+	//return returned_ids_set;
+	return 999;//?
+}
 
 int SemanticMemory::clear(){
 	unsigned size = LME_Array.size();

@@ -60,8 +60,7 @@ unsigned long StringToUnsignedLong(string str);
 #define SYM_CONSTANT_SYMBOL_TYPE 2
 #define INT_CONSTANT_SYMBOL_TYPE 3
 #define FLOAT_CONSTANT_SYMBOL_TYPE 4
-#define NUM_SYMBOL_TYPES 5
-#define NUM_PRODUCTION_TYPES 4
+
 
 
 // long term memory element
@@ -118,6 +117,22 @@ public:
 	//... all required data structure
 };
 
+class cue_count{
+public:
+	string attr;
+	string value;
+	int value_type;
+	int count;
+	cue_count(string a, string v, int vt, int ct){
+		attr = a;
+		value = v;
+		value_type = vt;
+		count = ct;
+	}
+	bool operator < (const cue_count c) const{
+		return count < c.count;
+	}
+};
 
 typedef stdext::hash_map<string, int> HASH_S_LP;
 typedef stdext::hash_map<string, HASH_S_LP> HASH_S_HASH_S_LP;
@@ -155,6 +170,10 @@ class SemanticMemory
 		bool match_retrieve_single_level_2006_3_15(const set<CueTriplet>&, string&, set<CueTriplet>& result, float& confidence, float& experience);
 		bool match_retrieve_single_level_2006_7_18(const string& cue_id, const set<CueTriplet>&, string&, set<CueTriplet>& result, float& confidence, float& experience);
 		
+		//Complexity is optimized
+		// Directly return pointer to the hash for next attribute-value pair
+		bool match_retrieve_single_level_2006_10_30(const string& cue_id, const set<CueTriplet>&, string&, set<CueTriplet>& result, float& confidence, float& experience);
+		
 		// I'll need a partial match function (on exemplars) to compare with clustering approach
 		// The threshold can be varied so that it can achieve hierachical clustering by exemplars.
 		// However, exemplars won't have much useful meta-information available, which has to be achieved by reducing the dimension of represetnation - prototype
@@ -172,7 +191,7 @@ class SemanticMemory
 		int get_chunk_count() {return memory_id_attr_hash.size();};
 		int get_lme_count(){return LME_Array.size();};
 
-		HASH_S_HASH_S_HASH_S_LP get_id_attr_hash(){return memory_id_attr_hash;};
+		HASH_S_HASH_S_HASH_S_LP& get_id_attr_hash(){return memory_id_attr_hash;};
 		LME* getLME_ptr(int index){return this->LME_Array[index];};
 		
 		int reset_history(); // after init agent, the history need better restarted, although the knowledge is still there
@@ -183,6 +202,10 @@ class SemanticMemory
 //	private:
 		// given attribute and value, find the id with the matching attr-value pair
 		set<string> match_attr_value(const string attr, const string value, int value_type);
+		// Just return the count without enumerating, to pre-sort the attr-pairs in the cue
+		int match_attr_value_count(const string attr, const string value, int value_type);
+		HASH_S_LP* match_attr_value_ret_id_hash(const string attr, const string value, int value_type);
+		
 	private:		
 		// given attribute and value, find the indexes of LME with the matching attr-value pair
 		// value must be either constant or long-term identifier and shouldn't be temporary identifier

@@ -21,7 +21,7 @@ namespace sdtext = ::__gnu_cxx;
 using namespace std;
 
 
-static bool YJ_debug = true;
+static bool YJ_debug = false;
 Symbol *find_identifier_from_wm(agent* thisAgent, Symbol* id,string target_id, set<string>& searched);
 preference *make_fake_pref_for_smem_query_retrieved(agent* thisAgent, Symbol* goal, wme* query, wme* retrieved);
 void retrieve_8_14(agent* thisAgent);

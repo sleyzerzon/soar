@@ -128,13 +128,14 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::IAgent* pAgent, std::vector<std
 		
 		// Increment line count
 		++lineCount;
-
+		
+		// This Trim function does not handle quoting mark loaded through a file correctly. e.g |some value| -- YJ
 		// Trim whitespace and comments
-		if (!Trim(line)) {
+		//if (!Trim(line)) {
 		//	HandleSourceError(lineCount, filename); Interface changed
-			if (path.length()) DoPopD();
-			return false;
-		}
+		//	if (path.length()) DoPopD();
+		//	return false;
+		//}
 	//	mResult << line << std::endl;
 		//cout << line << endl;
 		//AddListenerAndDisableCallbacks(pAgent);
@@ -148,8 +149,33 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::IAgent* pAgent, std::vector<std
 		vector<int> history;
 		char ch;
 		int type;
+		
+		if(true){
+			isstr >> id >> attr;
+			//cout << id << " " << attr << endl;
+			char val_ch = isstr.get();
+			while(val_ch == ' '){
+				val_ch = isstr.get();
+			}
+			
+			//cout << val_ch << endl;
+			if(val_ch == '|'){
+				char val[99999];
+				isstr.getline(val, 99999, '|');
+				value = string(val);
+			}
+			else{
+				isstr >> value;
+				value = val_ch + value;
+			}
+			isstr >> type;
 
-		isstr >> id >> attr >> value >> type;
+			//cout << id << " " << attr << " '" << value << "' " << type << " " << endl;
+		}
+		else{
+			isstr >> id >> attr >> value >> type;
+		}
+		
 		// id attr value type [2 3 4 ]
 		if(isstr >> ch){
 			if(ch == '['){

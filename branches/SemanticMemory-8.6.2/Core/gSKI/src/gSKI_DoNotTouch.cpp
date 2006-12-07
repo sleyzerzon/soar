@@ -2483,14 +2483,14 @@ namespace gSKI
 			}
 
 			vector<LME*> content;
-			thisAgent->semantic_memory->dump(content);
-			for(vector<LME*>::iterator itr = content.begin(); itr != content.end(); ++itr){
+		//	thisAgent->semantic_memory->dump(content);
+		//	for(vector<LME*>::iterator itr = content.begin(); itr != content.end(); ++itr){
 				
 				//mResult << std::endl;
 				//AddListenerAndDisableCallbacks(pIAgent);
 				//print(thisAgent, "<%s, %s, %s, %d>\n",(*itr)->id.c_str(), (*itr)->attr.c_str(), (*itr)->value.c_str(), (*itr)->value_type);
 				//RemoveListenerAndEnableCallbacks(pIAgent);
-			}
+		//	}
 			
 			set<string> filtered_id_set;
 			bool filter = false;
@@ -2499,8 +2499,9 @@ namespace gSKI
 				filtered_id_set = thisAgent->semantic_memory->match_attr_value(attr, value, -1);
 				filter = true;
 			}
-
-			HASH_S_HASH_S_HASH_S_LP id_attr_hash = thisAgent->semantic_memory->get_id_attr_hash();
+			
+			// This should retrun reference, not create a copy!
+			HASH_S_HASH_S_HASH_S_LP& id_attr_hash = thisAgent->semantic_memory->get_id_attr_hash();
 			for(HASH_S_HASH_S_HASH_S_LP::iterator itr = id_attr_hash.begin(); itr != id_attr_hash.end(); ++itr){
 				string id = itr->first;
 				if(filter && filtered_id_set.find(id) == filtered_id_set.end()){
