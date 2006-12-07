@@ -35,6 +35,7 @@
 #include "symtab.h"
 #include "init_soar.h"
 #include "rete.h"
+#include "reinforcement_learning.h"
 
 /* comment out the following line to supress compile-time o-support
    calculations */
@@ -1551,9 +1552,7 @@ production *make_production (agent* thisAgent,
   p->filename = NIL;	  
   p->firing_count = 0;
   p->reference_count = 1;
-  insert_at_head_of_dll (thisAgent->all_productions_of_type[type], p, next, prev);
-  thisAgent->num_productions_of_type[type]++;
-  p->type = type;
+  
   p->declared_support = UNDECLARED_SUPPORT;
   p->trace_firings = FALSE;
   p->p_node = NIL;               /* it's not in the Rete yet */
@@ -1561,6 +1560,28 @@ production *make_production (agent* thisAgent,
   p->rhs_unbound_variables = NIL; /* the Rete fills this in */
   p->instantiations = NIL;
   p->interrupt = FALSE;
+
+#ifdef NUMERIC_INDIFFERENCE
+  // Is this production an RL rule? Is it a template rule?
+  if (type == JUSTIFICATION_PRODUCTION_TYPE) {
+	  p->RL = FALSE;
+  } else {
+	  p->RL = check_prefs_for_RL(p);
+	  if (type == TEMPLATE_PRODUCTION_TYPE){
+		  if (!p->RL){
+			  print_with_symbols (thisAgent, "Template rule must have single numeric preference. Removing template flag from %y.\n", p->name);
+			  type = USER_PRODUCTION_TYPE;
+		  } else if (get_number_from_symbol(rhs_value_to_symbol(p->action_list->referent)) != 0){
+			  print_with_symbols (thisAgent, "Template rule must have zero-valued preference. Removing template flag from %y.\n", p->name);
+			  type = USER_PRODUCTION_TYPE;
+		  } else p->RL = FALSE;		// Template rules should not be updated.
+	  }
+  }
+#endif
+
+  insert_at_head_of_dll (thisAgent->all_productions_of_type[type], p, next, prev);
+  thisAgent->num_productions_of_type[type]++;
+  p->type = type;
 
   return p;
 }
@@ -1585,6 +1606,9 @@ void deallocate_production (agent* thisAgent, production *prod) {
 void excise_production (agent* thisAgent, production *prod, Bool print_sharp_sign) {
   if (prod->trace_firings) remove_pwatch (thisAgent, prod);
   remove_from_dll (thisAgent->all_productions_of_type[prod->type], prod, next, prev);
+#ifdef NUMERIC_INDIFFERENCE
+   if (prod->RL && prod->firing_count) remove_RL_refs_for_prod(thisAgent, prod); // Remove RL-related pointers to this production (unnecessary if rule never fired).
+#endif
   thisAgent->num_productions_of_type[prod->type]--;
   if (print_sharp_sign) print (thisAgent, "#");
   if (prod->p_node) excise_production_from_rete (thisAgent, prod);
@@ -1613,4 +1637,5 @@ void excise_all_productions(agent* thisAgent,
                                    i, 
                                    (bool)(print_sharp_sign&&thisAgent->sysparams[TRACE_LOADING_SYSPARAM]));
   }
+   thisAgent->RL_count = 1;
 }

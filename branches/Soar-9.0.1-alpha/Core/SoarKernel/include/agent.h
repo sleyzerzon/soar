@@ -318,6 +318,9 @@ typedef struct agent_struct {
   Symbol			* input_link_symbol;
   Symbol			* output_link_symbol;
   /* RPM 9/06 end */
+
+  Symbol            * reward_symbol; /* NUMERIC_INDIFFERENCE */
+
   
   /* ----------------------- Symbol table stuff -------------------------- */
 
@@ -537,7 +540,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
    struct timeval	*attention_lapse_tracker;
    Bool			attention_lapsing;
  
-  
   /* ----------------------- Chunker stuff -------------------------- */
   
   tc_number           backtrace_number;
@@ -791,9 +793,15 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   /* JC ADDED: Need to store RHS functions here so that agent's don't step on each other */
   rhs_function* rhs_functions;
 
-#ifdef NUMERIC_INDIFFERENCE
+/* NUMERIC_INDIFFERENCE - Stuff for numeric indifference and reinforcement learning */
   enum ni_mode numeric_indifferent_mode;      /* SW 08.19.2003 */
-#endif
+  enum exp_mode exploration_mode;
+  float Temperature;            // Parameter for Boltzmann exploration
+  double epsilon;               // Parameter for epsilon-greedy exploration
+  float gamma;                  // Discount rate
+  float alpha;                  // Learning rate
+  float lambda;					// Eligibility traces
+  unsigned long RL_count;   // Used for naming RL rules - RL-1, RL-2, etc.
 
 } agent;
 /*************** end of agent struct *****/

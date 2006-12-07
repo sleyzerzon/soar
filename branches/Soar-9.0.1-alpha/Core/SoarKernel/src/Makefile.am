@@ -24,6 +24,7 @@ prefmem.cpp\
 print.cpp\
 production.cpp\
 recmem.cpp\
+reinforcement_learning.cpp\
 reorder.cpp\
 rete.cpp\
 rhsfun.cpp\
@@ -61,6 +62,7 @@ reorder.h\
 ../include/parser.h\
 ../include/print.h\
 ../include/production.h\
+../include/reinforcement_learning.h\
 ../include/recmem.h\
 ../include/rete.h\
 ../include/rhsfun.h\

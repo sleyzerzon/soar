@@ -45,6 +45,7 @@
 #include "rete.h"
 #include "gdatastructs.h"
 #include "kernel_struct.h"
+#include "reinforcement_learning.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
 
@@ -493,6 +494,12 @@ void init_sysparams (agent* thisAgent) {
   // 1 deliberate saving is on, automatic saving is off
   // 2 automatic saving is on, deliberate saving is off
   // SEMANTIC_MEMORY
+
+#ifdef NUMERIC_INDIFFERENCE
+  thisAgent->sysparams[RL_ON_SYSPARAM] = TRUE;
+  thisAgent->sysparams[RL_ONPOLICY_SYSPARAM] = TRUE;
+#endif
+
 }
 
 /* ===================================================================
@@ -650,6 +657,11 @@ bool reinitialize_soar (agent* thisAgent) {
   set_sysparam(thisAgent, TRACE_WM_CHANGES_SYSPARAM,               FALSE);
   /* kjh (CUSP-B4) end */
 
+#ifdef NUMERIC_INDIFFERENCE
+  // reset_RL must happen before clear_goal_stack, otherwise we get unwanted Bellman updates while clearing goal stack
+  reset_RL(thisAgent);
+ #endif
+ 
   clear_goal_stack (thisAgent);
 
   if (thisAgent->operand2_mode == TRUE) {
@@ -1320,6 +1332,15 @@ void do_one_top_level_phase (agent* thisAgent)
 	  soar_invoke_callbacks(thisAgent, thisAgent, 
 		  AFTER_HALT_SOAR_CALLBACK,
 		  (soar_call_data) NULL);
+#ifdef NUMERIC_INDIFFERENCE
+	  // To model episodic task, after halt, perform RL update with next-state value 0
+	  if (thisAgent->sysparams[RL_ON_SYSPARAM]){
+	    for (Symbol* g = thisAgent->bottom_goal ; g ; g = g->id.higher_goal){
+	      tabulate_reward_value_for_goal(thisAgent,g);
+	      perform_Bellman_update(thisAgent, 0, g);
+	    }
+	  }
+#endif
   }
   
   if (thisAgent->stop_soar) {

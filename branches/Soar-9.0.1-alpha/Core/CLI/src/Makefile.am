@@ -22,6 +22,7 @@ cli_echocommands.cpp\
 cli_editproduction.cpp\
 cli_excise.cpp\
 cli_explainbacktraces.cpp\
+cli_exploration.cpp\
 cli_firingcounts.cpp\
 cli_gdsprint.cpp\
 cli_help.cpp\
@@ -51,6 +52,7 @@ cli_pwd.cpp\
 cli_quit.cpp\
 cli_removewme.cpp\
 cli_retenet.cpp\
+cli_RL.cpp\
 cli_run.cpp\
 cli_savebacktraces.cpp\
 cli_setlibrarylocation.cpp\

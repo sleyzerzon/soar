@@ -76,7 +76,15 @@ namespace gSKI
                         bool          full_prod,
                         unsigned int  productionType);
                      
+
          bool Preferences(Agent* thisAgent, int detail, bool object, const char* idString, const char* attrString);
+
+         void PrintRL(Agent*		thisAgent,
+		 			  char*			arg,
+		 			  bool			internal,
+		 			  bool			print_filename,
+					  bool			full_prod);
+
 
          bool ProductionFind(Agent*     thisAgent,
                              agent*      agnt,
@@ -117,6 +125,8 @@ namespace gSKI
 
 		 unsigned long GetChunkCount(Agent* pIAgent);
 		 void SetChunkCount(Agent* pIAgent, unsigned long count);
+
+		 void ResetRL(Agent* pIAgent);
 
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
 		// used by Semantic Memory loadMemory commandline
