@@ -28,6 +28,15 @@ namespace cli {
 		DECAY_NUM_OPTIONS, // must be last
 	};
     
+	enum eEpmemOptions {
+        EPMEM_REPORT_SETTINGS,
+        EPMEM_PRINT_MEM,
+        EPMEM_PRINT_MATCH_DIAGNOSTIC,
+        EPMEM_COMPARE_MEMS,
+        EPMEM_CUE_COMPARE_MEM,
+		EPMEM_NUM_OPTIONS, // must be last
+	};
+    
 	enum eExciseOptions {
 		EXCISE_ALL,
 		EXCISE_CHUNKS,
