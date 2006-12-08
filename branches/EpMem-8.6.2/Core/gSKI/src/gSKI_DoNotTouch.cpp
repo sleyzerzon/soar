@@ -31,6 +31,7 @@
 #include "decide.h"
 #include "explain.h"
 #include "soar_rand.h"
+#include "epmem.h"
 
 //#include "../../SoarIO/ConnectionSML/include/sock_Debug.h"
 
@@ -2448,20 +2449,61 @@ namespace gSKI
 			SoarSeedRNG();
 		}
 
-  	         void TgDWorkArounds::DecayInit(IAgent* pIAgent)
-  	         {
-  	             Agent* pAgent = (Agent*)(pIAgent);
-  	             agent* pSoarAgent = pAgent->GetSoarAgent();
-  	 
-  	             decay_init(pSoarAgent);
-  	         }
-  	 
-  	         void TgDWorkArounds::DecayDeInit(IAgent* pIAgent)
-  	         {
-  	             Agent* pAgent = (Agent*)(pIAgent);
-  	             agent* pSoarAgent = pAgent->GetSoarAgent();
-  	 
-  	             decay_deinit(pSoarAgent);
-  	         }
+         void TgDWorkArounds::DecayInit(IAgent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             decay_init(pSoarAgent);
+         }
+
+         void TgDWorkArounds::DecayDeInit(IAgent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             decay_deinit(pSoarAgent);
+         }
+
+         void TgDWorkArounds::EpmemPrintStatus(IAgent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_status(pSoarAgent);
+         }
+         
+         void TgDWorkArounds::EpmemPrintMemory(IAgent* pIAgent, int mem_id)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_memory_by_id(pSoarAgent, mem_id);
+         }
+         
+         void TgDWorkArounds::EpmemPrintMatchDiagnostic(IAgent* pIAgent, int state_num)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_match_diagnostic(pSoarAgent, state_num);
+         }
+         
+         void TgDWorkArounds::EpmemCompareMemories(IAgent* pIAgent, int mem1, int mem2)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_memory_comparison_by_id(pSoarAgent, mem1, mem2);
+         }
+         
+         void TgDWorkArounds::EpmemCompareCueToMemory(IAgent* pIAgent, int state_num, int mem)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_cue_comparison(pSoarAgent, state_num, mem);
+         }
+         
 	}// class
 }// namespace
