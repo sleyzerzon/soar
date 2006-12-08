@@ -187,12 +187,13 @@ protected:
 	bool ParseChunkNameFormat(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseCLog(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseCommandToFile(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
-        bool ParseDecay(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+    bool ParseDecay(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseDefaultWMEDepth(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseDirs(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseEcho(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseEchoCommands(gSKI::IAgent* pAgent, std::vector<std::string>& argv) ;
 	bool ParseEditProduction(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+    bool ParseEpmem(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseExcise(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseExplainBacktraces(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseFiringCounts(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
@@ -333,6 +334,13 @@ protected:
 	* @param productionName Production to edit
 	*************************************************************/
 	bool DoEditProduction(std::string productionName);
+
+	/*************************************************************
+	* @brief epmem command
+	* @param pAgent The pointer to the gSKI agent interface
+	*************************************************************/
+	bool DoEpmem(gSKI::IAgent* pAgent, enum eEpmemOptions setting,
+                 long arg1, long arg2);
 
 	/*************************************************************
 	* @brief excise command
