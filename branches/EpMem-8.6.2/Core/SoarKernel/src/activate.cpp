@@ -184,7 +184,6 @@
 #ifdef SOAR_WMEM_ACTIVATION
 
 
-
 //#define DECAY_DEBUG
 #ifdef DECAY_DEBUG
     #define log_activation(w,x,y,z) print_with_symbols(thisAgent, w, x,y,z)
@@ -946,7 +945,12 @@ void decay_update_wmes_tested_in_prods(agent *thisAgent)
      token temp_token, *t;
      instantiation *inst;
      condition *cond;
-  
+
+#ifdef SILENT_CRASH
+     __try
+     {
+#endif
+     
      start_timer(thisAgent, &(thisAgent->decay_tv));
      start_timer(thisAgent, &(thisAgent->decay_lhs_tv));
 
@@ -1030,7 +1034,25 @@ void decay_update_wmes_tested_in_prods(agent *thisAgent)
      
      stop_timer(thisAgent, &(thisAgent->decay_tv), &(thisAgent->total_decay_time));
      stop_timer(thisAgent, &(thisAgent->decay_lhs_tv), &(thisAgent->total_decay_lhs_time));
-  
+
+#ifdef SILENT_CRASH
+    }
+    __except(1)
+    {
+
+        print(thisAgent, "\nENCOUNTERED DECAY CRASH!  Exiting quietly. (log message)\n");
+        stop_log_file (thisAgent);
+
+        fprintf(stderr, "\nENCOUNTERED DECAY CRASH!  Exiting quietly. (stderr message)\n");
+        fflush(stderr);
+
+        _set_abort_behavior( 0, _WRITE_ABORT_MSG);
+//        abort();
+
+        TerminateProcess(GetCurrentProcess(), 0); 
+    }
+#endif //SILENT_CRASH
+     
  }//decay_update_wmes_tested_in_prods
 
 
