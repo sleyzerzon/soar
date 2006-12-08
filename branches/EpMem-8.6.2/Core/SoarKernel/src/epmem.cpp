@@ -82,7 +82,7 @@ extern unsigned long hash_string(const char *s);
 #define ubiquitous_max 25
 #define fraction_to_trim 0.0
 #define epmem_save_freq 500
-float card_act_ratio=1.5;
+float g_card_act_ratio=1.5;
 
 /*======================================================================
  * Data structures
@@ -195,6 +195,7 @@ typedef struct actwme_struct
  *         last_usage  - the number of the last retrieval that partially
  *                       matched this memory
  *         match_score - the total match score from the last partial match
+ *         act_total   - the sum of the activation levels in the last match
  *         num_matches - the number of cue entries that matched in the last match
  *
  */
@@ -204,6 +205,7 @@ typedef struct episodic_memory_struct
     int index;
     int last_usage;
     float match_score;
+    float act_total;
     int num_matches;
 } episodic_memory;
 
@@ -301,6 +303,23 @@ extern "C"
 {
 #endif
 
+/*======================================================================
+  EpMem declarations
+
+  These functions are called before they are declared
+   
+ *----------------------------------------------------------------------
+*/
+//Used internal but not (yet) called publicly
+Symbol *update_wmetree(agent *thisAgent, wmetree *node,
+                       Symbol *sym, arraylist *epmem,
+                       tc_number tc);
+
+episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
+                                 arraylist *cue, arraylist *negcue);
+
+
+    
 /* ===================================================================
    compare_ptr
 
@@ -449,6 +468,43 @@ arraylist *make_arraylist(agent *thisAgent, int init_cap)
 
     return al;
 }//make_arraylist
+
+/* ===================================================================
+   copy_arraylist
+
+   Allocates and initializes a new arraylist that is a copy of a given
+   original arraylist.
+
+   CAVEAT:  this is not a deep copy!
+   CAVEAT:  User is responsible for deallocation
+   
+   Created: 06 Dec 2006
+   =================================================================== */
+arraylist *copy_arraylist(agent *thisAgent, arraylist *orig)
+{
+    arraylist *al;
+    int i;
+
+    if (orig == NULL) return NULL;
+    if (orig->size == 0) return make_arraylist(thisAgent, orig->capacity);
+
+    al = (arraylist *)allocate_memory(thisAgent,
+                                      sizeof(arraylist),
+                                      MISCELLANEOUS_MEM_USAGE);
+    al->array = (void **)allocate_memory(thisAgent,
+                                         sizeof(void*) * orig->capacity,
+                                         MISCELLANEOUS_MEM_USAGE);
+    al->capacity = orig->capacity;
+    al->size = orig->size;
+    al->next = NULL;
+
+    for(i = 0; i < orig->capacity; i++)
+    {
+        al->array[i] = orig->array[i];
+    }
+
+    return al;
+}//copy_arraylist
 
 /* ===================================================================
    destroy_arraylist
@@ -1243,6 +1299,47 @@ epmem_header *make_epmem_header(agent *thisAgent, Symbol *s)
     return h;
 }//make_epmem_header
 
+/* ===================================================================
+   copy_epmem_header
+
+   Allocates and an initializes a copy of a given epmem header
+
+   CAVEST:  Pointers are just copied.  Changes made to substructures
+            will effect the original!
+   CAVEAT:  Caller is responsible for deallocation.  DO NOT use
+            destroy_epmem_header() because it will clean up copied
+            structures.  Just use deallocate_memory() instead.
+   
+   Created: 06 Dec 2006
+   =================================================================== */
+epmem_header *copy_epmem_header(agent *thisAgent, epmem_header *orig)
+{
+    epmem_header *h;
+
+    h = (epmem_header *)allocate_memory(thisAgent, sizeof(epmem_header), MISCELLANEOUS_MEM_USAGE);
+    h->index = orig->index;
+    h->state = orig->state;
+    h->curr_memory = orig->curr_memory;
+    h->metadata = orig->metadata;
+    h->next_cmd = orig->next_cmd;
+    h->temporal_cmd = orig->temporal_cmd;
+    h->prohibit_list = orig->prohibit_list;
+    h->last_cue_size = orig->last_cue_size;
+    h->last_match_size = orig->last_match_size;
+    h->last_match_score = orig->last_match_score;
+    h->ss_wme = orig->ss_wme;
+    h->epmem = orig->epmem;
+    h->query = orig->query;
+    h->negquery = orig->negquery;
+    h->retrieved = orig->retrieved;
+    h->epmem_wme = orig->epmem_wme;
+    h->query_wme = orig->query_wme;
+    h->negquery_wme = orig->negquery_wme;
+    h->retrieved_wme = orig->retrieved_wme;
+
+    return h;
+}//copy_epmem_header
+
 
 //Declare this in advance so that destroy_epmem_header() can call it.
 void epmem_clear_curr_mem(agent *thisAgent, epmem_header *h);
@@ -1392,6 +1489,99 @@ int wme_equals_node(wme *w, wmetree *node)
 }//wme_equals_node
 
 /* ===================================================================
+   epmem_print_status
+
+   This function will print the current status and configuration
+   info for the episodic memory subsystem of this agent.
+   
+   thisAgent - duh
+   
+   Created: 15 Nov 2006
+   =================================================================== */
+void epmem_print_status(agent *thisAgent)
+{
+    int i,j;
+    epmem_header *h;
+    
+    print(thisAgent, "\nEPISODIC MEMORY INFO");
+    print(thisAgent, "\n--------------------");
+    print(thisAgent, "\n               Number of stored memories: %d",
+          thisAgent->epmem_memories->size);
+    print(thisAgent, "\n          Number of retrievals performed: %ld",
+          thisAgent->epmem_num_queries);
+    if (strlen(thisAgent->epmem_load_filename) > 0)
+    {
+        print(thisAgent, "\n          Episodes were initialized from: %s",
+              thisAgent->epmem_load_filename);
+    }
+    if (strlen(thisAgent->epmem_save_filename) > 0)
+    {
+        print(thisAgent, "\n             Episodes are being saved to: %s",
+              thisAgent->epmem_save_filename);
+    }
+    print(thisAgent, "\n Total CPU time used by the EpMem module: %g seconds",
+          timer_value(&(thisAgent->epmem_total_time)));
+
+    //Print info from each existing epmem header
+    for(i = thisAgent->epmem_header_stack->size - 1; i >= 0; i--)
+    {
+        print(thisAgent, "\n");
+
+        h = (epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack,i);
+        print_with_symbols(thisAgent, "\nState %y", h->state);
+
+        if (h->curr_memory == NULL)
+        {
+            print(thisAgent, "\n          Currently retrieved memory: none");
+            break;
+        }
+        
+        print(thisAgent, "\n     Currently retrieved memory: %d",
+              h->curr_memory->index);
+
+        if (h->temporal_cmd->name != NULL)
+        {
+            print(thisAgent, "\n         Current command issued: %s",
+                  h->temporal_cmd->name);
+        }//if
+        else
+        {
+            print(thisAgent, "\n         Current command issued: none");
+        }//else
+            
+        print(thisAgent, "\n  Currently prohibited memories:");
+        if (h->prohibit_list->size > 0)
+        {
+            for(j = 0; j < h->prohibit_list->size; j++)
+            {
+                long nProbID = (long)get_arraylist_entry(thisAgent,
+                                                         h->prohibit_list,
+                                                         j);
+                print(thisAgent, " %ld", nProbID);
+            }
+        }//if
+        else
+        {
+            print(thisAgent, " none");
+        }
+
+
+        //Metadata Info
+        print(thisAgent, "\n                    Match score: %f", h->last_match_score);
+        print(thisAgent, "\n                       Cue size: %d", h->last_cue_size);
+        print(thisAgent, "\n         Normalized Match Score: %f",
+              h->last_match_score / (float)h->last_cue_size);
+        print(thisAgent, "\n              Match Cardinality: %f",
+              (float)h->last_match_size / (float)h->last_cue_size);
+        
+    }//for
+
+
+    
+}//epmem_print_status
+
+
+/* ===================================================================
    print_wmetree
 
    Prints an ASCII graphic representation of the wmetree rooted by the
@@ -1411,11 +1601,7 @@ void print_wmetree(agent *thisAgent, wmetree *node, int indent, int depth)
     
     if (node == NULL) return;
 
-    if (node->parent == NULL) // check for root
-    {
-        print(thisAgent, "\n\nROOT\n");
-    }
-    else
+    if (node->parent != NULL) // check for root
     {
         if (indent)
         {
@@ -1436,8 +1622,8 @@ void print_wmetree(agent *thisAgent, wmetree *node, int indent, int depth)
             default:
                 break;
         }//switch
-    }//else
-    print(thisAgent, "\n");
+        print(thisAgent, "\n");
+    }//if
 
     if (depth > 0)
     {
@@ -1512,7 +1698,43 @@ actwme *epmem_find_actwme_entry(agent *thisAgent, arraylist *epmem, wmetree *tar
 }//epmem_find_actwme_entry
 
 /* ===================================================================
-   print_memory
+   epmem_find_similar_actwme_entry
+
+   Finds an actwme entry in a given episodic memory that is similar
+   but not the same as a given wmetree node.  To be similar, it must
+   have these traits:
+   - shares the same parent as a given wmetree node
+   - has the same attribute.
+   - has a value with the same type
+
+   Returns NULL if not found.
+
+   Created: 01 Dec 2006
+   =================================================================== */
+actwme *epmem_find_similar_actwme_entry(agent *thisAgent,
+                                        arraylist *epmem,
+                                        wmetree *target)
+{
+    int i;
+
+    for(i = 0; i < epmem->size; i++)
+    {
+        actwme *entry = (actwme *)get_arraylist_entry(thisAgent, epmem, i);
+        if (entry->node == target) continue; // Don't return an exact match
+        if ( (entry->node->parent == target->parent)
+             && (entry->node->val_type == target->val_type)
+             && (strcmp(entry->node->attr, target->attr) == 0) )
+        {
+            return entry;
+        }
+    }//for
+
+    return NULL;
+    
+}//epmem_find_similar_actwme_entry
+
+/* ===================================================================
+   print_memory                       *RECURSIVE*
 
    thisAgent - duh
    epmem - an arraylist containing the epmem
@@ -1535,11 +1757,7 @@ void print_memory(agent *thisAgent, arraylist *epmem,
     if (epmem == NULL) return;
     if (node == NULL) return;
     
-    if (node->parent == NULL) // check for root
-    {
-        print(thisAgent, "\n\nROOT\n");
-    }
-    else
+    if (node->parent != NULL) // check for root
     {
         int bFound = FALSE;
         
@@ -1582,7 +1800,7 @@ void print_memory(agent *thisAgent, arraylist *epmem,
         //print the activation level
         print(thisAgent, "(%d)", aw->activation);
 
-    }//else
+    }//if
     print(thisAgent, "\n");
 
     if (depth > 0)
@@ -1598,6 +1816,209 @@ void print_memory(agent *thisAgent, arraylist *epmem,
     }
     
 }//print_memory
+
+/* ===================================================================
+   print_memory_match                        *RECURSIVE*
+
+   Print the WMEs in a memory that match (or do not match) a given cue.
+   
+   thisAgent - duh
+   epmem - an arraylist containing the epmem
+   node - the wmetree this memory is drawn from (probably thisAgent->epmem_wmetree)
+   indent - number of space to indent
+   cue - the cue
+   negcue - the negative cue
+   reverse - (boolean) if TRUE then print the non-matching rather
+             than matching entries
+   
+   Created: 20 Nov 2006
+   =================================================================== */
+void print_memory_match(agent *thisAgent, arraylist *epmem,
+                        wmetree *node, int indent,
+                        arraylist *cue, arraylist *negcue,
+                        int reverse)
+{
+    unsigned long hash_value;
+    wmetree *child;
+    actwme *aw = NULL;
+    actwme *aw_cue = NULL;
+    actwme *aw_negcue = NULL;
+    actwme *aw_similar = NULL;
+    int match = FALSE;
+    wmetree *cueNode = NULL;
+
+    if (epmem == NULL) return;
+    if (node == NULL) return;
+    if ((cue == NULL) && (negcue == NULL)) return;
+    
+    if (node->parent != NULL) // check for root
+    {
+        //Find out if this node is in the episodic memory
+        aw = epmem_find_actwme_entry(thisAgent, epmem, node);
+        
+        //Find out if this node is in the positive cue
+        if (cue != NULL)
+        {
+            aw_cue = epmem_find_actwme_entry(thisAgent, cue, node);
+        }
+        
+        //If it's not the positive cue, then check the negative cue
+        if ( (aw_cue == NULL) && (negcue != NULL) )
+        {
+            aw_negcue = epmem_find_actwme_entry(thisAgent, negcue, node);
+        }
+
+        //If all the values are NULL then return
+        if ( (aw_cue == NULL) && (aw_negcue == NULL) )
+        {
+            return;
+        }
+        
+        //Figure out if this node is a match to the cue.  A match
+        //is the case where the node is in the memory and the positive cue
+        //OR it's not in the memory but it is in the negative cue
+        match = ( ( (aw != NULL) && (aw_cue != NULL) )
+                  || ( (aw == NULL) && (aw_negcue != NULL) ) );
+        
+        //Print the node if it's a match (or NOT a match if
+        //the reverse boolean was set).
+        if ( (!reverse && match ) || (reverse && !match) )
+        {
+            //If the node is not in the memory, try to find a similar node
+            //to print instead
+            if (aw == NULL)
+            {
+                aw = epmem_find_similar_actwme_entry(thisAgent, epmem, node);
+                if (aw != NULL)
+                {
+                    cueNode = node;
+                    node = aw->node;
+                }
+            }//if
+            
+            
+            if (indent > 0)
+            {
+                print(thisAgent, "%*s+--", indent, "");
+            }
+            print(thisAgent, "%s",node->attr);
+
+            //Print the value of the node (or a default if not available)
+            if (aw == NULL)
+            {
+                if (node->children->count == 0)
+                {
+                    print(thisAgent, " MISSING");
+                }
+            }
+            else
+            {
+                switch(node->val_type)
+                {
+                    case SYM_CONSTANT_SYMBOL_TYPE:
+                        print(thisAgent, " %s", node->val.strval);
+                        break;
+                    case INT_CONSTANT_SYMBOL_TYPE:
+                        print(thisAgent, " %ld", node->val.intval);
+                        break;
+                    case FLOAT_CONSTANT_SYMBOL_TYPE:
+                        print(thisAgent, " %f", node->val.floatval);
+                        break;
+                    default:
+                        break;
+                }//switch
+            }
+
+            //print the activation level if available and relevant
+            if ( (aw != NULL) && (node->children->count == 0) )
+            {
+                print(thisAgent, "(%d)", aw->activation);
+            }
+
+            //if it was a negative cue match then note that
+            if ((aw != NULL) && (aw_negcue != NULL))
+            {
+                print(thisAgent, " <--matches negative cue");
+            }
+            
+            //If the node wasn't in the memory, print the cue's value
+            //for user reference
+            if ((aw == NULL) && (cueNode == NULL))
+            {
+                if (aw_cue != NULL)
+                {
+                    cueNode = aw_cue->node;
+                }
+                else
+                {
+                    cueNode = aw_negcue->node;
+                }
+            }
+            if (cueNode != NULL)
+            {
+                switch(cueNode->val_type)
+                {
+                    case SYM_CONSTANT_SYMBOL_TYPE:
+                        print(thisAgent, " [cue value: %s]", cueNode->val.strval);
+                        break;
+                    case INT_CONSTANT_SYMBOL_TYPE:
+                        print(thisAgent, " [cue value: %ld]", cueNode->val.intval);
+                        break;
+                    case FLOAT_CONSTANT_SYMBOL_TYPE:
+                        print(thisAgent, " [cue value: %f]", cueNode->val.floatval);
+                        break;
+                    default:
+                        break;
+                }//switch
+            }//if
+            
+            print(thisAgent, "\n");
+        }//if
+    }//if
+    
+    for (hash_value = 0; hash_value < node->children->size; hash_value++)
+    {
+        child = (wmetree *) (*(node->children->buckets + hash_value));
+        for (; child != NIL; child = child->next)
+        {
+            print_memory_match(thisAgent, epmem, child,
+                               indent + 3, cue, negcue, reverse);
+        }
+    }
+    
+}//print_memory_match
+
+/* ===================================================================
+   epmem_print_memory_by_id
+
+   This function will print an episodic memory from an agent's memory
+   store based on its id.
+   
+   thisAgent - duh
+   id        - the memory id
+   
+   Created: 14 Nov 2006
+   =================================================================== */
+void epmem_print_memory_by_id(agent *thisAgent, int id)
+{
+    episodic_memory *epmem;
+    char buf[1024];
+    
+    if (id >= thisAgent->epmem_memories->size)
+    {
+        sprintf(buf, "Invalid memory id (%d).  Pick a number between %d and %d.",
+                id, 1, thisAgent->epmem_memories->size);
+        print(thisAgent, buf);
+        return;
+    }//if
+
+    epmem = (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                   thisAgent->epmem_memories,
+                                                   id);
+    
+    print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 1000);
+    
+}//epmem_print_memory_by_id
 
 /* ===================================================================
    print_memory_graphically         *EATERS DOMAIN DEPENDENT*
@@ -1670,6 +2091,524 @@ void print_memory_graphically(agent *thisAgent, arraylist *epmem)
     
 }//print_memory_graphically
 
+/* ===================================================================
+   find_nth_best_matches
+
+   This function prints the top N matches for a given memory
+   cue excepting the one that's already been retrieved.
+   
+   thisAgent - duh
+   num - the number of matches to retrieve (i.e., "N")
+
+   CAVEAT:  Caller must deallocate the list
+   
+   Created: 06 Dec 2006
+   =================================================================== */
+arraylist *find_nth_best_matches(agent *thisAgent, epmem_header *h,
+                                 arraylist *cue, arraylist *negcue, int num)
+{
+    epmem_header *dummy;
+    int i;
+    arraylist *matches = make_arraylist(thisAgent, num);
+
+    //Create a dummy header that's a copy with a unique prohibit list
+    dummy = copy_epmem_header(thisAgent, h);
+    dummy->prohibit_list = copy_arraylist(thisAgent, h->prohibit_list);
+
+    //Retrieve other matches by continually prohibiting the current one
+    for(i = 0; i < num; i++)
+    {
+        append_entry_to_arraylist(thisAgent,
+                                  dummy->prohibit_list,
+                                  (void *)dummy->curr_memory->index);
+        
+        dummy->curr_memory = find_best_match(thisAgent, dummy, cue, negcue);
+
+        append_entry_to_arraylist(thisAgent,
+                                  matches,
+                                  (void *)dummy->curr_memory->index);
+    }//for
+
+    //Cleanup
+    destroy_arraylist(thisAgent, dummy->prohibit_list);
+    free_memory(thisAgent, dummy, MISCELLANEOUS_MEM_USAGE);
+    
+    return matches;
+    
+}//print_nth_best_matches
+
+/* ===================================================================
+   find_epmem_header_from_id
+
+   Given a state number (e.g., 76 indicates the state s76) this
+   function finds the epmem header attached to that state if it exists
+
+   =================================================================== */
+epmem_header *find_epmem_header_from_id(agent *thisAgent, int state_num)
+{
+    int i;
+    epmem_header *h = NULL;
+    
+    for(i = thisAgent->epmem_header_stack->size - 1; i >= 0; i--)
+    {
+        h = (epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack,i);
+        if (state_num == h->state->id.name_number)
+        {
+            break;
+        }
+    }
+
+    return h;
+
+}//find_epmem_header_from_id
+
+/* ===================================================================
+   epmem_print_match_diagnostic
+
+   This function will print information about how well a given memory
+   matches the cue on a given state.
+   
+   thisAgent - duh
+   state_num - the state number.  For example, if the symbol of the
+               desired state is S76 then this argument should be 76.
+   epmem_id  - the index of the memory
+   
+   Created: 08 Dec 2006
+   =================================================================== */
+void epmem_print_cue_comparison(agent *thisAgent, int state_num, int epmem_id)
+{
+    epmem_header *h;
+
+    /*
+     * Step 1:  Find the specified state and verify it has an active retrieval
+     */
+    h = find_epmem_header_from_id(thisAgent, state_num);
+    if (h == NULL)
+    {
+        print(thisAgent, "\nERROR:  The given state (S%d) does not exist.", state_num);
+        return;
+    }
+
+    if (h->curr_memory == NULL)
+    {
+        print(thisAgent, "\nERROR:  The given state (S%d) has no currently retrieved memory.", state_num);
+        return;
+    }
+
+    /*
+     * Step 2:  Find the specified memory
+     */
+    episodic_memory *epmem;
+    char buf[1024];
+    
+    if (epmem_id >= thisAgent->epmem_memories->size)
+    {
+        sprintf(buf, "Invalid memory id (%d).  Pick a number between %d and %d.",
+                epmem_id, 1, thisAgent->epmem_memories->size);
+        print(thisAgent, buf);
+        return;
+    }//if
+
+    epmem = (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                   thisAgent->epmem_memories,
+                                                   epmem_id);
+    
+    /*
+     * Step 3:  Retrieve the Cue Info
+     */
+    arraylist *al_query;
+    arraylist *al_negquery;
+    tc_number tc;
+    
+    //Create an arraylist representing the current query
+    al_query = make_arraylist(thisAgent, 32);
+    tc = h->query->id.tc_num + 1;
+    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query, al_query, tc);
+
+    //Create an arraylist representing the current negative query
+    al_negquery = make_arraylist(thisAgent, 32);
+    tc = h->negquery->id.tc_num + 1;
+    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery, al_negquery, tc);
+
+    /*
+     * Step 4:  Print the matching and non-matching parts of the memory
+     */
+    print(thisAgent, "\n\nMATCHING ENTRIES IN EPMEM %d:\n", epmem->index);
+    print_memory_match(thisAgent,
+                       epmem->content,
+                       thisAgent->epmem_wmetree,
+                       2, al_query, al_negquery,
+                       FALSE);
+    print(thisAgent, "\nNON-MATCHING ENTRIES IN EPMEM %d:\n", epmem->index);
+    print_memory_match(thisAgent,
+                       epmem->content,
+                       thisAgent->epmem_wmetree,
+                       2, al_query, al_negquery,
+                       TRUE);
+
+    /*
+     * Step 5: Cleanup
+     */
+    destroy_arraylist(thisAgent, al_query);
+    destroy_arraylist(thisAgent, al_negquery);
+    
+    
+}//epmem_print_cue_comparison
+
+/* ===================================================================
+   epmem_print_match_diagnostic
+
+   This function will print complete information about the currently
+   retrieved epmem in the given state and how it was retrieved
+   
+   thisAgent - duh
+   state_num - the state number.  For example, if the symbol of the
+               desired state is S76 then this argument should be 76.
+   
+   Created: 15 Nov 2006
+   =================================================================== */
+void epmem_print_match_diagnostic(agent *thisAgent, int state_num)
+{
+    int i;
+    epmem_header *h;
+
+    /*
+     * Step 1:  Find the specified state and verify it has an epmem
+     */
+    //Find the appropriate epmem header
+    h = find_epmem_header_from_id(thisAgent, state_num);
+    if (h == NULL)
+    {
+        print(thisAgent, "\nERROR:  The given state (S%d) does not exist.", state_num);
+        return;
+    }
+
+    if (h->curr_memory == NULL)
+    {
+        print(thisAgent, "\nERROR:  The given state (S%d) has no currently retrieved memory.", state_num);
+        return;
+    }
+
+    print(thisAgent, "\nEPISODIC MATCH DIAGNOSTIC");
+    print(thisAgent, "\n-------------------------");
+    
+    /*
+     * Step 2:  Retrieve the Cue Info
+     */
+    arraylist *al_query;
+    arraylist *al_negquery;
+    tc_number tc;
+    
+    //Create an arraylist representing the current query
+    al_query = make_arraylist(thisAgent, 32);
+    tc = h->query->id.tc_num + 1;
+    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query, al_query, tc);
+
+    //Create an arraylist representing the current negative query
+    al_negquery = make_arraylist(thisAgent, 32);
+    tc = h->negquery->id.tc_num + 1;
+    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery, al_negquery, tc);
+
+    /*
+     * Step 3: Print Metadata Info
+     */
+    print(thisAgent, "\n       Retrieved Epmem: #%d", h->curr_memory->index);
+    print(thisAgent, "\n           Match score:  %f", h->last_match_score);
+    print(thisAgent, "\n              Cue size:  %d", h->last_cue_size);
+    print(thisAgent, "\nNormalized Match Score:  %f",
+          h->last_match_score / (float)h->last_cue_size);
+    print(thisAgent, "\n   Card/Act Bias Ratio:  %f", g_card_act_ratio);
+    print(thisAgent, "\n     Match Cardinality:  %d", h->last_match_size);
+    print(thisAgent, "\n  Cardinality Fraction:  %f",
+          (float)h->last_match_size / (float)h->last_cue_size);
+
+    /*
+     * Step 4: Retrieve and print the next closest matches
+     */
+    arraylist *best_matches;
+    arraylist *best_matches_by_act;
+    arraylist *best_matches_by_card;
+    episodic_memory *epmem;
+    long id;
+    float save_ratio = g_card_act_ratio;
+
+    //Best matches using the current setting
+    best_matches = find_nth_best_matches(thisAgent, h, al_query, al_negquery, 5);
+    print(thisAgent, "\n\nNext 5 best matches: ");
+    for(i = 0; i < best_matches->size; i++)
+    {
+        id = (long)get_arraylist_entry(thisAgent, best_matches, i);
+        epmem = (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                       thisAgent->epmem_memories,
+                                                       id);
+
+        print(thisAgent, "\n              #%ld: score=%f activation=%f cardinality=%d",
+              id, epmem->match_score, epmem->act_total, epmem->num_matches);
+    }
+
+    //Best matches using activation only
+    g_card_act_ratio = (float)0.000001;
+    best_matches_by_act = find_nth_best_matches(thisAgent, h, al_query, al_negquery, 5);
+    print(thisAgent, "\n\nTop 5 memories by activation only: ");
+    for(i = 0; i < best_matches_by_act->size; i++)
+    {
+        id = (long)get_arraylist_entry(thisAgent, best_matches_by_act, i);
+        epmem = (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                       thisAgent->epmem_memories,
+                                                       id);
+
+        print(thisAgent, "\n              #%ld: activation=%f cardinality=%d ",
+              id, epmem->act_total, epmem->num_matches);
+    }
+    
+    //Best matches using cardinality only
+    g_card_act_ratio = (float)1000000.0;
+    best_matches_by_card = find_nth_best_matches(thisAgent, h, al_query, al_negquery, 5);
+    print(thisAgent, "\n\nTop 5 memories by cardinality: ");
+    for(i = 0; i < best_matches_by_card->size; i++)
+    {
+        id = (long)get_arraylist_entry(thisAgent, best_matches_by_card, i);
+        epmem = (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                       thisAgent->epmem_memories,
+                                                       id);
+
+        print(thisAgent, "\n              #%ld: activation=%f cardinality=%d ",
+              id, epmem->act_total, epmem->num_matches);
+    }
+    
+    //reset the global g_card_act_ratio
+    g_card_act_ratio = save_ratio;
+    
+    /*
+     * Step 5:  Print the matching and non-matching parts of the memory
+     */
+    print(thisAgent, "\n\nMATCHING ENTRIES IN EPMEM %d:\n", h->curr_memory->index);
+    print_memory_match(thisAgent,
+                       h->curr_memory->content,
+                       thisAgent->epmem_wmetree,
+                       2, al_query, al_negquery,
+                       FALSE);
+    print(thisAgent, "\nNON-MATCHING ENTRIES IN EPMEM %d:\n", h->curr_memory->index);
+    print_memory_match(thisAgent,
+                       h->curr_memory->content,
+                       thisAgent->epmem_wmetree,
+                       2, al_query, al_negquery,
+                       TRUE);
+
+    /*
+     * Step 6: Cleanup
+     */
+    destroy_arraylist(thisAgent, al_query);
+    destroy_arraylist(thisAgent, al_negquery);
+    
+    
+}//epmem_print_match_diagnostic
+
+/* ===================================================================
+   epmem_print_memory_comparison          *RECURSIVE*
+
+   This function will print a side-by-side comparison of two
+   episodic memories.  It only prints WMEs that are different
+   between the memories.
+   
+   thisAgent - duh
+   epmem1/epmem2 - the memories to print
+   node - the wmetree this memory is drawn from (probably thisAgent->epmem_wmetree)
+   indent - number of space to indent
+   depth - how deep to traverse the tree
+   
+   Created: 07 Dec 2006
+   =================================================================== */
+void epmem_print_memory_comparison(agent *thisAgent,
+                                   arraylist *epmem1, arraylist *epmem2,
+                                   wmetree *node, int indent, int depth)
+{
+    int i;
+    unsigned long hash_value;
+    wmetree *child;
+    actwme *aw1 = NULL;
+    actwme *aw2 = NULL;
+    int bEqual = FALSE;
+    char buf[512];
+    int padLength = 0;
+
+    if (node == NULL) return;
+    if (epmem1 == NULL) return;
+    if (epmem2 == NULL) return;
+    if (indent < 0) indent = 0;
+
+    if (node->parent != NULL) // check for root
+    {
+        int bFound = FALSE;
+        
+        //Find out if this node is in each arraylist
+        for(i = 0; i < epmem1->size; i++)
+        {
+            aw1 = (actwme *)get_arraylist_entry(thisAgent, epmem1, i);
+            if (aw1->node == node)
+            {
+                bFound = TRUE;
+                break;
+            }
+            aw1 = NULL;
+        }
+        
+        for(i = 0; i < epmem2->size; i++)
+        {
+            aw2 = (actwme *)get_arraylist_entry(thisAgent, epmem2, i);
+            if (aw2->node == node)
+            {
+                bFound = TRUE;
+                break;
+            }
+            aw2 = NULL;
+        }
+        
+        if (!bFound) return;
+
+        //Don't print if neither of the memories has a positive activation
+        if (!( ((aw1 != NULL) && (aw1->activation >= 0))
+               || ((aw2 != NULL) && (aw2->activation >= 0)) ))
+        {
+            bEqual = TRUE;
+        }
+
+        //Don't print if both memories have the entry at the same activation
+        //level
+        if ( (aw1 != NULL) && (aw2 != NULL)
+             && (aw1->activation == aw2->activation) )
+        {
+            bEqual = TRUE;
+        }
+
+        //If it's still ok to print the do so.
+        if (!bEqual)
+        {
+            //Print the WME to a buffer
+            buf[0] = '\0';
+            switch(node->val_type)
+            {
+                case SYM_CONSTANT_SYMBOL_TYPE:
+                    sprintf(buf, "%*s+--%s %s", indent, "", node->attr, node->val.strval);
+                    break;
+                case INT_CONSTANT_SYMBOL_TYPE:
+                    sprintf(buf, "%*s+--%s %ld", indent, "", node->attr, node->val.intval);
+                    break;
+                case FLOAT_CONSTANT_SYMBOL_TYPE:
+                    sprintf(buf, "%*s+--%s %f", indent, "", node->attr, node->val.floatval);
+                    break;
+                default:
+                    sprintf(buf, "%*s+--%s", indent, "", node->attr);
+                    break;
+            }//switch
+
+            //Truncate the buffer if necessary
+            if (strlen(buf) >= 33)
+            {
+                buf[33] = '\0';
+            }
+
+            //Calculate the required pad lengths
+            padLength = 38 - strlen(buf);
+            if (aw1 != NULL)
+            {
+                if (aw1->activation > 99)
+                {
+                    padLength -= 3;
+                }
+                else if ((aw1->activation > 9) || (aw1->activation < 0))
+                {
+                    padLength -= 2;
+                }
+                else
+                {
+                    padLength -= 1;
+                }
+            }//if            
+            //Print as necessary w/ activation levels
+            if (aw1 != NULL)
+            {
+                print(thisAgent, "%s(%d)%*s", buf, aw1->activation, padLength, "");
+            }
+            else
+            {
+                print(thisAgent, "                                        ");
+            }
+
+            if (aw2 != NULL)
+            {
+                print(thisAgent, "%s(%d)", buf, aw2->activation);
+            }
+                
+            
+            print(thisAgent, "\n");
+        }//if
+    }//if
+
+    
+    if (depth > 0)
+    {
+        for (hash_value = 0; hash_value < node->children->size; hash_value++)
+        {
+            child = (wmetree *) (*(node->children->buckets + hash_value));
+            for (; child != NIL; child = child->next)
+            {
+                epmem_print_memory_comparison(thisAgent, epmem1, epmem2,
+                                              child, indent+3, depth -1);
+            }
+        }
+    }//if
+    
+}//epmem_print_memory_comparison
+
+/* ===================================================================
+   epmem_print_memory_comparison_by_id
+
+   This function will print a side-by-side comparison of two
+   episodic memories.
+   
+   thisAgent - duh
+   id1/id2 - ids of the memories to print
+   
+   Created: 07 Dec 2006
+   =================================================================== */
+void epmem_print_memory_comparison_by_id(agent *thisAgent, int id1, int id2)
+{
+    episodic_memory *mem1;
+    episodic_memory *mem2;
+    char buf[512];
+
+    //Check for bad IDs
+    if (id1 >= thisAgent->epmem_memories->size)
+    {
+        sprintf(buf, "Invalid memory id (%d).  Pick a number between %d and %d.",
+                id1, 1, thisAgent->epmem_memories->size);
+        print(thisAgent, buf);
+        return;
+    }//if
+    if (id2 >= thisAgent->epmem_memories->size)
+    {
+        sprintf(buf, "Invalid memory id (%d).  Pick a number between %d and %d.",
+                id2, 1, thisAgent->epmem_memories->size);
+        print(thisAgent, buf);
+        return;
+    }//if
+
+
+    //Retrieve the memory contents
+    mem1 = (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                   thisAgent->epmem_memories,
+                                                   id1);
+    mem2 = (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                   thisAgent->epmem_memories,
+                                                   id2);
+
+    //Print the comparison
+    epmem_print_memory_comparison(thisAgent, mem1->content, mem2->content,
+                                  thisAgent->epmem_wmetree, 2, 1000);
+    
+
+}//epmem_print_memory_comparison_by_id
 
 /* ===================================================================
    find_child_node
@@ -1984,6 +2923,7 @@ void record_epmem(agent *thisAgent)
                                                    MISCELLANEOUS_MEM_USAGE);
     new_epmem->last_usage = -1;
     new_epmem->match_score = 0.0;
+    new_epmem->act_total = 0.0;
     new_epmem->num_matches = 0;
 
     //Starting with bottom_goal and moving toward top_goal, add all
@@ -2819,14 +3759,14 @@ int record_cue_element_match(agent *thisAgent,
     
     // card_adjust specifies how much to adjust the match score due to a
     // cardinality match
-    float card_adjust = ((float)card_act_ratio / (float)(negcue_cardinality + poscue_cardinality));
+    float card_adjust = ((float)g_card_act_ratio / (float)(negcue_cardinality + poscue_cardinality));
 
     // act_adjust specifies what to multiply the activation by to get
     // the correct activation adjustment  for the match score
     float act_adjust = 1.0;     // default
-    if (card_act_ratio != 0.0)
+    if (g_card_act_ratio != 0.0)
     {
-        act_adjust = (float)((1.0 / card_act_ratio) / MAX_DECAY);
+        act_adjust = (float)((1.0 / g_card_act_ratio) / MAX_DECAY);
     }
     
     
@@ -2889,6 +3829,7 @@ int record_cue_element_match(agent *thisAgent,
             epmem->last_usage = thisAgent->epmem_last_ret_id;
             comp_count++;
             epmem->match_score = 0.0;
+            epmem->act_total = 0.0;
             if (negcue)  //**See CAVEAT above
             {
                 epmem->num_matches = 0;
@@ -2917,11 +3858,13 @@ int record_cue_element_match(agent *thisAgent,
             {
                 epmem->match_score -= (float)aw_mem->activation * act_adjust;
                 epmem->match_score -=  card_adjust;
+                epmem->act_total -= (float)aw_mem->activation;
             }
             else
             {
                 epmem->match_score += (float)aw_mem->activation * act_adjust;
                 epmem->match_score +=  card_adjust;
+                epmem->act_total += (float)aw_mem->activation;
             }
         }//if
 
@@ -5175,6 +6118,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                 epmem->content = NULL;
                 epmem->last_usage = -1;
                 epmem->match_score = 0.0;
+                epmem->act_total = 0.0;
                 epmem->index = mem_id;
 
                 //Add the structure to the global memories list
@@ -5272,6 +6216,7 @@ int epmem_load_epmems_from_file(agent *thisAgent,
             epmem->content = NULL;
             epmem->last_usage = -1;
             epmem->match_score = 0.0;
+            epmem->act_total = 0.0;
             epmem->index = my_index;
             
             //Add the structure to the global memories list
