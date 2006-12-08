@@ -30,6 +30,7 @@ char const* Commands::kCLIDirs						= "dirs";
 char const* Commands::kCLIEcho						= "echo";
 char const* Commands::kCLIEchoCommands				= "echo-commands";
 char const* Commands::kCLIEditProduction			= "edit-production";
+char const* Commands::kCLIEpmem                     = "epmem";
 char const* Commands::kCLIExcise					= "excise";
 char const* Commands::kCLIExplainBacktraces			= "explain-backtraces";
 char const* Commands::kCLIFiringCounts				= "firing-counts";
