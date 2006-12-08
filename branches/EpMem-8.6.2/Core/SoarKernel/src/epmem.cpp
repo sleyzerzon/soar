@@ -5695,6 +5695,7 @@ void epmem_print_query_usage_wmetree(agent *thisAgent)
 
    Created: 23 Mar 2006
    =================================================================== */
+#define MAX_LIST_LEN 15
 int epmem_save_wmetree_to_file(agent *thisAgent,
                                FILE *f,
                                wmetree *node,
@@ -5704,6 +5705,7 @@ int epmem_save_wmetree_to_file(agent *thisAgent,
     int i;
     unsigned long hash_value;
     wmetree *child;
+    int len;
 
     if (node->attr == NULL)
     {
@@ -5736,6 +5738,7 @@ int epmem_save_wmetree_to_file(agent *thisAgent,
     
         fprintf(f, "%i ", node->depth);
 
+        len = 0;
         fputs("[ ", f);
         if (node->assoc_memories != NULL)
         {
@@ -5744,8 +5747,16 @@ int epmem_save_wmetree_to_file(agent *thisAgent,
                 episodic_memory *epmem =
                     (episodic_memory *)get_arraylist_entry(thisAgent, node->assoc_memories,i);
                 fprintf(f, "%i ", epmem->index);
-            }
-        }
+
+                //Keep a single line from getting too long
+                len++;
+                if (len >= MAX_LIST_LEN)
+                {
+                    fprintf(f, "@\n");
+                    len = 0;
+                }
+            }//for
+        }//if
         fputs("] ", f);
 
         fprintf(f, "%i %i\n", node->query_count, node->ubiquitous);
@@ -5971,7 +5982,7 @@ void epmem_clear_all_memories(agent *thisAgent)
    Created: 23 Mar 2006
    =================================================================== */
 //#define EPMEM_BUFLEN 262143 (this is too big!  why?)
-#define EPMEM_BUFLEN 200000
+#define EPMEM_BUFLEN 210000
 arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                                         FILE *f,
                                         wmetree *root_node,
@@ -6128,6 +6139,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
             //Add the structure to the assoc_memories list
             append_entry_to_arraylist(thisAgent, node->assoc_memories, (void *)epmem);
 
+            //Get the next id
             str = strtok(NULL, " ");
             if (str == NULL)
             {
@@ -6137,6 +6149,26 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                 free(buf);
                 return NULL;
             }
+
+            //Handle end of line token
+            if (str[0] == '@')
+            {
+                fgets(buf, EPMEM_BUFLEN, f);
+                if ( (strlen(buf) == 0)
+                     || ( ((buf[0] < '0') || (buf[0] > '9'))
+                          && (buf[0] != ']') ) )
+                {
+                    print(thisAgent, "ERROR: File improperly formatted.  Expected a node id.  Episode load aborted.");
+                    //%%%Clean up already loaded data here
+                    destroy_arraylist(thisAgent, nodelist);
+                    free(buf);
+                    return NULL;
+                }
+                
+                str = strtok(buf, " ");
+            }//if
+
+            //Get the next id
             mem_id = atoi(str);
         }//while
         
