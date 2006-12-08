@@ -151,8 +151,13 @@ namespace gSKI
 		virtual void SetChunkCount(IAgent* pIAgent, unsigned long count) = 0;
 
 		virtual void SeedRandomNumberGenerator(unsigned long int* pSeed) = 0;
-                virtual void DecayInit(IAgent* pIAgent) = 0;
-                virtual void DecayDeInit(IAgent* pIAgent) = 0;
+          virtual void DecayInit(IAgent* pIAgent) = 0;
+          virtual void DecayDeInit(IAgent* pIAgent) = 0;
+          virtual void EpmemPrintStatus(IAgent* pIAgent) = 0;
+          virtual void EpmemPrintMemory(IAgent* pIAgent, int mem_id) = 0;
+          virtual void EpmemPrintMatchDiagnostic(IAgent* pIAgent, int state_num) = 0;
+          virtual void EpmemCompareMemories(IAgent* pIAgent, int mem1, int mem2) = 0;
+          virtual void EpmemCompareCueToMemory(IAgent* pIAgent, int state_num, int mem) = 0;
 	  };
    }
 }
