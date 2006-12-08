@@ -279,6 +279,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\Cluster.cpp">
+			</File>
+			<File
 				RelativePath=".\src\consistency.cpp">
 				<FileConfiguration
 					Name="Distribution|Win32">
@@ -660,6 +663,12 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\semantic_memory.cpp">
+			</File>
+			<File
+				RelativePath=".\src\smem.cpp">
+			</File>
+			<File
 				RelativePath=".\src\soar_rand.cpp">
 			</File>
 			<File
@@ -787,6 +796,9 @@
 				RelativePath=".\include\chunk.h">
 			</File>
 			<File
+				RelativePath=".\include\Cluster.h">
+			</File>
+			<File
 				RelativePath=".\src\consistency.h">
 			</File>
 			<File
@@ -860,6 +872,12 @@
 			</File>
 			<File
 				RelativePath=".\include\rhsfun_math.h">
+			</File>
+			<File
+				RelativePath=".\include\semantic_memory.h">
+			</File>
+			<File
+				RelativePath=".\include\smem.h">
 			</File>
 			<File
 				RelativePath=".\include\soar_rand.h">
