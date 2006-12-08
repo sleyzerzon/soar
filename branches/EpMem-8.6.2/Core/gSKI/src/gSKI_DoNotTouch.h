@@ -108,6 +108,11 @@ namespace gSKI
         
 		 void DecayInit(IAgent* pIAgent);
 		 void DecayDeInit(IAgent* pIAgent);
+         void EpmemPrintStatus(IAgent* pIAgent);
+         void EpmemPrintMemory(IAgent* pIAgent, int mem_id);
+         void EpmemPrintMatchDiagnostic(IAgent* pIAgent, int state_num);
+         void EpmemCompareMemories(IAgent* pIAgent, int mem1, int mem2);
+         void EpmemCompareCueToMemory(IAgent* pIAgent, int state_num, int mem);
 	  };
    }
 }
