@@ -283,7 +283,6 @@
 						ObjectFile="$(IntDir)/$(InputName)1.obj"
 					/>
 				</FileConfiguration>
-
 			</File>
 			<File
 				RelativePath=".\src\consistency.cpp"
@@ -565,7 +564,7 @@
 					/>
 				</FileConfiguration>
 			</File>
-                        <File
+			<File
 				RelativePath=".\src\reinforcement_learning.cpp"
 				>
 				<FileConfiguration
@@ -670,10 +669,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\symtab.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\smem.cpp"
 				>
 			</File>
@@ -684,22 +679,6 @@
 			<File
 				RelativePath=".\src\symtab.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\src\tempmem.cpp"
@@ -895,11 +874,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\reorder.h"
+				RelativePath=".\include\reinforcement_learning.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\reinforcement_learning.h"
+				RelativePath=".\src\reorder.h"
 				>
 			</File>
 			<File
