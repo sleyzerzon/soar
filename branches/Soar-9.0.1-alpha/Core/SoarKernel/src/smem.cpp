@@ -1741,17 +1741,23 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 
 							
 							set<LME> current_save_chunk;
+							set<LME> architectural_wmes_under_save; // these won't be saved back?
 							bool save_complete = false;
+							bool save_status = false;
 
 							// ^save.status
 							for (wme* w = command_w->value->id.input_wmes; w != NIL; w = w->next){
 								string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
 
-									string value = symbol_constant_to_string(thisAgent, w->value);
-								if(attr == "status" && value == "complete"){
-									save_complete = true;                                              
+								string value = symbol_constant_to_string(thisAgent, w->value);
+								if(attr == "status"){
+									save_status = true;
+									if(value == "complete"){
+										save_complete = true;                                              
+									}
 									continue;
 								}
+								
 							}
 							
 							// ^command.save.data.
@@ -1799,20 +1805,57 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 
 											}
 											
+											// architectural wmes: input_wmes
+											for (wme* w = slot_w->value->id.input_wmes; w != NIL; w = w->next){
+												string id = symbol_constant_to_string(thisAgent, w->id); // ID must be SYM_CONSTANT_SYMBOL_TYPE
+												string attr = symbol_constant_to_string(thisAgent, w->attr); // attr must be SYM_CONSTANT_SYMBOL_TYPE
+												string value = symbol_constant_to_string(thisAgent, w->value);
+												int value_type = w->value->common.symbol_type;
+
+
+												//if(value_type == SYM_CONSTANT_SYMBOL_TYPE){
+												//        value = value.substr(1, value.length()-2); // get rif of quting marks
+												//}
+												if(YJ_debug)
+													print_with_symbols(thisAgent, "\n%y, %y, %y\n", w->id, w->attr, w->value);
+
+												//saved_wmes.insert(LME(id, attr, value, value_type));
+												current_save_chunk.insert(LME(id, attr, value, value_type));
+												//thisAgent->semantic_memory->insert_LME(id,attr,value,value_type);
+
+											}
+
+											
+
 
 									} // If data
 								
 								}
 							}
 
-							if(!save_complete && !current_save_chunk.empty()){
-								saved_wmes.insert(current_save_chunk.begin(), current_save_chunk.end());
-								// command.save.status complete
-								add_input_wme_with_history(thisAgent, command_w->value, 
-									make_sym_constant(thisAgent,"status"), make_sym_constant(thisAgent,"complete"));
+							
+							
 
-
+							
+							if(!save_status){
+								if(!save_complete && !current_save_chunk.empty()){
+									saved_wmes.insert(current_save_chunk.begin(), current_save_chunk.end());
+									// command.save.status complete
+									add_input_wme_with_history(thisAgent, command_w->value, 
+										make_sym_constant(thisAgent,"status"), make_sym_constant(thisAgent,"complete"));
+								}
+								else if(current_save_chunk.empty()){
+									add_input_wme_with_history(thisAgent, command_w->value, 
+										make_sym_constant(thisAgent,"status"), make_sym_constant(thisAgent,"empty-structure"));
+								}
+								else{ // this is impossible now
+									add_input_wme_with_history(thisAgent, command_w->value, 
+										make_sym_constant(thisAgent,"status"), make_sym_constant(thisAgent,"failure"));
+								}
 							}
+
+							
+							// There could be data but no structure
 
 					}
 
