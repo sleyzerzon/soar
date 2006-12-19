@@ -87,7 +87,7 @@ TOKEN:
 	 |<LSQBRACET:   "[">
 	 |<RSQBRACET:   "]">
 	 |<QUOTE:		"\"">
-     |<PRODTYPE:  (":chunk"|":default"|":o-support"|":i-support"|":monitor"|":interrupt")>
+     |<PRODTYPE:  (":chunk"|":default"|":o-support"|":i-support"|":monitor"|":interrupt"|":template")>
 	 // I know the variable looks weird but it does appear to be correct
 	 |<VARIABLE: "<" (["a"-"z","A"-"Z","0"-"9","$","%","&","*","+","-","/",":","=","?","_"])+ ">" >
 	 |<INTEGER_CONST: (["+","-"])? (["0"-"9"])+ >
