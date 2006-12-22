@@ -1338,8 +1338,15 @@ void print_phase (agent* thisAgent, char * s, bool end_of_phase)
 	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Output);
     break;
   case INPUT_ELAB_PHASE:
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Propose);
+	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_InputElab);
     break;
+  case DECISION_ELAB_PHASE:
+	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_DecElab);
+    break;  
+  case APPLICATION_ELAB_PHASE:
+	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_ApplElab);
+    break;
+
   case APPLY_PHASE:
     if (thisAgent->operand2_mode == TRUE)
     {

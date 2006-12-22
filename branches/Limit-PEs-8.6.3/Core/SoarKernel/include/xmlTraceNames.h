@@ -68,6 +68,9 @@ namespace xmlTraceNames
 	// next are new phase names
 	static char const* const kPhaseName_Propose	= "propose" ;
 	static char const* const kPhaseName_Apply  	= "apply" ;
+	static char const* const kPhaseName_InputElab = "input elab" ;
+	static char const* const kPhaseName_DecElab = "decision elab" ;
+	static char const* const kPhaseName_ApplElab = "application elab" ;
 	static char const* const kPhaseName_Unknown	= "unknown" ;
 	static char const* const kPhaseStatus_Begin	= "begin" ;
 	static char const* const kPhaseStatus_End	= "end" ;

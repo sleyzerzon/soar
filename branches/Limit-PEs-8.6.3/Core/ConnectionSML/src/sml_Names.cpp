@@ -109,6 +109,9 @@ char const* const sml_Names::kPhaseName_Output 	= "output" ;
 // next are new phase names
 char const* const sml_Names::kPhaseName_Propose	= "propose" ;
 char const* const sml_Names::kPhaseName_Apply  	= "apply" ;
+char const* const sml_Names::kPhaseName_InputElab = "input elab" ;
+char const* const sml_Names::kPhaseName_DecElab = "decision elab" ;
+char const* const sml_Names::kPhaseName_ApplElab = "application elab" ;
 char const* const sml_Names::kPhaseName_Unknown	= "unknown" ;
 char const* const sml_Names::kPhaseStatus_Begin	= "begin" ;
 char const* const sml_Names::kPhaseStatus_End	= "end" ;

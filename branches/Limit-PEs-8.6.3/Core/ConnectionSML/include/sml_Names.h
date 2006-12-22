@@ -101,6 +101,9 @@ public:
 	static char const* const kPhaseName_Decision ;
 	static char const* const kPhaseName_Output ;
 	static char const* const kPhaseName_Propose ;
+	static char const* const kPhaseName_InputElab ;
+	static char const* const kPhaseName_DecElab ;
+	static char const* const kPhaseName_ApplElab ;
 	static char const* const kPhaseName_Apply ;
 	static char const* const kPhaseName_Unknown;
 	static char const* const kPhaseStatus_Begin ;
