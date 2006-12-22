@@ -174,9 +174,6 @@ typedef struct agent_struct {
   //
   tc_number current_tc_number;
 
-  /////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////
-
   /* Hash tables for alpha memories, and for entries in left & right memories */
   void              * left_ht;
   void              * right_ht;
@@ -314,7 +311,7 @@ typedef struct agent_struct {
 
   /* --- stuff for max-chunks (which is a sysparam) --- */
   unsigned long       chunks_this_d_cycle; /* # chunks built this DC */
-  Bool		    max_chunks_reached;
+  Bool				  max_chunks_reached;
   
   /* --- list of productions whose firings are being traced --- */
   list              * productions_being_traced; 
@@ -708,7 +705,11 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   Bool       did_PE;
   Bool       soar_verbose_flag;
   int        FIRING_TYPE;
-  Symbol     *PE_level;
+  /* KJC 12/06.  New Decision Cycle and PE-only Apply Phase */
+  Symbol			*PE_goal;
+  goal_stack_level	PE_level;
+  bool				PEs_waiting_to_fire;     /* expt'l.  continue old operator if TRUE, 
+											      no impasse generated */
 
   struct ms_change_struct * ms_o_assertions;  /* changes to match set */
   struct ms_change_struct * ms_i_assertions;  /* changes to match set */

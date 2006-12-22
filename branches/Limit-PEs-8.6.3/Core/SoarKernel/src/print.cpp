@@ -1337,7 +1337,7 @@ void print_phase (agent* thisAgent, char * s, bool end_of_phase)
   case OUTPUT_PHASE:
 	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Output);
     break;
-  case PROPOSE_PHASE:
+  case INPUT_ELAB_PHASE:
 	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Propose);
     break;
   case APPLY_PHASE:

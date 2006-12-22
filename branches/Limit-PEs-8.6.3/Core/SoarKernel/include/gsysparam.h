@@ -78,6 +78,14 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define USER_SELECT_RANDOM 2     /* pick one at random */
 #define USER_SELECT_LAST   3     /* choose the last item   AGR 615 */
 
+/* -------------------------------
+      Ways to fire PE's in Apply
+------------------------------- */
+#define PE_SINGLE_WAVE	   0     /* fire only one wave of PEs */
+#define PE_ALLOW_CASCADE   1     /* fire PE's until finished or PE match at higher level */
+#define PE_FIRE_ALL        2     /* Keep firing PE's until no more match, not sure works ok */
+
+
 /* ---------------------------
    And now, the sysparam's
 --------------------------- */
@@ -160,8 +168,11 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 /* KJC 8/06:  generate warning and event if memory usage exceeds this value */
 #define MAX_MEMORY_USAGE_SYSPARAM                35
 
+/* KJC 12/06: control how PE's are fired in Apply */
+#define PE_FIRING_TYPE                           36
+
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  35
+#define HIGHEST_SYSPARAM_NUMBER                  36
 
 /* -----------------------------------------
    Sysparams[] stores the parameters; set_sysparam()

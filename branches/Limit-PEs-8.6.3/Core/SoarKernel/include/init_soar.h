@@ -172,9 +172,11 @@ extern void do_one_top_level_phase (agent* thisAgent);
  */
 
 enum top_level_phase { INPUT_PHASE = 0, 
-		               PROPOSE_PHASE,
+					   INPUT_ELAB_PHASE,
                        DECISION_PHASE,
+					   DECISION_ELAB_PHASE,
 		               APPLY_PHASE,
+					   APPLICATION_ELAB_PHASE,
                        OUTPUT_PHASE, 
                        PREFERENCE_PHASE, 
                        WM_PHASE,

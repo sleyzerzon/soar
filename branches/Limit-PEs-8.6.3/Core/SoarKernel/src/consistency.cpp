@@ -419,7 +419,7 @@ Bool minor_quiescence_at_goal(agent* thisAgent, Symbol *goal) {
  * is found.  Propose cares only about ms_i_assertions & retractions
  */
 
-Symbol * highest_active_goal_propose(agent* thisAgent) {
+Symbol * highest_active_goal_elaborations(agent* thisAgent) {
 
    Symbol *goal;
 
@@ -427,7 +427,7 @@ Symbol * highest_active_goal_propose(agent* thisAgent) {
 
 #ifdef DEBUG_DETERMINE_LEVEL_PHASE      
      /* Debugging only */
-     print(thisAgent, "In highest_active_goal_propose:\n");
+     print(thisAgent, "In highest_active_goal_elaborations:\n");
      if (goal->id.ms_i_assertions) print_assertion(goal->id.ms_i_assertions);
      if (goal->id.ms_retractions)  print_retraction(goal->id.ms_retractions); 
 #endif
@@ -471,8 +471,7 @@ Symbol * highest_active_goal_apply(agent* thisAgent) {
 #endif
 
      /* If there are any active productions at this goal, return the goal */
-     if ((goal->id.ms_i_assertions) || (goal->id.ms_o_assertions)
-	 || (goal->id.ms_retractions)) return goal;
+     if (goal->id.ms_o_assertions) return goal;  // KJC 12/06:  check only PE's
    }
 
    /* This routine should only be called when !quiescence.  However, there is
@@ -562,6 +561,11 @@ void initialize_consistency_calculations_for_new_decision(agent* thisAgent) {
 
   Symbol *goal;
 
+  //// I think we want to do this only when starting a new operator.  So if
+  //// continuing from a previous apply (to fire at a higher level), then 
+  //// we don't want to reset these variables.
+
+
 #ifdef DEBUG_DETERMINE_LEVEL_PHASE
   printf("\nInitialize consistency calculations for new decision.\n"); 
 #endif
@@ -589,43 +593,33 @@ void initialize_consistency_calculations_for_new_decision(agent* thisAgent) {
    goal that fired IE_PRODS in the previous elaboration).  Mini-quiescence is
    followed by a consistency check. */
 
-void determine_highest_active_production_level_in_stack_apply(agent* thisAgent) {
+void determine_highest_active_production_level_in_stack_apply(agent* thisAgent) 
+{
    
    Symbol * goal;
    int level_change_type, diff;
  
    /* KJC 04/05 - moved phase printing to init_soar: do_one_top_level_phase, case APPLY */
 
+   /*  KJC 12/06:  changing APPLY phase to fire only PE_PRODS.  code currently supports the
+    *  choice between firing a single wave of PE prods at highest active level, or firing 
+	*  from the highest level to lower levels until all fired, or until a PE match occurs at
+	*  higher level.  IE prods are done in the Apply_Elaboration_Phase that follows.
+	*  Since no IE prods will fire here, can remove test for mini-Quiescence and consistency
+	*  check, since was done last time IEs fired (in Decision_Elab_Phase).
+	*/
    
    #ifdef DEBUG_DETERMINE_LEVEL_PHASE
    printf("\nDetermining the highest active level in the stack....\n"); 
    #endif
-   
-   if (!any_assertions_or_retractions_ready(thisAgent)) 
-   {
-      /* This is quiescence */
-      #ifdef DEBUG_DETERMINE_LEVEL_PHASE
-      printf("\n(Full) APPLY phase Quiescence has been reached...going to output\n");
-      #endif
-      
-      /* Need to determine if this quiescence is also a minor quiescence,
-      otherwise, an inconsistent decision could get retained here (because
-      the consistency check was never run). (2.008).  Therefore, if
-      in the previous preference phase, IE_PRODS fired, then force a 
-      consistency check over the entire stack (by checking at the
-      bottom goal). */
-      
-      if (minor_quiescence_at_goal(thisAgent, thisAgent->bottom_goal)) 
-      {
-         goal_stack_consistent_through_goal(thisAgent, thisAgent->bottom_goal);
-      }
-      
-      /* regardless of the outcome, we go to the output phase */
-      
-      thisAgent->current_phase = OUTPUT_PHASE;
-      return;
-   } 
-   
+
+   // KJC 12/06:  Apply now fires only PE_PRODS 
+   if (!thisAgent->ms_o_assertions) {
+	   thisAgent->current_phase = APPLICATION_ELAB_PHASE;
+	   initialize_consistency_calculations_for_new_decision(thisAgent);
+	   return;
+   }
+
    /* Not Quiescence */
    
    /* Check for Max ELABORATIONS EXCEEDED */
@@ -634,10 +628,10 @@ void determine_highest_active_production_level_in_stack_apply(agent* thisAgent) 
       (unsigned long) (thisAgent->sysparams[MAX_ELABORATIONS_SYSPARAM])) 
    {
 	   if (thisAgent->sysparams[PRINT_WARNINGS_SYSPARAM]) {
-           print(thisAgent, "\nWarning: reached max-elaborations; proceeding to output phase.");
-		   GenerateWarningXML(thisAgent, "Warning: reached max-elaborations; proceeding to output phase.");
+           print(thisAgent, "\nWarning: reached max-elaborations; proceeding to next phase.");
+		   GenerateWarningXML(thisAgent, "Warning: reached max-elaborations; proceeding to next phase.");
 	   }
-      thisAgent->current_phase = OUTPUT_PHASE;
+      thisAgent->current_phase = APPLICATION_ELAB_PHASE;
       return;
    }
    
@@ -651,6 +645,7 @@ void determine_highest_active_production_level_in_stack_apply(agent* thisAgent) 
       thisAgent->active_level = thisAgent->active_goal->id.level;
    else 
       thisAgent->active_level = 0; /* Necessary for get_next_retraction */
+
    
    #ifdef DEBUG_DETERMINE_LEVEL_PHASE
    printf("\nHighest level of activity is....%d", thisAgent->active_level); 
@@ -681,131 +676,53 @@ void determine_highest_active_production_level_in_stack_apply(agent* thisAgent) 
       print(thisAgent, "\nOnly NIL goal retractions are active");
       #endif
       thisAgent->FIRING_TYPE = IE_PRODS;
-      //thisAgent->current_phase = PREFERENCE_PHASE;
+      thisAgent->current_phase = APPLICATION_ELAB_PHASE;
       break;
       
    case NEW_DECISION:
       #ifdef DEBUG_DETERMINE_LEVEL_PHASE
       print(thisAgent, "\nThis is a new decision....");
       #endif
-      thisAgent->FIRING_TYPE = active_production_type_at_goal(thisAgent->active_goal);
-      /* in APPLY phase, we can test for ONC here, check ms_o_assertions */ 
-      // KJC:  thisAgent->current_phase = PREFERENCE_PHASE;
+      thisAgent->FIRING_TYPE = PE_PRODS;
       break;
       
    case LOWER_LEVEL:
       #ifdef DEBUG_DETERMINE_LEVEL_PHASE
       print(thisAgent, "\nThe level is lower than the previous level....");  
-      #endif
-      /* Is there a minor quiescence at the previous level? */
-      if (minor_quiescence_at_goal(thisAgent, thisAgent->previous_active_goal)) {
-         #ifdef DEBUG_DETERMINE_LEVEL_PHASE
-         printf("\nMinor quiescence at level %d", thisAgent->previous_active_level); 
-         #endif
-         if (!goal_stack_consistent_through_goal(thisAgent, thisAgent->previous_active_goal)) 
-         {
-            thisAgent->current_phase = OUTPUT_PHASE;
-            break;
-         }
-      }
-      
-      /* else: check if return to interrupted level */
-      
-      goal = thisAgent->active_goal;
-      
-      #ifdef DEBUG_DETERMINE_LEVEL_PHASE
-      if (goal->id.saved_firing_type == IE_PRODS)
-         print(thisAgent, "\nSaved production type: IE _PRODS");
-      if (goal->id.saved_firing_type == PE_PRODS)
-         print(thisAgent, "\nSaved production type: PE _PRODS");
-      if (goal->id.saved_firing_type == NO_SAVED_PRODS)
-         print(thisAgent, "\nSaved production type: NONE");
-      #endif
-      
-      if (goal->id.saved_firing_type != NO_SAVED_PRODS) {
-         #ifdef DEBUG_DETERMINE_LEVEL_PHASE
-         print(thisAgent, "\nRestoring production type from previous processing at this level"); 
-         #endif
-         thisAgent->FIRING_TYPE = goal->id.saved_firing_type;     
-		 // KJC 04.05 commented the next line after reworking the phases in init_soar.cpp
-         // thisAgent->current_phase = DETERMINE_LEVEL_PHASE;
-		 // Reluctant to make this a recursive call, but somehow we need to go thru
-		 // and determine which level we should start with now that we've
-		 // returned from a lower level (solved a subgoal or changed the conditions).
-		 // We could return a flag instead and test it everytime thru loop in APPLY.
-         determine_highest_active_production_level_in_stack_apply(thisAgent);
-		 
-         break;
-      }
-      
-      /* else: just do a preference phase */
-      thisAgent->FIRING_TYPE = active_production_type_at_goal(thisAgent->active_goal);
-      //KJC: thisAgent->current_phase = PREFERENCE_PHASE;
+      #endif   
+      goal = thisAgent->active_goal;                
+      thisAgent->FIRING_TYPE = PE_PRODS;
       break;
       
    case SAME_LEVEL:
       #ifdef DEBUG_DETERMINE_LEVEL_PHASE
       print(thisAgent, "\nThe level is the same as the previous level...."); 
       #endif
-      if (minor_quiescence_at_goal(thisAgent, thisAgent->active_goal)) {
-         #ifdef DEBUG_DETERMINE_LEVEL_PHASE
-         printf("\nMinor quiescence at level %d", thisAgent->active_level); 
-         #endif
-         if (!goal_stack_consistent_through_goal(thisAgent, thisAgent->active_goal)) {
-            thisAgent->current_phase = OUTPUT_PHASE;
-            break;
-         } 
-      }
-      thisAgent->FIRING_TYPE = active_production_type_at_goal(thisAgent->active_goal);
-      //thisAgent->current_phase = PREFERENCE_PHASE;
+      thisAgent->FIRING_TYPE = PE_PRODS;
       break;
       
    case HIGHER_LEVEL:
       #ifdef DEBUG_DETERMINE_LEVEL_PHASE
       print(thisAgent, "\nThe level is higher than the previous level...."); 
-      #endif
-      
+      #endif     
       goal = thisAgent->previous_active_goal;
       goal->id.saved_firing_type = thisAgent->FIRING_TYPE;
-      
-      #ifdef DEBUG_DETERMINE_LEVEL_PHASE       
-      if (goal->id.saved_firing_type == IE_PRODS)
-         print(thisAgent, "\n Saving current firing type as IE_PRODS");
-      else if (goal->id.saved_firing_type == PE_PRODS)
-         print(thisAgent, "\n Saving current firing type as PE_PRODS");
-      else if (goal->id.saved_firing_type == NO_SAVED_PRODS)
-         print(thisAgent, "\n Saving current firing type as NO_SAVED_PRODS");
-      else
-         print(thisAgent, "\n Unknown SAVED firing type???????");
-      #endif
-      
-      /* run consistency check at new active level *before* firing any
-         productions there */
-      
-      #ifdef DEBUG_DETERMINE_LEVEL_PHASE       
-      printf("\nMinor quiescence at level %d", thisAgent->active_level);
-      #endif
-      if (!goal_stack_consistent_through_goal(thisAgent, thisAgent->active_goal)) 
-      {
-         thisAgent->current_phase = OUTPUT_PHASE;
-         break;
-      }
-      
-      /* If the decision is consistent, then just start processing at this level */
-      thisAgent->FIRING_TYPE = active_production_type_at_goal(thisAgent->active_goal);
-      //thisAgent->current_phase = PREFERENCE_PHASE;
-      break;
+      // in this version, where we are limiting PE firings, 
+	  // only fire PEs if at same or lower level, otherwise have to wait a dc.
+      thisAgent->FIRING_TYPE = IE_PRODS;
+	  // unless allowing all PEs to fire anywhere, if HIGHER_LEVEL, must wait for next decision
+      if (thisAgent->sysparams[PE_FIRING_TYPE] != PE_FIRE_ALL) thisAgent->current_phase = APPLICATION_ELAB_PHASE;
+	  break;
    }
-   
 }
 /* REW: end   05.05.97 */
 
 /* KJC: begin 10.04.98 */ /* swiped from REW's determine_highest_active... */
 /* ---------------------------------------------------------------------- */
 
-   /* determine_highest_active_production_level_in_stack_propose()
+   /* determine_highest_active_production_level_in_stack_elaborations()
 
-   This routine is called from the Propose Phase 
+   This routine is called from the various Elaboration Phase s
    under the new reordering of the Decision Cycle.
    In the Waterfall version of Soar, the this routine makes the
    determination of what goal level is active in the stack.  Activity
@@ -816,19 +733,17 @@ void determine_highest_active_production_level_in_stack_apply(agent* thisAgent) 
    goal that fired IE_PRODS in the previous elaboration).  Mini-quiescence is
    followed by a consistency check. */
 
-   /* This routine could be further pruned, since with 8.6.0 we have a
-      PROPOSE Phase, and don't have to keep toggling IE_PRODS
-	  KJC  april 2005 */
-
-void determine_highest_active_production_level_in_stack_propose(agent* thisAgent) {
+void determine_highest_active_production_level_in_stack_elaborations(agent* thisAgent) {
    
+	/*  Changes made to support three separate elaboration phases: one following INPUT,
+	 *  one following DECISION, and one following APPLICATION
+	 *  December 2006  KJ Coulter
+	 */
    Symbol * goal;
    int level_change_type, diff;
    
-   /* KJC 04/05 - moved phase printing to init_soar: do_one_top_level_phase, case APPLY */
-   
    #ifdef DEBUG_DETERMINE_LEVEL_PHASE
-   printf("\n(Propose) Determining the highest active level in the stack....\n"); 
+   printf("\n(elaborations) Determining the highest active level in the stack....\n"); 
    #endif
    
    // KJC 01.24.06  Changed logic for testing for IE prods.  Was incorrectly 
@@ -836,7 +751,7 @@ void determine_highest_active_production_level_in_stack_propose(agent* thisAgent
    // code change required #define, but it was never defined.
 
    /* We are only checking for i_assertions, not o_assertions, since we don't
-    *  want operators to fire in the proposal phase
+    *  want operators to fire in the elaboration phase
     */
     if (!(thisAgent->ms_retractions || thisAgent->ms_i_assertions)) 
 	{     
@@ -845,16 +760,25 @@ void determine_highest_active_production_level_in_stack_propose(agent* thisAgent
  
 			/* This is minor quiescence */
 #ifdef DEBUG_DETERMINE_LEVEL_PHASE
-			printf("\n Propose Phase Quiescence has been reached...going to decision\n");
+			printf("\n Elaboration Phase Quiescence has been reached...going to decision\n");
 #endif
 			
 			/* Force a consistency check over the entire stack (by checking at
 			the bottom goal). */
 			goal_stack_consistent_through_goal(thisAgent, thisAgent->bottom_goal);
 
-			/* Decision phase is always next */
-
-			thisAgent->current_phase = DECISION_PHASE;
+			switch (thisAgent->current_phase)
+			{
+			case INPUT_ELAB_PHASE:		
+				thisAgent->current_phase = DECISION_PHASE;
+				break;
+			case DECISION_ELAB_PHASE:
+				thisAgent->current_phase = APPLY_PHASE;
+				break;
+			case APPLICATION_ELAB_PHASE:
+				thisAgent->current_phase = OUTPUT_PHASE;
+				break;
+			}
 			return;
 		}
 	}
@@ -866,11 +790,23 @@ void determine_highest_active_production_level_in_stack_propose(agent* thisAgent
    if (thisAgent->e_cycles_this_d_cycle >= 
       (unsigned long) (thisAgent->sysparams[MAX_ELABORATIONS_SYSPARAM])) {
 		  if (thisAgent->sysparams[PRINT_WARNINGS_SYSPARAM]) {
-              print(thisAgent, "\nWarning: reached max-elaborations; proceeding to decision phase.");
-			  GenerateWarningXML(thisAgent, "Warning: reached max-elaborations; proceeding to decision phase.");
+              print(thisAgent, "\nWarning: reached max-elaborations; proceeding to next phase.");
+			  GenerateWarningXML(thisAgent, "Warning: reached max-elaborations; proceeding to next phase.");
 		  }
-      thisAgent->current_phase = DECISION_PHASE;
-      return;
+	
+		  switch (thisAgent->current_phase)
+		  {
+			case INPUT_ELAB_PHASE:		
+				thisAgent->current_phase = DECISION_PHASE;
+				break;
+			case DECISION_ELAB_PHASE:
+				thisAgent->current_phase = APPLY_PHASE;
+				break;
+			case APPLICATION_ELAB_PHASE:
+				thisAgent->current_phase = OUTPUT_PHASE;
+				break;
+		  }
+	      return;
    }
    
    /* not Max Elaborations */
@@ -879,9 +815,12 @@ void determine_highest_active_production_level_in_stack_propose(agent* thisAgent
       goal is NIL) */
    thisAgent->previous_active_goal = thisAgent->active_goal;
    thisAgent->previous_active_level = thisAgent->active_level;
+
+   thisAgent->FIRING_TYPE = IE_PRODS;  /* always the case for elaborations */
+
    
    /* Determine the new highest level of activity */
-   thisAgent->active_goal = highest_active_goal_propose(thisAgent);
+   thisAgent->active_goal = highest_active_goal_elaborations(thisAgent);
    if (thisAgent->active_goal)
       thisAgent->active_level = thisAgent->active_goal->id.level;
    else 
@@ -912,16 +851,12 @@ void determine_highest_active_production_level_in_stack_propose(agent* thisAgent
       #ifdef DEBUG_DETERMINE_LEVEL_PHASE
       print(thisAgent, "\nOnly NIL goal retractions are active");
       #endif
-      thisAgent->FIRING_TYPE = IE_PRODS;
-      //thisAgent->current_phase = PREFERENCE_PHASE;
       break;
       
    case NEW_DECISION:
       #ifdef DEBUG_DETERMINE_LEVEL_PHASE
       print(thisAgent, "\nThis is a new decision....");
       #endif
-      thisAgent->FIRING_TYPE = IE_PRODS;
-      //thisAgent->current_phase = PREFERENCE_PHASE;
       break;
       
    case LOWER_LEVEL:
@@ -931,20 +866,27 @@ void determine_highest_active_production_level_in_stack_propose(agent* thisAgent
       /* There is always a minor quiescence at the previous level
          in the propose phase, so check for consistency. */
       if (!goal_stack_consistent_through_goal(thisAgent, thisAgent->previous_active_goal)) {
-         thisAgent->current_phase = DECISION_PHASE;
-         break;
+			switch (thisAgent->current_phase)
+			{
+			case INPUT_ELAB_PHASE:		
+				thisAgent->current_phase = DECISION_PHASE;
+				break;
+			case DECISION_ELAB_PHASE:
+				thisAgent->current_phase = APPLY_PHASE;
+				break;
+			case APPLICATION_ELAB_PHASE:
+				thisAgent->current_phase = OUTPUT_PHASE;
+				break;
+			}
+			break;
       }
-      /* else: just do a preference phase */
-      thisAgent->FIRING_TYPE = IE_PRODS;
-      // thisAgent->current_phase = PREFERENCE_PHASE;
+      /* else: just do an elaboration phase */
       break;
       
    case SAME_LEVEL:
       #ifdef DEBUG_DETERMINE_LEVEL_PHASE
       print(thisAgent, "\nThe level is the same as the previous level...."); 
       #endif
-      thisAgent->FIRING_TYPE = IE_PRODS;
-      // thisAgent->current_phase = PREFERENCE_PHASE;
       break;
       
    case HIGHER_LEVEL:
@@ -973,15 +915,23 @@ void determine_highest_active_production_level_in_stack_propose(agent* thisAgent
       printf("\nMinor quiescence at level %d", thisAgent->active_level);
       #endif
       if (!goal_stack_consistent_through_goal(thisAgent, thisAgent->active_goal)) {
-         thisAgent->current_phase = DECISION_PHASE;
-         break;
+			switch (thisAgent->current_phase)
+			{
+			case INPUT_ELAB_PHASE:		
+				thisAgent->current_phase = DECISION_PHASE;
+				break;
+			case DECISION_ELAB_PHASE:
+				thisAgent->current_phase = APPLY_PHASE;
+				break;
+			case APPLICATION_ELAB_PHASE:
+				thisAgent->current_phase = OUTPUT_PHASE;
+				break;
+			}         break;
       }
       
       /* If the decision is consistent, then just keep processing
          at this level */
       
-      thisAgent->FIRING_TYPE = IE_PRODS;
-      // thisAgent->current_phase = PREFERENCE_PHASE;
       break;
    }
       

@@ -230,7 +230,7 @@ public class PhaseView extends AbstractFixedView implements Kernel.AgentEventInt
 				
 		if (phase == smlPhase.sml_INPUT_PHASE)
 			{ x = 31 ; y = 50 ;  }
-		if (phase == smlPhase.sml_PROPOSAL_PHASE)
+		if (phase == smlPhase.sml_INPUT_ELAB_PHASE)
 			{ x += 36 * 0 ; }
 		if (phase == smlPhase.sml_DECISION_PHASE)
 			{ x += 36 * 1 ; }

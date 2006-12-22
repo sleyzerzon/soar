@@ -75,16 +75,20 @@ typedef enum {
   /*  inline tests depend on this ordering... */
     smlEVENT_BEFORE_PHASE_EXECUTED,
     smlEVENT_BEFORE_INPUT_PHASE,
-    smlEVENT_BEFORE_PROPOSE_PHASE,
+    smlEVENT_BEFORE_INPUT_ELAB_PHASE,
     smlEVENT_BEFORE_DECISION_PHASE,
+    smlEVENT_BEFORE_DECISION_ELAB_PHASE,
     smlEVENT_BEFORE_APPLY_PHASE,
+    smlEVENT_BEFORE_APPLICATION_ELAB_PHASE,
     smlEVENT_BEFORE_OUTPUT_PHASE,
     smlEVENT_BEFORE_PREFERENCE_PHASE,	// Soar-7 mode only
     smlEVENT_BEFORE_WM_PHASE,			// Soar-7 mode only
 	smlEVENT_AFTER_INPUT_PHASE,
-    smlEVENT_AFTER_PROPOSE_PHASE,
+    smlEVENT_AFTER_INPUT_ELAB_PHASE,
     smlEVENT_AFTER_DECISION_PHASE,
+    smlEVENT_AFTER_DECISION_ELAB_PHASE,
     smlEVENT_AFTER_APPLY_PHASE,
+    smlEVENT_AFTER_APPLICATION_ELAB_PHASE,
     smlEVENT_AFTER_OUTPUT_PHASE,
     smlEVENT_AFTER_PREFERENCE_PHASE,	// Soar-7 mode only
     smlEVENT_AFTER_WM_PHASE,			// Soar-7 mode only
@@ -242,9 +246,11 @@ static inline bool IsUpdateEventID(int id)
 
 typedef enum {
     sml_INPUT_PHASE,		// NOTE: This enum MUST be kept in synch with egSKIPhaseType defined in gSKI_Enumerations.h
-    sml_PROPOSAL_PHASE,
+    sml_INPUT_ELAB_PHASE,
     sml_DECISION_PHASE,
+	sml_DECISION_ELAB_PHASE,
     sml_APPLY_PHASE,
+	sml_APPLICATION_ELAB_PHASE,
     sml_OUTPUT_PHASE,
 	sml_PREFERENCE_PHASE,	// Soar 7 mode only
 	sml_WM_PHASE			// Soar 7 mode only

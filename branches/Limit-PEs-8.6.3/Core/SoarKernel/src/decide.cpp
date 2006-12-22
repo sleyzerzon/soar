@@ -2530,7 +2530,13 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
    * this doesn't matter) --- */
    if (impasse_type == NO_CHANGE_IMPASSE_TYPE) 
    {
-      if (s->wmes) 
+	   if (thisAgent->PEs_waiting_to_fire && (goal == thisAgent->PE_goal)) {
+		   // the operator from the previous decision is continuing, not an impasse
+		   for(temp = candidates; temp; temp = temp->next_candidate)
+			   preference_remove_ref(thisAgent, temp);  // guessing that we need to do this...
+		   return TRUE;
+	   }
+	  if (s->wmes) 
       {
          attribute_of_impasse = s->attr;
       } 
@@ -2794,11 +2800,24 @@ void print_lowest_slot_in_context_stack (agent* thisAgent) {
    */
   /* REW: end   10.24.97 */
 
-  if (thisAgent->bottom_goal->id.operator_slot->wmes)
-    print_stack_trace (thisAgent, thisAgent->bottom_goal->id.operator_slot->wmes->value,
+	if (thisAgent->bottom_goal->id.operator_slot->wmes) {
+		if (thisAgent->PEs_waiting_to_fire && (thisAgent->PE_goal == thisAgent->bottom_goal)) {
+			// don't print the operator again: it wasn't reselected, just "stretched"
+			// trace_format would be something like: (thisAgent, "%right[6,%dc]: %rsd[   ]  %[O: %co%]");
+			add_trace_format (thisAgent, TRUE, FOR_OPERATORS_TF, NIL,
+				"%right[6,%dc]: %rsd[   ]   O: %co  ...CONTINUING");
+			// this should be the  goal at the level of PE firing
+			//  maybe thisAgent->active_goal->id.operator_slot->wmes->value
+			print_stack_trace (thisAgent, thisAgent->bottom_goal->id.operator_slot->wmes->value,
+				thisAgent->bottom_goal, FOR_OPERATORS_TF, TRUE);
+			// reset it to the standard format for operators
+			add_trace_format (thisAgent, TRUE, FOR_OPERATORS_TF, NIL,
+				"%right[6,%dc]: %rsd[   ]   O: %co");
+		} else {
+			print_stack_trace (thisAgent, thisAgent->bottom_goal->id.operator_slot->wmes->value,
                        thisAgent->bottom_goal, FOR_OPERATORS_TF, TRUE);
-
-
+		}
+	}
   /* RCHONG: begin 10.11 */
   /*
   this coded is needed just so that when an ONC is created in OPERAND

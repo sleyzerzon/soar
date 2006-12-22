@@ -244,9 +244,11 @@ namespace gSKI
 	 // the gSKI event handler has to increment counters on these events.
 	 this->AddRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
-	 this->AddRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
+	 this->AddRunListener(gSKIEVENT_AFTER_INPUT_ELAB_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_DECISION_PHASE, this) ;
+	 this->AddRunListener(gSKIEVENT_AFTER_DECISION_ELAB_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this) ;
+	 this->AddRunListener(gSKIEVENT_AFTER_APPLICATION_ELAB_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
 	 this->AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only     
@@ -282,9 +284,11 @@ namespace gSKI
 	   //remove the RunListeners we created for the counters
 	   this->RemoveRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
-	   this->RemoveRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
+	   this->RemoveRunListener(gSKIEVENT_AFTER_INPUT_ELAB_PHASE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_DECISION_PHASE, this) ;
+	   this->RemoveRunListener(gSKIEVENT_AFTER_DECISION_ELAB_PHASE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this) ;
+	   this->RemoveRunListener(gSKIEVENT_AFTER_APPLICATION_ELAB_PHASE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
 	   this->RemoveRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only

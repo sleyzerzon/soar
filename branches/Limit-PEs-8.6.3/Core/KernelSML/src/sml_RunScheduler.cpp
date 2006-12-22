@@ -33,7 +33,7 @@ RunScheduler::RunScheduler(KernelSML* pKernelSML)
 	m_pKernelSML = pKernelSML ;
 	m_RunFlags = sml_NONE ;
 	m_IsRunning = false ;
-	m_StopBeforePhase = gSKI_APPLY_PHASE ;
+	m_StopBeforePhase = gSKI_DECISION_ELAB_PHASE ;
 }
 
 /*************************************************************

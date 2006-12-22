@@ -63,16 +63,20 @@
 	  /*  tests for phase events depends on this ordering */
       gSKIEVENT_BEFORE_PHASE_EXECUTED,
       gSKIEVENT_BEFORE_INPUT_PHASE,
-      gSKIEVENT_BEFORE_PROPOSE_PHASE,
+      gSKIEVENT_BEFORE_INPUT_ELAB_PHASE,
       gSKIEVENT_BEFORE_DECISION_PHASE,
+      gSKIEVENT_BEFORE_DECISION_ELAB_PHASE,
       gSKIEVENT_BEFORE_APPLY_PHASE,
+      gSKIEVENT_BEFORE_APPLICATION_ELAB_PHASE,
       gSKIEVENT_BEFORE_OUTPUT_PHASE,
       gSKIEVENT_BEFORE_PREFERENCE_PHASE,	// Soar-7 mode only
       gSKIEVENT_BEFORE_WM_PHASE,			// Soar-7 mode only
       gSKIEVENT_AFTER_INPUT_PHASE,
-      gSKIEVENT_AFTER_PROPOSE_PHASE,
+      gSKIEVENT_AFTER_INPUT_ELAB_PHASE,
       gSKIEVENT_AFTER_DECISION_PHASE,
+      gSKIEVENT_AFTER_DECISION_ELAB_PHASE,
       gSKIEVENT_AFTER_APPLY_PHASE,
+      gSKIEVENT_AFTER_APPLICATION_ELAB_PHASE,
       gSKIEVENT_AFTER_OUTPUT_PHASE,
       gSKIEVENT_AFTER_PREFERENCE_PHASE,		// Soar-7 mode only
       gSKIEVENT_AFTER_WM_PHASE,				// Soar-7 mode only
@@ -434,15 +438,17 @@
    *       of the agent's commands.
    */
    typedef enum {
-      gSKI_INPUT_PHASE,			// NOTE: This enum MUST be kept in synch with smlPhase defined in sml_ClientEvents.h
-      gSKI_PROPOSAL_PHASE,
+      gSKI_INPUT_PHASE,			// NOTE: This enum MUST be kept in synch with smlPhase defined in sml_Events.h
+      gSKI_INPUT_ELAB_PHASE,
       gSKI_DECISION_PHASE,
+	  gSKI_DECISION_ELAB_PHASE,
       gSKI_APPLY_PHASE,
+	  gSKI_APPLICATION_ELAB_PHASE,
       gSKI_OUTPUT_PHASE,
 	  gSKI_PREFERENCE_PHASE,	// Soar 7 mode only
 	  gSKI_WM_PHASE,			// Soar 7 mode only
    } egSKIPhaseType;
-
+ 
    /**
    * @brief Agent run step definitions.
    *

@@ -77,12 +77,12 @@ extern void print_assertion(ms_change *msc);
 extern void print_retraction(ms_change *msc);
 void initialize_consistency_calculations_for_new_decision(agent* thisAgent);
 void determine_highest_active_production_level_in_stack_apply(agent* thisAgent);
-void determine_highest_active_production_level_in_stack_propose(agent* thisAgent);
+void determine_highest_active_production_level_in_stack_elaborations(agent* thisAgent);
 Bool goal_stack_consistent_through_goal(agent* thisAgent, Symbol *goal);
 Bool i_activity_at_goal(Symbol *goal);
 Bool minor_quiescence_at_goal(agent* thisAgent, Symbol *goal);
 int active_production_type_at_goal(Symbol *goal);
-Symbol * highest_active_goal_propose();
+Symbol * highest_active_goal_elaborations();
 Symbol * highest_active_goal_apply(agent* thisAgent);
 /* REW: end   08.20.97 */
 

@@ -326,17 +326,21 @@ NamedEventDataList* CreateRunEventData() {
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_PHASE_EXECUTED, "smlEVENT_BEFORE_PHASE_EXECUTED"));
 
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_INPUT_PHASE, "smlEVENT_BEFORE_INPUT_PHASE"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_PROPOSE_PHASE, "smlEVENT_BEFORE_PROPOSE_PHASE"));
+	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_INPUT_ELAB_PHASE, "smlEVENT_BEFORE_INPUT_ELAB_PHASE"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_DECISION_PHASE, "smlEVENT_BEFORE_DECISION_PHASE"));
+	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_DECISION_ELAB_PHASE, "smlEVENT_BEFORE_DECISION_ELAB_PHASE"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_APPLY_PHASE, "smlEVENT_BEFORE_APPLY_PHASE"));
+	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_APPLICATION_ELAB_PHASE, "smlEVENT_BEFORE_APPLICATION_ELAB_PHASE"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_OUTPUT_PHASE, "smlEVENT_BEFORE_OUTPUT_PHASE"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_PREFERENCE_PHASE, "smlEVENT_BEFORE_PREFERENCE_PHASE"));// Soar-7 mode only
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_WM_PHASE, "smlEVENT_BEFORE_WM_PHASE"));// Soar-7 mode only
 
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_INPUT_PHASE, "smlEVENT_AFTER_INPUT_PHASE")); 
-	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_PROPOSE_PHASE, "smlEVENT_AFTER_PROPOSE_PHASE")); 
+	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_INPUT_ELAB_PHASE, "smlEVENT_AFTER_INPUT_ELAB_PHASE")); 
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_DECISION_PHASE, "smlEVENT_AFTER_DECISION_PHASE")); 
+	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_DECISION_ELAB_PHASE, "smlEVENT_AFTER_DECISION_ELAB_PHASE")); 
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_APPLY_PHASE, "smlEVENT_AFTER_APPLY_PHASE"));
+	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_APPLICATION_ELAB_PHASE, "smlEVENT_AFTER_APPLICATION_ELAB_PHASE")); 
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_OUTPUT_PHASE, "smlEVENT_AFTER_OUTPUT_PHASE")); 
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_PREFERENCE_PHASE, "smlEVENT_AFTER_PREFERENCE_PHASE"));// Soar-7 mode only
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_WM_PHASE, "smlEVENT_AFTER_WM_PHASE"));// Soar-7 mode only

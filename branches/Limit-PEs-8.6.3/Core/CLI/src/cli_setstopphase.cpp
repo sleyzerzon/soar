@@ -55,7 +55,7 @@ bool CommandLineInterface::ParseSetStopPhase(gSKI::Agent* pAgent, std::vector<st
 				countPhaseArgs++ ;
 				break;
 			case 'p':
-				phase = gSKI_PROPOSAL_PHASE ;
+				phase = gSKI_INPUT_ELAB_PHASE ;
 				countPhaseArgs++ ;
 				break;
 			case 'd':
@@ -114,9 +114,11 @@ bool CommandLineInterface::DoSetStopPhase(bool setPhase, bool before, egSKIPhase
 	switch (stopPhase)
 	{
 	case gSKI_INPUT_PHASE:    phaseStr = "input phase" ; break ;
-	case gSKI_PROPOSAL_PHASE: phaseStr = "proposal phase" ; break ;
+	case gSKI_INPUT_ELAB_PHASE: phaseStr = "input elaboration phase" ; break ;
 	case gSKI_DECISION_PHASE: phaseStr = "decision phase" ; break ;
+	case gSKI_DECISION_ELAB_PHASE: phaseStr = "decision elaboration phase" ; break ;
 	case gSKI_APPLY_PHASE:    phaseStr = "apply phase" ; break ;
+	case gSKI_APPLICATION_ELAB_PHASE: phaseStr = "application elaboration phase" ; break ;
 	case gSKI_OUTPUT_PHASE:   phaseStr = "output phase" ; break ;
 	default:                  phaseStr = "unknown phase" ; break ;
 	}

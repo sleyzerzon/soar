@@ -62,8 +62,12 @@ char * soar_callback_names[] = {    /* Must match order of       */
   "after-output-phase",
   "before-decision-phase-cycle",
   "after-decision-phase-cycle",
-  "before-propose-phase-cycle",
-  "after-propose-phase-cycle",
+  "before-input-elab-phase-cycle",
+  "after-input-elab-phase-cycle",
+  "before-decision-elab-phase-cycle",
+  "after-decision-elab-phase-cycle",
+  "before-application-elab-phase-cycle",
+  "after-application-elab-phase-cycle",
   "before-apply-phase-cycle",
   "after-apply-phase-cycle",
   "wm-changes",
@@ -264,9 +268,13 @@ void soar_invoke_callbacks (agent* thisAgent,
   case BEFORE_DECISION_PHASE_CALLBACK:
   case AFTER_DECISION_PHASE_CALLBACK:
     /* for above two: thisAgent->current_phase = DECISION_PHASE */
-  case BEFORE_PROPOSE_PHASE_CALLBACK:
-  case AFTER_PROPOSE_PHASE_CALLBACK:
-    /* for above two: thisAgent->current_phase = PROPOSE_PHASE  soar8 only */
+  case BEFORE_INPUT_ELAB_PHASE_CALLBACK:
+  case AFTER_INPUT_ELAB_PHASE_CALLBACK:
+  case BEFORE_DECISION_ELAB_PHASE_CALLBACK:
+  case AFTER_DECISION_ELAB_PHASE_CALLBACK:
+  case BEFORE_APPLICATION_ELAB_PHASE_CALLBACK:
+  case AFTER_APPLICATION_ELAB_PHASE_CALLBACK:
+    /*  above phases are soar 8.7 and later */
   case BEFORE_APPLY_PHASE_CALLBACK:
   case AFTER_APPLY_PHASE_CALLBACK:
     /* for above two: thisAgent->current_phase = APPLY_PHASE soar8 only */
@@ -318,8 +326,12 @@ void soar_invoke_callbacks (agent* thisAgent,
   case AFTER_WM_PHASE_CALLBACK:
   case BEFORE_DECISION_PHASE_CALLBACK:
   case AFTER_DECISION_PHASE_CALLBACK:
-  case BEFORE_PROPOSE_PHASE_CALLBACK:
-  case AFTER_PROPOSE_PHASE_CALLBACK:
+  case BEFORE_INPUT_ELAB_PHASE_CALLBACK:
+  case AFTER_INPUT_ELAB_PHASE_CALLBACK:
+  case BEFORE_DECISION_ELAB_PHASE_CALLBACK:
+  case AFTER_DECISION_ELAB_PHASE_CALLBACK:
+  case BEFORE_APPLICATION_ELAB_PHASE_CALLBACK:
+  case AFTER_APPLICATION_ELAB_PHASE_CALLBACK:
   case BEFORE_APPLY_PHASE_CALLBACK:
   case AFTER_APPLY_PHASE_CALLBACK:
   case AFTER_DECISION_CYCLE_CALLBACK:
@@ -376,9 +388,13 @@ void soar_invoke_first_callback (agent* thisAgent,
   case BEFORE_DECISION_PHASE_CALLBACK:
   case AFTER_DECISION_PHASE_CALLBACK:
     /* for above two: thisAgent->current_phase = DECISION_PHASE */
-  case BEFORE_PROPOSE_PHASE_CALLBACK:
-  case AFTER_PROPOSE_PHASE_CALLBACK:
-    /* for above two: thisAgent->current_phase = PROPOSE_PHASE  soar8 only */
+  case BEFORE_INPUT_ELAB_PHASE_CALLBACK:
+  case AFTER_INPUT_ELAB_PHASE_CALLBACK:
+  case BEFORE_DECISION_ELAB_PHASE_CALLBACK:
+  case AFTER_DECISION_ELAB_PHASE_CALLBACK:
+  case BEFORE_APPLICATION_ELAB_PHASE_CALLBACK:
+  case AFTER_APPLICATION_ELAB_PHASE_CALLBACK:
+    /*  above phases are soar 8.7 and later */
   case BEFORE_APPLY_PHASE_CALLBACK:
   case AFTER_APPLY_PHASE_CALLBACK:
     /* for above two: thisAgent->current_phase = APPLY_PHASE soar8 only */
@@ -424,8 +440,12 @@ void soar_invoke_first_callback (agent* thisAgent,
   case AFTER_WM_PHASE_CALLBACK:
   case BEFORE_DECISION_PHASE_CALLBACK:
   case AFTER_DECISION_PHASE_CALLBACK:
-  case BEFORE_PROPOSE_PHASE_CALLBACK:
-  case AFTER_PROPOSE_PHASE_CALLBACK:
+  case BEFORE_INPUT_ELAB_PHASE_CALLBACK:
+  case AFTER_INPUT_ELAB_PHASE_CALLBACK:
+  case BEFORE_DECISION_ELAB_PHASE_CALLBACK:
+  case AFTER_DECISION_ELAB_PHASE_CALLBACK:
+  case BEFORE_APPLICATION_ELAB_PHASE_CALLBACK:
+  case AFTER_APPLICATION_ELAB_PHASE_CALLBACK:
   case BEFORE_APPLY_PHASE_CALLBACK:
   case AFTER_APPLY_PHASE_CALLBACK:
   case AFTER_DECISION_CYCLE_CALLBACK:

@@ -1122,7 +1122,7 @@ Bool any_assertions_or_retractions_ready (agent* thisAgent) {
         the bottom usually */
 
      for (goal=thisAgent->bottom_goal;goal;goal=goal->id.higher_goal) {
-       /* if there are any assertions or retrctions for this goal,
+       /* if there are any assertions or retractions for this goal,
           return TRUE */
        if (goal->id.ms_o_assertions || goal->id.ms_i_assertions ||
            goal->id.ms_retractions)
