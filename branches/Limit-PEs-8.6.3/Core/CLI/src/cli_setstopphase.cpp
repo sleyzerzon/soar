@@ -28,9 +28,12 @@ bool CommandLineInterface::ParseSetStopPhase(gSKI::Agent* pAgent, std::vector<st
 		{'B', "before",		0},	// optional (defaults to before)
 		{'A', "after",		0},	// optional
 		{'i', "input",	    0},	// requires one of these
+		{'I', "input_elab",	    0},	// requires one of these
 		{'p', "proposal",	0},
 		{'d', "decision",	0},
+		{'D', "decision_elab",	0},
 		{'a', "apply",		0},
+		{'E', "apply_elab",		0},
 		{'o', "output",		0},
 		{0, 0, 0}
 	};
@@ -54,6 +57,7 @@ bool CommandLineInterface::ParseSetStopPhase(gSKI::Agent* pAgent, std::vector<st
 				phase = gSKI_INPUT_PHASE ;
 				countPhaseArgs++ ;
 				break;
+			case 'I':
 			case 'p':
 				phase = gSKI_INPUT_ELAB_PHASE ;
 				countPhaseArgs++ ;
@@ -62,8 +66,16 @@ bool CommandLineInterface::ParseSetStopPhase(gSKI::Agent* pAgent, std::vector<st
 				phase = gSKI_DECISION_PHASE ;
 				countPhaseArgs++ ;
 				break;
+			case 'D':
+				phase = gSKI_DECISION_ELAB_PHASE ;
+				countPhaseArgs++ ;
+				break;
 			case 'a':
 				phase = gSKI_APPLY_PHASE ;
+				countPhaseArgs++ ;
+				break;
+			case 'E':
+				phase = gSKI_APPLICATION_ELAB_PHASE ;
 				countPhaseArgs++ ;
 				break;
 			case 'o':

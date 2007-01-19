@@ -271,10 +271,6 @@ public class Pane
 			// This will throw if there is no default constructor.
 			AbstractView view = (AbstractView)child.CreateObjectFromXMLDefaultConstructor() ;
 
-			// These are the 2 new lines to make it skip phase views
-                  if (view instanceof PhaseView)
-                    continue ;		
-
 			view.loadFromXML(frame, doc, this, child) ;
 			
 			this.addView(view) ;

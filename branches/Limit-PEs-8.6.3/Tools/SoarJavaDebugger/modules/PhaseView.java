@@ -183,10 +183,10 @@ public class PhaseView extends AbstractFixedView implements Kernel.AgentEventInt
 	protected smlPhase getPhaseFromPosition(int x, int y)
 	{
 		// Anyway over the "world" maps to stop before input phase
-		if (y > 36 || x <= 24)
+		if (y > 46 || x <= 39)
 			return smlPhase.sml_INPUT_PHASE ;
 
-		int phase = ((x-24) / 36) + 1 ;
+		int phase = ((x-39)*2 / 154) + 1 ;
 		
 		if (phase > smlPhase.sml_OUTPUT_PHASE.swigValue())
 			phase = smlPhase.sml_INPUT_PHASE.swigValue() ;
@@ -225,19 +225,23 @@ public class PhaseView extends AbstractFixedView implements Kernel.AgentEventInt
 	protected Point getCursorPosition(smlPhase phase)
 	{
 		// Position for center of stop before marker
-		int x = 29 ;
-		int y = 23 ;
+		int x = 69 ;
+		int y = 24 ;
 				
 		if (phase == smlPhase.sml_INPUT_PHASE)
-			{ x = 31 ; y = 50 ;  }
+			{ x = 39 ; y = 62 ;  }
 		if (phase == smlPhase.sml_INPUT_ELAB_PHASE)
-			{ x += 36 * 0 ; }
+			{ x = 69 ; }
 		if (phase == smlPhase.sml_DECISION_PHASE)
-			{ x += 36 * 1 ; }
+			{ x = 154 ; }
+		if (phase == smlPhase.sml_DECISION_ELAB_PHASE)
+			{ x = 228 ; }
 		if (phase == smlPhase.sml_APPLY_PHASE)
-			{ x += 36 * 2 ; }
+			{ x = 312 ; }
+		if (phase == smlPhase.sml_APPLICATION_ELAB_PHASE)
+			{ x = 384 ; }
 		if (phase == smlPhase.sml_OUTPUT_PHASE)
-			{ x += 36 * 3 ; }
+			{ x = 466 ; }
 
 		return new Point(x, y) ;
 	}
@@ -290,7 +294,7 @@ public class PhaseView extends AbstractFixedView implements Kernel.AgentEventInt
 
 		// Draw the decision cycle counter in the corner
 		String decisions = Integer.toString(m_DecisionCycle) ;
-		gc.drawText(decisions, 125, 41) ;
+		gc.drawText(decisions, 345, 60) ;
 	}
 	
 	public void agentEventHandler(int eventID, Object data, String agentName)
@@ -355,6 +359,8 @@ public class PhaseView extends AbstractFixedView implements Kernel.AgentEventInt
 
 		m_NextExecutionPhase = agent.GetCurrentPhase() ;
 		m_DecisionCycle      = agent.GetDecisionCycleCounter() ;
+
+		//System.out.println("Phase is " + m_NextExecutionPhase) ;
 		
 		// Have to make update in the UI thread.
 		// Callback comes in the document thread.

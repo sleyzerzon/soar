@@ -115,9 +115,9 @@ public class SoarCommands
 		if (phase == smlPhase.sml_DECISION_PHASE) 	return "decision" ;
 		if (phase == smlPhase.sml_INPUT_PHASE) 		return "input" ;
 		if (phase == smlPhase.sml_OUTPUT_PHASE) 		return "output" ;
-		if (phase == smlPhase.sml_INPUT_ELAB_PHASE) 	return "input elab" ;
-		if (phase == smlPhase.sml_DECISION_ELAB_PHASE) 	return "decision elab" ;
-		if (phase == smlPhase.sml_APPLICATION_ELAB_PHASE) 	return "appl elab" ;
+		if (phase == smlPhase.sml_INPUT_ELAB_PHASE) 	return "input_elab" ;
+		if (phase == smlPhase.sml_DECISION_ELAB_PHASE) 	return "decision_elab" ;
+		if (phase == smlPhase.sml_APPLICATION_ELAB_PHASE) 	return "apply_elab" ;
 		return "" ;
 	}
 	
