@@ -2530,11 +2530,16 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
    * this doesn't matter) --- */
    if (impasse_type == NO_CHANGE_IMPASSE_TYPE) 
    {
-	   if (thisAgent->PEs_waiting_to_fire && (goal == thisAgent->PE_goal)) {
-		   // the operator from the previous decision is continuing, not an impasse
-		   for(temp = candidates; temp; temp = temp->next_candidate)
-			   preference_remove_ref(thisAgent, temp);  // guessing that we need to do this...
-		   return TRUE;
+	   if (thisAgent->PEs_waiting_to_fire && (goal == thisAgent->PE_goal)) {		   		
+		   if (goal->id.operator_slot->wmes)
+		   {
+			   if (goal->id.operator_slot->wmes->value == thisAgent->PE_operator) {
+				   // the operator from the previous decision is continuing, not an impasse
+				   for(temp = candidates; temp; temp = temp->next_candidate)
+					   preference_remove_ref(thisAgent, temp);  // guessing that we need to do this...
+				   return TRUE;
+			   }
+		   }
 	   }
 	  if (s->wmes) 
       {
@@ -2801,7 +2806,9 @@ void print_lowest_slot_in_context_stack (agent* thisAgent) {
   /* REW: end   10.24.97 */
 
 	if (thisAgent->bottom_goal->id.operator_slot->wmes) {
-		if (thisAgent->PEs_waiting_to_fire && (thisAgent->PE_goal == thisAgent->bottom_goal)) {
+		if (thisAgent->PEs_waiting_to_fire && (thisAgent->PE_goal == thisAgent->bottom_goal) &&
+		   (thisAgent->PE_operator == thisAgent->bottom_goal->id.operator_slot->wmes->value)) 
+		{
 			// don't print the operator again: it wasn't reselected, just "stretched"
 			// trace_format would be something like: (thisAgent, "%right[6,%dc]: %rsd[   ]  %[O: %co%]");
 			add_trace_format (thisAgent, TRUE, FOR_OPERATORS_TF, NIL,

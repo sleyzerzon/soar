@@ -454,6 +454,9 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[MAX_GOAL_DEPTH] = 100;  /* generate an interrupt so users can recover before exceed program stack*/
   thisAgent->sysparams[MAX_MEMORY_USAGE_SYSPARAM] = 100000000; /* default to 100MB.  Event generated when exceeded*/
   thisAgent->sysparams[PE_FIRING_TYPE] = PE_SINGLE_WAVE;
+//  thisAgent->sysparams[PE_FIRING_TYPE] = PE_ALLOW_CASCADE;
+//  thisAgent->sysparams[PE_FIRING_TYPE] = PE_FIRE_ALL;
+
 
 //#ifdef USE_X_DISPLAY
 //  thisAgent->sysparams[RESPOND_TO_LOAD_ERRORS_SYSPARAM] = FALSE;
@@ -1226,12 +1229,13 @@ void do_one_top_level_phase (agent* thisAgent)
           /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
           thisAgent->e_cycles_this_d_cycle++;
+
 		  /* When to set these?  Only if firing PEs at this level */
 		  thisAgent->PE_level = thisAgent->active_level;  /* need in Decision to check */
 		  thisAgent->PE_goal = thisAgent->active_goal;    /*   if continuing or ONC */
+		  if (thisAgent->PE_goal->id.operator_slot->wmes)
+			  thisAgent->PE_operator = thisAgent->PE_goal->id.operator_slot->wmes->value;
 
-
-	
 		  if (thisAgent->FIRING_TYPE == PE_PRODS) { 
 			  thisAgent->pe_cycle_count++;
 	  		  thisAgent->pe_cycles_this_d_cycle++;

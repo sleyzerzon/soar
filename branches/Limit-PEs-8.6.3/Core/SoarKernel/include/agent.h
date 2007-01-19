@@ -706,7 +706,8 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   Bool       soar_verbose_flag;
   int        FIRING_TYPE;
   /* KJC 12/06.  New Decision Cycle and PE-only Apply Phase */
-  Symbol			*PE_goal;
+  Symbol		  * PE_goal;
+  Symbol	      * PE_operator;
   goal_stack_level	PE_level;
   bool				PEs_waiting_to_fire;     /* expt'l.  continue old operator if TRUE, 
 											      no impasse generated */

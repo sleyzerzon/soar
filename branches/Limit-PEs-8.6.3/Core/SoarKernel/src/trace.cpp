@@ -1426,9 +1426,9 @@ void print_stack_trace_xml(agent* thisAgent, Symbol *object, Symbol *state, int 
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kOperator_ID, symbol_to_string(thisAgent, current_o, true, 0, 0));
 				Symbol* name = find_name_of_object(thisAgent, current_o);
 				if(name) gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kOperator_Name, symbol_to_string(thisAgent, name, true, 0, 0));
-			}
-			if (thisAgent->PEs_waiting_to_fire && (state == thisAgent->PE_goal)) {
-				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kOperator_Name, "continuing");
+				if (thisAgent->PEs_waiting_to_fire && (current_o == thisAgent->PE_operator)) {
+					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kOperator_Name, "continuing");		
+				}
 			}
 			gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagOperator);
 			break;
