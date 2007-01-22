@@ -311,6 +311,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\cli_pefiringmode.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\cli_popd.cpp"
 					>
 				</File>

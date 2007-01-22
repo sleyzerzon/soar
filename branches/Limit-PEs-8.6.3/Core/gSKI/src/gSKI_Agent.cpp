@@ -997,10 +997,12 @@ namespace gSKI
 	   return m_agent->default_wme_depth;
    }
 
+  
    void Agent::SetDefaultWMEDepth(int d, Error* err)
    {
 	   m_agent->default_wme_depth = d;
    }
+
 
    /*
    =============================

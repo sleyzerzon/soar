@@ -231,6 +231,7 @@ protected:
 	bool ParseMultiAttributes(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseNumericIndifferentMode(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseOSupportMode(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParsePEFiringMode(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParsePopD(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParsePreferences(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParsePrint(gSKI::Agent* pAgent, std::vector<std::string>& argv);
@@ -499,6 +500,13 @@ protected:
 	* @param mode The new o-support mode.  Use -1 to query.
 	*************************************************************/
 	bool DoOSupportMode(gSKI::Agent* pAgent, int mode = -1);
+
+		/*************************************************************
+	* @brief pe-firing-mode command
+	* @param pAgent The pointer to the gSKI agent interface
+	* @param mode The new o-support mode.  Use -1 to query.
+	*************************************************************/
+	bool DoPEFiringMode(gSKI::Agent* pAgent, int mode = -1);
 
 	/*************************************************************
 	* @brief popd command

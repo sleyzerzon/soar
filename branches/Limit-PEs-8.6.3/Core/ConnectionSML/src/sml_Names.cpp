@@ -274,6 +274,7 @@ char const* const sml_Names::kParamLearnForceLearnStates = "learnforcelearnstate
 char const* const sml_Names::kParamLearnDontLearnStates = "learndontlearnstates";
 char const* const sml_Names::kParamLogSetting		= "log_setting";
 char const* const sml_Names::kParamDirectory		= "directory";
+char const* const sml_Names::kParamPEFiringType		= "pe-firing-type";
 char const* const sml_Names::kParamProcSeconds		= "proc-seconds";
 char const* const sml_Names::kParamRealSeconds		= "real-seconds";
 char const* const sml_Names::kParamWarningsSetting	= "warnings_setting";
