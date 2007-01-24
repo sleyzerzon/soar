@@ -214,6 +214,7 @@ protected:
 	bool ParseExcise(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseExplainBacktraces(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseFiringCounts(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseGCSkipWalk(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseGDSPrint(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseHelp(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseIndifferentSelection(gSKI::Agent* pAgent, std::vector<std::string>& argv);
@@ -377,6 +378,13 @@ protected:
 	*        multiple productions
 	*************************************************************/
 	bool DoFiringCounts(gSKI::Agent* pAgent, const int numberToList = -1, const std::string* pProduction = 0);
+
+	/*************************************************************
+	* @brief gc-skip-walk command
+	* @param pAgent The pointer to the gSKI agent interface
+	* @param setting The new setting, pass 0 (null) for query
+	*************************************************************/
+	bool DoGCSkipWalk(gSKI::Agent* pAgent, bool* pSetting = 0);
 
 	/*************************************************************
 	* @brief gds-print command

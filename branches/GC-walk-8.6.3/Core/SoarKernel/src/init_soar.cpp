@@ -478,6 +478,10 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[USE_LONG_CHUNK_NAMES] = TRUE;  /* kjh(B14) */
   thisAgent->sysparams[TRACE_OPERAND2_REMOVALS_SYSPARAM] = FALSE;
   thisAgent->sysparams[TIMERS_ENABLED] = TRUE;
+
+  /* when set to true, don't look for disconnected_ids when garbage collecting */
+  thisAgent->sysparams[GC_OMIT_WM_WALK_SYSPARAM] = FALSE;  /* KJC jan 06.  See notes in gsysparam.h */
+  
 }
 
 /* ===================================================================
@@ -608,6 +612,8 @@ bool reinitialize_soar (agent* thisAgent) {
   long cur_TRACE_FIRINGS_PREFERENCES_SYSPARAM;
   long cur_TRACE_WM_CHANGES_SYSPARAM;
   /* kjh (CUSP-B4) end */
+  long cur_GC_OMIT_WM_WALK_SYSPARAM;  /* kjc Jan 06 */
+
 
   thisAgent->did_PE = FALSE;    /* RCHONG:  10.11 */
 
@@ -624,6 +630,7 @@ bool reinitialize_soar (agent* thisAgent) {
   cur_TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM   = thisAgent->sysparams[TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM];
   cur_TRACE_FIRINGS_PREFERENCES_SYSPARAM      = thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM];
   cur_TRACE_WM_CHANGES_SYSPARAM               = thisAgent->sysparams[TRACE_WM_CHANGES_SYSPARAM];
+  cur_GC_OMIT_WM_WALK_SYSPARAM                = thisAgent->sysparams[GC_OMIT_WM_WALK_SYSPARAM];
 
   /* Temporarily disable tracing: */
   set_sysparam(thisAgent, TRACE_CONTEXT_DECISIONS_SYSPARAM,        FALSE);
@@ -634,6 +641,7 @@ bool reinitialize_soar (agent* thisAgent) {
   set_sysparam(thisAgent, TRACE_FIRINGS_PREFERENCES_SYSPARAM,      FALSE);
   set_sysparam(thisAgent, TRACE_WM_CHANGES_SYSPARAM,               FALSE);
   /* kjh (CUSP-B4) end */
+  set_sysparam(thisAgent, GC_OMIT_WM_WALK_SYSPARAM,                FALSE);
 
   clear_goal_stack (thisAgent);
 
@@ -669,6 +677,7 @@ bool reinitialize_soar (agent* thisAgent) {
   set_sysparam(thisAgent, TRACE_FIRINGS_PREFERENCES_SYSPARAM,      cur_TRACE_FIRINGS_PREFERENCES_SYSPARAM);
   set_sysparam(thisAgent, TRACE_WM_CHANGES_SYSPARAM,               cur_TRACE_WM_CHANGES_SYSPARAM);
   /* kjh (CUSP-B4) end */
+  set_sysparam(thisAgent, GC_OMIT_WM_WALK_SYSPARAM,                cur_GC_OMIT_WM_WALK_SYSPARAM);
 
   soar_invoke_callbacks(thisAgent, thisAgent, 
 		       AFTER_INIT_SOAR_CALLBACK,
@@ -1668,6 +1677,9 @@ void init_agent_memory(agent* thisAgent)
   //   1) these events are currently not exposed through SML, so no clients will see them
   //   2) even if these events were exposed, they are being fired during agent creation.  Since the agent
   //      hasn't been created yet, no client could have registered for the events anyway.
+
+  // =========>>  Also occurs during an init-soar.  Not good.
+
   // Note that this change replaces the do_buffered_wm_and_ownership_changes call which attempted to do some
   //   initialization (including triggering SW's changes).
   do_input_cycle(thisAgent);

@@ -243,6 +243,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\cli_gcskipwalk.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\cli_gdsprint.cpp"
 					>
 				</File>

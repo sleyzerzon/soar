@@ -160,8 +160,14 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 /* KJC 8/06:  generate warning and event if memory usage exceeds this value */
 #define MAX_MEMORY_USAGE_SYSPARAM                35
 
+/* don't look for disconnected_ids when garbage collecting */
+/* This code change is experimental and could cause seg faults or serious
+   * memory leaks.  The sysparam GC_OMIT_WM_WALK is toggled ON in reinitialize_soar 
+   * so that we always clean house during any init-soar.   */
+#define	GC_OMIT_WM_WALK_SYSPARAM                 36
+
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  35
+#define HIGHEST_SYSPARAM_NUMBER                  36
 
 /* -----------------------------------------
    Sysparams[] stores the parameters; set_sysparam()

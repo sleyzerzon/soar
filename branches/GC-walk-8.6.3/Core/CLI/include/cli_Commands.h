@@ -28,6 +28,7 @@ namespace cli {
 		static char const* kCLIExcise;
 		static char const* kCLIExplainBacktraces;
 		static char const* kCLIFiringCounts;
+		static char const* kCLIGCSkipWalk;
 		static char const* kCLIGDSPrint;
 		static char const* kCLIHelp;
 		static char const* kCLIIndifferentSelection;

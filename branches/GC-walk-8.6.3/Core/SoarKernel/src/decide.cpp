@@ -698,6 +698,28 @@ void do_demotion (agent* thisAgent) {
   /* --- if nothing's left with an unknown level, we're done --- */
   if (! thisAgent->ids_with_unknown_level) return;
 
+  /* comments added by karen.coulter@gmail.com Jan 06 */
+  /* If there are still ids with unknown level, AND there are circular structures
+   * in WM, then it's possible to have wholely disconnected ids still remaining on 
+   * ids_with_unknown_level (link_count > 0).  The mark and walk will update the
+   * levels for id's that are still connected, and remove them from the list. 
+   * After the mark and walk, any id's that remain on ids_with_unknown_level are 
+   * really disconnected and should be garbage collected.
+   *
+   * So, depending on how frequently an application is removing objects, or moving 
+   * objects from one level to another, there could be more or less of an impact of 
+   * having a very large working memory.  Anytime Soar's garbage collection has to 
+   * check for disconnected WMEs, it will walk all of working memory.
+   * For very large working memory sets, walking WM looking for disconnected id's
+   * can be very expensive.  If Soar returns now, then some disconnected_ids
+   * might leak, but Soar will run much faster.   
+   *
+   * This code change is experimental and could cause seg faults or serious
+   * memory leaks.  The sysparam GC_OMIT_WM_WALK is toggled ON in reinitialize_soar 
+   * so that we always clean house during any init-soar. 
+   */
+  if (thisAgent->sysparams[GC_OMIT_WM_WALK_SYSPARAM]) return;
+
   /* --- do the mark --- */
   thisAgent->highest_level_anything_could_fall_from =
                 LOWEST_POSSIBLE_GOAL_LEVEL;

@@ -32,6 +32,7 @@ char const* Commands::kCLIEditProduction			= "edit-production";
 char const* Commands::kCLIExcise					= "excise";
 char const* Commands::kCLIExplainBacktraces			= "explain-backtraces";
 char const* Commands::kCLIFiringCounts				= "firing-counts";
+char const* Commands::kCLIGCSkipWalk				= "gc-skip-walk";
 char const* Commands::kCLIGDSPrint					= "gds-print";
 char const* Commands::kCLIHelp						= "help";
 char const* Commands::kCLIIndifferentSelection		= "indifferent-selection";
