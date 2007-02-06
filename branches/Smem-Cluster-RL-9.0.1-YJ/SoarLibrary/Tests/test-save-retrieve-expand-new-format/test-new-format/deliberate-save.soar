@@ -1,0 +1,41 @@
+sp {propose*save
+   (state <s> ^name test-save
+             -^saved yes)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name save)
+}
+
+sp {apply*save
+   (state <s> ^smem.command <cmd>
+              ^operator <op>)
+   (<op> ^name save)
+-->
+   (<s> ^saved yes)
+   (<cmd> ^save <sa1> <sa2> <sa3> <sa4> <sa5>)
+   (<sa1> ^data <d1>)
+   (<sa2> ^data <d2>)
+   (<sa3> ^data <d3>)
+   (<sa4> ^data <d4>)
+   (<sa5> ^data <d5>)
+   (<d1> ^a1 v1
+          ^a2 v2
+          ^a3 v3
+      ^extra-attr test
+          ^a4 <id>)
+   (<d2> ^a1 v1
+          ^a2 v2
+          ^a3 v3
+      ^extra-attr test)
+   (<d3> ^a1 v4
+          ^a2 v5
+          ^a3 <d4>
+      ^extra-attr test)#attribute with value being unsaved id won't be saved
+   #save only values of constant, or identifers already been saved
+     (<d4> ^a1 v8
+            ^a2 v9
+            ^a3 <d5>)
+     (<d5> ^a1 v10
+            ^a2 v12
+            ^a3 v13)
+}

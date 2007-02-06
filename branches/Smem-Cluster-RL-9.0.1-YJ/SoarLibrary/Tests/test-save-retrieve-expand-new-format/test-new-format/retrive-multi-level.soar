@@ -1,0 +1,89 @@
+sp {propose*retrieve-level1
+   (state <s> ^name test-save
+              ^saved yes
+            # -^smem.command.save
+             -^retrieved-result)
+-->
+   (<s> ^operator <o> + )
+   (<o> ^name retrieve-level1)
+}
+
+sp {apply*retrieve-level1
+   (state <s> ^operator.name retrieve-level1
+              ^smem.command <cmd>)
+-->
+   (<cmd> ^query <c>)
+   (<c> ^a1 v4
+        ^a2 v5)
+}
+
+sp {apply*retrieve-level1*copy-result
+   (state <s> ^operator.name retrieve-level1
+              ^smem.command <cmd>
+              ^smem.result <rst>)
+   (<cmd> ^query <c>)
+   (<rst> ^retrieved <rd>)
+-->
+   (<s> ^retrieved-result <rd>)# this will retract the operator
+  # (<cmd> ^query <c> -)
+                          (write (crlf) |Successfully retrieved |<rd> (crlf))
+}
+
+sp {propose*expand-level2
+   (state <s> ^name test-save
+              ^retrieved-result <rr>)
+   (<rr> ^a3 <v3>)
+   (<v3> -^<any-attr>)#not-expanded yet
+-->
+   (<s> ^operator <o> + >)
+   (<o> ^name expand
+        ^to-expand <v3>)
+}
+
+sp {propose*expand-level3
+   (state <s> ^name test-save
+              ^retrieved-result.a3 <v3>)
+   (<v3> ^a3 <v33>)
+   (<v33> -^<any-attr>)#not-expanded yet
+-->
+   (<s> ^operator <o> + >)
+   (<o> ^name expand
+        ^to-expand <v33>)
+}
+
+sp {apply*expand
+   (state <s> ^operator <o>
+              ^smem.command <cmd>)
+   (<o> ^name expand
+        ^to-expand <e>)
+   (<cmd> ^query <c> <> <e>)
+-->
+   (<cmd> ^query <c> -
+             <e>)
+(write (crlf) |Expanding |<e> (crlf))
+}
+
+sp {propose*do-new-retrieval
+   (state <s> ^retrieved-result.a3.a3.a3
+             -^smem.result.retrieved.a1 v1)
+
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name do-new-retrieval)
+   
+}
+
+sp {apply*do-new-retrieval
+   (state <s> ^operator.name do-new-retrieval
+              ^smem.command <cmd>)
+   (<cmd> ^query <c>)
+   (<c> ^a1 <> v1)
+-->
+   (<cmd> ^query <new-cue>
+             <c> -)
+   (<new-cue> ^a1 v1
+              ^a2 v2)
+   (write (crlf) |Switching from expanding to regular retrieval| (crlf))
+}
+
+
