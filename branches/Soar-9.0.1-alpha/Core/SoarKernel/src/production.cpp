@@ -1561,6 +1561,8 @@ production *make_production (agent* thisAgent,
   p->instantiations = NIL;
   p->interrupt = FALSE;
 
+  p->RL_update_count = 0;
+
 #ifdef NUMERIC_INDIFFERENCE
   // Is this production an RL rule? Is it a template rule?
   if (type == JUSTIFICATION_PRODUCTION_TYPE) {

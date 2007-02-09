@@ -115,6 +115,7 @@ typedef struct production_struct {
   byte interrupt;			  /* SW: 7.31.03 */
   bool already_fired;                     /* RPM test workaround for bug #139 */
   Bool RL;                                /* NUMERIC_INDIFFERENCE - is this an RL rule */
+  unsigned long RL_update_count;			  /* RPM track number of times this rule has been updated (for RL rules only).  Used for debugging and reporting. */
 } production;
 
 /* ========================================================================

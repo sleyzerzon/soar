@@ -218,7 +218,10 @@ namespace gSKI
 			if (!full_prod) 
 			{
 				print_with_symbols(agnt, "%y  ",prod->name);
-				if (prod->RL) print_with_symbols(agnt, "%y", rhs_value_to_symbol(prod->action_list->referent));
+				if (prod->RL) {
+					print_with_symbols(agnt, "%y  ", make_int_constant(agnt, prod->RL_update_count));
+					print_with_symbols(agnt, "%y", rhs_value_to_symbol(prod->action_list->referent));
+				}
 			}
 			if (print_filename) 
 			{
