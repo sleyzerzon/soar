@@ -3804,7 +3804,7 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 			}
 	
 
-			if ((thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION) && (SoarRand() <= thisAgent->epsilon))	{
+			if ((thisAgent->exploration_mode == EPSILON_GREEDY_EXPLORATION) && (SoarRand() < thisAgent->epsilon))	{
 				// select at random 
 				
 				int   chosen_num;
