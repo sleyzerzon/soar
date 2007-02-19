@@ -93,6 +93,11 @@
          of all preferences supported by this goal.  This is needed so
          we can remove o-supported preferences when the goal goes away.
 
+       RL_data: (RL) for goals, stores info between cycles
+         needed to perform Bellman update at this goal level
+       reward_header: (RL) for goals, pointer to reward-link identifier,
+ 			used to find rewards placed in WM
+
        gds: pointer to a goal's dependency set
        saved_firing_type: the firing type that must be restored if
           Waterfall processing returns to this level. see consistency.c
@@ -225,6 +230,10 @@ typedef struct identifier_struct {
   struct slot_struct *operator_slot;
   struct preference_struct *preferences_from_goal;
 
+  /* --- NUMERIC_INDIFFERENCE - fields used for reinforcement learning - only on goals --- */
+  struct RL_data_struct *RL_data;			// data required for Bellman updates at this state
+  union symbol_union *reward_header;		// pointer to reward_link
+
   /* REW: begin 09.15.96 */
   struct gds_struct *gds;    /* Pointer to a goal's dependency set */
   /* REW: begin 09.15.96 */
@@ -321,7 +330,7 @@ extern Symbol *find_int_constant (agent* thisAgent, long value);
 extern Symbol *find_float_constant (agent* thisAgent, float value);
 
 extern Symbol *make_variable (agent* thisAgent, char *name);
-extern Symbol *make_sym_constant (agent* thisAgent, char *name);
+extern Symbol *make_sym_constant (agent* thisAgent, const char *name);
 extern Symbol *make_int_constant (agent* thisAgent, long value);
 extern Symbol *make_float_constant (agent* thisAgent, float value);
 extern Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_level level);

@@ -20,17 +20,25 @@
 #ifndef AGENT_H
 #define AGENT_H
 
+#include "kernel.h" 
+
 #ifndef GSYSPARAMS_H
 #include"gsysparam.h"
 #endif
 
-#include "kernel.h" 
 #include "init_soar.h"
 #include "mem.h"
 #include "lexer.h"
 #include "chunk.h"
 #include "callback.h"
 
+// YJ's stuff
+//#ifdef SEMANTIC_MEMORY
+// For header, better always include, gSKI need this compile argument too
+#include "Cluster.h"
+#include "semantic_memory.h"
+//#include "Cluster.h"
+//#endif SEMANTIC_MEMORY
 /* JC ADDED: Included to allow gski callbacks */
 #include "gski_event_system_data.h"
 
@@ -120,8 +128,54 @@ typedef signed short goal_stack_level;
 typedef struct alpha_mem_struct alpha_mem;
 typedef struct token_struct token;
 typedef char * test;
-
+class smem_accessary{
+public:
+	smem_accessary(){last_cue_id=""; last_retrieved = NIL; last_confidence = NIL; last_experience = NIL;last_status = NIL;last_link_to_query = NIL;}
+	string last_cue_id;
+	wme *last_retrieved, *last_confidence, *last_experience, *last_status, *last_link_to_query;
+	vector<Symbol*> arch_symbols;//these symbols have to de derefed mannually, deleting the substate is not enough, I don't know why
+};
 typedef struct agent_struct {
+	//#ifdef SEMANTIC_MEMORY
+	// Better not use directive for this, since other projects (gSKI) refers to it.
+	// YJ's stuff
+	Symbol *rec_link_symbol;
+	Symbol *rec_link_header;
+	wme *rec_header_link;
+	
+	Symbol *smem_link_id;
+	Symbol *smem_link_attr;
+	wme *smem_link;
+
+	Symbol *retrieve_link_id;
+	Symbol *retrieve_link_attr;
+	wme *retrieve_link_wme;
+	
+	Symbol *save_link_id;
+	Symbol *save_link_attr;
+	wme *save_link;
+	
+	
+	//Semantic Memory
+	SemanticMemory* semantic_memory;
+	NetWork* clusterNet;
+	bool retrieve_ready;
+	bool cluster_ready;
+	
+	vector<smem_accessary>* smem_structures;
+	//string* last_cue_id; // global variable to keep track of last cue so that whenever the cue changed, do a new retrieval.
+	//wme *last_retrieved, *last_confidence, *last_experience;
+
+	// For automatically save wmes - all new wmes in every cycle
+	set<LME>* to_be_saved_wmes;
+	set<string>* prohibited_ids;
+	vector<vector<wme*> >* gold_level_to_smem_links;
+	
+
+	unsigned long association_rule_counter;
+	// YJ's stuff
+	//#endif SEMANTIC_MEMORY
+
   /* After v8.6.1, all conditional compilations were removed
    * from struct definitions, including the agent struct below
    */
@@ -264,6 +318,9 @@ typedef struct agent_struct {
   Symbol			* input_link_symbol;
   Symbol			* output_link_symbol;
   /* RPM 9/06 end */
+
+  Symbol            * reward_symbol; /* NUMERIC_INDIFFERENCE */
+
   
   /* ----------------------- Symbol table stuff -------------------------- */
 
@@ -483,7 +540,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
    struct timeval	*attention_lapse_tracker;
    Bool			attention_lapsing;
  
-  
   /* ----------------------- Chunker stuff -------------------------- */
   
   tc_number           backtrace_number;
@@ -737,9 +793,15 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   /* JC ADDED: Need to store RHS functions here so that agent's don't step on each other */
   rhs_function* rhs_functions;
 
-#ifdef NUMERIC_INDIFFERENCE
+/* NUMERIC_INDIFFERENCE - Stuff for numeric indifference and reinforcement learning */
   enum ni_mode numeric_indifferent_mode;      /* SW 08.19.2003 */
-#endif
+  enum exp_mode exploration_mode;
+  float Temperature;            // Parameter for Boltzmann exploration
+  double epsilon;               // Parameter for epsilon-greedy exploration
+  float gamma;                  // Discount rate
+  float alpha;                  // Learning rate
+  float lambda;					// Eligibility traces
+  unsigned long RL_count;   // Used for naming RL rules - RL-1, RL-2, etc.
 
 } agent;
 /*************** end of agent struct *****/

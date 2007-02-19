@@ -316,11 +316,15 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   sym->id.tc_num = 0;
   sym->id.associated_output_links = NIL;
   sym->id.input_wmes = NIL;
+#ifdef NUMERIC_INDIFFERENCE
+  sym->id.RL_data = NIL;
+  sym->id.reward_header = NIL;
+#endif
   add_to_hash_table (thisAgent, thisAgent->identifier_hash_table, sym);
   return sym;
 }
 
-Symbol *make_sym_constant (agent* thisAgent, char *name) {
+Symbol *make_sym_constant (agent* thisAgent, const char *name) {
   Symbol *sym;
 
   sym = find_sym_constant(thisAgent, name);
@@ -581,6 +585,9 @@ void create_predefined_symbols (agent* thisAgent) {
   thisAgent->type_symbol = make_sym_constant (thisAgent, "type");
   thisAgent->goal_symbol = make_sym_constant (thisAgent, "goal");
   thisAgent->name_symbol = make_sym_constant (thisAgent, "name");
+#ifdef NUMERIC_INDIFFERENCE
+  thisAgent->reward_symbol = make_sym_constant (thisAgent, "reward-link");
+#endif
 
   thisAgent->ts_context_variable = make_variable (thisAgent, "<ts>");
   thisAgent->to_context_variable = make_variable (thisAgent, "<to>");
@@ -629,6 +636,9 @@ void release_predefined_symbols(agent* thisAgent) {
   release_helper(thisAgent,&(thisAgent->type_symbol));
   release_helper(thisAgent,&(thisAgent->goal_symbol));
   release_helper(thisAgent,&(thisAgent->name_symbol));
+#ifdef NUMERIC_INDIFFERENCE
+  release_helper(thisAgent,&(thisAgent->reward_symbol));
+#endif
 
   release_helper(thisAgent,&(thisAgent->ts_context_variable));
   release_helper(thisAgent,&(thisAgent->to_context_variable));

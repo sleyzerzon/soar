@@ -27,6 +27,7 @@ namespace cli {
 		static char const* kCLIEditProduction;
 		static char const* kCLIExcise;
 		static char const* kCLIExplainBacktraces;
+		static char const* kCLIExploration;					// NUMERIC_INDIFFERENCE
 		static char const* kCLIFiringCounts;
 		static char const* kCLIGDSPrint;
 		static char const* kCLIHelp;
@@ -56,6 +57,8 @@ namespace cli {
 		static char const* kCLIQuit;
 		static char const* kCLIRemoveWME;
 		static char const* kCLIReteNet;
+		static char const* kCLIRL;			//  NUMERIC_INDIFFERENCE
+		static char const* kCLIRLcaps;
 		static char const* kCLIRun;
 		static char const* kCLISaveBacktraces;
 		static char const* kCLISetLibraryLocation;
@@ -76,6 +79,18 @@ namespace cli {
 		static char const* kCLIWarnings;
 		static char const* kCLIWatch;
 		static char const* kCLIWatchWMEs;
+		//#ifdef SEMANTIC_MEMORY
+		static char const* kCLILoadMemory; //YJ
+		static char const* kCLIPrintMemory; //YJ
+		static char const* kCLIClearMemory; //YJ
+		static char const* kCLISummarizeMemory; //YJ
+		static char const* kCLISmemOption; //YJ
+
+		static char const* kCLICluster; //YJ
+
+		static char const* kCLIClusterTrain; //YJ
+		static char const* kCLIClusterRecognize; //YJ
+		//#endif 
 	}; // struct
 } // namespace cli
 

@@ -98,6 +98,8 @@ typedef std::bitset<STATS_NUM_OPTIONS> StatsBitset;
 typedef std::bitset<WATCH_NUM_OPTIONS> WatchBitset;
 typedef std::bitset<WATCH_WMES_TYPE_NUM_OPTIONS> WatchWMEsTypeBitset;
 
+// Semantic Memory
+typedef std::bitset<10> SmemBitset;
 // For option parsing
 typedef struct {
 	int shortOpt;
@@ -256,6 +258,8 @@ protected:
 	bool ParseWarnings(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatch(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseWatchWMEs(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseExploration(gSKI::Agent* pAgent, std::vector<std::string>& argv);		// NUMERIC_INDIFFERENCE
+	bool ParseRL(gSKI::Agent* pAgent, std::vector<std::string>& argv);					// NUMERIC_INDIFFERENCE
 
 	/*************************************************************
 	* @brief add-wme command
@@ -576,6 +580,28 @@ protected:
 	*************************************************************/
 	bool DoReteNet(gSKI::Agent* pAgent, bool save, std::string filename);
 
+	/****************************************************************
+	* @brief RL command
+	* @param pAgent The pointer to the gSKI agent interface
+	* @param RLSetting RL on/off
+	* @param algSetting on-policy/off-policy
+	* @param Temp Assignment to the alpha parameter
+	* @param gamma Assignment to the gamma parameter
+	* @param lambda Assignment to the lambda parameter
+	*****************************************************************/
+
+	bool DoRL(gSKI::Agent* pAgent, const int RLSetting, const int algSetting, const double alpha, const double gamma, const double lambda);
+
+	/*****************************************************************
+	* @brief Exploration command
+	* @param pAgent The pointer to the gSKI agent interface
+	* @param mode Exploration mode
+	* @param Temp Assignment to the Temperature parameter
+	* @param epsilon Assignment to the epsilon parameter
+	******************************************************************/
+
+	bool DoExploration(gSKI::Agent* pAgent, const int mode, const double Temp, const double epsilon);
+
 	/*************************************************************
 	* @brief run command
 	* @param pAgent The pointer to the gSKI agent interface
@@ -713,7 +739,21 @@ protected:
 	* @brief watch-wmes command
 	* @param pAgent The pointer to the gSKI agent interface
 	*************************************************************/
+
 	bool DoWatchWMEs(gSKI::Agent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
+
+//#ifdef SEMANTIC_MEMORY
+	// YJ's function
+	bool ParseLoadMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParsePrintMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseClearMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseSummarizeMemory(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseSmemOption(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+
+	bool ParseCluster(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseClusterTrain(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+	bool ParseClusterRecognize(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+//#endif
 
 	// Print callback events go here
 	virtual void HandleEvent(egSKIPrintEventId, gSKI::Agent*, const char* msg);
@@ -754,6 +794,7 @@ protected:
 	*************************************************************/
 	int ParseLevelOptarg();
 	int ParseLearningOptarg();
+	int ParseExplorationOptarg();				//  NUMERIC_INDIFFERENCE
 	bool CheckOptargRemoveOrZero();
 	bool ProcessWatchLevelSettings(const int level, WatchBitset& options, WatchBitset& settings, int& wmeSetting, int& learnSetting);
 

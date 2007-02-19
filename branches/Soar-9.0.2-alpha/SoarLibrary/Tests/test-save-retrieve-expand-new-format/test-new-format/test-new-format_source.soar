@@ -1,0 +1,12 @@
+source _firstload.soar
+pushd all
+source all_source.soar
+popd
+pushd elaborations
+source elaborations_source.soar
+popd
+source clear-all-save.soar
+source deliberate-save.soar
+source initialize-test-save.soar
+source retrive-multi-level.soar
+source stop.soar

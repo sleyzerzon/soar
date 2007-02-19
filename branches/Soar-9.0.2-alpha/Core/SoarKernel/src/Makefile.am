@@ -9,6 +9,7 @@ agent.cpp\
 backtrace.cpp\
 callback.cpp\
 chunk.cpp\
+Cluster.cpp\
 consistency.cpp\
 decide.cpp\
 explain.cpp\
@@ -23,10 +24,13 @@ prefmem.cpp\
 print.cpp\
 production.cpp\
 recmem.cpp\
+reinforcement_learning.cpp\
 reorder.cpp\
 rete.cpp\
 rhsfun.cpp\
 rhsfun_math.cpp\
+semantic_memory.cpp\
+smem.cpp\
 soar_rand.cpp\
 symtab.cpp\
 tempmem.cpp\
@@ -58,6 +62,7 @@ reorder.h\
 ../include/parser.h\
 ../include/print.h\
 ../include/production.h\
+../include/reinforcement_learning.h\
 ../include/recmem.h\
 ../include/rete.h\
 ../include/rhsfun.h\

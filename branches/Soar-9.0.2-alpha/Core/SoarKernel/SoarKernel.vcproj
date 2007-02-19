@@ -265,6 +265,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\Cluster.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\src\consistency.cpp"
 				>
 				<FileConfiguration
@@ -545,6 +565,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\reinforcement_learning.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\src\reorder.cpp"
 				>
 				<FileConfiguration
@@ -625,28 +665,20 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\semantic_memory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\smem.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\soar_rand.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\symtab.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\src\tempmem.cpp"
@@ -754,6 +786,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Cluster.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\consistency.h"
 				>
 			</File>
@@ -818,7 +854,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\shared\portability.h"
+				RelativePath=".\src\portability.h"
 				>
 			</File>
 			<File
@@ -838,6 +874,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\reinforcement_learning.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\reorder.h"
 				>
 			</File>
@@ -851,6 +891,14 @@
 			</File>
 			<File
 				RelativePath=".\include\rhsfun_math.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\semantic_memory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\smem.h"
 				>
 			</File>
 			<File

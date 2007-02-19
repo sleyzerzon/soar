@@ -1,0 +1,17 @@
+sp {propose*stop
+   (state <s> ^name test-save
+             #^got-result yes
+              ^retrieved-result.a3.a3.a3
+              ^smem.result.retrieved.a1 v1)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name stop)
+}
+
+sp {apply*stop
+   (state <s> ^operator <op>)
+   (<op> ^name stop)
+-->
+   (write |stop|)
+   (halt)
+}

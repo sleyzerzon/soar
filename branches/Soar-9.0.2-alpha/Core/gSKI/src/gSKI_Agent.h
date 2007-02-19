@@ -1142,6 +1142,14 @@ namespace gSKI
 		//}
 
 
+                void SetExplorationMode(egSKIExplorationMode m, Error* pErr = 0);
+                egSKIExplorationMode GetExplorationMode(Error* pErr = 0);
+                void SetExplorationParameter(egSKIExplorationParameter m, double value, Error* pErr = 0);
+		double GetExplorationParameter(egSKIExplorationParameter m, Error* pErr = 0);
+		void SetRLParameter(egSKIRLParameter m, double value, Error* pErr = 0);
+		double GetRLParameter(egSKIRLParameter m, Error* pErr = 0);
+
+
 		/** Fire the gSKIEVENT_BEFORE_RUN_STARTS event **/
 		void FireRunStartsEvent() ;
 

@@ -21,9 +21,9 @@
  *  must be kept up to date.
  * =======================================================================
  */
+#include "kernel.h"
 
 #include "agent.h"
-#include "kernel.h"
 #include "mem.h"
 #include "lexer.h"
 #include "symtab.h"
@@ -145,6 +145,29 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
 //  newAgent->current_line_index                 = 0;
 //#endif /* _WINDOWS */
   /* String redirection */
+#ifdef SEMANTIC_MEMORY
+  // YJ
+  newAgent->association_rule_counter			=0; // YJ's rule counter, old for rec_link
+  newAgent->semantic_memory = new SemanticMemory();
+  newAgent->retrieve_ready = true;
+  newAgent->cluster_ready = true;
+  
+  newAgent->to_be_saved_wmes = new set<LME>;
+  newAgent->prohibited_ids = new set<string>;
+  newAgent->gold_level_to_smem_links = new vector<vector<wme*> >();
+  
+  newAgent->smem_structures = new vector<smem_accessary>();
+ /* newAgent->last_cue_id = new string();
+  newAgent->last_retrieved = NIL;
+  newAgent->last_experience = NIL;
+  newAgent->last_confidence = NIL;
+  */
+  // 100 Units, 300 max dimensions
+  newAgent->clusterNet = new NetWork(100,300);
+
+  //End YJ
+#endif //SEMANTIC_MEMORY
+
   newAgent->using_output_string                = FALSE;
   newAgent->using_input_string                 = FALSE;
   newAgent->output_string                      = NIL;
@@ -292,17 +315,30 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->top_dir_stack->next = NIL;   /* AGR 568 */
   strcpy(newAgent->top_dir_stack->directory, cur_path);   /* AGR 568 */
 
-  /* changed all references of 'i', a var belonging to a previous for loop, to 'productionTypeCounter' to be unique 
-    stokesd Sept 10 2004*/
+  /* changed all references of 'i', a var belonging to a previous for loop,
+   *  to 'productionTypeCounter' to be unique   stokesd Sept 10 2004*/
   for (int productionTypeCounter=0; productionTypeCounter<NUM_PRODUCTION_TYPES; productionTypeCounter++) {  
     newAgent->all_productions_of_type[productionTypeCounter] = NIL;
     newAgent->num_productions_of_type[productionTypeCounter] = 0;
   }
 
   newAgent->o_support_calculation_type = 4; /* KJC 7/00 */ // changed from 3 to 4 by voigtjr  (/* bugzilla bug 339 */)
+
 #ifdef NUMERIC_INDIFFERENCE
-  newAgent->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_AVG;
-#endif
+  newAgent->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_SUM;
+  newAgent->exploration_mode = EPSILON_GREEDY_EXPLORATION;
+  newAgent->Temperature = 25.0;    /* used to keep summed indifferent preferences 
+                                    * within a reasonable range, since they will be used as
+				    * an exponent to the number 10, and must be stored 
+                                    * in a 64 bit double */
+  newAgent->epsilon = 0.1;     // proportion of the time an exploratory action is taken
+  newAgent->gamma = 0.9;       // discount factor
+  newAgent->alpha = 0.3;       // learning rate 
+  newAgent->lambda = 0;		   // eligibility traces	
+  newAgent->RL_count = 1;
+#endif   // NUMERIC_INDIFFERENCE
+
+
   newAgent->attribute_preferences_mode = 0; /* RBD 4/17/95 */
 
    /* JC ADDED: Make sure that the RHS functions get initialized correctly */
@@ -409,6 +445,26 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   soar_remove_all_monitorable_callbacks(delete_agent, (void*) delete_agent);
 
   /* RPM 9/06 begin */
+
+  /* KNOWN MEMORY LEAK! Need to track down and free ALL structures */
+  /* pointed to be fields in the agent structure.                  */
+
+#ifdef SEMANTIC_MEMORY
+  //YJ's stuff
+  // delete_agent->semantic_memory->clear();
+  delete delete_agent->semantic_memory;
+  delete delete_agent->clusterNet;
+
+  delete delete_agent->to_be_saved_wmes;
+  delete delete_agent->prohibited_ids;
+  delete delete_agent->gold_level_to_smem_links;
+  
+  //delete delete_agent->last_cue_id;
+  delete delete_agent->smem_structures;
+  //delete_agent->top_goal->id.common_symbol_info.reference_count --;
+  //print_with_symbols(delete_agent, "%f being dereferenced", delete_agent->top_goal);
+  // YJ's tuff
+#endif SEMANTIC_MEMORY
 
   free_memory(delete_agent, delete_agent->left_ht, HASH_TABLE_MEM_USAGE);
   free_memory(delete_agent, delete_agent->right_ht, HASH_TABLE_MEM_USAGE);

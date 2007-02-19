@@ -104,6 +104,9 @@ typedef union symbol_union Symbol;
 /* Uncomment the following line to debug memory usage */
 /* #define DEBUG_MEMORY */
 
+/* Uncomment the following line to enable semantic_memory facility */
+#define SEMANTIC_MEMORY
+
 /* Comment out the following line to avoid the overhead of keeping statistics
    on memory pool usage */
 //#define MEMORY_POOL_STATS
@@ -116,6 +119,7 @@ typedef union symbol_union Symbol;
    on how much time is spent in various parts of the system.  If you
    have DETAILED_TIMING_STATS defined, you must NOT define NO_TIMING_STUFF */
 /* #define DETAILED_TIMING_STATS */
+
 
 /* UNcomment the following line to have Soar maintain reference counts 
    on wmes and prefs at the top level.  This can result in larger
@@ -145,12 +149,24 @@ typedef union symbol_union Symbol;
 #define NUMERIC_INDIFFERENCE
 
 #ifdef NUMERIC_INDIFFERENCE
+
+/* UnComment the following line to enable reinforcement learning */
+#define REINFORCEMENT_LEARNING
+
 /* Possible modes for numeric indifference */
 enum ni_mode {
     NUMERIC_INDIFFERENT_MODE_AVG,
     NUMERIC_INDIFFERENT_MODE_SUM,
 };
 #endif 
+ 
+ /* Possible exploration policies for RL. */
+
+enum exp_mode {
+ 	BOLTZMANN_EXPLORATION,
+ 	EPSILON_GREEDY_EXPLORATION,
+ 	NO_EXPLORATION,
+};
 
 /* Comment the following line to disable workaround for bug 139 */
 #define BUG_139_WORKAROUND

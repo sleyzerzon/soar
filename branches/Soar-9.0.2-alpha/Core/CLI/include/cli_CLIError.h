@@ -100,6 +100,15 @@ namespace cli {
 			kPreferencesError					= 85, // FIXME: document in wiki
 			kInvalidRunInterleaveSetting		= 86,
 			kLoadLibraryError					= 87, // FIXME: document in wiki
+			kInvalidExplorationSetting			= 88, // NUMERIC_INDIFFERENCE
+			kTempMustBePositive					= 89, // NUMERIC_INDIFFERENCE
+			kEpsilonOutsideUnitInterval			= 90, // NUMERIC_INDIFFERENCE
+			kAlphaMustBeNonNegative				= 91, // NUMERIC_INDIFFERENCE
+			kParameterOutsideUnitInterval		= 92, // NUMERIC_INDIFFERENCE
+			kFloatExpected						= 93, // FIXME: document in wiki
+			kETRequiresOnPolicy					= 94, // NUMERIC_INDIFFERENCE
+			kOffPolicyDisallowsET				= 95, // NUMERIC_INDIFFERENCE
+
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -185,6 +194,14 @@ namespace cli {
 				case kPreferencesError:					return "Preferences command failed." ;
 				case kInvalidRunInterleaveSetting:		return "Invalid setting for run interleave option." ;
 				case kLoadLibraryError:					return "Error occurred while loading library";
+				case kInvalidExplorationSetting:		return "Invalid exploration mode.";
+				case kTempMustBePositive:				return "Temperature parameter must be positive.";
+				case kEpsilonOutsideUnitInterval:		return "Epsilon parameter must be in [0,1].";
+				case kAlphaMustBeNonNegative:			return "Alpha parameter must be non-negative.";
+				case kParameterOutsideUnitInterval:		return "Parameter must be in [0,1].";
+				case kFloatExpected:					return "Floating point argument expected.";
+				case kETRequiresOnPolicy:				return "Lambda > 0 requires RL --on-policy.";
+				case kOffPolicyDisallowsET:				return "Off-policy requires RL --lambda 0.";
 				default:								return "Unknown error code.";
 			}
 		}

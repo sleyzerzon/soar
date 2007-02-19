@@ -239,6 +239,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\cli_exploration.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\cli_firingcounts.cpp"
 					>
 				</File>
@@ -270,7 +274,11 @@
 					RelativePath=".\src\cli_learn.cpp"
 					>
 				</File>
-				<File
+                                <File
+					RelativePath=".\src\cli_loadMemory.cpp"
+                                        >
+				</File>
+                                <File
 					RelativePath=".\src\cli_loadLibrary.cpp"
 					>
 				</File>
@@ -352,6 +360,10 @@
 				</File>
 				<File
 					RelativePath=".\src\cli_retenet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\cli_RL.cpp"
 					>
 				</File>
 				<File

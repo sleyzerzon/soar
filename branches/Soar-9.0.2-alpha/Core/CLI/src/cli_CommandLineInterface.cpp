@@ -64,7 +64,8 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIEditProduction]				= &cli::CommandLineInterface::ParseEditProduction;
 	m_CommandMap[Commands::kCLIExcise]						= &cli::CommandLineInterface::ParseExcise;
 	m_CommandMap[Commands::kCLIExplainBacktraces]			= &cli::CommandLineInterface::ParseExplainBacktraces;
-	m_CommandMap[Commands::kCLIFiringCounts]				= &cli::CommandLineInterface::ParseFiringCounts;
+	m_CommandMap[Commands::kCLIExploration]			 	    = &cli::CommandLineInterface::ParseExploration;
+       	m_CommandMap[Commands::kCLIFiringCounts]				= &cli::CommandLineInterface::ParseFiringCounts;
 	m_CommandMap[Commands::kCLIGDSPrint]					= &cli::CommandLineInterface::ParseGDSPrint;
 	m_CommandMap[Commands::kCLIHelp]						= &cli::CommandLineInterface::ParseHelp;
 	m_CommandMap[Commands::kCLIIndifferentSelection]		= &cli::CommandLineInterface::ParseIndifferentSelection;
@@ -93,6 +94,8 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIQuit]						= &cli::CommandLineInterface::ParseQuit;
 	m_CommandMap[Commands::kCLIRemoveWME]					= &cli::CommandLineInterface::ParseRemoveWME;
 	m_CommandMap[Commands::kCLIReteNet]						= &cli::CommandLineInterface::ParseReteNet;
+	m_CommandMap[Commands::kCLIRL]						    = &cli::CommandLineInterface::ParseRL;
+	m_CommandMap[Commands::kCLIRLcaps]					    = &cli::CommandLineInterface::ParseRL;
 	m_CommandMap[Commands::kCLIRun]							= &cli::CommandLineInterface::ParseRun;
 	m_CommandMap[Commands::kCLISaveBacktraces]				= &cli::CommandLineInterface::ParseSaveBacktraces;
 	m_CommandMap[Commands::kCLISetLibraryLocation]			= &cli::CommandLineInterface::ParseSetLibraryLocation;
@@ -113,6 +116,16 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIWarnings]					= &cli::CommandLineInterface::ParseWarnings;
 	m_CommandMap[Commands::kCLIWatch]						= &cli::CommandLineInterface::ParseWatch;
 	m_CommandMap[Commands::kCLIWatchWMEs]					= &cli::CommandLineInterface::ParseWatchWMEs;
+//#ifdef SEMANTIC_MEMORY
+	m_CommandMap[Commands::kCLILoadMemory]				= &cli::CommandLineInterface::ParseLoadMemory; // YJ
+	m_CommandMap[Commands::kCLIPrintMemory]			= &cli::CommandLineInterface::ParsePrintMemory; // YJ
+	m_CommandMap[Commands::kCLIClearMemory]			= &cli::CommandLineInterface::ParseClearMemory; // YJ
+	m_CommandMap[Commands::kCLISummarizeMemory]			= &cli::CommandLineInterface::ParseSummarizeMemory; // YJ
+	m_CommandMap[Commands::kCLISmemOption]			= &cli::CommandLineInterface::ParseSmemOption; // YJ
+	m_CommandMap[Commands::kCLICluster]			= &cli::CommandLineInterface::ParseCluster; // YJ
+	m_CommandMap[Commands::kCLIClusterTrain]			= &cli::CommandLineInterface::ParseClusterTrain; // YJ
+	m_CommandMap[Commands::kCLIClusterRecognize]			= &cli::CommandLineInterface::ParseClusterRecognize; // YJ
+//#endif
 
 	// Indicate which commands should be echoed so that all users can see them when doing a shared debugging session
 	m_EchoMap[Commands::kCLIAddWME]						= true ;
@@ -126,6 +139,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIEcho]						= true ;
 	m_EchoMap[Commands::kCLIEchoCommands]				= true ;
 	m_EchoMap[Commands::kCLIExcise]						= true ;
+	m_EchoMap[Commands::kCLIExploration]					= true ;
 	m_EchoMap[Commands::kCLIIndifferentSelection]		= true ;
 	m_EchoMap[Commands::kCLIInitSoar]					= true ;
 	m_EchoMap[Commands::kCLIInputPeriod]				= true ;
@@ -142,6 +156,8 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIQuit]						= true ;
 	m_EchoMap[Commands::kCLIRemoveWME]					= true ;
 	m_EchoMap[Commands::kCLIReteNet]					= true ;
+	m_EchoMap[Commands::kCLIRL]						= true ;
+	m_EchoMap[Commands::kCLIRLcaps]						= true ;
 	m_EchoMap[Commands::kCLIRun]						= true ;
 	m_EchoMap[Commands::kCLISetLibraryLocation]			= true ;
 	m_EchoMap[Commands::kCLISoar8]						= true ;

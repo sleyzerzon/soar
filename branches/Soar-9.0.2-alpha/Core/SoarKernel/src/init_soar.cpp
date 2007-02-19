@@ -45,6 +45,7 @@
 #include "rete.h"
 #include "gdatastructs.h"
 #include "kernel_struct.h"
+#include "reinforcement_learning.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
 
@@ -52,6 +53,14 @@
 #include "gski_event_system_functions.h"
 
 #define INIT_FILE       "init.soar"
+#ifdef SEMANTIC_MEMORY
+// YJ's stuff
+
+extern void smem_routine(agent* thisAgent);
+extern void YJ_input_phase_call(agent* thisAgent);
+extern void YJ_decision_phase_call(agent* thisAgent);
+extern void YJ_application_phase_call(agent* thisAgent);
+#endif // SEMANTIC_MEMORY
 
 /* REW: begin 08.20.97   these defined in consistency.c  */
 extern void determine_highest_active_production_level_in_stack_propose(agent* thisAgent);
@@ -478,6 +487,19 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[USE_LONG_CHUNK_NAMES] = TRUE;  /* kjh(B14) */
   thisAgent->sysparams[TRACE_OPERAND2_REMOVALS_SYSPARAM] = FALSE;
   thisAgent->sysparams[TIMERS_ENABLED] = TRUE;
+
+  // SEMANTIC_MEMORY
+  thisAgent->sysparams[SMEM_SYSPARAM] = 0;
+  // 0 all off
+  // 1 deliberate saving is on, automatic saving is off
+  // 2 automatic saving is on, deliberate saving is off
+  // SEMANTIC_MEMORY
+
+#ifdef NUMERIC_INDIFFERENCE
+  thisAgent->sysparams[RL_ON_SYSPARAM] = TRUE;
+  thisAgent->sysparams[RL_ONPOLICY_SYSPARAM] = TRUE;
+#endif
+
 }
 
 /* ===================================================================
@@ -635,6 +657,11 @@ bool reinitialize_soar (agent* thisAgent) {
   set_sysparam(thisAgent, TRACE_WM_CHANGES_SYSPARAM,               FALSE);
   /* kjh (CUSP-B4) end */
 
+#ifdef NUMERIC_INDIFFERENCE
+  // reset_RL must happen before clear_goal_stack, otherwise we get unwanted Bellman updates while clearing goal stack
+  reset_RL(thisAgent);
+ #endif
+ 
   clear_goal_stack (thisAgent);
 
   if (thisAgent->operand2_mode == TRUE) {
@@ -755,6 +782,11 @@ void do_one_top_level_phase (agent* thisAgent)
   switch (thisAgent->current_phase) {
 
   case INPUT_PHASE:
+#ifdef SEMANTIC_MEMORY	
+	  // YJ
+		YJ_input_phase_call(thisAgent);
+	  // YJ
+#endif /* SEMANTIC_MEMORY */
 
 	 if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
          print_phase (thisAgent, "\n--- Input Phase --- \n",0);
@@ -982,6 +1014,11 @@ void do_one_top_level_phase (agent* thisAgent)
 
   /////////////////////////////////////////////////////////////////////////////////
   case APPLY_PHASE:   /* added in 8.6 to clarify Soar8 decision cycle */
+#ifdef SEMANTIC_MEMORY
+	  //YJ	
+	  YJ_application_phase_call(thisAgent);
+	//YJ
+#endif /* SEMANTIC_MEMORY */
 
       #ifndef NO_TIMING_STUFF
       start_timer (thisAgent, &thisAgent->start_phase_tv);
@@ -1080,6 +1117,11 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])
           print_phase (thisAgent, "\n--- Output Phase ---\n",0);
+	
+
+
+       /* JC ADDED: Tell gski about output phase beginning */
+       gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_PHASE, gSKI_K_OUTPUT_PHASE, 0);
       
       #ifndef NO_TIMING_STUFF      /* REW:  28.07.96 */
 	  start_timer (thisAgent, &thisAgent->start_phase_tv);
@@ -1096,7 +1138,13 @@ void do_one_top_level_phase (agent* thisAgent)
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_OUTPUT_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
- 
+
+	 #ifdef SEMANTIC_MEMORY
+	  // YJ's stuff
+	  smem_routine(thisAgent);
+	  //
+	#endif /* SEMANTIC_MEMORY */
+
       /* REW: begin 09.15.96 */
       if (thisAgent->operand2_mode == TRUE) {
 		  /* KJC June 05:  moved here from DECISION Phase */
@@ -1284,6 +1332,15 @@ void do_one_top_level_phase (agent* thisAgent)
 	  soar_invoke_callbacks(thisAgent, thisAgent, 
 		  AFTER_HALT_SOAR_CALLBACK,
 		  (soar_call_data) NULL);
+#ifdef NUMERIC_INDIFFERENCE
+	  // To model episodic task, after halt, perform RL update with next-state value 0
+	  if (thisAgent->sysparams[RL_ON_SYSPARAM]){
+	    for (Symbol* g = thisAgent->bottom_goal ; g ; g = g->id.higher_goal){
+	      tabulate_reward_value_for_goal(thisAgent,g);
+	      perform_Bellman_update(thisAgent, 0, g);
+	    }
+	  }
+#endif
   }
   
   if (thisAgent->stop_soar) {
