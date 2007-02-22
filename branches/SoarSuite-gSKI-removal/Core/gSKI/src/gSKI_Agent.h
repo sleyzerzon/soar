@@ -1166,16 +1166,15 @@ namespace gSKI
 		///////////////////////////////// NOT PART OF INTERFACE ///////////////////////////
 
 		/**
-		* @brief: Allows access to the agent pointer
-		*/
-		agent* GetSoarAgent(void) { return m_agent; }
-
-		/**
 		* @brief Gets the kernel associated with this agent.
 		*/
 		Kernel* GetKernel(void) { return m_kernel; }
 
 	public:
+		/**
+		* @brief: Allows access to the agent pointer
+		*/
+		agent* GetSoarAgent(void) { return m_agent; }
 
 		/** 
 		* @brief Event notifier for run events

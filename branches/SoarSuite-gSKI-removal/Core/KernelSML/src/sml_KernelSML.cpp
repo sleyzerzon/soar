@@ -1,7 +1,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // KernelSML class file.
@@ -49,6 +49,8 @@
 #include "IgSKI_Symbol.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_WorkingMemory.h"
+
+#include "KernelHeaders.h"
 
 using namespace sml ;
 using namespace gSKI ;
@@ -423,7 +425,7 @@ AgentSML* KernelSML::GetAgentSML(gSKI::Agent* pAgent)
 	if (iter == m_AgentMap.end())
 	{
 		// If not in the map, add it.
-		pResult = new AgentSML(this, pAgent) ;
+		pResult = new AgentSML(this, pAgent, pAgent->GetSoarAgent()) ;
 		m_AgentMap[pAgent] = pResult ;
 	}
 	else

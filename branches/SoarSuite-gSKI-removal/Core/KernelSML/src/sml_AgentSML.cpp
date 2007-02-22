@@ -1,7 +1,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // AgentSML class file.
@@ -30,6 +30,8 @@
 #include "IgSKI_InputLink.h"
 #include "IgSKI_WorkingMemory.h"
 
+#include "KernelHeaders.h"
+
 #ifdef _DEBUG
 // Comment this in to debug init-soar and inputwme::update calls
 //#define DEBUG_UPDATE
@@ -43,10 +45,12 @@
 
 using namespace sml ;
 
-AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pAgent) : /*m_AgentListener(pKernelSML, pAgent)*/ m_ProductionListener(pKernelSML, pAgent), m_RunListener(pKernelSML, pAgent), m_PrintListener(pKernelSML, pAgent), m_XMLListener(pKernelSML, pAgent)
+AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
+: m_ProductionListener(pKernelSML, pIAgent), m_RunListener(pKernelSML, pIAgent),
+  m_PrintListener(pKernelSML, pIAgent), m_XMLListener(pKernelSML, pIAgent)
 {
 	m_pKernelSML = pKernelSML ;
-	m_pIAgent = pAgent ;
+	m_pIAgent = pIAgent ;
 	m_pInputProducer = NULL ;
 	m_InputLinkRoot = NULL ;
 	m_OutputLinkRoot = NULL ;
@@ -62,11 +66,12 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pAgent) : /*m_AgentListen
 	m_OutputCounter = 0 ;
     m_localRunCount = 0 ;
     m_localStepCount= 0 ;
+	m_pAgent = pAgent ;
 
 	m_pBeforeDestroyedListener = NULL ;
 
 	// Create a listener for output events and other events we listen for
-	m_pOutputListener = new OutputListener(pKernelSML, pAgent) ;
+	m_pOutputListener = new OutputListener(pKernelSML, pIAgent) ;
 
 	// For KernelSML (us) to work correctly we need to listen for certain events, independently of what any client is interested in
 	// Currently:

@@ -26,6 +26,8 @@ namespace gSKI {
 	class IInputProducer ;
 }
 
+typedef struct agent_struct agent;
+
 #include <map>
 #include <list>
 #include <string>
@@ -59,6 +61,9 @@ protected:
 
 	// A reference to the underlying gSKI agent object
 	gSKI::Agent*	m_pIAgent ;
+
+	// A reference to the underlying kernel agent object
+	agent*			m_pAgent ;
 
 	// Pointer back to the owning kernel SML object
 	KernelSML*		m_pKernelSML ;
@@ -104,7 +109,7 @@ protected:
 	unsigned long m_OutputCounter ;
 
 public:
-	AgentSML(KernelSML* pKernelSML, gSKI::Agent* pAgent) ;
+	AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent) ;
 
 	~AgentSML() ;
 
@@ -122,6 +127,7 @@ public:
 	void ReleaseAllWmes(bool flushPendingRemoves = true) ;
 
 	gSKI::Agent* GetIAgent() { return m_pIAgent ; }
+	agent* GetAgent()		 { return m_pAgent ; }
 
 	void SetInputLinkRoot(gSKI::IWMObject* pRoot)   { m_InputLinkRoot = pRoot ; }
 	gSKI::IWMObject* GetInputLinkRoot()				{ return m_InputLinkRoot ; }
