@@ -1041,11 +1041,13 @@ namespace gSKI
       ClearError(err);
       return m_phaseCount;
    }
+   /*
    void Agent::ResetNumPhasesExecuted(Error* err)
    {
       ClearError(err);
       m_phaseCount = 0;
    }
+   */
    void Agent::ResetNilOutputCounter(Error* err)
    {
 	  ClearError(err);
@@ -1100,12 +1102,14 @@ namespace gSKI
       ClearError(err);
       return m_outputCount;
    }
+   /*
    void Agent::ResetNumOutputsExecuted(Error* err)
    {
       ClearError(err);
       m_outputCount = 0;
 	  m_nilOutputCycles = 0;
    }
+   */
 
 /********************************************************************
 * @brief	Agents maintain a number of counters (for how many phase,
@@ -1647,6 +1651,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 				a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_OUTPUT);
 				// m_nilOutputCycles gets reset whenever StepCtr is incremented for output
 			}
+			assert(a->m_agent->run_last_output_count == a->m_nilOutputCycles) ;
 		}
 	}
     if (gSKIEVENT_AFTER_ELABORATION_CYCLE == eventId) 

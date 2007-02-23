@@ -610,7 +610,7 @@ namespace gSKI
 		*             initialized.
 		*/
 		unsigned long GetNumPhasesExecuted(Error* err = 0);
-		void          ResetNumPhasesExecuted(Error* err = 0);
+		//void          ResetNumPhasesExecuted(Error* err = 0);
 
 		/********************************************************************
 		* @brief	Agents maintain a number of counters (for how many phase,
@@ -688,7 +688,7 @@ namespace gSKI
 		*             initialized.
 		*/
 		unsigned long GetNumOutputsExecuted(Error* err = 0);
-		void          ResetNumOutputsExecuted(Error* err = 0);
+		//void          ResetNumOutputsExecuted(Error* err = 0);
 		void          ResetNilOutputCounter(Error* err = 0);
 
 		AgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)

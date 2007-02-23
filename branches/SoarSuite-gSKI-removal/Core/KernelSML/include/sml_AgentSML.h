@@ -241,6 +241,7 @@ public:
 	unsigned long GetNumPhasesExecuted() ;
 	unsigned long GetNumOutputsGenerated() ;
 	unsigned long GetLastOutputCount() ;
+	void ResetLastOutputCount() ;
 
 } ;
 

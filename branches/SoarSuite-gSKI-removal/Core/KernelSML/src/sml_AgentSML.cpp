@@ -222,6 +222,14 @@ unsigned long AgentSML::GetLastOutputCount()
 	return m_agent->run_last_output_count ;
 }
 
+//=============================
+// Reset the count of how long since the agent last generated output
+//=============================
+void AgentSML::ResetLastOutputCount()
+{
+	m_agent->run_last_output_count = 0 ;
+}
+
 class AgentSML::AgentBeforeDestroyedListener: public gSKI::IAgentListener
 {
 public:

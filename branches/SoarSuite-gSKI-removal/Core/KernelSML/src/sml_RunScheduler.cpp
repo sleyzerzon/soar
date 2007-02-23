@@ -138,9 +138,17 @@ unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgent
 	case gSKI_INTERLEAVE_ELABORATION_PHASE:
 		return pAgent->GetNumElaborationsExecuted();
 	case gSKI_INTERLEAVE_DECISION_CYCLE:
-		return pAgentSML->GetNumDecisionCyclesExecuted();
+		{
+			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgentSML->GetNumDecisionCyclesExecuted()) ;
+			return decs ;
+		}
 	case gSKI_INTERLEAVE_OUTPUT:
-		return pAgent->GetNumOutputsExecuted();
+		{
+			unsigned long outputs = pAgent->GetNumOutputsExecuted() ;
+			assert (outputs == pAgentSML->GetNumOutputsGenerated()) ;
+			return outputs ;
+		}
 	default:
 		return 0;
 	}
@@ -166,11 +174,23 @@ unsigned long RunScheduler::GetRunCounter(gSKI::Agent* pAgent, AgentSML* pAgentS
 	case gSKI_RUN_ELABORATION_CYCLE:
 		return pAgent->GetNumElaborationsExecuted();
 	case gSKI_RUN_DECISION_CYCLE:
-		return pAgentSML->GetNumDecisionCyclesExecuted();
+		{
+			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgentSML->GetNumDecisionCyclesExecuted()) ;
+			return decs ;
+		}
 	case gSKI_RUN_UNTIL_OUTPUT:
-		return pAgent->GetNumOutputsExecuted();
+		{
+			unsigned long outputs = pAgent->GetNumOutputsExecuted() ;
+			assert (outputs == pAgentSML->GetNumOutputsGenerated()) ;
+			return outputs ;
+		}
 	case gSKI_RUN_FOREVER:
-		return pAgentSML->GetNumDecisionCyclesExecuted();
+		{
+			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgentSML->GetNumDecisionCyclesExecuted()) ;
+			return decs ;
+		}
 	default:
 		return 0;
 	}
@@ -392,6 +412,7 @@ void RunScheduler::InitializeRunCounters(egSKIRunType runStepSize, egSKIInterlea
 		{
  			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
 			pAgent->ResetNilOutputCounter();
+			pAgentSML->ResetLastOutputCount() ;
 			unsigned long count = GetRunCounter(pAgent, pAgentSML, runStepSize) ;
 			pAgentSML->SetInitialRunCount(count) ;
 			//pAgentSML->SetInitialStepCount(0) ;

@@ -1104,15 +1104,13 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  do_output_cycle(thisAgent);
 
-	  if (thisAgent->output_link_changed)
+	  // Count the outputs the agent generates (or times reaching max-nil-outputs without sending output)
+	  if (thisAgent->output_link_changed || ((++(thisAgent->run_last_output_count)) >= (unsigned long)thisAgent->sysparams[MAX_NIL_OUTPUT_CYCLES_SYSPARAM]))
 	  {
 		  thisAgent->run_last_output_count = 0 ;
 		  thisAgent->run_generated_output_count++ ;
 	  }
-	  else
-	  {
-		  thisAgent->run_last_output_count++ ;
-	  }
+
 	  thisAgent->run_phase_count++ ;
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_OUTPUT_PHASE_CALLBACK,
