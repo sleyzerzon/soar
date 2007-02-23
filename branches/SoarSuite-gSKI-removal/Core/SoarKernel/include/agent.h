@@ -350,6 +350,12 @@ typedef struct agent_struct {
   unsigned long       decision_phases_count;  /* can differ from d_cycle_count.  want for stats */
   //?? unsigned long       out_cycle_count;       /* # of output phases have gen'd output */
   //?? unsigned long       phase_count;       /* # of phases run so far */
+  /* DJP 2/22/07: These counts are based around the counts that the run command understands and are intended to capture the same semantics as run expects.
+     That may differ from some of the other counters above which historically may track slightly different values */
+  unsigned long		  run_phase_count ;				/* # of phases run since last init-soar */
+  unsigned long		  run_elaboration_count ;		/* # of elaboration cycles run since last init-soar.  A phase where nothing happens counts as an elaboration cycle */
+  unsigned long		  run_last_output_count ;		/* # of output phases since this agent last generated output */
+  unsigned long		  run_generated_output_count ;	/* # of output phases when this agent either generated output or reached "max-nil-output" cycles since last init-soar */
 
   /* REW: begin 09.15.96 */
 /* in Soar 8, PE's are done only during the APPLY phase */

@@ -63,7 +63,7 @@ protected:
 	gSKI::Agent*	m_pIAgent ;
 
 	// A reference to the underlying kernel agent object
-	agent*			m_pAgent ;
+	agent*			m_agent ;
 
 	// Pointer back to the owning kernel SML object
 	KernelSML*		m_pKernelSML ;
@@ -127,7 +127,7 @@ public:
 	void ReleaseAllWmes(bool flushPendingRemoves = true) ;
 
 	gSKI::Agent* GetIAgent() { return m_pIAgent ; }
-	agent* GetAgent()		 { return m_pAgent ; }
+	agent* GetAgent()		 { return m_agent ; }
 
 	void SetInputLinkRoot(gSKI::IWMObject* pRoot)   { m_InputLinkRoot = pRoot ; }
 	gSKI::IWMObject* GetInputLinkRoot()				{ return m_InputLinkRoot ; }
@@ -235,6 +235,13 @@ public:
 
 	void SetInitialOutputCount(unsigned long count)	{ m_OutputCounter = count ; }
 	unsigned long GetInitialOutputCount()			{ return m_OutputCounter ; }
+
+	unsigned long GetNumDecisionsExecuted() ;
+	unsigned long GetNumDecisionCyclesExecuted() ;
+	unsigned long GetNumPhasesExecuted() ;
+	unsigned long GetNumOutputsGenerated() ;
+	unsigned long GetLastOutputCount() ;
+
 } ;
 
 

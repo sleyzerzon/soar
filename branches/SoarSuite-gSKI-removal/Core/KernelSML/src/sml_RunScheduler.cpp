@@ -123,36 +123,22 @@ bool RunScheduler::VerifyStepSizeForRunType(egSKIRunType runStepSize, egSKIInter
 *			decisions etc.) they have ever executed.
 *			We use these counters to determine when a run should stop.
 *********************************************************************/
-unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, egSKIRunType runStepSize)
-{
-	switch(runStepSize)
-	{
-	case gSKI_RUN_SMALLEST_STEP:
-		return pAgent->GetNumSmallestStepsExecuted();
-	case gSKI_RUN_PHASE:
-		return pAgent->GetNumPhasesExecuted();
-	case gSKI_RUN_ELABORATION_CYCLE:
-		return pAgent->GetNumElaborationsExecuted();
-	case gSKI_RUN_DECISION_CYCLE:
-		return pAgent->GetNumDecisionCyclesExecuted();
-	case gSKI_RUN_UNTIL_OUTPUT:
-		return pAgent->GetNumOutputsExecuted();
-	default:
-		return 0;
-	}
-}
-unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, egSKIInterleaveType stepSize)
+unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgentSML, egSKIInterleaveType stepSize)
 {
 	switch(stepSize)
 	{
 	case gSKI_INTERLEAVE_SMALLEST_STEP:
 		return pAgent->GetNumSmallestStepsExecuted();
 	case gSKI_INTERLEAVE_PHASE:
-		return pAgent->GetNumPhasesExecuted();
+		{
+			unsigned long phases = pAgent->GetNumPhasesExecuted() ;
+			assert (phases == pAgentSML->GetNumPhasesExecuted()) ;
+			return phases ;
+		}
 	case gSKI_INTERLEAVE_ELABORATION_PHASE:
 		return pAgent->GetNumElaborationsExecuted();
 	case gSKI_INTERLEAVE_DECISION_CYCLE:
-		return pAgent->GetNumDecisionCyclesExecuted();
+		return pAgentSML->GetNumDecisionCyclesExecuted();
 	case gSKI_INTERLEAVE_OUTPUT:
 		return pAgent->GetNumOutputsExecuted();
 	default:
@@ -165,22 +151,26 @@ unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, egSKIInterleaveT
 *			decisions etc.) they have ever executed.
 *			We use these counters to determine when a run should stop.
 *********************************************************************/
-unsigned long RunScheduler::GetRunCounter(gSKI::Agent* pAgent, egSKIRunType runStepSize)
+unsigned long RunScheduler::GetRunCounter(gSKI::Agent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize)
 {
 	switch(runStepSize)
 	{
 	case gSKI_RUN_SMALLEST_STEP:
 		return pAgent->GetNumSmallestStepsExecuted();
 	case gSKI_RUN_PHASE:
-		return pAgent->GetNumPhasesExecuted();
+		{
+			unsigned long phases = pAgent->GetNumPhasesExecuted() ;
+			assert (phases == pAgentSML->GetNumPhasesExecuted()) ;
+			return phases ;
+		}
 	case gSKI_RUN_ELABORATION_CYCLE:
 		return pAgent->GetNumElaborationsExecuted();
 	case gSKI_RUN_DECISION_CYCLE:
-		return pAgent->GetNumDecisionCyclesExecuted();
+		return pAgentSML->GetNumDecisionCyclesExecuted();
 	case gSKI_RUN_UNTIL_OUTPUT:
 		return pAgent->GetNumOutputsExecuted();
 	case gSKI_RUN_FOREVER:
-		return pAgent->GetNumDecisionCyclesExecuted();
+		return pAgentSML->GetNumDecisionCyclesExecuted();
 	default:
 		return 0;
 	}
@@ -217,8 +207,8 @@ AgentSML* RunScheduler::GetAgentToSynchronizeWith()
 			// if this agent is later in decision cycle count or
 			// matches decision cycle count and has a later phase count then
 			// adopt it as the agent to synchronize with.
-			if (!pSynchAgent || pAgent->GetNumDecisionCyclesExecuted() > pSynchAgent->GetIAgent()->GetNumDecisionCyclesExecuted() ||
-				(pAgent->GetNumDecisionCyclesExecuted() == pSynchAgent->GetIAgent()->GetNumDecisionCyclesExecuted() &&
+			if (!pSynchAgent || pAgent->GetNumDecisionCyclesExecuted() > pSynchAgent->GetNumDecisionCyclesExecuted() ||
+				(pAgent->GetNumDecisionCyclesExecuted() == pSynchAgent->GetNumDecisionCyclesExecuted() &&
 				IsPhaseLater(pAgent->GetCurrentPhase(), pSynchAgent->GetIAgent()->GetCurrentPhase())))
 					pSynchAgent = pAgentSML ;
 		}
@@ -285,7 +275,7 @@ bool RunScheduler::AllAgentsAtStopBeforePhase()
 **************************************************************************/
 bool RunScheduler::IsAgentFinished(gSKI::Agent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count)
 {
-	unsigned long current = GetRunCounter(pAgent, runStepSize) ;
+	unsigned long current = GetRunCounter(pAgent, pAgentSML, runStepSize) ;
 	unsigned long initial = pAgentSML->GetInitialRunCount() ;
 
 	unsigned long difference = current - initial ;
@@ -373,6 +363,7 @@ void RunScheduler::FireBeforeRunStartsEvents()
 *			decisions etc.) they have ever executed.
 *			We use these counters to determine when a run should stop.
 *********************************************************************/
+/*
 void RunScheduler::RecordInitialRunCounters(egSKIRunType runStepSize)
 {
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
@@ -387,6 +378,7 @@ void RunScheduler::RecordInitialRunCounters(egSKIRunType runStepSize)
 		}
 	}
 }
+*/
 
 // The gSKI_Agent counters will maintain global values.  The counters in SML
 // are used locally within a single call to RunScheduledAgents
@@ -400,10 +392,10 @@ void RunScheduler::InitializeRunCounters(egSKIRunType runStepSize, egSKIInterlea
 		{
  			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
 			pAgent->ResetNilOutputCounter();
-			unsigned long count = GetRunCounter(pAgent, runStepSize) ;
+			unsigned long count = GetRunCounter(pAgent, pAgentSML, runStepSize) ;
 			pAgentSML->SetInitialRunCount(count) ;
 			//pAgentSML->SetInitialStepCount(0) ;
-			count = GetStepCounter(pAgent, interleaveStepSize) ; 
+			count = GetStepCounter(pAgent, pAgentSML, interleaveStepSize) ; 
 			pAgentSML->SetInitialStepCount(count) ;
 			pAgentSML->ResetLocalRunCounters() ;
 		}
@@ -900,7 +892,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 					// 
 
 					// if agent finished one runType, incr counter and remove from stepList				
-					if (pAgentSML->CompletedRunType(GetRunCounter(pAgent,runStepSize)) /* || pAgent->MaxNilOutputCyclesReached */ )
+					if (pAgentSML->CompletedRunType(GetRunCounter(pAgent, pAgentSML, runStepSize)) /* || pAgent->MaxNilOutputCyclesReached */ )
 				   {
 					   pAgentSML->IncrementLocalRunCounter();
 					   pAgentSML->PutAgentOnStepList(false);

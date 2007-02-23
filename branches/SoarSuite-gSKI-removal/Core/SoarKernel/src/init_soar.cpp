@@ -553,6 +553,11 @@ void reset_statistics (agent* thisAgent) {
 /* REW: end   09.15.96 */
   thisAgent->d_cycle_last_output = 0;   // KJC 11/17/05
 
+  thisAgent->run_phase_count = 0 ;
+  thisAgent->run_elaboration_count = 0 ;
+  thisAgent->run_last_output_count = 0 ;
+  thisAgent->run_generated_output_count = 0 ;
+
   reset_production_firing_counts(thisAgent);
 
 /* These are ALWAYS created in create_soar_agent, so might as 
@@ -793,6 +798,7 @@ void do_one_top_level_phase (agent* thisAgent)
 
       do_input_cycle(thisAgent);
 
+	  thisAgent->run_phase_count++ ;
       soar_invoke_callbacks(thisAgent, thisAgent, 
 		  AFTER_INPUT_PHASE_CALLBACK,
 		  (soar_call_data) NULL);
@@ -900,6 +906,8 @@ void do_one_top_level_phase (agent* thisAgent)
 			if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
 				print_phase(thisAgent, "\n--- END Proposal Phase ---\n",1);
 			}
+
+			thisAgent->run_phase_count++ ;
  			soar_invoke_callbacks(thisAgent, thisAgent, 
 									AFTER_PROPOSE_PHASE_CALLBACK,
 								(soar_call_data) NULL);
@@ -932,6 +940,7 @@ void do_one_top_level_phase (agent* thisAgent)
  
 	  do_preference_phase(thisAgent);
 
+	  thisAgent->run_phase_count++ ;
        soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_PREFERENCE_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
@@ -963,6 +972,7 @@ void do_one_top_level_phase (agent* thisAgent)
  
 	  do_working_memory_phase(thisAgent);
 
+	  thisAgent->run_phase_count++ ;
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_WM_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
@@ -1061,6 +1071,7 @@ void do_one_top_level_phase (agent* thisAgent)
  			if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
 				print_phase(thisAgent, "\n--- END Application Phase ---\n",1);
 			}
+			thisAgent->run_phase_count++ ;
  			soar_invoke_callbacks(thisAgent, thisAgent, 
 					AFTER_APPLY_PHASE_CALLBACK,
 					(soar_call_data) NULL);
@@ -1093,6 +1104,16 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  do_output_cycle(thisAgent);
 
+	  if (thisAgent->output_link_changed)
+	  {
+		  thisAgent->run_last_output_count = 0 ;
+		  thisAgent->run_generated_output_count++ ;
+	  }
+	  else
+	  {
+		  thisAgent->run_last_output_count++ ;
+	  }
+	  thisAgent->run_phase_count++ ;
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_OUTPUT_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
@@ -1173,6 +1194,7 @@ void do_one_top_level_phase (agent* thisAgent)
  
 	  do_decision_phase(thisAgent);
 
+	  thisAgent->run_phase_count++ ;
 	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_DECISION_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
