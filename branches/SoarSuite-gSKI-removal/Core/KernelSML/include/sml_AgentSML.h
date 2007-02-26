@@ -238,6 +238,7 @@ public:
 
 	unsigned long GetNumDecisionsExecuted() ;
 	unsigned long GetNumDecisionCyclesExecuted() ;
+	unsigned long GetNumElaborationsExecuted() ;
 	unsigned long GetNumPhasesExecuted() ;
 	unsigned long GetNumOutputsGenerated() ;
 	unsigned long GetLastOutputCount() ;

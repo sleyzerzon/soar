@@ -136,7 +136,11 @@ unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgent
 			return phases ;
 		}
 	case gSKI_INTERLEAVE_ELABORATION_PHASE:
-		return pAgent->GetNumElaborationsExecuted();
+		{
+			unsigned long elabs = pAgent->GetNumElaborationsExecuted() ;
+			assert (elabs == pAgentSML->GetNumElaborationsExecuted()) ;
+			return elabs ;
+		}
 	case gSKI_INTERLEAVE_DECISION_CYCLE:
 		{
 			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
@@ -172,7 +176,11 @@ unsigned long RunScheduler::GetRunCounter(gSKI::Agent* pAgent, AgentSML* pAgentS
 			return phases ;
 		}
 	case gSKI_RUN_ELABORATION_CYCLE:
-		return pAgent->GetNumElaborationsExecuted();
+		{
+			unsigned long elabs = pAgent->GetNumElaborationsExecuted() ;
+			assert (elabs == pAgentSML->GetNumElaborationsExecuted()) ;
+			return elabs ;
+		}
 	case gSKI_RUN_DECISION_CYCLE:
 		{
 			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
