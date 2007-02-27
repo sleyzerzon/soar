@@ -243,6 +243,9 @@ public:
 	unsigned long GetNumOutputsGenerated() ;
 	unsigned long GetLastOutputCount() ;
 	void ResetLastOutputCount() ;
+	egSKIPhaseType GetCurrentPhase() ;
+
+	bool IsSoar7Mode() ;
 
 } ;
 

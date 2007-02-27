@@ -90,11 +90,12 @@ namespace gSKI
        * AgentManager::RunInClientThread calls this method to execute
        *  agent running.
        */
+	  /*
       virtual egSKIRunResult Run(egSKIRunType        runLength, 
                                 unsigned long       count,
                                 egSKIInterleaveType runInterleave,
                                 Error*              err);
-
+	*/
       /** 
        * @brief The callback method for run events
 	   *

@@ -29,6 +29,7 @@
 #include "gSKI_Kernel.h"
 #include "IgSKI_InputLink.h"
 #include "IgSKI_WorkingMemory.h"
+#include "gSKI_EnumRemapping.h"
 
 #include "KernelHeaders.h"
 
@@ -238,6 +239,28 @@ unsigned long AgentSML::GetLastOutputCount()
 void AgentSML::ResetLastOutputCount()
 {
 	m_agent->run_last_output_count = 0 ;
+}
+
+//=============================
+// Special compatability mode to use Soar 7 decision cycle
+// Intended to allow easier upgrade from Soar 7 to Soar 8.
+//=============================
+bool AgentSML::IsSoar7Mode()
+{
+	// This mode signals Soar 8
+	if (m_agent->operand2_mode)
+		return false ;
+
+	return true ;
+}
+
+//=============================
+// Returns the current phase (which generally means the phase that is next going to execute
+// if you inspect this in between runs)
+//=============================
+egSKIPhaseType AgentSML::GetCurrentPhase()
+{
+	return gSKI::EnumRemappings::ReMapPhaseType((unsigned short)m_agent->current_phase,0);
 }
 
 class AgentSML::AgentBeforeDestroyedListener: public gSKI::IAgentListener

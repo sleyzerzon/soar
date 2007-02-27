@@ -131,26 +131,30 @@ unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgent
 		return pAgent->GetNumSmallestStepsExecuted();
 	case gSKI_INTERLEAVE_PHASE:
 		{
-			unsigned long phases = pAgent->GetNumPhasesExecuted() ;
-			assert (phases == pAgentSML->GetNumPhasesExecuted()) ;
+			unsigned long phases = pAgentSML->GetNumPhasesExecuted() ;
+			assert (phases == pAgent->GetNumPhasesExecuted()) ;
 			return phases ;
 		}
 	case gSKI_INTERLEAVE_ELABORATION_PHASE:
 		{
-			unsigned long elabs = pAgent->GetNumElaborationsExecuted() ;
-			assert (elabs == pAgentSML->GetNumElaborationsExecuted()) ;
+			unsigned long elabs = pAgentSML->GetNumElaborationsExecuted() ;
+
+			// Changing the definition for soar 7 mode so can't compare
+			if (!pAgentSML->IsSoar7Mode())
+				assert (elabs == pAgent->GetNumElaborationsExecuted()) ;
+
 			return elabs ;
 		}
 	case gSKI_INTERLEAVE_DECISION_CYCLE:
 		{
-			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
-			assert (decs == pAgentSML->GetNumDecisionCyclesExecuted()) ;
+			unsigned long decs = pAgentSML->GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
 			return decs ;
 		}
 	case gSKI_INTERLEAVE_OUTPUT:
 		{
-			unsigned long outputs = pAgent->GetNumOutputsExecuted() ;
-			assert (outputs == pAgentSML->GetNumOutputsGenerated()) ;
+			unsigned long outputs = pAgentSML->GetNumOutputsGenerated() ;
+			assert (outputs == pAgent->GetNumOutputsExecuted()) ;
 			return outputs ;
 		}
 	default:
@@ -171,32 +175,36 @@ unsigned long RunScheduler::GetRunCounter(gSKI::Agent* pAgent, AgentSML* pAgentS
 		return pAgent->GetNumSmallestStepsExecuted();
 	case gSKI_RUN_PHASE:
 		{
-			unsigned long phases = pAgent->GetNumPhasesExecuted() ;
-			assert (phases == pAgentSML->GetNumPhasesExecuted()) ;
+			unsigned long phases = pAgentSML->GetNumPhasesExecuted() ;
+			assert (phases == pAgent->GetNumPhasesExecuted()) ;
 			return phases ;
 		}
 	case gSKI_RUN_ELABORATION_CYCLE:
 		{
-			unsigned long elabs = pAgent->GetNumElaborationsExecuted() ;
-			assert (elabs == pAgentSML->GetNumElaborationsExecuted()) ;
+			unsigned long elabs = pAgentSML->GetNumElaborationsExecuted() ;
+
+			// Changing the definition for soar 7 mode so can't compare
+			if (!pAgentSML->IsSoar7Mode())
+				assert (elabs == pAgent->GetNumElaborationsExecuted()) ;
+
 			return elabs ;
 		}
 	case gSKI_RUN_DECISION_CYCLE:
 		{
-			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
-			assert (decs == pAgentSML->GetNumDecisionCyclesExecuted()) ;
+			unsigned long decs = pAgentSML->GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
 			return decs ;
 		}
 	case gSKI_RUN_UNTIL_OUTPUT:
 		{
-			unsigned long outputs = pAgent->GetNumOutputsExecuted() ;
-			assert (outputs == pAgentSML->GetNumOutputsGenerated()) ;
+			unsigned long outputs = pAgentSML->GetNumOutputsGenerated() ;
+			assert (outputs == pAgent->GetNumOutputsExecuted()) ;
 			return outputs ;
 		}
 	case gSKI_RUN_FOREVER:
 		{
-			unsigned long decs = pAgent->GetNumDecisionCyclesExecuted() ;
-			assert (decs == pAgentSML->GetNumDecisionCyclesExecuted()) ;
+			unsigned long decs = pAgentSML->GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
 			return decs ;
 		}
 	default:
@@ -237,7 +245,7 @@ AgentSML* RunScheduler::GetAgentToSynchronizeWith()
 			// adopt it as the agent to synchronize with.
 			if (!pSynchAgent || pAgent->GetNumDecisionCyclesExecuted() > pSynchAgent->GetNumDecisionCyclesExecuted() ||
 				(pAgent->GetNumDecisionCyclesExecuted() == pSynchAgent->GetNumDecisionCyclesExecuted() &&
-				IsPhaseLater(pAgent->GetCurrentPhase(), pSynchAgent->GetIAgent()->GetCurrentPhase())))
+				IsPhaseLater(pAgentSML->GetCurrentPhase(), pSynchAgent->GetCurrentPhase())))
 					pSynchAgent = pAgentSML ;
 		}
 	}
@@ -254,7 +262,7 @@ bool RunScheduler::AreAgentsSynchronized(AgentSML* pSynchAgent)
 		return true ;
 
 	bool same = true ;
-	egSKIPhaseType phase = pSynchAgent->GetIAgent()->GetCurrentPhase() ;
+	egSKIPhaseType phase = pSynchAgent->GetCurrentPhase() ;
 
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 	{
@@ -262,9 +270,9 @@ bool RunScheduler::AreAgentsSynchronized(AgentSML* pSynchAgent)
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
-			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
+			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
 
-			if (pAgent->GetCurrentPhase() != phase)
+			if (pAgentSML->GetCurrentPhase() != phase)
 				same = false ;
 		}
 	}
@@ -284,9 +292,9 @@ bool RunScheduler::AllAgentsAtStopBeforePhase()
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
-			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
+			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
 
-			if (pAgent->GetCurrentPhase() != m_StopBeforePhase)
+			if (pAgentSML->GetCurrentPhase() != m_StopBeforePhase)
 			{
 				//don't let this agent continue to run ahead
 //				pAgentSML->IncrementLocalRunCounter() ;
@@ -568,7 +576,7 @@ void RunScheduler::MoveTo_StopBeforePhase(egSKIRunType runStepSize)
 			if (pAgentSML->WasAgentOnRunList()) 
 			{
 				gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
-				egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
+				egSKIPhaseType phase = pAgentSML->GetCurrentPhase() ;
 				egSKIRunResult runResult = pAgentSML->GetResultOfLastRun() ;
 				if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
 
@@ -585,7 +593,7 @@ void RunScheduler::MoveTo_StopBeforePhase(egSKIRunType runStepSize)
 				while ((phase != m_StopBeforePhase) && (gSKI_RUN_COMPLETED == runResult))
 				{
 					runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, 1) ;
-					phase = pAgent->GetCurrentPhase() ;
+					phase = pAgentSML->GetCurrentPhase() ;
 					// don't cross Output-Input boundary here just to get to StopBefore phase for "Run 0"
 					if (gSKI_INPUT_PHASE == phase) break; 
 				}						
@@ -611,14 +619,14 @@ void RunScheduler::MoveTo_StopBeforePhase(egSKIRunType runStepSize)
 			if (pAgentSML->WasAgentOnRunList()) 
 			{
 				gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
-				egSKIPhaseType phase = pAgent->GetCurrentPhase() ;
+				egSKIPhaseType phase = pAgentSML->GetCurrentPhase() ;
 				egSKIRunResult runResult = pAgentSML->GetResultOfLastRun() ;
 				if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
  
 				while ((phase != m_StopBeforePhase) && (gSKI_RUN_COMPLETED == runResult))
 				{
 					runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, 1) ;
-					phase = pAgent->GetCurrentPhase() ;
+					phase = pAgentSML->GetCurrentPhase() ;
 					// We should never get to this point again, so we need to generate ERROR 
 					assert(gSKI_INPUT_PHASE != phase);
 				}		

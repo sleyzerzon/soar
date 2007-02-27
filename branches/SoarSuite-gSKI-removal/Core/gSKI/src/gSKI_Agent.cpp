@@ -411,6 +411,7 @@ namespace gSKI
 
    =============================
    */
+   /*
    egSKIRunResult Agent::RunInClientThread(egSKIRunType        runLength, 
                                            unsigned long       count,
                                            Error*              err)
@@ -439,6 +440,7 @@ namespace gSKI
       // This helper does all the work
       return run(runLength, count);
    }
+	*/
 
    egSKIRunResult Agent::StepInClientThread(egSKIInterleaveType  stepSize, 
                                                   unsigned long  stepCount,

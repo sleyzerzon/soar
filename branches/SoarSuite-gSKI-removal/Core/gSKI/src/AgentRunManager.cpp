@@ -218,6 +218,7 @@ namespace gSKI
 
    =============================
    */
+   /*
    egSKIRunResult AgentRunManager::Run(egSKIRunType        runLength, 
                                        unsigned long       count,
                                        egSKIInterleaveType runInterleave,
@@ -340,6 +341,7 @@ namespace gSKI
       m_groupRunning = false;
       return gSKI_RUN_COMPLETED;
    }
+	*/
 
 	/** Notify listeners that agents in the run list are starting or finishing their runs **/
 	void AgentRunManager::FireBeforeRunStartsEvents()

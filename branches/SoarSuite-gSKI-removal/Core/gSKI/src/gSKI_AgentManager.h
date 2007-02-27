@@ -363,10 +363,12 @@ namespace gSKI
        * @return An egSKIRunResult value indicating how the state of the system
        *            after continuation executed. @see egSKIRunResult
        */
+	  /*
       egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
                                        unsigned long       count         = 1,
                                        egSKIInterleaveType runInterleave = gSKI_INTERLEAVE_SMALLEST_STEP,
                                        Error*              err           = 0);
+	   */
 
       /**
        * @brief Interrupts all agent execution

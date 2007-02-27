@@ -178,9 +178,11 @@ namespace gSKI
 		*            gSKI_RUN_COMPLETED_AND_INTERRUPTED because it returns before
 		*            any interrupt can occur.
 		*/
+		/*
 		egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
 			unsigned long       count         = 1,
 			Error*              err           = 0);
+		*/
 		egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE, 
 			unsigned long  stepCount         = 1,
 			Error*         err               = 0);

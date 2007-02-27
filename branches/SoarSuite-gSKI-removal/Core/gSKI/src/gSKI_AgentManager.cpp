@@ -120,6 +120,7 @@ namespace gSKI
 |_| \_\\__,_|_| |_|___|_| |_|\____|_|_|\___|_| |_|\__||_| |_| |_|_|  \___|\__,_|\__,_|
    =============================
    */
+   /*
     egSKIRunResult AgentManager::RunInClientThread(egSKIRunType        runLength, 
                                                    unsigned long       count,
                                                    egSKIInterleaveType runInterleave,
@@ -129,7 +130,7 @@ namespace gSKI
       MegaAssert((count > 0) || (runLength == gSKI_RUN_FOREVER), "Cannot run agents for fewer than one steps.");
       return m_runManager.Run(runLength, count, runInterleave, err);
    }
-
+	*/
 
 
    /*
