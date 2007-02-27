@@ -1335,7 +1335,7 @@ namespace gSKI
 		*/
 		//{
 		egSKIRunResult step(egSKIInterleaveType stepSize, unsigned long count);  
-		egSKIRunResult  run(egSKIRunType runType, unsigned long maxSteps);
+		//egSKIRunResult  run(egSKIRunType runType, unsigned long maxSteps);
 		void preStepNotifications();
 		bool postStepNotifications();
 		void preStepNotificationsSoar7();

@@ -2020,6 +2020,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
    =============================
    */
+/*
    egSKIRunResult Agent::run(egSKIRunType runType, unsigned long maxSteps)
    {
       MegaAssert((maxSteps >= 0) || (runType == gSKI_RUN_FOREVER), "Cannot run for fewer than one steps.");
@@ -2047,15 +2048,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       {
          MegaAssert(!m_agent->system_halted, "System should not be halted here!");
 
-		 /*  Agent RunEvents moved back to Kernel; preStep does nothing now
-
-          * // Do pre-step notifications to listeners
-		  * if (m_agent->operand2_mode) {
-          *    preStepNotifications();
-		  * } else {
-		  *	 preStepNotificationsSoar7();
-		  * }
-		  */
+		 //  Agent RunEvents moved back to Kernel; preStep does nothing now
 
          ///////////////////////////////////////////////////////////////////
          // Execute the next step
@@ -2091,7 +2084,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
            // Notify of the interrupt
            RunNotifier nfAfterInt(this, m_lastPhase);
            m_runListeners.Notify(gSKIEVENT_AFTER_INTERRUPT, nfAfterInt);		
-		   /* This is probably redundant with the event above, which clients can listen for... */
+		   // This is probably redundant with the event above, which clients can listen for...
 		   PrintNotifier nfIntr(this, "Interrupt received.");
 		   m_printListeners.Notify(gSKIEVENT_PRINT, nfIntr);
 		   XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
@@ -2100,7 +2093,6 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
 		   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
 		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
-		   /* */
 
 #ifdef _WIN32
 #pragma warning (disable : 4390)
@@ -2154,6 +2146,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
       return retVal;
    }
+*/
 
 	/** Fire the gSKIEVENT_BEFORE_RUN_STARTS event.
 	    This is fired once before any running occurs **/
