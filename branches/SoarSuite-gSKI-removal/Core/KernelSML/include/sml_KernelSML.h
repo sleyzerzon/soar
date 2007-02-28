@@ -427,6 +427,11 @@ public:
 	void SetEchoCommands(bool state) { m_EchoCommands = state ; }
 	bool GetEchoCommands()			 { return m_EchoCommands ; }
 
+	/*************************************************************
+	* @brief	Request that all agents stop soon
+	*************************************************************/	
+	bool InterruptAllAgents(egSKIStopLocation stopLoc) ;
+
 protected:
 	KernelSML(unsigned short portToListenOn);
 

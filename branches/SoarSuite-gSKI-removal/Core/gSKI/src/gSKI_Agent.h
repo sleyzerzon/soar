@@ -1178,6 +1178,10 @@ namespace gSKI
 		*/
 		agent* GetSoarAgent(void) { return m_agent; }
 
+		void FireRunEvent(egSKIRunEventId eventId, unsigned short phase) ;
+		void FirePrintEvent(egSKIPrintEventId eventId, char const* pMsg) ;
+		void FireXMLEvent(egSKIXMLEventId eventId, const char* functionType, const char* attOrTag, const char* value) ;
+
 		/** 
 		* @brief Event notifier for run events
 		*/

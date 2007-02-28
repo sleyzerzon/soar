@@ -2164,6 +2164,24 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
        m_runListeners.Notify(gSKIEVENT_AFTER_RUN_ENDS, nfAfterEnd);
 	}
 
+	void Agent::FireRunEvent(egSKIRunEventId eventId, unsigned short phase)
+	{
+	   RunNotifier nfBeforeRunning(this,EnumRemappings::ReMapPhaseType(phase,0));
+	   m_runListeners.Notify(eventId, nfBeforeRunning);
+	}
+
+	void Agent::FirePrintEvent(egSKIPrintEventId eventId, char const* pMsg)
+	{
+	   PrintNotifier nfIntr(this, pMsg);
+	   m_printListeners.Notify(eventId, nfIntr);
+	}
+
+	void Agent::FireXMLEvent(egSKIXMLEventId eventId, const char* functionType, const char* attOrTag, const char* value)
+	{
+	   XMLNotifier xn3(this, functionType, attOrTag, value) ;
+	   m_XMLListeners.Notify(eventId, xn3);
+	}
+
    /*
    =============================
    sometimes we want the relevant counter for the RunType and

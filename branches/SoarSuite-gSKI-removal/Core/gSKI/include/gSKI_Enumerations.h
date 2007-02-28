@@ -471,6 +471,7 @@
    *                             on its output link.
    * @li RUN_FOREVER:           Run and don't stop until Stop is called.
    */
+   // NOTE: Order must now match egSKIInterleaveType's order
    typedef enum {
       gSKI_RUN_SMALLEST_STEP,
       gSKI_RUN_PHASE,
@@ -509,10 +510,11 @@
    * @li INTERLEAVE_OUTPUT: Run each agent until it produces output on the
    *      output link before transfering to the next agent.
    */
+   // NOTE: Order must now match egSKIRunType's order
    typedef enum {
       gSKI_INTERLEAVE_SMALLEST_STEP,        // not used for scheduler, but tested by CLI to set default  
-	  gSKI_INTERLEAVE_ELABORATION_PHASE,
       gSKI_INTERLEAVE_PHASE,
+	  gSKI_INTERLEAVE_ELABORATION_PHASE,
       gSKI_INTERLEAVE_DECISION_CYCLE,
       gSKI_INTERLEAVE_OUTPUT
    } egSKIInterleaveType;

@@ -97,11 +97,13 @@ protected:
 	bool m_ScheduledToRun ;
 	bool m_WasOnRunList;
 	bool m_OnStepList;
-	unsigned long m_InitialStepCount ;
-	unsigned long m_InitialRunCount ;
-	egSKIRunResult m_ResultOfLastRun ;
-    unsigned long m_localRunCount;
-    unsigned long m_localStepCount;
+	//unsigned long	m_InitialStepCount ;
+	unsigned long	m_InitialRunCount ;
+	egSKIRunResult	m_ResultOfLastRun ;
+    unsigned long	m_localRunCount;
+    unsigned long	m_localStepCount;
+	egSKIRunState	m_runState;          // Current agent run state
+	unsigned long	m_interruptFlags;    // Flags indicating an interrupt request
 
 	  // Used for update world events
 	bool m_CompletedOutputPhase ;
@@ -185,6 +187,16 @@ public:
 	void FireEchoEventIncludingSelf(char const* pMessage) { m_PrintListener.HandleEvent(gSKIEVENT_ECHO, m_pIAgent, pMessage) ; m_PrintListener.FlushOutput(NULL, gSKIEVENT_ECHO) ; }
 
 	/*************************************************************
+	* @brief	Send XML and print events for a simple string message
+	*************************************************************/
+	void FireSimpleXML(char const* pMsg) ;
+
+	/*************************************************************
+	* @brief	Send a run event
+	*************************************************************/
+	void FireRunEvent(egSKIRunEventId eventId) ;
+
+	/*************************************************************
 	* @brief	Converts an id from a client side value to a kernel side value.
 	*			We need to be able to do this because the client is adding a collection
 	*			of wmes at once, so it makes up the ids for those objects.
@@ -219,9 +231,9 @@ public:
 	egSKIRunResult	GetResultOfLastRun()		  { return m_ResultOfLastRun ; }
 	void SetResultOfRun(egSKIRunResult runResult) { m_ResultOfLastRun = runResult ; }
 
-	void SetInitialStepCount(unsigned long count)	{ m_InitialStepCount = count ; }
+	//void SetInitialStepCount(unsigned long count)	{ m_InitialStepCount = count ; }
 	void SetInitialRunCount(unsigned long count)	{ m_InitialRunCount = count ; }
-	unsigned long GetInitialStepCount()				{ return m_InitialStepCount ; }
+	//unsigned long GetInitialStepCount()				{ return m_InitialStepCount ; }
 	unsigned long GetInitialRunCount()				{ return m_InitialRunCount ; }
 	void ResetLocalRunCounters()                    { m_localRunCount = 0 ; m_localStepCount = 0 ; }
 	void IncrementLocalRunCounter()                 { m_localRunCount++ ; }
@@ -246,6 +258,14 @@ public:
 	egSKIPhaseType GetCurrentPhase() ;
 
 	bool IsSoar7Mode() ;
+
+	unsigned long GetRunCounter(egSKIRunType runStepSize) ;
+
+	// Request that the agent stop soon.
+	bool Interrupt(egSKIStopLocation stopLoc) ;
+	void ClearInterrupts() ;
+	egSKIRunResult StepInClientThread(egSKIInterleaveType  stepSize) ;
+	egSKIRunResult Step(egSKIInterleaveType stepSize) ;
 
 } ;
 

@@ -60,7 +60,7 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 	m_ScheduledToRun = false ;
 	m_OnStepList = false;
 	m_ResultOfLastRun = gSKI_RUN_COMPLETED ;
-	m_InitialStepCount = 0 ;
+	//m_InitialStepCount = 0 ;
 	m_InitialRunCount = 0 ;
 	m_CompletedOutputPhase = false ;
 	m_GeneratedOutput = false ;
@@ -261,6 +261,340 @@ bool AgentSML::IsSoar7Mode()
 egSKIPhaseType AgentSML::GetCurrentPhase()
 {
 	return gSKI::EnumRemappings::ReMapPhaseType((unsigned short)m_agent->current_phase,0);
+}
+
+unsigned long AgentSML::GetRunCounter(egSKIRunType runStepSize)
+{
+	gSKI::Agent* pAgent = GetIAgent() ;
+
+	switch(runStepSize)
+	{
+	case gSKI_RUN_SMALLEST_STEP:
+		assert(0) ;
+		return 0 ;	// Not supported
+		//return pAgent->GetNumSmallestStepsExecuted();
+	case gSKI_RUN_PHASE:
+		{
+			unsigned long phases = GetNumPhasesExecuted() ;
+			assert (phases == pAgent->GetNumPhasesExecuted()) ;
+			return phases ;
+		}
+	case gSKI_RUN_ELABORATION_CYCLE:
+		{
+			unsigned long elabs = GetNumElaborationsExecuted() ;
+
+			// Changing the definition for soar 7 mode so can't compare
+			if (!IsSoar7Mode())
+				assert (elabs == pAgent->GetNumElaborationsExecuted()) ;
+
+			return elabs ;
+		}
+	case gSKI_RUN_DECISION_CYCLE:
+		{
+			unsigned long decs = GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
+			return decs ;
+		}
+	case gSKI_RUN_UNTIL_OUTPUT:
+		{
+			unsigned long outputs = GetNumOutputsGenerated() ;
+			assert (outputs == pAgent->GetNumOutputsExecuted()) ;
+			return outputs ;
+		}
+	case gSKI_RUN_FOREVER:
+		{
+			unsigned long decs = GetNumDecisionCyclesExecuted() ;
+			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
+			return decs ;
+		}
+	default:
+		return 0;
+	}
+}
+
+
+//=============================
+// Request that the agent stop soon.
+//=============================
+bool AgentSML::Interrupt(egSKIStopLocation stopLoc)
+{
+  // This type of stopping requires full threading
+  assert(stopLoc  != gSKI_STOP_ON_CALLBACK_RETURN) ; //, "This mode is not implemented.");
+  assert(stopLoc  != gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN) ; //, "This mode is not implemented.");
+  if ((stopLoc  == gSKI_STOP_ON_CALLBACK_RETURN) ||
+     (stopLoc  == gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN))
+  { 
+     //SetError(err, gSKIERR_NOT_IMPLEMENTED);
+     return false;
+  }
+
+  // We are in the stuff we can implement
+  //ClearError(err);
+
+  // Tell the agent where to stop
+  m_interruptFlags = stopLoc;
+
+  // If the request for interrupt is gSKI_STOP_AFTER_DECISION_CYCLE, then it 
+  // will be caught in the RunScheduler::CompletedRunType() and/or IsAgentFinished().
+  // We don't want to interrupt agents until the appropriate time if the request is  
+  // gSKI_STOP_AFTER_DECISION_CYCLE.
+  
+  // These are immediate requests for interrupt, such as from RHS or application
+  if ((gSKI_STOP_AFTER_SMALLEST_STEP == stopLoc) || (gSKI_STOP_AFTER_PHASE == stopLoc)) {
+	  m_agent->stop_soar = TRUE;
+	  // If the agent is not running, we should set the runState flag now so agent won't run
+	  if (m_runState == gSKI_RUNSTATE_STOPPED)
+	  {
+		  m_runState = gSKI_RUNSTATE_INTERRUPTED;
+	  }
+	  // Running agents must test stopLoc & stop_soar in Step method to see if interrupted.
+	  // Because we set m_agent->stop_soar == TRUE above, any running agents should return to
+	  // gSKI at the end of the current phase, even if interleaving by larger steps.  KJC
+  }
+
+  // If  we implement suspend, it goes in the run method, not
+  //  here.
+  //m_suspendOnInterrupt = (stopType == gSKI_STOP_BY_SUSPENDING)? true: false;
+
+  return true;
+}
+
+//=============================
+// Clear any existing interrupt requests
+// (Generally done before starting a run)
+//=============================
+void AgentSML::ClearInterrupts()
+{
+  //ClearError(err);
+
+  // Clear the interrupts whether running or not
+  m_interruptFlags = 0;
+
+  // Only change state of agent if it is running
+  if(m_runState == gSKI_RUNSTATE_INTERRUPTED)
+  {
+    // We returned, and thus are stopped
+    m_runState = gSKI_RUNSTATE_STOPPED;
+  }
+}
+
+egSKIRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize)
+{
+  // Agent is already running, we cannot run
+  if(m_runState != gSKI_RUNSTATE_STOPPED)
+  {
+	  /*
+     if(m_runState == gSKI_RUNSTATE_HALTED)
+        SetError(err, gSKIERR_AGENT_HALTED);  // nothing ever tests for this...
+     else
+        SetError(err, gSKIERR_AGENT_RUNNING);
+	 */
+
+     return gSKI_RUN_ERROR;
+  }
+
+  m_runState = gSKI_RUNSTATE_RUNNING;
+
+  // Now clear error and do the run
+  //ClearError(err);
+
+  // This method does all the work
+  return Step(stepSize);
+}
+
+void AgentSML::FireRunEvent(egSKIRunEventId eventId) {
+	GetIAgent()->FireRunEvent(eventId, (unsigned short)m_agent->current_phase) ;
+}
+
+void AgentSML::FireSimpleXML(char const* pMsg)
+{
+   GetIAgent()->FirePrintEvent(gSKIEVENT_PRINT, pMsg) ;
+   GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionBeginTag, sml_Names::kTagMessage, 0) ; 
+   GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionAddAttribute, sml_Names::kTypeString, pMsg) ; 
+   GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionEndTag, sml_Names::kTagMessage, 0) ; 
+
+   /*
+   PrintNotifier nfIntr(this, "Interrupt received.");
+   m_printListeners.Notify(gSKIEVENT_PRINT, nfIntr);
+   XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
+   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
+   XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "Interrupt received.") ;
+   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
+   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
+   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
+   */
+}
+
+static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)
+{
+	return (steps >= maxSteps);
+}
+
+egSKIRunResult AgentSML::Step(egSKIInterleaveType stepSize)
+{    
+   // NOTE: This only works because they have the same ordering
+   // BADBAD: Eventually we should dispose of one of these types and fold them into a single enum
+   egSKIRunType runStepSize = (egSKIRunType)stepSize ;
+
+   // This method runs a single agent
+   unsigned long count = 1 ;
+   unsigned long startCount        = GetRunCounter(runStepSize) ; // getReleventCounter(stepSize);
+   const unsigned long  END_COUNT  = startCount + count ;
+
+   bool interrupted  = (m_runState == gSKI_RUNSTATE_INTERRUPTED)? true: false;
+
+   MegaAssert((count >= 0), "Cannot step for fewer than one count.");
+
+   if (! interrupted) {
+	   assert(!m_agent->system_halted) ; // , "System should not be halted here!");
+	   // Notify that agent is about to execute. (NOT the start of a run, just a step)
+	   FireRunEvent(gSKIEVENT_BEFORE_RUNNING) ;
+	   //RunNotifier nfBeforeRunning(this,EnumRemappings::ReMapPhaseType(m_agent->current_phase,0));
+	   //m_runListeners.Notify(gSKIEVENT_BEFORE_RUNNING, nfBeforeRunning);
+
+	   switch (stepSize) 
+	   {
+	   case  gSKI_INTERLEAVE_SMALLEST_STEP:     run_for_n_elaboration_cycles(m_agent, count); break;
+	   case  gSKI_INTERLEAVE_ELABORATION_PHASE: run_for_n_elaboration_cycles(m_agent, count); break;
+	   case  gSKI_INTERLEAVE_PHASE:             run_for_n_phases(m_agent, count);             break;
+	   case  gSKI_INTERLEAVE_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);    break;
+	   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count); 
+												break;
+	   }
+   }
+
+   if ((m_interruptFlags & gSKI_STOP_AFTER_SMALLEST_STEP) || 
+	   (m_interruptFlags & gSKI_STOP_AFTER_PHASE))
+   {
+	   interrupted = true;
+   }
+
+   // KJC: If a gSKI_STOP_AFTER_DECISION_CYCLE has been requested, need to
+   // check that agent phase is at the proper stopping point before interrupting.
+   // If not at the right phase, but interrupt was requested, then the SML scheduler
+   // method IsAgentFinished will return true and MoveTo_StopBeforePhase will
+   // step the agent by phases until this test is satisfied.
+   if ((m_interruptFlags & gSKI_STOP_AFTER_DECISION_CYCLE) && 
+	   (m_agent->current_phase == m_pKernelSML->GetStopBefore()))
+   {
+	   interrupted = true;
+   }
+
+   		   
+   if (interrupted) 
+   {
+       // Notify of the interrupt
+	   FireRunEvent(gSKIEVENT_AFTER_INTERRUPT) ;
+	   // BUGBUG? This references m_lastPhase -- is that different from current_phase??
+       //RunNotifier nfAfterInt(this, m_lastPhase);
+       //m_runListeners.Notify(gSKIEVENT_AFTER_INTERRUPT, nfAfterInt);
+
+	   /* This is probably redundant with the event above, which clients can listen for... */
+	   FireSimpleXML("Interrupt received.") ;
+	   /*
+	   PrintNotifier nfIntr(this, "Interrupt received.");
+	   m_printListeners.Notify(gSKIEVENT_PRINT, nfIntr);
+	   XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
+	   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
+	   XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "Interrupt received.") ;
+	   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
+	   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
+	   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
+	   */
+   }
+ 
+   egSKIRunResult retVal;
+
+   // We've exited the run loop so we see what we should return
+   if(m_agent->system_halted)
+   {
+	   // if the agent halted because it is in an infinite loop of no-change impasses
+	   // interrupt the agents and allow the user to try to recover.
+	   if ((long)m_agent->bottom_goal->id.level >=  m_agent->sysparams[MAX_GOAL_DEPTH])
+	   {// the agent halted because it seems to be in an infinite loop, so throw interrupt
+           //AgentManager* am = (AgentManager*)(m_kernel->GetAgentManager());
+		   //am->InterruptAll(gSKI_STOP_AFTER_PHASE);
+		   m_pKernelSML->InterruptAllAgents(gSKI_STOP_AFTER_PHASE) ;
+		   m_agent->system_halted = FALSE; // hack! otherwise won't run again.  
+		   m_runState = gSKI_RUNSTATE_INTERRUPTED;
+		   retVal     = gSKI_RUN_INTERRUPTED;
+		   // Notify of the interrupt
+
+		   //RunNotifier nfAfterInt(this, m_lastPhase);
+		   //m_runListeners.Notify(gSKIEVENT_AFTER_INTERRUPT, nfAfterInt);
+		   FireRunEvent(gSKIEVENT_AFTER_INTERRUPT) ;
+
+		   /* This is probably redundant with the event above, which clients can listen for... */
+		   FireSimpleXML("Interrupt received.") ;
+		   /*
+		   PrintNotifier nfIntr(this, "Interrupt received.");
+		   m_printListeners.Notify(gSKIEVENT_PRINT, nfIntr);
+		   XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
+		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
+		   XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "Interrupt received.") ;
+		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
+		   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
+		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
+		   */
+	   }
+	   else {
+	   // If we halted, we completed and our state is halted
+	   m_runState    = gSKI_RUNSTATE_HALTED;
+	   retVal        = gSKI_RUN_COMPLETED;
+
+	   FireRunEvent(gSKIEVENT_AFTER_HALTED) ;
+	   /*
+	   RunNotifier nfAfterHalt(this, m_lastPhase);
+       m_runListeners.Notify(gSKIEVENT_AFTER_HALTED, nfAfterHalt);
+	   */
+
+	   // fix for BUG 514  01-12-06
+	   FireSimpleXML("This Agent halted.") ;
+
+	   /*
+	   PrintNotifier nfHalted(this, "This Agent halted.");
+	   m_printListeners.Notify(gSKIEVENT_PRINT, nfHalted);
+	   XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
+	   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
+	   XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "This Agent halted.") ;
+	   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
+	   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
+	   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
+	   */
+	   }
+   }
+   else if(maxStepsReached(startCount, END_COUNT)) 
+   {
+	   if(interrupted)
+	   {
+		   m_runState = gSKI_RUNSTATE_INTERRUPTED;
+		   retVal     = gSKI_RUN_COMPLETED_AND_INTERRUPTED; 
+		   //retVal     = gSKI_RUN_INTERRUPTED;
+	   }
+	   else
+	   {
+		   m_runState = gSKI_RUNSTATE_STOPPED;
+		   retVal     = gSKI_RUN_COMPLETED;
+	   }
+   }
+   else 
+   {  
+	   // We were interrupted before we could complete
+	   assert(interrupted) ; //, "Should never get here if we aren't interrupted");
+
+	   m_runState    = gSKI_RUNSTATE_INTERRUPTED;
+	   retVal        = gSKI_RUN_INTERRUPTED;
+   }    
+
+   // Notify that agent stopped. (NOT the end of a run, just a step)
+   // Use AFTER_RUN_ENDS if you want to trap the end of the complete run.
+   FireRunEvent(gSKIEVENT_AFTER_RUNNING) ;
+   /*
+   RunNotifier nfAfterStop(this, m_lastPhase);
+   m_runListeners.Notify(gSKIEVENT_AFTER_RUNNING, nfAfterStop);
+   */
+
+   return retVal;
 }
 
 class AgentSML::AgentBeforeDestroyedListener: public gSKI::IAgentListener
