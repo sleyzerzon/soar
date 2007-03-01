@@ -1936,7 +1936,7 @@ void print_memory_match(agent *thisAgent, arraylist *epmem,
             }
 
             //if it was a negative cue match then note that
-            if ((aw != NULL) && (aw_negcue != NULL))
+            if ((aw != NULL) && (aw_negcue != NULL) && (cueNode == NULL))
             {
                 print(thisAgent, " <--matches negative cue");
             }
@@ -1956,18 +1956,27 @@ void print_memory_match(agent *thisAgent, arraylist *epmem,
             }
             if (cueNode != NULL)
             {
+                if (cueNode == aw_negcue->node)
+                {
+                    print(thisAgent, " [neg ");
+                }
+                else
+                {
+                    print(thisAgent, " [");
+                }
                 switch(cueNode->val_type)
                 {
                     case SYM_CONSTANT_SYMBOL_TYPE:
-                        print(thisAgent, " [cue value: %s]", cueNode->val.strval);
+                        print(thisAgent, "cue value: %s]", cueNode->val.strval);
                         break;
                     case INT_CONSTANT_SYMBOL_TYPE:
-                        print(thisAgent, " [cue value: %ld]", cueNode->val.intval);
+                        print(thisAgent, "cue value: %ld]", cueNode->val.intval);
                         break;
                     case FLOAT_CONSTANT_SYMBOL_TYPE:
-                        print(thisAgent, " [cue value: %f]", cueNode->val.floatval);
+                        print(thisAgent, "cue value: %f]", cueNode->val.floatval);
                         break;
                     default:
+                        print(thisAgent, "cue match]");
                         break;
                 }//switch
             }//if
@@ -6405,13 +6414,6 @@ void epmem_update(agent *thisAgent)
         if (h->next_cmd) 
         {
             respond_to_command_next(thisAgent, h);
-
-            //%%%DEBUGGING
-            if (h->curr_memory != NULL)
-            {
-                print(thisAgent, "\nRetrieved NEXT memory (%d)",
-                      h->curr_memory->index);
-            }
             continue;
         }
 
