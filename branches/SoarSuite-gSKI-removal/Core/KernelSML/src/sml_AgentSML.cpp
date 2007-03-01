@@ -68,6 +68,8 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
     m_localRunCount = 0 ;
     m_localStepCount= 0 ;
 	m_agent = pAgent ;
+    m_runState = gSKI_RUNSTATE_STOPPED;
+    m_interruptFlags = 0 ;
 
 	m_pBeforeDestroyedListener = NULL ;
 
@@ -316,7 +318,7 @@ unsigned long AgentSML::GetRunCounter(egSKIRunType runStepSize)
 //=============================
 // Request that the agent stop soon.
 //=============================
-bool AgentSML::Interrupt(egSKIStopLocation stopLoc)
+bool AgentSML::Interrupt(egSKIStopLocation stopLoc, gSKI::Error* err)
 {
   // This type of stopping requires full threading
   assert(stopLoc  != gSKI_STOP_ON_CALLBACK_RETURN) ; //, "This mode is not implemented.");
@@ -378,7 +380,7 @@ void AgentSML::ClearInterrupts()
   }
 }
 
-egSKIRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize)
+egSKIRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize, gSKI::Error* pError)
 {
   // Agent is already running, we cannot run
   if(m_runState != gSKI_RUNSTATE_STOPPED)
@@ -399,7 +401,7 @@ egSKIRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize)
   //ClearError(err);
 
   // This method does all the work
-  return Step(stepSize);
+  return Step(stepSize, pError);
 }
 
 void AgentSML::FireRunEvent(egSKIRunEventId eventId) {
@@ -430,7 +432,7 @@ static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)
 	return (steps >= maxSteps);
 }
 
-egSKIRunResult AgentSML::Step(egSKIInterleaveType stepSize)
+egSKIRunResult AgentSML::Step(egSKIInterleaveType stepSize, gSKI::Error* pError)
 {    
    // NOTE: This only works because they have the same ordering
    // BADBAD: Eventually we should dispose of one of these types and fold them into a single enum
@@ -514,7 +516,7 @@ egSKIRunResult AgentSML::Step(egSKIInterleaveType stepSize)
 	   {// the agent halted because it seems to be in an infinite loop, so throw interrupt
            //AgentManager* am = (AgentManager*)(m_kernel->GetAgentManager());
 		   //am->InterruptAll(gSKI_STOP_AFTER_PHASE);
-		   m_pKernelSML->InterruptAllAgents(gSKI_STOP_AFTER_PHASE) ;
+		   m_pKernelSML->InterruptAllAgents(gSKI_STOP_AFTER_PHASE, pError) ;
 		   m_agent->system_halted = FALSE; // hack! otherwise won't run again.  
 		   m_runState = gSKI_RUNSTATE_INTERRUPTED;
 		   retVal     = gSKI_RUN_INTERRUPTED;
@@ -563,7 +565,7 @@ egSKIRunResult AgentSML::Step(egSKIInterleaveType stepSize)
 	   */
 	   }
    }
-   else if(maxStepsReached(startCount, END_COUNT)) 
+   else if(maxStepsReached(GetRunCounter(runStepSize), END_COUNT)) 
    {
 	   if(interrupted)
 	   {

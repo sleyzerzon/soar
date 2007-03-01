@@ -572,17 +572,26 @@ egSKIPhaseType KernelSML::GetStopBefore()
 /*************************************************************
 * @brief	Request that all agents stop soon
 *************************************************************/	
-bool KernelSML::InterruptAllAgents(egSKIStopLocation stopLoc)
+bool KernelSML::InterruptAllAgents(egSKIStopLocation stopLoc, gSKI::Error* pError)
 {
 	bool result = true ;
 
 	for (AgentMapIter iter = m_AgentMap.begin() ; iter != m_AgentMap.end() ; iter++)
 	{
 		AgentSML* pAgentSML = iter->second ;
-		result = pAgentSML->Interrupt(stopLoc) && result ;
+		result = pAgentSML->Interrupt(stopLoc, pError) && result ;
 	}
 
 	return result ;
+}
+
+void KernelSML::ClearAllInterrupts()
+{
+	for (AgentMapIter iter = m_AgentMap.begin() ; iter != m_AgentMap.end() ; iter++)
+	{
+		AgentSML* pAgentSML = iter->second ;
+		pAgentSML->ClearInterrupts() ;
+	}
 }
 
 /*************************************************************

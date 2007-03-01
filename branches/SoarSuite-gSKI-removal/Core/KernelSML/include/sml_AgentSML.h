@@ -262,10 +262,14 @@ public:
 	unsigned long GetRunCounter(egSKIRunType runStepSize) ;
 
 	// Request that the agent stop soon.
-	bool Interrupt(egSKIStopLocation stopLoc) ;
+	bool Interrupt(egSKIStopLocation stopLoc, gSKI::Error* pError) ;
 	void ClearInterrupts() ;
-	egSKIRunResult StepInClientThread(egSKIInterleaveType  stepSize) ;
-	egSKIRunResult Step(egSKIInterleaveType stepSize) ;
+	egSKIRunResult StepInClientThread(egSKIInterleaveType  stepSize, gSKI::Error* pError) ;
+	egSKIRunResult Step(egSKIInterleaveType stepSize, gSKI::Error* pError) ;
+
+	unsigned long GetInterruptFlags()		{ return m_interruptFlags ; }
+	egSKIRunState GetRunState()				{ return m_runState ; }
+	void SetRunState(egSKIRunState state)	{ m_runState = state ; }
 
 } ;
 

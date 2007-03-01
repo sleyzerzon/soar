@@ -430,7 +430,8 @@ public:
 	/*************************************************************
 	* @brief	Request that all agents stop soon
 	*************************************************************/	
-	bool InterruptAllAgents(egSKIStopLocation stopLoc) ;
+	bool InterruptAllAgents(egSKIStopLocation stopLoc, gSKI::Error* pError) ;
+	void ClearAllInterrupts() ;
 
 protected:
 	KernelSML(unsigned short portToListenOn);
