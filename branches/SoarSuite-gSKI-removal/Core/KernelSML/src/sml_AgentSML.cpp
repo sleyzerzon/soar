@@ -20,6 +20,7 @@
 #include "sml_KernelSML.h"
 
 #include "gSKI_Events.h"
+#include "gSKI_Structures.h"
 #include "IgSKI_Wme.h"
 #include "gSKI_Agent.h"
 #include "IgSKI_InputProducer.h"
@@ -278,7 +279,7 @@ unsigned long AgentSML::GetRunCounter(egSKIRunType runStepSize)
 	case gSKI_RUN_PHASE:
 		{
 			unsigned long phases = GetNumPhasesExecuted() ;
-			assert (phases == pAgent->GetNumPhasesExecuted()) ;
+			//assert (phases == pAgent->GetNumPhasesExecuted()) ;
 			return phases ;
 		}
 	case gSKI_RUN_ELABORATION_CYCLE:
@@ -286,27 +287,27 @@ unsigned long AgentSML::GetRunCounter(egSKIRunType runStepSize)
 			unsigned long elabs = GetNumElaborationsExecuted() ;
 
 			// Changing the definition for soar 7 mode so can't compare
-			if (!IsSoar7Mode())
-				assert (elabs == pAgent->GetNumElaborationsExecuted()) ;
+			//if (!IsSoar7Mode())
+			//	assert (elabs == pAgent->GetNumElaborationsExecuted()) ;
 
 			return elabs ;
 		}
 	case gSKI_RUN_DECISION_CYCLE:
 		{
 			unsigned long decs = GetNumDecisionCyclesExecuted() ;
-			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
+			//assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
 			return decs ;
 		}
 	case gSKI_RUN_UNTIL_OUTPUT:
 		{
 			unsigned long outputs = GetNumOutputsGenerated() ;
-			assert (outputs == pAgent->GetNumOutputsExecuted()) ;
+			//assert (outputs == pAgent->GetNumOutputsExecuted()) ;
 			return outputs ;
 		}
 	case gSKI_RUN_FOREVER:
 		{
 			unsigned long decs = GetNumDecisionCyclesExecuted() ;
-			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
+			//assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
 			return decs ;
 		}
 	default:
@@ -326,12 +327,12 @@ bool AgentSML::Interrupt(egSKIStopLocation stopLoc, gSKI::Error* err)
   if ((stopLoc  == gSKI_STOP_ON_CALLBACK_RETURN) ||
      (stopLoc  == gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN))
   { 
-     //SetError(err, gSKIERR_NOT_IMPLEMENTED);
+	  SetError(err, gSKI::gSKIERR_NOT_IMPLEMENTED);
      return false;
   }
 
   // We are in the stuff we can implement
-  //ClearError(err);
+  ClearError(err);
 
   // Tell the agent where to stop
   m_interruptFlags = stopLoc;
@@ -367,8 +368,6 @@ bool AgentSML::Interrupt(egSKIStopLocation stopLoc, gSKI::Error* err)
 //=============================
 void AgentSML::ClearInterrupts()
 {
-  //ClearError(err);
-
   // Clear the interrupts whether running or not
   m_interruptFlags = 0;
 
@@ -385,12 +384,10 @@ egSKIRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize, gSKI:
   // Agent is already running, we cannot run
   if(m_runState != gSKI_RUNSTATE_STOPPED)
   {
-	  /*
      if(m_runState == gSKI_RUNSTATE_HALTED)
-        SetError(err, gSKIERR_AGENT_HALTED);  // nothing ever tests for this...
+		 SetError(pError, gSKI::gSKIERR_AGENT_HALTED);  // nothing ever tests for this...
      else
-        SetError(err, gSKIERR_AGENT_RUNNING);
-	 */
+		 SetError(pError, gSKI::gSKIERR_AGENT_RUNNING);
 
      return gSKI_RUN_ERROR;
   }
@@ -398,7 +395,7 @@ egSKIRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize, gSKI:
   m_runState = gSKI_RUNSTATE_RUNNING;
 
   // Now clear error and do the run
-  //ClearError(err);
+  ClearError(pError);
 
   // This method does all the work
   return Step(stepSize, pError);

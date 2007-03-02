@@ -1635,6 +1635,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
 	//increment phase counts, output counts, and elaboration counts
 	/* */
+	/*
 	if (IsAFTERPhaseEventID(eventId))
 	{
 		a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_PHASE);
@@ -1653,13 +1654,14 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 				a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_OUTPUT);
 				// m_nilOutputCycles gets reset whenever StepCtr is incremented for output
 			}
-			assert(a->m_agent->run_last_output_count == a->m_nilOutputCycles) ;
+			// DJP: assert(a->m_agent->run_last_output_count == a->m_nilOutputCycles) ;
 		}
 	}
     if (gSKIEVENT_AFTER_ELABORATION_CYCLE == eventId) 
 	{
 		a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
-	} /* */
+	}
+	*/
 
 	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
     a->m_runListeners.Notify(eventId, rn);
