@@ -153,6 +153,8 @@ typedef struct wme_struct {
     struct wme_decay_element_struct *decay_element;
     bool has_decay_element;
     /* MRJ end */
+
+    int decay_tc_value; // swinterm 3/5/2007
 #endif
     
     

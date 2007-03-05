@@ -21,7 +21,7 @@ extern "C"
 #endif
 
 //Uncomment to avoid the debug dialog for batch runs
-#define SILENT_CRASH
+//#define SILENT_CRASH
 
 #ifdef SILENT_CRASH
 #include "excpt.h"

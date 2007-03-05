@@ -514,7 +514,8 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   float decay_power_array[DECAY_POWER_ARRAY_SIZE];
   //This is used to store the amount of boost received in low precision mode
   int decay_quick_boost[DECAY_HISTORY_SIZE];
-    
+  
+  int decay_tc_counter; // swinterm 3/5/2007
     
 #endif //SOAR_WMEM_ACTIVATION
 
