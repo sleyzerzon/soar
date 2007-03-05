@@ -16,6 +16,7 @@
 #include "cli_Commands.h"
 
 #include "gSKI_Agent.h"
+#include "sml_AgentSML.h"
 
 using namespace cli;
 
@@ -32,7 +33,7 @@ bool CommandLineInterface::DoInitSoar(gSKI::Agent* pAgent) {
 	std::string oldResult = m_Result.str();
 
 	AddListenerAndDisableCallbacks(pAgent);
-	bool ok = pAgent->Reinitialize();
+	bool ok = m_pAgentSML->Reinitialize() ;
 	RemoveListenerAndEnableCallbacks(pAgent);
 
 	// restore the old result, ignoring output from init-soar

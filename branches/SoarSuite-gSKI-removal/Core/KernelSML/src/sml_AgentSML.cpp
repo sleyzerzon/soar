@@ -57,20 +57,11 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 	m_InputLinkRoot = NULL ;
 	m_OutputLinkRoot = NULL ;
 	m_SuppressRunEndsEvent = false ;
-	m_WasOnRunList = false;
-	m_ScheduledToRun = false ;
-	m_OnStepList = false;
-	m_ResultOfLastRun = gSKI_RUN_COMPLETED ;
-	//m_InitialStepCount = 0 ;
-	m_InitialRunCount = 0 ;
-	m_CompletedOutputPhase = false ;
-	m_GeneratedOutput = false ;
-	m_OutputCounter = 0 ;
-    m_localRunCount = 0 ;
-    m_localStepCount= 0 ;
+
 	m_agent = pAgent ;
-    m_runState = gSKI_RUNSTATE_STOPPED;
-    m_interruptFlags = 0 ;
+
+	// Set counters and flags used to control runs
+	InitializeRuntimeState() ;
 
 	m_pBeforeDestroyedListener = NULL ;
 
@@ -177,6 +168,30 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 #endif
 }
 
+void AgentSML::InitializeRuntimeState()
+{
+	m_WasOnRunList = false;
+	m_ScheduledToRun = false ;
+	m_OnStepList = false;
+	m_ResultOfLastRun = gSKI_RUN_COMPLETED ;
+	m_InitialRunCount = 0 ;
+	m_CompletedOutputPhase = false ;
+	m_GeneratedOutput = false ;
+	m_OutputCounter = 0 ;
+    m_localRunCount = 0 ;
+    m_localStepCount= 0 ;
+    m_runState = gSKI_RUNSTATE_STOPPED;
+    m_interruptFlags = 0 ;
+}
+
+
+bool AgentSML::Reinitialize()
+{
+	bool ok = GetIAgent()->Reinitialize();
+	InitializeRuntimeState() ;
+	return ok ;
+}
+
 void AgentSML::RemoveAllListeners(Connection* pConnection)
 {
 	m_ProductionListener.RemoveAllListeners(pConnection);
@@ -268,53 +283,40 @@ egSKIPhaseType AgentSML::GetCurrentPhase()
 
 unsigned long AgentSML::GetRunCounter(egSKIRunType runStepSize)
 {
-	gSKI::Agent* pAgent = GetIAgent() ;
-
 	switch(runStepSize)
 	{
 	case gSKI_RUN_SMALLEST_STEP:
 		assert(0) ;
 		return 0 ;	// Not supported
-		//return pAgent->GetNumSmallestStepsExecuted();
 	case gSKI_RUN_PHASE:
 		{
 			unsigned long phases = GetNumPhasesExecuted() ;
-			//assert (phases == pAgent->GetNumPhasesExecuted()) ;
 			return phases ;
 		}
 	case gSKI_RUN_ELABORATION_CYCLE:
 		{
 			unsigned long elabs = GetNumElaborationsExecuted() ;
-
-			// Changing the definition for soar 7 mode so can't compare
-			//if (!IsSoar7Mode())
-			//	assert (elabs == pAgent->GetNumElaborationsExecuted()) ;
-
 			return elabs ;
 		}
 	case gSKI_RUN_DECISION_CYCLE:
 		{
 			unsigned long decs = GetNumDecisionCyclesExecuted() ;
-			//assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
 			return decs ;
 		}
 	case gSKI_RUN_UNTIL_OUTPUT:
 		{
 			unsigned long outputs = GetNumOutputsGenerated() ;
-			//assert (outputs == pAgent->GetNumOutputsExecuted()) ;
 			return outputs ;
 		}
 	case gSKI_RUN_FOREVER:
 		{
 			unsigned long decs = GetNumDecisionCyclesExecuted() ;
-			//assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
 			return decs ;
 		}
 	default:
 		return 0;
 	}
 }
-
 
 //=============================
 // Request that the agent stop soon.

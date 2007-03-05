@@ -128,6 +128,9 @@ public:
 	// be removed (this should generally be correct so we'll default to true for it).
 	void ReleaseAllWmes(bool flushPendingRemoves = true) ;
 
+	// Explicitly reinitialize the agent as part of init-soar
+	bool Reinitialize() ;
+
 	gSKI::Agent* GetIAgent() { return m_pIAgent ; }
 	agent* GetAgent()		 { return m_agent ; }
 
@@ -270,6 +273,9 @@ public:
 	unsigned long GetInterruptFlags()		{ return m_interruptFlags ; }
 	egSKIRunState GetRunState()				{ return m_runState ; }
 	void SetRunState(egSKIRunState state)	{ m_runState = state ; }
+
+protected:
+	void InitializeRuntimeState() ;
 
 } ;
 
