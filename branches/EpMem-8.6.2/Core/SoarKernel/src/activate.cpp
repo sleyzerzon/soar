@@ -186,8 +186,8 @@
 
 //#define DECAY_DEBUG
 #ifdef DECAY_DEBUG
-    #define log_activation(w,x,y,z) print_with_symbols(thisAgent, w, x,y,z)
-    #define log_prod_name(x,y) print(thisAgent, x,y)
+    #define log_activation(w,x,y,z) print_with_symbols(thisAgent, w, x,y,z) ; fflush(stdout)
+    #define log_prod_name(x,y) print(thisAgent, x,y) ; fflush(stdout)
 #else
     #define log_activation(w, x,y,z)
     #define log_prod_name(x,y)
@@ -363,6 +363,7 @@ void decay_init(agent *thisAgent)
 	
 	// init the current pointer
 	(thisAgent->current_decay_timelist_element) = &(thisAgent->decay_timelist[0]);
+  thisAgent->decay_tc_counter = 2; // swinterm 3/5/2007
     
 
     // Pre-compute the integer powers of the decay exponent in order to avoid
@@ -595,7 +596,7 @@ void decay_reference_wme(agent *thisAgent, wme *w, int depth = 0)
 
    Created:  11 Mar 2004
    ========================================================================= */
-int dcah_helper(wme *w, wme_decay_element *el, int depth = 0)
+int dcah_helper(wme *w, wme_decay_element *el, int tc_value)
 {
     preference *pref = w->preference;
     instantiation *inst;
@@ -606,16 +607,14 @@ int dcah_helper(wme *w, wme_decay_element *el, int depth = 0)
 
     if (pref == NIL) return 0;
     
-    //Avoid stack overflow (This is a kludge, I know)
-    if (depth > 10) return 0;
-    
     inst = pref->inst;
     cond = inst->top_of_instantiated_conditions;
     while(cond != NIL)
     {
-        if (cond->type == POSITIVE_CONDITION)
+        if (cond->type == POSITIVE_CONDITION && cond->bt.wme_->decay_tc_value != tc_value)
         {
              cond_wme = cond->bt.wme_; // %%%has bt_info_struct.wme_ been deprecated?%%%
+             cond_wme->decay_tc_value = tc_value; // ensure we don't visit this wme again (swinterm, 3/5/2007)
              if (cond_wme->has_decay_element)
              {
                  if (!cond_wme->decay_element->just_created)
@@ -633,7 +632,7 @@ int dcah_helper(wme *w, wme_decay_element *el, int depth = 0)
              }//if
              else
              {
-                 num_cond_wmes += dcah_helper(cond_wme, el, depth +1);
+                 num_cond_wmes += dcah_helper(cond_wme, el, tc_value);
              }//else
 
         }//if
@@ -670,7 +669,7 @@ int dcah_helper(wme *w, wme_decay_element *el, int depth = 0)
 
    Created:  11 Mar 2004
    ========================================================================= */
-void decay_calculate_average_history(wme *w, wme_decay_element *el)
+void decay_calculate_average_history(agent* thisAgent, wme *w, wme_decay_element *el)
 {
     preference *pref = w->preference;
     int i;
@@ -684,7 +683,8 @@ void decay_calculate_average_history(wme *w, wme_decay_element *el)
         el->boost_history[i] = 0;
     }
 
-    num_cond_wmes = dcah_helper(w, el);
+    thisAgent->decay_tc_counter++; // swinterm 3/5/2007 
+    num_cond_wmes = dcah_helper(w, el, thisAgent->decay_tc_counter);
 
     if (num_cond_wmes > 0)
     {
@@ -807,7 +807,7 @@ void decay_update_new_wme(agent *thisAgent, wme *w, int num_refs)
 
     //Give the WME an initial history based upon the WMEs that were
     //tested to create it.
-    decay_calculate_average_history(w, temp_el);
+    decay_calculate_average_history(thisAgent, w, temp_el);
 
     //Initialize the activation log
     if ((thisAgent->sysparams)[WME_DECAY_LOGGING_SYSPARAM])

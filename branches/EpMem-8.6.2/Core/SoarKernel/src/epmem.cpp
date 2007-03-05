@@ -6568,8 +6568,13 @@ void init_epmem(agent *thisAgent)
     //Load pre-recorded episodic memories
     thisAgent->epmem_save_filename[0] = '\0';
     thisAgent->epmem_load_filename[0] = '\0';
+#ifdef WIN32
     sprintf(thisAgent->epmem_save_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
     sprintf(thisAgent->epmem_load_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
+#else
+    sprintf(thisAgent->epmem_save_filename, "/tmp/%s_epmems.txt", thisAgent->name);
+    sprintf(thisAgent->epmem_load_filename, "/tmp/%s_epmems.txt", thisAgent->name);
+#endif
     if (strlen(thisAgent->epmem_load_filename) > 0)
     {
         epmem_load_episodic_memory_from_file(thisAgent);
@@ -6577,7 +6582,11 @@ void init_epmem(agent *thisAgent)
         //%%%DEBUGGING
         char buf[1024];
         strcpy(buf, thisAgent->epmem_save_filename);
+#ifdef WIN32
         sprintf(thisAgent->epmem_save_filename, "c:\\temp\\sanity_%s_epmems.txt", thisAgent->name);
+#else
+        sprintf(thisAgent->epmem_save_filename, "/tmp/sanity_%s_epmems.txt", thisAgent->name);
+#endif
         epmem_save_episodic_memory_to_file(thisAgent);
         strcpy(thisAgent->epmem_save_filename, buf);
     }

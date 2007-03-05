@@ -119,6 +119,7 @@ wme *make_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value, Bool a
 #ifdef SOAR_WMEM_ACTIVATION
      w->decay_element = NIL;
      w->has_decay_element = FALSE;
+     w->decay_tc_value = -1; // swinterm 3/5/2007
 #endif
   
   return w;

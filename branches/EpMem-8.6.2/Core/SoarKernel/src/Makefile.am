@@ -5,12 +5,14 @@
 noinst_LTLIBRARIES = libSoarKernel.la
 
 libSoarKernel_la_SOURCES = \
+activate.cpp\
 agent.cpp\
 backtrace.cpp\
 callback.cpp\
 chunk.cpp\
 consistency.cpp\
 decide.cpp\
+epmem.cpp\
 explain.cpp\
 init_soar.cpp\
 io.cpp\
@@ -39,10 +41,12 @@ osupport.h\
 portability.h\
 prefmem.h\
 reorder.h\
+../include/activate.h\
 ../include/agent.h\
 ../include/callback.h\
 ../include/chunk.h\
 ../include/decide.h\
+../include/epmem.h\
 ../include/explain.h\
 ../include/gdatastructs.h\
 ../include/gski_event_system_data.h\
