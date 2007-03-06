@@ -2521,5 +2521,41 @@ namespace gSKI
              epmem_print_cue_comparison(pSoarAgent, state_num, mem);
          }
          
+         void TgDWorkArounds::EpmemLoadMemories(IAgent* pIAgent, char *fn)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_load_episodic_memory_from_file(pSoarAgent, fn);
+         }
+         
+         void TgDWorkArounds::EpmemSaveMemories(IAgent* pIAgent, char *fn)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_save_episodic_memory_to_file(pSoarAgent, fn);
+         }
+         
+         void TgDWorkArounds::EpmemAutoSaveMemories(IAgent* pIAgent, char *fn, int freq)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             if (strlen(fn) > 0)
+             {
+                 strcpy(pSoarAgent->epmem_autosave_filename, fn);
+             }
+             else
+             {
+#ifdef WIN32
+                 sprintf(pSoarAgent->epmem_autosave_filename, "c:\\temp\\%s_epmems.txt", pSoarAgent->name);
+#else
+                 sprintf(pSoarAgent->epmem_autosave_filename, "/tmp/%s_epmems.txt", pSoarAgent->name);
+#endif
+             }
+             pSoarAgent->epmem_save_freq = freq;
+         }
+         
 	}// class
 }// namespace

@@ -37,6 +37,9 @@ namespace cli {
         EPMEM_PRINT_MATCH_DIAGNOSTIC,
         EPMEM_COMPARE_MEMS,
         EPMEM_CUE_COMPARE_MEM,
+        EPMEM_LOAD,
+        EPMEM_SAVE,
+        EPMEM_AUTOSAVE,
 		EPMEM_NUM_OPTIONS, // must be last
 	};
     

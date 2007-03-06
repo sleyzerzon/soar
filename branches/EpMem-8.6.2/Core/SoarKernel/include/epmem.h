@@ -26,6 +26,8 @@ void epmem_print_memory_by_id(agent *thisAgent, int id);
 void epmem_print_match_diagnostic(agent *thisAgent, int state_num);
 void epmem_print_memory_comparison_by_id(agent *thisAgent, int id1, int id2);
 void epmem_print_cue_comparison(agent *thisAgent, int state_num, int epmem_id);
+void epmem_load_episodic_memory_from_file(agent *thisAgent, char *fn);
+void epmem_save_episodic_memory_to_file(agent *thisAgent, char *fn);
     
 #ifdef __cplusplus
 }//extern "C"

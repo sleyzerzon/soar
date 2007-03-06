@@ -540,10 +540,8 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
    epmem_header_stack         - A stack of epmem_header structs used to mirror the
                             current state stack in WM and keep track of the
                             ^epmem link attached to each one.
-   epmem_save_filename        - set this to a string containing a legit filename
-                            and the code will save episodic memories
-   epmem_load_filename        - set this to a string containing a legit filename
-                            and the code will load episodic memories
+   epmem_autosave_filename  - If episodic memories are being autosaved, this
+                              is the filename that's used.
    
 */
     typedef struct wmetree_struct wmetree;
@@ -559,10 +557,9 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
     long epmem_last_ret_id;
     long epmem_num_queries;
     arraylist *epmem_header_stack;
-    char epmem_save_filename[1024];
-    char epmem_load_filename[1024];
-    int epmem_active;
-
+    char epmem_autosave_filename[1024];
+    int epmem_save_freq;
+    
     //These timers are used for analyzing epmem performance
     struct timeval epmem_start_time;
     struct timeval epmem_total_time;

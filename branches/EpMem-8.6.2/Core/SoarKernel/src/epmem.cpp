@@ -65,8 +65,6 @@ extern unsigned long hash_string(const char *s);
    ubiquitous_max       - There must be at least this many episodic memories
                           before any node can be considered ubiquitous
    fraction_to_trim     - fraction of a new memory to trim before recording it
-   epmem_save_freq      - the episodic memory is saved to disk every N cycles.  
-                          This specifies N.
    card_act_ratio       - Specifies the ratio of match score weighting
                           between match cardinality and match activation.
                           
@@ -81,7 +79,6 @@ extern unsigned long hash_string(const char *s);
 #define ubiquitous_threshold 1.0
 #define ubiquitous_max 25
 #define fraction_to_trim 0.0
-#define epmem_save_freq 500
 float g_card_act_ratio=1.5;
 
 /*======================================================================
@@ -1526,15 +1523,11 @@ void epmem_print_status(agent *thisAgent)
           thisAgent->epmem_memories->size);
     print(thisAgent, "\n          Number of retrievals performed: %ld",
           thisAgent->epmem_num_queries);
-    if (strlen(thisAgent->epmem_load_filename) > 0)
+    if ( (strlen(thisAgent->epmem_autosave_filename) > 0)
+         && (thisAgent->epmem_save_freq > 0) )
     {
-        print(thisAgent, "\n          Episodes were initialized from: %s",
-              thisAgent->epmem_load_filename);
-    }
-    if (strlen(thisAgent->epmem_save_filename) > 0)
-    {
-        print(thisAgent, "\n             Episodes are being saved to: %s",
-              thisAgent->epmem_save_filename);
+        print(thisAgent, "\n         Episodes are being autosaved to: %s every %d cycles",
+              thisAgent->epmem_autosave_filename, thisAgent->epmem_save_freq);
     }
     print(thisAgent, "\n Total CPU time used by the EpMem module: %g seconds",
           timer_value(&(thisAgent->epmem_total_time)));
@@ -5881,17 +5874,17 @@ int epmem_save_epmems_to_file(agent *thisAgent,
 
    Created: 23 Mar 2006
    =================================================================== */
-void epmem_save_episodic_memory_to_file(agent *thisAgent)
+void epmem_save_episodic_memory_to_file(agent *thisAgent, char *fn)
 {
     FILE *f;
 
-    if (strlen(thisAgent->epmem_save_filename) == 0) return;
-    
-    f = fopen(thisAgent->epmem_save_filename, "w");
+    if ( (fn == NULL) || (strlen(fn) == 0) ) return;
+
+    f = fopen(fn, "w");
     if (f == NULL)
     {
         print(thisAgent, "\nERROR:  could not save episodes to file: ");
-        print(thisAgent, thisAgent->epmem_save_filename);
+        print(thisAgent, fn);
         return;
     }//if
 
@@ -6348,19 +6341,19 @@ int epmem_load_epmems_from_file(agent *thisAgent,
 
    Created: 23 Mar 2006
    =================================================================== */
-void epmem_load_episodic_memory_from_file(agent *thisAgent)
+void epmem_load_episodic_memory_from_file(agent *thisAgent, char *fn)
 {
     FILE *f;
     arraylist *nodelist;
 
-    if (strlen(thisAgent->epmem_load_filename) == 0) return;
+    if ( (fn == NULL) || (strlen(fn) == 0) ) return;
 
     //Check for a good file
-    f = fopen(thisAgent->epmem_load_filename, "r");
+    f = fopen(fn, "r");
     if (f == NULL)
     {
         print(thisAgent, "\nERROR:  could not load episodes from file: ");
-        print(thisAgent, thisAgent->epmem_load_filename);
+        print(thisAgent, fn);
         return;
     }//if
 
@@ -6471,9 +6464,12 @@ void epmem_update(agent *thisAgent)
     }//for
 
     //Save the current epmem store at regular intervals
-    if ((count % epmem_save_freq == 0) && (strlen(thisAgent->epmem_save_filename) != 0))
+    if ((thisAgent->epmem_save_freq != 0)
+        && (count % thisAgent->epmem_save_freq == 0)
+        && (strlen(thisAgent->epmem_autosave_filename) != 0))
     {
-        epmem_save_episodic_memory_to_file(thisAgent);
+        epmem_save_episodic_memory_to_file(thisAgent,
+                                           thisAgent->epmem_autosave_filename);
     }
     
     stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
@@ -6648,32 +6644,15 @@ void epmem_init(agent *thisAgent)
     //Initialize the thisAgent->epmem_header_stack array
     thisAgent->epmem_header_stack = make_arraylist(thisAgent, 20);
 
-    //Load pre-recorded episodic memories
-    thisAgent->epmem_save_filename[0] = '\0';
-    thisAgent->epmem_load_filename[0] = '\0';
+    //Initialize autosave values
+    thisAgent->epmem_save_freq = 500;
+    thisAgent->epmem_autosave_filename[0] = '\0';
 #ifdef WIN32
-    sprintf(thisAgent->epmem_save_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
-    sprintf(thisAgent->epmem_load_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
+    sprintf(thisAgent->epmem_autosave_filename, "c:\\temp\\%s_epmems.txt", thisAgent->name);
 #else
-    sprintf(thisAgent->epmem_save_filename, "/tmp/%s_epmems.txt", thisAgent->name);
-    sprintf(thisAgent->epmem_load_filename, "/tmp/%s_epmems.txt", thisAgent->name);
+    sprintf(thisAgent->epmem_autosave_filename, "/tmp/%s_epmems.txt", thisAgent->name);
 #endif
-    if (strlen(thisAgent->epmem_load_filename) > 0)
-    {
-        epmem_load_episodic_memory_from_file(thisAgent);
 
-        //%%%DEBUGGING
-        char buf[1024];
-        strcpy(buf, thisAgent->epmem_save_filename);
-#ifdef WIN32
-        sprintf(thisAgent->epmem_save_filename, "c:\\temp\\sanity_%s_epmems.txt", thisAgent->name);
-#else
-        sprintf(thisAgent->epmem_save_filename, "/tmp/sanity_%s_epmems.txt", thisAgent->name);
-#endif
-        epmem_save_episodic_memory_to_file(thisAgent);
-        strcpy(thisAgent->epmem_save_filename, buf);
-    }
-   
     //Reset the timers
     epmem_reset_cpu_usage_timers(thisAgent);
 

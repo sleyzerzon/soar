@@ -115,6 +115,9 @@ namespace gSKI
          void EpmemPrintMatchDiagnostic(IAgent* pIAgent, int state_num);
          void EpmemCompareMemories(IAgent* pIAgent, int mem1, int mem2);
          void EpmemCompareCueToMemory(IAgent* pIAgent, int state_num, int mem);
+         void EpmemLoadMemories(IAgent* pIAgent, char *fn);
+         void EpmemSaveMemories(IAgent* pIAgent, char *fn);
+         void EpmemAutoSaveMemories(IAgent* pIAgent, char *fn, int freq);
 	  };
    }
 }
