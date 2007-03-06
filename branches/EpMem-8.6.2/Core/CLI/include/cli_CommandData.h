@@ -30,6 +30,9 @@ namespace cli {
     
 	enum eEpmemOptions {
         EPMEM_REPORT_SETTINGS,
+        EPMEM_ON,
+        EPMEM_OFF,
+        EPMEM_PAUSE,
         EPMEM_PRINT_MEM,
         EPMEM_PRINT_MATCH_DIAGNOSTIC,
         EPMEM_COMPARE_MEMS,

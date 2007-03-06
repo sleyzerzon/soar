@@ -260,7 +260,7 @@ public class TankSoarWorld extends World implements WorldManager {
 				--m_NumMissilePacks;
 			}
 			getCell(location).setTank(m_Tanks[i]);
-			m_Tanks[i].setPoints(0);
+			m_Tanks[i].setPoints(0, "reset");
 			m_Tanks[i].reset();
 			m_Tanks[i].initSoar();
 		}
@@ -690,6 +690,98 @@ public class TankSoarWorld extends World implements WorldManager {
 				m_Tanks[i].reset();
 			}
 		}
+
+		//Added by :AMN: 06 Oct 06
+		//If no missiles have been fired in 100 turns then reset the tanks
+		int youngestAge = 1000;  //Initialize to an unreachably large value
+		for (int i = 0; i < m_Tanks.length; ++i) 
+		{
+			if (m_Tanks[i].getMissiles() >= m_Tanks[i].m_LastMissiles)
+			{
+				m_Tanks[i].m_LastMissilesAge++;
+				if (m_Tanks[i].m_LastMissilesAge < youngestAge)
+				{
+					youngestAge = m_Tanks[i].m_LastMissilesAge;
+				}
+			}
+			else
+			{
+				m_Tanks[i].m_LastMissilesAge = 0;
+			}
+			m_Tanks[i].m_LastMissiles = m_Tanks[i].getMissiles();
+		}//for
+		
+		//If any of the tanks hasn't fired a missile in 100 turns then reset the tanks
+		if ((youngestAge != 1000) && (youngestAge >= 100))
+		{
+			for (int i = 0; i < m_Tanks.length; ++i) 
+			{
+				getCell(m_Tanks[i].getLocation()).removeTank(m_Tanks[i]);
+				removeMissilesOwnedBy(m_Tanks[i]);
+				java.awt.Point location = findStartingLocation();
+				logger.info(m_Tanks[i].getName() + ": spawning (due to inactivity) at (" + location.x + "," + location.y + ")");
+				m_Tanks[i].setLocation(location);
+				getCell(location).setTank(m_Tanks[i]);
+				m_Tanks[i].reset();
+				
+				m_Tanks[i].m_LastMissilesAge = 0;
+			}
+		}//if
+
+/*		//Added by :AMN: ~17 Sep 06
+		//If no tanks' score has changed in 100 turns 
+		//then reset the tanks
+		int youngestAge = 1000;
+		for (int i = 0; i < m_Tanks.length; ++i) 
+		{
+			if (m_Tanks[i].getPoints() == m_Tanks[i].m_LastScore)
+			{
+				m_Tanks[i].m_LastScoreAge++;
+				if (m_Tanks[i].m_LastScoreAge < youngestAge)
+				{
+					youngestAge = m_Tanks[i].m_LastScoreAge;
+				}
+			}
+			else
+			{
+				m_Tanks[i].m_LastScore = m_Tanks[i].getPoints();
+				m_Tanks[i].m_LastScoreAge = 0;
+			}
+		}//for
+		if ((youngestAge != 1000) && (youngestAge >= 100))
+		{
+			for (int i = 0; i < m_Tanks.length; ++i) 
+			{
+				getCell(m_Tanks[i].getLocation()).removeTank(m_Tanks[i]);
+				removeMissilesOwnedBy(m_Tanks[i]);
+				java.awt.Point location = findStartingLocation();
+				logger.info(m_Tanks[i].getName() + ": spawning (due to inactivity) at (" + location.x + "," + location.y + ")");
+				m_Tanks[i].setLocation(location);
+				getCell(location).setTank(m_Tanks[i]);
+				m_Tanks[i].reset();
+				
+				m_Tanks[i].m_LastScoreAge = 0;
+			}
+			
+		}
+*/
+//      //  Added by :AMN: ~17 Sep 06
+//		//  Increase the health of each tank by a small amount
+//		for (int i = 0; i < m_Tanks.length; ++i) {
+//			if (m_Tanks[i].getEnergy() < 50)
+//			{
+//				m_Tanks[i].adjustEnergy(20);
+//			}
+//			else if (m_Tanks[i].getEnergy() < 200)
+//			{
+//				m_Tanks[i].adjustEnergy(10);
+//			}
+//			else
+//			{
+//				m_Tanks[i].adjustEnergy(1);
+//			}
+//		}
+		
 		
 		// Update all Tank sensors
 		if (logger.isLoggable(Level.FINEST)) logger.finest("Updating tank sensors");

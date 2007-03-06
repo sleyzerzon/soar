@@ -17,7 +17,8 @@ extern "C"
 {
 #endif
 
-void init_epmem(agent *thisAgent);
+void epmem_init(agent *thisAgent);
+void epmem_deinit(agent *thisAgent);
 void epmem_create_buffer(agent *thisAgent, Symbol *);
 void epmem_update(agent *thisAgent);
 void epmem_print_status(agent *thisAgent);

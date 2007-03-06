@@ -2465,6 +2465,22 @@ namespace gSKI
              decay_deinit(pSoarAgent);
          }
 
+         void TgDWorkArounds::EpmemEnable(IAgent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_init(pSoarAgent);
+         }
+
+         void TgDWorkArounds::EpmemDisable(IAgent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_deinit(pSoarAgent);
+         }
+
          void TgDWorkArounds::EpmemPrintStatus(IAgent* pIAgent)
          {
              Agent* pAgent = (Agent*)(pIAgent);

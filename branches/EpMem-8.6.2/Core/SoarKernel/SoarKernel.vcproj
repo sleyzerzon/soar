@@ -1066,7 +1066,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\epmem.h"
+				RelativePath=".\include\epmem.h"
 				>
 			</File>
 			<File

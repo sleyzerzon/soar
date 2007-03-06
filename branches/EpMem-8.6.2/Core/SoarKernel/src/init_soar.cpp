@@ -491,7 +491,12 @@ void init_sysparams (agent* thisAgent) {
   (thisAgent->sysparams)[WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM] = DECAY_DEFAULT_PERSISTENT_ACTIVATION;
 
 #endif //SOAR_WMEM_ACTIVATION
-  
+
+#ifdef EPISODIC_MEMORY
+  //Episodic memory system toggle
+  (thisAgent->sysparams)[EPMEM_SYSPARAM] = FALSE;
+#endif /* EPISODIC_MEMORY */
+
 }
 
 /* ===================================================================
@@ -1121,7 +1126,10 @@ void do_one_top_level_phase (agent* thisAgent)
 #endif /*SOAR_WMEM_ACTIVATION*/
 
 #ifdef EPISODIC_MEMORY
-     epmem_update(thisAgent);
+    if ((thisAgent->sysparams)[EPMEM_SYSPARAM])
+    {
+        epmem_update(thisAgent);
+    }
 #endif /* EPISODIC_MEMORY */
       
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
@@ -1691,8 +1699,11 @@ void init_agent_memory(agent* thisAgent)
                  thisAgent->io_header_output);
 
 #ifdef EPISODIC_MEMORY
-  //Create the ^epmem buffer
-  epmem_create_buffer(thisAgent, thisAgent->top_state);
+    if ((thisAgent->sysparams)[EPMEM_SYSPARAM])
+    {
+        //Create the ^epmem buffer
+        epmem_create_buffer(thisAgent, thisAgent->top_state);
+    }
 #endif //EPISODIC_MEMORY
   
   do_buffered_wm_and_ownership_changes(thisAgent);

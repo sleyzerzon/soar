@@ -30,6 +30,9 @@ using namespace sml;
 
 bool CommandLineInterface::ParseEpmem(gSKI::IAgent* pAgent, std::vector<std::string>& argv) {
     Options optionsData[] = {
+        {'n', "on",         0},
+        {'o', "off",        0},
+        {'z', "pause",      0},
         {'p', "print",      1},
         {'m', "match",      1},
         {'d', "diff",       2},
@@ -50,6 +53,15 @@ bool CommandLineInterface::ParseEpmem(gSKI::IAgent* pAgent, std::vector<std::str
 
         optCount++;
         switch (m_Option) {
+            case 'n':
+                DoEpmem(pAgent, EPMEM_ON, 0, 0);
+                break;
+            case 'o':
+                DoEpmem(pAgent, EPMEM_OFF, 0, 0);
+                break;
+            case 'z':
+                DoEpmem(pAgent, EPMEM_PAUSE, 0, 0);
+                break;
             case 'p':
                 if (!IsInteger(m_OptionArgument))
                 {
@@ -152,6 +164,9 @@ bool CommandLineInterface::ParseEpmem(gSKI::IAgent* pAgent, std::vector<std::str
         m_Result << "\nepmem command syntax: epmem [-cdmp [arg1] [arg2]]\n";
         m_Result << "\nExample Commands:\n";
         m_Result << "\n\tepmem                    Display the current epmem settings and active retrievals.";
+        m_Result << "\n\tepmem -n <id>            Turn the episodic memory system on.";
+        m_Result << "\n\tepmem -o <id>            Turn the episodic memory system off. (All existing episoidic memories will be lost!)";
+        m_Result << "\n\tepmem -z <id>            Suspend the episodic memory system.";
         m_Result << "\n\tepmem -p <id>            Print the contents of the memory with the given id.";
         m_Result << "\n\tepmem -m <state>         Display a match diagnostic for the retrieval on the given state.";
         m_Result << "\n\tepmem -d <id1> <id2>     Compare two memories with the given ids.";
@@ -167,12 +182,53 @@ bool CommandLineInterface::DoEpmem(gSKI::IAgent* pAgent,
                                    long arg2)
 {
 
+    long sp_val = 0;
     if (!RequireAgent(pAgent)) return false;
 
 	gSKI::EvilBackDoor::ITgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
     
     switch( setting )
     {
+        case EPMEM_ON:
+            sp_val = pKernelHack->GetSysparam(pAgent, EPMEM_SYSPARAM);
+            if (sp_val)
+            {
+                m_Result << "The episodic memory system is already ACTIVE.";
+            }                
+            else
+            {
+                pKernelHack->EpmemEnable(pAgent);
+                m_Result << "The episodic memory system is now ACTIVE.";
+            }
+            break;
+          
+        case EPMEM_OFF:
+            sp_val = pKernelHack->GetSysparam(pAgent, EPMEM_SYSPARAM);
+            if (sp_val)
+            {
+                pKernelHack->EpmemDisable(pAgent);
+                m_Result << "The episodic memory system has been DISABLED.";
+            }
+            else
+            {
+                m_Result << "The episodic memory system is already DISABLED.";
+            }
+            break;
+            
+        case EPMEM_PAUSE:
+            sp_val = pKernelHack->GetSysparam(pAgent, EPMEM_SUSPENDED_SYSPARAM);
+            if (sp_val)
+            {
+                pKernelHack->SetSysparam(pAgent, EPMEM_SUSPENDED_SYSPARAM, 0);
+                m_Result << "The episodic memory system has been UNPAUSED.";
+            }
+            else
+            {
+                pKernelHack->SetSysparam(pAgent, EPMEM_SUSPENDED_SYSPARAM, 1);
+                m_Result << "The episodic memory system has been PAUSED.";
+            }
+            break;
+            
         case EPMEM_REPORT_SETTINGS:
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemPrintStatus(pAgent);

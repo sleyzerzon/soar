@@ -1503,8 +1503,25 @@ void epmem_print_status(agent *thisAgent)
     int i,j;
     epmem_header *h;
     
+#ifdef DISABLE_EPMEM
+    return;
+#endif
+
     print(thisAgent, "\nEPISODIC MEMORY INFO");
     print(thisAgent, "\n--------------------");
+    if ((thisAgent->sysparams)[EPMEM_SYSPARAM])
+    {
+        print(thisAgent, "\n               Episodic Memory is currently ACTIVE.");
+        if ((thisAgent->sysparams)[EPMEM_SUSPENDED_SYSPARAM])
+        {
+            print(thisAgent, "\n               Episodic Memory is also currently SUSPENDED.");
+        }
+    }
+    else
+    {
+        print(thisAgent, "\n               Episodic Memory is currently DISABLED.");
+        return;
+    }
     print(thisAgent, "\n               Number of stored memories: %d",
           thisAgent->epmem_memories->size);
     print(thisAgent, "\n          Number of retrievals performed: %ld",
@@ -6380,6 +6397,13 @@ void epmem_update(agent *thisAgent)
     return;
 #endif
 
+    //Double check that I'm ready to go
+    if ( (! ((thisAgent->sysparams)[EPMEM_SYSPARAM]))
+         || ((thisAgent->sysparams)[EPMEM_SUSPENDED_SYSPARAM]))
+    {
+        return;
+    }
+
 #ifdef SILENT_CRASH
     __try
     {
@@ -6522,6 +6546,59 @@ void epmem_create_buffer(agent *thisAgent, Symbol *s)
 
 
 /* ===================================================================
+   epmem_deinit()
+
+   This routine deinitializes the epmem system.
+
+   Created: 02 Mar 2007
+   =================================================================== */
+
+void epmem_deinit(agent *thisAgent) 
+{
+    int i;
+    
+#ifdef DISABLE_EPMEM
+    return;
+#endif
+
+    //If I'm not initialized then don't re-deinitialize
+    if (! ((thisAgent->sysparams)[EPMEM_SYSPARAM]))
+    {
+        return;
+    }
+
+    //Deallocate the active wmes arrays
+    if (thisAgent->epmem_curr_active_wmes)
+    {
+        free(thisAgent->epmem_curr_active_wmes);
+        thisAgent->epmem_curr_active_wmes = NULL;
+    }
+    if (thisAgent->epmem_prev_active_wmes)
+    {
+        free(thisAgent->epmem_prev_active_wmes);
+        thisAgent->epmem_prev_active_wmes = NULL;
+    }
+
+    //Remove all episodic memories
+    epmem_clear_all_memories(thisAgent);
+    
+
+    //Deallocate the thisAgent->epmem_header_stack array
+    for(i = thisAgent->epmem_header_stack->size - 1; i >= 0; i--)
+    {
+        destroy_epmem_header(
+            thisAgent, 
+            (epmem_header *)remove_entry_from_arraylist(thisAgent->epmem_header_stack, i));
+    }
+    destroy_arraylist(thisAgent, thisAgent->epmem_header_stack);
+
+    //Note that epmem is now inactive
+    set_sysparam(thisAgent, EPMEM_SYSPARAM, FALSE);
+    
+}/*epmem_deinit*/
+
+
+/* ===================================================================
    init_epemem()
 
    This routine is called once to initialize the episodic memory system.
@@ -6529,11 +6606,17 @@ void epmem_create_buffer(agent *thisAgent, Symbol *s)
    Created: 03 Nov 2002
    =================================================================== */
 
-void init_epmem(agent *thisAgent) 
+void epmem_init(agent *thisAgent) 
 {
 #ifdef DISABLE_EPMEM
     return;
 #endif
+
+    //If I've already initialized don't initialize again
+    if ((thisAgent->sysparams)[EPMEM_SYSPARAM])
+    {
+        return;
+    }
 
     //Allocate the active wmes arrays
     thisAgent->epmem_curr_active_wmes = (wme **)calloc(num_active_wmes, sizeof(wme *));
@@ -6594,8 +6677,10 @@ void init_epmem(agent *thisAgent)
     //Reset the timers
     epmem_reset_cpu_usage_timers(thisAgent);
 
+    //Note that epmem is now active
+    set_sysparam(thisAgent, EPMEM_SYSPARAM, TRUE);
     
-}/*init_epmem*/
+}/*epmem_init*/
 
 
 

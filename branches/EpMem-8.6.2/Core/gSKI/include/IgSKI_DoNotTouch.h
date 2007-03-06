@@ -153,6 +153,8 @@ namespace gSKI
 		virtual void SeedRandomNumberGenerator(unsigned long int* pSeed) = 0;
           virtual void DecayInit(IAgent* pIAgent) = 0;
           virtual void DecayDeInit(IAgent* pIAgent) = 0;
+          virtual void EpmemEnable(IAgent* pIAgent) = 0;
+          virtual void EpmemDisable(IAgent* pIAgent) = 0;
           virtual void EpmemPrintStatus(IAgent* pIAgent) = 0;
           virtual void EpmemPrintMemory(IAgent* pIAgent, int mem_id) = 0;
           virtual void EpmemPrintMatchDiagnostic(IAgent* pIAgent, int state_num) = 0;
@@ -297,8 +299,13 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define WME_DECAY_PRECISION_SYSPARAM             41
 #define WME_DECAY_LOGGING_SYSPARAM               42
 
+//The following constants are used by EPISODIC_MEMORY
+#define EPMEM_SYSPARAM                           43
+#define EPMEM_SUSPENDED_SYSPARAM                 44
+
+
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  42
+#define HIGHEST_SYSPARAM_NUMBER                  44
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024   /* AGR 536  - from sys/param.h */

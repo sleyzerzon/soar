@@ -16,6 +16,7 @@ public class TankSoar {
 	private String logFilename;
 	private boolean notRandomSwitch;
 	private boolean noLogSwitch;
+	public static boolean useSNCPenalty = false;
 	private Level logLevel = Level.INFO;
 	
 	private static Logger logger = Logger.getLogger("simulation");
@@ -134,6 +135,7 @@ public class TankSoar {
 		logFilename = getOptionValue(args, "-log", kDefaultLogFilename);
 		notRandomSwitch = hasOption(args, "-notrandom");
 		noLogSwitch = hasOption(args, "-nolog");
+		useSNCPenalty = hasOption(args, "-useSNCpenalty"); // voigtjr: quick fix to prevent SNC penalty
 		if (hasOption(args, "-fine")) {
 			logLevel = Level.FINE;
 		} 

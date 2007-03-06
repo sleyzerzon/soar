@@ -561,6 +561,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
     arraylist *epmem_header_stack;
     char epmem_save_filename[1024];
     char epmem_load_filename[1024];
+    int epmem_active;
 
     //These timers are used for analyzing epmem performance
     struct timeval epmem_start_time;

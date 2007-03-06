@@ -168,7 +168,10 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 #define WME_DECAY_PRECISION_SYSPARAM             41
 #define WME_DECAY_LOGGING_SYSPARAM               42
 
-#define HIGHEST_SYSPARAM_NUMBER                  42
+#define EPMEM_SYSPARAM                           43
+#define EPMEM_SUSPENDED_SYSPARAM                 44
+
+#define HIGHEST_SYSPARAM_NUMBER                  44
 
  
 /* -----------------------------------------

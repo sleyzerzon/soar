@@ -93,11 +93,6 @@ void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
     decay_init(thisAgent);
 #endif
 
-#ifdef EPISODIC_MEMORY
-    /* See epmem.cpp */
-    init_epmem(thisAgent);
-#endif
-
 #ifdef REAL_TIME_BEHAVIOR
   /* RMJ */
   init_real_time(thisAgent);

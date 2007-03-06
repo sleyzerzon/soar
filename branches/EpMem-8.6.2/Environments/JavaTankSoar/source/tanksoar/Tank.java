@@ -65,7 +65,13 @@ public class Tank  extends WorldEntity implements Agent.RunEventInterface {
 	private int m_InitialHealth = 1000;
 	private int m_InitialMissiles = 15;
 	private boolean stopping = false;
-	
+
+    //%%%Added by :AMN: ~17 Sep 06
+    //(Yes, I know these should be private member variables.)
+    public int m_LastScore = getPoints();
+    public int m_LastScoreAge = 0;
+    public int m_LastMissiles = getMissiles();
+    public int m_LastMissilesAge = 0;
 
 	public Tank(Agent agent, String productions, String color, java.awt.Point initialLocation, String facing, int energy, int health, int missiles, TankSoarWorld world) {
 		super(agent, productions, color, initialLocation);
@@ -126,7 +132,10 @@ public class Tank  extends WorldEntity implements Agent.RunEventInterface {
 	public void runEventHandler(int eventID, Object data, Agent agent, int phase) {
 		if (!stopping) {
 			logger.warning(getName() + ": agent interrupted");
-			m_World.handleSNC(this);
+			// voigtjr: quick fix to disable snc penalty
+			if (TankSoar.useSNCPenalty) {
+				m_World.handleSNC(this);
+			}
 		}
 	}
 	

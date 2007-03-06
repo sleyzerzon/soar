@@ -411,7 +411,7 @@ public class EatersWorld extends World implements WorldManager {
 			m_Eaters[i].setMoved();
 			// Put eater on map, ignore food
 			getCell(location).setEater(m_Eaters[i]);
-			m_Eaters[i].setPoints(0);
+			m_Eaters[i].setPoints(0, "reset");
 			m_Eaters[i].initSoar();
 		}
 		updateEaterInput();
@@ -706,7 +706,7 @@ public class EatersWorld extends World implements WorldManager {
 			cash /= collidees.length;
 			if (logger.isLoggable(Level.FINE)) logger.fine("Cash to each: " + cash);
 			for (int i = 0; i < collidees.length; ++i) {
-				collidees[i].setPoints(cash);
+				collidees[i].setPoints(cash, "collision");
 			}
 			
 			// Remove from former location (only one of these for all eaters)

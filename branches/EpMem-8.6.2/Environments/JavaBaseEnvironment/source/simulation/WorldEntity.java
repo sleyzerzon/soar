@@ -63,9 +63,10 @@ public class WorldEntity {
 		m_PointsChanged = false;
 	}
 	
-	public void setPoints(int score) {
+	public void setPoints(int score, String comment) {
 		m_PointsChanged = true;
 		m_Points = score;
+		logger.info(getName() + " score: " + Integer.toString(m_Points) + " (" + comment + ")");
 	}
 	
 	public String getColor() {
