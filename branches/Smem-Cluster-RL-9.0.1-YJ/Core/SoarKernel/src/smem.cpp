@@ -1518,7 +1518,9 @@ void smem_save_wme (agent* thisAgent, wme* w){ // collect new wmes for later add
 			// to remove wmes with cue being identifier, need to do that before retrieval.
 		}
 		//thisAgent->semantic_memory->insert_LME(id,attr,value,value_type);
-		thisAgent->to_be_saved_wmes->insert(LME(id,attr,value,value_type)); // they need to be examined
+		vector<int> history = vector<int>();
+		history.push_back(w->timetag);
+		thisAgent->to_be_saved_wmes->insert(LME(id,attr,value,value_type, history)); // they need to be examined
 }
 
 void save_wmes_12_21(agent* thisAgent) {
@@ -1531,7 +1533,8 @@ void save_wmes_12_21(agent* thisAgent) {
 			}
 			//thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
 			// final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
-			final_lmes.push_back(LME(itr->id,itr->attr,itr->value,itr->value_type));
+			
+			final_lmes.push_back(LME(itr->id,itr->attr,itr->value,itr->value_type, itr->boost_history));
 		}
 		else{
 			if(YJ_debug){
@@ -1601,7 +1604,7 @@ void save_wmes_deliberate_merge_identical(agent* thisAgent){
 
 				//thisAgent->semantic_memory->insert_LME(itr->id,itr->attr,itr->value,itr->value_type);
 				//final_lmes.insert(LME(itr->id,itr->attr,itr->value,itr->value_type));
-				final_lmes.push_back(LME(itr->id,itr->attr,itr->value,itr->value_type));
+				final_lmes.push_back(LME(itr->id,itr->attr,itr->value,itr->value_type, itr->boost_history));
 			}
 		else{
 			if(YJ_debug) cout << "Not long term values" << endl;
@@ -1805,9 +1808,9 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 														print_with_symbols(thisAgent, "\n%y, %y, %y\n", w->id, w->attr, w->value);
 
 													//saved_wmes.insert(LME(id, attr, value, value_type));
-
-
-													current_save_chunk.insert(LME(id, attr, value, value_type));
+													vector<int> history = vector<int>();
+													history.push_back(w->timetag);
+													current_save_chunk.insert(LME(id, attr, value, value_type, history));
 
 													//thisAgent->semantic_memory->insert_LME(id,attr,value,value_type);
 
@@ -1830,7 +1833,9 @@ void find_save_wmes(agent* thisAgent, set<LME>& saved_wmes){
 													print_with_symbols(thisAgent, "\n%y, %y, %y\n", w->id, w->attr, w->value);
 
 												//saved_wmes.insert(LME(id, attr, value, value_type));
-												current_save_chunk.insert(LME(id, attr, value, value_type));
+												vector<int> history = vector<int>();
+												history.push_back(w->timetag);
+												current_save_chunk.insert(LME(id, attr, value, value_type, history));
 												//thisAgent->semantic_memory->insert_LME(id,attr,value,value_type);
 
 											}

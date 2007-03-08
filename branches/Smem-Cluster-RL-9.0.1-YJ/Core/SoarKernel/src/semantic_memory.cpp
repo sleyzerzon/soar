@@ -339,7 +339,8 @@ string SemanticMemory::merge_id(string& id, HASH_S_HASH_S_HASH_S_LP& id_attr_val
 					current_history.push_back(current_cycle);
 					// This will be merging with identical elements if the final_chunk_id is merged with some existing id
 					// Otherwise, it'll be a new element
-					this->insert_LME(final_chunk_id, attr, value, value_type, current_history);
+					//this->insert_LME(final_chunk_id, attr, value, value_type, current_history);
+					this->insert_LME(final_chunk_id, attr, value, value_type, lmes[lme_index].boost_history);
 				}
 			}
 

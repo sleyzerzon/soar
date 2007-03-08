@@ -444,6 +444,29 @@ bool CommandLineInterface::ParseCluster(gSKI::Agent* pAgent, std::vector<std::st
 			string input_file = argv[2];
 			pKernelHack->clustering(pAgent, std::vector<std::vector<double> >(), false, false, input_file, true, false);
 		}
+
+		
+	}
+
+	if(argv.size() >= 2){
+		if(argv[1] == "-d"){//decay rate
+			if(argv.size() == 2){
+				double current_value = pKernelHack->cluster_set_param(pAgent, "decay_rate", 0, false);
+				m_Result << "Current decay rate " << current_value << endl;
+			}
+			else if(argv.size() >= 3){
+				double decay_rate;
+				istringstream isstr(argv[2]);
+				if(isstr >> decay_rate){
+					double assigned_value = pKernelHack->cluster_set_param(pAgent, "decay_rate", decay_rate);
+					m_Result << "New decay rate set to" << assigned_value << endl;
+				}
+				else{
+					m_Result << "Bad argument " << argv[2] << endl;
+				}
+			}
+		}
+
 	}
 
 	// Quit needs no help

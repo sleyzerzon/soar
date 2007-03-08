@@ -140,6 +140,7 @@ namespace gSKI
 		 int clustering (Agent* pIAgent, std::vector<std::vector<double> > weights, bool print_flag=false, bool reset_flag=false, std::string filename="", bool input=false, bool output=false);
 		 int cluster_train (Agent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
 		 std::vector<std::vector<int> > cluster_recognize (Agent* pIAgent, std::vector<std::vector<std::pair<std::string, std::string> > > instances);
+		 double cluster_set_param(Agent* pIAgent, std::string param_name, double param_value, bool update=true);
 		// SEMANTIC_MEMORY
 	  };
    }

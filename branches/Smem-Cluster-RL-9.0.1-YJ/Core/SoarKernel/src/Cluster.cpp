@@ -9,6 +9,7 @@
 //#include "stdafx.h"
 #include "Cluster.h"
 #include <sstream>
+#include <cmath>
 
 
 float ranf(){
@@ -89,9 +90,23 @@ double Unit::activation(vector<double> input){
 	return total_activation;
 }
 
-void Unit::update(vector<double> input){
+double Unit::activation_distance(vector<double> input){
+	double total_activation = 0;
+	for(int i=0; i<(int)(input.size()); ++i){
+		if(i >= this->max_dim){
+			cout << "input " << input.size() << " exceeds maximum dimension " << this->max_dim << endl;
+			exit(1);
+		}
+		total_activation += pow((input[i] - this->weights[i]),2);
+	}
+	return 1/sqrt(total_activation);
+}
+
+void Unit::update(vector<double> input, double decay_rate){
 	double base_rate = 0.2;
-	double learn_rate = base_rate * pow((float)(this->counter+1), (float)-0.5);
+	// 0.5 is default rate, 0.3 is slower decaying - slower convergence, but more robust???
+	//double learn_rate = base_rate * pow((float)(this->counter+1), (float)-0.5);
+	double learn_rate = base_rate * pow((float)(this->counter+1), (float)decay_rate);
 	//cout << learn_rate << endl;
 	//for(int i=0; i<(int)(this->max_dim); ++i){
 	for(int i=0; i<(int)(input.size()); ++i){
@@ -128,6 +143,7 @@ NetWork::NetWork(int n_units, int max_dim){
 	}
 	_n_units = n_units;
 	_max_dim = max_dim;
+	decay_rate = -0.5;
 }
 
 void NetWork::reset(){
@@ -207,7 +223,7 @@ int NetWork::train_input_one_cycle(vector<double>& input, vector<double>& new_in
 	if(update){
 	// update/train winner
 		//cout << "updating " << winner_index << endl;
-		this->units[winner_index].update(input);
+		this->units[winner_index].update(input, decay_rate);
 		//for(int i=0; i<input.size(); ++i){
 		//	cout << units[winner_index].weights[i] << " ";
 		//}
@@ -255,17 +271,131 @@ int NetWork::winner(vector<double> input, vector<int> inhibit){
 			continue;
 		}
 		double current_activation = this->activation(input, i);
+
 	//	cout << current_activation << " "<<i<<",";
 		if(current_activation > max_activation){
 			max_activation = current_activation;
 			current_winner = i;
 		}
 	}
+	// If max_activation < threshold, then randomly pick a winner from the list of untrained units - with small counts
+	// Maybe a list of units ordered by updating counts
 	//cout << "winner " << current_winner <<endl;
 	return current_winner;
 }
 
 // Dot-production activation calculation
 double NetWork::activation(vector<double> input, int index){
-	return this->units[index].activation(input);
+	//return this->units[index].activation(input);
+	// Distance based activation
+	return this->units[index].activation_distance(input);
+}
+
+
+void NetWork::output_attr_val_pairs(){
+	vector<pair<string, string> > attr_val_pairs = vector<pair<string, string> >(attr_val_pair_to_index.size());
+	//cout << "SIZE " << attr_val_pair_to_index.size() << endl;
+
+	for(HASH_S_S_INT::iterator itr = attr_val_pair_to_index.begin(); itr != attr_val_pair_to_index.end(); ++itr){
+		string attr = itr->first;
+		HASH_S_INT val_to_index = itr->second;
+		for(HASH_S_INT::iterator itr2 = val_to_index.begin(); itr2 != val_to_index.end(); ++itr2){
+			string val = itr2->first;
+			int index = itr2->second;
+			//cout << index << endl;
+			if(index >= attr_val_pairs.size()){
+				attr_val_pairs.insert(attr_val_pairs.end(), index+1-attr_val_pairs.size(), pair<string,string>());
+			}
+			attr_val_pairs[index] = pair<string, string>(attr, val);
+		}
+	}
+
+	for(int i=0; i<attr_val_pairs.size(); ++i){
+		cout << "(" << attr_val_pairs[i].first << "," << attr_val_pairs[i].second << ") ";
+	}
+	cout << endl;
+}
+
+//
+void NetWork::cluster_export(string filename){
+	std::ofstream SoarFile(filename.c_str());
+	//SoarFile.open(filename.c_str());
+	int used_dim = this->attr_val_pair_to_index.size();
+	if(SoarFile){
+		// Eventually, there should be a way to directly dump/load binary memory
+		
+		SoarFile << this->units.size() << " " << this->index_to_attr_val_pair.size() <<endl;
+		for(int i = 0; i < this->index_to_attr_val_pair.size(); ++i){
+			string attr = this->index_to_attr_val_pair[i].first;
+			string value = this->index_to_attr_val_pair[i].second;
+			SoarFile << attr << " " << value << endl;
+		}
+		//SoarFile << ">END OF ATTR VALUE PAIR" << endl;
+
+		/*for(HASH_S_S_INT::iterator itr = thisAgent->clusterNet->attr_val_pair_to_index.begin(); itr != thisAgent->clusterNet->attr_val_pair_to_index.end(); ++itr){
+		string attr = itr->first;
+		HASH_S_INT value_to_index = itr->second;
+		for(HASH_S_INT::iterator itr2 = value_to_index.begin(); itr2 != value_to_index.end(); ++itr2){
+		string value = itr2->first;
+		int index = itr2->second;
+		}
+		}*/
+
+		for(int i=0; i< this->units.size(); ++i){
+			for(int j=0; j<used_dim; ++j){
+				//print(thisAgent, "%f ", thisAgent->clusterNet->units[i].weights[j]);
+				SoarFile << this->units[i].weights[j] << " ";
+			}
+			SoarFile << this->units[i].counter << "\n";
+		}
+	}
+}
+
+void NetWork::cluster_import(string filename){
+	std::ifstream SoarFile;
+	SoarFile.open(filename.c_str());
+	if(SoarFile){
+		
+		string line;
+		float input_number;
+		int i = 0;
+		getline(SoarFile, line);
+		std::istringstream isstr_first(line);
+		int n_units, n_dim;
+		isstr_first >> n_units >> n_dim;
+
+		for(int i = 0; i<n_dim; i++ ){
+			getline(SoarFile, line);
+			std::istringstream isstr(line);
+			string attr, val;
+			isstr >> attr >> val;
+			this->index_to_attr_val_pair.push_back(pair<string, string> (attr, val));
+
+			pair<HASH_S_S_INT::iterator, bool> pr;
+			pr = this->attr_val_pair_to_index.insert(pair<string, HASH_S_INT>(attr, HASH_S_INT()));
+			if(pr.second){
+				pr.first->second.insert(pair<string, int>(val, i));
+			}
+
+		}
+		while (getline(SoarFile, line)) {
+			std::istringstream isstr(line);
+			int j = 0;
+			while(isstr >> input_number){
+				if(i >= this->units.size() || j>= this->units[i].weights.size()){
+					break;
+					// outof bounds
+				}
+				if(isstr.eof()){
+					this->units[i].counter = input_number;
+					//cout << input_number;
+				}
+				else{
+					this->units[i].weights[j] = input_number;
+				}
+				++ j;
+			}
+			++ i;
+		}
+	}
 }

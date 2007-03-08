@@ -2827,85 +2827,11 @@ namespace gSKI
 			}
 
 			if(output){
-				std::ofstream SoarFile;
-				SoarFile.open(filename.c_str());
-				if(SoarFile){
-					// Eventually, there should be a way to directly dump/load binary memory
-					print(thisAgent, "Output to file %s\n", filename.c_str());
-					SoarFile << thisAgent->clusterNet->units.size() << " " << thisAgent->clusterNet->index_to_attr_val_pair.size() <<endl;
-					for(int i = 0; i < thisAgent->clusterNet->index_to_attr_val_pair.size(); ++i){
-						string attr = thisAgent->clusterNet->index_to_attr_val_pair[i].first;
-						string value = thisAgent->clusterNet->index_to_attr_val_pair[i].second;
-						SoarFile << attr << " " << value << endl;
-					}
-					//SoarFile << ">END OF ATTR VALUE PAIR" << endl;
-
-					/*for(HASH_S_S_INT::iterator itr = thisAgent->clusterNet->attr_val_pair_to_index.begin(); itr != thisAgent->clusterNet->attr_val_pair_to_index.end(); ++itr){
-						string attr = itr->first;
-						HASH_S_INT value_to_index = itr->second;
-						for(HASH_S_INT::iterator itr2 = value_to_index.begin(); itr2 != value_to_index.end(); ++itr2){
-							string value = itr2->first;
-							int index = itr2->second;
-						}
-					}*/
-				
-					for(int i=0; i< thisAgent->clusterNet->units.size(); ++i){
-						for(int j=0; j<used_dim; ++j){
-							//print(thisAgent, "%f ", thisAgent->clusterNet->units[i].weights[j]);
-							SoarFile << thisAgent->clusterNet->units[i].weights[j] << " ";
-						}
-						SoarFile << "\n";
-					}
-				}
-				else{
-					print(thisAgent, "Illegal filename: %s\n", filename.c_str());
-				}
+				thisAgent->clusterNet->cluster_export(filename);
 			}
 			
 			if(input){
-				std::ifstream SoarFile;
-				SoarFile.open(filename.c_str());
-				if(SoarFile){
-					thisAgent->clusterNet->reset();
-					string line;
-					float weight;
-					int i = 0;
-					getline(SoarFile, line);
-					std::istringstream isstr_first(line);
-					int n_units, n_dim;
-					isstr_first >> n_units >> n_dim;
-					delete thisAgent->clusterNet;
-					thisAgent->clusterNet = new NetWork(n_units, 100);
-
-					for(int i = 0; i<n_dim; i++ ){
-						getline(SoarFile, line);
-						std::istringstream isstr(line);
-						string attr, val;
-						isstr >> attr >> val;
-						thisAgent->clusterNet->index_to_attr_val_pair.push_back(pair<string, string> (attr, val));
-						
-						pair<HASH_S_S_INT::iterator, bool> pr;
-						pr = thisAgent->clusterNet->attr_val_pair_to_index.insert(pair<string, HASH_S_INT>(attr, HASH_S_INT()));
-						if(pr.second){
-							pr.first->second.insert(pair<string, int>(val, i));
-						}
-
-					}
-					while (getline(SoarFile, line)) {
-						std::istringstream isstr(line);
-						int j = 0;
-						while(isstr >> weight){
-							if(i >= thisAgent->clusterNet->units.size() || j>= thisAgent->clusterNet->units[i].weights.size()){
-								break;
-								// outof bounds
-							}
-							thisAgent->clusterNet->units[i].weights[j] = weight;
-							
-							++ j;
-						}
-						++ i;
-					}
-				}
+				thisAgent->clusterNet->cluster_import(filename);
 			}
 
 			
@@ -2932,6 +2858,23 @@ namespace gSKI
 			}
 			return clusters;
 		}
+
+		double TgDWorkArounds::cluster_set_param(Agent* pIAgent, std::string param_name, double param_value, bool update){
+			double return_value = 0;
+			Agent* pAgent2 = (Agent*)(pIAgent);
+			agent* thisAgent = pAgent2->GetSoarAgent();
+			if(param_name == "decay_rate"){
+				if(update){
+					thisAgent->clusterNet->decay_rate = param_value;
+					return_value = param_value;
+				}
+				else{
+					return_value = thisAgent->clusterNet->decay_rate;
+				}
+			}
+			return return_value;
+		}
+
 		// SEMANTIC_MEMORY
 
 	}// class

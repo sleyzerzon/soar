@@ -6,6 +6,7 @@
 //#include <hash_map>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #ifdef _MSC_VER
 #include <hash_map>
@@ -50,6 +51,7 @@ namespace __gnu_cxx
 // This class should support unit based operations: activation = unit*input, input2=input1-unit
 class Unit
 {
+	friend class NetWork;
 private:
 	
 	int max_dim;
@@ -58,7 +60,8 @@ public:
 	vector<double> weights;
 	Unit(int max_dim);
 	double activation(vector<double> input);
-	void update(vector<double> input); // learning rate is determined within the unit
+	double activation_distance(vector<double> input);
+	void update(vector<double> input, double decay_rate); // learning rate is determined within the unit
 	vector<double> subtract_input(vector<double>&);
 	// http://mathworld.wolfram.com/HyperspherePointPicking.html
 	// Uniform distribution from a hypersphere
@@ -80,6 +83,7 @@ private:
 	int _max_dim;
 
 public:
+	double decay_rate;
 	void reset();
 	vector<Unit> units;
 	vector<pair<string, string> > index_to_attr_val_pair;
@@ -94,7 +98,11 @@ public:
 	
 	vector<int> cluster_input(vector<double> input, bool update=true);
 	vector<int> cluster_input(vector<pair<string, string> >& attr_val_pairs, bool update=true);
+
+	void output_attr_val_pairs();
 	//void Cluster(vector<pair<string, string>& attr_val_pairs);
+	void cluster_export(string filename);
+	void cluster_import(string filename);
 	
 };
 
