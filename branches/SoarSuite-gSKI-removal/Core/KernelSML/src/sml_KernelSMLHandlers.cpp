@@ -496,6 +496,7 @@ bool KernelSML::HandleShutdown(gSKI::Agent* pAgent, char const* pCommandName, Co
 bool KernelSML::HandleGetRunState(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
 	unused(pCommandName) ;
+	unused(pError) ;
 
 	// Look up what type of information to report.
 	char const* pValue = pIncoming->GetArgString(sml_Names::kParamValue) ;
@@ -507,20 +508,22 @@ bool KernelSML::HandleGetRunState(gSKI::Agent* pAgent, char const* pCommandName,
 
 	std::ostringstream buffer;
 
+	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
+
 	if (strcmp(pValue, sml_Names::kParamPhase) == 0)
 	{
 		// Report the current phase.
-		buffer << pAgent->GetCurrentPhase(pError);
+		buffer << pAgentSML->GetCurrentPhase();
 	}
 	else if (strcmp(pValue, sml_Names::kParamDecision) == 0)
 	{
 		// Report the current decision number of decisions that have been executed
-		buffer << pAgent->GetNumDecisionsExecuted(pError);
+		buffer << pAgentSML->GetNumDecisionsExecuted();
 	}
 	else if (strcmp(pValue, sml_Names::kParamRunState) == 0) 	 
 	{ 	 
 		// Report the current run state 	 
-		buffer << pAgent->GetRunState(pError) ; 	 
+		buffer << pAgentSML->GetRunState() ; 	 
 	}
 	else
 	{

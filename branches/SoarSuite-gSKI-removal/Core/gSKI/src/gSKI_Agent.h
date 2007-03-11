@@ -594,7 +594,7 @@ namespace gSKI
 		* @returns The number of smallest steps since the agent was last
 		*             initialized.
 		*/
-		unsigned long GetNumSmallestStepsExecuted(Error* err = 0);
+		//unsigned long GetNumSmallestStepsExecuted(Error* err = 0);
 
 
 		/**
@@ -611,7 +611,7 @@ namespace gSKI
 		* @returns The number of phases since the agent was last
 		*             initialized.
 		*/
-		unsigned long GetNumPhasesExecuted(Error* err = 0);
+		//unsigned long GetNumPhasesExecuted(Error* err = 0);
 		//void          ResetNumPhasesExecuted(Error* err = 0);
 
 		/********************************************************************
@@ -621,7 +621,7 @@ namespace gSKI
 		*        This is a hack from KernelSML which listens to RunEvents.
 		*        Currently gSKI itself does not listen on RunEvents.
 		*********************************************************************/
-		void IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize) ;
+		//void IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize) ;
 
 
 		/**
@@ -638,7 +638,7 @@ namespace gSKI
 		* @returns The number of elaborations since the agent was last
 		*             initialized.
 		*/
-		unsigned long GetNumElaborationsExecuted(Error* err = 0);
+		//unsigned long GetNumElaborationsExecuted(Error* err = 0);
 
 
 		/**
@@ -655,7 +655,7 @@ namespace gSKI
 		* @returns The number of decision cycles since the agent was last
 		*             initialized.
 		*/
-		unsigned long GetNumDecisionCyclesExecuted(Error* err = 0);
+		//unsigned long GetNumDecisionCyclesExecuted(Error* err = 0);
 
 		/**
 		* @brief Gets the number of decisions made so far
@@ -672,7 +672,7 @@ namespace gSKI
 		* @returns The number of decisions made since the agent was last
 		*             initialized.
 		*/
-		unsigned long GetNumDecisionsExecuted(Error* err = 0);
+		//unsigned long GetNumDecisionsExecuted(Error* err = 0);
 
 
 		/**
@@ -689,7 +689,7 @@ namespace gSKI
 		* @returns The number of decision cycles with output since the agent was last
 		*             initialized.
 		*/
-		unsigned long GetNumOutputsExecuted(Error* err = 0);
+		//unsigned long GetNumOutputsExecuted(Error* err = 0);
 		//void          ResetNumOutputsExecuted(Error* err = 0);
 		void          ResetNilOutputCounter(Error* err = 0);
 
@@ -772,7 +772,7 @@ namespace gSKI
 		*               information.  If it is 0 (the default) extended error
 		*               information is not returned.
 		*/
-		void RemoveAllClientRhsFunctions(Error* err = 0);
+		//void RemoveAllClientRhsFunctions(Error* err = 0);
 
 		/*************************** Listeners ****************************************/
 
@@ -1429,7 +1429,7 @@ namespace gSKI
 		CmdRhsFunction		m_CmdRhs ;
 
 		/** List of all client defined rhs function */
-		tRhsFunctionMap       m_rhsFunctions;
+		//tRhsFunctionMap       m_rhsFunctions;
 
 		/** Statistic that can be used for debugging or scheduling */
 		//{

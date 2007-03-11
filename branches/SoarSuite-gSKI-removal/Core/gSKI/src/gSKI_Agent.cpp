@@ -629,6 +629,7 @@ namespace gSKI
    {
       ClearError(err);
 
+	  /*
       MegaAssert(rhsFunction != 0, "0 pointer passed in as a RHS function");
       if(rhsFunction == 0)
       {
@@ -651,9 +652,10 @@ namespace gSKI
          SetError(err, gSKIERR_RHS_FUNCTION_ALREADY_EXISTS);
          return false;
       }
-
+	
       // This is our storage part,...
       m_rhsFunctions[rhsFunction->GetName()] = rhsFunction;
+	  */
 
       // Tell Soar about it
       std::vector<char> tmpBuffer(rhsFunction->GetName(), rhsFunction->GetName() + strlen(rhsFunction->GetName()) + 1);
@@ -681,6 +683,7 @@ namespace gSKI
    {
       ClearError(err);
    
+	  /*
       MegaAssert(szName != 0, "0 pointer to a name passed in to RemoveRhsFunction");
       if(szName == 0)
       {
@@ -694,6 +697,7 @@ namespace gSKI
          SetError(err, gSKIERROR_NO_SUCH_RHS_FUNCTION);
          return false;
       }
+	*/
 
       // Tell the kernel we are done listening.
       std::vector<char> tmpBuffer(szName, szName + strlen(szName) + 1);
@@ -704,7 +708,7 @@ namespace gSKI
 	  symbol_remove_ref (m_agent, tmp);
 
       // Do our stuff
-      m_rhsFunctions.erase(it);
+      //m_rhsFunctions.erase(it);
 
       return false;
    }
@@ -714,6 +718,7 @@ namespace gSKI
 
    =========================
    */
+   /*
    void Agent::RemoveAllClientRhsFunctions(Error* err)
    {
       ClearError(err);
@@ -731,6 +736,7 @@ namespace gSKI
       // Clear our list
       m_rhsFunctions.clear();
    }
+   */
 
    /*
    =============================
@@ -1027,22 +1033,26 @@ namespace gSKI
    This counter deprecated as of v8.6.2
    =============================
    */
+   /*
    unsigned long Agent::GetNumSmallestStepsExecuted(Error* err)
    {
       ClearError(err);
       return m_smallestStepCount;
    }
+   */
    
    /*
    =============================
    This is a local gSKI counter, not from Kernel
    =============================
    */
+   /*
    unsigned long Agent::GetNumPhasesExecuted(Error* err)
    {
       ClearError(err);
       return m_phaseCount;
    }
+   */
    /*
    void Agent::ResetNumPhasesExecuted(Error* err)
    {
@@ -1063,40 +1073,45 @@ namespace gSKI
    step.  m_agent->e_cycle_count is true e_cycles only, from kernel.
    =============================
    */
+   /*
    unsigned long Agent::GetNumElaborationsExecuted(Error* err)
    {
       ClearError(err);
       return m_elaborationCount;  
    }
-
+	*/
    /*
    =============================
 
    =============================
    */
+   /*
    unsigned long Agent::GetNumDecisionCyclesExecuted(Error* err)
    {
       ClearError(err);
 	  return m_agent->d_cycle_count;
    }
+	*/
 
    /*
    =============================
    if desire number of decisions instead of full D_cycles
    =============================
    */
+   /*
    unsigned long Agent::GetNumDecisionsExecuted(Error* err)
    {
       ClearError(err);
 	  return m_agent->decision_phases_count;
    }
-
+	*/
 
    /*
    =============================
    This is a local gSKI counter, not from Kernel
    =============================
    */
+   /*
    unsigned long Agent::GetNumOutputsExecuted(Error* err)
    {
 	   // This variable is the number of output phases that 
@@ -1104,6 +1119,7 @@ namespace gSKI
       ClearError(err);
       return m_outputCount;
    }
+   */
    /*
    void Agent::ResetNumOutputsExecuted(Error* err)
    {
@@ -1118,6 +1134,7 @@ namespace gSKI
 *			decisions etc.) they have ever executed.
 *			We use these counters to determine when a run should stop.
 *********************************************************************/
+   /*
 void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 {
 	switch(interleaveStepSize)
@@ -1142,6 +1159,8 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 		return;
 	}
 }  
+*/
+
       /*
    =========================
     _       _     _ ____  _         _____                 _   _
@@ -1696,10 +1715,13 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	  // have to map to a gSKI event enum
  	// Only elaboration events should be going thru here.  Everything else is a
     // KernelEvent now.
+	  /*
 	if (gSKIEVENT_AFTER_ELABORATION_CYCLE == EnumRemappings::Map_Kernel_to_gSKI_RunEventId(eventId,eventOccured)) 
 	{
 		a->IncrementgSKIStepCounter(gSKI_INTERLEAVE_ELABORATION_PHASE);
-	} /* */
+	} 
+	*/
+	/* */
 
      // We have to change the the event id from a kernel id to a gSKI id
 	  RunNotifier rn(a, EnumRemappings::ReMapPhaseType(phase_data->phase_type,0));

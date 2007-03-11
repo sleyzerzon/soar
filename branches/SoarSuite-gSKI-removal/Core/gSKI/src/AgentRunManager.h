@@ -119,17 +119,18 @@ namespace gSKI
        *
        * If any agent is added to the run list, its counts are initialized.
        */
+	  /*
       void synchronizeRunList(egSKIRunType  runLength, 
                               unsigned long steps,
                               bool          forceReinit);
-
+	  */
       
       /** 
        * @brief Adds an agent to our run list
        *
        * The runLength and steps are used to initialize newly added agents.
        */ 
-      void addToRunList(Agent* a, egSKIRunType runLength, unsigned long steps);
+      //void addToRunList(Agent* a, egSKIRunType runLength, unsigned long steps);
 
       /** 
        * @brief Removes an agent from our run list
@@ -141,13 +142,13 @@ namespace gSKI
        *
        * Used by RunInClientThread.
        */
-      unsigned long getReleventStepCount(Agent* a, egSKIRunType runType);
+      //unsigned long getReleventStepCount(Agent* a, egSKIRunType runType);
 
       /** 
        * @brief called by synchronizeRunList when it needs to reinitialize
        *          all of the agents in the run list
        */
-      void initializeForRun(egSKIRunType  runLength, unsigned long steps);
+      //void initializeForRun(egSKIRunType  runLength, unsigned long steps);
 
 	  /** Look up the kernel for this run manager **/
 	  Kernel* getKernel() ;

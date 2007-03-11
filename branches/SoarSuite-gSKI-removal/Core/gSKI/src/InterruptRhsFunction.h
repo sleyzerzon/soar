@@ -17,6 +17,7 @@ when a production is fired.
 
 class InterruptRhsFunction: public gSKI::RhsFunction
 {
+	//Need to move this (and all RHS support functions) up to SML level
 public:
 	InterruptRhsFunction(gSKI::AgentManager* manager):m_manager(manager) { }
 

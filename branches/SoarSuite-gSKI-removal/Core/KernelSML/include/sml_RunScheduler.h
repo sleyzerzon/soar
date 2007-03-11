@@ -142,10 +142,10 @@ protected:
     egSKIRunResult  GetOverallRunResult() ;
 	void			HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase) ;
 	bool			HaveAllGeneratedOutput() ;
-	void            InitializeRunCounters(egSKIRunType runStepSize, egSKIInterleaveType stepSize) ;
+	void            InitializeRunCounters(egSKIRunType runStepSize) ;
     void            InitializeStepList() ;
 	void			InitializeUpdateWorldEvents(bool addListeners) ;
-	bool			IsAgentFinished(gSKI::Agent* pAgent, AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count) ;
+	bool			IsAgentFinished(AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count) ;
  	//void			RecordInitialRunCounters(egSKIRunType runStepSize) ;
  	void			ResetRunCounters(egSKIRunType runStepSize) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;

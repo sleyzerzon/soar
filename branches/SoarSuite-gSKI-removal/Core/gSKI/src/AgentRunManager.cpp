@@ -114,6 +114,7 @@ namespace gSKI
       
    =============================
    */   
+   /*
    void AgentRunManager::synchronizeRunList(egSKIRunType  runLength, 
                                             unsigned long steps,
                                             bool          forceReinit)
@@ -148,12 +149,13 @@ namespace gSKI
       if(forceReinit)
          initializeForRun(runLength, steps);
    }
-
+	*/
    /*
    =============================
       
    =============================
    */   
+   /*
    void AgentRunManager::initializeForRun(egSKIRunType runLength, unsigned long steps)
    {
       tAgentRunListIt it;
@@ -164,12 +166,14 @@ namespace gSKI
          (*it).maxSteps = (*it).steps + steps;
       }
    }
+   */
 
    /*
    =============================
       
    =============================
    */   
+   /*
    void AgentRunManager::addToRunList(Agent* a, egSKIRunType runLength, unsigned long steps)
    {
       // Iterate until we find the agent if it is in the list.
@@ -190,6 +194,7 @@ namespace gSKI
          m_runningAgents.push_back(AgentRunData(a, getReleventStepCount(a, runLength), steps));
       }
    }
+   */
 
    /*
    =============================
@@ -373,6 +378,7 @@ namespace gSKI
 
    =============================
    */
+	/*
    unsigned long AgentRunManager::getReleventStepCount(Agent* a, egSKIRunType runType)
    {
       switch(runType)
@@ -391,5 +397,6 @@ namespace gSKI
          return 0;
       }
    }
+   */
 
 }
