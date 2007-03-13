@@ -273,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sml_RhsFunction.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\sml_RhsListener.cpp"
 				>
 			</File>
@@ -372,6 +376,10 @@
 			</File>
 			<File
 				RelativePath=".\include\sml_ReceiverThread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\sml_RhsFunction.h"
 				>
 			</File>
 			<File
