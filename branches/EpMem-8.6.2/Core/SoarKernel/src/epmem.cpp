@@ -5878,7 +5878,10 @@ void epmem_save_episodic_memory_to_file(agent *thisAgent, char *fn)
 {
     FILE *f;
 
-    if ( (fn == NULL) || (strlen(fn) == 0) ) return;
+    if ( (fn == NULL) || (strlen(fn) == 0) )
+    {
+        fn = thisAgent->epmem_autosave_filename;
+    }
 
     f = fopen(fn, "w");
     if (f == NULL)
@@ -5927,6 +5930,9 @@ void epmem_clear_all_memories(agent *thisAgent)
     {
         epmem = (episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories, i);
 
+        //If memories are unloaded and reloaded the first entry can be NULL
+        if (epmem == NULL) continue;
+        
         //Clean up the actwme list (but not the associated wmetree nodes)
         for(j = 0; j < epmem->content->size; j++)
         {
@@ -6346,7 +6352,10 @@ void epmem_load_episodic_memory_from_file(agent *thisAgent, char *fn)
     FILE *f;
     arraylist *nodelist;
 
-    if ( (fn == NULL) || (strlen(fn) == 0) ) return;
+    if ( (fn == NULL) || (strlen(fn) == 0) )
+    {
+        fn = thisAgent->epmem_autosave_filename;
+    }
 
     //Check for a good file
     f = fopen(fn, "r");
