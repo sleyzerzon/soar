@@ -37,9 +37,9 @@ bool CommandLineInterface::ParseEpmem(gSKI::IAgent* pAgent, std::vector<std::str
         {'m', "match",      1},
         {'d', "diff",       2},
         {'c', "cue",        2},
-        {'l', "load",       1},
-        {'s', "save",       1},
-        {'a', "autosave",   2},
+        {'l', "load",       0},
+        {'s', "save",       0},
+        {'a', "autosave",   0},
         {0, 0, 0}
     };
 
@@ -156,26 +156,30 @@ bool CommandLineInterface::ParseEpmem(gSKI::IAgent* pAgent, std::vector<std::str
                 DoEpmem(pAgent, EPMEM_CUE_COMPARE_MEM, arg1, arg2);
                 break;
             case 'l':
-				if (argv.size() < 3)
+                //Use empty string to specify the default filename
+                buf[0] = '\0';
+                if (argv.size() >= 3)
                 {
-                    m_Result << "No filename specified.";
-                }
-                else
-                {
-                    strcpy(buf, m_OptionArgument.c_str());
-                    DoEpmem(pAgent, EPMEM_LOAD, (long)buf, 0);
+                    //Retrieve filename
+                    iter = argv.begin();
+                    tmpStr = *(++iter);
+                    tmpStr = *(++iter);
+                    strcpy(buf, tmpStr.c_str());
                 }//else                
+                DoEpmem(pAgent, EPMEM_LOAD, (long)buf, 0);
                 break;
             case 's':
-				if (argv.size() < 3)
+                //Use empty string to specify the default filename
+                buf[0] = '\0';
+				if (argv.size() >= 3)
                 {
-                    m_Result << "No filename specified.";
-                }
-                else
-                {
-                    strcpy(buf, m_OptionArgument.c_str());
-                    DoEpmem(pAgent, EPMEM_SAVE, (long)buf, 0);
+                    //Retrieve filename
+                    iter = argv.begin();
+                    tmpStr = *(++iter);
+                    tmpStr = *(++iter);
+                    strcpy(buf, tmpStr.c_str());
                 }//else                
+                DoEpmem(pAgent, EPMEM_SAVE, (long)buf, 0);
                 break;
             case 'a':
                 //Set default arguments
@@ -354,7 +358,15 @@ bool CommandLineInterface::DoEpmem(gSKI::IAgent* pAgent,
             
         case EPMEM_LOAD:
             str = (char *)arg1;
-            m_Result << "Loaded episodic memories from file " << str << "\n";
+            m_Result << "Loaded episodic memories from ";
+            if ((str != NULL) && (strlen(str) > 0))
+            {
+                m_Result <<  str << "\n";
+            }
+            else
+            {
+                m_Result <<  "default file\n";
+            }
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemLoadMemories(pAgent, str);
             this->RemoveListenerAndEnableCallbacks(pAgent);
@@ -362,7 +374,15 @@ bool CommandLineInterface::DoEpmem(gSKI::IAgent* pAgent,
           
         case EPMEM_SAVE:
             str = (char *)arg1;
-            m_Result << "Saved episodic memories to file " << str << "\n";
+            m_Result << "Saved episodic memories to ";
+            if ((str != NULL) && (strlen(str) > 0))
+            {
+                m_Result <<  str << "\n";
+            }
+            else
+            {
+                m_Result <<  "default file\n";
+            }
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemSaveMemories(pAgent, str);
             this->RemoveListenerAndEnableCallbacks(pAgent);
