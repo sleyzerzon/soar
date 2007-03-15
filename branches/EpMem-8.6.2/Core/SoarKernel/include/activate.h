@@ -24,7 +24,9 @@ extern "C"
 //#define SILENT_CRASH
 
 #ifdef SILENT_CRASH
+#ifdef WIN32
 #include "excpt.h"
+#endif
 #endif
 
 /* =======================================================================
