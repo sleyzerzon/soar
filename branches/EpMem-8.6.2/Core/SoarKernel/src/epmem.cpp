@@ -209,12 +209,15 @@ typedef struct episodic_memory_struct
 
 /*
  * epmem_command - This structure holds a query command given by
- *                 the agent as part of (possibly all of) a memory cue
+ *                 the agent.  Some commands can be handled directly
+ *                 but others require this structure.
  *
  *                 cmd_wme  - the ID of the command
  *                 name     - the name of the command
- *                 arg      - the command argument (currently only 1 supported)
+ *                 arg      - the command argument*
  *                 arg_type - the argument's type
+ *
+ * Commands that use this structure:  ^before, ^after
  *                 
  */
 typedef struct epmem_command_struct
@@ -241,19 +244,20 @@ typedef struct epmem_command_struct
  *  ss_wme          - a pointer to the state's ^superstate WME (used for
  *                    creating fake prefs)
  *  epmem           - The symbol that ^epmem has as an attribute
- *  query           - The symbol that ^query has as an attribute
- *  negquery        - The symbol that ^neg-query has as an attribute
- *  retrieved       - The symbol that ^retrieved has as an attribute
- *  curr_memory     - Pointer to the memory currently in the ^retrieved link
- *  cmd             - The current command given by the agent
- *  metadata        - a list of wme* that have been placed in WM that
- *                    provide metadata about the match.
+ *  command         - The symbol that ^command has as an attribute
+ *  result          - The symbol that ^result has as an attribute
+ *  query_cmd       - The root of the cue given via a "query" command 
  *  next_cmd        - If the agent has issued the "^command next" command
  *                    this flag is set to TRUE
  *  temporal_cmd    - This structure holds details of a "before" or "after"
  *                    command issued by the agent
  *  prohibit_list   - This arraylist stores ids the memories ^prohibit-ed
  *                    by the agent
+ *  curr_memory     - Pointer to the memory currently in the ^retrieved link
+ *  result_wmes     - a list of wme* that have been placed in WM as the result
+ *                    of a retrieval
+ *  retrieval_count - how many sequential memories have been retrieved via the
+ *                    next command.  Initial value=1 for the first retrieval.
  *  last_cue_size   - size of the last cue given to this header
  *  last_match_size - number of items that matched the cue in the last match
  *  last_match_score- the raw match score of the last match
@@ -266,17 +270,18 @@ typedef struct epmem_header_struct
     wme *ss_wme;
     Symbol *epmem;
     wme *epmem_wme;
-    Symbol *query;
-    wme *query_wme;
-    Symbol *negquery;
-    wme *negquery_wme;
-    Symbol *retrieved;
-    wme *retrieved_wme;
+    Symbol *command;
+    wme *command_wme;
+    Symbol *result;
+    wme *result_wme;
+    Symbol *query_cmd;
+    Symbol *negquery_cmd;
     int next_cmd;
     epmem_command *temporal_cmd;
     arraylist *prohibit_list;
     episodic_memory *curr_memory;
-    arraylist *metadata;
+    arraylist *result_wmes;
+    int retrieval_count;
     int last_cue_size;
     int last_match_size;
     float last_match_score;
@@ -1091,8 +1096,7 @@ void retrieve_all_child_wmes(agent *thisAgent,
 
    This function adds a fake preference to a WME so that it will not
    be added to the goal dependency set of the state it is attached
-   to.  Currently I only need to do this for the three epmem header
-   WMEs.
+   to.
 
    (The bulk of the content of this function is taken from
     make_fake_preference_for_goal_item() in decide.c)
@@ -1103,7 +1107,7 @@ void retrieve_all_child_wmes(agent *thisAgent,
                          cached in the epmem_header)
    Changed 12 Jan 2006 (added support for chunking by using the cue WMEs
                         as the conditions of the instantiation.  In
-                        a sense, this "fake preference" isn't realy fake
+                        a sense, this "fake preference" isn't really fake
                         anymore.
    =================================================================== */
 preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h, Symbol *goal, wme *w)
@@ -1117,7 +1121,7 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
 //      //%%%DEBUGGING
 //      print_with_symbols(thisAgent, "\nBuilding fake preference for WME: (%y ^%y %y)",
 //                         w->id, w->attr, w->value);
-    
+
     /*
      * make the fake preference
      */
@@ -1159,8 +1163,11 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
      */
     //Retrieve all the cue WMEs
     arraylist *query = make_arraylist(thisAgent, 32);
-    retrieve_all_child_wmes(thisAgent, h->query, query, h->query->id.tc_num + 1);
-
+    if (h->query_cmd != NULL)
+    {
+        retrieve_all_child_wmes(thisAgent, h->query_cmd, query, h->query_cmd->id.tc_num + 1);
+    }
+    
     //If there is no cue than just use ^superstate instead.  
     //(This should only happen with header WMEs).
     if (query->size ==0)
@@ -1248,11 +1255,14 @@ epmem_header *make_epmem_header(agent *thisAgent, Symbol *s)
     h = (epmem_header *)allocate_memory(thisAgent, sizeof(epmem_header), MISCELLANEOUS_MEM_USAGE);
     h->index = -42; //A bogus value to help with debugging
     h->state = s;
-    h->curr_memory = NULL;
-    h->metadata = make_arraylist(thisAgent, 5);
+    h->query_cmd = NULL;
+    h->negquery_cmd = NULL;
     h->next_cmd = 0;
     h->temporal_cmd = make_epmem_command(thisAgent);
     h->prohibit_list = make_arraylist(thisAgent, 5);
+    h->curr_memory = NULL;
+    h->result_wmes = make_arraylist(thisAgent, 32);
+    h->retrieval_count = 0;
     h->last_cue_size = 0;
     h->last_match_size = 0;
     h->last_match_score = 0.0;
@@ -1268,30 +1278,29 @@ epmem_header *make_epmem_header(agent *thisAgent, Symbol *s)
     
     //Create the ^epmem header symbols
     h->epmem = make_new_identifier(thisAgent, 'E', s->id.level);
-    h->query = make_new_identifier(thisAgent, 'E', s->id.level);
-    h->negquery = make_new_identifier(thisAgent, 'E', s->id.level);
-    h->retrieved = make_new_identifier(thisAgent, 'E', s->id.level);
+    h->command = make_new_identifier(thisAgent, 'E', s->id.level);
+    h->result = make_new_identifier(thisAgent, 'E', s->id.level);
 
-    //Add the ^epmem header WMEs
+    /*
+     * Create the top level WMEs
+     */
+    //<s> ^epmem <e>
     h->epmem_wme = add_input_wme(thisAgent, s, make_sym_constant(thisAgent, "epmem"), h->epmem);
     h->epmem_wme->preference =
         make_fake_preference_for_epmem_wme(thisAgent, h, s, h->epmem_wme);
     wme_add_ref(h->epmem_wme);
 
-    h->query_wme = add_input_wme(thisAgent, h->epmem, make_sym_constant(thisAgent, "query"), h->query);
-    h->query_wme->preference =
-        make_fake_preference_for_epmem_wme(thisAgent, h, s, h->query_wme);
-    wme_add_ref(h->query_wme);
+    //<e> ^command <c>
+    h->command_wme = add_input_wme(thisAgent, h->epmem, make_sym_constant(thisAgent, "command"), h->command);
+    h->command_wme->preference =
+        make_fake_preference_for_epmem_wme(thisAgent, h, s, h->command_wme);
+    wme_add_ref(h->command_wme);
 
-    h->negquery_wme = add_input_wme(thisAgent, h->epmem, make_sym_constant(thisAgent, "neg-query"), h->negquery);
-    h->negquery_wme->preference =
-        make_fake_preference_for_epmem_wme(thisAgent, h, s, h->negquery_wme);
-    wme_add_ref(h->negquery_wme);
-
-    h->retrieved_wme = add_input_wme(thisAgent, h->epmem, make_sym_constant(thisAgent, "retrieved"), h->retrieved);
-    h->retrieved_wme->preference =
-        make_fake_preference_for_epmem_wme(thisAgent, h, s, h->retrieved_wme);
-    wme_add_ref(h->retrieved_wme);
+    //<e> ^result <r>
+    h->result_wme = add_input_wme(thisAgent, h->epmem, make_sym_constant(thisAgent, "result"), h->result);
+    h->result_wme->preference =
+        make_fake_preference_for_epmem_wme(thisAgent, h, s, h->result_wme);
+    wme_add_ref(h->result_wme);
 
     return h;
 }//make_epmem_header
@@ -1299,7 +1308,7 @@ epmem_header *make_epmem_header(agent *thisAgent, Symbol *s)
 /* ===================================================================
    copy_epmem_header
 
-   Allocates and an initializes a copy of a given epmem header
+   Allocates and an initializes a SHALLOW copy of a given epmem header
 
    CAVEST:  Pointers are just copied.  Changes made to substructures
             will effect the original!
@@ -1316,30 +1325,31 @@ epmem_header *copy_epmem_header(agent *thisAgent, epmem_header *orig)
     h = (epmem_header *)allocate_memory(thisAgent, sizeof(epmem_header), MISCELLANEOUS_MEM_USAGE);
     h->index = orig->index;
     h->state = orig->state;
-    h->curr_memory = orig->curr_memory;
-    h->metadata = orig->metadata;
+    h->ss_wme = orig->ss_wme;
+    h->epmem = orig->epmem;
+    h->epmem_wme = orig->epmem_wme;
+    h->command = orig->command;
+    h->command_wme = orig->command_wme;
+    h->result = orig->result;
+    h->result_wme = orig->result_wme;
+    h->query_cmd = orig->query_cmd;
+    h->negquery_cmd = orig->negquery_cmd;
     h->next_cmd = orig->next_cmd;
     h->temporal_cmd = orig->temporal_cmd;
     h->prohibit_list = orig->prohibit_list;
+    h->curr_memory = orig->curr_memory;
+    h->result_wmes = orig->result_wmes;
+    h->retrieval_count = orig->retrieval_count;
     h->last_cue_size = orig->last_cue_size;
     h->last_match_size = orig->last_match_size;
     h->last_match_score = orig->last_match_score;
-    h->ss_wme = orig->ss_wme;
-    h->epmem = orig->epmem;
-    h->query = orig->query;
-    h->negquery = orig->negquery;
-    h->retrieved = orig->retrieved;
-    h->epmem_wme = orig->epmem_wme;
-    h->query_wme = orig->query_wme;
-    h->negquery_wme = orig->negquery_wme;
-    h->retrieved_wme = orig->retrieved_wme;
 
     return h;
 }//copy_epmem_header
 
 
 //Declare this in advance so that destroy_epmem_header() can call it.
-void epmem_clear_curr_mem(agent *thisAgent, epmem_header *h);
+void epmem_clear_curr_result(agent *thisAgent, epmem_header *h);
 
 /* ===================================================================
    destroy_epmem_header
@@ -1351,36 +1361,31 @@ void epmem_clear_curr_mem(agent *thisAgent, epmem_header *h);
 void destroy_epmem_header(agent *thisAgent, epmem_header *h)
 {
     //Remove any active memory (or a "no-retrieval" WME) from WM
-    epmem_clear_curr_mem(thisAgent, h);
+    epmem_clear_curr_result(thisAgent, h);
 
     //Cleanup attached data structures
     destroy_epmem_command(thisAgent, h->temporal_cmd);
-    destroy_arraylist(thisAgent, h->metadata);
     destroy_arraylist(thisAgent, h->prohibit_list);
+    destroy_arraylist(thisAgent, h->result_wmes);
     
     //Remove the ^epmem header WMEs
     remove_input_wme(thisAgent, h->epmem_wme);
     remove_fake_preference_for_epmem_wme(thisAgent, h->epmem_wme);
     wme_remove_ref(thisAgent, h->epmem_wme);
 
-    remove_input_wme(thisAgent, h->query_wme);
-    remove_fake_preference_for_epmem_wme(thisAgent, h->query_wme);
-    wme_remove_ref(thisAgent, h->query_wme);
+    remove_input_wme(thisAgent, h->command_wme);
+    remove_fake_preference_for_epmem_wme(thisAgent, h->command_wme);
+    wme_remove_ref(thisAgent, h->command_wme);
 
-    remove_input_wme(thisAgent, h->negquery_wme);
-    remove_fake_preference_for_epmem_wme(thisAgent, h->negquery_wme);
-    wme_remove_ref(thisAgent, h->negquery_wme);
-
-    remove_input_wme(thisAgent, h->retrieved_wme);
-    remove_fake_preference_for_epmem_wme(thisAgent, h->retrieved_wme);
-    wme_remove_ref(thisAgent, h->retrieved_wme);
+    remove_input_wme(thisAgent, h->result_wme);
+    remove_fake_preference_for_epmem_wme(thisAgent, h->result_wme);
+    wme_remove_ref(thisAgent, h->result_wme);
     
 
     //Dereference the ^epmem header symbols
     symbol_remove_ref(thisAgent, h->epmem);
-    symbol_remove_ref(thisAgent, h->query);
-    symbol_remove_ref(thisAgent, h->negquery);
-    symbol_remove_ref(thisAgent, h->retrieved);
+    symbol_remove_ref(thisAgent, h->command);
+    symbol_remove_ref(thisAgent, h->result);
 
     //Free the struct
     free_memory(thisAgent, h, MISCELLANEOUS_MEM_USAGE);
@@ -1551,7 +1556,7 @@ void epmem_print_status(agent *thisAgent)
 
         if (h->temporal_cmd->name != NULL)
         {
-            print(thisAgent, "\n         Current command issued: %s",
+            print(thisAgent, "\n         Current temporal command issued: %s",
                   h->temporal_cmd->name);
         }//if
         else
@@ -1577,6 +1582,7 @@ void epmem_print_status(agent *thisAgent)
 
 
         //Metadata Info
+        print(thisAgent, "\n                Sequence length: %d", h->retrieval_count);
         print(thisAgent, "\n                    Match score: %f", h->last_match_score);
         print(thisAgent, "\n                       Cue size: %d", h->last_cue_size);
         print(thisAgent, "\n         Normalized Match Score: %f",
@@ -2240,14 +2246,21 @@ void epmem_print_cue_comparison(agent *thisAgent, int state_num, int epmem_id)
     tc_number tc;
     
     //Create an arraylist representing the current query
-    al_query = make_arraylist(thisAgent, 32);
-    tc = h->query->id.tc_num + 1;
-    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query, al_query, tc);
-
+    if (h->query_cmd != NULL)
+    {
+        al_query = make_arraylist(thisAgent, 32);
+        tc = h->query_cmd->id.tc_num + 1;
+        update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query_cmd, al_query, tc);
+    }
+    
     //Create an arraylist representing the current negative query
-    al_negquery = make_arraylist(thisAgent, 32);
-    tc = h->negquery->id.tc_num + 1;
-    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery, al_negquery, tc);
+    if (h->negquery_cmd != NULL)
+    {
+        al_negquery = make_arraylist(thisAgent, 32);
+        tc = h->negquery_cmd->id.tc_num + 1;
+        update_wmetree(thisAgent, thisAgent->epmem_wmetree,
+                       h->negquery_cmd, al_negquery, tc);
+    }
 
     /*
      * Step 4:  Print the matching and non-matching parts of the memory
@@ -2319,19 +2332,26 @@ void epmem_print_match_diagnostic(agent *thisAgent, int state_num)
     tc_number tc;
     
     //Create an arraylist representing the current query
-    al_query = make_arraylist(thisAgent, 32);
-    tc = h->query->id.tc_num + 1;
-    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query, al_query, tc);
-
+    if (h->query_cmd != NULL)
+    {
+        al_query = make_arraylist(thisAgent, 32);
+        tc = h->query_cmd->id.tc_num + 1;
+        update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query_cmd, al_query, tc);
+    }
+    
     //Create an arraylist representing the current negative query
-    al_negquery = make_arraylist(thisAgent, 32);
-    tc = h->negquery->id.tc_num + 1;
-    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery, al_negquery, tc);
-
+    if (h->negquery_cmd != NULL)
+    {
+        al_negquery = make_arraylist(thisAgent, 32);
+        tc = h->negquery_cmd->id.tc_num + 1;
+        update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery_cmd, al_negquery, tc);
+    }
+    
     /*
      * Step 3: Print Metadata Info
      */
     print(thisAgent, "\n       Retrieved Epmem: #%d", h->curr_memory->index);
+    print(thisAgent, "\n       Sequence length: %d", h->retrieval_count);
     print(thisAgent, "\n           Match score:  %f", h->last_match_score);
     print(thisAgent, "\n              Cue size:  %d", h->last_cue_size);
     print(thisAgent, "\nNormalized Match Score:  %f",
@@ -3351,101 +3371,109 @@ void install_match_metadata(agent *thisAgent, epmem_header *h)
 {
     wme *new_wme;
     
+    //Retrieval count
+    new_wme = add_input_wme(thisAgent, h->result,
+                            make_sym_constant(thisAgent, "retrieval-count"),
+                            make_int_constant(thisAgent, h->retrieval_count));
+    append_entry_to_arraylist(thisAgent, h->result_wmes, new_wme);
+    wme_add_ref(new_wme);
+    new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
+
     //Match score
-    new_wme = add_input_wme(thisAgent, h->epmem,
+    new_wme = add_input_wme(thisAgent, h->result,
                             make_sym_constant(thisAgent, "match-score"),
                             make_float_constant(thisAgent, h->last_match_score));
-    append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
+    append_entry_to_arraylist(thisAgent, h->result_wmes, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
 
     //Cue size
-    new_wme = add_input_wme(thisAgent, h->epmem,
+    new_wme = add_input_wme(thisAgent, h->result,
                             make_sym_constant(thisAgent, "cue-size"),
                             make_int_constant(thisAgent, h->last_cue_size));
-    append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
+    append_entry_to_arraylist(thisAgent, h->result_wmes, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
 
     //Normalized Match Score
-    new_wme = add_input_wme(thisAgent, h->epmem,
+    new_wme = add_input_wme(thisAgent, h->result,
                             make_sym_constant(thisAgent, "normalized-match-score"),
                             make_float_constant(thisAgent, h->last_match_score / (float)h->last_cue_size));
-    append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
+    append_entry_to_arraylist(thisAgent, h->result_wmes, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
 
     //Match Cardinality
-    new_wme = add_input_wme(thisAgent, h->epmem,
+    new_wme = add_input_wme(thisAgent, h->result,
                             make_sym_constant(thisAgent, "match-cardinality"),
                             make_float_constant(thisAgent, (float)h->last_match_size / (float)h->last_cue_size));
-    append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
+    append_entry_to_arraylist(thisAgent, h->result_wmes, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
 
     //Memory ID (the IDs are sequential so this provides limited temporal info)
-    new_wme = add_input_wme(thisAgent, h->epmem,
+    new_wme = add_input_wme(thisAgent, h->result,
                             make_sym_constant(thisAgent, "memory-id"),
                             make_int_constant(thisAgent, h->curr_memory->index));
-    append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
+    append_entry_to_arraylist(thisAgent, h->result_wmes, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
 
     //Provide the ID of the next memory that will be created.  This
     //is roughly equivalent to the present (as opposed to the the past).
-    new_wme = add_input_wme(thisAgent, h->epmem,
+    new_wme = add_input_wme(thisAgent, h->result,
                             make_sym_constant(thisAgent, "present-id"),
                             make_int_constant(thisAgent, thisAgent->epmem_memories->size));
-    append_entry_to_arraylist(thisAgent, h->metadata, new_wme);
+    append_entry_to_arraylist(thisAgent, h->result_wmes, new_wme);
     wme_add_ref(new_wme);
     new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
 
 }//install_match_metadata
 
 /* ===================================================================
-   remove_match_metadata
+   remove_result_wmes
 
-   This routine removes all the metadata WMEs associated with the
-   given epmem_header
+   This routine removes all the WMEs with a given query result that are
+   NOT part of an episodic memory.  It's used as a helper function
+   for epmem_clear_curr_result
 
    Created: 06 June 2006 <--Devil's date!
    =================================================================== */
-void remove_match_metadata(agent *thisAgent, epmem_header *h)
+void remove_result_wmes(agent *thisAgent, epmem_header *h)
 {
     wme *w;
     int i;
 
-    i = h->metadata->size - 1;  // last entry in the list
+    i = h->result_wmes->size - 1;  // last entry in the list
     while(i >= 0)
     {
         //Remove the WME from WM
-        w = (wme *)get_arraylist_entry(thisAgent, h->metadata, i);
+        w = (wme *)get_arraylist_entry(thisAgent, h->result_wmes, i);
         remove_fake_preference_for_epmem_wme(thisAgent, w);
         remove_input_wme(thisAgent, w);
         wme_remove_ref(thisAgent, w);
 
         //Remove the pointer from the metadata list
-        remove_entry_from_arraylist(h->metadata, i);
+        remove_entry_from_arraylist(h->result_wmes, i);
 
         //Update the index
-        i = h->metadata->size - 1;
+        i = h->result_wmes->size - 1;
     }//for
-
-
     
-}//remove_match_metadata
+}//remove_result_wmes
 
 
 /* ===================================================================
-   epmem_clear_curr_mem
+   remove_curr_epmem
 
-   This routine removes all the epmem WMEs from working memory that
-   are associated with the current memory (h->retrieved).  
+   This routine removes all the WMEs in the current result that are
+   associated with the currently retrieved episodic memory.  It's used
+   as a helper function for epmem_clear_curr_result
 
    Created: 16 Feb 2004
    Overhauled: 26 Aug 2004
    =================================================================== */
-void epmem_clear_curr_mem(agent *thisAgent, epmem_header *h)
+void remove_curr_epmem(agent *thisAgent, epmem_header *h)
 {
     int i;
     wme *w;
@@ -3491,13 +3519,27 @@ void epmem_clear_curr_mem(agent *thisAgent, epmem_header *h)
         wme_remove_ref(thisAgent, w);
 
         //Bookkeeping
-        set_arraylist_entry(thisAgent, node->assoc_wmes,h->index, NULL);
+        set_arraylist_entry(thisAgent, node->assoc_wmes, h->index, NULL);
     
     }//for
 
-    remove_match_metadata(thisAgent, h);
     
-}//epmem_clear_curr_mem
+}//remove_curr_epmem
+
+/* ===================================================================
+   epmem_clear_curr_result
+
+   This routine removes all the epmem WMEs from working memory that
+   are associated with the current result (h->result).  
+
+   Created: 14 Mar 2007
+   =================================================================== */
+void epmem_clear_curr_result(agent *thisAgent, epmem_header *h)
+{
+    remove_curr_epmem(thisAgent, h);
+    remove_result_wmes(thisAgent, h);
+    
+}//epmem_clear_curr_result
 
 /* ===================================================================
    compare_memories
@@ -4787,8 +4829,21 @@ void install_epmem_in_wm(agent *thisAgent, epmem_header *h, arraylist *epmem)
     Symbol *id;
     Symbol *attr;
     Symbol *val;
+    wme *ret_wme;
     wme *new_wme;
 
+    //Create a new retrieved WME
+    //(Given: <s> ^epmem.result <res>; Create: <res> ^retrieved <ret>)
+    ret_wme = add_input_wme(thisAgent, h->result,
+                            make_sym_constant(thisAgent, "retrieved"),
+                            make_new_identifier(thisAgent,
+                                                'E',
+                                                h->result->id.level));
+    append_entry_to_arraylist(thisAgent, h->result_wmes, ret_wme);
+    wme_add_ref(ret_wme);
+    ret_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, ret_wme);
+
+    
     //Install the WMEs
     for(i = 0; i < epmem->size; i++)
     {
@@ -4811,7 +4866,7 @@ void install_epmem_in_wm(agent *thisAgent, epmem_header *h, arraylist *epmem)
         //Determine the WME's ID
         if (node->parent->depth == 0)
         {
-            id = h->retrieved;
+            id = ret_wme->value;
         }
         else
         {
@@ -4884,20 +4939,26 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
     
     //Remove the old retrieved memory
     start_timer(thisAgent, &(thisAgent->epmem_clearmem_start_time));
-    epmem_clear_curr_mem(thisAgent, h);
+    epmem_clear_curr_result(thisAgent, h);
     stop_timer(thisAgent, &(thisAgent->epmem_clearmem_start_time), &(thisAgent->epmem_clearmem_total_time));
     h->curr_memory = NULL;
 
     //Create an arraylist representing the current query
     al_query = make_arraylist(thisAgent, 32);
-    tc = h->query->id.tc_num + 1;
-    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query, al_query, tc);
-
+    if (h->query_cmd != NULL)
+    {
+        tc = h->query_cmd->id.tc_num + 1;
+        update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->query_cmd, al_query, tc);
+    }
+    
     //Create an arraylist representing the current negative query
     al_negquery = make_arraylist(thisAgent, 32);
-    tc = h->negquery->id.tc_num + 1;
-    update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery, al_negquery, tc);
-
+    if (h->negquery_cmd != NULL)
+    {
+        tc = h->negquery_cmd->id.tc_num + 1;
+        update_wmetree(thisAgent, thisAgent->epmem_wmetree, h->negquery_cmd, al_negquery, tc);
+    }
+    
     //If both queries are empty then we're done
     if ( (al_query->size == 0) && (al_negquery->size == 0) )
     {
@@ -4926,6 +4987,7 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
         stop_timer(thisAgent, &(thisAgent->epmem_installmem_start_time), &(thisAgent->epmem_installmem_total_time));
 
         //Provide meta-data on the match
+        h->retrieval_count = 1;
         install_match_metadata(thisAgent, h);
     }
     else
@@ -4933,9 +4995,9 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
         al_retrieved = NULL;
 
         //Notify the user of failed retrieval
-        new_wme = add_input_wme(thisAgent, h->retrieved,
-                                make_sym_constant(thisAgent, "no-retrieval"),
-                                make_sym_constant(thisAgent, "true"));
+        new_wme = add_input_wme(thisAgent, h->result,
+                                make_sym_constant(thisAgent, "retrieved"),
+                                make_sym_constant(thisAgent, "no-memory"));
         set_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes, h->index, new_wme);
         wme_add_ref(new_wme);
         new_wme->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, new_wme);
@@ -4969,165 +5031,92 @@ void epmem_retrieve_commands(agent *thisAgent, epmem_header *h)
     int i;
     tc_number tc;
     wme *cmd_wme = NULL;
-    wme *name_wme = NULL;
-    wme *arg_wme = NULL;
 
     //Clean up any old commands
+    h->query_cmd = NULL;
+    h->negquery_cmd = NULL;
     h->next_cmd = FALSE;
     cleanup_epmem_command(thisAgent, h->temporal_cmd);
     h->prohibit_list->size = 0;
 
-    //Retrieve all the WMEs on the ^query link
-    tc = h->query->id.tc_num + 1;
-    wmes = epmem_get_augs_of_id(thisAgent, h->query, tc, &len);
-    h->query->id.tc_num = tc - 1;
+    //Retrieve all the WMEs on the ^command link
+    tc = h->command->id.tc_num + 1;
+    wmes = epmem_get_augs_of_id(thisAgent, h->command, tc, &len);
+    h->command->id.tc_num = tc - 1;
     if (wmes == NULL) return;
 
     //Search those WMEs for commands
     for(i = 0; i < len; i++)
     {
-        //See if the WME is a command
-        cmd_wme = NULL;
-        if (wme_has_value(wmes[i], "command", NULL))
-        {
-            cmd_wme = wmes[i];
-        }
+        cmd_wme = wmes[i];
 
-        //If a command was found, parse it and store it
-        if ( (cmd_wme)
-             && (cmd_wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE) )
+        //Parse the command
+        char *name = cmd_wme->attr->sc.name;
+        Symbol *val = cmd_wme->value;
+        switch(name[0])
         {
-            //Get the command name and argument
-            name_wme = get_aug_of_id(thisAgent, cmd_wme->value,
-                                     "name", NULL);
-            arg_wme = get_aug_of_id(thisAgent, cmd_wme->value,
-                                    "argument", NULL);
-
-            //Parse the command
-            if ( (name_wme != NULL)
-                 && (name_wme->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE) )
-            {
-                char *name = name_wme->value->sc.name;
-                switch(name[0])
+            case 'a':
+                if ((strcmp(name, "after") == 0)
+                    && (val->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
                 {
-                    case 'a':
-                        if ((strcmp(name, "after") == 0)
-                            && (arg_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
-                        {
-                            h->temporal_cmd->name =
-                                (char *)allocate_memory(thisAgent,
-                                                        sizeof(char)*strlen(name) + 1,
-                                                        MISCELLANEOUS_MEM_USAGE);
-                            strcpy(h->temporal_cmd->name, name);
+                    h->temporal_cmd->name =
+                        (char *)allocate_memory(thisAgent,
+                                                sizeof(char)*strlen("after") + 1,
+                                                MISCELLANEOUS_MEM_USAGE);
+                    strcpy(h->temporal_cmd->name, "after");
 
-                            h->temporal_cmd->arg_type = INT_CONSTANT_SYMBOL_TYPE;
-                            h->temporal_cmd->arg.intval = arg_wme->value->ic.value;
-                        }
-                        break;
-                    case 'b':
-                        if ((strcmp(name, "before") == 0)
-                            && (arg_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
-                        {
-                            h->temporal_cmd->name =
-                                (char *)allocate_memory(thisAgent,
-                                                        sizeof(char)*strlen(name) + 1,
-                                                        MISCELLANEOUS_MEM_USAGE);
-                            strcpy(h->temporal_cmd->name, name);
+                    h->temporal_cmd->arg_type = INT_CONSTANT_SYMBOL_TYPE;
+                    h->temporal_cmd->arg.intval = val->ic.value;
+                }
+                break;
+            case 'b':
+                if ((strcmp(name, "before") == 0)
+                    && (val->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
+                {
+                    h->temporal_cmd->name =
+                        (char *)allocate_memory(thisAgent,
+                                                sizeof(char)*strlen("before") + 1,
+                                                MISCELLANEOUS_MEM_USAGE);
+                    strcpy(h->temporal_cmd->name, "before");
                             
-                            h->temporal_cmd->arg_type = INT_CONSTANT_SYMBOL_TYPE;
-                            h->temporal_cmd->arg.intval = arg_wme->value->ic.value;
-                        }
-                        break;
-                    case 'n':
-                        if (strcmp(name, "next") == 0)
-                        {
-                            h->next_cmd = TRUE;
-                        }
-                        break;
-                    case 'p':
-                        if ((strcmp(name, "prohibit") == 0)
-                            && (arg_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
-                        {
-                            append_entry_to_arraylist(thisAgent,
-                                                      h->prohibit_list,
-                                                      (void *)arg_wme->value->ic.value);
-                        }
-                        break;
-                    default:
-                        fprintf(stderr, "\nINVALID COMMAND: %s!\n", name);
-                }//switch                            
-
+                    h->temporal_cmd->arg_type = INT_CONSTANT_SYMBOL_TYPE;
+                    h->temporal_cmd->arg.intval = val->ic.value;
+                }
+                break;
+            case 'n':
+                if (strcmp(name, "next") == 0)
+                {
+                    h->next_cmd = TRUE;
+                }
+                else if (strcmp(name, "neg-query") == 0)
+                {
+                    h->negquery_cmd = val;
+                }
+                break;
+            case 'p':
+                if ((strcmp(name, "prohibit") == 0)
+                    && (val->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
+                {
+                    append_entry_to_arraylist(thisAgent,
+                                              h->prohibit_list,
+                                              (void *)val->ic.value);
+                }
+                break;
+            case 'q':
+                if (strcmp(name, "query") == 0)
+                {
+                    h->query_cmd = val;
+                }
+                break;
+            default:
+                fprintf(stderr, "\nINVALID COMMAND: %s!\n", name);
+        }//switch                            
                             
-            }//if
-        }//if
     }//for
 
     free_memory(thisAgent, wmes, MISCELLANEOUS_MEM_USAGE);
 
 }//epmem_retrieve_commands
-
-/* ===================================================================
-   increment_retrieval_count
-
-   Increments the value stored in ^epmem.retieval-count by a positive
-   integer. If the user passes a zero value then the present value is
-   reset to 1.  If the user passes a negative value then the present
-   value is removed from working memory.
-
-   27 Jan 2004
-   =================================================================== */
-void increment_retrieval_count(agent *thisAgent, epmem_header *h, long inc_amt)
-{
-    wme **wmes;
-    int len = 0;
-    int i;
-    tc_number tc;
-    long current_count = 0;
-    wme *w;
-
-    //Find the (epmem ^retreival-count n) WME, save the value,
-    //and remove the WME from WM
-    //%%%If I use get_aug_of_id() to do this part the agents slows 
-    //%%%way down.  WHY??
-    tc = h->epmem->id.tc_num + 1;
-    wmes = epmem_get_augs_of_id(thisAgent,  h->epmem, tc, &len );
-    h->epmem->id.tc_num = tc - 1; // %%%Why is this necessary?
-    
-    if (wmes == NULL) return;
-    for(i = 0; i < len; i++)
-    {
-        if ( (wme_has_value(wmes[i], "retrieval-count", NULL))
-             && (wmes[i]->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) )
-        {
-            current_count = wmes[i]->value->ic.value;
-            remove_input_wme(thisAgent, wmes[i]);
-            break;
-        }
-    }
-    free_memory(thisAgent, wmes, MISCELLANEOUS_MEM_USAGE);
-
-    //Check for remove only
-    if (inc_amt < 0)
-    {
-        return;
-    }
-
-    //Calculate the new retrieval count
-    current_count += inc_amt;
-    if (inc_amt == 0)
-    {
-        current_count = 1;
-    }
-
-    //Install a new WME
-    w = add_input_wme(thisAgent, h->epmem,
-                      make_sym_constant(thisAgent, "retrieval-count"),
-                      make_int_constant(thisAgent, current_count));
-    wme_add_ref(w);
-    w->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, w);
-
-}//increment_retrieval_count
-
 
 /* ===================================================================
    respond_to_command_next() 
@@ -5142,9 +5131,11 @@ void increment_retrieval_count(agent *thisAgent, epmem_header *h, long inc_amt)
    =================================================================== */
 void respond_to_command_next(agent *thisAgent, epmem_header *h)
 {
+    int ret_count = h->retrieval_count;
+    
     //Remove the old retrieved memory
     start_timer(thisAgent, &(thisAgent->epmem_clearmem_start_time));
-    epmem_clear_curr_mem(thisAgent, h);
+    epmem_clear_curr_result(thisAgent, h);
     stop_timer(thisAgent, &(thisAgent->epmem_clearmem_start_time), &(thisAgent->epmem_clearmem_total_time));
 
     //Check that there is a next memory available
@@ -5162,21 +5153,20 @@ void respond_to_command_next(agent *thisAgent, epmem_header *h)
         stop_timer(thisAgent, &(thisAgent->epmem_installmem_start_time), &(thisAgent->epmem_installmem_total_time));
 
         //Provide meta-data on the match
+        h->retrieval_count = ret_count + 1;
         install_match_metadata(thisAgent, h);
     }
     else
     {
         //Notify the user of failed retrieval
-        wme *w = add_input_wme(thisAgent, h->retrieved,
-                               make_sym_constant(thisAgent, "no-retrieval"),
-                               make_sym_constant(thisAgent, "true"));
+        wme *w = add_input_wme(thisAgent, h->result,
+                               make_sym_constant(thisAgent, "retrieved"),
+                               make_sym_constant(thisAgent, "no-memory"));
         set_arraylist_entry(thisAgent, thisAgent->epmem_wmetree->assoc_wmes, h->index, w);
-        wme_add_ref(w);
         w->preference = make_fake_preference_for_epmem_wme(thisAgent, h, h->state, w);
+        wme_add_ref(w);
     }
         
-    increment_retrieval_count(thisAgent, h, 1);
-
 }//respond_to_command_next
 
 /* ===================================================================
@@ -5601,7 +5591,7 @@ void epmem_print_cpu_usage(agent *thisAgent)
     f = timer_value(&(thisAgent->epmem_retrieve_total_time));
     print(thisAgent, "episodic retrieval                   %.3lf     %.3lf\n", f, f / total);
     f = timer_value(&(thisAgent->epmem_clearmem_total_time));
-    print(thisAgent, "    epmem_clear_curr_mem()           %.3lf     %.3lf\n", f, f / total);
+    print(thisAgent, "    epmem_clear_curr_result()           %.3lf     %.3lf\n", f, f / total);
     print(thisAgent, "    update_wmetree() is also called here (see above)\n");
     f = timer_value(&(thisAgent->epmem_match_total_time));
     print(thisAgent, "    find_best_match()                %.3lf     %.3lf\n", f, f / total);
@@ -5920,7 +5910,7 @@ void epmem_clear_all_memories(agent *thisAgent)
     for(i = 0; i < thisAgent->epmem_header_stack->size; i++)
     {
         epmem_header *h = (epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack, i);
-        epmem_clear_curr_mem(thisAgent, h);
+        epmem_clear_curr_result(thisAgent, h);
     }
     
     /*
@@ -5931,7 +5921,7 @@ void epmem_clear_all_memories(agent *thisAgent)
         epmem = (episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories, i);
 
         //If memories are unloaded and reloaded the first entry can be NULL
-        if (epmem == NULL) continue;
+        if ((epmem == NULL) || (epmem->content == NULL)) continue;
         
         //Clean up the actwme list (but not the associated wmetree nodes)
         for(j = 0; j < epmem->content->size; j++)
@@ -6433,35 +6423,28 @@ void epmem_update(agent *thisAgent)
     {
         epmem_header *h = (epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack, i);
 
-        //Retrieve any commands
+        //Process any commands from the agent
         epmem_retrieve_commands(thisAgent, h);
 
-        //Special Case:  the "next" command
+        //Respond to the "next" command
         if (h->next_cmd) 
         {
             respond_to_command_next(thisAgent, h);
             continue;
         }
-
-        //Handle any queries on the input link
-        epmem = respond_to_query(thisAgent, h);
+        
+        //Respond to the "query" and/or "negquery" command
+        if ( (h->query_cmd) || (h->negquery_cmd) )
+        {
+            //Handle any queries on the input link
+            epmem = respond_to_query(thisAgent, h);
+        }
 
         //%%%DEBUGGING
         if (h->curr_memory != NULL)
         {
             print(thisAgent, "\nRetrieved memory %d",
                   h->curr_memory->index);
-        }
-        
-        if (epmem != NULL)
-        {
-            //New retrieval:  reset count to zero
-            increment_retrieval_count(thisAgent, h, 0);
-        }
-        else
-        {
-            //No retrieval:  remove count from working memory
-            increment_retrieval_count(thisAgent, h, -1);
         }
         
 //          //%%%DEBUGGING
