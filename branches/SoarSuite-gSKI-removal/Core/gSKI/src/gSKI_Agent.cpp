@@ -232,8 +232,8 @@ namespace gSKI
 	 m_CmdRhs.SetAgent(this) ;
 
      // Adding some basic rhs functions
-     this->AddClientRhsFunction(&m_InterruptRhs);
-     this->AddClientRhsFunction(&m_ConcatRhs);
+     //this->AddClientRhsFunction(&m_InterruptRhs);
+     //this->AddClientRhsFunction(&m_ConcatRhs);
 	 this->AddClientRhsFunction(&m_ExecRhs) ;
 	 this->AddClientRhsFunction(&m_CmdRhs) ;
 
@@ -274,8 +274,8 @@ namespace gSKI
 	   do_preference_phase (m_agent);   /* allow all i-instantiations to retract */
 
 	   //remove the RhsFunctions we created (RPM 9/06)
-	   this->RemoveClientRhsFunction(m_InterruptRhs.GetName());
-	   this->RemoveClientRhsFunction(m_ConcatRhs.GetName());
+	   //this->RemoveClientRhsFunction(m_InterruptRhs.GetName());
+	   //this->RemoveClientRhsFunction(m_ConcatRhs.GetName());
 	   this->RemoveClientRhsFunction(m_ExecRhs.GetName());
 	   this->RemoveClientRhsFunction(m_CmdRhs.GetName());
 

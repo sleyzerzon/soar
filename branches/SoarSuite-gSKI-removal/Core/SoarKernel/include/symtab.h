@@ -321,7 +321,7 @@ extern Symbol *find_int_constant (agent* thisAgent, long value);
 extern Symbol *find_float_constant (agent* thisAgent, float value);
 
 extern Symbol *make_variable (agent* thisAgent, char *name);
-extern Symbol *make_sym_constant (agent* thisAgent, char *name);
+extern Symbol *make_sym_constant (agent* thisAgent, char const *name);
 extern Symbol *make_int_constant (agent* thisAgent, long value);
 extern Symbol *make_float_constant (agent* thisAgent, float value);
 extern Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_level level);

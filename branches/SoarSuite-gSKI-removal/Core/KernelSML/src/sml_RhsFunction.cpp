@@ -33,36 +33,37 @@ Symbol* RhsFunction::RhsFunctionCallback(agent* thisAgent, list* args, void* use
 	if( (rhsFunction->GetNumExpectedParameters() == kPARAM_NUM_VARIABLE) ||
 	  ((int)symVector.size() == rhsFunction->GetNumExpectedParameters()) )
 	{
-	 // Actually make the call.  We can do the dynamic cast because we passed in the
-	 //  symbol factory and thus know how the symbol was created.
-	 Symbol* pReturn = rhsFunction->Execute(&symVector);
+		 // Actually make the call.  We can do the dynamic cast because we passed in the
+		 //  symbol factory and thus know how the symbol was created.
+		 Symbol* pReturn = rhsFunction->Execute(&symVector);
 
-	 // Return the result, assuming it is not NIL
-	 if(rhsFunction->IsValueReturned() == true)
-	 {
-		// There should be a return value
-		assert(pReturn != 0);
-		if(pReturn != 0)
-		{
-		   // Return the result
-		   pSoarReturn = pReturn;
-		}
-		else
-		{
-		   // We have to return something to prevent a crash, so we return an error code
-		   pSoarReturn = make_sym_constant(thisAgent, "error_expected_rhs_function_to_return_value_but_it_did_NOT");
-		}
-	 }
-	 else
-	 {
-		// Expected that the rhs function would not return a value, but it did.  Return value ignored.
-		assert(pReturn == 0);
-	 }
+		 // Return the result, assuming it is not NIL
+		 if(rhsFunction->IsValueReturned() == true)
+		 {
+			// There should be a return value
+			assert(pReturn != 0);
+			if(pReturn != 0)
+			{
+			   // Return the result
+			   pSoarReturn = pReturn;
+			}
+			else
+			{
+			   // We have to return something to prevent a crash, so we return an error code
+			   pSoarReturn = make_sym_constant(thisAgent, "error_expected_rhs_function_to_return_value_but_it_did_NOT");
+			}
+		 }
+		 else
+		 {
+			// Expected that the rhs function would not return a value, but it did.  Return value ignored.
+			assert(pReturn == 0);
+		 }
 
-	// In any case, we are done using the return value
-	if(pReturn != 0)
-	{
-		symbol_remove_ref(thisAgent, pReturn) ;
+		// In any case, we are done using the return value
+		//if(pReturn != 0)
+		//{
+		//	symbol_remove_ref(thisAgent, pReturn) ;
+		//}
 	}
 	else
 	{
@@ -72,8 +73,40 @@ Symbol* RhsFunction::RhsFunctionCallback(agent* thisAgent, list* args, void* use
 		// We can return anything we want to soar; we return an error message so at least the problem is obvious.
 		if(rhsFunction->IsValueReturned() == true)
 			pSoarReturn = make_sym_constant(thisAgent, "error_wrong_number_of_args_passed_to_rhs_function");
-		}
 	}
 
 	return pSoarReturn;
+}
+
+Symbol* sml::InterruptRhsFunction::Execute(std::vector<Symbol*>* pArguments)
+{
+	unused(pArguments) ;
+
+	// BADBAD?  Should this be just an interrupt on this agent?  Existing semantics are for all agents so doing that here too.
+	m_pAgentSML->GetKernelSML()->InterruptAllAgents(gSKI_STOP_AFTER_SMALLEST_STEP, 0) ;
+	return 0 ;
+}
+
+Symbol* sml::ConcatRhsFunction::Execute(std::vector<Symbol*>* pArguments)
+{
+      std::ostringstream ostr;
+
+	  for (std::vector<Symbol*>::iterator iter = pArguments->begin() ; iter != pArguments->end() ; iter++)
+	  {
+		  Symbol* pSymbol = *iter ;
+
+		if ( !pSymbol ) {
+		 std::cerr << "Concat function was sent a null symbol! " 
+				   << "Ignoring it..."
+				   << std::endl;
+		} else {
+			std::string str = AgentSML::SymbolToString(pSymbol);
+			ostr << str ;
+		}
+	  }
+
+	  std::string res = ostr.str() ;
+	  char const* pResultStr = res.c_str() ;
+	  Symbol* pResult = make_sym_constant(m_pAgentSML->GetAgent(), pResultStr) ;
+	  return pResult ;
 }

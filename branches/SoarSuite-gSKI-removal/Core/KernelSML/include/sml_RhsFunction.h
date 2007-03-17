@@ -18,19 +18,19 @@ typedef struct cons_struct list;
 
 namespace sml {
 
-class KernelSML ;
+class AgentSML ;
 
 class RhsFunction
 {
 protected:
-	// The kernel
-	KernelSML* m_pKernelSML ;
+	// The agent
+	AgentSML* m_pAgentSML ;
 
 public:
 	static Symbol* RhsFunctionCallback(agent* thisAgent, list* args, void* user_data) ;
 	static const int kPARAM_NUM_VARIABLE = -1 ;
 
-	RhsFunction() { }
+	RhsFunction(AgentSML* pAgent) { m_pAgentSML = pAgent ; }
 
 	virtual ~RhsFunction() { }
 
@@ -60,6 +60,31 @@ public:
        */
 	  virtual Symbol* Execute(std::vector<Symbol*>* pArguments) = 0;
 } ;
+
+class InterruptRhsFunction: public RhsFunction
+{
+public:
+	InterruptRhsFunction(AgentSML* pAgent):RhsFunction(pAgent) { } 
+
+	const char* GetName() const { return "interrupt"; }
+	int GetNumExpectedParameters() const { return 0; }
+	bool IsValueReturned() const { return false; }
+
+	virtual Symbol* Execute(std::vector<Symbol*>* pArguments) ;
+};
+
+class ConcatRhsFunction: public RhsFunction
+{
+ public:
+	 ConcatRhsFunction(AgentSML* pAgent):RhsFunction(pAgent) { } 
+
+   const char* GetName() const { return "concat"; }
+   int GetNumExpectedParameters() const { return (kPARAM_NUM_VARIABLE); }
+   bool IsValueReturned() const { return true; }
+
+   virtual Symbol* Execute(std::vector<Symbol*>* pArguments) ;
+};
+
 
 }
 

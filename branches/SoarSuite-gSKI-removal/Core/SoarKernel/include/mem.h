@@ -174,7 +174,7 @@ extern void print_memory_statistics (agent* thisAgent);
 /* string utilities */
 /* ---------------- */
 
-extern char *make_memory_block_for_string (agent* thisAgent, char *s);
+extern char *make_memory_block_for_string (agent* thisAgent, char const*s);
 extern void free_memory_block_for_string (agent* thisAgent, char *p);
 
 typedef char Bool;

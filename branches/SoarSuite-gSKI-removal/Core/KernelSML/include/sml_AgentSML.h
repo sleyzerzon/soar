@@ -19,14 +19,17 @@
 #include "sml_XMLListener.h"
 #include "gSKI_Enumerations.h"
 
-// Forward declarations
+// Forward declarations for gSKI
 namespace gSKI {
 	class Agent ;
 	class IWme ;
 	class IInputProducer ;
 }
 
+// Forward definitions for kernel
 typedef struct agent_struct agent;
+typedef union symbol_union Symbol;
+typedef struct cons_struct list;
 
 #include <map>
 #include <list>
@@ -34,9 +37,10 @@ typedef struct agent_struct agent;
 
 namespace sml {
 
-// Forward declarations
+// Forward declarations for SML
 class OutputListener ;
 class KernelSML ;
+class RhsFunction ;
 
 // Map from a client side identifier to a kernel side one (e.g. "o3" => "O5")
 typedef std::map< std::string, std::string >	IdentifierMap ;
@@ -110,6 +114,9 @@ protected:
 	bool m_GeneratedOutput ;
 	unsigned long m_OutputCounter ;
 
+	RhsFunction*	m_pRhsInterrupt ;
+	RhsFunction*	m_pRhsConcat ;
+
 public:
 	AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent) ;
 
@@ -131,8 +138,9 @@ public:
 	// Explicitly reinitialize the agent as part of init-soar
 	bool Reinitialize() ;
 
-	gSKI::Agent* GetIAgent() { return m_pIAgent ; }
-	agent* GetAgent()		 { return m_agent ; }
+	gSKI::Agent* GetIAgent()  { return m_pIAgent ; }
+	agent* GetAgent()		  { return m_agent ; }
+	KernelSML* GetKernelSML() { return m_pKernelSML ; }
 
 	void SetInputLinkRoot(gSKI::IWMObject* pRoot)   { m_InputLinkRoot = pRoot ; }
 	gSKI::IWMObject* GetInputLinkRoot()				{ return m_InputLinkRoot ; }
@@ -220,6 +228,12 @@ public:
 
 	void RecordLongTimeTag(long timeTag, gSKI::IWme* pWme) ;
 	void RemoveLongTimeTag(long timeTag) ;
+
+	// Register a RHS function with the Soar kernel
+	void RegisterRHSFunction(RhsFunction* pFunction) ;
+	void RemoveRHSFunction(RhsFunction* pFunction) ;
+
+	static std::string SymbolToString(Symbol* pSymbol) ;
 
 	/*************************************************************
 	* @brief	Used to select which agents run on the next run command.

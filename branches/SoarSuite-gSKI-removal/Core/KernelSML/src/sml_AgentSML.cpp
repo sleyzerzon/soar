@@ -18,6 +18,7 @@
 #include "sml_OutputListener.h"
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
+#include "sml_RhsFunction.h"
 
 #include "gSKI_Events.h"
 #include "gSKI_Structures.h"
@@ -43,6 +44,12 @@
 #include "sock_Debug.h"	// For PrintDebugFormat
 #endif
 
+#ifdef _WIN32
+#define safeSprintf _snprintf
+#else
+#define safeSprintf snprintf
+#endif
+
 #include <assert.h>
 
 using namespace sml ;
@@ -59,6 +66,11 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 	m_SuppressRunEndsEvent = false ;
 
 	m_agent = pAgent ;
+
+	m_pRhsInterrupt = new InterruptRhsFunction(this) ;
+	m_pRhsConcat    = new ConcatRhsFunction(this) ;
+	RegisterRHSFunction(m_pRhsInterrupt) ;
+	RegisterRHSFunction(m_pRhsConcat) ;
 
 	// Set counters and flags used to control runs
 	InitializeRuntimeState() ;
@@ -102,6 +114,9 @@ void AgentSML::Clear(bool deletingThisAgent)
 	// Release any WME objects we still own.
 	// (Don't flush removes in this case as we're shutting down rather than just doing an init-soar).
 	ReleaseAllWmes(!deletingThisAgent) ;
+
+	RemoveRHSFunction(m_pRhsInterrupt) ; delete m_pRhsInterrupt ; m_pRhsInterrupt = NULL ;
+	RemoveRHSFunction(m_pRhsConcat) ; delete m_pRhsConcat ; m_pRhsConcat = NULL ;
 
 	m_ProductionListener.Clear();
 	m_RunListener.Clear();
@@ -722,4 +737,64 @@ void AgentSML::RemoveLongTimeTag(long timeTag)
 	Int2String(timeTag, str, sizeof(str)) ;
 
 	m_TimeTagMap.erase(str) ;
+}
+
+void AgentSML::RegisterRHSFunction(RhsFunction* rhsFunction)
+{
+	// Tell Soar about it
+	add_rhs_function (m_agent, 
+					make_sym_constant(m_agent, rhsFunction->GetName()),
+					RhsFunction::RhsFunctionCallback,
+					rhsFunction->GetNumExpectedParameters(),
+					rhsFunction->IsValueReturned(),
+					true,
+					static_cast<void*>(rhsFunction));
+}
+
+void AgentSML::RemoveRHSFunction(RhsFunction* rhsFunction)
+{
+	if (rhsFunction == NULL)
+		return ;
+
+	char const* szName = rhsFunction->GetName() ;
+
+	// Tell the kernel we are done listening.
+	//RPM 9/06: removed symbol ref so symbol is released properly
+	Symbol* tmp = make_sym_constant(m_agent, szName);
+	remove_rhs_function(m_agent, tmp);
+	symbol_remove_ref (m_agent, tmp);
+}
+
+std::string AgentSML::SymbolToString(Symbol* sym)
+{
+	if ( sym == 0 ) return "";
+
+	// No buffer overrun problems but resulting string may be 
+	// truncated.
+	char temp[128];
+
+	switch (sym->common.symbol_type) {
+	case VARIABLE_SYMBOL_TYPE:
+	 return (char*) (sym->var.name);
+	 break;
+	case IDENTIFIER_SYMBOL_TYPE:
+	 safeSprintf(temp,128,"%c%lu",sym->id.name_letter,sym->id.name_number);
+	 return std::string(temp);
+	 break;
+	case SYM_CONSTANT_SYMBOL_TYPE:
+	 return (char *) (sym->sc.name);
+	 break;
+	case INT_CONSTANT_SYMBOL_TYPE:
+	 safeSprintf(temp,128, "%ld",sym->ic.value);
+	 return std::string(temp);
+	 break;
+	case FLOAT_CONSTANT_SYMBOL_TYPE:
+	 safeSprintf(temp, 128, "%g",sym->fc.value);
+	 return std::string(temp);
+	 break;
+	default:
+	 assert( false ) ; // "This symbol type not supported";
+	 return "";
+	 break;
+	}
 }

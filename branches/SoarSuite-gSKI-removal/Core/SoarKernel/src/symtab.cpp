@@ -320,7 +320,7 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   return sym;
 }
 
-Symbol *make_sym_constant (agent* thisAgent, char *name) {
+Symbol *make_sym_constant (agent* thisAgent, char const*name) {
   Symbol *sym;
 
   sym = find_sym_constant(thisAgent, name);
