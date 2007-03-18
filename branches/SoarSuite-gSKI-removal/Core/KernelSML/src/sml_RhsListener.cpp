@@ -20,6 +20,7 @@
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
+#include "sml_AgentSML.h"
 #include "gSKI_Agent.h"
 
 using namespace sml ;
@@ -174,7 +175,6 @@ bool RhsListener::HandleFilterEvent(egSKIRhsEventId eventID, gSKI::Agent* pAgent
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, sml_Names::kFilterName) ;
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, pReturnValue) ;	// We send the current command line over
-		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLength, length) ;
 
 #ifdef _DEBUG
 		// Generate a text form of the XML so we can look at it in the debugger.
@@ -269,7 +269,6 @@ bool RhsListener::HandleEvent(egSKIRhsEventId eventID, gSKI::Agent* pAgent, bool
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, pFunctionName) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, pArgument) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLength, length) ;
 
 #ifdef _DEBUG
 	// Generate a text form of the XML so we can look at it in the debugger.
@@ -320,6 +319,98 @@ bool RhsListener::HandleEvent(egSKIRhsEventId eventID, gSKI::Agent* pAgent, bool
 					// (In practice this shouldn't be a problem--just need to make sure nobody crashes on a super long return string).
 					strncpy(pReturnValue, pResult, maxLengthReturnValue) ;
 					pReturnValue[maxLengthReturnValue-1] = 0 ;	// Make sure it's NULL terminated
+					result = true ;
+				}
+			}
+
+			connectionIter++ ;
+		}
+	}
+
+#ifdef _DEBUG
+	// Release the string form we generated for the debugger
+	pMsg->DeleteString(pStr) ;
+#endif
+
+	// Clean up
+	delete pMsg ;
+
+	return result ;
+}
+
+bool RhsListener::ExecuteRhsCommand(AgentSML* pAgentSML, egSKIRhsEventId eventID, std::string const& functionName, std::string const& arguments, std::string* pResultStr)
+{
+	bool result = false ;
+
+	// Get the list of connections (clients) who have registered to implement this right hand side (RHS) function.
+	ConnectionList* pList = GetRhsListeners(functionName.c_str()) ;
+
+	// If nobody is listening we're done (not a bug as we register for all rhs functions and only forward specific ones that the client has registered)
+	if (!pList || pList->size() == 0)
+		return result ;
+
+	ConnectionListIter connectionIter = pList->begin() ;
+
+	// We need the first connection for when we're building the message.  Perhaps this is a sign that
+	// we shouldn't have rolled these methods into Connection.
+	Connection* pConnection = *connectionIter ;
+
+	// Convert eventID to a string
+	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
+
+	// Build the SML message we're doing to send.
+	// Pass the agent in the "name" parameter not the "agent" parameter as this is a kernel
+	// level event, not an agent level one (because you need to register with the kernel to get "agent created").
+	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+	if (pAgentSML) pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, pAgentSML->GetName()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, functionName.c_str()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, arguments.c_str()) ;
+
+#ifdef _DEBUG
+	// Generate a text form of the XML so we can look at it in the debugger.
+	char* pStr = pMsg->GenerateXMLString(true) ;
+#endif
+
+	AnalyzeXML response ;
+
+	// We want to call embedded connections first, so that we get the best performance
+	// for these functions.  I don't want to sort the list or otherwise change it so
+	// instead we'll just use a rather clumsy outer loop to do this.
+	for (int phase = 0 ; phase < 2 && !result ; phase++)
+	{
+		// Only call to embedded connections
+		bool embeddedPhase = (phase == 0) ;
+
+		// Reset the iterator to the beginning of the list
+		connectionIter = pList->begin();
+
+		// Keep looping until we get a result
+		while (connectionIter != pList->end() && !result)
+		{
+			pConnection = *connectionIter ;
+
+			// We call all embedded connections (same process) first before
+			// trying any remote methods.  This ensures that if multiple folks register
+			// for the same function we execute the fastest one (w/o going over a socket for the result).
+			if (pConnection->IsRemoteConnection() && embeddedPhase)
+			{
+				connectionIter++ ;
+				continue ;
+			}
+
+			// It would be faster to just send a message here without waiting for a response
+			// but that could produce incorrect behavior if the client expects to act *during*
+			// the event that we're notifying them about (e.g. notification that we're in the input phase).
+			bool ok = pConnection->SendMessageGetResponse(&response, pMsg) ;
+
+			if (ok)
+			{
+				char const* pResult = response.GetResultString() ;
+
+				if (pResult != NULL)
+				{
+					(*pResultStr) = pResult ;
 					result = true ;
 				}
 			}

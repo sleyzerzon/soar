@@ -85,6 +85,30 @@ class ConcatRhsFunction: public RhsFunction
    virtual Symbol* Execute(std::vector<Symbol*>* pArguments) ;
 };
 
+class ExecRhsFunction: public RhsFunction
+{
+ public:
+   ExecRhsFunction(AgentSML* pAgent):RhsFunction(pAgent) { } 
+
+   const char* GetName() const { return "exec"; }
+   int GetNumExpectedParameters() const { return (kPARAM_NUM_VARIABLE); }
+   bool IsValueReturned() const { return true; }
+
+   virtual Symbol* Execute(std::vector<Symbol*>* pArguments) ;
+};
+
+class CmdRhsFunction: public RhsFunction
+{
+ public:
+   CmdRhsFunction(AgentSML* pAgent):RhsFunction(pAgent) { } 
+
+   const char* GetName() const { return "cmd"; }
+   int GetNumExpectedParameters() const { return (kPARAM_NUM_VARIABLE); }
+   bool IsValueReturned() const { return true; }
+
+   virtual Symbol* Execute(std::vector<Symbol*>* pArguments) ;
+};
+
 
 }
 

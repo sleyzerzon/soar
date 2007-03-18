@@ -93,10 +93,10 @@ typedef AgentMap::const_iterator			AgentMapConstIter ;
 class KernelSML
 {
 	// Allow the kernel listener to execute command lines directly
-	//friend class KernelListener ;
 	friend class AgentListener;
 	friend class RhsListener;
 	friend class RunScheduler ;
+	friend class AgentSML ;
 
 protected:
 	// The singleton kernel object
@@ -271,6 +271,8 @@ public:
 	*************************************************************/
 	void AddRhsListener(char const* pFunctionName, Connection* pConnection)	   { m_RhsListener.AddRhsListener(pFunctionName, pConnection) ; }
 	void RemoveRhsListener(char const* pFunctionName, Connection* pConnection) { m_RhsListener.RemoveRhsListener(pFunctionName, pConnection) ; }
+	bool FireRhsEvent(AgentSML* pAgentSML, egSKIRhsEventId eventID, std::string const& functionName, std::string const& arguments, std::string* pResult) {
+		 return m_RhsListener.ExecuteRhsCommand(pAgentSML, eventID, functionName, arguments, pResult) ; }
 
 	/*************************************************************
 	* @brief	Send this message out to any clients that are listening.

@@ -234,8 +234,8 @@ namespace gSKI
      // Adding some basic rhs functions
      //this->AddClientRhsFunction(&m_InterruptRhs);
      //this->AddClientRhsFunction(&m_ConcatRhs);
-	 this->AddClientRhsFunction(&m_ExecRhs) ;
-	 this->AddClientRhsFunction(&m_CmdRhs) ;
+	 //this->AddClientRhsFunction(&m_ExecRhs) ;
+	 //this->AddClientRhsFunction(&m_CmdRhs) ;
 
      m_pPerfMon = new AgentPerformanceMonitor(this);
 
@@ -276,8 +276,8 @@ namespace gSKI
 	   //remove the RhsFunctions we created (RPM 9/06)
 	   //this->RemoveClientRhsFunction(m_InterruptRhs.GetName());
 	   //this->RemoveClientRhsFunction(m_ConcatRhs.GetName());
-	   this->RemoveClientRhsFunction(m_ExecRhs.GetName());
-	   this->RemoveClientRhsFunction(m_CmdRhs.GetName());
+	   //this->RemoveClientRhsFunction(m_ExecRhs.GetName());
+	   //this->RemoveClientRhsFunction(m_CmdRhs.GetName());
 
 	   //remove the RunListeners we created for the counters
 	   this->RemoveRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;

@@ -25,6 +25,7 @@
 namespace sml {
 
 class Connection ;
+class AgentSML ;
 
 // Mapping from a rhs function name to the list of connections implementing that function
 typedef std::map< std::string, ConnectionList* >	RhsMap ;
@@ -92,6 +93,7 @@ public:
 	virtual bool HandleEvent(egSKIRhsEventId eventId, gSKI::Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 						     int maxLengthReturnValue, char* pReturnValue) ;
 
+	virtual bool ExecuteRhsCommand(AgentSML* pAgentSML, egSKIRhsEventId eventID, std::string const& functionName, std::string const& arguments, std::string* pResult) ;
 	virtual bool ExecuteCommandLine(gSKI::Agent* pAgent, char const* pFunctionName, char const* pArgument, int maxLengthReturnValue, char* pReturnValue) ;
 } ;
 

@@ -116,6 +116,8 @@ protected:
 
 	RhsFunction*	m_pRhsInterrupt ;
 	RhsFunction*	m_pRhsConcat ;
+	RhsFunction*	m_pRhsExec ;
+	RhsFunction*	m_pRhsCmd ;
 
 public:
 	AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent) ;
@@ -141,6 +143,8 @@ public:
 	gSKI::Agent* GetIAgent()  { return m_pIAgent ; }
 	agent* GetAgent()		  { return m_agent ; }
 	KernelSML* GetKernelSML() { return m_pKernelSML ; }
+
+	char const* GetName() ;
 
 	void SetInputLinkRoot(gSKI::IWMObject* pRoot)   { m_InputLinkRoot = pRoot ; }
 	gSKI::IWMObject* GetInputLinkRoot()				{ return m_InputLinkRoot ; }
@@ -233,7 +237,11 @@ public:
 	void RegisterRHSFunction(RhsFunction* pFunction) ;
 	void RemoveRHSFunction(RhsFunction* pFunction) ;
 
+	// Utility function (note it's static) for converting a symbol to a string
 	static std::string SymbolToString(Symbol* pSymbol) ;
+
+	// Execute a command line function (through the CLI processor)
+	std::string ExecuteCommandLine(std::string const& commmandLine) ;
 
 	/*************************************************************
 	* @brief	Used to select which agents run on the next run command.

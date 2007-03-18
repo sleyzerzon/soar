@@ -612,9 +612,8 @@ void Kernel::ReceivedRhsEvent(smlRhsEventId id, AnalyzeXML* pIncoming, ElementXM
 	char const* pFunctionName = pIncoming->GetArgString(sml_Names::kParamFunction) ;
 	char const* pArgument     = pIncoming->GetArgString(sml_Names::kParamValue) ;
 	char const* pAgentName	  = pIncoming->GetArgString(sml_Names::kParamName) ;
-	int maxLength			  = pIncoming->GetArgInt(sml_Names::kParamLength, 0) ;
 
-	if (!pFunctionName || maxLength == 0)
+	if (!pFunctionName)
 	{
 		// Should always include a function name
 		SetError(Error::kInvalidArgument) ;

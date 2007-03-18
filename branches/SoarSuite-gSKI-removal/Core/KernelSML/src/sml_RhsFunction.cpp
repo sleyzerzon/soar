@@ -110,3 +110,91 @@ Symbol* sml::ConcatRhsFunction::Execute(std::vector<Symbol*>* pArguments)
 	  Symbol* pResult = make_sym_constant(m_pAgentSML->GetAgent(), pResultStr) ;
 	  return pResult ;
 }
+
+Symbol* sml::CmdRhsFunction::Execute(std::vector<Symbol*>* pArguments)
+{
+	std::ostringstream ostr;
+
+	// Didn't pass a function name to "cmd"
+	if (pArguments->size() == 0)
+	{
+	 std::cerr << GetName() << " should be followed by a command name " 
+			   << std::endl;
+
+	  return NULL ;
+	}
+
+	bool first = false ;
+
+	// Get the command line string.
+	  for (std::vector<Symbol*>::iterator iter = pArguments->begin() ; iter != pArguments->end() ; iter++)
+	  {
+			Symbol* pSymbol = *iter ;
+
+			// Insert spaces between the arguments
+			if (first) first = false ;
+			else ostr << " " ;
+
+			if ( !pSymbol ) {
+			 std::cerr << "Concat function was sent a null symbol! " 
+					   << "Ignoring it..."
+					   << std::endl;
+			} else {
+				std::string str = AgentSML::SymbolToString(pSymbol);
+				ostr << str ;
+			}
+	  }
+
+	std::string argument = ostr.str() ;
+
+	std::string result = m_pAgentSML->ExecuteCommandLine(argument) ;
+
+	Symbol* pResult = make_sym_constant(m_pAgentSML->GetAgent(), result.c_str()) ;
+	return pResult ;
+}
+
+Symbol* sml::ExecRhsFunction::Execute(std::vector<Symbol*>* pArguments)
+{
+	std::ostringstream ostr;
+
+	// Didn't pass a function name to "exec"
+	if (pArguments->size() == 0)
+	{
+	 std::cerr << GetName() << " should be followed by a function name " 
+			   << std::endl;
+
+	  return NULL ;
+	}
+
+	std::string function = AgentSML::SymbolToString(pArguments->front()) ;
+
+	// Get the command line string.
+	// We've decided for "exec" to just concatenate all arguments together without inserting
+	// spaces.  This allows for powerful operations (such as constructing an argument out of pieces).
+	  for (std::vector<Symbol*>::iterator iter = (++pArguments->begin()) ; iter != pArguments->end() ; iter++)
+	  {
+			Symbol* pSymbol = *iter ;
+
+			if ( !pSymbol ) {
+				std::cerr << "Concat function was sent a null symbol! " 
+					   << "Ignoring it..."
+					   << std::endl;
+			} else {
+				std::string str = AgentSML::SymbolToString(pSymbol);
+				ostr << str ;
+			}
+	  }
+
+	std::string argument = ostr.str() ;
+
+	std::string result ;
+	bool ok = m_pAgentSML->GetKernelSML()->FireRhsEvent(m_pAgentSML, gSKIEVENT_RHS_USER_FUNCTION, function, argument, &result) ;
+
+	if (!ok)
+	{
+		result = std::string("Error: Nobody was registered to implement rhs function ") + function ;
+	}
+
+	Symbol* pResult = make_sym_constant(m_pAgentSML->GetAgent(), result.c_str()) ;
+	return pResult ;
+}

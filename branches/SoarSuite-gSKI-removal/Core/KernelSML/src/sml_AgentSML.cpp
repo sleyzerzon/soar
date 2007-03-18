@@ -69,8 +69,12 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 
 	m_pRhsInterrupt = new InterruptRhsFunction(this) ;
 	m_pRhsConcat    = new ConcatRhsFunction(this) ;
+	m_pRhsExec		= new ExecRhsFunction(this) ;
+	m_pRhsCmd		= new CmdRhsFunction(this) ;
 	RegisterRHSFunction(m_pRhsInterrupt) ;
 	RegisterRHSFunction(m_pRhsConcat) ;
+	RegisterRHSFunction(m_pRhsExec) ;
+	RegisterRHSFunction(m_pRhsCmd) ;
 
 	// Set counters and flags used to control runs
 	InitializeRuntimeState() ;
@@ -116,7 +120,9 @@ void AgentSML::Clear(bool deletingThisAgent)
 	ReleaseAllWmes(!deletingThisAgent) ;
 
 	RemoveRHSFunction(m_pRhsInterrupt) ; delete m_pRhsInterrupt ; m_pRhsInterrupt = NULL ;
-	RemoveRHSFunction(m_pRhsConcat) ; delete m_pRhsConcat ; m_pRhsConcat = NULL ;
+	RemoveRHSFunction(m_pRhsConcat)    ; delete m_pRhsConcat    ; m_pRhsConcat = NULL ;
+	RemoveRHSFunction(m_pRhsExec)      ; delete m_pRhsExec      ; m_pRhsExec = NULL ;
+	RemoveRHSFunction(m_pRhsCmd)       ; delete m_pRhsCmd       ; m_pRhsCmd = NULL ;
 
 	m_ProductionListener.Clear();
 	m_RunListener.Clear();
@@ -181,6 +187,11 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	PrintDebugFormat("%s AgentSML::ReleaseAllWmes end %s", this->GetIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
 	PrintDebugFormat("****************************************************") ;
 #endif
+}
+
+char const* AgentSML::GetName()
+{
+	return m_agent->name ;
 }
 
 void AgentSML::InitializeRuntimeState()
@@ -797,4 +808,48 @@ std::string AgentSML::SymbolToString(Symbol* sym)
 	 return "";
 	 break;
 	}
+}
+
+std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
+{
+	KernelSML* pKernel = m_pKernelSML ;
+
+	// We'll pretend this came from the local (embedded) connection.
+	Connection* pConnection = pKernel->GetEmbeddedConnection() ;
+
+	// Build up a message to execute the command line
+	bool rawOutput = true ;
+	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_CommandLine, rawOutput) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, this->GetName());
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLine, commandLine.c_str()) ;
+
+	AnalyzeXML incoming ;
+	incoming.Analyze(pMsg) ;
+
+	// Create a response object which the command line can fill in
+	ElementXML* pResponse = pConnection->CreateSMLResponse(pMsg) ;
+
+	// Execute the command line
+	bool ok = pKernel->ProcessCommand(sml_Names::kCommand_CommandLine, pConnection, &incoming, pResponse) ;
+
+	std::string result ;
+
+	if (ok)
+	{
+		// Take the result from executing the command line and fill it in to our "pReturnValue" array.
+		AnalyzeXML response ;
+		response.Analyze(pResponse) ;
+
+		result = response.GetResultString() ;
+	}
+	else
+	{
+		result = std::string("Error executing command ") + commandLine ;
+	}
+
+	// Clean up
+	delete pMsg ;
+	delete pResponse ;
+
+	return result ;
 }
