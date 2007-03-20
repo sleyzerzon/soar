@@ -44,6 +44,8 @@
 #define unused(x) (void)(x)
 #endif
 
+#define PROFILE_CONNECTIONS
+
 #include "sml_Errors.h"
 #include "thread_Lock.h"
 
@@ -57,6 +59,10 @@ namespace sock
 	// Forward declarations
 	class Socket ;
 }
+
+namespace soar_thread {
+	class OSSpecificTimer ;
+} ;
 
 namespace sml
 {
@@ -185,6 +191,11 @@ protected:
 
 	// The value to use for this connection's client side time tags (so each connection can have its own part of the id space)
 	long		m_InitialTimeTagCounter ;
+
+	// High resolution timer -- useful for profiling
+	soar_thread::OSSpecificTimer*	m_pTimer ;
+	double							m_IncomingTime ;
+	double							m_OutgoingTime ;
 
 public:
 	Connection() ;
@@ -598,6 +609,9 @@ public:
 
 	void SetInitialTimeTagCounter(long value)	{ m_InitialTimeTagCounter = value ; }
 	long GetInitialTimeTagCounter()				{ return m_InitialTimeTagCounter ; } 
+
+	double GetIncomingTime() { return m_IncomingTime ; }
+	double GetOutgoingTime() { return m_OutgoingTime ; }
 
 protected:
 	/*************************************************************

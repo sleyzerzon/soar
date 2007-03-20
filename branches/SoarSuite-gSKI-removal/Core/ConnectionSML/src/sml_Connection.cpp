@@ -35,6 +35,7 @@
 #include "sml_TagError.h"
 #include "sml_TagResult.h"
 #include "sock_ClientSocket.h"
+#include "thread_OSSpecific.h"
 
 #include <time.h>	// For debug random start of message id's
 
@@ -59,6 +60,10 @@ Connection::Connection()
 	m_bIsDirectConnection = false ;
 	m_bTraceCommunications = false ;
 	m_bIsKernelSide = false ;
+
+	m_pTimer = soar_thread::MakeTimer() ;
+	m_IncomingTime = 0.0 ;
+	m_OutgoingTime = 0.0 ;
 }
 
 /*************************************************************
@@ -98,6 +103,8 @@ Connection::~Connection()
 
 		m_IncomingMessageQueue.pop() ;
 	}
+
+	delete m_pTimer ;
 }
 
 

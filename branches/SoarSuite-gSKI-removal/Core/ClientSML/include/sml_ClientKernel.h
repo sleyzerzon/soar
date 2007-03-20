@@ -238,13 +238,6 @@ protected:
 	*************************************************************/
 	Agent* MakeAgent(char const* pAgentName) ;
 
-	/*************************************************************
-	* @brief Returns the connection information for this kernel
-	*		 which is how we communicate with the kernel (e.g. embedded,
-	*		 remotely over a socket etc.)
-	*************************************************************/
-	Connection* GetConnection() const { return m_Connection ; }
-
 	void SetSocketLib(sock::SocketLib* pLibrary) { m_SocketLibrary = pLibrary ; }
 
 	long	GenerateNextID()		{ return ++m_IdCounter ; }
@@ -960,6 +953,17 @@ public:
 	* @return error message or empty string for no error
 	*************************************************************/
 	std::string LoadExternalLibrary(char const* pLibraryCommand);
+
+	/*************************************************************
+	* @brief Returns the connection information for this kernel
+	*		 which is how we communicate with the kernel (e.g. embedded,
+	*		 remotely over a socket etc.)
+	*
+	*		 You should not generally need to call here.  If you are doing
+	*		 so for more than debugging information something is prob. wrong
+	*		 
+	*************************************************************/
+	Connection* GetConnection() const { return m_Connection ; }
 
 protected:
 	/*************************************************************

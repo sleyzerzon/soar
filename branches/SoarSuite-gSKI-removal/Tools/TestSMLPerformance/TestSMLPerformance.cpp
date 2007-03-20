@@ -29,6 +29,7 @@
 #include <time.h>
 #include "sml_Client.h"
 #include "sml_StringOps.h"
+#include "sml_Connection.h"
 
 using namespace sml;
 using namespace std;
@@ -204,6 +205,9 @@ void RunTest1(int numAgents, int numWmes, int numCycles) {
 
 	delete pEnv;
 
+	double incoming = kernel->GetConnection()->GetIncomingTime() ;
+	cout << "Incoming time: " << incoming/1000.0 << endl ;
+
 	kernel->Shutdown();
 	delete kernel;
 }
@@ -231,6 +235,9 @@ void RunTest2(int numAgents, int numWmes, int numCycles) {
 	cout << "Num Input Events : " << numInputEvents << endl;
 
 	delete pEnv;
+
+	double incoming = kernel->GetConnection()->GetIncomingTime() ;
+	cout << "Incoming time: " << incoming/1000.0 << endl ;
 
 	kernel->Shutdown();
 	delete kernel;

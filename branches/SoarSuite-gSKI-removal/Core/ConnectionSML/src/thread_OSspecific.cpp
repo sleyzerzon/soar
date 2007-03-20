@@ -43,6 +43,47 @@ bool soar_thread::SleepThread(long secs, long msecs)
 	return true ;
 }
 
+class WindowsTimer : public OSSpecificTimer
+{
+protected:
+	BOOL			m_Available ;
+	LARGE_INTEGER	frequency ;		// This many timer increments occur in one second
+	LARGE_INTEGER	start ;			// The timer at last Start() call
+	LARGE_INTEGER	accumulator ;	// The timer at last Start() call
+
+public:
+	WindowsTimer() {
+		m_Available = QueryPerformanceFrequency(&frequency) ;
+
+		Start() ;
+	}
+
+	virtual void Start() {
+		QueryPerformanceCounter(&start) ;
+	}
+
+	virtual double Elapsed() {
+		if (!m_Available)
+			return 0 ;
+
+		LARGE_INTEGER now ;
+		QueryPerformanceCounter(&now) ;
+
+		// QuadPart is all 64 bits
+		now.QuadPart = (now.QuadPart - start.QuadPart) ;
+
+		// LowPart is just the low order 32 bits
+		double elapsed = now.LowPart ;
+		double ms = (elapsed * 1000) / (double)frequency.LowPart ;
+		return ms ;
+	}
+} ;
+
+OSSpecificTimer* soar_thread::MakeTimer()
+{
+	return new WindowsTimer() ;
+}
+
 /* voigtjr:
    I rewrote the WindowsMutex class to use "critical sections" rather than 
    actual mutexes, the critical sections are faster for thread synchronization.
@@ -264,6 +305,28 @@ public:
 OSSpecificEvent* soar_thread::MakeEvent()
 {
 	return new LinuxEvent() ;
+}
+
+class LinuxTimer : public OSSpecificTimer
+{
+protected:
+
+public:
+	LinuxTimer() {
+	}
+
+	virtual void Start() {
+		assert(false) ;	// To be written.
+	}
+
+	virtual double Elapsed() {
+		return 0.0 ;
+	}
+}
+
+OSSpecificTimer* soar_thread::MakeTimer()
+{
+	return new LinuxTimer() ;
 }
 
 #endif // _WIN32

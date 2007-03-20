@@ -21,6 +21,8 @@
 #include "sml_Connection.h"
 #include "sml_Client.h"
 
+#include "thread_OSSpecific.h"	// For timer
+
 //#include "../../Profiler/include/simple_timer.h"
 
 // Define a sleep
@@ -2081,6 +2083,9 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	soar_thread::OSSpecificTimer* pTimer = soar_thread::MakeTimer() ;
+	pTimer->Start() ;
+
 	// Running a listener isn't really a test.  It just provides the other side for a remote test
 	// (so run one instance as a listener and then a second as a -remote test).
 	if (listener)
@@ -2119,6 +2124,10 @@ int main(int argc, char* argv[])
 		//double time = timer.Elapsed() ;
 		//cout << "Total run time: " << time << endl ;
 	}
+
+	double time = pTimer->Elapsed() ;
+	cout << "Elapsed time is " << time << endl ;
+	delete pTimer ;
 
 	printf("\nNow checking memory.  Any leaks will appear below.\nNothing indicates no leaks detected.\n") ;
 	printf("\nIf no leaks appear here, but some appear in the output\nwindow in the debugger, they have been leaked from a DLL.\nWhich is reporting when it's unloaded.\n\n") ;

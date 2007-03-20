@@ -20,6 +20,16 @@ void BeginThread(ThreadFuncPtr inThreadFuncPtr,void* inParam) ;
 
 bool SleepThread(long seconds, long msecs) ;
 
+class OSSpecificTimer
+{
+public:
+	virtual ~OSSpecificTimer() {} ;
+	virtual void   Start()   = 0 ;		// Measure from this point
+	virtual double Elapsed() = 0 ;		// Time (in ms) since Start() was last called
+} ;
+
+OSSpecificTimer* MakeTimer() ;
+
 // Methods for creating a mutex
 class OSSpecificMutex
 {
