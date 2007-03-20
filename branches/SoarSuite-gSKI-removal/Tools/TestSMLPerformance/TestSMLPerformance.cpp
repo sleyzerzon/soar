@@ -80,6 +80,9 @@ public:
 		for(int i=0; i<numWmes; i++) {
 			agent->Update((*wmes)[i], (*input)[i]);
 		}
+
+		// Explicit commit isn't required any more.
+		// Remove to speed up the processing of input.
 		agent->Commit();
 	}
 
