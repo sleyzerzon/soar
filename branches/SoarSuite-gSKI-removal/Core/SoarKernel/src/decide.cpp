@@ -486,10 +486,6 @@ void garbage_collect_id (agent* thisAgent, Symbol *id)
    slot *s;
    preference *pref, *next_pref;
    
-   /* JC ADDED: Tell gSKI that an object is being removed from memory */
-   /* KJC:  Do we really want this here?  This is garbage collection, not WM operations */
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_WMOBJECT_REMOVED, 0, thisAgent, static_cast<void*>(id));
-
 #ifdef DEBUG_LINKS  
    print_with_symbols (thisAgent, "\n*** Garbage collecting id: %y",id);
 #endif
@@ -2254,9 +2250,6 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
                        POP_CONTEXT_STACK_CALLBACK, 
                        (soar_call_data) goal);
 
-  /* JC ADDED: Tell gSKI that we have removed a subgoal */
-  gSKI_MakeAgentCallback(gSKI_K_EVENT_SUBSTATE_DESTROYED, 0, thisAgent, static_cast<void*>(goal));
-
   /* --- disconnect this goal from the goal stack --- */
   if (goal == thisAgent->top_goal) {
     thisAgent->top_goal = NIL;
@@ -2416,12 +2409,6 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   soar_invoke_callbacks(thisAgent, thisAgent, 
                        CREATE_NEW_CONTEXT_CALLBACK, 
                        (soar_call_data) id);
-
-   /* JC ADDED: Tell gSKI we have a new object in general (there are three places this can occur). */
-   gSKI_MakeAgentCallbackWMObjectAdded(thisAgent, NIL, NIL, id);
-
-   /* JC ADDED: Tell gSKI that a substate was created */
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_SUBSTATE_CREATED, 1, thisAgent, static_cast<void*>(id));
 }
 
 /* ------------------------------------------------------------------
@@ -2572,10 +2559,6 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s)
       
       for(temp = candidates; temp; temp = temp->next_candidate)
          preference_remove_ref(thisAgent, temp);
-      
-      /* JC ADDED: Notify gSKI of an operator selection  */
-      gSKI_MakeAgentCallback(gSKI_K_EVENT_OPERATOR_SELECTED, 1, thisAgent, 
-                             static_cast<void*>(w));
       
       return TRUE;
    } 
@@ -2901,10 +2884,6 @@ void add_wme_to_gds(agent* agentPtr, goal_dependency_set* gds, wme* wme_to_add)
 	   print_wme(agentPtr, wme_to_add);
 	   gSKI_MakeAgentCallbackXML(agentPtr, kFunctionEndTag, kTagVerbose);               
    }
- 
-   /* Callback gSKI (AFTER) */
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_GDS_WME_ADDED, 1, 
-                          agentPtr, static_cast<void*>(wme_to_add));
 }
 
 /*
@@ -3366,9 +3345,6 @@ a "twitchy" version of OPERAND2, and leave open the possibility that other
 approaches may be better */
 
 void gds_invalid_so_remove_goal (agent* thisAgent, wme *w) {
-
-   /* JC ADDED: Tell gSKI that the goals stack is about to be blown away */
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_GDS_VIOLATED, 0, thisAgent, static_cast<void*>(w));
 
   /* REW: begin 11.25.96 */ 
   #ifndef NO_TIMING_STUFF

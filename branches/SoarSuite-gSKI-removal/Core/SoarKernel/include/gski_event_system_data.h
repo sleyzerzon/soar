@@ -65,32 +65,12 @@
 enum egSKIAgentEvents
 {
    /* Do we need WME preference added? */
-   gSKI_K_EVENT_WME_ADDED = 0,            /* Data: wme*              */          // DONE!
-   gSKI_K_EVENT_WME_REMOVED,              /* Data: wme*              */          // DONE!
-   gSKI_K_EVENT_WMOBJECT_ADDED,           /* Data: symbol* & wme*    */          // DONE!
-   gSKI_K_EVENT_WMOBJECT_REMOVED,         /* Data: symbol* & 0       */          // DONE!
    gSKI_K_EVENT_PRODUCTION_ADDED,         /* Data: production*       */          // DONE!
    gSKI_K_EVENT_PRODUCTION_REMOVED,       /* Data: production*       */          // DONE!
    gSKI_K_EVENT_PRODUCTION_FIRED,         /* Data: instantiation* */             // DONE!
    gSKI_K_EVENT_PRODUCTION_RETRACTED,     /* Data: instantiation* */             // DONE!
-   gSKI_K_EVENT_OPERATOR_PROPOSED,        /* Data: Symbol* (state) & Symbol* (operator) */                     // DONE!
-   gSKI_K_EVENT_OPERATOR_SELECTED,        /* Data: Symbol* (state) & Symbol* (operator) */                     // DONE!
-   gSKI_K_EVENT_OPERATOR_RETRACTED,       /* Data: Symbol* (state) & Symbol* (operator) */                     // DONE!
-   gSKI_K_EVENT_OPERATOR_PREF_ADDED,      /* Data: Symbol* (state) & Symbol* (operator) & Pref Type (char) */  // DONE!
-   gSKI_K_EVENT_GDS_WME_ADDED,            /* Data: Symbol* (state) & wme* */     // DONE!
-   gSKI_K_EVENT_GDS_VIOLATED,             /* Data: wme* (contains gds!) */       // DONE!
-   gSKI_K_EVENT_SUBSTATE_CREATED,         /* Data: Symbol* (state) */            // DONE!
-   gSKI_K_EVENT_SUBSTATE_DESTROYED,       /* Data: Symbol* (state) */            // DONE!
-   gSKI_K_EVENT_PHASE,                    /* Data: Phase type (char) */          // DONE!
    gSKI_K_EVENT_ELABORATION_CYCLE,        /* Data: Phase type (char) & elab cycle count (int) ? */ // DONE!
-   gSKI_K_EVENT_DECISION_CYCLE,           /* Data: cycle count (int) */          // DONE!
    
-   // DON'T NEED, CAN BE PROPAGATED BY gSKI
-   // gSKI_K_EVENT_RETE_LOADED,              
-   // gSKI_K_EVENT_AGENT_INITIALIZED,  */    
-   // gSKI_K_EVENT_AGENT_RUN_STARTED,        
-   // gSKI_K_EVENT_AGENT_RUN_STOPPED,        
-
    /* NOT Deprecated.  gSKI not close to removing this yet.  */
    gSKI_K_EVENT_PRINT_CALLBACK,           /* Data: agent* & const char*     */   // DONE!
 

@@ -131,12 +131,6 @@ void add_wme_to_wm (agent* thisAgent, wme *w)
       {
          w->value->id.isa_operator++;
       }
-
-      /* JC ADDED: Tell about a new object if we have an acceptable or required preference.
-          This takes care of object created through I/O (others are taken care of at the
-          preference phase) */
-      if((w->value->id.link_count == 1) && !(w->value->id.isa_goal))
-         gSKI_MakeAgentCallbackWMObjectAdded(thisAgent, w->value, w->attr, w->id);
    }
 }
 
@@ -149,10 +143,6 @@ void remove_wme_from_wm (agent* thisAgent, wme *w)
       post_link_removal (thisAgent, w->id, w->value);
       if (w->attr==thisAgent->operator_symbol) 
       {
-         /* JC ADDED: Tell gski that an operator has been retracted */
-         if(w->value->id.isa_operator == 1)
-            gSKI_MakeAgentCallback(gSKI_K_EVENT_OPERATOR_RETRACTED, 1, thisAgent, static_cast<void*>(w));
-
          /* Do this afterward so that gSKI can know that this is an operator */
          w->value->id.isa_operator--;
       }
@@ -222,18 +212,13 @@ void do_buffered_wm_changes (agent* thisAgent)
   start_timer (thisAgent,  &start_tv);
 #endif
 #endif
-  /* JC MODIFIED: Added callbacks before and after each wme addition */
   for (c=thisAgent->wmes_to_add; c!=NIL; c=c->rest) 
   {
-     gSKI_MakeAgentCallback(gSKI_K_EVENT_WME_ADDED, 0, thisAgent, static_cast<void*>(c->first));
      add_wme_to_rete (thisAgent, static_cast<wme_struct *>(c->first));
-     gSKI_MakeAgentCallback(gSKI_K_EVENT_WME_ADDED, 1, thisAgent, static_cast<void*>(c->first));
   }
   for (c=thisAgent->wmes_to_remove; c!=NIL; c=c->rest)
   {
-     gSKI_MakeAgentCallback(gSKI_K_EVENT_WME_REMOVED, 0, thisAgent, static_cast<void*>(c->first));
      remove_wme_from_rete (thisAgent, static_cast<wme_struct *>(c->first));
-     gSKI_MakeAgentCallback(gSKI_K_EVENT_WME_REMOVED, 1, thisAgent, static_cast<void*>(c->first));
   }
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS

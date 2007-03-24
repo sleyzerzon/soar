@@ -98,25 +98,6 @@ inline void gSKI_MakeAgentCallback(unsigned long eventId,
 }
 
 /**
- * @brief Special function for more complex WMObject added method.
- */
-// !!!KJC :  can this go away?  Can Soar callback create struct?  Is it used?
-inline void gSKI_MakeAgentCallbackWMObjectAdded(struct agent_struct* soarAgent,
-                                                Symbol*              new_object,
-                                                Symbol*              ref_attr,
-                                                Symbol*              ref_object)
-{
-   gSKI_K_WMObjectCallbackData wmobject_data;
-
-   wmobject_data.wm_new_object         = new_object;
-   wmobject_data.wm_referencing_attr   = ref_attr;
-   wmobject_data.wm_referencing_object = ref_object; 
-
-   /* JC ADDED: Tell gSKI we have a new object in general (there are three places this can occur). */
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_WMOBJECT_ADDED, 1, soarAgent, static_cast<void*>(&wmobject_data));
-}
-
-/**
  * @brief Special function to handle the phase and decision cycle callbacks
  */
 // !!! KJC: this should go away.  Use Soar callbacks and create struct in handler.

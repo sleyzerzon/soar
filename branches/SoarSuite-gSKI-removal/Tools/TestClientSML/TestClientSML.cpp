@@ -1206,6 +1206,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	int phaseCount = 0 ;
 	int callbackPhase = pAgent->RegisterForRunEvent(smlEVENT_BEFORE_PHASE_EXECUTED, MyRunEventHandler, &phaseCount) ;
+//	int callbackDec = pAgent->RegisterForRunEvent(smlEVENT_BEFORE_DECISION_CYCLE, MyRunEventHandler, &phaseCount) ;
 
 	// Nothing should match here
 	std::string result = pAgent->RunSelf(4) ;
@@ -1247,6 +1248,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	}
 
 	pAgent->UnregisterForRunEvent(callbackPhase) ;
+//	pAgent->UnregisterForRunEvent(callbackDec) ;
 
 	// By this point the static variable ClientXMLStorage should have been filled in 
 	// and it should be valid, even though the event handler for MyXMLEventHandler has completed.

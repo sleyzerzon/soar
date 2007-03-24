@@ -222,7 +222,7 @@ void free_growable_string (agent* thisAgent, growable_string gs) {
 
 void add_block_to_memory_pool (agent* thisAgent, memory_pool *p) {
   char *new_block;
-  unsigned long size, i, item_num, interleave_factor, total;
+  unsigned long size, i, item_num, interleave_factor;
   char *item, *prev_item;
 
   /* --- allocate a new block for the pool --- */
