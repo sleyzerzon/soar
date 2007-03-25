@@ -90,6 +90,11 @@ typedef std::map< gSKI::Agent*, AgentSML* >	AgentMap ;
 typedef AgentMap::iterator					AgentMapIter ;
 typedef AgentMap::const_iterator			AgentMapConstIter ;
 
+// Map from kernel agent pointers to information we keep for SML about those agents.
+typedef std::map< agent*, AgentSML* >			KernelAgentMap ;
+typedef KernelAgentMap::iterator				KernelAgentMapIter ;
+typedef KernelAgentMap::const_iterator			KernelAgentMapConstIter ;
+
 class KernelSML
 {
 	// Allow the kernel listener to execute command lines directly
@@ -111,6 +116,7 @@ protected:
 	// Map from gSKI agent pointers to AgentSML objects, where we keep additional information
 	// required for SML about each agent.
 	AgentMap		m_AgentMap ;
+	KernelAgentMap	m_KernelAgentMap ;
 
 	// Command line interface module
 	cli::CommandLineInterface m_CommandLineInterface ;
@@ -378,6 +384,9 @@ public:
 	*	
 	*************************************************************/
 	AgentSML*	GetAgentSML(gSKI::Agent* pAgent) ;
+	AgentSML*	GetAgentSML(agent* pAgent) ;	// Lookup agent from kernel agent
+
+	void RecordAgentSML(AgentSML* pAgentSML, agent* pAgent) ;
 
 	/*************************************************************
 	* @brief	Returns the number of agents.
@@ -390,6 +399,7 @@ public:
 	*			with the underlying gSKI agent.
 	*************************************************************/	
 	bool DeleteAgentSML(gSKI::Agent* pAgent) ;
+	bool DeleteAgentSML(agent* pAgent) ;
 
 	/*************************************************************
 	* @brief	Stops and deletes all agents.  Generally called

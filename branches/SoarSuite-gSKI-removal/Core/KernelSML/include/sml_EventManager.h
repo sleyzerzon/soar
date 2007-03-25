@@ -15,6 +15,7 @@
 #include "gSKI_Enumerations.h"
 #include "sml_Connection.h"
 #include "sml_ElementXML.h"
+#include "sml_KernelCallback.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable : 4702)  // warning C4702: unreachable code, need to disable for VS.NET 2003 due to STL "bug" in certain cases
@@ -35,8 +36,7 @@ class KernelSML ;
 typedef std::list< Connection* >		ConnectionList ;
 typedef ConnectionList::iterator	ConnectionListIter ;
 
-template<typename EventType>
-class EventManager
+template<typename EventType> class EventManager
 {
 protected:
 	ConnectionList*	GetListeners(EventType eventID)
@@ -51,8 +51,12 @@ protected:
 
 public:
     // Mapping from the event to the list of connections listening to that event
-    typedef std::map< EventType, ConnectionList* >	EventMap ;
-    typedef typename EventMap::iterator						EventMapIter ;
+    typedef std::map< EventType, ConnectionList* >		EventMap ;
+    typedef typename EventMap::iterator					EventMapIter ;
+
+    typedef std::map< EventType, KernelCallback* >		KernelEventMap ;
+    typedef typename KernelEventMap::iterator			KernelEventMapIter ;
+
 protected:
 	// Map from event id to list of connections listening to that event
 	EventMap		m_EventMap ;
@@ -111,6 +115,14 @@ public:
 
 		// Return true if this is the first listener for this event
 		return (pList->size() == 1) ;
+	}
+
+	// Returns true if this is the first connection listening for this event
+	virtual bool BaseAddKernelListener(EventType eventID, KernelCallback* pKernelCallback)
+	{
+		unused(eventID) ;
+		unused(pKernelCallback) ;
+		return true ;
 	}
 
 	// Returns true if this is the first connection listening for this event

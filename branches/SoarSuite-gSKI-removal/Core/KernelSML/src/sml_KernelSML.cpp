@@ -427,6 +427,36 @@ AgentSML* KernelSML::GetAgentSML(gSKI::Agent* pAgent)
 		// If not in the map, add it.
 		pResult = new AgentSML(this, pAgent, pAgent->GetSoarAgent()) ;
 		m_AgentMap[pAgent] = pResult ;
+		RecordAgentSML(pResult, pAgent->GetSoarAgent()) ;
+	}
+	else
+	{
+		// If in the map, return it.
+		pResult = iter->second ;
+	}
+
+	return pResult ;
+}
+
+void KernelSML::RecordAgentSML(AgentSML* pAgentSML, agent* pAgent)
+{
+	m_KernelAgentMap[pAgent] = pAgentSML ;
+}
+
+AgentSML* KernelSML::GetAgentSML(agent* pAgent)
+{
+	if (!pAgent)
+		return NULL ;
+
+	AgentSML* pResult = NULL ;
+
+	// See if we already have an object in our map
+	KernelAgentMapIter iter = m_KernelAgentMap.find(pAgent) ;
+
+	if (iter == m_KernelAgentMap.end())
+	{
+		assert(false) ;	// Looking for an agent but not in our map
+		return NULL ;
 	}
 	else
 	{
@@ -477,12 +507,21 @@ bool KernelSML::DeleteAgentSML(gSKI::Agent* pAgent)
 	if (iter == m_AgentMap.end())
 		return false ;
 
+	KernelAgentMapIter kiter = m_KernelAgentMap.find(pAgent->GetSoarAgent()) ;
+	if (kiter == m_KernelAgentMap.end())
+	{
+		// Why is the agent in the gSKI map but not in the kernel map?
+		assert(false) ;
+		return false ;
+	}
+
 	// Delete the agent sml information
 	AgentSML* pResult = iter->second ;
 	delete pResult ;
 
 	// Erase the entry from the map
 	m_AgentMap.erase(iter) ;
+	m_KernelAgentMap.erase(kiter) ;
 
 	return true ;
 }
