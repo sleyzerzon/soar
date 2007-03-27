@@ -71,7 +71,7 @@ extern void gds_invalid_so_remove_goal (agent* thisAgent, wme *w);
 void add_input_function (agent* thisAgent, agent * a, soar_callback_fn f, 
 			 soar_callback_data cb_data, 
 			 soar_callback_free_fn free_fn, char * name) {
-  soar_add_callback(thisAgent, a, INPUT_PHASE_CALLBACK, f, cb_data, free_fn, name);
+  soar_add_callback(thisAgent, a, INPUT_PHASE_CALLBACK, f, INPUT_PHASE_CALLBACK, cb_data, free_fn, name);
 }
 
 void remove_input_function (agent* thisAgent, agent * a, char * name) {
@@ -95,7 +95,7 @@ void add_output_function (agent* thisAgent,
     }
   else
     {
-      soar_add_callback(thisAgent, a, OUTPUT_PHASE_CALLBACK, f, cb_data, free_fn, 
+      soar_add_callback(thisAgent, a, OUTPUT_PHASE_CALLBACK, f, OUTPUT_PHASE_CALLBACK, cb_data, free_fn, 
 			output_link_name);
     }
 }
@@ -642,7 +642,7 @@ void do_output_cycle (agent* thisAgent) {
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);
       #endif
-	  (ol->cb->function)(thisAgent, ol->cb->data, &output_call_data);
+	  (ol->cb->function)(thisAgent, ol->cb->eventid, ol->cb->data, &output_call_data);
       #ifndef NO_TIMING_STUFF      
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->output_function_cpu_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);
@@ -663,7 +663,7 @@ void do_output_cycle (agent* thisAgent) {
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);
       #endif
-      (ol->cb->function)(thisAgent, ol->cb->data, &output_call_data);
+	  (ol->cb->function)(thisAgent, ol->cb->eventid, ol->cb->data, &output_call_data);
       #ifndef NO_TIMING_STUFF      
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->output_function_cpu_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);
@@ -686,7 +686,7 @@ void do_output_cycle (agent* thisAgent) {
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);
       #endif
-      (ol->cb->function)(thisAgent, ol->cb->data, &output_call_data);
+	  (ol->cb->function)(thisAgent, ol->cb->eventid, ol->cb->data, &output_call_data);
       #ifndef NO_TIMING_STUFF      
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->output_function_cpu_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);
@@ -708,7 +708,7 @@ void do_output_cycle (agent* thisAgent) {
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);
       #endif
-      (ol->cb->function)(thisAgent, ol->cb->data, &output_call_data);
+	  (ol->cb->function)(thisAgent, ol->cb->eventid, ol->cb->data, &output_call_data);
       #ifndef NO_TIMING_STUFF      
       stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->output_function_cpu_time);
       start_timer (thisAgent, &thisAgent->start_kernel_tv);

@@ -51,6 +51,18 @@ static char const* GetValueType(egSKISymbolType type)
 	}
 }
 
+void OutputListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
+{
+	m_KernelSML = pKernelSML ;
+	m_Agent		= pAgentSML->GetIAgent() ;
+	SetAgentSML(pAgentSML) ;
+}
+
+// Called when an event occurs in the kernel
+void OutputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
+}
+
 // Register for the events that KernelSML itself needs to know about in order to work correctly.
 void OutputListener::RegisterForKernelSMLEvents()
 {

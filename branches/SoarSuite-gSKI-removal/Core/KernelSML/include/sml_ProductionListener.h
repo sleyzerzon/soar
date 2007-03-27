@@ -41,16 +41,21 @@ protected:
 	gSKI::Agent*	m_pAgent ;
 
 public:
-	ProductionListener(KernelSML* pKernelSML, gSKI::Agent* pAgent)
+	ProductionListener()
 	{
-		m_pKernelSML = pKernelSML ;
-		m_pAgent	 = pAgent ;
+		m_pKernelSML = 0 ;
+		m_pAgent	 = 0 ;
 	}
 
 	virtual ~ProductionListener()
 	{
 		Clear() ;
 	}
+
+	void Init(KernelSML* pKernelSML, AgentSML* pAgentSML) ;
+
+	// Called when an event occurs in the kernel
+	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
 	virtual bool AddListener(egSKIProductionEventId eventID, Connection* pConnection) ;

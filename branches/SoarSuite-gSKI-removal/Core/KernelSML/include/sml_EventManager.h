@@ -36,7 +36,7 @@ class KernelSML ;
 typedef std::list< Connection* >		ConnectionList ;
 typedef ConnectionList::iterator	ConnectionListIter ;
 
-template<typename EventType> class EventManager
+template<typename EventType> class EventManager : public KernelCallback
 {
 protected:
 	ConnectionList*	GetListeners(EventType eventID)
@@ -60,6 +60,7 @@ public:
 protected:
 	// Map from event id to list of connections listening to that event
 	EventMap		m_EventMap ;
+
 public:
 	virtual ~EventManager()
 	{

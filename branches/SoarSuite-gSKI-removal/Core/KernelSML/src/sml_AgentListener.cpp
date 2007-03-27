@@ -74,6 +74,11 @@ bool AgentListener::RemoveListener(egSKIAgentEventId eventID, Connection* pConne
 	return last ;
 }
 
+// Called when an event occurs in the kernel
+void AgentListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
+}
+
 // Called when an "AgentEvent" occurs in the kernel
 void AgentListener::HandleEvent(egSKIAgentEventId eventID, gSKI::Agent* agentPtr)
 {

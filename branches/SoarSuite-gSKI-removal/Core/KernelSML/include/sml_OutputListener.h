@@ -40,16 +40,21 @@ protected:
 	OutputTimeTagMap m_TimeTags ;
 
 public:
-	OutputListener(KernelSML* pKernelSML, gSKI::Agent* pAgent)
+	OutputListener()
 	{
-		m_KernelSML = pKernelSML ;
-		m_Agent		= pAgent ;
+		m_KernelSML = 0 ;
+		m_Agent = 0 ;
 	}
 
 	virtual ~OutputListener()
 	{
 		Clear() ;
 	}
+
+	void Init(KernelSML* pKernelSML, AgentSML* pAgentSML);
+
+	// Called when an event occurs in the kernel
+	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Register for the events that KernelSML itself needs to know about in order to work correctly.
 	void RegisterForKernelSMLEvents() ;

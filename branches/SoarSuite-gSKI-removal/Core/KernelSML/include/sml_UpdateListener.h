@@ -45,6 +45,9 @@ public:
 	// Initialize this listener
 	void Init(KernelSML* pKernelSML) { m_pKernelSML = pKernelSML ; }
 
+	// Called when an event occurs in the kernel
+	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
+
 	// Returns true if this is the first connection listening for this event
 	virtual bool AddListener(egSKIUpdateEventId eventID, Connection* pConnection) ;
 

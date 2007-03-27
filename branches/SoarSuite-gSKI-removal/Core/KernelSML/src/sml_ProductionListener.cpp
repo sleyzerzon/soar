@@ -27,10 +27,18 @@
 #include "IgSKI_Production.h"
 #include "gSKI_ProductionManager.h"
 #include "sml_KernelSML.h"
+#include "sml_AgentSML.h"
 
 #include "assert.h"
 
 using namespace sml ;
+
+void ProductionListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
+{
+	m_pKernelSML = pKernelSML ;
+	m_pAgent	 = pAgentSML->GetIAgent() ;
+	SetAgentSML(pAgentSML) ;
+}
 
 // Uncomment this symbol to disable print output buffering.
 // #define DISABLE_PRINT_OUTPUT_BUFFERING
@@ -59,6 +67,10 @@ bool ProductionListener::RemoveListener(egSKIProductionEventId eventID, Connecti
 	}
 
 	return last ;
+}
+
+void ProductionListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
 }
 
 // Called when a "ProductionEvent" occurs in the kernel

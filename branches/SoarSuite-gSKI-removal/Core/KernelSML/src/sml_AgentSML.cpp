@@ -55,8 +55,6 @@
 using namespace sml ;
 
 AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
-: m_ProductionListener(pKernelSML, pIAgent), m_RunListener(pKernelSML, pIAgent),
-  m_PrintListener(pKernelSML, pIAgent), m_XMLListener(pKernelSML, pIAgent)
 {
 	m_pKernelSML = pKernelSML ;
 	m_pIAgent = pIAgent ;
@@ -66,6 +64,12 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 	m_SuppressRunEndsEvent = false ;
 
 	m_agent = pAgent ;
+
+	m_PrintListener.Init(pKernelSML, this) ;
+	m_XMLListener.Init(pKernelSML, this) ;
+	m_RunListener.Init(pKernelSML, this) ;
+	m_ProductionListener.Init(pKernelSML, this) ;
+	m_OutputListener.Init(pKernelSML, this) ;
 
 	m_pRhsInterrupt = new InterruptRhsFunction(this) ;
 	m_pRhsConcat    = new ConcatRhsFunction(this) ;
@@ -81,27 +85,18 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 
 	m_pBeforeDestroyedListener = NULL ;
 
-	// Create a listener for output events and other events we listen for
-	m_pOutputListener = new OutputListener(pKernelSML, pIAgent) ;
-
 	// For KernelSML (us) to work correctly we need to listen for certain events, independently of what any client is interested in
 	// Currently:
 	// Listen for output callback events so we can send this output over to the clients
 	// Listen for "before" init-soar events (we need to know when these happen so we can release all WMEs on the input link, otherwise gSKI will fail to re-init the kernel correctly.)
 	// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
-	m_pOutputListener->RegisterForKernelSMLEvents() ;
+	m_OutputListener.RegisterForKernelSMLEvents() ;
 }
 
 AgentSML::~AgentSML()
 {
 	// Release any objects we still own
 	Clear(true) ;
-
-	// If we have an output listener object, delete it now.
-	// NOTE: At this point we're assuming AgentSML objects live as long as the underlying gSKI Agent object.
-	// If not, we need to unregister this listener, but we shouldn't do that here as the Agent object may
-	// be invalid by the time this destructor is called.
-	delete m_pOutputListener ;
 
 	delete m_pInputProducer ;
 }
@@ -127,7 +122,7 @@ void AgentSML::Clear(bool deletingThisAgent)
 	m_ProductionListener.Clear();
 	m_RunListener.Clear();
 	m_PrintListener.Clear();
-	m_pOutputListener->Clear() ;
+	m_OutputListener.Clear() ;
 	m_XMLListener.Clear() ;
 
 #ifdef DEBUG_UPDATE
@@ -223,7 +218,7 @@ void AgentSML::RemoveAllListeners(Connection* pConnection)
 	m_ProductionListener.RemoveAllListeners(pConnection);
 	m_RunListener.RemoveAllListeners(pConnection);
 	m_PrintListener.RemoveAllListeners(pConnection);
-	m_pOutputListener->RemoveAllListeners(pConnection) ; 
+	m_OutputListener.RemoveAllListeners(pConnection) ; 
 	m_XMLListener.RemoveAllListeners(pConnection) ;
 }
 

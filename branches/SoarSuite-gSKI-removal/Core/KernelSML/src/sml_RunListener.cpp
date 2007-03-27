@@ -40,6 +40,13 @@
 
 using namespace sml ;
 
+void RunListener::Init(sml::KernelSML *pKernelSML, AgentSML* pAgentSML)
+{
+	m_pKernelSML = pKernelSML ;
+	m_pAgent	 = pAgentSML->GetIAgent() ;
+	SetAgentSML(pAgentSML) ;
+}
+
 // Returns true if this is the first connection listening for this event
 bool RunListener::AddListener(egSKIRunEventId eventID, Connection* pConnection)
 {
@@ -64,6 +71,11 @@ bool RunListener::RemoveListener(egSKIRunEventId eventID, Connection* pConnectio
 	}
 
 	return last ;
+}
+
+// Called when an event occurs in the kernel
+void RunListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
 }
 
 // Called when a "RunEvent" occurs in the kernel

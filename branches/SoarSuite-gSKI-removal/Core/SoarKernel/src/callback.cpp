@@ -100,6 +100,7 @@ void soar_add_callback (agent* thisAgent,
 			soar_callback_agent the_agent, 
 			SOAR_CALLBACK_TYPE callback_type, 
 			soar_callback_fn fn, 
+			soar_callback_event_id eventid,
 			soar_callback_data data,
 			soar_callback_free_fn free_fn,
 			soar_callback_id id)
@@ -109,6 +110,7 @@ void soar_add_callback (agent* thisAgent,
   cb = (soar_callback *) malloc (sizeof(soar_callback));
   cb->function      = fn;
   cb->data          = data;
+  cb->eventid		= eventid ;
   cb->free_function = free_fn;
   cb->id            = savestring(id);
   
@@ -300,7 +302,7 @@ void soar_invoke_callbacks (agent* thisAgent,
       soar_callback * cb;
 
       cb = (soar_callback *) c->first;
-      cb->function(the_agent, cb->data, call_data);
+	  cb->function(the_agent, cb->eventid, cb->data, call_data);
     }
 
 /* REW: begin 28.07.96 */
@@ -406,7 +408,7 @@ void soar_invoke_first_callback (agent* thisAgent,
       soar_callback * cb;
 
       cb = (soar_callback *) head->first;
-      cb->function(the_agent, cb->data, call_data);
+	  cb->function(the_agent, cb->eventid, cb->data, call_data);
     
 
 /* REW: begin 28.07.96 */
@@ -523,7 +525,8 @@ void soar_pop_callback (agent* thisAgent,
 void soar_push_callback (agent* thisAgent, 
 			soar_callback_agent the_agent, 
 			SOAR_CALLBACK_TYPE callback_type, 
-			soar_callback_fn fn, 
+			soar_callback_fn fn,
+			soar_callback_event_id eventid,
 			soar_callback_data data,
 			soar_callback_free_fn free_fn)
 {
@@ -532,6 +535,7 @@ void soar_push_callback (agent* thisAgent,
   cb = (soar_callback *) malloc (sizeof(soar_callback));
   cb->function      = fn;
   cb->data          = data;
+  cb->eventid		= eventid ;
   cb->free_function = free_fn;
   cb->id            = NULL;
   
@@ -625,7 +629,7 @@ void soar_test_all_monitorable_callbacks(agent* thisAgent, soar_callback_agent t
   for(i = 1; i < NUMBER_OF_MONITORABLE_CALLBACKS; i++)
     {
       soar_add_callback(thisAgent, the_agent, static_cast<SOAR_CALLBACK_TYPE>(i), 
-			(soar_callback_fn) soar_callback_test_callback,
+			(soar_callback_fn) soar_callback_test_callback, i,
 			soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(i), TRUE), 
 			NULL, test_callback_name);
     }

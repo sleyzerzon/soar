@@ -49,6 +49,7 @@ namespace gSKI
 			static_cast<void*>(m_agent->GetSoarAgent()),
 			INPUT_PHASE_CALLBACK,
 			InputPhaseCallback,
+			0,
 			static_cast<void*>(this),
 			0,
 			"static_input_callback");
@@ -184,6 +185,7 @@ namespace gSKI
    */
 
   void InputLink::InputPhaseCallback( soar_callback_agent agent,
+									  soar_callback_event_id eventid,
                                       soar_callback_data callbackdata,
                                       soar_call_data calldata )
   {

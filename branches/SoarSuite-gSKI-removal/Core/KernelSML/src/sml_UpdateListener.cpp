@@ -43,6 +43,11 @@ bool UpdateListener::RemoveListener(egSKIUpdateEventId eventID, Connection* pCon
 	return last ;
 }
 
+// Called when an event occurs in the kernel
+void UpdateListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
+}
+
 // Called when a "RunEvent" occurs in the kernel
 void UpdateListener::HandleEvent(egSKIUpdateEventId eventID, int runFlags)
 {

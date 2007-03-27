@@ -186,6 +186,7 @@ namespace gSKI {
      * function is actually a pointer to the appropriate InputLink object.
      */
     static void InputPhaseCallback( soar_callback_agent agent,
+									soar_callback_event_id eventid,
                                     soar_callback_data callbackdata,
                                     soar_call_data calldata );
     

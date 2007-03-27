@@ -1313,6 +1313,7 @@ namespace gSKI
 		*/
 
 		static void HandleKernelRunEventCallback( soar_callback_agent agent,
+			soar_callback_event_id eventid,
 			soar_callback_data callbackdata,
 			soar_call_data calldata );
 

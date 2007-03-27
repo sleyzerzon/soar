@@ -1538,6 +1538,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 			  soar_add_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
 							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 
 								 HandleKernelRunEventCallback,
+								 (int)eventId,
 								 static_cast <void*> (eventInfo), 0, 
 								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
 			  }
@@ -1555,6 +1556,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 			  soar_add_callback (GetSoarAgent(),static_cast<void*>(GetSoarAgent()),
 							     static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 
 								 HandleKernelRunEventCallback,
+								 (int)eventId,
 								 static_cast <void*> (eventInfo), 0, 
 								 soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(EnumRemappings::KernelRunEventType(eventId)), 1));
 		  }
@@ -1643,6 +1645,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
    =========================
    */
    void Agent::HandleKernelRunEventCallback( soar_callback_agent agent,
+											 soar_callback_event_id eventid,
 					                         soar_callback_data callbackdata,
                                              soar_call_data calldata )
    {

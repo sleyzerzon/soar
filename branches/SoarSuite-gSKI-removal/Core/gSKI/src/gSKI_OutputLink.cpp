@@ -57,6 +57,7 @@ namespace gSKI
 			 static_cast<void*>(m_agent->GetSoarAgent()),
 			 OUTPUT_PHASE_CALLBACK,
 			 OutputPhaseCallback,
+			 0,
 			 static_cast<void*>(this),
 			 0,
 			 "output-link");
@@ -164,6 +165,7 @@ namespace gSKI
    */
 
    void OutputLink::OutputPhaseCallback( soar_callback_agent agent,
+					 soar_callback_event_id eventid,
 					 soar_callback_data callbackdata,
                                          soar_call_data calldata )
    {

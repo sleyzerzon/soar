@@ -31,6 +31,7 @@
 #include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 #include "sml_Events.h"
+#include "sml_AgentSML.h"
 
 using namespace sml ;
 
@@ -64,6 +65,11 @@ bool SystemListener::RemoveListener(egSKISystemEventId eventID, Connection* pCon
 void SystemListener::Init(KernelSML* pKernel)
 {
 	m_pKernelSML = pKernel ;
+}
+
+// Called when an event occurs in the kernel
+void SystemListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
 }
 
 // Called when a "SystemEvent" occurs in the kernel

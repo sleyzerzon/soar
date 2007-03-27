@@ -324,7 +324,9 @@ typedef char * soar_callback_id;
 typedef void * soar_callback_agent;
 typedef void * soar_callback_data;
 typedef void * soar_call_data;
+typedef int	   soar_callback_event_id;
 typedef void (*soar_callback_fn)(soar_callback_agent, 
+				 soar_callback_event_id,
 				 soar_callback_data, 
 				 soar_call_data);
 typedef void (*soar_callback_free_fn)(soar_callback_data);
@@ -337,6 +339,7 @@ typedef struct callback_struct
   soar_callback_id      id;
   soar_callback_fn      function;
   soar_callback_data    data;
+  soar_callback_event_id eventid ;
   soar_callback_free_fn free_function;
 } soar_callback;
 
@@ -344,6 +347,7 @@ extern void soar_add_callback (agent* thisAgent,
 			       soar_callback_agent, 
 			       SOAR_CALLBACK_TYPE, 
 			       soar_callback_fn, 
+				   soar_callback_event_id,
 			       soar_callback_data,
 			       soar_callback_free_fn, 
 			       soar_callback_id);

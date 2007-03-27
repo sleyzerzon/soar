@@ -43,6 +43,11 @@ bool StringListener::RemoveListener(egSKIStringEventId eventID, Connection* pCon
 	return last ;
 }
 
+// Called when an event occurs in the kernel
+void StringListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
+}
+
 // Called when a event occurs in the kernel
 bool StringListener::HandleEvent(egSKIStringEventId eventID, char const* pData, int maxLengthReturnValue, char* pReturnValue)
 {

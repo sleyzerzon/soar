@@ -17,6 +17,7 @@
 #include "sml_RunListener.h"
 #include "sml_PrintListener.h"
 #include "sml_XMLListener.h"
+#include "sml_OutputListener.h"
 #include "gSKI_Enumerations.h"
 
 // Forward declarations for gSKI
@@ -57,8 +58,6 @@ typedef TimeTagMap::const_iterator			TimeTagMapConstIter ;
 class AgentSML
 {
 protected:
-	// This is a callback we can register to listen for changes to the output-link
-	OutputListener*	m_pOutputListener ;
 
 	// This is a callback we register so we get called back each input phase (so we can check for incoming commands once per decision)
 	gSKI::IInputProducer* m_pInputProducer ;
@@ -86,6 +85,9 @@ protected:
 	RunListener			m_RunListener;
 	PrintListener		m_PrintListener;
 	XMLListener			m_XMLListener ;
+
+	// This is a callback we can register to listen for changes to the output-link
+	OutputListener		m_OutputListener ;
 
 	// We have to keep pointers to these objects so that we can release then during an init-soar.  Youch!
 	gSKI::IWMObject*	m_InputLinkRoot ;
@@ -153,7 +155,7 @@ public:
 	gSKI::IWMObject* GetOutputLinkRoot()			{ return m_OutputLinkRoot ; }
 
 //	void SetOutputListener(OutputListener* pListener)			{ m_pOutputListener = pListener ; }
-	OutputListener* GetOutputListener()							{ return m_pOutputListener ; }
+	OutputListener* GetOutputListener()							{ return &m_OutputListener ; }
 
 	void SetInputProducer(gSKI::IInputProducer* pInputProducer)	{ m_pInputProducer = pInputProducer ; }
 

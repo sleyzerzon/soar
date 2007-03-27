@@ -21,10 +21,23 @@
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
+#include "sml_AgentSML.h"
 
 #include "assert.h"
 
 using namespace sml ;
+
+void XMLListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
+{
+	m_pKernelSML = pKernelSML ;
+	m_pAgent	 = pAgentSML->GetIAgent() ;
+	m_EnablePrintCallback = true ;
+
+	for (int i = 0 ; i < kNumberEvents ; i++)
+		m_pAgentOutputFlusher[i] = NULL ;
+
+	SetAgentSML(pAgentSML) ;
+}
 
 // Returns true if this is the first connection listening for this event
 bool XMLListener::AddListener(egSKIXMLEventId eventID, Connection* pConnection)
@@ -59,6 +72,10 @@ bool XMLListener::RemoveListener(egSKIXMLEventId eventID, Connection* pConnectio
 	}
 
 	return last ;
+}
+
+void XMLListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
 }
 
 // Called when a "PrintEvent" occurs in the kernel

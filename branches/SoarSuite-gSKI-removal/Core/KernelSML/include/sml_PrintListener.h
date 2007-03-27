@@ -44,20 +44,19 @@ protected:
 	bool			m_EnablePrintCallback ;
 
 public:
-	PrintListener(KernelSML* pKernelSML, gSKI::Agent* pAgent)
-	{
-		m_pKernelSML = pKernelSML ;
-		m_pAgent	 = pAgent ;
-		m_EnablePrintCallback = true ;
-
-		for (int i = 0 ; i < kNumberPrintEvents ; i++)
-			m_pAgentOutputFlusher[i] = NULL ;
+	PrintListener() {
+		m_pKernelSML = 0 ;
+		m_pAgent	 = 0 ;
 	}
 
 	virtual ~PrintListener()
 	{
 		Clear() ;
 	}
+	void Init(KernelSML* pKernelSML, AgentSML* pAgentSML) ;
+
+	// Called when an event occurs in the kernel
+	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
 	virtual bool AddListener(egSKIPrintEventId eventID, Connection* pConnection) ;

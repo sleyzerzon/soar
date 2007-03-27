@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <string>
+#include <map>
 
 // Forward definitions for kernel
 typedef struct agent_struct agent;
@@ -35,32 +36,22 @@ class AgentSML ;
 
 class KernelCallback {
 protected:
-	int			m_EventID ;
 	AgentSML*	m_pAgentSML ;
-	bool		m_Registered ;
-	std::string m_CallbackID ;
+	std::map<int, bool> m_Registered ;
 
 public:
-	static void KernelCallbackStatic(void* pAgent, void* pData, void* pCallData) ;
+	static void KernelCallbackStatic(void* pAgent, int eventID, void* pData, void* pCallData) ;
 	static int  GetCallbackFromEventID(int eventID) ;
 
-	KernelCallback(int eventID, AgentSML* pAgentSML)
-	{
-		m_EventID	= eventID ;
-		m_pAgentSML = pAgentSML ;
-		m_Registered = false ;
-	}
+	KernelCallback() { m_pAgentSML = 0 ; }
+	virtual ~KernelCallback() ;
 
-	~KernelCallback()
-	{
-		if (m_Registered)
-			UnregisterWithKernel() ;
-	}
+	void SetAgentSML(AgentSML* pAgentSML) { m_pAgentSML = pAgentSML ; }
+	void ClearKernelCallback() ;
+	void RegisterWithKernel(int eventID) ;
+	void UnregisterWithKernel(int eventID) ;
 
-	void RegisterWithKernel() ;
-	void UnregisterWithKernel() ;
-
-	virtual void OnEvent(int eventID, AgentSML* pAgentSML, void* pCallData) = 0 ;
+	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) = 0 ;
 } ;
 
 }
