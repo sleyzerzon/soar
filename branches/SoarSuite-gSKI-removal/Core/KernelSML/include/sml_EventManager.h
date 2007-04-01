@@ -121,8 +121,7 @@ public:
 	// Returns true if this is the first connection listening for this event
 	virtual bool BaseAddKernelListener(EventType eventID, KernelCallback* pKernelCallback)
 	{
-		unused(eventID) ;
-		unused(pKernelCallback) ;
+		pKernelCallback->RegisterWithKernel(eventID) ;
 		return true ;
 	}
 

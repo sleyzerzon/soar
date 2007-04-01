@@ -50,6 +50,7 @@ public:
 	void ClearKernelCallback() ;
 	void RegisterWithKernel(int eventID) ;
 	void UnregisterWithKernel(int eventID) ;
+	bool IsRegisteredWithKernel(int eventID) ;
 
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) = 0 ;
 } ;

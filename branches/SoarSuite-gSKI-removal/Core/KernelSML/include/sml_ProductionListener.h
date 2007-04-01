@@ -25,6 +25,7 @@
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
 #include "sml_EventManager.h"
+#include "sml_Events.h"
 
 #include <string>
 #include <map>
@@ -62,6 +63,9 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(egSKIProductionEventId eventID, Connection* pConnection) ;
+
+	// Called when a "ProductionEvent" occurs in the kernel
+	virtual void HandleEvent(smlProductionEventId eventID, AgentSML* pAgentSML, std::string const& productionName) ;
 
 	// Called when a "ProductionEvent" occurs in the kernel
 	virtual void HandleEvent(egSKIProductionEventId eventId, gSKI::Agent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match) ;

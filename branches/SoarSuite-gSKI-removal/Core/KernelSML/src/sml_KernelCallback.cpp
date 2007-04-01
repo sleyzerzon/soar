@@ -34,7 +34,16 @@ void KernelCallback::KernelCallbackStatic(void* pAgent, int eventID, void* pData
 // Want to keep kernel types internal to the implementation files so just using an int.
 int KernelCallback::GetCallbackFromEventID(int eventID)
 {
-	return PRODUCTION_JUST_ADDED_CALLBACK ;
+	switch (eventID)
+	{
+	case smlEVENT_AFTER_PRODUCTION_ADDED:		return PRODUCTION_JUST_ADDED_CALLBACK ;
+	case smlEVENT_BEFORE_PRODUCTION_REMOVED:	return PRODUCTION_JUST_ABOUT_TO_BE_EXCISED_CALLBACK ;
+	case smlEVENT_AFTER_PRODUCTION_FIRED:		return FIRING_CALLBACK ;
+	case smlEVENT_BEFORE_PRODUCTION_RETRACTED:	return RETRACTION_CALLBACK ;
+	default: assert(false) ;	// Unrecognized event id passed
+	}
+
+	return smlEVENT_INVALID_EVENT ;
 }
 
 KernelCallback::~KernelCallback()
@@ -55,6 +64,11 @@ void KernelCallback::ClearKernelCallback()
 	m_Registered.clear() ;
 }
 
+bool KernelCallback::IsRegisteredWithKernel(int eventID)
+{
+	return (m_Registered[eventID] == true) ;
+}
+
 void KernelCallback::RegisterWithKernel(int eventID)
 {
 	// Should only register once
@@ -63,7 +77,7 @@ void KernelCallback::RegisterWithKernel(int eventID)
 
 	// Base the id on the address of this object which ensures it's unique
 	std::ostringstream buffer;
-	buffer << "id_0x" << this << eventID;
+	buffer << "id_0x" << this << "_evt_" << eventID;
 	std::string callbackID = buffer.str() ;
 
 	agent* pAgent = m_pAgentSML->GetAgent() ;
@@ -80,7 +94,7 @@ void KernelCallback::UnregisterWithKernel(int eventID)
 	m_Registered[eventID] = false ;
 
 	std::ostringstream buffer;
-	buffer << "id_0x" << this << eventID;
+	buffer << "id_0x" << this << "_evt_" << eventID;
 	std::string callbackID = buffer.str() ;
 
 	agent* pAgent = m_pAgentSML->GetAgent() ;
