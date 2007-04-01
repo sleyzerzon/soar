@@ -835,7 +835,10 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 		AnalyzeXML response ;
 		response.Analyze(pResponse) ;
 
-		result = response.GetResultString() ;
+		char const* pRes = response.GetResultString() ;
+
+		if (pRes)
+			result = pRes ;
 	}
 	else
 	{
