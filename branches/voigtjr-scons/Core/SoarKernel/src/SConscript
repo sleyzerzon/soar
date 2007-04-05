@@ -1,12 +1,17 @@
+#!/usr/bin/python
 import os
 import glob
 
 Import('env')
-env = env.Copy(CXXFLAGS = '-fno-strict-aliasing', CPPPATH = ['#Core/shared', '#Core/CLI/include', '#Core/gSKI/include'])
+env.Append(CPPFLAGS = ' -fno-strict-aliasing')
+
+print os.getcwd()
 
 sources = []
 sources.append(glob.glob("*.cpp"))
 sources.append(glob.glob("*.h"))
 sources.append(glob.glob(os.path.join("..","include","*.h")))
+
+print sources
 
 env.Library('SoarKernel', sources)
