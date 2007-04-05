@@ -1,57 +1,103 @@
+#!/usr/bin/python
 import os
 
-env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
-conf = Configure(env)
+# Custom test for GCC visibility flag
+def CheckVisibilityFlag(context):
+	visCheckSource = "char foo;"
+	context.Message('Checking support for -fvisibility=hidden...')
 
-# Require header function
+	lastCPPFLAGS = context.env['CPPFLAGS']
+	context.env.Append(CPPFLAGS = " -fvisibility=hidden")
+	
+	result = context.TryCompile(visCheckSource, 'c')
+	if not result:
+		context.env.Replace(CPPFLAGS = lastCPPFLAGS)
+
+	context.Result(result)
+	return result
+
+env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
+conf = Configure(env, custom_tests = {'CheckVisibilityFlag' : CheckVisibilityFlag})
+
+# What platform are we on?
+print "Detected", os.name, "platform."
+if os.name == 'posix':
+	conf.env.Append(CPPFLAGS = ' -DSCONS_POSIX')
+elif os.name == 'nt':
+	conf.env.Append(CPPFLAGS = ' -DSCONS_NT')
+	# TODO: finish windows platform
+	print "Platform unsupported."
+	Exit(1)
+else:
+	# TODO: do osx platform if it isn't 'posix'
+	print "Platform unsupported."
+	Exit(1)
+print
+
+# check if the compiler supports -fvisibility=hidden (GCC >= 4)
+if conf.env['CC'] == 'gcc':
+	if conf.CheckVisibilityFlag():
+		conf.env.Append(CPPFLAGS = " -fvisibility=hidden")
+		
+# Require functions
 def require(header):
 	if not conf.CheckCXXHeader(header):
 		print "Couldn't find required header", header
 		Exit(1)
+def requireLib(lib):
+	if not conf.CheckLib(lib):
+		print "Couldn't find required lib", lib
+		Exit(1)
 
-print "Checking for required headers..."
 require('assert.h')
 require('ctype.h')
 require('math.h')
 require('signal.h')
 require('stdio.h')
 require('time.h')
-print
 
-# What platform are we on?
 if os.name == 'posix':
-	print "Detected posix platform."
-	conf.env.Append('-DSCONS_POSIX')
-elif os.name == 'nt':
-	print "Detected nt platform."
-	conf.env.Append('-DSCONS_NT')
-else:
-	print "Detected unsupported platform:", os.name
-	Exit(1)
-
-print "Checking for platform-specific headers..."
-if os.name == 'posix':
+	require('arpa/inet.h')
+	require('ctype.h')
+	require('dlfcn.h')
 	require('errno.h')
+	require('fcntl.h')
 	require('inttypes.h')
+	require('limits.h')
+	require('locale.h')
+	require('malloc.h')
+	require('math.h')
+	require('memory.h')
+	require('netdb.h')
+	require('netinet/in.h')
+	require('pthread.h')
+	require('signal.h')
 	require('stddef.h')
 	require('stdint.h')
 	require('stdlib.h')
 	require('string.h')
 	require('strings.h')
+	require('sys/param.h')
 	require('sys/resource.h')
+	require('sys/socket.h')
 	require('sys/stat.h')
 	require('sys/syscall.h')
 	require('sys/time.h')
 	require('sys/types.h')
 	require('unistd.h')
 	require('utime.h')
+
+	requireLib('dl')
+	requireLib('m')
+	requireLib('pthread')
+
 elif os.name == 'nt':
+	# TODO: Many more things go here
 	require('direct.h')
 	require('windows.h')
 print
 
 env = conf.Finish()
-
 Export('env')
 
-SConscript(['Core/SoarKernel/src/SConscript'])
+SConscript('#Core/SoarKernel/SConscript')

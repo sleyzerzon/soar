@@ -32,12 +32,26 @@
 #include <time.h>
 
 #ifdef SCONS_NT
+#ifndef WIN32
+#define WIN32 1
+#endif
+#endif
+
+#ifdef WIN32
 #include <windows.h>
 #include <direct.h>
+
+// 
+// Enables fake rusage code in SoarKernel/src/init_soar.cpp
+#define USE_FAKE_RSUAGE
+
 //
 // Visual Studio 2005 requires these:
 #define getcwd _getcwd
 #define chdir _chdir
+
+//
+
 
 #endif
 
