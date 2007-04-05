@@ -19,13 +19,17 @@ def CheckVisibilityFlag(context):
 env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
 conf = Configure(env, custom_tests = {'CheckVisibilityFlag' : CheckVisibilityFlag})
 
+def addSymbol(symbol):
+	print "Adding symbol", symbol
+	conf.env.Append(CPPFLAGS = ' -D%s' % symbol)
+
 # What platform are we on?
 print "Detected", os.name, "platform."
 if os.name == 'posix':
-	conf.env.Append(CPPFLAGS = ' -DSCONS_POSIX')
+	addSymbol("SCONS_POSIX")
 elif os.name == 'nt':
-	conf.env.Append(CPPFLAGS = ' -DSCONS_NT')
 	# TODO: finish windows platform
+	addSymbol("SCONS_NT")
 	print "Platform unsupported."
 	Exit(1)
 else:
@@ -101,3 +105,11 @@ env = conf.Finish()
 Export('env')
 
 SConscript('#Core/SoarKernel/SConscript')
+SConscript('#Core/gSKI/SConscript')
+SConscript('#Core/ConnectionSML/SConscript')
+SConscript('#Core/ElementXML/SConscript')
+SConscript('#Core/CLI/SConscript')
+SConscript('#Core/ClientSML/SConscript')
+SConscript('#Core/KernelSML/SConscript')
+SConscript('#Tools/TestCLI/SConscript')
+

@@ -1,0 +1,25 @@
+#!/usr/bin/python
+import glob
+
+Import('env')
+env = env.Copy()
+env.Prepend(CPPPATH = ['include', 
+		       '../../Core/ClientSML/include',
+		       '../../Core/ElementXML/include',
+		       '../../Core/ConnectionSML/include'])
+
+libadd = [ 'ClientSML', 
+	   'ConnectionSML',
+	   'ElementXML',
+	   'SoarKernelSML', 
+	   'gSKI', 
+	   'SoarKernel', ]
+
+libpath = [ '../../Core/ClientSML',
+	    '../../Core/ConnectionSML',
+	    '../../Core/ElementXML',
+	    '../../Core/KernelSML', 
+	    '../../Core/gSKI', 
+	    '../../Core/SoarKernel', ]
+
+env.Program('TestCLI', glob.glob('*.cpp'), LIBS = libadd, LIBPATH = libpath)
