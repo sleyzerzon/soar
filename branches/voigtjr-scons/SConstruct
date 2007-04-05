@@ -1,0 +1,57 @@
+import os
+
+env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
+conf = Configure(env)
+
+# Require header function
+def require(header):
+	if not conf.CheckCXXHeader(header):
+		print "Couldn't find required header", header
+		Exit(1)
+
+print "Checking for required headers..."
+require('assert.h')
+require('ctype.h')
+require('math.h')
+require('signal.h')
+require('stdio.h')
+require('time.h')
+print
+
+# What platform are we on?
+if os.name == 'posix':
+	print "Detected posix platform."
+	conf.env.Append('-DSCONS_POSIX')
+elif os.name == 'nt':
+	print "Detected nt platform."
+	conf.env.Append('-DSCONS_NT')
+else:
+	print "Detected unsupported platform:", os.name
+	Exit(1)
+
+print "Checking for platform-specific headers..."
+if os.name == 'posix':
+	require('errno.h')
+	require('inttypes.h')
+	require('stddef.h')
+	require('stdint.h')
+	require('stdlib.h')
+	require('string.h')
+	require('strings.h')
+	require('sys/resource.h')
+	require('sys/stat.h')
+	require('sys/syscall.h')
+	require('sys/time.h')
+	require('sys/types.h')
+	require('unistd.h')
+	require('utime.h')
+elif os.name == 'nt':
+	require('direct.h')
+	require('windows.h')
+print
+
+env = conf.Finish()
+
+Export('env')
+
+SConscript(['Core/SoarKernel/src/SConscript'])
