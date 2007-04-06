@@ -10,16 +10,12 @@ env.Prepend(CPPPATH = ['include',
 
 libadd = [ 'ClientSML', 
 	   'ConnectionSML',
-	   'ElementXML',
-	   'SoarKernelSML', 
-	   'gSKI', 
-	   'SoarKernel', ]
+	   'ElementXML', 
+	   'SoarKernelSML', ]
 
 libpath = [ '../../Core/ClientSML',
 	    '../../Core/ConnectionSML',
-	    '../../Core/ElementXML',
-	    '../../Core/KernelSML', 
-	    '../../Core/gSKI', 
-	    '../../Core/SoarKernel', ]
+	    '../../Core/ElementXML', 
+	    '../../Core/KernelSML', ]
 
 env.Program('TestCLI', glob.glob('*.cpp'), LIBS = libadd, LIBPATH = libpath)
