@@ -18,4 +18,4 @@ libpath = [ '../../Core/ClientSML',
 	    ]
 
 env.Append(LIBS = libadd, LIBPATH = libpath)
-env.Program('TestCLI', glob.glob('*.cpp'))
+env.Program('TestSoarPerformance', glob.glob('*.cpp'))
