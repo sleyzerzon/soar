@@ -18,4 +18,5 @@ libpath = [ '../../Core/ClientSML',
 	    '../../Core/ElementXML', 
 	    '../../Core/KernelSML', ]
 
-env.Program('TestCLI', glob.glob('*.cpp'), LIBS = libadd, LIBPATH = libpath)
+env.Append(LIBS = libadd, LIBPATH = libpath)
+env.Program('TestCLI', glob.glob('*.cpp'))

@@ -12,13 +12,7 @@ env.Prepend(CPPPATH = ['src',
 		       '../ElementXML/include',
 		       '../ConnectionSML/include'])
 
-libadd1 = [ 'SoarKernel',
-	   'gSKI',
-	   'CommandLineInterface',
-	   'ConnectionSML',
-	   'ElementXML', ]
-
-libadd2 = [
+libadd = [
 	   'ElementXML',
 	   'ConnectionSML',
 	   'CommandLineInterface',
@@ -26,10 +20,12 @@ libadd2 = [
 	   'SoarKernel', 
 	   ]
 
-libpath = [ '../SoarKernel',
+libpath = [ 
+	    '../SoarKernel',
 	    '../gSKI',
 	    '../CLI',
 	    '../ConnectionSML',
-	    '../ElementXML', ]
+	    '../ElementXML', 
+	    ]
 
-env.SharedLibrary('SoarKernelSML', glob.glob('src/*.cpp'), LIBS = libadd2, LIBPATH = libpath)
+env.SharedLibrary('SoarKernelSML', glob.glob('src/*.cpp'), LIBS = libadd, LIBPATH = libpath)
