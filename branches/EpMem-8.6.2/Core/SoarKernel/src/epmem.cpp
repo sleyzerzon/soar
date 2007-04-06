@@ -67,6 +67,10 @@ extern unsigned long hash_string(const char *s);
    fraction_to_trim     - fraction of a new memory to trim before recording it
    card_act_ratio       - Specifies the ratio of match score weighting
                           between match cardinality and match activation.
+   epmem_age_limit      - If a memory has not be created or retrieved
+                          after this many other memories have been recorded
+                          then pitch it.  Set this to 0 for no limit.
+                          2100 = 99%; 600=95%
                           
    %%%TODO:  Made these values command line configurable
 
@@ -79,7 +83,8 @@ extern unsigned long hash_string(const char *s);
 #define ubiquitous_threshold 1.0
 #define ubiquitous_max 25
 #define fraction_to_trim 0.0
-float g_card_act_ratio=1.5;
+float g_card_act_ratio=1.0;
+#define epmem_age_limit 2100
 
 /*======================================================================
  * Data structures
@@ -194,6 +199,8 @@ typedef struct actwme_struct
  *         match_score - the total match score from the last partial match
  *         act_total   - the sum of the activation levels in the last match
  *         num_matches - the number of cue entries that matched in the last match
+ *         last_ret    - the last time this memory was created or retrieved
+ *                       (a value of -1 indicates the memory has been forgotten)
  *
  */
 typedef struct episodic_memory_struct
@@ -204,6 +211,7 @@ typedef struct episodic_memory_struct
     float match_score;
     float act_total;
     int num_matches;
+    int last_ret;
 } episodic_memory;
 
 
@@ -596,38 +604,6 @@ void append_entry_to_arraylist(agent *thisAgent, arraylist *al, void *new_entry)
 }//append_entry_to_arraylist
 
 /* ===================================================================
-   remove_entry_from_arraylist
-
-   Given an index, this function removes the entry at that index from
-   an arraylist and moves down subsequent entries to fill in the gap.
-   The caller is responsible for cleaning up the entry itself.
-   
-   Created: 04 Oct 2004
-   =================================================================== */
-void *remove_entry_from_arraylist(arraylist *al, int index)
-{
-    int i;
-    void *retval = NULL;
-    
-    //Catch erroneous input values
-    if (al == NULL) return NULL;
-    if (index >= al->size) return NULL;
-    if (index < 0) return NULL;
-
-    retval = al->array[index];
-    al->array[index] = NULL;
-    for(i = index + 1; i < al->size; i++)
-    {
-        al->array[i - 1] = al->array[i];
-    }
-    
-    (al->size)--;
-
-    return retval;
-    
-}//remove_entry_from_arraylist
-
-/* ===================================================================
    get_arraylist_entry
 
    Given an index, this function returns the entry in the arraylist
@@ -669,6 +645,80 @@ void set_arraylist_entry(agent *thisAgent, arraylist *al, int index, void *newva
 
     al->array[index] = newval;
 }//set_arraylist_entry
+
+/* ===================================================================
+   remove_entry_from_arraylist
+
+   Given an index, this function removes the entry at that index from
+   an arraylist and moves down subsequent entries to fill in the gap.
+   The caller is responsible for cleaning up the entry itself.
+   
+   Created: 04 Oct 2004
+   =================================================================== */
+void *remove_entry_from_arraylist(arraylist *al, int index)
+{
+    int i;
+    void *retval = NULL;
+    
+    //Catch erroneous input values
+    if (al == NULL) return NULL;
+    if (index >= al->size) return NULL;
+    if (index < 0) return NULL;
+
+    retval = al->array[index];
+    al->array[index] = NULL;
+    for(i = index + 1; i < al->size; i++)
+    {
+        al->array[i - 1] = al->array[i];
+    }
+    
+    (al->size)--;
+
+    return retval;
+    
+}//remove_entry_from_arraylist
+
+/* ===================================================================
+   remove_entry_from_arraylist_by_ptr
+
+   Given a pointer, this function removes the entry from an arraylist
+   that matches that pointer.
+
+   CAVEAT: The caller is responsible for cleaning up the entry itself.
+
+   
+   Created: 04 Apr 2007
+   =================================================================== */
+void remove_entry_from_arraylist_by_ptr(arraylist *al, void *ptr)
+{
+    int i;
+    void *curr = NULL;
+    int bFound = FALSE;
+    
+    //Loop over the associated epmems list to find this memory
+    for(i = 1; i < al->size; i++)
+    {
+        //get the entry pointer
+        curr = al->array[i];
+
+        //If we've found it just shift everything down a notch
+        if (bFound)
+        {
+            al->array[i - 1] = al->array[i];
+        }
+        //Otherwise see if we've found it
+        else if (curr == ptr)
+        {
+            bFound = TRUE;
+        }
+    }//for
+
+    if (bFound)
+    {
+        (al->size)--;
+    }
+    
+}//remove_entry_from_arraylist_by_ptr
 
 
 /* ===================================================================
@@ -2936,6 +2986,88 @@ arraylist *trim_epmem(arraylist *epmem)
 
 
 /* ===================================================================
+   forget_epmem
+
+   This routine removes the contents of an episodic memory as well
+   as associated entries in the working memory tree.  It leaves
+   the episodic memory header intact to aid in record keeping (especially
+   research related data collection).
+
+   Created: 05 Apr 2007
+   =================================================================== */
+void forget_epmem(agent *thisAgent, episodic_memory *epmem)
+{
+    int i;
+    
+    //Confirm the memory exists and hasn't already been forgotten
+    if ((epmem == NULL)
+        || (epmem->content == NULL)
+        || (epmem->content->size == 0))
+    {
+        return;
+    }
+        
+    //Clean up the actwme list (but not the associated wmetree nodes)
+    for(i = 0; i < epmem->content->size; i++)
+    {
+        actwme *aw = (actwme *)get_arraylist_entry(thisAgent,
+                                                   epmem->content,
+                                                   i);
+        remove_entry_from_arraylist_by_ptr(aw->node->assoc_memories, epmem);
+    }//for
+
+    //Remove the episodic memory content and replace with empty list
+    destroy_arraylist(thisAgent, epmem->content);
+    epmem->content = epmem->content = make_arraylist(thisAgent, 1);
+
+    //%%%DEBUGGING
+    print(thisAgent, "\nFORGOT MEMORY %d (last use %d)",
+          epmem->index, epmem->last_ret);
+    
+    //Mark this epmem as removed
+    epmem->last_ret = -1;
+
+}//forget_epmem
+
+/* ===================================================================
+   epmem_forget_via_recency_of_use
+
+   This routine scans all episodic memories for any that have not
+   been created or retrieved since the last N were recorded (where
+   N == epmem_age_limit).
+
+   Created: 05 Apr 2007
+   =================================================================== */
+void epmem_forget_via_recency_of_use(agent *thisAgent)
+{
+    int i;
+    episodic_memory *epmem;
+
+    for (i = 1; i < thisAgent->epmem_memories->size; i++)
+    {
+        epmem =
+            (episodic_memory *)get_arraylist_entry(thisAgent,
+                                                   thisAgent->epmem_memories,
+                                                   i);
+
+        //Check for missing epmem
+        if (epmem == NULL) continue;
+        
+        if (epmem->last_ret > 0)
+        {
+            int age = thisAgent->epmem_memories->size - epmem->last_ret;
+            if (age > epmem_age_limit)
+            {
+                forget_epmem(thisAgent, epmem);
+            }
+        }//if
+
+                
+    }//for
+    
+}//epmem_forget_via_recency_of_use
+
+/* ===================================================================
    record_epmem
 
    Once it has been determined that an epmem needs to be recorded,
@@ -2964,6 +3096,7 @@ void record_epmem(agent *thisAgent)
     new_epmem->match_score = 0.0;
     new_epmem->act_total = 0.0;
     new_epmem->num_matches = 0;
+    new_epmem->last_ret = thisAgent->epmem_memories->size;
 
     //Starting with bottom_goal and moving toward top_goal, add all
     //the current states to the wmetree and record the full WM
@@ -3034,6 +3167,10 @@ void record_epmem(agent *thisAgent)
 //      print_memory(thisAgent,
 //                   ((episodic_memory *)get_arraylist_entry(thisAgent, thisAgent->epmem_memories,thisAgent->epmem_memories->size - 1))->content,
 //                   thisAgent->epmem_wmetree, 0, 5);
+
+    
+    //Check for old memories to forget
+    epmem_forget_via_recency_of_use(thisAgent);
     
 }//record_epmem
 
@@ -4985,10 +5122,13 @@ arraylist *respond_to_query(agent *thisAgent, epmem_header *h)
         start_timer(thisAgent, &(thisAgent->epmem_installmem_start_time));
         install_epmem_in_wm(thisAgent, h, al_retrieved);
         stop_timer(thisAgent, &(thisAgent->epmem_installmem_start_time), &(thisAgent->epmem_installmem_total_time));
-
+        
         //Provide meta-data on the match
         h->retrieval_count = 1;
         install_match_metadata(thisAgent, h);
+
+        //Update the memory's recency
+        h->curr_memory->last_ret = thisAgent->epmem_memories->size;
     }
     else
     {
@@ -5155,6 +5295,9 @@ void respond_to_command_next(agent *thisAgent, epmem_header *h)
         //Provide meta-data on the match
         h->retrieval_count = ret_count + 1;
         install_match_metadata(thisAgent, h);
+        
+        //Update the memory's recency
+        h->curr_memory->last_ret = thisAgent->epmem_memories->size;
     }
     else
     {
@@ -5829,6 +5972,9 @@ int epmem_save_epmems_to_file(agent *thisAgent,
         //Write index
         fprintf(f, "%i ", i);
 
+        //Save the last_ret prefaced with an 'a' character
+        fprintf(f, "a%i ", epmem->last_ret);
+
         //Note:  There's no need to save last_usage and match_score
 
         //Write beginning of actwme list
@@ -6279,14 +6425,26 @@ int epmem_load_epmems_from_file(agent *thisAgent,
             continue;
         }
 
-        //Sanity check
+        //*Possibly* read epmem->last_ret.  In some older epmem files the
+        //last_ret value is missing so I have to detect and handle that case.
+        //If the value is present it will be prefaced with an 'a' character
         str = strtok(NULL, " ");
-        if (str[0] != '[')
+        switch(str[0])
         {
-            print(thisAgent, "ERROR: File improperly formatted.  Expected '[' but found %s. Epmems load aborted.", str);
-            //%%%Clean up already loaded data here
-            return 0;
-        }
+            case '[':
+                epmem->last_ret = thisAgent->epmem_memories->size;
+                break;
+            case 'a':
+                str = str + 1;
+                epmem->last_ret = atoi(str);
+                str = strtok(NULL, " ");
+                if (str[0] == '[') break; // sanity check
+                //otherwise fall through to unexpected token error
+            default:
+                print(thisAgent, "ERROR: File improperly formatted.  Expected '[' but found %s. Epmems load aborted.", str);
+                //%%%Clean up already loaded data here
+                return 0;
+        }//switch
 
         //Allocate the content list
         epmem->content = make_arraylist(thisAgent, 20);
