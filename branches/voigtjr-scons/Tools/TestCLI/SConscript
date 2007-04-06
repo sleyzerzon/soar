@@ -11,12 +11,12 @@ env.Prepend(CPPPATH = ['include',
 libadd = [ 'ClientSML', 
 	   'ConnectionSML',
 	   'ElementXML', 
-	   'SoarKernelSML', ]
+	   ]
 
 libpath = [ '../../Core/ClientSML',
 	    '../../Core/ConnectionSML',
 	    '../../Core/ElementXML', 
-	    '../../Core/KernelSML', ]
+	    ]
 
 env.Append(LIBS = libadd, LIBPATH = libpath)
 env.Program('TestCLI', glob.glob('*.cpp'))

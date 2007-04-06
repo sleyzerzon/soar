@@ -30,7 +30,7 @@
 #include "Windows.h"	// Needed for load library
 #undef SendMessage		// Windows defines this as a macro.  Yikes!
 
-#elif defined(HAVE_DLFCN_H)
+#else
 #include <dlfcn.h>      // Needed for dlopen and dlsym
 #define GetProcAddress dlsym
 
@@ -189,14 +189,8 @@ bool EmbeddedConnection::AttachConnection(char const* pLibraryName, bool optimiz
 #  else
 #    define WINDOWS_SHARED
 #  endif
-#endif
-
-#ifdef HAVE_CONFIG_H //to test for Linux/OS X
-#  ifdef STATIC_LINKED
-#    define LINUX_STATIC
-#  elif defined(HAVE_DLFCN_H) //if we don't have this, then we're implicitly doing a static build
-#    define LINUX_SHARED
-#  endif
+#else
+# define LINUX_SHARED
 #endif
 
 #ifdef WINDOWS_SHARED
@@ -276,8 +270,29 @@ bool EmbeddedConnection::AttachConnection(char const* pLibraryName, bool optimiz
 	// If we're not in Windows and we can't dynamically load methods we'll just get
 	// by with the two we really need.  This just means we can't get maximum optimization on
 	// this particular platform.
-	m_pProcessMessageFunction = &sml_ProcessMessage;
-	m_pCreateEmbeddedFunction = &sml_CreateEmbeddedConnection;
+	//
+	//m_pProcessMessageFunction = &sml_ProcessMessage;
+	//m_pCreateEmbeddedFunction = &sml_CreateEmbeddedConnection;
+
+	// reset error
+	dlerror();
+
+	// load symbol
+	m_pProcessMessageFunction = (ProcessMessageFunction) dlsym(hLibrary, "sml_ProcessMessage");
+	{
+		const char *dlsym_error = dlerror();
+		if (dlsym_error) {
+			SetError(Error::kFunctionsNotFound);
+		}
+	}
+
+	m_pCreateEmbeddedFunction = (CreateEmbeddedConnectionFunction) dlsym(hLibrary, "sml_CreateEmbeddedConnection");
+	{
+		const char *dlsym_error = dlerror();
+		if (dlsym_error) {
+			SetError(Error::kFunctionsNotFound);
+		}
+	}
 
 #endif // defined(LINUX_SHARED) || defined(WINDOWS_SHARED)
 
