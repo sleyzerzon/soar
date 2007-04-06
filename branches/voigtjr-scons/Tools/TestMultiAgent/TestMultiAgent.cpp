@@ -56,15 +56,10 @@ void SLEEP(long secs, long msecs)
 #include <fstream>
 #include <string>
 
-#if HAVE_STRINGS_H
-#include <strings.h>
-#if HAVE_STRCASECMP
-#define stricmp strcasecmp
-#endif // HAVE_STRCASECMP
-#endif // HAVE_STRINGS_H
-
 #ifdef _MSC_VER
 #define stricmp _stricmp
+#else
+#define stricmp strcasecmp
 #endif
 
 using namespace sml ;

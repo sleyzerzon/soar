@@ -8,15 +8,11 @@
 #include <string>
 #include <time.h>
 
-#if HAVE_STRINGS_H
-#include <strings.h>
-#if HAVE_STRCASECMP
-#define stricmp strcasecmp
-#endif // HAVE_STRCASECMP
-#endif // HAVE_STRINGS_H
-
 #ifdef _MSC_VER
 #define stricmp _stricmp
+#else
+#include <strings.h>
+#define stricmp strcasecmp
 #endif
 
 //#include <crtdbg.h>
