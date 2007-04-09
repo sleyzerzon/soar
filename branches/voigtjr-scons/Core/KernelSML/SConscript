@@ -28,4 +28,5 @@ libpath = [
 	    '../ElementXML', 
 	    ]
 
-env.SharedLibrary('SoarKernelSML', glob.glob('src/*.cpp'), LIBS = libadd, LIBPATH = libpath)
+SoarKernelSML = env.SharedLibrary('SoarKernelSML', glob.glob('src/*.cpp'), LIBS = libadd, LIBPATH = libpath)
+env.Install('#SoarLibrary/lib', SoarKernelSML)

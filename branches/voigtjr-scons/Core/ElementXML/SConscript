@@ -5,4 +5,5 @@ Import('env')
 env = env.Copy()
 env.Prepend(CPPPATH = ['src', 'include',])
 
-env.SharedLibrary('ElementXML', glob.glob('src/*.cpp'))
+ElementXML = env.SharedLibrary('ElementXML', glob.glob('src/*.cpp'))
+env.Install('#SoarLibrary/lib', ElementXML)

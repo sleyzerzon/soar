@@ -11,4 +11,5 @@ if os.name == 'posix':
 	env.Append(CPPFLAGS = ' -DUNIX')
 
 
-env.Library('gSKI', glob.glob('src/*.cpp'))
+gSKI = env.Library('gSKI', glob.glob('src/*.cpp'))
+env.Install('#SoarLibrary/lib', gSKI)

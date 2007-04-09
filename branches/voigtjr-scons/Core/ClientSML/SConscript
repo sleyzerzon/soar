@@ -5,4 +5,5 @@ Import('env')
 env = env.Copy()
 env.Prepend(CPPPATH = ['src', 'include', '../ElementXML/include', '../ConnectionSML/include', ])
 
-env.Library('ClientSML', glob.glob('src/*.cpp'))
+ClientSML = env.Library('ClientSML', glob.glob('src/*.cpp'))
+env.Install('#SoarLibrary/lib', ClientSML)

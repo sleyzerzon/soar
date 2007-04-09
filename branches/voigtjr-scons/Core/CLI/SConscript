@@ -12,4 +12,5 @@ env.Prepend(CPPPATH = ['src',
 		       '../ConnectionSML/include', 
 		       '../KernelSML/include', ])
 
-env.Library('CommandLineInterface', glob.glob('src/*.cpp'))
+CommandLineInterface = env.Library('CommandLineInterface', glob.glob('src/*.cpp'))
+env.Install('#SoarLibrary/lib', CommandLineInterface)
