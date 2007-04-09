@@ -24,5 +24,11 @@ libpath = [
 swigflags = '-c++ -java -Wall -package sml -ICore/ClientSML/include -ICore/ElementXML/include -ICore/ConnectionSML/include -outdir Core/ClientSMLSWIG/Java/build'
 
 Java_sml_ClientInterface = env.SharedLibrary('Java_sml_ClientInterface', glob.glob('*.i'), LIBS = libadd, LIBPATH = libpath, SWIGFLAGS = swigflags, SWIGCXXFILESUFFIX = "_wrap.cpp")
-env.Command('#SoarLibrary/bin/sml.jar', 'Java_sml_ClientInterface_wrap.cpp', 'Core/ClientSMLSWIG/Java/smlJar.sh')
 env.Install('#SoarLibrary/lib', Java_sml_ClientInterface)
+
+env.Java(target = 'classes', source = 'build')
+env.Append(JARCHDIR = 'Core/ClientSMLSWIG/Java/classes')
+
+sml_jar = env.Jar(target = 'sml.jar', source = 'classes')
+env.Install('#SoarLibrary/bin', sml_jar)
+
