@@ -230,9 +230,6 @@ typedef struct preference_struct {
   float numeric_value;
     /* END: REW: 2003-01-08 */
 
-  // RPM 4/07: bug 961: these track the value of the numeric (RL) preferences and the numeric (constant) preferences
-  int total_preferences_plus_const_for_candidate;
-  float numeric_plus_const_value;
   /////#endif
 
 } preference;

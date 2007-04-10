@@ -3647,13 +3647,11 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 		if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate){
 				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-				print(thisAgent, "RL Value (Avg) = %f", fabs(cand->numeric_value / cand->total_preferences_for_candidate));
-				print(thisAgent, " Total Value (Avg) = %f", fabs(cand->numeric_plus_const_value / cand->total_preferences_plus_const_for_candidate));
-				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);  
+				print(thisAgent, "Value (Avg) = %f", fabs(cand->numeric_value / cand->total_preferences_for_candidate));
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeAvg);
-				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, fabs(cand->numeric_value / cand->total_preferences_for_candidate));  
-				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateTotalValue, fabs(cand->numeric_plus_const_value / cand->total_preferences_for_candidate));  
+				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, fabs(cand->numeric_value / cand->total_preferences_for_candidate));
 				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 			}
 		}
@@ -3665,11 +3663,9 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
              * of negative values, so we'll warn when we see one.
              */
 
-            //total_probability += fabs(cand->numeric_value / cand->total_preferences_for_candidate);
-			total_probability += fabs(cand->numeric_plus_const_value / cand->total_preferences_plus_const_for_candidate);
+            total_probability += fabs(cand->numeric_value / cand->total_preferences_for_candidate);
 
-            //if (cand->numeric_value  < 0.0) {
-			if (cand->numeric_plus_const_value  < 0.0) {
+            if (cand->numeric_value  < 0.0) {
                 print_with_symbols
                     (thisAgent, "WARNING: Candidate %y has a negative value, which is unexpected with 'numeric-indifferent-mode -avg'",
                      cand->value);
@@ -3690,8 +3686,7 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
         currentSumOfValues = 0;
 
         for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-            //currentSumOfValues += fabs(cand->numeric_value  / cand->total_preferences_for_candidate);
-			currentSumOfValues += fabs(cand->numeric_plus_const_value  / cand->total_preferences_plus_const_for_candidate);
+            currentSumOfValues += fabs(cand->numeric_value  / cand->total_preferences_for_candidate);
             if (selectedProbability <= currentSumOfValues) {
                 /*
                    print_with_symbols("\n    Returning (Avg) candidate %y", cand->value); 
@@ -3742,27 +3737,17 @@ void compute_value_of_candidate(preference *cand, slot *s, float default_value)
         }
 	}
 
-	// RPM 4/07: track RL + non-RL value separately
-
-	cand->total_preferences_plus_const_for_candidate = cand->total_preferences_for_candidate;
-	cand->numeric_plus_const_value = cand->numeric_value;
-	
+	// RPM 4/07: bug 961: checking supposed binary indifferents for numeric values
 	for (pref = s->preferences[BINARY_INDIFFERENT_PREFERENCE_TYPE]; pref != NIL; pref = pref->next) {
 		if (cand->value == pref->value){ // find the candidate we're looking for
-			cand->total_preferences_plus_const_for_candidate += 1;
-			cand->numeric_plus_const_value += get_number_from_symbol(pref->referent);
+			cand->total_preferences_for_candidate += 1;
+			cand->numeric_value += get_number_from_symbol(pref->referent);
         }
 	}
 	
 	if (cand->total_preferences_for_candidate == 0) {
 		cand->numeric_value = default_value;
 		cand->total_preferences_for_candidate = 1;
-	}
-
-	// if this is zero, it means there were no RL or non-RL values, so use defaults
-	if (cand->total_preferences_plus_const_for_candidate == 0) {
-		cand->numeric_plus_const_value = default_value;
-		cand->total_preferences_plus_const_for_candidate = 1;
 	}
    
 }
@@ -3809,15 +3794,12 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
 					print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-					print(thisAgent, "RL Value (Sum) = %f, (Exp) = %f", cand->numeric_value, exp(cand->numeric_value / thisAgent->Temperature));
-					print(thisAgent, " Total Value (Sum) = %f, (Exp) = %f", cand->numeric_plus_const_value, exp(cand->numeric_plus_const_value / thisAgent->Temperature));
+					print(thisAgent, "Value (Sum) = %f, (Exp) = %f", cand->numeric_value, exp(cand->numeric_value / thisAgent->Temperature));
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, cand->numeric_value);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateExpValue, exp(cand->numeric_value / thisAgent->Temperature));
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateTotalValue, cand->numeric_plus_const_value);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateTotalExpValue, exp(cand->numeric_plus_const_value / thisAgent->Temperature));
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 				}
 			}
@@ -3828,8 +3810,7 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 						*  the use of negative valued preferences, so its possible the
 						*  sum is negative, here that means a fractional probability
 						*/
-				//total_probability += exp(cand->numeric_value / thisAgent->Temperature);
-				total_probability += exp(cand->numeric_plus_const_value / thisAgent->Temperature);
+				total_probability += exp(cand->numeric_value / thisAgent->Temperature);
 						/* print("\n   Total (Sum) Probability = %f", total_probability ); */
 			}
 
@@ -3838,8 +3819,7 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 			currentSumOfValues = 0;
 
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-				//currentSumOfValues += exp(cand->numeric_value / thisAgent->Temperature);
-				currentSumOfValues += exp(cand->numeric_plus_const_value / thisAgent->Temperature);
+				currentSumOfValues += exp(cand->numeric_value / thisAgent->Temperature);
 				if (selectedProbability <= currentSumOfValues) {
 					return cand;
 				}
@@ -3850,13 +3830,11 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 			if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 				for (cand = candidates; cand != NIL; cand = cand->next_candidate){
 					print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
-					print(thisAgent, "RL Value (Sum) = %f", cand->numeric_value);
-					print(thisAgent, " Total Value (Sum) = %f,", cand->numeric_plus_const_value);
+					print(thisAgent, "Value (Sum) = %f", cand->numeric_value);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, cand->numeric_value);
-					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateTotalValue, cand->numeric_plus_const_value);
 					gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 				}
 			}
@@ -3875,19 +3853,15 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 				// select the highest Q-value operator 
 			
 				preference *top_cand = candidates;
-				//float top_value = candidates->numeric_value;
-				float top_value = candidates->numeric_plus_const_value;
+				float top_value = candidates->numeric_value;
 				int num_max_cand = 0;
 	
 				for (cand=candidates; cand!=NIL; cand=cand->next_candidate){
-					//if (cand->numeric_value > top_value) {
-					if (cand->numeric_plus_const_value > top_value) {
-						//top_value = cand->numeric_value;
-						top_value = cand->numeric_plus_const_value;
+					if (cand->numeric_value > top_value) {
+						top_value = cand->numeric_value;
 						top_cand = cand;
 						num_max_cand = 1;
-					//} else if (cand->numeric_value == top_value) num_max_cand++;
-					} else if (cand->numeric_plus_const_value == top_value) num_max_cand++;
+					} else if (cand->numeric_value == top_value) num_max_cand++;
 				}
 
 				if (num_max_cand == 1)	return top_cand;
@@ -3897,13 +3871,11 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 					int chosen_num;
 					chosen_num = SoarRandInt(num_max_cand-1);
 					cand = candidates;
-					//while (cand->numeric_value != top_value) cand = cand->next_candidate;
-					while (cand->numeric_plus_const_value != top_value) cand = cand->next_candidate;
+					while (cand->numeric_value != top_value) cand = cand->next_candidate;
 					while (chosen_num) {
 						cand=cand->next_candidate;
 						chosen_num--;
-						//while (cand->numeric_value != top_value) cand = cand->next_candidate;
-						while (cand->numeric_plus_const_value != top_value) cand = cand->next_candidate;
+						while (cand->numeric_value != top_value) cand = cand->next_candidate;
 					}
 					return cand;
 				}
