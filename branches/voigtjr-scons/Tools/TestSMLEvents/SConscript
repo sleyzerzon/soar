@@ -18,4 +18,5 @@ libpath = [ '../../Core/ClientSML',
 	    ]
 
 env.Append(LIBS = libadd, LIBPATH = libpath)
-env.Program('TestSMLEvents', glob.glob('*.cpp'))
+TestSMLEvents = env.Program('TestSMLEvents', glob.glob('*.cpp'))
+env.Install('#SoarLibrary/bin', TestSMLEvents)

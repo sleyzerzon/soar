@@ -21,4 +21,5 @@ libpath = [ '../../Core/ClientSML',
 	    ]
 
 env.Append(LIBS = libadd, LIBPATH = libpath)
-env.Program('SoarTextIO', glob.glob('src/*.cpp'))
+SoarTextIO = env.Program('SoarTextIO', glob.glob('src/*.cpp'))
+env.Install('#SoarLibrary/bin', SoarTextIO)

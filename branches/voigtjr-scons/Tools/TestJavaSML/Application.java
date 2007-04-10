@@ -147,6 +147,10 @@ public class Application
 	
 	private void Test()
 	{
+		if (m_Kernel == null) {
+			System.out.println("Kernel was null.");
+			throw new IllegalStateException("Kernel was created null.");
+		}
 		// Make sure the kernel was ok
 		if (m_Kernel.HadError())
 			throw new IllegalStateException("Error initializing kernel: " + m_Kernel.GetLastErrorDescription()) ;
@@ -338,6 +342,8 @@ public class Application
 		m_Kernel = Kernel.CreateKernelInCurrentThread("SoarKernelSML", false, Kernel.GetDefaultPort()) ;
 		//m_Kernel.SetTraceCommunications(true) ;
 		
+		assert m_Kernel != null;
+
 		for (int i = 0 ; i < 200 ; i++)
 		{
 			//System.out.println("Checking " + i) ;
@@ -355,6 +361,8 @@ public class Application
 
 		// Initialize the remote kernel
 		m_Kernel = Kernel.CreateRemoteConnection(true, null, Kernel.GetDefaultPort()) ;
+
+		assert m_Kernel != null;
 
 		if (m_Kernel.HadError())
 		{
@@ -390,7 +398,9 @@ public class Application
 				System.out.println("############ Current Thread ############") ;
 
 				// Initialize the kernel
+				System.out.println("Creating kernel");
 				m_Kernel = Kernel.CreateKernelInCurrentThread("SoarKernelSML", false, 12345) ;
+				System.out.println("Done.");
 		
 				Test() ;
 				
