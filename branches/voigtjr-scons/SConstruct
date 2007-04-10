@@ -18,7 +18,7 @@ def CheckVisibilityFlag(context):
 	context.Result(result)
 	return result
 
-env = Environment(CXXFLAGS = "-Wall -g", CPPPATH = ["#Core/shared",])
+env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
 conf = Configure(env, custom_tests = {'CheckVisibilityFlag' : CheckVisibilityFlag})
 
 def addSymbol(symbol):
