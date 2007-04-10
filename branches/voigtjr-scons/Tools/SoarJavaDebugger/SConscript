@@ -47,3 +47,5 @@ env.Depends(jarStep, copyStep)
 env.Depends(copyStep, javacStep)
 
 env.Install('#SoarLibrary/bin', '#Tools/SoarJavaDebugger/SoarJavaDebugger.jar')
+
+env.Clean('classes', 'classes')
