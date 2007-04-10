@@ -128,6 +128,7 @@ SConscript('#Tools/FilterC/SConscript')
 # This needs some portability work before it can be added.
 ##SConscript('#Tools/LoggerWinC/SConscript')
 SConscript('#Tools/QuickLink/SConscript')
+SConscript('#Tools/SoarJavaDebugger/SConscript')
 SConscript('#Tools/SoarTextIO/SConscript')
 SConscript('#Tools/TOHSML/SConscript')
 SConscript('#Tools/TestCLI/SConscript')

@@ -8,7 +8,7 @@ env.Prepend(CPPPATH = [
 			'#Core/ElementXML/include',
 			'#Core/ConnectionSML/include'
 			])
-print "CPPFLAGS=", env['CPPFLAGS']
+
 if env['CPPFLAGS'].find('fvisibility') >= 0:
 	env.Append(CPPFLAGS = ' -Wno-unused -fno-strict-aliasing -fvisibility=default')
 else:
