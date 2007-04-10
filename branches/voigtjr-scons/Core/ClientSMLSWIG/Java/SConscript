@@ -11,8 +11,8 @@ env.Prepend(CPPPATH = [
 
 libadd = [
 	   'ClientSML',
-	   'ElementXML',
 	   'ConnectionSML',
+	   'ElementXML',
 	   ]
 
 libpath = [ 

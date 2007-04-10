@@ -18,7 +18,7 @@ def CheckVisibilityFlag(context):
 	context.Result(result)
 	return result
 
-env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
+env = Environment(CXXFLAGS = "-Wall -g", CPPPATH = ["#Core/shared",])
 conf = Configure(env, custom_tests = {'CheckVisibilityFlag' : CheckVisibilityFlag})
 
 def addSymbol(symbol):
@@ -121,9 +121,11 @@ SConscript('#Core/CLI/SConscript')
 SConscript('#Core/ClientSML/SConscript')
 SConscript('#Core/KernelSML/SConscript')
 SConscript('#Core/ClientSMLSWIG/Java/SConscript')
+SConscript('#Core/ClientSMLSWIG/Python/SConscript')
 
 # Test Apps
 SConscript('#Tools/FilterC/SConscript')
+# This needs some portability work before it can be added.
 ##SConscript('#Tools/LoggerWinC/SConscript')
 SConscript('#Tools/QuickLink/SConscript')
 SConscript('#Tools/SoarTextIO/SConscript')
