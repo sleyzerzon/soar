@@ -30,11 +30,11 @@
 #include "Windows.h"	// Needed for load library
 #undef SendMessage		// Windows defines this as a macro.  Yikes!
 
-#else
+#else // _WIN32
 #include <dlfcn.h>      // Needed for dlopen and dlsym
 #define GetProcAddress dlsym
 
-#endif // _WIN32
+#endif // not _WIN32
 
 using namespace sml ;
 
@@ -189,8 +189,14 @@ bool EmbeddedConnection::AttachConnection(char const* pLibraryName, bool optimiz
 #  else
 #    define WINDOWS_SHARED
 #  endif
-#else
-# define LINUX_SHARED
+#endif
+
+#ifdef SCONS_POSIX // scons has detected a posix environment
+#  ifdef STATIC_LINKED
+#    define LINUX_STATIC
+#  else
+#    define LINUX_SHARED
+#  endif
 #endif
 
 #ifdef WINDOWS_SHARED
@@ -270,31 +276,10 @@ bool EmbeddedConnection::AttachConnection(char const* pLibraryName, bool optimiz
 	// If we're not in Windows and we can't dynamically load methods we'll just get
 	// by with the two we really need.  This just means we can't get maximum optimization on
 	// this particular platform.
-	//
-	//m_pProcessMessageFunction = &sml_ProcessMessage;
-	//m_pCreateEmbeddedFunction = &sml_CreateEmbeddedConnection;
+	m_pProcessMessageFunction = &sml_ProcessMessage;
+	m_pCreateEmbeddedFunction = &sml_CreateEmbeddedConnection;
 
-	// reset error
-	dlerror();
-
-	// load symbol
-	m_pProcessMessageFunction = (ProcessMessageFunction) dlsym(hLibrary, "sml_ProcessMessage");
-	{
-		const char *dlsym_error = dlerror();
-		if (dlsym_error) {
-			SetError(Error::kFunctionsNotFound);
-		}
-	}
-
-	m_pCreateEmbeddedFunction = (CreateEmbeddedConnectionFunction) dlsym(hLibrary, "sml_CreateEmbeddedConnection");
-	{
-		const char *dlsym_error = dlerror();
-		if (dlsym_error) {
-			SetError(Error::kFunctionsNotFound);
-		}
-	}
-
-#endif // defined(LINUX_SHARED) || defined(WINDOWS_SHARED)
+#endif // not (defined(LINUX_SHARED) || defined(WINDOWS_SHARED))
 
 	// We only use the creation function once to create a connection object (which we'll pass back
 	// with each call).
