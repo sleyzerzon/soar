@@ -4,22 +4,22 @@ import sys
 from ConfigureJNI import ConfigureJNI
 
 # Custom test for GCC visibility flag
-def CheckVisibilityFlag(context):
-	visCheckSource = "char foo;"
-	context.Message('Checking support for -fvisibility=hidden...')
+def CheckAndAddVisibilityFlag(context):
+	context.Message('Checking support for -fvisibility=hidden... ')
 
 	lastCPPFLAGS = context.env['CPPFLAGS']
 	context.env.Append(CPPFLAGS = " -fvisibility=hidden")
 	
-	result = context.TryCompile(visCheckSource, 'c')
-	if result != 0:
+	# 0 is failure (!)
+	result = context.TryCompile("char foo;", '.c')
+	if result == 0:
 		context.env.Replace(CPPFLAGS = lastCPPFLAGS)
 
 	context.Result(result)
 	return result
 
 env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
-conf = Configure(env, custom_tests = {'CheckVisibilityFlag' : CheckVisibilityFlag})
+conf = Configure(env, custom_tests = {'CheckAndAddVisibilityFlag' : CheckAndAddVisibilityFlag})
 
 def addSymbol(symbol):
 	print "Adding symbol", symbol
@@ -48,8 +48,7 @@ if not ConfigureJNI(conf.env):
 
 # check if the compiler supports -fvisibility=hidden (GCC >= 4)
 if conf.env['CC'] == 'gcc':
-	if conf.CheckVisibilityFlag():
-		conf.env.Append(CPPFLAGS = " -fvisibility=hidden")
+	conf.CheckAndAddVisibilityFlag()
 		
 # Require functions
 def require(header):
