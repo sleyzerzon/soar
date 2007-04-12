@@ -1,0 +1,461 @@
+// !$*UTF8*$!
+{
+	8952A0CE0BA0607400572BDA /* Soar2D */ = {
+		activeExec = 0;
+		executables = (
+			901C988E0BCD8BD700A51C40 /* Soar2D */,
+		);
+	};
+	8953466D0BA976960018DABB /* all */ = {
+		activeExec = 0;
+	};
+	8953469C0BA986880018DABB /* Tcl_sml_ClientInterface */ = {
+		activeExec = 0;
+	};
+	895347E40BA9A1730018DABB /* Python_sml_ClientInterface */ = {
+		activeExec = 0;
+	};
+	89BE8E470B9AF8F900B8814F /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeBuildStyle = 901C98800BCD8BD700A51C40 /* Development */;
+		activeExecutable = 901C98820BCD8BD700A51C40 /* TestCLI */;
+		activeTarget = 8953466D0BA976960018DABB /* all */;
+		codeSenseManager = 901C989A0BCD8C1800A51C40 /* Code sense */;
+		executables = (
+			901C98820BCD8BD700A51C40 /* TestCLI */,
+			901C98830BCD8BD700A51C40 /* TestClientSML */,
+			901C98840BCD8BD700A51C40 /* TestConnectionSML */,
+			901C98850BCD8BD700A51C40 /* TestExternalLibraryExe */,
+			901C98860BCD8BD700A51C40 /* TestExternalLibraryLib */,
+			901C98870BCD8BD700A51C40 /* TestMultiAgent */,
+			901C98880BCD8BD700A51C40 /* TestSMLEvents */,
+			901C98890BCD8BD700A51C40 /* TestSMLPerformance */,
+			901C988A0BCD8BD700A51C40 /* TestSoarPerformance */,
+			901C988B0BCD8BD700A51C40 /* TestJavaSML */,
+			901C988C0BCD8BD700A51C40 /* VisualSoar */,
+			901C988D0BCD8BD700A51C40 /* SoarJavaDebugger */,
+			901C988E0BCD8BD700A51C40 /* Soar2D */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					243,
+					20,
+					48.1626,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 198020056;
+			PBXWorkspaceStateSaveDate = 198020056;
+		};
+		sourceControlManager = 901C98990BCD8C1800A51C40 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	89BE99F40B9B061D00B8814F /* SoarKernelSML */ = {
+		activeExec = 0;
+	};
+	89BE9B700B9B1C0600B8814F /* TestCLI */ = {
+		activeExec = 0;
+		executables = (
+			901C98820BCD8BD700A51C40 /* TestCLI */,
+		);
+	};
+	89BE9B850B9B276100B8814F /* TestClientSML */ = {
+		activeExec = 0;
+		executables = (
+			901C98830BCD8BD700A51C40 /* TestClientSML */,
+		);
+	};
+	89BE9B930B9B2CE200B8814F /* TestConnectionSML */ = {
+		activeExec = 0;
+		executables = (
+			901C98840BCD8BD700A51C40 /* TestConnectionSML */,
+		);
+	};
+	89BE9B9F0B9B2EDB00B8814F /* TestExternalLibraryExe */ = {
+		activeExec = 0;
+		executables = (
+			901C98850BCD8BD700A51C40 /* TestExternalLibraryExe */,
+		);
+	};
+	89BE9BB30B9B322300B8814F /* TestExternalLibraryLib */ = {
+		activeExec = 0;
+		executables = (
+			901C98860BCD8BD700A51C40 /* TestExternalLibraryLib */,
+		);
+	};
+	89BE9BCB0B9B34DF00B8814F /* TestMultiAgent */ = {
+		activeExec = 0;
+		executables = (
+			901C98870BCD8BD700A51C40 /* TestMultiAgent */,
+		);
+	};
+	89BE9BD80B9B361900B8814F /* TestSMLEvents */ = {
+		activeExec = 0;
+		executables = (
+			901C98880BCD8BD700A51C40 /* TestSMLEvents */,
+		);
+	};
+	89BE9BE60B9B48A200B8814F /* TestSMLPerformance */ = {
+		activeExec = 0;
+		executables = (
+			901C98890BCD8BD700A51C40 /* TestSMLPerformance */,
+		);
+	};
+	89BE9BF00B9B49D800B8814F /* TestSoarPerformance */ = {
+		activeExec = 0;
+		executables = (
+			901C988A0BCD8BD700A51C40 /* TestSoarPerformance */,
+		);
+	};
+	89BE9C0D0B9B62B400B8814F /* Java_sml_ClientInterface */ = {
+		activeExec = 0;
+	};
+	89BE9C630B9C8FF400B8814F /* TestJavaSML */ = {
+		activeExec = 0;
+		executables = (
+			901C988B0BCD8BD700A51C40 /* TestJavaSML */,
+		);
+	};
+	89BE9CB50B9D6FD100B8814F /* VisualSoar */ = {
+		activeExec = 0;
+		executables = (
+			901C988C0BCD8BD700A51C40 /* VisualSoar */,
+		);
+	};
+	89BE9D8C0B9D785600B8814F /* SoarJavaDebugger */ = {
+		activeExec = 0;
+		executables = (
+			901C988D0BCD8BD700A51C40 /* SoarJavaDebugger */,
+		);
+	};
+	89BE9E0D0B9D7E4B00B8814F /* SWT */ = {
+		activeExec = 0;
+	};
+	901C98820BCD8BD700A51C40 /* TestCLI */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestCLI;
+		sourceDirectories = (
+		);
+	};
+	901C98830BCD8BD700A51C40 /* TestClientSML */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestClientSML;
+		sourceDirectories = (
+		);
+	};
+	901C98840BCD8BD700A51C40 /* TestConnectionSML */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestConnectionSML;
+		sourceDirectories = (
+		);
+	};
+	901C98850BCD8BD700A51C40 /* TestExternalLibraryExe */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestExternalLibraryExe;
+		sourceDirectories = (
+		);
+	};
+	901C98860BCD8BD700A51C40 /* TestExternalLibraryLib */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestExternalLibraryLib;
+		sourceDirectories = (
+		);
+	};
+	901C98870BCD8BD700A51C40 /* TestMultiAgent */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestMultiAgent;
+		sourceDirectories = (
+		);
+	};
+	901C98880BCD8BD700A51C40 /* TestSMLEvents */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestSMLEvents;
+		sourceDirectories = (
+		);
+	};
+	901C98890BCD8BD700A51C40 /* TestSMLPerformance */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestSMLPerformance;
+		sourceDirectories = (
+		);
+	};
+	901C988A0BCD8BD700A51C40 /* TestSoarPerformance */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestSoarPerformance;
+		sourceDirectories = (
+		);
+	};
+	901C988B0BCD8BD700A51C40 /* TestJavaSML */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestJavaSML;
+		sourceDirectories = (
+		);
+	};
+	901C988C0BCD8BD700A51C40 /* VisualSoar */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = VisualSoar;
+		sourceDirectories = (
+		);
+	};
+	901C988D0BCD8BD700A51C40 /* SoarJavaDebugger */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = SoarJavaDebugger;
+		sourceDirectories = (
+		);
+	};
+	901C988E0BCD8BD700A51C40 /* Soar2D */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Soar2D;
+		sourceDirectories = (
+		);
+	};
+	901C98990BCD8C1800A51C40 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+		scmType = "";
+	};
+	901C989A0BCD8C1800A51C40 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+}

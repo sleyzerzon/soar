@@ -18,7 +18,7 @@ def CheckAndAddVisibilityFlag(context):
 	context.Result(result)
 	return result
 
-env = Environment(CXXFLAGS = "-Wall -g -O2", CPPPATH = ["#Core/shared",])
+env = Environment(CXXFLAGS = "-Wall -g", CPPPATH = ["#Core/shared",])
 conf = Configure(env, custom_tests = {'CheckAndAddVisibilityFlag' : CheckAndAddVisibilityFlag})
 
 def addSymbol(symbol):
@@ -76,7 +76,8 @@ if os.name == 'posix':
 	require('inttypes.h')
 	require('limits.h')
 	require('locale.h')
-	require('malloc.h')
+	# Not on mac osx, associated functions are in stdlib.h
+	#require('malloc.h')
 	require('math.h')
 	require('memory.h')
 	require('netdb.h')
@@ -120,11 +121,11 @@ SConscript('#Core/CLI/SConscript')
 SConscript('#Core/ClientSML/SConscript')
 SConscript('#Core/KernelSML/SConscript')
 SConscript('#Core/ClientSMLSWIG/Java/SConscript')
-SConscript('#Core/ClientSMLSWIG/Python/SConscript')
+#SConscript('#Core/ClientSMLSWIG/Python/SConscript')
 
 # Test Apps
 SConscript('#Tools/FilterC/SConscript')
-# This needs some portability work before it can be added.
+# This needs some portability work before it can be added (malloc.h on osx)
 ##SConscript('#Tools/LoggerWinC/SConscript')
 SConscript('#Tools/QuickLink/SConscript')
 SConscript('#Tools/SoarJavaDebugger/SConscript')

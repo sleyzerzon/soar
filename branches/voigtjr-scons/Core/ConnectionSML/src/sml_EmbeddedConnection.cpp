@@ -213,7 +213,7 @@ bool EmbeddedConnection::AttachConnection(char const* pLibraryName, bool optimiz
 	if (!hLibrary) {
 		printf("dlopen failed for %s: %s\n", newLibraryName.c_str(), dlerror());
 		// Try again with mac extention
-		newLibraryName = "lib" + libraryName + ".dylib";
+		newLibraryName = "lib" + libraryName + ".jnilib";
 		hLibrary = dlopen(newLibraryName.c_str(), RTLD_LAZY);
 		if (!hLibrary)
 		{

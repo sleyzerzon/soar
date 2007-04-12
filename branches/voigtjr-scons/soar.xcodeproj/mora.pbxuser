@@ -1,0 +1,1176 @@
+// !$*UTF8*$!
+{
+	8952A0CE0BA0607400572BDA /* Soar2D */ = {
+		activeExec = 0;
+		executables = (
+			8952A0D00BA0607400572BDA /* Soar2D */,
+		);
+	};
+	8952A0D00BA0607400572BDA /* Soar2D */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 0;
+		activeArgIndices = (
+			YES,
+		);
+		argumentStrings = (
+			eaters.xml,
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = ../../SoarLibrary/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Soar2D;
+		savedGlobals = {
+		};
+		sourceDirectories = (
+		);
+	};
+	8953466D0BA976960018DABB /* all */ = {
+		activeExec = 0;
+	};
+	8953469C0BA986880018DABB /* Tcl_sml_ClientInterface */ = {
+		activeExec = 0;
+	};
+	895347E40BA9A1730018DABB /* Python_sml_ClientInterface */ = {
+		activeExec = 0;
+	};
+	895347E80BA9A1FB0018DABB /* Python_sml_ClientInterface_wrap.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1280, 90314}}";
+			sepNavSelRange = "{3753, 20}";
+			sepNavVisRect = "{{0, 1524}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	895348590BA9A8120018DABB /* Python_sml_ClientInterface.py */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1232, 19474}}";
+			sepNavSelRange = "{4028, 27}";
+			sepNavVisRect = "{{0, 809}, {793, 553}}";
+			sepNavWindowFrame = "{{-845, 61}, {838, 658}}";
+		};
+	};
+	8953488A0BAA5A650018DABB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 89BE97820B9AF9A600B8814F /* main.cpp */;
+		name = "main.cpp: 27";
+		rLen = 0;
+		rLoc = 544;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
+	};
+	89BE8E470B9AF8F900B8814F /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeExecutable = 89BE9C650B9C8FF500B8814F /* TestJavaSML */;
+		activeTarget = 8953466D0BA976960018DABB /* all */;
+		addToTargets = (
+		);
+		breakpoints = (
+		);
+		breakpointsGroup = 89BE9B4A0B9B149E00B8814F /* XCBreakpointsBucket */;
+		codeSenseManager = 89BE8E4C0B9AF8F900B8814F /* Code sense */;
+		executables = (
+			89BE9B720B9B1C0600B8814F /* TestCLI */,
+			89BE9B870B9B276100B8814F /* TestClientSML */,
+			89BE9B950B9B2CE200B8814F /* TestConnectionSML */,
+			89BE9BA10B9B2EDB00B8814F /* TestExternalLibraryExe */,
+			89BE9BB50B9B322300B8814F /* TestExternalLibraryLib */,
+			89BE9BCD0B9B34DF00B8814F /* TestMultiAgent */,
+			89BE9BDA0B9B361900B8814F /* TestSMLEvents */,
+			89BE9BE80B9B48A200B8814F /* TestSMLPerformance */,
+			89BE9BF20B9B49D800B8814F /* TestSoarPerformance */,
+			89BE9C650B9C8FF500B8814F /* TestJavaSML */,
+			89BE9CB70B9D6FD100B8814F /* VisualSoar */,
+			89BE9D8E0B9D785600B8814F /* SoarJavaDebugger */,
+			8952A0D00BA0607400572BDA /* Soar2D */,
+		);
+		ignoreBreakpointsInProjectsDict = {
+		};
+		perUserDictionary = {
+			"PBXConfiguration.PBXBreakpointsDataSource.v1:1CA1AED706398EBD00589147" = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBreakpointsDataSource_BreakpointID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					210,
+					20,
+					110,
+					109,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBreakpointsDataSource_ActionID,
+					PBXBreakpointsDataSource_TypeID,
+					PBXBreakpointsDataSource_BreakpointID,
+					PBXBreakpointsDataSource_UseID,
+					PBXBreakpointsDataSource_LocationID,
+					PBXBreakpointsDataSource_ConditionID,
+					PBXBreakpointsDataSource_ContinueID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_FiletypeID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					382,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_Target_ColumnID,
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFindDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFindDataSource_LocationID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					200,
+					396.2085,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFindDataSource_MessageID,
+					PBXFindDataSource_LocationID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.XCSCMDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					340,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_SCM_ColumnID,
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					200,
+					202,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 196594323;
+			PBXWorkspaceStateSaveDate = 196594323;
+		};
+		perUserProjectItems = {
+			8953488A0BAA5A650018DABB /* PBXTextBookmark */ = 8953488A0BAA5A650018DABB /* PBXTextBookmark */;
+			89EDF0E50BB7CD94009EDA9E /* PBXTextBookmark */ = 89EDF0E50BB7CD94009EDA9E /* PBXTextBookmark */;
+		};
+		sourceControlManager = 89BE8E4B0B9AF8F900B8814F /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	89BE8E4B0B9AF8F900B8814F /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			SubversionToolPath = /usr/local/bin/svn;
+		};
+		scmType = "";
+	};
+	89BE8E4C0B9AF8F900B8814F /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	89BE8E770B9AF99000B8814F /* cli_loadLibrary.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 798}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 4}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE8ED50B9AF99000B8814F /* Java_sml_ClientInterface.i */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {866, 3878}}";
+			sepNavSelRange = "{12590, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE8ED70B9AF99000B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 770}}";
+			sepNavSelRange = "{1568, 0}";
+			sepNavVisRect = "{{0, 217}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE8ED80B9AF99000B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE8EDB0B9AF99100B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 588}}";
+			sepNavSelRange = "{865, 0}";
+			sepNavVisRect = "{{0, 35}, {793, 553}}";
+			sepNavWindowFrame = "{{-1011, 7}, {838, 658}}";
+		};
+	};
+	89BE8EDC0B9AF99100B8814F /* Python_sml_ClientInterface.i */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1280, 6804}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 1265}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE8EDD0B9AF99100B8814F /* readme.txt */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1508, 1358}}";
+			sepNavSelRange = "{1503, 20}";
+			sepNavVisRect = "{{0, 147}, {793, 553}}";
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE8EE20B9AF99100B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 630}}";
+			sepNavSelRange = "{1163, 0}";
+			sepNavVisRect = "{{0, 65}, {793, 553}}";
+			sepNavWindowFrame = "{{-1002, 24}, {838, 658}}";
+		};
+	};
+	89BE8F120B9AF99100B8814F /* sml_Connection.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {956, 14322}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 202}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE8F140B9AF99100B8814F /* sml_EmbeddedConnection.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1058, 5026}}";
+			sepNavSelRange = "{7483, 0}";
+			sepNavVisRect = "{{0, 2673}, {793, 553}}";
+			sepNavWindowFrame = "{{32, 51}, {838, 658}}";
+		};
+	};
+	89BE8F860B9AF99100B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE8FE10B9AF99200B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 1834}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 1281}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE90180B9AF99200B8814F /* config.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 4144}}";
+			sepNavSelRange = "{8525, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{-894, 20}, {838, 658}}";
+		};
+	};
+	89BE90190B9AF99200B8814F /* portability.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 2240}}";
+			sepNavSelRange = "{3346, 0}";
+			sepNavVisRect = "{{0, 939}, {793, 553}}";
+			sepNavWindowFrame = "{{120, 85}, {838, 658}}";
+		};
+	};
+	89BE90280B9AF99200B8814F /* kernel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 3920}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 2393}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE902B0B9AF99200B8814F /* mem.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 7028}}";
+			sepNavSelRange = "{6622, 0}";
+			sepNavVisRect = "{{0, 1599}, {793, 553}}";
+			sepNavWindowFrame = "{{120, 88}, {838, 658}}";
+		};
+	};
+	89BE903D0B9AF99200B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE904B0B9AF99200B8814F /* init_soar.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1328, 24822}}";
+			sepNavSelRange = "{23110, 0}";
+			sepNavVisRect = "{{0, 8824}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE904C0B9AF99200B8814F /* io.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {812, 12222}}";
+			sepNavSelRange = "{34232, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE904F0B9AF99200B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 1120}}";
+			sepNavSelRange = "{1513, 20}";
+			sepNavVisRect = "{{0, 567}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE905F0B9AF99200B8814F /* symtab.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1310, 9114}}";
+			sepNavSelRange = "{16871, 0}";
+			sepNavVisRect = "{{0, 6304}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE909F0B9AF99300B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE916F0B9AF99400B8814F /* build.sh */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {872, 602}}";
+			sepNavSelRange = "{734, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE91710B9AF99400B8814F /* new-config-outline.txt */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 1568}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE91730B9AF99400B8814F /* readme.txt */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE91790B9AF99500B8814F /* JarManifest */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE919D0B9AF99500B8814F /* run-Eaters.bat */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE919F0B9AF99500B8814F /* run-Soar2D.bat */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{89, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE91DD0B9AF99500B8814F /* Simulation.java */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {926, 9828}}";
+			sepNavSelRange = "{12576, 0}";
+			sepNavVisRect = "{{0, 5611}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE92430B9AF99600B8814F /* soar.icns */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE92500B9AF99600B8814F /* soar2007.png */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE92700B9AF99700B8814F /* makeTclSMLPackage.tcl */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE927A0B9AF99700B8814F /* TestPythonSML.py */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {878, 1708}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{-927, 33}, {838, 658}}";
+		};
+	};
+	89BE927B0B9AF99700B8814F /* TestTclSML.tcl */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {860, 2870}}";
+			sepNavSelRange = "{6757, 0}";
+			sepNavVisRect = "{{0, 2317}, {793, 553}}";
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE95B30B9AF9A000B8814F /* make-mac-app.sh */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE95B40B9AF9A000B8814F /* makeMacSWTApp.sh */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE96180B9AF9A100B8814F /* phase-apply.png */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE96200B9AF9A100B8814F /* phase-world.png */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE96220B9AF9A100B8814F /* build.sh */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 574}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{174, 81}, {838, 658}}";
+		};
+	};
+	89BE96240B9AF9A100B8814F /* Application.java */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {884, 1820}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 1017}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE96480B9AF9A100B8814F /* SoarCommands.java */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 1778}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 1225}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE96620B9AF9A200B8814F /* phase-decision.png */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE96660B9AF9A200B8814F /* phase-proposal.png */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE966B0B9AF9A200B8814F /* phase-world.png */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE966C0B9AF9A200B8814F /* JarDescription.jardesc */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1556, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE966D0B9AF9A200B8814F /* JarManifest */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE96900B9AF9A200B8814F /* SoarDebugger.plist */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1010, 686}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE97650B9AF9A500B8814F /* cli_Test.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1070, 6594}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE97670B9AF9A500B8814F /* Makefile.am */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE97710B9AF9A600B8814F /* TestClientSML.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1070, 30030}}";
+			sepNavSelRange = "{57267, 0}";
+			sepNavVisRect = "{{0, 26530}, {793, 553}}";
+			sepNavWindowFrame = "{{-918, 65}, {838, 658}}";
+		};
+	};
+	89BE977F0B9AF9A600B8814F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1112, 700}}";
+			sepNavSelRange = "{1394, 0}";
+			sepNavVisRect = "{{0, 147}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE97820B9AF9A600B8814F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {800, 1260}}";
+			sepNavSelRange = "{544, 0}";
+			sepNavVisRect = "{{0, 0}, {0, 0}}";
+			sepNavWindowFrame = "{{-935, 71}, {838, 658}}";
+		};
+	};
+	89BE97850B9AF9A600B8814F /* Application.java */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1088, 5964}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE97870B9AF9A600B8814F /* build.sh */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE97880B9AF9A600B8814F /* JarManifest */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE97900B9AF9A600B8814F /* README.txt */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{84, 20}, {838, 658}}";
+		};
+	};
+	89BE979D0B9AF9A600B8814F /* TestSoarPerformance.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 2702}}";
+			sepNavSelRange = "{3465, 0}";
+			sepNavVisRect = "{{0, 1171}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE97A00B9AF9A600B8814F /* README.txt */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE97FC0B9AF9A700B8814F /* build.sh */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 560}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{173, 26}, {838, 658}}";
+		};
+	};
+	89BE99BD0B9AF9AF00B8814F /* README */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 553}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{15, 83}, {838, 658}}";
+		};
+	};
+	89BE99E60B9AF9B000B8814F /* VisualSoar.plist */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {793, 770}}";
+			sepNavSelRange = "{1082, 31}";
+			sepNavVisRect = "{{0, 209}, {793, 553}}";
+			sepNavWindowFrame = "{{38, 62}, {838, 658}}";
+		};
+	};
+	89BE99F40B9B061D00B8814F /* SoarKernelSML */ = {
+		activeExec = 0;
+	};
+	89BE9B4A0B9B149E00B8814F /* XCBreakpointsBucket */ = {
+		isa = XCBreakpointsBucket;
+		name = "Project Breakpoints";
+		objects = (
+		);
+	};
+	89BE9B700B9B1C0600B8814F /* TestCLI */ = {
+		activeExec = 0;
+		executables = (
+			89BE9B720B9B1C0600B8814F /* TestCLI */,
+		);
+	};
+	89BE9B720B9B1C0600B8814F /* TestCLI */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = $SRCROOT/SoarLibrary/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestCLI;
+		sourceDirectories = (
+		);
+	};
+	89BE9B850B9B276100B8814F /* TestClientSML */ = {
+		activeExec = 0;
+		executables = (
+			89BE9B870B9B276100B8814F /* TestClientSML */,
+		);
+	};
+	89BE9B870B9B276100B8814F /* TestClientSML */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+			NO,
+		);
+		argumentStrings = (
+			"-shortlistener",
+			"-remoteconnect",
+			"-refcounttest",
+			"-simpleCommand",
+			"-listener",
+			"-stoptest",
+			"-remote",
+			"-synch",
+			"-retetest",
+			"-copy",
+			"-remoteIOListener",
+			"-runlistener",
+			"-time",
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = "$(SRCROOT)/SoarLibrary/lib";
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestClientSML;
+		sourceDirectories = (
+		);
+	};
+	89BE9B930B9B2CE200B8814F /* TestConnectionSML */ = {
+		activeExec = 0;
+		executables = (
+			89BE9B950B9B2CE200B8814F /* TestConnectionSML */,
+		);
+	};
+	89BE9B950B9B2CE200B8814F /* TestConnectionSML */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = "$(SRCROOT)/SoarLibrary/lib";
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestConnectionSML;
+		sourceDirectories = (
+		);
+	};
+	89BE9B9F0B9B2EDB00B8814F /* TestExternalLibraryExe */ = {
+		activeExec = 0;
+		executables = (
+			89BE9BA10B9B2EDB00B8814F /* TestExternalLibraryExe */,
+		);
+	};
+	89BE9BA10B9B2EDB00B8814F /* TestExternalLibraryExe */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = "$(SRCROOT)/SoarLibrary/lib";
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestExternalLibraryExe;
+		sourceDirectories = (
+		);
+	};
+	89BE9BB30B9B322300B8814F /* TestExternalLibraryLib */ = {
+		activeExec = 0;
+		executables = (
+			89BE9BB50B9B322300B8814F /* TestExternalLibraryLib */,
+		);
+	};
+	89BE9BB50B9B322300B8814F /* TestExternalLibraryLib */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = $SRCROOT/SoarLibrary/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestExternalLibraryLib;
+		savedGlobals = {
+		};
+		sourceDirectories = (
+		);
+		variableFormatDictionary = {
+		};
+	};
+	89BE9BCB0B9B34DF00B8814F /* TestMultiAgent */ = {
+		activeExec = 0;
+		executables = (
+			89BE9BCD0B9B34DF00B8814F /* TestMultiAgent */,
+		);
+	};
+	89BE9BCD0B9B34DF00B8814F /* TestMultiAgent */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = $SRCROOT/SoarLibrary/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestMultiAgent;
+		sourceDirectories = (
+		);
+	};
+	89BE9BD80B9B361900B8814F /* TestSMLEvents */ = {
+		activeExec = 0;
+		executables = (
+			89BE9BDA0B9B361900B8814F /* TestSMLEvents */,
+		);
+	};
+	89BE9BDA0B9B361900B8814F /* TestSMLEvents */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = $SRCROOT/SoarLibrary/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestSMLEvents;
+		sourceDirectories = (
+		);
+	};
+	89BE9BE60B9B48A200B8814F /* TestSMLPerformance */ = {
+		activeExec = 0;
+		executables = (
+			89BE9BE80B9B48A200B8814F /* TestSMLPerformance */,
+		);
+	};
+	89BE9BE80B9B48A200B8814F /* TestSMLPerformance */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = $SRCROOT/SoarLibrary/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestSMLPerformance;
+		sourceDirectories = (
+		);
+	};
+	89BE9BF00B9B49D800B8814F /* TestSoarPerformance */ = {
+		activeExec = 0;
+		executables = (
+			89BE9BF20B9B49D800B8814F /* TestSoarPerformance */,
+		);
+	};
+	89BE9BF20B9B49D800B8814F /* TestSoarPerformance */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = $SRCROOT/SoarLibrary/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestSoarPerformance;
+		sourceDirectories = (
+		);
+	};
+	89BE9C0D0B9B62B400B8814F /* Java_sml_ClientInterface */ = {
+		activeExec = 0;
+	};
+	89BE9C150B9B6E4200B8814F /* Java_sml_ClientInterface_wrap.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {992, 46788}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {793, 553}}";
+			sepNavWindowFrame = "{{61, 41}, {838, 658}}";
+		};
+	};
+	89BE9C630B9C8FF400B8814F /* TestJavaSML */ = {
+		activeExec = 0;
+		executables = (
+			89BE9C650B9C8FF500B8814F /* TestJavaSML */,
+		);
+	};
+	89BE9C650B9C8FF500B8814F /* TestJavaSML */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = ../lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TestJavaSML;
+		sourceDirectories = (
+		);
+	};
+	89BE9CB50B9D6FD100B8814F /* VisualSoar */ = {
+		activeExec = 0;
+		executables = (
+			89BE9CB70B9D6FD100B8814F /* VisualSoar */,
+		);
+	};
+	89BE9CB70B9D6FD100B8814F /* VisualSoar */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = VisualSoar;
+		sourceDirectories = (
+		);
+	};
+	89BE9D8C0B9D785600B8814F /* SoarJavaDebugger */ = {
+		activeExec = 0;
+		executables = (
+			89BE9D8E0B9D785600B8814F /* SoarJavaDebugger */,
+		);
+	};
+	89BE9D8E0B9D785600B8814F /* SoarJavaDebugger */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = ../lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = SoarJavaDebugger;
+		sourceDirectories = (
+		);
+	};
+	89BE9E0D0B9D7E4B00B8814F /* SWT */ = {
+		activeExec = 0;
+	};
+	89EDF0E50BB7CD94009EDA9E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 89BE97820B9AF9A600B8814F /* main.cpp */;
+		name = "main.cpp: 27";
+		rLen = 0;
+		rLoc = 544;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
+	};
+}
