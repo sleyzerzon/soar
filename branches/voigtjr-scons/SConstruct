@@ -121,7 +121,7 @@ SConscript('#Core/CLI/SConscript')
 SConscript('#Core/ClientSML/SConscript')
 SConscript('#Core/KernelSML/SConscript')
 SConscript('#Core/ClientSMLSWIG/Java/SConscript')
-#SConscript('#Core/ClientSMLSWIG/Python/SConscript')
+SConscript('#Core/ClientSMLSWIG/Python/SConscript')
 
 # Test Apps
 SConscript('#Tools/FilterC/SConscript')

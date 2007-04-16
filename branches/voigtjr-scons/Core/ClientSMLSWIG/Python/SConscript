@@ -26,12 +26,15 @@ libpath = [
 
 swigflags = '-c++ -python -Wall -ICore/ClientSML/include -ICore/ElementXML/include -ICore/ConnectionSML/include '
 
-Python_sml_ClientInterface = env.SharedLibrary('Python_sml_ClientInterface', 
-					       glob.glob('*.i'), 
-					       LIBS = libadd, 
-					       LIBPATH = libpath, 
-					       SWIGFLAGS = swigflags, 
-					       SWIGCXXFILESUFFIX = "_wrap.cpp")
-env.Install('#SoarLibrary/lib', Python_sml_ClientInterface)
+env.SharedLibrary('Python_sml_ClientInterface', 
+	       glob.glob('*.i'), 
+	       LIBS = libadd, 
+	       LIBPATH = libpath, 
+	       SWIGFLAGS = swigflags, 
+	       SWIGCXXFILESUFFIX = "_wrap.cpp")
+
+#libPython_sml_ClientInterface.so is not the correct naming convention for python dynamic code
+#it must be named, in this case, _Python_sml_ClientInterface.so
+env.InstallAs('#SoarLibrary/bin/_Python_sml_ClientInterface.so', 'libPython_sml_ClientInterface.so')
 env.Install('#SoarLibrary/bin', 'Python_sml_ClientInterface.py')
 
