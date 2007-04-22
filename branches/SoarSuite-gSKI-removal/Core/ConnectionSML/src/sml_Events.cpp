@@ -32,12 +32,6 @@ Events::Events()
 	RegisterEvent(smlEVENT_SYSTEM_STOP, "system-stop") ;
 	RegisterEvent(smlEVENT_INTERRUPT_CHECK, "interrupt-check") ;
 	RegisterEvent(smlEVENT_SYSTEM_PROPERTY_CHANGED, "system-property-changed") ;
-	RegisterEvent(smlEVENT_BEFORE_RHS_FUNCTION_ADDED, "before-rhs-function-added") ;
-	RegisterEvent(smlEVENT_AFTER_RHS_FUNCTION_ADDED, "after-rhs-function-added") ;
-	RegisterEvent(smlEVENT_BEFORE_RHS_FUNCTION_REMOVED, "before-rhs-function-removed") ;
-	RegisterEvent(smlEVENT_AFTER_RHS_FUNCTION_REMOVED, "after-rhs-function-removed") ;
-	RegisterEvent(smlEVENT_BEFORE_RHS_FUNCTION_EXECUTED, "before-rhs-function-executed") ;
-	RegisterEvent(smlEVENT_AFTER_RHS_FUNCTION_EXECUTED, "after-rhs-function-executed") ;
 
 	// Run events
 	RegisterEvent(smlEVENT_BEFORE_SMALLEST_STEP, "before-smallest-step") ;
