@@ -74,14 +74,29 @@ bool ProductionListener::RemoveListener(egSKIProductionEventId eventID, Connecti
 
 void ProductionListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
-	production* p = (production*) pCallData ;
-	assert(p) ;
-	assert(p->name->sc.name) ;
-
 	assert(IsProductionEventID(eventID)) ;
-	smlProductionEventId smlEventID = (smlProductionEventId)eventID ;
+	smlProductionEventId smlEventID = (smlProductionEventId)eventID ;	
 
-	std::string name = p->name->sc.name ;
+	std::string name ;
+
+	// We're either passed a production* or an instantiation* depending on the type of event
+	if (smlEventID == smlEVENT_AFTER_PRODUCTION_ADDED || smlEventID == smlEVENT_BEFORE_PRODUCTION_REMOVED)
+	{
+		production* p = (production*) pCallData ;
+		assert(p) ;
+		assert(p->name->sc.name) ;
+		name = p->name->sc.name ;
+	}
+	else
+	{
+		instantiation* inst = (instantiation*) pCallData ;
+		assert(inst) ;
+		production* p = inst->prod ;
+		assert(p) ;
+		assert(p->name->sc.name) ;
+		name = p->name->sc.name ;
+	}
+
 	HandleEvent(smlEventID, pAgentSML, name) ;
 }
 

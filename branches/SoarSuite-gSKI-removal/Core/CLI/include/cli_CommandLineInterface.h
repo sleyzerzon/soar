@@ -37,6 +37,8 @@
 #include "gSKI_Events.h"
 #include "gSKI_Structures.h"
 
+#include "sml_KernelCallback.h"
+
 // For test
 //#define WIN_STATIC_LINK
 
@@ -107,7 +109,7 @@ typedef struct {
 
 CommandLineInterface* GetCLI() ;
 
-class CommandLineInterface : public gSKI::IPrintListener, public gSKI::IProductionListener, public gSKI::IXMLListener {
+class CommandLineInterface : public gSKI::IPrintListener, sml::KernelCallback, public gSKI::IXMLListener {
 public:
 
 	EXPORT CommandLineInterface();
@@ -722,7 +724,8 @@ protected:
 	virtual void HandleEvent(egSKIXMLEventId eventId, gSKI::Agent* agentPtr, const char* funcType, const char* attOrTag, const char* value);
 
 	// Production callback events go here
-	virtual void HandleEvent(egSKIProductionEventId eventId, gSKI::Agent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match);
+	//virtual void HandleEvent(egSKIProductionEventId eventId, gSKI::Agent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match);
+	virtual void OnKernelEvent(int eventID, sml::AgentSML* pAgentSML, void* pCallData) ;
 
 	// Wrapped to handle errors more easily
 	int CLITokenize(std::string cmdline, std::vector<std::string>& argumentVector);
@@ -778,7 +781,7 @@ protected:
 	/*************************************************************
 	* @brief 
 	*************************************************************/
-	void HandleSourceError(int errorLine, const std::string& filename, gSKI::ProductionManager* pProductionManager);
+	void HandleSourceError(int errorLine, const std::string& filename);
 
 	/*************************************************************
 	* @brief 

@@ -89,10 +89,10 @@ namespace gSKI
       PhaseTypeEnumMapping[WM_PHASE]            = gSKI_WM_PHASE;
 
       // Event mappings
-      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_ADDED][1] = gSKIEVENT_AFTER_PRODUCTION_ADDED;
-      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_REMOVED][0] = gSKIEVENT_BEFORE_PRODUCTION_REMOVED;
-      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_FIRED][1] = gSKIEVENT_AFTER_PRODUCTION_FIRED;
-      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_RETRACTED][0] = gSKIEVENT_BEFORE_PRODUCTION_RETRACTED;
+//      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_ADDED][1] = gSKIEVENT_AFTER_PRODUCTION_ADDED;
+//      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_REMOVED][0] = gSKIEVENT_BEFORE_PRODUCTION_REMOVED;
+//      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_FIRED][1] = gSKIEVENT_AFTER_PRODUCTION_FIRED;
+//      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_RETRACTED][0] = gSKIEVENT_BEFORE_PRODUCTION_RETRACTED;
 
 	  EventEnumMapping[gSKI_K_EVENT_ELABORATION_CYCLE][0] = gSKIEVENT_BEFORE_ELABORATION_CYCLE;
 	  EventEnumMapping[gSKI_K_EVENT_ELABORATION_CYCLE][1] = gSKIEVENT_AFTER_ELABORATION_CYCLE;
@@ -198,6 +198,12 @@ namespace gSKI
    {
       if(!m_initialized) 
          Init();
+
+	  // DJP: Now handled directly between kernel and SML
+	  assert(false) ;
+	  return (egSKIAgentEvents)0 ;
+
+	  /*
       switch (eventId)
       {
       case gSKIEVENT_AFTER_PRODUCTION_ADDED:
@@ -213,6 +219,7 @@ namespace gSKI
          MegaAssert(false, "Could not map a production event id");
          return static_cast<egSKIAgentEvents>(0);
       }
+	  */
    }
 
 

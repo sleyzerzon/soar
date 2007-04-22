@@ -903,6 +903,7 @@ with the production names).
 |_____|_|___/\__\___|_| |_|\___|_|
    ==================================
    */
+   /* DJP: No longer used
    void ProductionManager::AddProductionListener(egSKIProductionEventId eventId, 
                                                  IProductionListener* listener, 
                                                  bool                 allowAsynch ,
@@ -929,6 +930,7 @@ with the production names).
                                HandleKernelProductionCallbacks);
       }   
    }
+	*/
 
    /*
    ==================================
@@ -943,6 +945,7 @@ with the production names).
 |_____|_|___/\__\___|_| |_|\___|_|
    ==================================
    */
+   /*
    void ProductionManager::RemoveProductionListener(egSKIProductionEventId eventId,
                                                     IProductionListener* listener,
                                                     Error*               err)
@@ -970,6 +973,7 @@ with the production names).
                                0, 0);
       }
    }
+	*/
 
    /*
    ==================================
@@ -994,6 +998,10 @@ with the production names).
                                                            agent*                soarAgent, 
                                                            void*                 data)
    {
+	   // DJP: No longer supported -- handled directly by kernel and SML
+	   assert(false) ;
+
+	   /*
       ProductionManager*   pm = static_cast<ProductionManager*>(object);
       Production*           p;
       IProductionInstance* pi;
@@ -1041,6 +1049,7 @@ with the production names).
          
 //         if(pi)
 //            pi->Release();   
+	*/
 	}
 }
 

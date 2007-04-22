@@ -59,7 +59,6 @@ using namespace xmlTraceNames ;
 // XML Generation functions.
 // 
 // These are currently local to rete while I'm working on matches.
-// They should eventually move to their own file with a new header.
 //
 /////////////////////////////////////////////////////////////////
 void xmlBeginTag(char const* pTag)

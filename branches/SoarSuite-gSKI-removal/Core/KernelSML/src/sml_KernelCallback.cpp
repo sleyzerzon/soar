@@ -24,10 +24,10 @@ void KernelCallback::KernelCallbackStatic(void* pAgent, int eventID, void* pData
 	agent* pKernelAgent   = (agent*)pAgent ;
 
 	// Make sure everything matches up correctly.
-	assert(pThis->m_pAgentSML->GetAgent() == pKernelAgent) ;
+	assert(pThis->m_pCallbackAgentSML->GetAgent() == pKernelAgent) ;
 
 	// Make the callback to the non-static method
-	pThis->OnKernelEvent(eventID, pThis->m_pAgentSML, pCallData) ;
+	pThis->OnKernelEvent(eventID, pThis->m_pCallbackAgentSML, pCallData) ;
 }
 
 // Not returning this as SOAR_CALLBACK_TYPE as that would expose the kernel headers through our headers.
@@ -80,7 +80,10 @@ void KernelCallback::RegisterWithKernel(int eventID)
 	buffer << "id_0x" << this << "_evt_" << eventID;
 	std::string callbackID = buffer.str() ;
 
-	agent* pAgent = m_pAgentSML->GetAgent() ;
+	// Did you remember to call SetAgentSML() before registering this callback?
+	assert(m_pCallbackAgentSML) ;
+
+	agent* pAgent = m_pCallbackAgentSML->GetAgent() ;
 	SOAR_CALLBACK_TYPE callbackType = (SOAR_CALLBACK_TYPE)GetCallbackFromEventID(eventID) ;
 
 	soar_add_callback (pAgent, pAgent, callbackType, KernelCallbackStatic, eventID, this, NULL, (char*)callbackID.c_str()) ;
@@ -97,7 +100,7 @@ void KernelCallback::UnregisterWithKernel(int eventID)
 	buffer << "id_0x" << this << "_evt_" << eventID;
 	std::string callbackID = buffer.str() ;
 
-	agent* pAgent = m_pAgentSML->GetAgent() ;
+	agent* pAgent = m_pCallbackAgentSML->GetAgent() ;
 	SOAR_CALLBACK_TYPE callbackType = (SOAR_CALLBACK_TYPE)GetCallbackFromEventID(eventID) ;
 
 	soar_remove_callback(pAgent, pAgent, callbackType, (char*)callbackID.c_str()) ;

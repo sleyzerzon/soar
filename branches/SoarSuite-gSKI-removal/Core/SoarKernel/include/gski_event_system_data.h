@@ -65,10 +65,10 @@
 enum egSKIAgentEvents
 {
    /* Do we need WME preference added? */
-   gSKI_K_EVENT_PRODUCTION_ADDED,         /* Data: production*       */          // DONE!
-   gSKI_K_EVENT_PRODUCTION_REMOVED,       /* Data: production*       */          // DONE!
-   gSKI_K_EVENT_PRODUCTION_FIRED,         /* Data: instantiation* */             // DONE!
-   gSKI_K_EVENT_PRODUCTION_RETRACTED,     /* Data: instantiation* */             // DONE!
+   //gSKI_K_EVENT_PRODUCTION_ADDED,         /* Data: production*       */          // DONE!
+   //gSKI_K_EVENT_PRODUCTION_REMOVED,       /* Data: production*       */          // DONE!
+   //gSKI_K_EVENT_PRODUCTION_FIRED,         /* Data: instantiation* */             // DONE!
+   //gSKI_K_EVENT_PRODUCTION_RETRACTED,     /* Data: instantiation* */             // DONE!
    gSKI_K_EVENT_ELABORATION_CYCLE,        /* Data: Phase type (char) & elab cycle count (int) ? */ // DONE!
    
    /* NOT Deprecated.  gSKI not close to removing this yet.  */

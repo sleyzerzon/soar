@@ -36,22 +36,23 @@ class AgentSML ;
 
 class KernelCallback {
 protected:
-	AgentSML*	m_pAgentSML ;
+	AgentSML*	m_pCallbackAgentSML ;
 	std::map<int, bool> m_Registered ;
 
 public:
 	static void KernelCallbackStatic(void* pAgent, int eventID, void* pData, void* pCallData) ;
 	static int  GetCallbackFromEventID(int eventID) ;
 
-	KernelCallback() { m_pAgentSML = 0 ; }
+	KernelCallback() { m_pCallbackAgentSML = 0 ; }
 	virtual ~KernelCallback() ;
 
-	void SetAgentSML(AgentSML* pAgentSML) { m_pAgentSML = pAgentSML ; }
+	void SetAgentSML(AgentSML* pAgentSML) { m_pCallbackAgentSML = pAgentSML ; }
 	void ClearKernelCallback() ;
 	void RegisterWithKernel(int eventID) ;
 	void UnregisterWithKernel(int eventID) ;
 	bool IsRegisteredWithKernel(int eventID) ;
 
+	// This is the actual callback for the event
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) = 0 ;
 } ;
 

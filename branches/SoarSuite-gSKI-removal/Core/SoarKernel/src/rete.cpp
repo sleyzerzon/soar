@@ -3527,9 +3527,6 @@ byte add_production_to_rete (agent* thisAgent,
   action *a;
   byte production_addition_result;
 
-  /* JC ADDED: tell gSKI we're about to add a production */
-  gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_ADDED, 0, thisAgent, static_cast<void*>(p));
-
   /* --- build the network for all the conditions --- */
   build_network_for_condition_list (thisAgent, lhs_top, 1, thisAgent->dummy_top_node, 
                       &bottom_node, &bottom_depth, &vars_bound);
@@ -3708,9 +3705,6 @@ byte add_production_to_rete (agent* thisAgent,
 //        add_production_to_stat_lists(new_prod);
 //#endif
 
-  /* JC ADDED: tell gSKI we're about to add a production */
-  gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_ADDED, 1, thisAgent, static_cast<void*>(p));
-
   return production_addition_result;
 }
 
@@ -3729,10 +3723,7 @@ void excise_production_from_rete (agent* thisAgent, production *p)
   soar_invoke_callbacks (thisAgent, thisAgent, 
                          PRODUCTION_JUST_ABOUT_TO_BE_EXCISED_CALLBACK,
                          (soar_call_data) p);
- 
-  /* JC ADDED: Tell gSKI we are about to excise a production */
-  gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_REMOVED, 0, thisAgent, static_cast<void*>(p));
-  
+   
 //#ifdef _WINDOWS
 //        remove_production_from_stat_lists(prod_to_be_excised);
 //#endif

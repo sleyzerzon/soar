@@ -734,10 +734,6 @@ void create_instantiation (agent* thisAgent, production *prod,
             (soar_call_data) inst);
 
    }
- 
-
-   /* JC ADDED: Need to tell gSKI that a production was fired */
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_FIRED, 1, thisAgent, static_cast<void*>(inst));
 }
 
 /* -----------------------------------------------------------------------
@@ -814,10 +810,6 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
 			RETRACTION_CALLBACK,
 			(soar_call_data) inst);
    
-  /* JC ADDED: tell gSKI that we've retracted a production instantiation */
-  gSKI_MakeAgentCallback(gSKI_K_EVENT_PRODUCTION_RETRACTED, 0, thisAgent, static_cast<void*>(inst));
-
-
   retracted_a_preference = FALSE;
   
   trace_it = trace_firings_of_inst (thisAgent, inst);

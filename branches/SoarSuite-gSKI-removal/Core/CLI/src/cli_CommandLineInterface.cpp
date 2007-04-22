@@ -38,6 +38,7 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "sml_XMLTrace.h"
+#include "KernelHeaders.h"
 
 #include "agent.h"
 
@@ -234,6 +235,7 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, gSKI::Agent
 
 	m_EchoResult = echoResults ;
 	m_pAgentSML = m_pKernelSML->GetAgentSML(pAgent) ;
+	SetAgentSML(m_pAgentSML) ;
 
 	// Process the command, ignoring its result (errors detected with m_LastError)
 	DoCommandInternal(pAgent, pCommandLine);
@@ -1080,5 +1082,26 @@ int CommandLineInterface::CLITokenize(string cmdline, vector<string>& argumentVe
 	}
 
 	return ret;
+}
+
+void CommandLineInterface::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+{
+	unused(pAgentSML) ;
+
+	if (eventID == gSKIEVENT_BEFORE_PRODUCTION_REMOVED)
+	{
+		// Only called when source command is active
+		++m_NumProductionsExcised;
+
+		if (m_SourceVerbose) {
+			production* p = (production*) pCallData ;
+			assert(p) ;
+			assert(p->name->sc.name) ;
+
+			std::string name = p->name->sc.name ;
+
+			m_ExcisedDuringSource.push_back(name.c_str());
+		}
+	}
 }
 
