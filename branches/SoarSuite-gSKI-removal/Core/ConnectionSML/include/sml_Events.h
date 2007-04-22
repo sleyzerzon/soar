@@ -51,9 +51,6 @@ namespace sml {
 typedef enum {
     smlEVENT_BEFORE_SHUTDOWN            = 1,
 	smlEVENT_AFTER_CONNECTION,
-    smlEVENT_AFTER_CONNECTION_LOST,
-    smlEVENT_BEFORE_RESTART,
-    smlEVENT_AFTER_RESTART,
 	smlEVENT_SYSTEM_START,
 	smlEVENT_SYSTEM_STOP,
 	smlEVENT_INTERRUPT_CHECK,					// Chance for client to interrupt a run (designed to be low bandwidth)
