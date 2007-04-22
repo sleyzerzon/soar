@@ -184,9 +184,11 @@ namespace gSKI
 			unsigned long       count         = 1,
 			Error*              err           = 0);
 		*/
+		/*
 		egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE, 
 			unsigned long  stepCount         = 1,
 			Error*         err               = 0);
+	    */
 
 		/**
 		* @brief Interrupts agent execution
@@ -1340,12 +1342,14 @@ namespace gSKI
 		* @brief Executes the low level details of each type of run
 		*/
 		//{
+		/*
 		egSKIRunResult step(egSKIInterleaveType stepSize, unsigned long count);  
 		//egSKIRunResult  run(egSKIRunType runType, unsigned long maxSteps);
 		void preStepNotifications();
 		bool postStepNotifications();
 		void preStepNotificationsSoar7();
 		bool postStepNotificationsSoar7();
+		*/
 		//}
 
 		/** 
