@@ -15,7 +15,8 @@
 
 #include "cli_Commands.h"
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 
 using namespace cli;
 using namespace sml;
@@ -35,7 +36,7 @@ bool CommandLineInterface::ParseSRand(gSKI::Agent* pAgent, std::vector<std::stri
 
 bool CommandLineInterface::DoSRand(unsigned long int* pSeed) {
 
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	pKernelHack->SeedRandomNumberGenerator(pSeed);
 	return true;

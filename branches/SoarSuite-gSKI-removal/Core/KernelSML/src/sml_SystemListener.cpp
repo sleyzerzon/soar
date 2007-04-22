@@ -40,10 +40,12 @@ bool SystemListener::AddListener(egSKISystemEventId eventID, Connection* pConnec
 {
     bool first = EventManager<egSKISystemEventId>::BaseAddListener(eventID, pConnection) ;
 
+	/* DJP: System events can't be implemented below SML because the kernel itself is agent based (it has no concept of something larger than an agent)
 	if (first)
 	{
 		m_pKernelSML->GetKernel()->AddSystemListener(eventID, this) ;
 	}
+	*/
 
 	return first ;
 }
@@ -53,10 +55,12 @@ bool SystemListener::RemoveListener(egSKISystemEventId eventID, Connection* pCon
 {
 	bool last = EventManager<egSKISystemEventId>::BaseRemoveListener(eventID, pConnection) ;
 
+	/* DJP: System events can't be implemented below SML because the kernel itself is agent based (it has no concept of something larger than an agent)
 	if (last)
 	{
 		m_pKernelSML->GetKernel()->RemoveSystemListener(eventID, this) ;
 	}
+	*/
 
 	return last ;
 }

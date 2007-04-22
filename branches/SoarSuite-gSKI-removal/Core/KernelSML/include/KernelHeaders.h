@@ -28,3 +28,4 @@
 #include "decide.h"
 #include "recmem.h"
 #include "symtab.h"
+#include "kernel_struct.h"

@@ -18,8 +18,9 @@
 #include "sml_Names.h"
 #include "sml_StringOps.h"
 
-#include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+//#include "gSKI_Kernel.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 
 using namespace cli;
 using namespace sml;
@@ -49,9 +50,9 @@ bool CommandLineInterface::DoAddWME(gSKI::Agent* pAgent, const std::string& id, 
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
-	unsigned long timetag = pKernelHack->AddWme(pAgent, id.c_str(), attribute.c_str(), value.c_str(), acceptable);
+	unsigned long timetag = pKernelHack->AddWme(m_pAgentSML, id.c_str(), attribute.c_str(), value.c_str(), acceptable);
 	if (timetag < 0) {
 		switch (timetag) {
 			default:

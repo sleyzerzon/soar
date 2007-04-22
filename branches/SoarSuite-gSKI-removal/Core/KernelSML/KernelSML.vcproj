@@ -253,6 +253,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sml_KernelHelpers.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\sml_KernelSML.cpp"
 				>
 			</File>
@@ -360,6 +364,10 @@
 			</File>
 			<File
 				RelativePath=".\include\sml_KernelCallback.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\sml_KernelHelpers.h"
 				>
 			</File>
 			<File

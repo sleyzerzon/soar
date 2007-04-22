@@ -19,7 +19,8 @@
 
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelHelpers.h"
+#include "sml_KernelSML.h"
 #include "gsysparam.h"
 
 using namespace cli;
@@ -83,12 +84,12 @@ bool CommandLineInterface::DoLearn(gSKI::Agent* pAgent, const LearnBitset& optio
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll need it
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	// No options means print current settings
 	if (options.none() || options.test(LEARN_LIST)) {
 
-		const long* pSysparams = pKernelHack->GetSysparams(pAgent);
+		const long* pSysparams = pKernelHack->GetSysparams(m_pAgentSML);
 
 		if (m_RawOutput) {
 			if (pAgent->IsLearningOn()) {
@@ -110,17 +111,17 @@ bool CommandLineInterface::DoLearn(gSKI::Agent* pAgent, const LearnBitset& optio
 			std::string output;
 			if (m_RawOutput) {
 				m_Result << "\nforce-learn states (when learn 'only'):";
-				pKernelHack->GetForceLearnStates(pAgent, output);
+				pKernelHack->GetForceLearnStates(m_pAgentSML, output);
 				if (output.size()) m_Result << '\n' + output;
 
 				m_Result << "\ndont-learn states (when learn 'except'):";
-				pKernelHack->GetDontLearnStates(pAgent, output);
+				pKernelHack->GetDontLearnStates(m_pAgentSML, output);
 				if (output.size()) m_Result << '\n' + output;
 
 			} else {
-				pKernelHack->GetForceLearnStates(pAgent, output);
+				pKernelHack->GetForceLearnStates(m_pAgentSML, output);
 				AppendArgTagFast(sml_Names::kParamLearnForceLearnStates, sml_Names::kTypeString, output.c_str());
-				pKernelHack->GetDontLearnStates(pAgent, output);
+				pKernelHack->GetDontLearnStates(m_pAgentSML, output);
 				AppendArgTagFast(sml_Names::kParamLearnDontLearnStates, sml_Names::kTypeString, output.c_str());
 			}
 		}
@@ -129,34 +130,34 @@ bool CommandLineInterface::DoLearn(gSKI::Agent* pAgent, const LearnBitset& optio
 
 	if (options.test(LEARN_ONLY)) {
 		pAgent->SetLearning(true);
-		pKernelHack->SetSysparam(pAgent, LEARNING_ONLY_SYSPARAM, true);
-		pKernelHack->SetSysparam(pAgent, LEARNING_EXCEPT_SYSPARAM, false);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_ONLY_SYSPARAM, true);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_EXCEPT_SYSPARAM, false);
 	}
 
 	if (options.test(LEARN_EXCEPT)) {
 		pAgent->SetLearning(true);
-		pKernelHack->SetSysparam(pAgent, LEARNING_ONLY_SYSPARAM, false);
-		pKernelHack->SetSysparam(pAgent, LEARNING_EXCEPT_SYSPARAM, true);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_ONLY_SYSPARAM, false);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_EXCEPT_SYSPARAM, true);
 	}
 
 	if (options.test(LEARN_ENABLE)) {
 		pAgent->SetLearning(true);
-		pKernelHack->SetSysparam(pAgent, LEARNING_ONLY_SYSPARAM, false);
-		pKernelHack->SetSysparam(pAgent, LEARNING_EXCEPT_SYSPARAM, false);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_ONLY_SYSPARAM, false);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_EXCEPT_SYSPARAM, false);
 	}
 
 	if (options.test(LEARN_DISABLE)) {
 		pAgent->SetLearning(false);
-		pKernelHack->SetSysparam(pAgent, LEARNING_ONLY_SYSPARAM, false);
-		pKernelHack->SetSysparam(pAgent, LEARNING_EXCEPT_SYSPARAM, false);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_ONLY_SYSPARAM, false);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_EXCEPT_SYSPARAM, false);
 	}
 
 	if (options.test(LEARN_ALL_LEVELS)) {
-		pKernelHack->SetSysparam(pAgent, LEARNING_ALL_GOALS_SYSPARAM, true);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_ALL_GOALS_SYSPARAM, true);
 	}
 
 	if (options.test(LEARN_BOTTOM_UP)) {
-		pKernelHack->SetSysparam(pAgent, LEARNING_ALL_GOALS_SYSPARAM, false);
+		pKernelHack->SetSysparam(m_pAgentSML, LEARNING_ALL_GOALS_SYSPARAM, false);
 	}
 
 	return true;

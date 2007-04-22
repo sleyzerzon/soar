@@ -21,7 +21,8 @@
 #include "gSKI_Kernel.h"
 #include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 
 using namespace cli;
 using namespace sml;
@@ -77,18 +78,18 @@ bool CommandLineInterface::DoExplainBacktraces(gSKI::Agent* pAgent, const std::s
 	if (condition < -1) return SetError(CLIError::kInvalidConditionNumber);
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	if (!pProduction) {
 		// no production means query, ignore other args
 		AddListenerAndDisableCallbacks(pAgent);
-		pKernelHack->ExplainListChunks(pAgent);
+		pKernelHack->ExplainListChunks(m_pAgentSML);
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
 
 	AddListenerAndDisableCallbacks(pAgent);
-	pKernelHack->ExplainChunks(pAgent, pProduction->c_str(), condition);
+	pKernelHack->ExplainChunks(m_pAgentSML, pProduction->c_str(), condition);
 	RemoveListenerAndEnableCallbacks(pAgent);
 	return true;
 }

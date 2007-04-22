@@ -481,9 +481,6 @@ bool KernelSML::HandleShutdown(gSKI::Agent* pAgent, char const* pCommandName, Co
 	unused(pAgent) ; unused(pCommandName) ; unused(pConnection) ; unused(pIncoming) ; unused(pResponse) ; unused(pError) ;
 
 	// Notify everyone that the system is about to shutdown.
-	// Note -- this event is not currently implemented in gSKI and we would
-	// prefer to send it now before the gSKI kernel object or any others are actually deleted
-	// so that there's still a stable system to respond to the event.
 	FireSystemEvent(gSKIEVENT_BEFORE_SHUTDOWN) ;
 
 	// Delete all agents explicitly now (so listeners can hear that the agents have been destroyed).
@@ -724,10 +721,8 @@ bool KernelSML::HandleFireEvent(gSKI::Agent* pAgent, char const* pCommandName, C
 
 	// Make the call.  These are the only events which we allow
 	// explicit client control over to date.
-	if (id == smlEVENT_SYSTEM_START)
-		GetKernel()->FireSystemStart() ;
-	else if (id == smlEVENT_SYSTEM_STOP)
-		GetKernel()->FireSystemStop() ;
+	if (id == smlEVENT_SYSTEM_START || id == smlEVENT_SYSTEM_STOP)
+		this->FireSystemEvent((egSKISystemEventId)id) ;
 
 	return true ;
 }

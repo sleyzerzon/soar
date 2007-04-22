@@ -18,7 +18,8 @@
 #include "sml_Names.h"
 
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 #include "gsysparam.h"
 
 using namespace cli;
@@ -65,15 +66,15 @@ bool CommandLineInterface::DoTimers(gSKI::Agent* pAgent, bool* pSetting) {
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	if (pSetting) {
 		// set, don't print
-		pKernelHack->SetSysparam(pAgent, TIMERS_ENABLED, *pSetting);
+		pKernelHack->SetSysparam(m_pAgentSML, TIMERS_ENABLED, *pSetting);
 
 	} else {
 		// print current setting
-		const long* pSysparams = pKernelHack->GetSysparams(pAgent);
+		const long* pSysparams = pKernelHack->GetSysparams(m_pAgentSML);
 
 		if (m_RawOutput) {
 			m_Result << (pSysparams[TIMERS_ENABLED] ? "Timers are enabled." : "Timers are disabled.");

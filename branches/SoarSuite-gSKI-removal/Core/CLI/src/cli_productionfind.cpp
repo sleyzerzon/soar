@@ -17,7 +17,8 @@
 #include "sml_Names.h"
 
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 
 using namespace cli;
 using namespace sml;
@@ -83,13 +84,13 @@ bool CommandLineInterface::DoProductionFind(gSKI::Agent* pAgent, const Productio
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of damnation, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	AddListenerAndDisableCallbacks(pAgent);
 
-	bool ret = pKernelHack->ProductionFind(pAgent, 
+	bool ret = pKernelHack->ProductionFind(m_pAgentSML, 
 		0, 
-		m_pKernel, 
+		m_pKernelSML, 
 		options.test(PRODUCTION_FIND_INCLUDE_LHS), 
 		options.test(PRODUCTION_FIND_INCLUDE_RHS), 
 		const_cast<char*>(pattern.c_str()), 

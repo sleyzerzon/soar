@@ -24,6 +24,7 @@
 #include "sml_ConnectionManager.h"
 #include "sml_Events.h"
 #include "sml_RunScheduler.h"
+#include "sml_KernelHelpers.h"
 #include "KernelSMLDirect.h"
 
 #include "thread_Lock.h"
@@ -136,6 +137,10 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	m_UpdateListener.Init(this) ;
 	m_StringListener.Init(this) ;
 
+	m_pSoarKernel = new kernel() ;
+
+	m_pKernelHelpers = new KernelHelpers() ;
+
 	// We'll use this to make sure only one connection is executing commands
 	// in the kernel at a time.
 	m_pKernelMutex = new soar_thread::Mutex() ;
@@ -202,6 +207,10 @@ KernelSML::~KernelSML()
 
 	if (m_pKernelFactory && m_pIKernel)
 		m_pKernelFactory->DestroyKernel(m_pIKernel);
+
+	delete m_pKernelHelpers ;
+
+	delete m_pSoarKernel ;
 
 	delete m_pKernelFactory ;
 
@@ -345,7 +354,7 @@ void KernelSML::AddConnection(Connection* pConnection)
 	m_pConnectionManager->AddConnection(pConnection) ;
 
 	// Notify listeners that we have a new connection.
-	m_SystemListener.HandleEvent(gSKIEVENT_AFTER_CONNECTION, GetKernel()) ;
+	this->FireSystemEvent(gSKIEVENT_AFTER_CONNECTION) ;
 }
 
 /*************************************************************
@@ -465,6 +474,15 @@ AgentSML* KernelSML::GetAgentSML(agent* pAgent)
 	}
 
 	return pResult ;
+}
+
+/*************************************************************
+* @brief	gSKI introduced a Soar kernel object.
+*			Not clear on why this exists but preserving it for now.
+*************************************************************/	
+kernel* KernelSML::GetSoarKernel()
+{
+	return m_pSoarKernel ;
 }
 
 /*************************************************************
@@ -600,7 +618,7 @@ Agent* KernelSML::GetAgent(char const* pAgentName)
 void KernelSML::SetStopBefore(egSKIPhaseType phase)
 {
 	m_pRunScheduler->SetStopBefore(phase) ;
-	GetKernel()->FireSystemPropertyChangedEvent() ;
+	this->FireSystemEvent(gSKIEVENT_SYSTEM_PROPERTY_CHANGED) ;
 }
 
 egSKIPhaseType KernelSML::GetStopBefore()

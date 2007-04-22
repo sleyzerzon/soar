@@ -20,7 +20,8 @@
 
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 #include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 
@@ -66,7 +67,7 @@ bool CommandLineInterface::DoPWatch(gSKI::Agent* pAgent, bool query, const std::
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	gSKI::ProductionManager* pProductionManager = pAgent->GetProductionManager();
 	gSKI::tIProductionIterator* pIter = 0;
@@ -129,7 +130,7 @@ bool CommandLineInterface::DoPWatch(gSKI::Agent* pAgent, bool query, const std::
 			// is it being watched
 			if (pProd->IsWatched()) {
 				// shut it off
-				if (!pKernelHack->StopTracingProduction(pAgent, pProd->GetName())) {
+				if (!pKernelHack->StopTracingProduction(m_pAgentSML, pProd->GetName())) {
 					// really shouldn't happen
 					return SetError(CLIError::kgSKIError);
 				}
@@ -142,9 +143,9 @@ bool CommandLineInterface::DoPWatch(gSKI::Agent* pAgent, bool query, const std::
 
 	// we have a production
 	if (setting) {
-		if (!pKernelHack->BeginTracingProduction(pAgent, pProduction->c_str())) return SetError(CLIError::kProductionNotFound);
+		if (!pKernelHack->BeginTracingProduction(m_pAgentSML, pProduction->c_str())) return SetError(CLIError::kProductionNotFound);
 	} else {
-		if (!pKernelHack->StopTracingProduction(pAgent, pProduction->c_str())) return SetError(CLIError::kProductionNotFound);
+		if (!pKernelHack->StopTracingProduction(m_pAgentSML, pProduction->c_str())) return SetError(CLIError::kProductionNotFound);
 	}
 	return true;
 }

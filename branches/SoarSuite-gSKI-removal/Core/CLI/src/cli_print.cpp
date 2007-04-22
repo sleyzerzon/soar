@@ -19,7 +19,8 @@
 
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelHelpers.h"
+#include "sml_KernelSML.h"
 #include "gsysparam.h"
 
 using namespace cli;
@@ -152,7 +153,7 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 	*/
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	// Check for stack print
 	if (options.test(PRINT_STACK)) {
@@ -165,7 +166,7 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 
 		// Structured output through structured output callback
 		if (m_RawOutput) AddListenerAndDisableCallbacks(pAgent);
-		pKernelHack->PrintStackTrace(pAgent, (options.test(PRINT_STATES)) ? true : false, (options.test(PRINT_OPERATORS)) ? true : false);
+		pKernelHack->PrintStackTrace(m_pAgentSML, (options.test(PRINT_STATES)) ? true : false, (options.test(PRINT_OPERATORS)) ? true : false);
 		if (m_RawOutput) RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
@@ -179,34 +180,34 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 	// Check for the five general print options (all, chunks, defaults, justifications, user)
 	if (options.test(PRINT_ALL)) {
 		AddListenerAndDisableCallbacks(pAgent);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, USER_PRODUCTION_TYPE);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
 	if (options.test(PRINT_CHUNKS)) {
 		AddListenerAndDisableCallbacks(pAgent);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
 	if (options.test(PRINT_DEFAULTS)) {
 		AddListenerAndDisableCallbacks(pAgent);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
 	if (options.test(PRINT_JUSTIFICATIONS)) {
 		AddListenerAndDisableCallbacks(pAgent);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
 	if (options.test(PRINT_USER)) {
 		AddListenerAndDisableCallbacks(pAgent);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, USER_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);
 		RemoveListenerAndEnableCallbacks(pAgent);
 		return true;
 	}
@@ -219,12 +220,12 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 		m_VarPrint = true;
 	}
 	if (pArg) {
-		pKernelHack->PrintSymbol(pAgent, const_cast<char*>(pArg->c_str()), name, filename, internal, full, depth);
+		pKernelHack->PrintSymbol(m_pAgentSML, const_cast<char*>(pArg->c_str()), name, filename, internal, full, depth);
 	} else {
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, USER_PRODUCTION_TYPE);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
-        pKernelHack->PrintUser(pAgent, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
+        pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
 	}
 	m_VarPrint = false;
 

@@ -144,6 +144,7 @@ public:
 
 	gSKI::Agent* GetIAgent()  { return m_pIAgent ; }
 	agent* GetAgent()		  { return m_agent ; }
+	agent* GetSoarAgent()	  { return m_agent ; }	// I prefer this naming.  Should eventually remove the other GetAgent() method.
 	KernelSML* GetKernelSML() { return m_pKernelSML ; }
 
 	char const* GetName() ;

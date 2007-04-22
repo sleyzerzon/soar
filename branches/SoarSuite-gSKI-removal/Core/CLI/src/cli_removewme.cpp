@@ -20,7 +20,8 @@
 
 #include "IgSKI_WorkingMemory.h"
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 
 using namespace cli;
 using namespace sml;
@@ -47,9 +48,9 @@ bool CommandLineInterface::DoRemoveWME(gSKI::Agent* pAgent, int timetag) {
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
-	if (pKernelHack->RemoveWmeByTimetag(pAgent, timetag)) return SetError(CLIError::kRemoveWMEFailed);
+	if (pKernelHack->RemoveWmeByTimetag(m_pAgentSML, timetag)) return SetError(CLIError::kRemoveWMEFailed);
 	return true;
 }
 

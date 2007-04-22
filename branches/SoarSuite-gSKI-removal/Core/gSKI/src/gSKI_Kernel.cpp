@@ -28,7 +28,7 @@
 
 //
 // HACK!
-#include "gSKI_DoNotTouch.h"
+//#include "gSKI_DoNotTouch.h"
 
 namespace gSKI
 {
@@ -156,6 +156,7 @@ namespace gSKI
                           |___/
       =========================
       */
+   /*
       void Kernel::AddSystemListener(egSKISystemEventId  nEventId, 
                              ISystemListener*    pListener, 
                              bool                bAllowAsynch,
@@ -164,7 +165,7 @@ namespace gSKI
          ClearError(err);
          m_systemListeners.AddListener(nEventId, pListener);
       }
-
+   */
 
    /*
    =========================
@@ -179,6 +180,7 @@ namespace gSKI
 |_____|_|___/\__\___|_| |_|\___|_|
       =========================
       */
+   /*
       void Kernel::RemoveSystemListener(egSKISystemEventId  nEventId,
                                 ISystemListener*     pListener,
                                 Error*               err)
@@ -186,7 +188,7 @@ namespace gSKI
          ClearError(err);
          m_systemListeners.RemoveListener(nEventId, pListener);
       }
-
+   */
 	  /**************************************************
 	   *
 	   * Listen for rhs user function firings
@@ -236,35 +238,36 @@ namespace gSKI
 			return result ;
 	  }
 
-	  /** Notify listeners that they should start the "system" (the simulation usually) */
+	  /*
 	  void Kernel::FireSystemStart()
 	  {
 		  SystemNotifier sys(this) ;
 		  m_systemListeners.Notify(gSKIEVENT_SYSTEM_START, sys) ;
 	  }
 
-	  /** Notify listeners that they should stop the "system" (the simulation usually) */
 	  void Kernel::FireSystemStop()
 	  {
 		  SystemNotifier sys(this) ;
 		  m_systemListeners.Notify(gSKIEVENT_SYSTEM_STOP, sys) ;
 	  }
 
-	  /** Notify listeners that Soar is running and give them a chance to interrupt it (without having to start up separate threads etc.) */
 	  void Kernel::FireInterruptCheckEvent()
 	  {
 		  SystemNotifier sys(this) ;
 		  m_systemListeners.Notify(gSKIEVENT_INTERRUPT_CHECK, sys) ;
 	  }
+	  */
 
 	  /** Notify listeners that a property has changed within the system.  We're not defining which property at this point so a client
 	      who wishes to know about a specific property listens for this event and then queries for the property they care about (which may or
 		  may not have changed). */
+	  /*
 	  void Kernel::FireSystemPropertyChangedEvent()
 	  {
 		  SystemNotifier sys(this) ;
 		  m_systemListeners.Notify(gSKIEVENT_SYSTEM_PROPERTY_CHANGED, sys) ;
 	  }
+	  */
 
 
    /*
@@ -330,11 +333,13 @@ namespace gSKI
    
    ==================================
    */
+   /*
   EvilBackDoor::TgDWorkArounds* Kernel::getWorkaroundObject()
   {
     static  EvilBackDoor::TgDWorkArounds evilBackDoor;
     return &evilBackDoor;
   }
+  */
 
   int  Kernel::GetInterruptCheckRate() const			{ return m_InterruptCheckRate ; }
   void Kernel::SetInterruptCheckRate(int newRate)	{ if (newRate >= 1) m_InterruptCheckRate = newRate ; }

@@ -18,6 +18,8 @@
 #include <crtdbg.h>
 #endif
 
+typedef struct kernel_struct kernel;
+
 // Forward declarations
 namespace gSKI {
 	class KernelFactory ;
@@ -64,6 +66,7 @@ class AgentSML;
 class ConnectionManager ;
 class Events ;
 class RunScheduler ;
+class KernelHelpers ;
 
 // Define the CommandFunction which we'll call to process commands
 typedef bool (KernelSML::*CommandFunction)(gSKI::Agent*, char const*, Connection*, AnalyzeXML*, ElementXML*, gSKI::Error*);
@@ -137,6 +140,9 @@ protected:
 	// Used to map event IDs to and from strings
 	Events*			m_pEventMap ;
 
+	// gSKI created this tiny wrapper object at the kernel level.  Keeping it for now.
+	kernel*			m_pSoarKernel ;
+
 	// Used to listen for kernel events that are kernel based (not for a specific agent)
 	SystemListener	m_SystemListener;
 	RhsListener		m_RhsListener;
@@ -155,6 +161,8 @@ protected:
 	bool			m_RequireSystemStop ;
 
 	RunScheduler*	m_pRunScheduler ;
+
+	KernelHelpers*	m_pKernelHelpers ;
 
 	// Used to shutdown a running system.  Not sure we really need to support this
 	// but this is an attempt.
@@ -387,6 +395,17 @@ public:
 	AgentSML*	GetAgentSML(agent* pAgent) ;	// Lookup agent from kernel agent
 
 	void RecordAgentSML(AgentSML* pAgentSML, agent* pAgent) ;
+
+	/*************************************************************
+	* @brief	gSKI introduced a Soar kernel object.
+	*			Not clear on why this exists but preserving it for now.
+	*************************************************************/	
+	kernel* GetSoarKernel() ;
+
+	/*************************************************************
+	* @brief	A set of methods generally used to implement CLI methods.
+	*************************************************************/	
+	KernelHelpers* GetKernelHelpers() { return m_pKernelHelpers ; }
 
 	/*************************************************************
 	* @brief	Returns the number of agents.

@@ -18,7 +18,8 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelHelpers.h"
+#include "sml_KernelSML.h"
 #include "gSKI_Kernel.h"
 #include "gsysparam.h"
 
@@ -83,45 +84,45 @@ bool CommandLineInterface::DoChunkNameFormat(gSKI::Agent* pAgent, const bool* pL
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	if (!pLongFormat && !pCount && !pPrefix) {
 		if (m_RawOutput) {
-			m_Result << "Using " << (pKernelHack->GetSysparam(pAgent, USE_LONG_CHUNK_NAMES) ? "long" : "short") << " chunk format.";
+			m_Result << "Using " << (pKernelHack->GetSysparam(m_pAgentSML, USE_LONG_CHUNK_NAMES) ? "long" : "short") << " chunk format.";
 		} else {
-			AppendArgTagFast(sml_Names::kParamChunkLongFormat, sml_Names::kTypeBoolean, pKernelHack->GetSysparam(pAgent, USE_LONG_CHUNK_NAMES) ? sml_Names::kTrue : sml_Names::kFalse);
+			AppendArgTagFast(sml_Names::kParamChunkLongFormat, sml_Names::kTypeBoolean, pKernelHack->GetSysparam(m_pAgentSML, USE_LONG_CHUNK_NAMES) ? sml_Names::kTrue : sml_Names::kFalse);
 		}
 		return true;
 	}
 
-	if (pLongFormat) pKernelHack->SetSysparam(pAgent, USE_LONG_CHUNK_NAMES, *pLongFormat);
+	if (pLongFormat) pKernelHack->SetSysparam(m_pAgentSML, USE_LONG_CHUNK_NAMES, *pLongFormat);
 
 	if (pCount) {
 		if (*pCount >= 0) {
-			if (*pCount >= pKernelHack->GetSysparam(pAgent, MAX_CHUNKS_SYSPARAM)) return SetError(CLIError::kCountGreaterThanMaxChunks);
-			if (static_cast<unsigned long>(*pCount) < pKernelHack->GetChunkCount(pAgent)) return SetError(CLIError::kCountLessThanChunks);
-			pKernelHack->SetChunkCount(pAgent, *pCount);
+			if (*pCount >= pKernelHack->GetSysparam(m_pAgentSML, MAX_CHUNKS_SYSPARAM)) return SetError(CLIError::kCountGreaterThanMaxChunks);
+			if (static_cast<unsigned long>(*pCount) < pKernelHack->GetChunkCount(m_pAgentSML)) return SetError(CLIError::kCountLessThanChunks);
+			pKernelHack->SetChunkCount(m_pAgentSML, *pCount);
 		} else {
 			// query
 			if (m_RawOutput) {
-				m_Result << "Chunk count: " << pKernelHack->GetChunkCount(pAgent);
+				m_Result << "Chunk count: " << pKernelHack->GetChunkCount(m_pAgentSML);
 			} else {
 				char buf[kMinBufferSize];
-				AppendArgTagFast(sml_Names::kParamChunkCount, sml_Names::kTypeInt, Int2String(pKernelHack->GetChunkCount(pAgent), buf, kMinBufferSize));
+				AppendArgTagFast(sml_Names::kParamChunkCount, sml_Names::kTypeInt, Int2String(pKernelHack->GetChunkCount(m_pAgentSML), buf, kMinBufferSize));
 			}
 		}
 	}
 
 	if (pPrefix) {
 		if (pPrefix->size()) {
-			if (!pKernelHack->SetChunkNamePrefix(pAgent, pPrefix->c_str())) return SetError(CLIError::kInvalidPrefix);
+			if (!pKernelHack->SetChunkNamePrefix(m_pAgentSML, pPrefix->c_str())) return SetError(CLIError::kInvalidPrefix);
 		} else {
 			// query
 			if (m_RawOutput) {
 				if (pCount && *pCount < 0) m_Result << "\n";
-				m_Result << "Prefix: " << pKernelHack->GetChunkNamePrefix(pAgent);
+				m_Result << "Prefix: " << pKernelHack->GetChunkNamePrefix(m_pAgentSML);
 			} else {
-				AppendArgTagFast(sml_Names::kParamChunkNamePrefix, sml_Names::kTypeString, pKernelHack->GetChunkNamePrefix(pAgent));
+				AppendArgTagFast(sml_Names::kParamChunkNamePrefix, sml_Names::kTypeString, pKernelHack->GetChunkNamePrefix(m_pAgentSML));
 			}
 		}
 	}

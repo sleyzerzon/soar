@@ -143,10 +143,12 @@ namespace gSKI
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
       */
+	  /*
       void AddSystemListener(egSKISystemEventId          eventId, 
                                      ISystemListener*    listener, 
                                      bool                allowAsynch = false,
                                      Error*              err         = 0);
+	  */
 
       /**
       *  @brief Removes a system event listener
@@ -175,9 +177,11 @@ namespace gSKI
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
       */
+	  /*
       void RemoveSystemListener(egSKISystemEventId           eventId,
                                         ISystemListener*     listener,
                                         Error*               err = 0);
+	  */
 
       /**
       *  @brief Adds a listener for rhs (right hand side) user functions
@@ -356,16 +360,16 @@ namespace gSKI
 		/**
 		* @brief Notify listeners to start or stop the entire system (the simulation)
 		**/
-		void FireSystemStart() ;
-		void FireSystemStop() ;
+		//void FireSystemStart() ;
+		//void FireSystemStop() ;
 
 		 /** Notify listeners that Soar is running and give them a chance to interrupt it (without having to start up separate threads etc.) */
-		 void FireInterruptCheckEvent() ;
+		 //void FireInterruptCheckEvent() ;
 
 		/** Notify listeners that a property has changed within the system.  We're not defining which property at this point so a client
 	      who wishes to know about a specific property listens for this event and then queries for the property they care about (which may or
 		  may not have changed). */
-		void FireSystemPropertyChangedEvent() ;
+		//void FireSystemPropertyChangedEvent() ;
 
 		 /** 
          * @brief Event notifier for system callbacks
@@ -469,7 +473,7 @@ namespace gSKI
 
 
 	  public:
-         EvilBackDoor::TgDWorkArounds* getWorkaroundObject();
+         //EvilBackDoor::TgDWorkArounds* getWorkaroundObject();
 
    };
 }

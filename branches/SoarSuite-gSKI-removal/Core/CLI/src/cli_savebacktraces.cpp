@@ -17,7 +17,8 @@
 #include "sml_StringOps.h"
 
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 #include "gSKI_ProductionManager.h"
 #include "IgSKI_Production.h"
 #include "gsysparam.h"
@@ -63,18 +64,18 @@ bool CommandLineInterface::DoSaveBacktraces(gSKI::Agent* pAgent, bool* pSetting)
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	if (!pSetting) {
 		if (m_RawOutput) {
-			m_Result << "Save bactraces is " << (pKernelHack->GetSysparam(pAgent, EXPLAIN_SYSPARAM) ? "enabled." : "disabled.");
+			m_Result << "Save bactraces is " << (pKernelHack->GetSysparam(m_pAgentSML, EXPLAIN_SYSPARAM) ? "enabled." : "disabled.");
 		} else {
-			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeBoolean, pKernelHack->GetSysparam(pAgent, EXPLAIN_SYSPARAM) ? sml_Names::kTrue : sml_Names::kFalse);
+			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeBoolean, pKernelHack->GetSysparam(m_pAgentSML, EXPLAIN_SYSPARAM) ? sml_Names::kTrue : sml_Names::kFalse);
 		}
 		return true;
 	}
 
-	pKernelHack->SetSysparam(pAgent, EXPLAIN_SYSPARAM, *pSetting);
+	pKernelHack->SetSysparam(m_pAgentSML, EXPLAIN_SYSPARAM, *pSetting);
 	return true;
 }
 

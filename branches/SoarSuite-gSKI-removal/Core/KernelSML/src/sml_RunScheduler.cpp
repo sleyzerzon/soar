@@ -789,7 +789,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 	pKernel->SetStopPoint(runStepSize, m_StopBeforePhase);
 
 	// Fire one event to indicate the entire system is starting
-	pKernel->FireSystemStart() ;
+	m_pKernelSML->FireSystemEvent(gSKIEVENT_SYSTEM_START) ;
 
 	// IF we did a StopBeforeUpdate, this is where we need to test and generate update events...
 	TestForFiringUpdateWorldEvents();
@@ -863,7 +863,8 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 			// A client can use any event, but this one is designed to allow clients
 			// to throttle back the frequency of the event to control performance.
 			if ((stepCount % interruptCheckRate) == 0)
-				pKernel->FireInterruptCheckEvent() ;
+				m_pKernelSML->FireSystemEvent(gSKIEVENT_INTERRUPT_CHECK) ;
+
 			stepCount++ ;
 
 			// Notify listeners that Soar is going to run.  This event is a kernel level (agent manager) event
@@ -941,7 +942,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 	MoveTo_StopBeforePhase(runStepSize, pError);  // agents will have done FireRunEndsEvent() here or above.
 
 	// Fire one event to indicate the entire system should stop.
-	pKernel->FireSystemStop() ;
+	m_pKernelSML->FireSystemEvent(gSKIEVENT_SYSTEM_STOP) ;
 
 	// clean up
 	m_IsRunning = false ;

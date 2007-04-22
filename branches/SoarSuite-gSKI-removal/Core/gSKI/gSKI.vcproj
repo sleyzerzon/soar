@@ -657,14 +657,6 @@
 				Name="Misc"
 				>
 				<File
-					RelativePath="src\gSKI_DoNotTouch.cpp"
-					>
-				</File>
-				<File
-					RelativePath="src\gSKI_DoNotTouch.h"
-					>
-				</File>
-				<File
 					RelativePath="src\gSKI_EnumRemapping.cpp"
 					>
 				</File>

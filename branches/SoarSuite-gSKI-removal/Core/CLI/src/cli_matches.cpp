@@ -20,7 +20,8 @@
 #include "sml_Names.h"
 
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelHelpers.h"
+#include "sml_KernelSML.h"
 #include "gsysparam.h"
 
 using namespace cli;
@@ -100,11 +101,11 @@ bool CommandLineInterface::DoMatches(gSKI::Agent* pAgent, const eMatchesMode mod
 	}
 
 	// Attain the evil back door of doom, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	if (mode == MATCHES_PRODUCTION) {
 		if (!pProduction) return SetError(CLIError::kProductionRequired);
-		rete_node* prod = pKernelHack->NameToProduction(pAgent, const_cast<char*>(pProduction->c_str()));
+		rete_node* prod = pKernelHack->NameToProduction(m_pAgentSML, const_cast<char*>(pProduction->c_str()));
 		if (!prod) {
 			SetErrorDetail("Production " + *pProduction);
 			return SetError(CLIError::kProductionNotFound);
@@ -113,12 +114,12 @@ bool CommandLineInterface::DoMatches(gSKI::Agent* pAgent, const eMatchesMode mod
 		if (m_RawOutput)
 		{
 			AddListenerAndDisableCallbacks(pAgent);		
-			pKernelHack->PrintPartialMatchInformation(pAgent, prod, wtt);
+			pKernelHack->PrintPartialMatchInformation(m_pAgentSML, prod, wtt);
 			RemoveListenerAndEnableCallbacks(pAgent);
 		}
 		else
 		{
-			pKernelHack->XMLPartialMatchInformation(pAgent, prod, wtt) ;
+			pKernelHack->XMLPartialMatchInformation(m_pAgentSML, prod, wtt) ;
 		}
 
 	} else {
@@ -129,12 +130,12 @@ bool CommandLineInterface::DoMatches(gSKI::Agent* pAgent, const eMatchesMode mod
 		if (m_RawOutput)
 		{
 			AddListenerAndDisableCallbacks(pAgent);		
-			pKernelHack->PrintMatchSet(pAgent, wtt, mst);
+			pKernelHack->PrintMatchSet(m_pAgentSML, wtt, mst);
 			RemoveListenerAndEnableCallbacks(pAgent);
 		}
 		else
 		{
-			pKernelHack->XMLMatchSet(pAgent, wtt, mst) ;
+			pKernelHack->XMLMatchSet(m_pAgentSML, wtt, mst) ;
 		}
 	}
 

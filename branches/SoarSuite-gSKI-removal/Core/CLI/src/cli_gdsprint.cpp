@@ -17,7 +17,8 @@
 #include "sml_Names.h"
 
 #include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 
 using namespace cli;
 using namespace sml;
@@ -33,10 +34,10 @@ bool CommandLineInterface::DoGDSPrint(gSKI::Agent* pAgent) {
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of desolation, even though we aren't the TgD
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	AddListenerAndDisableCallbacks(pAgent);
-	bool ret = pKernelHack->GDSPrint(pAgent);
+	bool ret = pKernelHack->GDSPrint(m_pAgentSML);
 	RemoveListenerAndEnableCallbacks(pAgent);
 
 	// put the result into a message(string) arg tag

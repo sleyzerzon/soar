@@ -17,8 +17,8 @@
 
 #include "sml_Names.h"
 
-#include "gSKI_Kernel.h"
-#include "gSKI_DoNotTouch.h"
+#include "sml_KernelSML.h"
+#include "sml_KernelHelpers.h"
 
 using namespace cli;
 using namespace sml;
@@ -91,11 +91,11 @@ bool CommandLineInterface::DoPreferences(gSKI::Agent* pAgent, const ePreferences
 	if (!RequireAgent(pAgent)) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll need it
-	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	//bool object = 1;
 	AddListenerAndDisableCallbacks(pAgent);
-	bool ret = pKernelHack->Preferences(pAgent, static_cast<int>(detail), object, pId ? pId->c_str() : 0, pAttribute ? pAttribute->c_str() : 0);
+	bool ret = pKernelHack->Preferences(m_pAgentSML, static_cast<int>(detail), object, pId ? pId->c_str() : 0, pAttribute ? pAttribute->c_str() : 0);
 	RemoveListenerAndEnableCallbacks(pAgent);
 
 	// put the result into a message(string) arg tag
