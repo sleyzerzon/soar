@@ -195,10 +195,10 @@ namespace gSKI
       m_agent(0), 
       m_active(true),
       m_kernel(kernel),
-      m_ConcatRhs(),
-      m_InterruptRhs(m_kernel->GetAgentManager()),
-	  m_ExecRhs(m_kernel),
-	  m_CmdRhs(m_kernel),
+      //m_ConcatRhs(),
+      //m_InterruptRhs(m_kernel->GetAgentManager()),
+	  //m_ExecRhs(m_kernel),
+	  //m_CmdRhs(m_kernel),
 	  m_pPerfMon(0)
    {
       MegaAssert(agentName != 0, "Null agent name pointer passed to agent constructor!");
@@ -228,8 +228,8 @@ namespace gSKI
          m_workingMemory = new WorkingMemory(this);
      }
 
-	 m_ExecRhs.SetAgent(this) ;
-	 m_CmdRhs.SetAgent(this) ;
+	 //m_ExecRhs.SetAgent(this) ;
+	 //m_CmdRhs.SetAgent(this) ;
 
      // Adding some basic rhs functions
      //this->AddClientRhsFunction(&m_InterruptRhs);

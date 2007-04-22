@@ -14,6 +14,7 @@
 #include "KernelHeaders.h"
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 using namespace sml ;

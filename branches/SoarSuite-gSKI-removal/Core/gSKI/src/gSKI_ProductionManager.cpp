@@ -27,6 +27,7 @@
 #include "IgSKI_Iterator.h"
 #include "gSKI_EnumRemapping.h"
 #include "gSKI_Agent.h"
+#include "gSKI_Kernel.h"
 
 //
 // Soar Kernel Specific Headers

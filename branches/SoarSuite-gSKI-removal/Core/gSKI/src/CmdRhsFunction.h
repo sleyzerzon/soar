@@ -11,6 +11,7 @@
   This rhs function allows a client to implement arbitrary behavior
   where the implementation of the function is within the client (not gSKI or the kernel).
 */
+/*
 
 #include "gSKI_RhsFunction.h"
 #include "gSKI_Kernel.h"
@@ -92,6 +93,6 @@ private:
    }
 
 };
-
+*/
 
 #endif

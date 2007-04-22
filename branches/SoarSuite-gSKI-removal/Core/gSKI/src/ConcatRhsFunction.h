@@ -11,6 +11,7 @@
    A simple rhs function for concatenating symbols into a string symbol.
 */
 
+/*
 #include "gSKI_RhsAction.h"
 #include "gSKI_RhsFunction.h"
 #include "gSKI_RhsFunctionAction.h"
@@ -50,5 +51,5 @@ class ConcatRhsFunction: public gSKI::RhsFunction
    }
 
 };
-
+*/
 #endif

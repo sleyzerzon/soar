@@ -29,6 +29,7 @@
       */
 
    typedef enum {
+	  // DJP: Converted to SML
       // Kernel events
       gSKIEVENT_BEFORE_SHUTDOWN            = 1,
 	  gSKIEVENT_AFTER_CONNECTION,
@@ -104,6 +105,7 @@
 
 
     typedef enum {
+	  // DJP: Converted to SML
       // Production Manager
       gSKIEVENT_AFTER_PRODUCTION_ADDED  = gSKIEVENT_LAST_RUN_EVENT + 1,
       gSKIEVENT_BEFORE_PRODUCTION_REMOVED,
@@ -167,6 +169,8 @@
     }
  
     typedef enum { 
+	  // DJP: Converted to SML
+
  	 // Used to provide user handler functions for RHS (right hand side) functions
    	 // fired within Soar productions.  This is different from normal events in that
  	 // the handler is executing the function and returning a value, not just being notified
@@ -208,6 +212,7 @@
 	// Events that can be used by environments to trigger when the world should update
 	// Currently not implemented by gSKI, but included for completeness.
 	typedef enum {
+	  // DJP: Converted to SML
 		gSKIEVENT_AFTER_ALL_OUTPUT_PHASES = gSKIEVENT_LAST_XML_EVENT + 1,	// All agents have completed output phase
 		gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT,								// All agents have generated output (since run began)
 	    gSKIEVENT_LAST_UPDATE_EVENT = gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT,
@@ -220,6 +225,7 @@
 
 	// Events that pass a string as parameter
 	typedef enum {
+	  // DJP: Converted to SML
 		gSKIEVENT_EDIT_PRODUCTION = gSKIEVENT_LAST_UPDATE_EVENT + 1,	// Arg is "char const*".
 		gSKIEVENT_LOAD_LIBRARY,											// Arg is "char const*"
 		gSKIEVENT_LAST_STRING_EVENT = gSKIEVENT_LOAD_LIBRARY,

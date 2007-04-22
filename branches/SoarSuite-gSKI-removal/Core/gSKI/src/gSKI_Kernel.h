@@ -218,11 +218,12 @@ namespace gSKI
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
       */
+/*
       virtual void AddRhsListener(egSKIRhsEventId  eventId, 
                                   IRhsListener*		  listener, 
                                   bool                allowAsynch = false,
                                   Error*              err         = 0) ;
-
+*/
 	  /**************************************************
 	   *
 	   * Notify listeners about a RHS user function firing.
@@ -236,9 +237,10 @@ namespace gSKI
 	   * rather than a generic user function that the user provides.
 	   *
 	   **************************************************/
+/*
 	  virtual bool FireRhsNotification(Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 									   int maxReturnValueLength, char* pReturnValue) ;
-
+*/
       /**
       *  @brief Removes a rhs listener
       *
@@ -265,10 +267,11 @@ namespace gSKI
       *               information.  If it is 0 (the default) extended error
       *               information is not returned.
       */
+/*
       virtual void RemoveRhsListener(egSKIRhsEventId eventId,
                                      IRhsListener*     listener,
                                      Error*            err = 0) ;
-
+*/
       /**
       *  @brief Adds a listener for connection lost events
       *

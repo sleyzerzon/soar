@@ -213,6 +213,8 @@ int main() {
 
 		RegisterForEvents(kernel, agent, dataList);
 
+		// Load up TOH as a base set of rules.
+		// Comment this out if we don't want any initial set of rules.
 		cout << kernel->ExecuteCommandLine("source ..\\..\\SoarLibrary\\Demos\\towers-of-hanoi\\towers-of-hanoi.soar", agent->GetAgentName()) << endl ;
 
 		//

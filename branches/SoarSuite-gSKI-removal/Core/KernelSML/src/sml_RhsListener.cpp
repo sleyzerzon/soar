@@ -82,11 +82,13 @@ void RhsListener::Init(KernelSML* pKernel)
 	// as it's handled internally by KernelSML.
 	// (Note -- this callback is only fired if we hit one of our RHS functions, not all RHS functions so
 	// registering for it all of the time doesn't incur extra overhead).
+	/*
 	if (!m_bListeningRHS)
 	{
 		m_pKernelSML->GetKernel()->AddRhsListener(gSKIEVENT_RHS_USER_FUNCTION, this) ;	
 		m_bListeningRHS = true ;
 	}
+	*/
 }
 
 // Release memory
@@ -103,11 +105,13 @@ void RhsListener::Clear()
 	m_RhsMap.clear() ;
 
 	// Stop listening for RHS functions
+	/*
 	if (m_bListeningRHS)
 	{
 		m_pKernelSML->GetKernel()->RemoveRhsListener(gSKIEVENT_RHS_USER_FUNCTION, this) ;
 		m_bListeningRHS = false ;
 	}
+	*/
 }
 
 void RhsListener::RemoveAllListeners(Connection* pConnection)

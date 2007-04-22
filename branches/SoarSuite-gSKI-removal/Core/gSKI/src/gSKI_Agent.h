@@ -19,6 +19,7 @@
 #include "IgSKI_InputLink.h"
 #include "IgSKI_OutputLink.h"
 #include "IgSKI_WMObject.h"
+#include "gSKI_RhsFunction.h"
 
 #include "EventManagementTemplates.h"
 
@@ -1424,10 +1425,10 @@ namespace gSKI
 
 		egSKIRunState         m_runState;          /**< Current agent run state */
 
-		ConcatRhsFunction     m_ConcatRhs;
-		InterruptRhsFunction  m_InterruptRhs;
-		ExecRhsFunction		m_ExecRhs ;
-		CmdRhsFunction		m_CmdRhs ;
+		//ConcatRhsFunction     m_ConcatRhs;
+		//InterruptRhsFunction  m_InterruptRhs;
+		//ExecRhsFunction		m_ExecRhs ;
+		//CmdRhsFunction		m_CmdRhs ;
 
 		/** List of all client defined rhs function */
 		//tRhsFunctionMap       m_rhsFunctions;

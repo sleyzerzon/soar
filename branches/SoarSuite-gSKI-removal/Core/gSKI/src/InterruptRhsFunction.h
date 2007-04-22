@@ -12,9 +12,9 @@ A simple rhs function for interrupting all running agents
 when a production is fired.
 */
 
+/*
 #include "gSKI_RhsFunction.h"
 #include "gSKI_AgentManager.h"
-
 class InterruptRhsFunction: public gSKI::RhsFunction
 {
 	//Need to move this (and all RHS support functions) up to SML level
@@ -39,5 +39,6 @@ public:
 private:
 	gSKI::AgentManager* m_manager;
 };
+*/
 
 #endif

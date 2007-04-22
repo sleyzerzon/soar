@@ -194,6 +194,7 @@ namespace gSKI
 	   * Listen for rhs user function firings
 	   *
 	   **************************************************/
+   /*
 	  void Kernel::AddRhsListener(egSKIRhsEventId   nEventId, 
                              IRhsListener*       pListener, 
                              bool                bAllowAsynch,
@@ -202,12 +203,13 @@ namespace gSKI
          ClearError(err);
          m_rhsListeners.AddListener(nEventId, pListener);
       }
-
+    */
 	  /**************************************************
 	   *
 	   * Stop listening for rhs user function firings
 	   *
 	   **************************************************/
+   /*
       void Kernel::RemoveRhsListener(egSKIRhsEventId    nEventId,
                                 IRhsListener*        pListener,
                                 Error*               err)
@@ -215,7 +217,7 @@ namespace gSKI
          ClearError(err);
          m_rhsListeners.RemoveListener(nEventId, pListener);
       }
-
+   */
 	  /**************************************************
 	   *
 	   * Notify listeners about a RHS user function firing.
@@ -229,6 +231,7 @@ namespace gSKI
 	   * rather than a generic user function that the user provides.
 	   *
 	   **************************************************/
+   /*
 	  bool Kernel::FireRhsNotification(Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 									   int maxReturnValueLength, char* pReturnValue)
 	  {
@@ -237,7 +240,7 @@ namespace gSKI
 
 			return result ;
 	  }
-
+   */
 	  /*
 	  void Kernel::FireSystemStart()
 	  {
