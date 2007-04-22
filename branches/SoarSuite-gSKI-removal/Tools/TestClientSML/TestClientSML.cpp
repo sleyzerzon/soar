@@ -1206,7 +1206,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	int phaseCount = 0 ;
 	int callbackPhase = pAgent->RegisterForRunEvent(smlEVENT_BEFORE_PHASE_EXECUTED, MyRunEventHandler, &phaseCount) ;
-//	int callbackDec = pAgent->RegisterForRunEvent(smlEVENT_BEFORE_DECISION_CYCLE, MyRunEventHandler, &phaseCount) ;
+	int callbackDec = pAgent->RegisterForRunEvent(smlEVENT_BEFORE_ELABORATION_CYCLE, MyRunEventHandler, &phaseCount) ;
 
 	// Nothing should match here
 	std::string result = pAgent->RunSelf(4) ;
@@ -1248,7 +1248,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	}
 
 	pAgent->UnregisterForRunEvent(callbackPhase) ;
-//	pAgent->UnregisterForRunEvent(callbackDec) ;
+	pAgent->UnregisterForRunEvent(callbackDec) ;
 
 	// By this point the static variable ClientXMLStorage should have been filled in 
 	// and it should be valid, even though the event handler for MyXMLEventHandler has completed.
@@ -1617,6 +1617,12 @@ void MyEchoEventHandler(smlPrintEventId id, void* pUserData, Agent* pAgent, char
 		cout << " ----> Received an echo event with contents: " << pMsg << endl ;    
 }
 
+void MyProductionLoaded(smlProductionEventId id, void* pUserData, Agent* pAgent, const char* pProdName, const char* pInst)
+{
+	if (pProdName)
+		cout << "Event " << id << " for production " << pProdName << endl ;
+}
+
 bool TestSML(bool embedded, bool useClientThread, bool fullyOptimized, bool simpleInitSoar, bool autoCommit)
 {
 	cout << "TestClientSML app starting..." << endl << endl;
@@ -1722,12 +1728,14 @@ bool TestSML(bool embedded, bool useClientThread, bool fullyOptimized, bool simp
 
 			// Listen to the echo of the load
 			int echoCallback = pAgent->RegisterForPrintEvent(smlEVENT_ECHO, &MyEchoEventHandler, NULL) ;
+			int prodListener = pAgent->RegisterForProductionEvent(smlEVENT_AFTER_PRODUCTION_ADDED, &MyProductionLoaded, NULL) ;
 
 			bool echo = true ;
 			bool load = pAgent->LoadProductions(path.c_str(), echo) ;
 
 			unused(load);
 			pAgent->UnregisterForPrintEvent(echoCallback) ;
+			pAgent->UnregisterForProductionEvent(prodListener) ;
 
 			if (pAgent->HadError())
 			{

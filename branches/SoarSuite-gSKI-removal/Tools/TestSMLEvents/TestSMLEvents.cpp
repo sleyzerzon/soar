@@ -213,6 +213,8 @@ int main() {
 
 		RegisterForEvents(kernel, agent, dataList);
 
+		cout << kernel->ExecuteCommandLine("source ..\\..\\SoarLibrary\\Demos\\towers-of-hanoi\\towers-of-hanoi.soar", agent->GetAgentName()) << endl ;
+
 		//
 		// let the user do whatever they want
 		//
@@ -308,12 +310,6 @@ NamedEventDataList* CreateSystemEventData() {
 	namedEventData->eventData.push_back(new EventData(smlEVENT_SYSTEM_START, "smlEVENT_SYSTEM_START"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_SYSTEM_STOP, "smlEVENT_SYSTEM_STOP"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_INTERRUPT_CHECK, "smlEVENT_INTERRUPT_CHECK"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_RHS_FUNCTION_ADDED, "smlEVENT_BEFORE_RHS_FUNCTION_ADDED"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_RHS_FUNCTION_ADDED, "smlEVENT_AFTER_RHS_FUNCTION_ADDED"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_RHS_FUNCTION_REMOVED, "smlEVENT_BEFORE_RHS_FUNCTION_REMOVED"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_RHS_FUNCTION_REMOVED, "smlEVENT_AFTER_RHS_FUNCTION_REMOVED"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_RHS_FUNCTION_EXECUTED, "smlEVENT_BEFORE_RHS_FUNCTION_EXECUTED"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_RHS_FUNCTION_EXECUTED, "smlEVENT_AFTER_RHS_FUNCTION_EXECUTED"));
 
 	return namedEventData;
 }
