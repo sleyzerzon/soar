@@ -42,6 +42,8 @@ int KernelCallback::InternalGetCallbackFromEventID(int eventID)
 	case smlEVENT_AFTER_PRODUCTION_FIRED:		return FIRING_CALLBACK ;
 	case smlEVENT_BEFORE_PRODUCTION_RETRACTED:	return RETRACTION_CALLBACK ;
 
+	case smlEVENT_BEFORE_SMALLEST_STEP:			return BEFORE_ELABORATION_CALLBACK ;	// Elaboration cycle is the smallest step
+	case smlEVENT_AFTER_SMALLEST_STEP:			return AFTER_ELABORATION_CALLBACK ;		// Elaboration cycle is the smallest step
 	case smlEVENT_BEFORE_ELABORATION_CYCLE:		return BEFORE_ELABORATION_CALLBACK ;
 	case smlEVENT_AFTER_ELABORATION_CYCLE:		return AFTER_ELABORATION_CALLBACK ;
 	case smlEVENT_BEFORE_INPUT_PHASE:			return BEFORE_INPUT_PHASE_CALLBACK ;

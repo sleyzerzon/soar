@@ -47,6 +47,7 @@
     }
  
     typedef enum {
+	  // DJP: Converted to SML
       // Agent (Run)Events
       gSKIEVENT_BEFORE_SMALLEST_STEP = gSKIEVENT_LAST_SYSTEM_EVENT + 1,
       gSKIEVENT_AFTER_SMALLEST_STEP,

@@ -55,7 +55,6 @@ bool RunListener::AddListener(egSKIRunEventId eventID, Connection* pConnection)
 	if (first)
 	{
 		this->RegisterWithKernel(eventID) ;
-		//m_pAgent->AddRunListener(eventID, this) ;
 	}
 
 	return first ;
@@ -69,7 +68,6 @@ bool RunListener::RemoveListener(egSKIRunEventId eventID, Connection* pConnectio
 	if (last)
 	{
 		this->UnregisterWithKernel(eventID) ;
-		//m_pAgent->RemoveRunListener(eventID, this) ;
 	}
 
 	return last ;
@@ -110,35 +108,3 @@ void RunListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallDat
 	delete pMsg ;
 }
 
-// Called when a "RunEvent" occurs in the kernel
-void RunListener::HandleEvent(egSKIRunEventId eventID, gSKI::Agent* agentPtr, egSKIPhaseType phase)
-{
-	// Get the first listener for this event (or return if there are none)
-	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIRunEventId>::GetBegin(eventID, &connectionIter))
-		return ;
-
-	// We need the first connection for when we're building the message.  Perhaps this is a sign that
-	// we shouldn't have rolled these methods into Connection.
-	Connection* pConnection = *connectionIter ;
-
-	// Convert eventID to a string
-	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
-
-	// Convert phase to a string
-	char phaseStr[kMinBufferSize] ;
-	Int2String(phase, phaseStr, sizeof(phaseStr)) ;
-
-	// Build the SML message we're doing to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, agentPtr->GetName()) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamPhase, phaseStr) ;
-
-	// Send the message out
-	AnalyzeXML response ;
-	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
-
-	// Clean up
-	delete pMsg ;
-}

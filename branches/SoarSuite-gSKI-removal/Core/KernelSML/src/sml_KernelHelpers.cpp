@@ -1088,8 +1088,8 @@ char * pref_names[] =
 int soar_ecPrintPreferences(agent* soarAgent, char *szId, char *szAttr, bool object, bool print_prod, wme_trace_type wtt)
 {
 
-	Symbol *id, *attr;
-	slot *s;
+	Symbol *id, *attr = 0;
+	slot *s = 0 ;
 	preference *p;
 	wme *w;
 	int i;

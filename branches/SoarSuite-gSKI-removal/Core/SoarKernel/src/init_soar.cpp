@@ -852,8 +852,6 @@ void do_one_top_level_phase (agent* thisAgent)
 		 
 			// We need to generate this event here in case no elaborations fire...
 			soar_invoke_callbacks(thisAgent, thisAgent, BEFORE_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//            gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//                        (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
 
   		   /* 'Prime the decision for a new round of production firings at the end of
 			* REW:   05.05.97   */  /*  KJC 04.05 moved here from INPUT_PHASE for 8.6.0 */
@@ -867,10 +865,6 @@ void do_one_top_level_phase (agent* thisAgent)
 			{  // no elaborations will fire this phase
 				thisAgent->run_elaboration_count++ ;	// All phases count as a run elaboration
 				soar_invoke_callbacks(thisAgent, thisAgent, AFTER_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-/*
-				gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 	
-					(thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 1);
-*/
 			}
 	  }
 
@@ -883,8 +877,6 @@ void do_one_top_level_phase (agent* thisAgent)
 		  if (thisAgent->e_cycles_this_d_cycle) 
 		  {  // only for 2nd cycle or higher.  1st cycle fired above
 			soar_invoke_callbacks(thisAgent, thisAgent, BEFORE_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//			  gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//				  (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
 		  }
 		  do_preference_phase(thisAgent);
 	      do_working_memory_phase(thisAgent);
@@ -894,8 +886,6 @@ void do_one_top_level_phase (agent* thisAgent)
 		  thisAgent->run_elaboration_count++ ;
 		  determine_highest_active_production_level_in_stack_propose(thisAgent);
 			soar_invoke_callbacks(thisAgent, thisAgent, AFTER_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//          gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//                                  (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 1);
           if (thisAgent->go_type == GO_ELABORATION) break;
 	  }
  
@@ -935,8 +925,6 @@ void do_one_top_level_phase (agent* thisAgent)
 	
       /* JC ADDED: Tell gski about elaboration phase beginning */
 	 soar_invoke_callbacks(thisAgent, thisAgent, BEFORE_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//      gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//                   (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
 
       #ifndef NO_TIMING_STUFF       /* REW: 28.07.96 */
       start_timer (thisAgent, &thisAgent->start_phase_tv);
@@ -995,8 +983,6 @@ void do_one_top_level_phase (agent* thisAgent)
       #endif
 
 	  soar_invoke_callbacks(thisAgent, thisAgent, AFTER_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//      gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//             (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 1);
 
      break;     /* END of Soar7 WM PHASE */
 
@@ -1023,8 +1009,6 @@ void do_one_top_level_phase (agent* thisAgent)
 
 			// We need to generate this event here in case no elaborations fire...
 			soar_invoke_callbacks(thisAgent, thisAgent, BEFORE_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//            gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//                        (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
 		 
 			/* 'prime' the cycle for a new round of production firings 
 			* in the APPLY (pref/wm) phase *//* KJC 04.05 moved here from end of DECISION */
@@ -1037,8 +1021,6 @@ void do_one_top_level_phase (agent* thisAgent)
 			{  // no elaborations will fire this phase	
 				thisAgent->run_elaboration_count++ ;	// All phases count as a run elaboration
 				soar_invoke_callbacks(thisAgent, thisAgent, AFTER_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//				gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//				      (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 1);
 			}
 	  }
 	  /* max-elaborations are checked in determine_highest_active... and if they
@@ -1051,8 +1033,6 @@ void do_one_top_level_phase (agent* thisAgent)
 		  if (thisAgent->e_cycles_this_d_cycle) 
 		  {  // only for 2nd cycle or higher.  1st cycle fired above     
 			soar_invoke_callbacks(thisAgent, thisAgent, BEFORE_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//			  gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//                    (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 0);
 		  }
 		  do_preference_phase(thisAgent);
 		  do_working_memory_phase(thisAgent);
@@ -1067,8 +1047,6 @@ void do_one_top_level_phase (agent* thisAgent)
 	  	  }
 		  determine_highest_active_production_level_in_stack_apply(thisAgent);
 		  soar_invoke_callbacks(thisAgent, thisAgent, AFTER_ELABORATION_CALLBACK, (soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)) ;
-//		  gSKI_MakeAgentCallbackPhase(thisAgent, gSKI_K_EVENT_ELABORATION_CYCLE, 
-//				      (thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE, 1);
 
 		  if (thisAgent->go_type == GO_ELABORATION) break;
       }

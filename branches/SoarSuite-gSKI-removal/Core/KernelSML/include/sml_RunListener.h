@@ -39,7 +39,7 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 
-class RunListener : public gSKI::IRunListener, public EventManager<egSKIRunEventId>
+class RunListener : public EventManager<egSKIRunEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
@@ -67,9 +67,6 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(egSKIRunEventId eventID, Connection* pConnection) ;
-
-	// Called when a "RunEvent" occurs in the kernel
-	virtual void HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase) ;
 } ;
 
 }
