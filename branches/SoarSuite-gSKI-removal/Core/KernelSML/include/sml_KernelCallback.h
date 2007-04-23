@@ -38,15 +38,18 @@ class KernelCallback {
 protected:
 	AgentSML*	m_pCallbackAgentSML ;
 	std::map<int, bool> m_Registered ;
+	static int  InternalGetCallbackFromEventID(int eventID) ;
 
 public:
 	static void KernelCallbackStatic(void* pAgent, int eventID, void* pData, void* pCallData) ;
 	static int  GetCallbackFromEventID(int eventID) ;
+	static bool IsCallbackImplementedInKernel(int eventID) ;
 
 	KernelCallback() { m_pCallbackAgentSML = 0 ; }
 	virtual ~KernelCallback() ;
 
-	void SetAgentSML(AgentSML* pAgentSML) { m_pCallbackAgentSML = pAgentSML ; }
+	virtual void SetAgentSML(AgentSML* pAgentSML)	{ m_pCallbackAgentSML = pAgentSML ; }
+	virtual	AgentSML* GetAgentSML()					{ return m_pCallbackAgentSML ; }
 	void ClearKernelCallback() ;
 	void RegisterWithKernel(int eventID) ;
 	void UnregisterWithKernel(int eventID) ;

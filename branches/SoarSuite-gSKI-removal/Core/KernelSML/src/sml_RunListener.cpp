@@ -54,7 +54,8 @@ bool RunListener::AddListener(egSKIRunEventId eventID, Connection* pConnection)
 
 	if (first)
 	{
-		m_pAgent->AddRunListener(eventID, this) ;
+		this->RegisterWithKernel(eventID) ;
+		//m_pAgent->AddRunListener(eventID, this) ;
 	}
 
 	return first ;
@@ -67,7 +68,8 @@ bool RunListener::RemoveListener(egSKIRunEventId eventID, Connection* pConnectio
 
 	if (last)
 	{
-		m_pAgent->RemoveRunListener(eventID, this) ;
+		this->UnregisterWithKernel(eventID) ;
+		//m_pAgent->RemoveRunListener(eventID, this) ;
 	}
 
 	return last ;
@@ -76,6 +78,36 @@ bool RunListener::RemoveListener(egSKIRunEventId eventID, Connection* pConnectio
 // Called when an event occurs in the kernel
 void RunListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	// Get the first listener for this event (or return if there are none)
+	ConnectionListIter connectionIter ;
+	if (!EventManager<egSKIRunEventId>::GetBegin((egSKIRunEventId)eventID, &connectionIter))
+		return ;
+
+	// We need the first connection for when we're building the message.  Perhaps this is a sign that
+	// we shouldn't have rolled these methods into Connection.
+	Connection* pConnection = *connectionIter ;
+
+	// Convert eventID to a string
+	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
+
+	// Convert phase to a string (cast through long long to prevent warning about pointer truncation from void*)
+	int phase = (int)(long long)pCallData ;
+
+	char phaseStr[kMinBufferSize] ;
+	Int2String(phase, phaseStr, sizeof(phaseStr)) ;
+
+	// Build the SML message we're doing to send.
+	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgentSML->GetName()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamPhase, phaseStr) ;
+
+	// Send the message out
+	AnalyzeXML response ;
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd((egSKIRunEventId)eventID)) ;
+
+	// Clean up
+	delete pMsg ;
 }
 
 // Called when a "RunEvent" occurs in the kernel

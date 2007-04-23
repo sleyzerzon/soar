@@ -347,7 +347,7 @@ namespace gSKI
       return gSKI_RUN_COMPLETED;
    }
 	*/
-
+#if 0
 	/** Notify listeners that agents in the run list are starting or finishing their runs **/
 	void AgentRunManager::FireBeforeRunStartsEvents()
 	{
@@ -372,6 +372,7 @@ namespace gSKI
 				((Agent*)curData->a)->FireRunEndsEvent() ;
 		 }
 	}
+#endif
 
    /*
    =============================

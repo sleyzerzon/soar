@@ -818,10 +818,12 @@ namespace gSKI
 		*               information.  If it is 0 (the default) extended error
 		*               information is not returned.
 		*/
+		/*
 		void AddRunListener(egSKIRunEventId     eventId, 
 			IRunListener*       listener, 
 			bool                allowAsynch = false,
 			Error*              err         = 0);
+	    */
 
 		/* void HandleEvent(egSKIRunEventId eventId, 
 		gSKI::Agent*   agentPtr, 
@@ -864,10 +866,11 @@ namespace gSKI
 		*               information.  If it is 0 (the default) extended error
 		*               information is not returned.
 		*/
+/*
 		void RemoveRunListener(egSKIRunEventId      eventId,
 			IRunListener*        listener,
 			Error*               err = 0);
-
+*/
 		/**
 		*  @brief Adds a listener for Rhs Function change events
 		*
@@ -1148,10 +1151,10 @@ namespace gSKI
 
 
 		/** Fire the gSKIEVENT_BEFORE_RUN_STARTS event **/
-		void FireRunStartsEvent() ;
+		//void FireRunStartsEvent() ;
 
 		/** Fire the gSKIEVENT_AFTER_RUN_ENDS event **/
-		void FireRunEndsEvent() ;
+		//void FireRunEndsEvent() ;
 
 		/** Multi-attribute support */
 		//{
@@ -1181,7 +1184,7 @@ namespace gSKI
 		*/
 		agent* GetSoarAgent(void) { return m_agent; }
 
-		void FireRunEvent(egSKIRunEventId eventId, unsigned short phase) ;
+		//void FireRunEvent(egSKIRunEventId eventId, unsigned short phase) ;
 		void FirePrintEvent(egSKIPrintEventId eventId, char const* pMsg) ;
 		void FireXMLEvent(egSKIXMLEventId eventId, const char* functionType, const char* attOrTag, const char* value) ;
 

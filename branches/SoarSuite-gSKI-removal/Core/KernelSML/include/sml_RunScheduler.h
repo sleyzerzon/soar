@@ -23,6 +23,7 @@
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
 #include "sml_Events.h"	// To get smlRunFlags
+#include "sml_KernelCallback.h"
 
 namespace gSKI {
 	class Agent ;
@@ -35,7 +36,7 @@ namespace sml {
 class KernelSML ;
 class AgentSML ;
 
-class RunScheduler : public gSKI::IRunListener
+class RunScheduler
 {
 protected:
 	KernelSML*	m_pKernelSML ;
@@ -140,7 +141,7 @@ protected:
 	//unsigned long	GetStepCounter(gSKI::Agent* pAgent, egSKIRunType runStepSize) ; //for old scheduler...
     //unsigned long   GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgentSML, egSKIInterleaveType stepSize) ;
     egSKIRunResult  GetOverallRunResult() ;
-	void			HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase) ;
+	//void			HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase) ;
 	bool			HaveAllGeneratedOutput() ;
 	void            InitializeRunCounters(egSKIRunType runStepSize) ;
     void            InitializeStepList() ;

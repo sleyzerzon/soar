@@ -345,8 +345,7 @@ void RunScheduler::FireBeforeRunStartsEvents()
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
-			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			pAgent->FireRunStartsEvent() ;
+			pAgentSML->FireRunEvent(gSKIEVENT_BEFORE_RUN_STARTS) ;
 		}
 	}
 }
@@ -414,8 +413,9 @@ void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 		// We register a listener so that the agent counters/flags get updated at the end of Output.
 		if (addListeners)
 		{
-			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			pAgent->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
+			pAgentSML->GetAgentRunCallback()->RegisterWithKernel(gSKIEVENT_AFTER_OUTPUT_PHASE) ;
+			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
+			//pAgent->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 		}
 	} 
 }
@@ -602,6 +602,7 @@ void RunScheduler::MoveTo_StopBeforePhase(egSKIRunType runStepSize, gSKI::Error*
 *           1/7/06:  KJC registered runListener only on AFTER_OUTPUT_PHASE
 *			 
 *********************************************************************/
+/*
 void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase)
 {
 	unused(phase) ;
@@ -620,6 +621,7 @@ void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egS
 		}
 	}
 }
+*/
 
 /********************************************************************
 * @brief	Check if the "AFTER_ALL_OUTPUT_PHASES" event should be
@@ -670,8 +672,9 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 
 		if (removeListeners)
 		{
-			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			pAgent->RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
+			pAgentSML->GetAgentRunCallback()->UnregisterWithKernel(gSKIEVENT_AFTER_OUTPUT_PHASE) ;
+			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
+			//pAgent->RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 		}
 	}
 }

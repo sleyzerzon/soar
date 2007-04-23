@@ -94,8 +94,8 @@ namespace gSKI
 //      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_FIRED][1] = gSKIEVENT_AFTER_PRODUCTION_FIRED;
 //      EventEnumMapping[gSKI_K_EVENT_PRODUCTION_RETRACTED][0] = gSKIEVENT_BEFORE_PRODUCTION_RETRACTED;
 
-	  EventEnumMapping[gSKI_K_EVENT_ELABORATION_CYCLE][0] = gSKIEVENT_BEFORE_ELABORATION_CYCLE;
-	  EventEnumMapping[gSKI_K_EVENT_ELABORATION_CYCLE][1] = gSKIEVENT_AFTER_ELABORATION_CYCLE;
+//	  EventEnumMapping[gSKI_K_EVENT_ELABORATION_CYCLE][0] = gSKIEVENT_BEFORE_ELABORATION_CYCLE;
+//	  EventEnumMapping[gSKI_K_EVENT_ELABORATION_CYCLE][1] = gSKIEVENT_AFTER_ELABORATION_CYCLE;
 
       RunEventEnumMapping[BEFORE_INPUT_PHASE_CALLBACK]	  = gSKIEVENT_BEFORE_INPUT_PHASE;
       RunEventEnumMapping[BEFORE_PROPOSE_PHASE_CALLBACK]  = gSKIEVENT_BEFORE_PROPOSE_PHASE;
@@ -259,6 +259,7 @@ namespace gSKI
    ==================================
    ==================================
    */
+#if 0
    egSKIAgentEvents EnumRemappings::RemapRunEventType(egSKIRunEventId eventId)
    /** this goes from gSKI to gSKI-added Kernel Events **/
    {
@@ -266,8 +267,8 @@ namespace gSKI
          Init();
       switch (eventId)
       {
-      case gSKIEVENT_BEFORE_ELABORATION_CYCLE:         return gSKI_K_EVENT_ELABORATION_CYCLE;
-      case gSKIEVENT_AFTER_ELABORATION_CYCLE:          return gSKI_K_EVENT_ELABORATION_CYCLE;
+//      case gSKIEVENT_BEFORE_ELABORATION_CYCLE:         return gSKI_K_EVENT_ELABORATION_CYCLE;
+//      case gSKIEVENT_AFTER_ELABORATION_CYCLE:          return gSKI_K_EVENT_ELABORATION_CYCLE;
  
        default:
          // Error condition
@@ -275,6 +276,7 @@ namespace gSKI
          return static_cast<egSKIAgentEvents>(0);
       }
    }
+#endif
 
    SOAR_CALLBACK_TYPE EnumRemappings::KernelRunEventType(egSKIRunEventId eventId)
    /** this goes from gSKI to Kernel native callbacks **/

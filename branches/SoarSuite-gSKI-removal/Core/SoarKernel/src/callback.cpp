@@ -46,6 +46,8 @@ char * soar_callback_names[] = {    /* Must match order of       */
   "before-init-soar",
   "after-init-soar",
   "after-halt-soar",
+  "before-elaboration",
+  "after-elaboration",
   "before-schedule-cycle",
   "after-schedule-cycle",
   "before-decision-cycle",
@@ -73,6 +75,12 @@ char * soar_callback_names[] = {    /* Must match order of       */
   "remove-attribute-impasse",
   "production-just-added",
   "production-just-about-to-be-excised",
+  "after-interrupt",
+  "after-halted",
+  "before-run-starts",
+  "after-run-ends",
+  "before-running",
+  "after-running",
   "firing",
   "retraction",
   "system-parameter-changed",
@@ -309,6 +317,8 @@ void soar_invoke_callbacks (agent* thisAgent,
 
 #ifndef NO_TIMING_STUFF
   switch (callback_type) {
+  case BEFORE_ELABORATION_CALLBACK:
+  case AFTER_ELABORATION_CALLBACK:
   case BEFORE_DECISION_CYCLE_CALLBACK:
   case BEFORE_INPUT_PHASE_CALLBACK:
   case AFTER_INPUT_PHASE_CALLBACK:

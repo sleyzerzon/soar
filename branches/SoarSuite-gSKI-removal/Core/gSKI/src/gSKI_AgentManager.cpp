@@ -350,9 +350,11 @@ namespace gSKI
          //  delete it after it is stopped.
          if(_agent->GetRunState() == gSKI_RUNSTATE_RUNNING)
          {
+			 assert(false) ;	// Not supported
+
             // Set up to listen for this agent being done running.  This will
             //  call RemoveAgentByName after the agent completes its run
-            _agent->AddRunListener(gSKIEVENT_AFTER_RUN_ENDS, &m_runCompleteListener);
+//            _agent->AddRunListener(gSKIEVENT_AFTER_RUN_ENDS, &m_runCompleteListener);
 
             // Tell it to halt
             _agent->Halt();

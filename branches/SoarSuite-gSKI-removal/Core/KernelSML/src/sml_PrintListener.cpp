@@ -50,7 +50,7 @@ bool PrintListener::AddListener(egSKIPrintEventId eventID, Connection* pConnecti
 			m_pAgent->AddPrintListener(eventID, this); 
 
 		// Register for specific events at which point we'll flush the buffer for this event
-		m_pAgentOutputFlusher[eventID-gSKIEVENT_FIRST_PRINT_EVENT] = new AgentOutputFlusher(this, m_pAgent, eventID);
+		m_pAgentOutputFlusher[eventID-gSKIEVENT_FIRST_PRINT_EVENT] = new AgentOutputFlusher(this, GetAgentSML(), eventID);
 	}
 
 	return first ;

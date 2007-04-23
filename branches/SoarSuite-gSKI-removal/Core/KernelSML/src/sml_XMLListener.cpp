@@ -50,7 +50,7 @@ bool XMLListener::AddListener(egSKIXMLEventId eventID, Connection* pConnection)
 		m_pAgent->AddXMLListener(eventID, this); 
 
 		// Register for specific events at which point we'll flush the buffer for this event
-		m_pAgentOutputFlusher[eventID-gSKIEVENT_XML_TRACE_OUTPUT] = new AgentOutputFlusher(this, m_pAgent, eventID);
+		m_pAgentOutputFlusher[eventID-gSKIEVENT_XML_TRACE_OUTPUT] = new AgentOutputFlusher(this, GetAgentSML(), eventID);
 	}
 
 	return first ;

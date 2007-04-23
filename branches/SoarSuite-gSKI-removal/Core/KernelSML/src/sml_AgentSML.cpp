@@ -80,6 +80,9 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 	RegisterRHSFunction(m_pRhsExec) ;
 	RegisterRHSFunction(m_pRhsCmd) ;
 
+	m_pAgentRunCallback = new AgentRunCallback() ;
+	m_pAgentRunCallback->SetAgentSML(this) ;
+
 	// Set counters and flags used to control runs
 	InitializeRuntimeState() ;
 
@@ -98,6 +101,7 @@ AgentSML::~AgentSML()
 	// Release any objects we still own
 	Clear(true) ;
 
+	delete m_pAgentRunCallback ;
 	delete m_pInputProducer ;
 }
 
@@ -425,7 +429,10 @@ egSKIRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize, gSKI:
 }
 
 void AgentSML::FireRunEvent(egSKIRunEventId eventId) {
-	GetIAgent()->FireRunEvent(eventId, (unsigned short)m_agent->current_phase) ;
+	// Trigger a callback from the kernel to propagate the event out to listeners.
+	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
+	int callbackEvent = KernelCallback::GetCallbackFromEventID(eventId) ;
+	soar_invoke_callbacks(m_agent, m_agent, (SOAR_CALLBACK_TYPE)callbackEvent,(soar_call_data) m_agent->current_phase);
 }
 
 void AgentSML::FireSimpleXML(char const* pMsg)

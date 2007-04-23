@@ -242,6 +242,7 @@ namespace gSKI
 	 
 	 // These need to be registered in gSKI RunListener because 
 	 // the gSKI event handler has to increment counters on these events.
+	 /*
 	 this->AddRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
@@ -249,7 +250,8 @@ namespace gSKI
 	 this->AddRunListener(gSKIEVENT_AFTER_APPLY_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 	 this->AddRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
-	 this->AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only     
+	 this->AddRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only    
+	 */
 	 
    }
 
@@ -280,6 +282,7 @@ namespace gSKI
 	   //this->RemoveClientRhsFunction(m_CmdRhs.GetName());
 
 	   //remove the RunListeners we created for the counters
+	   /*
 	   this->RemoveRunListener(gSKIEVENT_AFTER_ELABORATION_CYCLE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_INPUT_PHASE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_PROPOSE_PHASE, this) ;
@@ -288,6 +291,7 @@ namespace gSKI
 	   this->RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
 	   this->RemoveRunListener(gSKIEVENT_AFTER_PREFERENCE_PHASE, this) ;  // Soar-7 mode only
 	   this->RemoveRunListener(gSKIEVENT_AFTER_WM_PHASE, this) ;          // Soar-7 mode only
+	  */
 
       delete m_pPerfMon;
 
@@ -1494,6 +1498,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	AddRunListener
    ==========================
    */   
+#if 0
    void Agent::AddRunListener(egSKIRunEventId  eventId, 
                               IRunListener*    listener, 
                               bool             allowAsynch,
@@ -1634,7 +1639,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
 	  }
    }
-
+#endif
 	// Called when a "RunEvent" occurs in the kernel
    void Agent::HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase)
    {
@@ -2177,6 +2182,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 
 	/** Fire the gSKIEVENT_BEFORE_RUN_STARTS event.
 	    This is fired once before any running occurs **/
+#if 0
    void Agent::FireRunStartsEvent()
 	{
        RunNotifier nfBeforeStart(this, m_lastPhase);
@@ -2196,6 +2202,7 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
 	   RunNotifier nfBeforeRunning(this,EnumRemappings::ReMapPhaseType(phase,0));
 	   m_runListeners.Notify(eventId, nfBeforeRunning);
 	}
+#endif
 
 	void Agent::FirePrintEvent(egSKIPrintEventId eventId, char const* pMsg)
 	{

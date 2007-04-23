@@ -11,16 +11,17 @@
 #include "gSKI_Events.h"
 #include "gSKI_Enumerations.h"
 #include "gSKI_Agent.h"
+#include "sml_KernelCallback.h"
 
 namespace sml {
 
 class PrintListener;
 class XMLListener ;
 
-class AgentOutputFlusher : public gSKI::IRunListener
+class AgentOutputFlusher : public KernelCallback
 {
 protected:
-	gSKI::Agent* m_pAgent;
+	//gSKI::Agent* m_pAgent;
 	int m_EventID ;
 
 	// Only one listener will be filled in.
@@ -28,11 +29,13 @@ protected:
 	XMLListener*   m_pXMLListener;
 
 public:
-	AgentOutputFlusher(PrintListener* pPrintListener, gSKI::Agent* pAgent, egSKIPrintEventId eventID);
-	AgentOutputFlusher(XMLListener* pXMLListener, gSKI::Agent* pAgent, egSKIXMLEventId eventID);
+	AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, egSKIPrintEventId eventID);
+	AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, egSKIXMLEventId eventID);
 	virtual ~AgentOutputFlusher();
 
-	virtual void HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase);
+	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
+
+//	virtual void HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase);
 };
 
 }

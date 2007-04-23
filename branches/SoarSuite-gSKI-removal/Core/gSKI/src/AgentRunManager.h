@@ -154,8 +154,8 @@ namespace gSKI
 	  Kernel* getKernel() ;
 
 	  /** Notify listeners that agents in the run list are starting or finishing their runs **/
-	  void FireBeforeRunStartsEvents() ;
-	  void FireAfterRunEndsEvents() ;
+	 // void FireBeforeRunStartsEvents() ;
+	 //  void FireAfterRunEndsEvents() ;
 
    private:
 
