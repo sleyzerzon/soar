@@ -32,6 +32,9 @@ sml_SystemListener.cpp\
 sml_UntypedListener.cpp\
 sml_UpdateListener.cpp\
 sml_XMLListener.cpp\
+sml_KernelHelpers.cpp\
+sml_RhsFunction.cpp\
+sml_KernelCallback.cpp\
 ../include/KernelSMLdll.h\
 ../include/sml_AgentListener.h\
 ../include/sml_AgentOutputFlusher.h\
@@ -51,6 +54,9 @@ sml_XMLListener.cpp\
 ../include/sml_SystemListener.h\
 ../include/sml_UntypedListener.h\
 ../include/sml_UpdateListener.h\
+../include/sml_KernelHelpers.h\
+../include/sml_RhsFunction.h\
+../include/sml_KernelCallback.h\
 ../include/sml_XMLListener.h
 
 INCLUDES = \
