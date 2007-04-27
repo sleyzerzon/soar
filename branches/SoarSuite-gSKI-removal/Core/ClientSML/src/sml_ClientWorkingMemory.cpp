@@ -1265,7 +1265,8 @@ void WorkingMemory::Refresh()
 
 		// The children should all have been deleted during the init-soar cleanup
 		// If not, we're probably looking at a memory leak.
-		assert(outputs == 0) ;
+		//assert(outputs == 0) ;
+		m_OutputLink->GetSymbol()->DeleteAllChildren() ;
 	}
 }
 

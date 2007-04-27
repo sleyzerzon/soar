@@ -98,6 +98,7 @@ public:
 	// Have this identifier take ownership of this WME.  So when the identifier is deleted
 	// it will delete the WME.
 	void AddChild(WMElement* pWME) ;
+	void DeleteAllChildren() ;
 
 	void RemoveChild(WMElement* pWME) ;
 } ;

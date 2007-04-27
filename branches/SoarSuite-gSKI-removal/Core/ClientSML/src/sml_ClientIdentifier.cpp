@@ -40,12 +40,18 @@ IdentifierSymbol::~IdentifierSymbol()
 	// Nobody should be using this symbol when we're deleted.
 	assert (GetNumberUsing() == 0) ;
 
+	DeleteAllChildren() ;
+}
+
+void IdentifierSymbol::DeleteAllChildren()
+{
 	// We own all of these children, so delete them when we are deleted.
 	for (Identifier::ChildrenIter iter = m_Children.begin() ; iter != m_Children.end() ; iter++)
 	{
 		WMElement* pWME = *iter ;
 		delete pWME ;
 	}
+	m_Children.clear() ;
 }
 
 void IdentifierSymbol::AddChild(WMElement* pWME)
