@@ -252,6 +252,9 @@ bool WorkingMemory::ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing)
 		if (!m_OutputLink && IsStringEqualIgnoreCase(pAttribute, sml_Names::kOutputLinkName))
 		{
 			m_OutputLink = new Identifier(GetAgent(), pValue, timeTag) ;
+		} else if (IsStringEqual(m_OutputLink->GetValueAsString(), pValue) && IsStringEqualIgnoreCase(pAttribute, sml_Names::kOutputLinkName))
+		{
+			// Adding output link again but we already have it so ignored
 		} else
 		{
 			// If we reach here we've received output which is out of order (e.g. (Y ^att value) before (X ^att Y))
@@ -645,8 +648,12 @@ bool WorkingMemory::SynchronizeOutputLink()
 #endif
 
 	// Erase the existing output link and create a new representation from scratch
-	delete m_OutputLink ;
-	m_OutputLink = NULL ;
+	if (m_OutputLink)
+	{
+		int children = m_OutputLink->GetNumberChildren() ;
+		delete m_OutputLink ;
+		m_OutputLink = NULL ;
+	}
 
 	// Process the new list of output -- as if it had just occurred in the agent (when in fact we're just synching with it)
 	ok = ReceivedOutput(&incoming, &response) ;
@@ -1249,11 +1256,16 @@ void WorkingMemory::Refresh()
 		Commit() ;
 	}
 
-	// Remove the output link tree (it will be rebuilt when the agent next runs).
+	// At one time we delete the output link at the end of an init-soar but the current
+	// implementation of init-soar recreates the output link at the end of reinitializing the agent
+	// so the output link should not be deleted.
 	if (m_OutputLink)
 	{
-		delete m_OutputLink ;
-		m_OutputLink = NULL ;
+		int outputs = m_OutputLink->GetNumberChildren() ;
+
+		// The children should all have been deleted during the init-soar cleanup
+		// If not, we're probably looking at a memory leak.
+		assert(outputs == 0) ;
 	}
 }
 

@@ -433,10 +433,8 @@ AgentSML* KernelSML::GetAgentSML(gSKI::Agent* pAgent)
 
 	if (iter == m_AgentMap.end())
 	{
-		// If not in the map, add it.
-		pResult = new AgentSML(this, pAgent, pAgent->GetSoarAgent()) ;
-		m_AgentMap[pAgent] = pResult ;
-		RecordAgentSML(pResult, pAgent->GetSoarAgent()) ;
+		assert(false) ;	// Don't believe we ever want to do this and not find an agent
+		return NULL ;
 	}
 	else
 	{
@@ -450,6 +448,11 @@ AgentSML* KernelSML::GetAgentSML(gSKI::Agent* pAgent)
 void KernelSML::RecordAgentSML(AgentSML* pAgentSML, agent* pAgent)
 {
 	m_KernelAgentMap[pAgent] = pAgentSML ;
+}
+
+void KernelSML::RecordIAgent(AgentSML* pAgentSML, gSKI::Agent* pIAgent)
+{
+	m_AgentMap[pIAgent] = pAgentSML ;
 }
 
 AgentSML* KernelSML::GetAgentSML(agent* pAgent)

@@ -125,9 +125,14 @@ protected:
 	AgentRunCallback*	m_pAgentRunCallback ;
 
 public:
-	AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent) ;
+	AgentSML(KernelSML* pKernelSML, agent* pAgent) ;
+
+	void InitListeners() ;
+	void Init() ;
 
 	~AgentSML() ;
+
+	void SetIAgent(gSKI::Agent* pIAgent) { m_pIAgent = pIAgent ; }
 
 	// Release any objects or other data we are keeping.  We do this just
 	// prior to deleting AgentSML, but before the underlying gSKI agent has been deleted

@@ -1420,6 +1420,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 		}
 		else
 		{
+			cout << "Failed to find alternative" << endl ;
 			return false ;
 		}
 

@@ -54,16 +54,25 @@
 
 using namespace sml ;
 
-AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
+AgentSML::AgentSML(KernelSML* pKernelSML, agent* pAgent)
 {
 	m_pKernelSML = pKernelSML ;
-	m_pIAgent = pIAgent ;
+	m_pIAgent = NULL ;
 	m_pInputProducer = NULL ;
 	m_InputLinkRoot = NULL ;
 	m_OutputLinkRoot = NULL ;
 	m_SuppressRunEndsEvent = false ;
+	m_pBeforeDestroyedListener = NULL ;
+
+	m_pAgentRunCallback = new AgentRunCallback() ;
+	m_pAgentRunCallback->SetAgentSML(this) ;
 
 	m_agent = pAgent ;
+}
+
+void AgentSML::InitListeners()
+{
+	KernelSML* pKernelSML = m_pKernelSML ;
 
 	m_PrintListener.Init(pKernelSML, this) ;
 	m_XMLListener.Init(pKernelSML, this) ;
@@ -71,6 +80,17 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 	m_ProductionListener.Init(pKernelSML, this) ;
 	m_OutputListener.Init(pKernelSML, this) ;
 
+	// For KernelSML (us) to work correctly we need to listen for certain events, independently of what any client is interested in
+	// Currently:
+	// Listen for output callback events so we can send this output over to the clients
+	// Listen for "before" init-soar events (we need to know when these happen so we can release all WMEs on the input link, otherwise gSKI will fail to re-init the kernel correctly.)
+	// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
+	m_OutputListener.RegisterForKernelSMLEvents() ;
+}
+
+// Can't call this until after the Soar agent has been initialized
+void AgentSML::Init()
+{
 	m_pRhsInterrupt = new InterruptRhsFunction(this) ;
 	m_pRhsConcat    = new ConcatRhsFunction(this) ;
 	m_pRhsExec		= new ExecRhsFunction(this) ;
@@ -80,20 +100,8 @@ AgentSML::AgentSML(KernelSML* pKernelSML, gSKI::Agent* pIAgent, agent* pAgent)
 	RegisterRHSFunction(m_pRhsExec) ;
 	RegisterRHSFunction(m_pRhsCmd) ;
 
-	m_pAgentRunCallback = new AgentRunCallback() ;
-	m_pAgentRunCallback->SetAgentSML(this) ;
-
 	// Set counters and flags used to control runs
 	InitializeRuntimeState() ;
-
-	m_pBeforeDestroyedListener = NULL ;
-
-	// For KernelSML (us) to work correctly we need to listen for certain events, independently of what any client is interested in
-	// Currently:
-	// Listen for output callback events so we can send this output over to the clients
-	// Listen for "before" init-soar events (we need to know when these happen so we can release all WMEs on the input link, otherwise gSKI will fail to re-init the kernel correctly.)
-	// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
-	m_OutputListener.RegisterForKernelSMLEvents() ;
 }
 
 AgentSML::~AgentSML()

@@ -28,6 +28,8 @@
 #include <string>
 #include <map>
 
+typedef struct agent_struct agent;
+
 namespace gSKI
 {
    struct Error;
@@ -101,11 +103,13 @@ namespace gSKI
       * @returns A pointer to the agent that was added.  This pointer will be 0 if
       *           the function fails.
       */
-      Agent* AddAgent(const char*       name, 
+      Agent* AddAgent(agent* pSoarAgent, 
                        const char*       prodFileName = 0, 
                        bool              learningOn   = false,
                        egSKIOSupportMode oSupportMode = gSKI_O_SUPPORT_MODE_4,
                        Error*            err          = 0);
+
+	  void FireAgentCreated(Agent* pAgent) ;
 
       /**
       * @brief Removes an agent from this agent manager

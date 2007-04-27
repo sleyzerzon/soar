@@ -425,7 +425,7 @@ namespace gSKI
                            |___/
    =============================
    */
-   Agent* AgentManager::AddAgent(const char*       name, 
+   Agent* AgentManager::AddAgent(agent* pSoarAgent, 
                                   const char*       prodFileName, 
                                   bool              learningOn,
                                   egSKIOSupportMode oSupportMode,
@@ -434,23 +434,24 @@ namespace gSKI
       ClearError(err);
 	  //MegaAssert(false, "Stop here for debugging!");
 
-      if(IsInvalidPtr(name, err))
-         return 0;
+      Agent* _agent = new Agent(pSoarAgent, m_kernel);
 
-      Agent* _agent = new Agent(name, m_kernel);
-
-      std::string tmpStr(name);
+	  std::string tmpStr(pSoarAgent->name);
       m_agents.insert(std::pair<std::string, Agent *>(tmpStr, _agent));
 
-      // Notify everyone that the agent was created
-      AgentNotifier nf(_agent);
-      m_agentListeners.Notify(gSKIEVENT_AFTER_AGENT_CREATED, nf);
 
-	  if ( prodFileName ) {
-		_agent->GetProductionManager()->LoadSoarFile(prodFileName, err);
-	  }
+//	  if ( prodFileName ) {
+//		_agent->GetProductionManager()->LoadSoarFile(prodFileName, err);
+//	  }
       
       return _agent;
+   }
+
+   void AgentManager::FireAgentCreated(Agent* pAgent)
+   {
+      // Notify everyone that the agent was created
+      AgentNotifier nf(pAgent);
+      m_agentListeners.Notify(gSKIEVENT_AFTER_AGENT_CREATED, nf);
    }
 
    // TODO: Implement ReinitializeAll() method from the IAgentRunControl

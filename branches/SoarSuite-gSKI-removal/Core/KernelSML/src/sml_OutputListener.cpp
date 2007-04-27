@@ -19,6 +19,7 @@
 #include "sml_TagWme.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
+#include "KernelHeaders.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_WMObject.h"
@@ -39,17 +40,65 @@
 
 using namespace sml ;
 
-static char const* GetValueType(egSKISymbolType type)
+static char const* GetValueType(int type)
 {
 	switch (type)
 	{
-	case gSKI_DOUBLE: return sml_Names::kTypeDouble ;
-	case gSKI_INT:	  return sml_Names::kTypeInt ;
-	case gSKI_STRING: return sml_Names::kTypeString ;
-	case gSKI_OBJECT: return sml_Names::kTypeID ;
+	case VARIABLE_SYMBOL_TYPE: return sml_Names::kTypeVariable ;
+	case FLOAT_CONSTANT_SYMBOL_TYPE: return sml_Names::kTypeDouble ;
+	case INT_CONSTANT_SYMBOL_TYPE:	  return sml_Names::kTypeInt ;
+	case SYM_CONSTANT_SYMBOL_TYPE: return sml_Names::kTypeString ;
+	case IDENTIFIER_SYMBOL_TYPE: return sml_Names::kTypeID ;
 	default: return NULL ;
 	}
 }
+
+TagWme* OutputListener::CreateTagWme(wme* wme)
+{
+	// Create the wme tag
+	TagWme* pTag = new TagWme() ;
+
+	// Look up the type of value this is
+	int type = wme->value->sc.common_symbol_info.symbol_type ;
+	//egSKISymbolType type = pWME->GetValue()->GetType() ;
+	char const* pValueType = GetValueType(type) ;
+
+	// For additions we send everything
+	std::string id = AgentSML::SymbolToString(wme->id) ;
+	pTag->SetIdentifier(id.c_str()) ;
+	std::string att = AgentSML::SymbolToString(wme->attr) ;
+	pTag->SetAttribute(att.c_str()) ;
+	std::string val = AgentSML::SymbolToString(wme->value) ;
+	pTag->SetValue(val.c_str(), pValueType) ;
+	pTag->SetTimeTag(wme->timetag) ;
+	pTag->SetActionAdd() ;
+
+	return pTag ;
+}
+
+TagWme* OutputListener::CreateTagIOWme(io_wme* wme)
+{
+	// Create the wme tag
+	TagWme* pTag = new TagWme() ;
+
+	// Look up the type of value this is
+	int type = wme->value->sc.common_symbol_info.symbol_type ;
+	//egSKISymbolType type = pWME->GetValue()->GetType() ;
+	char const* pValueType = GetValueType(type) ;
+
+	// For additions we send everything
+	std::string id = AgentSML::SymbolToString(wme->id) ;
+	pTag->SetIdentifier(id.c_str()) ;
+	std::string att = AgentSML::SymbolToString(wme->attr) ;
+	pTag->SetAttribute(att.c_str()) ;
+	std::string val = AgentSML::SymbolToString(wme->value) ;
+	pTag->SetValue(val.c_str(), pValueType) ;
+	pTag->SetTimeTag(wme->timetag) ;
+	pTag->SetActionAdd() ;
+
+	return pTag ;
+}
+
 
 void OutputListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 {
@@ -61,18 +110,168 @@ void OutputListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 // Called when an event occurs in the kernel
 void OutputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	output_call_info* oinfo = static_cast<output_call_info*>(pCallData);
+	int outputMode = oinfo->mode;
+
+	io_wme* pWmes = oinfo->outputs ;
+	SendOutput((egSKIWorkingMemoryEventId)eventID, pAgentSML, outputMode, pWmes) ;
+}
+
+// OutputMode is one of:
+// #define ADDED_OUTPUT_COMMAND 1
+// #define MODIFIED_OUTPUT_COMMAND 2
+// #define REMOVED_OUTPUT_COMMAND 3
+
+void OutputListener::SendOutput(egSKIWorkingMemoryEventId eventId, AgentSML* pAgentSML, int outputMode, io_wme* io_wmelist)
+{
+	unused(outputMode) ;
+
+	if (eventId != gSKIEVENT_OUTPUT_PHASE_CALLBACK)
+		return ;
+
+	// Get the first listener for this event (or return if there are none)
+	ConnectionListIter connectionIter ;
+	if (!EventManager<egSKIWorkingMemoryEventId>::GetBegin(eventId, &connectionIter))
+		return ;
+
+	// We need the first connection for when we're building the message.  Perhaps this is a sign that
+	// we shouldn't have rolled these methods into Connection.
+	Connection* pConnection = *connectionIter ;
+
+	// Build the SML message we're doing to send.
+	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Output) ;
+
+	// Add the agent parameter and as a side-effect, get a pointer to the <command> tag.  This is an optimization.
+	ElementXML_Handle hCommand = pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgentSML->GetName()) ;
+	ElementXML command(hCommand) ;
+
+	// We are passed a list of all wmes in the transitive closure (TC) of the output link.
+	// We need to decide which of these we've already seen before, so we can just send the
+	// changes over to the client (rather than sending the entire TC each time).
+
+	// Reset everything in the current list of tags to "not in use".  After we've processed all wmes,
+	// any still in this state have been removed.
+	for (OutputTimeTagIter iter = m_TimeTags.begin() ; iter != m_TimeTags.end() ; iter++)
+	{
+		iter->second = false ;
+	}
+
+	for (io_wme* wme = io_wmelist ; wme != NIL ; wme = wme->next)
+	{
+		// Build the list of WME changes
+		long timeTag = wme->timetag ;
+
+		// See if we've already sent this wme to the client
+		OutputTimeTagIter iter = m_TimeTags.find(timeTag) ;
+
+		if (iter != m_TimeTags.end())
+		{
+			// This is a time tag we've already sent over, so mark it as still being in use
+			iter->second = true ;
+			continue ;
+		}
+
+		// If we reach here we need to send the wme to the client and add it to the list
+		// of tags currently in use.
+		m_TimeTags[timeTag] = true ;
+
+		// Create the wme tag
+		TagWme* pTag = CreateTagIOWme(wme) ;
+
+		// Create the wme tag
+		/*
+		TagWme* pTag = new TagWme() ;
+
+		// Look up the type of value this is
+		int type = wme->value->sc.common_symbol_info.symbol_type ;
+		//egSKISymbolType type = pWME->GetValue()->GetType() ;
+		char const* pValueType = GetValueType(type) ;
+
+		// For additions we send everything
+		std::string id = AgentSML::SymbolToString(wme->id) ;
+		pTag->SetIdentifier(id.c_str()) ;
+		std::string att = AgentSML::SymbolToString(wme->attr) ;
+		pTag->SetAttribute(att.c_str()) ;
+		std::string val = AgentSML::SymbolToString(wme->value) ;
+		pTag->SetValue(val.c_str(), pValueType) ;
+		pTag->SetTimeTag(wme->timetag) ;
+		pTag->SetActionAdd() ;
+		*/
+
+		// Add it as a child of the command tag
+		command.AddChild(pTag) ;
+
+		// Values retrieved via "GetVal" have to be released.
+		// Ah, but not if they come from an Iterator rather than an IteratorWithRelease.
+		// At least, it seems like if I call Release here it causes a crash on exit, while if I don't all seems well.
+		//pWME->Release();
+	}
+
+	// At this point we check the list of time tags and any which are not marked as "in use" must
+	// have been deleted, so we need to send them over to the client as deletions.
+	for (OutputTimeTagIter iter = m_TimeTags.begin() ; iter != m_TimeTags.end() ;)
+	{
+		// Ignore time tags that are still in use.
+		if (iter->second == true)
+		{
+			// We have to do manual iteration because we're deleting elements
+			// as we go and that invalidates iterators if we're not careful.
+			iter++ ;
+			continue ;
+		}
+
+		long timeTag = iter->first ;
+
+		// Create the wme tag
+		TagWme* pTag = new TagWme() ;
+
+		// For deletions we just send the time tag
+		pTag->SetTimeTag(timeTag) ;
+		pTag->SetActionRemove() ;
+
+		// Add it as a child of the command tag
+		command.AddChild(pTag) ;
+
+		// Delete the entry from the time tag map
+		m_TimeTags.erase(iter++);
+	}
+
+	// This is important.  We are working with a subpart of pMsg.
+	// If we retain ownership of the handle and delete the object
+	// it will release the handle...deleting part of our message.
+	command.Detach() ;
+
+	egSKIWorkingMemoryEventId eventID = gSKIEVENT_OUTPUT_PHASE_CALLBACK ;
+
+#ifdef _DEBUG
+	// Convert the XML to a string so we can look at it in the debugger
+	char *pStr = pMsg->GenerateXMLString(true) ;
+#endif
+
+	// Send the message out
+	AnalyzeXML response ;
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
+
+#ifdef _DEBUG
+	pMsg->DeleteString(pStr) ;
+#endif
+
+	// Clean up
+	delete pMsg ;
 }
 
 // Register for the events that KernelSML itself needs to know about in order to work correctly.
 void OutputListener::RegisterForKernelSMLEvents()
 {
 	// Listen for output callback events so we can send this output over to the clients
-	m_Agent->GetOutputLink()->GetOutputMemory()->AddWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
+	this->RegisterWithKernel(gSKIEVENT_OUTPUT_PHASE_CALLBACK) ;
+	//m_Agent->GetOutputLink()->GetOutputMemory()->AddWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
 }
 
 void OutputListener::UnRegisterForKernelSMLEvents()
 {
-	m_Agent->GetOutputLink()->GetOutputMemory()->RemoveWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
+	this->UnregisterWithKernel(gSKIEVENT_OUTPUT_PHASE_CALLBACK) ;
+	//m_Agent->GetOutputLink()->GetOutputMemory()->RemoveWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
 }
 
 // Returns true if this is the first connection listening for this event

@@ -32,6 +32,7 @@
 #include "sml_TagCommand.h"
 #include "sml_Events.h"
 #include "sml_RunScheduler.h"
+#include "KernelHeaders.h"
 
 #include "sock_Debug.h"	// For PrintDebugFormat
 
@@ -186,16 +187,28 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 		return InvalidArg(pConnection, pResponse, pCommandName, "Agent name missing") ;
 	}
 
+	agent* pSoarAgent = create_soar_agent(GetSoarKernel(), (char*)pName);
+
+	AgentSML* pAgentSML = new AgentSML(this, pSoarAgent) ;
+
 	// Make the call.
-	Agent* pAgent = GetKernel()->GetAgentManager()->AddAgent(pName, NULL, false, gSKI_O_SUPPORT_MODE_4, pError) ;
+	Agent* pIAgent = GetKernel()->GetAgentManager()->AddAgent(pSoarAgent, NULL, false, gSKI_O_SUPPORT_MODE_4, pError) ;
+	pAgentSML->SetIAgent(pIAgent) ;
+	this->RecordAgentSML(pAgentSML, pSoarAgent) ;
+	this->RecordIAgent(pAgentSML, pIAgent) ;
+
+	pAgentSML->InitListeners() ;	// This must happen before the soar agent is initialized
+
+	pIAgent->Init() ;	// Initializes the soar agent
+
+	pAgentSML->Init() ;		// This must happen AFTER the soar agent is initialized.
+
+	// Notify listeners that there is a new agent
+	GetKernel()->GetAgentManager()->FireAgentCreated(pIAgent) ;
 
 	// Register for output from this agent
-	if (pAgent)
+	if (pIAgent)
 	{
-		// We store additional, agent specific information required for SML in the AgentSML object.
-		// NOTE: This call to GetAgentSML() will create the object if necessary...which it will be in this case.
-		AgentSML* pAgentSML = GetAgentSML(pAgent) ;
-
 		// Mark the agent's status as just having been created for all connections
 		// Note--agent status for connections just refers to the last agent created, i.e. this one.
 		m_pConnectionManager->SetAgentStatus(sml_Names::kStatusCreated) ;
@@ -205,17 +218,17 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 		pAgentSML->SetInputProducer(pInputProducer) ;
 
 		// Add the input producer to the top level of the input link (doesn't matter for us which WME it's attached to)
-		IInputLink* pInputLink = pAgent->GetInputLink() ;
+		IInputLink* pInputLink = pIAgent->GetInputLink() ;
 		IWMObject* pRoot = NULL ;
 		pInputLink->GetRootObject(&pRoot) ;
-		pAgent->GetInputLink()->AddInputProducer(pRoot, pInputProducer) ;
+		pIAgent->GetInputLink()->AddInputProducer(pRoot, pInputProducer) ;
 		pRoot->Release() ;
 	}
 
 	// Return true if we got an agent constructed.
 	// If not, pError should contain the error and returning false
 	// means we'll pass that back to the caller.
-	return (pAgent != NULL) ;
+	return (pIAgent != NULL) ;
 }
 
 // Handle registering and unregistering for kernel events
@@ -1117,13 +1130,46 @@ bool KernelSML::HandleGetAllInput(gSKI::Agent* pAgent, char const* pCommandName,
 // Send the current state of the output link back to the caller.  (This is not a commonly used method).
 bool KernelSML::HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
-	unused(pCommandName) ; unused(pIncoming) ; unused(pConnection) ;
+	unused(pCommandName) ; unused(pIncoming) ; unused(pConnection) ; unused(pError) ;
 
 	// Build the SML message we're doing to send which in this case is an output command
 	// (just like one you'd get if the agent was generating output rather than being queried for its output link)
 	TagCommand* pTagResult = new TagCommand() ;
 	pTagResult->SetName(sml_Names::kCommand_Output) ;
 
+	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
+	agent* pSoarAgent = pAgentSML->GetAgent() ;
+
+	output_link *ol = pSoarAgent->existing_output_links ;	// This is technically a list but we only support one output link
+
+	//remove_output_link_tc_info (pSoarAgent, ol);
+	//calculate_output_link_tc_info (pSoarAgent, ol);
+	io_wme* iw_list = get_io_wmes_for_output_link (pSoarAgent, ol);
+
+	// Start with the output link itself
+	TagWme* pOutputLinkWme = OutputListener::CreateTagWme(ol->link_wme) ;
+	pTagResult->AddChild(pOutputLinkWme) ;
+
+	for (;iw_list != 0 ; iw_list = iw_list->next) {
+		// Create the wme tag for the output link itself
+		TagWme* pTagWme = OutputListener::CreateTagIOWme(iw_list) ;
+		/*
+		TagWme* pTagWme = new TagWme() ;
+
+		pTagWme->SetIdentifier("I1") ;	// I don't see how to get this value in gSKI (i.e. the value of ^io <io>) but we don't actually care what's passed here)
+		pTagWme->SetAttribute(sml_Names::kOutputLinkName) ;	// Again, can't see how to ask gSKI for this
+		pTagWme->SetValue(pRootObject->GetId()->GetString(), GetValueType(gSKI_OBJECT)) ;
+		pTagWme->SetTimeTag(5) ;	// Again, no way to get the real value, but I don't think it matters.  In current version of Soar this is always 5.
+		pTagWme->SetActionAdd() ;
+		*/
+		// Add this wme into the result
+		pTagResult->AddChild(pTagWme) ;
+
+	}
+
+	deallocate_io_wme_list(pSoarAgent, iw_list) ;
+
+	/*
 	// Walk the list of wmes on the input link and send them over
 	gSKI::IWMObject* pRootObject = NULL ;
 	pAgent->GetOutputLink()->GetRootObject(&pRootObject, pError) ;
@@ -1146,6 +1192,7 @@ bool KernelSML::HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName
 
 	// Add this wme's children to XML
 	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
+	*/
 
 	// Add the message to the response
 	pResponse->AddChild(pTagResult) ;
@@ -1156,8 +1203,8 @@ bool KernelSML::HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName
 	pResponse->DeleteString(pStr) ;
 #endif
 
-	if (pRootObject)
-		pRootObject->Release() ;
+	//if (pRootObject)
+	//	pRootObject->Release() ;
 
 	// Return true to indicate we've filled in all of the result tag we need
 	return true ;

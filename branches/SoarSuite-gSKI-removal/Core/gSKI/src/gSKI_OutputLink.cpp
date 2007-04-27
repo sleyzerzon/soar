@@ -53,6 +53,7 @@ namespace gSKI
 	  // DJP: The id for this callback seems to be important but I haven't figured out why yet.
 	  // However, if I change it from "output-link" to anything else I don't get a callback any more.
 	   // KJC:  "output-link" in Soar is a specific symconstant
+	   /*
       soar_add_callback( m_agent->GetSoarAgent(),
 			 static_cast<void*>(m_agent->GetSoarAgent()),
 			 OUTPUT_PHASE_CALLBACK,
@@ -61,6 +62,7 @@ namespace gSKI
 			 static_cast<void*>(this),
 			 0,
 			 "output-link");
+	 */
    }
 
    /*
@@ -71,11 +73,13 @@ namespace gSKI
 
    OutputLink::~OutputLink() 
    {
+	   /*
       // Removing the static callback from the soar kernel
       soar_remove_callback( m_agent->GetSoarAgent(),
 			    static_cast<void*>(m_agent->GetSoarAgent()),
 			    OUTPUT_PHASE_CALLBACK,
 				"output-link");
+	  */
    }
 
    /*
@@ -207,7 +211,7 @@ namespace gSKI
 	  // I'm adding this as an alternative route to get notifications about output link changes
 	  // that the existing output processor semantics doesn't support (e.g. getting all top level additions
 	  // or getting notifications of when a modification has occured to an existing structure on the output link).
-	  olink->m_memory.NotifyWorkingMemoryListeners(gSKIEVENT_OUTPUT_PHASE_CALLBACK, change, oinfo->outputs) ;
+//	  olink->m_memory.NotifyWorkingMemoryListeners(gSKIEVENT_OUTPUT_PHASE_CALLBACK, change, oinfo->outputs) ;
    }
 
    /*

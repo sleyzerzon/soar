@@ -395,6 +395,7 @@ public:
 	AgentSML*	GetAgentSML(agent* pAgent) ;	// Lookup agent from kernel agent
 
 	void RecordAgentSML(AgentSML* pAgentSML, agent* pAgent) ;
+	void RecordIAgent(AgentSML* pAgentSML, gSKI::Agent* pIAgent) ;
 
 	/*************************************************************
 	* @brief	gSKI introduced a Soar kernel object.

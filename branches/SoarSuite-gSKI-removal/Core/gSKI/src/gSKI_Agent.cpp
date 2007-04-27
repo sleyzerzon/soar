@@ -190,7 +190,7 @@ namespace gSKI
         |___/
    =============================
    */
-   Agent::Agent(const char *agentName, Kernel *kernel): 
+   Agent::Agent(agent* pSoarAgent, Kernel *kernel): 
       m_productionManager(0), 
       m_agent(0), 
       m_active(true),
@@ -201,43 +201,15 @@ namespace gSKI
 	  //m_CmdRhs(m_kernel),
 	  m_pPerfMon(0)
    {
-      MegaAssert(agentName != 0, "Null agent name pointer passed to agent constructor!");
+      MegaAssert(pSoarAgent != 0, "Null agent name pointer passed to agent constructor!");
       MegaAssert(kernel != 0, "Null kernel pointer passed to agent constructor!");
 
       // Why doesn't this call one of the initialize functions????
       initializeRuntimeState();
 
-      m_agent = create_soar_agent(m_kernel->GetSoarKernel(), const_cast<char *>(agentName));     
+      m_agent = pSoarAgent ; // create_soar_agent(m_kernel->GetSoarKernel(), const_cast<char *>(agentName));     
       MegaAssert(m_agent != 0, "Unable to create soar agent!");
 
-      if(m_agent)
-      {
-         // Temporary HACK.  This should be fixed in the kernel.
-         m_agent->stop_soar = FALSE;
-
-         // Creating the output link
-         // NOTE: THE OUTPUT LINK CREATION MUST COME BEFORE THE INITIALIZE CALL
-         // FOR THE OUTPUT LINK CALLBACK TO BE PROPERLY REGISTERED (see io.cpp for more 
-         // details in the update_for_top_state_wme_addition function)
-         m_outputlink = new OutputLink(this);
-
-         // Initializing the soar agent
-         initialize_soar_agent(m_kernel->GetSoarKernel(), m_agent);
-         
-         m_inputlink = new InputLink(this);
-         m_workingMemory = new WorkingMemory(this);
-     }
-
-	 //m_ExecRhs.SetAgent(this) ;
-	 //m_CmdRhs.SetAgent(this) ;
-
-     // Adding some basic rhs functions
-     //this->AddClientRhsFunction(&m_InterruptRhs);
-     //this->AddClientRhsFunction(&m_ConcatRhs);
-	 //this->AddClientRhsFunction(&m_ExecRhs) ;
-	 //this->AddClientRhsFunction(&m_CmdRhs) ;
-
-     m_pPerfMon = new AgentPerformanceMonitor(this);
 
 	 
 	 // These need to be registered in gSKI RunListener because 
@@ -254,6 +226,35 @@ namespace gSKI
 	 */
 	 
    }
+
+  void Agent::Init()
+  {
+     // Temporary HACK.  This should be fixed in the kernel.
+     m_agent->stop_soar = FALSE;
+
+     // Creating the output link
+     // NOTE: THE OUTPUT LINK CREATION MUST COME BEFORE THE INITIALIZE CALL
+     // FOR THE OUTPUT LINK CALLBACK TO BE PROPERLY REGISTERED (see io.cpp for more 
+     // details in the update_for_top_state_wme_addition function)
+     m_outputlink = new OutputLink(this);
+
+     // Initializing the soar agent
+     initialize_soar_agent(m_kernel->GetSoarKernel(), m_agent);
+     
+     m_inputlink = new InputLink(this);
+     m_workingMemory = new WorkingMemory(this);
+
+	 //m_ExecRhs.SetAgent(this) ;
+	 //m_CmdRhs.SetAgent(this) ;
+
+     // Adding some basic rhs functions
+     //this->AddClientRhsFunction(&m_InterruptRhs);
+     //this->AddClientRhsFunction(&m_ConcatRhs);
+	 //this->AddClientRhsFunction(&m_ExecRhs) ;
+	 //this->AddClientRhsFunction(&m_CmdRhs) ;
+
+     m_pPerfMon = new AgentPerformanceMonitor(this);
+  }
 
    /*
    =============================

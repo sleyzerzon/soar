@@ -71,6 +71,8 @@ int KernelCallback::InternalGetCallbackFromEventID(int eventID)
 	case smlEVENT_AFTER_RUN_ENDS:				return AFTER_RUN_ENDS_CALLBACK ;	// Implemented in SML
 	case smlEVENT_BEFORE_RUNNING:				return BEFORE_RUNNING_CALLBACK ;	// Implemented in SML
 	case smlEVENT_AFTER_RUNNING:				return AFTER_RUNNING_CALLBACK ;		// Implemented in SML
+
+	case smlEVENT_OUTPUT_PHASE_CALLBACK:		return OUTPUT_PHASE_CALLBACK ;
 	}
 
 	return smlEVENT_INVALID_EVENT ;
@@ -136,7 +138,11 @@ void KernelCallback::RegisterWithKernel(int eventID)
 
 	agent* pAgent = m_pCallbackAgentSML->GetAgent() ;
 
-	if (eventID != smlEVENT_BEFORE_PHASE_EXECUTED && eventID != smlEVENT_AFTER_PHASE_EXECUTED)
+	if (eventID == smlEVENT_OUTPUT_PHASE_CALLBACK)
+	{
+		add_output_function(pAgent, pAgent, KernelCallbackStatic, this, NULL, smlEVENT_OUTPUT_PHASE_CALLBACK, "output-link") ;
+	}
+	else if (eventID != smlEVENT_BEFORE_PHASE_EXECUTED && eventID != smlEVENT_AFTER_PHASE_EXECUTED)
 	{
 		// This is the standard case
 		SOAR_CALLBACK_TYPE callbackType = (SOAR_CALLBACK_TYPE)GetCallbackFromEventID(eventID) ;
@@ -175,7 +181,11 @@ void KernelCallback::UnregisterWithKernel(int eventID)
 
 	agent* pAgent = m_pCallbackAgentSML->GetAgent() ;
 
-	if (eventID != smlEVENT_BEFORE_PHASE_EXECUTED && eventID != smlEVENT_AFTER_PHASE_EXECUTED)
+	if (eventID == smlEVENT_OUTPUT_PHASE_CALLBACK)
+	{
+		remove_output_function(pAgent, pAgent, "output-link") ;
+	}
+	else if (eventID != smlEVENT_BEFORE_PHASE_EXECUTED && eventID != smlEVENT_AFTER_PHASE_EXECUTED)
 	{
 		SOAR_CALLBACK_TYPE callbackType = (SOAR_CALLBACK_TYPE)GetCallbackFromEventID(eventID) ;
 		soar_remove_callback(pAgent, pAgent, callbackType, (char*)callbackID.c_str()) ;

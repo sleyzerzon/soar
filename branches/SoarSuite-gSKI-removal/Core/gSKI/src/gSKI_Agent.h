@@ -55,7 +55,9 @@ namespace gSKI
 		/**
 		* @brief
 		*/
-		Agent(const char *agentName, Kernel *kernel);
+		Agent(agent* pSoarAgent, Kernel *kernel);
+
+	    void Init() ;
 
 		/** 
 		* @brief Destructor for an agent

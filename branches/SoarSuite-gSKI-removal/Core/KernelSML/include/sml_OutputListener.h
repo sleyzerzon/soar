@@ -20,16 +20,20 @@
 
 #include <map>
 
+typedef struct io_wme_struct io_wme;
+typedef struct wme_struct wme;
+
 namespace sml {
 
 class KernelSML ;
 class Connection ;
+class TagWme ;
 
 // This map is from time tag to bool to say whether a given tag has been seen in the latest event or not
 typedef std::map< long, bool >		OutputTimeTagMap ;
 typedef OutputTimeTagMap::iterator	OutputTimeTagIter ;
 
-class OutputListener : public gSKI::IWorkingMemoryListener, public gSKI::IAgentListener, public EventManager<egSKIWorkingMemoryEventId>
+class OutputListener : public gSKI::IAgentListener, public EventManager<egSKIWorkingMemoryEventId>
 {
 protected:
 	KernelSML*		m_KernelSML ;
@@ -51,10 +55,16 @@ public:
 		Clear() ;
 	}
 
+	static TagWme* CreateTagWme(wme* wme) ;
+	static TagWme* CreateTagIOWme(io_wme* wme) ;
+
 	void Init(KernelSML* pKernelSML, AgentSML* pAgentSML);
 
 	// Called when an event occurs in the kernel
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
+
+	// Send output out to the clients
+	virtual void SendOutput(egSKIWorkingMemoryEventId eventID, AgentSML* pAgentSML, int outputMode, io_wme* io_wmelist) ;
 
 	// Register for the events that KernelSML itself needs to know about in order to work correctly.
 	void RegisterForKernelSMLEvents() ;

@@ -180,6 +180,7 @@ typedef struct io_wme_struct {
   Symbol *id;                  /* id, attribute, and value of the wme */
   Symbol *attr;
   Symbol *value;
+  unsigned long timetag ;		/* DJP: Added.  Only guaranteed valid for an output wme. */
 } io_wme;
 
 typedef struct replay_struct {
@@ -207,17 +208,20 @@ typedef struct output_call_info_struct {
 } output_call_info;
 
 extern Symbol *get_output_value (io_wme *outputs, Symbol *id, Symbol *attr);
+extern io_wme *get_io_wmes_for_output_link (agent* thisAgent, output_link *ol) ;
+extern void deallocate_io_wme_list (agent* thisAgent, io_wme *iw) ;
 
 extern void add_input_function (agent * a, soar_callback_fn f, 
 				soar_callback_data cb_data, 
 				soar_callback_free_fn free_fn,
 				char * name);
 extern void remove_input_function (agent * a, char * name);
-extern void add_output_function (agent * a, soar_callback_fn f, 
+extern void add_output_function (agent* thisAgent, agent * a, soar_callback_fn f, 
 				 soar_callback_data cb_data, 
 				 soar_callback_free_fn free_fn,
+				 int eventID,
 				 char * output_link_name);
-extern void remove_output_function (agent * a, char * name);
+extern void remove_output_function (agent* thisAgent, agent * a, char * name);
 
 #ifdef __cplusplus
 }
