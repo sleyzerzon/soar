@@ -1153,46 +1153,12 @@ bool KernelSML::HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName
 	for (;iw_list != 0 ; iw_list = iw_list->next) {
 		// Create the wme tag for the output link itself
 		TagWme* pTagWme = OutputListener::CreateTagIOWme(iw_list) ;
-		/*
-		TagWme* pTagWme = new TagWme() ;
 
-		pTagWme->SetIdentifier("I1") ;	// I don't see how to get this value in gSKI (i.e. the value of ^io <io>) but we don't actually care what's passed here)
-		pTagWme->SetAttribute(sml_Names::kOutputLinkName) ;	// Again, can't see how to ask gSKI for this
-		pTagWme->SetValue(pRootObject->GetId()->GetString(), GetValueType(gSKI_OBJECT)) ;
-		pTagWme->SetTimeTag(5) ;	// Again, no way to get the real value, but I don't think it matters.  In current version of Soar this is always 5.
-		pTagWme->SetActionAdd() ;
-		*/
 		// Add this wme into the result
 		pTagResult->AddChild(pTagWme) ;
-
 	}
 
 	deallocate_io_wme_list(pSoarAgent, iw_list) ;
-
-	/*
-	// Walk the list of wmes on the input link and send them over
-	gSKI::IWMObject* pRootObject = NULL ;
-	pAgent->GetOutputLink()->GetRootObject(&pRootObject, pError) ;
-
-	// Create the wme tag for the output link itself
-	TagWme* pTagWme = new TagWme() ;
-
-	pTagWme->SetIdentifier("I1") ;	// I don't see how to get this value in gSKI (i.e. the value of ^io <io>) but we don't actually care what's passed here)
-	pTagWme->SetAttribute(sml_Names::kOutputLinkName) ;	// Again, can't see how to ask gSKI for this
-	pTagWme->SetValue(pRootObject->GetId()->GetString(), GetValueType(gSKI_OBJECT)) ;
-	pTagWme->SetTimeTag(5) ;	// Again, no way to get the real value, but I don't think it matters.  In current version of Soar this is always 5.
-	pTagWme->SetActionAdd() ;
-
-	// Add this wme into the result
-	pTagResult->AddChild(pTagWme) ;
-
-	// We need to keep track of which identifiers we've already added
-	// because this is a graph, so we may cycle back.
-	std::list<IWMObject*> traversedList ;
-
-	// Add this wme's children to XML
-	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
-	*/
 
 	// Add the message to the response
 	pResponse->AddChild(pTagResult) ;
@@ -1202,9 +1168,6 @@ bool KernelSML::HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName
 	char *pStr = pResponse->GenerateXMLString(true) ;
 	pResponse->DeleteString(pStr) ;
 #endif
-
-	//if (pRootObject)
-	//	pRootObject->Release() ;
 
 	// Return true to indicate we've filled in all of the result tag we need
 	return true ;

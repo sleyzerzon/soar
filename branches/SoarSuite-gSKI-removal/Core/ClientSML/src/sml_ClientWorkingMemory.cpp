@@ -252,7 +252,7 @@ bool WorkingMemory::ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing)
 		if (!m_OutputLink && IsStringEqualIgnoreCase(pAttribute, sml_Names::kOutputLinkName))
 		{
 			m_OutputLink = new Identifier(GetAgent(), pValue, timeTag) ;
-		} else if (IsStringEqual(m_OutputLink->GetValueAsString(), pValue) && IsStringEqualIgnoreCase(pAttribute, sml_Names::kOutputLinkName))
+		} else if (m_OutputLink && (IsStringEqual(m_OutputLink->GetValueAsString(), pValue) && IsStringEqualIgnoreCase(pAttribute, sml_Names::kOutputLinkName)))
 		{
 			// Adding output link again but we already have it so ignored
 		} else
