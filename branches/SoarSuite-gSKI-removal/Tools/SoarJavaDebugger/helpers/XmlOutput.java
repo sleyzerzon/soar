@@ -265,6 +265,7 @@ declared-support="[:i-support|:o-support]">
 		String candidate = xmlTrace.GetCandidateName() ;
 		String type = xmlTrace.GetCandidateType() ;
 		String value = xmlTrace.GetCandidateValue() ;
+		String expvalue = xmlTrace.GetCandidateExpValue() ;
 		
 		if (candidate != null)
 		{
@@ -281,6 +282,13 @@ declared-support="[:i-support|:o-support]">
 			
 			text.append(" = ") ;
 			text.append(value) ;
+
+			if (expvalue != null)
+			{
+				text.append(", (Exp) = ") ;
+				text.append(expvalue) ;
+			}
+
 		}
 		
 		return text.toString() ;
@@ -609,8 +617,12 @@ declared-support="[:i-support|:o-support]">
 		StringBuffer text = new StringBuffer() ;
 		
 		text.append("(") ;
-		text.append(wme.GetWmeTimeTag()) ;
-		text.append(": ") ;
+		String timetag = wme.GetWmeTimeTag();
+		if(timetag != null) {
+			text.append(wme.GetWmeTimeTag()) ;
+			text.append(": ") ;
+		}
+		
 		text.append(wme.GetWmeID()) ;
 		text.append(" ^") ;
 		text.append(wme.GetWmeAttribute()) ;

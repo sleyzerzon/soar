@@ -180,6 +180,12 @@ public class WindowManager {
 				case SWT.KEYPAD_ADD:
 					humanMove.open = !humanMove.open;
 					break;
+				case SWT.KEYPAD_1:
+					humanMove.openCode = 1;
+					break;
+				case SWT.KEYPAD_3:
+					humanMove.openCode = 2;
+					break;
 				case SWT.KEYPAD_MULTIPLY:
 					humanMove.stopSim = !humanMove.stopSim;
 					break;
@@ -404,6 +410,9 @@ public class WindowManager {
 				case SWT.KEYPAD_6:
 					humanMove.rotate = true;
 					humanMove.rotateDirection = Names.kRotateRight;
+					break;
+				case SWT.KEYPAD_2:
+					humanMove.backward = true;
 					break;
 				case SWT.KEYPAD_MULTIPLY:
 					humanMove.stopSim = true;
@@ -1118,14 +1127,8 @@ public class WindowManager {
 		return (display.isDisposed() || shell.isDisposed());
 	}
 
-	boolean agentDisplayUpdated;
-	boolean worldDisplayUpdated;
 	public void update() {
 		if (!isDisposed()) {
-			synchronized(this) {
-				agentDisplayUpdated = false;
-				worldDisplayUpdated = false;
-			}
 			display.syncExec(new Runnable() {
 				public void run() {
 					agentDisplay.worldChangeEvent();
@@ -1133,13 +1136,6 @@ public class WindowManager {
 					updateCounts();
 				}
 			});
-			synchronized(this) {
-				while (!agentDisplayUpdated || !worldDisplayUpdated) {
-					try {
-						this.wait();
-					} catch (InterruptedException ignored) {}
-				}
-			}
 		}
 	}
 

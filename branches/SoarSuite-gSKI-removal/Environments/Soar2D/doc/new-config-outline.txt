@@ -7,7 +7,7 @@
 		?<seed>
 			int seed
 		?<remote>
-		?<hide>
+		?<hide> (this is to hide the map, useful for tanksoar)
 		?<no-gui>
 		?<async>
 			int millisecondDelay
@@ -67,6 +67,7 @@
 			string filename
 		?<console>
 		?<time>
+		?<soar-print>
 	?<players>
 		?<debuggers>
 		?<default-points>
@@ -91,15 +92,23 @@
 				int health
 			?<missiles>
 				int missiles
+			*<shutdown-command>
+				string command
 	?<terminals>
 		?<max-updates>
 			int updateCount
+			?<continue>
 		?<agent-command>
 		?<points-remaining>
 		?<winning-score>
 			int theScore
 		?<food-remaining>
+			?<continue>
+				int maxRuns		# note that this and max-runs's maxRuns are independent
 		?<unopened-boxes>
+		?<max-runs>
+			int maxRuns 		# note that this and food-remaining's maxRuns are independent
+
 	?<clients>
 		*<client>
 			<name>

@@ -82,6 +82,7 @@ public class Configuration {
 		// terminals
 		this.terminalPointsRemaining = config.terminalPointsRemaining;
 		this.terminalFoodRemaining = config.terminalFoodRemaining;
+		this.terminalFoodRemainingContinue = config.terminalFoodRemainingContinue;
 		this.terminalUnopenedBoxes = config.terminalUnopenedBoxes;
 		this.terminalAgentCommand = config.terminalAgentCommand;
 		this.terminalMaxUpdates = config.terminalMaxUpdates;
@@ -127,7 +128,7 @@ public class Configuration {
 			
 			String versionString = root.getAttributeValue(kAttrVersion);
 			if (versionString == null || Integer.parseInt(versionString) != kConfigVersion) {
-				throw new LoadError("Configuration version 2 required.");
+				throw new LoadError("Configuration version 2 required, try removing the xml files from Soar2D.");
 			}
 			
 			general(root.getChild(kTagGeneral));
@@ -468,6 +469,7 @@ public class Configuration {
 				book.addContent(new Element(kTagColoredRooms));
 			}
 			book.addContent(new Element(kTagSpeed).setText(Integer.toString(this.getSpeed())));
+			book.addContent(new Element(kTagRotateSpeed).setText(Float.toString(this.getRotateSpeed())));
 			book.addContent(new Element(kTagBookCellSize).setText(Integer.toString(this.getBookCellSize())));
 			rules.addContent(book);
 			break;
@@ -863,6 +865,15 @@ public class Configuration {
 		this.speed = speed;
 	}
 	
+	private static final String kTagRotateSpeed = "rotate-speed";
+	private float rotateSpeed = (float)java.lang.Math.PI / 4;
+	public float getRotateSpeed() {
+		return this.rotateSpeed;
+	}
+	public void setRotateSpeed(float rotateSpeed) {
+		this.rotateSpeed = rotateSpeed;
+	}
+	
 	private static final String kTagBookCellSize = "book-cell-size";
 	private int bookCellSize = 16;
 	public int getBookCellSize() {
@@ -886,6 +897,13 @@ public class Configuration {
 					this.setSpeed(Integer.parseInt(child.getTextTrim()));
 				} catch (NumberFormatException e) {
 					throw new LoadError("Error parsing " + kTagSpeed);
+				}
+				
+			} else if (child.getName().equalsIgnoreCase(kTagRotateSpeed)) {
+				try {
+					this.setRotateSpeed(Float.parseFloat(child.getTextTrim()));
+				} catch (NumberFormatException e) {
+					throw new LoadError("Error parsing " + kTagRotateSpeed);
 				}
 				
 			} else if (child.getName().equalsIgnoreCase(kTagBookCellSize)) {
@@ -948,6 +966,16 @@ public class Configuration {
 		return this.logConsole;
 	}
 	
+	// log soar-print
+	private boolean logSoarPrint = false; // If true, register for and log soar print events
+	private static final String kTagSoarPrint = "soar-print";
+	public void setLogSoarPrint(boolean logSoarPrint) {
+		this.logSoarPrint = logSoarPrint;
+	}
+	public boolean getLogSoarPrint() {
+		return this.logSoarPrint;
+	}
+	
 	// log time
 	private boolean logTime = false;	// if true, put a time stamp with each log entry
 	private static final String kTagTime = "time";
@@ -968,12 +996,19 @@ public class Configuration {
 			logging.addContent(new Element(kTagConsole));
 		}
 		
+		if (this.getLogSoarPrint()) {
+			logging.addContent(new Element(kTagSoarPrint));
+		}
+		
 		if (this.getLogTime()) {
 			logging.addContent(new Element(kTagTime));
 		}
 	}
 	
 	private void logging(Element logging) throws LoadError {
+		if (logging == null) {
+			return;
+		}
 		List children = logging.getChildren();
 		Iterator iter = children.iterator();
 		while (iter.hasNext()) {
@@ -989,6 +1024,9 @@ public class Configuration {
 				
 			} else if (child.getName().equalsIgnoreCase(kTagConsole)) {
 				setLogConsole(true);
+				
+			} else if (child.getName().equalsIgnoreCase(kTagSoarPrint)) {
+				setLogSoarPrint(true);
 				
 			} else if (child.getName().equalsIgnoreCase(kTagTime)) {
 				setLogTime(true);
@@ -1037,6 +1075,9 @@ public class Configuration {
 	}
 	
 	private void players(Element players) throws LoadError {
+		if (players == null) {
+			return;
+		}
 		List children = players.getChildren();
 		Iterator iter = children.iterator();
 		while (iter.hasNext()) {
@@ -1071,6 +1112,7 @@ public class Configuration {
 	private static final String kTagEnergy = "energy";
 	private static final String kTagHealth = "health";
 	private static final String kTagMissiles = "missiles";
+	private static final String kTagShutdownCommand = "shutdown-command";
 	private ArrayList<PlayerConfig> players = new ArrayList<PlayerConfig>(); // List of information required to create players
 	public ArrayList<PlayerConfig> getPlayers() {
 		return this.players;
@@ -1182,6 +1224,9 @@ public class Configuration {
 				} catch (NumberFormatException e) {
 					throw new LoadError("Error parsing missiles");
 				}
+				
+			} else if (child.getName().equalsIgnoreCase(kTagShutdownCommand)) {
+				playerConfig.addShutdownCommand(child.getTextTrim());
 
 			} else {
 				throw new LoadError("Unrecognized tag: " + child.getName());
@@ -1232,6 +1277,18 @@ public class Configuration {
 	public boolean getTerminalFoodRemaining() {
 		return this.terminalFoodRemaining;
 	}
+	// Reset and restart the simulation after this terminal is reached
+	// int is the number of times to run before a forced stop
+	// 0 or 1 is equivalent to not having this tag
+	// negative values indicate run forever
+	private int terminalFoodRemainingContinue = 0;	
+	private static final String kTagFoodRemainingContinue = "continue";
+	public void setTerminalFoodRemainingContinue(int runs) {
+		this.terminalFoodRemainingContinue = runs;
+	}
+	public int getTerminalFoodRemainingContinue() {
+		return this.terminalFoodRemainingContinue;
+	}
 	
 	// terminal agent command
 	private boolean terminalUnopenedBoxes = false;	// Stop the simulation when no boxes are closed
@@ -1261,6 +1318,14 @@ public class Configuration {
 	public int getTerminalMaxUpdates() {
 		return this.terminalMaxUpdates;
 	}
+	private boolean terminalMaxUpdatesContinue = false;	
+	private static final String kTagMaxUpdatesContinue = "continue";
+	public void setTerminalMaxUpdatesContinue(boolean setting) {
+		this.terminalMaxUpdatesContinue = setting;
+	}
+	public boolean getTerminalMaxUpdatesContinue() {
+		return this.terminalMaxUpdatesContinue;
+	}
 	
 	private int terminalWinningScore = 0;			// Stop the simulation when a certain number of world updates have completed.
 	private static final String kTagWinningScore = "winning-score";
@@ -1271,9 +1336,22 @@ public class Configuration {
 		return this.terminalWinningScore;
 	}
 	
+	private int terminalMaxRuns = 0;				// 0 means no limit 
+	private static final String kTagMaxRuns = "max-runs";
+	public void setTerminalMaxRuns(int maxRuns) {
+		this.terminalMaxRuns = maxRuns;
+	}
+	public int getTerminalMaxRuns() {
+		return this.terminalMaxRuns;
+	}
+	
 	private void terminalsSave(Element terminals) {
 		if (this.getTerminalMaxUpdates() > 0) {
-			terminals.addContent(new Element(kTagMaxUpdates).setText(Integer.toString(this.getTerminalMaxUpdates())));
+			Element maxUpdates = new Element(kTagMaxUpdates).setText(Integer.toString(this.getTerminalMaxUpdates()));
+			if (this.getTerminalMaxUpdatesContinue()) {
+				maxUpdates.addContent(new Element(kTagMaxUpdatesContinue));
+			}
+			terminals.addContent(maxUpdates);
 		}
 		
 		if (this.getTerminalAgentCommand()) {
@@ -1289,15 +1367,32 @@ public class Configuration {
 		}
 		
 		if (this.getTerminalFoodRemaining()) {
-			terminals.addContent(new Element(kTagFoodRemaining));
+			if (this.getTerminalFoodRemainingContinue() > 0) {
+				// <food-remaining>
+				//   <continue>
+				//     int maxRuns
+				Element cont = new Element(kTagFoodRemainingContinue);
+				cont.setText(Integer.toString(this.getTerminalFoodRemainingContinue()));
+				Element foodRem = new Element(kTagFoodRemaining).addContent(cont);
+				terminals.addContent(foodRem);
+			} else {
+				terminals.addContent(new Element(kTagFoodRemaining));
+			}
 		}
 		
 		if (this.getTerminalUnopenedBoxes()) {
 			terminals.addContent(new Element(kTagUnopenedBoxes));
 		}
+
+		if (this.getTerminalMaxRuns() > 0) {
+			terminals.addContent(new Element(kTagMaxRuns).setText(Integer.toString(this.terminalMaxRuns)));
+		}
 	}
 	
 	private void terminals(Element terminals) throws LoadError {
+		if (terminals == null) {
+			return;
+		}
 		List children = terminals.getChildren();
 		Iterator iter = children.iterator();
 		
@@ -1309,6 +1404,10 @@ public class Configuration {
 					this.setTerminalMaxUpdates(Integer.parseInt(child.getTextTrim()));
 				} catch (NumberFormatException e) {
 					throw new LoadError("Error parsing max updates");
+				}
+				Element cont = child.getChild(kTagMaxUpdatesContinue);
+				if (cont != null) {
+					this.setTerminalMaxUpdatesContinue(true);
 				}
 
 			} else if (child.getName().equalsIgnoreCase(kTagAgentCommand)) {
@@ -1327,9 +1426,25 @@ public class Configuration {
 			} else if (child.getName().equalsIgnoreCase(kTagFoodRemaining)) {
 				this.setTerminalFoodRemaining(true);
 				
+				Element cont = child.getChild(kTagFoodRemainingContinue);
+				if (cont != null) {
+					try {
+						this.setTerminalFoodRemainingContinue(Integer.parseInt(cont.getTextTrim()));
+					} catch (NumberFormatException e) {
+						throw new LoadError("Error parsing food-remaining continue max runs");
+					}
+				}
+				
 			} else if (child.getName().equalsIgnoreCase(kTagUnopenedBoxes)) {
 				this.setTerminalUnopenedBoxes(true);
 				
+			} else if (child.getName().equalsIgnoreCase(kTagMaxRuns)) {
+				try {
+					this.setTerminalMaxRuns(Integer.parseInt(child.getTextTrim()));
+				} catch (NumberFormatException e) {
+					throw new LoadError("Error parsing max runs");
+				}
+
 			} else {
 				throw new LoadError("Unrecognized tag: " + child.getName());
 			}
@@ -1351,6 +1466,9 @@ public class Configuration {
 	}
 	
 	private void clients(Element clients) throws LoadError {
+		if (clients == null) {
+			return;
+		}
 		List children = clients.getChildren();
 		Iterator iter = children.iterator();
 		while (iter.hasNext()) {

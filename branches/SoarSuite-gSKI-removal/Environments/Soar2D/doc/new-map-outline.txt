@@ -8,6 +8,10 @@
 				?<health ?shields-down="boolean">
 				?<missiles>
 				?<remove>
+				?<reward-info>
+					?<use-open-code>
+				?<reward quantity="int">
+				?<reset>
 			?<update>
 				?<decay>
 				?<fly-missile>

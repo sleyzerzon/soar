@@ -45,6 +45,9 @@ public class GridMap {
 	}
 	
 	public void load() throws LoadError {
+		// one load call per object
+		assert mapCells == null;
+		
 		if (config == null) {
 			throw new LoadError("Configuration not set");
 		}
@@ -199,6 +202,10 @@ public class GridMap {
 	private static final String kTagHealth = "health";
 	private static final String kTagMissiles = "missiles";
 	private static final String kTagRemove = "remove";
+	private static final String kTagReward = "reward";
+	private static final String kTagRewardInfo = "reward-info";
+	private static final String kTagUseOpenCode = "use-open-code";
+	private static final String kTagReset = "reset";
 
 	private void applySave(Element apply, CellObject template) {
 		Iterator<String> iter = template.propertiesApply.keySet().iterator();
@@ -233,6 +240,22 @@ public class GridMap {
 		if (template.removeApply) {
 			apply.addContent(new Element(kTagRemove));
 		}
+		
+		if (template.rewardApply > 0) {
+			apply.addContent(new Element(kTagReward)).setAttribute(kAttrQuantity, Integer.toString(template.rewardApply));
+		}
+		
+		if (template.rewardInfoApply) {
+			if (this.openCode != 0) {
+				apply.addContent(new Element(kTagRewardInfo).addContent(new Element(kTagUseOpenCode)));
+			} else {
+				apply.addContent(new Element(kTagRewardInfo));
+			}
+		}
+		
+		if (template.resetApply) {
+			apply.addContent(new Element(kTagReset));
+		}
 	}
 
 	private void apply(Element apply, CellObject template) throws LoadError {
@@ -259,6 +282,18 @@ public class GridMap {
 			} else if (child.getName().equalsIgnoreCase(kTagRemove)) {
 				template.setRemoveApply(true);
 
+			} else if (child.getName().equalsIgnoreCase(kTagRewardInfo)) {
+				template.setRewardInfoApply(true);
+				if (child.getChild(kTagUseOpenCode) != null) {
+					openCode = Simulation.random.nextInt(kOpenCodeRange) + 1;
+				}
+
+			} else if (child.getName().equalsIgnoreCase(kTagReward)) {
+				reward(child, template);
+
+			} else if (child.getName().equalsIgnoreCase(kTagReset)) {
+				template.setResetApply(true);
+
 			} else {
 				throw new LoadError("Unrecognized tag: " + child.getName());
 			}
@@ -267,18 +302,32 @@ public class GridMap {
 	
 	private static final String kAttrShields = "shields";
 	
-	private void energy(Element energy, CellObject template) throws LoadError {
+	private void energy(Element energy, CellObject template) {
 		boolean shields = Boolean.parseBoolean(energy.getAttributeValue(kAttrShields, "false"));
 		template.setEnergyApply(true, shields);
 	}
 
 	private static final String kAttrShieldsDown = "shields-down";
 
-	private void health(Element health, CellObject template) throws LoadError {
+	private void health(Element health, CellObject template) {
 		boolean shieldsDown = Boolean.parseBoolean(health.getAttributeValue(kAttrShieldsDown, "false"));
 		template.setHealthApply(true, shieldsDown);
 	}
 
+	private static final String kAttrQuantity = "quantity";
+
+	private void reward(Element reward, CellObject template) throws LoadError {
+		String quantityString = reward.getAttributeValue(kAttrQuantity);
+		if (quantityString == null) {
+			throw new LoadError("No reward quantity specified.");
+		}
+		try {
+			template.setRewardApply(Integer.parseInt(quantityString));
+		} catch (NumberFormatException e) {
+			throw new LoadError("Invalid reward quantity specified.");
+		}
+	}
+	
 	private static final String kTagDecay = "decay";
 	private static final String kTagFlyMissile = "fly-missile";
 	private static final String kTagLinger = "linger";
@@ -388,6 +437,12 @@ public class GridMap {
 		}
 	}
 	
+	CellObject rewardInfoObject = null;
+	static final int kOpenCodeRange = 2; // 1..kOpenCodeRange (alternatively expressed as: 0..(kOpenCodeRange - 1) + 1
+	// If this is not zero, we are requiring an open code.
+	int openCode = 0;
+	int positiveRewardID = 0;
+	
 	private void cells(Element cells) throws LoadError {
 		String sizeString = cells.getAttributeValue(kAttrWorldSize);
 		if (sizeString == null || sizeString.length() <= 0) {
@@ -440,6 +495,35 @@ public class GridMap {
 			generateRandomFood();
 		}
 		
+		// pick positive box
+		if (rewardInfoObject != null) {
+			assert positiveRewardID == 0;
+			positiveRewardID = Simulation.random.nextInt(cellObjectManager.rewardObjects.size());
+			positiveRewardID += 1;
+			rewardInfoObject.addPropertyApply(Names.kPropertyPositiveBoxID, Integer.toString(positiveRewardID));
+			
+			// assigning colors like this helps us see the task happen
+			// colors[0] = info box (already assigned)
+			// colors[1] = positive reward box
+			// colors[2..n] = negative reward boxes
+			Iterator<CellObject> iter = cellObjectManager.rewardObjects.iterator();
+			int negativeColor = 2;
+			while (iter.hasNext()) {
+				CellObject aBox = iter.next();
+				if (aBox.getIntProperty(Names.kPropertyBoxID) == positiveRewardID) {
+					aBox.addProperty(Names.kPropertyColor, Soar2D.simulation.kColors[1]);
+				} else {
+					aBox.addProperty(Names.kPropertyColor, Soar2D.simulation.kColors[negativeColor]);
+					negativeColor += 1;
+					assert negativeColor < Soar2D.simulation.kColors.length;
+				}
+			}
+
+			// if using an open code, assign that
+			if (this.openCode != 0) {
+				rewardInfoObject.addPropertyApply(Names.kPropertyOpenCode, Integer.toString(openCode));
+			}
+		}
 	}
 	
 	private void row(Element row, int rowIndex) throws LoadError {
@@ -519,6 +603,12 @@ public class GridMap {
 			}
 		}
 		addObjectToCell(location, cellObject);
+
+		if (cellObject.rewardInfoApply) {
+			assert rewardInfoObject == null;
+			rewardInfoObject = cellObject;
+		}
+		
 		return background;
 	}
 
@@ -1301,14 +1391,37 @@ public class GridMap {
 		return isInBounds(location.x, location.y);
 	}
 
-	int roomCount = 0;
-	int doorCount = 0;
+	private int roomCount = 0;
+	private int doorCount = 0;
+	private int wallCount = 0;
+	
+	public class Barrier {
+		public int id = -1;
+		public java.awt.Point left;
+		public java.awt.Point right;
+		public String direction; 		// null == door
+		
+		public String toString() {
+			String output = new String(Integer.toString(id));
+			if (direction == null) {
+				output += " (door)";
+			} else {
+				output += " (" + direction + ")";
+			}
+			output += "(" + Integer.toString(left.x) + "," + Integer.toString(left.y) + ")-(" 
+					+ Integer.toString(right.x) + "," + Integer.toString(right.y) + ")";
+			return output;
+		}
+	}
+	private HashMap<Integer, ArrayList<Barrier> > roomBarrierMap = new HashMap<Integer, ArrayList<Barrier> >();
+	public ArrayList<Barrier> getRoomBarrierList(int roomID) {
+		return roomBarrierMap.get(roomID);
+	}
 	
 	public boolean generateRoomStructure() {
 		// Start in upper-left corner
 		// if cell is enterable, flood fill to find boundaries of room
 		// Go from left to right, then to the start of the next line
-		roomCount = 0;
 		LinkedList<java.awt.Point> floodQueue = new LinkedList<java.awt.Point>();
 		HashSet<java.awt.Point> explored = new HashSet<java.awt.Point>((this.size-2)*2);
 
@@ -1328,7 +1441,7 @@ public class GridMap {
 				assert cell.getObject(Names.kRoomID) == null;
 
 				// cell is enterable, we have a room
-				int roomNumber = roomCount;
+				int roomNumber = roomCount + doorCount + wallCount;
 				roomCount += 1;
 				
 				CellObject roomObject = cellObjectManager.createObject(Names.kRoomID);
@@ -1337,7 +1450,7 @@ public class GridMap {
 				HashSet<java.awt.Point> floodExplored = new HashSet<java.awt.Point>((this.size-2)*2);
 				floodExplored.add(location);
 				cell.addCellObject(roomObject);
-				System.out.print("Room " + roomNumber + ": (" + location.x + "," + location.y + ") ");
+				//System.out.print("Room " + roomNumber + ": (" + location.x + "," + location.y + ") ");
 				
 				// add the surrounding cells to the queue 
 				floodQueue.add(new java.awt.Point(location.x+1,location.y));
@@ -1364,7 +1477,7 @@ public class GridMap {
 					explored.add(floodLocation);
 
 					cell.addCellObject(new CellObject(roomObject));
-					System.out.print("(" + floodLocation.x + "," + floodLocation.y + ") ");
+					//System.out.print("(" + floodLocation.x + "," + floodLocation.y + ") ");
 
 					// add the four surrounding cells to the queue
 					floodQueue.add(new java.awt.Point(floodLocation.x+1,floodLocation.y));
@@ -1374,80 +1487,137 @@ public class GridMap {
 				}
 				
 				// figure out walls going clockwise starting with the wall north of the first square in the room
-				int wallCount = 0;
-				
 				int direction = Direction.kEastInt;
 				java.awt.Point startingWall = new java.awt.Point(location.x, location.y-1);
 				java.awt.Point next = new java.awt.Point(startingWall);
 				
-				boolean door = false;
-				int doorNumber = 0;
+				// Keep track of the current barrier information. When the wall ends, simply add it to the the room
+				// barrier map.
+				Barrier currentBarrier = null;
 				
-				boolean wall = false;
-				int wallNumber = 0;
+				// Keep track of barrier information
+				ArrayList<Barrier> barrierList = new ArrayList<Barrier>();
+				
+				// I probably should have commented this more when I wrote it.
+				// The comments have been inserted after the initial writing so they may be slightly wrong.
 				
 				while (true) {
+					
+					// This is used to figure out how to turn corners when walking along walls.
+					// Also used with figuring out barrier endpoints.
 					java.awt.Point previous = new java.awt.Point(next);
+					
+					// next is actually the location we're examining now
 					cell = getCell(next);
+					
+					// used to detect turns
+					java.awt.Point rightOfNext = null;
+					
+					// Get the wall and door objects. The can't both exist.
+					CellObject doorObject = cell.getObject(Names.kDoorID);
 					CellObject wallObject = cell.getObject(Names.kWallID);
-					if (wallObject == null) {
-						// Door!
-						wall = false;
+					
+					// One must exist, but not both
+					assert ((doorObject == null) && (wallObject != null)) || ((doorObject != null) && (wallObject == null));
+
+					if (doorObject != null) {
+						if (currentBarrier != null) {
+							// If we were just walking a wall, end and add the barrier
+							if (currentBarrier.direction != null) {
+								barrierList.add(currentBarrier);
+								currentBarrier = null;
+							}
+						}
 						
-						CellObject doorObject = cell.getObject(Names.kDoorID);
-						if (door == false) {
-							door = true;
+						// At this point, the currentBarrier, if it exists, is the door we're walking
+						if (currentBarrier == null) {
+							
+							// getting here means we're starting a new section of door
+							currentBarrier = new Barrier();
+							currentBarrier.left = new java.awt.Point(next);
+							
+							// get and reuse this door's id number
+							// doors that border two rooms use only the one id number
 							if (doorObject.hasProperty(Names.kPropertyNumber)) {
-								doorNumber = doorObject.getIntProperty(Names.kPropertyNumber);
+								currentBarrier.id = doorObject.getIntProperty(Names.kPropertyNumber);
 							} else {
-								doorNumber = doorCount;
+								
+								// we haven't seen this door yet so create a new id number
+								currentBarrier.id = roomCount + doorCount + wallCount;
 								doorCount += 1;
 							}
-							System.out.println();
-							System.out.print("  Door " + doorNumber + ": ");
-						} 
-						doorObject.addProperty(Names.kPropertyNumber, Integer.toString(doorNumber));
-						
-						System.out.print("(" + next.x + "," + next.y + ") ");
-						Direction.translate(next, direction);
-						
-						java.awt.Point rightOfNext = new java.awt.Point(next);
-						Direction.translate(rightOfNext, Direction.rightOf[direction]);
+							//System.out.println();
+							//System.out.print("  Door " + currentBarrier.id + ": ");
+						}
 
-						if (walls.contains(next) && !walls.contains(rightOfNext)) {
-							continue;
+						// if the door doesn't have a number, add it now.
+						if (!doorObject.hasProperty(Names.kPropertyNumber)) {
+							doorObject.addProperty(Names.kPropertyNumber, Integer.toString(currentBarrier.id));
 						}
-					} else {
+						
+					} else if (wallObject != null) /*redundant*/ {
 					
-						if (wall == false) {
-							wall = true;
-							wallNumber = wallCount;
+						if (currentBarrier != null) {
+							// If we were just walking a door, end and add the barrier
+							if (currentBarrier.direction == null) {
+								barrierList.add(currentBarrier);
+								currentBarrier = null;
+							}
+						}
+						
+						// At this point, the currentBarrier, if it exists, is the wall we're walking
+						if (currentBarrier == null) {
+							
+							// getting here means we're starting a new section of wall
+							currentBarrier = new Barrier();
+							currentBarrier.left = new java.awt.Point(next);
+							currentBarrier.direction = new String(Direction.stringOf[Direction.leftOf[direction]]);
+							
+							// we don't have the complications of doors sharing ids, so this must
+							// be a new wall, create a new id
+							currentBarrier.id = roomCount + doorCount + wallCount;
 							wallCount += 1;
-							System.out.println();
-							System.out.print("  Wall " + wallNumber + " (" + Direction.stringOf[Direction.leftOf[direction]] + "): ");
+							
+							//System.out.println();
+							//System.out.print("  Wall " + currentBarrier.id + ": (" + currentBarrier.direction + "): ");
 						}
 						
-						if (door) {
-							door = false;
-						}
-						
-						wallObject.addProperty(Direction.stringOf[Direction.leftOf[direction]], Integer.toString(wallNumber));
-	
-						System.out.print("(" + next.x + "," + next.y + ") ");
-						Direction.translate(next, direction);
-						
-						java.awt.Point rightOfNext = new java.awt.Point(next);
-						Direction.translate(rightOfNext, Direction.rightOf[direction]);
-		
-						if (walls.contains(next) && !walls.contains(rightOfNext)) {
-							continue;
-						}
+						// walls don't share ids, they are noted by the direction of the wall
+						wallObject.addProperty(currentBarrier.direction, Integer.toString(currentBarrier.id));
+
+					} else {
+						// the world is ending, check the asserts
+						assert false;
 					}
 					
+					//System.out.print("(" + next.x + "," + next.y + ") ");
+
+					// since current barrier is the door we're walking, update it's endpoint before we translate it
+					currentBarrier.right = new java.awt.Point(next);
+
+					// walk to the next section of wall
+					Direction.translate(next, direction);
+					
+					// we get the right of next here because if there is a next and
+					// a wall to the right of it, that means next is a door but there is
+					// a wall in the way so that door doesn't technically border our room,
+					// so, the door ends and we continue on the next segment of wall.
+					rightOfNext = new java.awt.Point(next);
+					Direction.translate(rightOfNext, Direction.rightOf[direction]);
+
+					// if there isn't a next, we're done anyway.
+					// continue if we're moving on with this section of wall, or fall
+					// through to terminate the wall.
+					if (walls.contains(next) && !walls.contains(rightOfNext)) {
+						continue;
+					}
+
 					// door or wall stops here
-					wall = false;
-					door = false;
-					System.out.print("terminated");
+					//System.out.print("(turn)");
+
+					// and the barrier to the list
+					barrierList.add(currentBarrier);
+					currentBarrier = null;
 					
 					// when going clockwise, when we turn right, we go to the cell adjacent to "next",
 					// when we turn left, we go to the cell adjacent to "previous"
@@ -1461,25 +1631,23 @@ public class GridMap {
 					// |   |   | R |  R = possible next, indicates right turn
 					// +---+---+---+    = irrelevant cell
 					
-					// this seems confusing, more examples:
+					//  going west    going north   going south
+					// +---+---+---+ +---+---+---+ +---+---+---+
+					// | R |   |   | |   | N | R | |   | W |   |
+					// +---+---+---+ +---+---+---+ +---+---+---+
+					// | N | P | W | | L | P |   | |   | P | L |
+					// +---+---+---+ +---+---+---+ +---+---+---+
+					// |   | L |   | |   | W |   | | R | N |   |
+					// +---+---+---+ +---+---+---+ +---+---+---+
 					
-					//  going west    going north
-					// +---+---+---+ +---+---+---+
-					// | R |   |   | |   | N | R |
-					// +---+---+---+ +---+---+---+
-					// | N | P | W | | L | P |   |
-					// +---+---+---+ +---+---+---+
-					// |   | L |   | |   | W |   |
-					// +---+---+---+ +---+---+---+
-					
-					// try turning right
+					// try turning right first
 					Direction.translate(next, Direction.rightOf[direction]);
 					if (walls.contains(next)) {
 						// right worked
 						direction = Direction.rightOf[direction];
 
 					} else {
-						// try turning left
+						// try turning left next
 						next = new java.awt.Point(previous);
 						Direction.translate(next, Direction.leftOf[direction]);
 						
@@ -1492,7 +1660,7 @@ public class GridMap {
 							// the remove will silently fail and that's ok
 							
 						} else {
-							// single length wall (left turn)
+							// single length wall (perform "left" turn)
 							direction = Direction.leftOf[direction];
 
 							// need to stay on previous because it is included on the new wall
@@ -1506,10 +1674,35 @@ public class GridMap {
 						break;
 					}
 				}
-				System.out.println();
+				//System.out.println();
+				
+				// Store room information
+				System.out.println("Room " + roomNumber + ":");
+				Iterator<Barrier> iter = barrierList.iterator();
+				while (iter.hasNext()) {
+					Barrier barrier = iter.next();
+					System.out.println(barrier);
+				}
+				this.roomBarrierMap.put(roomNumber, barrierList);
 			}
 		}
 		
 		return true;
+	}
+	
+	public CellObject getInObject(Point location) {
+		if (!this.isInBounds(location)) {
+			return null;
+		}
+		
+		CellObject cellObject = getObject(location, Names.kRoomID);
+		if (cellObject == null) {
+			cellObject = getObject(location, Names.kDoorID);
+			if (cellObject == null) {
+				return null;
+			}
+		}
+		
+		return cellObject;
 	}
 }

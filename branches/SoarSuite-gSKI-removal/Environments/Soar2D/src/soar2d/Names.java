@@ -50,9 +50,14 @@ public class Names {
 	public static final String kEnergyID = "energy";
 	public static final String kEnergyRechargerID = "energyrecharger";
 	public static final String kFireID = "fire";
+	public static final String kFloatXID = "floatx";
+	public static final String kFloatYID = "floaty";
 	public static final String kForwardID = "forward";
+	public static final String kHeadingID = "heading";
 	public static final String kHealthID = "health";
 	public static final String kHealthRechargerID = "healthrecharger";
+	public static final String kIdID = "id";
+	public static final String kInID = "in";
 	public static final String kIncomingID = "incoming";
 	public static final String kJumpID = "jump";
 	public static final String kLeftID = "left";
@@ -65,6 +70,7 @@ public class Names {
 	public static final String kOff = "off";
 	public static final String kOn = "on";
 	public static final String kOpenID = "open";
+	public static final String kOpenCodeID = "open-code";
 	public static final String kPositionID = "position";
 	public static final String kRadarID = "radar";
 	public static final String kRadarPowerID = "radar-power";
@@ -95,6 +101,7 @@ public class Names {
 	
 	public static final String kPropertyBlock = "block";
 	public static final String kPropertyBox = "box";
+	public static final String kPropertyBoxID = "box-id";
 	public static final String kPropertyCharger = "charger";
 	public static final String kPropertyColor = "color";
 	public static final String kPropertyDirection = "direction";
@@ -113,8 +120,10 @@ public class Names {
 	public static final String kPropertyMissiles = "missiles";
 	public static final String kPropertyMoveApply = "move-apply";
 	public static final String kPropertyNumber = "number";
+	public static final String kPropertyOpenCode = "open-code";
 	public static final String kPropertyOwner = "owner";
 	public static final String kPropertyPoints = "points";
+	public static final String kPropertyPositiveBoxID = "positive-box-id";
 	public static final String kPropertyRadarWaves = "radar-waves";
 	public static final String kPropertyRoom = "room";
 	public static final String kPropertyShape = "shape";

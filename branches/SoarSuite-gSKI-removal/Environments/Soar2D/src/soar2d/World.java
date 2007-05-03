@@ -15,6 +15,8 @@ public class World {
 	private static Logger logger = Logger.getLogger("soar2d");
 
 	private int worldCount = 0;
+	private int runsFoodRemaining = 0;
+	private int runsTerminal = 0;
 	private boolean printedStats = false;
 	
 	private GridMap map;
@@ -35,6 +37,12 @@ public class World {
 	private int missileReset = 0;
 	
 	public boolean load() {
+		this.runsFoodRemaining = Soar2D.config.getTerminalFoodRemainingContinue();
+		this.runsTerminal = Soar2D.config.getTerminalMaxRuns();
+		return loadInternal(false);
+	}
+
+	private boolean loadInternal(boolean resetDuringRun) {
 		GridMap newMap = new GridMap(Soar2D.config);
 		
 		try {
@@ -80,7 +88,7 @@ public class World {
 		}
 		
 		reset();
-		resetPlayers();
+		resetPlayers(resetDuringRun);
 		
 		logger.info("Map loaded, world reset.");
 		return true;
@@ -111,7 +119,7 @@ public class World {
 		return true;
 	}
 	
-	void resetPlayers() {
+	void resetPlayers(boolean resetDuringRun) {
 		if (players.size() == 0) {
 			return;
 		}
@@ -120,13 +128,13 @@ public class World {
 			// for each player
 			Player player = iter.next();
 			
-			resetPlayer(player);
+			resetPlayer(player, resetDuringRun);
 		}
 		
 		updatePlayers(false);
 	}
 	
-	private boolean resetPlayer(Player player) {
+	private boolean resetPlayer(Player player, boolean resetDuringRun) {
 		// find a suitable starting location
 		Point startingLocation = putInStartingLocation(player);
 		if (startingLocation == null) {
@@ -138,12 +146,23 @@ public class World {
 			// remove food from it
 			map.removeAllWithProperty(startingLocation, Names.kPropertyEdible);
 			
+			// This is here because the TOSCA stuff wants to keep around the reward
+			// in the beginning of the next phase
+			
+			if (resetDuringRun) {
+				player.mapReset();
+			}
+			
 			// falls through
 			
 		case kTankSoar:
 		case kBook:
-			// reset (init-soar)
-			player.reset();
+			if (resetDuringRun) {
+				player.fragged();
+			} else {
+				// reset (init-soar)
+				player.reset();
+			}
 			break;
 		}
 		return true;
@@ -309,7 +328,7 @@ public class World {
 			initialLocations.put(player.getName(), initialLocation);
 		}
 		
-		if (!resetPlayer(player)) {
+		if (!resetPlayer(player, false)) {
 			initialLocations.remove(player.getName());
 			players.remove(player);
 			playersMap.remove(player.getName());
@@ -407,7 +426,7 @@ public class World {
 					Iterator<CellObject> maIter = moveApply.iterator();
 					while (maIter.hasNext()) {
 						CellObject object = maIter.next();
-						if (object.apply(player)) {
+						if (object.apply(this, player)) {
 							map.removeObject(location, object.getName());
 						}
 					}
@@ -419,7 +438,7 @@ public class World {
 			}
 			
 			if (lastMove.open) {
-				open(player, location);
+				open(player, location, lastMove.openCode);
 			}
 		}
 	}
@@ -429,7 +448,7 @@ public class World {
 		Iterator<CellObject> foodIter = list.iterator();
 		while (foodIter.hasNext()) {
 			CellObject food = foodIter.next();
-			if (food.apply(player)) {
+			if (food.apply(this, player)) {
 				// if this returns true, it is consumed
 				map.removeObject(location, food.getName());
 			}
@@ -438,7 +457,7 @@ public class World {
 	
 	public void missileHit(Player player, Point location, CellObject missile) {
 		// Yes, I'm hit
-		missile.apply(player);
+		missile.apply(this, player);
 		
 		// apply points
 		player.adjustPoints(Soar2D.config.getMissileHitPenalty(), missile.getName());
@@ -466,7 +485,7 @@ public class World {
 		}
 	}
 	
-	private void open(Player player, Point location) {
+	private void open(Player player, Point location, int openCode) {
 		ArrayList<CellObject> boxes = map.getAllWithProperty(location, Names.kPropertyBox);
 		if (boxes.size() <= 0) {
 			Soar2D.logger.warning(player.getName() + " tried to open but there is no box.");
@@ -483,8 +502,28 @@ public class World {
 				return;
 			}
 		}
-		if (box.apply(player)) {
+		if (openCode != 0) {
+			box.addPropertyApply(Names.kPropertyOpenCode, Integer.toString(openCode));
+		}
+		if (box.apply(this, player)) {
 			map.removeObject(location, box.getName());
+		}
+		
+		if (box.getResetApply()) {
+			boolean stopNow = false;
+			
+			if (this.runsTerminal > 0) {
+				this.runsTerminal -= 1;
+				if (this.runsTerminal == 0) {
+					stopNow = true;
+				}
+			}
+
+			if (stopNow) {
+				this.stopAndDumpStats("Max resets achieved.", getSortedScores());
+			} else {
+				doRestartAfterUpdate();
+			}
 		}
 	}
 	
@@ -502,7 +541,10 @@ public class World {
 		return scores;
 	}
 	
+	boolean restartAfterUpdate = false;
+
 	public void update() {
+		
 		Soar2D.config.setHide(false);
 		
 		// Collect human input
@@ -518,8 +560,21 @@ public class World {
 
 		if (Soar2D.config.getTerminalMaxUpdates() > 0) {
 			if (worldCount >= Soar2D.config.getTerminalMaxUpdates()) {
-				stopAndDumpStats("Reached maximum updates, stopping.", getSortedScores());
-				return;
+				boolean stopNow = true;
+				
+				if (this.runsTerminal > 0) {
+					this.runsTerminal -= 1;
+					if (this.runsTerminal > 0) {
+						stopNow = false;
+					}
+				}
+
+				if (stopNow) {
+					stopAndDumpStats("Reached maximum updates, stopping.", getSortedScores());
+					return;
+				} else {
+					doRestartAfterUpdate();
+				}
 			}
 		}
 		
@@ -540,8 +595,27 @@ public class World {
 
 		if (Soar2D.config.getTerminalFoodRemaining()) {
 			if (map.getFoodCount() <= 0) {
-				stopAndDumpStats("All of the food is gone.", getSortedScores());
-				return;
+				boolean stopNow = true;
+				
+				if (Soar2D.config.getTerminalFoodRemainingContinue() != 0) {
+					// reduce continues by one if it is positive
+					if (runsFoodRemaining > 0) {
+						runsFoodRemaining -= 1;
+					}
+
+					// we only stop if continues is zero
+					if (runsFoodRemaining != 0) {
+						stopNow = false;
+					}
+				}
+				
+				if (stopNow) {
+					stopAndDumpStats("All of the food is gone.", getSortedScores());
+					return;
+					
+				} else {
+					doRestartAfterUpdate();
+				}
 			}
 		}
 
@@ -569,11 +643,41 @@ public class World {
 			bookUpdate();
 			break;
 		}
+
+		if (restartAfterUpdate) {
+			loadInternal(true);
+			if (Soar2D.wm.using()) {
+				Soar2D.wm.reset();
+			}
+		}
+	}
+	
+	private void doRestartAfterUpdate() {
+		restartAfterUpdate = true;
+		
+		int[] scores = getSortedScores();
+		boolean draw = false;
+		if (scores.length > 1) {
+			if (scores[scores.length - 1] ==  scores[scores.length - 2]) {
+				if (logger.isLoggable(Level.FINER)) logger.finer("Draw detected.");
+				draw = true;
+			}
+		}
+		
+		Iterator<Player> iter = players.iterator();
+		while (iter.hasNext()) {
+			String status = null;
+			Player player = iter.next();
+			if (player.getPoints() == scores[scores.length - 1]) {
+				status = draw ? "draw" : "winner";
+			} else {
+				status = "loser";
+			}
+			logger.info(player.getName() + ": " + player.getPoints() + " (" + status + ").");
+		}
 	}
 	
 	private void bookUpdate() {
-		System.out.println("bookUpdate");
-		
 		final float time = (float)Soar2D.config.getASyncDelay() / 1000.0f;
 
 		Iterator<Player> iter = players.iterator();
@@ -584,17 +688,34 @@ public class World {
 				return;
 			}
 			
-			if (!move.forward) {
+			if (move.rotate) {
+				final float rotateSpeed = Soar2D.config.getRotateSpeed();
+				
+				if (move.rotateDirection.equals(Names.kRotateLeft)) {
+					player.setHeadingRadians(player.getHeadingRadians() - (rotateSpeed * time));
+				} else if (move.rotateDirection.equals(Names.kRotateRight)) {
+					player.setHeadingRadians(player.getHeadingRadians() + (rotateSpeed * time));
+				}
+			}
+			
+			if (!move.forward && !move.backward) {
 				continue;
 			}
 			
-			final int speed = Soar2D.config.getSpeed();
+			float rate = Soar2D.config.getSpeed() * time;
+			if (move.forward && move.backward) {
+				rate = 0;
+			} else if (move.backward) {
+				rate *= -1;
+			}
 			final int cellSize = Soar2D.config.getBookCellSize();
-			final float heading = player.getHeading();
+			final float heading = player.getHeadingRadians();
 			
 			Point oldLocation = locations.get(player.getName());
 			Point newLocation = new Point(oldLocation);
-			
+
+			map.setPlayer(oldLocation, null);
+
 			Point2D.Float oldFloatLocation = floatLocations.get(player.getName());
 			Point2D.Float newFloatLocation = new Point2D.Float(oldFloatLocation.x, oldFloatLocation.y);
 
@@ -608,18 +729,26 @@ public class World {
 			 * north: 270 3pi/2
 			 */
 			
-			newFloatLocation.x += Math.cos(heading) * speed * time;
-			newFloatLocation.y += Math.sin(heading) * speed * time;
-			
+			newFloatLocation.x += Math.cos(heading) * rate;
+			newFloatLocation.y += Math.sin(heading) * rate;
 			
 			newLocation.x = (int)newFloatLocation.x / cellSize;
 			newLocation.y = (int)newFloatLocation.y / cellSize;
 			
-			System.out.println(newFloatLocation);
-			System.out.println(newLocation);
+			if (map.getAllWithProperty(newLocation, Names.kPropertyBlock).size() > 0) {
+//				System.out.println("blocked");
+				move.forward = false;
+				map.setPlayer(oldLocation, player);
 
-			floatLocations.put(player.getName(), newFloatLocation);
-			locations.put(player.getName(), newLocation);
+			} else {
+				
+//				System.out.println("       heading: " + heading);
+//				System.out.println("float location: " + newFloatLocation);
+//				System.out.println("      location: " + newLocation);
+
+				floatLocations.put(player.getName(), newFloatLocation);
+				locations.put(player.getName(), newLocation);
+			}
 		}
 		
 		iter = players.iterator();
@@ -634,7 +763,8 @@ public class World {
 		}
 
 		handleBookCollisions(findCollisions());
-
+		
+		updatePlayers(false);
 	}
 	
 	private Point2D.Float defaultFloatLocation(Point location) {
@@ -978,7 +1108,7 @@ public class World {
 			if (missilePacks.size() > 0) {
 				assert missilePacks.size() == 1;
 				CellObject pack = missilePacks.get(0);
-				pack.apply(player);
+				pack.apply(this, player);
 				map.removeAllWithProperty(location, Names.kPropertyMissiles);
 			}
 			
@@ -1314,9 +1444,6 @@ public class World {
 					if (collision.size() == 0) {
 						collision.add(left);
 						
-						// Add the boom on the map
-						map.setExplosion(locations.get(left.getName()));
-						
 						if (logger.isLoggable(Level.FINER)) logger.finer("collision at " + locations.get(left.getName()));
 					}
 					// Add each right as it is detected
@@ -1367,8 +1494,13 @@ public class World {
 				if (logger.isLoggable(Level.FINER)) logger.finer("Sum of cash is negative.");
 			}
 			
+			Point collisionLocation = locations.get(collision.get(0).getName());
+
+			// Add the boom on the map
+			map.setExplosion(collisionLocation);
+
 			// Remove from former location (only one of these for all players)
-			map.setPlayer(locations.get(collision.get(0).getName()), null);
+			map.setPlayer(collisionLocation, null);
 			
 			// Move to new cell, consume food
 			collideeIter = collision.listIterator();
@@ -1389,6 +1521,7 @@ public class World {
 		printedStats = false;
 		missileID = 0;
 		missileReset = 0;
+		restartAfterUpdate = false;
 	}
 	
 	public int getWorldCount() {

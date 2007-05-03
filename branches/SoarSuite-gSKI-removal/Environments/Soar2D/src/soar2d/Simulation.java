@@ -35,7 +35,7 @@ public class Simulation {
 	/**
 	 * Legal colors (see PlayerConfig)
 	 */
-	public final String kColors[] = { "red", "blue", "purple", "yellow", "orange", "green", "black",  };
+	public final String kColors[] = { "red", "blue", "yellow", "purple", "orange", "green", "black",  };
 	/**
 	 * A list of colors not currently taken by a player
 	 */
@@ -291,7 +291,7 @@ public class Simulation {
 					} else if (playerConfig.getName().equals(kMouse)) {
 						player = new Mouse(playerConfig);
 					} else {
-						player = new Cat(playerConfig);
+						player = new Robot(playerConfig);
 					}
 					break;
 				}
@@ -337,7 +337,7 @@ public class Simulation {
 						player = new SoarTank(agent, playerConfig);
 						break;
 					case kBook:
-						assert false;
+						player = new SoarRobot(agent, playerConfig);
 						break;
 					}
 					
@@ -354,6 +354,11 @@ public class Simulation {
 						throw new CreationException();
 					}
 		
+					// Scott Lathrop --  register for print events
+					if (Soar2D.config.getLogSoarPrint()) {
+						agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, Soar2D.control.getLogger(), null,true);
+					}
+					
 					// save both the agent
 					agents.put(player.getName(), agent);
 					
@@ -630,7 +635,7 @@ public class Simulation {
 	 */
 	public void runStep() {
 		if (runTilOutput) {
-			kernel.RunAllTilOutput();
+			kernel.RunAllTilOutput(smlInterleaveStepSize.sml_INTERLEAVE_UNTIL_OUTPUT);
 		} else {
 			kernel.RunAllAgents(1);
 		}

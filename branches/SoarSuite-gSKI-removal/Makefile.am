@@ -10,11 +10,8 @@ if SWIGJAVA
 	Tools/SoarJavaDebugger/build.sh
 	Tools/TestJavaSML/build.sh
 	Tools/VisualSoar/build.sh
-	Environments/JavaBaseEnvironment/build.sh
-	Environments/JavaEaters/build.sh
 	Environments/JavaMissionaries/build.sh
 	Environments/JavaTOH/build.sh
-	Environments/JavaTankSoar/build.sh
 	Environments/Soar2D/build.sh
 else
 endif
@@ -36,20 +33,20 @@ dist-hook:
 
 install-data-am:
 	$(INSTALL) SoarLibrary/bin/libcairo-swt.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-agl-carbon-3232.jnilib $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-atk-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-awt-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-cairo-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-carbon-3232.jnilib $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-glx-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-gnome-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-mozilla-gcc3-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-mozilla-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-pi-carbon-3232.jnilib $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-pi-gtk-3232.so $(libdir)
-	$(INSTALL) SoarLibrary/bin/libswt-webkit-carbon-3232.jnilib $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-agl-carbon-3236.jnilib $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-atk-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-awt-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-cairo-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-carbon-3236.jnilib $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-glx-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-gnome-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-mozilla-gcc3-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-mozilla-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-pi-carbon-3236.jnilib $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-pi-gtk-3236.so $(libdir)
+	$(INSTALL) SoarLibrary/bin/libswt-webkit-carbon-3236.jnilib $(libdir)
 if SWIGPYTHON
-	rm $(bindir)/Python_sml_ClientInterface.pyd
-	ln -s $(libdir)/libPython_sml_ClientInterface.so $(bindir)/Python_sml_ClientInterface.pyd
+	rm $(bindir)/_Python_sml_ClientInterface.so
+	ln -s $(libdir)/libPython_sml_ClientInterface.so $(bindir)/_Python_sml_ClientInterface.so
 endif

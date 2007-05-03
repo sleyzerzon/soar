@@ -68,6 +68,8 @@ public class ToscaEater {
 		
 		// Need to set the new value in the future (so choosing time+1)
 		m_InputVar.update(time+1, this, world, location) ;
+		
+		m_Eater.resetPointsChanged();
 	}
 	
 	/* (non-Javadoc)
@@ -101,11 +103,16 @@ public class ToscaEater {
 		}
 		else
 		{
-			move.move = true ;
-			move.moveDirection = this.m_OutputVar.GetDirection() ;
-			
-			if (move.moveDirection == 0)
-				move.move = false ;
+			if (this.m_OutputVar.IsOpening()) {
+				move.open = true;
+				move.openCode = this.m_OutputVar.GetOpenCode();
+			} else {
+				move.move = true ;
+				move.moveDirection = this.m_OutputVar.GetDirection() ;
+				
+				if (move.moveDirection == 0)
+					move.move = false ;
+			}
 		}
 
 		//MoveInfo move = Soar2D.wm.getHumanMove(getEater().getColor());
@@ -114,6 +121,12 @@ public class ToscaEater {
 		logger.info("Tosca agent move direction " + move.moveDirection);
 		return move;
 	}
+	
+	// see comments in input var, search for recentMapReset
+	public void mapReset() {
+		this.m_InputVar.mapReset();
+	}
+	
 	/* (non-Javadoc)
 	 * @see soar2d.player.Player#shutdown()
 	 */

@@ -35,6 +35,7 @@ bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::stri
 		{'f', "full",			0},
 		{'F', "filename",		0},
 		{'i', "internal",		0},
+		{'t', "tree",			0},
 		{'j', "justifications",	0},
 		{'n', "name",			0},
 		{'o', "operators",		0},
@@ -81,6 +82,9 @@ bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::stri
 			case 'i':
 				options.set(PRINT_INTERNAL);
 				break;
+			case 't':
+				options.set(PRINT_TREE);
+				break;
 			case 'j':
 				options.set(PRINT_JUSTIFICATIONS);
 				break;
@@ -114,7 +118,7 @@ bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::stri
 	switch (m_NonOptionArguments) {
 		case 0:  // no argument
 			// the i and d options require an argument
-			if (options.test(PRINT_INTERNAL) || options.test(PRINT_DEPTH)) return SetError(CLIError::kTooFewArgs);
+			if (options.test(PRINT_INTERNAL) || options.test(PRINT_TREE) || options.test(PRINT_DEPTH)) return SetError(CLIError::kTooFewArgs);
 			return DoPrint(pAgent, options, depth);
 
 		case 1: 
@@ -173,6 +177,7 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 
 	// Cache the flags since it makes function calls huge
 	bool internal = options.test(PRINT_INTERNAL);
+	bool tree = options.test(PRINT_TREE);
 	bool filename = options.test(PRINT_FILENAME);
 	bool full = options.test(PRINT_FULL);
 	bool name = options.test(PRINT_NAME);
@@ -220,7 +225,7 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 		m_VarPrint = true;
 	}
 	if (pArg) {
-		pKernelHack->PrintSymbol(m_pAgentSML, const_cast<char*>(pArg->c_str()), name, filename, internal, full, depth);
+		pKernelHack->PrintSymbol(m_pAgentSML, const_cast<char*>(pArg->c_str()), name, filename, internal, tree, full, depth);
 	} else {
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);

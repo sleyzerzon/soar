@@ -1,6 +1,7 @@
 package soar2d.visuals;
 
 import java.util.*;
+import java.awt.geom.Point2D;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.PaintEvent;
@@ -211,19 +212,6 @@ public class VisualWorld extends Canvas implements PaintListener {
 			
 			if (Soar2D.config.getHide()) {
 				painted = true;
-				if (Soar2D.control.isRunning()) {
-					if (agentLocation != null) {
-						synchronized(Soar2D.wm) {
-							Soar2D.wm.agentDisplayUpdated = true;
-							Soar2D.wm.notify();
-						}
-					} else {
-						synchronized(Soar2D.wm) {
-							Soar2D.wm.worldDisplayUpdated = true;
-							Soar2D.wm.notify();
-						}
-					}
-				}
 				return;
 			}
 			
@@ -560,14 +548,21 @@ public class VisualWorld extends Canvas implements PaintListener {
 							drawDot = true;
 						}
 						
-						gc.drawImage(image, location.x*cellSize, location.y*cellSize);
-
 						// draw the player color
 						if (drawDot) {
+							// image using float location then dot
+							Point2D.Float floatLocation = new Point2D.Float(Soar2D.simulation.world.getFloatLocation(player).x, Soar2D.simulation.world.getFloatLocation(player).y);
+							floatLocation.x -= cellSize/2;
+							floatLocation.y -= cellSize/2;
+							gc.drawImage(image, (int)floatLocation.x, (int)floatLocation.y);
+							
 							gc.setBackground(WindowManager.getColor(player.getColor()));
 							gc.fillOval(cellSize*location.x + cellSize/2 - kDotSize/2, 
 									cellSize*location.y + cellSize/2 - kDotSize/2, 
 									kDotSize, kDotSize);
+						} else {
+							// only the image
+							gc.drawImage(image, location.x*cellSize, location.y*cellSize);
 						}
 					}
 
@@ -583,19 +578,6 @@ public class VisualWorld extends Canvas implements PaintListener {
 		}
 		
 		painted = true;
-		if (Soar2D.control.isRunning()) {
-			if (agentLocation != null) {
-				synchronized(Soar2D.wm) {
-					Soar2D.wm.agentDisplayUpdated = true;
-					Soar2D.wm.notify();
-				}
-			} else {
-				synchronized(Soar2D.wm) {
-					Soar2D.wm.worldDisplayUpdated = true;
-					Soar2D.wm.notify();
-				}
-			}
-		}
 	}
 	
 	Image bootstrapImage(String imageName) {

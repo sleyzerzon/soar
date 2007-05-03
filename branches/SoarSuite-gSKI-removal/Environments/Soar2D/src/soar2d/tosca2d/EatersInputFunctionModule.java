@@ -21,7 +21,7 @@ public class EatersInputFunctionModule extends JavaFunctionModule {
 	}
 	
 	public int getStepSize() {
-		return 10 ;
+		return 20 ;
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class EatersInputFunctionModule extends JavaFunctionModule {
 		int time = GetClock().GetTime() ;
 
 		// Just make things move slow enough that I can see what's happening
-		try { java.lang.Thread.sleep(100) ; } catch (Exception ex) { }
+		// try { java.lang.Thread.sleep(100) ; } catch (Exception ex) { }
 		
 		Soar2D.control.tickEvent() ;
 
