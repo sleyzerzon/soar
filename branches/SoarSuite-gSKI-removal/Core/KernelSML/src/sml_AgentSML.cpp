@@ -635,7 +635,7 @@ void AgentSML::RegisterForBeforeAgentDestroyedEvent()
 
 void AgentSML::ScheduleAgentToRun(bool state) 
 { 
-	if (m_pIAgent->GetRunState() != gSKI_RUNSTATE_HALTED) 
+	if (this->GetRunState() != gSKI_RUNSTATE_HALTED) 
 	{
 		m_ScheduledToRun = state ; 
 		m_WasOnRunList = state; 
