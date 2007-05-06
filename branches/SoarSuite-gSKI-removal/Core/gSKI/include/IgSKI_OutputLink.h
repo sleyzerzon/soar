@@ -164,7 +164,6 @@ namespace gSKI {
        * This is useful for systems that only except input during callback events.
        */
       virtual void InvokeOutputProcessors(Error* err = 0) = 0;
-
    };
 }
 

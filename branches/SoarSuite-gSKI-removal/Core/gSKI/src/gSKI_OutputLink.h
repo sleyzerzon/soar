@@ -217,7 +217,6 @@ namespace gSKI {
        */
       void InvokeOutputProcessors(Error* err = 0);
 
-   private:
       /**
        * @brief Static callback function that handles dispatching raw kernel
        *  callbacks to the various output link objects.
@@ -231,6 +230,7 @@ namespace gSKI {
 				       soar_callback_data callbackdata,
 				       soar_call_data calldata );
 
+   private:
       /**
        * @brief Method called when the output link is created by the 
        *   Soar kernel
