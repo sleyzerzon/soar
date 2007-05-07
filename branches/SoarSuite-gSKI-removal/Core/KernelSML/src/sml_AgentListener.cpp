@@ -41,10 +41,10 @@ void AgentListener::Init(KernelSML* pKernelSML)
 	m_pKernelSML = pKernelSML ;
 
 	// Listen for "before" init-soar events (we need to know when these happen so we can release all WMEs on the input link, otherwise gSKI will fail to re-init the kernel correctly.)
-	m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_BEFORE_AGENT_REINITIALIZED, this, false) ;
+	//m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_BEFORE_AGENT_REINITIALIZED, this, false) ;
 
 	// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
-	m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_AFTER_AGENT_REINITIALIZED, this, false) ;
+	//m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_AFTER_AGENT_REINITIALIZED, this, false) ;
 }
 
 // Returns true if this is the first connection listening for this event
@@ -52,7 +52,7 @@ bool AgentListener::AddListener(egSKIAgentEventId eventID, Connection* pConnecti
 {
 	bool first = EventManager<egSKIAgentEventId>::BaseAddListener(eventID, pConnection) ;
 
-	if (first)
+	if (first && eventID == gSKIEVENT_BEFORE_AGENT_DESTROYED)
 	{
 		m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(eventID, this) ;
 	}
@@ -66,7 +66,7 @@ bool AgentListener::RemoveListener(egSKIAgentEventId eventID, Connection* pConne
     bool last = EventManager<egSKIAgentEventId>::BaseRemoveListener(eventID, pConnection) ;
 
 	// Unregister from the kernel -- except for the two events that this class is internally listening for.
-	if (last && eventID != gSKIEVENT_BEFORE_AGENT_REINITIALIZED && eventID != gSKIEVENT_AFTER_AGENT_REINITIALIZED)
+	if (last && eventID == gSKIEVENT_BEFORE_AGENT_DESTROYED)
 	{
 		m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(eventID, this) ;
 	}
@@ -77,10 +77,18 @@ bool AgentListener::RemoveListener(egSKIAgentEventId eventID, Connection* pConne
 // Called when an event occurs in the kernel
 void AgentListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	OnEvent((egSKIAgentEventId)eventID, pAgentSML) ;
 }
 
-// Called when an "AgentEvent" occurs in the kernel
+// Called when an "AgentEvent" occurs in gSKI
 void AgentListener::HandleEvent(egSKIAgentEventId eventID, gSKI::Agent* agentPtr)
+{
+	AgentSML* pAgent = m_pKernelSML->GetAgentSML(agentPtr) ;
+	assert(pAgent) ;
+	OnEvent(eventID, pAgent) ;
+}
+
+void AgentListener::OnEvent(egSKIAgentEventId eventID, AgentSML* pAgentSML)
 {
 	// Pass init-soar events over to the output listener so it can do some cleanup before and after the init-soar
 	// Then send them on to everyone else like normal.
@@ -89,9 +97,7 @@ void AgentListener::HandleEvent(egSKIAgentEventId eventID, gSKI::Agent* agentPtr
 		// This is a bit clumsy.  I think the reinitialized events should really be sent to the agent not to the agent manager
 		// (which is a kernel event) so we need to do this extra lookup stage.  If it was an agent event, we could directly
 		// attach it to the agent handler.
-		AgentSML* pAgent = m_pKernelSML->GetAgentSML(agentPtr) ;
-		assert(pAgent) ;
-		pAgent->GetOutputListener()->HandleEvent(eventID, agentPtr) ;
+		pAgentSML->GetOutputListener()->HandleEvent(eventID, pAgentSML->GetIAgent()) ;
 	}
 
 	// Get the first listener for this event (or return if there are none)
@@ -110,7 +116,7 @@ void AgentListener::HandleEvent(egSKIAgentEventId eventID, gSKI::Agent* agentPtr
 	// Pass the agent in the "name" parameter not the "agent" parameter as this is a kernel
 	// level event, not an agent level one (because you need to register with the kernel to get "agent created").
 	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
-	if (agentPtr) pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, agentPtr->GetName()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, pAgentSML->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 
 	// Send the message out

@@ -138,6 +138,8 @@ public:
 	// prior to deleting AgentSML, but before the underlying gSKI agent has been deleted
 	void Clear(bool deletingThisAgent) ;
 
+	void DeleteSelf() ;
+
 	void RegisterForBeforeAgentDestroyedEvent() ;
 
 	// Release all of the WMEs that we currently have references to

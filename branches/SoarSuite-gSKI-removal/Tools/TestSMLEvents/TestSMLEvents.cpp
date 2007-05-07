@@ -193,7 +193,7 @@ int main() {
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
 	// when that allocation occurs.
-	//_crtBreakAlloc = 73 ;
+	//_crtBreakAlloc = 17366 ;
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif // _MSC_VER
 
@@ -307,6 +307,7 @@ NamedEventDataList* CreateSystemEventData() {
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_SHUTDOWN, "smlEVENT_BEFORE_SHUTDOWN"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_CONNECTION, "smlEVENT_AFTER_CONNECTION"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_SYSTEM_START, "smlEVENT_SYSTEM_START"));
+	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_AGENTS_RUN_STEP, "smlEVENT_BEFORE_AGENTS_RUN_STEP"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_SYSTEM_STOP, "smlEVENT_SYSTEM_STOP"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_INTERRUPT_CHECK, "smlEVENT_INTERRUPT_CHECK"));
 
@@ -371,7 +372,6 @@ NamedEventDataList* CreateAgentEventData() {
 	
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_AGENT_CREATED, "smlEVENT_AFTER_AGENT_CREATED"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_AGENT_DESTROYED, "smlEVENT_BEFORE_AGENT_DESTROYED"));
-	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_AGENTS_RUN_STEP, "smlEVENT_BEFORE_AGENTS_RUN_STEP"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_BEFORE_AGENT_REINITIALIZED, "smlEVENT_BEFORE_AGENT_REINITIALIZED"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_AFTER_AGENT_REINITIALIZED, "smlEVENT_AFTER_AGENT_REINITIALIZED"));
 
@@ -382,10 +382,6 @@ NamedEventDataList* CreatePrintEventData() {
 	NamedEventDataList* namedEventData = new NamedEventDataList();
 	namedEventData->name = "print";
 	
-	//namedEventData->eventData.push_back(new EventData(smlEVENT_LOG_ERROR, "smlEVENT_LOG_ERROR"));
-	//namedEventData->eventData.push_back(new EventData(smlEVENT_LOG_WARNING, "smlEVENT_LOG_WARNING"));
-	//namedEventData->eventData.push_back(new EventData(smlEVENT_LOG_INFO, "smlEVENT_LOG_INFO"));
-	//namedEventData->eventData.push_back(new EventData(smlEVENT_LOG_DEBUG, "smlEVENT_LOG_DEBUG"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_ECHO, "smlEVENT_ECHO"));
 	namedEventData->eventData.push_back(new EventData(smlEVENT_PRINT, "smlEVENT_PRINT"));
 

@@ -104,6 +104,32 @@ void AgentSML::Init()
 	InitializeRuntimeState() ;
 }
 
+class AgentSML::AgentBeforeDestroyedListener: public gSKI::IAgentListener
+{
+public:
+	// This handler is called right before the agent is actually deleted
+	// inside gSKI.  We need to clean up any object we own now.
+	virtual void HandleEvent(egSKIAgentEventId, gSKI::Agent* pAgent)
+	{
+#ifdef DEBUG_UPDATE
+	PrintDebugFormat("AgentSML::AgentBeforeDestroyedListener start.") ;
+#endif
+		KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
+
+		// Unregister ourselves (this is important for the same reasons as listed above)
+		pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, this) ;
+
+		// Release any wmes or other objects we're keeping
+		AgentSML* pAgentSML = pKernelSML->GetAgentSML(pAgent) ;
+		pAgentSML->DeleteSelf() ;
+		pAgentSML = NULL ;	// At this point the pointer is invalid so clear it.
+
+#ifdef DEBUG_UPDATE
+	PrintDebugFormat("AgentSML::AgentBeforeDestroyedListener end.") ;
+#endif
+	}
+};
+
 AgentSML::~AgentSML()
 {
 	// Release any objects we still own
@@ -111,6 +137,7 @@ AgentSML::~AgentSML()
 
 	delete m_pAgentRunCallback ;
 	delete m_pInputProducer ;
+	delete m_pBeforeDestroyedListener ;
 }
 
 // Release any objects or other data we are keeping.  We do this just
@@ -220,8 +247,10 @@ void AgentSML::InitializeRuntimeState()
 
 bool AgentSML::Reinitialize()
 {
+	m_pKernelSML->FireAgentEvent(this, gSKIEVENT_BEFORE_AGENT_REINITIALIZED) ;
 	bool ok = GetIAgent()->Reinitialize();
 	InitializeRuntimeState() ;
+	m_pKernelSML->FireAgentEvent(this, gSKIEVENT_AFTER_AGENT_REINITIALIZED) ;
 	return ok ;
 }
 
@@ -449,17 +478,6 @@ void AgentSML::FireSimpleXML(char const* pMsg)
    GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionBeginTag, sml_Names::kTagMessage, 0) ; 
    GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionAddAttribute, sml_Names::kTypeString, pMsg) ; 
    GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionEndTag, sml_Names::kTagMessage, 0) ; 
-
-   /*
-   PrintNotifier nfIntr(this, "Interrupt received.");
-   m_printListeners.Notify(gSKIEVENT_PRINT, nfIntr);
-   XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
-   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
-   XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "Interrupt received.") ;
-   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
-   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
-   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
-   */
 }
 
 static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)
@@ -586,42 +604,25 @@ egSKIRunResult AgentSML::Step(egSKIInterleaveType stepSize, gSKI::Error* pError)
    return retVal;
 }
 
-class AgentSML::AgentBeforeDestroyedListener: public gSKI::IAgentListener
+void AgentSML::DeleteSelf()
 {
-public:
-	// This handler is called right before the agent is actually deleted
-	// inside gSKI.  We need to clean up any object we own now.
-	virtual void HandleEvent(egSKIAgentEventId, gSKI::Agent* pAgent)
-	{
-#ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML::AgentBeforeDestroyedListener start.") ;
-#endif
-		KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
+	this->Clear(false) ;
 
-		// Release any wmes or other objects we're keeping
-		AgentSML* pAgentSML = pKernelSML->GetAgentSML(pAgent) ;
-		pAgentSML->Clear(false) ;
+	// Remove the listeners that KernelSML uses for this agent.
+	// This is important.  Otherwise if we create a new agent using the same kernel object
+	// the listener will still exist inside gSKI and will crash when an agent event is next generated.
+	this->GetOutputListener()->UnRegisterForKernelSMLEvents() ;
 
-		// Remove the listeners that KernelSML uses for this agent.
-		// This is important.  Otherwise if we create a new agent using the same kernel object
-		// the listener will still exist inside gSKI and will crash when an agent event is next generated.
-		pAgentSML->GetOutputListener()->UnRegisterForKernelSMLEvents() ;
+	// Unregister ourselves (this is important for the same reasons as listed above)
+	//m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, this) ;
 
-		// Unregister ourselves (this is important for the same reasons as listed above)
-		pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, this) ;
+	// Then delete our matching agent sml information
+	m_pKernelSML->DeleteAgentSML(this->GetIAgent()) ;
 
-		// Then delete our matching agent sml information
-		pKernelSML->DeleteAgentSML(pAgent) ;
-
-		// Do self clean-up of this object as it's just called
-		// prior to deleting the AgentSML structure.
-		delete this ;
-
-#ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML::AgentBeforeDestroyedListener end.") ;
-#endif
-	}
-};
+	// Do self clean-up of this object as it's just called
+	// prior to deleting the AgentSML structure.
+	delete this ;
+}
 
 void AgentSML::RegisterForBeforeAgentDestroyedEvent()
 {

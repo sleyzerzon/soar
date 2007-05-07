@@ -52,6 +52,7 @@ typedef enum {
     smlEVENT_BEFORE_SHUTDOWN            = 1,
 	smlEVENT_AFTER_CONNECTION,
 	smlEVENT_SYSTEM_START,
+	smlEVENT_BEFORE_AGENTS_RUN_STEP,
 	smlEVENT_SYSTEM_STOP,
 	smlEVENT_INTERRUPT_CHECK,					// Chance for client to interrupt a run (designed to be low bandwidth)
 	smlEVENT_SYSTEM_PROPERTY_CHANGED,			// A sysparam or other value has been changed 
@@ -107,9 +108,9 @@ typedef enum {
 	// Agent manager
     smlEVENT_AFTER_AGENT_CREATED = smlEVENT_LAST_PRODUCTION_EVENT + 1,
     smlEVENT_BEFORE_AGENT_DESTROYED,
-	smlEVENT_BEFORE_AGENTS_RUN_STEP,
-    smlEVENT_BEFORE_AGENT_REINITIALIZED,
-    smlEVENT_AFTER_AGENT_REINITIALIZED,
+	//smlEVENT_BEFORE_AGENTS_RUN_STEP,		// Moved to system events because not specific to one agent
+    smlEVENT_BEFORE_AGENT_REINITIALIZED,	// DJP: I think these init-soar events should move to run events.  When they're hear you listen to the kernel for these not the agent, which seems wrong.
+    smlEVENT_AFTER_AGENT_REINITIALIZED,		// DJP: I'm not making the change today as I'm removing gSKI and want to minimize other changes, but it should be a simple change once gSKI has been fully removed.
 	smlEVENT_LAST_AGENT_EVENT = smlEVENT_AFTER_AGENT_REINITIALIZED
 } smlAgentEventId ;
 
@@ -121,11 +122,7 @@ typedef enum {
 
 typedef enum {
     // Error and print callbacks
-	smlEVENT_LOG_ERROR = smlEVENT_LAST_WM_EVENT + 1,
-    smlEVENT_LOG_WARNING,
-    smlEVENT_LOG_INFO,
-    smlEVENT_LOG_DEBUG,
-	smlEVENT_ECHO,
+	smlEVENT_ECHO = smlEVENT_LAST_WM_EVENT + 1,
     smlEVENT_PRINT,
 	smlEVENT_LAST_PRINT_EVENT = smlEVENT_PRINT
 } smlPrintEventId ;
@@ -214,7 +211,7 @@ static inline bool IsWorkingMemoryEventID(int id)
 
 static inline bool IsPrintEventID(int id)
 {
-	return (id >= smlEVENT_LOG_ERROR && id <= smlEVENT_LAST_PRINT_EVENT) ;
+	return (id >= smlEVENT_ECHO && id <= smlEVENT_LAST_PRINT_EVENT) ;
 }
 
 static inline bool IsRhsEventID(int id)

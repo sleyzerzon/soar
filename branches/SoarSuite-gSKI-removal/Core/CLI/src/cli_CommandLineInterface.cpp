@@ -637,11 +637,13 @@ void CommandLineInterface::PrependArgTagFast(const char* pParam, const char* pTy
 void CommandLineInterface::AddListenerAndDisableCallbacks(gSKI::Agent* pAgent) {
 	if (m_pKernelSML) m_pKernelSML->DisablePrintCallback(pAgent);
 	m_PrintEventToResult = true;
-	if (!m_pLogFile && pAgent) pAgent->AddPrintListener(gSKIEVENT_PRINT, this);
+	//if (!m_pLogFile && pAgent) pAgent->AddPrintListener(gSKIEVENT_PRINT, this);
+	if (!m_pLogFile && m_pAgentSML) RegisterWithKernel(gSKIEVENT_PRINT) ;
 }
 
 void CommandLineInterface::RemoveListenerAndEnableCallbacks(gSKI::Agent* pAgent) {
-	if (!m_pLogFile && pAgent) pAgent->RemovePrintListener(gSKIEVENT_PRINT, this);
+	//if (!m_pLogFile && pAgent) pAgent->RemovePrintListener(gSKIEVENT_PRINT, this);
+	if (!m_pLogFile && m_pAgentSML) UnregisterWithKernel(gSKIEVENT_PRINT);
 	m_PrintEventToResult = false;
 	if (m_pKernelSML) m_pKernelSML->EnablePrintCallback(pAgent);
 }
@@ -918,38 +920,6 @@ void CommandLineInterface::HandleEvent(egSKIXMLEventId eventId, gSKI::Agent* age
 	}
 }
 
-void CommandLineInterface::HandleEvent(egSKIPrintEventId, gSKI::Agent*, const char* msg) {
-	if (m_PrintEventToResult || m_pLogFile) {
-		if (m_VarPrint) {
-			// Transform if varprint, see print command
-			std::string message(msg);
-
-			regex_t comp;
-			regcomp(&comp, "[A-Z][0-9]+", REG_EXTENDED);
-
-			regmatch_t match;
-			memset(&match, 0, sizeof(regmatch_t));
-
-			while (regexec(&comp, message.substr(match.rm_eo, message.size() - match.rm_eo).c_str(), 1, &match, 0) == 0) {
-				message.insert(match.rm_so, "<");
-				message.insert(match.rm_eo + 1, ">");
-				match.rm_eo += 2;
-			}  
-
-			regfree(&comp);
-
-			// Simply append to message result
-			if (m_PrintEventToResult) {
-				CommandLineInterface::m_Result << message;
-			}
-		} else {
-			if (m_PrintEventToResult) {
-				CommandLineInterface::m_Result << msg;
-			}
-		}
-	}
-}
-
 CommandLineInterface* cli::GetCLI()
 {
 	return sml::KernelSML::GetKernelSML()->GetCommandLineInterface() ;
@@ -1106,6 +1076,42 @@ void CommandLineInterface::OnKernelEvent(int eventID, AgentSML* pAgentSML, void*
 			std::string name = p->name->sc.name ;
 
 			m_ExcisedDuringSource.push_back(name.c_str());
+		}
+	}
+	else if (eventID == gSKIEVENT_PRINT)
+	{
+		char const* msg = (char const*)pCallData ;
+
+		if (m_PrintEventToResult || m_pLogFile)
+		{
+			if (m_VarPrint)
+			{
+				// Transform if varprint, see print command
+				std::string message(msg);
+
+				regex_t comp;
+				regcomp(&comp, "[A-Z][0-9]+", REG_EXTENDED);
+
+				regmatch_t match;
+				memset(&match, 0, sizeof(regmatch_t));
+
+				while (regexec(&comp, message.substr(match.rm_eo, message.size() - match.rm_eo).c_str(), 1, &match, 0) == 0) {
+					message.insert(match.rm_so, "<");
+					message.insert(match.rm_eo + 1, ">");
+					match.rm_eo += 2;
+				}  
+
+				regfree(&comp);
+
+				// Simply append to message result
+				if (m_PrintEventToResult) {
+					CommandLineInterface::m_Result << message;
+				}
+			} else {
+				if (m_PrintEventToResult) {
+					CommandLineInterface::m_Result << msg;
+				}
+			}
 		}
 	}
 }

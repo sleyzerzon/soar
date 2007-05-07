@@ -61,6 +61,9 @@ public:
 
 	// Called when an "AgentEvent" occurs in the kernel
 	virtual void HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPtr) ;
+
+	virtual void OnEvent(egSKIAgentEventId eventID, AgentSML* pAgentSML) ;
+
 } ;
 
 }

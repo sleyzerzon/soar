@@ -109,7 +109,7 @@ typedef struct {
 
 CommandLineInterface* GetCLI() ;
 
-class CommandLineInterface : public gSKI::IPrintListener, sml::KernelCallback, public gSKI::IXMLListener {
+class CommandLineInterface : public sml::KernelCallback, public gSKI::IXMLListener {
 public:
 
 	EXPORT CommandLineInterface();
@@ -718,7 +718,7 @@ protected:
 	bool DoWatchWMEs(gSKI::Agent* pAgent, const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
 
 	// Print callback events go here
-	virtual void HandleEvent(egSKIPrintEventId, gSKI::Agent*, const char* msg);
+	//virtual void HandleEvent(egSKIPrintEventId, gSKI::Agent*, const char* msg);
 
 	// XML callback events go here
 	virtual void HandleEvent(egSKIXMLEventId eventId, gSKI::Agent* agentPtr, const char* funcType, const char* attOrTag, const char* value);

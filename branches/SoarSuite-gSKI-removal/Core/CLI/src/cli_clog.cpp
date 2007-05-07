@@ -159,7 +159,8 @@ bool CommandLineInterface::DoCLog(gSKI::Agent* pAgent, const eLogMode mode, cons
 			    m_LogFilename = filename;
             }
 
-			if (pAgent) pAgent->AddPrintListener(gSKIEVENT_PRINT, this);
+			//if (pAgent) pAgent->AddPrintListener(gSKIEVENT_PRINT, this);
+			if (m_pAgentSML) RegisterWithKernel(gSKIEVENT_PRINT) ;
 			break;
 
 		case LOG_ADD:
@@ -170,7 +171,8 @@ bool CommandLineInterface::DoCLog(gSKI::Agent* pAgent, const eLogMode mode, cons
 		case LOG_CLOSE:
 			if (!m_pLogFile) return SetError(CLIError::kLogNotOpen);
 
-			if (pAgent) pAgent->RemovePrintListener(gSKIEVENT_PRINT, this);
+			//if (pAgent) pAgent->RemovePrintListener(gSKIEVENT_PRINT, this);
+			if (m_pAgentSML) UnregisterWithKernel(gSKIEVENT_PRINT) ;
 			delete m_pLogFile;
 			m_pLogFile = 0;
 			m_LogFilename.clear();

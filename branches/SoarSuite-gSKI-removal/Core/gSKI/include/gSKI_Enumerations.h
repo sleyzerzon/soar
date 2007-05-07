@@ -34,6 +34,7 @@
       gSKIEVENT_BEFORE_SHUTDOWN            = 1,
 	  gSKIEVENT_AFTER_CONNECTION,
 	  gSKIEVENT_SYSTEM_START,
+	  gSKIEVENT_BEFORE_AGENTS_RUN_STEP,
 	  gSKIEVENT_SYSTEM_STOP,
 	  gSKIEVENT_INTERRUPT_CHECK,
 	  gSKIEVENT_SYSTEM_PROPERTY_CHANGED,
@@ -124,9 +125,11 @@
 
     typedef enum {
       // Agent manager
+	  // DJP: Converted to SML except for BEFORE_AGENT_DESTROYED
+	  // Leaving that one until SML takes over kernel ownership and we work on exact sequence for deleting agents.
       gSKIEVENT_AFTER_AGENT_CREATED = gSKIEVENT_LAST_PRODUCTION_EVENT + 1,
       gSKIEVENT_BEFORE_AGENT_DESTROYED,
-	  gSKIEVENT_BEFORE_AGENTS_RUN_STEP,
+	  //gSKIEVENT_BEFORE_AGENTS_RUN_STEP,		// Moved to system event (as not specific to an agent)
       gSKIEVENT_BEFORE_AGENT_REINITIALIZED,
       gSKIEVENT_AFTER_AGENT_REINITIALIZED,
       gSKIEVENT_LAST_AGENT_EVENT = gSKIEVENT_AFTER_AGENT_REINITIALIZED,
@@ -139,6 +142,7 @@
     }
 
     typedef enum {
+	  // DJP: Converted to SML
       // Working memory changes
       gSKIEVENT_OUTPUT_PHASE_CALLBACK = gSKIEVENT_LAST_AGENT_EVENT + 1,
       gSKIEVENT_LAST_WM_EVENT = gSKIEVENT_OUTPUT_PHASE_CALLBACK,
@@ -153,19 +157,20 @@
 
     typedef enum {
       // Error and print callbacks
-      gSKIEVENT_LOG_ERROR =  gSKIEVENT_LAST_WM_EVENT + 1,
-	  gSKIEVENT_FIRST_PRINT_EVENT = gSKIEVENT_LOG_ERROR,
-      gSKIEVENT_LOG_WARNING,
-      gSKIEVENT_LOG_INFO,
-      gSKIEVENT_LOG_DEBUG,
-	  gSKIEVENT_ECHO,
-      gSKIEVENT_PRINT,
+      //gSKIEVENT_LOG_ERROR =  gSKIEVENT_LAST_WM_EVENT + 1,
+	  //gSKIEVENT_FIRST_PRINT_EVENT = gSKIEVENT_LOG_ERROR,
+      //gSKIEVENT_LOG_WARNING,
+      //gSKIEVENT_LOG_INFO,
+      //gSKIEVENT_LOG_DEBUG,
+	  gSKIEVENT_ECHO = gSKIEVENT_LAST_WM_EVENT + 1,
+	  gSKIEVENT_FIRST_PRINT_EVENT = gSKIEVENT_ECHO,
+	  gSKIEVENT_PRINT,
       gSKIEVENT_LAST_PRINT_EVENT = gSKIEVENT_PRINT,
     } egSKIPrintEventId;
 
     static inline bool IsPrintEventID (int id)
     {
- 	   return (id >= gSKIEVENT_LOG_ERROR && 
+ 	   return (id >= gSKIEVENT_ECHO && 
  		id <= gSKIEVENT_LAST_PRINT_EVENT) ;
     }
  

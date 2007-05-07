@@ -355,7 +355,7 @@ namespace gSKI
       MegaAssert(am != 0, "Agent manager is not AgentManager!");
       
       // Tell listeners about his
-      am->FireBeforeAgentReinitialized(this);
+      //am->FireBeforeAgentReinitialized(this);
          
       /// INITIALIZATION HERE
       initializeRuntimeState();
@@ -380,7 +380,7 @@ namespace gSKI
       init_agent_memory( m_agent );
 
       // Tell listeners it is over
-      am->FireAfterAgentReinitialized(this);
+      //am->FireAfterAgentReinitialized(this);
 
       return ok;
    }

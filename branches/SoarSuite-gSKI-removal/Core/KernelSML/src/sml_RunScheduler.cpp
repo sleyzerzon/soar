@@ -874,7 +874,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 			// which allows a single listener to check for client driven interrupts for all agents.
 			// Sometimes that's easier to work with than the agent specific events (where you get <n> events from <n> agents)
 			//    note that there is not a corresponding AFTER_AGENTS_RUN_STEP event...
-			pKernel->GetAgentManager()->FireBeforeAgentsRunStepEvent() ;
+			m_pKernelSML->FireSystemEvent(gSKIEVENT_BEFORE_AGENTS_RUN_STEP) ;
 
 			for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 			{

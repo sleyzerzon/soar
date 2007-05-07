@@ -204,7 +204,10 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 	pAgentSML->Init() ;		// This must happen AFTER the soar agent is initialized.
 
 	// Notify listeners that there is a new agent
-	GetKernel()->GetAgentManager()->FireAgentCreated(pIAgent) ;
+	this->FireAgentEvent(pAgentSML, gSKIEVENT_AFTER_AGENT_CREATED) ;
+
+	// Also notify gSKI 
+	//GetKernel()->GetAgentManager()->FireAgentCreated(pIAgent) ;
 
 	// Register for output from this agent
 	if (pIAgent)

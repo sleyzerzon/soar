@@ -1388,7 +1388,7 @@ void Soar_LogAndPrint (agent* thisAgent, agent * the_agent, char * str)
 /* this_agent and the_agent????? This has got to be wrong. . . -ajc (8/1/02) */
 void Soar_Print (agent* thisAgent, agent * the_agent, char * str)
 {
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRINT_CALLBACK, 0, thisAgent, static_cast<void*>(str));
+//   gSKI_MakeAgentCallback(gSKI_K_EVENT_PRINT_CALLBACK, 0, thisAgent, static_cast<void*>(str));
    soar_invoke_first_callback(thisAgent, the_agent, 
 	                          PRINT_CALLBACK, /*(ClientData)*/ static_cast<void*>(str));
 }

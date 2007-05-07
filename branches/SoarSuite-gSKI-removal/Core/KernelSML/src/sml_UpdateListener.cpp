@@ -46,6 +46,12 @@ bool UpdateListener::RemoveListener(egSKIUpdateEventId eventID, Connection* pCon
 // Called when an event occurs in the kernel
 void UpdateListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	// There are currently no kernel events corresponding to this SML event.
+	// They are all directly generated from SML.  If we later add kernel callbacks
+	// for this class of events they would come here.
+	unused(eventID) ;
+	unused(pAgentSML) ;
+	unused(pCallData) ;
 }
 
 // Called when a "RunEvent" occurs in the kernel

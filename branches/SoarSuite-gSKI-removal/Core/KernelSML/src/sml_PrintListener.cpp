@@ -47,7 +47,10 @@ bool PrintListener::AddListener(egSKIPrintEventId eventID, Connection* pConnecti
 	{
 		// Echo events are SML only.  Everything else is implemented in gSKI
 		if (eventID != gSKIEVENT_ECHO)
-			m_pAgent->AddPrintListener(eventID, this); 
+		{
+			RegisterWithKernel(eventID) ;
+			//m_pAgent->AddPrintListener(eventID, this); 
+		}
 
 		// Register for specific events at which point we'll flush the buffer for this event
 		m_pAgentOutputFlusher[eventID-gSKIEVENT_FIRST_PRINT_EVENT] = new AgentOutputFlusher(this, GetAgentSML(), eventID);
@@ -65,7 +68,10 @@ bool PrintListener::RemoveListener(egSKIPrintEventId eventID, Connection* pConne
 	{
 		// Echo events are SML only.  Everything else is implemented in gSKI
 		if (eventID != gSKIEVENT_ECHO)
-			m_pAgent->RemovePrintListener(eventID, this); 
+		{
+			UnregisterWithKernel(eventID) ;
+			//m_pAgent->RemovePrintListener(eventID, this); 
+		}
 
 		// Unregister for the events when we'll flush the buffer
 		delete m_pAgentOutputFlusher[eventID-gSKIEVENT_FIRST_PRINT_EVENT] ;
@@ -78,16 +84,21 @@ bool PrintListener::RemoveListener(egSKIPrintEventId eventID, Connection* pConne
 // Called when an event occurs in the kernel
 void PrintListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	OnEvent((egSKIPrintEventId)eventID, pAgentSML, (const char*)pCallData) ;
 }
 
 // Called when a "PrintEvent" occurs in the kernel
 void PrintListener::HandleEvent(egSKIPrintEventId eventID, gSKI::Agent* agentPtr, const char* msg) 
 {
-	unused(eventID);
-	unused(agentPtr);
+	assert(GetAgentSML()->GetIAgent() == agentPtr) ;
 
+	OnEvent(eventID, GetAgentSML(), msg) ;
+}
+
+void PrintListener::OnEvent(egSKIPrintEventId eventID, AgentSML* pAgentSML, const char* msg)
+{
 	// We're assuming this is correct in the flush output function, so we should check it here
-	assert(agentPtr == m_pAgent);
+	assert(pAgentSML == GetAgentSML());
 
 	// If the print callbacks have been disabled, then don't forward this message
 	// on to the clients.  This allows us to use the print callback within the kernel to

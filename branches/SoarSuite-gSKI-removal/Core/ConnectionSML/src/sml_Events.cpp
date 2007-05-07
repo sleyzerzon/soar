@@ -86,10 +86,6 @@ Events::Events()
 	RegisterEvent(smlEVENT_AFTER_ALL_GENERATED_OUTPUT, "after-all-generated-output") ;
 
     // Error and print callbacks
-	RegisterEvent(smlEVENT_LOG_ERROR, "log-error") ;
-	RegisterEvent(smlEVENT_LOG_WARNING, "log-warning") ;
-	RegisterEvent(smlEVENT_LOG_INFO, "log-info") ;
-	RegisterEvent(smlEVENT_LOG_DEBUG, "log-debug") ;
 	RegisterEvent(smlEVENT_ECHO, "echo") ;
 	RegisterEvent(smlEVENT_PRINT, "print") ;
 

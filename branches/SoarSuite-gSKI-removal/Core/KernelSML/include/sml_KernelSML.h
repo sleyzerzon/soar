@@ -272,6 +272,11 @@ public:
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
 	*************************************************************/
+	void FireAgentEvent(AgentSML* pAgentSML, egSKIAgentEventId eventID)		{ m_AgentListener.OnEvent(eventID, pAgentSML) ; }
+
+	/*************************************************************
+	* @brief	Notify listeners that this event has occured.
+	*************************************************************/
 	std::string FireEditProductionEvent(char const* pProduction);
 
 	/*************************************************************
@@ -419,7 +424,7 @@ public:
 	*			with the underlying gSKI agent.
 	*************************************************************/	
 	bool DeleteAgentSML(gSKI::Agent* pAgent) ;
-	bool DeleteAgentSML(agent* pAgent) ;
+	//bool DeleteAgentSML(agent* pAgent) ;
 
 	/*************************************************************
 	* @brief	Stops and deletes all agents.  Generally called

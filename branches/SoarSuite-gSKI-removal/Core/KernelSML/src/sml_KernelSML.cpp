@@ -537,8 +537,9 @@ bool KernelSML::DeleteAgentSML(gSKI::Agent* pAgent)
 	}
 
 	// Delete the agent sml information
-	AgentSML* pResult = iter->second ;
-	delete pResult ;
+	// This is instead left up to the caller to do
+	//AgentSML* pResult = iter->second ;
+	//delete pResult ;
 
 	// Erase the entry from the map
 	m_AgentMap.erase(iter) ;

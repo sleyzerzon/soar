@@ -495,8 +495,11 @@ namespace gSKI
    */
    void AgentManager::FireBeforeAgentReinitialized(Agent* a)
    {
+	   assert(false) ;	// Removed this
+	   /*
       AgentNotifier nf(a);
       m_agentListeners.Notify(gSKIEVENT_BEFORE_AGENT_REINITIALIZED, nf);
+	  */
    }
    
    /*
@@ -506,8 +509,11 @@ namespace gSKI
    */
    void AgentManager::FireAfterAgentReinitialized(Agent* a)
    {
+	   assert(false) ;	// Removed this
+	   /*
       AgentNotifier nf(a);
       m_agentListeners.Notify(gSKIEVENT_AFTER_AGENT_REINITIALIZED, nf);
+	  */
    }
 
    /*
@@ -515,11 +521,13 @@ namespace gSKI
 
    =============================
    */
+   /*
    void AgentManager::FireBeforeAgentsRunStepEvent()
    {
 	  AgentNotifier nf(NULL) ;	// Not an agent specific event but an agent manager event.
       m_agentListeners.Notify(gSKIEVENT_BEFORE_AGENTS_RUN_STEP, nf);
    }
+   */
 
    /*
    =============================

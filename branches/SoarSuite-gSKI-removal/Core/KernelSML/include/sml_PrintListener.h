@@ -67,6 +67,8 @@ public:
 	// Called when a "PrintEvent" occurs in the kernel
 	virtual void HandleEvent(egSKIPrintEventId, gSKI::Agent*, const char* msg);
 
+	void OnEvent(egSKIPrintEventId eventID, AgentSML* pAgentSML, const char* msg) ;
+
 	// Allows us to temporarily stop forwarding print callback output from the kernel to the SML listeners
 	void EnablePrintCallback(bool enable) { m_EnablePrintCallback = enable ; }
 

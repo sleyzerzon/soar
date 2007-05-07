@@ -650,7 +650,7 @@ bool WorkingMemory::SynchronizeOutputLink()
 	// Erase the existing output link and create a new representation from scratch
 	if (m_OutputLink)
 	{
-		int children = m_OutputLink->GetNumberChildren() ;
+		//int children = m_OutputLink->GetNumberChildren() ;
 		delete m_OutputLink ;
 		m_OutputLink = NULL ;
 	}
@@ -1256,15 +1256,15 @@ void WorkingMemory::Refresh()
 		Commit() ;
 	}
 
-	// At one time we delete the output link at the end of an init-soar but the current
-	// implementation of init-soar recreates the output link at the end of reinitializing the agent
-	// so the output link should not be deleted.
+	// At one time we deleted the output link at the end of an init-soar but the current
+	// implementation of init-soar recreates the output link (in the kernel) at the end of reinitializing the agent
+	// so the output link should not be deleted but it's children need to be.
 	if (m_OutputLink)
 	{
-		int outputs = m_OutputLink->GetNumberChildren() ;
+		//int outputs = m_OutputLink->GetNumberChildren() ;
 
 		// The children should all have been deleted during the init-soar cleanup
-		// If not, we're probably looking at a memory leak.
+		// If not, we may be looking at a memory leak.
 		//assert(outputs == 0) ;
 		m_OutputLink->GetSymbol()->DeleteAllChildren() ;
 	}

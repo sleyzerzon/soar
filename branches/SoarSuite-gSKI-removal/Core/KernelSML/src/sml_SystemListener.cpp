@@ -74,6 +74,12 @@ void SystemListener::Init(KernelSML* pKernel)
 // Called when an event occurs in the kernel
 void SystemListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	// All system events are currently implemented directly in kernel SML so there's
+	// no underlying kernel callbacks to connect to.
+	// If we ever change that, this is where the callbacks would come in.
+	unused(eventID) ;
+	unused(pAgentSML) ;
+	unused(pCallData) ;
 }
 
 // Called when a "SystemEvent" occurs in the kernel
@@ -85,6 +91,9 @@ void SystemListener::HandleEvent(egSKISystemEventId eventID, gSKI::Kernel* kerne
 	// The system start event can be suppressed by a client.
 	// This allows us to run a Soar agent without running the associated simulation
 	// (which should be listening for system-start/system-stop events).
+
+	// DJP May 2007: This was an earlier idea about how we'd control systems through SML.  I'm
+	// not sure this model (and these events) are relevant anymore.
 	if (eventID == gSKIEVENT_SYSTEM_START)
 	{
 		bool suppress = m_pKernelSML->IsSystemStartSuppressed() ;
