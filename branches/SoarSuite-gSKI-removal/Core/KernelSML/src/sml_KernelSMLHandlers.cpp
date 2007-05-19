@@ -1179,7 +1179,7 @@ bool KernelSML::HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName
 // Add or remove a list of wmes we've been sent
 bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError)
 {
-	unused(pCommandName) ; unused(pResponse) ; unused(pConnection) ;
+	unused(pCommandName) ; unused(pResponse) ; unused(pConnection) ; unused(pError) ;
 
 	// Flag to control printing debug information about the input link
 #ifdef _DEBUG
@@ -1191,17 +1191,23 @@ bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Conne
 	if (!pAgent)
 		return false ;
 
+	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
+
+	// Record the input coming input message on a list
+	pAgentSML->AddToPendingInputList(pIncoming->GetElementXMLHandle()) ;
+
+	bool ok = true ;
+
 	// Get the command tag which contains the list of wmes
 	ElementXML const* pCommand = pIncoming->GetCommandTag() ;
+
+	// Removing old gSKI input
+#if 0
 
 	int nChildren = pCommand->GetNumberChildren() ;
 
 	ElementXML wmeXML(NULL) ;
 	ElementXML* pWmeXML = &wmeXML ;
-
-	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
-
-	bool ok = true ;
 
 	if (kDebugInput)
 		PrintDebugFormat("--------- %s starting input ----------", pAgent->GetName()) ;
@@ -1264,6 +1270,7 @@ bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Conne
 			ok = RemoveInputWME(pAgent, pTimeTag, pError) && ok ;
 		}
 	}
+#endif
 
 	// Echo back the list of wmes received, so other clients can see what's been added (rarely used).
 	pAgentSML->FireInputReceivedEvent(pCommand) ;

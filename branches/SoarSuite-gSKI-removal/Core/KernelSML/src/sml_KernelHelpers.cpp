@@ -872,6 +872,8 @@ void KernelHelpers::PrintUser(AgentSML*       thisAgent,
 	bool          full_prod,
 	unsigned int  productionType)
 {
+	unused(arg) ;
+
 	//bool output_arg = true; /* TEST for Soar-Bugs #161 */
 	for (production* prod=thisAgent->GetAgent()->all_productions_of_type[productionType];  
 		prod != NIL; prod = prod->next)
@@ -1498,6 +1500,8 @@ void read_rhs_pattern_and_get_matching_productions (agent* agnt,
 	bool just_chunks, 
 	bool no_chunks) 
 {
+	unused(krnl) ;
+
 	action *a, *alist, *pa;
 	int i;
 	production *prod;
@@ -1743,6 +1747,8 @@ void read_pattern_and_get_matching_productions (agent* agnt,
 	bool just_chunks,
 	bool no_chunks) 
 {
+	unused(krnl) ;
+
 	condition *c, *clist, *top, *bottom, *pc;
 	int i;
 	production *prod;
@@ -1833,6 +1839,8 @@ bool KernelHelpers::ProductionFind(AgentSML*     thisAgent,
 	bool        just_chunks,
 	bool        no_chunks)
 {
+	unused(agnt2) ;
+
 	agent* agnt = thisAgent->GetAgent();
 
 	list* current_pf_list = 0;

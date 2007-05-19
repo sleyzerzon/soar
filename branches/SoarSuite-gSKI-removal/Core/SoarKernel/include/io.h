@@ -127,14 +127,16 @@ extern Symbol *get_next_io_symbol_from_text_input_line (agent* thisAgent,
 #define NORMAL_INPUT_CYCLE 2
 #define TOP_STATE_JUST_REMOVED 3
 
-extern Symbol *get_new_io_identifier (agent* thisAgent, char first_letter);
-extern Symbol *get_io_sym_constant (agent* thisAgent, char *name);
+extern Symbol *get_new_io_identifier(agent* thisAgent, char first_letter) ;
+extern Symbol *get_io_identifier (agent* thisAgent, char first_letter, unsigned long number);
+extern Symbol *get_io_sym_constant (agent* thisAgent, char const *name);
 extern Symbol *get_io_int_constant (agent* thisAgent, long value);
 extern Symbol *get_io_float_constant (agent* thisAgent, float value);
-extern void release_io_symbol (agent* thisAgent, Symbol *sym);
+extern unsigned long release_io_symbol (agent* thisAgent, Symbol *sym);
 
 extern wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value);
 extern Bool remove_input_wme (agent* thisAgent, wme *w);
+extern wme* find_input_wme_by_timetag (agent* thisAgent, int timetag) ;
 
 /* =======================================================================
                             Output Functions

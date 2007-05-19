@@ -117,6 +117,7 @@ typedef enum {
 typedef enum {
 	// Working memory changes
 	smlEVENT_OUTPUT_PHASE_CALLBACK = smlEVENT_LAST_AGENT_EVENT + 1,
+	smlEVENT_INPUT_PHASE_CALLBACK,			// This event is not currently available to clients -- listen for before/after input phase instead
 	smlEVENT_LAST_WM_EVENT = smlEVENT_OUTPUT_PHASE_CALLBACK
 } smlWorkingMemoryEventId ;
 

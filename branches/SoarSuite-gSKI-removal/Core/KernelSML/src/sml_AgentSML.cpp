@@ -79,6 +79,7 @@ void AgentSML::InitListeners()
 	m_RunListener.Init(pKernelSML, this) ;
 	m_ProductionListener.Init(pKernelSML, this) ;
 	m_OutputListener.Init(pKernelSML, this) ;
+	m_InputListener.Init(pKernelSML, this) ;
 
 	// For KernelSML (us) to work correctly we need to listen for certain events, independently of what any client is interested in
 	// Currently:
@@ -86,6 +87,7 @@ void AgentSML::InitListeners()
 	// Listen for "before" init-soar events (we need to know when these happen so we can release all WMEs on the input link, otherwise gSKI will fail to re-init the kernel correctly.)
 	// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
 	m_OutputListener.RegisterForKernelSMLEvents() ;
+	m_InputListener.RegisterForKernelSMLEvents() ;
 }
 
 // Can't call this until after the Soar agent has been initialized
@@ -206,13 +208,28 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 		}
 	}
 
+	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
+		wme* wme = mapIter->second ;
+		release_io_symbol(this->GetAgent(), wme->id) ;
+		release_io_symbol(this->GetAgent(), wme->attr) ;
+		release_io_symbol(this->GetAgent(), wme->value) ;
+	}
+
 	if (m_InputLinkRoot)
 	{
 		m_InputLinkRoot->Release() ;
 	}
 	m_InputLinkRoot = NULL ;
 
+	for (PendingInputListIter iter = m_PendingInput.begin() ; iter != m_PendingInput.end() ; iter++)
+	{
+		ElementXML* pMsg = *iter ;
+		delete pMsg ;
+	}
+
 	m_TimeTagMap.clear() ;
+	m_PendingInput.clear() ;
+	m_KernelTimeTagMap.clear() ;
 	m_ToClientIdentifierMap.clear() ;
 	m_IdentifierMap.clear() ;
 
@@ -261,6 +278,20 @@ void AgentSML::RemoveAllListeners(Connection* pConnection)
 	m_PrintListener.RemoveAllListeners(pConnection);
 	m_OutputListener.RemoveAllListeners(pConnection) ; 
 	m_XMLListener.RemoveAllListeners(pConnection) ;
+}
+
+/*************************************************************
+* @brief	Add an input message to the pending input list
+*			-- it will be processed on the next input phase callback from the kernel.
+*************************************************************/
+void AgentSML::AddToPendingInputList(ElementXML_Handle hInputMsgHandle)
+{
+	// Create a new wrapper object for the message and store that with
+	// an increased ref count so the caller can do whatever they want with the original message
+	ElementXML* pMsg = new ElementXML(hInputMsgHandle) ;
+	pMsg->AddRefOnHandle() ;
+
+	m_PendingInput.push_back(pMsg) ;
 }
 
 //=============================
@@ -613,6 +644,8 @@ void AgentSML::DeleteSelf()
 	// the listener will still exist inside gSKI and will crash when an agent event is next generated.
 	this->GetOutputListener()->UnRegisterForKernelSMLEvents() ;
 
+	this->GetInputListener()->UnRegisterForKernelSMLEvents() ;
+
 	// Unregister ourselves (this is important for the same reasons as listed above)
 	//m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, this) ;
 
@@ -719,6 +752,47 @@ gSKI::IWme* AgentSML::ConvertTimeTag(char const* pTimeTag)
 	}
 }
 
+long AgentSML::ConvertTime(char const* pTimeTag)
+{
+	if (pTimeTag == NULL)
+		return 0 ;
+
+	TimeMapIter iter = m_TimeMap.find(pTimeTag) ;
+
+	if (iter == m_TimeMap.end())
+	{
+		return 0 ;
+	}
+	else
+	{
+		// If we found a mapping, return the mapped value
+		return iter->second ;
+	}
+}
+
+/*************************************************************
+* @brief	Converts a time tag from a client side value to
+*			a kernel side object
+*************************************************************/
+wme* AgentSML::ConvertKernelTimeTag(char const* pTimeTag)
+{
+	if (pTimeTag == NULL)
+		return NULL ;
+
+	KernelTimeTagMapIter iter = m_KernelTimeTagMap.find(pTimeTag) ;
+
+	if (iter == m_KernelTimeTagMap.end())
+	{
+		return NULL ;
+	}
+	else
+	{
+		// If we found a mapping, return the mapped value
+		wme* result = iter->second ;
+		return result ;
+	}
+}
+
 /*************************************************************
 * @brief	Maps from a client side time tag to a kernel side WME.
 *************************************************************/
@@ -735,6 +809,26 @@ void AgentSML::RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWME)
 #endif
 
 	m_TimeTagMap[pTimeTag] = pWME ;
+}
+
+void AgentSML::RecordTime(char const* pTimeTag, long time)
+{
+	m_TimeMap[pTimeTag] = time ;
+}
+
+void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
+{
+#ifdef _DEBUG
+	// I believe it correct that a time tag should never be re-used in this context
+	// so I'm including this assert.  However, it's possible this assumption is wrong (in particular after an init-soar?)
+	// so I'm only including it in debug builds and if the assert fails, check the context and make sure that this re-use
+	// in indeed a mistake.
+	// If you fail to call commit() after creating a new input wme and then issue an init-soar this assert may fire.
+	// If so, the fix is to call commit().
+	assert (m_KernelTimeTagMap.find(pTimeTag) == m_KernelTimeTagMap.end()) ;
+#endif
+
+	m_KernelTimeTagMap[pTimeTag] = pWme ;
 }
 
 void AgentSML::RecordLongTimeTag(long timeTag, gSKI::IWme* pWME)
@@ -759,6 +853,11 @@ void AgentSML::RemoveLongTimeTag(long timeTag)
 	Int2String(timeTag, str, sizeof(str)) ;
 
 	m_TimeTagMap.erase(str) ;
+}
+
+void AgentSML::RemoveKernelTimeTag(char const* pTimeTag)
+{
+	m_KernelTimeTagMap.erase(pTimeTag) ;
 }
 
 void AgentSML::RegisterRHSFunction(RhsFunction* rhsFunction)

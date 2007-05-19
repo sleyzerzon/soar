@@ -987,6 +987,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	// This is to test a bug where an identifier isn't fully removed from working memory (you can still print it) after it is destroyed.
 	Identifier* pIDRemoveTest = pAgent->CreateIdWME(pInputLink, "foo") ;
 	pAgent->CreateFloatWME(pIDRemoveTest, "bar", 1.23) ;
+	pAgent->CreateFloatWME(pIDRemoveTest, "bar2", 4.56) ;
 
 	std::string idValue = pIDRemoveTest->GetValueAsString() ;
 
@@ -999,13 +1000,23 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	bool ok = pAgent->Commit() ;
 	pAgent->RunSelf(1) ;
+	std::string wmes0 = pAgent->ExecuteCommandLine("print i2 --depth 3") ;
+
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
+
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
 
 	pAgent->DestroyWME(pIDRemoveTest) ;
 	pAgent->Commit() ;
 
-	//pAgent->RunSelf(1) ;
+	pAgent->RunSelf(1) ;
 	std::string wmes1 = pAgent->ExecuteCommandLine("print i2 --depth 3") ;
 	std::string wmes2 = pAgent->ExecuteCommandLine("print F1") ;	// BUGBUG: This wme remains in memory even after we add the "RunSelf" at which point it should be gone.
+
+	if (!InitSoarAgent(pAgent, doInitSoars))
+		return false ;
 
 	if (!InitSoarAgent(pAgent, doInitSoars))
 		return false ;
@@ -1052,12 +1063,12 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	ok = pAgent->Commit() ;
 
-	/*
+	pAgent->RunSelf(1) ;
+
 	printWMEs(pAgent->GetInputLink()) ;
 	std::string printInput1 = pAgent->ExecuteCommandLine("print --depth 2 I2") ;
 	cout << printInput1 << endl ;
 	cout << endl << "Now work with the input link" << endl ;
-	*/
 
 	// Delete one of the shared WMEs to make sure that's ok
 	//pAgent->DestroyWME(pID) ;
@@ -1278,6 +1289,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	cout << printInput << endl ;
 	*/
 
+#if 0
 	// Synchronizing the input link means we make our client copy match
 	// the current state of the agent.  We would generally only do this from
 	// a different client, but we can test here to see if it does nothing
@@ -1299,6 +1311,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 			return false ;
 		}
 	}
+#endif
 
 	// Then add some tic tac toe stuff which should trigger output
 	Identifier* pSquare = pAgent->CreateIdWME(pAgent->GetInputLink(), "square") ;
@@ -1926,11 +1939,13 @@ bool FullEmbeddedTest()
 {
 	bool ok = true ;
 
+#if 0
 	// Simple embedded, direct init-soar
 	ok = ok && TestSML(true, true, true, true, true) ;
 
 	// Embeddded using direct calls
 	ok = ok && TestSML(true, true, true, false, true) ;
+#endif
 
 	// Embedded not using direct calls
 	ok = ok && TestSML(true, true, false, false, true) ;

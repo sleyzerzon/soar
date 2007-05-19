@@ -18,6 +18,7 @@
 #include "sml_PrintListener.h"
 #include "sml_XMLListener.h"
 #include "sml_OutputListener.h"
+#include "sml_InputListener.h"
 #include "gSKI_Enumerations.h"
 
 // Forward declarations for gSKI
@@ -31,6 +32,7 @@ namespace gSKI {
 typedef struct agent_struct agent;
 typedef union symbol_union Symbol;
 typedef struct cons_struct list;
+typedef struct wme_struct wme;
 
 #include <map>
 #include <list>
@@ -56,8 +58,23 @@ typedef std::map< std::string, gSKI::IWme* >	TimeTagMap ;
 typedef TimeTagMap::iterator				TimeTagMapIter ;
 typedef TimeTagMap::const_iterator			TimeTagMapConstIter ;
 
+// Map from client side time tag to a kernel time tag
+typedef std::map< std::string, long >	TimeMap ;
+typedef TimeMap::iterator				TimeMapIter ;
+
+// List of input messages waiting for the next input phase callback from the kernel
+typedef std::list<ElementXML*>				PendingInputList ;
+typedef PendingInputList::iterator			PendingInputListIter ;
+
+typedef std::map< std::string, wme* >		KernelTimeTagMap ;
+typedef KernelTimeTagMap::iterator			KernelTimeTagMapIter ;
+typedef KernelTimeTagMap::const_iterator	KernelTimeTagMapConstIter ;
+
 class AgentSML
 {
+	friend class KernelSML ;
+	friend class InputListener ;
+
 protected:
 
 	// This is a callback we register so we get called back each input phase (so we can check for incoming commands once per decision)
@@ -76,7 +93,9 @@ protected:
 	IdentifierMap	m_IdentifierMap ;
 
 	// Map from client side time tags (as strings) to kernel side WME* objects
-	TimeTagMap		m_TimeTagMap ;
+	TimeTagMap			m_TimeTagMap ;
+	KernelTimeTagMap	m_KernelTimeTagMap ;
+	TimeMap				m_TimeMap ;
 
 	// For cleanup we also need a map from kernel side identifiers to client side ones (for cleanup)
 	IdentifierMap	m_ToClientIdentifierMap ;
@@ -90,9 +109,15 @@ protected:
 	// This is a callback we can register to listen for changes to the output-link
 	OutputListener		m_OutputListener ;
 
+	// This listener is called during the kernel's input phase callback
+	InputListener		m_InputListener ;
+
 	// We have to keep pointers to these objects so that we can release then during an init-soar.  Youch!
 	gSKI::IWMObject*	m_InputLinkRoot ;
 	gSKI::IWMObject*	m_OutputLinkRoot ;
+
+	// Input changes waiting to be processed at next input phase callback
+	PendingInputList	m_PendingInput ;
 
 	// Used to listen for a before removed event
 	class AgentBeforeDestroyedListener ;
@@ -165,8 +190,8 @@ public:
 	void SetOutputLinkRoot(gSKI::IWMObject* pRoot)  { m_OutputLinkRoot = pRoot ; }
 	gSKI::IWMObject* GetOutputLinkRoot()			{ return m_OutputLinkRoot ; }
 
-//	void SetOutputListener(OutputListener* pListener)			{ m_pOutputListener = pListener ; }
 	OutputListener* GetOutputListener()							{ return &m_OutputListener ; }
+	InputListener* GetInputListener()							{ return &m_InputListener ; }
 
 	void SetInputProducer(gSKI::IInputProducer* pInputProducer)	{ m_pInputProducer = pInputProducer ; }
 
@@ -240,11 +265,17 @@ public:
 	*			a kernel side one.
 	*************************************************************/
 	gSKI::IWme* ConvertTimeTag(char const* pTimeTag) ;
+	wme* ConvertKernelTimeTag(char const* pTimeTag) ;
+	long ConvertTime(char const* pTimeTag) ;
+
 	void RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWme) ;
 	void RemoveTimeTag(char const* pTimeTag) ;
+	void RecordKernelTimeTag(char const* pTimeTag, wme* pWme) ;
+	void RecordTime(char const* pTimeTag, long time) ;
 
 	void RecordLongTimeTag(long timeTag, gSKI::IWme* pWme) ;
 	void RemoveLongTimeTag(long timeTag) ;
+	void RemoveKernelTimeTag(char const* pTimeTag) ;
 
 	// Register a RHS function with the Soar kernel
 	void RegisterRHSFunction(RhsFunction* pFunction) ;
@@ -313,6 +344,14 @@ public:
 protected:
 	void InitializeRuntimeState() ;
 
+	/*************************************************************
+	* @brief	Add an input message to the pending input list
+	*			-- it will be processed on the next input phase callback from the kernel.
+	*			This agent takes ownership of the input message by adding a reference to it.
+	*************************************************************/
+	void AddToPendingInputList(ElementXML_Handle hInputMsgHandle) ;
+
+	PendingInputList*	GetPendingInputList() { return &m_PendingInput ; }
 } ;
 
 class AgentRunCallback : public KernelCallback

@@ -249,6 +249,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sml_InputListener.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\sml_KernelCallback.cpp"
 				>
 			</File>
@@ -364,6 +368,10 @@
 			</File>
 			<File
 				RelativePath=".\include\sml_EventManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\sml_InputListener.h"
 				>
 			</File>
 			<File

@@ -145,6 +145,7 @@
 	  // DJP: Converted to SML
       // Working memory changes
       gSKIEVENT_OUTPUT_PHASE_CALLBACK = gSKIEVENT_LAST_AGENT_EVENT + 1,
+	  smlEVENT_INPUT_PHASE_CALLBACK,
       gSKIEVENT_LAST_WM_EVENT = gSKIEVENT_OUTPUT_PHASE_CALLBACK,
     } egSKIWorkingMemoryEventId;
 

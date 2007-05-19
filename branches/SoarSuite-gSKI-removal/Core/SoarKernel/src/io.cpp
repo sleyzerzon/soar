@@ -148,11 +148,29 @@ void remove_output_function (agent* thisAgent, agent * a, char * name) {
    do some error checking, but they're nowhere near bullet-proof.
 ==================================================================== */
 
-Symbol *get_new_io_identifier (agent* thisAgent, char first_letter) {
-  return make_new_identifier (thisAgent, first_letter, TOP_GOAL_LEVEL);
+Symbol *get_new_io_identifier(agent* thisAgent, char first_letter)
+{
+	return make_new_identifier (thisAgent, first_letter, TOP_GOAL_LEVEL);
 }
 
-Symbol *get_io_sym_constant (agent* thisAgent, char *name) {
+Symbol *get_io_identifier (agent* thisAgent, char first_letter, unsigned long number) {
+  Symbol* id = find_identifier(thisAgent, first_letter, number) ;
+
+  // DJP: The other "make_<type>" methods either make a new object or incremenent the refence
+  // on an existing object.  So I'm going to make this method function the same way for identifiers.
+  if (id)
+  {
+	symbol_add_ref(id);
+  }
+  else
+  {
+	  id = make_new_identifier (thisAgent, first_letter, TOP_GOAL_LEVEL);
+  }
+
+  return id ;
+}
+
+Symbol *get_io_sym_constant (agent* thisAgent, char const *name) {
   return make_sym_constant (thisAgent, name);
 }
 
@@ -164,8 +182,8 @@ Symbol *get_io_float_constant (agent* thisAgent, float value) {
   return make_float_constant (thisAgent, value);
 }
 
-void release_io_symbol (agent* thisAgent, Symbol *sym) {
-  symbol_remove_ref (thisAgent, sym);
+unsigned long release_io_symbol (agent* thisAgent, Symbol *sym) {
+  return symbol_remove_ref (thisAgent, sym);
 }
 
 wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
@@ -184,6 +202,17 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
 
 
   return w;
+}
+
+wme* find_input_wme_by_timetag (agent* thisAgent, int timetag) {
+   wme *temp;
+
+   // This is doubly inefficient as we walk this list twice (once here and once
+   // in the remove_input_wme method).  Using a hash table could skip both list traversals.
+   for (temp=thisAgent->io_header_input->id.input_wmes; temp!=NIL; temp=temp->next)
+	   if (temp->timetag == timetag) break;
+
+	return temp ;
 }
 
 Bool remove_input_wme (agent* thisAgent, wme *w) {

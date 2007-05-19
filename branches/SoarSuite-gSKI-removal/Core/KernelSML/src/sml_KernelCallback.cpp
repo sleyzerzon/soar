@@ -73,6 +73,7 @@ int KernelCallback::InternalGetCallbackFromEventID(int eventID)
 	case smlEVENT_AFTER_RUNNING:				return AFTER_RUNNING_CALLBACK ;		// Implemented in SML
 
 	case smlEVENT_OUTPUT_PHASE_CALLBACK:		return OUTPUT_PHASE_CALLBACK ;
+	case smlEVENT_INPUT_PHASE_CALLBACK:			return INPUT_PHASE_CALLBACK ;
 
 	case smlEVENT_PRINT:						return PRINT_CALLBACK ;
 	}

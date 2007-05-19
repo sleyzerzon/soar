@@ -77,6 +77,7 @@ bool AgentListener::RemoveListener(egSKIAgentEventId eventID, Connection* pConne
 // Called when an event occurs in the kernel
 void AgentListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	unused(pCallData) ;
 	OnEvent((egSKIAgentEventId)eventID, pAgentSML) ;
 }
 
