@@ -94,6 +94,8 @@ public:
 	virtual FloatElement* ConvertToFloatElement() { return NULL; }
 	virtual StringElement* ConvertToStringElement() { return NULL; }
 
+	Agent*		GetAgent()	{ return m_Agent ; }
+
 protected:
 	// Keep these protected, so user can only create and destroy WMEs through
 	// the methods exposed in the agent class.  This makes it clear that the
@@ -104,8 +106,6 @@ protected:
 	void	SetJustAdded(bool state) { m_JustAdded = state ; }
 
 	void SetParent(Identifier* pParent) ;
-
-	Agent*		GetAgent()	{ return m_Agent ; }
 
 	// If we update the value we need to assign a new time tag to this WME.
 	// That's because we're really doing a delete followed by an add

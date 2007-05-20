@@ -207,39 +207,41 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   return w;
 }
 
-wme* find_input_wme_by_timetag_from_id (agent* thisAgent, Symbol* idSym, unsigned long timetag) {
+wme* find_input_wme_by_timetag_from_id (agent* thisAgent, Symbol* idSym, unsigned long timetag, tc_number tc) {
    wme *pWME,*w;
 
   //PrintDebugFormat("Scanning id %c%d", idSym->id.name_letter, idSym->id.name_number) ;
 
-   // This is super inefficient.  Using a hash table could save a lot here.
+  // Mark this id as having been visited (the key here is that tc numbers always increase so tc_num must be < tc until it's marked)
+  idSym->id.tc_num = tc ;
+
+   // This is inefficient.  Using a hash table could save a lot here.
 	for (pWME = idSym->id.input_wmes; pWME != NIL; pWME = pWME->next)
 	{
 		//PrintDebugFormat("Timetag %ld", pWME->timetag) ;
 		if (pWME->timetag == timetag)
 			return pWME ;
 
-		// BUGBUG: This will only work for a tree -- not a graph, but let's start there.
-		if (pWME->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE)
+		// NOTE: The test for the tc_num keeps us from getting stuck in loops within graphs
+		if (pWME->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE && pWME->value->id.tc_num != tc)
 		{
-			w = find_input_wme_by_timetag_from_id(thisAgent, pWME->value, timetag) ;
+			w = find_input_wme_by_timetag_from_id(thisAgent, pWME->value, timetag, tc) ;
 			if (w)
 				return w ;
 		}
 	}
-/*
-   // This is doubly inefficient as we walk this list twice (once here and once
-   // in the remove_input_wme method).  Using a hash table could skip both list traversals.
-   for (temp=thisAgent->io_header_input->id.input_wmes; temp!=NIL; temp=temp->next)
-	   if (temp->timetag == timetag) break;
-*/
 
 	return NIL ;
 }
 
 wme* find_input_wme_by_timetag (agent* thisAgent, unsigned long timetag) {
     //PrintDebugFormat("Looking for tag %ld", timetag) ;
-	return find_input_wme_by_timetag_from_id(thisAgent, thisAgent->io_header_input, timetag) ;
+
+	// We need to walk the input wmes without getting stuck in loops.
+	// We do this by using the tc_num field--setting it as we walk the graph, just as print does.
+	tc_number tc = get_new_tc_number(thisAgent);
+
+	return find_input_wme_by_timetag_from_id(thisAgent, thisAgent->io_header_input, timetag, tc) ;
 }
 
 Bool remove_input_wme (agent* thisAgent, wme *w) {

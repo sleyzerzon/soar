@@ -120,6 +120,10 @@ protected:
 	// So each identifier has a pointer to a symbol object, but two could share the same object.
 	IdentifierSymbol* m_pSymbol ;
 
+	// When walking graph structures it's helpful to have a way to indicate when we've visited
+	// a particular node in the graph (to avoid looping).  This is that value.
+	long m_Visited ;
+
 	IdentifierSymbol* GetSymbol() { return m_pSymbol ; }
 
 	ChildrenIter GetChildrenBegin() { return m_pSymbol->m_Children.begin() ; }
@@ -137,6 +141,9 @@ public:
 	virtual bool IsIdentifier() const { return true ; }
 	
 	virtual Identifier* ConvertToIdentifier() { return this; }
+
+	virtual void SetVisited(long visitValue) { m_Visited = visitValue ; }
+	virtual long GetVisited()				 { return m_Visited ; }
 
 	/*************************************************************
 	* @brief Searches for a child of this identifier that has pID as

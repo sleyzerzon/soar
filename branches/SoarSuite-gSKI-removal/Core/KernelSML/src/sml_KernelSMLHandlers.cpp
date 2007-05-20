@@ -1106,6 +1106,9 @@ bool KernelSML::HandleGetAllInput(gSKI::Agent* pAgent, char const* pCommandName,
 {
 	unused(pCommandName) ; unused(pIncoming) ; unused(pConnection) ;
 
+	// This is not available on the gSKI removal branch yet -- more work needed to implement it.
+assert(false) ;
+
 	// Create the result tag
 	TagResult* pTagResult = new TagResult() ;
 

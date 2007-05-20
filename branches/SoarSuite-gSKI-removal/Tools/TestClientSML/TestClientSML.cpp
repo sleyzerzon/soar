@@ -72,7 +72,7 @@ using std::string;
 
 int global_callback = -1 ;
 
-void printWMEs(WMElement const* pRoot)
+void printWMEsInternal(WMElement const* pRoot, long visitedCounter)
 {
 	if (pRoot->GetParent() == NULL)
 		cout << "Top Identifier " << pRoot->GetValueAsString() << endl ;
@@ -84,15 +84,28 @@ void printWMEs(WMElement const* pRoot)
 	if (pRoot->IsIdentifier())
 	{
 		Identifier* pID = (Identifier*)pRoot ;
-		int size = pID->GetNumberChildren() ;
 
-		for (int i = 0 ; i < size ; i++)
+		// If we've not already printed this id, print its children.
+		if (pID->GetVisited() != visitedCounter)
 		{
-			WMElement const* pWME = pID->GetChild(i) ;
+			pID->SetVisited(visitedCounter) ;
+			int size = pID->GetNumberChildren() ;
 
-			printWMEs(pWME) ;
+			for (int i = 0 ; i < size ; i++)
+			{
+				WMElement const* pWME = pID->GetChild(i) ;
+
+				printWMEsInternal(pWME, visitedCounter) ;
+			}
 		}
 	}
+}
+
+void printWMEs(WMElement* pRoot)
+{
+	Agent* pAgent = pRoot->GetAgent() ;
+	long visitedCounter = pAgent->GenerateNewVisitedCounter() ;
+	printWMEsInternal(pRoot, visitedCounter) ;
 }
 
 void SimpleRemoteConnection()
@@ -998,6 +1011,10 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	StringElement* pWMEtest = pAgent->CreateStringWME(pID, "typeTest", "Boeing747") ;
 	unused(pWMEtest) ;
 
+	// Create a new WME that creates a loop in the input graph
+	//Identifier* pID2 = pAgent->CreateSharedIdWME(pID, "all-planes", pID) ;
+	//unused(pID2) ;
+
 	bool ok = pAgent->Commit() ;
 	pAgent->RunSelf(1) ;
 	std::string wmes0 = pAgent->ExecuteCommandLine("print i2 --depth 3") ;
@@ -1053,13 +1070,6 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 
 	// Change the speed to 300
 	pAgent->Update(pWME2, 300) ;
-
-	// Create a new WME that shares the same id as plane
-	// BUGBUG: This is triggering an assert and memory leak now after the changes
-	// to InputWME not calling Update() immediately.  For now I've removed the test until
-	// we have time to figure out what's going wrong.
-	//Identifier* pID2 = pAgent->CreateSharedIdWME(pInputLink, "all-planes", pID) ;
-	//unused(pID2);
 
 	ok = pAgent->Commit() ;
 

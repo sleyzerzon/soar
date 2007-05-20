@@ -77,6 +77,7 @@ Identifier::Identifier(Agent* pAgent, char const* pIdentifier, long timeTag) : W
 {
 	m_pSymbol = new IdentifierSymbol(this) ;
 	m_pSymbol->SetIdentifierSymbol(pIdentifier) ;
+	m_Visited = 0 ;
 }
 
 // The normal case (where there is a parent id)
@@ -84,6 +85,7 @@ Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char
 {
 	m_pSymbol = new IdentifierSymbol(this) ;
 	m_pSymbol->SetIdentifierSymbol(pIdentifier) ;
+	m_Visited = 0 ;
 
 #ifdef SML_DIRECT
 	// Pass along with working memory object.  (Note: If you pass id's from input-link to output-link this just breaks gSKI all over the place, so please don't).
@@ -99,6 +101,7 @@ Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char
 {
 	m_pSymbol = pLinkedIdentifier->m_pSymbol ;
 	m_pSymbol->UsedBy(this) ;
+	m_Visited = 0 ;
 
 #ifdef SML_DIRECT
 	// Pass along with working memory object.  (Note: If you pass id's from input-link to output-link this just breaks gSKI all over the place, so please don't).

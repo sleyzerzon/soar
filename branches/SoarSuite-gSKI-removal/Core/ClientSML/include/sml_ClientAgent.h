@@ -174,6 +174,9 @@ protected:
 	// Used to generate unique IDs for callbacks
 	int		m_CallbackIDCounter ;
 
+	// Used to generate unique IDs for visited values when walking graph
+	long	m_VisitedCounter ;
+
 	// Internally we register a print callback and store its id here.
 	int		m_XMLCallback ;
 
@@ -247,6 +250,14 @@ public:
 	* @brief Returns a pointer to the kernel object that owns this Agent.
 	*************************************************************/
 	Kernel*		GetKernel() const		{ return m_Kernel ; }
+
+	/*************************************************************
+	* @brief Returns a new, unique visited value which can be used
+	* in conjunction with the SetVisited() and GetVisited() methods
+	* of the Identifier class to safely walk a graph that may contain
+	* loops.
+	*************************************************************/
+	long GenerateNewVisitedCounter()	{ return ++m_VisitedCounter ; }
 
 	/*************************************************************
 	* @brief Load a set of productions from a file.

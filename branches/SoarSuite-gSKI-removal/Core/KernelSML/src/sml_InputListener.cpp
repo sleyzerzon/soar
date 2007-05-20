@@ -235,10 +235,7 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 				haveKernelID = false ;
 		}
 
-		// Find the identifier number
-		char const* pNumber = value.c_str() ;
-		pNumber++ ;
-		int number = atoi(pNumber) ;
+		int number = 0 ;
 
 		// If we reach here without having a mapping to a kernel side identifier
 		// then we want to force the kernel to create a new id for us.
@@ -248,6 +245,16 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 		{
 			letter = (char)toupper(letter) ;
 			number = 0 ;
+		}
+		else
+		{
+			// Find the identifier number
+			char const* pNumber = value.c_str() ;
+			pNumber++ ;
+			number = atoi(pNumber) ;
+
+			// Find the identifier letter
+			letter = value[0] ;
 		}
 
 		// See if this identifier already exists
@@ -307,6 +314,7 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 {
 	// Get the wme that matches this time tag
 	long timetag = pAgentSML->ConvertTime(pTimeTag) ;
+
 	wme* pWME = find_input_wme_by_timetag(pAgentSML->GetAgent(), timetag) ;
 
 //	wme* pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
