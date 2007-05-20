@@ -26,7 +26,7 @@ using namespace sml ;
 
 // Flag to control printing debug information about the input link
 #ifdef _DEBUG
-	static bool kDebugInput = true ;
+	static bool kDebugInput = false ;
 #else
 	static bool kDebugInput = false ;
 #endif
@@ -56,6 +56,8 @@ static void Symbol2String(Symbol* pSymbol, 	bool refCounts, std::ostringstream& 
 
 static std::string Wme2String(wme* pWME, bool refCounts) {
 	std::ostringstream buffer ;
+
+	buffer << pWME->timetag << ":" ;
 
 	Symbol2String(pWME->id, refCounts, buffer) ;
 	buffer << " ^" ;
@@ -219,17 +221,34 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 	} else if (IsStringEqual(sml_Names::kTypeID, pType)) {
 		// Creating a WME with an identifier value
 
-		// Convert the value (itself an identifier) from client to kernel
-		std::string value ;
-		pAgentSML->ConvertID(pValue, &value) ;
+		CHECK_RET_FALSE(strlen(pValue)) ;		// Identifier must be format Xdddd for some letter "X" and at least one digit "d"
+		char letter = pValue[0]	;				// Kernel identifiers always use upper case identifier letters
 
-		CHECK_RET_FALSE(value.size() >= 2) ;		// Identifier must be format Xdddd for some letter "X" and at least one digit "d"
-		char letter = (char)toupper(value[0]) ;		// Kernel identifiers always use upper case identifier letters so shift here
+		bool haveKernelID = true ;
+		std::string value = pValue ;
+		if (letter >= 'a' || letter <= 'z')
+		{
+			// Convert the value (itself an identifier) from client to kernel
+			bool found = pAgentSML->ConvertID(pValue, &value) ;
 
-		// Create a pointer to the number part
+			if (!found)
+				haveKernelID = false ;
+		}
+
+		// Find the identifier number
 		char const* pNumber = value.c_str() ;
 		pNumber++ ;
 		int number = atoi(pNumber) ;
+
+		// If we reach here without having a mapping to a kernel side identifier
+		// then we want to force the kernel to create a new id for us.
+		// We'll do that by setting the number to 0 -- which will never match an existing
+		// identifier.
+		if (!haveKernelID)
+		{
+			letter = (char)toupper(letter) ;
+			number = 0 ;
+		}
 
 		// See if this identifier already exists
 		pValueSymbol = get_io_identifier(pAgent, letter, number) ;
@@ -272,7 +291,8 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 	// store these values in a hashtable.  Perhaps later we'll see about adding
 	// this support directly into the kernel.
 	pAgentSML->RecordTime(pTimeTag, timeTag) ;
-	//pAgentSML->RecordKernelTimeTag(pTimeTag, pNewInputWme) ;
+//	pAgentSML->RecordKernelTimeTag(pTimeTag, pNewInputWme) ;
+
 	unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->id) ;
 	unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->attr) ;
 	unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->value) ;
@@ -289,9 +309,18 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 	long timetag = pAgentSML->ConvertTime(pTimeTag) ;
 	wme* pWME = find_input_wme_by_timetag(pAgentSML->GetAgent(), timetag) ;
 
+//	wme* pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
+
+	std::string printInput1 = pAgentSML->ExecuteCommandLine("print --internal --depth 2 I2") ;
+
+	if (kDebugInput)
+		PrintDebugFormat("%s\nLooking for %ld", printInput1.c_str(), timetag) ;
+
 	// The wme is already gone so no work to do
 	if (!pWME)
+	{
 		return false ;
+	}
 
 //	wme* pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
 
@@ -321,6 +350,12 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 	}
 
 	Bool ok = remove_input_wme(pAgentSML->GetAgent(), pWME) ;
+
+	/*
+	unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
+	unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
+	unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pWME->value) ;
+	*/
 
 	// Remove the object from the time tag table because
 	// we no longer own it.

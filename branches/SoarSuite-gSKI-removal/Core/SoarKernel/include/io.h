@@ -136,7 +136,7 @@ extern unsigned long release_io_symbol (agent* thisAgent, Symbol *sym);
 
 extern wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value);
 extern Bool remove_input_wme (agent* thisAgent, wme *w);
-extern wme* find_input_wme_by_timetag (agent* thisAgent, int timetag) ;
+extern wme* find_input_wme_by_timetag (agent* thisAgent, unsigned long timetag) ;
 
 /* =======================================================================
                             Output Functions

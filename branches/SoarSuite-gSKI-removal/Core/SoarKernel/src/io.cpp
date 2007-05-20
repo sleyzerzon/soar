@@ -55,6 +55,8 @@
 #include "production.h"
 #include "lexer.h"
 #include "gski_event_system_functions.h" // support for generating XML output
+#include "../../ConnectionSML/include/sock_Debug.h"	// For PrintDebugFormat
+
 
 extern void gds_invalid_so_remove_goal (agent* thisAgent, wme *w);
 
@@ -200,19 +202,44 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   insert_at_head_of_dll (id->id.input_wmes, w, next, prev);
   add_wme_to_wm (thisAgent, w);
 
+  //PrintDebugFormat("Added wme with timetag %d to id %c%d ",w->timetag,id->id.name_letter,id->id.name_number) ;
 
   return w;
 }
 
-wme* find_input_wme_by_timetag (agent* thisAgent, int timetag) {
-   wme *temp;
+wme* find_input_wme_by_timetag_from_id (agent* thisAgent, Symbol* idSym, unsigned long timetag) {
+   wme *pWME,*w;
 
+  //PrintDebugFormat("Scanning id %c%d", idSym->id.name_letter, idSym->id.name_number) ;
+
+   // This is super inefficient.  Using a hash table could save a lot here.
+	for (pWME = idSym->id.input_wmes; pWME != NIL; pWME = pWME->next)
+	{
+		//PrintDebugFormat("Timetag %ld", pWME->timetag) ;
+		if (pWME->timetag == timetag)
+			return pWME ;
+
+		// BUGBUG: This will only work for a tree -- not a graph, but let's start there.
+		if (pWME->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE)
+		{
+			w = find_input_wme_by_timetag_from_id(thisAgent, pWME->value, timetag) ;
+			if (w)
+				return w ;
+		}
+	}
+/*
    // This is doubly inefficient as we walk this list twice (once here and once
    // in the remove_input_wme method).  Using a hash table could skip both list traversals.
    for (temp=thisAgent->io_header_input->id.input_wmes; temp!=NIL; temp=temp->next)
 	   if (temp->timetag == timetag) break;
+*/
 
-	return temp ;
+	return NIL ;
+}
+
+wme* find_input_wme_by_timetag (agent* thisAgent, unsigned long timetag) {
+    //PrintDebugFormat("Looking for tag %ld", timetag) ;
+	return find_input_wme_by_timetag_from_id(thisAgent, thisAgent->io_header_input, timetag) ;
 }
 
 Bool remove_input_wme (agent* thisAgent, wme *w) {

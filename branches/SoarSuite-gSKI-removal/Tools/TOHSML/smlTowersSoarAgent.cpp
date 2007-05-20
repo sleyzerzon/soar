@@ -71,7 +71,7 @@ void SoarAgent::MakeMove()
 	// SGIO takes no arguments.  SML pass in max decisions before stop (so it's clear this is how RunTilOutput works)
 //	pAgent->RunTilOutput();
 
-	const bool collectDebugInfo = false ;
+	const bool collectDebugInfo = true ;
 	int callbackp ;
 
 	// When debugging this it can be nice to capture the trace output to see what's happening.
