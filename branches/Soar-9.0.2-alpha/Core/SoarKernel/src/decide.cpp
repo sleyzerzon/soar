@@ -3784,10 +3784,10 @@ This function is only called in numeric_indifferent_mode Sum.
 preference *choose_according_to_exploration_mode(agent *thisAgent, preference * candidates, int numCandidates){
 
 	preference *cand = 0;
-	float total_probability = 0;
-	float selectedProbability = 0;
+	double total_probability = 0;
+	double selectedProbability = 0;
 	double rn = 0;
-	float currentSumOfValues = 0;
+	double currentSumOfValues = 0;
 
 	if (thisAgent->exploration_mode == BOLTZMANN_EXPLORATION){
 
@@ -3804,13 +3804,38 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 				}
 			}
 
+			/*
+			* method to increase usable range of boltzmann with double
+			* - find the highest/lowest q-values
+			* - take half the difference
+			* - subtract this value from all q-values when making calculations
+			* 
+			* this maintains relative probabilities of selection, while reducing greatly the exponential extremes of calculations
+			*/
+			float q_diff = 0;
+			if ( candidates->next_candidate != NIL ) {
+				float q_high = candidates->numeric_value;
+				float q_low = candidates->numeric_value;
+				
+				for (cand = candidates->next_candidate; cand != NIL; cand = cand->next_candidate) {
+					if ( cand->numeric_value > q_high )
+						q_high = cand->numeric_value;
+					if ( cand->numeric_value < q_low )
+						q_low = cand->numeric_value;
+				}
+
+				q_diff = ( q_high - q_low ) / 2;
+			} else {
+				q_diff = candidates->numeric_value;
+			}
+
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
 
 						/*  Total Probability represents the range of values, we expect
 						*  the use of negative valued preferences, so its possible the
 						*  sum is negative, here that means a fractional probability
 						*/
-				total_probability += exp(cand->numeric_value / thisAgent->Temperature);
+				total_probability += exp( (double) ( ( cand->numeric_value - q_diff ) / thisAgent->Temperature ) );
 						/* print("\n   Total (Sum) Probability = %f", total_probability ); */
 			}
 
@@ -3819,7 +3844,7 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 			currentSumOfValues = 0;
 
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
-				currentSumOfValues += exp(cand->numeric_value / thisAgent->Temperature);
+				currentSumOfValues += exp( (double) ( ( cand->numeric_value - q_diff ) / thisAgent->Temperature ) );
 				if (selectedProbability <= currentSumOfValues) {
 					return cand;
 				}
