@@ -3,6 +3,8 @@
 #endif // HAVE_CONFIG_H
 #include "portability.h"
 #include "soar_rand.h" // provides SoarRand, a better random number generator (see bug 595)
+#include <math.h>
+#include <float.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -3804,6 +3806,15 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 				}
 			}
 
+			/**
+			* Since we can't guarantee any combination of temperature/q-values, could be useful
+			* to notify the user if double limit has been breached.
+			*/
+			double exp_max = log( DBL_MAX );
+			// print( thisAgent, "Max e^x = %g", exp_max );
+			double q_max = exp_max * thisAgent->Temperature;
+			// print( thisAgent, "Max (e^x)*temp = %g", q_max );
+
 			/*
 			* method to increase usable range of boltzmann with double
 			* - find the highest/lowest q-values
@@ -3831,12 +3842,20 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 
 			for (cand = candidates; cand != NIL; cand = cand->next_candidate) {
 
-						/*  Total Probability represents the range of values, we expect
-						*  the use of negative valued preferences, so its possible the
-						*  sum is negative, here that means a fractional probability
-						*/
-				total_probability += exp( (double) ( ( cand->numeric_value - q_diff ) / thisAgent->Temperature ) );
-						/* print("\n   Total (Sum) Probability = %f", total_probability ); */
+				/*  Total Probability represents the range of values, we expect
+				*  the use of negative valued preferences, so its possible the
+				*  sum is negative, here that means a fractional probability
+				*/
+				float q_val = ( cand->numeric_value - q_diff );
+				total_probability += exp( (double) (  q_val / thisAgent->Temperature ) );
+				
+				/**
+				* Let user know if adjusted q-value will overflow
+				*/
+				if ( q_val > q_max )
+					print( thisAgent, "WARNING: Boltzmann update overflow! %g > %g", q_val, q_max );
+
+				/* print("\n   Total (Sum) Probability = %f", total_probability ); */
 			}
 
 			rn = SoarRand(); // generates a number in [0,1]
