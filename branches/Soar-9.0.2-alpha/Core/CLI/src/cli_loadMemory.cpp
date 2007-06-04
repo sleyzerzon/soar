@@ -9,6 +9,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif // HAVE_CONFIG_H
+#include <portability.h>
 
 //#ifdef SEMANTIC_MEMORY
 
@@ -20,7 +21,26 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#ifdef _WIN32
 #include <hash_map>
+#else // _WIN32
+// See: http://gcc.gnu.org/onlinedocs/libstdc++/faq/index.html
+#ifdef __GNUC__
+  #if __GNUC__ < 3
+    #include <hash_map.h>
+    namespace stdext { using ::hash_map; }; // inherit globals
+  #else
+    #include <ext/hash_map>
+    #if __GNUC_MINOR__ == 0
+      namespace stdext = std;               // GCC 3.0
+#else
+  namespace stdext = ::__gnu_cxx;       // GCC 3.1 and later
+    #endif
+  #endif
+  #else      // ...  there are other compilers, right?
+    namespace stdext = std;
+  #endif
+#endif // _WIN32
 #include "gSKI_Agent.h"
 //#include "agent.h"
 //#include "print.h"
@@ -122,7 +142,7 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::Agent* pAgent, std::vector<std:
 
 	// Should only hold most recent values
 	// If there is a tie, could have multiple value
-	stdext::hash_map<string, vector<memory_elem> > processed_memory;
+	__gnu_cxx::hash_map<string, vector<memory_elem> > processed_memory;
 
 	
 	while (getline(soarFile, line)) {
