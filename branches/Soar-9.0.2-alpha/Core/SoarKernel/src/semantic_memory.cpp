@@ -109,7 +109,7 @@ set<T> set_intersect(set<T>& set1, set<T>& set2){
 		set2_ptr = &set2;
 	}
 
-	for(set<T>::const_iterator itr = set1_ptr->begin(); itr != set1_ptr->end(); ++itr){
+	for(typename set<T>::const_iterator itr = set1_ptr->begin(); itr != set1_ptr->end(); ++itr){
 		if(set2_ptr->find(*itr) != set2_ptr->end()){
 			intersection.insert(*itr);
 		}
@@ -121,7 +121,7 @@ set<T> set_intersect(set<T>& set1, set<T>& set2){
 template <class T>
 ostream& operator << (ostream &out, const set<T>& s){
 	out << "\nSET" << endl;
-	for(set<T>::const_iterator itr = s.begin(); itr != s.end(); ++itr){
+	for(typename set<T>::const_iterator itr = s.begin(); itr != s.end(); ++itr){
 		out << *itr << ",";
 	}
 	out << endl;

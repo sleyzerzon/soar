@@ -24,6 +24,7 @@
 #ifdef _WIN32
 #include <hash_map>
 #else // _WIN32
+
 // See: http://gcc.gnu.org/onlinedocs/libstdc++/faq/index.html
 #ifdef __GNUC__
   #if __GNUC__ < 3
@@ -31,15 +32,26 @@
     namespace stdext { using ::hash_map; }; // inherit globals
   #else
     #include <ext/hash_map>
+namespace __gnu_cxx
+{
+        template<> struct hash< std::string >
+        {
+                size_t operator()( const std::string& x ) const
+                {
+                        return hash< const char* >()( x.c_str() );
+                }
+        };
+}
     #if __GNUC_MINOR__ == 0
       namespace stdext = std;               // GCC 3.0
-#else
-  namespace stdext = ::__gnu_cxx;       // GCC 3.1 and later
+    #else
+      namespace stdext = ::__gnu_cxx;       // GCC 3.1 and later
     #endif
   #endif
-  #else      // ...  there are other compilers, right?
+#else      // ...  there are other compilers, right?
     namespace stdext = std;
-  #endif
+#endif
+
 #endif // _WIN32
 #include "gSKI_Agent.h"
 //#include "agent.h"
@@ -142,7 +154,7 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::Agent* pAgent, std::vector<std:
 
 	// Should only hold most recent values
 	// If there is a tie, could have multiple value
-	__gnu_cxx::hash_map<string, vector<memory_elem> > processed_memory;
+	stdext::hash_map<string, vector<memory_elem> > processed_memory;
 
 	
 	while (getline(soarFile, line)) {
@@ -210,7 +222,8 @@ bool CommandLineInterface::ParseLoadMemory(gSKI::Agent* pAgent, std::vector<std:
 		if(history.size() == 0){ // no history
 			history.push_back(0);
 		}
-		stdext::hash_map<string, vector<memory_elem> >::iterator mem_itr = processed_memory.find(id+","+attr);
+		stdext::hash_map< string , vector<memory_elem> >::iterator mem_itr;
+		mem_itr = processed_memory.find(id+","+attr);
 		if(mem_itr == processed_memory.end()){
 			vector<memory_elem> multi_value_elemes;
 			multi_value_elemes.push_back(memory_elem(id, attr, value, type, history.back()));
