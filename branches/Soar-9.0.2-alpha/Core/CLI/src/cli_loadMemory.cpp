@@ -42,7 +42,7 @@ namespace __gnu_cxx
                 }
         };
 }
-    #if __GNUC_MINOR__ == 0
+    #if ( __GNUC_MINOR__ == 0 ) && ( __GNUC__ == 3 )
       namespace stdext = std;               // GCC 3.0
     #else
       namespace stdext = ::__gnu_cxx;       // GCC 3.1 and later
