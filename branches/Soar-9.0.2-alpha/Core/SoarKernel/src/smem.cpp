@@ -989,7 +989,7 @@ void retrieve_7_17(agent* thisAgent){
 			// Do retrieve only if the cue_id is the same with previous one
 			//if(current_cue_id == *(thisAgent->last_cue_id)){
 			if(current_cue_id == thisAgent->smem_structures->at(goal_level).last_cue_id){
-				print(thisAgent, "The same cue id\n");
+				//print(thisAgent, "The same cue id\n");
 				break;
 			}
 			else if(retrieve_w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE){ // cue must be an identifier, as the chunk name. Constant cue is not an option
@@ -1257,7 +1257,7 @@ void retrieve_7_17(agent* thisAgent){
 		//do_buffered_wm_and_ownership_changes(thisAgent);
 	}
 	else{
-		print(thisAgent, "The same cue id <%s>\n", current_cue_id.c_str());
+		//print(thisAgent, "The same cue id <%s>\n", current_cue_id.c_str());
 
 	}
 	
