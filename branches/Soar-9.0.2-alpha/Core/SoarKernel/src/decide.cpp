@@ -3853,7 +3853,15 @@ preference *choose_according_to_exploration_mode(agent *thisAgent, preference * 
 				* Let user know if adjusted q-value will overflow
 				*/
 				if ( q_val > q_max )
+				{
 					print( thisAgent, "WARNING: Boltzmann update overflow! %g > %g", q_val, q_max );
+					
+					char buf[256];
+                   	snprintf( buf, 254, "WARNING: Boltzmann update overflow! %g > %g", q_val, q_max );
+                   	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagVerbose);
+                   	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, buf);
+                   	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagVerbose);
+				}
 
 				/* print("\n   Total (Sum) Probability = %f", total_probability ); */
 			}
