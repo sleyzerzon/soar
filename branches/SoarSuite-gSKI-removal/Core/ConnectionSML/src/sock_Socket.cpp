@@ -1,7 +1,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // Socket class
@@ -59,7 +59,7 @@ Socket::Socket(SOCKET hSocket)
 
 Socket::~Socket()
 {
-	CloseSocket();
+	Close();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -173,83 +173,6 @@ static bool IsErrorWouldBlock()
 // Function name  : Socket::SendBuffer
 // 
 // Return type    : bool 	
-// Argument       : char* String	
-// 
-// Description	  : Send a string of data to a socket.
-//					The outgoing format on the socket will be
-//					a 4-byte length followed by the string of characters.
-//
-/////////////////////////////////////////////////////////////////////
-bool Socket::SendString(char const* pString)
-{
-	unsigned long len = (unsigned long)strlen(pString) ;
-
-	// Convert the value into network byte ordering (so it's compatible if we send it
-	// from a big-endian machine to a little endian one or vice-versa).
-	unsigned long netLen = htonl(len) ;
-
-	// Send the length out first
-	bool ok = SendBuffer((char*)&netLen, sizeof(netLen)) ;
-
-	// Now send the string of characters
-	ok = ok && SendBuffer(pString, len) ;
-
-	return ok ;
-}
-
-/////////////////////////////////////////////////////////////////////
-// Function name  : Socket::SendBuffer
-// 
-// Return type    : bool 	
-// Argument       : char* String	
-// 
-// Description	  : Send a string of data to a socket.
-//					The outgoing format on the socket will be
-//					a 4-byte length followed by the string of characters.
-//
-/////////////////////////////////////////////////////////////////////
-bool Socket::ReceiveString(std::string* pString)
-{
-	unsigned long netLen = 0 ;
-
-	// Make sure we return an empty string if we get an error
-	pString->clear() ;
-
-	// Read the length of the string (the first 4 bytes)
-	bool ok = ReceiveBuffer((char*)&netLen, sizeof(netLen)) ;
-
-	// Convert the length from network byte ordering back to our local order
-	unsigned long len = ntohl(netLen) ;
-
-	// If we got a zero length string.
-	if (len == 0)
-		return ok ;
-
-	// Create the buffer into which we'll receive data
-	char* buffer = new char[len+1] ;
-
-	// Receive the string
-	ok = ok && ReceiveBuffer(buffer, len) ;
-
-	// Make it null terminated
-	buffer[len] = 0 ;
-
-	// Return the result in the string
-	if (ok)
-	{
-		pString->assign(buffer) ;
-	}
-
-	// Release our temp buffer
-	delete buffer ;
-
-	return ok ;
-}
-
-/////////////////////////////////////////////////////////////////////
-// Function name  : Socket::SendBuffer
-// 
-// Return type    : bool 	
 // Argument       : char* pSendBuffer	
 // Argument       : size_t bufferSize	
 // 
@@ -294,7 +217,7 @@ bool Socket::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 				if (IsErrorWouldBlock())
 				{
 					PrintDebug("Waiting for socket to unblock") ;
-					SleepSocket(0, 100) ;
+					SleepSocket(0, 0) ;
 				}
 				else
 #endif
@@ -437,8 +360,8 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 				// so this would always be an error.
 				if (IsErrorWouldBlock())
 				{
-					PrintDebug("Waiting for socket to unblock") ;
-					SleepSocket(0, 10) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
+					//PrintDebug("Waiting for socket to unblock") ;
+					SleepSocket(0, 0) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
 				}
 				else
 #endif
@@ -451,7 +374,7 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 					// If we later decide we can survive certain ones, we should test for them here
 					// and not always close the socket.
 					PrintDebug("Closing our side of the socket because of error") ;
-					CloseSocket() ;
+					Close() ;
 
 					return false ;
 				}
@@ -466,7 +389,7 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 				// Now close down our socket
 				PrintDebug("Closing our side of the socket") ;
 
-				CloseSocket() ;
+				Close() ;
 
 				return false ;	// No message received.
 			}
@@ -490,7 +413,7 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 // Description	  : Convert the error code to useful text.
 //
 /////////////////////////////////////////////////////////////////////
-void sock::ReportErrorCode()
+void Socket::ReportErrorCode()
 {
 	CTDEBUG_ENTER_METHOD("SoarSocket - ReportErrorCode");
 
@@ -524,14 +447,14 @@ void sock::ReportErrorCode()
 }
 
 /////////////////////////////////////////////////////////////////////
-// Function name  : Socket::CloseSocket
+// Function name  : Socket::Close
 // 
 // Return type    : void 	
 // 
 // Description	  : Close down the socket.
 //
 /////////////////////////////////////////////////////////////////////
-void Socket::CloseSocket()
+void Socket::Close()
 {
 	if (m_hSocket)
 	{

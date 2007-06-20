@@ -12,10 +12,17 @@
 #ifndef LISTENER_THREAD_H
 #define LISTENER_THREAD_H
 
+#include "portability.h" // for ENABLE_NAMED_PIPES
+
 #include "thread_Thread.h"
+#include "sock_DataSender.h"
 #include "sock_ListenerSocket.h"
 #include "sock_SocketLib.h"
 #include "sml_Connection.h"
+
+#ifdef ENABLE_NAMED_PIPES
+#include "sock_ListenerNamedPipe.h"
+#endif
 
 #include <list>
 
@@ -31,8 +38,14 @@ protected:
 	unsigned short				m_Port ;
 	ConnectionManager*			m_Parent ;
 	sock::ListenerSocket		m_ListenerSocket ;
+	sock::ListenerSocket		m_LocalListenerSocket;
+#ifdef ENABLE_NAMED_PIPES
+	sock::ListenerNamedPipe		m_ListenerNamedPipe ;
+#endif
 
 	void Run() ;
+
+	void CreateConnection(sock::DataSender* pSender);
 
 public:
 	ListenerThread(ConnectionManager* parent, unsigned short port) { m_Parent = parent ; m_Port = port ; }

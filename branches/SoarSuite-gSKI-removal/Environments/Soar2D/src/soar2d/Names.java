@@ -23,6 +23,7 @@ public class Names {
 	
 	public static final String kRotateLeft = "left";
 	public static final String kRotateRight = "right";
+	public static final String kRotateStop = "stop";
 	
 	public static final String kHumanProductions = "<Human>";
 	
@@ -45,7 +46,9 @@ public class Names {
 	public static final String kDirectionID = "direction";
 	public static final String kDistanceID = "distance";
 	public static final String kDontEatID = "dont-eat";
-	public static final String kDoorID = "door";
+	public static final String kDropID = "drop";
+	public static final String kGatewayID = "gateway";
+	public static final String kGetID = "get";
 	public static final String kEaterID = "eater";
 	public static final String kEnergyID = "energy";
 	public static final String kEnergyRechargerID = "energyrecharger";
@@ -82,6 +85,8 @@ public class Names {
 	public static final String kRightID = "right";
 	public static final String kRoomID = "room";
 	public static final String kRotateID = "rotate";
+	public static final String kRotateAbsoluteID = "rotate-absolute";
+	public static final String kRotateRelativeID = "rotate-relative";
 	public static final String kRWavesID = "rwaves";
 	public static final String kScoreID = "score";
 	public static final String kSettingID = "setting";
@@ -90,6 +95,7 @@ public class Names {
 	public static final String kSilentID = "silent";
 	public static final String kSmellID = "smell";
 	public static final String kSoundID = "sound";
+	public static final String kStopID = "stop";
 	public static final String kStopSimID = "stop-sim";
 	public static final String kSwitchID = "switch";
 	public static final String kTankID = "tank";
@@ -105,7 +111,8 @@ public class Names {
 	public static final String kPropertyCharger = "charger";
 	public static final String kPropertyColor = "color";
 	public static final String kPropertyDirection = "direction";
-	public static final String kPropertyDoor = "door";
+	public static final String kPropertyGateway = "gateway";
+	public static final String kPropertyGatewayRender = "gateway-render";
 	public static final String kPropertyEdible = "edible";
 	public static final String kPropertyEnergy = "energy";
 	public static final String kPropertyFlyPhase = "fly-phase";

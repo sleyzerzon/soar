@@ -1,8 +1,10 @@
 package soar2d.player;
 
+import java.awt.geom.Point2D;
 import java.util.logging.*;
 
 import soar2d.*;
+import soar2d.world.CellObject;
 
 /**
  * @author voigtjr
@@ -24,11 +26,11 @@ public class Player {
 	private boolean pointsChanged = false;
 	private int pointsDelta = 0;
 
-	private float headingRadians = 0;	// heading in radians
-	public float getHeadingRadians() {
+	private double headingRadians = 0;	// heading in radians
+	public double getHeadingRadians() {
 		return headingRadians;
 	}
-	public void setHeadingRadians(float heading) {
+	public void setHeadingRadians(double heading) {
 		this.headingRadians = heading;
 	}
 	
@@ -66,7 +68,7 @@ public class Player {
 	 */
 	public void setPoints(int points, String comment) {
 		pointsChanged = true;
-		pointsDelta = this.points - points;
+		pointsDelta = points - this.points;
 		
 		this.points = points;
 		if (comment != null) {
@@ -83,6 +85,11 @@ public class Player {
 	 * why the change happened
 	 */
 	public void adjustPoints(int delta, String comment) {
+		if (delta == 0) {
+			logger.fine(this.name + " adjust points 0");
+			return;
+		}
+		
 		pointsChanged = (delta != 0);
 		pointsDelta = delta;
 		
@@ -197,13 +204,27 @@ public class Player {
 			this.facingInt = Simulation.random.nextInt(4) + 1;
 		}
 		
-		if (playerConfig.hasPoints()) {
-			this.points = playerConfig.getPoints();
-		} else {
-			this.points = Soar2D.config.getDefaultPoints();
+		// Nick, for some reason, would like to keep the scores across resets
+		// Because, he says, he is super-awesome.
+		if (soar2d.player.ToscaEater.kToscaEnabled == false) {
+			if (playerConfig.hasPoints()) {
+				this.points = playerConfig.getPoints();
+			} else {
+				this.points = Soar2D.config.getDefaultPoints();
+			}
 		}
+
 		pointsChanged = true;
 		pointsDelta = 0;
+		
+		headingRadians = 0;
+		collisionX = false;
+		collisionY = false;
+		rotationSpeed = 0;
+		destinationHeading = null;
+		velocity = new Point2D.Double(0,0);
+		speed = 0;
+		carriedObject = null;
 	}
 	/**
 	 * called when things are shutting down
@@ -238,17 +259,14 @@ public class Player {
 	}
 
 	public void radarTouch(int i) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public int getObservedDistance() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public RadarCell[][] getRadar() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -257,7 +275,6 @@ public class Player {
 	}
 
 	public int getBlocked() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 	
@@ -275,7 +292,6 @@ public class Player {
 		return name.equals(player.name);
 	}
 
-		// TODO Auto-generated method stub
 	public void setIncoming(int i) {
 	}
 
@@ -283,37 +299,30 @@ public class Player {
 		return 0;	}
 
 	public void resetSensors() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public boolean getHumanMove() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public void setSmell(int distance, String color) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public int getSmellDistance() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public String getSmellColor() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public void setSound(int soundNear) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	public int getSound() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 	
@@ -322,12 +331,10 @@ public class Player {
 	}
 
 	public void setOnHealthCharger(boolean b) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public void setOnEnergyCharger(boolean b) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -361,5 +368,96 @@ public class Player {
 	
 	public void mapReset() {
 		// this is for tosca's reward system
+	}
+	
+	private Point2D.Double velocity = new Point2D.Double(0,0);
+	public void setVelocity(Point2D.Double velocity) {
+		assert velocity != null;
+		this.velocity = velocity;
+	}
+	public Point2D.Double getVelocity() {
+		return this.velocity;
+	}
+
+	public int getLocationId() {
+		assert false;
+		return -1;
+	}
+
+	private double speed = 0;
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+	public double getSpeed() {
+		return speed;
+	}
+	
+	private Double destinationHeading = null;
+	public boolean hasDestinationHeading() {
+		return destinationHeading != null;
+	}
+	public double getDestinationHeading() {
+		assert destinationHeading != null;
+		return destinationHeading;
+	}
+	public void setDestinationHeading(double heading) {
+		this.destinationHeading = heading;
+	}
+	public void resetDestinationHeading() {
+		this.destinationHeading = null;
+	}
+	
+	private double rotationSpeed = 0;
+	public void setRotationSpeed(double rotationSpeed) {
+		this.rotationSpeed = rotationSpeed;
+	}
+	public double getRotationSpeed() {
+		return rotationSpeed;
+	}
+	
+	protected boolean collisionX = false;
+	protected boolean collisionY = false;
+	public void setCollisionX(boolean x) {
+		this.collisionX = x;
+	}
+	public void setCollisionY(boolean y) {
+		this.collisionY = y;
+	}
+	public boolean getCollisionX() {
+		return this.collisionX;
+	}
+	public boolean getCollisionY() {
+		return this.collisionY;
+	}
+	
+	public void rotateComplete() {
+		
+	}
+	public void updateGetStatus(boolean success) {
+		
+	}
+	public void updateDropStatus(boolean success) {
+		
+	}
+	
+	CellObject carriedObject = null;
+	public void carry(CellObject object) {
+		assert carriedObject == null;
+		carriedObject = object;
+	}
+	public CellObject drop() {
+		assert carriedObject != null;
+		CellObject temp = carriedObject;
+		carriedObject = null;
+		return temp;
+	}
+	public boolean isCarrying() {
+		return carriedObject != null;
+	}
+	public String getCarryType() {
+		if (carriedObject == null) {
+			return "none";
+		}
+		return carriedObject.getProperty("id");
 	}
 }

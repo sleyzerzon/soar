@@ -12,7 +12,8 @@
 
 #ifdef WIN_HEADERS
 #ifndef __STDC__ 
-#include "WinSock2.h"
+//somehow included in portability.h
+//#include "WinSock2.h"
 
 #define NET_CLOSESOCKET		closesocket
 #define NET_ERROR_NUMBER	WSAGetLastError()
@@ -45,10 +46,16 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/un.h>
 #include <errno.h>
 #include <unistd.h>
 
 #include <netinet/in.h>
+
+#ifndef SUN_LEN
+/* This system is not POSIX.1g.         */
+#define SUN_LEN(ptr) ((size_t) (((struct sockaddr_un *) 0)->sun_path) + strlen ((ptr)->sun_path))
+#endif
 
 // For some reason, Darwin (MacOSX) doesn't have this
 // It should be defined in netinet/in.h

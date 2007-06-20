@@ -72,7 +72,7 @@ public class Simulation {
 			kernel = Kernel.CreateRemoteConnection(true);
 		} else {
 			// Create kernel
-			kernel = Kernel.CreateKernelInNewThread("SoarKernelSML", 12121);
+			kernel = Kernel.CreateKernelInNewThread("SoarKernelSML", Soar2D.config.getPort());
 			//kernel = Kernel.CreateKernelInCurrentThread("SoarKernelSML", true);
 		}
 
@@ -88,13 +88,13 @@ public class Simulation {
 		// Make all runs non-random if asked
 		// For debugging, set this to make all random calls follow the same sequence
 		if (Soar2D.config.hasRandomSeed()) {
-			if (Soar2D.logger.isLoggable(Level.FINEST)) Soar2D.logger.finest("Not seeding generators.");
-			random = new Random();
-		} else {
 			// seed the generators
 			if (Soar2D.logger.isLoggable(Level.FINEST)) Soar2D.logger.finest("Seeding generators with " + Soar2D.config.getRandomSeed());
 			kernel.ExecuteCommandLine("srand " + Soar2D.config.getRandomSeed(), null) ;
 			random = new Random(Soar2D.config.getRandomSeed());
+		} else {
+			if (Soar2D.logger.isLoggable(Level.FINEST)) Soar2D.logger.finest("Not seeding generators.");
+			random = new Random();
 		}
 		
 		// Register for events
@@ -120,15 +120,15 @@ public class Simulation {
 		
 		// add dog and mouse (book)
 		// TODO: this could happen in the config file
-		if (Soar2D.config.getType() == SimType.kBook) {
-			PlayerConfig dogConfig = new PlayerConfig();
-			dogConfig.setName(kDog);
-			createPlayer(dogConfig);
-			
-			PlayerConfig mouseConfig = new PlayerConfig();
-			mouseConfig.setName(kMouse);
-			createPlayer(mouseConfig);
-		}
+//		if (Soar2D.config.getType() == SimType.kBook) {
+//			PlayerConfig dogConfig = new PlayerConfig();
+//			dogConfig.setName(kDog);
+//			createPlayer(dogConfig);
+//			
+//			PlayerConfig mouseConfig = new PlayerConfig();
+//			mouseConfig.setName(kMouse);
+//			createPlayer(mouseConfig);
+//		}
 		
 		// add initial players
 		Iterator<PlayerConfig> iter = Soar2D.config.getPlayers().iterator();

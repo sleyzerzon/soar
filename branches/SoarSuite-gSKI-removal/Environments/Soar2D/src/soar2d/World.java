@@ -29,7 +29,7 @@ public class World {
 	private HashMap<String, Player> playersMap = new HashMap<String, Player>(7);
 	private HashMap<String, Point> initialLocations = new HashMap<String, Point>(7);
 	private HashMap<String, Point> locations = new HashMap<String, Point>(7);
-	private HashMap<String, Point2D.Float> floatLocations = new HashMap<String, Point2D.Float>(7);
+	private HashMap<String, Point2D.Double> floatLocations = new HashMap<String, Point2D.Double>(7);
 	private HashMap<String, MoveInfo> lastMoves = new HashMap<String, MoveInfo>(7);
 	private HashMap<String, HashSet<Player> > killedTanks = new HashMap<String, HashSet<Player> >(7);
 	
@@ -91,6 +91,9 @@ public class World {
 		resetPlayers(resetDuringRun);
 		
 		logger.info("Map loaded, world reset.");
+		if (map.getOpenCode() != 0) {
+			logger.info("The correct open code is: " + map.getOpenCode());
+		}
 		return true;
 	}
 	
@@ -156,6 +159,10 @@ public class World {
 			// falls through
 			
 		case kTankSoar:
+			// reset (init-soar)
+			player.reset();
+			break;
+			
 		case kBook:
 			if (resetDuringRun) {
 				player.fragged();
@@ -220,6 +227,11 @@ public class World {
 			while (playerIter.hasNext()) {
 				Player player = playerIter.next();
 				player.commit(locations.get(player.getName()));
+			}
+			playerIter = players.iterator();
+			while (playerIter.hasNext()) {
+				Player player = playerIter.next();
+				player.resetPointsChanged();
 			}
 		}
 	}
@@ -503,7 +515,7 @@ public class World {
 			}
 		}
 		if (openCode != 0) {
-			box.addPropertyApply(Names.kPropertyOpenCode, Integer.toString(openCode));
+			box.addProperty(Names.kPropertyOpenCode, Integer.toString(openCode));
 		}
 		if (box.apply(this, player)) {
 			map.removeObject(location, box.getName());
@@ -581,8 +593,26 @@ public class World {
 		if (Soar2D.config.getTerminalWinningScore() > 0) {
 			int[] scores = getSortedScores();
 			if (scores[scores.length - 1] >= Soar2D.config.getTerminalWinningScore()) {
-				stopAndDumpStats("At least one player has achieved at least " + Soar2D.config.getTerminalWinningScore() + " points.", scores);
-				return;
+				if (Soar2D.config.getTerminalWinningScoreContinue()) {
+					boolean stopNow = true;
+					
+					if (this.runsTerminal > 0) {
+						this.runsTerminal -= 1;
+						if (this.runsTerminal > 0) {
+							stopNow = false;
+						}
+					}
+
+					if (stopNow) {
+						stopAndDumpStats("At least one player has achieved at least " + Soar2D.config.getTerminalWinningScore() + " points.", scores);
+						return;
+					} else {
+						doRestartAfterUpdate();
+					}
+				} else {
+					stopAndDumpStats("At least one player has achieved at least " + Soar2D.config.getTerminalWinningScore() + " points.", scores);
+					return;
+				}
 			}
 		}
 		
@@ -650,6 +680,8 @@ public class World {
 				Soar2D.wm.reset();
 			}
 		}
+		
+		//System.out.println(map);
 	}
 	
 	private void doRestartAfterUpdate() {
@@ -677,98 +709,343 @@ public class World {
 		}
 	}
 	
+	private boolean checkBlocked(Point location) {
+		if (map.getAllWithProperty(location, Names.kPropertyBlock).size() > 0) {
+			return true;
+		}
+		if (map.getAllWithProperty(location, "mblock").size() > 0) {
+			// FIXME: check height
+			return true;
+		}
+		return false;
+	}
+	
+	
+	private void bookMovePlayer(Player player, double time) {
+		final int cellSize = Soar2D.config.getBookCellSize();
+		
+		Point oldLocation = locations.get(player.getName());
+		Point newLocation = new Point(oldLocation);
+
+		Point2D.Double oldFloatLocation = floatLocations.get(player.getName());
+		Point2D.Double newFloatLocation = new Point2D.Double(oldFloatLocation.x, oldFloatLocation.y);
+
+		newFloatLocation.x += player.getSpeed() * Math.cos(player.getHeadingRadians()) * time;
+		newFloatLocation.y += player.getSpeed() * Math.sin(player.getHeadingRadians()) * time;
+		
+		newLocation.x = (int)newFloatLocation.x / cellSize;
+		newLocation.y = (int)newFloatLocation.y / cellSize;
+		
+		while (checkBlocked(newLocation)) {
+			// 1) determine what edge we're intersecting
+			if ((newLocation.x != oldLocation.x) && (newLocation.y != oldLocation.y)) {
+				// corner case
+				java.awt.Point oldx = new java.awt.Point(oldLocation.x, newLocation.y);
+				
+				// if oldx is blocked
+				if (checkBlocked(oldx)) {
+					player.setCollisionY(true);
+					// calculate y first
+					if (newLocation.y > oldLocation.y) {
+						// south
+						newFloatLocation.y = oldLocation.y * cellSize;
+						newFloatLocation.y += cellSize - 0.1;
+						newLocation.y = oldLocation.y;
+					} 
+					else if (newLocation.y < oldLocation.y) {
+						// north
+						newFloatLocation.y = oldLocation.y * cellSize;
+						newLocation.y = oldLocation.y;
+					} else {
+						assert false;
+					}
+				} 
+				else {
+					player.setCollisionX(true);
+					// calculate x first
+					if (newLocation.x > oldLocation.x) {
+						// east
+						newFloatLocation.x = oldLocation.x * cellSize;
+						newFloatLocation.x += cellSize - 0.1;
+						newLocation.x = oldLocation.x;
+					} 
+					else if (newLocation.x < oldLocation.x) {
+						// west
+						newFloatLocation.x = oldLocation.x * cellSize;
+						newLocation.x = oldLocation.x;
+					} else {
+						assert false;
+					} 
+				}
+				continue;
+			}
+			
+			if (newLocation.x > oldLocation.x) {
+				player.setCollisionX(true);
+				// east
+				newFloatLocation.x = oldLocation.x * cellSize;
+				newFloatLocation.x += cellSize - 0.1;
+				newLocation.x = oldLocation.x;
+			} 
+			else if (newLocation.x < oldLocation.x) {
+				player.setCollisionX(true);
+				// west
+				newFloatLocation.x = oldLocation.x * cellSize;
+				newLocation.x = oldLocation.x;
+			} 
+			else if (newLocation.y > oldLocation.y) {
+				player.setCollisionY(true);
+				// south
+				newFloatLocation.y = oldLocation.y * cellSize;
+				newFloatLocation.y += cellSize - 0.1;
+				newLocation.y = oldLocation.y;
+			} 
+			else if (newLocation.y < oldLocation.y) {
+				player.setCollisionY(true);
+				// north
+				newFloatLocation.y = oldLocation.y * cellSize;
+				newLocation.y = oldLocation.y;
+			}
+		}
+		
+		player.setVelocity(new Point2D.Double((newFloatLocation.x - oldFloatLocation.x)/time, (newFloatLocation.y - oldFloatLocation.y)/time));
+		map.setPlayer(oldLocation, null);
+		locations.put(player.getName(), newLocation);
+		floatLocations.put(player.getName(), newFloatLocation);
+		map.setPlayer(newLocation, player);
+	}
+	
+	private double totalTime = 0;
+	public double getTime() {
+		return totalTime;
+	}
+	
+	public double fmod(double a, double mod) {
+		double result = a;
+		assert mod > 0;
+		while (Math.abs(result) > mod) {
+			assert mod > 0;
+			if (result > 0) {
+				result -= mod;
+			} else {
+				result += mod;
+			}
+		}
+		return result;
+	}
+	
+	private void setRotationAndAbsoluteHeading(Player player, double targetHeading, double time) {
+		double relativeHeading = targetHeading - player.getHeadingRadians();
+		if (relativeHeading == 0) {
+			player.rotateComplete();
+			player.setRotationSpeed(0);
+			player.resetDestinationHeading();
+			return;
+		}
+
+		if (relativeHeading < 0) {
+			relativeHeading += 2* Math.PI;
+		}
+		
+		if (relativeHeading > Math.PI) {
+			player.setRotationSpeed(Soar2D.config.getRotateSpeed() * -1 * time);
+			player.setDestinationHeading(targetHeading);
+		}
+		else {
+			player.setRotationSpeed(Soar2D.config.getRotateSpeed() * time);
+			player.setDestinationHeading(targetHeading);
+		}
+		
+	}
+	
 	private void bookUpdate() {
-		final float time = (float)Soar2D.config.getASyncDelay() / 1000.0f;
+		final double time = (float)Soar2D.config.getCycleTimeSlice() / 1000.0f;
+		totalTime += time;
+		logger.fine("Total time: " + totalTime);
 
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
 			Player player = iter.next();
-			MoveInfo move = getAndStoreMove(player);			
+
+			// get each move
+			MoveInfo move = getAndStoreMove(player);
+			// null move indicates shutdown
 			if (move == null) {
 				return;
 			}
 			
+			logger.finer("Processing move: " + player.getName());
+			
+			// update rotation speed
 			if (move.rotate) {
-				final float rotateSpeed = Soar2D.config.getRotateSpeed();
-				
 				if (move.rotateDirection.equals(Names.kRotateLeft)) {
-					player.setHeadingRadians(player.getHeadingRadians() - (rotateSpeed * time));
-				} else if (move.rotateDirection.equals(Names.kRotateRight)) {
-					player.setHeadingRadians(player.getHeadingRadians() + (rotateSpeed * time));
+					logger.finer("Rotate: left");
+					player.setRotationSpeed(Soar2D.config.getRotateSpeed() * -1 * time);
+				} 
+				else if (move.rotateDirection.equals(Names.kRotateRight)) {
+					logger.finer("Rotate: right");
+					player.setRotationSpeed(Soar2D.config.getRotateSpeed() * time);
+				} 
+				else if (move.rotateDirection.equals(Names.kRotateStop)) {
+					logger.finer("Rotate: stop");
+					player.setRotationSpeed(0);
+				}
+				player.resetDestinationHeading();
+			} 
+			else if (move.rotateAbsolute) {
+				while (move.rotateAbsoluteHeading < 0) {
+					logger.finest("Correcting command negative heading");
+					move.rotateAbsoluteHeading += 2 * Math.PI;
+				}
+				move.rotateAbsoluteHeading = fmod(move.rotateAbsoluteHeading, 2 * Math.PI);
+
+				logger.finer("Rotate absolute: " + move.rotateAbsoluteHeading);
+				
+				setRotationAndAbsoluteHeading(player, move.rotateAbsoluteHeading, time);
+			}
+			else if (move.rotateRelative) {
+				double absoluteHeading = player.getHeadingRadians() + move.rotateRelativeAmount;
+				
+				while (absoluteHeading < 0) {
+					logger.finest("Correcting command negative heading");
+					absoluteHeading += 2 * Math.PI;
+				}
+				absoluteHeading = fmod(absoluteHeading, 2 * Math.PI);
+				logger.finer("Rotate relative: " + move.rotateRelativeAmount + ", absolute: " + absoluteHeading);
+				setRotationAndAbsoluteHeading(player, absoluteHeading, time);
+			}
+
+			// update heading if we rotate
+			if (player.getRotationSpeed() != 0) {
+				
+				double heading = player.getHeadingRadians() + player.getRotationSpeed();
+				
+				if (heading < 0) {
+					logger.finest("Correcting computed negative heading");
+					heading += 2 * Math.PI;
+				} 
+				heading = fmod(heading, 2 * Math.PI);
+
+				logger.finer("Rotating, computed heading: " + heading);
+				
+				if (player.hasDestinationHeading()) {
+					double relativeHeading = player.getDestinationHeading() - heading;
+					if (relativeHeading == 0) {
+						logger.fine("Destination heading reached: " + heading);
+						player.rotateComplete();
+						player.resetDestinationHeading();
+					} else {
+
+						if (relativeHeading < 0) {
+							relativeHeading += 2* Math.PI;
+						}
+
+						if (player.getRotationSpeed() < 0) {
+							if (relativeHeading < Math.PI) {
+								heading = player.getDestinationHeading();
+								logger.fine("Destination heading reached: " + heading);
+								player.rotateComplete();
+								player.resetDestinationHeading();
+								player.setRotationSpeed(0);
+							} else {
+								logger.finer("Destination heading pending");
+							}
+						}
+						else if (player.getRotationSpeed() > 0) {
+							if (relativeHeading > Math.PI) {
+								logger.fine("Destination heading reached: " + heading);
+								heading = player.getDestinationHeading();
+								player.rotateComplete();
+								player.resetDestinationHeading();
+								player.setRotationSpeed(0);
+							} else {
+								logger.finer("Destination heading pending");
+							}
+						}
+					}
+				}
+				player.setHeadingRadians(heading);
+			}
+			
+			// update speed
+			if (move.forward && move.backward) {
+				logger.finer("Move: stop");
+				player.setSpeed(0);
+			} 
+			else if (move.forward) {
+				logger.finer("Move: forward");
+				player.setSpeed(Soar2D.config.getSpeed());
+			}
+			else if (move.backward) {
+				logger.finer("Move: backward");
+				player.setSpeed(Soar2D.config.getSpeed() * -1);
+			}
+			
+			// reset collision sensor
+			player.setCollisionX(false);
+			player.setCollisionY(false);
+
+			// if we have velocity, process move
+			if (player.getSpeed() != 0) {
+				bookMovePlayer(player, time);
+			} else {
+				player.setVelocity(new Point2D.Double(0,0));
+			}
+			
+			if (move.get) {
+				logger.finer("Move: get");
+				CellObject block = map.getObject(move.getLocation, "mblock");
+				if (block == null || player.isCarrying()) {
+					if (block == null) {
+						logger.warning("get command failed, no object");
+					} else {
+						logger.warning("get command failed, full");
+					}
+					move.get = false;
+					player.updateGetStatus(false);
+				} else {
+					// FIXME: store get info for processing later
+					player.carry(map.getAllWithProperty(move.getLocation, "mblock").get(0));
+					map.removeObject(move.getLocation, "mblock");
+					player.updateGetStatus(true);
 				}
 			}
 			
-			if (!move.forward && !move.backward) {
-				continue;
-			}
-			
-			float rate = Soar2D.config.getSpeed() * time;
-			if (move.forward && move.backward) {
-				rate = 0;
-			} else if (move.backward) {
-				rate *= -1;
-			}
-			final int cellSize = Soar2D.config.getBookCellSize();
-			final float heading = player.getHeadingRadians();
-			
-			Point oldLocation = locations.get(player.getName());
-			Point newLocation = new Point(oldLocation);
-
-			map.setPlayer(oldLocation, null);
-
-			Point2D.Float oldFloatLocation = floatLocations.get(player.getName());
-			Point2D.Float newFloatLocation = new Point2D.Float(oldFloatLocation.x, oldFloatLocation.y);
-
-			/*
-			 * x-axis: cosine
-			 * y-axis: sine
-			 * 
-			 * east:    0   0
-			 * south:  90  pi/2
-			 * west:  180  pi
-			 * north: 270 3pi/2
-			 */
-			
-			newFloatLocation.x += Math.cos(heading) * rate;
-			newFloatLocation.y += Math.sin(heading) * rate;
-			
-			newLocation.x = (int)newFloatLocation.x / cellSize;
-			newLocation.y = (int)newFloatLocation.y / cellSize;
-			
-			if (map.getAllWithProperty(newLocation, Names.kPropertyBlock).size() > 0) {
-//				System.out.println("blocked");
-				move.forward = false;
-				map.setPlayer(oldLocation, player);
-
-			} else {
+			if (move.drop) {
+				Point2D.Double dropFloatLocation = new Point2D.Double(floatLocations.get(player.getName()).x, floatLocations.get(player.getName()).y);
+				dropFloatLocation.x += Soar2D.config.getBookCellSize() * Math.cos(player.getHeadingRadians());
+				dropFloatLocation.y += Soar2D.config.getBookCellSize() * Math.sin(player.getHeadingRadians());
+				java.awt.Point dropLocation = new java.awt.Point((int)dropFloatLocation.x / Soar2D.config.getBookCellSize(), (int)dropFloatLocation.y / Soar2D.config.getBookCellSize());
 				
-//				System.out.println("       heading: " + heading);
-//				System.out.println("float location: " + newFloatLocation);
-//				System.out.println("      location: " + newLocation);
+				if (dropLocation.equals(locations.get(player.getName()))) {
+					dropFloatLocation.x += (Soar2D.config.getBookCellSize() / 2) * Math.cos(player.getHeadingRadians());
+					dropFloatLocation.y += (Soar2D.config.getBookCellSize() / 2) * Math.sin(player.getHeadingRadians());
+					dropLocation = new java.awt.Point((int)dropFloatLocation.x / Soar2D.config.getBookCellSize(), (int)dropFloatLocation.y / Soar2D.config.getBookCellSize());
+					assert !dropLocation.equals(locations.get(player.getName()));
+				}
 
-				floatLocations.put(player.getName(), newFloatLocation);
-				locations.put(player.getName(), newLocation);
+				logger.finer("Move: drop " + dropLocation.x + "," + dropLocation.y);
+				
+				if (checkBlocked(dropLocation)) {
+					logger.warning("drop command failed, blocked");
+					move.drop = false;
+					player.updateDropStatus(false);
+				} else {
+					// FIXME: store drop info for processing later
+					map.addObjectToCell(dropLocation, player.drop());
+					player.updateDropStatus(true);
+				}
 			}
+			
 		}
 		
-		iter = players.iterator();
-		while (iter.hasNext()) {
-			Player player = iter.next();
-			MoveInfo lastMove = lastMoves.get(player.getName());
-			Point location = locations.get(player.getName());
-			
-			if (lastMove.forward) {
-				map.setPlayer(location, player);
-			}
-		}
-
 		handleBookCollisions(findCollisions());
 		
 		updatePlayers(false);
 	}
 	
-	private Point2D.Float defaultFloatLocation(Point location) {
-		Point2D.Float floatLocation = new Point2D.Float();
+	private Point2D.Double defaultFloatLocation(Point location) {
+		Point2D.Double floatLocation = new Point2D.Double();
 		final int cellSize = Soar2D.config.getBookCellSize();
 		
 		// default to center of square
@@ -1392,7 +1669,7 @@ public class World {
 		}
 		return move;
 	}
-		
+	
 	private void getTankMoves() {
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
@@ -1522,6 +1799,8 @@ public class World {
 		missileID = 0;
 		missileReset = 0;
 		restartAfterUpdate = false;
+		totalTime = 0;
+		//System.out.println(map);
 	}
 	
 	public int getWorldCount() {
@@ -1536,7 +1815,7 @@ public class World {
 		return locations.get(player.getName());
 	}
 	
-	public Point2D.Float getFloatLocation(Player player) {
+	public Point2D.Double getFloatLocation(Player player) {
 		return floatLocations.get(player.getName());
 	}
 
@@ -1558,5 +1837,73 @@ public class World {
 
 	public Player getPlayer(String playerName) {
 		return playersMap.get(playerName);
+	}
+
+	public void interruped(String name) {
+		if (Soar2D.wm.using()) {
+			return;
+		}
+		if (players.size() <= 1) {
+			return;
+		}
+		Iterator<Player> iter = players.iterator();
+		Player thePlayer = null;
+		Integer lowestScore = null;
+		while (iter.hasNext()) {
+			Player player = iter.next();
+			if (player.getName().equals(name)) {
+				thePlayer = player;
+			} else {
+				if (lowestScore == null) {
+					lowestScore = new Integer(player.getPoints());
+				} else {
+					lowestScore = Math.min(lowestScore, player.getPoints());
+				}
+			}
+			
+		}
+		if ((thePlayer == null) || (lowestScore == null)) {
+			// shouldn't happen if name is valid
+			return;
+		}
+		
+		lowestScore -= 1;
+		thePlayer.setPoints(lowestScore, "interrupted");
+		this.stopAndDumpStats("interrupted", getSortedScores());
+	}
+	
+	public double angleOff(Player player, Point2D.Double target) {
+		Point2D.Double playerVector = new Point2D.Double();
+		playerVector.x = getFloatLocation(player).x;
+		playerVector.y = getFloatLocation(player).y;
+		
+		Point2D.Double targetVector = new Point2D.Double();
+		targetVector.x = target.x;
+		targetVector.y = target.y;
+		
+		// translate target so i'm the origin
+		targetVector.x -= playerVector.x;
+		targetVector.y -= playerVector.y;
+		
+		// make target unit vector
+		double targetVectorLength = Math.sqrt(Math.pow(targetVector.x, 2) + Math.pow(targetVector.y, 2));
+		if (targetVectorLength <= 0) {
+			assert false;
+		}
+		targetVector.x /= targetVectorLength;
+		targetVector.y /= targetVectorLength;
+		
+		// make player facing vector
+		playerVector.x = Math.cos(player.getHeadingRadians());
+		playerVector.y = Math.sin(player.getHeadingRadians());
+		
+		double dotProduct = (targetVector.x * playerVector.x) + (targetVector.y * playerVector.y);
+		double crossProduct = (targetVector.x * playerVector.y) - (targetVector.y * playerVector.x);
+		
+		// calculate inverse cosine of that for angle
+		if (crossProduct < 0) {
+			return Math.acos(dotProduct);
+		}
+		return Math.acos(dotProduct) * -1;
 	}
 }

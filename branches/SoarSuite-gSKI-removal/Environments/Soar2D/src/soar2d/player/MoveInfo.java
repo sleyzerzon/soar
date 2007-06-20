@@ -23,7 +23,7 @@ public class MoveInfo {
 	public boolean dontEat = false;	// don't eat food
 	
 	// tanksoar + book
-	public boolean rotate = false;	// rotate tank
+	public boolean rotate = false;	// rotate
 	public String rotateDirection;	// Which way to rotate, must be valid if rotate true
 	
 	// tanksoar
@@ -38,6 +38,15 @@ public class MoveInfo {
 	// book
 	public boolean forward = false;	// move forward
 	public boolean backward = false;	// move backward
+	public boolean rotateAbsolute = false;	// rotate to a heading
+	public double rotateAbsoluteHeading;	// what heading to stop at
+	public boolean rotateRelative = false;	// rotate tank
+	public double rotateRelativeAmount;		// how far to rotate
+	public boolean get = false;
+	public java.awt.Point getLocation = null;
+	public int getId;
+	public boolean drop = false;
+	public int dropId;
 	
 	public MoveInfo() {
 	}
@@ -95,6 +104,18 @@ public class MoveInfo {
 			}
 			if (rotate) {
 				output += "(" + Names.kRotateID + ": " + rotateDirection + ")";			
+			}
+			if (rotateAbsolute) {
+				output += "(" + Names.kRotateAbsoluteID + ": " + rotateAbsoluteHeading + ")";			
+			}
+			if (rotateRelative) {
+				output += "(" + Names.kRotateRelativeID + ": " + rotateRelativeAmount + ")";			
+			}
+			if (get) {
+				output += "(" + Names.kGetID + ": " + getId + ": " + getLocation.x + "," + getLocation.y + ")";
+			}
+			if (drop) {
+				output += "(" + Names.kDropID + ": " + dropId + ")";
 			}
 			break;
 		}

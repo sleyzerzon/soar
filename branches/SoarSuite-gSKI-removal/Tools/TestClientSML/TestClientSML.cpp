@@ -2183,4 +2183,7 @@ int main(int argc, char* argv[])
 		char* str = gets(line) ;
 		unused(str);
 	}
+
+	if (!success) return 1;
+	return 0;
 }

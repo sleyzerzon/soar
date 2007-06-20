@@ -30,6 +30,7 @@ public class Configuration {
 		// meta
 		this.setType(config.simType);
 		this.map = config.map.getAbsoluteFile();
+		this.port = config.port;
 
 		// general
 		this.random = config.random;
@@ -67,6 +68,8 @@ public class Configuration {
 		this.coloredRooms = config.coloredRooms;
 		this.speed = config.speed;
 		this.bookCellSize = config.bookCellSize;
+		this.cycleTimeSlice = config.cycleTimeSlice;
+		this.visionCone = config.visionCone;
 		
 		// logging
 		this.logLevel = Level.parse(config.logLevel.getName());
@@ -86,7 +89,9 @@ public class Configuration {
 		this.terminalUnopenedBoxes = config.terminalUnopenedBoxes;
 		this.terminalAgentCommand = config.terminalAgentCommand;
 		this.terminalMaxUpdates = config.terminalMaxUpdates;
+		this.terminalMaxUpdatesContinue = config.terminalMaxUpdatesContinue;
 		this.terminalWinningScore = config.terminalWinningScore;
+		this.terminalWinningScoreContinue = config.terminalWinningScoreContinue;
 		
 		// clients
 		this.clients = new ArrayList<ClientConfig>(config.clients);
@@ -256,20 +261,35 @@ public class Configuration {
 		return this.map;
 	}
 	
+	private final int kDefaultPort = 12121;
+	private int port = kDefaultPort; // use default
+	private static final String kTagPort = "port";
+	public void setPort(int port) {
+		if (port < 0) {
+			return;
+		} else if (port > 65535) {
+			return;
+		}
+		this.port = port;
+	}
+	public int getPort() {
+		return this.port;
+	}
+	
 	// random execution
 	private boolean random = true; 	// If true, use random numbers (don't seed generators)
 	private int randomSeed = 0;		// if random is false, this is the seed
 	private static final String kTagSeed = "seed";
 	public void setRandomSeed(int seed) {
-		this.random = true;
+		this.random = false;
 		this.randomSeed = seed;
 	}
 	public void unsetRandomSeed() {
-		this.random = false;
+		this.random = true;
 		this.randomSeed = 0;
 	}
 	public boolean hasRandomSeed() {
-		return this.random;
+		return !this.random;
 	}
 	public int getRandomSeed() {
 		return this.randomSeed;
@@ -333,6 +353,10 @@ public class Configuration {
 		general.addContent(new Element(kTagGame).setText(gameText));
 		
 		general.addContent(new Element(kTagMap).setText(this.map.getPath()));
+		
+		if (this.port != kDefaultPort) {
+			general.addContent(new Element(kTagPort).setText(Integer.toString(this.port)));
+		}
 		
 		if (this.hasRandomSeed()) {
 			general.addContent(new Element(kTagSeed).setText(Integer.toString(this.getRandomSeed())));
@@ -398,13 +422,20 @@ public class Configuration {
 		while (iter.hasNext()) {
 			Element child = (Element)iter.next();
 			
-			if (child.getName().equalsIgnoreCase(kTagSeed)) {
+			if (child.getName().equalsIgnoreCase(kTagPort)) {
+				try {
+					setPort(Integer.parseInt(child.getTextTrim()));
+				} catch (NumberFormatException e) {
+					throw new LoadError("Error parsing port.");
+				}
+				
+			} else if (child.getName().equalsIgnoreCase(kTagSeed)) {
 				try {
 					setRandomSeed(Integer.parseInt(child.getTextTrim()));
 				} catch (NumberFormatException e) {
 					throw new LoadError("Error parsing seed.");
 				}
-				
+					
 			} else if (child.getName().equalsIgnoreCase(kTagRemote)) {
 				setRemote(true);
 				
@@ -471,6 +502,8 @@ public class Configuration {
 			book.addContent(new Element(kTagSpeed).setText(Integer.toString(this.getSpeed())));
 			book.addContent(new Element(kTagRotateSpeed).setText(Float.toString(this.getRotateSpeed())));
 			book.addContent(new Element(kTagBookCellSize).setText(Integer.toString(this.getBookCellSize())));
+			book.addContent(new Element(kTagCycleTimeSlice).setText(Integer.toString(this.getCycleTimeSlice())));
+			book.addContent(new Element(kTagVisionCone).setText(Double.toString(this.getVisionCone())));
 			rules.addContent(book);
 			break;
 		}
@@ -883,6 +916,24 @@ public class Configuration {
 		this.bookCellSize = bookCellSize;
 	}
 	
+	private static final String kTagCycleTimeSlice = "cycle-time-slice";
+	private int cycleTimeSlice = 50;
+	public int getCycleTimeSlice() {
+		return this.cycleTimeSlice;
+	}
+	public void setCycleTimeSlice(int cycleTimeSlice) {
+		this.cycleTimeSlice = cycleTimeSlice;
+	}
+	
+	private static final String kTagVisionCone = "vision-cone";
+	private double visionCone = (3 * Math.PI) / 4;
+	public double getVisionCone() {
+		return this.visionCone;
+	}
+	public void setVisionCone(double visionCone) {
+		this.visionCone = visionCone;
+	}
+	
 	private void book(Element book) throws LoadError {
 		List children = book.getChildren();
 		Iterator iter = children.iterator();
@@ -911,6 +962,20 @@ public class Configuration {
 					this.setBookCellSize(Integer.parseInt(child.getTextTrim()));
 				} catch (NumberFormatException e) {
 					throw new LoadError("Error parsing " + kTagBookCellSize);
+				}
+				
+			} else if (child.getName().equalsIgnoreCase(kTagCycleTimeSlice)) {
+				try {
+					this.setCycleTimeSlice(Integer.parseInt(child.getTextTrim()));
+				} catch (NumberFormatException e) {
+					throw new LoadError("Error parsing " + kTagCycleTimeSlice);
+				}
+				
+			} else if (child.getName().equalsIgnoreCase(kTagVisionCone)) {
+				try {
+					this.setVisionCone(Double.parseDouble(child.getTextTrim()));
+				} catch (NumberFormatException e) {
+					throw new LoadError("Error parsing " + kTagVisionCone);
 				}
 				
 			} else {
@@ -1335,6 +1400,14 @@ public class Configuration {
 	public int getTerminalWinningScore() {
 		return this.terminalWinningScore;
 	}
+	private boolean terminalWinningScoreContinue = false;	
+	private static final String kTagWinningScoreContinue = "continue";
+	public void setTerminalWinningScoreContinue(boolean setting) {
+		this.terminalWinningScoreContinue = setting;
+	}
+	public boolean getTerminalWinningScoreContinue() {
+		return this.terminalWinningScoreContinue;
+	}
 	
 	private int terminalMaxRuns = 0;				// 0 means no limit 
 	private static final String kTagMaxRuns = "max-runs";
@@ -1363,7 +1436,11 @@ public class Configuration {
 		}
 		
 		if (this.getTerminalWinningScore() > 0) {
-			terminals.addContent(new Element(kTagWinningScore).setText(Integer.toString(this.getTerminalWinningScore())));
+			Element winningScore = new Element(kTagWinningScore).setText(Integer.toString(this.getTerminalWinningScore()));
+			if (this.getTerminalWinningScoreContinue()) {
+				winningScore.addContent(new Element(kTagWinningScoreContinue));
+			}
+			terminals.addContent(winningScore);
 		}
 		
 		if (this.getTerminalFoodRemaining()) {
@@ -1421,6 +1498,10 @@ public class Configuration {
 					this.setTerminalWinningScore(Integer.parseInt(child.getTextTrim()));
 				} catch (NumberFormatException e) {
 					throw new LoadError("Error parsing winning score");
+				}
+				Element cont = child.getChild(kTagWinningScoreContinue);
+				if (cont != null) {
+					this.setTerminalWinningScoreContinue(true);
 				}
 
 			} else if (child.getName().equalsIgnoreCase(kTagFoodRemaining)) {

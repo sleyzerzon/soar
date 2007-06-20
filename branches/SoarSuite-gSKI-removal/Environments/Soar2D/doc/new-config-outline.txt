@@ -4,6 +4,8 @@
 			enum { tanksoar, eaters, book }
 		<map>
 			string filename
+		?<port>
+			int port (what ip port to listen on)
 		?<seed>
 			int seed
 		?<remote>
@@ -57,9 +59,15 @@
 			?<book>
 				?<colored-rooms>
 				?<speed>
-					int pixelsPerSec
-				?<book-cell-size>
-					int pixels
+					int pixelsPerSec default: 16
+				?<book-cell-size> 
+					int pixels default: 16
+				?<cycle-time-slice>
+					int milliseconds default: 50
+				?<vision-cone>
+					float radians (max visible angle-off is half of this)
+				?<rotate-speed>
+					float radians per sec default: pi / 4
 	?<logging>
 		?<level>
 			enum { severe, warning, info, fine, finer, finest }
@@ -97,11 +105,12 @@
 	?<terminals>
 		?<max-updates>
 			int updateCount
-			?<continue>
+			?<continue>			# unnecessary!?
 		?<agent-command>
 		?<points-remaining>
 		?<winning-score>
 			int theScore
+			?<continue>			# unnecessary!?
 		?<food-remaining>
 			?<continue>
 				int maxRuns		# note that this and max-runs's maxRuns are independent

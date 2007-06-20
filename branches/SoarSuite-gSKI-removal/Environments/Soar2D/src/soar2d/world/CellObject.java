@@ -89,11 +89,11 @@ public class CellObject {
 	boolean flyMissileUpdate = false;
 	boolean lingerUpdate = false;
 	
-	private static int idCount = 0;
-	private Integer id;
+	private static long idCount = 0;
+	private Long id;
 	
 	CellObject(CellObject cellObject) {
-		this.id = new Integer(idCount++);
+		this.id = new Long(idCount++);
 		this.properties = new HashMap<String, String>(cellObject.properties);
 		this.propertiesApply = new HashMap<String, String>(cellObject.propertiesApply);
 		this.name = new String(cellObject.name);
@@ -113,12 +113,8 @@ public class CellObject {
 	}
 	
 	CellObject(String name) {
-		this.id = new Integer(idCount++);
+		this.id = new Long(idCount++);
 		this.name = name;
-	}
-	
-	public Integer getId() {
-		return id;
 	}
 	
 	public boolean equals(CellObject other) {
@@ -299,8 +295,7 @@ public class CellObject {
 					// reward positively
 					player.adjustPoints(rewardApply, "positive reward");
 				} else {
-					// reward negatively
-					player.adjustPoints(rewardApply / 10, "small reward (wrong open code)");
+                    player.adjustPoints(1, "small reward (wrong open code)");
 				}
 			} else {
 				// I'm  not the positive box, set resetApply false
@@ -424,5 +419,10 @@ public class CellObject {
 			return Float.parseFloat((String)properties.get(name));
 		}
 		return kDefaultPropertyFloat;
+	}
+
+	public void removeProperty(String property) {
+		String value = properties.remove(property);
+		assert value != null;
 	}
 }

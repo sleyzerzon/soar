@@ -1,138 +1,301 @@
-67
+143
 SOAR_ID 0
 SOAR_ID 1
 SOAR_ID 2
 SOAR_ID 3
 ENUMERATION 4 1 state
 ENUMERATION 5 1 nil
-INTEGER_RANGE 6 0 2147483647
-INTEGER_RANGE 7 0 2147483647
-FLOAT_RANGE 8 0.0 Infinity
-FLOAT_RANGE 9 0.0 Infinity
-INTEGER_RANGE 10 0 359
-INTEGER_RANGE 11 0 2147483647
-FLOAT_RANGE 12 0.0 0.9990000128746033
-INTEGER_RANGE 13 -1 2147483647
+SOAR_ID 6
+ENUMERATION 7 2 complete error
+SOAR_ID 8
+ENUMERATION 9 3 backward forward stop
+ENUMERATION 10 2 complete error
+ENUMERATION 11 3 left right stop
+SOAR_ID 12
+STRING 13
 SOAR_ID 14
-INTEGER_RANGE 15 0 2147483647
+ENUMERATION 15 1 wander
 SOAR_ID 16
-INTEGER_RANGE 17 0 2147483647
-ENUMERATION 18 4 east north south west
-SOAR_ID 19
-INTEGER_RANGE 20 0 2147483647
-INTEGER_RANGE 21 0 2147483647
-SOAR_ID 22
-INTEGER_RANGE 23 0 2147483647
-INTEGER_RANGE 24 0 2147483647
-SOAR_ID 25
+ENUMERATION 17 1 state
+ENUMERATION 18 1 wander
+ENUMERATION 19 2 operator state
+ENUMERATION 20 2 multiple none
+ENUMERATION 21 2 no-change tie
+ENUMERATION 22 1 book
+SOAR_ID 23
+ENUMERATION 24 1 wait
+ENUMERATION 25 1 elaboration
 SOAR_ID 26
-INTEGER_RANGE 27 0 2147483647
-SOAR_ID 28
-INTEGER_RANGE 29 0 2147483647
-INTEGER_RANGE 30 0 2147483647
-SOAR_ID 31
-INTEGER_RANGE 32 0 2147483647
+SOAR_ID 27
+FLOAT_RANGE 28 -Infinity Infinity
+SOAR_ID 29
+SOAR_ID 30
+INTEGER_RANGE 31 0 2147483647
+SOAR_ID 32
 INTEGER_RANGE 33 0 2147483647
-SOAR_ID 34
-ENUMERATION 35 2 complete error
-SOAR_ID 36
-ENUMERATION 37 3 backward forward none
-ENUMERATION 38 2 complete error
-ENUMERATION 39 2 left right
-SOAR_ID 40
-STRING 41
-SOAR_ID 42
-ENUMERATION 43 1 wander
+INTEGER_RANGE 34 0 2147483647
+SOAR_ID 35
+INTEGER_RANGE 36 0 2147483647
+INTEGER_RANGE 37 0 2147483647
+SOAR_ID 38
+FLOAT_RANGE 39 0.0 Infinity
+FLOAT_RANGE 40 0.0 Infinity
+FLOAT_RANGE 41 -Infinity Infinity
+ENUMERATION 42 4 east north south west
+SOAR_ID 43
 SOAR_ID 44
-ENUMERATION 45 1 state
-ENUMERATION 46 1 wander
-ENUMERATION 47 1 move
-SOAR_ID 48
-ENUMERATION 49 2 operator state
-ENUMERATION 50 2 multiple none
-ENUMERATION 51 2 no-change tie
-ENUMERATION 52 1 book
-SOAR_ID 53
-ENUMERATION 54 1 wait
-ENUMERATION 55 1 elaboration
+FLOAT_RANGE 45 -Infinity Infinity
+FLOAT_RANGE 46 0.0 Infinity
+FLOAT_RANGE 47 0.0 Infinity
+INTEGER_RANGE 48 0 2147483647
+SOAR_ID 49
+INTEGER_RANGE 50 0 2147483647
+INTEGER_RANGE 51 0 2147483647
+SOAR_ID 52
+INTEGER_RANGE 53 0 2147483647
+INTEGER_RANGE 54 0 2147483647
+INTEGER_RANGE 55 0 2147483647
 SOAR_ID 56
-SOAR_ID 57
-SOAR_ID 58
-SOAR_ID 59
-ENUMERATION 60 1 forward
+ENUMERATION 57 2 false true
+ENUMERATION 58 2 false true
+INTEGER_RANGE 59 0 2147483647
+INTEGER_RANGE 60 -2147483648 2147483647
 SOAR_ID 61
-SOAR_ID 62
-INTEGER_RANGE 63 0 359
-INTEGER_RANGE 64 0 359
-FLOAT_RANGE 65 0.0 Infinity
-FLOAT_RANGE 66 0.0 Infinity
-69
-0 attribute 49
-0 choices 50
-0 impasse 51
+FLOAT_RANGE 62 0.0 Infinity
+FLOAT_RANGE 63 0.0 Infinity
+INTEGER_RANGE 64 0 2147483647
+INTEGER_RANGE 65 0 2147483647
+FLOAT_RANGE 66 0.0 1.0
+FLOAT_RANGE 67 0.0 Infinity
+SOAR_ID 68
+FLOAT_RANGE 69 0.0 Infinity
+FLOAT_RANGE 70 -Infinity Infinity
+FLOAT_RANGE 71 -Infinity Infinity
+SOAR_ID 72
+SOAR_ID 73
+FLOAT_RANGE 74 -Infinity Infinity
+FLOAT_RANGE 75 -Infinity Infinity
+ENUMERATION 76 2 complete error
+ENUMERATION 77 2 complete error
+ENUMERATION 78 2 complete error
+SOAR_ID 79
+ENUMERATION 80 1 state
+ENUMERATION 81 1 move-to-gateway
+ENUMERATION 82 1 rotate
+SOAR_ID 83
+ENUMERATION 84 1 move
+SOAR_ID 85
+SOAR_ID 86
+ENUMERATION 87 1 state
+ENUMERATION 88 1 move-block
+ENUMERATION 89 1 get
+SOAR_ID 90
+ENUMERATION 91 1 blocked
+SOAR_ID 92
+INTEGER_RANGE 93 -2147483648 2147483647
+ENUMERATION 94 4 east north south west
+SOAR_ID 95
+INTEGER_RANGE 96 -2147483648 2147483647
+ENUMERATION 97 1 block
+SOAR_ID 98
+FLOAT_RANGE 99 -Infinity Infinity
+INTEGER_RANGE 100 -2147483648 2147483647
+INTEGER_RANGE 101 -2147483648 2147483647
+ENUMERATION 102 1 block
+SOAR_ID 103
+FLOAT_RANGE 104 -Infinity Infinity
+ENUMERATION 105 2 no yes
+FLOAT_RANGE 106 -Infinity Infinity
+FLOAT_RANGE 107 -Infinity Infinity
+INTEGER_RANGE 108 -2147483648 2147483647
+INTEGER_RANGE 109 -2147483648 2147483647
+SOAR_ID 110
+ENUMERATION 111 1 move-to-gateway
+SOAR_ID 112
+ENUMERATION 113 1 move-block
+INTEGER_RANGE 114 -2147483648 2147483647
+INTEGER_RANGE 115 -2147483648 2147483647
+INTEGER_RANGE 116 -2147483648 2147483647
+SOAR_ID 117
+SOAR_ID 118
+SOAR_ID 119
+ENUMERATION 120 1 true
+ENUMERATION 121 1 true
+ENUMERATION 122 1 true
+SOAR_ID 123
+SOAR_ID 124
+ENUMERATION 125 1 nil
+ENUMERATION 126 1 stop
+INTEGER_RANGE 127 -2147483648 2147483647
+INTEGER_RANGE 128 -2147483648 2147483647
+SOAR_ID 129
+ENUMERATION 130 1 drop
+INTEGER_RANGE 131 -2147483648 2147483647
+INTEGER_RANGE 132 -2147483648 2147483647
+SOAR_ID 133
+ENUMERATION 134 1 move
+SOAR_ID 135
+SOAR_ID 136
+ENUMERATION 137 1 rotate
+SOAR_ID 138
+ENUMERATION 139 1 stop
+SOAR_ID 140
+SOAR_ID 141
+FLOAT_RANGE 142 0.0 Infinity
+156
+0 attribute 19
+0 block-id 114
+0 choices 20
+0 impasse 21
 0 io 1
-0 item 56
-0 name 52
-0 operator 42
-0 operator 53
+0 name 22
+0 operator 14
+0 operator 23
+0 operator 110
+0 operator 112
 0 superstate 5
 0 top-state 0
 0 type 4
 1 input-link 2
 1 output-link 3
-2 clock 11
-2 dog 61
-2 floatx 8
-2 floaty 9
-2 heading 10
-2 in 13
-2 mouse 62
-2 random 12
-2 room 14
-2 x 6
-2 y 7
-3 move 34
-3 rotate 36
-3 stop-sim 40
-14 door 25
-14 id 15
-14 wall 16
-16 direction 18
-16 id 17
-16 left 19
-16 right 22
-19 x 20
-19 y 21
-22 x 23
-22 y 24
-25 left 28
-25 right 31
-25 to 26
-26 id 27
-28 x 29
-28 y 30
-31 x 32
-31 y 33
-34 direction 37
-34 status 35
-36 direction 39
-36 status 38
-40 true 41
-42 actions 3
-42 name 43
-44 name 46
-44 operator 48
-44 superstate 0
-44 top-state 0
-44 type 45
-48 actions 58
-48 name 47
-53 name 54
-53 random 55
-56 name 57
-58 move 59
-59 direction 60
-61 bearing 63
-61 distance 65
-62 bearing 64
-62 distance 66
+2 area-description 29
+2 object 98
+2 self 26
+3 move 6
+3 rotate 8
+3 rotate-absolute 72
+3 rotate-relative 73
+3 stop-sim 12
+6 direction 9
+6 status 7
+8 direction 11
+8 status 10
+12 status 78
+12 true 13
+14 actions 3
+14 name 15
+16 io 1
+16 name 18
+16 operator 133
+16 operator 136
+16 operator 138
+16 superstate 0
+16 top-state 0
+16 type 17
+23 name 24
+23 random 25
+26 angle 27
+26 area 93
+26 carry 95
+26 collision 56
+26 cycle 59
+26 position 61
+26 random 66
+26 score 60
+26 time 67
+26 velocity 68
+27 yaw 28
+29 gateway 43
+29 wall 30
+30 center 38
+30 direction 42
+30 id 31
+30 left 32
+30 right 35
+32 col 33
+32 row 34
+35 col 37
+35 row 36
+38 angle-off 41
+38 x 39
+38 y 40
+43 center 44
+43 direction 94
+43 id 48
+43 left 49
+43 right 52
+43 to 55
+44 angle-off 45
+44 range 142
+44 x 46
+44 y 47
+49 col 50
+49 row 51
+52 col 53
+52 row 54
+56 x 58
+56 y 57
+61 col 65
+61 row 64
+61 x 62
+61 y 63
+68 speed 69
+68 x 70
+68 y 71
+72 status 76
+72 yaw 74
+73 amount 75
+73 status 77
+79 gateway 43
+79 io 1
+79 moving 121
+79 name 81
+79 need-to-turn 120
+79 operator 83
+79 operator 85
+79 operator 92
+79 rotating 122
+79 superstate 125
+79 top-state 0
+79 type 80
+83 actions 124
+83 name 82
+85 actions 123
+85 name 84
+86 block-id 127
+86 io 1
+86 name 88
+86 operator 90
+86 operator 129
+86 superstate 0
+86 top-state 0
+86 type 87
+90 actions 117
+90 name 89
+92 block-id 132
+92 name 91
+95 id 96
+95 type 97
+98 angle-off 99
+98 area 100
+98 id 101
+98 position 103
+98 range 104
+98 type 102
+98 visible 105
+103 col 109
+103 row 108
+103 x 106
+103 y 107
+110 gateway 116
+110 name 111
+112 block-id 115
+112 name 113
+117 get 118
+117 move 119
+117 rotate-relative 73
+118 id 128
+119 direction 126
+123 move 6
+124 rotate-relative 73
+129 block-id 131
+129 name 130
+133 actions 135
+133 name 134
+135 move 6
+136 actions 141
+136 name 137
+138 actions 140
+138 name 139
+140 move 6
+141 rotate 8
