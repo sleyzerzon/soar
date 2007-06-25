@@ -322,7 +322,7 @@ public:
 	virtual double Elapsed() {
 		return 0.0 ;
 	}
-}
+};
 
 OSSpecificTimer* soar_thread::MakeTimer()
 {

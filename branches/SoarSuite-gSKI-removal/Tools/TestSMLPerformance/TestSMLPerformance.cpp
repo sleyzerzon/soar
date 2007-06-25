@@ -30,7 +30,7 @@
 #include "sml_Client.h"
 #include "sml_StringOps.h"
 #include "sml_Connection.h"
-#include "thread_OSSpecific.h"
+#include "thread_OSspecific.h"
 
 using namespace sml;
 using namespace std;

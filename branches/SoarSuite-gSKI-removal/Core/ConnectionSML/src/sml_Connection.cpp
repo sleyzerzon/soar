@@ -39,7 +39,7 @@
 #include "sml_TagError.h"
 #include "sml_TagResult.h"
 #include "sock_ClientSocket.h"
-#include "thread_OSSpecific.h"
+#include "thread_OSspecific.h"
 
 #ifdef ENABLE_NAMED_PIPES
 #include "sock_ClientNamedPipe.h"

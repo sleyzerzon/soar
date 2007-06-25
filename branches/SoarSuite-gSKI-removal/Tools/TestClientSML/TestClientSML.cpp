@@ -21,7 +21,7 @@
 #include "sml_Connection.h"
 #include "sml_Client.h"
 
-#include "thread_OSSpecific.h"	// For timer
+#include "thread_OSspecific.h"	// For timer
 
 //#include "../../Profiler/include/simple_timer.h"
 
