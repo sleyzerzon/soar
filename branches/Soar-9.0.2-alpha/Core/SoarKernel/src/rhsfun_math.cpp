@@ -28,6 +28,11 @@
 #include "lexer.h"
 #include "rhsfun.h"
 
+#include <stdlib.h>
+#include <math.h>
+
+
+
 /* --------------------------------------------------------------------
                                 Plus
 

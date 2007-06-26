@@ -8,6 +8,8 @@
 
 //#include "stdafx.h"
 #include "Cluster.h"
+#include <math.h>
+#include <time.h>
 
 
 float ranf(){

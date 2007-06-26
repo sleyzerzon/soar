@@ -37,6 +37,8 @@
 #include "rete.h"
 #include "reinforcement_learning.h"
 
+#include <ctype.h>
+
 /* comment out the following line to supress compile-time o-support
    calculations */
 /* RCHONG: begin 10.11 */

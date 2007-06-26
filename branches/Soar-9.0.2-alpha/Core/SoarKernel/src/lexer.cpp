@@ -70,6 +70,10 @@
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
 
+#include <stdlib.h>
+#include <math.h>
+#include <ctype.h>
+
 //
 // These three should be safe for re-entrancy.  --JNW--
 //
