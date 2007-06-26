@@ -72,12 +72,14 @@ public class Tank  extends WorldEntity implements Agent.RunEventInterface {
     public int m_LastScoreAge = 0;
     public int m_LastMissiles = getMissiles();
     public int m_LastMissilesAge = 0;
+    private int m_CycleCount = 0;
 
 	public Tank(Agent agent, String productions, String color, java.awt.Point initialLocation, String facing, int energy, int health, int missiles, TankSoarWorld world) {
 		super(agent, productions, color, initialLocation);
 		
 		if (m_Agent != null) {
 			m_Agent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_INTERRUPT, this, null);
+			m_Agent.RegisterForRunEvent(smlRunEventId.smlEVENT_AFTER_OUTPUT_PHASE, this, null);
 		}
 
 		m_World = world;
@@ -129,15 +131,27 @@ public class Tank  extends WorldEntity implements Agent.RunEventInterface {
 	}
 	
 	
-	public void runEventHandler(int eventID, Object data, Agent agent, int phase) {
-		if (!stopping) {
+	public void runEventHandler(int eventID, Object data, Agent agent, int phase)
+    {
+		if ((eventID == smlRunEventId.smlEVENT_AFTER_INTERRUPT.swigValue()) && (!stopping))
+        {
 			logger.warning(getName() + ": agent interrupted");
 			// voigtjr: quick fix to disable snc penalty
 			if (TankSoar.useSNCPenalty) {
 				m_World.handleSNC(this);
 			}
 		}
-	}
+        else if (eventID == smlRunEventId.smlEVENT_AFTER_OUTPUT_PHASE.swigValue())
+        {
+            m_CycleCount ++;
+            if (m_CycleCount >= 500)
+            {
+                agent.ExecuteCommandLine("stats");
+                m_CycleCount = 0;
+            }
+        }//else if
+                 
+	}//runEventHandler
 	
 	public boolean equals(Tank tank) {
 		if (getName().equals(tank.getName())) {

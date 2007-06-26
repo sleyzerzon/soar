@@ -693,7 +693,9 @@ public class TankSoarWorld extends World implements WorldManager {
 
 		//Added by :AMN: 06 Oct 06
 		//If no missiles have been fired in 100 turns then reset the tanks
-		int youngestAge = 1000;  //Initialize to an unreachably large value
+        int initial_youngest_age = 1000;
+        int max_turns_without_missile = 100; //For virtual sensors: 100000;
+		int youngestAge = initial_youngest_age;  //Initialize to an unreachably large value
 		for (int i = 0; i < m_Tanks.length; ++i) 
 		{
 			if (m_Tanks[i].getMissiles() >= m_Tanks[i].m_LastMissiles)
@@ -711,8 +713,9 @@ public class TankSoarWorld extends World implements WorldManager {
 			m_Tanks[i].m_LastMissiles = m_Tanks[i].getMissiles();
 		}//for
 		
-		//If any of the tanks hasn't fired a missile in 100 turns then reset the tanks
-		if ((youngestAge != 1000) && (youngestAge >= 100))
+		//If any of the tanks hasn't fired a missile in N turns then reset the
+        // tanks (N=max_turns_without_missile)
+		if ((youngestAge != initial_youngest_age) && (youngestAge >= max_turns_without_missile))
 		{
 			for (int i = 0; i < m_Tanks.length; ++i) 
 			{
