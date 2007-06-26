@@ -24,11 +24,14 @@ char const* Commands::kCLICD						= "cd";
 char const* Commands::kCLIChunkNameFormat			= "chunk-name-format";			
 char const* Commands::kCLICLog						= "clog";
 char const* Commands::kCLICommandToFile				= "command-to-file";
+char const* Commands::kCLIDecay                     = "decay";
+
 char const* Commands::kCLIDefaultWMEDepth			= "default-wme-depth";
 char const* Commands::kCLIDirs						= "dirs";
 char const* Commands::kCLIEcho						= "echo";
 char const* Commands::kCLIEchoCommands				= "echo-commands";
 char const* Commands::kCLIEditProduction			= "edit-production";
+char const* Commands::kCLIEpmem                     = "epmem";
 char const* Commands::kCLIExcise					= "excise";
 char const* Commands::kCLIExplainBacktraces			= "explain-backtraces";
 char const* Commands::kCLIFiringCounts				= "firing-counts";

@@ -118,6 +118,19 @@ namespace gSKI
 		 void SetChunkCount(Agent* pIAgent, unsigned long count);
 
 		 void SeedRandomNumberGenerator(unsigned long int* pSeed);
+        
+		 void DecayInit(Agent* pIAgent);
+		 void DecayDeInit(Agent* pIAgent);
+		 void EpmemEnable(Agent* pIAgent);
+		 void EpmemDisable(Agent* pIAgent);
+         void EpmemPrintStatus(Agent* pIAgent);
+         void EpmemPrintMemory(Agent* pIAgent, int mem_id);
+         void EpmemPrintMatchDiagnostic(Agent* pIAgent, int state_num);
+         void EpmemCompareMemories(Agent* pIAgent, int mem1, int mem2);
+         void EpmemCompareCueToMemory(Agent* pIAgent, int state_num, int mem);
+         void EpmemLoadMemories(Agent* pIAgent, char *fn);
+         void EpmemSaveMemories(Agent* pIAgent, char *fn);
+         void EpmemAutoSaveMemories(Agent* pIAgent, char *fn, int freq);
 	  };
    }
 }

@@ -14,6 +14,35 @@
 
 namespace cli {
 
+	enum eDecayOptions {
+        DECAY_REPORT_SETTINGS,
+        DECAY_ON,          
+        DECAY_OFF,         
+        DECAY_ACTIVATION,  
+        DECAY_I_SUPPORT_MODE,
+        DECAY_FORGETTING,  
+        DECAY_WME_CRITERIA,
+        DECAY_PRECISION,   
+        DECAY_LOG,         
+        DECAY_EXPONENT,    
+		DECAY_NUM_OPTIONS, // must be last
+	};
+    
+	enum eEpmemOptions {
+        EPMEM_REPORT_SETTINGS,
+        EPMEM_ON,
+        EPMEM_OFF,
+        EPMEM_PAUSE,
+        EPMEM_PRINT_MEM,
+        EPMEM_PRINT_MATCH_DIAGNOSTIC,
+        EPMEM_COMPARE_MEMS,
+        EPMEM_CUE_COMPARE_MEM,
+        EPMEM_LOAD,
+        EPMEM_SAVE,
+        EPMEM_AUTOSAVE,
+		EPMEM_NUM_OPTIONS, // must be last
+	};
+    
 	enum eExciseOptions {
 		EXCISE_ALL,
 		EXCISE_CHUNKS,

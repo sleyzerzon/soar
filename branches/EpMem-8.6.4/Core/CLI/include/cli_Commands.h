@@ -20,11 +20,13 @@ namespace cli {
 		static char const* kCLIChunkNameFormat;
 		static char const* kCLICLog;
 		static char const* kCLICommandToFile;
+		static char const* kCLIDecay;
 		static char const* kCLIDefaultWMEDepth;
 		static char const* kCLIDirs;
 		static char const* kCLIEcho;
 		static char const* kCLIEchoCommands;
 		static char const* kCLIEditProduction;
+		static char const* kCLIEpmem;
 		static char const* kCLIExcise;
 		static char const* kCLIExplainBacktraces;
 		static char const* kCLIFiringCounts;

@@ -179,6 +179,14 @@
 				RelativePath=".\src\cli_Commands.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\src\cli_decay.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\cli_epmem.cpp"
+				>
+			</File>
 			<Filter
 				Name="Commands"
 				>

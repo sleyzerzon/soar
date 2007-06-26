@@ -36,6 +36,8 @@
 #ifndef WMEM_H
 #define WMEM_H
 
+#include "kernel.h"
+
 #ifdef __cplusplus
 extern "C"
 {

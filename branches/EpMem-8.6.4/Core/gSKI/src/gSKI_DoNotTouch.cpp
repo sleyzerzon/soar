@@ -33,6 +33,7 @@
 #include "soar_rand.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
+#include "epmem.h"
 
 //#include "../../SoarIO/ConnectionSML/include/sock_Debug.h"
 
@@ -2125,6 +2126,13 @@ namespace gSKI
 			insert_at_head_of_dll(pWme->id->id.input_wmes, pWme, next, prev);
 			add_wme_to_wm(pSoarAgent, pWme);
 
+            #ifdef SOAR_WMEM_ACTIVATION
+//			if ((pSoarAgent->sysparams)[WME_DECAY_SYSPARAM]) {
+				
+				decay_update_new_wme(pSoarAgent, pWme, 1);
+//			}
+            #endif //SOAR_WMEM_ACTIVATION
+
 #ifdef USE_CAPTURE_REPLAY
 			// TODO
 #endif // USE_CAPTURE_REPLAY
@@ -2657,5 +2665,114 @@ namespace gSKI
 			}
 			SoarSeedRNG();
 		}
+
+         void TgDWorkArounds::DecayInit(Agent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             decay_init(pSoarAgent);
+         }
+
+         void TgDWorkArounds::DecayDeInit(Agent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             decay_deinit(pSoarAgent);
+         }
+
+         void TgDWorkArounds::EpmemEnable(Agent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_init(pSoarAgent);
+         }
+
+         void TgDWorkArounds::EpmemDisable(Agent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_deinit(pSoarAgent);
+         }
+
+         void TgDWorkArounds::EpmemPrintStatus(Agent* pIAgent)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_status(pSoarAgent);
+         }
+         
+         void TgDWorkArounds::EpmemPrintMemory(Agent* pIAgent, int mem_id)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_memory_by_id(pSoarAgent, mem_id);
+         }
+         
+         void TgDWorkArounds::EpmemPrintMatchDiagnostic(Agent* pIAgent, int state_num)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_match_diagnostic(pSoarAgent, state_num);
+         }
+         
+         void TgDWorkArounds::EpmemCompareMemories(Agent* pIAgent, int mem1, int mem2)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_memory_comparison_by_id(pSoarAgent, mem1, mem2);
+         }
+         
+         void TgDWorkArounds::EpmemCompareCueToMemory(Agent* pIAgent, int state_num, int mem)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_print_cue_comparison(pSoarAgent, state_num, mem);
+         }
+         
+         void TgDWorkArounds::EpmemLoadMemories(Agent* pIAgent, char *fn)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_load_episodic_memory_from_file(pSoarAgent, fn);
+         }
+         
+         void TgDWorkArounds::EpmemSaveMemories(Agent* pIAgent, char *fn)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             epmem_save_episodic_memory_to_file(pSoarAgent, fn);
+         }
+         
+         void TgDWorkArounds::EpmemAutoSaveMemories(Agent* pIAgent, char *fn, int freq)
+         {
+             Agent* pAgent = (Agent*)(pIAgent);
+             agent* pSoarAgent = pAgent->GetSoarAgent();
+
+             if (strlen(fn) > 0)
+             {
+                 strcpy(pSoarAgent->epmem_autosave_filename, fn);
+             }
+             else
+             {
+#ifdef WIN32
+                 sprintf(pSoarAgent->epmem_autosave_filename, "c:\\temp\\%s_epmems.txt", pSoarAgent->name);
+#else
+                 sprintf(pSoarAgent->epmem_autosave_filename, "/tmp/%s_epmems.txt", pSoarAgent->name);
+#endif
+             }
+             pSoarAgent->epmem_save_freq = freq;
+         }
+         
 	}// class
 }// namespace

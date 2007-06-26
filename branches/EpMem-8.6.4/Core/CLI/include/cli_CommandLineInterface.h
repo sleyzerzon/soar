@@ -200,11 +200,13 @@ protected:
 	bool ParseChunkNameFormat(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseCLog(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseCommandToFile(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+    bool ParseDecay(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseDefaultWMEDepth(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseDirs(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseEcho(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseEchoCommands(gSKI::Agent* pAgent, std::vector<std::string>& argv) ;
 	bool ParseEditProduction(gSKI::Agent* pAgent, std::vector<std::string>& argv);
+    bool ParseEpmem(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseExcise(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseExplainBacktraces(gSKI::Agent* pAgent, std::vector<std::string>& argv);
 	bool ParseFiringCounts(gSKI::Agent* pAgent, std::vector<std::string>& argv);
@@ -312,6 +314,12 @@ protected:
 	bool DoCLog(gSKI::Agent* pAgent, const eLogMode mode = LOG_QUERY, const std::string* pFilename = 0, const std::string* pToAdd = 0, bool silent = false);
 
 	/*************************************************************
+	* @brief decay command
+	* @param pAgent The pointer to the gSKI agent interface
+	*************************************************************/
+	bool DoDecay(gSKI::Agent* pAgent, enum eDecayOptions setting, long arg);
+
+	/*************************************************************
 	* @brief default-wme-depth command
 	* @param pAgent The pointer to the gSKI agent interface
 	* @param pDepth The pointer to the new wme depth, a positive integer.  
@@ -343,6 +351,13 @@ protected:
 	* @param productionName Production to edit
 	*************************************************************/
 	bool DoEditProduction(std::string productionName);
+
+	/*************************************************************
+	* @brief epmem command
+	* @param pAgent The pointer to the gSKI agent interface
+	*************************************************************/
+	bool DoEpmem(gSKI::Agent* pAgent, enum eEpmemOptions setting,
+                 long arg1, long arg2);
 
 	/*************************************************************
 	* @brief excise command
@@ -759,10 +774,20 @@ protected:
 
 	eRunInterleaveMode ParseRunInterleaveOptarg();
 
+	/************************************************************* 	 
+	* @brief Prints the current WM activation settings
+	*************************************************************/ 	 
+        void PrintCurrentDecaySettings(gSKI::Agent* pAgent);
+
 	/*************************************************************
 	* @brief 
 	*************************************************************/
 	bool IsInteger(const std::string& s);
+
+	/*************************************************************
+	* @brief 
+	*************************************************************/
+	bool IsFloat(const std::string& s);
 
 	/*************************************************************
 	* @brief 
