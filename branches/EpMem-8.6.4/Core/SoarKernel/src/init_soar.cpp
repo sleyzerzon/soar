@@ -43,6 +43,7 @@
 #include "wmem.h"
 #include "io.h"
 #include "rete.h"
+#include "epmem.h"
 #include "gdatastructs.h"
 #include "kernel_struct.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
@@ -476,6 +477,25 @@ void init_sysparams (agent* thisAgent) {
   thisAgent->sysparams[USE_LONG_CHUNK_NAMES] = TRUE;  /* kjh(B14) */
   thisAgent->sysparams[TRACE_OPERAND2_REMOVALS_SYSPARAM] = FALSE;
   thisAgent->sysparams[TIMERS_ENABLED] = TRUE;
+
+#ifdef SOAR_WMEM_ACTIVATION
+  //Decay system toggle
+  (thisAgent->sysparams)[WME_DECAY_SYSPARAM] = FALSE;
+  
+  //These default values are specified in activate.h
+  (thisAgent->sysparams)[WME_DECAY_EXPONENT_SYSPARAM] = DECAY_DEFAULT_EXPONENT;
+  (thisAgent->sysparams)[WME_DECAY_WME_CRITERIA_SYSPARAM] = DECAY_DEFAULT_WME_CRITERIA;
+  (thisAgent->sysparams)[WME_DECAY_ALLOW_FORGETTING_SYSPARAM] = DECAY_DEFAULT_ALLOW_FORGETTING;
+  (thisAgent->sysparams)[WME_DECAY_I_SUPPORT_MODE_SYSPARAM] = DECAY_DEFAULT_I_SUPPORT_MODE;
+  (thisAgent->sysparams)[WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM] = DECAY_DEFAULT_PERSISTENT_ACTIVATION;
+
+#endif //SOAR_WMEM_ACTIVATION
+
+#ifdef EPISODIC_MEMORY
+  //Episodic memory system toggle
+  (thisAgent->sysparams)[EPMEM_SYSPARAM] = FALSE;
+#endif /* EPISODIC_MEMORY */
+
 }
 
 /* ===================================================================
@@ -578,6 +598,12 @@ void reset_statistics (agent* thisAgent) {
      reset_timer (&thisAgent->match_cpu_time[ii]);
      reset_timer (&thisAgent->gds_cpu_time[ii]);
   }
+
+#ifdef SOAR_WMEM_ACTIVATION
+  reset_timer (&(thisAgent->total_decay_time));
+#endif //SOAR_WMEM_ACTIVATION
+  
+
 }
 
 void reinitialize_all_agents ( Kernel* thisKernel ) {
@@ -1091,6 +1117,20 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  do_output_cycle(thisAgent);
 
+#ifdef SOAR_WMEM_ACTIVATION
+     if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM])
+     {
+         decay_move_and_remove_wmes(thisAgent);
+     }
+#endif /*SOAR_WMEM_ACTIVATION*/
+
+#ifdef EPISODIC_MEMORY
+    if ((thisAgent->sysparams)[EPMEM_SYSPARAM])
+    {
+        epmem_update(thisAgent);
+    }
+#endif /* EPISODIC_MEMORY */
+      
  	  soar_invoke_callbacks(thisAgent, thisAgent, 
 			 AFTER_OUTPUT_PHASE_CALLBACK,
 			 (soar_call_data) NULL);
@@ -1649,6 +1689,14 @@ void init_agent_memory(agent* thisAgent)
                  thisAgent->output_link_symbol,
                  thisAgent->io_header_output);
 
+#ifdef EPISODIC_MEMORY
+    if ((thisAgent->sysparams)[EPMEM_SYSPARAM])
+    {
+        //Create the ^epmem buffer
+        epmem_create_buffer(thisAgent, thisAgent->top_state);
+    }
+#endif //EPISODIC_MEMORY
+  
   // KJC & RPM 10/06
   // A lot of stuff isn't initialized properly until the input and output cycles are run the first time.
   // Because of this, SW had to put in a hack to work around changes made to the output-link in the first

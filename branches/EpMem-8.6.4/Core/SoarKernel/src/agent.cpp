@@ -44,6 +44,7 @@
 #include "callback.h"
 #include "io.h"
 #include "kernel_struct.h"
+#include "epmem.h"
 
 /* JC ADDED: Need to initialize gski callbacks */
 #include "gski_event_system_functions.h"
@@ -87,6 +88,10 @@ void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
   init_chunker (thisAgent);
   init_tracing (thisAgent);
   init_explain(thisAgent);  /* AGR 564 */
+
+#ifdef SOAR_WMEM_ACTIVATION
+    decay_init(thisAgent);
+#endif
 
 #ifdef REAL_TIME_BEHAVIOR
   /* RMJ */

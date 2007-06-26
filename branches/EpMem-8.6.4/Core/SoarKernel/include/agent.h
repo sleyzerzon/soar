@@ -30,6 +30,9 @@
 #include "lexer.h"
 #include "chunk.h"
 #include "callback.h"
+#include "activate.h"
+
+
 
 /* JC ADDED: Included to allow gski callbacks */
 #include "gski_event_system_data.h"
@@ -194,6 +197,10 @@ typedef struct agent_struct {
   memory_pool         alpha_mem_pool;
   memory_pool         ms_change_pool;
   memory_pool         node_varnames_pool;
+  
+#ifdef SOAR_WMEM_ACTIVATION
+  memory_pool         decay_element_pool;
+#endif
   
   /* Dummy nodes and tokens */
   struct rete_node_struct * dummy_top_node;
@@ -483,7 +490,121 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
    struct timeval	*attention_lapse_tracker;
    Bool			attention_lapsing;
  
+#ifdef SOAR_WMEM_ACTIVATION
+  struct decay_timelist_element_struct decay_timelist[DECAY_ARRAY_SIZE];
+  struct decay_timelist_element_struct *current_decay_timelist_element;
+    
+  struct timeval      decay_tv;
+  struct timeval      total_decay_time;
+
+  struct timeval      decay_new_wme_tv;
+  struct timeval      total_decay_new_wme_time;
+
+  struct timeval      decay_move_remove_tv;
+  struct timeval      total_decay_move_remove_time;
+
+  struct timeval      decay_rhs_tv;
+  struct timeval      total_decay_rhs_time;
+
+  struct timeval      decay_lhs_tv;
+  struct timeval      total_decay_lhs_time;
+
+  struct timeval      decay_deallocate_tv;
+  struct timeval      total_decay_deallocate_time;
+
+  struct timeval      decay_deallocate_tv_2;
+  struct timeval      total_decay_deallocate_time_2;
+
+  // this is the array to hold precomputed power calculations
+  float decay_power_array[DECAY_POWER_ARRAY_SIZE];
+  //This is used to store the amount of boost received in low precision mode
+  int decay_quick_boost[DECAY_HISTORY_SIZE];
   
+  int decay_tc_counter; // swinterm 3/5/2007
+    
+#endif //SOAR_WMEM_ACTIVATION
+
+#ifdef EPISODIC_MEMORY
+/*
+    These variables contains the agent's episodic memory store and related info
+
+   epmem_curr_active_wmes  - the n most active wmes in working memory
+   epmem_prev_active_wmes - the n most active wmes in working memory
+                            when the last memory was recorded
+   epmem_wmetree              - The head of a giant wmetree used to represent all
+                            the states that that agent has seen so far.  This is,
+                            in effect, the episodic store of the agent.
+   epmem_wmetree_size         - The number of nodes in epmem_wmetree
+   epmem_memories             - This is an array of all the memories that the
+                            agent has.  Each memory is an index into epmem_wmetree
+   epmem_last_tag             - The timetag of the last command on the output-link
+   epmem_last_ret_id          - This value gets incremeted at each retrieval. It's
+                            currently used by the matcher to keep track of the
+                            best match for this retrieval in wmetree->last_usage
+   epmem_num_queries          - Total number of queries that have been performed so far
+   epmem_header_stack         - A stack of epmem_header structs used to mirror the
+                            current state stack in WM and keep track of the
+                            ^epmem link attached to each one.
+   epmem_autosave_filename  - If episodic memories are being autosaved, this
+                              is the filename that's used.
+   
+*/
+    typedef struct wmetree_struct wmetree;
+    typedef struct arraylist_struct arraylist;
+
+    
+    wme **epmem_curr_active_wmes;
+    wme **epmem_prev_active_wmes;
+    wmetree *epmem_wmetree;
+    int epmem_wmetree_size;
+    arraylist *epmem_memories;
+    unsigned long epmem_last_tag;
+    long epmem_last_ret_id;
+    long epmem_num_queries;
+    arraylist *epmem_header_stack;
+    char epmem_autosave_filename[1024];
+    int epmem_save_freq;
+    
+    //These timers are used for analyzing epmem performance
+    struct timeval epmem_start_time;
+    struct timeval epmem_total_time;
+
+    struct timeval epmem_record_start_time;
+    struct timeval epmem_record_total_time;
+
+    struct timeval epmem_retrieve_start_time;
+    struct timeval epmem_retrieve_total_time;
+
+    struct timeval epmem_clearmem_start_time;
+    struct timeval epmem_clearmem_total_time;
+
+    struct timeval epmem_updatewmetree_start_time;
+    struct timeval epmem_updatewmetree_total_time;
+
+    struct timeval epmem_getaugs_start_time;
+    struct timeval epmem_getaugs_total_time;
+
+    struct timeval epmem_match_start_time;
+    struct timeval epmem_match_total_time;
+
+    struct timeval epmem_findchild_start_time;
+    struct timeval epmem_findchild_total_time;
+    
+    struct timeval epmem_addnode_start_time;
+    struct timeval epmem_addnode_total_time;
+    
+    struct timeval epmem_installmem_start_time;
+    struct timeval epmem_installmem_total_time;
+
+    struct timeval epmem_misc1_start_time;
+    struct timeval epmem_misc1_total_time;
+
+    struct timeval epmem_misc2_start_time;
+    struct timeval epmem_misc2_total_time;
+
+    
+#endif //EPISODIC_MEMORY 
+ 
   /* ----------------------- Chunker stuff -------------------------- */
   
   tc_number           backtrace_number;

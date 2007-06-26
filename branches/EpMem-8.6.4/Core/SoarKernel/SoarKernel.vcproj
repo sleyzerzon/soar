@@ -185,6 +185,10 @@
 			Filter=".cpp"
 			>
 			<File
+				RelativePath=".\src\activate.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\agent.cpp"
 				>
 				<FileConfiguration
@@ -303,6 +307,10 @@
 						ObjectFile="$(IntDir)/$(InputName)1.obj"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\epmem.cpp"
+				>
 			</File>
 			<File
 				RelativePath=".\src\explain.cpp"
@@ -738,6 +746,10 @@
 			Filter=".h"
 			>
 			<File
+				RelativePath=".\include\activate.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\agent.h"
 				>
 			</File>
@@ -759,6 +771,10 @@
 			</File>
 			<File
 				RelativePath=".\include\decide.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\epmem.h"
 				>
 			</File>
 			<File
