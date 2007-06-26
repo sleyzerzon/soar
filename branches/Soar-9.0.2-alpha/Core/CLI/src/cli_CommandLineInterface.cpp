@@ -6,9 +6,6 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 #include "cli_CommandLineInterface.h"
@@ -16,8 +13,6 @@
 // FIXME: This needs to be dealt with in a portable manner.
 #ifdef WIN32
 #include "pcreposix.h"
-#else //WIN32
-#include <regex.h>
 #endif // WIN32
 
 #include <assert.h>

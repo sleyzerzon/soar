@@ -6,25 +6,13 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 #include "cli_CommandLineInterface.h"
-
-#ifdef WIN32
-#include <windows.h>
-#include <winbase.h>
-#else // WIN32
-#include <sys/types.h>
-#include <dirent.h>
-#include <errno.h>
-#endif // WIN32
-
 #include "cli_Commands.h"
-
 #include "sml_Names.h"
+
+#include <errno.h>
 
 using namespace cli;
 using namespace sml;
