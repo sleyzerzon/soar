@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="Tools/SoarJavaDebugger/bin" path="Tools/SoarJavaDebugger/src"/>
+	<classpathentry kind="src" output="Tools/LoggerJava/bin" path="Tools/LoggerJava/log"/>
 	<classpathentry kind="src" path="Tools/VisualSoar/Source"/>
 	<classpathentry kind="src" output="Environments/JavaTOH/bin" path="Environments/JavaTOH/src"/>
 	<classpathentry kind="src" output="Environments/Soar2D/bin" path="Environments/Soar2D/src"/>
