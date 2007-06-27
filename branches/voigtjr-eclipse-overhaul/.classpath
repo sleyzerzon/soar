@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="Tools/SoarJavaDebugger/bin" path="Tools/SoarJavaDebugger/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="SoarLibrary/bin/sml.jar"/>
+	<classpathentry kind="lib" path="SoarLibrary/bin/swt.jar"/>
+	<classpathentry kind="lib" path="SoarLibrary/bin/tosca.jar"/>
+	<classpathentry kind="lib" path="Environments/Soar2D/jdom.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
