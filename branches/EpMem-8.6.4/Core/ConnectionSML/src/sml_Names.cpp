@@ -380,6 +380,17 @@ char const* const sml_Names::kParamWatchLearning					= "watchlearning";
 char const* const sml_Names::kParamWatchBacktracing					= "watchbacktracing";
 char const* const sml_Names::kParamWatchIndifferentSelection		= "watchindifferentselection";
 
+//Parameter names for decay command
+char const* const sml_Names::kParamDecayStatus       = "decay";
+char const* const sml_Names::kParamDecayExponent     = "decayexp";
+char const* const sml_Names::kParamDecayActivation   = "decayact";
+char const* const sml_Names::kParamDecayISupportMode = "decayisupportmode";
+char const* const sml_Names::kParamDecayForgetting   = "decayforget";
+char const* const sml_Names::kParamDecayWMECriteria  = "decaywmecrit";
+char const* const sml_Names::kParamDecayPrecision    = "decayprecision";
+char const* const sml_Names::kParamDecayLogFile      = "decaylogfile";
+char const* const sml_Names::kParamDecayMessage      = "decaymsg";
+    
 // Values (these are not case sensitive unlike the rest)
 char const* const sml_Names::kTrue	= "true" ;
 char const* const sml_Names::kFalse	= "false" ;

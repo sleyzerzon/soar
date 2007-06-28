@@ -366,6 +366,17 @@ public:
 	static char const* const kParamWatchBacktracing;
 	static char const* const kParamWatchIndifferentSelection;
 
+    //Parameter names for decay command
+	static char const* const kParamDecayStatus;
+	static char const* const kParamDecayExponent;
+	static char const* const kParamDecayActivation;
+	static char const* const kParamDecayISupportMode;
+	static char const* const kParamDecayForgetting;
+	static char const* const kParamDecayWMECriteria;
+	static char const* const kParamDecayPrecision;
+	static char const* const kParamDecayLogFile;
+	static char const* const kParamDecayMessage;
+    
 	// Values (these are not case sensitive unlike the rest)
 	static char const* const kTrue ;
 	static char const* const kFalse ;
