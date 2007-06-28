@@ -1,0 +1,3 @@
+pushd combat-control-agent
+source combat-control-agent_source.soar
+popd
