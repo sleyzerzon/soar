@@ -17,7 +17,7 @@ copySources = [
 copySources.extend(glob.glob('src/images/*'))
 copySources.extend(glob.glob('src/altimages/*'))
 
-copyTargets = map(lambda x: 'classes/' + x, copySources)
+copyTargets = map(lambda x: 'classes/' + x.lstrip('src/'), copySources)
 
 copyStep = env.Command(copyTargets, copySources, SoarSCons.DoCopy)
 jarStep = env.Command('#Tools/SoarJavaDebugger/SoarJavaDebugger.jar', [copySources, 'classes'], 'jar cfm Tools/SoarJavaDebugger/SoarJavaDebugger.jar Tools/SoarJavaDebugger/JarManifest -C Tools/SoarJavaDebugger/classes .')
