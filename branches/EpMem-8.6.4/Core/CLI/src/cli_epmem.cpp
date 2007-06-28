@@ -49,7 +49,9 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
     int optCount = 0;
     std::string tmpStr;
     std::vector<std::string>::iterator iter;
-    char buf[64];
+    char convbuf[64];
+    char buf[1024];
+    std::string msg;
     
     for (;;) {
         if (!ProcessOptions(argv, optionsData)) return false;
@@ -75,7 +77,7 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
                 arg1 = atoi(m_OptionArgument.c_str());
                 if (arg1 < 0)
                 {
-                    m_Result << "Epmem ID expected.  Can not be a negative number.";
+                    msg = "Epmem ID expected.  Can not be a negative number.";
                 }
                 else
                 {
@@ -83,19 +85,19 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
                 }
                 break;
             case 'm':
-                strcpy(buf, m_OptionArgument.c_str());
-                if ( (buf[0] == 's') || (buf[0] == 'S') )
+                strcpy(convbuf, m_OptionArgument.c_str());
+                if ( (convbuf[0] == 's') || (convbuf[0] == 'S') )
                 {
-                    arg1 = atoi(((char *)buf) + 1);
+                    arg1 = atoi(((char *)convbuf) + 1);
                 }
                 else
                 {
-                    arg1 = atoi(buf);
+                    arg1 = atoi(convbuf);
                 }
                 
                 if (arg1 < 0)
                 {
-                    m_Result << "Invalid state ID.";
+                    msg = "Invalid state ID.";
                 }
                 
                 DoEpmem(pAgent, EPMEM_PRINT_MATCH_DIAGNOSTIC, arg1, 0);
@@ -103,8 +105,10 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
             case 'd':
 				if (argv.size() != 4)
                 {
-                    m_Result << "Two epmem IDs expected.  I received ";
-                    m_Result << argv.size() - 2 << ".";
+                    sprintf(buf,
+                            "Two epmem IDs expected.  I received %d.",
+                            argv.size() - 2);
+                    msg = buf;
                     break;
                 }
                 iter = argv.begin();
@@ -116,7 +120,7 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
 
                 if ((arg1 < 0) || (arg2 < 0))
                 {
-                    m_Result << "Epmem ID expected.  Can not be a negative number.";
+                    msg = "Epmem ID expected.  Can not be a negative number.";
                     break;
                 }
                 
@@ -125,24 +129,24 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
             case 'c':
 				if (argv.size() != 4)
                 {
-                    m_Result << "Wrong number of arguments. Expected a state followed by a memory id.";
+                    msg = "Wrong number of arguments. Expected a state followed by a memory id.";
                     break;
                 }
                 iter = argv.begin();
                 tmpStr = *(++iter);
                 tmpStr = *(++iter);
-                strcpy(buf, tmpStr.c_str());
-                if ( (buf[0] == 's') || (buf[0] == 'S') )
+                strcpy(convbuf, tmpStr.c_str());
+                if ( (convbuf[0] == 's') || (convbuf[0] == 'S') )
                 {
-                    arg1 = atoi(((char *)buf) + 1);
+                    arg1 = atoi(((char *)convbuf) + 1);
                 }
                 else
                 {
-                    arg1 = atoi(buf);
+                    arg1 = atoi(convbuf);
                 }
                 if (arg1 < 0)
                 {
-                    m_Result << "Invalid state ID.";
+                    msg = "Invalid state ID.";
                     break;
                 }
                 tmpStr = *(++iter);
@@ -150,7 +154,7 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
 
                 if (arg2 < 0)
                 {
-                    m_Result << "Epmem ID expected for second number.  Can not be a negative number.";
+                    msg = "Epmem ID expected for second number.  Can not be a negative number.";
                     break;
                 }
                 
@@ -158,34 +162,34 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
                 break;
             case 'l':
                 //Use empty string to specify the default filename
-                buf[0] = '\0';
+                convbuf[0] = '\0';
                 if (argv.size() >= 3)
                 {
                     //Retrieve filename
                     iter = argv.begin();
                     tmpStr = *(++iter);
                     tmpStr = *(++iter);
-                    strcpy(buf, tmpStr.c_str());
+                    strcpy(convbuf, tmpStr.c_str());
                 }//else                
-                DoEpmem(pAgent, EPMEM_LOAD, (long)buf, 0);
+                DoEpmem(pAgent, EPMEM_LOAD, (long)convbuf, 0);
                 break;
             case 's':
                 //Use empty string to specify the default filename
-                buf[0] = '\0';
+                convbuf[0] = '\0';
 				if (argv.size() >= 3)
                 {
                     //Retrieve filename
                     iter = argv.begin();
                     tmpStr = *(++iter);
                     tmpStr = *(++iter);
-                    strcpy(buf, tmpStr.c_str());
+                    strcpy(convbuf, tmpStr.c_str());
                 }//else                
-                DoEpmem(pAgent, EPMEM_SAVE, (long)buf, 0);
+                DoEpmem(pAgent, EPMEM_SAVE, (long)convbuf, 0);
                 break;
             case 'a':
                 //Set default arguments
                 arg2 = 500;     // default
-                buf[0] = '\0';  // default
+                convbuf[0] = '\0';  // default
 
                 //Get user specified arguments
 				if (argv.size() >= 3)
@@ -194,7 +198,7 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
                     iter = argv.begin();
                     tmpStr = *(++iter);
                     tmpStr = *(++iter);
-                    strcpy(buf, tmpStr.c_str());
+                    strcpy(convbuf, tmpStr.c_str());
 
                     //Retrieve autosave frequency
                     arg2 = 500; // default
@@ -206,7 +210,7 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
                     
                     if (arg2 < 0)
                     {
-                        m_Result << "Invalid autosave frequency specified.  Resetting to 500.\n";
+                        msg = "Invalid autosave frequency specified.  Resetting to 500.\n";
                         arg2 = 500;
                     }
 
@@ -215,52 +219,59 @@ bool CommandLineInterface::ParseEpmem(gSKI::Agent* pAgent, std::vector<std::stri
                 //Generate result message
                 if (arg2 == 0)
                 {
-                    m_Result << "Disabling episodic memory autosave feature.";
+                    msg = "Disabling episodic memory autosave feature.";
                 }
                 else
                 {
-                    if (strlen(buf) == 0)
+                    if (strlen(convbuf) == 0)
                     {
-                        m_Result << "Autosaving to default file";
+                        strcpy(convbuf, "default file");
                     }
-                    else
-                    {
-                        m_Result << "Autosaving to " << buf;
-                    }
-                    
-                    m_Result << " every " << arg2 << " cycles.";
+                    sprintf(buf, "Autosaving to %s every %d cycles.",
+                            convbuf, arg2);
+                    msg = buf;
                 }//else
                     
-                DoEpmem(pAgent, EPMEM_AUTOSAVE, (long)buf, arg2);
+                DoEpmem(pAgent, EPMEM_AUTOSAVE, (long)convbuf, arg2);
                 
                 break;
             default:
                 return SetError(CLIError::kGetOptError);
+        }//switch
+        
+        if ((m_RawOutput) && (msg.length() > 0))
+        {
+            m_Result << msg.c_str();
         }
-    }
+        else
+        {
+            AppendArgTagFast(sml_Names::kParamMessage, sml_Names::kTypeString, msg.c_str());
+        }
+        
+    }//for
 
 	if (optCount == 0)
     {
         DoEpmem(pAgent, EPMEM_REPORT_SETTINGS, 0, 0);
-        m_Result << "\n\n---";
-        m_Result << "\nAvailable Commands:\n";
-        m_Result << "\n\tepmem                         Display the current epmem settings and active ";
-        m_Result << "\n\t                              retrievals.";
-        m_Result << "\n\tepmem -n <id>                 Turn the episodic memory system on.";
-        m_Result << "\n\tepmem -o <id>                 Turn the episodic memory system off. ";
-        m_Result << "\n\t                              (All existing episoidic memories will be lost!)";
-        m_Result << "\n\tepmem -z <id>                 Suspend the episodic memory system.";
-        m_Result << "\n\tepmem -p <id>                 Print the contents of the memory with the ";
-        m_Result << "\n\t                              given id.";
-        m_Result << "\n\tepmem -m <state>              Display a match diagnostic for the retrieval on ";
-        m_Result << "\n\t                              the given state.";
-        m_Result << "\n\tepmem -d <id1> <id2>          Compare two memories with the given ids.";
-        m_Result << "\n\tepmem -c <state> <id>         Match the memory with the given id to the memory ";
-        m_Result << "\n\t                              cue on the given state.";
-        m_Result << "\n\tepmem -s <filename>           Save episodic memories to file.";
-        m_Result << "\n\tepmem -l <filename>           Load episodic memories from file.";
-        m_Result << "\n\tepmem -a [<filename> [freq]]  Autosave episodic memories to [filename] every ";
-        m_Result << "\n\t                              [freq] cycles.  Set frequnecy to zero to disable.";
+        msg = "\n\n---";
+        msg += "\nAvailable Commands:\n";
+        msg += "\n\tepmem                         Display the current epmem settings and active ";
+        msg += "\n\t                              retrievals.";
+        msg += "\n\tepmem -n <id>                 Turn the episodic memory system on.";
+        msg += "\n\tepmem -o <id>                 Turn the episodic memory system off. ";
+        msg += "\n\t                              (All existing episoidic memories will be lost!)";
+        msg += "\n\tepmem -z <id>                 Suspend the episodic memory system.";
+        msg += "\n\tepmem -p <id>                 Print the contents of the memory with the ";
+        msg += "\n\t                              given id.";
+        msg += "\n\tepmem -m <state>              Display a match diagnostic for the retrieval on ";
+        msg += "\n\t                              the given state.";
+        msg += "\n\tepmem -d <id1> <id2>          Compare two memories with the given ids.";
+        msg += "\n\tepmem -c <state> <id>         Match the memory with the given id to the memory ";
+        msg += "\n\t                              cue on the given state.";
+        msg += "\n\tepmem -s <filename>           Save episodic memories to file.";
+        msg += "\n\tepmem -l <filename>           Load episodic memories from file.";
+        msg += "\n\tepmem -a [<filename> [freq]]  Autosave episodic memories to [filename] every ";
+        msg += "\n\t                              [freq] cycles.  Set frequnecy to zero to disable.";
     }
     
     return true;
@@ -275,6 +286,8 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
     long sp_val = 0;
     char *str;
     if (!RequireAgent(pAgent)) return false;
+    std::string msg;
+    char buf[1024];
 
 	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
     
@@ -284,12 +297,12 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
             sp_val = pKernelHack->GetSysparam(pAgent, EPMEM_SYSPARAM);
             if (sp_val)
             {
-                m_Result << "The episodic memory system is already ACTIVE.";
+                msg = "The episodic memory system is already ACTIVE.";
             }                
             else
             {
                 pKernelHack->EpmemEnable(pAgent);
-                m_Result << "The episodic memory system is now ACTIVE.";
+                msg = "The episodic memory system is now ACTIVE.";
             }
             break;
           
@@ -298,11 +311,11 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
             if (sp_val)
             {
                 pKernelHack->EpmemDisable(pAgent);
-                m_Result << "The episodic memory system has been DISABLED.";
+                msg = "The episodic memory system has been DISABLED.";
             }
             else
             {
-                m_Result << "The episodic memory system is already DISABLED.";
+                msg = "The episodic memory system is already DISABLED.";
             }
             break;
             
@@ -311,12 +324,12 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
             if (sp_val)
             {
                 pKernelHack->SetSysparam(pAgent, EPMEM_SUSPENDED_SYSPARAM, 0);
-                m_Result << "The episodic memory system has been UNPAUSED.";
+                msg = "The episodic memory system has been UNPAUSED.";
             }
             else
             {
                 pKernelHack->SetSysparam(pAgent, EPMEM_SUSPENDED_SYSPARAM, 1);
-                m_Result << "The episodic memory system has been PAUSED.";
+                msg = "The episodic memory system has been PAUSED.";
             }
             break;
             
@@ -327,7 +340,9 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
             break;
         
         case EPMEM_PRINT_MEM:
-            m_Result << "Printing epmem #" << arg1 << "\n";
+            sprintf(buf, "Printing epmem #%d\n", arg1);
+            msg = buf;
+            
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemPrintMemory(pAgent, arg1);
             this->RemoveListenerAndEnableCallbacks(pAgent);
@@ -340,17 +355,20 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
             break;
             
         case EPMEM_COMPARE_MEMS:
-            m_Result << "Displaying the differences between memories ";
-            m_Result << arg1 << " and " << arg2 << ":\n";
-                
+            sprintf(buf,
+                    "Displaying the differences between memories %d and %d:\n",
+                    arg1, arg2);
+            msg = buf;
+            
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemCompareMemories(pAgent, arg1, arg2);
             this->RemoveListenerAndEnableCallbacks(pAgent);
             break;
 
         case EPMEM_CUE_COMPARE_MEM:
-            m_Result << "Comparing the cue on state s" << arg1;
-            m_Result << " to memory #" << arg2 << ":\n";
+            sprintf(buf, "Comparing the cue on state s%d to memory #%d:\n",
+                    arg1, arg2);
+            msg = buf;
                 
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemCompareCueToMemory(pAgent, arg1, arg2);
@@ -359,15 +377,12 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
             
         case EPMEM_LOAD:
             str = (char *)arg1;
-            m_Result << "Loaded episodic memories from ";
-            if ((str != NULL) && (strlen(str) > 0))
+            if ((str == NULL) || (strlen(str) == 0))
             {
-                m_Result <<  str << "\n";
+                strcpy(str, "default file");
             }
-            else
-            {
-                m_Result <<  "default file\n";
-            }
+            sprintf(buf, "Loaded episodic memories from %s\n");
+            msg = buf;
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemLoadMemories(pAgent, str);
             this->RemoveListenerAndEnableCallbacks(pAgent);
@@ -375,15 +390,13 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
           
         case EPMEM_SAVE:
             str = (char *)arg1;
-            m_Result << "Saved episodic memories to ";
-            if ((str != NULL) && (strlen(str) > 0))
+            if ((str == NULL) || (strlen(str) == 0))
             {
-                m_Result <<  str << "\n";
+                strcpy(str, "default file");
             }
-            else
-            {
-                m_Result <<  "default file\n";
-            }
+            sprintf(buf, "Saved episodic memories to %s\n", str);
+            msg = buf;
+            
             this->AddListenerAndDisableCallbacks(pAgent);
             pKernelHack->EpmemSaveMemories(pAgent, str);
             this->RemoveListenerAndEnableCallbacks(pAgent);
@@ -397,6 +410,17 @@ bool CommandLineInterface::DoEpmem(gSKI::Agent* pAgent,
             break;
     }//switch
 
+    if ((m_RawOutput) && (msg.length() > 0))
+    {
+        m_Result << msg.c_str();
+    }
+    else
+    {
+        AppendArgTagFast(sml_Names::kParamMessage, sml_Names::kTypeString, msg.c_str());
+    }
+        
+        
+    
     return true;
 }
 
