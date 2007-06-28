@@ -31,14 +31,19 @@
 #define chdir _chdir
 #define strcasecmp _stricmp
 #define vsnprintf _vsnprintf
-#define snprintf _snprintf 
+#define snprintf _snprintf
+#ifndef strdup
+#define strdup _strdup
+#endif
+
+// Use named pipes instead of sockets for same-machine interprocess communication
 #define ENABLE_NAMED_PIPES
 
 // BADBAD: Not sure where this macro is coming from but I saw this
 // in IgSKI_Symbol.h and it's needed for the GetObject() calls to compile.
 #ifdef _WIN32
-#undef GetObject
-#undef SendMessage
+//#undef GetObject
+//#undef SendMessage
 #endif
 
 // FIXME: This is for gSKI. We do need to address the whole sleep issue though.
