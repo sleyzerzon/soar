@@ -17,51 +17,14 @@
 #include <assert.h>
 
 #include "sml_Names.h"
+#include "sml_StringOps.h"
 
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_DoNotTouch.h"
 #include "gsysparam.h"
+#include "activate.h"
 
-/*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*
-
-  These declarations are needed to print the decay settings.  I've
-  copied them wholesale from activate.h in the kernel.  This means
-  that the two bits of code must be kept in synch.
-
- *KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*KLUDGE*/
-
-#define MAX_DECAY 200
-#define DECAY_ARRAY_SIZE (MAX_DECAY + 1)
-#define DECAY_HISTORY_SIZE 10
-#define DECAY_POWER_ARRAY_SIZE 270
-#define DECAY_ACTIVATION_CUTOFF -1.6
-#define DECAY_EXPONENT_DIVISOR 1000.0
-#define DECAY_DEFAULT_EXPONENT -800
-#define DECAY_ACTIVATION_LOG_SIZE 10
-
-#define DECAY_WME_CRITERIA_O_SUPPORT_ONLY       0
-#define DECAY_WME_CRITERIA_O_ARCH               1
-#define DECAY_WME_CRITERIA_ALL                  2
-#define DECAY_DEFAULT_WME_CRITERIA              DECAY_WME_CRITERIA_O_SUPPORT_ONLY
-
-#define DECAY_DEFAULT_ALLOW_FORGETTING          1
-
-#define DECAY_I_SUPPORT_MODE_NONE               0
-#define DECAY_I_SUPPORT_MODE_NO_CREATE          1
-#define DECAY_I_SUPPORT_MODE_UNIFORM            2
-#define DECAY_DEFAULT_I_SUPPORT_MODE            DECAY_I_SUPPORT_MODE_NONE
-
-#define DECAY_DEFAULT_PERSISTENT_ACTIVATION         0
-
-#define DECAY_PRECISION_HIGH                    0
-#define DECAY_PRECISION_LOW                     1
-#define DECAY_DEFAULT_PRECISION                 DECAY_PRECISION_HIGH
-
-#define DECAY_DEFAULT_LOGGING                   0
-
-
-//*** END OF KLUDGE * END OF KLUDGE * END OF KLUDGE * END OF KLUDGE ***/
 
 using namespace cli;
 using namespace sml;
@@ -85,7 +48,7 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
     FILE *fileHandle = NULL;
     int optCount = 0;
     std::string msg;
-
+    
     for (;;) {
         if (!ProcessOptions(argv, optionsData)) return false;
         if (m_Option == -1) break;
@@ -94,9 +57,11 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
         switch (m_Option) {
             case 'n':
                 DoDecay(pAgent, DECAY_ON, 0);
+                msg = "Decay is On";
                 break;
             case 'o':
                 DoDecay(pAgent, DECAY_OFF, 0);
+                msg = "Decay is Off";
                 break;
             case 'e':
                 if (!IsFloat(m_OptionArgument))
@@ -107,7 +72,8 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
                 exp = atof(m_OptionArgument.c_str());
                 if (exp <= 0)
                 {
-                    m_Result << "Exponent not set: should be a positive number";
+                    SetErrorDetail("Exponent not set: should be a positive number");
+                    SetError(CLIError::kInvalidValue);
                 }
                 else
                 {
@@ -119,12 +85,12 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
             case 'a':
                 if (m_OptionArgument == "once"   || m_OptionArgument == "0")
                 {
-                    m_Result << "Instantiations will only boost WMEs on the cycle they are created.\n";
+                    msg = "Instantiations will only boost WMEs on the cycle they are created.\n";
                     arg = 0;
                 }
                 else if (m_OptionArgument == "persistent" || m_OptionArgument == "1")
                 {
-                    m_Result << "Instantiations will activate wmes each cycle until retraction.";
+                    msg = "Instantiations will activate wmes each cycle until retraction.";
                     arg = 1;
                 }
                 else
@@ -138,22 +104,21 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
             case 'i':
                 if (m_OptionArgument == "none" || m_OptionArgument == "0")
                 {
-                    m_Result << "I-supported WMEs will not affect activation levels.\n";
+                    msg = "I-supported WMEs will not affect activation levels.\n";
                     arg = 0;
                 }
                 else if (m_OptionArgument == "no-create" || m_OptionArgument == "1")
                 {
-                    m_Result << "I-supported WMEs will boost supporting WMEs except when first created.\n";
+                    msg = "I-supported WMEs will boost supporting WMEs except when first created.\n";
                     arg = 1;
                 }
                 else if (m_OptionArgument == "uniform" || m_OptionArgument == "2")
                 {
-                    m_Result << "I-supported WMEs will always boost supporting WMEs when referenced.\n";
+                    msg = "I-supported WMEs will always boost supporting WMEs when referenced.\n";
                     arg = 2;
                 }
                 else
-                {
-                    SetErrorDetail("Invalid i-support-mode specified: " + m_OptionArgument + "Current options are: 'none', 'no-create' or 'uniform'");
+                {                    SetErrorDetail("Invalid i-support-mode specified: " + m_OptionArgument + "Current options are: 'none', 'no-create' or 'uniform'");
                     SetError(CLIError::kInvalidMode);
                     break;
                 }
@@ -162,12 +127,12 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
             case 'f':
                 if (m_OptionArgument == "off"   || m_OptionArgument == "0")
                 {
-                    m_Result << "Forgotten WMEs will NOT be removed from working memory.\n";
+                    msg = "Forgotten WMEs will NOT be removed from working memory.\n";
                     arg = 0;
                 }
                 else if (m_OptionArgument == "on"     || m_OptionArgument == "1")
                 {
-                    m_Result << "Forgotten WMEs will be removed from working memory.\n";
+                    msg = "Forgotten WMEs will be removed from working memory.\n";
                     arg = 1;
                 }
                 else
@@ -181,17 +146,17 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
             case 'w':
                 if (m_OptionArgument == "o-support" || m_OptionArgument == "0")
                 {
-                    m_Result << "Only o-supported WMEs will be activated.\n";
+                    msg = "Only o-supported WMEs will be activated.\n";
                     arg = 0;
                 }
                 else if (m_OptionArgument == "architectural" || m_OptionArgument == "1")
                 {
-                    m_Result << "O-supported and architectural WMEs will be activated.\n";
+                    msg = "O-supported and architectural WMEs will be activated.\n";
                     arg = 1;
                 }
                 else if (m_OptionArgument == "all" || m_OptionArgument == "2")
                 {
-                    m_Result << "All WMEs in working memory will be activated.\n";
+                    msg = "All WMEs in working memory will be activated.\n";
                     arg = 2;
                 }
                 else
@@ -205,12 +170,12 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
             case 'p':
                 if (m_OptionArgument == "high" || m_OptionArgument == "0")
                 {
-                    m_Result << "WME activation levels will be calculated with high precision (slower).\n";
+                    msg = "WME activation levels will be calculated with high precision (slower).\n";
                     arg = 0;
                 }
                 else if (m_OptionArgument == "low" || m_OptionArgument == "1")
                 {
-                    m_Result << "WME activation levels will be calculated with low precision (faster).\n";
+                    msg = "WME activation levels will be calculated with low precision (faster).\n";
                     arg = 1;
                 }
                 else
@@ -224,7 +189,7 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
             case 'l':
                 if (m_OptionArgument == "off" || m_OptionArgument == "0")
                 {
-                    m_Result << "Log file closed.";
+                    msg = "Log file closed.";
                     arg = 0;
                     fileHandle = 0;
                 }
@@ -235,20 +200,28 @@ bool CommandLineInterface::ParseDecay(gSKI::Agent* pAgent, std::vector<std::stri
                     {
                         msg = "Error opening file: ";
                         msg += m_OptionArgument;
-                        m_Result << msg.c_str();
                         return false;
                     }
                      msg = "Logging activation levels to file: ";
-                    msg += m_OptionArgument;
-                    m_Result << msg.c_str();
+                     msg += m_OptionArgument;
                 }
                 
                 DoDecay(pAgent, DECAY_LOG, (long)fileHandle);
                 break;
             default:
                 return SetError(CLIError::kGetOptError);
+        }//switch
+        
+        if ((m_RawOutput) && (msg.length() > 0))
+        {
+            m_Result << msg.c_str();
         }
-    }
+        else
+        {
+            AppendArgTagFast(sml_Names::kParamDecayMessage, sml_Names::kTypeString, msg.c_str());
+        }
+
+    }//for
 
 	if (optCount == 0)
     {
@@ -279,117 +252,208 @@ void CommandLineInterface::PrintCurrentDecaySettings(gSKI::Agent* pAgent)
     char buf[1024];
     long sp_val = 0;
 	gSKI::EvilBackDoor::TgDWorkArounds* pKernelHack = m_pKernel->getWorkaroundObject();
+    std::string msg;
+    char *strval;
+    char convbuf[kMinBufferSize];
 
-    m_Result << "Current decay settings:\n";
+    msg = "Current decay settings:\n";
+
+    /*
+     * Decay on/off
+     */
     sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_SYSPARAM);
     if (sp_val)
     {
-        m_Result << "   --on\n";
+        msg += "   --on\n";
     }
     else
     {
-        m_Result << "   --off\n";
+        msg += "   --off\n";
+    }
+    if (!m_RawOutput)
+    {
+        AppendArgTag(sml_Names::kParamDecayStatus,
+                     sml_Names::kTypeBoolean, 
+                     sp_val ? sml_Names::kTrue : sml_Names::kFalse);
     }
 
+    /*
+     * Decay exponent
+     */
     sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_EXPONENT_SYSPARAM);
-    sprintf(buf, "   Decay exponent set to %f \n", (double) (-1.0 * (double)sp_val / DECAY_EXPONENT_DIVISOR));
-    m_Result << buf;
+    double dblval = (double) (-1.0 * (double)sp_val / DECAY_EXPONENT_DIVISOR);
+    sprintf(buf, "   Decay exponent set to %f \n", dblval);
+    msg += buf;
 
+    if (!m_RawOutput)
+    {
+        sprintf(convbuf, "%g", dblval);
+        AppendArgTag(sml_Names::kParamDecayExponent,
+                     sml_Names::kTypeDouble,
+                     convbuf);
+    }
+
+    
+    /*
+     * Decay Activation Criteria
+     */
     sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_WME_CRITERIA_SYSPARAM);
     switch(sp_val)
     {
         case DECAY_WME_CRITERIA_O_SUPPORT_ONLY:
-            m_Result << "   Only o-supported WMEs are being activated.\n";
+            msg += "   Only o-supported WMEs are being activated.\n";
+            strval = "o-supported";
             break;
         case DECAY_WME_CRITERIA_O_ARCH:
-            m_Result << "   O-supported and architectural WMEs are being activated.\n";
+            msg += "   O-supported and architectural WMEs are being activated.\n";
+            strval = "o-supported and architectural";
             break;
         case DECAY_WME_CRITERIA_ALL:
-            m_Result << "   All WMEs in working memory are being activated.\n";
+            msg += "   All WMEs in working memory are being activated.\n";
+            strval = "all";
             break;
     }
+    if (!m_RawOutput)
+    {
+        AppendArgTag(sml_Names::kParamDecayActivation,
+                     sml_Names::kTypeString,
+                     strval);
+    }
     
-    sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_ALLOW_FORGETTING_SYSPARAM);
-    if(sp_val)
-    {
-        m_Result << "   Forgotten WMEs will be removed from working memory.\n";
-    }
-    else
-    {
-        m_Result << "   Forgotten WMEs will NOT be removed from working memory.\n";
-    }
-
+    
+    /*
+     * Decay 
+     */
     sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_I_SUPPORT_MODE_SYSPARAM);
     switch(sp_val)
     {
         case DECAY_I_SUPPORT_MODE_NONE:
-            m_Result << "   I-supported WMEs will not affect activation levels.\n";
+            msg += "   I-supported WMEs will not affect activation levels.\n";
+            strval = "none";
             break;
         case DECAY_I_SUPPORT_MODE_NO_CREATE:
-            m_Result << "   I-supported WMEs will boost supporting WMEs except when first created.\n";
+            msg += "   I-supported WMEs will boost supporting WMEs except when first created.\n";
+            strval = "no create";
             break;
         case DECAY_I_SUPPORT_MODE_UNIFORM:
-            m_Result << "   I-supported WMEs will always boost supporting WMEs when referenced.\n";
+            msg += "   I-supported WMEs will always boost supporting WMEs when referenced.\n";
+            strval = "uniform";
             break;
     }
+    if (!m_RawOutput)
+    {
+        AppendArgTag(sml_Names::kParamDecayISupportMode,
+                     sml_Names::kTypeString,
+                     strval);
+    }
     
-    sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM);
+    /*
+     * Decay Forgetting
+     */
+    sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_ALLOW_FORGETTING_SYSPARAM);
     if(sp_val)
     {
-        m_Result << "   Instantiations will boost WMEs each cycle until retraction.\n";
+        msg += "   Forgotten WMEs will be removed from working memory.\n";
     }
     else
     {
-        m_Result << "   Instantiations will only boost WMEs on the cycle they are created.\n";
+        msg += "   Forgotten WMEs will NOT be removed from working memory.\n";
+    }
+    if (!m_RawOutput)
+    {
+        AppendArgTag(sml_Names::kParamDecayForgetting,
+                     sml_Names::kTypeBoolean, 
+                     sp_val ? sml_Names::kTrue : sml_Names::kFalse);
+    }
+
+    /*
+     * Decay Activation Boost Critierion
+     */
+    sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM);
+    if(sp_val)
+    {
+        msg += "   Instantiations will boost WMEs each cycle until retraction.\n";
+        strval = "always";
+    }
+    else
+    {
+        msg += "   Instantiations will only boost WMEs on the cycle they are created.\n";
+        strval = "creation";
+    }
+    if (!m_RawOutput)
+    {
+        AppendArgTag(sml_Names::kParamDecayWMECriteria,
+                     sml_Names::kTypeString,
+                     strval);
     }
     
+    /*
+     * Decay 
+     */
     sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_PRECISION_SYSPARAM);
     switch(sp_val)
     {
         case DECAY_PRECISION_HIGH:
-            m_Result << "   WME activation levels will be calculated with high precision (slower).\n";
+            msg += "   WME activation levels will be calculated with high precision (slower).\n";
+            strval = "high";
             break;
         case DECAY_PRECISION_LOW:
-            m_Result << "   WME activation levels will be calculated with low precision (faster).\n";
+            msg += "   WME activation levels will be calculated with low precision (faster).\n";
+            strval = "low";
             break;
     }
+    if (!m_RawOutput)
+    {
+        AppendArgTag(sml_Names::kParamDecayPrecision,
+                     sml_Names::kTypeString,
+                     strval);
+    }
 
+    /*
+     * Decay Logging
+     */
     sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_LOGGING_SYSPARAM);
     if(sp_val)
     {
-        m_Result << "   WME activation levels are being logged.\n";
+        msg += "   WME activation levels are being logged.\n";
     }
     else
     {
-        m_Result << "   WME activation levels are not being logged.\n";
+        msg += "   WME activation levels are not being logged.\n";
+    }
+    if (!m_RawOutput)
+    {
+        AppendArgTag(sml_Names::kParamDecayLogFile,
+                     sml_Names::kTypeBoolean, 
+                     sp_val ? sml_Names::kTrue : sml_Names::kFalse);
     }
     
     
     
 //  #ifndef NO_TIMING_STUFF
-//      m_Result << "\nTiming Information:\n";
+//      msg += "\nTiming Information:\n";
 
 //      sprintf(buf, "   Time spent on decay: %11.3f secs. \n", timer_value(&(pAgent->total_decay_time)));
-//      m_Result << buf;
+//      msg += buf;
 //      sprintf(buf, "          for new wmes: %11.3f secs. \n", timer_value(&(pAgent->total_decay_new_wme_time)));
-//      m_Result << buf;
+//      msg += buf;
 //      sprintf(buf, "     for move / remove: %11.3f secs. \n", timer_value(&(pAgent->total_decay_move_remove_time)));
-//      m_Result << buf;
+//      msg += buf;
 //      sprintf(buf, "               for rhs: %11.3f secs. \n", timer_value(&(pAgent->total_decay_rhs_time)));
-//      m_Result << buf;
+//      msg += buf;
 //      sprintf(buf, "               for lhs: %11.3f secs. \n", timer_value(&(pAgent->total_decay_lhs_time)));
-//      m_Result << buf;
+//      msg += buf;
 //      sprintf(buf, "        for deallocate: %11.3f secs. \n", timer_value(&(pAgent->total_decay_deallocate_time)));
-//      m_Result << buf;
+//      msg += buf;
 //      sprintf(buf, "          deallocate 2: %11.3f secs. \n", timer_value(&(pAgent->total_decay_deallocate_time_2)));
-//      m_Result << buf;
+//      msg += buf;
 
 //  #endif
 
 
 #ifdef MEMORY_POOL_STATS
     sprintf(buf, "\nUsing %i slots in the memory pool \n", (pAgent->decay_element_pool).used_count);
-    m_Result << buf;
+    msg += buf;
 #endif
        
     sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_SYSPARAM);
@@ -399,10 +463,10 @@ void CommandLineInterface::PrintCurrentDecaySettings(gSKI::Agent* pAgent)
 //          last_spot = (first_spot - 1 + DECAY_ARRAY_SIZE) % DECAY_ARRAY_SIZE;
 
 //          sprintf(buf, "\nCurrently activated WMEs (cycle %i): \n", (pAgent->current_decay_timelist_element)->time);
-//          m_Result << buf;
-//          m_Result << "   forget on   decay  kernel                         \n";
-//          m_Result << "     cycle      refs   refs            WME           \n";
-//          m_Result << "   ---------   -----  ------  -----------------------\n";
+//          msg += buf;
+//          msg += "   forget on   decay  kernel                         \n";
+//          msg += "     cycle      refs   refs            WME           \n";
+//          msg += "   ---------   -----  ------  -----------------------\n";
         
 //          i = first_spot;
 //          while(i != last_spot)
@@ -429,19 +493,19 @@ void CommandLineInterface::PrintCurrentDecaySettings(gSKI::Agent* pAgent)
 //                  }
                 
 //                  sprintf(buf, "   %8i   %5i  %6i ", (pAgent->decay_timelist[i]).time, num_refs, print_this->this_wme->reference_count);
-//                  m_Result << buf;
+//                  msg += buf;
 //                  print_with_symbols(pAgent, "  (%y ^%y %y) ", print_this->this_wme->id, print_this->this_wme->attr, print_this->this_wme->value);
 //                  if (print_this->this_wme->preference == NIL)
 //                  {
-//                      m_Result << " architectural\n";
+//                      msg += " architectural\n";
 //                  }
 //                  else if (print_this->this_wme->preference->o_supported)
 //                  {
-//                      m_Result << " o-supported\n";
+//                      msg += " o-supported\n";
 //                  }
 //                  else
 //                  {
-//                      m_Result << " i-supported\n";
+//                      msg += " i-supported\n";
 //                  }
                     
 //                  print_this = print_this->next;
@@ -449,9 +513,14 @@ void CommandLineInterface::PrintCurrentDecaySettings(gSKI::Agent* pAgent)
             
 //              i = (i + 1) % DECAY_ARRAY_SIZE;
 //          }//while
-        m_Result << "\n\n";
+        msg += "\n\n";
     }//if
-  
+
+    if ((m_RawOutput) && (msg.length() > 0))
+    {
+        m_Result << msg.c_str();
+    }
+    
 }//print_current_decay_settings
 
 
@@ -485,7 +554,6 @@ bool CommandLineInterface::DoDecay(gSKI::Agent* pAgent,
                 pKernelHack->DecayInit(pAgent);
             }
 
-            m_Result << "Decay is On";
             pKernelHack->SetSysparam(pAgent, WME_DECAY_SYSPARAM, 1);
             break;
           
@@ -498,14 +566,14 @@ bool CommandLineInterface::DoDecay(gSKI::Agent* pAgent,
             {
                 pKernelHack->DecayDeInit(pAgent);
             }
-            m_Result << "Decay is Off";
             pKernelHack->SetSysparam(pAgent, WME_DECAY_SYSPARAM, 0);
             break;
         case DECAY_EXPONENT:
             sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_SYSPARAM);
             if (sp_val)
             {
-                m_Result << "Cannot set decay exponent while decay mechanism is turned on."; 
+                SetErrorDetail("Cannot set decay exponent while decay mechanism is turned on.");
+                SetError(CLIError::kInvalidMode);
             }
             else
             {
@@ -516,7 +584,22 @@ bool CommandLineInterface::DoDecay(gSKI::Agent* pAgent,
                 pKernelHack->SetSysparam(pAgent, WME_DECAY_EXPONENT_SYSPARAM, arg);
 
                 sp_val = pKernelHack->GetSysparam(pAgent, WME_DECAY_EXPONENT_SYSPARAM);
-                sprintf(buf, "   Decay exponent set to %f \n", (double) (-1.0 * (double)sp_val / DECAY_EXPONENT_DIVISOR));
+                double dblval = (double) (-1.0 * (double)sp_val / DECAY_EXPONENT_DIVISOR);
+                sprintf(buf, "   Decay exponent set to %f \n", dblval);
+                
+                if (m_RawOutput)
+                {
+                    m_Result << buf;
+                }
+                else
+                {
+                    char convbuf[kMinBufferSize];
+                    sprintf(convbuf, "%g", dblval);
+                    AppendArgTag(sml_Names::kParamDecayExponent,
+                                 sml_Names::kTypeDouble,
+                                 convbuf);
+                }
+
                 m_Result << buf;
 
             }
