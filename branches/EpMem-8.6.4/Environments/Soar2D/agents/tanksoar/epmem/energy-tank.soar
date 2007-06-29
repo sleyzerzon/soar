@@ -1,0 +1,3 @@
+pushd energy-tank
+source energy-tank_source.soar
+popd
