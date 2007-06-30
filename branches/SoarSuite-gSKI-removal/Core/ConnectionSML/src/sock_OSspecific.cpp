@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -19,11 +16,8 @@
 //////////////////////////////////////////////////////////////////////
 // Windows Versions
 //////////////////////////////////////////////////////////////////////
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#include <windows.h>
 
 #include "sock_OSspecific.h"
-#include "sock_SocketHeader.h"
 
 bool sock::InitializeOperatingSystemSocketLibrary()
 {
@@ -64,23 +58,11 @@ bool sock::MakeSocketNonBlocking(SOCKET hSock)
 	return (res == 0) ;
 }
 
-bool sock::SleepSocket(long secs, long msecs)
-{
-	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
-	
-	Sleep((secs * 1000) + msecs) ;
-
-	return true ;
-}
-
 #else	// _WIN32
 //////////////////////////////////////////////////////////////////////
 // Linux Versions
 //////////////////////////////////////////////////////////////////////
 #include "sock_OSspecific.h"
-#include "sock_SocketHeader.h"
-
-#include <time.h>			// For sleep
 
 // Nothing needs to be initialized on Linux
 bool sock::InitializeOperatingSystemSocketLibrary()
@@ -101,15 +83,4 @@ bool sock::MakeSocketNonBlocking(SOCKET hSock)
 	return (res == 0) ;
 }
 
-bool sock::SleepSocket(long secs, long msecs)
-{
-	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
-	
-	struct timespec sleeptime;
-	sleeptime.tv_sec = secs;
-	sleeptime.tv_nsec = msecs * 1000000;
-	nanosleep(&sleeptime, 0);
-
-	return true ;
-}
 #endif	// _WIN32

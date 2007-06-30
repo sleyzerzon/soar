@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // RhsListener class file.
@@ -16,6 +13,7 @@
 */
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_RhsListener.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"

@@ -25,28 +25,12 @@
 
 #include <string>
 
-// Define the SOCKET type without pulling in "sock_SocketHeader.h" which would
-// pull in all of the Windows headers...that's a lot of work for one typedef.
-#ifdef _WIN32
-typedef	unsigned int	SOCKET ;
-#else // _WIN32
-#ifndef SOCKET	 // voigtjr: SOCKET seems to be already defined on linux
-typedef int				SOCKET ;
-#endif  // SOCKET
-#endif // _WIN32
-
 #ifdef _WIN32
 // Bring in the windows socket library.
 // By doing this in the code like this, each client doesn't need to add the winsock library
 // as an explicit dependency.  When it includes this header, it gets the winsock library linked in.
 #pragma comment (lib, "ws2_32.lib")
-#endif
-
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif 
-
-#include <sys/types.h>
+#endif // _WIN32
 
 #include "sock_DataSender.h"
 
@@ -58,10 +42,11 @@ namespace sock {
 // Useful utility functions.
 unsigned long GetLocalIP() ;
 char*		  GetLocalIPAddress() ;
+#ifdef ENABLE_LOCAL_SOCKETS
+std::string GetLocalSocketDir();		
+#endif
 
 #define NO_CONNECTION	0
-
-#define LOCAL_SOCKET_PATH "/var/tmp/"
 
 class ListenerSocket ;
 class ClientSocket ;
@@ -101,7 +86,7 @@ public:
 
 	// Close down our side of the socket
 	void		Close() ;
-		
+
 public:
 	// Print out debug information about the messages we are sending and receiving.
 	// NOTE: We still print out information about start up/shut down, errors etc. without this flag being true.
@@ -118,8 +103,6 @@ protected:
 	bool		SendBuffer(char const* pSendBuffer, size_t bufferSize) ;
 	bool		ReceiveBuffer(char* pRecvBuffer, size_t bufferSize) ;
 
-	// Report info on the error than just occurred.
-	void ReportErrorCode() ;
 };
 
 } // Namespace

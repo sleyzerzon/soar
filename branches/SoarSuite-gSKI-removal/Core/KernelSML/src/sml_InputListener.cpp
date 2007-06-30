@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // InputListener class file.
@@ -14,13 +11,12 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_InputListener.h"
 #include "sml_Connection.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
 #include "KernelHeaders.h"
-#include "sock_Check.h"
-#include "sock_Debug.h"	// For PrintDebugFormat
 
 using namespace sml ;
 

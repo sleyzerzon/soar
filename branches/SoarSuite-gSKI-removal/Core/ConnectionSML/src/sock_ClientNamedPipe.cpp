@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -16,10 +13,9 @@
 // 
 /////////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
+#ifdef ENABLE_NAMED_PIPES
 
-#include "sock_Debug.h"
-#include "sock_NamedPipeHeader.h"
+#include "sml_Utils.h"
 #include "sock_ClientNamedPipe.h"
 #include <assert.h>
 
@@ -54,11 +50,26 @@ bool ClientNamedPipe::ConnectToServer(char const* pPipeName)
 
 	if (pPipeName == NULL) { pPipeName = "12121"; }
 
+	unsigned long usernamesize = UNLEN+1;
+	char username[UNLEN+1];
+	GetUserName(username,&usernamesize);
+
 	// Get the address
 	std::string name = "\\\\.\\pipe\\";
+	name.append(username);
+	name.append("-");
 	name.append(pPipeName);
 
+	// set the name of this datasender
+	this->name = "pipe ";
+	this->name.append(name);
+
 	HANDLE hPipe;
+
+// silence warning about constant conditional expression
+#ifdef _MSC_VER
+#pragma warning (disable : 4127)
+#endif
 
 	while(1) {
 		// Create the pipe
@@ -74,10 +85,10 @@ bool ClientNamedPipe::ConnectToServer(char const* pPipeName)
 
 		if(hPipe != INVALID_HANDLE_VALUE) break;
 		
-		if (PIPE_ERROR_NUMBER != PIPE_BUSY)
+		if (GetLastError() != ERROR_PIPE_BUSY)
 		{
 			PrintDebug("Error: Error creating client connection pipe") ;
-			ReportErrorCode();
+			ReportSystemErrorMessage();
 			return false ;
 		}
 
@@ -85,15 +96,17 @@ bool ClientNamedPipe::ConnectToServer(char const* pPipeName)
 		if (!WaitNamedPipe(name.c_str(), 20000)) 
 		{ 
 			PrintDebug("Error: Error opening client connection pipe") ;
-			ReportErrorCode();
+			ReportSystemErrorMessage();
 			return false;
 		}
 	}
-
+#ifdef _MSC_VER
+#pragma warning (default : 4127)
+#endif
 	// Record the sock so it's cleaned up correctly on exit
 	m_hPipe = hPipe ;
 
 	return true ;
 }
 
-#endif // _WIN32
+#endif // ENABLE_NAMED_PIPES

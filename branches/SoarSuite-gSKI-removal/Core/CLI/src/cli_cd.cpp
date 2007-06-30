@@ -6,21 +6,14 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
+#include "sml_Utils.h"
 #include "cli_CommandLineInterface.h"
 
 #include "cli_Commands.h"
 
 using namespace cli;
-
-#ifdef WIN32
-#include <direct.h>
-#define chdir _chdir
-#endif // WIN32
 
 bool CommandLineInterface::ParseCD(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
 	unused(pAgent);

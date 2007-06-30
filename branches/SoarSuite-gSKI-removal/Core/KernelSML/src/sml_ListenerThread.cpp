@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -14,12 +11,13 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_ConnectionManager.h"
 #include "sml_ListenerThread.h"
 #include "sml_KernelSML.h"
-#include "sock_Debug.h"
 
 #include <time.h>	// To get clock
+#include <stdio.h> // To concat file name for socket file deletion
 
 using namespace sml ;
 using namespace sock ;
@@ -43,7 +41,7 @@ void ListenerThread::Run()
 #ifdef ENABLE_LOCAL_SOCKETS
 
 	// Create the listener
-	PrintDebugFormat("Listening on file %s%d", LOCAL_SOCKET_PATH, m_Port) ;
+	PrintDebugFormat("Listening on file %s%d", sock::GetLocalSocketDir().c_str(), m_Port) ;
 
 	ok = m_LocalListenerSocket.CreateListener(m_Port, true);
 
@@ -56,8 +54,11 @@ void ListenerThread::Run()
 
 #ifdef ENABLE_NAMED_PIPES
 
+	unsigned long usernamesize = UNLEN+1;
+	char username[UNLEN+1];
+	GetUserName(username,&usernamesize);
 	std::stringstream pipeName;
-	pipeName << "\\\\.\\pipe\\" << m_Port;
+	pipeName << "\\\\.\\pipe\\" << username << "-" << m_Port;
 
 	// Create the listener
 	PrintDebugFormat("Listening on pipe %s", pipeName.str().c_str()) ;
@@ -106,13 +107,26 @@ void ListenerThread::Run()
 		// Sleep for a little before checking for a new connection
 		// New connections will come in very infrequently so this doesn't
 		// have to be very rapid.
-		Sleep(0, 50) ;
+		soar_sleep(0, 50) ;
 	}
 
 	// Shut down our listener socket
 	m_ListenerSocket.Close() ;
 #ifdef ENABLE_LOCAL_SOCKETS
 	m_LocalListenerSocket.Close();
+
+// This code shouldn't be necessary since the we unlink existing files on start
+// and since the file is in the user's home, permissions for that won't be an issue
+/*
+	char f_name[256];
+	sprintf( f_name, "%s%d", sock::GetLocalSocketDir().c_str(), m_Port );
+	PrintDebugFormat( "Attempting to delete %s", f_name );
+	int del_status = unlink( f_name );
+	if ( del_status == 0 )
+		PrintDebug( "Delete succeeded!" );
+	else
+		PrintDebugFormat( "Error occurred during delete attempt, error code %d", errno );
+*/
 #endif
 #ifdef ENABLE_NAMED_PIPES
 	m_ListenerNamedPipe.Close();
@@ -121,7 +135,7 @@ void ListenerThread::Run()
 
 void ListenerThread::CreateConnection(DataSender* pSender)
 {
-	PrintDebug("Got new connection") ;
+	PrintDebugFormat("Got new connection on %s", pSender->GetName().c_str()) ;
 
 	// Create a new connection object for this socket
 	Connection* pConnection = Connection::CreateRemoteConnection(pSender) ;

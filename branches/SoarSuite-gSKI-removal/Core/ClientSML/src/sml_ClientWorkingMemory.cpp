@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -24,6 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_ClientWorkingMemory.h"
 #include "sml_ClientIdentifier.h"
 #include "sml_ClientAgent.h"
@@ -39,8 +37,6 @@
 #include "sml_EmbeddedConnection.h"	// For access to direct methods
 #include "sml_ClientDirect.h"
 #include <assert.h>
-
-#include "sock_Debug.h"
 
 using namespace sml ;
 

@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -27,20 +24,16 @@
 // 
 /////////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
+#ifdef ENABLE_NAMED_PIPES
 
 #include <stdio.h>
-#include "sock_NamedPipeHeader.h"
+#include "sml_Utils.h"
 #include "sock_NamedPipe.h"
-#include "sock_Check.h"
-#include "sock_Debug.h"
-
-#include "sock_Utils.h"
 
 #include <assert.h>
 
 #ifdef PIPE_NON_BLOCKING
-#include "sock_OSspecific.h"	// For sleep
+#include "sml_Utils.h"	// For soar_sleep
 #endif
 
 using namespace sock ;
@@ -116,7 +109,7 @@ bool NamedPipe::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 			success = WriteFile( 
 				hPipe,        // handle to pipe 
 				pSendBuffer,      // buffer to write from 
-				bufferSize, // number of bytes to write 
+				(unsigned long)bufferSize, // number of bytes to write 
 				&thisSend,   // number of bytes written 
 				NULL);        // not overlapped I/O 
 
@@ -130,13 +123,13 @@ bool NamedPipe::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 				if (IsErrorWouldBlock())
 				{
 					PrintDebug("Waiting for pipe to unblock") ;
-					SleepSocket(0, 0) ;
+					soar_sleep(0, 0) ;
 				}
 				else
 #endif
 				{
 					PrintDebug("Error: Error sending message") ;
-					ReportErrorCode() ;
+					ReportSystemErrorMessage() ;
 					return false ;
 				}
 			}
@@ -169,6 +162,9 @@ bool NamedPipe::IsReadDataAvailable(long secondsWait, long millisecondsWait)
 {
 	assert(millisecondsWait<1000 && "specified milliseconds must be less than 1000");
 
+	unused(secondsWait);
+	unused(millisecondsWait);
+
 	CTDEBUG_ENTER_METHOD("NamedPipe::IsReadDataAvailable");
 
 	HANDLE hPipe = m_hPipe ;
@@ -189,18 +185,18 @@ bool NamedPipe::IsReadDataAvailable(long secondsWait, long millisecondsWait)
 	if (res == 0)
 	{
 		// if the pipe hasn't been connected yet, then just return
-		if(GetLastError() == PIPE_BAD) {
+		if(GetLastError() == ERROR_BAD_PIPE) {
 			return false;
 		}
 
-		if(GetLastError() == PIPE_BROKEN) {
+		if(GetLastError() == ERROR_BROKEN_PIPE) {
 			PrintDebug("Remote pipe has closed gracefully") ;
 			Close() ;
 			return false;
 		}
 
 		PrintDebug("Error: Error checking if data is available to be read") ;
-		ReportErrorCode() ;
+		ReportSystemErrorMessage() ;
 
 		// We treat these errors as all being fatal, which they all appear to be.
 		// If we later decide we can survive certain ones, we should test for them here
@@ -261,7 +257,7 @@ bool NamedPipe::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 			success = ReadFile( 
 				hPipe,        // handle to pipe 
 				pRecvBuffer,    // buffer to receive data 
-				bufferSize, // size of buffer 
+				(unsigned long)bufferSize, // size of buffer 
 				&thisRead, // number of bytes read 
 				NULL);        // not overlapped I/O 
 
@@ -275,14 +271,14 @@ bool NamedPipe::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 				if (IsErrorWouldBlock())
 				{
 					//PrintDebug("Waiting for pipe to unblock") ;
-					SleepSocket(0, 0) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
+					soar_sleep(0, 0) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
 				}
 				else
 #endif
 				{
 					PrintDebug("Error: Error receiving message") ;
 
-					ReportErrorCode() ;
+					ReportSystemErrorMessage() ;
 
 					// We treat these errors as all being fatal, which they all appear to be.
 					// If we later decide we can survive certain ones, we should test for them here
@@ -323,39 +319,6 @@ bool NamedPipe::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 }
 
 /////////////////////////////////////////////////////////////////////
-// Function name  : ReportErrorCode
-// 
-// Return type    : void 	
-// 
-// Description	  : Convert the error code to useful text.
-//
-/////////////////////////////////////////////////////////////////////
-void NamedPipe::ReportErrorCode()
-{
-	CTDEBUG_ENTER_METHOD("SoarPipe - ReportErrorCode");
-
-	unsigned long error = PIPE_ERROR_NUMBER ;
-
-	switch (error)
-	{
-	case PIPE_INVALID_HANDLE:	PrintDebug("Error: The handle is invalid.") ; break ;
-	case PIPE_BROKEN:			PrintDebug("Error: The pipe has been ended.") ; break ;
-	case PIPE_ALREADY_EXISTS:	PrintDebug("Error: Cannot create a file when that file already exists.") ; break ;
-	case PIPE_BAD:				PrintDebug("Error: The pipe state is invalid.") ; break ;
-	case PIPE_BUSY:				PrintDebug("Error: All pipe instances are busy.") ; break ;
-	case PIPE_NO_DATA:			PrintDebug("Error: The pipe is being closed.") ; break ;
-	case PIPE_NOT_CONNECTED:	PrintDebug("Error: No process is on the other end of the pipe.") ; break ;
-	case PIPE_MORE_DATA:		PrintDebug("Error: More data is available.") ; break ;
-
-	default:
-		{
-			PrintDebugFormat("Error: Unknown error %d",error) ;
-			break ;
-		}
-	}
-}
-
-/////////////////////////////////////////////////////////////////////
 // Function name  : NamedPipe::Close
 // 
 // Return type    : void 	
@@ -375,4 +338,4 @@ void NamedPipe::Close()
 	}
 }
 
-#endif //_WIN32
+#endif // ENABLE_NAMED_PIPES

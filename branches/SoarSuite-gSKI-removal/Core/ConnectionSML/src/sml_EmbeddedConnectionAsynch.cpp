@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // EmbeddedConnectionAsynch class
@@ -20,11 +17,11 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_EmbeddedConnectionAsynch.h"
 #include "sml_ElementXML.h"
 #include "sml_MessageSML.h"
 #include "thread_Thread.h"
-#include "sock_Debug.h"
 
 #include <string>
 #include <iostream>
@@ -52,7 +49,7 @@ EmbeddedConnectionAsynch::~EmbeddedConnectionAsynch()
 * this command.  To get a response call GetResponseForID()
 * and wait for the response to occur.
 *************************************************************/
-void EmbeddedConnectionAsynch::SendMessage(ElementXML* pMsg)
+void EmbeddedConnectionAsynch::SendMsg(ElementXML* pMsg)
 {
 	ClearError() ;
 
@@ -267,7 +264,7 @@ ElementXML* EmbeddedConnectionAsynch::GetResponseForID(char const* pID, bool wai
 		// Allow other threads the chance to update
 		// (by calling with 0 for sleep time we don't give away cycles if
 		//  no other thread is waiting to execute).
-		soar_thread::Thread::SleepStatic(sleepTimeSecs, sleepTimeMillisecs) ;
+		soar_sleep(sleepTimeSecs, sleepTimeMillisecs) ;
 
 #ifdef PROFILE_CONNECTIONS
 		m_IncomingTime += m_pTimer->Elapsed() ;
@@ -313,7 +310,7 @@ bool EmbeddedConnectionAsynch::ReceiveMessages(bool allMessages)
 		// If we got a response to the incoming message, send that response back.
 		if (pResponse)
 		{
-			SendMessage(pResponse) ;		
+			SendMsg(pResponse) ;		
 		}
 
 		// We're done with the response

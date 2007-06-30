@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // AgentListener class file.
@@ -21,6 +18,7 @@
 */
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_AgentListener.h"
 #include "sml_OutputListener.h"
 #include "sml_Connection.h"

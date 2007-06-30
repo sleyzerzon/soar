@@ -1,3 +1,5 @@
+#include <portability.h>
+
 /////////////////////////////////////////////////////////////////
 // KernelCallback class file.
 //
@@ -9,6 +11,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_KernelCallback.h"
 #include "sml_AgentSML.h"
 #include "KernelHeaders.h"

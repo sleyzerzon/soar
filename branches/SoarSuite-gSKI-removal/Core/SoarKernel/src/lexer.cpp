@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -61,6 +58,8 @@
     See comments in soarkernel.h for an overview.
    ====================================================================== */
 
+#include <stdlib.h>
+
 #include "lexer.h"
 #include "mem.h"
 #include "kernel.h"
@@ -69,6 +68,9 @@
 #include "init_soar.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
+
+#include <math.h>
+#include <ctype.h>
 
 //
 // These three should be safe for re-entrancy.  --JNW--

@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -23,6 +20,8 @@
  * =======================================================================
  */
 
+#include <stdlib.h>
+
 #include "production.h"
 #include "mem.h"
 #include "kernel.h"
@@ -35,6 +34,8 @@
 #include "symtab.h"
 #include "init_soar.h"
 #include "rete.h"
+
+#include <ctype.h>
 
 /* comment out the following line to supress compile-time o-support
    calculations */

@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 #include <iostream>
@@ -33,11 +30,6 @@
 #elif defined SML_GSKI_STYLE
 	//SML Directives
 
-#endif
-
-// helps quell warnings
-#ifndef unused
-#define unused(x) (void)(x)
 #endif
 
 using std::cout; using std::cin; using std::endl;
@@ -162,25 +154,6 @@ int main(int argc, char* argv[])
 		//time = total.Elapsed() ;
 		//cout << "Total run time: " << time << endl ;
 	}
-
-//#ifdef _DEBUG
-//	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
-//	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
-
-//	_CrtDbgReport(_CRT_WARN, NULL, NULL, "TowersOfHanoi", "Checking memory in TowersOfHanoi\n");
-//	_CrtDumpMemoryLeaks();
-//#endif
-
-#ifdef _MSC_VER
-	// Wait for the user to press return to exit the program. (So window doesn't just vanish).
-	if (stopAtEnd)
-	{
-		printf("\n\nPress <return> to exit\n") ;
-		char line[100] ;
-		char* str = gets(line) ;
-		unused(str);
-	}
-#endif //_MSC_VER
 
 	return 0;
 }

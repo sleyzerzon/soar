@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -15,10 +12,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
-#include <crtdbg.h>
-#endif
-
+#include "sml_Utils.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "sml_Connection.h"
@@ -33,8 +27,6 @@
 #include "sml_Events.h"
 #include "sml_RunScheduler.h"
 #include "KernelHeaders.h"
-
-#include "sock_Debug.h"	// For PrintDebugFormat
 
 #include <iostream>
 #include <fstream>
@@ -62,38 +54,6 @@
 
 using namespace sml ;
 using namespace gSKI ;
-
-// BADBAD: Not sure where this macro is coming from but I saw this
-// in IgSKI_Symbol.h and it's needed for the GetObject() calls to compile.
-#ifdef _WIN32
-#undef GetObject
-#undef SendMessage
-#endif
-
-#if HAVE_STRINGS_H
-#include <strings.h>
-#if HAVE_STRCASECMP
-#define stricmp strcasecmp
-#endif // HAVE_STRCASECMP
-#endif // HAVE_STRINGS_H
-
-#ifdef _MSC_VER
-#define stricmp _stricmp
-#endif
-
-/*
-static void DebugPrint(char const* pFilename, int line, char const* pMsg)
-{
-#ifdef _WIN32
-#ifdef _DEBUG
-	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
-	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
-
-	_CrtDbgReport(_CRT_WARN, pFilename, line, "KernelSML", pMsg);
-#endif
-#endif
-}
-*/
 
 /*
   ==================================

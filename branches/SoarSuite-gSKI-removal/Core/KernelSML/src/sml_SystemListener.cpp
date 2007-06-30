@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // SystemListener class file.
@@ -25,6 +22,7 @@
 *      gSKIEVENT_AFTER_RHS_FUNCTION_EXECUTED,
 */////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_SystemListener.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"

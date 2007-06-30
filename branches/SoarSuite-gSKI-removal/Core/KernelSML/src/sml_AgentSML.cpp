@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -14,6 +11,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_AgentSML.h"
 #include "sml_OutputListener.h"
 #include "sml_StringOps.h"
@@ -38,10 +36,6 @@
 #ifdef _DEBUG
 // Comment this in to debug init-soar and inputwme::update calls
 //#define DEBUG_UPDATE
-#endif
-
-#ifdef DEBUG_UPDATE
-#include "sock_Debug.h"	// For PrintDebugFormat
 #endif
 
 #ifdef _WIN32

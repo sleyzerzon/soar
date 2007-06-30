@@ -1,3 +1,5 @@
+#include <portability.h>
+
 /////////////////////////////////////////////////////////////////
 // RhsFunction class file.
 //
@@ -7,6 +9,7 @@
 // Support for right hand side functions.
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_RhsFunction.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"

@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // AgentOutputFlusher class file.
@@ -11,16 +8,13 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_AgentOutputFlusher.h"
 #include "assert.h"
 #include "sml_PrintListener.h"
 #include "sml_XMLListener.h"
 
 using namespace sml ;
-
-#ifndef unused
-#define unused(x) (void)(x)
-#endif
 
 AgentOutputFlusher::AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, egSKIPrintEventId eventID) : m_pPrintListener(pPrintListener)
 {

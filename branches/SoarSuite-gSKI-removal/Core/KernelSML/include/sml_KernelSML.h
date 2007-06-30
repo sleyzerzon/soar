@@ -14,10 +14,6 @@
 #ifndef SML_KERNEL_SML_H
 #define SML_KERNEL_SML_H
 
-#ifdef _WIN32
-#include <crtdbg.h>
-#endif
-
 typedef struct kernel_struct kernel;
 
 // Forward declarations
@@ -32,15 +28,8 @@ namespace gSKI {
 	struct Error ;
 }
 
-#ifdef _MSC_VER
-#pragma warning (disable : 4702)  // warning C4702: unreachable code, need to disable for VS.NET 2003 due to STL "bug" in certain cases
-#endif
 #include <map>
-#ifdef _MSC_VER
-#pragma warning (default : 4702)
-#endif
 #include <list>
-
 
 #include "cli_CommandLineInterface.h"
 #include "sml_SystemListener.h"
@@ -217,7 +206,6 @@ public:
 	*************************************************************/
 	static void DebugPrint(char const* pFilename, int line, char const* pMsg)
 	{
-#ifdef _WIN32
 #ifdef _DEBUG
 		_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
 		_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
@@ -227,8 +215,7 @@ public:
 		unused(pFilename) ;
 		unused(line) ;
 		unused(pMsg) ;
-#endif
-#endif
+#endif // _DEBUG
 	}
 
 public:

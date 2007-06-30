@@ -13,26 +13,17 @@
 *
 *****************************************************/
 
+#include <portability.h>
+
+#include "sml_Utils.h"
 #include "SoarTextIO.h"
-#include "stdlib.h"
 #include <iostream>
 #include <stdlib.h>
 #include <string>
 #include <cctype>
 
-#ifdef _WIN32
-#include <process.h>
-#include <windows.h>
-#include <conio.h>
-#include <direct.h>
 #include <errno.h>
-#else
 #include <time.h>
-//#include <ncurses.h>
-#include <pthread.h>
-
-#endif //_WIN32
-
 
 using namespace sml;
 
@@ -50,24 +41,15 @@ void* RunForever( void* info);
 
 SoarTextIO::SoarTextIO()
 {
-#ifdef _WIN32
-	_chdir("../../SoarLibrary/bin/");
-#endif
 	init_soar = false;
 	RemoteConnect();
 	cout << endl;	
-
-
-
 }
 
 SoarTextIO::~SoarTextIO()
 {
 	pKernel->Shutdown();
 	delete pKernel;
-#ifndef _WIN32
-//	endwin();
-#endif
 }
 
 void
@@ -283,11 +265,7 @@ SoarTextIO::WriteCycle(istream* getFrom)
 
 	word = "", forMem = "";
 	checker = "";
-#ifdef _WIN32
-	while(!printNow) { Sleep(1); }
-#else 
-	while(!printNow) { usleep(1); }
-#endif // _WIN32
+	while(!printNow) { soar_sleep(0,1); }
 	if(*getFrom == cin)
 	{
 		if(print_hack != 2)
@@ -877,11 +855,7 @@ SoarTextIO::spawnDebugger()
 
 	while(1)
 	{
-#ifdef _WIN32
-		Sleep(100);
-#else
-		sleep(1);
-#endif
+		soar_sleep(1,0);
 		pKernel->GetAllConnectionInfo();
 		char const * status = pKernel->GetAgentStatus(java_debugger);
 		if(status && !strcmp(status,ready)) break;
@@ -906,10 +880,6 @@ void
 SoarTextIO::WhenReady()
 {
 	cout << endl << "Please make sure your productions are loaded before giving Soar input.";
-	/*	string hold;
-	while(!_kbhit()){ Sleep(10); };
-	Sleep(10);
-	cin >> hold;*/
 	cout << endl << endl;
 }
 

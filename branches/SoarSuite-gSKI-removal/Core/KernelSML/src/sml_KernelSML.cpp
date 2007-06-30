@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -16,6 +13,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "sml_Connection.h"
@@ -55,13 +53,6 @@
 
 using namespace sml ;
 using namespace gSKI ;
-
-// BADBAD: Not sure where this macro is coming from but I saw this
-// in IgSKI_Symbol.h and it's needed for the GetObject() calls to compile.
-#ifdef _WIN32
-#undef GetObject
-#undef SendMessage
-#endif
 
 // Singleton instance of the kernel object
 KernelSML* KernelSML::s_pKernel = NULL ;
@@ -184,7 +175,7 @@ void KernelSML::DeleteAllAgents(bool waitTillDeleted)
 		int maxTries = 100 ;	// Wait for a second then abort anyway
 		while (waitTillDeleted && agentCount == m_AgentMap.size() && maxTries > 0)
 		{
-			soar_thread::Thread::SleepStatic(0, 10) ;
+			soar_sleep(0, 10) ;
 			maxTries-- ;
 		}
 	}

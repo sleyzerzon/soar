@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -14,6 +11,7 @@
 // one of these and then creating agents through it etc.
 //
 /////////////////////////////////////////////////////////////////
+#include "sml_Utils.h"
 #include "sml_ClientKernel.h"
 #include "sml_ClientAgent.h"
 #include "sml_Connection.h"
@@ -1690,15 +1688,6 @@ bool Kernel::CheckForIncomingEvents()
 }
 
 /*************************************************************
-* @brief This is a utility wrapper to let us sleep the entire client process
-*		 for a period of time.
-*************************************************************/
-void Kernel::Sleep(long milliseconds)
-{
-	soar_thread::Thread::SleepStatic(0, milliseconds) ;
-}
-
-/*************************************************************
 * @brief Register for a particular event at the kernel
 *************************************************************/
 void Kernel::RegisterForEventWithKernel(int id, char const* pAgentName)
@@ -2437,16 +2426,6 @@ std::string Kernel::GetSMLVersion()
 }
 
 // The below stuff is to support LoadExternalLibrary
-
-#ifdef _WIN32
-#include "Windows.h"	// Needed for load library
-#undef SendMessage		// Windows defines this as a macro.  Yikes!
-
-#else // _WIN32
-#include <dlfcn.h>      // Needed for dlopen and dlsym
-#define GetProcAddress dlsym
-
-#endif // not _WIN32
 
 // how will we report errors from this?
 // -- numeric code (bad because codes will be different for each library, or library can fail in ways not covered by pre-defined codes)

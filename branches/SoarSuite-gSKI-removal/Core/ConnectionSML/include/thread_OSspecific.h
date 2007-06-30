@@ -18,8 +18,6 @@ typedef void (*ThreadFuncPtr)(void*);
 
 void BeginThread(ThreadFuncPtr inThreadFuncPtr,void* inParam) ;
 
-bool SleepThread(long seconds, long msecs) ;
-
 class OSSpecificTimer
 {
 public:

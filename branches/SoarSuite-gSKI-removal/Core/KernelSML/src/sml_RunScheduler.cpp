@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // Run class
@@ -13,6 +10,7 @@
 // can function well in concert with a debugger.
 //
 /////////////////////////////////////////////////////////////////
+#include "sml_Utils.h"
 #include "sml_RunScheduler.h"
 
 #ifdef USE_NEW_SCHEDULER

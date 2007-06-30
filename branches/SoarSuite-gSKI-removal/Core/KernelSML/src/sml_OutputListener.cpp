@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // OutputListener class file.
@@ -14,6 +11,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_OutputListener.h"
 #include "sml_Connection.h"
 #include "sml_TagWme.h"
@@ -31,10 +29,6 @@
 #ifdef _DEBUG
 // Comment this in to debug init-soar and inputwme::update calls
 //#define DEBUG_UPDATE
-#endif
-
-#ifdef DEBUG_UPDATE
-#include "sock_Debug.h"	// For PrintDebugFormat
 #endif
 
 #include <vector>

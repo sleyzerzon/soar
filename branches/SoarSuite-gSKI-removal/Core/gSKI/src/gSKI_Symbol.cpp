@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -32,13 +29,6 @@
 //#include "MegaUnitTest.h"
 //
 //DEF_EXPOSE(gSKI_Symbol)
-
-#ifdef _WIN32
-#define safeSprintf _snprintf
-#else
-#define safeSprintf snprintf
-#endif
-
 
 namespace gSKI
 {
@@ -254,18 +244,18 @@ namespace gSKI
          return (char*) (sym->var.name);
          break;
       case IDENTIFIER_SYMBOL_TYPE:
-         safeSprintf(temp,128,"%c%lu",sym->id.name_letter,sym->id.name_number);
+         snprintf(temp,128,"%c%lu",sym->id.name_letter,sym->id.name_number);
          return std::string(temp);
          break;
       case SYM_CONSTANT_SYMBOL_TYPE:
          return (char *) (sym->sc.name);
          break;
       case INT_CONSTANT_SYMBOL_TYPE:
-         safeSprintf(temp,128, "%ld",sym->ic.value);
+         snprintf(temp,128, "%ld",sym->ic.value);
          return std::string(temp);
          break;
       case FLOAT_CONSTANT_SYMBOL_TYPE:
-         safeSprintf(temp, 128, "%g",sym->fc.value);
+         snprintf(temp, 128, "%g",sym->fc.value);
          return std::string(temp);
          break;
       default:

@@ -132,9 +132,6 @@ typedef union symbol_union Symbol;
    about creating chunk names. */
 /*  #define DEBUG_CHUNK_NAMES */
 
-/* Uncomment following line if you want to use the ANSI stdarg facility */
-#define USE_STDARGS
-
 /* UnComment the following lines if you want to use X windows rather    */
 /* than standard I/O and are not using Tcl. */
 /* #ifndef USE_TCL */
@@ -185,11 +182,6 @@ enum ni_mode {
 #define MINOR_VERSION_NUMBER 6
 #define MICRO_VERSION_NUMBER 4
 #define GREEK_VERSION_NUMBER 0
-
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#endif
 
 #define BUFFER_MSG_SIZE 128
 

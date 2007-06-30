@@ -317,6 +317,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sml_Utils.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\sml_XMLTrace.cpp"
 				>
 			</File>
@@ -330,10 +334,6 @@
 			</File>
 			<File
 				RelativePath=".\src\sock_DataSender.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\sock_Debug.cpp"
 				>
 			</File>
 			<File
@@ -358,10 +358,6 @@
 			</File>
 			<File
 				RelativePath=".\src\sock_SocketLib.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\sock_Utils.cpp"
 				>
 			</File>
 			<File
@@ -479,11 +475,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\sml_XMLTrace.h"
+				RelativePath=".\include\sml_Utils.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\sock_Check.h"
+				RelativePath=".\include\sml_XMLTrace.h"
 				>
 			</File>
 			<File
@@ -499,10 +495,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\sock_Debug.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\sock_ListenerNamedPipe.h"
 				>
 			</File>
@@ -515,10 +507,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\sock_NamedPipeHeader.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\sock_OSspecific.h"
 				>
 			</File>
@@ -527,15 +515,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\sock_SocketHeader.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\sock_SocketLib.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\sock_Utils.h"
 				>
 			</File>
 			<File

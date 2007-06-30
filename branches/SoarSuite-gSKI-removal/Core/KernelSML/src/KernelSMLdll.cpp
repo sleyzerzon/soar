@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // KernelSMLdll.cpp : Defines the entry point for the DLL application.
@@ -19,17 +16,14 @@
 // embedded in the client application).
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "KernelSMLdll.h"
 #include "sml_KernelSML.h"
 
 #ifdef _WIN32
 
 // Check for memory leaks
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
-#include <crtdbg.h>
-#endif
 
 bool __stdcall DllMain( void * hModule, 
                        unsigned long  ul_reason_for_call, 
@@ -38,7 +32,7 @@ bool __stdcall DllMain( void * hModule,
 {
 #ifdef _DEBUG
 //	_crtBreakAlloc = 165;
-#endif
+#endif // _DEBUG
 
 	unused(hModule) ;
 	unused(ul_reason_for_call) ;
@@ -47,10 +41,10 @@ bool __stdcall DllMain( void * hModule,
 // Define this ourselves to save bringing in the entire windows headers for this one value.
 #ifndef DLL_PROCESS_DETACH
 #define DLL_PROCESS_DETACH 0
-#endif
+#endif // DLL_PROCESS_DETACH
 #ifndef DLL_PROCESS_ATTACH
 #define DLL_PROCESS_ATTACH   1    
-#endif
+#endif // DLL_PROCESS_ATTACH
 
 	if (ul_reason_for_call == DLL_PROCESS_ATTACH)
 	{
@@ -78,9 +72,9 @@ bool __stdcall DllMain( void * hModule,
 // it back on at some point and chase them all down.
 //		_CrtDbgReport(_CRT_WARN, NULL, NULL, "KernelSML", "Checking memory in KernelSML\n");
 //		_CrtDumpMemoryLeaks();
-#endif
+#endif // _DEBUG
 	}
 
     return 1;
 }
-#endif
+#endif // _WIN32

@@ -25,11 +25,8 @@
 #ifndef NAMED_PIPE_H
 #define NAMED_PIPE_H
 
-#ifdef _WIN32
+#ifdef ENABLE_NAMED_PIPES
 #include <string>
-
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#include <windows.h>			// for INVALID_HANDLE_VALUE
 
 #include "sock_DataSender.h"
 
@@ -100,12 +97,9 @@ protected:
 	bool		SendBuffer(char const* pSendBuffer, size_t bufferSize) ;
 	bool		ReceiveBuffer(char* pRecvBuffer, size_t bufferSize) ;
 
-	// Report info on the error than just occurred.
-	void ReportErrorCode() ;
-
 };
 
 } // Namespace
 
-#endif // _WIN32
+#endif // ENABLE_NAMED_PIPES
 #endif // NAMED_PIPE_H

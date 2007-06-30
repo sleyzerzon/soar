@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -20,11 +17,15 @@
  * =======================================================================
  */
 
+#include <stdlib.h>
+
 #include "mem.h"
 #include "kernel.h"
 #include "agent.h"
 #include "init_soar.h"
 #include "print.h"
+
+#include <assert.h>
 
 /* ====================================================================
 
@@ -238,7 +239,7 @@ void add_block_to_memory_pool (agent* thisAgent, memory_pool *p) {
   can we keep a block counter on the agent and check it modulo some function of the limit?
    */
  /*
-  total = 0;
+  unsigned long total = 0;
   for (i=0; i<NUM_MEM_USAGE_CODES; i++) total += thisAgent->memory_for_usage[i];
   
   if (total > thisAgent->sysparams[MAX_MEMORY_USAGE_SYSPARAM]) {      

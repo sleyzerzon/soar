@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // ConnectionManager class
@@ -15,11 +12,11 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_ConnectionManager.h"
 #include "sml_ListenerThread.h"
 #include "sml_ReceiverThread.h"
 #include "sml_KernelSML.h"
-#include "sock_Debug.h"
 
 #include <time.h>	// To get clock
 

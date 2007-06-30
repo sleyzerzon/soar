@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -42,7 +39,9 @@
 
    See comments in soarkernel.h for more information.
    ================================================================== */
- 
+
+#include <stdlib.h>
+
 #include "io.h"
 #include "callback.h"
 #include "agent.h"
@@ -55,8 +54,9 @@
 #include "production.h"
 #include "lexer.h"
 #include "gski_event_system_functions.h" // support for generating XML output
-#include "../../ConnectionSML/include/sock_Debug.h"	// For PrintDebugFormat
+//#include "../../ConnectionSML/include/sml_Utils.h"	// For PrintDebugFormat
 
+#include <ctype.h>
 
 extern void gds_invalid_so_remove_goal (agent* thisAgent, wme *w);
 

@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // ReceiverThread class
@@ -14,10 +11,10 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_ConnectionManager.h"
 #include "sml_ReceiverThread.h"
 #include "sml_KernelSML.h"
-#include "sock_Debug.h"
 
 #include <time.h>	// To get clock
 
@@ -80,8 +77,8 @@ void ReceiverThread::Run()
 		// Sleep(0) just allows other threads to run before we continue
 		// to execute.
 		if (current - last > delay)
-			Sleep(0, 5) ;
+			soar_sleep(0, 5) ;
 		else
-			Sleep(0, 0) ;
+			soar_sleep(0, 0) ;
 	}
 }

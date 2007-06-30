@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // EventThread class
@@ -21,9 +18,9 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_EventThread.h"
 #include "sml_Connection.h"
-#include "sock_Debug.h"
 
 #include <time.h>	// To get clock
 
@@ -101,14 +98,14 @@ void EventThread::Run()
 		// Sleep(0) just allows other threads to run before we continue
 		// to execute.
 		if (current - last > delay)
-			Sleep(0, 5) ;
+			soar_sleep(0, 5) ;
 		else
 			// Changed this to always use sleep 5 now.
 			// Calling sleep(0) here as we used to can cause a single threaded app
 			// to take over the CPU, slowing down the entire system.  Doesn't happen
 			// on a hyper threaded CPU, but on a normal CPU it's a significant problem.
 			// The trade-off is that the response to events may not be quite as fast.
-			Sleep(0, 5) ;
+			soar_sleep(0, 5) ;
 	}
 
 /*

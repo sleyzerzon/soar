@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /********************************************************************
 * @file gski_symbolfactory.h 

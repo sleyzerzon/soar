@@ -6,21 +6,10 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
+#include "sml_Utils.h"
 #include "cli_CommandLineInterface.h"
-
-#ifdef WIN32
-#include <direct.h>
-#include <Windows.h>
-#define getcwd _getcwd
-#include "pcreposix.h"
-#else //WIN32
-#include <regex.h>
-#endif // WIN32
 
 #include <assert.h>
 

@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -22,10 +19,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
-#undef SendMessage		// Windows defines this as a macro.  Yikes!
-#endif
-
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_ElementXML.h"
 #include "sml_MessageSML.h"
@@ -496,7 +490,7 @@ bool Connection::SendMessageGetResponse(AnalyzeXML* pAnalysis, ElementXML* pMsg)
 	soar_thread::Lock lock(&m_ClientMutex) ;
 
 	// Send the command over.
-	SendMessage(pMsg);
+	SendMsg(pMsg);
 
 	// There was an error in the send, so we're done.
 	if (HadError())

@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // RemoteConnection class
@@ -18,9 +15,9 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_RemoteConnection.h"
 #include "sock_Socket.h"
-#include "sock_Debug.h"
 #include "thread_Thread.h"
 
 #include <assert.h>
@@ -162,7 +159,7 @@ bool RemoteConnection::DoesResponseMatch(ElementXML* pResponse, char const* pID)
 * To get a response call GetResponseForID()
 * and wait for the response to occur.
 *************************************************************/
-void RemoteConnection::SendMessage(ElementXML* pMsg)
+void RemoteConnection::SendMsg(ElementXML* pMsg)
 {
 	ClearError() ;
 
@@ -259,7 +256,7 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 		// Allow other threads the chance to update
 		// (by calling with 0 for sleep time we don't give away cycles if
 		//  no other thread is waiting to execute).
-		soar_thread::Thread::SleepStatic(sleepTimeSecs, sleepTimeMillisecs) ;
+		soar_sleep(sleepTimeSecs, sleepTimeMillisecs) ;
 
 		// Check if the connection has been closed
 		if (IsClosed())
@@ -361,7 +358,7 @@ bool RemoteConnection::ReceiveMessages(bool allMessages, long secondsWait, long 
 		// If we got a response to the incoming message, send that response back.
 		if (pResponse)
 		{
-			SendMessage(pResponse) ;		
+			SendMsg(pResponse) ;		
 		}
 
 		// We're done with the response

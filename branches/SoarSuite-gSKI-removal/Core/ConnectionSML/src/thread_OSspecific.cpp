@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // OSspecific class
@@ -23,24 +20,12 @@ using namespace soar_thread ;
 //////////////////////////////////////////////////////////////////////
 // Windows Versions
 //////////////////////////////////////////////////////////////////////
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#define _WIN32_WINNT 0x0400		// This is required since our target is NT4+
-#include <windows.h>
-#include <process.h>
 
 void soar_thread::BeginThread(ThreadFuncPtr inThreadFuncPtr,void* inParam)
 {
 	// Must compile with the /MT switch (for multi-threaded libraries)
 	// or you'll get a "function not found" error here.
      _beginthread(inThreadFuncPtr,0,inParam) ;
-}
-
-bool soar_thread::SleepThread(long secs, long msecs)
-{
-	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
-	Sleep( (secs * 1000) + msecs) ;
-
-	return true ;
 }
 
 class WindowsTimer : public OSSpecificTimer
@@ -149,11 +134,7 @@ OSSpecificEvent* soar_thread::MakeEvent()
 // Linux/POSIX Versions -- untested
 //////////////////////////////////////////////////////////////////////
 
-#include <pthread.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <errno.h>
-#include <sys/time.h>
 
 struct ThreadArgs {
     ThreadFuncPtr threadFuncPtr;
@@ -182,21 +163,6 @@ void soar_thread::BeginThread(ThreadFuncPtr inThreadFuncPtr,void* inParam)
     pthread_create(&t,&attr,LinuxThreadFunc,threadArgs);
 
     pthread_attr_destroy(&attr);
-}
-
-bool soar_thread::SleepThread(long secs, long msecs)
-{
-	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
-	
-	// if sleep 0 is requested, then don't sleep at all (an actual sleep 0 is very slow on Linux, and probably OS X, too)
-	if(msecs || secs) {
-		struct timespec sleeptime;
-		sleeptime.tv_sec = secs;
-		sleeptime.tv_nsec = msecs * 1000000;
-		nanosleep(&sleeptime, 0);
-	}
-
-	return true ;
 }
 
 class LinuxMutex : public OSSpecificMutex

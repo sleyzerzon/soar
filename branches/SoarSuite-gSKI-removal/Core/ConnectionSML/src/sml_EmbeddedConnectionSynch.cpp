@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-//FIXME: #include <portability.h>
+#include <portability.h>
 
 /////////////////////////////////////////////////////////////////
 // EmbeddedConnectionSynch class
@@ -16,11 +13,11 @@
 //
 /////////////////////////////////////////////////////////////////
 
+#include "sml_Utils.h"
 #include "sml_EmbeddedConnectionSynch.h"
 #include "sml_ElementXML.h"
 #include "sml_MessageSML.h"
 #include "thread_Thread.h"
-#include "sock_Debug.h"
 
 #include <string>
 #include <iostream>
@@ -35,7 +32,7 @@ using namespace sml ;
 *		 The caller can pick up the response later with a
 *		 call to GetResponseForID().
 *************************************************************/
-void EmbeddedConnectionSynch::SendMessage(ElementXML* pMsg)
+void EmbeddedConnectionSynch::SendMsg(ElementXML* pMsg)
 {
 	ClearError() ;
 

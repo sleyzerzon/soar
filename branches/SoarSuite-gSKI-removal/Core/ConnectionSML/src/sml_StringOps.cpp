@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -16,11 +13,6 @@
 /////////////////////////////////////////////////////////////////
 
 #include "sml_StringOps.h"
-
-#ifdef _MSC_VER
-#define snprintf _snprintf 
-#define stricmp _stricmp
-#endif // _MSC_VER
 
 /*************************************************************
 * @brief Returns true if strings are equal (case sensitive).

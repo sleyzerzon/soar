@@ -11,11 +11,9 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
+#include "sml_Utils.h"
 #include <assert.h>
 
 #include "sml_Connection.h"
@@ -25,39 +23,7 @@
 
 //#include "../../Profiler/include/simple_timer.h"
 
-// Define a sleep
-#ifdef _WIN32
-#define _WINSOCKAPI_
-#include <Windows.h>
-void SLEEP(long secs, long msecs)
-{
-	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
-	Sleep((secs * 1000) + msecs) ;
-}
-#else
-#include <time.h>
-void SLEEP(long secs, long msecs)
-{
-	assert(msecs < 1000 && "Specified milliseconds too large; use seconds argument to specify part of time >= 1000 milliseconds");
-	struct timespec sleeptime;
-	sleeptime.tv_sec = secs;
-	sleeptime.tv_nsec = msecs * 1000000;
-	nanosleep(&sleeptime, 0);
-}
-#endif
-
-// helps quell warnings
-#ifndef unused
-#define unused(x) (void)(x)
-#endif
-
-// Use Visual C++'s memory checking functionality
-#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
-
-#ifdef _MSC_VER
-#include <crtdbg.h>
-#endif // _MSC_VER
 
 #include <iostream>
 #include <fstream>
@@ -126,7 +92,7 @@ void SimpleRemoteConnection()
 			cout << "Found agent: " << pAgent->GetAgentName() << endl ;
 		}
 
-		SLEEP(1,0) ;
+		soar_sleep(1,0) ;
 	}
 
 	delete pKernel ;
@@ -157,7 +123,7 @@ bool SimpleRemoteSynchTest()
 			}
 		}
 
-		SLEEP(1,0) ;
+		soar_sleep(1,0) ;
 	}
 
 	pKernel->Shutdown() ;
@@ -250,7 +216,7 @@ bool SimpleRemoteConnect()
 	int callbackp = pAgent->RegisterForPrintEvent(smlEVENT_PRINT, MyPrintEventHandler, &trace) ;
 	unused(callbackp); // eliminate gcc compiler warning
 
-	SLEEP(1,0) ;
+	soar_sleep(1,0) ;
 
 	// Comment this in if you need to debug the messages going back and forth.
 	//pKernel->SetTraceCommunications(true) ;
@@ -326,7 +292,7 @@ bool SimpleListener(int life)
 			unused(check);
 		}
 
-		SLEEP(pauseSecs, pauseMsecs) ;
+		soar_sleep(pauseSecs, pauseMsecs) ;
 	}
 
 	delete pKernel ;
@@ -417,7 +383,7 @@ bool SimpleRemoteIOTest()
 	//pAgent->RunSelf(1) ;
 
 	// Make sure there's long enough for the listener to notice our connection
-	SLEEP(1, 0) ;
+	soar_sleep(1, 0) ;
 
 	// Disconnect
 	pKernel->Shutdown() ;
@@ -461,10 +427,10 @@ bool SimpleRemoteIOListener()
 		if (nConnections == 1 && connected)
 			done = true ;
 
-		SLEEP(pauseSecs, pauseMsecs) ;
+		soar_sleep(pauseSecs, pauseMsecs) ;
 	}
 
-	SLEEP(1,0) ;
+	soar_sleep(1,0) ;
 
 	std::string res = pAgent->InitSoar() ;
 	cout << res << endl ;
@@ -1719,12 +1685,12 @@ bool TestSML(bool embedded, bool useClientThread, bool fullyOptimized, bool simp
 
 			if (simpleInitSoar) 
 			{
-				SLEEP(0, 200) ;
+				soar_sleep(0, 200) ;
 
 				cout << "Performing simple init-soar..." << endl << endl;
 				pAgent->InitSoar() ;
 
-				SLEEP(0, 200) ;
+				soar_sleep(0, 200) ;
 
 				ok = pKernel->DestroyAgent(pAgent) ;
 				if (!ok)
@@ -2012,13 +1978,13 @@ void ReportResult(std::string testName, bool success)
 
 int main(int argc, char* argv[])
 {
-#ifdef _MSC_VER
+#ifdef _DEBUG
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
 	// when that allocation occurs.
 	//_crtBreakAlloc = 1265 ;
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif // _MSC_VER
+#endif // _DEBUG
 
 	//SimpleTimer timer ;
 
@@ -2156,33 +2122,6 @@ int main(int argc, char* argv[])
 
 	printf("\nNow checking memory.  Any leaks will appear below.\nNothing indicates no leaks detected.\n") ;
 	printf("\nIf no leaks appear here, but some appear in the output\nwindow in the debugger, they have been leaked from a DLL.\nWhich is reporting when it's unloaded.\n\n") ;
-
-	/*
-// Static linking means we're going to see leaks from anywhere (e.g. gSKI, kernel etc.) which is overkill.
-#ifndef STATIC_LINKED
-#ifdef _MSC_VER
-	// Set the memory checking output to go to Visual Studio's debug window (so we have a copy to keep)
-	// and to stdout so we can see it immediately.
-	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
-	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
-
-	// Now check for memory leaks.
-	// This will only detect leaks in objects that we allocate within this executable and static libs.
-	// If we allocate something in a DLL then this call won't see it because it works by overriding the
-	// local implementation of malloc.
-	_CrtDumpMemoryLeaks();
-
-#endif // _MSC_VER
-#endif // STATIC_LINKED
-	*/
-	// Wait for the user to press return to exit the program. (So window doesn't just vanish).
-	if (stopAtEnd)
-	{
-		printf("\n\nPress <return> to exit\n") ;
-		char line[100] ;
-		char* str = gets(line) ;
-		unused(str);
-	}
 
 	if (!success) return 1;
 	return 0;

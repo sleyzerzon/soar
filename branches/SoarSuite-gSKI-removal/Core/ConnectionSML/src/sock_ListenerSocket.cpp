@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -15,8 +12,10 @@
 // 
 /////////////////////////////////////////////////////////////////
 #include "sock_ListenerSocket.h"
-#include "sock_Debug.h"
+#include "sml_Utils.h"
 #include "sock_OSspecific.h"
+
+#include <sstream>
 
 using namespace sock ;
 
@@ -48,6 +47,8 @@ ListenerSocket::~ListenerSocket()
 bool ListenerSocket::CreateListener(unsigned short port, bool local)
 {
 	CTDEBUG_ENTER_METHOD("ListenerSocket::CreateListener");
+
+	unused(local);
 
 	// Should only call this once
 	if (m_hSocket)
@@ -99,12 +100,20 @@ bool ListenerSocket::CreateListener(unsigned short port, bool local)
 		memset(&local_address, 0, sizeof(local_address));
 
 		local_address.sun_family = AF_UNIX;
-		sprintf(local_address.sun_path, "%s%u", LOCAL_SOCKET_PATH, port); // buffer is 108 chars long, so this is safe
+		sprintf(local_address.sun_path, "%s%u", sock::GetLocalSocketDir().c_str(), port); // buffer is 108 chars long, so this is safe
+
+		// set the name of the datasender
+		this->name = "file ";
+		this->name.append(local_address.sun_path);
 
 		// BADBAD: should check to see if it's in use?
 		unlink(local_address.sun_path); // in case it already exists
 
 		int len = SUN_LEN(&local_address);
+
+		// create directory where socket file will live (if the directory already exists, this will fail, but we don't care)
+		res = mkdir(sock::GetLocalSocketDir().c_str(), 0700);
+
 		res = bind(hListener, (sockaddr*)&local_address, len) ;
 
 		if (res != 0)
@@ -116,6 +125,11 @@ bool ListenerSocket::CreateListener(unsigned short port, bool local)
 	} else 
 #endif
 	{
+		// set the name of the datasender
+		std::stringstream sname;
+		sname << "port " << port;
+		this->name = sname.str();
+
 		memset(&address, 0, sizeof(address)) ;
 
 		address.sin_family = AF_INET ;	// Indicates the type of data in this structure
@@ -190,6 +204,8 @@ Socket* ListenerSocket::CheckForClientConnection()
 	// Create a generic CTSocket because once the connection has been
 	// made all sockets are both servers and clients.  No need to distinguish.
 	Socket* pConnection = new Socket(connectedSocket) ;
+
+	pConnection->name = this->name;
 
 	return pConnection ;
 }

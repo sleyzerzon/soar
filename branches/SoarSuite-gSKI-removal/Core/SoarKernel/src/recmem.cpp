@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -28,6 +25,8 @@
  * the (implicit) reference count on the instantiation decreases.
  * =======================================================================
  */
+
+#include <stdlib.h>
 
 #include "gdatastructs.h"
 #include "instantiations.h"

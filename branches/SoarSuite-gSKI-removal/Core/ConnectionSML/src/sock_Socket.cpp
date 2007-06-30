@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -26,17 +23,13 @@
 /////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
-#include "sock_SocketHeader.h"
+#include "sml_Utils.h"
 #include "sock_Socket.h"
-#include "sock_Check.h"
-#include "sock_Debug.h"
-
-#include "sock_Utils.h"
 
 #include <assert.h>
 
 #ifdef NON_BLOCKING
-#include "sock_OSspecific.h"	// For sleep
+#include "sml_Utils.h"	// For soar_sleep
 #endif
 
 using namespace sock ;
@@ -150,6 +143,22 @@ unsigned long sock::GetLocalIP()
 	return stLclAddr.sin_addr.s_addr;
 }
 
+/////////////////////////////////////////////////////////////////////
+// Function name  : GetLocalSocketDir
+// 
+// Return type    : std::string	
+// 
+// Description	  : Get the path to the directory that contains the local socket file
+//
+/////////////////////////////////////////////////////////////////////
+#ifdef ENABLE_LOCAL_SOCKETS
+std::string sock::GetLocalSocketDir()
+{
+	std::string dir = getenv("HOME");
+	dir.append("/.soartmp/");
+	return dir;
+}
+#endif
 
 /////////////////////////////////////////////////////////////////////
 // Function name  : IsErrorWouldBlock
@@ -163,7 +172,7 @@ unsigned long sock::GetLocalIP()
 #ifdef NON_BLOCKING
 static bool IsErrorWouldBlock()
 {
-	int error = NET_ERROR_NUMBER ;
+	int error = ERROR_NUMBER ;
 
 	return (error == NET_EWOULDBLOCK) ;
 }
@@ -217,13 +226,13 @@ bool Socket::SendBuffer(char const* pSendBuffer, size_t bufferSize)
 				if (IsErrorWouldBlock())
 				{
 					PrintDebug("Waiting for socket to unblock") ;
-					SleepSocket(0, 0) ;
+					soar_sleep(0, 0) ;
 				}
 				else
 #endif
 				{
 					PrintDebug("Error: Error sending message") ;
-					ReportErrorCode() ;
+					ReportSystemErrorMessage() ;
 					return false ;
 				}
 			}
@@ -269,17 +278,19 @@ bool Socket::IsReadDataAvailable(long secondsWait, long millisecondsWait)
 	fd_set set ;
 	FD_ZERO(&set) ;
 
+	//////
+	// This _MSC_VER test is legit, for a warning C4127: conditional expression is constant in a
+	// windows-defined FD_SET macro below
 	#ifdef _MSC_VER
 	#pragma warning(push, 3)
 	#endif
-
 	// Add hSock to the set of descriptors to check
-	// This generates a warning on level 4 in VC++ 6.
+	// This generates a warning on level 4 in VC++ 2005.
 	FD_SET(hSock, &set) ;
-
 	#ifdef _MSC_VER
 	#pragma warning(pop)
 	#endif
+	//////
 
 	// Wait for milliseconds for select to return (can be 0 to just poll)
 	TIMEVAL zero ;
@@ -293,7 +304,7 @@ bool Socket::IsReadDataAvailable(long secondsWait, long millisecondsWait)
 	if (res == SOCKET_ERROR)
 	{
 		PrintDebug("Error: Error checking if data is available to be read") ;
-		ReportErrorCode() ;
+		ReportSystemErrorMessage() ;
 		return false ;
 	}
 
@@ -361,14 +372,14 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 				if (IsErrorWouldBlock())
 				{
 					//PrintDebug("Waiting for socket to unblock") ;
-					SleepSocket(0, 0) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
+					soar_sleep(0, 0) ;	// BADBAD: Should have a proper way to pass control back to the caller while we're blocked.
 				}
 				else
 #endif
 				{
 					PrintDebug("Error: Error receiving message") ;
 
-					ReportErrorCode() ;
+					ReportSystemErrorMessage() ;
 
 					// We treat these errors as all being fatal, which they all appear to be.
 					// If we later decide we can survive certain ones, we should test for them here
@@ -406,47 +417,6 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 }
 
 /////////////////////////////////////////////////////////////////////
-// Function name  : ReportErrorCode
-// 
-// Return type    : void 	
-// 
-// Description	  : Convert the error code to useful text.
-//
-/////////////////////////////////////////////////////////////////////
-void Socket::ReportErrorCode()
-{
-	CTDEBUG_ENTER_METHOD("SoarSocket - ReportErrorCode");
-
-	int error = NET_ERROR_NUMBER ;
-
-	switch (error)
-	{
-	case NET_NOTINITIALISED:PrintDebug("Error: WSA Startup needs to be called first") ; break ;
-	case NET_ENETDOWN:		PrintDebug("Error: Underlying network is down") ; break ;
-	case NET_EFAULT:		PrintDebug("Error: Buffer is not in a valid address space") ; break ;
-	case NET_ENOTCONN:		PrintDebug("Error: The socket is not connected") ; break ;
-	case NET_EINTR:			PrintDebug("Error: The blocking call was cancelled") ; break ;
-	case NET_EINPROGRESS:	PrintDebug("Error: A blocking call is in progress") ; break ;
-	case NET_ENETRESET:		PrintDebug("Error: The connection has been broken") ; break ;
-	case NET_ENOTSOCK:		PrintDebug("Error: The descriptor is not a socket") ; break ;
-	case NET_EOPNOTSUPP:	PrintDebug("Error: OOB data is not supported on this socket") ; break ;
-	case NET_ESHUTDOWN:		PrintDebug("Error: The socket has been shutdown") ; break ;
-	case NET_EWOULDBLOCK:	PrintDebug("Error: The operation would block") ; break ;
-	case NET_EMSGSIZE:		PrintDebug("Error: The message is too large") ; break ;
-	case NET_EINVAL:		PrintDebug("Error: An invalid argument was passed to a function") ; break ;
-	case NET_ECONNABORTED:	PrintDebug("Error: The circuit was terminated") ; break ;
-	case NET_ETIMEDOUT:		PrintDebug("Error: The conection timed out") ; break ;
-	case NET_ECONNRESET:	PrintDebug("Error: The circuit was reset by the remote side") ; break ;
-
-	default:
-		{
-			PrintDebugFormat("Error: Unknown error %d",error) ;
-			break ;
-		}
-	}
-}
-
-/////////////////////////////////////////////////////////////////////
 // Function name  : Socket::Close
 // 
 // Return type    : void 	
@@ -459,11 +429,7 @@ void Socket::Close()
 	if (m_hSocket)
 	{
 		// Let the other side know we're shutting down
-#ifdef WIN32
-		shutdown(m_hSocket,SD_BOTH);
-#else // WIN32
-		shutdown(m_hSocket,SHUT_RDWR);
-#endif // not WIN32
+		shutdown(m_hSocket, NET_SD_BOTH);
 
 		NET_CLOSESOCKET(m_hSocket) ;
 		m_hSocket = NO_CONNECTION ;

@@ -158,13 +158,11 @@ public class EatersInputStateVariable extends JavaStateVariable {
 		main.AddNamedValue("StateRepresentation", stateRep);
         
         Vector ltm = new Vector();
-		Vector relevantActions = new Vector(6);
+		Vector relevantActions = new Vector(4);
 		relevantActions.Set(0, 1.0);
 		relevantActions.Set(1, 2.0);
 		relevantActions.Set(2, 3.0);
 		relevantActions.Set(3, 4.0);
-		relevantActions.Set(4, -1.0);
-		relevantActions.Set(5, -1.0);
 		java.awt.Point myLocation = new java.awt.Point();
 		myLocation.x = location.x;
 		myLocation.y = location.y;
@@ -176,6 +174,7 @@ public class EatersInputStateVariable extends JavaStateVariable {
 			int boxID = box.getIntProperty(Names.kPropertyBoxID);
 			if (boxID == kInfoBoxID)
             {
+                relevantActions.Resize(5);
 				relevantActions.Set(4, 5.0);
                 if (box.hasProperty(Names.kPropertyPositiveBoxID))
                 {
@@ -186,17 +185,21 @@ public class EatersInputStateVariable extends JavaStateVariable {
                     {
                         ltm.Resize(4);
                         ltm.Set(2, 1);
-                        ltm.Set(3, box.getIntProperty(Names.kPropertyOpenCode));
+                        ltm.Set(3, box.getIntProperty(Names.kPropertyOpenCode) + 2);
                     }            
                 }
             }
-			else if (box.hasProperty(Names.kPropertyOpenCode))
+			else if (world.getMap().mapUsesOpenCode())
 			{
+                relevantActions.Resize(6);
 				relevantActions.Set(4, 6.0);
 				relevantActions.Set(5, 7.0);
 			}
 			else
+            {
+                relevantActions.Resize(5);
 				relevantActions.Set(4, 5.0);
+            }
 		}
 		main.AddNamedValue("RelevantActions", relevantActions);
         main.AddNamedValue("LongTermMemories", ltm);

@@ -6,18 +6,9 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 #include "cli_CommandLineInterface.h"
-
-#ifdef WIN32
-#include <windows.h>
-#else // WIN32
-#include <sys/time.h>
-#endif // WIN32
 
 #include <time.h>
 

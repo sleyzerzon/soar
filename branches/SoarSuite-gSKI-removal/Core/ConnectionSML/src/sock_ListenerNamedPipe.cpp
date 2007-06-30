@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 #include <portability.h>
 
 /////////////////////////////////////////////////////////////////
@@ -17,10 +14,10 @@
 // 
 /////////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
+#ifdef ENABLE_NAMED_PIPES
 
 #include "sock_ListenerNamedPipe.h"
-#include "sock_Debug.h"
+#include "sml_Utils.h"
 
 using namespace sock ;
 
@@ -52,6 +49,10 @@ ListenerNamedPipe::~ListenerNamedPipe()
 bool ListenerNamedPipe::CreateListener(const char* name)
 {
 	CTDEBUG_ENTER_METHOD("ListenerNamedPipe::CreateListener");
+
+	// set the name of this datasender
+	this->name = "pipe ";
+	this->name.append(name);
 
 	/*// Should only call this once
 	if (m_hPipe != INVALID_HANDLE_VALUE)
@@ -124,7 +125,9 @@ NamedPipe* ListenerNamedPipe::CheckForClientConnection()
 	// made all pipes are both servers and clients.  No need to distinguish.
 	NamedPipe* pConnection = new NamedPipe(m_hPipe) ;
 
+	pConnection->name = this->name;
+
 	return pConnection ;
 }
 
-#endif _WIN32
+#endif ENABLE_NAMED_PIPES

@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -39,8 +36,6 @@
 #include "instantiations.h"
 #include "rete.h"
 
-#include "pcreposix.h"
-
 //
 // Utility Headers
 #include "MegaAssert.h"
@@ -57,21 +52,6 @@
 //#include "MegaUnitTest.h"
 //DEF_EXPOSE(gSKI_ProductionManager);
 
-#ifdef WIN32
-#include <direct.h>
-#define GetCwd _getcwd
-#else
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#define GetCwd getcwd
-#endif
-
-#ifdef _WIN32
-#define safeSprintf _snprintf
-#else
-#define safeSprintf snprintf
-#endif
 
 
 
@@ -210,7 +190,7 @@ _|___/    __         _    _             ____  _               _
       char *pathName = new char[pathLength];
 
       char *c;
-      while((c = GetCwd(pathName, pathLength))  == 0)
+      while((c = getcwd(pathName, pathLength))  == 0)
       {
          pathLength *= 2;
          delete[] pathName;
@@ -351,7 +331,7 @@ _|___/    __         _    _             ____  _               _
          soarFile.open(fullPath.c_str());
          if(!soarFile.is_open()) {
             char msg[gSKI_EXTENDED_ERROR_MESSAGE_LENGTH];
-            safeSprintf(msg, gSKI_EXTENDED_ERROR_MESSAGE_LENGTH, "Could not find %s", fileName);
+            snprintf(msg, gSKI_EXTENDED_ERROR_MESSAGE_LENGTH, "Could not find %s", fileName);
             SetErrorExtended(err, gSKIERR_FILE_NOT_FOUND, msg);
             return false;
          }
@@ -502,7 +482,7 @@ _|___/    __         _    _             ____  _               _
       if(f == 0)
       {
          char errMsg[gSKI_EXTENDED_ERROR_MESSAGE_LENGTH];
-         safeSprintf(errMsg, gSKI_EXTENDED_ERROR_MESSAGE_LENGTH, "Could not open file %s", fn);
+         snprintf(errMsg, gSKI_EXTENDED_ERROR_MESSAGE_LENGTH, "Could not open file %s", fn);
          SetErrorExtended(err, gSKIERR_FILE_NOT_FOUND, errMsg);
          return false;
       }
@@ -532,7 +512,7 @@ _|___/    __         _    _             ____  _               _
       if(f == 0)
       {
          char errMsg[gSKI_EXTENDED_ERROR_MESSAGE_LENGTH];
-         safeSprintf(errMsg, gSKI_EXTENDED_ERROR_MESSAGE_LENGTH, "Could not open file %s", fn);
+         snprintf(errMsg, gSKI_EXTENDED_ERROR_MESSAGE_LENGTH, "Could not open file %s", fn);
          SetErrorExtended(err, gSKIERR_FILE_NOT_FOUND, errMsg);
          return false;
       }

@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
-#include "portability.h"
+#include <portability.h>
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
@@ -38,6 +35,8 @@
  * =======================================================================
  */
 
+#include <stdlib.h>
+
 #include "rhsfun.h"
 #include "kernel.h"
 #include "print.h"
@@ -57,6 +56,7 @@
 #include "gski_event_system_functions.h" // support for triggering XML events
 
 #include <map>
+#include <time.h>
 
 using namespace xmlTraceNames;
 
