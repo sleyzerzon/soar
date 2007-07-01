@@ -23,9 +23,10 @@
 
 //#define DEBUG_WMES
 
-#include "kernel.h"
+#include <stdlib.h>
 
 #include "wmem.h"
+#include "kernel.h"
 #include "agent.h"
 #include "gdatastructs.h"
 #include "symtab.h"

@@ -34,8 +34,6 @@
 
 #include <fstream>
 
-//#include "../../SoarIO/ConnectionSML/include/sock_Debug.h"
-
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
 
 namespace gSKI 

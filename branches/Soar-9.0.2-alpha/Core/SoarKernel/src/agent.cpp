@@ -20,6 +20,8 @@
  */
 #include "kernel.h"
 
+#include <stdlib.h>
+
 #include "agent.h"
 #include "mem.h"
 #include "lexer.h"
