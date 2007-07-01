@@ -1,9 +1,6 @@
 // Cluster.cpp : Defines the entry point for the console application.
 //
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#include "portability.h"
+#include <portability.h>
 
 
 //#include "stdafx.h"

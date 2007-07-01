@@ -1,15 +1,12 @@
+#include <portability.h>
+
 // 8-23-2006
 // To comply with the design doc
 // Cluster link is not included since not sure about it
 
-// testings
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
-#include "portability.h"
-
 //#ifdef SEMANTIC_MEMORY
 
+#include <stdlib.h>
 
 #include "smem.h"
 

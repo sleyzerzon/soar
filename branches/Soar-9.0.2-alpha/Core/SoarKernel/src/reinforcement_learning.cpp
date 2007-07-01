@@ -1,10 +1,8 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
+#include <portability.h>
 
 #include <math.h>
+#include <stdlib.h>
 
-#include "portability.h"
 #include "reinforcement_learning.h"
 #include "rhsfun.h"
 #include "production.h"
