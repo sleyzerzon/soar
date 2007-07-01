@@ -274,8 +274,8 @@ int main() {
 		ResetEventCounts();
 		RunTest2(numAgents, numWmes, numCycles);
 
-		cout << endl << endl << "Press enter to exit.";
-		cin.get();
+		//cout << endl << endl << "Press enter to exit.";
+		//cin.get();
 	}
 
 	return 0;
