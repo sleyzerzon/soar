@@ -18,7 +18,11 @@ print "Detected platform:", sys.platform
 if os.name != "posix":
 	print "Unsupported OS."
 	Exit(1)
-	
+
+pythonDefault = 'yes'
+if sys.platform == 'cygwin':
+	print "Disabling python by default, it will not yet build on this platform."
+	pythonDefault = 'no'
 	
 #################
 # Command line options
@@ -31,7 +35,7 @@ opts = Options()
 opts.AddOptions(
 	BoolOption('java', 'Build the Soar Java interface (required for debugger)', 'yes'), 
 	BoolOption('swt', 'Build Java SWT projects (required for debugger)', 'yes'), 
-	BoolOption('python', 'Build the Soar Python interface', 'yes'), 
+	BoolOption('python', 'Build the Soar Python interface', pythonDefault), 
 	BoolOption('csharp', 'Build the Soar CSharp interface', 'no'), 
 	BoolOption('tcl', 'Build the Soar Tcl interface', 'no'), 
 	BoolOption('static', 'Use static linking when possible', 'no'), 
