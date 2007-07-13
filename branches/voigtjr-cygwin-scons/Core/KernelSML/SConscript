@@ -23,8 +23,10 @@ libadd = [
 	   'CommandLineInterface',
 	   'gSKI',
 	   'SoarKernel',
-	   'pcre',
 	   ]
+
+if sys.platform == 'cygwin':
+	   libadd.extend(['pcre',])
 
 if sys.platform == 'cygwin':
 	libadd.extend(['ws2_32',])
