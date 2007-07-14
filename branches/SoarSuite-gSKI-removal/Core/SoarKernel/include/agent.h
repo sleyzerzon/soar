@@ -30,6 +30,7 @@
 #include "lexer.h"
 #include "chunk.h"
 #include "callback.h"
+#include <map>
 
 /* JC ADDED: Included to allow gski callbacks */
 #include "gski_event_system_data.h"
@@ -64,6 +65,7 @@ typedef struct io_wme_struct io_wme;
 typedef struct multi_attributes_struct multi_attribute;
 typedef struct replay_struct replay;
 typedef struct kernel_struct Kernel;
+typedef std::map<unsigned long, wme*> WmeMap ;
 
 // following def's moved here from old interface.h file  KJC nov 05
 /* AGR 568 begin */
@@ -361,6 +363,9 @@ typedef struct agent_struct {
 /* in Soar 8, PE's are done only during the APPLY phase */
   unsigned long       pe_cycle_count;          /* # of PE's run so far */
   unsigned long       pe_cycles_this_d_cycle;  /* # of PE's run this DC */
+
+  /* DJP: Adding a hash table to map from time tag to wme */
+  WmeMap*			  wmeMap ;
 
   parent_inst *parent_list_head;
 /* REW: end   09.15.96 */

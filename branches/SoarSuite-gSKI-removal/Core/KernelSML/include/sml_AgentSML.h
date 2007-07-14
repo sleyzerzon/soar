@@ -268,6 +268,9 @@ public:
 	wme* ConvertKernelTimeTag(char const* pTimeTag) ;
 	long ConvertTime(char const* pTimeTag) ;
 
+	// Debug method
+	void PrintKernelTimeTags() ;
+
 	void RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWme) ;
 	void RemoveTimeTag(char const* pTimeTag) ;
 	void RecordKernelTimeTag(char const* pTimeTag, wme* pWme) ;

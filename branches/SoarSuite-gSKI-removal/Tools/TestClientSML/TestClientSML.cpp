@@ -967,6 +967,7 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	Identifier* pIDRemoveTest = pAgent->CreateIdWME(pInputLink, "foo") ;
 	pAgent->CreateFloatWME(pIDRemoveTest, "bar", 1.23) ;
 	pAgent->CreateFloatWME(pIDRemoveTest, "bar2", 4.56) ;
+	pAgent->CreateFloatWME(pIDRemoveTest, "bar3", 8.57) ;
 
 	std::string idValue = pIDRemoveTest->GetValueAsString() ;
 
@@ -984,6 +985,8 @@ bool TestAgent(Kernel* pKernel, Agent* pAgent, bool doInitSoars)
 	bool ok = pAgent->Commit() ;
 	pAgent->RunSelf(1) ;
 	std::string wmes0 = pAgent->ExecuteCommandLine("print i2 --depth 3") ;
+
+	cout << wmes0 << endl ;
 
 	if (!InitSoarAgent(pAgent, doInitSoars))
 		return false ;
@@ -1982,7 +1985,7 @@ int main(int argc, char* argv[])
 	// When we have a memory leak, set this variable to
 	// the allocation number (e.g. 122) and then we'll break
 	// when that allocation occurs.
-	//_crtBreakAlloc = 1265 ;
+	//_crtBreakAlloc = 1591 ;
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif // _DEBUG
 

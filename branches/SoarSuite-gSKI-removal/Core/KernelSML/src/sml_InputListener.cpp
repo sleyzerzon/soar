@@ -24,8 +24,10 @@ using namespace sml ;
 #ifdef _DEBUG
 	static bool kDebugInput = false ;
 #else
-	static bool kDebugInput = false ;
+	static bool kDebugInput = true ;
 #endif
+
+static bool kMaintainHashTable = false ;
 
 // A set of helper functions for tracing kernel wmes
 static void Symbol2String(Symbol* pSymbol, 	bool refCounts, std::ostringstream& buffer) {
@@ -86,18 +88,28 @@ void InputListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 // Called when an event occurs in the kernel
 void InputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
-    int callbacktype = (int)reinterpret_cast<long long>(pCallData);
+	switch (eventID) {
+		case smlEVENT_INPUT_PHASE_CALLBACK:
+		{
+			int callbacktype = (int)reinterpret_cast<long long>(pCallData);
 
-    switch(callbacktype) {
-    case TOP_STATE_JUST_CREATED:
-	  ProcessPendingInput(pAgentSML, callbacktype) ;
-      break;
-    case NORMAL_INPUT_CYCLE:
-	  ProcessPendingInput(pAgentSML, callbacktype) ;
-      break;
-    case TOP_STATE_JUST_REMOVED:
-      break;
-	}
+			switch(callbacktype) {
+			case TOP_STATE_JUST_CREATED:
+			  ProcessPendingInput(pAgentSML, callbacktype) ;
+			  break;
+			case NORMAL_INPUT_CYCLE:
+			  ProcessPendingInput(pAgentSML, callbacktype) ;
+			  break;
+			case TOP_STATE_JUST_REMOVED:
+			  break;
+			}
+		}
+		case INPUT_WME_REMOVED_CALLBACK:
+		{
+			Symbol* id = (Symbol*)(pCallData) ;
+
+		}
+	} ;
 }
 
 void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int callbacktype)
@@ -294,11 +306,17 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 	// store these values in a hashtable.  Perhaps later we'll see about adding
 	// this support directly into the kernel.
 	pAgentSML->RecordTime(pTimeTag, timeTag) ;
-//	pAgentSML->RecordKernelTimeTag(pTimeTag, pNewInputWme) ;
 
-	unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->id) ;
-	unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->attr) ;
-	unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->value) ;
+	if (kMaintainHashTable)
+	{
+		pAgentSML->RecordKernelTimeTag(pTimeTag, pNewInputWme) ;
+	}
+	else
+	{
+		unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->id) ;
+		unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->attr) ;
+		unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->value) ;
+	}
 
 	if (kDebugInput)
 		PrintDebugWme("Adding wme ", pNewInputWme, true) ;
@@ -311,9 +329,22 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 	// Get the wme that matches this time tag
 	long timetag = pAgentSML->ConvertTime(pTimeTag) ;
 
-	wme* pWME = find_input_wme_by_timetag(pAgentSML->GetAgent(), timetag) ;
+	if (kDebugInput)
+	{
+		PrintDebugFormat("Before removing wme") ;
+		pAgentSML->PrintKernelTimeTags() ;
+	}
 
-//	wme* pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
+	wme *pWME ;
+
+	if (!kMaintainHashTable)
+	{
+		pWME = find_input_wme_by_timetag(pAgentSML->GetAgent(), timetag) ;
+	}
+	else
+	{
+		pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
+	}
 
 	std::string printInput1 = pAgentSML->ExecuteCommandLine("print --internal --depth 2 I2") ;
 
@@ -355,15 +386,19 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 
 	Bool ok = remove_input_wme(pAgentSML->GetAgent(), pWME) ;
 
-	/*
-	unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
-	unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
-	unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pWME->value) ;
-	*/
-
 	// Remove the object from the time tag table because
 	// we no longer own it.
-	pAgentSML->RemoveKernelTimeTag(pTimeTag) ;
+	if (kMaintainHashTable)
+	{
+		pAgentSML->RemoveKernelTimeTag(pTimeTag) ;
+
+		unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
+		unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
+		unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pWME->value) ;
+
+		PrintDebugFormat("After removing wme") ;
+		pAgentSML->PrintKernelTimeTags() ;
+	}
 
 	CHECK_RET_FALSE(ok) ;
 
@@ -375,10 +410,12 @@ void InputListener::RegisterForKernelSMLEvents()
 {
 	// Listen for input callback events so we can submit pending input to the kernel
 	this->RegisterWithKernel(smlEVENT_INPUT_PHASE_CALLBACK) ;
+	this->RegisterWithKernel(INPUT_WME_REMOVED_CALLBACK) ;
 }
 
 void InputListener::UnRegisterForKernelSMLEvents()
 {
 	this->UnregisterWithKernel(smlEVENT_INPUT_PHASE_CALLBACK) ;
+	this->UnregisterWithKernel(INPUT_WME_REMOVED_CALLBACK) ;
 }
 

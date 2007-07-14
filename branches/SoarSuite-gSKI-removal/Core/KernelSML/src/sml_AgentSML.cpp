@@ -48,6 +48,50 @@
 
 using namespace sml ;
 
+// A set of helper functions for tracing kernel wmes
+static void Symbol2String(Symbol* pSymbol, 	bool refCounts, std::ostringstream& buffer) {
+	if (pSymbol->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
+		buffer << pSymbol->id.name_letter ;
+		buffer << pSymbol->id.name_number ;
+	}
+	else if (pSymbol->common.symbol_type==VARIABLE_SYMBOL_TYPE) {
+		buffer << pSymbol->var.name ;
+	}
+	else if (pSymbol->common.symbol_type==SYM_CONSTANT_SYMBOL_TYPE) {
+		buffer << pSymbol->sc.name ;
+	}
+	else if (pSymbol->common.symbol_type==INT_CONSTANT_SYMBOL_TYPE) {
+		buffer << pSymbol->ic.value ;
+	}
+	else if (pSymbol->common.symbol_type==FLOAT_CONSTANT_SYMBOL_TYPE) {
+		buffer << pSymbol->fc.value ;
+	}
+
+	if (refCounts)
+		buffer << "[" << pSymbol->common.reference_count << "]" ;
+}
+
+static std::string Wme2String(wme* pWME, bool refCounts) {
+	std::ostringstream buffer ;
+
+	buffer << pWME->timetag << ":" ;
+
+	Symbol2String(pWME->id, refCounts, buffer) ;
+	buffer << " ^" ;
+	Symbol2String(pWME->attr, refCounts, buffer) ;
+	buffer << " " ;
+	Symbol2String(pWME->value, refCounts, buffer) ;
+
+	buffer << " 0x" << (long)pWME ;
+
+	return buffer.str() ;
+}
+
+static void PrintDebugWme(char const* pMsg, wme* pWME, bool refCounts = false) {
+	std::string str = Wme2String(pWME, refCounts) ;
+	PrintDebugFormat("%s %s", pMsg, str.c_str()) ;
+}
+
 AgentSML::AgentSML(KernelSML* pKernelSML, agent* pAgent)
 {
 	m_pKernelSML = pKernelSML ;
@@ -202,8 +246,12 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 		}
 	}
 
+	PrintDebugFormat("About to release kernel wmes") ;
+	PrintKernelTimeTags() ;
+
 	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
 		wme* wme = mapIter->second ;
+		PrintDebugWme("Releasing ", wme, true) ;
 		release_io_symbol(this->GetAgent(), wme->id) ;
 		release_io_symbol(this->GetAgent(), wme->attr) ;
 		release_io_symbol(this->GetAgent(), wme->value) ;
@@ -787,6 +835,15 @@ wme* AgentSML::ConvertKernelTimeTag(char const* pTimeTag)
 	}
 }
 
+// Debug method
+void AgentSML::PrintKernelTimeTags()
+{
+	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
+		wme* wme = mapIter->second ;
+		PrintDebugWme("Recorded wme ", wme, true) ;
+	}
+}
+
 /*************************************************************
 * @brief	Maps from a client side time tag to a kernel side WME.
 *************************************************************/
@@ -822,6 +879,7 @@ void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
 	assert (m_KernelTimeTagMap.find(pTimeTag) == m_KernelTimeTagMap.end()) ;
 #endif
 
+	PrintDebugWme("Recording wme ", pWme, true) ;
 	m_KernelTimeTagMap[pTimeTag] = pWme ;
 }
 
