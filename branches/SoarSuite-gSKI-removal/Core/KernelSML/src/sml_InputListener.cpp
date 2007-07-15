@@ -24,7 +24,7 @@ using namespace sml ;
 #ifdef _DEBUG
 	static bool kDebugInput = false ;
 #else
-	static bool kDebugInput = true ;
+	static bool kDebugInput = false ;
 #endif
 
 static bool kMaintainHashTable = false ;
@@ -103,11 +103,6 @@ void InputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallD
 			case TOP_STATE_JUST_REMOVED:
 			  break;
 			}
-		}
-		case INPUT_WME_REMOVED_CALLBACK:
-		{
-			Symbol* id = (Symbol*)(pCallData) ;
-
 		}
 	} ;
 }
@@ -410,12 +405,10 @@ void InputListener::RegisterForKernelSMLEvents()
 {
 	// Listen for input callback events so we can submit pending input to the kernel
 	this->RegisterWithKernel(smlEVENT_INPUT_PHASE_CALLBACK) ;
-	this->RegisterWithKernel(INPUT_WME_REMOVED_CALLBACK) ;
 }
 
 void InputListener::UnRegisterForKernelSMLEvents()
 {
 	this->UnregisterWithKernel(smlEVENT_INPUT_PHASE_CALLBACK) ;
-	this->UnregisterWithKernel(INPUT_WME_REMOVED_CALLBACK) ;
 }
 
