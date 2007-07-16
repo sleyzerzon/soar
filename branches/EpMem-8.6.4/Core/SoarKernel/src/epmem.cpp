@@ -5,7 +5,7 @@
  * Routines for Soar's episodic memory module (added in 2002 by :AMN:)
  *
  *
- * Copyright (c) 1995-2002 Carnegie Mellon University,
+ * Copyright (c) 1995-2007 Carnegie Mellon University,
  *                         The Regents of the University of Michigan,
  *                         University of Southern California/Information
  *                         Sciences Institute.  All rights reserved.
@@ -19,10 +19,30 @@
  */
 
 /*
- *  %%%TODO:
- *  1.  Add my own MEM_USAGE constant?
- *  2.  Put global variables into soar_agent (e.g., current_agent())
- *  3.  Allow user to configure the global variables on the command line
+ *  FUTURE WORK:
+ *  1.  I'm currently allocating all my memory with the MISCELLANEOUS_MEM_USAGE
+ *      constant.  Should I add a separate constant specifically for
+ *      episodic memory allocation (which can grow quite large)?
+ *  2.  The "epmem" command (see cli_epmem.cpp) could be modified to
+ *      allow the user to configure various settings at runtime.
+ *      Particularly, the epmem constants (below).
+ *  3.  Interval-based matching (once implemented in an older version)
+ *      could be reimplemented here and in such a way that the user
+ *      could select between them at compile time.
+ *  4.  Multi-valued attributes are currently handled poorly,
+ *      especially during cleanup (where they cause a memory leak).
+ *      The real fix will probbaly require abandoning the shortcut of
+ *      treating working memory as a tree rather than a graph.
+ *  5.  Currently, as long as a cue exists the epmem system does a new
+ *      retrieval every cycle.  Performance could be improved
+ *      dramatically if there was some way to detect that the cue is
+ *      unchanged since last cycle and do nothing.
+ 
+ *  6.  The current epmem store is saved to a file at regular
+ *      intervals.  The user can set the filename and the interval
+ *      but it would be nice if there was a more meaningful criterion
+ *      for saving.  At the very least, something should fire when the
+ *      agent exits to save the current store.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -46,34 +66,43 @@ extern unsigned long hash_string(const char *s);
 //Uncomment this to make epmem a no-op
 //#define DISABLE_EPMEM
 
-/* EpMem constants
+/*======================================================================
+
+  EpMem Constants
+
+  CAVEAT:  Some of these constants are used by code that is currently
+           not active but must be enabled.
    
-   num_active_wmes - epmem uses the n most active wmes to decide whether to
-                     record a new memory.  This is n.
-   num_wmes_changed - number of wmes in the current list that must be
-                      different from the previous list to trigger
-                      a new memory.
-   memories_init_size  - starting size for the thisAgent->epmem_memories array
-   memory_match_wait   - How long to wait before memories can be recalled.  This
-                         value is expressed in the number of newer memories that
-                         must exist before this one is retrievable.
+   num_active_wmes      - epmem sometimes uses the n most active wmes
+                          to decide whether to record a new memory.
+                          This is n.
+   num_wmes_changed     - number of wmes in the current list that must
+                          be different from the previous list to
+                          trigger a new memory.
+   memories_init_size   - starting size for the
+                          thisAgent->epmem_memories array
+   memory_match_wait    - How long to wait before memories can be recalled.  This
+                          value is expressed in the number of newer memories that
+                          must exist before this one is retrievable.
    ubiquitous_threshold - When a wmetree node's assoc_memories list has
                           a number of entries that exceeds this fraction
                           of the total number of episodic memories then it
                           has become too ubiquitous and is no longer used
                           in matching.
-   ubiquitous_max       - There must be at least this many episodic memories
-                          before any node can be considered ubiquitous
-   fraction_to_trim     - fraction of a new memory to trim before recording it
+   ubiquitous_max       - There must be at least this many episodic
+                          memories before any node can be considered
+                          ubiquitous
+   fraction_to_trim     - fraction of a new memory to trim before
+                          recording it
    card_act_ratio       - Specifies the ratio of match score weighting
-                          between match cardinality and match activation.
-   epmem_age_limit      - If a memory has not be created or retrieved
-                          after this many other memories have been recorded
+                          between match cardinality and match
+                          activation.
+   epmem_age_limit -      If a memory has not be created or retrieved after
+                          this many other memories have been recorded
                           then pitch it.  Set this to 0 for no limit.
                           2100 = 99%; 600=95%
                           
-   %%%TODO:  Made these values command line configurable
-
+  ======================================================================
 */
 
 #define num_active_wmes 1
@@ -87,23 +116,28 @@ float g_card_act_ratio=3.0;
 #define epmem_age_limit 2100
 
 /*======================================================================
- * Data structures
+ * EpMem Data Structures
  *----------------------------------------------------------------------
  */
 
 /*
- * arraylist - A growable array.  The soar kernel in general could
- *             benefit from this struct and its related routines.
+ * arraylist
  *
- *             I use an arraylist to store each episodic memory (as a list of
- *             pointers into thisAgent->epmem_wmetree_size).  I also use it in the wmetree stuct to
- *             store a list of pointers to memories that use that node.
+ * A growable array.  This was written before the Soar kernel
+ * supported C++ compiles (and thus we could have used a Vector
+ * instead).  I'm not hurry to switch to Vectors since I hate the
+ * STL.
  *
- *             array - an array of void pointers
- *             capactiy - the current size of the array
- *             size - the number of cells in the array currently being used
- *             next - used to create a linked list of these (also allows
- *                    hashing)
+ * I use an arraylist to store each episodic memory (as a list of
+ * pointers into thisAgent->epmem_wmetree_size).  I also use it in the
+ * wmetree stuct to store a list of pointers to memories that use that
+ * node.
+ *
+ * Members:
+ * next     - used to create a linked list of these (also allows hashing)
+ * array    - an array of void pointers
+ * capactiy - the current size of the array
+ * size     - the number of cells in the array currently being used
  *
  */
 typedef struct arraylist_struct
@@ -115,40 +149,52 @@ typedef struct arraylist_struct
 } arraylist;
 
 /*
-
-   wmetree - Used to build a tree representation of the structure and content of
-             all states that the agent has encountered.  This in turn is used to
-             construct an episodic memory
-
-             id             - every WME in the tree has a unique id.  I can't
-                              use the timetag because multiple WMEs may have the same
-                              value.
-             attr           - the string representing the WME attribute associated
-                              with this tree node
-             val            - the string representing the WME value associated
-                              with this tree node (*only* if this is a leaf node)
-             relation       - used in cues.  This specifies the relation that
-                              the matched epmem's value for this WME must have
-                              with the value in the cue (e.g., "greater than")
-             children       - children of the current node (hash table)
-             parent         - parent of the current node.
-             depth          - depth in the tree (root node is depth=0)
-             next/prev      - dll of all nodes in the tree to allow iterative
-                              implementation of several algorithms
-             assoc_wmes     - a list of wmes that are currently in WM that
-                              were created using this node as their template
-                              (i.e., as part of a retrieval).  The index of
-                              a particular WME in the list always equals
-                              the index of the epmem_header for the memory.
-             assoc_memories - this is a list of pointers to all the episodic
-                              memories that use this WME.  As such it is
-                              effectively an arraylist of arraylists.
-             query_count    - How many times this WME has been in a cue and
-                              therfore triggered its associated memories to be
-                              examined for a match. (performance diagnostic use
-                              only)
-                      
-*/
+ * 
+ *   wmetree
+ *
+ * Used to build a tree representation of the structure and content of
+ * all WMEs that the agent has encountered.  This in turn is used to
+ * store and construct episodic memories.  This structure represents
+ * one node in the tree.
+ *
+ *  Members:
+ *   next           - dll of all nodes in the tree to allow hashing as
+ *                    well as iterative traversal
+ *   id             - every WME in the tree has a unique id.  I can't
+ *                    use the timetag because multiple WMEs may be
+ *                    created over time that have the same attr/value.
+ *   attr           - the string representing the WME attribute associated
+ *                    with this tree node
+ *   val            - the string representing the WME value associated
+ *                    with this tree node (*only* if this is a leaf node)
+ *   val_type       - whether this WME's value is a string/int/float/other.
+ *                    Uses the constants from symtab.h
+ *   relation       - used in cues.  This specifies the relation that
+ *                    the matched epmem's value for this WME must have
+ *                    with the value in the cue (e.g., "greater than")
+ *   children       - children of the current node (hash table)
+ *   parent         - parent of the current node.  Currently only a
+ *                    single parent is supported.  Thus episodic
+ *                    memories are always a tree.
+ *   depth          - depth in the tree (root node is depth=0)
+ *   assoc_wmes     - a list of wmes that are currently in WM that
+ *                    were created using this node as their template
+ *                    (i.e., as part of a retrieval).  The index of
+ *                    a particular WME in the list always equals
+ *                    the index of the epmem_header for the memory.
+ *   assoc_memories - this is a list of pointers to all the episodic
+ *                    memories that use this WME.  As such it is
+ *                    effectively an arraylist of arraylists.
+ *   query_count    - How many times this WME has been in a cue and
+ *                    therfore triggered its associated memories to be
+ *                    examined for a match. (performance diagnostic use
+ *                    only)
+ *   ubiquitous     - this is a boolean flag that indicates whether
+ *                    or not this node appears in "most" episodes.
+ *                    "Most" is defined using ubiquitous_threshold and
+ *                    ubiquitous_max
+ *
+ */
 
 enum wmetree_relation { NONE, GREATER_THAN, LESS_THAN };
 
@@ -192,15 +238,16 @@ typedef struct actwme_struct
 /*
  * episodic_memory - This data structure contains a single episodic memory.
  *
- *         content     - a list of actwme structs.
- *         index       - this memory's index in the thisAgent->epmem_memories arraylist
- *         last_usage  - the number of the last retrieval that partially
- *                       matched this memory
- *         match_score - the total match score from the last partial match
- *         act_total   - the sum of the activation levels in the last match
- *         num_matches - the number of cue entries that matched in the last match
- *         last_ret    - the last time this memory was created or retrieved
- *                       (a value of -1 indicates the memory has been forgotten)
+ *   content     - an arraylist of actwme structs.
+ *   index       - this memory's index in the
+ *                 thisAgent->epmem_memories arraylist
+ *   last_usage  - the number of the last retrieval that partially
+ *                 matched this memory
+ *   match_score - the total match score from the last partial match
+ *   act_total   - the sum of the activation levels in the last match
+ *   num_matches - the number of cue entries that matched in the last match
+ *   last_ret    - the cycle when this memory was last created or retrieved
+ *                 (a value of -1 indicates the memory has been forgotten)
  *
  */
 typedef struct episodic_memory_struct
@@ -216,17 +263,18 @@ typedef struct episodic_memory_struct
 
 
 /*
- * epmem_command - This structure holds a query command given by
- *                 the agent.  Some commands can be handled directly
- *                 but others require this structure.
+ * epmem_command
  *
- *                 cmd_wme  - the ID of the command
- *                 name     - the name of the command
- *                 arg      - the command argument*
- *                 arg_type - the argument's type
+ * This structure holds a query command given by the agent.  Some
+ * commands can be handled directly but others require this structure.
  *
- * Commands that use this structure:  ^before, ^after
- *                 
+ *   cmd_wme  - the ID of the command
+ *   name     - the name of the command
+ *   arg      - the command argument*
+ *   arg_type - the argument's type
+ *
+ * Commands that currently use this structure:  ^before, ^after
+ *
  */
 typedef struct epmem_command_struct
 {
@@ -242,8 +290,10 @@ typedef struct epmem_command_struct
 } epmem_command;
 
 /*
- * epmem_header     - An arraylist of these is used to keep track of the
- *                    ^epmem link attached to each state in working memory
+ * epmem_header
+ *
+ * An arraylist of these is used to keep track of the ^epmem link
+ * attached to each state in working memory
  *
  *  index           - the index of this header in thisAgent->epmem_header_stack.  This
  *                    index is used to reference the assoc_wmes arraylist
@@ -314,21 +364,35 @@ extern "C"
 #endif
 
 /*======================================================================
-  EpMem declarations
+  EpMem Forward Declarations
 
-  These functions are called before they are declared
+  These non-public functions are used before they are defined.
    
  *----------------------------------------------------------------------
 */
-//Used internal but not (yet) called publicly
-Symbol *update_wmetree(agent *thisAgent, wmetree *node,
-                       Symbol *sym, arraylist *epmem,
+Symbol *update_wmetree(agent *thisAgent,
+                       wmetree *node,
+                       Symbol *sym,
+                       arraylist *epmem,
                        tc_number tc);
 
-episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
-                                 arraylist *cue, arraylist *negcue);
+episodic_memory *find_best_match(agent *thisAgent,
+                                 epmem_header *h,
+                                 arraylist *cue,
+                                 arraylist *negcue);
 
+void epmem_clear_curr_result(agent *thisAgent,
+                             epmem_header *h);
 
+wme *get_aug_of_id(agent *thisAgent,
+                   Symbol *sym,
+                   char *attr_name,
+                   char *value_name);
+
+void retrieve_all_child_wmes(agent *thisAgent,
+                             Symbol *sym, 
+                             arraylist *syms,
+                             tc_number tc);
     
 /* ===================================================================
    compare_ptr
@@ -485,7 +549,7 @@ arraylist *make_arraylist(agent *thisAgent, int init_cap)
    Allocates and initializes a new arraylist that is a copy of a given
    original arraylist.
 
-   CAVEAT:  this is not a deep copy!
+   CAVEAT:  This is not a deep copy!
    CAVEAT:  User is responsible for deallocation
    
    Created: 06 Dec 2006
@@ -540,7 +604,7 @@ void destroy_arraylist(agent *thisAgent, arraylist *al)
 /* ===================================================================
    grow_arraylist
 
-   This funciton increases the length of an arraylist to a minimum
+   This function increases the length of an arraylist to a minimum
    of a given capacity.
    
    Created: 06 Oct 2004
@@ -653,6 +717,9 @@ void set_arraylist_entry(agent *thisAgent, arraylist *al, int index, void *newva
    an arraylist and moves down subsequent entries to fill in the gap.
    The caller is responsible for cleaning up the entry itself.
    
+   CAVEAT: The caller is responsible for cleaning up the content
+           of the entry itself.
+   
    Created: 04 Oct 2004
    =================================================================== */
 void *remove_entry_from_arraylist(arraylist *al, int index)
@@ -684,8 +751,8 @@ void *remove_entry_from_arraylist(arraylist *al, int index)
    Given a pointer, this function removes the entry from an arraylist
    that matches that pointer.
 
-   CAVEAT: The caller is responsible for cleaning up the entry itself.
-
+   CAVEAT: The caller is responsible for cleaning up the content
+           of the entry itself.
    
    Created: 04 Apr 2007
    =================================================================== */
@@ -789,7 +856,7 @@ wmetree *make_wmetree_node(agent *thisAgent, wme *w)
 
    Deallocate an entire wmetree.
 
-   CAVEAT:  All children of this node are also deleted!
+   CAVEAT:  All children of the given node are also deleted!
    CAVEAT:  Caller should make sure that no retreived epmems are in WM which
             are associated with this node or any of its children.
    CAVEAT:  asssoc_memories is dealloated but the epmems it points
@@ -885,7 +952,8 @@ epmem_command *make_epmem_command(agent *thisAgent)
 /* ===================================================================
    cleanup_epmem_command
 
-   This routine cleans out old data in an epmem command
+   This routine cleans out old data in an epmem command but does
+   not deallocate it.
 
    Created: 13 July 06
    =================================================================== */
@@ -929,236 +997,24 @@ void destroy_epmem_command(agent *thisAgent, epmem_command *cmd)
 }//destroy_epmem_command
 
 /* ===================================================================
-   wme_has_value
-
-   This routine returns TRUE is the given WMEs attribute and value are
-   both symbols and have then names given.  If either of the given
-   names are NULL then they are assumed to be a match (i.e., a
-   wildcard).
-
-   Created: 14 Dec 2002
-   =================================================================== */
-int wme_has_value(wme *w, char *attr_name, char *value_name)
-{
-    if (w == NULL) return FALSE;
-    
-    if (attr_name != NULL)
-    {
-        if (w->attr->common.symbol_type != SYM_CONSTANT_SYMBOL_TYPE)
-        {
-            return FALSE;
-        }
-
-        if (strcmp(w->attr->sc.name, attr_name) != 0)
-        {
-            return FALSE;
-        }
-    }
-
-    if (value_name != NULL)
-    {
-        if (w->value->common.symbol_type != SYM_CONSTANT_SYMBOL_TYPE)
-        {
-            return FALSE;
-        }
-
-        if (strcmp(w->value->sc.name, value_name) != 0)
-        {
-            return FALSE;
-        }
-    }
-
-    return TRUE;
-
-}//wme_has_value
-
-/* ===================================================================
-   epmem_get_augs_of_id()
-
-   This routine works just like the one defined in utilities.h.
-   Except this one does not use C++ templates because I think they
-   stink and I refuse to use them.  Please don't argue with me about
-   it.
-   
-   Created (sort of): 25 Jan 2006
-   =================================================================== */
-wme **epmem_get_augs_of_id(agent* thisAgent, Symbol * id, tc_number tc, int *num_attr)
-{
-   slot *s;
-   wme *w;
-
-
-   wme **list;                 /* array of WME pointers, AGR 652 */
-   int attr;                   /* attribute index, AGR 652 */
-   int n;
-
-
-/* AGR 652  The plan is to go through the list of WMEs and find out how
-  many there are.  Then we malloc an array of that many pointers.
-  Then we go through the list again and copy all the pointers to that array.
-  Then we qsort the array and print it out.  94.12.13 */
-
-
-   if (id->common.symbol_type != IDENTIFIER_SYMBOL_TYPE)
-       return NULL;
-   if (id->id.tc_num == tc)
-       return NULL;
-   id->id.tc_num = tc;
-
-
-   /* --- first, count all direct augmentations of this id --- */
-   n = 0;
-   for (w = id->id.impasse_wmes; w != NIL; w = w->next)
-       n++;
-   for (w = id->id.input_wmes; w != NIL; w = w->next)
-       n++;
-   for (s = id->id.slots; s != NIL; s = s->next) {
-       for (w = s->wmes; w != NIL; w = w->next)
-           n++;
-       for (w = s->acceptable_preference_wmes; w != NIL; w = w->next)
-           n++;
-   }
-
-
-   /* --- next, construct the array of wme pointers and sort them --- */
-   list = static_cast<wme**>(allocate_memory(thisAgent, n * sizeof(wme *), MISCELLANEOUS_MEM_USAGE));
-   attr = 0;
-   for (w = id->id.impasse_wmes; w != NIL; w = w->next)
-       list[attr++] = w;
-   for (w = id->id.input_wmes; w != NIL; w = w->next)
-       list[attr++] = w;
-   for (s = id->id.slots; s != NIL; s = s->next) {
-       for (w = s->wmes; w != NIL; w = w->next)
-           list[attr++] = w;
-       for (w = s->acceptable_preference_wmes; w != NIL; w = w->next)
-           list[attr++] = w;
-   }
-
-
-   *num_attr = n;
-   return list;
-}
-
-
-/* ===================================================================
-   get_aug_of_id()
-
-   This routine examines a symbol for an augmentation that as the
-   given attribute and value and returns it.  See wme_has_value()
-   for info on how the correct wme is matched to the given strings.
-   
-   Created: 19 Oct 2004
-   =================================================================== */
-wme *get_aug_of_id(agent *thisAgent, Symbol *sym, char *attr_name, char *value_name)
-{
-    wme **wmes;
-    int len = 0;
-    int i;
-    tc_number tc;
-    wme *ret_wme = NULL;
-    
-    tc = sym->id.tc_num + 1;
-    wmes = epmem_get_augs_of_id(thisAgent, sym, tc, &len);
-    sym->id.tc_num = tc - 1;
-    if (wmes == NULL) return NULL;
-
-    for(i = 0; i < len; i++)
-    {
-        if (wme_has_value(wmes[i], attr_name, value_name))
-        {
-            ret_wme = wmes[i];
-            break;
-        }
-    }
-
-    free_memory(thisAgent, wmes, MISCELLANEOUS_MEM_USAGE);
-    return ret_wme;
-}//get_aug_of_id
-
-/* ===================================================================
-   retrieve_all_child_wmes
-
-   Generates an arraylist of wme* that points to all the WMEs that
-   descend from a given symbol
-
-   sym   - the parent symbol
-   syms  - an arraylist to fill with wme* pointers that descend from the
-           parent.
-   tc    - a transitive closure number for avoiding loops in working mem
-
-   CAVEAT:  This function is computationally expensive.
-   
-   Created: 06 Dec 2005
-   =================================================================== */
-void retrieve_all_child_wmes(agent *thisAgent,
-                             Symbol *sym, 
-                             arraylist *syms,
-                             tc_number tc)
-{
-    wme **wmes = NULL;
-    int len = 0;
-    int i;
-    Symbol *ss = NULL;
-    int pos = -1;
-    wme *w;
-
-    do
-    {
-        pos++;
-        
-        start_timer(thisAgent, &(thisAgent->epmem_getaugs_start_time));
-        wmes = epmem_get_augs_of_id(thisAgent,  sym, tc, &len );
-        stop_timer(thisAgent, &(thisAgent->epmem_getaugs_start_time), &(thisAgent->epmem_getaugs_total_time));
-
-        if (wmes != NULL)
-        {
-            for(i = 0; i < len; i++)
-            {
-                //insert childnode into the arraylist
-                append_entry_to_arraylist(thisAgent, syms, (void *)wmes[i]);
-            }//for
-            
-            free_memory(thisAgent, wmes, MISCELLANEOUS_MEM_USAGE);
-        }//if
-
-        //Find the next WME in the list that has an identifier as
-        //a value (and thus may have child WMEs)
-        while (pos < syms->size)
-        {
-            w = (wme *)get_arraylist_entry(thisAgent, syms, pos);
-            sym = w->value;
-            if (sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE)
-            {
-                break;
-            }
-            
-            pos++;
-        }//while
-          
-    }while(pos < syms->size);
-
-    
-}//retrieve_all_child_wmes
-
-
-/* ===================================================================
    make_fake_preference_for_epmem_wme
 
    This function adds a fake preference to a WME so that it will not
    be added to the goal dependency set of the state it is attached
-   to.
+   to.  This is used to prevents the GDS from removing a state
+   whenever a epmem is retrieved that is attached to it.  
 
    (The bulk of the content of this function is taken from
     make_fake_preference_for_goal_item() in decide.c)
    
    
    Created: 18 Oct 2004
-   Changed: 24 Jan 2005 (to improve performance the ^superstate wme is now
+   Changed  24 Jan 2005: to improve performance the ^superstate wme is now
                          cached in the epmem_header)
-   Changed 12 Jan 2006 (added support for chunking by using the cue WMEs
-                        as the conditions of the instantiation.  In
-                        a sense, this "fake preference" isn't really fake
-                        anymore.
+   Changed  12 Jan 2006: added support for chunking by using the cue WMEs
+                         as the conditions of the instantiation.  In
+                         a sense, this "fake preference" isn't really fake
+                         anymore.
    =================================================================== */
 preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h, Symbol *goal, wme *w)
 {
@@ -1167,10 +1023,6 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
     condition *cond;
     condition *prev_cond = NULL;
     int i;
-
-//      //%%%DEBUGGING
-//      print_with_symbols(thisAgent, "\nBuilding fake preference for WME: (%y ^%y %y)",
-//                         w->id, w->attr, w->value);
 
     /*
      * make the fake preference
@@ -1209,7 +1061,7 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
      * make the fake condition for all cue elements
      *
      * NOTE: This is effectively an instantiation whose condition is
-     *       the cue WMEs and whose action is the retrieved epmem WME
+     *       the cue WMEs and whose sole action is the retrieved epmem WME
      */
     //Retrieve all the cue WMEs
     arraylist *query = make_arraylist(thisAgent, 32);
@@ -1230,11 +1082,6 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
     {
         wme *cue_wme = (wme *)get_arraylist_entry(thisAgent, query, i);
 
-//          //%%%DEBUGGING
-//          print(thisAgent, "\n Condition #%d: ", i);
-//          print_with_symbols(thisAgent, "(%y %y %y)",
-//                             cue_wme->id, cue_wme->attr, cue_wme->value);
-        
         //Construct the condition
         allocate_with_pool(thisAgent, &(thisAgent->condition_pool), &cond);
         cond->type = POSITIVE_CONDITION;
@@ -1266,7 +1113,6 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
 
     destroy_arraylist(thisAgent, query);
     
-    /* --- return the fake preference --- */
     return pref;
 }//make_fake_preference_for_epmem_wme
 
@@ -1274,7 +1120,9 @@ preference *make_fake_preference_for_epmem_wme(agent *thisAgent, epmem_header *h
    remove_fake_preference_for_epmem_wme
 
    This function removes a fake preference on a WME created by
-   make_fake_preference_for_epmem_wme()
+   make_fake_preference_for_epmem_wme().  While it's a one-line
+   function I thought it was important to create it so it would be
+   clear what's going on in this case.
    
    Created: 21 Oct 2004
    =================================================================== */
@@ -1285,7 +1133,6 @@ void remove_fake_preference_for_epmem_wme(agent *thisAgent, wme *w)
     
 
 }//remove_fake_preference_for_epmem_wme
-
 
 /* ===================================================================
    make_epmem_header
@@ -1358,9 +1205,10 @@ epmem_header *make_epmem_header(agent *thisAgent, Symbol *s)
 /* ===================================================================
    copy_epmem_header
 
-   Allocates and an initializes a SHALLOW copy of a given epmem header
+   Allocates and an initializes a SHALLOW copy of a given epmem
+   header.
 
-   CAVEST:  Pointers are just copied.  Changes made to substructures
+   CAVEAT:  Pointers are just copied.  Changes made to substructures
             will effect the original!
    CAVEAT:  Caller is responsible for deallocation.  DO NOT use
             destroy_epmem_header() because it will clean up copied
@@ -1396,10 +1244,6 @@ epmem_header *copy_epmem_header(agent *thisAgent, epmem_header *orig)
 
     return h;
 }//copy_epmem_header
-
-
-//Declare this in advance so that destroy_epmem_header() can call it.
-void epmem_clear_curr_result(agent *thisAgent, epmem_header *h);
 
 /* ===================================================================
    destroy_epmem_header
@@ -1443,52 +1287,228 @@ void destroy_epmem_header(agent *thisAgent, epmem_header *h)
 }//destroy_epmem_header
 
 /* ===================================================================
-   symbols_are_equal_value
+   wme_has_value
 
-   This compares two symbols.  If they have the same type and value
-   it returns TRUE, otherwise FALSE.  Identifiers and variables
-   yield a response of TRUE.
+   This routine returns TRUE if the given WMEs attribute and value are
+   both symbols and have the names given.  If either of the given
+   names are NULL then they are assumed to be a match (i.e., a
+   wildcard).  Thus passing NULL for both attr_name and value_name
+   will always yield a TRUE result.
 
-   Created: 12 Dec 2002
+   Created: 14 Dec 2002
    =================================================================== */
-int symbols_are_equal_value(Symbol *a, Symbol *b)
+int wme_has_value(wme *w, char *attr_name, char *value_name)
 {
-    if (a->common.symbol_type != b->common.symbol_type)
+    if (w == NULL) return FALSE;
+    
+    if (attr_name != NULL)
     {
-        return FALSE;
-    }
-
-    switch(a->common.symbol_type)
-    {
-        case SYM_CONSTANT_SYMBOL_TYPE:
-            return ! (strcmp(a->sc.name, b->sc.name));
-        case INT_CONSTANT_SYMBOL_TYPE:
-            return a->ic.value == b->ic.value;
-        case FLOAT_CONSTANT_SYMBOL_TYPE:
-            return a->fc.value == b->fc.value;
-        case VARIABLE_SYMBOL_TYPE:
-        case IDENTIFIER_SYMBOL_TYPE:
-            return TRUE;
-        default:
+        if (w->attr->common.symbol_type != SYM_CONSTANT_SYMBOL_TYPE)
+        {
             return FALSE;
+        }
+
+        if (strcmp(w->attr->sc.name, attr_name) != 0)
+        {
+            return FALSE;
+        }
     }
 
-}//symbols_are_equal_value
+    if (value_name != NULL)
+    {
+        if (w->value->common.symbol_type != SYM_CONSTANT_SYMBOL_TYPE)
+        {
+            return FALSE;
+        }
+
+        if (strcmp(w->value->sc.name, value_name) != 0)
+        {
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+
+}//wme_has_value
 
 /* ===================================================================
-   wmes_are_equal_value
+   epmem_get_augs_of_id()
 
-   This compares two wmes.  If they have the same type and value
-   it returns true.
-
-   Created: 12 Dec 2002
+   This routine works just like the one defined in utilities.h.
+   Except this one does not use C++ templates because I have an
+   irrational dislike for them borne from the years when the STL
+   highly un-portable.  I'm told this is no longer true but I'm still
+   bitter. 
+   
+   Created (sort of): 25 Jan 2006
    =================================================================== */
-int wmes_are_equal_value(wme *a, wme *b)
+wme **epmem_get_augs_of_id(agent* thisAgent, Symbol * id, tc_number tc, int *num_attr)
 {
-    return (symbols_are_equal_value(a->attr, b->attr))
-        && (symbols_are_equal_value(a->value, b->value));
+   slot *s;
+   wme *w;
 
-}//wmes_are_equal_value
+
+   wme **list;                 /* array of WME pointers, AGR 652 */
+   int attr;                   /* attribute index, AGR 652 */
+   int n;
+
+
+/* AGR 652  The plan is to go through the list of WMEs and find out how
+  many there are.  Then we malloc an array of that many pointers.
+  Then we go through the list again and copy all the pointers to that array.
+  Then we qsort the array and print it out.  94.12.13 */
+
+
+   if (id->common.symbol_type != IDENTIFIER_SYMBOL_TYPE)
+       return NULL;
+   if (id->id.tc_num == tc)
+       return NULL;
+   id->id.tc_num = tc;
+
+
+   /* --- first, count all direct augmentations of this id --- */
+   n = 0;
+   for (w = id->id.impasse_wmes; w != NIL; w = w->next)
+       n++;
+   for (w = id->id.input_wmes; w != NIL; w = w->next)
+       n++;
+   for (s = id->id.slots; s != NIL; s = s->next) {
+       for (w = s->wmes; w != NIL; w = w->next)
+           n++;
+       for (w = s->acceptable_preference_wmes; w != NIL; w = w->next)
+           n++;
+   }
+
+
+   /* --- next, construct the array of wme pointers and sort them --- */
+   list = static_cast<wme**>(allocate_memory(thisAgent, n * sizeof(wme *), MISCELLANEOUS_MEM_USAGE));
+   attr = 0;
+   for (w = id->id.impasse_wmes; w != NIL; w = w->next)
+       list[attr++] = w;
+   for (w = id->id.input_wmes; w != NIL; w = w->next)
+       list[attr++] = w;
+   for (s = id->id.slots; s != NIL; s = s->next) {
+       for (w = s->wmes; w != NIL; w = w->next)
+           list[attr++] = w;
+       for (w = s->acceptable_preference_wmes; w != NIL; w = w->next)
+           list[attr++] = w;
+   }
+
+
+   *num_attr = n;
+   return list;
+}
+
+/* ===================================================================
+   get_aug_of_id()
+
+   This routine examines a symbol for an augmentation that as the
+   given attribute and value and returns it.  See wme_has_value()
+   for info on how the correct wme is matched to the given strings.
+   
+   Created: 19 Oct 2004
+   =================================================================== */
+wme *get_aug_of_id(agent *thisAgent, Symbol *sym, char *attr_name, char *value_name)
+{
+    wme **wmes;
+    int len = 0;
+    int i;
+    tc_number tc;
+    wme *ret_wme = NULL;
+    
+    tc = sym->id.tc_num + 1;
+    wmes = epmem_get_augs_of_id(thisAgent, sym, tc, &len);
+    sym->id.tc_num = tc - 1;
+    if (wmes == NULL) return NULL;
+
+    for(i = 0; i < len; i++)
+    {
+        if (wme_has_value(wmes[i], attr_name, value_name))
+        {
+            ret_wme = wmes[i];
+            break;
+        }
+    }
+
+    free_memory(thisAgent, wmes, MISCELLANEOUS_MEM_USAGE);
+    return ret_wme;
+}//get_aug_of_id
+
+/* ===================================================================
+   retrieve_all_child_wmes
+
+   Generates an arraylist of wme* that points to all the WMEs in
+   working memory that descend from a given symbol.  In other words,
+   it returns a list of all the WMEs that you can reach from that
+   symbol.  Thus, for example, passing S1 would get you all the WMEs
+   on the top-state.
+
+   sym   - the parent symbol
+   syms  - an arraylist to fill with wme* pointers that descend from the
+           parent.
+   tc    - a transitive closure number for avoiding loops in working mem
+
+   CAVEAT:  This function is computationally expensive and should only
+            be used by output functions.
+   
+   Created: 06 Dec 2005
+   =================================================================== */
+void retrieve_all_child_wmes(agent *thisAgent,
+                             Symbol *sym, 
+                             arraylist *syms,
+                             tc_number tc)
+{
+    wme **wmes = NULL;
+    int len = 0;
+    int i;
+    Symbol *ss = NULL;
+    int pos = -1;
+    wme *w;
+
+    /*
+     * General Appraoch: Fill the syms list with all the WMEs we've
+     * encountered so far.  Maintain a pos pointer to the next symbol
+     * that hasn't been examined yet.  Add children of the current
+     * WME to the list before advancing the pos pointer.  Thus, when
+     * you get to the end of the list you've found all the children.
+     */
+    do
+    {
+        pos++;
+        
+        start_timer(thisAgent, &(thisAgent->epmem_getaugs_start_time));
+        wmes = epmem_get_augs_of_id(thisAgent,  sym, tc, &len );
+        stop_timer(thisAgent, &(thisAgent->epmem_getaugs_start_time), &(thisAgent->epmem_getaugs_total_time));
+
+        if (wmes != NULL)
+        {
+            for(i = 0; i < len; i++)
+            {
+                //insert childnode into the arraylist
+                append_entry_to_arraylist(thisAgent, syms, (void *)wmes[i]);
+            }//for
+            
+            free_memory(thisAgent, wmes, MISCELLANEOUS_MEM_USAGE);
+        }//if
+
+        //Find the next WME in the list that has an identifier as
+        //a value (and thus may have child WMEs)
+        while (pos < syms->size)
+        {
+            w = (wme *)get_arraylist_entry(thisAgent, syms, pos);
+            sym = w->value;
+            if (sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE)
+            {
+                break;
+            }
+            
+            pos++;
+        }//while
+          
+    }while(pos < syms->size);
+
+    
+}//retrieve_all_child_wmes
 
 /* ===================================================================
    wme_equals_node
@@ -1545,8 +1565,6 @@ int wme_equals_node(wme *w, wmetree *node)
 
    This function will print the current status and configuration
    info for the episodic memory subsystem of this agent.
-   
-   thisAgent - duh
    
    Created: 15 Nov 2006
    =================================================================== */
@@ -1641,17 +1659,16 @@ void epmem_print_status(agent *thisAgent)
               (float)h->last_match_size / (float)h->last_cue_size);
         
     }//for
-
-
     
 }//epmem_print_status
 
 
 /* ===================================================================
-   print_wmetree
+   print_wmetree                           *RECURSIVE*
 
    Prints an ASCII graphic representation of the wmetree rooted by the
-   given node.
+   given node.  This is VERY USEFUL for debugging but not actually
+   used during normal epmem operation.
 
    node - wmetree to print
    indent - how many spaces to indent
@@ -1707,15 +1724,22 @@ void print_wmetree(agent *thisAgent, wmetree *node, int indent, int depth)
 /* ===================================================================
    epmem_find_wmetree_entry
 
-   Finds a descendent entry that has a particular id and attribute in a
-   given memory.  If the given parent is thisAgent->epmem_wmetree then it is assumed
-   to be a wildcard match.
+   Finds a descendent of a given wmetree node that has a particular id
+   and attribute and is in a given memory.  If the specified wmetree
+   node is the root (thisAgent->epmem_wmetree) then it is assumed to
+   be a wildcard match.  Returns NULL if not found.
 
-   Returns NULL if not found.
+   epmem - an arraylist of actwme structs to search
+   id - the id we're searching for (which will be the "parent" pointer
+        in the target wmetree struct)
+   s  - the attribute we're searching for
 
    Created: 20 Feb 2004
    =================================================================== */
-wmetree *epmem_find_wmetree_entry(agent *thisAgent, arraylist *epmem, wmetree *id, char *s)
+wmetree *epmem_find_wmetree_entry(agent *thisAgent,
+                                  arraylist *epmem,
+                                  wmetree *id,
+                                  char *s)
 {
     int i;
 
@@ -1747,7 +1771,9 @@ wmetree *epmem_find_wmetree_entry(agent *thisAgent, arraylist *epmem, wmetree *i
 
    Created: 29 Nov 2004
    =================================================================== */
-actwme *epmem_find_actwme_entry(agent *thisAgent, arraylist *epmem, wmetree *target)
+actwme *epmem_find_actwme_entry(agent *thisAgent,
+                                arraylist *epmem,
+                                wmetree *target)
 {
     int i;
 
@@ -1768,7 +1794,7 @@ actwme *epmem_find_actwme_entry(agent *thisAgent, arraylist *epmem, wmetree *tar
 
    Finds an actwme entry in a given episodic memory that is similar
    but not the same as a given wmetree node.  To be similar, it must
-   have these traits:
+   have all these traits:
    - shares the same parent as a given wmetree node
    - has the same attribute.
    - has a value with the same type
@@ -1802,6 +1828,8 @@ actwme *epmem_find_similar_actwme_entry(agent *thisAgent,
 /* ===================================================================
    print_memory                       *RECURSIVE*
 
+   Prints the content of an episodic memory.
+   
    thisAgent - duh
    epmem - an arraylist containing the epmem
    node - the wmetree this memory is drawn from (probably thisAgent->epmem_wmetree)
@@ -1812,8 +1840,12 @@ actwme *epmem_find_similar_actwme_entry(agent *thisAgent,
    
    Created: 01 Mar 2004
    =================================================================== */
-void print_memory(agent *thisAgent, arraylist *epmem,
-                  wmetree *node, int indent, int depth, char *attrs = NULL)
+void print_memory(agent *thisAgent,
+                  arraylist *epmem,
+                  wmetree *node,
+                  int indent,
+                  int depth,
+                  char *attrs = NULL)
 {
     int i;
     unsigned long hash_value;
@@ -1886,11 +1918,14 @@ void print_memory(agent *thisAgent, arraylist *epmem,
 /* ===================================================================
    print_memory_match                        *RECURSIVE*
 
-   Print the WMEs in a memory that match (or do not match) a given cue.
+   Print the WMEs in a memory that match (or do not match) a given
+   cue.  
+   
    
    thisAgent - duh
    epmem - an arraylist containing the epmem
-   node - the wmetree this memory is drawn from (probably thisAgent->epmem_wmetree)
+   node - the wmetree this memory is drawn from (almost always
+          thisAgent->epmem_wmetree)
    indent - number of space to indent
    cue - the cue
    negcue - the negative cue
@@ -2067,7 +2102,7 @@ void print_memory_match(agent *thisAgent, arraylist *epmem,
    epmem_print_memory_by_id
 
    This function will print an episodic memory from an agent's memory
-   store based on its id.
+   store based on its id.  (Used in response to the epmem -p command.)
    
    thisAgent - duh
    id        - the memory id
@@ -2094,77 +2129,6 @@ void epmem_print_memory_by_id(agent *thisAgent, int id)
     print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 1000);
     
 }//epmem_print_memory_by_id
-
-/* ===================================================================
-   print_memory_graphically         *EATERS DOMAIN DEPENDENT*
-
-   
-   Created: 01 Mar 2004
-   =================================================================== */
-void print_memory_graphically(agent *thisAgent, arraylist *epmem)
-{
-    wmetree *ol            = NULL;
-    wmetree *il            = NULL;
-    wmetree *move          = NULL;
-    wmetree *direction     = NULL;
-    wmetree *eater         = NULL;
-    wmetree *score         = NULL;
-    wmetree *my_location   = NULL;
-    wmetree *north         = NULL;
-    wmetree *south         = NULL;
-    wmetree *east          = NULL;
-    wmetree *west          = NULL;
-    wmetree *n_content     = NULL;
-    wmetree *s_content     = NULL;
-    wmetree *e_content     = NULL;
-    wmetree *w_content     = NULL;
-    char n_char = '?';
-    char s_char = '?';
-    char e_char = '?';
-    char w_char = '?';
-    char dir_char = '?';
-
-    //Find the direction of movement
-    ol = epmem_find_wmetree_entry(thisAgent, epmem, thisAgent->epmem_wmetree, "output-link");
-    move = epmem_find_wmetree_entry(thisAgent, epmem, ol, "move");
-    direction = epmem_find_wmetree_entry(thisAgent, epmem, move, "direction");
-
-    //Find the current score
-    il = epmem_find_wmetree_entry(thisAgent, epmem, thisAgent->epmem_wmetree, "input-link");
-    eater = epmem_find_wmetree_entry(thisAgent, epmem, il, "eater");
-    score = epmem_find_wmetree_entry(thisAgent, epmem, eater, "score");
-    
-    //Find the contents of each surrounding cell
-    my_location = epmem_find_wmetree_entry(thisAgent, epmem, il, "my-location");
-    north = epmem_find_wmetree_entry(thisAgent, epmem, my_location, "north");
-    south = epmem_find_wmetree_entry(thisAgent, epmem, my_location, "south");
-    east = epmem_find_wmetree_entry(thisAgent, epmem, my_location, "east");
-    west = epmem_find_wmetree_entry(thisAgent, epmem, my_location, "west");
-    n_content = epmem_find_wmetree_entry(thisAgent, epmem, north, "content");
-    s_content = epmem_find_wmetree_entry(thisAgent, epmem, south, "content");
-    e_content = epmem_find_wmetree_entry(thisAgent, epmem, east, "content");
-    w_content = epmem_find_wmetree_entry(thisAgent, epmem, west, "content");
-
-    if (n_content != NULL) n_char   = n_content->val.strval[0];
-    if (s_content != NULL) s_char   = s_content->val.strval[0];
-    if (e_content != NULL) e_char   = e_content->val.strval[0];
-    if (w_content != NULL) w_char   = w_content->val.strval[0];
-    if (direction != NULL) dir_char = direction->val.strval[0];
-
-    print(thisAgent, "\n         %c", n_char);
-    print(thisAgent, "\n        %c%c%c",w_char, dir_char, e_char);
-    print(thisAgent, "\n         %c", s_char);
-
-    if (score != NULL)
-    {
-        print(thisAgent, "\n  score=%d.", score->val.intval);
-    }
-    else
-    {
-        print(thisAgent, "\n  score=NOT AVAILABLE");
-    }
-    
-}//print_memory_graphically
 
 /* ===================================================================
    find_nth_best_matches
@@ -2244,10 +2208,10 @@ epmem_header *find_epmem_header_from_id(agent *thisAgent, int state_num)
 }//find_epmem_header_from_id
 
 /* ===================================================================
-   epmem_print_match_diagnostic
+   epmem_print_cue_comparison
 
    This function will print information about how well a given memory
-   matches the cue on a given state.
+   matches the cue on a given state.  
    
    thisAgent - duh
    state_num - the state number.  For example, if the symbol of the
@@ -2295,7 +2259,7 @@ void epmem_print_cue_comparison(agent *thisAgent, int state_num, int epmem_id)
                                                    epmem_id);
     
     /*
-     * Step 3:  Retrieve the Cue Info
+     * Step 3:  Retrieve the cue info
      */
     arraylist *al_query;
     arraylist *al_negquery;
@@ -2347,7 +2311,8 @@ void epmem_print_cue_comparison(agent *thisAgent, int state_num, int epmem_id)
    epmem_print_match_diagnostic
 
    This function will print complete information about the currently
-   retrieved epmem in the given state and how it was retrieved
+   retrieved epmem in the given state and how it was retrieved.  This
+   is used in response to the "epmem -m" command.
    
    thisAgent - duh
    state_num - the state number.  For example, if the symbol of the
@@ -2709,7 +2674,7 @@ void epmem_print_memory_comparison_by_id(agent *thisAgent, int id1, int id2)
    find_child_node
 
    Given a wmetree node and a wme, this function returns the child
-   node that represents that WME (or NULL).
+   node of the given node that represents that WME (or NULL).
    
    Created: 12 Jan 2004
    =================================================================== */
@@ -2741,7 +2706,10 @@ wmetree *find_child_node(wmetree *node, wme *w)
    
    Created: 12 Jan 2004
    =================================================================== */
-void add_node_to_memory(agent *thisAgent, arraylist *epmem, wmetree *node, int activation)
+void add_node_to_memory(agent *thisAgent,
+                        arraylist *epmem,
+                        wmetree *node,
+                        int activation)
 {
     //Allocate and init a new actwme
     actwme *aw = (actwme *)allocate_memory(thisAgent, sizeof(actwme),
@@ -2756,9 +2724,10 @@ void add_node_to_memory(agent *thisAgent, arraylist *epmem, wmetree *node, int a
 /* ===================================================================
    handle_relation
 
-   This function examines a given wme to see if it's a special relation
-   for a cue (e.g., "greater--than").  If it is, it extracts the relation info
-   and updates the given node with that info.
+   This function examines a given wme found in an episodic memory cue
+   to see if it's a special relation for a cue (e.g.,
+   "greater--than").  If it is, it extracts the relation info and
+   updates the given node with that info.
 
    The function returns TRUE if a relation was handled and false otherwise. 
    
@@ -2802,34 +2771,6 @@ int handle_relation(agent *thisAgent, wmetree *node, wme *w)
 }//handle_relation
 
 /* ===================================================================
-   wme_to_ignore   %%%PLATFORM SPECIFIC%%%
-
-   The function returns TRUE if a given WME has a useless but memory
-   hogging value (specific to heurall-epmem-bot in tanksoar)
-   
-   Created: 30 Oct 2006
-   =================================================================== */
-int wme_to_ignore(wme *w)
-{
-    //Check for a relation
-    if (wme_has_value(w, "meta-eval-time", NULL))
-    {
-        return TRUE;
-    }
-    else if (wme_has_value(w, "random", NULL))
-    {
-        return TRUE;
-    }
-    else if (wme_has_value(w, "clock", NULL))
-    {
-        return TRUE;
-    }
-
-    return FALSE;              
-    
-}//wme_to_ignore
-
-/* ===================================================================
    update_wmetree
 
    Updates the wmetree given a pointer to a corresponding wme in working
@@ -2840,6 +2781,11 @@ int wme_to_ignore(wme *w)
    If this function finds a ^superstate WME it does not traverse that link.
    Instead, it records the find and returns it to the caller.  The caller
    can then call update_wmetree again if desired.
+
+   *This is a critical function in the epmem operation and is worth
+   understanding completely.  It is used as part of the process of
+   recording a new episodic memory.  It is also used to process
+   episodic memory cues.
 
    node - the root of the WME tree to be updated
    sym - the root of the tree in working memory to update it with
@@ -2866,7 +2812,13 @@ Symbol *update_wmetree(agent *thisAgent,
     int pos = 0;
 
     start_timer(thisAgent, &(thisAgent->epmem_updatewmetree_start_time));
-    
+
+    /*
+     * The epmem arraylist is filled with wmetree equivalents of all
+     * the WMEs that are found as children of the given Symbol (sym).
+     * The pos pointer indicates the current place in the list.  If
+     * pos reaches the end of the list we're done.
+     */
     while(pos <= epmem->size)
     {
         start_timer(thisAgent, &(thisAgent->epmem_getaugs_start_time));
@@ -2877,12 +2829,6 @@ Symbol *update_wmetree(agent *thisAgent,
         {
             for(i = 0; i < len; i++)
             {
-                //%%%KLUDGE: ignore prolific tanksoar WMEs
-                if (wme_to_ignore(wmes[i]))
-                {
-                    continue;
-                }
-
                 //Check for special case: relation specification
                 if (handle_relation(thisAgent, node, wmes[i]))
                 {
@@ -2965,6 +2911,9 @@ Symbol *update_wmetree(agent *thisAgent,
    lower than the given value.
 
    NOTE:  This routine could be a lot more efficient.
+   
+   NOTE 16 July 2007: This routine is currently not used but may be
+                      useful in the future so I've left it in.
 
    Created: 13 Dec 2004
    =================================================================== */
@@ -2998,6 +2947,9 @@ arraylist *trim_epmem(arraylist *epmem)
    as associated entries in the working memory tree.  It leaves
    the episodic memory header intact to aid in record keeping (especially
    research related data collection).
+
+   NOTE 16 July 2007: This routine is currently not used but may be
+                      useful in the future so I've left it in.  
 
    Created: 05 Apr 2007
    =================================================================== */
@@ -3049,8 +3001,19 @@ void epmem_forget_via_recency_of_use(agent *thisAgent)
     int i;
     episodic_memory *epmem;
 
-    //%%%DISABLED
-    return;
+    /*
+     * BUGBUG: THIS FUNCTION IS CURRENTLY DISABLED
+     *
+     * I have performed some experiments with this function and the
+     * agent's behavior doesn't seem to jive with my expectations.
+     * Specifically, setting the epmem_age_limit very very high
+     * should be the same as not forgetting at all.  But, instead
+     * there is a significant drop in agent performance (in TankSoar
+     * anyway).  I'm leaving this in the to-be-investigated pile for
+     * the time being.  -:AMN: 16 July 07
+     *
+     */
+    return;                     // remove this line to re-enable
     
     for (i = 1; i < thisAgent->epmem_memories->size; i++)
     {
@@ -3084,7 +3047,9 @@ void epmem_forget_via_recency_of_use(agent *thisAgent)
 
    Note:  I had epmems with missing WMEs when I just incremented
           the tc number by one.  I found it had to be at least 3
-          to work reliably.  Don't ask me why.
+          to work reliably.  A better solution would be to add
+          my own tc_epmem number to the Symbol struct but that's
+          awfully RAM instensive.
    
    Created: 12 Jan 2004
    =================================================================== */
@@ -3224,95 +3189,6 @@ int wme_array_diff(wme **arr1, wme** arr2, int len)
 }//wme_array_diff
 
 /* ===================================================================
-   wme_to_skip
-
-   This is a helper function for get_most_activated_wmes.  Certain
-   WMEs from the environment update every cycle (e.g., ^random) and
-   thus gain high activation every cycle.  However, since the value is
-   different and virtually unique every time they cause recall
-   proposal rules to be created that will never fire.  To prevent
-   this, WMEs with certain hard-coded names are ignored when
-   retrieving the top n most activated wmes.  I realize this isn't
-   a very psychologically plausible fix for this problem but it
-   will do in the near term.
-
-   Currently Ignoring these Tanksoar WMEs:
-     cycle
-     random
-     clock
-     x
-     y
-   And these Eaters WMEs:
-     ^name eaters
-     cycle
-     score
-     eater-score
-     x
-     y
-   And these WMEs which are part of the performance data recorded by
-   the eaters agent and not part of the agent proper.
-     prev-score
-     reward
-     score
-     x
-     y
-     move-count
-     could-reflect
-    
-
-   %%%TODO:  Remove the need for this function.
-     
-   Created: 12 Dec 2002
-   =================================================================== */
-int wme_to_skip(wme *w)
-{
-    char *s;
-    
-    if (w->attr->common.symbol_type != SYM_CONSTANT_SYMBOL_TYPE)
-    {
-        return FALSE;
-    }
-
-    s = w->attr->sc.name;
-    switch(s[0])
-    {
-        case 'c':
-            switch(s[1])
-            {
-                case 'y': return strcmp(s, "cycle") == 0;
-                case 'l': return strcmp(s, "clock") == 0;
-                case 'o': return strcmp(s, "could-reflect") == 0;
-                default:  return FALSE;
-            }
-        case 'e':
-            return strcmp(s, "eater-score") == 0;
-        case 'm':
-            return strcmp(s, "move-count") == 0;
-        case 'n':
-            if (    (strcmp(s, "name") == 0)
-                 && (strcmp(w->value->sc.name, "eaters") == 0) )
-            {
-                return TRUE;
-            }
-            return FALSE;
-        case 'p':
-            return strcmp(s, "prev-score") == 0;
-        case 's':
-            return strcmp(s, "score") == 0;
-        case 'r':
-            if (s[1] == 'a') return strcmp(s, "random") == 0;
-            if (s[1] == 'e') return strcmp(s, "reward") == 0;
-            return FALSE;
-        case 'x':
-            return s[1] == '\0';
-        case 'y':
-            return s[1] == '\0';
-        default:
-            return FALSE;
-    }//switch
-}//wme_to_skip
-
-/* ===================================================================
    get_most_activated_wmes
 
    Use the decay wmes array to retrive the n most activated wmes.  The
@@ -3329,7 +3205,9 @@ int wme_to_skip(wme *w)
    be selected.
 
    This function returns the actual number of wmes that were placed in
-   given array.  
+   given array.
+
+   See Also: consider_new_epmem_via_activation()
    
    Created: 06 Nov 2002
    Changed: 25 April 2003 - added leaf preference threshold
@@ -3361,8 +3239,7 @@ int get_most_activated_wmes(agent *thisAgent, wme **active_wmes, int n, int nonl
             decay_element = decay_list[decay_pos].first_decay_element;
             while (decay_element != NULL)
             {
-                if ( (IS_LEAF_WME(decay_element->this_wme))
-                     && (! wme_to_skip(decay_element->this_wme)) )
+                if (IS_LEAF_WME(decay_element->this_wme))
                 {
                     active_wmes[pos] = decay_element->this_wme;
                     pos++;
@@ -3449,11 +3326,6 @@ void consider_new_epmem_via_output(agent *thisAgent)
             }
         }
     }
-
-    //%%%KLUDGE:  Don't record an epmem if I can find a ^wander WME
-    w = get_aug_of_id(thisAgent, thisAgent->top_goal, "wander", "yes");
-    if (w != NULL) return;
-
 
     //If there's a new command record a new memory
     if (bNewMemory)
@@ -3655,9 +3527,7 @@ void remove_curr_epmem(agent *thisAgent, epmem_header *h)
         if (get_arraylist_entry(thisAgent, node->assoc_wmes,h->index) == NULL)
         {
             //This is a memory leak caused by multi-valued attributes.
-            //I'm going to punt on it for now.
-//%%%              print(thisAgent, "\nERROR: WME should be in memory for: ");
-//%%%              print_wmetree(thisAgent, node, 0, 0);
+            //I'm going to punt on it for now. -:AMN:
             continue;
         }
 
@@ -3691,172 +3561,11 @@ void epmem_clear_curr_result(agent *thisAgent, epmem_header *h)
 }//epmem_clear_curr_result
 
 /* ===================================================================
-   compare_memories
-
-   Compares two episodic memories and returns the number of *leaf
-   WMEs* they have in common.  Obviously both lists should reference
-   the same wmetree for this comparison to be useful.
-
-   This function ignores WMEs that are not leaf WMEs.
-   
-   Created: 23 Feb 2004
-   =================================================================== */
-int compare_memories(agent *thisAgent, arraylist *epmem1, arraylist *epmem2)
-{
-    int count = 0;
-    int pos1 = 0;
-    int pos2 = 0;
-
-    while((pos1 < epmem1->size) && (pos2 < epmem2->size))
-    {
-        wmetree *node1 = ((actwme *)get_arraylist_entry(thisAgent, epmem1,pos1))->node;
-        wmetree *node2 = ((actwme *)get_arraylist_entry(thisAgent, epmem2,pos2))->node;
-        
-        if (node1->val_type == IDENTIFIER_SYMBOL_TYPE)
-        {
-            pos1++;
-            continue;
-        }
-        
-        if (node2->val_type == IDENTIFIER_SYMBOL_TYPE)
-        {
-            pos2++;
-            continue;
-        }
-        
-        if (node1 == node2)
-        {
-            count++;
-            pos1++;
-            pos2++;
-        }
-        else if (node1 < node2)
-        {
-            pos1++;
-        }
-        else
-        {
-            pos2++;
-        }
-    }//while
-
-    return count;
-}//compare_memories
-
-/* ===================================================================
-   compare_memories_ideal               *EATERS ONLY*
-
-   Compares two episoidic memories and returns the number of ideal
-   wmes that match.  I've handcoded ideal wmes to be the contents of
-   cells immediately adjacent to the eater and the direction the eater
-   is headed.
-  
-   Created: 23 Feb 2004
-   =================================================================== */
-int compare_memories_ideal(agent *thisAgent, arraylist *epmem1, arraylist *epmem2)
-{
-    wmetree *node1;
-    wmetree *node2;
-    wmetree *tmp1;
-    wmetree *tmp2;
-    char *direction = NULL;
-
-    //Compare the direction eater is travelling
-    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, thisAgent->epmem_wmetree, "output-link");
-    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, node1, "move");
-    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, node1, "direction");
-    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, thisAgent->epmem_wmetree, "output-link");
-    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, node2, "move");
-    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, node2, "direction");
-    if ( (node1 != NULL) && (node1 == node2) )
-    {
-        direction = node1->val.strval;
-    }
-    else
-    {
-        //Wrong direction
-        return 0;
-    }
-
-    //Find the eater's cell
-    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, thisAgent->epmem_wmetree, "input-link");
-    node1 = epmem_find_wmetree_entry(thisAgent, epmem1, node1, "my-location");
-    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, thisAgent->epmem_wmetree, "input-link");
-    node2 = epmem_find_wmetree_entry(thisAgent, epmem2, node2, "my-location");
-
-    //Compare destination cell content
-    tmp1 = epmem_find_wmetree_entry(thisAgent, epmem1, node1, direction);
-    tmp1 = epmem_find_wmetree_entry(thisAgent, epmem1, tmp1, "content");
-    tmp2 = epmem_find_wmetree_entry(thisAgent, epmem2, node2, direction);
-    tmp2 = epmem_find_wmetree_entry(thisAgent, epmem2, tmp2, "content");
-    if ( (tmp1 != NULL) && (tmp1 == tmp2) ) return 2;
-
-
-    return 0;
-
-}//compare_memories_ideal
-
-/* ===================================================================
-   compare_memories_act_indiv_mem
-
-   Compares two episodic memories and returns the number of *leaf*
-   WMEs they have in common.  Obviously both lists should reference
-   the same wmetree for this comparison to be useful.
-
-   This function ignores WMEs that are not leaf WMEs.
-   This function weights matches based upon the current activation
-   level of matching WMEs.
-   
-   
-   Created: 09 March 2004
-   =================================================================== */
-int compare_memories_act_indiv_mem(agent *thisAgent, arraylist *epmem1, arraylist *epmem2)
-{
-    int count = 0;
-    int pos1 = 0;
-    int pos2 = 0;
-
-    while((pos1 < epmem1->size) && (pos2 < epmem2->size))
-    {
-        wmetree *node1 = ((actwme *)get_arraylist_entry(thisAgent, epmem1,pos1))->node;
-        wmetree *node2 = ((actwme *)get_arraylist_entry(thisAgent, epmem2,pos2))->node;
-        
-        if (node1->val_type == IDENTIFIER_SYMBOL_TYPE)
-        {
-            pos1++;
-            continue;
-        }
-        
-        if (node2->val_type == IDENTIFIER_SYMBOL_TYPE)
-        {
-            pos2++;
-            continue;
-        }
-        
-        if (node1 == node2)
-        {
-            count += ((actwme *)get_arraylist_entry(thisAgent, epmem1,pos1))->activation;
-            pos1++;
-            pos2++;
-        }
-        else if (node1 < node2)
-        {
-            pos1++;
-        }
-        else
-        {
-            pos2++;
-        }
-    }//while
-
-    return count;
-}//compare_memories_act_indiv_mem
-
-/* ===================================================================
    meets_relation
 
    Given a two wmetree nodes, this function determines whether the
-   first meets the relation specified by the second.
+   first meets the relation (e.g., "greater-than") specified by the
+   second.
 
    Created:  18 Jul 2006
    =================================================================== */
@@ -3941,6 +3650,8 @@ int meets_relation(wmetree *candidate, wmetree *archetype)
                         (a NULL value indicates this does not need to
                          be calculated)
 
+   SEE ALSO: This is a fundamental helper routine for find_best_match() 
+                         
    CAVEAT: This function assumes that the negative cue is processed first. 
                          
    CAVEAT: The negcue_cardinality is added to the num_matches only for
@@ -3981,12 +3692,6 @@ int record_cue_element_match(agent *thisAgent,
         act_adjust = (float)((1.0 / g_card_act_ratio) / MAX_DECAY);
     }
     
-    
-//      //%%%DEBUGGING
-//      print(thisAgent, "\n\tMatches for %s cue entry %s: ",
-//            negcue ? "negative" : "positive",
-//            node->attr);
-
     //Loop over the associated epmems
     for(i = 1; i < node->assoc_memories->size; i++)
     {
@@ -4088,15 +3793,6 @@ int record_cue_element_match(agent *thisAgent,
                  || (epmem->match_score > (*best_mem_via_score)->match_score) )
             {
                 *best_mem_via_score = epmem;
-                
-//                  //%%%DEBUGGING
-//                  print(thisAgent,
-//                        "\nBest memory so far is #%d with match score %f and cardinality %d:",
-//                        epmem->index,
-//                        epmem->match_score,
-//                        epmem->num_matches);
-//                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 5,
-//                               "io input-link x y direction radar-setting radar-status");
             }//if
         }//if
             
@@ -4128,8 +3824,8 @@ int record_cue_element_match(agent *thisAgent,
    match is placed in the given epmem_header.
 
    Created:  19 Jan 2004
-   Overhauled:  18 Jul 2006 - added new capabilities and moved some guts to a
-                              sub function
+   Overhauled:  18 Jul 2006 - added new capabilities and moved some
+                              guts to a sub function: record_cue_element_match
    =================================================================== */
 episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
                                  arraylist *cue, arraylist *negcue)
@@ -4142,13 +3838,6 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
     episodic_memory *selected_mem = NULL;
     int i;
     int comp_count = 0;         // number of epmems that were examined
-
-//      //%%%DEBUGGING
-//      print(thisAgent, "\nRECEIVED THIS CUE");
-//      print(thisAgent, "\n(negative)");
-//      print_memory(thisAgent, negcue, thisAgent->epmem_wmetree, 2, 5);
-//      print(thisAgent, "(positive)");
-//      print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
 
     start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
 
@@ -4314,15 +4003,6 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
 
     stop_timer(thisAgent, &(thisAgent->epmem_match_start_time), &(thisAgent->epmem_match_total_time));
 
-//      //%%%DEBUGGING
-//      stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
-//      stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
-//      print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
-//      if (best_mem_via_score != NULL) print(thisAgent, "\nbest match score=%f\n", best_mem_via_score->match_score);
-//      if (best_mem_via_cardinality != NULL) print(thisAgent, "\nbest match cardinality=%d of %d\n", best_mem_via_cardinality->num_matches, total_cardinality);
-//      start_timer(thisAgent, &(thisAgent->epmem_start_time));
-//      start_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time));
-
     //Record the statistics for this match
     if (selected_mem != NULL)
     {
@@ -4331,639 +4011,8 @@ episodic_memory *find_best_match(agent *thisAgent, epmem_header *h,
         h->last_match_score = selected_mem->match_score;
     }
 
-//      //%%%DEBUGGING
-//      if (selected_mem != NULL)
-//      {
-//          print(thisAgent,
-//                "\nSelected the following memory (#%d) with match score %f and cardinality %d:",
-//                selected_mem->index,
-//                selected_mem->match_score,
-//                selected_mem->num_matches);
-//          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 5,
-//                       NULL);
-//                       //"io input-link x y direction radar-setting radar-status");
-//      }
-    
-    
     return selected_mem;
 }//find_best_match
-
-
-/* ===================================================================
-   get_radar_tank_data            *DOMAIN SPECIFIC*
-
-   Retrieves the x,y position, direction and radar-setting from an arraylist
-
-   Created:  10 Nov 2005
-   =================================================================== */
-typedef struct radar_tank_data_struct
-{
-    int x;
-    int y;
-    char direction[16];
-    int radar_setting;
-    int radar_distance;
-} radar_tank_data;
-
-void get_radar_tank_data(arraylist *al, radar_tank_data *rtd)
-{
-    int i;
-    wmetree *input_link = NULL;
-    
-    rtd->x = -1;
-    rtd->y = -1;
-    strcpy(rtd->direction, "unknown");
-    rtd->radar_setting = -1;
-    rtd->radar_distance = -1;
-
-    for(i = 0; i < al->size; i++)
-    {
-        actwme *aw = (actwme *)al->array[i]; //%%%HACK: should call get_arraylist_entry instead
-        char *attr = aw->node->attr;
-
-        if ( (strlen(attr) == 10) && (strcmp(attr, "input-link") == 0) )
-        {
-            input_link = aw->node;
-        }
-        else if ( (strlen(attr) == 1) && (aw->node->parent == input_link) && (strcmp(attr, "x") == 0) )
-        {
-            rtd->x = aw->node->val.intval;
-        }
-        else if ( (strlen(attr) == 1) && (aw->node->parent == input_link) && (strcmp(attr, "y") == 0) )
-        {
-            rtd->y = aw->node->val.intval;
-        }
-        else if ( (strlen(attr) == 9) && (aw->node->parent == input_link) && (strcmp(attr, "direction") == 0) )
-        {
-            strcpy(rtd->direction, aw->node->val.strval);
-        }
-        else if ( (strlen(attr) == 13) && (aw->node->parent == input_link) && (strcmp(attr, "radar-setting") == 0) )
-        {
-            rtd->radar_setting = aw->node->val.intval;
-        }
-        else if ( (strlen(attr) == 14) && (aw->node->parent == input_link) && (strcmp(attr, "radar-distance") == 0) )
-        {
-            rtd->radar_distance = aw->node->val.intval;
-        }
-    }//for
-}//get_radar_tank_data
-
-
-/* ===================================================================
-   is_radar_tank_match            *DOMAIN SPECIFIC*
-
-   Determines whether the given memory matches the given cue within
-   the context of the TankSoar radar tank.  (Used for debugging.)
-
-   Created:  10 Nov 2005
-   =================================================================== */
-int is_radar_tank_match(arraylist *cue, arraylist *mem)
-{
-    radar_tank_data cue_rtd;
-    radar_tank_data mem_rtd;
-
-    get_radar_tank_data(cue, &cue_rtd);
-    get_radar_tank_data(mem, &mem_rtd);
-
-    if ( (cue_rtd.x != -1)
-         && (cue_rtd.y != -1)
-         && (cue_rtd.direction[0] != 'u')
-         && (cue_rtd.x == mem_rtd.x)
-         && (cue_rtd.y == mem_rtd.y)
-         && (strcmp(cue_rtd.direction, mem_rtd.direction) == 0)
-         && ( (cue_rtd.radar_setting == mem_rtd.radar_setting)
-              || (mem_rtd.radar_setting == -1)))
-    {
-        return TRUE;
-    }
-
-    return FALSE;
-    
-}//is_radar_tank_match
-
-/* ===================================================================
-   find_best_match_RADARTANK        *DOMAIN SPECIFIC*
-
-   Same as find_best_match but prints lots of debugging info.
-
-   Caveat:  This function assumes you're doing the radar task
-            in tanksoar!!
-
-   Created:  10 November 2005
-   =================================================================== */
-episodic_memory *find_best_match_RADARTANK(agent *thisAgent, epmem_header *h, arraylist *cue)
-{
-    float best_score = 0.0;
-    episodic_memory *best_mem_via_score = NULL;
-    int cue_cardinality = 0;
-    int best_cardinality = 0;
-    episodic_memory *best_mem_via_cardinality = NULL;
-    episodic_memory *selected_mem = NULL;
-    int i;
-    int j;
-    int comp_count = 0;         // number of epmems that were examined
-
-//      //%%%DEBUGGING
-//      print(thisAgent, "\nRECEIVED THIS CUE");
-//      print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
-    
-    start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
-
-    //If there aren't enough memories to examine just return
-    //the first one
-    if (thisAgent->epmem_memories->size <= memory_match_wait)
-    {
-        return 0;
-    }
-
-    //Give this match a unique id
-    thisAgent->epmem_last_ret_id++;
-
-    //Every memory gets a match score boost if it contains a memory
-    //that's in the cue.  So we need to loop over the assoc_memories
-    //list for each wmetree node in the cue
-    for(i = 0; i < cue->size; i++)
-    {
-        //pull an entry out of the cue
-        actwme *aw_cue = (actwme *)get_arraylist_entry(thisAgent, cue,i);
-
-        // if the entry has associated epmems then note that this node
-        // was used in the match
-        if (aw_cue->node->assoc_memories->size > 0)
-        {
-            aw_cue->node->query_count++;
-        }
-
-        //If the entry is a leaf node then add it to the cue cardinality
-        //used for detecting an exact match
-        if (aw_cue->node->children->count == 0)
-        {
-            cue_cardinality++;
-        }
-
-//          //%%%DEBUGGING
-//          print(thisAgent, "\n\tMatches for cue entry %s: ", aw_cue->node->attr);
-
-        //Loop over the associated epmems
-        for(j = 1; j < aw_cue->node->assoc_memories->size; j++)
-        {
-            //get the next associated epmem
-            episodic_memory *epmem =
-                (episodic_memory *)get_arraylist_entry(thisAgent, aw_cue->node->assoc_memories,j);
-
-            //Record that there was a match
-            if (epmem->last_usage != thisAgent->epmem_last_ret_id)
-            {
-                //Reinit the match data from last time
-                epmem->last_usage = thisAgent->epmem_last_ret_id;
-                comp_count++;
-                epmem->match_score = 0.0;
-                epmem->num_matches = 1;
-            }
-            else
-            {
-                (epmem->num_matches)++;
-            }
-            
-            //Find the entry in that epmem that matches the cue entry
-            actwme *aw_mem = epmem_find_actwme_entry(thisAgent, epmem->content, aw_cue->node);
-
-            if (aw_mem != NULL)
-            {
-//                  //%%%DEBUGGING
-//                  print(thisAgent, "%d, ", epmem->index);
-                
-                //Increment the match score
-                epmem->match_score += (float)aw_mem->activation;
-            }
-
-            //Check to see if this mem has the best match score so far
-            if (epmem->match_score > best_score)
-            {
-//                  //%%%DEBUGGING
-//                  if (best_mem_via_score != NULL)
-//                  {
-//                      print(thisAgent,
-//                            "\nRejected the following memory (#%d) with match score %f:",
-//                            best_mem_via_score->index,
-//                            best_score);
-//                      print_memory(thisAgent, best_mem_via_score->content, thisAgent->epmem_wmetree, 2, 5,
-//                                   "io input-link x y direction radar-setting");
-//                  }
-                
-                best_score = epmem->match_score;
-                best_mem_via_score = epmem;
-            }
-//              //%%%DEBUGGING
-//              else if (is_radar_tank_match(cue, epmem->content))
-//              {
-//                  print(thisAgent,
-//                        "\nRejected matching memory (#%d) with match score %f:",
-//                        epmem->index, epmem->match_score);
-//                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 6,
-//                               "io input-link x y radar radar position radar radar position");
-//              }
-            
-            //Check to see if this mem has the best match cardinality so far
-            if (epmem->num_matches > best_cardinality)
-            {
-                best_mem_via_cardinality = epmem;
-                best_cardinality = epmem->num_matches;
-            }
-            else if ( (epmem->num_matches == best_cardinality)
-                      && (epmem->match_score > best_mem_via_cardinality->match_score) )
-            {
-                best_mem_via_cardinality = epmem;
-                best_cardinality = epmem->num_matches;
-            }
-            
-        }//for
-    }//for
-
-    //The selected memory is the exact match.  If there is no exact match, then
-    //the epmem with the best match score is returned.
-    if (best_cardinality == cue_cardinality)
-    {
-        selected_mem = best_mem_via_cardinality;
-    }
-    else
-    {
-        selected_mem = best_mem_via_score;
-    }
-    
-    stop_timer(thisAgent, &(thisAgent->epmem_match_start_time), &(thisAgent->epmem_match_total_time));
-
-    //%%%DEBUGGING
-    stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
-    stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
-    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
-    print(thisAgent, "\nbest match score=%f\n", best_score);
-    print(thisAgent, "\nbest match cardinality=%d of %d\n", best_cardinality, cue_cardinality);
-    start_timer(thisAgent, &(thisAgent->epmem_start_time));
-    start_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time));
-
-//      //%%%DEBUGGING
-//      if (selected_mem != NULL)
-//      {
-//          if (is_radar_tank_match(cue, selected_mem->content))
-//          {
-//              print(thisAgent,
-//                    "\nSelected CORRECT memory (#%d) with match score %f:",
-//                    selected_mem->index, best_score);
-//          }
-//          else
-//          {
-//              print(thisAgent,
-//                    "\nSelected INCORRECT memory (#%d) with match score %f:",
-//                    selected_mem->index, best_score);
-//          }             
-//          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 6,
-//                       "io input-link x y direction radar radar position radar radar radar-distance radar-setting radar-status");
-//      }
-
-//      //%%%HARDCODE:  Only chunk over exact match
-//      if (is_radar_tank_match(cue, best_mem->content))
-//      {
-//          thisAgent->sysparams[LEARNING_ON_SYSPARAM] = TRUE;
-//      }
-//      else
-//      {
-//          thisAgent->sysparams[LEARNING_ON_SYSPARAM] = FALSE;
-//      }
-    
-    
-    //%%%Currently hard coded for tanksoar
-    //Disable chunking if we are not confident in the result
-//      if (best_score < 280.0)
-//      {
-//          thisAgent->sysparams[LEARNING_ON_SYSPARAM] = FALSE;
-//      }
-//      else
-//      {
-//          thisAgent->sysparams[LEARNING_ON_SYSPARAM] = TRUE;
-//      }
-
-    
-    //Record the statistics for this match
-    h->last_cue_size = cue_cardinality;
-    h->last_match_size = selected_mem->num_matches;
-    h->last_match_score = selected_mem->match_score;
-    
-    return selected_mem;
-}//find_best_match_RADARTANK
-
-/* ===================================================================
-   get_energy_tank_data            *DOMAIN SPECIFIC*
-
-   Retrieves the x,y position, direction and radar-setting from an arraylist
-
-   Created:  10 Nov 2005
-   =================================================================== */
-typedef struct energy_tank_data_struct
-{
-    int x;
-    int y;
-    int position;               // 1=center, 2=left, 3=right, 0=not in the epmem
-    int radar_distance;
-} energy_tank_data;
-
-void get_energy_tank_data(arraylist *al, energy_tank_data *etd)
-{
-    int i;
-    wmetree *input_link = NULL;
-    wmetree *radar = NULL;
-    wmetree *energy = NULL;
-    int data_total = 0;
-        
-    
-    etd->x = -1;
-    etd->y = -1;
-    etd->position = -1;
-    etd->radar_distance = -1;
-
-    for(i = 0; i < al->size; i++)
-    {
-        actwme *aw = (actwme *)al->array[i]; //%%%HACK: should call get_arraylist_entry instead
-        char *attr = aw->node->attr;
-
-        if (data_total == 4) break;
-        
-        if ( (strlen(attr) == 10) && (strcmp(attr, "input-link") == 0) )
-        {
-            input_link = aw->node;
-        }
-        else if ( (strlen(attr) == 5) && (strcmp(attr, "radar") == 0) && (aw->node->parent == input_link))
-        {
-            radar = aw->node;
-        }
-        else if ( (strlen(attr) == 6) && (strcmp(attr, "energy") == 0) && (aw->node->parent == radar))
-        {
-            energy = aw->node;
-        }
-        else if ( (strlen(attr) == 1) && (aw->node->parent == input_link) && (strcmp(attr, "x") == 0) )
-        {
-            etd->x = aw->node->val.intval;
-            data_total++;
-        }
-        else if ( (strlen(attr) == 1) && (aw->node->parent == input_link) && (strcmp(attr, "y") == 0) )
-        {
-            etd->y = aw->node->val.intval;
-            data_total++;
-        }
-        else if ( (strlen(attr) == 14) && (aw->node->parent == input_link) && (strcmp(attr, "radar-distance") == 0) )
-        {
-            etd->radar_distance = aw->node->val.intval;
-            data_total++;
-        }
-        else if ( (strlen(attr) == 8) && (aw->node->parent == energy) && (strcmp(attr, "position") == 0) )
-        {
-            switch(aw->node->val.strval[0])
-            {
-                case 'c':
-                    etd->position = 1;
-                    break;
-                case 'l':
-                    etd->position = 2;
-                    break;
-                case 'r':
-                    etd->position = 3;
-                    break;
-                default:
-                    break;
-            }//switch
-            data_total++;
-        }//else
-
-    }//for
-}//get_energy_tank_data
-
-
-
-/* ===================================================================
-   is_energy_tank_match            *DOMAIN SPECIFIC*
-
-   Determines whether the given memory matches the given cue within
-   the context of the TankSoar energy tank.  (Used for debugging.)
-
-   Created:  02 May 2006
-   =================================================================== */
-int is_energy_tank_match(arraylist *cue, arraylist *mem)
-{
-    energy_tank_data cue_etd;
-    energy_tank_data mem_etd;
-
-    get_energy_tank_data(cue, &cue_etd);
-    get_energy_tank_data(mem, &mem_etd);
-
-    if ( (cue_etd.x != -1) && (cue_etd.x != mem_etd.x) )
-    {
-        return FALSE;
-    }
-    if ( (cue_etd.y != -1) && (cue_etd.y != mem_etd.y) )
-    {
-        return FALSE;
-    }
-    if ( (cue_etd.position != -1) && (cue_etd.position != mem_etd.position) )
-    {
-        return FALSE;
-    }
-    if ( (cue_etd.radar_distance != -1) && (cue_etd.radar_distance != mem_etd.radar_distance) )
-    {
-        return FALSE;
-    }
-    
-    return TRUE;
-    
-}//is_energy_tank_match
-
-/* ===================================================================
-   find_best_match_ENERGYTANK        *DOMAIN SPECIFIC*
-
-   Same as find_best_match but prints lots of debugging info.
-
-   Caveat:  This function assumes you're doing the radar task
-            in tanksoar!!
-
-   Created:  01 May 2006
-   =================================================================== */
-episodic_memory *find_best_match_ENERGYTANK(agent *thisAgent, epmem_header *h, arraylist *cue)
-{
-    float best_score = 0;
-    episodic_memory *best_mem_via_score = NULL;
-    int cue_cardinality = 0;
-    int best_cardinality = 0;
-    episodic_memory *best_mem_via_cardinality = NULL;
-    episodic_memory *selected_mem = NULL;
-    int i;
-    int j;
-    int comp_count = 0;         // number of epmems that were examined
-
-//      //%%%DEBUGGING
-//      print(thisAgent, "\nRECEIVED THIS CUE");
-//      print_memory(thisAgent, cue, thisAgent->epmem_wmetree, 2, 5);
-    
-    start_timer(thisAgent, &(thisAgent->epmem_match_start_time));
-
-    //If there aren't enough memories to examine just return
-    //the first one
-    if (thisAgent->epmem_memories->size <= memory_match_wait)
-    {
-        return 0;
-    }
-
-    //Give this match a unique id
-    thisAgent->epmem_last_ret_id++;
-
-    //Every memory gets a match score boost if it contains a memory
-    //that's in the cue.  So we need to loop over the assoc_memories
-    //list for each wmetree node in the cue
-    for(i = 0; i < cue->size; i++)
-    {
-        //pull an entry out of the cue
-        actwme *aw_cue = (actwme *)get_arraylist_entry(thisAgent, cue,i);
-
-        // if the entry has associated epmems then note that this node
-        // was used in the match
-        if (aw_cue->node->assoc_memories->size > 0)
-        {
-            aw_cue->node->query_count++;
-        }
-
-        //If the entry is a leaf node then add it to the cue cardinality
-        //used for detecting an exact match
-        if (aw_cue->node->children->count == 0)
-        {
-            cue_cardinality++;
-        }
-
-//          //%%%DEBUGGING
-//          print(thisAgent, "\n\tMatches for cue entry %s: ", aw_cue->node->attr);
-
-        //Loop over the associated epmems
-        for(j = 1; j < aw_cue->node->assoc_memories->size; j++)
-        {
-            //get the next associated epmem
-            episodic_memory *epmem =
-                (episodic_memory *)get_arraylist_entry(thisAgent, aw_cue->node->assoc_memories,j);
-
-            //Record that there was a match
-            if (epmem->last_usage != thisAgent->epmem_last_ret_id)
-            {
-                //Reinit the match data from last time
-                epmem->last_usage = thisAgent->epmem_last_ret_id;
-                comp_count++;
-                epmem->match_score = 0.0;
-                epmem->num_matches = 1;
-            }
-            else
-            {
-                (epmem->num_matches)++;
-            }
-            
-            //Find the entry in that epmem that matches the cue entry
-            actwme *aw_mem = epmem_find_actwme_entry(thisAgent, epmem->content, aw_cue->node);
-
-            if (aw_mem != NULL)
-            {
-//                  //%%%DEBUGGING
-//                  print(thisAgent, "%d, ", epmem->index);
-                
-                //Increment the match score
-                epmem->match_score += (float)aw_mem->activation;
-            }
-
-            //Check to see if this mem has the best match score so far
-            if (epmem->match_score > best_score)
-            {
-//                  //%%%DEBUGGING
-//                  if (best_mem_via_score != NULL)
-//                  {
-//                      print(thisAgent,
-//                            "\nRejected the following memory (#%d) with match score %f:",
-//                            best_mem_via_score->index,
-//                            best_score);
-//                      print_memory(thisAgent, best_mem_via_score->content, thisAgent->epmem_wmetree, 2, 5,
-//                                   "io input-link x y radar energy position");
-//                  }
-                
-                best_score = epmem->match_score;
-                best_mem_via_score = epmem;
-            }
-//              //%%%DEBUGGING
-//              else if (is_energy_tank_match(cue, epmem->content))
-//              {
-//                  print(thisAgent,
-//                        "\nRejected matching memory (#%d) with match score %f:",
-//                        epmem->index, epmem->match_score);
-//                  print_memory(thisAgent, epmem->content, thisAgent->epmem_wmetree, 2, 6,
-//                               "io input-link x y radar energy position radar energy position");
-//              }
-            
-            //Check to see if this mem has the best match cardinality so far
-            if (epmem->num_matches > best_cardinality)
-            {
-                best_mem_via_cardinality = epmem;
-                best_cardinality = epmem->num_matches;
-            }
-            else if ( (epmem->num_matches == best_cardinality)
-                      && (epmem->match_score > best_mem_via_cardinality->match_score) )
-            {
-                best_mem_via_cardinality = epmem;
-                best_cardinality = epmem->num_matches;
-            }
-            
-        }//for
-    }//for
-
-    //The selected memory is the exact match.  If there is no exact match, then
-    //the epmem with the best match score is returned.
-    if (best_cardinality == cue_cardinality)
-    {
-        selected_mem = best_mem_via_cardinality;
-    }
-    else
-    {
-        selected_mem = best_mem_via_score;
-    }
-    
-    stop_timer(thisAgent, &(thisAgent->epmem_match_start_time), &(thisAgent->epmem_match_total_time));
-
-    //%%%DEBUGGING
-    stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
-    stop_timer(thisAgent, &(thisAgent->epmem_start_time), &(thisAgent->epmem_total_time));
-    print(thisAgent, "\nmemories searched:\t%d of %d\n", comp_count, thisAgent->epmem_memories->size);
-    print(thisAgent, "\nbest match score=%f\n", best_score);
-    print(thisAgent, "\nbest match cardinality=%d of %d\n", best_cardinality, cue_cardinality);
-    start_timer(thisAgent, &(thisAgent->epmem_start_time));
-    start_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time));
-
-//      //%%%DEBUGGING
-//      if (selected_mem != NULL)
-//      {
-//          if (is_energy_tank_match(cue, selected_mem->content))
-//          {
-//              print(thisAgent,
-//                    "\nSelected CORRECT memory (#%d) with match score %f:",
-//                    selected_mem->index, best_score);
-//          }
-//          else
-//          {
-//              print(thisAgent,
-//                    "\nSelected INCORRECT memory (#%d) with match score %f:",
-//                    selected_mem->index, best_score);
-//          }             
-//          print_memory(thisAgent, selected_mem->content, thisAgent->epmem_wmetree, 2, 6,
-//                       "io input-link x y direction radar energy position radar energy radar-distance radar-setting radar-status");
-//      }
-
-    //Record the statistics for this match
-    h->last_cue_size = cue_cardinality;
-    h->last_match_size = selected_mem->num_matches;
-    h->last_match_score = selected_mem->match_score;
-    
-    return selected_mem;
-}//find_best_match_ENERGYTANK
-
 
 /* ===================================================================
    install_epmem_in_wm
@@ -5066,9 +4115,9 @@ void install_epmem_in_wm(agent *thisAgent, epmem_header *h, arraylist *epmem)
 /* ===================================================================
    respond_to_query()
 
-   This routine examines a query attached to a given symbol.  The result
-   is attached to another given symbol.  Any existing WMEs in the retrieval
-   buffer are removed.
+   This routine examines an episodic memory cue attached to a given
+   symbol.  The result is attached to another given symbol.  In
+   addition, any existing WMEs in the retrieval buffer are removed.
 
    The routine returns a pointer to the arraylist representing the
    memory which was placed on the the retrieved link (or NULL).
@@ -5439,45 +4488,16 @@ void epmem_update_header_stack(agent *thisAgent)
         append_entry_to_arraylist(thisAgent, thisAgent->epmem_header_stack, (void *)h);
     }
 
-//      //%%%DEBUGGING:  Print the current header stack
-//      print(thisAgent, "\nEpMem Header Stack: ");
-//      for(i = 0; i < thisAgent->epmem_header_stack->size; i++)
-//      {
-//          print_with_symbols("%y ",
-//                             ((epmem_header *)get_arraylist_entry(thisAgent, thisAgent->epmem_header_stack,i))->state);
-//      }
-//      print(thisAgent, "\n");
-    
-    
 }//epmem_update_header_stack
 
-
-/* ===================================================================
-   epmem_print_curr_memory()           *DEBUGGING*
-
-   Prints information about what's currently on the ^epmem link.
-
-   Created: 20 Feb 2004
-   =================================================================== */
-void epmem_print_curr_memory(agent *thisAgent, epmem_header *h)
-{
-    if (h->curr_memory == NULL)
-    {
-        print(thisAgent, "\nCURRENT MEMORY:  None.\n");
-        return;
-    }
-    
-    //Print the current memory
-    print(thisAgent, "\nCURRENT MEMORY:  %d of %d\t\t", h->curr_memory->index, thisAgent->epmem_memories->size);
-    print_memory_graphically(thisAgent, h->curr_memory->content);
-
-}//epmem_print_curr_memory
 
 /* ===================================================================
    epmem_calc_wmetree_size      *RECURSIVE*
 
    Calculates the size of a wmetree in terms of numbers of nodes
 
+   SEE ALSO: epmem_print_mem_usage
+   
    Created: 15 June 2004
    =================================================================== */
 int epmem_calc_wmetree_size(wmetree *node)
@@ -5505,8 +4525,11 @@ int epmem_calc_wmetree_size(wmetree *node)
 /* ===================================================================
    epmem_print_detailed_usage_memories
 
-   Prints a memory usage trace for thisAgent->epmem_memories to a given file handle.
+   Prints a memory usage trace for thisAgent->epmem_memories to a
+   given file handle.
 
+   SEE ALSO: epmem_print_mem_usage
+   
    Created: 15 June 2004
    =================================================================== */
 //NOTE:  NUM_BINS must be less than 256 and HISTOGRAM_SIZE must be greater
@@ -5565,6 +4588,8 @@ void epmem_print_detailed_usage_memories(agent *thisAgent, FILE *f)
    largest - initial caller should set an int to zero and pass in a
              ptr to it here
 
+   SEE ALSO: epmem_print_mem_usage
+   
    Created: 15 June 2004
    =================================================================== */
 void epduw_helper(wmetree *node, int *histogram, int *largest)
@@ -5627,6 +4652,14 @@ void epmem_print_detailed_usage_wmetree(FILE *f, wmetree *node)
    Prints information about how much RAM the episodic memories are
    using to a file.
 
+   CAVEAT: The output has hardcoded values for the size of a given
+            struct.  I can't just use sizeof() here because I have to
+            take into account sub-structures that are always there.  A
+            proper routine would actually caculate the total size
+            using a series of sizeof commands but it was overkill for
+            the experiment I was doing and even that's not foolproof
+            if new substructs are added. -:AMN:
+
    Created: 14 June 2004
    =================================================================== */
 void epmem_print_mem_usage(agent *thisAgent)
@@ -5687,7 +4720,8 @@ void epmem_print_mem_usage(agent *thisAgent)
             num_actwmes += epmem->content->size;
         }
     }
-    
+
+    //Print the info
     print(thisAgent, "\n");
     print(thisAgent, "%.6d wmetree structs = %.10d bytes\n", num_wmetrees, num_wmetrees*65);
     print(thisAgent, "%.6d epmem ptrs      = %.10d bytes\n", num_am_ptrs, num_am_ptrs*4);
@@ -5703,6 +4737,9 @@ void epmem_print_mem_usage(agent *thisAgent)
 /* ===================================================================
    epmem_reset_cpu_usage_timers() 
 
+   Reset all the timing info recorded about the CPU usage of
+   the epmem subsystem.
+   
    Created: 07 Jul 2004
    =================================================================== */
 void epmem_reset_cpu_usage_timers(agent *thisAgent)
@@ -5725,6 +4762,8 @@ void epmem_reset_cpu_usage_timers(agent *thisAgent)
 /* ===================================================================
    epmem_print_cpu_usage() 
 
+   Print CPU usage info for the epmem subsystem.
+   
    Created: 07 Jul 2004
    =================================================================== */
 void epmem_print_cpu_usage(agent *thisAgent)
@@ -5764,97 +4803,11 @@ void epmem_print_cpu_usage(agent *thisAgent)
 }//epmem_print_cpu_usage
 
 /* ===================================================================
-   epmem_print_query_usage_wmetree      *RECURSIVE*
-
-   Prints a info showing how often nodes of a particular size
-   (in terms of number of children) were used in a query cue.
-
-   Created: 13 July 2004
-   =================================================================== */
-void epquw_helper(agent *thisAgent,
-                  wmetree *node,
-                  int *total_queries,
-                  int *num_nodes,
-                  int *largest)
-{
-    int nodesize;
-    unsigned long hash_value;
-    wmetree *child;
-
-    if (node->assoc_memories != NULL)
-    {
-        nodesize = node->assoc_memories->size;
-        if (nodesize < HISTOGRAM_SIZE)
-        {
-            (total_queries[nodesize]) += node->query_count;
-            (num_nodes[nodesize]) ++;
-            if (nodesize > *largest) *largest = nodesize;
-        }
-
-    }
-
-    for (hash_value = 0; hash_value < node->children->size; hash_value++)
-    {
-        child = (wmetree *) (*(node->children->buckets + hash_value));
-        for (; child != NIL; child = child->next)
-        {
-            epquw_helper(thisAgent, child, total_queries, num_nodes, largest);
-        }
-    }
-    
-}//epquw_helper
-
-void epmem_print_query_usage_wmetree(agent *thisAgent)
-{
-    FILE *f;
-    static int total_queries[HISTOGRAM_SIZE];
-    static int num_nodes[HISTOGRAM_SIZE];
-    int i;
-    int largest = 0;
-
-    //Print the episodic memories' usage
-    f = fopen("\\temp\\epmem_query_usage_wmetree.txt", "aw");
-    if (f == NULL) return;
-
-    for(i = 0; i < HISTOGRAM_SIZE; i++)
-    {
-        total_queries[i] = 0;
-        num_nodes[i] = 0;
-    }
-
-    epquw_helper(thisAgent, thisAgent->epmem_wmetree, total_queries, num_nodes, &largest);
-    
-    if (num_nodes[2] == 0)
-    {
-        fprintf(f, "0");
-    }
-    else
-    {
-        fprintf(f, "%d", total_queries[2] / num_nodes[2]);
-    }
-        
-    for(i = 2; i <= largest; i++)
-    {
-        if (num_nodes[i] == 0)
-        {
-            fprintf(f, "\t0");
-        }
-        else
-        {
-            fprintf(f, "\t%d", total_queries[i] / num_nodes[i]);
-        }
-
-    }
-    fprintf(f, "\n");
-    fclose(f);
-    
-}//epmem_print_query_usage_wmetree
-
-/* ===================================================================
    epmem_save_wmetree_to_file()             *RECURSIVE*
 
    This routine saves the contents of a given wmetree to a given file.  It
    returns the total number of nodes that were written.
+   
    f - file to write to
    node - root of tree to write
    parent_id - numerical index of the parent
@@ -6246,7 +5199,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                 if (strcmp(str, "<id>") != 0)
                 {
                     print(thisAgent, "ERROR: File improperly formatted.  Expected \"<id>\" but found %s. Episodes not loaded.", str);
-                    //%%%Clean up already loaded data here
+                    //%%%I should clean up already loaded data here
                     destroy_arraylist(thisAgent, nodelist);
                     free(buf);
                     return NULL;
@@ -6263,7 +5216,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
         if (parent_node == NULL)
         {
             print(thisAgent, "ERROR: File improperly formatted.  Child node references nonexistant parent. Episode load aborted.", str);
-            //%%%Clean up already loaded data here
+            //%%%I should clean up already loaded data here
             destroy_arraylist(thisAgent, nodelist);
             free(buf);
             return NULL;
@@ -6281,7 +5234,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
         if (str[0] != '[')
         {
             print(thisAgent, "ERROR: File improperly formatted.  Expected '[' but found %s. Episode load aborted.", str);
-            //%%%Clean up already loaded data here
+            //%%%I should clean up already loaded data here
             destroy_arraylist(thisAgent, nodelist);
             free(buf);
             return NULL;
@@ -6320,7 +5273,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
             if (str == NULL)
             {
                 print(thisAgent, "ERROR: File improperly formatted.  Expected a node id but reached end-of-string.  Could this be a buffer overrun? Episode load aborted.", str);
-                //%%%Clean up already loaded data here
+                //%%%I should clean up already loaded data here
                 destroy_arraylist(thisAgent, nodelist);
                 free(buf);
                 return NULL;
@@ -6335,7 +5288,7 @@ arraylist *epmem_load_wmetree_from_file(agent *thisAgent,
                           && (buf[0] != ']') ) )
                 {
                     print(thisAgent, "ERROR: File improperly formatted.  Expected a node id.  Episode load aborted.");
-                    //%%%Clean up already loaded data here
+                    //%%%I should clean up already loaded data here
                     destroy_arraylist(thisAgent, nodelist);
                     free(buf);
                     return NULL;
@@ -6457,7 +5410,7 @@ int epmem_load_epmems_from_file(agent *thisAgent,
                 //otherwise fall through to unexpected token error
             default:
                 print(thisAgent, "ERROR: File improperly formatted.  Expected '[' but found %s. Epmems load aborted.", str);
-                //%%%Clean up already loaded data here
+                //%%%I should clean up already loaded data here
                 return 0;
         }//switch
 
@@ -6477,7 +5430,7 @@ int epmem_load_epmems_from_file(agent *thisAgent,
             if (node_id >= nodelist->size)
             {
                 print(thisAgent, "ERROR: File improperly formatted.  Illegal node index loaded. Epmems load aborted.", str);
-                //%%%Clean up already loaded data here
+                //%%%I should clean up already loaded data here
                 return 0;
             }
             node = (wmetree *)get_arraylist_entry(thisAgent, nodelist, node_id);
@@ -6546,7 +5499,10 @@ void epmem_load_episodic_memory_from_file(agent *thisAgent, char *fn)
 
    This routine is called at every output phase to allow the episodic
    memory system to update its current memory store and respond to any
-   queries. 
+   queries.
+
+   NOTE:  This function is the "grand central station" of the epmem
+          subsystem. 
 
    Created: 19 Jan 2004
    =================================================================== */
@@ -6570,6 +5526,7 @@ void epmem_update(agent *thisAgent)
     }
 
 #ifdef SILENT_CRASH
+    //See the comment below
     __try
     {
 #endif
@@ -6612,24 +5569,8 @@ void epmem_update(agent *thisAgent)
             //Handle any queries on the input link
             epmem = respond_to_query(thisAgent, h);
         }
-
-        //%%%DEBUGGING
-        if (h->curr_memory != NULL)
-        {
-            stop_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time), &(thisAgent->epmem_retrieve_total_time));
-            print(thisAgent, "\nRetrieved memory %d",
-                  h->curr_memory->index);
-            start_timer(thisAgent, &(thisAgent->epmem_retrieve_start_time));
-        }
+    }
         
-//          //%%%DEBUGGING
-//          if (h->curr_memory != NULL)
-//          {
-//              epmem_print_curr_memory(h);
-//          }
-        
-    }//for
-
     //Save the current epmem store at regular intervals
     if ((thisAgent->epmem_save_freq != 0)
         && (count % thisAgent->epmem_save_freq == 0)
@@ -6644,22 +5585,11 @@ void epmem_update(agent *thisAgent)
 
     
     
-    //%%%DEBUGGING
-    if (count % 500 == 0)
-    {
-        epmem_print_mem_usage(thisAgent);
-        epmem_print_cpu_usage(thisAgent);
-        print(thisAgent, "\n%d cycles completed\n", count);
-    }
-    
-//      //%%%DEBUGGING
-//      if (count % 100 == 0)
-//      {
-//          epmem_print_query_usage_wmetree();
-//          print(thisAgent, "\n%d queries and %d memories\n", thisAgent->epmem_num_queries, thisAgent->epmem_memories->size);
-//      }
 
-    
+
+    //This is Windows specific code to avoid the GPF dialog box
+    //when things go awry.  It's VERY HANDY when running multiple
+    //batches.
 #ifdef SILENT_CRASH
     }
     __except(1)
@@ -6671,7 +5601,6 @@ void epmem_update(agent *thisAgent)
         fflush(stderr);
         
         _set_abort_behavior( 0, _WRITE_ABORT_MSG);
-//        abort();
 
         TerminateProcess(GetCurrentProcess(), 0); 
     }
