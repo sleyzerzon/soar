@@ -82,7 +82,7 @@ static std::string Wme2String(wme* pWME, bool refCounts) {
 	buffer << " " ;
 	Symbol2String(pWME->value, refCounts, buffer) ;
 
-	buffer << " 0x" << (long)pWME ;
+	buffer << " 0x" << (uintptr_t)pWME ;
 
 	return buffer.str() ;
 }
