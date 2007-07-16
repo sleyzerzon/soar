@@ -48,7 +48,26 @@ libpath = [
 
 swigflags = '-c++ -java -Wall -package sml -ICore/ClientSML/include -ICore/ElementXML/include -ICore/ConnectionSML/include -outdir Core/ClientSMLSWIG/Java/build'
 
-Java_sml_ClientInterface = env.SharedLibrary('Java_sml_ClientInterface', glob.glob('*.i'), LIBS = libadd, LIBPATH = libpath, SWIGFLAGS = swigflags, SWIGCXXFILESUFFIX = "_wrap.cpp")
+###
+# Changes suggested by Markus
+env_jni = env.Copy()
+targetname = 'Java_sml_ClientInterface'
+if sys.platform == 'darwin':
+	env_jni.Append(SHLINKFLAGS = ' -framework JavaVM')
+	targetname = 'libJava_sml_ClientInterface.jnilib'
+	#env_jni['SHLIBSUFFIX'] = '.jnilib'
+elif sys.platform == 'cygwin':
+    env_jni.Append(CCFLAGS = '-mno-cygwin')
+    env_jni.Append(SHLINKFLAGS = '-mno-cygwin -Wl,--kill-at')
+    targetname = 'Java_sml_ClientInterface'
+
+Java_sml_ClientInterface = env_jni.SharedLibrary(targetname, glob.glob('*.i'), 
+												 LIBS = libadd,LIBPATH = libpath, SWIGFLAGS = swigflags, 
+												 SWIGCXXFILESUFFIX = "_wrap.cpp")
+
+#Java_sml_ClientInterface = env.SharedLibrary('Java_sml_ClientInterface', glob.glob('*.i'), LIBS = libadd, LIBPATH = libpath, SWIGFLAGS = swigflags, SWIGCXXFILESUFFIX = "_wrap.cpp")
+# end changes suggested by Markus
+###
 
 env.Install('#SoarLibrary/lib', Java_sml_ClientInterface)
 
