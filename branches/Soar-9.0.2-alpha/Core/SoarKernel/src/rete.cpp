@@ -1051,7 +1051,7 @@ Symbol *find_goal_for_match_set_change_assertion(agent* thisAgent, ms_change *ms
   }
   { char msg[BUFFER_MSG_SIZE];
   print_with_symbols(thisAgent, "\nError: Did not find goal for ms_change assertion: %y\n", msc->p_node->b.p.prod->name);
-  snprintf(msg, BUFFER_MSG_SIZE,"\nError: Did not find goal for ms_change assertion: %s\n",
+  SNPRINTF(msg, BUFFER_MSG_SIZE,"\nError: Did not find goal for ms_change assertion: %s\n",
          symbol_to_string(thisAgent, msc->p_node->b.p.prod->name,TRUE,NIL, 0));
   msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
   abort_with_fatal_error(thisAgent, msg);
@@ -2852,7 +2852,7 @@ void add_rete_tests_for_test (agent* thisAgent, test t,
       char msg[BUFFER_MSG_SIZE];
       print_with_symbols (thisAgent, "Error: Rete build found test of unbound var: %y\n",
                           referent);
-      snprintf (msg, BUFFER_MSG_SIZE, "Error: Rete build found test of unbound var: %s\n",
+      SNPRINTF (msg, BUFFER_MSG_SIZE, "Error: Rete build found test of unbound var: %s\n",
                           symbol_to_string(thisAgent, referent,TRUE, NIL, 0));
      msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
      abort_with_fatal_error(thisAgent, msg);
@@ -2896,7 +2896,7 @@ void add_rete_tests_for_test (agent* thisAgent, test t,
       char msg[BUFFER_MSG_SIZE];
       print_with_symbols (thisAgent, "Error: Rete build found test of unbound var: %y\n",
                           ct->data.referent);
-      snprintf (msg, BUFFER_MSG_SIZE, "Error: Rete build found test of unbound var: %s\n",
+      SNPRINTF (msg, BUFFER_MSG_SIZE, "Error: Rete build found test of unbound var: %s\n",
                           symbol_to_string(thisAgent, ct->data.referent,TRUE, NIL, 0));
       msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
       abort_with_fatal_error(thisAgent, msg);
@@ -2945,7 +2945,7 @@ void add_rete_tests_for_test (agent* thisAgent, test t,
     
   default:
     { char msg[BUFFER_MSG_SIZE];
-    snprintf (msg, BUFFER_MSG_SIZE,"Error: found bad test type %d while building rete\n",
+    SNPRINTF (msg, BUFFER_MSG_SIZE,"Error: found bad test type %d while building rete\n",
            ct->type);
     msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
     abort_with_fatal_error(thisAgent, msg);
@@ -4734,7 +4734,7 @@ void unhashed_positive_node_left_addition (agent* thisAgent, rete_node *node, to
 
 void rete_error_left (agent* thisAgent, rete_node *node, token *t, wme *w) {
   char msg[BUFFER_MSG_SIZE];
-  snprintf (msg, BUFFER_MSG_SIZE, "Rete net error:  tried to left-activate node of type %d\n",
+  SNPRINTF (msg, BUFFER_MSG_SIZE, "Rete net error:  tried to left-activate node of type %d\n",
          node->node_type);
   msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
   abort_with_fatal_error(thisAgent, msg);
@@ -4742,7 +4742,7 @@ void rete_error_left (agent* thisAgent, rete_node *node, token *t, wme *w) {
 
 void rete_error_right (agent* thisAgent, rete_node *node, wme *w) {
   char msg[BUFFER_MSG_SIZE];
-  snprintf (msg, BUFFER_MSG_SIZE, "Rete net error:  tried to right-activate node of type %d\n",
+  SNPRINTF (msg, BUFFER_MSG_SIZE, "Rete net error:  tried to right-activate node of type %d\n",
          node->node_type);
   msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
   abort_with_fatal_error(thisAgent, msg);
@@ -5857,7 +5857,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
            print_with_symbols(thisAgent, "\n   RETE: putting [%y] into ms_o_assertions",
                               node->b.p.prod->name);
            char buf[256];
-           snprintf(buf, 254, "RETE: putting [%s] into ms_o_assertions", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
+           SNPRINTF(buf, 254, "RETE: putting [%s] into ms_o_assertions", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
            GenerateVerboseXML(thisAgent, buf);
         }
      }
@@ -5877,7 +5877,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
            print_with_symbols(thisAgent, "\n   RETE: putting [%y] into ms_i_assertions",
                               node->b.p.prod->name);
            char buf[256];
-           snprintf(buf, 254, "RETE: putting [%s] into ms_i_assertions", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
+           SNPRINTF(buf, 254, "RETE: putting [%s] into ms_i_assertions", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
            GenerateVerboseXML(thisAgent, buf);
         }
      }
@@ -6077,7 +6077,7 @@ void p_node_left_removal (agent* thisAgent, rete_node *node, token *tok, wme *w)
       (thisAgent->soar_verbose_flag == TRUE)) {
           print_with_symbols (thisAgent, "\n%y: ",node->b.p.prod->name);
           char buf[256];
-          snprintf(buf, 254, "%s: ", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
+          SNPRINTF(buf, 254, "%s: ", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
           GenerateVerboseXML(thisAgent, buf);
       }
 
@@ -6209,7 +6209,7 @@ void remove_token_and_subtree (agent* thisAgent, token *root) {
 
     } else {
       char msg[BUFFER_MSG_SIZE];
-      snprintf (msg, BUFFER_MSG_SIZE,
+      SNPRINTF (msg, BUFFER_MSG_SIZE,
               "Internal error: bad node type %d in remove_token_and_subtree\n",
               node->node_type);
      msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
@@ -6752,7 +6752,7 @@ rhs_value reteload_rhs_value (Kernel* thisKernel, agent* thisAgent, FILE* f) {
     if (!rf) {
       char msg[BUFFER_MSG_SIZE];
       print_with_symbols (thisAgent, "Error: can't load this file because it uses an undefined RHS function %y\n", sym);
-      snprintf (msg, BUFFER_MSG_SIZE, "Error: can't load this file because it uses an undefined RHS function %s\n", symbol_to_string(thisAgent, sym,TRUE,NIL, 0));
+      SNPRINTF (msg, BUFFER_MSG_SIZE, "Error: can't load this file because it uses an undefined RHS function %s\n", symbol_to_string(thisAgent, sym,TRUE,NIL, 0));
       msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
       abort_with_fatal_error(thisAgent, msg);
     }
@@ -7100,7 +7100,7 @@ void retesave_rete_node_and_children (agent* thisAgent, rete_node *node, FILE* f
 
   default:
     {char msg[BUFFER_MSG_SIZE];
-    snprintf (msg, BUFFER_MSG_SIZE,
+    SNPRINTF (msg, BUFFER_MSG_SIZE,
            "Internal error: fastsave found node type %d\n", node->node_type);
     msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
     abort_with_fatal_error(thisAgent, msg);
@@ -7249,7 +7249,7 @@ void reteload_node_and_children (Kernel* thisKernel, agent* thisAgent, rete_node
 
   default:
     { char msg[BUFFER_MSG_SIZE];
-    snprintf (msg, BUFFER_MSG_SIZE,"Internal error: fastload found node type %d\n", type);
+    SNPRINTF (msg, BUFFER_MSG_SIZE,"Internal error: fastload found node type %d\n", type);
     msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
     abort_with_fatal_error(thisAgent, msg);
     New = NIL; /* unreachable, but without it gcc -Wall warns here */
@@ -7731,7 +7731,7 @@ long ppmi_aux (agent* thisAgent,   /* current agent */
     strncpy (match_count_string, ">>>>", MATCH_COUNT_STRING_BUFFER_SIZE);
 	match_count_string[MATCH_COUNT_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
   } else {
-    snprintf (match_count_string, MATCH_COUNT_STRING_BUFFER_SIZE, "%4ld", matches_at_this_level);
+    SNPRINTF (match_count_string, MATCH_COUNT_STRING_BUFFER_SIZE, "%4ld", matches_at_this_level);
 	match_count_string[MATCH_COUNT_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
   }
 
@@ -8777,7 +8777,7 @@ long xml_aux (agent* thisAgent,   /* current agent */
 	//match_count_string[MATCH_COUNT_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
   } else {
     //xmlInt(kMatchCount, matches_at_this_level) ;
-    //snprintf (match_count_string, MATCH_COUNT_STRING_BUFFER_SIZE, "%4ld", matches_at_this_level);
+    //SNPRINTF (match_count_string, MATCH_COUNT_STRING_BUFFER_SIZE, "%4ld", matches_at_this_level);
 	//match_count_string[MATCH_COUNT_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
   }
 
