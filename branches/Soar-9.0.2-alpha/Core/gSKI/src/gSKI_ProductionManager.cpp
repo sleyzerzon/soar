@@ -406,7 +406,8 @@ _|___/    __         _    _             ____  _               _
 	  exciseCount = exciseCount + a->num_productions_of_type[USER_PRODUCTION_TYPE] +
                                   a->num_productions_of_type[CHUNK_PRODUCTION_TYPE] +
 								  a->num_productions_of_type[JUSTIFICATION_PRODUCTION_TYPE] +
-								  a->num_productions_of_type[DEFAULT_PRODUCTION_TYPE];
+								  a->num_productions_of_type[DEFAULT_PRODUCTION_TYPE] +
+								  a->num_productions_of_type[TEMPLATE_PRODUCTION_TYPE];
       excise_all_productions(m_agent->GetSoarAgent(), false);
 	  return true;
    }
