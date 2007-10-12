@@ -305,6 +305,7 @@ bool Socket::IsReadDataAvailable(long secondsWait, long millisecondsWait)
 	{
 		PrintDebug("Error: Error checking if data is available to be read") ;
 		ReportSystemErrorMessage() ;
+		Close() ;	// If the socket has an error we'll shut it down
 		return false ;
 	}
 
