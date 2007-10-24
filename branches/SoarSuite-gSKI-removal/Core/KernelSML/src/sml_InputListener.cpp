@@ -341,10 +341,11 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 		pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
 	}
 
-	std::string printInput1 = pAgentSML->ExecuteCommandLine("print --internal --depth 2 I2") ;
-
 	if (kDebugInput)
+	{
+	    std::string printInput1 = pAgentSML->ExecuteCommandLine("print --internal --depth 2 I2") ;
 		PrintDebugFormat("%s\nLooking for %ld", printInput1.c_str(), timetag) ;
+	}
 
 	// The wme is already gone so no work to do
 	if (!pWME)
