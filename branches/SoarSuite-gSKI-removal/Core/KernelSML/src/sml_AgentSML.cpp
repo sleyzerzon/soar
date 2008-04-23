@@ -38,12 +38,6 @@
 //#define DEBUG_UPDATE
 #endif
 
-#ifdef _WIN32
-#define safeSprintf _snprintf
-#else
-#define safeSprintf snprintf
-#endif
-
 #include <assert.h>
 
 using namespace sml ;
@@ -186,7 +180,7 @@ AgentSML::~AgentSML()
 void AgentSML::Clear(bool deletingThisAgent)
 {
 #ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML::Clear start %s", deletingThisAgent ? "deleting this agent." : "not deleting this agent.") ;
+	sml::PrintDebugFormat("AgentSML::Clear start %s", deletingThisAgent ? "deleting this agent." : "not deleting this agent.") ;
 #endif
 
 	// Release any WME objects we still own.
@@ -205,7 +199,7 @@ void AgentSML::Clear(bool deletingThisAgent)
 	m_XMLListener.Clear() ;
 
 #ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML::Clear end %s", deletingThisAgent ? "deleting this agent." : "not deleting this agent.") ;
+	sml::PrintDebugFormat("AgentSML::Clear end %s", deletingThisAgent ? "deleting this agent." : "not deleting this agent.") ;
 #endif
 }
 
@@ -217,9 +211,9 @@ void AgentSML::Clear(bool deletingThisAgent)
 void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 {
 #ifdef DEBUG_UPDATE
-	PrintDebugFormat("****************************************************") ;
-	PrintDebugFormat("%s AgentSML::ReleaseAllWmes start %s", this->GetIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
-	PrintDebugFormat("****************************************************") ;
+	sml::PrintDebugFormat("****************************************************") ;
+	sml::PrintDebugFormat("%s AgentSML::ReleaseAllWmes start %s", this->GetIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
+	sml::PrintDebugFormat("****************************************************") ;
 #endif
 
 	if (flushPendingRemoves)
@@ -274,11 +268,12 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	m_KernelTimeTagMap.clear() ;
 	m_ToClientIdentifierMap.clear() ;
 	m_IdentifierMap.clear() ;
+	m_IdentifierRefMap.clear() ;
 
 #ifdef DEBUG_UPDATE
-	PrintDebugFormat("****************************************************") ;
-	PrintDebugFormat("%s AgentSML::ReleaseAllWmes end %s", this->GetIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
-	PrintDebugFormat("****************************************************") ;
+	sml::PrintDebugFormat("****************************************************") ;
+	sml::PrintDebugFormat("%s AgentSML::ReleaseAllWmes end %s", this->GetIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
+	sml::PrintDebugFormat("****************************************************") ;
 #endif
 }
 
@@ -750,25 +745,75 @@ bool AgentSML::ConvertID(char const* pClientID, std::string* pKernelID)
 
 void AgentSML::RecordIDMapping(char const* pClientID, char const* pKernelID)
 {
+	// Do we already have a mapping?
+	IdentifierMapIter iter = m_IdentifierMap.find(pClientID);
+
+	if (iter == m_IdentifierMap.end())
+	{
+		// We don't, create a mapping, this indicates a reference count of 1
 	m_IdentifierMap[pClientID] = pKernelID ;
 
 	// Record in both directions, so we can clean up (at which time we only know the kernel side ID).
 	m_ToClientIdentifierMap[pKernelID] = pClientID ;
+
+		// Note that we leave the entry out of m_IdentifierRefMap, we only use
+		// that for counts of two or greater
+}
+	else
+	{
+		// The mapping already exists, so we need to check and see if we have a reference
+		// count for it yet
+		IdentifierRefMapIter iter = m_IdentifierRefMap.find(pClientID);
+		if (iter == m_IdentifierRefMap.end())
+		{
+			// there is no reference count and this is the second reference, so set it to two
+			m_IdentifierRefMap[pClientID] = 2 ;
+		}
+		else 
+		{
+			// there is a reference count, increment it
+			iter->second += 1;
+		}
+	}
 }
 
 void AgentSML::RemoveID(char const* pKernelID)
 {
+	// first, find the identifer
 	IdentifierMapIter iter = m_ToClientIdentifierMap.find(pKernelID) ;
 
 	// This identifier should have been in the table
-	assert (iter != m_ToClientIdentifierMap.end()) ;
+	// Note: sometimes this is called by gSKI when it is removing wmes. gSKI doesn't know if
+	// we're a direct connection and therefore aren't using this map, so in that case we need to not
+	// update this. Therefore, we can't assert here.
+	//assert (iter != m_ToClientIdentifierMap.end()) ;
 	if (iter == m_ToClientIdentifierMap.end())
 		return ;
 
-	// Delete this mapping from both tables
-	std::string clientID = iter->second ;
+	// cache the identifer value
+	std::string& clientID = iter->second ;
+
+	// decrement the reference count and remove the identifier from the maps if it is there
+	IdentifierRefMapIter refIter = m_IdentifierRefMap.find(clientID);
+	if (refIter == m_IdentifierRefMap.end())
+	{
+		// when we have an entry in the m_IdentifierMap but not m_IdentifierRefMap, this 
+		// means our ref count is one, so we're decrementing to zero, so we remove it
 	m_IdentifierMap.erase(clientID) ;
 	m_ToClientIdentifierMap.erase(pKernelID) ;
+		return;
+}
+	else 
+	{
+		// if we have an entry, decrement it
+		refIter->second -= 1;
+
+		// if the count falls to 1, remove it from this map since presence in the map requires 
+		// at least a ref count of two
+		if (refIter->second < 2) {
+			m_IdentifierRefMap.erase(refIter);
+		}
+	}
 }
 
 /*************************************************************
@@ -899,6 +944,23 @@ void AgentSML::RemoveTimeTag(char const* pTimeTag)
 	m_TimeTagMap.erase(pTimeTag) ;
 }
 
+void AgentSML::RemoveTimeTagByWmeSLOW(gSKI::IWme* pWme)
+{
+	// This is used by KernelSML::RemoveInputWMERecords to remove a timetag
+	// when gSKI is removing wmes from the kernel due to an identifier deletion.
+
+	// It's slow because it is linear with respect to the number of wmes.
+	// TODO: There should be a two-way mapping.
+	for ( TimeTagMapIter iter = m_TimeTagMap.begin(); iter != m_TimeTagMap.end(); ++iter )
+	{
+		if ( iter->second == pWme )
+		{
+			m_TimeTagMap.erase( iter );
+			return;
+		}
+	}
+}
+
 void AgentSML::RemoveLongTimeTag(long timeTag)
 {
 	char str[kMinBufferSize] ;
@@ -951,18 +1013,18 @@ std::string AgentSML::SymbolToString(Symbol* sym)
 	 return (char*) (sym->var.name);
 	 break;
 	case IDENTIFIER_SYMBOL_TYPE:
-	 safeSprintf(temp,128,"%c%lu",sym->id.name_letter,sym->id.name_number);
+	 SNPRINTF(temp,128,"%c%lu",sym->id.name_letter,sym->id.name_number);
 	 return std::string(temp);
 	 break;
 	case SYM_CONSTANT_SYMBOL_TYPE:
 	 return (char *) (sym->sc.name);
 	 break;
 	case INT_CONSTANT_SYMBOL_TYPE:
-	 safeSprintf(temp,128, "%ld",sym->ic.value);
+	 SNPRINTF(temp,128, "%ld",sym->ic.value);
 	 return std::string(temp);
 	 break;
 	case FLOAT_CONSTANT_SYMBOL_TYPE:
-	 safeSprintf(temp, 128, "%g",sym->fc.value);
+	 SNPRINTF(temp, 128, "%g",sym->fc.value);
 	 return std::string(temp);
 	 break;
 	default:

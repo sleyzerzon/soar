@@ -175,7 +175,7 @@ void KernelSML::DeleteAllAgents(bool waitTillDeleted)
 		int maxTries = 100 ;	// Wait for a second then abort anyway
 		while (waitTillDeleted && agentCount == m_AgentMap.size() && maxTries > 0)
 		{
-			soar_sleep(0, 10) ;
+			sml::Sleep(0, 10) ;
 			maxTries-- ;
 		}
 	}
@@ -1041,6 +1041,11 @@ EXPORT void sml_DirectReleaseWME(Direct_WorkingMemory_Handle wm, Direct_WME_Hand
 EXPORT void sml_DirectReleaseWMObject(Direct_WMObject_Handle parent)
 {
 	((IWMObject*)parent)->Release() ;
+}
+
+EXPORT int sml_DirectGetIWMObjMapSize(Direct_WorkingMemory_Handle wm)
+{
+	return ((IWorkingMemory*)wm)->GetWMObjMapSize();
 }
 
 /*

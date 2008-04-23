@@ -2,6 +2,14 @@ package soar2d;
 
 import java.io.*;
 import java.util.logging.*;
+
+import soar2d.configuration.BookConfiguration;
+import soar2d.configuration.Configuration;
+import soar2d.configuration.EatersConfiguration;
+import soar2d.configuration.KitchenConfiguration;
+import soar2d.configuration.LoadError;
+import soar2d.configuration.TankSoarConfiguration;
+import soar2d.configuration.TaxiConfiguration;
 import soar2d.visuals.*;
 /*
  * A note about log levels:
@@ -32,10 +40,13 @@ public class Soar2D {
 	String configFile = null;
 
 	public static final String kDefaultXMLEatersSettingsFile = "eaters.xml";
+	public static final String kDefaultXMLKitchenSettingsFile = "kitchen.xml";
 	public static final String kDefaultXMLTankSoarSettingsFile = "tanksoar.xml";
 	public static final String kDefaultXMLEatersConsoleSettingsFile = "eaters-console.xml";
 	public static final String kDefaultXMLTankSoarConsoleSettingsFile = "tanksoar-console.xml";
 	public static final String kDefaultXMLBookSettingsFile = "book.xml";
+	public static final String kDefaultXMLBookDiscreteSettingsFile = "book-discrete.xml";
+	public static final String kDefaultXMLTaxiSettingsFile = "taxi.xml";
 
 	public static final Logger logger = Logger.getLogger("soar2d");
 	public static Configuration config = new Configuration();
@@ -44,20 +55,28 @@ public class Soar2D {
 	public static final Controller control = new Controller();
 
 	public Soar2D(String[] args) {
-		// Fire up view
-		boolean wmSuccess = wm.initialize();
 
 		// Try to install default config files
 		try {
 			install(kDefaultXMLEatersSettingsFile);
 		} catch (IOException e) {
+			wm.initialize();
 			control.severeError("IOException installing " + kDefaultXMLEatersSettingsFile + ": " + e.getMessage());
+			wm.shutdown();
+			System.exit(1);
+		}
+		try {
+			install(kDefaultXMLKitchenSettingsFile);
+		} catch (IOException e) {
+			wm.initialize();
+			control.severeError("IOException installing " + kDefaultXMLKitchenSettingsFile + ": " + e.getMessage());
 			wm.shutdown();
 			System.exit(1);
 		}
 		try {
 			install(kDefaultXMLTankSoarSettingsFile);
 		} catch (IOException e) {
+			wm.initialize();
 			control.severeError("IOException installing " + kDefaultXMLTankSoarSettingsFile + ": " + e.getMessage());
 			wm.shutdown();
 			System.exit(1);
@@ -65,6 +84,7 @@ public class Soar2D {
 		try {
 			install(kDefaultXMLEatersConsoleSettingsFile);
 		} catch (IOException e) {
+			wm.initialize();
 			control.severeError("IOException installing " + kDefaultXMLEatersConsoleSettingsFile + ": " + e.getMessage());
 			wm.shutdown();
 			System.exit(1);
@@ -72,6 +92,7 @@ public class Soar2D {
 		try {
 			install(kDefaultXMLTankSoarConsoleSettingsFile);
 		} catch (IOException e) {
+			wm.initialize();
 			control.severeError("IOException installing " + kDefaultXMLTankSoarConsoleSettingsFile + ": " + e.getMessage());
 			wm.shutdown();
 			System.exit(1);
@@ -79,7 +100,24 @@ public class Soar2D {
 		try {
 			install(kDefaultXMLBookSettingsFile);
 		} catch (IOException e) {
+			wm.initialize();
 			control.severeError("IOException installing " + kDefaultXMLBookSettingsFile + ": " + e.getMessage());
+			wm.shutdown();
+			System.exit(1);
+		}
+		try {
+			install(kDefaultXMLBookDiscreteSettingsFile);
+		} catch (IOException e) {
+			wm.initialize();
+			control.severeError("IOException installing " + kDefaultXMLBookDiscreteSettingsFile + ": " + e.getMessage());
+			wm.shutdown();
+			System.exit(1);
+		}
+		try {
+			install(kDefaultXMLTaxiSettingsFile);
+		} catch (IOException e) {
+			wm.initialize();
+			control.severeError("IOException installing " + kDefaultXMLTaxiSettingsFile + ": " + e.getMessage());
 			wm.shutdown();
 			System.exit(1);
 		}
@@ -87,7 +125,7 @@ public class Soar2D {
 		if (args.length > 0) {
 			configFile = args[0];
 		} else {
-			if (wmSuccess) {
+			if (wm.initialize()) {
 				configFile = wm.promptForConfig();
 			} else {
 				System.err.println("No configuration file specified. Please specify a configuration file on the command line.");
@@ -99,10 +137,10 @@ public class Soar2D {
 		}
 		
 		// Read config file
-		config = new Configuration();
 		try {
 			config.load(new File(configFile));
-		} catch (Configuration.LoadError e) {
+		} catch (LoadError e) {
+			wm.initialize();
 			control.severeError("Error loading configuration file: " + e.getMessage());
 			wm.shutdown();
 			System.exit(1);
@@ -121,6 +159,7 @@ public class Soar2D {
 				}
 				logger.addHandler(handler);
 			} catch (IOException e) {
+				wm.initialize();
 				control.severeError("IOException creating " + config.getLogFile().getAbsolutePath() + ": " + e.getMessage());
 				wm.shutdown();
 				System.exit(1);
@@ -144,19 +183,19 @@ public class Soar2D {
 			logger.setLevel(Level.OFF);
 		}
 		
+		// if using gui
 		if (!config.getNoGUI()) {
-			if (!wmSuccess) {
+			// initialize wm
+			if (!wm.initialize()) {
 				control.severeError("Failed to initialize display.");
 				System.exit(1);
 			}
-		} else {
-			// shut down visuals
-			wm.shutdown();
 		}
 
 		// Initialize simulation
 		if (!simulation.initialize()) {
 			System.exit(1);
+			wm.shutdown();
 		}
 		
 		if (!config.getNoGUI()) {
@@ -167,6 +206,7 @@ public class Soar2D {
 			control.startSimulation(false, false);
 		}
 		
+		// calls wm.shutdown()
 		control.shutdown();
 	}
 

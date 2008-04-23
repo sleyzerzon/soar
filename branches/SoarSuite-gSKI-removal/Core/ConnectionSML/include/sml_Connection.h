@@ -40,6 +40,7 @@
 #include "thread_Lock.h"
 
 // These last ones are just for convenience, they could come out
+#include "ElementXMLHandle.h"
 #include "sml_ElementXML.h"
 #include "sml_AnalyzeXML.h"
 #include "sml_Names.h"
@@ -120,7 +121,7 @@ typedef std::map< std::string, CallbackList* >	CallbackMap ;
 typedef CallbackMap::iterator					CallbackMapIter ;
 
 // Used to store a queue of messages
-typedef std::queue< ElementXML* >	MessageQueue ;
+typedef std::queue< ElementXML_Handle >	MessageQueue ;
 
 typedef std::list< ElementXML* >	MessageList ;
 typedef MessageList::iterator		MessageListIter ;

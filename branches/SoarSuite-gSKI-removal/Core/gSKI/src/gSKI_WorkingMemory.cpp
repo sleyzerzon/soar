@@ -24,7 +24,7 @@
 #include "MegaAssert.h"
 
 #include "symtab.h"
-#include "io.h"
+#include "io_soar.h"
 #include "wmem.h"
 #include "agent.h"
 #include "gdatastructs.h"
@@ -797,5 +797,10 @@ namespace gSKI
       ClearError(err);
 
 	  // Nothing to listen for yet.
+   }
+
+   int WorkingMemory::GetWMObjMapSize() const 
+   { 
+	   return static_cast<int>(this->m_wmobjectmap.size()); 
    }
 }

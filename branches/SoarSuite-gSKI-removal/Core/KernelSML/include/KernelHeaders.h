@@ -28,6 +28,6 @@
 #include "decide.h"
 #include "recmem.h"
 #include "symtab.h"
-#include "io.h"
+#include "io_soar.h"
 #include "wmem.h"
 #include "kernel_struct.h"

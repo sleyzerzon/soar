@@ -28,7 +28,7 @@
 #include <string>
 #include <set>
 
-#include "io.h"
+#include "io_soar.h"
 
 namespace gSKI {
 
@@ -61,7 +61,7 @@ namespace gSKI {
       * 
       * Including adestructor for the usual C++ safety reasons.
       */     
-    ~OutputWorkingMemory();
+    virtual ~OutputWorkingMemory();
 
      /**
       * @brief Returns a pointer to the Agent that owns this OutputWorkingMemory
@@ -683,8 +683,6 @@ namespace gSKI {
       */
       void Reinitialize();
 
-      void registerObjectSymbol(gSymbol* pSym);
-
       /**
        * @brief Listen for changes to wmes attached to the output link.
        *
@@ -709,6 +707,8 @@ namespace gSKI {
        * @brief Handles updating working memory.  Not implemented for output link yet.
        */
 	  virtual void Update(bool forceAdds, bool forceRemoves) { }
+
+ 	  virtual int GetWMObjMapSize() const;
 
    private:
       /**
@@ -752,7 +752,6 @@ namespace gSKI {
       // TODO: Properly comment these methods
       void ReleaseAllWmes();
       void ReleaseAllWMObjects();
-      void ReleaseAllSymbols();
 
       ///////////////// LISTENER MANAGEMENT STUFF ////////////////////////////
       /** 
@@ -819,11 +818,6 @@ namespace gSKI {
       typedef tWmeMap::iterator tWmeMapItr;
 
       tWmeMap m_wmemap;
-
-      typedef std::set<gSymbol*> tSymSet;
-      typedef tSymSet::iterator tSymSetItr;
-
-      tSymSet m_symSet;
    };
 }
 

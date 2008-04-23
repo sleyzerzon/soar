@@ -212,7 +212,7 @@ bool WorkingMemory::ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing)
 
 	if (tracing)
 	{
-		PrintDebugFormat("Received output wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
+		sml::PrintDebugFormat("Received output wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
 	}
 
 	long timeTag = atoi(pTimeTag) ;
@@ -238,7 +238,7 @@ bool WorkingMemory::ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing)
 		}
 		else
 		{
-			PrintDebugFormat("Unable to create an output wme -- type was not recognized") ;
+			sml::PrintDebugFormat("Unable to create an output wme -- type was not recognized") ;
 			GetAgent()->SetDetailedError(Error::kOutputError, "Unable to create an output wme -- type was not recognized") ;
 		}
 	}
@@ -259,7 +259,7 @@ bool WorkingMemory::ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing)
 			pAddWme = CreateWME(NULL, pID, pAttribute, pValue, pType, timeTag) ;
 
 			if (tracing)
-				PrintDebugFormat("Received output wme (orphaned): %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
+				sml::PrintDebugFormat("Received output wme (orphaned): %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
 
 			if (pAddWme)
 				m_OutputOrphans.push_back(pAddWme) ;
@@ -302,7 +302,7 @@ bool WorkingMemory::TryToAttachOrphanedChildren(Identifier* pPossibleParent)
 		pPossibleParent->AddChild(pWme) ;
 
 		if (this->GetAgent()->GetKernel()->IsTracingCommunications())
-			PrintDebugFormat("Adding orphaned child to this ID: %s ^%s %s (time tag %d)", pWme->GetIdentifierName(), pWme->GetAttribute(), pWme->GetValueAsString(), pWme->GetTimeTag()) ;
+			sml::PrintDebugFormat("Adding orphaned child to this ID: %s ^%s %s (time tag %d)", pWme->GetIdentifierName(), pWme->GetAttribute(), pWme->GetValueAsString(), pWme->GetTimeTag()) ;
 
 		// If the wme being attached is itself an identifier, we have to check in turn to see if it has any orphaned children
 		if (pWme->IsIdentifier())
@@ -342,7 +342,7 @@ bool WorkingMemory::ReceivedOutputRemoval(ElementXML* pWmeXML, bool tracing)
 	if (pWME && pWME->GetParent())
 	{
 		if (tracing)
-			PrintDebugFormat("Removing output wme: time tag %s", pTimeTag) ;
+			sml::PrintDebugFormat("Removing output wme: time tag %s", pTimeTag) ;
 
 		pWME->GetParent()->RemoveChild(pWME) ;
 
@@ -353,7 +353,7 @@ bool WorkingMemory::ReceivedOutputRemoval(ElementXML* pWmeXML, bool tracing)
 	else
 	{
 		if (tracing)
-			PrintDebugFormat("Remove output wme request (seems to already be gone): time tag %s", pTimeTag) ;
+			sml::PrintDebugFormat("Remove output wme request (seems to already be gone): time tag %s", pTimeTag) ;
 		return false ;
 	}
 
@@ -425,7 +425,7 @@ bool WorkingMemory::ReceivedOutput(AnalyzeXML* pIncoming, ElementXML* pResponse)
 		ok = false ;
 
 		if (tracing)
-			PrintDebugFormat("Some output WMEs have no matching parent IDs -- they are ophans.  This is bad.") ;
+			sml::PrintDebugFormat("Some output WMEs have no matching parent IDs -- they are ophans.  This is bad.") ;
 
 		GetAgent()->SetDetailedError(Error::kOutputError, "Some output WMEs have no matching parent IDs -- they are ophans.  This is bad.") ;
 		m_OutputOrphans.clear() ;	// Have to discard them.
@@ -570,7 +570,7 @@ bool WorkingMemory::SynchronizeInputLink()
 
 		if (tracing)
 		{
-			PrintDebugFormat("Received input wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
+			sml::PrintDebugFormat("Received input wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
 		}
 
 		long timeTag = atoi(pTimeTag) ;
@@ -593,14 +593,14 @@ bool WorkingMemory::SynchronizeInputLink()
 			}
 			else
 			{
-				PrintDebugFormat("Unable to create an input wme -- type was not recognized") ;
+				sml::PrintDebugFormat("Unable to create an input wme -- type was not recognized") ;
 				GetAgent()->SetDetailedError(Error::kOutputError, "Unable to create an input wme -- type was not recognized") ;
 			}
 		}
 		else
 		{
 			if (tracing)
-				PrintDebugFormat("Received input wme (orphaned): %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
+				sml::PrintDebugFormat("Received input wme (orphaned): %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
 		}
 	}
 
@@ -1266,3 +1266,18 @@ void WorkingMemory::Refresh()
 	}
 }
 
+int WorkingMemory::GetIWMObjMapSize()
+{
+	int result = -1;
+#ifdef SML_DIRECT
+	if (GetConnection()->IsDirectConnection())
+	{
+		Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName(), true) ;
+		if (wm)
+		{
+			result = ((EmbeddedConnection*)GetConnection())->DirectGetIWMObjMapSize(wm);
+		}
+	}
+#endif
+	return result;
+}

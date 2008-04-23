@@ -25,7 +25,7 @@
 #include "MegaAssert.h"
 
 #include "symtab.h"
-#include "io.h"
+#include "io_soar.h"
 #include "wmem.h"
 #include "agent.h"
 #include "gdatastructs.h"
@@ -48,7 +48,6 @@ namespace gSKI
    {
       ReleaseAllWmes();
       ReleaseAllWMObjects();
-      ReleaseAllSymbols();
       if(m_rootOutputObject)
       {
          m_rootOutputObject->Release();
@@ -712,27 +711,6 @@ namespace gSKI
 
       ReleaseAllWmes();
       ReleaseAllWMObjects();
-      ReleaseAllSymbols();
-   }
-
-   void OutputWorkingMemory::registerObjectSymbol(gSymbol* pSym)
-   {
-      MegaAssert(pSym->GetType() == gSKI_OBJECT, "Tried to register non-object symbol");
-
-      std::pair<tSymSetItr, bool> r = m_symSet.insert(pSym);
-      if(r.second)
-      {
-         pSym->AddRef();
-      }
-   }
-
-   void OutputWorkingMemory::ReleaseAllSymbols() {
-      for(tSymSetItr it = m_symSet.begin(); it != m_symSet.end(); ++it)
-      {
-         gSymbol* pSym = *it;
-         pSym->Release();
-      }
-      m_symSet.clear();
    }
 
    void OutputWorkingMemory::ReleaseAllWmes()
@@ -786,4 +764,10 @@ namespace gSKI
       
       return iobj;
    }
+
+   int OutputWorkingMemory::GetWMObjMapSize() const
+   { 
+	   return static_cast<int>(this->m_wmobjectmap.size()); 
+   }
+
 }

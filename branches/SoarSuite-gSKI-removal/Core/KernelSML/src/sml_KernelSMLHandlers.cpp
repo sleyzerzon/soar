@@ -186,6 +186,8 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 		pInputLink->GetRootObject(&pRoot) ;
 		pIAgent->GetInputLink()->AddInputProducer(pRoot, pInputProducer) ;
 		pRoot->Release() ;
+
+		pIAgent->SetRemoveWmeCallback( RemoveInputWMERecordsCallback );
 	}
 
 	// Return true if we got an agent constructed.
@@ -885,14 +887,16 @@ bool KernelSML::AddInputWME(gSKI::Agent* pAgent, char const* pID, char const* pA
 		{
 			// Add a WME with an identifier value
 			pWME = pInputWM->AddWmeNewObject(pParentObject, pAttribute, pError) ;
-			
-			if (pWME)
-			{
-				// We need to record the id that the kernel assigned to this object and match it against the id the
-				// client is using, so that in future we can map the client's id to the kernel's.
-				char const* pKernelID = pWME->GetValue()->GetString() ;
-				pAgentSML->RecordIDMapping(pValue, pKernelID) ;
-			}
+		}
+
+		if (pWME)
+		{
+			// We need to record the id that the kernel assigned to this object and match it against the id the
+			// client is using, so that in future we can map the client's id to the kernel's.
+			// voigtjr 02/2008: We need to call RecordIDMapping regardless of whether it is already
+			// mapped because we need to keep track of reference counts to behave correctly regarding shared IDs
+			char const* pKernelID = pWME->GetValue()->GetString() ;
+			pAgentSML->RecordIDMapping(pValue, pKernelID) ;
 		}
 	}
 	else if (IsStringEqual(sml_Names::kTypeInt, pType))
@@ -919,13 +923,22 @@ bool KernelSML::AddInputWME(gSKI::Agent* pAgent, char const* pID, char const* pA
 	// So where we had planned to map from client time tag to kernel time tag, we'll instead
 	// map from client time tag to IWme*.
 	// That means we need to be careful to delete the IWme* objects later.
-	if (pWME)
+	if (pWME && addingToInputLink)
 		pAgentSML->RecordTimeTag(pTimeTag, pWME) ;
 
 	// We'll release this when the table of time tags is eventually destroyed or
 	// when the wme is deleted.
 //	pWME->Release() ;
 
+	// If this is the output lin, we have to release the WME immediately,
+	// otherwise there is a memory leak because there is no way for the client
+	// to remove WMEs once they're added to the output link. The WME will get
+	// cleaned up properly when the output command retracts and it is garbage
+	// collected (DR 11/8/2007)
+	if(!addingToInputLink)
+	{
+		pWME->Release();
+	}
 	pParentObject->Release() ;
 
 	// If we have an error object, check that it hasn't been set by an earlier call.
@@ -984,6 +997,41 @@ bool KernelSML::RemoveInputWME(gSKI::Agent* pAgent, char const* pTimeTag, gSKI::
 		return !gSKI::isError(*pError) ;
 
 	return true ;
+}
+
+void KernelSML::RemoveInputWMERecordsCallback(gSKI::Agent* pAgent, gSKI::IWme* pWME)
+{
+	s_pKernel->RemoveInputWMERecords(pAgent, pWME);
+}
+
+void KernelSML::RemoveInputWMERecords(gSKI::Agent* pAgent, gSKI::IWme* pWME)
+{
+	if (!pAgent || !pWME)
+		return;
+
+	// We store additional information for SML in the AgentSML structure, so look that up.
+	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
+
+	// If this is an identifier, need to remove it from the ID mapping table too.
+	if (pWME->GetValue()->GetType() == gSKI_OBJECT)
+	{
+		// Get the kernel-side identifier
+		std::string id = pWME->GetValue()->GetString() ;
+
+		// Look up the wmobject for this id
+		//IWMObject* pObject = NULL ;
+		//pInputWM->GetObjectById(id.c_str(), &pObject, pError) ;
+
+		//assert(!pError || !gSKI::isError(*pError)) ;
+		//pInputWM->RemoveObject(pObject) ;
+
+		// Remove it from the id mapping table
+		pAgentSML->RemoveID(id.c_str()) ;
+	}
+
+	// Remove the object from the time tag table because
+	// we no longer own it.
+	pAgentSML->RemoveTimeTagByWmeSLOW(pWME) ;
 }
 
 static char const* GetValueType(egSKISymbolType type)
@@ -1173,7 +1221,7 @@ bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Conne
 	ElementXML* pWmeXML = &wmeXML ;
 
 	if (kDebugInput)
-		PrintDebugFormat("--------- %s starting input ----------", pAgent->GetName()) ;
+		sml::PrintDebugFormat("--------- %s starting input ----------", pAgent->GetName()) ;
 
 	for (int i = 0 ; i < nChildren ; i++)
 	{
@@ -1214,7 +1262,7 @@ bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Conne
 
 			if (kDebugInput)
 			{
-				PrintDebugFormat("%s Add %s ^%s %s (type %s tag %s)", pAgent->GetName(), id.c_str(), pAttribute, pValue, pType, pTimeTag) ;
+				sml::PrintDebugFormat("%s Add %s ^%s %s (type %s tag %s)", pAgent->GetName(), id.c_str(), pAttribute, pValue, pType, pTimeTag) ;
 			}
 
 			// Add the wme
@@ -1226,7 +1274,7 @@ bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Conne
 
 			if (kDebugInput)
 			{
-				PrintDebugFormat("%s Remove tag %s", pAgent->GetName(), pTimeTag) ;
+				sml::PrintDebugFormat("%s Remove tag %s", pAgent->GetName(), pTimeTag) ;
 			}
 
 			// Remove the wme
@@ -1239,7 +1287,7 @@ bool KernelSML::HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Conne
 	pAgentSML->FireInputReceivedEvent(pCommand) ;
 
 	if (kDebugInput)
-		PrintDebugFormat("--------- %s ending input ----------", pAgent->GetName()) ;
+		sml::PrintDebugFormat("--------- %s ending input ----------", pAgent->GetName()) ;
 
 	// Returns false if any of the adds/removes fails
 	return ok ;
@@ -1283,7 +1331,7 @@ bool KernelSML::HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName,
 	}
 
 	if (kDebugCommandLine)
-		PrintDebugFormat("Executing %s", pLine) ;
+		sml::PrintDebugFormat("Executing %s", pLine) ;
 	
 	AgentSML* pAgentSML = this->GetAgentSML(pAgent) ;
 
@@ -1292,7 +1340,7 @@ bool KernelSML::HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName,
 		pAgentSML->FireEchoEvent(pConnection, pLine) ;
 
 	if (kDebugCommandLine)
-		PrintDebugFormat("Echoed line\n") ;
+		sml::PrintDebugFormat("Echoed line\n") ;
 
 	// Send this command line through anyone registered filters.
 	// If there are no filters (or this command requested not to be filtered), this copies the original line into the filtered line unchanged.
@@ -1354,6 +1402,10 @@ bool KernelSML::HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName,
 				if (pFilteredOutput == NULL)
 					pFilteredOutput = "" ;
 
+            if(filteredError)
+            {
+               pConnection->AddErrorToSMLResponse(pResponse, pFilteredOutput, -1) ;
+            }
 				bool res = this->ReturnResult(pConnection, pResponse, pFilteredOutput) ;
 
 				// Can only clean this up after we're finished using it or pFilteredLine will become invalid
@@ -1365,14 +1417,14 @@ bool KernelSML::HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName,
 	}
 
 	if (kDebugCommandLine)
-		PrintDebugFormat("Filtered line is %s\n", pFilteredLine) ;
+		sml::PrintDebugFormat("Filtered line is %s\n", pFilteredLine) ;
 
 	// Make the call.
 	m_CommandLineInterface.SetRawOutput(rawOutput);
 	bool result = m_CommandLineInterface.DoCommand(pConnection, pAgent, pFilteredLine, echoResults, pResponse) ;
 
 	if (kDebugCommandLine)
-		PrintDebugFormat("Completed %s", pLine) ;
+		sml::PrintDebugFormat("Completed %s", pLine) ;
 
 	// Can only clean this up after we're finished using it or pFilteredLine will become invalid
 	delete pFilteredXML ;
@@ -1398,3 +1450,4 @@ bool KernelSML::HandleExpandCommandLine(gSKI::Agent* pAgent, char const* pComman
 	// Make the call.
 	return m_CommandLineInterface.ExpandCommand(pConnection, pLine, pResponse) ;
 }
+

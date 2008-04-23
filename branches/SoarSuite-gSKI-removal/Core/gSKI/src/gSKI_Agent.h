@@ -20,6 +20,7 @@
 #include "IgSKI_OutputLink.h"
 #include "IgSKI_WMObject.h"
 #include "gSKI_RhsFunction.h"
+#include "gSKI_InputWMObject.h"
 
 #include "EventManagementTemplates.h"
 
@@ -51,7 +52,13 @@ namespace gSKI
 
 	class Agent : public gSKI::IRunListener
 	{
-	public:     
+	public:    
+
+		// This special callback is used so that AgentSML can be notified when gSKI decides to remove wmes
+		// that AgentSML is keeping track of so that it can clear its records.
+		void SetRemoveWmeCallback( RemoveWmeCallback callback ) { this->m_removeWmeCallback = callback; }
+		RemoveWmeCallback GetRemoveWmeCallback() { return this->m_removeWmeCallback; }
+
 		/**
 		* @brief
 		*/
@@ -1453,6 +1460,8 @@ namespace gSKI
 		//}
 
 		AgentPerformanceMonitor* m_pPerfMon;
+
+		RemoveWmeCallback m_removeWmeCallback;
 	};
 }
 #endif

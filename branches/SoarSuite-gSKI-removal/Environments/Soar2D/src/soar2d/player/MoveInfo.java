@@ -1,5 +1,8 @@
 package soar2d.player;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import soar2d.*;
 
 /**
@@ -12,7 +15,7 @@ public class MoveInfo {
 	// all
 	public boolean stopSim = false;	// stop the simulation by command
 	
-	// eaters + tanksoar
+	// eaters + tanksoar + kitchen
 	public boolean move = false;	// move
 	public int moveDirection = -1;	// direction to move
 	
@@ -47,6 +50,23 @@ public class MoveInfo {
 	public int getId;
 	public boolean drop = false;
 	public int dropId;
+	
+	// kitchen
+	public boolean moveWithObject = false;
+	public boolean mix = false;
+	public boolean cook = false;
+	public boolean eat = false;
+	
+	// taxi
+	public boolean pickup = false;
+	public boolean putdown = false;
+	public boolean fillup = false;
+	
+	public class Communication {
+		public String to;
+		public String message;
+	}
+	public ArrayList<Communication> messages = new ArrayList<Communication>();
 	
 	public MoveInfo() {
 	}
@@ -117,7 +137,46 @@ public class MoveInfo {
 			if (drop) {
 				output += "(" + Names.kDropID + ": " + dropId + ")";
 			}
+			Iterator<Communication> iter = messages.iterator();
+			while (iter.hasNext()) {
+				Communication comm = iter.next();
+				output += "(comm: " + comm.to + ": " + comm.message + ")";
+			}
 			break;
+
+		case kKitchen:
+			if (move) {
+				output += "(" + Names.kMoveID + ": " + Direction.stringOf[moveDirection] + ")";
+			}
+			if (moveWithObject) {
+				output += "(move-with-object)";
+			}
+			if (mix) {
+				output += "(mix)";
+			}
+			if (cook) {
+				output += "(cook)";
+			}
+			if (eat) {
+				output += "(eat)";
+			}
+			break;
+
+		case kTaxi:
+			if (move) {
+				output += "(" + Names.kMoveID + ": " + Direction.stringOf[moveDirection] + ")";
+			}
+			if (pickup) {
+				output += "(" + Names.kPickUpID + ")";
+			}
+			if (putdown) {
+				output += "(" + Names.kPutDownID + ")";
+			}
+			if (fillup) {
+				output += "(" + Names.kFillUpID + ")";
+			}
+			break;
+			
 		}
 		
 		if (stopSim) {

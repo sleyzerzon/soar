@@ -44,7 +44,7 @@ class WorkingMemory
 protected:
 	Agent*		m_Agent ;
 	Identifier*	m_InputLink ;
-	Identifier* m_OutputLink ;
+	Identifier* m_OutputLink ; // this is initialized the first time an agent generates output; until then it is null
 
 	// List of changes that are pending to be sent to the kernel
 	DeltaList	m_DeltaList ;
@@ -97,6 +97,8 @@ public:
 	Identifier*		CreateIdWME(Identifier* parent, char const* pAttribute) ;
 	Identifier*		CreateSharedIdWME(Identifier* parent, char const* pAttribute, Identifier* pSharedValue) ;
 
+	int GetIWMObjMapSize();	// For unit tests, see bug 1034 and ClientSMLTest
+
 	void			UpdateString(StringElement* pWME, char const* pValue) ;
 	void			UpdateInt(IntElement* pWME, int value) ;
 	void			UpdateFloat(FloatElement* pWME, double value) ;
@@ -119,6 +121,7 @@ public:
 	bool			IsCommitRequired() ;
 	bool			Commit() ;
 	bool			IsAutoCommitEnabled() ;
+
 };
 
 }//closes namespace

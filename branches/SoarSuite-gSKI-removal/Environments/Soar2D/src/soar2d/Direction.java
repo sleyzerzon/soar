@@ -62,6 +62,11 @@ public class Direction {
 	public final static String[] stringOf = new String[5];
 	
 	/**
+	 * Use to convert an int to a string direction
+	 */
+	public final static double[] radiansOf = new double[5];
+	
+	/**
 	 * Use to convert from direction int to indicator int
 	 */
 	public final static int[] indicators = new int[5];
@@ -110,6 +115,12 @@ public class Direction {
 		stringOf[kEastInt] = Names.kEast;
 		stringOf[kSouthInt] = Names.kSouth;
 		stringOf[kWestInt] = Names.kWest;
+		
+		radiansOf[0] = 0.0;					
+		radiansOf[kNorthInt] = 3 * Math.PI / 2;
+		radiansOf[kEastInt] = 0.0;
+		radiansOf[kSouthInt] = Math.PI / 2;
+		radiansOf[kWestInt] = Math.PI;
 		
 		backwardOf[0] = 0;					
 		backwardOf[kNorthInt] = kSouthInt;	// backward of north is south
@@ -169,6 +180,37 @@ public class Direction {
 	}
 	
 	private Direction() {
+	}
+
+	public static double toDisplayRadians(double internalRadians) {
+		while (internalRadians < 0) {
+			internalRadians += 2 * Math.PI;
+		}
+		return fmod(internalRadians + Math.PI / 2, 2 * Math.PI);
+	}
+	
+	public static double toInternalRadians(double displayRadians) {
+		while (displayRadians < 0) {
+			displayRadians += 2 * Math.PI;
+		}
+		displayRadians = fmod(displayRadians - Math.PI / 2, 2 * Math.PI);
+		while (displayRadians < 0) {
+			displayRadians += 2 * Math.PI;
+		}
+		return displayRadians;
+	}
+	
+	public static double fmod(double a, double mod) {
+		double result = a;
+		assert mod > 0;
+		while (Math.abs(result) >= mod) {
+			if (result > 0) {
+				result -= mod;
+			} else {
+				result += mod;
+			}
+		}
+		return result;
 	}
 }
 

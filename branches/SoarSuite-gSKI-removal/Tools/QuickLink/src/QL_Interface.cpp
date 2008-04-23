@@ -333,7 +333,7 @@ void QL_Interface::print_last_output()
 
 void QL_Interface::spawn_debugger()
 {
-#ifndef SCONS
+#ifdef _WIN32
 
 	// spawn the debugger asynchronously
 	
@@ -360,7 +360,7 @@ void QL_Interface::spawn_debugger()
 		}
 	}
 
-#else // linux spawnning
+#else // not _WIN32
 
 	pid_t pid = fork();
 
@@ -386,7 +386,7 @@ void QL_Interface::spawn_debugger()
 
 	while(1)
 	{
-		soar_sleep(1, 0);
+		sml::Sleep(1, 0);
 		m_pKernel->GetAllConnectionInfo();
 		char const * status = m_pKernel->GetAgentStatus(java_debugger);
 		update_views(".");

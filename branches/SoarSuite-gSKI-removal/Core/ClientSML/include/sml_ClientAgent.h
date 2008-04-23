@@ -130,6 +130,9 @@ class Agent : public ClientErrors
 	friend class FloatElement ;
 	friend class Identifier ;
 
+public: // BUGBUG: make protected and ClientSMLTest a friend
+	int GetIWMObjMapSize();	// For unit test, see bug 1034 and ClientSMLTest
+
 protected:
 	// The mapping from event number to a list of handlers to call when that event fires
 	typedef sml::ListMap<smlRunEventId, RunEventHandlerPlusData>				RunEventMap ;
@@ -285,6 +288,8 @@ public:
 	/*************************************************************
 	* @brief Returns the id object for the output link.
 	*		 The agent retains ownership of this object.
+   *      Note this will be null until the first time an agent
+   *      puts something on the output link.
 	*************************************************************/
 	Identifier* GetOutputLink() ;
 

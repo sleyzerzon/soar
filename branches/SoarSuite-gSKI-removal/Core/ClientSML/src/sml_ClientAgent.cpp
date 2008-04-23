@@ -987,6 +987,8 @@ Identifier* Agent::GetInputLink()
 /*************************************************************
 * @brief Returns the id object for the output link.
 *		 The agent retains ownership of this object.
+*      Note this will be null until the first time an agent
+*      puts something on the output link.
 *************************************************************/
 Identifier* Agent::GetOutputLink()
 {
@@ -1619,4 +1621,9 @@ bool Agent::SynchronizeInputLink()
 bool Agent::SynchronizeOutputLink()
 {
 	return GetWM()->SynchronizeOutputLink() ;
+}
+
+int Agent::GetIWMObjMapSize()
+{
+	return GetWM()->GetIWMObjMapSize();
 }

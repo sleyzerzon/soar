@@ -360,6 +360,8 @@ public:
 	*************************************************************/
 	bool IsRemoteConnection() ;
 
+	bool IsDirectConnection() ;
+
 	/*************************************************************
 	* @brief Preparation for deleting the kernel.
 	*		 Agents are destroyed at this point (if we own the kernel)

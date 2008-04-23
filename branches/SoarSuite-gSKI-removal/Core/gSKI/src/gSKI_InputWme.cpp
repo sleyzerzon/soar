@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "io.h"
+#include "io_soar.h"
 
 #include "gSKI_InputWMObject.h"
 #include "gSKI_InputWorkingMemory.h"
@@ -28,7 +28,7 @@
 #include "MegaAssert.h"
 
 #ifdef DEBUG_UPDATE
-#include "..\..\ConnectionSML\include\sml_Utils.h"	// For PrintDebugFormat
+#include "..\..\ConnectionSML\include\sml_Utils.h"	// For sml::PrintDebugFormat
 #endif
 
 //
@@ -160,7 +160,7 @@ namespace gSKI
     //Update();
   }
 
-  void InputWme::Update(bool forceAdds, bool forceRemoves)
+  bool InputWme::Update(bool forceAdds, bool forceRemoves)
   {
      // Adding the WME directly to working memory if were in the input or output phase
      egSKIPhaseType curphase = m_manager->GetAgent()->GetCurrentPhase();
@@ -176,7 +176,7 @@ namespace gSKI
 	  std::string remove = m_removeWme ? (doRemoves ? "Remove wme now." : "Marked for remove, but not doRemoves.") : "" ;
 	  std::string add    = !m_rawwme ? (doAdds ? "Add wme." : "Marked to add, but not doAdd.") : "" ;
 
-	  PrintDebugFormat("Updating %s ^%s %s.  Status is: %s %s %s ", id.c_str(), att.c_str(), value.c_str(), soarwme.c_str(), remove.c_str(), add.c_str()) ;
+	  sml::PrintDebugFormat("Updating %s ^%s %s.  Status is: %s %s %s ", id.c_str(), att.c_str(), value.c_str(), soarwme.c_str(), remove.c_str(), add.c_str()) ;
 #endif
 
 	 if ( doAdds || doRemoves ) 
@@ -191,7 +191,7 @@ namespace gSKI
 			 Symbol* val = m_value->GetSoarSymbol();
 
 #ifdef DEBUG_UPDATE
-			 PrintDebugFormat("Adding %s ^%s %s", id.c_str(), att.c_str(), value.c_str()) ;
+			 sml::PrintDebugFormat("Adding %s ^%s %s", id.c_str(), att.c_str(), value.c_str()) ;
 #endif
 
 			 m_rawwme = add_input_wme( a, idsym, attr, val );
@@ -205,7 +205,7 @@ namespace gSKI
 			 if (m_rawwme != 0 ) 
 			 {
 #ifdef DEBUG_UPDATE
-			    PrintDebugFormat("Removing %s ^%s %s", id.c_str(), att.c_str(), value.c_str()) ;
+			    sml::PrintDebugFormat("Removing %s ^%s %s", id.c_str(), att.c_str(), value.c_str()) ;
 #endif
 
 				Bool retvalue =  remove_input_wme(m_manager->GetSoarAgent(), m_rawwme);
@@ -231,9 +231,10 @@ namespace gSKI
 			 // can be released, because the removal of the kernel wme won't occur until the next
 			 // input phase after RemoveWme is called.  Thus "RemoveWme" now includes a reference decrement
 			 // as part of its actions, providing the client a good way to do clean up.
-			 this->Release() ;
+			 return this->Release() ;
 		 }
      }
+	 return false;
   }
 
 }

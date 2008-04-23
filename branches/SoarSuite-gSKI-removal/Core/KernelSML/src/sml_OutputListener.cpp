@@ -458,7 +458,7 @@ void OutputListener::HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPt
 		AgentSML* pAgent = this->m_KernelSML->GetAgentSML(agentPtr) ;
 
 #ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML before agent reinitialized received - start.") ;
+	sml::PrintDebugFormat("AgentSML before agent reinitialized received - start.") ;
 #endif
 		if (pAgent)
 		{
@@ -466,7 +466,7 @@ void OutputListener::HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPt
 		}
 
 #ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML before agent reinitialized received - end.") ;
+	sml::PrintDebugFormat("AgentSML before agent reinitialized received - end.") ;
 #endif
 	}
 
