@@ -264,13 +264,13 @@ bool CommandLineInterface::DoSource(gSKI::Agent* pAgent, std::string filename) {
 
 			} else if (quote == true) { // bug 967 fix
 				SetError(CLIError::kUnmatchedBracketOrQuote);
-				HandleSourceError(lineCountCache, filename, pProductionManager);
+				HandleSourceError(lineCountCache, filename);
 				if (path.length()) DoPopD();
 				return false;
 
 			} else if (pipe == true) { // bug 968 fix
 				SetError(CLIError::kNewlineBeforePipe);
-				HandleSourceError(lineCountCache, filename, pProductionManager);
+				HandleSourceError(lineCountCache, filename);
 				if (path.length()) DoPopD();
 				return false;
 			}
