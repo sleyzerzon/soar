@@ -29,6 +29,10 @@ class ClientSMLTest : public CPPUNIT_NS::TestCase
 	CPPUNIT_TEST( testNewThreadNoAutoCommit );
 	CPPUNIT_TEST( testRemote );
 	CPPUNIT_TEST( testRemoteNoAutoCommit );
+	CPPUNIT_TEST( testSimpleCopy );
+	CPPUNIT_TEST( testSimpleReteNetLoader );
+	CPPUNIT_TEST( testSimpleStopUpdate );
+	CPPUNIT_TEST( testSimpleSNCBreak );
 	CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
 	CPPUNIT_TEST( testWMEMemoryLeak );					// see bugzilla bug 1035
 	CPPUNIT_TEST( testWMEMemoryLeakNotOptimized );		// see bugzilla bug 1035
@@ -55,6 +59,10 @@ protected:
 	void testNewThreadNoAutoCommit();
 	void testRemote();
 	void testRemoteNoAutoCommit();
+	void testSimpleCopy();
+	void testSimpleReteNetLoader();
+	void testSimpleStopUpdate();
+	void testSimpleSNCBreak();
 
 private:
 	void createKernelAndAgents( bool embedded, bool useClientThread, bool fullyOptimized, bool autoCommit, int port = 12121 );
@@ -65,7 +73,8 @@ private:
 
 	std::string getAgentName( int agentIndex );
 	void initAgent( sml::Agent* pAgent );
-	void loadProductions( sml::Agent* pAgent );
+	void loadProductions( sml::Agent* pAgent, const std::string& productions );
+	void checkProductions( sml::Agent* pAgent, const std::string& productions );
 	void doRHSHandlerTest( sml::Agent* pAgent );
 	void doClientMessageHandlerTest( sml::Agent* pAgent );
 	void doFilterHandlerTest( sml::Agent* pAgent );
@@ -74,6 +83,9 @@ private:
 	void doAliasTest( sml::Agent* pAgent );
 	void doXMLTest( sml::Agent* pAgent );
 	void doAgentTest( sml::Agent* pAgent );
+
+	void doSimpleCopy();
+	void doSimpleReteNetLoader();
 
 	void spawnListener();
 	void cleanUpListener();
@@ -188,7 +200,8 @@ void ClientSMLTest::doFullTest()
 		sml::Agent* pAgent = pKernel->GetAgent( getAgentName( agentCounter ).c_str() ) ;
 		CPPUNIT_ASSERT( pAgent != NULL );
 
-		loadProductions( pAgent );
+		loadProductions( pAgent, "/Tests/testsml.soar" );
+		checkProductions( pAgent, "/Tests/testsml.soar" );
 		doRHSHandlerTest( pAgent );
 		initAgent( pAgent );
 		doClientMessageHandlerTest( pAgent );
@@ -348,6 +361,52 @@ void ClientSMLTest::testWMEMemoryLeakInternal( sml::UpdateEventHandler handler, 
 #endif
 }
 
+void ClientSMLTest::testSimpleCopy()
+{
+	numberAgents = 1;
+	createKernelAndAgents(true, true, true, true);
+
+	doSimpleCopy();
+}
+
+void ClientSMLTest::testSimpleReteNetLoader()
+{
+	numberAgents = 1;
+	createKernelAndAgents(true, true, true, true);
+
+	doSimpleReteNetLoader();
+}
+
+void ClientSMLTest::testSimpleStopUpdate()
+{
+	numberAgents = 1;
+	createKernelAndAgents(true, true, true, true);
+
+	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
+	CPPUNIT_ASSERT( pAgent != NULL );
+
+	int callback_u = pKernel->RegisterForUpdateEvent( sml::smlEVENT_AFTER_ALL_OUTPUT_PHASES, Handlers::MyCallStopOnUpdateEventHandler, 0 ) ;
+
+	pAgent->RunSelf(4) ;
+	CPPUNIT_ASSERT_MESSAGE( "RunSelf", pAgent->GetLastCommandLineResult() );
+
+	CPPUNIT_ASSERT_MESSAGE( "Should be 1", pAgent->GetDecisionCycleCounter() == 1);
+}
+
+void ClientSMLTest::testSimpleSNCBreak()
+{
+	numberAgents = 1;
+	createKernelAndAgents(true, true, true, true);
+
+	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
+	CPPUNIT_ASSERT( pAgent != NULL );
+
+	pAgent->RunSelfForever();
+	CPPUNIT_ASSERT_MESSAGE( "RunSelfForever", pAgent->GetLastCommandLineResult() );
+
+	CPPUNIT_ASSERT_MESSAGE( "Should be 100", pAgent->GetDecisionCycleCounter() == 100);
+}
+
 void ClientSMLTest::spawnListener()
 {
 	// Spawning a new process is radically different on windows vs linux.
@@ -461,28 +520,26 @@ void ClientSMLTest::initAgent( sml::Agent* pAgent )
 	CPPUNIT_ASSERT_MESSAGE( "init-soar", pAgent->GetLastCommandLineResult() );
 }
 
-void ClientSMLTest::loadProductions( sml::Agent* pAgent )
+void ClientSMLTest::loadProductions( sml::Agent* pAgent, const std::string& productions )
 {
 	// TODO boost filesystem
 	std::stringstream path;
-	path << pKernel->GetLibraryLocation() << "/Tests/testsml.soar" ;
+	path << pKernel->GetLibraryLocation() << productions ;
 
-	// Listen to the echo of the load
-	bool echoHandlerReceived( false );
-	int echoCallback = pAgent->RegisterForPrintEvent( sml::smlEVENT_ECHO, Handlers::MyEchoEventHandler, &echoHandlerReceived ) ;
-	
 	pAgent->LoadProductions( path.str().c_str(), true ) ;
 	CPPUNIT_ASSERT_MESSAGE( "LoadProductions", pAgent->GetLastCommandLineResult() );
-	// BUGBUG: this does not work
-	//CPPUNIT_ASSERT( echoHandlerReceived );
-	echoHandlerReceived = false;
-	CPPUNIT_ASSERT_MESSAGE( pAgent->GetLastErrorDescription(), pAgent->UnregisterForPrintEvent(echoCallback) );
-	CPPUNIT_ASSERT_MESSAGE( pAgent->GetLastErrorDescription(), !pAgent->HadError() );
 
 	if ( verbose )
 	{
 		std::cout << "Loaded productions" << std::endl ;
 	}
+}
+
+void ClientSMLTest::checkProductions( sml::Agent* pAgent, const std::string& productions )
+{
+	// TODO boost filesystem
+	std::stringstream path;
+	path << pKernel->GetLibraryLocation() << productions ;
 
 	CPPUNIT_ASSERT( pAgent->IsProductionLoaded( "apply*move" ) );
 	CPPUNIT_ASSERT( !pAgent->IsProductionLoaded( "made*up*name" ) );
@@ -496,12 +553,12 @@ void ClientSMLTest::loadProductions( sml::Agent* pAgent )
 
 	pAgent->LoadProductions( path.str().c_str(), true ) ;
 	CPPUNIT_ASSERT_MESSAGE( "LoadProductions", pAgent->GetLastCommandLineResult() );
-	CPPUNIT_ASSERT( !echoHandlerReceived );	// We unregistered this
 
 	CPPUNIT_ASSERT( pAgent->UnregisterForProductionEvent( prodCall ) );
 }
 
-std::string ClientSMLTest::getAgentName( int agentIndex ) {
+std::string ClientSMLTest::getAgentName( int agentIndex ) 
+{
 	std::stringstream name;
 	name << kBaseName << 1 + agentIndex;
 	return name.str();
@@ -1066,5 +1123,97 @@ void ClientSMLTest::doAgentTest( sml::Agent* pAgent )
 	CPPUNIT_ASSERT( pAgent->UnregisterForRunEvent(callback1) );
 	CPPUNIT_ASSERT( pAgent->UnregisterForRunEvent(callback2) );
 	CPPUNIT_ASSERT( pAgent->UnregisterForRunEvent(callback_run_count) );
+}
+
+// Creates an agent that copies values from input link to output link
+// so we can test that this is OK.
+void ClientSMLTest::doSimpleCopy()
+{
+	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
+	CPPUNIT_ASSERT( pAgent != NULL );
+
+	loadProductions( pAgent, "/Tests/testcopy.soar" );
+
+/* Input structure for the test
+(S1 ^io I1)
+  (I1 ^input-link I3)
+    (I3 ^sentence S2)
+      (S2 ^newest yes ^num-words 3 ^sentence-num 1 ^word W1 ^word W2 ^word W3)
+        (W1 ^num-word 1 ^word the)
+        (W2 ^num-word 2 ^word cat)
+        (W3 ^num-word 3 ^word in)
+*/
+
+	sml::Identifier* map = pAgent->GetInputLink() ;
+	sml::Identifier* square2 = pAgent->CreateIdWME(map, "square");
+	sml::Identifier* square5 = pAgent->CreateIdWME(map, "square");
+	pAgent->CreateSharedIdWME(square2, "north", square5) ;
+	pAgent->CreateSharedIdWME(square5, "south", square2) ;
+
+	sml::Identifier* pSentence = pAgent->CreateIdWME(pAgent->GetInputLink(), "sentence") ;
+	pAgent->CreateStringWME(pSentence, "newest", "yes") ;
+	pAgent->CreateIntWME(pSentence, "num-words", 3) ;
+	sml::Identifier* pWord1 = pAgent->CreateIdWME(pSentence, "word") ;
+
+	sml::Identifier* pWord5 = pAgent->CreateSharedIdWME(pSentence, "word", pWord1) ;
+
+
+	sml::Identifier* pWord2 = pAgent->CreateIdWME(pSentence, "word") ;
+	sml::Identifier* pWord3 = pAgent->CreateIdWME(pSentence, "word") ;
+	pAgent->CreateIntWME(pWord1, "num-word", 1) ;
+	pAgent->CreateIntWME(pWord2, "num-word", 2) ;
+	pAgent->CreateIntWME(pWord3, "num-word", 3) ;
+	pAgent->CreateStringWME(pWord1, "word", "the") ;
+	pAgent->CreateStringWME(pWord2, "word", "cat") ;
+	pAgent->CreateStringWME(pWord3, "word", "in") ;
+	pAgent->Commit() ;
+
+	// Register for the trace output
+	std::stringstream trace ;	// We'll pass this into the handler and build up the output in it
+	int callbackp = pAgent->RegisterForPrintEvent( sml::smlEVENT_PRINT, Handlers::MyPrintEventHandler, &trace) ;
+
+	// Set to true for more detail on this
+	pKernel->SetTraceCommunications(false) ;
+
+	std::string result = pAgent->RunSelf(3) ;
+	//cout << result << endl ;
+	//cout << trace << endl ;
+
+	// TODO: check this output
+	//pAgent->ExecuteCommandLine("print --depth 5 s1");
+
+	int changes = pAgent->GetNumberOutputLinkChanges() ;
+
+	// TODO: verify output
+	//for (int i = 0 ; i < changes ; i++)
+	//{
+	//	sml::WMElement* pOutputWme = pAgent->GetOutputLinkChange(i) ;
+	//	std::cout << pOutputWme->GetIdentifier()->GetIdentifierSymbol() << " ^ " << pOutputWme->GetAttribute() << " " << pOutputWme->GetValueAsString() << std::endl ;
+	//}
+
+	// We had a bug where some of these wmes would get dropped (the orphaned wme scheme didn't handle multiple levels)
+	// so check now that we got the correct number of changes.
+	CPPUNIT_ASSERT( changes == 12 );
+}
+
+void ClientSMLTest::doSimpleReteNetLoader()
+{
+	// Creates an agent that loads a rete net and then works with it a little.
+	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
+	CPPUNIT_ASSERT( pAgent != NULL );
+
+	std::string path = std::string(pKernel->GetLibraryLocation()) + "/Tests/test.soarx" ;
+	std::string command = std::string("rete-net -l ") + path ;
+	std::string result = pAgent->ExecuteCommandLine(command.c_str()) ;
+	CPPUNIT_ASSERT( pAgent->GetLastCommandLineResult() );
+
+	// Make us match the current input link values
+	pAgent->SynchronizeInputLink();
+
+	// Get the latest id from the input link
+	sml::Identifier* pID = pAgent->GetInputLink() ;
+	//cout << "Input link id is " << pID->GetValueAsString() << endl ;
+
+	CPPUNIT_ASSERT( pID );
 }
 
