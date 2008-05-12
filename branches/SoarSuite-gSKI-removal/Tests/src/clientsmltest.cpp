@@ -1155,6 +1155,8 @@ void ClientSMLTest::doSimpleCopy()
 	pAgent->CreateIntWME(pSentence, "num-words", 3) ;
 	sml::Identifier* pWord1 = pAgent->CreateIdWME(pSentence, "word") ;
 
+	// BUGBUG: Is this legal? Can you have duplicate wmes? Should create shared id wme be able
+	// to create a wme with the same id/attribute/value? (and different timetag?)
 	sml::Identifier* pWord5 = pAgent->CreateSharedIdWME(pSentence, "word", pWord1) ;
 
 
@@ -1176,6 +1178,7 @@ void ClientSMLTest::doSimpleCopy()
 	pKernel->SetTraceCommunications(false) ;
 
 	std::string result = pAgent->RunSelf(3) ;
+
 	//cout << result << endl ;
 	//cout << trace << endl ;
 
@@ -1183,6 +1186,26 @@ void ClientSMLTest::doSimpleCopy()
 	//pAgent->ExecuteCommandLine("print --depth 5 s1");
 
 	int changes = pAgent->GetNumberOutputLinkChanges() ;
+
+	//std::cout << pAgent->ExecuteCommandLine("print i3 -d 100 -i --tree");
+
+	/*
+	Output:
+
+	(28: I3 ^text-output S4)
+	  (14: S4 ^newest yes)
+	  (15: S4 ^num-words 3)
+	  (16: S4 ^word W1)       <-------- Shared ID?
+		(8: W1 ^num-word 1)
+		(9: W1 ^word the)
+	  (17: S4 ^word W1)       <-------- Shared ID?
+	  (18: S4 ^word W2)
+		(10: W2 ^num-word 2)
+		(11: W2 ^word cat)
+	  (19: S4 ^word W3)
+		(12: W3 ^num-word 3)
+		(13: W3 ^word in)
+	*/
 
 	// TODO: verify output
 	//for (int i = 0 ; i < changes ; i++)
@@ -1193,7 +1216,9 @@ void ClientSMLTest::doSimpleCopy()
 
 	// We had a bug where some of these wmes would get dropped (the orphaned wme scheme didn't handle multiple levels)
 	// so check now that we got the correct number of changes.
-	CPPUNIT_ASSERT( changes == 12 );
+	std::stringstream changesString;
+	changesString << "Number of changes: " << changes << ", this failure is currently expected but needs to be addressed, see wiki gSKI removal page";
+	CPPUNIT_ASSERT_MESSAGE( changesString.str().c_str(), changes == 12 );
 }
 
 void ClientSMLTest::doSimpleReteNetLoader()
