@@ -240,7 +240,7 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 		}
 	}
 
-	PrintDebugFormat("About to release kernel wmes") ;
+	//PrintDebugFormat("About to release kernel wmes") ;
 	PrintKernelTimeTags() ;
 
 	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
