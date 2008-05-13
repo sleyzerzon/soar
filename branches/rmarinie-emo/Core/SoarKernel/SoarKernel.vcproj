@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="include;../CLI/include/;../gSKI/src;../gSKI/include;../shared"
+				AdditionalIncludeDirectories="include;../CLI/include/;../gSKI/src;../gSKI/include;../shared;    C:\Program Files\boost\boost_1_34_1"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -189,6 +189,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\emotion.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\explain.cpp"
 				>
 			</File>
@@ -303,6 +307,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\AppraisalFrame.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\AppraisalStatus.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\backtrace.h"
 				>
 			</File>
@@ -332,6 +344,10 @@
 			</File>
 			<File
 				RelativePath=".\include\exploration.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Feeling.h"
 				>
 			</File>
 			<File
@@ -380,6 +396,14 @@
 			</File>
 			<File
 				RelativePath=".\include\misc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\ModalEmotion.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Mood.h"
 				>
 			</File>
 			<File
