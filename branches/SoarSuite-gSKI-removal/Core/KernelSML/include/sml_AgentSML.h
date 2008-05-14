@@ -349,13 +349,13 @@ public:
 
 	bool IsSoar7Mode() ;
 
-	unsigned long GetRunCounter(egSKIRunType runStepSize) ;
+	unsigned long GetRunCounter(smlRunStepSize runStepSize) ;
 
 	// Request that the agent stop soon.
 	bool Interrupt(egSKIStopLocation stopLoc) ;
 	void ClearInterrupts() ;
-	smlRunResult StepInClientThread(egSKIInterleaveType  stepSize, gSKI::Error* pError) ;
-	smlRunResult Step(egSKIInterleaveType stepSize) ;
+	smlRunResult StepInClientThread(smlInterleaveStepSize  stepSize, gSKI::Error* pError) ;
+	smlRunResult Step(smlInterleaveStepSize stepSize) ;
 
 	unsigned long GetInterruptFlags()		{ return m_interruptFlags ; }
 	egSKIRunState GetRunState()				{ return m_runState ; }

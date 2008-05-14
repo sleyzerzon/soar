@@ -939,47 +939,23 @@ EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool inp
 	return (Direct_WMObject_Handle)pRoot ;
 }
 
-static egSKIRunType ConvertSMLRunType(int size)
-{
-	switch ((smlRunStepSize)size)
-	{
-	case sml_ELABORATION: return gSKI_RUN_ELABORATION_CYCLE ;
-	case sml_PHASE:       return gSKI_RUN_PHASE ;
-	case sml_DECISION:    return gSKI_RUN_DECISION_CYCLE ;
-	case sml_UNTIL_OUTPUT:return gSKI_RUN_UNTIL_OUTPUT ;
-	default:			  assert(0) ; return gSKI_RUN_DECISION_CYCLE ;
-	}
-}
-
-static egSKIInterleaveType ConvertSMLInterleaveType(int size)
-{
-	switch ((smlInterleaveStepSize)size)
-	{
-	case sml_INTERLEAVE_ELABORATION: return gSKI_INTERLEAVE_ELABORATION_PHASE ;
-	case sml_INTERLEAVE_PHASE:       return gSKI_INTERLEAVE_PHASE ;
-	case sml_INTERLEAVE_DECISION:    return gSKI_INTERLEAVE_DECISION_CYCLE ;
-	case sml_INTERLEAVE_UNTIL_OUTPUT:return gSKI_INTERLEAVE_OUTPUT ;
-	default:			  assert(0) ; return gSKI_INTERLEAVE_PHASE ;
-	}
-}
-
 // A fully direct run would be a call straight to gSKI but supporting that is too dangerous
 // due to the extra events and control logic surrounding the SML RunScheduler.
 // So we compromise with a call directly to that scheduler, boosting performance over the standard "run" path
 // which goes through the command line processor.
-EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, int interleaveSize, int count)
+EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, int interleaveSizeIn, int count)
 {
+	smlInterleaveStepSize interleaveSize = static_cast<smlInterleaveStepSize>(interleaveSizeIn);
 	KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
 
 	RunScheduler* pScheduler = pKernelSML->GetRunScheduler() ;
 	smlRunFlags runFlags = sml_NONE ;
 
 	// Decide on the type of run.
-	egSKIRunType runType = (forever) ? gSKI_RUN_FOREVER : ConvertSMLRunType(stepSize) ;
+	smlRunStepSize runType = (forever) ? sml_DECISION : static_cast<smlRunStepSize>(stepSize) ;
 
 	// Decide how large of a step to run each agent before switching to the next agent
-	egSKIInterleaveType interleaveStepSize = ConvertSMLInterleaveType(interleaveSize) ;
-	pScheduler->VerifyStepSizeForRunType( runType, interleaveStepSize) ;
+	pScheduler->VerifyStepSizeForRunType( forever, runType, interleaveSize) ;
 
 	if (pAgentName)
 	{
@@ -1007,7 +983,7 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
 
 	// Do the run
-	smlRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart) ;
+	smlRunResult runResult = pScheduler->RunScheduledAgents(forever, runType, count, runFlags, (smlInterleaveStepSize)interleaveSize, synchronizeAtStart) ;
 
 	unused(runResult) ;
 

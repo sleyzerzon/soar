@@ -117,26 +117,26 @@ eRunInterleaveMode CommandLineInterface::ParseRunInterleaveOptarg() {
 bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterleaveMode interleaveIn) {
 	if (!RequireAgent()) return false;
 
-	// Default run type is forever
-	egSKIRunType runType = gSKI_RUN_FOREVER;
-	// ... unless there is a count, then the default is a decision cycle:
-	if (count >= 0) runType = gSKI_RUN_DECISION_CYCLE;
+	// Default run type is sml_DECISION
+	smlRunStepSize runType = sml_DECISION;
+	//// ... unless there is a count, then the default is a decision cycle:
+	//if (count >= 0) runType = sml_DECISION;
+
+	// if there is no count, we're going forever
+	bool forever = (count < 0);
 
 	// Override run type with option flag:
 	if (options.test(RUN_ELABORATION)) {
-		runType = gSKI_RUN_ELABORATION_CYCLE;
+		runType = sml_ELABORATION;
 
 	} else if (options.test(RUN_PHASE)) {
-		runType = gSKI_RUN_PHASE;
+		runType = sml_PHASE;
 
 	} else if (options.test(RUN_DECISION)) {
-		runType = gSKI_RUN_DECISION_CYCLE;
+		runType = sml_DECISION;
 
 	} else if (options.test(RUN_OUTPUT)) {
-		runType = gSKI_RUN_UNTIL_OUTPUT;
-
-	} else if (options.test(RUN_FOREVER)) {
-		runType = gSKI_RUN_FOREVER;	
+		runType = sml_UNTIL_OUTPUT;
 	}
 
 	if (count == -1)
@@ -178,24 +178,24 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	// By default, we run one phase per agent but this isn't always appropriate.
 	egSKIRunType interleaveStepSize = gSKI_RUN_PHASE ;
 #ifdef USE_NEW_SCHEDULER
-	egSKIInterleaveType interleave;
+	smlInterleaveStepSize interleave;
 
 	switch(interleaveIn) {
 		case RUN_INTERLEAVE_DEFAULT:
 		default:
-			interleave  = pScheduler->DefaultInterleaveStepSize(runType) ;
+			interleave  = pScheduler->DefaultInterleaveStepSize(forever, runType) ;
 			break;
 		case RUN_INTERLEAVE_ELABORATION:
-			interleave = gSKI_INTERLEAVE_ELABORATION_PHASE;
+			interleave = sml_INTERLEAVE_ELABORATION;
 			break;
 		case RUN_INTERLEAVE_DECISION:
-			interleave = gSKI_INTERLEAVE_DECISION_CYCLE;
+			interleave = sml_INTERLEAVE_DECISION;
 			break;
 		case RUN_INTERLEAVE_PHASE:
-			interleave = gSKI_INTERLEAVE_PHASE;
+			interleave = sml_INTERLEAVE_PHASE;
 			break;
 		case RUN_INTERLEAVE_OUTPUT:
-			interleave = gSKI_INTERLEAVE_OUTPUT;
+			interleave = sml_INTERLEAVE_UNTIL_OUTPUT;
 			break;
 	}
 
@@ -220,7 +220,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	}
 
 #ifdef USE_NEW_SCHEDULER
-	if (!pScheduler->VerifyStepSizeForRunType( runType, interleave) ) {
+	if (!pScheduler->VerifyStepSizeForRunType(forever, runType, interleave) ) {
 		SetError(CLIError::kInvalidRunInterleaveSetting);
 		SetErrorDetail("Run type and interleave setting incompatible.");
 		return false;
@@ -228,14 +228,14 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 #endif
 
 	// If we're running by decision cycle synchronize up the agents to the same phase before we start
-	bool synchronizeAtStart = ((runType == gSKI_RUN_DECISION_CYCLE) || (runType == gSKI_RUN_FOREVER)) ; 
+	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ; 
 
 	// Do the run
 #ifdef USE_OLD_SCHEDULER
 	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart) ;
 #endif
 #ifdef USE_NEW_SCHEDULER
-	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleave, synchronizeAtStart) ;
+	runResult = pScheduler->RunScheduledAgents(forever, runType, count, runFlags, interleave, synchronizeAtStart) ;
 #endif
 
 	// Check for error

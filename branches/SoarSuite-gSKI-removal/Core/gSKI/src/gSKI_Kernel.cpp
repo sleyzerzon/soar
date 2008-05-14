@@ -345,9 +345,9 @@ namespace gSKI
   void Kernel::SetInterruptCheckRate(int newRate)	{ if (newRate >= 1) m_InterruptCheckRate = newRate ; }
 
   unsigned long Kernel::GetStopPoint()                 {return m_stopPoint ; }
-  void Kernel::SetStopPoint(egSKIRunType runStepSize, egSKIPhaseType m_StopBeforePhase)
+  void Kernel::SetStopPoint(bool forever, egSKIRunType runStepSize, egSKIPhaseType m_StopBeforePhase)
   {
-	  if ((gSKI_RUN_DECISION_CYCLE == runStepSize) || (gSKI_RUN_FOREVER == runStepSize)) {
+	  if ((gSKI_RUN_DECISION_CYCLE == runStepSize) || forever) {
 		  m_stopPoint = m_StopBeforePhase ;
 	  } else  {
 		  m_stopPoint = gSKI_INPUT_PHASE ;

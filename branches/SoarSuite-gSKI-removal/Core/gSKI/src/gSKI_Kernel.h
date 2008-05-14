@@ -358,7 +358,7 @@ namespace gSKI
 		*  stopBeforePhase, otherwise stop after the OutputPhase.
 		*/
 		unsigned long GetStopPoint() ;
-		void SetStopPoint(egSKIRunType runStepSize, egSKIPhaseType m_StopBeforePhase) ;
+		void SetStopPoint(bool forever, egSKIRunType runStepSize, egSKIPhaseType m_StopBeforePhase) ;
 		
 		/**
 		* @brief Notify listeners to start or stop the entire system (the simulation)

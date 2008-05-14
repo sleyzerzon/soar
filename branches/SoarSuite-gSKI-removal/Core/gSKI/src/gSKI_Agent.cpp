@@ -310,7 +310,6 @@ namespace gSKI
    */
    void Agent::initializeRuntimeState()
    {
-      m_smallestStepCount = 0;
       m_phaseCount        = 0;
       m_elaborationCount  = 0;
       m_decisionCount     = 0;  // should be m_agent->d_cycle_count.  Can we delete this var?
@@ -2230,8 +2229,6 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
       //  run step it has executed.
       switch(runType)
       {
-      case gSKI_RUN_SMALLEST_STEP:
-         return &m_smallestStepCount;
       case gSKI_RUN_PHASE:
          return &m_phaseCount;
       case gSKI_RUN_ELABORATION_CYCLE:

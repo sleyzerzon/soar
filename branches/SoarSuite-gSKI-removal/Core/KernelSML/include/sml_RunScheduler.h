@@ -60,7 +60,7 @@ public:
 	* @return   interleaveStepSize -- how large of a step each agent is run 
 	*           before other agents are run
     *********************************************************************/
-	egSKIInterleaveType DefaultInterleaveStepSize(egSKIRunType runStepSize) ;
+	smlInterleaveStepSize DefaultInterleaveStepSize(bool forever, smlRunStepSize runStepSize) ;
 
     /********************************************************************
     * @brief	Don't try to Run with an nonsense interleaveStepSize
@@ -69,7 +69,7 @@ public:
  	* @param interleaveStepSize -- how large of a step each agent is run 
 	*                              before other agents are run
     *********************************************************************/
-    bool VerifyStepSizeForRunType(egSKIRunType runStepSize, egSKIInterleaveType interleave) ;
+    bool VerifyStepSizeForRunType(bool forever, smlRunStepSize runStepSize, smlInterleaveStepSize interleave) ;
 
 	/*************************************************************
 	* @brief	Indicate that the next time RunScheduledAgents() is called
@@ -96,22 +96,7 @@ public:
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	smlRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize) ;
-
-	/*************************************************************
-	* @brief	Run all agents previously marked as being scheduled to run.
-	*
-	* @param runStepSize -- decision/phase etc.
-	* @param count		 -- how many steps to run
-	* @param runFlags	 -- type of run we're doing (passed back to environment)
-	* @param interleaveStepSize -- how large of a step each agent is run before other agents are run
-	* @param synchronize -- if true, synchronize all agents scheduled to run to the same phase before running all agents in step
-	* @param pError		 -- any error
-	*
-	* @return Not clear on how to set this when have multiple agents.
-	*		  Can query each for "GetLastRunResult()".
-	*************************************************************/	
-	smlRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIInterleaveType interleaveStepSize, bool synchronize) ;
+	smlRunResult RunScheduledAgents(bool forever, smlRunStepSize runStepSize, unsigned long count, smlRunFlags runFlags, smlInterleaveStepSize interleaveStepSize, bool synchronize) ;
 
 	/*************************************************************
 	* @brief	Returns true if at least one agent is currently running.
@@ -136,22 +121,18 @@ protected:
 	bool			AreAgentsSynchronized(AgentSML* pSynchAgent) ;
 	bool			AllAgentsAtStopBeforePhase() ;
 	bool			AreAllOutputPhasesComplete() ;
-	void            MoveTo_StopBeforePhase(egSKIRunType runStepSize, gSKI::Error* pError) ;
+	void            MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSize, gSKI::Error* pError) ;
 	void			FireBeforeRunStartsEvents() ;
-	//unsigned long	GetStepCounter(gSKI::Agent* pAgent, egSKIRunType runStepSize) ; //for old scheduler...
-    //unsigned long   GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgentSML, egSKIInterleaveType stepSize) ;
     smlRunResult  GetOverallRunResult() ;
-	//void			HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase) ;
 	bool			HaveAllGeneratedOutput() ;
-	void            InitializeRunCounters(egSKIRunType runStepSize) ;
+	void            InitializeRunCounters(smlRunStepSize runStepSize) ;
     void            InitializeStepList() ;
 	void			InitializeUpdateWorldEvents(bool addListeners) ;
-	bool			IsAgentFinished(AgentSML* pAgentSML, egSKIRunType runStepSize, unsigned long count) ;
- 	//void			RecordInitialRunCounters(egSKIRunType runStepSize) ;
- 	void			ResetRunCounters(egSKIRunType runStepSize) ;
+	bool			IsAgentFinished(AgentSML* pAgentSML, bool forever,  smlRunStepSize runStepSize, unsigned long count) ;
+ 	void			ResetRunCounters(smlRunStepSize runStepSize) ;
 	void			TerminateUpdateWorldEvents(bool removeListeners) ;
 	void			TestForFiringUpdateWorldEvents();
-	bool			TestIfAllFinished(egSKIRunType runStepSize, unsigned long count) ;
+	bool			TestIfAllFinished(bool forever, smlRunStepSize runStepSize, unsigned long count) ;
 
 	AgentSML*		GetAgentToSynchronizeWith() ;
 } ;

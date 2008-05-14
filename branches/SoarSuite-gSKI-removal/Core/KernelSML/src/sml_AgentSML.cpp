@@ -412,13 +412,10 @@ smlPhase AgentSML::GetCurrentPhase()
 	return (smlPhase)gSKI::EnumRemappings::ReMapPhaseType((unsigned short)m_agent->current_phase,0);
 }
 
-unsigned long AgentSML::GetRunCounter(egSKIRunType runStepSize)
+unsigned long AgentSML::GetRunCounter(smlRunStepSize runStepSize)
 {
 	switch(runStepSize)
 	{
-	case gSKI_RUN_SMALLEST_STEP:
-		assert(0) ;
-		return 0 ;	// Not supported
 	case gSKI_RUN_PHASE:
 		{
 			unsigned long phases = GetNumPhasesExecuted() ;
@@ -438,11 +435,6 @@ unsigned long AgentSML::GetRunCounter(egSKIRunType runStepSize)
 		{
 			unsigned long outputs = GetNumOutputsGenerated() ;
 			return outputs ;
-		}
-	case gSKI_RUN_FOREVER:
-		{
-			unsigned long decs = GetNumDecisionCyclesExecuted() ;
-			return decs ;
 		}
 	default:
 		return 0;
@@ -508,7 +500,7 @@ void AgentSML::ClearInterrupts()
   }
 }
 
-smlRunResult AgentSML::StepInClientThread(egSKIInterleaveType  stepSize, gSKI::Error* pError)
+smlRunResult AgentSML::StepInClientThread(smlInterleaveStepSize  stepSize, gSKI::Error* pError)
 {
   // Agent is already running, we cannot run
   if(m_runState != gSKI_RUNSTATE_STOPPED)
@@ -550,11 +542,11 @@ static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)
 	return (steps >= maxSteps);
 }
 
-smlRunResult AgentSML::Step(egSKIInterleaveType stepSize)
+smlRunResult AgentSML::Step(smlInterleaveStepSize stepSize)
 {    
    // NOTE: This only works because they have the same ordering
    // BADBAD: Eventually we should dispose of one of these types and fold them into a single enum
-   egSKIRunType runStepSize = (egSKIRunType)stepSize ;
+   smlRunStepSize runStepSize = (smlRunStepSize)stepSize ;
 
    // This method runs a single agent
    unsigned long count = 1 ;
@@ -572,7 +564,6 @@ smlRunResult AgentSML::Step(egSKIInterleaveType stepSize)
 
 	   switch (stepSize) 
 	   {
-	   case  gSKI_INTERLEAVE_SMALLEST_STEP:     run_for_n_elaboration_cycles(m_agent, count); break;
 	   case  gSKI_INTERLEAVE_ELABORATION_PHASE: run_for_n_elaboration_cycles(m_agent, count); break;
 	   case  gSKI_INTERLEAVE_PHASE:             run_for_n_phases(m_agent, count);             break;
 	   case  gSKI_INTERLEAVE_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);    break;

@@ -243,16 +243,18 @@ enum smlPhase
 
 enum smlRunStepSize
 {
+	// Note: phase moved before elaboration because that's how gSKI was doing things
+	sml_PHASE,						// keep in synch with egSKIRunType
 	sml_ELABORATION,
-	sml_PHASE,
 	sml_DECISION,
 	sml_UNTIL_OUTPUT
 };
 
 enum smlInterleaveStepSize
 {
+	// Note: phase moved before elaboration because that's how gSKI was doing things
+	sml_INTERLEAVE_PHASE,			// keep in synch with egSKIInterleaveType
 	sml_INTERLEAVE_ELABORATION,
-	sml_INTERLEAVE_PHASE,
 	sml_INTERLEAVE_DECISION,
 	sml_INTERLEAVE_UNTIL_OUTPUT
 };
@@ -268,7 +270,7 @@ enum smlRunFlags
 
 enum smlRunResult
 {
-    sml_RUN_ERROR,
+    sml_RUN_ERROR,				// NOTE: This enum MUST be kept in synch with egSKIRunResult defined in gSKI_Enumerations.h
     sml_RUN_EXECUTING,
     sml_RUN_INTERRUPTED,
     sml_RUN_COMPLETED,

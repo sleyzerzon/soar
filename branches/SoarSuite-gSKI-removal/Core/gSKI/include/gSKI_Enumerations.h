@@ -477,13 +477,10 @@
    */
    // NOTE: Order must now match egSKIInterleaveType's order
    typedef enum {
-      gSKI_RUN_SMALLEST_STEP,
       gSKI_RUN_PHASE,
 	  gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step 
       gSKI_RUN_DECISION_CYCLE,
       gSKI_RUN_UNTIL_OUTPUT,
-      gSKI_RUN_FOREVER,
-      gSKI_NUM_RUN_TYPES
    } egSKIRunType;
 
    /** 
@@ -516,8 +513,7 @@
    */
    // NOTE: Order must now match egSKIRunType's order
    typedef enum {
-      gSKI_INTERLEAVE_SMALLEST_STEP,        // not used for scheduler, but tested by CLI to set default  
-      gSKI_INTERLEAVE_PHASE,
+      gSKI_INTERLEAVE_PHASE,				// Keep in synch with smlInterleaveStepSize
 	  gSKI_INTERLEAVE_ELABORATION_PHASE,
       gSKI_INTERLEAVE_DECISION_CYCLE,
       gSKI_INTERLEAVE_OUTPUT

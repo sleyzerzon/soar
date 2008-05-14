@@ -79,6 +79,7 @@ int KernelCallback::InternalGetCallbackFromEventID(int eventID)
 	case smlEVENT_INPUT_PHASE_CALLBACK:			return INPUT_PHASE_CALLBACK ;
 
 	case smlEVENT_PRINT:						return PRINT_CALLBACK ;
+	case smlEVENT_XML_TRACE_OUTPUT:				return XML_GENERATION_CALLBACK ;
 	}
 
 	return smlEVENT_INVALID_EVENT ;

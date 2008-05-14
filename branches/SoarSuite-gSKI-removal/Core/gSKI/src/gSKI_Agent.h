@@ -1451,7 +1451,6 @@ namespace gSKI
 
 		/** Statistic that can be used for debugging or scheduling */
 		//{
-		unsigned long         m_smallestStepCount ;     
 		unsigned long         m_phaseCount ;
 		unsigned long         m_elaborationCount ;
 		unsigned long         m_decisionCount ;
