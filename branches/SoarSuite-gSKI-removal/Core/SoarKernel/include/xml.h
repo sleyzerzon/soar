@@ -27,6 +27,17 @@
 
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 
+// This is the data that needs to be passed back with the xml callback
+// This is defined here because it needs to be included by KernelSML/CLI and the SoarKernel
+struct XmlCallbackData {
+	const char* funcType;
+	const char* attOrTag;
+	const char* value;
+};
+
+typedef union symbol_union Symbol;
+typedef struct wme_struct wme;
+
 extern void xmlBeginTag(char const* pTag) ;
 extern void xmlEndTag(char const* pTag) ;
 extern void xmlString(char const* pAttribute, char const* pValue) ;

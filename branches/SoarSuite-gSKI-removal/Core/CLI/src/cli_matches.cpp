@@ -25,7 +25,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseMatches(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseMatches(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'a', "assertions",		0},
 		{'c', "count",			0},
@@ -73,15 +73,15 @@ bool CommandLineInterface::ParseMatches(gSKI::Agent* pAgent, std::vector<std::st
 
 	if (m_NonOptionArguments == 1) {
 		if (mode != MATCHES_ASSERTIONS_RETRACTIONS) return SetError(CLIError::kTooManyArgs);
-		return DoMatches(pAgent, MATCHES_PRODUCTION, detail, &argv[m_Argument - m_NonOptionArguments]);
+		return DoMatches(MATCHES_PRODUCTION, detail, &argv[m_Argument - m_NonOptionArguments]);
 	}
 
-	return DoMatches(pAgent, mode, detail);
+	return DoMatches(mode, detail);
 }
 
-bool CommandLineInterface::DoMatches(gSKI::Agent* pAgent, const eMatchesMode mode, const eWMEDetail detail, const std::string* pProduction) {
+bool CommandLineInterface::DoMatches(const eMatchesMode mode, const eWMEDetail detail, const std::string* pProduction) {
 
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	wme_trace_type wtt = 0;
 	switch (detail) {
@@ -111,9 +111,9 @@ bool CommandLineInterface::DoMatches(gSKI::Agent* pAgent, const eMatchesMode mod
 
 		if (m_RawOutput)
 		{
-			AddListenerAndDisableCallbacks(pAgent);		
+			AddListenerAndDisableCallbacks();		
 			pKernelHack->PrintPartialMatchInformation(m_pAgentSML, prod, wtt);
-			RemoveListenerAndEnableCallbacks(pAgent);
+			RemoveListenerAndEnableCallbacks();
 		}
 		else
 		{
@@ -127,9 +127,9 @@ bool CommandLineInterface::DoMatches(gSKI::Agent* pAgent, const eMatchesMode mod
 
 		if (m_RawOutput)
 		{
-			AddListenerAndDisableCallbacks(pAgent);		
+			AddListenerAndDisableCallbacks();		
 			pKernelHack->PrintMatchSet(m_pAgentSML, wtt, mst);
-			RemoveListenerAndEnableCallbacks(pAgent);
+			RemoveListenerAndEnableCallbacks();
 		}
 		else
 		{

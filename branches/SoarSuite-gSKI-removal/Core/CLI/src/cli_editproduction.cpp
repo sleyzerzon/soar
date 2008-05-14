@@ -17,8 +17,7 @@
 
 using namespace cli;
 
-bool CommandLineInterface::ParseEditProduction(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(pAgent);
+bool CommandLineInterface::ParseEditProduction(std::vector<std::string>& argv) {
 	if (argv.size() != 2) {
 		SetErrorDetail("Need to include the name of the production to edit.");
 		return SetError(CLIError::kTooFewArgs);

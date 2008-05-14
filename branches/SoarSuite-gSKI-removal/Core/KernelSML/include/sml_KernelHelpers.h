@@ -23,10 +23,14 @@ typedef void * soar_callback_agent;
 
 #include <string>
 
+// Included because we need XmlCallbackData defined in KernelSML/CLI
+#include "xml.h"
+
 namespace sml
 {
   class AgentSML ;
   class KernelSML ;
+  class XMLTrace ;
 
   class KernelHelpers
   {
@@ -117,6 +121,8 @@ namespace sml
 	 void SetChunkCount(AgentSML* pIAgent, unsigned long count);
 
 	 void SeedRandomNumberGenerator(unsigned long int* pSeed);
+
+	 void XmlCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn);
   };
 }
 #endif

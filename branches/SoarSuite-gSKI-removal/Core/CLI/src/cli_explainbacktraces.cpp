@@ -25,7 +25,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseExplainBacktraces(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseExplainBacktraces(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'c', "condition",	1},
 		{'f', "full",		0},
@@ -63,14 +63,14 @@ bool CommandLineInterface::ParseExplainBacktraces(gSKI::Agent* pAgent, std::vect
 	}
 
 	// we have a production
-	if (m_NonOptionArguments == 1) return DoExplainBacktraces(pAgent, &argv[m_Argument - m_NonOptionArguments], condition);
+	if (m_NonOptionArguments == 1) return DoExplainBacktraces(&argv[m_Argument - m_NonOptionArguments], condition);
 	
 	// query
-	return DoExplainBacktraces(pAgent);
+	return DoExplainBacktraces();
 }
 
-bool CommandLineInterface::DoExplainBacktraces(gSKI::Agent* pAgent, const std::string* pProduction, const int condition) {
-	if (!RequireAgent(pAgent)) return false;
+bool CommandLineInterface::DoExplainBacktraces(const std::string* pProduction, const int condition) {
+	if (!RequireAgent()) return false;
 
 	// quick sanity check
 	if (condition < -1) return SetError(CLIError::kInvalidConditionNumber);
@@ -80,15 +80,15 @@ bool CommandLineInterface::DoExplainBacktraces(gSKI::Agent* pAgent, const std::s
 
 	if (!pProduction) {
 		// no production means query, ignore other args
-		AddListenerAndDisableCallbacks(pAgent);
+		AddListenerAndDisableCallbacks();
 		pKernelHack->ExplainListChunks(m_pAgentSML);
-		RemoveListenerAndEnableCallbacks(pAgent);
+		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 
-	AddListenerAndDisableCallbacks(pAgent);
+	AddListenerAndDisableCallbacks();
 	pKernelHack->ExplainChunks(m_pAgentSML, pProduction->c_str(), condition);
-	RemoveListenerAndEnableCallbacks(pAgent);
+	RemoveListenerAndEnableCallbacks();
 	return true;
 }
 

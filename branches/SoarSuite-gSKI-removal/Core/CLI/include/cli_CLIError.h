@@ -24,7 +24,7 @@ namespace cli {
 			kGetOptError						= 3,
 			kCommandNotImplemented				= 4,
 			kProductionNotFound					= 5,
-			kMultiAttributeNotFound				= 6,
+			//kMultiAttributeNotFound				= 6,
 			kNotImplemented						= 8,
 			kExtraClosingParen					= 10,
 			kUnmatchedBracketOrQuote			= 11,
@@ -60,8 +60,8 @@ namespace cli {
 			kDirectoryStackEmpty				= 44,
 			kMissingFilenameArg					= 45,
 			kOpenFileFail						= 46,
-			kCantSaveReteWithJustifications		= 47,
-			kCantLoadReteWithProductions		= 48,
+			//kCantSaveReteWithJustifications		= 47,
+			//kCantLoadReteWithProductions		= 48,
 			kReteSaveOperationFail				= 49,
 			kReteLoadOperationFail				= 50,
 			kInvalidProduction					= 51,
@@ -71,7 +71,7 @@ namespace cli {
 			kInvalidAttribute					= 55,
 			kInvalidValue						= 56,
 			kRemoveWMEFailed					= 57,
-			kInvalidOSupportMode				= 58,
+			//kInvalidOSupportMode				= 58,
 			kInvalidWMEFilterType				= 59,
 			kFilterExpected						= 60,
 			kDuplicateWMEFilter					= 61, 
@@ -100,6 +100,9 @@ namespace cli {
 			kPreferencesError					= 85, // FIXME: document in wiki
 			kInvalidRunInterleaveSetting		= 86,
 			kLoadLibraryError					= 87, // FIXME: document in wiki
+			kWorkingMemoryNotEmpty				= 88, 
+			kDuplicateProduction				= 89, 
+			kProductionAddFailed				= 90, 
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -109,7 +112,7 @@ namespace cli {
 				case kGetOptError:						return "GetOpt returned with an error.";
 				case kCommandNotImplemented:			return "Command not implemented.";
 				case kProductionNotFound:				return "Production not found.";
-				case kMultiAttributeNotFound:			return "Multi-attribute not found.";
+				//case kMultiAttributeNotFound:			return "Multi-attribute not found.";
 				case kNotImplemented:					return "Not implemented.";
 				case kExtraClosingParen:				return "Closing bracket found without opening counterpart.";
 				case kUnmatchedBracketOrQuote:			return "No closing quotes/brackets/parens found.";
@@ -145,8 +148,8 @@ namespace cli {
 				case kDirectoryStackEmpty:				return "Directory stack empty, no directory to change to.";
 				case kMissingFilenameArg:				return "Missing filename argument.";
 				case kOpenFileFail:						return "Failed to open file for reading.";
-				case kCantSaveReteWithJustifications:	return "Can't save rete while justifications are present.";
-				case kCantLoadReteWithProductions:		return "Can't load rete unless production memory is empty.";
+				//case kCantSaveReteWithJustifications:	return "Can't save rete while justifications are present.";
+				//case kCantLoadReteWithProductions:		return "Can't load rete unless production memory is empty.";
 				case kReteSaveOperationFail:			return "Rete save operation failed.";
 				case kReteLoadOperationFail:			return "Rete load operation failed.";
 				case kInvalidProduction:				return "Invalid production.";
@@ -156,7 +159,7 @@ namespace cli {
 				case kInvalidAttribute:					return "Unknown or invalid attribute.";
 				case kInvalidValue:						return "Unknown or invalid value.";
 				case kRemoveWMEFailed:					return "Remove WME failed.";
-				case kInvalidOSupportMode:				return "Invalid O-Support mode, use 0-4.";
+				//case kInvalidOSupportMode:				return "Invalid O-Support mode, use 0-4.";
 				case kInvalidWMEFilterType:				return "Invalid WME filter type, expected 'adds' 'removes' or 'both'.";
 				case kFilterExpected:					return "ID/Attribute/Value filter expected, one or more missing.";
 				case kDuplicateWMEFilter:				return "That WME filter already exists.";
@@ -185,6 +188,9 @@ namespace cli {
 				case kPreferencesError:					return "Preferences command failed." ;
 				case kInvalidRunInterleaveSetting:		return "Invalid setting for run interleave option." ;
 				case kLoadLibraryError:					return "Error occurred while loading library";
+				case kWorkingMemoryNotEmpty:			return "Working memory not empty.";
+				case kDuplicateProduction:				return "Duplicate production exists.";
+				case kProductionAddFailed:				return "Production addition failed.";
 				default:								return "Unknown error code.";
 			}
 		}

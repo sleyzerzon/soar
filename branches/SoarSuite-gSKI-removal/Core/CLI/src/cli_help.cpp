@@ -19,9 +19,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseHelp(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(pAgent);
-
+bool CommandLineInterface::ParseHelp(std::vector<std::string>& argv) {
 	if (argv.size() > 2) {
 		SetErrorDetail("Pass only the command name you would like help with.");
 		return SetError(CLIError::kTooManyArgs);

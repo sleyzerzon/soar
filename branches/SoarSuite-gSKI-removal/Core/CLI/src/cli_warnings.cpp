@@ -22,7 +22,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseWarnings(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseWarnings(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'e', "enable",		0},
 		{'d', "disable",	0},
@@ -54,11 +54,11 @@ bool CommandLineInterface::ParseWarnings(gSKI::Agent* pAgent, std::vector<std::s
 
 	if (m_NonOptionArguments) SetError(CLIError::kTooManyArgs);
 
-	return DoWarnings(pAgent, query ? 0 : &setting);
+	return DoWarnings(query ? 0 : &setting);
 }
 
-bool CommandLineInterface::DoWarnings(gSKI::Agent* pAgent, bool* pSetting) {
-	if (!RequireAgent(pAgent)) return false;
+bool CommandLineInterface::DoWarnings(bool* pSetting) {
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;

@@ -19,9 +19,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseSRand(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-
-	unused(pAgent);
+bool CommandLineInterface::ParseSRand(std::vector<std::string>& argv) {
 
 	if (argv.size() < 2) return DoSRand();
 

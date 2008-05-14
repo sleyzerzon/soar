@@ -17,7 +17,6 @@
 #include "cli_Aliases.h"
 
 #include "gSKI_Error.h"
-#include "gSKI_Agent.h"
 
 // SML includes
 #include "sml_Connection.h"
@@ -27,6 +26,7 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "sml_XMLTrace.h"
+#include "sml_KernelHelpers.h"
 #include "KernelHeaders.h"
 
 #include "agent.h"
@@ -161,6 +161,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_XMLEventTag = 0 ;
 	m_EchoResult = false ;
 	m_pAgentSML = 0 ;
+	m_pAgentSoar = 0;
 	m_VarPrint = false;
 
 	m_XMLResult = new XMLTrace() ;
@@ -210,7 +211,7 @@ EXPORT bool CommandLineInterface::ShouldEchoCommand(char const* pCommandLine)
 * @param echoResults If true send a copy of the result to the echo event
 * @param pResponse Pointer to XML response object
 *************************************************************/
-EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, gSKI::Agent* pAgent, const char* pCommandLine, bool echoResults, ElementXML* pResponse) {
+EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentSML* pAgent, const char* pCommandLine, bool echoResults, ElementXML* pResponse) {
 	// No way to return data
 	if (!pConnection) return false;
 	if (!pResponse) return false;
@@ -222,11 +223,20 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, gSKI::Agent
 	}
 
 	m_EchoResult = echoResults ;
-	m_pAgentSML = m_pKernelSML->GetAgentSML(pAgent) ;
+	m_pAgentSML = pAgent;
+	if (m_pAgentSML)
+	{
+		m_pAgentSoar = m_pAgentSML->GetSoarAgent();
+	}
+	else
+	{
+		m_pAgentSoar = 0;
+	}
+
 	SetAgentSML(m_pAgentSML) ;
 
 	// Process the command, ignoring its result (errors detected with m_LastError)
-	DoCommandInternal(pAgent, pCommandLine);
+	DoCommandInternal(pCommandLine);
 
 	GetLastResultSML(pConnection, pResponse);
 
@@ -387,16 +397,16 @@ EXPORT bool CommandLineInterface::ExpandCommand(sml::Connection* pConnection, co
 	return ok ;
 }
 
-bool CommandLineInterface::DoCommandInternal(gSKI::Agent* pAgent, const std::string& commandLine) {
+bool CommandLineInterface::DoCommandInternal(const std::string& commandLine) {
 	vector<string> argv;
 	// Parse command:
 	if (CLITokenize(commandLine, argv) == -1)  return false;	// Parsing failed
 
 	// Execute the command
-	return DoCommandInternal(pAgent, argv);
+	return DoCommandInternal(argv);
 }
 
-bool CommandLineInterface::DoCommandInternal(gSKI::Agent* pAgent, vector<string>& argv) {
+bool CommandLineInterface::DoCommandInternal(vector<string>& argv) {
 	if (!argv.size()) return true;
 
 	// Check for help flags
@@ -496,7 +506,7 @@ bool CommandLineInterface::DoCommandInternal(gSKI::Agent* pAgent, vector<string>
 	ResetOptions();
 
 	// Make the Parse call
-	return (this->*pFunction)(pAgent, argv);
+	return (this->*pFunction)(argv);
 }
 
 bool CommandLineInterface::CheckForHelp(std::vector<std::string>& argv) {
@@ -573,17 +583,11 @@ bool CommandLineInterface::IsInteger(const string& s) {
 	return true;
 }
 
-bool CommandLineInterface::RequireAgent(agent* pAgent) {
+bool CommandLineInterface::RequireAgent() {
 	// Requiring an agent implies requiring a kernel
 	if (!RequireKernel()) return false;
-	if (!pAgent) return SetError(CLIError::kAgentRequired);
-	return true;
-}
-
-bool CommandLineInterface::RequireAgent(gSKI::Agent* pAgent) {
-	// Requiring an agent implies requiring a kernel
-	if (!RequireKernel()) return false;
-	if (!pAgent) return SetError(CLIError::kAgentRequired);
+	if (!m_pAgentSML) return SetError(CLIError::kAgentRequired);
+	if (!m_pAgentSoar) return SetError(CLIError::kAgentRequired);
 	return true;
 }
 
@@ -624,30 +628,32 @@ void CommandLineInterface::PrependArgTagFast(const char* pParam, const char* pTy
 	m_ResponseTags.push_front(pTag);
 }
 
-void CommandLineInterface::AddListenerAndDisableCallbacks(gSKI::Agent* pAgent) {
-	if (m_pKernelSML) m_pKernelSML->DisablePrintCallback(pAgent);
+void CommandLineInterface::AddListenerAndDisableCallbacks() {
+	m_pAgentSML->DisablePrintCallback();
 	m_PrintEventToResult = true;
 	//if (!m_pLogFile && pAgent) pAgent->AddPrintListener(gSKIEVENT_PRINT, this);
-	if (!m_pLogFile && m_pAgentSML) RegisterWithKernel(gSKIEVENT_PRINT) ;
+	if (!m_pLogFile) RegisterWithKernel(smlEVENT_PRINT) ;
 }
 
-void CommandLineInterface::RemoveListenerAndEnableCallbacks(gSKI::Agent* pAgent) {
+void CommandLineInterface::RemoveListenerAndEnableCallbacks() {
 	//if (!m_pLogFile && pAgent) pAgent->RemovePrintListener(gSKIEVENT_PRINT, this);
-	if (!m_pLogFile && m_pAgentSML) UnregisterWithKernel(gSKIEVENT_PRINT);
+	if (!m_pLogFile) UnregisterWithKernel(smlEVENT_PRINT);
 	m_PrintEventToResult = false;
-	if (m_pKernelSML) m_pKernelSML->EnablePrintCallback(pAgent);
+	m_pAgentSML->EnablePrintCallback();
 }
 
-void CommandLineInterface::AddXMLListenerAndDisableCallbacks(gSKI::Agent* pAgent) {
-	if (m_pKernelSML) m_pKernelSML->DisablePrintCallback(pAgent);
+void CommandLineInterface::AddXMLListenerAndDisableCallbacks() {
+	m_pAgentSML->DisablePrintCallback();
 	m_XMLEventToResult = true;
-	if (pAgent) pAgent->AddXMLListener(gSKIEVENT_XML_TRACE_OUTPUT, this);
+	//if (pAgent) pAgent->AddXMLListener(gSKIEVENT_XML_TRACE_OUTPUT, this);
+	RegisterWithKernel(smlEVENT_XML_TRACE_OUTPUT) ;
 }
 
-void CommandLineInterface::RemoveXMLListenerAndEnableCallbacks(gSKI::Agent* pAgent) {
-	if (pAgent) pAgent->RemoveXMLListener(gSKIEVENT_XML_TRACE_OUTPUT, this);
+void CommandLineInterface::RemoveXMLListenerAndEnableCallbacks() {
+	UnregisterWithKernel(smlEVENT_XML_TRACE_OUTPUT);
+	//if (pAgent) pAgent->RemoveXMLListener(gSKIEVENT_XML_TRACE_OUTPUT, this);
 	m_XMLEventToResult = false;
-	if (m_pKernelSML) m_pKernelSML->EnablePrintCallback(pAgent);
+	m_pAgentSML->EnablePrintCallback();
 
 	if (m_XMLEventTag)
 	{
@@ -860,55 +866,57 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 	return true;
 }
 
-/** 
-* @brief Event callback function
-*
-* This method recieves callbacks when the xml event occurs for an agent.
-*
-* @param eventId	  Id of the event that occured (can only be gSKIEVENT_XML_TRACE_OUTPUT)
-* @param agentPtr	  Pointer to the agent that fired the print event
-* @param funcType     Pointer to c-style string containing the function type (i.e. addTag, addAttributeValuePair, endTag)
-* @param attOrTag     Pointer to c-style string containing the tag to add or remove or the attribute to add
-* @param value		  Pointer to c-style string containing the value to add (may be NULL if just adding/ending a tag)
-*/
-void CommandLineInterface::HandleEvent(egSKIXMLEventId eventId, gSKI::Agent* agentPtr, const char* funcType, const char* attOrTag, const char* value) {
-	unused(eventId) ;
-	unused(agentPtr) ;
-
-	// Collect up the incoming XML events into an XML object
-	if (!m_XMLEventTag)
-		m_XMLEventTag = new XMLTrace() ;
-
-	// We need to decide what type of operation this is and we'd like to do that
-	// fairly efficiently so we'll switch based on the first character of the name.
-	char ch = funcType[0] ;
-
-	switch (ch)
-	{
-	case 'b' : 
-		if (strcmp(sml_Names::kFunctionBeginTag, funcType) == 0)
-		{
-			m_XMLEventTag->BeginTag(attOrTag) ;
-		}
-		break ;
-	case 'e':
-		if (strcmp(sml_Names::kFunctionEndTag, funcType) == 0)
-		{
-			m_XMLEventTag->EndTag(attOrTag) ;
-		}
-		break ;
-	case 'a':
-		if (strcmp(sml_Names::kFunctionAddAttribute, funcType) == 0)
-		{
-			m_XMLEventTag->AddAttribute(attOrTag, value) ;
-		}
-		break ;
-	default:
-		// This is an unknown function type
-		assert(ch == 'b' || ch == 'e' || ch == 'a') ;
-		break ;
-	}
-}
+// FIXME
+// Revisit how XML is passed from the kernel to the CLI
+// Right now, the kernel gets a singleton CLI pointer and the XML is stored directly in to the CLI 
+// (statically) instead of using a callback
+///** 
+//* @brief Event callback function
+//*
+//* This method recieves callbacks when the xml event occurs for an agent.
+//*
+//* @param eventId	  Id of the event that occured (can only be gSKIEVENT_XML_TRACE_OUTPUT)
+//* @param agentPtr	  Pointer to the agent that fired the print event
+//* @param funcType     Pointer to c-style string containing the function type (i.e. addTag, addAttributeValuePair, endTag)
+//* @param attOrTag     Pointer to c-style string containing the tag to add or remove or the attribute to add
+//* @param value		  Pointer to c-style string containing the value to add (may be NULL if just adding/ending a tag)
+//*/
+//void CommandLineInterface::HandleEvent(egSKIXMLEventId, gSKI::Agent*, const char* funcType, const char* attOrTag, const char* value) {
+//
+//	// Collect up the incoming XML events into an XML object
+//	if (!m_XMLEventTag)
+//		m_XMLEventTag = new XMLTrace() ;
+//
+//	// We need to decide what type of operation this is and we'd like to do that
+//	// fairly efficiently so we'll switch based on the first character of the name.
+//	char ch = funcType[0] ;
+//
+//	switch (ch)
+//	{
+//	case 'b' : 
+//		if (strcmp(sml_Names::kFunctionBeginTag, funcType) == 0)
+//		{
+//			m_XMLEventTag->BeginTag(attOrTag) ;
+//		}
+//		break ;
+//	case 'e':
+//		if (strcmp(sml_Names::kFunctionEndTag, funcType) == 0)
+//		{
+//			m_XMLEventTag->EndTag(attOrTag) ;
+//		}
+//		break ;
+//	case 'a':
+//		if (strcmp(sml_Names::kFunctionAddAttribute, funcType) == 0)
+//		{
+//			m_XMLEventTag->AddAttribute(attOrTag, value) ;
+//		}
+//		break ;
+//	default:
+//		// This is an unknown function type
+//		assert(ch == 'b' || ch == 'e' || ch == 'a') ;
+//		break ;
+//	}
+//}
 
 CommandLineInterface* cli::GetCLI()
 {
@@ -1049,10 +1057,9 @@ int CommandLineInterface::CLITokenize(string cmdline, vector<string>& argumentVe
 	return ret;
 }
 
-void CommandLineInterface::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+void CommandLineInterface::OnKernelEvent(int eventID, AgentSML*, void* pCallData)
 {
-	unused(pAgentSML) ;
-
+	// Registered for this event in source command
 	if (eventID == gSKIEVENT_BEFORE_PRODUCTION_REMOVED)
 	{
 		// Only called when source command is active
@@ -1068,7 +1075,7 @@ void CommandLineInterface::OnKernelEvent(int eventID, AgentSML* pAgentSML, void*
 			m_ExcisedDuringSource.push_back(name.c_str());
 		}
 	}
-	else if (eventID == gSKIEVENT_PRINT)
+	else if (eventID == smlEVENT_PRINT)
 	{
 		char const* msg = (char const*)pCallData ;
 
@@ -1104,5 +1111,22 @@ void CommandLineInterface::OnKernelEvent(int eventID, AgentSML* pAgentSML, void*
 			}
 		}
 	}
-}
+	else if (eventID == smlEVENT_XML_TRACE_OUTPUT)
+	{
+		// Collect up the incoming XML events into an XML object
+		if (!m_XMLEventTag)
+			m_XMLEventTag = new XMLTrace() ;
+
+		// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
+		sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
+
+		pKernelHack->XmlCallbackHelper( m_XMLEventTag, pCallData );
+	} 
+	else
+	{
+		assert(false);
+		// unknown event
+		// TODO: gracefully (?) deal with this error
+	}
+} // function
 

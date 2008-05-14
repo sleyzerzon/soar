@@ -18,6 +18,7 @@
 #include "gSKI_Kernel.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
+#include "sml_XMLTrace.h"
 
 #include "agent.h"
 #include "gdatastructs.h"
@@ -2608,4 +2609,46 @@ void KernelHelpers::SeedRandomNumberGenerator(unsigned long int* pSeed)
 	}
 	SoarSeedRNG();
 }
+
+void KernelHelpers::XmlCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn)
+{
+	assert(pCallDataIn);
+	XmlCallbackData* pCallData = static_cast<XmlCallbackData*>(pCallDataIn);
+	assert(pCallData);
+
+	// The value can be NULL if this is a begin/end tag event.
+	assert(pCallData->funcType) ;
+	assert(pCallData->attOrTag) ;
+
+	// We need to decide what type of operation this is and we'd like to do that
+	// fairly efficiently so we'll switch based on the first character.
+	char ch = pCallData->funcType[0] ;
+
+	switch (ch)
+	{
+	case 'b' : 
+		if (strcmp(sml_Names::kFunctionBeginTag, pCallData->funcType) == 0)
+		{
+			xmlTrace->BeginTag(pCallData->attOrTag) ;
+		}
+		break ;
+	case 'e':
+		if (strcmp(sml_Names::kFunctionEndTag, pCallData->funcType) == 0)
+		{
+			xmlTrace->EndTag(pCallData->attOrTag) ;
+		}
+		break ;
+	case 'a':
+		if (strcmp(sml_Names::kFunctionAddAttribute, pCallData->funcType) == 0)
+		{
+			xmlTrace->AddAttribute(pCallData->attOrTag, pCallData->value) ;
+		}
+		break ;
+	default:
+		// This is an unknown function type
+		assert(ch == 'b' || ch == 'e' || ch == 'a') ;
+		break ;
+	}
+}
+
 }// namespace

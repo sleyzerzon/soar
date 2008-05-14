@@ -13,7 +13,6 @@
 
 #include "cli_Commands.h"
 
-#include "gSKI_Agent.h"
 #include "gSKI_AgentManager.h"
 #include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
@@ -21,7 +20,7 @@
 
 using namespace cli;
 
-bool CommandLineInterface::ParseStopSoar(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseStopSoar(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'s', "self",		0},
 		{0, 0, 0}
@@ -47,18 +46,18 @@ bool CommandLineInterface::ParseStopSoar(gSKI::Agent* pAgent, std::vector<std::s
 		std::string reasonForStopping;
 		unsigned int optind = m_Argument - m_NonOptionArguments;
 		while (optind < argv.size()) reasonForStopping += argv[optind++] + ' ';
-		return DoStopSoar(pAgent, self, &reasonForStopping);
+		return DoStopSoar(self, &reasonForStopping);
 	}
-	return DoStopSoar(pAgent, self);
+	return DoStopSoar(self);
 }
 
-bool CommandLineInterface::DoStopSoar(gSKI::Agent* pAgent, bool self, const std::string* reasonForStopping) {
+bool CommandLineInterface::DoStopSoar(bool self, const std::string* reasonForStopping) {
 
 	unused(reasonForStopping);
 
 	if (self) {
-		if (!RequireAgent(pAgent)) return false;
-		//if (!pAgent->Interrupt(gSKI_STOP_AFTER_DECISION_CYCLE, gSKI_STOP_BY_RETURNING, &m_gSKIError)) {
+		if (!RequireAgent()) return false;
+		//if (!m_pAgentSML->Interrupt(gSKI_STOP_AFTER_DECISION_CYCLE, gSKI_STOP_BY_RETURNING, &m_gSKIError)) {
 		if (!m_pAgentSML->Interrupt(gSKI_STOP_AFTER_DECISION_CYCLE, &m_gSKIError)) {
 			SetErrorDetail("Error interrupting agent.");
 			return SetError(CLIError::kgSKIError);

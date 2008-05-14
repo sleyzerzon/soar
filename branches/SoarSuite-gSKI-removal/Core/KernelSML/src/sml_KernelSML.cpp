@@ -714,22 +714,6 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 }
 
 /*************************************************************
-* @brief	Enable/disable the print callback for a given agent.
-*			This allows us to use the print callback within the
-*			kernel without forwarding that output to clients
-*			(useful for capturing the output from some commands).
-*************************************************************/
-void KernelSML::DisablePrintCallback(gSKI::Agent* pAgent)
-{
-	GetAgentSML(pAgent)->DisablePrintCallback() ;
-}
-
-void KernelSML::EnablePrintCallback(gSKI::Agent* pAgent)
-{
-	GetAgentSML(pAgent)->EnablePrintCallback() ;
-}
-
-/*************************************************************
 * @brief	Takes an incoming SML message and responds with
 *			an appropriate response message.
 *

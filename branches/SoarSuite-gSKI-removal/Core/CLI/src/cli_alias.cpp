@@ -18,8 +18,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseAlias(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(pAgent);
+bool CommandLineInterface::ParseAlias(std::vector<std::string>& argv) {
 
 	if (argv.size() == 1) {
 		// If no arguments, list aliases

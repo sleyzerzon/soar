@@ -420,15 +420,6 @@ public:
 	void DeleteAllAgents(bool waitTillDeleted) ;
 
 	/*************************************************************
-	* @brief	Enable/disable the print callback for a given agent.
-	*			This allows us to use the print callback within the
-	*			kernel without forwarding that output to clients
-	*			(useful for capturing the output from some commands).
-	*************************************************************/
-	void DisablePrintCallback(gSKI::Agent* pAgent) ;
-	void EnablePrintCallback(gSKI::Agent* pAgent)  ;
-
-	/*************************************************************
 	* @brief	The run scheduler is responsible for deciding which
 	*			agents to include in a run and actually performing
 	*			that run.

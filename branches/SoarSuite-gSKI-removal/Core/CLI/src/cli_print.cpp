@@ -15,16 +15,18 @@
 
 #include "sml_Names.h"
 
-#include "gSKI_Agent.h"
+#include "agent.h"
+
 #include "gSKI_Kernel.h"
 #include "sml_KernelHelpers.h"
 #include "sml_KernelSML.h"
+#include "sml_AgentSML.h"
 #include "gsysparam.h"
 
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParsePrint(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'a', "all",			0},
 		{'c', "chunks",			0},
@@ -44,7 +46,7 @@ bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::stri
 		{0, 0, 0}
 	};
 
-	int depth = pAgent->GetDefaultWMEDepth();
+	int depth = m_pAgentSoar->default_wme_depth;
 	PrintBitset options(0);
 
 	for (;;) {
@@ -117,7 +119,7 @@ bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::stri
 		case 0:  // no argument
 			// the i and d options require an argument
 			if (options.test(PRINT_INTERNAL) || options.test(PRINT_TREE) || options.test(PRINT_DEPTH)) return SetError(CLIError::kTooFewArgs);
-			return DoPrint(pAgent, options, depth);
+			return DoPrint(options, depth);
 
 		case 1: 
 			// the acDjus options don't allow an argument
@@ -131,7 +133,7 @@ bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::stri
 				SetErrorDetail("No argument allowed when printing all/chunks/defaults/justifications/user/stack.");
 				return SetError(CLIError::kTooManyArgs);
 			}
-			return DoPrint(pAgent, options, depth, &(argv[m_Argument - m_NonOptionArguments]));
+			return DoPrint(options, depth, &(argv[m_Argument - m_NonOptionArguments]));
 
 		default: // more than 1 arg
 			break;
@@ -140,9 +142,9 @@ bool CommandLineInterface::ParsePrint(gSKI::Agent* pAgent, std::vector<std::stri
 	return SetError(CLIError::kTooManyArgs);
 }
 
-bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int depth, const std::string* pArg) {
+bool CommandLineInterface::DoPrint(PrintBitset options, int depth, const std::string* pArg) {
 	// Need agent pointer for function calls
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Strip any surrounding "{"
 	/*
@@ -167,9 +169,9 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 		}
 
 		// Structured output through structured output callback
-		if (m_RawOutput) AddListenerAndDisableCallbacks(pAgent);
+		if (m_RawOutput) AddListenerAndDisableCallbacks();
 		pKernelHack->PrintStackTrace(m_pAgentSML, (options.test(PRINT_STATES)) ? true : false, (options.test(PRINT_OPERATORS)) ? true : false);
-		if (m_RawOutput) RemoveListenerAndEnableCallbacks(pAgent);
+		if (m_RawOutput) RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 
@@ -182,42 +184,42 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 
 	// Check for the five general print options (all, chunks, defaults, justifications, user)
 	if (options.test(PRINT_ALL)) {
-		AddListenerAndDisableCallbacks(pAgent);
+		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks(pAgent);
+		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_CHUNKS)) {
-		AddListenerAndDisableCallbacks(pAgent);
+		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks(pAgent);
+		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_DEFAULTS)) {
-		AddListenerAndDisableCallbacks(pAgent);
+		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks(pAgent);
+		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_JUSTIFICATIONS)) {
-		AddListenerAndDisableCallbacks(pAgent);
+		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks(pAgent);
+		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_USER)) {
-		AddListenerAndDisableCallbacks(pAgent);
+		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks(pAgent);
+		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 
 	// Default to symbol print if there is an arg, otherwise print all
-	if (m_RawOutput) AddListenerAndDisableCallbacks(pAgent);
-	else			 AddXMLListenerAndDisableCallbacks(pAgent) ;
+	if (m_RawOutput) AddListenerAndDisableCallbacks();
+	else			 AddXMLListenerAndDisableCallbacks() ;
 
 	if (options.test(PRINT_VARPRINT)) {
 		m_VarPrint = true;
@@ -232,8 +234,8 @@ bool CommandLineInterface::DoPrint(gSKI::Agent* pAgent, PrintBitset options, int
 	}
 	m_VarPrint = false;
 
-	if (m_RawOutput) RemoveListenerAndEnableCallbacks(pAgent);
-	else			 RemoveXMLListenerAndEnableCallbacks(pAgent) ;
+	if (m_RawOutput) RemoveListenerAndEnableCallbacks();
+	else			 RemoveXMLListenerAndEnableCallbacks() ;
 
 	// put the result into a message(string) arg tag
 	if (!m_RawOutput) ResultToArgTag();

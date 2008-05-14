@@ -17,7 +17,7 @@
 /*********************************** INLINE FUNCTIONS *****************************************/
 /* Gotta include these after the other stuff to keep circular includes from happening. */
 #include "agent.h"
-#include "xmlTraceNames.h"
+#include "xml.h"
 
 #include <assert.h>
 
@@ -127,7 +127,7 @@ inline void gSKI_MakeAgentCallbackXML(	agent*		soarAgent,
                                         const char*	attOrTag,
 										const char*	value=0)
 {
-   gSKI_K_XMLCallbackData xml_data;
+   XmlCallbackData xml_data;
 	/*
 	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
                     &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
@@ -138,7 +138,9 @@ inline void gSKI_MakeAgentCallbackXML(	agent*		soarAgent,
    xml_data.attOrTag = attOrTag;
    xml_data.value = value;
 
-   gSKI_MakeAgentCallback(gSKI_K_EVENT_XML_OUTPUT, 0, soarAgent, static_cast<void*>(&xml_data));
+   //gSKI_MakeAgentCallback(gSKI_K_EVENT_XML_OUTPUT, 0, soarAgent, static_cast<void*>(&xml_data));
+   soar_invoke_first_callback(soarAgent, soarAgent, 
+	                          XML_GENERATION_CALLBACK, /*(XmlCallbackData)*/ static_cast<void*>(&xml_data));
 	/*
 	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
                     &thisAgent->monitors_cpu_time[thisAgent->current_phase]);

@@ -13,26 +13,24 @@
 
 #include "cli_Commands.h"
 
-#include "gSKI_Agent.h"
 #include "sml_AgentSML.h"
 
 using namespace cli;
 
-bool CommandLineInterface::ParseInitSoar(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(argv);
-	return DoInitSoar(pAgent);
+bool CommandLineInterface::ParseInitSoar(std::vector<std::string>&) {
+	return DoInitSoar();
 }
 
-bool CommandLineInterface::DoInitSoar(gSKI::Agent* pAgent) {
+bool CommandLineInterface::DoInitSoar() {
 	// Need agent pointer for function calls
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Save the current result
 	std::string oldResult = m_Result.str();
 
-	AddListenerAndDisableCallbacks(pAgent);
+	AddListenerAndDisableCallbacks();
 	bool ok = m_pAgentSML->Reinitialize() ;
-	RemoveListenerAndEnableCallbacks(pAgent);
+	RemoveListenerAndEnableCallbacks();
 
 	// restore the old result, ignoring output from init-soar
 	m_Result.str(oldResult); 

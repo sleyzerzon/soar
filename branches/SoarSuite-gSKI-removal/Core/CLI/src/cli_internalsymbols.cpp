@@ -22,22 +22,21 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseInternalSymbols(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(argv);
-	return DoInternalSymbols(pAgent);
+bool CommandLineInterface::ParseInternalSymbols(std::vector<std::string>&) {
+	return DoInternalSymbols();
 }
 
-bool CommandLineInterface::DoInternalSymbols(gSKI::Agent* pAgent) {
+bool CommandLineInterface::DoInternalSymbols() {
 
 	// Need agent pointer for function calls
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 		
-	AddListenerAndDisableCallbacks(pAgent);
+	AddListenerAndDisableCallbacks();
 	pKernelHack->PrintInternalSymbols(m_pAgentSML);
-	RemoveListenerAndEnableCallbacks(pAgent);
+	RemoveListenerAndEnableCallbacks();
 
 	// put the result into a message(string) arg tag
 	if (!m_RawOutput) ResultToArgTag();

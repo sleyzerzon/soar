@@ -23,7 +23,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseTimers(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseTimers(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'e', "enable",		0},
 		{'d', "disable",	0},
@@ -56,12 +56,12 @@ bool CommandLineInterface::ParseTimers(gSKI::Agent* pAgent, std::vector<std::str
 	// No non-option arguments
 	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
 
-	return DoTimers(pAgent, print ? 0 : &setting);
+	return DoTimers(print ? 0 : &setting);
 }
 
-bool CommandLineInterface::DoTimers(gSKI::Agent* pAgent, bool* pSetting) {
+bool CommandLineInterface::DoTimers(bool* pSetting) {
 	// Need agent pointer and kernel pointer for sysparam
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;

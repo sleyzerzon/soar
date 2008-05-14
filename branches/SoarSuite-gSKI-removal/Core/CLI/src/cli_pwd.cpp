@@ -17,9 +17,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParsePWD(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(pAgent);
-
+bool CommandLineInterface::ParsePWD(std::vector<std::string>& argv) {
 	// No arguments to print working directory
 	if (argv.size() != 1) {
 		SetErrorDetail("pwd takes no arguments.");

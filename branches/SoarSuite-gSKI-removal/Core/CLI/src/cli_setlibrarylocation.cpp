@@ -17,9 +17,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseSetLibraryLocation(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(pAgent);
-
+bool CommandLineInterface::ParseSetLibraryLocation(std::vector<std::string>& argv) {
 	if (argv.size() > 2) {
 		SetErrorDetail("Expected a path, please enclose in quotes if there are spaces in the path.");
 		return SetError(CLIError::kTooManyArgs);

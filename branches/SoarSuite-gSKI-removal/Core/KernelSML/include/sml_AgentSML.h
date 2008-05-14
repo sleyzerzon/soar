@@ -377,9 +377,8 @@ protected:
 class AgentRunCallback : public KernelCallback
 {
 	// This is the actual callback for the event
-	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void*)
 	{
-		unused(pCallData) ;
 		if (gSKIEVENT_AFTER_OUTPUT_PHASE == eventID) 	
 		{
 			pAgentSML->SetCompletedOutputPhase(true) ;

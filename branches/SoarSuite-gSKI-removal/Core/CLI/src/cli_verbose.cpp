@@ -22,7 +22,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseVerbose(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseVerbose(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'d', "disable",	0},
 		{'e', "enable",		0},
@@ -54,12 +54,12 @@ bool CommandLineInterface::ParseVerbose(gSKI::Agent* pAgent, std::vector<std::st
 
 	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
 
-	return DoVerbose(pAgent, query ? 0 : &setting);
+	return DoVerbose(query ? 0 : &setting);
 }
 
-bool CommandLineInterface::DoVerbose(gSKI::Agent* pAgent, bool* pSetting) {
+bool CommandLineInterface::DoVerbose(bool* pSetting) {
 
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;

@@ -24,7 +24,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseSaveBacktraces(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseSaveBacktraces(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'d', "disable",	0},
 		{'e', "enable",		0},
@@ -54,12 +54,12 @@ bool CommandLineInterface::ParseSaveBacktraces(gSKI::Agent* pAgent, std::vector<
 		}
 	}
 	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
-	return DoSaveBacktraces(pAgent, query ? 0 : &setting);
+	return DoSaveBacktraces(query ? 0 : &setting);
 }
 
-bool CommandLineInterface::DoSaveBacktraces(gSKI::Agent* pAgent, bool* pSetting) {
+bool CommandLineInterface::DoSaveBacktraces(bool* pSetting) {
 
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;

@@ -107,7 +107,7 @@ void InputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallD
 	} ;
 }
 
-void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int callbacktype)
+void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int )
 {
 	PendingInputList* pPending = pAgentSML->GetPendingInputList() ;
 

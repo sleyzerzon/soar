@@ -24,7 +24,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseRemoveWME(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseRemoveWME(std::vector<std::string>& argv) {
 	// Exactly one argument
 	if (argv.size() < 2) {
 		SetErrorDetail("Please supply a timetag.");
@@ -38,12 +38,12 @@ bool CommandLineInterface::ParseRemoveWME(gSKI::Agent* pAgent, std::vector<std::
 	int timetag = atoi(argv[1].c_str());
 	if (!timetag) return SetError(CLIError::kIntegerMustBePositive);
 
-	return DoRemoveWME(pAgent, timetag);
+	return DoRemoveWME(timetag);
 }
 
-bool CommandLineInterface::DoRemoveWME(gSKI::Agent* pAgent, int timetag) {
+bool CommandLineInterface::DoRemoveWME(int timetag) {
 	// Need agent pointer for function calls
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;

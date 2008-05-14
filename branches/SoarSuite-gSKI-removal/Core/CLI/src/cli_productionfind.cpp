@@ -21,7 +21,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseProductionFind(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseProductionFind(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'c', "chunks",			0},
 		{'l', "lhs",				0},
@@ -74,17 +74,17 @@ bool CommandLineInterface::ParseProductionFind(gSKI::Agent* pAgent, std::vector<
 	}
 	pattern = pattern.substr(0, pattern.length() - 1);
 
-	return DoProductionFind(pAgent, options, pattern);
+	return DoProductionFind(options, pattern);
 }
 
-bool CommandLineInterface::DoProductionFind(gSKI::Agent* pAgent, const ProductionFindBitset& options, const std::string& pattern) {
+bool CommandLineInterface::DoProductionFind(const ProductionFindBitset& options, const std::string& pattern) {
 	// Need agent pointer for function calls
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of damnation, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
-	AddListenerAndDisableCallbacks(pAgent);
+	AddListenerAndDisableCallbacks();
 
 	bool ret = pKernelHack->ProductionFind(m_pAgentSML, 
 		0, 
@@ -96,7 +96,7 @@ bool CommandLineInterface::DoProductionFind(gSKI::Agent* pAgent, const Productio
 		options.test(PRODUCTION_FIND_ONLY_CHUNKS),
 		options.test(PRODUCTION_FIND_NO_CHUNKS));
 	
-	RemoveListenerAndEnableCallbacks(pAgent);
+	RemoveListenerAndEnableCallbacks();
 
 	// put the result into a message(string) arg tag
 	if (!m_RawOutput) ResultToArgTag();

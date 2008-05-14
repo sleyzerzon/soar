@@ -21,7 +21,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseRun(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseRun(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'d', "decision",		0},
 		{'e', "elaboration",	0},
@@ -95,7 +95,7 @@ bool CommandLineInterface::ParseRun(gSKI::Agent* pAgent, std::vector<std::string
 		if (count < 0 || (count == 0 && specifiedType && !options.test(RUN_DECISION))) return SetError(CLIError::kIntegerMustBePositive);
 	} 
 
-	return DoRun(pAgent, options, count, interleaveMode);
+	return DoRun(options, count, interleaveMode);
 }
 
 eRunInterleaveMode CommandLineInterface::ParseRunInterleaveOptarg() {
@@ -114,8 +114,8 @@ eRunInterleaveMode CommandLineInterface::ParseRunInterleaveOptarg() {
 	return RUN_INTERLEAVE_DEFAULT;
 }
 
-bool CommandLineInterface::DoRun(gSKI::Agent* pAgent, const RunBitset& options, int count, eRunInterleaveMode interleaveIn) {
-	if (!RequireAgent(pAgent)) return false;
+bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterleaveMode interleaveIn) {
+	if (!RequireAgent()) return false;
 
 	// Default run type is forever
 	egSKIRunType runType = gSKI_RUN_FOREVER;
@@ -160,12 +160,11 @@ bool CommandLineInterface::DoRun(gSKI::Agent* pAgent, const RunBitset& options, 
 
 	if (options.test(RUN_SELF))
 	{
-		AgentSML* pAgentSML = m_pKernelSML->GetAgentSML(pAgent) ;
 		runFlags = (smlRunFlags)(runFlags | sml_RUN_SELF) ;
 
 		// Schedule just this one agent to run
 		pScheduler->ScheduleAllAgentsToRun(false) ;
-		pScheduler->ScheduleAgentToRun(pAgentSML, true) ;
+		pScheduler->ScheduleAgentToRun(m_pAgentSML, true) ;
 	}
 	else
 	{
@@ -279,7 +278,7 @@ bool CommandLineInterface::DoRun(gSKI::Agent* pAgent, const RunBitset& options, 
             // Do not print anything
 			// might be helpful if we checked agents to see if any halted...
 			// retval is gSKI_RUN_COMPLETED, but agent m_RunState == gSKI_RUNSTATE_HALTED
-			// should only check the agents pAgentSML->WasOnRunList()
+			// should only check the agents m_pAgentSML->WasOnRunList()
 			if (pScheduler->AnAgentHaltedDuringRun())
 			{
 				if (m_RawOutput) {

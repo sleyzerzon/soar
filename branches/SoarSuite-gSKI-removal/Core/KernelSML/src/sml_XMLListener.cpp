@@ -20,6 +20,7 @@
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
+#include "sml_KernelHelpers.h"
 
 #include "assert.h"
 
@@ -72,13 +73,28 @@ bool XMLListener::RemoveListener(egSKIXMLEventId eventID, Connection* pConnectio
 	return last ;
 }
 
-void XMLListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+void XMLListener::OnKernelEvent(int eventID, AgentSML*, void* pCallDataIn)
 {
+	// If the print callbacks have been disabled, then don't forward this message
+	// on to the clients.  This allows us to use the print callback within the kernel to
+	// retrieve information without it appearing in the trace.  (One day we won't need to do this enable/disable game).
+	if (!m_EnablePrintCallback)
+		return ;
+
+	int nBuffer = eventID - gSKIEVENT_XML_TRACE_OUTPUT ;
+	assert(nBuffer >= 0 && nBuffer < kNumberEvents) ;
+
+	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
+	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
+
+	pKernelHack->XmlCallbackHelper( &m_BufferedXMLOutput[nBuffer], pCallDataIn );
 }
 
 // Called when a "PrintEvent" occurs in the kernel
 void XMLListener::HandleEvent(egSKIXMLEventId eventId, gSKI::Agent* agentPtr, const char* funcType, const char* attOrTag, const char* value)
 {
+	assert(false); // shouldn't be using this function anymore
+
 	// We're assuming this is correct in the flush output function, so we should check it here
 	assert(agentPtr == m_pAgent);
     unused(agentPtr); // quell warning on VS.NET for release builds

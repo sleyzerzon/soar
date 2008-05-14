@@ -1421,7 +1421,7 @@ bool KernelSML::HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName,
 
 	// Make the call.
 	m_CommandLineInterface.SetRawOutput(rawOutput);
-	bool result = m_CommandLineInterface.DoCommand(pConnection, pAgent, pFilteredLine, echoResults, pResponse) ;
+	bool result = m_CommandLineInterface.DoCommand(pConnection, pAgentSML, pFilteredLine, echoResults, pResponse) ;
 
 	if (kDebugCommandLine)
 		sml::PrintDebugFormat("Completed %s", pLine) ;

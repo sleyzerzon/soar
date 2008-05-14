@@ -74,7 +74,7 @@ enum egSKIAgentEvents
    /* NOT Deprecated.  gSKI not close to removing this yet.  */
    gSKI_K_EVENT_PRINT_CALLBACK,           /* Data: agent* & const char*     */   // DONE!
 
-   gSKI_K_EVENT_XML_OUTPUT,        /* Data: agent* & const char* & const char* & const char*    */ 
+   gSKI_K_EVENT_XML_OUTPUT,        /* Data: agent* & const char* & const char* & const char*    */ // DONE! ?
 
    /* Must be the last value in this enumeration */
    gSKI_K_MAX_AGENT_EVENTS                
@@ -173,17 +173,17 @@ typedef struct gSKI_K_PhaseCallbackData_struct {
 
 } gSKI_K_PhaseCallbackData;
 
-typedef struct gSKI_K_XMLCallbackData_struct {
-
-   /** Current XML function type (i.e. addTag, endTag, addAttributeValuePair */
-   const char*                  funcType;
-
-   /** Current elaboration cycle number */
-   const char*                  attOrTag;
-
-   /** Number of elaborations this cycle */
-   const char*                  value;
-
-} gSKI_K_XMLCallbackData;
-
+//typedef struct gSKI_K_XMLCallbackData_struct {
+//
+//   /** Current XML function type (i.e. addTag, endTag, addAttributeValuePair */
+//   const char*                  funcType;
+//
+//   /** Current elaboration cycle number */
+//   const char*                  attOrTag;
+//
+//   /** Number of elaborations this cycle */
+//   const char*                  value;
+//
+//} gSKI_K_XMLCallbackData;
+//
 #endif

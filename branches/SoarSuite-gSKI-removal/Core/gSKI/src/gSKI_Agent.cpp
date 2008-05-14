@@ -1481,13 +1481,15 @@ void Agent::IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize)
                                             agent*                soarAgent, 
                                             void*                 data)
    {
-	  Agent* a = static_cast<Agent*>(object);
-      gSKI_K_XMLCallbackData* xml_data = static_cast<gSKI_K_XMLCallbackData*>(data);
+	   assert(false); // should not be used
 
-      // We have to change the the event id from a kernel id to a gSKI id
+	  //Agent* a = static_cast<Agent*>(object);
+   //   gSKI_K_XMLCallbackData* xml_data = static_cast<gSKI_K_XMLCallbackData*>(data);
 
-	  XMLNotifier xn(a, xml_data->funcType, xml_data->attOrTag, xml_data->value);
-      a->m_XMLListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_XMLEventId(eventId), xn);
+   //   // We have to change the the event id from a kernel id to a gSKI id
+
+	  //XMLNotifier xn(a, xml_data->funcType, xml_data->attOrTag, xml_data->value);
+   //   a->m_XMLListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_XMLEventId(eventId), xn);
    }
 
 

@@ -24,7 +24,7 @@
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseChunkNameFormat(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
+bool CommandLineInterface::ParseChunkNameFormat(std::vector<std::string>& argv) {
 	Options optionsData[] = {
 		{'c', "count",		2},
 		{'l', "long",		0},
@@ -74,12 +74,12 @@ bool CommandLineInterface::ParseChunkNameFormat(gSKI::Agent* pAgent, std::vector
 
 	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
 
-	return DoChunkNameFormat(pAgent, changeFormat ? &longFormat : 0, countFlag ? &count : 0, patternFlag ? &pattern : 0);
+	return DoChunkNameFormat(changeFormat ? &longFormat : 0, countFlag ? &count : 0, patternFlag ? &pattern : 0);
 }
 
-bool CommandLineInterface::DoChunkNameFormat(gSKI::Agent* pAgent, const bool* pLongFormat, const int* pCount, const std::string* pPrefix) {
+bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int* pCount, const std::string* pPrefix) {
 	// Need agent pointer for function calls
-	if (!RequireAgent(pAgent)) return false;
+	if (!RequireAgent()) return false;
 
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;

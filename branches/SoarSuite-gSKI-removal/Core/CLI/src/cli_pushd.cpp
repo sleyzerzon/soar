@@ -15,9 +15,7 @@
 
 using namespace cli;
 
-bool CommandLineInterface::ParsePushD(gSKI::Agent* pAgent, std::vector<std::string>& argv) {
-	unused(pAgent);
-
+bool CommandLineInterface::ParsePushD(std::vector<std::string>& argv) {
 	// Only takes one argument, the directory to change into
 	if (argv.size() < 2) {
 		SetErrorDetail("Expected directory to change to.");

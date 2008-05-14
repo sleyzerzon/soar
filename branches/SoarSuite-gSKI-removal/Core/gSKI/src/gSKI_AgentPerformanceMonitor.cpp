@@ -22,7 +22,7 @@ using namespace gSKI;
 // a hack so I don't have to rewrite all the current_agent code below...
 #define current_agent(x) a->x
 
-namespace {
+//namespace {
 
    bool string_match_up_to (const char * string1, 
                             const char * string2, 
@@ -108,7 +108,7 @@ double soar_cDetermineTimerResolution( double *min, double *max) {
       oss << v;
       return oss.str();
    }
-}
+//}
 
 
 AgentPerformanceMonitor::AgentPerformanceMonitor(Agent* pAgent) :
