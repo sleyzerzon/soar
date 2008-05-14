@@ -20,7 +20,7 @@ namespace cli {
 	public:
 		enum {
 			kNoError							= 0,
-			kgSKIError							= 2,
+			//kgSKIError							= 2,
 			kGetOptError						= 3,
 			kCommandNotImplemented				= 4,
 			kProductionNotFound					= 5,
@@ -108,7 +108,7 @@ namespace cli {
 		static char const* GetErrorDescription(ErrorCode code) {
 			switch (code) {
 				case kNoError:							return "No Error.";
-				case kgSKIError:						return "gSKI error.";
+				//case kgSKIError:						return "gSKI error.";
 				case kGetOptError:						return "GetOpt returned with an error.";
 				case kCommandNotImplemented:			return "Command not implemented.";
 				case kProductionNotFound:				return "Production not found.";

@@ -16,8 +16,6 @@
 #include "sml_Names.h"
 #include "sml_StringOps.h"
 
-#include "IgSKI_WorkingMemory.h"
-#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 #include "sml_KernelHelpers.h"
 

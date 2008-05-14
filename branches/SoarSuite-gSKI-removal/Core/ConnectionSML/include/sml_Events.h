@@ -230,7 +230,8 @@ static inline bool IsUpdateEventID(int id)
 	return (id >= smlEVENT_AFTER_ALL_OUTPUT_PHASES && id <= smlEVENT_LAST_UPDATE_EVENT) ;
 }
 
-typedef enum {
+enum smlPhase 
+{
     sml_INPUT_PHASE,		// NOTE: This enum MUST be kept in synch with egSKIPhaseType defined in gSKI_Enumerations.h
     sml_PROPOSAL_PHASE,
     sml_DECISION_PHASE,
@@ -238,47 +239,49 @@ typedef enum {
     sml_OUTPUT_PHASE,
 	sml_PREFERENCE_PHASE,	// Soar 7 mode only
 	sml_WM_PHASE			// Soar 7 mode only
-} smlPhase;
+};
 
-typedef enum
+enum smlRunStepSize
 {
 	sml_ELABORATION,
 	sml_PHASE,
 	sml_DECISION,
 	sml_UNTIL_OUTPUT
-} smlRunStepSize ;
+};
 
-typedef enum
+enum smlInterleaveStepSize
 {
 	sml_INTERLEAVE_ELABORATION,
 	sml_INTERLEAVE_PHASE,
 	sml_INTERLEAVE_DECISION,
 	sml_INTERLEAVE_UNTIL_OUTPUT
-} smlInterleaveStepSize ;
+};
 
-typedef enum
+enum smlRunFlags
 {
 	sml_NONE				=  0,		// No special flags set
 	sml_RUN_SELF			=  1 << 0,	// User included --self flag when running agent
 	sml_RUN_ALL				=  1 << 1,	// User ran all agents
 	sml_UPDATE_WORLD		=  1 << 2,	// User explicitly requested world to update
 	sml_DONT_UPDATE_WORLD	=  1 << 3	// User explicitly requested world to not update
-} smlRunFlags ;
+};
 
-typedef enum {
+enum smlRunResult
+{
     sml_RUN_ERROR,
     sml_RUN_EXECUTING,
     sml_RUN_INTERRUPTED,
     sml_RUN_COMPLETED,
     sml_RUN_COMPLETED_AND_INTERRUPTED	// Stop was requested but run completed before agent was interrupted.
-} smlRunResult;
+};
 
-typedef enum {
+enum smlRunState
+{
   sml_RUNSTATE_STOPPED,
   sml_RUNSTATE_INTERRUPTED,
   sml_RUNSTATE_RUNNING,
   sml_RUNSTATE_HALTED
-} smlRunState;
+};
 
 /////////////////////////////////////////////////////////////////
 // Map event ids to and from strings

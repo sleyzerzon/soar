@@ -113,7 +113,7 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	m_pIKernel = m_pKernelFactory->Create();
 
 	// Give the command line interface a reference to the kernel interface
-	m_CommandLineInterface.SetKernel(m_pIKernel, m_pKernelFactory->GetKernelVersion(), this);
+	m_CommandLineInterface.SetKernel(this);
 
 	// Create the map from command name to handler function
 	BuildCommandMap() ; 
@@ -610,13 +610,13 @@ Agent* KernelSML::GetAgent(char const* pAgentName)
 *			E.g. Pass input phase to stop just after generating output and before receiving input.
 *			This is a setting which modifies the future behavior of "run <n> --decisions" commands.
 *************************************************************/	
-void KernelSML::SetStopBefore(egSKIPhaseType phase)
+void KernelSML::SetStopBefore(smlPhase phase)
 {
 	m_pRunScheduler->SetStopBefore(phase) ;
 	this->FireSystemEvent(gSKIEVENT_SYSTEM_PROPERTY_CHANGED) ;
 }
 
-egSKIPhaseType KernelSML::GetStopBefore()
+smlPhase KernelSML::GetStopBefore()
 {
 	return m_pRunScheduler->GetStopBefore() ;
 }
@@ -624,14 +624,14 @@ egSKIPhaseType KernelSML::GetStopBefore()
 /*************************************************************
 * @brief	Request that all agents stop soon
 *************************************************************/	
-bool KernelSML::InterruptAllAgents(egSKIStopLocation stopLoc, gSKI::Error* pError)
+bool KernelSML::InterruptAllAgents(egSKIStopLocation stopLoc)
 {
 	bool result = true ;
 
 	for (AgentMapIter iter = m_AgentMap.begin() ; iter != m_AgentMap.end() ; iter++)
 	{
 		AgentSML* pAgentSML = iter->second ;
-		result = pAgentSML->Interrupt(stopLoc, pError) && result ;
+		result = pAgentSML->Interrupt(stopLoc) && result ;
 	}
 
 	return result ;
@@ -1007,7 +1007,7 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
 
 	// Do the run
-	egSKIRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, NULL) ;
+	smlRunResult runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart) ;
 
 	unused(runResult) ;
 

@@ -12,7 +12,6 @@
 #include "cli_CommandLineInterface.h"
 
 #include "cli_Commands.h"
-#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 #include "sml_KernelHelpers.h"
 

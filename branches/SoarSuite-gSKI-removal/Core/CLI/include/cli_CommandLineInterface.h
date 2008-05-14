@@ -27,10 +27,6 @@
 #include "cli_Aliases.h"
 #include "cli_CLIError.h"
 
-// gSKI includes
-#include "gSKI_Events.h"
-#include "gSKI_Structures.h"
-
 #include "sml_KernelCallback.h"
 
 // For test
@@ -43,17 +39,13 @@
 typedef struct agent_struct agent;
 typedef struct production_struct production;
 
-namespace gSKI {
-	class Agent;
-	class Kernel;
-	class ProductionManager;
-}
 namespace sml {
 	class ElementXML;
 	class KernelSML;
 	class Connection ;
 	class AgentSML;
 	class XMLTrace;
+	enum smlPhase;
 }
 
 namespace cli {
@@ -111,11 +103,9 @@ public:
 	*		 Also has the side effect of setting the home directory to
 	*		 the location of SoarKernelSML, because the kernel is required
 	*		 to get that directory.
-	* @param pKernel The pointer to the gSKI kernel interface
-	* @param kernelVersion The gSKI version, available from the KernelFactory
 	* @param pKernelSML The pointer to the KernelSML object, optional, used to disable print callbacks
 	*************************************************************/
-	EXPORT void SetKernel(gSKI::Kernel* pKernel, gSKI::Version kernelVersion, sml::KernelSML* pKernelSML = 0);
+	EXPORT void SetKernel(sml::KernelSML* pKernelSML = 0);
 
 	/*************************************************************
 	* @brief Set the output style to raw or structured.
@@ -125,9 +115,9 @@ public:
 
 	/*************************************************************
 	* @brief Process a command.  Give it a command line and it will parse
-	*		 and execute the command using gSKI or system calls.
+	*		 and execute the command using system calls.
 	* @param pConnection The connection, for communication to the client
-	* @param pAgent The pointer to the gSKI agent interface
+	* @param pAgent The pointer to the agent interface
 	* @param pCommandLine The command line string, arguments separated by spaces
 	* @param echoResults If true send a copy of the result to the echo event
 	* @param pResponse Pointer to XML response object
@@ -252,7 +242,6 @@ protected:
 
 	/*************************************************************
 	* @brief add-wme command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param id Id string for the new wme
 	* @param attribute Attribute string for the new wme
 	* @param value Value string for the new wme
@@ -285,7 +274,6 @@ protected:
 
 	/*************************************************************
 	* @brief chunk-name-format command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pLongFormat Pointer to the new format type, true for long format, false 
 	*        for short format, 0 (null) for query or no change
 	* @param pCount Pointer to the new counter, non negative integer, 0 (null) for query
@@ -296,7 +284,6 @@ protected:
 
 	/*************************************************************
 	* @brief clog command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param mode The mode for the log command, see cli_CommandData.h
 	* @param pFilename The log filename, pass 0 (null) if not applicable to mode
 	* @param pToAdd The string to add to the log, pass 0 (null) if not applicable to mode
@@ -306,7 +293,6 @@ protected:
 
 	/*************************************************************
 	* @brief default-wme-depth command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pDepth The pointer to the new wme depth, a positive integer.  
 	*        Pass 0 (null) pointer for query.
 	*************************************************************/
@@ -339,7 +325,6 @@ protected:
 
 	/*************************************************************
 	* @brief excise command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options The various options set on the command line, see 
 	*        cli_CommandData.h
 	* @param pProduction A production to excise, optional
@@ -348,7 +333,6 @@ protected:
 
 	/*************************************************************
 	* @brief explain-backtraces command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pProduction Pointer to involved production. Pass 0 (null) for 
 	*        query
 	* @param condition A number representing the condition number to explain, 
@@ -359,7 +343,6 @@ protected:
 
 	/*************************************************************
 	* @brief firing-counts command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param numberToList The number of top-firing productions to list.  
 	*        Use 0 to list those that haven't fired. -1 lists all
 	* @param pProduction The specific production to list, pass 0 (null) to list 
@@ -369,7 +352,6 @@ protected:
 
 	/*************************************************************
 	* @brief gds-print command
-	* @param pAgent The pointer to the gSKI agent interface
 	*************************************************************/
 	bool DoGDSPrint();
 
@@ -381,7 +363,6 @@ protected:
 
 	/*************************************************************
 	* @brief indifferent-selection command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param mode What mode to set indifferent selection to, or query.  
 	*        See eIndifferentMode
 	*************************************************************/
@@ -389,26 +370,22 @@ protected:
 
 	/*************************************************************
 	* @brief init-soar command
-	* @param pAgent The pointer to the gSKI agent interface
 	*************************************************************/
 	bool DoInitSoar();
 
 	/*************************************************************
 	* @brief input-period command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pPeriod Pointer to the period argument, null for query
 	*************************************************************/
 	bool DoInputPeriod(int* pPeriod = 0);
 
 	/*************************************************************
 	* @brief internal-symbols command
-	* @param pAgent The pointer to the gSKI agent interface
 	*************************************************************/
 	bool DoInternalSymbols();
 
 	/*************************************************************
 	* @brief learn command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options The various options set on the command line, 
 	*        see cli_CommandData.h
 	*************************************************************/
@@ -428,7 +405,6 @@ protected:
 
 	/*************************************************************
 	* @brief matches command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param mode The mode for the command, see cli_CommandData.h
 	* @param detail The WME detail, see cli_CommandData.h
 	* @param pProduction The production, pass 0 (null) if not applicable to mode
@@ -437,35 +413,30 @@ protected:
 
 	/*************************************************************
 	* @brief max-chunks command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param n The new max chunks value, use 0 to query
 	*************************************************************/
 	bool DoMaxChunks(const int n = 0);
 
 	/*************************************************************
 	* @brief max-elaborations command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param n The new max elaborations value, use 0 to query
 	*************************************************************/
 	bool DoMaxElaborations(const int n = 0);
 
 	/*************************************************************
 	* @brief max-memory-usage command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param n The new memory usage value, in bytes
 	*************************************************************/
 	bool DoMaxMemoryUsage(const int n = 0);
 
 	/*************************************************************
 	* @brief max-nil-output-cycles command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param n The new max nil output cycles value, use 0 to query
 	*************************************************************/
 	bool DoMaxNilOutputCycles(const int n);
 
 	/*************************************************************
 	* @brief memories command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options Options for the memories flag, see cli_CommandData.h
 	* @param n number of productions to print sorted by most memory use, use 0 for all
 	* @param pProduction specific production to print, ignored if any 
@@ -475,7 +446,6 @@ protected:
 
 	/*************************************************************
 	* @brief multi-attributes command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pAttribute The attribute, pass 0 (null) for query
 	* @param n The count, pass 0 (null) for query if pAttribute is also null, 
 	*        otherwise this will default to 10
@@ -484,14 +454,12 @@ protected:
 
 	/*************************************************************
 	* @brief numeric-indifferent mode command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param mode The mode for this command, see cli_CommandData.h
 	*************************************************************/
 	bool DoNumericIndifferentMode(const eNumericIndifferentMode mode);
 
 	/*************************************************************
 	* @brief o-support-mode command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param mode The new o-support mode.  Use -1 to query.
 	*************************************************************/
 	bool DoOSupportMode(int mode = -1);
@@ -503,7 +471,6 @@ protected:
 
 	/*************************************************************
 	* @brief preferences command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param detail The preferences detail level, see cli_CommandData.h
 	* @param pId An existing soar identifier or 0 (null)
 	* @param pAttribute An existing soar attribute of the specified identifier or 0 (null)
@@ -512,7 +479,6 @@ protected:
 
 	/*************************************************************
 	* @brief print command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options The options to the print command, see cli_CommandData.h
 	* @param depth WME depth
 	* @param pArg The identifier/timetag/pattern/production name to print, 
@@ -522,7 +488,6 @@ protected:
 
 	/*************************************************************
 	* @brief production-find command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options The options to the command, see cli_CommandData.h
 	* @param pattern Any pattern that can appear in productions.
 	*************************************************************/
@@ -536,7 +501,6 @@ protected:
 
 	/*************************************************************
 	* @brief pwatch command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param query Pass true to query, all other args ignored
 	* @param pProduction The production to watch or stop watching, pass 0 (null) 
 	*        to disable watching of all productions (setting ignored)
@@ -556,14 +520,12 @@ protected:
 
 	/*************************************************************
 	* @brief remove-wme command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param timetag The timetag of the wme to remove
 	*************************************************************/
 	bool DoRemoveWME(int timetag);
 
 	/*************************************************************
 	* @brief rete-net command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param save true to save, false to load
 	* @param filename the rete-net file
 	*************************************************************/
@@ -571,7 +533,6 @@ protected:
 
 	/*************************************************************
 	* @brief run command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options Options for the run command, see cli_CommandData.h
 	* @param count The count, units or applicability depends on options
 	* @param interleave Support for round robin execution across agents 
@@ -581,7 +542,6 @@ protected:
 
 	/*************************************************************
 	* @brief save-backtraces command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param setting The new setting, pass 0 (null) for query
 	*************************************************************/
 	bool DoSaveBacktraces(bool* pSetting = 0);
@@ -598,7 +558,7 @@ protected:
 	* @param before
 	* @param phase
 	*************************************************************/
-	bool DoSetStopPhase(bool setPhase, bool before, egSKIPhaseType phase);
+	bool DoSetStopPhase(bool setPhase, bool before, sml::smlPhase phase);
 
 	/*************************************************************
 	* @brief soar8 command
@@ -613,14 +573,12 @@ protected:
 
 	/*************************************************************
 	* @brief source command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param filename The file to source
 	*************************************************************/
 	bool DoSource(std::string filename);
 
 	/*************************************************************
 	* @brief sp command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param production The production to add to working memory
 	*************************************************************/
 	bool DoSP(const std::string& production);
@@ -634,14 +592,12 @@ protected:
 
 	/*************************************************************
 	* @brief stats command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options The options for the stats command, see cli_CommandData.h
 	*************************************************************/
 	bool DoStats(const StatsBitset& options);
 
 	/*************************************************************
 	* @brief stop-soar command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param self Stop the only pAgent (false means stop all agents in kernel)
 	* @param reasonForStopping optional reason for stopping
 	*************************************************************/
@@ -649,14 +605,12 @@ protected:
 
 	/*************************************************************
 	* @brief time command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param argv The command line with the time arg removed
 	*************************************************************/
 	bool DoTime(std::vector<std::string>& argv);
 
 	/*************************************************************
 	* @brief timers command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pSetting The timers setting, true to turn on, false to turn off, 
 	*        pass 0 (null) to query
 	*************************************************************/
@@ -664,7 +618,6 @@ protected:
 
 	/*************************************************************
 	* @brief verbose command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pSetting The verbose setting, true to turn on, false to turn off, 
 	*        pass 0 (null) to query
 	*************************************************************/
@@ -677,7 +630,6 @@ protected:
 
 	/*************************************************************
 	* @brief waitsnc command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pSetting The waitsnc setting, true to turn on, false to turn off, 
 	*        pass 0 (null) to query
 	*************************************************************/
@@ -685,7 +637,6 @@ protected:
 
 	/*************************************************************
 	* @brief warnings command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param pSetting The warnings setting, true to turn on, false to turn off, 
 	*        pass 0 (null) to query
 	*************************************************************/
@@ -693,7 +644,6 @@ protected:
 
 	/*************************************************************
 	* @brief watch command
-	* @param pAgent The pointer to the gSKI agent interface
 	* @param options Options for the watch command, see cli_CommandData.h
 	* @param settings Settings for the watch command, if a flag (option) is set, its 
 	*        setting is set using this (true/on or false/off)
@@ -704,18 +654,9 @@ protected:
 
 	/*************************************************************
 	* @brief watch-wmes command
-	* @param pAgent The pointer to the gSKI agent interface
 	*************************************************************/
 	bool DoWatchWMEs(const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
 
-	// Print callback events go here
-	//virtual void HandleEvent(egSKIPrintEventId, sml::AgentSML*, const char* msg);
-
-	// XML callback events go here
-	//virtual void HandleEvent(egSKIXMLEventId eventId, gSKI::Agent* agentPtr, const char* funcType, const char* attOrTag, const char* value);
-
-	// Production callback events go here
-	//virtual void HandleEvent(egSKIProductionEventId eventId, sml::AgentSML* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match);
 	virtual void OnKernelEvent(int eventID, sml::AgentSML* pAgentSML, void* pCallData) ;
 
 	// Wrapped to handle errors more easily
@@ -856,7 +797,6 @@ protected:
 	int					m_SourceDirDepth;		// Depth of directory stack since source command, used to return to the dir that source was issued in.
 	cli::ErrorCode		m_LastError;			// Last error code (see cli_CLIError.h)
 	std::string			m_LastErrorDetail;		// Additional detail concerning the last error
-	gSKI::Error			m_gSKIError;			// gSKI error output from calls made to process the command
 	bool				m_PrintEventToResult;	// True when print events should append message to result
 	bool				m_XMLEventToResult;		// True when xml events should append message to result
 	sml::XMLTrace*		m_XMLEventTag;			// Used to collect up the xml events
@@ -867,11 +807,9 @@ protected:
 
 	Aliases				m_Aliases;				// Alias management object
 	CommandMap			m_CommandMap;			// Mapping of command names to function pointers
-	gSKI::Kernel*		m_pKernel;				// Pointer to the current gSKI kernel
 	sml::KernelSML*		m_pKernelSML;
 	sml::AgentSML*		m_pAgentSML;			// Agent we're currently working with
 	agent*				m_pAgentSoar;			// Agent we're currently working with (soar kernel)
-	gSKI::Version		m_KernelVersion;		// Kernel version number
 	std::string			m_LibraryDirectory;		// The library directory, server side, see help command
 	StringStack			m_DirectoryStack;		// Directory stack for pushd/popd
 	std::string			m_LogFilename;			// Used for logging to a file.

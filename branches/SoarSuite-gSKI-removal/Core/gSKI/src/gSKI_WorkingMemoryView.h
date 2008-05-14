@@ -37,7 +37,7 @@ namespace gSKI {
      *
      */
     // TODO: Comment this constructor appropriately
-    WorkingMemoryView(Agent* agent) {}
+    WorkingMemoryView(Agent* /*agent*/) {}
 
       /**
        * @brief Virtual Destructor

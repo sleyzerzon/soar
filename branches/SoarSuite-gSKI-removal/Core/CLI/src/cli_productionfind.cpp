@@ -14,7 +14,6 @@
 #include "cli_Commands.h"
 #include "sml_Names.h"
 
-#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 #include "sml_KernelHelpers.h"
 

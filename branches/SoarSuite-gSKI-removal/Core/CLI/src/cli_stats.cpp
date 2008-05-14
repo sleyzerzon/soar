@@ -353,10 +353,6 @@ void CommandLineInterface::GetSystemStats()
 	m_Result << "    *** single kernel timer.  Differences between this value    ***\n";
 	m_Result << "    *** and the computed total kernel time  are expected. See   ***\n";
 	m_Result << "    *** help  for the  stats command  for more  information.    ***\n";
-	m_Result << "    *** The format fields for the timers are 8.3f, limiting     ***\n";
-	m_Result << "    *** printable values to a maximum of approximately 2.5 hrs. ***\n";
-	m_Result << "    *** See gSKI_AgentPerformanceMonitor.cpp to change the      ***\n";
-	m_Result << "    *** fieldwidths of the timers for runtime data > 2 hrs      ***\n";
 
 	m_Result << std::resetiosflags( std::ios_base::fixed );
 	m_Result.precision( oldPrecision );

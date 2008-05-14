@@ -45,7 +45,7 @@ protected:
 	bool		m_AllGeneratedOutputEventFired ;
 
 	// When running by decision stop before this phase runs.
-	egSKIPhaseType m_StopBeforePhase ;
+	smlPhase m_StopBeforePhase ;
 
 	// When running multiple agents, we synchronize them to this agent (same phase) before starting the real run.
 	AgentSML*	m_pSynchAgentSML ;
@@ -96,7 +96,7 @@ public:
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
+	smlRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIRunType interleaveStepSize, bool synchronize) ;
 
 	/*************************************************************
 	* @brief	Run all agents previously marked as being scheduled to run.
@@ -111,7 +111,7 @@ public:
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	egSKIRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIInterleaveType interleaveStepSize, bool synchronize, gSKI::Error* pError) ;
+	smlRunResult RunScheduledAgents(egSKIRunType runStepSize, unsigned long count, smlRunFlags runFlags, egSKIInterleaveType interleaveStepSize, bool synchronize) ;
 
 	/*************************************************************
 	* @brief	Returns true if at least one agent is currently running.
@@ -128,8 +128,8 @@ public:
 	*			E.g. Pass input phase to stop just after generating output and before receiving input.
 	*			This is a setting which modifies the future behavior of "run <n> --decisions" commands.
 	**********************************************************************/	
-	void SetStopBefore(egSKIPhaseType phase)	{ m_StopBeforePhase = phase ; }
-	egSKIPhaseType GetStopBefore()				{ return m_StopBeforePhase ; }
+	void SetStopBefore(smlPhase phase)	{ m_StopBeforePhase = phase ; }
+	smlPhase GetStopBefore()				{ return m_StopBeforePhase ; }
 
 protected:
 	bool            AgentsStillStepping() ;
@@ -140,7 +140,7 @@ protected:
 	void			FireBeforeRunStartsEvents() ;
 	//unsigned long	GetStepCounter(gSKI::Agent* pAgent, egSKIRunType runStepSize) ; //for old scheduler...
     //unsigned long   GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgentSML, egSKIInterleaveType stepSize) ;
-    egSKIRunResult  GetOverallRunResult() ;
+    smlRunResult  GetOverallRunResult() ;
 	//void			HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase) ;
 	bool			HaveAllGeneratedOutput() ;
 	void            InitializeRunCounters(egSKIRunType runStepSize) ;

@@ -524,7 +524,7 @@ bool KernelSML::HandleGetResultOfLastRun(gSKI::Agent* pAgent, char const* pComma
 {
 	unused(pCommandName) ; unused(pIncoming) ; unused(pError) ;
 
-	egSKIRunResult runResult = GetAgentSML(pAgent)->GetResultOfLastRun() ;
+	smlRunResult runResult = GetAgentSML(pAgent)->GetResultOfLastRun() ;
 	return this->ReturnIntResult(pConnection, pResponse, runResult) ;
 }
 

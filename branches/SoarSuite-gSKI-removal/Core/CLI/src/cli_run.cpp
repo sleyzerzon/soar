@@ -144,7 +144,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 		count = 1 ;
 	}
 
-	egSKIRunResult runResult ;
+	smlRunResult runResult ;
 
 	// NOTE: We use a scheduler implemented in kernelSML rather than
 	// the gSKI scheduler implemented by AgentManager.  This gives us
@@ -205,14 +205,18 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	{
 		// If the entire system is running by elaboration cycles, then we need to run each agent by elaboration cycles (they're usually
 		// smaller than a phase).
-		case gSKI_RUN_ELABORATION_CYCLE: interleaveStepSize = gSKI_RUN_ELABORATION_CYCLE ; break ;
+		case gSKI_RUN_ELABORATION_CYCLE: 
+			interleaveStepSize = gSKI_RUN_ELABORATION_CYCLE ; 
+			break ;
 
 		// If we're running the system to output we want to run each agent until it generates output.  This can be many decisions.
 		// The reason is actually to do with stopping the agent after n decisions (default 15) if no output occurs.
 		// DJP -- We need to rethink this design so using phase interleaving until we do.
 		// case gSKI_RUN_UNTIL_OUTPUT: interleaveStepSize = gSKI_RUN_UNTIL_OUTPUT ; break ;
 
-		default: interleaveStepSize = gSKI_RUN_PHASE ; break ;
+		default: 
+			interleaveStepSize = gSKI_RUN_PHASE ; 
+			break ;
 	}
 
 #ifdef USE_NEW_SCHEDULER
@@ -228,26 +232,31 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 
 	// Do the run
 #ifdef USE_OLD_SCHEDULER
-	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart, &m_gSKIError) ;
+	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart) ;
 #endif
 #ifdef USE_NEW_SCHEDULER
-	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleave, synchronizeAtStart, &m_gSKIError) ;
+	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleave, synchronizeAtStart) ;
 #endif
 
 	// Check for error
-	if (runResult == gSKI_RUN_ERROR) {
-        if (m_gSKIError.Id == gSKI::gSKIERR_AGENT_RUNNING) {
-            return SetError(CLIError::kAlreadyRunning);
-        } else if (gSKI::isError(m_gSKIError)) {
-		    return SetError(CLIError::kgSKIError);
-	    }
+	if (runResult == sml_RUN_ERROR) {
+		// FIXME: report extended run error
+     //   if (m_gSKIError.Id == gSKI::gSKIERR_AGENT_RUNNING) {
+     //       return SetError(CLIError::kAlreadyRunning);
+     //   } else if (gSKI::isError(m_gSKIError)) {
+		   // return SetError(CLIError::kgSKIError);
+	    //}
         return SetError(CLIError::kRunFailed);
 	}
 
 
 	char buf[kMinBufferSize];
 	switch (runResult) {
-		case gSKI_RUN_EXECUTING:
+		case sml_RUN_ERROR:
+			return SetError(CLIError::kRunFailed);
+			break;
+
+		case sml_RUN_EXECUTING:
 			if (m_RawOutput) {
 				// NOTE: I don't think this is currently possible
 				m_Result << "\nRun stopped (still executing).";
@@ -256,9 +265,9 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 			}
 			break;
 
-		case gSKI_RUN_COMPLETED_AND_INTERRUPTED:					// an interrupt was requested, but the run completed first
+		case sml_RUN_COMPLETED_AND_INTERRUPTED:					// an interrupt was requested, but the run completed first
 			// falls through
-		case gSKI_RUN_INTERRUPTED:
+		case sml_RUN_INTERRUPTED:
 			if (m_RawOutput) {
 				m_Result << "\nRun stopped (interrupted).";
 			} else {
@@ -274,7 +283,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 			}
 			break;
 
-		case gSKI_RUN_COMPLETED:
+		case sml_RUN_COMPLETED:
             // Do not print anything
 			// might be helpful if we checked agents to see if any halted...
 			// retval is gSKI_RUN_COMPLETED, but agent m_RunState == gSKI_RUNSTATE_HALTED
@@ -290,7 +299,8 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 			break;
 
 		default:
-			return SetError(CLIError::kgSKIError);
+			assert(false);
+			return SetError(CLIError::kRunFailed);
 	}
 	return true;
 }

@@ -16,9 +16,7 @@
 #include "cli_Commands.h"
 #include "sml_StringOps.h"
 #include "sml_Names.h"
-
-#include "gSKI_ProductionManager.h"
-#include "IgSKI_Production.h"
+#include "sml_Events.h"
 
 #include <assert.h>
 
@@ -138,8 +136,6 @@ bool CommandLineInterface::DoSource(std::string filename) {
 	static int numTotalProductionsSourced;
 	static int numTotalProductionsExcised;
 
-	//gSKI::ProductionManager* pProductionManager = m_pAgentSML->GetProductionManager();
-
 	if (m_SourceDepth == 0) {				// Check for top-level source call
 		m_SourceDirDepth = 0;				// Set directory depth to zero on first call to source, even though it should be zero anyway
 
@@ -149,8 +145,7 @@ bool CommandLineInterface::DoSource(std::string filename) {
 		numTotalProductionsExcised = 0;
 
 		// Register for production removed events so we can report the number of excised productions
-		this->RegisterWithKernel(gSKIEVENT_BEFORE_PRODUCTION_REMOVED) ;
-		//pProductionManager->AddProductionListener(gSKIEVENT_BEFORE_PRODUCTION_REMOVED, this);
+		this->RegisterWithKernel(smlEVENT_BEFORE_PRODUCTION_REMOVED) ;
 	}
 	++m_SourceDepth;
 
@@ -352,8 +347,7 @@ bool CommandLineInterface::DoSource(std::string filename) {
 	if (!m_SourceDepth) {
 		
 		// Remove production listener
-		this->UnregisterWithKernel(gSKIEVENT_BEFORE_PRODUCTION_REMOVED) ;
-		//pProductionManager->RemoveProductionListener(gSKIEVENT_BEFORE_PRODUCTION_REMOVED, this);
+		this->UnregisterWithKernel(smlEVENT_BEFORE_PRODUCTION_REMOVED) ;
 
 		if (m_RawOutput) {
 			if (m_SourceMode != SOURCE_DISABLE) {
@@ -414,8 +408,7 @@ void CommandLineInterface::HandleSourceError(int errorLine, const std::string& f
 	if (!m_SourceError) {
 
 		// Remove listener
-		this->UnregisterWithKernel(gSKIEVENT_BEFORE_PRODUCTION_REMOVED) ;
-		//pProductionManager->RemoveProductionListener(gSKIEVENT_BEFORE_PRODUCTION_REMOVED, this);
+		this->UnregisterWithKernel(smlEVENT_BEFORE_PRODUCTION_REMOVED) ;
 
 		// Flush excised production list
 		if (m_ExcisedDuringSource.size()) m_ExcisedDuringSource.clear();
@@ -450,20 +443,3 @@ void CommandLineInterface::HandleSourceError(int errorLine, const std::string& f
 		m_SourceErrorDetail += "\n\t--> Sourced by: " + filename + " (line " + Int2String(errorLine, buf, kMinBufferSize) + ")";
 	}
 }
-
-// Production callback events go here
-/*
-void CommandLineInterface::HandleEvent(egSKIProductionEventId eventId, sml::AgentSML* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match) {
-	unused(eventId);
-	unused(match);
-	unused(agentPtr);
-
-	// Only called when source command is active
-	assert(eventId == gSKIEVENT_BEFORE_PRODUCTION_REMOVED);
-	++m_NumProductionsExcised;
-
-	if (m_SourceVerbose) {
-		m_ExcisedDuringSource.push_back(prod->GetName());
-	}
-}
-*/

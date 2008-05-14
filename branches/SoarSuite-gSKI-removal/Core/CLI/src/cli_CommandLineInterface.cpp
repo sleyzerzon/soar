@@ -16,8 +16,6 @@
 #include "cli_Commands.h"
 #include "cli_Aliases.h"
 
-#include "gSKI_Error.h"
-
 // SML includes
 #include "sml_Connection.h"
 #include "sml_TagResult.h"
@@ -147,14 +145,11 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIWatchWMEs]					= true ;
 
 	// Initialize other members
-	m_pKernel = 0;
 	m_SourceError = false;
 	m_SourceDepth = 0;
 	m_SourceDirDepth = 0;
 	m_pLogFile = 0;
-	m_KernelVersion.major = m_KernelVersion.minor = 0;
 	m_LastError = CLIError::kNoError;
-	gSKI::ClearError(&m_gSKIError);
 	m_Initialized = true;
 	m_PrintEventToResult = false;
 	m_XMLEventToResult = false;
@@ -204,9 +199,9 @@ EXPORT bool CommandLineInterface::ShouldEchoCommand(char const* pCommandLine)
 
 /*************************************************************
 * @brief Process a command.  Give it a command line and it will parse
-*		 and execute the command using gSKI or system calls.
+*		 and execute the command using system calls.
 * @param pConnection The connection, for communication to the client
-* @param pAgent The pointer to the gSKI agent interface
+* @param pAgent The pointer to the agent interface
 * @param pCommandLine The command line string, arguments separated by spaces
 * @param echoResults If true send a copy of the result to the echo event
 * @param pResponse Pointer to XML response object
@@ -304,7 +299,6 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 	m_ResponseTags.clear();	
 	m_LastError = CLIError::kNoError;	
 	m_LastErrorDetail.clear();			
-	gSKI::ClearError(&m_gSKIError);
 }
 
 string CommandLineInterface::GenerateErrorString()
@@ -318,17 +312,6 @@ string CommandLineInterface::GenerateErrorString()
 		errorDescription += "\nResult before error happened:\n";
 		errorDescription += m_Result.str();
 	}
-	if (gSKI::isError(m_gSKIError)) {
-		errorDescription += "\ngSKI Error code: ";
-		char buf[kMinBufferSize];
-		Int2String(m_gSKIError.Id, buf, kMinBufferSize);
-		errorDescription += buf;
-		errorDescription += "\ngSKI Error text: ";
-		errorDescription += m_gSKIError.Text;
-		errorDescription += "\ngSKI Error details: ";
-		errorDescription += m_gSKIError.ExtendedMsg;
-	}
-
 	return errorDescription;
 }
 
@@ -521,9 +504,7 @@ bool CommandLineInterface::CheckForHelp(std::vector<std::string>& argv) {
 	return false;
 }
 
-EXPORT void CommandLineInterface::SetKernel(gSKI::Kernel* pKernel, gSKI::Version kernelVersion, sml::KernelSML* pKernelSML) {
-	m_pKernel = pKernel;
-	m_KernelVersion = kernelVersion;
+EXPORT void CommandLineInterface::SetKernel(sml::KernelSML* pKernelSML) {
 	m_pKernelSML = pKernelSML;
 
 	// Now that we have the kernel, set the home directory to the location of SoarKernelSML's parent directory,
@@ -592,7 +573,7 @@ bool CommandLineInterface::RequireAgent() {
 }
 
 bool CommandLineInterface::RequireKernel() {
-	if (!m_pKernel) return SetError(CLIError::kKernelRequired);
+	if (!m_pKernelSML) return SetError(CLIError::kKernelRequired);
 	return true;
 }
 
@@ -631,12 +612,10 @@ void CommandLineInterface::PrependArgTagFast(const char* pParam, const char* pTy
 void CommandLineInterface::AddListenerAndDisableCallbacks() {
 	m_pAgentSML->DisablePrintCallback();
 	m_PrintEventToResult = true;
-	//if (!m_pLogFile && pAgent) pAgent->AddPrintListener(gSKIEVENT_PRINT, this);
 	if (!m_pLogFile) RegisterWithKernel(smlEVENT_PRINT) ;
 }
 
 void CommandLineInterface::RemoveListenerAndEnableCallbacks() {
-	//if (!m_pLogFile && pAgent) pAgent->RemovePrintListener(gSKIEVENT_PRINT, this);
 	if (!m_pLogFile) UnregisterWithKernel(smlEVENT_PRINT);
 	m_PrintEventToResult = false;
 	m_pAgentSML->EnablePrintCallback();
@@ -645,13 +624,11 @@ void CommandLineInterface::RemoveListenerAndEnableCallbacks() {
 void CommandLineInterface::AddXMLListenerAndDisableCallbacks() {
 	m_pAgentSML->DisablePrintCallback();
 	m_XMLEventToResult = true;
-	//if (pAgent) pAgent->AddXMLListener(gSKIEVENT_XML_TRACE_OUTPUT, this);
 	RegisterWithKernel(smlEVENT_XML_TRACE_OUTPUT) ;
 }
 
 void CommandLineInterface::RemoveXMLListenerAndEnableCallbacks() {
 	UnregisterWithKernel(smlEVENT_XML_TRACE_OUTPUT);
-	//if (pAgent) pAgent->RemoveXMLListener(gSKIEVENT_XML_TRACE_OUTPUT, this);
 	m_XMLEventToResult = false;
 	m_pAgentSML->EnablePrintCallback();
 
@@ -1060,7 +1037,7 @@ int CommandLineInterface::CLITokenize(string cmdline, vector<string>& argumentVe
 void CommandLineInterface::OnKernelEvent(int eventID, AgentSML*, void* pCallData)
 {
 	// Registered for this event in source command
-	if (eventID == gSKIEVENT_BEFORE_PRODUCTION_REMOVED)
+	if (eventID == smlEVENT_BEFORE_PRODUCTION_REMOVED)
 	{
 		// Only called when source command is active
 		++m_NumProductionsExcised;

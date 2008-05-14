@@ -141,7 +141,7 @@ protected:
 	bool m_OnStepList;
 	//unsigned long	m_InitialStepCount ;
 	unsigned long	m_InitialRunCount ;
-	egSKIRunResult	m_ResultOfLastRun ;
+	smlRunResult	m_ResultOfLastRun ;
     unsigned long	m_localRunCount;
     unsigned long	m_localStepCount;
 	egSKIRunState	m_runState;          // Current agent run state
@@ -317,8 +317,8 @@ public:
 	bool IsAgentOnStepList()		    { return m_OnStepList ; }
 	bool WasAgentOnRunList()            { return m_WasOnRunList ; }
 
-	egSKIRunResult	GetResultOfLastRun()		  { return m_ResultOfLastRun ; }
-	void SetResultOfRun(egSKIRunResult runResult) { m_ResultOfLastRun = runResult ; }
+	smlRunResult	GetResultOfLastRun()		  { return m_ResultOfLastRun ; }
+	void SetResultOfRun(smlRunResult runResult) { m_ResultOfLastRun = runResult ; }
 
 	//void SetInitialStepCount(unsigned long count)	{ m_InitialStepCount = count ; }
 	void SetInitialRunCount(unsigned long count)	{ m_InitialRunCount = count ; }
@@ -344,7 +344,7 @@ public:
 	unsigned long GetNumOutputsGenerated() ;
 	unsigned long GetLastOutputCount() ;
 	void ResetLastOutputCount() ;
-	egSKIPhaseType GetCurrentPhase() ;
+	smlPhase GetCurrentPhase() ;
 	AgentRunCallback* GetAgentRunCallback() { return m_pAgentRunCallback ; }
 
 	bool IsSoar7Mode() ;
@@ -352,10 +352,10 @@ public:
 	unsigned long GetRunCounter(egSKIRunType runStepSize) ;
 
 	// Request that the agent stop soon.
-	bool Interrupt(egSKIStopLocation stopLoc, gSKI::Error* pError) ;
+	bool Interrupt(egSKIStopLocation stopLoc) ;
 	void ClearInterrupts() ;
-	egSKIRunResult StepInClientThread(egSKIInterleaveType  stepSize, gSKI::Error* pError) ;
-	egSKIRunResult Step(egSKIInterleaveType stepSize, gSKI::Error* pError) ;
+	smlRunResult StepInClientThread(egSKIInterleaveType  stepSize, gSKI::Error* pError) ;
+	smlRunResult Step(egSKIInterleaveType stepSize) ;
 
 	unsigned long GetInterruptFlags()		{ return m_interruptFlags ; }
 	egSKIRunState GetRunState()				{ return m_runState ; }

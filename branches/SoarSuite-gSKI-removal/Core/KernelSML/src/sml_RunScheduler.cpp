@@ -31,7 +31,7 @@ RunScheduler::RunScheduler(KernelSML* pKernelSML)
 	m_pKernelSML = pKernelSML ;
 	m_RunFlags = sml_NONE ;
 	m_IsRunning = false ;
-	m_StopBeforePhase = gSKI_APPLY_PHASE ;
+	m_StopBeforePhase = sml_APPLY_PHASE ;
 }
 
 /*************************************************************
@@ -169,7 +169,7 @@ I think we don't use this -- it's only called once -- what does that mean??
 /*************************************************************************
 * @brief	Returns true if phase1 is later in the execution cycle than phase2
 **************************************************************************/
-static bool IsPhaseLater(egSKIPhaseType phase1, egSKIPhaseType phase2)
+static bool IsPhaseLater(smlPhase phase1, smlPhase phase2)
 {
 	// Right now the enum is in the correct order, but if we change Soar we
 	// might need to make this more complex.
@@ -217,7 +217,7 @@ bool RunScheduler::AreAgentsSynchronized(AgentSML* pSynchAgent)
 		return true ;
 
 	bool same = true ;
-	egSKIPhaseType phase = pSynchAgent->GetCurrentPhase() ;
+	smlPhase phase = pSynchAgent->GetCurrentPhase() ;
 
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 	{
@@ -527,8 +527,8 @@ void RunScheduler::MoveTo_StopBeforePhase(egSKIRunType runStepSize, gSKI::Error*
 			{
 				AgentSML* pAgent = pAgentSML ;
 				//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
-				egSKIPhaseType phase = pAgentSML->GetCurrentPhase() ;
-				egSKIRunResult runResult = pAgentSML->GetResultOfLastRun() ;
+				smlPhase phase = pAgentSML->GetCurrentPhase() ;
+				smlRunResult runResult = pAgentSML->GetResultOfLastRun() ;
 				//if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
 				if (pAgent->IsSoar7Mode()) continue ;
 
@@ -542,12 +542,12 @@ void RunScheduler::MoveTo_StopBeforePhase(egSKIRunType runStepSize, gSKI::Error*
 					runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, pError) ; // force interrupt
 				}					
 
-				while ((phase != m_StopBeforePhase) && (gSKI_RUN_COMPLETED == runResult))
+				while ((phase != m_StopBeforePhase) && (sml_RUN_COMPLETED == runResult))
 				{
 					runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, pError) ;
 					phase = pAgentSML->GetCurrentPhase() ;
 					// don't cross Output-Input boundary here just to get to StopBefore phase for "Run 0"
-					if (gSKI_INPUT_PHASE == phase) break; 
+					if (sml_INPUT_PHASE == phase) break; 
 				}						
 				pAgentSML->SetResultOfRun(runResult) ;
 
@@ -572,17 +572,17 @@ void RunScheduler::MoveTo_StopBeforePhase(egSKIRunType runStepSize, gSKI::Error*
 			{
 				AgentSML* pAgent = pAgentSML ;
 				//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
-				egSKIPhaseType phase = pAgentSML->GetCurrentPhase() ;
-				egSKIRunResult runResult = pAgentSML->GetResultOfLastRun() ;
+				smlPhase phase = pAgentSML->GetCurrentPhase() ;
+				smlRunResult runResult = pAgentSML->GetResultOfLastRun() ;
 				//if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
 				if (pAgent->IsSoar7Mode()) continue ;
  
-				while ((phase != m_StopBeforePhase) && (gSKI_RUN_COMPLETED == runResult))
+				while ((phase != m_StopBeforePhase) && (sml_RUN_COMPLETED == runResult))
 				{
 					runResult = pAgent->StepInClientThread(gSKI_INTERLEAVE_PHASE, pError) ;
 					phase = pAgentSML->GetCurrentPhase() ;
 					// We should never get to this point again, so we need to generate ERROR 
-					assert(gSKI_INPUT_PHASE != phase);
+					assert(sml_INPUT_PHASE != phase);
 				}		
 
 				pAgentSML->SetResultOfRun(runResult) ;
@@ -685,16 +685,16 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
             gSKI_RUN_COMPLETED_AND_INTERRUPTED 
 
 *********************************************************************/
-egSKIRunResult RunScheduler::GetOverallRunResult()
+smlRunResult RunScheduler::GetOverallRunResult()
 {
-	egSKIRunResult overallResult = gSKI_RUN_COMPLETED;
+	smlRunResult overallResult = sml_RUN_COMPLETED;
 
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 	{
 		AgentSML* pAgentSML = iter->second ;
-		egSKIRunResult result = pAgentSML->GetResultOfLastRun();
+		smlRunResult result = pAgentSML->GetResultOfLastRun();
 	//	if (result < overallResult) overallResult = result;
-		if (result == gSKI_RUN_INTERRUPTED) overallResult = gSKI_RUN_INTERRUPTED;
+		if (result == sml_RUN_INTERRUPTED) overallResult = sml_RUN_INTERRUPTED;
 	}
 	return overallResult ;
 }
@@ -763,13 +763,16 @@ bool RunScheduler::IsRunning()
 * @return Not clear on how to set this when have multiple agents.
 *		  Can query each for "GetLastRunResult()".
 *************************************************************/	
-egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, 
+smlRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize, 
 												   unsigned long count, 
 												   smlRunFlags runFlags, 
 												   egSKIInterleaveType interleaveStepSize, 
-												   bool synchronize, 
-												   gSKI::Error* pError)
+												   bool synchronize)
 {
+	// FIXME: use a different mechanism to report detailed run error:
+	gSKI::Error error;
+	gSKI::Error* pError = &error;
+
     // Agents were already appropriately added (or not) to the RunList before calling this method.
 	// For every Run Command issued, we can find out if agent is still scheduled to run,
 	// and/or whether it was scheduled to run at all.  When agents stop or Halt, the
@@ -787,7 +790,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
  	gSKI::Kernel* pKernel = m_pKernelSML->GetKernel() ;
 
 	// Depending on RunType, set the stop location for gSKI_STOP_AFTER_DECISION_CYCLE interrupts
-	pKernel->SetStopPoint(runStepSize, m_StopBeforePhase);
+	pKernel->SetStopPoint(runStepSize, (egSKIPhaseType)m_StopBeforePhase);
 
 	// Fire one event to indicate the entire system is starting
 	m_pKernelSML->FireSystemEvent(gSKIEVENT_SYSTEM_START) ;
@@ -806,11 +809,11 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 	bool runFinished = false ;
 	long stepCount   = 0 ;
 //	long runCount    = 0 ;
-	egSKIRunResult overallResult = gSKI_RUN_COMPLETED ;	
+	smlRunResult overallResult = sml_RUN_COMPLETED ;	
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)		
 	{		
 		AgentSML* pAgentSML = iter->second ;
-		if (pAgentSML->IsAgentScheduledToRun()) pAgentSML->SetResultOfRun(gSKI_RUN_COMPLETED) ;
+		if (pAgentSML->IsAgentScheduledToRun()) pAgentSML->SetResultOfRun(sml_RUN_COMPLETED) ;
 	}
 
 	m_pKernelSML->ClearAllInterrupts();
@@ -882,7 +885,7 @@ egSKIRunResult RunScheduler::RunScheduledAgents(egSKIRunType runStepSize,
 				{			
 					// Run all agents one "interleaveStepSize".		
 					//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
-					egSKIRunResult runResult = pAgentSML->StepInClientThread(interleaveStepSize, pError) ;
+					smlRunResult runResult = pAgentSML->StepInClientThread(interleaveStepSize, pError) ;
 					// ?? pAgentSML->IncrementLocalStepCounter();
 
 					// halted and running agents will return an error from StepInClientThread

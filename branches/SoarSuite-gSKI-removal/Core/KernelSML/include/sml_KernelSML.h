@@ -431,8 +431,8 @@ public:
 	*			E.g. Pass input phase to stop just after generating output and before receiving input.
 	*			This is a setting which modifies the future behavior of "run <n> --decisions" commands.
 	*************************************************************/	
-	void SetStopBefore(egSKIPhaseType phase) ;
-	egSKIPhaseType GetStopBefore() ;
+	void SetStopBefore(smlPhase phase) ;
+	smlPhase GetStopBefore() ;
 
 	/*************************************************************
 	* @brief	If true, whenever a user issues a command that changes the state of the kernel in some manner
@@ -445,7 +445,7 @@ public:
 	/*************************************************************
 	* @brief	Request that all agents stop soon
 	*************************************************************/	
-	bool InterruptAllAgents(egSKIStopLocation stopLoc, gSKI::Error* pError) ;
+	bool InterruptAllAgents(egSKIStopLocation stopLoc) ;
 	void ClearAllInterrupts() ;
 
 protected:

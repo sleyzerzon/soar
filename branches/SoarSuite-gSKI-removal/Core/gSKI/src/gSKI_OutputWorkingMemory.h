@@ -706,7 +706,7 @@ namespace gSKI {
 	  /**
        * @brief Handles updating working memory.  Not implemented for output link yet.
        */
-	  virtual void Update(bool forceAdds, bool forceRemoves) { }
+	  virtual void Update(bool /*forceAdds*/, bool /*forceRemoves*/) { }
 
  	  virtual int GetWMObjMapSize() const;
 

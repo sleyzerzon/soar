@@ -308,9 +308,9 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 	}
 	else
 	{
-		unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->id) ;
-		unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->attr) ;
-		unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->value) ;
+		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->id) ;
+		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->attr) ;
+		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->value) ;
 	}
 
 	if (kDebugInput)
@@ -368,7 +368,7 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 
 		// This extra release of the identifier value seems to be required
 		// but I don't understand why.
-		Symbol* pIDSymbol = pWME->value ;
+		/*Symbol* pIDSymbol = */pWME->value ;
 //		release_io_symbol(pAgentSML->GetAgent(), pIDSymbol) ;
 //		release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
 //		release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
@@ -388,9 +388,9 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 	{
 		pAgentSML->RemoveKernelTimeTag(pTimeTag) ;
 
-		unsigned long refCount1 = release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
-		unsigned long refCount2 = release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
-		unsigned long refCount3 = release_io_symbol(pAgentSML->GetAgent(), pWME->value) ;
+		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
+		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
+		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetAgent(), pWME->value) ;
 
 		PrintDebugFormat("After removing wme") ;
 		pAgentSML->PrintKernelTimeTags() ;

@@ -155,7 +155,6 @@ bool CommandLineInterface::DoCLog(const eLogMode mode, const std::string* pFilen
 			    m_LogFilename = filename;
             }
 
-			//if (pAgent) pAgent->AddPrintListener(gSKIEVENT_PRINT, this);
 			if (m_pAgentSML) RegisterWithKernel(smlEVENT_PRINT) ;
 			break;
 
@@ -167,7 +166,6 @@ bool CommandLineInterface::DoCLog(const eLogMode mode, const std::string* pFilen
 		case LOG_CLOSE:
 			if (!m_pLogFile) return SetError(CLIError::kLogNotOpen);
 
-			//if (pAgent) pAgent->RemovePrintListener(gSKIEVENT_PRINT, this);
 			if (m_pAgentSML) UnregisterWithKernel(smlEVENT_PRINT) ;
 			delete m_pLogFile;
 			m_pLogFile = 0;

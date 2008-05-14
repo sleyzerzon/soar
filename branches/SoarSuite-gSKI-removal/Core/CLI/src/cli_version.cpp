@@ -15,6 +15,8 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
+#include "agent.h"
+
 using namespace cli;
 using namespace sml;
 
@@ -34,13 +36,13 @@ bool CommandLineInterface::DoVersion() {
 	std::string sTimeDateStamp = timedatestamp.str();
 
 	if (m_RawOutput) {
-		m_Result << m_KernelVersion.major << '.' << m_KernelVersion.minor << '.' << m_KernelVersion.micro << '\n';
+		m_Result << soar_version_string << "\n";
 		m_Result << "Build date: " << sTimeDateStamp.c_str() << " " ;
 
 	} else {
-		AppendArgTagFast(sml_Names::kParamVersionMajor, sml_Names::kTypeInt, Int2String(m_KernelVersion.major, buf, kMinBufferSize));
-		AppendArgTagFast(sml_Names::kParamVersionMinor, sml_Names::kTypeInt, Int2String(m_KernelVersion.minor, buf, kMinBufferSize));
-		AppendArgTagFast(sml_Names::kParamVersionMicro, sml_Names::kTypeInt, Int2String(m_KernelVersion.micro, buf, kMinBufferSize));
+		AppendArgTagFast(sml_Names::kParamVersionMajor, sml_Names::kTypeInt, Int2String(MAJOR_VERSION_NUMBER, buf, kMinBufferSize));
+		AppendArgTagFast(sml_Names::kParamVersionMinor, sml_Names::kTypeInt, Int2String(MINOR_VERSION_NUMBER, buf, kMinBufferSize));
+		AppendArgTagFast(sml_Names::kParamVersionMicro, sml_Names::kTypeInt, Int2String(MICRO_VERSION_NUMBER, buf, kMinBufferSize));
 		AppendArgTag(sml_Names::kParamBuildDate, sml_Names::kTypeString, sTimeDateStamp.c_str());
 	}
 	return true;
