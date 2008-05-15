@@ -115,7 +115,7 @@ void OutputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCall
 	gSKI::OutputLink::OutputPhaseCallback(pAgentSML->GetAgent(), eventID, pIOutputLink, oinfo) ;
 
 	io_wme* pWmes = oinfo->outputs ;
-	SendOutput((egSKIWorkingMemoryEventId)eventID, pAgentSML, outputMode, pWmes) ;
+	SendOutput((smlWorkingMemoryEventId)eventID, pAgentSML, outputMode, pWmes) ;
 }
 
 // OutputMode is one of:
@@ -123,7 +123,7 @@ void OutputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCall
 // #define MODIFIED_OUTPUT_COMMAND 2
 // #define REMOVED_OUTPUT_COMMAND 3
 
-void OutputListener::SendOutput(egSKIWorkingMemoryEventId eventId, AgentSML* pAgentSML, int outputMode, io_wme* io_wmelist)
+void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgentSML, int outputMode, io_wme* io_wmelist)
 {
 	unused(outputMode) ;
 
@@ -132,7 +132,7 @@ void OutputListener::SendOutput(egSKIWorkingMemoryEventId eventId, AgentSML* pAg
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIWorkingMemoryEventId>::GetBegin(eventId, &connectionIter))
+	if (!EventManager<smlWorkingMemoryEventId>::GetBegin(eventId, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
@@ -249,7 +249,7 @@ void OutputListener::SendOutput(egSKIWorkingMemoryEventId eventId, AgentSML* pAg
 	// it will release the handle...deleting part of our message.
 	command.Detach() ;
 
-	egSKIWorkingMemoryEventId eventID = gSKIEVENT_OUTPUT_PHASE_CALLBACK ;
+	smlWorkingMemoryEventId eventID = smlEVENT_OUTPUT_PHASE_CALLBACK ;
 
 #ifdef _DEBUG
 	// Convert the XML to a string so we can look at it in the debugger
@@ -283,7 +283,7 @@ void OutputListener::UnRegisterForKernelSMLEvents()
 }
 
 // Returns true if this is the first connection listening for this event
-bool OutputListener::AddListener(egSKIWorkingMemoryEventId eventID, Connection* pConnection)
+bool OutputListener::AddListener(smlWorkingMemoryEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
@@ -297,7 +297,7 @@ bool OutputListener::AddListener(egSKIWorkingMemoryEventId eventID, Connection* 
 }
 
 // Returns true if at least one connection remains listening for this event
-bool OutputListener::RemoveListener(egSKIWorkingMemoryEventId eventID, Connection* pConnection)
+bool OutputListener::RemoveListener(smlWorkingMemoryEventId eventID, Connection* pConnection)
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
@@ -310,7 +310,7 @@ bool OutputListener::RemoveListener(egSKIWorkingMemoryEventId eventID, Connectio
 	return last ;
 }
 
-void OutputListener::HandleEvent(egSKIWorkingMemoryEventId eventId, gSKI::Agent* agentPtr, egSKIWorkingMemoryChange change, gSKI::tIWmeIterator* wmelist)
+void OutputListener::HandleEvent(smlWorkingMemoryEventId eventId, gSKI::Agent* agentPtr, egSKIWorkingMemoryChange change, gSKI::tIWmeIterator* wmelist)
 {
 	unused(change) ;
 
@@ -322,7 +322,7 @@ void OutputListener::HandleEvent(egSKIWorkingMemoryEventId eventId, gSKI::Agent*
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIWorkingMemoryEventId>::GetBegin(eventId, &connectionIter))
+	if (!EventManager<smlWorkingMemoryEventId>::GetBegin(eventId, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
@@ -426,7 +426,7 @@ void OutputListener::HandleEvent(egSKIWorkingMemoryEventId eventId, gSKI::Agent*
 	// it will release the handle...deleting part of our message.
 	command.Detach() ;
 
-	egSKIWorkingMemoryEventId eventID = gSKIEVENT_OUTPUT_PHASE_CALLBACK ;
+	smlWorkingMemoryEventId eventID = smlEVENT_OUTPUT_PHASE_CALLBACK ;
 
 #ifdef _DEBUG
 	// Convert the XML to a string so we can look at it in the debugger

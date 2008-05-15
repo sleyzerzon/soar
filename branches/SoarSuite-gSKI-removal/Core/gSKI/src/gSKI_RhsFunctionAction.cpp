@@ -27,26 +27,14 @@
 
 namespace gSKI
 {
-   /*
-   ===============================
-   ===============================
-   */
    RhsFunctionAction::RhsFunctionAction(): 
       m_name(""), m_numParams(0), m_standAlone(true) {}
 
-   /*
-   ===============================
-   ===============================
-   */
    RhsFunctionAction::RhsFunctionAction(agent* a, list* funcall_list)
    {
       SetValues(a, funcall_list);
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    RhsFunctionAction& RhsFunctionAction::operator=(const RhsFunctionAction& rhs)
    {
       if(this != &rhs)
@@ -68,10 +56,6 @@ namespace gSKI
       return *this;
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    void RhsFunctionAction::SetValues(agent* a, list* funcall_list)
    {
       MegaAssert(a != 0, "Cannnot set rhs function actions with a 0 agent pointer.");
@@ -98,10 +82,6 @@ namespace gSKI
       }
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    void RhsFunctionAction::cleanup()
    {
       for(tParamVecIt it = m_parameters.begin(); it != m_parameters.end(); ++it)
@@ -110,50 +90,28 @@ namespace gSKI
       m_parameters.clear();
    }
 
-
-   /*
-   ===============================
-   ===============================
-   */
    RhsFunctionAction::~RhsFunctionAction() 
    {
       cleanup();
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    const char*             RhsFunctionAction::GetName(Error* err)
    {
       ClearError(err);
       return m_name.c_str();
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    int                     RhsFunctionAction::GetNumParameters(Error* err) const
    {
       ClearError(err);
       return m_numParams;
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    tIActionElementIterator* RhsFunctionAction::GetParameterList(Error* err) 
    {
       // Create iterator and return it
       return new Iterator<ActionElement*, tParamVec>(m_parameters);
    }
-
-   /*
-   ===============================
-   ===============================
-   */
 
    bool                    RhsFunctionAction::IsStandAlone(Error* err) const
    {

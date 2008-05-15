@@ -360,79 +360,6 @@ namespace gSKI {
       bool loadSoarFile(tStringSet& sourcedFiles, const char *fileName, Error *err);
       /*************************** Listeners *********************************/
 
-      /**
-      *  @brief Adds a listener for production events
-      *
-      *  Call this method to register a listener to recieve production events.
-      *  Agent production events are:
-      *     @li gSKIEVENT_AFTER_PRODUCTION_ADDED,
-      *     @li gSKIEVENT_BEFORE_PRODUCTION_REMOVED,
-      *     @li gSKIEVENT_AFTER_PRODUCTION_FIRED,
-      *     @li gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
-      *
-      *  If this listener has already been added for the given event, nothing happens
-      *
-      *  Possible Errors:
-      *     @li gSKIERR_INVALID_PTR -- If you pass an invalid pointer for a listener.
-      *
-      *  @param eventId  One of the valid event ids listed above
-      *  @param listener A pointer to a client owned listener that will be called back when
-      *                      an event occurs.  Because the listener is client owned, it is not
-      *                      cleaned up by the kernel when it shuts down.  The same listener
-      *                      can be registered to recieve multiple events.  If this listener
-      *                      is 0, no listener is added and an error is recored in err.
-      *  @param allowAsynch A flag indicating whether or not it is ok for the listener to be
-      *                         notified asynchonously of system operation.  If you specify "true"
-      *                         the system may not callback the listener until some time after
-      *                         the event occurs. This flag is only a hint, the system may callback
-      *                         your listener synchronously.  The main purpose of this flag is to
-      *                         allow for efficient out-of-process implementation of event callbacks
-      *  @param  err Pointer to client-owned error structure.  If the pointer
-      *               is not 0 this structure is filled with extended error
-      *               information.  If it is 0 (the default) extended error
-      *               information is not returned.
-      */
-	  /*
-      void AddProductionListener(egSKIProductionEventId eventId, 
-                                 IProductionListener* listener, 
-                                 bool                 allowAsynch = false,
-                                 Error*               err         = 0);
-	  */
-     /**
-      *  @brief Removes an production event listener
-      *
-      *  Call this method to remove a previously added event listener.
-      *  The system will automatically remove all listeners when the kernel shutsdown;
-      *   however, since all listeners are client owned, the client is responsible for
-      *   cleaning up memory used by listeners.
-      *
-      *  If the given listener is not registered to recieve the given event, this
-      *     function will do nothing (but a warning is logged).
-      *
-      *  Agent production events are:
-      *     @li gSKIEVENT_AFTER_PRODUCTION_ADDED,
-      *     @li gSKIEVENT_BEFORE_PRODUCTION_REMOVED,
-      *     @li gSKIEVENT_AFTER_PRODUCTION_FIRED,
-      *     @li gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
-      *
-      *  Possible Errors:
-      *     @li gSKIERR_INVALID_PTR -- If you pass an invalid pointer for a listener.
-      *
-      *  @param eventId  One of the valid event ids listed above
-      *  @param listener A pointer to the listener you would like to remove.  Passing a 0
-      *                     pointer causes nothing to happen except an error being recorded
-      *                     to err.
-      *  @param  err Pointer to client-owned error structure.  If the pointer
-      *               is not 0 this structure is filled with extended error
-      *               information.  If it is 0 (the default) extended error
-      *               information is not returned.
-      */
-	  /*
-      void RemoveProductionListener(egSKIProductionEventId eventId,
-                                     IProductionListener* listener,
-                                     Error*               err = 0);
-	  */
-
    private:
 
       ///////////////// LISTENER MANAGEMENT STUFF ////////////////////////////
@@ -441,9 +368,6 @@ namespace gSKI {
        */
       class ProductionNotifier {
       public:
-         /**
-          * @brief 
-          */
          ProductionNotifier(Agent* a, IProduction* p, IProductionInstance* m) : 
                                                                     m_agent(a), 
                                                                     m_prod(p), 
@@ -452,9 +376,6 @@ namespace gSKI {
          
          }
 
-         /**
-          * @brief 
-          */
          void operator()(egSKIProductionEventId eventId, IProductionListener* listener)
          {
             listener->HandleEvent(eventId, m_agent, m_prod, m_match);
@@ -465,12 +386,7 @@ namespace gSKI {
          IProductionInstance*  m_match;
       };
       
-      /** 
-       * @brief Listener manager definitions 
-       */
-      //{
       typedef ListenerManager<egSKIProductionEventId, IProductionListener, ProductionNotifier>   tProductionListenerManager;
-      //}
 
       /** 
        * @brief Static function to handle callbacks for the production listeners.

@@ -28,12 +28,13 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 class TagWme ;
+enum smlWorkingMemoryEventId;
 
 // This map is from time tag to bool to say whether a given tag has been seen in the latest event or not
 typedef std::map< long, bool >		OutputTimeTagMap ;
 typedef OutputTimeTagMap::iterator	OutputTimeTagIter ;
 
-class OutputListener : public gSKI::IAgentListener, public EventManager<egSKIWorkingMemoryEventId>
+class OutputListener : public gSKI::IAgentListener, public EventManager<smlWorkingMemoryEventId>
 {
 protected:
 	KernelSML*		m_KernelSML ;
@@ -64,7 +65,7 @@ public:
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Send output out to the clients
-	virtual void SendOutput(egSKIWorkingMemoryEventId eventID, AgentSML* pAgentSML, int outputMode, io_wme* io_wmelist) ;
+	virtual void SendOutput(smlWorkingMemoryEventId eventID, AgentSML* pAgentSML, int outputMode, io_wme* io_wmelist) ;
 
 	// Register for the events that KernelSML itself needs to know about in order to work correctly.
 	void RegisterForKernelSMLEvents() ;
@@ -73,13 +74,13 @@ public:
 	void UnRegisterForKernelSMLEvents() ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKIWorkingMemoryEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(smlWorkingMemoryEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKIWorkingMemoryEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(smlWorkingMemoryEventId eventID, Connection* pConnection) ;
 
 	// Working memory event listener (called when the agent generates output)
-	virtual void HandleEvent(egSKIWorkingMemoryEventId eventId, gSKI::Agent* agentPtr, egSKIWorkingMemoryChange change, gSKI::tIWmeIterator* wmelist) ;
+	virtual void HandleEvent(smlWorkingMemoryEventId eventId, gSKI::Agent* agentPtr, egSKIWorkingMemoryChange change, gSKI::tIWmeIterator* wmelist) ;
 
 	// Agent event listener (called when soar is re-initialized)
 	virtual void HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPtr) ;

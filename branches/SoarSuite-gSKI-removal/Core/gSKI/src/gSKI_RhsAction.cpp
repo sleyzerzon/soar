@@ -23,28 +23,16 @@
 
 namespace gSKI 
 {
-   /*
-   ===============================
-   ===============================
-   */
    RhsAction::RhsAction(): m_binary(false), m_preference(gSKI_ANY_PREF), m_support(gSKI_UNKNOWN_SUPPORT)
    {
       // Cannnot set other values.  Creator needs to call SetValues
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    RhsAction::RhsAction(agent* a, action* act) 
    {
       SetValues(a, act);
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    RhsAction& RhsAction::operator=(const RhsAction& rhs)
    {
       if(this != &rhs)
@@ -60,10 +48,6 @@ namespace gSKI
       return *this;
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    void RhsAction::SetValues(agent* a, action* act)
    {
       MegaAssert(a != 0, "Cannot initialize a rhs action with a 0 agent pointer!");
@@ -88,28 +72,15 @@ namespace gSKI
          m_binaryReferent.SetValues(a, act->referent);
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    RhsAction::~RhsAction() 
    {
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    ActionElement*  RhsAction::GetIdElement(Error* err)
    {
       ClearError(err);
       return &m_id;
    }
-
-   /*
-   ===============================
-   ===============================
-   */
 
    ActionElement*  RhsAction::GetAttrElement(Error* err)
    {
@@ -117,21 +88,12 @@ namespace gSKI
       return &m_attr;
    }
 
-   /*
-   ===============================
-   ===============================
-   */
-
    ActionElement*       RhsAction::GetValueElement(Error* err)
    {
       ClearError(err);
       return &m_value;
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    ActionElement*       RhsAction::GetBinaryPreferenceElement(Error* err)
    {
       if (m_binary)
@@ -146,21 +108,11 @@ namespace gSKI
       }
    }
 
-   /*
-   ===============================
-
-   ===============================
-   */
    egSKIPreferenceType  RhsAction::GetPreferenceType(Error* err) const
    {
       return m_preference;
    }
 
-   /*
-   ===============================
-
-   ===============================
-   */
    egSKISupportType     RhsAction::GetSupportType(Error* err) const
    {
       return m_support;

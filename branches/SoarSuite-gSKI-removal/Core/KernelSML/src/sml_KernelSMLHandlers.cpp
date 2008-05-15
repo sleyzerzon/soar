@@ -327,9 +327,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 
 		// Register this connection as listening for this event
 		if (registerForEvent)
-			pOutputListener->AddListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, pConnection) ;
+			pOutputListener->AddListener(smlEVENT_OUTPUT_PHASE_CALLBACK, pConnection) ;
 		else
-			pOutputListener->RemoveListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, pConnection) ;
+			pOutputListener->RemoveListener(smlEVENT_OUTPUT_PHASE_CALLBACK, pConnection) ;
 	} else {
 		// The event didn't match any of our handlers
 		return InvalidArg(pConnection, pResponse, pCommandName, "KernelSML doesn't know how to handle that event id") ;
