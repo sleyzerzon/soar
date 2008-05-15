@@ -12,13 +12,16 @@
 *
 * purpose: 
 *********************************************************************/
-#include "sml_Utils.h"
+
 #include "sml_KernelHelpers.h"
-#include "gSKI_Agent.h"
-#include "gSKI_Kernel.h"
+
+#include "sml_Utils.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
 #include "sml_XMLTrace.h"
+
+#include "gSKI_Agent.h"
+#include "gSKI_Kernel.h"
 
 #include "agent.h"
 #include "gdatastructs.h"
@@ -38,6 +41,8 @@
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
 
 using namespace sml ;
+using namespace xmlTraceNames;
+
 
 namespace sml 
 {

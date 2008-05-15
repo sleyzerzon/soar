@@ -24,12 +24,6 @@
 #include "stdio.h"
 #include <vector>
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//
-//DEF_EXPOSE(gSKI_Symbol)
-
 namespace gSKI
 {
 
@@ -172,12 +166,6 @@ namespace gSKI
       return m_obj;
    }
 
-   /*
-     ===============================
-     
-     ===============================
-   */
-   
    bool gSymbol::IsEqual(const ISymbol* sym,
                          Error*         err) const
    {

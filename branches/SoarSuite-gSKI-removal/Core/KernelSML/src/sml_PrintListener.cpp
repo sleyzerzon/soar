@@ -10,11 +10,12 @@
 // specific events occur within the agent:
 //
 /*
-*       gSKIEVENT_PRINT
+*       smlEVENT_PRINT
 */
 /////////////////////////////////////////////////////////////////
 
 #include "sml_PrintListener.h"
+
 #include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
@@ -28,7 +29,6 @@ using namespace sml ;
 void PrintListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 {
 	m_pKernelSML = pKernelSML ;
-	m_pAgent	 = pAgentSML->GetIAgent() ;
 	m_EnablePrintCallback = true ;
 
 	for (int i = 0 ; i < kNumberPrintEvents ; i++)
@@ -85,14 +85,6 @@ void PrintListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallD
 	OnEvent(static_cast<smlPrintEventId>(eventID), pAgentSML, (const char*)pCallData) ;
 }
 
-// Called when a "PrintEvent" occurs in the kernel
-void PrintListener::HandleEvent(smlPrintEventId eventID, gSKI::Agent* agentPtr, const char* msg) 
-{
-	assert(GetAgentSML()->GetIAgent() == agentPtr) ;
-
-	OnEvent(eventID, GetAgentSML(), msg) ;
-}
-
 void PrintListener::OnEvent(smlPrintEventId eventID, AgentSML* pAgentSML, const char* msg)
 {
 	// We're assuming this is correct in the flush output function, so we should check it here
@@ -135,11 +127,11 @@ void PrintListener::FlushOutput(Connection* pSourceConnection, smlPrintEventId e
 	AnalyzeXML response ;
 
 	// For non-echo events, just send it normally
-	if (eventID != gSKIEVENT_ECHO)
+	if (eventID != smlEVENT_ECHO)
 	{
 		// Build the SML message we're going to send.
 		ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
-		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pAgent->GetName());
+		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName());
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].c_str());
 
@@ -162,7 +154,7 @@ void PrintListener::FlushOutput(Connection* pSourceConnection, smlPrintEventId e
 
 			// Build the SML message we're going to send.
 			ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
-			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pAgent->GetName());
+			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName());
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].c_str());
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamSelf, (pSourceConnection == pConnection) ? sml_Names::kTrue : sml_Names::kFalse) ;

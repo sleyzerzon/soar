@@ -200,14 +200,6 @@ namespace gSKI {
                                                              Error* err = 0) const = 0;
 
       /** 
-       *  This may be dangerous, because productions should be
-       *   i-supported, though it might be nice to have the ability to
-       *   add an operator for debug purposes.
-       */
-      /* TODO: Find out if we should have a "Propose Operator method*/
-      // virtual IWMObject* ProposeOperator()
-      
-      /** 
        * @brief Retrieves the goal dependency stack for this state
        *
        * The goal dependency stack is a list of WMEs in higher states that

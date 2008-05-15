@@ -8,11 +8,11 @@
 // specific events occur within the agent:
 //
 /*
-*     gSKIEVENT_AFTER_AGENT_CREATED,
-*     gSKIEVENT_BEFORE_AGENT_DESTROYED,
-*	  gSKIEVENT_BEFORE_AGENTS_RUN_STEP,
-*     gSKIEVENT_BEFORE_AGENT_REINITIALIZED,
-*     gSKIEVENT_AFTER_AGENT_REINITIALIZED,
+*     smlEVENT_AFTER_AGENT_CREATED,
+*     smlEVENT_BEFORE_AGENT_DESTROYED,
+*	  smlEVENT_BEFORE_AGENTS_RUN_STEP,
+*     smlEVENT_BEFORE_AGENT_REINITIALIZED,
+*     smlEVENT_AFTER_AGENT_REINITIALIZED,
 */
 /////////////////////////////////////////////////////////////////
 
@@ -20,10 +20,6 @@
 #define AGENT_LISTENER_H
 
 #include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_Iterator.h"
-#include "gSKI_Agent.h"
-#include "gSKI_Kernel.h"
 #include "sml_EventManager.h"
 
 #include <string>

@@ -11,11 +11,13 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_InputListener.h"
+
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
+
 #include "KernelHeaders.h"
 
 using namespace sml ;

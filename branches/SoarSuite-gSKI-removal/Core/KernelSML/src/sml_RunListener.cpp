@@ -10,27 +10,25 @@
 // specific events occur within the agent:
 //
 /*
-*     @li gSKIEVENT_BEFORE_SMALLEST_STEP
-*     @li gSKIEVENT_AFTER_SMALLEST_STEP
-*     @li gSKIEVENT_BEFORE_ELABORATION_CYCLE
-*     @li gSKIEVENT_AFTER_ELABORATION_CYCLE
-*     @li gSKIEVENT_BEFORE_PHASE_EXECUTED
-*     @li gSKIEVENT_AFTER_PHASE_EXECUTED
-*     @li gSKIEVENT_BEFORE_DECISION_CYCLE
-*     @li gSKIEVENT_AFTER_DECISION_CYCLE
-*     @li gSKIEVENT_AFTER_INTERRUPT
-*     @li gSKIEVENT_BEFORE_RUNNING
-*     @li gSKIEVENT_AFTER_RUNNING
+*     @li smlEVENT_BEFORE_SMALLEST_STEP
+*     @li smlEVENT_AFTER_SMALLEST_STEP
+*     @li smlEVENT_BEFORE_ELABORATION_CYCLE
+*     @li smlEVENT_AFTER_ELABORATION_CYCLE
+*     @li smlEVENT_BEFORE_PHASE_EXECUTED
+*     @li smlEVENT_AFTER_PHASE_EXECUTED
+*     @li smlEVENT_BEFORE_DECISION_CYCLE
+*     @li smlEVENT_AFTER_DECISION_CYCLE
+*     @li smlEVENT_AFTER_INTERRUPT
+*     @li smlEVENT_BEFORE_RUNNING
+*     @li smlEVENT_AFTER_RUNNING
 */
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_RunListener.h"
+
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
-#include "IgSKI_Production.h"
-#include "gSKI_ProductionManager.h"
-#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 
@@ -41,7 +39,6 @@ using namespace sml ;
 void RunListener::Init(sml::KernelSML *pKernelSML, AgentSML* pAgentSML)
 {
 	m_pKernelSML = pKernelSML ;
-	m_pAgent	 = pAgentSML->GetIAgent() ;
 	SetAgentSML(pAgentSML) ;
 }
 

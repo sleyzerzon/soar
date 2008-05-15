@@ -18,47 +18,21 @@
 #include "MegaAssert.h"
 #include "gSKI_Symbol.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_SymbolFactory);
-
 namespace gSKI
 {
 
-  /*
-    ===============================
-
-    ===============================
-  */
   SymbolFactory::SymbolFactory(agent* agent):
     m_agent(agent)
   {    
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
   SymbolFactory::~SymbolFactory() {}
 
-  /*
-    ===============================
-
-    ===============================
-  */
   void SymbolFactory::SetAgentPtr(agent* a) 
    {
       MegaAssert(a != 0, "Cannot set the agent pointer to 0 in the SymbolFactory.");
       m_agent = a;
    }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   ISymbol* SymbolFactory::CreateIntSymbol(int ivalue, Error * err) const
   {
@@ -67,12 +41,6 @@ namespace gSKI
     return new gSymbol(m_agent, ivalue);
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   ISymbol* SymbolFactory::CreateDoubleSymbol(double dvalue, 
                                                     Error * err) const
   {
@@ -80,12 +48,6 @@ namespace gSKI
     MegaAssert(m_agent != 0, "Cannot initialize a symbol with no agent structure available");
     return new gSymbol(m_agent, dvalue);
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   ISymbol* SymbolFactory::CreateStringSymbol(const char* svalue,
                                                     Error * err) const

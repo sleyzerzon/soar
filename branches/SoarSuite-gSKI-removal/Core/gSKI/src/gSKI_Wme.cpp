@@ -17,19 +17,8 @@
 #include "gSKI_Error.h"
 #include "MegaAssert.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_Wme);
-
 namespace gSKI
 {
-  /*
-    ===============================
-
-    ===============================
-  */
-
    Wme::Wme(IWorkingMemory* manager, wme* wme):
       m_manager(manager)
    {
@@ -41,19 +30,7 @@ namespace gSKI
       m_timetag = wme->timetag;
    }
    
-  /*
-    ===============================
-
-    ===============================
-  */
-
   Wme::~Wme() {}
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWMObject* Wme::GetOwningObject(Error* err) const
   {
@@ -67,12 +44,6 @@ namespace gSKI
     }
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   const ISymbol* Wme::GetAttribute(Error* err) const
   {
     ClearError(err);
@@ -81,12 +52,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   const ISymbol* Wme::GetValue(Error* err) const
   {
@@ -97,24 +62,12 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   long Wme::GetTimeTag(Error* err) const
   {
     ClearError(err);
 
     return m_timetag;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   egSKISupportType Wme::GetSupportType(Error * err) const
   {
@@ -125,12 +78,6 @@ namespace gSKI
     return gSKI_I_SUPPORT;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   tIProductionIterator* Wme::GetSupportProductions(Error* err) const
   {
     ClearError(err);
@@ -139,12 +86,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   bool Wme::HasBeenRemoved(Error* err) const
   {
@@ -155,12 +96,6 @@ namespace gSKI
     return false;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   bool Wme::IsEqual(IWme* wme, Error* err) const
   {
      ClearError(err);
@@ -170,12 +105,6 @@ namespace gSKI
      return false;
   }
 
-  /*
-    ===============================
-    
-    ===============================
-  */
-  
   bool Wme::Release(Error* err)
   {
     ClearError(err);
@@ -184,23 +113,11 @@ namespace gSKI
 	return false ;
   }
 
-
-  /*
-    ===============================
-
-    ===============================
-  */
-
   void Wme::SetOwningObject(WMObject* obj)
   {
      m_owningobject = obj;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
   bool Wme::AttributeEquals( const std::string& attr )
   {
     if ( m_attribute == 0 ) return false;

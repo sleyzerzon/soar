@@ -14,20 +14,8 @@
 *********************************************************************/
 #include "gSKI_WMStaticView.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_WMStaticView);
-
 namespace gSKI
 {
-
-  /*
-    ===============================
-
-    ===============================
-  */
-
   WMStaticView::~WMStaticView() {}
 
 }

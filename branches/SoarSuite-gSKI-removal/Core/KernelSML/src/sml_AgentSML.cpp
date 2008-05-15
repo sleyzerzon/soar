@@ -11,8 +11,9 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_AgentSML.h"
+
+#include "sml_Utils.h"
 #include "sml_OutputListener.h"
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
@@ -30,6 +31,7 @@
 #include "IgSKI_InputLink.h"
 #include "IgSKI_WorkingMemory.h"
 #include "gSKI_EnumRemapping.h"
+#include "gSKI_Enumerations.h"
 
 #include "KernelHeaders.h"
 

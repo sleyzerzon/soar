@@ -38,11 +38,6 @@ namespace gSKI {
    struct Error;
 }
 
-/*
-  ==================================
-   
-  ==================================
-*/
 template<typename T>
 inline bool IsInvalidPtr(T p, gSKI::Error *err)
 {

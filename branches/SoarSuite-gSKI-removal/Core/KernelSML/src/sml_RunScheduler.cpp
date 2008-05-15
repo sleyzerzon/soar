@@ -10,8 +10,10 @@
 // can function well in concert with a debugger.
 //
 /////////////////////////////////////////////////////////////////
-#include "sml_Utils.h"
+
 #include "sml_RunScheduler.h"
+
+#include "sml_Utils.h"
 
 #ifdef USE_NEW_SCHEDULER
 
@@ -21,6 +23,7 @@
 
 #include "gSKI_Error.h"
 #include "gSKI_AgentManager.h"
+#include "gSKI_Kernel.h"
 
 #include <assert.h>
 
@@ -367,9 +370,9 @@ void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 		// We register a listener so that the agent counters/flags get updated at the end of Output.
 		if (addListeners)
 		{
-			pAgentSML->GetAgentRunCallback()->RegisterWithKernel(gSKIEVENT_AFTER_OUTPUT_PHASE) ;
+			pAgentSML->GetAgentRunCallback()->RegisterWithKernel(smlEVENT_AFTER_OUTPUT_PHASE) ;
 			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			//pAgent->AddRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
+			//pAgent->AddRunListener(smlEVENT_AFTER_OUTPUT_PHASE, this) ;
 		}
 	} 
 }
@@ -599,9 +602,9 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 
 		if (removeListeners)
 		{
-			pAgentSML->GetAgentRunCallback()->UnregisterWithKernel(gSKIEVENT_AFTER_OUTPUT_PHASE) ;
+			pAgentSML->GetAgentRunCallback()->UnregisterWithKernel(smlEVENT_AFTER_OUTPUT_PHASE) ;
 			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			//pAgent->RemoveRunListener(gSKIEVENT_AFTER_OUTPUT_PHASE, this) ;
+			//pAgent->RemoveRunListener(smlEVENT_AFTER_OUTPUT_PHASE, this) ;
 		}
 	}
 }

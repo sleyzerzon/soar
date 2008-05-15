@@ -24,11 +24,6 @@
 
 #include "EventManagementTemplates.h"
 
-#include "ConcatRhsFunction.h"
-#include "InterruptRhsFunction.h"
-#include "ExecRhsFunction.h"
-#include "CmdRhsFunction.h"
-
 typedef struct agent_struct agent;
 
 // For the listeners

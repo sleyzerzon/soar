@@ -12,12 +12,14 @@
 /////////////////////////////////////////////////////////////////
 
 #include "sml_OutputListener.h"
+
 #include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_TagWme.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
 #include "KernelHeaders.h"
+
 #include "IgSKI_Wme.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_WMObject.h"
@@ -127,7 +129,7 @@ void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgen
 {
 	unused(outputMode) ;
 
-	if (eventId != gSKIEVENT_OUTPUT_PHASE_CALLBACK)
+	if (eventId != smlEVENT_OUTPUT_PHASE_CALLBACK)
 		return ;
 
 	// Get the first listener for this event (or return if there are none)
@@ -272,14 +274,14 @@ void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgen
 void OutputListener::RegisterForKernelSMLEvents()
 {
 	// Listen for output callback events so we can send this output over to the clients
-	this->RegisterWithKernel(gSKIEVENT_OUTPUT_PHASE_CALLBACK) ;
-	//m_Agent->GetOutputLink()->GetOutputMemory()->AddWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
+	this->RegisterWithKernel(smlEVENT_OUTPUT_PHASE_CALLBACK) ;
+	//m_Agent->GetOutputLink()->GetOutputMemory()->AddWorkingMemoryListener(smlEVENT_OUTPUT_PHASE_CALLBACK, this) ;
 }
 
 void OutputListener::UnRegisterForKernelSMLEvents()
 {
-	this->UnregisterWithKernel(gSKIEVENT_OUTPUT_PHASE_CALLBACK) ;
-	//m_Agent->GetOutputLink()->GetOutputMemory()->RemoveWorkingMemoryListener(gSKIEVENT_OUTPUT_PHASE_CALLBACK, this) ;
+	this->UnregisterWithKernel(smlEVENT_OUTPUT_PHASE_CALLBACK) ;
+	//m_Agent->GetOutputLink()->GetOutputMemory()->RemoveWorkingMemoryListener(smlEVENT_OUTPUT_PHASE_CALLBACK, this) ;
 }
 
 // Returns true if this is the first connection listening for this event
@@ -314,7 +316,7 @@ void OutputListener::HandleEvent(smlWorkingMemoryEventId eventId, gSKI::Agent* a
 {
 	unused(change) ;
 
-	if (eventId != gSKIEVENT_OUTPUT_PHASE_CALLBACK)
+	if (eventId != smlEVENT_OUTPUT_PHASE_CALLBACK)
 		return ;
 
 	if (wmelist->GetNumElements() == 0)

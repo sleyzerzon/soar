@@ -8,7 +8,7 @@
 // specific events occur within the agent:
 //
 /*
-*       gSKIEVENT_XML_TRACE_OUTPUT
+*       smlEVENT_XML_TRACE_OUTPUT
 */
 /////////////////////////////////////////////////////////////////
 
@@ -16,7 +16,6 @@
 #define XML_LISTENER_H
 
 #include "sml_EventManager.h"
-#include "sml_AgentOutputFlusher.h"
 #include "sml_XMLTrace.h"
 
 #include <string>
@@ -26,11 +25,13 @@ namespace sml {
 
 class KernelSML ;
 class Connection ;
+class AgentOutputFlusher;
+enum smlXMLEventId;
 
 class XMLListener : public EventManager<smlXMLEventId>
 {
 protected:
-	const static int kNumberEvents = gSKIEVENT_LAST_XML_EVENT - gSKIEVENT_XML_TRACE_OUTPUT + 1 ;
+	const static int kNumberEvents = smlEVENT_LAST_XML_EVENT - smlEVENT_XML_TRACE_OUTPUT + 1 ;
 	KernelSML*		m_pKernelSML ;
 	XMLTrace		m_BufferedXMLOutput[kNumberEvents];
 	AgentOutputFlusher* m_pAgentOutputFlusher[kNumberEvents];

@@ -8,11 +8,11 @@
 // specific events occur within the agent:
 //
 /*
-*      gSKIEVENT_AFTER_PRODUCTION_ADDED,
-*      gSKIEVENT_BEFORE_PRODUCTION_REMOVED,
-*     //gSKIEVENT_BEFORE_PRODUCTION_FIRED,
-*      gSKIEVENT_AFTER_PRODUCTION_FIRED,
-*      gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
+*      smlEVENT_AFTER_PRODUCTION_ADDED,
+*      smlEVENT_BEFORE_PRODUCTION_REMOVED,
+*     //smlEVENT_BEFORE_PRODUCTION_FIRED,
+*      smlEVENT_AFTER_PRODUCTION_FIRED,
+*      smlEVENT_BEFORE_PRODUCTION_RETRACTED,
 */
 /////////////////////////////////////////////////////////////////
 

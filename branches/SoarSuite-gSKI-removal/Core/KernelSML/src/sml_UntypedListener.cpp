@@ -11,13 +11,11 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_UntypedListener.h"
+
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
-#include "IgSKI_Production.h"
-#include "gSKI_ProductionManager.h"
-#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 

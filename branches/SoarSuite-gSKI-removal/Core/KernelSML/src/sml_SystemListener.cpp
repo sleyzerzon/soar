@@ -10,26 +10,28 @@
 // specific events occur within the kernel:
 /*
 *      // System events
-*      gSKIEVENT_BEFORE_SHUTDOWN            = 1,
-*      gSKIEVENT_AFTER_CONNECTION_LOST,
-*      gSKIEVENT_BEFORE_RESTART,
-*      gSKIEVENT_AFTER_RESTART,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_ADDED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_ADDED,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_REMOVED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_REMOVED,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_EXECUTED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_EXECUTED,
+*      smlEVENT_BEFORE_SHUTDOWN            = 1,
+*      smlEVENT_AFTER_CONNECTION_LOST,
+*      smlEVENT_BEFORE_RESTART,
+*      smlEVENT_AFTER_RESTART,
+*      smlEVENT_BEFORE_RHS_FUNCTION_ADDED,
+*      smlEVENT_AFTER_RHS_FUNCTION_ADDED,
+*      smlEVENT_BEFORE_RHS_FUNCTION_REMOVED,
+*      smlEVENT_AFTER_RHS_FUNCTION_REMOVED,
+*      smlEVENT_BEFORE_RHS_FUNCTION_EXECUTED,
+*      smlEVENT_AFTER_RHS_FUNCTION_EXECUTED,
 */////////////////////////////////////////////////////////////////
 
 #include "sml_SystemListener.h"
+
 #include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
-#include "gSKI_Kernel.h"
 #include "sml_KernelSML.h"
 #include "sml_Events.h"
 #include "sml_AgentSML.h"
+
+#include "gSKI_Kernel.h"
 
 using namespace sml ;
 
@@ -84,7 +86,7 @@ void SystemListener::OnKernelEvent(int eventIDIn, AgentSML* , void* )
 
 	// DJP May 2007: This was an earlier idea about how we'd control systems through SML.  I'm
 	// not sure this model (and these events) are relevant anymore.
-	if (eventID == gSKIEVENT_SYSTEM_START)
+	if (eventID == smlEVENT_SYSTEM_START)
 	{
 		bool suppress = m_pKernelSML->IsSystemStartSuppressed() ;
 
@@ -97,7 +99,7 @@ void SystemListener::OnKernelEvent(int eventIDIn, AgentSML* , void* )
 	}
 
 	// Similarly, system stop can be suppressed.
-	if (eventID == gSKIEVENT_SYSTEM_STOP)
+	if (eventID == smlEVENT_SYSTEM_STOP)
 	{
 		bool suppress = m_pKernelSML->IsSystemStopSuppressed() ;
 

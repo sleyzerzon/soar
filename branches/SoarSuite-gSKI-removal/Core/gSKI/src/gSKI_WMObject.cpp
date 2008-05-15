@@ -26,20 +26,8 @@
 
 #include "symtab.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//
-//DEF_EXPOSE(gSKI_WMObject);
-
 namespace gSKI 
 {
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    WMObject::WMObject(WorkingMemory* manager,Symbol* sym):
       m_gsym(0),
@@ -54,34 +42,17 @@ namespace gSKI
       m_gsym = new gSymbol(manager->GetSoarAgent(), sym, this, false);
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    WMObject::~WMObject() 
    {
      m_gsym->Release();
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
    const ISymbol* WMObject::GetId(Error* err) const
    {
       ClearError(err);
 
       return m_gsym;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    tIWMObjectIterator* WMObject::GetObjectsReferencing(Error* err) const
    {
@@ -92,12 +63,6 @@ namespace gSKI
       return 0;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    tIWMObjectIterator* WMObject::GetObjectsReferencedBy(Error* err) const
    {
       ClearError(err);
@@ -107,12 +72,6 @@ namespace gSKI
       return 0;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    tIWmeIterator* WMObject::GetWmesReferencing(Error* err) const
    {
       ClearError(err);
@@ -121,12 +80,6 @@ namespace gSKI
 
       return 0;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    tIWmeIterator* WMObject::GetWMEs(const char* attributeName,
                                     egSKISymbolType valueType,
@@ -139,24 +92,12 @@ namespace gSKI
       return 0;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    egSKIWMObjectType WMObject::GetObjectType(Error* err) const
    {
       ClearError(err);
 
       return gSKI_SIMPLE_OBJECT;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    IState* WMObject::ToState(Error* err) const
    {
@@ -167,12 +108,6 @@ namespace gSKI
       return 0;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    bool WMObject::HasBeenRemoved(Error* err) const
    {
       ClearError(err);
@@ -182,12 +117,6 @@ namespace gSKI
       return false;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    bool WMObject::IsEqual(IWMObject* object, Error* err) const
    {
       ClearError(err);
@@ -196,12 +125,6 @@ namespace gSKI
 
       return false;
    }
-
-   /*
-     ===============================
-    
-     ===============================
-   */
   
    bool WMObject::Release(Error* err)
    {
@@ -211,11 +134,6 @@ namespace gSKI
 	  return false ;
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void WMObject::ReInitialize() 
    {
       m_vwmes.clear();
@@ -223,41 +141,21 @@ namespace gSKI
       m_childmap.clear();
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void WMObject::AddReferencedWme(Wme* wme)
    {
       m_vwmes.push_back(wme);
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void WMObject::AddReferencedObject(WMObject* obj, Wme* wme)
    {
       m_childmap.insert(std::pair<Wme*,WMObject*>(wme, obj));
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void WMObject::AddReferencingObject(WMObject* obj, Wme* wme)
    {
       m_parentmap.insert(std::pair<Wme*,WMObject*>(wme, obj));
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    tIWMObjectIterator* 
    WMObject::GetObjectsReferencedByAttribute(const std::string& attr) const
    {

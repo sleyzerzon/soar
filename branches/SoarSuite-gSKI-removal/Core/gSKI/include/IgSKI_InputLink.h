@@ -48,18 +48,6 @@ namespace gSKI {
      virtual ~IInputLink() {}
       
       /**
-       * @brief 
-       *
-       */
-      //virtual void UpdateInputLink() = 0;
-
-      /**
-       * @brief
-       *
-       */
-      //virtual void SetAutomaticUpdate() = 0;
-
-      /**
        * @brief Returns aa pointer to the root WMObject on the input link
        *
        * This method returns a pointer to the root WMObject on the input link.

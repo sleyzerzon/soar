@@ -10,22 +10,26 @@
 // specific events occur within the agent:
 //
 /*
-*     gSKIEVENT_AFTER_AGENT_CREATED,
-*     gSKIEVENT_BEFORE_AGENT_DESTROYED,
-*	  gSKIEVENT_BEFORE_AGENTS_RUN_STEP,
-*     gSKIEVENT_BEFORE_AGENT_REINITIALIZED,
-*     gSKIEVENT_AFTER_AGENT_REINITIALIZED,
+*     smlEVENT_AFTER_AGENT_CREATED,
+*     smlEVENT_BEFORE_AGENT_DESTROYED,
+*	  smlEVENT_BEFORE_AGENTS_RUN_STEP,
+*     smlEVENT_BEFORE_AGENT_REINITIALIZED,
+*     smlEVENT_AFTER_AGENT_REINITIALIZED,
 */
 /////////////////////////////////////////////////////////////////
 
 #include "sml_AgentListener.h"
+
 #include "sml_Utils.h"
 #include "sml_OutputListener.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
-#include "gSKI_AgentManager.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
+
+#include "gSKI_AgentManager.h"
+#include "gSKI_Agent.h"
+#include "gSKI_Kernel.h"
 
 #include "assert.h"
 
@@ -37,12 +41,6 @@ using namespace sml ;
 void AgentListener::Init(KernelSML* pKernelSML)
 {
 	m_pKernelSML = pKernelSML ;
-
-	// Listen for "before" init-soar events (we need to know when these happen so we can release all WMEs on the input link, otherwise gSKI will fail to re-init the kernel correctly.)
-	//m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_BEFORE_AGENT_REINITIALIZED, this, false) ;
-
-	// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
-	//m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_AFTER_AGENT_REINITIALIZED, this, false) ;
 }
 
 // Returns true if this is the first connection listening for this event

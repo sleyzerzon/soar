@@ -9,17 +9,22 @@
 // This class's HandleEvent method is called when
 // specific events occur within the kernel:
 /*
-*      gSKIEVENT_RHS_USER_FUNCTION
+*      smlEVENT_RHS_USER_FUNCTION
 */
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_RhsListener.h"
+
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
+
 #include "gSKI_Agent.h"
+#include "gSKI_Events.h"
+#include "gSKI_Enumerations.h"
+#include "IgSKI_Iterator.h"
 
 using namespace sml ;
 
@@ -74,19 +79,6 @@ void RhsListener::RemoveRhsListener(char const* pFunctionName, Connection* pConn
 void RhsListener::Init(KernelSML* pKernel)
 {
 	m_pKernelSML = pKernel ;
-
-	// We always listen for RHS functions because we use the same callback to implement
-	// both "cmd" and "exec" and "cmd" is valid even if no clients are registered with us
-	// as it's handled internally by KernelSML.
-	// (Note -- this callback is only fired if we hit one of our RHS functions, not all RHS functions so
-	// registering for it all of the time doesn't incur extra overhead).
-	/*
-	if (!m_bListeningRHS)
-	{
-		m_pKernelSML->GetKernel()->AddRhsListener(gSKIEVENT_RHS_USER_FUNCTION, this) ;	
-		m_bListeningRHS = true ;
-	}
-	*/
 }
 
 // Release memory
@@ -101,15 +93,6 @@ void RhsListener::Clear()
 
 	// Release the RHS function lists
 	m_RhsMap.clear() ;
-
-	// Stop listening for RHS functions
-	/*
-	if (m_bListeningRHS)
-	{
-		m_pKernelSML->GetKernel()->RemoveRhsListener(gSKIEVENT_RHS_USER_FUNCTION, this) ;
-		m_bListeningRHS = false ;
-	}
-	*/
 }
 
 void RhsListener::RemoveAllListeners(Connection* pConnection)
@@ -124,11 +107,11 @@ void RhsListener::RemoveAllListeners(Connection* pConnection)
 	}
 }
 
-bool RhsListener::HandleFilterEvent(smlRhsEventId eventID, gSKI::Agent* pAgent, char const* pArgument,
+bool RhsListener::HandleFilterEvent(smlRhsEventId eventID, AgentSML* pAgent, char const* pArgument,
 						    int maxLengthReturnValue, char* pReturnValue)
 {
 	// Currently only supporting one event here, but that could change in time.
-	assert(eventID == gSKIEVENT_FILTER) ;
+	assert(eventID == smlEVENT_FILTER) ;
 
 	// Filters are handled as a RHS function call internally, using a special reserved name.
 	char const* pFunctionName = sml_Names::kFilterName ;
@@ -231,7 +214,7 @@ bool RhsListener::HandleFilterEvent(smlRhsEventId eventID, gSKI::Agent* pAgent, 
 // pFunctionName and pArgument define the RHS function being called (the client may parse pArgument to extract other values)
 // pResultValue is a string allocated by the caller than is of size maxLengthReturnValue that should be filled in with the return value.
 // The bool return value should be "true" if a return value is filled in, otherwise return false.
-bool RhsListener::HandleEvent(smlRhsEventId eventID, gSKI::Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+bool RhsListener::HandleEvent(smlRhsEventId eventID, AgentSML* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 						    int maxLengthReturnValue, char* pReturnValue)
 {
 	// If this should be handled by the command line processor do so now without going
@@ -433,7 +416,7 @@ bool RhsListener::ExecuteRhsCommand(AgentSML* pAgentSML, smlRhsEventId eventID, 
 }
 
 // Execute the command line by building up an XML message and submitting it to our regular command processor.
-bool RhsListener::ExecuteCommandLine(gSKI::Agent* pAgent, char const* pFunctionName, char const* pArgument, int maxLengthReturnValue, char* pReturnValue)
+bool RhsListener::ExecuteCommandLine(AgentSML* pAgent, char const* pFunctionName, char const* pArgument, int maxLengthReturnValue, char* pReturnValue)
 {
 	KernelSML* pKernel = m_pKernelSML ;
 

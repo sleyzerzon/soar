@@ -10,11 +10,12 @@
 // specific events occur within the agent:
 //
 /*
-*       gSKIEVENT_XML_TRACE_OUTPUT
+*       smlEVENT_XML_TRACE_OUTPUT
 */
 /////////////////////////////////////////////////////////////////
 
 #include "sml_XMLListener.h"
+
 #include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
@@ -67,8 +68,8 @@ bool XMLListener::RemoveListener(smlXMLEventId eventID, Connection* pConnection)
 		UnregisterWithKernel(eventID) ;
 
 		// Unregister for the events when we'll flush the buffer
-		delete m_pAgentOutputFlusher[eventID-gSKIEVENT_XML_TRACE_OUTPUT] ;
-		m_pAgentOutputFlusher[eventID-gSKIEVENT_XML_TRACE_OUTPUT] = NULL ;
+		delete m_pAgentOutputFlusher[eventID-smlEVENT_XML_TRACE_OUTPUT] ;
+		m_pAgentOutputFlusher[eventID-smlEVENT_XML_TRACE_OUTPUT] = NULL ;
 	}
 
 	return last ;

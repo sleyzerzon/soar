@@ -8,9 +8,6 @@
 #ifndef AGENT_OUTPUT_FLUSHER_H
 #define AGENT_OUTPUT_FLUSHER_H
 
-#include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "gSKI_Agent.h"
 #include "sml_KernelCallback.h"
 
 namespace sml {

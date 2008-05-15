@@ -374,19 +374,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\CmdRhsFunction.h"
-				>
-			</File>
-			<File
-				RelativePath="src\ConcatRhsFunction.h"
-				>
-			</File>
-			<File
 				RelativePath="src\EventManagementTemplates.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ExecRhsFunction.h"
 				>
 			</File>
 			<File
@@ -638,14 +626,6 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_Stub.cpp"
-				>
-			</File>
-			<File
-				RelativePath="include\gSKI_Stub.h"
-				>
-			</File>
-			<File
 				RelativePath="src\gSKI_Symbol.cpp"
 				>
 			</File>
@@ -775,10 +755,6 @@
 			</File>
 			<File
 				RelativePath="include\megaassert.h"
-				>
-			</File>
-			<File
-				RelativePath="include\Win32LinuxDefines.h"
 				>
 			</File>
 		</Filter>

@@ -12,8 +12,9 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_KernelSML.h"
+
+#include "sml_Utils.h"
 #include "sml_AgentSML.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
@@ -35,7 +36,6 @@
 #include <assert.h>
 
 #include "gSKI_KernelFactory.h"
-#include "gSKI_Stub.h"
 #include "gSKI_Kernel.h"
 
 #include "gSKI_Error.h"
@@ -53,14 +53,13 @@
 #include "IgSKI_WorkingMemory.h"
 
 using namespace sml ;
-using namespace gSKI ;
 
 /*
   ==================================
   SML input producer
   ==================================
 */
-class sml_InputProducer: public IInputProducer
+class sml_InputProducer: public gSKI::IInputProducer
 {
 public:
 
@@ -76,8 +75,8 @@ public:
    
    // The update function required by the IInputProducer interface
    // (Responsible for updating the state of working memory)
-   virtual void Update(IWorkingMemory* wmemory,
-                       IWMObject* obj)
+   virtual void Update(gSKI::IWorkingMemory* wmemory,
+                       gSKI::IWMObject* obj)
    {
 	   unused(wmemory) ;
 	   unused(obj) ;
@@ -152,7 +151,7 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 	AgentSML* pAgentSML = new AgentSML(this, pSoarAgent) ;
 
 	// Make the call.
-	Agent* pIAgent = GetKernel()->GetAgentManager()->AddAgent(pSoarAgent, NULL, false, gSKI_O_SUPPORT_MODE_4, pError) ;
+	gSKI::Agent* pIAgent = GetKernel()->GetAgentManager()->AddAgent(pSoarAgent, NULL, false, gSKI_O_SUPPORT_MODE_4, pError) ;
 	pAgentSML->SetIAgent(pIAgent) ;
 	this->RecordAgentSML(pAgentSML, pSoarAgent) ;
 	this->RecordIAgent(pAgentSML, pIAgent) ;
@@ -166,9 +165,6 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 	// Notify listeners that there is a new agent
 	this->FireAgentEvent(pAgentSML, smlEVENT_AFTER_AGENT_CREATED) ;
 
-	// Also notify gSKI 
-	//GetKernel()->GetAgentManager()->FireAgentCreated(pIAgent) ;
-
 	// Register for output from this agent
 	if (pIAgent)
 	{
@@ -181,8 +177,8 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 		pAgentSML->SetInputProducer(pInputProducer) ;
 
 		// Add the input producer to the top level of the input link (doesn't matter for us which WME it's attached to)
-		IInputLink* pInputLink = pIAgent->GetInputLink() ;
-		IWMObject* pRoot = NULL ;
+		gSKI::IInputLink* pInputLink = pIAgent->GetInputLink() ;
+		gSKI::IWMObject* pRoot = NULL ;
 		pInputLink->GetRootObject(&pRoot) ;
 		pIAgent->GetInputLink()->AddInputProducer(pRoot, pInputProducer) ;
 		pRoot->Release() ;
@@ -319,7 +315,7 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 			pAgentSML->AddPrintListener(static_cast<smlPrintEventId>(id), pConnection) ;
 		else
 			pAgentSML->RemovePrintListener(static_cast<smlPrintEventId>(id), pConnection) ;
-	} else if(id == (int)gSKIEVENT_OUTPUT_PHASE_CALLBACK) {
+	} else if(id == (int)smlEVENT_OUTPUT_PHASE_CALLBACK) {
 
 		// Output event
 		AgentSML* pAgentSML = GetAgentSML(pAgent) ;
@@ -591,7 +587,7 @@ bool KernelSML::HandleIsProductionLoaded(gSKI::Agent* pAgent, char const* pComma
 		return InvalidArg(pConnection, pResponse, pCommandName, "Need to specify the production name to check.") ;
 	}
 
-	tIProductionIterator* prodIter = pAgent->GetProductionManager()->GetProduction(pName, false, pError) ;
+	gSKI::tIProductionIterator* prodIter = pAgent->GetProductionManager()->GetProduction(pName, false, pError) ;
 	bool found = prodIter->GetNumElements() > 0 ;
 	prodIter->Release() ;
 
@@ -630,10 +626,10 @@ bool KernelSML::HandleGetAgentList(gSKI::Agent* pAgent, char const* pCommandName
 	unused(pAgent) ; unused(pCommandName) ; unused(pConnection) ; unused(pIncoming) ;
 
 	// Make the call.
-	AgentManager* pManager = GetKernel()->GetAgentManager() ;
+	gSKI::AgentManager* pManager = GetKernel()->GetAgentManager() ;
 
 	// Get the list of agents
-	tIAgentIterator* iter = pManager->GetAgentIterator(pError) ;
+	gSKI::tIAgentIterator* iter = pManager->GetAgentIterator(pError) ;
 
 	if (!iter)
 		return false ;
@@ -645,7 +641,7 @@ bool KernelSML::HandleGetAgentList(gSKI::Agent* pAgent, char const* pCommandName
 	// Walk the list of agents and return their names
 	while (iter->IsValid())
 	{
-		Agent* pAgent = iter->GetVal() ;
+		gSKI::Agent* pAgent = iter->GetVal() ;
 
 		// Add a name tag to the output
 		TagName* pTagName = new TagName() ;
@@ -794,14 +790,14 @@ bool KernelSML::HandleGetInputLink(gSKI::Agent* pAgent, char const* pCommandName
 
 	// We want the input link's id
 	// Start with the root object for the input link
-	IWMObject* pRootObject = NULL ;
+	gSKI::IWMObject* pRootObject = NULL ;
 	pAgent->GetInputLink()->GetRootObject(&pRootObject, pError) ;
 
 	if (pRootObject == NULL)
 		return false ;
 
 	// Get the symbol for the id of this object
-	ISymbol const* pID = pRootObject->GetId(pError) ;
+	gSKI::ISymbol const* pID = pRootObject->GetId(pError) ;
 
 	if (pID == NULL)
 	{
@@ -835,12 +831,12 @@ bool KernelSML::AddInputWME(gSKI::Agent* pAgent, char const* pID, char const* pA
 	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
 
 	bool addingToInputLink = true ;
-	IWorkingMemory* pInputWM = pAgent->GetInputLink()->GetInputLinkMemory(pError) ;
+	gSKI::IWorkingMemory* pInputWM = pAgent->GetInputLink()->GetInputLinkMemory(pError) ;
 
 	// First get the object which will own this new wme
 	// Because we build from the top down, this should always exist by the
 	// time we wish to add structure beneath it.
-	IWMObject* pParentObject = NULL ;
+	gSKI::IWMObject* pParentObject = NULL ;
 	pInputWM->GetObjectById(pID, &pParentObject) ;
 
 	// Soar also allows the environment to modify elements on the output link.
@@ -857,7 +853,7 @@ bool KernelSML::AddInputWME(gSKI::Agent* pAgent, char const* pID, char const* pA
 	if (!pParentObject)
 		return false ;
 
-	IWme* pWME = NULL ;
+	gSKI::IWme* pWME = NULL ;
 
 	if (IsStringEqual(sml_Names::kTypeString, pType))
 	{
@@ -874,7 +870,7 @@ bool KernelSML::AddInputWME(gSKI::Agent* pAgent, char const* pID, char const* pA
 		pAgentSML->ConvertID(pValue, &value) ;
 
 		// See if we can find an object with this id (if so we're not adding a new identifier)
-		IWMObject* pLinkObject = NULL ;
+		gSKI::IWMObject* pLinkObject = NULL ;
 		pInputWM->GetObjectById(value.c_str(), &pLinkObject) ;
 
 		if (pLinkObject)
@@ -953,10 +949,10 @@ bool KernelSML::RemoveInputWME(gSKI::Agent* pAgent, char const* pTimeTag, gSKI::
 	// We store additional information for SML in the AgentSML structure, so look that up.
 	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
 
-	IWorkingMemory* pInputWM = pAgent->GetInputLink()->GetInputLinkMemory(pError) ;
+	gSKI::IWorkingMemory* pInputWM = pAgent->GetInputLink()->GetInputLinkMemory(pError) ;
 
 	// Get the wme that matches this time tag
-	IWme* pWME = pAgentSML->ConvertTimeTag(pTimeTag) ;
+	gSKI::IWme* pWME = pAgentSML->ConvertTimeTag(pTimeTag) ;
 
 	// Failed to find the wme--that shouldn't happen.
 	if (!pWME)
@@ -1046,7 +1042,7 @@ static char const* GetValueType(egSKISymbolType type)
 	}
 }
 
-static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, std::list<IWMObject*> *pTraversedList)
+static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, std::list<gSKI::IWMObject*> *pTraversedList)
 {
 	if (!pRoot || !pTagResult)
 		return false ;
@@ -1126,7 +1122,7 @@ assert(false) ;
 
 	// We need to keep track of which identifiers we've already added
 	// because this is a graph, so we may cycle back.
-	std::list<IWMObject*> traversedList ;
+	std::list<gSKI::IWMObject*> traversedList ;
 
 	// Add this wme's children to XML
 	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
@@ -1371,7 +1367,7 @@ bool KernelSML::HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName,
 		char* pXMLString = filterXML.GenerateXMLString(true) ;
 
 		std::string filteredXML ;
-		bool filtered = this->SendFilterMessage(pAgent, pXMLString, &filteredXML) ;
+		bool filtered = this->SendFilterMessage(pAgentSML, pXMLString, &filteredXML) ;
 
 		// Clean up the XML message
 		filterXML.DeleteString(pXMLString) ;

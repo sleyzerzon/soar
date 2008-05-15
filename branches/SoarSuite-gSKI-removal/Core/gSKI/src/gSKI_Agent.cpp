@@ -38,6 +38,8 @@
 #include "decide.h"
 #include "recmem.h"
 
+using namespace xmlTraceNames;
+
 
 // Private namespace for the workaround for callbacks
 namespace {

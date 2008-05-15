@@ -29,37 +29,14 @@
 #include "agent.h"
 #include "gdatastructs.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_WorkingMemory);
-
 namespace gSKI
 {
-  /*
-    ===============================
-
-    ===============================
-  */
-
    WorkingMemory::WorkingMemory(Agent* agent):
      m_agent(agent),
      m_rootOutputObject(0)
    {}
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   WorkingMemory::~WorkingMemory() {}
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   Agent* WorkingMemory::GetAgent(Error * err) const
   {
@@ -67,12 +44,6 @@ namespace gSKI
 
     return m_agent;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWme* WorkingMemory::AddWme(const ISymbol* idSymbol, 
                               const ISymbol* attrSymbol,
@@ -86,12 +57,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::AddWmeInt(IWMObject* wmObject,
                                  const char* attr,
                                  int intValue,
@@ -103,12 +68,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWme* WorkingMemory::AddWmeDouble(IWMObject* wmObject,
                                     const char* attr,
@@ -122,12 +81,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::AddWmeString(IWMObject* wmObject,
                                     const char* attr,
                                     const char* value,
@@ -139,12 +92,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWme* WorkingMemory::AddWmeObjectCopy(IWMObject*       wmObject,
                                         const char*      attr,
@@ -158,12 +105,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::AddWmeObjectLink(IWMObject* wmObject,
                                         const char* attr,
                                         IWMObject* value,
@@ -176,12 +117,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::AddWmeNewObject(IWMObject* wmObject,
                                        const char* attr,
                                        Error* err)
@@ -192,12 +127,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWme* WorkingMemory::ReplaceWme(IWme* oldwme,
                                   const ISymbol* newvalue,
@@ -210,12 +139,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::ReplaceIntWme(IWme* oldwme,
                                      int newvalue,
                                      Error* err)
@@ -226,12 +149,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWme* WorkingMemory::ReplaceDoubleWme(IWme* oldwme,
                                         double newvalue,
@@ -244,12 +161,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::ReplaceStringWme(IWme* oldwme,
                                         const char* newvalue,
                                         Error* err)
@@ -260,12 +171,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWme* WorkingMemory::ReplaceWmeObjectCopy(IWme* oldwme,
                                             const IWMObject* newvalue,
@@ -278,12 +183,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::ReplaceWmeObjectLink(IWme* oldwme,
                                             const IWMObject* newvalue,
                                             Error* err)
@@ -295,12 +194,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   IWme* WorkingMemory::ReplaceWmeNewObject(IWme* oldwme,
                                            Error* err)
   {
@@ -311,12 +204,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   void WorkingMemory::RemoveWme(IWme* wme,
                                 Error* err)
   {
@@ -324,12 +211,6 @@ namespace gSKI
 
     MegaAssert(false, "NOT IMPLEMENTED YET!");
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   void WorkingMemory::RemoveObject(IWMObject* object,
                                    Error* err)
@@ -339,12 +220,6 @@ namespace gSKI
     MegaAssert(false, "NOT IMPLEMENTED YET!");
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   void WorkingMemory::RemoveObjectWmes(IWMObject* object,
                                        Error* err)
   {
@@ -352,12 +227,6 @@ namespace gSKI
 
     MegaAssert(false, "NOT IMPLEMENTED YET!");
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   ISymbolFactory* WorkingMemory::GetSymbolFactory(Error* err)
   {
@@ -367,12 +236,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   void WorkingMemory::GetObjectById(const char* idstring,
                                     IWMObject** object,
@@ -385,12 +248,6 @@ namespace gSKI
      object = 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   tIWMObjectIterator* WorkingMemory::GetAllObjects(Error* err) const
   {
     ClearError(err);
@@ -399,12 +256,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   tIWmeIterator* WorkingMemory::GetAllWmes(Error* err) const
   {
@@ -415,12 +266,6 @@ namespace gSKI
     return 0;
   }
   
-  /*
-    ===============================
-
-    ===============================
-  */
-
   tIWMObjectIterator* WorkingMemory::FindObjectsByCriteria(Error* err) const
   {
     ClearError(err);
@@ -430,12 +275,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   tIWmeIterator* WorkingMemory::FindWmesByCriteria(Error* err) const
   {
     ClearError(err);
@@ -444,12 +283,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
   
   IWMStaticView* WorkingMemory::CreateSubView(const IWMObject* rootobject,
                                Error* err) const
@@ -460,12 +293,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
    void WorkingMemory::UpdateWithIOWmes(io_wme* wmelist)
    {
@@ -560,12 +387,6 @@ namespace gSKI
 
    }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
    wme* WorkingMemory::GetInputWme(Symbol* id, 
 				   Symbol* attribute, 
 				   Symbol* value)
@@ -587,12 +408,6 @@ namespace gSKI
       }
       return 0;
    }
-
-   /*
-     ===============================
-     
-     ===============================
-   */
    
    wme* WorkingMemory::GetSlotWme(Symbol* id,
                                   Symbol* attribute,
@@ -625,12 +440,6 @@ namespace gSKI
       return 0;
    }
    
-   /*
-     ===============================
-     
-     ===============================
-   */
-
    WMObject* WorkingMemory::GetOrCreateWMObject(Symbol* idSymbol)
    {
       // Return a null pointer if one is passed
@@ -653,12 +462,6 @@ namespace gSKI
       return obj;
    }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-      
   Wme* WorkingMemory::GetOrCreateWme(wme* rawWme) 
   {
      // Returning a null pointer if one is passed in
@@ -679,11 +482,6 @@ namespace gSKI
      return wme;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
   void WorkingMemory::ReInitializeWMObjects()
   {
      for ( tWMObjectIt it = m_wmobjectmap.begin(); 
@@ -693,22 +491,12 @@ namespace gSKI
      }
   }
       
-  /*
-    ===============================
-
-    ===============================
-  */
   tIWMObjectIterator* WorkingMemory::FindObjects( WMObject* obj, 
                                                   const std::string& path)
   {
     return obj->GetObjectsReferencedByAttribute(path);
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
   void WorkingMemory::GetOutputRootObject(WMObject** rootObject)
   {
     if ( m_rootOutputObject == 0 ) {
@@ -725,29 +513,17 @@ namespace gSKI
     *rootObject = m_rootOutputObject;
   }
 
-  /*
-    ===============================
-    ===============================
-  */
   agent* WorkingMemory::GetSoarAgent()
   {
     return m_agent->GetSoarAgent();
   }
 
-  /*
-    ===============================
-    ===============================
-  */
   void WorkingMemory::Reinitialize()
   {
      ReleaseAllWmes();
      ReleaseAllWMObjects();
   }
 
-  /*
-    ===============================
-    ===============================
-  */
    void WorkingMemory::ReleaseAllWmes()
    {
       for ( tWmeIt it = m_wmemap.begin(); it != m_wmemap.end(); ++it ) {
@@ -756,10 +532,6 @@ namespace gSKI
       m_wmemap.clear();
    }
    
-   /*
-     ===============================
-     ===============================
-   */
    void WorkingMemory::ReleaseAllWMObjects()
    {
       for ( tWMObjectIt it = m_wmobjectmap.begin(); it != m_wmobjectmap.end();

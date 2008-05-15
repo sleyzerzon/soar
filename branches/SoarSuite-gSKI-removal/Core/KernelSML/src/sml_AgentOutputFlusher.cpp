@@ -8,11 +8,14 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_AgentOutputFlusher.h"
+
 #include "assert.h"
+
+#include "sml_Utils.h"
 #include "sml_PrintListener.h"
 #include "sml_XMLListener.h"
+#include "sml_Events.h"
 
 using namespace sml ;
 
@@ -21,10 +24,8 @@ AgentOutputFlusher::AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* 
 	m_pXMLListener = NULL ;
 	m_EventID = eventID ;
 	this->SetAgentSML(pAgent) ;
-	this->RegisterWithKernel(gSKIEVENT_AFTER_DECISION_CYCLE) ;
-	this->RegisterWithKernel(gSKIEVENT_AFTER_RUNNING) ;
-	//m_pAgent->AddRunListener(gSKIEVENT_AFTER_DECISION_CYCLE, this);
-	//m_pAgent->AddRunListener(gSKIEVENT_AFTER_RUNNING, this);
+	this->RegisterWithKernel(smlEVENT_AFTER_DECISION_CYCLE) ;
+	this->RegisterWithKernel(smlEVENT_AFTER_RUNNING) ;
 }
 
 AgentOutputFlusher::AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, smlXMLEventId eventID) : m_pXMLListener(pXMLListener)
@@ -32,22 +33,19 @@ AgentOutputFlusher::AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAge
 	m_pPrintListener = NULL ;
 	m_EventID = eventID ;
 	this->SetAgentSML(pAgent) ;
-	this->RegisterWithKernel(gSKIEVENT_AFTER_DECISION_CYCLE) ;
-	this->RegisterWithKernel(gSKIEVENT_AFTER_RUNNING) ;
+	this->RegisterWithKernel(smlEVENT_AFTER_DECISION_CYCLE) ;
+	this->RegisterWithKernel(smlEVENT_AFTER_RUNNING) ;
 }
 
 AgentOutputFlusher::~AgentOutputFlusher()
 {
-	this->UnregisterWithKernel(gSKIEVENT_AFTER_DECISION_CYCLE) ;
-	this->UnregisterWithKernel(gSKIEVENT_AFTER_RUNNING) ;
-
-	//m_pAgent->RemoveRunListener(gSKIEVENT_AFTER_DECISION_CYCLE, this);
-	//m_pAgent->RemoveRunListener(gSKIEVENT_AFTER_RUNNING, this);
+	this->UnregisterWithKernel(smlEVENT_AFTER_DECISION_CYCLE) ;
+	this->UnregisterWithKernel(smlEVENT_AFTER_RUNNING) ;
 }
 
 void AgentOutputFlusher::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
-	assert(eventID == gSKIEVENT_AFTER_DECISION_CYCLE || eventID == gSKIEVENT_AFTER_RUNNING);
+	assert(eventID == smlEVENT_AFTER_DECISION_CYCLE || eventID == smlEVENT_AFTER_RUNNING);
 	unused(eventID);
 	unused(pAgentSML);
 	unused(pCallData);

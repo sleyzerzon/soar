@@ -8,28 +8,25 @@
 // specific events occur within the agent:
 //
 /*
-*     @li gSKIEVENT_BEFORE_SMALLEST_STEP
-*     @li gSKIEVENT_AFTER_SMALLEST_STEP
-*     @li gSKIEVENT_BEFORE_ELABORATION_CYCLE
-*     @li gSKIEVENT_AFTER_ELABORATION_CYCLE
-*     @li gSKIEVENT_BEFORE_PHASE_EXECUTED
-*     @li gSKIEVENT_AFTER_PHASE_EXECUTED
-*     @li gSKIEVENT_BEFORE_DECISION_CYCLE
-*     @li gSKIEVENT_AFTER_DECISION_CYCLE
-*     @li gSKIEVENT_AFTER_INTERRUPT
-*     @li gSKIEVENT_BEFORE_RUNNING
-*     @li gSKIEVENT_AFTER_RUNNING
+*     @li smlEVENT_BEFORE_SMALLEST_STEP
+*     @li smlEVENT_AFTER_SMALLEST_STEP
+*     @li smlEVENT_BEFORE_ELABORATION_CYCLE
+*     @li smlEVENT_AFTER_ELABORATION_CYCLE
+*     @li smlEVENT_BEFORE_PHASE_EXECUTED
+*     @li smlEVENT_AFTER_PHASE_EXECUTED
+*     @li smlEVENT_BEFORE_DECISION_CYCLE
+*     @li smlEVENT_AFTER_DECISION_CYCLE
+*     @li smlEVENT_AFTER_INTERRUPT
+*     @li smlEVENT_BEFORE_RUNNING
+*     @li smlEVENT_AFTER_RUNNING
 */
 /////////////////////////////////////////////////////////////////
 
 #ifndef RUN_LISTENER_H
 #define RUN_LISTENER_H
 
-#include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_Iterator.h"
-#include "gSKI_Agent.h"
 #include "sml_EventManager.h"
+
 #include <string>
 #include <map>
 
@@ -43,13 +40,11 @@ class RunListener : public EventManager<smlRunEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
-	gSKI::Agent*	m_pAgent ;
 
 public:
 	RunListener()
 	{
 		m_pKernelSML = 0 ;
-		m_pAgent	 = 0 ;
 	}
 
 	virtual ~RunListener()

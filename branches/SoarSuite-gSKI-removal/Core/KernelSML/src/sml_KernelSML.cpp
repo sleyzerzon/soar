@@ -13,8 +13,9 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_KernelSML.h"
+
+#include "sml_Utils.h"
 #include "sml_AgentSML.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
@@ -34,7 +35,6 @@
 #include <stdlib.h>
 
 #include "gSKI_KernelFactory.h"
-#include "gSKI_Stub.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_Error.h"
 #include "gSKI_ErrorIds.h"
@@ -52,7 +52,6 @@
 #include "KernelHeaders.h"
 
 using namespace sml ;
-using namespace gSKI ;
 
 // Singleton instance of the kernel object
 KernelSML* KernelSML::s_pKernel = NULL ;
@@ -107,7 +106,7 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	m_pEventMap = new Events() ;
 
 	// Create a Kernel Factory
-	m_pKernelFactory = gSKI_CreateKernelFactory();
+	m_pKernelFactory = new gSKI::KernelFactory();
    
 	// Create the kernel instance
 	m_pIKernel = m_pKernelFactory->Create();
@@ -239,7 +238,7 @@ std::string KernelSML::FireEditProductionEvent(char const* pProduction) {
 	callbackData.maxLengthReturnStringBuffer = kBufferLength;
 	callbackData.pReturnStringBuffer = response;
 
-	m_StringListener.OnKernelEvent( gSKIEVENT_EDIT_PRODUCTION, 0, &callbackData );
+	m_StringListener.OnKernelEvent( smlEVENT_EDIT_PRODUCTION, 0, &callbackData );
 
 	// This next bit of code is completely redundant, the strcpy below is basically a no-op:
 
@@ -267,7 +266,7 @@ std::string KernelSML::FireLoadLibraryEvent(char const* pLibraryCommand) {
 	callbackData.maxLengthReturnStringBuffer = kBufferLength;
 	callbackData.pReturnStringBuffer = response;
 
-	m_StringListener.OnKernelEvent( gSKIEVENT_LOAD_LIBRARY, 0, &callbackData );
+	m_StringListener.OnKernelEvent( smlEVENT_LOAD_LIBRARY, 0, &callbackData );
 
 	// This next bit of code is completely redundant, the strcpy below is basically a no-op:
 
@@ -292,7 +291,7 @@ std::string KernelSML::SendClientMessage(gSKI::Agent* pAgent, char const* pMessa
 	char response[10000] ;
 	response[0] = 0 ;
 
-	bool ok = m_RhsListener.HandleEvent(smlEVENT_CLIENT_MESSAGE, pAgent, false, pMessageType, pMessage, sizeof(response), response) ;
+	bool ok = m_RhsListener.HandleEvent(smlEVENT_CLIENT_MESSAGE, GetAgentSML(pAgent), false, pMessageType, pMessage, sizeof(response), response) ;
 	if (!ok)
 	{
 		// There was listening to this message
@@ -308,7 +307,7 @@ std::string KernelSML::SendClientMessage(gSKI::Agent* pAgent, char const* pMessa
 *			version of the command line.
 *			Returns true if at least one filter was registered.
 *************************************************************/
-bool KernelSML::SendFilterMessage(gSKI::Agent* pAgent, char const* pCommandLine, std::string* pResult)
+bool KernelSML::SendFilterMessage(AgentSML* pAgent, char const* pCommandLine, std::string* pResult)
 {
 	char response[10000] ;
 	response[0] = 0 ;
@@ -618,12 +617,12 @@ bool KernelSML::InvalidArg(Connection* pConnection, ElementXML* pResponse, char 
 /*************************************************************
 * @brief	Look up an agent from its name.
 *************************************************************/
-Agent* KernelSML::GetAgent(char const* pAgentName)
+gSKI::Agent* KernelSML::GetAgent(char const* pAgentName)
 {
 	if (!pAgentName)
 		return NULL ;
 
-	Agent* pAgent = GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
+	gSKI::Agent* pAgent = GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
 	return pAgent ;
 }
 
@@ -691,7 +690,7 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 	// Look up the agent name parameter (most commands have this)
 	char const* pAgentName = pIncoming->GetArgString(sml_Names::kParamAgent) ;
 
-	Agent* pAgent = NULL ;
+	gSKI::Agent* pAgent = NULL ;
 
 	if (pAgentName)
 	{
@@ -813,7 +812,7 @@ ElementXML* KernelSML::ProcessIncomingSML(Connection* pConnection, ElementXML* p
 // the clientTimeTag is because wme->GetTimeTag() is only valid once the wme has actually
 // been added to the kernel's working memory--which won't happen until Soar is next run
 // and we pass through an input-phase.
-static inline void RecordWME_Map(IWorkingMemory* wm, IWme* wme, long clientTimeTag)
+static inline void RecordWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
 	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(wm->GetAgent()) ;
 
@@ -822,7 +821,7 @@ static inline void RecordWME_Map(IWorkingMemory* wm, IWme* wme, long clientTimeT
 //	KernelSML::DebugPrint(wme->GetValue()->GetString(), clientTimeTag, "Recorded\n") ;
 }
 
-static inline void RemoveWME_Map(IWorkingMemory* wm, IWme* wme, long clientTimeTag)
+static inline void RemoveWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
 	unused(wme) ;
 	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(wm->GetAgent()) ;
@@ -841,24 +840,24 @@ static inline void RemoveWME_Map(IWorkingMemory* wm, IWme* wme, long clientTimeT
 *************************************************************/
 EXPORT Direct_WME_Handle sml_DirectAddWME_String(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, char const* value)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeString((IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
+	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::IWorkingMemory*)wm)->AddWmeString((gSKI::IWMObject*)parent, pAttribute, value) ;
+	RecordWME_Map((gSKI::IWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
 
 EXPORT Direct_WME_Handle sml_DirectAddWME_Int(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, int value)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeInt((IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
+	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::IWorkingMemory*)wm)->AddWmeInt((gSKI::IWMObject*)parent, pAttribute, value) ;
+	RecordWME_Map((gSKI::IWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
 
 EXPORT Direct_WME_Handle sml_DirectAddWME_Double(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, double value)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeDouble((IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
+	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::IWorkingMemory*)wm)->AddWmeDouble((gSKI::IWMObject*)parent, pAttribute, value) ;
+	RecordWME_Map((gSKI::IWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
@@ -872,10 +871,10 @@ EXPORT Direct_WME_Handle sml_DirectAddWME_Double(Direct_WorkingMemory_Handle wm,
 EXPORT void sml_DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
 {
 	// Remove this from the list of wme's we're tracking.  Do this before removing it from working memory
-	RemoveWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
+	RemoveWME_Map((gSKI::IWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
 
 	// Remove the wme from working memory
-	((IWorkingMemory*)wm)->RemoveWme((IWme*)wme) ;
+	((gSKI::IWorkingMemory*)wm)->RemoveWme((gSKI::IWme*)wme) ;
 
 	// We used to release after the call to RemoveWme, but we've clarified the definition
 	// of remove wme so that it release the wme after it is actually deleted (which won't occur
@@ -891,8 +890,8 @@ EXPORT void sml_DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handl
 *************************************************************/
 EXPORT Direct_WME_Handle sml_DirectAddID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeNewObject((IWMObject*)parent, pAttribute) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
+	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::IWorkingMemory*)wm)->AddWmeNewObject((gSKI::IWMObject*)parent, pAttribute) ;
+	RecordWME_Map((gSKI::IWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
@@ -907,8 +906,8 @@ EXPORT Direct_WME_Handle sml_DirectAddID(Direct_WorkingMemory_Handle wm, Direct_
 *************************************************************/
 EXPORT Direct_WME_Handle sml_DirectLinkID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, Direct_WMObject_Handle orig)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((IWorkingMemory*)wm)->AddWmeObjectLink((IWMObject*)parent, pAttribute, (IWMObject*)orig) ;
-	RecordWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
+	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::IWorkingMemory*)wm)->AddWmeObjectLink((gSKI::IWMObject*)parent, pAttribute, (gSKI::IWMObject*)orig) ;
+	RecordWME_Map((gSKI::IWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
 
 	return wme ;
 }
@@ -922,13 +921,13 @@ EXPORT Direct_WME_Handle sml_DirectLinkID(Direct_WorkingMemory_Handle wm, Direct
 EXPORT Direct_WMObject_Handle sml_DirectGetThisWMObject(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme)
 {
 	unused(wm) ;
-	Direct_WMObject_Handle wmobject = (Direct_WMObject_Handle)((IWme*)wme)->GetValue()->GetObject() ;
+	Direct_WMObject_Handle wmobject = (Direct_WMObject_Handle)((gSKI::IWme*)wme)->GetValue()->GetObject() ;
 	return wmobject ;
 }
 
 EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgentName, bool input)
 {
-	Agent* pAgent = KernelSML::GetKernelSML()->GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
+	gSKI::Agent* pAgent = KernelSML::GetKernelSML()->GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
 
 	if (!pAgent)
 		return 0 ;
@@ -941,12 +940,12 @@ EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgent
 
 EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool input)
 {
-	Agent* pAgent = KernelSML::GetKernelSML()->GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
+	gSKI::Agent* pAgent = KernelSML::GetKernelSML()->GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
 
 	if (!pAgent)
 		return 0 ;
 
-	IWMObject* pRoot = NULL ;
+	gSKI::IWMObject* pRoot = NULL ;
 	if (input)
 	{
 		pAgent->GetInputLink()->GetRootObject(&pRoot) ;
@@ -1015,25 +1014,18 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 EXPORT void sml_DirectReleaseWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
 {
 	// Remove this from the list of wme's we're tracking.  Do this before we release it
-	RemoveWME_Map((IWorkingMemory*)wm, (IWme*)wme, clientTimeTag) ;
+	RemoveWME_Map((gSKI::IWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
 
-	((IWme*)wme)->Release() ;
+	((gSKI::IWme*)wme)->Release() ;
 }
 
 EXPORT void sml_DirectReleaseWMObject(Direct_WMObject_Handle parent)
 {
-	((IWMObject*)parent)->Release() ;
+	((gSKI::IWMObject*)parent)->Release() ;
 }
 
 EXPORT int sml_DirectGetIWMObjMapSize(Direct_WorkingMemory_Handle wm)
 {
-	return ((IWorkingMemory*)wm)->GetWMObjMapSize();
+	return ((gSKI::IWorkingMemory*)wm)->GetWMObjMapSize();
 }
 
-/*
-EXPORT Direct_Agent_Handle sml_DirectGetAgent(char const* pAgentName)
-{
-	Agent* pAgent = KernelSML::GetKernelSML()->GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
-	return (Direct_Agent_Handle)pAgent ;
-}
-*/

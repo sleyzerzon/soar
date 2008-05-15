@@ -58,6 +58,9 @@
 
 #include <ctype.h>
 
+using namespace xmlTraceNames;
+
+
 extern void gds_invalid_so_remove_goal (agent* thisAgent, wme *w);
 
 /* ====================================================================

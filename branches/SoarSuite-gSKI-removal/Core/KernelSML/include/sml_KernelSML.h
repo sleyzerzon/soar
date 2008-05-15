@@ -300,7 +300,7 @@ public:
 	*			registered a filter.  The result is the processed
 	*			version of the command line.
 	*************************************************************/
-	bool SendFilterMessage(gSKI::Agent* pAgent, char const* pCommandLine, std::string* pResult) ;
+	bool SendFilterMessage(AgentSML* pAgent, char const* pCommandLine, std::string* pResult) ;
 
 	/*************************************************************
 	* @brief	Returns true if at least one filter is registered.

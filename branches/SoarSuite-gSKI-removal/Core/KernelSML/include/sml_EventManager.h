@@ -12,7 +12,7 @@
 #ifndef EVENT_MANAGER_H
 #define EVENT_MANAGER_H
 
-#include "gSKI_Enumerations.h"
+#include "sml_Events.h"
 #include "sml_Connection.h"
 #include "sml_ElementXML.h"
 #include "sml_KernelCallback.h"
@@ -152,7 +152,7 @@ public:
 		// be valid for this particular event manager.
 		// We could make this more efficient by defining the set for each handler
 		// but the cost of removing all should be minimal as this is a rare event.
-		for (int i = 1 ; i < gSKIEVENT_LAST ; i++)
+		for (int i = 1 ; i < smlEVENT_LAST ; i++)
 		{
 			EventType id = (EventType)i ;
 			RemoveListener(id, pConnection) ;

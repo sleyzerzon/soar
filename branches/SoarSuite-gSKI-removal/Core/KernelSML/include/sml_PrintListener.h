@@ -8,7 +8,7 @@
 // specific events occur within the agent:
 //
 /*
-*       gSKIEVENT_PRINT
+*       smlEVENT_PRINT
 */
 /////////////////////////////////////////////////////////////////
 
@@ -29,9 +29,8 @@ class Connection ;
 class PrintListener : public EventManager<smlPrintEventId>
 {
 protected:
-	const static int kNumberPrintEvents = gSKIEVENT_LAST_PRINT_EVENT - gSKIEVENT_FIRST_PRINT_EVENT + 1 ;
+	const static int kNumberPrintEvents = smlEVENT_LAST_PRINT_EVENT - smlEVENT_FIRST_PRINT_EVENT + 1 ;
 	KernelSML*		m_pKernelSML ;
-	gSKI::Agent*	m_pAgent ;
 	std::string		m_BufferedPrintOutput[kNumberPrintEvents];
 	AgentOutputFlusher* m_pAgentOutputFlusher[kNumberPrintEvents];
 
@@ -41,7 +40,6 @@ protected:
 public:
 	PrintListener() {
 		m_pKernelSML = 0 ;
-		m_pAgent	 = 0 ;
 	}
 
 	virtual ~PrintListener()
@@ -58,9 +56,6 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(smlPrintEventId eventID, Connection* pConnection) ;
-
-	// Called when a "PrintEvent" occurs in the kernel
-	virtual void HandleEvent(smlPrintEventId, gSKI::Agent*, const char* msg);
 
 	void OnEvent(smlPrintEventId eventID, AgentSML* pAgentSML, const char* msg) ;
 

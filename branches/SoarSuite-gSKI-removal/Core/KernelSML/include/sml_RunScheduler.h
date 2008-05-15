@@ -20,13 +20,7 @@
 #ifndef SML_RUN_SCHEDULER_H
 #define SML_RUN_SCHEDULER_H
 
-#include "gSKI_Enumerations.h"
-#include "gSKI_Events.h"
-#include "sml_Events.h"	// To get smlRunFlags
-#include "sml_KernelCallback.h"
-
 namespace gSKI {
-	class Agent ;
 	struct Error ;
 }
 
@@ -35,6 +29,10 @@ namespace sml {
 // Forward declarations
 class KernelSML ;
 class AgentSML ;
+enum smlRunFlags;
+enum smlPhase;
+enum smlRunStepSize;
+enum smlRunResult;
 
 class RunScheduler
 {

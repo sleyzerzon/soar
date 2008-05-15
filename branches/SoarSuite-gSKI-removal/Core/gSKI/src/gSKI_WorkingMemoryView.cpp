@@ -25,19 +25,7 @@
 namespace gSKI
 {
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   WorkingMemoryView::~WorkingMemoryView() {}
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWMObject* WorkingMemoryView::GetObjectById(const char* idstring,
                                                 Error* err) const
@@ -49,12 +37,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   tIWMObjectIterator* WorkingMemoryView::GetAllObjects(Error* err) const
   {
     ClearError(err);
@@ -63,12 +45,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   tIWmeIterator* WorkingMemoryView::GetAllWmes(Error* err) const
   {
@@ -79,12 +55,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   tIWMObjectIterator* WorkingMemoryView::FindObjectsByCriteria(Error* err) const
   {
     ClearError(err);
@@ -94,12 +64,6 @@ namespace gSKI
     return 0;
   }
 
-  /*
-    ===============================
-
-    ===============================
-  */
-
   tIWmeIterator* WorkingMemoryView::FindWmesByCriteria(Error* err) const
   {
     ClearError(err);
@@ -108,12 +72,6 @@ namespace gSKI
 
     return 0;
   }
-
-  /*
-    ===============================
-
-    ===============================
-  */
 
   IWMStaticView* 
   WorkingMemoryView::CreateSubView(const IWMObject* rootobject,

@@ -8,25 +8,21 @@
 // specific events occur within the kernel:
 /*
 *      // System events
-*      gSKIEVENT_BEFORE_SHUTDOWN            = 1,
-*      gSKIEVENT_AFTER_CONNECTION_LOST,
-*      gSKIEVENT_BEFORE_RESTART,
-*      gSKIEVENT_AFTER_RESTART,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_ADDED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_ADDED,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_REMOVED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_REMOVED,
-*      gSKIEVENT_BEFORE_RHS_FUNCTION_EXECUTED,
-*      gSKIEVENT_AFTER_RHS_FUNCTION_EXECUTED,
+*      smlEVENT_BEFORE_SHUTDOWN            = 1,
+*      smlEVENT_AFTER_CONNECTION_LOST,
+*      smlEVENT_BEFORE_RESTART,
+*      smlEVENT_AFTER_RESTART,
+*      smlEVENT_BEFORE_RHS_FUNCTION_ADDED,
+*      smlEVENT_AFTER_RHS_FUNCTION_ADDED,
+*      smlEVENT_BEFORE_RHS_FUNCTION_REMOVED,
+*      smlEVENT_AFTER_RHS_FUNCTION_REMOVED,
+*      smlEVENT_BEFORE_RHS_FUNCTION_EXECUTED,
+*      smlEVENT_AFTER_RHS_FUNCTION_EXECUTED,
 */////////////////////////////////////////////////////////////////
 
 #ifndef SYSTEM_LISTENER_H
 #define SYSTEM_LISTENER_H
 
-#include "gSKI_Events.h"
-//#include "gSKI_Enumerations.h"
-//#include "IgSKI_Iterator.h"
-//#include "gSKI_Kernel.h"
 #include "sml_EventManager.h"
 
 #include <string>

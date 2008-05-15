@@ -157,6 +157,8 @@
 
 
 
+using namespace xmlTraceNames;
+
 
 
 

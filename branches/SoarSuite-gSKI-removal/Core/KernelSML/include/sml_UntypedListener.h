@@ -12,10 +12,6 @@
 #ifndef STRING_LISTENER_H
 #define STRING_LISTENER_H
 
-#include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_Iterator.h"
-#include "gSKI_Agent.h"
 #include "sml_EventManager.h"
 
 #include <string>
