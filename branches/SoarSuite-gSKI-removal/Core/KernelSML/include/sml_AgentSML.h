@@ -212,10 +212,10 @@ public:
 	void RemoveProductionListener(egSKIProductionEventId eventID, Connection* pConnection) { m_ProductionListener.RemoveListener(eventID, pConnection) ; }	
 	void AddRunListener(egSKIRunEventId eventID, Connection* pConnection)	{ m_RunListener.AddListener(eventID, pConnection) ; }
 	void RemoveRunListener(egSKIRunEventId eventID, Connection* pConnection) { m_RunListener.RemoveListener(eventID, pConnection) ; }	
-	void AddPrintListener(egSKIPrintEventId eventID, Connection* pConnection)	{ m_PrintListener.AddListener(eventID, pConnection) ; }
-	void RemovePrintListener(egSKIPrintEventId eventID, Connection* pConnection) { m_PrintListener.RemoveListener(eventID, pConnection) ; }	
-	void AddXMLListener(egSKIXMLEventId eventID, Connection* pConnection) { m_XMLListener.AddListener(eventID, pConnection) ; }
-	void RemoveXMLListener(egSKIXMLEventId eventID, Connection* pConnection) { m_XMLListener.RemoveListener(eventID, pConnection) ; }
+	void AddPrintListener(smlPrintEventId eventID, Connection* pConnection)	{ m_PrintListener.AddListener(eventID, pConnection) ; }
+	void RemovePrintListener(smlPrintEventId eventID, Connection* pConnection) { m_PrintListener.RemoveListener(eventID, pConnection) ; }	
+	void AddXMLListener(smlXMLEventId eventID, Connection* pConnection) { m_XMLListener.AddListener(eventID, pConnection) ; }
+	void RemoveXMLListener(smlXMLEventId eventID, Connection* pConnection) { m_XMLListener.RemoveListener(eventID, pConnection) ; }
 
 	// Echo the list of wmes received back to any listeners
 	void FireInputReceivedEvent(ElementXML const* pCommands) { m_XMLListener.FireInputReceivedEvent(pCommands) ; }
@@ -237,7 +237,11 @@ public:
 	*			to issue a command and have another client (typically the debugger)
 	*			listen in on the output.
 	*************************************************************/
-	void FireEchoEvent(Connection* pConnection, char const* pMessage) { m_PrintListener.HandleEvent(gSKIEVENT_ECHO, m_pIAgent, pMessage) ; m_PrintListener.FlushOutput(pConnection, gSKIEVENT_ECHO) ; }
+	void FireEchoEvent(Connection* pConnection, char const* pMessage) 
+	{ 
+		m_PrintListener.HandleEvent(smlEVENT_ECHO, m_pIAgent, pMessage) ; 
+		m_PrintListener.FlushOutput(pConnection, smlEVENT_ECHO) ; 
+	}
 
 	/*************************************************************
 	* @brief	This is the same as the regular FireEchoEvent, except
@@ -247,7 +251,11 @@ public:
 	*			We shouldn't use this extensively and may choose to
 	*			remove this and replace it with a different event later.
 	*************************************************************/
-	void FireEchoEventIncludingSelf(char const* pMessage) { m_PrintListener.HandleEvent(gSKIEVENT_ECHO, m_pIAgent, pMessage) ; m_PrintListener.FlushOutput(NULL, gSKIEVENT_ECHO) ; }
+	void FireEchoEventIncludingSelf(char const* pMessage) 
+	{ 
+		m_PrintListener.HandleEvent(smlEVENT_ECHO, m_pIAgent, pMessage) ; 
+		m_PrintListener.FlushOutput(NULL, smlEVENT_ECHO) ; 
+	}
 
 	/*************************************************************
 	* @brief	Send XML and print events for a simple string message
@@ -352,7 +360,7 @@ public:
 	unsigned long GetRunCounter(smlRunStepSize runStepSize) ;
 
 	// Request that the agent stop soon.
-	bool Interrupt(egSKIStopLocation stopLoc) ;
+	bool Interrupt(smlStopLocationFlags stopLoc) ;
 	void ClearInterrupts() ;
 	smlRunResult StepInClientThread(smlInterleaveStepSize  stepSize, gSKI::Error* pError) ;
 	smlRunResult Step(smlInterleaveStepSize stepSize) ;

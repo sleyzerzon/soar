@@ -42,25 +42,24 @@ bool StringListener::RemoveListener(egSKIStringEventId eventID, Connection* pCon
 }
 
 // Called when an event occurs in the kernel
-void StringListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+void StringListener::OnKernelEvent(int eventIDIn, AgentSML* /*pAgentSML*/, void* pCallData)
 {
 	// There are currently no kernel events corresponding to this SML event.
 	// They are all directly generated from SML.  If we later add kernel callbacks
 	// for this class of events they would come here.
-	unused(eventID) ;
-	unused(pAgentSML) ;
-	unused(pCallData) ;
-}
 
-// Called when a event occurs in the kernel
-bool StringListener::HandleEvent(egSKIStringEventId eventID, char const* pData, int maxLengthReturnValue, char* pReturnValue)
-{
-	bool result = false ;
+	egSKIStringEventId eventID = static_cast<egSKIStringEventId>(eventIDIn);
+	StringListenerCallbackData* pCallbackData = static_cast<StringListenerCallbackData*>(pCallData);
+	assert( pCallbackData );
+
+	memset( pCallbackData->pReturnStringBuffer, 0, pCallbackData->maxLengthReturnStringBuffer );
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
 	if (!EventManager<egSKIStringEventId>::GetBegin(eventID, &connectionIter))
-		return result;
+	{
+		return;
+	}
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
 	// we shouldn't have rolled these methods into Connection.
@@ -73,8 +72,8 @@ bool StringListener::HandleEvent(egSKIStringEventId eventID, char const* pData, 
 	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 
-	if (pData)
-		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, pData) ;
+	if (pCallbackData->pData)
+		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, pCallbackData->pData) ;
 
 	// Note: we should be telling the client the maximum length of the result,
 	// however, we're planning on changing this so there is no maximum length
@@ -92,13 +91,10 @@ bool StringListener::HandleEvent(egSKIStringEventId eventID, char const* pData, 
 		// value and return it in "pReturnValue" to the caller.
 		// If the client returns a longer string than the caller allowed we just truncate it.
 		// (In practice this shouldn't be a problem--just need to make sure nobody crashes on a super long return string).
-		strncpy(pReturnValue, pResult, maxLengthReturnValue) ;
-		pReturnValue[maxLengthReturnValue-1] = 0 ;	// Make sure it's NULL terminated
-		result = true ;
+		strncpy( pCallbackData->pReturnStringBuffer, pResult, pCallbackData->maxLengthReturnStringBuffer ) ;
+		pCallbackData->pReturnStringBuffer[ pCallbackData->maxLengthReturnStringBuffer-1 ] = 0 ;	// Make sure it's NULL terminated
 	}
 
 	// Clean up
 	delete pMsg ;
-
-	return result;
 }

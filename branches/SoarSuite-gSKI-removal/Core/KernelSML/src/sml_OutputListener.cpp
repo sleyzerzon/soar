@@ -11,8 +11,8 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_OutputListener.h"
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_TagWme.h"
 #include "sml_AgentSML.h"
@@ -447,13 +447,15 @@ void OutputListener::HandleEvent(egSKIWorkingMemoryEventId eventId, gSKI::Agent*
 
 // Agent event listener (called when soar has been or is about to be re-initialized)
 // BADBAD: This shouldn't really be handled in a class called OutputListener.
-void OutputListener::HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPtr)
+void OutputListener::HandleEvent(egSKIAgentEventId eventIdIn, gSKI::Agent* agentPtr)
 {
+	smlAgentEventId eventId = static_cast<smlAgentEventId>(eventIdIn);
+
 	// Before the kernel is re-initialized we have to release all input WMEs.
 	// If we don't do this, gSKI will fail to re-initialize the kernel correctly as it
 	// assumes that all WMEs are deleted prior to reinitializing the kernel and if we have
 	// outstanding references to the objects it has no way to make the deletion happen.
-	if (eventId == gSKIEVENT_BEFORE_AGENT_REINITIALIZED)
+	if (eventId == smlEVENT_BEFORE_AGENT_REINITIALIZED)
 	{
 		AgentSML* pAgent = this->m_KernelSML->GetAgentSML(agentPtr) ;
 
@@ -472,7 +474,7 @@ void OutputListener::HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPt
 
 	// After the kernel has been re-initialized we need to send everything on the output link over again
 	// when Soar is next run.
-	if (eventId == gSKIEVENT_AFTER_AGENT_REINITIALIZED)
+	if (eventId == smlEVENT_AFTER_AGENT_REINITIALIZED)
 	{
 		// When the user types init-soar, we need to reset everything, so when the agent is next run
 		// we will send over output link information again.  The client also needs to register for this event

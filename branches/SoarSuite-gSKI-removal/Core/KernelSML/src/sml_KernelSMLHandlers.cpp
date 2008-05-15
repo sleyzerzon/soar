@@ -164,7 +164,7 @@ bool KernelSML::HandleCreateAgent(gSKI::Agent* pAgentPtr, char const* pCommandNa
 	pAgentSML->Init() ;		// This must happen AFTER the soar agent is initialized.
 
 	// Notify listeners that there is a new agent
-	this->FireAgentEvent(pAgentSML, gSKIEVENT_AFTER_AGENT_CREATED) ;
+	this->FireAgentEvent(pAgentSML, smlEVENT_AFTER_AGENT_CREATED) ;
 
 	// Also notify gSKI 
 	//GetKernel()->GetAgentManager()->FireAgentCreated(pIAgent) ;
@@ -240,9 +240,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 
 		// Agent events
 		if (registerForEvent)
-			this->AddAgentListener((egSKIAgentEventId)id, pConnection) ;
+			this->AddAgentListener(static_cast<smlAgentEventId>(id), pConnection) ;
 		else
-			this->RemoveAgentListener((egSKIAgentEventId)id, pConnection) ;
+			this->RemoveAgentListener(static_cast<smlAgentEventId>(id), pConnection) ;
 	} else if(IsRhsEventID(id)) {
 
 		// Rhs user functions
@@ -291,9 +291,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 		AgentSML* pAgentSML = GetAgentSML(pAgent) ;
 
 		if (registerForEvent)
-			pAgentSML->AddXMLListener((egSKIXMLEventId)id, pConnection) ;
+			pAgentSML->AddXMLListener(static_cast<smlXMLEventId>(id), pConnection) ;
 		else
-			pAgentSML->RemoveXMLListener((egSKIXMLEventId)id, pConnection) ;
+			pAgentSML->RemoveXMLListener(static_cast<smlXMLEventId>(id), pConnection) ;
 
 	} else if (IsUpdateEventID(id))	{
 		if (registerForEvent)
@@ -316,9 +316,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 		AgentSML* pAgentSML = GetAgentSML(pAgent) ;
 
 		if (registerForEvent)
-			pAgentSML->AddPrintListener((egSKIPrintEventId)id, pConnection) ;
+			pAgentSML->AddPrintListener(static_cast<smlPrintEventId>(id), pConnection) ;
 		else
-			pAgentSML->RemovePrintListener((egSKIPrintEventId)id, pConnection) ;
+			pAgentSML->RemovePrintListener(static_cast<smlPrintEventId>(id), pConnection) ;
 	} else if(id == (int)gSKIEVENT_OUTPUT_PHASE_CALLBACK) {
 
 		// Output event

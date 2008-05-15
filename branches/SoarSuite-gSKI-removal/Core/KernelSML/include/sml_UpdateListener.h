@@ -53,9 +53,6 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(egSKIUpdateEventId eventID, Connection* pConnection) ;
-
-	// Called when an "UpdateEvent" occurs in the kernel
-	virtual void HandleEvent(egSKIUpdateEventId eventId, int runFlags) ;
 } ;
 
 }

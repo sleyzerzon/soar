@@ -28,228 +28,239 @@
 	  egSKIGenericEventId
       */
 
-   typedef enum {
-	  // DJP: Converted to SML
-      // Kernel events
-      gSKIEVENT_BEFORE_SHUTDOWN            = 1,
-	  gSKIEVENT_AFTER_CONNECTION,
-	  gSKIEVENT_SYSTEM_START,
-	  gSKIEVENT_BEFORE_AGENTS_RUN_STEP,
-	  gSKIEVENT_SYSTEM_STOP,
-	  gSKIEVENT_INTERRUPT_CHECK,
-	  gSKIEVENT_SYSTEM_PROPERTY_CHANGED,
-      gSKIEVENT_LAST_SYSTEM_EVENT  = gSKIEVENT_SYSTEM_PROPERTY_CHANGED,
-    } egSKISystemEventId;
+enum egSKISystemEventId
+{
+	// DJP: Converted to SML
+	// Kernel events
+	gSKIEVENT_BEFORE_SHUTDOWN            = 1,
+	gSKIEVENT_AFTER_CONNECTION,
+	gSKIEVENT_SYSTEM_START,
+	gSKIEVENT_BEFORE_AGENTS_RUN_STEP,
+	gSKIEVENT_SYSTEM_STOP,
+	gSKIEVENT_INTERRUPT_CHECK,
+	gSKIEVENT_SYSTEM_PROPERTY_CHANGED,
+	gSKIEVENT_LAST_SYSTEM_EVENT  = gSKIEVENT_SYSTEM_PROPERTY_CHANGED,
+} ;
 
-    static inline bool IsSystemEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_BEFORE_SHUTDOWN && 
- 		id <= gSKIEVENT_LAST_SYSTEM_EVENT) ;
-    }
- 
-    typedef enum {
-	  // DJP: Converted to SML
-      // Agent (Run)Events
-      gSKIEVENT_BEFORE_SMALLEST_STEP = gSKIEVENT_LAST_SYSTEM_EVENT + 1,
-      gSKIEVENT_AFTER_SMALLEST_STEP,
-      gSKIEVENT_BEFORE_ELABORATION_CYCLE,
-      gSKIEVENT_AFTER_ELABORATION_CYCLE,
-	  /*  tests for phase events depends on this ordering */
-      gSKIEVENT_BEFORE_PHASE_EXECUTED,
-      gSKIEVENT_BEFORE_INPUT_PHASE,
-      gSKIEVENT_BEFORE_PROPOSE_PHASE,
-      gSKIEVENT_BEFORE_DECISION_PHASE,
-      gSKIEVENT_BEFORE_APPLY_PHASE,
-      gSKIEVENT_BEFORE_OUTPUT_PHASE,
-      gSKIEVENT_BEFORE_PREFERENCE_PHASE,	// Soar-7 mode only
-      gSKIEVENT_BEFORE_WM_PHASE,			// Soar-7 mode only
-      gSKIEVENT_AFTER_INPUT_PHASE,
-      gSKIEVENT_AFTER_PROPOSE_PHASE,
-      gSKIEVENT_AFTER_DECISION_PHASE,
-      gSKIEVENT_AFTER_APPLY_PHASE,
-      gSKIEVENT_AFTER_OUTPUT_PHASE,
-      gSKIEVENT_AFTER_PREFERENCE_PHASE,		// Soar-7 mode only
-      gSKIEVENT_AFTER_WM_PHASE,				// Soar-7 mode only
-	  gSKIEVENT_AFTER_PHASE_EXECUTED,
-	  /* 	  */
-      gSKIEVENT_BEFORE_DECISION_CYCLE,
-      gSKIEVENT_AFTER_DECISION_CYCLE,
-	  gSKIEVENT_MAX_MEMORY_USAGE_EXCEEDED,  // Total memory usage exceeded sysparam value
-      gSKIEVENT_AFTER_INTERRUPT,
-	  gSKIEVENT_AFTER_HALTED,
-	  gSKIEVENT_BEFORE_RUN_STARTS,		// Before start a run
-	  gSKIEVENT_AFTER_RUN_ENDS,			// After run ends for any reason
-      gSKIEVENT_BEFORE_RUNNING,			// Before running one increment
-      gSKIEVENT_AFTER_RUNNING,			// After running one increment
-      gSKIEVENT_LAST_RUN_EVENT = gSKIEVENT_AFTER_RUNNING,
-    } egSKIRunEventId;
+static inline bool IsSystemEventID (int id)
+{
+	return (id >= gSKIEVENT_BEFORE_SHUTDOWN && 
+		id <= gSKIEVENT_LAST_SYSTEM_EVENT) ;
+}
 
-    static inline bool IsRunEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_BEFORE_SMALLEST_STEP && 
- 		id <= gSKIEVENT_LAST_RUN_EVENT) ;
-    }
-     static inline bool IsPhaseEventID (int id)
-    {
- 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
- 		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
-    }
-      static inline bool IsBEFOREPhaseEventID (int id)
-    {
- 	   return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
- 		id <= gSKIEVENT_BEFORE_WM_PHASE) ;
-    }
-     static inline bool IsAFTERPhaseEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_AFTER_INPUT_PHASE && 
- 		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
-    }
+enum egSKIRunEventId
+{
+	// DJP: Converted to SML
+	// Agent (Run)Events
+	gSKIEVENT_BEFORE_SMALLEST_STEP = gSKIEVENT_LAST_SYSTEM_EVENT + 1,
+	gSKIEVENT_AFTER_SMALLEST_STEP,
+	gSKIEVENT_BEFORE_ELABORATION_CYCLE,
+	gSKIEVENT_AFTER_ELABORATION_CYCLE,
+	/*  tests for phase events depends on this ordering */
+	gSKIEVENT_BEFORE_PHASE_EXECUTED,
+	gSKIEVENT_BEFORE_INPUT_PHASE,
+	gSKIEVENT_BEFORE_PROPOSE_PHASE,
+	gSKIEVENT_BEFORE_DECISION_PHASE,
+	gSKIEVENT_BEFORE_APPLY_PHASE,
+	gSKIEVENT_BEFORE_OUTPUT_PHASE,
+	gSKIEVENT_BEFORE_PREFERENCE_PHASE,	// Soar-7 mode only
+	gSKIEVENT_BEFORE_WM_PHASE,			// Soar-7 mode only
+	gSKIEVENT_AFTER_INPUT_PHASE,
+	gSKIEVENT_AFTER_PROPOSE_PHASE,
+	gSKIEVENT_AFTER_DECISION_PHASE,
+	gSKIEVENT_AFTER_APPLY_PHASE,
+	gSKIEVENT_AFTER_OUTPUT_PHASE,
+	gSKIEVENT_AFTER_PREFERENCE_PHASE,		// Soar-7 mode only
+	gSKIEVENT_AFTER_WM_PHASE,				// Soar-7 mode only
+	gSKIEVENT_AFTER_PHASE_EXECUTED,
+	/* 	  */
+	gSKIEVENT_BEFORE_DECISION_CYCLE,
+	gSKIEVENT_AFTER_DECISION_CYCLE,
+	gSKIEVENT_MAX_MEMORY_USAGE_EXCEEDED,  // Total memory usage exceeded sysparam value
+	gSKIEVENT_AFTER_INTERRUPT,
+	gSKIEVENT_AFTER_HALTED,
+	gSKIEVENT_BEFORE_RUN_STARTS,		// Before start a run
+	gSKIEVENT_AFTER_RUN_ENDS,			// After run ends for any reason
+	gSKIEVENT_BEFORE_RUNNING,			// Before running one increment
+	gSKIEVENT_AFTER_RUNNING,			// After running one increment
+	gSKIEVENT_LAST_RUN_EVENT = gSKIEVENT_AFTER_RUNNING,
+} ;
+
+static inline bool IsRunEventID (int id)
+{
+	return (id >= gSKIEVENT_BEFORE_SMALLEST_STEP && 
+		id <= gSKIEVENT_LAST_RUN_EVENT) ;
+}
+static inline bool IsPhaseEventID (int id)
+{
+	return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
+		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
+}
+static inline bool IsBEFOREPhaseEventID (int id)
+{
+	return (id > gSKIEVENT_BEFORE_PHASE_EXECUTED && 
+		id <= gSKIEVENT_BEFORE_WM_PHASE) ;
+}
+static inline bool IsAFTERPhaseEventID (int id)
+{
+	return (id >= gSKIEVENT_AFTER_INPUT_PHASE && 
+		id < gSKIEVENT_AFTER_PHASE_EXECUTED) ;
+}
 
 
-    typedef enum {
-	  // DJP: Converted to SML
-      // Production Manager
-      gSKIEVENT_AFTER_PRODUCTION_ADDED  = gSKIEVENT_LAST_RUN_EVENT + 1,
-      gSKIEVENT_BEFORE_PRODUCTION_REMOVED,
-      //gSKIEVENT_BEFORE_PRODUCTION_FIRED,
-      gSKIEVENT_AFTER_PRODUCTION_FIRED,
-      gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
-      gSKIEVENT_LAST_PRODUCTION_EVENT = gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
-    } egSKIProductionEventId;
-    
-    static inline bool IsProductionEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_AFTER_PRODUCTION_ADDED && 
- 		id <= gSKIEVENT_LAST_PRODUCTION_EVENT ) ;
-    }
+enum egSKIProductionEventId
+{
+	// DJP: Converted to SML
+	// Production Manager
+	gSKIEVENT_AFTER_PRODUCTION_ADDED  = gSKIEVENT_LAST_RUN_EVENT + 1,
+	gSKIEVENT_BEFORE_PRODUCTION_REMOVED,
+	//gSKIEVENT_BEFORE_PRODUCTION_FIRED,
+	gSKIEVENT_AFTER_PRODUCTION_FIRED,
+	gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
+	gSKIEVENT_LAST_PRODUCTION_EVENT = gSKIEVENT_BEFORE_PRODUCTION_RETRACTED,
+} ;
 
-    typedef enum {
-      // Agent manager
-	  // DJP: Converted to SML except for BEFORE_AGENT_DESTROYED
-	  // Leaving that one until SML takes over kernel ownership and we work on exact sequence for deleting agents.
-      gSKIEVENT_AFTER_AGENT_CREATED = gSKIEVENT_LAST_PRODUCTION_EVENT + 1,
-      gSKIEVENT_BEFORE_AGENT_DESTROYED,
-	  //gSKIEVENT_BEFORE_AGENTS_RUN_STEP,		// Moved to system event (as not specific to an agent)
-      gSKIEVENT_BEFORE_AGENT_REINITIALIZED,
-      gSKIEVENT_AFTER_AGENT_REINITIALIZED,
-      gSKIEVENT_LAST_AGENT_EVENT = gSKIEVENT_AFTER_AGENT_REINITIALIZED,
-    } egSKIAgentEventId;
-     
-    static inline bool IsAgentEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_AFTER_AGENT_CREATED && 
- 		id <= gSKIEVENT_LAST_AGENT_EVENT) ;
-    }
+static inline bool IsProductionEventID (int id)
+{
+	return (id >= gSKIEVENT_AFTER_PRODUCTION_ADDED && 
+		id <= gSKIEVENT_LAST_PRODUCTION_EVENT ) ;
+}
 
-    typedef enum {
-	  // DJP: Converted to SML
-      // Working memory changes
-      gSKIEVENT_OUTPUT_PHASE_CALLBACK = gSKIEVENT_LAST_AGENT_EVENT + 1,
-	  smlEVENT_INPUT_PHASE_CALLBACK,
-      gSKIEVENT_LAST_WM_EVENT = gSKIEVENT_OUTPUT_PHASE_CALLBACK,
-    } egSKIWorkingMemoryEventId;
+enum egSKIAgentEventId
+{
+	// Agent manager
+	// DJP: Converted to SML except for BEFORE_AGENT_DESTROYED
+	// Leaving that one until SML takes over kernel ownership and we work on exact sequence for deleting agents.
+	gSKIEVENT_AFTER_AGENT_CREATED = gSKIEVENT_LAST_PRODUCTION_EVENT + 1,
+	gSKIEVENT_BEFORE_AGENT_DESTROYED,
+	//gSKIEVENT_BEFORE_AGENTS_RUN_STEP,		// Moved to system event (as not specific to an agent)
+	gSKIEVENT_BEFORE_AGENT_REINITIALIZED,
+	gSKIEVENT_AFTER_AGENT_REINITIALIZED,
+	gSKIEVENT_LAST_AGENT_EVENT = gSKIEVENT_AFTER_AGENT_REINITIALIZED,
+} ;
 
-    static inline bool IsWorkingMemoryEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_OUTPUT_PHASE_CALLBACK && 
- 		id <= gSKIEVENT_LAST_WM_EVENT) ;
-    }
- 
+static inline bool IsAgentEventID (int id)
+{
+	return (id >= gSKIEVENT_AFTER_AGENT_CREATED && 
+		id <= gSKIEVENT_LAST_AGENT_EVENT) ;
+}
 
-    typedef enum {
-      // Error and print callbacks
-      //gSKIEVENT_LOG_ERROR =  gSKIEVENT_LAST_WM_EVENT + 1,
-	  //gSKIEVENT_FIRST_PRINT_EVENT = gSKIEVENT_LOG_ERROR,
-      //gSKIEVENT_LOG_WARNING,
-      //gSKIEVENT_LOG_INFO,
-      //gSKIEVENT_LOG_DEBUG,
-	  gSKIEVENT_ECHO = gSKIEVENT_LAST_WM_EVENT + 1,
-	  gSKIEVENT_FIRST_PRINT_EVENT = gSKIEVENT_ECHO,
-	  gSKIEVENT_PRINT,
-      gSKIEVENT_LAST_PRINT_EVENT = gSKIEVENT_PRINT,
-    } egSKIPrintEventId;
+enum egSKIWorkingMemoryEventId
+{
+	// DJP: Converted to SML
+	// Working memory changes
+	gSKIEVENT_OUTPUT_PHASE_CALLBACK = gSKIEVENT_LAST_AGENT_EVENT + 1,
+	smlEVENT_INPUT_PHASE_CALLBACK,
+	gSKIEVENT_LAST_WM_EVENT = gSKIEVENT_OUTPUT_PHASE_CALLBACK,
+} ;
 
-    static inline bool IsPrintEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_ECHO && 
- 		id <= gSKIEVENT_LAST_PRINT_EVENT) ;
-    }
- 
-    typedef enum { 
-	  // DJP: Converted to SML
+static inline bool IsWorkingMemoryEventID (int id)
+{
+	return (id >= gSKIEVENT_OUTPUT_PHASE_CALLBACK && 
+		id <= gSKIEVENT_LAST_WM_EVENT) ;
+}
 
- 	 // Used to provide user handler functions for RHS (right hand side) functions
-   	 // fired within Soar productions.  This is different from normal events in that
- 	 // the handler is executing the function and returning a value, not just being notified
- 	 // that something has happened.
- 	 gSKIEVENT_RHS_USER_FUNCTION = gSKIEVENT_LAST_PRINT_EVENT + 1,
-	 gSKIEVENT_FILTER,
-	 gSKIEVENT_CLIENT_MESSAGE,
-	 gSKIEVENT_LAST_RHS_EVENT = gSKIEVENT_CLIENT_MESSAGE,
-    } egSKIRhsEventId;
- 
-    static inline bool IsRhsEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_RHS_USER_FUNCTION && 
- 		id <= gSKIEVENT_LAST_RHS_EVENT) ;
-    }
 
-	 typedef enum { 
- 	 // This is directly implemented in gSKI, but is not really the same event as the SML side.
-	 // On the gSKI side this is used to signal the generation of XML trace events.
-	 // On the client side it is used send complete XML objects.
-	 // That is, a bunch of gSKI XML trace events get combined into a single XML object and sent
-	 //  as a single SML event.
-	 // We decided to use the same event number for both sides since the event numbers need to match up
-	 //  anyway and these are strongly related events.
- 	 gSKIEVENT_XML_TRACE_OUTPUT = gSKIEVENT_LAST_RHS_EVENT + 1,
+enum egSKIPrintEventId
+{
+	// Error and print callbacks
+	//gSKIEVENT_LOG_ERROR =  gSKIEVENT_LAST_WM_EVENT + 1,
+	//gSKIEVENT_FIRST_PRINT_EVENT = gSKIEVENT_LOG_ERROR,
+	//gSKIEVENT_LOG_WARNING,
+	//gSKIEVENT_LOG_INFO,
+	//gSKIEVENT_LOG_DEBUG,
+	gSKIEVENT_ECHO = gSKIEVENT_LAST_WM_EVENT + 1,
+	gSKIEVENT_FIRST_PRINT_EVENT = gSKIEVENT_ECHO,
+	gSKIEVENT_PRINT,
+	gSKIEVENT_LAST_PRINT_EVENT = gSKIEVENT_PRINT,
+} ;
 
-	 // Used to echo input wmes back to a client (so one client can listen in on additions made by another).
-	 gSKIEVENT_XML_INPUT_RECEIVED,
+static inline bool IsPrintEventID (int id)
+{
+	return (id >= gSKIEVENT_ECHO && 
+		id <= gSKIEVENT_LAST_PRINT_EVENT) ;
+}
 
-	 gSKIEVENT_LAST_XML_EVENT = gSKIEVENT_XML_INPUT_RECEIVED,
-    } egSKIXMLEventId;
+enum egSKIRhsEventId
+{ 
+	// DJP: Converted to SML
 
-	static inline bool IsXMLEventID (int id)
-    {
- 	   return (id >= gSKIEVENT_XML_TRACE_OUTPUT && 
- 		id <= gSKIEVENT_LAST_XML_EVENT) ;
-    }
+	// Used to provide user handler functions for RHS (right hand side) functions
+	// fired within Soar productions.  This is different from normal events in that
+	// the handler is executing the function and returning a value, not just being notified
+	// that something has happened.
+	gSKIEVENT_RHS_USER_FUNCTION = gSKIEVENT_LAST_PRINT_EVENT + 1,
+	gSKIEVENT_FILTER,
+	gSKIEVENT_CLIENT_MESSAGE,
+	gSKIEVENT_LAST_RHS_EVENT = gSKIEVENT_CLIENT_MESSAGE,
+} ;
 
-	// Events that can be used by environments to trigger when the world should update
-	// Currently not implemented by gSKI, but included for completeness.
-	typedef enum {
-	  // DJP: Converted to SML
-		gSKIEVENT_AFTER_ALL_OUTPUT_PHASES = gSKIEVENT_LAST_XML_EVENT + 1,	// All agents have completed output phase
-		gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT,								// All agents have generated output (since run began)
-	    gSKIEVENT_LAST_UPDATE_EVENT = gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT,
-	} egSKIUpdateEventId ;
+static inline bool IsRhsEventID (int id)
+{
+	return (id >= gSKIEVENT_RHS_USER_FUNCTION && 
+		id <= gSKIEVENT_LAST_RHS_EVENT) ;
+}
 
-	static inline bool IsUpdateEventID(int id)
-	{
-		return (id >= gSKIEVENT_AFTER_ALL_OUTPUT_PHASES && id <= gSKIEVENT_LAST_UPDATE_EVENT) ;
-	}
+enum egSKIXMLEventId
+{ 
+	// This is directly implemented in gSKI, but is not really the same event as the SML side.
+	// On the gSKI side this is used to signal the generation of XML trace events.
+	// On the client side it is used send complete XML objects.
+	// That is, a bunch of gSKI XML trace events get combined into a single XML object and sent
+	//  as a single SML event.
+	// We decided to use the same event number for both sides since the event numbers need to match up
+	//  anyway and these are strongly related events.
+	gSKIEVENT_XML_TRACE_OUTPUT = gSKIEVENT_LAST_RHS_EVENT + 1,
 
-	// Events that pass a string as parameter
-	typedef enum {
-	  // DJP: Converted to SML
-		gSKIEVENT_EDIT_PRODUCTION = gSKIEVENT_LAST_UPDATE_EVENT + 1,	// Arg is "char const*".
-		gSKIEVENT_LOAD_LIBRARY,											// Arg is "char const*"
-		gSKIEVENT_LAST_STRING_EVENT = gSKIEVENT_LOAD_LIBRARY,
-	} egSKIStringEventId ;
+	// Used to echo input wmes back to a client (so one client can listen in on additions made by another).
+	gSKIEVENT_XML_INPUT_RECEIVED,
 
-	static inline bool IsStringEventID(int id)
-	{
-		return (id >= gSKIEVENT_EDIT_PRODUCTION && id <= gSKIEVENT_LAST_STRING_EVENT) ;
-	}
+	gSKIEVENT_LAST_XML_EVENT = gSKIEVENT_XML_INPUT_RECEIVED,
+} ;
 
-    typedef enum {
-       // Used to indicate an error in some cases
-       gSKIEVENT_INVALID_EVENT              = 0,
-       // Marker for end of gSKI event list
-       // Must always be at the end of the enum
-       gSKIEVENT_LAST = gSKIEVENT_LAST_STRING_EVENT + 1
-    } egSKIGenericEventId;
+static inline bool IsXMLEventID (int id)
+{
+	return (id >= gSKIEVENT_XML_TRACE_OUTPUT && 
+		id <= gSKIEVENT_LAST_XML_EVENT) ;
+}
+
+// Events that can be used by environments to trigger when the world should update
+// Currently not implemented by gSKI, but included for completeness.
+enum egSKIUpdateEventId
+{
+	// DJP: Converted to SML
+	gSKIEVENT_AFTER_ALL_OUTPUT_PHASES = gSKIEVENT_LAST_XML_EVENT + 1,	// All agents have completed output phase
+	gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT,								// All agents have generated output (since run began)
+	gSKIEVENT_LAST_UPDATE_EVENT = gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT,
+}  ;
+
+static inline bool IsUpdateEventID(int id)
+{
+	return (id >= gSKIEVENT_AFTER_ALL_OUTPUT_PHASES && id <= gSKIEVENT_LAST_UPDATE_EVENT) ;
+}
+
+// Events that pass a string as parameter
+enum egSKIStringEventId
+{
+	// DJP: Converted to SML
+	gSKIEVENT_EDIT_PRODUCTION = gSKIEVENT_LAST_UPDATE_EVENT + 1,	// Arg is "char const*".
+	gSKIEVENT_LOAD_LIBRARY,											// Arg is "char const*"
+	gSKIEVENT_LAST_STRING_EVENT = gSKIEVENT_LOAD_LIBRARY,
+}  ;
+
+static inline bool IsStringEventID(int id)
+{
+	return (id >= gSKIEVENT_EDIT_PRODUCTION && id <= gSKIEVENT_LAST_STRING_EVENT) ;
+}
+
+enum egSKIGenericEventId
+{
+	// Used to indicate an error in some cases
+	gSKIEVENT_INVALID_EVENT              = 0,
+	// Marker for end of gSKI event list
+	// Must always be at the end of the enum
+	gSKIEVENT_LAST = gSKIEVENT_LAST_STRING_EVENT + 1
+} ;
 
    /** End of Event Id enumerations.  **/
 
@@ -257,21 +268,22 @@
 		@li SINGLE_THREADED  Does not synchronize multi-threaded access.
 		@li MULTI_THREADED   Synchronizes multi-threaded access (multiple threads can access at same time)
    */
-   typedef enum  { 
-      gSKI_SINGLE_THREAD, 
-      gSKI_MULTI_THREAD 
-   } egSKIThreadingModel;
+enum egSKIThreadingModel 
+{ 
+	gSKI_SINGLE_THREAD, 
+	gSKI_MULTI_THREAD 
+} ;
 
    /** Types of working memory changes
 	   @li ADDED_OUTPUT_COMMAND		A new wme is added to the top level of the output link
 	   @li MODIFIED_OUTPUT_COMMAND	A wme within the transitive closure of the output link is added or removed
 	   @li REMOVED_OUTPUT_COMMAND	A wme is removed from the top level of the output link
    */
-   typedef enum {
-	  gSKI_ADDED_OUTPUT_COMMAND,
-	  gSKI_MODIFIED_OUTPUT_COMMAND,
-	  gSKI_REMOVED_OUTPUT_COMMAND
-   } egSKIWorkingMemoryChange ;
+enum egSKIWorkingMemoryChange {
+	gSKI_ADDED_OUTPUT_COMMAND,
+	gSKI_MODIFIED_OUTPUT_COMMAND,
+	gSKI_REMOVED_OUTPUT_COMMAND
+} ;
 
    /**
       Types of processes in which the kernel can be housed.  
@@ -285,13 +297,14 @@
       @li ANY_OUT_OF_PROCESS:     Either LOCAL_OUT_OF_PROCESS or REMOTE_OUT_OF_PROCESS
       @li ANY_PROCESS:            Any of IN/LOCAL_OUT_OF/REMOTE_OUT_OF PROCESS.
    */
-   typedef enum  { 
-      gSKI_IN_PROCESS, 
-      gSKI_LOCAL_OUT_OF_PROCESS, 
-      gSKI_REMOTE_OUT_OF_PROCESS, 
-      gSKI_ANY_OUT_OF_PROCESS, 
-      gSKI_ANY_PROCESS 
-   } egSKIProcessType;
+enum egSKIProcessType
+{ 
+	gSKI_IN_PROCESS, 
+	gSKI_LOCAL_OUT_OF_PROCESS, 
+	gSKI_REMOTE_OUT_OF_PROCESS, 
+	gSKI_ANY_OUT_OF_PROCESS, 
+	gSKI_ANY_PROCESS 
+} ;
 
    /**
     * Symbol types for the ISymbol interface.
@@ -306,15 +319,16 @@
     * @li STRING:    A simple string
     * @li OBJECT:    A Working memory ObjectSoar identifier
     */
-   typedef enum {
-     gSKI_ANY_SYMBOL = 0xff,
-     gSKI_DOUBLE     = 0x01,
-     gSKI_INT        = 0x02,
-     gSKI_STRING     = 0x04,
-     gSKI_OBJECT     = 0x08,
-     gSKI_VARIABLE   = 0x10,
-     gSKI_INVALID    = 0x20
-   } egSKISymbolType;
+enum egSKISymbolType 
+{
+	gSKI_ANY_SYMBOL = 0xff,
+	gSKI_DOUBLE     = 0x01,
+	gSKI_INT        = 0x02,
+	gSKI_STRING     = 0x04,
+	gSKI_OBJECT     = 0x08,
+	gSKI_VARIABLE   = 0x10,
+	gSKI_INVALID    = 0x20
+} ;
 
 
    
@@ -332,11 +346,12 @@
     * @li STATE_OBJECT:    A working memory state. You can cast a state object
     *                       to an IState object using IWMObject::ToState
     */
-   typedef enum {
-      gSKI_SIMPLE_OBJECT,
-      gSKI_OPERATOR_OBJECT,
-      gSKI_STATE_OBJECT
-   } egSKIWMObjectType;
+enum egSKIWMObjectType 
+{
+	gSKI_SIMPLE_OBJECT,
+	gSKI_OPERATOR_OBJECT,
+	gSKI_STATE_OBJECT
+} ;
 
    /** 
     * @brief Definition of the types of impasses possible in soar
@@ -359,13 +374,14 @@
     *         one required operator, or the same operator is both required
     *         and prohibited.
     */
-   typedef enum {
-      gSKI_STATE_NO_CHANGE_IMPASSE,
-      gSKI_OPERATOR_NO_CHANGE_IMPASSE,
-      gSKI_OPERATOR_TIE_IMPASSE,
-      gSKI_OPERATOR_CONFLICT_IMPASSE,
-      gSKI_OPERATOR_CONSTRAINT_FAILURE_IMPASSE
-   } egSKIImpasseType;
+enum egSKIImpasseType 
+{
+	gSKI_STATE_NO_CHANGE_IMPASSE,
+	gSKI_OPERATOR_NO_CHANGE_IMPASSE,
+	gSKI_OPERATOR_TIE_IMPASSE,
+	gSKI_OPERATOR_CONFLICT_IMPASSE,
+	gSKI_OPERATOR_CONSTRAINT_FAILURE_IMPASSE
+} ;
 
    /** 
     * @brief Defines types of unary preferences in soar
@@ -395,19 +411,20 @@
     * @li BIN_WORSE:   Binary preference used for partial ordering where one operator
     *                   is worse than another (returned for RhsActions only).
     */
-   typedef enum {
-      gSKI_ANY_PREF              = 0x0000,
-      gSKI_ACCEPTABLE_PREF       = 0x0001,
-      gSKI_REJECT_PREF           = 0x0002,
-      gSKI_BEST_PREF             = 0x0004,
-      gSKI_WORST_PREF            = 0x0008,
-      gSKI_REQUIRE_PREF          = 0x0010,
-      gSKI_PROHIBIT_PREF         = 0x0020,
-      gSKI_INDIFFERENT_PREF      = 0x0040,
-      gSKI_BIN_INDIFFERENT_PREF  = 0x0080,
-      gSKI_BIN_BETTER_PREF       = 0x0100,
-      gSKI_BIN_WORSE_PREF        = 0x0200
-   } egSKIPreferenceType;
+enum egSKIPreferenceType 
+{
+	gSKI_ANY_PREF              = 0x0000,
+	gSKI_ACCEPTABLE_PREF       = 0x0001,
+	gSKI_REJECT_PREF           = 0x0002,
+	gSKI_BEST_PREF             = 0x0004,
+	gSKI_WORST_PREF            = 0x0008,
+	gSKI_REQUIRE_PREF          = 0x0010,
+	gSKI_PROHIBIT_PREF         = 0x0020,
+	gSKI_INDIFFERENT_PREF      = 0x0040,
+	gSKI_BIN_INDIFFERENT_PREF  = 0x0080,
+	gSKI_BIN_BETTER_PREF       = 0x0100,
+	gSKI_BIN_WORSE_PREF        = 0x0200
+} ;
 
 
    
@@ -439,15 +456,16 @@
    *       During this phase any registered output consumers are notified
    *       of the agent's commands.
    */
-   typedef enum {
-      gSKI_INPUT_PHASE,			// NOTE: This enum MUST be kept in synch with smlPhase defined in sml_ClientEvents.h
-      gSKI_PROPOSAL_PHASE,
-      gSKI_DECISION_PHASE,
-      gSKI_APPLY_PHASE,
-      gSKI_OUTPUT_PHASE,
-	  gSKI_PREFERENCE_PHASE,	// Soar 7 mode only
-	  gSKI_WM_PHASE,			// Soar 7 mode only
-   } egSKIPhaseType;
+enum egSKIPhaseType 
+{
+	gSKI_INPUT_PHASE,			// NOTE: This enum MUST be kept in synch with smlPhase defined in sml_ClientEvents.h
+	gSKI_PROPOSAL_PHASE,
+	gSKI_DECISION_PHASE,
+	gSKI_APPLY_PHASE,
+	gSKI_OUTPUT_PHASE,
+	gSKI_PREFERENCE_PHASE,	// Soar 7 mode only
+	gSKI_WM_PHASE,			// Soar 7 mode only
+} ;
 
    /**
    * @brief Agent run step definitions.
@@ -476,12 +494,13 @@
    * @li RUN_FOREVER:           Run and don't stop until Stop is called.
    */
    // NOTE: Order must now match egSKIInterleaveType's order
-   typedef enum {
-      gSKI_RUN_PHASE,
-	  gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step 
-      gSKI_RUN_DECISION_CYCLE,
-      gSKI_RUN_UNTIL_OUTPUT,
-   } egSKIRunType;
+enum egSKIRunType 
+{
+	gSKI_RUN_PHASE,
+	gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step 
+	gSKI_RUN_DECISION_CYCLE,
+	gSKI_RUN_UNTIL_OUTPUT,
+} ;
 
    /** 
    * @brief Agent run interleaving definitions
@@ -512,12 +531,13 @@
    *      output link before transfering to the next agent.
    */
    // NOTE: Order must now match egSKIRunType's order
-   typedef enum {
-      gSKI_INTERLEAVE_PHASE,				// Keep in synch with smlInterleaveStepSize
-	  gSKI_INTERLEAVE_ELABORATION_PHASE,
-      gSKI_INTERLEAVE_DECISION_CYCLE,
-      gSKI_INTERLEAVE_OUTPUT
-   } egSKIInterleaveType;
+enum egSKIInterleaveType 
+{
+	gSKI_INTERLEAVE_PHASE,				// Keep in synch with smlInterleaveStepSize
+	gSKI_INTERLEAVE_ELABORATION_PHASE,
+	gSKI_INTERLEAVE_DECISION_CYCLE,
+	gSKI_INTERLEAVE_OUTPUT
+} ;
 
 
    /** 
@@ -535,12 +555,13 @@
     *                           the Agent::Halt method or the AgentManager::HaltAll
     *                           method.
     */
-   typedef enum {
-      gSKI_RUNSTATE_STOPPED,
-      gSKI_RUNSTATE_INTERRUPTED,
-      gSKI_RUNSTATE_RUNNING,
-      gSKI_RUNSTATE_HALTED
-   } egSKIRunState;
+enum egSKIRunState 
+{
+	gSKI_RUNSTATE_STOPPED,
+	gSKI_RUNSTATE_INTERRUPTED,
+	gSKI_RUNSTATE_RUNNING,
+	gSKI_RUNSTATE_HALTED
+} ;
 
    /** 
     * @brief Definition of the ways in which runs can complete
@@ -559,13 +580,14 @@
     *      of the system is the same as if the run completed. (you call
     *      a Run method to start running again.)
     */
-   typedef enum {
-      gSKI_RUN_ERROR,
-      gSKI_RUN_EXECUTING,
-      gSKI_RUN_INTERRUPTED,
-      gSKI_RUN_COMPLETED,
-      gSKI_RUN_COMPLETED_AND_INTERRUPTED
-   } egSKIRunResult;
+enum egSKIRunResult 
+{
+	gSKI_RUN_ERROR,
+	gSKI_RUN_EXECUTING,
+	gSKI_RUN_INTERRUPTED,
+	gSKI_RUN_COMPLETED,
+	gSKI_RUN_COMPLETED_AND_INTERRUPTED
+} ;
    
    /**
    *  Agent stop points definition.
@@ -600,13 +622,12 @@
    *       phase.
    *  @li STOP_NEXT_DECISION_CYCLE: Stop at the end of the next decision cycle.
    */
-   typedef enum {
-      gSKI_STOP_ON_CALLBACK_RETURN			= 1 << 0,
-      gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN	= 1 << 1,
-      gSKI_STOP_AFTER_SMALLEST_STEP			= 1 << 2,
-      gSKI_STOP_AFTER_PHASE					= 1 << 3,
-      gSKI_STOP_AFTER_DECISION_CYCLE		= 1 << 4
-   } egSKIStopLocation;
+enum egSKIStopLocation
+{
+	gSKI_STOP_AFTER_SMALLEST_STEP			= 1 << 0,	// Keep in synch with smlStopLocationFlags
+	gSKI_STOP_AFTER_PHASE					= 1 << 1,
+	gSKI_STOP_AFTER_DECISION_CYCLE			= 1 << 2,
+} ;
 
    /** 
    *  @brief Ways you can stop the agents from running.
@@ -623,10 +644,11 @@
    *       effectively stop the entire application.  The thread remains
    *       suspended until Run is called on that thread group again.
    */
-   typedef enum {
-      gSKI_STOP_BY_RETURNING,
-      gSKI_STOP_BY_SUSPENDING
-   } egSKIStopType;
+enum egSKIStopType
+{
+	gSKI_STOP_BY_RETURNING,
+	gSKI_STOP_BY_SUSPENDING
+} ;
 
    /**
     * Support types for IWME instances.
@@ -647,12 +669,13 @@
     */
    // TODO: Flesh this out with more details and make sure that these are
    // the only types of support
-   typedef enum {
-      // Note that these are purposely the same values as used by the soar kernel
-     gSKI_UNKNOWN_SUPPORT = 0,
-     gSKI_O_SUPPORT = 1,
-     gSKI_I_SUPPORT = 2    
-   } egSKISupportType;
+enum egSKISupportType 
+{
+	// Note that these are purposely the same values as used by the soar kernel
+	gSKI_UNKNOWN_SUPPORT = 0,
+	gSKI_O_SUPPORT = 1,
+	gSKI_I_SUPPORT = 2    
+} ;
 
    /** 
    * @brief Definition of all allowed o-support modes in Soar
@@ -673,12 +696,13 @@
    *       elaborate an operator.  This is the default mode in Soar 8.
    * @li gSKI_O_SUPPORT_MODE_4: The new default, TODO
    */
-   typedef enum {
-      gSKI_O_SUPPORT_MODE_0,
-      gSKI_O_SUPPORT_MODE_2,
-      gSKI_O_SUPPORT_MODE_3,
-      gSKI_O_SUPPORT_MODE_4,
-   } egSKIOSupportMode;
+enum egSKIOSupportMode 
+{
+	gSKI_O_SUPPORT_MODE_0,
+	gSKI_O_SUPPORT_MODE_2,
+	gSKI_O_SUPPORT_MODE_3,
+	gSKI_O_SUPPORT_MODE_4,
+} ;
 
    /**
     * @brief Definition of action element types
@@ -689,10 +713,11 @@
     *                        RhsFunctionAction that generates the
     *                        symbol for the element at runtime.
     */
-   typedef enum {
-      gSKI_ACTION_SYMBOL,
-      gSKI_ACTION_FUNCTION
-   } egSKIActionElementType;
+enum egSKIActionElementType
+{
+	gSKI_ACTION_SYMBOL,
+	gSKI_ACTION_FUNCTION
+} ;
 
    /**
     * @brief: Definition of the different types of tests.
@@ -706,29 +731,31 @@
     * @li gSKI_LESS_THAN_OR_EQUAL
     * @li gSKI_NOT_EQUAL
     */
-   typedef enum  {
-      gSKI_EQUAL,
-      gSKI_GREATER_THAN,
-      gSKI_LESS_THAN,
-      gSKI_GREATER_OR_EQUAL,
-      gSKI_LESS_THAN_OR_EQUAL,
-      gSKI_NOT_EQUAL,
-      gSKI_DISJUNCTION,
-      gSKI_CONJUNCTION,
-      gSKI_OTHER,
-   } egSKITestType;
+enum egSKITestType
+{
+	gSKI_EQUAL,
+	gSKI_GREATER_THAN,
+	gSKI_LESS_THAN,
+	gSKI_GREATER_OR_EQUAL,
+	gSKI_LESS_THAN_OR_EQUAL,
+	gSKI_NOT_EQUAL,
+	gSKI_DISJUNCTION,
+	gSKI_CONJUNCTION,
+	gSKI_OTHER,
+} ;
 
    /**
     * @brief Difinition of the different types of productions.
     */
-   typedef enum {
-      gSKI_CHUNK,
-      gSKI_DEFAULT,
-      gSKI_JUSTIFICATION,
-      gSKI_USER,
+enum egSKIProdType 
+{
+	gSKI_CHUNK,
+	gSKI_DEFAULT,
+	gSKI_JUSTIFICATION,
+	gSKI_USER,
 
-      gSKI_NUM_PRODUCTION_TYPES, /// End marker for iteration
-   } egSKIProdType;
+	gSKI_NUM_PRODUCTION_TYPES, /// End marker for iteration
+} ;
 
    /** 
     * @brief Definition of a special value for rhs function parameter number
@@ -737,22 +764,23 @@
     *
     * @li gSKI_PARAM_NUM_VARIABLE Any number of parameters can be passed into the function
     */
-   typedef enum {
-      gSKI_PARAM_NUM_VARIABLE = -1
-   } egSKIParamNumType;
+enum egSKIParamNumType
+{
+	gSKI_PARAM_NUM_VARIABLE = -1
+} ;
 
-   typedef enum
-   {
-      gSKI_USER_SELECT_FIRST,    /// just choose the first candidate item
-      gSKI_USER_SELECT_ASK,      /// ask the user
-      gSKI_USER_SELECT_RANDOM,   /// pick one at random
-      gSKI_USER_SELECT_LAST,     /// choose the last item
-   } egSKIUserSelectType;
+enum egSKIUserSelectType
+{
+	gSKI_USER_SELECT_FIRST,    /// just choose the first candidate item
+	gSKI_USER_SELECT_ASK,      /// ask the user
+	gSKI_USER_SELECT_RANDOM,   /// pick one at random
+	gSKI_USER_SELECT_LAST,     /// choose the last item
+} ;
 
-   typedef enum
-   {
-      gSKI_NUMERIC_INDIFFERENT_MODE_SUM,  /// do numeric indifference by summing all values asserted by the rules.  Indifferent prefferences with no explicit value are assigned the numeric weight of 0.
-      gSKI_NUMERIC_INDIFFERENT_MODE_AVG,  /// do numeric indiffernce by averaging all values asserted by the rules.  Indifferent preferrences with no explicit value are assigned the numeric weight of 50.
-   } egSKINumericIndifferentMode;
+enum egSKINumericIndifferentMode 
+{
+	gSKI_NUMERIC_INDIFFERENT_MODE_SUM,  /// do numeric indifference by summing all values asserted by the rules.  Indifferent prefferences with no explicit value are assigned the numeric weight of 0.
+	gSKI_NUMERIC_INDIFFERENT_MODE_AVG,  /// do numeric indiffernce by averaging all values asserted by the rules.  Indifferent preferrences with no explicit value are assigned the numeric weight of 50.
+} ;
 
 #endif

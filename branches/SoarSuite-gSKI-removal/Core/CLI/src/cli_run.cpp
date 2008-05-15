@@ -17,6 +17,7 @@
 #include "sml_KernelSML.h"
 #include "sml_Events.h"
 #include "sml_RunScheduler.h"
+#include "cli_CLIError.h"
 
 using namespace cli;
 using namespace sml;
@@ -176,9 +177,6 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 		pScheduler->ScheduleAllAgentsToRun(true) ;
 	}
 
-	// Decide how large of a step to run each agent before switching to the next agent
-	// By default, we run one phase per agent but this isn't always appropriate.
-	egSKIRunType interleaveStepSize = gSKI_RUN_PHASE ;
 #ifdef USE_NEW_SCHEDULER
 	smlInterleaveStepSize interleave;
 
@@ -203,24 +201,6 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 
 #endif
 
-	switch (runType)
-	{
-		// If the entire system is running by elaboration cycles, then we need to run each agent by elaboration cycles (they're usually
-		// smaller than a phase).
-		case gSKI_RUN_ELABORATION_CYCLE: 
-			interleaveStepSize = gSKI_RUN_ELABORATION_CYCLE ; 
-			break ;
-
-		// If we're running the system to output we want to run each agent until it generates output.  This can be many decisions.
-		// The reason is actually to do with stopping the agent after n decisions (default 15) if no output occurs.
-		// DJP -- We need to rethink this design so using phase interleaving until we do.
-		// case gSKI_RUN_UNTIL_OUTPUT: interleaveStepSize = gSKI_RUN_UNTIL_OUTPUT ; break ;
-
-		default: 
-			interleaveStepSize = gSKI_RUN_PHASE ; 
-			break ;
-	}
-
 #ifdef USE_NEW_SCHEDULER
 	if (!pScheduler->VerifyStepSizeForRunType(forever, runType, interleave) ) {
 		SetError(CLIError::kInvalidRunInterleaveSetting);
@@ -230,11 +210,12 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 #endif
 
 	// If we're running by decision cycle synchronize up the agents to the same phase before we start
-	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ; 
+	bool synchronizeAtStart = (runType == sml_DECISION) ; 
 
 	// Do the run
 #ifdef USE_OLD_SCHEDULER
-	runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart) ;
+	assert(false);
+	//runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart) ;
 #endif
 #ifdef USE_NEW_SCHEDULER
 	runResult = pScheduler->RunScheduledAgents(forever, runType, count, runFlags, interleave, synchronizeAtStart) ;
@@ -243,11 +224,6 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	// Check for error
 	if (runResult == sml_RUN_ERROR) {
 		// FIXME: report extended run error
-     //   if (m_gSKIError.Id == gSKI::gSKIERR_AGENT_RUNNING) {
-     //       return SetError(CLIError::kAlreadyRunning);
-     //   } else if (gSKI::isError(m_gSKIError)) {
-		   // return SetError(CLIError::kgSKIError);
-	    //}
         return SetError(CLIError::kRunFailed);
 	}
 
@@ -288,7 +264,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 		case sml_RUN_COMPLETED:
             // Do not print anything
 			// might be helpful if we checked agents to see if any halted...
-			// retval is gSKI_RUN_COMPLETED, but agent m_RunState == gSKI_RUNSTATE_HALTED
+			// retval is sml_RUN_COMPLETED, but agent m_RunState == gSKI_RUNSTATE_HALTED
 			// should only check the agents m_pAgentSML->WasOnRunList()
 			if (pScheduler->AnAgentHaltedDuringRun())
 			{

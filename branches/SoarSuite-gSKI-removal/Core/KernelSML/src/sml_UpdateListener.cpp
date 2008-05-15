@@ -42,19 +42,16 @@ bool UpdateListener::RemoveListener(egSKIUpdateEventId eventID, Connection* pCon
 }
 
 // Called when an event occurs in the kernel
-void UpdateListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+void UpdateListener::OnKernelEvent(int eventIDIn, AgentSML* /*pAgentSML*/, void* pCallData)
 {
 	// There are currently no kernel events corresponding to this SML event.
 	// They are all directly generated from SML.  If we later add kernel callbacks
 	// for this class of events they would come here.
-	unused(eventID) ;
-	unused(pAgentSML) ;
-	unused(pCallData) ;
-}
 
-// Called when a "RunEvent" occurs in the kernel
-void UpdateListener::HandleEvent(egSKIUpdateEventId eventID, int runFlags)
-{
+	egSKIUpdateEventId eventID = static_cast<egSKIUpdateEventId>(eventIDIn);
+	int* pRunFlags = static_cast<int*>(pCallData);
+	assert(pRunFlags);
+
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
 	if (!EventManager<egSKIUpdateEventId>::GetBegin(eventID, &connectionIter))
@@ -69,7 +66,7 @@ void UpdateListener::HandleEvent(egSKIUpdateEventId eventID, int runFlags)
 
 	// Convert phase to a string
 	char runStr[kMinBufferSize] ;
-	Int2String(runFlags, runStr, sizeof(runStr)) ;
+	Int2String(*pRunFlags, runStr, sizeof(runStr)) ;
 
 	// Build the SML message we're doing to send.
 	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;

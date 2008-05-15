@@ -18,6 +18,9 @@ namespace sml {
 class PrintListener;
 class XMLListener ;
 
+enum smlPrintEventId;
+enum smlXMLEventId;
+
 class AgentOutputFlusher : public KernelCallback
 {
 protected:
@@ -29,8 +32,8 @@ protected:
 	XMLListener*   m_pXMLListener;
 
 public:
-	AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, egSKIPrintEventId eventID);
-	AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, egSKIXMLEventId eventID);
+	AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, smlPrintEventId eventID);
+	AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, smlXMLEventId eventID);
 	virtual ~AgentOutputFlusher();
 
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;

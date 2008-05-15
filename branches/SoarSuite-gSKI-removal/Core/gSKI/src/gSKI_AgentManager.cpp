@@ -145,16 +145,6 @@ namespace gSKI
    {
       Agent* a;
 
-      // This type of stopping requires full threading
-      MegaAssert(stopLoc  != gSKI_STOP_ON_CALLBACK_RETURN, "This mode is not implemented.");
-      MegaAssert(stopLoc  != gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN, "This mode is not implemented.");
-      if((stopLoc  == gSKI_STOP_ON_CALLBACK_RETURN) ||
-         (stopLoc  == gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN))
-      { 
-         SetError(err, gSKIERR_NOT_IMPLEMENTED);
-         return false;
-      }
-
       ClearError(err);
 
       // Iterate over each of the agents and call interrupt on each of
@@ -427,15 +417,6 @@ namespace gSKI
       m_agentListeners.Notify(gSKIEVENT_AFTER_AGENT_CREATED, nf);
    }
 
-   // TODO: Implement ReinitializeAll() method from the IAgentRunControl
-   // interface
-   bool AgentManager::ReinitializeAll(Error* err) 
-   { 
-      MegaAssert(false, "Implement this method!");
-      return true; 
-   } 
-
-
    /*
    =============================
 
@@ -460,47 +441,6 @@ namespace gSKI
    {
       RemoveListenerFromManager(m_agentListeners, eventId, listener, err);
    }
-
-   /*
-   =============================
-
-   =============================
-   */
-   void AgentManager::FireBeforeAgentReinitialized(Agent* a)
-   {
-	   assert(false) ;	// Removed this
-	   /*
-      AgentNotifier nf(a);
-      m_agentListeners.Notify(gSKIEVENT_BEFORE_AGENT_REINITIALIZED, nf);
-	  */
-   }
-   
-   /*
-   =============================
-
-   =============================
-   */
-   void AgentManager::FireAfterAgentReinitialized(Agent* a)
-   {
-	   assert(false) ;	// Removed this
-	   /*
-      AgentNotifier nf(a);
-      m_agentListeners.Notify(gSKIEVENT_AFTER_AGENT_REINITIALIZED, nf);
-	  */
-   }
-
-   /*
-   =============================
-
-   =============================
-   */
-   /*
-   void AgentManager::FireBeforeAgentsRunStepEvent()
-   {
-	  AgentNotifier nf(NULL) ;	// Not an agent specific event but an agent manager event.
-      m_agentListeners.Notify(gSKIEVENT_BEFORE_AGENTS_RUN_STEP, nf);
-   }
-   */
 
    /*
    =============================

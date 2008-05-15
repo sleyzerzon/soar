@@ -18,12 +18,10 @@
 */
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_ProductionListener.h"
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
-#include "IgSKI_Production.h"
-#include "gSKI_ProductionManager.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "KernelHeaders.h"
@@ -35,7 +33,6 @@ using namespace sml ;
 void ProductionListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 {
 	m_pKernelSML = pKernelSML ;
-	m_pAgent	 = pAgentSML->GetIAgent() ;
 	SetAgentSML(pAgentSML) ;
 }
 
@@ -72,34 +69,30 @@ bool ProductionListener::RemoveListener(egSKIProductionEventId eventID, Connecti
 
 void ProductionListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
+	// TODO: all event handlers should be doing this:
 	assert(IsProductionEventID(eventID)) ;
+
 	smlProductionEventId smlEventID = (smlProductionEventId)eventID ;	
 
-	std::string name ;
+	std::string productionName ;
 
 	// We're either passed a production* or an instantiation* depending on the type of event
+	production* p = 0;
 	if (smlEventID == smlEVENT_AFTER_PRODUCTION_ADDED || smlEventID == smlEVENT_BEFORE_PRODUCTION_REMOVED)
 	{
-		production* p = (production*) pCallData ;
-		assert(p) ;
-		assert(p->name->sc.name) ;
-		name = p->name->sc.name ;
+		p = (production*) pCallData ;
 	}
 	else
 	{
 		instantiation* inst = (instantiation*) pCallData ;
 		assert(inst) ;
-		production* p = inst->prod ;
-		assert(p) ;
-		assert(p->name->sc.name) ;
-		name = p->name->sc.name ;
+		p = inst->prod ;
 	}
 
-	HandleEvent(smlEventID, pAgentSML, name) ;
-}
+	assert(p) ;
+	assert(p->name->sc.name) ;
+	productionName = p->name->sc.name ;
 
-void ProductionListener::HandleEvent(smlProductionEventId eventID, AgentSML* pAgentSML, std::string const& productionName)
-{
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
 	if (!EventManager<egSKIProductionEventId>::GetBegin((egSKIProductionEventId)eventID, &connectionIter))
@@ -126,12 +119,3 @@ void ProductionListener::HandleEvent(smlProductionEventId eventID, AgentSML* pAg
 	delete pMsg ;
 }
 
-// Called when a "ProductionEvent" occurs in the kernel
-void ProductionListener::HandleEvent(egSKIProductionEventId eventID, gSKI::Agent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match)
-{
-	// This class isn't implemented in gSKI yet.
-	unused(match) ;
-
-	AgentSML* pAgentSML = m_pKernelSML->GetAgentSML(agentPtr) ;
-	HandleEvent( (smlProductionEventId)eventID, pAgentSML, prod->GetName() ) ;
-}

@@ -16,6 +16,7 @@
 #include <assert.h>
 
 #include "sml_Names.h"
+#include "cli_CLIError.h"
 
 #include "sml_KernelHelpers.h"
 #include "sml_KernelSML.h"

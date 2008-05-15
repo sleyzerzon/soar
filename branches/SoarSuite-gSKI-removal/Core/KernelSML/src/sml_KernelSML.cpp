@@ -229,15 +229,25 @@ void KernelSML::Shutdown()
 *************************************************************/
 std::string KernelSML::FireEditProductionEvent(char const* pProduction) { 
 
-	char response[10000] ;
+	const int kBufferLength = 10000; 
+	char response[kBufferLength] ;
 	response[0] = 0 ;
 
-	bool ok = m_StringListener.HandleEvent(gSKIEVENT_EDIT_PRODUCTION, pProduction, sizeof(response), response) ;
-	if (!ok)
-	{
-		// return zero length string for success
-		strcpy(response, "") ;
-	}
+	StringListenerCallbackData callbackData;
+
+	callbackData.pData = pProduction;
+	callbackData.maxLengthReturnStringBuffer = kBufferLength;
+	callbackData.pReturnStringBuffer = response;
+
+	m_StringListener.OnKernelEvent( gSKIEVENT_EDIT_PRODUCTION, 0, &callbackData );
+
+	// This next bit of code is completely redundant, the strcpy below is basically a no-op:
+
+	//if ( response[0] == 0 )
+	//{
+	//	// return zero length string for success
+	//	strcpy(response, "") ;
+	//}
 
 	return response ;
 }
@@ -246,17 +256,29 @@ std::string KernelSML::FireEditProductionEvent(char const* pProduction) {
 * @brief	Notify listeners that this event has occured.
 *************************************************************/
 std::string KernelSML::FireLoadLibraryEvent(char const* pLibraryCommand) { 
-	char response[10000] ;
+
+	const int kBufferLength = 10000; 
+	char response[kBufferLength] ;
 	response[0] = 0 ;
 
-	bool ok = m_StringListener.HandleEvent(gSKIEVENT_LOAD_LIBRARY, pLibraryCommand, sizeof(response), response) ;
-	if (!ok)
-	{
-		// return zero length string for success
-		strcpy(response, "") ;
-	}
+	StringListenerCallbackData callbackData;
+
+	callbackData.pData = pLibraryCommand;
+	callbackData.maxLengthReturnStringBuffer = kBufferLength;
+	callbackData.pReturnStringBuffer = response;
+
+	m_StringListener.OnKernelEvent( gSKIEVENT_LOAD_LIBRARY, 0, &callbackData );
+
+	// This next bit of code is completely redundant, the strcpy below is basically a no-op:
+
+	//if ( response[0] == 0 )
+	//{
+	//	// return zero length string for success
+	//	strcpy(response, "") ;
+	//}
 
 	return response ;
+
 }
 //////////////////////////////////////
 
@@ -624,7 +646,7 @@ smlPhase KernelSML::GetStopBefore()
 /*************************************************************
 * @brief	Request that all agents stop soon
 *************************************************************/	
-bool KernelSML::InterruptAllAgents(egSKIStopLocation stopLoc)
+bool KernelSML::InterruptAllAgents(smlStopLocationFlags stopLoc)
 {
 	bool result = true ;
 

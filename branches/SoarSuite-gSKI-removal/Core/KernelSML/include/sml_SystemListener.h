@@ -24,9 +24,9 @@
 #define SYSTEM_LISTENER_H
 
 #include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_Iterator.h"
-#include "gSKI_Kernel.h"
+//#include "gSKI_Enumerations.h"
+//#include "IgSKI_Iterator.h"
+//#include "gSKI_Kernel.h"
 #include "sml_EventManager.h"
 
 #include <string>
@@ -36,7 +36,7 @@ namespace sml {
 
 class Connection ;
 
-class SystemListener : public gSKI::ISystemListener, public EventManager<egSKISystemEventId>
+class SystemListener : public EventManager<egSKISystemEventId>
 {
 protected:
 	// The kernel
@@ -61,9 +61,6 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(egSKISystemEventId eventID, Connection* pConnection) ;
-
-	// Called when a "SystemEvent" occurs in the kernel
-	virtual void HandleEvent(egSKISystemEventId eventId, gSKI::Kernel* kernel) ;
 
 } ;
 

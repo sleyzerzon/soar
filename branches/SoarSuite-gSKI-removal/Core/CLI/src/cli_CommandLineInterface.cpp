@@ -14,7 +14,7 @@
 #include <assert.h>
 
 #include "cli_Commands.h"
-#include "cli_Aliases.h"
+#include "cli_CLIError.h"
 
 // SML includes
 #include "sml_Connection.h"
@@ -842,58 +842,6 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 	}
 	return true;
 }
-
-// FIXME
-// Revisit how XML is passed from the kernel to the CLI
-// Right now, the kernel gets a singleton CLI pointer and the XML is stored directly in to the CLI 
-// (statically) instead of using a callback
-///** 
-//* @brief Event callback function
-//*
-//* This method recieves callbacks when the xml event occurs for an agent.
-//*
-//* @param eventId	  Id of the event that occured (can only be gSKIEVENT_XML_TRACE_OUTPUT)
-//* @param agentPtr	  Pointer to the agent that fired the print event
-//* @param funcType     Pointer to c-style string containing the function type (i.e. addTag, addAttributeValuePair, endTag)
-//* @param attOrTag     Pointer to c-style string containing the tag to add or remove or the attribute to add
-//* @param value		  Pointer to c-style string containing the value to add (may be NULL if just adding/ending a tag)
-//*/
-//void CommandLineInterface::HandleEvent(egSKIXMLEventId, gSKI::Agent*, const char* funcType, const char* attOrTag, const char* value) {
-//
-//	// Collect up the incoming XML events into an XML object
-//	if (!m_XMLEventTag)
-//		m_XMLEventTag = new XMLTrace() ;
-//
-//	// We need to decide what type of operation this is and we'd like to do that
-//	// fairly efficiently so we'll switch based on the first character of the name.
-//	char ch = funcType[0] ;
-//
-//	switch (ch)
-//	{
-//	case 'b' : 
-//		if (strcmp(sml_Names::kFunctionBeginTag, funcType) == 0)
-//		{
-//			m_XMLEventTag->BeginTag(attOrTag) ;
-//		}
-//		break ;
-//	case 'e':
-//		if (strcmp(sml_Names::kFunctionEndTag, funcType) == 0)
-//		{
-//			m_XMLEventTag->EndTag(attOrTag) ;
-//		}
-//		break ;
-//	case 'a':
-//		if (strcmp(sml_Names::kFunctionAddAttribute, funcType) == 0)
-//		{
-//			m_XMLEventTag->AddAttribute(attOrTag, value) ;
-//		}
-//		break ;
-//	default:
-//		// This is an unknown function type
-//		assert(ch == 'b' || ch == 'e' || ch == 'a') ;
-//		break ;
-//	}
-//}
 
 CommandLineInterface* cli::GetCLI()
 {

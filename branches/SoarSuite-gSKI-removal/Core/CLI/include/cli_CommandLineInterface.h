@@ -23,11 +23,10 @@
 #include <sstream>
 
 // Local includes
+#include "sml_KernelCallback.h"
+
 #include "cli_CommandData.h"
 #include "cli_Aliases.h"
-#include "cli_CLIError.h"
-
-#include "sml_KernelCallback.h"
 
 // For test
 //#define WIN_STATIC_LINK
@@ -53,6 +52,7 @@ namespace cli {
 // Forward declarations
 class CommandLineInterface;
 class GetOpt;
+typedef int ErrorCode;
 
 // Define the CommandFunction which we'll call to process commands
 typedef bool (CommandLineInterface::*CommandFunction)(std::vector<std::string>& argv);

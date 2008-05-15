@@ -10,11 +10,13 @@
 
 #include "sml_Utils.h"
 #include "cli_CommandLineInterface.h"
+#include "cli_CLIError.h"
 
 #include "cli_Commands.h"
 
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
+#include "sml_Events.h"
 
 using namespace cli;
 
@@ -55,7 +57,7 @@ bool CommandLineInterface::DoStopSoar(bool self, const std::string* reasonForSto
 
 	if (self) {
 		if (!RequireAgent()) return false;
-		if (!m_pAgentSML->Interrupt(gSKI_STOP_AFTER_DECISION_CYCLE)) {
+		if (!m_pAgentSML->Interrupt(sml::sml_STOP_AFTER_DECISION_CYCLE)) {
 			SetErrorDetail("Error interrupting agent.");
 			return SetError(CLIError::kRunFailed); // FIXME: should be stopfailed
 		}
@@ -70,7 +72,7 @@ bool CommandLineInterface::DoStopSoar(bool self, const std::string* reasonForSto
 		// So instead we set a flag and allow system stop to fire at the end of the run.
 		m_pKernelSML->RequireSystemStop(true) ;
 
-		if (!m_pKernelSML->InterruptAllAgents(gSKI_STOP_AFTER_DECISION_CYCLE)) {
+		if (!m_pKernelSML->InterruptAllAgents(sml::sml_STOP_AFTER_DECISION_CYCLE)) {
 			SetErrorDetail("Error interrupting all agents.");
 			return SetError(CLIError::kRunFailed); // FIXME: should be stopfailed
 		}

@@ -383,98 +383,6 @@ namespace gSKI
 
    /*
    =============================
- ____      _       _ _   _       _ _       __        ___ _   _
-|  _ \ ___(_)_ __ (_) |_(_) __ _| (_)______\ \      / (_) |_| |__
-| |_) / _ \ | '_ \| | __| |/ _` | | |_  / _ \ \ /\ / /| | __| '_ \
-|  _ <  __/ | | | | | |_| | (_| | | |/ /  __/\ V  V / | | |_| | | |
-|_|_\_\___|_|_|_|_|_|\__|_|\__,_|_|_/___\___| \_/\_/  |_|\__|_| |_|
- / _ \| | __| / ___|  ___| |_| |_(_)_ __   __ _ ___
-| | | | |/ _` \___ \ / _ \ __| __| | '_ \ / _` / __|
-| |_| | | (_| |___) |  __/ |_| |_| | | | | (_| \__ \
- \___/|_|\__,_|____/ \___|\__|\__|_|_| |_|\__, |___/
-                                          |___/
-   =============================
-   */
-   bool Agent::ReinitializeWithOldSettings(Error* err)
-   {
-      MegaAssert(false, "Not implemented yet.");
-      ClearError(err);
-
-      // Should we just call Reinitialize with parameters same
-      //  as current state?
-      initializeRuntimeState();
-
-      return false;
-   }
-
-   /*
-   =============================
-
-   =============================
-   */
-   /*
-   egSKIRunResult Agent::RunInClientThread(egSKIRunType        runLength, 
-                                           unsigned long       count,
-                                           Error*              err)
-   {
-      // TODO: This will need to be locked at some point
-      //  Just the part that checks the runstate and then
-      //  sets the runstate.  Notifying the agent manager
-      //  about who is running is a bit tricky.
-
-      // Agent is already running, we cannot run
-      if(m_runState != gSKI_RUNSTATE_STOPPED)
-      {
-         if(m_runState == gSKI_RUNSTATE_HALTED)
-            SetError(err, gSKIERR_AGENT_HALTED);
-         else
-            SetError(err, gSKIERR_AGENT_RUNNING);
-
-         return gSKI_RUN_ERROR;
-      }
-
-      m_runState = gSKI_RUNSTATE_RUNNING;
-
-      // Now clear error and do the run
-      ClearError(err);
-
-      // This helper does all the work
-      return run(runLength, count);
-   }
-	*/
-
-   /*
-   egSKIRunResult Agent::StepInClientThread(egSKIInterleaveType  stepSize, 
-                                                  unsigned long  stepCount,
-                                                         Error*  err)
-   {
-      //KJC copied from RunInClientThread above.
-
-      // Agent is already running, we cannot run
-      if(m_runState != gSKI_RUNSTATE_STOPPED)
-      {
-         if(m_runState == gSKI_RUNSTATE_HALTED)
-            SetError(err, gSKIERR_AGENT_HALTED);  // nothing ever tests for this...
-         else
-            SetError(err, gSKIERR_AGENT_RUNNING);
-
-         return gSKI_RUN_ERROR;
-      }
-
-      m_runState = gSKI_RUNSTATE_RUNNING;
-
-      // Now clear error and do the run
-      ClearError(err);
-
-      // This method does all the work
-      return step(stepSize, stepCount);
-   }
-   */
-
-
-
-   /*
-   =============================
 
    =============================
    */
@@ -484,11 +392,7 @@ namespace gSKI
    {
       // This type of stopping requires full threading
       MegaAssert(stopType != gSKI_STOP_BY_SUSPENDING, "This mode is not implemented.");
-      MegaAssert(stopLoc  != gSKI_STOP_ON_CALLBACK_RETURN, "This mode is not implemented.");
-      MegaAssert(stopLoc  != gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN, "This mode is not implemented.");
-      if((stopType == gSKI_STOP_BY_SUSPENDING) ||
-         (stopLoc  == gSKI_STOP_ON_CALLBACK_RETURN) ||
-         (stopLoc  == gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN))
+      if(stopType == gSKI_STOP_BY_SUSPENDING)
       { 
          SetError(err, gSKIERR_NOT_IMPLEMENTED);
          return false;

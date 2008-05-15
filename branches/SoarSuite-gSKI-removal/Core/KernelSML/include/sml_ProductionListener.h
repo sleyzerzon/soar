@@ -19,11 +19,6 @@
 #ifndef PRODUCTION_LISTENER_H
 #define PRODUCTION_LISTENER_H
 
-#include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_Iterator.h"
-#include "gSKI_Agent.h"
-#include "gSKI_Kernel.h"
 #include "sml_EventManager.h"
 #include "sml_Events.h"
 
@@ -35,17 +30,15 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 
-class ProductionListener : public gSKI::IProductionListener, public EventManager<egSKIProductionEventId>
+class ProductionListener : public EventManager<egSKIProductionEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
-	gSKI::Agent*	m_pAgent ;
 
 public:
 	ProductionListener()
 	{
 		m_pKernelSML = 0 ;
-		m_pAgent	 = 0 ;
 	}
 
 	virtual ~ProductionListener()
@@ -63,12 +56,6 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(egSKIProductionEventId eventID, Connection* pConnection) ;
-
-	// Called when a "ProductionEvent" occurs in the kernel
-	virtual void HandleEvent(smlProductionEventId eventID, AgentSML* pAgentSML, std::string const& productionName) ;
-
-	// Called when a "ProductionEvent" occurs in the kernel
-	virtual void HandleEvent(egSKIProductionEventId eventId, gSKI::Agent* agentPtr, gSKI::IProduction* prod, gSKI::IProductionInstance* match) ;
 } ;
 
 }

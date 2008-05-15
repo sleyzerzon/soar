@@ -742,7 +742,7 @@ void dougs_calculate_support_for_instantiation_preferences (agent* thisAgent, in
    the test may contain variables.
 ------------------------------------------------------------------ */
 
-typedef enum yes_no_maybe_enum { YES, NO, MAYBE } yes_no_maybe;
+enum yes_no_maybe { YES, NO, MAYBE } ;
 
 yes_no_maybe test_is_for_symbol (test t, Symbol *sym) {
   cons *c;

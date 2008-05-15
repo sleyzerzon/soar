@@ -34,7 +34,9 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 
-class AgentListener : gSKI::IAgentListener, public EventManager<egSKIAgentEventId>
+enum smlAgentEventId;
+
+class AgentListener : gSKI::IAgentListener, public EventManager<smlAgentEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
@@ -54,15 +56,15 @@ public:
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKIAgentEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(smlAgentEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKIAgentEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(smlAgentEventId eventID, Connection* pConnection) ;
 
 	// Called when an "AgentEvent" occurs in the kernel
 	virtual void HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPtr) ;
 
-	virtual void OnEvent(egSKIAgentEventId eventID, AgentSML* pAgentSML) ;
+	virtual void OnEvent(smlAgentEventId eventID, AgentSML* pAgentSML) ;
 
 } ;
 

@@ -57,6 +57,8 @@ class Events ;
 class RunScheduler ;
 class KernelHelpers ;
 
+enum smlStopLocationFlags ;
+
 // Define the CommandFunction which we'll call to process commands
 typedef bool (KernelSML::*CommandFunction)(gSKI::Agent*, char const*, Connection*, AnalyzeXML*, ElementXML*, gSKI::Error*);
 
@@ -238,28 +240,34 @@ public:
 	*			for a particular event in the kernel.
 	*************************************************************/
 	void AddSystemListener(egSKISystemEventId eventID, Connection* pConnection)	 { m_SystemListener.AddListener(eventID, pConnection) ; }
-	void AddAgentListener(egSKIAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
+	void AddAgentListener(smlAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
 	void AddUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection)	 { m_UpdateListener.AddListener(eventID, pConnection) ; }
 	void AddStringListener(egSKIStringEventId eventID, Connection* pConnection)  { m_StringListener.AddListener(eventID, pConnection) ; }
 	void RemoveSystemListener(egSKISystemEventId eventID, Connection* pConnection) { m_SystemListener.RemoveListener(eventID, pConnection) ; }
-	void RemoveAgentListener(egSKIAgentEventId eventID, Connection* pConnection)   { m_AgentListener.RemoveListener(eventID, pConnection) ; }
+	void RemoveAgentListener(smlAgentEventId eventID, Connection* pConnection)   { m_AgentListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection) { m_UpdateListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveStringListener(egSKIStringEventId eventID, Connection* pConnection) { m_StringListener.RemoveListener(eventID, pConnection) ; }
 
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
 	*************************************************************/
-	void FireUpdateListenerEvent(egSKIUpdateEventId eventID, int runFlags)	{ m_UpdateListener.HandleEvent(eventID, runFlags) ; }
+	void FireUpdateListenerEvent(egSKIUpdateEventId eventID, int runFlags)	
+	{ 
+		m_UpdateListener.OnKernelEvent(eventID, 0, &runFlags) ; 
+	}
 
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
 	*************************************************************/
-	void FireSystemEvent(egSKISystemEventId eventID)						{ m_SystemListener.HandleEvent(eventID, GetKernel()) ; }
+	void FireSystemEvent(egSKISystemEventId eventID)						
+	{ 
+		m_SystemListener.OnKernelEvent(eventID, 0 , 0) ; 
+	}
 
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
 	*************************************************************/
-	void FireAgentEvent(AgentSML* pAgentSML, egSKIAgentEventId eventID)		{ m_AgentListener.OnEvent(eventID, pAgentSML) ; }
+	void FireAgentEvent(AgentSML* pAgentSML, smlAgentEventId eventID)		{ m_AgentListener.OnEvent(eventID, pAgentSML) ; }
 
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
@@ -445,7 +453,7 @@ public:
 	/*************************************************************
 	* @brief	Request that all agents stop soon
 	*************************************************************/	
-	bool InterruptAllAgents(egSKIStopLocation stopLoc) ;
+	bool InterruptAllAgents(smlStopLocationFlags stopLoc) ;
 	void ClearAllInterrupts() ;
 
 protected:

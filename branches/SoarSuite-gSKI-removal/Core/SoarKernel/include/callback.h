@@ -45,7 +45,8 @@ extern "C"
  /* First we define the possible callbacks in an enum.  Then we  */
  /* describe how each one will be called in user code.           */
 
-typedef enum {
+enum SOAR_CALLBACK_TYPE
+{
   NO_CALLBACK,                      /* Used for missing callback */
   SYSTEM_TERMINATION_CALLBACK,
   AFTER_INIT_AGENT_CALLBACK,
@@ -98,7 +99,7 @@ typedef enum {
                                     /* type.  Used to indicate   */
                                     /* list size and MUST ALWAYS */
                                     /* BE LAST.                  */
-} SOAR_CALLBACK_TYPE;
+} ;
 
 #define NUMBER_OF_MONITORABLE_CALLBACKS (NUMBER_OF_CALLBACKS - 2)
 

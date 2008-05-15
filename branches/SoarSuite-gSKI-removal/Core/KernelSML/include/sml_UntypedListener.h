@@ -26,6 +26,13 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 
+struct StringListenerCallbackData 
+{
+	char const* pData;					// Input
+	char* pReturnStringBuffer;			// Output, client owned buffer, zero length string when there is no output (former function returned false)
+	int maxLengthReturnStringBuffer;	// Output, length of client owned buffer
+};
+
 class StringListener : public EventManager<egSKIStringEventId>
 {
 protected:
@@ -45,7 +52,7 @@ public:
 	// Initialize this listener
 	void Init(KernelSML* pKernelSML) { m_pKernelSML = pKernelSML ; }
 
-	// Called when an event occurs in the kernel
+	// Called when an event occurs in the kernel, see comments for StringListenerCallbackData
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
@@ -53,9 +60,6 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(egSKIStringEventId eventID, Connection* pConnection) ;
-
-	// Called when an "StringEvent" occurs in the kernel
-	virtual bool HandleEvent(egSKIStringEventId eventId, char const* data, int maxLengthReturnValue, char* pReturnValue) ;
 } ;
 
 }

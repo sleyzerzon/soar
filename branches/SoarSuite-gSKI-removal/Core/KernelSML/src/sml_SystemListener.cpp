@@ -22,8 +22,8 @@
 *      gSKIEVENT_AFTER_RHS_FUNCTION_EXECUTED,
 */////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_SystemListener.h"
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
 #include "gSKI_Kernel.h"
@@ -70,21 +70,13 @@ void SystemListener::Init(KernelSML* pKernel)
 }
 
 // Called when an event occurs in the kernel
-void SystemListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
+void SystemListener::OnKernelEvent(int eventIDIn, AgentSML* , void* )
 {
 	// All system events are currently implemented directly in kernel SML so there's
 	// no underlying kernel callbacks to connect to.
 	// If we ever change that, this is where the callbacks would come in.
-	unused(eventID) ;
-	unused(pAgentSML) ;
-	unused(pCallData) ;
-}
 
-// Called when a "SystemEvent" occurs in the kernel
-void SystemListener::HandleEvent(egSKISystemEventId eventID, gSKI::Kernel* kernel)
-{
-	// We don't send the kernel over because we only support a single kernel object in SML
-	unused(kernel) ;
+	egSKISystemEventId eventID = static_cast<egSKISystemEventId>(eventIDIn);
 
 	// The system start event can be suppressed by a client.
 	// This allows us to run a Soar agent without running the associated simulation

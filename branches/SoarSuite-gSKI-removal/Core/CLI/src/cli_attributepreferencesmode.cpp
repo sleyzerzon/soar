@@ -14,6 +14,8 @@
 #include "sml_Names.h"
 #include "sml_StringOps.h"
 #include "agent.h"
+#include "cli_CLIError.h"
+
 
 using namespace cli;
 using namespace sml;

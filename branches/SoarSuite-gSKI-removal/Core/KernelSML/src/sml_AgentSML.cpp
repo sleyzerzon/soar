@@ -301,10 +301,10 @@ void AgentSML::InitializeRuntimeState()
 
 bool AgentSML::Reinitialize()
 {
-	m_pKernelSML->FireAgentEvent(this, gSKIEVENT_BEFORE_AGENT_REINITIALIZED) ;
+	m_pKernelSML->FireAgentEvent(this, smlEVENT_BEFORE_AGENT_REINITIALIZED) ;
 	bool ok = GetIAgent()->Reinitialize();
 	InitializeRuntimeState() ;
-	m_pKernelSML->FireAgentEvent(this, gSKIEVENT_AFTER_AGENT_REINITIALIZED) ;
+	m_pKernelSML->FireAgentEvent(this, smlEVENT_AFTER_AGENT_REINITIALIZED) ;
 	return ok ;
 }
 
@@ -444,17 +444,8 @@ unsigned long AgentSML::GetRunCounter(smlRunStepSize runStepSize)
 //=============================
 // Request that the agent stop soon.
 //=============================
-bool AgentSML::Interrupt(egSKIStopLocation stopLoc)
+bool AgentSML::Interrupt(smlStopLocationFlags stopLoc)
 {
-  // This type of stopping requires full threading
-  assert(stopLoc  != gSKI_STOP_ON_CALLBACK_RETURN) ; //, "This mode is not implemented.");
-  assert(stopLoc  != gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN) ; //, "This mode is not implemented.");
-  if ((stopLoc  == gSKI_STOP_ON_CALLBACK_RETURN) ||
-     (stopLoc  == gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN))
-  { 
-     return false;
-  }
-
   // Tell the agent where to stop
   m_interruptFlags = stopLoc;
 
@@ -464,7 +455,7 @@ bool AgentSML::Interrupt(egSKIStopLocation stopLoc)
   // gSKI_STOP_AFTER_DECISION_CYCLE.
   
   // These are immediate requests for interrupt, such as from RHS or application
-  if ((gSKI_STOP_AFTER_SMALLEST_STEP == stopLoc) || (gSKI_STOP_AFTER_PHASE == stopLoc)) {
+  if ((sml_STOP_AFTER_SMALLEST_STEP == stopLoc) || (sml_STOP_AFTER_PHASE == stopLoc)) {
 	  m_agent->stop_soar = TRUE;
 	  // If the agent is not running, we should set the runState flag now so agent won't run
 	  if (m_runState == gSKI_RUNSTATE_STOPPED)
@@ -608,7 +599,7 @@ smlRunResult AgentSML::Step(smlInterleaveStepSize stepSize)
 	   // interrupt the agents and allow the user to try to recover.
 	   if ((long)m_agent->bottom_goal->id.level >=  m_agent->sysparams[MAX_GOAL_DEPTH])
 	   {// the agent halted because it seems to be in an infinite loop, so throw interrupt
-		   m_pKernelSML->InterruptAllAgents(gSKI_STOP_AFTER_PHASE) ;
+		   m_pKernelSML->InterruptAllAgents(sml_STOP_AFTER_PHASE) ;
 		   m_agent->system_halted = FALSE; // hack! otherwise won't run again.  
 		   m_runState = gSKI_RUNSTATE_INTERRUPTED;
 		   retVal     = sml_RUN_INTERRUPTED;

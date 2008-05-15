@@ -16,7 +16,7 @@
 
 using namespace sml ;
 
-AgentOutputFlusher::AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, egSKIPrintEventId eventID) : m_pPrintListener(pPrintListener)
+AgentOutputFlusher::AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, smlPrintEventId eventID) : m_pPrintListener(pPrintListener)
 {
 	m_pXMLListener = NULL ;
 	m_EventID = eventID ;
@@ -27,7 +27,7 @@ AgentOutputFlusher::AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* 
 	//m_pAgent->AddRunListener(gSKIEVENT_AFTER_RUNNING, this);
 }
 
-AgentOutputFlusher::AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, egSKIXMLEventId eventID) : m_pXMLListener(pXMLListener)
+AgentOutputFlusher::AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, smlXMLEventId eventID) : m_pXMLListener(pXMLListener)
 {
 	m_pPrintListener = NULL ;
 	m_EventID = eventID ;
@@ -53,9 +53,9 @@ void AgentOutputFlusher::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* p
 	unused(pCallData);
 
 	if (m_pPrintListener)
-		m_pPrintListener->FlushOutput((egSKIPrintEventId)m_EventID);
+		m_pPrintListener->FlushOutput(static_cast<smlPrintEventId>(m_EventID));
 	if (m_pXMLListener)
-		m_pXMLListener->FlushOutput((egSKIXMLEventId)m_EventID) ;
+		m_pXMLListener->FlushOutput(static_cast<smlXMLEventId>(m_EventID)) ;
 }
 
 /*
@@ -70,6 +70,6 @@ void AgentOutputFlusher::HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agent
 	if (m_pPrintListener)
 		m_pPrintListener->FlushOutput((egSKIPrintEventId)m_EventID);
 	if (m_pXMLListener)
-		m_pXMLListener->FlushOutput((egSKIXMLEventId)m_EventID) ;
+		m_pXMLListener->FlushOutput((smlXMLEventId)m_EventID) ;
 }
 */

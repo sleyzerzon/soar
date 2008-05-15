@@ -14,8 +14,8 @@
 */
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
 #include "sml_PrintListener.h"
+#include "sml_Utils.h"
 #include "sml_Connection.h"
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
@@ -37,43 +37,43 @@ void PrintListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 }
 
 // Returns true if this is the first connection listening for this event
-bool PrintListener::AddListener(egSKIPrintEventId eventID, Connection* pConnection)
+bool PrintListener::AddListener(smlPrintEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
 	if (first)
 	{
 		// Echo events are SML only.  Everything else is implemented in gSKI
-		if (eventID != gSKIEVENT_ECHO)
+		if (eventID != smlEVENT_ECHO)
 		{
 			RegisterWithKernel(eventID) ;
 			//m_pAgent->AddPrintListener(eventID, this); 
 		}
 
 		// Register for specific events at which point we'll flush the buffer for this event
-		m_pAgentOutputFlusher[eventID-gSKIEVENT_FIRST_PRINT_EVENT] = new AgentOutputFlusher(this, GetAgentSML(), eventID);
+		m_pAgentOutputFlusher[eventID-smlEVENT_FIRST_PRINT_EVENT] = new AgentOutputFlusher(this, GetAgentSML(), eventID);
 	}
 
 	return first ;
 }
 
 // Returns true if at least one connection remains listening for this event
-bool PrintListener::RemoveListener(egSKIPrintEventId eventID, Connection* pConnection)
+bool PrintListener::RemoveListener(smlPrintEventId eventID, Connection* pConnection)
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
 	if (last)
 	{
 		// Echo events are SML only.  Everything else is implemented in gSKI
-		if (eventID != gSKIEVENT_ECHO)
+		if (eventID != smlEVENT_ECHO)
 		{
 			UnregisterWithKernel(eventID) ;
 			//m_pAgent->RemovePrintListener(eventID, this); 
 		}
 
 		// Unregister for the events when we'll flush the buffer
-		delete m_pAgentOutputFlusher[eventID-gSKIEVENT_FIRST_PRINT_EVENT] ;
-		m_pAgentOutputFlusher[eventID-gSKIEVENT_FIRST_PRINT_EVENT] = NULL ;
+		delete m_pAgentOutputFlusher[eventID-smlEVENT_FIRST_PRINT_EVENT] ;
+		m_pAgentOutputFlusher[eventID-smlEVENT_FIRST_PRINT_EVENT] = NULL ;
 	}
 
 	return last ;
@@ -82,18 +82,18 @@ bool PrintListener::RemoveListener(egSKIPrintEventId eventID, Connection* pConne
 // Called when an event occurs in the kernel
 void PrintListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData)
 {
-	OnEvent((egSKIPrintEventId)eventID, pAgentSML, (const char*)pCallData) ;
+	OnEvent(static_cast<smlPrintEventId>(eventID), pAgentSML, (const char*)pCallData) ;
 }
 
 // Called when a "PrintEvent" occurs in the kernel
-void PrintListener::HandleEvent(egSKIPrintEventId eventID, gSKI::Agent* agentPtr, const char* msg) 
+void PrintListener::HandleEvent(smlPrintEventId eventID, gSKI::Agent* agentPtr, const char* msg) 
 {
 	assert(GetAgentSML()->GetIAgent() == agentPtr) ;
 
 	OnEvent(eventID, GetAgentSML(), msg) ;
 }
 
-void PrintListener::OnEvent(egSKIPrintEventId eventID, AgentSML* pAgentSML, const char* msg)
+void PrintListener::OnEvent(smlPrintEventId eventID, AgentSML* pAgentSML, const char* msg)
 {
 	// We're assuming this is correct in the flush output function, so we should check it here
 	assert(pAgentSML == GetAgentSML());
@@ -101,19 +101,19 @@ void PrintListener::OnEvent(egSKIPrintEventId eventID, AgentSML* pAgentSML, cons
 	// If the print callbacks have been disabled, then don't forward this message
 	// on to the clients.  This allows us to use the print callback within the kernel to
 	// retrieve information without it appearing in the trace.  (One day we won't need to do this enable/disable game).
-	if (!m_EnablePrintCallback && eventID == gSKIEVENT_PRINT)
+	if (!m_EnablePrintCallback && eventID == smlEVENT_PRINT)
 		return ;
 
-	int nBuffer = eventID - gSKIEVENT_FIRST_PRINT_EVENT ;
+	int nBuffer = eventID - smlEVENT_FIRST_PRINT_EVENT ;
 	assert(nBuffer >= 0 && nBuffer < kNumberPrintEvents) ;
 
 	// Buffer print output to be flushed later
 	m_BufferedPrintOutput[nBuffer] += msg;
 }
 
-void PrintListener::FlushOutput(Connection* pSourceConnection, egSKIPrintEventId eventID) 
+void PrintListener::FlushOutput(Connection* pSourceConnection, smlPrintEventId eventID) 
 {
-	int buffer = eventID - gSKIEVENT_FIRST_PRINT_EVENT ;
+	int buffer = eventID - smlEVENT_FIRST_PRINT_EVENT ;
 
 	// Nothing waiting to be sent, so we're done.
 	if (!m_BufferedPrintOutput[buffer].size())
@@ -121,7 +121,7 @@ void PrintListener::FlushOutput(Connection* pSourceConnection, egSKIPrintEventId
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIPrintEventId>::GetBegin(eventID, &connectionIter))
+	if (!EventManager<smlPrintEventId>::GetBegin(eventID, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
