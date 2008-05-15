@@ -12,8 +12,8 @@ class MultiAgentTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( MultiAgentTest );	
 
-	CPPUNIT_TEST( testTwoAgents );
-	CPPUNIT_TEST( testTenAgents );
+	//CPPUNIT_TEST( testTwoAgents );
+	//CPPUNIT_TEST( testTenAgents );
 
 	CPPUNIT_TEST_SUITE_END();
 

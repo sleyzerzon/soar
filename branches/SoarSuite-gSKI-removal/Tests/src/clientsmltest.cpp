@@ -28,16 +28,16 @@ class ClientSMLTest : public CPPUNIT_NS::TestCase
 	CPPUNIT_TEST( testNewThread );
 	CPPUNIT_TEST( testNewThreadNoAutoCommit );
 	CPPUNIT_TEST( testRemote );
-	CPPUNIT_TEST( testRemoteNoAutoCommit );
-	CPPUNIT_TEST( testSimpleCopy );
-	CPPUNIT_TEST( testSimpleReteNetLoader );
-	CPPUNIT_TEST( testSimpleStopUpdate );
-	CPPUNIT_TEST( testSimpleSNCBreak );
-	CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
-	CPPUNIT_TEST( testWMEMemoryLeak );					// see bugzilla bug 1035
-	CPPUNIT_TEST( testWMEMemoryLeakNotOptimized );		// see bugzilla bug 1035
-	CPPUNIT_TEST( testWMEMemoryLeakNoAutoCommit );		// see bugzilla bug 1035
-	CPPUNIT_TEST( testWMEMemoryLeakRemote );			// see bugzilla bug 1035
+	//CPPUNIT_TEST( testRemoteNoAutoCommit );
+	//CPPUNIT_TEST( testSimpleCopy );
+	//CPPUNIT_TEST( testSimpleReteNetLoader );
+	//CPPUNIT_TEST( testSimpleStopUpdate );
+	//CPPUNIT_TEST( testSimpleSNCBreak );
+	//CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
+	//CPPUNIT_TEST( testWMEMemoryLeak );					// see bugzilla bug 1035
+	//CPPUNIT_TEST( testWMEMemoryLeakNotOptimized );		// see bugzilla bug 1035
+	//CPPUNIT_TEST( testWMEMemoryLeakNoAutoCommit );		// see bugzilla bug 1035
+	//CPPUNIT_TEST( testWMEMemoryLeakRemote );			// see bugzilla bug 1035
 
 	CPPUNIT_TEST_SUITE_END();
 
