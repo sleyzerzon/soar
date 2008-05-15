@@ -46,7 +46,8 @@ bool XMLListener::AddListener(egSKIXMLEventId eventID, Connection* pConnection)
 	if (first && eventID == gSKIEVENT_XML_TRACE_OUTPUT)
 	{
 		// Listen for XML trace events within gSKI
-		m_pAgent->AddXMLListener(eventID, this); 
+		//m_pAgent->AddXMLListener(eventID, this); 
+		RegisterWithKernel(eventID) ;
 
 		// Register for specific events at which point we'll flush the buffer for this event
 		m_pAgentOutputFlusher[eventID-gSKIEVENT_XML_TRACE_OUTPUT] = new AgentOutputFlusher(this, GetAgentSML(), eventID);
@@ -63,7 +64,8 @@ bool XMLListener::RemoveListener(egSKIXMLEventId eventID, Connection* pConnectio
 	if (last && eventID == gSKIEVENT_XML_TRACE_OUTPUT)
 	{
 		// Unregister for the XML trace events in gSKI
-		m_pAgent->RemoveXMLListener(eventID, this); 
+		//m_pAgent->RemoveXMLListener(eventID, this); 
+		UnregisterWithKernel(eventID) ;
 
 		// Unregister for the events when we'll flush the buffer
 		delete m_pAgentOutputFlusher[eventID-gSKIEVENT_XML_TRACE_OUTPUT] ;
