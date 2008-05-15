@@ -59,10 +59,6 @@ namespace gSKI
 
       static void Init();
    private:
-      /**
-       * @brief: 
-       */
-      //{
       static unsigned short TestTypeEnumMapping[NUM_TEST_TYPES+1];
       static unsigned short SymbolTypeEnumMapping[NUM_SYMBOL_TYPES];
       static unsigned short PrefTypeEnumMapping[NUM_PREFERENCE_TYPES];
@@ -72,7 +68,6 @@ namespace gSKI
       static unsigned short PrintEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
 	  static unsigned short XMLEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
       static unsigned short ProductionTypeEnumMapping[NUM_PRODUCTION_TYPES];
-      //}
 
       static bool m_initialized;
    };

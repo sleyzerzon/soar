@@ -513,7 +513,7 @@ smlRunResult AgentSML::StepInClientThread(smlRunStepSize  stepSize, gSKI::Error*
   return Step(stepSize);
 }
 
-void AgentSML::FireRunEvent(egSKIRunEventId eventId) {
+void AgentSML::FireRunEvent(smlRunEventId eventId) {
 	// Trigger a callback from the kernel to propagate the event out to listeners.
 	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
 	int callbackEvent = KernelCallback::GetCallbackFromEventID(eventId) ;
@@ -549,7 +549,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
    if (! interrupted) {
 	   assert(!m_agent->system_halted) ; // , "System should not be halted here!");
 	   // Notify that agent is about to execute. (NOT the start of a run, just a step)
-	   FireRunEvent(gSKIEVENT_BEFORE_RUNNING) ;
+	   FireRunEvent(smlEVENT_BEFORE_RUNNING) ;
 	   //RunNotifier nfBeforeRunning(this,EnumRemappings::ReMapPhaseType(m_agent->current_phase,0));
 	   //m_runListeners.Notify(gSKIEVENT_BEFORE_RUNNING, nfBeforeRunning);
 
@@ -583,7 +583,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
    if (interrupted) 
    {
        // Notify of the interrupt
-	   FireRunEvent(gSKIEVENT_AFTER_INTERRUPT) ;
+	   FireRunEvent(smlEVENT_AFTER_INTERRUPT) ;
 
 	   /* This is probably redundant with the event above, which clients can listen for... */
 	   FireSimpleXML("Interrupt received.") ;
@@ -604,7 +604,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 		   retVal     = sml_RUN_INTERRUPTED;
 		   // Notify of the interrupt
 
-		   FireRunEvent(gSKIEVENT_AFTER_INTERRUPT) ;
+		   FireRunEvent(smlEVENT_AFTER_INTERRUPT) ;
 
 		   /* This is probably redundant with the event above, which clients can listen for... */
 		   FireSimpleXML("Interrupt received.") ;
@@ -614,7 +614,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 	   m_runState    = sml_RUNSTATE_HALTED;
 	   retVal        = sml_RUN_COMPLETED;
 
-	   FireRunEvent(gSKIEVENT_AFTER_HALTED) ;
+	   FireRunEvent(smlEVENT_AFTER_HALTED) ;
 
 	   // fix for BUG 514  01-12-06
 	   FireSimpleXML("This Agent halted.") ;
@@ -645,7 +645,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 
    // Notify that agent stopped. (NOT the end of a run, just a step)
    // Use AFTER_RUN_ENDS if you want to trap the end of the complete run.
-   FireRunEvent(gSKIEVENT_AFTER_RUNNING) ;
+   FireRunEvent(smlEVENT_AFTER_RUNNING) ;
 
    return retVal;
 }

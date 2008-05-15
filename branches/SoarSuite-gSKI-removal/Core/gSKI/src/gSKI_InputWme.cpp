@@ -31,13 +31,6 @@
 #include "..\..\ConnectionSML\include\sml_Utils.h"	// For sml::PrintDebugFormat
 #endif
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-
-
-//DEF_EXPOSE(gSKI_InputWme);
-
 namespace gSKI
 {
    InputWme::InputWme( InputWorkingMemory* manager, 

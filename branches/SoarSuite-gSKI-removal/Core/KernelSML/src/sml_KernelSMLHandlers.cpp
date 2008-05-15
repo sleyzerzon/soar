@@ -208,7 +208,7 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 	// So let's add some checks here to make sure that the two tables are synchronized.
 	// (If we wish we could introduce a mapping here between the two sets of ids but for now we're not doing that).
 	assert(gSKIEVENT_INVALID_EVENT == (egSKIGenericEventId)smlEVENT_INVALID_EVENT) ;	// First matches
-	assert(gSKIEVENT_AFTER_RUNNING == (egSKIRunEventId)smlEVENT_AFTER_RUNNING) ;	// Random one in middle matches
+	assert(gSKIEVENT_AFTER_RUNNING == (smlRunEventId)smlEVENT_AFTER_RUNNING) ;	// Random one in middle matches
 	assert(gSKIEVENT_BEFORE_AGENT_REINITIALIZED == (egSKIAgentEventId)smlEVENT_BEFORE_AGENT_REINITIALIZED) ;	// Another middle one matches
 	assert(gSKIEVENT_PRINT == (egSKIPrintEventId)smlEVENT_PRINT); // What the heck, another one
 	assert(gSKIEVENT_RHS_USER_FUNCTION == (egSKIRhsEventId)smlEVENT_RHS_USER_FUNCTION) ;
@@ -265,9 +265,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 		AgentSML* pAgentSML = GetAgentSML(pAgent) ;
 
 		if (registerForEvent)
-			pAgentSML->AddRunListener((egSKIRunEventId)id, pConnection) ;
+			pAgentSML->AddRunListener((smlRunEventId)id, pConnection) ;
 		else
-			pAgentSML->RemoveRunListener((egSKIRunEventId)id, pConnection) ;
+			pAgentSML->RemoveRunListener((smlRunEventId)id, pConnection) ;
 	} else if(IsProductionEventID(id)) {
 
 		// Production event

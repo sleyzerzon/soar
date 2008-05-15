@@ -33,16 +33,6 @@ namespace gSKI
    unsigned short EnumRemappings::ProductionTypeEnumMapping[NUM_PRODUCTION_TYPES];
    bool EnumRemappings::m_initialized = false;
 
-   /*
-   ==================================
- _____                       ____                                  _
-| ____|_ __  _   _ _ __ ___ |  _ \ ___ _ __ ___   __ _ _ __  _ __ (_)_ __   __ _ ___
-|  _| | '_ \| | | | '_ ` _ \| |_) / _ \ '_ ` _ \ / _` | '_ \| '_ \| | '_ \ / _` / __|
-| |___| | | | |_| | | | | | |  _ <  __/ | | | | | (_| | |_) | |_) | | | | | (_| \__ \
-|_____|_| |_|\__,_|_| |_| |_|_| \_\___|_| |_| |_|\__,_| .__/| .__/|_|_| |_|\__, |___/
-                                                      |_|   |_|            |___/
-   ==================================
-   */
    void EnumRemappings::Init(void)
    {
       TestTypeEnumMapping[NOT_EQUAL_TEST] =          gSKI_NOT_EQUAL;
@@ -126,16 +116,6 @@ namespace gSKI
       m_initialized = true;
    }
 
-   /*
-   ==================================
- ____      __  __           _____        _  _____
-|  _ \ ___|  \/  | __ _ _ _|_   _|__ ___| ||_   _|   _ _ __   ___
-| |_) / _ \ |\/| |/ _` | '_ \| |/ _ Y __| __|| || | | | '_ \ / _ \
-|  _ <  __/ |  | | (_| | |_) | |  __|__ \ |_ | || |_| | |_) |  __/
-|_| \_\___|_|  |_|\__,_| .__/|_|\___|___/\__||_| \__, | .__/ \___|
-                       |_|                       |___/|_|
-   ==================================
-   */
    egSKITestType EnumRemappings::ReMapTestType(unsigned short type)
    {
       if(!m_initialized) 
@@ -144,16 +124,6 @@ namespace gSKI
       return static_cast<egSKITestType>(TestTypeEnumMapping[type]);
    }
 
-   /*
-   ==================================
- ____      __  __            ____                  _           _ _____
-|  _ \ ___|  \/  | __ _ _ __/ ___| _   _ _ __ ___ | |__   ___ | |_   _|   _ _ __   ___
-| |_) / _ \ |\/| |/ _` | '_ \___ \| | | | '_ ` _ \| '_ \ / _ \| | | || | | | '_ \ / _ \
-|  _ <  __/ |  | | (_| | |_) |__) | |_| | | | | | | |_) | (_) | | | || |_| | |_) |  __/
-|_| \_\___|_|  |_|\__,_| .__/____/ \__, |_| |_| |_|_.__/ \___/|_| |_| \__, | .__/ \___|
-                       |_|         |___/                              |___/|_|
-   ==================================
-   */
    egSKISymbolType EnumRemappings::ReMapSymbolType(unsigned short type)
    {
       if(!m_initialized) 
@@ -162,10 +132,6 @@ namespace gSKI
       return static_cast<egSKISymbolType>(SymbolTypeEnumMapping[type]);
    }
 
-   /*
-   ==================================
-   ==================================
-   */
    egSKIPreferenceType EnumRemappings::ReMapPreferenceType(unsigned short type)
    {
       if(!m_initialized) 
@@ -174,10 +140,6 @@ namespace gSKI
       return static_cast<egSKIPreferenceType>(PrefTypeEnumMapping[type]);
    }
    
-   /*
-   ==================================
-   ==================================
-   */
    egSKIPhaseType EnumRemappings::ReMapPhaseType(unsigned short phase, bool application)
    {
       if(!m_initialized) 
@@ -186,10 +148,6 @@ namespace gSKI
 	  return static_cast<egSKIPhaseType>(PhaseTypeEnumMapping[phase]);
    }
 
-   /*
-   ==================================
-   ==================================
-   */
    egSKIAgentEvents EnumRemappings::RemapProductionEventType(egSKIProductionEventId eventId)
    /** this goes from gSKI to Kernel Events **/
    {
@@ -200,30 +158,8 @@ namespace gSKI
 	  assert(false) ;
 	  return (egSKIAgentEvents)0 ;
 
-	  /*
-      switch (eventId)
-      {
-      case gSKIEVENT_AFTER_PRODUCTION_ADDED:
-         return gSKI_K_EVENT_PRODUCTION_ADDED;
-      case gSKIEVENT_BEFORE_PRODUCTION_REMOVED:
-         return gSKI_K_EVENT_PRODUCTION_REMOVED;
-      case gSKIEVENT_AFTER_PRODUCTION_FIRED:
-         return gSKI_K_EVENT_PRODUCTION_FIRED;
-      case gSKIEVENT_BEFORE_PRODUCTION_RETRACTED:
-         return gSKI_K_EVENT_PRODUCTION_RETRACTED;
-      default:
-         // Error condition
-         MegaAssert(false, "Could not map a production event id");
-         return static_cast<egSKIAgentEvents>(0);
-      }
-	  */
    }
 
-
-   /*
-   ==================================
-   ==================================
-   */
 
   egSKIProductionEventId EnumRemappings::Map_Kernel_to_gSKI_ProdEventId(unsigned long eventId, unsigned char occured)
   { 
@@ -242,38 +178,6 @@ namespace gSKI
 	return static_cast<egSKIProductionEventId>(0);
       }
   }
-  /**  could be changed to lines below for more explicit coding 
-      switch (eventId)
-      {
-      case gSKI_K_EVENT_PRODUCTION_ADDED:     return gSKIEVENT_AFTER_PRODUCTION_ADDED;
-      case gSKI_K_EVENT_PRODUCTION_REMOVED:   return gSKIEVENT_BEFORE_PRODUCTION_REMOVED;
-      case gSKI_K_EVENT_PRODUCTION_FIRED:     return gSKIEVENT_AFTER_PRODUCTION_FIRED;
-      case gSKI_K_EVENT_PRODUCTION_RETRACTED: return gSKIEVENT_BEFORE_PRODUCTION_RETRACTED;
-      }
-  **/
-
-   /*
-   ==================================
-   ==================================
-   */
-#if 0
-   egSKIAgentEvents EnumRemappings::RemapRunEventType(egSKIRunEventId eventId)
-   /** this goes from gSKI to gSKI-added Kernel Events **/
-   {
-      if(!m_initialized) 
-         Init();
-      switch (eventId)
-      {
-//      case gSKIEVENT_BEFORE_ELABORATION_CYCLE:         return gSKI_K_EVENT_ELABORATION_CYCLE;
-//      case gSKIEVENT_AFTER_ELABORATION_CYCLE:          return gSKI_K_EVENT_ELABORATION_CYCLE;
- 
-       default:
-         // Error condition
-         MegaAssert(false, "Could not map a run event id");
-         return static_cast<egSKIAgentEvents>(0);
-      }
-   }
-#endif
 
    SOAR_CALLBACK_TYPE EnumRemappings::KernelRunEventType(egSKIRunEventId eventId)
    /** this goes from gSKI to Kernel native callbacks **/
@@ -306,10 +210,6 @@ namespace gSKI
          return static_cast<SOAR_CALLBACK_TYPE>(0);
       }
    }
-   /*
-   ==================================
-   ==================================
-   */
 
   egSKIRunEventId EnumRemappings::Map_Kernel_to_gSKI_RunEventId(unsigned long eventId, unsigned char occured)
   { 
@@ -328,11 +228,8 @@ namespace gSKI
 	return static_cast<egSKIRunEventId>(0);
       }
   }
-   /*
-   ==================================
-   ==================================
-   */
-   egSKIAgentEvents EnumRemappings::RemapPrintEventType(egSKIPrintEventId eventId)
+
+  egSKIAgentEvents EnumRemappings::RemapPrintEventType(egSKIPrintEventId eventId)
    /** this goes from gSKI to Kernel Events **/
    {
       if(!m_initialized) 
@@ -400,46 +297,6 @@ namespace gSKI
       }
   }
 
-   /*
-   ==================================
-   ==================================
-   */
-   /** KJC:  egSKIEventId no longer exists.  If needed, must be EventType-specific.
-
-   egSKIEventId EnumRemappings::RemapEventType(unsigned long eventId, unsigned char occured)
-   // this goes from Kernel to gSKI events.  
-   {
-      if(!m_initialized) 
-         Init();
-      switch (eventId)
-      {
-	  MUST CONVERT THE eventID to a gSKI ENUM for these tests to work
-	  case IsSystemEventId(eventId):
-		  return static_cast<egSKISystemEventId>(EventEnumMapping[eventId][occured]);
-	  case IsRunEventId(eventId):
-		  return static_cast<egSKIRunEventId>(EventEnumMapping[eventId][occured]);
-	  case IsAgentEventId(eventId):
-		  return static_cast<egSKIAgentEventId>(EventEnumMapping[eventId][occured]);
-	  case IsWorkingMemoryEventId(eventId):
-		  return static_cast<egSKIWorkingMemoryEventId>(EventEnumMapping[eventId][occured]);
-	  case IsPrintEventId(eventId):
-		  return static_cast<egSKIPrintEventId>(EventEnumMapping[eventId][occured]);
-	  case IsRhsEventId(eventId):
-		  return static_cast<egSKIRhsEventId>(EventEnumMapping[eventId][occured]);
-	  case IsGenericEventId(eventId):
-		  return static_cast<egSKIGenericEventId>(EventEnumMapping[eventId][occured]);
-      default:
-         // Error condition
-         MegaAssert(false, "Could not map a production event id");
-         return static_cast<egSKIProductionEventId>(0);   
-	  }
-   }
-   */
-
-   /*
-   ==================================
-   ==================================
-   */
    egSKIProdType EnumRemappings::ReMapProductionType(unsigned short type)
    {
       if(!m_initialized) 

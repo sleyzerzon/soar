@@ -299,7 +299,7 @@ void RunScheduler::FireBeforeRunStartsEvents()
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
-			pAgentSML->FireRunEvent(gSKIEVENT_BEFORE_RUN_STARTS) ;
+			pAgentSML->FireRunEvent(smlEVENT_BEFORE_RUN_STARTS) ;
 		}
 	}
 }
@@ -544,7 +544,7 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 				pAgentSML->SetResultOfRun(runResult) ;
 
 				// Notify listeners that this agent is finished running
-				pAgent->FireRunEvent(gSKIEVENT_AFTER_RUN_ENDS) ;
+				pAgent->FireRunEvent(smlEVENT_AFTER_RUN_ENDS) ;
 			}
 		}
 	}
@@ -557,7 +557,7 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 *			 
 *********************************************************************/
 /*
-void RunScheduler::HandleEvent(egSKIRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase)
+void RunScheduler::HandleEvent(smlRunEventId eventID, gSKI::Agent* pAgent, egSKIPhaseType phase)
 {
 	unused(phase) ;
 	AgentSML* pAgentSML = m_pKernelSML->GetAgentSML(pAgent) ;
@@ -876,7 +876,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 					// If we know we won't have to step to StopBefore phase
 					// notify listeners that this agent is finished running
 					if ((runStepSize != sml_DECISION) && !forever)
-						pAgentSML->FireRunEvent(gSKIEVENT_AFTER_RUN_ENDS) ;
+						pAgentSML->FireRunEvent(smlEVENT_AFTER_RUN_ENDS) ;
 				}
 				else
 				{

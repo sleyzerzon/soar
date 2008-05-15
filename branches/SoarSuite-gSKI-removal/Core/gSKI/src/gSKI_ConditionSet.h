@@ -152,8 +152,6 @@ namespace gSKI {
      typedef std::vector<Condition*>    tConditionVec;
      typedef tConditionVec::iterator     tConditionVecIt;
 
-     //typedef std::vector<ConditionSet*> tConditionSetVec;
-     //typedef tConditionSetVec::iterator  tConditionSetVecIt;
      typedef FwdContainerType< std::vector<ConditionSet *> >          tConditionSet;
      typedef Iterator<tConditionSet::V, tConditionSet::t>  tConditionSetIter;
 

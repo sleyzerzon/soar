@@ -46,7 +46,7 @@ void RunListener::Init(sml::KernelSML *pKernelSML, AgentSML* pAgentSML)
 }
 
 // Returns true if this is the first connection listening for this event
-bool RunListener::AddListener(egSKIRunEventId eventID, Connection* pConnection)
+bool RunListener::AddListener(smlRunEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
@@ -59,7 +59,7 @@ bool RunListener::AddListener(egSKIRunEventId eventID, Connection* pConnection)
 }
 
 // Returns true if at least one connection remains listening for this event
-bool RunListener::RemoveListener(egSKIRunEventId eventID, Connection* pConnection)
+bool RunListener::RemoveListener(smlRunEventId eventID, Connection* pConnection)
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
@@ -76,7 +76,7 @@ void RunListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallDat
 {
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIRunEventId>::GetBegin((egSKIRunEventId)eventID, &connectionIter))
+	if (!EventManager<smlRunEventId>::GetBegin((smlRunEventId)eventID, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
@@ -100,7 +100,7 @@ void RunListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallDat
 
 	// Send the message out
 	AnalyzeXML response ;
-	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd((egSKIRunEventId)eventID)) ;
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd((smlRunEventId)eventID)) ;
 
 	// Clean up
 	delete pMsg ;

@@ -59,7 +59,7 @@ void AgentOutputFlusher::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* p
 }
 
 /*
-void AgentOutputFlusher::HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase)
+void AgentOutputFlusher::HandleEvent(smlRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase)
 {
 	assert(eventId == gSKIEVENT_AFTER_DECISION_CYCLE || eventId == gSKIEVENT_AFTER_RUNNING);
 	assert(agentPtr == m_pAgent);

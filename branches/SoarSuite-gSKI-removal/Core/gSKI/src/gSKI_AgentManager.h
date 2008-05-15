@@ -462,11 +462,8 @@ namespace gSKI
        *
        * @param Agent about to be intialized
        */
-      //{
       void FireBeforeAgentReinitialized(Agent* a);
       void FireAfterAgentReinitialized(Agent* a);
- 	  //void FireBeforeAgentsRunStepEvent() ;
-     //}
  
       public: 
 
@@ -494,9 +491,7 @@ namespace gSKI
          /** 
          * @brief Listener manager definitions 
          */
-         //{
          typedef ListenerManager<egSKIAgentEventId, IAgentListener, AgentNotifier>   tAgentListenerManager;
-         //}
 
          /**************************** -------------- ************************/
 

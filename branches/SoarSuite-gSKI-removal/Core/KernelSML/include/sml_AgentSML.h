@@ -210,8 +210,8 @@ public:
 
 	void AddProductionListener(smlProductionEventId eventID, Connection* pConnection)	{ m_ProductionListener.AddListener(eventID, pConnection) ; }
 	void RemoveProductionListener(smlProductionEventId eventID, Connection* pConnection) { m_ProductionListener.RemoveListener(eventID, pConnection) ; }	
-	void AddRunListener(egSKIRunEventId eventID, Connection* pConnection)	{ m_RunListener.AddListener(eventID, pConnection) ; }
-	void RemoveRunListener(egSKIRunEventId eventID, Connection* pConnection) { m_RunListener.RemoveListener(eventID, pConnection) ; }	
+	void AddRunListener(smlRunEventId eventID, Connection* pConnection)	{ m_RunListener.AddListener(eventID, pConnection) ; }
+	void RemoveRunListener(smlRunEventId eventID, Connection* pConnection) { m_RunListener.RemoveListener(eventID, pConnection) ; }	
 	void AddPrintListener(smlPrintEventId eventID, Connection* pConnection)	{ m_PrintListener.AddListener(eventID, pConnection) ; }
 	void RemovePrintListener(smlPrintEventId eventID, Connection* pConnection) { m_PrintListener.RemoveListener(eventID, pConnection) ; }	
 	void AddXMLListener(smlXMLEventId eventID, Connection* pConnection) { m_XMLListener.AddListener(eventID, pConnection) ; }
@@ -265,7 +265,7 @@ public:
 	/*************************************************************
 	* @brief	Send a run event
 	*************************************************************/
-	void FireRunEvent(egSKIRunEventId eventId) ;
+	void FireRunEvent(smlRunEventId eventId) ;
 
 	/*************************************************************
 	* @brief	Converts an id from a client side value to a kernel side value.

@@ -38,7 +38,7 @@ public:
 
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
-//	virtual void HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase);
+//	virtual void HandleEvent(smlRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase);
 };
 
 }

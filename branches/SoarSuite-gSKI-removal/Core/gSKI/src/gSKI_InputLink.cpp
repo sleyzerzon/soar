@@ -24,18 +24,8 @@
 
 #include <iostream>
 
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_InputLink);
-
-
 namespace gSKI
 {
-   /*
-     ===============================
-
-     ===============================
-   */
-
 	//KJC:  This should really register thru add_input_function 
 	//      to be more explicit.
   InputLink::InputLink(Agent* agent):
@@ -56,12 +46,6 @@ namespace gSKI
      
   }
 
-   /*
-     ===============================
-
-    ===============================
-   */
-
    InputLink::~InputLink() 
    {
      // Removing the callback
@@ -73,12 +57,6 @@ namespace gSKI
      // Releasing the root object on destruction
 //      if (m_rootObject != 0) m_rootObject->Release();
    }
-
-   /*
-    ===============================
-    
-    ===============================
-   */
 
    void InputLink::GetRootObject(IWMObject** rootObject, Error* err)
    {
@@ -94,24 +72,12 @@ namespace gSKI
       *rootObject = obj;
    }
 
-   /*
-    ===============================
-
-    ===============================
-   */
-
    IWorkingMemory* InputLink::GetInputLinkMemory(Error* err)
    {
       ClearError(err);
 
       return &m_memory;
    }
-
-   /*
-    ===============================
-    
-    ===============================
-   */
 
    void InputLink::AddInputProducer(IWMObject* object,
                                     IInputProducer* producer,
@@ -141,12 +107,6 @@ namespace gSKI
 
    }
 
-   /*
-    ===============================
-    
-    ===============================
-   */
-  
    void InputLink::RemoveInputProducer(IWMObject* object,
                                        IInputProducer* producer,
                                        Error* err)
@@ -175,12 +135,6 @@ namespace gSKI
 
    }
 
-   /*
-    ===============================
-    
-    ===============================
-   */
-
   void InputLink::InputPhaseCallback( soar_callback_agent agent,
 									  soar_callback_event_id eventid,
                                       soar_callback_data callbackdata,
@@ -205,24 +159,12 @@ namespace gSKI
     }
   }
 
-  /*
-    ===============================
-    
-    ===============================
-  */
-  
   void InputLink::InitialUpdate()
   {
     // Perform necessary update functions
     //std::cout << "\nInitial input link update!\n";
   }
 
-  /*
-    ===============================
-    
-    ===============================
-  */
-  
   void InputLink::Update()
   {
      //std::cout << __FILE__ << ":" << __LINE__ << std::endl;
@@ -231,12 +173,6 @@ namespace gSKI
     m_memory.Update(false, false);
   }
 
-  /*
-    ===============================
-    
-    ===============================
-  */
-  
   void InputLink::FinalUpdate()
   {
 	  Reinitialize();

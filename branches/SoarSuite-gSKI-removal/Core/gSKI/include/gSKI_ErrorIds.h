@@ -17,30 +17,6 @@
 
 namespace gSKI {
 
-//   enum { gSKI_EXTENDED_ERROR_MESSAGE_LENGTH = 256 };
-
-   /**
-    * Used to descript error identifiers.
-    */
-//   typedef unsigned long tgSKIErrId;
-
-   /**
-    * @brief Error structure
-    *
-    * This stucture holds the relevant informaation about an error condition.
-    * This class would typically be returned from a function call.
-    */
-//   struct Error {
-//   public:
-//      tgSKIErrId     Id;               /**< Unique error identifier */
-//      const char*    Text;             /**< Test message describing the error. */
-//      char           ExtendedMsg[gSKI_EXTENDED_ERROR_MESSAGE_LENGTH]; 
-//                                       /**< Extra text messages relating to the error */
-//   };
-
-   /**
-    * @brief the Error handling class
-    */
    class ErrorClass : private gSKI::Error
    {
    public:

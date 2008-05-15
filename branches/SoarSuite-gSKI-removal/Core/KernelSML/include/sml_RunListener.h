@@ -30,7 +30,6 @@
 #include "IgSKI_Iterator.h"
 #include "gSKI_Agent.h"
 #include "sml_EventManager.h"
-
 #include <string>
 #include <map>
 
@@ -38,8 +37,9 @@ namespace sml {
 
 class KernelSML ;
 class Connection ;
+enum smlRunEventId; 
 
-class RunListener : public EventManager<egSKIRunEventId>
+class RunListener : public EventManager<smlRunEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
@@ -63,10 +63,10 @@ public:
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKIRunEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(smlRunEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKIRunEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(smlRunEventId eventID, Connection* pConnection) ;
 } ;
 
 }
