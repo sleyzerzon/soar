@@ -120,7 +120,7 @@ namespace gSKI
    /*
     egSKIRunResult AgentManager::RunInClientThread(egSKIRunType        runLength, 
                                                    unsigned long       count,
-                                                   egSKIInterleaveType runInterleave,
+                                                   egSKIRunType runInterleave,
                                                    Error*              err)
    {
 

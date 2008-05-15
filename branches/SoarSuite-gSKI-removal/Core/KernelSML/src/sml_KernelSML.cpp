@@ -967,7 +967,7 @@ EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool inp
 // which goes through the command line processor.
 EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, int interleaveSizeIn, int count)
 {
-	smlInterleaveStepSize interleaveSize = static_cast<smlInterleaveStepSize>(interleaveSizeIn);
+	smlRunStepSize interleaveSize = static_cast<smlRunStepSize>(interleaveSizeIn);
 	KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
 
 	RunScheduler* pScheduler = pKernelSML->GetRunScheduler() ;
@@ -1005,7 +1005,7 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
 
 	// Do the run
-	smlRunResult runResult = pScheduler->RunScheduledAgents(forever, runType, count, runFlags, (smlInterleaveStepSize)interleaveSize, synchronizeAtStart) ;
+	smlRunResult runResult = pScheduler->RunScheduledAgents(forever, runType, count, runFlags, (smlRunStepSize)interleaveSize, synchronizeAtStart) ;
 
 	unused(runResult) ;
 

@@ -262,15 +262,6 @@ enum smlRunStepSize
 	sml_UNTIL_OUTPUT
 };
 
-enum smlInterleaveStepSize
-{
-	// Note: phase moved before elaboration because that's how gSKI was doing things
-	sml_INTERLEAVE_PHASE,			// keep in synch with egSKIInterleaveType
-	sml_INTERLEAVE_ELABORATION,
-	sml_INTERLEAVE_DECISION,
-	sml_INTERLEAVE_UNTIL_OUTPUT
-};
-
 enum smlRunFlags
 {
 	sml_NONE				=  0,		// No special flags set

@@ -149,56 +149,6 @@ namespace gSKI
 		*/
 		bool ReinitializeWithOldSettings(Error* err = 0);
 
-		/** 
-		* @brief Runs this agent in a client owned thread.
-		*
-		* Call this method to execute an agent in a client-owned thread.  Typical
-		*  reasons for doing this include running agents in a single threaded
-		*  application, and managing threading and agent scheduling in the client.
-		*  
-		* This method will only work if the agent is currently stopped (not
-		*  interrupted or running).
-		*
-		* This method will not return until the the given run length has elapsed
-		*  (unless there is an error or Stop is called). After this method
-		*  returns, you may call this method again to continue a run at the
-		*  point the agents left off.
-		*
-		* Possible Errors:
-		*   @li gSKIERR_AGENT_RUNNING if the agents are currently being
-		*         run individually or as a group.
-		*
-		* @see egSKIRunType
-		*
-		* @param runLength How long to run the system.  Choices are       
-		*          gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
-		*          gSKI_RUN_DECISION_CYCLE, gSKI_RUN_UNTIL_OUTPUT, and
-		*          gSKI_RUN_FOREVER.  See egSKIRunType for details.
-		* @param  count  this parameter tells the method
-		*          how many elaboration phases, decision phase or decision cycles
-		*          to run before returning. 
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*
-		* @return An egSKIRunResult value indicating how the state of the system
-		*            after continuation executed. @see egSKIRunResult  This method
-		*            will never return gSKI_RUN_INTERRUPTED or 
-		*            gSKI_RUN_COMPLETED_AND_INTERRUPTED because it returns before
-		*            any interrupt can occur.
-		*/
-		/*
-		egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
-			unsigned long       count         = 1,
-			Error*              err           = 0);
-		*/
-		/*
-		egSKIRunResult StepInClientThread(egSKIInterleaveType   stepSize   = gSKI_INTERLEAVE_DECISION_CYCLE, 
-			unsigned long  stepCount         = 1,
-			Error*         err               = 0);
-	    */
-
 		/**
 		* @brief Interrupts agent execution
 		*
@@ -633,7 +583,7 @@ namespace gSKI
 		*        This is a hack from KernelSML which listens to RunEvents.
 		*        Currently gSKI itself does not listen on RunEvents.
 		*********************************************************************/
-		//void IncrementgSKIStepCounter(egSKIInterleaveType interleaveStepSize) ;
+		//void IncrementgSKIStepCounter(egSKIRunType interleaveStepSize) ;
 
 
 		/**
@@ -1355,7 +1305,7 @@ namespace gSKI
 		*/
 		//{
 		/*
-		egSKIRunResult step(egSKIInterleaveType stepSize, unsigned long count);  
+		egSKIRunResult step(egSKIRunType stepSize, unsigned long count);  
 		//egSKIRunResult  run(egSKIRunType runType, unsigned long maxSteps);
 		void preStepNotifications();
 		bool postStepNotifications();
@@ -1378,15 +1328,6 @@ namespace gSKI
 		{
 			return (steps && (*steps >= maxSteps))? true: false;
 		}
-
-		/** 
-		* @brief Retrieves teh relavent step counter for the given runType
-		*
-		* This is used by run(...) to get the counter that it needs to calcualte
-		*  how long it should run.
-		*/
-		unsigned long* getReleventCounter(egSKIRunType runType);
-		unsigned long* getReleventCounter(egSKIInterleaveType stepType);
 
 		/** 
 		* @brief Initializes the run counters and interrupt flags

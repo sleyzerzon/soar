@@ -362,8 +362,8 @@ public:
 	// Request that the agent stop soon.
 	bool Interrupt(smlStopLocationFlags stopLoc) ;
 	void ClearInterrupts() ;
-	smlRunResult StepInClientThread(smlInterleaveStepSize  stepSize, gSKI::Error* pError) ;
-	smlRunResult Step(smlInterleaveStepSize stepSize) ;
+	smlRunResult StepInClientThread(smlRunStepSize  stepSize, gSKI::Error* pError) ;
+	smlRunResult Step(smlRunStepSize stepSize) ;
 
 	unsigned long GetInterruptFlags()		{ return m_interruptFlags ; }
 	egSKIRunState GetRunState()				{ return m_runState ; }

@@ -25,10 +25,6 @@
 namespace gSKI
 {
 
-   /*
-   ===============================
-   ===============================
-   */
    ActionElement::ActionElement(agent* a, rhs_value rhsval)
    {
       // This ensures we don't try to cleanup the pointer before allocating anything.
@@ -36,21 +32,12 @@ namespace gSKI
       SetValues(a, rhsval);
    }
 
-
-   /*
-   ===============================
-   ===============================
-   */
    ActionElement::ActionElement()
    {
       // No default type to set
       m_val.sym = 0;
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    ActionElement& ActionElement::operator=(const ActionElement& rhs)
    {
       if(this != &rhs)
@@ -100,19 +87,11 @@ namespace gSKI
       }
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    ActionElement::~ActionElement() 
    {
       cleanup();
    }
 
-   /*
-   ===============================
-   ===============================
-   */
    void ActionElement::cleanup()
    {
       // Choose the right type so we get the right destructor
@@ -132,23 +111,12 @@ namespace gSKI
       m_val.sym = 0;
     }
 
-
-   /*
-   ===============================
-
-   ===============================
-   */
    egSKIActionElementType      ActionElement::GetType(Error* err) const
    {
       ClearError(err);
       return m_type;
    }
 
-   /*
-   ===============================
-
-   ===============================
-   */
    const RhsFunctionAction*   ActionElement::GetFunction(Error* err) const
    {
       MegaAssert(m_type == gSKI_ACTION_FUNCTION, "Cannot return a symbol as a function.");
@@ -166,11 +134,6 @@ namespace gSKI
       }
    }
 
-   /*
-   ===============================
-
-   ===============================
-   */
    const ISymbol*              ActionElement::GetSymbol(Error* err) const
    {
       MegaAssert(m_type == gSKI_ACTION_SYMBOL, "Cannot return a symbol as a function.");

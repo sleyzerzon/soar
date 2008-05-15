@@ -61,29 +61,29 @@ void RunScheduler::ScheduleAllAgentsToRun(bool state)
 *			for the interleaveStepSize for running agents.
 *
 *********************************************************************/
-smlInterleaveStepSize RunScheduler::DefaultInterleaveStepSize(bool forever, smlRunStepSize runStepSize)
+smlRunStepSize RunScheduler::DefaultInterleaveStepSize(bool forever, smlRunStepSize runStepSize)
 {
 	if (forever)
 	{
-		return sml_INTERLEAVE_PHASE;
+		return sml_PHASE;
 	}
 
 	switch(runStepSize)
 	{
 	case sml_PHASE:
-		return sml_INTERLEAVE_PHASE;
+		return sml_PHASE;
 	case sml_ELABORATION:
-		return sml_INTERLEAVE_ELABORATION;
+		return sml_ELABORATION;
 	case sml_DECISION:
-		//return sml_INTERLEAVE_PHASE;		 // tested ok in SoarJavaDebugger 01/18/06
-		return sml_INTERLEAVE_DECISION;
+		//return sml_PHASE;		 // tested ok in SoarJavaDebugger 01/18/06
+		return sml_DECISION;
 	case sml_UNTIL_OUTPUT:
-		//return sml_INTERLEAVE_PHASE;      // tested ok in SoarJavaDebugger 01/18/06
-		//return sml_INTERLEAVE_DECISION;  // tested ok in SoarJavaDebugger 01/18/06
-		return sml_INTERLEAVE_UNTIL_OUTPUT;
+		//return sml_PHASE;      // tested ok in SoarJavaDebugger 01/18/06
+		//return sml_DECISION;  // tested ok in SoarJavaDebugger 01/18/06
+		return sml_UNTIL_OUTPUT;
 	default:
 		assert(false);
-		return sml_INTERLEAVE_PHASE;
+		return sml_PHASE;
 	}
 }
 
@@ -91,88 +91,38 @@ smlInterleaveStepSize RunScheduler::DefaultInterleaveStepSize(bool forever, smlR
 * @brief	Don't try to Run with an nonsense interleaveStepSize
 *
 *********************************************************************/
-bool RunScheduler::VerifyStepSizeForRunType(bool forever, smlRunStepSize runStepSize, smlInterleaveStepSize interleave)
+bool RunScheduler::VerifyStepSizeForRunType(bool forever, smlRunStepSize runStepSize, smlRunStepSize interleave)
 {
 
 	if (forever)
 	{
-		// can interleave by any smlInterleaveStepSize
-		return (gSKI_INTERLEAVE_PHASE == interleave || 
-			   gSKI_INTERLEAVE_ELABORATION_PHASE == interleave || 
-			   gSKI_INTERLEAVE_DECISION_CYCLE == interleave ||
-			   gSKI_INTERLEAVE_OUTPUT == interleave) ;
+		// can interleave by any smlRunStepSize
+		return (sml_PHASE == interleave || 
+			   sml_ELABORATION == interleave || 
+			   sml_DECISION == interleave ||
+			   sml_UNTIL_OUTPUT == interleave) ;
 	}
 
 	switch(runStepSize)
 	{
 	case sml_PHASE:
-		return ( gSKI_INTERLEAVE_PHASE == interleave ) ;
+		return ( sml_PHASE == interleave ) ;
 	case sml_ELABORATION:
-		return ( gSKI_INTERLEAVE_ELABORATION_PHASE == interleave ) ;
+		return ( sml_ELABORATION == interleave ) ;
 	case sml_DECISION:
-		return (gSKI_INTERLEAVE_PHASE == interleave || 
-			   gSKI_INTERLEAVE_ELABORATION_PHASE == interleave || 
-			   gSKI_INTERLEAVE_DECISION_CYCLE == interleave) ;
+		return (sml_PHASE == interleave || 
+			   sml_ELABORATION == interleave || 
+			   sml_DECISION == interleave) ;
 	case sml_UNTIL_OUTPUT:
-		return (gSKI_INTERLEAVE_PHASE == interleave || 
-			   gSKI_INTERLEAVE_ELABORATION_PHASE == interleave || 
-			   gSKI_INTERLEAVE_DECISION_CYCLE == interleave ||
-			   gSKI_INTERLEAVE_OUTPUT == interleave) ;
+		return (sml_PHASE == interleave || 
+			   sml_ELABORATION == interleave || 
+			   sml_DECISION == interleave ||
+			   sml_UNTIL_OUTPUT == interleave) ;
 	default:
 		assert(0);
 		return false;
 	}
 }
-/********************************************************************
-* @brief	Agents maintain a number of counters (for how many phase,
-*			decisions etc.) they have ever executed.
-*			We use these counters to determine when a run should stop.
-*********************************************************************/
-/*
-unsigned long RunScheduler::GetStepCounter(gSKI::Agent* pAgent, AgentSML* pAgentSML, smlInterleaveStepSize stepSize)
-{
-I think we don't use this -- it's only called once -- what does that mean??
-
-	switch(stepSize)
-	{
-	case gSKI_INTERLEAVE_SMALLEST_STEP:
-		assert(0) ; // Not supported ;
-		return 0 ;
-		//return pAgent->GetNumSmallestStepsExecuted();
-	case gSKI_INTERLEAVE_PHASE:
-		{
-			unsigned long phases = pAgentSML->GetNumPhasesExecuted() ;
-			assert (phases == pAgent->GetNumPhasesExecuted()) ;
-			return phases ;
-		}
-	case gSKI_INTERLEAVE_ELABORATION_PHASE:
-		{
-			unsigned long elabs = pAgentSML->GetNumElaborationsExecuted() ;
-
-			// Changing the definition for soar 7 mode so can't compare
-			if (!pAgentSML->IsSoar7Mode())
-				assert (elabs == pAgent->GetNumElaborationsExecuted()) ;
-
-			return elabs ;
-		}
-	case gSKI_INTERLEAVE_DECISION_CYCLE:
-		{
-			unsigned long decs = pAgentSML->GetNumDecisionCyclesExecuted() ;
-			assert (decs == pAgent->GetNumDecisionCyclesExecuted()) ;
-			return decs ;
-		}
-	case gSKI_INTERLEAVE_OUTPUT:
-		{
-			unsigned long outputs = pAgentSML->GetNumOutputsGenerated() ;
-			assert (outputs == pAgent->GetNumOutputsExecuted()) ;
-			return outputs ;
-		}
-	default:
-		return 0;
-	}
-}
-*/
-
 /*************************************************************************
 * @brief	Returns true if phase1 is later in the execution cycle than phase2
 **************************************************************************/
@@ -545,12 +495,12 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 					(pAgent->GetInterruptFlags() & gSKI_STOP_AFTER_DECISION_CYCLE))
 				{
 					pAgent->SetRunState(gSKI_RUNSTATE_INTERRUPTED);
-					runResult = pAgent->StepInClientThread(sml_INTERLEAVE_PHASE, pError) ; // force interrupt
+					runResult = pAgent->StepInClientThread(sml_PHASE, pError) ; // force interrupt
 				}					
 
 				while ((phase != m_StopBeforePhase) && (sml_RUN_COMPLETED == runResult))
 				{
-					runResult = pAgent->StepInClientThread(sml_INTERLEAVE_PHASE, pError) ;
+					runResult = pAgent->StepInClientThread(sml_PHASE, pError) ;
 					phase = pAgentSML->GetCurrentPhase() ;
 					// don't cross Output-Input boundary here just to get to StopBefore phase for "Run 0"
 					if (sml_INPUT_PHASE == phase) break; 
@@ -585,7 +535,7 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
  
 				while ((phase != m_StopBeforePhase) && (sml_RUN_COMPLETED == runResult))
 				{
-					runResult = pAgent->StepInClientThread(sml_INTERLEAVE_PHASE, pError) ;
+					runResult = pAgent->StepInClientThread(sml_PHASE, pError) ;
 					phase = pAgentSML->GetCurrentPhase() ;
 					// We should never get to this point again, so we need to generate ERROR 
 					assert(sml_INPUT_PHASE != phase);
@@ -772,7 +722,7 @@ bool RunScheduler::IsRunning()
 smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runStepSize, 
 												   unsigned long count, 
 												   smlRunFlags runFlags, 
-												   smlInterleaveStepSize interleaveStepSize, 
+												   smlRunStepSize interleaveStepSize, 
 												   bool synchronize)
 {
 	// FIXME: use a different mechanism to report detailed run error:
@@ -835,7 +785,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	// will naturally synch agents interleaving by Decision or Output.
 	// When interleaving by Elaboration cycles, synching can't be done.
 	m_pSynchAgentSML = NULL ;
-	if (synchronize && (sml_INTERLEAVE_ELABORATION != interleaveStepSize))
+	if (synchronize && (sml_ELABORATION != interleaveStepSize))
 	{
 		AgentSML* pSynchAgentSML = this->GetAgentToSynchronizeWith() ;
 		bool inSynch = AreAgentsSynchronized(pSynchAgentSML) ;

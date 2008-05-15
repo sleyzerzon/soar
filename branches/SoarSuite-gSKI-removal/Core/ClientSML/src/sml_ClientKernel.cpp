@@ -1243,7 +1243,7 @@ bool Kernel::IsCommitRequired()
 * @returns The result of executing the run command.
 *		   The output from during the run is sent to a different callback.
 *************************************************************/
-char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepSize, smlInterleaveStepSize interleaveStepSize)
+char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepSize, smlRunStepSize interleaveStepSize)
 {
 	if (IsCommitRequired())
 	{
@@ -1279,10 +1279,10 @@ char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepS
 
 	switch (interleaveStepSize)
 	{
-		case sml_INTERLEAVE_ELABORATION:	interleave = "-i e" ; break ;
-		case sml_INTERLEAVE_PHASE:			interleave = "-i p" ; break ;
-		case sml_INTERLEAVE_DECISION:		interleave = "-i d" ; break ;
-		case sml_INTERLEAVE_UNTIL_OUTPUT:	interleave = "-i o" ; break ;
+		case sml_ELABORATION:	interleave = "-i e" ; break ;
+		case sml_PHASE:			interleave = "-i p" ; break ;
+		case sml_DECISION:		interleave = "-i d" ; break ;
+		case sml_UNTIL_OUTPUT:	interleave = "-i o" ; break ;
 		default: return "Unrecognized interleave size parameter passed to RunAllAgents" ;
 	}
 
@@ -1300,7 +1300,7 @@ char const* Kernel::RunAllAgents(unsigned long numberSteps, smlRunStepSize stepS
 	return pResult ;
 }
 
-char const* Kernel::RunAllAgentsForever(smlInterleaveStepSize interleaveStepSize)
+char const* Kernel::RunAllAgentsForever(smlRunStepSize interleaveStepSize)
 {
 	if (IsCommitRequired())
 	{
@@ -1320,10 +1320,10 @@ char const* Kernel::RunAllAgentsForever(smlInterleaveStepSize interleaveStepSize
 
 	switch (interleaveStepSize)
 	{
-		case sml_INTERLEAVE_ELABORATION:	interleave = "-i e" ; break ;
-		case sml_INTERLEAVE_PHASE:			interleave = "-i p" ; break ;
-		case sml_INTERLEAVE_DECISION:		interleave = "-i d" ; break ;
-		case sml_INTERLEAVE_UNTIL_OUTPUT:	interleave = "-i o" ; break ;
+		case sml_ELABORATION:	interleave = "-i e" ; break ;
+		case sml_PHASE:			interleave = "-i p" ; break ;
+		case sml_DECISION:		interleave = "-i d" ; break ;
+		case sml_UNTIL_OUTPUT:	interleave = "-i o" ; break ;
 		default: return "Unrecognized interleave size parameter passed to RunAllAgents" ;
 	}
 
@@ -1358,7 +1358,7 @@ char const* Kernel::RunAllAgentsForever(smlInterleaveStepSize interleaveStepSize
 * before then that agent will stop running.  (This value can be changed with the
 * max-nil-output-cycles command).
 *************************************************************/
-char const* Kernel::RunAllTilOutput(smlInterleaveStepSize interleaveStepSize)
+char const* Kernel::RunAllTilOutput(smlRunStepSize interleaveStepSize)
 {
 	if (IsCommitRequired())
 	{
@@ -1378,10 +1378,10 @@ char const* Kernel::RunAllTilOutput(smlInterleaveStepSize interleaveStepSize)
 
 	switch (interleaveStepSize)
 	{
-		case sml_INTERLEAVE_ELABORATION:	interleave = "-i e" ; break ;
-		case sml_INTERLEAVE_PHASE:			interleave = "-i p" ; break ;
-		case sml_INTERLEAVE_DECISION:		interleave = "-i d" ; break ;
-		case sml_INTERLEAVE_UNTIL_OUTPUT:	interleave = "-i o" ; break ;
+		case sml_ELABORATION:	interleave = "-i e" ; break ;
+		case sml_PHASE:			interleave = "-i p" ; break ;
+		case sml_DECISION:		interleave = "-i d" ; break ;
+		case sml_UNTIL_OUTPUT:	interleave = "-i o" ; break ;
 		default: return "Unrecognized interleave size parameter passed to RunAllAgents" ;
 	}
 

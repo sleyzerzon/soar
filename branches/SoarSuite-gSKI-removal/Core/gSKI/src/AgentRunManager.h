@@ -84,19 +84,6 @@ namespace gSKI
       void RemoveAgentFromRunList(Agent* a);
 
       /** 
-       * @brief runs the agents in the run list.
-       *
-       * The parameters are the same as those for RunInClientThread.
-       * AgentManager::RunInClientThread calls this method to execute
-       *  agent running.
-       */
-	  /*
-      virtual egSKIRunResult Run(egSKIRunType        runLength, 
-                                unsigned long       count,
-                                egSKIInterleaveType runInterleave,
-                                Error*              err);
-	*/
-      /** 
        * @brief The callback method for run events
 	   *
 	   *  KJC:  2/21  Actually the only event is for an egSKIAgentEvent, 
@@ -115,47 +102,12 @@ namespace gSKI
       bool isValidAgent(Agent* a);
 
       /** 
-       * @brief Puts new agents in the run list and removes old ones
-       *
-       * If any agent is added to the run list, its counts are initialized.
-       */
-	  /*
-      void synchronizeRunList(egSKIRunType  runLength, 
-                              unsigned long steps,
-                              bool          forceReinit);
-	  */
-      
-      /** 
-       * @brief Adds an agent to our run list
-       *
-       * The runLength and steps are used to initialize newly added agents.
-       */ 
-      //void addToRunList(Agent* a, egSKIRunType runLength, unsigned long steps);
-
-      /** 
        * @brief Removes an agent from our run list
        */
       void removeFromRunList(Agent* a);
 
-      /** 
-       * @brief Gets the run counter relevant to the given runType
-       *
-       * Used by RunInClientThread.
-       */
-      //unsigned long getReleventStepCount(Agent* a, egSKIRunType runType);
-
-      /** 
-       * @brief called by synchronizeRunList when it needs to reinitialize
-       *          all of the agents in the run list
-       */
-      //void initializeForRun(egSKIRunType  runLength, unsigned long steps);
-
 	  /** Look up the kernel for this run manager **/
 	  Kernel* getKernel() ;
-
-	  /** Notify listeners that agents in the run list are starting or finishing their runs **/
-	 // void FireBeforeRunStartsEvents() ;
-	 //  void FireAfterRunEndsEvents() ;
 
    private:
 

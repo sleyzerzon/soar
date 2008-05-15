@@ -493,52 +493,13 @@ enum egSKIPhaseType
    *                             on its output link.
    * @li RUN_FOREVER:           Run and don't stop until Stop is called.
    */
-   // NOTE: Order must now match egSKIInterleaveType's order
 enum egSKIRunType 
-{
+{	// keep in synch with smlRunStepSize
 	gSKI_RUN_PHASE,
 	gSKI_RUN_ELABORATION_CYCLE,	// in Soar 7 mode, this is not the same as smallest_step 
 	gSKI_RUN_DECISION_CYCLE,
 	gSKI_RUN_UNTIL_OUTPUT,
 } ;
-
-   /** 
-   * @brief Agent run interleaving definitions
-   *
-   * Agent interleave definitions are used to tell the system how long
-   *   to run each agent before giving run time to the next agent.  Of
-   *   course this only applies to multiple agents running in a single
-   *   thread group.
-   *
-   * @li INTERLEAVE_SMALLEST_STEP: Run each agent the shortest time possible
-   *      before moving to the next agent.  The amount of time each agent
-   *      runs depends on the current decision phase.  For the Soar 8 mode
-   *      INPUT, OUTPUT and DECISION phases, the smallest step is the
-   *      decision phase.  For PROPOSAL and APPLY phases, the smallest
-   *      step is the elaboration phase (a single pass of parallel rule
-   *      firings).  
-   *      In Soar 7 mode, the smallest step is the same as a PHASE, but
-   *	  users should be allowed to interleave by ELABORATION if they want to.
-   *      A Soar 7 ELABORATION is once thru input-preference-wm-output, 
-   *	  until mini-quiescence.
-   * @li INTERLEAVE_PHASE: Run each agent one phase before
-   *      moving to the next agent.  A phase is one of
-   *      the following phase types: gSKI_INPUT_PHASE, gSKI_PROPOSAL_PHASE,
-   *      gSKI_DECISION_PHASE, gSKI_APPLY_PHASE, and gSKI_OUTPUT_PHASE.
-   * @li INTERLEAVE_DECISION_CYCLE: Run each agent a full decision cycle
-   *      before transfering processing to the next agent.
-   * @li INTERLEAVE_OUTPUT: Run each agent until it produces output on the
-   *      output link before transfering to the next agent.
-   */
-   // NOTE: Order must now match egSKIRunType's order
-enum egSKIInterleaveType 
-{
-	gSKI_INTERLEAVE_PHASE,				// Keep in synch with smlInterleaveStepSize
-	gSKI_INTERLEAVE_ELABORATION_PHASE,
-	gSKI_INTERLEAVE_DECISION_CYCLE,
-	gSKI_INTERLEAVE_OUTPUT
-} ;
-
 
    /** 
     * @brief Definitions for the agent running states

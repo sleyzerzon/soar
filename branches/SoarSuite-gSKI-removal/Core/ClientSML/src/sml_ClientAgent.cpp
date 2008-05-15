@@ -1314,7 +1314,7 @@ char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, stepSize, sml_INTERLEAVE_PHASE, (int)numberSteps) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, stepSize, sml_PHASE, (int)numberSteps) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1354,7 +1354,7 @@ char const* Agent::RunSelfForever()
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), true, sml_DECISION, sml_INTERLEAVE_PHASE, 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), true, sml_DECISION, sml_PHASE, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif
@@ -1449,7 +1449,7 @@ char const* Agent::RunSelfTilOutput()
 #ifdef SML_DIRECT
 		if (GetConnection()->IsDirectConnection())
 		{
-			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, sml_UNTIL_OUTPUT, sml_INTERLEAVE_PHASE, 1) ;
+			((EmbeddedConnection*)GetConnection())->DirectRun(this->GetAgentName(), false, sml_UNTIL_OUTPUT, sml_PHASE, 1) ;
 			return "DirectRun completed" ;
 		}
 #endif

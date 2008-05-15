@@ -278,52 +278,6 @@ namespace gSKI
        */
       void           RemoveAllAgentsFromRunList(Error* err = 0);
 
-      /** 
-       * @brief Runs all of the agents in the run list together in round-robin fashion.
-       *
-       * Call this method to execute all of the agents currently in the agent
-       *  manager together in the client thread. 
-       *
-       * Already running and halted agents are taken out of the agent manager's
-       *  run list automatically when this method tries to run them.
-       *  
-       * Possible Errors:
-       *   @li gSKIERR_NO_AGENTS_TO_RUN if the run list for this agent manager
-       *                 does not contain any agents.
-       *
-       * @see egSKIRunType
-       * @see AgentManager::AddAgentToRunList
-       * @see AgentManager::AddAllAgentsToRunList
-       * @see AgentManager::RemoveAgentFromRunList
-       *
-       * @param runLength How long to run the system.  Choices are       
-       *          gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE, gSKI_RUN_PHASE,
-       *          gSKI_RUN_DECISION_CYCLE, gSKI_RUN_UNTIL_OUTPUT, and
-       *          gSKI_RUN_FOREVER.  See egSKIRunType for details.
-       * @param  count For gSKI_RUN_SMALLEST_STEP, gSKI_RUN_ELABORATION_PHASE gSKI_RUN_PHASE,
-       *          and gSKI_RUN_DECISION_CYCLE this parameter tells the method
-       *          how many elaboration phases, decision phase or decision cycles
-       *          to run before returning. For other run types this parameter
-       *          is ignored.
-       * @param runInterleave How to interleave agent execution.  Choices are
-       *          gSKI_INTERLEAVE_ELAB_PHASE, gSKI_INTERLEAVE_DECISION_PHASE
-       *          gSKI_INTERLEAVE_DECISION_CYCLE, and gSKI_INTERLEAVE_OUTPUT.
-       *          See egSKIInterleaveType for more details.
-       * @param  err Pointer to client-owned error structure.  If the pointer
-       *               is not 0 this structure is filled with extended error
-       *               information.  If it is 0 (the default) extended error
-       *               information is not returned.
-       *
-       * @return An egSKIRunResult value indicating how the state of the system
-       *            after continuation executed. @see egSKIRunResult
-       */
-	  /*
-      egSKIRunResult RunInClientThread(egSKIRunType        runLength     = gSKI_RUN_FOREVER, 
-                                       unsigned long       count         = 1,
-                                       egSKIInterleaveType runInterleave = gSKI_INTERLEAVE_SMALLEST_STEP,
-                                       Error*              err           = 0);
-	   */
-
       /**
        * @brief Interrupts all agent execution
        *

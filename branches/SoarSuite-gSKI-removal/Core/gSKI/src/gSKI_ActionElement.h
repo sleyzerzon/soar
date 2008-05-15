@@ -53,7 +53,6 @@ namespace gSKI {
        * Copy operations also supplied (needed to do ref count
        *  on symbol correctly).
        */
-      //{
       ActionElement();
       ActionElement(agent* a, rhs_value rhsval);
       ActionElement(const ActionElement& old) 
@@ -61,7 +60,6 @@ namespace gSKI {
          m_val.sym = 0;    // need this to ensure no cleanup before creation
          *this = old; 
       }
-      //}
 
       /** 
        * @brief Copy operator (guarrantees proper symbol ref counting)

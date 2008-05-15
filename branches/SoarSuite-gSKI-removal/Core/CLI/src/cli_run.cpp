@@ -178,7 +178,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	}
 
 #ifdef USE_NEW_SCHEDULER
-	smlInterleaveStepSize interleave;
+	smlRunStepSize interleave;
 
 	switch(interleaveIn) {
 		case RUN_INTERLEAVE_DEFAULT:
@@ -186,16 +186,16 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 			interleave  = pScheduler->DefaultInterleaveStepSize(forever, runType) ;
 			break;
 		case RUN_INTERLEAVE_ELABORATION:
-			interleave = sml_INTERLEAVE_ELABORATION;
+			interleave = sml_ELABORATION;
 			break;
 		case RUN_INTERLEAVE_DECISION:
-			interleave = sml_INTERLEAVE_DECISION;
+			interleave = sml_DECISION;
 			break;
 		case RUN_INTERLEAVE_PHASE:
-			interleave = sml_INTERLEAVE_PHASE;
+			interleave = sml_PHASE;
 			break;
 		case RUN_INTERLEAVE_OUTPUT:
-			interleave = sml_INTERLEAVE_UNTIL_OUTPUT;
+			interleave = sml_UNTIL_OUTPUT;
 			break;
 	}
 

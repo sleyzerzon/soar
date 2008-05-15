@@ -60,7 +60,7 @@ public:
 	* @return   interleaveStepSize -- how large of a step each agent is run 
 	*           before other agents are run
     *********************************************************************/
-	smlInterleaveStepSize DefaultInterleaveStepSize(bool forever, smlRunStepSize runStepSize) ;
+	smlRunStepSize DefaultInterleaveStepSize(bool forever, smlRunStepSize runStepSize) ;
 
     /********************************************************************
     * @brief	Don't try to Run with an nonsense interleaveStepSize
@@ -69,7 +69,7 @@ public:
  	* @param interleaveStepSize -- how large of a step each agent is run 
 	*                              before other agents are run
     *********************************************************************/
-    bool VerifyStepSizeForRunType(bool forever, smlRunStepSize runStepSize, smlInterleaveStepSize interleave) ;
+    bool VerifyStepSizeForRunType(bool forever, smlRunStepSize runStepSize, smlRunStepSize interleave) ;
 
 	/*************************************************************
 	* @brief	Indicate that the next time RunScheduledAgents() is called
@@ -96,7 +96,7 @@ public:
 	* @return Not clear on how to set this when have multiple agents.
 	*		  Can query each for "GetLastRunResult()".
 	*************************************************************/	
-	smlRunResult RunScheduledAgents(bool forever, smlRunStepSize runStepSize, unsigned long count, smlRunFlags runFlags, smlInterleaveStepSize interleaveStepSize, bool synchronize) ;
+	smlRunResult RunScheduledAgents(bool forever, smlRunStepSize runStepSize, unsigned long count, smlRunFlags runFlags, smlRunStepSize interleaveStepSize, bool synchronize) ;
 
 	/*************************************************************
 	* @brief	Returns true if at least one agent is currently running.

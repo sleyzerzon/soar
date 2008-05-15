@@ -491,7 +491,7 @@ void AgentSML::ClearInterrupts()
   }
 }
 
-smlRunResult AgentSML::StepInClientThread(smlInterleaveStepSize  stepSize, gSKI::Error* pError)
+smlRunResult AgentSML::StepInClientThread(smlRunStepSize  stepSize, gSKI::Error* pError)
 {
   // Agent is already running, we cannot run
   if(m_runState != gSKI_RUNSTATE_STOPPED)
@@ -533,7 +533,7 @@ static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)
 	return (steps >= maxSteps);
 }
 
-smlRunResult AgentSML::Step(smlInterleaveStepSize stepSize)
+smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 {    
    // NOTE: This only works because they have the same ordering
    // BADBAD: Eventually we should dispose of one of these types and fold them into a single enum
@@ -555,11 +555,10 @@ smlRunResult AgentSML::Step(smlInterleaveStepSize stepSize)
 
 	   switch (stepSize) 
 	   {
-	   case  gSKI_INTERLEAVE_ELABORATION_PHASE: run_for_n_elaboration_cycles(m_agent, count); break;
-	   case  gSKI_INTERLEAVE_PHASE:             run_for_n_phases(m_agent, count);             break;
-	   case  gSKI_INTERLEAVE_DECISION_CYCLE:    run_for_n_decision_cycles(m_agent, count);    break;
-	   case  gSKI_INTERLEAVE_OUTPUT:            run_for_n_modifications_of_output(m_agent, count); 
-												break;
+	   case  sml_ELABORATION:	run_for_n_elaboration_cycles(m_agent, count); break;
+	   case  sml_PHASE:         run_for_n_phases(m_agent, count);             break;
+	   case  sml_DECISION:		run_for_n_decision_cycles(m_agent, count);    break;
+	   case  sml_UNTIL_OUTPUT:  run_for_n_modifications_of_output(m_agent, count); break;
 	   }
    }
 
