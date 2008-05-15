@@ -232,9 +232,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 	{
 		// System Events
 		if (registerForEvent)
-			this->AddSystemListener((egSKISystemEventId)id, pConnection) ;
+			this->AddSystemListener((smlSystemEventId)id, pConnection) ;
 		else
-			this->RemoveSystemListener((egSKISystemEventId)id, pConnection) ;
+			this->RemoveSystemListener((smlSystemEventId)id, pConnection) ;
 
 	} else if(IsAgentEventID(id)) {
 
@@ -441,7 +441,7 @@ class KernelSML::OnSystemStopDeleteAll: public gSKI::ISystemListener
 public:
 	// This handler is called right before the agent is actually deleted
 	// inside gSKI.  We need to clean up any object we own now.
-	virtual void HandleEvent(egSKISystemEventId, gSKI::Kernel* pKernel)
+	virtual void HandleEvent(smlSystemEventId, gSKI::Kernel* pKernel)
 	{
 		unused(pKernel) ;
 
@@ -459,7 +459,7 @@ bool KernelSML::HandleShutdown(gSKI::Agent* pAgent, char const* pCommandName, Co
 	unused(pAgent) ; unused(pCommandName) ; unused(pConnection) ; unused(pIncoming) ; unused(pResponse) ; unused(pError) ;
 
 	// Notify everyone that the system is about to shutdown.
-	FireSystemEvent(gSKIEVENT_BEFORE_SHUTDOWN) ;
+	FireSystemEvent(smlEVENT_BEFORE_SHUTDOWN) ;
 
 	// Delete all agents explicitly now (so listeners can hear that the agents have been destroyed).
 	DeleteAllAgents(true) ;
@@ -700,7 +700,7 @@ bool KernelSML::HandleFireEvent(gSKI::Agent* pAgent, char const* pCommandName, C
 	// Make the call.  These are the only events which we allow
 	// explicit client control over to date.
 	if (id == smlEVENT_SYSTEM_START || id == smlEVENT_SYSTEM_STOP)
-		this->FireSystemEvent((egSKISystemEventId)id) ;
+		this->FireSystemEvent((smlSystemEventId)id) ;
 
 	return true ;
 }

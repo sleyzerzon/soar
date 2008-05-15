@@ -367,7 +367,7 @@ void KernelSML::AddConnection(Connection* pConnection)
 	m_pConnectionManager->AddConnection(pConnection) ;
 
 	// Notify listeners that we have a new connection.
-	this->FireSystemEvent(gSKIEVENT_AFTER_CONNECTION) ;
+	this->FireSystemEvent(smlEVENT_AFTER_CONNECTION) ;
 }
 
 /*************************************************************
@@ -635,7 +635,7 @@ Agent* KernelSML::GetAgent(char const* pAgentName)
 void KernelSML::SetStopBefore(smlPhase phase)
 {
 	m_pRunScheduler->SetStopBefore(phase) ;
-	this->FireSystemEvent(gSKIEVENT_SYSTEM_PROPERTY_CHANGED) ;
+	this->FireSystemEvent(smlEVENT_SYSTEM_PROPERTY_CHANGED) ;
 }
 
 smlPhase KernelSML::GetStopBefore()

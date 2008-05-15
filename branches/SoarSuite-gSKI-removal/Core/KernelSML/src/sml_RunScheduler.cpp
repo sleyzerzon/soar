@@ -749,7 +749,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	pKernel->SetStopPoint(forever, (egSKIRunType)runStepSize, (egSKIPhaseType)m_StopBeforePhase);
 
 	// Fire one event to indicate the entire system is starting
-	m_pKernelSML->FireSystemEvent(gSKIEVENT_SYSTEM_START) ;
+	m_pKernelSML->FireSystemEvent(smlEVENT_SYSTEM_START) ;
 
 	// IF we did a StopBeforeUpdate, this is where we need to test and generate update events...
 	TestForFiringUpdateWorldEvents();
@@ -823,7 +823,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 			// A client can use any event, but this one is designed to allow clients
 			// to throttle back the frequency of the event to control performance.
 			if ((stepCount % interruptCheckRate) == 0)
-				m_pKernelSML->FireSystemEvent(gSKIEVENT_INTERRUPT_CHECK) ;
+				m_pKernelSML->FireSystemEvent(smlEVENT_INTERRUPT_CHECK) ;
 
 			stepCount++ ;
 
@@ -831,7 +831,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 			// which allows a single listener to check for client driven interrupts for all agents.
 			// Sometimes that's easier to work with than the agent specific events (where you get <n> events from <n> agents)
 			//    note that there is not a corresponding AFTER_AGENTS_RUN_STEP event...
-			m_pKernelSML->FireSystemEvent(gSKIEVENT_BEFORE_AGENTS_RUN_STEP) ;
+			m_pKernelSML->FireSystemEvent(smlEVENT_BEFORE_AGENTS_RUN_STEP) ;
 
 			for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 			{
@@ -902,7 +902,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	MoveTo_StopBeforePhase(forever, runStepSize, pError);  // agents will have done FireRunEndsEvent() here or above.
 
 	// Fire one event to indicate the entire system should stop.
-	m_pKernelSML->FireSystemEvent(gSKIEVENT_SYSTEM_STOP) ;
+	m_pKernelSML->FireSystemEvent(smlEVENT_SYSTEM_STOP) ;
 
 	// clean up
 	m_IsRunning = false ;

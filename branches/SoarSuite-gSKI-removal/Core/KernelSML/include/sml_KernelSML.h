@@ -239,11 +239,11 @@ public:
 	* @brief	Add or remove a connection from the list listening
 	*			for a particular event in the kernel.
 	*************************************************************/
-	void AddSystemListener(egSKISystemEventId eventID, Connection* pConnection)	 { m_SystemListener.AddListener(eventID, pConnection) ; }
+	void AddSystemListener(smlSystemEventId eventID, Connection* pConnection)	 { m_SystemListener.AddListener(eventID, pConnection) ; }
 	void AddAgentListener(smlAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
 	void AddUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection)	 { m_UpdateListener.AddListener(eventID, pConnection) ; }
 	void AddStringListener(egSKIStringEventId eventID, Connection* pConnection)  { m_StringListener.AddListener(eventID, pConnection) ; }
-	void RemoveSystemListener(egSKISystemEventId eventID, Connection* pConnection) { m_SystemListener.RemoveListener(eventID, pConnection) ; }
+	void RemoveSystemListener(smlSystemEventId eventID, Connection* pConnection) { m_SystemListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveAgentListener(smlAgentEventId eventID, Connection* pConnection)   { m_AgentListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection) { m_UpdateListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveStringListener(egSKIStringEventId eventID, Connection* pConnection) { m_StringListener.RemoveListener(eventID, pConnection) ; }
@@ -259,7 +259,7 @@ public:
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
 	*************************************************************/
-	void FireSystemEvent(egSKISystemEventId eventID)						
+	void FireSystemEvent(smlSystemEventId eventID)						
 	{ 
 		m_SystemListener.OnKernelEvent(eventID, 0 , 0) ; 
 	}

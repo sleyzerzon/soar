@@ -34,9 +34,9 @@
 using namespace sml ;
 
 // Returns true if this is the first connection listening for this event
-bool SystemListener::AddListener(egSKISystemEventId eventID, Connection* pConnection)
+bool SystemListener::AddListener(smlSystemEventId eventID, Connection* pConnection)
 {
-    bool first = EventManager<egSKISystemEventId>::BaseAddListener(eventID, pConnection) ;
+    bool first = EventManager<smlSystemEventId>::BaseAddListener(eventID, pConnection) ;
 
 	/* DJP: System events can't be implemented below SML because the kernel itself is agent based (it has no concept of something larger than an agent)
 	if (first)
@@ -49,9 +49,9 @@ bool SystemListener::AddListener(egSKISystemEventId eventID, Connection* pConnec
 }
 
 // Returns true if at least one connection remains listening for this event
-bool SystemListener::RemoveListener(egSKISystemEventId eventID, Connection* pConnection)
+bool SystemListener::RemoveListener(smlSystemEventId eventID, Connection* pConnection)
 {
-	bool last = EventManager<egSKISystemEventId>::BaseRemoveListener(eventID, pConnection) ;
+	bool last = EventManager<smlSystemEventId>::BaseRemoveListener(eventID, pConnection) ;
 
 	/* DJP: System events can't be implemented below SML because the kernel itself is agent based (it has no concept of something larger than an agent)
 	if (last)
@@ -76,7 +76,7 @@ void SystemListener::OnKernelEvent(int eventIDIn, AgentSML* , void* )
 	// no underlying kernel callbacks to connect to.
 	// If we ever change that, this is where the callbacks would come in.
 
-	egSKISystemEventId eventID = static_cast<egSKISystemEventId>(eventIDIn);
+	smlSystemEventId eventID = static_cast<smlSystemEventId>(eventIDIn);
 
 	// The system start event can be suppressed by a client.
 	// This allows us to run a Soar agent without running the associated simulation
@@ -111,7 +111,7 @@ void SystemListener::OnKernelEvent(int eventIDIn, AgentSML* , void* )
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKISystemEventId>::GetBegin(eventID, &connectionIter))
+	if (!EventManager<smlSystemEventId>::GetBegin(eventID, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that

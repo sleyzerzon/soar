@@ -33,11 +33,6 @@
 #include "..\..\ConnectionSML\include\sml_Utils.h"	// For sml::PrintDebugFormat
 #endif
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_InputWMObject);
-
 namespace gSKI 
 {
 	InputWMObject::InputWMObject(InputWorkingMemory* manager, Symbol* sym)

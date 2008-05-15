@@ -56,7 +56,7 @@ void KernelHelpers::SetSysparam (AgentSML* agent, int param_number, long new_val
 	sml::KernelSML* pKernelSML = agent->GetKernelSML() ;
 
 	agent->GetAgent()->sysparams[param_number] = new_value;
-	pKernelSML->FireSystemEvent(gSKIEVENT_SYSTEM_PROPERTY_CHANGED) ;
+	pKernelSML->FireSystemEvent(smlEVENT_SYSTEM_PROPERTY_CHANGED) ;
 	//internalAgent->GetKernel()->FireSystemPropertyChangedEvent() ;
 }
 

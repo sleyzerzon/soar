@@ -35,8 +35,9 @@
 namespace sml {
 
 class Connection ;
+enum smlSystemEventId;
 
-class SystemListener : public EventManager<egSKISystemEventId>
+class SystemListener : public EventManager<smlSystemEventId>
 {
 protected:
 	// The kernel
@@ -57,10 +58,10 @@ public:
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKISystemEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(smlSystemEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKISystemEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(smlSystemEventId eventID, Connection* pConnection) ;
 
 } ;
 
