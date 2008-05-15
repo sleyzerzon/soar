@@ -14,7 +14,10 @@
 #include "sml_Utils.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
+
 #include "KernelHeaders.h"
+
+#include <iostream>
 
 using namespace sml ;
 

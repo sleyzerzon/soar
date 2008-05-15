@@ -51,7 +51,7 @@ namespace sml
      */
 	 void SetSysparam (AgentSML* agent, int param_number, long new_value);
      long GetSysparam(AgentSML* agent, int param_number);
-	 const long* GetSysparams(AgentSML* agent);
+	 const long* GetSysparams(AgentSML* agent); // USE ONLY AS READ-ONLY
 
      rete_node* NameToProduction(AgentSML* agent, char* string_to_test);
      void PrintPartialMatchInformation(AgentSML* thisAgent, 

@@ -22,7 +22,6 @@
 #endif
 
 #include <assert.h>
-#include <string>
 #include <map>
 
 // Forward definitions for kernel

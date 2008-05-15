@@ -31,8 +31,6 @@
 #include "sml_Events.h"
 #include "sml_AgentSML.h"
 
-#include "gSKI_Kernel.h"
-
 using namespace sml ;
 
 // Returns true if this is the first connection listening for this event
@@ -121,11 +119,11 @@ void SystemListener::OnKernelEvent(int eventIDIn, AgentSML* , void* )
 	Connection* pConnection = *connectionIter ;
 
 	// Convert eventID to a string
-	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
+	char const* eventString = m_pKernelSML->ConvertEventToString(eventID) ;
 
 	// Build the SML message we're doing to send.
 	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, eventString) ;
 
 	// Send the message out
 	AnalyzeXML response ;

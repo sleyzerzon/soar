@@ -21,11 +21,6 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 
-#include "gSKI_Agent.h"
-#include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_Iterator.h"
-
 using namespace sml ;
 
 // Start listening for a specific RHS user function.  When it fires we'll call to the client

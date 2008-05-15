@@ -23,19 +23,15 @@
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
 
-#include "agent.h"
+#include "KernelHeaders.h"
+
 #include "gdatastructs.h"
-#include "production.h"
 #include "rete.h"
-#include "wmem.h"
 #include "trace.h"
-#include "print.h"
 #include "parser.h"
 #include "rhsfun.h"
-#include "decide.h"
 #include "explain.h"
 #include "soar_rand.h"
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "gski_event_system_functions.h" // support for triggering XML events
 
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
@@ -46,6 +42,7 @@ using namespace xmlTraceNames;
 
 namespace sml 
 {
+
 typedef struct wme_filter_struct {
 	Symbol *id;
 	Symbol *attr;

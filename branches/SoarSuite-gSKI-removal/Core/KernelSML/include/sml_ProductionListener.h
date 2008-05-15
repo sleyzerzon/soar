@@ -20,7 +20,6 @@
 #define PRODUCTION_LISTENER_H
 
 #include "sml_EventManager.h"
-#include "sml_Events.h"
 
 #include <string>
 #include <map>

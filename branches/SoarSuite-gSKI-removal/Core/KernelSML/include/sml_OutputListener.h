@@ -12,11 +12,9 @@
 #ifndef OUTPUT_LISTENER_H
 #define OUTPUT_LISTENER_H
 
-#include "gSKI_Events.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_Iterator.h"
-#include "gSKI_Agent.h"
 #include "sml_EventManager.h"
+
+#include "gSKI_Events.h"
 
 #include <map>
 
@@ -38,7 +36,6 @@ class OutputListener : public gSKI::IAgentListener, public EventManager<smlWorki
 {
 protected:
 	KernelSML*		m_KernelSML ;
-	gSKI::Agent*	m_Agent ;
 
 	// A list of the time tags of output wmes that we've already seen and sent to the client
 	// This allows us to only send changes over.
@@ -48,7 +45,6 @@ public:
 	OutputListener()
 	{
 		m_KernelSML = 0 ;
-		m_Agent = 0 ;
 	}
 
 	virtual ~OutputListener()

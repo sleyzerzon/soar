@@ -12,7 +12,6 @@
 
 #include "cli_Aliases.h"
 
-#include <string>
 #include <assert.h>
 
 using namespace cli;

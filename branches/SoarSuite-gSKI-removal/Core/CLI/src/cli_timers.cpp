@@ -72,6 +72,7 @@ bool CommandLineInterface::DoTimers(bool* pSetting) {
 
 	} else {
 		// print current setting
+		// BUGBUG: Use Get/SetSysparam because it fires an event!
 		const long* pSysparams = pKernelHack->GetSysparams(m_pAgentSML);
 
 		if (m_RawOutput) {

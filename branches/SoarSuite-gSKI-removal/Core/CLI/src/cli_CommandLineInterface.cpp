@@ -13,6 +13,9 @@
 
 #include <assert.h>
 
+#include <iostream>
+#include <fstream>
+
 #include "cli_Commands.h"
 #include "cli_CLIError.h"
 

@@ -8,6 +8,9 @@
 
 #include <portability.h>
 
+#include <iostream>
+#include <fstream>
+
 #include "sml_Utils.h"
 #include "cli_CommandLineInterface.h"
 

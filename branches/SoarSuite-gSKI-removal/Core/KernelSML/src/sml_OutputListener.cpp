@@ -20,12 +20,9 @@
 #include "sml_KernelSML.h"
 #include "KernelHeaders.h"
 
-#include "IgSKI_Wme.h"
+#include "gSKI_Enumerations.h"
+#include "gSKI_Agent.h"
 #include "IgSKI_Symbol.h"
-#include "IgSKI_WMObject.h"
-#include "IgSKI_OutputLink.h"
-#include "gSKI_AgentManager.h"
-#include "IgSKI_WorkingMemory.h"
 #include "gSKI_OutputLink.h"
 
 #ifdef _DEBUG
@@ -57,7 +54,6 @@ TagWme* OutputListener::CreateTagWme(wme* wme)
 
 	// Look up the type of value this is
 	int type = wme->value->sc.common_symbol_info.symbol_type ;
-	//egSKISymbolType type = pWME->GetValue()->GetType() ;
 	char const* pValueType = GetValueType(type) ;
 
 	// For additions we send everything
@@ -80,7 +76,6 @@ TagWme* OutputListener::CreateTagIOWme(io_wme* wme)
 
 	// Look up the type of value this is
 	int type = wme->value->sc.common_symbol_info.symbol_type ;
-	//egSKISymbolType type = pWME->GetValue()->GetType() ;
 	char const* pValueType = GetValueType(type) ;
 
 	// For additions we send everything
@@ -100,7 +95,6 @@ TagWme* OutputListener::CreateTagIOWme(io_wme* wme)
 void OutputListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 {
 	m_KernelSML = pKernelSML ;
-	m_Agent		= pAgentSML->GetIAgent() ;
 	SetAgentSML(pAgentSML) ;
 }
 

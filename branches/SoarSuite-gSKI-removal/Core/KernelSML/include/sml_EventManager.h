@@ -12,7 +12,7 @@
 #ifndef EVENT_MANAGER_H
 #define EVENT_MANAGER_H
 
-#include "sml_Events.h"
+#include "sml_Events.h" // smlEVENT_LAST
 #include "sml_Connection.h"
 #include "sml_ElementXML.h"
 #include "sml_KernelCallback.h"

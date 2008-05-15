@@ -320,6 +320,7 @@ bool CommandLineInterface::DoWatch(const WatchBitset& options, const WatchBitset
 
 	if (options.none()) {
 		// Print watch settings.
+		// BUGBUG: Use Get/SetSysparam because it fires an event!
 		const long* pSysparams = pKernelHack->GetSysparams(m_pAgentSML);
 		int learning;
 		if (!pSysparams[TRACE_CHUNK_NAMES_SYSPARAM] 

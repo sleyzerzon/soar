@@ -15,7 +15,6 @@
 #include "sml_Utils.h"
 #include "sml_PrintListener.h"
 #include "sml_XMLListener.h"
-#include "sml_Events.h"
 
 using namespace sml ;
 
