@@ -208,8 +208,8 @@ public:
 	void SetSuppressRunEndsEvent(bool state) { m_SuppressRunEndsEvent = state ; }
 	bool GetSuppressRunEndsEvent()			 { return m_SuppressRunEndsEvent ; }
 
-	void AddProductionListener(egSKIProductionEventId eventID, Connection* pConnection)	{ m_ProductionListener.AddListener(eventID, pConnection) ; }
-	void RemoveProductionListener(egSKIProductionEventId eventID, Connection* pConnection) { m_ProductionListener.RemoveListener(eventID, pConnection) ; }	
+	void AddProductionListener(smlProductionEventId eventID, Connection* pConnection)	{ m_ProductionListener.AddListener(eventID, pConnection) ; }
+	void RemoveProductionListener(smlProductionEventId eventID, Connection* pConnection) { m_ProductionListener.RemoveListener(eventID, pConnection) ; }	
 	void AddRunListener(egSKIRunEventId eventID, Connection* pConnection)	{ m_RunListener.AddListener(eventID, pConnection) ; }
 	void RemoveRunListener(egSKIRunEventId eventID, Connection* pConnection) { m_RunListener.RemoveListener(eventID, pConnection) ; }	
 	void AddPrintListener(smlPrintEventId eventID, Connection* pConnection)	{ m_PrintListener.AddListener(eventID, pConnection) ; }

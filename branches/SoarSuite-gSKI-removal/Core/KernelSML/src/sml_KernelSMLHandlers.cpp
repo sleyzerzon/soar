@@ -278,9 +278,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 		AgentSML* pAgentSML = GetAgentSML(pAgent) ;
 
 		if (registerForEvent)
-			pAgentSML->AddProductionListener((egSKIProductionEventId)id, pConnection) ;
+			pAgentSML->AddProductionListener((smlProductionEventId)id, pConnection) ;
 		else
-			pAgentSML->RemoveProductionListener((egSKIProductionEventId)id, pConnection) ;
+			pAgentSML->RemoveProductionListener((smlProductionEventId)id, pConnection) ;
 	} else if(IsXMLEventID(id)) {
 
 		// XML Event

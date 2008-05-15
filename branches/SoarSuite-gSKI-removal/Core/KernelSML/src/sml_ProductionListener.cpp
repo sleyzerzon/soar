@@ -40,7 +40,7 @@ void ProductionListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 // #define DISABLE_PRINT_OUTPUT_BUFFERING
 
 // Returns true if this is the first connection listening for this event
-bool ProductionListener::AddListener(egSKIProductionEventId eventID, Connection* pConnection)
+bool ProductionListener::AddListener(smlProductionEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
@@ -54,7 +54,7 @@ bool ProductionListener::AddListener(egSKIProductionEventId eventID, Connection*
 }
 
 // Returns true if at least one connection remains listening for this event
-bool ProductionListener::RemoveListener(egSKIProductionEventId eventID, Connection* pConnection)
+bool ProductionListener::RemoveListener(smlProductionEventId eventID, Connection* pConnection)
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
@@ -95,7 +95,7 @@ void ProductionListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* p
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIProductionEventId>::GetBegin((egSKIProductionEventId)eventID, &connectionIter))
+	if (!EventManager<smlProductionEventId>::GetBegin((smlProductionEventId)eventID, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that
@@ -113,7 +113,7 @@ void ProductionListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* p
 
 	// Send the message out
 	AnalyzeXML response ;
-	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd((egSKIProductionEventId)eventID)) ;
+	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd((smlProductionEventId)eventID)) ;
 
 	// Clean up
 	delete pMsg ;
