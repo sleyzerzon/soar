@@ -292,7 +292,7 @@ std::string KernelSML::SendClientMessage(gSKI::Agent* pAgent, char const* pMessa
 	char response[10000] ;
 	response[0] = 0 ;
 
-	bool ok = m_RhsListener.HandleEvent(gSKIEVENT_CLIENT_MESSAGE, pAgent, false, pMessageType, pMessage, sizeof(response), response) ;
+	bool ok = m_RhsListener.HandleEvent(smlEVENT_CLIENT_MESSAGE, pAgent, false, pMessageType, pMessage, sizeof(response), response) ;
 	if (!ok)
 	{
 		// There was listening to this message
@@ -313,7 +313,7 @@ bool KernelSML::SendFilterMessage(gSKI::Agent* pAgent, char const* pCommandLine,
 	char response[10000] ;
 	response[0] = 0 ;
 
-	bool ok = m_RhsListener.HandleFilterEvent(gSKIEVENT_FILTER, pAgent, pCommandLine, sizeof(response), response) ;
+	bool ok = m_RhsListener.HandleFilterEvent(smlEVENT_FILTER, pAgent, pCommandLine, sizeof(response), response) ;
 
 	if (!ok)
 	{

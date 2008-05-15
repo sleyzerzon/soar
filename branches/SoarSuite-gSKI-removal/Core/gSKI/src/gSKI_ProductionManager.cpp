@@ -19,7 +19,6 @@
 #include "gSKI_ProductionManager.h"
 #include "gSKI_Error.h"
 #include "gSKI_Enumerations.h"
-//#include "gSKI_SetActiveAgent.h"
 #include "gSKI_Production.h"
 #include "IgSKI_Iterator.h"
 #include "gSKI_EnumRemapping.h"
@@ -47,34 +46,10 @@
 #include <iostream>
 #include <cstdio>
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_ProductionManager);
-
-
-
-
-
 using namespace std;
 
 namespace gSKI {
 
-   /*
-   ==================================
-                          ____       _      _
- _ __ ___  __ _  _____  _|  _ \  ___| | ___| |_ ___
-| '__/ _ \/ _` |/ _ \ \/ / | | |/ _ \ |/ _ \ __/ _ \
-| | |  __/ (_| |  __/>  <| |_| |  __/ |  __/ ||  __/
-|_|  \___|\__, |\___/_/\_\____/ \___|_|\___|\__\___|
-__        |___/
-\ \      / / __ __ _ _ __  _ __   ___ _ __
- \ \ /\ / / '__/ _` | '_ \| '_ \ / _ \ '__|
-  \ V  V /| | | (_| | |_) | |_) |  __/ |
-   \_/\_/ |_|  \__,_| .__/| .__/ \___|_|
-                    |_|   |_|
-   ==================================
-   */
    void regexDeleteWrapper(std::string& inputFile, 
                       const char* regularexpression)
    {
@@ -102,56 +77,16 @@ __        |___/
       regfree( &compiled_pattern );
    }
 
-
-   /*
-   ==================================
- ____                _            _   _
-|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-|  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-|_|  _|_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-|  \/  | __ _ _ __   __ _  __ _  ___ _ __
-| |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|
-| |  | | (_| | | | | (_| | (_| |  __/ |
-|_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|
-                          |___/
-   ==================================
-   */
    ProductionManager::ProductionManager(Agent *agent_)  : m_agent(agent_) 
    {
 
    }
 
-
-   /*
-   ===============================
- /\/|___                _            _   _
-|/\/  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-   | |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-   |  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
- __|_|_  |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-|  \/  | __ _ _ __   __ _  __ _  ___ _ __
-| |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|
-| |  | | (_| | | | | (_| | (_| |  __/ |
-|_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|
-                          |___/
-   ===============================
-   */
    ProductionManager::~ProductionManager() 
    {
    
    }
 
-
-   /*
-   ==================================
- _                 _ _____ _ _
-| | ___   __ _  __| |  ___(_) | ___
-| |/ _ \ / _` |/ _` | |_  | | |/ _ \
-| | (_) | (_| | (_| |  _| | | |  __/
-|_|\___/ \__,_|\__,_|_|   |_|_|\___|
-   ==================================
-   */
    string ProductionManager::loadFile(std::istream& is)
    {
       std::string soarFile;
@@ -168,22 +103,6 @@ __        |___/
       return soarFile;
    }
 
-
-   /*
-   ==================================
-            _    ____                          _
-  __ _  ___| |_ / ___|   _ _ __ _ __ ___ _ __ | |_
- / _` |/ _ \ __| |  | | | | '__| '__/ _ \ '_ \| __|
-| (_| |  __/ |_| |__| |_| | |  | | |  __/ | | | |_
- \__, |\___|\__|\____\__,_|_|  |_|  \___|_| |_|\__|
-_|___/    __         _    _             ____  _               _
-\ \      / /__  _ __| | _(_)_ __   __ _|  _ \(_)_ __ ___  ___| |_ ___  _ __ _   _
- \ \ /\ / / _ \| '__| |/ / | '_ \ / _` | | | | | '__/ _ \/ __| __/ _ \| '__| | | |
-  \ V  V / (_) | |  |   <| | | | | (_| | |_| | | | |  __/ (__| || (_) | |  | |_| |
-   \_/\_/ \___/|_|  |_|\_\_|_| |_|\__, |____/|_|_|  \___|\___|\__\___/|_|   \__, |
-                                  |___/                                     |___/
-   ==================================
-   */
    std::string ProductionManager::getCurrentWorkingDirectory()
    {
       int pathLength = 32;
@@ -202,16 +121,6 @@ _|___/    __         _    _             ____  _               _
       return tmp;
    }
 
-   /*
-   ==================================
-                           ____
- _ __   __ _ _ __ ___  ___/ ___|  ___  _   _ _ __ ___ ___ ___
-| '_ \ / _` | '__/ __|/ _ \___ \ / _ \| | | | '__/ __/ _ Y __|
-| |_) | (_| | |  \__ \  __/___) | (_) | |_| | | | (_|  __|__ \
-| .__/ \__,_|_|  |___/\___|____/ \___/ \__,_|_|  \___\___|___/
-|_|
-   ==================================
-   */
    bool ProductionManager::parseSources(tStringSet& sourcedFiles, std::string &file,
                                         std::string &path,
                                         Error *err)
@@ -252,32 +161,11 @@ _|___/    __         _    _             ____  _               _
       return true;
    }
 
-
-   /*
-   ===============================
- _                    _ ____                   _____ _ _
-| |    ___   __ _  __| / ___|  ___   __ _ _ __|  ___(_) | ___
-| |   / _ \ / _` |/ _` \___ \ / _ \ / _` | '__| |_  | | |/ _ \
-| |__| (_) | (_| | (_| |___) | (_) | (_| | |  |  _| | | |  __/
-|_____\___/ \__,_|\__,_|____/ \___/ \__,_|_|  |_|   |_|_|\___|
-   ===============================
-   */
    bool ProductionManager::LoadSoarFile(const char *fileName, Error *err)
    {
       tStringSet sourcedFiles;
       return loadSoarFile(sourcedFiles, fileName, err);
    }
-
-
-   /*
-   ===============================
- _                 _ ____                   _____ _ _
-| | ___   __ _  __| / ___|  ___   __ _ _ __|  ___(_) | ___
-| |/ _ \ / _` |/ _` \___ \ / _ \ / _` | '__| |_  | | |/ _ \
-| | (_) | (_| | (_| |___) | (_) | (_| | |  |  _| | | |  __/
-|_|\___/ \__,_|\__,_|____/ \___/ \__,_|_|  |_|   |_|_|\___|
-   ===============================
-   */
 
    bool ProductionManager::loadSoarFile(tStringSet& sourcedFiles, const char *fileName, Error *err)
    {
@@ -364,15 +252,6 @@ _|___/    __         _    _             ____  _               _
       }
    }
 
-   /*
-   ===============================
-    _       _     _ ____                _            _   _
-   / \   __| | __| |  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-  / _ \ / _` |/ _` | |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
- / ___ \ (_| | (_| |  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-/_/   \_\__,_|\__,_|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-   ===============================
-   */
    bool ProductionManager::AddProduction(const IProduction *newProd, Error *pErr)
    {
       ClearError(pErr);
@@ -380,15 +259,6 @@ _|___/    __         _    _             ____  _               _
       return true;
    }
 
-   /*
-   ===============================
- ____                               ____                _            _   _
-|  _ \ ___ _ __ ___   _____   _____|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |_) / _ \ '_ ` _ \ / _ \ \ / / _ \ |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-|  _ <  __/ | | | | | (_) \ V /  __/  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-|_| \_\___|_| |_| |_|\___/ \_/ \___|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-   ===============================
-   */
    bool ProductionManager::RemoveProduction(IProduction* prod, Error* err) const
    {
       ClearError(err);
@@ -412,19 +282,6 @@ _|___/    __         _    _             ____  _               _
 	  return true;
    }
 
-   /*
-   ===============================
- ____                               ____                _            _   _
-|  _ \ ___ _ __ ___   _____   _____|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |_) / _ \ '_ ` _ \ / _ \ \ / / _ \ |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-|  _ <  __/ | | | | | (_) \ V /  __/  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-|_|_\_\___|_| |_| |_|\___/ \_/ \___|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-/ ___|  ___| |_
-\___ \ / _ \ __|
- ___) |  __/ |_
-|____/ \___|\__|
-   ===============================
-   */
    bool ProductionManager::RemoveProductionSet(tIProductionIterator* prodSet, Error* err)
    {
       ClearError(err);
@@ -464,15 +321,6 @@ _|___/    __         _    _             ____  _               _
  	  return true;
    }
 
-   /*
-   ===============================
- _                    _ ____      _
-| |    ___   __ _  __| |  _ \ ___| |_ ___
-| |   / _ \ / _` |/ _` | |_) / _ \ __/ _ \
-| |__| (_) | (_| | (_| |  _ <  __/ ||  __/
-|_____\___/ \__,_|\__,_|_| \_\___|\__\___|
-   ===============================
-   */
    bool ProductionManager::LoadRete(const char* fn, Error* err)
    {
       ClearError(err);
@@ -494,15 +342,6 @@ _|___/    __         _    _             ____  _               _
       return true;
    }
 
-   /*
-   ===============================
- ____                  ____      _
-/ ___|  __ ___   _____|  _ \ ___| |_ ___
-\___ \ / _` \ \ / / _ \ |_) / _ \ __/ _ \
- ___) | (_| |\ V /  __/  _ <  __/ ||  __/
-|____/ \__,_| \_/ \___|_| \_\___|\__\___|
-   ===============================
-   */
    bool ProductionManager::SaveRete(const char *fn, Error *err) const
    {
       ClearError(err);
@@ -523,16 +362,6 @@ _|___/    __         _    _             ____  _               _
    
       return true;
    }
-
-   /*
-   ===============================
-  ____      _   ____                _            _   _
- / ___| ___| |_|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |  _ / _ \ __| |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-| |_| |  __/ |_|  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
- \____|\___|\__|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-   ===============================
-   */
 
    /*
 WARNING!!!  All of the Get*Production(s) methods appear to leak symbol ref counts in
@@ -565,15 +394,6 @@ with the production names).
       return new tProductionIter(userProds);
    }
 
-   /*
-   ===============================
-  ____      _      _    _ _ ____                _            _   _
- / ___| ___| |_   / \  | | |  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __  ___
-| |  _ / _ \ __| / _ \ | | | |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \/ __|
-| |_| |  __/ |_ / ___ \| | |  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | \__ \
- \____|\___|\__/_/   \_\_|_|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|___/
-   ===============================
-   */
    tIProductionIterator* ProductionManager::GetAllProductions(bool includeConditions, Error* err) const
    {
       prodVec UserProdVec;
@@ -586,15 +406,6 @@ with the production names).
       return new tProductionIter(UserProdVec);
    }
 
-   /*
-   ==================================
-  ____      _   ____                _            _   _
- / ___| ___| |_|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __  ___
-| |  _ / _ \ __| |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \/ __|
-| |_| |  __/ |_|  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | \__ \
- \____|\___|\__|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|___/
-   ==================================
-   */
    void ProductionManager::GetProductions(prodVec& prodVec, bool includeConditions, unsigned char prodType) const
    {
       agent*              a = m_agent->GetSoarAgent();
@@ -610,19 +421,6 @@ with the production names).
       }
    }
 
-   /*
-   ===============================
-  ____      _   _   _
- / ___| ___| |_| | | |___  ___ _ __
-| |  _ / _ \ __| | | / __|/ _ \ '__|
-| |_| |  __/ |_| |_| \__ \  __/ |
- \____|\___|\__|\___/|___/\___|_| _   _
-|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __  ___
-| |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \/ __|
-|  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | \__ \
-|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|___/
-   ===============================
-   */
    tIProductionIterator* ProductionManager::GetUserProductions(Error* err) const
    {
       prodVec UserProdVec;
@@ -632,15 +430,6 @@ with the production names).
       return new tProductionIter(UserProdVec);
    }
 
-   /*
-   ===============================
-  ____      _    ____ _                 _
- / ___| ___| |_ / ___| |__  _   _ _ __ | | _____
-| |  _ / _ \ __| |   | '_ \| | | | '_ \| |/ / __|
-| |_| |  __/ |_| |___| | | | |_| | | | |   <\__ \
- \____|\___|\__|\____|_| |_|\__,_|_| |_|_|\_\___/
-   ===============================
-   */
    tIProductionIterator* ProductionManager::GetChunks(Error* err) const
    {
       prodVec ChunkProdVec;
@@ -650,15 +439,6 @@ with the production names).
       return new tProductionIter(ChunkProdVec);
    }
 
-   /*
-   ===============================
-  ____      _      _           _   _  __ _           _   _
- / ___| ___| |_   | |_   _ ___| |_(_)/ _(_) ___ __ _| |_(_) ___  _ __  ___
-| |  _ / _ \ __|  | | | | / __| __| | |_| |/ __/ _` | __| |/ _ \| '_ \/ __|
-| |_| |  __/ || |_| | |_| \__ \ |_| |  _| | (_| (_| | |_| | (_) | | | \__ \
- \____|\___|\__\___/ \__,_|___/\__|_|_| |_|\___\__,_|\__|_|\___/|_| |_|___/
-   ===============================
-   */
    tIProductionIterator* ProductionManager::GetJustifications(Error* err) const
    {
       prodVec JustificationProdVec;
@@ -668,19 +448,6 @@ with the production names).
       return new tProductionIter(JustificationProdVec);
    }
 
-   /*
-   ===============================
-  ____      _   ____        __             _ _
- / ___| ___| |_|  _ \  ___ / _| __ _ _   _| | |_
-| |  _ / _ \ __| | | |/ _ \ |_ / _` | | | | | __|
-| |_| |  __/ |_| |_| |  __/  _| (_| | |_| | | |_
- \____|\___|\__|____/_\___|_|  \__,_|\__,_|_|\__|
-|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __  ___
-| |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \/ __|
-|  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | \__ \
-|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|___/
-   ===============================
-   */
    tIProductionIterator* ProductionManager::GetDefaultProductions(Error* err) const
    {
       prodVec DefaultProdVec;
@@ -690,25 +457,8 @@ with the production names).
       return new tProductionIter(DefaultProdVec);
    }
   
-   /*
-   ==================================  ____                                     _
-    _ __ ___ _ __ ___   _____   _____ / ___|___  _ __ ___  _ __ ___   ___ _ __ | |_ ___
-   | '__/ _ \ '_ ` _ \ / _ \ \ / / _ \ |   / _ \| '_ ` _ \| '_ ` _ \ / _ \ '_ \| __/ __|
-   | | |  __/ | | | | | (_) \ V /  __/ |__| (_) | | | | | | | | | | |  __/ | | | |_\__ \
-   |_|  \___|_| |_| |_|\___/ \_/ \___|\____\___/|_| |_| |_|_| |_| |_|\___|_| |_|\__|___/
-   ==================================
-   */
    void ProductionManager::removeComments(std::string & inputFile)
    {
-      //
-      // (^)    Search for anything that starts at the beginning of the line
-      // (\\s*) is followed by any number of spaces 
-      // (#)    followed by a pound sign
-      // (.*?)  followed by the shortest sequence of any characters 
-      // ($)    ending at the end of the line.
-      //
-      //regexDeleteWrapper(inputFile, "sp");
-      //regexDeleteWrapper(inputFile, "\n[:space:]*?#.*?\n");
       regexDeleteWrapper(inputFile, "^\\s*?#.*?$");
 
       //
@@ -716,21 +466,6 @@ with the production names).
       //regexDeleteWrapper(inputFile, "^[:space:]*$");
    }
 
-
-   /*
-   ==================================
-                       _    _ _                        _
- ___  ___   __ _ _ __ / \  | | |_ ___ _ __ _ __   __ _| |_ ___
-/ __|/ _ \ / _` | '__/ _ \ | | __/ _ \ '__| '_ \ / _` | __/ _ \
-\__ \ (_) | (_| | | / ___ \| | ||  __/ |  | | | | (_| | ||  __/
-|___/\___/ \__,_|_|/_/ _ \_\_|\__\___|_|  |_| |_|\__,_|\__\___|
-|_ _|_ __  _ __  _   _| |_
- | || '_ \| '_ \| | | | __|
- | || | | | |_) | |_| | |_
-|___|_| |_| .__/ \__,_|\__|
-          |_|
-   ==================================
-   */
    void ProductionManager::soarAlternateInput(agent *ai_agent, char  *ai_string, 
                                               char  *ai_suffix, Bool   ai_exit   )
    {
@@ -744,16 +479,6 @@ with the production names).
    return;
    }
 
-
-   /*
-   ==================================
-    _       _     _ ____                _            _   _
-   / \   __| | __| |  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-  / _ \ / _` |/ _` | |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
- / ___ \ (_| | (_| |  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-/_/   \_\__,_|\__,_|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-   ==================================
-   */
    void ProductionManager::AddProduction(char *productionText, Error *err)
    {  
       ClearError(err);
@@ -782,17 +507,6 @@ with the production names).
 	  }
   }
    
-
-   /*
-     ==================================
-                                ____                _            _   _
-      _ __   __ _ _ __ ___  ___|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __  ___
-     | '_ \ / _` | '__/ __|/ _ \ |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \/ __|
-     | |_) | (_| | |  \__ \  __/  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | \__ \
-     | .__/ \__,_|_|  |___/\___|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|___/
-     |_|
-     ==================================
-   */
    void ProductionManager::parseProductions(string &inputFile)
    {
 
@@ -871,108 +585,6 @@ with the production names).
       // All the production matches are removed as part of the search so no
       // call to regexDeleteWrapper is needed here
    }
-   /*
-   ==================================
-    _       _     _ ____                _            _   _
-   / \   __| | __| |  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-  / _ \ / _` |/ _` | |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
- / ___ \ (_| | (_| |  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-/_/   \_\__,_|\__,_|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-| |   (_)___| |_ ___ _ __   ___ _ __
-| |   | / __| __/ _ \ '_ \ / _ \ '__|
-| |___| \__ \ ||  __/ | | |  __/ |
-|_____|_|___/\__\___|_| |_|\___|_|
-   ==================================
-   */
-   /* DJP: No longer used
-   void ProductionManager::AddProductionListener(egSKIProductionEventId eventId, 
-                                                 IProductionListener* listener, 
-                                                 bool                 allowAsynch ,
-                                                 Error*               err)
-   {
-      MegaAssert(listener, "Cannot add a 0 listener pointer.");
-      if(!listener)
-      {
-         SetError(err, gSKIERR_INVALID_PTR);
-         return;
-      }
-
-      ClearError(err);
-      m_productionListeners.AddListener(eventId, listener);
-
-      // If we have added our first listener, we tell the kernel
-      //  we want to recieve these events.
-      if(m_productionListeners.GetNumListeners(eventId) == 1)
-      {
-         // This is a kernel call (not part of gSKI)
-         gSKI_SetAgentCallback(m_agent->GetSoarAgent(), 
-                               EnumRemappings::RemapProductionEventType(eventId),
-                               static_cast<void*>(this),
-                               HandleKernelProductionCallbacks);
-      }   
-   }
-	*/
-
-   /*
-   ==================================
- ____                               ____                _            _   _
-|  _ \ ___ _ __ ___   _____   _____|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |_) / _ \ '_ ` _ \ / _ \ \ / / _ \ |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-|  _ <  __/ | | | | | (_) \ V /  __/  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-|_| \_\___|_|_|_| |_|\___/ \_/ \___|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-| |   (_)___| |_ ___ _ __   ___ _ __
-| |   | / __| __/ _ \ '_ \ / _ \ '__|
-| |___| \__ \ ||  __/ | | |  __/ |
-|_____|_|___/\__\___|_| |_|\___|_|
-   ==================================
-   */
-   /*
-   void ProductionManager::RemoveProductionListener(egSKIProductionEventId eventId,
-                                                    IProductionListener* listener,
-                                                    Error*               err)
-   {
-      MegaAssert(listener, "Cannot remove a 0 listener pointer.");
-      if(!listener)
-      {
-         SetError(err, gSKIERR_INVALID_PTR);
-         return;
-      }
-
-      ClearError(err);
-      m_productionListeners.RemoveListener(eventId, listener);
-
-      // If we have no more listeners, stop asking kernel to
-      //  notify us
-      if(m_productionListeners.GetNumListeners(eventId) == 0)
-      {
-         // This is a kernel call (not part of gSKI)
-         // Setting the callback to 0 causes the kernel
-         //   not to fire the event
-         // This is a kernel call (not part of gSKI)
-         gSKI_SetAgentCallback(m_agent->GetSoarAgent(), 
-                               EnumRemappings::RemapProductionEventType(eventId),
-                               0, 0);
-      }
-   }
-	*/
-
-   /*
-   ==================================
- _   _                 _ _      _  __                    _
-| | | | __ _ _ __   __| | | ___| |/ /___ _ __ _ __   ___| |
-| |_| |/ _` | '_ \ / _` | |/ _ \ ' // _ \ '__| '_ \ / _ \ |
-|  _  | (_| | | | | (_| | |  __/ . \  __/ |  | | | |  __/ |
-|_|_|_|\__,_|_| |_|\__,_|_|\___|_|\_\___|_|  |_| |_|\___|_|
-|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-|  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-|_|___|_|  \___/_\__,_|\__,_|\___|\__|_|\___/|_| |_|
- / ___|__ _| | | |__   __ _  ___| | _____
-| |   / _` | | | '_ \ / _` |/ __| |/ / __|
-| |__| (_| | | | |_) | (_| | (__|   <\__ \
- \____\__,_|_|_|_.__/ \__,_|\___|_|\_\___/
-   ==================================
-   */
    void ProductionManager::HandleKernelProductionCallbacks(unsigned long         eventId, 
                                                            unsigned char         eventOccured,
                                                            void*                 object, 
@@ -981,56 +593,6 @@ with the production names).
    {
 	   // DJP: No longer supported -- handled directly by kernel and SML
 	   assert(false) ;
-
-	   /*
-      ProductionManager*   pm = static_cast<ProductionManager*>(object);
-      Production*           p;
-      IProductionInstance* pi;
-
-	  // The gSKI events are
-	  // BEFORE_PRODUCTION_REMOVED and
-	  // AFTER_PRODUCTION_ADDED
-	  // AFTER_PRODUCTION_FIRED
-	  // BEFORE_PRODUCTION_RETRACTED
-	  // so check that the timing of the before/after logic is correct from the kernel.
-	  if ((eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_REMOVED) ||
-		  (!eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_ADDED) ||
-		  (!eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_FIRED) ||
-		  (eventOccured && eventId == gSKI_K_EVENT_PRODUCTION_RETRACTED))
-	  {
-		  // Why is the kernel issuing a callback which we can't pass on to gSKI.  One or the other should change.
-		  return ;
-	  }
-
-         if((eventId == gSKI_K_EVENT_PRODUCTION_ADDED) || 
-            (eventId == gSKI_K_EVENT_PRODUCTION_REMOVED))
-         {
-            p  = new Production(static_cast<production*>(data), false, pm->m_agent->GetSoarAgent());
-            pi = 0;
-         }
-         else
-         {
-            // The data passed in is a production instance
-            instantiation* soarPI = static_cast<instantiation*>(data);
-
-            // Get the production from the instantiation
-            p =  new Production(soarPI->prod, false, pm->m_agent->GetSoarAgent());
-
-            // Dont have an instantiation yet
-            pi = 0;
-         }
-
-         // We have to change the the event id from a kernel id to a gSKI id
-         ProductionNotifier pn(pm->m_agent, p, pi);
-         pm->m_productionListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_ProdEventId(eventId, eventOccured), pn);
-
-         // Clean up the new data members
-         if(p)
-            p->Release();
-         
-//         if(pi)
-//            pi->Release();   
-	*/
 	}
 }
 
@@ -1062,16 +624,6 @@ bool removeDir(const char* name){
 #include "gSKI_Stub.h"
 
 using namespace gSKI;
-#ifndef NO_MEGA_UNIT_TESTS
-
-void prodTest();
-
-DEF_TEST_INSUITE(ProductionFileLoadTesting, Start)
-{
-   prodTest();
-}
-
-#endif
 
 inline string makeDummyProd(const string& name){
   string dummyProduction = "sp{ "+ name + "\n"
@@ -1087,102 +639,4 @@ inline string makeDummyProd(const string& name){
 inline bool isValidProdName(const string& name){
    return name == "test1" || name == "test2" || name == "test3" || name == "test4";
 }
-
-#ifndef NO_MEGA_UNIT_TESTS
-
-void prodTest(){
-   bool madeDir = false;
-   bool madeDir2 = false;
-   ofstream out;
-   out.open("test1.soar");
-   VALIDATE(!out.fail());
-   out <<"source \"MUT/test2.soar\""<<endl;
-   out <<"source \"test1.soar\""<<endl;
-   out<<makeDummyProd("test1")<<endl;
-   out.close();
-   out.open("test3.soar");
-   VALIDATE(!out.fail());
-   out << "source \"test1.soar\""<<endl;
-   out << "source \"MUT/test2.soar\""<<endl;
-   out << "source \"MUT/innerDir/test4.soar\"" <<endl;
-   out<<makeDummyProd("test3")<<endl;
-   out.close();
-   out.open("MUT/test2.soar");
-   if(out.fail()){
-      //most likely directory doesn't exist
-	  madeDir = true;
-	  VALIDATE(makeDir("MUT"));
-	  out.clear();
-      out.open("MUT/test2.soar");
-	  VALIDATE(!out.fail());
-   }
-   out<<"source \"../test3.soar\""<<endl;
-   out<<makeDummyProd("test2")<<endl;
-   out.close();
-   out.open("MUT/innerDir/test4.soar");
-   if(out.fail()){
-      //most likely directory doesn't exist
-	  madeDir2 = true;
-	  VALIDATE(makeDir("MUT/innerDir"));
-	  out.clear();
-      out.open("MUT/innerDir/test4.soar");
-	  VALIDATE(!out.fail());
-   }
-   out << "source \"../../test1.soar\""<<endl;
-   out << "source \"../test2.soar\""<<endl;
-   out << "source \"../../test3.soar\""<<endl;
-   out<<makeDummyProd("test4")<<endl;
-   out.close();
-   KernelFactory*      kF    = gSKI_CreateKernelFactory();
-   VALIDATE(kF != 0);
-
-   Kernel*             k     = kF->Create();
-   VALIDATE(k != 0);
-
-   AgentManager*       IAM   = k->GetAgentManager();
-   VALIDATE(IAM != 0);
-
-   Agent*              agent = IAM->AddAgent("ProductionTestAgent");
-   VALIDATE(agent != 0);
-
-   ProductionManager*  IPM   = agent->GetProductionManager();
-   VALIDATE(IPM != 0);
-
-   VALIDATE(IPM->LoadSoarFile("test1.soar"));
-   tIProductionIterator* itr= IPM->GetAllProductions();
-   VALIDATE(itr->IsValid());
-   VALIDATE(isValidProdName(itr->GetVal()->GetName()));
-   itr->Next();
-   VALIDATE(itr->IsValid());
-   VALIDATE(isValidProdName(itr->GetVal()->GetName()));
-   itr->Next();
-   VALIDATE(itr->IsValid());
-   VALIDATE(isValidProdName(itr->GetVal()->GetName()));
-   itr->Next();
-   VALIDATE(itr->IsValid());
-   VALIDATE(isValidProdName(itr->GetVal()->GetName()));
-   itr->Next();
-   VALIDATE(!itr->IsValid());
-   
-   itr->Release();
-   IAM->RemoveAgentByName(agent->GetName());
-//   k->Release();  
-   kF->Release();
-      
-   VALIDATE(!remove("MUT/innerDir/test4.soar"));
-   if(madeDir2){
-	   VALIDATE(removeDir("MUT/innerDir"));
-   }
-   VALIDATE(!remove("MUT/test2.soar"));
-   VALIDATE(!remove("test1.soar"));
-   VALIDATE(!remove("test3.soar"));
-   if(madeDir){
-      VALIDATE(removeDir("MUT"));
-   }
-
-}
-
-#endif
-
-
 

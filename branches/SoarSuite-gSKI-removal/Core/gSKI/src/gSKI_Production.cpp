@@ -20,8 +20,6 @@
 #include "gSKI_Iterator.h"
 #include "gSKI_EnumRemapping.h"
 
-//#include "MegaUnitTest.h"
-
 #include <string>
 
 //
@@ -33,19 +31,8 @@
 #include "gdatastructs.h"
 #include "rhsfun.h"
 
-//DEF_EXPOSE(gSKI_Production);
-
 namespace gSKI
 {
-   /*
-   ==================================
- ____                _            _   _
-|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-|  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-|_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-   ==================================
-   */
    // If includeConditions is false, the conditions and actions are not loaded (i.e. creating gSKI copies of the kernel conditions)
    // and only the name etc. are valid in the production.  This turns out to be
    // all that we are interested in 95% of the time -- boosting performance substantially.
@@ -102,25 +89,11 @@ namespace gSKI
       return *this;
    }
 
-   /*
-   ===============================
- /\/|____                _            _   _
-|/\/|  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-    | |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-    |  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-    |_|   |_|  \___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-   ===============================
-   */
    Production::~Production() 
    {
       cleanup();
    }
 
-   /*
-   ===============================
-
-   ===============================
-   */
    void Production::cleanup()
    {
       if(m_conditionSet)
@@ -142,31 +115,10 @@ namespace gSKI
       m_functions.clear();
    }
 
-   /*
-   ===============================
-  ____      _   _____ _      _              ____                  _
- / ___| ___| |_|  ___(_)_ __(_)_ __   __ _ / ___|___  _   _ _ __ | |_
-| |  _ / _ \ __| |_  | | '__| | '_ \ / _` | |   / _ \| | | | '_ \| __|
-| |_| |  __/ |_|  _| | | |  | | | | | (_| | |__| (_) | |_| | | | | |_
- \____|\___|\__|_|   |_|_|  |_|_| |_|\__, |\____\___/ \__,_|_| |_|\__|
-                                     |___/
-   ===============================
-   */
-
    unsigned long Production::GetFiringCount(Error *err) const
    {
       return m_soarProduction->firing_count;
    }
-
-   /*
-   ===============================
-  ____      _   _   _
- / ___| ___| |_| \ | | __ _ _ __ ___   ___
-| |  _ / _ \ __|  \| |/ _` | '_ ` _ \ / _ \
-| |_| |  __/ |_| |\  | (_| | | | | | |  __/
- \____|\___|\__|_| \_|\__,_|_| |_| |_|\___|
-   ===============================
-   */
 
    const char* Production::GetName(Error *err) const
    {
@@ -182,11 +134,6 @@ namespace gSKI
       return 0;
    }
 
-   /*
-   ==================================
-   
-   ==================================
-   */
    egSKIProdType Production::GetType(Error *pErr) const
    {
       MegaAssert(m_soarProduction != 0, "Uninitialized PRoduction.");
@@ -194,32 +141,11 @@ namespace gSKI
       return EnumRemappings::ReMapProductionType(m_soarProduction->type);
    }
 
-
-   /*
-   ===============================
-  ____      _   ____
- / ___| ___| |_|  _ \  ___   ___ ___
-| |  _ / _ \ __| | | |/ _ \ / __/ __|
-| |_| |  __/ |_| |_| | (_) | (__\__ \
- \____|\___|\__|____/ \___/ \___|___/
-   ===============================
-   */
-
    const char* Production::GetDocs(Error *err) const
    {
 
       return 0;
    }
-
-   /*
-   ===============================
-  ____      _   ____
- / ___| ___| |_/ ___|  ___  _   _ _ __ ___ ___
-| |  _ / _ \ __\___ \ / _ \| | | | '__/ __/ _ \
-| |_| |  __/ |_ ___) | (_) | |_| | | | (_|  __/
- \____|\___|\__|____/ \___/ \__,_|_|  \___\___|
-   ===============================
-   */
 
    const char* Production::GetSource(Error *err) const
    {
@@ -233,50 +159,10 @@ namespace gSKI
       while(CondSets->IsValid());
    }
 
-   /*
-   ===============================
-  ____      _  _____         _
- / ___| ___| ||_   _|____  _| |_
-| |  _ / _ \ __|| |/ _ \ \/ / __|
-| |_| |  __/ |_ | |  __/>  <| |_
- \____|\___|\__||_|\___/_/\_\\__|
-   ===============================
-   */
-
    const char* Production::GetText(Error *err) const 
    {
-//      condition *top, *bottom;
-//      action* rhs;
-//      bool internal=true;  // The "internal" parameter, if TRUE,
-//                           // indicates that the LHS and RHS should 
-//                           // be printed in internal format.
-//    
-//      p_node_to_conditions_and_nots (m_agent, m_soarProduction->p_node, 0, 0, &top, &bottom, 0,&rhs);
-//      print_string ("   ");
-//        
-//      print_condition_list (top, 3, internal);
-//
-//      loadConditions(top, *m_conditionSet);
-//
-//      deallocate_condition_list (top);  
-//        
-//      print_string ("\n    -->\n  "); 
-//      print_string ("  "); 
-//      print_action_list (rhs, 4, internal);
-//      print_string ("\n}\n");
-//         
       return 0;
    }
-
-   /*
-   ===============================
-  ____      _    ____                _ _ _   _
- / ___| ___| |_ / ___|___  _ __   __| (_) |_(_) ___  _ __  ___
-| |  _ / _ \ __| |   / _ \| '_ \ / _` | | __| |/ _ \| '_ \/ __|
-| |_| |  __/ |_| |__| (_) | | | | (_| | | |_| | (_) | | | \__ \
- \____|\___|\__|\____\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
-   ===============================
-   */
 
    ConditionSet* Production::GetConditions(Error *err) const
    {
@@ -285,16 +171,6 @@ namespace gSKI
 
       return m_conditionSet;
    }
-
-   /*
-   ===============================
-  ____      _      _        _   _
- / ___| ___| |_   / \   ___| |_(_) ___  _ __  ___
-| |  _ / _ \ __| / _ \ / __| __| |/ _ \| '_ \/ __|
-| |_| |  __/ |_ / ___ \ (__| |_| | (_) | | | \__ \
- \____|\___|\__/_/   \_\___|\__|_|\___/|_| |_|___/
-   ===============================
-   */
 
    tIRhsActionIterator* Production::GetActions(Error *err)
    {
@@ -305,19 +181,6 @@ namespace gSKI
       return new Iterator<RhsAction*, tRhsActionVec>(m_actions);
    }
 
-   /*
-   ===============================
-  ____      _   ____  _                  _    _    _
- / ___| ___| |_/ ___|| |_ __ _ _ __   __| |  / \  | | ___  _ __   ___
-| |  _ / _ \ __\___ \| __/ _` | '_ \ / _` | / _ \ | |/ _ \| '_ \ / _ \
-| |_| |  __/ |_ ___) | || (_| | | | | (_| |/ ___ \| | (_) | | | |  __/
- \____|\___|\__|____/ \__\__,_|_| |_|\__,_/_/   \_\_|\___/|_| |_|\___|
-|  ___|   _ _ __   ___| |_(_) ___  _ __  ___
-| |_ | | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-|  _|| |_| | | | | (__| |_| | (_) | | | \__ \
-|_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-   ===============================
-   */
    tIRhsFunctionActionIterator* Production::GetStandAloneFunctions(Error* err)
    {
       // If this is NULL, you should ask to includeConditions when building the production object.
@@ -327,11 +190,6 @@ namespace gSKI
       return new Iterator<RhsFunctionAction*, tRhsFunctionVec>(m_functions);
    }
 
-   /*
-   ==================================
-
-   ==================================
-   */
    void Production::Excise(Error *pErr )
    {
       excise_production(m_agent, m_soarProduction, false);
@@ -344,33 +202,11 @@ namespace gSKI
       return count_rete_tokens_for_production(m_agent, m_soarProduction);
    }
 
-   /*
-   ==================================
- _                 _ ____                _            _   _
-| | ___   __ _  __| |  _ \ _ __ ___   __| |_   _  ___| |_(_) ___  _ __
-| |/ _ \ / _` |/ _` | |_) | '__/ _ \ / _` | | | |/ __| __| |/ _ \| '_ \
-| | (_) | (_| | (_| |  __/| | | (_) | (_| | |_| | (__| |_| | (_) | | | |
-|_|\___/ \__,_|\__,_|_|   |_|__\___/ \__,_|\__,_|\___|\__|_|\___/|_| |_|
-|  ___| __ ___  _ __ ___ | |/ /___ _ __ _ __   ___| |
-| |_ | '__/ _ \| '_ ` _ \| ' // _ \ '__| '_ \ / _ \ |
-|  _|| | | (_) | | | | | | . \  __/ |  | | | |  __/ |
-|_|  |_|  \___/|_| |_| |_|_|\_\___|_|  |_| |_|\___|_|
-   ==================================
-   */
    void Production::loadProductionFromKernel(void) const
    {
       
    }
 
-   /*
-   ==================================
- _                 _  ____                _ _ _   _
-| | ___   __ _  __| |/ ___|___  _ __   __| (_) |_(_) ___  _ __  ___
-| |/ _ \ / _` |/ _` | |   / _ \| '_ \ / _` | | __| |/ _ \| '_ \/ __|
-| | (_) | (_| | (_| | |__| (_) | | | | (_| | | |_| | (_) | | | \__ \
-|_|\___/ \__,_|\__,_|\____\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
-   ==================================
-   */
    void Production::loadConditions(condition *conds, ConditionSet &condSet) const
    {
       if(conds == 0) 
@@ -391,15 +227,6 @@ namespace gSKI
       }
    }
 
-   /*
-   ==================================
- _                 _    _        _   _
-| | ___   __ _  __| |  / \   ___| |_(_) ___  _ __  ___
-| |/ _ \ / _` |/ _` | / _ \ / __| __| |/ _ \| '_ \/ __|
-| | (_) | (_| | (_| |/ ___ \ (__| |_| | (_) | | | \__ \
-|_|\___/ \__,_|\__,_/_/   \_\___|\__|_|\___/|_| |_|___/
-   ==================================
-   */
    void Production::loadActions(action* actions, tRhsActionVec& actionVec, tRhsFunctionVec& funcVec)
    {
       if(actions == 0)

@@ -124,7 +124,7 @@ void RhsListener::RemoveAllListeners(Connection* pConnection)
 	}
 }
 
-bool RhsListener::HandleFilterEvent(egSKIRhsEventId eventID, gSKI::Agent* pAgent, char const* pArgument,
+bool RhsListener::HandleFilterEvent(smlRhsEventId eventID, gSKI::Agent* pAgent, char const* pArgument,
 						    int maxLengthReturnValue, char* pReturnValue)
 {
 	// Currently only supporting one event here, but that could change in time.
@@ -231,7 +231,7 @@ bool RhsListener::HandleFilterEvent(egSKIRhsEventId eventID, gSKI::Agent* pAgent
 // pFunctionName and pArgument define the RHS function being called (the client may parse pArgument to extract other values)
 // pResultValue is a string allocated by the caller than is of size maxLengthReturnValue that should be filled in with the return value.
 // The bool return value should be "true" if a return value is filled in, otherwise return false.
-bool RhsListener::HandleEvent(egSKIRhsEventId eventID, gSKI::Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+bool RhsListener::HandleEvent(smlRhsEventId eventID, gSKI::Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 						    int maxLengthReturnValue, char* pReturnValue)
 {
 	// If this should be handled by the command line processor do so now without going
@@ -340,7 +340,7 @@ bool RhsListener::HandleEvent(egSKIRhsEventId eventID, gSKI::Agent* pAgent, bool
 	return result ;
 }
 
-bool RhsListener::ExecuteRhsCommand(AgentSML* pAgentSML, egSKIRhsEventId eventID, std::string const& functionName, std::string const& arguments, std::string* pResultStr)
+bool RhsListener::ExecuteRhsCommand(AgentSML* pAgentSML, smlRhsEventId eventID, std::string const& functionName, std::string const& arguments, std::string* pResultStr)
 {
 	bool result = false ;
 

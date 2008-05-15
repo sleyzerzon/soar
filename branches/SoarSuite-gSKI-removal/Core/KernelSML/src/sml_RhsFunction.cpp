@@ -191,7 +191,7 @@ Symbol* sml::ExecRhsFunction::Execute(std::vector<Symbol*>* pArguments)
 	std::string argument = ostr.str() ;
 
 	std::string result ;
-	bool ok = m_pAgentSML->GetKernelSML()->FireRhsEvent(m_pAgentSML, gSKIEVENT_RHS_USER_FUNCTION, function, argument, &result) ;
+	bool ok = m_pAgentSML->GetKernelSML()->FireRhsEvent(m_pAgentSML, smlEVENT_RHS_USER_FUNCTION, function, argument, &result) ;
 
 	if (!ok)
 	{

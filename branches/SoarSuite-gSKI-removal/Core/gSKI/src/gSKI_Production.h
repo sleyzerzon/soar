@@ -20,8 +20,6 @@
 #include "gSKI_RhsAction.h"
 #include "gSKI_RhsFunctionAction.h"
 
-//#include "MegaUnitTest.h"
-
 #include <vector>
 
 //
@@ -45,10 +43,6 @@ namespace gSKI {
   class Production : public RefCountedReleaseImpl<IProduction>
    {
    public:
-      /**
-       * @brief: Constructor
-       */
-      //{
       Production(production *prod, bool includeConditions, agent* agent);
       Production(const Production& old): 
          RefCountedReleaseImpl<IProduction>(old),
@@ -56,11 +50,7 @@ namespace gSKI {
       {
          *this = old;
       }
-      //}
 
-     /** 
-      * @brief Copy operator ensuring a correct deep copy.
-      */
      Production&  operator=(const Production& rhs);
 
       /**
@@ -211,23 +201,13 @@ namespace gSKI {
 
      private:
   
-        /** 
-         * Container to store rhs actions ("make" actions in soar lingo)
-         */
-        //{
         typedef std::vector<RhsAction*>         tRhsActionVec;
         typedef tRhsActionVec::iterator         tRhsActionVecIt;
         typedef tRhsActionVec::const_iterator   tRhsActionVecCIt;
-        //}
 
-        /** 
-         * Container to store stand alone rhs functions 
-         */
-        //{
         typedef std::vector<RhsFunctionAction*>  tRhsFunctionVec;
         typedef tRhsFunctionVec::iterator        tRhsFunctionVecIt;
         typedef tRhsFunctionVec::const_iterator  tRhsFunctionVecCIt;
-        //}
 
         /**
          * @brief: Takes the current production and loads up all of it's 
@@ -265,8 +245,6 @@ namespace gSKI {
 
         /** Stores the stand alone function actions (if any) */
         tRhsFunctionVec   m_functions;
-
-//        DECL_TEST_INCLASS(test1);
 
 	protected:  // 2/23/05: changed to protected to eliminate gcc warning
 		/**

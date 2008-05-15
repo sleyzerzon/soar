@@ -30,11 +30,6 @@
 #include "agent.h"
 #include "gdatastructs.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_OutputWorkingMemory);
-
 namespace gSKI
 {
 
@@ -722,10 +717,6 @@ namespace gSKI
       m_wmemap.clear();
    }
    
-   /*
-     ===============================
-     ===============================
-   */
    void OutputWorkingMemory::ReleaseAllWMObjects()
    {
       for ( tWMObjMapItr it = m_wmobjectmap.begin(); it != m_wmobjectmap.end();
@@ -736,10 +727,6 @@ namespace gSKI
       m_wmobjectmap.clear();
    }
 
-   /*
-     ===============================
-     ===============================
-   */
    OutputWMObject* OutputWorkingMemory::GetOrCreateObjectFromInterface(IWMObject* obj)
    {
       // First try to dynamic cast the object
