@@ -144,7 +144,7 @@ protected:
 	smlRunResult	m_ResultOfLastRun ;
     unsigned long	m_localRunCount;
     unsigned long	m_localStepCount;
-	egSKIRunState	m_runState;          // Current agent run state
+	smlRunState		m_runState;          // Current agent run state
 	unsigned long	m_interruptFlags;    // Flags indicating an interrupt request
 
 	  // Used for update world events
@@ -366,8 +366,8 @@ public:
 	smlRunResult Step(smlRunStepSize stepSize) ;
 
 	unsigned long GetInterruptFlags()		{ return m_interruptFlags ; }
-	egSKIRunState GetRunState()				{ return m_runState ; }
-	void SetRunState(egSKIRunState state)	{ m_runState = state ; }
+	smlRunState GetRunState()				{ return m_runState ; }
+	void SetRunState(smlRunState state)	{ m_runState = state ; }
 
 protected:
 	void InitializeRuntimeState() ;

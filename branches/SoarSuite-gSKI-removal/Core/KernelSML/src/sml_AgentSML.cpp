@@ -294,7 +294,7 @@ void AgentSML::InitializeRuntimeState()
 	m_OutputCounter = 0 ;
     m_localRunCount = 0 ;
     m_localStepCount= 0 ;
-    m_runState = gSKI_RUNSTATE_STOPPED;
+    m_runState = sml_RUNSTATE_STOPPED;
     m_interruptFlags = 0 ;
 }
 
@@ -458,9 +458,9 @@ bool AgentSML::Interrupt(smlStopLocationFlags stopLoc)
   if ((sml_STOP_AFTER_SMALLEST_STEP == stopLoc) || (sml_STOP_AFTER_PHASE == stopLoc)) {
 	  m_agent->stop_soar = TRUE;
 	  // If the agent is not running, we should set the runState flag now so agent won't run
-	  if (m_runState == gSKI_RUNSTATE_STOPPED)
+	  if (m_runState == sml_RUNSTATE_STOPPED)
 	  {
-		  m_runState = gSKI_RUNSTATE_INTERRUPTED;
+		  m_runState = sml_RUNSTATE_INTERRUPTED;
 	  }
 	  // Running agents must test stopLoc & stop_soar in Step method to see if interrupted.
 	  // Because we set m_agent->stop_soar == TRUE above, any running agents should return to
@@ -484,19 +484,19 @@ void AgentSML::ClearInterrupts()
   m_interruptFlags = 0;
 
   // Only change state of agent if it is running
-  if(m_runState == gSKI_RUNSTATE_INTERRUPTED)
+  if(m_runState == sml_RUNSTATE_INTERRUPTED)
   {
     // We returned, and thus are stopped
-    m_runState = gSKI_RUNSTATE_STOPPED;
+    m_runState = sml_RUNSTATE_STOPPED;
   }
 }
 
 smlRunResult AgentSML::StepInClientThread(smlRunStepSize  stepSize, gSKI::Error* pError)
 {
   // Agent is already running, we cannot run
-  if(m_runState != gSKI_RUNSTATE_STOPPED)
+  if(m_runState != sml_RUNSTATE_STOPPED)
   {
-     if(m_runState == gSKI_RUNSTATE_HALTED)
+     if(m_runState == sml_RUNSTATE_HALTED)
 		 SetError(pError, gSKI::gSKIERR_AGENT_HALTED);  // nothing ever tests for this...
      else
 		 SetError(pError, gSKI::gSKIERR_AGENT_RUNNING);
@@ -504,7 +504,7 @@ smlRunResult AgentSML::StepInClientThread(smlRunStepSize  stepSize, gSKI::Error*
      return sml_RUN_ERROR;
   }
 
-  m_runState = gSKI_RUNSTATE_RUNNING;
+  m_runState = sml_RUNSTATE_RUNNING;
 
   // Now clear error and do the run
   ClearError(pError);
@@ -544,7 +544,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
    unsigned long startCount        = GetRunCounter(runStepSize) ; // getReleventCounter(stepSize);
    const unsigned long  END_COUNT  = startCount + count ;
 
-   bool interrupted  = (m_runState == gSKI_RUNSTATE_INTERRUPTED)? true: false;
+   bool interrupted  = (m_runState == sml_RUNSTATE_INTERRUPTED)? true: false;
 
    if (! interrupted) {
 	   assert(!m_agent->system_halted) ; // , "System should not be halted here!");
@@ -600,7 +600,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 	   {// the agent halted because it seems to be in an infinite loop, so throw interrupt
 		   m_pKernelSML->InterruptAllAgents(sml_STOP_AFTER_PHASE) ;
 		   m_agent->system_halted = FALSE; // hack! otherwise won't run again.  
-		   m_runState = gSKI_RUNSTATE_INTERRUPTED;
+		   m_runState = sml_RUNSTATE_INTERRUPTED;
 		   retVal     = sml_RUN_INTERRUPTED;
 		   // Notify of the interrupt
 
@@ -611,7 +611,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 	   }
 	   else {
 	   // If we halted, we completed and our state is halted
-	   m_runState    = gSKI_RUNSTATE_HALTED;
+	   m_runState    = sml_RUNSTATE_HALTED;
 	   retVal        = sml_RUN_COMPLETED;
 
 	   FireRunEvent(gSKIEVENT_AFTER_HALTED) ;
@@ -624,13 +624,13 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
    {
 	   if(interrupted)
 	   {
-		   m_runState = gSKI_RUNSTATE_INTERRUPTED;
+		   m_runState = sml_RUNSTATE_INTERRUPTED;
 		   retVal     = sml_RUN_COMPLETED_AND_INTERRUPTED; 
 		   //retVal     = sml_RUN_INTERRUPTED;
 	   }
 	   else
 	   {
-		   m_runState = gSKI_RUNSTATE_STOPPED;
+		   m_runState = sml_RUNSTATE_STOPPED;
 		   retVal     = sml_RUN_COMPLETED;
 	   }
    }
@@ -639,7 +639,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 	   // We were interrupted before we could complete
 	   assert(interrupted) ; //, "Should never get here if we aren't interrupted");
 
-	   m_runState    = gSKI_RUNSTATE_INTERRUPTED;
+	   m_runState    = sml_RUNSTATE_INTERRUPTED;
 	   retVal        = sml_RUN_INTERRUPTED;
    }    
 
@@ -684,7 +684,7 @@ void AgentSML::RegisterForBeforeAgentDestroyedEvent()
 
 void AgentSML::ScheduleAgentToRun(bool state) 
 { 
-	if (this->GetRunState() != gSKI_RUNSTATE_HALTED) 
+	if (this->GetRunState() != sml_RUNSTATE_HALTED) 
 	{
 		m_ScheduledToRun = state ; 
 		m_WasOnRunList = state; 

@@ -542,102 +542,6 @@ namespace gSKI
 		egSKIPhaseType GetCurrentPhase(Error* err = 0);
 
 		/**
-		* @brief Gets the current count of smallest steps executed
-		*
-		* Call this method when you need to know the number of smallest steps
-		*  (elaboration cycles or phases, depending on the phase) that have
-		*  executed since this agent was last initialized.
-		*
-		* @param err  Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		*
-		* @returns The number of smallest steps since the agent was last
-		*             initialized.
-		*/
-		//unsigned long GetNumSmallestStepsExecuted(Error* err = 0);
-
-
-		/**
-		* @brief Gets the current phase count for this agent
-		*
-		* Call this method when you need to know the number of phases
-		*  that have executed since this agent was last initialized.
-		*
-		* @param err  Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		*
-		* @returns The number of phases since the agent was last
-		*             initialized.
-		*/
-		//unsigned long GetNumPhasesExecuted(Error* err = 0);
-		//void          ResetNumPhasesExecuted(Error* err = 0);
-
-		/********************************************************************
-		* @brief	Agents maintain a number of counters (for how many phase,
-		*			elaborations etc.) they have ever executed.
-		*			We use these counters to determine when a run should stop.
-		*        This is a hack from KernelSML which listens to RunEvents.
-		*        Currently gSKI itself does not listen on RunEvents.
-		*********************************************************************/
-		//void IncrementgSKIStepCounter(egSKIRunType interleaveStepSize) ;
-
-
-		/**
-		* @brief Gets the current elaborations count for this agent
-		*
-		* Call this method when you need to know the number of elaborations
-		*  that have executed since this agent was last initialized.
-		*
-		* @param err  Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		*
-		* @returns The number of elaborations since the agent was last
-		*             initialized.
-		*/
-		//unsigned long GetNumElaborationsExecuted(Error* err = 0);
-
-
-		/**
-		* @brief Gets the current decision cycle count
-		*
-		* Call this method when you need to know the number of decision cycles
-		*  this agent has executed since it was initialized (or reinitiailzed)
-		*
-		* @param err  Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		*
-		* @returns The number of decision cycles since the agent was last
-		*             initialized.
-		*/
-		//unsigned long GetNumDecisionCyclesExecuted(Error* err = 0);
-
-		/**
-		* @brief Gets the number of decisions made so far
-		*
-		* Call this method when you need to know the number of decisions  
-		*  (rather than full decision cycles)
-		*  this agent has made since it was initialized (or reinitiailzed)
-		*
-		* @param err  Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		*
-		* @returns The number of decisions made since the agent was last
-		*             initialized.
-		*/
-		//unsigned long GetNumDecisionsExecuted(Error* err = 0);
-
-
-		/**
 		* @brief Gets the current output count for this agent
 		*
 		* Call this method when you need to know the number of decision cycles
@@ -651,8 +555,6 @@ namespace gSKI
 		* @returns The number of decision cycles with output since the agent was last
 		*             initialized.
 		*/
-		//unsigned long GetNumOutputsExecuted(Error* err = 0);
-		//void          ResetNumOutputsExecuted(Error* err = 0);
 		void          ResetNilOutputCounter(Error* err = 0);
 
 		AgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)
@@ -723,113 +625,6 @@ namespace gSKI
 		*/
 		bool RemoveClientRhsFunction(const char* name, Error* err = 0);
 
-		/**
-		*  @brief Remove all client-defined RHS functions from this agent
-		*
-		*  Call this method tor remove ALL client-defined RHS functions from this
-		*   agent.  
-		*  
-		*  @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*/
-		//void RemoveAllClientRhsFunctions(Error* err = 0);
-
-		/*************************** Listeners ****************************************/
-
-		/**
-		*  @brief Adds a listener for agent running events
-		*
-		*  Call this method to register a listener to recieve system events.
-		*  Agent run events are:
-		*     @li gSKIEVENT_BEFORE_SMALLEST_STEP
-		*     @li gSKIEVENT_AFTER_SMALLEST_STEP
-		*     @li gSKIEVENT_BEFORE_ELABORATION_CYCLE
-		*     @li gSKIEVENT_AFTER_ELABORATION_CYCLE
-		*     @li gSKIEVENT_BEFORE_PHASE_EXECUTED
-		*     @li gSKIEVENT_AFTER_PHASE_EXECUTED
-		*     @li gSKIEVENT_BEFORE_DECISION_CYCLE
-		*     @li gSKIEVENT_AFTER_DECISION_CYCLE
-		*     @li gSKIEVENT_AFTER_INTERRUPT
-		*     @li gSKIEVENT_BEFORE_RUNNING
-		*     @li gSKIEVENT_AFTER_RUNNING
-		*
-		*  If this listener has already been added for the given event, nothing happens
-		*
-		*  Possible Errors:
-		*     @li gSKIERR_INVALID_PTR -- If you pass an invalid pointer for a listener.
-		*
-		*  @param eventId  One of the valid event ids listed above
-		*  @param listener A pointer to a client owned listener that will be called back when
-		*                      an event occurs.  Because the listener is client owned, it is not
-		*                      cleaned up by the kernel when it shuts down.  The same listener
-		*                      can be registered to recieve multiple events.  If this listener
-		*                      is 0, no listener is added and an error is recored in err.
-		*  @param allowAsynch A flag indicating whether or not it is ok for the listener to be
-		*                         notified asynchonously of system operation.  If you specify "true"
-		*                         the system may not callback the listener until some time after
-		*                         the event occurs. This flag is only a hint, the system may callback
-		*                         your listener synchronously.  The main purpose of this flag is to
-		*                         allow for efficient out-of-process implementation of event callbacks
-		*  @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*/
-		/*
-		void AddRunListener(egSKIRunEventId     eventId, 
-			IRunListener*       listener, 
-			bool                allowAsynch = false,
-			Error*              err         = 0);
-	    */
-
-		/* void HandleEvent(egSKIRunEventId eventId, 
-		gSKI::Agent*   agentPtr, 
-		egSKIPhaseType  phase,
-		Error*          err = 0);*/
-
-		/**
-		*  @brief Removes an agent running event listener
-		*
-		*  Call this method to remove a previously added event listener.
-		*  The system will automatically remove all listeners when the kernel shutsdown;
-		*   however, since all listeners are client owned, the client is responsible for
-		*   cleaning up memory used by listeners.
-		*
-		*  If the given listener is not registered to recieve the given event, this
-		*     function will do nothing (but a warning is logged).
-		*
-		*  Agent run events are:
-		*     @li gSKIEVENT_BEFORE_SMALLEST_STEP
-		*     @li gSKIEVENT_AFTER_SMALLEST_STEP
-		*     @li gSKIEVENT_BEFORE_ELABORATION_CYCLE
-		*     @li gSKIEVENT_AFTER_ELABORATION_CYCLE
-		*     @li gSKIEVENT_BEFORE_PHASE_EXECUTED
-		*     @li gSKIEVENT_AFTER_PHASE_EXECUTED
-		*     @li gSKIEVENT_BEFORE_DECISION_CYCLE
-		*     @li gSKIEVENT_AFTER_DECISION_CYCLE
-		*     @li gSKIEVENT_AFTER_INTERRUPT
-		*     @li gSKIEVENT_BEFORE_RUNNING
-		*     @li gSKIEVENT_AFTER_RUNNING
-		*
-		*  Possible Errors:
-		*     @li gSKIERR_INVALID_PTR -- If you pass an invalid pointer for a listener.
-		*
-		*  @param eventId  One of the valid event ids listed above
-		*  @param listener A pointer to the listener you would like to remove.  Passing a 0
-		*                     pointer causes nothing to happen except an error being recorded
-		*                     to err.
-		*  @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*/
-/*
-		void RemoveRunListener(egSKIRunEventId      eventId,
-			IRunListener*        listener,
-			Error*               err = 0);
-*/
 		/**
 		*  @brief Adds a listener for Rhs Function change events
 		*
@@ -1097,7 +892,6 @@ namespace gSKI
 		*
 		* These are deprecated.  Do not use them.
 		*/ 
-		//{
 		void AddPrintListener(egSKIPrintEventId        eventId, 
 			IPrintListener*          listener, 
 			bool                     allowAsynch = false,
@@ -1106,23 +900,12 @@ namespace gSKI
 		void RemovePrintListener(egSKIPrintEventId     eventId,
 			IPrintListener*       listener,
 			Error*                err = 0);
-		//}
 
-
-		/** Fire the gSKIEVENT_BEFORE_RUN_STARTS event **/
-		//void FireRunStartsEvent() ;
-
-		/** Fire the gSKIEVENT_AFTER_RUN_ENDS event **/
-		//void FireRunEndsEvent() ;
-
-		/** Multi-attribute support */
-		//{
 		tIMultiAttributeIterator* GetMultiAttributes(Error* pErr = 0);
 		IMultiAttribute* GetMultiAttribute(const char* attribute, Error* pErr = 0);
 		void SetMultiAttribute(const char* attribute, 
 			int priority,
 			Error* pErr = 0);
-		//}
 
 		egSKINumericIndifferentMode GetNumericIndifferentMode(Error* pErr = 0);
 		void SetNumericIndifferentMode(egSKINumericIndifferentMode m, Error* pErr = 0);
@@ -1162,19 +945,6 @@ namespace gSKI
 			Agent*           m_agent;
 			egSKIPhaseType    m_phase;
 		};
-
-		/** 
-		* @brief RunListener for phase Events
-		*/  /*
-		class PhaseListener : public IRunListener
-		{
-		public:
-		void HandleEvent(egSKIRunEventId eventId, Agent* agentPtr, egSKIPhaseType phase);
-		//??  { HandleKernelRunEvent ?}
-		private:
-		Agent* a;
-		}; 
-		*/
 
 		/** 
 		* @brief Event notifier for XML events
@@ -1300,30 +1070,6 @@ namespace gSKI
 
 	private:
 
-		/** 
-		* @brief Executes the low level details of each type of run
-		*/
-		//{
-		/*
-		egSKIRunResult step(egSKIRunType stepSize, unsigned long count);  
-		//egSKIRunResult  run(egSKIRunType runType, unsigned long maxSteps);
-		void preStepNotifications();
-		bool postStepNotifications();
-		void preStepNotificationsSoar7();
-		bool postStepNotificationsSoar7();
-		*/
-		//}
-
-		/** 
-		* @brief Returns true if the number of steps passed in is equal to maxSteps.
-		*
-		* This method is needed because steps can be a 0 pointer.  This method handles
-		*  the additional work necessary to keep the test safe.  A 0 steps pointer
-		*  causes a return of false.
-		*/
-		//  Need to do a little more work to support elaborations in Soar 8, since
-		//  input, decide, and propose count as an elaboration also.  should they?
-
 		bool          maxStepsReached(unsigned long* steps, unsigned long maxSteps)
 		{
 			return (steps && (*steps >= maxSteps))? true: false;
@@ -1358,8 +1104,6 @@ namespace gSKI
 		/**  struct defined for RunEvent userdata **/
 		struct			   RunEventCallbackData {Agent * a; egSKIRunEventId eventId;};
 
-		//PhaseListener*       m_phaseListener;     /**< Listens for the BEFORE/AFTER phase events */
-
 		/* RPM 9/06 added to keep track of eventInfo's so they can be released */
 		std::map<egSKIRunEventId, RunEventCallbackData*> m_RunEvents;
 
@@ -1382,22 +1126,11 @@ namespace gSKI
 
 		egSKIRunState         m_runState;          /**< Current agent run state */
 
-		//ConcatRhsFunction     m_ConcatRhs;
-		//InterruptRhsFunction  m_InterruptRhs;
-		//ExecRhsFunction		m_ExecRhs ;
-		//CmdRhsFunction		m_CmdRhs ;
-
-		/** List of all client defined rhs function */
-		//tRhsFunctionMap       m_rhsFunctions;
-
-		/** Statistic that can be used for debugging or scheduling */
-		//{
 		unsigned long         m_phaseCount ;
 		unsigned long         m_elaborationCount ;
 		unsigned long         m_decisionCount ;
 		unsigned long         m_outputCount ;
 		unsigned long			m_nilOutputCycles ;
-		//}
 
 		AgentPerformanceMonitor* m_pPerfMon;
 

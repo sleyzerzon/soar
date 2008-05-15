@@ -16,7 +16,6 @@
 #include "gSKI_Error.h"
 #include "gSKI_Agent.h"
 #include "gSKI_Enumerations.h"
-//#include "gSKI_SetActiveAgent.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_ProductionManager.h"
 
@@ -26,24 +25,9 @@
 #include "agent.h"
 #include "kernel_struct.h"
 
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_AgentManager);
-
 namespace gSKI 
 {
 
- 
-
-   /*
-   =============================
-    _                    _   __  __
-   / \   __ _  ___ _ __ | |_|  \/  | __ _ _ __   __ _  __ _  ___ _ __
-  / _ \ / _` |/ _ \ '_ \| __| |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|
- / ___ \ (_| |  __/ | | | |_| |  | | (_| | | | | (_| | (_| |  __/ |
-/_/   \_\__, |\___|_| |_|\__|_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|
-        |___/                                         |___/
-   =============================
-   */
    AgentManager::AgentManager(Kernel* krnl) : m_kernel(krnl), m_runManager(krnl)
    {
       m_runCompleteListener.SetAgentManager(this);
@@ -62,33 +46,18 @@ namespace gSKI
       }
    }
 
-   /*
-   =============================
-
-   =============================
-   */
    void AgentManager::AddAgentToRunList(Agent* agentToAdd, Error* err)
    {
       ClearError(err);
       m_runManager.AddAgentToRunList(agentToAdd);
    }
 
-   /*
-   =============================
-
-   =============================
-   */
    void AgentManager::RemoveAgentFromRunList(Agent* agentToAdd, Error* err)
    {
       ClearError(err);
       m_runManager.RemoveAgentFromRunList(agentToAdd);
    }
 
-   /*
-   =============================
-
-   =============================
-   */
    void AgentManager::AddAllAgentsToRunList(Error* err)
    {
       ClearError(err);
@@ -96,11 +65,6 @@ namespace gSKI
          m_runManager.AddAgentToRunList((*it).second);
    }
 
-   /*
-   =============================
-
-   =============================
-   */
    void AgentManager::RemoveAllAgentsFromRunList(Error* err)
    {
       ClearError(err);
@@ -108,38 +72,7 @@ namespace gSKI
          m_runManager.RemoveAgentFromRunList((*it).second);
    }
 
-   /*
-   =============================
- ____              ___        ____ _ _            _  _____ _                        _
-|  _ \ _   _ _ __ |_ _|_ __  / ___| (_) ___ _ __ | ||_   _| |__  _ __ ___  __ _  __| |
-| |_) | | | | '_ \ | || '_ \| |   | | |/ _ \ '_ \| __|| | | '_ \| '__/ _ \/ _` |/ _` |
-|  _ <| |_| | | | || || | | | |___| | |  __/ | | | |_ | | | | | | | |  __/ (_| | (_| |
-|_| \_\\__,_|_| |_|___|_| |_|\____|_|_|\___|_| |_|\__||_| |_| |_|_|  \___|\__,_|\__,_|
-   =============================
-   */
-   /*
-    egSKIRunResult AgentManager::RunInClientThread(egSKIRunType        runLength, 
-                                                   unsigned long       count,
-                                                   egSKIRunType runInterleave,
-                                                   Error*              err)
-   {
 
-      MegaAssert((count > 0) || (runLength == gSKI_RUN_FOREVER), "Cannot run agents for fewer than one steps.");
-      return m_runManager.Run(runLength, count, runInterleave, err);
-   }
-	*/
-
-
-   /*
-   =============================
- ___       _                             _      _    _ _
-|_ _|_ __ | |_ ___ _ __ _ __ _   _ _ __ | |_   / \  | | |
- | || '_ \| __/ _ \ '__| '__| | | | '_ \| __| / _ \ | | |
- | || | | | ||  __/ |  | |  | |_| | |_) | |_ / ___ \| | |
-|___|_| |_|\__\___|_|  |_|   \__,_| .__/ \__/_/   \_\_|_|
-                                  |_|
-   =============================
-   */
    bool AgentManager::InterruptAll(egSKIStopLocation    stopLoc, 
                                    Error*               err)
    {
@@ -162,16 +95,6 @@ namespace gSKI
       return true;
    }
 
-   /*
-   =============================
-  ____ _                  _    _ _ ___       _                             _
- / ___| | ___  __ _ _ __ / \  | | |_ _|_ __ | |_ ___ _ __ _ __ _   _ _ __ | |_ ___
-| |   | |/ _ \/ _` | '__/ _ \ | | || || '_ \| __/ _ \ '__| '__| | | | '_ \| __/ __|
-| |___| |  __/ (_| | | / ___ \| | || || | | | ||  __/ |  | |  | |_| | |_) | |_\__ \
- \____|_|\___|\__,_|_|/_/   \_\_|_|___|_| |_|\__\___|_|  |_|   \__,_| .__/ \__|___/
-                                                                    |_|
-   =============================
-   */
    void AgentManager::ClearAllInterrupts(Error* err)
    {
       Agent* a;
@@ -191,15 +114,6 @@ namespace gSKI
       }
    }
 
-   /*
-   =============================
- _   _       _ _      _    _ _
-| | | | __ _| | |_   / \  | | |
-| |_| |/ _` | | __| / _ \ | | |
-|  _  | (_| | | |_ / ___ \| | |
-|_| |_|\__,_|_|\__/_/   \_\_|_|
-   =============================
-   */
    void AgentManager::HaltAll(Error* err)
    {
       Agent* a;
@@ -219,16 +133,6 @@ namespace gSKI
       }
    }
 
-   /*
-   =============================
-  ____      _      _                    _   ___ _                 _
- / ___| ___| |_   / \   __ _  ___ _ __ | |_|_ _| |_ ___ _ __ __ _| |_ ___  _ __
-| |  _ / _ \ __| / _ \ / _` |/ _ \ '_ \| __|| || __/ _ \ '__/ _` | __/ _ \| '__|
-| |_| |  __/ |_ / ___ \ (_| |  __/ | | | |_ | || ||  __/ | | (_| | || (_) | |
- \____|\___|\__/_/   \_\__, |\___|_| |_|\__|___|\__\___|_|  \__,_|\__\___/|_|
-                       |___/
-   =============================
-   */
    tIAgentIterator* AgentManager::GetAgentIterator(Error* err)
    {
 		ClearError(err);
@@ -249,16 +153,6 @@ namespace gSKI
 		return pAgentIter;
    }
 
-   /*
-   =============================
-  ____      _      _                    _
- / ___| ___| |_   / \   __ _  ___ _ __ | |_
-| |  _ / _ \ __| / _ \ / _` |/ _ \ '_ \| __|
-| |_| |  __/ |_ / ___ \ (_| |  __/ | | | |_
- \____|\___|\__/_/   \_\__, |\___|_| |_|\__|
-                       |___/
-   =============================
-   */
    Agent* AgentManager::GetAgent(const char* name, Error* err)
    {
       ClearError(err);
@@ -280,19 +174,6 @@ namespace gSKI
       return agentIt->second;
    }
 
-   /*
-   =============================
- ____                                  _                    _   ____
-|  _ \ ___ _ __ ___   _____   _____   / \   __ _  ___ _ __ | |_| __ ) _   _
-| |_) / _ \ '_ ` _ \ / _ \ \ / / _ \ / _ \ / _` |/ _ \ '_ \| __|  _ \| | | |
-|  _ <  __/ | | | | | (_) \ V /  __// ___ \ (_| |  __/ | | | |_| |_) | |_| |
-|_| \_\___|_| |_| |_|\___/ \_/ \___/_/   \_\__, |\___|_| |_|\__|____/ \__, |
-| \ | | __ _ _ __ ___   ___                |___/                      |___/
-|  \| |/ _` | '_ ` _ \ / _ \
-| |\  | (_| | | | | | |  __/
-|_| \_|\__,_|_| |_| |_|\___|
-   =============================
-   */
    void AgentManager::RemoveAgentByName(const char *name, Error* err)
    {
       ClearError(err);
@@ -342,16 +223,6 @@ namespace gSKI
       }
    }
 
-   /*
-   =============================
- ____                                  _                    _
-|  _ \ ___ _ __ ___   _____   _____   / \   __ _  ___ _ __ | |_
-| |_) / _ \ '_ ` _ \ / _ \ \ / / _ \ / _ \ / _` |/ _ \ '_ \| __|
-|  _ <  __/ | | | | | (_) \ V /  __// ___ \ (_| |  __/ | | | |_
-|_| \_\___|_| |_| |_|\___/ \_/ \___/_/   \_\__, |\___|_| |_|\__|
-                                           |___/
-   =============================
-   */
    void AgentManager::RemoveAgent(Agent* agent, Error* err)
    {
       ClearError(err);
@@ -378,16 +249,6 @@ namespace gSKI
       SetError(err, gSKIERR_AGENT_DOES_NOT_EXIST);
    }
 
-   /*
-   =============================
-    _       _     _    _                    _
-   / \   __| | __| |  / \   __ _  ___ _ __ | |_
-  / _ \ / _` |/ _` | / _ \ / _` |/ _ \ '_ \| __|
- / ___ \ (_| | (_| |/ ___ \ (_| |  __/ | | | |_
-/_/   \_\__,_|\__,_/_/   \_\__, |\___|_| |_|\__|
-                           |___/
-   =============================
-   */
    Agent* AgentManager::AddAgent(agent* pSoarAgent, 
                                   const char*       prodFileName, 
                                   bool              learningOn,
@@ -403,10 +264,6 @@ namespace gSKI
       m_agents.insert(std::pair<std::string, Agent *>(tmpStr, _agent));
 
 
-//	  if ( prodFileName ) {
-//		_agent->GetProductionManager()->LoadSoarFile(prodFileName, err);
-//	  }
-      
       return _agent;
    }
 
@@ -417,11 +274,6 @@ namespace gSKI
       m_agentListeners.Notify(gSKIEVENT_AFTER_AGENT_CREATED, nf);
    }
 
-   /*
-   =============================
-
-   =============================
-   */
    void AgentManager::AddAgentListener(egSKIAgentEventId eventId, 
                                      IAgentListener*     listener, 
                                      bool                allowAsynch,
@@ -430,11 +282,6 @@ namespace gSKI
       AddListenerToManager(m_agentListeners, eventId, listener, err);
    }
 
-   /*
-   =============================
-
-   =============================
-   */
    void AgentManager::RemoveAgentListener(egSKIAgentEventId  eventId,
                                         IAgentListener*      listener,
                                         Error*               err)
@@ -442,11 +289,6 @@ namespace gSKI
       RemoveListenerFromManager(m_agentListeners, eventId, listener, err);
    }
 
-   /*
-   =============================
-
-   =============================
-   */
    void AgentManager::AgentRunCompletedListener::HandleEvent(egSKIRunEventId eventId, Agent* agentPtr, egSKIPhaseType phase)
    {
       MegaAssert(eventId == gSKIEVENT_AFTER_RUN_ENDS, "Getting an unexpected event in the agent removal listener.");
@@ -455,5 +297,5 @@ namespace gSKI
 
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
+
 

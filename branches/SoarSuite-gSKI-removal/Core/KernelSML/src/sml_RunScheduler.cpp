@@ -415,7 +415,7 @@ bool RunScheduler::AreAllOutputPhasesComplete()
 		{
 			AgentSML* pAgentSML = iter->second ;	
 			if (pAgentSML->WasAgentOnRunList() && 	
-				(gSKI_RUNSTATE_HALTED != (pAgentSML->GetRunState())) &&	
+				(sml_RUNSTATE_HALTED != (pAgentSML->GetRunState())) &&	
 				pAgentSML->HasCompletedOutputPhase())	
 				return true;
 		}
@@ -491,10 +491,10 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 				// as in Bug 648, it's possible that a client has requested STOP_AFTER_DECISION
 				// while the agent was stopped at the m_StopBeforePhase, yet the agent run logic has
 				// dropped thru to this point without generating the interrupt yet.
-				if ((m_StopBeforePhase == phase) && (pAgent->GetRunState() == gSKI_RUNSTATE_STOPPED) &&
+				if ((m_StopBeforePhase == phase) && (pAgent->GetRunState() == sml_RUNSTATE_STOPPED) &&
 					(pAgent->GetInterruptFlags() & gSKI_STOP_AFTER_DECISION_CYCLE))
 				{
-					pAgent->SetRunState(gSKI_RUNSTATE_INTERRUPTED);
+					pAgent->SetRunState(sml_RUNSTATE_INTERRUPTED);
 					runResult = pAgent->StepInClientThread(sml_PHASE, pError) ; // force interrupt
 				}					
 
@@ -669,7 +669,7 @@ bool RunScheduler::AnAgentHaltedDuringRun()
 		{
 			AgentSML* pAgent = pAgentSML ;
 			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			if (pAgent->GetRunState() == gSKI_RUNSTATE_HALTED) return true;
+			if (pAgent->GetRunState() == sml_RUNSTATE_HALTED) return true;
 		}
 	}
 	return false;
@@ -865,11 +865,11 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	
 				   // Have to test the run state to find out if we are still ok to keep running
 			       // (not sure if runResult provides this as well, but they're from different enums).
-				   egSKIRunState runState = pAgentSML->GetRunState() ;
+				   smlRunState runState = pAgentSML->GetRunState() ;
 
 				// An agent should return "stopped" if it's just pausing in the middle of a run
 				// before we run it for the next phase.  Anything else means this agent is done running.
-				if (runState != gSKI_RUNSTATE_STOPPED || agentFinishedRun)
+				if (runState != sml_RUNSTATE_STOPPED || agentFinishedRun)
 				{
 					pAgentSML->RemoveAgentFromRunList() ;
 					pAgentSML->SetResultOfRun(runResult) ;
