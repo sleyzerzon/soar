@@ -27,11 +27,8 @@ namespace gSKI
       */
       MultiAttribute(Agent* pAgent, const char* attribute, int priority);
 
-      /** Implement IMultiAttribute */
-      //{
       virtual const char* GetAttributeName(Error *pErr = 0) const; 
       virtual int GetMatchingPriority(Error *pErr = 0) const;
-      //}
 
    private:
       Agent* m_pAgent;           /// Owning agent

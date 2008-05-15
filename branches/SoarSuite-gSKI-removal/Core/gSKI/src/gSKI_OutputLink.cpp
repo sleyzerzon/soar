@@ -29,18 +29,8 @@
 #include <iostream>
 #include <algorithm>
 
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_OutputLink);
-
-
 namespace gSKI
 {
-
-   /*
-     ===============================
-
-     ===============================
-   */
  
   OutputLink::OutputLink(Agent* agent):
     m_agent(agent),
@@ -62,12 +52,6 @@ namespace gSKI
 	 */
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    OutputLink::~OutputLink() 
    {
 	   /*
@@ -78,12 +62,6 @@ namespace gSKI
 				"output-link");
 	  */
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    void OutputLink::AddOutputProcessor(const char* attributePath,
 				       IOutputProcessor* processor,
@@ -98,12 +76,6 @@ namespace gSKI
       m_processormap.insert(std::pair<std::string, IOutputProcessor*>
                             (path, processor));
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    void OutputLink::RemoveOutputProcessor(const char* attributePath,
                                           IOutputProcessor* processor,
@@ -130,12 +102,6 @@ namespace gSKI
 
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    void OutputLink::GetRootObject(IWMObject** rootObject, Error* error)
    {
       ClearError(error);
@@ -144,26 +110,6 @@ namespace gSKI
       m_memory.GetOutputRootObject(&obj);
       *rootObject = obj;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
-
-   // Inlined into header based on profiling data
-   //IWorkingMemory* OutputLink::GetOutputMemory(Error* error)
-   //{
-   //   ClearError(error);
-   //
-   //   return &m_memory;
-   //}
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    void OutputLink::OutputPhaseCallback( soar_callback_agent agent,
 					 soar_callback_event_id eventid,
@@ -211,12 +157,6 @@ namespace gSKI
 //	  olink->m_memory.NotifyWorkingMemoryListeners(gSKIEVENT_OUTPUT_PHASE_CALLBACK, change, oinfo->outputs) ;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    void OutputLink::InitialUpdate(io_wme* wmelist)
    {
       // Perform necessary functions
@@ -224,11 +164,6 @@ namespace gSKI
 
      ProcessIOWmes(wmelist);
    }
-   /*
-     ===============================
-
-     ===============================
-   */
 
    void OutputLink::Update(io_wme* wmelist)
    {
@@ -237,12 +172,6 @@ namespace gSKI
 
      ProcessIOWmes(wmelist);
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    void OutputLink::FinalUpdate(io_wme* wmelist)
    {
@@ -256,12 +185,6 @@ namespace gSKI
 
      //x->Release();
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    void OutputLink::ProcessIOWmes(io_wme* wmelist)
    {
@@ -301,11 +224,6 @@ namespace gSKI
       
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
    void OutputLink::InvokeOutputProcessors(Error * err) 
    {
       ClearError(err);

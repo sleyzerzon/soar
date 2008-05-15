@@ -21,20 +21,8 @@
 
 #include "symtab.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//
-//DEF_EXPOSE(gSKI_OutputWMObject);
-
 namespace gSKI 
 {
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    OutputWMObject::OutputWMObject(OutputWorkingMemory* manager,Symbol* sym):
       m_sym(sym),
@@ -53,12 +41,6 @@ namespace gSKI
       symbol_add_ref(m_sym);
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    OutputWMObject::~OutputWMObject() 
    {
      symbol_remove_ref(m_manager->GetSoarAgent(),
@@ -66,23 +48,12 @@ namespace gSKI
      m_gsym->Release();
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
    const ISymbol* OutputWMObject::GetId(Error* err) const
    {
       ClearError(err);
 
       return m_gsym;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    tIWMObjectIterator* OutputWMObject::GetObjectsReferencing(Error* err) const
    {
@@ -93,12 +64,6 @@ namespace gSKI
       return 0;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    tIWMObjectIterator* OutputWMObject::GetObjectsReferencedBy(Error* err) const
    {
       ClearError(err);
@@ -108,12 +73,6 @@ namespace gSKI
       return 0;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    tIWmeIterator* OutputWMObject::GetWmesReferencing(Error* err) const
    {
       ClearError(err);
@@ -122,12 +81,6 @@ namespace gSKI
 
       return 0;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    tIWmeIterator* OutputWMObject::GetWMEs(const char* attributeName,
                                           egSKISymbolType valueType,
@@ -155,24 +108,12 @@ namespace gSKI
       return new tWmeIter(matchingWmes);
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    egSKIWMObjectType OutputWMObject::GetObjectType(Error* err) const
    {
       ClearError(err);
 
       return gSKI_SIMPLE_OBJECT;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    IState* OutputWMObject::ToState(Error* err) const
    {
@@ -183,12 +124,6 @@ namespace gSKI
       return 0;
    }
 
-   /*
-     ===============================
-
-     ===============================
-   */
-
    bool OutputWMObject::HasBeenRemoved(Error* err) const
    {
       ClearError(err);
@@ -197,12 +132,6 @@ namespace gSKI
 
       return false;
    }
-
-   /*
-     ===============================
-
-     ===============================
-   */
 
    bool OutputWMObject::IsEqual(IWMObject* object, Error* err) const
    {
@@ -213,11 +142,6 @@ namespace gSKI
       return false;
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void OutputWMObject::ReInitialize() 
    {
       m_vwmes.clear();
@@ -225,41 +149,21 @@ namespace gSKI
       m_childmap.clear();
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void OutputWMObject::AddReferencedWme(OutputWme* wme)
    {
       m_vwmes.push_back(wme);
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void OutputWMObject::AddReferencedObject(OutputWMObject* obj, OutputWme* wme)
    {
       m_childmap.insert(std::pair<OutputWme*,OutputWMObject*>(wme, obj));
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    void OutputWMObject::AddReferencingObject(OutputWMObject* obj, OutputWme* wme)
    {
       m_parentmap.insert(std::pair<OutputWme*,OutputWMObject*>(wme, obj));
    }
 
-   /*
-     ===============================
-    
-     ===============================
-   */
    tIWMObjectIterator* 
    OutputWMObject::GetObjectsReferencedByAttribute(const std::string& attr) const
    {

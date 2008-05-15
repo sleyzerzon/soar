@@ -302,9 +302,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 			RemoveUpdateListener((smlUpdateEventId)id, pConnection) ;
 	} else if (IsStringEventID(id))	{
 		if (registerForEvent)
-			AddStringListener((egSKIStringEventId)id, pConnection) ;
+			AddStringListener((smlStringEventId)id, pConnection) ;
 		else
-			RemoveStringListener((egSKIStringEventId)id, pConnection) ;
+			RemoveStringListener((smlStringEventId)id, pConnection) ;
 	}
 	else if(IsPrintEventID(id)) {
 

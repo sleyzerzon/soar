@@ -26,7 +26,7 @@
 using namespace sml ;
 
 // Returns true if this is the first connection listening for this event
-bool StringListener::AddListener(egSKIStringEventId eventID, Connection* pConnection)
+bool StringListener::AddListener(smlStringEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
@@ -34,7 +34,7 @@ bool StringListener::AddListener(egSKIStringEventId eventID, Connection* pConnec
 }
 
 // Returns true if at least one connection remains listening for this event
-bool StringListener::RemoveListener(egSKIStringEventId eventID, Connection* pConnection)
+bool StringListener::RemoveListener(smlStringEventId eventID, Connection* pConnection)
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
@@ -48,7 +48,7 @@ void StringListener::OnKernelEvent(int eventIDIn, AgentSML* /*pAgentSML*/, void*
 	// They are all directly generated from SML.  If we later add kernel callbacks
 	// for this class of events they would come here.
 
-	egSKIStringEventId eventID = static_cast<egSKIStringEventId>(eventIDIn);
+	smlStringEventId eventID = static_cast<smlStringEventId>(eventIDIn);
 	StringListenerCallbackData* pCallbackData = static_cast<StringListenerCallbackData*>(pCallData);
 	assert( pCallbackData );
 
@@ -56,7 +56,7 @@ void StringListener::OnKernelEvent(int eventIDIn, AgentSML* /*pAgentSML*/, void*
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIStringEventId>::GetBegin(eventID, &connectionIter))
+	if (!EventManager<smlStringEventId>::GetBegin(eventID, &connectionIter))
 	{
 		return;
 	}

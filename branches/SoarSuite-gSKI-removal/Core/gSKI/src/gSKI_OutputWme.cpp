@@ -19,11 +19,6 @@
 #include "gSKI_Error.h"
 #include "MegaAssert.h"
 
-//
-// Explicit Export for this file.
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_OutputWme);
-
 namespace gSKI
 {
    OutputWme::OutputWme(OutputWorkingMemory* manager, wme* wme, IWMObject* valobj):

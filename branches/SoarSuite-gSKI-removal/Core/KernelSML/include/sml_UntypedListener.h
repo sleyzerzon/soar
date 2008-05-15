@@ -25,6 +25,7 @@ namespace sml {
 
 class KernelSML ;
 class Connection ;
+enum smlStringEventId;
 
 struct StringListenerCallbackData 
 {
@@ -33,7 +34,7 @@ struct StringListenerCallbackData
 	int maxLengthReturnStringBuffer;	// Output, length of client owned buffer
 };
 
-class StringListener : public EventManager<egSKIStringEventId>
+class StringListener : public EventManager<smlStringEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
@@ -56,10 +57,10 @@ public:
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKIStringEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(smlStringEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKIStringEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(smlStringEventId eventID, Connection* pConnection) ;
 } ;
 
 }
