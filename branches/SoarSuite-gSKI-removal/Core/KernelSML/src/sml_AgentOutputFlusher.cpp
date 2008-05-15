@@ -57,19 +57,3 @@ void AgentOutputFlusher::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* p
 	if (m_pXMLListener)
 		m_pXMLListener->FlushOutput(static_cast<smlXMLEventId>(m_EventID)) ;
 }
-
-/*
-void AgentOutputFlusher::HandleEvent(smlRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase)
-{
-	assert(eventId == gSKIEVENT_AFTER_DECISION_CYCLE || eventId == gSKIEVENT_AFTER_RUNNING);
-	assert(agentPtr == m_pAgent);
-	unused(eventId);
-	unused(agentPtr);
-	unused(phase);
-
-	if (m_pPrintListener)
-		m_pPrintListener->FlushOutput((egSKIPrintEventId)m_EventID);
-	if (m_pXMLListener)
-		m_pXMLListener->FlushOutput((smlXMLEventId)m_EventID) ;
-}
-*/

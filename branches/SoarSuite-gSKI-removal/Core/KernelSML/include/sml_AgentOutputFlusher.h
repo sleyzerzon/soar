@@ -37,8 +37,6 @@ public:
 	virtual ~AgentOutputFlusher();
 
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
-
-//	virtual void HandleEvent(smlRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase);
 };
 
 }
