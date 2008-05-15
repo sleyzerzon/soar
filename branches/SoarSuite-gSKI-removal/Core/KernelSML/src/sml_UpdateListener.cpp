@@ -26,7 +26,7 @@
 using namespace sml ;
 
 // Returns true if this is the first connection listening for this event
-bool UpdateListener::AddListener(egSKIUpdateEventId eventID, Connection* pConnection)
+bool UpdateListener::AddListener(smlUpdateEventId eventID, Connection* pConnection)
 {
 	bool first = BaseAddListener(eventID, pConnection) ;
 
@@ -34,7 +34,7 @@ bool UpdateListener::AddListener(egSKIUpdateEventId eventID, Connection* pConnec
 }
 
 // Returns true if at least one connection remains listening for this event
-bool UpdateListener::RemoveListener(egSKIUpdateEventId eventID, Connection* pConnection)
+bool UpdateListener::RemoveListener(smlUpdateEventId eventID, Connection* pConnection)
 {
 	bool last = BaseRemoveListener(eventID, pConnection) ;
 
@@ -48,13 +48,13 @@ void UpdateListener::OnKernelEvent(int eventIDIn, AgentSML* /*pAgentSML*/, void*
 	// They are all directly generated from SML.  If we later add kernel callbacks
 	// for this class of events they would come here.
 
-	egSKIUpdateEventId eventID = static_cast<egSKIUpdateEventId>(eventIDIn);
+	smlUpdateEventId eventID = static_cast<smlUpdateEventId>(eventIDIn);
 	int* pRunFlags = static_cast<int*>(pCallData);
 	assert(pRunFlags);
 
 	// Get the first listener for this event (or return if there are none)
 	ConnectionListIter connectionIter ;
-	if (!EventManager<egSKIUpdateEventId>::GetBegin(eventID, &connectionIter))
+	if (!EventManager<smlUpdateEventId>::GetBegin(eventID, &connectionIter))
 		return ;
 
 	// We need the first connection for when we're building the message.  Perhaps this is a sign that

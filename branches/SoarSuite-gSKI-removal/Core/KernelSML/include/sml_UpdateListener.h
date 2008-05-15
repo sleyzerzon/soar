@@ -25,8 +25,9 @@ namespace sml {
 
 class KernelSML ;
 class Connection ;
+enum smlUpdateEventId;
 
-class UpdateListener : public EventManager<egSKIUpdateEventId>
+class UpdateListener : public EventManager<smlUpdateEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
@@ -49,10 +50,10 @@ public:
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;
 
 	// Returns true if this is the first connection listening for this event
-	virtual bool AddListener(egSKIUpdateEventId eventID, Connection* pConnection) ;
+	virtual bool AddListener(smlUpdateEventId eventID, Connection* pConnection) ;
 
 	// Returns true if at least one connection remains listening for this event
-	virtual bool RemoveListener(egSKIUpdateEventId eventID, Connection* pConnection) ;
+	virtual bool RemoveListener(smlUpdateEventId eventID, Connection* pConnection) ;
 } ;
 
 }

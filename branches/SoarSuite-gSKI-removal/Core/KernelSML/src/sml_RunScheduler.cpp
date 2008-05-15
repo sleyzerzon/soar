@@ -587,7 +587,7 @@ void RunScheduler::TestForFiringUpdateWorldEvents()
 		if (AreAllOutputPhasesComplete())
 		{
 			// If so fire the after_all_output_phases event
-			m_pKernelSML->FireUpdateListenerEvent(gSKIEVENT_AFTER_ALL_OUTPUT_PHASES, m_RunFlags) ;
+			m_pKernelSML->FireUpdateListenerEvent(smlEVENT_AFTER_ALL_OUTPUT_PHASES, m_RunFlags) ;
 
 			// Then clear the completed output flags so we can repeat the process.
 			for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
@@ -602,7 +602,7 @@ void RunScheduler::TestForFiringUpdateWorldEvents()
 				m_AllGeneratedOutputEventFired = true ;
 
 				// If so fire the after_all_generated_output event
-				m_pKernelSML->FireUpdateListenerEvent(gSKIEVENT_AFTER_ALL_GENERATED_OUTPUT, m_RunFlags) ;
+				m_pKernelSML->FireUpdateListenerEvent(smlEVENT_AFTER_ALL_GENERATED_OUTPUT, m_RunFlags) ;
 
 				// Then clear the generated output flags and repeat the process.
 				for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)

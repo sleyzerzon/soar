@@ -297,9 +297,9 @@ bool KernelSML::HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommand
 
 	} else if (IsUpdateEventID(id))	{
 		if (registerForEvent)
-			AddUpdateListener((egSKIUpdateEventId)id, pConnection) ;
+			AddUpdateListener((smlUpdateEventId)id, pConnection) ;
 		else
-			RemoveUpdateListener((egSKIUpdateEventId)id, pConnection) ;
+			RemoveUpdateListener((smlUpdateEventId)id, pConnection) ;
 	} else if (IsStringEventID(id))	{
 		if (registerForEvent)
 			AddStringListener((egSKIStringEventId)id, pConnection) ;

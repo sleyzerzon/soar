@@ -14,11 +14,6 @@
 *********************************************************************/
 #include "gSKI_MapIterator.h"
 
-
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_MapIterator);
-
-
 namespace gSKI 
 {
 

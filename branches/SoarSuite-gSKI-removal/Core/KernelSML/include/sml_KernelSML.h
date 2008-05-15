@@ -241,17 +241,17 @@ public:
 	*************************************************************/
 	void AddSystemListener(smlSystemEventId eventID, Connection* pConnection)	 { m_SystemListener.AddListener(eventID, pConnection) ; }
 	void AddAgentListener(smlAgentEventId eventID, Connection* pConnection)	 { m_AgentListener.AddListener(eventID, pConnection) ; }
-	void AddUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection)	 { m_UpdateListener.AddListener(eventID, pConnection) ; }
+	void AddUpdateListener(smlUpdateEventId eventID, Connection* pConnection)	 { m_UpdateListener.AddListener(eventID, pConnection) ; }
 	void AddStringListener(egSKIStringEventId eventID, Connection* pConnection)  { m_StringListener.AddListener(eventID, pConnection) ; }
 	void RemoveSystemListener(smlSystemEventId eventID, Connection* pConnection) { m_SystemListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveAgentListener(smlAgentEventId eventID, Connection* pConnection)   { m_AgentListener.RemoveListener(eventID, pConnection) ; }
-	void RemoveUpdateListener(egSKIUpdateEventId eventID, Connection* pConnection) { m_UpdateListener.RemoveListener(eventID, pConnection) ; }
+	void RemoveUpdateListener(smlUpdateEventId eventID, Connection* pConnection) { m_UpdateListener.RemoveListener(eventID, pConnection) ; }
 	void RemoveStringListener(egSKIStringEventId eventID, Connection* pConnection) { m_StringListener.RemoveListener(eventID, pConnection) ; }
 
 	/*************************************************************
 	* @brief	Notify listeners that this event has occured.
 	*************************************************************/
-	void FireUpdateListenerEvent(egSKIUpdateEventId eventID, int runFlags)	
+	void FireUpdateListenerEvent(smlUpdateEventId eventID, int runFlags)	
 	{ 
 		m_UpdateListener.OnKernelEvent(eventID, 0, &runFlags) ; 
 	}

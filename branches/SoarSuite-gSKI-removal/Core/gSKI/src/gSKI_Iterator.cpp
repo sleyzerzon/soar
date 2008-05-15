@@ -15,10 +15,6 @@
 #include "gSKI_Iterator.h"
 
 
-//#include "MegaUnitTest.h"
-//DEF_EXPOSE(gSKI_Iterator);
-
-
 namespace gSKI 
 {
 
