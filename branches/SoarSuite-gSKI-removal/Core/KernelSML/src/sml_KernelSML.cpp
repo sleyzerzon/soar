@@ -774,7 +774,7 @@ void KernelSML::PrintDebugSymbol(Symbol* pSymbol, bool refCounts ) {
 // and we pass through an input-phase.
 static inline void RecordWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetName() ) ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetSoarAgent()->name ) ;
 
 	pAgentSML->RecordLongTimeTag( clientTimeTag, wme ) ;
 
@@ -784,7 +784,7 @@ static inline void RecordWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long
 static inline void RemoveWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
 	unused(wme) ;
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetName() ) ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetSoarAgent()->name ) ;
 
 	pAgentSML->RemoveLongTimeTag( clientTimeTag ) ;
 

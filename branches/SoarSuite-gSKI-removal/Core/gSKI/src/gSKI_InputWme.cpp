@@ -26,6 +26,9 @@
 #include "gSKI_Symbol.h"
 #include "gSKI_Error.h"
 #include "MegaAssert.h"
+#include "gSKI_EnumRemapping.h"
+
+#include "agent.h"
 
 #ifdef DEBUG_UPDATE
 #include "..\..\ConnectionSML\include\sml_Utils.h"	// For sml::PrintDebugFormat
@@ -156,7 +159,7 @@ namespace gSKI
   bool InputWme::Update(bool forceAdds, bool forceRemoves)
   {
      // Adding the WME directly to working memory if were in the input or output phase
-     egSKIPhaseType curphase = m_manager->GetAgent()->GetCurrentPhase();
+	  egSKIPhaseType curphase = EnumRemappings::ReMapPhaseType(m_manager->GetAgent()->GetSoarAgent()->current_phase,0);
 	 
 	 bool doAdds    = ((curphase == gSKI_INPUT_PHASE && !forceRemoves )|| forceAdds) ;
 	 bool doRemoves = ((curphase == gSKI_INPUT_PHASE && !forceAdds) || forceRemoves) ;

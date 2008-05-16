@@ -29,7 +29,6 @@
 #include "rhsfun.h"
 #include "production.h" // for struct multi_attributes
 #include "print.h"      // for symboltostring
-#include "gSKI_AgentPerformanceMonitor.h"
 #include "gSKI_MultiAttribute.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "decide.h"
@@ -236,55 +235,55 @@ namespace gSKI
 
    }
 
-   bool Agent::AddClientRhsFunction(RhsFunction* rhsFunction, 
-                                    Error*        err)
-   {
-      ClearError(err);
-
-      // Tell Soar about it
-      std::vector<char> tmpBuffer(rhsFunction->GetName(), rhsFunction->GetName() + strlen(rhsFunction->GetName()) + 1);
-      add_rhs_function (m_agent, 
-                        make_sym_constant(m_agent, &tmpBuffer[0]),
-                        rhsFunctionProxy,
-                        rhsFunction->GetNumExpectedParameters(),
-                        rhsFunction->IsValueReturned(),
-                        true,
-                        static_cast<void*>(rhsFunction));
-
-      return false;
-   }
-
-   bool Agent::RemoveClientRhsFunction(const char* szName, Error* err)
-   {
-      ClearError(err);
-   
-      // Tell the kernel we are done listening.
-      std::vector<char> tmpBuffer(szName, szName + strlen(szName) + 1);
-
-	  //RPM 9/06: removed symbol ref so symbol is released properly
-	  Symbol* tmp = make_sym_constant(m_agent, &tmpBuffer[0]);
-      remove_rhs_function(m_agent, tmp);
-	  symbol_remove_ref (m_agent, tmp);
-
-      // Do our stuff
-      //m_rhsFunctions.erase(it);
-
-      return false;
-   }
-
-   const char* Agent::GetName(Error* err)
-   {
-      ClearError(err);
-
-      return m_agent->name;
-   }
-
+//   bool Agent::AddClientRhsFunction(RhsFunction* rhsFunction, 
+//                                    Error*        err)
+//   {
+//      ClearError(err);
+//
+//      // Tell Soar about it
+//      std::vector<char> tmpBuffer(rhsFunction->GetName(), rhsFunction->GetName() + strlen(rhsFunction->GetName()) + 1);
+//      add_rhs_function (m_agent, 
+//                        make_sym_constant(m_agent, &tmpBuffer[0]),
+//                        rhsFunctionProxy,
+//                        rhsFunction->GetNumExpectedParameters(),
+//                        rhsFunction->IsValueReturned(),
+//                        true,
+//                        static_cast<void*>(rhsFunction));
+//
+//      return false;
+//   }
+//
+//   bool Agent::RemoveClientRhsFunction(const char* szName, Error* err)
+//   {
+//      ClearError(err);
+//   
+//      // Tell the kernel we are done listening.
+//      std::vector<char> tmpBuffer(szName, szName + strlen(szName) + 1);
+//
+//	  //RPM 9/06: removed symbol ref so symbol is released properly
+//	  Symbol* tmp = make_sym_constant(m_agent, &tmpBuffer[0]);
+//      remove_rhs_function(m_agent, tmp);
+//	  symbol_remove_ref (m_agent, tmp);
+//
+//      // Do our stuff
+//      //m_rhsFunctions.erase(it);
+//
+//      return false;
+//   }
+//
+//   const char* Agent::GetName(Error* err)
+//   {
+//      ClearError(err);
+//
+//      return m_agent->name;
+//   }
+//
    IInputLink* Agent::GetInputLink(Error* err)
    {
       ClearError(err);
       return m_inputlink;
    }
-
+//
    IOutputLink* Agent::GetOutputLink(Error* err)
    {
       ClearError(err);
@@ -296,438 +295,438 @@ namespace gSKI
       ClearError(err);
       return m_workingMemory;
    }
-
-   bool Agent::IsLearningOn(Error* err)
-   {
-      ClearError(err);
-      return m_agent->sysparams[LEARNING_ON_SYSPARAM] ? true : false;
-   }
-
-   void Agent::SetLearning(bool on, Error* err)
-   {
-      ClearError(err);
-      m_agent->sysparams[LEARNING_ON_SYSPARAM] = on;
-   }
- 
-   int Agent::GetMaxChunks(Error* err /*= 0*/)
-   {
-      ClearError(err);
-      return m_agent->sysparams[MAX_CHUNKS_SYSPARAM];
-   }
-   void Agent::SetMaxChunks(int maxChunks, Error* err /*= 0*/)
-   {
-      ClearError(err);
-      m_agent->sysparams[MAX_CHUNKS_SYSPARAM] = maxChunks;
-   }
-
-   int Agent::GetMaxElaborations(Error* err /*= 0*/)
-   {
-      ClearError(err);
-      return m_agent->sysparams[MAX_ELABORATIONS_SYSPARAM];
-   }
-   void Agent::SetMaxElaborations(int maxElabs, Error* err /*= 0*/)
-   {
-      ClearError(err);
-      m_agent->sysparams[MAX_ELABORATIONS_SYSPARAM] = maxElabs;
-   }
-
-   int Agent::GetMaxNilOutputCycles(Error* err /*= 0*/)
-   {
-      ClearError(err);
-      return m_agent->sysparams[MAX_NIL_OUTPUT_CYCLES_SYSPARAM];
-   }
-   void Agent::SetMaxNilOutputCycles(int maxNils, Error* err /*= 0*/)
-   {
-      ClearError(err);
-      m_agent->sysparams[MAX_NIL_OUTPUT_CYCLES_SYSPARAM] = maxNils;
-   }
-
-   bool Agent::IsWaitingOnStateNoChange(Error* err)
-   {
-      ClearError(err);
-      return m_agent->waitsnc != 0;
-   }
-
-   void Agent::SetWaitOnStateNoChange(bool on, Error* err)
-   {
-      ClearError(err);
-      m_agent->waitsnc = on;
-   }
-
-   egSKIOSupportMode Agent::GetOSupportMode(Error* err)
-   {
-      ClearError(err);
-
-      egSKIOSupportMode m = gSKI_O_SUPPORT_MODE_4;
-      switch(m_agent->o_support_calculation_type)
-      {
-      case 0: m = gSKI_O_SUPPORT_MODE_0; break;
-      case 2: m = gSKI_O_SUPPORT_MODE_2; break;
-      case 3: m = gSKI_O_SUPPORT_MODE_3; break;
-      case 4: m = gSKI_O_SUPPORT_MODE_4; break;
-      default:
-         MegaAssert(false, "Invalid o-support-mode setting");
-      }
-      return m;
-   }
-
-   void Agent::SetOSupportMode(egSKIOSupportMode mode, Error* err) 
-   {
-      ClearError(err);
-	  switch (mode) 
-	  {
-		  case gSKI_O_SUPPORT_MODE_0:
-			  m_agent->o_support_calculation_type = 0;
-			  break;
-		  case gSKI_O_SUPPORT_MODE_2:
-			  m_agent->o_support_calculation_type = 2;
-			  break;
-		  case gSKI_O_SUPPORT_MODE_3:
-			  m_agent->o_support_calculation_type = 3;
-			  break;
-		  case gSKI_O_SUPPORT_MODE_4:
-			  m_agent->o_support_calculation_type = 4;
-			  break;
-		  default:
-			  MegaAssert(false, "Invalid o-support-mode");
-	  }
-   }
-
-   egSKIUserSelectType Agent::GetIndifferentSelection(Error* err /*= 0*/)
-   {
-      int us = m_agent->sysparams[USER_SELECT_MODE_SYSPARAM];
-
-      switch(us)
-      {
-      case USER_SELECT_FIRST  : return gSKI_USER_SELECT_FIRST;
-      case USER_SELECT_ASK    : return gSKI_USER_SELECT_ASK;
-      case USER_SELECT_RANDOM : return gSKI_USER_SELECT_RANDOM;
-      case USER_SELECT_LAST   : return gSKI_USER_SELECT_LAST;
-      default:
-         MegaAssert(false, "Invalid indifferent selection setting");
-         return gSKI_USER_SELECT_FIRST;
-      }
-   }
-
-   void Agent::SetIndifferentSelection(egSKIUserSelectType t, Error* err /*= 0*/)
-   {
-      int us = -1;
-      switch(t)
-      {
-      case gSKI_USER_SELECT_FIRST  : us = USER_SELECT_FIRST;   break;
-      case gSKI_USER_SELECT_ASK    : us = USER_SELECT_ASK;     break;
-      case gSKI_USER_SELECT_RANDOM : us = USER_SELECT_RANDOM;  break;
-      case gSKI_USER_SELECT_LAST   : us = USER_SELECT_LAST;    break;
-      default:
-         MegaAssert(false, "Invalid indifferent selection setting");
-      }
-      if(us != -1)
-      {
-         m_agent->sysparams[USER_SELECT_MODE_SYSPARAM] = us;
-      }
-   }
-
-   int Agent::GetDefaultWMEDepth(Error* err)
-   {
-	   return m_agent->default_wme_depth;
-   }
-
-   void Agent::SetDefaultWMEDepth(int d, Error* err)
-   {
-	   m_agent->default_wme_depth = d;
-   }
-
-   egSKIPhaseType Agent::GetCurrentPhase(Error* err)
-   {
-      ClearError(err);
-      // return m_nextPhase;
-	  // KJC:  shouldn't this really be 
-	  return EnumRemappings::ReMapPhaseType(m_agent->current_phase,0);
-	  // should we also set m_lastPhase??
-   }
-
-      void Agent::AddRhsFunctionChangeListener(egSKISystemEventId    nEventId, 
-                                        IRhsFunctionChangeListener*  pListener, 
-                                        bool                         bAllowAsynch,
-                                        Error*                       err)
-      {
-         ClearError(err);
-      
-      }
-
-
-      void Agent::RemoveRhsFunctionChangeListener(egSKISystemEventId    nEventId,
-                                           IRhsFunctionChangeListener*  pListener,
-                                           Error*                       err)
-      {
-         ClearError(err);
-      
-      }
-
-
-      void Agent::AddRhsFunctionListener(egSKISystemEventId  nEventId, 
-                                  IRhsFunctionListener* pListener, 
-                                  bool                  bAllowAsynch,
-                                  Error*                err)
-      {
-         ClearError(err);
-      
-      }
-
-
-      void Agent::AddRhsFunctionListenerNameFilter(egSKISystemEventId nEventId,
-                                            IRhsFunctionListener* pListener,
-                                            const char*           szRhsFuncNamePattern,
-                                            bool                  bNegate,
-                                            Error*                err)
-      {
-         ClearError(err);
-      
-      }
-
-      void Agent::RemoveRhsFunctionListener(egSKISystemEventId      nEventId,
-                                             IRhsFunctionListener*  pListener,
-                                             Error*                 err)
-      {
-         ClearError(err);
-
-      }
-
-
-      void Agent::RemoveRhsFunctionListenerFilters(egSKISystemEventId     nEventId,
-                                                    IRhsFunctionListener* pListener,
-                                                    Error*                err)
-      {
-      
-      }
-
-   void Agent::HandleKernelXMLCallback(unsigned long			  eventId, 
-                                            unsigned char         eventOccured,
-                                            void*                 object, 
-                                            agent*                soarAgent, 
-                                            void*                 data)
-   {
-	   assert(false); // should not be used
-
-	  //Agent* a = static_cast<Agent*>(object);
-   //   gSKI_K_XMLCallbackData* xml_data = static_cast<gSKI_K_XMLCallbackData*>(data);
-
-   //   // We have to change the the event id from a kernel id to a gSKI id
-
-	  //XMLNotifier xn(a, xml_data->funcType, xml_data->attOrTag, xml_data->value);
-   //   a->m_XMLListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_XMLEventId(eventId), xn);
-   }
-
-
-	// Called when a "RunEvent" occurs in the kernel
-   void Agent::HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase)
-   {
-   }
-
-   /*
-   =========================
-	HandleRunEventCallback
-   =========================
-   */
-   void Agent::HandleKernelRunEventCallback( soar_callback_agent agent,
-											 soar_callback_event_id eventid,
-					                         soar_callback_data callbackdata,
-                                             soar_call_data calldata )
-   {
-	   // Kernel Decision cycle events have NULL calldata, so do phases...at least for now
-	   // callbackdata holds the agent object and eventId
-	RunEventCallbackData * e = static_cast<RunEventCallbackData*>(callbackdata);
-	Agent*            a = e->a;
-	egSKIRunEventId eventId = e->eventId;
-
-
-	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
-    a->m_runListeners.Notify(eventId, rn);
-
-	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
-		(IsBEFOREPhaseEventID(eventId)))
-	{
-		a->m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED , rn);
-	}
-	else if ((a->m_runListeners.GetNumListeners(gSKIEVENT_AFTER_PHASE_EXECUTED) > 0) &&
-		(IsAFTERPhaseEventID(eventId)))
-	{
-		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
-	} 
-	
-   }
-
-   void Agent::DeleteRunEventCallbackData (soar_callback_data data)
-   {
-	   delete static_cast <Agent::RunEventCallbackData*>  (data); 
-   }
-
-   // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events 
-   void Agent::HandleEventStatic(egSKIRunEventId eventId, Agent* a, egSKIPhaseType phase)
-   {
-	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
- 
-	// KJC 12/1/05:  everything should be going thru HandleKernelRunEventCallback
-	//  or HandleRunEventCallback (for Elaborations only).
-	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
-		(IsBEFOREPhaseEventID(eventId)))
-	{
-		a->m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED , rn);
-	}
-	else if ((a->m_runListeners.GetNumListeners(gSKIEVENT_AFTER_PHASE_EXECUTED) > 0) &&
-		(IsAFTERPhaseEventID(eventId)))
-	{
-		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
-	} 
-}
-
-
-   // TODO: Flesh out this function (dummy body allows compilation)
-   IState* Agent::GetTopState(Error* err)
-   {
-      ClearError(err);
-
-      return 0;
-   }
-
-   // TODO: Flesh out this function (dummy body allows compilation)
-   IState* Agent::GetBottomState(Error* err)
-   {
-      ClearError(err);
-      
-      return 0;
-   }
-
-   tIMultiAttributeIterator* Agent::GetMultiAttributes(Error* pErr /*= 0*/)
-   {
-      typedef FwdContainerType< std::vector<IMultiAttribute * > >  tVec;
-      typedef IteratorWithRelease<tVec::V, tVec::t>  tIter;
-      
-      tVec::t attrs;
-      multi_attribute* m = m_agent->multi_attributes;
-      while(m)
-      {
-         char tmp[1024];
-         attrs.push_back(new MultiAttribute(this, 
-                                            symbol_to_string(m_agent, m->symbol, TRUE, tmp, 1024), 
-                                            m->value));
-         m = m->next;
-      }
-      return new tIter(attrs);
-   }
-
-   IMultiAttribute* Agent::GetMultiAttribute(const char* attribute, Error* pErr /*= 0*/)
-   {
-      multi_attribute* m = m_agent->multi_attributes;
-      std::vector<char> tmp(attribute, attribute + strlen(attribute) + 1);
-      Symbol* s = make_sym_constant(m_agent, &tmp[0]);
-
-      while (m) 
-      {
-         if (m->symbol == s) 
-         {
-            symbol_remove_ref(m_agent, s);
-            return new MultiAttribute(this, attribute, m->value);
-         }
-         m = m->next;
-      }
-      symbol_remove_ref(m_agent, s);
-      return 0;
-   }
-
-   void Agent::SetMultiAttribute(const char* attribute, 
-                                    int priority,
-                                    Error* pErr /*= 0*/)
-   {
-      multi_attribute* m = m_agent->multi_attributes;
-      std::vector<char> tmp(attribute, attribute + strlen(attribute) + 1);
-      Symbol* s = make_sym_constant(m_agent, &tmp[0]);
-
-      while (m) 
-      {
-         if (m->symbol == s) 
-         {
-            m->value = priority;
-            symbol_remove_ref(m_agent, s);
-            return;
-         }
-         m = m->next;
-      }
-      /* sym wasn't in the table if we get here, so add it */
-      m = (multi_attribute *) allocate_memory(m_agent, sizeof(multi_attribute), MISCELLANEOUS_MEM_USAGE);
-      m->value = priority;
-      m->symbol = s;
-      m->next = m_agent->multi_attributes;
-      m_agent->multi_attributes = m;
-   }
-
-
-   egSKINumericIndifferentMode Agent::GetNumericIndifferentMode(Error* pErr/* = 0*/) {
-
-      egSKINumericIndifferentMode m = gSKI_NUMERIC_INDIFFERENT_MODE_AVG;
-
-      switch(GetSoarAgent()->numeric_indifferent_mode) {
-         case NUMERIC_INDIFFERENT_MODE_AVG:
-            m = gSKI_NUMERIC_INDIFFERENT_MODE_AVG;
-            break;
-         case NUMERIC_INDIFFERENT_MODE_SUM:
-            m =  gSKI_NUMERIC_INDIFFERENT_MODE_SUM;
-            break;
-         default:
-            MegaAssert(false, "Invalid numeric indifferent mode");
-            break;
-      }
-
-      return m;
-   }
-
-   void Agent::SetNumericIndifferentMode(egSKINumericIndifferentMode m, Error* pErr/* = 0*/) {
-      switch(m) {
-         case gSKI_NUMERIC_INDIFFERENT_MODE_AVG:
-            GetSoarAgent()->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_AVG;
-            return;
-         case gSKI_NUMERIC_INDIFFERENT_MODE_SUM:
-            GetSoarAgent()->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_SUM;
-            return;
-         default:
-            MegaAssert(false, "Invalid numeric indifferent mode");
-      }
-   }
-
-   int Agent::GetAttributePreferencesMode(Error* err) 
-   {
-	   return GetSoarAgent()->attribute_preferences_mode;
-   }
-	
-   void Agent::SetAttributePreferencesMode(int mode, Error* err) 
-   {
-	   MegaAssert((mode >= 0) && (mode <= 2), "Attribute preferences mode must be 0, 1, or 2");
-	   GetSoarAgent()->attribute_preferences_mode = mode;
-   }
-      
-   int Agent::GetInputPeriod(Error* err) 
-   {
-	   return GetSoarAgent()->input_period;
-   }
-	
-   void Agent::SetInputPeriod(int period, Error* err) 
-   {
-	   MegaAssert(period >= 0, "Input period must be non-negative");
-	   GetSoarAgent()->input_period = period;
-   }
-      
-   bool Agent::GetOperand2Mode() {
-		return m_agent->operand2_mode ? true : false;
-   }
-
-   void Agent::SetOperand2Mode(bool mode) {
-		m_agent->operand2_mode = mode ? TRUE : FALSE;
-   }
-
-   extern agent* GetSoarAgentPtr(Agent* agent)
-   {
-      return ((Agent*)agent)->GetSoarAgent();
-   }
+//
+//   bool Agent::IsLearningOn(Error* err)
+//   {
+//      ClearError(err);
+//      return m_agent->sysparams[LEARNING_ON_SYSPARAM] ? true : false;
+//   }
+//
+//   void Agent::SetLearning(bool on, Error* err)
+//   {
+//      ClearError(err);
+//      m_agent->sysparams[LEARNING_ON_SYSPARAM] = on;
+//   }
+// 
+//   int Agent::GetMaxChunks(Error* err /*= 0*/)
+//   {
+//      ClearError(err);
+//      return m_agent->sysparams[MAX_CHUNKS_SYSPARAM];
+//   }
+//   void Agent::SetMaxChunks(int maxChunks, Error* err /*= 0*/)
+//   {
+//      ClearError(err);
+//      m_agent->sysparams[MAX_CHUNKS_SYSPARAM] = maxChunks;
+//   }
+//
+//   int Agent::GetMaxElaborations(Error* err /*= 0*/)
+//   {
+//      ClearError(err);
+//      return m_agent->sysparams[MAX_ELABORATIONS_SYSPARAM];
+//   }
+//   void Agent::SetMaxElaborations(int maxElabs, Error* err /*= 0*/)
+//   {
+//      ClearError(err);
+//      m_agent->sysparams[MAX_ELABORATIONS_SYSPARAM] = maxElabs;
+//   }
+//
+//   int Agent::GetMaxNilOutputCycles(Error* err /*= 0*/)
+//   {
+//      ClearError(err);
+//      return m_agent->sysparams[MAX_NIL_OUTPUT_CYCLES_SYSPARAM];
+//   }
+//   void Agent::SetMaxNilOutputCycles(int maxNils, Error* err /*= 0*/)
+//   {
+//      ClearError(err);
+//      m_agent->sysparams[MAX_NIL_OUTPUT_CYCLES_SYSPARAM] = maxNils;
+//   }
+//
+//   bool Agent::IsWaitingOnStateNoChange(Error* err)
+//   {
+//      ClearError(err);
+//      return m_agent->waitsnc != 0;
+//   }
+//
+//   void Agent::SetWaitOnStateNoChange(bool on, Error* err)
+//   {
+//      ClearError(err);
+//      m_agent->waitsnc = on;
+//   }
+//
+//   egSKIOSupportMode Agent::GetOSupportMode(Error* err)
+//   {
+//      ClearError(err);
+//
+//      egSKIOSupportMode m = gSKI_O_SUPPORT_MODE_4;
+//      switch(m_agent->o_support_calculation_type)
+//      {
+//      case 0: m = gSKI_O_SUPPORT_MODE_0; break;
+//      case 2: m = gSKI_O_SUPPORT_MODE_2; break;
+//      case 3: m = gSKI_O_SUPPORT_MODE_3; break;
+//      case 4: m = gSKI_O_SUPPORT_MODE_4; break;
+//      default:
+//         MegaAssert(false, "Invalid o-support-mode setting");
+//      }
+//      return m;
+//   }
+//
+//   void Agent::SetOSupportMode(egSKIOSupportMode mode, Error* err) 
+//   {
+//      ClearError(err);
+//	  switch (mode) 
+//	  {
+//		  case gSKI_O_SUPPORT_MODE_0:
+//			  m_agent->o_support_calculation_type = 0;
+//			  break;
+//		  case gSKI_O_SUPPORT_MODE_2:
+//			  m_agent->o_support_calculation_type = 2;
+//			  break;
+//		  case gSKI_O_SUPPORT_MODE_3:
+//			  m_agent->o_support_calculation_type = 3;
+//			  break;
+//		  case gSKI_O_SUPPORT_MODE_4:
+//			  m_agent->o_support_calculation_type = 4;
+//			  break;
+//		  default:
+//			  MegaAssert(false, "Invalid o-support-mode");
+//	  }
+//   }
+//
+//   egSKIUserSelectType Agent::GetIndifferentSelection(Error* err /*= 0*/)
+//   {
+//      int us = m_agent->sysparams[USER_SELECT_MODE_SYSPARAM];
+//
+//      switch(us)
+//      {
+//      case USER_SELECT_FIRST  : return gSKI_USER_SELECT_FIRST;
+//      case USER_SELECT_ASK    : return gSKI_USER_SELECT_ASK;
+//      case USER_SELECT_RANDOM : return gSKI_USER_SELECT_RANDOM;
+//      case USER_SELECT_LAST   : return gSKI_USER_SELECT_LAST;
+//      default:
+//         MegaAssert(false, "Invalid indifferent selection setting");
+//         return gSKI_USER_SELECT_FIRST;
+//      }
+//   }
+//
+//   void Agent::SetIndifferentSelection(egSKIUserSelectType t, Error* err /*= 0*/)
+//   {
+//      int us = -1;
+//      switch(t)
+//      {
+//      case gSKI_USER_SELECT_FIRST  : us = USER_SELECT_FIRST;   break;
+//      case gSKI_USER_SELECT_ASK    : us = USER_SELECT_ASK;     break;
+//      case gSKI_USER_SELECT_RANDOM : us = USER_SELECT_RANDOM;  break;
+//      case gSKI_USER_SELECT_LAST   : us = USER_SELECT_LAST;    break;
+//      default:
+//         MegaAssert(false, "Invalid indifferent selection setting");
+//      }
+//      if(us != -1)
+//      {
+//         m_agent->sysparams[USER_SELECT_MODE_SYSPARAM] = us;
+//      }
+//   }
+//
+//   int Agent::GetDefaultWMEDepth(Error* err)
+//   {
+//	   return m_agent->default_wme_depth;
+//   }
+//
+//   void Agent::SetDefaultWMEDepth(int d, Error* err)
+//   {
+//	   m_agent->default_wme_depth = d;
+//   }
+//
+//   egSKIPhaseType Agent::GetCurrentPhase(Error* err)
+//   {
+//      ClearError(err);
+//      // return m_nextPhase;
+//	  // KJC:  shouldn't this really be 
+//	  return EnumRemappings::ReMapPhaseType(m_agent->current_phase,0);
+//	  // should we also set m_lastPhase??
+//   }
+//
+//      void Agent::AddRhsFunctionChangeListener(egSKISystemEventId    nEventId, 
+//                                        IRhsFunctionChangeListener*  pListener, 
+//                                        bool                         bAllowAsynch,
+//                                        Error*                       err)
+//      {
+//         ClearError(err);
+//      
+//      }
+//
+//
+//      void Agent::RemoveRhsFunctionChangeListener(egSKISystemEventId    nEventId,
+//                                           IRhsFunctionChangeListener*  pListener,
+//                                           Error*                       err)
+//      {
+//         ClearError(err);
+//      
+//      }
+//
+//
+//      void Agent::AddRhsFunctionListener(egSKISystemEventId  nEventId, 
+//                                  IRhsFunctionListener* pListener, 
+//                                  bool                  bAllowAsynch,
+//                                  Error*                err)
+//      {
+//         ClearError(err);
+//      
+//      }
+//
+//
+//      void Agent::AddRhsFunctionListenerNameFilter(egSKISystemEventId nEventId,
+//                                            IRhsFunctionListener* pListener,
+//                                            const char*           szRhsFuncNamePattern,
+//                                            bool                  bNegate,
+//                                            Error*                err)
+//      {
+//         ClearError(err);
+//      
+//      }
+//
+//      void Agent::RemoveRhsFunctionListener(egSKISystemEventId      nEventId,
+//                                             IRhsFunctionListener*  pListener,
+//                                             Error*                 err)
+//      {
+//         ClearError(err);
+//
+//      }
+//
+//
+//      void Agent::RemoveRhsFunctionListenerFilters(egSKISystemEventId     nEventId,
+//                                                    IRhsFunctionListener* pListener,
+//                                                    Error*                err)
+//      {
+//      
+//      }
+//
+//   void Agent::HandleKernelXMLCallback(unsigned long			  eventId, 
+//                                            unsigned char         eventOccured,
+//                                            void*                 object, 
+//                                            agent*                soarAgent, 
+//                                            void*                 data)
+//   {
+//	   assert(false); // should not be used
+//
+//	  //Agent* a = static_cast<Agent*>(object);
+//   //   gSKI_K_XMLCallbackData* xml_data = static_cast<gSKI_K_XMLCallbackData*>(data);
+//
+//   //   // We have to change the the event id from a kernel id to a gSKI id
+//
+//	  //XMLNotifier xn(a, xml_data->funcType, xml_data->attOrTag, xml_data->value);
+//   //   a->m_XMLListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_XMLEventId(eventId), xn);
+//   }
+//
+//
+//	// Called when a "RunEvent" occurs in the kernel
+//   void Agent::HandleEvent(egSKIRunEventId eventId, gSKI::Agent* agentPtr, egSKIPhaseType phase)
+//   {
+//   }
+//
+//   /*
+//   =========================
+//	HandleRunEventCallback
+//   =========================
+//   */
+//   void Agent::HandleKernelRunEventCallback( soar_callback_agent agent,
+//											 soar_callback_event_id eventid,
+//					                         soar_callback_data callbackdata,
+//                                             soar_call_data calldata )
+//   {
+//	   // Kernel Decision cycle events have NULL calldata, so do phases...at least for now
+//	   // callbackdata holds the agent object and eventId
+//	RunEventCallbackData * e = static_cast<RunEventCallbackData*>(callbackdata);
+//	Agent*            a = e->a;
+//	egSKIRunEventId eventId = e->eventId;
+//
+//
+//	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
+//    a->m_runListeners.Notify(eventId, rn);
+//
+//	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
+//		(IsBEFOREPhaseEventID(eventId)))
+//	{
+//		a->m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED , rn);
+//	}
+//	else if ((a->m_runListeners.GetNumListeners(gSKIEVENT_AFTER_PHASE_EXECUTED) > 0) &&
+//		(IsAFTERPhaseEventID(eventId)))
+//	{
+//		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
+//	} 
+//	
+//   }
+//
+//   void Agent::DeleteRunEventCallbackData (soar_callback_data data)
+//   {
+//	   delete static_cast <Agent::RunEventCallbackData*>  (data); 
+//   }
+//
+//   // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events 
+//   void Agent::HandleEventStatic(egSKIRunEventId eventId, Agent* a, egSKIPhaseType phase)
+//   {
+//	RunNotifier rn(a, EnumRemappings::ReMapPhaseType(a->m_agent->current_phase,0));
+// 
+//	// KJC 12/1/05:  everything should be going thru HandleKernelRunEventCallback
+//	//  or HandleRunEventCallback (for Elaborations only).
+//	if ((a->m_runListeners.GetNumListeners(gSKIEVENT_BEFORE_PHASE_EXECUTED) > 0) &&
+//		(IsBEFOREPhaseEventID(eventId)))
+//	{
+//		a->m_runListeners.Notify(gSKIEVENT_BEFORE_PHASE_EXECUTED , rn);
+//	}
+//	else if ((a->m_runListeners.GetNumListeners(gSKIEVENT_AFTER_PHASE_EXECUTED) > 0) &&
+//		(IsAFTERPhaseEventID(eventId)))
+//	{
+//		a->m_runListeners.Notify(gSKIEVENT_AFTER_PHASE_EXECUTED , rn);
+//	} 
+//}
+//
+//
+//   // TODO: Flesh out this function (dummy body allows compilation)
+//   IState* Agent::GetTopState(Error* err)
+//   {
+//      ClearError(err);
+//
+//      return 0;
+//   }
+//
+//   // TODO: Flesh out this function (dummy body allows compilation)
+//   IState* Agent::GetBottomState(Error* err)
+//   {
+//      ClearError(err);
+//      
+//      return 0;
+//   }
+//
+//   tIMultiAttributeIterator* Agent::GetMultiAttributes(Error* pErr /*= 0*/)
+//   {
+//      typedef FwdContainerType< std::vector<IMultiAttribute * > >  tVec;
+//      typedef IteratorWithRelease<tVec::V, tVec::t>  tIter;
+//      
+//      tVec::t attrs;
+//      multi_attribute* m = m_agent->multi_attributes;
+//      while(m)
+//      {
+//         char tmp[1024];
+//         attrs.push_back(new MultiAttribute(this, 
+//                                            symbol_to_string(m_agent, m->symbol, TRUE, tmp, 1024), 
+//                                            m->value));
+//         m = m->next;
+//      }
+//      return new tIter(attrs);
+//   }
+//
+//   IMultiAttribute* Agent::GetMultiAttribute(const char* attribute, Error* pErr /*= 0*/)
+//   {
+//      multi_attribute* m = m_agent->multi_attributes;
+//      std::vector<char> tmp(attribute, attribute + strlen(attribute) + 1);
+//      Symbol* s = make_sym_constant(m_agent, &tmp[0]);
+//
+//      while (m) 
+//      {
+//         if (m->symbol == s) 
+//         {
+//            symbol_remove_ref(m_agent, s);
+//            return new MultiAttribute(this, attribute, m->value);
+//         }
+//         m = m->next;
+//      }
+//      symbol_remove_ref(m_agent, s);
+//      return 0;
+//   }
+//
+//   void Agent::SetMultiAttribute(const char* attribute, 
+//                                    int priority,
+//                                    Error* pErr /*= 0*/)
+//   {
+//      multi_attribute* m = m_agent->multi_attributes;
+//      std::vector<char> tmp(attribute, attribute + strlen(attribute) + 1);
+//      Symbol* s = make_sym_constant(m_agent, &tmp[0]);
+//
+//      while (m) 
+//      {
+//         if (m->symbol == s) 
+//         {
+//            m->value = priority;
+//            symbol_remove_ref(m_agent, s);
+//            return;
+//         }
+//         m = m->next;
+//      }
+//      /* sym wasn't in the table if we get here, so add it */
+//      m = (multi_attribute *) allocate_memory(m_agent, sizeof(multi_attribute), MISCELLANEOUS_MEM_USAGE);
+//      m->value = priority;
+//      m->symbol = s;
+//      m->next = m_agent->multi_attributes;
+//      m_agent->multi_attributes = m;
+//   }
+//
+//
+//   egSKINumericIndifferentMode Agent::GetNumericIndifferentMode(Error* pErr/* = 0*/) {
+//
+//      egSKINumericIndifferentMode m = gSKI_NUMERIC_INDIFFERENT_MODE_AVG;
+//
+//      switch(GetSoarAgent()->numeric_indifferent_mode) {
+//         case NUMERIC_INDIFFERENT_MODE_AVG:
+//            m = gSKI_NUMERIC_INDIFFERENT_MODE_AVG;
+//            break;
+//         case NUMERIC_INDIFFERENT_MODE_SUM:
+//            m =  gSKI_NUMERIC_INDIFFERENT_MODE_SUM;
+//            break;
+//         default:
+//            MegaAssert(false, "Invalid numeric indifferent mode");
+//            break;
+//      }
+//
+//      return m;
+//   }
+//
+//   void Agent::SetNumericIndifferentMode(egSKINumericIndifferentMode m, Error* pErr/* = 0*/) {
+//      switch(m) {
+//         case gSKI_NUMERIC_INDIFFERENT_MODE_AVG:
+//            GetSoarAgent()->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_AVG;
+//            return;
+//         case gSKI_NUMERIC_INDIFFERENT_MODE_SUM:
+//            GetSoarAgent()->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_SUM;
+//            return;
+//         default:
+//            MegaAssert(false, "Invalid numeric indifferent mode");
+//      }
+//   }
+//
+//   int Agent::GetAttributePreferencesMode(Error* err) 
+//   {
+//	   return GetSoarAgent()->attribute_preferences_mode;
+//   }
+//	
+//   void Agent::SetAttributePreferencesMode(int mode, Error* err) 
+//   {
+//	   MegaAssert((mode >= 0) && (mode <= 2), "Attribute preferences mode must be 0, 1, or 2");
+//	   GetSoarAgent()->attribute_preferences_mode = mode;
+//   }
+//      
+//   int Agent::GetInputPeriod(Error* err) 
+//   {
+//	   return GetSoarAgent()->input_period;
+//   }
+//	
+//   void Agent::SetInputPeriod(int period, Error* err) 
+//   {
+//	   MegaAssert(period >= 0, "Input period must be non-negative");
+//	   GetSoarAgent()->input_period = period;
+//   }
+//      
+//   bool Agent::GetOperand2Mode() {
+//		return m_agent->operand2_mode ? true : false;
+//   }
+//
+//   void Agent::SetOperand2Mode(bool mode) {
+//		m_agent->operand2_mode = mode ? TRUE : FALSE;
+//   }
+//
+//   extern agent* GetSoarAgentPtr(Agent* agent)
+//   {
+//      return ((Agent*)agent)->GetSoarAgent();
+//   }
 
 
 }

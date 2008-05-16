@@ -1031,6 +1031,5 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 
 void AgentSML::SetIAgent(gSKI::Agent* pIAgent)
 { 
-	assert( std::string( GetName() ) == std::string( pIAgent->GetName() ) );
 	m_pIAgent = pIAgent ; 
 }

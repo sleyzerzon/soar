@@ -893,7 +893,7 @@ void KernelSML::RemoveInputWMERecordsCallback(gSKI::Agent* pAgent, gSKI::IWme* p
 void KernelSML::RemoveInputWMERecords(gSKI::Agent* pAgent, gSKI::IWme* pWME)
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
-	AgentSML* pAgentSML = GetAgentSML( pAgent->GetName() ) ;
+	AgentSML* pAgentSML = GetAgentSML( pAgent->GetSoarAgent()->name ) ;
 
 	if (!pAgentSML || !pWME)
 		return;
