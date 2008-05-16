@@ -25,7 +25,7 @@
  *
  * !!!  In fact, the only events propagated to gSKI as of Soar 8.6, are:
  *			 gSKI_K_EVENT_XML_OUTPUT,
- *           gSKI_K_EVENT_PRINT_CALLBACK,
+ *           gSKI_K_EVENT_PRINT_CALLBACK, // converted gSKI removal
  *           gSKI_K_EVENT_PRODUCTION_* events
  *      gSKI doesn't register for any other event.  Instead, it mirrors
  *      the generation of these events within its own scheduler and makes
@@ -72,7 +72,7 @@ enum egSKIAgentEvents
    //gSKI_K_EVENT_ELABORATION_CYCLE,        /* Data: Phase type (char) & elab cycle count (int) ? */ // DONE!
    
    /* NOT Deprecated.  gSKI not close to removing this yet.  */
-   gSKI_K_EVENT_PRINT_CALLBACK,           /* Data: agent* & const char*     */   // DONE!
+   //gSKI_K_EVENT_PRINT_CALLBACK,           /* Data: agent* & const char*     */   // DONE!
 
    gSKI_K_EVENT_XML_OUTPUT,        /* Data: agent* & const char* & const char* & const char*    */ // DONE! ?
 

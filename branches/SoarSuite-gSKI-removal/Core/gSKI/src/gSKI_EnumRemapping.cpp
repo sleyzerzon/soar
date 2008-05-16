@@ -26,9 +26,7 @@ namespace gSKI
    unsigned short EnumRemappings::PrefTypeEnumMapping[NUM_PREFERENCE_TYPES];
    unsigned short EnumRemappings::PhaseTypeEnumMapping[NUM_PHASE_TYPES];
    unsigned short EnumRemappings::EventEnumMapping[gSKI_K_MAX_AGENT_EVENTS][2];
-   /* unsigned short EnumRemappings::EventEnumMapping[gSKI_K_MAX_AGENT_EVENTS]; */
    unsigned short EnumRemappings::RunEventEnumMapping[NUMBER_OF_MONITORABLE_CALLBACKS];
-   unsigned short EnumRemappings::PrintEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
    unsigned short EnumRemappings::XMLEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
    unsigned short EnumRemappings::ProductionTypeEnumMapping[NUM_PRODUCTION_TYPES];
    bool EnumRemappings::m_initialized = false;
@@ -104,7 +102,7 @@ namespace gSKI
 	  RunEventEnumMapping[AFTER_DECISION_CYCLE_CALLBACK]  = gSKIEVENT_AFTER_DECISION_CYCLE;
 	  RunEventEnumMapping[MAX_MEMORY_USAGE_CALLBACK] = gSKIEVENT_MAX_MEMORY_USAGE_EXCEEDED;
 
-	  PrintEventEnumMapping[gSKI_K_EVENT_PRINT_CALLBACK] = gSKIEVENT_PRINT;
+	  //PrintEventEnumMapping[gSKI_K_EVENT_PRINT_CALLBACK] = gSKIEVENT_PRINT;
 
 	  XMLEventEnumMapping[gSKI_K_EVENT_XML_OUTPUT] = gSKIEVENT_XML_TRACE_OUTPUT;
 
@@ -226,40 +224,6 @@ namespace gSKI
 	// Error condition
 	MegaAssert(false, "Could not map a Run event id");
 	return static_cast<egSKIRunEventId>(0);
-      }
-  }
-
-  egSKIAgentEvents EnumRemappings::RemapPrintEventType(egSKIPrintEventId eventId)
-   /** this goes from gSKI to Kernel Events **/
-   {
-      if(!m_initialized) 
-         Init();
-      switch (eventId)	 
-      {
-      case gSKIEVENT_PRINT:
-         return gSKI_K_EVENT_PRINT_CALLBACK;
-      default:
-         // Error condition
-         MegaAssert(false, "Could not map a print event id");
-         return static_cast<egSKIAgentEvents>(0);
-      }
-   }
-
-  egSKIPrintEventId EnumRemappings::Map_Kernel_to_gSKI_PrintEventId(unsigned long eventId)
-  { 
-	unsigned long gSKIeventId;
-
-    if(!m_initialized) 
-       Init();
-
-	gSKIeventId = (PrintEventEnumMapping[eventId]);
-    
-	if (IsPrintEventID(gSKIeventId)) {
-		return static_cast<egSKIPrintEventId>(gSKIeventId);
-      } else {
-	// Error condition
-	MegaAssert(false, "Could not map a print event id");
-	return static_cast<egSKIPrintEventId>(0);
       }
   }
 

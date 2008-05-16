@@ -34,7 +34,6 @@ namespace gSKI
       static egSKIProdType  ReMapProductionType(unsigned short);
  
 	  static egSKIProductionEventId Map_Kernel_to_gSKI_ProdEventId(unsigned long eventId, unsigned char occured);
-      static egSKIPrintEventId      Map_Kernel_to_gSKI_PrintEventId(unsigned long eventId);
 	  static egSKIXMLEventId		Map_Kernel_to_gSKI_XMLEventId(unsigned long eventId);
 	  static egSKIRunEventId		Map_Kernel_to_gSKI_RunEventId(unsigned long eventId, unsigned char occured);
  
@@ -52,7 +51,7 @@ namespace gSKI
       ////////////////////////////////////////////////////////////////
       // OPPOSITE DIRECTION MAPPINGS:  gSKI to Kernel...
       static egSKIAgentEvents RemapProductionEventType(egSKIProductionEventId eventId);
-      static egSKIAgentEvents RemapPrintEventType(egSKIPrintEventId eventId);
+      //static egSKIAgentEvents RemapPrintEventType(egSKIPrintEventId eventId);
 	  static egSKIAgentEvents RemapXMLEventType(egSKIXMLEventId eventId);
 	  static egSKIAgentEvents RemapRunEventType(egSKIRunEventId eventId);
 	  static SOAR_CALLBACK_TYPE KernelRunEventType(egSKIRunEventId eventId);
@@ -65,7 +64,7 @@ namespace gSKI
       static unsigned short PhaseTypeEnumMapping[NUM_PHASE_TYPES];
       static unsigned short EventEnumMapping[gSKI_K_MAX_AGENT_EVENTS][2];
       static unsigned short RunEventEnumMapping[NUMBER_OF_MONITORABLE_CALLBACKS];
-      static unsigned short PrintEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
+      //static unsigned short PrintEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
 	  static unsigned short XMLEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
       static unsigned short ProductionTypeEnumMapping[NUM_PRODUCTION_TYPES];
 

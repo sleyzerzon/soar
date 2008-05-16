@@ -882,20 +882,6 @@ namespace gSKI
 			IXMLListener*         listener,
 			Error*                err = 0);
 
-		/** 
-		* @brief Print callback support
-		*
-		* These are deprecated.  Do not use them.
-		*/ 
-		void AddPrintListener(egSKIPrintEventId        eventId, 
-			IPrintListener*          listener, 
-			bool                     allowAsynch = false,
-			Error*                   err         = 0);
-
-		void RemovePrintListener(egSKIPrintEventId     eventId,
-			IPrintListener*       listener,
-			Error*                err = 0);
-
 		tIMultiAttributeIterator* GetMultiAttributes(Error* pErr = 0);
 		IMultiAttribute* GetMultiAttribute(const char* attribute, Error* pErr = 0);
 		void SetMultiAttribute(const char* attribute, 
@@ -974,23 +960,6 @@ namespace gSKI
 			Agent*           m_agent;
 			const char*       m_msg;
 		};
-
-		/** 
-		* @brief Static function to handle callbacks for the print function.
-		*
-		* @param eventId  Id of the kernel level event that occured.
-		* @param eventOccured true if the event happened already, false if
-		*                      the event is about to happen
-		* @param object   Pointer to an Agent object (casted to void)
-		* @param soarAgent Pointer to the kernel level agent structure associated
-		*                    with this callback
-		* @param data      Callback data (in this case a const char*)
-		*/
-		static void HandleKernelPrintCallback(unsigned long         eventId, 
-			unsigned char         eventOccured,
-			void*                 object, 
-			agent*                soarAgent, 
-			void*                 data);
 
 		/** 
 		* @brief Static function to handle callbacks for the XML function.
