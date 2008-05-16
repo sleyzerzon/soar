@@ -514,7 +514,7 @@ void AgentSML::FireRunEvent(smlRunEventId eventId) {
 	// Trigger a callback from the kernel to propagate the event out to listeners.
 	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
 	int callbackEvent = KernelCallback::GetCallbackFromEventID(eventId) ;
-	soar_invoke_callbacks(m_agent, m_agent, (SOAR_CALLBACK_TYPE)callbackEvent,(soar_call_data) m_agent->current_phase);
+	soar_invoke_callbacks(m_agent, m_agent, (SOAR_CALLBACK_TYPE)callbackEvent,(soar_call_data) m_agent->current_phase); // BADBAD cast int to void*
 }
 
 void AgentSML::FireSimpleXML(char const* pMsg)
