@@ -14,66 +14,6 @@
 #ifndef GSKI_EVENT_SYSTEM_KERNEL_H
 #define GSKI_EVENT_SYSTEM_KERNEL_H
 
-/**
- * gski_event_system_kernel.h/c defines the event propagation routines that 
- *  tie the kernel to the gSKI project.
- *
- * These events and the data in them do not necessarily correspond to
- *  the events, callbacks, and data in the gSKI event system.  These
- *  events callback into gSKI, where gSKI translates the event into
- *  gSKI style listener events and notifies listeners.
- *
- * !!!  In fact, the only events propagated to gSKI as of Soar 8.6, are:
- *			 gSKI_K_EVENT_XML_OUTPUT,// converted gSKI removal
- *           gSKI_K_EVENT_PRINT_CALLBACK, // converted gSKI removal
- *           gSKI_K_EVENT_PRODUCTION_* events
- *      gSKI doesn't register for any other event.  Instead, it mirrors
- *      the generation of these events within its own scheduler and makes
- *      assumptions about Soar's execution cycle.  (KJC June 2005)
- *  
- * Only one object at a time can listen to any given event in the kernel.
- *  Propagation to listeners is handled by the gSKI objects.
- */
-
-/*
- * Kernel events are essentially global system events.  The callback
- *  functions for these cannot be stored in the agent structure because
- *  they are not associated with an existing agent.
- *
- * These shoudl be stored in a kernel object (as opposed to global data).
- */
-// THESE CAN ALL BE PROPAGATED FROM GSKI!!
-//enum egSKIKernelEvents
-//{
-//   gSKI_K_EVENT_KERNEL_SHUTDOWN = 0,      /* Data: Kernel* (when available) */
-//   gSKI_K_EVENT_KERNEL_RESTART,           /* Data: Kernel* (when available) */
-//   gSKI_K_EVENT_AGENT_ADDED,              /* Data: agent*                   */
-//   gSKI_K_EVENT_AGENT_REMOVED,            /* Data: agent*                   */ 
-//   gSKI_K_EVENT_THREAD_GROUP_RUN,         /* Data: Kernel* ??               */ 
-//   gSKI_K_EVENT_THREAD_GROUP_STOP,        /* Data: Kernel* ??               */
-//   gSKI_K_EVENT_RHS_FUNC_ADDED,           /* Data: Kernel* & rhs function   */ 
-//   gSKI_K_EVENT_RHS_FUNC_REMOVED,         /* Data: Kernel* & rhs function   */ 
-//   gSKI_K_EVENT_RHS_FUNC_EXECUTED,        /* Data: Kernel* & rhs function & sym params? & ret val? */
-//
-//   /* Must be the last value in this enumeration */
-//   gSKI_K_MAX_KERNEL_EVENTS       
-//};
-
-/**
- * List of the phases for the soar 8 kernel. 
- *  These are used for the phase callbacks.
- */
-enum egSKIPhases
-{
-   gSKI_K_INPUT_PHASE = 0,
-   gSKI_K_PROPOSAL_PHASE,
-   gSKI_K_DECISION_PHASE,
-   gSKI_K_APPLY_PHASE,
-   gSKI_K_OUTPUT_PHASE,
-   gSKI_K_PREFERENCE_PHASE,	// Soar 7 mode only
-   gSKI_K_WM_PHASE 			// Soar 7 mode only
-};
-
 /* We have to forward declare these to keep from having a circular reference */
 struct agent_struct;
 union  symbol_union;
@@ -133,36 +73,4 @@ typedef struct gSKI_K_WMObjectCallbackData_struct {
 
 } gSKI_K_WMObjectCallbackData;
 
-/** 
- * @brief Structure for decision cycle callbacks
- */
-typedef struct gSKI_K_PhaseCallbackData_struct {
-
-   /** Current phase of the decision cycle */
-   egSKIPhases                   phase_type;
-
-   /** Current decision cycle number */
-   unsigned int                  decision_cycles;
-
-   /** Current elaboration cycle number */
-   unsigned int                  elaboration_cycles;
-
-   /** Number of elaborations this cycle */
-   unsigned int                  elaborations_this_phase;
-
-} gSKI_K_PhaseCallbackData;
-
-//typedef struct gSKI_K_XMLCallbackData_struct {
-//
-//   /** Current XML function type (i.e. addTag, endTag, addAttributeValuePair */
-//   const char*                  funcType;
-//
-//   /** Current elaboration cycle number */
-//   const char*                  attOrTag;
-//
-//   /** Number of elaborations this cycle */
-//   const char*                  value;
-//
-//} gSKI_K_XMLCallbackData;
-//
 #endif
