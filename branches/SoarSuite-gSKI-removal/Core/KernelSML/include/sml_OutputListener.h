@@ -14,8 +14,6 @@
 
 #include "sml_EventManager.h"
 
-#include "gSKI_Events.h"
-
 #include <map>
 
 typedef struct io_wme_struct io_wme;
@@ -32,7 +30,7 @@ enum smlWorkingMemoryEventId;
 typedef std::map< long, bool >		OutputTimeTagMap ;
 typedef OutputTimeTagMap::iterator	OutputTimeTagIter ;
 
-class OutputListener : public gSKI::IAgentListener, public EventManager<smlWorkingMemoryEventId>
+class OutputListener : public EventManager<smlWorkingMemoryEventId>
 {
 protected:
 	KernelSML*		m_KernelSML ;
@@ -75,11 +73,9 @@ public:
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(smlWorkingMemoryEventId eventID, Connection* pConnection) ;
 
-	// Working memory event listener (called when the agent generates output)
-	virtual void HandleEvent(smlWorkingMemoryEventId eventId, gSKI::Agent* agentPtr, egSKIWorkingMemoryChange change, gSKI::tIWmeIterator* wmelist) ;
+	// re-initialize handler
+	void ReinitializeEvent(smlAgentEventId eventId) ;
 
-	// Agent event listener (called when soar is re-initialized)
-	virtual void HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPtr) ;
 } ;
 
 }

@@ -20,11 +20,6 @@
 #include "sml_KernelSML.h"
 #include "KernelHeaders.h"
 
-#include "gSKI_Enumerations.h"
-#include "gSKI_Agent.h"
-#include "IgSKI_Symbol.h"
-#include "gSKI_OutputLink.h"
-
 #ifdef _DEBUG
 // Comment this in to debug init-soar and inputwme::update calls
 //#define DEBUG_UPDATE
@@ -107,8 +102,8 @@ void OutputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCall
 	// TEMP Step
 	// Update gSKI's representations too.  This is needed because we do input on the output-link (via ^status complete and the like) so
 	// until we have removed gSKI from the input side we still need this help on the output side.
-	gSKI::OutputLink* pIOutputLink = (gSKI::OutputLink*)pAgentSML->GetIAgent()->GetOutputLink() ;
-	gSKI::OutputLink::OutputPhaseCallback(pAgentSML->GetAgent(), eventID, pIOutputLink, oinfo) ;
+	//gSKI::OutputLink* pIOutputLink = (gSKI::OutputLink*)pAgentSML->GetIAgent()->GetOutputLink() ;
+	//gSKI::OutputLink::OutputPhaseCallback(pAgentSML->GetAgent(), eventID, pIOutputLink, oinfo) ;
 
 	io_wme* pWmes = oinfo->outputs ;
 	SendOutput((smlWorkingMemoryEventId)eventID, pAgentSML, outputMode, pWmes) ;
@@ -306,165 +301,26 @@ bool OutputListener::RemoveListener(smlWorkingMemoryEventId eventID, Connection*
 	return last ;
 }
 
-void OutputListener::HandleEvent(smlWorkingMemoryEventId eventId, gSKI::Agent* agentPtr, egSKIWorkingMemoryChange change, gSKI::tIWmeIterator* wmelist)
-{
-	unused(change) ;
-
-	if (eventId != smlEVENT_OUTPUT_PHASE_CALLBACK)
-		return ;
-
-	if (wmelist->GetNumElements() == 0)
-		return ;
-
-	// Get the first listener for this event (or return if there are none)
-	ConnectionListIter connectionIter ;
-	if (!EventManager<smlWorkingMemoryEventId>::GetBegin(eventId, &connectionIter))
-		return ;
-
-	// We need the first connection for when we're building the message.  Perhaps this is a sign that
-	// we shouldn't have rolled these methods into Connection.
-	Connection* pConnection = *connectionIter ;
-
-	// Build the SML message we're doing to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Output) ;
-
-	// Add the agent parameter and as a side-effect, get a pointer to the <command> tag.  This is an optimization.
-	ElementXML_Handle hCommand = pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, agentPtr->GetName()) ;
-	ElementXML command(hCommand) ;
-
-	// We are passed a list of all wmes in the transitive closure (TC) of the output link.
-	// We need to decide which of these we've already seen before, so we can just send the
-	// changes over to the client (rather than sending the entire TC each time).
-
-	// Reset everything in the current list of tags to "not in use".  After we've processed all wmes,
-	// any still in this state have been removed.
-	for (OutputTimeTagIter iter = m_TimeTags.begin() ; iter != m_TimeTags.end() ; iter++)
-	{
-		iter->second = false ;
-	}
-
-	// Build the list of WME changes
-	for(; wmelist->IsValid(); wmelist->Next())
-	{
-		// Get the next wme
-		gSKI::IWme* pWME = wmelist->GetVal();
-
-		long timeTag = pWME->GetTimeTag() ;
-
-		// See if we've already sent this wme to the client
-		OutputTimeTagIter iter = m_TimeTags.find(timeTag) ;
-
-		if (iter != m_TimeTags.end())
-		{
-			// This is a time tag we've already sent over, so mark it as still being in use
-			iter->second = true ;
-			continue ;
-		}
-
-		// If we reach here we need to send the wme to the client and add it to the list
-		// of tags currently in use.
-		m_TimeTags[timeTag] = true ;
-
-		// Create the wme tag
-		TagWme* pTag = new TagWme() ;
-
-		// Look up the type of value this is
-		egSKISymbolType type = pWME->GetValue()->GetType() ;
-		char const* pValueType = GetValueType(type) ;
-
-		// For additions we send everything
-		pTag->SetIdentifier(pWME->GetOwningObject()->GetId()->GetString()) ;
-		pTag->SetAttribute(pWME->GetAttribute()->GetString()) ;
-		pTag->SetValue(pWME->GetValue()->GetString(), pValueType) ;
-		pTag->SetTimeTag(pWME->GetTimeTag()) ;
-		pTag->SetActionAdd() ;
-
-		// Add it as a child of the command tag
-		command.AddChild(pTag) ;
-
-		// Values retrieved via "GetVal" have to be released.
-		// Ah, but not if they come from an Iterator rather than an IteratorWithRelease.
-		// At least, it seems like if I call Release here it causes a crash on exit, while if I don't all seems well.
-		//pWME->Release();
-	}
-
-	// At this point we check the list of time tags and any which are not marked as "in use" must
-	// have been deleted, so we need to send them over to the client as deletions.
-	for (OutputTimeTagIter iter = m_TimeTags.begin() ; iter != m_TimeTags.end() ;)
-	{
-		// Ignore time tags that are still in use.
-		if (iter->second == true)
-		{
-			// We have to do manual iteration because we're deleting elements
-			// as we go and that invalidates iterators if we're not careful.
-			iter++ ;
-			continue ;
-		}
-
-		long timeTag = iter->first ;
-
-		// Create the wme tag
-		TagWme* pTag = new TagWme() ;
-
-		// For deletions we just send the time tag
-		pTag->SetTimeTag(timeTag) ;
-		pTag->SetActionRemove() ;
-
-		// Add it as a child of the command tag
-		command.AddChild(pTag) ;
-
-		// Delete the entry from the time tag map
-		m_TimeTags.erase(iter++);
-	}
-
-	// This is important.  We are working with a subpart of pMsg.
-	// If we retain ownership of the handle and delete the object
-	// it will release the handle...deleting part of our message.
-	command.Detach() ;
-
-	smlWorkingMemoryEventId eventID = smlEVENT_OUTPUT_PHASE_CALLBACK ;
-
-#ifdef _DEBUG
-	// Convert the XML to a string so we can look at it in the debugger
-	char *pStr = pMsg->GenerateXMLString(true) ;
-#endif
-
-	// Send the message out
-	AnalyzeXML response ;
-	SendEvent(pConnection, pMsg, &response, connectionIter, GetEnd(eventID)) ;
-
-#ifdef _DEBUG
-	pMsg->DeleteString(pStr) ;
-#endif
-
-	// Clean up
-	delete pMsg ;
-}
-
 // Agent event listener (called when soar has been or is about to be re-initialized)
 // BADBAD: This shouldn't really be handled in a class called OutputListener.
-void OutputListener::HandleEvent(egSKIAgentEventId eventIdIn, gSKI::Agent* agentPtr)
+void OutputListener::ReinitializeEvent(smlAgentEventId eventId) 
 {
-	smlAgentEventId eventId = static_cast<smlAgentEventId>(eventIdIn);
-
 	// Before the kernel is re-initialized we have to release all input WMEs.
 	// If we don't do this, gSKI will fail to re-initialize the kernel correctly as it
 	// assumes that all WMEs are deleted prior to reinitializing the kernel and if we have
 	// outstanding references to the objects it has no way to make the deletion happen.
 	if (eventId == smlEVENT_BEFORE_AGENT_REINITIALIZED)
 	{
-		AgentSML* pAgent = this->m_KernelSML->GetAgentSML(agentPtr) ;
-
 #ifdef DEBUG_UPDATE
-	sml::PrintDebugFormat("AgentSML before agent reinitialized received - start.") ;
+	sml::PrintDebugFormat("OutputListener before agent reinitialized received - start.") ;
 #endif
-		if (pAgent)
+		if (m_pCallbackAgentSML)
 		{
-			pAgent->ReleaseAllWmes() ;
+			m_pCallbackAgentSML->ReleaseAllWmes() ;
 		}
 
 #ifdef DEBUG_UPDATE
-	sml::PrintDebugFormat("AgentSML before agent reinitialized received - end.") ;
+	sml::PrintDebugFormat("OutputListener before agent reinitialized received - end.") ;
 #endif
 	}
 

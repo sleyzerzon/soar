@@ -25,6 +25,8 @@ namespace gSKI {
 	class Agent ;
 	class IWme ;
 	class IInputProducer ;
+	class IWMObject;
+	struct Error;
 }
 
 // Forward definitions for kernel

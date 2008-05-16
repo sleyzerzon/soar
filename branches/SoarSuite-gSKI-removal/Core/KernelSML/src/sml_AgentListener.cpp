@@ -96,7 +96,7 @@ void AgentListener::OnEvent(smlAgentEventId eventID, AgentSML* pAgentSML)
 		// This is a bit clumsy.  I think the reinitialized events should really be sent to the agent not to the agent manager
 		// (which is a kernel event) so we need to do this extra lookup stage.  If it was an agent event, we could directly
 		// attach it to the agent handler.
-		pAgentSML->GetOutputListener()->HandleEvent(static_cast<egSKIAgentEventId>(eventID), pAgentSML->GetIAgent()) ;
+		pAgentSML->GetOutputListener()->ReinitializeEvent( eventID ) ;
 	}
 
 	// Get the first listener for this event (or return if there are none)
