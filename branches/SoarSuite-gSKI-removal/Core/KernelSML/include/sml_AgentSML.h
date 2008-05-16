@@ -168,7 +168,7 @@ public:
 
 	~AgentSML() ;
 
-	void SetIAgent(gSKI::Agent* pIAgent) { m_pIAgent = pIAgent ; }
+	void SetIAgent(gSKI::Agent* pIAgent) ;
 
 	// Release any objects or other data we are keeping.  We do this just
 	// prior to deleting AgentSML, but before the underlying gSKI agent has been deleted
@@ -363,7 +363,7 @@ public:
 	// Request that the agent stop soon.
 	bool Interrupt(smlStopLocationFlags stopLoc) ;
 	void ClearInterrupts() ;
-	smlRunResult StepInClientThread(smlRunStepSize  stepSize, gSKI::Error* pError) ;
+	smlRunResult StepInClientThread(smlRunStepSize  stepSize) ;
 	smlRunResult Step(smlRunStepSize stepSize) ;
 
 	unsigned long GetInterruptFlags()		{ return m_interruptFlags ; }

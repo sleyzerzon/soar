@@ -80,8 +80,8 @@ typedef OutputProcessorList_t::iterator		OutputProcessorListIter_t ;
 //typedef std::list< OutputListener* >			OutputListenerList_t ;
 //typedef OutputListenerList_t::iterator		OutputListenerListIter_t ;
 
-// Map from agent pointers to information we keep for SML about those agents.
-typedef std::map< gSKI::Agent*, AgentSML* >	AgentMap ;
+// Map from agent names to information we keep for SML about those agents.
+typedef std::map< std::string, AgentSML* >	AgentMap ;
 typedef AgentMap::iterator					AgentMapIter ;
 typedef AgentMap::const_iterator			AgentMapConstIter ;
 
@@ -374,29 +374,12 @@ public:
 	/*************************************************************
 	* @brief	Look up an agent from its name.
 	*************************************************************/
-	gSKI::Agent* GetAgent(char const* pAgentName) ;
+	AgentSML* GetAgentSML(char const* pAgentName) ;
 
 	/*************************************************************
 	* @brief	Get the kernel object.
 	*************************************************************/
 	gSKI::Kernel* GetKernel() { return m_pIKernel ; }
-
-	/*************************************************************
-	* @brief	Look up our additional SML information for a specific agent.
-	*
-	*			This will always return an AgentSML object.
-	*			If the Agent* is new, this call will record a new AgentSML
-	*			object in the m_AgentMap and return a pointer to it.
-	*			We do this, so we can easily support connecting up to
-	*			agents that were created before a connection is established
-	*			through SML to the kernel (e.g. when attaching a debugger).
-	*	
-	*************************************************************/
-	AgentSML*	GetAgentSML(gSKI::Agent* pAgent) ;
-	AgentSML*	GetAgentSML(agent* pAgent) ;	// Lookup agent from kernel agent
-
-	void RecordAgentSML(AgentSML* pAgentSML, agent* pAgent) ;
-	void RecordIAgent(AgentSML* pAgentSML, gSKI::Agent* pIAgent) ;
 
 	/*************************************************************
 	* @brief	gSKI introduced a Soar kernel object.
@@ -419,7 +402,7 @@ public:
 	*			This object stores the data SML uses when working
 	*			with the underlying gSKI agent.
 	*************************************************************/	
-	bool DeleteAgentSML(gSKI::Agent* pAgent) ;
+	bool DeleteAgentSML( const char* agentName ) ;
 	//bool DeleteAgentSML(agent* pAgent) ;
 
 	/*************************************************************

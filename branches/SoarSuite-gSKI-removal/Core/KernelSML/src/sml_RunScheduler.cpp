@@ -459,7 +459,7 @@ bool RunScheduler::HaveAllGeneratedOutput()
 *            finished running, this routine will check whether they
 *            need to be stepped to a different phase.
 *********************************************************************/
-void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSize, gSKI::Error* pError)
+void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSize)
 {
 	// If we ran by decision_cycle and we've run the appropriate number of decisions, 
 	// then  step agent until it reached the correct phase where it should stop.  
@@ -498,12 +498,12 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 					(pAgent->GetInterruptFlags() & gSKI_STOP_AFTER_DECISION_CYCLE))
 				{
 					pAgent->SetRunState(sml_RUNSTATE_INTERRUPTED);
-					runResult = pAgent->StepInClientThread(sml_PHASE, pError) ; // force interrupt
+					runResult = pAgent->StepInClientThread(sml_PHASE) ; // force interrupt
 				}					
 
 				while ((phase != m_StopBeforePhase) && (sml_RUN_COMPLETED == runResult))
 				{
-					runResult = pAgent->StepInClientThread(sml_PHASE, pError) ;
+					runResult = pAgent->StepInClientThread(sml_PHASE) ;
 					phase = pAgentSML->GetCurrentPhase() ;
 					// don't cross Output-Input boundary here just to get to StopBefore phase for "Run 0"
 					if (sml_INPUT_PHASE == phase) break; 
@@ -538,7 +538,7 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
  
 				while ((phase != m_StopBeforePhase) && (sml_RUN_COMPLETED == runResult))
 				{
-					runResult = pAgent->StepInClientThread(sml_PHASE, pError) ;
+					runResult = pAgent->StepInClientThread(sml_PHASE) ;
 					phase = pAgentSML->GetCurrentPhase() ;
 					// We should never get to this point again, so we need to generate ERROR 
 					assert(sml_INPUT_PHASE != phase);
@@ -701,10 +701,6 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 												   smlRunStepSize interleaveStepSize, 
 												   bool synchronize)
 {
-	// FIXME: use a different mechanism to report detailed run error:
-	gSKI::Error error;
-	gSKI::Error* pError = &error;
-
     // Agents were already appropriately added (or not) to the RunList before calling this method.
 	// For every Run Command issued, we can find out if agent is still scheduled to run,
 	// and/or whether it was scheduled to run at all.  When agents stop or Halt, the
@@ -817,7 +813,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 				{			
 					// Run all agents one "interleaveStepSize".		
 					//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
-					smlRunResult runResult = pAgentSML->StepInClientThread(interleaveStepSize, pError) ;
+					smlRunResult runResult = pAgentSML->StepInClientThread(interleaveStepSize) ;
 					// ?? pAgentSML->IncrementLocalStepCounter();
 
 					// halted and running agents will return an error from StepInClientThread
@@ -875,7 +871,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	}  // END of While (!runFinished)
 
 	// kernel events might fire in next method...
-	MoveTo_StopBeforePhase(forever, runStepSize, pError);  // agents will have done FireRunEndsEvent() here or above.
+	MoveTo_StopBeforePhase(forever, runStepSize);  // agents will have done FireRunEndsEvent() here or above.
 
 	// Fire one event to indicate the entire system should stop.
 	m_pKernelSML->FireSystemEvent(smlEVENT_SYSTEM_STOP) ;

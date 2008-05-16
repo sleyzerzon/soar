@@ -422,79 +422,6 @@ bool KernelSML::IsTracingCommunications()
 	return m_pConnectionManager->IsTracingCommunications() ;
 }
 
-/*************************************************************
-* @brief	Look up our additional SML information for a specific agent.
-*
-*			This will always return an AgentSML object.
-*			If the Agent* is new, this call will record a new AgentSML
-*			object in the m_AgentMap and return a pointer to it.
-*			We do this, so we can easily support connecting up to
-*			agents that were created before a connection is established
-*			through SML to the kernel (e.g. when attaching a debugger).
-*	
-*************************************************************/
-AgentSML* KernelSML::GetAgentSML(gSKI::Agent* pAgent)
-{
-	if (!pAgent)
-		return NULL ;
-
-	AgentSML* pResult = NULL ;
-
-	// See if we already have an object in our map
-	AgentMapIter iter = m_AgentMap.find(pAgent) ;
-
-	if (iter == m_AgentMap.end())
-	{
-		assert(false) ;	// Don't believe we ever want to do this and not find an agent
-		return NULL ;
-	}
-	else
-	{
-		// If in the map, return it.
-		pResult = iter->second ;
-	}
-
-	return pResult ;
-}
-
-void KernelSML::RecordAgentSML(AgentSML* pAgentSML, agent* pAgent)
-{
-	m_KernelAgentMap[pAgent] = pAgentSML ;
-}
-
-void KernelSML::RecordIAgent(AgentSML* pAgentSML, gSKI::Agent* pIAgent)
-{
-	m_AgentMap[pIAgent] = pAgentSML ;
-}
-
-AgentSML* KernelSML::GetAgentSML(agent* pAgent)
-{
-	if (!pAgent)
-		return NULL ;
-
-	AgentSML* pResult = NULL ;
-
-	// See if we already have an object in our map
-	KernelAgentMapIter iter = m_KernelAgentMap.find(pAgent) ;
-
-	if (iter == m_KernelAgentMap.end())
-	{
-		assert(false) ;	// Looking for an agent but not in our map
-		return NULL ;
-	}
-	else
-	{
-		// If in the map, return it.
-		pResult = iter->second ;
-	}
-
-	return pResult ;
-}
-
-/*************************************************************
-* @brief	gSKI introduced a Soar kernel object.
-*			Not clear on why this exists but preserving it for now.
-*************************************************************/	
 kernel* KernelSML::GetSoarKernel()
 {
 	return m_pSoarKernel ;
@@ -505,7 +432,8 @@ kernel* KernelSML::GetSoarKernel()
 *************************************************************/	
 int	KernelSML::GetNumberAgents()
 {
-	return (int)m_AgentMap.size() ;
+	// FIXME: this function should return unsigned
+	return static_cast<int>( m_AgentMap.size() );
 }
 
 /*************************************************************
@@ -516,9 +444,9 @@ void KernelSML::RemoveAllListeners(Connection* pConnection)
 	// Remove any agent specific listeners
 	for (AgentMapIter iter = m_AgentMap.begin() ; iter != m_AgentMap.end() ; iter++)
 	{
-		AgentSML* pAgent = iter->second ;
+		AgentSML* pAgentSML = iter->second ;
 
-		pAgent->RemoveAllListeners(pConnection) ;
+		pAgentSML->RemoveAllListeners(pConnection) ;
 	}
 
 	// Remove any kernel event listeners
@@ -532,15 +460,15 @@ void KernelSML::RemoveAllListeners(Connection* pConnection)
 /*************************************************************
 * @brief	Delete the agent sml object for this agent.
 *************************************************************/	
-bool KernelSML::DeleteAgentSML(gSKI::Agent* pAgent)
+bool KernelSML::DeleteAgentSML( const char* agentName )
 {
 	// See if we already have an object in our map
-	AgentMapIter iter = m_AgentMap.find(pAgent) ;
+	AgentMapIter iter = m_AgentMap.find( agentName ) ;
 
 	if (iter == m_AgentMap.end())
 		return false ;
 
-	KernelAgentMapIter kiter = m_KernelAgentMap.find(pAgent->GetSoarAgent()) ;
+	KernelAgentMapIter kiter = m_KernelAgentMap.find( iter->second->GetSoarAgent() ) ;
 	if (kiter == m_KernelAgentMap.end())
 	{
 		// Why is the agent in the gSKI map but not in the kernel map?
@@ -617,13 +545,22 @@ bool KernelSML::InvalidArg(Connection* pConnection, ElementXML* pResponse, char 
 /*************************************************************
 * @brief	Look up an agent from its name.
 *************************************************************/
-gSKI::Agent* KernelSML::GetAgent(char const* pAgentName)
+AgentSML* KernelSML::GetAgentSML(char const* pAgentName)
 {
 	if (!pAgentName)
 		return NULL ;
+	
+	AgentMapIter iter = m_AgentMap.find( pAgentName ) ;
 
-	gSKI::Agent* pAgent = GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
-	return pAgent ;
+	if (iter == m_AgentMap.end())
+	{
+		return NULL ;
+	}
+	else
+	{
+		// If in the map, return it.
+		return iter->second ;
+	}
 }
 
 /*************************************************************
@@ -690,13 +627,13 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 	// Look up the agent name parameter (most commands have this)
 	char const* pAgentName = pIncoming->GetArgString(sml_Names::kParamAgent) ;
 
-	gSKI::Agent* pAgent = NULL ;
+	AgentSML* pAgentSML = NULL ;
 
 	if (pAgentName)
 	{
-		pAgent = GetAgent(pAgentName) ;
+		pAgentSML = GetAgentSML( pAgentName ) ;
 
-		if (!pAgent)
+		if (!pAgentSML)
 		{
 			// Failed to find this agent
 			std::string msg = "Could not find an agent with name: " ;
@@ -707,7 +644,7 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 	}
 
 	// Call to the handler (this is a pointer to member call so it's a bit odd)
-	bool result = (this->*pFunction)(GetAgentSML(pAgent), pCommandName, pConnection, pIncoming, pResponse) ;
+	bool result = (this->*pFunction)(pAgentSML, pCommandName, pConnection, pIncoming, pResponse) ;
 
 	// If we return false, we report a generic error about the call.
 	if (!result)
@@ -852,7 +789,7 @@ void KernelSML::PrintDebugSymbol(Symbol* pSymbol, bool refCounts ) {
 // and we pass through an input-phase.
 static inline void RecordWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(wm->GetAgent()) ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetName() ) ;
 
 	pAgentSML->RecordLongTimeTag( clientTimeTag, wme ) ;
 
@@ -862,7 +799,7 @@ static inline void RecordWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long
 static inline void RemoveWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
 	unused(wme) ;
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(wm->GetAgent()) ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetName() ) ;
 
 	pAgentSML->RemoveLongTimeTag( clientTimeTag ) ;
 
@@ -978,21 +915,21 @@ EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgent
 
 EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool input)
 {
-	gSKI::Agent* pAgent = KernelSML::GetKernelSML()->GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( pAgentName ) ;
 
-	if (!pAgent)
+	if (!pAgentSML)
 		return 0 ;
 
 	gSKI::IWMObject* pRoot = NULL ;
 	if (input)
 	{
-		pAgent->GetInputLink()->GetRootObject(&pRoot) ;
-		KernelSML::GetKernelSML()->GetAgentSML(pAgent)->SetInputLinkRoot(pRoot) ;
+		pAgentSML->GetIAgent()->GetInputLink()->GetRootObject(&pRoot) ;
+		pAgentSML->SetInputLinkRoot(pRoot) ;
 	}
 	else
 	{
-		pAgent->GetOutputLink()->GetRootObject(&pRoot) ;
-		KernelSML::GetKernelSML()->GetAgentSML(pAgent)->SetOutputLinkRoot(pRoot) ;
+		pAgentSML->GetIAgent()->GetOutputLink()->GetRootObject(&pRoot) ;
+		pAgentSML->SetOutputLinkRoot(pRoot) ;
 	}
 
 	return (Direct_WMObject_Handle)pRoot ;
@@ -1018,12 +955,10 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 
 	if (pAgentName)
 	{
-		gSKI::Agent* pAgent = pKernelSML->GetAgent(pAgentName) ;
-		
-		if (!pAgent)
+		AgentSML* pAgentSML = pKernelSML->GetAgentSML( pAgentName );
+		if (!pAgentSML)
 			return ;
 
-		AgentSML* pAgentSML = pKernelSML->GetAgentSML(pAgent) ;
 		runFlags = (smlRunFlags)(runFlags | sml_RUN_SELF) ;
 
 		// Schedule just this one agent to run

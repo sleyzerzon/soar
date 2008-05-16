@@ -78,13 +78,14 @@ void AgentListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallD
 }
 
 // Called when an "AgentEvent" occurs in gSKI
-void AgentListener::HandleEvent(egSKIAgentEventId eventIdIn, gSKI::Agent* agentPtr)
+void AgentListener::HandleEvent(egSKIAgentEventId eventIdIn, gSKI::Agent* pAgent)
 {
 	smlAgentEventId eventId = static_cast<smlAgentEventId>(eventIdIn);
 
-	AgentSML* pAgent = m_pKernelSML->GetAgentSML(agentPtr) ;
-	assert(pAgent) ;
-	OnEvent(eventId, pAgent) ;
+	AgentSML* pAgentSML = m_pKernelSML->GetAgentSML( pAgent->GetName() ) ;
+	assert(pAgentSML) ;
+
+	OnEvent(eventId, pAgentSML) ;
 }
 
 void AgentListener::OnEvent(smlAgentEventId eventID, AgentSML* pAgentSML)

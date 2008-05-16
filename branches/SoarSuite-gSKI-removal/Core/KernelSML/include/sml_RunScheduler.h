@@ -119,7 +119,7 @@ protected:
 	bool			AreAgentsSynchronized(AgentSML* pSynchAgent) ;
 	bool			AllAgentsAtStopBeforePhase() ;
 	bool			AreAllOutputPhasesComplete() ;
-	void            MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSize, gSKI::Error* pError) ;
+	void            MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSize) ;
 	void			FireBeforeRunStartsEvents() ;
     smlRunResult  GetOverallRunResult() ;
 	bool			HaveAllGeneratedOutput() ;

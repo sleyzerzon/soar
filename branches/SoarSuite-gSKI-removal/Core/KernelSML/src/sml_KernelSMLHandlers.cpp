@@ -145,14 +145,16 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 	pAgentSML = new AgentSML(this, pSoarAgent) ;
 
 	// Make the call.
-	gSKI::Agent* pIAgent = GetKernel()->GetAgentManager()->AddAgent(pSoarAgent, NULL, false, gSKI_O_SUPPORT_MODE_4) ;
-	pAgentSML->SetIAgent(pIAgent) ;
-	this->RecordAgentSML(pAgentSML, pSoarAgent) ;
-	this->RecordIAgent(pAgentSML, pIAgent) ;
+	gSKI::Agent* pAgent = GetKernel()->GetAgentManager()->AddAgent(pSoarAgent, NULL, false, gSKI_O_SUPPORT_MODE_4) ;
+	pAgentSML->SetIAgent(pAgent) ;
+
+	// Update our maps
+	m_KernelAgentMap[ pSoarAgent ] = pAgentSML ;
+	m_AgentMap[ pAgentSML->GetName() ] = pAgentSML ;
 
 	pAgentSML->InitListeners() ;	// This must happen before the soar agent is initialized
 
-	pIAgent->Init() ;	// Initializes the soar agent
+	pAgent->Init() ;	// Initializes the soar agent
 
 	pAgentSML->Init() ;		// This must happen AFTER the soar agent is initialized.
 
@@ -160,7 +162,7 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 	this->FireAgentEvent(pAgentSML, smlEVENT_AFTER_AGENT_CREATED) ;
 
 	// Register for output from this agent
-	if (pIAgent)
+	if (pAgent)
 	{
 		// Mark the agent's status as just having been created for all connections
 		// Note--agent status for connections just refers to the last agent created, i.e. this one.
@@ -171,19 +173,19 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 		pAgentSML->SetInputProducer(pInputProducer) ;
 
 		// Add the input producer to the top level of the input link (doesn't matter for us which WME it's attached to)
-		gSKI::IInputLink* pInputLink = pIAgent->GetInputLink() ;
+		gSKI::IInputLink* pInputLink = pAgent->GetInputLink() ;
 		gSKI::IWMObject* pRoot = NULL ;
 		pInputLink->GetRootObject(&pRoot) ;
-		pIAgent->GetInputLink()->AddInputProducer(pRoot, pInputProducer) ;
+		pAgent->GetInputLink()->AddInputProducer(pRoot, pInputProducer) ;
 		pRoot->Release() ;
 
-		pIAgent->SetRemoveWmeCallback( RemoveInputWMERecordsCallback );
+		pAgent->SetRemoveWmeCallback( RemoveInputWMERecordsCallback );
 	}
 
 	// Return true if we got an agent constructed.
 	// If not, pError should contain the error and returning false
 	// means we'll pass that back to the caller.
-	return (pIAgent != NULL) ;
+	return (pAgent != NULL) ;
 }
 
 // Handle registering and unregistering for kernel events
@@ -911,15 +913,16 @@ bool KernelSML::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 
 void KernelSML::RemoveInputWMERecordsCallback(gSKI::Agent* pAgent, gSKI::IWme* pWME)
 {
+	assert( pAgent );
 	s_pKernel->RemoveInputWMERecords(pAgent, pWME);
 }
 
 void KernelSML::RemoveInputWMERecords(gSKI::Agent* pAgent, gSKI::IWme* pWME)
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
-	AgentSML* pAgentSML = GetAgentSML(pAgent) ;
+	AgentSML* pAgentSML = GetAgentSML( pAgent->GetName() ) ;
 
-	if (!pAgent || !pWME)
+	if (!pAgentSML || !pWME)
 		return;
 
 	// If this is an identifier, need to remove it from the ID mapping table too.

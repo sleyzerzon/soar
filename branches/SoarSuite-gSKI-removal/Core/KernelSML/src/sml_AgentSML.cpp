@@ -151,7 +151,7 @@ public:
 		pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, this) ;
 
 		// Release any wmes or other objects we're keeping
-		AgentSML* pAgentSML = pKernelSML->GetAgentSML(pAgent) ;
+		AgentSML* pAgentSML = pKernelSML->GetAgentSML( pAgent->GetName() ) ;
 		pAgentSML->DeleteSelf() ;
 		pAgentSML = NULL ;	// At this point the pointer is invalid so clear it.
 
@@ -405,8 +405,20 @@ bool AgentSML::IsSoar7Mode()
 //=============================
 smlPhase AgentSML::GetCurrentPhase()
 {
+	switch ( (unsigned short)m_agent->current_phase )
+	{
+	case INPUT_PHASE:		return sml_INPUT_PHASE;
+	case PROPOSE_PHASE:		return sml_PROPOSAL_PHASE;
+	case DECISION_PHASE:	return sml_DECISION_PHASE;
+	case APPLY_PHASE:		return sml_APPLY_PHASE;
+	case OUTPUT_PHASE:		return sml_OUTPUT_PHASE;
+	case PREFERENCE_PHASE:	return sml_PREFERENCE_PHASE;
+	case WM_PHASE:			return sml_WM_PHASE;
 
-	return (smlPhase)gSKI::EnumRemappings::ReMapPhaseType((unsigned short)m_agent->current_phase,0);
+	default:
+		assert(false);
+		return sml_INPUT_PHASE;
+	}
 }
 
 unsigned long AgentSML::GetRunCounter(smlRunStepSize runStepSize)
@@ -488,23 +500,15 @@ void AgentSML::ClearInterrupts()
   }
 }
 
-smlRunResult AgentSML::StepInClientThread(smlRunStepSize  stepSize, gSKI::Error* pError)
+smlRunResult AgentSML::StepInClientThread(smlRunStepSize  stepSize)
 {
   // Agent is already running, we cannot run
   if(m_runState != sml_RUNSTATE_STOPPED)
   {
-     if(m_runState == sml_RUNSTATE_HALTED)
-		 SetError(pError, gSKI::gSKIERR_AGENT_HALTED);  // nothing ever tests for this...
-     else
-		 SetError(pError, gSKI::gSKIERR_AGENT_RUNNING);
-
      return sml_RUN_ERROR;
   }
 
   m_runState = sml_RUNSTATE_RUNNING;
-
-  // Now clear error and do the run
-  ClearError(pError);
 
   // This method does all the work
   return Step(stepSize);
@@ -662,7 +666,7 @@ void AgentSML::DeleteSelf()
 	//m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, this) ;
 
 	// Then delete our matching agent sml information
-	m_pKernelSML->DeleteAgentSML(this->GetIAgent()) ;
+	m_pKernelSML->DeleteAgentSML( this->GetName() ) ;
 
 	// Do self clean-up of this object as it's just called
 	// prior to deleting the AgentSML structure.
@@ -1054,4 +1058,10 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 	delete pResponse ;
 
 	return result ;
+}
+
+void AgentSML::SetIAgent(gSKI::Agent* pIAgent)
+{ 
+	assert( std::string( GetName() ) == std::string( pIAgent->GetName() ) );
+	m_pIAgent = pIAgent ; 
 }
