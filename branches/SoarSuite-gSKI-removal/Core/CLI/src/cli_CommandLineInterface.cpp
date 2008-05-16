@@ -34,7 +34,6 @@
 
 using namespace cli;
 using namespace sml;
-using namespace std;
 
 std::ostringstream CommandLineInterface::m_Result;	
 
@@ -217,7 +216,7 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
 	// Log input
 	if (m_pLogFile) {
 		if (pAgent) (*m_pLogFile) << pAgent->GetName() << "> ";
-		(*m_pLogFile) << pCommandLine << endl;
+		(*m_pLogFile) << pCommandLine << std::endl;
 	}
 
 	m_EchoResult = echoResults ;
@@ -255,7 +254,7 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 
 	if (m_LastError == CLIError::kNoError) {
         // Log output
-        if (m_pLogFile) (*m_pLogFile) << m_Result.str() << endl;
+        if (m_pLogFile) (*m_pLogFile) << m_Result.str() << std::endl;
 
         // The command succeeded, so return the result if raw output
 		if (m_RawOutput) {
@@ -288,13 +287,13 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 		}
 	} else {
 		// The command failed, add the error message
-		string errorDescription = GenerateErrorString();
+		std::string errorDescription = GenerateErrorString();
 
 		pConnection->AddErrorToSMLResponse(pResponse, errorDescription.c_str(), m_LastError);
 		EchoString(pConnection, errorDescription.c_str()) ;
 
         // Log error
-        if (m_pLogFile) (*m_pLogFile) << errorDescription << endl;
+        if (m_pLogFile) (*m_pLogFile) << errorDescription << std::endl;
 	}
 
 	// reset state
@@ -304,9 +303,9 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 	m_LastErrorDetail.clear();			
 }
 
-string CommandLineInterface::GenerateErrorString()
+std::string CommandLineInterface::GenerateErrorString()
 {
-	string errorDescription = CLIError::GetErrorDescription(m_LastError);
+	std::string errorDescription = CLIError::GetErrorDescription(m_LastError);
 	if (m_LastErrorDetail.size()) {
 		errorDescription += "\nError detail: ";
 		errorDescription += m_LastErrorDetail;
@@ -319,7 +318,7 @@ string CommandLineInterface::GenerateErrorString()
 }
 
 /************************************************************* 	 
-* @brief Echo the given string through the smlEVENT_ECHO event
+* @brief Echo the given std::string through the smlEVENT_ECHO event
 *		 if the call requested that commands be echoed.
 *************************************************************/ 	 
 void CommandLineInterface::EchoString(sml::Connection* pConnection, char const* pString)
@@ -342,7 +341,7 @@ bool CommandLineInterface::ExpandCommandToString(const char* pCommandLine, std::
 {
 	SetError(CLIError::kNoError);
 
-	vector<string> argv;
+	std::vector<std::string> argv;
 
 	// 1) Parse command
 	if (CLITokenize(pCommandLine, argv) == -1)
@@ -384,7 +383,7 @@ EXPORT bool CommandLineInterface::ExpandCommand(sml::Connection* pConnection, co
 }
 
 bool CommandLineInterface::DoCommandInternal(const std::string& commandLine) {
-	vector<string> argv;
+	std::vector<std::string> argv;
 	// Parse command:
 	if (CLITokenize(commandLine, argv) == -1)  return false;	// Parsing failed
 
@@ -392,7 +391,7 @@ bool CommandLineInterface::DoCommandInternal(const std::string& commandLine) {
 	return DoCommandInternal(argv);
 }
 
-bool CommandLineInterface::DoCommandInternal(vector<string>& argv) {
+bool CommandLineInterface::DoCommandInternal(std::vector<std::string>& argv) {
 	if (!argv.size()) return true;
 
 	// Check for help flags
@@ -535,7 +534,7 @@ EXPORT void CommandLineInterface::SetKernel(sml::KernelSML* pKernelSML) {
 #endif // WIN32
 }
 
-bool CommandLineInterface::GetCurrentWorkingDirectory(string& directory) {
+bool CommandLineInterface::GetCurrentWorkingDirectory(std::string& directory) {
 	// Pull an arbitrary buffer size of 1024 out of a hat and use it
 	char buf[1024];
 	char* ret = getcwd(buf, 1024);
@@ -548,8 +547,8 @@ bool CommandLineInterface::GetCurrentWorkingDirectory(string& directory) {
 	return true;
 }
 
-bool CommandLineInterface::IsInteger(const string& s) {
-	string::const_iterator iter = s.begin();
+bool CommandLineInterface::IsInteger(const std::string& s) {
+	std::string::const_iterator iter = s.begin();
 	
 	// Allow negatives
 	if (s.length() > 1) {
@@ -922,7 +921,7 @@ void CommandLineInterface::XMLResultToResponse(char const* pCommandName)
 	m_XMLResult->Reset() ;
 }
 
-int CommandLineInterface::CLITokenize(string cmdline, vector<string>& argumentVector) {
+int CommandLineInterface::CLITokenize(std::string cmdline, std::vector<std::string>& argumentVector) {
 
 	int ret = Tokenize(cmdline, argumentVector);
 	
