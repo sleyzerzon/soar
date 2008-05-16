@@ -209,7 +209,7 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 {
 #ifdef DEBUG_UPDATE
 	sml::PrintDebugFormat("****************************************************") ;
-	sml::PrintDebugFormat("%s AgentSML::ReleaseAllWmes start %s", this->GetIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
+	sml::PrintDebugFormat("%s AgentSML::ReleaseAllWmes start %s", this->GetgSKIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
 	sml::PrintDebugFormat("****************************************************") ;
 #endif
 
@@ -217,7 +217,7 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	{
 		bool forceAdds = false ;	// It doesn't matter if we do these or not as we're about to release everything.  Seems best to not start things up.
 		bool forceRemoves = true ;	// SML may have deleted a wme but gSKI has yet to act on this.  As SML has removed its object we have no way to free the gSKI object w/o doing this update.
-		this->GetIAgent()->GetInputLink()->GetInputLinkMemory()->Update(forceAdds, forceRemoves) ;
+		this->GetgSKIAgent()->GetInputLink()->GetInputLinkMemory()->Update(forceAdds, forceRemoves) ;
 	}
 
 	// Release any WME objects we still own.
@@ -269,7 +269,7 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 
 #ifdef DEBUG_UPDATE
 	sml::PrintDebugFormat("****************************************************") ;
-	sml::PrintDebugFormat("%s AgentSML::ReleaseAllWmes end %s", this->GetIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
+	sml::PrintDebugFormat("%s AgentSML::ReleaseAllWmes end %s", this->GetgSKIAgent()->GetName(), flushPendingRemoves ? "flush pending removes." : "do not flush pending removes.") ;
 	sml::PrintDebugFormat("****************************************************") ;
 #endif
 }
@@ -299,7 +299,7 @@ void AgentSML::InitializeRuntimeState()
 bool AgentSML::Reinitialize()
 {
 	m_pKernelSML->FireAgentEvent(this, smlEVENT_BEFORE_AGENT_REINITIALIZED) ;
-	bool ok = GetIAgent()->Reinitialize();
+	bool ok = GetgSKIAgent()->Reinitialize();
 	InitializeRuntimeState() ;
 	m_pKernelSML->FireAgentEvent(this, smlEVENT_AFTER_AGENT_REINITIALIZED) ;
 	return ok ;
@@ -523,10 +523,10 @@ void AgentSML::FireRunEvent(smlRunEventId eventId) {
 
 void AgentSML::FireSimpleXML(char const* pMsg)
 {
-   GetIAgent()->FirePrintEvent(gSKIEVENT_PRINT, pMsg) ;
-   GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionBeginTag, sml_Names::kTagMessage, 0) ; 
-   GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionAddAttribute, sml_Names::kTypeString, pMsg) ; 
-   GetIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionEndTag, sml_Names::kTagMessage, 0) ; 
+   GetgSKIAgent()->FirePrintEvent(gSKIEVENT_PRINT, pMsg) ;
+   GetgSKIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionBeginTag, sml_Names::kTagMessage, 0) ; 
+   GetgSKIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionAddAttribute, sml_Names::kTypeString, pMsg) ; 
+   GetgSKIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionEndTag, sml_Names::kTagMessage, 0) ; 
 }
 
 static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)
@@ -551,8 +551,6 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 	   assert(!m_agent->system_halted) ; // , "System should not be halted here!");
 	   // Notify that agent is about to execute. (NOT the start of a run, just a step)
 	   FireRunEvent(smlEVENT_BEFORE_RUNNING) ;
-	   //RunNotifier nfBeforeRunning(this,EnumRemappings::ReMapPhaseType(m_agent->current_phase,0));
-	   //m_runListeners.Notify(gSKIEVENT_BEFORE_RUNNING, nfBeforeRunning);
 
 	   switch (stepSize) 
 	   {

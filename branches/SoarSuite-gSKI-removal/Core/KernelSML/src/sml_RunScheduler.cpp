@@ -150,7 +150,6 @@ AgentSML* RunScheduler::GetAgentToSynchronizeWith()
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
-			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
 			AgentSML* pAgent = pAgentSML ;
 
 			// What this says is:
@@ -185,8 +184,6 @@ bool RunScheduler::AreAgentsSynchronized(AgentSML* pSynchAgent)
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
-			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-
 			if (pAgentSML->GetCurrentPhase() != phase)
 				same = false ;
 		}
@@ -207,8 +204,6 @@ bool RunScheduler::AllAgentsAtStopBeforePhase()
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
-			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-
 			if (pAgentSML->GetCurrentPhase() != m_StopBeforePhase)
 			{
 				//don't let this agent continue to run ahead
@@ -321,7 +316,7 @@ void RunScheduler::RecordInitialRunCounters(smlRunStepSize runStepSize)
 
 		if (pAgentSML->IsAgentScheduledToRun())
 		{
- 			gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
+ 			gSKI::Agent* pAgent = pAgentSML->GetgSKIAgent() ;
 			unsigned long count = GetStepCounter(pAgent, runStepSize) ;  
 			pAgentSML->SetInitialStepCount(count) ; 
 		}
@@ -371,8 +366,6 @@ void RunScheduler::InitializeUpdateWorldEvents(bool addListeners)
 		if (addListeners)
 		{
 			pAgentSML->GetAgentRunCallback()->RegisterWithKernel(smlEVENT_AFTER_OUTPUT_PHASE) ;
-			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			//pAgent->AddRunListener(smlEVENT_AFTER_OUTPUT_PHASE, this) ;
 		}
 	} 
 }
@@ -485,7 +478,6 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 			if (pAgentSML->WasAgentOnRunList()) 
 			{
 				AgentSML* pAgent = pAgentSML ;
-				//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
 				smlPhase phase = pAgentSML->GetCurrentPhase() ;
 				smlRunResult runResult = pAgentSML->GetResultOfLastRun() ;
 				//if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
@@ -530,7 +522,6 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 			if (pAgentSML->WasAgentOnRunList()) 
 			{
 				AgentSML* pAgent = pAgentSML ;
-				//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
 				smlPhase phase = pAgentSML->GetCurrentPhase() ;
 				smlRunResult runResult = pAgentSML->GetResultOfLastRun() ;
 				//if (! pAgent->GetOperand2Mode()) continue;  // we don't support for agents in Soar7 mode...
@@ -585,7 +576,6 @@ void RunScheduler::TestForFiringUpdateWorldEvents()
 				{                    
 					AgentSML* pAgentSML = iter->second ;
 					pAgentSML->SetGeneratedOutput(false) ;
-					//pAgentSML->SetInitialOutputCount(pAgentSML->GetIAgent()->GetNumOutputsExecuted()) ;
 					pAgentSML->SetInitialOutputCount(pAgentSML->GetNumOutputsGenerated()) ;
 				}
 			}
@@ -603,8 +593,6 @@ void RunScheduler::TerminateUpdateWorldEvents(bool removeListeners)
 		if (removeListeners)
 		{
 			pAgentSML->GetAgentRunCallback()->UnregisterWithKernel(smlEVENT_AFTER_OUTPUT_PHASE) ;
-			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
-			//pAgent->RemoveRunListener(smlEVENT_AFTER_OUTPUT_PHASE, this) ;
 		}
 	}
 }
@@ -644,7 +632,6 @@ bool RunScheduler::AnAgentHaltedDuringRun()
 		if (pAgentSML->WasAgentOnRunList() )
 		{
 			AgentSML* pAgent = pAgentSML ;
-			//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;
 			if (pAgent->GetRunState() == sml_RUNSTATE_HALTED) return true;
 		}
 	}
@@ -812,7 +799,6 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 				if (pAgentSML->IsAgentOnStepList())
 				{			
 					// Run all agents one "interleaveStepSize".		
-					//gSKI::Agent* pAgent = pAgentSML->GetIAgent() ;			
 					smlRunResult runResult = pAgentSML->StepInClientThread(interleaveStepSize) ;
 					// ?? pAgentSML->IncrementLocalStepCounter();
 

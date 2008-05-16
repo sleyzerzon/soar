@@ -406,7 +406,7 @@ bool KernelSML::HandleDestroyAgent(AgentSML* pAgentSML, char const* /*pCommandNa
 
 	// Make the call to actually delete the agent
 	// This will trigger a call to our m_pBeforeDestroyedListener
-	GetKernel()->GetAgentManager()->RemoveAgent(pAgentSML->GetIAgent()) ;
+	GetKernel()->GetAgentManager()->RemoveAgent(pAgentSML->GetgSKIAgent()) ;
 
 	return true ;
 }
@@ -549,7 +549,7 @@ bool KernelSML::HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pComma
 		return InvalidArg(pConnection, pResponse, pCommandName, "Need to specify the production name to check.") ;
 	}
 
-	gSKI::tIProductionIterator* prodIter = pAgentSML->GetIAgent()->GetProductionManager()->GetProduction(pName, false) ;
+	gSKI::tIProductionIterator* prodIter = pAgentSML->GetgSKIAgent()->GetProductionManager()->GetProduction(pName, false) ;
 	bool found = prodIter->GetNumElements() > 0 ;
 	prodIter->Release() ;
 
@@ -720,7 +720,7 @@ bool KernelSML::HandleLoadProductions(AgentSML* pAgentSML, char const* pCommandN
 	}
 
 	// Make the call.
-	bool ok = pAgentSML->GetIAgent()->GetProductionManager()->LoadSoarFile(pFilename) ;
+	bool ok = pAgentSML->GetgSKIAgent()->GetProductionManager()->LoadSoarFile(pFilename) ;
 
 	return ok ;
 }
@@ -733,7 +733,7 @@ bool KernelSML::HandleGetInputLink(AgentSML* pAgentSML, char const* /*pCommandNa
 	// We want the input link's id
 	// Start with the root object for the input link
 	gSKI::IWMObject* pRootObject = NULL ;
-	pAgentSML->GetIAgent()->GetInputLink()->GetRootObject(&pRootObject) ;
+	pAgentSML->GetgSKIAgent()->GetInputLink()->GetRootObject(&pRootObject) ;
 
 	if (pRootObject == NULL)
 		return false ;
@@ -771,7 +771,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
 	bool addingToInputLink = true ;
-	gSKI::IWorkingMemory* pInputWM = pAgentSML->GetIAgent()->GetInputLink()->GetInputLinkMemory() ;
+	gSKI::IWorkingMemory* pInputWM = pAgentSML->GetgSKIAgent()->GetInputLink()->GetInputLinkMemory() ;
 
 	// First get the object which will own this new wme
 	// Because we build from the top down, this should always exist by the
@@ -784,7 +784,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 	// if we don't find our parent on the input side.
 	if (!pParentObject)
 	{
-		pInputWM = pAgentSML->GetIAgent()->GetOutputLink()->GetOutputMemory() ;
+		pInputWM = pAgentSML->GetgSKIAgent()->GetOutputLink()->GetOutputMemory() ;
 		pInputWM->GetObjectById(pID, &pParentObject) ;
 		addingToInputLink = false ;
 	}
@@ -882,7 +882,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 
 bool KernelSML::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 {
-	gSKI::IWorkingMemory* pInputWM = pAgentSML->GetIAgent()->GetInputLink()->GetInputLinkMemory() ;
+	gSKI::IWorkingMemory* pInputWM = pAgentSML->GetgSKIAgent()->GetInputLink()->GetInputLinkMemory() ;
 
 	// Get the wme that matches this time tag
 	gSKI::IWme* pWME = pAgentSML->ConvertTimeTag(pTimeTag) ;
@@ -1026,7 +1026,7 @@ bool KernelSML::HandleGetAllInput(AgentSML* pAgentSML, char const* /*pCommandNam
 
 	// Walk the list of wmes on the input link and send them over
 	gSKI::IWMObject* pRootObject = NULL ;
-	pAgentSML->GetIAgent()->GetInputLink()->GetRootObject(&pRootObject) ;
+	pAgentSML->GetgSKIAgent()->GetInputLink()->GetRootObject(&pRootObject) ;
 
 	// We need to keep track of which identifiers we've already added
 	// because this is a graph, so we may cycle back.

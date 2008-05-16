@@ -168,7 +168,7 @@ void KernelSML::DeleteAllAgents(bool waitTillDeleted)
 
 		// Make the call to actually delete the agent
 		// This will trigger a call to our m_pBeforeDestroyedListener
-		GetKernel()->GetAgentManager()->RemoveAgent(pAgentSML->GetIAgent(), NULL) ;
+		GetKernel()->GetAgentManager()->RemoveAgent(pAgentSML->GetgSKIAgent(), NULL) ;
 
 		// Now wait for the agent to be deleted (if we were requested to do so)
 		int maxTries = 100 ;	// Wait for a second then abort anyway
@@ -902,7 +902,7 @@ EXPORT Direct_WMObject_Handle sml_DirectGetThisWMObject(Direct_WorkingMemory_Han
 
 EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgentName, bool input)
 {
-	gSKI::Agent* pAgent = KernelSML::GetKernelSML()->GetKernel()->GetAgentManager()->GetAgent(pAgentName) ;
+	gSKI::Agent* pAgent = KernelSML::GetKernelSML()->GetAgentSML(pAgentName)->GetgSKIAgent() ;
 
 	if (!pAgent)
 		return 0 ;
@@ -923,12 +923,12 @@ EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool inp
 	gSKI::IWMObject* pRoot = NULL ;
 	if (input)
 	{
-		pAgentSML->GetIAgent()->GetInputLink()->GetRootObject(&pRoot) ;
+		pAgentSML->GetgSKIAgent()->GetInputLink()->GetRootObject(&pRoot) ;
 		pAgentSML->SetInputLinkRoot(pRoot) ;
 	}
 	else
 	{
-		pAgentSML->GetIAgent()->GetOutputLink()->GetRootObject(&pRoot) ;
+		pAgentSML->GetgSKIAgent()->GetOutputLink()->GetRootObject(&pRoot) ;
 		pAgentSML->SetOutputLinkRoot(pRoot) ;
 	}
 
