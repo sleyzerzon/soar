@@ -25,9 +25,7 @@ namespace gSKI
    unsigned short EnumRemappings::SymbolTypeEnumMapping[NUM_SYMBOL_TYPES];
    unsigned short EnumRemappings::PrefTypeEnumMapping[NUM_PREFERENCE_TYPES];
    unsigned short EnumRemappings::PhaseTypeEnumMapping[NUM_PHASE_TYPES];
-   unsigned short EnumRemappings::EventEnumMapping[gSKI_K_MAX_AGENT_EVENTS][2];
    unsigned short EnumRemappings::RunEventEnumMapping[NUMBER_OF_MONITORABLE_CALLBACKS];
-   unsigned short EnumRemappings::XMLEventEnumMapping[gSKI_K_MAX_AGENT_EVENTS];
    unsigned short EnumRemappings::ProductionTypeEnumMapping[NUM_PRODUCTION_TYPES];
    bool EnumRemappings::m_initialized = false;
 
@@ -102,10 +100,6 @@ namespace gSKI
 	  RunEventEnumMapping[AFTER_DECISION_CYCLE_CALLBACK]  = gSKIEVENT_AFTER_DECISION_CYCLE;
 	  RunEventEnumMapping[MAX_MEMORY_USAGE_CALLBACK] = gSKIEVENT_MAX_MEMORY_USAGE_EXCEEDED;
 
-	  //PrintEventEnumMapping[gSKI_K_EVENT_PRINT_CALLBACK] = gSKIEVENT_PRINT;
-
-	  XMLEventEnumMapping[gSKI_K_EVENT_XML_OUTPUT] = gSKIEVENT_XML_TRACE_OUTPUT;
-
       ProductionTypeEnumMapping[JUSTIFICATION_PRODUCTION_TYPE] = gSKI_JUSTIFICATION;
       ProductionTypeEnumMapping[USER_PRODUCTION_TYPE] = gSKI_USER;
       ProductionTypeEnumMapping[CHUNK_PRODUCTION_TYPE] = gSKI_CHUNK;
@@ -146,37 +140,6 @@ namespace gSKI
 	  return static_cast<egSKIPhaseType>(PhaseTypeEnumMapping[phase]);
    }
 
-   egSKIAgentEvents EnumRemappings::RemapProductionEventType(egSKIProductionEventId eventId)
-   /** this goes from gSKI to Kernel Events **/
-   {
-      if(!m_initialized) 
-         Init();
-
-	  // DJP: Now handled directly between kernel and SML
-	  assert(false) ;
-	  return (egSKIAgentEvents)0 ;
-
-   }
-
-
-  egSKIProductionEventId EnumRemappings::Map_Kernel_to_gSKI_ProdEventId(unsigned long eventId, unsigned char occured)
-  { 
-	unsigned long gSKIeventId;
-
-    if(!m_initialized) 
-       Init();
-
-	gSKIeventId = (EventEnumMapping[eventId][occured]);
-    
-	if (IsProductionEventID(gSKIeventId)) {
-		return static_cast<egSKIProductionEventId>(gSKIeventId);
-      } else {
-	// Error condition
-	MegaAssert(false, "Could not map a production event id");
-	return static_cast<egSKIProductionEventId>(0);
-      }
-  }
-
    SOAR_CALLBACK_TYPE EnumRemappings::KernelRunEventType(egSKIRunEventId eventId)
    /** this goes from gSKI to Kernel native callbacks **/
    {
@@ -208,58 +171,6 @@ namespace gSKI
          return static_cast<SOAR_CALLBACK_TYPE>(0);
       }
    }
-
-  egSKIRunEventId EnumRemappings::Map_Kernel_to_gSKI_RunEventId(unsigned long eventId, unsigned char occured)
-  { 
-	unsigned long gSKIeventId;
-
-    if(!m_initialized) 
-       Init();
-
-	gSKIeventId = (EventEnumMapping[eventId][occured]);
-    
-	if (IsRunEventID(gSKIeventId)) {
-		return static_cast<egSKIRunEventId>(gSKIeventId);
-      } else {
-	// Error condition
-	MegaAssert(false, "Could not map a Run event id");
-	return static_cast<egSKIRunEventId>(0);
-      }
-  }
-
-  egSKIAgentEvents EnumRemappings::RemapXMLEventType(egSKIXMLEventId eventId)
-   /** this goes from gSKI to Kernel Events **/
-   {
-      if(!m_initialized) 
-         Init();
-      switch (eventId)	 
-      {
-      case gSKIEVENT_XML_TRACE_OUTPUT:
-         return gSKI_K_EVENT_XML_OUTPUT;
-      default:
-         // Error condition
-         MegaAssert(false, "Could not map an XML event id");
-         return static_cast<egSKIAgentEvents>(0);
-      }
-   }
-
-   egSKIXMLEventId EnumRemappings::Map_Kernel_to_gSKI_XMLEventId(unsigned long eventId)
-  { 
-	unsigned long gSKIeventId;
-
-    if(!m_initialized) 
-       Init();
-
-	gSKIeventId = (XMLEventEnumMapping[eventId]);
-    
-	if (IsXMLEventID(gSKIeventId)) {
-		return static_cast<egSKIXMLEventId>(gSKIeventId);
-      } else {
-	// Error condition
-	MegaAssert(false, "Could not map an XNL event id");
-	return static_cast<egSKIXMLEventId>(0);
-      }
-  }
 
    egSKIProdType EnumRemappings::ReMapProductionType(unsigned short type)
    {

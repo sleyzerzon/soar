@@ -723,64 +723,6 @@ namespace gSKI
       
       }
 
-	  void Agent::AddXMLListener(egSKIXMLEventId	 eventId, 
-							IXMLListener*            listener, 
-							bool                     allowAsynch,
-							Error*                   err)
-	  {
-		  MegaAssert(listener, "Cannot add a 0 listener pointer.");
-		  if(!listener)
-		  {
-			  SetError(err, gSKIERR_INVALID_PTR);
-			  return;
-		  }
-
-		  ClearError(err);
-		  bool added = m_XMLListeners.AddListener(eventId, listener);
-
-
-		  // If we have added our first listener, we tell the kernel
-		  //  we want to recieve these events.
-		  if(added && m_XMLListeners.GetNumListeners(eventId) == 1)
-		  {
-			  // This is a kernel call (not part of gSKI)
-			  // Must convert gSKI event to Kernel event
-			  gSKI_SetAgentCallback(GetSoarAgent(), 
-				  EnumRemappings::RemapXMLEventType(eventId),
-				  static_cast<void*>(this),
-				  HandleKernelXMLCallback);
-		  }
-	  }
-
-	  void Agent::RemoveXMLListener(egSKIXMLEventId  eventId,
-                               IXMLListener*         listener,
-                               Error*                err)
-   {
-      MegaAssert(listener, "Cannot remove a 0 listener pointer.");
-      if(!listener)
-      {
-         SetError(err, gSKIERR_INVALID_PTR);
-         return;
-      }
-
-      ClearError(err);
-      bool removed = m_XMLListeners.RemoveListener(eventId, listener);
-
-      // If we have no more listeners, stop asking kernel to
-      //  notify us
-      if(removed && m_XMLListeners.GetNumListeners(eventId) == 0)
-      {
-         // This is a kernel call (not part of gSKI)
-		 // Must convert gSKI event to Kernel event
-         // Setting the callback to 0 causes the kernel
-         //   not to fire the event
-         gSKI_SetAgentCallback(GetSoarAgent(), 
-			 				     EnumRemappings::RemapXMLEventType(eventId),
-                                 static_cast<void*>(this),
-								 HandleKernelXMLCallback);
-      }
-   }
-
    void Agent::HandleKernelXMLCallback(unsigned long			  eventId, 
                                             unsigned char         eventOccured,
                                             void*                 object, 
@@ -840,20 +782,6 @@ namespace gSKI
    void Agent::DeleteRunEventCallbackData (soar_callback_data data)
    {
 	   delete static_cast <Agent::RunEventCallbackData*>  (data); 
-   }
-
-   void Agent::HandleRunEventCallback(unsigned long         eventId, 
-                                      unsigned char         eventOccured,
-                                      void*                 object, 
-                                      agent*                soarAgent, 
-                                      void*                 data)
-   {
-      Agent*        a = static_cast<Agent*>(object);
-      gSKI_K_PhaseCallbackData* phase_data = static_cast<gSKI_K_PhaseCallbackData*>(data);
-
-     // We have to change the the event id from a kernel id to a gSKI id
-	  RunNotifier rn(a, EnumRemappings::ReMapPhaseType(phase_data->phase_type,0));
-      a->m_runListeners.Notify(EnumRemappings::Map_Kernel_to_gSKI_RunEventId(eventId,eventOccured), rn);
    }
 
    // Listener to propagate the gSKI BEFORE_PHASE and AFTER_PHASE events 

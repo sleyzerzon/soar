@@ -24,7 +24,7 @@
  *  gSKI style listener events and notifies listeners.
  *
  * !!!  In fact, the only events propagated to gSKI as of Soar 8.6, are:
- *			 gSKI_K_EVENT_XML_OUTPUT,
+ *			 gSKI_K_EVENT_XML_OUTPUT,// converted gSKI removal
  *           gSKI_K_EVENT_PRINT_CALLBACK, // converted gSKI removal
  *           gSKI_K_EVENT_PRODUCTION_* events
  *      gSKI doesn't register for any other event.  Instead, it mirrors
@@ -58,27 +58,6 @@
 //   /* Must be the last value in this enumeration */
 //   gSKI_K_MAX_KERNEL_EVENTS       
 //};
-
-/*
- * All of the events that are fired for the agent.
- */
-enum egSKIAgentEvents
-{
-   /* Do we need WME preference added? */
-   //gSKI_K_EVENT_PRODUCTION_ADDED,         /* Data: production*       */          // DONE!
-   //gSKI_K_EVENT_PRODUCTION_REMOVED,       /* Data: production*       */          // DONE!
-   //gSKI_K_EVENT_PRODUCTION_FIRED,         /* Data: instantiation* */             // DONE!
-   //gSKI_K_EVENT_PRODUCTION_RETRACTED,     /* Data: instantiation* */             // DONE!
-   //gSKI_K_EVENT_ELABORATION_CYCLE,        /* Data: Phase type (char) & elab cycle count (int) ? */ // DONE!
-   
-   /* NOT Deprecated.  gSKI not close to removing this yet.  */
-   //gSKI_K_EVENT_PRINT_CALLBACK,           /* Data: agent* & const char*     */   // DONE!
-
-   gSKI_K_EVENT_XML_OUTPUT,        /* Data: agent* & const char* & const char* & const char*    */ // DONE! ?
-
-   /* Must be the last value in this enumeration */
-   gSKI_K_MAX_AGENT_EVENTS                
-};
 
 /**
  * List of the phases for the soar 8 kernel. 

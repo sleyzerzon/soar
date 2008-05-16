@@ -38,9 +38,6 @@ typedef struct kernel_struct {
    /* Moved this here from rhsfun.cpp. -AJC (8/9/02) */
    /* rhs_function *available_rhs_functions; */
 
-   /** Contains the list of kernel callbacks for gSKI */
-   // gSKI_K_CallbackData     gskiCallbacks[gSKI_K_MAX_KERNEL_EVENTS];
-
 } Kernel;
 
 /* ============================== FUNCTIONS ============================*/

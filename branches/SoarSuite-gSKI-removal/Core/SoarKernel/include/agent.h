@@ -700,9 +700,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   multi_attribute   * multi_attributes;
   /* char                path[MAXPATHLEN];    AGR 568 */
   
-  /* JC ADDED: Array of callbacks for gSKI objects */
-  gSKI_K_CallbackData  gskiCallbacks[gSKI_K_MAX_AGENT_EVENTS];
-
   //soar_callback_array soar_callbacks;
   list			      * soar_callbacks[NUMBER_OF_CALLBACKS];
   

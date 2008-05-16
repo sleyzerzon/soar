@@ -60,13 +60,6 @@ char * soar_version_string;
 
 void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
 
-  /* Updated this from soar_agent to thisAgent. -AJC (8/8/02) */
-  /* JC ADDED: Initialize the gski callbacks. 
-     This is mildly frightening.  I hope soar_agent is set correctly
-      by this point
-  */
-  gSKI_InitializeAgentCallbacks(thisAgent);
-
   /* JC ADDED: link the agent to its kernel */
   thisAgent->kernel = thisKernel;
 
