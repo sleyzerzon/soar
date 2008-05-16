@@ -15,7 +15,6 @@
 #include "gSKI_Agent.h"
 #include "gSKI_Error.h"
 #include "MegaAssert.h"
-#include "gSKI_ProductionManager.h"
 #include "gSKI_InputLink.h"
 #include "gSKI_OutputLink.h"
 #include "gSKI_WorkingMemory.h"
@@ -175,20 +174,11 @@ namespace gSKI
 {
 
    Agent::Agent(agent* pSoarAgent, Kernel *kernel): 
-      m_productionManager(0), 
-      m_agent(0), 
+      m_agent(pSoarAgent), 
       m_active(true),
       m_kernel(kernel),
 	  m_pPerfMon(0)
    {
-      MegaAssert(pSoarAgent != 0, "Null agent name pointer passed to agent constructor!");
-      MegaAssert(kernel != 0, "Null kernel pointer passed to agent constructor!");
-
-      // Why doesn't this call one of the initialize functions????
-      initializeRuntimeState();
-
-      m_agent = pSoarAgent ; // create_soar_agent(m_kernel->GetSoarKernel(), const_cast<char *>(agentName));     
-      MegaAssert(m_agent != 0, "Unable to create soar agent!");	 
    }
 
   void Agent::Init()
@@ -228,7 +218,6 @@ namespace gSKI
       delete m_inputlink;
       delete m_outputlink;
       delete m_workingMemory;
-      delete m_productionManager;
    
       destroy_soar_agent(m_kernel->GetSoarKernel(), m_agent);
    }
@@ -238,37 +227,13 @@ namespace gSKI
 
    =============================
    */
-   void Agent::initializeRuntimeState()
-   {
-      m_phaseCount        = 0;
-      m_elaborationCount  = 0;
-      m_decisionCount     = 0;  // should be m_agent->d_cycle_count.  Can we delete this var?
-      m_outputCount       = 0;
-	  m_nilOutputCycles   = 0;
-
-      // This tells run that we are starting a new cycle
-      m_lastPhase         = gSKI_OUTPUT_PHASE; /* okay eventhough not correct for Soar 7 */
-      m_nextPhase         = gSKI_INPUT_PHASE;
-
-      // perhaps we need to tell the agent manager to stop all agents or to only stop this agent
-      // BUG agent doesn't actually stop
-      m_runState          = gSKI_RUNSTATE_STOPPED;
-
-      // Clear out interrupts
-      m_suspendOnInterrupt = false;
-      m_interruptFlags     = 0;
-   }
-
-   bool Agent::Reinitialize(const char*       productionFileName, 
+   void Agent::Reinitialize(const char*       productionFileName, 
                             bool              learningOn,
                             egSKIOSupportMode oSupportMode,
                             Error*            err)
    {
      //MegaAssert(false, "Not implemented yet.");
       ClearError(err);
-
-      /// INITIALIZATION HERE
-      initializeRuntimeState();
 
       // Reinitializing the input and output links
       m_inputlink->Reinitialize();
@@ -286,148 +251,15 @@ namespace gSKI
       // reinitialize_soar cleans out the agents memory the 
       // init_agent_memory call adds back in the top state and
       // other misc. objects and wmes.
-      bool ok = reinitialize_soar( m_agent );
-      init_agent_memory( m_agent );
+
+	  // Moved into SML
+      //bool ok = reinitialize_soar( m_agent );
+      //init_agent_memory( m_agent );
 
       // Tell listeners it is over
       //am->FireAfterAgentReinitialized(this);
 
-      return ok;
-   }
-
-   /*
-   =============================
-
-   =============================
-   */
-   bool Agent::Interrupt(egSKIStopLocation    stopLoc, 
-                         egSKIStopType        stopType,
-                         Error*               err)
-   {
-      // This type of stopping requires full threading
-      MegaAssert(stopType != gSKI_STOP_BY_SUSPENDING, "This mode is not implemented.");
-      if(stopType == gSKI_STOP_BY_SUSPENDING)
-      { 
-         SetError(err, gSKIERR_NOT_IMPLEMENTED);
-         return false;
-      }
-
-      // We are in the stuff we can implement
-      ClearError(err);
-
-      // Tell the agent where to stop
-      m_interruptFlags = stopLoc;
-
-	  // If the request for interrupt is gSKI_STOP_AFTER_DECISION_CYCLE, then it 
-	  // will be caught in the RunScheduler::CompletedRunType() and/or IsAgentFinished().
-	  // We don't want to interrupt agents until the appropriate time if the request is  
-	  // gSKI_STOP_AFTER_DECISION_CYCLE.
-	  
-      // These are immediate requests for interrupt, such as from RHS or application
-	  if ((gSKI_STOP_AFTER_SMALLEST_STEP == stopLoc) || (gSKI_STOP_AFTER_PHASE == stopLoc)) {
-		  m_agent->stop_soar = TRUE;
-		  // If the agent is not running, we should set the runState flag now so agent won't run
-		  if (m_runState == gSKI_RUNSTATE_STOPPED)
-		  {
-			  m_runState = gSKI_RUNSTATE_INTERRUPTED;
-		  }
-		  // Running agents must test stopLoc & stop_soar in Step method to see if interrupted.
-		  // Because we set m_agent->stop_soar == TRUE above, any running agents should return to
-		  // gSKI at the end of the current phase, even if interleaving by larger steps.  KJC
-	  }
- 
-      // If  we implement suspend, it goes in the run method, not
-      //  here.
-      m_suspendOnInterrupt = (stopType == gSKI_STOP_BY_SUSPENDING)? true: false;
-
-
-      return true;
-   }
-
-   /*
-   =============================
-
-   =============================
-   */
-   void Agent::ClearInterrupts(Error* err)
-   {
-      ClearError(err);
-
-      // Clear the interrupts whether running or not
-      m_interruptFlags = 0;
-
-      // Only change state of agent if it is running
-      if(m_runState == gSKI_RUNSTATE_INTERRUPTED)
-      {
-
-         // Check about suspension
-         if(m_suspendOnInterrupt)
-         {
-            // TODO: When we implement suspend capabilities, waking
-            //  would go here...
-            m_suspendOnInterrupt = false;
-
-            // We were in the middle of running
-            m_runState = gSKI_RUNSTATE_RUNNING;
-         }
-         else
-         {
-            // We returned, and thus are stopped
-            m_runState = gSKI_RUNSTATE_STOPPED;
-         }
-      }
-   }
-
-   unsigned long Agent::GetInterruptFlags(Error* err)
-   {
-      ClearError(err);
-      return m_interruptFlags;
-   }
-
-   /*
-   =============================
-
-   =============================
-   */
-   void Agent::Halt(Error* err)
-   {
-      ClearError(err);
-
-      // Tell soar we halted (may have to lock here)
-      m_agent->system_halted = TRUE;
-
-      // If we are not running, set the run state to halted
-      // If we are running, the step method will set the
-      //   state to halted.
-	  if(m_runState != gSKI_RUNSTATE_RUNNING) 
-	  {
-		  m_runState = gSKI_RUNSTATE_HALTED;
-
-		   RunNotifier nfAfterHalt(this, m_lastPhase);
-           m_runListeners.Notify(gSKIEVENT_AFTER_HALTED, nfAfterHalt);
-
-		  // fix for BUG 514  01-12-06
-		  PrintNotifier nfHalted(this, "This Agent halted.");
-		  m_printListeners.Notify(gSKIEVENT_PRINT, nfHalted);
-		  XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
-		  m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
-		  XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "This Agent halted.") ;
-		  m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
-		  XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
-		  m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
-	  }
-   }
-
-   egSKIRunState Agent::GetRunState(Error* err)
-   {
-      ClearError(err);
-      return m_runState;
-   }
-   	  
-   void Agent::SetRunState(egSKIRunState state,Error* err)
-   { 
-      ClearError(err);
-	  m_runState = state; 
+      //return ok;
    }
 
    bool Agent::AddClientRhsFunction(RhsFunction* rhsFunction, 
@@ -471,19 +303,6 @@ namespace gSKI
       ClearError(err);
 
       return m_agent->name;
-   }
-
-
-
-   ProductionManager* Agent::GetProductionManager(Error* err)
-   {
-      ClearError(err);
-
-      if(m_productionManager == 0) {
-         m_productionManager = new ProductionManager(this);
-      }
-
-      return m_productionManager;
    }
 
    IInputLink* Agent::GetInputLink(Error* err)
@@ -651,12 +470,6 @@ namespace gSKI
 	  // KJC:  shouldn't this really be 
 	  return EnumRemappings::ReMapPhaseType(m_agent->current_phase,0);
 	  // should we also set m_lastPhase??
-   }
-
-   void Agent::ResetNilOutputCounter(Error* err)
-   {
-	  ClearError(err);
-	  m_nilOutputCycles = 0;
    }
 
       void Agent::AddRhsFunctionChangeListener(egSKISystemEventId    nEventId, 

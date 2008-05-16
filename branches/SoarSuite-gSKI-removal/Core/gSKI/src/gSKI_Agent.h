@@ -120,7 +120,7 @@ namespace gSKI
 		* @return true if the agent was reinitialized successfully, false if there
 		*           was an error and the agent could not be completely reinitialized.
 		*/
-		bool Reinitialize(const char*       productionFileName = 0, 
+		void Reinitialize(const char*       productionFileName = 0, 
 			bool              learningOn         = false,
 			egSKIOSupportMode oSupportMode       = gSKI_O_SUPPORT_MODE_4,
 			Error*            err                = 0);
@@ -144,117 +144,7 @@ namespace gSKI
 		*/
 		bool ReinitializeWithOldSettings(Error* err = 0);
 
-		/**
-		* @brief Interrupts agent execution
-		*
-		* Call this method to interrupt agent execution.  If the agent is not running,
-		*  nothing happens.
-		*
-		* Agents do not stop immediately upon being notified to interrupt. They stop
-		*  at one of the safe stopping points listed in the egSKIStopLocation 
-		*  enumeration.  Essentially this Interrupt method is a request to the agents
-		*  to stop processing.  It will stop when it gets a chance.  
-		*
-		* Be careful when calling Interrupt from a single threaded application.   If
-		*  you call interrupt in a single threaded app with stopType = gSKI_STOP_BY_SUSPEND
-		*  you will put your whole process to sleep with no chance of waking.
-		*
-		* If the agent is already stopped or interrupted, the interrupt is still
-		*  set.  You need to call ClearInterrupts to clear an interrupt created
-		*  with the Interrupt method.
-		*
-		* Possible Errors:
-		*   @li gSKIERR_CANNOT_SUSPEND if you specify gSKI_STOP_BY_SUSPEND
-		*         from the client-owned thread that created the agents. (Only
-		*         applicable when running agents using AgentManager::RunInClientThread
-		*         or Agent::RunInClientThread).
-		*   @li gSKIERR_CANNOT_STOP_FOR_CALLBACKS if you specify 
-		*           gSKI_STOP_ON_CALLBACK_RETURN or gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN
-		*           together with gSKI_STOP_BY_RETURNING.  These settings are 
-		*           incompatible because the system cannot safely return after
-		*           callbacks (it can suspend, however).
-		* 
-		* @see egSKIStopLocation
-		* @see egSKIStopType
-		*
-		* @param stopLoc Where to interrupt agent execution.  Possible locations are
-		*         gSKI_STOP_ON_CALLBACK_RETURN, gSKI_STOP_AFTER_ALL_CALLBACKS_RETURN,
-		*         gSKI_STOP_AFTER_CURRENT_PHASE, gSKI_STOP_NEXT_ELABORATION_CYCLE,
-		*         gSKI_STOP_NEXT_PHASE, and gSKI_STOP_NEXT_DECISION_CYCLE.
-		*         See egSKIStopLocation for more details.
-		* @param stopType How to stop the agent.  This can be one of
-		*               gSKI_STOP_BY_RETURNING or gSKI_STOP_BY_SLEEPING.
-		*               See egSKIStopType for more details.
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*
-		* @return true if the agent could be stopped.  false if there was an
-		*           error preventing it from being stopped.  See err for 
-		*           detailed error information.
-		*/
-		bool Interrupt(egSKIStopLocation    stopLoc, 
-			egSKIStopType        stopType,
-			Error*               err   = 0);
-
 		unsigned long GetInterruptFlags (Error* err = 0);
-
-		/** 
-		* @brief Clears any interrupts currently set for this agent
-		*
-		* Call to cause an agent to clear any currently set interrupts.
-		*  After calling this method the runstate of the agent is
-		*  set to gSKI_RUNSTATE_STOPPED.  
-		*
-		* If the agent was stopped by suspending the thread, this method
-		*  will wake the thread and it will begin processing again
-		*
-		* Calling this method when the agent is stopped or running
-		*  has no effect.
-		*
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*/
-		void ClearInterrupts(Error* err = 0);
-
-		/** 
-		* @brief Halts an agent permanently
-		*
-		* Call this method to immediately halt the agent permanently. A halted
-		*  agent must be reinitialized before it can run again after halting.
-		*  The halt actually occurs as soon as the agent completes the current
-		*  smallest step.  This method results in the agent run state being
-		*  set to gSKI_RUNSTATE_HALTED.
-		*
-		* If the agent is already halted, this method does nothing.
-		*
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*/
-		void Halt(Error* err = 0);
-
-		/**
-		* @brief Gets the current state of execution for this agent.
-		*
-		* An agent can be stopped, running or interrupted.
-		*
-		* @see egSKIRunState
-		*
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		* 
-		* @returns an enumerated value indicating the current state of execution
-		*           for this agent.
-		*/
-		egSKIRunState GetRunState(Error* err = 0);
-		void          SetRunState(egSKIRunState state, Error* err = 0) ;
 
 		/**
 		* @brief Gets the name of the agent
@@ -275,22 +165,6 @@ namespace gSKI
 		*/
 		const char* GetName(Error* err = 0);
 
-
-		/**
-		* @brief Returns a pointer to this agent's production manager
-		*
-		* Use the production manager to load and excise productions and
-		*  to iterate over productions and matches.
-		*
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		* 
-		* @returns A pointer to the production manager for this agent.  This
-		*           pointer may be 0 if the function fails.
-		*/
-		ProductionManager* GetProductionManager(Error* err = 0);
 
 		/**
 		* @brief Returns a pointer to the input link for this agent
@@ -535,22 +409,6 @@ namespace gSKI
 		* @returns The decision phase this agent is currently in.
 		*/
 		egSKIPhaseType GetCurrentPhase(Error* err = 0);
-
-		/**
-		* @brief Gets the current output count for this agent
-		*
-		* Call this method when you need to know the number of decision cycles
-		*  in which output has occured sing this agent was last initialized.
-		*
-		* @param err  Pointer to client-owned error structure.  If the pointer
-		*              is not NULL this structure is filled with extended error
-		*              information.  If it is NULL (the default) extended error
-		*              information is not returned.
-		*
-		* @returns The number of decision cycles with output since the agent was last
-		*             initialized.
-		*/
-		void          ResetNilOutputCounter(Error* err = 0);
 
 		AgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)
 		{ 
@@ -955,11 +813,6 @@ namespace gSKI
 			return (steps && (*steps >= maxSteps))? true: false;
 		}
 
-		/** 
-		* @brief Initializes the run counters and interrupt flags
-		*/
-		void initializeRuntimeState();
-
 	private:
 
 		/** Defines a map of rhs function */
@@ -968,8 +821,6 @@ namespace gSKI
 		typedef tRhsFunctionMap::iterator            tRhsFunctionMapIt;
 		typedef tRhsFunctionMap::const_iterator      tRhsFunctionMapCIt;
 		//}
-
-		ProductionManager*   m_productionManager; /**< The production manager for this agent. */
 
 		agent*                m_agent;             /**< the Soar agent pointer. */
 
@@ -997,20 +848,6 @@ namespace gSKI
 
 		////////////////// STUFF FOR RUN MANAGEMENT //////////////////////////////
 
-		egSKIPhaseType        m_lastPhase;         /**< Last executed phase */
-		egSKIPhaseType        m_nextPhase;         /**< Next phase that will execute (also current phase) */
-
-		unsigned long         m_interruptFlags;    /**< Flags indicating an interrupt request */
-
-		bool                  m_suspendOnInterrupt;   /**< True if the agent should suspend its thread on interrupt */
-
-		egSKIRunState         m_runState;          /**< Current agent run state */
-
-		unsigned long         m_phaseCount ;
-		unsigned long         m_elaborationCount ;
-		unsigned long         m_decisionCount ;
-		unsigned long         m_outputCount ;
-		unsigned long			m_nilOutputCycles ;
 
 		AgentPerformanceMonitor* m_pPerfMon;
 

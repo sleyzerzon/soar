@@ -269,7 +269,11 @@ void AgentSML::InitializeRuntimeState()
 bool AgentSML::Reinitialize()
 {
 	m_pKernelSML->FireAgentEvent(this, smlEVENT_BEFORE_AGENT_REINITIALIZED) ;
-	bool ok = GetgSKIAgent()->Reinitialize();
+	GetgSKIAgent()->Reinitialize();
+
+    bool ok = reinitialize_soar( m_agent );
+    init_agent_memory( m_agent );
+
 	InitializeRuntimeState() ;
 	m_pKernelSML->FireAgentEvent(this, smlEVENT_AFTER_AGENT_REINITIALIZED) ;
 	return ok ;

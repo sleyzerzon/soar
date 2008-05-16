@@ -578,14 +578,6 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_ProductionManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_ProductionManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\gSKI_ReleaseImpl.cpp"
 				>
 			</File>

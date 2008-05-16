@@ -41,7 +41,6 @@
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
 #include "gSKI_Agent.h"
-#include "gSKI_ProductionManager.h"
 #include "IgSKI_OutputProcessor.h"
 #include "IgSKI_InputProducer.h"
 #include "IgSKI_Symbol.h"

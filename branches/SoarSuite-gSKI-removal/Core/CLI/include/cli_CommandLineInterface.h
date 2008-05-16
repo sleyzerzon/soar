@@ -161,18 +161,6 @@ public:
 	bool XMLMoveCurrentToChild(int index) ;
 	bool XMLMoveCurrentToLastChild() ;
 
-protected:
-
-	void GetLastResultSML(sml::Connection* pConnection, sml::ElementXML* pResponse);
-
-	/*************************************************************
-	* @brief Does the bulk of command parsing and chooses what function
-	*		 to call to process the command.  DoCommand mainly does
-	*		 SML stuff.
-	*************************************************************/
-	bool DoCommandInternal(const std::string& commandLine);
-	bool DoCommandInternal(std::vector<std::string>& argv);
-
 	// The internal Parse functions follow
 	bool ParseAddWME(std::vector<std::string>& argv);
 	bool ParseAlias(std::vector<std::string>& argv);
@@ -654,6 +642,18 @@ protected:
 	* @brief watch-wmes command
 	*************************************************************/
 	bool DoWatchWMEs(const eWatchWMEsMode mode, WatchWMEsTypeBitset type, const std::string* pIdString = 0, const std::string* pAttributeString = 0, const std::string* pValueString = 0);
+
+protected:
+
+	void GetLastResultSML(sml::Connection* pConnection, sml::ElementXML* pResponse);
+
+	/*************************************************************
+	* @brief Does the bulk of command parsing and chooses what function
+	*		 to call to process the command.  DoCommand mainly does
+	*		 SML stuff.
+	*************************************************************/
+	bool DoCommandInternal(const std::string& commandLine);
+	bool DoCommandInternal(std::vector<std::string>& argv);
 
 	virtual void OnKernelEvent(int eventID, sml::AgentSML* pAgentSML, void* pCallData) ;
 

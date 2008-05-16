@@ -48,7 +48,6 @@ bool ProductionListener::AddListener(smlProductionEventId eventID, Connection* p
 	if (first)
 	{
 		this->RegisterWithKernel(eventID) ;
-		//m_pAgent->GetProductionManager()->AddProductionListener(eventID, this) ;
 	}
 
 	return first ;
@@ -62,7 +61,6 @@ bool ProductionListener::RemoveListener(smlProductionEventId eventID, Connection
 	if (last)
 	{
 		this->UnregisterWithKernel(eventID) ;
-		//m_pAgent->GetProductionManager()->RemoveProductionListener(eventID, this) ;
 	}
 
 	return last ;

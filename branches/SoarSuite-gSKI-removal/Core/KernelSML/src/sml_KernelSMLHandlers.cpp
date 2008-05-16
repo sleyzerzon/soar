@@ -43,7 +43,6 @@
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
 #include "gSKI_Agent.h"
-#include "gSKI_ProductionManager.h"
 #include "IgSKI_OutputProcessor.h"
 #include "IgSKI_OutputLink.h"
 #include "IgSKI_InputProducer.h"
@@ -540,9 +539,13 @@ bool KernelSML::HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pComma
 		return InvalidArg(pConnection, pResponse, pCommandName, "Need to specify the production name to check.") ;
 	}
 
-	gSKI::tIProductionIterator* prodIter = pAgentSML->GetgSKIAgent()->GetProductionManager()->GetProduction(pName, false) ;
-	bool found = prodIter->GetNumElements() > 0 ;
-	prodIter->Release() ;
+	Symbol* sym = find_sym_constant( pAgentSML->GetSoarAgent(), pName );
+
+	bool found = true;
+	if (!sym || !(sym->sc.production))
+	{
+		found = false;
+	}
 
 	return ReturnBoolResult(pConnection, pResponse, found) ;
 }
@@ -691,11 +694,8 @@ bool KernelSML::HandleLoadProductions(AgentSML* pAgentSML, char const* pCommandN
 	{
 		return InvalidArg(pConnection, pResponse, pCommandName, "Filename missing") ;
 	}
-
-	// Make the call.
-	bool ok = pAgentSML->GetgSKIAgent()->GetProductionManager()->LoadSoarFile(pFilename) ;
-
-	return ok ;
+	
+	return m_CommandLineInterface.DoSource( pFilename );
 }
 
 bool KernelSML::HandleGetInputLink(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* pConnection, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)
