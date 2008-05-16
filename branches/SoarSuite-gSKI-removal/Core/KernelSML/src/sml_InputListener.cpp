@@ -31,56 +31,6 @@ using namespace sml ;
 
 static bool kMaintainHashTable = false ;
 
-// A set of helper functions for tracing kernel wmes
-static void Symbol2String(Symbol* pSymbol, 	bool refCounts, std::ostringstream& buffer) {
-	if (pSymbol->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
-		buffer << pSymbol->id.name_letter ;
-		buffer << pSymbol->id.name_number ;
-	}
-	else if (pSymbol->common.symbol_type==VARIABLE_SYMBOL_TYPE) {
-		buffer << pSymbol->var.name ;
-	}
-	else if (pSymbol->common.symbol_type==SYM_CONSTANT_SYMBOL_TYPE) {
-		buffer << pSymbol->sc.name ;
-	}
-	else if (pSymbol->common.symbol_type==INT_CONSTANT_SYMBOL_TYPE) {
-		buffer << pSymbol->ic.value ;
-	}
-	else if (pSymbol->common.symbol_type==FLOAT_CONSTANT_SYMBOL_TYPE) {
-		buffer << pSymbol->fc.value ;
-	}
-
-	if (refCounts)
-		buffer << "[" << pSymbol->common.reference_count << "]" ;
-}
-
-static std::string Wme2String(wme* pWME, bool refCounts) {
-	std::ostringstream buffer ;
-
-	buffer << pWME->timetag << ":" ;
-
-	Symbol2String(pWME->id, refCounts, buffer) ;
-	buffer << " ^" ;
-	Symbol2String(pWME->attr, refCounts, buffer) ;
-	buffer << " " ;
-	Symbol2String(pWME->value, refCounts, buffer) ;
-
-	return buffer.str() ;
-}
-
-static void PrintDebugWme(char const* pMsg, wme* pWME, bool refCounts = false) {
-	std::string str = Wme2String(pWME, refCounts) ;
-	PrintDebugFormat("%s %s", pMsg, str.c_str()) ;
-}
-
-static void PrintDebugSymbol(Symbol* pSymbol, bool refCounts = false) {
-	std::ostringstream buffer ;
-	Symbol2String(pSymbol, refCounts, buffer) ;
-	std::string str = buffer.str() ;
-
-	PrintDebugFormat("%s", str.c_str()) ;
-}
-
 void InputListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 {
 	m_KernelSML = pKernelSML ;
