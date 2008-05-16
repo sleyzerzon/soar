@@ -194,9 +194,9 @@ void backtrace_through_instantiation (agent* thisAgent,
     if (inst->prod) print_with_symbols (thisAgent, "%y\n",inst->prod->name);
     else print_string (thisAgent, "[dummy production]\n");
     
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagBacktrace);
-    if (inst->prod) gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, symbol_to_string(thisAgent, inst->prod->name, true, 0, 0));
-    else gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, "[dummy production]");
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagBacktrace);
+    if (inst->prod) makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, symbol_to_string(thisAgent, inst->prod->name, true, 0, 0));
+    else makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, "[dummy production]");
       
   }
 
@@ -207,8 +207,8 @@ void backtrace_through_instantiation (agent* thisAgent,
       /* mvp 5-17-94 */
       print_spaces (thisAgent, indent);
       print_string (thisAgent, "(We already backtraced through this instantiation.)\n");
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kBacktracedAlready, "true");
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagBacktrace);
+      makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kBacktracedAlready, "true");
+      makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagBacktrace);
     }
     return;
   }
@@ -386,42 +386,42 @@ void backtrace_through_instantiation (agent* thisAgent,
     /* mvp 5-17-94 */
     print_spaces (thisAgent, indent);
     print_string (thisAgent, "  -->Grounds:\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagGrounds);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagGrounds);
     print_consed_list_of_condition_wmes (thisAgent, grounds_to_print, indent);
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagGrounds);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagGrounds);
     print (thisAgent, "\n");
     print_spaces (thisAgent, indent);
     print_string (thisAgent, "\n  -->Potentials:\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagPotentials);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagPotentials);
     print_consed_list_of_condition_wmes (thisAgent, pots_to_print, indent);
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPotentials);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPotentials);
     print (thisAgent, "\n");
     print_spaces (thisAgent, indent);
     print_string (thisAgent, "  -->Locals:\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagLocals);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagLocals);
     print_consed_list_of_condition_wmes (thisAgent, locals_to_print, indent);
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocals);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocals);
     print (thisAgent, "\n");
     print_spaces (thisAgent, indent);
     print_string (thisAgent, "  -->Negated:\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagNegated);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagNegated);
     print_consed_list_of_conditions (thisAgent, negateds_to_print, indent);
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagNegated);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagNegated);
     print (thisAgent, "\n");
     print_spaces (thisAgent, indent);
     print_string (thisAgent, "  -->Nots:\n");
     /* mvp done */
 
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagNots);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagNots);
     for (not1=inst->nots; not1!=NIL; not1=not1->next) {
       print_with_symbols (thisAgent, "    %y <> %y\n", not1->s1, not1->s2);
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagNot);
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kBacktraceSymbol1, symbol_to_string(thisAgent, not1->s1, true, 0, 0));
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kBacktraceSymbol2, symbol_to_string(thisAgent, not1->s2, true, 0, 0));
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagNot);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagNot);
+      makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kBacktraceSymbol1, symbol_to_string(thisAgent, not1->s1, true, 0, 0));
+      makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kBacktraceSymbol2, symbol_to_string(thisAgent, not1->s2, true, 0, 0));
+	  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagNot);
     }
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagNots);
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagBacktrace);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagNots);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagBacktrace);
   }
 
   /* Moved these free's down to here, to ensure they are cleared even if we're 
@@ -449,7 +449,7 @@ void trace_locals (agent* thisAgent, goal_stack_level grounds_level) {
 
   if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
     print_string (thisAgent, "\n\n*** Tracing Locals ***\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagLocals);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagLocals);
   }
   
   while (thisAgent->locals) {
@@ -460,7 +460,7 @@ void trace_locals (agent* thisAgent, goal_stack_level grounds_level) {
 
     if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
       print_string (thisAgent, "\nFor local ");
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagLocal);
+      makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagLocal);
       print_wme (thisAgent, cond->bt.wme_);
       print_string (thisAgent, " ");
     }
@@ -479,19 +479,19 @@ void trace_locals (agent* thisAgent, goal_stack_level grounds_level) {
           p = static_cast<preference_struct *>(prohibits->first);
           if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
             print_string (thisAgent, "     For prohibit preference: ");
-            gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProhibitPreference);
+            makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProhibitPreference);
             print_preference (thisAgent, p);
           }
           backtrace_through_instantiation (thisAgent, p->inst, grounds_level, cond, 6);
 
           if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-            gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProhibitPreference);
+            makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProhibitPreference);
           }
         }
       }
       /* mvp done */
       if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-          gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocal);
+          makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocal);
       }
       continue;
     }
@@ -499,8 +499,8 @@ void trace_locals (agent* thisAgent, goal_stack_level grounds_level) {
 	if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
       print_string (thisAgent, "...no trace, can't BT");
 	  // add an empty <backtrace> tag to make parsing XML easier
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagBacktrace);
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagBacktrace);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagBacktrace);
+	  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagBacktrace);
 	}
     /* --- for augmentations of the local goal id, either handle the
        "^quiescence t" test or discard it --- */
@@ -514,7 +514,7 @@ void trace_locals (agent* thisAgent, goal_stack_level grounds_level) {
 	thisAgent->quiescence_t_flag = TRUE;
       }
       if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-          gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocal);
+          makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocal);
       }
       continue;
     }
@@ -522,19 +522,19 @@ void trace_locals (agent* thisAgent, goal_stack_level grounds_level) {
     /* --- otherwise add it to the potential set --- */
     if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
       print_string (thisAgent, " --> make it a potential.");
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagAddToPotentials);
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagAddToPotentials);
+      makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagAddToPotentials);
+      makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagAddToPotentials);
     }
     add_to_potentials (thisAgent, cond);
     
     if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-        gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocal);
+        makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocal);
     }
 
   } /* end of while locals loop */
 
   if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocals);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagLocals);
   }
 }
 
@@ -555,7 +555,7 @@ void trace_grounded_potentials (agent* thisAgent) {
   
   if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
     print_string (thisAgent, "\n\n*** Tracing Grounded Potentials ***\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagGroundedPotentials);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagGroundedPotentials);
   }
   
   /* --- setup the tc of the ground set --- */
@@ -593,7 +593,7 @@ void trace_grounded_potentials (agent* thisAgent) {
   } /* end of while need_another_pass */
 
   if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagGroundedPotentials);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagGroundedPotentials);
   }
 }
 
@@ -617,7 +617,7 @@ Bool trace_ungrounded_potentials (agent* thisAgent, goal_stack_level grounds_lev
 
   if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
     print_string (thisAgent, "\n\n*** Tracing Ungrounded Potentials ***\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagUngroundedPotentials);
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagUngroundedPotentials);
   }
   
   /* --- scan through positive potentials, pick out the ones that have
@@ -640,7 +640,7 @@ Bool trace_ungrounded_potentials (agent* thisAgent, goal_stack_level grounds_lev
   /* --- if none to BT, exit --- */
   if (!pots_to_bt) {
       if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-          gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagUngroundedPotentials);
+          makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagUngroundedPotentials);
       }
       return FALSE;
   }
@@ -653,7 +653,7 @@ Bool trace_ungrounded_potentials (agent* thisAgent, goal_stack_level grounds_lev
     free_cons (thisAgent, c);
     if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
       print_string (thisAgent, "\nFor ungrounded potential ");
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagUngroundedPotential);
+      makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagUngroundedPotential);
       print_wme (thisAgent, potential->bt.wme_);
       print_string (thisAgent, " ");
     }
@@ -667,24 +667,24 @@ Bool trace_ungrounded_potentials (agent* thisAgent, goal_stack_level grounds_lev
         p = static_cast<preference_struct *>(prohibits->first);
         if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
           print_string (thisAgent, "     For prohibit preference: ");
-          gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProhibitPreference);
+          makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProhibitPreference);
           print_preference (thisAgent, p);
         }
         backtrace_through_instantiation (thisAgent, p->inst, grounds_level, potential, 6);
         
         if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-            gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProhibitPreference);
+            makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProhibitPreference);
         }
       }
     }
     /* mvp done */
     if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-        gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagUngroundedPotential);
+        makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagUngroundedPotential);
     }
   }
 
   if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) {
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagUngroundedPotentials);
+      makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagUngroundedPotentials);
   }
 
   return TRUE;

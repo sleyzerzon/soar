@@ -632,8 +632,8 @@ void create_instantiation (agent* thisAgent, production *prod,
    /* --- phase has changed to output by printing the arrow --- */
    if (trace_it && thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM]) {
       print (thisAgent, " -->\n");
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActionSideMarker);
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActionSideMarker);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActionSideMarker);
+	  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActionSideMarker);
    }
 
    /* --- execute the RHS actions, collect the results --- */
@@ -826,8 +826,8 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
 				(wme_trace_type)thisAgent->sysparams[TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM],1);
 			if (thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM]) {
 				print (thisAgent, " -->\n");
-				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActionSideMarker);
-				gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActionSideMarker);
+				makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActionSideMarker);
+				makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActionSideMarker);
 			}
 		}
         if (thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM]) {
@@ -1036,19 +1036,19 @@ void do_preference_phase (agent* thisAgent) {
   if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
 	  if (thisAgent->operand2_mode == TRUE) {
 		  if (thisAgent->current_phase == APPLY_PHASE) {  /* it's always IE for PROPOSE */
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_FiringProductions);
+			  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
+			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_FiringProductions);
 			  switch (thisAgent->FIRING_TYPE) {
 					case PE_PRODS:
 						print (thisAgent, "\t--- Firing Productions (PE) ---\n",0);
-						gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
+						makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
 						break;
 					case IE_PRODS:
 						print (thisAgent, "\t--- Firing Productions (IE) ---\n",0);
-						gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
+						makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
 						break;
 			  }
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
+			  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
 		  }
 	  }
 	  else

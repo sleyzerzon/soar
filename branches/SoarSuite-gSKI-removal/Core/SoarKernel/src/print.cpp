@@ -697,9 +697,9 @@ void print_condition_list (agent* thisAgent, condition *conds,
       {
          free_with_pool (&thisAgent->dl_cons_pool, dc);
          print_string (thisAgent, "-{");
-         gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagConjunctive_Negation_Condition);
+         makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagConjunctive_Negation_Condition);
          print_condition_list (thisAgent, c->data.ncc.top, indent+2, internal);
-         gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagConjunctive_Negation_Condition);
+         makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagConjunctive_Negation_Condition);
          print_string (thisAgent, "}");
          continue;
       }
@@ -726,23 +726,23 @@ void print_condition_list (agent* thisAgent, condition *conds,
 
       /* --- print the collected cond's all together --- */
       print_string (thisAgent, " (");
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCondition);
+      makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCondition);
 
       if (removed_goal_test) 
       {
          print_string (thisAgent, "state ");
-         gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionTest, kConditionTestState);
+         makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionTest, kConditionTestState);
 
       }
 
       if (removed_impasse_test) 
       {
          print_string (thisAgent, "impasse ");
-         gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionTest, kConditionTestImpasse);
+         makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionTest, kConditionTestImpasse);
       }
 
       print_string (thisAgent, test_to_string (thisAgent, id_test, NULL, 0));
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionId, test_to_string (thisAgent, id_test, NULL, 0));
+      makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kConditionId, test_to_string (thisAgent, id_test, NULL, 0));
       deallocate_test (thisAgent, thisAgent->id_test_to_match);
       deallocate_test (thisAgent, id_test);
 
@@ -788,10 +788,10 @@ void print_condition_list (agent* thisAgent, condition *conds,
             add_to_growable_string(thisAgent, &gs, temp);
          }
       }
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCondition, text_of_growable_string(gs));
+      makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCondition, text_of_growable_string(gs));
       free_growable_string(thisAgent, gs);
       print_string (thisAgent, ")");
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCondition);
+      makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCondition);
    } /* end of while (conds_not_yet_printed) */
 }
 
@@ -854,10 +854,10 @@ void print_action_list (agent* thisAgent, action *actions,
     a = static_cast<action_struct *>(dc->item);
     if (a->type==FUNCALL_ACTION) {
       free_with_pool (&thisAgent->dl_cons_pool, dc);
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagAction);
+      makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagAction);
       print_string (thisAgent, rhs_value_to_string (thisAgent, a->value, NULL, 0));
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kAction, rhs_value_to_string (thisAgent, a->value, NULL, 0));
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagAction);
+      makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kAction, rhs_value_to_string (thisAgent, a->value, NULL, 0));
+      makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagAction);
       continue;
     }
 
@@ -875,8 +875,8 @@ void print_action_list (agent* thisAgent, action *actions,
 
     /* --- print the collected actions all together --- */
     print_with_symbols (thisAgent, "(%y", thisAgent->action_id_to_match);
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagAction);
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kActionId, symbol_to_string(thisAgent, thisAgent->action_id_to_match, true, 0, 0));
+    makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagAction);
+    makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kActionId, symbol_to_string(thisAgent, thisAgent->action_id_to_match, true, 0, 0));
     growable_string gs = make_blank_growable_string(thisAgent);
     while (actions_for_this_id) {
       dc = actions_for_this_id;
@@ -911,10 +911,10 @@ void print_action_list (agent* thisAgent, action *actions,
         add_to_growable_string(thisAgent, &gs, temp);
       }
     }
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kAction, text_of_growable_string(gs));
+    makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kAction, text_of_growable_string(gs));
     free_growable_string(thisAgent, gs);
     print_string (thisAgent, ")");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagAction);
+    makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagAction);
   } /* end of while (actions_not_yet_printed) */
 }
 
@@ -934,8 +934,8 @@ void print_production (agent* thisAgent, production *p, Bool internal) {
   */
   print_with_symbols (thisAgent, "sp {%y\n", p->name);
 
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, symbol_to_string (thisAgent, p->name, TRUE, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, symbol_to_string (thisAgent, p->name, TRUE, 0, 0));
   
   /* 
   --- print optional documention string --- 
@@ -945,7 +945,7 @@ void print_production (agent* thisAgent, production *p, Bool internal) {
     char temp[MAX_LEXEME_LENGTH*2+10];
     string_to_escaped_string (thisAgent, p->documentation, '"', temp);
     print (thisAgent, "    %s\n", temp);
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDocumentation, temp);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDocumentation, temp);
   }
   
   /* 
@@ -955,30 +955,30 @@ void print_production (agent* thisAgent, production *p, Bool internal) {
   {
   case DEFAULT_PRODUCTION_TYPE: 
      print_string (thisAgent, "    :default\n");
-     gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeDefault);
+     makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeDefault);
      break;
   case USER_PRODUCTION_TYPE: 
      break;
   case CHUNK_PRODUCTION_TYPE: 
      print_string (thisAgent, "    :chunk\n"); 
-     gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeChunk);
+     makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeChunk);
      break;
   case JUSTIFICATION_PRODUCTION_TYPE:
     print_string (thisAgent, "    :justification ;# not reloadable\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeJustification);
+    makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionType, kProductionTypeJustification);
     break;
   }
 
   if (p->declared_support==DECLARED_O_SUPPORT)
   {
     print_string (thisAgent, "    :o-support\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDeclaredSupport, kProductionDeclaredOSupport);
+    makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDeclaredSupport, kProductionDeclaredOSupport);
   }
 
   else if (p->declared_support==DECLARED_I_SUPPORT)
   {
     print_string (thisAgent, "    :i-support\n");
-    gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDeclaredSupport, kProductionDeclaredISupport);
+    makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProductionDeclaredSupport, kProductionDeclaredISupport);
   }
 
   /* 
@@ -988,18 +988,18 @@ void print_production (agent* thisAgent, production *p, Bool internal) {
 								 &top, &bottom, NIL,&rhs);
   print_string (thisAgent, "   ");
   
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagConditions);
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagConditions);
   print_condition_list (thisAgent, top, 3, internal);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagConditions);
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagConditions);
   deallocate_condition_list (thisAgent, top);
   
   print_string (thisAgent, "\n    -->\n  ");
   print_string (thisAgent, "  ");
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActions);
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActions);
   print_action_list (thisAgent, rhs, 4, internal);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActions);
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActions);
   print_string (thisAgent, "\n}\n");
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
   
   deallocate_action_list (thisAgent, rhs);
 }
@@ -1083,23 +1083,23 @@ void print_preference (agent* thisAgent, preference *pref) {
   print (thisAgent, "\n");
 
   // <preference id="s1" attr="foo" value="123" pref_type=">"></preference>
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagPreference);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Id, symbol_to_string (thisAgent, pref->id, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, pref->attr, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, pref->value, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagPreference);
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Id, symbol_to_string (thisAgent, pref->id, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, pref->attr, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, pref->value, true, 0, 0));
 
   char buf[2];
   buf[0] = pref_type;
   buf[1] = 0;
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPreference_Type, (char*)buf);
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPreference_Type, (char*)buf);
   
   if (preference_is_binary(pref->type)) {
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kReferent, symbol_to_string (thisAgent, pref->referent, true, 0, 0));
+	  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kReferent, symbol_to_string (thisAgent, pref->referent, true, 0, 0));
   }
   if (pref->o_supported) {
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kOSupported, ":O");
+	  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kOSupported, ":O");
   }
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPreference);
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPreference);
 			
 }
 //#ifdef USE_TCL
@@ -1112,9 +1112,9 @@ filtered_print_wme_add(agent* thisAgent, wme *w) {
   if (passes_wme_filtering(thisAgent, w,TRUE)) 
   {
     print (thisAgent, "=>WM: ");
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWMEAdd);
+	makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWMEAdd);
     print_wme(thisAgent, w);
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWMEAdd);
+	makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWMEAdd);
   }
 }
 
@@ -1123,9 +1123,9 @@ void filtered_print_wme_remove(agent* thisAgent, wme *w)
   if (passes_wme_filtering(thisAgent, w,FALSE)) 
   {
     print (thisAgent, "<=WM: ");
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWMERemove);
+	makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWMERemove);
     print_wme(thisAgent, w);  /*  print_wme takes care of tagged output itself */
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWMERemove);
+	makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWMERemove);
   }
 }
 //#endif /* USE_TCL */
@@ -1140,14 +1140,14 @@ void print_wme (agent* thisAgent, wme *w) {
   print (thisAgent, "\n");
 
   // <wme tag="123" id="s1" attr="foo" attrtype="string" val="123" valtype="string"></wme>
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, w->timetag);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Id, symbol_to_string (thisAgent, w->id, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, w->attr, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, w->value, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_ValueType, symbol_to_typeString(thisAgent, w->value));
-  if (w->acceptable) gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWMEPreference, "+");
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, w->timetag);
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Id, symbol_to_string (thisAgent, w->id, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, w->attr, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, w->value, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_ValueType, symbol_to_typeString(thisAgent, w->value));
+  if (w->acceptable) makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWMEPreference, "+");
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
 
 }
 
@@ -1158,13 +1158,13 @@ void print_wme_without_timetag (agent* thisAgent, wme *w) {
   print (thisAgent, "\n");
 
   // <wme id="s1" attr="foo" attrtype="string" val="123" valtype="string"></wme>
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Id, symbol_to_string (thisAgent, w->id, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, w->attr, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, w->value, true, 0, 0));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_ValueType, symbol_to_typeString(thisAgent, w->value));
-  if (w->acceptable) gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWMEPreference, "+");
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Id, symbol_to_string (thisAgent, w->id, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, w->attr, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, w->value, true, 0, 0));
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_ValueType, symbol_to_typeString(thisAgent, w->value));
+  if (w->acceptable) makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWMEPreference, "+");
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
 
 }
 
@@ -1187,21 +1187,21 @@ void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
 
 
   if (action == PRINTING) {
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
   } else if (action == FIRING) {
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction_Firing);
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction_Firing);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
   } else if (action == RETRACTING) {
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction_Retracting);
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction_Retracting);
+	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagProduction);
   }
 
   if (inst->prod) {
       print_with_symbols  (thisAgent, "%y", inst->prod->name);
-      gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, symbol_to_string (thisAgent, inst->prod->name, true, 0, 0));
+      makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, symbol_to_string (thisAgent, inst->prod->name, true, 0, 0));
   } else {
       print (thisAgent, "[dummy production]");
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, "[dummy_production]");
+	  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kProduction_Name, "[dummy_production]");
 
   }
 
@@ -1209,13 +1209,13 @@ void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
 
   if (wtt==NONE_WME_TRACE) {
 	  if (action == PRINTING) {
-		  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
+		  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
 	  } else if (action == FIRING) {
-		  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
-		  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Firing);
+		  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
+		  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Firing);
 	  } else if (action == RETRACTING) {
-		  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
-		  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Retracting);
+		  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
+		  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Retracting);
 	  }
 	  return;
   }
@@ -1226,9 +1226,9 @@ void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
       case TIMETAG_WME_TRACE:
         print (thisAgent, " %lu", cond->bt.wme_->timetag);
 
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, cond->bt.wme_->timetag);
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
+		makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
+		makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, cond->bt.wme_->timetag);
+		makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
 
         break;
       case FULL_WME_TRACE:	
@@ -1245,9 +1245,9 @@ void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
 			  // Wmes that matched the LHS of a retraction may already be free'd; just print tt.
 			  print (thisAgent, " %lu", cond->bt.wme_->timetag);
 
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, cond->bt.wme_->timetag);
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
+			  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
+			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, cond->bt.wme_->timetag);
+			  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
  
               #endif
 		  }
@@ -1256,13 +1256,13 @@ void print_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
     }
 	
 	if (action == PRINTING) {
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
+		makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
 	} else if (action == FIRING) {
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Firing);
+		makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
+		makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Firing);
 	} else if (action == RETRACTING) {
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Retracting);
+		makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction);
+		makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagProduction_Retracting);
 	}
 }
 
@@ -1290,53 +1290,53 @@ void print_phase (agent* thisAgent, char * s, bool end_of_phase)
 
   // the rest is all for tagged output events
 
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagPhase);
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagPhase);
 
   if (end_of_phase) {
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Status, kPhaseStatus_End);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Status, kPhaseStatus_End);
   }
 
   switch (thisAgent->current_phase) {
   case INPUT_PHASE:
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Input);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Input);
 	break;
   case PREFERENCE_PHASE:
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Pref);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Pref);
     break;
   case WM_PHASE:
-	  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_WM);
+	  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_WM);
 	  if (thisAgent->operand2_mode == TRUE) {
 		  switch (thisAgent->FIRING_TYPE) {
 		  case PE_PRODS:  /* no longer needed;  Soar8 has PROPOSE/APPLY */
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
+			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
               break;
 		  case IE_PRODS:
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
+			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
               break;
 		  }
       }
 	  break;
   case DECISION_PHASE:
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Decision);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Decision);
     break;
   case OUTPUT_PHASE:
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Output);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Output);
     break;
   case PROPOSE_PHASE:
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Propose);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Propose);
     break;
   case APPLY_PHASE:
     if (thisAgent->operand2_mode == TRUE)
     {
-		gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Apply);
+		makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Apply);
 	}
     break;
   default:
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Unknown);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kPhaseName_Unknown);
     break;
   } // end switch
 
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPhase);
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPhase);
   return;
 }
 

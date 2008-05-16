@@ -1958,10 +1958,10 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 
                        char buf[256];
                        SNPRINTF(buf, 254, "Removing state S%d because element in GDS changed.", w->gds->goal->id.level);
-                       gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagVerbose);
-	                   gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, buf);
+                       makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagVerbose);
+	                   makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, buf);
                        print_wme(thisAgent, w);
-                       gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagVerbose);
+                       makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagVerbose);
                     }
                     gds_invalid_so_remove_goal(thisAgent, w);
                  }
@@ -2691,19 +2691,19 @@ void do_working_memory_phase (agent* thisAgent) {
    if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
       if (thisAgent->operand2_mode == TRUE) {		  
 		  if (thisAgent->current_phase == APPLY_PHASE) {  /* it's always IE for PROPOSE */
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_ChangingWorkingMemory);
+			  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
+			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_ChangingWorkingMemory);
 			  switch (thisAgent->FIRING_TYPE) {
                   case PE_PRODS:
 					  print (thisAgent, "\t--- Change Working Memory (PE) ---\n",0);
-					  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
+					  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
 					  break;      
 				  case IE_PRODS:	
 					  print (thisAgent, "\t--- Change Working Memory (IE) ---\n",0);
-					  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
+					  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
 					  break;
 			  }
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
+			  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
 		  }
       }
       else
@@ -2876,10 +2876,10 @@ void add_wme_to_gds(agent* agentPtr, goal_dependency_set* gds, wme* wme_to_add)
 	   print(agentPtr, " WME: "); 
 	   char buf[256];
 	   SNPRINTF(buf, 254, "Adding to GDS for S%d: ", wme_to_add->gds->goal->id.level);
-	   gSKI_MakeAgentCallbackXML(agentPtr, kFunctionBeginTag, kTagVerbose);
-	   gSKI_MakeAgentCallbackXML(agentPtr, kFunctionAddAttribute, kTypeString, buf);
+	   makeAgentCallbackXML(agentPtr, kFunctionBeginTag, kTagVerbose);
+	   makeAgentCallbackXML(agentPtr, kFunctionAddAttribute, kTypeString, buf);
 	   print_wme(agentPtr, wme_to_add);
-	   gSKI_MakeAgentCallbackXML(agentPtr, kFunctionEndTag, kTagVerbose);               
+	   makeAgentCallbackXML(agentPtr, kFunctionEndTag, kTagVerbose);               
    }
 }
 
@@ -3596,11 +3596,11 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
             if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
 		           print(thisAgent, "Value (Sum) = %f", exp(cand->sum_of_probability / TEMPERATURE));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->sum_of_probability / TEMPERATURE));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+               makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
+               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
+               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
+               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->sum_of_probability / TEMPERATURE));
+               makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 			}     
             /*  Total Probability represents the range of values, we expect
              *  the use of negative valued preferences, so its possible the
@@ -3642,11 +3642,11 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
             if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]) {
 				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);  
 		           print(thisAgent, "Value (Avg) = %f", fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeAvg);
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
-               gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+               makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
+               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
+               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeAvg);
+               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
+               makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
 			}    
             /* Total probability represents the range of values that
              * we'll map into for selection.  Here we don't expect the use

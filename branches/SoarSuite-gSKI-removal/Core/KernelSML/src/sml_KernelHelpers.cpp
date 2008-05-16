@@ -328,13 +328,13 @@ int compare_attr (const void * e1, const void * e2)
 void neatly_print_wme_augmentation_of_id (agent* thisAgent, wme *w, int indentation) {
 	char buf[NEATLY_PRINT_BUF_SIZE], *ch;
 
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, w->timetag);
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, w->attr, true, 0, 0));
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, w->value, true, 0, 0));
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_ValueType, symbol_to_typeString(thisAgent, w->value));
-	if (w->acceptable) gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWMEPreference, "+");
-	gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
+	makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, w->timetag);
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, w->attr, true, 0, 0));
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, w->value, true, 0, 0));
+	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_ValueType, symbol_to_typeString(thisAgent, w->value));
+	if (w->acceptable) makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWMEPreference, "+");
+	makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
 
 	strcpy (buf, " ^");
 	ch = buf;
@@ -488,15 +488,15 @@ void print_augs_of_id (agent* agnt,
 
 				// XML format of an <id> followed by a series of <wmes> each of which shares the original ID.
 				// <id id="s1"><wme tag="123" attr="foo" attrtype="string" val="123" valtype="string"></wme><wme attr="bar" ...></wme></id>
-				gSKI_MakeAgentCallbackXML(agnt, kFunctionBeginTag, kWME_Id);
-				gSKI_MakeAgentCallbackXML(agnt, kFunctionAddAttribute, kWME_Id, symbol_to_string (agnt, id, true, 0, 0));
+				makeAgentCallbackXML(agnt, kFunctionBeginTag, kWME_Id);
+				makeAgentCallbackXML(agnt, kFunctionAddAttribute, kWME_Id, symbol_to_string (agnt, id, true, 0, 0));
 
 				for (attr=0; attr < num_attr; attr++) {
 					w = list[attr];
 					neatly_print_wme_augmentation_of_id (agnt, w, indent);
 				}
 				
-				gSKI_MakeAgentCallbackXML(agnt, kFunctionEndTag, kWME_Id);
+				makeAgentCallbackXML(agnt, kFunctionEndTag, kWME_Id);
 
 				print (agnt, ")\n");
 			}
@@ -2234,10 +2234,10 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 
 						char buf[256];
 						SNPRINTF(buf, 254, "remove_input_wme: Removing state S%d because element in GDS changed.", pWme->gds->goal->id.level);
-						gSKI_MakeAgentCallbackXML(pSoarAgent, kFunctionBeginTag, kTagVerbose);
-						gSKI_MakeAgentCallbackXML(pSoarAgent, kFunctionAddAttribute, kTypeString, buf);
+						makeAgentCallbackXML(pSoarAgent, kFunctionBeginTag, kTagVerbose);
+						makeAgentCallbackXML(pSoarAgent, kFunctionAddAttribute, kTypeString, buf);
 						print_wme(pSoarAgent, pWme);
-						gSKI_MakeAgentCallbackXML(pSoarAgent, kFunctionEndTag, kTagVerbose);
+						makeAgentCallbackXML(pSoarAgent, kFunctionEndTag, kTagVerbose);
 					}
 
 				gds_invalid_so_remove_goal(pSoarAgent, pWme);

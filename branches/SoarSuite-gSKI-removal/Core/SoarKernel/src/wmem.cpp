@@ -231,10 +231,10 @@ void do_buffered_wm_changes (agent* thisAgent)
            next_c = cr->rest;
            if (w == cr->first) {
               print (thisAgent, "WARNING: WME added and removed in same phase : ");
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWarning);
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, "WARNING: WME added and removed in same phase :");
+			  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWarning);
+			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, "WARNING: WME added and removed in same phase :");
               print_wme(thisAgent, w);
-			  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWarning);
+			  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWarning);
            } 
         } 
      } 

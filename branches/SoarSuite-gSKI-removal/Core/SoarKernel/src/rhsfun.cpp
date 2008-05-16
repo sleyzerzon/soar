@@ -208,9 +208,9 @@ Symbol *write_rhs_function_code (agent* thisAgent, list *args, void* user_data) 
     print_string (thisAgent, string);
   }
 
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagRHS_write);
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kRHS_String, text_of_growable_string(gs));
-  gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagRHS_write);
+  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagRHS_write);
+  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kRHS_String, text_of_growable_string(gs));
+  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagRHS_write);
 
   free_growable_string(thisAgent, gs);
   

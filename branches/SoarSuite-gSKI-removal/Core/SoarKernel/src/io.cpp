@@ -296,10 +296,10 @@ Bool remove_input_wme (agent* thisAgent, wme *w) {
 
 				 char buf[256];
 				 SNPRINTF(buf, 254, "remove_input_wme: Removing state S%d because element in GDS changed.", w->gds->goal->id.level);
-				 gSKI_MakeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagVerbose);
-				 gSKI_MakeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, buf);
+				 makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagVerbose);
+				 makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, buf);
 				 print_wme(thisAgent, w);
-				 gSKI_MakeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagVerbose);
+				 makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagVerbose);
 			 }
 
 			 gds_invalid_so_remove_goal(thisAgent, w);
