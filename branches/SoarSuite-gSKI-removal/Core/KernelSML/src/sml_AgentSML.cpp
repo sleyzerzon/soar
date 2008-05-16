@@ -19,15 +19,14 @@
 #include "sml_KernelSML.h"
 #include "sml_RhsFunction.h"
 
-//#include "gSKI_Kernel.h"
 #include "IgSKI_InputProducer.h"
 #include "gSKI_Agent.h"
 #include "IgSKI_WorkingMemory.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_Symbol.h"
-//#include "gSKI_EnumRemapping.h"
 
 #include "KernelHeaders.h"
+#include "xml.h"
 
 #ifdef _DEBUG
 // Comment this in to debug init-soar and inputwme::update calls
@@ -429,10 +428,10 @@ bool AgentSML::Interrupt(smlStopLocationFlags stopLoc)
   // Tell the agent where to stop
   m_interruptFlags = stopLoc;
 
-  // If the request for interrupt is gSKI_STOP_AFTER_DECISION_CYCLE, then it 
+  // If the request for interrupt is sml_STOP_AFTER_DECISION_CYCLE, then it 
   // will be caught in the RunScheduler::CompletedRunType() and/or IsAgentFinished().
   // We don't want to interrupt agents until the appropriate time if the request is  
-  // gSKI_STOP_AFTER_DECISION_CYCLE.
+  // sml_STOP_AFTER_DECISION_CYCLE.
   
   // These are immediate requests for interrupt, such as from RHS or application
   if ((sml_STOP_AFTER_SMALLEST_STEP == stopLoc) || (sml_STOP_AFTER_PHASE == stopLoc)) {
@@ -446,10 +445,6 @@ bool AgentSML::Interrupt(smlStopLocationFlags stopLoc)
 	  // Because we set m_agent->stop_soar == TRUE above, any running agents should return to
 	  // gSKI at the end of the current phase, even if interleaving by larger steps.  KJC
   }
-
-  // If  we implement suspend, it goes in the run method, not
-  //  here.
-  //m_suspendOnInterrupt = (stopType == gSKI_STOP_BY_SUSPENDING)? true: false;
 
   return true;
 }
@@ -494,10 +489,10 @@ void AgentSML::FireRunEvent(smlRunEventId eventId) {
 
 void AgentSML::FireSimpleXML(char const* pMsg)
 {
-   GetgSKIAgent()->FirePrintEvent(gSKIEVENT_PRINT, pMsg) ;
-   GetgSKIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionBeginTag, sml_Names::kTagMessage, 0) ; 
-   GetgSKIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionAddAttribute, sml_Names::kTypeString, pMsg) ; 
-   GetgSKIAgent()->FireXMLEvent(gSKIEVENT_XML_TRACE_OUTPUT, sml_Names::kFunctionEndTag, sml_Names::kTagMessage, 0) ; 
+	// Trigger a callback from the kernel to propagate the event out to listeners.
+	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
+	Soar_Print( m_agent, m_agent, const_cast<char*>(pMsg) );
+	GenerateMessageXML( m_agent, pMsg );
 }
 
 static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)
@@ -579,15 +574,16 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 		   /* This is probably redundant with the event above, which clients can listen for... */
 		   FireSimpleXML("Interrupt received.") ;
 	   }
-	   else {
-	   // If we halted, we completed and our state is halted
-	   m_runState    = sml_RUNSTATE_HALTED;
-	   retVal        = sml_RUN_COMPLETED;
+	   else 
+	   {
+		   // If we halted, we completed and our state is halted
+		   m_runState    = sml_RUNSTATE_HALTED;
+		   retVal        = sml_RUN_COMPLETED;
 
-	   FireRunEvent(smlEVENT_AFTER_HALTED) ;
+		   FireRunEvent(smlEVENT_AFTER_HALTED) ;
 
-	   // fix for BUG 514  01-12-06
-	   FireSimpleXML("This Agent halted.") ;
+		   // fix for BUG 514  01-12-06
+		   FireSimpleXML("This Agent halted.") ;
 	   }
    }
    else if(maxStepsReached(GetRunCounter(runStepSize), END_COUNT)) 
