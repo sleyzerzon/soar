@@ -62,23 +62,6 @@ namespace gSKI
        const KernelFactory* GetKernelFactory(Error* err = 0) const ;
 
       /**
-       * @brief Returns the performance monitor for this kernel
-       *
-       * Use the performance monitor to look at timing and memory usage by 
-       *  the kernel and its agents.
-       *
-       * @param  err Pointer to client-owned error structure.  If the pointer
-       *               is not 0 this structure is filled with extended error
-       *               information.  If it is 0 (the default) extended error
-       *               information is not returned.
-       *
-       * @returns A pointer to the performance monitor for this kernel.  This pointer
-       *           may be 0 if there is a failure.
-       */
-      /* TODO: This interface needs to be defined */
-      IPerformanceMonitor* GetPerformanceMonitor(Error* err = 0);
-
-      /**
        * @brief Returns the instance information for this instance of the kernel
        *
        * Use the instance information to discover the threading model, process model

@@ -175,9 +175,7 @@ namespace gSKI
 
    Agent::Agent(agent* pSoarAgent, Kernel *kernel): 
       m_agent(pSoarAgent), 
-      m_active(true),
-      m_kernel(kernel),
-	  m_pPerfMon(0)
+      m_kernel(kernel)
    {
    }
 
@@ -198,7 +196,6 @@ namespace gSKI
      m_inputlink = new InputLink(this);
      m_workingMemory = new WorkingMemory(this);
 
-     m_pPerfMon = new AgentPerformanceMonitor(this);
   }
 
   Agent::~Agent()
@@ -210,8 +207,6 @@ namespace gSKI
 	   m_agent->active_level = 0; /* Signal that everything should be retracted */
 	   m_agent->FIRING_TYPE = IE_PRODS;
 	   do_preference_phase (m_agent);   /* allow all i-instantiations to retract */
-
-      delete m_pPerfMon;
 
       // Cleaning up the input and output links and the working memory
       // object since these are wholly owned by the agent.
@@ -232,7 +227,6 @@ namespace gSKI
                             egSKIOSupportMode oSupportMode,
                             Error*            err)
    {
-     //MegaAssert(false, "Not implemented yet.");
       ClearError(err);
 
       // Reinitializing the input and output links
@@ -240,26 +234,6 @@ namespace gSKI
       m_outputlink->Reinitialize();
       m_workingMemory->Reinitialize();
 
-      // !!!
-      // perhaps we need to tell the agent manager to stop all agents or to only stop this agent
-      // tcl/tgd needs to know that the agent(s?) stop
-      // tcl either runs all of them, or none at all, so our only option (right now) is to stop all (?)
-      // -- has to be done outside of gski, gski can't know about it from an oop perspective
-
-      // !! remember tgd clears all interrupts each time it calls run
-
-      // reinitialize_soar cleans out the agents memory the 
-      // init_agent_memory call adds back in the top state and
-      // other misc. objects and wmes.
-
-	  // Moved into SML
-      //bool ok = reinitialize_soar( m_agent );
-      //init_agent_memory( m_agent );
-
-      // Tell listeners it is over
-      //am->FireAfterAgentReinitialized(this);
-
-      //return ok;
    }
 
    bool Agent::AddClientRhsFunction(RhsFunction* rhsFunction, 
@@ -742,18 +716,6 @@ namespace gSKI
 	   GetSoarAgent()->input_period = period;
    }
       
-	void Agent::FirePrintEvent(egSKIPrintEventId eventId, char const* pMsg)
-	{
-	   PrintNotifier nfIntr(this, pMsg);
-	   m_printListeners.Notify(eventId, nfIntr);
-	}
-
-	void Agent::FireXMLEvent(egSKIXMLEventId eventId, const char* functionType, const char* attOrTag, const char* value)
-	{
-	   XMLNotifier xn3(this, functionType, attOrTag, value) ;
-	   m_XMLListeners.Notify(eventId, xn3);
-	}
-
    bool Agent::GetOperand2Mode() {
 		return m_agent->operand2_mode ? true : false;
    }

@@ -125,25 +125,6 @@ namespace gSKI
 			egSKIOSupportMode oSupportMode       = gSKI_O_SUPPORT_MODE_4,
 			Error*            err                = 0);
 
-		/** 
-		* @brief Reinitializes the agent using the current productions and settings
-		*
-		* This method is very similar to Agent::Reinitialize except it does
-		*  not excise any productions.  The current learning setting and
-		*  o-support mode are used.  See Agent::Reinitialize for more details.
-		*
-		* Agents are initialized to the STOP state.  @see gSKIRunState
-		*
-		* @param  err Pointer to client-owned error structure.  If the pointer
-		*               is not 0 this structure is filled with extended error
-		*               information.  If it is 0 (the default) extended error
-		*               information is not returned.
-		*
-		* @return true if the agent was reinitialized successfully, false if there
-		*           was an error and the agent could not be completely reinitialized.
-		*/
-		bool ReinitializeWithOldSettings(Error* err = 0);
-
 		unsigned long GetInterruptFlags (Error* err = 0);
 
 		/**
@@ -409,13 +390,6 @@ namespace gSKI
 		* @returns The decision phase this agent is currently in.
 		*/
 		egSKIPhaseType GetCurrentPhase(Error* err = 0);
-
-		AgentPerformanceMonitor* GetPerformanceMonitor(Error* err = 0)
-		{ 
-			// unreferenced formal parameters
-			(void)(err);
-			return m_pPerfMon; 
-		}
 
 		/**
 		* @brief Adds a client-defined rhs function to this agent.
@@ -701,10 +675,6 @@ namespace gSKI
 		*/
 		agent* GetSoarAgent(void) { return m_agent; }
 
-		//void FireRunEvent(egSKIRunEventId eventId, unsigned short phase) ;
-		void FirePrintEvent(egSKIPrintEventId eventId, char const* pMsg) ;
-		void FireXMLEvent(egSKIXMLEventId eventId, const char* functionType, const char* attOrTag, const char* value) ;
-
 		/** 
 		* @brief Event notifier for run events
 		*/
@@ -824,12 +794,6 @@ namespace gSKI
 
 		agent*                m_agent;             /**< the Soar agent pointer. */
 
-		bool                  m_active;            /**< Indication of this agent is active */
-
-		tPrintListenerManager m_printListeners;    /**< Holds listeners to the print event */
-
-		tXMLListenerManager	m_XMLListeners;		/**< Holds listeners to the XML event */
-
 		tRunListenerManager   m_runListeners;      /**< Holds listeners for the run events */
 
 		/**  struct defined for RunEvent userdata **/
@@ -848,8 +812,6 @@ namespace gSKI
 
 		////////////////// STUFF FOR RUN MANAGEMENT //////////////////////////////
 
-
-		AgentPerformanceMonitor* m_pPerfMon;
 
 		RemoveWmeCallback m_removeWmeCallback;
 	};

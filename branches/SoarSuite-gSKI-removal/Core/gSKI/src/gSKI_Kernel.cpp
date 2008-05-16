@@ -43,13 +43,6 @@ namespace gSKI
       return m_kF;
    }
 
-   IPerformanceMonitor* Kernel::GetPerformanceMonitor(Error* err)
-   {
-      ClearError(err);
-   
-      return 0;
-   }
-
    InstanceInfo* Kernel::GetInstanceInformation(Error* err)
    {
       ClearError(err);
