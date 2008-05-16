@@ -151,7 +151,7 @@ void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgen
 	// Start with the output link itself
 	// The kernel seems to only output this itself during link initialization
 	// and we might be connecting up after that.  Including it twice will not hurt on the client side.
-	output_link *ol = pAgentSML->GetAgent()->existing_output_links ;	// This is technically a list but we only support one output link
+	output_link *ol = pAgentSML->GetSoarAgent()->existing_output_links ;	// This is technically a list but we only support one output link
 	TagWme* pOutputLinkWme = OutputListener::CreateTagWme(ol->link_wme) ;
 	command.AddChild(pOutputLinkWme) ;
 

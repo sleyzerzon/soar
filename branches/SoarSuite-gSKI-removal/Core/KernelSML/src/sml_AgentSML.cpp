@@ -19,14 +19,13 @@
 #include "sml_KernelSML.h"
 #include "sml_RhsFunction.h"
 
-#include "gSKI_Kernel.h"
-#include "gSKI_AgentManager.h"
+//#include "gSKI_Kernel.h"
 #include "IgSKI_InputProducer.h"
 #include "gSKI_Agent.h"
 #include "IgSKI_WorkingMemory.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_Symbol.h"
-#include "gSKI_EnumRemapping.h"
+//#include "gSKI_EnumRemapping.h"
 
 #include "KernelHeaders.h"
 
@@ -91,7 +90,7 @@ AgentSML::AgentSML(KernelSML* pKernelSML, agent* pAgent)
 	m_InputLinkRoot = NULL ;
 	m_OutputLinkRoot = NULL ;
 	m_SuppressRunEndsEvent = false ;
-	m_pBeforeDestroyedListener = NULL ;
+	//m_pBeforeDestroyedListener = NULL ;
 
 	m_pAgentRunCallback = new AgentRunCallback() ;
 	m_pAgentRunCallback->SetAgentSML(this) ;
@@ -135,40 +134,12 @@ void AgentSML::Init()
 	InitializeRuntimeState() ;
 }
 
-class AgentSML::AgentBeforeDestroyedListener: public gSKI::IAgentListener
-{
-public:
-	// This handler is called right before the agent is actually deleted
-	// inside gSKI.  We need to clean up any object we own now.
-	virtual void HandleEvent(egSKIAgentEventId, gSKI::Agent* pAgent)
-	{
-#ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML::AgentBeforeDestroyedListener start.") ;
-#endif
-		KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
-
-		// Unregister ourselves (this is important for the same reasons as listed above)
-		pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, this) ;
-
-		// Release any wmes or other objects we're keeping
-		AgentSML* pAgentSML = pKernelSML->GetAgentSML( pAgent->GetName() ) ;
-		pAgentSML->DeleteSelf() ;
-		pAgentSML = NULL ;	// At this point the pointer is invalid so clear it.
-
-#ifdef DEBUG_UPDATE
-	PrintDebugFormat("AgentSML::AgentBeforeDestroyedListener end.") ;
-#endif
-	}
-};
-
 AgentSML::~AgentSML()
 {
-	// Release any objects we still own
-	Clear(true) ;
-
 	delete m_pAgentRunCallback ;
 	delete m_pInputProducer ;
-	delete m_pBeforeDestroyedListener ;
+	//delete m_pBeforeDestroyedListener ;
+	delete m_pIAgent;
 }
 
 // Release any objects or other data we are keeping.  We do this just
@@ -243,9 +214,9 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
 		wme* wme = mapIter->second ;
 		PrintDebugWme("Releasing ", wme, true) ;
-		release_io_symbol(this->GetAgent(), wme->id) ;
-		release_io_symbol(this->GetAgent(), wme->attr) ;
-		release_io_symbol(this->GetAgent(), wme->value) ;
+		release_io_symbol(this->GetSoarAgent(), wme->id) ;
+		release_io_symbol(this->GetSoarAgent(), wme->attr) ;
+		release_io_symbol(this->GetSoarAgent(), wme->value) ;
 	}
 
 	if (m_InputLinkRoot)
@@ -425,22 +396,22 @@ unsigned long AgentSML::GetRunCounter(smlRunStepSize runStepSize)
 {
 	switch(runStepSize)
 	{
-	case gSKI_RUN_PHASE:
+	case sml_PHASE:
 		{
 			unsigned long phases = GetNumPhasesExecuted() ;
 			return phases ;
 		}
-	case gSKI_RUN_ELABORATION_CYCLE:
+	case sml_ELABORATION:
 		{
 			unsigned long elabs = GetNumElaborationsExecuted() ;
 			return elabs ;
 		}
-	case gSKI_RUN_DECISION_CYCLE:
+	case sml_DECISION:
 		{
 			unsigned long decs = GetNumDecisionCyclesExecuted() ;
 			return decs ;
 		}
-	case gSKI_RUN_UNTIL_OUTPUT:
+	case sml_UNTIL_OUTPUT:
 		{
 			unsigned long outputs = GetNumOutputsGenerated() ;
 			return outputs ;
@@ -561,8 +532,8 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 	   }
    }
 
-   if ((m_interruptFlags & gSKI_STOP_AFTER_SMALLEST_STEP) || 
-	   (m_interruptFlags & gSKI_STOP_AFTER_PHASE))
+   if ((m_interruptFlags & sml_STOP_AFTER_SMALLEST_STEP) || 
+	   (m_interruptFlags & sml_STOP_AFTER_PHASE))
    {
 	   interrupted = true;
    }
@@ -572,7 +543,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
    // If not at the right phase, but interrupt was requested, then the SML scheduler
    // method IsAgentFinished will return true and MoveTo_StopBeforePhase will
    // step the agent by phases until this test is satisfied.
-   if ((m_interruptFlags & gSKI_STOP_AFTER_DECISION_CYCLE) && 
+   if ((m_interruptFlags & sml_STOP_AFTER_DECISION_CYCLE) && 
 	   (m_agent->current_phase == m_pKernelSML->GetStopBefore()))
    {
 	   interrupted = true;
@@ -651,7 +622,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
 
 void AgentSML::DeleteSelf()
 {
-	this->Clear(false) ;
+	this->Clear(true) ;
 
 	// Remove the listeners that KernelSML uses for this agent.
 	// This is important.  Otherwise if we create a new agent using the same kernel object
@@ -671,16 +642,16 @@ void AgentSML::DeleteSelf()
 	delete this ;
 }
 
-void AgentSML::RegisterForBeforeAgentDestroyedEvent()
-{
-	// We should do this immediately before we delete the agent.
-	// We shouldn't do it earlier or we can't be sure it'll be last on the list of listeners which is where we
-	// need it to be (so that we clear our information about the gSKI agent *after* we've notified any of our listeners
-	// about this event).
-	m_pBeforeDestroyedListener = new AgentBeforeDestroyedListener() ;
-	m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, m_pBeforeDestroyedListener) ;
-}
-
+//void AgentSML::RegisterForBeforeAgentDestroyedEvent()
+//{
+//	// We should do this immediately before we delete the agent.
+//	// We shouldn't do it earlier or we can't be sure it'll be last on the list of listeners which is where we
+//	// need it to be (so that we clear our information about the gSKI agent *after* we've notified any of our listeners
+//	// about this event).
+//	m_pBeforeDestroyedListener = new AgentBeforeDestroyedListener() ;
+//	m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(gSKIEVENT_BEFORE_AGENT_DESTROYED, m_pBeforeDestroyedListener) ;
+//}
+//
 void AgentSML::ScheduleAgentToRun(bool state) 
 { 
 	if (this->GetRunState() != sml_RUNSTATE_HALTED) 

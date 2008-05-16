@@ -394,14 +394,6 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_AgentManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_AgentManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\gSKI_AgentPerformanceMonitor.cpp"
 				>
 			</File>

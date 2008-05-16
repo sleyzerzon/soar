@@ -156,7 +156,7 @@ void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int )
 bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag)
 {
 	Symbol* pValueSymbol = 0 ;
-	agent*  pAgent = pAgentSML->GetAgent() ;
+	agent*  pAgent = pAgentSML->GetSoarAgent() ;
 
 	CHECK_RET_FALSE(strlen(pID) >= 2) ;
 	char idLetter = pID[0] ;
@@ -260,9 +260,9 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 	}
 	else
 	{
-		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->id) ;
-		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->attr) ;
-		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetAgent(), pNewInputWme->value) ;
+		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetSoarAgent(), pNewInputWme->id) ;
+		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetSoarAgent(), pNewInputWme->attr) ;
+		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetSoarAgent(), pNewInputWme->value) ;
 	}
 
 	if (kDebugInput)
@@ -286,7 +286,7 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 
 	if (!kMaintainHashTable)
 	{
-		pWME = find_input_wme_by_timetag(pAgentSML->GetAgent(), timetag) ;
+		pWME = find_input_wme_by_timetag(pAgentSML->GetSoarAgent(), timetag) ;
 	}
 	else
 	{
@@ -332,7 +332,7 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 		//pAgentSML->RemoveID(id.c_str()) ;
 	}
 
-	Bool ok = remove_input_wme(pAgentSML->GetAgent(), pWME) ;
+	Bool ok = remove_input_wme(pAgentSML->GetSoarAgent(), pWME) ;
 
 	// Remove the object from the time tag table because
 	// we no longer own it.
@@ -340,9 +340,9 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 	{
 		pAgentSML->RemoveKernelTimeTag(pTimeTag) ;
 
-		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
-		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
-		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetAgent(), pWME->value) ;
+		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetSoarAgent(), pWME->id) ;
+		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetSoarAgent(), pWME->attr) ;
+		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetSoarAgent(), pWME->value) ;
 
 		PrintDebugFormat("After removing wme") ;
 		pAgentSML->PrintKernelTimeTags() ;

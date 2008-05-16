@@ -30,7 +30,7 @@ void KernelCallback::KernelCallbackStatic(void* pAgent, int eventID, void* pData
 	agent* pKernelAgent   = (agent*)pAgent ;
 
 	// Make sure everything matches up correctly.
-	assert(pThis->m_pCallbackAgentSML->GetAgent() == pKernelAgent) ;
+	assert(pThis->m_pCallbackAgentSML->GetSoarAgent() == pKernelAgent) ;
 
 	// Make the callback to the non-static method
 	pThis->OnKernelEvent(eventID, pThis->m_pCallbackAgentSML, pCallData) ;
@@ -145,7 +145,7 @@ void KernelCallback::RegisterWithKernel(int eventID)
 	// Did you remember to call SetAgentSML() before registering this callback?
 	assert(m_pCallbackAgentSML) ;
 
-	agent* pAgent = m_pCallbackAgentSML->GetAgent() ;
+	agent* pAgent = m_pCallbackAgentSML->GetSoarAgent() ;
 
 	if (eventID == smlEVENT_OUTPUT_PHASE_CALLBACK)
 	{
@@ -188,7 +188,7 @@ void KernelCallback::UnregisterWithKernel(int eventID)
 	buffer << "id_0x" << this << "_evt_" << eventID;
 	std::string callbackID = buffer.str() ;
 
-	agent* pAgent = m_pCallbackAgentSML->GetAgent() ;
+	agent* pAgent = m_pCallbackAgentSML->GetSoarAgent() ;
 
 	if (eventID == smlEVENT_OUTPUT_PHASE_CALLBACK)
 	{

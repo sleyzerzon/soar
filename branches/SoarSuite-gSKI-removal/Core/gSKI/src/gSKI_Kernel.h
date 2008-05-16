@@ -62,22 +62,6 @@ namespace gSKI
        const KernelFactory* GetKernelFactory(Error* err = 0) const ;
 
       /**
-       * @brief  Returns the agent manager for this kernel.
-       *
-       * Use the agent manager to add and remove agents as well as 
-       *  set up the agents to run, etc.
-       *
-       * @param  err Pointer to client-owned error structure.  If the pointer
-       *               is not 0 this structure is filled with extended error
-       *               information.  If it is 0 (the default) extended error
-       *               information is not returned.
-       *
-       * @return A pointer to the agent manager.  The pointer may be 0 if there
-       *          is a failure.
-       */
-      AgentManager* GetAgentManager(Error* err = 0);
-
-      /**
        * @brief Returns the performance monitor for this kernel
        *
        * Use the performance monitor to look at timing and memory usage by 

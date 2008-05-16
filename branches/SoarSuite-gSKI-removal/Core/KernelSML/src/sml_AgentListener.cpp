@@ -27,7 +27,6 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 
-#include "gSKI_AgentManager.h"
 #include "gSKI_Agent.h"
 #include "gSKI_Kernel.h"
 
@@ -48,10 +47,10 @@ bool AgentListener::AddListener(smlAgentEventId eventID, Connection* pConnection
 {
 	bool first = EventManager<smlAgentEventId>::BaseAddListener(eventID, pConnection) ;
 
-	if (first && eventID == smlEVENT_BEFORE_AGENT_DESTROYED)
-	{
-		m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(static_cast<egSKIAgentEventId>(eventID), this) ;
-	}
+	//if (first && eventID == smlEVENT_BEFORE_AGENT_DESTROYED)
+	//{
+	//	m_pKernelSML->GetKernel()->GetAgentManager()->AddAgentListener(static_cast<egSKIAgentEventId>(eventID), this) ;
+	//}
 
 	return first ;
 }
@@ -61,11 +60,11 @@ bool AgentListener::RemoveListener(smlAgentEventId eventID, Connection* pConnect
 {
     bool last = EventManager<smlAgentEventId>::BaseRemoveListener(eventID, pConnection) ;
 
-	// Unregister from the kernel -- except for the two events that this class is internally listening for.
-	if (last && eventID == smlEVENT_BEFORE_AGENT_DESTROYED)
-	{
-		m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(static_cast<egSKIAgentEventId>(eventID), this) ;
-	}
+	//// Unregister from the kernel -- except for the two events that this class is internally listening for.
+	//if (last && eventID == smlEVENT_BEFORE_AGENT_DESTROYED)
+	//{
+	//	m_pKernelSML->GetKernel()->GetAgentManager()->RemoveAgentListener(static_cast<egSKIAgentEventId>(eventID), this) ;
+	//}
 
 	return last ;
 }
@@ -77,17 +76,17 @@ void AgentListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallD
 	OnEvent(static_cast<smlAgentEventId>(eventID), pAgentSML) ;
 }
 
-// Called when an "AgentEvent" occurs in gSKI
-void AgentListener::HandleEvent(egSKIAgentEventId eventIdIn, gSKI::Agent* pAgent)
-{
-	smlAgentEventId eventId = static_cast<smlAgentEventId>(eventIdIn);
-
-	AgentSML* pAgentSML = m_pKernelSML->GetAgentSML( pAgent->GetName() ) ;
-	assert(pAgentSML) ;
-
-	OnEvent(eventId, pAgentSML) ;
-}
-
+//// Called when an "AgentEvent" occurs in gSKI
+//void AgentListener::HandleEvent(egSKIAgentEventId eventIdIn, gSKI::Agent* pAgent)
+//{
+//	smlAgentEventId eventId = static_cast<smlAgentEventId>(eventIdIn);
+//
+//	AgentSML* pAgentSML = m_pKernelSML->GetAgentSML( pAgent->GetName() ) ;
+//	assert(pAgentSML) ;
+//
+//	OnEvent(eventId, pAgentSML) ;
+//}
+//
 void AgentListener::OnEvent(smlAgentEventId eventID, AgentSML* pAgentSML)
 {
 	// Pass init-soar events over to the output listener so it can do some cleanup before and after the init-soar

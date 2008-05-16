@@ -16,7 +16,6 @@
 #include "gSKI_Error.h"
 #include "MegaAssert.h"
 #include "gSKI_ProductionManager.h"
-#include "gSKI_AgentManager.h"
 #include "gSKI_InputLink.h"
 #include "gSKI_OutputLink.h"
 #include "gSKI_WorkingMemory.h"
@@ -268,13 +267,6 @@ namespace gSKI
      //MegaAssert(false, "Not implemented yet.");
       ClearError(err);
 
-      // Notify the agent manager
-      AgentManager* am = (AgentManager*)(m_kernel->GetAgentManager());
-      MegaAssert(am != 0, "Agent manager is not AgentManager!");
-      
-      // Tell listeners about his
-      //am->FireBeforeAgentReinitialized(this);
-         
       /// INITIALIZATION HERE
       initializeRuntimeState();
 

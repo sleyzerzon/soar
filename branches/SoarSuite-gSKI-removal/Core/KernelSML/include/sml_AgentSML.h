@@ -131,8 +131,8 @@ protected:
 	PendingInputList	m_PendingInput ;
 
 	// Used to listen for a before removed event
-	class AgentBeforeDestroyedListener ;
-	AgentBeforeDestroyedListener*	m_pBeforeDestroyedListener ;
+	//class AgentBeforeDestroyedListener ;
+	//AgentBeforeDestroyedListener*	m_pBeforeDestroyedListener ;
 
 	bool m_SuppressRunEndsEvent ;
 
@@ -160,13 +160,13 @@ protected:
 
 	AgentRunCallback*	m_pAgentRunCallback ;
 
+	~AgentSML() ;
+
 public:
 	AgentSML(KernelSML* pKernelSML, agent* pAgent) ;
 
 	void InitListeners() ;
 	void Init() ;
-
-	~AgentSML() ;
 
 	void SetIAgent(gSKI::Agent* pIAgent) ;
 
@@ -189,8 +189,7 @@ public:
 	bool Reinitialize() ;
 
 	gSKI::Agent* GetgSKIAgent()  { return m_pIAgent ; }
-	agent* GetAgent()		  { return m_agent ; }
-	agent* GetSoarAgent()	  { return m_agent ; }	// I prefer this naming.  Should eventually remove the other GetAgent() method.
+	agent* GetSoarAgent()	  { return m_agent ; }
 	KernelSML* GetKernelSML() { return m_pKernelSML ; }
 
 	char const* GetName() ;

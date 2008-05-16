@@ -42,7 +42,6 @@
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
-#include "gSKI_AgentManager.h"
 #include "gSKI_Agent.h"
 #include "gSKI_ProductionManager.h"
 #include "IgSKI_OutputProcessor.h"
@@ -131,6 +130,8 @@ void KernelSML::BuildCommandMap()
 *************************************************************/
 bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse)
 {
+	assert( !pAgentSML ); // FIXME: handle gracefully
+
 	// Get the parameters
 	char const* pName = pIncoming->GetArgString(sml_Names::kParamName) ;
 
@@ -141,11 +142,10 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 
 	agent* pSoarAgent = create_soar_agent(GetSoarKernel(), (char*)pName);
 
-	assert( !pAgentSML ); // FIXME: handle gracefully
 	pAgentSML = new AgentSML(this, pSoarAgent) ;
 
 	// Make the call.
-	gSKI::Agent* pAgent = GetKernel()->GetAgentManager()->AddAgent(pSoarAgent, NULL, false, gSKI_O_SUPPORT_MODE_4) ;
+	gSKI::Agent* pAgent = new gSKI::Agent( pSoarAgent, GetKernel() );
 	pAgentSML->SetIAgent(pAgent) ;
 
 	// Update our maps
@@ -393,20 +393,11 @@ bool KernelSML::HandleDestroyAgent(AgentSML* pAgentSML, char const* /*pCommandNa
 	if (!pAgentSML)
 		return false ;
 
-	// gSKI's RemoveAgent call isn't guaranteed to complete immediately.
-	// Instead it's a request (if the agent is running we have to stop it first and wait for that to happen
-	// before the delete it honored).  So we register for this notification that the agent is actually about
-	// to be deleted and then we release the data we have on this agent.
-	// It's also important that we register this listener now so that it's added to the *end* of the list of listeners.
-	// That's required as we want to send out calls to our clients for this before_agent_destroyed event and then
-	// clean up our agent information.  This will only work if our clean up comes last, which it will be because
-	// we're adding it immediately prior to the notification (although if the listener implementation is changed to not use push_back
-	// this will break).
-	pAgentSML->RegisterForBeforeAgentDestroyedEvent() ;
+	FireAgentEvent( pAgentSML, smlEVENT_BEFORE_AGENT_DESTROYED );
 
-	// Make the call to actually delete the agent
-	// This will trigger a call to our m_pBeforeDestroyedListener
-	GetKernel()->GetAgentManager()->RemoveAgent(pAgentSML->GetgSKIAgent()) ;
+	// Release any wmes or other objects we're keeping
+	pAgentSML->DeleteSelf() ;
+	pAgentSML = NULL ;	// At this point the pointer is invalid so clear it.
 
 	return true ;
 }
@@ -581,36 +572,18 @@ bool KernelSML::HandleIsSoarRunning(AgentSML* /*pAgentSML*/, char const* /*pComm
 
 bool KernelSML::HandleGetAgentList(AgentSML* /*pAgentSML*/, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)
 {
-	// Make the call.
-	gSKI::AgentManager* pManager = GetKernel()->GetAgentManager() ;
-
-	// Get the list of agents
-	gSKI::tIAgentIterator* iter = pManager->GetAgentIterator() ;
-
-	if (!iter)
-		return false ;
-
 	// Create the result tag
 	TagResult* pTagResult = new TagResult() ;
 	pTagResult->AddAttribute(sml_Names::kCommandOutput, sml_Names::kStructuredOutput) ;
 
 	// Walk the list of agents and return their names
-	while (iter->IsValid())
+	for (AgentMapIter iter = m_AgentMap.begin() ; iter != m_AgentMap.end() ; iter++)
 	{
-		gSKI::Agent* pAgent = iter->GetVal() ;
-
 		// Add a name tag to the output
 		TagName* pTagName = new TagName() ;
-		pTagName->SetName(pAgent->GetName()) ;
+		pTagName->SetName( iter->first.c_str() ) ;
 		pTagResult->AddChild(pTagName) ;
-
-		// Apparently, we don't release agent objects return from an agent iterator.  There is no such method.
-		//pAgent->Release() ;
-
-		iter->Next() ;
 	}
-
-	iter->Release() ;
 
 	// Add the result tag to the response
 	pResponse->AddChild(pTagResult) ;
@@ -1053,7 +1026,7 @@ bool KernelSML::HandleGetAllOutput(AgentSML* pAgentSML, char const* /*pCommandNa
 	TagCommand* pTagResult = new TagCommand() ;
 	pTagResult->SetName(sml_Names::kCommand_Output) ;
 
-	agent* pSoarAgent = pAgentSML->GetAgent() ;
+	agent* pSoarAgent = pAgentSML->GetSoarAgent() ;
 
 	output_link *ol = pSoarAgent->existing_output_links ;	// This is technically a list but we only support one output link
 

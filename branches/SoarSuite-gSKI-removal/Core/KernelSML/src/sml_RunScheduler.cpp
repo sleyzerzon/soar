@@ -22,7 +22,6 @@
 #include "sml_Events.h"
 
 #include "gSKI_Error.h"
-#include "gSKI_AgentManager.h"
 #include "gSKI_Kernel.h"
 
 #include <assert.h>

@@ -53,25 +53,25 @@ void KernelHelpers::SetSysparam (AgentSML* agent, int param_number, long new_val
 	//Agent* internalAgent = (Agent*)(agent);
 	sml::KernelSML* pKernelSML = agent->GetKernelSML() ;
 
-	agent->GetAgent()->sysparams[param_number] = new_value;
+	agent->GetSoarAgent()->sysparams[param_number] = new_value;
 	pKernelSML->FireSystemEvent(smlEVENT_SYSTEM_PROPERTY_CHANGED) ;
 	//internalAgent->GetKernel()->FireSystemPropertyChangedEvent() ;
 }
 
 long KernelHelpers::GetSysparam(AgentSML* agent, int param_number)
 {
-	return agent->GetAgent()->sysparams[param_number];
+	return agent->GetSoarAgent()->sysparams[param_number];
 }
 
 const long* KernelHelpers::GetSysparams(AgentSML* agent)
 {
-	return agent->GetAgent()->sysparams;
+	return agent->GetSoarAgent()->sysparams;
 }
 
 rete_node* KernelHelpers::NameToProduction (AgentSML* agent, char* string_to_test)
 {
 	::Symbol* sym;
-	sym = find_sym_constant(agent->GetAgent(), string_to_test);
+	sym = find_sym_constant(agent->GetSoarAgent(), string_to_test);
 
 	if (sym && sym->sc.production)
 		return sym->sc.production->p_node;
@@ -84,24 +84,24 @@ void KernelHelpers::PrintPartialMatchInformation(AgentSML* agent,
 struct rete_node_struct *p_node,
 	wme_trace_type wtt)
 {
-	print_partial_match_information(agent->GetAgent(), p_node, wtt);
+	print_partial_match_information(agent->GetSoarAgent(), p_node, wtt);
 }
 
 void KernelHelpers::PrintMatchSet(AgentSML* agent, wme_trace_type wtt, ms_trace_type  mst)
 {
-	print_match_set(agent->GetAgent(), wtt, mst);
+	print_match_set(agent->GetSoarAgent(), wtt, mst);
 }
 
 void KernelHelpers::XMLPartialMatchInformation(AgentSML* agent, 
 struct rete_node_struct *p_node,
 	wme_trace_type wtt)
 {
-	xml_partial_match_information(agent->GetAgent(), p_node, wtt);
+	xml_partial_match_information(agent->GetSoarAgent(), p_node, wtt);
 }
 
 void KernelHelpers::XMLMatchSet(AgentSML* agent, wme_trace_type wtt, ms_trace_type  mst)
 {
-	xml_match_set(agent->GetAgent(), wtt, mst);
+	xml_match_set(agent->GetSoarAgent(), wtt, mst);
 }
 
 
@@ -113,7 +113,7 @@ void KernelHelpers::PrintStackTrace(AgentSML* agent, bool print_states, bool pri
 	const int maxStates = 500 ;
 	int stateCount = 0 ;
 
-	for (g = agent->GetAgent()->top_goal; g != NIL; g = g->id.lower_goal) 
+	for (g = agent->GetSoarAgent()->top_goal; g != NIL; g = g->id.lower_goal) 
 	{
 		stateCount++ ;
 
@@ -122,20 +122,20 @@ void KernelHelpers::PrintStackTrace(AgentSML* agent, bool print_states, bool pri
 
 		if (print_states)
 		{
-			print_stack_trace (agent->GetAgent(),g, g, FOR_STATES_TF, false);
-			print (agent->GetAgent(), "\n");
+			print_stack_trace (agent->GetSoarAgent(),g, g, FOR_STATES_TF, false);
+			print (agent->GetSoarAgent(), "\n");
 		}
 		if (print_operators && g->id.operator_slot->wmes) 
 		{
-			print_stack_trace (agent->GetAgent(), g->id.operator_slot->wmes->value,
+			print_stack_trace (agent->GetSoarAgent(), g->id.operator_slot->wmes->value,
 				g, FOR_OPERATORS_TF, false);
-			print (agent->GetAgent(), "\n");
+			print (agent->GetSoarAgent(), "\n");
 		}
 	}
 
 	if (stateCount > maxStates)
 	{
-		print (agent->GetAgent(), "...Stack goes on for another %d states\n", stateCount - maxStates);
+		print (agent->GetSoarAgent(), "...Stack goes on for another %d states\n", stateCount - maxStates);
 	}
 }
 
@@ -790,7 +790,7 @@ void KernelHelpers::PrintSymbol(AgentSML* thisAgent,
 	wme* w;
 	list* wmes;
 
-	agent* agnt = thisAgent->GetAgent();
+	agent* agnt = thisAgent->GetSoarAgent();
 
 	get_lexeme_from_string(agnt, arg);
 
@@ -811,10 +811,10 @@ void KernelHelpers::PrintSymbol(AgentSML* thisAgent,
 
 	case INT_CONSTANT_LEXEME:
 		output_arg = true; /* Soar-Bugs #161 */
-		for (w=thisAgent->GetAgent()->all_wmes_in_rete; w!=NIL; w=w->rete_next)
+		for (w=thisAgent->GetSoarAgent()->all_wmes_in_rete; w!=NIL; w=w->rete_next)
 			// RDF (08282002) Added the following cast to get rid of warning
 			// message
-			if (w->timetag == (unsigned long) thisAgent->GetAgent()->lexeme.int_val) 
+			if (w->timetag == (unsigned long) thisAgent->GetSoarAgent()->lexeme.int_val) 
 				break;
 		if (w) 
 		{
@@ -870,11 +870,11 @@ void KernelHelpers::PrintUser(AgentSML*       thisAgent,
 	unused(arg) ;
 
 	//bool output_arg = true; /* TEST for Soar-Bugs #161 */
-	for (production* prod=thisAgent->GetAgent()->all_productions_of_type[productionType];  
+	for (production* prod=thisAgent->GetSoarAgent()->all_productions_of_type[productionType];  
 		prod != NIL; prod = prod->next)
 	{
 		/* CUSP B11 kjh */
-		do_print_for_production(thisAgent->GetAgent(), prod,internal,
+		do_print_for_production(thisAgent->GetSoarAgent(), prod,internal,
 			print_filename,full_prod);
 	}
 }
@@ -1280,7 +1280,7 @@ bool KernelHelpers::Preferences(AgentSML* thisAgent, int detail, bool object, co
 {
 	static const int PREFERENCES_BUFFER_SIZE = 128;
 
-	agent* soarAgent = thisAgent->GetAgent();
+	agent* soarAgent = thisAgent->GetSoarAgent();
 
 	char id[PREFERENCES_BUFFER_SIZE];
 	char attr[PREFERENCES_BUFFER_SIZE];
@@ -1839,7 +1839,7 @@ bool KernelHelpers::ProductionFind(AgentSML*     thisAgent,
 {
 	unused(agnt2) ;
 
-	agent* agnt = thisAgent->GetAgent();
+	agent* agnt = thisAgent->GetSoarAgent();
 
 	list* current_pf_list = 0;
 
@@ -1886,7 +1886,7 @@ bool KernelHelpers::ProductionFind(AgentSML*     thisAgent,
 
 bool KernelHelpers::GDSPrint(AgentSML* thisAgent)
 {
-	agent* agnt = thisAgent->GetAgent();
+	agent* agnt = thisAgent->GetSoarAgent();
 
 	wme *w;
 	Symbol *goal;

@@ -617,7 +617,6 @@ bool removeDir(const char* name){
 
 
 #include "gSKI_Agent.h"
-#include "gSKI_AgentManager.h"
 #include "gSKI_Kernel.h"
 #include "gSKI_KernelFactory.h"
 

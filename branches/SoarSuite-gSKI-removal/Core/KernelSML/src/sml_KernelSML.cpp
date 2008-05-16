@@ -40,7 +40,6 @@
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
-#include "gSKI_AgentManager.h"
 #include "gSKI_Agent.h"
 #include "gSKI_ProductionManager.h"
 #include "IgSKI_OutputProcessor.h"
@@ -155,20 +154,7 @@ void KernelSML::DeleteAllAgents(bool waitTillDeleted)
 		AgentSML* pAgentSML = m_AgentMap.begin()->second ;
 		size_t agentCount = m_AgentMap.size() ;
 
-		// gSKI's RemoveAgent call isn't guaranteed to complete immediately.
-		// Instead it's a request (if the agent is running we have to stop it first and wait for that to happen
-		// before the delete it honored).  So we register for this notification that the agent is actually about
-		// to be deleted and then we release the data we have on this agent.
-		// It's also important that we register this listener now so that it's added to the *end* of the list of listeners.
-		// That's required as we want to send out calls to our clients for this before_agent_destroyed event and then
-		// clean up our agent information.  This will only work if our clean up comes last, which it will be because
-		// we're adding it immediately prior to the notification (although if the listener implementation is changed to not use push_back
-		// this will break).
-		pAgentSML->RegisterForBeforeAgentDestroyedEvent() ;
-
-		// Make the call to actually delete the agent
-		// This will trigger a call to our m_pBeforeDestroyedListener
-		GetKernel()->GetAgentManager()->RemoveAgent(pAgentSML->GetgSKIAgent(), NULL) ;
+		HandleDestroyAgent( pAgentSML, 0, 0, 0, 0 );
 
 		// Now wait for the agent to be deleted (if we were requested to do so)
 		int maxTries = 100 ;	// Wait for a second then abort anyway

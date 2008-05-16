@@ -451,11 +451,6 @@ protected:
 
 protected:
 	/*************************************************************
-	* @brief	Get the kernel factory object.
-	*************************************************************/
-	gSKI::KernelFactory* GetKernelFactory() { return m_pKernelFactory ; }
-
-	/*************************************************************
 	* @brief	Return an object* to the caller.
 	*************************************************************/
 	bool ReturnResult(Connection* pConnection, ElementXML* pResponse, char const* pResult) ;

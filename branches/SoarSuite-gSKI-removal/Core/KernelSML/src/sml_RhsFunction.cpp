@@ -114,7 +114,7 @@ Symbol* sml::ConcatRhsFunction::Execute(std::vector<Symbol*>* pArguments)
 
 	  std::string res = ostr.str() ;
 	  char const* pResultStr = res.c_str() ;
-	  Symbol* pResult = make_sym_constant(m_pAgentSML->GetAgent(), pResultStr) ;
+	  Symbol* pResult = make_sym_constant(m_pAgentSML->GetSoarAgent(), pResultStr) ;
 	  return pResult ;
 }
 
@@ -156,7 +156,7 @@ Symbol* sml::CmdRhsFunction::Execute(std::vector<Symbol*>* pArguments)
 
 	std::string result = m_pAgentSML->ExecuteCommandLine(argument) ;
 
-	Symbol* pResult = make_sym_constant(m_pAgentSML->GetAgent(), result.c_str()) ;
+	Symbol* pResult = make_sym_constant(m_pAgentSML->GetSoarAgent(), result.c_str()) ;
 	return pResult ;
 }
 
@@ -202,6 +202,6 @@ Symbol* sml::ExecRhsFunction::Execute(std::vector<Symbol*>* pArguments)
 		result = std::string("Error: Nobody was registered to implement rhs function ") + function ;
 	}
 
-	Symbol* pResult = make_sym_constant(m_pAgentSML->GetAgent(), result.c_str()) ;
+	Symbol* pResult = make_sym_constant(m_pAgentSML->GetSoarAgent(), result.c_str()) ;
 	return pResult ;
 }

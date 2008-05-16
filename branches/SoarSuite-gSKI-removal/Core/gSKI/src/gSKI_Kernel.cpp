@@ -15,7 +15,6 @@
 #include "gSKI_Kernel.h"
 #include "gSKI_Error.h"
 #include "gSKI_InstanceInfo.h"
-#include "gSKI_AgentManager.h"
 #include "gSKI_EnumRemapping.h"
 #include "kernel_struct.h"
 #include "MegaAssert.h"
@@ -30,22 +29,13 @@ namespace gSKI
 	  m_stopPoint    = gSKI_INPUT_PHASE;
       init_soar( m_soarKernel );
       m_instanceInfo = new InstanceInfo("test1", "test2", gSKI_IN_PROCESS, gSKI_SINGLE_THREAD);
-      m_agentMgr     = new AgentManager(this);
    }
 
    Kernel::~Kernel()
    {
-      delete m_agentMgr; m_agentMgr = 0;
       delete m_instanceInfo; m_instanceInfo = 0;
       destroy_kernel(m_soarKernel);
       m_soarKernel = 0;
-   }
-
-   AgentManager* Kernel::GetAgentManager(Error* err)
-   {
-      ClearError(err);
-
-      return(m_agentMgr); 
    }
 
    const KernelFactory* Kernel::GetKernelFactory(Error* err) const
