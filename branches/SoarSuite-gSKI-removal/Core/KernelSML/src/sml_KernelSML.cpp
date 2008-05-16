@@ -286,12 +286,12 @@ std::string KernelSML::FireLoadLibraryEvent(char const* pLibraryCommand) {
 *			These messages are from one client to another--kernelSML is just
 *			facilitating the message passing process without knowing/caring what is being passed.
 *************************************************************/
-std::string KernelSML::SendClientMessage(gSKI::Agent* pAgent, char const* pMessageType, char const* pMessage)
+std::string KernelSML::SendClientMessage(AgentSML* pAgentSML, char const* pMessageType, char const* pMessage)
 {
 	char response[10000] ;
 	response[0] = 0 ;
 
-	bool ok = m_RhsListener.HandleEvent(smlEVENT_CLIENT_MESSAGE, GetAgentSML(pAgent), false, pMessageType, pMessage, sizeof(response), response) ;
+	bool ok = m_RhsListener.HandleEvent(smlEVENT_CLIENT_MESSAGE, pAgentSML, false, pMessageType, pMessage, sizeof(response), response) ;
 	if (!ok)
 	{
 		// There was listening to this message

@@ -293,7 +293,7 @@ public:
 	*			These messages are from one client to another--kernelSML is just
 	*			facilitating the message passing process without knowing/caring what is being passed.
 	*************************************************************/
-	std::string SendClientMessage(gSKI::Agent* pAgent, char const* pMessageType, char const* pMessage) ;
+	std::string SendClientMessage(AgentSML* pAgentSML, char const* pMessageType, char const* pMessage) ;
 
 	/*************************************************************
 	* @brief	Send this command line out to all clients that have

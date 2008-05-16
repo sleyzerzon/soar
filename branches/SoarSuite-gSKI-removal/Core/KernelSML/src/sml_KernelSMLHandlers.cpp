@@ -714,7 +714,7 @@ bool KernelSML::HandleSendClientMessage(gSKI::Agent* pAgent, char const* pComman
 		return InvalidArg(pConnection, pResponse, pCommandName, "Require a message type and a message and one is missing") ;
 	}
 
-	std::string result = this->SendClientMessage(pAgent, pMessageType, pMessage) ;
+	std::string result = this->SendClientMessage(GetAgentSML(pAgent), pMessageType, pMessage) ;
 
 	return ReturnResult(pConnection, pResponse, result.c_str()) ;
 }
