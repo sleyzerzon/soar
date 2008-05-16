@@ -20,9 +20,6 @@
 #include "sml_KernelSML.h"
 #include "sml_XMLTrace.h"
 
-#include "gSKI_Agent.h"
-#include "gSKI_Kernel.h"
-
 #include "KernelHeaders.h"
 
 #include "gdatastructs.h"
@@ -1324,7 +1321,10 @@ bool KernelHelpers::Preferences(AgentSML* thisAgent, int detail, bool object, co
 			wtt = FULL_WME_TRACE;
 			break;
 		default:
-			MegaAssert(false, "Illegal detail level");
+			//MegaAssert(false, "Illegal detail level");
+			assert(false);
+			wtt = NONE_WME_TRACE;
+			break;
 	}
 
 	if (soar_ecPrintPreferences(soarAgent, id, attr, object, print_productions, wtt)) {
