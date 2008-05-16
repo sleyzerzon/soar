@@ -14,8 +14,6 @@
 #ifndef KERNEL_STRUCT_H
 #define KERNEL_STRUCT_H
 
-#include "gski_event_system_data.h"
-
 typedef unsigned long tc_number;
 typedef struct cons_struct cons;
 typedef cons list;

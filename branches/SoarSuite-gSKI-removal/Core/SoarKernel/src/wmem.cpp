@@ -35,9 +35,7 @@
 #include "rete.h"
 #include "print.h"
 #include "tempmem.h"
-
-/* JC ADDED */
-#include "gski_event_system_functions.h"
+#include "xml.h"
 
 using namespace xmlTraceNames;
 

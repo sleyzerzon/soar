@@ -27,7 +27,7 @@
  * =======================================================================
  */
 
-#include <stdlib.h>
+#include "xml.h"
 
 #include "rete.h"
 #include "kernel.h"

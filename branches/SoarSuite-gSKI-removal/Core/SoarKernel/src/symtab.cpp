@@ -38,7 +38,7 @@
 #include "production.h"
 #include "init_soar.h"
 #include "print.h"
-#include "gski_event_system_functions.h" // for XML trace output
+#include "xml.h"
 
 #include <ctype.h>
 

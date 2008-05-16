@@ -43,10 +43,7 @@
 #include "gdatastructs.h"
 #include "kernel_struct.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
-#include "gski_event_system_functions.h" // support for triggering XML events
-
-/* JC ADDED: Used for gski callbacks */
-#include "gski_event_system_functions.h"
+#include "xml.h"
 
 #define INIT_FILE       "init.soar"
 

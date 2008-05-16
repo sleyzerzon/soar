@@ -32,9 +32,6 @@
 #include "callback.h"
 #include <map>
 
-/* JC ADDED: Included to allow gski callbacks */
-#include "gski_event_system_data.h"
-
 /* JC ADDED: Included so we can put the RHS functions in here */
 typedef struct rhs_function_struct rhs_function;
 

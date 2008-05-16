@@ -16,7 +16,6 @@
 #include "gSKI_Events.h"
 #include "gdatastructs.h"
 #include "init_soar.h"
-#include "gski_event_system_data.h"
 #include "callback.h"
 
 namespace gSKI

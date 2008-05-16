@@ -48,9 +48,9 @@
 #include "explain.h"
 #include "tempmem.h"
 #include "io_soar.h"
+#include "xml.h"
 
 /* JC ADDED: This is for event firing in gSKI */
-#include "gski_event_system_functions.h"
 
 using namespace xmlTraceNames;
 

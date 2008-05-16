@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 #include "kernel_struct.h"
-#include "gski_event_system_functions.h"
+#include "kernel.h"
 
 /** 
  * @brief Creates an instance of the soar kernel structure.

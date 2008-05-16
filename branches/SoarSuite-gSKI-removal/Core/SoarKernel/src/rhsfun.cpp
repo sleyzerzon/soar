@@ -53,7 +53,7 @@
 #include "wmem.h"
 #include "gdatastructs.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
-#include "gski_event_system_functions.h" // support for triggering XML events
+#include "xml.h"
 
 #include <map>
 #include <time.h>

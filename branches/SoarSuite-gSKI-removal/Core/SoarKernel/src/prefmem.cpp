@@ -35,9 +35,6 @@
 #include "prefmem.h"
 #include "print.h"
 
-/* JC ADDED: For telling gski about events */
-#include "gski_event_system_functions.h"
-
 char * preference_name[] =
 { "acceptable",
   "require",

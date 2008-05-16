@@ -44,10 +44,6 @@
 #include "io_soar.h"
 #include "kernel_struct.h"
 
-/* JC ADDED: Need to initialize gski callbacks */
-#include "gski_event_system_functions.h"
-
-
 /* ================================================================== */
 
 char * soar_version_string;

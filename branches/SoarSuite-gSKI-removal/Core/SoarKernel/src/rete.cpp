@@ -104,9 +104,6 @@
 #include "lexer.h"
 #include "xml.h"
 
-/* JC ADDED: for gSKI events */
-#include "gski_event_system_functions.h"
-
 // So we can call directly to it to create XML output.
 // If you need a kernel w/o any external dependencies, removing this include
 // and methods starting with xml_ should do the trick.

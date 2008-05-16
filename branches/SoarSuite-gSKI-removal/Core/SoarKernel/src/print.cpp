@@ -37,12 +37,9 @@
 #include "production.h"
 #include "instantiations.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
-#include "gski_event_system_functions.h" // support for triggering XML events
+#include "xml.h"
 
 #include <stdarg.h>
-
-/* JC ADDED */
-#include "gski_event_system_functions.h"
 
 using namespace xmlTraceNames;
 

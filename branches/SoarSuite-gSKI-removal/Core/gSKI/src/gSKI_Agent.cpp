@@ -28,7 +28,6 @@
 #include "gSKI_RhsFunction.h"
 #include "agent.h"
 #include "init_soar.h"
-#include "gski_event_system_functions.h"
 #include "rhsfun.h"
 #include "production.h" // for struct multi_attributes
 #include "print.h"      // for symboltostring

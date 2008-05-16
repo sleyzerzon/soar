@@ -31,7 +31,6 @@
 #include "agent.h"
 #include "production.h"
 #include "symtab.h"
-#include "gski_event_system_functions.h"
 #include "instantiations.h"
 #include "rete.h"
 

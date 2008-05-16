@@ -315,14 +315,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\gski_event_system_data.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\gski_event_system_functions.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\gsysparam.h"
 				>
 			</File>

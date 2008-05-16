@@ -53,8 +53,7 @@
 #include "decide.h"
 #include "production.h"
 #include "lexer.h"
-#include "gski_event_system_functions.h" // support for generating XML output
-//#include "../../ConnectionSML/include/sml_Utils.h"	// For PrintDebugFormat
+#include "xml.h"
 
 #include <ctype.h>
 

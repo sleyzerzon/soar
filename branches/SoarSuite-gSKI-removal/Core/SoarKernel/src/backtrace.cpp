@@ -33,7 +33,7 @@
 #include "explain.h"
 #include "recmem.h"
 #include "xmlTraceNames.h" // for XML trace stuff
-#include "gski_event_system_functions.h"  //for XML trace stuff
+#include "xml.h"
 
 using namespace xmlTraceNames;
 

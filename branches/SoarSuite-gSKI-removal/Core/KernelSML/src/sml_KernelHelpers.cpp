@@ -29,7 +29,6 @@
 #include "rhsfun.h"
 #include "explain.h"
 #include "soar_rand.h"
-#include "gski_event_system_functions.h" // support for triggering XML events
 
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
 

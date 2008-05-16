@@ -37,7 +37,7 @@
 #include "rete.h"
 #include "wmem.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
-#include "gski_event_system_functions.h"
+#include "xml.h"
 
 void remove_operator_if_necessary(agent* thisAgent, slot *s, wme *w){
 
