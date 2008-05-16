@@ -61,7 +61,7 @@ class KernelHelpers ;
 enum smlStopLocationFlags ;
 
 // Define the CommandFunction which we'll call to process commands
-typedef bool (KernelSML::*CommandFunction)(gSKI::Agent*, char const*, Connection*, AnalyzeXML*, ElementXML*, gSKI::Error*);
+typedef bool (KernelSML::*CommandFunction)(AgentSML*, char const*, Connection*, AnalyzeXML*, ElementXML*);
 
 // Used to store a map from command name to function handler for that command
 typedef std::map< std::string, CommandFunction >	CommandMap ;
@@ -497,10 +497,10 @@ protected:
 	bool ProcessCommand(char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 
 	// Add a value to working memory
-	bool AddInputWME(gSKI::Agent* pAgent, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag, gSKI::Error* pError) ;
+	bool AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
 
 	// Remove a value from working memory.  The time tag is the string form of an int.
-	bool RemoveInputWME(gSKI::Agent* pAgent, char const* pTimeTag, gSKI::Error* pError) ;
+	bool RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag) ;
 
 	// Remove a value from our records that has been removed by the kernel from working memory.
 	static void RemoveInputWMERecordsCallback(gSKI::Agent* pAgent, gSKI::IWme* pWME);
@@ -523,34 +523,34 @@ protected:
 	* @returns False if we had an error and wish to generate a generic error message (based on the incoming call + pError)
 	*          True if the call succeeded or we generated another more specific error already.
 	*************************************************************/
-	bool HandleCreateAgent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleLoadProductions(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetInputLink(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleInput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleCommandLine(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleExpandCommandLine(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleCheckForIncomingCommands(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleDestroyAgent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetAgentList(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleSetInterruptCheckRate(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleFireEvent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleSuppressEvent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetVersion(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleShutdown(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleIsSoarRunning(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleSetConnectionInfo(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetConnections(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetAllInput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetAllOutput(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetRunState(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleIsProductionLoaded(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleSendClientMessage(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleWasAgentOnRunList(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetResultOfLastRun(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
-	bool HandleGetInitialTimeTag(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
+	bool HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleLoadProductions(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetInputLink(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleExpandCommandLine(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleCheckForIncomingCommands(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleDestroyAgent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetAgentList(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleSetInterruptCheckRate(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleFireEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleSuppressEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetVersion(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleShutdown(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleIsSoarRunning(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleSetConnectionInfo(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetConnections(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetAllInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetAllOutput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetRunState(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleSendClientMessage(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleWasAgentOnRunList(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetResultOfLastRun(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleGetInitialTimeTag(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 
 	// Note: Register and unregister are both sent to this one handler
-	bool HandleRegisterForEvent(gSKI::Agent* pAgent, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse, gSKI::Error* pError) ;
+	bool HandleRegisterForEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 
 };
 

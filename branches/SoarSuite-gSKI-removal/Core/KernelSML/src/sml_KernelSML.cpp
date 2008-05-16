@@ -706,12 +706,8 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 		}
 	}
 
-	// Create a blank error code
-	gSKI::Error error ;
-	ClearError(&error) ;
-
 	// Call to the handler (this is a pointer to member call so it's a bit odd)
-	bool result = (this->*pFunction)(pAgent, pCommandName, pConnection, pIncoming, pResponse, &error) ;
+	bool result = (this->*pFunction)(GetAgentSML(pAgent), pCommandName, pConnection, pIncoming, pResponse) ;
 
 	// If we return false, we report a generic error about the call.
 	if (!result)
@@ -719,14 +715,6 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 		std::string msg = "The call " ;
 		msg += pCommandName ;
 		msg += " failed to execute correctly." ;
-		if (isError(error))
-		{
-			msg += "gSKI error was: " ;
-			msg += error.Text ;
-			msg += " details: " ;
-			msg += error.ExtendedMsg ;
-		}
-
 		AddErrorMsg(pConnection, pResponse, msg.c_str()) ;
 		return false ;
 	}
