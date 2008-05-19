@@ -19,7 +19,6 @@
 #ifndef AGENT_LISTENER_H
 #define AGENT_LISTENER_H
 
-#include "gSKI_Events.h"
 #include "sml_EventManager.h"
 
 #include <string>

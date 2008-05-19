@@ -36,7 +36,7 @@ bool CommandLineInterface::DoVersion() {
 	std::string sTimeDateStamp = timedatestamp.str();
 
 	if (m_RawOutput) {
-		m_Result << soar_version_string << "\n";
+		m_Result << m_pKernelSML->GetVersionString() << "\n";
 		m_Result << "Build date: " << sTimeDateStamp.c_str() << " " ;
 
 	} else {

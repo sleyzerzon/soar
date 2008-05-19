@@ -61,7 +61,6 @@ typedef struct explain_chunk_struct explain_chunk_str;
 typedef struct io_wme_struct io_wme;
 typedef struct multi_attributes_struct multi_attribute;
 typedef struct replay_struct replay;
-typedef struct kernel_struct Kernel;
 typedef std::map<unsigned long, wme*> WmeMap ;
 
 // following def's moved here from old interface.h file  KJC nov 05
@@ -736,9 +735,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   Bool       waitsnc_detect; 
   /* REW: end   10.24.97 */
 
-   /* JC ADDED: link to owning kernel (for convenience and less param passing) */
-  Kernel*    kernel;
-
   /* JC ADDED: Need to store RHS functions here so that agent's don't step on each other */
   rhs_function* rhs_functions;
 
@@ -748,6 +744,8 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
 } agent;
 /*************** end of agent struct *****/
+
+void init_soar_agent(agent* thisAgent);
 
 #ifdef USE_MACROS
 
@@ -798,15 +796,15 @@ extern "C"
 
 #endif /* USE_MACROS */
 
-extern char * soar_version_string;
+//extern char * soar_version_string;
 
 //extern agent * soar_agent;
 
-extern agent * create_soar_agent (Kernel* thisKernel, char * name);
-extern void    destroy_soar_agent (Kernel* thisKernel, agent* soar_agent);
+extern agent * create_soar_agent (char * name);
+extern void    destroy_soar_agent (agent* soar_agent);
 
-void initialize_soar_agent(Kernel *thisKernel, agent* thisAgent);
-
+//void initialize_soar_agent(Kernel *thisKernel, agent* thisAgent);
+//
 /* Ideally, this should be in "lexer.h", but to avoid circular dependencies
    among header files, I am forced to put it here. */
 #ifdef USE_MACROS

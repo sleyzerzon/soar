@@ -6691,7 +6691,7 @@ void retesave_rhs_value (rhs_value rv, FILE* f) {
   }
 }
 
-rhs_value reteload_rhs_value (Kernel* thisKernel, agent* thisAgent, FILE* f) {
+rhs_value reteload_rhs_value (agent* thisAgent, FILE* f) {
   rhs_value rv, temp;
   unsigned long i, count;
   Symbol *sym;
@@ -6722,7 +6722,7 @@ rhs_value reteload_rhs_value (Kernel* thisKernel, agent* thisAgent, FILE* f) {
     push(thisAgent, rf, funcall_list);
     count = reteload_four_bytes(f);    
     while (count--) {
-      temp = reteload_rhs_value(thisKernel, thisAgent,f);
+      temp = reteload_rhs_value(thisAgent,f);
       push(thisAgent, temp, funcall_list);
     }
     funcall_list = destructively_reverse_list (funcall_list);
@@ -6780,7 +6780,7 @@ void retesave_rhs_action (action *a, FILE* f) {
   }
 }
     
-action *reteload_rhs_action (Kernel* thisKernel, agent* thisAgent, FILE* f) {
+action *reteload_rhs_action (agent* thisAgent, FILE* f) {
   action *a;
 
   allocate_with_pool (thisAgent, &thisAgent->action_pool, &a);
@@ -6789,13 +6789,13 @@ action *reteload_rhs_action (Kernel* thisKernel, agent* thisAgent, FILE* f) {
   a->support = reteload_one_byte(f);
   if (a->type==FUNCALL_ACTION) {
     a->id = NIL; a->attr = NIL; a->referent = NIL;
-    a->value = reteload_rhs_value(thisKernel, thisAgent,f);
+    a->value = reteload_rhs_value(thisAgent,f);
   } else { /* MAKE_ACTION's */
-    a->id = reteload_rhs_value(thisKernel, thisAgent,f);
-    a->attr = reteload_rhs_value(thisKernel, thisAgent,f);
-    a->value = reteload_rhs_value(thisKernel, thisAgent,f);
+    a->id = reteload_rhs_value(thisAgent,f);
+    a->attr = reteload_rhs_value(thisAgent,f);
+    a->value = reteload_rhs_value(thisAgent,f);
     if (preference_is_binary (a->preference_type))
-      a->referent = reteload_rhs_value(thisKernel, thisAgent,f);
+      a->referent = reteload_rhs_value(thisAgent,f);
     else
       a->referent = NIL;
   }
@@ -6811,7 +6811,7 @@ void retesave_action_list (action *first_a, FILE* f) {
   for (a=first_a; a!=NIL; a=a->next) retesave_rhs_action (a,f);
 }
 
-action *reteload_action_list (Kernel* thisKernel, agent* thisAgent, FILE* f) {
+action *reteload_action_list (agent* thisAgent, FILE* f) {
   action *a, *prev_a, *first_a;
   unsigned long count;
   
@@ -6819,7 +6819,7 @@ action *reteload_action_list (Kernel* thisKernel, agent* thisAgent, FILE* f) {
   prev_a = NIL;
   first_a = NIL;  /* unneeded, but without it gcc -Wall warns here */
   while (count--) {
-    a = reteload_rhs_action (thisKernel, thisAgent,f );
+    a = reteload_rhs_action (thisAgent,f );
     if (prev_a) prev_a->next = a; else first_a = a;
     prev_a = a;
   }
@@ -7072,7 +7072,7 @@ void retesave_rete_node_and_children (agent* thisAgent, rete_node *node, FILE* f
   retesave_children_of_node (thisAgent, node,f);
 }
 
-void reteload_node_and_children (Kernel* thisKernel, agent* thisAgent, rete_node *parent, FILE* f) {
+void reteload_node_and_children (agent* thisAgent, rete_node *parent, FILE* f) {
   byte type, left_unlinked_flag;
   rete_node *New, *ncc_top;
   unsigned long count;
@@ -7164,7 +7164,7 @@ void reteload_node_and_children (Kernel* thisKernel, agent* thisAgent, rete_node
     }
     prod->type = reteload_one_byte (f);
     prod->declared_support = reteload_one_byte (f);
-    prod->action_list = reteload_action_list (thisKernel, thisAgent,f);
+    prod->action_list = reteload_action_list (thisAgent,f);
 
     count = reteload_four_bytes (f);
     update_max_rhs_unbound_variables (thisAgent, count);
@@ -7208,7 +7208,7 @@ void reteload_node_and_children (Kernel* thisKernel, agent* thisAgent, rete_node
 
   /* --- read in the children of the node --- */
   count = reteload_four_bytes(f);
-  while (count--) reteload_node_and_children (thisKernel, thisAgent, New,f);
+  while (count--) reteload_node_and_children (thisAgent, New,f);
 }
 
 /* ----------------------------------------------------------------------
@@ -7237,7 +7237,7 @@ Bool save_rete_net (agent* thisAgent, FILE *dest_file) {
   return TRUE;
 }
 
-Bool load_rete_net (Kernel* thisKernel, agent* thisAgent, FILE *source_file) {
+Bool load_rete_net (agent* thisAgent, FILE *source_file) {
   int format_version_num;
   unsigned long i, count;
 
@@ -7278,7 +7278,7 @@ Bool load_rete_net (Kernel* thisKernel, agent* thisAgent, FILE *source_file) {
   reteload_all_symbols(thisAgent,source_file);
   reteload_alpha_memories(thisAgent,source_file);
   count = reteload_four_bytes(source_file);
-  while (count--) reteload_node_and_children (thisKernel, thisAgent, thisAgent->dummy_top_node,source_file);
+  while (count--) reteload_node_and_children (thisAgent, thisAgent->dummy_top_node,source_file);
 
   /* --- clean up auxilliary tables --- */
   reteload_free_am_table(thisAgent);

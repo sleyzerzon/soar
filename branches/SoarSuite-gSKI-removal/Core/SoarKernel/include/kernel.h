@@ -185,8 +185,8 @@ enum ni_mode {
 
 #define BUFFER_MSG_SIZE 128
 
-extern char * soar_version_string;
-extern char * soar_news_string;
+//extern char * soar_version_string;
+//extern char * soar_news_string;
 
 /* REW: begin 05.05.97 */
 #define OPERAND2_MODE_NAME "Operand2/Waterfall"

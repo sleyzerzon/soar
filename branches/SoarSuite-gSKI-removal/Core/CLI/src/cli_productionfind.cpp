@@ -86,9 +86,7 @@ bool CommandLineInterface::DoProductionFind(const ProductionFindBitset& options,
 
 	AddListenerAndDisableCallbacks();
 
-	bool ret = pKernelHack->ProductionFind(m_pAgentSML, 
-		0, 
-		m_pKernelSML, 
+	bool ret = pKernelHack->ProductionFind(m_pAgentSML->GetSoarAgent(), 
 		options.test(PRODUCTION_FIND_INCLUDE_LHS), 
 		options.test(PRODUCTION_FIND_INCLUDE_RHS), 
 		const_cast<char*>(pattern.c_str()), 

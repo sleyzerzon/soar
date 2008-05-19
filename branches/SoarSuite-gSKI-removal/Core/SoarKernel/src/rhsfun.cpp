@@ -48,7 +48,6 @@
 #include "production.h"
 #include "rhsfun_math.h"
 #include "io_soar.h"
-#include "kernel_struct.h"
 #include "recmem.h"
 #include "wmem.h"
 #include "gdatastructs.h"

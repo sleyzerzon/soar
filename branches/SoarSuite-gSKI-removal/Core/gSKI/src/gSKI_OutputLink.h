@@ -18,14 +18,11 @@
 
 #include "gSKI_OutputWorkingMemory.h"
 #include "gSKI_Enumerations.h"
-#include "gSKI_Events.h"
 
 #include "IgSKI_Wme.h"
 #include "IterUtils.h"
 #include "gSKI_Iterator.h"
 #include "gSKI_ReleaseImpl.h"
-
-#include "EventManagementTemplates.h"
 
 #include <string>
 //#include <multimap>

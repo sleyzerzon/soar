@@ -42,11 +42,10 @@
 #include "trace.h"
 #include "callback.h"
 #include "io_soar.h"
-#include "kernel_struct.h"
 
 /* ================================================================== */
 
-char * soar_version_string;
+//char * soar_version_string;
 
 /* ===================================================================
    
@@ -54,10 +53,7 @@ char * soar_version_string;
 
 =================================================================== */
 
-void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
-
-  /* JC ADDED: link the agent to its kernel */
-  thisAgent->kernel = thisKernel;
+void init_soar_agent(agent* thisAgent) {
 
   /* JC ADDED: initialize the rhs function linked list */
   thisAgent->rhs_functions = NIL;
@@ -113,15 +109,12 @@ void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
 
 ===============================
 */
-agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {                                          /* loop index */
+agent * create_soar_agent (char * agent_name) {                                          /* loop index */
   char cur_path[MAXPATHLEN];   /* AGR 536 */
 
   agent* newAgent = (agent *) malloc(sizeof(agent));
 
   newAgent->current_tc_number = 0;
-
-  thisKernel->agent_counter++;
-  thisKernel->agent_count++;
 
   newAgent->name                               = savestring(agent_name);
 
@@ -316,29 +309,8 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
 
 ===============================
 */
-void initialize_soar_agent(Kernel *thisKernel, agent* thisAgent) {
-
-  init_soar_agent(thisKernel, thisAgent);
-                                         /* Add agent to global list   */
-                                         /* of all agents.             */
-  push(thisAgent, thisAgent, thisKernel->all_soar_agents);
-
-  soar_invoke_callbacks(thisAgent, thisAgent, 
-			AFTER_INIT_AGENT_CALLBACK,
-			(soar_call_data) NULL);
-}
-
-/*
-===============================
-
-===============================
-*/
-void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
+void destroy_soar_agent (agent * delete_agent)
 {
-  cons  * c;
-  cons  * prev = NULL;   /* Initialized to placate gcc -Wall */
-  agent * the_agent;
- 
   //print(delete_agent, "\nDestroying agent %s.\n", delete_agent->name);  /* AGR 532 */
 
 //#ifdef USE_X_DISPLAY
@@ -350,21 +322,6 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   delete delete_agent->wmeMap ;
 
   remove_built_in_rhs_functions(delete_agent);
-
-  /* Splice agent structure out of global list of agents. */
-  for (c = thisKernel->all_soar_agents; c != NIL; c = c->rest) {  
-	  the_agent = (agent *) c->first;
-	  if (the_agent == delete_agent) {
-		  if (c == thisKernel->all_soar_agents) {
-			  thisKernel->all_soar_agents = c->rest;
-		  } else {
-			  prev->rest = c->rest;
-		  }
-		  free_cons(the_agent, c);  // RPM 11/06
-		  break;
-	  }
-	  prev = c;
-  }
 
   /* Free structures stored in agent structure */
   free(delete_agent->name);
@@ -448,6 +405,4 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
 
   /* Free soar agent structure */
   free((void *) delete_agent);
- 
-  thisKernel->agent_count--;
 }

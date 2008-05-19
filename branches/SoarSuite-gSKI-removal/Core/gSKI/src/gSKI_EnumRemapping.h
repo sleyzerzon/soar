@@ -13,7 +13,6 @@
 #define GSKI_ENUMREMAPPING_H
 
 #include "gSKI_Enumerations.h"
-#include "gSKI_Events.h"
 #include "gdatastructs.h"
 #include "init_soar.h"
 #include "callback.h"

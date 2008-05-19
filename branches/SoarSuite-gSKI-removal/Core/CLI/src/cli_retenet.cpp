@@ -91,7 +91,7 @@ bool CommandLineInterface::DoReteNet(bool save, std::string filename) {
 			return SetError( CLIError::kOpenFileFail );
 		}
 
-		if ( load_rete_net( m_pKernelSML->GetSoarKernel(), m_pAgentSoar, file ) == FALSE )
+		if ( load_rete_net( m_pAgentSoar, file ) == FALSE )
 		{
 			// TODO: additional error information
 			return SetError( CLIError::kReteLoadOperationFail );

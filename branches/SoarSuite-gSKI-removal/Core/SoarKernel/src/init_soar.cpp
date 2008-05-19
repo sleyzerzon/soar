@@ -41,7 +41,6 @@
 #include "io_soar.h"
 #include "rete.h"
 #include "gdatastructs.h"
-#include "kernel_struct.h"
 #include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "xml.h"
 
@@ -578,21 +577,6 @@ void reset_statistics (agent* thisAgent) {
      reset_timer (&thisAgent->gds_cpu_time[ii]);
   }
 }
-
-void reinitialize_all_agents ( Kernel* thisKernel ) {
-  // Looping over all the agents in the Kernel 
-  for ( cons* c = thisKernel->all_soar_agents; c != NIL; c=c->rest ) {
-    agent* curagent = (agent*) c->first;
-
-    // Resets the agent and clears working memory
-    reinitialize_soar( curagent );
-
-    // Adds the top state and io symbols and wmes
-    init_agent_memory( curagent );
-  }
-
-}
-  
 
 bool reinitialize_soar (agent* thisAgent) {
 
@@ -1528,34 +1512,34 @@ void run_for_n_selections_of_slot_at_level (agent* thisAgent, long n,
 
 =================================================================== */
 
-char * soar_news_string = "\
-General questions and topics for discussion should be sent to\n\
-soar-group@umich.edu. Bug reports should be sent to soar-bugs@umich.edu\n\
-The current bug-list may be obtained by sending mail to\n\
-soar-bugs@umich.edu with the Subject: line \"bug list\".\n\
-The Soar Home Page URL is:  http://ai.eecs.umich.edu/soar\n\
-\n\
-Copyright (c) 1995-1999 Carnegie Mellon University,\n\
-                         University of Michigan,\n\
-                         University of Southern California/Information\n\
-                         Sciences Institute.  All rights reserved.\n\
-The Soar consortium proclaims this software is in the public domain, and\n\
-is made available AS IS.  Carnegie Mellon University, The University of \n\
-Michigan, and The University of Southern California/Information Sciences \n\
-Institute make no warranties about the software or its performance,\n\
-implied or otherwise.\n\
-\n\
-Type \"help\" for information on various topics.\n\
-Type \"quit\" to exit Soar.  Use ctrl-c to stop a Soar run.\n\
-Type \"soarnews\" to repeat this information.\n\
-Type \"version\" for Soar version information.\
-";
-
-void print_startup_banner (agent* thisAgent) {
-  print(thisAgent, soar_version_string);
-  print(thisAgent, soar_news_string);
-}
-
+//char * soar_news_string = "\
+//General questions and topics for discussion should be sent to\n\
+//soar-group@umich.edu. Bug reports should be sent to soar-bugs@umich.edu\n\
+//The current bug-list may be obtained by sending mail to\n\
+//soar-bugs@umich.edu with the Subject: line \"bug list\".\n\
+//The Soar Home Page URL is:  http://ai.eecs.umich.edu/soar\n\
+//\n\
+//Copyright (c) 1995-1999 Carnegie Mellon University,\n\
+//                         University of Michigan,\n\
+//                         University of Southern California/Information\n\
+//                         Sciences Institute.  All rights reserved.\n\
+//The Soar consortium proclaims this software is in the public domain, and\n\
+//is made available AS IS.  Carnegie Mellon University, The University of \n\
+//Michigan, and The University of Southern California/Information Sciences \n\
+//Institute make no warranties about the software or its performance,\n\
+//implied or otherwise.\n\
+//\n\
+//Type \"help\" for information on various topics.\n\
+//Type \"quit\" to exit Soar.  Use ctrl-c to stop a Soar run.\n\
+//Type \"soarnews\" to repeat this information.\n\
+//Type \"version\" for Soar version information.\
+//";
+//
+//void print_startup_banner (agent* thisAgent) {
+//  print(thisAgent, soar_version_string);
+//  print(thisAgent, soar_news_string);
+//}
+//
 /* ===================================================================
    
              Loading the Initialization File ".init.soar"
@@ -1570,7 +1554,7 @@ extern char *getenv();
    but shorter than MAXPATHLEN (from sys/param.h).  4-May-94  */
 
 // KJC Nov 05:  moved here from old interface.cpp, so could remove interface.* files
-void load_file (Kernel* thisKernel, agent* thisAgent, char *file_name, FILE *already_open_file) {
+void load_file (agent* thisAgent, char *file_name, FILE *already_open_file) {
 Bool old_print_prompt_flag;
 
   old_print_prompt_flag = thisAgent->print_prompt_flag;
@@ -1584,36 +1568,36 @@ Bool old_print_prompt_flag;
 }
 
 
-void load_init_file (Kernel* thisKernel, agent* thisAgent) {
-#define LOAD_INIT_FILE_BUFFER_SIZE 1000
-  char filename[LOAD_INIT_FILE_BUFFER_SIZE];   /* AGR 536 */
-  char *home_directory;
-  FILE *initfile;
-
-  strncpy (filename, INIT_FILE, LOAD_INIT_FILE_BUFFER_SIZE);
-  initfile = fopen (filename, "r");
-  if (!initfile) {
-    home_directory = getenv ("HOME");
-    if (home_directory) {
-      strncpy (filename, home_directory, LOAD_INIT_FILE_BUFFER_SIZE);
-      filename[LOAD_INIT_FILE_BUFFER_SIZE - 1] = 0; /* ensure null termination */
-      strncat (filename, "/",LOAD_INIT_FILE_BUFFER_SIZE - strlen(filename));
-      filename[LOAD_INIT_FILE_BUFFER_SIZE - 1] = 0; /* ensure null termination */
-      strncat (filename, INIT_FILE, LOAD_INIT_FILE_BUFFER_SIZE - strlen(filename));
-      filename[LOAD_INIT_FILE_BUFFER_SIZE - 1] = 0; /* ensure null termination */
-      initfile = fopen (filename, "r");
-    }
-  }
-
-  print_startup_banner(thisAgent);
-
-  if (initfile) {
-    print (thisAgent, "\nLoading %s\n",filename);
-    load_file (thisKernel, thisAgent, filename, initfile);
-    fclose (initfile);
-  }
-}
-
+//void load_init_file (Kernel* thisKernel, agent* thisAgent) {
+//#define LOAD_INIT_FILE_BUFFER_SIZE 1000
+//  char filename[LOAD_INIT_FILE_BUFFER_SIZE];   /* AGR 536 */
+//  char *home_directory;
+//  FILE *initfile;
+//
+//  strncpy (filename, INIT_FILE, LOAD_INIT_FILE_BUFFER_SIZE);
+//  initfile = fopen (filename, "r");
+//  if (!initfile) {
+//    home_directory = getenv ("HOME");
+//    if (home_directory) {
+//      strncpy (filename, home_directory, LOAD_INIT_FILE_BUFFER_SIZE);
+//      filename[LOAD_INIT_FILE_BUFFER_SIZE - 1] = 0; /* ensure null termination */
+//      strncat (filename, "/",LOAD_INIT_FILE_BUFFER_SIZE - strlen(filename));
+//      filename[LOAD_INIT_FILE_BUFFER_SIZE - 1] = 0; /* ensure null termination */
+//      strncat (filename, INIT_FILE, LOAD_INIT_FILE_BUFFER_SIZE - strlen(filename));
+//      filename[LOAD_INIT_FILE_BUFFER_SIZE - 1] = 0; /* ensure null termination */
+//      initfile = fopen (filename, "r");
+//    }
+//  }
+//
+//  print_startup_banner(thisAgent);
+//
+//  if (initfile) {
+//    print (thisAgent, "\nLoading %s\n",filename);
+//    load_file (thisKernel, thisAgent, filename, initfile);
+//    fclose (initfile);
+//  }
+//}
+//
 int terminate_soar (agent* thisAgent)
 {
   /* Shouldn't we free *all* agents here? */
@@ -1721,72 +1705,4 @@ void init_agent_memory(agent* thisAgent)
   // (see io.cpp for details)
   thisAgent->prev_top_state = thisAgent->top_state;
 
-}
-
-void init_soar (Kernel * thisKernel)
-{
-  unsigned int random_seed = 1;
-  
-  /* This is not quite thread-safe, but it is a step in the right direction.
-     -AJC (8/9/02) */
-  // DJP-FREE: I'm not sure why this is only done once ever.
-  static Bool bInit = FALSE;
-  if (!bInit || !soar_version_string)
-  {
-	  bInit = TRUE;
-#define INIT_SOAR_BUFFER_SIZE 1000
-	  char buffer[1000];
-	  
-#if MICRO_VERSION_NUMBER > 0
-    SNPRINTF(buffer, INIT_SOAR_BUFFER_SIZE,
-             "%d.%d.%d", MAJOR_VERSION_NUMBER, MINOR_VERSION_NUMBER, MICRO_VERSION_NUMBER);
-    buffer[INIT_SOAR_BUFFER_SIZE - 1] = 0;   /* ensure null termination */
-#else
-    SNPRINTF(buffer, INIT_SOAR_BUFFER_SIZE, "%d.%d", MAJOR_VERSION_NUMBER, MINOR_VERSION_NUMBER);
-    buffer[INIT_SOAR_BUFFER_SIZE - 1] = 0;   /* ensure null termination */
-#endif
-
-	  soar_version_string = savestring(buffer);
-  }
-
-#ifdef REAL_TIME_BEHAVIOR
-  /* RMJ */
-  current_real_time = (struct timeval *) malloc(sizeof(struct timeval));
-#endif
-
-  if (0) {
-    // TODO: Make sure that this ifdef is neccessary for the timeing code
-    // (remove it if it isn't)
-#ifndef NO_TIMING_STUFF
-    struct timeval tv;
-    start_timer (NULL, &tv);
-#endif
-  }
-  /* RPM 12/05 we now use SoarRand instead of ANSI rand/srand; see bug 595 */
-  /* --- set the random number generator seed to a "random" value --- */
-//  random_seed = (unsigned int) time(0);
-
-  /* For debugging, we want the same output every time. -AJC (8/6/02) */
-//#ifdef _DEBUG
-//  random_seed = 1;
-//#endif
-//  srand( random_seed );
-
-  /* For debuggin purposes */
-//  printf("\nRandom Seed = %u\n", random_seed);
-
-  /* This is deprecated. -AJC (8/6/02) */
-  //setup_signal_handling();
-
-  //soar_agent = create_soar_agent(thisKernel, "soar");
-  //init_built_in_commands (soar_agent);
-  //init_parser (); /* This should be in interface.c? */
-
-  /* We no longer have a global agent. -AJC (8/7/02) */  
-  //soar_invoke_callbacks(soar_agent, soar_agent, 
-  //		SYSTEM_STARTUP_CALLBACK,
-  //		(soar_call_data) NULL);
-
-  //printf(soar_version_string);
-  //printf(soar_news_string);
 }

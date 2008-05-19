@@ -27,8 +27,6 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 
-#include "gSKI_Kernel.h"
-
 #include "assert.h"
 
 using namespace sml ;

@@ -6,6 +6,8 @@
 //
 /////////////////////////////////////////////////////////////////
 
+// SEE INIT_SOAR.CPP:1531 for old soarnews
+
 #include <portability.h>
 
 #include "sml_Utils.h"

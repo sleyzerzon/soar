@@ -35,13 +35,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "gSKI_KernelFactory.h"
-#include "gSKI_Kernel.h"
-
 #include "gSKI_Error.h"
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
-#include "gSKI_Events.h"
 #include "IgSKI_OutputProcessor.h"
 #include "IgSKI_InputProducer.h"
 #include "IgSKI_Symbol.h"
@@ -140,7 +136,7 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 		return InvalidArg(pConnection, pResponse, pCommandName, "Agent name missing") ;
 	}
 
-	agent* pSoarAgent = create_soar_agent(GetSoarKernel(), (char*)pName);
+	agent* pSoarAgent = create_soar_agent( const_cast< char* >(pName) );
 
 	pAgentSML = new AgentSML(this, pSoarAgent) ;
 
@@ -391,21 +387,6 @@ bool KernelSML::HandleDestroyAgent(AgentSML* pAgentSML, char const* /*pCommandNa
 	return true ;
 }
 
-class KernelSML::OnSystemStopDeleteAll: public gSKI::ISystemListener
-{
-public:
-	// This handler is called right before the agent is actually deleted
-	// inside gSKI.  We need to clean up any object we own now.
-	virtual void HandleEvent(smlSystemEventId, gSKI::Kernel* /*pKernel*/)
-	{
-		KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
-
-		pKernelSML->DeleteAllAgents(true) ;
-
-		delete this ;
-	}
-};
-
 // Shutdown is an irrevocal request to delete all agents and prepare for kernel deletion.
 bool KernelSML::HandleShutdown(AgentSML* /*pAgentSML*/, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, ElementXML* /*pResponse*/)
 {
@@ -542,18 +523,10 @@ bool KernelSML::HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pComma
 
 bool KernelSML::HandleGetVersion(AgentSML* /*pAgentSML*/, char const* /*pCommandName*/, Connection* pConnection, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)
 {
-	std::ostringstream buffer;
-
-	// Look up the current version of Soar and return it as a string
-	gSKI::Version version = this->m_pKernelFactory->GetKernelVersion() ;
-	buffer << version.major << "." << version.minor << "." << version.micro;
-	std::string bufferStdString = buffer.str();
-	const char* bufferCString = bufferStdString.c_str();
-
 	// Our hard-coded string should match the version returned from Soar
-	assert(strcmp(sml_Names::kSoarVersionValue, bufferCString) == 0) ;
+	assert( strcmp(sml_Names::kSoarVersionValue, this->GetVersionString().c_str() ) == 0) ;
 
-	return this->ReturnResult(pConnection, pResponse, bufferCString) ;
+	return this->ReturnResult(pConnection, pResponse, this->GetVersionString().c_str() ) ;
 }
 
 bool KernelSML::HandleIsSoarRunning(AgentSML* /*pAgentSML*/, char const* /*pCommandName*/, Connection* pConnection, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)
@@ -592,7 +565,7 @@ bool KernelSML::HandleSetInterruptCheckRate(AgentSML* /*pAgentSML*/, char const*
 	int newRate = pIncoming->GetArgInt(sml_Names::kParamValue, 1) ;
 
 	// Make the call.
-	GetKernel()->SetInterruptCheckRate(newRate) ;
+	m_InterruptCheckRate = newRate;
 
 	return true ;
 }

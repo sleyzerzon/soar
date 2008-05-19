@@ -84,7 +84,7 @@ void AgentSML::Init()
 	m_outputlink = new gSKI::OutputLink(m_agent);
 
 	// Initializing the soar agent
-	initialize_soar_agent(m_pKernelSML->GetSoarKernel(), m_agent);
+	init_soar_agent( m_agent );
 
 	m_inputlink = new gSKI::InputLink(m_agent);
 	m_workingMemory = new gSKI::WorkingMemory(m_agent);
@@ -122,7 +122,7 @@ AgentSML::~AgentSML()
 	delete m_outputlink;
 	delete m_workingMemory;
 
-	destroy_soar_agent(m_pKernelSML->GetSoarKernel(), m_agent);
+	destroy_soar_agent( m_agent );
 }
 
 // Release any objects or other data we are keeping.  We do this just

@@ -80,9 +80,7 @@ namespace sml
                  
      bool Preferences(AgentSML* thisAgent, int detail, bool object, const char* idString, const char* attrString);
 
-     bool ProductionFind(AgentSML*     thisAgent,
-                         agent*      agnt,
-                         KernelSML*    kernel,
+     bool ProductionFind(agent*      agnt,
                          bool        lhs,
                          bool        rhs,
                          char*       arg,

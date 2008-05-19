@@ -34,12 +34,9 @@
 #include <map>
 #include <stdlib.h>
 
-#include "gSKI_KernelFactory.h"
-#include "gSKI_Kernel.h"
 #include "gSKI_Error.h"
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
-#include "gSKI_Events.h"
 #include "gSKI_InputLink.h"
 #include "gSKI_OutputLink.h"
 #include "IgSKI_OutputProcessor.h"
@@ -79,6 +76,14 @@ KernelSML* KernelSML::CreateKernelSML(unsigned short portToListenOn)
 	return s_pKernel ;
 }
 
+std::string KernelSML::GetVersionString() {
+	std::stringstream versionString;
+
+	// TODO: cache this?
+	versionString << MAJOR_VERSION_NUMBER << "." << MINOR_VERSION_NUMBER << "." << MICRO_VERSION_NUMBER;
+	return versionString.str();
+}
+
 /*************************************************************
 * @brief	Returns the singleton kernel object.
 *************************************************************/
@@ -104,12 +109,6 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	// Initalize the event map
 	m_pEventMap = new Events() ;
 
-	// Create a Kernel Factory
-	m_pKernelFactory = new gSKI::KernelFactory();
-   
-	// Create the kernel instance
-	m_pIKernel = m_pKernelFactory->Create();
-
 	// Give the command line interface a reference to the kernel interface
 	m_CommandLineInterface.SetKernel(this);
 
@@ -126,8 +125,6 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 	m_UpdateListener.Init(this) ;
 	m_StringListener.Init(this) ;
 
-	m_pSoarKernel = new kernel() ;
-
 	m_pKernelHelpers = new KernelHelpers() ;
 
 	// We'll use this to make sure only one connection is executing commands
@@ -140,8 +137,9 @@ KernelSML::KernelSML(unsigned short portToListenOn)
 
 	m_pRunScheduler = new RunScheduler(this) ;
 
-	m_pSystemStopListener = NULL ;
 	m_EchoCommands = false ;
+
+	m_InterruptCheckRate = 10;
 }
 
 /** Deletes all agents and optionally waits until this has actually happened (if the agent is running there may be a delay) */
@@ -181,14 +179,7 @@ KernelSML::~KernelSML()
 	m_UpdateListener.Clear() ;
 	m_StringListener.Clear() ;
 
-	if (m_pKernelFactory && m_pIKernel)
-		m_pKernelFactory->DestroyKernel(m_pIKernel);
-
 	delete m_pKernelHelpers ;
-
-	delete m_pSoarKernel ;
-
-	delete m_pKernelFactory ;
 
 	delete m_pConnectionManager ;
 
@@ -207,6 +198,16 @@ void KernelSML::Shutdown()
 {
 	m_pConnectionManager->Shutdown() ;
 }
+
+void KernelSML::SetStopPoint(bool forever, smlRunStepSize runStepSize, smlPhase m_StopBeforePhase)
+{
+	if ((sml_DECISION == runStepSize) || forever) {
+		m_StopPoint = m_StopBeforePhase ;
+	} else  {
+		m_StopPoint = sml_INPUT_PHASE ;
+	}
+}
+
 
 //////////////////////////////////////
 /*************************************************************
@@ -406,11 +407,6 @@ void KernelSML::SetTraceCommunications(bool state)
 bool KernelSML::IsTracingCommunications()
 {
 	return m_pConnectionManager->IsTracingCommunications() ;
-}
-
-kernel* KernelSML::GetSoarKernel()
-{
-	return m_pSoarKernel ;
 }
 
 /*************************************************************

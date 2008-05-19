@@ -366,10 +366,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm"
 			>
 			<File
-				RelativePath="src\EventManagementTemplates.h"
-				>
-			</File>
-			<File
 				RelativePath="src\gSKI_ActionElement.cpp"
 				>
 			</File>
@@ -414,10 +410,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\gSKI_Events.h"
-				>
-			</File>
-			<File
 				RelativePath="src\gSKI_InputLink.cpp"
 				>
 			</File>
@@ -450,35 +442,11 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_InstanceInfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_InstanceInfo.h"
-				>
-			</File>
-			<File
 				RelativePath="src\gSKI_Iterator.cpp"
 				>
 			</File>
 			<File
 				RelativePath="src\gSKI_Iterator.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Kernel.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Kernel.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_KernelFactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_KernelFactory.h"
 				>
 			</File>
 			<File
@@ -658,19 +626,11 @@
 				>
 			</File>
 			<File
-				RelativePath="include\IgSKI_InputLink.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_Iterator.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\IgSKI_MultiAttribute.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_OutputLink.h"
 				>
 			</File>
 			<File
@@ -699,10 +659,6 @@
 			</File>
 			<File
 				RelativePath="include\IgSKI_WorkingMemory.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_WorkingMemoryView.h"
 				>
 			</File>
 			<File

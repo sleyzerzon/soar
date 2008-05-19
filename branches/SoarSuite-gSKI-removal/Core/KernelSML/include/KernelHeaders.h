@@ -30,4 +30,3 @@
 #include "symtab.h"
 #include "io_soar.h"
 #include "wmem.h"
-#include "kernel_struct.h"

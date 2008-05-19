@@ -1492,13 +1492,11 @@ void print_binding_list (agent* agnt, list *bindings)
 }
 
 void read_rhs_pattern_and_get_matching_productions (agent* agnt,
-	kernel* krnl,
 	list **current_pf_list, 
 	bool show_bindings,
 	bool just_chunks, 
 	bool no_chunks) 
 {
-	unused(krnl) ;
 
 	action *a, *alist, *pa;
 	int i;
@@ -1739,14 +1737,11 @@ bool conditions_are_equal_with_bindings (agent* agnt, condition *c1, condition *
 }
 
 void read_pattern_and_get_matching_productions (agent* agnt,
-	kernel* krnl,
 	list **current_pf_list, 
 	bool show_bindings,
 	bool just_chunks,
 	bool no_chunks) 
 {
-	unused(krnl) ;
-
 	condition *c, *clist, *top, *bottom, *pc;
 	int i;
 	production *prod;
@@ -1827,9 +1822,8 @@ void read_pattern_and_get_matching_productions (agent* agnt,
 			if (bindings) free_binding_list(agnt, bindings); /* DJP 4/3/96 -- To catch the last production */
 }
 
-bool KernelHelpers::ProductionFind(AgentSML*     thisAgent,
-	agent*      agnt2,
-	KernelSML*    kernel,
+bool KernelHelpers::ProductionFind(
+	agent* agnt,
 	bool        lhs,
 	bool        rhs,
 	char*       arg,
@@ -1837,13 +1831,7 @@ bool KernelHelpers::ProductionFind(AgentSML*     thisAgent,
 	bool        just_chunks,
 	bool        no_chunks)
 {
-	unused(agnt2) ;
-
-	agent* agnt = thisAgent->GetSoarAgent();
-
 	list* current_pf_list = 0;
-
-
 
 	if (lhs) 
 	{
@@ -1854,7 +1842,6 @@ bool KernelHelpers::ProductionFind(AgentSML*     thisAgent,
 
 		get_lexeme(agnt);
 		read_pattern_and_get_matching_productions (agnt, 
-			kernel->GetSoarKernel(),
 			&current_pf_list,
 			show_bindings,
 			just_chunks, 
@@ -1869,7 +1856,7 @@ bool KernelHelpers::ProductionFind(AgentSML*     thisAgent,
 		agnt->alternate_input_suffix = ") ";
 
 		get_lexeme(agnt);
-		read_rhs_pattern_and_get_matching_productions (agnt, kernel->GetSoarKernel(), &current_pf_list,
+		read_rhs_pattern_and_get_matching_productions (agnt, &current_pf_list,
 			show_bindings,
 			just_chunks, 
 			no_chunks);

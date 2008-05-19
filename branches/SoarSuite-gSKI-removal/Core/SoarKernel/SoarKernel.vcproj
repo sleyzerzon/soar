@@ -197,10 +197,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\kernel_struct.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\lexer.cpp"
 				>
 			</File>
@@ -332,10 +328,6 @@
 			</File>
 			<File
 				RelativePath=".\include\kernel.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\kernel_struct.h"
 				>
 			</File>
 			<File

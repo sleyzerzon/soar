@@ -22,7 +22,6 @@
 #include "sml_Events.h"
 
 #include "gSKI_Error.h"
-#include "gSKI_Kernel.h"
 
 #include <assert.h>
 
@@ -701,10 +700,8 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	// Record initial counts and zero the local "run" counter (that we're about to be incrementing)
  	InitializeRunCounters(runStepSize) ;
 
- 	gSKI::Kernel* pKernel = m_pKernelSML->GetKernel() ;
-
 	// Depending on RunType, set the stop location for gSKI_STOP_AFTER_DECISION_CYCLE interrupts
-	pKernel->SetStopPoint(forever, static_cast<egSKIRunType>(runStepSize), (egSKIPhaseType)m_StopBeforePhase);
+	m_pKernelSML->SetStopPoint( forever, runStepSize, m_StopBeforePhase );
 
 	// Fire one event to indicate the entire system is starting
 	m_pKernelSML->FireSystemEvent(smlEVENT_SYSTEM_START) ;
@@ -735,7 +732,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	// Record that we're now running, so we can poll for our status during a run.
 	m_IsRunning = true ;
 
-	int interruptCheckRate = pKernel->GetInterruptCheckRate() ;
+	int interruptCheckRate = m_pKernelSML->GetInterruptCheckRate() ;
  
 	// If we need to synchronize agents, we'll set the synchAgent pointer.
 	// Otherwise, we'll clear it to indicate no synch needed.

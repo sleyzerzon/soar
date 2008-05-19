@@ -14,13 +14,10 @@
 #ifndef SML_KERNEL_SML_H
 #define SML_KERNEL_SML_H
 
-typedef struct kernel_struct kernel;
 typedef struct wme_struct wme;
 
 // Forward declarations
 namespace gSKI {
-	class KernelFactory ;
-	class Kernel ;
 	class IInputProducer ;
 	class IOutputProcessor ;
 	class OutputListener ;
@@ -99,8 +96,6 @@ class KernelSML
 
 protected:
 
-	gSKI::KernelFactory* m_pKernelFactory;
-
 	// The singleton kernel object
 	static KernelSML*	s_pKernel ;
 
@@ -118,9 +113,6 @@ protected:
 	// Command line interface module
 	cli::CommandLineInterface m_CommandLineInterface ;
 
-	// The gSKI kernel objects
-	gSKI::Kernel*			m_pIKernel ;
-
 	// A listener socket and the list of connections to the kernel
 	ConnectionManager* m_pConnectionManager ;
 
@@ -132,9 +124,6 @@ protected:
 
 	// Used to map event IDs to and from strings
 	Events*			m_pEventMap ;
-
-	// gSKI created this tiny wrapper object at the kernel level.  Keeping it for now.
-	kernel*			m_pSoarKernel ;
 
 	// Used to listen for kernel events that are kernel based (not for a specific agent)
 	SystemListener	m_SystemListener;
@@ -157,17 +146,21 @@ protected:
 
 	KernelHelpers*	m_pKernelHelpers ;
 
-	// Used to shutdown a running system.  Not sure we really need to support this
-	// but this is an attempt.
-	class OnSystemStopDeleteAll ;
-	OnSystemStopDeleteAll*	m_pSystemStopListener ;
-
 	// If true, whenever a user issues a command that changes the state of the kernel in some manner
 	// the command and its results are echoed to anyone listening.  This is useful when two users
 	// are debugging the same kernel (and should be off at other times).
 	bool			m_EchoCommands ;
 
+	int				m_InterruptCheckRate;
+	smlPhase		m_StopPoint ;
+
 public:
+
+	void SetStopPoint(bool forever, smlRunStepSize runStepSize, smlPhase m_StopBeforePhase);
+	smlPhase GetStopPoint() { return m_StopPoint; }
+
+	int GetInterruptCheckRate() { return m_InterruptCheckRate; }
+
 	/*************************************************************
 	* @brief	Returns the singleton kernel object.
 	*************************************************************/
@@ -179,6 +172,8 @@ public:
 	*			given port.
 	*************************************************************/
 	static KernelSML* CreateKernelSML(unsigned short portToListenOn) ;
+
+	static std::string GetVersionString();
 
 	/*************************************************************
 	* @brief	Delete the singleton kernel object
@@ -376,17 +371,6 @@ public:
 	* @brief	Look up an agent from its name.
 	*************************************************************/
 	AgentSML* GetAgentSML(char const* pAgentName) ;
-
-	/*************************************************************
-	* @brief	Get the kernel object.
-	*************************************************************/
-	gSKI::Kernel* GetKernel() { return m_pIKernel ; }
-
-	/*************************************************************
-	* @brief	gSKI introduced a Soar kernel object.
-	*			Not clear on why this exists but preserving it for now.
-	*************************************************************/	
-	kernel* GetSoarKernel() ;
 
 	/*************************************************************
 	* @brief	A set of methods generally used to implement CLI methods.
