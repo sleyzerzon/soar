@@ -434,38 +434,6 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_OutputLink.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_OutputLink.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_OutputWme.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_OutputWme.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_OutputWMObject.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_OutputWMObject.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_OutputWorkingMemory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_OutputWorkingMemory.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\gSKI_ReleaseImpl.cpp"
 				>
 			</File>
@@ -518,31 +486,11 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_WorkingMemory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_WorkingMemory.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_WorkingMemoryView.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_WorkingMemoryView.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\IgSKI_InputProducer.h"
 				>
 			</File>
 			<File
 				RelativePath="include\IgSKI_Iterator.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\IgSKI_OutputProcessor.h"
 				>
 			</File>
 			<File
@@ -563,10 +511,6 @@
 			</File>
 			<File
 				RelativePath="include\IgSKI_WMObject.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_WorkingMemory.h"
 				>
 			</File>
 			<File

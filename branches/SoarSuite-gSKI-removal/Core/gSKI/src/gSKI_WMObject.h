@@ -26,7 +26,7 @@
 
 namespace gSKI {
 
-   class WorkingMemory;
+   class InputWorkingMemory;
    class gSymbol;
    class Wme;
 
@@ -68,7 +68,7 @@ namespace gSKI {
        * @brief Constructors
        *
        */
-      WMObject(WorkingMemory* manager, Symbol* sym);
+      WMObject(InputWorkingMemory* manager, Symbol* sym);
 	 
       /** 
        * @brief Destructor
@@ -304,7 +304,7 @@ namespace gSKI {
      
    private:
      gSymbol* m_gsym;
-     WorkingMemory* m_manager;
+     InputWorkingMemory* m_manager;
 
      std::vector<Wme*> m_vwmes;
      std::map<Wme*,WMObject*> m_parentmap;

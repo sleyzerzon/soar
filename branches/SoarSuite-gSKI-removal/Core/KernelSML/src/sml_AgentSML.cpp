@@ -20,8 +20,6 @@
 #include "sml_RhsFunction.h"
 
 #include "gSKI_InputLink.h"
-#include "gSKI_OutputLink.h"
-#include "gSKI_WorkingMemory.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_Symbol.h"
 
@@ -74,17 +72,10 @@ void AgentSML::Init()
 	// Temporary HACK.  This should be fixed in the kernel.
 	m_agent->stop_soar = FALSE;
 
-	// Creating the output link
-	// NOTE: THE OUTPUT LINK CREATION MUST COME BEFORE THE INITIALIZE CALL
-	// FOR THE OUTPUT LINK CALLBACK TO BE PROPERLY REGISTERED (see io.cpp for more 
-	// details in the update_for_top_state_wme_addition function)
-	m_outputlink = new gSKI::OutputLink(m_agent);
-
 	// Initializing the soar agent
 	init_soar_agent( m_agent );
 
 	m_inputlink = new gSKI::InputLink(m_agent);
-	m_workingMemory = new gSKI::WorkingMemory(m_agent);
 
 	m_pRhsInterrupt = new InterruptRhsFunction(this) ;
 	m_pRhsConcat    = new ConcatRhsFunction(this) ;
@@ -114,8 +105,6 @@ AgentSML::~AgentSML()
 	// Cleaning up the input and output links and the working memory
 	// object since these are wholly owned by the agent.
 	delete m_inputlink;
-	delete m_outputlink;
-	delete m_workingMemory;
 
 	destroy_soar_agent( m_agent );
 }
@@ -249,11 +238,7 @@ bool AgentSML::Reinitialize()
 {
 	m_pKernelSML->FireAgentEvent(this, smlEVENT_BEFORE_AGENT_REINITIALIZED) ;
 
-//	GetgSKIAgent()->Reinitialize(); BEGIN
 	m_inputlink->Reinitialize();
-	m_outputlink->Reinitialize();
-	m_workingMemory->Reinitialize();
-//	GetgSKIAgent()->Reinitialize(); END
 
     bool ok = reinitialize_soar( m_agent );
     init_agent_memory( m_agent );

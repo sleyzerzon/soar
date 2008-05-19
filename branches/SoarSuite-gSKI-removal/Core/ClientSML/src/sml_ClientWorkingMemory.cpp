@@ -488,8 +488,8 @@ Identifier* WorkingMemory::GetInputLink()
 #ifdef SML_DIRECT
 			if (GetConnection()->IsDirectConnection())
 			{
-				Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName(), true) ;
-				Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetRoot(GetAgent()->GetAgentName(), true) ;
+				Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName()) ;
+				Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetRoot(GetAgent()->GetAgentName()) ;
 				m_InputLink->SetWorkingMemoryHandle(wm) ;
 				m_InputLink->SetWMObjectHandle(wmobject) ;
 			}
@@ -1238,8 +1238,8 @@ void WorkingMemory::Refresh()
 			{
 				m_InputLink->ClearAllWMObjectHandles() ;
 
-				Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName(), true) ;
-				Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetRoot(GetAgent()->GetAgentName(), true) ;
+				Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName()) ;
+				Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetRoot(GetAgent()->GetAgentName()) ;
 				m_InputLink->SetWorkingMemoryHandle(wm) ;
 				m_InputLink->SetWMObjectHandle(wmobject) ;
 			}
@@ -1272,7 +1272,7 @@ int WorkingMemory::GetIWMObjMapSize()
 #ifdef SML_DIRECT
 	if (GetConnection()->IsDirectConnection())
 	{
-		Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName(), true) ;
+		Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName()) ;
 		if (wm)
 		{
 			result = ((EmbeddedConnection*)GetConnection())->DirectGetIWMObjMapSize(wm);

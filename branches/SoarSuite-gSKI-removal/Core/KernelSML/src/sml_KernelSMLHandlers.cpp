@@ -38,14 +38,11 @@
 #include "gSKI_Error.h"
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
-#include "IgSKI_OutputProcessor.h"
 #include "IgSKI_InputProducer.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_Wme.h"
-#include "IgSKI_WorkingMemory.h"
 #include "IgSKI_WMObject.h"
 #include "gSKI_InputLink.h"
-#include "gSKI_OutputLink.h"
 
 using namespace sml ;
 
@@ -70,7 +67,7 @@ using namespace sml ;
 //   
 //   // The update function required by the IInputProducer interface
 //   // (Responsible for updating the state of working memory)
-//   virtual void Update(gSKI::IWorkingMemory* /*wmemory*/, gSKI::IWMObject* /*obj*/)
+//   virtual void Update(gSKI::InputWorkingMemory* /*wmemory*/, gSKI::IWMObject* /*obj*/)
 //   {
 //	   // Check for any new incoming commands from remote connections.
 //	   // We do this in an input producer so it's once per decision during a run and
@@ -713,7 +710,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
 	bool addingToInputLink = true ;
-	gSKI::IWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
+	gSKI::InputWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
 
 	// First get the object which will own this new wme
 	// Because we build from the top down, this should always exist by the
@@ -724,12 +721,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 	// Soar also allows the environment to modify elements on the output link.
 	// This is a form of backdoor input, so we need to check on the output side too
 	// if we don't find our parent on the input side.
-	if (!pParentObject)
-	{
-		pInputWM = pAgentSML->m_outputlink->GetOutputMemory() ;
-		pInputWM->GetObjectById(pID, &pParentObject) ;
-		addingToInputLink = false ;
-	}
+	assert ( pParentObject ); // BUGBUG TEST THIS NEVER HAPPENS
 
 	// Failed to find the parent.
 	if (!pParentObject)
@@ -824,7 +816,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 
 bool KernelSML::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 {
-	gSKI::IWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
+	gSKI::InputWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
 
 	// Get the wme that matches this time tag
 	gSKI::IWme* pWME = pAgentSML->ConvertTimeTag(pTimeTag) ;

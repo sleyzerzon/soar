@@ -28,8 +28,6 @@ namespace gSKI {
 	class IWme ;
 	class IWMObject;
 	class InputLink;
-	class OutputLink;
-	class WorkingMemory;
 	struct Error;
 }
 
@@ -89,8 +87,6 @@ class AgentSML
 
 public:
 	gSKI::InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
-	gSKI::OutputLink*          m_outputlink;        /**< A pointer to this agent's output link. */
-	gSKI::WorkingMemory*       m_workingMemory;     /**< A pointer to this agent's working memory. */
 
 	static void InputPhaseCallback( soar_callback_agent agent, soar_callback_event_id eventid, soar_callback_data callbackdata, soar_call_data calldata );
 

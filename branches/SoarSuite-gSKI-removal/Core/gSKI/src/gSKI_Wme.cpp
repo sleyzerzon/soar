@@ -19,7 +19,7 @@
 
 namespace gSKI
 {
-   Wme::Wme(WorkingMemory* manager, wme* wme):
+   Wme::Wme(InputWorkingMemory* manager, wme* wme):
       m_manager(manager)
    {
       MegaAssert( manager != 0, "Trying to create a Wme with a null manager!");

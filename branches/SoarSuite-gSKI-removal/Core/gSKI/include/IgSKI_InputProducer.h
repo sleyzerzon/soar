@@ -57,7 +57,7 @@ namespace gSKI {
        * @param object The input wme associated with this InputProducer.
        */
       // TODO: Verify that the ShouldUpdate() method is no longer necessary.
-      virtual void Update(IWorkingMemory* wmemory,
+      virtual void Update(InputWorkingMemory* wmemory,
                           IWMObject* object) = 0;
 
    };

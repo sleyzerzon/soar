@@ -475,52 +475,6 @@ namespace gSKI
 		*object = pWMObject ;
 	}
 
-	tIWMObjectIterator* InputWorkingMemory::GetAllObjects(Error* err) const
-	{
-		ClearError(err);
-
-		MegaAssert(false, "NOT IMPLEMENTED YET!");
-
-		return 0;
-	}
-
-	tIWmeIterator* InputWorkingMemory::GetAllWmes(Error* err) const
-	{
-		ClearError(err);
-
-		MegaAssert(false, "NOT IMPLEMENTED YET!");
-
-		return 0;
-	}
-
-	tIWMObjectIterator* InputWorkingMemory::FindObjectsByCriteria(Error* err) const
-	{
-		ClearError(err);
-
-		MegaAssert(false, "NOT IMPLEMENTED YET!");
-
-		return 0;
-	}
-
-	tIWmeIterator* InputWorkingMemory::FindWmesByCriteria(Error* err) const
-	{
-		ClearError(err);
-
-		MegaAssert(false, "NOT IMPLEMENTED YET!");
-
-		return 0;
-	}
-
-	IWMStaticView* InputWorkingMemory::CreateSubView(const IWMObject* rootobject,
-		Error* err) const
-	{
-		ClearError(err);
-
-		MegaAssert(false, "NOT IMPLEMENTED YET!");
-
-		return 0;
-	}
-
 	wme* InputWorkingMemory::GetInputWme(Symbol* id, 
 		Symbol* attribute, 
 		Symbol* value)
@@ -576,12 +530,6 @@ namespace gSKI
 		// No matching Wme was found
 		return 0;
 	}   
-
-	tIWMObjectIterator* InputWorkingMemory::FindObjects( InputWMObject* obj, 
-		const std::string& path)
-	{
-		return obj->GetObjectsReferencedByAttribute(path);
-	}
 
 	InputWMObject* InputWorkingMemory::GetOrCreateObjectFromSymbol(const ISymbol* idsym)
 	{

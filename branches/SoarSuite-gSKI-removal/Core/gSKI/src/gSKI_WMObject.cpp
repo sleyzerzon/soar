@@ -17,11 +17,10 @@
 
 #include "IgSKI_Iterator.h"
 
-#include "gSKI_WorkingMemory.h"
 #include "gSKI_Wme.h"
 #include "gSKI_Symbol.h"
 #include "gSKI_Error.h"
-
+#include "gSKI_InputWorkingMemory.h"
 #include "MegaAssert.h"
 
 #include "symtab.h"
@@ -29,7 +28,7 @@
 namespace gSKI 
 {
 
-   WMObject::WMObject(WorkingMemory* manager,Symbol* sym):
+   WMObject::WMObject(InputWorkingMemory* manager,Symbol* sym):
       m_gsym(0),
       m_manager(manager)
    {

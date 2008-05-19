@@ -42,8 +42,8 @@ typedef Direct_WME_Handle			(*DirectAddIDFunction)(Direct_WorkingMemory_Handle, 
 typedef Direct_WME_Handle			(*DirectLinkIDFunction)(Direct_WorkingMemory_Handle, Direct_WMObject_Handle, long, char const*, Direct_WMObject_Handle) ;
 typedef Direct_WMObject_Handle		(*DirectGetThisWMObjectFunction)(Direct_WorkingMemory_Handle, Direct_WME_Handle) ;
 
-typedef Direct_WorkingMemory_Handle (*DirectGetWorkingMemoryFunction)(char const*, bool) ;
-typedef Direct_WMObject_Handle		(*DirectGetRootFunction)(char const*, bool) ;
+typedef Direct_WorkingMemory_Handle (*DirectGetWorkingMemoryFunction)(char const*) ;
+typedef Direct_WMObject_Handle		(*DirectGetRootFunction)(char const*) ;
 typedef void						(*DirectRunFunction)(char const*, bool, int, int, int) ;
 
 typedef void						(*DirectReleaseWMEFunction)(Direct_WorkingMemory_Handle, Direct_WME_Handle, long) ;
@@ -97,8 +97,8 @@ EXPORT Direct_WME_Handle sml_DirectLinkID(Direct_WorkingMemory_Handle wm, Direct
 EXPORT Direct_WMObject_Handle sml_DirectGetThisWMObject(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme) ;
 
 //EXPORT Direct_Agent_Handle sml_DirectGetAgent(char const* pAgentName) ;
-EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgentName, bool input) ;
-EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool input) ;
+EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgentName) ;
+EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName) ;
 
 EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, int interleaveSize, int count) ;
 

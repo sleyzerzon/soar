@@ -130,13 +130,13 @@ public:
 		return m_pDirectGetThisWMObjectFunction(wm, wme) ;
 	}
 
-	Direct_WorkingMemory_Handle DirectGetWorkingMemory(char const* pAgentName, bool input)
+	Direct_WorkingMemory_Handle DirectGetWorkingMemory(char const* pAgentName)
 	{
-		return m_pDirectGetWorkingMemoryFunction(pAgentName, input) ;
+		return m_pDirectGetWorkingMemoryFunction(pAgentName) ;
 	}
-	Direct_WMObject_Handle		DirectGetRoot(char const* pAgentName, bool input)
+	Direct_WMObject_Handle		DirectGetRoot(char const* pAgentName)
 	{
-		return m_pDirectGetRootFunction(pAgentName, input) ;
+		return m_pDirectGetRootFunction(pAgentName) ;
 	}
 	void						DirectRun(char const* pAgentName, bool forever, int stepSize, int interleaveSize, int count)
 	{

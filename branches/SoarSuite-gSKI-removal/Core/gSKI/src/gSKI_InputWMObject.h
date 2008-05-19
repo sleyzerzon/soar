@@ -13,13 +13,12 @@
 #ifndef GSKI_INPUTWMOBJECT_H
 #define GSKI_INPUTWMOBJECT_H
 
-#include "IgSKI_WorkingMemory.h"
 #include "IgSKI_Iterator.h"
 #include "IgSKI_WMObject.h"
 #include "IterUtils.h"
 #include "gSKI_Iterator.h"
 #include "gSKI_ReleaseImpl.h"
-#include "gSKI_WorkingMemory.h"
+#include "gSKI_InputWorkingMemory.h"
 
 #include "symtab.h"
 
