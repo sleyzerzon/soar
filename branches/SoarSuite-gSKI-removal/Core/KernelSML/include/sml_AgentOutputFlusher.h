@@ -21,7 +21,6 @@ enum smlXMLEventId;
 class AgentOutputFlusher : public KernelCallback
 {
 protected:
-	//gSKI::Agent* m_pAgent;
 	int m_EventID ;
 
 	// Only one listener will be filled in.

@@ -20,10 +20,12 @@
 #include "sml_OutputListener.h"
 #include "sml_InputListener.h"
 
+#include "callback.h"
+
+
 // Forward declarations for gSKI
 namespace gSKI {
 	class IWme ;
-	class IInputProducer ;
 	class IWMObject;
 	class InputLink;
 	class OutputLink;
@@ -90,10 +92,9 @@ public:
 	gSKI::OutputLink*          m_outputlink;        /**< A pointer to this agent's output link. */
 	gSKI::WorkingMemory*       m_workingMemory;     /**< A pointer to this agent's working memory. */
 
-protected:
+	static void InputPhaseCallback( soar_callback_agent agent, soar_callback_event_id eventid, soar_callback_data callbackdata, soar_call_data calldata );
 
-	// This is a callback we register so we get called back each input phase (so we can check for incoming commands once per decision)
-	gSKI::IInputProducer* m_pInputProducer ;
+protected:
 
 	// A reference to the underlying kernel agent object
 	agent*			m_agent ;
@@ -203,8 +204,6 @@ public:
 
 	OutputListener* GetOutputListener()							{ return &m_OutputListener ; }
 	InputListener* GetInputListener()							{ return &m_InputListener ; }
-
-	void SetInputProducer(gSKI::IInputProducer* pInputProducer)	{ m_pInputProducer = pInputProducer ; }
 
 	void SetSuppressRunEndsEvent(bool state) { m_SuppressRunEndsEvent = state ; }
 	bool GetSuppressRunEndsEvent()			 { return m_SuppressRunEndsEvent ; }

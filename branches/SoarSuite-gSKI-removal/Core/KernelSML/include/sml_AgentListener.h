@@ -31,7 +31,7 @@ class Connection ;
 
 enum smlAgentEventId;
 
-class AgentListener : /*gSKI::IAgentListener, */public EventManager<smlAgentEventId>
+class AgentListener : public EventManager<smlAgentEventId>
 {
 protected:
 	KernelSML*		m_pKernelSML ;
@@ -55,9 +55,6 @@ public:
 
 	// Returns true if at least one connection remains listening for this event
 	virtual bool RemoveListener(smlAgentEventId eventID, Connection* pConnection) ;
-
-	// Called when an "AgentEvent" occurs in the kernel
-	//virtual void HandleEvent(egSKIAgentEventId eventId, gSKI::Agent* agentPtr) ;
 
 	virtual void OnEvent(smlAgentEventId eventID, AgentSML* pAgentSML) ;
 

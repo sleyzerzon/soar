@@ -49,39 +49,39 @@
 
 using namespace sml ;
 
-/*
-  ==================================
-  SML input producer
-  ==================================
-*/
-class sml_InputProducer: public gSKI::IInputProducer
-{
-public:
-
-   // Simple constructor
-   sml_InputProducer(KernelSML* pKernelSML)
-   {
-	   m_KernelSML	= pKernelSML ;
-   }
-   
-   virtual ~sml_InputProducer() 
-   {
-   }
-   
-   // The update function required by the IInputProducer interface
-   // (Responsible for updating the state of working memory)
-   virtual void Update(gSKI::IWorkingMemory* /*wmemory*/, gSKI::IWMObject* /*obj*/)
-   {
-	   // Check for any new incoming commands from remote connections.
-	   // We do this in an input producer so it's once per decision during a run and
-	   // the input phase seems like the correct point for incoming commands.
-	   m_KernelSML->ReceiveAllMessages() ;
-   }
-
-private:
-	sml::KernelSML*		m_KernelSML ;
-};
-
+///*
+//  ==================================
+//  SML input producer
+//  ==================================
+//*/
+//class sml_InputProducer: public gSKI::IInputProducer
+//{
+//public:
+//
+//   // Simple constructor
+//   sml_InputProducer(KernelSML* pKernelSML)
+//   {
+//	   m_KernelSML	= pKernelSML ;
+//   }
+//   
+//   virtual ~sml_InputProducer() 
+//   {
+//   }
+//   
+//   // The update function required by the IInputProducer interface
+//   // (Responsible for updating the state of working memory)
+//   virtual void Update(gSKI::IWorkingMemory* /*wmemory*/, gSKI::IWMObject* /*obj*/)
+//   {
+//	   // Check for any new incoming commands from remote connections.
+//	   // We do this in an input producer so it's once per decision during a run and
+//	   // the input phase seems like the correct point for incoming commands.
+//	   m_KernelSML->ReceiveAllMessages() ;
+//   }
+//
+//private:
+//	sml::KernelSML*		m_KernelSML ;
+//};
+//
 void KernelSML::BuildCommandMap()
 {
 	m_CommandMap[sml_Names::kCommand_CreateAgent]		= &sml::KernelSML::HandleCreateAgent ;
@@ -158,14 +158,20 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 	m_pConnectionManager->SetAgentStatus(sml_Names::kStatusCreated) ;
 
 	// We also need to listen to input events so we can pump waiting sockets and get interrupt messages etc.
-	sml_InputProducer* pInputProducer = new sml_InputProducer(this) ;
-	pAgentSML->SetInputProducer(pInputProducer) ;
+	soar_add_callback( pSoarAgent,
+		static_cast<void*>(pSoarAgent),
+		INPUT_PHASE_CALLBACK,
+		&sml::AgentSML::InputPhaseCallback,
+		0,
+		0,
+		0,
+		"static_input_callback");
 
 	// Add the input producer to the top level of the input link (doesn't matter for us which WME it's attached to)
-	gSKI::IWMObject* pRoot = NULL ;
-	pAgentSML->m_inputlink->GetRootObject(&pRoot) ;
-	pAgentSML->m_inputlink->AddInputProducer(pRoot, pInputProducer) ;
-	pRoot->Release() ;
+	//gSKI::IWMObject* pRoot = NULL ;
+	//pAgentSML->m_inputlink->GetRootObject(&pRoot) ;
+	//pAgentSML->m_inputlink->AddInputProducer(pRoot, pInputProducer) ;
+	//pRoot->Release() ;
 
 	pAgentSML->m_inputlink->GetInputLinkMemory()->m_RemoveWmeCallback = RemoveInputWMERecordsCallback;
 

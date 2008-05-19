@@ -19,7 +19,6 @@
 #include "sml_KernelSML.h"
 #include "sml_RhsFunction.h"
 
-#include "IgSKI_InputProducer.h"
 #include "gSKI_InputLink.h"
 #include "gSKI_OutputLink.h"
 #include "gSKI_WorkingMemory.h"
@@ -41,11 +40,9 @@ using namespace sml ;
 AgentSML::AgentSML(KernelSML* pKernelSML, agent* pAgent)
 {
 	m_pKernelSML = pKernelSML ;
-	m_pInputProducer = NULL ;
 	m_InputLinkRoot = NULL ;
 	m_OutputLinkRoot = NULL ;
 	m_SuppressRunEndsEvent = false ;
-	//m_pBeforeDestroyedListener = NULL ;
 
 	m_pAgentRunCallback = new AgentRunCallback() ;
 	m_pAgentRunCallback->SetAgentSML(this) ;
@@ -105,8 +102,6 @@ void AgentSML::Init()
 AgentSML::~AgentSML()
 {
 	delete m_pAgentRunCallback ;
-	delete m_pInputProducer ;
-	//delete m_pBeforeDestroyedListener ;
 
 	/* RPM 9/06 added code from reinitialize_soar to clean up stuff hanging from last run
 			   need to put it here instead of in destroy_soar_agent because gSKI is
@@ -1017,3 +1012,29 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 
 	return result ;
 }
+
+void AgentSML::InputPhaseCallback(soar_callback_agent /*agent*/,
+								   soar_callback_event_id /*eventid*/,
+								   soar_callback_data /*callbackdata*/,
+								   soar_call_data /*calldata*/ )
+{
+	//int callbacktype = (int)reinterpret_cast<long long>(calldata);
+
+	//switch(callbacktype) {
+	//case TOP_STATE_JUST_CREATED:
+	//	m_inputlink->InitialUpdate();
+	//	break;
+	//case NORMAL_INPUT_CYCLE:
+	//	m_inputlink->Update();
+	//	break;
+	//case TOP_STATE_JUST_REMOVED:
+	//	m_inputlink->FinalUpdate();
+	//	break;
+	//default:
+	//	assert(false); //, "The static input callback is of unknown type!");
+	//	break;
+	//}
+	//
+	KernelSML::GetKernelSML()->ReceiveAllMessages();	
+}
+
