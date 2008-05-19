@@ -99,12 +99,6 @@ void OutputListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCall
 	output_call_info* oinfo = static_cast<output_call_info*>(pCallData);
 	int outputMode = oinfo->mode;
 
-	// TEMP Step
-	// Update gSKI's representations too.  This is needed because we do input on the output-link (via ^status complete and the like) so
-	// until we have removed gSKI from the input side we still need this help on the output side.
-	//gSKI::OutputLink* pIOutputLink = (gSKI::OutputLink*)pAgentSML->GetgSKIAgent()->GetOutputLink() ;
-	//gSKI::OutputLink::OutputPhaseCallback(pAgentSML->GetAgent(), eventID, pIOutputLink, oinfo) ;
-
 	io_wme* pWmes = oinfo->outputs ;
 	SendOutput((smlWorkingMemoryEventId)eventID, pAgentSML, outputMode, pWmes) ;
 }

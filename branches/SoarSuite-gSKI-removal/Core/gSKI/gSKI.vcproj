@@ -534,7 +534,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\IgSKI_InputProducer.h"
+				>
+			</File>
+			<File
 				RelativePath="include\IgSKI_Iterator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\IgSKI_OutputProcessor.h"
 				>
 			</File>
 			<File
