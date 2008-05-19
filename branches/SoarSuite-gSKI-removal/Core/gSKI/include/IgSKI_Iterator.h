@@ -144,7 +144,6 @@ namespace gSKI {
    class ConditionSet;
    class IMultiAttribute;
    class InstanceInfo;
-   class IProduction;
    class ISymbol;
    class IWme;
    class IWMObject;
@@ -154,17 +153,11 @@ namespace gSKI {
    class TestSet;
 
    /** Typedefs for iterator instantiations */
-   typedef IIterator<ActionElement*>            tIActionElementIterator;
-   typedef IIterator<Condition *>               tIConditionIterator;
-   typedef IIterator<ConditionSet *>            tIConditionSetIterator;
    typedef IIterator<IMultiAttribute *>          tIMultiAttributeIterator;
    typedef IIterator<InstanceInfo*>				tIInstanceInfoIterator;
-   typedef IIterator<IProduction *>              tIProductionIterator;
    typedef IIterator<ISymbol*>                   tISymbolIterator;
    typedef IIterator<IWme *>                     tIWmeIterator;
    typedef IIterator<IWMObject *>                tIWMObjectIterator;
-   typedef IIterator<RhsAction *>               tIRhsActionIterator;
-   typedef IIterator<RhsFunctionAction*>        tIRhsFunctionActionIterator;
    typedef IIterator<TestSet *>                 tITestSetIterator;
    typedef IIterator<Test *>                    tITestIterator;
 }

@@ -366,30 +366,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm"
 			>
 			<File
-				RelativePath="src\gSKI_ActionElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_ActionElement.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Condition.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Condition.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_ConditionSet.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_ConditionSet.h"
-				>
-			</File>
-			<File
 				RelativePath="include\gSKI_Enumerations.h"
 				>
 			</File>
@@ -450,30 +426,6 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_MapIterator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_MapIterator.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Match.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Match.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\gSKI_MultiAttribute.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\gSKI_MultiAttribute.h"
-				>
-			</File>
-			<File
 				RelativePath="src\gSKI_ObjectToPtrIterator.cpp"
 				>
 			</File>
@@ -514,39 +466,11 @@
 				>
 			</File>
 			<File
-				RelativePath="src\gSKI_Production.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Production.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\gSKI_ReleaseImpl.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\gSKI_ReleaseImpl.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_RhsAction.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_RhsAction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\gSKI_RhsFunction.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_RhsFunctionAction.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_RhsFunctionAction.h"
 				>
 			</File>
 			<File
@@ -567,22 +491,6 @@
 			</File>
 			<File
 				RelativePath="src\gSKI_SymbolFactory.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Test.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Test.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_TestSet.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_TestSet.h"
 				>
 			</File>
 			<File
@@ -630,14 +538,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\IgSKI_MultiAttribute.h"
-				>
-			</File>
-			<File
-				RelativePath="include\IgSKI_Production.h"
-				>
-			</File>
-			<File
 				RelativePath="include\IgSKI_Release.h"
 				>
 			</File>
@@ -659,10 +559,6 @@
 			</File>
 			<File
 				RelativePath="include\IgSKI_WorkingMemory.h"
-				>
-			</File>
-			<File
-				RelativePath="src\InterruptRhsFunction.h"
 				>
 			</File>
 			<File

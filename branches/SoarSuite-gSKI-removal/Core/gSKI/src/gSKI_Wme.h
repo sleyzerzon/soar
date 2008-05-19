@@ -139,25 +139,6 @@ namespace gSKI {
      egSKISupportType GetSupportType(Error * err = 0) const;
       
       /**
-       * @brief Returns an iterator to the productions that created/support
-       * the WME
-       *
-       * This method returns an iterator to the productions that 
-       * created/support the WME. For WME's manually added by the user or
-       * created externally on the input link, this iterator will be empty.
-       *
-       * @param  err Pointer to client-owned error structure.  If the pointer
-       *               is not 0 this structure is filled with extended error
-       *               information.  If it is 0 (the default) extended error
-       *               information is not returned.
-       *
-       * @return an iterator to the productions that support the WME
-       */
-      /* TODO: This method should probably be eliminated */
-     tIProductionIterator* 
-         GetSupportProductions(Error* err = 0) const;
-
-      /**
        * @brief Returns true if the WME has been removed from the agent's working memory
        *
        * This method returns true if WME has been removed from the agent's working memory.

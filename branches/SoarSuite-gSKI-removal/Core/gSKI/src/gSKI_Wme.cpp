@@ -78,15 +78,6 @@ namespace gSKI
     return gSKI_I_SUPPORT;
   }
 
-  tIProductionIterator* Wme::GetSupportProductions(Error* err) const
-  {
-    ClearError(err);
-
-    MegaAssert(false, "NOT IMPLEMENTED YET!");
-
-    return 0;
-  }
-
   bool Wme::HasBeenRemoved(Error* err) const
   {
     ClearError(err);

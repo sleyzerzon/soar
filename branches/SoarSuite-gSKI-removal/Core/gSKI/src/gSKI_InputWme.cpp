@@ -21,7 +21,7 @@
 
 #include "gSKI_InputWMObject.h"
 #include "gSKI_InputWorkingMemory.h"
-#include "IgSKI_Production.h"
+
 #include "gSKI_Symbol.h"
 #include "gSKI_Error.h"
 #include "MegaAssert.h"
@@ -107,15 +107,6 @@ namespace gSKI
     ClearError(err);
 
     return gSKI_I_SUPPORT;
-  }
-
-  tIProductionIterator* InputWme::GetSupportProductions(Error* err) const
-  {
-    ClearError(err);
-
-    // There are no supporting productions for input wmes so return an empty iterator
-    std::vector<IProduction*> temp;
-    return new tProductionIter(temp);
   }
 
   bool InputWme::HasBeenRemoved(Error* err) const

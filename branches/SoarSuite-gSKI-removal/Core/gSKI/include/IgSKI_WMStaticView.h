@@ -13,7 +13,6 @@
 #ifndef IGSKI_WMSTATICVIEW_H
 #define IGSKI_WMSTATICVIEW_H
 
-#include "IgSKI_WorkingMemoryView.h"
 #include "IgSKI_Release.h"
 #include "IgSKI_Iterator.h"
 
