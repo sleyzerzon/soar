@@ -42,13 +42,14 @@
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
-#include "gSKI_Agent.h"
 #include "IgSKI_OutputProcessor.h"
-#include "IgSKI_OutputLink.h"
 #include "IgSKI_InputProducer.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_WorkingMemory.h"
+#include "IgSKI_WMObject.h"
+#include "gSKI_InputLink.h"
+#include "gSKI_OutputLink.h"
 
 using namespace sml ;
 
@@ -143,48 +144,37 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 
 	pAgentSML = new AgentSML(this, pSoarAgent) ;
 
-	// Make the call.
-	gSKI::Agent* pAgent = new gSKI::Agent( pSoarAgent, GetKernel() );
-	pAgentSML->SetIAgent(pAgent) ;
-
 	// Update our maps
 	m_KernelAgentMap[ pSoarAgent ] = pAgentSML ;
 	m_AgentMap[ pAgentSML->GetName() ] = pAgentSML ;
 
 	pAgentSML->InitListeners() ;	// This must happen before the soar agent is initialized
 
-	pAgent->Init() ;	// Initializes the soar agent
-
-	pAgentSML->Init() ;		// This must happen AFTER the soar agent is initialized.
+	pAgentSML->Init() ;
 
 	// Notify listeners that there is a new agent
 	this->FireAgentEvent(pAgentSML, smlEVENT_AFTER_AGENT_CREATED) ;
 
 	// Register for output from this agent
-	if (pAgent)
-	{
-		// Mark the agent's status as just having been created for all connections
-		// Note--agent status for connections just refers to the last agent created, i.e. this one.
-		m_pConnectionManager->SetAgentStatus(sml_Names::kStatusCreated) ;
 
-		// We also need to listen to input events so we can pump waiting sockets and get interrupt messages etc.
-		sml_InputProducer* pInputProducer = new sml_InputProducer(this) ;
-		pAgentSML->SetInputProducer(pInputProducer) ;
+	// Mark the agent's status as just having been created for all connections
+	// Note--agent status for connections just refers to the last agent created, i.e. this one.
+	m_pConnectionManager->SetAgentStatus(sml_Names::kStatusCreated) ;
 
-		// Add the input producer to the top level of the input link (doesn't matter for us which WME it's attached to)
-		gSKI::IInputLink* pInputLink = pAgent->GetInputLink() ;
-		gSKI::IWMObject* pRoot = NULL ;
-		pInputLink->GetRootObject(&pRoot) ;
-		pAgent->GetInputLink()->AddInputProducer(pRoot, pInputProducer) ;
-		pRoot->Release() ;
+	// We also need to listen to input events so we can pump waiting sockets and get interrupt messages etc.
+	sml_InputProducer* pInputProducer = new sml_InputProducer(this) ;
+	pAgentSML->SetInputProducer(pInputProducer) ;
 
-		pAgent->SetRemoveWmeCallback( RemoveInputWMERecordsCallback );
-	}
+	// Add the input producer to the top level of the input link (doesn't matter for us which WME it's attached to)
+	gSKI::IWMObject* pRoot = NULL ;
+	pAgentSML->m_inputlink->GetRootObject(&pRoot) ;
+	pAgentSML->m_inputlink->AddInputProducer(pRoot, pInputProducer) ;
+	pRoot->Release() ;
+
+	pAgentSML->m_inputlink->GetInputLinkMemory()->m_RemoveWmeCallback = RemoveInputWMERecordsCallback;
 
 	// Return true if we got an agent constructed.
-	// If not, pError should contain the error and returning false
-	// means we'll pass that back to the caller.
-	return (pAgent != NULL) ;
+	return true ;
 }
 
 // Handle registering and unregistering for kernel events
@@ -706,7 +696,7 @@ bool KernelSML::HandleGetInputLink(AgentSML* pAgentSML, char const* /*pCommandNa
 	// We want the input link's id
 	// Start with the root object for the input link
 	gSKI::IWMObject* pRootObject = NULL ;
-	pAgentSML->GetgSKIAgent()->GetInputLink()->GetRootObject(&pRootObject) ;
+	pAgentSML->m_inputlink->GetRootObject(&pRootObject) ;
 
 	if (pRootObject == NULL)
 		return false ;
@@ -744,7 +734,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
 	bool addingToInputLink = true ;
-	gSKI::IWorkingMemory* pInputWM = pAgentSML->GetgSKIAgent()->GetInputLink()->GetInputLinkMemory() ;
+	gSKI::IWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
 
 	// First get the object which will own this new wme
 	// Because we build from the top down, this should always exist by the
@@ -757,7 +747,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 	// if we don't find our parent on the input side.
 	if (!pParentObject)
 	{
-		pInputWM = pAgentSML->GetgSKIAgent()->GetOutputLink()->GetOutputMemory() ;
+		pInputWM = pAgentSML->m_outputlink->GetOutputMemory() ;
 		pInputWM->GetObjectById(pID, &pParentObject) ;
 		addingToInputLink = false ;
 	}
@@ -855,7 +845,7 @@ bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pA
 
 bool KernelSML::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 {
-	gSKI::IWorkingMemory* pInputWM = pAgentSML->GetgSKIAgent()->GetInputLink()->GetInputLinkMemory() ;
+	gSKI::IWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
 
 	// Get the wme that matches this time tag
 	gSKI::IWme* pWME = pAgentSML->ConvertTimeTag(pTimeTag) ;
@@ -884,16 +874,16 @@ bool KernelSML::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 	return true ;
 }
 
-void KernelSML::RemoveInputWMERecordsCallback(gSKI::Agent* pAgent, gSKI::IWme* pWME)
+void KernelSML::RemoveInputWMERecordsCallback(agent* pSoarAgent, gSKI::IWme* pWME)
 {
-	assert( pAgent );
-	s_pKernel->RemoveInputWMERecords(pAgent, pWME);
+	assert( pSoarAgent );
+	s_pKernel->RemoveInputWMERecords(pSoarAgent, pWME);
 }
 
-void KernelSML::RemoveInputWMERecords(gSKI::Agent* pAgent, gSKI::IWme* pWME)
+void KernelSML::RemoveInputWMERecords(agent* pSoarAgent, gSKI::IWme* pWME)
 {
 	// We store additional information for SML in the AgentSML structure, so look that up.
-	AgentSML* pAgentSML = GetAgentSML( pAgent->GetSoarAgent()->name ) ;
+	AgentSML* pAgentSML = GetAgentSML( pSoarAgent->name ) ;
 
 	if (!pAgentSML || !pWME)
 		return;
@@ -999,7 +989,7 @@ bool KernelSML::HandleGetAllInput(AgentSML* pAgentSML, char const* /*pCommandNam
 
 	// Walk the list of wmes on the input link and send them over
 	gSKI::IWMObject* pRootObject = NULL ;
-	pAgentSML->GetgSKIAgent()->GetInputLink()->GetRootObject(&pRootObject) ;
+	pAgentSML->m_inputlink->GetRootObject(&pRootObject) ;
 
 	// We need to keep track of which identifiers we've already added
 	// because this is a graph, so we may cycle back.

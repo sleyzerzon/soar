@@ -17,10 +17,10 @@
 #include "gSKI_InputWMObject.h"
 #include "gSKI_InputWorkingMemory.h"
 #include "gSKI_Error.h"
-#include "gSKI_Agent.h"
 #include "MegaAssert.h"
 
 #include "io_soar.h"
+#include "agent.h"
 
 #include <iostream>
 
@@ -28,12 +28,12 @@ namespace gSKI
 {
 	//KJC:  This should really register thru add_input_function 
 	//      to be more explicit.
-  InputLink::InputLink(Agent* agent):
+  InputLink::InputLink(agent* agent):
     m_agent(agent),
     m_memory(agent)
   {
-     soar_add_callback( m_agent->GetSoarAgent(),
-			static_cast<void*>(m_agent->GetSoarAgent()),
+     soar_add_callback( m_agent,
+			static_cast<void*>(m_agent),
 			INPUT_PHASE_CALLBACK,
 			InputPhaseCallback,
 			0,
@@ -49,8 +49,8 @@ namespace gSKI
    InputLink::~InputLink() 
    {
      // Removing the callback
-     soar_remove_callback( m_agent->GetSoarAgent(),
-			   static_cast<void*>(m_agent->GetSoarAgent()),
+     soar_remove_callback( m_agent,
+			   static_cast<void*>(m_agent),
                            INPUT_PHASE_CALLBACK,
                            "static_input_callback" );
 
@@ -72,7 +72,7 @@ namespace gSKI
       *rootObject = obj;
    }
 
-   IWorkingMemory* InputLink::GetInputLinkMemory(Error* err)
+   InputWorkingMemory* InputLink::GetInputLinkMemory(Error* err)
    {
       ClearError(err);
 

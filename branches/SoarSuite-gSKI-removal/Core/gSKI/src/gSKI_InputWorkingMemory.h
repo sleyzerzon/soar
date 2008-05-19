@@ -16,7 +16,6 @@
 #include "IgSKI_WorkingMemory.h"
 #include "gSKI_WorkingMemoryView.h"
 #include "gSKI_Symbol.h"
-#include "gSKI_Agent.h"
 
 #include <map>
 #include <string>
@@ -26,10 +25,10 @@
 
 namespace gSKI {
 
-   class Agent;
    class InputWMObject;
    class InputWme;
    class IWorkingMemoryListener ;
+   class ISymbolFactory;
 
 
    /** 
@@ -41,13 +40,15 @@ namespace gSKI {
     * also provides access to the ISymbolFactory interface for creating 
     * Soar Symbols.
     */
-   class InputWorkingMemory: public IWorkingMemory {
+   class InputWorkingMemory : public IWorkingMemory {
    public:
+
+	   RemoveWmeCallback m_RemoveWmeCallback;
 
       /**
        * @brief Constructor
        */
-      InputWorkingMemory(Agent* agent);
+      InputWorkingMemory(agent* agent);
        
       /**
        * @brief Virtual Destructor
@@ -71,7 +72,7 @@ namespace gSKI {
        * @return a pointer to the agent that owns the InputWorkingMemory 
        *          (this pointer can never be NULL)
        */
-      Agent* GetAgent(Error * err = 0) const;
+      agent* GetAgent(Error * err = 0) const;
 
       /**
        * @brief Adds a Wme using the most type safe WMObject, ISymbol, ISymbol syntax
@@ -545,7 +546,7 @@ namespace gSKI {
        *          id string, NULL if a WMObject with that ID does not exist
        *          or if the idstring itself is NULL.
        */
-      void GetObjectById(const char* idstring,
+      virtual void GetObjectById(const char* idstring,
                                IWMObject** object,
                                Error* err = 0) const;
 
@@ -686,11 +687,6 @@ namespace gSKI {
 											   Error*                    err = 0) ;
 
       /**
-       * @brief Allows access to associated raw soar agent pointer
-       */
-      agent* GetSoarAgent() const;
-
-      /**
        * @brief Used to retrieve an input wme given an id, attribute and value triplet
        *
        * This method is useful for converting io_wme's to real wme's. If a 
@@ -753,7 +749,7 @@ namespace gSKI {
          }
 
          // Making a symbol for the new integer
-         ISymbol* value = new gSymbol(m_agent->GetSoarAgent(), newvalue);
+         ISymbol* value = new gSymbol(m_agent, newvalue);
          
          IWme* pWme = ReplaceWme(oldwme, value, err);
          value->Release();
@@ -767,7 +763,7 @@ namespace gSKI {
       void ReleaseAllWmes();
       void ReleaseAllWMObjects();
 
-      Agent* m_agent; /**< The agent associated with this working memory */
+      agent* m_agent; /**< The agent associated with this working memory */
 
       /** Map from symbol hash id to InputWMObject */
       typedef std::map<unsigned long, InputWMObject*> tWMObjMap;

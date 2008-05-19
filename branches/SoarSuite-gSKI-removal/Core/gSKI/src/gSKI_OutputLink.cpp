@@ -17,7 +17,6 @@
 
 #include "gSKI_OutputLink.h"
 #include "gSKI_Error.h"
-#include "gSKI_Agent.h"
 #include "gSKI_Symbol.h"
 #include "gSKI_WMObject.h"
 #include "gSKI_OutputWme.h"
@@ -32,35 +31,15 @@
 namespace gSKI
 {
  
-  OutputLink::OutputLink(Agent* agent):
+  OutputLink::OutputLink(agent* agent):
     m_agent(agent),
     m_memory(agent),
     m_autoupdate(true)
    {
-	  // DJP: The id for this callback seems to be important but I haven't figured out why yet.
-	  // However, if I change it from "output-link" to anything else I don't get a callback any more.
-	   // KJC:  "output-link" in Soar is a specific symconstant
-	   /*
-      soar_add_callback( m_agent->GetSoarAgent(),
-			 static_cast<void*>(m_agent->GetSoarAgent()),
-			 OUTPUT_PHASE_CALLBACK,
-			 OutputPhaseCallback,
-			 0,
-			 static_cast<void*>(this),
-			 0,
-			 "output-link");
-	 */
    }
 
    OutputLink::~OutputLink() 
    {
-	   /*
-      // Removing the static callback from the soar kernel
-      soar_remove_callback( m_agent->GetSoarAgent(),
-			    static_cast<void*>(m_agent->GetSoarAgent()),
-			    OUTPUT_PHASE_CALLBACK,
-				"output-link");
-	  */
    }
 
    void OutputLink::AddOutputProcessor(const char* attributePath,

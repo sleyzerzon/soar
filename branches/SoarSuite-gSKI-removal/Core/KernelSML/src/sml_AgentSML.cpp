@@ -20,8 +20,9 @@
 #include "sml_RhsFunction.h"
 
 #include "IgSKI_InputProducer.h"
-#include "gSKI_Agent.h"
-#include "IgSKI_WorkingMemory.h"
+#include "gSKI_InputLink.h"
+#include "gSKI_OutputLink.h"
+#include "gSKI_WorkingMemory.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_Symbol.h"
 
@@ -37,54 +38,9 @@
 
 using namespace sml ;
 
-// A set of helper functions for tracing kernel wmes
-static void Symbol2String(Symbol* pSymbol, 	bool refCounts, std::ostringstream& buffer) {
-	if (pSymbol->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
-		buffer << pSymbol->id.name_letter ;
-		buffer << pSymbol->id.name_number ;
-	}
-	else if (pSymbol->common.symbol_type==VARIABLE_SYMBOL_TYPE) {
-		buffer << pSymbol->var.name ;
-	}
-	else if (pSymbol->common.symbol_type==SYM_CONSTANT_SYMBOL_TYPE) {
-		buffer << pSymbol->sc.name ;
-	}
-	else if (pSymbol->common.symbol_type==INT_CONSTANT_SYMBOL_TYPE) {
-		buffer << pSymbol->ic.value ;
-	}
-	else if (pSymbol->common.symbol_type==FLOAT_CONSTANT_SYMBOL_TYPE) {
-		buffer << pSymbol->fc.value ;
-	}
-
-	if (refCounts)
-		buffer << "[" << pSymbol->common.reference_count << "]" ;
-}
-
-static std::string Wme2String(wme* pWME, bool refCounts) {
-	std::ostringstream buffer ;
-
-	buffer << pWME->timetag << ":" ;
-
-	Symbol2String(pWME->id, refCounts, buffer) ;
-	buffer << " ^" ;
-	Symbol2String(pWME->attr, refCounts, buffer) ;
-	buffer << " " ;
-	Symbol2String(pWME->value, refCounts, buffer) ;
-
-	buffer << " 0x" << (uintptr_t)pWME ;
-
-	return buffer.str() ;
-}
-
-static void PrintDebugWme(char const* pMsg, wme* pWME, bool refCounts = false) {
-	std::string str = Wme2String(pWME, refCounts) ;
-	PrintDebugFormat("%s %s", pMsg, str.c_str()) ;
-}
-
 AgentSML::AgentSML(KernelSML* pKernelSML, agent* pAgent)
 {
 	m_pKernelSML = pKernelSML ;
-	m_pIAgent = NULL ;
 	m_pInputProducer = NULL ;
 	m_InputLinkRoot = NULL ;
 	m_OutputLinkRoot = NULL ;
@@ -99,14 +55,12 @@ AgentSML::AgentSML(KernelSML* pKernelSML, agent* pAgent)
 
 void AgentSML::InitListeners()
 {
-	KernelSML* pKernelSML = m_pKernelSML ;
-
-	m_PrintListener.Init(pKernelSML, this) ;
-	m_XMLListener.Init(pKernelSML, this) ;
-	m_RunListener.Init(pKernelSML, this) ;
-	m_ProductionListener.Init(pKernelSML, this) ;
-	m_OutputListener.Init(pKernelSML, this) ;
-	m_InputListener.Init(pKernelSML, this) ;
+	m_PrintListener.Init(m_pKernelSML, this) ;
+	m_XMLListener.Init(m_pKernelSML, this) ;
+	m_RunListener.Init(m_pKernelSML, this) ;
+	m_ProductionListener.Init(m_pKernelSML, this) ;
+	m_OutputListener.Init(m_pKernelSML, this) ;
+	m_InputListener.Init(m_pKernelSML, this) ;
 
 	// For KernelSML (us) to work correctly we need to listen for certain events, independently of what any client is interested in
 	// Currently:
@@ -120,6 +74,21 @@ void AgentSML::InitListeners()
 // Can't call this until after the Soar agent has been initialized
 void AgentSML::Init()
 {
+	// Temporary HACK.  This should be fixed in the kernel.
+	m_agent->stop_soar = FALSE;
+
+	// Creating the output link
+	// NOTE: THE OUTPUT LINK CREATION MUST COME BEFORE THE INITIALIZE CALL
+	// FOR THE OUTPUT LINK CALLBACK TO BE PROPERLY REGISTERED (see io.cpp for more 
+	// details in the update_for_top_state_wme_addition function)
+	m_outputlink = new gSKI::OutputLink(m_agent);
+
+	// Initializing the soar agent
+	initialize_soar_agent(m_pKernelSML->GetSoarKernel(), m_agent);
+
+	m_inputlink = new gSKI::InputLink(m_agent);
+	m_workingMemory = new gSKI::WorkingMemory(m_agent);
+
 	m_pRhsInterrupt = new InterruptRhsFunction(this) ;
 	m_pRhsConcat    = new ConcatRhsFunction(this) ;
 	m_pRhsExec		= new ExecRhsFunction(this) ;
@@ -138,7 +107,22 @@ AgentSML::~AgentSML()
 	delete m_pAgentRunCallback ;
 	delete m_pInputProducer ;
 	//delete m_pBeforeDestroyedListener ;
-	delete m_pIAgent;
+
+	/* RPM 9/06 added code from reinitialize_soar to clean up stuff hanging from last run
+			   need to put it here instead of in destroy_soar_agent because gSKI is
+				cleaning up too much stuff and thus it will crash if called later */
+	clear_goal_stack (m_agent);
+	m_agent->active_level = 0; /* Signal that everything should be retracted */
+	m_agent->FIRING_TYPE = IE_PRODS;
+	do_preference_phase (m_agent);   /* allow all i-instantiations to retract */
+
+	// Cleaning up the input and output links and the working memory
+	// object since these are wholly owned by the agent.
+	delete m_inputlink;
+	delete m_outputlink;
+	delete m_workingMemory;
+
+	destroy_soar_agent(m_pKernelSML->GetSoarKernel(), m_agent);
 }
 
 // Release any objects or other data we are keeping.  We do this just
@@ -187,7 +171,7 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	{
 		bool forceAdds = false ;	// It doesn't matter if we do these or not as we're about to release everything.  Seems best to not start things up.
 		bool forceRemoves = true ;	// SML may have deleted a wme but gSKI has yet to act on this.  As SML has removed its object we have no way to free the gSKI object w/o doing this update.
-		this->GetgSKIAgent()->GetInputLink()->GetInputLinkMemory()->Update(forceAdds, forceRemoves) ;
+		this->m_inputlink->GetInputLinkMemory()->Update(forceAdds, forceRemoves) ;
 	}
 
 	// Release any WME objects we still own.
@@ -212,7 +196,7 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 
 	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
 		wme* wme = mapIter->second ;
-		PrintDebugWme("Releasing ", wme, true) ;
+		KernelSML::PrintDebugWme("Releasing ", wme, true) ;
 		release_io_symbol(this->GetSoarAgent(), wme->id) ;
 		release_io_symbol(this->GetSoarAgent(), wme->attr) ;
 		release_io_symbol(this->GetSoarAgent(), wme->value) ;
@@ -269,7 +253,12 @@ void AgentSML::InitializeRuntimeState()
 bool AgentSML::Reinitialize()
 {
 	m_pKernelSML->FireAgentEvent(this, smlEVENT_BEFORE_AGENT_REINITIALIZED) ;
-	GetgSKIAgent()->Reinitialize();
+
+//	GetgSKIAgent()->Reinitialize(); BEGIN
+	m_inputlink->Reinitialize();
+	m_outputlink->Reinitialize();
+	m_workingMemory->Reinitialize();
+//	GetgSKIAgent()->Reinitialize(); END
 
     bool ok = reinitialize_soar( m_agent );
     init_agent_memory( m_agent );
@@ -833,7 +822,7 @@ void AgentSML::PrintKernelTimeTags()
 {
 	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
 		wme* wme = mapIter->second ;
-		PrintDebugWme("Recorded wme ", wme, true) ;
+		KernelSML::PrintDebugWme("Recorded wme ", wme, true) ;
 	}
 }
 
@@ -872,7 +861,7 @@ void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
 	assert (m_KernelTimeTagMap.find(pTimeTag) == m_KernelTimeTagMap.end()) ;
 #endif
 
-	PrintDebugWme("Recording wme ", pWme, true) ;
+	KernelSML::PrintDebugWme("Recording wme ", pWme, true) ;
 	m_KernelTimeTagMap[pTimeTag] = pWme ;
 }
 
@@ -1027,9 +1016,4 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 	delete pResponse ;
 
 	return result ;
-}
-
-void AgentSML::SetIAgent(gSKI::Agent* pIAgent)
-{ 
-	m_pIAgent = pIAgent ; 
 }

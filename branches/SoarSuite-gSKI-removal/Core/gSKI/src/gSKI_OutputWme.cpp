@@ -37,18 +37,18 @@ namespace gSKI
 
       if(wme->attr->sc.common_symbol_info.symbol_type != IDENTIFIER_SYMBOL_TYPE)
       {
-         m_gattr = new gSymbol(m_manager->GetSoarAgent(), wme->attr, 0, false);
+         m_gattr = new gSymbol(m_manager->GetAgent(), wme->attr, 0, false);
       }
       else
       {
-         m_gattr = new gSymbol(m_manager->GetSoarAgent(), "error_attribute_cannot_be_object");
+         m_gattr = new gSymbol(m_manager->GetAgent(), "error_attribute_cannot_be_object");
       }
 
       if(valobj)
       {
          ((OutputWMObject*)valobj)->AddRef();
       }
-      m_gvalue = new gSymbol(m_manager->GetSoarAgent(), wme->value, valobj, true);
+      m_gvalue = new gSymbol(m_manager->GetAgent(), wme->value, valobj, true);
 
       m_timetag = wme->timetag;
 
@@ -78,7 +78,7 @@ namespace gSKI
       m_gvalue->AddRef();
 
       // Quickly adding the wme to working memory
-      agent* a = m_manager->GetSoarAgent();
+      agent* a = m_manager->GetAgent();
       Symbol* id = wmobj->GetSoarSymbol();
       Symbol* att = m_gattr->GetSoarSymbol();
       Symbol* val = m_gvalue->GetSoarSymbol();

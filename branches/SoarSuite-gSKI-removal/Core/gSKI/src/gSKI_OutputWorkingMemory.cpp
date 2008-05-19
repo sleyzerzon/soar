@@ -17,7 +17,6 @@
 #include "gSKI_OutputWMObject.h"
 #include "gSKI_OutputWme.h"
 #include "gSKI_Error.h"
-#include "gSKI_Agent.h"
 #include "gSKI_Symbol.h"
 
 #include <set>
@@ -33,7 +32,7 @@
 namespace gSKI
 {
 
-   OutputWorkingMemory::OutputWorkingMemory(Agent* agent):
+   OutputWorkingMemory::OutputWorkingMemory(agent* agent):
       m_agent(agent),
       m_rootOutputObject(0)
    {
@@ -49,7 +48,7 @@ namespace gSKI
       }
    }
 
-   Agent* OutputWorkingMemory::GetAgent(Error * err) const
+   agent* OutputWorkingMemory::GetAgent(Error * err) const
    {
       ClearError(err);
       return m_agent;
@@ -109,8 +108,8 @@ namespace gSKI
          return 0;
       }      
          
-      ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
-      ISymbol* value = new gSymbol(m_agent->GetSoarAgent(), intValue);
+      ISymbol* attribute = new gSymbol(m_agent, attr);
+      ISymbol* value = new gSymbol(m_agent, intValue);
       
       IWme* pWme = AddWme(wmObject, attribute, value);
       attribute->Release();
@@ -133,8 +132,8 @@ namespace gSKI
          return 0;
       }      
          
-      ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
-      ISymbol* value = new gSymbol(m_agent->GetSoarAgent(), dValue);
+      ISymbol* attribute = new gSymbol(m_agent, attr);
+      ISymbol* value = new gSymbol(m_agent, dValue);
       
       IWme* pWme = AddWme(wmObject, attribute, value);
       attribute->Release();
@@ -157,8 +156,8 @@ namespace gSKI
          return 0;
       }      
          
-      ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
-      ISymbol* value = new gSymbol(m_agent->GetSoarAgent(), val);
+      ISymbol* attribute = new gSymbol(m_agent, attr);
+      ISymbol* value = new gSymbol(m_agent, val);
       
       IWme* pWme = AddWme(wmObject, attribute, value);
       attribute->Release();
@@ -308,7 +307,7 @@ namespace gSKI
 	  unsigned long value = atol(&idstring[1]) ;
 
 	  // See if there's a symbol matching this in the kernel.
-	  Symbol* id = find_identifier(GetSoarAgent(), letter, value) ;
+	  Symbol* id = find_identifier(GetAgent(), letter, value) ;
 
 	  if (!id)
 	  {
@@ -672,7 +671,7 @@ namespace gSKI
          // Get the raw symbol from the agent structure and 
          // create a OutputWMObject for it
          m_rootOutputObject = 
-            GetOrCreateWMObject(m_agent->GetSoarAgent()->io_header_output);
+            GetOrCreateWMObject(m_agent->io_header_output);
 
          MegaAssert( m_rootOutputObject != 0, 
             "There is no root output link object!");
@@ -689,11 +688,6 @@ namespace gSKI
       if ( m_rootOutputObject != 0 ) m_rootOutputObject->AddRef();
 
       *rootObject = m_rootOutputObject;
-   }
-
-   agent* OutputWorkingMemory::GetSoarAgent() const
-   {
-      return m_agent->GetSoarAgent();
    }
 
    void OutputWorkingMemory::Reinitialize()

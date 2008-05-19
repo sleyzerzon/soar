@@ -140,7 +140,6 @@ namespace gSKI {
 
    /* Forward declarations for particular instantiations of the iterator */
    class ActionElement;
-   class Agent;
    class Condition;
    class ConditionSet;
    class IMultiAttribute;
@@ -156,7 +155,6 @@ namespace gSKI {
 
    /** Typedefs for iterator instantiations */
    typedef IIterator<ActionElement*>            tIActionElementIterator;
-   typedef IIterator<Agent*>                    tIAgentIterator;
    typedef IIterator<Condition *>               tIConditionIterator;
    typedef IIterator<ConditionSet *>            tIConditionSetIterator;
    typedef IIterator<IMultiAttribute *>          tIMultiAttributeIterator;

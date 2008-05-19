@@ -79,7 +79,7 @@ bool CommandLineInterface::DoStats(const StatsBitset& options) {
 		{
 			return SetError( CLIError::kNotImplemented );
 		}
-		if ( options.test(STATS_SYSTEM) )
+		if ( (!options.test(STATS_MEMORY) && !options.test(STATS_RETE)) || options.test(STATS_SYSTEM) )
 		{
 			GetSystemStats();
 		}

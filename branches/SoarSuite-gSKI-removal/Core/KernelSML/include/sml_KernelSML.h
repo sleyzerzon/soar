@@ -21,7 +21,6 @@ typedef struct wme_struct wme;
 namespace gSKI {
 	class KernelFactory ;
 	class Kernel ;
-	class Agent ;
 	class IInputProducer ;
 	class IOutputProcessor ;
 	class OutputListener ;
@@ -99,6 +98,9 @@ class KernelSML
 	friend class AgentSML ;
 
 protected:
+
+	gSKI::KernelFactory* m_pKernelFactory;
+
 	// The singleton kernel object
 	static KernelSML*	s_pKernel ;
 
@@ -117,7 +119,6 @@ protected:
 	cli::CommandLineInterface m_CommandLineInterface ;
 
 	// The gSKI kernel objects
-	gSKI::KernelFactory*	m_pKernelFactory ;   
 	gSKI::Kernel*			m_pIKernel ;
 
 	// A listener socket and the list of connections to the kernel
@@ -481,8 +482,8 @@ protected:
 	bool RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag) ;
 
 	// Remove a value from our records that has been removed by the kernel from working memory.
-	static void RemoveInputWMERecordsCallback(gSKI::Agent* pAgent, gSKI::IWme* pWME);
-	void RemoveInputWMERecords(gSKI::Agent* pAgent, gSKI::IWme* pWME) ;
+	static void RemoveInputWMERecordsCallback(agent* pSoarAgent, gSKI::IWme* pWME);
+	void RemoveInputWMERecords(agent* pSoarAgent, gSKI::IWme* pWME) ;
 
 	// There should always be exactly one local connection to the kernel (the process that loaded us).
 	Connection* GetEmbeddedConnection() ;

@@ -17,7 +17,7 @@ namespace gSKI {
 
    // Forward Declarations
    class IWMObject;
-   class IWorkingMemory;
+   class OutputWorkingMemory;
 
    /**
     * @brief IOutputConsumer interface for converting WMObjects on the 
@@ -57,7 +57,7 @@ namespace gSKI {
        *                  link
        * @param object The output wme that matches the registration pattern
        */
-      virtual void ProcessOutput(IWorkingMemory* wmemory,
+      virtual void ProcessOutput(OutputWorkingMemory* wmemory,
                                  IWMObject* object) = 0;
 
    };

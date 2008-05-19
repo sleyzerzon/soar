@@ -9,7 +9,7 @@
 
 namespace gSKI
 {
-   MultiAttribute::MultiAttribute(Agent* pAgent, 
+   MultiAttribute::MultiAttribute(agent* pAgent, 
                                   const char* attribute, int priority) :
       m_pAgent(pAgent), m_attribute(attribute), m_priority(priority)
    {

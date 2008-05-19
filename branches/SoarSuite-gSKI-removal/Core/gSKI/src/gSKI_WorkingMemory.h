@@ -13,7 +13,6 @@
 #ifndef GSKI_WORKINGMEMORY_H
 #define GSKI_WORKINGMEMORY_H
 
-#include "IgSKI_WorkingMemory.h"
 #include "gSKI_WorkingMemoryView.h"
 
 #include <map>
@@ -22,11 +21,15 @@
 #include "io_soar.h"
 
 namespace gSKI {
+  class IWme;
+}
 
-  class Agent;
+namespace gSKI {
+
   class WMObject;
   class Wme;
   class IWorkingMemoryListener ;
+   class ISymbolFactory;
 
    /** 
     * @brief The main interface for access to the various aspects of the
@@ -37,13 +40,13 @@ namespace gSKI {
     * also provides access to the ISymbolFactory interface for creating 
     * Soar Symbols.
     */
-  class WorkingMemory: public IWorkingMemory {
+  class WorkingMemory {
   public:
 
     /**
      * @brief Constructor
      */
-     WorkingMemory(Agent* agent);
+     WorkingMemory(agent* agent);
        
      /**
       * @brief Virtual Destructor
@@ -67,7 +70,7 @@ namespace gSKI {
       * @return a pointer to the agent that owns the WorkingMemory 
       *          (this pointer can never be NULL)
       */
-    Agent* GetAgent(Error * err = 0) const;
+    agent* GetAgent(Error * err = 0) const;
 
      /**
       * @brief Adds a Wme using the old-style symbol syntax
@@ -635,13 +638,7 @@ namespace gSKI {
 	  /**
        * @brief Handles updating working memory.  Not implemented for main working memory.
        */
-	 void Update(bool forceAdds, bool forceRemoves) { } 
-
-     /**
-      * @brief Method to make raw soar interfaces easier to use (they require
-      *        an agent pointer
-      */
-     agent* GetSoarAgent();
+	 void Update(bool /*forceAdds*/, bool /*forceRemoves*/) { } 
 
      /**
       * @brief Used to update output working memory for a new crop of
@@ -724,7 +721,7 @@ namespace gSKI {
       void ReleaseAllWmes();
       void ReleaseAllWMObjects();
 
-      Agent* m_agent; /**< The agent associated with this working memory */
+      agent* m_agent; 
       std::map<unsigned long, WMObject*> m_wmobjectmap;
       std::map<unsigned long, Wme*> m_wmemap;
       WMObject* m_rootOutputObject;

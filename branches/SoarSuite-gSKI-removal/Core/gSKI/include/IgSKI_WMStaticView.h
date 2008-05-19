@@ -30,7 +30,7 @@ namespace gSKI {
     * provides methods for searching over memory data elements and creating
     * static subviews.
     */
-   class IWMStaticView: public IWorkingMemoryView, public IRelease {
+   class IWMStaticView : public IRelease {
    public:
 
       /** 

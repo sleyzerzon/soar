@@ -366,14 +366,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm"
 			>
 			<File
-				RelativePath="src\AgentRunManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\AgentRunManager.h"
-				>
-			</File>
-			<File
 				RelativePath="src\EventManagementTemplates.h"
 				>
 			</File>
@@ -383,14 +375,6 @@
 			</File>
 			<File
 				RelativePath="src\gSKI_ActionElement.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Agent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\gSKI_Agent.h"
 				>
 			</File>
 			<File

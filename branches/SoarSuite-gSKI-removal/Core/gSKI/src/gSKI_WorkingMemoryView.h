@@ -14,13 +14,19 @@
 #ifndef GSKI_WORKINGMEMORYVIEW_H
 #define GSKI_WORKINGMEMORYVIEW_H
 
-#include "IgSKI_WorkingMemoryView.h"
+#include "IgSKI_Iterator.h"
+
+typedef struct agent_struct agent;
 
 namespace gSKI {
 
-  class Agent;
+   // Forward declarations
+   class IWMObject;
+   class IWme;
+   class IWMStaticView;
+   struct Error;
 
-   /**
+	/**
     * @brief This interface represents a collection of working memory data
     *         and provides methods for searching and creating sub views
     *
@@ -29,7 +35,7 @@ namespace gSKI {
     * memory data elements and creating static snap shots of protions of 
     * working memory (using the CreateSubView() method).
     */
-  class WorkingMemoryView: public IWorkingMemoryView {
+  class WorkingMemoryView {
 
   public:
     /**
@@ -37,7 +43,7 @@ namespace gSKI {
      *
      */
     // TODO: Comment this constructor appropriately
-    WorkingMemoryView(Agent* /*agent*/) {}
+    WorkingMemoryView(agent* /*agent*/) {}
 
       /**
        * @brief Virtual Destructor

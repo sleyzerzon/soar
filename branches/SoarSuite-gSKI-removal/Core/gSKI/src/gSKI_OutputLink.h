@@ -13,7 +13,7 @@
 #ifndef GSKI_OUTPUTLINK_H
 #define GSKI_OUTPUTLINK_H
 
-#include "IgSKI_OutputLink.h"
+//#include "IgSKI_OutputLink.h"
 #include "gSKI_Error.h"
 
 #include "gSKI_OutputWorkingMemory.h"
@@ -35,8 +35,6 @@
 
 namespace gSKI {
 
-   class Agent;
-
    /**
     * @brief Handles registration and invokation of OutputProcessors
     *
@@ -54,7 +52,7 @@ namespace gSKI {
     * UpdateProcessors() methods.
     */
    // TODO: Still need to address automatic update vs. manual update issues
-   class OutputLink: public IOutputLink {
+   class OutputLink/*: public IOutputLink*/ {
    public:
 
       /**
@@ -67,7 +65,7 @@ namespace gSKI {
        *
        * @param agent The agent that owns the output link.
        */
-      OutputLink(Agent* agent);
+      OutputLink(agent* agent);
     
       /**
        * @brief Virtual Destructor
@@ -173,10 +171,8 @@ namespace gSKI {
        * @returns The IWorkingMemory object associated with the data on 
        *           the agent's output link.
        */     
-		IWorkingMemory* GetOutputMemory(Error* error)
+		OutputWorkingMemory* GetOutputMemory()
 		{
-			ClearError(error);
-
 			return &m_memory;
 		}
 
@@ -267,7 +263,7 @@ namespace gSKI {
        */
       void ProcessIOWmes(io_wme* wmelist);
 
-      Agent* m_agent;  /**< The agent that owns this output link. */
+      agent* m_agent;  /**< The agent that owns this output link. */
       OutputWorkingMemory m_memory; /**< Stores outputlink's wme's/objects */
       bool m_autoupdate;
       std::multimap<std::string, IOutputProcessor*> m_processormap;

@@ -22,7 +22,6 @@
 #include "gSKI_InputWMObject.h"
 #include "gSKI_InputWorkingMemory.h"
 #include "IgSKI_Production.h"
-#include "gSKI_Agent.h"
 #include "gSKI_Symbol.h"
 #include "gSKI_Error.h"
 #include "MegaAssert.h"
@@ -159,7 +158,7 @@ namespace gSKI
   bool InputWme::Update(bool forceAdds, bool forceRemoves)
   {
      // Adding the WME directly to working memory if were in the input or output phase
-	  egSKIPhaseType curphase = EnumRemappings::ReMapPhaseType(m_manager->GetAgent()->GetSoarAgent()->current_phase,0);
+	  egSKIPhaseType curphase = EnumRemappings::ReMapPhaseType(m_manager->GetAgent()->current_phase,0);
 	 
 	 bool doAdds    = ((curphase == gSKI_INPUT_PHASE && !forceRemoves )|| forceAdds) ;
 	 bool doRemoves = ((curphase == gSKI_INPUT_PHASE && !forceAdds) || forceRemoves) ;
@@ -181,7 +180,7 @@ namespace gSKI
 		 // (unless it has already been removed)
 		 if ( doAdds && m_rawwme == 0 && !m_removeWme ) 
 		 {
-			 agent* a = m_manager->GetSoarAgent();
+			 agent* a = m_manager->GetAgent();
 			 Symbol* idsym = m_owningobject->GetSoarSymbol();
 			 Symbol* attr = m_attribute->GetSoarSymbol();
 			 Symbol* val = m_value->GetSoarSymbol();
@@ -204,7 +203,7 @@ namespace gSKI
 			    sml::PrintDebugFormat("Removing %s ^%s %s", id.c_str(), att.c_str(), value.c_str()) ;
 #endif
 
-				Bool retvalue =  remove_input_wme(m_manager->GetSoarAgent(), m_rawwme);
+				Bool retvalue =  remove_input_wme(m_manager->GetAgent(), m_rawwme);
 
 				MegaAssert( retvalue, "Trouble removing an input wme!");
 				m_rawwme = 0;

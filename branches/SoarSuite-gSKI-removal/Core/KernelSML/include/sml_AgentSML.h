@@ -22,10 +22,12 @@
 
 // Forward declarations for gSKI
 namespace gSKI {
-	class Agent ;
 	class IWme ;
 	class IInputProducer ;
 	class IWMObject;
+	class InputLink;
+	class OutputLink;
+	class WorkingMemory;
 	struct Error;
 }
 
@@ -83,13 +85,15 @@ class AgentSML
 	friend class KernelSML ;
 	friend class InputListener ;
 
+public:
+	gSKI::InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
+	gSKI::OutputLink*          m_outputlink;        /**< A pointer to this agent's output link. */
+	gSKI::WorkingMemory*       m_workingMemory;     /**< A pointer to this agent's working memory. */
+
 protected:
 
 	// This is a callback we register so we get called back each input phase (so we can check for incoming commands once per decision)
 	gSKI::IInputProducer* m_pInputProducer ;
-
-	// A reference to the underlying gSKI agent object
-	gSKI::Agent*	m_pIAgent ;
 
 	// A reference to the underlying kernel agent object
 	agent*			m_agent ;
@@ -168,8 +172,6 @@ public:
 	void InitListeners() ;
 	void Init() ;
 
-	void SetIAgent(gSKI::Agent* pIAgent) ;
-
 	// Release any objects or other data we are keeping.  We do this just
 	// prior to deleting AgentSML, but before the underlying gSKI agent has been deleted
 	void Clear(bool deletingThisAgent) ;
@@ -188,7 +190,6 @@ public:
 	// Explicitly reinitialize the agent as part of init-soar
 	bool Reinitialize() ;
 
-	gSKI::Agent* GetgSKIAgent()  { return m_pIAgent ; }
 	agent* GetSoarAgent()	  { return m_agent ; }
 	KernelSML* GetKernelSML() { return m_pKernelSML ; }
 

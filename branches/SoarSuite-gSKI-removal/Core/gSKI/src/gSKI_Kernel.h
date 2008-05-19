@@ -17,6 +17,7 @@
 #include "EventManagementTemplates.h"
 
 typedef struct kernel_struct kernel;
+typedef struct agent_struct agent;
 
 namespace gSKI 
 {
@@ -202,7 +203,7 @@ namespace gSKI
 		 // When using this should call NotifyGetResult() not just Notify().
 		 class RhsNotifier {
          public:
-            RhsNotifier(Agent* agent, bool commandLine, char const* pFunctionName, char const* pArgument,
+            RhsNotifier(agent* agent, bool commandLine, char const* pFunctionName, char const* pArgument,
 					    int maxLengthReturnValue, char* pReturnValue):
 						m_Agent(agent), m_CommandLine(commandLine), m_FunctionName(pFunctionName), m_Argument(pArgument),
 						m_MaxLength(maxLengthReturnValue), m_ReturnValue(pReturnValue)
@@ -215,7 +216,7 @@ namespace gSKI
 				return haveResult ;
             }
          private:
-			Agent*			m_Agent ;
+			agent*			m_Agent ;
 			bool			m_CommandLine ;
 			char const*		m_FunctionName ;
 			char const*		m_Argument ;

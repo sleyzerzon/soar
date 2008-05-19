@@ -40,7 +40,8 @@
 #include "gSKI_ErrorIds.h"
 #include "gSKI_Enumerations.h"
 #include "gSKI_Events.h"
-#include "gSKI_Agent.h"
+#include "gSKI_InputLink.h"
+#include "gSKI_OutputLink.h"
 #include "IgSKI_OutputProcessor.h"
 #include "IgSKI_InputProducer.h"
 #include "IgSKI_Symbol.h"
@@ -774,7 +775,7 @@ void KernelSML::PrintDebugSymbol(Symbol* pSymbol, bool refCounts ) {
 // and we pass through an input-phase.
 static inline void RecordWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetSoarAgent()->name ) ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->name ) ;
 
 	pAgentSML->RecordLongTimeTag( clientTimeTag, wme ) ;
 
@@ -784,7 +785,7 @@ static inline void RecordWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long
 static inline void RemoveWME_Map(gSKI::IWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
 {
 	unused(wme) ;
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->GetSoarAgent()->name ) ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->name ) ;
 
 	pAgentSML->RemoveLongTimeTag( clientTimeTag ) ;
 
@@ -878,24 +879,23 @@ EXPORT Direct_WME_Handle sml_DirectLinkID(Direct_WorkingMemory_Handle wm, Direct
 *			(WMObject) from a wme.
 *			(parent ^attribute <id>) - returns <id> (not parent)
 *************************************************************/
-EXPORT Direct_WMObject_Handle sml_DirectGetThisWMObject(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme)
+EXPORT Direct_WMObject_Handle sml_DirectGetThisWMObject(Direct_WorkingMemory_Handle /*wm*/, Direct_WME_Handle wme)
 {
-	unused(wm) ;
 	Direct_WMObject_Handle wmobject = (Direct_WMObject_Handle)((gSKI::IWme*)wme)->GetValue()->GetObject() ;
 	return wmobject ;
 }
 
 EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgentName, bool input)
 {
-	gSKI::Agent* pAgent = KernelSML::GetKernelSML()->GetAgentSML(pAgentName)->GetgSKIAgent() ;
+	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(pAgentName);
 
-	if (!pAgent)
+	if (!pAgentSML)
 		return 0 ;
 
 	if (input)
-		return (Direct_WorkingMemory_Handle)pAgent->GetInputLink()->GetInputLinkMemory() ;
+		return (Direct_WorkingMemory_Handle)pAgentSML->m_inputlink->GetInputLinkMemory() ;
 	else
-		return (Direct_WorkingMemory_Handle)pAgent->GetOutputLink()->GetOutputMemory() ;
+		return (Direct_WorkingMemory_Handle)pAgentSML->m_outputlink->GetOutputMemory() ;
 }
 
 EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool input)
@@ -908,12 +908,12 @@ EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName, bool inp
 	gSKI::IWMObject* pRoot = NULL ;
 	if (input)
 	{
-		pAgentSML->GetgSKIAgent()->GetInputLink()->GetRootObject(&pRoot) ;
+		pAgentSML->m_inputlink->GetRootObject(&pRoot) ;
 		pAgentSML->SetInputLinkRoot(pRoot) ;
 	}
 	else
 	{
-		pAgentSML->GetgSKIAgent()->GetOutputLink()->GetRootObject(&pRoot) ;
+		pAgentSML->m_outputlink->GetRootObject(&pRoot) ;
 		pAgentSML->SetOutputLinkRoot(pRoot) ;
 	}
 

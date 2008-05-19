@@ -247,7 +247,7 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 	CHECK_RET_FALSE(pNewInputWme) ;
 
 	if (kDebugInput)
-		PrintDebugWme("Adding wme ", pNewInputWme, true) ;
+		KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
 
 	// The kernel doesn't support direct lookup of wme from timetag so we'll
 	// store these values in a hashtable.  Perhaps later we'll see about adding
@@ -266,7 +266,7 @@ bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const
 	}
 
 	if (kDebugInput)
-		PrintDebugWme("Adding wme ", pNewInputWme, true) ;
+		KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
 
 	return true ;
 }
@@ -308,7 +308,7 @@ bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
 //	wme* pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
 
 	if (kDebugInput)
-		PrintDebugWme("Removing input wme ", pWME, true) ;
+		KernelSML::PrintDebugWme("Removing input wme ", pWME, true) ;
 
 	CHECK_RET_FALSE(pWME) ;
 

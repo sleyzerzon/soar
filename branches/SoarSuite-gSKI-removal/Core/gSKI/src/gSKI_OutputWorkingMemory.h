@@ -32,11 +32,11 @@
 
 namespace gSKI {
 
-  class Agent;
   class OutputWMObject;
   class OutputWme;
   class gSymbol;
   class OutputLink ;
+  class ISymbolFactory;
 
    /** 
     * @brief The main interface for access to the various aspects of the
@@ -47,14 +47,14 @@ namespace gSKI {
     * also provides access to the ISymbolFactory interface for creating 
     * Soar Symbols.
     */
-  class OutputWorkingMemory: public IWorkingMemory {
+  class OutputWorkingMemory : public IWorkingMemory {
   public:
 	  friend class OutputLink ;	// Needs access to GetOutputWme
 
     /**
      * @brief Constructor
      */
-     OutputWorkingMemory(Agent* agent);
+     OutputWorkingMemory(agent* agent);
        
      /**
       * @brief Virtual Destructor
@@ -78,7 +78,7 @@ namespace gSKI {
       * @return a pointer to the agent that owns the OutputWorkingMemory 
       *          (this pointer can never be NULL)
       */
-    Agent* GetAgent(Error * err = 0) const;
+    agent* GetAgent(Error * err = 0) const;
 
       /**
        * @brief Adds a Wme using the most type safe WMObject, ISymbol, ISymbol syntax
@@ -547,7 +547,7 @@ namespace gSKI {
        *          id string, NULL if a WMObject with that ID does not exist
        *          or if the idstring itself is NULL.
        */
-     void GetObjectById(const char* idstring,
+     virtual void GetObjectById(const char* idstring,
                               IWMObject** object,
                               Error* err = 0) const;
 
@@ -673,11 +673,6 @@ namespace gSKI {
      tIWMObjectIterator* FindObjects( OutputWMObject* obj, const std::string& path);
 
      /**
-      * @brief Helper method to retrieve raw soar agent pointer
-      */
-     agent* GetSoarAgent() const;
-
-     /**
       * @brief Reinitializes the output working memory by cleaning out all the
       *        WMObjects and WMEs
       */
@@ -762,7 +757,7 @@ namespace gSKI {
          /**
           * @brief 
           */
-         WorkingMemoryNotifier(Agent* a, egSKIWorkingMemoryChange c, tIWmeIterator* w) : 
+         WorkingMemoryNotifier(agent* a, egSKIWorkingMemoryChange c, tIWmeIterator* w) : 
                                                                     m_agent(a), 
                                                                     m_change(c), 
                                                                     m_wmelist(w) 
@@ -778,7 +773,7 @@ namespace gSKI {
             listener->HandleEvent(eventId, m_agent, m_change, m_wmelist);
          }
       private:
-         Agent*					m_agent;
+         agent*					m_agent;
          egSKIWorkingMemoryChange   m_change;
          tIWmeIterator*				m_wmelist ;
       };
@@ -805,7 +800,7 @@ namespace gSKI {
 	  void NotifyWorkingMemoryListeners(egSKIWorkingMemoryEventId eventId, 
 		                                egSKIWorkingMemoryChange change, io_wme* io_wmelist) ;
 
-      Agent* m_agent; /**< The agent associated with this working memory */
+      agent* m_agent; /**< The agent associated with this working memory */
 
 
       typedef std::map<unsigned long, OutputWMObject*> tWMObjMap;

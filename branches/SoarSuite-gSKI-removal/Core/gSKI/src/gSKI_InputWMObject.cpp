@@ -22,7 +22,6 @@
 #include "gSKI_InputWorkingMemory.h"
 #include "gSKI_Wme.h"
 #include "gSKI_Error.h"
-#include "gSKI_Agent.h"
 #include "gSKI_Symbol.h"
 
 #include "MegaAssert.h"
@@ -49,7 +48,7 @@ namespace gSKI
 		// Creating the GSKI symbol.  This will add a reference to the symbol.
 		// but since I also keep around the raw symbol (and release it) I'll add
 		// another refcount here
-		m_gsym = new gSymbol(m_manager->GetSoarAgent(), 
+		m_gsym = new gSymbol(manager->GetAgent(), 
 			m_sym,
 			this, false);
 
@@ -65,22 +64,22 @@ namespace gSKI
 		MegaAssert( m_manager != 0, "Manager for InputWMObject cannot be null!");
 
 		// Creating a new identifier symbol for this WMObject
-		MegaAssert( m_manager->GetSoarAgent(), 
+		MegaAssert( m_manager->GetAgent(), 
 			"Manager must belong to non-null agent!");
-		m_sym = get_new_io_identifier(m_manager->GetSoarAgent(),
+		m_sym = get_new_io_identifier(m_manager->GetAgent(),
 			m_letter);
 
 		// Creating the GSKI symbol also
-		m_gsym = new gSymbol(m_manager->GetSoarAgent(), m_sym, this, false);
+		m_gsym = new gSymbol(m_manager->GetAgent(), m_sym, this, false);
 	}
 
 	InputWMObject::~InputWMObject() 
 	{
 		MegaAssert(m_manager != 0, "Manager for InputWMObject cannot be null!");
 
-		symbol_remove_ref(m_manager->GetSoarAgent(),	m_sym);
+		symbol_remove_ref(m_manager->GetAgent(),	m_sym);
 		///  NO!  This should be release_io_symbol to encapsulate the ref handling.  KJC
-		///release_io_symbol((m_manager->GetSoarAgent(),	m_sym);
+		///release_io_symbol((m_manager->GetAgent(),	m_sym);
 
 		if(m_gsym)
 		{
@@ -445,7 +444,7 @@ namespace gSKI
 		}
 	}
 
-	void InputWMObject::MarkWmeForRemoval( InputWme* wme, Agent* pAgent, RemoveWmeCallback callback )
+	void InputWMObject::MarkWmeForRemoval( InputWme* wme, agent* pAgent, RemoveWmeCallback callback )
 	{
 		// Call remove on the wme to mark it for removal
 		wme->Remove();
@@ -466,7 +465,7 @@ namespace gSKI
 		iter->second->MarkForRemoval( processedObjects, pAgent, callback );
 	}
 
-	void InputWMObject::MarkForRemoval( std::set<InputWMObject*>& processedObjects, Agent* pAgent, RemoveWmeCallback callback )
+	void InputWMObject::MarkForRemoval( std::set<InputWMObject*>& processedObjects, agent* pAgent, RemoveWmeCallback callback )
 	{
 		// Don't process this object twice
 		// see processedObjects in Update methods above for more comments

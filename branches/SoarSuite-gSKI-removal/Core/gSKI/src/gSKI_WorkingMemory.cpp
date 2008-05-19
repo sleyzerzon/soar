@@ -17,7 +17,6 @@
 #include "gSKI_WMObject.h"
 #include "gSKI_Wme.h"
 #include "gSKI_Error.h"
-#include "gSKI_Agent.h"
 
 #include <set>
 
@@ -31,14 +30,14 @@
 
 namespace gSKI
 {
-   WorkingMemory::WorkingMemory(Agent* agent):
+   WorkingMemory::WorkingMemory(agent* agent):
      m_agent(agent),
      m_rootOutputObject(0)
    {}
 
   WorkingMemory::~WorkingMemory() {}
 
-  Agent* WorkingMemory::GetAgent(Error * err) const
+  agent* WorkingMemory::GetAgent(Error * err) const
   {
     ClearError(err);
 
@@ -504,18 +503,13 @@ namespace gSKI
       // Get the raw symbol from the agent structure and 
       // create a WMObject for it
       m_rootOutputObject = 
-        GetOrCreateWMObject(m_agent->GetSoarAgent()->io_header_output);
+        GetOrCreateWMObject(m_agent->io_header_output);
 
       MegaAssert( m_rootOutputObject != 0, 
                   "There is no root output link object!");
     }
       
     *rootObject = m_rootOutputObject;
-  }
-
-  agent* WorkingMemory::GetSoarAgent()
-  {
-    return m_agent->GetSoarAgent();
   }
 
   void WorkingMemory::Reinitialize()

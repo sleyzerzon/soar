@@ -13,7 +13,7 @@
 #ifndef GSKI_INPUTLINK_H
 #define GSKI_INPUTLINK_H
 
-#include "IgSKI_InputLink.h"
+//#include "IgSKI_InputLink.h"
 
 #include "gSKI_InputWorkingMemory.h"
 #include "gSKI_InputWMObject.h"
@@ -21,8 +21,6 @@
 #include "callback.h"
 
 namespace gSKI {
-
-  class Agent;
 
   /**
    * @brief Handles registration and invokation of InputProducers and 
@@ -38,7 +36,7 @@ namespace gSKI {
    * replacement is performed or not.
    */
   // TODO: Still need to address automatic vs. manual update issues
-  class InputLink: public IInputLink {
+  class InputLink {
   public:
     /**
      * @brief Constructor
@@ -50,7 +48,7 @@ namespace gSKI {
      *
      * @param agent The agent that owns the input link.
      */
-    InputLink(Agent* agent);
+    InputLink(agent* agent);
 
     /**
      * @brief Virtual Destructor
@@ -100,7 +98,7 @@ namespace gSKI {
      * @returns The IWorkingMemory object associated with the data on 
      *           the agent's input link
      */
-    IWorkingMemory* GetInputLinkMemory(Error* err = 0);
+    InputWorkingMemory* GetInputLinkMemory(Error* err = 0);
 
     /**
      * @brief Registers an InputProducer with a WMObject on the agent's
@@ -205,7 +203,7 @@ namespace gSKI {
      */
     void FinalUpdate();
 
-    Agent* m_agent;  /**< The agent that owns this input link. */
+    agent* m_agent;  /**< The agent that owns this input link. */
     InputWorkingMemory m_memory; /**< The working memory object that handles input working memory */
 /*     InputWMObject* m_rootObject; */
     

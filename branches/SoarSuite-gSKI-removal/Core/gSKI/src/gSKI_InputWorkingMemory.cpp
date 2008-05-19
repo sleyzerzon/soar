@@ -19,7 +19,6 @@
 #include "gSKI_Wme.h"
 #include "gSKI_Symbol.h"
 #include "gSKI_Error.h"
-#include "gSKI_Agent.h"
 
 #include <set>
 
@@ -38,7 +37,7 @@
 
 namespace gSKI
 {
-	InputWorkingMemory::InputWorkingMemory(Agent* agent)
+	InputWorkingMemory::InputWorkingMemory(agent* agent)
 		: m_agent(agent)
 		, m_rootInputObject(0)
 	{}
@@ -56,7 +55,7 @@ namespace gSKI
 		ReleaseAllWMObjects();
 	}
 
-	Agent* InputWorkingMemory::GetAgent(Error * err) const
+	agent* InputWorkingMemory::GetAgent(Error * err) const
 	{
 		ClearError(err);
 
@@ -118,8 +117,8 @@ namespace gSKI
 			return 0;
 		}
 
-		ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
-		ISymbol* value = new gSymbol(m_agent->GetSoarAgent(), intValue);
+		ISymbol* attribute = new gSymbol(m_agent, attr);
+		ISymbol* value = new gSymbol(m_agent, intValue);
 
 		IWme* pWme = AddWme(wmObject, attribute, value);
 		attribute->Release();
@@ -142,8 +141,8 @@ namespace gSKI
 			return 0;
 		}      
 
-		ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
-		ISymbol* value = new gSymbol(m_agent->GetSoarAgent(), dValue);
+		ISymbol* attribute = new gSymbol(m_agent, attr);
+		ISymbol* value = new gSymbol(m_agent, dValue);
 
 		IWme* pWme = AddWme(wmObject, attribute, value);
 		attribute->Release();
@@ -166,8 +165,8 @@ namespace gSKI
 			return 0;
 		}      
 
-		ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
-		ISymbol* value = new gSymbol(m_agent->GetSoarAgent(), val);
+		ISymbol* attribute = new gSymbol(m_agent, attr);
+		ISymbol* value = new gSymbol(m_agent, val);
 
 		IWme* pWme = AddWme(wmObject, attribute, value);
 		attribute->Release();
@@ -191,7 +190,7 @@ namespace gSKI
 			return 0;
 		}
 
-		ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
+		ISymbol* attribute = new gSymbol(m_agent, attr);
 		InputWMObject* value = CopyObjectFromInterface(val);
 
 		IWme* pWme = AddWme(wmObject, attribute, value->GetId());
@@ -214,7 +213,7 @@ namespace gSKI
 			return 0;
 		}
 
-		ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
+		ISymbol* attribute = new gSymbol(m_agent, attr);
 		InputWMObject* value = GetOrCreateObjectFromInterface(val);      
 
 		IWme* pWme = AddWme(wmObject, attribute, value->GetId());
@@ -236,7 +235,7 @@ namespace gSKI
 			return 0;
 		}
 
-		ISymbol* attribute = new gSymbol(m_agent->GetSoarAgent(), attr);
+		ISymbol* attribute = new gSymbol(m_agent, attr);
 
 		InputWMObject* value = new InputWMObject(this, *attr);
 		m_wmobjectmap.insert(tWMObjMap::value_type( value->GetSoarSymbol()->common.hash_id, value ));
@@ -346,7 +345,7 @@ namespace gSKI
 		InputWme* inwme = GetOrCreateWmeFromInterface(wme);
 
 		// Tell the object that owns the wme to mark it for deletion and mark everything under it for deletion.
-		inwmobj->MarkWmeForRemoval( inwme, this->GetAgent(), this->GetAgent()->GetRemoveWmeCallback() );
+		inwmobj->MarkWmeForRemoval( inwme, this->GetAgent(), this->m_RemoveWmeCallback );
 
 		// Old code: Can't call Remove directly, need to use
 		//InputWme* inwme = GetOrCreateWmeFromInterface(wme);
@@ -381,7 +380,7 @@ namespace gSKI
 		unsigned long value = atol(&idstring[1]) ;
 
 		// See if there's a symbol matching this in the kernel.
-		Symbol* id = find_identifier(GetSoarAgent(), letter, value) ;
+		Symbol* id = find_identifier(m_agent, letter, value) ;
 
 		if (!id)
 		{
@@ -450,7 +449,7 @@ namespace gSKI
 		unsigned long value = atol(&idstring[1]) ;
 
 		// See if there's a symbol matching this in the kernel.
-		Symbol* id = find_identifier(GetSoarAgent(), letter, value) ;
+		Symbol* id = find_identifier(m_agent, letter, value) ;
 
 		if (!id)
 		{
@@ -666,7 +665,7 @@ namespace gSKI
 		// to patch things up in that case, but we'll try it and see.
 		if (m_rootInputObject)
 		{
-			Symbol* isym = GetSoarAgent()->io_header_input ;
+			Symbol* isym = m_agent->io_header_input ;
 			if (m_rootInputObject->GetSoarSymbol() != isym)
 			{
 				// The input link symbols don't match between gSKI and the kernel.
@@ -683,7 +682,7 @@ namespace gSKI
 			// Create the working memory object from the raw soar symbol
 			MegaAssert( m_agent != 0, "Raw agent pointer can not be null!");
 
-			Symbol* isym = GetSoarAgent()->io_header_input;
+			Symbol* isym = m_agent->io_header_input;
 			MegaAssert( isym != 0, "Raw root input symbol can not be null!");
 
 			m_rootInputObject = new InputWMObject(this, isym);
@@ -701,11 +700,6 @@ namespace gSKI
 		if ( m_rootInputObject != 0 ) m_rootInputObject->AddRef();
 
 		*rootObject = m_rootInputObject;
-	}
-
-	agent* InputWorkingMemory::GetSoarAgent() const
-	{
-		return m_agent->GetSoarAgent();
 	}
 
 	void InputWorkingMemory::Update(bool forceAdds, bool forceRemoves)

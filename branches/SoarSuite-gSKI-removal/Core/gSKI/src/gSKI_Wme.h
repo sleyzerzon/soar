@@ -22,7 +22,7 @@
 
 namespace gSKI {
 
-   class IWorkingMemory;
+   class WorkingMemory;
 
    /**
     * @brief Interface for Soar Working Memory Elements
@@ -40,7 +40,7 @@ namespace gSKI {
       * @brief For constructing Wme objects from io_wme objects
       *
       */
-     Wme(IWorkingMemory* manager, wme* wme);
+     Wme(WorkingMemory* manager, wme* wme);
 
       /**
        * @brief Virtual Destructor
@@ -201,7 +201,7 @@ namespace gSKI {
 
      // TODO: We've removed the ability to get support information from 
      // the WME's themselves. Does this functionality need to be added 
-     // or is it more appropriate in IWorkingMemory or ProductionManager?
+     // or is it more appropriate in WorkingMemory or ProductionManager?
 
      bool Release(Error* err=0);
      // TODO: Comment the above function
@@ -214,7 +214,7 @@ namespace gSKI {
      bool AttributeEquals(const std::string& attr);
 
   private:
-     IWorkingMemory* m_manager;
+     WorkingMemory* m_manager;
      WMObject* m_owningobject;
      wme* m_rawwme;
      Symbol* m_id;

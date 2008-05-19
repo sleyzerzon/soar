@@ -17,6 +17,8 @@
 #include "gSKI_Enumerations.h"
 #include "IgSKI_Iterator.h"
 
+typedef struct agent_struct agent;
+
 namespace gSKI {
 
    /** Forward declarations of all listeners */
@@ -34,7 +36,6 @@ namespace gSKI {
 /*********************** Interface definitions *******************************/
 
 
-   class Agent;
    class Kernel;
    class IProduction;
    class IProductionInstance;
@@ -60,7 +61,7 @@ namespace gSKI {
       * @param agentPtr Pointer to the agent that fired the print event
       * @param msg      Pointer to c-style string containing the print text
       */
-      virtual void HandleEvent(egSKIPrintEventId eventId, Agent* agentPtr, const char* msg) = 0;
+      virtual void HandleEvent(egSKIPrintEventId eventId, agent* agentPtr, const char* msg) = 0;
    };
 
    /** 
@@ -85,7 +86,7 @@ namespace gSKI {
 	  * @param attOrTag     Pointer to c-style string containing the tag to add or remove or the attribute to add
 	  * @param value		Pointer to c-style string containing the value to add (may be NULL if just adding/ending a tag)
       */
-      virtual void HandleEvent(egSKIXMLEventId eventId, Agent* agentPtr, const char* funcType, const char* attOrTag, const char* value) = 0;
+      virtual void HandleEvent(egSKIXMLEventId eventId, agent* agentPtr, const char* funcType, const char* attOrTag, const char* value) = 0;
    };
 
    /** 
@@ -110,7 +111,7 @@ namespace gSKI {
 	  * @param change	The type of change that just occured
       * @param wmelist  Pointer to list of wmes that are affected by this event
       */
-      virtual void HandleEvent(egSKIWorkingMemoryEventId eventId, Agent* agentPtr, egSKIWorkingMemoryChange change, tIWmeIterator* wmelist) = 0;
+      virtual void HandleEvent(egSKIWorkingMemoryEventId eventId, agent* agentPtr, egSKIWorkingMemoryChange change, tIWmeIterator* wmelist) = 0;
    };
 
    /** 
@@ -136,7 +137,7 @@ namespace gSKI {
        * @param phase    The run phase to which the event applies.
        */
       virtual void HandleEvent(egSKIRunEventId   eventId, 
-                               Agent*        agentPtr, 
+                               agent*        agentPtr, 
                                egSKIPhaseType phase) = 0;
    };
 
@@ -164,7 +165,7 @@ namespace gSKI {
        *                    added and removed events).
        */
       virtual void HandleEvent(egSKIProductionEventId eventId, 
-                               Agent*                agentPtr, 
+                               agent*                agentPtr, 
                                IProduction*           prod,
                                IProductionInstance*   match) = 0;
    };
@@ -190,7 +191,7 @@ namespace gSKI {
        * @param agentPtr Pointer to the agent for which the event occured
        */
       virtual void HandleEvent(egSKIAgentEventId      eventId, 
-                               Agent*                agentPtr) = 0;
+                               agent*                agentPtr) = 0;
    };
 
    /** 
@@ -220,7 +221,7 @@ namespace gSKI {
 		// commandLine is true if we expect this to be handled by the command line processor (false => a custom RHS function that the user provides)
 		// pResultValue is a string allocated by the caller than is of size maxLengthReturnValue that should be filled in with the return value.
 		// The bool return value should be "true" if a return value is filled in, otherwise return false.
-		virtual bool HandleEvent(egSKIRhsEventId eventId, Agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
+		virtual bool HandleEvent(egSKIRhsEventId eventId, agent* pAgent, bool commandLine, char const* pFunctionName, char const* pArgument,
 								 int maxLengthReturnValue, char* pReturnValue) = 0;
 	};
 

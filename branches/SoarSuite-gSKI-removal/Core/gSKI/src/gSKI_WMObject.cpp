@@ -39,7 +39,7 @@ namespace gSKI
                   "Symbol associated with a WMObject must be an Identifier!");
 
       // The gSymbol will add the reference
-      m_gsym = new gSymbol(manager->GetSoarAgent(), sym, this, false);
+      m_gsym = new gSymbol(manager->GetAgent(), sym, this, false);
    }
 
    WMObject::~WMObject() 

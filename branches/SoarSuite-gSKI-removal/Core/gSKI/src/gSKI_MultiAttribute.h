@@ -11,9 +11,10 @@
 #include "IgSKI_MultiAttribute.h"
 #include "gSKI_ReleaseImpl.h"
 
+typedef struct agent_struct agent;
+
 namespace gSKI
 {
-   class Agent;
 
    class MultiAttribute : public RefCountedReleaseImpl<IMultiAttribute>
    {
@@ -25,13 +26,13 @@ namespace gSKI
          @param attribute Attribute name
          @param priority Matching priority
       */
-      MultiAttribute(Agent* pAgent, const char* attribute, int priority);
+      MultiAttribute(agent* pAgent, const char* attribute, int priority);
 
       virtual const char* GetAttributeName(Error *pErr = 0) const; 
       virtual int GetMatchingPriority(Error *pErr = 0) const;
 
    private:
-      Agent* m_pAgent;           /// Owning agent
+      agent* m_pAgent;           /// Owning agent
       std::string m_attribute;   /// Name of attribute
       int m_priority;            /// Matching priority
 
