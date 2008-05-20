@@ -171,33 +171,8 @@ void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgen
 		// Create the wme tag
 		TagWme* pTag = CreateTagIOWme(wme) ;
 
-		// Create the wme tag
-		/*
-		TagWme* pTag = new TagWme() ;
-
-		// Look up the type of value this is
-		int type = wme->value->sc.common_symbol_info.symbol_type ;
-		//egSKISymbolType type = pWME->GetValue()->GetType() ;
-		char const* pValueType = GetValueType(type) ;
-
-		// For additions we send everything
-		std::string id = AgentSML::SymbolToString(wme->id) ;
-		pTag->SetIdentifier(id.c_str()) ;
-		std::string att = AgentSML::SymbolToString(wme->attr) ;
-		pTag->SetAttribute(att.c_str()) ;
-		std::string val = AgentSML::SymbolToString(wme->value) ;
-		pTag->SetValue(val.c_str(), pValueType) ;
-		pTag->SetTimeTag(wme->timetag) ;
-		pTag->SetActionAdd() ;
-		*/
-
 		// Add it as a child of the command tag
 		command.AddChild(pTag) ;
-
-		// Values retrieved via "GetVal" have to be released.
-		// Ah, but not if they come from an Iterator rather than an IteratorWithRelease.
-		// At least, it seems like if I call Release here it causes a crash on exit, while if I don't all seems well.
-		//pWME->Release();
 	}
 
 	// At this point we check the list of time tags and any which are not marked as "in use" must

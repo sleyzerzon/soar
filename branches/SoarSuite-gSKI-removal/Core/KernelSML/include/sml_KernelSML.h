@@ -447,16 +447,6 @@ protected:
 
 	bool ProcessCommand(char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 
-	// Add a value to working memory
-	bool AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
-
-	// Remove a value from working memory.  The time tag is the string form of an int.
-	bool RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag) ;
-
-	// Remove a value from our records that has been removed by the kernel from working memory.
-	static void RemoveInputWMERecordsCallback(agent* pSoarAgent, gSKI::IWme* pWME);
-	void RemoveInputWMERecords(agent* pSoarAgent, gSKI::IWme* pWME) ;
-
 	// There should always be exactly one local connection to the kernel (the process that loaded us).
 	Connection* GetEmbeddedConnection() ;
 
@@ -491,7 +481,7 @@ protected:
 	bool HandleIsSoarRunning(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	bool HandleSetConnectionInfo(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	bool HandleGetConnections(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetAllInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	//bool HandleGetAllInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	bool HandleGetAllOutput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	bool HandleGetRunState(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
 	bool HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;

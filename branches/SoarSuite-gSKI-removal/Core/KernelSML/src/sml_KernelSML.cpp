@@ -34,14 +34,6 @@
 #include <map>
 #include <stdlib.h>
 
-#include "gSKI_Error.h"
-#include "gSKI_ErrorIds.h"
-#include "gSKI_Enumerations.h"
-#include "gSKI_InputLink.h"
-#include "IgSKI_InputProducer.h"
-#include "IgSKI_Symbol.h"
-#include "IgSKI_Wme.h"
-
 #include "KernelHeaders.h"
 
 using namespace sml ;
@@ -759,32 +751,6 @@ void KernelSML::PrintDebugSymbol(Symbol* pSymbol, bool refCounts ) {
 // time critical part of the interface.
 /////////////////////////////////////////////////////////////////
 
-// Unfortunately we need to keep track of all wmes as they are created and destroyed
-// so that we can release them properly if the user issues an "init-soar".
-// Under gSKI's current memory model this is the client's responsibility or the agent
-// won't release its existing WMEs.  Also the reason we go to the extend of passing in
-// the clientTimeTag is because wme->GetTimeTag() is only valid once the wme has actually
-// been added to the kernel's working memory--which won't happen until Soar is next run
-// and we pass through an input-phase.
-static inline void RecordWME_Map(gSKI::InputWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
-{
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->name ) ;
-
-	pAgentSML->RecordLongTimeTag( clientTimeTag, wme ) ;
-
-//	KernelSML::DebugPrint(wme->GetValue()->GetString(), clientTimeTag, "Recorded\n") ;
-}
-
-static inline void RemoveWME_Map(gSKI::InputWorkingMemory* wm, gSKI::IWme* wme, long clientTimeTag)
-{
-	unused(wme) ;
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( wm->GetAgent()->name ) ;
-
-	pAgentSML->RemoveLongTimeTag( clientTimeTag ) ;
-
-//	KernelSML::DebugPrint(wme->GetValue()->GetString(), clientTimeTag), "Removed\n") ;
-}
-
 /*************************************************************
 * @brief	Add a wme.
 * @param input		True if adding to input link.  False if adding to output link
@@ -792,28 +758,45 @@ static inline void RemoveWME_Map(gSKI::InputWorkingMemory* wm, gSKI::IWme* wme, 
 * @param pAttribute The attribute name to use
 * @param value		The value to use
 *************************************************************/
-EXPORT Direct_WME_Handle sml_DirectAddWME_String(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, char const* value)
+EXPORT void sml_DirectAddWME_String(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, char const* pValue, long clientTimetag)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::InputWorkingMemory*)wm)->AddWmeString((gSKI::IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((gSKI::InputWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
+	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
+	assert(pAgentSML);
 
-	return wme ;
+	std::stringstream timetagString;
+	timetagString << clientTimetag;
+
+	pAgentSML->AddInputWME( pId, pAttribute, pValue, sml_Names::kTypeString, timetagString.str().c_str() );
 }
 
-EXPORT Direct_WME_Handle sml_DirectAddWME_Int(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, int value)
+EXPORT void sml_DirectAddWME_Int(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, int value, long clientTimetag)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::InputWorkingMemory*)wm)->AddWmeInt((gSKI::IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((gSKI::InputWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
+	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
+	assert(pAgentSML);
 
-	return wme ;
+	// BADBAD conversion happening twice
+	std::stringstream valueString;
+	valueString << value;
+
+	std::stringstream timetagString;
+	timetagString << clientTimetag;
+
+	pAgentSML->AddInputWME( pId, pAttribute, valueString.str().c_str(), sml_Names::kTypeInt, timetagString.str().c_str() );
 }
 
-EXPORT Direct_WME_Handle sml_DirectAddWME_Double(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, double value)
+EXPORT void sml_DirectAddWME_Double(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, double value, long clientTimetag)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::InputWorkingMemory*)wm)->AddWmeDouble((gSKI::IWMObject*)parent, pAttribute, value) ;
-	RecordWME_Map((gSKI::InputWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
+	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
+	assert(pAgentSML);
 
-	return wme ;
+	// BADBAD conversion happening twice
+	std::stringstream valueString;
+	valueString << value;
+
+	std::stringstream timetagString;
+	timetagString << clientTimetag;
+
+	pAgentSML->AddInputWME( pId, pAttribute, valueString.str().c_str(), sml_Names::kTypeDouble, timetagString.str().c_str() );
 }
 
 /*************************************************************
@@ -822,18 +805,15 @@ EXPORT Direct_WME_Handle sml_DirectAddWME_Double(Direct_WorkingMemory_Handle wm,
 * @param wm			The working memory object (either input or output)
 * @param wme		The wme we're removing
 *************************************************************/
-EXPORT void sml_DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
+EXPORT void sml_DirectRemoveWME(Direct_AgentSML_Handle pAgentSMLIn, long clientTimetag)
 {
-	// Remove this from the list of wme's we're tracking.  Do this before removing it from working memory
-	RemoveWME_Map((gSKI::InputWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
+	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
+	assert(pAgentSML);
 
-	// Remove the wme from working memory
-	((gSKI::InputWorkingMemory*)wm)->RemoveWme((gSKI::IWme*)wme) ;
+	std::stringstream timetagString;
+	timetagString << clientTimetag;
 
-	// We used to release after the call to RemoveWme, but we've clarified the definition
-	// of remove wme so that it release the wme after it is actually deleted (which won't occur
-	// until the next input phase).  This makes our clean up safer and easier.
-    //	((IWme*)wme)->Release() ;
+	pAgentSML->RemoveInputWME( timetagString.str().c_str() );
 }
 
 /*************************************************************
@@ -842,64 +822,24 @@ EXPORT void sml_DirectRemoveWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handl
 * @param parent		The identifier (WMObject) we're adding to.
 * @param pAttribute	The attribute to add
 *************************************************************/
-EXPORT Direct_WME_Handle sml_DirectAddID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute)
+EXPORT void sml_DirectAddID(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, char const* pValueId, long clientTimetag)
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::InputWorkingMemory*)wm)->AddWmeNewObject((gSKI::IWMObject*)parent, pAttribute) ;
-	RecordWME_Map((gSKI::InputWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
+	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
+	assert(pAgentSML);
 
-	return wme ;
+	std::stringstream timetagString;
+	timetagString << clientTimetag;
+
+	pAgentSML->AddInputWME( pId, pAttribute, pValueId, sml_Names::kTypeID, timetagString.str().c_str() );
 }
 
-/*************************************************************
-* @brief	Creates a new wme with an existing id as its value
-*			(parent ^attribute <existing-id>)
-* @param wm			The working memory object (either input or output)
-* @param parent		The identifier (WMObject) we're adding to.
-* @param pAttribute	The attribute to add
-* @param orig		The original identifier (whose value we are copying)
-*************************************************************/
-EXPORT Direct_WME_Handle sml_DirectLinkID(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle parent, long clientTimeTag, char const* pAttribute, Direct_WMObject_Handle orig)
+EXPORT Direct_AgentSML_Handle sml_DirectGetAgentSMLHandle(char const* pAgentName) 
 {
-	Direct_WME_Handle wme = (Direct_WME_Handle)((gSKI::InputWorkingMemory*)wm)->AddWmeObjectLink((gSKI::IWMObject*)parent, pAttribute, (gSKI::IWMObject*)orig) ;
-	RecordWME_Map((gSKI::InputWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
+	KernelSML* pKernelSML = KernelSML::GetKernelSML() ;
 
-	return wme ;
-}
+	AgentSML* pAgentSML = pKernelSML->GetAgentSML( pAgentName );
 
-/*************************************************************
-* @brief	The AddID methods return a WME, but for gSKI you need
-*			a WMObject to work with them, so this gets the identifier
-*			(WMObject) from a wme.
-*			(parent ^attribute <id>) - returns <id> (not parent)
-*************************************************************/
-EXPORT Direct_WMObject_Handle sml_DirectGetThisWMObject(Direct_WorkingMemory_Handle /*wm*/, Direct_WME_Handle wme)
-{
-	Direct_WMObject_Handle wmobject = (Direct_WMObject_Handle)((gSKI::IWme*)wme)->GetValue()->GetObject() ;
-	return wmobject ;
-}
-
-EXPORT Direct_WorkingMemory_Handle sml_DirectGetWorkingMemory(char const* pAgentName)
-{
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML(pAgentName);
-
-	if (!pAgentSML)
-		return 0 ;
-
-	return (Direct_WorkingMemory_Handle)pAgentSML->m_inputlink->GetInputLinkMemory() ;
-}
-
-EXPORT Direct_WMObject_Handle sml_DirectGetRoot(char const* pAgentName)
-{
-	AgentSML* pAgentSML = KernelSML::GetKernelSML()->GetAgentSML( pAgentName ) ;
-
-	if (!pAgentSML)
-		return 0 ;
-
-	gSKI::IWMObject* pRoot = NULL ;
-	pAgentSML->m_inputlink->GetRootObject(&pRoot) ;
-	pAgentSML->SetInputLinkRoot(pRoot) ;
-
-	return (Direct_WMObject_Handle)pRoot ;
+	return reinterpret_cast<Direct_AgentSML_Handle>(pAgentSML);
 }
 
 // A fully direct run would be a call straight to gSKI but supporting that is too dangerous
@@ -941,7 +881,7 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 	}
 
 	// If we're running by decision cycle synchronize up the agents to the same phase before we start
-	bool synchronizeAtStart = (runType == gSKI_RUN_DECISION_CYCLE) ;
+	bool synchronizeAtStart = (runType == sml_DECISION) ;
 
 	// Do the run
 	smlRunResult runResult = pScheduler->RunScheduledAgents(forever, runType, count, runFlags, (smlRunStepSize)interleaveSize, synchronizeAtStart) ;
@@ -950,23 +890,4 @@ EXPORT void sml_DirectRun(char const* pAgentName, bool forever, int stepSize, in
 
 	return ;
 }
-
-EXPORT void sml_DirectReleaseWME(Direct_WorkingMemory_Handle wm, Direct_WME_Handle wme, long clientTimeTag)
-{
-	// Remove this from the list of wme's we're tracking.  Do this before we release it
-	RemoveWME_Map((gSKI::InputWorkingMemory*)wm, (gSKI::IWme*)wme, clientTimeTag) ;
-
-	((gSKI::IWme*)wme)->Release() ;
-}
-
-EXPORT void sml_DirectReleaseWMObject(Direct_WMObject_Handle parent)
-{
-	((gSKI::IWMObject*)parent)->Release() ;
-}
-
-EXPORT int sml_DirectGetIWMObjMapSize(Direct_WorkingMemory_Handle wm)
-{
-	return ((gSKI::InputWorkingMemory*)wm)->GetWMObjMapSize();
-}
-
 

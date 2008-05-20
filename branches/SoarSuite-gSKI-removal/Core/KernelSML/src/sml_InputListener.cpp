@@ -29,8 +29,6 @@ using namespace sml ;
 	static bool kDebugInput = false ;
 #endif
 
-static bool kMaintainHashTable = false ;
-
 void InputListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 {
 	m_KernelSML = pKernelSML ;
@@ -121,17 +119,13 @@ void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int )
 				if (!pID || !pAttribute || !pValue || !pTimeTag)
 					continue ;
 
-				// Map the ID from client side to kernel side (if the id is already a kernel side id it's returned unchanged)
-				std::string id ;
-				pAgentSML->ConvertID(pID, &id) ;
-
 				if (kDebugInput)
 				{
-					PrintDebugFormat("%s Add %s ^%s %s (type %s tag %s)", pAgentSML->GetName(), id.c_str(), pAttribute, pValue, pType, pTimeTag) ;
+					PrintDebugFormat("%s Add %s ^%s %s (type %s tag %s)", pAgentSML->GetName(), pID, pAttribute, pValue, pType, pTimeTag) ;
 				}
 
 				// Add the wme
-				ok = AddInputWME(pAgentSML, id.c_str(), pAttribute, pValue, pType, pTimeTag) && ok ;
+				ok = pAgentSML->AddInputWME( pID, pAttribute, pValue, pType, pTimeTag) && ok ;
 			}
 			else if (remove)
 			{
@@ -143,7 +137,7 @@ void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int )
 				}
 
 				// Remove the wme
-				ok = RemoveInputWME(pAgentSML, pTimeTag) && ok ;
+				ok = pAgentSML->RemoveInputWME(pTimeTag) && ok ;
 			}
 		}
 
@@ -151,206 +145,6 @@ void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int )
 	}
 
 	pPending->clear() ;
-}
-
-bool InputListener::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag)
-{
-	Symbol* pValueSymbol = 0 ;
-	agent*  pAgent = pAgentSML->GetSoarAgent() ;
-
-	CHECK_RET_FALSE(strlen(pID) >= 2) ;
-	char idLetter = pID[0] ;
-	int idNumber = atoi(&pID[1]) ;
-
-	if (IsStringEqual(sml_Names::kTypeString, pType)) {
-		// Creating a wme with a string constant value
-		pValueSymbol = get_io_sym_constant(pAgent, pValue) ;
-	} else if (IsStringEqual(sml_Names::kTypeInt, pType)) {
-		// Creating a WME with an int value
-		int value = atoi(pValue) ;
-		pValueSymbol = get_io_int_constant(pAgent, value) ;
-	} else if (IsStringEqual(sml_Names::kTypeDouble, pType)) {
-		// Creating a WME with a float value
-		float value = (float)atof(pValue) ;
-		pValueSymbol = get_io_float_constant(pAgent, value) ;
-	} else if (IsStringEqual(sml_Names::kTypeID, pType)) {
-		// Creating a WME with an identifier value
-
-		CHECK_RET_FALSE(strlen(pValue)) ;		// Identifier must be format Xdddd for some letter "X" and at least one digit "d"
-		char letter = pValue[0]	;				// Kernel identifiers always use upper case identifier letters
-
-		bool haveKernelID = true ;
-		std::string value = pValue ;
-		if (letter >= 'a' || letter <= 'z')
-		{
-			// Convert the value (itself an identifier) from client to kernel
-			bool found = pAgentSML->ConvertID(pValue, &value) ;
-
-			if (!found)
-				haveKernelID = false ;
-		}
-
-		int number = 0 ;
-
-		// If we reach here without having a mapping to a kernel side identifier
-		// then we want to force the kernel to create a new id for us.
-		// We'll do that by setting the number to 0 -- which will never match an existing
-		// identifier.
-		if (!haveKernelID)
-		{
-			letter = (char)toupper(letter) ;
-			number = 0 ;
-		}
-		else
-		{
-			// Find the identifier number
-			char const* pNumber = value.c_str() ;
-			pNumber++ ;
-			number = atoi(pNumber) ;
-
-			// Find the identifier letter
-			letter = value[0] ;
-		}
-
-		// See if this identifier already exists
-		pValueSymbol = get_io_identifier(pAgent, letter, number) ;
-
-		// If we just created this symbol record it in our mapping table
-		if (pValueSymbol->common.reference_count == 1)
-		{
-			// We need to record the id that the kernel assigned to this object and match it against the id the
-			// client is using, so that in future we can map the client's id to the kernel's.
-			std::ostringstream buffer;
-			buffer << pValueSymbol->id.name_letter ;
-			buffer << pValueSymbol->id.name_number ;
-			std::string newid = buffer.str() ;
-			pAgentSML->RecordIDMapping(pValue, newid.c_str()) ;
-
-			if (kDebugInput)
-			{
-				PrintDebugFormat("Recording id mapping of %s to %s", pValue, newid.c_str()) ;
-			}
-		}
-	}
-
-	// Now create the wme
-
-	Symbol* pIDSymbol   = get_io_identifier(pAgent, idLetter, idNumber) ;
-	Symbol* pAttrSymbol = get_io_sym_constant(pAgent, pAttribute) ;
-
-	CHECK_RET_FALSE(pIDSymbol) ;
-	CHECK_RET_FALSE(pAttrSymbol) ;
-
-	wme* pNewInputWme = add_input_wme(pAgent, pIDSymbol, pAttrSymbol, pValueSymbol) ;
-	long timeTag = pNewInputWme->timetag ;
-
-	CHECK_RET_FALSE(pNewInputWme) ;
-
-	if (kDebugInput)
-		KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
-
-	// The kernel doesn't support direct lookup of wme from timetag so we'll
-	// store these values in a hashtable.  Perhaps later we'll see about adding
-	// this support directly into the kernel.
-	pAgentSML->RecordTime(pTimeTag, timeTag) ;
-
-	if (kMaintainHashTable)
-	{
-		pAgentSML->RecordKernelTimeTag(pTimeTag, pNewInputWme) ;
-	}
-	else
-	{
-		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetSoarAgent(), pNewInputWme->id) ;
-		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetSoarAgent(), pNewInputWme->attr) ;
-		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetSoarAgent(), pNewInputWme->value) ;
-	}
-
-	if (kDebugInput)
-		KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
-
-	return true ;
-}
-
-bool InputListener::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
-{
-	// Get the wme that matches this time tag
-	long timetag = pAgentSML->ConvertTime(pTimeTag) ;
-
-	if (kDebugInput)
-	{
-		PrintDebugFormat("Before removing wme") ;
-		pAgentSML->PrintKernelTimeTags() ;
-	}
-
-	wme *pWME ;
-
-	if (!kMaintainHashTable)
-	{
-		pWME = find_input_wme_by_timetag(pAgentSML->GetSoarAgent(), timetag) ;
-	}
-	else
-	{
-		pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
-	}
-
-	if (kDebugInput)
-	{
-	    std::string printInput1 = pAgentSML->ExecuteCommandLine("print --internal --depth 2 I2") ;
-		PrintDebugFormat("%s\nLooking for %ld", printInput1.c_str(), timetag) ;
-	}
-
-	// The wme is already gone so no work to do
-	if (!pWME)
-	{
-		return false ;
-	}
-
-//	wme* pWME = pAgentSML->ConvertKernelTimeTag(pTimeTag) ;
-
-	if (kDebugInput)
-		KernelSML::PrintDebugWme("Removing input wme ", pWME, true) ;
-
-	CHECK_RET_FALSE(pWME) ;
-
-	if (pWME->value->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
-		std::ostringstream buffer;
-		buffer << pWME->value->id.name_letter ;
-		buffer << pWME->value->id.name_number ;
-		std::string newid = buffer.str() ;
-
-		// This extra release of the identifier value seems to be required
-		// but I don't understand why.
-		/*Symbol* pIDSymbol = */pWME->value ;
-//		release_io_symbol(pAgentSML->GetAgent(), pIDSymbol) ;
-//		release_io_symbol(pAgentSML->GetAgent(), pWME->id) ;
-//		release_io_symbol(pAgentSML->GetAgent(), pWME->attr) ;
-
-		// Remove this id from the id mapping table
-		// BUGBUG: This seems to be assuming that there's only a single use of this ID in the kernel, but what if it's shared?
-		// I think we might not want to do this and just leave the mapping forever once it has been used.  If the client
-		// re-uses this value we'll continue to map it.
-		//pAgentSML->RemoveID(id.c_str()) ;
-	}
-
-	Bool ok = remove_input_wme(pAgentSML->GetSoarAgent(), pWME) ;
-
-	// Remove the object from the time tag table because
-	// we no longer own it.
-	if (kMaintainHashTable)
-	{
-		pAgentSML->RemoveKernelTimeTag(pTimeTag) ;
-
-		/*unsigned long refCount1 = */release_io_symbol(pAgentSML->GetSoarAgent(), pWME->id) ;
-		/*unsigned long refCount2 = */release_io_symbol(pAgentSML->GetSoarAgent(), pWME->attr) ;
-		/*unsigned long refCount3 = */release_io_symbol(pAgentSML->GetSoarAgent(), pWME->value) ;
-
-		PrintDebugFormat("After removing wme") ;
-		pAgentSML->PrintKernelTimeTags() ;
-	}
-
-	CHECK_RET_FALSE(ok) ;
-
-	return (ok != 0) ;
 }
 
 // Register for the events that KernelSML itself needs to know about in order to work correctly.

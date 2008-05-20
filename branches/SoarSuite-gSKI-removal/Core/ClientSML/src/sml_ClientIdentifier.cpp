@@ -25,11 +25,6 @@ using namespace sml ;
 IdentifierSymbol::IdentifierSymbol(Identifier* pIdentifier)
 {
 	m_UsedBy.push_back(pIdentifier) ;
-
-#ifdef SML_DIRECT
-	m_WM = 0 ;
-	m_WMObject = 0 ;
-#endif
 }
 
 IdentifierSymbol::~IdentifierSymbol()
@@ -70,7 +65,7 @@ void IdentifierSymbol::RemoveChild(WMElement* pWME)
 }
 
 // This version is only needed at the top of the tree (e.g. the input link)
-Identifier::Identifier(Agent* pAgent, char const* pIdentifier, long timeTag) : WMElement(pAgent, NULL, NULL, NULL, timeTag)
+Identifier::Identifier(Agent* pAgent, char const* pIdentifier, long timeTag) : WMElement(pAgent, NULL, pIdentifier, NULL, timeTag)
 {
 	m_pSymbol = new IdentifierSymbol(this) ;
 	m_pSymbol->SetIdentifierSymbol(pIdentifier) ;
@@ -83,14 +78,6 @@ Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char
 	m_pSymbol = new IdentifierSymbol(this) ;
 	m_pSymbol->SetIdentifierSymbol(pIdentifier) ;
 	m_Visited = 0 ;
-
-#ifdef SML_DIRECT
-	// Pass along with working memory object.  (Note: If you pass id's from input-link to output-link this just breaks gSKI all over the place, so please don't).
-	if (pParent)
-		m_pSymbol->m_WM = pParent->GetSymbol()->m_WM ;
-	else
-		m_pSymbol->m_WM = NULL ;
-#endif
 }
 
 // Creating one identifier to have the same value as another
@@ -99,14 +86,6 @@ Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char
 	m_pSymbol = pLinkedIdentifier->m_pSymbol ;
 	m_pSymbol->UsedBy(this) ;
 	m_Visited = 0 ;
-
-#ifdef SML_DIRECT
-	// Pass along with working memory object.  (Note: If you pass id's from input-link to output-link this just breaks gSKI all over the place, so please don't).
-	if (pParent)
-		m_pSymbol->m_WM = pParent->GetSymbol()->m_WM ;
-	else
-		m_pSymbol->m_WM = NULL ;
-#endif
 }
 
 Identifier::~Identifier(void)
@@ -126,11 +105,6 @@ Identifier::~Identifier(void)
 void Identifier::SetParent(Identifier* pParent)
 {
 	WMElement::SetParent(pParent) ;
-
-#ifdef SML_DIRECT
-	// Pass along with working memory object.  (Note: If you pass id's from input-link to output-link this just breaks gSKI all over the place, so please don't).
-	m_pSymbol->m_WM = pParent->GetSymbol()->m_WM ;
-#endif
 }
 
 /*************************************************************
@@ -342,41 +316,9 @@ void Identifier::Refresh()
 }
 
 #ifdef SML_DIRECT
-void Identifier::ClearAllWMObjectHandles()
+void Identifier::DirectAdd(Direct_AgentSML_Handle pAgentSML, long timeTag)
 {
-	SetWMObjectHandle(0) ;
-
-	for (ChildrenIter iter = m_pSymbol->m_Children.begin() ; iter != m_pSymbol->m_Children.end() ; iter++)
-	{
-		WMElement* pWME = *iter ;
-		pWME->ClearAllWMObjectHandles() ;
-	}
-}
-
-Direct_WME_Handle Identifier::DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag)
-{
-	// If this identifier is sharing ID values with other identifiers, we add the first object
-	// and then link all subsequent ones together.
-	Direct_WME_Handle wme = 0 ;
-	if (m_pSymbol->IsFirstUser(this))
-	{
-		wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectAddID(wm, wmobject, timeTag, GetAttribute()) ;
-	}
-	else
-	{
-		Identifier* pSharedID = m_pSymbol->GetFirstUser() ;
-		Direct_WMObject_Handle sharedWMObject = pSharedID->GetWMObjectHandle() ;
-
-		// Fatal error during init-soar for direct connection
-		// This wmobject value should have already been created through an add call
-		// when the first user of the symbol was called.
-		assert(sharedWMObject != 0) ;
-
-		wme = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectLinkID(wm, wmobject, timeTag, GetAttribute(), sharedWMObject) ;
-	}
-
-	Direct_WMObject_Handle newwmobject = ((EmbeddedConnection*)GetAgent()->GetConnection())->DirectGetThisWMObject(wm, wme) ;
-	SetWMObjectHandle(newwmobject) ;
-	return wme ;
+	EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>(GetAgent()->GetConnection());
+	pConnection->DirectAddID( pAgentSML, m_ID->GetIdentifierSymbol(), GetAttribute(), GetValueAsString(), timeTag);
 }
 #endif

@@ -27,6 +27,7 @@
 #include "sml_TagCommand.h"
 #include "sml_Events.h"
 #include "sml_RunScheduler.h"
+#include "sml_KernelHelpers.h"
 #include "KernelHeaders.h"
 
 #include <iostream>
@@ -35,10 +36,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "gSKI_Error.h"
-#include "gSKI_ErrorIds.h"
-#include "gSKI_Enumerations.h"
-#include "IgSKI_InputProducer.h"
 #include "IgSKI_Symbol.h"
 #include "IgSKI_Wme.h"
 #include "IgSKI_WMObject.h"
@@ -46,39 +43,6 @@
 
 using namespace sml ;
 
-///*
-//  ==================================
-//  SML input producer
-//  ==================================
-//*/
-//class sml_InputProducer: public gSKI::IInputProducer
-//{
-//public:
-//
-//   // Simple constructor
-//   sml_InputProducer(KernelSML* pKernelSML)
-//   {
-//	   m_KernelSML	= pKernelSML ;
-//   }
-//   
-//   virtual ~sml_InputProducer() 
-//   {
-//   }
-//   
-//   // The update function required by the IInputProducer interface
-//   // (Responsible for updating the state of working memory)
-//   virtual void Update(gSKI::InputWorkingMemory* /*wmemory*/, gSKI::IWMObject* /*obj*/)
-//   {
-//	   // Check for any new incoming commands from remote connections.
-//	   // We do this in an input producer so it's once per decision during a run and
-//	   // the input phase seems like the correct point for incoming commands.
-//	   m_KernelSML->ReceiveAllMessages() ;
-//   }
-//
-//private:
-//	sml::KernelSML*		m_KernelSML ;
-//};
-//
 void KernelSML::BuildCommandMap()
 {
 	m_CommandMap[sml_Names::kCommand_CreateAgent]		= &sml::KernelSML::HandleCreateAgent ;
@@ -100,7 +64,7 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_IsSoarRunning]		= &sml::KernelSML::HandleIsSoarRunning ;
 	m_CommandMap[sml_Names::kCommand_GetConnections]	= &sml::KernelSML::HandleGetConnections ;
 	m_CommandMap[sml_Names::kCommand_SetConnectionInfo] = &sml::KernelSML::HandleSetConnectionInfo ;
-	m_CommandMap[sml_Names::kCommand_GetAllInput]		= &sml::KernelSML::HandleGetAllInput ;
+	//m_CommandMap[sml_Names::kCommand_GetAllInput]		= &sml::KernelSML::HandleGetAllInput ;
 	m_CommandMap[sml_Names::kCommand_GetAllOutput]		= &sml::KernelSML::HandleGetAllOutput ;
 	m_CommandMap[sml_Names::kCommand_GetRunState]		= &sml::KernelSML::HandleGetRunState ;
 	m_CommandMap[sml_Names::kCommand_IsProductionLoaded]= &sml::KernelSML::HandleIsProductionLoaded ;
@@ -164,13 +128,7 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 		0,
 		"static_input_callback");
 
-	// Add the input producer to the top level of the input link (doesn't matter for us which WME it's attached to)
-	//gSKI::IWMObject* pRoot = NULL ;
-	//pAgentSML->m_inputlink->GetRootObject(&pRoot) ;
-	//pAgentSML->m_inputlink->AddInputProducer(pRoot, pInputProducer) ;
-	//pRoot->Release() ;
-
-	pAgentSML->m_inputlink->GetInputLinkMemory()->m_RemoveWmeCallback = RemoveInputWMERecordsCallback;
+	//pAgentSML->m_inputlink->GetInputLinkMemory()->m_RemoveWmeCallback = RemoveInputWMERecordsCallback;
 
 	// Return true if we got an agent constructed.
 	return true ;
@@ -181,16 +139,6 @@ bool KernelSML::HandleRegisterForEvent(AgentSML* pAgentSML, char const* pCommand
 {
 	// Decide if registering or unregistering
 	bool registerForEvent = (strcmp(pCommandName, sml_Names::kCommand_RegisterForEvent) == 0) ;
-
-	// The value sent over is actually defined in sml_Events.h but we're just casting it over to egSKIEventId.
-	// So let's add some checks here to make sure that the two tables are synchronized.
-	// (If we wish we could introduce a mapping here between the two sets of ids but for now we're not doing that).
-	assert(gSKIEVENT_INVALID_EVENT == (egSKIGenericEventId)smlEVENT_INVALID_EVENT) ;	// First matches
-	assert(gSKIEVENT_AFTER_RUNNING == (smlRunEventId)smlEVENT_AFTER_RUNNING) ;	// Random one in middle matches
-	assert(gSKIEVENT_BEFORE_AGENT_REINITIALIZED == (egSKIAgentEventId)smlEVENT_BEFORE_AGENT_REINITIALIZED) ;	// Another middle one matches
-	assert(gSKIEVENT_PRINT == (egSKIPrintEventId)smlEVENT_PRINT); // What the heck, another one
-	assert(gSKIEVENT_RHS_USER_FUNCTION == (smlRhsEventId)smlEVENT_RHS_USER_FUNCTION) ;
-	assert(gSKIEVENT_LAST== (egSKIGenericEventId)smlEVENT_LAST) ;
 
 	// Get the parameters
 	char const* pEventName = pIncoming->GetArgString(sml_Names::kParamEventID) ;
@@ -204,15 +152,13 @@ bool KernelSML::HandleRegisterForEvent(AgentSML* pAgentSML, char const* pCommand
 	int id = ConvertStringToEvent(pEventName) ;
 
 	// Decide what type of event this is and where to register/unregister it
-	// gSKI uses a different class for each type of event.  We collect those together
-	// where possible to reduce the amount of extra scaffolding code.
 	if(IsSystemEventID(id))
 	{
 		// System Events
 		if (registerForEvent)
-			this->AddSystemListener((smlSystemEventId)id, pConnection) ;
+			this->AddSystemListener(static_cast<smlSystemEventId>(id), pConnection) ;
 		else
-			this->RemoveSystemListener((smlSystemEventId)id, pConnection) ;
+			this->RemoveSystemListener(static_cast<smlSystemEventId>(id), pConnection) ;
 
 	} else if(IsAgentEventID(id)) {
 
@@ -669,316 +615,133 @@ bool KernelSML::HandleGetInputLink(AgentSML* pAgentSML, char const* /*pCommandNa
 	if (!pAgentSML)
 		return false ;
 
-	// We want the input link's id
-	// Start with the root object for the input link
-	gSKI::IWMObject* pRootObject = NULL ;
-	pAgentSML->m_inputlink->GetRootObject(&pRootObject) ;
-
-	if (pRootObject == NULL)
-		return false ;
-
-	// Get the symbol for the id of this object
-	gSKI::ISymbol const* pID = pRootObject->GetId() ;
-
-	if (pID == NULL)
-	{
-		pRootObject->Release() ;
-		return false ;
-	}
+	Symbol* sym = pAgentSML->GetSoarAgent()->io_header_input;
 
 	// Turn the id symbol into an actual string
-	char const* id = pID->GetString() ;
+	char buf[ MAX_LEXEME_LENGTH ];
+	char * id = symbol_to_string ( pAgentSML->GetSoarAgent(), sym, true, buf, MAX_LEXEME_LENGTH );
 	
 	if (id)
 	{
+		// FIXME: this doesn't work
+		//id[0] = static_cast<char>(tolower( id[0] )); // sending client side id
+
 		// Fill in the id string as the result of this command
 		this->ReturnResult(pConnection, pResponse, id) ;
 	}
-
-	// No need to release the pID
-	// because it's returned as a const by GetId().
-	// pID->Release() ;
-
-	// Clean up
-	pRootObject->Release() ;
 
 	// We succeeded if we got an id string
 	return (id != NULL) ;
 }
 
-bool KernelSML::AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag)
-{
-	// We store additional information for SML in the AgentSML structure, so look that up.
-	bool addingToInputLink = true ;
-	gSKI::InputWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
-
-	// First get the object which will own this new wme
-	// Because we build from the top down, this should always exist by the
-	// time we wish to add structure beneath it.
-	gSKI::IWMObject* pParentObject = NULL ;
-	pInputWM->GetObjectById(pID, &pParentObject) ;
-
-	// Soar also allows the environment to modify elements on the output link.
-	// This is a form of backdoor input, so we need to check on the output side too
-	// if we don't find our parent on the input side.
-	assert ( pParentObject ); // BUGBUG TEST THIS NEVER HAPPENS
-
-	// Failed to find the parent.
-	if (!pParentObject)
-		return false ;
-
-	gSKI::IWme* pWME = NULL ;
-
-	if (IsStringEqual(sml_Names::kTypeString, pType))
-	{
-		// Add a WME with a string value
-		pWME = pInputWM->AddWmeString(pParentObject, pAttribute, pValue) ;
-	}
-	else if (IsStringEqual(sml_Names::kTypeID, pType))
-	{
-		// There are two cases here.  We're either adding a new identifier
-		// or we're adding a new wme that has an existing identifier as it's value.
-
-		// Convert the value (itself an identifier) from client to kernel
-		std::string value ;
-		pAgentSML->ConvertID(pValue, &value) ;
-
-		// See if we can find an object with this id (if so we're not adding a new identifier)
-		gSKI::IWMObject* pLinkObject = NULL ;
-		pInputWM->GetObjectById(value.c_str(), &pLinkObject) ;
-
-		if (pLinkObject)
-		{
-			// Create a new wme with the same value as an existing wme
-			pWME = pInputWM->AddWmeObjectLink(pParentObject, pAttribute, pLinkObject) ;
-			pLinkObject->Release() ;
-		}
-		else
-		{
-			// Add a WME with an identifier value
-			pWME = pInputWM->AddWmeNewObject(pParentObject, pAttribute) ;
-		}
-
-		if (pWME)
-		{
-			// We need to record the id that the kernel assigned to this object and match it against the id the
-			// client is using, so that in future we can map the client's id to the kernel's.
-			// voigtjr 02/2008: We need to call RecordIDMapping regardless of whether it is already
-			// mapped because we need to keep track of reference counts to behave correctly regarding shared IDs
-			char const* pKernelID = pWME->GetValue()->GetString() ;
-			pAgentSML->RecordIDMapping(pValue, pKernelID) ;
-		}
-	}
-	else if (IsStringEqual(sml_Names::kTypeInt, pType))
-	{
-		// Add a WME with an int value
-		int value = atoi(pValue) ;
-		pWME = pInputWM->AddWmeInt(pParentObject, pAttribute, value) ;
-	}
-	else if (IsStringEqual(sml_Names::kTypeDouble, pType))
-	{
-		// Add a WME with a float value
-		double value = atof(pValue) ;
-		pWME = pInputWM->AddWmeDouble(pParentObject, pAttribute, value) ;
-	}
-
-	if (!pWME)
-	{
-		pParentObject->Release() ;
-		return false ;
-	}
-
-	// Well here's a surprise.  The kernel doesn't support a direct lookup from timeTag to wme.
-	// So we need to maintain our own map out here so we can find the WME's quickly for removal.
-	// So where we had planned to map from client time tag to kernel time tag, we'll instead
-	// map from client time tag to IWme*.
-	// That means we need to be careful to delete the IWme* objects later.
-	if (pWME && addingToInputLink)
-		pAgentSML->RecordTimeTag(pTimeTag, pWME) ;
-
-	// We'll release this when the table of time tags is eventually destroyed or
-	// when the wme is deleted.
-//	pWME->Release() ;
-
-	// If this is the output lin, we have to release the WME immediately,
-	// otherwise there is a memory leak because there is no way for the client
-	// to remove WMEs once they're added to the output link. The WME will get
-	// cleaned up properly when the output command retracts and it is garbage
-	// collected (DR 11/8/2007)
-	if(!addingToInputLink)
-	{
-		pWME->Release();
-	}
-	pParentObject->Release() ;
-
-	return true ;
-}
-
-bool KernelSML::RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag)
-{
-	gSKI::InputWorkingMemory* pInputWM = pAgentSML->m_inputlink->GetInputLinkMemory() ;
-
-	// Get the wme that matches this time tag
-	gSKI::IWme* pWME = pAgentSML->ConvertTimeTag(pTimeTag) ;
-
-	// Failed to find the wme--that shouldn't happen.
-	if (!pWME)
-		return false ;
-
-	// If this is an identifier, need to remove it from the ID mapping table too.
-	if (pWME->GetValue()->GetType() == gSKI_OBJECT)
-	{
-		// Get the kernel-side identifier
-		std::string id = pWME->GetValue()->GetString() ;
-
-		// Remove it from the id mapping table
-		pAgentSML->RemoveID(id.c_str()) ;
-	}
-
-	// Remove the wme from working memory
-	pInputWM->RemoveWme(pWME) ;
-
-	// Remove the object from the time tag table because
-	// we no longer own it.
-	pAgentSML->RemoveTimeTag(pTimeTag) ;
-
-	return true ;
-}
-
-void KernelSML::RemoveInputWMERecordsCallback(agent* pSoarAgent, gSKI::IWme* pWME)
-{
-	assert( pSoarAgent );
-	s_pKernel->RemoveInputWMERecords(pSoarAgent, pWME);
-}
-
-void KernelSML::RemoveInputWMERecords(agent* pSoarAgent, gSKI::IWme* pWME)
-{
-	// We store additional information for SML in the AgentSML structure, so look that up.
-	AgentSML* pAgentSML = GetAgentSML( pSoarAgent->name ) ;
-
-	if (!pAgentSML || !pWME)
-		return;
-
-	// If this is an identifier, need to remove it from the ID mapping table too.
-	if (pWME->GetValue()->GetType() == gSKI_OBJECT)
-	{
-		// Get the kernel-side identifier
-		std::string id = pWME->GetValue()->GetString() ;
-
-		// Remove it from the id mapping table
-		pAgentSML->RemoveID(id.c_str()) ;
-	}
-
-	// Remove the object from the time tag table because
-	// we no longer own it.
-	pAgentSML->RemoveTimeTagByWmeSLOW(pWME) ;
-}
-
-static char const* GetValueType(egSKISymbolType type)
-{
-	switch (type)
-	{
-	case gSKI_DOUBLE: return sml_Names::kTypeDouble ;
-	case gSKI_INT:	  return sml_Names::kTypeInt ;
-	case gSKI_STRING: return sml_Names::kTypeString ;
-	case gSKI_OBJECT: return sml_Names::kTypeID ;
-	default: return NULL ;
-	}
-}
-
-static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, std::list<gSKI::IWMObject*> *pTraversedList)
-{
-	if (!pRoot || !pTagResult)
-		return false ;
-
-	gSKI::tIWmeIterator* iter = pRoot->GetWMEs() ;
-
-	while (iter->IsValid())
-	{
-		gSKI::IWme* pWME = iter->GetVal() ;
-
-		// In some cases, wmes either haven't been added yet or have already been removed from the kernel
-		// but still exist in gSKI.  In both cases, we can't (naturally) get a correct time tag for the wme
-		// so I think we should skip these wmes.  That's clearly correct if the wme has been removed, but I'm
-		// less sure if it's in the process of getting added.
-		if (pWME->HasBeenRemoved())
-		{
-			pWME->Release() ;
-			iter->Next() ;
-
-			continue ;
-		}
-
-		TagWme* pTagWme = new TagWme() ;
-
-		// Sometimes gSKI's owning object links are null -- esp. on the output side so I'm adding
-		// a workaround to use the root object's ID.
-		if (pWME->GetOwningObject())
-			pTagWme->SetIdentifier(pWME->GetOwningObject()->GetId()->GetString()) ;
-		else
-			pTagWme->SetIdentifier(pRoot->GetId()->GetString()) ;
-
-		pTagWme->SetAttribute(pWME->GetAttribute()->GetString()) ;
-		pTagWme->SetValue(pWME->GetValue()->GetString(), GetValueType(pWME->GetValue()->GetType())) ;
-		pTagWme->SetTimeTag(pWME->GetTimeTag()) ;
-		pTagWme->SetActionAdd() ;
-
-		// Add this wme into the result
-		pTagResult->AddChild(pTagWme) ;
-
-		// If this is an identifier then add all of its children too
-		if (pWME->GetValue()->GetType() == gSKI_OBJECT)
-		{
-			gSKI::IWMObject* pChild = pWME->GetValue()->GetObject() ;
-
-			// Check that we haven't already added this identifier before
-			// (there can be cycles).
-			if (std::find(pTraversedList->begin(), pTraversedList->end(), pChild) == pTraversedList->end())
-			{
-				pTraversedList->push_back(pChild) ;
-				AddWmeChildrenToXML(pChild, pTagResult, pTraversedList) ;
-			}
-		}
-
-		pWME->Release() ;
-		iter->Next() ;
-	}
-
-	iter->Release() ;
-
-	return true ;
-}
-
-// Send the current state of the input link back to the caller.  (This is not a commonly used method).
-bool KernelSML::HandleGetAllInput(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)
-{
-	// This is not available on the gSKI removal branch yet -- more work needed to implement it.
-	assert(false) ;
-
-	// Create the result tag
-	TagResult* pTagResult = new TagResult() ;
-
-	// Walk the list of wmes on the input link and send them over
-	gSKI::IWMObject* pRootObject = NULL ;
-	pAgentSML->m_inputlink->GetRootObject(&pRootObject) ;
-
-	// We need to keep track of which identifiers we've already added
-	// because this is a graph, so we may cycle back.
-	std::list<gSKI::IWMObject*> traversedList ;
-
-	// Add this wme's children to XML
-	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
-
-	// Add the result tag to the response
-	pResponse->AddChild(pTagResult) ;
-
-	if (pRootObject)
-		pRootObject->Release() ;
-
-	// Return true to indicate we've filled in all of the result tag we need
-	return true ;
-}
-
+//static char const* GetValueType(egSKISymbolType type)
+//{
+//	switch (type)
+//	{
+//	case gSKI_DOUBLE: return sml_Names::kTypeDouble ;
+//	case gSKI_INT:	  return sml_Names::kTypeInt ;
+//	case gSKI_STRING: return sml_Names::kTypeString ;
+//	case gSKI_OBJECT: return sml_Names::kTypeID ;
+//	default: return NULL ;
+//	}
+//}
+//
+//static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, ElementXML* pTagResult, std::list<gSKI::IWMObject*> *pTraversedList)
+//{
+//	if (!pRoot || !pTagResult)
+//		return false ;
+//
+//	gSKI::tIWmeIterator* iter = pRoot->GetWMEs() ;
+//
+//	while (iter->IsValid())
+//	{
+//		gSKI::IWme* pWME = iter->GetVal() ;
+//
+//		// In some cases, wmes either haven't been added yet or have already been removed from the kernel
+//		// but still exist in gSKI.  In both cases, we can't (naturally) get a correct time tag for the wme
+//		// so I think we should skip these wmes.  That's clearly correct if the wme has been removed, but I'm
+//		// less sure if it's in the process of getting added.
+//		if (pWME->HasBeenRemoved())
+//		{
+//			pWME->Release() ;
+//			iter->Next() ;
+//
+//			continue ;
+//		}
+//
+//		TagWme* pTagWme = new TagWme() ;
+//
+//		// Sometimes gSKI's owning object links are null -- esp. on the output side so I'm adding
+//		// a workaround to use the root object's ID.
+//		if (pWME->GetOwningObject())
+//			pTagWme->SetIdentifier(pWME->GetOwningObject()->GetId()->GetString()) ;
+//		else
+//			pTagWme->SetIdentifier(pRoot->GetId()->GetString()) ;
+//
+//		pTagWme->SetAttribute(pWME->GetAttribute()->GetString()) ;
+//		pTagWme->SetValue(pWME->GetValue()->GetString(), GetValueType(pWME->GetValue()->GetType())) ;
+//		pTagWme->SetTimeTag(pWME->GetTimeTag()) ;
+//		pTagWme->SetActionAdd() ;
+//
+//		// Add this wme into the result
+//		pTagResult->AddChild(pTagWme) ;
+//
+//		// If this is an identifier then add all of its children too
+//		if (pWME->GetValue()->GetType() == gSKI_OBJECT)
+//		{
+//			gSKI::IWMObject* pChild = pWME->GetValue()->GetObject() ;
+//
+//			// Check that we haven't already added this identifier before
+//			// (there can be cycles).
+//			if (std::find(pTraversedList->begin(), pTraversedList->end(), pChild) == pTraversedList->end())
+//			{
+//				pTraversedList->push_back(pChild) ;
+//				AddWmeChildrenToXML(pChild, pTagResult, pTraversedList) ;
+//			}
+//		}
+//
+//		pWME->Release() ;
+//		iter->Next() ;
+//	}
+//
+//	iter->Release() ;
+//
+//	return true ;
+//}
+//
+//// Send the current state of the input link back to the caller.  (This is not a commonly used method).
+//bool KernelSML::HandleGetAllInput(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)
+//{
+//	// This is not available on the gSKI removal branch yet -- more work needed to implement it.
+//	assert(false) ;
+//
+//	// Create the result tag
+//	TagResult* pTagResult = new TagResult() ;
+//	pTagResult->SetName(sml_Names::kCommand_Input) ;
+//
+//	agent* pSoarAgent = pAgentSML->GetSoarAgent() ;
+//
+//	// Walk the list of wmes on the input link and send them over
+//	gSKI::IWMObject* pRootObject = NULL ;
+//	pAgentSML->m_inputlink->GetRootObject(&pRootObject) ;
+//
+//	// We need to keep track of which identifiers we've already added
+//	// because this is a graph, so we may cycle back.
+//	std::list<gSKI::IWMObject*> traversedList ;
+//
+//	// Add this wme's children to XML
+//	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
+//
+//	// Add the result tag to the response
+//	pResponse->AddChild(pTagResult) ;
+//
+//	if (pRootObject)
+//		pRootObject->Release() ;
+//
+//	// Return true to indicate we've filled in all of the result tag we need
+//	return true ;
+//}
+//
 // Send the current state of the output link back to the caller.  (This is not a commonly used method).
 bool KernelSML::HandleGetAllOutput(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)
 {

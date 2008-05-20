@@ -229,11 +229,11 @@ bool RunScheduler::IsAgentFinished(AgentSML* pAgentSML, bool forever, smlRunStep
 	bool finished = (difference >= count) && !forever;
 
 						   
-	// if a gSKI_STOP_AFTER_DECISION_CYCLE is requested,  then
+	// if a sml_STOP_AFTER_DECISION_CYCLE is requested,  then
 	// agents that are running by Decisions should get marked as finished.
 	// They will generate interrupt in MoveTo_StopBeforePhase
 					   
-	if ( ((sml_DECISION == runStepSize) || forever) && (pAgentSML->GetInterruptFlags() & gSKI_STOP_AFTER_DECISION_CYCLE) )					  
+	if ( ((sml_DECISION == runStepSize) || forever) && (pAgentSML->GetInterruptFlags() & sml_STOP_AFTER_DECISION_CYCLE) )					  
 	{
 		finished = true;					 
 	}
@@ -485,7 +485,7 @@ void RunScheduler::MoveTo_StopBeforePhase(bool forever, smlRunStepSize runStepSi
 				// while the agent was stopped at the m_StopBeforePhase, yet the agent run logic has
 				// dropped thru to this point without generating the interrupt yet.
 				if ((m_StopBeforePhase == phase) && (pAgent->GetRunState() == sml_RUNSTATE_STOPPED) &&
-					(pAgent->GetInterruptFlags() & gSKI_STOP_AFTER_DECISION_CYCLE))
+					(pAgent->GetInterruptFlags() & sml_STOP_AFTER_DECISION_CYCLE))
 				{
 					pAgent->SetRunState(sml_RUNSTATE_INTERRUPTED);
 					runResult = pAgent->StepInClientThread(sml_PHASE) ; // force interrupt

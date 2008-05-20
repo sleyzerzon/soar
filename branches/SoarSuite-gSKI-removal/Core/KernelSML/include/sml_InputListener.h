@@ -27,9 +27,6 @@ protected:
 
 	void ProcessPendingInput(AgentSML* pAgentSML, int callbacktype) ;
 
-	bool AddInputWME(AgentSML* pAgentSML, char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
-	bool RemoveInputWME(AgentSML* pAgentSML, char const* pTimeTag) ;
-
 public:
 	InputListener()
 	{

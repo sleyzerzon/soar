@@ -69,8 +69,8 @@ typedef TimeTagMap::iterator				TimeTagMapIter ;
 typedef TimeTagMap::const_iterator			TimeTagMapConstIter ;
 
 // Map from client side time tag to a kernel time tag
-typedef std::map< std::string, long >	TimeMap ;
-typedef TimeMap::iterator				TimeMapIter ;
+typedef std::map< std::string, long >		TimeMap ;
+typedef TimeMap::iterator					TimeMapIter ;
 
 // List of input messages waiting for the next input phase callback from the kernel
 typedef std::list<ElementXML*>				PendingInputList ;
@@ -89,6 +89,9 @@ public:
 	gSKI::InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
 
 	static void InputPhaseCallback( soar_callback_agent agent, soar_callback_event_id eventid, soar_callback_data callbackdata, soar_call_data calldata );
+
+	bool AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
+	bool RemoveInputWME(char const* pTimeTag) ;
 
 protected:
 

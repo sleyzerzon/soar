@@ -484,16 +484,6 @@ Identifier* WorkingMemory::GetInputLink()
 		if (GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_GetInputLink, GetAgentName()))
 		{
 			m_InputLink = new Identifier(GetAgent(), response.GetResultString(), GenerateTimeTag()) ;
-
-#ifdef SML_DIRECT
-			if (GetConnection()->IsDirectConnection())
-			{
-				Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName()) ;
-				Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetRoot(GetAgent()->GetAgentName()) ;
-				m_InputLink->SetWorkingMemoryHandle(wm) ;
-				m_InputLink->SetWMObjectHandle(wmobject) ;
-			}
-#endif
 		}
 	}
 
@@ -513,103 +503,106 @@ Identifier* WorkingMemory::GetInputLink()
 *************************************************************/
 bool WorkingMemory::SynchronizeInputLink()
 {
-	// Not supported for direct connections
-	if (GetConnection()->IsDirectConnection())
-		return false ;
+	assert(false); // not implemented yet
+	return false;
 
-	AnalyzeXML response ;
-
-	// Call to the kernel to get the current state of the input link
-	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_GetAllInput, GetAgentName()) ;
-	
-	if (!ok)
-		return false ;
-
-#ifdef _DEBUG
-	char* pStr = response.GenerateXMLString(true) ;
-#endif
-
-	// Erase the existing input link and create a new representation from scratch
-	delete m_InputLink ;
-	m_InputLink = NULL ;
-
-	GetInputLink() ;
-
-	// Get the result tag which contains the list of wmes
-	ElementXML const* pMain = response.GetResultTag() ;
-
-	int nChildren = pMain->GetNumberChildren() ;
-
-	ElementXML wmeXML(NULL) ;
-	ElementXML* pWmeXML = &wmeXML ;
-
-	bool tracing = this->GetAgent()->GetKernel()->IsTracingCommunications() ;
-
-	for (int i = 0 ; i < nChildren ; i++)
-	{
-		pMain->GetChild(&wmeXML, i) ;
-
-		// Ignore tags that aren't wmes.
-		if (!pWmeXML->IsTag(sml_Names::kTagWME))
-			continue ;
-
-		// Get the wme information
-		char const* pID			= pWmeXML->GetAttribute(sml_Names::kWME_Id) ;	// These IDs will be kernel side ids (e.g. "I3" not "i3")
-		char const* pAttribute  = pWmeXML->GetAttribute(sml_Names::kWME_Attribute) ;
-		char const* pValue		= pWmeXML->GetAttribute(sml_Names::kWME_Value) ;
-		char const* pType		= pWmeXML->GetAttribute(sml_Names::kWME_ValueType) ;	// Can be NULL (=> string)
-		char const* pTimeTag	= pWmeXML->GetAttribute(sml_Names::kWME_TimeTag) ;	// These will be kernel side time tags (e.g. +5 not -7)
-
-		// Set the default value
-		if (!pType)
-			pType = sml_Names::kTypeString ;
-
-		// Check we got everything we need
-		if (!pID || !pAttribute || !pValue || !pTimeTag)
-			continue ;
-
-		if (tracing)
-		{
-			sml::PrintDebugFormat("Received input wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
-		}
-
-		long timeTag = atoi(pTimeTag) ;
-
-		// Find the parent wme that we're adding this new wme to
-		// (Actually, there can be multiple WMEs that have this identifier
-		//  as its value, but any one will do because the true parent is the
-		//  identifier symbol which is the same for any identifiers).
-		Identifier* pParent = FindIdentifier(pID, true, false) ;
-		WMElement* pAddWme = NULL ;
-
-		if (pParent)
-		{
-			// Create a client side wme object to match the input wme and add it to
-			// our tree of objects.
-			pAddWme = CreateWME(pParent, pID, pAttribute, pValue, pType, timeTag) ;
-			if (pAddWme)
-			{
-				pParent->AddChild(pAddWme) ;
-			}
-			else
-			{
-				sml::PrintDebugFormat("Unable to create an input wme -- type was not recognized") ;
-				GetAgent()->SetDetailedError(Error::kOutputError, "Unable to create an input wme -- type was not recognized") ;
-			}
-		}
-		else
-		{
-			if (tracing)
-				sml::PrintDebugFormat("Received input wme (orphaned): %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
-		}
-	}
-
-#ifdef _DEBUG
-	response.DeleteString(pStr) ;
-#endif
-
-	// Returns false if had any errors
-	return ok ;
+//	// Not supported for direct connections
+//	if (GetConnection()->IsDirectConnection())
+//		return false ;
+//
+//	AnalyzeXML response ;
+//
+//	// Call to the kernel to get the current state of the input link
+//	bool ok = GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_GetAllInput, GetAgentName()) ;
+//	
+//	if (!ok)
+//		return false ;
+//
+//#ifdef _DEBUG
+//	char* pStr = response.GenerateXMLString(true) ;
+//#endif
+//
+//	// Erase the existing input link and create a new representation from scratch
+//	delete m_InputLink ;
+//	m_InputLink = NULL ;
+//
+//	GetInputLink() ;
+//
+//	// Get the result tag which contains the list of wmes
+//	ElementXML const* pMain = response.GetResultTag() ;
+//
+//	int nChildren = pMain->GetNumberChildren() ;
+//
+//	ElementXML wmeXML(NULL) ;
+//	ElementXML* pWmeXML = &wmeXML ;
+//
+//	bool tracing = this->GetAgent()->GetKernel()->IsTracingCommunications() ;
+//
+//	for (int i = 0 ; i < nChildren ; i++)
+//	{
+//		pMain->GetChild(&wmeXML, i) ;
+//
+//		// Ignore tags that aren't wmes.
+//		if (!pWmeXML->IsTag(sml_Names::kTagWME))
+//			continue ;
+//
+//		// Get the wme information
+//		char const* pID			= pWmeXML->GetAttribute(sml_Names::kWME_Id) ;	// These IDs will be kernel side ids (e.g. "I3" not "i3")
+//		char const* pAttribute  = pWmeXML->GetAttribute(sml_Names::kWME_Attribute) ;
+//		char const* pValue		= pWmeXML->GetAttribute(sml_Names::kWME_Value) ;
+//		char const* pType		= pWmeXML->GetAttribute(sml_Names::kWME_ValueType) ;	// Can be NULL (=> string)
+//		char const* pTimeTag	= pWmeXML->GetAttribute(sml_Names::kWME_TimeTag) ;	// These will be kernel side time tags (e.g. +5 not -7)
+//
+//		// Set the default value
+//		if (!pType)
+//			pType = sml_Names::kTypeString ;
+//
+//		// Check we got everything we need
+//		if (!pID || !pAttribute || !pValue || !pTimeTag)
+//			continue ;
+//
+//		if (tracing)
+//		{
+//			sml::PrintDebugFormat("Received input wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
+//		}
+//
+//		long timeTag = atoi(pTimeTag) ;
+//
+//		// Find the parent wme that we're adding this new wme to
+//		// (Actually, there can be multiple WMEs that have this identifier
+//		//  as its value, but any one will do because the true parent is the
+//		//  identifier symbol which is the same for any identifiers).
+//		Identifier* pParent = FindIdentifier(pID, true, false) ;
+//		WMElement* pAddWme = NULL ;
+//
+//		if (pParent)
+//		{
+//			// Create a client side wme object to match the input wme and add it to
+//			// our tree of objects.
+//			pAddWme = CreateWME(pParent, pID, pAttribute, pValue, pType, timeTag) ;
+//			if (pAddWme)
+//			{
+//				pParent->AddChild(pAddWme) ;
+//			}
+//			else
+//			{
+//				sml::PrintDebugFormat("Unable to create an input wme -- type was not recognized") ;
+//				GetAgent()->SetDetailedError(Error::kOutputError, "Unable to create an input wme -- type was not recognized") ;
+//			}
+//		}
+//		else
+//		{
+//			if (tracing)
+//				sml::PrintDebugFormat("Received input wme (orphaned): %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
+//		}
+//	}
+//
+//#ifdef _DEBUG
+//	response.DeleteString(pStr) ;
+//#endif
+//
+//	// Returns false if had any errors
+//	return ok ;
 }
 
 /*************************************************************
@@ -694,12 +687,12 @@ StringElement* WorkingMemory::CreateStringWME(Identifier* parent, char const* pA
 	parent->AddChild(pWME) ;
 
 #ifdef SML_DIRECT
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-	if (GetConnection()->IsDirectConnection() && wm)
+	if ( GetConnection()->IsDirectConnection() )
 	{
-		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_String(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, pValue) ;
-		pWME->SetWMEHandle(wme) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+
+		pConnection->DirectAddWME_String( agentSMLHandle, parent->GetIdentifierName(), pAttribute, pValue, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -730,12 +723,12 @@ IntElement* WorkingMemory::CreateIntWME(Identifier* parent, char const* pAttribu
 	parent->AddChild(pWME) ;
 
 #ifdef SML_DIRECT
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-	if (GetConnection()->IsDirectConnection() && wm)
+	if ( GetConnection()->IsDirectConnection() )
 	{
-		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Int(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, value) ;
-		pWME->SetWMEHandle(wme) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+
+		pConnection->DirectAddWME_Int( agentSMLHandle, parent->GetIdentifierName(), pAttribute, value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -766,12 +759,12 @@ FloatElement* WorkingMemory::CreateFloatWME(Identifier* parent, char const* pAtt
 	parent->AddChild(pWME) ;
 
 #ifdef SML_DIRECT
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-	if (GetConnection()->IsDirectConnection() && wm)
+	if ( GetConnection()->IsDirectConnection() )
 	{
-		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Double(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, value) ;
-		pWME->SetWMEHandle(wme) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+
+		pConnection->DirectAddWME_Double( agentSMLHandle, parent->GetIdentifierName(), pAttribute, value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -819,17 +812,14 @@ void WorkingMemory::UpdateString(StringElement* pWME, char const* pValue)
 	pWME->GenerateNewTimeTag() ;
 
 #ifdef SML_DIRECT
-	IdentifierSymbol* parent = pWME->GetIdentifier() ;
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-
-	if (GetConnection()->IsDirectConnection() && wm)
+	if ( GetConnection()->IsDirectConnection() )
 	{
-		// Remove the existing wme.  This releases the gSKI WME as well, invalidating our WMEHandle which we will replace in a moment.
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), removeTimeTag) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
 
-		// Add the new value immediately
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_String(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pWME->GetAttribute(), pValue) ;
-		pWME->SetWMEHandle(wme) ;
+		pConnection->DirectRemoveWME( agentSMLHandle, removeTimeTag );
+
+		pConnection->DirectAddWME_String( agentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), pValue, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return ;
@@ -870,17 +860,14 @@ void WorkingMemory::UpdateInt(IntElement* pWME, int value)
 	pWME->GenerateNewTimeTag() ;
 
 #ifdef SML_DIRECT
-	IdentifierSymbol* parent = pWME->GetIdentifier() ;
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-
-	if (GetConnection()->IsDirectConnection())
+	if ( GetConnection()->IsDirectConnection() )
 	{
-		// Remove the existing wme.  This releases the gSKI WME as well, invalidating our WMEHandle which we will replace in a moment.
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), removeTimeTag) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
 
-		// Add the new value immediately
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Int(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pWME->GetAttribute(), value) ;
-		pWME->SetWMEHandle(wme) ;
+		pConnection->DirectRemoveWME( agentSMLHandle, removeTimeTag );
+
+		pConnection->DirectAddWME_Int( agentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return ;
@@ -923,17 +910,14 @@ void WorkingMemory::UpdateFloat(FloatElement* pWME, double value)
 	pWME->GenerateNewTimeTag() ;
 
 #ifdef SML_DIRECT
-	IdentifierSymbol* parent = pWME->GetIdentifier() ;
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-
-	if (GetConnection()->IsDirectConnection() && wm)
+	if ( GetConnection()->IsDirectConnection() )
 	{
-		// Remove the existing wme.  This releases the gSKI WME as well, invalidating our WMEHandle which we will replace in a moment.
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), removeTimeTag) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
 
-		// Add the new value immediately
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddWME_Double(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pWME->GetAttribute(), value) ;
-		pWME->SetWMEHandle(wme) ;
+		pConnection->DirectRemoveWME( agentSMLHandle, removeTimeTag );
+
+		pConnection->DirectAddWME_Double( agentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return ;
@@ -1003,15 +987,12 @@ Identifier* WorkingMemory::CreateIdWME(Identifier* parent, char const* pAttribut
 	parent->AddChild(pWME) ;
 
 #ifdef SML_DIRECT
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-
-	if (GetConnection()->IsDirectConnection() && wm)
+	if (GetConnection()->IsDirectConnection())
 	{
-		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectAddID(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute) ;
-		Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetThisWMObject(wm, wme) ;
-		pWME->SetWMEHandle(wme) ;
-		pWME->SetWMObjectHandle(wmobject) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+
+		pConnection->DirectAddID( agentSMLHandle, parent->GetIdentifierName(), pAttribute, id.c_str(), pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -1048,14 +1029,12 @@ Identifier*	WorkingMemory::CreateSharedIdWME(Identifier* parent, char const* pAt
 	parent->AddChild(pWME) ;
 
 #ifdef SML_DIRECT
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-	if (GetConnection()->IsDirectConnection() && wm)
+	if (GetConnection()->IsDirectConnection())
 	{
-		// Add the wme immediately and return the new object.
-		Direct_WME_Handle wme = ((EmbeddedConnection*)GetConnection())->DirectLinkID(wm, parent->GetWMObjectHandle(), pWME->GetTimeTag(), pAttribute, pSharedValue->GetWMObjectHandle()) ;
-		Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetThisWMObject(wm, wme) ;
-		pWME->SetWMEHandle(wme) ;
-		pWME->SetWMObjectHandle(wmobject) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+
+		pConnection->DirectAddID( agentSMLHandle, parent->GetIdentifierName(), pAttribute, id.c_str(), pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -1096,14 +1075,12 @@ bool WorkingMemory::DestroyWME(WMElement* pWME)
 	parent->RemoveChild(pWME) ;
 
 #ifdef SML_DIRECT
-	Direct_WorkingMemory_Handle wm = parent->GetWorkingMemoryHandle() ;
-
-	if (GetConnection()->IsDirectConnection() && wm)
+	if ( GetConnection()->IsDirectConnection() )
 	{
-		// Remove the wme immediately, which also invalidates the handle, so clear it immediately
-		// (or we'll crash in the destructor for pWME just below)
-		((EmbeddedConnection*)GetConnection())->DirectRemoveWME(wm, pWME->GetWMEHandle(), pWME->GetTimeTag()) ;
-		pWME->SetWMEHandle(0) ;
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+
+		pConnection->DirectRemoveWME( agentSMLHandle, pWME->GetTimeTag() );
 
 		// Return immediately, without adding it to the commit list
 		delete pWME ;
@@ -1231,19 +1208,6 @@ void WorkingMemory::Refresh()
 			// change value (since it's architecturally created) and also adding a method to set the identifier value
 			// is a bad idea if we only need it here.
 			std::string result = response.GetResultString() ;
-
-	#ifdef SML_DIRECT
-			// Get the current input link object ids
-			if (GetConnection()->IsDirectConnection())
-			{
-				m_InputLink->ClearAllWMObjectHandles() ;
-
-				Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName()) ;
-				Direct_WMObject_Handle wmobject = ((EmbeddedConnection*)GetConnection())->DirectGetRoot(GetAgent()->GetAgentName()) ;
-				m_InputLink->SetWorkingMemoryHandle(wm) ;
-				m_InputLink->SetWMObjectHandle(wmobject) ;
-			}
-	#endif
 		}
 
 		m_InputLink->Refresh() ;
@@ -1264,20 +1228,4 @@ void WorkingMemory::Refresh()
 		//assert(outputs == 0) ;
 		m_OutputLink->GetSymbol()->DeleteAllChildren() ;
 	}
-}
-
-int WorkingMemory::GetIWMObjMapSize()
-{
-	int result = -1;
-#ifdef SML_DIRECT
-	if (GetConnection()->IsDirectConnection())
-	{
-		Direct_WorkingMemory_Handle wm = ((EmbeddedConnection*)GetConnection())->DirectGetWorkingMemory(GetAgent()->GetAgentName()) ;
-		if (wm)
-		{
-			result = ((EmbeddedConnection*)GetConnection())->DirectGetIWMObjMapSize(wm);
-		}
-	}
-#endif
-	return result;
 }

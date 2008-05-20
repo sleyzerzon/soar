@@ -16,7 +16,7 @@
 namespace gSKI {
 
    // Forward Declarations
-   class IWorkingMemory;
+   class InputWorkingMemory;
    class IWMObject;
    
    /**

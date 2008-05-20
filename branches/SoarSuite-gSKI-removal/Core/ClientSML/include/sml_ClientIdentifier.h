@@ -51,17 +51,6 @@ protected:
 	// This is true if the list of children of this identifier was changed.  The client chooses when to clear these flags.
 	bool m_AreChildrenModified ;
 
-// The gSKI objects for this wme.  This allows us to optimize the embedded connection.
-#ifdef SML_DIRECT
-protected:
-	Direct_WorkingMemory_Handle	m_WM ;
-	Direct_WMObject_Handle		m_WMObject ;
-
-public:
-	Direct_WorkingMemory_Handle GetWorkingMemoryHandle()		{ return m_WM ; }
-	Direct_WMObject_Handle		GetWMObjectHandle()				{ return m_WMObject ; }
-#endif
-
 public:
 	IdentifierSymbol(Identifier* pIdentifier) ;
 	~IdentifierSymbol() ;
@@ -247,16 +236,7 @@ protected:
 	void RemoveChild(WMElement* pWME) { m_pSymbol->RemoveChild(pWME) ; }
 
 #ifdef SML_DIRECT
-	void SetWorkingMemoryHandle(Direct_WorkingMemory_Handle wm) { m_pSymbol->m_WM = wm ; }
-	void SetWMObjectHandle(Direct_WMObject_Handle wmobject)		{ m_pSymbol->m_WMObject = wmobject ; }
-
-	Direct_WorkingMemory_Handle GetWorkingMemoryHandle()		{ return m_pSymbol->m_WM ; }
-	Direct_WMObject_Handle		GetWMObjectHandle()				{ return m_pSymbol->m_WMObject ; }
-
-	// Reset all handles to 0
-	void ClearAllWMObjectHandles() ;
-
-	virtual Direct_WME_Handle DirectAdd(Direct_WorkingMemory_Handle wm, Direct_WMObject_Handle wmobject, long timeTag) ;
+	virtual void DirectAdd(Direct_AgentSML_Handle pAgentSML, long timeTag) ;
 #endif
 
 	// Send over to the kernel again

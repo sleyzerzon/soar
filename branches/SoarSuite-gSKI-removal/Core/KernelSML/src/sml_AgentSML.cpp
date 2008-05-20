@@ -1023,3 +1023,242 @@ void AgentSML::InputPhaseCallback(soar_callback_agent /*agent*/,
 	KernelSML::GetKernelSML()->ReceiveAllMessages();	
 }
 
+bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pClientTimeTag)
+{
+	static bool kMaintainHashTable = false ; // wtf
+
+
+	// TODO: 
+	// If input performance continues to be an issue, maybe some of these checks are redundant and can be removed.
+
+	// Begin sanity check
+	// This function requires client side identifiers and timetags
+	CHECK_RET_FALSE( pID );		// must have id
+	// FIXME: enable, I2 seems to be a special case
+	//CHECK_RET_FALSE( islower( pID[0] ) );	// id must be lower case
+
+	CHECK_RET_FALSE( pAttribute );		// must have attribute
+
+	CHECK_RET_FALSE( pValue );
+	if ( pType == sml_Names::kTypeID ) // if we're making a shared identifier
+	{
+		// the shared ID must be client side
+		CHECK_RET_FALSE( isalpha( pValue[0] ) );	// id must be alpha
+		CHECK_RET_FALSE( islower( pValue[0] ) );	// id must be lower case
+	}
+
+	// must have client side timetag
+	CHECK_RET_FALSE( pClientTimeTag );
+	CHECK_RET_FALSE( atoi( pClientTimeTag ) < 0 ) ;
+	// End sanity check
+
+	// Convert ID to kernel side.
+	CHECK_RET_FALSE(strlen(pID) >= 2) ;
+
+	std::string idKernel ;
+	ConvertID(pID, &idKernel) ;
+
+	char idLetter = idKernel[0] ;
+	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
+
+	Symbol* pValueSymbol = 0 ;
+
+	if (IsStringEqual(sml_Names::kTypeString, pType)) 
+	{
+		// Creating a wme with a string constant value
+		pValueSymbol = get_io_sym_constant(m_agent, pValue) ;
+
+	} 
+	else if (IsStringEqual(sml_Names::kTypeInt, pType)) 
+	{
+		// Creating a WME with an int value
+		int value = atoi(pValue) ;
+		pValueSymbol = get_io_int_constant(m_agent, value) ;
+
+	} 
+	else if (IsStringEqual(sml_Names::kTypeDouble, pType)) 
+	{
+		// Creating a WME with a float value
+		float value = (float)atof(pValue) ;
+		pValueSymbol = get_io_float_constant(m_agent, value) ;
+
+	} 
+	else if (IsStringEqual(sml_Names::kTypeID, pType)) 
+	{
+
+		// We will always receive a client-side identifier
+		// If that identifier is found when we try to convert it, it already exists in the kernel, we make a shared id.
+		// If that identifier is not found when we try to convert it, we make a new identifier.
+		
+		std::string idValue ;
+		int idValueNumber = 0 ;
+		char idValueLetter = 0;
+		bool didntFindId = true;
+
+		if ( ConvertID( pValue, &idValue ) )
+		{
+			// we found a kernel side mapping, shared id
+			didntFindId = false;	// for sanity check below
+			idValueLetter = idValue[0];
+			idValueNumber = atoi( &(idValue.c_str()[1]) ) ;
+		}
+		else 
+		{
+			// no kernel side mapping, new id
+
+			// new id based on first character of attribute
+			if ( isalpha( pAttribute[0] ) )
+			{
+				idValueLetter = pAttribute[0];				// take the first letter of the attribute
+				idValueLetter = (char)toupper( idValueLetter );	// make it upper case
+			} 
+			else 
+			{
+				idValueLetter = 'I';	// attribute is not alpha, use default 'I'
+			}
+			// Number is ignored in new ID case
+		}
+
+		// Find/create the identifier
+		pValueSymbol = get_io_identifier( m_agent, idValueLetter, idValueNumber ) ;
+
+		// If we just created this symbol record it in our mapping table
+		if (pValueSymbol->common.reference_count == 1)
+		{
+			CHECK_RET_FALSE( didntFindId );		// sanity check: if we're here, we better not have found the id in the conversion
+			
+			// We need to record the id that the kernel assigned to this object and match it against the id the
+			// client is using, so that in future we can map the client's id to the kernel's.
+			std::ostringstream buffer;
+			buffer << pValueSymbol->id.name_letter ;
+			buffer << pValueSymbol->id.name_number ;
+
+			this->RecordIDMapping(pValue, buffer.str().c_str()) ;
+
+			//if (kDebugInput)
+			//{
+			//	PrintDebugFormat("Recording id mapping of %s to %s", pValue, newid.c_str()) ;
+			//}
+		}
+	}
+
+	// Now create the wme
+	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
+	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
+
+	CHECK_RET_FALSE( pIDSymbol ) ;
+	CHECK_RET_FALSE( pAttrSymbol ) ;
+
+	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
+	CHECK_RET_FALSE( pNewInputWme ) ;
+	long timeTag = pNewInputWme->timetag ;
+
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
+
+	// The kernel doesn't support direct lookup of wme from timetag so we'll
+	// store these values in a hashtable.  Perhaps later we'll see about adding
+	// this support directly into the kernel.
+	this->RecordTime( pClientTimeTag, timeTag ) ;
+
+	if (kMaintainHashTable)
+	{
+		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+	}
+	else
+	{
+		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
+	}
+
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
+
+	return true ;
+}
+
+bool AgentSML::RemoveInputWME(char const* pTimeTag)
+{
+	static bool kMaintainHashTable = false ; // wtf
+
+	// Get the wme that matches this time tag
+	long timetag = this->ConvertTime(pTimeTag) ;
+
+	//if (kDebugInput)
+	//{
+	//	PrintDebugFormat("Before removing wme") ;
+	//	this->PrintKernelTimeTags() ;
+	//}
+
+	wme *pWME ;
+
+	if (!kMaintainHashTable)
+	{
+		pWME = find_input_wme_by_timetag(m_agent, timetag) ;
+	}
+	else
+	{
+		pWME = this->ConvertKernelTimeTag(pTimeTag) ;
+	}
+
+	//if (kDebugInput)
+	//{
+	//    std::string printInput1 = this->ExecuteCommandLine("print --internal --depth 2 I2") ;
+	//	PrintDebugFormat("%s\nLooking for %ld", printInput1.c_str(), timetag) ;
+	//}
+
+	// The wme is already gone so no work to do
+	if (!pWME)
+	{
+		return false ;
+	}
+
+//	wme* pWME = this->ConvertKernelTimeTag(pTimeTag) ;
+
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme("Removing input wme ", pWME, true) ;
+
+	CHECK_RET_FALSE(pWME) ;
+
+	if (pWME->value->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
+		std::ostringstream buffer;
+		buffer << pWME->value->id.name_letter ;
+		buffer << pWME->value->id.name_number ;
+		std::string newid = buffer.str() ;
+
+		// This extra release of the identifier value seems to be required
+		// but I don't understand why.
+		/*Symbol* pIDSymbol = */pWME->value ;
+//		release_io_symbol(this->GetAgent(), pIDSymbol) ;
+//		release_io_symbol(this->GetAgent(), pWME->id) ;
+//		release_io_symbol(this->GetAgent(), pWME->attr) ;
+
+		// Remove this id from the id mapping table
+		// BUGBUG: This seems to be assuming that there's only a single use of this ID in the kernel, but what if it's shared?
+		// I think we might not want to do this and just leave the mapping forever once it has been used.  If the client
+		// re-uses this value we'll continue to map it.
+		//this->RemoveID(id.c_str()) ;
+	}
+
+	Bool ok = remove_input_wme(m_agent, pWME) ;
+
+	// Remove the object from the time tag table because
+	// we no longer own it.
+	if (kMaintainHashTable)
+	{
+		RemoveKernelTimeTag(pTimeTag) ;
+
+		/*unsigned long refCount1 = */release_io_symbol(m_agent, pWME->id) ;
+		/*unsigned long refCount2 = */release_io_symbol(m_agent, pWME->attr) ;
+		/*unsigned long refCount3 = */release_io_symbol(m_agent, pWME->value) ;
+
+		PrintDebugFormat("After removing wme") ;
+		PrintKernelTimeTags() ;
+	}
+
+	CHECK_RET_FALSE(ok) ;
+
+	return (ok != 0) ;
+}
+
