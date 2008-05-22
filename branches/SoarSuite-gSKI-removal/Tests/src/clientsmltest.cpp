@@ -22,13 +22,13 @@ class ClientSMLTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( ClientSMLTest );	
 
-	//CPPUNIT_TEST( testEmbeddedDirectInit );
-	//CPPUNIT_TEST( testEmbeddedDirect );
-	//CPPUNIT_TEST( testEmbedded );
-	//CPPUNIT_TEST( testNewThread );
-	//CPPUNIT_TEST( testNewThreadNoAutoCommit );
-	//CPPUNIT_TEST( testRemote );
-	//CPPUNIT_TEST( testRemoteNoAutoCommit );
+	CPPUNIT_TEST( testEmbeddedDirectInit );
+	CPPUNIT_TEST( testEmbeddedDirect );
+	CPPUNIT_TEST( testEmbedded );
+	CPPUNIT_TEST( testNewThread );
+	CPPUNIT_TEST( testNewThreadNoAutoCommit );
+	CPPUNIT_TEST( testRemote );
+	CPPUNIT_TEST( testRemoteNoAutoCommit );
 	CPPUNIT_TEST( testSimpleCopy );
 	//CPPUNIT_TEST( testSimpleReteNetLoader );
 	CPPUNIT_TEST( testSimpleStopUpdate );
