@@ -69,14 +69,15 @@ typedef TimeTagMap::iterator				TimeTagMapIter ;
 typedef TimeTagMap::const_iterator			TimeTagMapConstIter ;
 
 // Map from client side time tag to a kernel time tag
-typedef std::map< std::string, long >		TimeMap ;
+//typedef std::map< std::string, long >		TimeMap ;
+typedef std::map< long, long >		TimeMap ;
+
 typedef TimeMap::iterator					TimeMapIter ;
 
 // List of input messages waiting for the next input phase callback from the kernel
 typedef std::list<ElementXML*>				PendingInputList ;
 typedef PendingInputList::iterator			PendingInputListIter ;
 
-//typedef std::map< std::string, wme* >		KernelTimeTagMap ;
 typedef std::map< std::string, wme* >		KernelTimeTagMap ;
 typedef KernelTimeTagMap::iterator			KernelTimeTagMapIter ;
 typedef KernelTimeTagMap::const_iterator	KernelTimeTagMapConstIter ;
@@ -91,10 +92,10 @@ public:
 
 	static void InputPhaseCallback( soar_callback_agent agent, soar_callback_event_id eventid, soar_callback_data callbackdata, soar_call_data calldata );
 
-   bool AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag);
-   bool AddIntInputWME(char const* pID, char const* pAttribute, int value, char const* pClientTimeTag);
-   bool AddDoubleInputWME(char const* pID, char const* pAttribute, double value, char const* pClientTimeTag);
-   bool AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag);
+   bool AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
+   bool AddIntInputWME(char const* pID, char const* pAttribute, int value, long clientTimeTag);
+   bool AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag);
+   bool AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
 
 	bool AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
 	bool RemoveInputWME(char const* pTimeTag) ;
@@ -293,6 +294,7 @@ public:
 	*************************************************************/
 	gSKI::IWme* ConvertTimeTag(char const* pTimeTag) ;
 	wme* ConvertKernelTimeTag(char const* pTimeTag) ;
+   long AgentSML::ConvertTime(long clientTimeTag);
 	long ConvertTime(char const* pTimeTag) ;
 
 	// Debug method
@@ -301,7 +303,8 @@ public:
 	void RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWme) ;
 	void RemoveTimeTag(char const* pTimeTag) ;
 	void RecordKernelTimeTag(char const* pTimeTag, wme* pWme) ;
-	void RecordTime(char const* pTimeTag, long time) ;
+   void RecordTime(long clientTimeTag, long kernelTimeTag) ;
+	//void RecordTime(char const* pTimeTag, long time) ;
 	// Used by callback from gSKI to remove records of a wme (timetag) that 
 	// is getting removed due to an object (identifier) deletion
 	void RemoveTimeTagByWmeSLOW(gSKI::IWme* pWme) ;	

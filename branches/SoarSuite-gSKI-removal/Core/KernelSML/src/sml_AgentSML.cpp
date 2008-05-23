@@ -756,12 +756,9 @@ gSKI::IWme* AgentSML::ConvertTimeTag(char const* pTimeTag)
 	}
 }
 
-long AgentSML::ConvertTime(char const* pTimeTag)
+long AgentSML::ConvertTime(long clientTimeTag)
 {
-	if (pTimeTag == NULL)
-		return 0 ;
-
-	TimeMapIter iter = m_TimeMap.find(pTimeTag) ;
+   TimeMapIter iter = m_TimeMap.find(clientTimeTag) ;
 
 	if (iter == m_TimeMap.end())
 	{
@@ -772,6 +769,14 @@ long AgentSML::ConvertTime(char const* pTimeTag)
 		// If we found a mapping, return the mapped value
 		return iter->second ;
 	}
+}
+
+long AgentSML::ConvertTime(char const* pTimeTag)
+{
+	if (pTimeTag == NULL)
+		return 0 ;
+
+   return ConvertTime(atoi(pTimeTag));
 }
 
 /*************************************************************
@@ -824,10 +829,15 @@ void AgentSML::RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWME)
 	m_TimeTagMap[pTimeTag] = pWME ;
 }
 
-void AgentSML::RecordTime(char const* pTimeTag, long time)
+void AgentSML::RecordTime(long clientTimeTag, long kernelTimeTag)
 {
-	m_TimeMap[pTimeTag] = time ;
+   m_TimeMap[clientTimeTag] = kernelTimeTag ;
 }
+
+//void AgentSML::RecordTime(char const* pTimeTag, long time)
+//{
+//   RecordTime(atoi(pTimeTag), time);
+//}
 
 void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
 {
@@ -838,7 +848,7 @@ void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
 	// in indeed a mistake.
 	// If you fail to call commit() after creating a new input wme and then issue an init-soar this assert may fire.
 	// If so, the fix is to call commit().
-	assert (m_KernelTimeTagMap.find(timeTag) == m_KernelTimeTagMap.end()) ;
+	assert (m_KernelTimeTagMap.find(pTimeTag) == m_KernelTimeTagMap.end()) ;
 #endif
 
 	KernelSML::PrintDebugWme("Recording wme ", pWme, true) ;
@@ -1022,7 +1032,7 @@ void AgentSML::InputPhaseCallback(soar_callback_agent /*agent*/,
 	//
 	KernelSML::GetKernelSML()->ReceiveAllMessages();	
 }
-bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag)
+bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag)
 {
    static bool kMaintainHashTable = false ; // wtf
 
@@ -1054,11 +1064,11 @@ bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char c
 	// The kernel doesn't support direct lookup of wme from timetag so we'll
 	// store these values in a hashtable.  Perhaps later we'll see about adding
 	// this support directly into the kernel.
-	this->RecordTime( pClientTimeTag, timeTag ) ;
+	this->RecordTime( clientTimeTag, timeTag ) ;
 
 	if (kMaintainHashTable)
 	{
-		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
 	}
 	else
 	{
@@ -1073,7 +1083,7 @@ bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char c
 	return true ;
 }
 
-bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value, char const* pClientTimeTag)
+bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value, long clientTimeTag)
 {
    static bool kMaintainHashTable = false ; // wtf
 
@@ -1104,11 +1114,11 @@ bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value
 	// The kernel doesn't support direct lookup of wme from timetag so we'll
 	// store these values in a hashtable.  Perhaps later we'll see about adding
 	// this support directly into the kernel.
-	this->RecordTime( pClientTimeTag, timeTag ) ;
+	this->RecordTime( clientTimeTag, timeTag ) ;
 
 	if (kMaintainHashTable)
 	{
-		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
 	}
 	else
 	{
@@ -1123,7 +1133,7 @@ bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value
 	return true ;
 }
 
-bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double value, char const* pClientTimeTag)
+bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag)
 {
    static bool kMaintainHashTable = false ; // wtf
 
@@ -1154,11 +1164,11 @@ bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double
 	// The kernel doesn't support direct lookup of wme from timetag so we'll
 	// store these values in a hashtable.  Perhaps later we'll see about adding
 	// this support directly into the kernel.
-	this->RecordTime( pClientTimeTag, timeTag ) ;
+	this->RecordTime( clientTimeTag, timeTag ) ;
 
 	if (kMaintainHashTable)
 	{
-		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
 	}
 	else
 	{
@@ -1173,7 +1183,7 @@ bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double
 	return true ;
 }
 
-bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag)
+bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag)
 {
    static bool kMaintainHashTable = false ; // wtf
 
@@ -1257,11 +1267,11 @@ bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const
 	// The kernel doesn't support direct lookup of wme from timetag so we'll
 	// store these values in a hashtable.  Perhaps later we'll see about adding
 	// this support directly into the kernel.
-	this->RecordTime( pClientTimeTag, timeTag ) ;
+	this->RecordTime( clientTimeTag, timeTag ) ;
 
 	if (kMaintainHashTable)
 	{
-		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
 	}
 	else
 	{
@@ -1308,29 +1318,30 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 	// Convert ID to kernel side.
 	CHECK_RET_FALSE(strlen(pID) >= 2) ;
 
+   long clientTimeTag = atoi(pClientTimeTag);
 	if (IsStringEqual(sml_Names::kTypeString, pType)) 
 	{
 		// Creating a wme with a string constant value
-		return AddStringInputWME(pID, pAttribute, pValue, pClientTimeTag);
+		return AddStringInputWME(pID, pAttribute, pValue, clientTimeTag);
 
 	} 
 	else if (IsStringEqual(sml_Names::kTypeInt, pType)) 
 	{
 		// Creating a WME with an int value
 		int value = atoi(pValue) ;
-		return AddIntInputWME(pID, pAttribute, value, pClientTimeTag);
+		return AddIntInputWME(pID, pAttribute, value, clientTimeTag);
 
 	} 
 	else if (IsStringEqual(sml_Names::kTypeDouble, pType)) 
 	{
 		// Creating a WME with a float value
 		float value = (float)atof(pValue) ;
-		return AddDoubleInputWME(pID, pAttribute, value, pClientTimeTag);
+		return AddDoubleInputWME(pID, pAttribute, value, clientTimeTag);
 
 	} 
 	else if (IsStringEqual(sml_Names::kTypeID, pType)) 
 	{
-      return AddIdInputWME(pID, pAttribute, pValue, pClientTimeTag);
+      return AddIdInputWME(pID, pAttribute, pValue, clientTimeTag);
 	}
    else
    {
