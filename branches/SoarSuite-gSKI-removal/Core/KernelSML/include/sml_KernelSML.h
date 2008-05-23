@@ -34,6 +34,7 @@ namespace gSKI {
 #include "sml_AgentListener.h"
 #include "sml_UpdateListener.h"
 #include "sml_UntypedListener.h"
+#include "sml_Utils.h" // required for release builds for unused macro
 
 namespace soar_thread
 {
