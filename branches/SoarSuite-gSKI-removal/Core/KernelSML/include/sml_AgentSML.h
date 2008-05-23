@@ -98,8 +98,7 @@ protected:
 	// Keep track of number of instances of client side identifiers
 	IdentifierRefMap m_IdentifierRefMap;
 
-	// Map from client side time tags (as strings) to kernel side WME* objects
-	KernelTimeTagMap	m_KernelTimeTagMap ;
+	// Map from client side time tags to kernel side timetags
 	TimeMap				m_TimeMap ;
 
 	// For cleanup we also need a map from kernel side identifiers to client side ones (for cleanup)
@@ -256,7 +255,7 @@ public:
 	*************************************************************/
 	bool ConvertID(char const* pClientID, std::string* pKernelID) ;
 	void RecordIDMapping(char const* pClientID, char const* pKernelID) ;
-	void RemoveID(char const* pKernelID) ;
+	void RemoveID(char const* pKernelID) ;  // BADBAD: this function only referenced in commented out code
 
 	/*************************************************************
 	* @brief	Converts a time tag from a client side value to
@@ -266,16 +265,7 @@ public:
    long AgentSML::ConvertTime(long clientTimeTag);
 	long ConvertTime(char const* pTimeTag) ;
 
-	// Debug method
-	void PrintKernelTimeTags() ;
-
-	void RemoveTimeTag(char const* pTimeTag) ;
-	void RecordKernelTimeTag(char const* pTimeTag, wme* pWme) ;
    void RecordTime(long clientTimeTag, long kernelTimeTag) ;
-	//void RecordTime(char const* pTimeTag, long time) ;
-
-	void RemoveLongTimeTag(long timeTag) ;
-	void RemoveKernelTimeTag(char const* pTimeTag) ;
 
 	// Register a RHS function with the Soar kernel
 	void RegisterRHSFunction(RhsFunction* pFunction) ;

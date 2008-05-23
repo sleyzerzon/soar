@@ -146,15 +146,15 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	}
 
 	//PrintDebugFormat("About to release kernel wmes") ;
-	PrintKernelTimeTags() ;
-
-	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
-		wme* wme = mapIter->second ;
-		KernelSML::PrintDebugWme("Releasing ", wme, true) ;
-		release_io_symbol(this->GetSoarAgent(), wme->id) ;
-		release_io_symbol(this->GetSoarAgent(), wme->attr) ;
-		release_io_symbol(this->GetSoarAgent(), wme->value) ;
-	}
+	
+   // BADBAD: we don't create or maintain this map anymore -- does this loop need to be replaced with something?
+	//for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
+	//	wme* wme = mapIter->second ;
+	//	KernelSML::PrintDebugWme("Releasing ", wme, true) ;
+	//	release_io_symbol(this->GetSoarAgent(), wme->id) ;
+	//	release_io_symbol(this->GetSoarAgent(), wme->attr) ;
+	//	release_io_symbol(this->GetSoarAgent(), wme->value) ;
+	//}
 
 	for (PendingInputListIter iter = m_PendingInput.begin() ; iter != m_PendingInput.end() ; iter++)
 	{
@@ -163,7 +163,6 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	}
 
 	m_PendingInput.clear() ;
-	m_KernelTimeTagMap.clear() ;
 	m_ToClientIdentifierMap.clear() ;
 	m_IdentifierMap.clear() ;
 	m_IdentifierRefMap.clear() ;
@@ -717,67 +716,9 @@ long AgentSML::ConvertTime(char const* pTimeTag)
    return ConvertTime(atoi(pTimeTag));
 }
 
-/*************************************************************
-* @brief	Converts a time tag from a client side value to
-*			a kernel side object
-*************************************************************/
-wme* AgentSML::ConvertKernelTimeTag(char const* pTimeTag)
-{
-	if (pTimeTag == NULL)
-		return NULL ;
-
-	KernelTimeTagMapIter iter = m_KernelTimeTagMap.find(pTimeTag) ;
-
-	if (iter == m_KernelTimeTagMap.end())
-	{
-		return NULL ;
-	}
-	else
-	{
-		// If we found a mapping, return the mapped value
-		wme* result = iter->second ;
-		return result ;
-	}
-}
-
-// Debug method
-void AgentSML::PrintKernelTimeTags()
-{
-	for (KernelTimeTagMapIter mapIter = m_KernelTimeTagMap.begin() ; mapIter != m_KernelTimeTagMap.end() ; mapIter++) {
-		wme* wme = mapIter->second ;
-		KernelSML::PrintDebugWme("Recorded wme ", wme, true) ;
-	}
-}
-
 void AgentSML::RecordTime(long clientTimeTag, long kernelTimeTag)
 {
    m_TimeMap[clientTimeTag] = kernelTimeTag ;
-}
-
-//void AgentSML::RecordTime(char const* pTimeTag, long time)
-//{
-//   RecordTime(atoi(pTimeTag), time);
-//}
-
-void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
-{
-#ifdef _DEBUG
-	// I believe it correct that a time tag should never be re-used in this context
-	// so I'm including this assert.  However, it's possible this assumption is wrong (in particular after an init-soar?)
-	// so I'm only including it in debug builds and if the assert fails, check the context and make sure that this re-use
-	// in indeed a mistake.
-	// If you fail to call commit() after creating a new input wme and then issue an init-soar this assert may fire.
-	// If so, the fix is to call commit().
-	assert (m_KernelTimeTagMap.find(pTimeTag) == m_KernelTimeTagMap.end()) ;
-#endif
-
-	KernelSML::PrintDebugWme("Recording wme ", pWme, true) ;
-	m_KernelTimeTagMap[pTimeTag] = pWme ;
-}
-
-void AgentSML::RemoveKernelTimeTag(char const* pTimeTag)
-{
-	m_KernelTimeTagMap.erase(pTimeTag) ;
 }
 
 void AgentSML::RegisterRHSFunction(RhsFunction* rhsFunction)
@@ -911,10 +852,11 @@ void AgentSML::InputPhaseCallback(soar_callback_agent /*agent*/,
 	//
 	KernelSML::GetKernelSML()->ReceiveAllMessages();	
 }
+
+// BADBAD: The following AddXInputWME functions share a lot of duplicate code.  Should probably create additional functions for overlapping parts
+
 bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag)
 {
-   static bool kMaintainHashTable = false ; // wtf
-
    std::string idKernel ;
 	ConvertID(pID, &idKernel) ;
 
@@ -940,21 +882,13 @@ bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char c
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
 
-	// The kernel doesn't support direct lookup of wme from timetag so we'll
-	// store these values in a hashtable.  Perhaps later we'll see about adding
-	// this support directly into the kernel.
+	// Keep track of which client timetags correspond to which kernel timetags
 	this->RecordTime( clientTimeTag, timeTag ) ;
 
-	if (kMaintainHashTable)
-	{
-//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
-	}
-	else
-	{
-		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
-		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
-		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
-	}
+	
+	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
 
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
@@ -964,8 +898,6 @@ bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char c
 
 bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value, long clientTimeTag)
 {
-   static bool kMaintainHashTable = false ; // wtf
-
    std::string idKernel ;
 	ConvertID(pID, &idKernel) ;
 
@@ -990,21 +922,12 @@ bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
 
-	// The kernel doesn't support direct lookup of wme from timetag so we'll
-	// store these values in a hashtable.  Perhaps later we'll see about adding
-	// this support directly into the kernel.
+   // Keep track of which client timetags correspond to which kernel timetags
 	this->RecordTime( clientTimeTag, timeTag ) ;
 
-	if (kMaintainHashTable)
-	{
-//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
-	}
-	else
-	{
-		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
-		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
-		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
-	}
+	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
 
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
@@ -1014,8 +937,6 @@ bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value
 
 bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag)
 {
-   static bool kMaintainHashTable = false ; // wtf
-
    std::string idKernel ;
 	ConvertID(pID, &idKernel) ;
 
@@ -1040,21 +961,12 @@ bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
 
-	// The kernel doesn't support direct lookup of wme from timetag so we'll
-	// store these values in a hashtable.  Perhaps later we'll see about adding
-	// this support directly into the kernel.
+	// Keep track of which client timetags correspond to which kernel timetags
 	this->RecordTime( clientTimeTag, timeTag ) ;
 
-	if (kMaintainHashTable)
-	{
-//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
-	}
-	else
-	{
-		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
-		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
-		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
-	}
+	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
 
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
@@ -1064,8 +976,6 @@ bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double
 
 bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag)
 {
-   static bool kMaintainHashTable = false ; // wtf
-
    std::string idKernel ;
 	ConvertID(pID, &idKernel) ;
 
@@ -1143,21 +1053,13 @@ bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
 
-	// The kernel doesn't support direct lookup of wme from timetag so we'll
-	// store these values in a hashtable.  Perhaps later we'll see about adding
-	// this support directly into the kernel.
+	// Keep track of which client timetags correspond to which kernel timetags
 	this->RecordTime( clientTimeTag, timeTag ) ;
 
-	if (kMaintainHashTable)
-	{
-//		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
-	}
-	else
-	{
-		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
-		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
-		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
-	}
+
+	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
 
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
@@ -1167,9 +1069,6 @@ bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const
 
 bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pClientTimeTag)
 {
-	static bool kMaintainHashTable = false ; // wtf
-
-
 	// TODO: 
 	// If input performance continues to be an issue, maybe some of these checks are redundant and can be removed.
 
@@ -1229,8 +1128,6 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 }
 bool AgentSML::RemoveInputWME(long timeTag)
 {
- 	static bool kMaintainHashTable = false ; // wtf
-
 	// Get the wme that matches this time tag
 	long timetag = this->ConvertTime(timeTag) ;
 
@@ -1242,14 +1139,7 @@ bool AgentSML::RemoveInputWME(long timeTag)
 
 	wme *pWME = 0;
 
-	if (!kMaintainHashTable)
-	{
-		pWME = find_input_wme_by_timetag(m_agent, timetag) ;
-	}
-	else
-	{
-//		pWME = this->ConvertKernelTimeTag(pTimeTag) ;
-	}
+	pWME = find_input_wme_by_timetag(m_agent, timetag) ;
 
 	//if (kDebugInput)
 	//{
@@ -1262,8 +1152,6 @@ bool AgentSML::RemoveInputWME(long timeTag)
 	{
 		return false ;
 	}
-
-//	wme* pWME = this->ConvertKernelTimeTag(pTimeTag) ;
 
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme("Removing input wme ", pWME, true) ;
@@ -1292,23 +1180,9 @@ bool AgentSML::RemoveInputWME(long timeTag)
 
 	Bool ok = remove_input_wme(m_agent, pWME) ;
 
-	// Remove the object from the time tag table because
-	// we no longer own it.
-	if (kMaintainHashTable)
-	{
-//		RemoveKernelTimeTag(pTimeTag) ;
-
-		/*unsigned long refCount1 = */release_io_symbol(m_agent, pWME->id) ;
-		/*unsigned long refCount2 = */release_io_symbol(m_agent, pWME->attr) ;
-		/*unsigned long refCount3 = */release_io_symbol(m_agent, pWME->value) ;
-
-		PrintDebugFormat("After removing wme") ;
-		PrintKernelTimeTags() ;
-	}
-
 	CHECK_RET_FALSE(ok) ;
 
-	return (ok != 0) ;
+	return (ok != 0) ;  // BADBAD: redundant with previous line?
 }
 
 bool AgentSML::RemoveInputWME(char const* pTimeTag)
