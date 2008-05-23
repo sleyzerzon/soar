@@ -98,7 +98,8 @@ public:
    bool AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
 
 	bool AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
-	bool RemoveInputWME(char const* pTimeTag) ;
+	bool RemoveInputWME(long timeTag) ;
+   bool RemoveInputWME(char const* pTimeTag) ;
 
 protected:
 

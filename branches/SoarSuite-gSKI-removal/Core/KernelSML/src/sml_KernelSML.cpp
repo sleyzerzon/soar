@@ -813,10 +813,10 @@ EXPORT void sml_DirectRemoveWME(Direct_AgentSML_Handle pAgentSMLIn, long clientT
 	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
 	assert(pAgentSML);
 
-	std::stringstream timetagString;
-	timetagString << clientTimetag;
+//	std::stringstream timetagString;
+//	timetagString << clientTimetag;
 
-	pAgentSML->RemoveInputWME( timetagString.str().c_str() );
+	pAgentSML->RemoveInputWME( clientTimetag );
 }
 
 /*************************************************************

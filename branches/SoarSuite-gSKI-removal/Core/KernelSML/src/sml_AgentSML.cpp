@@ -1348,13 +1348,12 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
       CHECK_RET_FALSE(0);  // bad type
    }
 }
-
-bool AgentSML::RemoveInputWME(char const* pTimeTag)
+bool AgentSML::RemoveInputWME(long timeTag)
 {
-	static bool kMaintainHashTable = false ; // wtf
+ 	static bool kMaintainHashTable = false ; // wtf
 
 	// Get the wme that matches this time tag
-	long timetag = this->ConvertTime(pTimeTag) ;
+	long timetag = this->ConvertTime(timeTag) ;
 
 	//if (kDebugInput)
 	//{
@@ -1370,7 +1369,7 @@ bool AgentSML::RemoveInputWME(char const* pTimeTag)
 	}
 	else
 	{
-		pWME = this->ConvertKernelTimeTag(pTimeTag) ;
+//		pWME = this->ConvertKernelTimeTag(pTimeTag) ;
 	}
 
 	//if (kDebugInput)
@@ -1390,27 +1389,27 @@ bool AgentSML::RemoveInputWME(char const* pTimeTag)
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme("Removing input wme ", pWME, true) ;
 
-	CHECK_RET_FALSE(pWME) ;
+	CHECK_RET_FALSE(pWME) ;  //BADBAD: above check means this will never be triggered; one of the checks should go, but not sure which (can this function be legitimately called with a timetag for a wme that's already been removed?)
 
-	if (pWME->value->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
-		std::ostringstream buffer;
-		buffer << pWME->value->id.name_letter ;
-		buffer << pWME->value->id.name_number ;
-		std::string newid = buffer.str() ;
-
-		// This extra release of the identifier value seems to be required
-		// but I don't understand why.
-		/*Symbol* pIDSymbol = */pWME->value ;
-//		release_io_symbol(this->GetAgent(), pIDSymbol) ;
-//		release_io_symbol(this->GetAgent(), pWME->id) ;
-//		release_io_symbol(this->GetAgent(), pWME->attr) ;
-
-		// Remove this id from the id mapping table
-		// BUGBUG: This seems to be assuming that there's only a single use of this ID in the kernel, but what if it's shared?
-		// I think we might not want to do this and just leave the mapping forever once it has been used.  If the client
-		// re-uses this value we'll continue to map it.
-		//this->RemoveID(id.c_str()) ;
-	}
+//	if (pWME->value->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
+//		std::ostringstream buffer;
+//		buffer << pWME->value->id.name_letter ;
+//		buffer << pWME->value->id.name_number ;
+//		std::string newid = buffer.str() ;
+//
+//		// This extra release of the identifier value seems to be required
+//		// but I don't understand why.
+//		//Symbol* pIDSymbol = pWME->value ;
+////		release_io_symbol(this->GetAgent(), pIDSymbol) ;
+////		release_io_symbol(this->GetAgent(), pWME->id) ;
+////		release_io_symbol(this->GetAgent(), pWME->attr) ;
+//
+//		// Remove this id from the id mapping table
+//		// BUGBUG: This seems to be assuming that there's only a single use of this ID in the kernel, but what if it's shared?
+//		// I think we might not want to do this and just leave the mapping forever once it has been used.  If the client
+//		// re-uses this value we'll continue to map it.
+//		//this->RemoveID(id.c_str()) ;
+//	}
 
 	Bool ok = remove_input_wme(m_agent, pWME) ;
 
@@ -1418,7 +1417,7 @@ bool AgentSML::RemoveInputWME(char const* pTimeTag)
 	// we no longer own it.
 	if (kMaintainHashTable)
 	{
-		RemoveKernelTimeTag(pTimeTag) ;
+//		RemoveKernelTimeTag(pTimeTag) ;
 
 		/*unsigned long refCount1 = */release_io_symbol(m_agent, pWME->id) ;
 		/*unsigned long refCount2 = */release_io_symbol(m_agent, pWME->attr) ;
@@ -1431,5 +1430,10 @@ bool AgentSML::RemoveInputWME(char const* pTimeTag)
 	CHECK_RET_FALSE(ok) ;
 
 	return (ok != 0) ;
+}
+
+bool AgentSML::RemoveInputWME(char const* pTimeTag)
+{
+   return RemoveInputWME(atoi(pTimeTag));
 }
 
