@@ -21,8 +21,6 @@
 #include "sml_AgentSML.h"
 #include "sml_Events.h"
 
-#include "gSKI_Error.h"
-
 #include <assert.h>
 
 using namespace sml ;

@@ -19,10 +19,6 @@
 #include "sml_KernelSML.h"
 #include "sml_RhsFunction.h"
 
-#include "gSKI_InputLink.h"
-#include "IgSKI_Wme.h"
-#include "IgSKI_Symbol.h"
-
 #include "KernelHeaders.h"
 #include "xml.h"
 
@@ -38,8 +34,6 @@ using namespace sml ;
 AgentSML::AgentSML(KernelSML* pKernelSML, agent* pAgent)
 {
 	m_pKernelSML = pKernelSML ;
-	m_InputLinkRoot = NULL ;
-	m_OutputLinkRoot = NULL ;
 	m_SuppressRunEndsEvent = false ;
 
 	m_pAgentRunCallback = new AgentRunCallback() ;
@@ -75,8 +69,6 @@ void AgentSML::Init()
 	// Initializing the soar agent
 	init_soar_agent( m_agent );
 
-	m_inputlink = new gSKI::InputLink(m_agent);
-
 	m_pRhsInterrupt = new InterruptRhsFunction(this) ;
 	m_pRhsConcat    = new ConcatRhsFunction(this) ;
 	m_pRhsExec		= new ExecRhsFunction(this) ;
@@ -101,10 +93,6 @@ AgentSML::~AgentSML()
 	m_agent->active_level = 0; /* Signal that everything should be retracted */
 	m_agent->FIRING_TYPE = IE_PRODS;
 	do_preference_phase (m_agent);   /* allow all i-instantiations to retract */
-
-	// Cleaning up the input and output links and the working memory
-	// object since these are wholly owned by the agent.
-	delete m_inputlink;
 
 	destroy_soar_agent( m_agent );
 }
@@ -155,24 +143,6 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 	{
 		bool forceAdds = false ;	// It doesn't matter if we do these or not as we're about to release everything.  Seems best to not start things up.
 		bool forceRemoves = true ;	// SML may have deleted a wme but gSKI has yet to act on this.  As SML has removed its object we have no way to free the gSKI object w/o doing this update.
-		this->m_inputlink->GetInputLinkMemory()->Update(forceAdds, forceRemoves) ;
-	}
-
-	// Release any WME objects we still own.
-	for (TimeTagMapIter mapIter = m_TimeTagMap.begin() ; mapIter != m_TimeTagMap.end() ; mapIter++)
-	{
-		gSKI::IWme* pWme = mapIter->second ;
-		std::string value = pWme->GetValue()->GetString() ;
-
-		bool deleted = pWme->Release() ;
-
-		if (!deleted)
-		{
-			// Can put a break point here to see if any wmes aren't being deleted when they are released.
-			// Unforunately, we can't assert or do more because that can be valid (others places might validly have a reference to pWme).
-			int x = 1 ;
-			unused(x) ;
-		}
 	}
 
 	//PrintDebugFormat("About to release kernel wmes") ;
@@ -186,19 +156,12 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 		release_io_symbol(this->GetSoarAgent(), wme->value) ;
 	}
 
-	if (m_InputLinkRoot)
-	{
-		m_InputLinkRoot->Release() ;
-	}
-	m_InputLinkRoot = NULL ;
-
 	for (PendingInputListIter iter = m_PendingInput.begin() ; iter != m_PendingInput.end() ; iter++)
 	{
 		ElementXML* pMsg = *iter ;
 		delete pMsg ;
 	}
 
-	m_TimeTagMap.clear() ;
 	m_PendingInput.clear() ;
 	m_KernelTimeTagMap.clear() ;
 	m_ToClientIdentifierMap.clear() ;
@@ -237,8 +200,6 @@ void AgentSML::InitializeRuntimeState()
 bool AgentSML::Reinitialize()
 {
 	m_pKernelSML->FireAgentEvent(this, smlEVENT_BEFORE_AGENT_REINITIALIZED) ;
-
-	m_inputlink->Reinitialize();
 
     bool ok = reinitialize_soar( m_agent );
     init_agent_memory( m_agent );
@@ -733,29 +694,6 @@ void AgentSML::RemoveID(char const* pKernelID)
 	}
 }
 
-/*************************************************************
-* @brief	Converts a time tag from a client side value to
-*			a kernel side object
-*************************************************************/
-gSKI::IWme* AgentSML::ConvertTimeTag(char const* pTimeTag)
-{
-	if (pTimeTag == NULL)
-		return NULL ;
-
-	TimeTagMapIter iter = m_TimeTagMap.find(pTimeTag) ;
-
-	if (iter == m_TimeTagMap.end())
-	{
-		return NULL ;
-	}
-	else
-	{
-		// If we found a mapping, return the mapped value
-		gSKI::IWme* result = iter->second ;
-		return result ;
-	}
-}
-
 long AgentSML::ConvertTime(long clientTimeTag)
 {
    TimeMapIter iter = m_TimeMap.find(clientTimeTag) ;
@@ -811,24 +749,6 @@ void AgentSML::PrintKernelTimeTags()
 	}
 }
 
-/*************************************************************
-* @brief	Maps from a client side time tag to a kernel side WME.
-*************************************************************/
-void AgentSML::RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWME)
-{
-#ifdef _DEBUG
-	// I believe it correct that a time tag should never be re-used in this context
-	// so I'm including this assert.  However, it's possible this assumption is wrong (in particular after an init-soar?)
-	// so I'm only including it in debug builds and if the assert fails, check the context and make sure that this re-use
-	// in indeed a mistake.
-	// If you fail to call commit() after creating a new input wme and then issue an init-soar this assert may fire.
-	// If so, the fix is to call commit().
-	assert (m_TimeTagMap.find(pTimeTag) == m_TimeTagMap.end()) ;
-#endif
-
-	m_TimeTagMap[pTimeTag] = pWME ;
-}
-
 void AgentSML::RecordTime(long clientTimeTag, long kernelTimeTag)
 {
    m_TimeMap[clientTimeTag] = kernelTimeTag ;
@@ -853,47 +773,6 @@ void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
 
 	KernelSML::PrintDebugWme("Recording wme ", pWme, true) ;
 	m_KernelTimeTagMap[pTimeTag] = pWme ;
-}
-
-void AgentSML::RecordLongTimeTag(long timeTag, gSKI::IWme* pWME)
-{
-	// Make sure it's a valid time tag
-	assert(timeTag != 0) ;
-
-	char str[kMinBufferSize] ;
-	Int2String(timeTag, str, sizeof(str)) ;
-
-	RecordTimeTag(str, pWME) ;
-}
-
-void AgentSML::RemoveTimeTag(char const* pTimeTag)
-{
-	m_TimeTagMap.erase(pTimeTag) ;
-}
-
-void AgentSML::RemoveTimeTagByWmeSLOW(gSKI::IWme* pWme)
-{
-	// This is used by KernelSML::RemoveInputWMERecords to remove a timetag
-	// when gSKI is removing wmes from the kernel due to an identifier deletion.
-
-	// It's slow because it is linear with respect to the number of wmes.
-	// TODO: There should be a two-way mapping.
-	for ( TimeTagMapIter iter = m_TimeTagMap.begin(); iter != m_TimeTagMap.end(); ++iter )
-	{
-		if ( iter->second == pWme )
-		{
-			m_TimeTagMap.erase( iter );
-			return;
-		}
-	}
-}
-
-void AgentSML::RemoveLongTimeTag(long timeTag)
-{
-	char str[kMinBufferSize] ;
-	Int2String(timeTag, str, sizeof(str)) ;
-
-	m_TimeTagMap.erase(str) ;
 }
 
 void AgentSML::RemoveKernelTimeTag(char const* pTimeTag)
@@ -1361,7 +1240,7 @@ bool AgentSML::RemoveInputWME(long timeTag)
 	//	this->PrintKernelTimeTags() ;
 	//}
 
-	wme *pWME ;
+	wme *pWME = 0;
 
 	if (!kMaintainHashTable)
 	{

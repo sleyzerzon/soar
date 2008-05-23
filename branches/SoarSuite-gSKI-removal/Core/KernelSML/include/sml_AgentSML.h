@@ -23,14 +23,6 @@
 #include "callback.h"
 
 
-// Forward declarations for gSKI
-namespace gSKI {
-	class IWme ;
-	class IWMObject;
-	class InputLink;
-	struct Error;
-}
-
 // Forward definitions for kernel
 typedef struct agent_struct agent;
 typedef union symbol_union Symbol;
@@ -61,13 +53,6 @@ typedef std::map< std::string, int >		IdentifierRefMap ;
 typedef IdentifierRefMap::iterator			IdentifierRefMapIter ;
 typedef IdentifierRefMap::const_iterator	IdentifierRefMapConstIter ;
 
-// Map from a client side time tag (as a string) to a kernel side WME* object
-// (Had planned to just map the time tag to a kernel time tag...but it turns out
-//  there's no quick way to look up an object in the kernel from its time tag).
-typedef std::map< std::string, gSKI::IWme* >	TimeTagMap ;
-typedef TimeTagMap::iterator				TimeTagMapIter ;
-typedef TimeTagMap::const_iterator			TimeTagMapConstIter ;
-
 // Map from client side time tag to a kernel time tag
 //typedef std::map< std::string, long >		TimeMap ;
 typedef std::map< long, long >		TimeMap ;
@@ -88,8 +73,6 @@ class AgentSML
 	friend class InputListener ;
 
 public:
-	gSKI::InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
-
 	static void InputPhaseCallback( soar_callback_agent agent, soar_callback_event_id eventid, soar_callback_data callbackdata, soar_call_data calldata );
 
    bool AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
@@ -116,14 +99,13 @@ protected:
 	IdentifierRefMap m_IdentifierRefMap;
 
 	// Map from client side time tags (as strings) to kernel side WME* objects
-	TimeTagMap			m_TimeTagMap ;
 	KernelTimeTagMap	m_KernelTimeTagMap ;
 	TimeMap				m_TimeMap ;
 
 	// For cleanup we also need a map from kernel side identifiers to client side ones (for cleanup)
 	IdentifierMap	m_ToClientIdentifierMap ;
 
-	// Used to listen for kernel/gSKI events that are agent specific
+	// Used to listen for kernel events that are agent specific
 	ProductionListener	m_ProductionListener;
 	RunListener			m_RunListener;
 	PrintListener		m_PrintListener;
@@ -134,10 +116,6 @@ protected:
 
 	// This listener is called during the kernel's input phase callback
 	InputListener		m_InputListener ;
-
-	// We have to keep pointers to these objects so that we can release then during an init-soar.  Youch!
-	gSKI::IWMObject*	m_InputLinkRoot ;
-	gSKI::IWMObject*	m_OutputLinkRoot ;
 
 	// Input changes waiting to be processed at next input phase callback
 	PendingInputList	m_PendingInput ;
@@ -181,7 +159,7 @@ public:
 	void Init() ;
 
 	// Release any objects or other data we are keeping.  We do this just
-	// prior to deleting AgentSML, but before the underlying gSKI agent has been deleted
+	// prior to deleting AgentSML
 	void Clear(bool deletingThisAgent) ;
 
 	void DeleteSelf() ;
@@ -190,9 +168,6 @@ public:
 
 	// Release all of the WMEs that we currently have references to
 	// It's a little less severe than clear() which releases everything we own, not just wmes.
-	// If flushPendingRemoves is true, make sure gSKI removes all wmes from Soar's working memory
-	// that have been marked for removal but are still waiting for the next input phase to actually
-	// be removed (this should generally be correct so we'll default to true for it).
 	void ReleaseAllWmes(bool flushPendingRemoves = true) ;
 
 	// Explicitly reinitialize the agent as part of init-soar
@@ -202,12 +177,6 @@ public:
 	KernelSML* GetKernelSML() { return m_pKernelSML ; }
 
 	char const* GetName() ;
-
-	void SetInputLinkRoot(gSKI::IWMObject* pRoot)   { m_InputLinkRoot = pRoot ; }
-	gSKI::IWMObject* GetInputLinkRoot()				{ return m_InputLinkRoot ; }
-
-	void SetOutputLinkRoot(gSKI::IWMObject* pRoot)  { m_OutputLinkRoot = pRoot ; }
-	gSKI::IWMObject* GetOutputLinkRoot()			{ return m_OutputLinkRoot ; }
 
 	OutputListener* GetOutputListener()							{ return &m_OutputListener ; }
 	InputListener* GetInputListener()							{ return &m_InputListener ; }
@@ -293,7 +262,6 @@ public:
 	* @brief	Converts a time tag from a client side value to
 	*			a kernel side one.
 	*************************************************************/
-	gSKI::IWme* ConvertTimeTag(char const* pTimeTag) ;
 	wme* ConvertKernelTimeTag(char const* pTimeTag) ;
    long AgentSML::ConvertTime(long clientTimeTag);
 	long ConvertTime(char const* pTimeTag) ;
@@ -301,16 +269,11 @@ public:
 	// Debug method
 	void PrintKernelTimeTags() ;
 
-	void RecordTimeTag(char const* pTimeTag, gSKI::IWme* pWme) ;
 	void RemoveTimeTag(char const* pTimeTag) ;
 	void RecordKernelTimeTag(char const* pTimeTag, wme* pWme) ;
    void RecordTime(long clientTimeTag, long kernelTimeTag) ;
 	//void RecordTime(char const* pTimeTag, long time) ;
-	// Used by callback from gSKI to remove records of a wme (timetag) that 
-	// is getting removed due to an object (identifier) deletion
-	void RemoveTimeTagByWmeSLOW(gSKI::IWme* pWme) ;	
 
-	void RecordLongTimeTag(long timeTag, gSKI::IWme* pWme) ;
 	void RemoveLongTimeTag(long timeTag) ;
 	void RemoveKernelTimeTag(char const* pTimeTag) ;
 

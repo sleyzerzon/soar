@@ -20,10 +20,6 @@
 #ifndef SML_RUN_SCHEDULER_H
 #define SML_RUN_SCHEDULER_H
 
-namespace gSKI {
-	struct Error ;
-}
-
 namespace sml {
 
 // Forward declarations

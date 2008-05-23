@@ -16,15 +16,6 @@
 
 typedef struct wme_struct wme;
 
-// Forward declarations
-namespace gSKI {
-	class IInputProducer ;
-	class IOutputProcessor ;
-	class OutputListener ;
-	class IWme ;
-	struct Error ;
-}
-
 #include <map>
 #include <list>
 
@@ -94,7 +85,7 @@ protected:
 	// Map from command name to function to handle it
 	CommandMap	m_CommandMap ;
 
-	// Map from gSKI agent pointers to AgentSML objects, where we keep additional information
+	// Map from agent names to AgentSML objects, where we keep additional information
 	// required for SML about each agent.
 	AgentMap		m_AgentMap ;
 	KernelAgentMap	m_KernelAgentMap ;

@@ -36,11 +36,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "IgSKI_Symbol.h"
-#include "IgSKI_Wme.h"
-#include "IgSKI_WMObject.h"
-#include "gSKI_InputLink.h"
-
 using namespace sml ;
 
 void KernelSML::BuildCommandMap()
