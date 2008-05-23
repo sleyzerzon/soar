@@ -76,6 +76,7 @@ typedef TimeMap::iterator					TimeMapIter ;
 typedef std::list<ElementXML*>				PendingInputList ;
 typedef PendingInputList::iterator			PendingInputListIter ;
 
+//typedef std::map< std::string, wme* >		KernelTimeTagMap ;
 typedef std::map< std::string, wme* >		KernelTimeTagMap ;
 typedef KernelTimeTagMap::iterator			KernelTimeTagMapIter ;
 typedef KernelTimeTagMap::const_iterator	KernelTimeTagMapConstIter ;
@@ -89,6 +90,11 @@ public:
 	gSKI::InputLink*           m_inputlink;         /**< A pointer to this agent's input link. */
 
 	static void InputPhaseCallback( soar_callback_agent agent, soar_callback_event_id eventid, soar_callback_data callbackdata, soar_call_data calldata );
+
+   bool AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag);
+   bool AddIntInputWME(char const* pID, char const* pAttribute, int value, char const* pClientTimeTag);
+   bool AddDoubleInputWME(char const* pID, char const* pAttribute, double value, char const* pClientTimeTag);
+   bool AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag);
 
 	bool AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
 	bool RemoveInputWME(char const* pTimeTag) ;

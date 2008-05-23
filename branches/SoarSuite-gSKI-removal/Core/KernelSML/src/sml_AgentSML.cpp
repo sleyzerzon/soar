@@ -838,7 +838,7 @@ void AgentSML::RecordKernelTimeTag(char const* pTimeTag, wme* pWme)
 	// in indeed a mistake.
 	// If you fail to call commit() after creating a new input wme and then issue an init-soar this assert may fire.
 	// If so, the fix is to call commit().
-	assert (m_KernelTimeTagMap.find(pTimeTag) == m_KernelTimeTagMap.end()) ;
+	assert (m_KernelTimeTagMap.find(timeTag) == m_KernelTimeTagMap.end()) ;
 #endif
 
 	KernelSML::PrintDebugWme("Recording wme ", pWme, true) ;
@@ -1022,40 +1022,11 @@ void AgentSML::InputPhaseCallback(soar_callback_agent /*agent*/,
 	//
 	KernelSML::GetKernelSML()->ReceiveAllMessages();	
 }
-
-bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pClientTimeTag)
+bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag)
 {
-	static bool kMaintainHashTable = false ; // wtf
+   static bool kMaintainHashTable = false ; // wtf
 
-
-	// TODO: 
-	// If input performance continues to be an issue, maybe some of these checks are redundant and can be removed.
-
-	// Begin sanity check
-	// This function requires client side identifiers and timetags
-	CHECK_RET_FALSE( pID );		// must have id
-	// FIXME: enable, I2 seems to be a special case
-	//CHECK_RET_FALSE( islower( pID[0] ) );	// id must be lower case
-
-	CHECK_RET_FALSE( pAttribute );		// must have attribute
-
-	CHECK_RET_FALSE( pValue );
-	if ( pType == sml_Names::kTypeID ) // if we're making a shared identifier
-	{
-		// the shared ID must be client side
-		CHECK_RET_FALSE( isalpha( pValue[0] ) );	// id must be alpha
-		CHECK_RET_FALSE( islower( pValue[0] ) );	// id must be lower case
-	}
-
-	// must have client side timetag
-	CHECK_RET_FALSE( pClientTimeTag );
-	CHECK_RET_FALSE( atoi( pClientTimeTag ) < 0 ) ;
-	// End sanity check
-
-	// Convert ID to kernel side.
-	CHECK_RET_FALSE(strlen(pID) >= 2) ;
-
-	std::string idKernel ;
+   std::string idKernel ;
 	ConvertID(pID, &idKernel) ;
 
 	char idLetter = idKernel[0] ;
@@ -1063,83 +1034,210 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 
 	Symbol* pValueSymbol = 0 ;
 
-	if (IsStringEqual(sml_Names::kTypeString, pType)) 
+	// Creating a wme with a string constant value
+	pValueSymbol = get_io_sym_constant(m_agent, pValue) ;
+
+	// Now create the wme
+	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
+	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
+
+	CHECK_RET_FALSE( pIDSymbol ) ;
+	CHECK_RET_FALSE( pAttrSymbol ) ;
+
+	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
+	CHECK_RET_FALSE( pNewInputWme ) ;
+	long timeTag = pNewInputWme->timetag ;
+
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
+
+	// The kernel doesn't support direct lookup of wme from timetag so we'll
+	// store these values in a hashtable.  Perhaps later we'll see about adding
+	// this support directly into the kernel.
+	this->RecordTime( pClientTimeTag, timeTag ) ;
+
+	if (kMaintainHashTable)
 	{
-		// Creating a wme with a string constant value
-		pValueSymbol = get_io_sym_constant(m_agent, pValue) ;
-
-	} 
-	else if (IsStringEqual(sml_Names::kTypeInt, pType)) 
+		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+	}
+	else
 	{
-		// Creating a WME with an int value
-		int value = atoi(pValue) ;
-		pValueSymbol = get_io_int_constant(m_agent, value) ;
+		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
+	}
 
-	} 
-	else if (IsStringEqual(sml_Names::kTypeDouble, pType)) 
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
+
+	return true ;
+}
+
+bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value, char const* pClientTimeTag)
+{
+   static bool kMaintainHashTable = false ; // wtf
+
+   std::string idKernel ;
+	ConvertID(pID, &idKernel) ;
+
+	char idLetter = idKernel[0] ;
+	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
+
+	Symbol* pValueSymbol = 0 ;
+
+	pValueSymbol = get_io_int_constant(m_agent, value) ;
+
+	// Now create the wme
+	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
+	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
+
+	CHECK_RET_FALSE( pIDSymbol ) ;
+	CHECK_RET_FALSE( pAttrSymbol ) ;
+
+	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
+	CHECK_RET_FALSE( pNewInputWme ) ;
+	long timeTag = pNewInputWme->timetag ;
+
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
+
+	// The kernel doesn't support direct lookup of wme from timetag so we'll
+	// store these values in a hashtable.  Perhaps later we'll see about adding
+	// this support directly into the kernel.
+	this->RecordTime( pClientTimeTag, timeTag ) ;
+
+	if (kMaintainHashTable)
 	{
-		// Creating a WME with a float value
-		float value = (float)atof(pValue) ;
-		pValueSymbol = get_io_float_constant(m_agent, value) ;
-
-	} 
-	else if (IsStringEqual(sml_Names::kTypeID, pType)) 
+		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+	}
+	else
 	{
+		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
+	}
 
-		// We will always receive a client-side identifier
-		// If that identifier is found when we try to convert it, it already exists in the kernel, we make a shared id.
-		// If that identifier is not found when we try to convert it, we make a new identifier.
-		
-		std::string idValue ;
-		int idValueNumber = 0 ;
-		char idValueLetter = 0;
-		bool didntFindId = true;
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
 
-		if ( ConvertID( pValue, &idValue ) )
+	return true ;
+}
+
+bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double value, char const* pClientTimeTag)
+{
+   static bool kMaintainHashTable = false ; // wtf
+
+   std::string idKernel ;
+	ConvertID(pID, &idKernel) ;
+
+	char idLetter = idKernel[0] ;
+	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
+
+	Symbol* pValueSymbol = 0 ;
+
+	pValueSymbol = get_io_float_constant(m_agent, value) ;
+
+	// Now create the wme
+	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
+	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
+
+	CHECK_RET_FALSE( pIDSymbol ) ;
+	CHECK_RET_FALSE( pAttrSymbol ) ;
+
+	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
+	CHECK_RET_FALSE( pNewInputWme ) ;
+	long timeTag = pNewInputWme->timetag ;
+
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
+
+	// The kernel doesn't support direct lookup of wme from timetag so we'll
+	// store these values in a hashtable.  Perhaps later we'll see about adding
+	// this support directly into the kernel.
+	this->RecordTime( pClientTimeTag, timeTag ) ;
+
+	if (kMaintainHashTable)
+	{
+		this->RecordKernelTimeTag( pClientTimeTag, pNewInputWme ) ;
+	}
+	else
+	{
+		/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
+		/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
+		/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
+	}
+
+	//if (kDebugInput)
+	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
+
+	return true ;
+}
+
+bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pClientTimeTag)
+{
+   static bool kMaintainHashTable = false ; // wtf
+
+   std::string idKernel ;
+	ConvertID(pID, &idKernel) ;
+
+	char idLetter = idKernel[0] ;
+	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
+
+	Symbol* pValueSymbol = 0 ;
+
+
+	// We will always receive a client-side identifier
+	// If that identifier is found when we try to convert it, it already exists in the kernel, we make a shared id.
+	// If that identifier is not found when we try to convert it, we make a new identifier.
+	
+	std::string idValue ;
+	int idValueNumber = 0 ;
+	char idValueLetter = 0;
+	bool didntFindId = true;
+
+	if ( ConvertID( pValue, &idValue ) )
+	{
+		// we found a kernel side mapping, shared id
+		didntFindId = false;	// for sanity check below
+		idValueLetter = idValue[0];
+		idValueNumber = atoi( &(idValue.c_str()[1]) ) ;
+	}
+	else 
+	{
+		// no kernel side mapping, new id
+
+		// new id based on first character of attribute
+		if ( isalpha( pAttribute[0] ) )
 		{
-			// we found a kernel side mapping, shared id
-			didntFindId = false;	// for sanity check below
-			idValueLetter = idValue[0];
-			idValueNumber = atoi( &(idValue.c_str()[1]) ) ;
-		}
+			idValueLetter = pAttribute[0];				// take the first letter of the attribute
+			idValueLetter = (char)toupper( idValueLetter );	// make it upper case
+		} 
 		else 
 		{
-			// no kernel side mapping, new id
-
-			// new id based on first character of attribute
-			if ( isalpha( pAttribute[0] ) )
-			{
-				idValueLetter = pAttribute[0];				// take the first letter of the attribute
-				idValueLetter = (char)toupper( idValueLetter );	// make it upper case
-			} 
-			else 
-			{
-				idValueLetter = 'I';	// attribute is not alpha, use default 'I'
-			}
-			// Number is ignored in new ID case
+			idValueLetter = 'I';	// attribute is not alpha, use default 'I'
 		}
+		// Number is ignored in new ID case
+   }
+	// Find/create the identifier
+	pValueSymbol = get_io_identifier( m_agent, idValueLetter, idValueNumber ) ;
 
-		// Find/create the identifier
-		pValueSymbol = get_io_identifier( m_agent, idValueLetter, idValueNumber ) ;
+	// If we just created this symbol record it in our mapping table
+	if (pValueSymbol->common.reference_count == 1)
+	{
+		CHECK_RET_FALSE( didntFindId );		// sanity check: if we're here, we better not have found the id in the conversion
+		
+		// We need to record the id that the kernel assigned to this object and match it against the id the
+		// client is using, so that in future we can map the client's id to the kernel's.
+		std::ostringstream buffer;
+		buffer << pValueSymbol->id.name_letter ;
+		buffer << pValueSymbol->id.name_number ;
 
-		// If we just created this symbol record it in our mapping table
-		if (pValueSymbol->common.reference_count == 1)
-		{
-			CHECK_RET_FALSE( didntFindId );		// sanity check: if we're here, we better not have found the id in the conversion
-			
-			// We need to record the id that the kernel assigned to this object and match it against the id the
-			// client is using, so that in future we can map the client's id to the kernel's.
-			std::ostringstream buffer;
-			buffer << pValueSymbol->id.name_letter ;
-			buffer << pValueSymbol->id.name_number ;
+		this->RecordIDMapping(pValue, buffer.str().c_str()) ;
 
-			this->RecordIDMapping(pValue, buffer.str().c_str()) ;
-
-			//if (kDebugInput)
-			//{
-			//	PrintDebugFormat("Recording id mapping of %s to %s", pValue, newid.c_str()) ;
-			//}
-		}
+		//if (kDebugInput)
+		//{
+		//	PrintDebugFormat("Recording id mapping of %s to %s", pValue, newid.c_str()) ;
+		//}
 	}
 
 	// Now create the wme
@@ -1176,6 +1274,68 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
 
 	return true ;
+}
+
+bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pClientTimeTag)
+{
+	static bool kMaintainHashTable = false ; // wtf
+
+
+	// TODO: 
+	// If input performance continues to be an issue, maybe some of these checks are redundant and can be removed.
+
+	// Begin sanity check
+	// This function requires client side identifiers and timetags
+	CHECK_RET_FALSE( pID );		// must have id
+	// FIXME: enable, I2 seems to be a special case
+	//CHECK_RET_FALSE( islower( pID[0] ) );	// id must be lower case
+
+	CHECK_RET_FALSE( pAttribute );		// must have attribute
+
+	CHECK_RET_FALSE( pValue );
+	if ( pType == sml_Names::kTypeID ) // if we're making a shared identifier
+	{
+		// the shared ID must be client side
+		CHECK_RET_FALSE( isalpha( pValue[0] ) );	// id must be alpha
+		CHECK_RET_FALSE( islower( pValue[0] ) );	// id must be lower case
+	}
+
+	// must have client side timetag
+	CHECK_RET_FALSE( pClientTimeTag );
+	CHECK_RET_FALSE( atoi( pClientTimeTag ) < 0 ) ;
+	// End sanity check
+
+	// Convert ID to kernel side.
+	CHECK_RET_FALSE(strlen(pID) >= 2) ;
+
+	if (IsStringEqual(sml_Names::kTypeString, pType)) 
+	{
+		// Creating a wme with a string constant value
+		return AddStringInputWME(pID, pAttribute, pValue, pClientTimeTag);
+
+	} 
+	else if (IsStringEqual(sml_Names::kTypeInt, pType)) 
+	{
+		// Creating a WME with an int value
+		int value = atoi(pValue) ;
+		return AddIntInputWME(pID, pAttribute, value, pClientTimeTag);
+
+	} 
+	else if (IsStringEqual(sml_Names::kTypeDouble, pType)) 
+	{
+		// Creating a WME with a float value
+		float value = (float)atof(pValue) ;
+		return AddDoubleInputWME(pID, pAttribute, value, pClientTimeTag);
+
+	} 
+	else if (IsStringEqual(sml_Names::kTypeID, pType)) 
+	{
+      return AddIdInputWME(pID, pAttribute, pValue, pClientTimeTag);
+	}
+   else
+   {
+      CHECK_RET_FALSE(0);  // bad type
+   }
 }
 
 bool AgentSML::RemoveInputWME(char const* pTimeTag)

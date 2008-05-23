@@ -766,7 +766,8 @@ EXPORT void sml_DirectAddWME_String(Direct_AgentSML_Handle pAgentSMLIn, char con
 	std::stringstream timetagString;
 	timetagString << clientTimetag;
 
-	pAgentSML->AddInputWME( pId, pAttribute, pValue, sml_Names::kTypeString, timetagString.str().c_str() );
+	//pAgentSML->AddInputWME( pId, pAttribute, pValue, sml_Names::kTypeString, timetagString.str().c_str() );
+   pAgentSML->AddStringInputWME( pId, pAttribute, pValue, timetagString.str().c_str() );
 }
 
 EXPORT void sml_DirectAddWME_Int(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, int value, long clientTimetag)
@@ -775,13 +776,14 @@ EXPORT void sml_DirectAddWME_Int(Direct_AgentSML_Handle pAgentSMLIn, char const*
 	assert(pAgentSML);
 
 	// BADBAD conversion happening twice
-	std::stringstream valueString;
-	valueString << value;
+	//std::stringstream valueString;
+	//valueString << value;
 
 	std::stringstream timetagString;
 	timetagString << clientTimetag;
 
-	pAgentSML->AddInputWME( pId, pAttribute, valueString.str().c_str(), sml_Names::kTypeInt, timetagString.str().c_str() );
+	//pAgentSML->AddInputWME( pId, pAttribute, valueString.str().c_str(), sml_Names::kTypeInt, timetagString.str().c_str() );
+   pAgentSML->AddIntInputWME( pId, pAttribute, value, timetagString.str().c_str() );
 }
 
 EXPORT void sml_DirectAddWME_Double(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, double value, long clientTimetag)
@@ -790,13 +792,14 @@ EXPORT void sml_DirectAddWME_Double(Direct_AgentSML_Handle pAgentSMLIn, char con
 	assert(pAgentSML);
 
 	// BADBAD conversion happening twice
-	std::stringstream valueString;
-	valueString << value;
+	//std::stringstream valueString;
+	//valueString << value;
 
 	std::stringstream timetagString;
 	timetagString << clientTimetag;
 
-	pAgentSML->AddInputWME( pId, pAttribute, valueString.str().c_str(), sml_Names::kTypeDouble, timetagString.str().c_str() );
+	//pAgentSML->AddInputWME( pId, pAttribute, valueString.str().c_str(), sml_Names::kTypeDouble, timetagString.str().c_str() );
+   pAgentSML->AddIntInputWME( pId, pAttribute, value, timetagString.str().c_str() );
 }
 
 /*************************************************************
@@ -830,7 +833,8 @@ EXPORT void sml_DirectAddID(Direct_AgentSML_Handle pAgentSMLIn, char const* pId,
 	std::stringstream timetagString;
 	timetagString << clientTimetag;
 
-	pAgentSML->AddInputWME( pId, pAttribute, pValueId, sml_Names::kTypeID, timetagString.str().c_str() );
+	//pAgentSML->AddInputWME( pId, pAttribute, pValueId, sml_Names::kTypeID, timetagString.str().c_str() );
+   pAgentSML->AddIdInputWME( pId, pAttribute, pValueId, timetagString.str().c_str() );
 }
 
 EXPORT Direct_AgentSML_Handle sml_DirectGetAgentSMLHandle(char const* pAgentName) 
