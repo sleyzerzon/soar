@@ -75,9 +75,19 @@ class AgentSML
 public:
 	static void InputPhaseCallback( soar_callback_agent agent, soar_callback_event_id eventid, soar_callback_data callbackdata, soar_call_data calldata );
 
+protected:
+   // This function actually creates a wme in Soar (and the associated mappings between client and kernel side timetags)
+   // Currently, only the functions below call this, so it's protected
+   bool AddInputWME(char const* pID, char const* pAttribute, Symbol* pValueSymbol, long clientTimeTag);
+public:
+   // These functions convert values into Symbols so the above function can be called
+   // These functions are called directly in "optimized" mode (set when the client-side kernel is created)
    bool AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
    bool AddIntInputWME(char const* pID, char const* pAttribute, int value, long clientTimeTag);
    bool AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag);
+
+   // This function converts string values into typed values so the above functions can be called
+   // This function is called by InputListener and passed info taken from XML objects
    bool AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
 
 	bool AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;

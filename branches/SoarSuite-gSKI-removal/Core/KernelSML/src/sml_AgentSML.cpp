@@ -853,22 +853,15 @@ void AgentSML::InputPhaseCallback(soar_callback_agent /*agent*/,
 	KernelSML::GetKernelSML()->ReceiveAllMessages();	
 }
 
-// BADBAD: The following AddXInputWME functions share a lot of duplicate code.  Should probably create additional functions for overlapping parts
-
-bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag)
+bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, Symbol* pValueSymbol, long clientTimeTag)
 {
    std::string idKernel ;
 	ConvertID(pID, &idKernel) ;
 
-	char idLetter = idKernel[0] ;
+   char idLetter = idKernel[0] ;
 	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
 
-	Symbol* pValueSymbol = 0 ;
-
-	// Creating a wme with a string constant value
-	pValueSymbol = get_io_sym_constant(m_agent, pValue) ;
-
-	// Now create the wme
+   // Now create the wme
 	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
 	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
 
@@ -896,94 +889,33 @@ bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char c
 	return true ;
 }
 
+bool AgentSML::AddStringInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag)
+{
+	// Creating a wme with a string constant value
+	Symbol* pValueSymbol = get_io_sym_constant(m_agent, pValue) ;
+
+	return AddInputWME(pID, pAttribute, pValueSymbol, clientTimeTag);
+}
+
 bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value, long clientTimeTag)
 {
-   std::string idKernel ;
-	ConvertID(pID, &idKernel) ;
+   // Creating a wme with an int constant value
+	Symbol* pValueSymbol = get_io_int_constant(m_agent, value) ;
 
-	char idLetter = idKernel[0] ;
-	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
-
-	Symbol* pValueSymbol = 0 ;
-
-	pValueSymbol = get_io_int_constant(m_agent, value) ;
-
-	// Now create the wme
-	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
-	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
-
-	CHECK_RET_FALSE( pIDSymbol ) ;
-	CHECK_RET_FALSE( pAttrSymbol ) ;
-
-	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
-	CHECK_RET_FALSE( pNewInputWme ) ;
-	long timeTag = pNewInputWme->timetag ;
-
-	//if (kDebugInput)
-	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
-
-   // Keep track of which client timetags correspond to which kernel timetags
-	this->RecordTime( clientTimeTag, timeTag ) ;
-
-	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
-	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
-	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
-
-	//if (kDebugInput)
-	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
-
-	return true ;
+   return AddInputWME(pID, pAttribute, pValueSymbol, clientTimeTag);
 }
 
 bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag)
 {
-   std::string idKernel ;
-	ConvertID(pID, &idKernel) ;
+   // Creating a wme with an int constant value
+	Symbol* pValueSymbol = get_io_float_constant(m_agent, value) ;
 
-	char idLetter = idKernel[0] ;
-	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
-
-	Symbol* pValueSymbol = 0 ;
-
-	pValueSymbol = get_io_float_constant(m_agent, value) ;
-
-	// Now create the wme
-	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
-	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
-
-	CHECK_RET_FALSE( pIDSymbol ) ;
-	CHECK_RET_FALSE( pAttrSymbol ) ;
-
-	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
-	CHECK_RET_FALSE( pNewInputWme ) ;
-	long timeTag = pNewInputWme->timetag ;
-
-	//if (kDebugInput)
-	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
-
-	// Keep track of which client timetags correspond to which kernel timetags
-	this->RecordTime( clientTimeTag, timeTag ) ;
-
-	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
-	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
-	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
-
-	//if (kDebugInput)
-	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
-
-	return true ;
+	return AddInputWME(pID, pAttribute, pValueSymbol, clientTimeTag);
 }
 
 bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag)
 {
-   std::string idKernel ;
-	ConvertID(pID, &idKernel) ;
-
-	char idLetter = idKernel[0] ;
-	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
-
 	Symbol* pValueSymbol = 0 ;
-
 
 	// We will always receive a client-side identifier
 	// If that identifier is found when we try to convert it, it already exists in the kernel, we make a shared id.
@@ -1039,32 +971,7 @@ bool AgentSML::AddIdInputWME(char const* pID, char const* pAttribute, char const
 		//}
 	}
 
-	// Now create the wme
-	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
-	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
-
-	CHECK_RET_FALSE( pIDSymbol ) ;
-	CHECK_RET_FALSE( pAttrSymbol ) ;
-
-	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
-	CHECK_RET_FALSE( pNewInputWme ) ;
-	long timeTag = pNewInputWme->timetag ;
-
-	//if (kDebugInput)
-	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
-
-	// Keep track of which client timetags correspond to which kernel timetags
-	this->RecordTime( clientTimeTag, timeTag ) ;
-
-
-	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
-	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
-	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
-
-	//if (kDebugInput)
-	//	KernelSML::PrintDebugWme("Adding wme ", pNewInputWme, true) ;
-
-	return true ;
+   return AddInputWME(pID, pAttribute, pValueSymbol, clientTimeTag);
 }
 
 bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pClientTimeTag)
