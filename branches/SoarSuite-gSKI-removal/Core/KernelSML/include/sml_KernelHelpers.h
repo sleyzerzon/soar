@@ -52,13 +52,6 @@ namespace sml
 	 const long* const GetSysparams(AgentSML* agent) const; // USE ONLY AS READ-ONLY
 
      rete_node* NameToProduction(AgentSML* agent, char* string_to_test);
-     void PrintPartialMatchInformation(AgentSML* thisAgent, 
-     struct rete_node_struct *p_node, wme_trace_type wtt);
-     void PrintMatchSet(AgentSML* thisAgent, wme_trace_type wtt, ms_trace_type  mst);
-	 virtual void XMLPartialMatchInformation(AgentSML* thisAgent, 
-                                               struct rete_node_struct *p_node,
-                                               wme_trace_type wtt) ;
-    virtual void XMLMatchSet(AgentSML* thisAgent, wme_trace_type wtt, ms_trace_type  mst) ;
 
      void PrintStackTrace(AgentSML* thisAgent, bool print_states, bool print_operators);
      void PrintSymbol(AgentSML*     thisAgent, 
@@ -109,14 +102,6 @@ namespace sml
 
 	 void ExplainListChunks(AgentSML* pIAgent);
 	 bool ExplainChunks(AgentSML* pIAgent, const char* pProduction, int mode);
-
-	 const char* GetChunkNamePrefix(AgentSML* pIAgent);
-	 bool SetChunkNamePrefix(AgentSML* pIAgent, const char* pPrefix);
-
-	 unsigned long GetChunkCount(AgentSML* pIAgent);
-	 void SetChunkCount(AgentSML* pIAgent, unsigned long count);
-
-	 void SeedRandomNumberGenerator(unsigned long int* pSeed);
 
 	 void XmlCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn);
   };

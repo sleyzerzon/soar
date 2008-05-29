@@ -21,6 +21,7 @@
 #include "sml_KernelHelpers.h"
 #include "sml_KernelSML.h"
 #include "gsysparam.h"
+#include "rete.h"
 
 using namespace cli;
 using namespace sml;
@@ -108,13 +109,13 @@ bool CommandLineInterface::DoMatches(const eMatchesMode mode, const eWMEDetail d
 
 		if (m_RawOutput)
 		{
-			AddListenerAndDisableCallbacks();		
-			pKernelHack->PrintPartialMatchInformation(m_pAgentSML, prod, wtt);
+			AddListenerAndDisableCallbacks();	
+			print_partial_match_information(m_pAgentSML->GetSoarAgent(), prod, wtt);
 			RemoveListenerAndEnableCallbacks();
 		}
 		else
 		{
-			pKernelHack->XMLPartialMatchInformation(m_pAgentSML, prod, wtt) ;
+			xml_partial_match_information(m_pAgentSML->GetSoarAgent(), prod, wtt);
 		}
 
 	} else {
@@ -125,12 +126,12 @@ bool CommandLineInterface::DoMatches(const eMatchesMode mode, const eWMEDetail d
 		if (m_RawOutput)
 		{
 			AddListenerAndDisableCallbacks();		
-			pKernelHack->PrintMatchSet(m_pAgentSML, wtt, mst);
+			print_match_set(m_pAgentSML->GetSoarAgent(), wtt, mst);
 			RemoveListenerAndEnableCallbacks();
 		}
 		else
 		{
-			pKernelHack->XMLMatchSet(m_pAgentSML, wtt, mst) ;
+			xml_match_set(m_pAgentSML->GetSoarAgent(), wtt, mst);
 		}
 	}
 

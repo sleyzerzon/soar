@@ -14,7 +14,8 @@
 
 #include "cli_Commands.h"
 #include "sml_KernelSML.h"
-#include "sml_KernelHelpers.h"
+#include "soar_rand.h"
+
 
 using namespace cli;
 using namespace sml;
@@ -31,10 +32,15 @@ bool CommandLineInterface::ParseSRand(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoSRand(unsigned long int* pSeed) {
+	if (pSeed) 
+	{
+		SoarSeedRNG( *pSeed );
+	}
+	else
+	{
+		SoarSeedRNG();
+	}
 
-	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
-
-	pKernelHack->SeedRandomNumberGenerator(pSeed);
 	return true;
 }
 

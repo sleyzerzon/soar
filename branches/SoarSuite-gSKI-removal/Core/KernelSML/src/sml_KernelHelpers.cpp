@@ -76,32 +76,6 @@ rete_node* KernelHelpers::NameToProduction (AgentSML* agent, char* string_to_tes
 		return 0;
 }
 
-
-void KernelHelpers::PrintPartialMatchInformation(AgentSML* agent, 
-struct rete_node_struct *p_node,
-	wme_trace_type wtt)
-{
-	print_partial_match_information(agent->GetSoarAgent(), p_node, wtt);
-}
-
-void KernelHelpers::PrintMatchSet(AgentSML* agent, wme_trace_type wtt, ms_trace_type  mst)
-{
-	print_match_set(agent->GetSoarAgent(), wtt, mst);
-}
-
-void KernelHelpers::XMLPartialMatchInformation(AgentSML* agent, 
-struct rete_node_struct *p_node,
-	wme_trace_type wtt)
-{
-	xml_partial_match_information(agent->GetSoarAgent(), p_node, wtt);
-}
-
-void KernelHelpers::XMLMatchSet(AgentSML* agent, wme_trace_type wtt, ms_trace_type  mst)
-{
-	xml_match_set(agent->GetSoarAgent(), wtt, mst);
-}
-
-
 void KernelHelpers::PrintStackTrace(AgentSML* agent, bool print_states, bool print_operators)
 {
 	Symbol *g;
@@ -2552,47 +2526,6 @@ bool KernelHelpers::ExplainChunks(AgentSML* pAgent, const char* pProduction, int
 			break;
 	}
 	return true;
-}
-
-const char* KernelHelpers::GetChunkNamePrefix(AgentSML* pAgent)
-{
-	agent* pSoarAgent = pAgent->GetSoarAgent();
-
-	return pSoarAgent->chunk_name_prefix;
-}
-
-bool KernelHelpers::SetChunkNamePrefix(AgentSML* pAgent, const char* pPrefix)
-{
-	agent* pSoarAgent = pAgent->GetSoarAgent();
-
-	if (strchr(pPrefix, '*')) return false;
-
-	// TODO: change to strncpy
-	strcpy(pSoarAgent->chunk_name_prefix, pPrefix);
-	return true;
-}
-
-unsigned long KernelHelpers::GetChunkCount(AgentSML* pAgent)
-{
-	agent* pSoarAgent = pAgent->GetSoarAgent();
-
-	return pSoarAgent->chunk_count;
-}
-
-void KernelHelpers::SetChunkCount(AgentSML* pAgent, unsigned long count)
-{
-	agent* pSoarAgent = pAgent->GetSoarAgent();
-
-	pSoarAgent->chunk_count = count;
-}
-
-void KernelHelpers::SeedRandomNumberGenerator(unsigned long int* pSeed)
-{
-	if (pSeed) {
-		SoarSeedRNG(*pSeed);
-		return;
-	}
-	SoarSeedRNG();
 }
 
 void KernelHelpers::XmlCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn)

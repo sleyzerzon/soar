@@ -19,6 +19,7 @@
 
 #include "sml_KernelHelpers.h"
 #include "sml_KernelSML.h"
+#include "sml_AgentSML.h"
 #include "gsysparam.h"
 
 using namespace cli;
@@ -95,29 +96,35 @@ bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int*
 	if (pCount) {
 		if (*pCount >= 0) {
 			if (*pCount >= pKernelHack->GetSysparam(m_pAgentSML, MAX_CHUNKS_SYSPARAM)) return SetError(CLIError::kCountGreaterThanMaxChunks);
-			if (static_cast<unsigned long>(*pCount) < pKernelHack->GetChunkCount(m_pAgentSML)) return SetError(CLIError::kCountLessThanChunks);
-			pKernelHack->SetChunkCount(m_pAgentSML, *pCount);
+			if (static_cast<unsigned long>(*pCount) < m_pAgentSML->GetSoarAgent()->chunk_count ) return SetError(CLIError::kCountLessThanChunks);
+			m_pAgentSML->GetSoarAgent()->chunk_count = *pCount;
 		} else {
 			// query
 			if (m_RawOutput) {
-				m_Result << "Chunk count: " << pKernelHack->GetChunkCount(m_pAgentSML);
+				m_Result << "Chunk count: " << m_pAgentSML->GetSoarAgent()->chunk_count;
 			} else {
 				char buf[kMinBufferSize];
-				AppendArgTagFast(sml_Names::kParamChunkCount, sml_Names::kTypeInt, Int2String(pKernelHack->GetChunkCount(m_pAgentSML), buf, kMinBufferSize));
+				AppendArgTagFast(sml_Names::kParamChunkCount, sml_Names::kTypeInt, Int2String(m_pAgentSML->GetSoarAgent()->chunk_count, buf, kMinBufferSize));
 			}
 		}
 	}
 
 	if (pPrefix) {
 		if (pPrefix->size()) {
-			if (!pKernelHack->SetChunkNamePrefix(m_pAgentSML, pPrefix->c_str())) return SetError(CLIError::kInvalidPrefix);
+			if ( strchr(pPrefix->c_str(), '*') ) 
+			{
+				return SetError(CLIError::kInvalidPrefix);
+			}
+			
+			strcpy( m_pAgentSML->GetSoarAgent()->chunk_name_prefix, pPrefix->c_str() );
+
 		} else {
 			// query
 			if (m_RawOutput) {
 				if (pCount && *pCount < 0) m_Result << "\n";
-				m_Result << "Prefix: " << pKernelHack->GetChunkNamePrefix(m_pAgentSML);
+				m_Result << "Prefix: " << m_pAgentSML->GetSoarAgent()->chunk_name_prefix;
 			} else {
-				AppendArgTagFast(sml_Names::kParamChunkNamePrefix, sml_Names::kTypeString, pKernelHack->GetChunkNamePrefix(m_pAgentSML));
+				AppendArgTagFast(sml_Names::kParamChunkNamePrefix, sml_Names::kTypeString, m_pAgentSML->GetSoarAgent()->chunk_name_prefix);
 			}
 		}
 	}
