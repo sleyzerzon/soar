@@ -679,10 +679,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   char		    current_line[1024];
   int	        current_line_index;
  
-  /* String redirection */
-  Bool		    using_input_string;
-  char		  * input_string;
-  
   /*mvp 5-17-94 */
   list              * variables_set;
   

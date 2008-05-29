@@ -125,9 +125,6 @@ agent * create_soar_agent (char * agent_name) {                                 
 //  newAgent->current_line[0]                    = 0;
 //  newAgent->current_line_index                 = 0;
 //#endif /* _WINDOWS */
-  /* String redirection */
-  newAgent->using_input_string                 = FALSE;
-  newAgent->input_string                       = NIL;
 
   newAgent->alias_list                         = NIL;  /* AGR 568 */
   newAgent->all_wmes_in_rete                   = NIL;

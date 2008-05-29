@@ -360,7 +360,7 @@ void soar_invoke_first_callback (agent* thisAgent,
   list * head;
 
   /* if no callback is registered, just return */
-  head = ((agent *)thisAgent)->soar_callbacks[callback_type];
+  head = thisAgent->soar_callbacks[callback_type];
   if (head == NULL) return;
 
 /* REW: begin 28.07.96 */
