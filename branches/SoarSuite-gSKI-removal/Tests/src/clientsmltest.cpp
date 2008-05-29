@@ -30,7 +30,7 @@ class ClientSMLTest : public CPPUNIT_NS::TestCase
 	CPPUNIT_TEST( testRemote );
 	CPPUNIT_TEST( testRemoteNoAutoCommit );
 	CPPUNIT_TEST( testSimpleCopy );
-	//CPPUNIT_TEST( testSimpleReteNetLoader );
+	CPPUNIT_TEST( testSimpleReteNetLoader );
 	CPPUNIT_TEST( testSimpleStopUpdate );
 	CPPUNIT_TEST( testSimpleSNCBreak );
 	CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
@@ -1233,7 +1233,8 @@ void ClientSMLTest::doSimpleReteNetLoader()
 	CPPUNIT_ASSERT( pAgent->GetLastCommandLineResult() );
 
 	// Make us match the current input link values
-	pAgent->SynchronizeInputLink();
+	// TODO: implement
+	//pAgent->SynchronizeInputLink();
 
 	// Get the latest id from the input link
 	sml::Identifier* pID = pAgent->GetInputLink() ;
