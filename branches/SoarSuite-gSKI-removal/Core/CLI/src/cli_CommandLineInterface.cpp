@@ -214,11 +214,15 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
 	// No way to return data
 	if (!pConnection) return false;
 	if (!pResponse) return false;
-	if (!pAgent) return false;
-
-	m_pAgentSML = pAgent;
-	m_pAgentSoar = m_pAgentSML->GetSoarAgent();
-	assert( m_pAgentSoar );
+	if (pAgent) 
+	{
+		m_pAgentSML = pAgent;
+		m_pAgentSoar = m_pAgentSML->GetSoarAgent();
+		assert( m_pAgentSoar );
+	} else {
+		m_pAgentSML = 0;
+		m_pAgentSoar = 0;
+	}
 
 	// Log input
 	if (m_pLogFile) {
