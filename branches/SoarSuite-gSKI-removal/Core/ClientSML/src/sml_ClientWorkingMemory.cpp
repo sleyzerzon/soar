@@ -45,6 +45,10 @@ WorkingMemory::WorkingMemory()
 	m_InputLink  = NULL ;
 	m_OutputLink = NULL ;
 	m_Agent		 = NULL ;
+
+#ifdef SML_DIRECT
+	m_AgentSMLHandle = 0;
+#endif // SML_DIRECT
 }
 
 WorkingMemory::~WorkingMemory()
@@ -477,6 +481,14 @@ bool WorkingMemory::ReceivedOutput(AnalyzeXML* pIncoming, ElementXML* pResponse)
 *************************************************************/
 Identifier* WorkingMemory::GetInputLink()
 {
+#ifdef SML_DIRECT
+	if ( GetConnection()->IsDirectConnection() )
+	{
+		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
+		m_AgentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+	}
+#endif // SML_DIRECT
+
 	if (!m_InputLink)
 	{
 		AnalyzeXML response ;
@@ -690,9 +702,7 @@ StringElement* WorkingMemory::CreateStringWME(Identifier* parent, char const* pA
 	if ( GetConnection()->IsDirectConnection() )
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
-
-		pConnection->DirectAddWME_String( agentSMLHandle, parent->GetValueAsString(), pAttribute, pValue, pWME->GetTimeTag());
+		pConnection->DirectAddWME_String( m_AgentSMLHandle, parent->GetValueAsString(), pAttribute, pValue, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -726,9 +736,7 @@ IntElement* WorkingMemory::CreateIntWME(Identifier* parent, char const* pAttribu
 	if ( GetConnection()->IsDirectConnection() )
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
-
-		pConnection->DirectAddWME_Int( agentSMLHandle, parent->GetValueAsString(), pAttribute, value, pWME->GetTimeTag());
+		pConnection->DirectAddWME_Int( m_AgentSMLHandle, parent->GetValueAsString(), pAttribute, value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -762,9 +770,7 @@ FloatElement* WorkingMemory::CreateFloatWME(Identifier* parent, char const* pAtt
 	if ( GetConnection()->IsDirectConnection() )
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
-
-		pConnection->DirectAddWME_Double( agentSMLHandle, parent->GetValueAsString(), pAttribute, value, pWME->GetTimeTag());
+		pConnection->DirectAddWME_Double( m_AgentSMLHandle, parent->GetValueAsString(), pAttribute, value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -815,11 +821,9 @@ void WorkingMemory::UpdateString(StringElement* pWME, char const* pValue)
 	if ( GetConnection()->IsDirectConnection() )
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+		pConnection->DirectRemoveWME( m_AgentSMLHandle, removeTimeTag );
 
-		pConnection->DirectRemoveWME( agentSMLHandle, removeTimeTag );
-
-		pConnection->DirectAddWME_String( agentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), pValue, pWME->GetTimeTag());
+		pConnection->DirectAddWME_String( m_AgentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), pValue, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return ;
@@ -863,11 +867,9 @@ void WorkingMemory::UpdateInt(IntElement* pWME, int value)
 	if ( GetConnection()->IsDirectConnection() )
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+		pConnection->DirectRemoveWME( m_AgentSMLHandle, removeTimeTag );
 
-		pConnection->DirectRemoveWME( agentSMLHandle, removeTimeTag );
-
-		pConnection->DirectAddWME_Int( agentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), value, pWME->GetTimeTag());
+		pConnection->DirectAddWME_Int( m_AgentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return ;
@@ -913,11 +915,9 @@ void WorkingMemory::UpdateFloat(FloatElement* pWME, double value)
 	if ( GetConnection()->IsDirectConnection() )
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
+		pConnection->DirectRemoveWME( m_AgentSMLHandle, removeTimeTag );
 
-		pConnection->DirectRemoveWME( agentSMLHandle, removeTimeTag );
-
-		pConnection->DirectAddWME_Double( agentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), value, pWME->GetTimeTag());
+		pConnection->DirectAddWME_Double( m_AgentSMLHandle, pWME->GetIdentifierName(), pWME->GetAttribute(), value, pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return ;
@@ -990,9 +990,7 @@ Identifier* WorkingMemory::CreateIdWME(Identifier* parent, char const* pAttribut
 	if (GetConnection()->IsDirectConnection())
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
-
-		pConnection->DirectAddID( agentSMLHandle, parent->GetValueAsString(), pAttribute, id.c_str(), pWME->GetTimeTag());
+		pConnection->DirectAddID( m_AgentSMLHandle, parent->GetValueAsString(), pAttribute, id.c_str(), pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -1032,9 +1030,7 @@ Identifier*	WorkingMemory::CreateSharedIdWME(Identifier* parent, char const* pAt
 	if (GetConnection()->IsDirectConnection())
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
-
-		pConnection->DirectAddID( agentSMLHandle, parent->GetValueAsString(), pAttribute, id.c_str(), pWME->GetTimeTag());
+		pConnection->DirectAddID( m_AgentSMLHandle, parent->GetValueAsString(), pAttribute, id.c_str(), pWME->GetTimeTag());
 
 		// Return immediately, without adding it to the commit list.
 		return pWME ;
@@ -1078,9 +1074,7 @@ bool WorkingMemory::DestroyWME(WMElement* pWME)
 	if ( GetConnection()->IsDirectConnection() )
 	{
 		EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>( GetConnection() );
-		Direct_AgentSML_Handle agentSMLHandle = pConnection->DirectGetAgentSMLHandle( GetAgentName() );
-
-		pConnection->DirectRemoveWME( agentSMLHandle, pWME->GetTimeTag() );
+		pConnection->DirectRemoveWME( m_AgentSMLHandle, pWME->GetTimeTag() );
 
 		// Return immediately, without adding it to the commit list
 		delete pWME ;

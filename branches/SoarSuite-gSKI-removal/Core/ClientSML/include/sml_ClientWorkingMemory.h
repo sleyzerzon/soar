@@ -24,6 +24,7 @@
 #include "sml_ObjectMap.h"
 #include "sml_DeltaList.h"
 #include "sml_OutputDeltaList.h"
+#include "sml_ClientDirect.h" // SML_DIRECT defined here
 
 #include <list>
 
@@ -42,6 +43,11 @@ class AnalyzeXML ;
 class WorkingMemory
 {
 protected:
+
+#ifdef SML_DIRECT
+	Direct_AgentSML_Handle m_AgentSMLHandle;
+#endif // SML_DIRECT
+
 	Agent*		m_Agent ;
 	Identifier*	m_InputLink ;
 	Identifier* m_OutputLink ; // this is initialized the first time an agent generates output; until then it is null
