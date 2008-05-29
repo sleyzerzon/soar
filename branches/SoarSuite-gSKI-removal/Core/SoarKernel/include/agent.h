@@ -688,7 +688,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   //soar_callback_array soar_callbacks;
   list			      * soar_callbacks[NUMBER_OF_CALLBACKS];
   
-  alias_struct      * alias_list;   /* AGR 568 */
   char              * alternate_input_string; 
   char              * alternate_input_suffix; 
   Bool                alternate_input_exit; /* Soar-Bugs #54, TMH */
