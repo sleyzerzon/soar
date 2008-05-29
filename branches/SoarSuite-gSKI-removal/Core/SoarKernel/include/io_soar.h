@@ -42,17 +42,8 @@ typedef struct callback_struct soar_callback;
 typedef cons list;
 typedef union symbol_union Symbol;
 
-typedef void * soar_callback_agent;
 typedef void * soar_callback_data;
 typedef void * soar_call_data;
-  /*
-    RDF 20020709: These are now defined in callback .h
-
-    typedef void (*soar_callback_free_fn)(soar_callback_data);
-    typedef void (*soar_callback_fn)(soar_callback_agent, 
-    soar_callback_data, 
-    soar_call_data);
-  */
 
 extern void init_soar_io (agent* thisAgent);
 extern void do_input_cycle (agent* thisAgent);
@@ -218,12 +209,12 @@ extern void add_input_function (agent * a, soar_callback_fn f,
 				soar_callback_free_fn free_fn,
 				char * name);
 extern void remove_input_function (agent * a, char * name);
-extern void add_output_function (agent* thisAgent, agent * a, soar_callback_fn f, 
+extern void add_output_function (agent* thisAgent, soar_callback_fn f, 
 				 soar_callback_data cb_data, 
 				 soar_callback_free_fn free_fn,
 				 int eventID,
 				 char * output_link_name);
-extern void remove_output_function (agent* thisAgent, agent * a, char * name);
+extern void remove_output_function (agent* thisAgent, char * name);
 
 #ifdef __cplusplus
 }

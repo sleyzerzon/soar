@@ -115,7 +115,6 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 
 	// We also need to listen to input events so we can pump waiting sockets and get interrupt messages etc.
 	soar_add_callback( pSoarAgent,
-		static_cast<void*>(pSoarAgent),
 		INPUT_PHASE_CALLBACK,
 		&sml::AgentSML::InputPhaseCallback,
 		0,

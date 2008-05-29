@@ -12,11 +12,7 @@
  * =======================================================================
  *  These are the routines that support printing Soar data structures.
  *  
- *  Everything eventually ends up in print_string which calls the Tcl
- *  interface routine Soar_LogAndPrint.  Logging and I/O redirection are
- *  now done through Tcl.  There's also one odd piece of user i/o done
- *  in decide.cpp to manage indifferent-selection -ask.  (it needs work)
- *  see more detailed comments in soarkernel.h
+ * obsolete comments deleted
  * =======================================================================
  */
 /* =================================================================
@@ -44,17 +40,6 @@
 using namespace xmlTraceNames;
 
 /* -------------------------------------------------------------------
-    Printing with an Optional Log File and with Redirection to a File
-
-   We want to print stuff not only to the screen but also to a log
-   file (if one is currently being used).  The print_string(), print(),
-   print_with_symbols(), and print_spaces() routines do this.
-
-   Start_log_file() and stop_log_file() open and close the current log
-   file.  Print_string_to_log_file_only() is called by the lexer to
-   echo keyboard input to the log file (it's already on the screen, so
-   we don't want to print it there too).
-
    Print_string() and print_spaces() do the obvious things.
    Print() is exactly like printf() in C, except it prints to both
    the screen and log file (if there is one).  Print_with_symbols()
@@ -69,43 +54,7 @@ using namespace xmlTraceNames;
    Tell_printer_that_output_column_has_been_reset () is called from the
    lexer every time it reads a line from the keyboard--since after the
    user types a line (and hits return) the output column is reset.
-
-   We also support temporarily redirecting all printing output to
-   another file.  This is done by calling start_redirection_to_file()
-   and stop_redirection_to_file().  In between these calls, all screen
-   and log file output is turned off, and printing is done only to the
-   redirection file.
 ------------------------------------------------------------------- */
-
-void start_log_file (agent* thisAgent, char *filename, Bool append) {
-  if (thisAgent->logging_to_file) stop_log_file (thisAgent);
-
-  chdir(thisAgent->top_dir_stack->directory);
-  thisAgent->log_file = fopen (filename, (append ? "a" : "w") );
-  
-  if (thisAgent->log_file) {
-    thisAgent->logging_to_file = TRUE;
-    thisAgent->log_file_name = make_memory_block_for_string (thisAgent, filename);
-    print (thisAgent, "Logging to file %s\n", filename);
-  } else {
-    /* --- error when opening the file --- */
-    print (thisAgent, "Error: unable to open file %s\n",filename);
-  }
-}
-
-void stop_log_file (agent* thisAgent) {
-  if (!thisAgent->logging_to_file) return;
-  print (thisAgent, "Closing log file %s\n", thisAgent->log_file_name);
-  if (fclose (thisAgent->log_file))
-    print (thisAgent, "Error: unable to close file %s\n", thisAgent->log_file_name);
-  free_memory_block_for_string (thisAgent, thisAgent->log_file_name);
-  thisAgent->logging_to_file = FALSE;
-}
-
-void print_string_to_log_file_only (agent* thisAgent, char *string) {
-  fputs (string, thisAgent->log_file);
-}
-
 
 int get_printer_output_column (agent* thisAgent) {
   return thisAgent->printer_output_column;
@@ -115,18 +64,6 @@ void tell_printer_that_output_column_has_been_reset (agent* thisAgent) {
   thisAgent->printer_output_column = 1;
 }
 
-
-void start_redirection_to_file (agent* thisAgent, FILE *already_opened_file) {
-  thisAgent->saved_printer_output_column = thisAgent->printer_output_column;
-  thisAgent->printer_output_column = 1;
-  thisAgent->redirecting_to_file = TRUE;
-  thisAgent->redirection_file = already_opened_file;
-}
-
-void stop_redirection_to_file (agent* thisAgent) {
-  thisAgent->redirecting_to_file = FALSE;
-  thisAgent->printer_output_column = thisAgent->saved_printer_output_column;
-}
 
 /* -----------------------------------------------------------------------
                              Print_string
@@ -138,112 +75,16 @@ void stop_redirection_to_file (agent* thisAgent) {
 
 
 void print_string (agent* thisAgent, char *s) {
-  char *ch;
-//#ifdef __SC__
-//  char *buf, *strbuf;
-//  int i,len, usebuf = 0, num_of_inserts = 0;
-//#endif
+	char *ch;
 
-  for (ch=s; *ch!=0; ch++) {
-    if (*ch=='\n')
-      thisAgent->printer_output_column = 1;
-    else
-      thisAgent->printer_output_column++;
-    /* BUGBUG doesn't handle tabs correctly */
-//#ifdef __SC__
-//	if (thisAgent->printer_output_column >= 80)
-//	{
-//		thisAgent->printer_output_column = 1;
-//		len = strlen((usebuf?strbuf:s))+2;
-//		buf = (char *)allocate_memory(thisAgent, len*sizeof(char),STRING_MEM_USAGE);
-//		for (i=0;(s+i+num_of_inserts) <= ch;i++) {
-//			buf[i] = (usebuf?strbuf:s)[i];
-//		}
-//		buf[i] = '\n';
-//		for (;i<=(len-1);i++) {
-//			buf[i+1] = (usebuf?strbuf:s)[i];
-//		}
-//		if (usebuf) free_memory_block_for_string(thisAgent, strbuf);
-//		strbuf = (char *)allocate_memory(agent* thisAgent, len*sizeof(char),STRING_MEM_USAGE);
-//		for (i=0;i<=len; i++) {
-//			strbuf[i] = buf[i];
-//		}
-//		free_memory_block_for_string(thisAgent, buf);
-//		usebuf=1;
-//		num_of_inserts++;
-//	}
-//  }
-//
-//  if (thisAgent->redirecting_to_file) {
-//    fputs (s, thisAgent->redirection_file);
-//  } else {
-//  	fputs ((usebuf?strbuf:s), stdout);
-//    fflush (stdout);
-//	if (usebuf) free_memory_block_for_string(thisAgent, strbuf);
-//#else
-  }
+	for (ch=s; *ch!=0; ch++) {
+		if (*ch=='\n')
+			thisAgent->printer_output_column = 1;
+		else
+			thisAgent->printer_output_column++;
+	}
 
-  if (thisAgent->redirecting_to_file) {
-    fputs (s, thisAgent->redirection_file);
-  } else {
-    if (thisAgent->using_output_string) 
-      strcat(thisAgent->output_string,s);
-    else {
-//#ifdef USE_X_DISPLAY
-//      print_x_string(thisAgent->X_data, s);
-//#elif _WINDOWS
-//      print_string_to_window(s);
-//#else
-	   Soar_LogAndPrint(thisAgent, thisAgent, s);
-      //fputs (s, stdout);
-      //fflush (stdout);
-//#endif /* USE_X_DISPLAY */
-//#endif /* __SC__*/
-    }
-    if (thisAgent->logging_to_file) fputs (s, thisAgent->log_file);
-  }
-
-  // bugzilla bug 319
-  // voigtjr: NEW IMPLEMENTATION doesn't work yet,
-  // not sure why but probably because the print/log callbacks aren't pointing to anything
-  // maybe gSKI needs to register callbacks?
-
-  //  char *ch;
-
-  //  for (ch = s; *ch != 0; ch++) {
-  //      if (*ch == '\n') {
-  //          thisAgent->printer_output_column = 1;
-  //      } else {
-  //          thisAgent->printer_output_column++;
-  //      }
-  //  }
-
-  //  if (thisAgent->redirecting_to_file) {
-  //      fputs(s, thisAgent->redirection_file);
-  //  } else {
-  //      /* this code is never executed since using_output_string is never true
-  //         if (current_agent(using_output_string)) 
-  //         strcat(current_agent(output_string),s);
-  //         else {
-  //       */
-  //      /* 
-  //         A bunch of crazy, interface dependent functions used to be called
-  //         here.  I am removing all of that, and using the Tcl interface
-  //         as a model of what the generalized behavior should in fact be.
-  //         The old version, which used the Tcl interface simply made a function
-  //         call to the interface layer which then simply invoked the 
-  //         LOG and PRINT callbacks, which seems like the way to go.
-
-  //         081699 SW
-  //       */
-
-		//// sending thisAgent twice?  yes, weird, probably wrong, see Soar_Print   -voigtjr 3/5/04
-  //      soar_invoke_first_callback(thisAgent, thisAgent, LOG_CALLBACK, s);
-  //      soar_invoke_first_callback(thisAgent, thisAgent, PRINT_CALLBACK, s);
-  //  }
-  //  if (thisAgent->logging_to_file) {
-  //      fputs(s, thisAgent->log_file);
-  //  }
+	soar_invoke_first_callback(thisAgent, PRINT_CALLBACK, /*(ClientData)*/ static_cast<void*>(s));
 }
 
 /* ---------------------------------------------------------------
@@ -1339,32 +1180,6 @@ void print_phase (agent* thisAgent, char * s, bool end_of_phase)
   makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagPhase);
   return;
 }
-
-
-
-/*
-===========================
- These must be here for soar to be happy
-===========================
-*/
-void Soar_LogAndPrint (agent* thisAgent, agent * the_agent, char * str)
-{
-   Soar_Log(thisAgent, the_agent, str);
-   Soar_Print(thisAgent, the_agent, str);
-}
-
-/* this_agent and the_agent????? This has got to be wrong. . . -ajc (8/1/02) */
-void Soar_Print (agent* thisAgent, agent * the_agent, char * str)
-{
-   soar_invoke_first_callback(thisAgent, the_agent, 
-	                          PRINT_CALLBACK, /*(ClientData)*/ static_cast<void*>(str));
-}
-
-void Soar_Log (agent* thisAgent, agent * the_agent, char * str)
-{
-   soar_invoke_first_callback(thisAgent, the_agent, 
-	                          LOG_CALLBACK, /*(ClientData)*/ static_cast<void*>(str));
-} 
 
 /*
 ===========================

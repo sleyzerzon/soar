@@ -726,7 +726,7 @@ void create_instantiation (agent* thisAgent, production *prod,
     /* MVP 6-8-94 */
    if (!thisAgent->system_halted) {
       /* --- invoke callback function --- */
-      soar_invoke_callbacks(thisAgent, thisAgent, 
+      soar_invoke_callbacks(thisAgent, 
             FIRING_CALLBACK,
             (soar_call_data) inst);
 
@@ -803,7 +803,7 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
   Bool trace_it;
 
   /* --- invoke callback function --- */
-  soar_invoke_callbacks(thisAgent, thisAgent, 
+  soar_invoke_callbacks(thisAgent, 
 			RETRACTION_CALLBACK,
 			(soar_call_data) inst);
    
@@ -1063,7 +1063,7 @@ void do_preference_phase (agent* thisAgent) {
   while (get_next_assertion (thisAgent, &prod, &tok, &w)) {
      if (thisAgent->max_chunks_reached) {
        thisAgent->system_halted = TRUE;
-	   	  soar_invoke_callbacks(thisAgent, thisAgent, 
+	   	  soar_invoke_callbacks(thisAgent, 
 		  AFTER_HALT_SOAR_CALLBACK,
 		  (soar_call_data) NULL);
        return;

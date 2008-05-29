@@ -72,24 +72,24 @@ extern void gds_invalid_so_remove_goal (agent* thisAgent, wme *w);
    install each I/O function.
 ==================================================================== */
 
-void add_input_function (agent* thisAgent, agent * a, soar_callback_fn f, 
+void add_input_function (agent* thisAgent, soar_callback_fn f, 
 			 soar_callback_data cb_data, 
 			 soar_callback_free_fn free_fn, char * name) {
-  soar_add_callback(thisAgent, a, INPUT_PHASE_CALLBACK, f, INPUT_PHASE_CALLBACK, cb_data, free_fn, name);
+  soar_add_callback(thisAgent, INPUT_PHASE_CALLBACK, f, INPUT_PHASE_CALLBACK, cb_data, free_fn, name);
 }
 
-void remove_input_function (agent* thisAgent, agent * a, char * name) {
-  soar_remove_callback(thisAgent, a, INPUT_PHASE_CALLBACK, name);
+void remove_input_function (agent* thisAgent, char * name) {
+  soar_remove_callback(thisAgent, INPUT_PHASE_CALLBACK, name);
 }
 
 void add_output_function (agent* thisAgent, 
-			  agent * a, soar_callback_fn f, 
+			  soar_callback_fn f, 
 			  soar_callback_data cb_data, 
 			  soar_callback_free_fn free_fn,
 			  int eventID,
 			  char * output_link_name)
 {
-  if (soar_exists_callback_id (a, OUTPUT_PHASE_CALLBACK, output_link_name)
+  if (soar_exists_callback_id (thisAgent, OUTPUT_PHASE_CALLBACK, output_link_name)
       != NULL)
     {
       print (thisAgent, "Error: tried to add_output_function with duplicate name %s\n",
@@ -100,34 +100,34 @@ void add_output_function (agent* thisAgent,
     }
   else
     {
-      soar_add_callback(thisAgent, a, OUTPUT_PHASE_CALLBACK, f, eventID, cb_data, free_fn, 
+      soar_add_callback(thisAgent, OUTPUT_PHASE_CALLBACK, f, eventID, cb_data, free_fn, 
 			output_link_name);
     }
 }
 
-void remove_output_function (agent* thisAgent, agent * a, char * name) {
-  soar_callback * cb;
-  output_link *ol;
+void remove_output_function (agent* thisAgent, char * name) {
+	soar_callback * cb;
+	output_link *ol;
 
-  /* Remove indexing structures ... */
+	/* Remove indexing structures ... */
 
-  cb = soar_exists_callback_id(a, OUTPUT_PHASE_CALLBACK, name);
-  if (!cb) return;
+	cb = soar_exists_callback_id(thisAgent, OUTPUT_PHASE_CALLBACK, name);
+	if (!cb) return;
 
-  for (ol=a->existing_output_links; ol!=NIL; ol=ol->next) 
-    {
-      if (ol->cb == cb)
+	for (ol=thisAgent->existing_output_links; ol!=NIL; ol=ol->next) 
 	{
-	  /* Remove ol entry */
-	  ol->link_wme->output_link = NULL;
-	  wme_remove_ref(thisAgent, ol->link_wme);
-	  remove_from_dll(a->existing_output_links, ol, next, prev);
-	  free_with_pool(&(a->output_link_pool), ol);
-	  break;
+		if (ol->cb == cb)
+		{
+			/* Remove ol entry */
+			ol->link_wme->output_link = NULL;
+			wme_remove_ref(thisAgent, ol->link_wme);
+			remove_from_dll(thisAgent->existing_output_links, ol, next, prev);
+			free_with_pool(&(thisAgent->output_link_pool), ol);
+			break;
+		}
 	}
-    }
 
-  soar_remove_callback(thisAgent, a, OUTPUT_PHASE_CALLBACK, name);
+	soar_remove_callback(thisAgent, OUTPUT_PHASE_CALLBACK, name);
 }
 
 /* ====================================================================
@@ -321,7 +321,7 @@ void do_input_cycle (agent* thisAgent) {
 
   if (thisAgent->prev_top_state && (!thisAgent->top_state)) {
     /* --- top state was just removed --- */
-    soar_invoke_callbacks(thisAgent, thisAgent, INPUT_PHASE_CALLBACK, 
+    soar_invoke_callbacks(thisAgent, INPUT_PHASE_CALLBACK, 
 			 (soar_call_data) TOP_STATE_JUST_REMOVED);
     release_io_symbol (thisAgent, thisAgent->io_header);
     release_io_symbol (thisAgent, thisAgent->io_header_input);
@@ -362,7 +362,7 @@ void do_input_cycle (agent* thisAgent) {
   /* --- if there is a top state, do the normal input cycle --- */
 
   if (thisAgent->top_state) {
-    soar_invoke_callbacks(thisAgent, thisAgent, INPUT_PHASE_CALLBACK, 
+    soar_invoke_callbacks(thisAgent, INPUT_PHASE_CALLBACK, 
 			 (soar_call_data) NORMAL_INPUT_CYCLE);
   }
 

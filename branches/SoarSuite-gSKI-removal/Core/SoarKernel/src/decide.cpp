@@ -1163,13 +1163,6 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
         if ((chosen_num>=1) && (chosen_num<=num_candidates)) break;
         print (thisAgent, "You must enter a number between 1 and %d\n", num_candidates);
       }
-      if (thisAgent->logging_to_file) {
-        char temp[50];
-        SNPRINTF (temp,50, "%d\n", chosen_num);
-		temp[49] = 0; /* ensure null termination */
-
-        print_string_to_log_file_only (thisAgent, temp);
-      }
 /* AGR 615 begin */
       switch (num_candidates - chosen_num) {
       case 2:
@@ -1720,7 +1713,7 @@ void create_new_attribute_impasse_for_slot (agent* thisAgent, slot *s, byte impa
   s->impasse_id = id;
   id->id.isa_impasse = TRUE;
 
-  soar_invoke_callbacks(thisAgent, thisAgent, 
+  soar_invoke_callbacks(thisAgent, 
                        CREATE_NEW_ATTRIBUTE_IMPASSE_CALLBACK, 
                        (soar_call_data) s);
 }
@@ -1728,7 +1721,7 @@ void create_new_attribute_impasse_for_slot (agent* thisAgent, slot *s, byte impa
 void remove_existing_attribute_impasse_for_slot (agent* thisAgent, slot *s) {
   Symbol *id;
 
-  soar_invoke_callbacks(thisAgent, thisAgent, 
+  soar_invoke_callbacks(thisAgent, 
                        REMOVE_ATTRIBUTE_IMPASSE_CALLBACK, 
                        (soar_call_data) s);
 
@@ -2243,7 +2236,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
     remove_existing_context_and_descendents (thisAgent, goal->id.lower_goal);
 
   /* --- invoke callback routine --- */
-  soar_invoke_callbacks(thisAgent, thisAgent, 
+  soar_invoke_callbacks(thisAgent, 
                        POP_CONTEXT_STACK_CALLBACK, 
                        (soar_call_data) goal);
 
@@ -2403,7 +2396,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.allow_bottom_up_chunks = TRUE;
 
   /* --- invoke callback routine --- */
-  soar_invoke_callbacks(thisAgent, thisAgent, 
+  soar_invoke_callbacks(thisAgent, 
                        CREATE_NEW_CONTEXT_CALLBACK, 
                        (soar_call_data) id);
 }

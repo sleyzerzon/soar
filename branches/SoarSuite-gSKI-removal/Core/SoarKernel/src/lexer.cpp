@@ -256,8 +256,6 @@ void get_next_char (agent* thisAgent) {
     thisAgent->current_file->current_line++;
     if (reading_from_top_level(thisAgent)) {
       tell_printer_that_output_column_has_been_reset (thisAgent);
-      if (thisAgent->logging_to_file)
-        print_string_to_log_file_only (thisAgent, thisAgent->current_file->buffer);
     }
   } else {
     /* s==NIL means immediate eof encountered or read error occurred */

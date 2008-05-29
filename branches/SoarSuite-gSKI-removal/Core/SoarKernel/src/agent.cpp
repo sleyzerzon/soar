@@ -126,9 +126,7 @@ agent * create_soar_agent (char * agent_name) {                                 
 //  newAgent->current_line_index                 = 0;
 //#endif /* _WINDOWS */
   /* String redirection */
-  newAgent->using_output_string                = FALSE;
   newAgent->using_input_string                 = FALSE;
-  newAgent->output_string                      = NIL;
   newAgent->input_string                       = NIL;
 
   newAgent->alias_list                         = NIL;  /* AGR 568 */
@@ -168,7 +166,6 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->lex_alias                          = NIL;  /* AGR 568 */
   newAgent->link_update_mode                   = UPDATE_LINKS_NORMALLY;
   newAgent->locals_tc                          = 0;
-  newAgent->logging_to_file                    = FALSE;
   newAgent->max_chunks_reached                 = FALSE; /* MVP 6-24-94 */
   newAgent->mcs_counter                        = 1;
   newAgent->memory_pools_in_use                = NIL;
@@ -184,7 +181,6 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->productions_being_traced           = NIL; 
   newAgent->promoted_ids                       = NIL;
   newAgent->reason_for_stopping                = "Startup";
-  newAgent->redirecting_to_file                = FALSE;
   newAgent->replay_input_data                  = FALSE;
   newAgent->slots_for_possible_removal         = NIL;
   newAgent->stop_soar                          = TRUE;           
@@ -290,7 +286,7 @@ agent * create_soar_agent (char * agent_name) {                                 
    /* JC ADDED: Make sure that the RHS functions get initialized correctly */
    newAgent->rhs_functions = NIL;
 
-  soar_init_callbacks((soar_callback_agent) newAgent);
+  soar_init_callbacks( newAgent );
 
   //
   // This call is needed to set up callbacks.
@@ -354,7 +350,7 @@ void destroy_soar_agent (agent * delete_agent)
   /* Cleaning up the various callbacks 
      TODO: Not clear why callbacks need to take the agent pointer essentially twice.
   */
-  soar_remove_all_monitorable_callbacks(delete_agent, (void*) delete_agent);
+  soar_remove_all_monitorable_callbacks(delete_agent);
 
   /* RPM 9/06 begin */
 

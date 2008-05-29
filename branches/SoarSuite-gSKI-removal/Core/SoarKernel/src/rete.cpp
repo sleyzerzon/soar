@@ -3701,7 +3701,7 @@ byte add_production_to_rete (agent* thisAgent,
   }
 
    /* --- invoke callback functions --- */
-  soar_invoke_callbacks (thisAgent, thisAgent, PRODUCTION_JUST_ADDED_CALLBACK,
+  soar_invoke_callbacks (thisAgent, PRODUCTION_JUST_ADDED_CALLBACK,
                          (soar_call_data) p);
 
 //#ifdef _WINDOWS
@@ -3723,7 +3723,7 @@ void excise_production_from_rete (agent* thisAgent, production *p)
   rete_node *p_node, *parent;
   ms_change *msc;
 
-  soar_invoke_callbacks (thisAgent, thisAgent, 
+  soar_invoke_callbacks (thisAgent, 
                          PRODUCTION_JUST_ABOUT_TO_BE_EXCISED_CALLBACK,
                          (soar_call_data) p);
    
@@ -7192,7 +7192,7 @@ void reteload_node_and_children (agent* thisAgent, rete_node *parent, FILE* f) {
     update_node_with_matches_from_above (thisAgent, New);
 
      /* --- invoke callback on the production --- */
-    soar_invoke_callbacks (thisAgent, thisAgent, PRODUCTION_JUST_ADDED_CALLBACK,
+    soar_invoke_callbacks (thisAgent, PRODUCTION_JUST_ADDED_CALLBACK,
                           (soar_call_data) prod);
  
     break;

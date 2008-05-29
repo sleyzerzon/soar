@@ -19,8 +19,6 @@ typedef struct rete_node_struct rete_node;
 typedef unsigned char ms_trace_type;
 typedef struct agent_struct agent;
 
-typedef void * soar_callback_agent;
-
 #include <string>
 
 // Included because we need XmlCallbackData defined in KernelSML/CLI

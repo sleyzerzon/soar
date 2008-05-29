@@ -599,13 +599,8 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
   /* ------------------ Printing utilities stuff --------------------- */
 
-  FILE              * log_file;
-  char              * log_file_name;
-  Bool                logging_to_file;
   char                printed_output_string[MAX_LEXEME_LENGTH*2+10];
   int                 printer_output_column;
-  Bool                redirecting_to_file;
-  FILE              * redirection_file;
   int                 saved_printer_output_column;
   
   /* kjh(CUSP-B10) begin */
@@ -687,8 +682,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   /* String redirection */
   Bool		    using_input_string;
   char		  * input_string;
-  Bool		    using_output_string;
-  char		  * output_string;
   
   /*mvp 5-17-94 */
   list              * variables_set;

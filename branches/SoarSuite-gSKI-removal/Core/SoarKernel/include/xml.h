@@ -73,8 +73,7 @@ inline void makeAgentCallbackXML(	agent*		soarAgent,
    xml_data.attOrTag = attOrTag;
    xml_data.value = value;
 
-   soar_invoke_first_callback(soarAgent, soarAgent, 
-	                          XML_GENERATION_CALLBACK, /*(XmlCallbackData)*/ static_cast<void*>(&xml_data));
+   soar_invoke_first_callback(soarAgent, XML_GENERATION_CALLBACK, /*(XmlCallbackData)*/ static_cast<void*>(&xml_data));
 	/*
 	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
                     &thisAgent->monitors_cpu_time[thisAgent->current_phase]);

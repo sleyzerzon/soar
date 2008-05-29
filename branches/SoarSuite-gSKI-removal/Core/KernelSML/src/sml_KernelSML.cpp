@@ -799,7 +799,7 @@ EXPORT void sml_DirectAddWME_Double(Direct_AgentSML_Handle pAgentSMLIn, char con
 	//timetagString << clientTimetag;
 
 	//pAgentSML->AddInputWME( pId, pAttribute, valueString.str().c_str(), sml_Names::kTypeDouble, timetagString.str().c_str() );
-   pAgentSML->AddIntInputWME( pId, pAttribute, value, clientTimetag );
+   pAgentSML->AddDoubleInputWME( pId, pAttribute, value, clientTimetag );
 }
 
 /*************************************************************

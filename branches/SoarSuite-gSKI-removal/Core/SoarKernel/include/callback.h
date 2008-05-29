@@ -330,11 +330,13 @@ enum SOAR_CALLBACK_TYPE
 //typedef list * soar_callback_array[NUMBER_OF_CALLBACKS];
 typedef char Bool;
 typedef char * soar_callback_id;
-typedef void * soar_callback_agent;
 typedef void * soar_callback_data;
 typedef void * soar_call_data;
 typedef int	   soar_callback_event_id;
-typedef void (*soar_callback_fn)(soar_callback_agent, 
+
+typedef struct agent_struct agent;
+
+typedef void (*soar_callback_fn)(agent*, 
 				 soar_callback_event_id,
 				 soar_callback_data, 
 				 soar_call_data);
@@ -353,7 +355,6 @@ typedef struct callback_struct
 } soar_callback;
 
 extern void soar_add_callback (agent* thisAgent, 
-			       soar_callback_agent, 
 			       SOAR_CALLBACK_TYPE, 
 			       soar_callback_fn, 
 				   soar_callback_event_id,
@@ -364,40 +365,34 @@ extern void soar_callback_data_free_string (soar_callback_data);
 extern char * soar_callback_enum_to_name (SOAR_CALLBACK_TYPE, Bool);
 extern SOAR_CALLBACK_TYPE soar_callback_name_to_enum (char *, Bool);
 extern void soar_destroy_callback(soar_callback *);
-extern Bool soar_exists_callback (soar_callback_agent, SOAR_CALLBACK_TYPE);
-extern soar_callback * soar_exists_callback_id (soar_callback_agent the_agent,
+extern Bool soar_exists_callback (agent*, SOAR_CALLBACK_TYPE);
+extern soar_callback * soar_exists_callback_id (agent* the_agent,
   					      SOAR_CALLBACK_TYPE callback_type,
 						soar_callback_id id);
-extern void soar_init_callbacks (soar_callback_agent);
+extern void soar_init_callbacks (agent*);
 extern void soar_invoke_callbacks (agent* thisAgent, 
-				   soar_callback_agent, 
 				   SOAR_CALLBACK_TYPE, 
 				   soar_call_data);
 extern void soar_invoke_first_callback (agent* thisAgent, 
-					soar_callback_agent, 
 					SOAR_CALLBACK_TYPE, 
 					soar_call_data);
-extern void soar_list_all_callbacks (soar_callback_agent, 
+extern void soar_list_all_callbacks (agent*, 
 				     Bool);
-extern void soar_list_all_callbacks_for_event (agent* thisAgent, soar_callback_agent, 
+extern void soar_list_all_callbacks_for_event (agent* thisAgent, 
 					       SOAR_CALLBACK_TYPE);
-extern void soar_pop_callback (soar_callback_agent the_agent, 
+extern void soar_pop_callback (agent* the_agent, 
 			       SOAR_CALLBACK_TYPE callback_type);
-extern void soar_push_callback (soar_callback_agent the_agent, 
+extern void soar_push_callback (agent* the_agent, 
 				SOAR_CALLBACK_TYPE callback_type, 
 				soar_callback_fn fn, 
 				soar_callback_data data,
 				soar_callback_free_fn free_fn);
-extern void soar_remove_all_monitorable_callbacks (agent* thisAgent, 
-						   soar_callback_agent);
-extern void soar_remove_all_callbacks_for_event (agent* thisAgent, 
-						 soar_callback_agent, 
-						 SOAR_CALLBACK_TYPE);
+extern void soar_remove_all_monitorable_callbacks (agent* thisAgent);
+extern void soar_remove_all_callbacks_for_event (agent* thisAgent, SOAR_CALLBACK_TYPE);
 extern void soar_remove_callback (agent* thisAgent, 
-				  soar_callback_agent,
 				  SOAR_CALLBACK_TYPE, 
 				  soar_callback_id);
-extern void soar_test_all_monitorable_callbacks(soar_callback_agent);
+extern void soar_test_all_monitorable_callbacks(agent*);
 #endif
 
 #ifdef __cplusplus

@@ -234,7 +234,7 @@ Symbol *crlf_rhs_function_code (agent* thisAgent, list *args, void* user_data) {
 
 Symbol *halt_rhs_function_code (agent* thisAgent, list *args, void* user_data) {
   thisAgent->system_halted = TRUE;
-  	  soar_invoke_callbacks(thisAgent, thisAgent, 
+  	  soar_invoke_callbacks(thisAgent,
 		  AFTER_HALT_SOAR_CALLBACK,
 		  (soar_call_data) NULL);
 

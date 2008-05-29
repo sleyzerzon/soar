@@ -141,8 +141,9 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 
 	if (flushPendingRemoves)
 	{
-		bool forceAdds = false ;	// It doesn't matter if we do these or not as we're about to release everything.  Seems best to not start things up.
-		bool forceRemoves = true ;	// SML may have deleted a wme but gSKI has yet to act on this.  As SML has removed its object we have no way to free the gSKI object w/o doing this update.
+		// TODO:
+		//bool forceAdds = false ;	// It doesn't matter if we do these or not as we're about to release everything.  Seems best to not start things up.
+		//bool forceRemoves = true ;	// SML may have deleted a wme but gSKI has yet to act on this.  As SML has removed its object we have no way to free the gSKI object w/o doing this update.
 	}
 
 	//PrintDebugFormat("About to release kernel wmes") ;
@@ -417,14 +418,14 @@ void AgentSML::FireRunEvent(smlRunEventId eventId) {
 	// Trigger a callback from the kernel to propagate the event out to listeners.
 	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
 	int callbackEvent = KernelCallback::GetCallbackFromEventID(eventId) ;
-	soar_invoke_callbacks(m_agent, m_agent, (SOAR_CALLBACK_TYPE)callbackEvent,(soar_call_data) m_agent->current_phase); // BADBAD cast int to void*
+	soar_invoke_callbacks(m_agent, (SOAR_CALLBACK_TYPE)callbackEvent,(soar_call_data) m_agent->current_phase); // BADBAD cast int to void*
 }
 
 void AgentSML::FireSimpleXML(char const* pMsg)
 {
 	// Trigger a callback from the kernel to propagate the event out to listeners.
 	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
-	Soar_Print( m_agent, m_agent, const_cast<char*>(pMsg) );
+	soar_invoke_first_callback(m_agent, PRINT_CALLBACK, /*(ClientData)*/ static_cast<void*>( const_cast<char*>( pMsg ) ) );
 	GenerateMessageXML( m_agent, pMsg );
 }
 
@@ -828,7 +829,7 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 	return result ;
 }
 
-void AgentSML::InputPhaseCallback(soar_callback_agent /*agent*/,
+void AgentSML::InputPhaseCallback( agent* /*agent*/,
 								   soar_callback_event_id /*eventid*/,
 								   soar_callback_data /*callbackdata*/,
 								   soar_call_data /*calldata*/ )
@@ -908,7 +909,7 @@ bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value
 bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag)
 {
    // Creating a wme with an int constant value
-	Symbol* pValueSymbol = get_io_float_constant(m_agent, value) ;
+	Symbol* pValueSymbol = get_io_float_constant(m_agent, value) ; // regarding warning on this line: nate possibly changed this on the RL branch (double -> float conversion)
 
 	return AddInputWME(pID, pAttribute, pValueSymbol, clientTimeTag);
 }
@@ -1003,7 +1004,7 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 	// Convert ID to kernel side.
 	CHECK_RET_FALSE(strlen(pID) >= 2) ;
 
-   long clientTimeTag = atoi(pClientTimeTag);
+	long clientTimeTag = atoi(pClientTimeTag);
 	if (IsStringEqual(sml_Names::kTypeString, pType)) 
 	{
 		// Creating a wme with a string constant value
@@ -1026,13 +1027,15 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 	} 
 	else if (IsStringEqual(sml_Names::kTypeID, pType)) 
 	{
-      return AddIdInputWME(pID, pAttribute, pValue, clientTimeTag);
+		return AddIdInputWME(pID, pAttribute, pValue, clientTimeTag);
 	}
-   else
-   {
-      CHECK_RET_FALSE(0);  // bad type
-   }
+	else
+	{
+		assert( false ); // bad type
+		return false;
+	}
 }
+
 bool AgentSML::RemoveInputWME(long timeTag)
 {
 	// Get the wme that matches this time tag

@@ -40,7 +40,7 @@ protected:
 	static int  InternalGetCallbackFromEventID(int eventID) ;
 
 public:
-	static void KernelCallbackStatic(void* pAgent, int eventID, void* pData, void* pCallData) ;
+	static void KernelCallbackStatic(agent* pAgent, int eventID, void* pData, void* pCallData) ;
 	static int  GetCallbackFromEventID(int eventID) ;
 	static bool IsCallbackImplementedInKernel(int eventID) ;
 
