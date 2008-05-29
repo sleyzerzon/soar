@@ -20,8 +20,8 @@
 #include "sml_ListMap.h"
 
 // Forward declaratiokn for ElementXML_Handle.
-struct ElementXML_InterfaceStructTag ;
-typedef struct ElementXML_InterfaceStructTag *ElementXML_Handle ;
+struct ElementXML_InterfaceStruct ;
+typedef struct ElementXML_InterfaceStruct *ElementXML_Handle ;
 
 namespace sock
 {

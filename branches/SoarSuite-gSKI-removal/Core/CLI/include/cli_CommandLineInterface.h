@@ -82,11 +82,11 @@ typedef std::bitset<WATCH_NUM_OPTIONS> WatchBitset;
 typedef std::bitset<WATCH_WMES_TYPE_NUM_OPTIONS> WatchWMEsTypeBitset;
 
 // For option parsing
-typedef struct {
+struct Options {
 	int shortOpt;
 	const char* longOpt;
 	int argument;
-} Options;
+} ;
 
 CommandLineInterface* GetCLI() ;
 
