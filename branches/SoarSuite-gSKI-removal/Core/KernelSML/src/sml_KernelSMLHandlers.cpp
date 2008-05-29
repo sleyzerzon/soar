@@ -42,7 +42,6 @@ void KernelSML::BuildCommandMap()
 {
 	m_CommandMap[sml_Names::kCommand_CreateAgent]		= &sml::KernelSML::HandleCreateAgent ;
 	m_CommandMap[sml_Names::kCommand_DestroyAgent]		= &sml::KernelSML::HandleDestroyAgent ;
-	m_CommandMap[sml_Names::kCommand_LoadProductions]	= &sml::KernelSML::HandleLoadProductions ;
 	m_CommandMap[sml_Names::kCommand_GetInputLink]		= &sml::KernelSML::HandleGetInputLink ;
 	m_CommandMap[sml_Names::kCommand_Input]				= &sml::KernelSML::HandleInput ;
 	m_CommandMap[sml_Names::kCommand_CommandLine]		= &sml::KernelSML::HandleCommandLine ;
@@ -586,22 +585,6 @@ bool KernelSML::HandleCheckForIncomingCommands(AgentSML* /*pAgentSML*/, char con
 		receivedOneMessage = m_pConnectionManager->ReceiveAllMessages() ;
 
 	return this->ReturnBoolResult(pConnection, pResponse, receivedOneMessage) ;
-}
-
-bool KernelSML::HandleLoadProductions(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse)
-{
-	if (!pAgentSML)
-		return false ;
-
-	// Get the parameters
-	char const* pFilename = pIncoming->GetArgString(sml_Names::kParamFilename) ;
-
-	if (!pFilename)
-	{
-		return InvalidArg(pConnection, pResponse, pCommandName, "Filename missing") ;
-	}
-	
-	return m_CommandLineInterface.DoSource( pFilename );
 }
 
 bool KernelSML::HandleGetInputLink(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* pConnection, AnalyzeXML* /*pIncoming*/, ElementXML* pResponse)

@@ -374,7 +374,6 @@ public:
 	static char const* const kCommand_CreateAgent ;
 	static char const* const kCommand_DestroyAgent ;
 	static char const* const kCommand_GetAgentList ;
-	static char const* const kCommand_LoadProductions ;
 	static char const* const kCommand_GetInputLink ;
 	static char const* const kCommand_GetOutputLink ;
 	static char const* const kCommand_Run ;

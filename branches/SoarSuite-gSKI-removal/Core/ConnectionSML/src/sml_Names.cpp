@@ -385,7 +385,6 @@ char const* const sml_Names::kFalse	= "false" ;
 char const* const sml_Names::kCommand_CreateAgent			= "create_agent" ;
 char const* const sml_Names::kCommand_DestroyAgent			= "destroy_agent" ;
 char const* const sml_Names::kCommand_GetAgentList			= "get_agent_list" ;
-char const* const sml_Names::kCommand_LoadProductions		= "load_productions" ;
 char const* const sml_Names::kCommand_GetInputLink			= "get_input_link" ;
 char const* const sml_Names::kCommand_GetOutputLink			= "get_output_link" ;
 char const* const sml_Names::kCommand_Run					= "run" ;
