@@ -83,8 +83,7 @@ bool CommandLineInterface::DoLearn(const LearnBitset& options) {
 	// No options means print current settings
 	if (options.none() || options.test(LEARN_LIST)) {
 
-		// BUGBUG: Use Get/SetSysparam because it fires an event!
-		const long* pSysparams = pKernelHack->GetSysparams(m_pAgentSML);
+		const long* const pSysparams = pKernelHack->GetSysparams(m_pAgentSML);
 
 		if (m_RawOutput) {
 			if (pSysparams[LEARNING_ON_SYSPARAM]) {

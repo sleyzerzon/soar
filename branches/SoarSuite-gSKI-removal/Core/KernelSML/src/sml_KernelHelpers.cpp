@@ -49,13 +49,10 @@ typedef struct wme_filter_struct {
 
 void KernelHelpers::SetSysparam (AgentSML* agent, int param_number, long new_value) 
 {
-	//agnt->sysparams[param_number] = new_value;
-	//Agent* internalAgent = (Agent*)(agent);
 	sml::KernelSML* pKernelSML = agent->GetKernelSML() ;
 
 	agent->GetSoarAgent()->sysparams[param_number] = new_value;
 	pKernelSML->FireSystemEvent(smlEVENT_SYSTEM_PROPERTY_CHANGED) ;
-	//internalAgent->GetKernel()->FireSystemPropertyChangedEvent() ;
 }
 
 long KernelHelpers::GetSysparam(AgentSML* agent, int param_number)
@@ -63,7 +60,7 @@ long KernelHelpers::GetSysparam(AgentSML* agent, int param_number)
 	return agent->GetSoarAgent()->sysparams[param_number];
 }
 
-const long* KernelHelpers::GetSysparams(AgentSML* agent)
+const long* const KernelHelpers::GetSysparams(AgentSML* agent) const
 {
 	return agent->GetSoarAgent()->sysparams;
 }
