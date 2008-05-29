@@ -80,9 +80,6 @@ bool CommandLineInterface::ParseMatches(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoMatches(const eMatchesMode mode, const eWMEDetail detail, const std::string* pProduction) {
-
-	if (!RequireAgent()) return false;
-
 	wme_trace_type wtt = 0;
 	switch (detail) {
 		case WME_DETAIL_NONE:

@@ -56,15 +56,12 @@ bool CommandLineInterface::DoStopSoar(bool self, const std::string* reasonForSto
 	unused(reasonForStopping);
 
 	if (self) {
-		if (!RequireAgent()) return false;
 		if (!m_pAgentSML->Interrupt(sml::sml_STOP_AFTER_DECISION_CYCLE)) {
 			SetErrorDetail("Error interrupting agent.");
 			return SetError(CLIError::kRunFailed); // FIXME: should be stopfailed
 		}
 		return true;
 	} else {
-		if (!RequireKernel()) return false;
-
 		// Make sure the system stop event will be fired at the end of the run.
 		// We used to call FireSystemStop() in this function, but that's no good because
 		// it comes before the agent has stopped because interrupt only stops at the next

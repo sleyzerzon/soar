@@ -312,9 +312,6 @@ bool CommandLineInterface::CheckOptargRemoveOrZero() {
 }
 
 bool CommandLineInterface::DoWatch(const WatchBitset& options, const WatchBitset& settings, const int wmeSetting, const int learnSetting) {
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

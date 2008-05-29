@@ -38,9 +38,6 @@ bool CommandLineInterface::ParseMaxMemoryUsage(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoMaxMemoryUsage(const int n) {
-
-	if (!RequireAgent()) return false;
-
 	if (!n) {
 		// query
 		if (m_RawOutput) {

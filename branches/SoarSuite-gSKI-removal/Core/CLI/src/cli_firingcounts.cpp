@@ -58,8 +58,6 @@ bool CommandLineInterface::ParseFiringCounts(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoFiringCounts(const int numberToList, const std::string* pProduction) {
-	if (!RequireAgent()) return false;
-
 	std::vector< std::pair< std::string, unsigned long > > firings;
 
 	// if we have a production, just get that one, otherwise get them all

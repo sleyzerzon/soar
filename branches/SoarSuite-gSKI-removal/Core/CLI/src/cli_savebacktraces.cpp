@@ -56,9 +56,6 @@ bool CommandLineInterface::ParseSaveBacktraces(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoSaveBacktraces(bool* pSetting) {
-
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

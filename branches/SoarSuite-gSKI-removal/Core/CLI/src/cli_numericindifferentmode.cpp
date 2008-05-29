@@ -54,8 +54,6 @@ bool CommandLineInterface::ParseNumericIndifferentMode(std::vector<std::string>&
 }
 
 bool CommandLineInterface::DoNumericIndifferentMode(const eNumericIndifferentMode mode) {
-	if (!RequireAgent()) return false;
-
 	switch (mode) {
 		case 0:
 			break;

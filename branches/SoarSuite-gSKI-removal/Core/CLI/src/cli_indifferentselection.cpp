@@ -61,8 +61,6 @@ bool CommandLineInterface::ParseIndifferentSelection(std::vector<std::string>& a
 }
 
 bool CommandLineInterface::DoIndifferentSelection(eIndifferentMode mode) {
-	if (!RequireAgent()) return false;
-
 	if (mode == INDIFFERENT_QUERY) {
 		// query
 		char buf[kMinBufferSize];

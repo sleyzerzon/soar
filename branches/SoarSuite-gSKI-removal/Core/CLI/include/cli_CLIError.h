@@ -37,8 +37,8 @@ namespace cli {
 			kgetcwdFail 						= 18,
 			kgettimeofdayFail 					= 19,
 			kchdirFail							= 20,
-			kAgentRequired						= 21,
-			kKernelRequired						= 22,
+			//kAgentRequired						= 21,
+			//kKernelRequired						= 22,
 			kAliasNotFound						= 23,
 			//kAliasExists						= 24,
 			kNoHelpFile							= 27,
@@ -125,8 +125,8 @@ namespace cli {
 				case kgetcwdFail:						return "Error getting current working directory.";
 				case kgettimeofdayFail:					return "gettimeofday() failed.";
 				case kchdirFail:						return "Error changing to directory.";
-				case kAgentRequired:					return "An agent is required for this command.";
-				case kKernelRequired:					return "A kernel is required for this command.";
+				//case kAgentRequired:					return "An agent is required for this command.";
+				//case kKernelRequired:					return "A kernel is required for this command.";
 				case kAliasNotFound:					return "Alias not found.";
 				//case kAliasExists:						return "Alias exists, remove to overwrite.";
 				case kNoHelpFile:						return "Could not find help files.  Check the library location using the 'set-library-location' command.  The library location should be set to SoarLibrary.";

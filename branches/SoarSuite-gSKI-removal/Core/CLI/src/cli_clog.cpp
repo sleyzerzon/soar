@@ -126,8 +126,6 @@ bool CommandLineInterface::ParseCLog(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoCLog(const eLogMode mode, const std::string* pFilename, const std::string* pToAdd, bool silent) {
-	if (!RequireAgent()) return false;
-
 	std::ios_base::openmode openmode = std::ios_base::out;
 
  	switch (mode) {

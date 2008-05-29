@@ -43,8 +43,6 @@ bool CommandLineInterface::ParseMultiAttributes(std::vector<std::string>& argv) 
 }
 
 bool CommandLineInterface::DoMultiAttributes(const std::string* pAttribute, int n) {
-	if (!RequireAgent()) return false;
-
 	multi_attribute* maList = m_pAgentSoar->multi_attributes;
 
 	if (!pAttribute && !n) {

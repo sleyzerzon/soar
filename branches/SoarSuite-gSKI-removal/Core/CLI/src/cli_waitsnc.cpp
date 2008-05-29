@@ -56,8 +56,6 @@ bool CommandLineInterface::ParseWaitSNC(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoWaitSNC(bool* pSetting) {
-	if (!RequireAgent()) return false;
-
 	if (!pSetting) {
 		if (m_RawOutput) {
 			m_Result << "Current waitsnc setting: " << (m_pAgentSoar->waitsnc ? "enabled" : "disabled");

@@ -60,8 +60,6 @@ bool CommandLineInterface::ParseReteNet(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoReteNet(bool save, std::string filename) {
-	if (!RequireAgent()) return false;
-
 	if (!filename.size()) return SetError(CLIError::kMissingFilenameArg);
 
 	StripQuotes(filename);

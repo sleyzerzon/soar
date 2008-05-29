@@ -209,9 +209,16 @@ EXPORT bool CommandLineInterface::ShouldEchoCommand(char const* pCommandLine)
 * @param pResponse Pointer to XML response object
 *************************************************************/
 EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentSML* pAgent, const char* pCommandLine, bool echoResults, ElementXML* pResponse) {
+	if (!m_pKernelSML) return false;
+
 	// No way to return data
 	if (!pConnection) return false;
 	if (!pResponse) return false;
+	if (!pAgent) return false;
+
+	m_pAgentSML = pAgent;
+	m_pAgentSoar = m_pAgentSML->GetSoarAgent();
+	assert( m_pAgentSoar );
 
 	// Log input
 	if (m_pLogFile) {
@@ -220,16 +227,8 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
 	}
 
 	m_EchoResult = echoResults ;
-	m_pAgentSML = pAgent;
-	if (m_pAgentSML)
-	{
-		m_pAgentSoar = m_pAgentSML->GetSoarAgent();
-	}
-	else
-	{
-		m_pAgentSoar = 0;
-	}
 
+	// For kernel callback classn we inherit
 	SetAgentSML(m_pAgentSML) ;
 
 	// Process the command, ignoring its result (errors detected with m_LastError)
@@ -563,19 +562,6 @@ bool CommandLineInterface::IsInteger(const std::string& s) {
 		}
 		++iter;
 	}
-	return true;
-}
-
-bool CommandLineInterface::RequireAgent() {
-	// Requiring an agent implies requiring a kernel
-	if (!RequireKernel()) return false;
-	if (!m_pAgentSML) return SetError(CLIError::kAgentRequired);
-	if (!m_pAgentSoar) return SetError(CLIError::kAgentRequired);
-	return true;
-}
-
-bool CommandLineInterface::RequireKernel() {
-	if (!m_pKernelSML) return SetError(CLIError::kKernelRequired);
 	return true;
 }
 

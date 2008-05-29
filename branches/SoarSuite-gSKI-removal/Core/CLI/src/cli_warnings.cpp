@@ -59,8 +59,6 @@ bool CommandLineInterface::ParseWarnings(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoWarnings(bool* pSetting) {
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

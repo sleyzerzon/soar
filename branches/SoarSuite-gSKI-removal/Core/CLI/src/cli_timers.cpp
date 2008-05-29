@@ -60,9 +60,6 @@ bool CommandLineInterface::ParseTimers(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoTimers(bool* pSetting) {
-	// Need agent pointer and kernel pointer for sysparam
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

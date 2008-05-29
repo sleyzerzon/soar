@@ -37,9 +37,6 @@ bool CommandLineInterface::ParseMaxElaborations(std::vector<std::string>& argv) 
 }
 
 bool CommandLineInterface::DoMaxElaborations(const int n) {
-
-	if (!RequireAgent()) return false;
-
 	if (!n) {
 		// Query
 		if (m_RawOutput) {

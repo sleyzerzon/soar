@@ -143,9 +143,6 @@ bool CommandLineInterface::ParsePrint(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoPrint(PrintBitset options, int depth, const std::string* pArg) {
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	// Strip any surrounding "{"
 	/*
 	std::string local = *pArg ;

@@ -78,8 +78,6 @@ bool CommandLineInterface::ParseSource(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoSource(std::string filename) {
-	if (!RequireAgent()) return false;
-
     StripQuotes(filename);
 
 	// Separate the path out of the filename if any

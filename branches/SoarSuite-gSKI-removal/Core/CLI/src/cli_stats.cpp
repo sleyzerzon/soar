@@ -67,9 +67,6 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 
 
 bool CommandLineInterface::DoStats(const StatsBitset& options) {
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	if (m_RawOutput) {
 		if ( options.test(STATS_MEMORY) )
 		{

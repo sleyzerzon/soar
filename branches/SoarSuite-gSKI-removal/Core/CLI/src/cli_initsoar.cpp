@@ -23,9 +23,6 @@ bool CommandLineInterface::ParseInitSoar(std::vector<std::string>&) {
 }
 
 bool CommandLineInterface::DoInitSoar() {
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	// Save the current result
 	std::string oldResult = m_Result.str();
 

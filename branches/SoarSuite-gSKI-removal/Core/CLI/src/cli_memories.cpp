@@ -93,8 +93,6 @@ bool CommandLineInterface::ParseMemories(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoMemories(const MemoriesBitset options, int n, const std::string* pProduction) {
-	if (!RequireAgent()) return false;
-
 	std::vector< std::pair< std::string, unsigned long > > memories;
 
 	// get either one production or all of them

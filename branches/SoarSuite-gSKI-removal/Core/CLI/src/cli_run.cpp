@@ -116,8 +116,6 @@ eRunInterleaveMode CommandLineInterface::ParseRunInterleaveOptarg() {
 }
 
 bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterleaveMode interleaveIn) {
-	if (!RequireAgent()) return false;
-
 	// Default run type is sml_DECISION
 	smlRunStepSize runType = sml_DECISION;
 	//// ... unless there is a count, then the default is a decision cycle:

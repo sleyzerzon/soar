@@ -36,8 +36,6 @@ bool CommandLineInterface::ParseMaxNilOutputCycles(std::vector<std::string>& arg
 }
 
 bool CommandLineInterface::DoMaxNilOutputCycles(const int n) {
-	if (!RequireAgent()) return false;
-
 	if (!n) {
 		// query
 		if (m_RawOutput) {

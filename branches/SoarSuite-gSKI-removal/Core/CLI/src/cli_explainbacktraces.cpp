@@ -68,8 +68,6 @@ bool CommandLineInterface::ParseExplainBacktraces(std::vector<std::string>& argv
 }
 
 bool CommandLineInterface::DoExplainBacktraces(const std::string* pProduction, const int condition) {
-	if (!RequireAgent()) return false;
-
 	// quick sanity check
 	if (condition < -1) return SetError(CLIError::kInvalidConditionNumber);
 

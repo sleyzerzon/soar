@@ -62,9 +62,6 @@ bool CommandLineInterface::ParsePWatch(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoPWatch(bool query, const std::string* pProduction, bool setting) {
-
-	if (!RequireAgent()) return false;
-
 	// check for query or not production 
 	if (query || !pProduction) {
 		// list all productions currently being traced

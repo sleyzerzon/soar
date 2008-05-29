@@ -25,10 +25,6 @@ bool CommandLineInterface::ParseGDSPrint(std::vector<std::string>&) {
 }
 
 bool CommandLineInterface::DoGDSPrint() {
-
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of desolation, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

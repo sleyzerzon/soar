@@ -78,9 +78,6 @@ bool CommandLineInterface::ParseChunkNameFormat(std::vector<std::string>& argv) 
 }
 
 bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int* pCount, const std::string* pPrefix) {
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

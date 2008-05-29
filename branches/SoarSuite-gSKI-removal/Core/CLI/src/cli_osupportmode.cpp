@@ -41,9 +41,6 @@ bool CommandLineInterface::ParseOSupportMode(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoOSupportMode(int mode) {
-
-	if (!RequireAgent()) return false;
-
 	if (mode < 0) {
 		mode = m_pAgentSoar->o_support_calculation_type;
 

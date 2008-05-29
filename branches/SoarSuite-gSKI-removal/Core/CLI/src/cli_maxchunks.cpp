@@ -37,9 +37,6 @@ bool CommandLineInterface::ParseMaxChunks(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoMaxChunks(const int n) {
-
-	if (!RequireAgent()) return false;
-
 	if (!n) {
 		// query
 		if (m_RawOutput) {

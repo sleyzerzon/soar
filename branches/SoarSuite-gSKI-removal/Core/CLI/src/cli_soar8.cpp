@@ -56,9 +56,6 @@ bool CommandLineInterface::ParseSoar8(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoSoar8(bool* pSoar8) {
-
-	if (!RequireAgent()) return false;
-
 	if (!pSoar8) {
 		// query
 		if (m_RawOutput) {

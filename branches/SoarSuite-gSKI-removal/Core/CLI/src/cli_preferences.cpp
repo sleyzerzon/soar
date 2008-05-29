@@ -87,8 +87,6 @@ bool CommandLineInterface::ParsePreferences(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoPreferences(const ePreferencesDetail detail, bool object, const std::string* pId, const std::string* pAttribute) {
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

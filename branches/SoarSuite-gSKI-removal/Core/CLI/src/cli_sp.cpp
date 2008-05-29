@@ -53,9 +53,6 @@ void soarAlternateInput(agent *ai_agent, const char  *ai_string, char  *ai_suffi
 }
 
 bool CommandLineInterface::DoSP(const std::string& productionString) {
-	// Must have agent to give production to
-	if (!RequireAgent()) return false;
-
 	// Load the production
 	this->AddListenerAndDisableCallbacks();
 	// voigtjr: note: this TODO from gSKI:

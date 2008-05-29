@@ -81,8 +81,6 @@ bool CommandLineInterface::ParseExcise(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoExcise(const ExciseBitset& options, const std::string* pProduction) {
-	if (!RequireAgent()) return false;
-
 	int exciseCount = 0;
 
 	// Process the general options

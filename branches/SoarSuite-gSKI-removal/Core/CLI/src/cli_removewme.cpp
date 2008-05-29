@@ -41,9 +41,6 @@ bool CommandLineInterface::ParseRemoveWME(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoRemoveWME(int timetag) {
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

@@ -44,9 +44,6 @@ bool CommandLineInterface::ParseAddWME(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoAddWME(const std::string& id, const std::string& attribute, const std::string& value, bool acceptable) {
-	// Need agent pointer for function calls
-	if (!RequireAgent()) return false;
-
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 

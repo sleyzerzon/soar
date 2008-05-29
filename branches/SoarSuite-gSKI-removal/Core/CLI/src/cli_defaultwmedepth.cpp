@@ -35,8 +35,6 @@ bool CommandLineInterface::ParseDefaultWMEDepth(std::vector<std::string>& argv) 
 }
 
 bool CommandLineInterface::DoDefaultWMEDepth(const int* pDepth) {
-	if (!RequireAgent()) return false;
-
 	if (!pDepth) {
 		if (m_RawOutput) {
 			m_Result << m_pAgentSoar->default_wme_depth;
