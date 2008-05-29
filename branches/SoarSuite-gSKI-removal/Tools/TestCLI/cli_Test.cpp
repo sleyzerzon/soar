@@ -27,6 +27,7 @@ soar_thread::Mutex*	g_pInputQueueMutex = 0;
 soar_thread::Event*	g_pInputQueueWriteEvent = 0;
 soar_thread::Event*	g_pWaitForInput = 0;
 InputThread*		g_pInputThread = 0;
+int					g_TraceCallbackID = 0;
 
 InputThread::InputThread() {
 }
@@ -67,6 +68,12 @@ void InputThread::Run() {
 // callback functions
 void PrintCallbackHandler(sml::smlPrintEventId id, void* pUserData, sml::Agent* pAgent, char const* pMessage) {
 	cout << pMessage;	// simply display whatever comes back through the event
+}
+
+void XmlCallbackHandler(sml::smlXMLEventId id, void* pUserData, sml::Agent* pAgent, sml::ClientXML* pXML) {
+	char* message = pXML->GenerateXMLString(true, true);
+	cout << message;
+	pXML->DeleteString(message);
 }
 
 void RunCallbackHandler(sml::smlRunEventId id, void* pUserData, sml::Agent* pAgent, sml::smlPhase phase) {
@@ -249,14 +256,20 @@ bool CommandProcessor::ProcessLine(std::string& commandLine) {
 	temporaryHistoryIndex = historyIndex;
 
 	// Process meta-commands first, since they return
-	if (commandLine == "raw") {
+	if (!raw && commandLine == "raw") {
+		sml::Agent* pAgent = pKernel->GetAgent( AGENT_NAME );
+		pAgent->UnregisterForXMLEvent(g_TraceCallbackID);
+		g_TraceCallbackID = pAgent->RegisterForPrintEvent( sml::smlEVENT_PRINT, PrintCallbackHandler, 0 );
 		raw = true;
 		DisplayPrompt(true);
 		g_pWaitForInput->TriggerEvent();
 		return true;
 
 	}
-	if (commandLine == "structured") {
+	if (raw && commandLine == "structured") {
+		sml::Agent* pAgent = pKernel->GetAgent( AGENT_NAME );
+		pAgent->UnregisterForPrintEvent(g_TraceCallbackID);
+		g_TraceCallbackID = pAgent->RegisterForXMLEvent( sml::smlEVENT_XML_TRACE_OUTPUT, XmlCallbackHandler, 0 );
 		raw = false;
 		DisplayPrompt(true);
 		g_pWaitForInput->TriggerEvent();
@@ -386,7 +399,7 @@ int main(int argc, char** argv)
 
 		// Register for necessary callbacks
 		int callbackID1 = pAgent->RegisterForRunEvent(sml::smlEVENT_BEFORE_DECISION_CYCLE, RunCallbackHandler, 0);
-		int callbackID2 = pAgent->RegisterForPrintEvent(sml::smlEVENT_PRINT, PrintCallbackHandler, 0);
+		g_TraceCallbackID = pAgent->RegisterForPrintEvent(sml::smlEVENT_PRINT, PrintCallbackHandler, 0);
 
 		// Do script if any
 		bool good = true;
@@ -410,7 +423,7 @@ int main(int argc, char** argv)
 			while (g_pCommandProcessor->ProcessCharacter(getKey(true))) {}
 		}
 
-		pAgent->UnregisterForPrintEvent(callbackID2);
+		pAgent->UnregisterForPrintEvent(g_TraceCallbackID);
 		pAgent->UnregisterForRunEvent(callbackID1);
 
 		// Don't delete agent, owned by kernel
