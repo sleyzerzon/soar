@@ -1157,7 +1157,7 @@ void ClientSMLTest::doSimpleCopy()
 
 	// BADBAD: This should be illegal, but is not!
 	//sml::Identifier* pWord5 = pAgent->CreateSharedIdWME(pSentence, "word", pWord1) ;
-
+	sml::Identifier* pWord5 = pAgent->CreateSharedIdWME(pSentence, "word2", pWord1) ;
 
 	sml::Identifier* pWord2 = pAgent->CreateIdWME(pSentence, "word") ;
 	sml::Identifier* pWord3 = pAgent->CreateIdWME(pSentence, "word") ;
@@ -1218,7 +1218,7 @@ void ClientSMLTest::doSimpleCopy()
 	std::stringstream changesString;
 	//changesString << "Number of changes: " << changes << ", this failure is currently expected but needs to be addressed, see wiki gSKI removal page";
 	changesString << "Number of changes: " << changes;
-	CPPUNIT_ASSERT_MESSAGE( changesString.str().c_str(), changes == 12 );
+	CPPUNIT_ASSERT_MESSAGE( changesString.str().c_str(), changes == 13 );
 }
 
 void ClientSMLTest::doSimpleReteNetLoader()
