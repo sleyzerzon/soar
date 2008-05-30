@@ -190,6 +190,7 @@ unsigned long release_io_symbol (agent* thisAgent, Symbol *sym) {
   return symbol_remove_ref (thisAgent, sym);
 }
 
+// BADBAD: should rename these functions (and wmeMap, for that matter) to be specific to input wmes, since that's all they are used for (these function names would be good for manipulating a map that deals with all wmes, not just input wmes)
 void add_wme_to_wmeMap(agent* thisAgent, wme* w) {
 	unsigned long timetag = w->timetag ;
 	(*(thisAgent->wmeMap))[timetag] = w ;
@@ -201,8 +202,12 @@ void remove_wme_from_wmeMap(agent* thisAgent, wme* w) {
 }
 
 wme* find_wme_from_timetag(agent* thisAgent, unsigned long timetag) {
-	wme* w = (*(thisAgent->wmeMap))[timetag] ;
-	return w ;
+   WmeMap::iterator wi = thisAgent->wmeMap->find(timetag);
+   if(wi == thisAgent->wmeMap->end())
+   {
+      return NULL;
+   }
+   return wi->second;
 }
 
 wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
@@ -252,6 +257,7 @@ wme* find_input_wme_by_timetag_from_id (agent* thisAgent, Symbol* idSym, unsigne
 	return NIL ;
 }
 
+// BADBAD: This is just a one-line passthrough to find_wme_from_timetag.  Given that the map just tracks input wmes, this function has the better name, and thus the code from find_wme_from_timetag should be moved into here.  (find_wme_from_timetag is a good name for a function that can find any wme by timetag, not just input wmes).
 wme* find_input_wme_by_timetag (agent* thisAgent, unsigned long timetag) {
     //PrintDebugFormat("Looking for tag %ld", timetag) ;
 	return find_wme_from_timetag(thisAgent, timetag) ;
