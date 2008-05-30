@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <bitset>
 
 #include "sml_Connection.h"
 #include "sml_Client.h"
@@ -18,26 +19,39 @@
 #include <sys/wait.h>
 #endif // !_WIN32
 
+enum eKernelOptions
+{
+	NONE,
+	EMBEDDED,
+	USE_CLIENT_THREAD,
+	FULLY_OPTIMIZED,
+	AUTO_COMMIT_ENABLED,
+	NUM_KERNEL_OPTIONS,
+};
+
+typedef std::bitset<NUM_KERNEL_OPTIONS> KernelBitset;
+
 class ClientSMLTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( ClientSMLTest );	
 
-	CPPUNIT_TEST( testEmbeddedDirectInit );
-	CPPUNIT_TEST( testEmbeddedDirect );
-	CPPUNIT_TEST( testEmbedded );
-	CPPUNIT_TEST( testNewThread );
-	CPPUNIT_TEST( testNewThreadNoAutoCommit );
-	CPPUNIT_TEST( testRemote );
-	CPPUNIT_TEST( testRemoteNoAutoCommit );
-	CPPUNIT_TEST( testSimpleCopy );
-	CPPUNIT_TEST( testSimpleReteNetLoader );
-	CPPUNIT_TEST( testSimpleStopUpdate );
-	CPPUNIT_TEST( testSimpleSNCBreak );
-	CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
-	CPPUNIT_TEST( testWMEMemoryLeak );					// see bugzilla bug 1035
-	CPPUNIT_TEST( testWMEMemoryLeakNotOptimized );		// see bugzilla bug 1035
-	CPPUNIT_TEST( testWMEMemoryLeakNoAutoCommit );		// see bugzilla bug 1035
-	CPPUNIT_TEST( testWMEMemoryLeakRemote );			// see bugzilla bug 1035
+	//CPPUNIT_TEST( testEmbeddedDirectInit );
+	//CPPUNIT_TEST( testEmbeddedDirect );
+	//CPPUNIT_TEST( testEmbedded );
+	//CPPUNIT_TEST( testNewThread );
+	//CPPUNIT_TEST( testNewThreadNoAutoCommit );
+	//CPPUNIT_TEST( testRemote );
+	//CPPUNIT_TEST( testRemoteNoAutoCommit );
+	//CPPUNIT_TEST( testSimpleCopy );
+	//CPPUNIT_TEST( testSimpleReteNetLoader );
+	//CPPUNIT_TEST( testSimpleStopUpdate );
+	//CPPUNIT_TEST( testSimpleSNCBreak );
+	//CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
+	//CPPUNIT_TEST( testWMEMemoryLeak );					// see bugzilla bug 1035
+	//CPPUNIT_TEST( testWMEMemoryLeakNotOptimized );		// see bugzilla bug 1035
+	//CPPUNIT_TEST( testWMEMemoryLeakNoAutoCommit );		// see bugzilla bug 1035
+	//CPPUNIT_TEST( testWMEMemoryLeakRemote );			// see bugzilla bug 1035
+	CPPUNIT_TEST( testNonAlphaAttrs );
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -63,13 +77,14 @@ protected:
 	void testSimpleReteNetLoader();
 	void testSimpleStopUpdate();
 	void testSimpleSNCBreak();
+	void testNonAlphaAttrs();
 
 private:
-	void createKernelAndAgents( bool embedded, bool useClientThread, bool fullyOptimized, bool autoCommit, int port = 12121 );
+	void createKernelAndAgents( const KernelBitset& options, int port = 12121 );
 
 	void doFullTest();
 
-	void testWMEMemoryLeakInternal( sml::UpdateEventHandler handler, bool autoCommit, bool embedded, bool fullyOptimized );
+	void testWMEMemoryLeakInternal( sml::UpdateEventHandler handler, const KernelBitset& options );
 
 	std::string getAgentName( int agentIndex );
 	void initAgent( sml::Agent* pAgent );
@@ -219,7 +234,12 @@ void ClientSMLTest::doFullTest()
 void ClientSMLTest::testEmbeddedDirectInit()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, true, true, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	for ( int agentCounter = 0 ; agentCounter < numberAgents ; ++agentCounter )
 	{
@@ -233,7 +253,12 @@ void ClientSMLTest::testEmbeddedDirectInit()
 void ClientSMLTest::testEmbeddedDirect()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, true, true, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	doFullTest();
 }
@@ -241,7 +266,11 @@ void ClientSMLTest::testEmbeddedDirect()
 void ClientSMLTest::testEmbedded()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, true, false, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	doFullTest();
 }
@@ -249,7 +278,10 @@ void ClientSMLTest::testEmbedded()
 void ClientSMLTest::testNewThread()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, false, false, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	doFullTest();
 }
@@ -257,7 +289,9 @@ void ClientSMLTest::testNewThread()
 void ClientSMLTest::testNewThreadNoAutoCommit()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, false, false, false);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	createKernelAndAgents( options );
 
 	doFullTest();
 }
@@ -273,7 +307,9 @@ void ClientSMLTest::testRemote()
 	}
 
 	numberAgents = 1;
-	createKernelAndAgents( false, false, false, true );
+	KernelBitset options(0);
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	doFullTest();
 
@@ -294,7 +330,8 @@ void ClientSMLTest::testRemoteNoAutoCommit()
 	}
 
 	numberAgents = 1;
-	createKernelAndAgents( false, false, false, false );
+	KernelBitset options(0);
+	createKernelAndAgents( options );
 
 	doFullTest();
 
@@ -306,22 +343,40 @@ void ClientSMLTest::testRemoteNoAutoCommit()
 
 void ClientSMLTest::testWMEMemoryLeakDestroyChildren()
 {
-	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandlerDestroyChildren, true, true, true );
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	options.set( USE_CLIENT_THREAD );
+	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandlerDestroyChildren, options );
 }
 
 void ClientSMLTest::testWMEMemoryLeak()
 {
-	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, true, true, true );
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	options.set( USE_CLIENT_THREAD );
+	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, options );
 }
 
 void ClientSMLTest::testWMEMemoryLeakNotOptimized()
 {
-	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, true, true, false );
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( AUTO_COMMIT_ENABLED );
+	options.set( USE_CLIENT_THREAD );
+	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, options );
 }
 
 void ClientSMLTest::testWMEMemoryLeakNoAutoCommit()
 {
-	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, false, true, true );
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( FULLY_OPTIMIZED );
+	options.set( USE_CLIENT_THREAD );
+	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, options );
 }
 
 void ClientSMLTest::testWMEMemoryLeakRemote()
@@ -329,15 +384,19 @@ void ClientSMLTest::testWMEMemoryLeakRemote()
 	remote = true;
 	spawnListener();
 
-	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, true, false, true );
+	KernelBitset options(0);
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	options.set( USE_CLIENT_THREAD );
+	testWMEMemoryLeakInternal( Handlers::MyMemoryLeakUpdateHandler, options );
 }
 
-void ClientSMLTest::testWMEMemoryLeakInternal( sml::UpdateEventHandler handler, bool autoCommit, bool embedded, bool fullyOptimized )
+void ClientSMLTest::testWMEMemoryLeakInternal( sml::UpdateEventHandler handler, const KernelBitset& options )
 {
 	// see bugzilla bug 1034, 1035
 
 	numberAgents = 1;
-	createKernelAndAgents(embedded, true, fullyOptimized, autoCommit);
+	createKernelAndAgents( options );
 
 	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
 	CPPUNIT_ASSERT( pAgent != NULL );
@@ -364,15 +423,51 @@ void ClientSMLTest::testWMEMemoryLeakInternal( sml::UpdateEventHandler handler, 
 void ClientSMLTest::testSimpleCopy()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, true, true, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	doSimpleCopy();
+}
+
+void ClientSMLTest::testNonAlphaAttrs()
+{
+	numberAgents = 1;
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
+
+	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
+	CPPUNIT_ASSERT( pAgent != NULL );
+
+	sml::Identifier* il = pAgent->GetInputLink() ;
+	sml::Identifier* one = pAgent->CreateIdWME(il, "1");
+	sml::Identifier* two = pAgent->CreateSharedIdWME(il, "2", one) ;
+	sml::StringElement* three = pAgent->CreateStringWME(il, "3", "4") ;
+	sml::IntElement* four = pAgent->CreateIntWME(il, "5", 6) ;
+	sml::FloatElement* five = pAgent->CreateFloatWME(il, "7", 8.0) ;
+	pAgent->Commit() ;
+
+	std::string result = pAgent->RunSelf(3) ;
+
+	// TODO: Test that things are there
 }
 
 void ClientSMLTest::testSimpleReteNetLoader()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, true, true, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	doSimpleReteNetLoader();
 }
@@ -380,7 +475,12 @@ void ClientSMLTest::testSimpleReteNetLoader()
 void ClientSMLTest::testSimpleStopUpdate()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, true, true, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
 	CPPUNIT_ASSERT( pAgent != NULL );
@@ -396,7 +496,12 @@ void ClientSMLTest::testSimpleStopUpdate()
 void ClientSMLTest::testSimpleSNCBreak()
 {
 	numberAgents = 1;
-	createKernelAndAgents(true, true, true, true);
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
 
 	sml::Agent* pAgent = pKernel->GetAgent( getAgentName( 0 ).c_str() ) ;
 	CPPUNIT_ASSERT( pAgent != NULL );
@@ -465,17 +570,30 @@ void ClientSMLTest::cleanUpListener()
 #endif // _WIN32
 }
 
-void ClientSMLTest::createKernelAndAgents( bool embedded, bool useClientThread, bool fullyOptimized, bool autoCommit, int port )
+void ClientSMLTest::createKernelAndAgents( const KernelBitset& options, int port )
 {
-	pKernel = embedded ?
-		(useClientThread ? sml::Kernel::CreateKernelInCurrentThread( sml::Kernel::GetDefaultLibraryName(), fullyOptimized, sml::Kernel::GetDefaultPort())
-		: sml::Kernel::CreateKernelInNewThread("SoarKernelSML", sml::Kernel::GetDefaultPort()))
-		: sml::Kernel::CreateRemoteConnection(true, NULL, port) ;
+	CPPUNIT_ASSERT( pKernel == NULL );
+
+	if ( options.test( EMBEDDED ) )
+	{
+		if ( options.test( USE_CLIENT_THREAD ) )
+		{
+			pKernel = sml::Kernel::CreateKernelInCurrentThread( sml::Kernel::GetDefaultLibraryName(), options.test( FULLY_OPTIMIZED ), sml::Kernel::GetDefaultPort());
+		}
+		else
+		{
+			pKernel = sml::Kernel::CreateKernelInNewThread("SoarKernelSML", sml::Kernel::GetDefaultPort());
+		}
+	}
+	else
+	{
+		pKernel = sml::Kernel::CreateRemoteConnection(true, 0, port);
+	}
 
 	CPPUNIT_ASSERT( pKernel != NULL );
 	CPPUNIT_ASSERT_MESSAGE( pKernel->GetLastErrorDescription(), !pKernel->HadError() );
 
-	pKernel->SetAutoCommit( autoCommit ) ;
+	pKernel->SetAutoCommit( options.test( AUTO_COMMIT_ENABLED ) ) ;
 
 	// Set this to true to give us lots of extra debug information on remote clients
 	// (useful in a test app like this).
