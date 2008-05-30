@@ -20,6 +20,7 @@
 #define AGENT_LISTENER_H
 
 #include "sml_EventManager.h"
+#include "sml_Events.h"
 
 #include <string>
 #include <map>
@@ -28,8 +29,6 @@ namespace sml {
 
 class KernelSML ;
 class Connection ;
-
-enum smlAgentEventId;
 
 class AgentListener : public EventManager<smlAgentEventId>
 {

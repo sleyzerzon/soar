@@ -22,6 +22,7 @@
 
 // Local includes
 #include "sml_KernelCallback.h"
+#include "sml_Events.h"
 
 #include "cli_CommandData.h"
 #include "cli_Aliases.h"
@@ -42,7 +43,6 @@ namespace sml {
 	class Connection ;
 	class AgentSML;
 	class XMLTrace;
-	enum smlPhase;
 }
 
 namespace cli {

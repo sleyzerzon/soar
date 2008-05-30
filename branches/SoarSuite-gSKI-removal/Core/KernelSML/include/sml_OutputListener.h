@@ -13,6 +13,7 @@
 #define OUTPUT_LISTENER_H
 
 #include "sml_EventManager.h"
+#include "sml_Events.h"
 
 #include <map>
 
@@ -24,7 +25,6 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 class TagWme ;
-enum smlWorkingMemoryEventId;
 
 // This map is from time tag to bool to say whether a given tag has been seen in the latest event or not
 typedef std::map< long, bool >		OutputTimeTagMap ;

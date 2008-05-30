@@ -13,6 +13,7 @@
 #define STRING_LISTENER_H
 
 #include "sml_EventManager.h"
+#include "sml_Events.h"
 
 #include <string>
 #include <map>
@@ -21,7 +22,6 @@ namespace sml {
 
 class KernelSML ;
 class Connection ;
-enum smlStringEventId;
 
 struct StringListenerCallbackData 
 {

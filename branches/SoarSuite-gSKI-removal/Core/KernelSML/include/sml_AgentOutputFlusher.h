@@ -9,14 +9,12 @@
 #define AGENT_OUTPUT_FLUSHER_H
 
 #include "sml_KernelCallback.h"
+#include "sml_Events.h"
 
 namespace sml {
 
 class PrintListener;
 class XMLListener ;
-
-enum smlPrintEventId;
-enum smlXMLEventId;
 
 class AgentOutputFlusher : public KernelCallback
 {

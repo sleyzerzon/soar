@@ -20,15 +20,13 @@
 #ifndef SML_RUN_SCHEDULER_H
 #define SML_RUN_SCHEDULER_H
 
+#include "sml_Events.h"
+
 namespace sml {
 
 // Forward declarations
 class KernelSML ;
 class AgentSML ;
-enum smlRunFlags;
-enum smlPhase;
-enum smlRunStepSize;
-enum smlRunResult;
 
 class RunScheduler
 {

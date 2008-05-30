@@ -15,6 +15,7 @@
 #define RHS_LISTENER_H
 
 #include "sml_EventManager.h"
+#include "sml_Events.h"
 
 #include <string>
 #include <map>
@@ -23,7 +24,6 @@ namespace sml {
 
 class Connection ;
 class AgentSML ;
-enum smlRhsEventId;
 
 // Mapping from a rhs function name to the list of connections implementing that function
 typedef std::map< std::string, ConnectionList* >	RhsMap ;

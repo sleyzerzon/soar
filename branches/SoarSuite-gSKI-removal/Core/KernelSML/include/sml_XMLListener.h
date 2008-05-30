@@ -17,6 +17,7 @@
 
 #include "sml_EventManager.h"
 #include "sml_XMLTrace.h"
+#include "sml_Events.h"
 
 #include <string>
 #include <map>
@@ -26,7 +27,6 @@ namespace sml {
 class KernelSML ;
 class Connection ;
 class AgentOutputFlusher;
-enum smlXMLEventId;
 
 class XMLListener : public EventManager<smlXMLEventId>
 {

@@ -26,6 +26,7 @@ typedef struct wme_struct wme;
 #include "sml_UpdateListener.h"
 #include "sml_UntypedListener.h"
 #include "sml_Utils.h" // required for release builds for unused macro
+#include "sml_Events.h"
 
 namespace soar_thread
 {
@@ -45,8 +46,6 @@ class ConnectionManager ;
 class Events ;
 class RunScheduler ;
 class KernelHelpers ;
-
-enum smlStopLocationFlags ;
 
 // Define the CommandFunction which we'll call to process commands
 typedef bool (KernelSML::*CommandFunction)(AgentSML*, char const*, Connection*, AnalyzeXML*, ElementXML*);
