@@ -35,22 +35,22 @@ class ClientSMLTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( ClientSMLTest );	
 
-	//CPPUNIT_TEST( testEmbeddedDirectInit );
-	//CPPUNIT_TEST( testEmbeddedDirect );
-	//CPPUNIT_TEST( testEmbedded );
-	//CPPUNIT_TEST( testNewThread );
-	//CPPUNIT_TEST( testNewThreadNoAutoCommit );
-	//CPPUNIT_TEST( testRemote );
-	//CPPUNIT_TEST( testRemoteNoAutoCommit );
-	//CPPUNIT_TEST( testSimpleCopy );
-	//CPPUNIT_TEST( testSimpleReteNetLoader );
-	//CPPUNIT_TEST( testSimpleStopUpdate );
-	//CPPUNIT_TEST( testSimpleSNCBreak );
-	//CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
-	//CPPUNIT_TEST( testWMEMemoryLeak );					// see bugzilla bug 1035
-	//CPPUNIT_TEST( testWMEMemoryLeakNotOptimized );		// see bugzilla bug 1035
-	//CPPUNIT_TEST( testWMEMemoryLeakNoAutoCommit );		// see bugzilla bug 1035
-	//CPPUNIT_TEST( testWMEMemoryLeakRemote );			// see bugzilla bug 1035
+	CPPUNIT_TEST( testEmbeddedDirectInit );
+	CPPUNIT_TEST( testEmbeddedDirect );
+	CPPUNIT_TEST( testEmbedded );
+	CPPUNIT_TEST( testNewThread );
+	CPPUNIT_TEST( testNewThreadNoAutoCommit );
+	CPPUNIT_TEST( testRemote );
+	CPPUNIT_TEST( testRemoteNoAutoCommit );
+	CPPUNIT_TEST( testSimpleCopy );
+	CPPUNIT_TEST( testSimpleReteNetLoader );
+	CPPUNIT_TEST( testSimpleStopUpdate );
+	CPPUNIT_TEST( testSimpleSNCBreak );
+	CPPUNIT_TEST( testWMEMemoryLeakDestroyChildren );	// see bugzilla bug 1034
+	CPPUNIT_TEST( testWMEMemoryLeak );					// see bugzilla bug 1035
+	CPPUNIT_TEST( testWMEMemoryLeakNotOptimized );		// see bugzilla bug 1035
+	CPPUNIT_TEST( testWMEMemoryLeakNoAutoCommit );		// see bugzilla bug 1035
+	CPPUNIT_TEST( testWMEMemoryLeakRemote );			// see bugzilla bug 1035
 	CPPUNIT_TEST( testNonAlphaAttrs );
 
 	CPPUNIT_TEST_SUITE_END();
@@ -1154,9 +1154,7 @@ void ClientSMLTest::doAgentTest( sml::Agent* pAgent )
 	CPPUNIT_ASSERT( clearedNumberCommands == 0);
 
 	if ( verbose ) std::cout << "Marking command as completed." << std::endl ;
-	sml::StringElement* pCompleted = pAgent->CreateStringWME(pMove, "status", "complete") ;
-	CPPUNIT_ASSERT( pCompleted );
-
+	pMove->AddStatusComplete();
 	CPPUNIT_ASSERT( pAgent->Commit() );
 
 	// Test the ability to resynch the output link -- this should throw away our current output link representation
