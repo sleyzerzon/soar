@@ -1037,7 +1037,7 @@ void CommandLineInterface::OnKernelEvent(int eventID, AgentSML*, void* pCallData
 		// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 		sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
-		pKernelHack->XmlCallbackHelper( m_XMLEventTag, pCallData );
+		pKernelHack->XMLCallbackHelper( m_XMLEventTag, pCallData );
 	} 
 	else
 	{

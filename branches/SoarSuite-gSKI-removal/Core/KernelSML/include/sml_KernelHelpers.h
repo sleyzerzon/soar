@@ -21,7 +21,7 @@ typedef struct agent_struct agent;
 
 #include <string>
 
-// Included because we need XmlCallbackData defined in KernelSML/CLI
+// Included because we need XMLCallbackData defined in KernelSML/CLI
 #include "xml.h"
 
 namespace sml
@@ -103,7 +103,7 @@ namespace sml
 	 void ExplainListChunks(AgentSML* pIAgent);
 	 bool ExplainChunks(AgentSML* pIAgent, const char* pProduction, int mode);
 
-	 void XmlCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn);
+	 void XMLCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn);
   };
 }
 #endif

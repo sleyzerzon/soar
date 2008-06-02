@@ -2528,10 +2528,10 @@ bool KernelHelpers::ExplainChunks(AgentSML* pAgent, const char* pProduction, int
 	return true;
 }
 
-void KernelHelpers::XmlCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn)
+void KernelHelpers::XMLCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn)
 {
 	assert(pCallDataIn);
-	XmlCallbackData* pCallData = static_cast<XmlCallbackData*>(pCallDataIn);
+	XMLCallbackData* pCallData = static_cast<XMLCallbackData*>(pCallDataIn);
 	assert(pCallData);
 
 	// The value can be NULL if this is a begin/end tag event.

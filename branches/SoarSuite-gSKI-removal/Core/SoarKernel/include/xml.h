@@ -31,7 +31,7 @@
 
 // This is the data that needs to be passed back with the xml callback
 // This is defined here because it needs to be included by KernelSML/CLI and the SoarKernel
-struct XmlCallbackData {
+struct XMLCallbackData {
 	const char* funcType;
 	const char* attOrTag;
 	const char* value;
@@ -62,7 +62,7 @@ inline void makeAgentCallbackXML(	agent*		soarAgent,
                                         const char*	attOrTag,
 										const char*	value=0)
 {
-   XmlCallbackData xml_data;
+   XMLCallbackData xml_data;
 	/*
 	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
                     &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
@@ -73,7 +73,7 @@ inline void makeAgentCallbackXML(	agent*		soarAgent,
    xml_data.attOrTag = attOrTag;
    xml_data.value = value;
 
-   soar_invoke_first_callback(soarAgent, XML_GENERATION_CALLBACK, /*(XmlCallbackData)*/ static_cast<void*>(&xml_data));
+   soar_invoke_first_callback(soarAgent, XML_GENERATION_CALLBACK, /*(XMLCallbackData)*/ static_cast<void*>(&xml_data));
 	/*
 	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
                     &thisAgent->monitors_cpu_time[thisAgent->current_phase]);

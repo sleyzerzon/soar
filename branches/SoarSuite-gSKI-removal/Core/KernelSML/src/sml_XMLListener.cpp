@@ -89,7 +89,7 @@ void XMLListener::OnKernelEvent(int eventID, AgentSML*, void* pCallDataIn)
 	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
-	pKernelHack->XmlCallbackHelper( &m_BufferedXMLOutput[nBuffer], pCallDataIn );
+	pKernelHack->XMLCallbackHelper( &m_BufferedXMLOutput[nBuffer], pCallDataIn );
 }
 
 void XMLListener::FlushOutput(smlXMLEventId eventID) 

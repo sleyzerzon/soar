@@ -70,7 +70,7 @@ void PrintCallbackHandler(sml::smlPrintEventId id, void* pUserData, sml::Agent* 
 	cout << pMessage;	// simply display whatever comes back through the event
 }
 
-void XmlCallbackHandler(sml::smlXMLEventId id, void* pUserData, sml::Agent* pAgent, sml::ClientXML* pXML) {
+void XMLCallbackHandler(sml::smlXMLEventId id, void* pUserData, sml::Agent* pAgent, sml::ClientXML* pXML) {
 	char* message = pXML->GenerateXMLString(true, true);
 	cout << message;
 	pXML->DeleteString(message);
@@ -269,7 +269,7 @@ bool CommandProcessor::ProcessLine(std::string& commandLine) {
 	if (raw && commandLine == "structured") {
 		sml::Agent* pAgent = pKernel->GetAgent( AGENT_NAME );
 		pAgent->UnregisterForPrintEvent(g_TraceCallbackID);
-		g_TraceCallbackID = pAgent->RegisterForXMLEvent( sml::smlEVENT_XML_TRACE_OUTPUT, XmlCallbackHandler, 0 );
+		g_TraceCallbackID = pAgent->RegisterForXMLEvent( sml::smlEVENT_XML_TRACE_OUTPUT, XMLCallbackHandler, 0 );
 		raw = false;
 		DisplayPrompt(true);
 		g_pWaitForInput->TriggerEvent();
