@@ -130,7 +130,7 @@ void PrintListener::FlushOutput(Connection* pSourceConnection, smlPrintEventId e
 	if (eventID != smlEVENT_ECHO)
 	{
 		// Build the SML message we're going to send.
-		ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
+		soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName());
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].c_str());
@@ -153,7 +153,7 @@ void PrintListener::FlushOutput(Connection* pSourceConnection, smlPrintEventId e
 			connectionIter++ ;
 
 			// Build the SML message we're going to send.
-			ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
+			soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName());
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].c_str());

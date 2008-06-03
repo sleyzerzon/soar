@@ -44,14 +44,9 @@
 #include "rhsfun.h"
 #include "lexer.h"
 
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
+#include "cli_CommandLineInterface.h"
 
-// So we can call directly to it to create XML output.
-// If you need a kernel w/o any external dependencies, removing this include
-// and the implementation of these XML methods should do the trick.
-#include "cli_CommandLineInterface.h"	
-
-using namespace xmlTraceNames ;
+using namespace soar_TraceNames ;
 
 /////////////////////////////////////////////////////////////////
 //

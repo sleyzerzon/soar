@@ -23,12 +23,15 @@ typedef struct agent_struct agent;
 
 // Included because we need XMLCallbackData defined in KernelSML/CLI
 #include "xml.h"
+namespace soarxml
+{
+  class XMLTrace ;
+}
 
 namespace sml
 {
   class AgentSML ;
   class KernelSML ;
-  class XMLTrace ;
 
   class KernelHelpers
   {
@@ -103,7 +106,7 @@ namespace sml
 	 void ExplainListChunks(AgentSML* pIAgent);
 	 bool ExplainChunks(AgentSML* pIAgent, const char* pProduction, int mode);
 
-	 void XMLCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn);
+	 void XMLCallbackHelper(soarxml::XMLTrace* xmlTrace, void* pCallDataIn);
   };
 }
 #endif

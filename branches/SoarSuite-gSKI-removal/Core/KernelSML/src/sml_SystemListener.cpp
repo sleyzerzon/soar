@@ -122,7 +122,7 @@ void SystemListener::OnKernelEvent(int eventIDIn, AgentSML* , void* )
 	char const* eventString = m_pKernelSML->ConvertEventToString(eventID) ;
 
 	// Build the SML message we're doing to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, eventString) ;
 
 	// Send the message out

@@ -45,7 +45,7 @@
 #include "tempmem.h"
 #include "xml.h"
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 /* Uncomment the following line to get instantiation printouts */
 /* #define DEBUG_INSTANTIATIONS */

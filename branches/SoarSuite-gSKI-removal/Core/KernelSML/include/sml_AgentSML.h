@@ -60,7 +60,7 @@ typedef std::map< long, long >		TimeMap ;
 typedef TimeMap::iterator					TimeMapIter ;
 
 // List of input messages waiting for the next input phase callback from the kernel
-typedef std::list<ElementXML*>				PendingInputList ;
+typedef std::list<soarxml::ElementXML*>		PendingInputList ;
 typedef PendingInputList::iterator			PendingInputListIter ;
 
 typedef std::map< std::string, wme* >		KernelTimeTagMap ;
@@ -203,7 +203,7 @@ public:
 	void RemoveXMLListener(smlXMLEventId eventID, Connection* pConnection) { m_XMLListener.RemoveListener(eventID, pConnection) ; }
 
 	// Echo the list of wmes received back to any listeners
-	void FireInputReceivedEvent(ElementXML const* pCommands) { m_XMLListener.FireInputReceivedEvent(pCommands) ; }
+	void FireInputReceivedEvent(soarxml::ElementXML const* pCommands) { m_XMLListener.FireInputReceivedEvent(pCommands) ; }
 
 	void RemoveAllListeners(Connection* pConnection) ;
 

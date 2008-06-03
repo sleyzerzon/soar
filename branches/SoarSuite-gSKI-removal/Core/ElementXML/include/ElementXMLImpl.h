@@ -42,11 +42,7 @@
 #include <vector>
 #include <map>
 
-#ifndef unused
-#define unused(x) (void)(x)
-#endif
-
-namespace sml
+namespace soarxml
 {
 
 // Forward declarations
@@ -574,6 +570,6 @@ protected:
 
 };
 
-} // end of namespace
+} // namespace soarxml
 
 #endif // ElementXMLImpl_H

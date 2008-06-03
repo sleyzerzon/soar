@@ -51,13 +51,12 @@
 #include "recmem.h"
 #include "wmem.h"
 #include "gdatastructs.h"
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "xml.h"
 
 #include <map>
 #include <time.h>
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 void add_rhs_function (agent* thisAgent, 
                        Symbol *name,

@@ -52,7 +52,7 @@
 
 /* JC ADDED: This is for event firing in gSKI */
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 #ifdef NUMERIC_INDIFFERENCE
 /* REW: 2003-01-02 Behavior Variability Kernel Experiments */

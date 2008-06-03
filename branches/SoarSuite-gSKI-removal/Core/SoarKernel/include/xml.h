@@ -25,7 +25,7 @@
 #ifndef SOAR_XML_H
 #define SOAR_XML_H
 
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
+#include "soar_TraceNames.h" // for constants for XML function types, tags and attributes
 #include "callback.h"
 #include <stdio.h>
 
@@ -128,27 +128,27 @@ inline void makeAgentCallbackXML(	agent*		soarAgent,
 }
 
 inline void GenerateWarningXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionBeginTag, xmlTraceNames::kTagWarning);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionAddAttribute, xmlTraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionEndTag, xmlTraceNames::kTagWarning);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagWarning);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagWarning);
 }
 
 inline void GenerateErrorXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionBeginTag, xmlTraceNames::kTagError);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionAddAttribute, xmlTraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionEndTag, xmlTraceNames::kTagError);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagError);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagError);
 }
 
 inline void GenerateMessageXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionBeginTag, xmlTraceNames::kTagMessage);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionAddAttribute, xmlTraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionEndTag, xmlTraceNames::kTagMessage);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagMessage);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagMessage);
 }
 
 inline void GenerateVerboseXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionBeginTag, xmlTraceNames::kTagVerbose);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionAddAttribute, xmlTraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, xmlTraceNames::kFunctionEndTag, xmlTraceNames::kTagVerbose);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagVerbose);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
+	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagVerbose);
 }
 
 #endif

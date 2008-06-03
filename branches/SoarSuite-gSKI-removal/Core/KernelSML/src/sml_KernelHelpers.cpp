@@ -18,7 +18,7 @@
 #include "sml_Utils.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
-#include "sml_XMLTrace.h"
+#include "XMLTrace.h"
 
 #include "KernelHeaders.h"
 
@@ -33,7 +33,8 @@
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
 
 using namespace sml ;
-using namespace xmlTraceNames;
+using namespace soarxml ;
+using namespace soar_TraceNames ;
 
 
 namespace sml 

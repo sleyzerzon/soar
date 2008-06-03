@@ -67,7 +67,7 @@ void UpdateListener::OnKernelEvent(int eventIDIn, AgentSML* /*pAgentSML*/, void*
 	Int2String(*pRunFlags, runStr, sizeof(runStr)) ;
 
 	// Build the SML message we're doing to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, runStr) ;
 

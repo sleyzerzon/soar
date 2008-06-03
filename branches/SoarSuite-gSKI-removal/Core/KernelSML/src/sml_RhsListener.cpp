@@ -150,7 +150,7 @@ bool RhsListener::HandleFilterEvent(smlRhsEventId eventID, AgentSML* pAgent, cha
 		// Build the SML message we're doing to send.
 		// Pass the agent in the "name" parameter not the "agent" parameter as this is a kernel
 		// level event, not an agent level one (because you need to register with the kernel to get "agent created").
-		ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+		soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, pAgent ? pAgent->GetName() : "") ;
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, sml_Names::kFilterName) ;
@@ -244,7 +244,7 @@ bool RhsListener::HandleEvent(smlRhsEventId eventID, AgentSML* pAgent, bool comm
 	// Build the SML message we're doing to send.
 	// Pass the agent in the "name" parameter not the "agent" parameter as this is a kernel
 	// level event, not an agent level one (because you need to register with the kernel to get "agent created").
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	if (pAgent) pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, pAgent->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, pFunctionName) ;
@@ -341,7 +341,7 @@ bool RhsListener::ExecuteRhsCommand(AgentSML* pAgentSML, smlRhsEventId eventID, 
 	// Build the SML message we're doing to send.
 	// Pass the agent in the "name" parameter not the "agent" parameter as this is a kernel
 	// level event, not an agent level one (because you need to register with the kernel to get "agent created").
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	if (pAgentSML) pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, pAgentSML->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, functionName.c_str()) ;
@@ -429,7 +429,7 @@ bool RhsListener::ExecuteCommandLine(AgentSML* pAgent, char const* pFunctionName
 
 	// Build up a message to execute the command line
 	bool rawOutput = true ;
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_CommandLine, rawOutput) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_CommandLine, rawOutput) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgent->GetName());
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLine, commandLine.c_str()) ;
 
@@ -437,7 +437,7 @@ bool RhsListener::ExecuteCommandLine(AgentSML* pAgent, char const* pFunctionName
 	incoming.Analyze(pMsg) ;
 
 	// Create a response object which the command line can fill in
-	ElementXML* pResponse = pConnection->CreateSMLResponse(pMsg) ;
+	soarxml::ElementXML* pResponse = pConnection->CreateSMLResponse(pMsg) ;
 
 	// Execute the command line
 	bool ok = pKernel->ProcessCommand(sml_Names::kCommand_CommandLine, pConnection, &incoming, pResponse) ;

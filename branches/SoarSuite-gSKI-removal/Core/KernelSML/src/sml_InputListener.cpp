@@ -17,6 +17,7 @@
 #include "sml_Connection.h"
 #include "sml_AgentSML.h"
 #include "sml_KernelSML.h"
+#include "sml_StringOps.h"
 
 #include "KernelHeaders.h"
 
@@ -64,7 +65,7 @@ void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int )
 	bool ok = true ;
 
 	for (PendingInputListIter iter = pPending->begin() ; iter != pPending->end() ; iter++) {
-		ElementXML* pInputMsg = *iter ;
+		soarxml::ElementXML* pInputMsg = *iter ;
 
 		// Analyze the message and find important tags
 		AnalyzeXML msg ;
@@ -76,12 +77,12 @@ void InputListener::ProcessPendingInput(AgentSML* pAgentSML, int )
 		// Only input commands should be stored in the pending input list
 		assert(!strcmp(pCommandName, "input")) ;
 
-		ElementXML const* pCommand = msg.GetCommandTag() ;
+		soarxml::ElementXML const* pCommand = msg.GetCommandTag() ;
 
 		int nChildren = pCommand->GetNumberChildren() ;
 
-		ElementXML wmeXML(NULL) ;
-		ElementXML* pWmeXML = &wmeXML ;
+		soarxml::ElementXML wmeXML(NULL) ;
+		soarxml::ElementXML* pWmeXML = &wmeXML ;
 
 		if (kDebugInput)
 			PrintDebugFormat("--------- %s starting input ----------", pAgentSML->GetName()) ;

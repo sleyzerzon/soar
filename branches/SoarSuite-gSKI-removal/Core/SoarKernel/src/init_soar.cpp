@@ -41,7 +41,6 @@
 #include "io_soar.h"
 #include "rete.h"
 #include "gdatastructs.h"
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "xml.h"
 
 #define INIT_FILE       "init.soar"

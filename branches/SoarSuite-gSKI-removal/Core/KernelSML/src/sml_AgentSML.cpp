@@ -159,7 +159,7 @@ void AgentSML::ReleaseAllWmes(bool flushPendingRemoves)
 
 	for (PendingInputListIter iter = m_PendingInput.begin() ; iter != m_PendingInput.end() ; iter++)
 	{
-		ElementXML* pMsg = *iter ;
+		soarxml::ElementXML* pMsg = *iter ;
 		delete pMsg ;
 	}
 
@@ -226,7 +226,7 @@ void AgentSML::AddToPendingInputList(ElementXML_Handle hInputMsgHandle)
 {
 	// Create a new wrapper object for the message and store that with
 	// an increased ref count so the caller can do whatever they want with the original message
-	ElementXML* pMsg = new ElementXML(hInputMsgHandle) ;
+	soarxml::ElementXML* pMsg = new soarxml::ElementXML(hInputMsgHandle) ;
 	pMsg->AddRefOnHandle() ;
 
 	m_PendingInput.push_back(pMsg) ;
@@ -791,7 +791,7 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 
 	// Build up a message to execute the command line
 	bool rawOutput = true ;
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_CommandLine, rawOutput) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_CommandLine, rawOutput) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, this->GetName());
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLine, commandLine.c_str()) ;
 
@@ -799,7 +799,7 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 	incoming.Analyze(pMsg) ;
 
 	// Create a response object which the command line can fill in
-	ElementXML* pResponse = pConnection->CreateSMLResponse(pMsg) ;
+	soarxml::ElementXML* pResponse = pConnection->CreateSMLResponse(pMsg) ;
 
 	// Execute the command line
 	bool ok = pKernel->ProcessCommand(sml_Names::kCommand_CommandLine, pConnection, &incoming, pResponse) ;

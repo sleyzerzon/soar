@@ -68,7 +68,7 @@ protected:
 #endif
 
 	/** We need to cache the responses to calls **/
-	ElementXML* m_pLastResponse ;
+	soarxml::ElementXML* m_pLastResponse ;
 
 public:
 	virtual ~EmbeddedConnection() ;
@@ -86,8 +86,8 @@ public:
 
 	// Overridden in concrete subclasses
 	virtual bool IsAsynchronous() = 0 ;		// Returns true if messages are queued and executed on receiver's thread
-	virtual void SendMsg(ElementXML* pMsg) = 0 ;
-	virtual ElementXML* GetResponseForID(char const* pID, bool wait) = 0 ;
+	virtual void SendMsg(soarxml::ElementXML* pMsg) = 0 ;
+	virtual soarxml::ElementXML* GetResponseForID(char const* pID, bool wait) = 0 ;
 	virtual bool ReceiveMessages(bool allMessages) = 0 ;
 
 #ifdef KERNEL_SML_DIRECT

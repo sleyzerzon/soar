@@ -21,12 +21,16 @@
 #include <list>
 #include <utility>	// For std::pair
 
+namespace soarxml
+{
+	class ElementXML ;
+}
+
 namespace sml {
 
 class Kernel ;
 class Connection ;
 class AnalyzeXML ;
-class ElementXML ;
 class ClientXML ;
 class ClientAnalyzedXML ;
 
@@ -201,7 +205,7 @@ protected:
 	* @param pIncoming	The output command (list of wmes added/removed from output link)
 	* @param pResponse	The reply (no real need to fill anything in here currently)
 	*************************************************************/
-	void ReceivedOutput(AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	void ReceivedOutput(AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
 
 	/*************************************************************
 	* @brief This function is called when an event is received
@@ -210,14 +214,14 @@ protected:
 	* @param pIncoming	The event command
 	* @param pResponse	The reply (no real need to fill anything in here currently)
 	*************************************************************/
-	void ReceivedEvent(AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedRunEvent(smlRunEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedProductionEvent(smlProductionEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedPrintEvent(smlPrintEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedXMLEvent(smlXMLEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	void ReceivedEvent(AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedRunEvent(smlRunEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedProductionEvent(smlProductionEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedPrintEvent(smlPrintEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedXMLEvent(smlXMLEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
 
 	/** NOTE: Slightly different sig as this is called without analyzing the incoming msg so it's a bit faster */
-	void ReceivedXMLTraceEvent(smlXMLEventId id, ElementXML* pIncomingMsg, ElementXML* pResponse) ;
+	void ReceivedXMLTraceEvent(smlXMLEventId id, soarxml::ElementXML* pIncomingMsg, soarxml::ElementXML* pResponse) ;
 
 	/*************************************************************
 	* @brief This function is called after output has been received

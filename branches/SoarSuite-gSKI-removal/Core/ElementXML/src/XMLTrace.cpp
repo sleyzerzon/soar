@@ -15,16 +15,17 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_Utils.h"
-#include "sml_XMLTrace.h"
+#include "XMLTrace.h"
 #include "assert.h"
+#include "soar_TraceNames.h" // for constants for XML function types, tags and attributes
 
-using namespace sml ;
+namespace soarxml
+{
 
 XMLTrace::XMLTrace()
 {
 	m_XML = new ElementXML() ;
-	m_XML->SetTagName(sml_Names::kTagTrace) ;
+	m_XML->SetTagName(soar_TraceNames::kTagTrace) ;
 
 	m_pCurrentTag = new ElementXML(m_XML->GetXMLHandle()) ;
 	m_pCurrentTag->AddRefOnHandle() ;
@@ -62,7 +63,7 @@ void XMLTrace::Reset()
 	m_XML = NULL ;
 
 	m_XML = new ElementXML() ;
-	m_XML->SetTagName(sml_Names::kTagTrace) ;
+	m_XML->SetTagName(soar_TraceNames::kTagTrace) ;
 
 	m_pCurrentTag = new ElementXML(m_XML->GetXMLHandle()) ;
 	m_pCurrentTag->AddRefOnHandle() ;
@@ -232,3 +233,5 @@ ElementXML* XMLTrace::DetatchObject()
 	m_XML = NULL ;
 	return pResult ;
 }
+
+} // namespace soarxml

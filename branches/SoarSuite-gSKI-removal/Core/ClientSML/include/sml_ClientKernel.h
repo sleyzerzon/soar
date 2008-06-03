@@ -19,13 +19,18 @@
 #include "sml_ClientEvents.h"
 #include "sml_ListMap.h"
 
-// Forward declaratiokn for ElementXML_Handle.
-struct ElementXML_InterfaceStruct ;
-typedef struct ElementXML_InterfaceStruct *ElementXML_Handle ;
+// Forward declare so clients can use this
+struct ElementXML_InterfaceStruct;
+typedef ElementXML_InterfaceStruct* ElementXML_Handle ;
 
 namespace sock
 {
 	class SocketLib ;
+}
+
+namespace soarxml
+{
+	class ElementXML ;
 }
 
 namespace sml {
@@ -33,7 +38,6 @@ namespace sml {
 // Forward declarations
 class Agent ;
 class Connection ;
-class ElementXML ;
 class EventThread ;
 class Events ;
 class AnalyzeXML ;
@@ -256,12 +260,12 @@ protected:
 	* @param pIncoming	The event command
 	* @param pResponse	The reply (no real need to fill anything in here currently)
 	*************************************************************/
-	void ReceivedEvent(AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedSystemEvent(smlSystemEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedAgentEvent(smlAgentEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedRhsEvent(smlRhsEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedUpdateEvent(smlUpdateEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	void ReceivedStringEvent(smlStringEventId id, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	void ReceivedEvent(AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedSystemEvent(smlSystemEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedAgentEvent(smlAgentEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedRhsEvent(smlRhsEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedUpdateEvent(smlUpdateEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	void ReceivedStringEvent(smlStringEventId id, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
 
 	/*************************************************************
 	* @brief If this message is an XML trace message returns
@@ -270,7 +274,7 @@ protected:
 	*		 This function is just to boost performance on trace messages
 	*		 which are really performance critical.
 	*************************************************************/
-	Agent* IsXMLTraceEvent(ElementXML* pIncomingMsg) ;
+	Agent* IsXMLTraceEvent(soarxml::ElementXML* pIncomingMsg) ;
 
 	void InitializeTimeTagCounter() ;
 
@@ -966,13 +970,13 @@ protected:
 	* @brief This function is called when we receive a "call" SML
 	*		 message from the kernel.
 	*************************************************************/
-	static ElementXML* ReceivedCall(Connection* pConnection, ElementXML* pIncoming, void* pUserData) ;
+	static soarxml::ElementXML* ReceivedCall(Connection* pConnection, soarxml::ElementXML* pIncoming, void* pUserData) ;
 
 	/*************************************************************
 	* @brief This function is called (indirectly) when we receive a "call" SML
 	*		 message from the kernel.
 	*************************************************************/
-	ElementXML* ProcessIncomingSML(Connection* pConnection, ElementXML* pIncoming) ;
+	soarxml::ElementXML* ProcessIncomingSML(Connection* pConnection, soarxml::ElementXML* pIncoming) ;
 
 	/*************************************************************
 	* @brief The workhorse function to create an embedded connection.

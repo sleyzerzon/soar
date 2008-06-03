@@ -39,6 +39,7 @@
 #include <assert.h>
 
 using namespace sml ;
+using namespace soarxml;
 
 WorkingMemory::WorkingMemory()
 {

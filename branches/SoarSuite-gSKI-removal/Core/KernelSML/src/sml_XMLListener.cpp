@@ -26,6 +26,7 @@
 #include "assert.h"
 
 using namespace sml ;
+using namespace soarxml ;
 
 void XMLListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 {
@@ -115,7 +116,7 @@ void XMLListener::FlushOutput(smlXMLEventId eventID)
 	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
 
 	// Build the SML message we're going to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
 
 	// NOTE: For this trace message we require that the agent name be the first param here (so we can look it up quickly)
 	// and any other changes to the structure of this message should be carefully checked to make sure they don't
@@ -127,7 +128,7 @@ void XMLListener::FlushOutput(smlXMLEventId eventID)
 	// add it as a child of this message.  This is just moving a few pointers around, nothing is getting copied.
 	// The structure of the message is <sml><command></command><trace></trace></sml>
 	ElementXML_Handle xmlHandle = xmlTrace->Detach() ;
-	ElementXML* pXMLTrace = new ElementXML(xmlHandle) ;
+	soarxml::ElementXML* pXMLTrace = new ElementXML(xmlHandle) ;
 	pMsg->AddChild(pXMLTrace) ;
 
 	// Clear the XML trace object, completing the flush.
@@ -142,7 +143,7 @@ void XMLListener::FlushOutput(smlXMLEventId eventID)
 }
 
 // Echo the list of wmes received back to any listeners
-void XMLListener::FireInputReceivedEvent(ElementXML const* pCommands)
+void XMLListener::FireInputReceivedEvent(soarxml::ElementXML const* pCommands)
 {
 	smlXMLEventId eventID = smlEVENT_XML_INPUT_RECEIVED ;
 
@@ -161,23 +162,23 @@ void XMLListener::FireInputReceivedEvent(ElementXML const* pCommands)
 	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
 
 	// Build the SML message we're going to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
 
 	// Add the agent parameter and as a side-effect, get a pointer to the <command> tag.  This is an optimization.
 	ElementXML_Handle hCommand = pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName()) ;
-	ElementXML command(hCommand) ;
+	soarxml::ElementXML command(hCommand) ;
 
 	// Copy the list of wmes from the input message over
 	int nWmes = pCommands->GetNumberChildren() ;
 	for (int i = 0 ; i < nWmes ; i++)
 	{
-		ElementXML wme ;
+		soarxml::ElementXML wme ;
 		pCommands->GetChild(&wme, i) ;
 
 		if (wme.IsTag(sml_Names::kTagWME))
 		{
-			ElementXML* pCopy = wme.MakeCopy() ;
+			soarxml::ElementXML* pCopy = wme.MakeCopy() ;
 			command.AddChild(pCopy) ;
 		}
 	}

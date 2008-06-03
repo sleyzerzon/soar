@@ -14,6 +14,7 @@
 #include "sml_MessageSML.h"
 
 using namespace sml ;
+using namespace soarxml;
 
 MessageSML::MessageSML()
 {

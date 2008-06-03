@@ -37,12 +37,16 @@
 typedef struct agent_struct agent;
 typedef struct production_struct production;
 
+namespace soarxml
+{
+	class ElementXML ;
+	class XMLTrace;
+}
+
 namespace sml {
-	class ElementXML;
 	class KernelSML;
 	class Connection ;
 	class AgentSML;
-	class XMLTrace;
 }
 
 namespace cli {
@@ -67,7 +71,7 @@ typedef std::map<std::string, bool>				EchoMap ;
 typedef std::stack<std::string> StringStack;
 
 // Define the list for structured responses
-typedef std::list<sml::ElementXML*> ElementXMLList;
+typedef std::list<soarxml::ElementXML*> ElementXMLList;
 typedef ElementXMLList::iterator ElementXMLListIter;
 
 // Define bitsets for various commands
@@ -120,7 +124,7 @@ public:
 	* @param echoResults If true send a copy of the result to the echo event
 	* @param pResponse Pointer to XML response object
 	*************************************************************/
-	EXPORT bool DoCommand(sml::Connection* pConnection, sml::AgentSML* pAgent, const char* pCommandLine, bool echoResults, sml::ElementXML* pResponse);
+	EXPORT bool DoCommand(sml::Connection* pConnection, sml::AgentSML* pAgent, const char* pCommandLine, bool echoResults, soarxml::ElementXML* pResponse);
 
 	/*************************************************************
 	* @brief Takes a command line and expands any aliases and returns
@@ -129,7 +133,7 @@ public:
 	* @param pCommandLine The command line string, arguments separated by spaces
 	* @param pResponse Pointer to XML response object
 	*************************************************************/
-	EXPORT bool ExpandCommand(sml::Connection* pConnection, const char* pCommandLine, sml::ElementXML* pResponse);
+	EXPORT bool ExpandCommand(sml::Connection* pConnection, const char* pCommandLine, soarxml::ElementXML* pResponse);
 
 	/*************************************************************
 	* @brief Returns true if the given command should always be echoed (to any listeners)
@@ -645,7 +649,7 @@ public:
 
 protected:
 
-	void GetLastResultSML(sml::Connection* pConnection, sml::ElementXML* pResponse);
+	void GetLastResultSML(sml::Connection* pConnection, soarxml::ElementXML* pResponse);
 
 	/*************************************************************
 	* @brief Does the bulk of command parsing and chooses what function
@@ -787,11 +791,11 @@ protected:
 	std::string			m_LastErrorDetail;		// Additional detail concerning the last error
 	bool				m_PrintEventToResult;	// True when print events should append message to result
 	bool				m_XMLEventToResult;		// True when xml events should append message to result
-	sml::XMLTrace*		m_XMLEventTag;			// Used to collect up the xml events
+	soarxml::XMLTrace*	m_XMLEventTag;			// Used to collect up the xml events
 	bool				m_EchoResult;			// If true, copy result of command to echo event stream
 	EchoMap				m_EchoMap;				// If command appears in this map, always echo it.
 	bool				m_VarPrint;				// Used in print command to put <>'s around identifiers.
-	sml::XMLTrace*		m_XMLResult;			// Used to collect up XML output from commands that directly support that.
+	soarxml::XMLTrace*	m_XMLResult;			// Used to collect up XML output from commands that directly support that.
 
 	Aliases				m_Aliases;				// Alias management object
 	CommandMap			m_CommandMap;			// Mapping of command names to function pointers

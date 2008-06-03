@@ -13,10 +13,10 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_ParseXMLFile.h"
-#include "sml_ElementXMLImpl.h"
+#include "ParseXMLFile.h"
+#include "ElementXMLImpl.h"
 
-using namespace sml ;
+using namespace soarxml;
 
 ParseXMLFile::ParseXMLFile(FILE* pInputFile)
 {
@@ -79,4 +79,3 @@ void ParseXMLFile::GetNextChar()
 	if (m_Pos >= m_LineLength)
 		ReadLine() ;
 }
-

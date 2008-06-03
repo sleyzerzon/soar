@@ -23,7 +23,7 @@
 //  is the only one that really access the data in the class).
 /////////////////////////////////////////////////////////////////
 
-#include "sml_ElementXMLImpl.h"
+#include "ElementXMLImpl.h"
 
 #include <algorithm>	// For "for_each"
 
@@ -33,8 +33,7 @@
 #endif //_MSC_VER
 #endif //DEBUG_REFCOUNTS
 
-
-using namespace sml ;
+using namespace soarxml;
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1355,4 +1354,3 @@ char* ElementXMLImpl::CopyBuffer(char const* original, int length)
 	
 	return str ;
 }
-

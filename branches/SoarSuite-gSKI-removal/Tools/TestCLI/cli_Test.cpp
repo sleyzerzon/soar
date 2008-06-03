@@ -10,7 +10,7 @@
 #include "sml_Connection.h"
 #include "sml_Client.h"
 #include "sml_AnalyzeXML.h"
-#include "sml_ElementXML.h"
+#include "ElementXML.h"
 #include "sml_Events.h"
 
 #include "thread_Lock.h"
@@ -297,7 +297,7 @@ bool CommandProcessor::ProcessLine(std::string& commandLine) {
 	} else {
 		sml::ClientAnalyzedXML* pStructuredResponse = new sml::ClientAnalyzedXML();
 		previousResult = pKernel->ExecuteCommandLineXML(commandLine.c_str(), AGENT_NAME, pStructuredResponse);
-		const sml::ElementXML* pResultTag = pStructuredResponse->GetResultTag();
+		const soarxml::ElementXML* pResultTag = pStructuredResponse->GetResultTag();
 
 		if (pResultTag) {
 			char* pOutput = pResultTag->GenerateXMLString(true);
@@ -307,7 +307,7 @@ bool CommandProcessor::ProcessLine(std::string& commandLine) {
 			pResultTag->DeleteString(pOutput);
 		}
 
-		const sml::ElementXML* pErrorTag = pStructuredResponse->GetErrorTag();
+		const soarxml::ElementXML* pErrorTag = pStructuredResponse->GetErrorTag();
 		if (pErrorTag) {
 			char* pOutput = pErrorTag->GenerateXMLString(true);
 			if (pOutput) {

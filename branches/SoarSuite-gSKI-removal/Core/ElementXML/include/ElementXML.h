@@ -50,12 +50,18 @@
 #define NUL 0
 #endif
 
-#include "sml_Errors.h"
 #include "ElementXMLHandle.h"
 
-namespace sml
+// get definition of EXPORT
+#include "Export.h"
+
+namespace sml 
 {
-class Connection ;
+	class Connection ;
+}
+
+namespace soarxml
+{
 
 /*************************************************************
 * @brief The ElementXML class represents an element in an XML stream.
@@ -64,7 +70,7 @@ class Connection ;
 class ElementXML
 {
 	// Let Connection have access to Fast methods (which are protected because they take care to use correctly).
-	friend class Connection ;
+	friend class sml::Connection ;
 	friend class XMLTrace ;
 
 protected:
@@ -74,9 +80,8 @@ public:
 	/*************************************************************
 	* @brief XML ids can only contain letters, numbers, “.” “-“ and “_”.
 	*************************************************************/
-	static bool IsValidID(char const* str) ;
+	EXPORT static bool IsValidID(char const* str) ;
 
-public:
 	////////////////////////////////////////////////////////////////
 	//
 	// Constructors and destructors
@@ -86,7 +91,7 @@ public:
     /*************************************************************
     * @brief Default constructor.
     *************************************************************/
-	ElementXML();
+	EXPORT ElementXML();
 
 	/*************************************************************
     * @brief Construct an object to manage an existing handle.
@@ -96,7 +101,7 @@ public:
 	*
 	* @param hXML	The handle to an existing ElementXML object
     *************************************************************/
-	ElementXML(ElementXML_Handle hXML) ;
+	EXPORT ElementXML(ElementXML_Handle hXML) ;
 
 	/*************************************************************
     * @brief Destructor.
@@ -104,7 +109,7 @@ public:
 	*		 If this object is managing a handle when it is deleted,
 	*		 that handle's ref count is reduced.
     *************************************************************/
-	virtual ~ElementXML(void);
+	EXPORT virtual ~ElementXML(void);
 
 	/*************************************************************
     * @brief Release our reference to this object, possibly
@@ -116,7 +121,7 @@ public:
 	*
 	* @returns The new reference count (0 implies the object was deleted)
     *************************************************************/
-	int ReleaseRefOnHandle() ;
+	EXPORT int ReleaseRefOnHandle() ;
 
 	/*************************************************************
 	* @brief Add a new reference to this object.
@@ -131,12 +136,12 @@ public:
 	*
 	* @returns The new reference count (will be at least 2).
 	*************************************************************/
-	int AddRefOnHandle() ;
+	EXPORT int AddRefOnHandle() ;
 
 	/*************************************************************
 	* @returns Reports the current reference count (must be > 0)
 	*************************************************************/
-	int GetRefCount() ;
+	EXPORT int GetRefCount() ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -153,7 +158,7 @@ public:
 	*
 	* @param hXML	The handle to an existing ElementXML object
     *************************************************************/
-	void Attach(ElementXML_Handle hXML) ;
+	EXPORT void Attach(ElementXML_Handle hXML) ;
 
 	/*************************************************************
     * @brief Releases ownership of the handle.
@@ -161,7 +166,7 @@ public:
 	*		 The caller must call releaseRef() on this handle
 	*		 when it is done with it.
     *************************************************************/
-	ElementXML_Handle Detach() ;
+	EXPORT ElementXML_Handle Detach() ;
 
 	/*************************************************************
     * @brief Provides access to the handle this object is managing.
@@ -171,7 +176,7 @@ public:
 	*		 (If the caller wishes to keep a reference to this returned
 	*		  handle it should call addRef() on it).
     *************************************************************/
-	ElementXML_Handle GetXMLHandle() const ;
+	EXPORT ElementXML_Handle GetXMLHandle() const ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -186,19 +191,19 @@ public:
 	* @param  copyName	If true, tagName will be copied.  If false, we take ownership of tagName.
 	* @returns	true if the tag name is valid.
 	*************************************************************/
-	bool SetTagName(char* tagName, bool copyName = true) ;
+	EXPORT bool SetTagName(char* tagName, bool copyName = true) ;
 
     /*************************************************************
     * @brief Helper overload -- if we're passed a const, must copy it.
 	*************************************************************/
-	bool SetTagName(char const* tagName) { return SetTagName(CopyString(tagName), false) ; }
+	EXPORT bool SetTagName(char const* tagName);
 
     /*************************************************************
     * @brief Gets the tag name for this element.
 	*
     * @returns The tag name.
 	*************************************************************/
-	char const* GetTagName() const ;
+	EXPORT char const* GetTagName() const ;
 
     /*************************************************************
     * @brief Returns true if the tag name matches.
@@ -207,7 +212,7 @@ public:
 	*
     * @returns true if equal (case sensitive)
 	*************************************************************/
-	bool IsTag(char const* pTagName) const ;
+	EXPORT bool IsTag(char const* pTagName) const ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -227,14 +232,14 @@ public:
 	*
 	* @param Comment	The comment string.
 	*************************************************************/
-	bool SetComment(char const* pComment) ;
+	EXPORT bool SetComment(char const* pComment) ;
 
 	/*************************************************************
 	* @brief Returns the comment for this element.
 	*
 	* @returns The comment string for this element (or zero-length string if there is none)
 	*************************************************************/
-	char const* GetComment() const ;
+	EXPORT char const* GetComment() const ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -254,12 +259,12 @@ public:
 	*
     * @param  pChild	The child to add.  Will be released when the parent is destroyed.
 	*************************************************************/
-	ElementXML_Handle AddChild(ElementXML* pChild) ;
+	EXPORT ElementXML_Handle AddChild(ElementXML* pChild) ;
 
     /*************************************************************
     * @brief Returns the number of children of this element.
 	*************************************************************/
-	int GetNumberChildren() const ;
+	EXPORT int GetNumberChildren() const ;
 
     /*************************************************************
     * @brief Returns the n-th child of this element by placing it in pChild.
@@ -273,7 +278,7 @@ public:
 	* 
 	* @returns false if index is out of range.
 	*************************************************************/
-	bool GetChild(ElementXML* pChild, int index) const ;
+	EXPORT bool GetChild(ElementXML* pChild, int index) const ;
 
     /*************************************************************
     * @brief Returns the parent of this element by placing it in pParent.
@@ -282,7 +287,7 @@ public:
 	*
 	* @returns false if has no parent.
 	*************************************************************/
-	bool GetParent(ElementXML* pParent) const ;
+	EXPORT bool GetParent(ElementXML* pParent) const ;
 
 	/*************************************************************
 	* @brief Returns a copy of this object.
@@ -291,7 +296,7 @@ public:
 	*
 	*		 Call delete on the returned object when you are done with it.
 	*************************************************************/
-	ElementXML* MakeCopy() const ;
+	EXPORT ElementXML* MakeCopy() const ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -308,18 +313,18 @@ public:
 	* @param  copyValue		If true, atttributeName will be copied.  If false, we take ownership of attributeValue
 	* @returns true if attribute name is valid (debug mode only)
 	*************************************************************/
-	bool AddAttribute(char* attributeName, char* attributeValue, bool copyName = true, bool copyValue = true);
+	EXPORT bool AddAttribute(char* attributeName, char* attributeValue, bool copyName = true, bool copyValue = true);
 
     /*************************************************************
     * @brief Helper overloads -- if we're passed a const, must copy it.
 	*************************************************************/
-	bool AddAttribute(char const* attributeName, char* attributeValue)		 { return AddAttribute(CopyString(attributeName), attributeValue, false, true) ; }
-	bool AddAttribute(char const* attributeName, char const* attributeValue) { return AddAttribute(CopyString(attributeName), CopyString(attributeValue), false, false) ; }
+	EXPORT bool AddAttribute(char const* attributeName, char* attributeValue);
+	EXPORT bool AddAttribute(char const* attributeName, char const* attributeValue);
 
     /*************************************************************
     * @brief Get the number of attributes attached to this element.  
 	*************************************************************/
-	int GetNumberAttributes() const ;
+	EXPORT int GetNumberAttributes() const ;
 
     /*************************************************************
     * @brief Get the name of the n-th attribute of this element.
@@ -327,14 +332,14 @@ public:
 	*
 	* @param index	The 0-based index of the attribute to return.
 	*************************************************************/
-	const char* GetAttributeName(int index) const ;
+	EXPORT const char* GetAttributeName(int index) const ;
 
     /*************************************************************
     * @brief Get the value of the n-th attribute of this element.
 	*
 	* @param index	The 0-based index of the attribute to return.
 	*************************************************************/
-	const char* GetAttributeValue(int index) const ;
+	EXPORT const char* GetAttributeValue(int index) const ;
 
     /*************************************************************
     * @brief Get the value of the named attribute of this element.
@@ -342,7 +347,7 @@ public:
 	* @param attName	The name of the attribute to look up.
 	* @returns The value of the named attribute (or null if this attribute doesn't exist).
 	*************************************************************/
-	const char* GetAttribute(const char* attName) const ;
+	EXPORT const char* GetAttribute(const char* attName) const ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -358,8 +363,8 @@ public:
 	*						These values will be converted when the XML stream is created.
 	* @param  copyData		If true, characterData will be copied.  If false, we take ownership of characterData
 	*************************************************************/
-	void SetCharacterData(char* characterData, bool copyData = true) ;
-	void SetCharacterData(char const* characterData)	{ SetCharacterData(CopyString(characterData), false) ; }
+	EXPORT void SetCharacterData(char* characterData, bool copyData = true) ;
+	EXPORT void SetCharacterData(char const* characterData);
 
 	/*************************************************************
     * @brief Setting the chracter data in this way indicates that this element’s character data should be treated as a binary buffer
@@ -369,8 +374,8 @@ public:
 	* @param length			The length of the buffer (note: allocateString(len) allocates len+1 bytes--and the len+1 needs to be passed in here.
 	* @param copyData		If true, characterData will be copied.  If false, we take ownership of characterData
 	*************************************************************/
-	void SetBinaryCharacterData(char* characterData, int length, bool copyData = true) ;
-	void SetBinaryCharacterData(char const* characterData, int length) { SetBinaryCharacterData(CopyBuffer(characterData, length), length, false) ; }
+	EXPORT void SetBinaryCharacterData(char* characterData, int length, bool copyData = true) ;
+	EXPORT void SetBinaryCharacterData(char const* characterData, int length);
 
     /*************************************************************
     * @brief Get the character data for this element.
@@ -379,13 +384,13 @@ public:
 	*			The character data returned will not include any XML escape sequences (e.g. &lt;). 
 	*			It will include the original special characters (e.g. "<").
 	*************************************************************/
-	char const* GetCharacterData() const ;
+	EXPORT char const* GetCharacterData() const ;
 
 	/*************************************************************
     * @brief Returns true if the character data should be treated as a binary buffer
 	*		 rather than a null-terminated character string.
 	*************************************************************/
-	bool IsCharacterDataBinary() const ;
+	EXPORT bool IsCharacterDataBinary() const ;
 
 	/*************************************************************
     * @brief Converts a character data buffer into binary data.
@@ -404,7 +409,7 @@ public:
 	*
 	* @returns True if buffer is binary after conversion.
 	*************************************************************/
-	bool ConvertCharacterDataToBinary() ;
+	EXPORT bool ConvertCharacterDataToBinary() ;
 
     /*************************************************************
     * @brief Returns the length of the character data.
@@ -412,7 +417,7 @@ public:
 	* If the data is a binary buffer this is the size of that buffer.
 	* If the data is a null terminated string this is the length of the string + 1 (for the null).
 	*************************************************************/
-	int	 GetCharacterDataLength() const ;
+	EXPORT int	 GetCharacterDataLength() const ;
 
     /*************************************************************
     * @brief Setting this value to true indicates that this element’s character data should be stored in a CDATA section.
@@ -422,12 +427,12 @@ public:
 	*
 	* @param useCData	true if this element’s character data should be stored in a CDATA section.
 	*************************************************************/
-	void SetUseCData(bool useCData) ;
+	EXPORT void SetUseCData(bool useCData) ;
 
 	/*************************************************************
     * @brief Returns true if this element's character data should be stored in a CDATA section when streamed to XML.
 	*************************************************************/
-	bool GetUseCData() const ;
+	EXPORT bool GetUseCData() const ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -443,7 +448,7 @@ public:
 	*
 	* @returns The string form of the object.  Caller must delete with DeleteString().
 	*************************************************************/
-	char* GenerateXMLString(bool includeChildren, bool insertNewLines = false) const ;
+	EXPORT char* GenerateXMLString(bool includeChildren, bool insertNewLines = false) const ;
 
     /*************************************************************
     * @brief Returns the length of string needed to represent this object (does not include the trailing null, so add one for that)
@@ -451,7 +456,7 @@ public:
 	* @param includeChildren	Includes all children in the XML output.
 	* @param insertNewlines		Add newlines to space out the tags to be more human-readable
 	*************************************************************/
-	int DetermineXMLStringLength(bool includeChildren, bool insertNewLines = false) const ;
+	EXPORT int DetermineXMLStringLength(bool includeChildren, bool insertNewLines = false) const ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -471,21 +476,21 @@ public:
 	* @param length		The length is the number of characters in the string, so length+1 bytes will be allocated
 	*					(so that a trailing null is always included).  Thus passing length 0 is valid and will allocate a single byte.
 	*************************************************************/
-	static char* AllocateString(int length) ;
+	EXPORT static char* AllocateString(int length) ;
 
     /*************************************************************
     * @brief Utility function to release memory allocated by this element and returned to the caller.
 	*
 	* @param string		The string to release.  Passing NULL is valid and does nothing.
 	*************************************************************/
-	static void DeleteString(char* pString) ;
+	EXPORT static void DeleteString(char* pString) ;
 
     /*************************************************************
     * @brief	Performs an allocation and then copies the contents of the passed in string to the newly allocated string.
 	*
 	* @param string		The string to copy.  Passing NULL is valid and returns NULL.
 	*************************************************************/
-	static char* CopyString(char const* original) ;
+	EXPORT static char* CopyString(char const* original) ;
 
 	/*************************************************************
     * @brief	Performs an allocation and then copies the contents of the passed in buffer to the newly allocated buffer.
@@ -494,7 +499,7 @@ public:
 	* @param string		The buffer to copy.  Passing NULL is valid and returns NULL.
 	* @param length		The length of the buffer to copy (this exact length will be allocated--no trailing NULL is added).
 	*************************************************************/
-	static char* CopyBuffer(char const* original, int length) ;
+	EXPORT static char* CopyBuffer(char const* original, int length) ;
 
 	////////////////////////////////////////////////////////////////
 	//
@@ -509,7 +514,7 @@ public:
 	* @param  pString	The XML document stored in a string.
 	* @returns NULL if parsing failed, otherwise the ElementXML representing XML doc
 	*************************************************************/
-	static ElementXML* ParseXMLFromString(char const* pString) ;
+	EXPORT static ElementXML* ParseXMLFromString(char const* pString) ;
 
 	/*************************************************************
 	* @brief Parse an XML document from a (long) string and return an ElementXML object
@@ -521,7 +526,7 @@ public:
 	* @param  endPos    This value is filled in at the end of the parse and indicates where the parse ended. (if endPos == strlen(pString) we're done)
 	* @returns NULL if parsing failed, otherwise the ElementXML representing XML doc
 	*************************************************************/
-	static ElementXML* ParseXMLFromStringSequence(char const* pString, size_t startPos, size_t* endPos) ;
+	EXPORT static ElementXML* ParseXMLFromStringSequence(char const* pString, size_t startPos, size_t* endPos) ;
 
 	/*************************************************************
 	* @brief Parse an XML document from a file and return an ElementXML object
@@ -530,14 +535,14 @@ public:
 	* @param  pFilename	The file to load
 	* @returns NULL if parsing failed, otherwise the ElementXML representing XML doc
 	*************************************************************/
-	static ElementXML* ParseXMLFromFile(char const* pFilename) ;
+	EXPORT static ElementXML* ParseXMLFromFile(char const* pFilename) ;
 
 	/*************************************************************
 	* @brief Returns an error message describing reason for error in last parse.
 	*
 	* Call here if the parsing functions return NULL to find out what went wrong.
 	*************************************************************/
-	static char const* GetLastParseErrorDescription() ;
+	EXPORT static char const* GetLastParseErrorDescription() ;
 
 protected:
 	/*************************************************************
@@ -551,9 +556,9 @@ protected:
 	* @param  copyValue		If true, atttributeName will be copied.  If false, we take ownership of attributeValue
 	* @returns true if attribute name is valid (debug mode only)
 	*************************************************************/
-	bool AddAttributeFast(char const* attributeName, char* attributeValue, bool copyValue = true);
+	EXPORT bool AddAttributeFast(char const* attributeName, char* attributeValue, bool copyValue = true);
 
-	bool AddAttributeFast(char const* attributeName, char const* attributeValue) { return AddAttributeFast(attributeName, CopyString(attributeValue), false) ; } 
+	EXPORT bool AddAttributeFast(char const* attributeName, char const* attributeValue);
 
 	/*************************************************************
     * @brief Adds an attribute name-value pair.
@@ -565,7 +570,7 @@ protected:
 	* @param attributeValue Can be any string.
 	* @returns true if attribute name is valid (debug mode only)
 	*************************************************************/
-	bool AddAttributeFastFast(char const* attributeName, char const* attributeValue);
+	EXPORT bool AddAttributeFastFast(char const* attributeName, char const* attributeValue);
 
     /*************************************************************
     * @brief Set the tag name for this element.
@@ -577,7 +582,7 @@ protected:
     * @param  tagName	Tag name can only contain letters, numbers, “.” “-“ and “_”.
 	* @returns	true if the tag name is valid.
 	*************************************************************/
-	bool SetTagNameFast(char const* tagName) ;
+	EXPORT bool SetTagNameFast(char const* tagName) ;
 
 
 };

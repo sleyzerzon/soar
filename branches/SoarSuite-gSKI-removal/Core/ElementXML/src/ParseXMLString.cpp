@@ -13,10 +13,10 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_ParseXMLString.h"
-#include "sml_ElementXMLImpl.h"
+#include "ParseXMLString.h"
+#include "ElementXMLImpl.h"
 
-using namespace sml ;
+using namespace soarxml;
 
 ParseXMLString::ParseXMLString(char const* pInputLine, size_t startPos)
 {

@@ -26,7 +26,7 @@
 #include "sml_StringOps.h"
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
-#include "sml_XMLTrace.h"
+#include "XMLTrace.h"
 #include "sml_KernelHelpers.h"
 #include "KernelHeaders.h"
 
@@ -34,6 +34,7 @@
 
 using namespace cli;
 using namespace sml;
+using namespace soarxml;
 
 std::ostringstream CommandLineInterface::m_Result;	
 
@@ -244,7 +245,7 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
 	return true;
 }
 
-void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::ElementXML* pResponse) {
+void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, soarxml::ElementXML* pResponse) {
 	assert(pConnection);
 	assert(pResponse);
 
@@ -373,7 +374,7 @@ bool CommandLineInterface::ExpandCommandToString(const char* pCommandLine, std::
 * @param pCommandLine The command line string, arguments separated by spaces
 * @param pResponse Pointer to XML response object
 *************************************************************/
-EXPORT bool CommandLineInterface::ExpandCommand(sml::Connection* pConnection, const char* pCommandLine, sml::ElementXML* pResponse)
+EXPORT bool CommandLineInterface::ExpandCommand(sml::Connection* pConnection, const char* pCommandLine, soarxml::ElementXML* pResponse)
 {
 	std::string result ;
 

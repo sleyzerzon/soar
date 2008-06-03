@@ -37,7 +37,7 @@
 #include "tempmem.h"
 #include "xml.h"
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 /* ======================================================================
 

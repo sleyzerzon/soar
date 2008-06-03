@@ -32,12 +32,11 @@
 #include "rhsfun.h"
 #include "production.h"
 #include "instantiations.h"
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "xml.h"
 
 #include <stdarg.h>
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 /* -------------------------------------------------------------------
    Print_string() and print_spaces() do the obvious things.

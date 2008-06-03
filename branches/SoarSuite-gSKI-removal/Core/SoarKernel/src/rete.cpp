@@ -104,11 +104,6 @@
 #include "lexer.h"
 #include "xml.h"
 
-// So we can call directly to it to create XML output.
-// If you need a kernel w/o any external dependencies, removing this include
-// and methods starting with xml_ should do the trick.
-#include "cli_CommandLineInterface.h"	
-
 /* ----------- basic functionality switches ----------- */
 
 /* Set to FALSE to preserve variable names in chunks (takes extra space) */
@@ -154,7 +149,7 @@
 
 
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 
 

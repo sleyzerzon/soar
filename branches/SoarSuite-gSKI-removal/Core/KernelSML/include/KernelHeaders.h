@@ -24,7 +24,6 @@
 #include "rhsfun.h"
 #include "production.h" // for struct multi_attributes
 #include "print.h"      // for symboltostring
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "decide.h"
 #include "recmem.h"
 #include "symtab.h"

@@ -25,7 +25,7 @@
 
 #include <string>
 
-namespace sml {
+namespace soarxml {
 
 // I think we'll want to implement our own parseString class
 // which is (a) using allocateString() calls (so we can just pass off the results)

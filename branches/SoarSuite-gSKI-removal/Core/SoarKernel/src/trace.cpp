@@ -37,12 +37,11 @@
 #include "gdatastructs.h"
 #include "tempmem.h"
 #include "wmem.h"
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "xml.h"
 
 #include <ctype.h>
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 /* --- trace format types --- */
 

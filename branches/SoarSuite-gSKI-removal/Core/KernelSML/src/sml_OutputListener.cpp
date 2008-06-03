@@ -125,11 +125,11 @@ void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgen
 	Connection* pConnection = *connectionIter ;
 
 	// Build the SML message we're doing to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Output) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Output) ;
 
 	// Add the agent parameter and as a side-effect, get a pointer to the <command> tag.  This is an optimization.
 	ElementXML_Handle hCommand = pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgentSML->GetName()) ;
-	ElementXML command(hCommand) ;
+	soarxml::ElementXML command(hCommand) ;
 
 	// We are passed a list of all wmes in the transitive closure (TC) of the output link.
 	// We need to decide which of these we've already seen before, so we can just send the

@@ -883,17 +883,17 @@ void ClientSMLTest::doXMLTest( sml::Agent* pAgent )
 	char* xmlString = xml2.GenerateXMLString( true );
 	CPPUNIT_ASSERT( xmlString );
 
-	sml::ElementXML const* pResult = xml2.GetResultTag() ;
+	soarxml::ElementXML const* pResult = xml2.GetResultTag() ;
 	CPPUNIT_ASSERT( pResult );
 
 	// The XML format of "print" is a <trace> tag containing a series of
 	// a) <wme> tags (if this is an --internal print) or
 	// b) <id> tags that contain <wme> tags if this is not an --internal print.
-	sml::ElementXML traceChild ;
+	soarxml::ElementXML traceChild ;
 	CPPUNIT_ASSERT( pResult->GetChild( &traceChild, 0 ) );
 
 	int nChildren = traceChild.GetNumberChildren() ;
-	sml::ElementXML wmeChild ;
+	soarxml::ElementXML wmeChild ;
 	for (int i = 0 ; i < nChildren ; i++)
 	{
 		traceChild.GetChild( &wmeChild, i ) ;

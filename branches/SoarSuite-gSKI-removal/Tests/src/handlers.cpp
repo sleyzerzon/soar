@@ -73,7 +73,7 @@ std::string Handlers::MyClientMessageHandler( sml::smlRhsEventId, void* pUserDat
 // This is a very dumb filter--it adds "--depth 2" to all commands passed to it.
 std::string Handlers::MyFilterHandler( sml::smlRhsEventId, void* pUserData, sml::Agent*, char const*, char const* pCommandLine)
 {
-	sml::ElementXML* pXML = sml::ElementXML::ParseXMLFromString( pCommandLine ) ;
+	soarxml::ElementXML* pXML = soarxml::ElementXML::ParseXMLFromString( pCommandLine ) ;
 	CPPUNIT_ASSERT( pXML );
 	CPPUNIT_ASSERT( pXML->GetAttribute( sml::sml_Names::kFilterCommand ) );
 

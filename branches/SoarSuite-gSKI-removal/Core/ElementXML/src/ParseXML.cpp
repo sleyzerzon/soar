@@ -22,10 +22,10 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_ParseXML.h"
-#include "sml_ElementXMLImpl.h"
+#include "ParseXML.h"
+#include "ElementXMLImpl.h"
 
-using namespace sml ;
+using namespace soarxml;
 
 // We use a special attribute "bin_encoding='hex'" to indicate
 // when binary data is stored in the character data stream.

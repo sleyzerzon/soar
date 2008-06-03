@@ -33,6 +33,7 @@
 #include <string>
 
 using namespace sml;
+using namespace soarxml;
 
 Agent::Agent(Kernel* pKernel, char const* pName)
 {

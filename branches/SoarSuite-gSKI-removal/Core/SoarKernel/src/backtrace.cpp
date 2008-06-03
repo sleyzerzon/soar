@@ -32,10 +32,9 @@
 #include "symtab.h"
 #include "explain.h"
 #include "recmem.h"
-#include "xmlTraceNames.h" // for XML trace stuff
 #include "xml.h"
 
-using namespace xmlTraceNames;
+using namespace soar_TraceNames;
 
 /* ====================================================================
 

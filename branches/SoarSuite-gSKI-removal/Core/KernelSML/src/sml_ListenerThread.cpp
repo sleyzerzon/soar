@@ -24,7 +24,7 @@ using namespace sml ;
 using namespace sock ;
 
 // From KernelSMLInterface (which handles embedded connections)
-extern ElementXML* ReceivedCall(Connection* pConnection, ElementXML* pIncoming, void* pUserData) ;
+extern soarxml::ElementXML* ReceivedCall(Connection* pConnection, soarxml::ElementXML* pIncoming, void* pUserData) ;
 
 void ListenerThread::Run()
 {

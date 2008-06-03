@@ -16,7 +16,7 @@
 #define XML_LISTENER_H
 
 #include "sml_EventManager.h"
-#include "sml_XMLTrace.h"
+#include "XMLTrace.h"
 #include "sml_Events.h"
 
 #include <string>
@@ -32,12 +32,12 @@ class XMLListener : public EventManager<smlXMLEventId>
 {
 protected:
 	const static int kNumberEvents = smlEVENT_LAST_XML_EVENT - smlEVENT_XML_TRACE_OUTPUT + 1 ;
-	KernelSML*		m_pKernelSML ;
-	XMLTrace		m_BufferedXMLOutput[kNumberEvents];
-	AgentOutputFlusher* m_pAgentOutputFlusher[kNumberEvents];
+	KernelSML*				m_pKernelSML ;
+	soarxml::XMLTrace		m_BufferedXMLOutput[kNumberEvents];
+	AgentOutputFlusher*		m_pAgentOutputFlusher[kNumberEvents];
 
 	// When false we don't forward print callback events to the listeners.  (Useful when we're backdooring into the kernel)
-	bool			m_EnablePrintCallback ;
+	bool					m_EnablePrintCallback ;
 
 public:
 	XMLListener()
@@ -68,7 +68,7 @@ public:
 	void FlushOutput(smlXMLEventId eventID);
 
 	// Echo the list of wmes received back to any listeners
-	void FireInputReceivedEvent(ElementXML const* pCommands) ;
+	void FireInputReceivedEvent(soarxml::ElementXML const* pCommands) ;
 } ;
 
 }

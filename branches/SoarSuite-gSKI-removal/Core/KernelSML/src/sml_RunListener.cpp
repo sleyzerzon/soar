@@ -90,7 +90,7 @@ void RunListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallDat
 	Int2String(phase, phaseStr, sizeof(phaseStr)) ;
 
 	// Build the SML message we're doing to send.
-	ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
+	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgentSML->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamPhase, phaseStr) ;

@@ -36,13 +36,12 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_ElementXML.h"
-#include "sml_StringOps.h"
+#include "ElementXML.h"
 #include "ElementXMLInterface.h"
 
 #include <assert.h>
 
-using namespace sml ;
+using namespace soarxml;
 
 ////////////////////////////////////////////////////////////////
 //
@@ -75,7 +74,7 @@ bool ElementXML::IsValidID(char const* str)
 *************************************************************/
 ElementXML::ElementXML()
 {
-	m_hXML = ::sml_NewElementXML() ;
+	m_hXML = ::soarxml_NewElementXML() ;
 }
 
 /*************************************************************
@@ -94,7 +93,7 @@ ElementXML::~ElementXML(void)
 {
 	if (m_hXML)
 	{
-		int refCount = ::sml_ReleaseRef(m_hXML) ;
+		int refCount = ::soarxml_ReleaseRef(m_hXML) ;
 
 		// This code should be unnecessary but harmless and it makes a useful place
 		// to put a break point if there are ref-counting problems with an object.
@@ -111,7 +110,7 @@ ElementXML::~ElementXML(void)
 *************************************************************/
 int ElementXML::ReleaseRefOnHandle()
 {
-	int refCount = ::sml_ReleaseRef(m_hXML) ;
+	int refCount = ::soarxml_ReleaseRef(m_hXML) ;
 
 	// We use a ReleaseRef() model on the ElementXML object
 	// to delete it.
@@ -131,7 +130,7 @@ int ElementXML::ReleaseRefOnHandle()
 *************************************************************/
 int ElementXML::AddRefOnHandle()
 {
-	return ::sml_AddRef(m_hXML) ;
+	return ::soarxml_AddRef(m_hXML) ;
 }
 
 /*************************************************************
@@ -139,7 +138,7 @@ int ElementXML::AddRefOnHandle()
 *************************************************************/
 int ElementXML::GetRefCount()
 {
-	return ::sml_GetRefCount(m_hXML) ;
+	return ::soarxml_GetRefCount(m_hXML) ;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -160,7 +159,7 @@ int ElementXML::GetRefCount()
 void ElementXML::Attach(ElementXML_Handle hXML)
 {
 	if (m_hXML)
-		::sml_ReleaseRef(m_hXML) ;
+		::soarxml_ReleaseRef(m_hXML) ;
 
 	m_hXML = hXML ;
 }
@@ -208,6 +207,11 @@ ElementXML_Handle ElementXML::GetXMLHandle() const
 * @param  tagName	Tag name can only contain letters, numbers, “.” “-“ and “_”.
 * @returns	true if the tag name is valid.
 *************************************************************/
+bool ElementXML::SetTagName(char const* tagName) 
+{ 
+	return SetTagName(CopyString(tagName), false) ; 
+}
+
 bool ElementXML::SetTagName(char* tagName, bool copyName)
 {
 #ifdef DEBUG
@@ -215,7 +219,7 @@ bool ElementXML::SetTagName(char* tagName, bool copyName)
 		return false ;
 #endif
 
-	return ::sml_SetTagName(m_hXML, tagName, copyName) ;
+	return ::soarxml_SetTagName(m_hXML, tagName, copyName) ;
 }
 
 /*************************************************************
@@ -235,7 +239,7 @@ bool ElementXML::SetTagNameFast(char const* tagName)
 		return false ;
 #endif
 
-	return ::sml_SetTagNameFast(m_hXML, tagName) ;
+	return ::soarxml_SetTagNameFast(m_hXML, tagName) ;
 }
 
 /*************************************************************
@@ -245,7 +249,7 @@ bool ElementXML::SetTagNameFast(char const* tagName)
 *************************************************************/
 char const* ElementXML::GetTagName() const
 {
-	return ::sml_GetTagName(m_hXML) ;
+	return ::soarxml_GetTagName(m_hXML) ;
 }
 
 /*************************************************************
@@ -262,7 +266,7 @@ bool ElementXML::IsTag(char const* pTagName) const
 
 	char const* pThisTag = GetTagName() ;
 
-	if (!pThisTag)
+	if (!pThisTag || !pTagName)
 		return false ;
 
 	// In some cases we'll use the same exact pointer
@@ -270,7 +274,7 @@ bool ElementXML::IsTag(char const* pTagName) const
 	if (pThisTag == pTagName)
 		return true ;
 
-	return (IsStringEqual(pThisTag, pTagName)) ;
+	return strcmp(pThisTag, pTagName) == 0;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -293,7 +297,7 @@ bool ElementXML::IsTag(char const* pTagName) const
 *************************************************************/
 bool ElementXML::SetComment(char const* pComment)
 {
-	return ::sml_SetComment(m_hXML, pComment) ;
+	return ::soarxml_SetComment(m_hXML, pComment) ;
 }
 
 /*************************************************************
@@ -303,7 +307,7 @@ bool ElementXML::SetComment(char const* pComment)
 *************************************************************/
 char const* ElementXML::GetComment() const
 {
-	return ::sml_GetComment(m_hXML) ;
+	return ::soarxml_GetComment(m_hXML) ;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -329,7 +333,7 @@ ElementXML_Handle ElementXML::AddChild(ElementXML* pChild)
 	ElementXML_Handle hChild = pChild->Detach() ;
 	delete pChild ;
 	
-	::sml_AddChild(m_hXML, hChild) ;
+	::soarxml_AddChild(m_hXML, hChild) ;
 	return hChild ;
 }
 
@@ -338,7 +342,7 @@ ElementXML_Handle ElementXML::AddChild(ElementXML* pChild)
 *************************************************************/
 int ElementXML::GetNumberChildren() const
 {
-	return ::sml_GetNumberChildren(m_hXML) ;
+	return ::soarxml_GetNumberChildren(m_hXML) ;
 }
 
 /*************************************************************
@@ -355,7 +359,7 @@ int ElementXML::GetNumberChildren() const
 *************************************************************/
 bool ElementXML::GetChild(ElementXML* pChild, int index) const
 {
-	ElementXML_Handle hChild = ::sml_GetChild(m_hXML, index) ;
+	ElementXML_Handle hChild = ::soarxml_GetChild(m_hXML, index) ;
 
 	if (!hChild)
 		return false ;
@@ -375,7 +379,7 @@ bool ElementXML::GetChild(ElementXML* pChild, int index) const
 *************************************************************/
 bool ElementXML::GetParent(ElementXML* pParent) const
 {
-	ElementXML_Handle hParent = ::sml_GetParent(m_hXML) ;
+	ElementXML_Handle hParent = ::soarxml_GetParent(m_hXML) ;
 
 	if (!hParent)
 		return false ;
@@ -395,7 +399,7 @@ bool ElementXML::GetParent(ElementXML* pParent) const
 *************************************************************/
 ElementXML* ElementXML::MakeCopy() const
 {
-	ElementXML_Handle hCopy = ::sml_MakeCopy(m_hXML) ;
+	ElementXML_Handle hCopy = ::soarxml_MakeCopy(m_hXML) ;
 
 	return new ElementXML(hCopy) ;
 }
@@ -419,9 +423,19 @@ ElementXML* ElementXML::MakeCopy() const
 * @param attributeValue Can be any string.
 * @returns true if attribute name is valid (debug mode only)
 *************************************************************/
+bool ElementXML::AddAttribute(char const* attributeName, char* attributeValue)		 
+{ 
+	return AddAttribute(CopyString(attributeName), attributeValue, false, true) ; 
+}
+
+bool ElementXML::AddAttribute(char const* attributeName, char const* attributeValue) 
+{ 
+	return AddAttribute(CopyString(attributeName), CopyString(attributeValue), false, false) ; 
+}
+
 bool ElementXML::AddAttribute(char* attributeName, char* attributeValue, bool copyName, bool copyValue)
 {
-	return ::sml_AddAttribute(m_hXML, attributeName, attributeValue, copyName, copyValue) ;
+	return ::soarxml_AddAttribute(m_hXML, attributeName, attributeValue, copyName, copyValue) ;
 }
 
 /*************************************************************
@@ -437,9 +451,14 @@ bool ElementXML::AddAttribute(char* attributeName, char* attributeValue, bool co
 * @param attributeValue Can be any string.
 * @returns true if attribute name is valid (debug mode only)
 *************************************************************/
+bool ElementXML::AddAttributeFast(char const* attributeName, char const* attributeValue) 
+{ 
+	return AddAttributeFast(attributeName, CopyString(attributeValue), false) ; 
+} 
+
 bool ElementXML::AddAttributeFast(char const* attributeName, char* attributeValue, bool copyValue)
 {
-	return ::sml_AddAttributeFast(m_hXML, attributeName, attributeValue, copyValue) ;
+	return ::soarxml_AddAttributeFast(m_hXML, attributeName, attributeValue, copyValue) ;
 }
 
 /*************************************************************
@@ -454,7 +473,7 @@ bool ElementXML::AddAttributeFast(char const* attributeName, char* attributeValu
 *************************************************************/
 bool ElementXML::AddAttributeFastFast(char const* attributeName, char const* attributeValue)
 {
-	return ::sml_AddAttributeFastFast(m_hXML, attributeName, attributeValue) ;
+	return ::soarxml_AddAttributeFastFast(m_hXML, attributeName, attributeValue) ;
 }
 
 /*************************************************************
@@ -462,7 +481,7 @@ bool ElementXML::AddAttributeFastFast(char const* attributeName, char const* att
 *************************************************************/
 int ElementXML::GetNumberAttributes() const
 {
-	return ::sml_GetNumberAttributes(m_hXML) ;
+	return ::soarxml_GetNumberAttributes(m_hXML) ;
 }
 
 /*************************************************************
@@ -474,7 +493,7 @@ int ElementXML::GetNumberAttributes() const
 *************************************************************/
 const char* ElementXML::GetAttributeName(int index) const
 {
-	return ::sml_GetAttributeName(m_hXML, index) ;
+	return ::soarxml_GetAttributeName(m_hXML, index) ;
 }
 
 /*************************************************************
@@ -484,7 +503,7 @@ const char* ElementXML::GetAttributeName(int index) const
 *************************************************************/
 const char* ElementXML::GetAttributeValue(int index) const
 {
-	return ::sml_GetAttributeValue(m_hXML, index) ;
+	return ::soarxml_GetAttributeValue(m_hXML, index) ;
 }
 
 /*************************************************************
@@ -495,7 +514,7 @@ const char* ElementXML::GetAttributeValue(int index) const
 *************************************************************/
 const char* ElementXML::GetAttribute(const char* attName) const
 {
-	return ::sml_GetAttribute(m_hXML, attName) ;
+	return ::soarxml_GetAttribute(m_hXML, attName) ;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -511,14 +530,24 @@ const char* ElementXML::GetAttribute(const char* attName) const
 *						with the XML escape sequences &lt; etc.
 *						These values will be converted when the XML stream is created.
 *************************************************************/
+void ElementXML::SetCharacterData(char const* characterData)	
+{ 
+	SetCharacterData(CopyString(characterData), false) ; 
+}
+
 void ElementXML::SetCharacterData(char* characterData, bool copyData)
 {
-	::sml_SetCharacterData(m_hXML, characterData, copyData) ;
+	::soarxml_SetCharacterData(m_hXML, characterData, copyData) ;
+}
+
+void ElementXML::SetBinaryCharacterData(char const* characterData, int length) 
+{ 
+	SetBinaryCharacterData(CopyBuffer(characterData, length), length, false) ; 
 }
 
 void ElementXML::SetBinaryCharacterData(char* characterData, int length, bool copyData)
 {
-	::sml_SetBinaryCharacterData(m_hXML, characterData, length, copyData) ;
+	::soarxml_SetBinaryCharacterData(m_hXML, characterData, length, copyData) ;
 }
 
 /*************************************************************
@@ -530,7 +559,7 @@ void ElementXML::SetBinaryCharacterData(char* characterData, int length, bool co
 *************************************************************/
 char const* ElementXML::GetCharacterData() const
 {
-	return ::sml_GetCharacterData(m_hXML) ;
+	return ::soarxml_GetCharacterData(m_hXML) ;
 }
 
 /*************************************************************
@@ -539,7 +568,7 @@ char const* ElementXML::GetCharacterData() const
 *************************************************************/
 bool ElementXML::IsCharacterDataBinary() const
 {
-	return ::sml_IsCharacterDataBinary(m_hXML) ;
+	return ::soarxml_IsCharacterDataBinary(m_hXML) ;
 }
 
 /*************************************************************
@@ -561,7 +590,7 @@ bool ElementXML::IsCharacterDataBinary() const
 *************************************************************/
 bool ElementXML::ConvertCharacterDataToBinary()
 {
-	return ::sml_ConvertCharacterDataToBinary(m_hXML) ;
+	return ::soarxml_ConvertCharacterDataToBinary(m_hXML) ;
 }
 
 /*************************************************************
@@ -572,7 +601,7 @@ bool ElementXML::ConvertCharacterDataToBinary()
 *************************************************************/
 int	 ElementXML::GetCharacterDataLength() const
 {
-	return ::sml_GetCharacterDataLength(m_hXML) ;
+	return ::soarxml_GetCharacterDataLength(m_hXML) ;
 }
 
 /*************************************************************
@@ -583,7 +612,7 @@ int	 ElementXML::GetCharacterDataLength() const
 *************************************************************/
 void ElementXML::SetUseCData(bool useCData)
 {
-	::sml_SetUseCData(m_hXML, useCData) ;
+	::soarxml_SetUseCData(m_hXML, useCData) ;
 }
 
 /*************************************************************
@@ -591,7 +620,7 @@ void ElementXML::SetUseCData(bool useCData)
 *************************************************************/
 bool ElementXML::GetUseCData() const
 {
-	return ::sml_GetUseCData(m_hXML) ;
+	return ::soarxml_GetUseCData(m_hXML) ;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -610,7 +639,7 @@ bool ElementXML::GetUseCData() const
 *************************************************************/
 char* ElementXML::GenerateXMLString(bool includeChildren, bool insertNewLines) const
 {
-	return ::sml_GenerateXMLString(m_hXML, includeChildren, insertNewLines) ;
+	return ::soarxml_GenerateXMLString(m_hXML, includeChildren, insertNewLines) ;
 }
 
 /*************************************************************
@@ -621,7 +650,7 @@ char* ElementXML::GenerateXMLString(bool includeChildren, bool insertNewLines) c
 *************************************************************/
 int ElementXML::DetermineXMLStringLength(bool includeChildren, bool insertNewLines) const
 {
-	return ::sml_DetermineXMLStringLength(m_hXML, includeChildren, insertNewLines) ;
+	return ::soarxml_DetermineXMLStringLength(m_hXML, includeChildren, insertNewLines) ;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -644,7 +673,7 @@ int ElementXML::DetermineXMLStringLength(bool includeChildren, bool insertNewLin
 *************************************************************/
 char* ElementXML::AllocateString(int length)
 {
-	return ::sml_AllocateString(length) ;
+	return ::soarxml_AllocateString(length) ;
 }
 
 /*************************************************************
@@ -654,7 +683,7 @@ char* ElementXML::AllocateString(int length)
 *************************************************************/
 void ElementXML::DeleteString(char* pString)
 {
-	::sml_DeleteString(pString) ;
+	::soarxml_DeleteString(pString) ;
 }
 
 /*************************************************************
@@ -664,7 +693,7 @@ void ElementXML::DeleteString(char* pString)
 *************************************************************/
 char* ElementXML::CopyString(char const* original)
 {
-	return ::sml_CopyString(original) ;
+	return ::soarxml_CopyString(original) ;
 }
 
 /*************************************************************
@@ -676,7 +705,7 @@ char* ElementXML::CopyString(char const* original)
 *************************************************************/
 char* ElementXML::CopyBuffer(char const* original, int length)
 {
-	return ::sml_CopyBuffer(original, length) ;
+	return ::soarxml_CopyBuffer(original, length) ;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -694,7 +723,7 @@ char* ElementXML::CopyBuffer(char const* original, int length)
 *************************************************************/
 ElementXML* ElementXML::ParseXMLFromString(char const* pString)
 {
-	ElementXML_Handle hXML = ::sml_ParseXMLFromString(pString) ;
+	ElementXML_Handle hXML = ::soarxml_ParseXMLFromString(pString) ;
 
 	if (!hXML)
 		return NULL ;
@@ -714,7 +743,7 @@ ElementXML* ElementXML::ParseXMLFromString(char const* pString)
 *************************************************************/
 ElementXML* ElementXML::ParseXMLFromStringSequence(char const* pString, size_t startPos, size_t* endPos)
 {
-	ElementXML_Handle hXML = ::sml_ParseXMLFromStringSequence(pString, startPos, endPos) ;
+	ElementXML_Handle hXML = ::soarxml_ParseXMLFromStringSequence(pString, startPos, endPos) ;
 
 	if (!hXML)
 		return NULL ;
@@ -731,7 +760,7 @@ ElementXML* ElementXML::ParseXMLFromStringSequence(char const* pString, size_t s
 *************************************************************/
 ElementXML* ElementXML::ParseXMLFromFile(char const* pFilename)
 {
-	ElementXML_Handle hXML = ::sml_ParseXMLFromFile(pFilename) ;
+	ElementXML_Handle hXML = ::soarxml_ParseXMLFromFile(pFilename) ;
 
 	if (!hXML)
 		return NULL ;
@@ -746,5 +775,5 @@ ElementXML* ElementXML::ParseXMLFromFile(char const* pFilename)
 *************************************************************/
 char const* ElementXML::GetLastParseErrorDescription()
 {
-	return ::sml_GetLastParseErrorDescription() ;
+	return ::soarxml_GetLastParseErrorDescription() ;
 }

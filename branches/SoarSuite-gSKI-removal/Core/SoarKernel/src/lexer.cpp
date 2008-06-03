@@ -66,7 +66,6 @@
 #include "agent.h"
 #include "print.h"
 #include "init_soar.h"
-#include "xmlTraceNames.h" // for constants for XML function types, tags and attributes
 #include "xml.h"
 
 #include <math.h>

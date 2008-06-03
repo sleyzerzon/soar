@@ -35,6 +35,7 @@
 #include <assert.h>
 
 using namespace sml ;
+using namespace soarxml;
 
 char const* const Kernel::kDefaultLibraryName = "SoarKernelSML" ;
 

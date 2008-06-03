@@ -286,7 +286,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\src\ElementXML.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ElementXMLdll.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ElementXMLImpl.cpp"
 				>
 			</File>
 			<File
@@ -294,19 +302,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\sml_ElementXMLImpl.cpp"
+				RelativePath=".\src\ParseXML.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\sml_ParseXML.cpp"
+				RelativePath=".\src\ParseXMLFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\sml_ParseXMLFile.cpp"
+				RelativePath=".\src\ParseXMLString.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\sml_ParseXMLString.cpp"
+				RelativePath=".\src\XMLTrace.cpp"
 				>
 			</File>
 		</Filter>
@@ -316,7 +324,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\include\ElementXMLdll.h"
+				RelativePath=".\include\ElementXML.h"
 				>
 			</File>
 			<File
@@ -324,23 +332,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\ElementXMLImpl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\ElementXMLInterface.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\sml_ElementXMLImpl.h"
+				RelativePath=".\include\ParseXML.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\sml_ParseXML.h"
+				RelativePath=".\include\ParseXMLFile.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\sml_ParseXMLFile.h"
+				RelativePath=".\include\ParseXMLString.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\sml_ParseXMLString.h"
+				RelativePath=".\include\XMLTrace.h"
 				>
 			</File>
 		</Filter>

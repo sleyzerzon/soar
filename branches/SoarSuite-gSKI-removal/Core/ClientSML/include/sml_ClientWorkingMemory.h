@@ -28,6 +28,11 @@
 
 #include <list>
 
+namespace soarxml
+{
+	class ElementXML ;
+}
+
 namespace sml {
 
 // Forward declarations
@@ -37,7 +42,6 @@ class StringElement ;
 class IntElement ;
 class FloatElement ;
 class Identifier ;
-class ElementXML ;
 class AnalyzeXML ;
 
 class WorkingMemory
@@ -110,9 +114,9 @@ public:
 	bool			DestroyWME(WMElement* pWME) ;
 
 	bool			TryToAttachOrphanedChildren(Identifier* pPossibleParent) ;
-	bool			ReceivedOutputRemoval(ElementXML* pWmeXML, bool tracing) ;
-	bool			ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing) ;
-	bool			ReceivedOutput(AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool			ReceivedOutputRemoval(soarxml::ElementXML* pWmeXML, bool tracing) ;
+	bool			ReceivedOutputAddition(soarxml::ElementXML* pWmeXML, bool tracing) ;
+	bool			ReceivedOutput(AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
 
 	bool			SynchronizeInputLink() ;
 	bool			SynchronizeOutputLink() ;

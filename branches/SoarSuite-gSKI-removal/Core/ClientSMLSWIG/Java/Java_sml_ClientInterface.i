@@ -37,7 +37,7 @@
 %rename(ShutdownInternal) sml::Kernel::Shutdown();
 
 // Workaround since SWIG doesn't support %delobj in Java (definition of GetCPtrAndDisown is below)
-%typemap(javain) sml::ElementXML* pChild "GetCPtrAndDisown($javainput)"
+%typemap(javain) soarxml::ElementXML* pChild "GetCPtrAndDisown($javainput)"
 
 %pragma(java) jniclasscode=%{
   static {
@@ -220,7 +220,7 @@
 // Some handy alternative method names and additional wrappers to help support some legacy code and may be
 // useful for future Java apps.  We don't want to add these to the underlying C++ code because the Exception logic etc.
 // would be a real pain to support cross-language.
-%typemap(javacode) sml::ElementXML %{
+%typemap(javacode) soarxml::ElementXML %{
    public static final String kClassAttribute   = "Class" ;
    public static final String kVersionAttribute = "Version" ;
 

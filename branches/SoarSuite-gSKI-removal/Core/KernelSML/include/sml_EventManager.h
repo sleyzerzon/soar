@@ -14,7 +14,7 @@
 
 #include "sml_Events.h" // smlEVENT_LAST
 #include "sml_Connection.h"
-#include "sml_ElementXML.h"
+#include "ElementXML.h"
 #include "sml_KernelCallback.h"
 
 #include <list>
@@ -187,7 +187,7 @@ public:
 		return pList->end() ;
 	}
 
-	virtual void SendEvent(Connection* pConnection, ElementXML* pMsg, AnalyzeXML* pResponse, ConnectionListIter begin, ConnectionListIter end)
+	virtual void SendEvent(Connection* pConnection, soarxml::ElementXML* pMsg, AnalyzeXML* pResponse, ConnectionListIter begin, ConnectionListIter end)
 	{
 	#ifdef _DEBUG
 		// Generate a text form of the XML so we can look at it in the debugger.

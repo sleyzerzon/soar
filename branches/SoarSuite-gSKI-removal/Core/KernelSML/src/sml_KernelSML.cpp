@@ -44,7 +44,7 @@ KernelSML* KernelSML::s_pKernel = NULL ;
 // On Windows this is set to the DLL's hModule handle.
 void* KernelSML::s_hModule = NULL ;
 
-static ElementXML* AddErrorMsg(Connection* pConnection, ElementXML* pResponse, char const* pErrorMsg, int errorCode = -1)
+static soarxml::ElementXML* AddErrorMsg(Connection* pConnection, soarxml::ElementXML* pResponse, char const* pErrorMsg, int errorCode = -1)
 {
 	pConnection->AddErrorToSMLResponse(pResponse, pErrorMsg, errorCode) ;
 	return pResponse ;
@@ -465,7 +465,7 @@ bool KernelSML::DeleteAgentSML( const char* agentName )
 * @param pResult	This is the string to be returned.
 * @returns	False if the string is NULL.
 *************************************************************/
-bool KernelSML::ReturnResult(Connection* pConnection, ElementXML* pResponse, char const* pResult)
+bool KernelSML::ReturnResult(Connection* pConnection, soarxml::ElementXML* pResponse, char const* pResult)
 {
 	if (!pResult)
 		return false ;
@@ -478,7 +478,7 @@ bool KernelSML::ReturnResult(Connection* pConnection, ElementXML* pResponse, cha
 /*************************************************************
 * @brief	Return an integer result to the caller.
 *************************************************************/
-bool KernelSML::ReturnIntResult(Connection* pConnection, ElementXML* pResponse, int result)
+bool KernelSML::ReturnIntResult(Connection* pConnection, soarxml::ElementXML* pResponse, int result)
 {
 	char buffer[kMinBufferSize] ;
 	Int2String(result, buffer, kMinBufferSize) ;
@@ -491,7 +491,7 @@ bool KernelSML::ReturnIntResult(Connection* pConnection, ElementXML* pResponse, 
 /*************************************************************
 * @brief	Return a boolean result to the caller.
 *************************************************************/
-bool KernelSML::ReturnBoolResult(Connection* pConnection, ElementXML* pResponse, bool result)
+bool KernelSML::ReturnBoolResult(Connection* pConnection, soarxml::ElementXML* pResponse, bool result)
 {
 	char const* pResult = result ? sml_Names::kTrue : sml_Names::kFalse ;
 	pConnection->AddSimpleResultToSMLResponse(pResponse, pResult) ;
@@ -501,7 +501,7 @@ bool KernelSML::ReturnBoolResult(Connection* pConnection, ElementXML* pResponse,
 /*************************************************************
 * @brief	Return an invalid argument error to the caller.
 *************************************************************/
-bool KernelSML::InvalidArg(Connection* pConnection, ElementXML* pResponse, char const* pCommandName, char const* pErrorDescription)
+bool KernelSML::InvalidArg(Connection* pConnection, soarxml::ElementXML* pResponse, char const* pCommandName, char const* pErrorDescription)
 {
 	std::string msg = "Invalid arguments for command : " ;
 	msg += pCommandName ;
@@ -579,7 +579,7 @@ void KernelSML::ClearAllInterrupts()
 * @brief	Take an incoming command and call the appropriate
 *			handler to process it.
 *************************************************************/
-bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse)
+bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse)
 {
 	// Look up the function that handles this command
 	CommandFunction pFunction = m_CommandMap[pCommandName] ;
@@ -637,7 +637,7 @@ bool KernelSML::ProcessCommand(char const* pCommandName, Connection* pConnection
 * @param pConnection	The connection this message came in on.
 * @param pIncoming		The incoming message
 *************************************************************/
-ElementXML* KernelSML::ProcessIncomingSML(Connection* pConnection, ElementXML* pIncomingMsg)
+soarxml::ElementXML* KernelSML::ProcessIncomingSML(Connection* pConnection, soarxml::ElementXML* pIncomingMsg)
 {
 	if (!pIncomingMsg || !pConnection)
 		return NULL ;
@@ -653,7 +653,7 @@ ElementXML* KernelSML::ProcessIncomingSML(Connection* pConnection, ElementXML* p
 	char* pIncomingXML = pIncomingMsg->GenerateXMLString(true) ;
 #endif
 
-	ElementXML* pResponse = pConnection->CreateSMLResponse(pIncomingMsg) ;
+	soarxml::ElementXML* pResponse = pConnection->CreateSMLResponse(pIncomingMsg) ;
 
 	// Fatal error creating the response
 	if (!pResponse)
@@ -685,8 +685,8 @@ ElementXML* KernelSML::ProcessIncomingSML(Connection* pConnection, ElementXML* p
 
 	// Set a break point on this next line if you wish to see the incoming
 	// and outgoing as XML before they get deleted.
-	ElementXML::DeleteString(pIncomingXML) ;
-	ElementXML::DeleteString(pResponseXML) ;
+	soarxml::ElementXML::DeleteString(pIncomingXML) ;
+	soarxml::ElementXML::DeleteString(pResponseXML) ;
 #endif
 
 	return pResponse ;

@@ -28,11 +28,12 @@
 #ifndef SML_XML_TRACE_H
 #define SML_XML_TRACE_H
 
-#include "sml_ElementXML.h"
-#include "sml_StringOps.h"
-#include "sml_Names.h"
+#include "ElementXML.h"
 
-namespace sml
+// get definition of EXPORT
+#include "Export.h"
+
+namespace soarxml
 {
 
 class XMLTrace
@@ -45,24 +46,24 @@ private:
 	ElementXML*	m_pCurrentTag ;
 
 public:
-	XMLTrace() ;
+	EXPORT XMLTrace() ;
 
 	// Alternative contstuctor where we specify the base tag name
-	XMLTrace(char const* pTagName) ;
+	EXPORT XMLTrace(char const* pTagName) ;
 
-	virtual ~XMLTrace() ;
+	EXPORT virtual ~XMLTrace() ;
 
 	/*************************************************************
 	* @brief	Reinitialize this XML trace object so we can
 	*			re-use it.
 	*************************************************************/
-	void Reset() ;
+	EXPORT void Reset() ;
 
 	/*************************************************************
 	* @brief	Returns true if this tag contains no children
 	*			(i.e. it has just been reset).
 	*************************************************************/
-	bool IsEmpty() ;
+	EXPORT bool IsEmpty() ;
 
 	/*************************************************************
 	* @brief	Start a new tag.
@@ -73,7 +74,7 @@ public:
 	* NOTE: The tag name must remain in scope forever (i.e. it should be
 	* a constant).  This allows us to save time by not copying the string.
 	*************************************************************/
-	void BeginTag(char const* pTagName) ;
+	EXPORT void BeginTag(char const* pTagName) ;
 	
 	/*************************************************************
 	* @brief	Terminate the current tag.
@@ -81,7 +82,7 @@ public:
 	* The tag name is just used for error checking to make sure
 	* everything is properly balanced.
 	*************************************************************/
-	void EndTag(char const* pTagName) ;
+	EXPORT void EndTag(char const* pTagName) ;
 
 	/*************************************************************
 	* @brief	Adds an attribute to the current tag.
@@ -90,7 +91,7 @@ public:
 	* a constant).  This allows us to save time by not copying the string.
 	* Naturally, the value doesn't have this restriction.
 	*************************************************************/
-	void AddAttribute(char const* pAttributeName, char const* pValue) ;
+	EXPORT void AddAttribute(char const* pAttributeName, char const* pValue) ;
 
 	/*************************************************************
     * @brief Releases ownership of the underlying XML object.
@@ -104,14 +105,14 @@ public:
 	*		NOTE: After doing this the XMLTrace object should either be
 	*		deleted or Reset() should be called on it.
     *************************************************************/
-	ElementXML_Handle Detach() ;
+	EXPORT ElementXML_Handle Detach() ;
 
 	/*************************************************************
 	* @brief Releases ownership of the underlying XML object.
 	*
 	* As for Detach() but returns an object rather than a handle.
 	*************************************************************/
-	ElementXML* DetatchObject() ;
+	EXPORT ElementXML* DetatchObject() ;
 
 	/*************************************************************
 	* @brief	Occassionally it's helpful to be able to back up
@@ -127,11 +128,11 @@ public:
 	*			moveToParent() ;	// Go back to parent
 	*			... continue on
 	*************************************************************/
-	bool MoveCurrentToParent() ;
-	bool MoveCurrentToChild(int index) ;
-	bool MoveCurrentToLastChild() ;
+	EXPORT bool MoveCurrentToParent() ;
+	EXPORT bool MoveCurrentToChild(int index) ;
+	EXPORT bool MoveCurrentToLastChild() ;
 } ;
 
-}
+} // namespace
 
 #endif	// SML_XML_TRACE_H

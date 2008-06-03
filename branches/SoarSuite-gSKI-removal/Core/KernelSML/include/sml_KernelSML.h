@@ -33,10 +33,14 @@ namespace soar_thread
 	class Mutex ;
 }
 
+namespace soarxml
+{
+	class ElementXML ;
+}
+
 namespace sml {
 
 // Forward declarations
-class ElementXML ;
 class Connection ;
 class AnalyzeXML ;
 class KernelSML ;
@@ -48,7 +52,7 @@ class RunScheduler ;
 class KernelHelpers ;
 
 // Define the CommandFunction which we'll call to process commands
-typedef bool (KernelSML::*CommandFunction)(AgentSML*, char const*, Connection*, AnalyzeXML*, ElementXML*);
+typedef bool (KernelSML::*CommandFunction)(AgentSML*, char const*, Connection*, AnalyzeXML*, soarxml::ElementXML*);
 
 // Used to store a map from command name to function handler for that command
 typedef std::map< std::string, CommandFunction >	CommandMap ;
@@ -344,7 +348,7 @@ public:
 	* @param pConnection	The connection this message came in on.
 	* @param pIncoming		The incoming message
 	*************************************************************/
-	ElementXML* ProcessIncomingSML(Connection* pConnection, ElementXML* pIncoming) ;
+	soarxml::ElementXML* ProcessIncomingSML(Connection* pConnection, soarxml::ElementXML* pIncoming) ;
 
 	/*************************************************************
 	* @brief	Look up an agent from its name.
@@ -417,26 +421,26 @@ protected:
 	/*************************************************************
 	* @brief	Return an object* to the caller.
 	*************************************************************/
-	bool ReturnResult(Connection* pConnection, ElementXML* pResponse, char const* pResult) ;
+	bool ReturnResult(Connection* pConnection, soarxml::ElementXML* pResponse, char const* pResult) ;
 
 	/*************************************************************
 	* @brief	Return an integer result to the caller.
 	*************************************************************/
-	bool ReturnIntResult(Connection* pConnection, ElementXML* pResponse, int result) ;
+	bool ReturnIntResult(Connection* pConnection, soarxml::ElementXML* pResponse, int result) ;
 
 	/*************************************************************
 	* @brief	Return a boolean result to the caller.
 	*************************************************************/
-	bool ReturnBoolResult(Connection* pConnection, ElementXML* pResponse, bool result) ;
+	bool ReturnBoolResult(Connection* pConnection, soarxml::ElementXML* pResponse, bool result) ;
 
 	/*************************************************************
 	* @brief	Return an invalid argument error to the caller.
 	*************************************************************/
-	bool InvalidArg(Connection* pConnection, ElementXML* pResponse, char const* pCommandName, char const* pErrorDescription) ;
+	bool InvalidArg(Connection* pConnection, soarxml::ElementXML* pResponse, char const* pCommandName, char const* pErrorDescription) ;
 
 	void BuildCommandMap() ;
 
-	bool ProcessCommand(char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool ProcessCommand(char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
 
 	// There should always be exactly one local connection to the kernel (the process that loaded us).
 	Connection* GetEmbeddedConnection() ;
@@ -455,33 +459,33 @@ protected:
 	* @returns False if we had an error and wish to generate a generic error message (based on the incoming call + pError)
 	*          True if the call succeeded or we generated another more specific error already.
 	*************************************************************/
-	bool HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetInputLink(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleExpandCommandLine(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleCheckForIncomingCommands(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleDestroyAgent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetAgentList(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleSetInterruptCheckRate(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleFireEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleSuppressEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetVersion(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleShutdown(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleIsSoarRunning(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleSetConnectionInfo(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetConnections(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	//bool HandleGetAllInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetAllOutput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetRunState(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleSendClientMessage(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleWasAgentOnRunList(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetResultOfLastRun(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
-	bool HandleGetInitialTimeTag(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetInputLink(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleExpandCommandLine(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleCheckForIncomingCommands(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleDestroyAgent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetAgentList(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleSetInterruptCheckRate(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleFireEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleSuppressEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetVersion(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleShutdown(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleIsSoarRunning(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleSetConnectionInfo(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetConnections(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	//bool HandleGetAllInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetAllOutput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetRunState(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleSendClientMessage(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleWasAgentOnRunList(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetResultOfLastRun(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
+	bool HandleGetInitialTimeTag(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
 
 	// Note: Register and unregister are both sent to this one handler
-	bool HandleRegisterForEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, ElementXML* pResponse) ;
+	bool HandleRegisterForEvent(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse) ;
 
 };
 

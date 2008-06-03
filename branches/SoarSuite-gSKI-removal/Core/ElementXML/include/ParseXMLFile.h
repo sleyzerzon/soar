@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////
-// ParseXMLString class
+// ParseXMLFile class
 //
 // Author: Douglas Pearson, www.threepenny.net
 // Date  : August 2004
@@ -7,17 +7,17 @@
 // This class is used to parse an XML document from a file/string and
 // create an ElementXML object that represents it.
 //
-// This version reads from a string.
+// This version reads from a file.
 //
 /////////////////////////////////////////////////////////////////
 
-#ifndef PARSE_XML_STRING_H
-#define PARSE_XML_STRING_H
+#ifndef PARSE_XML_FILE_H
+#define PARSE_XML_FILE_H
 
 #include <string>
-#include "sml_ParseXML.h"
+#include "ParseXML.h"
 
-namespace sml {
+namespace soarxml {
 
 // I think we'll want to implement our own parseString class
 // which is (a) using allocateString() calls (so we can just pass off the results)
@@ -28,11 +28,17 @@ typedef std::string	ParseString ;
 
 class ElementXML ;
 
-class ParseXMLString : public ParseXML
+class ParseXMLFile : public ParseXML
 {
 protected:
-	// The string we are reading.
-	char const* m_pInputLine ;
+	enum { kBufferSize = 1024 } ;
+
+protected:
+	// The input file
+	FILE*		m_pInputFile ;
+
+	// The current string of characters that we're reading
+	char	m_CurrentLine[kBufferSize] ;
 
 	// Location in the current line buffer
 	size_t		m_Pos ;
@@ -40,28 +46,10 @@ protected:
 	// Number of chars in the current line buffer (when pos reaches this, read another line)
 	size_t		m_LineLength ;
 
-	// Location when we start the current token
-	size_t		m_StartTokenPos ;
+	// Set to true when we have read all there is in the file (but not parsed it yet).
+	bool		m_ReachedEOF ;
 
-	/************************************************************************
-	* 
-	* Read the next character from the input string.
-	*
-	*************************************************************************/
-	virtual inline void GetNextChar()
-	{
-		// When we're at the end of file, we're done.
-		if (IsError() || IsEOF())
-			return ;
-
-		// Move the pointer along to the next char in the current input line
-		m_Pos++ ;
-		
-		// If we moved off the end of the current line, move to the next input line.
-		if (m_Pos >= m_LineLength)
-			ReadLine() ;
-	}
-
+	virtual void GetNextChar() ;
 	virtual void ReadLine() ;
 
 	/************************************************************************
@@ -69,9 +57,9 @@ protected:
 	* Returns the current character from the input stream.
 	* 
 	*************************************************************************/
-	virtual inline char GetCurrentChar()
+	virtual char GetCurrentChar()
 	{
-		return m_pInputLine[m_Pos] ;
+		return m_CurrentLine[m_Pos] ;
 	}
 	
 	// To support reading a stream of XML documents from a single string/file
@@ -80,13 +68,13 @@ protected:
 	// to be able to backup.  (This has no impact if we're just reading one XML document from a stream).
 	virtual void		StartingNewToken()
 	{
-		m_StartTokenPos = m_Pos ;
+		// Not implementing anything on the file side yet for this.
+		// Only add something here if we decide we want to read multiple docs from a file.
 	}
 
 public:
-	ParseXMLString(char const* pInputLine, size_t startPos);
-	size_t getEndPosition() { return m_StartTokenPos ; }
-	virtual ~ParseXMLString(void);
+	ParseXMLFile(FILE* pInputFile);
+	virtual ~ParseXMLFile(void);
 };
 
 }	// namespace
