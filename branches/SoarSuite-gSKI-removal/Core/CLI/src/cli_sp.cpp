@@ -54,7 +54,6 @@ void soarAlternateInput(agent *ai_agent, const char  *ai_string, char  *ai_suffi
 
 bool CommandLineInterface::DoSP(const std::string& productionString) {
 	// Load the production
-	this->AddListenerAndDisableCallbacks();
 	// voigtjr: note: this TODO from gSKI:
 	// TODO: This should not be needed, FIX!
 	// contents of gSKI ProductionManager::soarAlternateInput function:
@@ -68,7 +67,6 @@ bool CommandLineInterface::DoSP(const std::string& productionString) {
 
 	set_lexer_allow_ids( m_pAgentSoar, true );
 	soarAlternateInput( m_pAgentSoar, 0, 0, true ); 
-	this->RemoveListenerAndEnableCallbacks();
 
 	if (!p) { 
 		if (rete_addition_result == DUPLICATE_PRODUCTION) {

@@ -14,7 +14,6 @@
 namespace sml {
 
 class PrintListener;
-class XMLListener ;
 
 class AgentOutputFlusher : public KernelCallback
 {
@@ -23,11 +22,9 @@ protected:
 
 	// Only one listener will be filled in.
 	PrintListener* m_pPrintListener;
-	XMLListener*   m_pXMLListener;
 
 public:
 	AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, smlPrintEventId eventID);
-	AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, smlXMLEventId eventID);
 	virtual ~AgentOutputFlusher();
 
 	virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData) ;

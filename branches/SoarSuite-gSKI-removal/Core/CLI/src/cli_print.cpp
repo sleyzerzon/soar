@@ -22,6 +22,7 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "gsysparam.h"
+#include "xml.h"
 
 using namespace cli;
 using namespace sml;
@@ -166,9 +167,7 @@ bool CommandLineInterface::DoPrint(PrintBitset options, int depth, const std::st
 		}
 
 		// Structured output through structured output callback
-		if (m_RawOutput) AddListenerAndDisableCallbacks();
 		pKernelHack->PrintStackTrace(m_pAgentSML, (options.test(PRINT_STATES)) ? true : false, (options.test(PRINT_OPERATORS)) ? true : false);
-		if (m_RawOutput) RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 
@@ -181,43 +180,30 @@ bool CommandLineInterface::DoPrint(PrintBitset options, int depth, const std::st
 
 	// Check for the five general print options (all, chunks, defaults, justifications, user)
 	if (options.test(PRINT_ALL)) {
-		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_CHUNKS)) {
-		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, CHUNK_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_DEFAULTS)) {
-		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, DEFAULT_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_JUSTIFICATIONS)) {
-		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, JUSTIFICATION_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 	if (options.test(PRINT_USER)) {
-		AddListenerAndDisableCallbacks();
         pKernelHack->PrintUser(m_pAgentSML, 0, internal, filename, full, USER_PRODUCTION_TYPE);
-		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 
 	// Default to symbol print if there is an arg, otherwise print all
-	if (m_RawOutput) AddListenerAndDisableCallbacks();
-	else			 AddXMLListenerAndDisableCallbacks() ;
-
 	if (options.test(PRINT_VARPRINT)) {
 		m_VarPrint = true;
 	}
@@ -231,11 +217,6 @@ bool CommandLineInterface::DoPrint(PrintBitset options, int depth, const std::st
 	}
 	m_VarPrint = false;
 
-	if (m_RawOutput) RemoveListenerAndEnableCallbacks();
-	else			 RemoveXMLListenerAndEnableCallbacks() ;
-
-	// put the result into a message(string) arg tag
-	if (!m_RawOutput) ResultToArgTag();
 	return true;
 }
 

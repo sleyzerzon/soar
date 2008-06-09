@@ -42,6 +42,7 @@
 #include "trace.h"
 #include "callback.h"
 #include "io_soar.h"
+#include "xml.h"
 
 /* ================================================================== */
 
@@ -279,8 +280,11 @@ agent * create_soar_agent (char * agent_name) {                                 
 #endif
   newAgent->attribute_preferences_mode = 0; /* RBD 4/17/95 */
 
-   /* JC ADDED: Make sure that the RHS functions get initialized correctly */
-   newAgent->rhs_functions = NIL;
+  /* JC ADDED: Make sure that the RHS functions get initialized correctly */
+  newAgent->rhs_functions = NIL;
+
+  // JRV: Allocates data for XML generation
+  xml_create( newAgent );
 
   soar_init_callbacks( newAgent );
 
@@ -394,6 +398,9 @@ void destroy_soar_agent (agent * delete_agent)
   }
 
   /* RPM 9/06 end */
+
+  // JRV: Frees data used by XML generation
+  xml_destroy( delete_agent );
 
   /* Free soar agent structure */
   free((void *) delete_agent);

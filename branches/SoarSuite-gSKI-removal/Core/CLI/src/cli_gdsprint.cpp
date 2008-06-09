@@ -28,12 +28,8 @@ bool CommandLineInterface::DoGDSPrint() {
 	// Attain the evil back door of desolation, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
-	AddListenerAndDisableCallbacks();
 	bool ret = pKernelHack->GDSPrint(m_pAgentSML);
-	RemoveListenerAndEnableCallbacks();
 
-	// put the result into a message(string) arg tag
-	if (!m_RawOutput) ResultToArgTag();
 	return ret;
 }
 

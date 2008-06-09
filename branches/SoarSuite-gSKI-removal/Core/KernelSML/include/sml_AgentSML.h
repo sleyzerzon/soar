@@ -218,6 +218,13 @@ public:
 	void EnablePrintCallback()  { m_PrintListener.EnablePrintCallback(true) ; m_XMLListener.EnablePrintCallback(true) ; }
 
 	/*************************************************************
+	* @brief	During an init-soar, the agent generates print callbacks
+	*			that need to be flushed before the trace is printed during
+	*			the first run.
+	*************************************************************/
+	void FlushPrintOutput() { m_PrintListener.FlushOutput( NULL, smlEVENT_PRINT ); }
+
+	/*************************************************************
 	* @brief	Trigger an "echo" event.  This event allows one client
 	*			to issue a command and have another client (typically the debugger)
 	*			listen in on the output.

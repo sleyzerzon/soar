@@ -81,8 +81,6 @@ bool CommandLineInterface::DoProductionFind(const ProductionFindBitset& options,
 	// Attain the evil back door of damnation, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
-	AddListenerAndDisableCallbacks();
-
 	bool ret = pKernelHack->ProductionFind(m_pAgentSML->GetSoarAgent(), 
 		options.test(PRODUCTION_FIND_INCLUDE_LHS), 
 		options.test(PRODUCTION_FIND_INCLUDE_RHS), 
@@ -91,10 +89,6 @@ bool CommandLineInterface::DoProductionFind(const ProductionFindBitset& options,
 		options.test(PRODUCTION_FIND_ONLY_CHUNKS),
 		options.test(PRODUCTION_FIND_NO_CHUNKS));
 	
-	RemoveListenerAndEnableCallbacks();
-
-	// put the result into a message(string) arg tag
-	if (!m_RawOutput) ResultToArgTag();
 	return ret;
 }
 

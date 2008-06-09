@@ -26,9 +26,15 @@ bool CommandLineInterface::DoInitSoar() {
 	// Save the current result
 	std::string oldResult = m_Result.str();
 
-	AddListenerAndDisableCallbacks();
+	SetTrapPrintCallbacks( false );
+
 	bool ok = m_pAgentSML->Reinitialize() ;
-	RemoveListenerAndEnableCallbacks();
+
+	// S1 gets created during Reinitialize, clear its output from the trace buffers
+	xml_invoke_callback( m_pAgentSML->GetSoarAgent() );
+	m_pAgentSML->FlushPrintOutput();
+
+	SetTrapPrintCallbacks( true );
 
 	// restore the old result, ignoring output from init-soar
 	m_Result.str(oldResult); 

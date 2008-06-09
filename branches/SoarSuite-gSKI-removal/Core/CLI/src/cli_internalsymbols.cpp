@@ -29,12 +29,8 @@ bool CommandLineInterface::DoInternalSymbols() {
 	// Attain the evil back door of doom, even though we aren't the TgD
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 		
-	AddListenerAndDisableCallbacks();
 	pKernelHack->PrintInternalSymbols(m_pAgentSML);
-	RemoveListenerAndEnableCallbacks();
 
-	// put the result into a message(string) arg tag
-	if (!m_RawOutput) ResultToArgTag();
 	return true;
 }
 

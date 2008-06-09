@@ -14,22 +14,11 @@
 
 #include "sml_Utils.h"
 #include "sml_PrintListener.h"
-#include "sml_XMLListener.h"
 
 using namespace sml ;
 
 AgentOutputFlusher::AgentOutputFlusher(PrintListener* pPrintListener, AgentSML* pAgent, smlPrintEventId eventID) : m_pPrintListener(pPrintListener)
 {
-	m_pXMLListener = NULL ;
-	m_EventID = eventID ;
-	this->SetAgentSML(pAgent) ;
-	this->RegisterWithKernel(smlEVENT_AFTER_DECISION_CYCLE) ;
-	this->RegisterWithKernel(smlEVENT_AFTER_RUNNING) ;
-}
-
-AgentOutputFlusher::AgentOutputFlusher(XMLListener* pXMLListener, AgentSML* pAgent, smlXMLEventId eventID) : m_pXMLListener(pXMLListener)
-{
-	m_pPrintListener = NULL ;
 	m_EventID = eventID ;
 	this->SetAgentSML(pAgent) ;
 	this->RegisterWithKernel(smlEVENT_AFTER_DECISION_CYCLE) ;
@@ -51,6 +40,4 @@ void AgentOutputFlusher::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* p
 
 	if (m_pPrintListener)
 		m_pPrintListener->FlushOutput(static_cast<smlPrintEventId>(m_EventID));
-	if (m_pXMLListener)
-		m_pXMLListener->FlushOutput(static_cast<smlXMLEventId>(m_EventID)) ;
 }

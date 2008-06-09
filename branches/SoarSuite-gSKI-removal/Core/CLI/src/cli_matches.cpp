@@ -109,9 +109,7 @@ bool CommandLineInterface::DoMatches(const eMatchesMode mode, const eWMEDetail d
 
 		if (m_RawOutput)
 		{
-			AddListenerAndDisableCallbacks();	
 			print_partial_match_information(m_pAgentSML->GetSoarAgent(), prod, wtt);
-			RemoveListenerAndEnableCallbacks();
 		}
 		else
 		{
@@ -125,9 +123,7 @@ bool CommandLineInterface::DoMatches(const eMatchesMode mode, const eWMEDetail d
 
 		if (m_RawOutput)
 		{
-			AddListenerAndDisableCallbacks();		
 			print_match_set(m_pAgentSML->GetSoarAgent(), wtt, mst);
-			RemoveListenerAndEnableCallbacks();
 		}
 		else
 		{

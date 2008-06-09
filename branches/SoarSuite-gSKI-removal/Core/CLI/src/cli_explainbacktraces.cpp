@@ -76,15 +76,11 @@ bool CommandLineInterface::DoExplainBacktraces(const std::string* pProduction, c
 
 	if (!pProduction) {
 		// no production means query, ignore other args
-		AddListenerAndDisableCallbacks();
 		pKernelHack->ExplainListChunks(m_pAgentSML);
-		RemoveListenerAndEnableCallbacks();
 		return true;
 	}
 
-	AddListenerAndDisableCallbacks();
 	pKernelHack->ExplainChunks(m_pAgentSML, pProduction->c_str(), condition);
-	RemoveListenerAndEnableCallbacks();
 	return true;
 }
 

@@ -106,6 +106,8 @@ bool KernelSML::HandleCreateAgent(AgentSML* pAgentSML, char const* pCommandName,
 	// Notify listeners that there is a new agent
 	this->FireAgentEvent(pAgentSML, smlEVENT_AFTER_AGENT_CREATED) ;
 
+	xml_invoke_callback( pAgentSML->GetSoarAgent() );
+
 	// Register for output from this agent
 
 	// Mark the agent's status as just having been created for all connections

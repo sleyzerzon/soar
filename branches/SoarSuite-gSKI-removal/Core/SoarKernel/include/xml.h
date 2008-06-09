@@ -25,130 +25,52 @@
 #ifndef SOAR_XML_H
 #define SOAR_XML_H
 
-#include "soar_TraceNames.h" // for constants for XML function types, tags and attributes
-#include "callback.h"
-#include <stdio.h>
-
-// This is the data that needs to be passed back with the xml callback
-// This is defined here because it needs to be included by KernelSML/CLI and the SoarKernel
-struct XMLCallbackData {
-	const char* funcType;
-	const char* attOrTag;
-	const char* value;
-};
-
-typedef union symbol_union Symbol;
+typedef struct agent_struct agent;
 typedef struct wme_struct wme;
+typedef union symbol_union Symbol;
 
-extern void xmlBeginTag(char const* pTag) ;
-extern void xmlEndTag(char const* pTag) ;
-extern void xmlString(char const* pAttribute, char const* pValue) ;
-extern void xmlSymbol(agent* thisAgent, char const* pAttribute, Symbol* pSymbol) ;
-extern void xmlMoveCurrentToParent() ;
-extern void xmlMoveCurrentToChild(int index) ;
-extern void xmlMoveCurrentToLastChild() ;
-extern void xmlULong(char const* pAttribute, unsigned long value) ;
-extern void xmlInt(char const* pAttribute, int value) ;
-extern void xmlAddSimpleTag(char const* pTag) ;
-extern void xmlAttValue(char const* pTag, char const* pAttribute, char const* pValue) ;
-extern void xml_wme (agent* thisAgent, wme *w) ;
+void xml_create( agent* pAgent );
+void xml_reset( agent* pAgent );
+void xml_destroy( agent* pAgent );
 
-/**
- * @brief Special functions to handle the xml callback
- */
+void xml_begin_tag( agent* pAgent, char const* pTag ) ;
+void xml_end_tag( agent* pAgent, char const* pTag ) ;
 
-inline void makeAgentCallbackXML(	agent*		soarAgent,
-                                        const char*	funcType,
-                                        const char*	attOrTag,
-										const char*	value=0)
+void xml_move_current_to_parent( agent* pAgent ) ;
+void xml_move_current_to_child( agent* pAgent, int index ) ;
+void xml_move_current_to_last_child( agent* pAgent ) ;
+
+void xml_att_val( agent* pAgent, char const* pAttribute, unsigned long value ) ;
+void xml_att_val( agent* pAgent, char const* pAttribute, int value ) ;
+void xml_att_val( agent* pAgent, char const* pAttribute, long value ) ;
+void xml_att_val( agent* pAgent, char const* pAttribute, double value ) ;
+void xml_att_val( agent* pAgent, char const* pAttribute, char const* pValue ) ;
+void xml_att_val( agent* pAgent, char const* pAttribute, Symbol* pSymbol ) ;
+
+void xml_object( agent* pAgent, char const* pTag ) ;
+void xml_object( agent* pAgent, char const* pTag, char const* pAttribute, char const* pValue ) ;
+void xml_object( agent* pAgent, char const* pTag, char const* pAttribute, unsigned long value ) ;
+void xml_object( agent* pAgent, char const* pTag, char const* pAttribute, long value ) ;
+void xml_object( agent* pAgent, char const* pTag, char const* pAttribute, double value ) ;
+
+#define XML_WME_NO_TIMETAG false
+void xml_object( agent* pAgent, wme* pWME, bool printTimetag = true ) ;
+
+void xml_generate_warning( agent* pAgent, const char* pMessage);
+void xml_generate_error( agent* pAgent, const char* pMessage);
+void xml_generate_message( agent* pAgent, const char* pMessage);
+void xml_generate_verbose( agent* pAgent, const char* pMessage);
+
+void xml_invoke_callback( agent* pAgent );
+
+// BADBAD: The kernel should not use these methods. This method should probably be in a different header.
+namespace soarxml
 {
-   XMLCallbackData xml_data;
-	/*
-	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-                    &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
-	    stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
-        start_timer (thisAgent, &thisAgent->start_phase_tv);
-	*/	   
-   xml_data.funcType = funcType;
-   xml_data.attOrTag = attOrTag;
-   xml_data.value = value;
-
-   soar_invoke_first_callback(soarAgent, XML_GENERATION_CALLBACK, /*(XMLCallbackData)*/ static_cast<void*>(&xml_data));
-	/*
-	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-                    &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
-       start_timer(thisAgent, &thisAgent->start_kernel_tv);
-       start_timer(thisAgent, &thisAgent->start_phase_tv);
-	*/
+	class ElementXML;
 }
 
-inline void makeAgentCallbackXML(	agent*			soarAgent,
-                                        const char*		funcType,
-                                        const char*		attOrTag,
-										unsigned long	value)
-{
-	char buf[25];
-	/*
-	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-                    &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
-	    stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
-        start_timer (thisAgent, &thisAgent->start_phase_tv);
-	*/	   
-
-	SNPRINTF(buf, 24, "%lu", value);
-	makeAgentCallbackXML(soarAgent, funcType, attOrTag, (char*)buf);
-	/*
-	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-                    &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
-       start_timer(thisAgent, &thisAgent->start_kernel_tv);
-       start_timer(thisAgent, &thisAgent->start_phase_tv);
-	*/
-}
-
-inline void makeAgentCallbackXML(	agent*		soarAgent,
-                                        const char*	funcType,
-                                        const char*	attOrTag,
-										double      value)
-{
-	char buf[25];
-	/*
-	    stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-                    &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
-	    stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
-        start_timer (thisAgent, &thisAgent->start_phase_tv);
-	*/	   
-	SNPRINTF(buf, 24, "%f", value);
-	makeAgentCallbackXML(soarAgent, funcType, attOrTag, (char*)buf);
-	/*
-	   stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-                    &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
-       start_timer(thisAgent, &thisAgent->start_kernel_tv);
-       start_timer(thisAgent, &thisAgent->start_phase_tv);
-	*/
-}
-
-inline void GenerateWarningXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagWarning);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagWarning);
-}
-
-inline void GenerateErrorXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagError);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagError);
-}
-
-inline void GenerateMessageXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagMessage);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagMessage);
-}
-
-inline void GenerateVerboseXML(agent* soarAgent, const char* message) {
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionBeginTag, soar_TraceNames::kTagVerbose);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionAddAttribute, soar_TraceNames::kTypeString, message);
-	makeAgentCallbackXML(soarAgent, soar_TraceNames::kFunctionEndTag, soar_TraceNames::kTagVerbose);
-}
+soarxml::ElementXML* xml_get_xml( agent* pAgent );
+void xml_begin_command_mode( agent* pAgent );
+soarxml::ElementXML* xml_end_command_mode( agent* pAgent );
 
 #endif

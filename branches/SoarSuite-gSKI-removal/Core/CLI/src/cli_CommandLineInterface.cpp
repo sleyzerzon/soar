@@ -155,8 +155,6 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_LastError = CLIError::kNoError;
 	m_Initialized = true;
 	m_PrintEventToResult = false;
-	m_XMLEventToResult = false;
-	m_XMLEventTag = 0 ;
 	m_EchoResult = false ;
 	m_pAgentSML = 0 ;
 	m_pAgentSoar = 0;
@@ -233,16 +231,82 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
 
 	m_EchoResult = echoResults ;
 
-	// For kernel callback classn we inherit
+	// For kernel callback class we inherit
 	SetAgentSML(m_pAgentSML) ;
+
+	SetTrapPrintCallbacks( true );
 
 	// Process the command, ignoring its result (errors detected with m_LastError)
 	DoCommandInternal(pCommandLine);
+
+	SetTrapPrintCallbacks( false );
 
 	GetLastResultSML(pConnection, pResponse);
 
 	// Always returns true to indicate that we've generated any needed error message already
 	return true;
+}
+
+void CommandLineInterface::SetTrapPrintCallbacks(bool setting)
+{
+	if (!m_pAgentSML)
+	{
+		return;
+	}
+
+	if (setting)
+	{
+		// Trap print callbacks
+		m_pAgentSML->DisablePrintCallback();
+		m_PrintEventToResult = true;
+		if (!m_pLogFile) 
+		{
+			// If we're logging, we're already registered for this.
+			RegisterWithKernel(smlEVENT_PRINT);
+		}
+
+		if (!m_RawOutput)
+		{
+			// Tell kernel to collect result in command buffer as opposed to trace buffer
+			xml_begin_command_mode( m_pAgentSML->GetSoarAgent() );
+		}
+	}
+	else
+	{
+		if (!m_RawOutput)
+		{
+			// Retrieve command buffer, tell kernel to use trace buffer again
+			ElementXML* pXMLCommandResult = xml_end_command_mode( m_pAgentSML->GetSoarAgent() );
+
+			// The root object is just a <trace> tag.  The substance is in the children
+			// Add childrend of the command buffer to response tags
+			for ( int i = 0; i < pXMLCommandResult->GetNumberChildren(); ++i )
+			{
+				ElementXML* pChildXML = new ElementXML();
+				pXMLCommandResult->GetChild( pChildXML, i );
+
+				m_ResponseTags.push_back( pChildXML );
+			}
+
+			delete pXMLCommandResult;
+
+			// Add text result to response tags
+			if ( m_Result.str().length() )
+			{
+				AppendArgTagFast( sml_Names::kParamMessage, sml_Names::kTypeString, m_Result.str().c_str() );
+				m_Result.str("");
+			}
+		}
+
+		// Re-enable print callbacks
+		if (!m_pLogFile) 
+		{
+			// If we're logging, we want to stay registered for this
+			UnregisterWithKernel(smlEVENT_PRINT);
+		}
+		m_PrintEventToResult = false;
+		m_pAgentSML->EnablePrintCallback();
+	}
 }
 
 void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, soarxml::ElementXML* pResponse) {
@@ -279,14 +343,8 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, soarxm
 				pResponse->AddChild(pTag);
 
 			} else {
-				// Otherwise, return result as simple result if there is one
-				if (m_Result.str().size()) {
-					pConnection->AddSimpleResultToSMLResponse(pResponse, m_Result.str().c_str());
-					EchoString(pConnection, m_Result.str().c_str()) ;
-				} else {
-					// Or, simply return true
-					pConnection->AddSimpleResultToSMLResponse(pResponse, sml_Names::kTrue);
-				}
+				// Or, simply return true
+				pConnection->AddSimpleResultToSMLResponse(pResponse, sml_Names::kTrue);
 			}
 		}
 	} else {
@@ -602,37 +660,6 @@ void CommandLineInterface::PrependArgTagFast(const char* pParam, const char* pTy
 	m_ResponseTags.push_front(pTag);
 }
 
-void CommandLineInterface::AddListenerAndDisableCallbacks() {
-	m_pAgentSML->DisablePrintCallback();
-	m_PrintEventToResult = true;
-	if (!m_pLogFile) RegisterWithKernel(smlEVENT_PRINT) ;
-}
-
-void CommandLineInterface::RemoveListenerAndEnableCallbacks() {
-	if (!m_pLogFile) UnregisterWithKernel(smlEVENT_PRINT);
-	m_PrintEventToResult = false;
-	m_pAgentSML->EnablePrintCallback();
-}
-
-void CommandLineInterface::AddXMLListenerAndDisableCallbacks() {
-	m_pAgentSML->DisablePrintCallback();
-	m_XMLEventToResult = true;
-	RegisterWithKernel(smlEVENT_XML_TRACE_OUTPUT) ;
-}
-
-void CommandLineInterface::RemoveXMLListenerAndEnableCallbacks() {
-	UnregisterWithKernel(smlEVENT_XML_TRACE_OUTPUT);
-	m_XMLEventToResult = false;
-	m_pAgentSML->EnablePrintCallback();
-
-	if (m_XMLEventTag)
-	{
-		m_ResponseTags.push_back(m_XMLEventTag->DetatchObject()) ;
-		delete m_XMLEventTag ;
-		m_XMLEventTag = NULL ;
-	}
-}
-
 bool CommandLineInterface::SetError(cli::ErrorCode code) {
 	m_LastError = code;
 	return false;
@@ -640,11 +667,6 @@ bool CommandLineInterface::SetError(cli::ErrorCode code) {
 bool CommandLineInterface::SetErrorDetail(const std::string detail) {
 	m_LastErrorDetail = detail;
 	return false;
-}
-
-void CommandLineInterface::ResultToArgTag() {
-	AppendArgTagFast(sml_Names::kParamMessage, sml_Names::kTypeString, m_Result.str().c_str());
-	m_Result.str("");
 }
 
 bool CommandLineInterface::StripQuotes(std::string& str) {
@@ -1029,17 +1051,6 @@ void CommandLineInterface::OnKernelEvent(int eventID, AgentSML*, void* pCallData
 			}
 		}
 	}
-	else if (eventID == smlEVENT_XML_TRACE_OUTPUT)
-	{
-		// Collect up the incoming XML events into an XML object
-		if (!m_XMLEventTag)
-			m_XMLEventTag = new XMLTrace() ;
-
-		// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
-		sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
-
-		pKernelHack->XMLCallbackHelper( m_XMLEventTag, pCallData );
-	} 
 	else
 	{
 		assert(false);

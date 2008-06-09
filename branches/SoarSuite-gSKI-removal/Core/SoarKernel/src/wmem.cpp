@@ -36,6 +36,7 @@
 #include "print.h"
 #include "tempmem.h"
 #include "xml.h"
+#include "soar_TraceNames.h"
 
 using namespace soar_TraceNames;
 
@@ -72,7 +73,7 @@ void reset_wme_timetags (agent* thisAgent) {
     print (thisAgent, "Internal warning:  wanted to reset wme timetag generator, but\n");
     print (thisAgent, "there are still some wmes allocated. (Probably a memory leak.)\n");
     print (thisAgent, "(Leaving timetag numbers alone.)\n");
-	GenerateWarningXML(thisAgent, "Internal warning:  wanted to reset wme timetag generator, but\nthere are still some wmes allocated. (Probably a memory leak.)\n(Leaving timetag numbers alone.)");
+	xml_generate_warning(thisAgent, "Internal warning:  wanted to reset wme timetag generator, but\nthere are still some wmes allocated. (Probably a memory leak.)\n(Leaving timetag numbers alone.)");
     return;
   }
   thisAgent->current_wme_timetag = 1;
@@ -230,11 +231,12 @@ void do_buffered_wm_changes (agent* thisAgent)
         for (cr=thisAgent->wmes_to_remove; cr!=NIL; cr=next_c) {
            next_c = cr->rest;
            if (w == cr->first) {
-              print (thisAgent, "WARNING: WME added and removed in same phase : ");
-			  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWarning);
-			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, "WARNING: WME added and removed in same phase :");
+			  const char * const kWarningMessage = "WARNING: WME added and removed in same phase : ";
+              print (thisAgent, const_cast< char* >( kWarningMessage) );
+			  xml_begin_tag( thisAgent, kTagWarning );
+			  xml_att_val( thisAgent, kTypeString, kWarningMessage );
               print_wme(thisAgent, w);
-			  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWarning);
+  			  xml_end_tag( thisAgent, kTagWarning );
            } 
         } 
      } 

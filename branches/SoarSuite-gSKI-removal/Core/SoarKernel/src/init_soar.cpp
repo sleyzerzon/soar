@@ -97,8 +97,8 @@ void abort_with_fatal_error (agent* thisAgent, char *msg) {
   fprintf (stderr,"%s",msg);
   fprintf (stderr,warning);
   
-  GenerateErrorXML(thisAgent, msg);
-  GenerateErrorXML(thisAgent, warning);
+  xml_generate_error(thisAgent, msg);
+  xml_generate_error(thisAgent, warning);
 
   f = fopen("soarerror", "w");
   fprintf (f,"%s",msg);
@@ -616,6 +616,9 @@ bool reinitialize_soar (agent* thisAgent) {
   reset_wme_timetags (thisAgent);
   reset_statistics (thisAgent);
 
+  // JRV: For XML generation
+  xml_reset( thisAgent );
+
   /* RDF 01282003: Reinitializing the various halt and stop flags */
   thisAgent->system_halted = FALSE;
   thisAgent->stop_soar = FALSE;			// voigtjr:  this line doesn't exist in other kernel
@@ -689,7 +692,7 @@ void do_one_top_level_phase (agent* thisAgent)
   {
     print (thisAgent,
 	   "\nSystem halted.  Use (init-soar) before running Soar again.");
-	GenerateErrorXML(thisAgent, "System halted.  Use (init-soar) before running Soar again.");
+	xml_generate_error(thisAgent, "System halted.  Use (init-soar) before running Soar again.");
     thisAgent->stop_soar = TRUE;
     thisAgent->reason_for_stopping = "System halted.";
     return;
@@ -1084,6 +1087,9 @@ void do_one_top_level_phase (agent* thisAgent)
  
       /* REW: begin 09.15.96 */
       if (thisAgent->operand2_mode == TRUE) {
+		  // JRV: Get rid of the cached XML after every decision but before the after-decision-phase callback
+		  xml_invoke_callback( thisAgent ); // invokes XML_GENERATION_CALLBACK, clears XML state
+
 		  /* KJC June 05:  moved here from DECISION Phase */
  	      soar_invoke_callbacks(thisAgent, 
 		                    	AFTER_DECISION_CYCLE_CALLBACK,
@@ -1115,7 +1121,7 @@ void do_one_top_level_phase (agent* thisAgent)
 		  (unsigned long)(thisAgent->sysparams[MAX_ELABORATIONS_SYSPARAM])) {
 			  if (thisAgent->sysparams[PRINT_WARNINGS_SYSPARAM]) {			
 				  print (thisAgent, "\nWarning: reached max-elaborations; proceeding to decision phase.");
-				  GenerateWarningXML(thisAgent, "Warning: reached max-elaborations; proceeding to decision phase.");
+				  xml_generate_warning(thisAgent, "Warning: reached max-elaborations; proceeding to decision phase.");
 			  }
 		  thisAgent->current_phase = DECISION_PHASE;
 	  } else
@@ -1161,6 +1167,7 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  thisAgent->run_phase_count++ ;
 	  thisAgent->run_elaboration_count++ ;	// All phases count as a run elaboration
+
 	  soar_invoke_callbacks(thisAgent, 
 			 AFTER_DECISION_PHASE_CALLBACK,
 			 (soar_call_data) DECISION_PHASE);
@@ -1176,6 +1183,9 @@ void do_one_top_level_phase (agent* thisAgent)
 	  }
 
 	  if (thisAgent->operand2_mode == FALSE) {
+		  // JRV: Get rid of the cached XML after every decision but before the after-decision-phase callback
+		  xml_invoke_callback( thisAgent ); // invokes XML_GENERATION_CALLBACK, clears XML state
+
           /* KJC June 05: Soar8 - moved AFTER_DECISION_CYCLE_CALLBACK to proper spot in OUTPUT */
  	      soar_invoke_callbacks(thisAgent, 
 		                    	AFTER_DECISION_CYCLE_CALLBACK,
@@ -1203,7 +1213,7 @@ void do_one_top_level_phase (agent* thisAgent)
 				                    (soar_call_data) thisAgent->current_phase);
  
 			  do_decision_phase(thisAgent);
-     
+
 			  soar_invoke_callbacks(thisAgent, thisAgent, AFTER_DECISION_PHASE_CALLBACK,
                                     (soar_call_data) thisAgent->current_phase);
 

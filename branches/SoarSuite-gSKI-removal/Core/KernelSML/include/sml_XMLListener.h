@@ -26,15 +26,11 @@ namespace sml {
 
 class KernelSML ;
 class Connection ;
-class AgentOutputFlusher;
 
 class XMLListener : public EventManager<smlXMLEventId>
 {
 protected:
-	const static int kNumberEvents = smlEVENT_LAST_XML_EVENT - smlEVENT_XML_TRACE_OUTPUT + 1 ;
 	KernelSML*				m_pKernelSML ;
-	soarxml::XMLTrace		m_BufferedXMLOutput[kNumberEvents];
-	AgentOutputFlusher*		m_pAgentOutputFlusher[kNumberEvents];
 
 	// When false we don't forward print callback events to the listeners.  (Useful when we're backdooring into the kernel)
 	bool					m_EnablePrintCallback ;
@@ -63,9 +59,6 @@ public:
 
 	// Allows us to temporarily stop forwarding print callback output from the kernel to the SML listeners
 	void EnablePrintCallback(bool enable) { m_EnablePrintCallback = enable ; }
-
-	// Send the SML event to the clients (flush output)
-	void FlushOutput(smlXMLEventId eventID);
 
 	// Echo the list of wmes received back to any listeners
 	void FireInputReceivedEvent(soarxml::ElementXML const* pCommands) ;

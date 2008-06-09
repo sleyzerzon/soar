@@ -44,6 +44,7 @@
 #include "recmem.h"
 #include "tempmem.h"
 #include "xml.h"
+#include "soar_TraceNames.h"
 
 using namespace soar_TraceNames;
 
@@ -336,7 +337,7 @@ preference *execute_action (agent* thisAgent, action *a, struct token_struct *to
 		add_to_growable_string(thisAgent, &gs, " ^");
 		add_to_growable_string(thisAgent, &gs, symbol_to_string(thisAgent, attr, true, 0, 0));
 		add_to_growable_string(thisAgent, &gs, ".");
-		GenerateWarningXML(thisAgent, text_of_growable_string(gs));
+		xml_generate_warning(thisAgent, text_of_growable_string(gs));
 		free_growable_string(thisAgent, gs);
 
      }  
@@ -582,7 +583,7 @@ void create_instantiation (agent* thisAgent, production *prod,
                inst->prod->name);
          char buf[256];
          SNPRINTF(buf, 254, "in create_instantiation: %s", symbol_to_string(thisAgent, inst->prod->name, true, 0, 0));
-         GenerateVerboseXML(thisAgent, buf);
+         xml_generate_verbose(thisAgent, buf);
        }
    }
    /* REW: end   09.15.96 */
@@ -632,8 +633,7 @@ void create_instantiation (agent* thisAgent, production *prod,
    /* --- phase has changed to output by printing the arrow --- */
    if (trace_it && thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM]) {
       print (thisAgent, " -->\n");
-	  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActionSideMarker);
-	  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActionSideMarker);
+	  xml_object( thisAgent, kTagActionSideMarker );
    }
 
    /* --- execute the RHS actions, collect the results --- */
@@ -667,7 +667,7 @@ void create_instantiation (agent* thisAgent, production *prod,
                   need_to_do_support_calculations = TRUE;
                   if (thisAgent->soar_verbose_flag == TRUE) {
                      printf("\n\nin create_instantiation():  need_to_do_support_calculations == TRUE!!!\n\n");
-                     GenerateVerboseXML(thisAgent, "in create_instantiation():  need_to_do_support_calculations == TRUE!!!");
+                     xml_generate_verbose(thisAgent, "in create_instantiation():  need_to_do_support_calculations == TRUE!!!");
                   }
                }
 
@@ -826,8 +826,7 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
 				(wme_trace_type)thisAgent->sysparams[TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM],1);
 			if (thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM]) {
 				print (thisAgent, " -->\n");
-				makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagActionSideMarker);
-				makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagActionSideMarker);
+				xml_object( thisAgent, kTagActionSideMarker );
 			}
 		}
         if (thisAgent->sysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM]) {
@@ -888,7 +887,7 @@ void assert_new_preferences (agent* thisAgent)
    if ((thisAgent->operand2_mode == TRUE) &&
        (thisAgent->soar_verbose_flag == TRUE)) {
            printf("\n   in assert_new_preferences:");
-           GenerateVerboseXML(thisAgent, "in assert_new_preferences:");
+           xml_generate_verbose(thisAgent, "in assert_new_preferences:");
        }
    /* REW: end   09.15.96 */
    
@@ -952,7 +951,7 @@ void assert_new_preferences (agent* thisAgent)
             inst->prod->name);
             char buf[256];
             SNPRINTF(buf, 254, "asserting instantiation: %s", symbol_to_string(thisAgent, inst->prod->name, true, 0, 0));
-            GenerateVerboseXML(thisAgent, buf);
+            xml_generate_verbose(thisAgent, buf);
           }
       }
       /* REW: end   09.15.96 */
@@ -1036,19 +1035,19 @@ void do_preference_phase (agent* thisAgent) {
   if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
 	  if (thisAgent->operand2_mode == TRUE) {
 		  if (thisAgent->current_phase == APPLY_PHASE) {  /* it's always IE for PROPOSE */
-			  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
-			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_FiringProductions);
+			  xml_begin_tag( thisAgent, kTagSubphase );
+			  xml_att_val( thisAgent, kPhase_Name, kSubphaseName_FiringProductions );
 			  switch (thisAgent->FIRING_TYPE) {
 					case PE_PRODS:
 						print (thisAgent, "\t--- Firing Productions (PE) ---\n",0);
-						makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
+						xml_att_val( thisAgent, kPhase_FiringType, kPhaseFiringType_PE );
 						break;
 					case IE_PRODS:
 						print (thisAgent, "\t--- Firing Productions (IE) ---\n",0);
-						makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
+						xml_att_val( thisAgent, kPhase_FiringType, kPhaseFiringType_IE );
 						break;
 			  }
-			  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
+			  xml_end_tag( thisAgent, kTagSubphase );
 		  }
 	  }
 	  else

@@ -15,8 +15,6 @@
 
 #include "sml_Utils.h"
 
-#ifdef USE_NEW_SCHEDULER
-
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "sml_Events.h"
@@ -679,12 +677,12 @@ bool RunScheduler::IsRunning()
 *		  Can query each for "GetLastRunResult()".
 *************************************************************/	
 smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runStepSize, 
-												   unsigned long count, 
-												   smlRunFlags runFlags, 
-												   smlRunStepSize interleaveStepSize, 
-												   bool synchronize)
+											  unsigned long count, 
+											  smlRunFlags runFlags, 
+											  smlRunStepSize interleaveStepSize, 
+											  bool synchronize)
 {
-    // Agents were already appropriately added (or not) to the RunList before calling this method.
+	// Agents were already appropriately added (or not) to the RunList before calling this method.
 	// For every Run Command issued, we can find out if agent is still scheduled to run,
 	// and/or whether it was scheduled to run at all.  When agents stop or Halt, the
 	// AgentScheduledToRun bool is set to false, but WasScheduledToRun is unchanged.
@@ -696,7 +694,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	VerifyStepSizeForRunType(forever, runStepSize, interleaveStepSize) ;
 
 	// Record initial counts and zero the local "run" counter (that we're about to be incrementing)
- 	InitializeRunCounters(runStepSize) ;
+	InitializeRunCounters(runStepSize) ;
 
 	// Depending on RunType, set the stop location for gSKI_STOP_AFTER_DECISION_CYCLE interrupts
 	m_pKernelSML->SetStopPoint( forever, runStepSize, m_StopBeforePhase );
@@ -706,7 +704,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 
 	// IF we did a StopBeforeUpdate, this is where we need to test and generate update events...
 	TestForFiringUpdateWorldEvents();
- 	m_AllGeneratedOutputEventFired = false ;
+	m_AllGeneratedOutputEventFired = false ;
 
 	// Initialize state required for update world events
 	// Should we do this even if previous Run was interrupted?  Probably not.
@@ -717,7 +715,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 
 	bool runFinished = false ;
 	long stepCount   = 0 ;
-//	long runCount    = 0 ;
+	//	long runCount    = 0 ;
 	smlRunResult overallResult = sml_RUN_COMPLETED ;	
 	for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)		
 	{		
@@ -731,7 +729,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	m_IsRunning = true ;
 
 	int interruptCheckRate = m_pKernelSML->GetInterruptCheckRate() ;
- 
+
 	// If we need to synchronize agents, we'll set the synchAgent pointer.
 	// Otherwise, we'll clear it to indicate no synch needed.
 	// This only matters when interleaving by Phases, since SoarKernel methods
@@ -751,8 +749,8 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 	//  If so, we'll decrement  the RunCount before entering the Run loop so  
 	//  as not to run more Decision phases than specified in the runCount.  See bug #710.
 	if ((sml_DECISION == runStepSize) && !forever) 
-		 if (!AllAgentsAtStopBeforePhase() && (count > 0)) count--;
- 
+		if (!AllAgentsAtStopBeforePhase() && (count > 0)) count--;
+
 
 	// If we issue a "run 0" and all agents are synched and in the correct state we're done.
 	if (!m_pSynchAgentSML && TestIfAllFinished(forever, runStepSize, count))
@@ -789,7 +787,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 			for (AgentMapIter iter = m_pKernelSML->m_AgentMap.begin() ; iter != m_pKernelSML->m_AgentMap.end() ; iter++)
 			{
 				AgentSML* pAgentSML = iter->second ;
- 
+
 				if (pAgentSML->IsAgentOnStepList())
 				{			
 					// Run all agents one "interleaveStepSize".		
@@ -801,40 +799,41 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 
 					// if agent finished one runType, incr counter and remove from stepList				
 					if (pAgentSML->CompletedRunType(pAgentSML->GetRunCounter(runStepSize)) /* || pAgent->MaxNilOutputCyclesReached */ )
-				   {
-					   pAgentSML->IncrementLocalRunCounter();
-					   pAgentSML->PutAgentOnStepList(false);
-				   } 
-				   else 
-				   {   
-					   runFinished = false; 
-				   }
+					{
+						pAgentSML->IncrementLocalRunCounter();
+						pAgentSML->PutAgentOnStepList(false);
+					} 
+					else 
+					{   
+						runFinished = false; 
+					}
 
-				   // if agent finished count runTypes, remove from RunList, else runFinished = false;	
-				   // can also return true if a gSKI_STOP_AFTER_DECISION_CYCLE interrupt occurred 
-				   // or is pending on agents with RunType DECISION or FOREVER.
-				   bool agentFinishedRun = IsAgentFinished(pAgentSML, forever, runStepSize, count) ;
-	
-				   // Have to test the run state to find out if we are still ok to keep running
-			       // (not sure if runResult provides this as well, but they're from different enums).
-				   smlRunState runState = pAgentSML->GetRunState() ;
+					// if agent finished count runTypes, remove from RunList, else runFinished = false;	
+					// can also return true if a gSKI_STOP_AFTER_DECISION_CYCLE interrupt occurred 
+					// or is pending on agents with RunType DECISION or FOREVER.
+					bool agentFinishedRun = IsAgentFinished(pAgentSML, forever, runStepSize, count) ;
 
-				// An agent should return "stopped" if it's just pausing in the middle of a run
-				// before we run it for the next phase.  Anything else means this agent is done running.
-				if (runState != sml_RUNSTATE_STOPPED || agentFinishedRun)
-				{
-					pAgentSML->RemoveAgentFromRunList() ;
-					pAgentSML->SetResultOfRun(runResult) ;
-					// If we know we won't have to step to StopBefore phase
-					// notify listeners that this agent is finished running
-					if ((runStepSize != sml_DECISION) && !forever)
-						pAgentSML->FireRunEvent(smlEVENT_AFTER_RUN_ENDS) ;
-				}
-				else
-				{
-					// If at least one agent wants to keep running, we keep running.
-					runFinished = false ;
-				}					
+					// Have to test the run state to find out if we are still ok to keep running
+					// (not sure if runResult provides this as well, but they're from different enums).
+					smlRunState runState = pAgentSML->GetRunState() ;
+
+					// An agent should return "stopped" if it's just pausing in the middle of a run
+					// before we run it for the next phase.  Anything else means this agent is done running.
+					if (runState != sml_RUNSTATE_STOPPED || agentFinishedRun)
+					{
+						pAgentSML->RemoveAgentFromRunList() ;
+						pAgentSML->SetResultOfRun(runResult) ;
+						// If we know we won't have to step to StopBefore phase
+						// notify listeners that this agent is finished running
+						if ((runStepSize != sml_DECISION) && !forever) {
+							pAgentSML->FireRunEvent(smlEVENT_AFTER_RUN_ENDS) ;
+						}
+					}
+					else
+					{
+						// If at least one agent wants to keep running, we keep running.
+						runFinished = false ;
+					}					
 				}
 			}
 		}
@@ -842,7 +841,7 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 		// any kernel-level events that are satisfied
 		//  KJC Is this where we might want to add a "phase" for StopBeforePhase?   
 		//  We'd need to use m_AllGeneratedOutputEventFired
-	    TestForFiringUpdateWorldEvents();
+		TestForFiringUpdateWorldEvents();
 
 		// Check for whether the kernel events requested a stop-soar.
 		if (TestIfAllFinished(forever, runStepSize, count))
@@ -869,5 +868,3 @@ smlRunResult RunScheduler::RunScheduledAgents(bool forever, smlRunStepSize runSt
 
 	return overallResult ;
 }
-
-#endif // USE_NEW_SCHEDULER

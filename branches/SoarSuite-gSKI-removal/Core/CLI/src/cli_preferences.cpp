@@ -91,12 +91,9 @@ bool CommandLineInterface::DoPreferences(const ePreferencesDetail detail, bool o
 	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
 
 	//bool object = 1;
-	AddListenerAndDisableCallbacks();
 	bool ret = pKernelHack->Preferences(m_pAgentSML, static_cast<int>(detail), object, pId ? pId->c_str() : 0, pAttribute ? pAttribute->c_str() : 0);
-	RemoveListenerAndEnableCallbacks();
 
 	// put the result into a message(string) arg tag
-	if (!m_RawOutput) ResultToArgTag();
 	if (!ret) return SetError(CLIError::kPreferencesError);
 	return ret;
 }

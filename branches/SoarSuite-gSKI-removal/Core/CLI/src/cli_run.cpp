@@ -175,7 +175,6 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 		pScheduler->ScheduleAllAgentsToRun(true) ;
 	}
 
-#ifdef USE_NEW_SCHEDULER
 	smlRunStepSize interleave;
 
 	switch(interleaveIn) {
@@ -197,27 +196,21 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 			break;
 	}
 
-#endif
-
-#ifdef USE_NEW_SCHEDULER
 	if (!pScheduler->VerifyStepSizeForRunType(forever, runType, interleave) ) {
 		SetError(CLIError::kInvalidRunInterleaveSetting);
 		SetErrorDetail("Run type and interleave setting incompatible.");
 		return false;
 	}
-#endif
 
 	// If we're running by decision cycle synchronize up the agents to the same phase before we start
 	bool synchronizeAtStart = (runType == sml_DECISION) ; 
 
+	SetTrapPrintCallbacks( false );
+
 	// Do the run
-#ifdef USE_OLD_SCHEDULER
-	assert(false);
-	//runResult = pScheduler->RunScheduledAgents(runType, count, runFlags, interleaveStepSize, synchronizeAtStart) ;
-#endif
-#ifdef USE_NEW_SCHEDULER
 	runResult = pScheduler->RunScheduledAgents(forever, runType, count, runFlags, interleave, synchronizeAtStart) ;
-#endif
+
+	SetTrapPrintCallbacks( true );
 
 	// Check for error
 	if (runResult == sml_RUN_ERROR) {

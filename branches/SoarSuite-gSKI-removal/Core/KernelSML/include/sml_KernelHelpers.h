@@ -105,8 +105,6 @@ namespace sml
 
 	 void ExplainListChunks(AgentSML* pIAgent);
 	 bool ExplainChunks(AgentSML* pIAgent, const char* pProduction, int mode);
-
-	 void XMLCallbackHelper(soarxml::XMLTrace* xmlTrace, void* pCallDataIn);
   };
 }
 #endif

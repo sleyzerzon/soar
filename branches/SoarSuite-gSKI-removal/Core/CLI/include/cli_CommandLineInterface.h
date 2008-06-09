@@ -659,6 +659,8 @@ protected:
 	bool DoCommandInternal(const std::string& commandLine);
 	bool DoCommandInternal(std::vector<std::string>& argv);
 
+	void SetTrapPrintCallbacks(bool setting);
+
 	virtual void OnKernelEvent(int eventID, sml::AgentSML* pAgentSML, void* pCallData) ;
 
 	// Wrapped to handle errors more easily
@@ -739,16 +741,8 @@ protected:
 	*************************************************************/ 	 
 	bool StripQuotes(std::string& str); 	 
 
-	void AddListenerAndDisableCallbacks();
-	void RemoveListenerAndEnableCallbacks();
-
-	void AddXMLListenerAndDisableCallbacks() ;
-	void RemoveXMLListenerAndEnableCallbacks() ;
-
 	bool SetError(cli::ErrorCode code);				// always returns false
 	bool SetErrorDetail(const std::string detail);	// always returns false
-
-	void ResultToArgTag(); // clears result
 
 	void XMLResultToResponse(char const* pCommandName) ; // clears m_XMLResult
 
@@ -782,7 +776,6 @@ protected:
 	bool				m_Initialized;			// True if state has been cleared for a new command execution
 	static std::ostringstream m_Result;			// Raw output from the command
 	bool				m_RawOutput;			// True if we want string output.
-	ElementXMLList		m_ResponseTags;			// List of tags for the response.
 	bool				m_SourceError;			// Used to control debug printing for source command errors
 	std::string			m_SourceErrorDetail;	// Used for detailed source error output
 	int					m_SourceDepth;			// Depth of source command calls.
@@ -790,12 +783,12 @@ protected:
 	cli::ErrorCode		m_LastError;			// Last error code (see cli_CLIError.h)
 	std::string			m_LastErrorDetail;		// Additional detail concerning the last error
 	bool				m_PrintEventToResult;	// True when print events should append message to result
-	bool				m_XMLEventToResult;		// True when xml events should append message to result
-	soarxml::XMLTrace*	m_XMLEventTag;			// Used to collect up the xml events
 	bool				m_EchoResult;			// If true, copy result of command to echo event stream
 	EchoMap				m_EchoMap;				// If command appears in this map, always echo it.
 	bool				m_VarPrint;				// Used in print command to put <>'s around identifiers.
+
 	soarxml::XMLTrace*	m_XMLResult;			// Used to collect up XML output from commands that directly support that.
+	ElementXMLList		m_ResponseTags;			// List of tags for the response.
 
 	Aliases				m_Aliases;				// Alias management object
 	CommandMap			m_CommandMap;			// Mapping of command names to function pointers

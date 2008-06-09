@@ -415,6 +415,12 @@ smlRunResult AgentSML::StepInClientThread(smlRunStepSize  stepSize)
 }
 
 void AgentSML::FireRunEvent(smlRunEventId eventId) {
+	if ( eventId == smlEVENT_AFTER_RUN_ENDS )
+	{
+		// Send the trace to the clients
+		xml_invoke_callback( GetSoarAgent() ); // invokes XML_GENERATION_CALLBACK, clears XML state
+	}
+
 	// Trigger a callback from the kernel to propagate the event out to listeners.
 	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
 	int callbackEvent = KernelCallback::GetCallbackFromEventID(eventId) ;
@@ -426,7 +432,7 @@ void AgentSML::FireSimpleXML(char const* pMsg)
 	// Trigger a callback from the kernel to propagate the event out to listeners.
 	// This allows us to use a single uniform model for all run events (even when some are really originating here in SML).
 	soar_invoke_first_callback(m_agent, PRINT_CALLBACK, /*(ClientData)*/ static_cast<void*>( const_cast<char*>( pMsg ) ) );
-	GenerateMessageXML( m_agent, pMsg );
+	xml_generate_message( m_agent, pMsg );
 }
 
 static bool maxStepsReached(unsigned long steps, unsigned long maxSteps)

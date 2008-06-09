@@ -29,6 +29,8 @@
 #include "rhsfun.h"
 #include "explain.h"
 #include "soar_rand.h"
+#include "xml.h"
+#include "soar_TraceNames.h"
 
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
 
@@ -300,13 +302,7 @@ int compare_attr (const void * e1, const void * e2)
 void neatly_print_wme_augmentation_of_id (agent* thisAgent, wme *w, int indentation) {
 	char buf[NEATLY_PRINT_BUF_SIZE], *ch;
 
-	makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagWME);
-	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_TimeTag, w->timetag);
-	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Attribute, symbol_to_string (thisAgent, w->attr, true, 0, 0));
-	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_Value, symbol_to_string (thisAgent, w->value, true, 0, 0));
-	makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWME_ValueType, symbol_to_typeString(thisAgent, w->value));
-	if (w->acceptable) makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kWMEPreference, "+");
-	makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagWME);
+	xml_object( thisAgent, w );
 
 	strcpy (buf, " ^");
 	ch = buf;
@@ -460,15 +456,15 @@ void print_augs_of_id (agent* agnt,
 
 				// XML format of an <id> followed by a series of <wmes> each of which shares the original ID.
 				// <id id="s1"><wme tag="123" attr="foo" attrtype="string" val="123" valtype="string"></wme><wme attr="bar" ...></wme></id>
-				makeAgentCallbackXML(agnt, kFunctionBeginTag, kWME_Id);
-				makeAgentCallbackXML(agnt, kFunctionAddAttribute, kWME_Id, symbol_to_string (agnt, id, true, 0, 0));
+				xml_begin_tag(agnt, kWME_Id);
+				xml_att_val(agnt, kWME_Id, id);
 
 				for (attr=0; attr < num_attr; attr++) {
 					w = list[attr];
 					neatly_print_wme_augmentation_of_id (agnt, w, indent);
 				}
 				
-				makeAgentCallbackXML(agnt, kFunctionEndTag, kWME_Id);
+				xml_end_tag(agnt, kWME_Id);
 
 				print (agnt, ")\n");
 			}
@@ -2193,10 +2189,10 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 
 						char buf[256];
 						SNPRINTF(buf, 254, "remove_input_wme: Removing state S%d because element in GDS changed.", pWme->gds->goal->id.level);
-						makeAgentCallbackXML(pSoarAgent, kFunctionBeginTag, kTagVerbose);
-						makeAgentCallbackXML(pSoarAgent, kFunctionAddAttribute, kTypeString, buf);
+						xml_begin_tag(pSoarAgent, kTagVerbose);
+						xml_att_val(pSoarAgent, kTypeString, buf);
 						print_wme(pSoarAgent, pWme);
-						makeAgentCallbackXML(pSoarAgent, kFunctionEndTag, kTagVerbose);
+						xml_end_tag(pSoarAgent, kTagVerbose);
 					}
 
 				gds_invalid_so_remove_goal(pSoarAgent, pWme);
@@ -2527,47 +2523,6 @@ bool KernelHelpers::ExplainChunks(AgentSML* pAgent, const char* pProduction, int
 			break;
 	}
 	return true;
-}
-
-void KernelHelpers::XMLCallbackHelper(XMLTrace* xmlTrace, void* pCallDataIn)
-{
-	assert(pCallDataIn);
-	XMLCallbackData* pCallData = static_cast<XMLCallbackData*>(pCallDataIn);
-	assert(pCallData);
-
-	// The value can be NULL if this is a begin/end tag event.
-	assert(pCallData->funcType) ;
-	assert(pCallData->attOrTag) ;
-
-	// We need to decide what type of operation this is and we'd like to do that
-	// fairly efficiently so we'll switch based on the first character.
-	char ch = pCallData->funcType[0] ;
-
-	switch (ch)
-	{
-	case 'b' : 
-		if (strcmp(sml_Names::kFunctionBeginTag, pCallData->funcType) == 0)
-		{
-			xmlTrace->BeginTag(pCallData->attOrTag) ;
-		}
-		break ;
-	case 'e':
-		if (strcmp(sml_Names::kFunctionEndTag, pCallData->funcType) == 0)
-		{
-			xmlTrace->EndTag(pCallData->attOrTag) ;
-		}
-		break ;
-	case 'a':
-		if (strcmp(sml_Names::kFunctionAddAttribute, pCallData->funcType) == 0)
-		{
-			xmlTrace->AddAttribute(pCallData->attOrTag, pCallData->value) ;
-		}
-		break ;
-	default:
-		// This is an unknown function type
-		assert(ch == 'b' || ch == 'e' || ch == 'a') ;
-		break ;
-	}
 }
 
 }// namespace

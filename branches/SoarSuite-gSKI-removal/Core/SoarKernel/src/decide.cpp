@@ -49,6 +49,7 @@
 #include "tempmem.h"
 #include "io_soar.h"
 #include "xml.h"
+#include "soar_TraceNames.h"
 
 /* JC ADDED: This is for event firing in gSKI */
 
@@ -1951,10 +1952,10 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 
                        char buf[256];
                        SNPRINTF(buf, 254, "Removing state S%d because element in GDS changed.", w->gds->goal->id.level);
-                       makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagVerbose);
-	                   makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kTypeString, buf);
+                       xml_begin_tag(thisAgent, kTagVerbose);
+	                   xml_att_val(thisAgent, kTypeString, buf);
                        print_wme(thisAgent, w);
-                       makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagVerbose);
+                       xml_end_tag(thisAgent, kTagVerbose);
                     }
                     gds_invalid_so_remove_goal(thisAgent, w);
                  }
@@ -2371,8 +2372,8 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
 		// then the interrupt is generated and system_halted is set to FALSE so the user can recover.
 		print(thisAgent, "\nGoal stack depth exceeded %d on a no-change impasse.\n",thisAgent->sysparams[MAX_GOAL_DEPTH]);
 		print(thisAgent, "Soar appears to be in an infinite loop.  \nContinuing to subgoal may cause Soar to \nexceed the program stack of your system.\n");
-		GenerateWarningXML(thisAgent, "\nGoal stack depth exceeded on a no-change impasse.\n");
-		GenerateWarningXML(thisAgent, "Soar appears to be in an infinite loop.  \nContinuing to subgoal may cause Soar to \nexceed the program stack of your system.\n");
+		xml_generate_warning(thisAgent, "\nGoal stack depth exceeded on a no-change impasse.\n");
+		xml_generate_warning(thisAgent, "Soar appears to be in an infinite loop.  \nContinuing to subgoal may cause Soar to \nexceed the program stack of your system.\n");
 		thisAgent->stop_soar = TRUE;
 		thisAgent->system_halted = TRUE;
 		thisAgent->reason_for_stopping = "Max Goal Depth exceeded.";
@@ -2684,19 +2685,19 @@ void do_working_memory_phase (agent* thisAgent) {
    if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
       if (thisAgent->operand2_mode == TRUE) {		  
 		  if (thisAgent->current_phase == APPLY_PHASE) {  /* it's always IE for PROPOSE */
-			  makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagSubphase);
-			  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_Name, kSubphaseName_ChangingWorkingMemory);
+			  xml_begin_tag(thisAgent, kTagSubphase);
+			  xml_att_val(thisAgent, kPhase_Name, kSubphaseName_ChangingWorkingMemory);
 			  switch (thisAgent->FIRING_TYPE) {
                   case PE_PRODS:
 					  print (thisAgent, "\t--- Change Working Memory (PE) ---\n",0);
-					  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_PE);
+					  xml_att_val(thisAgent, kPhase_FiringType, kPhaseFiringType_PE);
 					  break;      
 				  case IE_PRODS:	
 					  print (thisAgent, "\t--- Change Working Memory (IE) ---\n",0);
-					  makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kPhase_FiringType, kPhaseFiringType_IE);
+					  xml_att_val(thisAgent, kPhase_FiringType, kPhaseFiringType_IE);
 					  break;
 			  }
-			  makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagSubphase);
+			  xml_end_tag(thisAgent, kTagSubphase);
 		  }
       }
       else
@@ -2869,10 +2870,11 @@ void add_wme_to_gds(agent* agentPtr, goal_dependency_set* gds, wme* wme_to_add)
 	   print(agentPtr, " WME: "); 
 	   char buf[256];
 	   SNPRINTF(buf, 254, "Adding to GDS for S%d: ", wme_to_add->gds->goal->id.level);
-	   makeAgentCallbackXML(agentPtr, kFunctionBeginTag, kTagVerbose);
-	   makeAgentCallbackXML(agentPtr, kFunctionAddAttribute, kTypeString, buf);
+
+	   xml_begin_tag(agentPtr, kTagVerbose);
+	   xml_att_val(agentPtr, kTypeString, buf);
 	   print_wme(agentPtr, wme_to_add);
-	   makeAgentCallbackXML(agentPtr, kFunctionEndTag, kTagVerbose);               
+	   xml_end_tag(agentPtr, kTagVerbose);               
    }
 }
 
@@ -3589,11 +3591,11 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
             if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]){
 				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);
 		           print(thisAgent, "Value (Sum) = %f", exp(cand->sum_of_probability / TEMPERATURE));
-               makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum);
-               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, exp(cand->sum_of_probability / TEMPERATURE));
-               makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+               xml_begin_tag(thisAgent, kTagCandidate);
+               xml_att_val(thisAgent, kCandidateName, cand->value);
+               xml_att_val(thisAgent, kCandidateType, kCandidateTypeSum);
+               xml_att_val(thisAgent, kCandidateValue, exp(cand->sum_of_probability / TEMPERATURE));
+               xml_end_tag(thisAgent, kTagCandidate);
 			}     
             /*  Total Probability represents the range of values, we expect
              *  the use of negative valued preferences, so its possible the
@@ -3635,11 +3637,11 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
             if (thisAgent->sysparams[TRACE_INDIFFERENT_SYSPARAM]) {
 				print_with_symbols(thisAgent, "\n Candidate %y:  ", cand->value);  
 		           print(thisAgent, "Value (Avg) = %f", fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
-               makeAgentCallbackXML(thisAgent, kFunctionBeginTag, kTagCandidate);
-               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateName, symbol_to_string (thisAgent, cand->value, true, 0, 0));
-               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateType, kCandidateTypeAvg);
-               makeAgentCallbackXML(thisAgent, kFunctionAddAttribute, kCandidateValue, fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
-               makeAgentCallbackXML(thisAgent, kFunctionEndTag, kTagCandidate);
+               xml_begin_tag(thisAgent, kTagCandidate);
+               xml_att_val(thisAgent, kCandidateName, cand->value);
+               xml_att_val(thisAgent, kCandidateType, kCandidateTypeAvg);
+               xml_att_val(thisAgent, kCandidateValue, fabs(cand->sum_of_probability / cand->total_preferences_for_candidate));
+               xml_end_tag(thisAgent, kTagCandidate);
 			}    
             /* Total probability represents the range of values that
              * we'll map into for selection.  Here we don't expect the use
@@ -3656,7 +3658,7 @@ preference *probabilistically_select(agent* thisAgent, slot * s, preference * ca
 				add_to_growable_string(thisAgent, &gs, "WARNING: Candidate ");
 				add_to_growable_string(thisAgent, &gs, symbol_to_string(thisAgent, cand->value, true, 0, 0));
 				add_to_growable_string(thisAgent, &gs, " has a negative value, which is unexpected with 'numeric-indifferent-mode -avg'");
-				GenerateWarningXML(thisAgent, text_of_growable_string(gs));
+				xml_generate_warning(thisAgent, text_of_growable_string(gs));
 				free_growable_string(thisAgent, gs);
             }
             /* print("\n   Total (Avg) Probability = %f", total_probability ); */

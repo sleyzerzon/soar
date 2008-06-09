@@ -826,7 +826,7 @@ test parse_head_of_conds_for_one_id (agent* thisAgent, char first_letter_if_no_i
 		add_to_growable_string(thisAgent, &gs, "Warning: Constant ");
 		add_to_growable_string(thisAgent, &gs, symbol_to_string(thisAgent, sym, true, 0, 0));
 		add_to_growable_string(thisAgent, &gs, " in id field test.\n         This will never match.");
-		GenerateWarningXML(thisAgent, text_of_growable_string(gs));
+		xml_generate_warning(thisAgent, text_of_growable_string(gs));
 		free_growable_string(thisAgent, gs);
 		//TODO: should we append this to the previous XML message or create a new message for it?
         print_location_of_most_recent_lexeme(thisAgent);
@@ -1513,7 +1513,7 @@ action *parse_preferences_soar8_non_operator (agent* thisAgent, Symbol *id,
     if ( (preference_type != ACCEPTABLE_PREFERENCE_TYPE) &&
 			(preference_type != REJECT_PREFERENCE_TYPE) ) {
       print (thisAgent, "\nWARNING: in Soar8, the only allowable non-operator preference \nis REJECT - .\nIgnoring specified preferences.\n");
-	  GenerateWarningXML(thisAgent, "WARNING: in Soar8, the only allowable non-operator preference \nis REJECT - .\nIgnoring specified preferences.");
+	  xml_generate_warning(thisAgent, "WARNING: in Soar8, the only allowable non-operator preference \nis REJECT - .\nIgnoring specified preferences.");
 
       /* JC BUG FIX: Have to check to make sure that the rhs_values are converted to strings
                correctly before we print */
@@ -1882,7 +1882,7 @@ production *parse_production (agent* thisAgent, unsigned char* rete_addition_res
     }
 	if (!strcmp(thisAgent->lexeme.string, ":interrupt")) {
 	  print(thisAgent, "WARNING :interrupt is not supported with the current build options...");
-	  GenerateWarningXML(thisAgent, "WARNING :interrupt is not supported with the current build options...");
+	  xml_generate_warning(thisAgent, "WARNING :interrupt is not supported with the current build options...");
 	  get_lexeme(thisAgent);
 	  continue;
 	}

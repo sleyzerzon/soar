@@ -138,17 +138,13 @@ bool CommandLineInterface::DoWatchWMEs(const eWatchWMEsMode mode, WatchWMEsTypeB
 		case WATCH_WMES_LIST:
 			if (type.none()) type.flip();
 
-			this->AddListenerAndDisableCallbacks();
 			pKernelHack->ListWMEFilters(m_pAgentSML, type.test(WATCH_WMES_TYPE_ADDS), type.test(WATCH_WMES_TYPE_REMOVES));
-			this->RemoveListenerAndEnableCallbacks();
 			break;
 
 		case WATCH_WMES_RESET:
 			if (type.none()) type.flip();
 
-			this->AddListenerAndDisableCallbacks();
 			retb = pKernelHack->ResetWMEFilters(m_pAgentSML, type.test(WATCH_WMES_TYPE_ADDS), type.test(WATCH_WMES_TYPE_REMOVES));
-			this->RemoveListenerAndEnableCallbacks();
 
 			if (!retb) return SetError(CLIError::kWMEFilterNotFound);
 			break;

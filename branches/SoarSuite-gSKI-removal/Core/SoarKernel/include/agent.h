@@ -32,6 +32,10 @@
 #include "callback.h"
 #include <map>
 
+// JRV: Added to support XML management inside Soar
+// These handles should not be used directly, see xml.h
+typedef void* xml_handle;
+
 /* JC ADDED: Included so we can put the RHS functions in here */
 typedef struct rhs_function_struct rhs_function;
 
@@ -729,6 +733,12 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 #ifdef NUMERIC_INDIFFERENCE
   enum ni_mode numeric_indifferent_mode;      /* SW 08.19.2003 */
 #endif
+
+  // JRV: Added to support XML management inside Soar
+  // These handles should not be used directly, see xml.h
+  xml_handle xml_destination;		// The current destination for all XML generation, essentially either == to xml_trace or xml_commands
+  xml_handle xml_trace;				// During a run, xml_destination will be set to this pointer.
+  xml_handle xml_commands;			// During commands, xml_destination will be set to this pointer.
 
 } agent;
 /*************** end of agent struct *****/

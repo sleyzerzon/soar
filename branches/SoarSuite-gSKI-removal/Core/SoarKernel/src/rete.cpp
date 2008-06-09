@@ -103,6 +103,7 @@
 #include "rhsfun.h"
 #include "lexer.h"
 #include "xml.h"
+#include "soar_TraceNames.h"
 
 /* ----------- basic functionality switches ----------- */
 
@@ -5761,7 +5762,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
                                     growable_string gs = make_blank_growable_string(thisAgent);
                                     add_to_growable_string(thisAgent, &gs, "WARNING:  operator elaborations mixed with operator applications\nget o_support in prod ");
                                     add_to_growable_string(thisAgent, &gs, symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
-                                    GenerateWarningXML(thisAgent, text_of_growable_string(gs));
+                                    xml_generate_warning(thisAgent, text_of_growable_string(gs));
                                     free_growable_string(thisAgent, gs);
 
 									prod_type = PE_PRODS;
@@ -5775,7 +5776,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
                                     growable_string gs = make_blank_growable_string(thisAgent);
                                     add_to_growable_string(thisAgent, &gs, "WARNING:  operator elaborations mixed with operator applications\nget i_support in prod ");
                                     add_to_growable_string(thisAgent, &gs, symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
-                                    GenerateWarningXML(thisAgent, text_of_growable_string(gs));
+                                    xml_generate_warning(thisAgent, text_of_growable_string(gs));
                                     free_growable_string(thisAgent, gs);
 
 									prod_type = IE_PRODS;
@@ -5816,7 +5817,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
                               node->b.p.prod->name);
            char buf[256];
            SNPRINTF(buf, 254, "RETE: putting [%s] into ms_o_assertions", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
-           GenerateVerboseXML(thisAgent, buf);
+           xml_generate_verbose(thisAgent, buf);
         }
      }
 
@@ -5836,7 +5837,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
                               node->b.p.prod->name);
            char buf[256];
            SNPRINTF(buf, 254, "RETE: putting [%s] into ms_i_assertions", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
-           GenerateVerboseXML(thisAgent, buf);
+           xml_generate_verbose(thisAgent, buf);
         }
      }
   }
@@ -6036,7 +6037,7 @@ void p_node_left_removal (agent* thisAgent, rete_node *node, token *tok, wme *w)
           print_with_symbols (thisAgent, "\n%y: ",node->b.p.prod->name);
           char buf[256];
           SNPRINTF(buf, 254, "%s: ", symbol_to_string(thisAgent, node->b.p.prod->name, true, 0, 0));
-          GenerateVerboseXML(thisAgent, buf);
+          xml_generate_verbose(thisAgent, buf);
       }
 
   /* REW: end   09.15.96 */
@@ -6045,7 +6046,7 @@ void p_node_left_removal (agent* thisAgent, rete_node *node, token *tok, wme *w)
     if (node->b.p.prod->type == JUSTIFICATION_PRODUCTION_TYPE) {
 #ifdef BUG_139_WORKAROUND_WARNING
         print(thisAgent, "\nWarning: can't find an existing inst to retract (BUG 139 WORKAROUND)\n");
-		GenerateWarningXML(thisAgent, "Warning: can't find an existing inst to retract (BUG 139 WORKAROUND)");
+		xml_generate_warning(thisAgent, "Warning: can't find an existing inst to retract (BUG 139 WORKAROUND)");
 #endif
         return;
     }
@@ -8017,8 +8018,8 @@ void xml_whole_token (agent* thisAgent, token *t, wme_trace_type wtt) {
   if (t==thisAgent->dummy_top_token) return;
   xml_whole_token (thisAgent, t->parent, wtt);
   if (t->w) {
-    if (wtt==TIMETAG_WME_TRACE) xmlULong(kWME_TimeTag, t->w->timetag);
-    else if (wtt==FULL_WME_TRACE) xml_wme (thisAgent, t->w);
+    if (wtt==TIMETAG_WME_TRACE) xml_att_val(thisAgent, kWME_TimeTag, t->w->timetag);
+    else if (wtt==FULL_WME_TRACE) xml_object (thisAgent, t->w);
     //if (wtt!=NONE_WME_TRACE) print (thisAgent, " ");
   }
 }
@@ -8042,7 +8043,7 @@ void xml_test (agent* thisAgent, char const* pTag, test t) {
 
   if (test_is_blank_test(t)) {
     //if (!dest) dest=thisAgent->printed_output_string;
-    xmlString(pTag, "[BLANK TEST]") ;	// Using tag as attribute name
+    xml_att_val(thisAgent, pTag, "[BLANK TEST]") ;	// Using tag as attribute name
     //strncpy (dest, "[BLANK TEST]", dest_size);  /* this should never get executed */
 	//dest[dest_size - 1] = 0; /* ensure null termination */
     //return dest;
@@ -8050,7 +8051,7 @@ void xml_test (agent* thisAgent, char const* pTag, test t) {
   }
 
   if (test_is_blank_or_equality_test(t)) {
-    xmlSymbol(thisAgent, pTag, referent_of_equality_test(t)) ;	// Using tag as attribute name
+    xml_att_val(thisAgent, pTag, referent_of_equality_test(t)) ;	// Using tag as attribute name
 	return ;
     //return symbol_to_string (thisAgent, referent_of_equality_test(t), TRUE, dest, dest_size);
   }
@@ -8102,7 +8103,7 @@ void xml_test (agent* thisAgent, char const* pTag, test t) {
     break;
   case DISJUNCTION_TEST:
     // BUGBUG: Need to think this through more carefully
-    xmlString(pTag, "BUGBUG--Adding disjunction in XML--not done yet") ;
+    xml_att_val(thisAgent, pTag, "BUGBUG--Adding disjunction in XML--not done yet") ;
     strncpy (ch, "<< ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
@@ -8116,7 +8117,7 @@ void xml_test (agent* thisAgent, char const* pTag, test t) {
     break;
   case CONJUNCTIVE_TEST:
     // BUGBUG: Need to think this through more carefully
-    xmlString(pTag, "BUGBUG--Adding conjunction in XML--not done yet") ;
+    xml_att_val(thisAgent, pTag, "BUGBUG--Adding conjunction in XML--not done yet") ;
     strncpy (ch, "{ ", dest_size - (ch - dest)); 
     ch[dest_size - (ch - dest) - 1] = 0; /* ensure null termination */
 	while (*ch) ch++;
@@ -8138,7 +8139,7 @@ void xml_test (agent* thisAgent, char const* pTag, test t) {
     break;
   }
 
-  xmlString(pTag, dest) ;
+  xml_att_val(thisAgent, pTag, dest) ;
   return ;
 }
 #endif //0
@@ -8197,9 +8198,9 @@ void xml_condition_list (agent* thisAgent, condition *conds,
       {
          free_with_pool (&thisAgent->dl_cons_pool, dc);
          //print_string (thisAgent, "-{");
-         xmlBeginTag(kTagConjunctive_Negation_Condition);
+         xml_begin_tag(thisAgent, kTagConjunctive_Negation_Condition);
          xml_condition_list (thisAgent, c->data.ncc.top, indent+2, internal);
-         xmlEndTag(kTagConjunctive_Negation_Condition);
+         xml_end_tag(thisAgent, kTagConjunctive_Negation_Condition);
          //print_string (thisAgent, "}");
          continue;
       }
@@ -8230,24 +8231,24 @@ void xml_condition_list (agent* thisAgent, condition *conds,
       {
 		  /* --- print the collected cond's all together --- */
 		  //print_string (thisAgent, " (");
-		  xmlBeginTag(kTagCondition);
+		  xml_begin_tag(thisAgent, kTagCondition);
 
 		  if (removed_goal_test) 
 		  {
 			 //print_string (thisAgent, "state ");
-			 xmlString(kConditionTest, kConditionTestState);
+			 xml_att_val(thisAgent, kConditionTest, kConditionTestState);
 
 		  }
 
 		  if (removed_impasse_test) 
 		  {
 			 //print_string (thisAgent, "impasse ");
-			 xmlString(kConditionTest, kConditionTestImpasse);
+			 xml_att_val(thisAgent, kConditionTest, kConditionTestImpasse);
 		  }
 
 		  //print_string (thisAgent, test_to_string (thisAgent, id_test, NULL, 0));
 		  //xml_test(thisAgent, kConditionId, id_test) ;
-		  xmlString(kConditionId, test_to_string(thisAgent, id_test, NULL, 0)) ;
+		  xml_att_val(thisAgent, kConditionId, test_to_string(thisAgent, id_test, NULL, 0)) ;
 		  deallocate_test (thisAgent, thisAgent->id_test_to_match);
 		  deallocate_test (thisAgent, id_test);
 
@@ -8274,7 +8275,7 @@ void xml_condition_list (agent* thisAgent, condition *conds,
 			while (*ch) ch++;
 
 			*ch = 0 ; // Terminate
-			xmlString(kAttribute, temp) ;
+			xml_att_val(thisAgent, kAttribute, temp) ;
 
 			// Reset the ch pointer
 			ch = temp ;
@@ -8296,12 +8297,12 @@ void xml_condition_list (agent* thisAgent, condition *conds,
             }
             //print_string (thisAgent, temp);
             //add_to_growable_string(thisAgent, &gs, temp);
-		    xmlString(kValue, temp);
+		    xml_att_val(thisAgent, kValue, temp);
          }
 		 //free_growable_string(thisAgent, gs);
       }
       //print_string (thisAgent, ")");
-	  xmlEndTag(kTagCondition);
+	  xml_end_tag(thisAgent, kTagCondition);
    } /* end of while (conds_not_yet_printed) */
 }
 
@@ -8327,21 +8328,21 @@ void xml_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
 
 
   if (action == PRINTING) {
-	  xmlBeginTag(kTagProduction);
+	  xml_begin_tag(thisAgent, kTagProduction);
   } else if (action == FIRING) {
-	  xmlBeginTag(kTagProduction_Firing);
-	  xmlBeginTag(kTagProduction);
+	  xml_begin_tag(thisAgent, kTagProduction_Firing);
+	  xml_begin_tag(thisAgent, kTagProduction);
   } else if (action == RETRACTING) {
-	  xmlBeginTag(kTagProduction_Retracting);
-	  xmlBeginTag(kTagProduction);
+	  xml_begin_tag(thisAgent, kTagProduction_Retracting);
+	  xml_begin_tag(thisAgent, kTagProduction);
   }
 
   if (inst->prod) {
       //print_with_symbols  (thisAgent, "%y", inst->prod->name);
-      xmlSymbol(thisAgent, kProduction_Name, inst->prod->name);
+      xml_att_val(thisAgent, kProduction_Name, inst->prod->name);
   } else {
       //print (thisAgent, "[dummy production]");
-	  xmlString(kProduction_Name, "[dummy_production]");
+	  xml_att_val(thisAgent, kProduction_Name, "[dummy_production]");
 
   }
 
@@ -8349,13 +8350,13 @@ void xml_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
 
   if (wtt==NONE_WME_TRACE) {
 	  if (action == PRINTING) {
-		  xmlEndTag(kTagProduction);
+		  xml_end_tag(thisAgent, kTagProduction);
 	  } else if (action == FIRING) {
-		  xmlEndTag(kTagProduction);
-		  xmlEndTag(kTagProduction_Firing);
+		  xml_end_tag(thisAgent, kTagProduction);
+		  xml_end_tag(thisAgent, kTagProduction_Firing);
 	  } else if (action == RETRACTING) {
-		  xmlEndTag(kTagProduction);
-		  xmlEndTag(kTagProduction_Retracting);
+		  xml_end_tag(thisAgent, kTagProduction);
+		  xml_end_tag(thisAgent, kTagProduction_Retracting);
 	  }
 	  return;
   }
@@ -8366,28 +8367,28 @@ void xml_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
       case TIMETAG_WME_TRACE:
         //print (thisAgent, " %lu", cond->bt.wme_->timetag);
 
-		xmlBeginTag(kTagWME);
-		xmlULong(kWME_TimeTag, cond->bt.wme_->timetag);
-		xmlEndTag(kTagWME);
+		xml_begin_tag(thisAgent, kTagWME);
+		xml_att_val(thisAgent, kWME_TimeTag, cond->bt.wme_->timetag);
+		xml_end_tag(thisAgent, kTagWME);
 
         break;
       case FULL_WME_TRACE:	
 		  if (action != RETRACTING) {
 			  //print (thisAgent, " ");
-			  xml_wme (thisAgent, cond->bt.wme_);
+			  xml_object (thisAgent, cond->bt.wme_);
 		  } else {
 			  // Not all conds available when retracting, depending on DO_TOP_LEVEL_REF_CTS
 			  #ifdef DO_TOP_LEVEL_REF_CTS
 			  //print (thisAgent, " ");
-			  xml_wme (thisAgent, cond->bt.wme_);
+			  xml_object (thisAgent, cond->bt.wme_);
               #else
 
 			  // Wmes that matched the LHS of a retraction may already be free'd; just print tt.
 			  //print (thisAgent, " %lu", cond->bt.wme_->timetag);
 
-			  xmlBeginTag(kTagWME);
-			  xmlULong(kWME_TimeTag, cond->bt.wme_->timetag);
-			  xmlEndTag(kTagWME);
+			  xml_begin_tag(thisAgent, kTagWME);
+			  xml_att_val(thisAgent, kWME_TimeTag, cond->bt.wme_->timetag);
+			  xml_end_tag(thisAgent, kTagWME);
  
               #endif
 		  }
@@ -8396,13 +8397,13 @@ void xml_instantiation_with_wmes (agent* thisAgent, instantiation *inst,
     }
 	
 	if (action == PRINTING) {
-		xmlEndTag(kTagProduction);
+		xml_end_tag(thisAgent, kTagProduction);
 	} else if (action == FIRING) {
-		xmlEndTag(kTagProduction);
-		xmlEndTag(kTagProduction_Firing);
+		xml_end_tag(thisAgent, kTagProduction);
+		xml_end_tag(thisAgent, kTagProduction_Firing);
 	} else if (action == RETRACTING) {
-		xmlEndTag(kTagProduction);
-		xmlEndTag(kTagProduction_Retracting);
+		xml_end_tag(thisAgent, kTagProduction);
+		xml_end_tag(thisAgent, kTagProduction_Retracting);
 	}
 }
 
@@ -8425,14 +8426,14 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
 
     if (mst == MS_ASSERT_RETRACT || mst == MS_ASSERT) {
        //print (thisAgent, "O Assertions:\n");
-		xmlBeginTag(kOAssertions) ;
+		xml_begin_tag(thisAgent, kOAssertions) ;
 
        for (msc=thisAgent->ms_o_assertions; msc!=NIL; msc=msc->next) {
 
          if(wtt != NONE_WME_TRACE) {
-		   xmlBeginTag(kTagProduction) ;
-		   xmlSymbol(thisAgent, kName, msc->p_node->b.p.prod->name) ;
-		   xmlSymbol(thisAgent, kGoal, msc->goal) ;
+		   xml_begin_tag(thisAgent, kTagProduction) ;
+		   xml_att_val(thisAgent, kName, msc->p_node->b.p.prod->name) ;
+		   xml_att_val(thisAgent, kGoal, msc->goal) ;
            //print_with_symbols (thisAgent, "  %y ", msc->p_node->b.p.prod->name);
            /* REW: begin 08.20.97 */
            /* Add match goal to the print of the matching production */
@@ -8443,7 +8444,7 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
            temp_token.w = msc->w;
            xml_whole_token (thisAgent, &temp_token, wtt);
            //print (thisAgent, "\n");
-		   xmlEndTag(kTagProduction) ;
+		   xml_end_tag(thisAgent, kTagProduction) ;
          }
          else {
            /* REW: begin 10.22.97 */
@@ -8468,12 +8469,12 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
 
       if (wtt == NONE_WME_TRACE) {
          while (ms_trace) {
-		   xmlBeginTag(kTagProduction) ;
+		   xml_begin_tag(thisAgent, kTagProduction) ;
            tmp = ms_trace; ms_trace = tmp->next;
-		   xmlSymbol(thisAgent, kName, tmp->sym) ;
-		   xmlSymbol(thisAgent, kGoal, tmp->goal) ;
+		   xml_att_val(thisAgent, kName, tmp->sym) ;
+		   xml_att_val(thisAgent, kGoal, tmp->goal) ;
            if (tmp->count > 1)
-			   xmlInt(kCount, tmp->count) ;	// DJP -- No idea what this count is
+			   xml_att_val(thisAgent, kCount, tmp->count) ;	// DJP -- No idea what this count is
            //print_with_symbols (thisAgent, "  %y ", tmp->sym);
            /* REW: begin 08.20.97 */
            /*  BUG: for now this will print the goal of the first
@@ -8487,15 +8488,15 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
            //else
            //  print(thisAgent, "\n");
            free_memory(thisAgent, (void *)tmp, MISCELLANEOUS_MEM_USAGE);
-	       xmlEndTag(kTagProduction) ;
+	       xml_end_tag(thisAgent, kTagProduction) ;
         }
       }
-	  xmlEndTag(kOAssertions) ;
+	  xml_end_tag(thisAgent, kOAssertions) ;
 	}
 
      if (mst == MS_ASSERT_RETRACT || mst == MS_ASSERT) {
        //print (thisAgent, "I Assertions:\n");
-	   xmlBeginTag(kIAssertions) ;
+	   xml_begin_tag(thisAgent, kIAssertions) ;
        for (msc=thisAgent->ms_i_assertions; msc!=NIL; msc=msc->next) {
 
          if(wtt != NONE_WME_TRACE) {
@@ -8503,16 +8504,16 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
            /* REW: begin 08.20.97 */
            /* Add match goal to the print of the matching production */
            //print_with_symbols(thisAgent, " [%y] ", msc->goal);
-		   xmlBeginTag(kTagProduction) ;
-		   xmlSymbol(thisAgent, kName, msc->p_node->b.p.prod->name) ;
-		   xmlSymbol(thisAgent, kGoal, msc->goal) ;
+		   xml_begin_tag(thisAgent, kTagProduction) ;
+		   xml_att_val(thisAgent, kName, msc->p_node->b.p.prod->name) ;
+		   xml_att_val(thisAgent, kGoal, msc->goal) ;
 
            /* REW: end   08.20.97 */
            temp_token.parent = msc->tok;
            temp_token.w = msc->w;
            xml_whole_token (thisAgent, &temp_token, wtt);
            //print (thisAgent, "\n");
-	       xmlEndTag(kTagProduction) ;
+	       xml_end_tag(thisAgent, kTagProduction) ;
          }
          else {
            /* REW: begin 10.22.97 */
@@ -8539,11 +8540,11 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
       if (wtt == NONE_WME_TRACE) {
          while (ms_trace) {
            tmp = ms_trace; ms_trace = tmp->next;
-		   xmlBeginTag(kTagProduction) ;
-		   xmlSymbol(thisAgent, kName, tmp->sym) ;
-		   xmlSymbol(thisAgent, kGoal, tmp->goal) ;
+		   xml_begin_tag(thisAgent, kTagProduction) ;
+		   xml_att_val(thisAgent, kName, tmp->sym) ;
+		   xml_att_val(thisAgent, kGoal, tmp->goal) ;
            if (tmp->count > 1)
-			   xmlInt(kCount, tmp->count) ;	// DJP -- No idea what this count is
+			   xml_att_val(thisAgent, kCount, tmp->count) ;	// DJP -- No idea what this count is
            //print_with_symbols (thisAgent, "  %y ", tmp->sym);
            /* REW: begin 08.20.97 */
            /*  BUG: for now this will print the goal of the first
@@ -8558,11 +8559,11 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
            //  print(thisAgent, "\n");
 
            free_memory(thisAgent, (void *)tmp, MISCELLANEOUS_MEM_USAGE);
-	       xmlEndTag(kTagProduction) ;
+	       xml_end_tag(thisAgent, kTagProduction) ;
         }
       }
     }
-	xmlEndTag(kIAssertions) ;
+	xml_end_tag(thisAgent, kIAssertions) ;
   }
   /* REW: end   09.15.96 */
 
@@ -8570,17 +8571,17 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
 
 
   if (mst == MS_ASSERT_RETRACT || mst == MS_ASSERT) {
-    xmlBeginTag(kAssertions) ;
+    xml_begin_tag(thisAgent, kAssertions) ;
     //print (thisAgent, "Assertions:\n");
     for (msc=thisAgent->ms_assertions; msc!=NIL; msc=msc->next) {
       if(wtt != NONE_WME_TRACE) {
-	    xmlBeginTag(kTagProduction) ;
-	    xmlSymbol(thisAgent, kName, msc->p_node->b.p.prod->name) ;
+	    xml_begin_tag(thisAgent, kTagProduction) ;
+	    xml_att_val(thisAgent, kName, msc->p_node->b.p.prod->name) ;
         //print_with_symbols (thisAgent, "  %y\n ", msc->p_node->b.p.prod->name);
         temp_token.parent = msc->tok;
         temp_token.w = msc->w;
         xml_whole_token (thisAgent, &temp_token, wtt);
-		xmlEndTag(kTagProduction) ;
+		xml_end_tag(thisAgent, kTagProduction) ;
         //print (thisAgent, "\n");
       } else {
         if((tmp = in_ms_trace(msc->p_node->b.p.prod->name, ms_trace))!=NIL) {
@@ -8598,26 +8599,26 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
     if (wtt == NONE_WME_TRACE) {
       while (ms_trace) {
         tmp = ms_trace; ms_trace = tmp->next;
-	    xmlBeginTag(kTagProduction) ;
-	    xmlSymbol(thisAgent, kName, tmp->sym) ;
-	    xmlSymbol(thisAgent, kGoal, tmp->goal) ;
+	    xml_begin_tag(thisAgent, kTagProduction) ;
+	    xml_att_val(thisAgent, kName, tmp->sym) ;
+	    xml_att_val(thisAgent, kGoal, tmp->goal) ;
         if (tmp->count > 1)
-		   xmlInt(kCount, tmp->count) ;	// DJP -- No idea what this count is
+		   xml_att_val(thisAgent, kCount, tmp->count) ;	// DJP -- No idea what this count is
         //print_with_symbols (thisAgent, "  %y ", tmp->sym);
         //if (tmp->count > 1)
         //  print(thisAgent, "(%d)\n", tmp->count);
         //else
         //  print(thisAgent, "\n");
         free_memory(thisAgent, (void *)tmp, MISCELLANEOUS_MEM_USAGE);
-	    xmlEndTag(kTagProduction) ;
+	    xml_end_tag(thisAgent, kTagProduction) ;
       }
     }
-	xmlEndTag(kAssertions) ;
+	xml_end_tag(thisAgent, kAssertions) ;
   }
 
   /* --- Print retractions --- */  
   if (mst == MS_ASSERT_RETRACT || mst == MS_RETRACT) {
-    xmlBeginTag(kRetractions) ;
+    xml_begin_tag(thisAgent, kRetractions) ;
     //print (thisAgent, "Retractions:\n");
     for (msc=thisAgent->ms_retractions; msc!=NIL; msc=msc->next) {
       if(wtt != NONE_WME_TRACE) {
@@ -8649,14 +8650,14 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
     if(wtt == NONE_WME_TRACE) {
       while (ms_trace) {
         tmp = ms_trace; ms_trace = tmp->next;
-	    xmlBeginTag(kTagProduction) ;
-	    xmlSymbol(thisAgent, kName, tmp->sym) ;
+	    xml_begin_tag(thisAgent, kTagProduction) ;
+	    xml_att_val(thisAgent, kName, tmp->sym) ;
         if (tmp->goal)
-			xmlSymbol(thisAgent, kGoal, tmp->goal) ;
+			xml_att_val(thisAgent, kGoal, tmp->goal) ;
 		else
-			xmlString(kGoal, "NIL") ;
+			xml_att_val(thisAgent, kGoal, "NIL") ;
         if (tmp->count > 1)
-		   xmlInt(kCount, tmp->count) ;	// DJP -- No idea what this count is
+		   xml_att_val(thisAgent, kCount, tmp->count) ;	// DJP -- No idea what this count is
         //print_with_symbols (thisAgent, "  %y ", tmp->sym);
            /* REW: begin 08.20.97 */
            /*  BUG: for now this will print the goal of the first assertion
@@ -8674,7 +8675,7 @@ void xml_match_set (agent* thisAgent, wme_trace_type wtt, ms_trace_type mst) {
         //else
         //  print(thisAgent, "\n");
         free_memory(thisAgent, (void *)tmp, MISCELLANEOUS_MEM_USAGE);
-	    xmlEndTag(kTagProduction) ;
+	    xml_end_tag(thisAgent, kTagProduction) ;
       }
     }
   }
@@ -8713,15 +8714,15 @@ long xml_aux (agent* thisAgent,   /* current agent */
   /* --- Form string for current match count:  If an earlier cond had no
      matches, just leave it blank; if this is the first 0, use ">>>>" --- */
   if (! matches_one_level_up) {
-    //xmlInt(kMatchCount, 0) ;
+    //xml_att_val(thisAgent, kMatchCount, 0) ;
     //strncpy (match_count_string, "    ", MATCH_COUNT_STRING_BUFFER_SIZE);
 	//match_count_string[MATCH_COUNT_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
   } else if (! matches_at_this_level) {
-    //xmlInt(kMatchCount, 0) ;
+    //xml_att_val(thisAgent, kMatchCount, 0) ;
     //strncpy (match_count_string, ">>>>", MATCH_COUNT_STRING_BUFFER_SIZE);
 	//match_count_string[MATCH_COUNT_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
   } else {
-    //xmlInt(kMatchCount, matches_at_this_level) ;
+    //xml_att_val(thisAgent, kMatchCount, matches_at_this_level) ;
     //SNPRINTF (match_count_string, MATCH_COUNT_STRING_BUFFER_SIZE, "%4ld", matches_at_this_level);
 	//match_count_string[MATCH_COUNT_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
   }
@@ -8731,7 +8732,7 @@ long xml_aux (agent* thisAgent,   /* current agent */
 
   if (cond->type==CONJUNCTIVE_NEGATION_CONDITION) {
     /* --- recursively print match counts for the NCC subconditions --- */
-    xmlBeginTag(kTagConjunctive_Negation_Condition) ;
+    xml_begin_tag(thisAgent, kTagConjunctive_Negation_Condition) ;
     //print (thisAgent, "    -{\n");
     xml_aux (thisAgent, real_parent_node(node->b.cn.partner),
               parent,
@@ -8740,19 +8741,19 @@ long xml_aux (agent* thisAgent,   /* current agent */
               indent+5);
     //print_spaces (thisAgent, indent);
     //print (thisAgent, "%s }\n", match_count_string);
-	xmlEndTag(kTagConjunctive_Negation_Condition) ;
+	xml_end_tag(thisAgent, kTagConjunctive_Negation_Condition) ;
   } else {
     //print (thisAgent, "%s", match_count_string);
     xml_condition (thisAgent, cond);
 
 	// DJP: This is a trick to let us insert more attributes into xml_condition().
-	xmlMoveCurrentToLastChild() ;
+	xml_move_current_to_last_child(thisAgent) ;
     // DJP: Moved this test from earlier down to here as no longer building match_count_string
     if (!matches_one_level_up)
-		xmlInt(kMatchCount, 0) ;
+		xml_att_val(thisAgent, kMatchCount, 0) ;
 	else
-	    xmlInt(kMatchCount, matches_at_this_level) ;
-	xmlMoveCurrentToParent() ;
+	    xml_att_val(thisAgent, kMatchCount, matches_at_this_level) ;
+	xml_move_current_to_parent(thisAgent) ;
 
     //print (thisAgent, "\n");
     /* --- if this is the first match-failure (0 matches), print info on
@@ -8760,31 +8761,31 @@ long xml_aux (agent* thisAgent,   /* current agent */
     if (matches_one_level_up && (!matches_at_this_level)) {
       if (wtt!=NONE_WME_TRACE) {
         //print_spaces (thisAgent, indent);
-		xmlBeginTag(kTagLeftMatches) ;
+		xml_begin_tag(thisAgent, kTagLeftMatches) ;
         //print (thisAgent, "*** Matches For Left ***\n");
         parent_tokens = get_all_left_tokens_emerging_from_node (thisAgent, parent);
         for (t=parent_tokens; t!=NIL; t=t->next_of_node) {
           //print_spaces (thisAgent, indent);
-		  xmlBeginTag(kTagToken) ;
+		  xml_begin_tag(thisAgent, kTagToken) ;
           xml_whole_token (thisAgent, t, wtt);
-		  xmlEndTag(kTagToken) ;
+		  xml_end_tag(thisAgent, kTagToken) ;
           //print (thisAgent, "\n");
         }
         deallocate_token_list (thisAgent, parent_tokens);
-		xmlEndTag(kTagLeftMatches) ;
+		xml_end_tag(thisAgent, kTagLeftMatches) ;
         //print_spaces (thisAgent, indent);
         //print (thisAgent, "*** Matches for Right ***\n");
-		xmlBeginTag(kTagRightMatches) ;
+		xml_begin_tag(thisAgent, kTagRightMatches) ;
         //print_spaces (thisAgent, indent);
         for (rm=node->b.posneg.alpha_mem_->right_mems; rm!=NIL;
              rm=rm->next_in_am) {
           //if (wtt==TIMETAG_WME_TRACE) print (thisAgent, "%lu", rm->w->timetag);
           //else if (wtt==FULL_WME_TRACE) print_wme (thisAgent, rm->w);
           //print (thisAgent, " ");
-          if (wtt==TIMETAG_WME_TRACE) xmlULong(kWME_TimeTag, rm->w->timetag);
-          else if (wtt==FULL_WME_TRACE) xml_wme (thisAgent, rm->w);
+          if (wtt==TIMETAG_WME_TRACE) xml_att_val(thisAgent, kWME_TimeTag, rm->w->timetag);
+          else if (wtt==FULL_WME_TRACE) xml_object (thisAgent, rm->w);
         }
-		xmlEndTag(kTagRightMatches) ;
+		xml_end_tag(thisAgent, kTagRightMatches) ;
         //print (thisAgent, "\n");
       }
     } /* end of if (matches_one_level_up ...) */
@@ -8799,12 +8800,12 @@ void xml_partial_match_information (agent* thisAgent, rete_node *p_node, wme_tra
   long n;
   token *tokens, *t;
 
-  xmlBeginTag(kTagProduction) ;
+  xml_begin_tag(thisAgent, kTagProduction) ;
   p_node_to_conditions_and_nots (thisAgent, p_node, NIL, NIL, &top_cond, &bottom_cond,
                                  NIL, NIL);
   n = xml_aux (thisAgent, p_node->parent, thisAgent->dummy_top_node, bottom_cond,
                 wtt, 0);
-  xmlInt(kMatches, n) ;
+  xml_att_val(thisAgent, kMatches, n) ;
   //print (thisAgent, "\n%d complete matches.\n", n);
   if (n && (wtt!=NONE_WME_TRACE)) {
     print (thisAgent, "*** Complete Matches ***\n");
@@ -8816,7 +8817,7 @@ void xml_partial_match_information (agent* thisAgent, rete_node *p_node, wme_tra
     deallocate_token_list (thisAgent, tokens);
   }
   deallocate_condition_list (thisAgent, top_cond);
-  xmlEndTag(kTagProduction) ;
+  xml_end_tag(thisAgent, kTagProduction) ;
 }
 
 

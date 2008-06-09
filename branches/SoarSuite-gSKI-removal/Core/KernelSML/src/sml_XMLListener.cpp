@@ -33,9 +33,6 @@ void XMLListener::Init(KernelSML* pKernelSML, AgentSML* pAgentSML)
 	m_pKernelSML = pKernelSML ;
 	m_EnablePrintCallback = true ;
 
-	for (int i = 0 ; i < kNumberEvents ; i++)
-		m_pAgentOutputFlusher[i] = NULL ;
-
 	SetAgentSML(pAgentSML) ;
 }
 
@@ -46,12 +43,7 @@ bool XMLListener::AddListener(smlXMLEventId eventID, Connection* pConnection)
 
 	if (first && eventID == smlEVENT_XML_TRACE_OUTPUT)
 	{
-		// Listen for XML trace events within gSKI
-		//m_pAgent->AddXMLListener(eventID, this); 
 		RegisterWithKernel(eventID) ;
-
-		// Register for specific events at which point we'll flush the buffer for this event
-		m_pAgentOutputFlusher[eventID-smlEVENT_XML_TRACE_OUTPUT] = new AgentOutputFlusher(this, GetAgentSML(), eventID);
 	}
 
 	return first ;
@@ -64,19 +56,13 @@ bool XMLListener::RemoveListener(smlXMLEventId eventID, Connection* pConnection)
 
 	if (last && eventID == smlEVENT_XML_TRACE_OUTPUT)
 	{
-		// Unregister for the XML trace events in gSKI
-		//m_pAgent->RemoveXMLListener(eventID, this); 
 		UnregisterWithKernel(eventID) ;
-
-		// Unregister for the events when we'll flush the buffer
-		delete m_pAgentOutputFlusher[eventID-smlEVENT_XML_TRACE_OUTPUT] ;
-		m_pAgentOutputFlusher[eventID-smlEVENT_XML_TRACE_OUTPUT] = NULL ;
 	}
 
 	return last ;
 }
 
-void XMLListener::OnKernelEvent(int eventID, AgentSML*, void* pCallDataIn)
+void XMLListener::OnKernelEvent(int eventIDIn, AgentSML*, void* pCallDataIn)
 {
 	// If the print callbacks have been disabled, then don't forward this message
 	// on to the clients.  This allows us to use the print callback within the kernel to
@@ -84,23 +70,11 @@ void XMLListener::OnKernelEvent(int eventID, AgentSML*, void* pCallDataIn)
 	if (!m_EnablePrintCallback)
 		return ;
 
-	int nBuffer = eventID - smlEVENT_XML_TRACE_OUTPUT ;
-	assert(nBuffer >= 0 && nBuffer < kNumberEvents) ;
-
-	// Attain the evil back door of doom, even though we aren't the TgD, because we'll probably need it
-	sml::KernelHelpers* pKernelHack = m_pKernelSML->GetKernelHelpers() ;
-
-	pKernelHack->XMLCallbackHelper( &m_BufferedXMLOutput[nBuffer], pCallDataIn );
-}
-
-void XMLListener::FlushOutput(smlXMLEventId eventID) 
-{
-	int buffer = eventID - smlEVENT_XML_TRACE_OUTPUT ;
-
-	// Nothing waiting to be sent, so we're done.
-	XMLTrace* xmlTrace = &m_BufferedXMLOutput[buffer] ;
+	ElementXML* pXMLTrace = reinterpret_cast< ElementXML* >( pCallDataIn );
+	smlXMLEventId eventID = static_cast< smlXMLEventId >( eventIDIn );
 	
-	if (xmlTrace->IsEmpty())
+	// Nothing waiting to be sent, so we're done.
+	if ( pXMLTrace->GetNumberChildren() == 0 )
 		return ;
 
 	// Get the first listener for this event (or return if there are none)
@@ -124,15 +98,9 @@ void XMLListener::FlushOutput(smlXMLEventId eventID)
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName());
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
 
-	// Extract the XML object from the xmlTrace object and
-	// add it as a child of this message.  This is just moving a few pointers around, nothing is getting copied.
+	// Add it as a child of this message.  This is just moving a few pointers around, nothing is getting copied.
 	// The structure of the message is <sml><command></command><trace></trace></sml>
-	ElementXML_Handle xmlHandle = xmlTrace->Detach() ;
-	soarxml::ElementXML* pXMLTrace = new ElementXML(xmlHandle) ;
 	pMsg->AddChild(pXMLTrace) ;
-
-	// Clear the XML trace object, completing the flush.
-	xmlTrace->Reset() ;
 
 	// Send the message out
 	AnalyzeXML response ;
