@@ -378,7 +378,7 @@ bool Socket::ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)
 				else
 #endif
 				{
-					sml::PrintDebug("Error: Error receiving message") ;
+					sml::PrintDebug("Error: Error receiving message (socket)") ;
 
 					sml::ReportSystemErrorMessage() ;
 
