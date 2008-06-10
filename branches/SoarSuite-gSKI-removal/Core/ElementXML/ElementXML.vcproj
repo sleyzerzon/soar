@@ -286,10 +286,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\ElementXML.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\ElementXMLdll.cpp"
 				>
 			</File>
@@ -311,10 +307,6 @@
 			</File>
 			<File
 				RelativePath=".\src\ParseXMLString.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\XMLTrace.cpp"
 				>
 			</File>
 		</Filter>
