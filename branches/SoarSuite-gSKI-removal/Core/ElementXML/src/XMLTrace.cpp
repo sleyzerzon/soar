@@ -171,7 +171,7 @@ void XMLTrace::EndTag(char const* pTagName)
 	// Make sure we're closing the tag we expect
 	assert (m_pCurrentTag->IsTag(pTagName)) ;
 #else
-    unused(pTagName); // quell compiler warning in VS.NET
+    (void)(pTagName); // quell compiler warning in VS.NET
 #endif
 
 	MoveCurrentToParent() ;
