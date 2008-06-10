@@ -725,7 +725,12 @@ long AgentSML::ConvertTime(char const* pTimeTag)
 
 void AgentSML::RecordTime(long clientTimeTag, long kernelTimeTag)
 {
-   m_TimeMap[clientTimeTag] = kernelTimeTag ;
+	m_TimeMap[clientTimeTag] = kernelTimeTag ;
+}
+
+void AgentSML::RemoveTime(long clientTimeTag)
+{
+	m_TimeMap.erase(clientTimeTag);
 }
 
 void AgentSML::RegisterRHSFunction(RhsFunction* rhsFunction)
@@ -1042,10 +1047,10 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 	}
 }
 
-bool AgentSML::RemoveInputWME(long timeTag)
+bool AgentSML::RemoveInputWME(long clientTimeTag)
 {
 	// Get the wme that matches this time tag
-	long timetag = this->ConvertTime(timeTag) ;
+	long kernelTimeTag = this->ConvertTime(clientTimeTag) ;
 
 	//if (kDebugInput)
 	//{
@@ -1055,7 +1060,7 @@ bool AgentSML::RemoveInputWME(long timeTag)
 
 	wme *pWME = 0;
 
-	pWME = find_input_wme_by_timetag(m_agent, timetag) ;
+	pWME = find_input_wme_by_timetag(m_agent, kernelTimeTag) ;
 
 	//if (kDebugInput)
 	//{
@@ -1095,6 +1100,9 @@ bool AgentSML::RemoveInputWME(long timeTag)
 //	}
 
 	Bool ok = remove_input_wme(m_agent, pWME) ;
+
+	// Keep track of which client timetags correspond to which kernel timetags
+	this->RemoveTime( clientTimeTag ) ;
 
 	CHECK_RET_FALSE(ok) ;
 

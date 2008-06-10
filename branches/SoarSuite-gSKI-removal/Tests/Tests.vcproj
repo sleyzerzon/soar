@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\iotest.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\main.cpp"
 				>
 			</File>

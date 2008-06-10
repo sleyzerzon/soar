@@ -269,6 +269,10 @@ void xml_generate_verbose( agent* pAgent, const char* pMessage )
 void xml_invoke_callback( agent* pAgent )
 {
 	soarxml::XMLTrace* pXML = reinterpret_cast< soarxml::XMLTrace* >( pAgent->xml_destination );
+	if ( pXML->IsEmpty() )
+	{
+		return;
+	}
 
 	soarxml::ElementXML* pResult = pXML->DetatchObject();
 	pXML->Reset();

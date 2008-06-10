@@ -282,7 +282,8 @@ public:
    long AgentSML::ConvertTime(long clientTimeTag);
 	long ConvertTime(char const* pTimeTag) ;
 
-   void RecordTime(long clientTimeTag, long kernelTimeTag) ;
+    void RecordTime(long clientTimeTag, long kernelTimeTag) ;
+	void RemoveTime(long clientTimeTag);
 
 	// Register a RHS function with the Soar kernel
 	void RegisterRHSFunction(RhsFunction* pFunction) ;
