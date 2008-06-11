@@ -58,6 +58,7 @@ void AgentSML::InitListeners()
 	// Listen for "after" init-soar events (we need to know when these happen so we can resend the output link over to the client)
 	m_OutputListener.RegisterForKernelSMLEvents() ;
 	m_InputListener.RegisterForKernelSMLEvents() ;
+
 }
 
 // Can't call this until after the Soar agent has been initialized
@@ -80,10 +81,23 @@ void AgentSML::Init()
 
 	// Set counters and flags used to control runs
 	InitializeRuntimeState() ;
+
+	// Register for the new INPUT_WME_GARBAGE_COLLECTED_CALLBACK
+	// Base the id on the address of this object which ensures it's unique
+	std::ostringstream callbackId;
+	callbackId << "id_0x" << this << "_evt_" << INPUT_WME_GARBAGE_COLLECTED_CALLBACK;
+	soar_add_callback ( GetSoarAgent(), INPUT_WME_GARBAGE_COLLECTED_CALLBACK, InputWmeGarbageCollectedHandler, 
+		INPUT_WME_GARBAGE_COLLECTED_CALLBACK, this, 0, const_cast< char* >( callbackId.str().c_str() ) ) ;
 }
 
 AgentSML::~AgentSML()
 {
+	// Register for the new INPUT_WME_GARBAGE_COLLECTED_CALLBACK
+	// Base the id on the address of this object which ensures it's unique
+	std::ostringstream callbackId;
+	callbackId << "id_0x" << this << "_evt_" << INPUT_WME_GARBAGE_COLLECTED_CALLBACK;
+	soar_remove_callback( GetSoarAgent(), INPUT_WME_GARBAGE_COLLECTED_CALLBACK, const_cast< char* >( callbackId.str().c_str() ) ) ;
+
 	delete m_pAgentRunCallback ;
 
 	/* RPM 9/06 added code from reinitialize_soar to clean up stuff hanging from last run
@@ -635,14 +649,14 @@ void AgentSML::RecordIDMapping(char const* pClientID, char const* pKernelID)
 	if (iter == m_IdentifierMap.end())
 	{
 		// We don't, create a mapping, this indicates a reference count of 1
-	m_IdentifierMap[pClientID] = pKernelID ;
+		m_IdentifierMap[pClientID] = pKernelID ;
 
-	// Record in both directions, so we can clean up (at which time we only know the kernel side ID).
-	m_ToClientIdentifierMap[pKernelID] = pClientID ;
+		// Record in both directions, so we can clean up (at which time we only know the kernel side ID).
+		m_ToClientIdentifierMap[pKernelID] = pClientID ;
 
 		// Note that we leave the entry out of m_IdentifierRefMap, we only use
 		// that for counts of two or greater
-}
+	}
 	else
 	{
 		// The mapping already exists, so we need to check and see if we have a reference
@@ -683,10 +697,10 @@ void AgentSML::RemoveID(char const* pKernelID)
 	{
 		// when we have an entry in the m_IdentifierMap but not m_IdentifierRefMap, this 
 		// means our ref count is one, so we're decrementing to zero, so we remove it
-	m_IdentifierMap.erase(clientID) ;
-	m_ToClientIdentifierMap.erase(pKernelID) ;
+		m_IdentifierMap.erase(clientID) ;
+		m_ToClientIdentifierMap.erase(pKernelID) ;
 		return;
-}
+	}
 	else 
 	{
 		// if we have an entry, decrement it
@@ -702,9 +716,9 @@ void AgentSML::RemoveID(char const* pKernelID)
 
 long AgentSML::ConvertTime(long clientTimeTag)
 {
-   TimeMapIter iter = m_TimeMap.find(clientTimeTag) ;
+   CKTimeMapIter iter = m_CKTimeMap.find(clientTimeTag) ;
 
-	if (iter == m_TimeMap.end())
+	if (iter == m_CKTimeMap.end())
 	{
 		return 0 ;
 	}
@@ -725,12 +739,36 @@ long AgentSML::ConvertTime(char const* pTimeTag)
 
 void AgentSML::RecordTime(long clientTimeTag, long kernelTimeTag)
 {
-	m_TimeMap[clientTimeTag] = kernelTimeTag ;
+	m_CKTimeMap[clientTimeTag] = kernelTimeTag ;
+	m_KCTimeMap[kernelTimeTag] = clientTimeTag ;
 }
 
-void AgentSML::RemoveTime(long clientTimeTag)
+void AgentSML::RemoveClientTime(long clientTimeTag)
 {
-	m_TimeMap.erase(clientTimeTag);
+	CKTimeMapIter ckIter = m_CKTimeMap.find( clientTimeTag );
+	if ( ckIter == m_CKTimeMap.end() )
+	{
+		assert( false );
+		return;
+	}
+
+	m_KCTimeMap.erase( ckIter->second );
+	m_CKTimeMap.erase( ckIter );
+}
+
+void AgentSML::RemoveKernelTime( unsigned long kernelTimeTag )
+{
+	KCTimeMapIter kcIter = m_KCTimeMap.find( kernelTimeTag );
+	if ( kcIter == m_KCTimeMap.end() )
+	{
+		// Can't assert false here because this gets called for architecturally
+		// created wmes such as (S1 ^io I1), etc.
+		//assert( false );
+		return;
+	}
+
+	m_CKTimeMap.erase( kcIter->second );
+	m_KCTimeMap.erase( kcIter );
 }
 
 void AgentSML::RegisterRHSFunction(RhsFunction* rhsFunction)
@@ -790,6 +828,19 @@ std::string AgentSML::SymbolToString(Symbol* sym)
 	 assert( false ) ; // "This symbol type not supported";
 	 return "";
 	 break;
+	}
+}
+
+char const* AgentSML::GetValueType(int type)
+{
+	switch (type)
+	{
+	case VARIABLE_SYMBOL_TYPE: return sml_Names::kTypeVariable ;
+	case FLOAT_CONSTANT_SYMBOL_TYPE: return sml_Names::kTypeDouble ;
+	case INT_CONSTANT_SYMBOL_TYPE:	  return sml_Names::kTypeInt ;
+	case SYM_CONSTANT_SYMBOL_TYPE: return sml_Names::kTypeString ;
+	case IDENTIFIER_SYMBOL_TYPE: return sml_Names::kTypeID ;
+	default: return NULL ;
 	}
 }
 
@@ -881,7 +932,11 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, Symbol* pVal
 	CHECK_RET_FALSE( pAttrSymbol ) ;
 
 	wme* pNewInputWme = add_input_wme( m_agent, pIDSymbol, pAttrSymbol, pValueSymbol ) ;
+
 	CHECK_RET_FALSE( pNewInputWme ) ;
+
+	AddWmeToWmeMap( pNewInputWme ) ;
+
 	long timeTag = pNewInputWme->timetag ;
 
 	//if (kDebugInput)
@@ -1060,7 +1115,7 @@ bool AgentSML::RemoveInputWME(long clientTimeTag)
 
 	wme *pWME = 0;
 
-	pWME = find_input_wme_by_timetag(m_agent, kernelTimeTag) ;
+	pWME = FindWmeFromKernelTimetag( kernelTimeTag ) ;
 
 	//if (kDebugInput)
 	//{
@@ -1079,7 +1134,7 @@ bool AgentSML::RemoveInputWME(long clientTimeTag)
 
 	CHECK_RET_FALSE(pWME) ;  //BADBAD: above check means this will never be triggered; one of the checks should go, but not sure which (can this function be legitimately called with a timetag for a wme that's already been removed?)
 
-//	if (pWME->value->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
+	if (pWME->value->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
 //		std::ostringstream buffer;
 //		buffer << pWME->value->id.name_letter ;
 //		buffer << pWME->value->id.name_number ;
@@ -1096,13 +1151,14 @@ bool AgentSML::RemoveInputWME(long clientTimeTag)
 //		// BUGBUG: This seems to be assuming that there's only a single use of this ID in the kernel, but what if it's shared?
 //		// I think we might not want to do this and just leave the mapping forever once it has been used.  If the client
 //		// re-uses this value we'll continue to map it.
-//		//this->RemoveID(id.c_str()) ;
-//	}
+		this->RemoveID( SymbolToString( pWME->value ).c_str() ) ;
+	}
 
+	RemoveWmeFromWmeMap( pWME );
 	Bool ok = remove_input_wme(m_agent, pWME) ;
 
 	// Keep track of which client timetags correspond to which kernel timetags
-	this->RemoveTime( clientTimeTag ) ;
+	this->RemoveClientTime( clientTimeTag ) ;
 
 	CHECK_RET_FALSE(ok) ;
 
@@ -1114,3 +1170,35 @@ bool AgentSML::RemoveInputWME(char const* pTimeTag)
    return RemoveInputWME(atoi(pTimeTag));
 }
 
+void AgentSML::AddWmeToWmeMap(  wme* w ) 
+{
+	unsigned long timetag = w->timetag ;
+	m_WmeMap[timetag] = w ;
+}
+
+void AgentSML::RemoveWmeFromWmeMap( wme* w ) 
+{
+	unsigned long timetag = w->timetag ;
+	m_WmeMap.erase(timetag) ;
+}
+
+wme* AgentSML::FindWmeFromKernelTimetag( unsigned long timetag ) 
+{
+   WmeMapIter wi = m_WmeMap.find( timetag );
+   if( wi == m_WmeMap.end() )
+   {
+      return NULL;
+   }
+   return wi->second;
+}
+
+void AgentSML::InputWmeGarbageCollectedHandler( agent* /*pSoarAgent*/, int eventID, void* pData, void* pCallData )
+{
+	assert( eventID == static_cast< int >( INPUT_WME_GARBAGE_COLLECTED_CALLBACK ) );
+
+	wme* pWME = reinterpret_cast< wme* >( pCallData );
+	AgentSML* pAgent = reinterpret_cast< AgentSML* >( pData );
+
+	pAgent->RemoveWmeFromWmeMap( pWME );
+	pAgent->RemoveKernelTime( pWME->timetag );
+}

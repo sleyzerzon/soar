@@ -258,8 +258,6 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->real_time_tracker = 0;
   newAgent->attention_lapse_tracker = 0;
 
-  newAgent->wmeMap = new WmeMap() ;
-
   if(!getcwd(cur_path, MAXPATHLEN))
     print(newAgent, "Unable to set current directory while initializing agent.\n");
   newAgent->top_dir_stack = (dir_stack_struct *) malloc(sizeof(dir_stack_struct));   /* AGR 568 */
@@ -314,8 +312,6 @@ void destroy_soar_agent (agent * delete_agent)
 //  /* Destroy X window associated with agent */
 //  destroy_agent_window (delete_agent);
 //#endif /* USE_X_DISPLAY */
-
-  delete delete_agent->wmeMap ;
 
   remove_built_in_rhs_functions(delete_agent);
 

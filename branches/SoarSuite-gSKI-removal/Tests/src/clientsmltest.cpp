@@ -576,6 +576,7 @@ void ClientSMLTest::createKernelAndAgents( const KernelBitset& options, int port
 
 	if ( options.test( EMBEDDED ) )
 	{
+		CPPUNIT_ASSERT( !remote );
 		if ( options.test( USE_CLIENT_THREAD ) )
 		{
 			pKernel = sml::Kernel::CreateKernelInCurrentThread( sml::Kernel::GetDefaultLibraryName(), options.test( FULLY_OPTIMIZED ), sml::Kernel::GetDefaultPort());
@@ -587,6 +588,7 @@ void ClientSMLTest::createKernelAndAgents( const KernelBitset& options, int port
 	}
 	else
 	{
+		CPPUNIT_ASSERT( remote );
 		pKernel = sml::Kernel::CreateRemoteConnection(true, 0, port);
 	}
 

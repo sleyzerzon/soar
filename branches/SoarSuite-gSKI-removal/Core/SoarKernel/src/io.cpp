@@ -191,26 +191,6 @@ unsigned long release_io_symbol (agent* thisAgent, Symbol *sym) {
   return symbol_remove_ref (thisAgent, sym);
 }
 
-// BADBAD: should rename these functions (and wmeMap, for that matter) to be specific to input wmes, since that's all they are used for (these function names would be good for manipulating a map that deals with all wmes, not just input wmes)
-void add_wme_to_wmeMap(agent* thisAgent, wme* w) {
-	unsigned long timetag = w->timetag ;
-	(*(thisAgent->wmeMap))[timetag] = w ;
-}
-
-void remove_wme_from_wmeMap(agent* thisAgent, wme* w) {
-	unsigned long timetag = w->timetag ;
-	(*(thisAgent->wmeMap)).erase(timetag) ;
-}
-
-wme* find_wme_from_timetag(agent* thisAgent, unsigned long timetag) {
-   WmeMap::iterator wi = thisAgent->wmeMap->find(timetag);
-   if(wi == thisAgent->wmeMap->end())
-   {
-      return NULL;
-   }
-   return wi->second;
-}
-
 wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   wme *w;
 
@@ -224,7 +204,6 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   w = make_wme (thisAgent, id, attr, value, FALSE);
   insert_at_head_of_dll (id->id.input_wmes, w, next, prev);
   add_wme_to_wm (thisAgent, w);
-  add_wme_to_wmeMap(thisAgent, w) ;
 
   //PrintDebugFormat("Added wme with timetag %d to id %c%d ",w->timetag,id->id.name_letter,id->id.name_number) ;
 
@@ -256,20 +235,6 @@ wme* find_input_wme_by_timetag_from_id (agent* thisAgent, Symbol* idSym, unsigne
 	}
 
 	return NIL ;
-}
-
-// BADBAD: This is just a one-line passthrough to find_wme_from_timetag.  Given that the map just tracks input wmes, this function has the better name, and thus the code from find_wme_from_timetag should be moved into here.  (find_wme_from_timetag is a good name for a function that can find any wme by timetag, not just input wmes).
-wme* find_input_wme_by_timetag (agent* thisAgent, unsigned long timetag) {
-    //PrintDebugFormat("Looking for tag %ld", timetag) ;
-	return find_wme_from_timetag(thisAgent, timetag) ;
-
-/*
-	// We need to walk the input wmes without getting stuck in loops.
-	// We do this by using the tc_num field--setting it as we walk the graph, just as print does.
-	tc_number tc = get_new_tc_number(thisAgent);
-
-	return find_input_wme_by_timetag_from_id(thisAgent, thisAgent->io_header_input, timetag, tc) ;
-*/
 }
 
 Bool remove_input_wme (agent* thisAgent, wme *w) {
@@ -319,7 +284,6 @@ Bool remove_input_wme (agent* thisAgent, wme *w) {
   
   /* REW: end   09.15.96 */
   
-  remove_wme_from_wmeMap (thisAgent, w);
   remove_wme_from_wm (thisAgent, w);
 
   return TRUE;

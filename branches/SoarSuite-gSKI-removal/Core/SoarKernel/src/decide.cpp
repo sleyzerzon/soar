@@ -492,7 +492,7 @@ void garbage_collect_id (agent* thisAgent, Symbol *id)
        This is handled by remove_existing_such-and-such... */
    
    /* --- remove any input wmes from the id --- */
-   remove_wme_list_from_wm (thisAgent, id->id.input_wmes);
+   remove_wme_list_from_wm (thisAgent, id->id.input_wmes, true);
    id->id.input_wmes = NIL;
    
    for (s = id->id.slots; s != NIL; s = s->next) 

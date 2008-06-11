@@ -28,7 +28,10 @@ class IOTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( IOTest );	// The name of this class
 
-	CPPUNIT_TEST( testInputLeak );
+	//CPPUNIT_TEST( testInputLeak );
+	//CPPUNIT_TEST( testInputLeak2 );
+	//CPPUNIT_TEST( testInputLeak3 );
+	//CPPUNIT_TEST( testInputLeak4 );
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -37,7 +40,10 @@ public:
 	void tearDown();	// Called after each function outlined by CPPUNIT_TEST
 
 protected:
-	void testInputLeak();
+	void testInputLeak();  // only string
+	void testInputLeak2(); // explicitly delete both
+	void testInputLeak3(); // only delete identifier
+	void testInputLeak4(); // do something with shared ids
 
 	void createKernelAndAgents( const KernelBitset& options, int port = 12121 );
 
@@ -152,7 +158,7 @@ void IOTest::testInputLeak()
 
 	//_CrtMemCheckpoint( &memState );
 	//_CrtSetBreakAlloc( 2406 );
-	for ( int count = 0; count < 500000; ++count )
+	for ( int count = 0; count < 50000; ++count )
 	{
 		if ( count % 2 == 0 )
 		{
@@ -174,6 +180,183 @@ void IOTest::testInputLeak()
 			pAgent->DestroyWME( pFooBar );
 
 			pFooBar = 0;
+
+			pKernel->RunAllAgents(1);
+
+			//_CrtMemDumpAllObjectsSince( &memState );
+		}
+	}
+}
+
+void IOTest::testInputLeak2()
+{
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
+
+	sml::Agent* pAgent = pKernel->GetAgent( "IOTest" ) ;
+	CPPUNIT_ASSERT( pAgent != 0 );
+
+	sml::Identifier* pInputLink = pAgent->GetInputLink();
+	sml::Identifier* pIdentifier = 0;
+	sml::StringElement* pFooBar = 0;
+
+	//_CrtMemState memState;
+
+	//_CrtMemCheckpoint( &memState );
+	//_CrtSetBreakAlloc( 4951 );
+	for ( int count = 0; count < 50000; ++count )
+	{
+		if ( count % 2 == 0 )
+		{
+			// even case
+
+			// creating the wme
+			CPPUNIT_ASSERT( pIdentifier == 0 );
+			CPPUNIT_ASSERT( pFooBar == 0 );
+			
+			pIdentifier = pAgent->CreateIdWME(pInputLink, "alpha");
+			CPPUNIT_ASSERT( pIdentifier != 0 );
+
+			pFooBar = pAgent->CreateStringWME(pIdentifier, "foo", "bar");
+			CPPUNIT_ASSERT( pFooBar != 0 );
+
+			pKernel->RunAllAgents(1);
+		} 
+		else
+		{
+			// odd case
+			// deleting the wme
+			CPPUNIT_ASSERT( pFooBar != 0 );
+			pAgent->DestroyWME( pFooBar );
+
+			CPPUNIT_ASSERT( pIdentifier != 0 );
+			pAgent->DestroyWME( pIdentifier );
+
+			pIdentifier = 0;
+			pFooBar = 0;
+
+			pKernel->RunAllAgents(1);
+
+			//_CrtMemDumpAllObjectsSince( &memState );
+		}
+	}
+}
+
+void IOTest::testInputLeak3()
+{
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
+
+	sml::Agent* pAgent = pKernel->GetAgent( "IOTest" ) ;
+	CPPUNIT_ASSERT( pAgent != 0 );
+
+	sml::Identifier* pInputLink = pAgent->GetInputLink();
+	sml::Identifier* pIdentifier = 0;
+	sml::StringElement* pFooBar = 0;
+
+	//_CrtMemState memState;
+
+	//_CrtMemCheckpoint( &memState );
+	//_CrtSetBreakAlloc( 2451 );
+	for ( int count = 0; count < 50000; ++count )
+	{
+		if ( count % 2 == 0 )
+		{
+			// even case
+
+			// creating the wme
+			CPPUNIT_ASSERT( pIdentifier == 0 );
+			CPPUNIT_ASSERT( pFooBar == 0 );
+			
+			pIdentifier = pAgent->CreateIdWME(pInputLink, "alpha");
+			CPPUNIT_ASSERT( pIdentifier != 0 );
+
+			pFooBar = pAgent->CreateStringWME(pIdentifier, "foo", "bar");
+			CPPUNIT_ASSERT( pFooBar != 0 );
+
+			pKernel->RunAllAgents(1);
+		} 
+		else
+		{
+			// odd case
+			// deleting the wme
+			CPPUNIT_ASSERT( pIdentifier != 0 );
+			pAgent->DestroyWME( pIdentifier );
+
+			pIdentifier = 0;
+			pFooBar = 0;
+
+			pKernel->RunAllAgents(1);
+
+			//_CrtMemDumpAllObjectsSince( &memState );
+		}
+	}
+}
+
+void IOTest::testInputLeak4()
+{
+	KernelBitset options(0);
+	options.set( EMBEDDED );
+	options.set( USE_CLIENT_THREAD );
+	options.set( FULLY_OPTIMIZED );
+	options.set( AUTO_COMMIT_ENABLED );
+	createKernelAndAgents( options );
+
+	sml::Agent* pAgent = pKernel->GetAgent( "IOTest" ) ;
+	CPPUNIT_ASSERT( pAgent != 0 );
+
+	sml::Identifier* pInputLink = pAgent->GetInputLink();
+	sml::Identifier* pIdentifier = 0;
+	sml::StringElement* pFooBar = 0;
+	sml::Identifier* pSharedIdentifier = 0;
+
+	//_CrtMemState memState;
+
+	//_CrtMemCheckpoint( &memState );
+	//_CrtSetBreakAlloc( 2451 );
+	for ( int count = 0; count < 50000; ++count )
+	{
+		if ( count % 2 == 0 )
+		{
+			// even case
+
+			// creating the wme
+			CPPUNIT_ASSERT( pIdentifier == 0 );
+			CPPUNIT_ASSERT( pFooBar == 0 );
+			CPPUNIT_ASSERT( pSharedIdentifier == 0 );
+			
+			pIdentifier = pAgent->CreateIdWME(pInputLink, "alpha");
+			CPPUNIT_ASSERT( pIdentifier != 0 );
+
+			pFooBar = pAgent->CreateStringWME(pIdentifier, "foo", "bar");
+			CPPUNIT_ASSERT( pFooBar != 0 );
+
+			pSharedIdentifier = pAgent->CreateSharedIdWME(pInputLink, "alpha", pIdentifier);
+			CPPUNIT_ASSERT( pSharedIdentifier != 0 );
+
+			pKernel->RunAllAgents(1);
+		} 
+		else
+		{
+			// odd case
+			// deleting the wme
+			CPPUNIT_ASSERT( pIdentifier != 0 );
+			pAgent->DestroyWME( pIdentifier );
+
+			CPPUNIT_ASSERT( pSharedIdentifier != 0 );
+			pAgent->DestroyWME( pSharedIdentifier );
+
+			pIdentifier = 0;
+			pFooBar = 0;
+			pSharedIdentifier = 0;
 
 			pKernel->RunAllAgents(1);
 

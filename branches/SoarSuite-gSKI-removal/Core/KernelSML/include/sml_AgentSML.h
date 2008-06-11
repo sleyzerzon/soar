@@ -54,18 +54,20 @@ typedef IdentifierRefMap::iterator			IdentifierRefMapIter ;
 typedef IdentifierRefMap::const_iterator	IdentifierRefMapConstIter ;
 
 // Map from client side time tag to a kernel time tag
-//typedef std::map< std::string, long >		TimeMap ;
-typedef std::map< long, long >		TimeMap ;
+typedef std::map< long, unsigned long >		CKTimeMap ;
+typedef CKTimeMap::iterator					CKTimeMapIter ;
 
-typedef TimeMap::iterator					TimeMapIter ;
+// Map from kernel side time tag to client time tag
+typedef std::map< unsigned long, long >		KCTimeMap ;
+typedef KCTimeMap::iterator					KCTimeMapIter ;
 
 // List of input messages waiting for the next input phase callback from the kernel
 typedef std::list<soarxml::ElementXML*>		PendingInputList ;
 typedef PendingInputList::iterator			PendingInputListIter ;
 
-typedef std::map< std::string, wme* >		KernelTimeTagMap ;
-typedef KernelTimeTagMap::iterator			KernelTimeTagMapIter ;
-typedef KernelTimeTagMap::const_iterator	KernelTimeTagMapConstIter ;
+// Map of kernel time tags to kernel wmes for input
+typedef std::map< unsigned long, wme* >				WmeMap;
+typedef std::map< unsigned long, wme* >::iterator	WmeMapIter;
 
 class AgentSML
 {
@@ -86,14 +88,14 @@ public:
    bool AddIntInputWME(char const* pID, char const* pAttribute, int value, long clientTimeTag);
    bool AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag);
 
-   // This function converts string values into typed values so the above functions can be called
-   // This function is called by InputListener and passed info taken from XML objects
-   bool AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
+    // This function converts string values into typed values so the above functions can be called
+    // This function is called by InputListener and passed info taken from XML objects
+    bool AddIdInputWME(char const* pID, char const* pAttribute, char const* pValue, long clientTimeTag);
 
 	bool AddInputWME(char const* pID, char const* pAttribute, char const* pValue, char const* pType, char const* pTimeTag) ;
 	bool RemoveInputWME(long timeTag) ;
-   bool RemoveInputWME(char const* pTimeTag) ;
-
+    bool RemoveInputWME(char const* pTimeTag) ;
+   
 protected:
 
 	// A reference to the underlying kernel agent object
@@ -105,14 +107,15 @@ protected:
 	// Map from client side identifiers to kernel side ones
 	IdentifierMap	m_IdentifierMap ;
 
+	// For cleanup we also need a map from kernel side identifiers to client side ones (for cleanup)
+	IdentifierMap	m_ToClientIdentifierMap ;
+
 	// Keep track of number of instances of client side identifiers
 	IdentifierRefMap m_IdentifierRefMap;
 
-	// Map from client side time tags to kernel side timetags
-	TimeMap				m_TimeMap ;
-
-	// For cleanup we also need a map from kernel side identifiers to client side ones (for cleanup)
-	IdentifierMap	m_ToClientIdentifierMap ;
+	// Map from client side time tags to kernel side timetags, and back (for cleanup
+	CKTimeMap		m_CKTimeMap ;
+	KCTimeMap		m_KCTimeMap ;
 
 	// Used to listen for kernel events that are agent specific
 	ProductionListener	m_ProductionListener;
@@ -159,9 +162,17 @@ protected:
 
 	AgentRunCallback*	m_pAgentRunCallback ;
 
+	WmeMap			m_WmeMap ; // Kernel time tag to kernel wme
+
+	void AddWmeToWmeMap( wme* w );
+	wme* FindWmeFromKernelTimetag( unsigned long timetag );
+	static void InputWmeGarbageCollectedHandler( agent* pAgent, int eventID, void* pData, void* pCallData ) ;
+
 	~AgentSML() ;
 
 public:
+	void RemoveWmeFromWmeMap( wme* w );
+
 	AgentSML(KernelSML* pKernelSML, agent* pAgent) ;
 
 	void InitListeners() ;
@@ -283,7 +294,8 @@ public:
 	long ConvertTime(char const* pTimeTag) ;
 
     void RecordTime(long clientTimeTag, long kernelTimeTag) ;
-	void RemoveTime(long clientTimeTag);
+	void RemoveClientTime(long clientTimeTag);
+	void RemoveKernelTime(unsigned long kernelTimeTag);
 
 	// Register a RHS function with the Soar kernel
 	void RegisterRHSFunction(RhsFunction* pFunction) ;
@@ -291,6 +303,7 @@ public:
 
 	// Utility function (note it's static) for converting a symbol to a string
 	static std::string SymbolToString(Symbol* pSymbol) ;
+	static char const* GetValueType(int type);
 
 	// Execute a command line function (through the CLI processor)
 	std::string ExecuteCommandLine(std::string const& commmandLine) ;

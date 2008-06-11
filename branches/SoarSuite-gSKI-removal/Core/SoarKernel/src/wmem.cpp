@@ -164,18 +164,23 @@ void remove_wme_from_wm (agent* thisAgent, wme *w)
    /* REW: end   09.15.96 */
 }
 
-void remove_wme_list_from_wm (agent* thisAgent, wme *w) 
+void remove_wme_list_from_wm (agent* thisAgent, wme *w, bool updateWmeMap) 
 {
-   wme *next_w;
-   
-   while (w) 
-   {
-      next_w = w->next;
-      
-      remove_wme_from_wm (thisAgent, w);
-      
-      w = next_w;
-   }
+	wme *next_w;
+
+	while (w) 
+	{
+		next_w = w->next;
+
+		if (updateWmeMap) 
+		{
+			soar_invoke_callbacks( thisAgent, INPUT_WME_GARBAGE_COLLECTED_CALLBACK, reinterpret_cast< soar_call_data >( w ) ); 
+			//remove_wme_from_wmeMap (thisAgent, w);
+		}
+		remove_wme_from_wm (thisAgent, w);
+
+		w = next_w;
+	}
 }
 
 void do_buffered_wm_changes (agent* thisAgent) 

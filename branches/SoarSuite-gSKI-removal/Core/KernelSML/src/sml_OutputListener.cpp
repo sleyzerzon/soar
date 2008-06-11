@@ -29,19 +29,6 @@
 
 using namespace sml ;
 
-static char const* GetValueType(int type)
-{
-	switch (type)
-	{
-	case VARIABLE_SYMBOL_TYPE: return sml_Names::kTypeVariable ;
-	case FLOAT_CONSTANT_SYMBOL_TYPE: return sml_Names::kTypeDouble ;
-	case INT_CONSTANT_SYMBOL_TYPE:	  return sml_Names::kTypeInt ;
-	case SYM_CONSTANT_SYMBOL_TYPE: return sml_Names::kTypeString ;
-	case IDENTIFIER_SYMBOL_TYPE: return sml_Names::kTypeID ;
-	default: return NULL ;
-	}
-}
-
 TagWme* OutputListener::CreateTagWme(wme* wme)
 {
 	// Create the wme tag
@@ -49,7 +36,7 @@ TagWme* OutputListener::CreateTagWme(wme* wme)
 
 	// Look up the type of value this is
 	int type = wme->value->sc.common_symbol_info.symbol_type ;
-	char const* pValueType = GetValueType(type) ;
+	char const* pValueType = AgentSML::GetValueType(type) ;
 
 	// For additions we send everything
 	std::string id = AgentSML::SymbolToString(wme->id) ;
@@ -71,7 +58,7 @@ TagWme* OutputListener::CreateTagIOWme(io_wme* wme)
 
 	// Look up the type of value this is
 	int type = wme->value->sc.common_symbol_info.symbol_type ;
-	char const* pValueType = GetValueType(type) ;
+	char const* pValueType = AgentSML::GetValueType(type) ;
 
 	// For additions we send everything
 	std::string id = AgentSML::SymbolToString(wme->id) ;

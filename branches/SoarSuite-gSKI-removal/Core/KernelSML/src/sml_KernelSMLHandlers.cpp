@@ -58,7 +58,7 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_IsSoarRunning]		= &sml::KernelSML::HandleIsSoarRunning ;
 	m_CommandMap[sml_Names::kCommand_GetConnections]	= &sml::KernelSML::HandleGetConnections ;
 	m_CommandMap[sml_Names::kCommand_SetConnectionInfo] = &sml::KernelSML::HandleSetConnectionInfo ;
-	//m_CommandMap[sml_Names::kCommand_GetAllInput]		= &sml::KernelSML::HandleGetAllInput ;
+	m_CommandMap[sml_Names::kCommand_GetAllInput]		= &sml::KernelSML::HandleGetAllInput ;
 	m_CommandMap[sml_Names::kCommand_GetAllOutput]		= &sml::KernelSML::HandleGetAllOutput ;
 	m_CommandMap[sml_Names::kCommand_GetRunState]		= &sml::KernelSML::HandleGetRunState ;
 	m_CommandMap[sml_Names::kCommand_IsProductionLoaded]= &sml::KernelSML::HandleIsProductionLoaded ;
@@ -613,114 +613,51 @@ bool KernelSML::HandleGetInputLink(AgentSML* pAgentSML, char const* /*pCommandNa
 	return (id != NULL) ;
 }
 
-//static char const* GetValueType(egSKISymbolType type)
-//{
-//	switch (type)
-//	{
-//	case gSKI_DOUBLE: return sml_Names::kTypeDouble ;
-//	case gSKI_INT:	  return sml_Names::kTypeInt ;
-//	case gSKI_STRING: return sml_Names::kTypeString ;
-//	case gSKI_OBJECT: return sml_Names::kTypeID ;
-//	default: return NULL ;
-//	}
-//}
-//
-//static bool AddWmeChildrenToXML(gSKI::IWMObject* pRoot, soarxml::ElementXML* pTagResult, std::list<gSKI::IWMObject*> *pTraversedList)
-//{
-//	if (!pRoot || !pTagResult)
-//		return false ;
-//
-//	gSKI::tIWmeIterator* iter = pRoot->GetWMEs() ;
-//
-//	while (iter->IsValid())
-//	{
-//		gSKI::IWme* pWME = iter->GetVal() ;
-//
-//		// In some cases, wmes either haven't been added yet or have already been removed from the kernel
-//		// but still exist in gSKI.  In both cases, we can't (naturally) get a correct time tag for the wme
-//		// so I think we should skip these wmes.  That's clearly correct if the wme has been removed, but I'm
-//		// less sure if it's in the process of getting added.
-//		if (pWME->HasBeenRemoved())
-//		{
-//			pWME->Release() ;
-//			iter->Next() ;
-//
-//			continue ;
-//		}
-//
-//		TagWme* pTagWme = new TagWme() ;
-//
-//		// Sometimes gSKI's owning object links are null -- esp. on the output side so I'm adding
-//		// a workaround to use the root object's ID.
-//		if (pWME->GetOwningObject())
-//			pTagWme->SetIdentifier(pWME->GetOwningObject()->GetId()->GetString()) ;
-//		else
-//			pTagWme->SetIdentifier(pRoot->GetId()->GetString()) ;
-//
-//		pTagWme->SetAttribute(pWME->GetAttribute()->GetString()) ;
-//		pTagWme->SetValue(pWME->GetValue()->GetString(), GetValueType(pWME->GetValue()->GetType())) ;
-//		pTagWme->SetTimeTag(pWME->GetTimeTag()) ;
-//		pTagWme->SetActionAdd() ;
-//
-//		// Add this wme into the result
-//		pTagResult->AddChild(pTagWme) ;
-//
-//		// If this is an identifier then add all of its children too
-//		if (pWME->GetValue()->GetType() == gSKI_OBJECT)
-//		{
-//			gSKI::IWMObject* pChild = pWME->GetValue()->GetObject() ;
-//
-//			// Check that we haven't already added this identifier before
-//			// (there can be cycles).
-//			if (std::find(pTraversedList->begin(), pTraversedList->end(), pChild) == pTraversedList->end())
-//			{
-//				pTraversedList->push_back(pChild) ;
-//				AddWmeChildrenToXML(pChild, pTagResult, pTraversedList) ;
-//			}
-//		}
-//
-//		pWME->Release() ;
-//		iter->Next() ;
-//	}
-//
-//	iter->Release() ;
-//
-//	return true ;
-//}
-//
-//// Send the current state of the input link back to the caller.  (This is not a commonly used method).
-//bool KernelSML::HandleGetAllInput(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, soarxml::ElementXML* pResponse)
-//{
-//	// This is not available on the gSKI removal branch yet -- more work needed to implement it.
-//	assert(false) ;
-//
-//	// Create the result tag
-//	TagResult* pTagResult = new TagResult() ;
-//	pTagResult->SetName(sml_Names::kCommand_Input) ;
-//
-//	agent* pSoarAgent = pAgentSML->GetSoarAgent() ;
-//
-//	// Walk the list of wmes on the input link and send them over
-//	gSKI::IWMObject* pRootObject = NULL ;
-//	pAgentSML->m_inputlink->GetRootObject(&pRootObject) ;
-//
-//	// We need to keep track of which identifiers we've already added
-//	// because this is a graph, so we may cycle back.
-//	std::list<gSKI::IWMObject*> traversedList ;
-//
-//	// Add this wme's children to XML
-//	AddWmeChildrenToXML(pRootObject, pTagResult, &traversedList) ;
-//
-//	// Add the result tag to the response
-//	pResponse->AddChild(pTagResult) ;
-//
-//	if (pRootObject)
-//		pRootObject->Release() ;
-//
-//	// Return true to indicate we've filled in all of the result tag we need
-//	return true ;
-//}
-//
+// Send the current state of the input link back to the caller.  (This is not a commonly used method).
+bool KernelSML::HandleGetAllInput(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, soarxml::ElementXML* pResponse)
+{
+	// Create the result tag
+	TagCommand* pTagResult = new TagCommand() ;
+	pTagResult->SetName(sml_Names::kCommand_Input) ;
+
+	assert(false);
+	agent* pSoarAgent = pAgentSML->GetSoarAgent() ;
+
+	//WmeMap* pWmeMap = pSoarAgent->wmeMap;
+	//WmeMapIter iter = pWmeMap->begin();
+	//while (iter != pWmeMap->end() )
+	//{
+	//	wme* pWme = iter->second;
+
+	//	int type = pWme->value->sc.common_symbol_info.symbol_type ;
+	//	char const* pValueType = AgentSML::GetValueType( type ) ;
+
+	//	TagWme* pTagWme = new TagWme() ;
+	//	pTagWme->SetIdentifier( AgentSML::SymbolToString( pWme->id ).c_str() );
+	//	pTagWme->SetAttribute( AgentSML::SymbolToString( pWme->attr ).c_str() );
+	//	pTagWme->SetValue( AgentSML::SymbolToString( pWme->value ).c_str(), pValueType );
+	//	pTagWme->SetTimeTag( pWme->timetag );
+	//	pTagWme->SetActionAdd() ;
+
+	//	// Add this wme into the result
+	//	pTagResult->AddChild( pTagWme ) ;
+
+	//	++iter;
+	//}
+
+	// Add the message to the response
+	pResponse->AddChild(pTagResult) ;
+
+#ifdef _DEBUG
+	// Set a break point in here to look at the message as a string
+	char *pStr = pResponse->GenerateXMLString(true) ;
+	pResponse->DeleteString(pStr) ;
+#endif
+
+	// Return true to indicate we've filled in all of the result tag we need
+	return true ;
+}
+
 // Send the current state of the output link back to the caller.  (This is not a commonly used method).
 bool KernelSML::HandleGetAllOutput(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, soarxml::ElementXML* pResponse)
 {
