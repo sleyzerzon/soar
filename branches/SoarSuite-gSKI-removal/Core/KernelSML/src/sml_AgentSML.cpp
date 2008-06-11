@@ -714,7 +714,7 @@ void AgentSML::RemoveID(char const* pKernelID)
 	}
 }
 
-long AgentSML::ConvertTime(long clientTimeTag)
+unsigned long AgentSML::ConvertTime(long clientTimeTag)
 {
    CKTimeMapIter iter = m_CKTimeMap.find(clientTimeTag) ;
 
@@ -729,7 +729,7 @@ long AgentSML::ConvertTime(long clientTimeTag)
 	}
 }
 
-long AgentSML::ConvertTime(char const* pTimeTag)
+unsigned long AgentSML::ConvertTime(char const* pTimeTag)
 {
 	if (pTimeTag == NULL)
 		return 0 ;
@@ -741,19 +741,6 @@ void AgentSML::RecordTime(long clientTimeTag, long kernelTimeTag)
 {
 	m_CKTimeMap[clientTimeTag] = kernelTimeTag ;
 	m_KCTimeMap[kernelTimeTag] = clientTimeTag ;
-}
-
-void AgentSML::RemoveClientTime(long clientTimeTag)
-{
-	CKTimeMapIter ckIter = m_CKTimeMap.find( clientTimeTag );
-	if ( ckIter == m_CKTimeMap.end() )
-	{
-		assert( false );
-		return;
-	}
-
-	m_KCTimeMap.erase( ckIter->second );
-	m_CKTimeMap.erase( ckIter );
 }
 
 void AgentSML::RemoveKernelTime( unsigned long kernelTimeTag )
@@ -896,35 +883,18 @@ void AgentSML::InputPhaseCallback( agent* /*agent*/,
 								   soar_callback_data /*callbackdata*/,
 								   soar_call_data /*calldata*/ )
 {
-	//int callbacktype = (int)reinterpret_cast<long long>(calldata);
-
-	//switch(callbacktype) {
-	//case TOP_STATE_JUST_CREATED:
-	//	m_inputlink->InitialUpdate();
-	//	break;
-	//case NORMAL_INPUT_CYCLE:
-	//	m_inputlink->Update();
-	//	break;
-	//case TOP_STATE_JUST_REMOVED:
-	//	m_inputlink->FinalUpdate();
-	//	break;
-	//default:
-	//	assert(false); //, "The static input callback is of unknown type!");
-	//	break;
-	//}
-	//
 	KernelSML::GetKernelSML()->ReceiveAllMessages();	
 }
 
 bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, Symbol* pValueSymbol, long clientTimeTag)
 {
-   std::string idKernel ;
+	std::string idKernel ;
 	ConvertID(pID, &idKernel) ;
 
-   char idLetter = idKernel[0] ;
+	char idLetter = idKernel[0] ;
 	int idNumber = atoi( &(idKernel.c_str()[1]) ) ;
 
-   // Now create the wme
+	// Now create the wme
 	Symbol* pIDSymbol   = get_io_identifier( m_agent, idLetter, idNumber) ;
 	Symbol* pAttrSymbol = get_io_sym_constant( m_agent, pAttribute ) ;
 
@@ -935,17 +905,14 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, Symbol* pVal
 
 	CHECK_RET_FALSE( pNewInputWme ) ;
 
-	AddWmeToWmeMap( pNewInputWme ) ;
+	AddWmeToWmeMap( clientTimeTag, pNewInputWme ) ;
 
-	long timeTag = pNewInputWme->timetag ;
+	//long timeTag = pNewInputWme->timetag ;
 
 	//if (kDebugInput)
 	//	KernelSML::PrintDebugWme( "Adding wme ", pNewInputWme, true ) ;
 
-	// Keep track of which client timetags correspond to which kernel timetags
-	this->RecordTime( clientTimeTag, timeTag ) ;
-
-	
+	// we just created these so lets release our ownership of them (they belong to the wme now)
 	/*unsigned long refCount1 = */release_io_symbol( m_agent, pNewInputWme->id ) ;
 	/*unsigned long refCount2 = */release_io_symbol( m_agent, pNewInputWme->attr ) ;
 	/*unsigned long refCount3 = */release_io_symbol( m_agent, pNewInputWme->value ) ;
@@ -1134,31 +1101,12 @@ bool AgentSML::RemoveInputWME(long clientTimeTag)
 
 	CHECK_RET_FALSE(pWME) ;  //BADBAD: above check means this will never be triggered; one of the checks should go, but not sure which (can this function be legitimately called with a timetag for a wme that's already been removed?)
 
-	if (pWME->value->common.symbol_type==IDENTIFIER_SYMBOL_TYPE) {
-//		std::ostringstream buffer;
-//		buffer << pWME->value->id.name_letter ;
-//		buffer << pWME->value->id.name_number ;
-//		std::string newid = buffer.str() ;
-//
-//		// This extra release of the identifier value seems to be required
-//		// but I don't understand why.
-//		//Symbol* pIDSymbol = pWME->value ;
-////		release_io_symbol(this->GetAgent(), pIDSymbol) ;
-////		release_io_symbol(this->GetAgent(), pWME->id) ;
-////		release_io_symbol(this->GetAgent(), pWME->attr) ;
-//
-//		// Remove this id from the id mapping table
-//		// BUGBUG: This seems to be assuming that there's only a single use of this ID in the kernel, but what if it's shared?
-//		// I think we might not want to do this and just leave the mapping forever once it has been used.  If the client
-//		// re-uses this value we'll continue to map it.
+	if ( pWME->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) {
 		this->RemoveID( SymbolToString( pWME->value ).c_str() ) ;
 	}
 
 	RemoveWmeFromWmeMap( pWME );
 	Bool ok = remove_input_wme(m_agent, pWME) ;
-
-	// Keep track of which client timetags correspond to which kernel timetags
-	this->RemoveClientTime( clientTimeTag ) ;
 
 	CHECK_RET_FALSE(ok) ;
 
@@ -1170,22 +1118,28 @@ bool AgentSML::RemoveInputWME(char const* pTimeTag)
    return RemoveInputWME(atoi(pTimeTag));
 }
 
-void AgentSML::AddWmeToWmeMap(  wme* w ) 
+void AgentSML::AddWmeToWmeMap( long clientTimeTag, wme* w ) 
 {
 	unsigned long timetag = w->timetag ;
-	m_WmeMap[timetag] = w ;
+	m_KernelTimeTagToWmeMap[timetag] = w ;
+
+	// Keep track of which client timetags correspond to which kernel timetags
+	this->RecordTime( clientTimeTag, timetag ) ;
 }
 
 void AgentSML::RemoveWmeFromWmeMap( wme* w ) 
 {
 	unsigned long timetag = w->timetag ;
-	m_WmeMap.erase(timetag) ;
+	m_KernelTimeTagToWmeMap.erase(timetag) ;
+
+	// Keep track of which client timetags correspond to which kernel timetags
+	this->RemoveKernelTime( timetag ) ;
 }
 
 wme* AgentSML::FindWmeFromKernelTimetag( unsigned long timetag ) 
 {
-   WmeMapIter wi = m_WmeMap.find( timetag );
-   if( wi == m_WmeMap.end() )
+   WmeMapIter wi = m_KernelTimeTagToWmeMap.find( timetag );
+   if( wi == m_KernelTimeTagToWmeMap.end() )
    {
       return NULL;
    }
@@ -1200,5 +1154,4 @@ void AgentSML::InputWmeGarbageCollectedHandler( agent* /*pSoarAgent*/, int event
 	AgentSML* pAgent = reinterpret_cast< AgentSML* >( pData );
 
 	pAgent->RemoveWmeFromWmeMap( pWME );
-	pAgent->RemoveKernelTime( pWME->timetag );
 }

@@ -162,9 +162,9 @@ protected:
 
 	AgentRunCallback*	m_pAgentRunCallback ;
 
-	WmeMap			m_WmeMap ; // Kernel time tag to kernel wme
+	WmeMap			m_KernelTimeTagToWmeMap ; // Kernel time tag to kernel wme
 
-	void AddWmeToWmeMap( wme* w );
+	void AddWmeToWmeMap( long clientTimeTag, wme* w );
 	wme* FindWmeFromKernelTimetag( unsigned long timetag );
 	static void InputWmeGarbageCollectedHandler( agent* pAgent, int eventID, void* pData, void* pCallData ) ;
 
@@ -290,11 +290,10 @@ public:
 	*			a kernel side one.
 	*************************************************************/
 	wme* ConvertKernelTimeTag(char const* pTimeTag) ;
-   long AgentSML::ConvertTime(long clientTimeTag);
-	long ConvertTime(char const* pTimeTag) ;
+    unsigned long ConvertTime(long clientTimeTag);
+	unsigned long ConvertTime(char const* pTimeTag) ;
 
     void RecordTime(long clientTimeTag, long kernelTimeTag) ;
-	void RemoveClientTime(long clientTimeTag);
 	void RemoveKernelTime(unsigned long kernelTimeTag);
 
 	// Register a RHS function with the Soar kernel
