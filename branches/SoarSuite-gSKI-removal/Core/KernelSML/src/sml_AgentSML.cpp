@@ -758,6 +758,16 @@ void AgentSML::RemoveKernelTime( unsigned long kernelTimeTag )
 	m_KCTimeMap.erase( kcIter );
 }
 
+long AgentSML::GetClientTimetag( unsigned long kernelTimeTag )
+{
+	KCTimeMapIter kcIter = m_KCTimeMap.find( kernelTimeTag );
+	if ( kcIter == m_KCTimeMap.end() )
+	{
+		return 0;
+	}
+	return kcIter->second;
+}
+
 void AgentSML::RegisterRHSFunction(RhsFunction* rhsFunction)
 {
 	// Tell Soar about it

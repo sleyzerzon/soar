@@ -613,37 +613,65 @@ bool KernelSML::HandleGetInputLink(AgentSML* pAgentSML, char const* /*pCommandNa
 	return (id != NULL) ;
 }
 
+static bool AddWmeChildrenToXML( AgentSML* pAgentSML, wme* pRoot, soarxml::ElementXML* pTagResult, std::list< wme* >& traversedList )
+{
+	if (!pRoot || !pTagResult)
+		return false ;
+
+    for (wme* w = pRoot->value->id.input_wmes; w != NIL; w = w->next)
+	{
+		TagWme* pTagWme = OutputListener::CreateTagWme( pAgentSML, w ) ;
+
+#ifdef _DEBUG
+		// Set a break point in here to look at the message as a string
+		char *pStr = pTagWme->GenerateXMLString(true) ;
+		pTagWme->DeleteString(pStr) ;
+#endif
+
+		// Add this wme into the result
+		pTagResult->AddChild(pTagWme) ;
+
+		// If this is an identifier then add all of its children too
+		if ( w->value->sc.common_symbol_info.symbol_type == IDENTIFIER_SYMBOL_TYPE )
+		{	
+			if ( std::find( traversedList.begin(), traversedList.end(), w ) == traversedList.end() )
+			{
+				traversedList.push_back( w );
+				AddWmeChildrenToXML( pAgentSML, w, pTagResult, traversedList );
+			}
+		}
+	}
+
+	return true ;
+}
+
 // Send the current state of the input link back to the caller.  (This is not a commonly used method).
 bool KernelSML::HandleGetAllInput(AgentSML* pAgentSML, char const* /*pCommandName*/, Connection* /*pConnection*/, AnalyzeXML* /*pIncoming*/, soarxml::ElementXML* pResponse)
 {
 	// Create the result tag
-	TagCommand* pTagResult = new TagCommand() ;
-	pTagResult->SetName(sml_Names::kCommand_Input) ;
+	TagResult* pTagResult = new TagResult() ;
 
-	assert(false);
 	agent* pSoarAgent = pAgentSML->GetSoarAgent() ;
 
-	//WmeMap* pWmeMap = pSoarAgent->wmeMap;
-	//WmeMapIter iter = pWmeMap->begin();
-	//while (iter != pWmeMap->end() )
-	//{
-	//	wme* pWme = iter->second;
+	// Find the input link wme I1 ^input-link I2
+	wme* pInputLinkWme = 0;
+    for (wme* w = pSoarAgent->io_header->id.input_wmes; w != NIL; w = w->next)
+	{
+		if ( w->attr == pSoarAgent->input_link_symbol )
+		{
+			pInputLinkWme = w;
+			break;
+		}
+	}
+	assert( pInputLinkWme );
+	if( !pInputLinkWme )
+	{
+		return false;
+	}
 
-	//	int type = pWme->value->sc.common_symbol_info.symbol_type ;
-	//	char const* pValueType = AgentSML::GetValueType( type ) ;
+	std::list< wme* > traversedList ;
 
-	//	TagWme* pTagWme = new TagWme() ;
-	//	pTagWme->SetIdentifier( AgentSML::SymbolToString( pWme->id ).c_str() );
-	//	pTagWme->SetAttribute( AgentSML::SymbolToString( pWme->attr ).c_str() );
-	//	pTagWme->SetValue( AgentSML::SymbolToString( pWme->value ).c_str(), pValueType );
-	//	pTagWme->SetTimeTag( pWme->timetag );
-	//	pTagWme->SetActionAdd() ;
-
-	//	// Add this wme into the result
-	//	pTagResult->AddChild( pTagWme ) ;
-
-	//	++iter;
-	//}
+	AddWmeChildrenToXML( pAgentSML, pInputLinkWme, pTagResult, traversedList ) ;
 
 	// Add the message to the response
 	pResponse->AddChild(pTagResult) ;
@@ -675,12 +703,12 @@ bool KernelSML::HandleGetAllOutput(AgentSML* pAgentSML, char const* /*pCommandNa
 	io_wme* iw_list = get_io_wmes_for_output_link (pSoarAgent, ol);
 
 	// Start with the output link itself
-	TagWme* pOutputLinkWme = OutputListener::CreateTagWme(ol->link_wme) ;
+	TagWme* pOutputLinkWme = OutputListener::CreateTagWme( pAgentSML, ol->link_wme ) ;
 	pTagResult->AddChild(pOutputLinkWme) ;
 
 	for (;iw_list != 0 ; iw_list = iw_list->next) {
 		// Create the wme tag for the output link itself
-		TagWme* pTagWme = OutputListener::CreateTagIOWme(iw_list) ;
+		TagWme* pTagWme = OutputListener::CreateTagIOWme( pAgentSML, iw_list ) ;
 
 		// Add this wme into the result
 		pTagResult->AddChild(pTagWme) ;

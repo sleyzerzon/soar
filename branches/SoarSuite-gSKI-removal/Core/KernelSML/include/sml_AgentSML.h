@@ -295,6 +295,7 @@ public:
 
     void RecordTime(long clientTimeTag, long kernelTimeTag) ;
 	void RemoveKernelTime(unsigned long kernelTimeTag);
+	long GetClientTimetag( unsigned long kernelTimeTag );
 
 	// Register a RHS function with the Soar kernel
 	void RegisterRHSFunction(RhsFunction* pFunction) ;

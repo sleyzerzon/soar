@@ -29,7 +29,7 @@
 
 using namespace sml ;
 
-TagWme* OutputListener::CreateTagWme(wme* wme)
+TagWme* OutputListener::CreateTagWme( AgentSML* pAgent, wme* wme )
 {
 	// Create the wme tag
 	TagWme* pTag = new TagWme() ;
@@ -45,13 +45,24 @@ TagWme* OutputListener::CreateTagWme(wme* wme)
 	pTag->SetAttribute(att.c_str()) ;
 	std::string val = AgentSML::SymbolToString(wme->value) ;
 	pTag->SetValue(val.c_str(), pValueType) ;
-	pTag->SetTimeTag(wme->timetag) ;
+
+	long clientTimetag = pAgent->GetClientTimetag( wme->timetag );
+	if ( clientTimetag < 0 )
+	{
+		// valid client timetag
+		pTag->SetTimeTag( clientTimetag ) ;
+	}
+	else
+	{
+		pTag->SetTimeTag( wme->timetag ) ;
+	}
+
 	pTag->SetActionAdd() ;
 
 	return pTag ;
 }
 
-TagWme* OutputListener::CreateTagIOWme(io_wme* wme)
+TagWme* OutputListener::CreateTagIOWme( AgentSML* pAgent, io_wme* wme )
 {
 	// Create the wme tag
 	TagWme* pTag = new TagWme() ;
@@ -67,7 +78,18 @@ TagWme* OutputListener::CreateTagIOWme(io_wme* wme)
 	pTag->SetAttribute(att.c_str()) ;
 	std::string val = AgentSML::SymbolToString(wme->value) ;
 	pTag->SetValue(val.c_str(), pValueType) ;
-	pTag->SetTimeTag(wme->timetag) ;
+
+	long clientTimetag = pAgent->GetClientTimetag( wme->timetag );
+	if ( clientTimetag < 0 )
+	{
+		// valid client timetag
+		pTag->SetTimeTag( clientTimetag ) ;
+	}
+	else
+	{
+		pTag->SetTimeTag( wme->timetag ) ;
+	}
+
 	pTag->SetActionAdd() ;
 
 	return pTag ;
@@ -133,7 +155,7 @@ void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgen
 	// The kernel seems to only output this itself during link initialization
 	// and we might be connecting up after that.  Including it twice will not hurt on the client side.
 	output_link *ol = pAgentSML->GetSoarAgent()->existing_output_links ;	// This is technically a list but we only support one output link
-	TagWme* pOutputLinkWme = OutputListener::CreateTagWme(ol->link_wme) ;
+	TagWme* pOutputLinkWme = OutputListener::CreateTagWme( pAgentSML, ol->link_wme) ;
 	command.AddChild(pOutputLinkWme) ;
 
 	for (io_wme* wme = io_wmelist ; wme != NIL ; wme = wme->next)
@@ -156,7 +178,7 @@ void OutputListener::SendOutput(smlWorkingMemoryEventId eventId, AgentSML* pAgen
 		m_TimeTags[timeTag] = true ;
 
 		// Create the wme tag
-		TagWme* pTag = CreateTagIOWme(wme) ;
+		TagWme* pTag = CreateTagIOWme( pAgentSML, wme) ;
 
 		// Add it as a child of the command tag
 		command.AddChild(pTag) ;

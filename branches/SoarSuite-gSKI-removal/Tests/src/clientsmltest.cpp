@@ -1037,9 +1037,9 @@ void ClientSMLTest::doAgentTest( sml::Agent* pAgent )
 	//cout << "Input link before synchronization" << endl ;
 	//printWMEs( pAgent->GetInputLink() ) ;
 
-	// TODO: This causes an assertion with the new gSKI stuff, not implemented
-	//bool synch = pAgent->SynchronizeInputLink() ;
+	bool synch = pAgent->SynchronizeInputLink() ;
 
+	// TODO: SynchronizeInputLink is only valid during certain kinds of connections
 	//if (synch)
 	//{
 		////cout << "Results of synchronizing the input link:" << endl ;
@@ -1351,8 +1351,7 @@ void ClientSMLTest::doSimpleReteNetLoader()
 	CPPUNIT_ASSERT( pAgent->GetLastCommandLineResult() );
 
 	// Make us match the current input link values
-	// TODO: implement
-	//pAgent->SynchronizeInputLink();
+	pAgent->SynchronizeInputLink();
 
 	// Get the latest id from the input link
 	sml::Identifier* pID = pAgent->GetInputLink() ;

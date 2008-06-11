@@ -50,8 +50,8 @@ public:
 		Clear() ;
 	}
 
-	static TagWme* CreateTagWme(wme* wme) ;
-	static TagWme* CreateTagIOWme(io_wme* wme) ;
+	static TagWme* CreateTagWme( AgentSML* pAgent, wme* wme ) ;
+	static TagWme* CreateTagIOWme( AgentSML* pAgent, io_wme* wme ) ;
 
 	void Init(KernelSML* pKernelSML, AgentSML* pAgentSML);
 
