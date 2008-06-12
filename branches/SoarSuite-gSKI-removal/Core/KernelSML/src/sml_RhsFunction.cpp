@@ -31,7 +31,7 @@ Symbol* RhsFunction::RhsFunctionCallback(agent* thisAgent, list* args, void* use
 
 	// List of symbols wrapped in gSymbols
 	std::vector<Symbol*> symVector;
-	for(; args != NIL; args = args = args->rest)
+	for(; args != NIL; args = args->rest)
 		symVector.push_back(static_cast<Symbol*>(args->first));
 
 	Symbol* pSoarReturn = 0;

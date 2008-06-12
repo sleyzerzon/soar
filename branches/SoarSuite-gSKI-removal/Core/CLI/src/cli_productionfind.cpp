@@ -17,6 +17,7 @@
 
 #include "sml_KernelSML.h"
 #include "sml_KernelHelpers.h"
+#include "sml_AgentSML.h"
 
 using namespace cli;
 using namespace sml;

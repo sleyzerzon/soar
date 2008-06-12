@@ -73,7 +73,7 @@ bool CommandLineInterface::DoReteNet(bool save, std::string filename) {
 			return SetError( CLIError::kOpenFileFail );
 		}
 
-		if ( save_rete_net( m_pAgentSoar, file ) == FALSE )
+		if ( ! save_rete_net( m_pAgentSoar, file ) )
 		{
 			// TODO: additional error information
 			return SetError( CLIError::kReteSaveOperationFail );
@@ -89,7 +89,7 @@ bool CommandLineInterface::DoReteNet(bool save, std::string filename) {
 			return SetError( CLIError::kOpenFileFail );
 		}
 
-		if ( load_rete_net( m_pAgentSoar, file ) == FALSE )
+		if ( ! load_rete_net( m_pAgentSoar, file ) )
 		{
 			// TODO: additional error information
 			return SetError( CLIError::kReteLoadOperationFail );

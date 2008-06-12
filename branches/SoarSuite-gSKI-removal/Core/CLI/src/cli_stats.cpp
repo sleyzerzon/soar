@@ -16,6 +16,7 @@
 #include "cli_Commands.h"
 #include "sml_Names.h"
 #include "sml_StringOps.h"
+#include "sml_KernelSML.h"
 
 #include "agent.h"
 #include "init_soar.h" // for timer_value
@@ -355,3 +356,4 @@ void CommandLineInterface::GetSystemStats()
 	m_Result << std::resetiosflags( std::ios_base::fixed );
 	m_Result.precision( oldPrecision );
 }
+

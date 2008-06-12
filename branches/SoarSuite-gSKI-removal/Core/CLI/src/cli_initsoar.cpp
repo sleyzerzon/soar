@@ -15,6 +15,7 @@
 #include "cli_CLIError.h"
 
 #include "sml_AgentSML.h"
+#include "xml.h"
 
 using namespace cli;
 

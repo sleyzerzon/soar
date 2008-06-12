@@ -1165,3 +1165,4 @@ void AgentSML::InputWmeGarbageCollectedHandler( agent* /*pSoarAgent*/, int event
 
 	pAgent->RemoveWmeFromWmeMap( pWME );
 }
+
