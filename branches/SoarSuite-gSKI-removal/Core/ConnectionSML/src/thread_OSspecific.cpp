@@ -276,17 +276,27 @@ OSSpecificEvent* soar_thread::MakeEvent()
 class LinuxTimer : public OSSpecificTimer
 {
 protected:
+	struct timeval start;
+	struct timezone zone;
 
 public:
 	LinuxTimer() {
+		Start();
 	}
 
 	virtual void Start() {
-		assert(false) ;	// To be written.
+		gettimeofday( &start, &zone );
 	}
 
 	virtual double Elapsed() {
-		return 0.0 ;
+		struct timeval end;
+
+		gettimeofday( &end, &zone );
+
+		double t1 =  (double)start.tv_sec + (double)start.tv_usec/(1000*1000);
+		double t2 =  (double)end.tv_sec + (double)end.tv_usec/(1000*1000);
+
+		return t2 - t1 ;
 	}
 };
 
