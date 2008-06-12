@@ -21,6 +21,7 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 #include "gsysparam.h"
+#include "agent.h"
 
 using namespace cli;
 using namespace sml;

@@ -8,8 +8,6 @@ env = env.Copy()
 env.Prepend(CPPPATH = ['src', 
 		       'include', 
 		       '../SoarKernel/include',
-		       '../gSKI/src',
-		       '../gSKI/include',
 		       '../CLI/include',
 		       '../ElementXML/include',
 		       '../ConnectionSML/include'])
