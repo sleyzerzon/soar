@@ -209,13 +209,12 @@ void RunTest1(int numAgents, int numWmes, int numCycles) {
 	cout << "Num Update Events: " << numUpdateEvents << endl;
 	cout << "Num Input Events : " << numInputEvents << endl;
 
+#ifdef PROFILE_CONNECTIONS  // from sml_Connection.h
 	double incoming = kernel->GetConnection()->GetIncomingTime() ;
 	cout << "Incoming time: " << incoming/1000.0 << endl ;
-
-	const char* stats = kernel->ExecuteCommandLine("stats", "0") ;
-	cout << stats ;
-
+#endif
 	cout << "Input time : " << pEnv->m_InputTime/1000.0 << endl ;
+
 
 	delete pEnv;
 
@@ -245,10 +244,15 @@ void RunTest2(int numAgents, int numWmes, int numCycles) {
 	cout << "Num Update Events: " << numUpdateEvents << endl;
 	cout << "Num Input Events : " << numInputEvents << endl;
 
-	delete pEnv;
-
+#ifdef PROFILE_CONNECTIONS  // from sml_Connection.h
 	double incoming = kernel->GetConnection()->GetIncomingTime() ;
 	cout << "Incoming time: " << incoming/1000.0 << endl ;
+#endif
+
+   // Doesn't make sense to include this, since the time is only updated in Environment::UpdateAll, which isn't used in this test
+   //cout << "Input time : " << pEnv->m_InputTime/1000.0 << endl ;
+
+   delete pEnv;
 
 	kernel->Shutdown();
 	delete kernel;
