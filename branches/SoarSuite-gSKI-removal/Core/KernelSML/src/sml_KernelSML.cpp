@@ -550,6 +550,17 @@ smlPhase KernelSML::GetStopBefore()
 	return m_pRunScheduler->GetStopBefore() ;
 }
 
+top_level_phase KernelSML::ConvertSMLToSoarPhase( smlPhase phase ) 
+{
+	// check a few
+	assert( INPUT_PHASE == static_cast< top_level_phase >( sml_INPUT_PHASE ) );
+	assert( PREFERENCE_PHASE == static_cast< top_level_phase >( sml_PREFERENCE_PHASE ) );
+	
+	// just cast
+	return static_cast< top_level_phase >( phase );
+}
+
+
 /*************************************************************
 * @brief	Request that all agents stop soon
 *************************************************************/	

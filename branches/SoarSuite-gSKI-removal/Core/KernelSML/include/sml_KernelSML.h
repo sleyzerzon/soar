@@ -27,6 +27,7 @@ typedef struct wme_struct wme;
 #include "sml_UntypedListener.h"
 #include "sml_Utils.h" // required for release builds for unused macro
 #include "sml_Events.h"
+#include "init_soar.h"
 
 namespace soar_thread
 {
@@ -393,6 +394,7 @@ public:
 	*************************************************************/	
 	void SetStopBefore(smlPhase phase) ;
 	smlPhase GetStopBefore() ;
+	top_level_phase ConvertSMLToSoarPhase( smlPhase phase ) ;
 
 	/*************************************************************
 	* @brief	If true, whenever a user issues a command that changes the state of the kernel in some manner

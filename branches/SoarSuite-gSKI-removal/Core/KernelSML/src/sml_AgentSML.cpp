@@ -952,7 +952,7 @@ bool AgentSML::AddIntInputWME(char const* pID, char const* pAttribute, int value
 bool AgentSML::AddDoubleInputWME(char const* pID, char const* pAttribute, double value, long clientTimeTag)
 {
    // Creating a wme with an int constant value
-	Symbol* pValueSymbol = get_io_float_constant(m_agent, value) ; // regarding warning on this line: nate possibly changed this on the RL branch (double -> float conversion)
+	Symbol* pValueSymbol = get_io_float_constant(m_agent, static_cast< float >( value ) ) ; // regarding warning on this line: nate possibly changed this on the RL branch (double -> float conversion)
 
 	return AddInputWME(pID, pAttribute, pValueSymbol, clientTimeTag);
 }
