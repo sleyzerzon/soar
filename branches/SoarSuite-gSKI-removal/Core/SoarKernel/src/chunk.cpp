@@ -1196,7 +1196,7 @@ void chunk_instantiation (agent* thisAgent,
 	  goto chunking_done; /* this leaks memory but who cares */
   }
   
-  { condition *inst_lhs_top, *inst_lhs_bottom;
+  { condition *inst_lhs_top = 0, *inst_lhs_bottom = 0;
   
   reorder_instantiated_conditions (top_cc, &inst_lhs_top, &inst_lhs_bottom);
   

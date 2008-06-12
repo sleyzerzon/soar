@@ -6850,7 +6850,7 @@ void retesave_rete_test (rete_test *rt, FILE* f) {
     retesave_one_byte (rt->data.variable_referent.field_num,f);
     retesave_two_bytes (rt->data.variable_referent.levels_up,f);
   } else if (rt->type==DISJUNCTION_RETE_TEST) {
-    for (i=0, c=rt->data.disjunction_list; c!=NIL; i++, c=c->rest,f);
+    for (i=0, c=rt->data.disjunction_list; c!=NIL; i++, c=c->rest);
     retesave_two_bytes (i,f);
     for (c=rt->data.disjunction_list; c!=NIL; c=c->rest)
       retesave_four_bytes (((Symbol *)(c->first))->common.a.retesave_symindex,f);

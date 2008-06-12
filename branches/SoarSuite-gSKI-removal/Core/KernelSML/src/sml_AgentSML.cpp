@@ -493,7 +493,7 @@ smlRunResult AgentSML::Step(smlRunStepSize stepSize)
    // method IsAgentFinished will return true and MoveTo_StopBeforePhase will
    // step the agent by phases until this test is satisfied.
    if ((m_interruptFlags & sml_STOP_AFTER_DECISION_CYCLE) && 
-	   (m_agent->current_phase == m_pKernelSML->GetStopBefore()))
+	   ( m_agent->current_phase == m_pKernelSML->ConvertSMLToSoarPhase( m_pKernelSML->GetStopBefore() ) ) )
    {
 	   interrupted = true;
    }

@@ -58,6 +58,8 @@
 
 #include <ctype.h>
 
+#include <assert.h>
+
 using namespace soar_TraceNames;
 
 

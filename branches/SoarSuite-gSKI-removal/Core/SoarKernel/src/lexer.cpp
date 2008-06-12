@@ -71,6 +71,8 @@
 #include <math.h>
 #include <ctype.h>
 
+#include <assert.h>
+
 //
 // These three should be safe for re-entrancy.  --JNW--
 //

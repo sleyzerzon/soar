@@ -36,6 +36,8 @@
 #include "print.h"
 #include "wmem.h"
 
+#include "assert.h" 
+
 using namespace soar_TraceNames;
 namespace stn = soar_TraceNames;
 
@@ -148,7 +150,7 @@ void xml_att_val( agent* pAgent, char const* pAttribute, int value )
 void xml_att_val( agent* pAgent, char const* pAttribute, long value )
 {
 	char buf[51];
-	SNPRINTF(buf, 50, "%d", value);
+	SNPRINTF(buf, 50, "%ld", value);
 
 	soarxml::XMLTrace* pXML = reinterpret_cast< soarxml::XMLTrace* >( pAgent->xml_destination );
 	pXML->AddAttribute( pAttribute, buf ) ;

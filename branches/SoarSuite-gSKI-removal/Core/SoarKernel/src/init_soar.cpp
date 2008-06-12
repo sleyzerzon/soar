@@ -43,6 +43,8 @@
 #include "gdatastructs.h"
 #include "xml.h"
 
+#include "assert.h"
+
 #define INIT_FILE       "init.soar"
 
 /* REW: begin 08.20.97   these defined in consistency.c  */
@@ -1343,8 +1345,8 @@ void run_for_n_phases (agent* thisAgent, long n) {
 }
 
 void run_for_n_elaboration_cycles (agent* thisAgent, long n) {
-  long e_cycles_at_start, d_cycles_at_start, elapsed_cycles;
-  go_type_enum save_go_type;
+  long e_cycles_at_start, d_cycles_at_start, elapsed_cycles = 0;
+  go_type_enum save_go_type = GO_PHASE;
   
   if (n == -1) { run_forever(thisAgent); return; }
   if (n < -1) return;
@@ -1500,40 +1502,6 @@ void run_for_n_selections_of_slot_at_level (agent* thisAgent, long n,
 #endif
 }
 
-/* ===================================================================
-
-                     Print the Startup Banner
-
-=================================================================== */
-
-//char * soar_news_string = "\
-//General questions and topics for discussion should be sent to\n\
-//soar-group@umich.edu. Bug reports should be sent to soar-bugs@umich.edu\n\
-//The current bug-list may be obtained by sending mail to\n\
-//soar-bugs@umich.edu with the Subject: line \"bug list\".\n\
-//The Soar Home Page URL is:  http://ai.eecs.umich.edu/soar\n\
-//\n\
-//Copyright (c) 1995-1999 Carnegie Mellon University,\n\
-//                         University of Michigan,\n\
-//                         University of Southern California/Information\n\
-//                         Sciences Institute.  All rights reserved.\n\
-//The Soar consortium proclaims this software is in the public domain, and\n\
-//is made available AS IS.  Carnegie Mellon University, The University of \n\
-//Michigan, and The University of Southern California/Information Sciences \n\
-//Institute make no warranties about the software or its performance,\n\
-//implied or otherwise.\n\
-//\n\
-//Type \"help\" for information on various topics.\n\
-//Type \"quit\" to exit Soar.  Use ctrl-c to stop a Soar run.\n\
-//Type \"soarnews\" to repeat this information.\n\
-//Type \"version\" for Soar version information.\
-//";
-//
-//void print_startup_banner (agent* thisAgent) {
-//  print(thisAgent, soar_version_string);
-//  print(thisAgent, soar_news_string);
-//}
-//
 /* ===================================================================
    
              Loading the Initialization File ".init.soar"

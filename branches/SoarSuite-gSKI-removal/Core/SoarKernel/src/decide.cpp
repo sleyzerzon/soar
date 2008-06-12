@@ -51,7 +51,7 @@
 #include "xml.h"
 #include "soar_TraceNames.h"
 
-/* JC ADDED: This is for event firing in gSKI */
+#include "assert.h"
 
 using namespace soar_TraceNames;
 
@@ -1135,7 +1135,8 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 /* AGR 615 begin */
       print(thisAgent, "Or choose one of the following to change the user-select mode\n");
       print(thisAgent, "to something else:  %d (first), %d (last), %d (random)\n",
-	     num_candidates+=1, num_candidates+=1, num_candidates+=1);
+	     num_candidates + 1, num_candidates + 2, num_candidates + 3);
+      num_candidates += 3;
 /* AGR 615 end */
       while (TRUE) {
         char ch;

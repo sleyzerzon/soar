@@ -131,6 +131,11 @@
 #include <stdio.h>	// Needed for FILE token below
 #include <string.h> 	// Needed for strlen, etc. below
 
+#ifndef _WIN32
+#include <strings.h>
+#include <stdlib.h> // malloc
+#endif // !_WIN32
+
 #ifdef __cplusplus
 extern "C"
 {
