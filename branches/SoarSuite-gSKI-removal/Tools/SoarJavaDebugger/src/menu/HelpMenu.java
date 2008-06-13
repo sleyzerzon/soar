@@ -99,7 +99,7 @@ public class HelpMenu {
 
 		// This version is based on the version of the client interface compiled into the debugger
 		// and is always available.
-		String aboutText = newLine + "\tSoar Debugger version: \t" + Kernel.GetSoarClientVersion() + newLine ;
+		String aboutText = newLine + "\tSoar Debugger version: \t" + Kernel.getKSMLVersionValue() + newLine ;
 
 		// This version is based on the runtime
 		aboutText += "\tSoar Kernel version: \t" ;
@@ -112,11 +112,11 @@ public class HelpMenu {
 			aboutText += "no kernel is running." ;
 		
 		// This version is for the communication library
-		aboutText += newLine + "\tSML version: \t\t" + Kernel.GetSMLVersion() + newLine ;
+		aboutText += newLine + "\tSML version: \t\t" + Kernel.getKSMLVersionValue() + newLine ;
 
-		aboutText += newLine + "\tDeveloped by: " + newLine + "\t\tDouglas Pearson" + newLine + "\t\tBob Marinier" + newLine + "\t\tKaren Coulter" + newLine + "\t\tJon Voigt" + newLine + "\t\tand others." + newLine ;
+		aboutText += newLine + "\tDeveloped by: " + newLine + "\t\tDouglas Pearson" + newLine + "\t\tBob Marinier" + newLine + "\t\tKaren Coulter" + newLine + "\t\tJonathan Voigt" + newLine + "\t\tand others." + newLine ;
 		
-		aboutText += newLine + "For help with the debugger or other aspects of Soar " + Kernel.GetSoarClientVersion() + newLine + "application development send email to soar-sml-list@umich.edu" + newLine + newLine ;
+		aboutText += newLine + "For help with the debugger or other aspects of Soar " + Kernel.getKSMLVersionValue() + newLine + "application development send email to soar-sml-list@lists.sourceforge.net" + newLine + newLine ;
 		aboutText += "For help with writing Soar systems (production rules) or for theoretical discussions " + newLine + "of the Soar cognitive architecture send email to soar-group@lists.sourceforge.net" + newLine ;
 		
 		m_Frame.ShowMessageBox("About Soar's Debugger", aboutText) ;
