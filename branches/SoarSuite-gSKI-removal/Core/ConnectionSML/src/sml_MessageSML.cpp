@@ -19,14 +19,12 @@ using namespace soarxml;
 MessageSML::MessageSML()
 {
 	SetTagNameFast(sml_Names::kTagSML) ;
-	AddAttributeFastFast(sml_Names::kSoarVersion, sml_Names::kSoarVersionValue) ;
 	AddAttributeFastFast(sml_Names::kSMLVersion,  sml_Names::kSMLVersionValue) ;
 }
 
 MessageSML::MessageSML(DocType type, int id)
 {
 	SetTagNameFast(sml_Names::kTagSML) ;
-	AddAttributeFastFast(sml_Names::kSoarVersion, sml_Names::kSoarVersionValue) ;
 	AddAttributeFastFast(sml_Names::kSMLVersion,  sml_Names::kSMLVersionValue) ;
 
 	char const* pDocType = sml_Names::kDocType_Call ;

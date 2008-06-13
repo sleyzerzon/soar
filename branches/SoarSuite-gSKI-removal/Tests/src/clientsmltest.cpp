@@ -11,6 +11,7 @@
 #include "sml_Client.h"
 #include "sml_Utils.h"
 #include "thread_Event.h"
+#include "kernel.h"
 
 #include "handlers.h"
 
@@ -130,6 +131,12 @@ bool ClientSMLTest::verbose = false;
 
 void ClientSMLTest::setUp()
 {
+	assert( MAJOR_VERSION_NUMBER == SML_MAJOR_VERSION_NUMBER );
+	assert( MINOR_VERSION_NUMBER == SML_MINOR_VERSION_NUMBER );
+	assert( MICRO_VERSION_NUMBER == SML_MICRO_VERSION_NUMBER );
+	assert( GREEK_VERSION_NUMBER == SML_GREEK_VERSION_NUMBER );
+	assert( strcmp( VERSION_STRING, SML_VERSION_STRING ) == 0 );
+
 	pKernel = NULL;
 	numberAgents = 1;
 	clientXMLStorage = NULL;
@@ -602,10 +609,9 @@ void ClientSMLTest::createKernelAndAgents( const KernelBitset& options, int port
     // pKernel->SetTraceCommunications(true) ;
 
 	if ( verbose ) std::cout << "Soar kernel version " << pKernel->GetSoarKernelVersion() << std::endl ;
-	if ( verbose ) std::cout << "Soar client version " << pKernel->GetSoarClientVersion() << std::endl ;
-	if ( verbose ) std::cout << "SML version " << pKernel->GetSMLVersion() << std::endl ;
+	if ( verbose ) std::cout << "SML version " << sml::Kernel::kSMLVersionValue << std::endl ;
 
-	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( pKernel->GetSoarClientVersion() ) );
+	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( sml::Kernel::kSMLVersionValue ) );
 
 	bool creationHandlerReceived( false );
 	pKernel->RegisterForAgentEvent( sml::smlEVENT_AFTER_AGENT_CREATED, Handlers::MyCreationHandler, &creationHandlerReceived ) ;

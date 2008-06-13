@@ -119,7 +119,7 @@ void IOTest::createKernelAndAgents( const KernelBitset& options, int port )
 	// (useful in a test app like this).
     // pKernel->SetTraceCommunications(true) ;
 
-	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( pKernel->GetSoarClientVersion() ) );
+	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( sml::Kernel::kSMLVersionValue ) );
 
 	// Report the number of agents (always 0 unless this is a remote connection to a CLI or some such)
 	CPPUNIT_ASSERT( pKernel->GetNumberAgents() == 0 );

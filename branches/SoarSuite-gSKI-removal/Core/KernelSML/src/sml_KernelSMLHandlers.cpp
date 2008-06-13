@@ -467,10 +467,7 @@ bool KernelSML::HandleIsProductionLoaded(AgentSML* pAgentSML, char const* pComma
 
 bool KernelSML::HandleGetVersion(AgentSML* /*pAgentSML*/, char const* /*pCommandName*/, Connection* pConnection, AnalyzeXML* /*pIncoming*/, soarxml::ElementXML* pResponse)
 {
-	// Our hard-coded string should match the version returned from Soar
-	assert( strcmp(sml_Names::kSoarVersionValue, this->GetVersionString().c_str() ) == 0) ;
-
-	return this->ReturnResult(pConnection, pResponse, this->GetVersionString().c_str() ) ;
+	return this->ReturnResult(pConnection, pResponse, kSoarVersionValue ) ;
 }
 
 bool KernelSML::HandleIsSoarRunning(AgentSML* /*pAgentSML*/, char const* /*pCommandName*/, Connection* pConnection, AnalyzeXML* /*pIncoming*/, soarxml::ElementXML* pResponse)

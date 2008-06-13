@@ -38,9 +38,12 @@ using namespace sml ;
 using namespace soarxml;
 
 char const* const Kernel::kDefaultLibraryName = "SoarKernelSML" ;
+const char* Kernel::kSMLVersionValue = SML_VERSION_STRING;
 
 Kernel::Kernel(Connection* pConnection)
 {
+	sml_Names::SetSMLVersionValue( Kernel::kSMLVersionValue );
+
 	m_Connection     = pConnection ;
 	m_TimeTagCounter = 0 ;
 	m_IdCounter      = 0 ;
@@ -2423,16 +2426,6 @@ std::string Kernel::GetSoarKernelVersion()
 	{
 		return "Error: Unable to retrieve the version from the kernel" ;
 	}
-}
-
-std::string Kernel::GetSoarClientVersion()
-{
-	return sml_Names::kSoarVersionValue ;
-}
-
-std::string Kernel::GetSMLVersion()
-{
-	return sml_Names::kSMLVersionValue ;
 }
 
 // The below stuff is to support LoadExternalLibrary

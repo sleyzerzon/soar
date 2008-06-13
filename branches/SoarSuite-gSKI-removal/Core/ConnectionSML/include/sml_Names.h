@@ -25,11 +25,11 @@ public:
 	static char const* const kDocType_Call ;
 	static char const* const kDocType_Response ;
 	static char const* const kDocType_Notify ;
-	static char const* const kSoarVersion ;
 	static char const* const kSMLVersion ;
-	static char const* const kSMLVersionValue ;
-	static char const* const kSoarVersionValue ;
 	static char const* const kOutputLinkName ;
+
+	static void SetSMLVersionValue( const char* version );
+	static const char* kSMLVersionValue;
 
 	// <command> tag identifiers
 	static char const* const kTagCommand ;

@@ -40,6 +40,7 @@ using namespace sml ;
 
 // Singleton instance of the kernel object
 KernelSML* KernelSML::s_pKernel = NULL ;
+const char* KernelSML::kSoarVersionValue = VERSION_STRING;
 
 // On Windows this is set to the DLL's hModule handle.
 void* KernelSML::s_hModule = NULL ;
@@ -65,14 +66,6 @@ KernelSML* KernelSML::CreateKernelSML(unsigned short portToListenOn)
 	return s_pKernel ;
 }
 
-std::string KernelSML::GetVersionString() {
-	std::stringstream versionString;
-
-	// TODO: cache this?
-	versionString << MAJOR_VERSION_NUMBER << "." << MINOR_VERSION_NUMBER << "." << MICRO_VERSION_NUMBER;
-	return versionString.str();
-}
-
 /*************************************************************
 * @brief	Returns the singleton kernel object.
 *************************************************************/
@@ -95,6 +88,8 @@ cli::CommandLineInterface* KernelSML::GetCommandLineInterface()
 
 KernelSML::KernelSML(unsigned short portToListenOn)
 {
+	sml_Names::SetSMLVersionValue( KernelSML::kSoarVersionValue );
+
 	// Initalize the event map
 	m_pEventMap = new Events() ;
 

@@ -12,6 +12,14 @@
 #ifndef SML_KERNEL_H
 #define SML_KERNEL_H
 
+// These must mirror the kernel versions in kernel.h
+// There is also a version string in SoarJavaDebugger doc.Document.java
+#define SML_MAJOR_VERSION_NUMBER 9
+#define SML_MINOR_VERSION_NUMBER 0
+#define SML_MICRO_VERSION_NUMBER 0
+#define SML_GREEK_VERSION_NUMBER 0
+#define SML_VERSION_STRING "9.0.0"
+
 #include <string>
 
 #include "sml_ObjectMap.h"
@@ -930,8 +938,7 @@ public:
 	*		 E.g. 8.6.1
 	*************************************************************/
 	std::string GetSoarKernelVersion() ;
-	static std::string GetSoarClientVersion() ;
-	static std::string GetSMLVersion() ;
+	static const char* kSMLVersionValue;
 
 	/*************************************************************
 	* @brief Calls Commit() for all agents -- sending any queued I/O operations

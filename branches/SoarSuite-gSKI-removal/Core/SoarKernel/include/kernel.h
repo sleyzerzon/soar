@@ -178,10 +178,13 @@ enum ni_mode {
 /* Current Soar version number */
 /* --------------------------- */
 
-#define MAJOR_VERSION_NUMBER 8
-#define MINOR_VERSION_NUMBER 6
-#define MICRO_VERSION_NUMBER 4
+// These must mirror the SML versions in sml_ClientKernel.h
+// There is also a version string in SoarJavaDebugger doc.Document.java
+#define MAJOR_VERSION_NUMBER 9
+#define MINOR_VERSION_NUMBER 0
+#define MICRO_VERSION_NUMBER 0
 #define GREEK_VERSION_NUMBER 0
+#define VERSION_STRING "9.0.0"
 
 #define BUFFER_MSG_SIZE 128
 
