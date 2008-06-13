@@ -279,6 +279,11 @@ void xml_invoke_callback( agent* pAgent )
 	soarxml::ElementXML* pResult = pXML->DetatchObject();
 	pXML->Reset();
 
+#ifdef _DEBUG
+	char* pStr = pResult->GenerateXMLString( true ) ;
+	pResult->DeleteString( pStr ) ;
+#endif // _DEBUG
+
 	// We need to call the handler explicitly here instead of using soar_invoke_callbacks
 	// because we need to create a new ElementXML object for each handler that gets called.
 	for ( cons* c = pAgent->soar_callbacks[XML_GENERATION_CALLBACK]; c != NIL; c = c->rest )

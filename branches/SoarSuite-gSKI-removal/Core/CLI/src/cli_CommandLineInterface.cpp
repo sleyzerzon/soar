@@ -265,31 +265,28 @@ void CommandLineInterface::SetTrapPrintCallbacks(bool setting)
 			RegisterWithKernel(smlEVENT_PRINT);
 		}
 
-		if (!m_RawOutput)
-		{
-			// Tell kernel to collect result in command buffer as opposed to trace buffer
-			xml_begin_command_mode( m_pAgentSML->GetSoarAgent() );
-		}
+		// Tell kernel to collect result in command buffer as opposed to trace buffer
+		xml_begin_command_mode( m_pAgentSML->GetSoarAgent() );
 	}
 	else
 	{
-		if (!m_RawOutput)
+		// Retrieve command buffer, tell kernel to use trace buffer again
+		ElementXML* pXMLCommandResult = xml_end_command_mode( m_pAgentSML->GetSoarAgent() );
+
+		// The root object is just a <trace> tag.  The substance is in the children
+		// Add childrend of the command buffer to response tags
+		for ( int i = 0; i < pXMLCommandResult->GetNumberChildren(); ++i )
 		{
-			// Retrieve command buffer, tell kernel to use trace buffer again
-			ElementXML* pXMLCommandResult = xml_end_command_mode( m_pAgentSML->GetSoarAgent() );
+			ElementXML* pChildXML = new ElementXML();
+			pXMLCommandResult->GetChild( pChildXML, i );
 
-			// The root object is just a <trace> tag.  The substance is in the children
-			// Add childrend of the command buffer to response tags
-			for ( int i = 0; i < pXMLCommandResult->GetNumberChildren(); ++i )
-			{
-				ElementXML* pChildXML = new ElementXML();
-				pXMLCommandResult->GetChild( pChildXML, i );
+			m_ResponseTags.push_back( pChildXML );
+		}
 
-				m_ResponseTags.push_back( pChildXML );
-			}
+		delete pXMLCommandResult;
 
-			delete pXMLCommandResult;
-
+		if ( !m_RawOutput )
+		{
 			// Add text result to response tags
 			if ( m_Result.str().length() )
 			{
