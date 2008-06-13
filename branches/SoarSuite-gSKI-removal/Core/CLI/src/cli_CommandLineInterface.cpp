@@ -357,7 +357,14 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, soarxm
 
 	// reset state
 	m_Result.str("");
+
+	// Delete all remaining xml objects
+	for ( ElementXMLListIter cleanupIter = m_ResponseTags.begin(); cleanupIter != m_ResponseTags.end(); ++cleanupIter )
+	{
+		delete *cleanupIter;
+	}
 	m_ResponseTags.clear();	
+
 	m_LastError = CLIError::kNoError;	
 	m_LastErrorDetail.clear();			
 }
