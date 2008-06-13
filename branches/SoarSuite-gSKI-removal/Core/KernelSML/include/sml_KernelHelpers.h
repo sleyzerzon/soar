@@ -93,9 +93,6 @@ namespace sml
 	 bool BeginTracingProduction(AgentSML* pIAgent, const char* pProductionName);
 	 bool StopTracingProduction(AgentSML* pIAgent, const char* pProductionName);
 
-	 long AddWme(AgentSML* pIAgent, const char* pIdString, const char* pAttrString, const char* pValueString, bool acceptable);
-	 int RemoveWmeByTimetag(AgentSML* pIAgent, int num);
-
 	 void PrintInternalSymbols(AgentSML* pIAgent);
 
 	 int AddWMEFilter(AgentSML* pIAgent, const char *pIdString, const char *pAttrString, const char *pValueString, bool adds, bool removes);

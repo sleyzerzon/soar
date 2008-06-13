@@ -31,6 +31,7 @@
 #include "soar_rand.h"
 #include "xml.h"
 #include "soar_TraceNames.h"
+#include "utilities.h"
 
 extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
 
@@ -112,51 +113,6 @@ void KernelHelpers::PrintStackTrace(AgentSML* agent, bool print_states, bool pri
 		print (agent->GetSoarAgent(), "...Stack goes on for another %d states\n", stateCount - maxStates);
 	}
 }
-
-void get_context_var_info ( agent* agnt, Symbol **dest_goal,
-	Symbol **dest_attr_of_slot,
-	Symbol **dest_current_value);
-
-Symbol *read_identifier_or_context_variable (agent* agnt) 
-{
-	Symbol *id;
-	Symbol *g, *attr, *value;
-
-	if (agnt->lexeme.type==IDENTIFIER_LEXEME) {
-		id = find_identifier (agnt, agnt->lexeme.id_letter, agnt->lexeme.id_number);
-		if (!id) {
-			print (agnt, "There is no identifier %c%lu.\n", agnt->lexeme.id_letter,
-				agnt->lexeme.id_number);
-			print_location_of_most_recent_lexeme(agnt);
-			return NIL;
-		}
-		return id;
-	}
-	if (agnt->lexeme.type==VARIABLE_LEXEME) 
-	{
-		get_context_var_info (agnt, &g, &attr, &value);
-		if (!attr) {
-			print (agnt, "Expected identifier (or context variable)\n");
-			print_location_of_most_recent_lexeme(agnt);
-			return NIL;
-		}
-		if (!value) {
-			print (agnt, "There is no current %s.\n", agnt->lexeme.string);
-			print_location_of_most_recent_lexeme(agnt);
-			return NIL;
-		}
-		if (value->common.symbol_type!=IDENTIFIER_SYMBOL_TYPE) {
-			print (agnt, "The current %s ", agnt->lexeme.string);
-			print_with_symbols (agnt, "(%y) is not an identifier.\n", value);
-			print_location_of_most_recent_lexeme(agnt);
-			return NIL;
-		}
-		return value;
-	}
-	print (agnt, "Expected identifier (or context variable)\n");
-	print_location_of_most_recent_lexeme(agnt);
-	return NIL;
-}		
 
 void do_print_for_production (agent* agnt, 
 	production *prod, 
@@ -532,48 +488,6 @@ void do_print_for_wme (agent* agnt, wme *w, int depth, bool internal, bool tree)
 	}
 }
 
-void get_lexeme_from_string (agent* agnt, char * the_lexeme)
-{
-	int i;
-	char * c;
-	bool sym_constant_start_found = FALSE;
-	bool sym_constant_end_found = FALSE;
-
-	for (c = the_lexeme, i = 0; *c; c++, i++)
-	{
-		if (*c == '|')
-		{
-			if (!sym_constant_start_found)
-			{
-				i--;
-				sym_constant_start_found = TRUE;
-			}
-			else
-			{
-				i--;
-				sym_constant_end_found = TRUE;
-			}
-		}
-		else
-		{
-			agnt->lexeme.string[i] = *c;
-		} 
-	}
-
-	agnt->lexeme.string[i] = '\0'; /* Null terminate lexeme string */
-
-	agnt->lexeme.length = i;
-
-	if (sym_constant_end_found)
-	{
-		agnt->lexeme.type = SYM_CONSTANT_LEXEME;
-	}
-	else 
-	{
-		determine_type_of_constituent_string(agnt);
-	}
-}
-
 /* --- Read and consume one pattern element.  Return 0 if error, 1 if "*",
 otherwise return 2 and set dest_sym to find_symbol() result. --- */
 int read_pattern_component (agent* agnt, Symbol **dest_sym) 
@@ -597,66 +511,6 @@ int read_pattern_component (agent* agnt, Symbol **dest_sym)
 		print (agnt, "Expected identifier or constant in wme pattern\n");
 		print_location_of_most_recent_lexeme(agnt);
 		return 0;
-	}
-}
-
-void get_context_var_info ( agent* agnt, Symbol **dest_goal,
-	Symbol **dest_attr_of_slot,
-	Symbol **dest_current_value) 
-{
-	Symbol *v, *g;
-	int levels_up;
-	wme *w;
-
-	v = find_variable (agnt, agnt->lexeme.string);
-	if (v==agnt->s_context_variable) {
-		levels_up = 0;
-		*dest_attr_of_slot = agnt->state_symbol;
-	} else if (v==agnt->o_context_variable) {
-		levels_up = 0;
-		*dest_attr_of_slot = agnt->operator_symbol;
-	} else if (v==agnt->ss_context_variable) {
-		levels_up = 1;
-		*dest_attr_of_slot = agnt->state_symbol;
-	} else if (v==agnt->so_context_variable) {
-		levels_up = 1;
-		*dest_attr_of_slot = agnt->operator_symbol;
-	} else if (v==agnt->sss_context_variable) {
-		levels_up = 2;
-		*dest_attr_of_slot = agnt->state_symbol;
-	} else if (v==agnt->sso_context_variable) {
-		levels_up = 2;
-		*dest_attr_of_slot = agnt->operator_symbol;
-	} else if (v==agnt->ts_context_variable) {
-		levels_up = agnt->top_goal ? agnt->bottom_goal->id.level-agnt->top_goal->id.level : 0;
-		*dest_attr_of_slot = agnt->state_symbol;
-	} else if (v==agnt->to_context_variable) {
-		levels_up = agnt->top_goal ? agnt->bottom_goal->id.level-agnt->top_goal->id.level : 0;
-		*dest_attr_of_slot = agnt->operator_symbol;
-	} else {
-		*dest_goal = NIL;
-		*dest_attr_of_slot = NIL;
-		*dest_current_value = NIL;
-		return;
-	}
-
-	g = agnt->bottom_goal;
-	while (g && levels_up) {
-		g = g->id.higher_goal;
-		levels_up--;
-	}
-	*dest_goal = g;
-
-	if (!g) {
-		*dest_current_value = NIL;
-		return;
-	}
-
-	if (*dest_attr_of_slot==agnt->state_symbol) {
-		*dest_current_value = g;
-	} else {
-		w = g->id.operator_slot->wmes;
-		*dest_current_value = w ? w->value : NIL;
 	}
 }
 
@@ -955,83 +809,6 @@ void print_preference_and_source (agent* agnt, preference *pref,
 }
 
 
-/*
-*	This procedure parses a string to determine if it is a
-*      lexeme for an identifier or context variable.
-* 
-*      Many interface routines take identifiers as arguments.  
-*      These ids can be given as normal ids, or as special variables 
-*      such as <s> for the current state, etc.  This routine reads 
-*      (without consuming it) an identifier or context variable, 
-*      and returns a pointer (Symbol *) to the id.  (In the case of 
-*      context variables, the instantiated variable is returned.  If 
-*      any error occurs (e.g., no such id, no instantiation of the 
-*      variable), an error message is printed and NIL is returned.
-*
-* Results:
-*	Pointer to a symbol for the variable or NIL.
-*
-* Side effects:
-*	None.
-*
-===============================
-*/
-bool read_id_or_context_var_from_string (agent* agnt, char * the_lexeme,
-	Symbol * * result_id) 
-{
-	Symbol *id;
-	Symbol *g, *attr, *value;
-
-	get_lexeme_from_string(agnt, the_lexeme);
-
-	if (agnt->lexeme.type == IDENTIFIER_LEXEME) 
-	{
-		id = find_identifier(agnt, agnt->lexeme.id_letter, agnt->lexeme.id_number);
-		if (!id) 
-		{
-			return false;
-		}
-		else
-		{
-			*result_id = id;
-			return true;
-		}
-	}
-
-	if (agnt->lexeme.type==VARIABLE_LEXEME) 
-	{
-		get_context_var_info (agnt, &g, &attr, &value);
-
-		if ((!attr) || (!value))
-		{
-			return false;
-		}
-
-		if (value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE) 
-		{
-			return false;
-		}
-
-		*result_id = value;
-		return true;
-	}
-
-	return false;
-}
-
-bool  string_match (char * string1, char * string2)
-{
-	if ((string1 == NULL) && (string2 == NULL))
-		return true;
-
-	if (   (string1 != NULL) 
-		&& (string2 != NULL) 
-		&& !(strcmp(string1, string2)))
-		return true;
-	else
-		return false;
-}
-
 bool string_match_up_to (char * string1, 
 	char * string2, 
 	unsigned int positions)
@@ -1072,22 +849,24 @@ int read_pref_detail_from_string (char *the_lexeme,
 	bool *print_productions,
 	wme_trace_type *wtt)
 {
-	if (string_match_up_to(the_lexeme, "-none", 3) || string_match(the_lexeme, "0")) 
+	std::string the_lexeme_string = the_lexeme;
+
+	if (string_match_up_to(the_lexeme, "-none", 3) || the_lexeme_string == "0")
 	{
 		*print_productions = FALSE;
 		*wtt               = NONE_WME_TRACE;
 	} 
-	else if (string_match_up_to(the_lexeme, "-names", 3) || string_match(the_lexeme, "1")) 
+	else if (string_match_up_to(the_lexeme, "-names", 3) || the_lexeme_string == "1") 
 	{
 		*print_productions = TRUE;
 		*wtt               = NONE_WME_TRACE;
 	} 
-	else if (string_match_up_to(the_lexeme, "-timetags", 2) || string_match(the_lexeme, "2")) 
+	else if (string_match_up_to(the_lexeme, "-timetags", 2) || the_lexeme_string == "2") 
 	{
 		*print_productions = TRUE;
 		*wtt               = TIMETAG_WME_TRACE;
 	} 
-	else if (string_match_up_to(the_lexeme, "-wmes", 2) || string_match(the_lexeme, "3")) 
+	else if (string_match_up_to(the_lexeme, "-wmes", 2) || the_lexeme_string == "3") 
 	{
 		*print_productions = TRUE;
 		*wtt               = FULL_WME_TRACE;
@@ -1964,172 +1743,6 @@ bool KernelHelpers::StopTracingProduction(AgentSML* pAgent, const char* pProduct
 	return true;
 }
 
-long KernelHelpers::AddWme(AgentSML* pAgent, const char* pIdString, const char* pAttrString, const char* pValueString, bool acceptable) {
-	agent* pSoarAgent = pAgent->GetSoarAgent();
-
-	// Get ID
-	Symbol* pId;
-	if (!read_id_or_context_var_from_string(pSoarAgent, const_cast<char*>(pIdString), &pId)) return -1;
-
-	// get optional '^', if present
-	if (*pAttrString == '^') {
-		pAttrString++;
-	}
-
-	// get attribute or '*'
-	Symbol* pAttr;
-	if (string_match("*", const_cast<char*>(pAttrString))) {
-		pAttr = make_new_identifier(pSoarAgent, 'I', pId->id.level);
-	} else {
-		get_lexeme_from_string(pSoarAgent, const_cast<char*>(pAttrString));
-
-		switch (pSoarAgent->lexeme.type) {
-		case SYM_CONSTANT_LEXEME:
-			pAttr = make_sym_constant(pSoarAgent, pSoarAgent->lexeme.string);
-			break;
-		case INT_CONSTANT_LEXEME:
-			pAttr = make_int_constant(pSoarAgent, pSoarAgent->lexeme.int_val);
-			break;
-		case FLOAT_CONSTANT_LEXEME:
-			pAttr = make_float_constant(pSoarAgent, pSoarAgent->lexeme.float_val);
-			break;
-		case IDENTIFIER_LEXEME:
-		case VARIABLE_LEXEME:
-			pAttr = read_identifier_or_context_variable(pSoarAgent);
-			if (!pAttr) {
-				return -2;
-			}
-			symbol_add_ref(pAttr);
-			break;
-		default:
-			return -2;
-		}
-	}
-
-	// get value or '*'
-	Symbol* pValue;
-	if (string_match("*", const_cast<char*>(pValueString)) == TRUE) {
-		pValue = make_new_identifier(pSoarAgent, 'I', pId->id.level);
-	} else {
-		get_lexeme_from_string(pSoarAgent, const_cast<char*>(pValueString));
-		switch (pSoarAgent->lexeme.type) {
-		case SYM_CONSTANT_LEXEME:
-			pValue = make_sym_constant(pSoarAgent, pSoarAgent->lexeme.string);
-			break;
-		case INT_CONSTANT_LEXEME:
-			pValue = make_int_constant(pSoarAgent, pSoarAgent->lexeme.int_val);
-			break;
-		case FLOAT_CONSTANT_LEXEME:
-			pValue = make_float_constant(pSoarAgent, pSoarAgent->lexeme.float_val);
-			break;
-		case IDENTIFIER_LEXEME:
-		case VARIABLE_LEXEME:
-			pValue = read_identifier_or_context_variable(pSoarAgent);
-			if (!pValue) {
-				symbol_remove_ref(pSoarAgent, pAttr);
-				return -3;
-			}
-			symbol_add_ref(pValue);
-			break;
-		default:
-			symbol_remove_ref(pSoarAgent, pAttr);
-			return -3;
-		}
-	}
-
-	// now create and add the wme
-	wme* pWme = make_wme(pSoarAgent, pId, pAttr, pValue, acceptable);			
-
-	symbol_remove_ref(pSoarAgent, pWme->attr);
-	symbol_remove_ref(pSoarAgent, pWme->value);
-	insert_at_head_of_dll(pWme->id->id.input_wmes, pWme, next, prev);
-	add_wme_to_wm(pSoarAgent, pWme);
-
-#ifdef USE_CAPTURE_REPLAY
-	// TODO
-#endif // USE_CAPTURE_REPLAY
-
-	/* REW: begin 28.07.96 */
-	/* OK.  This is an ugly hack.  Basically we want to keep track of kernel
-	time and callback time.  add-wme is called from either a callback
-	(for input routines) or from the command line (or someplace else?).
-	Here, I'm just assuming that we'll normally call add-wme from an
-	input routine so I turn off the input_function_timer and turn on
-	the kernel timers before the call to the low-level function:
-	do_buffered_wm_and_ownership_changes.
-
-	This assumption is problematic because anytime add-wme is called 
-	from some place other than the input function, there is a potential
-	to get some erroneous (if start_kernel_tv wasn't set for the 
-	input function) or just bad (if start_kernel_tv isn't defined)
-	timing data.   The real problem is that this very high-level 
-	routine is going deep into the kernel.  We can either ignore
-	this and just call the time spent doing wm changes here time
-	spent outside the kernel or we can try to do the accounting,
-	what this hack is a first-attempt at doing.  
-
-	However, my testing turned up no problems -- I was able to add
-	and remove WMEs without messing up the timers.  So it`s a 
-	hack that seems to work.  For now.  (there is a plan to 
-	add routines for specifically adding and deleting input
-	WMEs which should help clear up this isse)               REW */
-
-	/* REW: end 28.07.96 */
-
-#ifndef NO_TIMING_STUFF
-	if (pSoarAgent->current_phase == INPUT_PHASE) {
-		/* Stop input_function_cpu_time timer.  Restart kernel and phase timers */
-		stop_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv), &(pSoarAgent->input_function_cpu_time));
-		start_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv));
-
-#ifndef KERNEL_TIME_ONLY
-		start_timer(pSoarAgent, &(pSoarAgent->start_phase_tv));
-#endif // KERNEL_TIME_ONLY
-	}
-#endif // NO_TIMING_STUFF
-	/* REW: end 28.07.96 */
-
-	/* note: 
-	* I don't completely understand this:
-	* The deal seems to be that when NO_TOP_LEVEL_REFS is used, wmes on the i/o
-	* link (obviously) have fewer references than thy would otherwise.
-	* Although calling this here (in soar_cAddWme) doesn't seem to matter
-	* one way or the other, calling it in soar_cRemoveWme really leads to 
-	* problems.  What happens is that the i/o wme is removed prior to 
-	* fully figuring out the match set.  This means that productions which
-	* should have fired, dont.  However, if we comment this out for the
-	* NO_TOP_LEVEL_REFS fix we don't seem to get this problem.  There might be
-	* an underlying pathology here, but so far I don't know what it is.
-	* This suspicion is heightened by the fact that even when this fix
-	* is made, wmes are deallocated in a different place (e.g. at the end of
-	* the input cycle) than using a normal build.
-	*
-	* an interesting aside seems to be that we don't need to do buffered
-	* wme and own changes here regardless of whether or not L1R is used
-	* so long as we test to make sure we're in the INPUT_PHASE.  I will 
-	* look into this more later.
-	*/
-
-#ifndef NO_TOP_LEVEL_REFS
-	do_buffered_wm_and_ownership_changes(pSoarAgent);
-#endif // NO_TOP_LEVEL_REFS
-
-	/* REW: begin 28.07.96 */
-#ifndef NO_TIMING_STUFF
-	if (pSoarAgent->current_phase == INPUT_PHASE) {
-#ifndef KERNEL_TIME_ONLY
-		stop_timer(pSoarAgent, &(pSoarAgent->start_phase_tv), &(pSoarAgent->decision_cycle_phase_timers[(pSoarAgent->current_phase)]));
-#endif // KERNEL_TIME_ONLY
-		stop_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv), &(pSoarAgent->total_kernel_time));
-		start_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv));
-	}
-#endif // NO_TIMING_STUFF
-	/* REW: end 28.07.96 */
-
-	//*new_wme = (psoar_wme) pWme; // new_wme declared in parameter list in soar_cAddWme 8.5.2
-	return static_cast<long>(pWme->timetag);
-}
-
 int RemoveWme(agent* pSoarAgent, wme* pWme)
 {
 	//	wme *w, *w2;
@@ -2177,9 +1790,7 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 #endif // USE_CAPTURE_REPLAY
 
 	/* REW: begin 09.15.96 */
-#ifndef SOAR_8_ONLY
 	if (pSoarAgent->operand2_mode) {
-#endif // SOAR_8_ONLY
 		if (pWme->gds) {
 			if (pWme->gds->goal != NIL) {
 				if (pSoarAgent->soar_verbose_flag || pSoarAgent->sysparams[TRACE_WM_CHANGES_SYSPARAM])
@@ -2200,9 +1811,7 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 				GDS should be removed */
 			}
 		}
-#ifndef SOAR_8_ONLY
 	}
-#endif // SOAR_8_ONLY
 	/* REW: end   09.15.96 */
 
 	// now remove w from working memory
@@ -2239,21 +1848,6 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 #endif // NO_TOP_LEVEL_REFS
 
 	return 0;
-}
-
-int KernelHelpers::RemoveWmeByTimetag(AgentSML* pAgent, int num)
-{
-	agent* pSoarAgent = pAgent->GetSoarAgent();
-
-	wme *pWme;
-
-	for (pWme = pSoarAgent->all_wmes_in_rete; pWme != NIL; pWme = pWme->rete_next)
-		if (pWme->timetag == (unsigned long) num)
-			break;
-
-	if (!pWme) return -1;
-	if (!RemoveWme(pSoarAgent, pWme)) return 0; // this is the correct case
-	return -2;                  /* Unspecified Failure */
 }
 
 void KernelHelpers::PrintInternalSymbols(AgentSML* pAgent)

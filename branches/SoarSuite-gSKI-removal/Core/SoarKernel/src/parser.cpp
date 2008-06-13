@@ -1627,11 +1627,7 @@ action *parse_attr_value_make (agent* thisAgent, Symbol *id)
     /* parse_preferences actually creates the action.  eventhough
      there aren't really any preferences to read, we need the default
      acceptable and parallel prefs created for all attributes in path */
-#ifndef SOAR_8_ONLY
     if(thisAgent->operand2_mode && (strcmp(szAttribute,"operator") != 0))
-#else
-    if(strcmp(szAttribute,"operator") != 0)
-#endif
     {
       new_actions = parse_preferences_soar8_non_operator (thisAgent, id, attr, 
 														  symbol_to_rhs_value(new_var));
@@ -1667,11 +1663,7 @@ action *parse_attr_value_make (agent* thisAgent, Symbol *id)
       deallocate_action_list (thisAgent, all_actions);
       return NIL;
     }
-#ifndef SOAR_8_ONLY
     if(thisAgent->operand2_mode && (strcmp(szAttribute,"operator") != 0))
-#else
-    if(strcmp(szAttribute,"operator") != 0)
-#endif
 	 {
       new_actions = parse_preferences_soar8_non_operator (thisAgent, id, attr, value);
     } 

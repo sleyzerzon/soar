@@ -22,25 +22,31 @@ using namespace sml;
 
 bool CommandLineInterface::ParseNumericIndifferentMode(std::vector<std::string>& argv) {
 
-	Options optionsData[] = {
+	Options optionsData[] = 
+	{
 		{'a', "average",	0},
 		{'a', "avg",		0},
 		{'s', "sum",		0},
 		{0, 0, 0}
 	};
 
-	eNumericIndifferentMode mode = NUMERIC_INDIFFERENT_QUERY;
+	ni_mode mode = NUMERIC_INDIFFERENT_MODE_AVG;
+	bool query = true;
 
-	for (;;) {
+	for (;;) 
+	{
 		if (!ProcessOptions(argv, optionsData)) return false;
 		if (m_Option == -1) break;
 
-		switch (m_Option) {
+		switch (m_Option) 
+		{
 			case 'a':
-				mode = NUMERIC_INDIFFERENT_AVERAGE;
+				mode = NUMERIC_INDIFFERENT_MODE_AVG;
+				query = false;
 				break;
 			case 's':
-				mode = NUMERIC_INDIFFERENT_SUM;
+				mode = NUMERIC_INDIFFERENT_MODE_SUM;
+				query = false;
 				break;
 			default:
 				return SetError(CLIError::kGetOptError);
@@ -50,45 +56,40 @@ bool CommandLineInterface::ParseNumericIndifferentMode(std::vector<std::string>&
 	// No additional arguments
 	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);		
 
-	return DoNumericIndifferentMode(mode);
+	return DoNumericIndifferentMode( query, mode );
 }
 
-bool CommandLineInterface::DoNumericIndifferentMode(const eNumericIndifferentMode mode) {
-	switch (mode) {
-		case 0:
-			break;
-		case NUMERIC_INDIFFERENT_AVERAGE:
-			m_pAgentSoar->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_AVG;
-			return true;
-		case NUMERIC_INDIFFERENT_SUM:
-			m_pAgentSoar->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_SUM;
-			return true;
-		default:
-			return SetError(CLIError::kInvalidNumericIndifferentMode);
+bool CommandLineInterface::DoNumericIndifferentMode( bool query, const ni_mode mode ) 
+{
+	if ( query )
+	{
+		if (m_RawOutput) {
+			m_Result << "Current numeric indifferent mode: ";
+
+			switch (m_pAgentSoar->numeric_indifferent_mode) {
+				case NUMERIC_INDIFFERENT_MODE_AVG:
+					m_Result << "average";
+					break;
+				case NUMERIC_INDIFFERENT_MODE_SUM:
+					m_Result << "sum";
+					break;
+				default:
+					m_Result << "unknown";
+					assert( false );
+					return SetError(CLIError::kInvalidNumericIndifferentMode);
+			}
+		}
+		else
+		{
+			std::stringstream modeString;
+			modeString << static_cast< int >( m_pAgentSoar->numeric_indifferent_mode );
+			AppendArgTagFast(sml_Names::kParamNumericIndifferentMode, sml_Names::kTypeInt, modeString.str().c_str() );
+		}
 	}
-	
-	char buf[kMinBufferSize];
-	if (m_RawOutput) {
-		m_Result << "Current numeric indifferent mode: ";
+	else // !query
+	{
+		m_pAgentSoar->numeric_indifferent_mode = mode;
 	}
 
-	switch (m_pAgentSoar->numeric_indifferent_mode) {
-		case NUMERIC_INDIFFERENT_MODE_AVG:
-			if (m_RawOutput) {
-				m_Result << "average";
-			} else {
-				AppendArgTagFast(sml_Names::kParamNumericIndifferentMode, sml_Names::kTypeInt, Int2String((int)NUMERIC_INDIFFERENT_AVERAGE, buf, kMinBufferSize));
-			}
-			break;
-		case NUMERIC_INDIFFERENT_MODE_SUM:
-			if (m_RawOutput) {
-				m_Result << "sum";
-			} else {
-				AppendArgTagFast(sml_Names::kParamNumericIndifferentMode, sml_Names::kTypeInt, Int2String((int)NUMERIC_INDIFFERENT_SUM, buf, kMinBufferSize));
-			}
-			break;
-		default:
-			return SetError(CLIError::kInvalidNumericIndifferentMode);
-	}
 	return true;
 }

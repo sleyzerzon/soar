@@ -26,6 +26,7 @@
 
 #include "cli_CommandData.h"
 #include "cli_Aliases.h"
+#include "kernel.h"
 
 // For test
 //#define WIN_STATIC_LINK
@@ -237,7 +238,7 @@ public:
 	* @param value Value string for the new wme
 	* @param acceptable True to give wme acceptable preference
 	*************************************************************/
-	bool DoAddWME(const std::string& id, const std::string& attribute, const std::string& value, bool acceptable);
+	bool DoAddWME(const std::string& id, std::string attribute, const std::string& value, bool acceptable);
 
 	/*************************************************************
 	* @brief alias command
@@ -444,9 +445,10 @@ public:
 
 	/*************************************************************
 	* @brief numeric-indifferent mode command
-	* @param mode The mode for this command, see cli_CommandData.h
+	* @param query true to query
+	* @param mode The new mode, ignored on query
 	*************************************************************/
-	bool DoNumericIndifferentMode(const eNumericIndifferentMode mode);
+	bool DoNumericIndifferentMode(bool query, const ni_mode mode);
 
 	/*************************************************************
 	* @brief o-support-mode command
@@ -512,7 +514,7 @@ public:
 	* @brief remove-wme command
 	* @param timetag The timetag of the wme to remove
 	*************************************************************/
-	bool DoRemoveWME(int timetag);
+	bool DoRemoveWME(unsigned long timetag);
 
 	/*************************************************************
 	* @brief rete-net command

@@ -70,7 +70,7 @@ namespace cli {
 			kInvalidID							= 54,
 			kInvalidAttribute					= 55,
 			kInvalidValue						= 56,
-			kRemoveWMEFailed					= 57,
+			//kRemoveWMEFailed					= 57,
 			//kInvalidOSupportMode				= 58,
 			kInvalidWMEFilterType				= 59,
 			kFilterExpected						= 60,
@@ -158,7 +158,7 @@ namespace cli {
 				case kInvalidID:						return "Unknown or invalid ID.";
 				case kInvalidAttribute:					return "Unknown or invalid attribute.";
 				case kInvalidValue:						return "Unknown or invalid value.";
-				case kRemoveWMEFailed:					return "Remove WME failed.";
+				//case kRemoveWMEFailed:					return "Remove WME failed.";
 				//case kInvalidOSupportMode:				return "Invalid O-Support mode, use 0-4.";
 				case kInvalidWMEFilterType:				return "Invalid WME filter type, expected 'adds' 'removes' or 'both'.";
 				case kFilterExpected:					return "ID/Attribute/Value filter expected, one or more missing.";
