@@ -11,7 +11,7 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_UntypedListener.h"
+#include "sml_StringListener.h"
 
 #include "sml_Utils.h"
 #include "sml_Connection.h"

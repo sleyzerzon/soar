@@ -305,11 +305,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\sml_SystemListener.cpp"
+				RelativePath=".\src\sml_StringListener.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\sml_UntypedListener.cpp"
+				RelativePath=".\src\sml_SystemListener.cpp"
 				>
 			</File>
 			<File
@@ -427,11 +427,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\sml_SystemListener.h"
+				RelativePath=".\include\sml_StringListener.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\sml_UntypedListener.h"
+				RelativePath=".\include\sml_SystemListener.h"
 				>
 			</File>
 			<File
