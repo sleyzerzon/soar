@@ -12,6 +12,7 @@
 #include "sml_Utils.h"
 #include "thread_Event.h"
 #include "kernel.h"
+#include "soarversion.h"
 
 #include "handlers.h"
 
@@ -609,9 +610,9 @@ void ClientSMLTest::createKernelAndAgents( const KernelBitset& options, int port
     // pKernel->SetTraceCommunications(true) ;
 
 	if ( verbose ) std::cout << "Soar kernel version " << pKernel->GetSoarKernelVersion() << std::endl ;
-	if ( verbose ) std::cout << "SML version " << sml::Kernel::kSMLVersionValue << std::endl ;
+	if ( verbose ) std::cout << "SML version " << sml::sml_Names::kSMLVersionValue << std::endl ;
 
-	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( sml::Kernel::kSMLVersionValue ) );
+	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( sml::sml_Names::kSoarVersionValue ) );
 
 	bool creationHandlerReceived( false );
 	pKernel->RegisterForAgentEvent( sml::smlEVENT_AFTER_AGENT_CREATED, Handlers::MyCreationHandler, &creationHandlerReceived ) ;

@@ -157,8 +157,6 @@ public:
 	*************************************************************/
 	static KernelSML* CreateKernelSML(unsigned short portToListenOn) ;
 
-	static const char* kSoarVersionValue;
-
 	/*************************************************************
 	* @brief	Delete the singleton kernel object
 	*************************************************************/

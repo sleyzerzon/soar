@@ -11,6 +11,7 @@
 #include "sml_Client.h"
 #include "sml_Utils.h"
 #include "thread_Event.h"
+#include "sml_Names.h"
 
 enum eKernelOptions
 {
@@ -119,7 +120,7 @@ void IOTest::createKernelAndAgents( const KernelBitset& options, int port )
 	// (useful in a test app like this).
     // pKernel->SetTraceCommunications(true) ;
 
-	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( sml::Kernel::kSMLVersionValue ) );
+	CPPUNIT_ASSERT( std::string( pKernel->GetSoarKernelVersion() ) == std::string( sml::sml_Names::kSoarVersionValue ) );
 
 	// Report the number of agents (always 0 unless this is a remote connection to a CLI or some such)
 	CPPUNIT_ASSERT( pKernel->GetNumberAgents() == 0 );

@@ -38,12 +38,9 @@ using namespace sml ;
 using namespace soarxml;
 
 char const* const Kernel::kDefaultLibraryName = "SoarKernelSML" ;
-const char* Kernel::kSMLVersionValue = SML_VERSION_STRING;
 
 Kernel::Kernel(Connection* pConnection)
 {
-	sml_Names::SetSMLVersionValue( Kernel::kSMLVersionValue );
-
 	m_Connection     = pConnection ;
 	m_TimeTagCounter = 0 ;
 	m_IdCounter      = 0 ;

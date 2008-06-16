@@ -16,6 +16,8 @@
 #include "sml_Names.h"
 #include "sml_KernelSML.h"
 
+#include "soarversion.h"
+
 #include "agent.h"
 
 using namespace cli;
@@ -37,7 +39,7 @@ bool CommandLineInterface::DoVersion() {
 	std::string sTimeDateStamp = timedatestamp.str();
 
 	if (m_RawOutput) {
-		m_Result << KernelSML::kSoarVersionValue << "\n";
+		m_Result << sml_Names::kSoarVersionValue << "\n";
 		m_Result << "Build date: " << sTimeDateStamp.c_str() << " " ;
 
 	} else {

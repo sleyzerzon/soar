@@ -11,6 +11,8 @@
 /////////////////////////////////////////////////////////////////
 
 #include "sml_Names.h"
+#include "soarversion.h"
+
 #include <assert.h>
 
 using namespace sml ;
@@ -26,13 +28,9 @@ char const* const sml_Names::kDocType_Notify	= "notify" ;
 char const* const sml_Names::kSMLVersion		= "smlversion" ;
 char const* const sml_Names::kOutputLinkName	= "output-link" ;
 
-// Initialized when kernel is created
-void sml_Names::SetSMLVersionValue( const char* version )
-{
-	assert( version );
-	kSMLVersionValue = version;
-}
-const char* sml_Names::kSMLVersionValue = 0;
+// Version strings
+const char* sml_Names::kSoarVersionValue = VERSION_STRING;
+const char* sml_Names::kSMLVersionValue = SML_VERSION_STRING;
 
 // <command> tag identifiers
 char const* const sml_Names::kTagCommand		= "command" ;

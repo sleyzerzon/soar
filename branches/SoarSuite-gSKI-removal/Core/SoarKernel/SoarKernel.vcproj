@@ -403,6 +403,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\shared\soarversion.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\stl_support.h"
 				>
 			</File>
