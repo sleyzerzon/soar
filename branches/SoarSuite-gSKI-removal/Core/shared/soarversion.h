@@ -2,6 +2,7 @@
 #define SOARVERSION_H
 
 // There is also a version string in SoarJavaDebugger doc.Document.java
+// Yet another version string in  (root)/SConstruct
 
 #define MAJOR_VERSION_NUMBER 9
 #define MINOR_VERSION_NUMBER 0

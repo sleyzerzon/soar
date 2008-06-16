@@ -28,8 +28,8 @@ public:
 	static char const* const kSMLVersion ;
 	static char const* const kOutputLinkName ;
 
-	static const char* kSoarVersionValue;
-	static const char* kSMLVersionValue;
+	static const char* const kSoarVersionValue;
+	static const char* const kSMLVersionValue;
 
 	// <command> tag identifiers
 	static char const* const kTagCommand ;
