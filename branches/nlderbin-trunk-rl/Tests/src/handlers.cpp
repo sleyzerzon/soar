@@ -47,14 +47,6 @@ void Handlers::MyCreationHandler( sml::smlAgentEventId, void* pUserData, sml::Ag
 	*pHandlerReceived = true;
 }
 
-void Handlers::MyEchoEventHandler( sml::smlPrintEventId, void* pUserData, sml::Agent*, char const* pMsg )
-{
-	CPPUNIT_ASSERT( pMsg != NULL );
-	CPPUNIT_ASSERT( pUserData );
-	bool* pHandlerReceived = static_cast< bool* >( pUserData );
-	*pHandlerReceived = true;
-}
-
 void Handlers::MyProductionHandler( sml::smlProductionEventId id, void* pUserData, sml::Agent*, char const*, char const* )
 {
 	CPPUNIT_ASSERT( pUserData );
@@ -282,7 +274,7 @@ void Handlers::MyMemoryLeakUpdateHandlerInternal( bool destroyChildren, sml::sml
 	switch ( step % 3 )
 	{
 	case 0:
-		if ( pAgent->GetKernel()->IsRemoteConnection() == false )
+		if ( pAgent->GetKernel()->IsDirectConnection() )
 		{
 			CPPUNIT_ASSERT( pAgent->GetIWMObjMapSize() == 1 ); // root
 		}
@@ -305,14 +297,14 @@ void Handlers::MyMemoryLeakUpdateHandlerInternal( bool destroyChildren, sml::sml
 
 		CPPUNIT_ASSERT( pAgent->Commit() );
 
-		if ( pAgent->GetKernel()->IsRemoteConnection() == false )
+		if ( pAgent->GetKernel()->IsDirectConnection() )
 		{
 			CPPUNIT_ASSERT( pAgent->GetIWMObjMapSize() == 7 ); // root, pRootID x 2, pChildID x 4
 		}
 		break;
 
 	case 1:
-		if ( pAgent->GetKernel()->IsRemoteConnection() == false )
+		if ( pAgent->GetKernel()->IsDirectConnection() )
 		{
 			CPPUNIT_ASSERT( pAgent->GetIWMObjMapSize() == 7 ); // root, pRootID x 2, pChildID x 4
 		}
@@ -343,7 +335,7 @@ void Handlers::MyMemoryLeakUpdateHandlerInternal( bool destroyChildren, sml::sml
 
 		CPPUNIT_ASSERT( pAgent->Commit() );
 
-		if ( pAgent->GetKernel()->IsRemoteConnection() == false )
+		if ( pAgent->GetKernel()->IsDirectConnection() )
 		{
 			CPPUNIT_ASSERT( pAgent->GetIWMObjMapSize() == 7 ); // root, pRootID x 2, pChildID x 4, removed after step
 		}
@@ -366,7 +358,7 @@ void Handlers::MyMemoryLeakUpdateHandlerInternal( bool destroyChildren, sml::sml
 		break;
 
 	default:
-		if ( pAgent->GetKernel()->IsRemoteConnection() == false )
+		if ( pAgent->GetKernel()->IsDirectConnection() )
 		{
 			CPPUNIT_ASSERT( pAgent->GetIWMObjMapSize() == 1 ); // root
 		}
@@ -375,3 +367,9 @@ void Handlers::MyMemoryLeakUpdateHandlerInternal( bool destroyChildren, sml::sml
 
 	++step;
 }
+
+void Handlers::MyCallStopOnUpdateEventHandler( sml::smlUpdateEventId, void*, sml::Kernel* pKernel, sml::smlRunFlags )
+{
+	pKernel->StopAllAgents();
+}
+
