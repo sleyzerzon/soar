@@ -21,12 +21,14 @@
 #include "soar_rand.h"
 #include "agent.h"
 #include "print.h"
-#include "gski_event_system_functions.h"
-#include "xmlTraceNames.h"
 
 #include "exploration.h"
 #include "misc.h"
+#include "xml.h"
+#include "soar_TraceNames.h"
 #include "reinforcement_learning.h"
+
+using namespace soar_TraceNames;
 
 /***************************************************************************
  * Function     : exploration_valid_policy
@@ -633,12 +635,12 @@ preference *exploration_boltzmann_select( agent *my_agent, preference *candidate
 		{
 			print_with_symbols( my_agent, "\n Candidate %y:  ", cand->value );
 			print( my_agent, "Value (Sum) = %f, (Exp) = %f", cand->numeric_value, exp( cand->numeric_value / temp ) );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionBeginTag, kTagCandidate );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kCandidateName, symbol_to_string( my_agent, cand->value, true, 0, 0 ) );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kCandidateValue, cand->numeric_value );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kCandidateExpValue, exp( cand->numeric_value / temp ) );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionEndTag, kTagCandidate );
+			xml_begin_tag( my_agent, kTagCandidate );
+			xml_att_val( my_agent, kCandidateName, cand->value );
+			xml_att_val( my_agent, kCandidateType, kCandidateTypeSum );
+			xml_att_val( my_agent, kCandidateValue, cand->numeric_value );
+			xml_att_val( my_agent, kCandidateExpValue, exp( cand->numeric_value / temp ) );
+			xml_end_tag( my_agent, kTagCandidate );
 		}
 	}
 
@@ -697,9 +699,7 @@ preference *exploration_boltzmann_select( agent *my_agent, preference *candidate
 			
 			char buf[256];
        		SNPRINTF( buf, 254, "WARNING: Boltzmann update overflow! %g > %g", q_val, q_max );
-       		gSKI_MakeAgentCallbackXML( my_agent, kFunctionBeginTag, kTagWarning );
-       		gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kTypeString, buf );
-       		gSKI_MakeAgentCallbackXML( my_agent, kFunctionEndTag, kTagWarning );
+       		xml_generate_warning( my_agent, buf );
 		}
 	}
 
@@ -732,11 +732,11 @@ preference *exploration_epsilon_greedy_select( agent *my_agent, preference *cand
 		{
 			print_with_symbols( my_agent, "\n Candidate %y:  ", cand->value );
 			print( my_agent, "Value (Sum) = %f", cand->numeric_value );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionBeginTag, kTagCandidate );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kCandidateName, symbol_to_string( my_agent, cand->value, true, 0, 0 ) );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kCandidateType, kCandidateTypeSum );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kCandidateValue, cand->numeric_value );
-			gSKI_MakeAgentCallbackXML( my_agent, kFunctionEndTag, kTagCandidate );
+			xml_begin_tag( my_agent, kTagCandidate );
+			xml_att_val( my_agent, kCandidateName, cand->value );
+			xml_att_val( my_agent, kCandidateType, kCandidateTypeSum );
+			xml_att_val( my_agent, kCandidateValue, cand->numeric_value );
+			xml_end_tag( my_agent, kTagCandidate );
 		}
 	}
 

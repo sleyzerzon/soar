@@ -31,12 +31,11 @@
 #include "rete.h"
 #include "wmem.h"
 
-#include "xmlTraceNames.h"
-#include "gski_event_system_functions.h"
 #include "print.h"
 
 #include "reinforcement_learning.h"
 #include "misc.h"
+#include "xml.h"
 
 extern Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv, goal_stack_level new_id_level, char new_id_letter, struct token_struct *tok, wme *w);
 extern void variablize_symbol (agent* thisAgent, Symbol **sym);
@@ -1112,10 +1111,7 @@ void rl_store_data( agent *my_agent, Symbol *goal, preference *cand )
 				SNPRINTF( buf, 254, "WARNING: gap ended (%c%d)", goal->id.name_letter, goal->id.name_number );
 				
 				print( my_agent, buf );
-				
-       			gSKI_MakeAgentCallbackXML( my_agent, kFunctionBeginTag, kTagWarning );
-       			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kTypeString, buf );
-       			gSKI_MakeAgentCallbackXML( my_agent, kFunctionEndTag, kTagWarning );
+				xml_generate_warning( my_agent, buf );
 			}
 		}
 		
@@ -1132,10 +1128,7 @@ void rl_store_data( agent *my_agent, Symbol *goal, preference *cand )
 				SNPRINTF( buf, 254, "WARNING: gap started (%c%d)", goal->id.name_letter, goal->id.name_number );
 				
 				print( my_agent, buf );
-				
-       			gSKI_MakeAgentCallbackXML( my_agent, kFunctionBeginTag, kTagWarning );
-       			gSKI_MakeAgentCallbackXML( my_agent, kFunctionAddAttribute, kTypeString, buf );
-       			gSKI_MakeAgentCallbackXML( my_agent, kFunctionEndTag, kTagWarning );
+				xml_generate_warning( my_agent, buf );
 			}
 		}
 		
