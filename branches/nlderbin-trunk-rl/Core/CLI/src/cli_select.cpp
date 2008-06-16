@@ -43,7 +43,7 @@ bool CommandLineInterface::DoSelect( gSKI::Agent* pAgent, const std::string* pOp
 
 	if ( !pOp )
 	{
-		const char *my_selection = get_selected_operator( my_agent );
+		const char *my_selection = select_get_operator( my_agent );
 		
 		if ( my_selection != NULL )
 		{

@@ -91,8 +91,8 @@ void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
   init_chunker (thisAgent);
   init_tracing (thisAgent);
   init_explain(thisAgent);  /* AGR 564 */
-  init_select(thisAgent);
-  init_predict(thisAgent);
+  select_init(thisAgent);
+  predict_init(thisAgent);
 
 #ifdef REAL_TIME_BEHAVIOR
   /* RMJ */
@@ -327,31 +327,31 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
 
   
   // exploration initialization
-  newAgent->exploration_params[ EXPLORATION_PARAM_EPSILON ] = add_exploration_parameter( 0.1, &validate_epsilon, "epsilon" );
-  newAgent->exploration_params[ EXPLORATION_PARAM_TEMPERATURE ] = add_exploration_parameter( 25, &validate_temperature, "temperature" );
+  newAgent->exploration_params[ EXPLORATION_PARAM_EPSILON ] = exploration_add_parameter( 0.1, &exploration_validate_epsilon, "epsilon" );
+  newAgent->exploration_params[ EXPLORATION_PARAM_TEMPERATURE ] = exploration_add_parameter( 25, &exploration_validate_temperature, "temperature" );
   
   // rl initialization
-  newAgent->rl_params[ RL_PARAM_LEARNING ] = add_rl_parameter( "learning", RL_LEARNING_ON, &validate_rl_learning, &convert_rl_learning, &convert_rl_learning );    
-  newAgent->rl_params[ RL_PARAM_DISCOUNT_RATE ] = add_rl_parameter( "discount-rate", 0.9, &validate_rl_discount );  
-  newAgent->rl_params[ RL_PARAM_LEARNING_RATE ] = add_rl_parameter( "learning-rate", 0.3, &validate_rl_learning_rate );
-  newAgent->rl_params[ RL_PARAM_LEARNING_POLICY ] = add_rl_parameter( "learning-policy", RL_LEARNING_SARSA, &validate_rl_learning_policy, &convert_rl_learning_policy, &convert_rl_learning_policy );
-  newAgent->rl_params[ RL_PARAM_ET_DECAY_RATE ] = add_rl_parameter( "eligibility-trace-decay-rate", 0, &validate_rl_decay_rate );
-  newAgent->rl_params[ RL_PARAM_ET_TOLERANCE ] = add_rl_parameter( "eligibility-trace-tolerance", 0.001, &validate_rl_trace_tolerance );
-  newAgent->rl_params[ RL_PARAM_TEMPORAL_EXTENSION ] = add_rl_parameter( "temporal-extension", RL_TE_ON, &validate_te_enabled, &convert_te_enabled, &convert_te_enabled );
+  newAgent->rl_params[ RL_PARAM_LEARNING ] = rl_add_parameter( "learning", RL_LEARNING_OFF, &rl_validate_learning, &rl_convert_learning, &rl_convert_learning );    
+  newAgent->rl_params[ RL_PARAM_DISCOUNT_RATE ] = rl_add_parameter( "discount-rate", 0.9, &rl_validate_discount );  
+  newAgent->rl_params[ RL_PARAM_LEARNING_RATE ] = rl_add_parameter( "learning-rate", 0.3, &rl_validate_learning_rate );
+  newAgent->rl_params[ RL_PARAM_LEARNING_POLICY ] = rl_add_parameter( "learning-policy", RL_LEARNING_SARSA, &rl_validate_learning_policy, &rl_convert_learning_policy, &rl_convert_learning_policy );
+  newAgent->rl_params[ RL_PARAM_ET_DECAY_RATE ] = rl_add_parameter( "eligibility-trace-decay-rate", 0, &rl_validate_decay_rate );
+  newAgent->rl_params[ RL_PARAM_ET_TOLERANCE ] = rl_add_parameter( "eligibility-trace-tolerance", 0.001, &rl_validate_trace_tolerance );
+  newAgent->rl_params[ RL_PARAM_TEMPORAL_EXTENSION ] = rl_add_parameter( "temporal-extension", RL_TE_ON, &rl_validate_te_enabled, &rl_convert_te_enabled, &rl_convert_te_enabled );
 
-  newAgent->rl_stats[ RL_STAT_UPDATE_ERROR ] = add_rl_stat( "update-error" );
-  newAgent->rl_stats[ RL_STAT_TOTAL_REWARD ] = add_rl_stat( "total-reward" );
-  newAgent->rl_stats[ RL_STAT_GLOBAL_REWARD ] = add_rl_stat( "global-reward" );
+  newAgent->rl_stats[ RL_STAT_UPDATE_ERROR ] = rl_add_stat( "update-error" );
+  newAgent->rl_stats[ RL_STAT_TOTAL_REWARD ] = rl_add_stat( "total-reward" );
+  newAgent->rl_stats[ RL_STAT_GLOBAL_REWARD ] = rl_add_stat( "global-reward" );
 
-  initialize_template_tracking( newAgent );
+  rl_initialize_template_tracking( newAgent );
   
   // select initialization
   newAgent->select = new select_info;
-  init_select( newAgent );
+  select_init( newAgent );
 
   // predict initialization
   newAgent->prediction = new std::string();
-  init_predict( newAgent );
+  predict_init( newAgent );
 
   return newAgent;
 }
@@ -494,11 +494,11 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
 	  delete delete_agent->exploration_params[ i ];
 
   // cleanup Soar-RL
-  clean_parameters( delete_agent );
-  clean_stats( delete_agent );
+  rl_clean_parameters( delete_agent );
+  rl_clean_stats( delete_agent );
 
   // cleanup select
-  init_select( delete_agent );
+  select_init( delete_agent );
   delete delete_agent->select;
 
   // cleanup predict

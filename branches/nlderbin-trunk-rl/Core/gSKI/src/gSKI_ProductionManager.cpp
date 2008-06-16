@@ -412,7 +412,7 @@ _|___/    __         _    _             ____  _               _
 								  a->num_productions_of_type[TEMPLATE_PRODUCTION_TYPE];
       excise_all_productions(m_agent->GetSoarAgent(), false);
       
-      initialize_template_tracking( a );
+      rl_initialize_template_tracking( a );
 	  return true;
    }
 
@@ -511,7 +511,7 @@ _|___/    __         _    _             ____  _               _
 		   }
 	   }
 	   
-	   initialize_template_tracking( a );
+	   rl_initialize_template_tracking( a );
 	   return true;
    }
 

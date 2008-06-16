@@ -41,7 +41,7 @@ bool CommandLineInterface::DoPredict( gSKI::Agent* pAgent )
 	// get soar kernel agent - bad gSKI!
 	agent *my_agent = pAgent->GetSoarAgent();
 
-	const char *prediction_result = get_prediction( my_agent );
+	const char *prediction_result = predict_get( my_agent );
 
 	if ( m_RawOutput )
 		m_Result << prediction_result;

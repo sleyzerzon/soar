@@ -831,10 +831,10 @@ byte require_preference_semantics (agent *thisAgent, slot *s, preference **resul
     if (p->value == value) return CONSTRAINT_FAILURE_IMPASSE_TYPE;
   
   /* --- the lone require is the winner --- */
-  if ( candidates && soar_rl_enabled( thisAgent ) )
+  if ( candidates && rl_enabled( thisAgent ) )
   {
-	  compute_value_of_candidate( thisAgent, candidates, s, 0 );
-	  perform_rl_update( thisAgent, candidates->numeric_value, s->id );
+	  exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
+	  rl_perform_update( thisAgent, candidates->numeric_value, s->id );
   }
 
   return NONE_IMPASSE_TYPE;
@@ -857,18 +857,18 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   // if this is the true decision slot and selection has been made, attempt force selection
   if ( !( ( ( thisAgent->attribute_preferences_mode == 2 ) || ( thisAgent->operand2_mode == TRUE ) ) && ( !s->isa_context_slot ) ) ) 
   {
-	  if ( get_selected_operator( thisAgent ) != NULL )
+	  if ( select_get_operator( thisAgent ) != NULL )
 	  {
-		  preference *force_result = force_selection( thisAgent, s->all_preferences, !predict );
+		  preference *force_result = select_force( thisAgent, s->all_preferences, !predict );
 
 		  if ( force_result )
 		  {
 			  *result_candidates = force_result;
 
-			  if ( !predict && soar_rl_enabled( thisAgent ) )
+			  if ( !predict && rl_enabled( thisAgent ) )
 			  {
-				  compute_value_of_candidate( thisAgent, force_result, s, 0 );
-				  perform_rl_update( thisAgent, force_result->numeric_value, s->id );
+				  exploration_compute_value_of_candidate( thisAgent, force_result, s, 0 );
+				  rl_perform_update( thisAgent, force_result->numeric_value, s->id );
 			  }
 
 			  return NONE_IMPASSE_TYPE;
@@ -925,11 +925,11 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   if ((!candidates) || (! candidates->next_candidate)) {
     *result_candidates = candidates;
 
-	if ( !consistency && soar_rl_enabled( thisAgent ) && candidates )
+	if ( !consistency && rl_enabled( thisAgent ) && candidates )
 	{
 		// perform update here for just one candidate
-		compute_value_of_candidate( thisAgent, candidates, s, 0 );
-		perform_rl_update( thisAgent, candidates->numeric_value, s->id );
+		exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
+		rl_perform_update( thisAgent, candidates->numeric_value, s->id );
 	}
 
     return NONE_IMPASSE_TYPE;
@@ -1095,11 +1095,11 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   {
 	  *result_candidates = candidates;
 	  
-	  if ( !consistency && soar_rl_enabled( thisAgent ) && candidates )
+	  if ( !consistency && rl_enabled( thisAgent ) && candidates )
 	  {
 		  // perform update here for just one candidate
-		  compute_value_of_candidate( thisAgent, candidates, s, 0 );
-		  perform_rl_update( thisAgent, candidates->numeric_value, s->id );
+		  exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
+		  rl_perform_update( thisAgent, candidates->numeric_value, s->id );
 	  }
 	  
 	  return NONE_IMPASSE_TYPE;
@@ -1153,7 +1153,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
   {
     if ( !consistency )
 	{
-		(*result_candidates) = choose_according_to_exploration_mode( thisAgent, s, candidates ); 
+		(*result_candidates) = exploration_choose_according_to_policy( thisAgent, s, candidates ); 
 		(*result_candidates)->next_candidate = NIL;
 	}
 	else
@@ -1879,10 +1879,10 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   remove_wmes_for_context_slot (thisAgent, goal->id.operator_slot);
   update_impasse_items (thisAgent, goal, NIL); /* causes items & fake pref's to go away */
   
-  if ( soar_rl_enabled( thisAgent ) )
+  if ( rl_enabled( thisAgent ) )
   {
-	tabulate_reward_value_for_goal( thisAgent, goal );
-	perform_rl_update( thisAgent, 0, goal ); // this update only sees reward - there is no next state
+	rl_tabulate_reward_value_for_goal( thisAgent, goal );
+	rl_perform_update( thisAgent, 0, goal ); // this update only sees reward - there is no next state
   }
   
   remove_wme_list_from_wm (thisAgent, goal->id.impasse_wmes);
@@ -2005,7 +2005,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.allow_bottom_up_chunks = TRUE;
 
   id->id.rl_info = static_cast<rl_data *>( allocate_memory( thisAgent, sizeof( rl_data ), MISCELLANEOUS_MEM_USAGE ) );
-  id->id.rl_info->eligibility_traces = new soar_rl_et_map( std::less<production *>(), SoarMemoryAllocator<std::pair<production* const, double> >( thisAgent, MISCELLANEOUS_MEM_USAGE ) );
+  id->id.rl_info->eligibility_traces = new rl_et_map( std::less<production *>(), SoarMemoryAllocator<std::pair<production* const, double> >( thisAgent, MISCELLANEOUS_MEM_USAGE ) );
   id->id.rl_info->prev_op_rl_rules = NIL;
   id->id.rl_info->previous_q = 0;
   id->id.rl_info->reward = 0;
@@ -2103,7 +2103,7 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s, bool predict 
 
 	  if ( predict )
 	  {
-		  set_prediction( thisAgent, "none" );
+		  predict_set( thisAgent, "none" );
 		  return TRUE;
 	  }
    } 
@@ -2117,24 +2117,24 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s, bool predict 
 		  switch ( impasse_type )
 		  {
 				case CONSTRAINT_FAILURE_IMPASSE_TYPE:
-					set_prediction( thisAgent, "constraint" );
+					predict_set( thisAgent, "constraint" );
 					break;
 				
 				case CONFLICT_IMPASSE_TYPE:
-					set_prediction( thisAgent, "conflict" );
+					predict_set( thisAgent, "conflict" );
 					break;
 
 				case TIE_IMPASSE_TYPE:
-					set_prediction( thisAgent, "tie" );
+					predict_set( thisAgent, "tie" );
 					break;
 
 				case NO_CHANGE_IMPASSE_TYPE:
-					set_prediction( thisAgent, "none" );
+					predict_set( thisAgent, "none" );
 					break;
 
 				default:
 					if ( !candidates || ( candidates->value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE ) )
-						set_prediction( thisAgent, "none" );
+						predict_set( thisAgent, "none" );
 					else
 					{
 						std::string temp = "";
@@ -2147,7 +2147,7 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s, bool predict 
 						temp += (*temp2);
 						delete temp2;
 
-						set_prediction( thisAgent, temp.c_str() );
+						predict_set( thisAgent, temp.c_str() );
 					}
 					break;
 		  }
@@ -2225,8 +2225,8 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s, bool predict 
       for(temp = candidates; temp; temp = temp->next_candidate)
          preference_remove_ref(thisAgent, temp);
       
-      if ( soar_rl_enabled( thisAgent ) )
-		store_rl_data( thisAgent, goal, candidates );
+      if ( rl_enabled( thisAgent ) )
+		rl_store_data( thisAgent, goal, candidates );
 	  
 	  /* JC ADDED: Notify gSKI of an operator selection  */
       gSKI_MakeAgentCallback(gSKI_K_EVENT_OPERATOR_SELECTED, 1, thisAgent, 
@@ -2408,10 +2408,10 @@ void do_working_memory_phase (agent* thisAgent) {
 
 void do_decision_phase (agent* thisAgent, bool predict) 
 {
-	if ( !predict && soar_rl_enabled( thisAgent ) )
-		tabulate_reward_values( thisAgent );
+	if ( !predict && rl_enabled( thisAgent ) )
+		rl_tabulate_reward_values( thisAgent );
 
-	srand_restore_snapshot( thisAgent, !predict );
+	predict_srand_restore_snapshot( thisAgent, !predict );
 	
 	/* phase printing moved to init_soar: do_one_top_level_phase */
 
@@ -2428,7 +2428,7 @@ void do_decision_phase (agent* thisAgent, bool predict)
 	   decide_non_context_slots(thisAgent);
 	   do_buffered_wm_and_ownership_changes(thisAgent);
 
-	   update_exploration_parameters( thisAgent );
+	   exploration_update_parameters( thisAgent );
    }
 }  
 

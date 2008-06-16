@@ -180,13 +180,13 @@ bool CommandLineInterface::ParseIndifferentSelection( gSKI::Agent* pAgent, std::
 			
 			if ( options.test( INDIFFERENT_EPSILON ) )
 			{
-				if ( valid_parameter_value( my_agent, "epsilon", new_val ) )
+				if ( exploration_valid_parameter_value( my_agent, "epsilon", new_val ) )
 					return DoIndifferentSelection( pAgent, 'e', &( argv[2] ) );
 				else
 					return SetError( CLIError::kInvalidValue );
 			}
 			else if ( options.test( INDIFFERENT_TEMPERATURE ) )
-				if ( valid_parameter_value( my_agent, "temperature", new_val ) )
+				if ( exploration_valid_parameter_value( my_agent, "temperature", new_val ) )
 					return DoIndifferentSelection( pAgent, 't', &( argv[2] ) );
 				else
 					return SetError( CLIError::kInvalidValue );
@@ -223,7 +223,7 @@ bool CommandLineInterface::ParseIndifferentSelection( gSKI::Agent* pAgent, std::
 			return SetError( CLIError::kTooManyArgs );
 		
 		// make sure first argument is a valid parameter name
-		if ( !valid_exploration_parameter( my_agent, argv[2].c_str() ) )
+		if ( !exploration_valid_parameter( my_agent, argv[2].c_str() ) )
 			return SetError( CLIError::kInvalidAttribute );
 		
 		if ( m_NonOptionArguments == 1 )
@@ -231,7 +231,7 @@ bool CommandLineInterface::ParseIndifferentSelection( gSKI::Agent* pAgent, std::
 		else if ( m_NonOptionArguments == 2 )
 		{
 			// validate reduction policy
-			if ( valid_reduction_policy( my_agent, argv[2].c_str(), argv[3].c_str() ) )
+			if ( exploration_valid_reduction_policy( my_agent, argv[2].c_str(), argv[3].c_str() ) )
 				return DoIndifferentSelection( pAgent, 'p', &( argv[2] ), &( argv[3] ) );
 			else
 				return SetError( CLIError::kInvalidValue );
@@ -247,11 +247,11 @@ bool CommandLineInterface::ParseIndifferentSelection( gSKI::Agent* pAgent, std::
 			return SetError( CLIError::kTooManyArgs );
 		
 		// make sure first argument is a valid parameter name
-		if ( !valid_exploration_parameter( my_agent, argv[2].c_str() ) )
+		if ( !exploration_valid_parameter( my_agent, argv[2].c_str() ) )
 			return SetError( CLIError::kInvalidAttribute );
 		
 		// make sure second argument is a valid reduction policy
-		if ( !valid_reduction_policy( my_agent, argv[2].c_str(), argv[3].c_str() ) )
+		if ( !exploration_valid_reduction_policy( my_agent, argv[2].c_str(), argv[3].c_str() ) )
 			return SetError( CLIError::kInvalidAttribute );
 		
 		if ( m_NonOptionArguments == 2 )
@@ -262,7 +262,7 @@ bool CommandLineInterface::ParseIndifferentSelection( gSKI::Agent* pAgent, std::
 			from_string( new_val, argv[4] );
 			
 			// validate setting
-			if ( !valid_reduction_rate( my_agent, argv[2].c_str(), argv[3].c_str(), new_val ) )
+			if ( !exploration_valid_reduction_rate( my_agent, argv[2].c_str(), argv[3].c_str(), new_val ) )
 				return SetError( CLIError::kInvalidValue );
 			else
 				return DoIndifferentSelection( pAgent, 'r', &( argv[2] ), &( argv[3] ), &( argv[4] ) ); 
@@ -293,7 +293,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 	// show selection policy
 	if ( !pOp )
 	{
-		const char *policy_name = convert_exploration_policy( get_exploration_policy( my_agent ) );
+		const char *policy_name = exploration_convert_policy( exploration_get_policy( my_agent ) );
 		
 		if ( m_RawOutput )
 			m_Result << policy_name;
@@ -305,24 +305,24 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 	
 	// selection policy
 	else if ( pOp == 'b' )
-		return set_exploration_policy( my_agent, "boltzmann" );
+		return exploration_set_policy( my_agent, "boltzmann" );
 	else if ( pOp == 'g' )
-		return set_exploration_policy( my_agent, "epsilon-greedy" );
+		return exploration_set_policy( my_agent, "epsilon-greedy" );
 	else if ( pOp == 'f' )
-		return set_exploration_policy( my_agent, "first" );
+		return exploration_set_policy( my_agent, "first" );
 	else if ( pOp == 'l' )
-		return set_exploration_policy( my_agent, "last" );
+		return exploration_set_policy( my_agent, "last" );
 	/*else if ( pOp == 'u' )
-		return set_exploration_policy( my_agent, "random-uniform" );*/
+		return exploration_set_policy( my_agent, "random-uniform" );*/
 	else if ( pOp == 'x' )
-		return set_exploration_policy( my_agent, "softmax" );
+		return exploration_set_policy( my_agent, "softmax" );
 	
 	// auto-update control
 	else if ( pOp == 'a' )
 	{
 		if ( !p1 )
 		{
-			bool setting = get_auto_update_exploration( my_agent );
+			bool setting = exploration_get_auto_update( my_agent );
 			
 			if ( m_RawOutput )
 				m_Result << ( ( setting )?( "on" ):( "off" ) );
@@ -333,7 +333,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 		}
 		else
 		{	
-			return set_auto_update_exploration( my_agent, ( p1->compare("on") == 0 ) );
+			return exploration_set_auto_update( my_agent, ( p1->compare("on") == 0 ) );
 		}
 	}
 	
@@ -342,7 +342,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 	{
 		if ( !p1 )
 		{
-			double param_value = get_parameter_value( my_agent, "epsilon" ); 
+			double param_value = exploration_get_parameter_value( my_agent, "epsilon" ); 
 			std::string *temp = to_string( param_value );
 			
 			if ( m_RawOutput )
@@ -358,14 +358,14 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 			double new_val;
 			from_string( new_val, *p1 );
 			
-			return set_parameter_value( my_agent, "epsilon", new_val );
+			return exploration_set_parameter_value( my_agent, "epsilon", new_val );
 		}
 	}
 	else if ( pOp == 't' )
 	{
 		if ( !p1 )
 		{
-			double param_value = get_parameter_value( my_agent, "temperature" ); 
+			double param_value = exploration_get_parameter_value( my_agent, "temperature" ); 
 			std::string *temp = to_string( param_value );
 
 			if ( m_RawOutput )
@@ -381,7 +381,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 			double new_val;
 			from_string( new_val, *p1 );
 			
-			return set_parameter_value( my_agent, "temperature", new_val );
+			return exploration_set_parameter_value( my_agent, "temperature", new_val );
 		}
 	}
 	
@@ -390,7 +390,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 	{
 		if ( !p2 )
 		{
-			const char *policy_name = convert_reduction_policy( get_reduction_policy( my_agent, p1->c_str() ) );
+			const char *policy_name = exploration_convert_reduction_policy( exploration_get_reduction_policy( my_agent, p1->c_str() ) );
 					
 			if ( m_RawOutput )
 				m_Result << policy_name;
@@ -400,7 +400,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 			return true;
 		}
 		else
-			return set_reduction_policy( my_agent, p1->c_str(), p2->c_str() );
+			return exploration_set_reduction_policy( my_agent, p1->c_str(), p2->c_str() );
 	}
 	
 	// selection parameter reduction rate
@@ -408,7 +408,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 	{
 		if ( !p3 )
 		{
-			double reduction_rate = get_reduction_rate( my_agent, p1->c_str(), p2->c_str() );
+			double reduction_rate = exploration_get_reduction_rate( my_agent, p1->c_str(), p2->c_str() );
 			std::string *temp = to_string( reduction_rate );
 			
 			if ( m_RawOutput )
@@ -424,7 +424,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 			double new_val;
 			from_string( new_val, *p3 );
 			
-			return set_reduction_rate( my_agent, p1->c_str(), p2->c_str(), new_val );
+			return exploration_set_reduction_rate( my_agent, p1->c_str(), p2->c_str(), new_val );
 		}
 	}
 	
@@ -437,7 +437,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 		double temp_value;
 		
 		temp = "Exploration Policy: ";
-		temp += convert_exploration_policy( get_exploration_policy( my_agent ) );
+		temp += exploration_convert_policy( exploration_get_policy( my_agent ) );
 		
 		if ( m_RawOutput )
 			m_Result << temp << "\n"; 
@@ -448,7 +448,7 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 		temp = "";
 		
 		temp = "Automatic Policy Parameter Reduction: ";
-		temp += ( ( get_auto_update_exploration( my_agent ) )?( "on" ):( "off" ) );
+		temp += ( ( exploration_get_auto_update( my_agent ) )?( "on" ):( "off" ) );
 		
 		if ( m_RawOutput )
 			m_Result << temp << "\n\n"; 
@@ -462,9 +462,9 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 		for ( int i=0; i<EXPLORATION_PARAMS; i++ )
 		{	
 			// value
-			temp = convert_exploration_parameter( my_agent, i );
+			temp = exploration_convert_parameter( my_agent, i );
 			temp += ": ";
-			temp_value = get_parameter_value( my_agent, i ); 
+			temp_value = exploration_get_parameter_value( my_agent, i ); 
 			temp4 = to_string( temp_value );
 			temp += (*temp4);
 			delete temp4;
@@ -475,9 +475,9 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
 			
 			// reduction policy
-			temp = convert_exploration_parameter( my_agent, i );
+			temp = exploration_convert_parameter( my_agent, i );
 			temp += " Reduction Policy: ";
-			temp += convert_reduction_policy( get_reduction_policy( my_agent, i ) );
+			temp += exploration_convert_reduction_policy( exploration_get_reduction_policy( my_agent, i ) );
 			if ( m_RawOutput )
 				m_Result << temp << "\n";
 			else
@@ -488,18 +488,18 @@ bool CommandLineInterface::DoIndifferentSelection( gSKI::Agent* pAgent, const ch
 			temp3 = "";
 			for ( int j=0; j<EXPLORATION_REDUCTIONS; j++ )
 			{
-				temp2 += convert_reduction_policy( j );
+				temp2 += exploration_convert_reduction_policy( j );
 				if ( j != ( EXPLORATION_REDUCTIONS - 1 ) )
 					temp2 += "/";
 				
-				temp_value = get_reduction_rate( my_agent, i, j );
+				temp_value = exploration_get_reduction_rate( my_agent, i, j );
 				temp4 = to_string( temp_value );
 				temp3 += (*temp4);
 				delete temp4;
 				if ( j != ( EXPLORATION_REDUCTIONS - 1 ) )
 					temp3 += "/";
 			}
-			temp = convert_exploration_parameter( my_agent, i );
+			temp = exploration_convert_parameter( my_agent, i );
 			temp += " Reduction Rate (";
 			temp += temp2;
 			temp += "): ";
