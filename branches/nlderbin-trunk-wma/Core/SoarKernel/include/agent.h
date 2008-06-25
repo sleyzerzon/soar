@@ -777,7 +777,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   wma_timelist_element *wma_timelist_current;
   
   double wma_power_array[ WMA_POWER_SIZE ];
-  int wma_quick_boost[ WMA_DECAY_HISTORY ];
+  int wma_quick_boost[ WMA_DECAY_HISTORY + 1 ];
   bool wma_initialized;
   bool wma_first;
   tc_number wma_tc_counter;
