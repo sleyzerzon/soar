@@ -66,6 +66,7 @@
 #include "src/cli_warnings.cpp"
 #include "src/cli_watch.cpp"
 #include "src/cli_watchwmes.cpp"
+#include "src/cli_wma.cpp"
 
 /** End Commands Subdirectory **/
 

@@ -28,5 +28,6 @@
 #include "src/tempmem.cpp"
 #include "src/trace.cpp"
 #include "src/utilities.cpp"
+#include "src/wma.cpp"
 #include "src/wmem.cpp"
 #include "src/xml.cpp"
