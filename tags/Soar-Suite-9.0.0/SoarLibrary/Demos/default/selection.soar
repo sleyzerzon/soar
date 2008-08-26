@@ -1,0 +1,5 @@
+# SBW 7/30/2008: changed to point to vs project so we only maintain one version
+# of the selection code
+pushd selection-vs-project
+source selection.soar
+popd
