@@ -1,5 +1,5 @@
 /*************************************************************************
- * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
+ * PLEASE SEE THE FILE "license.txt" (INCLUDED WITH THIS SOFTWARE PACKAGE)
  * FOR LICENSE AND COPYRIGHT INFORMATION. 
  *************************************************************************/
 
@@ -175,14 +175,17 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 /* NLD: Soar-RL trace information */
 #define TRACE_RL_SYSPARAM						 39
 
+/* JRV: Bug 1087: Chunk through local negations */
+#define CHUNK_THROUGH_LOCAL_NEGATIONS_SYSPARAM	 40
+
 /* NLD: WMA enabled parameter */
-#define WMA_ENABLED								 40
+#define WMA_ENABLED								 41
 
 /* NLD: WMA trace information */
-#define TRACE_WMA_SYSPARAM						 41
+#define TRACE_WMA_SYSPARAM						 42
 
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  41
+#define HIGHEST_SYSPARAM_NUMBER                  42
 
 /* -----------------------------------------
    Sysparams[] stores the parameters; set_sysparam()
