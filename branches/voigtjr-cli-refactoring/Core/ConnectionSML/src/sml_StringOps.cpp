@@ -216,6 +216,59 @@ int sml::Tokenize(std::string cmdline, std::vector<std::string>& argumentVector)
 	return argc;
 }
 
+void sml::GetTokenizeErrorString( int errorCode, std::string& errorString )
+{
+	std::ostringstream errorStringStream;
+
+	switch ( errorCode ) {
+		case -1:
+			errorStringStream << "Newline reached before closing pipe or quote.";
+			break;
+
+		case -2:
+			errorStringStream << "Extra closing bracket found '}'.";
+			break;
+
+		case -3:
+			errorStringStream << "Extra closing paren found ')'.";
+			break;
+
+		default:
+			{
+				errorCode = abs( errorCode );
+
+				const int QUOTES_MASK = 4;
+				const int BRACKETS_MASK = 8;
+				const int PARENS_MASK = 16;
+				const int PIPES_MASK = 32;
+
+				errorStringStream << "These quoting characters were not closed: ";
+				bool foundError = false;
+				if ( QUOTES_MASK & errorCode ) {
+					foundError = true;
+					errorStringStream << "\"";
+				}
+				if ( BRACKETS_MASK & errorCode ) {
+					foundError = true;
+					errorStringStream << "{";
+				}
+				if ( PARENS_MASK & errorCode ) {
+					foundError = true;
+					errorStringStream << "(";
+				}
+				if ( PIPES_MASK & errorCode ) {
+					foundError = true;
+					errorStringStream << "|";
+				}
+				assert( foundError );
+			}
+			break;
+	}
+
+	errorString.assign( errorStringStream.str() );
+}
+
+
 /*************************************************************
 * @brief Trim comments off of a line (for command parsing)
 * @return true on success, false if there is a new-line before a pipe quotation ends

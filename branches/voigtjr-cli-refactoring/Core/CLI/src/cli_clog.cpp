@@ -1,28 +1,47 @@
-/////////////////////////////////////////////////////////////////
-// log command file.
-//
-// Author: Jonathan Voigt, voigtjr@gmail.com
-// Date  : 2004
-//
-/////////////////////////////////////////////////////////////////
-
 #include <portability.h>
 
-#include "cli_CommandLineInterface.h"
-
-#include <fstream>
-
-#include <assert.h>
-
-#include "cli_Commands.h"
-#include "cli_CommandData.h"
-#include "cli_CLIError.h"
-
-#include "sml_Names.h"
-#include "sml_Events.h"
+#include "cli_echo.h"
+#include "cli_CLI.h"
 
 using namespace cli;
 using namespace sml;
+
+CLog::CLog() 
+: m_Add( 0 )
+, m_Append( 0 )
+, m_Close( 0 )
+, m_Disable( 0 )
+, m_Existing( 0 )
+, m_Query( 0 )
+{
+	m_OptionHandler.AddOption( 'a', "add", &m_Add );
+	m_OptionHandler.AddOption( 'A', "append", &m_Append );
+	m_OptionHandler.AddOption( 'c', "close", &m_Close );
+	m_OptionHandler.AddOption( 'd', "disable", &m_Disable );
+	m_OptionHandler.AddOption( 'e', "existing", &m_Existing );
+	m_OptionHandler.AddOption( 'd', "off", &m_Disable );
+	m_OptionHandler.AddOption( 'q', "query", &m_Query );
+}
+
+void CLog::operator()( std::vector< std::string >& argv, CommandOutput& commandOutput )
+{
+	m_Add = 0;
+	m_Append = 0;
+	m_Close = 0;
+	m_Disable = 0;
+	m_Existing = 0;
+	m_Query = 0;
+
+	m_OptionHandler.ProcessOptions( argv );
+
+	if ( m_Add )
+	{
+		if ( argv.size() < 2 )
+		{
+
+	}
+
+}
 
 bool CommandLineInterface::ParseCLog(std::vector<std::string>& argv) {
 	Options optionsData[] = {

@@ -1,113 +1,91 @@
-/////////////////////////////////////////////////////////////////
-// echo command file.
-//
-// Author: Jonathan Voigt, voigtjr@gmail.com
-// Date  : 2004
-//
-/////////////////////////////////////////////////////////////////
-
 #include <portability.h>
 
-#include "sml_Utils.h"
-#include "cli_CommandLineInterface.h"
-#include "cli_CLIError.h"
-
-#include "cli_Commands.h"
+#include "cli_echo.h"
+#include "cli_CLI.h"
 
 #include "sml_Names.h"
+#include "sml_StringOps.h"
+
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 using namespace cli;
 using namespace sml;
 
-bool CommandLineInterface::ParseEcho(std::vector<std::string>& argv) {
-	Options optionsData[] = {
-		{'n', "no-newline", 0},
-		{0, 0, 0}
-	};
-
-	bool echoNewline(true);
-
-	for (;;) {
-		if (!ProcessOptions(argv, optionsData)) return false;
-		if (m_Option == -1) break;
-
-		switch (m_Option) {
-			case 'n':
-				echoNewline = false;
-				break;
-			default:
-				return SetError(CLIError::kGetOptError);
-		}
-	}
-
-	std::vector<std::string> newArgv;
-	newArgv.push_back(argv[0]);
-	unsigned optind = m_Argument - m_NonOptionArguments;
-	for (unsigned i = optind; i < argv.size(); ++i) {
-		newArgv.push_back(argv[i]);
-	}
-	return DoEcho(newArgv, echoNewline);
+Echo::Echo() 
+: m_DontEchoNewline( 0 )
+{
+	m_OptionHandler.AddOption( 'n', "no-newline", &m_DontEchoNewline );
 }
 
-bool CommandLineInterface::DoEcho(const std::vector<std::string>& argv, bool echoNewline) {
+void Echo::operator()( std::vector< std::string >& argv, CommandOutput& commandOutput )
+{
+	m_DontEchoNewline = 0;
 
-	std::string message;
+	m_OptionHandler.ProcessOptions( argv );
 
-	// Concatenate arguments (spaces between arguments are lost unless enclosed in quotes)
-	for (unsigned i = 1; i < argv.size(); ++i) {
-		message += argv[i];
-		message += ' ';
-	}
+	// remove command name
+	argv.erase( argv.begin() );
+
+	// combine args
+	std::ostringstream output;
+	std::for_each( argv.begin(), argv.end(), BuildOutputString( output ) );
 
 	// remove trailing space
-	message = message.substr(0, message.length() - 1);
+	assert( output.str().length() );
+	std::string outputString( output.str().substr( 0, output.str().length() - 1 ) );
 
 	// Convert backslash characters
-	for(std::string::size_type pos = 0; (pos = message.find('\\', pos)) != std::string::npos; ++pos) {
-		if (message.size() <= pos + 1) break;
+	for ( std::string::size_type pos = 0; ( pos = outputString.find( '\\', pos ) ) != std::string::npos; ++pos ) {
+		if ( outputString.size() <= pos + 1 ) 
+		{
+			break;
+		}
+
 		// Found a backslash with a character after it, remove it
-		message.erase(pos, 1);
-		switch (message[pos]) {
+		outputString.erase( pos, 1 );
+		switch ( outputString.at( pos ) ) 
+		{
 			case '\\':
 				break;
 			case 'b': // backspace
-				message[pos] = '\b';
+				outputString[pos] = '\b';
 				break;
 			case 'c': // supress trailing newline
-				message.erase(pos, 1);
+				outputString.erase(pos, 1);
 				--pos;
-				echoNewline = false;
+				m_DontEchoNewline = true;
 				break;
 			case 'f': // form feed
-				message[pos] = '\f';
+				outputString[pos] = '\f';
 				break;
 			case 'n': // newline
-				message[pos] = '\n';
+				outputString[pos] = '\n';
 				break;
 			case 'r': // carriage return
-				message[pos] = '\r';
+				outputString[pos] = '\r';
 				break;
 			case 't': // horizontal tab
-				message[pos] = '\t';
+				outputString[pos] = '\t';
 				break;
 			case 'v': // vertical tab
-				message[pos] = '\v';
+				outputString[pos] = '\v';
 				break;
 			default: // error
-				return SetError(CLIError::kInvalidBackslashEscapeCharacter);
+				throw InvalidEscapedCharacterCode( outputString.at( pos ) );
 		} 
 	}
 
 	// Add newline if applicable
-	if (echoNewline) {
-		message += '\n';
+	if ( !m_DontEchoNewline ) {
+		outputString += '\n';
 	}
 
-	if (m_RawOutput) {
-		m_Result << message;
+	if ( commandOutput.GetUsingRawOutput() ) {
+		commandOutput.m_RawOutput << outputString;
 	} else {
-		AppendArgTagFast(sml_Names::kParamMessage, sml_Names::kTypeString, message.c_str());
+		commandOutput.AppendArgTagFast( sml_Names::kParamMessage, sml_Names::kTypeString, outputString.c_str() );
 	}
-	return true;
 }
-

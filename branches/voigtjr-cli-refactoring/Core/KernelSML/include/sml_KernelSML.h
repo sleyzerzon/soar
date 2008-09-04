@@ -19,7 +19,7 @@ typedef struct wme_struct wme;
 #include <map>
 #include <list>
 
-#include "cli_CommandLineInterface.h"
+#include "cli_CLI.h"
 #include "sml_SystemListener.h"
 #include "sml_RhsListener.h"
 #include "sml_AgentListener.h"
@@ -95,7 +95,7 @@ protected:
 	KernelAgentMap	m_KernelAgentMap ;
 
 	// Command line interface module
-	cli::CommandLineInterface m_CommandLineInterface ;
+	cli::CLI m_CLI ;
 
 	// A listener socket and the list of connections to the kernel
 	ConnectionManager* m_pConnectionManager ;
@@ -172,7 +172,7 @@ public:
 	* @brief	Return pointer to the class that handles the command
 	*			line parsing and execution of commands.
 	*************************************************************/
-	static cli::CommandLineInterface* GetCommandLineInterface() ;
+	static cli::CLI* GetCLI() ;
 
 	/*************************************************************
 	* @brief	The module handle (only set on Windows) can be

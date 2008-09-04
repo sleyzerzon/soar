@@ -758,6 +758,60 @@ bool KernelSML::HandleInput(AgentSML* pAgentSML, char const* /*pCommandName*/, C
 	return ok ;
 }
 
+bool ShouldEchoCommand( const cli::CLI& cli, char const* pCommandLine )
+{
+	if ( !pCommandLine )
+	{
+		return false ;
+	}
+
+	std::string command = pCommandLine ;
+
+	char const* pSpace = strchr( pCommandLine, ' ' ) ;
+	if ( pSpace )
+	{
+		// Trim everything from space on
+		command.erase( pSpace-pCommandLine, command.length() ) ;
+	}
+
+	// See if there's an entry in the echo map for this command
+	// BADBAD: This won't work for short forms of the command or aliases; but making this test
+	// happen later in the command line processing causes too many re-entrancy problem within the command line module.
+
+	return cli.ShouldEchoCommand( command ) ;
+}
+
+bool ExpandCommandToString( const char* pCommandLine, const cli::CLI& cli, std::string& expandedLine )
+{
+	assert( pCommandLine );
+
+	std::vector< std::string > argv;
+
+	// 1) Parse command
+	if ( Tokenize( std::string( pCommandLine ), argv ) < 0 )
+	{
+		return false ;
+	}
+
+	// 2) Translate aliases
+	if ( cli.Translate(argv) )
+	{
+		// 3) Reassemble the command line
+		std::ostringstream output;
+		std::for_each( argv.begin(), argv.end(), BuildOutputString( output ) );
+
+		// not worrying about trailing space
+		expandedLine.assign( output.str() );
+	}
+	else
+	{
+		// no translation happened
+		expandedLine.assign( pCommandLine );
+	}
+
+	return true ;
+}
+
 // Executes a generic command line for a specific agent
 bool KernelSML::HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse)
 {
@@ -774,7 +828,7 @@ bool KernelSML::HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName,
 
 	// If the user chooses to enable this feature, certain commands are always echoed back.
 	// This is primarily to support two users connected to and debugging the same kernel at once.
-	if (GetEchoCommands() && m_CommandLineInterface.ShouldEchoCommand(pLine))
+	if (GetEchoCommands() && ShouldEchoCommand( m_CLI, pLine ) )
 		echoResults = true ;
 
 	bool rawOutput = false;
@@ -816,7 +870,7 @@ bool KernelSML::HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName,
 		// it seems this will be correct in almost all cases, so let's start with this assumption and
 		// wait until it's proved incorrect.
 		std::string expandedLine ;
-		if (m_CommandLineInterface.ExpandCommandToString(pLine, &expandedLine))
+		if ( ExpandCommandToString(pLine, m_CLI, expandedLine) )
 			pLine = expandedLine.c_str() ;
 
 		// We'll send the command over as an XML packet, so there's some structure to work with.
@@ -881,8 +935,17 @@ bool KernelSML::HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName,
 		sml::PrintDebugFormat("Filtered line is %s\n", pFilteredLine) ;
 
 	// Make the call.
-	m_CommandLineInterface.SetRawOutput(rawOutput);
-	bool result = m_CommandLineInterface.DoCommand(pConnection, pAgentSML, pFilteredLine, echoResults, pResponse) ;
+	m_CLI.SetUsingRawOutput( rawOutput );
+	std::vector< std::string > argv;
+	int tokenizeResult = Tokenize( std::string( pFilteredLine ), argv );
+	if ( tokenizeResult < 0 )
+	{
+		std::string errorString;
+		GetTokenizeErrorString( tokenizeResult, errorString );
+		pConnection->AddErrorToSMLResponse( pResponse, errorString.c_str() );
+		return false ;
+	}
+	bool result = m_CLI.ExecuteCommand( pConnection, pAgentSML, argv, echoResults, pResponse );
 
 	if (kDebugCommandLine)
 		sml::PrintDebugFormat("Completed %s", pLine) ;
@@ -905,5 +968,11 @@ bool KernelSML::HandleExpandCommandLine(AgentSML* /*pAgentSML*/, char const* pCo
 	}
 
 	// Make the call.
-	return m_CommandLineInterface.ExpandCommand(pConnection, pLine, pResponse) ;
+	std::string expandedLine;
+	if ( ExpandCommandToString( pLine, m_CLI, expandedLine ) )
+	{
+		pConnection->AddSimpleResultToSMLResponse( pResponse, expandedLine.c_str() );
+		return true;
+	}
+	return false;
 }

@@ -14,7 +14,9 @@
 #ifndef STRING_OPS_H
 #define STRING_OPS_H
 
+#include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
 
 namespace sml {
@@ -58,12 +60,32 @@ void StringDelete(char* pStr) ;
 *		 tokens and stores them in the argumentVector string.
 *************************************************************/
 int Tokenize(std::string cmdline, std::vector<std::string>& argumentVector);
+void GetTokenizeErrorString( int errorCode, std::string& errorString );
 
 /*************************************************************
 * @brief Trim comments off of a line (for command parsing)
 * @return true on success, false if there is a new-line before a pipe quotation ends
 *************************************************************/
 bool Trim(std::string& line);
+
+// used by CLI echo and expand command line
+struct BuildOutputString 
+{
+	std::ostringstream& output;
+
+	BuildOutputString( std::ostringstream& output ) 
+		: output( output )
+    {
+    }
+
+    void operator()( const std::string& value ) 
+    {
+		output << value << " ";
+    }
+
+private:
+	BuildOutputString& operator=( const BuildOutputString& );
+};
 
 }
 

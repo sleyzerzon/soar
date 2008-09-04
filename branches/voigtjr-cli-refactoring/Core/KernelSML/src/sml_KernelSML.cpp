@@ -77,21 +77,18 @@ KernelSML* KernelSML::GetKernelSML()
 * @brief	Return pointer to the class that handles the command
 *			line parsing and execution of commands.
 *************************************************************/
-cli::CommandLineInterface* KernelSML::GetCommandLineInterface()
+cli::CLI* KernelSML::GetCLI()
 {
 	if (!s_pKernel)
 		return NULL ;
 
-	return &s_pKernel->m_CommandLineInterface ;
+	return &s_pKernel->m_CLI ;
 }
 
 KernelSML::KernelSML(unsigned short portToListenOn)
 {
 	// Initalize the event map
 	m_pEventMap = new Events() ;
-
-	// Give the command line interface a reference to the kernel interface
-	m_CommandLineInterface.SetKernel(this);
 
 	// Create the map from command name to handler function
 	BuildCommandMap() ; 
