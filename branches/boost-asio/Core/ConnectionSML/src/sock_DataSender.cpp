@@ -76,14 +76,7 @@ bool DataSender::ReceiveString(std::string* pString)
 	}
 
 	// Release our temp buffer
-	delete buffer ;  // BUGBUG: shouldn't this be delete [] buffer?
+	delete [] buffer ;
 
 	return ok ;
-}
-
-void DataSender::Close()
-{
-   soar_thread::Lock lock( &m_CloseMutex );
-
-   CloseInternal();
 }

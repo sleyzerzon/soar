@@ -42,6 +42,16 @@ void ListenerThread::Run()
 	}
 }
 
+void ListenerThread::StartAccept()
+{
+	// Create the listener
+	//sml::PrintDebugFormat("Listening on port %d", m_Port) ;
+	boost::asio::ip::tcp::socket* connectedSocket = new tcp::socket(m_acceptor.get_io_service());
+	std::string name = "port " + boost::lexical_cast<std::string>(m_acceptor.local_endpoint().port());
+	sock::Socket* pConnection = new sock::Socket(connectedSocket, name) ;
+	m_acceptor.async_accept(*connectedSocket, boost::bind(&ListenerThread::CreateConnection, this, pConnection));
+}
+
 void ListenerThread::CreateConnection(DataSender* pSender)
 {
 	sml::PrintDebugFormat("Got new connection on %s", pSender->GetName().c_str()) ;

@@ -14,8 +14,7 @@
 
 #include "thread_Thread.h"
 #include "sock_DataSender.h"
-#include "sock_ListenerSocket.h"
-#include "sock_SocketLib.h"
+#include "sock_Socket.h"
 #include "sml_Connection.h"
 
 #include <list>
@@ -46,14 +45,7 @@ public:
 	ListenerThread(ConnectionManager* parent, unsigned short port) : m_acceptor(Connection::s_IOService, tcp::endpoint(tcp::v4(), port)) 
 	{ m_Parent = parent ; m_Port = port ; }
 
-	void StartAccept()
-	{
-		// Create the listener
-		//sml::PrintDebugFormat("Listening on port %d", m_Port) ;
-		boost::asio::ip::tcp::socket* connectedSocket = new tcp::socket(m_acceptor.get_io_service());
-		sock::Socket* pConnection = new sock::Socket(connectedSocket) ;
-		m_acceptor.async_accept(*connectedSocket, boost::bind(&ListenerThread::CreateConnection, this, pConnection));
-	}
+	void StartAccept();
 } ;
 
 

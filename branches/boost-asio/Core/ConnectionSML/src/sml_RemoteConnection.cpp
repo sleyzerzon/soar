@@ -310,7 +310,7 @@ bool RemoteConnection::ReceiveMessages(bool allMessages, long secondsWait, long 
 
 		// Only check for read data after we've checked that the socket is still alive.
 		// (This is because IsReadData can't signal the difference between a dead connection and no data)
-		haveData = m_DataSender->IsReadDataAvailable(secondsWait, millisecondsWait) ;
+		haveData = m_DataSender->IsReadDataAvailable() ;
 
 		if (!haveData)
 			break ;

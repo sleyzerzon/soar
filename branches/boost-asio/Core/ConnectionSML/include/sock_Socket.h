@@ -27,55 +27,34 @@
 
 #include <string>
 
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace sock {
 
-// Useful utility functions.
-unsigned long GetLocalIP() ;
-char*		  GetLocalIPAddress() ;
-
-class ListenerSocket ;
-class ClientSocket ;
-
 class Socket : public DataSender
 {
-	// Allow these classes access to our constructor
-	friend class ListenerSocket ;
-	friend class ClientSocket ;
-
 protected:
 	boost::asio::ip::tcp::socket* m_pSocket;
 
-	// Controls whether we dump out the messages we're sending and receiving.
-	bool m_bTraceCommunications ;
-
 	// These objects are created through the ListenerSocket or ClientSocket classes.
 public:
-	Socket();
-	Socket(boost::asio::ip::tcp::socket* socket);
+	Socket() : m_pSocket(0) { m_bTraceCommunications = false; }
+	Socket(boost::asio::ip::tcp::socket* socket) : m_pSocket(socket)  { m_bTraceCommunications = false; }
+	Socket(boost::asio::ip::tcp::socket* socket, std::string name) : m_pSocket(socket)  { m_bTraceCommunications = false; m_name = name; }
 
 public:
 	// Destructor closes the socket
-	virtual		~Socket();
+	virtual		~Socket() { Close();	delete m_pSocket; }
 
 	// Note: When we try to read/write to the socket next we may
 	// find this is no longer true--it's just the last state we know about.
 	bool		IsAlive()					{ return m_pSocket->is_open() ; }
 
-	// Returns handle for socket
-	//SOCKET		GetSocketHandle()			{ return m_hSocket ; }
-
 	// Check if data is waiting to be read
 	// Returns true if socket is closed--but then receiveMsg will know it's closed.
 	// The timeout for waiting for data is secondsWait + millisecondsWait, where millisecondsWait < 1000
-	bool		IsReadDataAvailable(long secondsWait = 0, long millisecondsWait = 0) 
-	{
-		return m_pSocket->available() > 0;
-	}
+	bool		IsReadDataAvailable() {	return m_pSocket->available() > 0; }
 
 public:
 
@@ -94,12 +73,6 @@ public:
 	// Print out debug information about the messages we are sending and receiving.
 	// NOTE: We still print out information about start up/shut down, errors etc. without this flag being true.
 	void		SetTraceCommunications(bool state) { m_bTraceCommunications = state ; }
-
-	// Send a string of characters.  Outgoing format will be "<4-byte length>"+string data
-	bool		SendString(char const* pString) ;
-
-	// Receive a string of characters.  Incoming format on socket should be "<4-byte length>"+string data
-	bool		ReceiveString(std::string* pString) ;
 
 protected:
 	// Lower level buffer send and receive calls.

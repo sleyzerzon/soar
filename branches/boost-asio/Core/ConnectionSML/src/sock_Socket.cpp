@@ -35,28 +35,6 @@
 
 using namespace sock ;
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-Socket::Socket()
-{
-	m_pSocket = 0;
-	m_bTraceCommunications = false ;
-}
-
-Socket::Socket(boost::asio::ip::tcp::socket* socket)
-{
-	m_pSocket = socket ;
-	m_bTraceCommunications = false ;
-}
-
-Socket::~Socket()
-{
-	Close();
-	delete m_pSocket;
-}
-
 const char* kLocalHost = "127.0.0.1" ; // Special IP address meaning "this machine"
 
 /////////////////////////////////////////////////////////////////////
@@ -73,14 +51,16 @@ bool Socket::ConnectToServer(char const* pNetAddress, unsigned short port)
 {
 	using namespace boost::asio;
 
-	CTDEBUG_ENTER_METHOD("ClientSocket::ConnectToServer");
+	CTDEBUG_ENTER_METHOD("Socket::ConnectToServer");
 
-	std::string address;
-	ip::address a;
-	if(pNetAddress) a = ip::address::from_string(pNetAddress);
-	else a = ip::address::from_string(kLocalHost);
-	//m_pSocket = new ip::tcp::socket(ioservice);
-	m_pSocket->connect( ip::tcp::endpoint(a, port) );
+	if (pNetAddress == NULL) pNetAddress = kLocalHost ;
+
+	// set the name of the datasender
+	std::stringstream name;
+	name << "port " << port;
+	m_name = name.str();
+
+	m_pSocket->connect( ip::tcp::endpoint(ip::address::from_string(pNetAddress), port) );
 
 	return true ;
 }

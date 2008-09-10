@@ -37,11 +37,11 @@ protected:
 	bool m_bTraceCommunications ;
 
 	// The name of this datasender
-	std::string name;
+	std::string m_name;
 
 	// These objects are created through the ListenerDataSender or ClientDataSender classes.
 protected:
-	DataSender() {name="NONAME";};
+	DataSender() {m_name="NONAME";};
 
 public:
 	// Destructor closes the socket
@@ -54,13 +54,13 @@ public:
 	// Check if data is waiting to be read
 	// Returns true if data sender is closed--but then receiveMsg will know it's closed.
 	// The timeout for waiting for data is secondsWait + millisecondsWait, where millisecondsWait < 1000
-	virtual bool		IsReadDataAvailable(long secondsWait = 0, long millisecondsWait = 0)=0;
+	virtual bool		IsReadDataAvailable()=0;
 
 	// Close down our side of the data sender, locks and calls CloseInternal
-	void		Close();
+	void		Close() { soar_thread::Lock lock( &m_CloseMutex ); CloseInternal(); }
 
 	// Get the name of this datasender
-	virtual std::string	GetName() { return name; }
+	virtual std::string	GetName() { return m_name; }
 		
 public:
 	// Print out debug information about the messages we are sending and receiving.

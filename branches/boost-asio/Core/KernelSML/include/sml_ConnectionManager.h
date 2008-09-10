@@ -15,7 +15,6 @@
 
 #include "thread_Thread.h"
 #include "thread_Lock.h"
-#include "sock_SocketLib.h"
 #include "sml_Connection.h"
 
 #include <list>
@@ -30,10 +29,6 @@ class ReceiverThread ;
 class ConnectionManager
 {
 protected:
-	// Initialize the socket library when we create this manager
-	// which we do by creating a socket lib object.
-	sock::SocketLib				m_SocketLib ;
-
 	// The listener socket, wrapped in a thread
 	ListenerThread*				m_ListenerThread ;
 
