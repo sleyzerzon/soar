@@ -39,9 +39,18 @@ protected:
 
 	// These objects are created through the ListenerSocket or ClientSocket classes.
 public:
-	Socket() : m_pSocket(0) { m_bTraceCommunications = false; }
-	Socket(boost::asio::ip::tcp::socket* socket) : m_pSocket(socket)  { m_bTraceCommunications = false; }
-	Socket(boost::asio::ip::tcp::socket* socket, std::string name) : m_pSocket(socket)  { m_bTraceCommunications = false; m_name = name; }
+	Socket() 
+		: m_pSocket( 0 ) 
+	{}
+
+	Socket( boost::asio::ip::tcp::socket* socket ) 
+		: m_pSocket( socket ) 
+	{}
+
+	Socket( boost::asio::ip::tcp::socket* socket, const std::string& name ) 
+		: DataSender( name )
+		, m_pSocket( socket )
+	{}
 
 public:
 	// Destructor closes the socket

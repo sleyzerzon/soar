@@ -40,13 +40,13 @@
 #include "thread_Lock.h"
 
 
-#include <boost/asio.hpp>
-
 // These last ones are just for convenience, they could come out
 #include "ElementXMLHandle.h"
 #include "ElementXML.h"
 #include "sml_AnalyzeXML.h"
 #include "sml_Names.h"
+
+#include <boost/asio.hpp>
 
 
 namespace sock
@@ -197,10 +197,6 @@ protected:
 	double							m_OutgoingTime ;
 
 public:
-	// boost::asio support
-	static boost::asio::io_service s_IOService;
-
-public:
 	Connection() ;
 	virtual ~Connection() ;
 
@@ -239,7 +235,7 @@ public:
 	*
 	* @returns A RemoteConnection instance.
 	*************************************************************/
-	static Connection* CreateRemoteConnection(bool sharedFileSystem, char const* pIPaddress, unsigned short port = kDefaultSMLPort, ErrorCode* pError = NULL) ;
+	static Connection* CreateRemoteConnection(boost::asio::io_service& ioService, bool sharedFileSystem, char const* pIPaddress, unsigned short port = kDefaultSMLPort, ErrorCode* pError = NULL) ;
 
 	/*************************************************************
 	* @brief Create a new connection object wrapping a socket.

@@ -61,7 +61,7 @@ public:
 	// So generally it takes the form "while (!m_QuitNow && !done) { doWork() ; SleepThread() ;  } "
 	virtual void Run() = 0 ;
 
-	// Client's should call this (consider it to be private, but we can't actually make it so)
+	// Clients should not call this (consider it to be private, but we can't actually make it so)
 	// If you wish to stop the thread, call "Stop" instead (which asks it to stop).
 	void SetStopped(bool state) { m_Stopped = state ; }
 } ;

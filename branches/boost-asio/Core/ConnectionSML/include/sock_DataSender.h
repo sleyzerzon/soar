@@ -33,15 +33,23 @@ class DataSender
 
 protected:
 
-	// Controls whether we dump out the messages we're sending and receiving.
-	bool m_bTraceCommunications ;
-
 	// The name of this datasender
 	std::string m_name;
 
+	// Controls whether we dump out the messages we're sending and receiving.
+	bool m_bTraceCommunications ;
+
 	// These objects are created through the ListenerDataSender or ClientDataSender classes.
 protected:
-	DataSender() {m_name="NONAME";};
+	DataSender() 
+		: m_name( "NONAME" )
+		, m_bTraceCommunications( false )
+	{}
+
+	DataSender( const std::string& name ) 
+		: m_name( name )
+		, m_bTraceCommunications( false )
+	{}
 
 public:
 	// Destructor closes the socket

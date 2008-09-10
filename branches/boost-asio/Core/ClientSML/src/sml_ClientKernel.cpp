@@ -21,12 +21,12 @@
 #include "sml_Events.h"
 #include "sml_ClientAnalyzedXML.h"
 
-#include "sock_SocketLib.h"
 #include "thread_Thread.h"	// To get to sleep
 #include "EmbeddedSMLInterface.h" // for static reference
 
 #include "sml_EmbeddedConnection.h"	// For access to direct methods
 #include "sml_ClientDirect.h"
+#include "sml_IOServiceThread.h"
 
 #include <iostream>     
 #include <sstream>     
@@ -39,7 +39,7 @@ using namespace soarxml;
 
 char const* const Kernel::kDefaultLibraryName = "SoarKernelSML" ;
 
-Kernel::Kernel(Connection* pConnection)
+Kernel::Kernel(Connection* pConnection, boost::asio::io_service* pIOService)
 {
 	m_Connection     = pConnection ;
 	m_TimeTagCounter = 0 ;
@@ -70,6 +70,13 @@ Kernel::Kernel(Connection* pConnection)
 		// for those.
 		if (pConnection->IsAsynchronous())
 			m_pEventThread->Start() ;
+	}
+
+	if ( pIOService )
+	{
+		// start the io service thread to pump tcp messages
+		m_pIOServiceThread = new IOServiceThread( pIOService ) ;
+		m_pIOServiceThread->Start() ;
 	}
 
 /* voigtjr, rmarinie
@@ -210,6 +217,10 @@ Kernel::~Kernel(void)
 	if (m_Connection)
 		m_Connection->CloseConnection() ;
 
+	// this should already have exited
+	if (m_pIOServiceThread)
+		m_pIOServiceThread->Stop(true) ;
+
 	// Must stop the event thread before deleting the connection
 	// as it has a pointer to the connection.
 	if (m_pEventThread)
@@ -223,6 +234,7 @@ Kernel::~Kernel(void)
 	}
 	m_ConnectionInfoList.clear() ;
 
+	delete m_pIOServiceThread;
 	delete m_pEventThread ;
 
 	delete m_Connection ;
@@ -755,13 +767,16 @@ Kernel* Kernel::CreateRemoteConnection(bool sharedFileSystem, char const* pIPadd
 
 	// Initialize the socket library before attempting to create a connection
 	//sock::SocketLib* pLib = new sock::SocketLib() ;
+	boost::asio::io_service* pIOService = new boost::asio::io_service();
+	// this thing gets deleted in IOServiceThread
+	assert( pIOService );
 
 	// Connect to the remote socket
-	Connection* pConnection = Connection::CreateRemoteConnection(sharedFileSystem, pIPaddress, (unsigned short)port, &errorCode) ;
+	Connection* pConnection = Connection::CreateRemoteConnection(*pIOService, sharedFileSystem, pIPaddress, (unsigned short)port, &errorCode) ;
 
 	// Even if pConnection is NULL, we still build a kernel object, so we have
 	// a clean way to pass the error code back to the caller.
-	Kernel* pKernel = new Kernel(pConnection) ;
+	Kernel* pKernel = new Kernel(pConnection, pIOService) ;
 	//pKernel->SetSocketLib(pLib) ;
 	pKernel->SetError(errorCode) ;
 

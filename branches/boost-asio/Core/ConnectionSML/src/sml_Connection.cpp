@@ -45,8 +45,6 @@
 using namespace sml ;
 using namespace soarxml;
 
-boost::asio::io_service Connection::s_IOService;
-
 /*************************************************************
 * @brief Constructor
 *************************************************************/
@@ -165,7 +163,7 @@ Connection* Connection::CreateEmbeddedConnection(char const* pLibraryName, bool 
 *
 * @returns A RemoteConnection instance.
 *************************************************************/
-Connection* Connection::CreateRemoteConnection(bool sharedFileSystem, char const* pIPaddress, unsigned short port, ErrorCode* pError)
+Connection* Connection::CreateRemoteConnection(boost::asio::io_service& ioService, bool sharedFileSystem, char const* pIPaddress, unsigned short port, ErrorCode* pError)
 {
 	RemoteConnection* pConnection;
 
@@ -190,7 +188,7 @@ Connection* Connection::CreateRemoteConnection(bool sharedFileSystem, char const
 	} else
 #endif
 	{
-		boost::asio::ip::tcp::socket* socket = new boost::asio::ip::tcp::socket(s_IOService);
+		boost::asio::ip::tcp::socket* socket = new boost::asio::ip::tcp::socket(ioService);
 		sock::Socket* pSocket = new sock::Socket(socket) ;
 		bool ok = pSocket->ConnectToServer(pIPaddress, port) ;
 

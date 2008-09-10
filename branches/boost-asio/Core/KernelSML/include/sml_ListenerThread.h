@@ -33,8 +33,7 @@ class ConnectionManager ;
 class ListenerThread : public soar_thread::Thread
 {
 protected:
-	unsigned short				m_Port ;
-	ConnectionManager*			m_Parent ;
+	// boost::asio support
 	tcp::acceptor m_acceptor;
 
 	void Run() ;
@@ -42,10 +41,17 @@ protected:
 	void CreateConnection(sock::DataSender* pSender);
 
 public:
-	ListenerThread(ConnectionManager* parent, unsigned short port) : m_acceptor(Connection::s_IOService, tcp::endpoint(tcp::v4(), port)) 
-	{ m_Parent = parent ; m_Port = port ; }
+	ListenerThread( boost::asio::io_service& ioservice, unsigned short port) 
+		: m_acceptor( ioservice, tcp::endpoint( tcp::v4(), port ) ) 
+	{}
+
+	~ListenerThread()
+	{
+		m_acceptor.get_io_service().stop();
+	}
 
 	void StartAccept();
+	void StopAccept() ;
 } ;
 
 

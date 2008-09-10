@@ -73,8 +73,6 @@ void EventThread::Run()
 */
 	while (!m_QuitNow && !m_pConnection->IsClosed())
 	{
-		Connection::s_IOService.poll();
-
 		// Our purpose is to check for incoming messages when the
 		// client itself is sleeping for some reason.  It makes
 		// the client logic simpler.

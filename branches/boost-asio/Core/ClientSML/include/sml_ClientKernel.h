@@ -19,6 +19,9 @@
 #include "sml_ClientEvents.h"
 #include "sml_ListMap.h"
 
+#include <boost/asio.hpp>
+
+
 // Forward declare so clients can use this
 struct ElementXML_InterfaceStruct;
 typedef ElementXML_InterfaceStruct* ElementXML_Handle ;
@@ -39,6 +42,7 @@ namespace sml {
 class Agent ;
 class Connection ;
 class EventThread ;
+class IOServiceThread;
 class Events ;
 class AnalyzeXML ;
 class ClientAnalyzedXML ;
@@ -216,9 +220,10 @@ protected:
 	// It ensures the client stays "alive" and is optional (there are other ways for clients to keep themselves
 	// responsive).
 	EventThread*		m_pEventThread ;
+	IOServiceThread*	m_pIOServiceThread;
 
 	// To create a kernel object, use one of the static methods, e.g. Kernel::CreateEmbeddedConnection().
-	Kernel(Connection* pConnection);
+	Kernel(Connection* pConnection, boost::asio::io_service* pIOService = 0);
 
 	void InitEvents() ;
 

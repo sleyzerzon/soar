@@ -937,6 +937,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\sml_IOServiceThread.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\sml_ListMap.h"
 				>
 			</File>

@@ -29,24 +29,20 @@ extern soarxml::ElementXML* ReceivedCall(Connection* pConnection, soarxml::Eleme
 void ListenerThread::Run()
 {
 	StartAccept();
+	
+	m_acceptor.get_io_service().run();
+}
 
-	while (!m_QuitNow)
-	{
-		//sml::PrintDebug("Check for incoming connection") ;
-		Connection::s_IOService.poll();
-
-		// Sleep for a little before checking for a new connection
-		// New connections will come in very infrequently so this doesn't
-		// have to be very rapid.
-		sml::Sleep(0, 50) ;
-	}
+void ListenerThread::StopAccept() 
+{
+	m_acceptor.close();
 }
 
 void ListenerThread::StartAccept()
 {
 	// Create the listener
 	//sml::PrintDebugFormat("Listening on port %d", m_Port) ;
-	boost::asio::ip::tcp::socket* connectedSocket = new tcp::socket(m_acceptor.get_io_service());
+	boost::asio::ip::tcp::socket* connectedSocket = new tcp::socket( m_acceptor.get_io_service() );
 	std::string name = "port " + boost::lexical_cast<std::string>(m_acceptor.local_endpoint().port());
 	sock::Socket* pConnection = new sock::Socket(connectedSocket, name) ;
 	m_acceptor.async_accept(*connectedSocket, boost::bind(&ListenerThread::CreateConnection, this, pConnection));
@@ -55,6 +51,8 @@ void ListenerThread::StartAccept()
 void ListenerThread::CreateConnection(DataSender* pSender)
 {
 	sml::PrintDebugFormat("Got new connection on %s", pSender->GetName().c_str()) ;
+
+	sock::Socket* pConnectionUpcast = dynamic_cast< sock::Socket* >( pSender );
 
 	// Create a new connection object for this socket
 	Connection* pConnection = Connection::CreateRemoteConnection(pSender) ;

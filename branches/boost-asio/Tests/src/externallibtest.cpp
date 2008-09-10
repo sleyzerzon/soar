@@ -6,7 +6,7 @@ class ExternalLibTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( ExternalLibTest );	
 
-	CPPUNIT_TEST( testExternalLib );
+	//CPPUNIT_TEST( testExternalLib );
 
 	CPPUNIT_TEST_SUITE_END();
 

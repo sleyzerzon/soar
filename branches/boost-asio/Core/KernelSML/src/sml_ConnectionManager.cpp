@@ -31,7 +31,7 @@ ConnectionManager::ConnectionManager(unsigned short port)
 	m_ListenerThread = NULL ;
 	if (port != 0)
 	{
-		m_ListenerThread = new ListenerThread(this, port) ;
+		m_ListenerThread = new ListenerThread(m_IOService, port) ;
 		m_ListenerThread->Start() ;
 	}
 
@@ -89,26 +89,13 @@ void ConnectionManager::Shutdown()
 	// Stop the thread (and wait until it has stopped)
 	if (m_ListenerThread)
 	{
-		m_ListenerThread->Stop(true) ;
-
-		// Remove the listener
-		delete m_ListenerThread ;
-		m_ListenerThread = NULL ;
+		// stop listening for new connections
+		m_ListenerThread->StopAccept() ;
+	
+		//sml::PrintDebug("Listener stopped") ;
 	}
 
-//	sml::PrintDebug("Listener stopped") ;
-
-	// Stop the receiver thread (and wait until is has stopped)
-	if (m_ReceiverThread)
-	{
-		m_ReceiverThread->Stop(true) ;
-
-	//	sml::PrintDebug("Receiver stopped") ;
-
-		// Remove the thread
-		delete m_ReceiverThread ;
-		m_ReceiverThread = NULL ;
-	}
+	// stop all current connections
 
 	// Serialize thread access to the connections list
 	soar_thread::Lock lock(&m_ConnectionsMutex) ;
@@ -138,6 +125,25 @@ void ConnectionManager::Shutdown()
 		delete pConnection ;
 	}
 	m_ClosedConnections.clear() ;
+
+	if (m_ListenerThread)
+	{
+		// Remove the listener
+		delete m_ListenerThread ;
+		m_ListenerThread = NULL ;
+	}
+
+	// Stop the receiver thread (and wait until is has stopped)
+	if (m_ReceiverThread)
+	{
+		m_ReceiverThread->Stop(true) ;
+
+	//	sml::PrintDebug("Receiver stopped") ;
+
+		// Remove the thread
+		delete m_ReceiverThread ;
+		m_ReceiverThread = NULL ;
+	}
 
 //	sml::PrintDebug("Completed shutdown") ;
 }

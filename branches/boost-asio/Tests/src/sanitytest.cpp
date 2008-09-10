@@ -31,7 +31,7 @@ class SanityTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( SanityTest );	// The name of this class
 
-	CPPUNIT_TEST( testSanity );
+	//CPPUNIT_TEST( testSanity );
 
 	CPPUNIT_TEST_SUITE_END();
 
