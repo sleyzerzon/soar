@@ -94,7 +94,7 @@ void ConnectionManager::Shutdown()
 		// connections (below) and a new one comes in because the acceptor hasn't actually stopped yet
 		m_ListenerThread->StopAccept(true) ;
 	
-		sml::PrintDebug("Listener acceptor stopped") ;
+		//sml::PrintDebug("Listener acceptor stopped") ;
 	}
 
 	// stop all current connections
@@ -133,7 +133,7 @@ void ConnectionManager::Shutdown()
 	{
 		m_ReceiverThread->Stop(true) ;
 
-		sml::PrintDebug("Receiver stopped") ;
+		//sml::PrintDebug("Receiver stopped") ;
 
 		// Remove the thread
 		delete m_ReceiverThread ;
@@ -146,7 +146,7 @@ void ConnectionManager::Shutdown()
 		m_ListenerThread->RequestStopIOService();
 		// Stop the thread (and wait until it has stopped -- it will stop when the ioservice has stopped)
 		m_ListenerThread->Stop(true);
-		sml::PrintDebug("Listener stopped") ;
+		//sml::PrintDebug("Listener stopped") ;
 		// Remove the listener
 		delete m_ListenerThread ;
 		m_ListenerThread = NULL ;
