@@ -86,13 +86,15 @@ void ConnectionManager::Shutdown()
 {
 //	sml::PrintDebug("Shutting down connection manager") ;
 
-	// Stop the thread (and wait until it has stopped)
+	
 	if (m_ListenerThread)
 	{
-		// stop listening for new connections
-		m_ListenerThread->StopAccept() ;
+		// stop listening for new connections 
+		// need to wait for completion so there isn't a race where we're in the middle of closing
+		// connections (below) and a new one comes in because the acceptor hasn't actually stopped yet
+		m_ListenerThread->StopAccept(true) ;
 	
-		//sml::PrintDebug("Listener stopped") ;
+		sml::PrintDebug("Listener acceptor stopped") ;
 	}
 
 	// stop all current connections
@@ -126,8 +128,13 @@ void ConnectionManager::Shutdown()
 	}
 	m_ClosedConnections.clear() ;
 
+	// we have to wait until after the connections have been closed before we stop the ioservice
 	if (m_ListenerThread)
 	{
+		m_ListenerThread->RequestStopIOService();
+		// Stop the thread (and wait until it has stopped -- it will stop when the ioservice has stopped)
+		m_ListenerThread->Stop(true);
+		sml::PrintDebug("Listener stopped") ;
 		// Remove the listener
 		delete m_ListenerThread ;
 		m_ListenerThread = NULL ;
@@ -138,7 +145,7 @@ void ConnectionManager::Shutdown()
 	{
 		m_ReceiverThread->Stop(true) ;
 
-	//	sml::PrintDebug("Receiver stopped") ;
+		sml::PrintDebug("Receiver stopped") ;
 
 		// Remove the thread
 		delete m_ReceiverThread ;

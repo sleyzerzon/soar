@@ -20,6 +20,8 @@
 #include <time.h>	// To get clock
 #include <stdio.h> // To concat file name for socket file deletion
 
+#include <boost/bind.hpp>
+
 using namespace sml ;
 using namespace sock ;
 
@@ -29,19 +31,38 @@ extern soarxml::ElementXML* ReceivedCall(Connection* pConnection, soarxml::Eleme
 void ListenerThread::Run()
 {
 	StartAccept();
-	
 	m_acceptor.get_io_service().run();
 }
 
-void ListenerThread::StopAccept() 
+void ListenerThread::StopAccept(bool wait) 
 {
+	// post a message so this runs on the ListenerThread
 	m_acceptor.get_io_service().post(boost::bind(&ListenerThread::HandleStopAccept, this));
-	m_acceptor.get_io_service().run();
+
+	if(wait)
+	{
+		while(m_acceptor.is_open())
+		{
+			sml::Sleep(0, 10);
+		}
+	}
 }
 
 void ListenerThread::HandleStopAccept()
 {
+	m_stoppingAcceptor = true;
 	m_acceptor.close();
+}
+
+void ListenerThread::RequestStopIOService() 
+{
+	// post a message so this runs on the ListenerThread
+	m_acceptor.get_io_service().post(boost::bind(&ListenerThread::HandleStopIOService, this));
+}
+
+void ListenerThread::HandleStopIOService()
+{
+	m_acceptor.get_io_service().stop();
 }
 
 void ListenerThread::StartAccept()
@@ -49,16 +70,23 @@ void ListenerThread::StartAccept()
 	// Create the listener
 	//sml::PrintDebugFormat("Listening on port %d", m_Port) ;
 	boost::asio::ip::tcp::socket* connectedSocket = new tcp::socket( m_acceptor.get_io_service() );
-	std::string name = "port " + boost::lexical_cast<std::string>(m_acceptor.local_endpoint().port());
+	std::string name = "port " + m_port;
 	sock::Socket* pConnection = new sock::Socket(connectedSocket, name) ;
-	m_acceptor.async_accept(*connectedSocket, boost::bind(&ListenerThread::CreateConnection, this, pConnection));
+	m_acceptor.async_accept(*connectedSocket, boost::bind(&ListenerThread::CreateConnection, this, pConnection, boost::asio::placeholders::error));
 }
 
-void ListenerThread::CreateConnection(DataSender* pSender)
+void ListenerThread::CreateConnection(DataSender* pSender, const boost::system::error_code& error)
 {
-	sml::PrintDebugFormat("Got new connection on %s", pSender->GetName().c_str()) ;
-
-	//sock::Socket* pConnectionUpcast = dynamic_cast< sock::Socket* >( pSender );
+	if(error)
+	{
+		// if this is just the abort error from interrupting the async_accept, then return
+		if(m_stoppingAcceptor && error == boost::asio::error::operation_aborted) return;
+		else
+		{
+			std::cerr << "\nAcceptor error: " << error.message() << std::endl;
+			return;
+		}
+	}
 
 	// Create a new connection object for this socket
 	Connection* pConnection = Connection::CreateRemoteConnection(pSender) ;

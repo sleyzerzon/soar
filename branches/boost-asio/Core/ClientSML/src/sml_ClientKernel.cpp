@@ -48,6 +48,7 @@ Kernel::Kernel(Connection* pConnection, boost::asio::io_service* pIOService)
 	m_LastError		 = Error::kNoError ;
 	m_CallbackIDCounter = 0 ;
 	m_pEventThread	= 0 ;
+	m_pIOServiceThread	= 0 ;
 	m_pEventMap		= new Events() ;
 	m_bTracingCommunications = false ;
 	m_bShutdown		= false ;
