@@ -26,9 +26,6 @@ using namespace boost::asio::ip;
 
 namespace sml {
 
-// Forward declarations
-class ConnectionManager ;
-
 // A listener socket wrapped in a thread
 class ListenerThread : public soar_thread::Thread
 {
@@ -39,11 +36,14 @@ protected:
 	void Run() ;
 
 	void CreateConnection(sock::DataSender* pSender);
+	void HandleStopAccept();
 
 public:
 	ListenerThread( boost::asio::io_service& ioservice, unsigned short port) 
 		: m_acceptor( ioservice, tcp::endpoint( tcp::v4(), port ) ) 
-	{}
+	{
+		m_acceptor.set_option(tcp::acceptor::reuse_address(true));
+	}
 
 	~ListenerThread()
 	{

@@ -35,6 +35,12 @@ void ListenerThread::Run()
 
 void ListenerThread::StopAccept() 
 {
+	m_acceptor.get_io_service().post(boost::bind(&ListenerThread::HandleStopAccept, this));
+	m_acceptor.get_io_service().run();
+}
+
+void ListenerThread::HandleStopAccept()
+{
 	m_acceptor.close();
 }
 
@@ -52,7 +58,7 @@ void ListenerThread::CreateConnection(DataSender* pSender)
 {
 	sml::PrintDebugFormat("Got new connection on %s", pSender->GetName().c_str()) ;
 
-	sock::Socket* pConnectionUpcast = dynamic_cast< sock::Socket* >( pSender );
+	//sock::Socket* pConnectionUpcast = dynamic_cast< sock::Socket* >( pSender );
 
 	// Create a new connection object for this socket
 	Connection* pConnection = Connection::CreateRemoteConnection(pSender) ;
