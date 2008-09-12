@@ -184,6 +184,13 @@ void Kernel::Shutdown()
 	// disconnecting a remote connection.
 	if (!GetConnection() || GetConnection()->IsRemoteConnection())
 	{
+		// Must stop the event thread before deleting the connection
+		// as it has a pointer to the connection.
+		// Must stop the event thread before even closing the connection
+		// as it may try to check a closed connection (race condition)
+		if (m_pEventThread)
+			m_pEventThread->Stop(true) ;
+
 		if (GetConnection())
 			GetConnection()->CloseConnection() ;
 
@@ -214,18 +221,23 @@ Kernel::~Kernel(void)
 	// during clean up.
 	m_AgentMap.clear() ;
 
+	// Must stop the event thread before deleting the connection
+	// as it has a pointer to the connection.
+	// Must stop the event thread before even closing the connection
+	// as it may try to check a closed connection (race condition)
+	// NOTE: for remote connections, this was already done in Shutdown()
+	if (m_pEventThread)
+		m_pEventThread->Stop(true) ;
+
 	// We also need to close the connection
 	if (m_Connection)
 		m_Connection->CloseConnection() ;
 
 	// this should already have exited
-	if (m_pIOServiceThread)
-		m_pIOServiceThread->Stop(true) ;
+	//if (m_pIOServiceThread)
+	//	m_pIOServiceThread->Stop(true) ;
 
-	// Must stop the event thread before deleting the connection
-	// as it has a pointer to the connection.
-	if (m_pEventThread)
-		m_pEventThread->Stop(true) ;
+	
 
 	// Clean up any connection info we have stored
 	for (ConnectionListIter iter = m_ConnectionInfoList.begin() ; iter != m_ConnectionInfoList.end() ; iter++)
@@ -235,10 +247,12 @@ Kernel::~Kernel(void)
 	}
 	m_ConnectionInfoList.clear() ;
 
-	delete m_pIOServiceThread;
-	delete m_pEventThread ;
-
-	delete m_Connection ;
+	if (m_pEventThread)
+		delete m_pEventThread ;
+	if (m_Connection)
+		delete m_Connection ;
+	if (m_pIOServiceThread)
+		delete m_pIOServiceThread;  // this needs to happen after m_Connection is deleted or else the datasender (e.g., socket) won't get cleaned up properly
 
 	// Deleting this shuts down the socket library if we were using it.
 	//delete m_SocketLibrary ;

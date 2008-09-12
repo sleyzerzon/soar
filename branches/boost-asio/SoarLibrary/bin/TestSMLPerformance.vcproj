@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Core\ClientSML\include;..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include;..\..\Core\shared"
+				AdditionalIncludeDirectories="..\..\Core\ClientSML\include;..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include;..\..\Core\shared;C:\boost_1_36_0"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -63,6 +63,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)\SoarLibrary\bin\$(ProjectName).exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="c:\boost_1_36_0\lib"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 			/>
@@ -118,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\Core\ClientSML\include;..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include;..\..\Core\shared"
+				AdditionalIncludeDirectories="..\..\Core\ClientSML\include;..\..\Core\ConnectionSML\include;..\..\Core\ElementXML\include;..\..\Core\shared;C:\boost_1_36_0"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
@@ -138,6 +139,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)\SoarLibrary\bin\$(ProjectName).exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="c:\boost_1_36_0\lib"
 				GenerateDebugInformation="true"
 			/>
 			<Tool

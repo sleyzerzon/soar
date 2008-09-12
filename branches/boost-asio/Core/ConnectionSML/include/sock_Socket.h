@@ -87,26 +87,40 @@ protected:
 	// Lower level buffer send and receive calls.
 	bool		SendBuffer(char const* pSendBuffer, size_t bufferSize)
 	{
+		if(!m_pSocket->is_open()) // note: this does not guarantee that the socket won't close after this but before we try to use it
+		{
+			if (m_bTraceCommunications) sml::PrintDebug("Error: Can't send because this socket is closed") ;
+			return false;
+		}
+
 		try
 		{
 			boost::asio::write(*m_pSocket, boost::asio::buffer(pSendBuffer, bufferSize)); 
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << e.what() << std::endl;
+			std::cerr << "\nSocket::SendBuffer: is_open = " << m_pSocket->is_open() << std::endl;
+			std::cerr << "\nSocket::SendBuffer: " << e.what() << std::endl;
 			return false;
 		}
 		return true;
 	}
 	bool		ReceiveBuffer(char* pRecvBuffer, size_t bufferSize) 
 	{
+		if(!m_pSocket->is_open()) // note: this does not guarantee that the socket won't close after this but before we try to use it
+		{
+			if (m_bTraceCommunications) sml::PrintDebug("Error: Can't check for read data because this socket is closed") ;
+			return false;
+		}
+
 		try
 		{
 			boost::asio::read(*m_pSocket, boost::asio::buffer(pRecvBuffer, bufferSize));
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << e.what() << std::endl;
+			std::cerr << "\nSocket::ReceiveBuffer: is_open = " << m_pSocket->is_open() << std::endl;
+			std::cerr << "\nSocket::ReceiveBuffer: " << e.what() << std::endl;
 			return false;
 		}
 		return true;

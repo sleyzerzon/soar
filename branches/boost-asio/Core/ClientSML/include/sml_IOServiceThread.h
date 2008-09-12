@@ -24,6 +24,11 @@ protected:
 		m_pIOService->run();
 	}
 
+	void HandleStopIOService()
+	{
+		m_pIOService->stop();
+	}
+
 	boost::asio::io_service* m_pIOService;
 
 public:
@@ -35,7 +40,9 @@ public:
 
 	~IOServiceThread()
 	{
-		m_pIOService->stop();
+		// post a message so this runs on this thread
+		m_pIOService->post(boost::bind(&IOServiceThread::HandleStopIOService, this));
+		this->Stop(true); // wait for ioservice to stop
 		delete m_pIOService;
 		m_pIOService = 0;
 	}

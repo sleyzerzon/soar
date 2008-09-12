@@ -13,10 +13,10 @@ class ElementXMLTest : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( ElementXMLTest );
 
-	//CPPUNIT_TEST( testSimple );
-	//CPPUNIT_TEST( testChildren );
-	//CPPUNIT_TEST( testParse );
-	//CPPUNIT_TEST( testBinaryData );
+	CPPUNIT_TEST( testSimple );
+	CPPUNIT_TEST( testChildren );
+	CPPUNIT_TEST( testParse );
+	CPPUNIT_TEST( testBinaryData );
 
 	CPPUNIT_TEST_SUITE_END();
 
