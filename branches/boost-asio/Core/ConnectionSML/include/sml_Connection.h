@@ -46,8 +46,13 @@
 #include "sml_AnalyzeXML.h"
 #include "sml_Names.h"
 
-#include <boost/asio.hpp>
-
+namespace boost
+{
+	namespace asio
+	{
+		class io_service;
+	}
+}
 
 namespace sock
 {

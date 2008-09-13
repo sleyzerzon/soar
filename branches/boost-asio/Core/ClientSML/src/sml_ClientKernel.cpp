@@ -44,7 +44,6 @@ Kernel::Kernel(Connection* pConnection, boost::asio::io_service* pIOService)
 	m_Connection     = pConnection ;
 	m_TimeTagCounter = 0 ;
 	m_IdCounter      = 0 ;
-	m_SocketLibrary  = NULL ;
 	m_LastError		 = Error::kNoError ;
 	m_CallbackIDCounter = 0 ;
 	m_pEventThread	= 0 ;

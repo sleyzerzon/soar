@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Tests\include;../../Core/shared;../../Core/SoarKernel/include;../../Core/KernelSML/include;../../Core/ElementXML/include;../../Core/ConnectionSML/include;../../Core/ClientSML/include;../../Core/CLI/include;C:\boost_1_36_0"
+				AdditionalIncludeDirectories="..\..\Tests\include;../../Core/shared;../../Core/SoarKernel/include;../../Core/KernelSML/include;../../Core/ElementXML/include;../../Core/ConnectionSML/include;../../Core/ClientSML/include;../../Core/CLI/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\Tests\include;../../Core/shared;../../Core/SoarKernel/include;../../Core/KernelSML/include;../../Core/ElementXML/include;../../Core/ConnectionSML/include;../../Core/ClientSML/include;../../Core/CLI/include;C:\boost_1_36_0"
+				AdditionalIncludeDirectories="..\..\Tests\include;../../Core/shared;../../Core/SoarKernel/include;../../Core/KernelSML/include;../../Core/ElementXML/include;../../Core/ConnectionSML/include;../../Core/ClientSML/include;../../Core/CLI/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"

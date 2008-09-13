@@ -32,7 +32,7 @@ class ConnectionManager
 {
 protected:
 	// boost::asio support
-	boost::asio::io_service m_IOService;
+	boost::asio::io_service		m_IOService;
 
 	// The listener socket, wrapped in a thread
 	ListenerThread*				m_ListenerThread ;

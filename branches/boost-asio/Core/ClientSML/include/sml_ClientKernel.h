@@ -19,16 +19,16 @@
 #include "sml_ClientEvents.h"
 #include "sml_ListMap.h"
 
-#include <boost/asio.hpp>
-
-
 // Forward declare so clients can use this
 struct ElementXML_InterfaceStruct;
 typedef ElementXML_InterfaceStruct* ElementXML_Handle ;
 
-namespace sock
+namespace boost
 {
-	class SocketLib ;
+	namespace asio
+	{
+		class io_service;
+	}
 }
 
 namespace soarxml
@@ -172,7 +172,6 @@ protected:
 	ObjectMap<Agent*>	m_AgentMap ;
 	std::string			m_CommandLineResult;
 	bool				m_CommandLineSucceeded ;
-	sock::SocketLib*	m_SocketLibrary ;
 
 	// Info about all connections (have to explicitly request this)
 	std::list<ConnectionInfo*> m_ConnectionInfoList ;
@@ -246,8 +245,6 @@ protected:
 	*		 with actually creating a Soar agent -- see CreateAgent for that)
 	*************************************************************/
 	Agent* MakeAgent(char const* pAgentName) ;
-
-	void SetSocketLib(sock::SocketLib* pLibrary) { m_SocketLibrary = pLibrary ; }
 
 	long	GenerateNextID()		{ return ++m_IdCounter ; }
 	long	GenerateNextTimeTag()	{ return --m_TimeTagCounter ; }	// Count down so different from Soar kernel
