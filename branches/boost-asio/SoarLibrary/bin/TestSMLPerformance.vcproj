@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)\SoarLibrary\bin\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="c:\boost_1_36_0\lib"
+				AdditionalLibraryDirectories="..\..\Core\shared\lib"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 			/>
@@ -139,7 +139,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)\SoarLibrary\bin\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="c:\boost_1_36_0\lib"
+				AdditionalLibraryDirectories="..\..\Core\shared\lib"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
