@@ -18,6 +18,8 @@
 #include "sml_Names.h"
 #include "sml_StringOps.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -73,12 +75,13 @@ bool CommandLineInterface::DoTime(std::vector<std::string>& argv) {
 	double procElapsed = (procFinish - procStart) / (double)CLOCKS_PER_SEC;
 
 	// Print elapsed time and return
-	char buf[kMinBufferSize];
 	if (m_RawOutput) {
 		m_Result << "\n(" << procElapsed << "s) proc" << "\n(" << realElapsed << "s) real";
 	} else {
-		AppendArgTagFast(sml_Names::kParamRealSeconds, sml_Names::kTypeDouble, Double2String(realElapsed, buf, kMinBufferSize));
-		AppendArgTagFast(sml_Names::kParamProcSeconds, sml_Names::kTypeDouble, Double2String(procElapsed, buf, kMinBufferSize));
+		using boost::lexical_cast;
+
+		AppendArgTagFast(sml_Names::kParamRealSeconds, sml_Names::kTypeDouble, lexical_cast< std::string >( realElapsed ).c_str() );
+		AppendArgTagFast(sml_Names::kParamProcSeconds, sml_Names::kTypeDouble, lexical_cast< std::string >( procElapsed ).c_str() );
 	}
 	return ret;
 }

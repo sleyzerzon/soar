@@ -59,17 +59,6 @@ char* sml::Int2String(long value, char* buffer, int maxChars)
 }
 
 /*************************************************************
-* @brief Convert double to string.
-*************************************************************/
-char* sml::Double2String(double value, char* buffer, int maxChars)
-{
-	//return gcvt(value, maxChars - 1, buffer) ; // gcvt not portable
-	SNPRINTF(buffer, maxChars, "%f", value);
-	buffer[maxChars - 1] = 0; // ensure null termination as win32 behavior is unspecified
-	return buffer;
-}
-
-/*************************************************************
 * @brief Returns a copy of the string.
 *************************************************************/
 char* sml::StringCopy(char const* pStr)
