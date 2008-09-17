@@ -19,6 +19,8 @@
 #include "sml_RunScheduler.h"
 #include "cli_CLIError.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -222,7 +224,6 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	}
 
 
-	char buf[kMinBufferSize];
 	switch (runResult) {
 		case sml_RUN_ERROR:
 			return SetError(CLIError::kRunFailed);
@@ -233,7 +234,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 				// NOTE: I don't think this is currently possible
 				m_Result << "\nRun stopped (still executing).";
 			} else {
-				AppendArgTagFast(sml_Names::kParamRunResult, sml_Names::kTypeInt, Int2String((int)runResult, buf, kMinBufferSize));
+				AppendArgTagFast(sml_Names::kParamRunResult, sml_Names::kTypeInt, boost::lexical_cast< std::string >( runResult ));
 			}
 			break;
 
@@ -243,7 +244,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 			if (m_RawOutput) {
 				m_Result << "\nRun stopped (interrupted).";
 			} else {
-				AppendArgTagFast(sml_Names::kParamRunResult, sml_Names::kTypeInt, Int2String((int)runResult, buf, kMinBufferSize));
+				AppendArgTagFast(sml_Names::kParamRunResult, sml_Names::kTypeInt, boost::lexical_cast< std::string >( runResult ));
 			}
 			if (pScheduler->AnAgentHaltedDuringRun())
 			{

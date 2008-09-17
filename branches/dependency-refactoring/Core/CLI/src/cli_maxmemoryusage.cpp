@@ -18,6 +18,8 @@
 #include "agent.h"
 #include "sml_AgentSML.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -43,8 +45,7 @@ bool CommandLineInterface::DoMaxMemoryUsage(const int n) {
 		if (m_RawOutput) {
 			m_Result << m_pAgentSoar->sysparams[MAX_MEMORY_USAGE_SYSPARAM] << " bytes";
 		} else {
-			char buf[kMinBufferSize];
-			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, Int2String(m_pAgentSoar->sysparams[MAX_CHUNKS_SYSPARAM], buf, kMinBufferSize));
+			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, boost::lexical_cast< std::string >( m_pAgentSoar->sysparams[MAX_CHUNKS_SYSPARAM] ));
 		}
 		return true;
 	}

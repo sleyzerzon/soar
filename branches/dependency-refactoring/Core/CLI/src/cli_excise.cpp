@@ -22,6 +22,8 @@
 
 #include "reinforcement_learning.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -192,8 +194,7 @@ bool CommandLineInterface::DoExcise(const ExciseBitset& options, const std::stri
 		m_Result << "\n" << exciseCount << " production" << (exciseCount == 1 ? " " : "s ") << "excised.";
 	} else {
 		// Add the count tag to the front
-		char buf[kMinBufferSize];
-		PrependArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(exciseCount, buf, kMinBufferSize));
+		PrependArgTag(sml_Names::kParamCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >( exciseCount ));
 	}
 
 	return true;

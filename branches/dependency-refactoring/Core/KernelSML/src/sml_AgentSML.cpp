@@ -825,7 +825,7 @@ std::string AgentSML::ExecuteCommandLine(std::string const& commandLine)
 	bool rawOutput = true ;
 	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_CommandLine, rawOutput) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, this->GetName());
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLine, commandLine.c_str()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLine, commandLine) ;
 
 	AnalyzeXML incoming ;
 	incoming.Analyze(pMsg) ;

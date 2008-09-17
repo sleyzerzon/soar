@@ -22,6 +22,8 @@
 #include "symtab.h"
 #include "rete.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -191,19 +193,19 @@ bool CommandLineInterface::DoMemories(const MemoriesBitset options, int n, const
 	sort(memories.begin(), memories.end(), s);
 
 	// print them
-	char buf[1024];
 	int i = 0;
 	for (std::vector< std::pair< std::string, unsigned long > >::reverse_iterator j = memories.rbegin(); 
 		j != memories.rend() && (n == 0 || i < n); 
 		++j, ++i) 
 	{
 		if (m_RawOutput) {
+			char buf[1024];
 			SNPRINTF(buf, 1023, "\n%6lu:  %s", j->second, j->first.c_str());
 			buf[1023] = 0;
 			m_Result << buf;
 		} else {
-			AppendArgTagFast(sml_Names::kParamName, sml_Names::kTypeString, j->first.c_str());
-			AppendArgTagFast(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(j->second, buf, 1024));
+			AppendArgTagFast(sml_Names::kParamName, sml_Names::kTypeString, j->first);
+			AppendArgTagFast(sml_Names::kParamCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >( j->second ));
 		}
 	}
 	return true;

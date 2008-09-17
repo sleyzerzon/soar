@@ -18,6 +18,8 @@
 #include "sml_ClientAgent.h"
 #include "sml_ClientIdentifier.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace sml ;
 
 IntElement::IntElement(Agent* pAgent, Identifier* pParent, char const* pID, char const* pAttributeName, int value, long timeTag) 
@@ -45,11 +47,8 @@ char const* IntElement::GetValueType() const
 // Returns a string form of the value stored here.
 char const* IntElement::GetValueAsString() const
 {
-	char buffer[kMinBufferSize] ;
-	Int2String(m_Value, buffer, sizeof(buffer)) ;
-
 	IntElement* pThis = (IntElement*)this ;
-	pThis->m_StringForm = buffer ;
+	pThis->m_StringForm = boost::lexical_cast< std::string >( m_Value );
 	return m_StringForm.c_str() ;
 }
 

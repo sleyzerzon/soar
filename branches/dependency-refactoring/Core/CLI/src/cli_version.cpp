@@ -20,6 +20,8 @@
 
 #include "agent.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -32,8 +34,6 @@ bool CommandLineInterface::ParseVersion(std::vector<std::string>&) {
 
 bool CommandLineInterface::DoVersion() {
 
-	char buf[kMinBufferSize];
-
 	std::ostringstream timedatestamp;
 	timedatestamp << kDatestamp << " " << kTimestamp;
 	std::string sTimeDateStamp = timedatestamp.str();
@@ -43,9 +43,9 @@ bool CommandLineInterface::DoVersion() {
 		m_Result << "Build date: " << sTimeDateStamp.c_str() << " " ;
 
 	} else {
-		AppendArgTagFast(sml_Names::kParamVersionMajor, sml_Names::kTypeInt, Int2String(MAJOR_VERSION_NUMBER, buf, kMinBufferSize));
-		AppendArgTagFast(sml_Names::kParamVersionMinor, sml_Names::kTypeInt, Int2String(MINOR_VERSION_NUMBER, buf, kMinBufferSize));
-		AppendArgTagFast(sml_Names::kParamVersionMicro, sml_Names::kTypeInt, Int2String(MICRO_VERSION_NUMBER, buf, kMinBufferSize));
+		AppendArgTagFast(sml_Names::kParamVersionMajor, sml_Names::kTypeInt, boost::lexical_cast< std::string >(MAJOR_VERSION_NUMBER));
+		AppendArgTagFast(sml_Names::kParamVersionMinor, sml_Names::kTypeInt, boost::lexical_cast< std::string >(MINOR_VERSION_NUMBER));
+		AppendArgTagFast(sml_Names::kParamVersionMicro, sml_Names::kTypeInt, boost::lexical_cast< std::string >(MICRO_VERSION_NUMBER));
 		AppendArgTag(sml_Names::kParamBuildDate, sml_Names::kTypeString, sTimeDateStamp.c_str());
 	}
 	return true;

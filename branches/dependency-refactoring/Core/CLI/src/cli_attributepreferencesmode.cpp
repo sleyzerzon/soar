@@ -16,6 +16,7 @@
 #include "agent.h"
 #include "cli_CLIError.h"
 
+#include <boost/lexical_cast.hpp>
 
 using namespace cli;
 using namespace sml;
@@ -43,8 +44,7 @@ bool CommandLineInterface::DoAttributePreferencesMode(int* pMode) {
 		if (m_RawOutput) {
 			m_Result << m_pAgentSoar->attribute_preferences_mode;
 		} else {
-			char buf[kMinBufferSize];
-			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, Int2String(m_pAgentSoar->attribute_preferences_mode, buf, kMinBufferSize));
+			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, boost::lexical_cast< std::string >( m_pAgentSoar->attribute_preferences_mode ).c_str() );
 		}
 		return true;
 	}

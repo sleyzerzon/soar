@@ -108,7 +108,7 @@ void ProductionListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* p
 	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgentSML->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, productionName.c_str()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, productionName) ;
 
 	// Send the message out
 	AnalyzeXML response ;

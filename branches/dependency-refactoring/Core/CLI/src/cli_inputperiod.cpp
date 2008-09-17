@@ -17,6 +17,8 @@
 
 #include "agent.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -39,8 +41,7 @@ bool CommandLineInterface::DoInputPeriod(int* pPeriod) {
 		if (m_RawOutput) {
 			m_Result << m_pAgentSoar->input_period;
 		} else {
-			char buf[kMinBufferSize];
-			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, Int2String(m_pAgentSoar->input_period, buf, kMinBufferSize));
+			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, boost::lexical_cast< std::string >( m_pAgentSoar->input_period ));
 		}
 		return true;
 	}

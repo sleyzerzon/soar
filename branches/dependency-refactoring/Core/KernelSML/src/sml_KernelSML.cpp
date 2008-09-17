@@ -36,6 +36,8 @@
 
 #include "KernelHeaders.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace sml ;
 
 // Singleton instance of the kernel object
@@ -472,10 +474,7 @@ bool KernelSML::ReturnResult(Connection* pConnection, soarxml::ElementXML* pResp
 *************************************************************/
 bool KernelSML::ReturnIntResult(Connection* pConnection, soarxml::ElementXML* pResponse, int result)
 {
-	char buffer[kMinBufferSize] ;
-	Int2String(result, buffer, kMinBufferSize) ;
-
-	pConnection->AddSimpleResultToSMLResponse(pResponse, buffer) ;
+	pConnection->AddSimpleResultToSMLResponse(pResponse, boost::lexical_cast< std::string >(result).c_str()) ;
 
 	return true ;
 }

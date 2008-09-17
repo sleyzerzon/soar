@@ -38,6 +38,8 @@
 #include "sml_ClientDirect.h"
 #include <assert.h>
 
+#include <boost/lexical_cast.hpp>
+
 using namespace sml ;
 using namespace soarxml;
 
@@ -955,9 +957,6 @@ void WorkingMemory::GenerateNewID(char const* pAttribute, std::string* pID)
 {
 	int id = GetAgent()->GetKernel()->GenerateNextID() ;
 
-	char buffer[kMinBufferSize] ;
-	Int2String(id, buffer, sizeof(buffer)) ;
-
 	// we'll start our ids with lower case so we can distinguish them
 	// from soar id's.  We'll take the first letter of the attribute,
 	// much as soar does, but always add a unique number to the back,
@@ -974,7 +973,7 @@ void WorkingMemory::GenerateNewID(char const* pAttribute, std::string* pID)
 
 	// Return the result
 	*pID = letter ;
-	pID->append(buffer) ;
+	pID->append( boost::lexical_cast< std::string >( id ) ) ;
 }
 
 /*************************************************************

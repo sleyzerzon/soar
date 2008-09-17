@@ -747,21 +747,37 @@ protected:
 	/*************************************************************
 	* @brief 
 	*************************************************************/
+	inline void AppendArgTag(const char* pParam, const char* pType, const std::string& value)
+	{
+		AppendArgTag( pParam, pType, value.c_str() );
+	}
 	void AppendArgTag(const char* pParam, const char* pType, const char* pValue);
 
 	/*************************************************************
 	* @brief 
 	*************************************************************/
+	inline void AppendArgTagFast(const char* pParam, const char* pType, const std::string& value)
+	{
+		AppendArgTagFast( pParam, pType, value.c_str() );
+	}
 	void AppendArgTagFast(const char* pParam, const char* pType, const char* pValue);
 
 	/*************************************************************
 	* @brief 
 	*************************************************************/
+	inline void PrependArgTag(const char* pParam, const char* pType, const std::string& value)
+	{
+		PrependArgTag( pParam, pType, value.c_str() );
+	}
 	void PrependArgTag(const char* pParam, const char* pType, const char* pValue);
 
 	/*************************************************************
 	* @brief 
 	*************************************************************/
+	inline void PrependArgTagFast(const char* pParam, const char* pType, const std::string& value)
+	{
+		PrependArgTagFast( pParam, pType, value.c_str() );
+	}
 	void PrependArgTagFast(const char* pParam, const char* pType, const char* pValue);
 
 	/************************************************************* 	 

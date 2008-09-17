@@ -40,25 +40,6 @@ bool sml::IsStringEqualIgnoreCase(char const* pStr1, char const* pStr2)
 }
 
 /*************************************************************
-* @brief Convert int to string.
-*************************************************************/
-char* sml::Int2String(long value, char* buffer, int maxChars)
-{
-	// A 64-bit value can be 20 digits, plus one for -ve and one for NULL.
-	// Anything less than that is not safe.
-	if (maxChars < kMinBufferSize)
-	{
-		buffer[0] = '0' ;
-		return buffer ;
-	}
-
-	// Changed from ltoa -> SNPRINTF by voigtjr
-	SNPRINTF(buffer, maxChars, "%ld", value);
-	buffer[maxChars - 1] = 0; // windows doesn't guarantee null termination
-	return buffer;
-}
-
-/*************************************************************
 * @brief Returns a copy of the string.
 *************************************************************/
 char* sml::StringCopy(char const* pStr)

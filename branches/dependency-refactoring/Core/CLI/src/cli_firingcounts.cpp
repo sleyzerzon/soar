@@ -22,6 +22,8 @@
 #include "production.h"
 #include "symtab.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -121,8 +123,8 @@ bool CommandLineInterface::DoFiringCounts(const int numberToList, const std::str
 			buf[1023] = 0;
 			m_Result << buf;
 		} else {
-			AppendArgTagFast(sml_Names::kParamName, sml_Names::kTypeString, j->first.c_str());
-			AppendArgTagFast(sml_Names::kParamCount, sml_Names::kTypeInt, Int2String(j->second, buf, 1024));
+			AppendArgTagFast(sml_Names::kParamName, sml_Names::kTypeString, j->first );
+			AppendArgTagFast(sml_Names::kParamCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >( j->second ));
 		}
 	}
 	return true;

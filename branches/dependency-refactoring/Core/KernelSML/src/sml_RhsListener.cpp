@@ -21,6 +21,8 @@
 #include "sml_KernelSML.h"
 #include "sml_AgentSML.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace sml ;
 
 // Start listening for a specific RHS user function.  When it fires we'll call to the client
@@ -129,10 +131,6 @@ bool RhsListener::HandleFilterEvent(smlRhsEventId eventID, AgentSML* pAgent, cha
 	// Convert eventID to a string
 	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
 
-	// Also convert the length to a string
-	char length[kMinBufferSize] ;
-	Int2String(maxLengthReturnValue, length, sizeof(length)) ;
-
 	// Copy the initial command line into the return buffer and send that over.
 	// This will be sequentially replaced by each filter in turn and whatever
 	// is left in here at the end is the result of the filtering.
@@ -237,10 +235,6 @@ bool RhsListener::HandleEvent(smlRhsEventId eventID, AgentSML* pAgent, bool comm
 	// Convert eventID to a string
 	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
 
-	// Also convert the length to a string
-	char length[kMinBufferSize] ;
-	Int2String(maxLengthReturnValue, length, sizeof(length)) ;
-
 	// Build the SML message we're doing to send.
 	// Pass the agent in the "name" parameter not the "agent" parameter as this is a kernel
 	// level event, not an agent level one (because you need to register with the kernel to get "agent created").
@@ -344,8 +338,8 @@ bool RhsListener::ExecuteRhsCommand(AgentSML* pAgentSML, smlRhsEventId eventID, 
 	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	if (pAgentSML) pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamName, pAgentSML->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, functionName.c_str()) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, arguments.c_str()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamFunction, functionName) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, arguments) ;
 
 #ifdef _DEBUG
 	// Generate a text form of the XML so we can look at it in the debugger.
@@ -432,7 +426,7 @@ bool RhsListener::ExecuteCommandLine(AgentSML* pAgent, char const* pFunctionName
 	bool rawOutput = true ;
 	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_CommandLine, rawOutput) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgent->GetName());
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLine, commandLine.str().c_str()) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamLine, commandLine.str()) ;
 
 	AnalyzeXML incoming ;
 	incoming.Analyze(pMsg) ;

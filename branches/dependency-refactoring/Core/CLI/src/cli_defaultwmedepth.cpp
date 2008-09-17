@@ -16,6 +16,8 @@
 #include "sml_StringOps.h"
 #include "agent.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -39,8 +41,7 @@ bool CommandLineInterface::DoDefaultWMEDepth(const int* pDepth) {
 		if (m_RawOutput) {
 			m_Result << m_pAgentSoar->default_wme_depth;
 		} else {
-			char buf[kMinBufferSize];
-			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, Int2String(m_pAgentSoar->default_wme_depth, buf, kMinBufferSize));
+			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeInt, boost::lexical_cast< std::string >( m_pAgentSoar->default_wme_depth ));
 		}
 		return true;
 	}

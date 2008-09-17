@@ -23,6 +23,8 @@
 
 #include <assert.h>
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 using namespace std;
@@ -363,11 +365,11 @@ bool CommandLineInterface::StreamSource( std::istream& soarStream, const std::st
 			}
 
 		} else {
-			char buf[kMinBufferSize];
+
 			AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, pFilename->c_str());
-			AppendArgTag(sml_Names::kParamSourcedProductionCount, sml_Names::kTypeInt, Int2String(m_NumProductionsSourced, buf, kMinBufferSize));
-			AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, Int2String(m_NumProductionsExcised, buf, kMinBufferSize));
-			AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, Int2String(m_NumProductionsIgnored, buf, kMinBufferSize));
+			AppendArgTag(sml_Names::kParamSourcedProductionCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >(m_NumProductionsSourced));
+			AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >(m_NumProductionsExcised));
+			AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >(m_NumProductionsIgnored));
 
 			std::list< std::string >::iterator iter = m_ExcisedDuringSource.begin();
 			while (iter != m_ExcisedDuringSource.end()) {
@@ -421,10 +423,9 @@ bool CommandLineInterface::StreamSource( std::istream& soarStream, const std::st
 
 		} else {
 			if (m_SourceMode != SOURCE_DISABLE) {
-				char buf[kMinBufferSize];
-				AppendArgTag(sml_Names::kParamSourcedProductionCount, sml_Names::kTypeInt, Int2String(numTotalProductionsSourced, buf, kMinBufferSize));
-				AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, Int2String(numTotalProductionsExcised, buf, kMinBufferSize));
-				AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, Int2String(numTotalProductionsIgnored, buf, kMinBufferSize));
+				AppendArgTag(sml_Names::kParamSourcedProductionCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >(numTotalProductionsSourced));
+				AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >(numTotalProductionsExcised));
+				AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >(numTotalProductionsIgnored));
 
 				if (m_SourceVerbose) {
 					std::list< std::string >::iterator iter = m_ExcisedDuringSource.begin();
@@ -468,8 +469,7 @@ void CommandLineInterface::HandleSourceError( int errorLine, const std::string* 
 		m_SourceErrorDetail.clear();
 		m_SourceErrorDetail += "\nSource command error on (or near) line ";
 
-		char buf[kMinBufferSize];
-		m_SourceErrorDetail += Int2String(errorLine, buf, kMinBufferSize);
+		m_SourceErrorDetail += boost::lexical_cast< std::string >(errorLine);
 
 		if ( pFilename )
 		{
@@ -490,8 +490,7 @@ void CommandLineInterface::HandleSourceError( int errorLine, const std::string* 
 		m_SourceError = true;
 
 	} else if ( pFilename ) {
-		char buf[kMinBufferSize];
-		m_SourceErrorDetail += "\n\t--> Sourced by: " + *pFilename + " (line " + Int2String(errorLine, buf, kMinBufferSize) + ")";
+		m_SourceErrorDetail += "\n\t--> Sourced by: " + *pFilename + " (line " + boost::lexical_cast< std::string >(errorLine) + ")";
 	}
 
 	// Reset depth to zero

@@ -21,6 +21,8 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace sml
 {
 
@@ -52,10 +54,7 @@ public:
 
 	void SetTimeTag(long timeTag)
 	{
-		char buffer[kMinBufferSize] ;
-		Int2String(timeTag, buffer, sizeof(buffer)) ;
-
-		this->AddAttributeFast(sml_Names::kWME_TimeTag, CopyString(buffer), false) ;
+		this->AddAttributeFast(sml_Names::kWME_TimeTag, CopyString(boost::lexical_cast< std::string >(timeTag).c_str()), false) ;
 	}
 
 	void SetActionAdd()

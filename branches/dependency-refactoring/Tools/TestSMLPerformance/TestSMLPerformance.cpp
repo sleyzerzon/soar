@@ -23,6 +23,8 @@
 #include "sml_Connection.h"
 #include "thread_OSspecific.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace sml;
 using namespace std;
 
@@ -55,9 +57,7 @@ public:
 		// Create wmes
 		Identifier* pInputLink = agent->GetInputLink();
 		for(int i=0; i<numWmes; i++) {
-			char buffer[25];
-			Int2String(i, buffer, sizeof(buffer)) ;
-			wmes->push_back(agent->CreateIntWME(pInputLink, buffer, 0));
+			wmes->push_back(agent->CreateIntWME(pInputLink, boost::lexical_cast< std::string >( i ).c_str(), 0));
 		}
 	}
 
@@ -103,9 +103,7 @@ public:
 		// Create agents
 		pAgents = new vector<TestAgent*>();
 		for(int i=0; i<numAgents; i++) {
-			char buffer[25];
-			Int2String(i, buffer, sizeof(buffer)) ;
-			pAgents->push_back(new TestAgent(kernel, buffer, numWmes));
+			pAgents->push_back(new TestAgent(kernel, boost::lexical_cast< std::string >( i ).c_str(), numWmes));
 		}
 
 		for(int agent=0; agent<numAgents; agent++) {

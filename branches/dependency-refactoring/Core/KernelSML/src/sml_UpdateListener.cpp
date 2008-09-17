@@ -21,6 +21,8 @@
 
 #include "assert.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace sml ;
 
 // Returns true if this is the first connection listening for this event
@@ -62,14 +64,10 @@ void UpdateListener::OnKernelEvent(int eventIDIn, AgentSML* pAgentSML, void* pCa
 	// Convert eventID to a string
 	char const* event = m_pKernelSML->ConvertEventToString(eventID) ;
 
-	// Convert phase to a string
-	char runStr[kMinBufferSize] ;
-	Int2String(*pRunFlags, runStr, sizeof(runStr)) ;
-
 	// Build the SML message we're doing to send.
 	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, runStr) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamValue, boost::lexical_cast< std::string >(*pRunFlags)) ;
 
 	// Send the message out
 	AnalyzeXML response ;

@@ -572,6 +572,10 @@ public:
 	* @returns Pointer to the ElementXML_Handle for the <command> tag (not the full message, just the <command> part)
 	*		   This is rarely needed, but could be used to optimize the code.  DO NOT release this handle.
 	*************************************************************/
+	inline ElementXML_Handle AddParameterToSMLCommand(soarxml::ElementXML* pCommand, char const* pName, const std::string& value, char const* pValueType = NULL)
+	{
+		return AddParameterToSMLCommand( pCommand, pName, value.c_str(), pValueType );
+	}
 	virtual ElementXML_Handle AddParameterToSMLCommand(soarxml::ElementXML* pCommand, char const* pName, char const* pValue, char const* pValueType = NULL) ;
 
 	/*************************************************************

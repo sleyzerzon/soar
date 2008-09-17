@@ -21,6 +21,8 @@
 #include "sml_KernelHelpers.h"
 #include "gsysparam.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -403,7 +405,6 @@ bool CommandLineInterface::DoWatch(const WatchBitset& options, const WatchBitset
 			m_Result << "\n  Soar-RL:  " << (pSysparams[TRACE_RL_SYSPARAM] ? "on" : "off");
 
 		} else {
-			char buf[kMinBufferSize];
 			AppendArgTag(sml_Names::kParamWatchDecisions, sml_Names::kTypeBoolean, 
 				pSysparams[TRACE_CONTEXT_DECISIONS_SYSPARAM] ? sml_Names::kTrue : sml_Names::kFalse);
 
@@ -427,7 +428,7 @@ bool CommandLineInterface::DoWatch(const WatchBitset& options, const WatchBitset
 
 			// Subtract one here because the kernel constants (e.g. TIMETAG_WME_TRACE) are one plus the number we use
 			AppendArgTag(sml_Names::kParamWatchWMEDetail, sml_Names::kTypeInt, 
-				Int2String(pSysparams[TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM]-1, buf, kMinBufferSize));
+				boost::lexical_cast< std::string >(pSysparams[TRACE_FIRINGS_WME_TRACE_TYPE_SYSPARAM]-1));
 
 			AppendArgTag(sml_Names::kParamWatchWorkingMemoryChanges, sml_Names::kTypeBoolean, 
 				pSysparams[TRACE_WM_CHANGES_SYSPARAM] ? sml_Names::kTrue : sml_Names::kFalse);
@@ -436,7 +437,7 @@ bool CommandLineInterface::DoWatch(const WatchBitset& options, const WatchBitset
 				pSysparams[TRACE_FIRINGS_PREFERENCES_SYSPARAM] ? sml_Names::kTrue : sml_Names::kFalse);
 
 			AppendArgTag(sml_Names::kParamWatchLearning, sml_Names::kTypeInt, 
-				Int2String(learning, buf, kMinBufferSize));
+				boost::lexical_cast< std::string >(learning));
 
 			AppendArgTag(sml_Names::kParamWatchBacktracing, sml_Names::kTypeBoolean, 
 				pSysparams[TRACE_BACKTRACING_SYSPARAM] ? sml_Names::kTrue : sml_Names::kFalse);

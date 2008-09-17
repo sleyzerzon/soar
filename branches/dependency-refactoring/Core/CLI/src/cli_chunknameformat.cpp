@@ -23,6 +23,8 @@
 #include "gsysparam.h"
 #include "agent.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cli;
 using namespace sml;
 
@@ -104,8 +106,7 @@ bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int*
 			if (m_RawOutput) {
 				m_Result << "Chunk count: " << m_pAgentSML->GetSoarAgent()->chunk_count;
 			} else {
-				char buf[kMinBufferSize];
-				AppendArgTagFast(sml_Names::kParamChunkCount, sml_Names::kTypeInt, Int2String(m_pAgentSML->GetSoarAgent()->chunk_count, buf, kMinBufferSize));
+				AppendArgTagFast(sml_Names::kParamChunkCount, sml_Names::kTypeInt, boost::lexical_cast< std::string >( m_pAgentSML->GetSoarAgent()->chunk_count ).c_str() );
 			}
 		}
 	}

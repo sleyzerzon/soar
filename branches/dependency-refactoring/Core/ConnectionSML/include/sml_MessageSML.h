@@ -16,6 +16,8 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace sml
 {
 
@@ -37,10 +39,7 @@ public:
 
 	void SetID(int id)
 	{
-		char buffer[kMinBufferSize] ;
-		Int2String(id, buffer, kMinBufferSize) ;
-
-		this->AddAttributeFast(sml_Names::kID, buffer) ;
+		this->AddAttributeFast(sml_Names::kID, boost::lexical_cast< std::string >( id ).c_str() ) ;
 	}
 
 	void SetDocType(char const* pType)

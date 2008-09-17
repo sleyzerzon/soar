@@ -16,6 +16,8 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace sml {
 
 class TagError : public soarxml::ElementXML
@@ -31,10 +33,7 @@ public:
 
 	void SetErrorCode(int error)
 	{
-		char errorBuffer[kMinBufferSize] ;
-		Int2String(error, errorBuffer, kMinBufferSize) ;
-
-		this->AddAttributeFast(sml_Names::kErrorCode, errorBuffer) ;
+		this->AddAttributeFast(sml_Names::kErrorCode, boost::lexical_cast< std::string >( error ).c_str() ) ;
 	}
 
 };

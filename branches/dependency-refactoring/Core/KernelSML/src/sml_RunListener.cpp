@@ -34,6 +34,8 @@
 
 #include "assert.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace sml ;
 
 void RunListener::Init(sml::KernelSML *pKernelSML, AgentSML* pAgentSML)
@@ -86,14 +88,11 @@ void RunListener::OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallDat
 	// Convert phase to a string (cast through long long to prevent warning about pointer truncation from void*)
 	int phase = (int)(long long)pCallData ;
 
-	char phaseStr[kMinBufferSize] ;
-	Int2String(phase, phaseStr, sizeof(phaseStr)) ;
-
 	// Build the SML message we're doing to send.
 	soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, pAgentSML->GetName()) ;
 	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event) ;
-	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamPhase, phaseStr) ;
+	pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamPhase, boost::lexical_cast< std::string >(phase)) ;
 
 	// Send the message out
 	AnalyzeXML response ;

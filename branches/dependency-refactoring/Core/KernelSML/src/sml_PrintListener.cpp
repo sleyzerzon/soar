@@ -133,7 +133,7 @@ void PrintListener::FlushOutput(Connection* pSourceConnection, smlPrintEventId e
 		soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName());
 		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
-		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].str().c_str());
+		pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].str());
 
 		// Send the message out
 		AnalyzeXML response ;
@@ -156,7 +156,7 @@ void PrintListener::FlushOutput(Connection* pSourceConnection, smlPrintEventId e
 			soarxml::ElementXML* pMsg = pConnection->CreateSMLCommand(sml_Names::kCommand_Event);
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamAgent, m_pCallbackAgentSML->GetName());
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamEventID, event);
-			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].str().c_str());
+			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamMessage, m_BufferedPrintOutput[buffer].str());
 			pConnection->AddParameterToSMLCommand(pMsg, sml_Names::kParamSelf, (pSourceConnection == pConnection) ? sml_Names::kTrue : sml_Names::kFalse) ;
 
 			#ifdef _DEBUG

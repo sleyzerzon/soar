@@ -30,13 +30,6 @@ bool IsStringEqual(char const* pStr1, char const* pStr2) ;
 bool IsStringEqualIgnoreCase(char const* pStr1, char const* pStr2) ;
 
 /*************************************************************
-* @brief Convert int to string.
-*		 Minimum buffer size is 25 (for a 64-bit int).
-*************************************************************/
-const int kMinBufferSize = 25 ;
-char* Int2String(long value, char* buffer, int maxChars) ;
-
-/*************************************************************
 * @brief Returns a copy of the string.
 *		 Some libraries may not have strdup().  If so we
 *		 can fix it here.
