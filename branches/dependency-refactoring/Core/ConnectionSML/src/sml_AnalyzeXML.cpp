@@ -26,6 +26,8 @@
 #include "sml_StringOps.h"
 #include "ElementXMLInterface.h"
 
+#include <boost/algorithm/string/compare.hpp>
+
 using namespace sml ;
 using namespace soarxml;
 

@@ -13,8 +13,8 @@
 #define SML_NODESMLH
 
 #include "ElementXML.h"
-#include "sml_StringOps.h"
 #include "sml_Names.h"
+#include "sml_StringOps.h"
 
 #include <boost/lexical_cast.hpp>
 

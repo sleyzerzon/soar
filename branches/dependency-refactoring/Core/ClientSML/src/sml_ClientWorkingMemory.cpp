@@ -31,14 +31,15 @@
 #include "sml_ClientIntElement.h"
 #include "sml_ClientFloatElement.h"
 #include "sml_TagWme.h"
-#include "sml_StringOps.h"
 #include "sml_Errors.h"
+#include "sml_StringOps.h"
 
 #include "sml_EmbeddedConnection.h"	// For access to direct methods
 #include "sml_ClientDirect.h"
 #include <assert.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/compare.hpp>
 
 using namespace sml ;
 using namespace soarxml;

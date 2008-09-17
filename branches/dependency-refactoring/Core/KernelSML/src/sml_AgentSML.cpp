@@ -15,9 +15,9 @@
 
 #include "sml_Utils.h"
 #include "sml_OutputListener.h"
-#include "sml_StringOps.h"
 #include "sml_KernelSML.h"
 #include "sml_RhsFunction.h"
+#include "sml_StringOps.h"
 
 #include "KernelHeaders.h"
 #include "xml.h"
@@ -28,6 +28,8 @@
 #endif
 
 #include <assert.h>
+
+#include <boost/algorithm/string/compare.hpp>
 
 using namespace sml ;
 
@@ -1021,6 +1023,7 @@ bool AgentSML::AddInputWME(char const* pID, char const* pAttribute, char const* 
 	CHECK_RET_FALSE(strlen(pID) >= 2) ;
 
 	long clientTimeTag = atoi(pClientTimeTag);
+
 	if (IsStringEqual(sml_Names::kTypeString, pType)) 
 	{
 		// Creating a wme with a string constant value

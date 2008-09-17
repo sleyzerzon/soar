@@ -20,6 +20,8 @@
 #include "sml_ClientDirect.h"
 #include "sml_EmbeddedConnection.h"	// For direct methods
 
+#include <boost/algorithm/string/compare.hpp>
+
 using namespace sml ;
 
 IdentifierSymbol::IdentifierSymbol(Identifier* pIdentifier)

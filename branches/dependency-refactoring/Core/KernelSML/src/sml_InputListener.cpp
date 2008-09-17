@@ -21,6 +21,8 @@
 
 #include "KernelHeaders.h"
 
+#include <boost/algorithm/string/compare.hpp>
+
 using namespace sml ;
 
 // Flag to control printing debug information about the input link

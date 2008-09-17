@@ -12,32 +12,11 @@
 //
 /////////////////////////////////////////////////////////////////
 
-#include "sml_StringOps.h"
+#include <sml_StringOps.h>
 
 #include <iostream>
 #include <sstream>
-
-/*************************************************************
-* @brief Returns true if strings are equal (case sensitive).
-*************************************************************/
-bool sml::IsStringEqual(char const* pStr1, char const* pStr2)
-{
-	if (pStr1 == NULL || pStr2 == NULL)
-		return false ;
-
-	return (strcmp(pStr1, pStr2) == 0) ;
-}
-
-/*************************************************************
-* @brief Returns true if strings are equal (case insensitive).
-*************************************************************/
-bool sml::IsStringEqualIgnoreCase(char const* pStr1, char const* pStr2)
-{
-	if (pStr1 == NULL || pStr2 == NULL)
-		return false ;
-
-		return (strcasecmp(pStr1, pStr2) == 0) ;
-}
+#include <string>
 
 /*************************************************************
 * @brief Returns a copy of the string.

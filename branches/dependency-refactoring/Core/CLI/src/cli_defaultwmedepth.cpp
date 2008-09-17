@@ -13,7 +13,6 @@
 
 #include "cli_Commands.h"
 #include "sml_Names.h"
-#include "sml_StringOps.h"
 #include "agent.h"
 
 #include <boost/lexical_cast.hpp>

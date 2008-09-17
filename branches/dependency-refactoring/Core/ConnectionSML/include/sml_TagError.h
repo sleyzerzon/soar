@@ -13,7 +13,6 @@
 #define SML_TAG_ERROR_H
 
 #include "ElementXML.h"
-#include "sml_StringOps.h"
 #include "sml_Names.h"
 
 #include <boost/lexical_cast.hpp>

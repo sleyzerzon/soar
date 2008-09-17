@@ -16,7 +16,6 @@
 #include "cli_CLIError.h"
 
 #include "sml_Names.h"
-#include "sml_StringOps.h"
 
 #include <boost/lexical_cast.hpp>
 
