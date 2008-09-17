@@ -7,7 +7,7 @@
 
 namespace cli
 {
-	class Command
+	struct Command
 	{
 		virtual ~Command() {}
 		virtual char const* GetCommandName() const = 0;

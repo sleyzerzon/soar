@@ -15,15 +15,12 @@ using namespace cli;
 using namespace sml;
 
 Echo::Echo() 
-: m_DontEchoNewline( 0 )
 {
 	m_OptionHandler.AddOption( 'n', "no-newline", &m_DontEchoNewline );
 }
 
 void Echo::operator()( std::vector< std::string >& argv, CommandOutput& commandOutput )
 {
-	m_DontEchoNewline = 0;
-
 	m_OptionHandler.ProcessOptions( argv );
 
 	// remove command name
@@ -31,7 +28,7 @@ void Echo::operator()( std::vector< std::string >& argv, CommandOutput& commandO
 
 	// combine args
 	std::ostringstream output;
-	std::for_each( argv.begin(), argv.end(), BuildOutputString( output ) );
+	std::for_each( argv.begin(), argv.end(), ConcatinateStringsWithSpaces( output ) );
 
 	// remove trailing space
 	assert( output.str().length() );

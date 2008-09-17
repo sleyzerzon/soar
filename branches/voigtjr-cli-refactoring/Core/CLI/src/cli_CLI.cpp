@@ -23,17 +23,12 @@ CLI::~CLI()
 
 bool CLI::ExecuteCommand( sml::KernelSML& kernelSML, sml::Connection& connection, sml::AgentSML* pAgentSML, std::vector< std::string >& argv, bool echoResults, soarxml::ElementXML& response )
 {
-	// Log input
-	if (m_pLogFile) {
-		if (pAgentSML) 
-		{
-			(*m_pLogFile) << pAgent->GetName() << "> ";
-		}
-		std::for_each( argv.begin(), argv.end(), BuildOutputString( *m_pLogFile ) );
-		(*m_pLogFile) << std::endl;
-	}
+	PushAgent( pAgent );
 
-	SetTrapPrintCallbacks( true );
+	// Log command line
+	m_CommandOutput.LogCommandLine( std::vector< std::string >& argv );
+
+	m_CommandOutput.SetTrapPrintCallbacks( true );
 
 	m_SourceDepth = 0;
 	m_SourceMode = SOURCE_DEFAULT;
@@ -55,68 +50,23 @@ bool CLI::ExecuteCommand( sml::KernelSML& kernelSML, sml::Connection& connection
 	return true;
 }
 
-void CLI::SetTrapPrintCallbacks( bool setting )
+void CLI::PushAgent( sml::AgentSML* pAgent )
 {
-	if (!m_pAgentSML)
-	{
-		return;
-	}
+	m_pAgentSMLStack.push( pAgent );
 
-	// If we've already set it, don't re-set it
-	if ( m_TrapPrintEvents == setting )
-	{
-		return;
-	}
+	m_CommandOutput.SetAgentSML( pAgent );
+}
 
-	if (setting)
+void CLI::PopAgent()
+{
+	m_pAgentSMLStack.pop();
+	if ( m_pAgentSMLStack.size() )
 	{
-		// Trap print callbacks
-		m_pAgentSML->DisablePrintCallback();
-		m_TrapPrintEvents = true;
-		if (!m_pLogFile) 
-		{
-			// If we're logging, we're already registered for this.
-			RegisterWithKernel(smlEVENT_PRINT);
-		}
-
-		// Tell kernel to collect result in command buffer as opposed to trace buffer
-		xml_begin_command_mode( m_pAgentSML->GetSoarAgent() );
+		m_CommandOutput.SetAgentSML( m_pAgentSMLStack.top() );
 	}
 	else
 	{
-		// Retrieve command buffer, tell kernel to use trace buffer again
-		ElementXML* pXMLCommandResult = xml_end_command_mode( m_pAgentSML->GetSoarAgent() );
-
-		// The root object is just a <trace> tag.  The substance is in the children
-		// Add childrend of the command buffer to response tags
-		for ( int i = 0; i < pXMLCommandResult->GetNumberChildren(); ++i )
-		{
-			ElementXML* pChildXML = new ElementXML();
-			pXMLCommandResult->GetChild( pChildXML, i );
-
-			m_ResponseTags.push_back( pChildXML );
-		}
-
-		delete pXMLCommandResult;
-
-		if ( !m_RawOutput )
-		{
-			// Add text result to response tags
-			if ( m_Result.str().length() )
-			{
-				AppendArgTagFast( sml_Names::kParamMessage, sml_Names::kTypeString, m_Result.str().c_str() );
-				m_Result.str("");
-			}
-		}
-
-		// Re-enable print callbacks
-		if (!m_pLogFile) 
-		{
-			// If we're logging, we want to stay registered for this
-			UnregisterWithKernel(smlEVENT_PRINT);
-		}
-		m_TrapPrintEvents = false;
-		m_pAgentSML->EnablePrintCallback();
+		m_CommandOutput.SetAgentSML( 0 ) ;
 	}
 }
 

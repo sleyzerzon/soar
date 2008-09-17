@@ -69,11 +69,11 @@ void GetTokenizeErrorString( int errorCode, std::string& errorString );
 bool Trim(std::string& line);
 
 // used by CLI echo and expand command line
-struct BuildOutputString 
+struct ConcatinateStringsWithSpaces 
 {
 	std::ostringstream& output;
 
-	BuildOutputString( std::ostringstream& output ) 
+	ConcatinateStringsWithSpaces( std::ostringstream& output ) 
 		: output( output )
     {
     }
@@ -84,7 +84,7 @@ struct BuildOutputString
     }
 
 private:
-	BuildOutputString& operator=( const BuildOutputString& );
+	ConcatinateStringsWithSpaces& operator=( const ConcatinateStringsWithSpaces& );
 };
 
 }

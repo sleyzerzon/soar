@@ -109,9 +109,18 @@ void OptionHandler::AddOptionOptionalArgument( char shortOption, char const* lon
 	m_Options.push_back( option );
 }
 
+void ClearOption( Option& option )
+{
+	option.argument = 0;
+	option.count = 0;
+}
+
 void OptionHandler::ProcessOptions( std::vector< std::string >& argv )
 {
 	assert( argv.size() );
+
+	// clear options
+	std::for_each( m_Options.begin(), m_Options.end(), ClearOption );
 
 	// iterate through arguments, skipping first
 	std::vector< std::string >::iterator iter = argv.begin();

@@ -1,107 +1,51 @@
 #ifndef CLI_COMMANDOUTPUT_H
 #define CLI_COMMANDOUTPUT_H
 
-#include "sml_TagResult.h"
-#include "sml_TagArg.h"
-
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <vector>
-#include <cassert>
 
 namespace cli
 {
-	class CommandOutput
+	class CommandOutput : public sml::KernelCallback
 	{
 	public:
-		CommandOutput()
-			: m_UsingRawOutput( true )
-		{}
+		CommandOutput();
+		virtual ~CommandOutput();
 
-		void SetUsingRawOutput( bool usingRawOutput ) 
-		{ 
-			m_UsingRawOutput = usingRawOutput;
-		}
+		void LogCommandLine( const std::vector< std::string >& argv );
 
-		bool GetUsingRawOutput() const 
-		{ 
-			return m_UsingRawOutput; 
-		}
+		void SetUsingRawOutput( bool usingRawOutput );
+		bool GetUsingRawOutput() const;
 
-		void Clear()
-		{
-			if ( m_RawOutput.str().length() )
-			{
-				m_RawOutput.str( "" );
-			}
+		void SetTrapPrintCallbacks( bool setting );
 
-			if ( m_ResponseTags.size() )
-			{
-				assert( false ); // this next line must be checked
-				std::vector< soarxml::ElementXML* >( m_ResponseTags ).swap( m_ResponseTags );
-			}
-		}
+		virtual void OnKernelEvent(int eventID, AgentSML* pAgentSML, void* pCallData);
 
-		bool HaveOutput()
-		{
-			return m_RawOutput.str().length() || m_ResponseTags.size();
-		}
+		void Clear();
+		bool HaveOutput();
 
 		// raw
 		std::ostringstream m_RawOutput;
 
 		// structured
-		void AppendArgTag( const char* pParam, const char* pType, const char* pValue ) 
-		{
-			sml::TagArg* pTag = new sml::TagArg();
-			pTag->SetParam( pParam );
-			pTag->SetType( pType );
-			pTag->SetValue( pValue );
-			m_ResponseTags.push_back( pTag );
-		}
+		void AppendArgTag( const char* pParam, const char* pType, const char* pValue );
+		void AppendArgTagFast( const char* pParam, const char* pType, const char* pValue );
+		void PrependArgTag( const char* pParam, const char* pType, const char* pValue );
+		void PrependArgTagFast( const char* pParam, const char* pType, const char* pValue );
 
-		void AppendArgTagFast( const char* pParam, const char* pType, const char* pValue )
-		{
-			sml::TagArg* pTag = new sml::TagArg();
-			pTag->SetParamFast( pParam );
-			pTag->SetTypeFast( pType );
-			pTag->SetValue( pValue );
-			m_ResponseTags.push_back( pTag );
-		}
-
-		void PrependArgTag( const char* pParam, const char* pType, const char* pValue ) 
-		{
-			sml::TagArg* pTag = new sml::TagArg();
-			pTag->SetParam( pParam );
-			pTag->SetType( pType );
-			pTag->SetValue( pValue );
-			m_ResponseTags.insert( m_ResponseTags.begin(), pTag );
-		}
-
-		void PrependArgTagFast( const char* pParam, const char* pType, const char* pValue ) 
-		{
-			sml::TagArg* pTag = new sml::TagArg();
-			pTag->SetParamFast( pParam );
-			pTag->SetTypeFast( pType );
-			pTag->SetValue( pValue );
-			m_ResponseTags.insert( m_ResponseTags.begin(), pTag );
-		}
-
-		void RecordResponse( soarxml::ElementXML* pResponse )
-		{
-			sml::TagResult* pTag = new sml::TagResult();
-			
-			for ( std::vector< soarxml::ElementXML* >::iterator iter = m_ResponseTags.begin(); iter != m_ResponseTags.end(); ++iter )
-			{
-				pTag->AddChild( *iter );
-			}
-
-			pResponse->AddChild( pTag );
-		}
+		void RecordResponse( soarxml::ElementXML* pResponse );
 
 	private:
 		bool m_UsingRawOutput;
 		std::vector< soarxml::ElementXML* > m_ResponseTags;
+		std::ofstream* m_pLogFile; // The log file stream
+		bool m_TrapPrintEvents;
+		bool m_VarPrint
+
+		CommandOutput( const CommandOutput& );
+		CommandOutput& operator=( const CommandOutput& );
 	};
 
 }

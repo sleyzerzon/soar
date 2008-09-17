@@ -758,27 +758,16 @@ bool KernelSML::HandleInput(AgentSML* pAgentSML, char const* /*pCommandName*/, C
 	return ok ;
 }
 
-bool ShouldEchoCommand( const cli::CLI& cli, char const* pCommandLine )
+bool ShouldEchoCommand( const cli::CLI& cli, std::string command )
 {
-	if ( !pCommandLine )
-	{
-		return false ;
-	}
-
-	std::string command = pCommandLine ;
-
-	char const* pSpace = strchr( pCommandLine, ' ' ) ;
-	if ( pSpace )
-	{
-		// Trim everything from space on
-		command.erase( pSpace-pCommandLine, command.length() ) ;
-	}
-
 	// See if there's an entry in the echo map for this command
-	// BADBAD: This won't work for short forms of the command or aliases; but making this test
-	// happen later in the command line processing causes too many re-entrancy problem within the command line module.
+	size_t space = command.find( ' ' );
+	if ( space == std::string::npos )
+	{
+		return false;
+	}
 
-	return cli.ShouldEchoCommand( command ) ;
+	return cli.ShouldEchoCommand( command.substr( 0,  ) ;
 }
 
 bool ExpandCommandToString( const char* pCommandLine, const cli::CLI& cli, std::string& expandedLine )
@@ -798,7 +787,7 @@ bool ExpandCommandToString( const char* pCommandLine, const cli::CLI& cli, std::
 	{
 		// 3) Reassemble the command line
 		std::ostringstream output;
-		std::for_each( argv.begin(), argv.end(), BuildOutputString( output ) );
+		std::for_each( argv.begin(), argv.end(), ConcatinateStringsWithSpaces( output ) );
 
 		// not worrying about trailing space
 		expandedLine.assign( output.str() );
@@ -828,7 +817,7 @@ bool KernelSML::HandleCommandLine(AgentSML* pAgentSML, char const* pCommandName,
 
 	// If the user chooses to enable this feature, certain commands are always echoed back.
 	// This is primarily to support two users connected to and debugging the same kernel at once.
-	if (GetEchoCommands() && ShouldEchoCommand( m_CLI, pLine ) )
+	if (GetEchoCommands() && pLine && ShouldEchoCommand( m_CLI, pLine ) )
 		echoResults = true ;
 
 	bool rawOutput = false;

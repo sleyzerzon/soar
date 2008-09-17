@@ -27,10 +27,6 @@ namespace cli
 		};
 
 	private:
-		virtual void Reset();
-		virtual void Parse();
-		virtual void Execute();
-
 		OptionHandler m_OptionHandler;
 		int m_DontEchoNewline;
 

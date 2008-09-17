@@ -54,7 +54,10 @@ namespace cli
 		std::vector< Command* > m_Commands;
 		CommandOutput m_CommandOutput;
 		Aliases m_Aliases;
-		std::ofstream* m_pLogFile;
+		std::stack< sml::AgentSML* > m_pAgentSMLStack;	// Agent we're currently working with
+
+		PushAgent( sml::AgentSML* pAgent );
+		PopAgent();
 	};
 }
 

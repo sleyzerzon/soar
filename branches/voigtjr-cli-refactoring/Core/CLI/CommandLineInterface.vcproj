@@ -315,6 +315,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\cli_CommandOutput.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\cli_OptionHandler.cpp"
 				>
 			</File>
@@ -331,6 +335,10 @@
 				</File>
 				<File
 					RelativePath=".\src\cli_echo.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\cli_source.cpp"
 					>
 				</File>
 			</Filter>
