@@ -26,15 +26,18 @@ namespace sml {
 *************************************************************/
 inline bool IsStringEqual( char const* pStr1, char const* pStr2 )
 {
-	return pStr1 && pStr2 && std::string( pStr1 ) == pStr2;
+	//return pStr1 && pStr2 && std::string( pStr1 ) == pStr2;
+	return boost::equals(pStr1, pStr2);
 }
 inline bool IsStringEqual( char const* pStr1, const std::string& str2 ) 
 {
-	return pStr1 && str2 == pStr1;
+	//return pStr1 && str2 == pStr1;
+	return boost::equals(pStr1, str2);
 }
 inline bool IsStringEqual( const std::string& str1, char const* pStr2 ) 
 {
-	return pStr2 && str1 == pStr2;
+	//return pStr2 && str1 == pStr2;
+	return boost::equals(str1, pStr2);
 }
 inline bool IsStringEqual( const std::string& str1, const std::string& str2 ) 
 {
@@ -46,9 +49,10 @@ inline bool IsStringEqual( const std::string& str1, const std::string& str2 )
 *************************************************************/
 inline bool IsStringEqualIgnoreCase( std::string str1, std::string str2 ) 
 {
-	boost::algorithm::to_lower( str1 );
-	boost::algorithm::to_lower( str2 );
-	return str1 == str2;
+	return boost::iequals(str1, str2);
+	//boost::algorithm::to_lower( str1 );
+	//boost::algorithm::to_lower( str2 );
+	//return str1 == str2;
 }
 
 /*************************************************************
