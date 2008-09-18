@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <map>
+#include <boost/lexical_cast.hpp>
 
 using namespace cli;
 using namespace sml;
@@ -114,7 +115,15 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 					
 				case rl_param_number:
 					double temp;
-					from_string( temp, argv[3] );
+					try
+					{
+						temp = boost::lexical_cast< double >( argv[3] );
+					}
+					catch ( boost::bad_lexical_cast& )
+					{
+						return SetError( CLIError::kInvalidValue );
+					}
+
 					if ( !rl_valid_parameter_value( m_pAgentSoar, argv[2].c_str(), temp ) )
 						return SetError( CLIError::kInvalidValue );
 					else
@@ -156,7 +165,6 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 	if ( !pOp )
 	{
 		std::string temp;
-		std::string *temp2;
 		double temp_val;
 		
 		temp = "Soar-RL learning: ";
@@ -189,9 +197,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 						
 		temp = "discount-rate: ";
 		temp_val = rl_get_parameter( m_pAgentSoar, RL_PARAM_DISCOUNT_RATE );
-		temp2 = to_string( temp_val );
-		temp += (*temp2);
-		delete temp2;
+		temp += boost::lexical_cast< std::string >( temp_val );
 		if ( m_RawOutput )
 			m_Result << temp << "\n\n";
 		else
@@ -221,9 +227,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 		
 		temp = "learning-rate: ";
 		temp_val = rl_get_parameter( m_pAgentSoar, RL_PARAM_LEARNING_RATE );
-		temp2 = to_string( temp_val );
-		temp += (*temp2);
-		delete temp2;
+		temp += boost::lexical_cast< std::string >( temp_val );
 		if ( m_RawOutput )
 			m_Result << temp << "\n\n";
 		else
@@ -245,9 +249,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 		
 		temp = "eligibility-trace-decay-rate: ";
 		temp_val = rl_get_parameter( m_pAgentSoar, RL_PARAM_ET_DECAY_RATE );
-		temp2 = to_string( temp_val );
-		temp += (*temp2);
-		delete temp2;
+		temp += boost::lexical_cast< std::string >( temp_val );
 		if ( m_RawOutput )
 			m_Result << temp << "\n";
 		else
@@ -255,9 +257,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 		
 		temp = "eligibility-trace-tolerance: ";
 		temp_val = rl_get_parameter( m_pAgentSoar, RL_PARAM_ET_TOLERANCE );
-		temp2 = to_string( temp_val );
-		temp += (*temp2);
-		delete temp2;
+		temp += boost::lexical_cast< std::string >( temp_val );
 		if ( m_RawOutput )
 			m_Result << temp << "\n\n";
 		else
@@ -271,7 +271,6 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 	else if ( pOp == 'g' )
 	{
 		std::string output = "";
-		std::string *temp2;
 		const char *tag_type = sml_Names::kTypeString;
 		
 		switch ( rl_get_parameter_type( m_pAgentSoar, pAttr->c_str() ) )
@@ -282,9 +281,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 				
 			case rl_param_number:
 				double temp = rl_get_parameter( m_pAgentSoar, pAttr->c_str() );
-				temp2 = to_string( temp );
-				output += (*temp2);
-				delete temp2;
+				output += boost::lexical_cast< std::string >( temp );
 				tag_type = sml_Names::kTypeDouble;
 				break;
 		}
@@ -305,10 +302,19 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 				break;
 				
 			case rl_param_number:
-				double temp;
-				from_string( temp, *pVal );
-				return rl_set_parameter( m_pAgentSoar, pAttr->c_str(), temp );
-				
+				{
+					double temp = 0;
+					try
+					{
+						temp = boost::lexical_cast< double >( *pVal );
+					}
+					catch ( boost::bad_lexical_cast& )
+					{
+						// BUGBUG: Is an error possible here? Handle it if so. The old code ignored conversion error.
+					}
+					return rl_set_parameter( m_pAgentSoar, pAttr->c_str(), temp );
+				}
+
 				break;
 				
 			case rl_param_invalid:
@@ -322,13 +328,10 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 		{
 			double temp;
 			std::string output;
-			std::string *temp_str;
 			
 			output = "Error from last update: ";
 			temp = rl_get_stat( m_pAgentSoar, (const long) RL_STAT_UPDATE_ERROR );
-			temp_str = to_string( temp );
-			output += (*temp_str);
-			delete temp_str;
+			output += boost::lexical_cast< std::string >( temp );
 			if ( m_RawOutput )
 				m_Result << output << "\n";
 			else
@@ -336,9 +339,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 			
 			output = "Total reward in last cycle: ";
 			temp = rl_get_stat( m_pAgentSoar, RL_STAT_TOTAL_REWARD );
-			temp_str = to_string( temp );
-			output += (*temp_str);
-			delete temp_str;
+			output += boost::lexical_cast< std::string >( temp );
 			if ( m_RawOutput )
 				m_Result << output << "\n";
 			else
@@ -346,9 +347,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 			
 			output = "Global reward since init: ";
 			temp = rl_get_stat( m_pAgentSoar, RL_STAT_GLOBAL_REWARD );
-			temp_str = to_string( temp );
-			output += (*temp_str);
-			delete temp_str;
+			output += boost::lexical_cast< std::string >( temp );
 			if ( m_RawOutput )
 				m_Result << output << "\n";
 			else
@@ -357,9 +356,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 		else
 		{
 			double temp = rl_get_stat( m_pAgentSoar, pAttr->c_str() );
-			std::string *temp_str = to_string( temp );
-			std::string output = (*temp_str);
-			delete temp_str;
+			std::string output = boost::lexical_cast< std::string >( temp );
 			
 			if ( m_RawOutput )
 				m_Result << output;

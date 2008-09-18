@@ -30,6 +30,7 @@
 #include "xml.h"
 
 #include "misc.h"
+#include <boost/lexical_cast.hpp>
 
 extern Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv, goal_stack_level new_id_level, char new_id_letter, struct token_struct *tok, wme *w);
 extern void variablize_symbol (agent* thisAgent, Symbol **sym);
@@ -867,9 +868,13 @@ int rl_get_template_id( const char *prod_name )
 		return -1;
 	
 	// convert id
-	int id;
-	from_string( id, id_str );
-	return id;
+	try
+	{
+		return boost::lexical_cast< int >( id_str );
+	}
+	catch ( boost::bad_lexical_cast& )
+	{}
+	return -1;
 }
 
 /***************************************************************************
@@ -950,14 +955,11 @@ void rl_revert_template_id( agent *my_agent )
 	Symbol *new_name_symbol;
 	std::string new_name = "";
 	std::string empty_string = "";
-	std::string *temp_id;
 	int new_id;
 	do
 	{
 		new_id = rl_next_template_id( my_agent );
-		temp_id = to_string( new_id );
-		new_name = ( "rl*" + empty_string + my_template->name->sc.name + "*" + (*temp_id) );
-		delete temp_id;
+		new_name = ( "rl*" + empty_string + my_template->name->sc.name + "*" + boost::lexical_cast< std::string >( new_id ) );
 	} while ( find_sym_constant( my_agent, new_name.c_str() ) != NIL );
 	new_name_symbol = make_sym_constant( my_agent, (char *) new_name.c_str() );
 	

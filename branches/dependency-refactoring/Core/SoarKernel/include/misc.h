@@ -25,31 +25,6 @@
 // String functions
 //////////////////////////////////////////////////////////
 
-// Conversion of value to string
-template<class T> std::string *to_string( T &x )
-{
-	std::string *return_val;
-	
-	// instantiate stream
-	std::ostringstream o;
-	
-	// get value into stream
-	o << std::setprecision( 16 ) << x;
-	
-	// spit value back as string
-	return_val = new std::string( o.str() );
-	o.flush();
-
-	return return_val;
-}
-
-// Conversion from string to value
-template <class T> bool from_string( T &val, std::string str )
-{
-	std::stringstream i( str );
-	return static_cast<bool>( i >> val );
-}
-
 // Determine if a string represents a natural number (i.e. all numbers)
 extern bool is_natural_number( std::string *str );
 

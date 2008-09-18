@@ -58,6 +58,8 @@
 
 #include "assert.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace soar_TraceNames;
 
 /* REW: 2003-01-06 A temporary helper function */
@@ -2147,9 +2149,7 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s, bool predict 
 						temp += candidates->value->id.name_letter;
 
 						// get number
-						std::string *temp2 = to_string( candidates->value->id.name_number );
-						temp += (*temp2);
-						delete temp2;
+						temp += boost::lexical_cast< std::string >( candidates->value->id.name_number );
 
 						predict_set( thisAgent, temp.c_str() );
 					}
