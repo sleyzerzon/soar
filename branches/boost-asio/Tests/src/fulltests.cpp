@@ -287,6 +287,7 @@ void FullTests::destroySoar()
 
 		CPPUNIT_ASSERT_MESSAGE( "Listener side kernel shutdown failed to fire smlEVENT_BEFORE_SHUTDOWN", shutdownEvent.WaitForEvent(5, 0) );
 
+		//sml::Sleep(1,0);
 		// Note, in the remote case, this does not fire smlEVENT_BEFORE_SHUTDOWN
 		// the listener side shutdown does trigger the event when it is deleted, see simplelistener.cpp
 		m_pKernel->Shutdown() ;

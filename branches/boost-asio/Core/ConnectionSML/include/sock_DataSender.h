@@ -65,7 +65,7 @@ public:
 	virtual bool		IsReadDataAvailable()=0;
 
 	// Close down our side of the data sender, locks and calls CloseInternal
-	void		Close() { soar_thread::Lock lock( &m_CloseMutex ); CloseInternal(); }
+	virtual void		Close() = 0;
 
 	// Get the name of this datasender
 	virtual std::string	GetName() { return m_name; }
@@ -85,9 +85,6 @@ protected:
 	// Lower level buffer send and receive calls.
 	virtual bool		SendBuffer(char const* pSendBuffer, size_t bufferSize)=0 ;
 	virtual bool		ReceiveBuffer(char* pRecvBuffer, size_t bufferSize)=0 ;
-
-   // Specific kinds of locks have different ways of shutting themselves down, they must do it here
-   virtual void CloseInternal() = 0;
 
 private:
    // Locks calls to CloseInternal

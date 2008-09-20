@@ -58,12 +58,39 @@ public:
 
 	// Note: When we try to read/write to the socket next we may
 	// find this is no longer true--it's just the last state we know about.
-	virtual bool	IsAlive()					{ return m_pSocket->is_open() ; }
+	virtual bool	IsAlive()					
+	{ 
+		try
+		{
+			//m_pSocket->remote_endpoint();
+			m_pSocket->available();
+		}
+		catch (std::exception& e)
+		{
+			return false;
+		}
+		return true;
+	}
 
 	// Check if data is waiting to be read
 	// Returns true if socket is closed--but then receiveMsg will know it's closed.
 	// The timeout for waiting for data is secondsWait + millisecondsWait, where millisecondsWait < 1000
 	virtual bool	IsReadDataAvailable() {	return m_pSocket->available() > 0; }
+
+	// Close down our side of the socket
+	virtual void	Close()
+	{ 
+		if(!m_pSocket->is_open()) return;
+		try
+		{
+			m_pSocket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+		} catch (std::exception& e)
+		{
+			std::cerr << "\nSocket::CloseInternal: is_open = " << m_pSocket->is_open() << std::endl;
+			std::cerr << "\nSocket::CloseInternal: " << e.what() << std::endl;
+		}
+		m_pSocket->close(); 
+	}
 
 public:
 
@@ -84,9 +111,6 @@ protected:
 	// Lower level buffer send and receive calls.
 	virtual bool	SendBuffer(char const* pSendBuffer, size_t bufferSize) ;
 	virtual bool	ReceiveBuffer(char* pRecvBuffer, size_t bufferSize) ;
-
-	// Close down our side of the socket
-	virtual void	CloseInternal() { m_pSocket->close(); }
 
 };
 

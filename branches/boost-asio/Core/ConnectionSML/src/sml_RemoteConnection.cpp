@@ -226,6 +226,8 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 	long waitForMessageTimeSeconds = 1 ;
 	long waitForMessageTimeMilliseconds = 0 ;
 
+	int numRetries = 1000;
+	int retryCounter = 0;
 	// If we don't already have this response cached,
 	// then read any pending messages.
 	do
@@ -262,6 +264,11 @@ ElementXML* RemoteConnection::GetResponseForID(char const* pID, bool wait)
 		// Check if the connection has been closed
 		if (IsClosed())
 			return NULL ;
+
+		if(retryCounter >= numRetries)
+			return NULL;
+
+		retryCounter++;
 
 	} while (wait) ;
 
@@ -385,6 +392,7 @@ void RemoteConnection::SetTraceCommunications(bool state)
 
 void RemoteConnection::CloseConnection()
 {
+	soar_thread::Lock lock(&m_ClientMutex) ;
 	m_DataSender->Close() ;
 }
 

@@ -331,6 +331,7 @@ bool EmbeddedConnection::IsClosed()
 *************************************************************/
 void EmbeddedConnection::CloseConnection()
 {
+	soar_thread::Lock lock(&m_ClientMutex) ;
 	ClearError() ;
 
 	if (m_hConnection)
