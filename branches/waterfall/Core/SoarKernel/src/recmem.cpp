@@ -559,10 +559,12 @@ void create_instantiation (agent* thisAgent, production *prod,
    Symbol **cell;
 
 #ifdef BUG_139_WORKAROUND
+    /* New waterfall model: this is now checked for before we call this function */
+    assert(prod->type != JUSTIFICATION_PRODUCTION_TYPE);
     /* RPM workaround for bug #139: don't fire justifications */
-    if (prod->type == JUSTIFICATION_PRODUCTION_TYPE) {
-        return;
-    }
+    //if (prod->type == JUSTIFICATION_PRODUCTION_TYPE) {
+    //    return;
+    //}
 #endif
 
    allocate_with_pool (thisAgent, &thisAgent->instantiation_pool, &inst);
@@ -747,6 +749,56 @@ void create_instantiation (agent* thisAgent, production *prod,
    }
 }
 
+/**
+ * New waterfall model:
+ * Returns true if the function create_instantiation should run for this production.
+ * Used to delay firing of matches in the inner preference loop.
+ */
+BOOL shouldCreateInstantiation (agent* thisAgent, production *prod, struct token_struct *tok, wme *w) 
+{
+	if (thisAgent->active_level == thisAgent->highest_active_level) {
+		return TRUE;
+	}
+
+	if (prod->type == TEMPLATE_PRODUCTION_TYPE) {
+		return TRUE;
+	}
+
+	// Scan RHS identifiers for their levels, don't fire those at or higher than the change level
+    action* a = NIL;
+    for (a=prod->action_list; a!=NIL; a=a->next) {
+		// skip unbound variables
+		if (rhs_value_is_unboundvar(a->id)) {
+			continue;
+		}
+
+		// try to make a symbol
+		Symbol* idSym = NIL;
+		if (rhs_value_is_symbol(a->id)) {
+			idSym = rhs_value_to_symbol(a->id);
+		} else {
+			if (rhs_value_is_reteloc(a->id)) {
+				idSym = get_symbol_from_rete_loc ((unsigned short) rhs_value_to_reteloc_levels_up(a->id),
+					(byte)rhs_value_to_reteloc_field_num(a->id),
+					tok, w);
+			} else {
+				// it's a function call, skip it
+				continue;
+			}
+		}
+		assert(idSym != NIL);
+
+		// check level for legal change
+		if (idSym->id.level <= thisAgent->change_level) {
+			if (thisAgent->sysparams[TRACE_WATERFALL_SYSPARAM]) {
+				print_with_symbols(thisAgent, "*** Waterfall: aborting firing because (%y * *)", idSym);
+				print(thisAgent, " level %d is on or higher (lower int) than change level %d\n", idSym->id.level, thisAgent->change_level);
+			}
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
 /* -----------------------------------------------------------------------
                         Deallocate Instantiation
 
@@ -1033,9 +1085,6 @@ void assert_new_preferences (agent* thisAgent)
 ----------------------------------------------------------------------- */
 
 void do_preference_phase (agent* thisAgent) {
-  production *prod;
-  struct token_struct *tok;
-  wme *w;
   instantiation *inst;
 
 
@@ -1072,44 +1121,114 @@ void do_preference_phase (agent* thisAgent) {
 		  print_phase (thisAgent, "\n--- Preference Phase ---\n",0);
   }
 
+  // inner elaboration cycle
+  for (;;) {
+	  thisAgent->change_level = thisAgent->next_change_level;
 
-  thisAgent->newly_created_instantiations = NIL;
+	  if (thisAgent->sysparams[TRACE_WATERFALL_SYSPARAM]) {
+		  print (thisAgent, "\n--- Inner Elaboration Phase, active level %d", thisAgent->active_level);
+		  if (thisAgent->active_goal) {
+			  print_with_symbols (thisAgent, " (%y)", thisAgent->active_goal);
+		  }
+		  print (thisAgent, " ---\n");
+	  }
 
-  /* MVP 6-8-94 */
-  while (get_next_assertion (thisAgent, &prod, &tok, &w)) {
-     if (thisAgent->max_chunks_reached) {
-       thisAgent->system_halted = TRUE;
-	   	  soar_invoke_callbacks(thisAgent, 
-		  AFTER_HALT_SOAR_CALLBACK,
-		  (soar_call_data) NULL);
-       return;
-     }
-     create_instantiation (thisAgent, prod, tok, w);
-   }
+	  thisAgent->newly_created_instantiations = NIL;
 
-  assert_new_preferences (thisAgent);
+	  Bool assertionsExist = FALSE;
+	  production *prod;
+	  struct token_struct *tok;
+	  wme *w;
+	  while (postpone_assertion (thisAgent, &prod, &tok, &w)) {
+		  assertionsExist = TRUE;
 
-  while (get_next_retraction (thisAgent, &inst))
-    retract_instantiation (thisAgent, inst);
+		  if (thisAgent->max_chunks_reached) {
+			  consume_last_postponed_assertion(thisAgent);
+			  thisAgent->system_halted = TRUE;
+			  soar_invoke_callbacks(thisAgent, 
+				  AFTER_HALT_SOAR_CALLBACK,
+				  (soar_call_data) NULL);
+			  return;
+		  }
 
-/* REW: begin 08.20.97 */
+		  if (prod->type == JUSTIFICATION_PRODUCTION_TYPE) {
+			  consume_last_postponed_assertion(thisAgent);
 
-  /*  In Waterfall, if there are nil goal retractions, then we want to 
-      retract them as well, even though they are not associated with any
-      particular goal (because their goal has been deleted). The 
-      functionality of this separate routine could have been easily 
-      combined in get_next_retraction but I wanted to highlight the 
-      distinction between regualr retractions (those that can be 
-      mapped onto a goal) and nil goal retractions that require a
-      special data strucutre (because they don't appear on any goal) 
-      REW.  */
+			  // don't fire justifications
+			  continue;
+		  }
 
-  if (thisAgent->operand2_mode && thisAgent->nil_goal_retractions) {
-    while (get_next_nil_goal_retraction (thisAgent, &inst))
-      retract_instantiation (thisAgent, inst);
-  }
+		  if (shouldCreateInstantiation(thisAgent, prod, tok, w)) {
+			  consume_last_postponed_assertion(thisAgent);
+			  create_instantiation (thisAgent, prod, tok, w);
+		  }
+	  }
 
-/* REW: end   08.20.97 */
+	  // New waterfall model: something fired or is pending to fire at this level, 
+	  // so this active level becomes the next change level.
+	  if (assertionsExist) {
+		  if (thisAgent->active_level > thisAgent->next_change_level) {
+			  thisAgent->next_change_level = thisAgent->active_level;
+		  }
+	  }
+
+	  // New waterfall model: push unfired matches back on to the assertion lists
+	  restore_postponed_assertions(thisAgent);
+
+	  assert_new_preferences (thisAgent);
+
+	  while (get_next_retraction (thisAgent, &inst))
+		  retract_instantiation (thisAgent, inst);
+
+	  /* REW: begin 08.20.97 */
+	  /*  In Waterfall, if there are nil goal retractions, then we want to 
+	  retract them as well, even though they are not associated with any
+	  particular goal (because their goal has been deleted). The 
+	  functionality of this separate routine could have been easily 
+	  combined in get_next_retraction but I wanted to highlight the 
+	  distinction between regualr retractions (those that can be 
+	  mapped onto a goal) and nil goal retractions that require a
+	  special data strucutre (because they don't appear on any goal) 
+	  REW.  */
+
+	  if (thisAgent->operand2_mode && thisAgent->nil_goal_retractions) {
+		  while (get_next_nil_goal_retraction (thisAgent, &inst))
+			  retract_instantiation (thisAgent, inst);
+	  }
+	  /* REW: end   08.20.97 */
+
+	  // Update accounting
+	  thisAgent->inner_e_cycle_count++;
+
+	  if (thisAgent->active_goal == NIL) {
+		  if (thisAgent->sysparams[TRACE_WATERFALL_SYSPARAM]) {
+			  print(thisAgent, " inner preference loop doesn't have active goal.\n");
+		  }
+		  break;
+	  }
+
+	  if (thisAgent->active_goal->id.lower_goal == NIL) {
+		  if (thisAgent->sysparams[TRACE_WATERFALL_SYSPARAM]) {
+			  print(thisAgent, " inner preference loop at bottom goal.\n");
+		  }
+		  break;
+	  }
+
+	  if (thisAgent->current_phase == APPLY_PHASE) {
+		  thisAgent->active_goal = highest_active_goal_apply(thisAgent, thisAgent->active_goal->id.lower_goal, TRUE);
+	  } else {
+		  assert(thisAgent->current_phase == PROPOSE_PHASE);
+		  thisAgent->active_goal = highest_active_goal_propose(thisAgent, thisAgent->active_goal->id.lower_goal, TRUE);
+	  }
+
+	  if (thisAgent->active_goal != NIL)
+	  {
+		  thisAgent->active_level = thisAgent->active_goal->id.level;
+	  } else {
+		  print(thisAgent, " inner preference loop finished but not at quiescence.\n");
+		  break;
+	  }
+  } // end inner elaboration loop
 
   if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
      if (! thisAgent->operand2_mode) {

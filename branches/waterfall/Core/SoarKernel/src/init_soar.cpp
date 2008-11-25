@@ -318,6 +318,8 @@ void reset_statistics (agent* thisAgent) {
   thisAgent->run_last_output_count = 0 ;
   thisAgent->run_generated_output_count = 0 ;
 
+  thisAgent->inner_e_cycle_count = 0;
+
   reset_production_firing_counts(thisAgent);
 
 /* These are ALWAYS created in create_soar_agent, so might as 
@@ -633,8 +635,25 @@ void do_one_top_level_phase (agent* thisAgent)
 			  // FIXME return the correct enum top_level_phase constant in soar_call_data? /*(soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)*/
 			  soar_invoke_callbacks(thisAgent, BEFORE_ELABORATION_CALLBACK, NULL ) ;
 		  }
+
+		  /* New waterfall model: */
+		  // Save previous active level for usage on next elaboration cycle.
+		  thisAgent->highest_active_level = thisAgent->active_level;
+		  thisAgent->highest_active_goal = thisAgent->active_goal;
+
+		  thisAgent->change_level = thisAgent->highest_active_level;
+		  thisAgent->next_change_level = thisAgent->highest_active_level;
+		  /* End new waterfall model */
+
 		  do_preference_phase(thisAgent);
-	      do_working_memory_phase(thisAgent);
+
+		  /* New waterfall model: */
+		  // Restore previous active level
+		  thisAgent->active_level = thisAgent->highest_active_level;
+		  thisAgent->active_goal = thisAgent->highest_active_goal;
+		  /* End new waterfall model */
+
+		  do_working_memory_phase(thisAgent);
           /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
           thisAgent->e_cycles_this_d_cycle++;
@@ -795,7 +814,24 @@ void do_one_top_level_phase (agent* thisAgent)
 			  // FIXME return the correct enum top_level_phase constant in soar_call_data? /*(soar_call_data)((thisAgent->applyPhase == TRUE)? gSKI_K_APPLY_PHASE: gSKI_K_PROPOSAL_PHASE)*/
 			soar_invoke_callbacks(thisAgent, BEFORE_ELABORATION_CALLBACK, NULL ) ;
 		  }
+
+		  /* New waterfall model: */
+		  // Save previous active level for usage on next elaboration cycle.
+		  thisAgent->highest_active_level = thisAgent->active_level;
+		  thisAgent->highest_active_goal = thisAgent->active_goal;
+
+		  thisAgent->change_level = thisAgent->highest_active_level;
+		  thisAgent->next_change_level = thisAgent->highest_active_level;
+		  /* End new waterfall model */
+
 		  do_preference_phase(thisAgent);
+
+		  /* New waterfall model: */
+		  // Restore previous active level
+		  thisAgent->active_level = thisAgent->highest_active_level;
+		  thisAgent->active_goal = thisAgent->highest_active_goal;
+		  /* End new waterfall model */
+
 		  do_working_memory_phase(thisAgent);
           /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
