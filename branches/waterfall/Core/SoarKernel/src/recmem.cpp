@@ -767,32 +767,33 @@ BOOL shouldCreateInstantiation (agent* thisAgent, production *prod, struct token
 	// Scan RHS identifiers for their levels, don't fire those at or higher than the change level
     action* a = NIL;
     for (a=prod->action_list; a!=NIL; a=a->next) {
+		if (a->type==FUNCALL_ACTION) {
+			continue;
+		}
+
 		// skip unbound variables
 		if (rhs_value_is_unboundvar(a->id)) {
 			continue;
 		}
 
 		// try to make a symbol
-		Symbol* idSym = NIL;
+		Symbol* sym = NIL;
 		if (rhs_value_is_symbol(a->id)) {
-			idSym = rhs_value_to_symbol(a->id);
+			sym = rhs_value_to_symbol(a->id);
 		} else {
 			if (rhs_value_is_reteloc(a->id)) {
-				idSym = get_symbol_from_rete_loc ((unsigned short) rhs_value_to_reteloc_levels_up(a->id),
+				sym = get_symbol_from_rete_loc ((unsigned short) rhs_value_to_reteloc_levels_up(a->id),
 					(byte)rhs_value_to_reteloc_field_num(a->id),
 					tok, w);
-			} else {
-				// it's a function call, skip it
-				continue;
 			}
 		}
-		assert(idSym != NIL);
+		assert(sym != NIL);
 
 		// check level for legal change
-		if (idSym->id.level <= thisAgent->change_level) {
+		if (sym->id.level <= thisAgent->change_level) {
 			if (thisAgent->sysparams[TRACE_WATERFALL_SYSPARAM]) {
-				print_with_symbols(thisAgent, "*** Waterfall: aborting firing because (%y * *)", idSym);
-				print(thisAgent, " level %d is on or higher (lower int) than change level %d\n", idSym->id.level, thisAgent->change_level);
+				print_with_symbols(thisAgent, "*** Waterfall: aborting firing because (%y * *)", sym);
+				print(thisAgent, " level %d is on or higher (lower int) than change level %d\n", sym->id.level, thisAgent->change_level);
 			}
 			return FALSE;
 		}
@@ -1139,6 +1140,7 @@ void do_preference_phase (agent* thisAgent) {
 	  production *prod;
 	  struct token_struct *tok;
 	  wme *w;
+	  Bool once = TRUE;
 	  while (postpone_assertion (thisAgent, &prod, &tok, &w)) {
 		  assertionsExist = TRUE;
 
@@ -1159,6 +1161,7 @@ void do_preference_phase (agent* thisAgent) {
 		  }
 
 		  if (shouldCreateInstantiation(thisAgent, prod, tok, w)) {
+			  once = FALSE;
 			  consume_last_postponed_assertion(thisAgent);
 			  create_instantiation (thisAgent, prod, tok, w);
 		  }
