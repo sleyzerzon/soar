@@ -636,25 +636,10 @@ void do_one_top_level_phase (agent* thisAgent)
 			  soar_invoke_callbacks(thisAgent, BEFORE_ELABORATION_CALLBACK, NULL ) ;
 		  }
 
-		  /* New waterfall model: */
-		  // Save previous active level for usage on next elaboration cycle.
-		  thisAgent->highest_active_level = thisAgent->active_level;
-		  thisAgent->highest_active_goal = thisAgent->active_goal;
-
-		  thisAgent->change_level = thisAgent->highest_active_level;
-		  thisAgent->next_change_level = thisAgent->highest_active_level;
-		  /* End new waterfall model */
-
 		  do_preference_phase(thisAgent);
-
-		  /* New waterfall model: */
-		  // Restore previous active level
-		  thisAgent->active_level = thisAgent->highest_active_level;
-		  thisAgent->active_goal = thisAgent->highest_active_goal;
-		  /* End new waterfall model */
-
 		  do_working_memory_phase(thisAgent);
-          /* Update accounting.  Moved here by KJC 04/05/05 */
+
+		  /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
           thisAgent->e_cycles_this_d_cycle++;
 		  thisAgent->run_elaboration_count++ ;
@@ -815,25 +800,10 @@ void do_one_top_level_phase (agent* thisAgent)
 			soar_invoke_callbacks(thisAgent, BEFORE_ELABORATION_CALLBACK, NULL ) ;
 		  }
 
-		  /* New waterfall model: */
-		  // Save previous active level for usage on next elaboration cycle.
-		  thisAgent->highest_active_level = thisAgent->active_level;
-		  thisAgent->highest_active_goal = thisAgent->active_goal;
-
-		  thisAgent->change_level = thisAgent->highest_active_level;
-		  thisAgent->next_change_level = thisAgent->highest_active_level;
-		  /* End new waterfall model */
-
 		  do_preference_phase(thisAgent);
-
-		  /* New waterfall model: */
-		  // Restore previous active level
-		  thisAgent->active_level = thisAgent->highest_active_level;
-		  thisAgent->active_goal = thisAgent->highest_active_goal;
-		  /* End new waterfall model */
-
 		  do_working_memory_phase(thisAgent);
-          /* Update accounting.  Moved here by KJC 04/05/05 */
+
+		  /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
           thisAgent->e_cycles_this_d_cycle++;
 		  thisAgent->run_elaboration_count++ ;

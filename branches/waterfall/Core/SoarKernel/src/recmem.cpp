@@ -1122,6 +1122,14 @@ void do_preference_phase (agent* thisAgent) {
 		  print_phase (thisAgent, "\n--- Preference Phase ---\n",0);
   }
 
+  /* New waterfall model: */
+  // Save previous active level for usage on next elaboration cycle.
+  thisAgent->highest_active_level = thisAgent->active_level;
+  thisAgent->highest_active_goal = thisAgent->active_goal;
+
+  thisAgent->change_level = thisAgent->highest_active_level;
+  thisAgent->next_change_level = thisAgent->highest_active_level;
+
   // inner elaboration cycle
   for (;;) {
 	  thisAgent->change_level = thisAgent->next_change_level;
@@ -1180,26 +1188,6 @@ void do_preference_phase (agent* thisAgent) {
 
 	  assert_new_preferences (thisAgent);
 
-	  while (get_next_retraction (thisAgent, &inst))
-		  retract_instantiation (thisAgent, inst);
-
-	  /* REW: begin 08.20.97 */
-	  /*  In Waterfall, if there are nil goal retractions, then we want to 
-	  retract them as well, even though they are not associated with any
-	  particular goal (because their goal has been deleted). The 
-	  functionality of this separate routine could have been easily 
-	  combined in get_next_retraction but I wanted to highlight the 
-	  distinction between regualr retractions (those that can be 
-	  mapped onto a goal) and nil goal retractions that require a
-	  special data strucutre (because they don't appear on any goal) 
-	  REW.  */
-
-	  if (thisAgent->operand2_mode && thisAgent->nil_goal_retractions) {
-		  while (get_next_nil_goal_retraction (thisAgent, &inst))
-			  retract_instantiation (thisAgent, inst);
-	  }
-	  /* REW: end   08.20.97 */
-
 	  // Update accounting
 	  thisAgent->inner_e_cycle_count++;
 
@@ -1232,6 +1220,31 @@ void do_preference_phase (agent* thisAgent) {
 		  break;
 	  }
   } // end inner elaboration loop
+
+  // Restore previous active level
+  thisAgent->active_level = thisAgent->highest_active_level;
+  thisAgent->active_goal = thisAgent->highest_active_goal;
+  /* End new waterfall model */
+
+  while (get_next_retraction (thisAgent, &inst))
+	  retract_instantiation (thisAgent, inst);
+
+  /* REW: begin 08.20.97 */
+  /*  In Waterfall, if there are nil goal retractions, then we want to 
+  retract them as well, even though they are not associated with any
+  particular goal (because their goal has been deleted). The 
+  functionality of this separate routine could have been easily 
+  combined in get_next_retraction but I wanted to highlight the 
+  distinction between regualr retractions (those that can be 
+  mapped onto a goal) and nil goal retractions that require a
+  special data strucutre (because they don't appear on any goal) 
+  REW.  */
+
+  if (thisAgent->operand2_mode && thisAgent->nil_goal_retractions) {
+	  while (get_next_nil_goal_retraction (thisAgent, &inst))
+		  retract_instantiation (thisAgent, inst);
+  }
+  /* REW: end   08.20.97 */
 
   if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM]) {
      if (! thisAgent->operand2_mode) {
