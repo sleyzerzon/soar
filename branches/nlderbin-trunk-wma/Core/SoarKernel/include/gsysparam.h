@@ -178,14 +178,17 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 /* JRV: Bug 1087: Chunk through local negations */
 #define CHUNK_THROUGH_LOCAL_NEGATIONS_SYSPARAM	 40
 
+/* New waterfall model: trace waterfall events */
+#define TRACE_WATERFALL_SYSPARAM				 41
+
 /* NLD: WMA enabled parameter */
-#define WMA_ENABLED								 41
+#define WMA_ENABLED								 42
 
 /* NLD: WMA trace information */
-#define TRACE_WMA_SYSPARAM						 42
+#define TRACE_WMA_SYSPARAM						 43
 
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  42
+#define HIGHEST_SYSPARAM_NUMBER                  43
 
 /* -----------------------------------------
    Sysparams[] stores the parameters; set_sysparam()
