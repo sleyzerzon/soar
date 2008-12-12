@@ -1,3 +1,0 @@
-pushd eater
-source eater_source.soar
-popd
