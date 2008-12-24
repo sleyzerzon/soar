@@ -52,6 +52,8 @@ opts.AddOptions(
 	BoolOption('verbose', 'Verbose compiler output', 'no'),
 	
 	BoolOption('gcc42', 'Use GCC-4.2 (experimental, Darwin only)', 'no'),
+	
+	BoolOption('iphone', 'Build for the iPhone SDK', 'no'),
 )
 
 # Create the environment using the options
@@ -69,6 +71,11 @@ conf = Configure(env, custom_tests = custom_tests)
 
 # We define SCONS to indicate to the source that SCONS is controlling the build.
 conf.env.Append(CPPFLAGS = ' -DSCONS')
+
+# Makes any necessary changes for iPhone SDK
+if conf.env['iphone']:
+	conf.env.Append(CPPFLAGS = ' -DSTATIC_LINKED -DIPHONE_SDK')
+	conf.env.Append(CPPFLAGS = ' -DIPHONE_SDK')
 
 # We need to know if we're on darwin because malloc.h doesn't exist, functions are in stdlib.h
 if sys.platform == "darwin":
@@ -186,35 +193,36 @@ SConscript('#Core/CLI/SConscript')
 SConscript('#Core/ClientSML/SConscript')
 SConscript('#Core/KernelSML/SConscript')
 
-if sys.platform == 'cygwin':
-	SConscript('#Core/pcre/SConscript')
-
-if env['java']:
-	SConscript('#Core/ClientSMLSWIG/Java/SConscript')
-
-	# Only build the interface if we're building for eclipse	
-	if not env['eclipse']:
-		SConscript('#Tools/LoggerJava/SConscript')
-		SConscript('#Tools/TestJavaSML/SConscript')
-		
-		SConscript('#Tools/VisualSoar/SConscript')
+if env['iphone'] == False:
+	if sys.platform == 'cygwin':
+		SConscript('#Core/pcre/SConscript')
+	
+	if env['java']:
+		SConscript('#Core/ClientSMLSWIG/Java/SConscript')
+	
+		# Only build the interface if we're building for eclipse	
+		if not env['eclipse']:
+			SConscript('#Tools/LoggerJava/SConscript')
+			SConscript('#Tools/TestJavaSML/SConscript')
 			
-		if env['swt']:
-			SConscript('#Tools/SoarJavaDebugger/SConscript')
-			SConscript('#Environments/Soar2D/SConscript')
-			SConscript('#Environments/JavaMissionaries/SConscript')
-			SConscript('#Environments/JavaTOH/SConscript')
-
-if env['python']:
-	SConscript('#Core/ClientSMLSWIG/Python/SConscript')
-
-SConscript('#Tools/TestCLI/SConscript')
-SConscript('#Tools/FilterC/SConscript')
-SConscript('#Tools/QuickLink/SConscript')
-SConscript('#Tools/SoarTextIO/SConscript')
-SConscript('#Tools/TOHSML/SConscript')
-SConscript('#Tools/TestSMLEvents/SConscript')
-SConscript('#Tools/TestSMLPerformance/SConscript')
-SConscript('#Tools/TestSoarPerformance/SConscript')
-SConscript('#Tests/SConscript')
+			SConscript('#Tools/VisualSoar/SConscript')
+				
+			if env['swt']:
+				SConscript('#Tools/SoarJavaDebugger/SConscript')
+				SConscript('#Environments/Soar2D/SConscript')
+				SConscript('#Environments/JavaMissionaries/SConscript')
+				SConscript('#Environments/JavaTOH/SConscript')
+	
+	if env['python']:
+		SConscript('#Core/ClientSMLSWIG/Python/SConscript')
+	
+	SConscript('#Tools/TestCLI/SConscript')
+	SConscript('#Tools/FilterC/SConscript')
+	SConscript('#Tools/QuickLink/SConscript')
+	SConscript('#Tools/SoarTextIO/SConscript')
+	SConscript('#Tools/TOHSML/SConscript')
+	SConscript('#Tools/TestSMLEvents/SConscript')
+	SConscript('#Tools/TestSMLPerformance/SConscript')
+	SConscript('#Tools/TestSoarPerformance/SConscript')
+	SConscript('#Tests/SConscript')
 

@@ -31,7 +31,9 @@
 #endif // MAXPATHLEN
 
 // Use local sockets instead of internet sockets for same-machine interprocess communication
+#ifndef IPHONE_SDK
 #define ENABLE_LOCAL_SOCKETS
+#endif
 
 #include <dlfcn.h>      // Needed for dlopen and dlsym
 #define GetProcAddress dlsym
@@ -90,7 +92,7 @@
 // Don't think this error maps to Unix error codes.
 // Leave it with original Windows value just so we can compile.
 #define NET_NOTINITIALISED	10093
-// 
+//
 ///////
 
 #define NET_SD_BOTH			SHUT_RDWR

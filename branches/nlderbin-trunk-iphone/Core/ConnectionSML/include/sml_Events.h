@@ -194,17 +194,17 @@ static inline bool IsRunEventID(int id)
 {
 	return (id >= smlEVENT_BEFORE_SMALLEST_STEP && id <= smlEVENT_LAST_RUN_EVENT) ;
 }
-static inline bool IsPhaseEventID (int id)
+static inline bool IsPhaseEventID (int event_id)
 {   
-	return (id > smlEVENT_BEFORE_PHASE_EXECUTED && id < smlEVENT_AFTER_PHASE_EXECUTED) ;
+	return (event_id > smlEVENT_BEFORE_PHASE_EXECUTED && event_id < smlEVENT_AFTER_PHASE_EXECUTED) ;
 }
 static inline bool IsBEFOREPhaseEventID (int id)
 {
  	return (id > smlEVENT_BEFORE_PHASE_EXECUTED && id <= smlEVENT_BEFORE_WM_PHASE) ;
 }
-static inline bool IsAFTERPhaseEventID (int id)
+static inline bool IsAFTERPhaseEventID (int event_id)
 {
- 	return (id >= smlEVENT_AFTER_INPUT_PHASE && id < smlEVENT_AFTER_PHASE_EXECUTED) ;
+ 	return (event_id >= smlEVENT_AFTER_INPUT_PHASE && event_id < smlEVENT_AFTER_PHASE_EXECUTED) ;
 }
 
 static inline bool IsProductionEventID(int id)
