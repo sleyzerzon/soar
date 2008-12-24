@@ -1,0 +1,145 @@
+// !$*UTF8*$!
+{
+	1B3E3F190F026AD500A892D1 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.mm */;
+		name = "main.mm: 56";
+		rLen = 0;
+		rLoc = 2185;
+		rType = 0;
+		vrLen = 873;
+		vrLoc = 0;
+	};
+	1B95BF4D0F0266F300A7D646 /* iSoar */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = iSoar;
+		sourceDirectories = (
+		);
+	};
+	1B95BF590F0266F800A7D646 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	1B95BF5A0F0266F800A7D646 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	1B95BF700F02685E00A7D646 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 1D3623250D0F684500981E51 /* iSoarAppDelegate.m */;
+		name = "iSoarAppDelegate.m: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 459;
+		vrLoc = 0;
+	};
+	1B95BF720F02685E00A7D646 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 1D3623250D0F684500981E51 /* iSoarAppDelegate.m */;
+		name = "iSoarAppDelegate.m: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 459;
+		vrLoc = 0;
+	};
+	1BACA5620F026BEE00A4AF1B /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.mm */;
+		name = "main.mm: 34";
+		rLen = 0;
+		rLoc = 989;
+		rType = 0;
+		vrLen = 836;
+		vrLoc = 0;
+	};
+	1D3623250D0F684500981E51 /* iSoarAppDelegate.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {716, 428}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 459}";
+		};
+	};
+	1D6058900D05DD3D006BFB54 /* iSoar */ = {
+		activeExec = 0;
+		executables = (
+			1B95BF4D0F0266F300A7D646 /* iSoar */,
+		);
+	};
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 1B95BF4D0F0266F300A7D646 /* iSoar */;
+		activeTarget = 1D6058900D05DD3D006BFB54 /* iSoar */;
+		addToTargets = (
+			1D6058900D05DD3D006BFB54 /* iSoar */,
+		);
+		codeSenseManager = 1B95BF5A0F0266F800A7D646 /* Code sense */;
+		executables = (
+			1B95BF4D0F0266F300A7D646 /* iSoar */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					538,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 251816666;
+			PBXWorkspaceStateSaveDate = 251816666;
+		};
+		perUserProjectItems = {
+			1B3E3F190F026AD500A892D1 /* PBXTextBookmark */ = 1B3E3F190F026AD500A892D1 /* PBXTextBookmark */;
+			1B95BF700F02685E00A7D646 /* PBXTextBookmark */ = 1B95BF700F02685E00A7D646 /* PBXTextBookmark */;
+			1B95BF720F02685E00A7D646 /* PBXTextBookmark */ = 1B95BF720F02685E00A7D646 /* PBXTextBookmark */;
+			1BACA5620F026BEE00A4AF1B /* PBXTextBookmark */ = 1BACA5620F026BEE00A4AF1B /* PBXTextBookmark */;
+		};
+		sourceControlManager = 1B95BF590F0266F800A7D646 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	29B97316FDCFA39411CA2CEA /* main.mm */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {726, 1134}}";
+			sepNavSelRange = "{989, 0}";
+			sepNavVisRange = "{0, 836}";
+		};
+	};
+}
