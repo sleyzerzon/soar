@@ -13,6 +13,7 @@
 		1B3E3F010F026A7E00A892D1 /* libSoarKernel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B3E3EFB0F026A7E00A892D1 /* libSoarKernel.a */; };
 		1B3E3F020F026A7E00A892D1 /* libConnectionSML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B3E3EFC0F026A7E00A892D1 /* libConnectionSML.a */; };
 		1B3E3F030F026A7E00A892D1 /* libSoarKernelSML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B3E3EFD0F026A7E00A892D1 /* libSoarKernelSML.a */; };
+		1B83D4EC0F0276400074E0C9 /* soar2008.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B83D4EB0F0276400074E0C9 /* soar2008.png */; };
 		1D3623260D0F684500981E51 /* iSoarAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* iSoarAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -28,6 +29,7 @@
 		1B3E3EFB0F026A7E00A892D1 /* libSoarKernel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSoarKernel.a; path = ../../../SoarLibrary/lib/libSoarKernel.a; sourceTree = SOURCE_ROOT; };
 		1B3E3EFC0F026A7E00A892D1 /* libConnectionSML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libConnectionSML.a; path = ../../../SoarLibrary/lib/libConnectionSML.a; sourceTree = SOURCE_ROOT; };
 		1B3E3EFD0F026A7E00A892D1 /* libSoarKernelSML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSoarKernelSML.a; path = ../../../SoarLibrary/lib/libSoarKernelSML.a; sourceTree = SOURCE_ROOT; };
+		1B83D4EB0F0276400074E0C9 /* soar2008.png */ = {isa = PBXFileReference; explicitFileType = image.png; path = soar2008.png; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* iSoarAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iSoarAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* iSoarAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iSoarAppDelegate.m; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1B83D4EB0F0276400074E0C9 /* soar2008.png */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 			);
@@ -174,6 +177,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
+				1B83D4EC0F0276400074E0C9 /* soar2008.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
