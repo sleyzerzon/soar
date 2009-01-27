@@ -10,57 +10,62 @@ class CellSynchronized extends Cell {
 	}
 	
 	@Override
-	synchronized Player getPlayer() {
+	void addObserver(CellObjectObserver observer) {
+		super.addObserver(observer);
+	}
+	
+	@Override
+	public synchronized Player getPlayer() {
 		return super.getPlayer();
 	}
 	
 	@Override
-	synchronized void setPlayer(Player player) {
+	public synchronized void setPlayer(Player player) {
 		super.setPlayer(player);
 	}
 	
 	@Override
-	synchronized void addObject(CellObject cellObject) {
+	public synchronized void addObject(CellObject cellObject) {
 		super.addObject(cellObject);
 	}
 	
 	@Override
-	synchronized ArrayList<CellObject> getAllWithProperty(String name) {	
+	public synchronized ArrayList<CellObject> getAllWithProperty(String name) {	
 		return super.getAllWithProperty(name);
 	}
 	
 	@Override
-	synchronized ArrayList<CellObject> getAll() {	
+	public synchronized ArrayList<CellObject> getAll() {	
 		return super.getAll();
 	}
 	
 	@Override
-	synchronized boolean hasAnyWithProperty(String name) {	
+	public synchronized boolean hasAnyWithProperty(String name) {	
 		return super.hasAnyWithProperty(name);
 	}
 	
 	@Override
-	synchronized ArrayList<CellObject> removeAllByProperty(String name) {
+	public synchronized ArrayList<CellObject> removeAllByProperty(String name) {
 		return super.removeAllByProperty(name);
 	}
 	
 	@Override
-	synchronized public ArrayList<CellObject> removeAll() {
+	public synchronized ArrayList<CellObject> removeAll() {
 		return super.removeAll();
 	}
 
 	@Override
-	synchronized CellObject getObject(String name) {
+	public synchronized CellObject getObject(String name) {
 		return super.getObject(name);
 	}
 	
 	@Override
-	synchronized boolean hasObject(String name) {
+	public synchronized boolean hasObject(String name) {
 		return super.hasObject(name);
 	}
 	
 	@Override
-	synchronized CellObject removeObject(String name) {
+	public synchronized CellObject removeObject(String name) {
 		return super.removeObject(name);
 	}
 }

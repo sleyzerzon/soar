@@ -1239,7 +1239,7 @@ public class WindowManager {
 		
 		try {
 			this.editMap.load(null);
-		} catch (GridMap.LoadError e) {
+		} catch (Exception e) {
 			// TODO: handle gracefully
 			assert false;
 		}

@@ -13,7 +13,7 @@ import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.Soar2D;
 
-public class TaxiMap extends GridMap {
+public class TaxiMap implements GridMap {
 	private static Logger logger = Logger.getLogger(TaxiMap.class);
 
 	// this should be a property of the player, but this is easier

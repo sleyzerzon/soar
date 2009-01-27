@@ -1,12 +1,9 @@
 package soar2d.map;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
-import org.jdom.Element;
 
 import soar2d.Direction;
 import soar2d.Names;
@@ -14,11 +11,89 @@ import soar2d.Soar2D;
 import soar2d.players.Player;
 import soar2d.world.TankSoarWorld;
 
-public class TankSoarMap extends GridMap {
+public class TankSoarMap implements GridMap, CellObjectObserver {
 	
-	public TankSoarMap() {
+	GridMapData data;
+
+	public TankSoarMap(File mapFile) throws Exception {
+		data = GridMapUtil.loadFromFile(mapFile, this);
+
+		// Add ground to cells that don't have a background.
+		int size = data.cells.size();
+		int [] xy = new int[2];
+		for (xy[0] = 0; xy[0] < size; ++xy[0]) {
+			for (xy[1] = 0; xy[1] < size; ++xy[1]) {
+				Cell cell = data.cells.getCell(xy);
+				if (!cellHasBackground(cell)) {
+					// add ground
+					CellObject cellObject = data.cellObjectManager.createObject(Names.kGround);
+					cell.addObject(cellObject);
+				}
+			}
+		}
 	}
 
+	private boolean cellHasBackground(Cell cell) {
+		for (CellObject cellObject : cell.getAll()) {
+			if ((cellObject.getName() == Names.kGround)
+					|| cellObject.hasProperty(Names.kPropertyBlock)
+					|| cellObject.hasProperty(Names.kPropertyCharger)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public int size() {
+		return data.cells.size();
+	}
+	
+	public Cell getCell(int[] xy) {
+		return data.cells.getCell(xy);
+	}
+
+	public boolean isAvailable(int[] location) {
+		Cell cell = getCell(location);
+		boolean enterable = !cell.hasAnyWithProperty(Names.kPropertyBlock);
+		boolean noPlayer = cell.getPlayer() == null;
+		boolean noMissilePack = !cell.hasAnyWithProperty(Names.kPropertyMissiles);
+		boolean noCharger = !cell.hasAnyWithProperty(Names.kPropertyCharger);
+		return enterable && noPlayer && noMissilePack && noCharger;
+	}
+	
+	public int[] getAvailableLocationAmortized() {
+		return GridMapUtil.getAvailableLocationAmortized(this);
+	}
+
+	public void addStateUpdate(int [] location, CellObject added) {
+		// Update state we keep track of specific to game type
+		if (added.hasProperty(Names.kPropertyCharger)) {
+			if (!health && added.hasProperty(Names.kPropertyHealth)) {
+				health = true;
+			}
+			if (!energy && added.hasProperty(Names.kPropertyEnergy)) {
+				energy = true;
+			}
+		}
+		if (added.hasProperty(Names.kPropertyMissiles)) {
+			missilePacks += 1;
+		}
+	}
+
+	public void removalStateUpdate(int [] location, CellObject removed) {
+		if (removed.hasProperty(Names.kPropertyCharger)) {
+			if (health && removed.hasProperty(Names.kPropertyHealth)) {
+				health = false;
+			}
+			if (energy && removed.hasProperty(Names.kPropertyEnergy)) {
+				energy = false;
+			}
+		}
+		if (removed.hasProperty(Names.kPropertyMissiles)) {
+			missilePacks -= 1;
+		}
+	}
+	
 	int missilePacks = 0;	// returns the number of missile packs on the map
 	public int numberMissilePacks() {
 		return missilePacks;
@@ -33,99 +108,27 @@ public class TankSoarMap extends GridMap {
 	public boolean hasEnergyCharger() {
 		return energy;
 	}
-	
-	@Override
-	protected void cell(Element cell, int [] location) throws LoadError {
-		boolean background = false;
 		
-		List<Element> children = (List<Element>)cell.getChildren();
-		Iterator<Element> iter = children.iterator();
-		while (iter.hasNext()) {
-			Element child = iter.next();
-			
-			if (!child.getName().equalsIgnoreCase(kTagObject)) {
-				throw new LoadError("unrecognized tag: " + child.getName());
-			}
-			
-			background = object(child, location);
-		}
-		
-		if (!background) {
-			// add ground
-			CellObject cellObject = cellObjectManager.createObject(Names.kGround);
-			addObjectToCell(location, cellObject);
-		}
-	}
-	
-	@Override
-	protected boolean object(Element object, int [] location) throws LoadError {
-		String name = object.getTextTrim();
-		if (name.length() <= 0) {
-			throw new LoadError("object doesn't have name");
-		}
-		
-		if (!cellObjectManager.hasTemplate(name)) {
-			throw new LoadError("object \"" + name + "\" does not map to a cell object");
-		}
-		
-		CellObject cellObject = cellObjectManager.createObject(name);
-		
-		// false for all but tanksoar, tanksoar checks
-		boolean background = objectIsBackground(cellObject);
-		addObjectToCell(location, cellObject);
-
-		if (cellObject.rewardInfoApply) {
-			assert rewardInfoObject == null;
-			rewardInfoObject = cellObject;
-		}
-		
-		return background;
-	}
-
-	@Override
-	public boolean isAvailable(int [] location) {
-		Cell cell = getCell(location);
-		boolean enterable = !cell.hasAnyWithProperty(Names.kPropertyBlock);
-		boolean noPlayer = cell.getPlayer() == null;
-		boolean noMissilePack = !cell.hasAnyWithProperty(Names.kPropertyMissiles);
-		boolean noCharger = !cell.hasAnyWithProperty(Names.kPropertyCharger);
-		return enterable && noPlayer && noMissilePack && noCharger;
-	}
-
-	public boolean objectIsBackground(CellObject cellObject) {
-		if (cellObject.hasProperty(Names.kPropertyBlock) 
-				|| (cellObject.getName() == Names.kGround)
-				|| (cellObject.hasProperty(Names.kPropertyCharger))) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void setExplosion(int [] location) {
-		addObjectToCell(location, cellObjectManager.createObject(Names.kExplosion));
-	}
-
 	private static class MissileData {
-		MissileData(int [] location, CellObject missile) {
-			this.location = location;
+		MissileData(Cell cell, CellObject missile) {
+			this.cell = cell;
 			this.missile = missile;
 		}
-		int [] location;
+		Cell cell;
 		CellObject missile;
 	}
-	@Override
+	
 	public void updateObjects(TankSoarWorld tsWorld) {
-		HashSet<CellObject> copy = new HashSet<CellObject>(updatables);
+		HashSet<CellObject> copy = new HashSet<CellObject>(data.updatables);
 		ArrayList<int []> explosions = new ArrayList<int []>();
 		ArrayList<MissileData> newMissiles = new ArrayList<MissileData>();
 		for (CellObject cellObject : copy) {
-			int [] location = Arrays.copyOf(updatablesLocations.get(cellObject), updatablesLocations.get(cellObject).length);
+			int [] location = Arrays.copyOf(data.updatablesLocations.get(cellObject), data.updatablesLocations.get(cellObject).length);
 			
 			if (cellObject.update(location)) {
 
 				// Remove it from the cell
-				removalStateUpdate(getCell(location).removeObject(cellObject.getName()));
+				getCell(location).removeObject(cellObject.getName());
 
 				// Missiles fly, handle that
 				if (cellObject.hasProperty(Names.kPropertyMissile)) {
@@ -172,7 +175,7 @@ public class TankSoarMap extends GridMap {
 						
 						// if the missile is not in phase 2, return
 						if (phase != 2) {
-							newMissiles.add(new MissileData(location, cellObject));
+							newMissiles.add(new MissileData(cell, cellObject));
 							break;
 						}
 						
@@ -184,42 +187,11 @@ public class TankSoarMap extends GridMap {
 		}
 
 		for (int[] location : explosions) {
-			setExplosion(location);
+			tsWorld.setExplosion(location);
 		}
 		for (MissileData data : newMissiles) {
-			addObjectToCell(data.location, data.missile);
+			data.cell.addObject(data.missile);
 		}
 	}
 	
-	@Override
-	void addStateUpdate(int [] location, CellObject added) {
-		super.addStateUpdate(location, added);
-		// Update state we keep track of specific to game type
-		if (added.hasProperty(Names.kPropertyCharger)) {
-			if (!health && added.hasProperty(Names.kPropertyHealth)) {
-				health = true;
-			}
-			if (!energy && added.hasProperty(Names.kPropertyEnergy)) {
-				energy = true;
-			}
-		}
-		if (added.hasProperty(Names.kPropertyMissiles)) {
-			missilePacks += 1;
-		}
-	}
-	@Override
-	void removalStateUpdate(CellObject removed) {
-		super.removalStateUpdate(removed);
-		if (removed.hasProperty(Names.kPropertyCharger)) {
-			if (health && removed.hasProperty(Names.kPropertyHealth)) {
-				health = false;
-			}
-			if (energy && removed.hasProperty(Names.kPropertyEnergy)) {
-				energy = false;
-			}
-		}
-		if (removed.hasProperty(Names.kPropertyMissiles)) {
-			missilePacks -= 1;
-		}
-	}
 }

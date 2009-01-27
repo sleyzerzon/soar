@@ -12,7 +12,7 @@ import soar2d.Names;
 import soar2d.Soar2D;
 import soar2d.config.SimConfig;
 
-public class BookMap extends GridMap {
+public class BookMap implements GridMap {
 
 	public BookMap() {
 	}

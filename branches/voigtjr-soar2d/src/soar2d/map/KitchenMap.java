@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 
 import soar2d.Names;
 
-public class KitchenMap extends GridMap {
+public class KitchenMap implements GridMap {
 	private static Logger logger = Logger.getLogger(KitchenMap.class);
 
 	public KitchenMap() {

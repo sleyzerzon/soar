@@ -1,27 +1,73 @@
 package soar2d.map;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import soar2d.Names;
 import soar2d.Soar2D;
-import soar2d.world.TankSoarWorld;
 
-public class EatersMap extends GridMap {
+public class EatersMap implements GridMap, CellObjectObserver {
 
-	public EatersMap() {
+	GridMapData data;
+	
+	EatersMap(File mapFile) throws Exception {
+		data = GridMapUtil.loadFromFile(mapFile, this);
+	}
+	
+	public int size() {
+		return data.cells.size();
+	}
+	
+	public Cell getCell(int[] xy) {
+		return data.cells.getCell(xy);
 	}
 
-	@Override
-	public void updateObjects(TankSoarWorld tsWorld) {
-		HashSet<CellObject> copy = new HashSet<CellObject>(updatables);
+	public boolean isAvailable(int[] location) {
+		Cell cell = data.cells.getCell(location);
+		boolean enterable = !cell.hasAnyWithProperty(Names.kPropertyBlock);
+		boolean noPlayer = cell.getPlayer() == null;
+		return enterable && noPlayer;
+	}
+	
+	public int[] getAvailableLocationAmortized() {
+		return GridMapUtil.getAvailableLocationAmortized(this);
+	}
+
+	public void addStateUpdate(int [] location, CellObject added) {
+		// Update state we keep track of specific to game type
+		if (added.hasProperty(Names.kPropertyEdible)) {
+			foodCount += 1;
+		}
+		if (added.hasProperty(Names.kPropertyPoints)) {
+			scoreCount += added.getIntProperty(Names.kPropertyPoints);
+		}
+	}
+
+	public void removalStateUpdate(int [] location, CellObject removed) {
+		if (Soar2D.config.terminalsConfig().unopened_boxes) {
+			if (isUnopenedBox(removed)) {
+				unopenedBoxes.remove(removed);
+			}
+		}
+		
+		if (removed.hasProperty(Names.kPropertyEdible)) {
+			foodCount -= 1;
+		}
+		if (removed.hasProperty(Names.kPropertyPoints)) {
+			scoreCount -= removed.getIntProperty(Names.kPropertyPoints);
+		}
+	}
+
+	public void updateObjects() {
+		HashSet<CellObject> copy = new HashSet<CellObject>(data.updatables);
 		for (CellObject cellObject : copy) {
-			int [] location = updatablesLocations.get(cellObject);
+			int [] location = data.updatablesLocations.get(cellObject);
 			
 			int previousScore = setPreviousScore(cellObject);
 
 			if (cellObject.update(location)) {
-				removalStateUpdate(getCell(location).removeObject(cellObject.getName()));
+				getCell(location).removeObject(cellObject.getName());
 			}
 
 			// decay
@@ -41,6 +87,16 @@ public class EatersMap extends GridMap {
 		}
 	}
 	
+	private boolean isUnopenedBox(CellObject object) {
+		if (object.hasProperty(Names.kPropertyBox)) {
+			String status = object.getProperty(Names.kPropertyStatus);
+			if (status == null || !status.equals(Names.kOpen)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	int scoreCount = 0;
 	public int getScoreCount() {
 		return scoreCount;
@@ -56,22 +112,6 @@ public class EatersMap extends GridMap {
 		return unopenedBoxes.size();
 	}
 	
-	@Override
-	public boolean isAvailable(int [] location) {
-		Cell cell = getCell(location);
-		boolean enterable = !cell.hasAnyWithProperty(Names.kPropertyBlock);
-		boolean noPlayer = cell.getPlayer() == null;
-		return enterable && noPlayer;
-	}
-	
-	@Override
-	public void setExplosion(int [] location) {
-		CellObject explosion = new CellObject(Names.kExplosion);
-		explosion.addProperty(Names.kPropertyLinger, "2");
-		explosion.setLingerUpdate(true);
-		addObjectToCell(location, explosion);
-	}
-	
 	private int setPreviousScore(CellObject cellObject) {
 		if (cellObject.hasProperty(Names.kPropertyPoints)) {
 			return cellObject.getIntProperty(Names.kPropertyPoints);
@@ -79,32 +119,4 @@ public class EatersMap extends GridMap {
 		return 0;
 	}
 	
-	@Override
-	void addStateUpdate(int [] location, CellObject added) {
-		super.addStateUpdate(location, added);
-		// Update state we keep track of specific to game type
-		if (added.hasProperty(Names.kPropertyEdible)) {
-			foodCount += 1;
-		}
-		if (added.hasProperty(Names.kPropertyPoints)) {
-			scoreCount += added.getIntProperty(Names.kPropertyPoints);
-		}
-	}
-
-	@Override
-	void removalStateUpdate(CellObject removed) {
-		super.removalStateUpdate(removed);
-		if (Soar2D.config.terminalsConfig().unopened_boxes) {
-			if (isUnopenedBox(removed)) {
-				unopenedBoxes.remove(removed);
-			}
-		}
-		
-		if (removed.hasProperty(Names.kPropertyEdible)) {
-			foodCount -= 1;
-		}
-		if (removed.hasProperty(Names.kPropertyPoints)) {
-			scoreCount -= removed.getIntProperty(Names.kPropertyPoints);
-		}
-	}
 }

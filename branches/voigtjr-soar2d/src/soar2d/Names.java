@@ -224,4 +224,5 @@ public class Names {
 	public static final String kMouse = "mouse";
 	
 	public static final String kBookObjectName = "mblock";
+	
 }

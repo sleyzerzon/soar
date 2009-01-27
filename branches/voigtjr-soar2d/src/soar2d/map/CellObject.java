@@ -7,9 +7,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import soar2d.Names;
-import soar2d.Soar2D;
 import soar2d.players.Player;
-import soar2d.world.World;
 
 /**
  * @author voigtjr
@@ -252,8 +250,6 @@ public class CellObject {
 	 * @return true if the object should be removed from the cell after the apply
 	 */
 	public boolean apply(Player player) {
-		World world = Soar2D.simulation.world;
-		
 		for (String key : propertiesApply.keySet()) {
 			String value = propertiesApply.get(key);
 			logger.info(Names.Info.newProperty + key + " --> " + value);
@@ -290,14 +286,11 @@ public class CellObject {
 		
 		// Reward apply is only true on the reward boxes, not info boxes
 		if (rewardApply > 0) {
-			assert properties.containsKey(Names.kPropertyBoxID);
-			int myID = Integer.parseInt(properties.get(Names.kPropertyBoxID));
-
 			// am I the positive box
-			if (myID == world.getMap().positiveRewardID) {
+			if (rewardBox) {
 				// if the open code is not zero, get an open code
 				int suppliedOpenCode = 0;
-				if (world.getMap().openCode != 0) {
+				if (openCode != 0) {
 					// get the open code if any
 					if (properties.containsKey(Names.kPropertyOpenCode)) {
 						suppliedOpenCode = Integer.parseInt(properties.get(Names.kPropertyOpenCode));
@@ -305,7 +298,7 @@ public class CellObject {
 				}
 				
 				// see if we opened the box correctly
-				if (suppliedOpenCode == world.getMap().openCode) {
+				if (suppliedOpenCode == openCode) {
 					// reward positively
 					player.adjustPoints(rewardApply, "positive reward");
 				} else {
@@ -325,6 +318,15 @@ public class CellObject {
 		}
 		
 		return false;
+	}
+	
+	boolean rewardBox = false;
+	void setRewardBox() {
+		rewardBox = true;
+	}
+	int openCode = 0;
+	void setOpenCode(int openCode) {
+		this.openCode = openCode;
 	}
 	/**
 	 * @param world the world 

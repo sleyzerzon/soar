@@ -270,7 +270,7 @@ public class EatersWorld implements IWorld {
 			int [] collisionLocation = players.getLocation(collision.get(0));
 
 			// Add the boom on the map
-			map.setExplosion(collisionLocation);
+			setExplosion(collisionLocation);
 
 			// Remove from former location (only one of these for all players)
 			map.setPlayer(collisionLocation, null);
@@ -288,7 +288,15 @@ public class EatersWorld implements IWorld {
 			}
 		}
 	}
+
+	public void setExplosion(int[] xy) {
+		CellObject explosion = new CellObject(Names.kExplosion);
+		explosion.addProperty(Names.kPropertyLinger, "2");
+		explosion.setLingerUpdate(true);
+		data.cells.getCell(xy).addObject(explosion);
+	}
 	
+
 	public int getMinimumAvailableLocations() {
 		return 1;
 	}

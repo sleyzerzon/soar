@@ -13,7 +13,6 @@ import soar2d.config.SimConfig;
 import soar2d.map.EatersMap;
 import soar2d.map.GridMap;
 import soar2d.map.TaxiMap;
-import soar2d.map.GridMap.LoadError;
 import soar2d.players.MoveInfo;
 import soar2d.players.Player;
 
@@ -28,7 +27,7 @@ public class World {
 	private boolean printedStats = false;
 	
 	private File mapFile;
-	private GridMap map;
+
 	public GridMap getMap() {
 		return map;
 	}
@@ -84,7 +83,7 @@ public class World {
 		
 		try {
 			newMap.load(newMapFile);
-		} catch (GridMap.LoadError e) {
+		} catch (Exception e) {
 			error(e.getMessage());
 			return false;
 		}
@@ -101,9 +100,6 @@ public class World {
 		resetPlayers(resetDuringRun);
 		
 		logger.info(mapFile.getName() + " loaded, world reset.");
-		if (map.getOpenCode() != 0) {
-			logger.info("The correct open code is: " + map.getOpenCode());
-		}
 		return true;
 	}
 	

@@ -43,7 +43,10 @@ public class TankSoarWorld implements IWorld {
 		return true;
 	}
 	
-	
+	public void setExplosion(int [] location) {
+		addObjectToCell(location, cellObjectManager.createObject(Names.kExplosion));
+	}
+
 	private HashMap<Player, HashSet<Player> > killedTanks = new HashMap<Player, HashSet<Player> >(7);
 	private int missileID = 0;
 	private int missileReset = 0;

@@ -7,7 +7,7 @@ import java.util.Iterator;
 import soar2d.players.Player;
 
 class Cell {
-	public static Cell createCell(boolean headless, int[] xy) {
+	static Cell createCell(boolean headless, int[] xy) {
 		if (headless) {
 			// only one thread
 			return new Cell(xy);
@@ -19,6 +19,14 @@ class Cell {
 		this.location = Arrays.copyOf(xy, xy.length);
 	}
 	int [] location;
+	public int[] getLocation() {
+		return Arrays.copyOf(location, location.length);
+	}
+	
+	private ArrayList<CellObjectObserver> observers = new ArrayList<CellObjectObserver>();
+	void addObserver(CellObjectObserver observer) {
+		observers.add(observer);
+	}
 	
 	@Override
 	public String toString() {
@@ -28,15 +36,15 @@ class Cell {
 	Cell[] neighbors = new Cell[5]; // uses Direction, which is 1-4 not 0-5
 	
 	private boolean draw = true;
-	boolean resetRedraw() {
+	public boolean checkAndResetRedraw() {
 		boolean temp = draw;
 		draw = false;
 		return temp;
 	}
-	boolean checkRedraw() {
+	public boolean checkRedraw() {
 		return draw;
 	}
-	void forceRedraw() {
+	public void forceRedraw() {
 		draw = true;
 	}
 	
@@ -51,39 +59,48 @@ class Cell {
 	int distance = -1;
 	Cell parent;
 	
-	Player getPlayer() {
+	public Player getPlayer() {
 		return this.player;
 	}
 	
-	void setPlayer(Player player) {
+	public void setPlayer(Player player) {
 		draw = true;
 		this.player = player;
 	}
 	
 	/** Objects keyed by name, not null name will replace existing if any */
-	void addObject(CellObject cellObject) {
+	public void addObject(CellObject cellObject) {
 		draw = true;
 		if (cellObject == null) {
 			throw new NullPointerException();
 		}
 		removeObject(cellObject.getName());
 		cellObjects.add(cellObject);
+		
+		for (CellObjectObserver observer : observers) {
+			observer.addStateUpdate(location, cellObject);
+		}
 	}
 	
-	ArrayList<CellObject> getAll() {	
+	public ArrayList<CellObject> getAll() {	
 		if (cellObjects.size() == 0) {
 			return null;
 		}
 		return new ArrayList<CellObject>(cellObjects);
 	}
 	
-	ArrayList<CellObject> removeAll() {
+	public ArrayList<CellObject> removeAll() {
 		draw = true;
 		if (cellObjects.size() == 0) {
 			return null;
 		}
 		ArrayList<CellObject> ret = cellObjects;
 		cellObjects = new ArrayList<CellObject>();
+		for (CellObject cellObject : ret) {
+			for (CellObjectObserver observer : observers) {
+				observer.removalStateUpdate(location, cellObject);
+			}
+		}
 		return ret;
 	}
 
@@ -93,7 +110,7 @@ class Cell {
 	 * 
 	 * Returns the object by name.
 	 */
-	CellObject getObject(String name) {
+	public CellObject getObject(String name) {
 		if (name == null) {
 			throw new NullPointerException();
 		}
@@ -111,7 +128,7 @@ class Cell {
 	 * 
 	 * Check to see if the object with the specified name is in the cell.
 	 */
-	boolean hasObject(String name) {
+	public boolean hasObject(String name) {
 		for (CellObject object : cellObjects) {
 			if (object.getName().equals(name)) {
 				return true;
@@ -127,7 +144,7 @@ class Cell {
 	 * If the specified object exists in the cell, it is removed and returned.
 	 * Null is returned if the object isn't in the cell.
 	 */
-	CellObject removeObject(String name) {
+	public CellObject removeObject(String name) {
 		if (name == null) {
 			throw new NullPointerException();
 		}
@@ -137,6 +154,10 @@ class Cell {
 			CellObject object = iter.next();
 			if (object.getName().equals(name)) {
 				iter.remove();
+				for (CellObjectObserver observer : observers) {
+					observer.removalStateUpdate(location, object);
+				}
+				// no more iteration, removal state could change cellObjects!
 				return object;
 			}
 		}
@@ -150,7 +171,7 @@ class Cell {
 	 * Returns all objects in the cell with the specified property.
 	 * The returned list is never null but could be length zero.
 	 */
-	ArrayList<CellObject> getAllWithProperty(String name) {	
+	public ArrayList<CellObject> getAllWithProperty(String name) {	
 		ArrayList<CellObject> ret = null;
 		for (CellObject object : cellObjects) {
 			if (object.hasProperty(name)) {
@@ -163,7 +184,7 @@ class Cell {
 		return ret;
 	}
 	
-	boolean hasAnyWithProperty(String name) {	
+	public boolean hasAnyWithProperty(String name) {	
 		for (CellObject object : cellObjects) {
 			if (object.hasProperty(name)) {
 				return true;
@@ -172,7 +193,7 @@ class Cell {
 		return false;
 	}
 	
-	ArrayList<CellObject> removeAllByProperty(String name) {
+	public ArrayList<CellObject> removeAllByProperty(String name) {
 		draw = true;
 		ArrayList<CellObject> ret = null;
 		Iterator<CellObject> iter = cellObjects.iterator();
@@ -184,6 +205,12 @@ class Cell {
 				}
 				ret.add(object);
 				iter.remove();
+			}
+		}
+		for (CellObject cellObject : ret) {
+			// needs to be outside above loop because cellObjects could change.
+			for (CellObjectObserver observer : observers) {
+				observer.removalStateUpdate(location, cellObject);
 			}
 		}
 		return ret;
