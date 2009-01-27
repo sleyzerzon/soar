@@ -43,6 +43,10 @@ public class BookMap implements GridMap {
 		boolean mblock = cell.hasAnyWithProperty(Names.kBookObjectName);
 		return enterable && noPlayer && !mblock;
 	}
+
+	public boolean isInBounds(int[] xy) {
+		return data.cells.isInBounds(xy);
+	}
 	
 	private int roomCount = 0;
 	private int gatewayCount = 0;
@@ -752,5 +756,9 @@ public class BookMap implements GridMap {
 			bookObjects.remove(removed);
 			bookObjectInfo.remove(removed);
 		}
+	}
+
+	public CellObject createObjectByName(String name) {
+		return data.cellObjectManager.createObject(name);
 	}
 }

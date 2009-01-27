@@ -13,6 +13,10 @@ import soar2d.players.Taxi;
 
 public class TaxiWorld implements IWorld {
 
+	public TaxiWorld(String map) throws Exception {
+		
+	}
+	
 	public void fragPlayer(Player player, GridMap map, PlayersManager players,
 			int [] location) {
 
@@ -29,9 +33,18 @@ public class TaxiWorld implements IWorld {
 			PlayersManager players, int [] location) {
 	}
 
+	private boolean stopNextCyclePassengerPickUp = false;
+	private boolean stopNextCycleFuelRemaining = false;
+	private boolean stopNextCyclePassengerDelivered = false;
+	
 	public void reset(GridMap _map) {
 		TaxiMap map = (TaxiMap)_map;
 		map.placePassengerAndSetDestination();
+		
+		// TODO: from world
+		this.stopNextCycleFuelRemaining = false;
+		this.stopNextCyclePassengerPickUp = false;
+		this.stopNextCyclePassengerDelivered = false;
 	}
 	
 	public String update(GridMap _map, PlayersManager players) {

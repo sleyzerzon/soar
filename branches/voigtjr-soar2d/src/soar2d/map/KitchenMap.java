@@ -110,6 +110,10 @@ public class KitchenMap implements GridMap {
 		return enterable && noPlayer;
 	}
 
+	public boolean isInBounds(int[] xy) {
+		return data.cells.isInBounds(xy);
+	}
+	
 	public boolean isCountertop(int [] location) {
 		return getCell(location).getObject("countertop") != null;
 	}
@@ -128,5 +132,9 @@ public class KitchenMap implements GridMap {
 	void removalStateUpdate(CellObject removed) {
 		super.removalStateUpdate(removed);
 		checkBasics(null, removed, false);
+	}
+
+	public CellObject createObjectByName(String name) {
+		return data.cellObjectManager.createObject(name);
 	}
 }

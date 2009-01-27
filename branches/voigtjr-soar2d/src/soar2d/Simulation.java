@@ -39,7 +39,12 @@ import soar2d.players.soar.SoarTank;
 import soar2d.players.soar.SoarTaxi;
 import soar2d.players.tosca.ToscaCook;
 import soar2d.players.tosca.ToscaEater;
-import soar2d.world.World;
+import soar2d.world.BookWorld;
+import soar2d.world.EatersWorld;
+import soar2d.world.IWorld;
+import soar2d.world.KitchenWorld;
+import soar2d.world.TankSoarWorld;
+import soar2d.world.TaxiWorld;
 
 /**
  * @author voigtjr
@@ -66,7 +71,8 @@ public class Simulation {
 	/**
 	 * The world and everything associated with it
 	 */
-	public World world = new World();
+	private IWorld world;
+	
 	/**
 	 * Legal colors (see PlayerConfig)
 	 */
@@ -83,13 +89,7 @@ public class Simulation {
 	private Game game;
 	private boolean usingTosca;
 	
-	/**
-	 * @return true if there were no errors during initialization
-	 * 
-	 * sets everything up in preparation of execution. only called once per
-	 * program run (not once per soar run)
-	 */
-	public boolean initialize(SimConfig config) {
+	void initialize(SimConfig config) throws Exception {
 		this.game = config.game();
 		this.usingTosca = config.generalConfig().tosca;
 		
@@ -110,8 +110,7 @@ public class Simulation {
 		}
 
 		if (kernel.HadError()) {
-			fatalError(Names.Errors.kernelCreation + kernel.GetLastErrorDescription());
-			return false;
+			throw new Exception(Names.Errors.kernelCreation + kernel.GetLastErrorDescription());
 		}
 		
 		// We want the most performance
@@ -145,15 +144,29 @@ public class Simulation {
 		
 		// Load the world
 		logger.trace(Names.Trace.loadingWorld);
-		if(!world.load(game, config.generalConfig().map, config.generalConfig().runs)) {
-			return false;
+		switch (game) {
+		case TANKSOAR:
+			world = new TankSoarWorld(config.generalConfig().map);
+			break;
+		case EATERS:
+			world = new EatersWorld(config.generalConfig().map);
+			break;
+		case KITCHEN:
+			world = new KitchenWorld(config.generalConfig().map);
+			break;
+		case TAXI:
+			world = new TaxiWorld(config.generalConfig().map);
+			break;
+		case ROOM:
+			world = new BookWorld(config.generalConfig().map);
+			break;
 		}
-		
+		Soar2D.control.setRunsTerminal(config.generalConfig().runs);
+		Soar2D.control.resetTime();
+
 		// Start or wait for clients (false: before agent creation)
 		logger.trace(Names.Trace.beforeClients);
-		if (!doClients(false)) {
-			return false;
-		}
+		doClients(false);
 		
 		// add initial players
 		logger.trace(Names.Trace.initialPlayers);
@@ -163,23 +176,13 @@ public class Simulation {
 		
 		// Start or wait for clients (true: after agent creation)
 		logger.trace(Names.Trace.afterClients);
-		if (!doClients(true)) {
-			return false;
-		}
-		
-		// success
-		return true;
+		doClients(true);
 	}
 	
-	private void fatalError(String message) {
-		logger.fatal(message);
-		Soar2D.control.errorPopUp(message);
-	}
-	
-	private void error(String message) {
-		logger.fatal(message);
-		Soar2D.control.errorPopUp(message);
-	}
+//	private void error(String message) {
+//		logger.fatal(message);
+//		Soar2D.control.errorPopUp(message);
+//	}
 	
 	public ArrayList<String> getUnusedColors() {
 		return unusedColors;
@@ -265,19 +268,17 @@ public class Simulation {
 	 * 
 	 * create a player and add it to the simulation and world
 	 */
-	public void createPlayer(String playerId, PlayerConfig playerConfig) {
+	public void createPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
 		if (Game.TAXI == game && (world.getPlayers().size() > 1)) {
 			// if this is removed, revisit white color below!
-			error(Names.Errors.taxi1Player);
-			return;
+			throw new Exception(Names.Errors.taxi1Player);
 		}
 		
 		// if a color was specified
 		if (playerConfig.color != null) {
 			//make sure it is unused
 			if (!unusedColors.contains(playerConfig.color)) {
-				error(Names.Errors.usedColor + playerConfig.color);
-				return;
+				throw new Exception(Names.Errors.usedColor + playerConfig.color);
 			}
 			// it is unused, so use it
 			useAColor(playerConfig.color);
@@ -290,8 +291,7 @@ public class Simulation {
 			if (color == null) {
 				
 				// if we didn't then they are all gone
-				error(Names.Errors.noMoreSlots);
-				return;
+				throw new Exception(Names.Errors.noMoreSlots);
 			}
 			playerConfig.color = color;
 		}
@@ -445,7 +445,7 @@ public class Simulation {
 			// a problem in this block requires us to free up the color
 			freeAColor(playerConfig.color);
 			if (e.getMessage() != null) {
-				error(e.getMessage());
+				throw new Exception(e.getMessage());
 			}
 			return;
 		}
@@ -546,7 +546,7 @@ public class Simulation {
 	 * @param after do the clients denoted as "after" agent creation
 	 * @return true if the clients all connected.
 	 */
-	private boolean doClients(boolean after) {
+	private void doClients(boolean after) throws Exception {
 		for ( Entry<String, ClientConfig> entry : Soar2D.config.clientConfigs().entrySet()) {
 			if (entry.getValue().after != after) {
 				continue;
@@ -560,12 +560,10 @@ public class Simulation {
 				spawnClient(entry.getKey(), entry.getValue());
 			} else {
 				if (!waitForClient(entry.getKey(), entry.getValue())) {
-					error(Names.Errors.clientSpawn + entry.getKey());
-					return false;
+					throw new Exception(Names.Errors.clientSpawn + entry.getKey());
 				}
 			}
 		}
-		return true;
 	}
 
 	/**
@@ -596,7 +594,7 @@ public class Simulation {
 	 * 
 	 * spawns a client, waits for it to connect
 	 */
-	public void spawnClient(String clientID, ClientConfig clientConfig) {
+	public void spawnClient(String clientID, ClientConfig clientConfig) throws Exception {
 		Runtime r = java.lang.Runtime.getRuntime();
 		logger.trace(Names.Trace.spawningClient + clientID);
 
@@ -616,14 +614,11 @@ public class Simulation {
 			rd.start();
 			
 			if (!waitForClient(clientID, clientConfig)) {
-				error(Names.Errors.clientSpawn + clientID);
-				return;
+				throw new Exception(Names.Errors.clientSpawn + clientID);
 			}
 			
 		} catch (IOException e) {
-			error(Names.Errors.clientSpawn + clientID + ": " + e.getMessage());
-			shutdown();
-			System.exit(1);
+			throw new Exception(Names.Errors.clientSpawn + clientID + ": " + e.getMessage());
 		}
 	}
 	
@@ -695,14 +690,10 @@ public class Simulation {
 	 * 
 	 * resets the world, ready for a new run
 	 */
-	public boolean reset() {
+	public void reset() throws Exception {
 		logger.info(Names.Info.reset);
-		if (!world.load(game, null, Soar2D.config.generalConfig().runs)) {
-			File mapFile = new File(Soar2D.config.generalConfig().map);
-			error("Error loading map " + mapFile.getAbsolutePath());
-			return false;
-		}
-		return true;
+		world.reset();
+		Soar2D.control.resetTime();
 	}
 
 	/**
@@ -710,7 +701,7 @@ public class Simulation {
 	 */
 	public void shutdown() {
 		if (world != null) {
-			world.shutdown();
+			world.removeAllPlayers();
 		}
 		
 		assert this.agents.size() == 0;
@@ -736,12 +727,6 @@ public class Simulation {
 		return agents.size() > 0;
 	}
 	
-	/**
-	 * TODO
-	 * @return true if the simulation has reached a terminal state
-	 * 
-	 * check to see if one of the terminal states has been reached
-	 */
 	public boolean isDone() {
 		return world.isTerminal();
 	}

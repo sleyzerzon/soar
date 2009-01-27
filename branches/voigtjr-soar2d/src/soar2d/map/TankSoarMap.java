@@ -60,6 +60,10 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		boolean noCharger = !cell.hasAnyWithProperty(Names.kPropertyCharger);
 		return enterable && noPlayer && noMissilePack && noCharger;
 	}
+
+	public boolean isInBounds(int[] xy) {
+		return data.cells.isInBounds(xy);
+	}
 	
 	public int[] getAvailableLocationAmortized() {
 		return GridMapUtil.getAvailableLocationAmortized(this);
@@ -193,5 +197,8 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 			data.cell.addObject(data.missile);
 		}
 	}
-	
+
+	public CellObject createObjectByName(String name) {
+		return data.cellObjectManager.createObject(name);
+	}
 }

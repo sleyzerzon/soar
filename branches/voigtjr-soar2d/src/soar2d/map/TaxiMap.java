@@ -164,6 +164,10 @@ public class TaxiMap implements GridMap {
 		return !destination && !fuel && noPlayer;
 	}
 
+	public boolean isInBounds(int[] xy) {
+		return data.cells.isInBounds(xy);
+	}
+	
 	public boolean isFuelNegative() {
 		return fuel < 0;
 	}
@@ -237,5 +241,9 @@ public class TaxiMap implements GridMap {
 		//if (removed.hasProperty("passenger")) {
 		//	this.passengerLocation = null;
 		//}
+	}
+
+	public CellObject createObjectByName(String name) {
+		return data.cellObjectManager.createObject(name);
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import soar2d.players.Player;
 
-class Cell {
+public class Cell {
 	static Cell createCell(boolean headless, int[] xy) {
 		if (headless) {
 			// only one thread

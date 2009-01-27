@@ -5,6 +5,8 @@ public interface GridMap {
 	public Cell getCell(int[] xy);
 	public boolean isAvailable(int[] location);
 	public int[] getAvailableLocationAmortized();
+	public boolean isInBounds(int[] xy);
+	public CellObject createObjectByName(String name);
 }
 
 /*

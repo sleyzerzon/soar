@@ -21,6 +21,10 @@ import soar2d.players.Player;
 public class KitchenWorld implements IWorld {
 	private static Logger logger = Logger.getLogger(KitchenWorld.class);
 
+	public KitchenWorld(String map) throws Exception {
+		
+	}
+	
 	public void fragPlayer(Player player, GridMap map, PlayersManager players,
 			int [] location) {
 

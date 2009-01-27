@@ -1,15 +1,21 @@
 package soar2d.world;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
+
 import soar2d.Soar2D;
+import soar2d.map.GridMap;
 import soar2d.players.MoveInfo;
 import soar2d.players.Player;
 
 public class PlayersManager {
+	private static Logger logger = Logger.getLogger(PlayersManager.class);
+
 	private ArrayList<Player> players = new ArrayList<Player>(7);
 	private ArrayList<Player> humanPlayers = new ArrayList<Player>(7);
 	private HashMap<String, Player> playersMap = new HashMap<String, Player>(7);
@@ -18,31 +24,31 @@ public class PlayersManager {
 	private HashMap<Player, double []> floatLocations = new HashMap<Player, double []>(7);
 	private HashMap<Player, MoveInfo> lastMoves = new HashMap<Player, MoveInfo>(7);
 	
-	public int numberOfPlayers() {
+	int numberOfPlayers() {
 		return players.size();
 	}
 
-	public Iterator<Player> humanIterator() {
+	Iterator<Player> humanIterator() {
 		return humanPlayers.iterator();
 	}
 	
-	public ArrayList<Player> getAll() {
+	ArrayList<Player> getAll() {
 		return players;
 	}
 	
-	public Iterator<Player> iterator() {
+	Iterator<Player> iterator() {
 		return players.iterator();
 	}
 	
-	public ListIterator<Player> listIterator() {
+	ListIterator<Player> listIterator() {
 		return players.listIterator();
 	}
 	
-	public ListIterator<Player> listIterator(int index) {
+	ListIterator<Player> listIterator(int index) {
 		return players.listIterator(index);
 	}
 	
-	public int [] getLocation(Player player) {
+	int [] getLocation(Player player) {
 		return locations.get(player);
 	}
 	
@@ -50,7 +56,7 @@ public class PlayersManager {
 		locations.put(player, location);
 	}
 	
-	public double [] getFloatLocation(Player player) {
+	double [] getFloatLocation(Player player) {
 		return floatLocations.get(player);
 	}
 	
@@ -58,7 +64,7 @@ public class PlayersManager {
 		floatLocations.put(player, location);
 	}
 	
-	public MoveInfo getMove(Player player) {
+	MoveInfo getMove(Player player) {
 		return lastMoves.get(player);
 	}
 	
@@ -66,19 +72,20 @@ public class PlayersManager {
 		lastMoves.put(player, move);
 	}
 	
-	public Player get(String name) {
+	Player get(String name) {
 		return playersMap.get(name);
 	}
 	
-	public Player get(int index) {
+	Player get(int index) {
 		return players.get(index);
 	}
 	
-	public int indexOf(Player player) {
+	int indexOf(Player player) {
 		return players.indexOf(player);
 	}
 	
 	void remove(Player player) {
+		logger.info("Removing player " + player);
 		players.remove(player);
 		humanPlayers.remove(player);
 		playersMap.remove(player.getName());
@@ -88,7 +95,13 @@ public class PlayersManager {
 		lastMoves.remove(player);
 	}
 	
-	void add(Player player, int [] initialLocation, boolean human) {
+	void add(Player player, GridMap map, int [] initialLocation, boolean human) throws Exception {
+		logger.info("Adding player " + player);
+
+		if(playersMap.containsKey(player.getName())) {
+			throw new Exception("Player already exists.");
+		}
+
 		players.add(player);
 		playersMap.put(player.getName(), player);
 		
@@ -101,30 +114,29 @@ public class PlayersManager {
 		}
 	}
 	
-	public boolean hasInitialLocation(Player player) {
+	boolean hasInitialLocation(Player player) {
 		return initialLocations.containsKey(player);
 	}
 
-	public int [] getInitialLocation(Player player) {
+	int [] getInitialLocation(Player player) {
 		return initialLocations.get(player);
 	}
 	
-	public boolean exists(Player player) {
+	boolean exists(Player player) {
 		return playersMap.containsKey(player.getName());
 	}
 	
-	public double angleOff(Player left, Player right) {
+	double angleOff(Player left, Player right) {
 		double [] target = new double [] { floatLocations.get(right)[0], floatLocations.get(right)[1] };
 		
 		return angleOff(left, target);
 	}
 
-	public int size() {
+	int size() {
 		return players.size();
 	}
 	
-
-	public double angleOff(Player left, double [] target) {
+	double angleOff(Player left, double [] target) {
 		double [] playerVector = new double [] { floatLocations.get(left)[0], floatLocations.get(left)[1] };
 
 		if (Soar2D.config.roomConfig().continuous == false) {
@@ -163,4 +175,36 @@ public class PlayersManager {
 		return Math.acos(dotProduct) * -1;
 	}
 
+	int [] putInStartingLocation(Player player, GridMap map, boolean useInitialLocation) throws Exception {
+		int[] location = null;
+		if (useInitialLocation && hasInitialLocation(player)) {
+			location = getInitialLocation(player);
+			if (!map.isAvailable(location)) {
+				logger.warn(player.getName() + ": Initial location (" + location[0] + "," + location[1] + ") is blocked, going random.");
+				location = null;
+			}
+		}
+		
+		if (location == null) {
+			location = map.getAvailableLocationAmortized();
+			if (location == null) {
+				throw new Exception("There are no suitable starting locations for " + player.getName() + ".");
+			}
+		}
+		
+		// put the player in it
+		map.getCell(location).setPlayer(player);
+		setLocation(player, location);
+		return location;
+	}
+
+	int[] getSortedScores() {
+		int[] scores = new int[players.size()];
+		
+		for (int i = 0; i < players.size(); ++i) {
+			scores[i] = players.get(i).getPoints();
+		}
+		Arrays.sort(scores);
+		return scores;
+	}
 }

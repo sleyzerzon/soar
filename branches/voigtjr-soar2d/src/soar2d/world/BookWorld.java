@@ -20,6 +20,10 @@ import soar2d.players.Player;
 public class BookWorld implements IWorld {
 	private static Logger logger = Logger.getLogger(BookWorld.class);
 
+	public BookWorld(String map) throws Exception {
+		
+	}
+	
 	public boolean postLoad(GridMap _map) {
 		BookMap map = (BookMap)_map;
 		if (map.generateRoomStructure() == false) {

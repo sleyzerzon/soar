@@ -8,7 +8,6 @@ import java.io.InputStream;
 import soar2d.config.SimConfig;
 import soar2d.visuals.WindowManager;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 /*
@@ -67,8 +66,10 @@ public class Soar2D {
 
 		// Initialize simulation
 		logger.trace(Names.Trace.initSimulation);
-		if (!simulation.initialize(config)) {
-			fatalError(Names.Errors.simulationInitFail);
+		try {
+			simulation.initialize(config);
+		} catch (Exception e) {
+			fatalError(Names.Errors.simulationInitFail + e.getMessage());
 		}
 		
 		if (usingGUI) {

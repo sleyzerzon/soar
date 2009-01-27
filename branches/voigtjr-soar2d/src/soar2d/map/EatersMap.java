@@ -11,7 +11,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 
 	GridMapData data;
 	
-	EatersMap(File mapFile) throws Exception {
+	public EatersMap(File mapFile) throws Exception {
 		data = GridMapUtil.loadFromFile(mapFile, this);
 	}
 	
@@ -28,6 +28,10 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		boolean enterable = !cell.hasAnyWithProperty(Names.kPropertyBlock);
 		boolean noPlayer = cell.getPlayer() == null;
 		return enterable && noPlayer;
+	}
+
+	public boolean isInBounds(int[] xy) {
+		return data.cells.isInBounds(xy);
 	}
 	
 	public int[] getAvailableLocationAmortized() {
@@ -119,4 +123,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		return 0;
 	}
 	
+	public CellObject createObjectByName(String name) {
+		return data.cellObjectManager.createObject(name);
+	}
 }

@@ -21,6 +21,10 @@ import soar2d.players.Player;
 public class TankSoarWorld implements IWorld {
 	private static Logger logger = Logger.getLogger(TankSoarWorld.class);
 
+	public TankSoarWorld(String map) throws Exception {
+		
+	}
+	
 	public boolean postLoad(GridMap _map) {
 		TankSoarMap tMap = (TankSoarMap)_map;
 		if (!tMap.hasEnergyCharger()) {
