@@ -71,7 +71,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 			
 			int previousScore = setPreviousScore(cellObject);
 
-			if (cellObject.update(location)) {
+			if (cellObject.update()) {
 				getCell(location).removeObject(cellObject.getName());
 			}
 

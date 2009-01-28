@@ -16,11 +16,91 @@ import org.jdom.input.SAXBuilder;
 import soar2d.Direction;
 import soar2d.Simulation;
 import soar2d.Soar2D;
+import soar2d.config.Config;
+import soar2d.config.ConfigFile;
 import soar2d.map.Names;
 
 class GridMapUtil {
 	private static Logger logger = Logger.getLogger(GridMapUtil.class);
 
+	static GridMapData loadFromConfigFile(File mapFile, CellObjectObserver observer) throws Exception {
+		GridMapData data = new GridMapData();
+		data.cellObjectManager = new CellObjectManager();
+		
+		Config map = new Config(new ConfigFile(mapFile.getAbsolutePath()));
+		File objectsFile = new File(map.getString("objects"));
+		Config objects = new Config(new ConfigFile(objectsFile.getAbsolutePath()));
+		
+
+		buildReferenceMap(data);
+		return data;
+	}
+
+	private static void cellObjectConfig(GridMapData data, Config objects) throws Exception {
+		for (String name : objects.getStrings("objects")) {
+			Config object = objects.getChild("objects." + name);
+			CellObject template = new CellObject(name);
+
+			for (String property : objects.getStrings("properties", new String[0])) {
+				template.addProperty(property, objects.getString("properties." + property));
+			}
+
+			if (objects.hasKey("points")) {
+				template.setPointsApply(true);
+			}
+			if (objects.hasKey("energy")) {
+				
+			}
+			if (objects.hasKey("health")) {
+				
+			}
+			if (objects.hasKey("missiles")) {
+				
+			}
+			if (objects.hasKey("energy")) {
+				
+			}
+			if (objects.hasKey("energy")) {
+				
+			}
+			} else if (child.getName().equalsIgnoreCase(Names.kTagHealth)) {
+				health(child, template);
+				
+			} else if (child.getName().equalsIgnoreCase(Names.kTagMissiles)) {
+				template.setMissilesApply(true);
+
+			} else if (child.getName().equalsIgnoreCase(Names.kTagRemove)) {
+				template.setRemoveApply(true);
+
+			} else if (child.getName().equalsIgnoreCase(Names.kTagRewardInfo)) {
+				template.setRewardInfoApply(true);
+				if (child.getChild(Names.kTagUseOpenCode) != null) {
+					data.openCode = Simulation.random.nextInt(data.kOpenCodeRange) + 1;
+					logger.info("The correct open code is: " + data.openCode);
+				}
+
+			} else if (child.getName().equalsIgnoreCase(Names.kTagReward)) {
+				reward(child, template);
+
+			} else if (child.getName().equalsIgnoreCase(Names.kTagReset)) {
+				template.setResetApply(true);
+
+			} else if (child.getName().equalsIgnoreCase(Names.kTagFuel)) {
+				template.setFuelApply(true);
+
+			} else {
+				throw new Exception("Unrecognized tag: " + child.getName());
+			}
+
+			for (String applyProperty : objects.getStrings("apply.properties", new String[0])) {
+				template.addPropertyApply(applyProperty, objects.getString("apply.properties." + applyProperty));
+			}
+		}		
+		
+		data.cellObjectManager.registerTemplate(template);
+	}
+	
+	///////////////////////////////////////////////
 	static GridMapData loadFromFile(File mapFile, CellObjectObserver observer) throws Exception {
 		GridMapData data = new GridMapData();
 		data.cellObjectManager = new CellObjectManager();
@@ -55,7 +135,11 @@ class GridMapUtil {
 		} catch (IllegalStateException e) {
 			throw new Exception("Illegal state: " + e.getMessage());
 		}
-		
+		buildReferenceMap(data);
+		return data;
+	}
+	
+	private static void buildReferenceMap(GridMapData data) {
 		// Build cell reference map
 		assert data.cells != null;
 		int [] xy = new int[2];
@@ -76,8 +160,6 @@ class GridMapUtil {
 				}
 			}
 		}
-		
-		return data;
 	}
 
 	private static void cellObject(GridMapData data, Element cellObject) throws Exception {

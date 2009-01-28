@@ -1,0 +1,38 @@
+objects = [b,n,w];
+objects {
+	b {
+		properties = [edible, color, shape, points, id];
+		properties {
+			edible = true;
+			color = red;
+			shape = square;
+			points = 10;
+			id = bonusfood;
+		}
+		apply {
+			points = true;
+			remove = true;
+		}
+	}
+	n {
+		properties = [edible, color, shape, points, id];
+		properties {
+			edible = true;
+			color = blue;
+			shape = round;
+			points = 10;
+			id = normalfood;
+		}
+		apply {
+			points = true;
+			remove = true;
+		}
+	}
+	w {
+		properties = [block, id];
+		properties {
+			block = true;
+			id = wall;
+		}
+	}
+}

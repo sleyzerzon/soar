@@ -7,6 +7,8 @@ block
 
 block.outside = false;
 
+block = "also with values";
+
 parent
 {
 	child1
@@ -73,3 +75,9 @@ key5 = [
      value5.2,
 ];
 key6 { subkey6.1 = value6.1; subkey6.2 = value6.2; }
+
+dashes-ok = yes;
+
+null-array = [];
+#doesn't work
+#null-array-values = [,,,,];

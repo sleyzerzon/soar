@@ -22,79 +22,24 @@ public class CellObject {
 	private static final float kDefaultPropertyFloat = 0;			// if a float property doesn't exist
 	private static final int kDefaultPropertyInt = 0;				// if an int property doesn't exist
 
-	/**
-	 * Property list, name to value, both strings for simplicity
-	 */
 	HashMap<String, String> properties = new HashMap<String, String>();
-	/**
-	 * List of properties to apply to the object if this object is applied.
-	 * Used for YJs boxes.
-	 */
 	HashMap<String, String> propertiesApply = new HashMap<String, String>();
-	/**
-	 * The name of this cell object.
-	 */
 	String name;
 
-	/**
-	 * remove the object after the apply
-	 */
 	boolean removeApply = false;
-	/**
-	 * do reward logic during the apply, the amount is the reward
-	 * one positive reward per reward set, the rest are negative
-	 * info box contains box-id of positive reward
-	 */
+
 	int rewardApply = 0;
-	/**
-	 * do reward information logic during the apply
-	 */
 	boolean rewardInfoApply = false;
-	/**
-	 * perform a reset after this update, just like a terminal
-	 */
+
 	boolean resetApply = false;
-	/**
-	 * add the points property to the player during the apply.
-	 * Points can be negative or zero.
-	 */
 	boolean pointsApply = false;
-	/**
-	 * add the missiles to the player during the apply.
-	 * Missiles can be negative or zero.
-	 */
 	boolean missilesApply = false;
-	/**
-	 * add the health to the player during the apply.
-	 * Health can be negative or zero.
-	 */
 	boolean healthApply = false;
-	/**
-	 * If this is true, only apply health if shields are down.
-	 * Useful for attacking missiles.
-	 */
 	boolean healthApplyShieldsDown = false;
-	/**
-	 * add the energy to the player during the apply.
-	 * energy can be negative or zero.
-	 */
 	boolean energyApply = false;
-	/**
-	 * add fuel to the player (map) during the apply
-	 */
 	boolean fuelApply = false;
-	/**
-	 * If this is true, only apply energy if shields are up.
-	 * Useful for attacking missiles.
-	 */
 	boolean energyApplyShieldsUp = false;
-	/**
-	 * Apply the decay property to this cell's points on an update.
-	 */
 	boolean decayUpdate = false;
-	/**
-	 * Apply the fly missile code on an update.
-	 */
 	boolean flyMissileUpdate = false;
 	boolean lingerUpdate = false;
 	
@@ -122,6 +67,9 @@ public class CellObject {
 	}
 	
 	CellObject(String name) {
+		if (name == null) {
+			throw new NullPointerException();
+		}
 		this.id = new Long(idCount++);
 		this.name = name;
 	}
@@ -341,14 +289,8 @@ public class CellObject {
 	void setOpenCode(int openCode) {
 		this.openCode = openCode;
 	}
-	/**
-	 * @param world the world 
-	 * @param location where this object is at
-	 * @return true if the object should be removed from the cell after the update
-	 * 
-	 * This is called if the object is "updatable"
-	 */
-	public boolean update(int [] location) {
+
+	public boolean update() {
 		if (decayUpdate) {
 			assert properties.containsKey(Names.kPropertyPoints);
 			int points = Integer.parseInt(properties.get(Names.kPropertyPoints));

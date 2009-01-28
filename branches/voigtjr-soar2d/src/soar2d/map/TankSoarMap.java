@@ -138,7 +138,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		for (CellObject cellObject : copy) {
 			int [] location = Arrays.copyOf(data.updatablesLocations.get(cellObject), data.updatablesLocations.get(cellObject).length);
 			
-			if (cellObject.update(location)) {
+			if (cellObject.update()) {
 				logger.trace("Update triggered deletion of " + cellObject.getName() + " at " + Arrays.toString(location));
 				
 				// Remove it from the cell
@@ -195,7 +195,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 						}
 						
 						// we are in phase 2, call update again, this will move us out of phase 2 to phase 3
-						cellObject.update(location);
+						cellObject.update();
 					}
 				}
 			}
