@@ -5,59 +5,102 @@ import org.apache.log4j.Logger;
 import soar2d.Direction;
 import soar2d.Simulation;
 import soar2d.Soar2D;
-import soar2d.world.World;
+import soar2d.map.TankSoarMap;
 
 public class Tank extends Player {
 	private static Logger logger = Logger.getLogger(Tank.class);
 
-	/**
-	 * missile count
-	 */
-	protected int missiles;
-	/**
-	 * energy count
-	 */
-	protected int energy;
-	/**
-	 * health count
-	 */
-	protected int health;
-	/**
-	 * true if shields up
-	 */
-	protected boolean shieldsUp;
-	/**
-	 * radar switch
-	 */
-	protected boolean radarSwitch;
-	/**
-	 * radar power setting
-	 */
-	protected int radarPower;
-	
-	protected int observedPower;
+	private CommandInfo command;
+	private TankCommander commander;
+	private int initialMissiles;
+	private int initialEnergy;
+	private int initialHealth;
+	private int missiles;
+	private int energy;
+	private int health;
 
-	protected RadarCell[][] radar;
-	
-	protected int rwaves;
-	protected int blocked;
-	protected int incoming;
-	private int resurrectFrame = 0;
-	
-	protected int smellDistance;
-	protected String smellColor;
-	
-	private CommandInfo move;
-	protected Direction sound;
-	protected boolean onHealthCharger;
-	protected boolean onEnergyCharger;
-
-	public Tank( String playerId) {
+	public Tank(String playerId, int initialMissiles, int initialEnergy, int initialHealth) throws Exception {
 		super(playerId);
+		this.initialMissiles = initialMissiles;
+		this.initialEnergy = initialEnergy;
+		this.initialHealth = initialHealth;
+
 		clearRadar(); // creates the radar structure
 		reset();
 	}
 	
+	public void setCommander(TankCommander commander) {
+		this.commander = commander;
+	}
+	
+	public CommandInfo getCommand() throws Exception {
+		if (commander != null) {
+			command = commander.getCommand();
+		} else {
+			command = Soar2D.simulation.getHumanCommand(this);
+		}
+		
+		// the facing depends on the move
+		if (command.move) { 
+			super.setFacing(command.moveDirection);
+		}
+
+		return command;
+	}
+	
+	@Override
+	public void reset() throws Exception {
+		super.reset();
+
+		if (initialMissiles > 0) {
+			this.missiles = initialMissiles;
+		} else {
+			this.missiles = Soar2D.config.tanksoarConfig().default_missiles;
+		}
+		if (initialEnergy > 0) {
+			this.health = initialEnergy;
+		} else {
+			this.health = Soar2D.config.tanksoarConfig().default_health;
+		}
+		if (initialHealth > 0) {
+			this.energy = initialHealth;
+		} else {
+			this.energy = Soar2D.config.tanksoarConfig().default_energy;
+		}
+		
+		shieldsUp = false;
+		radarSwitch = false;
+		radarPower = 0;
+		resurrectFrame = Soar2D.simulation.getWorldCount();
+		clearRadar();
+		resetSensors();
+
+		if (commander != null) {
+			commander.reset();
+		}
+	}
+	
+	private boolean shieldsUp;
+	private boolean radarSwitch;
+	private int radarPower;
+	
+	private int observedPower;
+
+	private RadarCell[][] radar;
+	
+	private int rwaves;
+	private int blocked;
+	private int incoming;
+	private int resurrectFrame = 0;
+	
+	private int smellDistance;
+	private String smellColor;
+	
+	private CommandInfo move;
+	private Direction sound;
+	private boolean onHealthCharger;
+	private boolean onEnergyCharger;
+
 	public boolean getRadarSwitch() {
 		return radarSwitch;
 	}
@@ -247,18 +290,17 @@ public class Tank extends Player {
 		return shieldsUp;
 	}
 
-	public void update(int [] location) {
-		World world = Soar2D.simulation.world;
-		super.update(location);
+	public void update(int [] newLocation, TankSoarMap tankSoarMap) {
+		super.update(newLocation);
 		
 		if (radarSwitch) {
-			observedPower = world.getMap().getRadar(radar, location, getFacing(), radarPower);
+			observedPower = tankSoarMap.getRadar(radar, newLocation, getFacing(), radarPower);
 		} else {
 			clearRadar();
 			observedPower = 0;
 		}
 		
-		blocked = world.getMap().getBlocked(location);
+		blocked = tankSoarMap.getBlocked(newLocation);
 }
 	
 	public int getBlocked() {
@@ -298,35 +340,8 @@ public class Tank extends Player {
 		energy = Soar2D.config.tanksoarConfig().default_energy;
 		health = Soar2D.config.tanksoarConfig().default_health;
 		missiles = Soar2D.config.tanksoarConfig().default_missiles;
-		resurrectFrame = Soar2D.simulation.world.getWorldCount(); 
+		resurrectFrame = Soar2D.simulation.getWorldCount(); 
 		setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
-		clearRadar();
-		resetSensors();
-	}
-	
-	public void reset() {
-		super.reset();
-
-		if (playerConfig.missiles > 0) {
-			this.missiles = playerConfig.missiles;
-		} else {
-			this.missiles = Soar2D.config.tanksoarConfig().default_missiles;
-		}
-		if (playerConfig.health > 0) {
-			this.health = playerConfig.health;
-		} else {
-			this.health = Soar2D.config.tanksoarConfig().default_health;
-		}
-		if (playerConfig.energy > 0) {
-			this.energy = playerConfig.energy;
-		} else {
-			this.energy = Soar2D.config.tanksoarConfig().default_energy;
-		}
-		
-		shieldsUp = false;
-		radarSwitch = false;
-		radarPower = 0;
-		resurrectFrame = Soar2D.simulation.world.getWorldCount();
 		clearRadar();
 		resetSensors();
 	}
@@ -404,7 +419,7 @@ public class Tank extends Player {
 	}
 	
 	public boolean getResurrect() {
-		return Soar2D.simulation.world.getWorldCount() == resurrectFrame;
+		return Soar2D.simulation.getWorldCount() == resurrectFrame;
 	}
 
 	private void clearRadar() {
@@ -421,18 +436,9 @@ public class Tank extends Player {
 		
 	}
 
-	public CommandInfo getCommand() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setCommander(TankCommander commander) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void shutdownCommander() {
-		// TODO Auto-generated method stub
-		
+	public void shutdownCommander() throws Exception {
+		if (commander != null) {
+			commander.shutdown();
+		}
 	}
 }

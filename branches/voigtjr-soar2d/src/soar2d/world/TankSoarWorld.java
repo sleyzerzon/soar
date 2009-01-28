@@ -52,6 +52,9 @@ public class TankSoarWorld implements World {
 			addCharger(true);
 		}
 		
+		missileID = 0;
+		missileReset = 0;
+
 		// Spawn missile packs
 		while (tankSoarMap.numberMissilePacks() < Soar2D.config.tanksoarConfig().max_missile_packs) {
 			spawnMissilePack(tankSoarMap, true);
@@ -128,7 +131,7 @@ public class TankSoarWorld implements World {
 				}
 			}
 				
-			tank.update(players.getLocation(tank));
+			tank.update(players.getLocation(tank), tankSoarMap);
 		}
 		
 		for (Tank tank : players.getAll()) {
@@ -139,7 +142,7 @@ public class TankSoarWorld implements World {
 		}
 	}
 
-	private void setExplosion(int [] xy) {
+	public void setExplosion(int [] xy) {
 		CellObject explosion = tankSoarMap.createObjectByName(Names.kExplosion);
 		tankSoarMap.getCell(xy).addObject(explosion);
 	}
@@ -634,11 +637,6 @@ public class TankSoarWorld implements World {
 		tank.adjustEnergy(tank.getRadarPower() * -1, "radar");
 	}
 	
-	public void reset(GridMap map) {
-		missileID = 0;
-		missileReset = 0;
-	}
-	
 	private void chargeUp(Tank tank, int [] location) {
 		// Charge up
 		ArrayList<CellObject> chargers = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyCharger);
@@ -789,7 +787,7 @@ public class TankSoarWorld implements World {
 	
 	public void addPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
 		boolean human = playerConfig.productions == null;
-		Tank tank = new Tank(playerId);
+		Tank tank = new Tank(playerId, playerConfig.missiles, playerConfig.energy, playerConfig.health);
 	
 		players.add(tank, tankSoarMap, playerConfig.pos, human);
 		
