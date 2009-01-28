@@ -43,7 +43,7 @@ public class BookWorld implements World {
 			assert player.getSpeed() == 0;
 			assert player.getVelocity()[0] == 0.0;
 			
-			CommandInfo move = players.getMove(player);
+			CommandInfo move = players.getCommand(player);
 			
 			logger.debug("Processing move: " + player.getName());
 			
@@ -157,7 +157,7 @@ public class BookWorld implements World {
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
 			Player player = iter.next();
-			CommandInfo move = players.getMove(player);
+			CommandInfo move = players.getCommand(player);
 			
 			logger.debug("Processing move: " + player.getName());
 			

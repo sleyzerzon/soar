@@ -28,8 +28,8 @@ public class EatersWorld implements World {
 
 	private File eatersMapFile;
 	private EatersMap eatersMap;
-	private WorldData data;
 	private PlayersManager<Eater> players = new PlayersManager<Eater>();
+	private ArrayList<String> stopMessages = new ArrayList<String>();
 	
 	public EatersWorld(String map) throws Exception {
 		
@@ -43,8 +43,9 @@ public class EatersWorld implements World {
 	
 	public void reset() throws Exception {
 		eatersMap = new EatersMap(eatersMapFile);
-		data = new WorldData();
+		stopMessages.clear();
 		resetPlayers();
+		Soar2D.wm.reset();
 	}
 	
 	private void resetPlayers() throws Exception {
@@ -62,152 +63,80 @@ public class EatersWorld implements World {
 			// put the player in it
 			eatersMap.getCell(startingLocation).setPlayer(eater);
 
-			resetPlayer(eater);
+			eater.reset();
 		}
 		
 		updatePlayers();
 	}
-	
-	public void update() throws Exception {
-		
-		String restartMessage = null;
-		
-		Soar2D.config.generalConfig().hidemap = false;
-		
-		// Collect human input
-		for (Eater eater : players.getAll()) {
-			if (Soar2D.config.generalConfig().force_human || players.isHuman(eater)) {
-				if (eater.getCommand(true) == null) {
-					return;
-				}
-			}
-		}
-		
-		++data.worldCount;
 
-		if (Soar2D.config.terminalsConfig().max_updates > 0) {
-			if (data.worldCount >= Soar2D.config.terminalsConfig().max_updates) {
-				String message = "Reached maximum updates, stopping.";
-				if (Soar2D.control.checkRunsTerminal()) {
-					if (!data.printedStats) {
-						WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, message);
-						data.printedStats = true;
-					}
-					return;
-				} else {
-					restartMessage = message;
-				}
-			}
-		}
-		
-		if (Soar2D.config.terminalsConfig().winning_score > 0) {
-			int[] scores = players.getSortedScores();
-			if (scores[scores.length - 1] >= Soar2D.config.terminalsConfig().winning_score) {
-				String message = "At least one player has achieved at least " + Soar2D.config.terminalsConfig().winning_score + " points.";
-				if (Soar2D.control.checkRunsTerminal()) {
-					if (!data.printedStats) {
-						WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, message);
-						data.printedStats = true;
-					}
-					return;
-				} else {
-					restartMessage = message;
-				}
-			}
-		}
-		
+	private void checkPointsRemaining() {
 		if (Soar2D.config.terminalsConfig().points_remaining) {
 			if (eatersMap.getScoreCount() <= 0) {
-				if (!data.printedStats) {
-					WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, "There are no points remaining.");
-					data.printedStats = true;
-				}
-				return;
+				stopMessages.add("There are no points remaining.");
 			}
 		}
+	}
 	
+	private void checkFoodRemaining() {
 		if (Soar2D.config.terminalsConfig().food_remaining) {
 			if (eatersMap.getFoodCount() <= 0) {
-				String message = "All of the food is gone.";
-				if (Soar2D.control.checkRunsTerminal()) {
-					if (!data.printedStats) {
-						WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, message);
-						data.printedStats = true;
-					}
-					return;
-					
-				} else {
-					restartMessage = message;
-				}
+				stopMessages.add("All the food is gone.");
 			}
 		}
-
+	}
+	
+	private void checkUnopenedBoxes() {
 		if (Soar2D.config.terminalsConfig().unopened_boxes) {
 			if (eatersMap.getUnopenedBoxCount() <= 0) {
-				if (!data.printedStats) {
-					WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, "All of the boxes are open.");
-					data.printedStats = true;
-				}
-				return;
+				stopMessages.add("All of the boxes are open.");
 			}
 		}
+	}
 
-		if (players.numberOfPlayers() == 0) {
-			logger.warn("Update called with no players.");
-			Soar2D.control.stopSimulation();
-			return;
+	public void update(int worldCount) throws Exception {
+		// Collect input
+		for (Eater eater : players.getAll()) {
+			CommandInfo command = eater.getCommand();
+			if (command == null) {
+				return;
+			}
+			players.setCommand(eater, command);
+			WorldUtil.checkStopSim(stopMessages, command, eater);
 		}
 		
-		// get moves
-		for (Eater eater : players.getAll()) {
-			CommandInfo move = eater.getCommand(false);
-			if (Soar2D.control.isShuttingDown()) {
-				return;
-			}
-			
-			assert move != null;
-			String moveString = move.toString();
-			if (moveString.length() > 0) logger.info(eater.getName() + ": " + moveString);
-
-			players.setMove(eater, move);
-			
-			if (move.stopSim) {
-				String message = eater.getName() + " issued simulation stop command.";
-				if (Soar2D.config.terminalsConfig().agent_command) {
-					if (!data.printedStats) {
-						WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, message);
-						data.printedStats = true;
-					}
-				} else {
-					logger.warn(message);
-				}
-			}
-		}
+		WorldUtil.checkMaxUpdates(stopMessages, worldCount);
+		WorldUtil.checkWinningScore(stopMessages, players.getSortedScores());
+		checkPointsRemaining();
+		checkFoodRemaining();
+		checkUnopenedBoxes();
+		WorldUtil.checkNumPlayers(players.numberOfPlayers());
 		
 		moveEaters();
 		if (Soar2D.control.isShuttingDown()) {
 			return;
 		}
-		restartMessage = updateMapAndEatFood();
+		
+		updateMapAndEatFood();
+		
 		handleEatersCollisions(findCollisions(players));	
 		updatePlayers();
 		eatersMap.updateObjects();
 
-		if (restartMessage != null) {
-			if (!data.printedStats) {
-				WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, restartMessage);
-				data.printedStats = true;
+		if (stopMessages.size() > 0) {
+			boolean stopping = Soar2D.control.checkRunsTerminal();
+			WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), stopping, stopMessages);
+
+			if (stopping) {
+				Soar2D.control.stopSimulation();
+			} else {
+				// reset and continue;
+				reset();
+				Soar2D.control.startSimulation(false, false);
 			}
-			
-			reset();
-			if (Soar2D.wm.using()) {
-				Soar2D.wm.reset();
-			}
-			Soar2D.control.startSimulation(false, false);
 		}
 	}
 	
-	public void updatePlayers() throws Exception {
+	private void updatePlayers() throws Exception {
 		for (Eater eater : players.getAll()) {
 			eater.update(players.getLocation(eater), eatersMap);
 		}
@@ -215,18 +144,18 @@ public class EatersWorld implements World {
 
 	private void moveEaters() {
 		for (Eater eater : players.getAll()) {
-			CommandInfo move = players.getMove(eater);			
+			CommandInfo command = players.getCommand(eater);			
 
-			if (!move.move) {
+			if (!command.move) {
 				continue;
 			}
 
 			// Calculate new location
 			int [] oldLocation = players.getLocation(eater);
 			int [] newLocation = Arrays.copyOf(oldLocation, oldLocation.length);
-			Direction.translate(newLocation, move.moveDirection);
-			if (move.jump) {
-				Direction.translate(newLocation, move.moveDirection);
+			Direction.translate(newLocation, command.moveDirection);
+			if (command.jump) {
+				Direction.translate(newLocation, command.moveDirection);
 			}
 			
 			// Verify legal move and commit move
@@ -234,7 +163,7 @@ public class EatersWorld implements World {
 				// remove from cell
 				eatersMap.getCell(oldLocation).setPlayer(null);
 				
-				if (move.jump) {
+				if (command.jump) {
 					eater.adjustPoints(Soar2D.config.eatersConfig().jump_penalty, "jump penalty");
 				}
 				players.setLocation(eater, newLocation);
@@ -245,12 +174,12 @@ public class EatersWorld implements World {
 		}
 	}
 
-	private String updateMapAndEatFood() {
+	private void updateMapAndEatFood() {
 		for (Eater eater : players.getAll()) {
-			CommandInfo lastMove = players.getMove(eater);
+			CommandInfo lastCommand = players.getCommand(eater);
 			int [] location = players.getLocation(eater);
 			
-			if (lastMove.move || lastMove.jump) {
+			if (lastCommand.move || lastCommand.jump) {
 				eatersMap.getCell(location).setPlayer(eater);
 
 				ArrayList<CellObject> moveApply = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyMoveApply);
@@ -263,15 +192,14 @@ public class EatersWorld implements World {
 				}
 			}
 			
-			if (!lastMove.dontEat) {
+			if (!lastCommand.dontEat) {
 				eat(eater, location);
 			}
 			
-			if (lastMove.open) {
-				return open(eater, location, lastMove.openCode);
+			if (lastCommand.open) {
+				open(eater, location, lastCommand.openCode);
 			}
 		}
-		return null;
 	}
 	
 	private boolean apply(CellObject object, Eater eater) {
@@ -291,11 +219,10 @@ public class EatersWorld implements World {
 		return object.removeApply();
 	}
 	
-	private String open(Eater eater, int [] location, int openCode) {
+	private void open(Eater eater, int [] location, int openCode) {
 		ArrayList<CellObject> boxes = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyBox);
 		if (boxes == null) {
 			logger.warn(eater.getName() + " tried to open but there is no box.");
-			return null;
 		}
 
 		// TODO: multiple boxes
@@ -305,7 +232,6 @@ public class EatersWorld implements World {
 		if (box.hasProperty(Names.kPropertyStatus)) {
 			if (box.getProperty(Names.kPropertyStatus).equalsIgnoreCase(Names.kOpen)) {
 				logger.warn(eater.getName() + " tried to open an open box.");
-				return null;
 			}
 		}
 		if (openCode != 0) {
@@ -314,18 +240,13 @@ public class EatersWorld implements World {
 		if (apply(box, eater)) {
 			eatersMap.getCell(location).removeObject(box.getName());
 		}
-		
+		checkResetApply(box);
+	}
+
+	private void checkResetApply(CellObject box) {
 		if (box.getResetApply()) {
-			String message = "Max resets achieved.";
-			if (Soar2D.control.checkRunsTerminal()) {
-				if (!data.printedStats) {
-					WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, message);
-				}
-			} else {
-				return message;
-			}
+			stopMessages.add("Max resets achieved.");
 		}
-		return null;
 	}
 	
 	private void eat(Eater eater, int [] location) {
@@ -452,14 +373,14 @@ public class EatersWorld implements World {
 				eatersMap.getCell(location).setPlayer(eater);
 				
 				eater.setFragged(true);
-				if (!players.getMove(eater).dontEat) {
+				if (!players.getCommand(eater).dontEat) {
 					eat(eater, location);
 				}
 			}
 		}
 	}
 
-	public void setExplosion(int[] xy) {
+	private void setExplosion(int[] xy) {
 		CellObject explosion = eatersMap.createObjectByName(Names.kExplosion);
 		explosion.addProperty(Names.kPropertyLinger, "2");
 		explosion.setLingerUpdate(true);
@@ -467,16 +388,8 @@ public class EatersWorld implements World {
 	}
 	
 
-	public int getMinimumAvailableLocations() {
-		return 1;
-	}
-
-	public void resetPlayer(Eater eater) throws Exception {
-		eater.reset();
-	}
-
 	public boolean isTerminal() {
-		return data.printedStats;
+		return stopMessages.size() > 0;
 	}
 
 	public void removePlayer(String name) throws Exception {
@@ -489,10 +402,7 @@ public class EatersWorld implements World {
 	
 	public void interrupted(String agentName) throws Exception {
 		players.interrupted(agentName);
-		
-		if (!data.printedStats) {
-			WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), true, "interrupted");
-		}
+		stopMessages.add("interrupted");
 	}
 
 	public int numberOfPlayers() {
@@ -527,10 +437,6 @@ public class EatersWorld implements World {
 
 	public GridMap getMap() {
 		return eatersMap;
-	}
-
-	public int getWorldCount() {
-		return data.worldCount;
 	}
 
 	public Player[] getPlayers() {

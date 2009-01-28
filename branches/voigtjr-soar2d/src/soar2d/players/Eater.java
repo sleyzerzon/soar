@@ -15,14 +15,11 @@ public class Eater extends Player {
 		this.commander = commander;
 	}
 	
-	public CommandInfo getCommand(boolean human) throws Exception {
-		if (human || Soar2D.config.generalConfig().force_human) {
-			command = Soar2D.simulation.getHumanCommand(this);
-		} else if (commander != null) {
+	public CommandInfo getCommand() throws Exception {
+		if (commander != null) {
 			command = commander.getCommand();
 		} else {
-			command = new CommandInfo();
-			command.randomEaters();
+			command = Soar2D.simulation.getHumanCommand(this);
 		}
 		
 		// the facing depends on the move

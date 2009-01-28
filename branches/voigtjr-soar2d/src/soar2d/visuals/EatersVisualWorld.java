@@ -42,12 +42,6 @@ public class EatersVisualWorld extends VisualWorld {
 			if (agentLocation != null) {
 				painted = false;
 			}
-			
-			if (Soar2D.config.generalConfig().hidemap) {
-				painted = true;
-				return;
-			}
-			
 		} else {
 			if (agentLocation != null || lastX != e.x || lastY != e.y || internalRepaint) {
 				lastX = e.x;
@@ -55,10 +49,10 @@ public class EatersVisualWorld extends VisualWorld {
 				painted = false;
 			}
 
-			if (Soar2D.config.generalConfig().hidemap || disabled || !painted) {
+			if (disabled || !painted) {
 				gc.setBackground(WindowManager.widget_background);
 				gc.fillRectangle(0,0, this.getWidth(), this.getHeight());
-				if (disabled || Soar2D.config.generalConfig().hidemap) {
+				if (disabled) {
 					painted = true;
 					return;
 				}

@@ -1,5 +1,6 @@
-package soar2d.players.soar;
+package soar2d.players;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,14 +18,10 @@ import soar2d.Direction;
 import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.Soar2D;
-import soar2d.players.CommandInfo;
-import soar2d.players.Player;
-import soar2d.players.RadarCell;
-import soar2d.players.Tank;
 import soar2d.world.PlayersManager;
 import soar2d.world.World;
 
-public class SoarTank extends Tank implements Agent.RunEventInterface {
+public class SoarTank implements Agent.RunEventInterface, TankCommander {
 	private static Logger logger = Logger.getLogger(SoarTank.class);
 
 	private Agent agent;
@@ -85,7 +82,7 @@ public class SoarTank extends Tank implements Agent.RunEventInterface {
 	
 	InputLinkMetadata metadata;
 
-	public SoarTank(Agent agent, String playerId) {
+	public SoarTank(Tank tank, Agent agent, String[] shutdown_commands, File metadataFile) {
 		super(playerId);
 		this.agent = agent;
 		this.shutdownCommands = playerConfig.shutdown_commands;

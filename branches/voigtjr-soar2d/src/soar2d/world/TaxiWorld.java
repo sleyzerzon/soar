@@ -53,7 +53,7 @@ public class TaxiWorld implements World {
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
 			Taxi player = (Taxi)iter.next();
-			CommandInfo move = players.getMove(player);
+			CommandInfo move = players.getCommand(player);
 			
 			// for visual world 
 			player.resetPointsChanged();

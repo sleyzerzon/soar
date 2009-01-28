@@ -1251,7 +1251,7 @@ public class WindowManager {
 			foodCount.setText(Integer.toString(eMap.getFoodCount()));
 			scoreCount.setText(Integer.toString(eMap.getScoreCount()));
 		}
-		worldCount.setText(Integer.toString(world.getWorldCount()));
+		worldCount.setText(Integer.toString(Soar2D.simulation.getWorldCount()));
 	}
 
 	boolean isDisposed() {
@@ -1308,6 +1308,9 @@ public class WindowManager {
 	}
 	
 	public void reset() {
+		if (!using() || visualWorld == null) {
+			return;
+		}
 		if (!isDisposed()) {
 			display.syncExec(new Runnable() {
 				public void run() {

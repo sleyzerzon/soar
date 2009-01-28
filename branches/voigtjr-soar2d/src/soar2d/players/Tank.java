@@ -7,7 +7,7 @@ import soar2d.Simulation;
 import soar2d.Soar2D;
 import soar2d.world.World;
 
-public class Tank {
+public class Tank extends Player {
 	private static Logger logger = Logger.getLogger(Tank.class);
 
 	/**
@@ -409,5 +409,30 @@ public class Tank {
 
 	private void clearRadar() {
 		radar = new RadarCell[Soar2D.config.tanksoarConfig().radar_width][Soar2D.config.tanksoarConfig().radar_height];
+	}
+
+	public void playersChanged() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void commit(int[] location) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public CommandInfo getCommand() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setCommander(TankCommander commander) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void shutdownCommander() {
+		// TODO Auto-generated method stub
+		
 	}
 }

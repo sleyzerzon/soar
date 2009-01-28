@@ -20,7 +20,7 @@ public class PlayersManager<P extends Player> {
 	private HashMap<P, int []> initialLocations = new HashMap<P, int []>(7);
 	private HashMap<P, int []> locations = new HashMap<P, int []>(7);
 	private HashMap<P, double []> floatLocations = new HashMap<P, double []>(7);
-	private HashMap<P, CommandInfo> lastMoves = new HashMap<P, CommandInfo>(7);
+	private HashMap<P, CommandInfo> lastCommands = new HashMap<P, CommandInfo>(7);
 	
 	int numberOfPlayers() {
 		return players.size();
@@ -62,12 +62,17 @@ public class PlayersManager<P extends Player> {
 		floatLocations.put(player, location);
 	}
 	
-	CommandInfo getMove(P player) {
-		return lastMoves.get(player);
+	CommandInfo getCommand(P player) {
+		return lastCommands.get(player);
 	}
 	
-	void setMove(P player, CommandInfo move) {
-		lastMoves.put(player, move);
+	void setCommand(P player, CommandInfo move) {
+		lastCommands.put(player, move);
+
+		String moveString = move.toString();
+		if (moveString.length() > 0) {
+			logger.info(player.getName() + ": " + moveString);
+		}
 	}
 	
 	P get(String name) {
@@ -90,7 +95,7 @@ public class PlayersManager<P extends Player> {
 		initialLocations.remove(player);
 		locations.remove(player);
 		floatLocations.remove(player);
-		lastMoves.remove(player);
+		lastCommands.remove(player);
 	}
 	
 	void add(P player, GridMap map, int [] initialLocation, boolean human) throws Exception {

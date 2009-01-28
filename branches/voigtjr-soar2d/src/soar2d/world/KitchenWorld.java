@@ -48,7 +48,7 @@ public class KitchenWorld implements World {
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
 			Cook player = (Cook)iter.next();
-			CommandInfo move = players.getMove(player);
+			CommandInfo move = players.getCommand(player);
 			
 			// for visual world 
 			player.resetPointsChanged();

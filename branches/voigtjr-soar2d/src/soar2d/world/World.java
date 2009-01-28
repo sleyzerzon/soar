@@ -6,10 +6,9 @@ import soar2d.players.Player;
 
 public interface World {
 	// simulation
-	public void update() throws Exception;
+	public void update(int worldCount) throws Exception;
 	public void reset() throws Exception;
 	public GridMap getMap();
-	public int getWorldCount();
 	
 	// player management
 	public int numberOfPlayers();

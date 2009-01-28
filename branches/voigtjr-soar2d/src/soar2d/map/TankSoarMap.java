@@ -7,8 +7,6 @@ import java.util.HashSet;
 
 import soar2d.Direction;
 import soar2d.Names;
-import soar2d.Soar2D;
-import soar2d.players.Player;
 import soar2d.players.Player;
 import soar2d.world.TankSoarWorld;
 
@@ -171,7 +169,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 						
 						if (player != null) {
 							// missile is destroyed
-							tsWorld.missileHit(player, this, location, cellObject, Soar2D.simulation.world.getPlayers());
+							tsWorld.missileHit(player, cellObject);
 							explosions.add(location);
 							break;
 						}
@@ -201,5 +199,34 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 
 	public CellObject createObjectByName(String name) {
 		return data.cellObjectManager.createObject(name);
+	}
+
+	public File getMetadataFile() {
+		return data.metadataFile;
+	}
+
+	public ArrayList<CellObject> getTemplatesWithProperty(String name) {
+		return data.cellObjectManager.getTemplatesWithProperty(name);
+	}
+
+	public Direction getSoundNear(int[] location) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public CellObject createRandomObjectWithProperty(String propertyMissile) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void handleIncoming() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public CellObject createRandomObjectWithProperties(String propertyHealth,
+			String propertyCharger) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

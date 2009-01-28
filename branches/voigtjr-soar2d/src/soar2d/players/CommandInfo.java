@@ -74,14 +74,6 @@ public class CommandInfo {
 	public CommandInfo() {
 	}
 	
-	public void randomEaters() {
-		move = Simulation.random.nextBoolean();
-		if (move) {
-			jump = Simulation.random.nextBoolean();
-			moveDirection = Direction.values()[Simulation.random.nextInt(Direction.values().length - 1) + 1];
-		}
-	}
-	
 	public String toString() {
 		String output = new String();
 		

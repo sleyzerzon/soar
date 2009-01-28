@@ -131,7 +131,7 @@ public class Simulation {
 		logger.trace(Names.Trace.loadingWorld);
 		switch (game) {
 		case TANKSOAR:
-			world = new TankSoarWorld(config.generalConfig().map);
+			world = new TankSoarWorld(config.generalConfig().map, Soar2D.config.tanksoarConfig().max_missile_packs);
 			break;
 		case EATERS:
 			world = new EatersWorld(config.generalConfig().map);
@@ -148,6 +148,7 @@ public class Simulation {
 		}
 		Soar2D.control.setRunsTerminal(config.generalConfig().runs);
 		Soar2D.control.resetTime();
+		worldCount = 0;
 
 		// Start or wait for clients (false: before agent creation)
 		logger.trace(Names.Trace.beforeClients);
@@ -514,8 +515,14 @@ public class Simulation {
 	/**
 	 * update the sim, or, in this case, the world
 	 */
+	private int worldCount;
 	public void update() throws Exception {
-		world.update();
+		worldCount += 1;
+		world.update(worldCount);
+	}
+	
+	public int getWorldCount() {
+		return worldCount;
 	}
 
 	/**
@@ -549,6 +556,7 @@ public class Simulation {
 	public void reset() throws Exception {
 		logger.info(Names.Info.reset);
 		world.reset();
+		worldCount = 0;
 		Soar2D.control.resetTime();
 	}
 
