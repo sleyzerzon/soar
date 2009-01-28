@@ -15,7 +15,7 @@ import soar2d.Soar2D;
  * This object keeps track of the "object templates" or prototypes.
  * These objects are copied to create new objects.
  */
-public class CellObjectManager {
+class CellObjectManager {
 	/**
 	 * The templates, mapped by name.
 	 */
@@ -62,7 +62,7 @@ public class CellObjectManager {
 		return true;
 	}
 	
-	public Collection<CellObject> getTemplates() {
+	Collection<CellObject> getTemplates() {
 		return templates.values();
 	}
 	
@@ -70,7 +70,7 @@ public class CellObjectManager {
 	 * @param name the property name
 	 * @return list of cell object templates that have that property
 	 */
-	public ArrayList<CellObject> getTemplatesWithProperty(String name) {
+	ArrayList<CellObject> getTemplatesWithProperty(String name) {
 		ArrayList<CellObject> ret = new ArrayList<CellObject>(templates.values());
 		Iterator<CellObject> iter = ret.iterator();
 		while (iter.hasNext()) {

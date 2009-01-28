@@ -6,7 +6,7 @@ import soar2d.Soar2D;
 import soar2d.world.PlayersManager;
 import soar2d.world.World;
 
-public class Dog extends Player {
+public class Dog {
 
 	public Dog(String playerId) {
 		super(playerId);
@@ -42,8 +42,8 @@ public class Dog extends Player {
 		}
 	}
 	
-	public MoveInfo getMove() {
-		MoveInfo move = new MoveInfo();
+	public CommandInfo getMove() {
+		CommandInfo move = new CommandInfo();
 		if (target == null) {
 			// todo: wander
 			move.forward = true;

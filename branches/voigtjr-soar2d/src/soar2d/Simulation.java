@@ -24,24 +24,11 @@ import sml.sml_Names;
 import soar2d.config.ClientConfig;
 import soar2d.config.PlayerConfig;
 import soar2d.config.SimConfig;
-import soar2d.players.Cook;
-import soar2d.players.Dog;
-import soar2d.players.Eater;
-import soar2d.players.Mouse;
+import soar2d.players.CommandInfo;
 import soar2d.players.Player;
-import soar2d.players.Robot;
-import soar2d.players.Tank;
-import soar2d.players.Taxi;
-import soar2d.players.soar.SoarCook;
-import soar2d.players.soar.SoarEater;
-import soar2d.players.soar.SoarRobot;
-import soar2d.players.soar.SoarTank;
-import soar2d.players.soar.SoarTaxi;
-import soar2d.players.tosca.ToscaCook;
-import soar2d.players.tosca.ToscaEater;
 import soar2d.world.BookWorld;
 import soar2d.world.EatersWorld;
-import soar2d.world.IWorld;
+import soar2d.world.World;
 import soar2d.world.KitchenWorld;
 import soar2d.world.TankSoarWorld;
 import soar2d.world.TaxiWorld;
@@ -71,7 +58,7 @@ public class Simulation {
 	/**
 	 * The world and everything associated with it
 	 */
-	private IWorld world;
+	private World world;
 	
 	/**
 	 * Legal colors (see PlayerConfig)
@@ -87,11 +74,9 @@ public class Simulation {
 	private HashMap<String, Agent> agents = new HashMap<String, Agent>();
 
 	private Game game;
-	private boolean usingTosca;
 	
-	void initialize(SimConfig config) throws Exception {
+	World initialize(SimConfig config) throws Exception {
 		this.game = config.game();
-		this.usingTosca = config.generalConfig().tosca;
 		
 		// keep track of colors
 		for (String color : kColors) {
@@ -177,6 +162,7 @@ public class Simulation {
 		// Start or wait for clients (true: after agent creation)
 		logger.trace(Names.Trace.afterClients);
 		doClients(true);
+		return world;
 	}
 	
 //	private void error(String message) {
@@ -243,33 +229,12 @@ public class Simulation {
 	}
 
 	/**
-	 * @author voigtjr
-	 *
-	 * exception class to keep things sane during player creation
-	 */
-	class CreationException extends Throwable {
-		static final long serialVersionUID = 1;
-		private String message;
-		
-		public CreationException() {
-		}
-		
-		public CreationException(String message) {
-			this.message = message;
-		}
-		
-		public String getMessage() {
-			return message;
-		}
-	}
-
-	/**
 	 * @param playerConfig configuration data for the future player
 	 * 
 	 * create a player and add it to the simulation and world
 	 */
 	public void createPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
-		if (Game.TAXI == game && (world.getPlayers().size() > 1)) {
+		if (Game.TAXI == game && (world.numberOfPlayers() > 1)) {
 			// if this is removed, revisit white color below!
 			throw new Exception(Names.Errors.taxi1Player);
 		}
@@ -302,158 +267,53 @@ public class Simulation {
 		}
 		
 		try {
-			// check for duplicate name
-			if (world.getPlayers().get(playerConfig.name) != null) {
-				throw new CreationException("Failed to create player: " + playerConfig.name + " already exists.");
-			}
-			
-			// check for human agent
-			if (playerConfig.productions == null) {
-				
-				// create a human agent
-				Player player = null;
-				
-				// eater or tank depending on the setting
-				boolean human = true;
-				switch(game) {
-				case EATERS:
-					if (usingTosca) {
-						player = new ToscaEater(playerId);
-						human = false;
-					} else {
-						player = new Eater(playerId);
-					}
-					break;
-					
-				case TANKSOAR:
-					player = new Tank(playerId);
-					break;
-					
-				case ROOM:
-					if (playerConfig.name.equals(Names.kDog)) {
-						player = new Dog(playerId);
-						human = false;
-					} else if (playerConfig.name.equals(Names.kMouse)) {
-						player = new Mouse(playerId);
-						human = false;
-					} else {
-						player = new Robot(playerId);
-					}
-					break;
-
-				case KITCHEN:
-					if (usingTosca) {
-						player = new ToscaCook(playerId);
-						human = false;
-					} else {
-						player = new Cook(playerId);
-					}
-					break;
-					
-				case TAXI:
-					player = new Taxi(playerId);
-					break;
-
-				}
-				
-				assert player != null;
-				
-				// set its location if necessary
-				int [] initialLocation = playerConfig.pos == null ? null : new int [] { playerConfig.pos[0], playerConfig.pos[1] };
-
-				// This can fail if there are no open squares on the map, message printed already
-				if (!world.addPlayer(player, initialLocation, human)) {
-					throw new CreationException();
-				}
-				
-			} else {
-				
-				// we need to create a soar agent, do it
-				Agent agent = kernel.CreateAgent(playerConfig.name);
-				if (agent == null) {
-					throw new CreationException("Agent " + playerConfig.name + " creation failed: " + kernel.GetLastErrorDescription());
-				}
-				
-				try {
-					// now load the productions
-					File productionsFile = new File(playerConfig.productions);
-					if (!agent.LoadProductions(productionsFile.getAbsolutePath())) {
-						throw new CreationException("Agent " + playerConfig.name + " production load failed: " + agent.GetLastErrorDescription());
-					}
-					
-					// if requested, set max memory usage
-					int maxmem = Soar2D.config.soarConfig().max_memory_usage;
-					if (maxmem > 0) {
-						agent.ExecuteCommandLine("max-memory-usage " + Integer.toString(maxmem));
-					}
-			
-					Player player = null;
-					
-					// create the tank or eater, soar style
-					switch(game) {
-					case EATERS:
-						player = new SoarEater(agent, playerId); 
-						break;
-					case TANKSOAR:
-						player = new SoarTank(agent, playerId);
-						break;
-					case ROOM:
-						player = new SoarRobot(agent, playerId);
-						break;
-					case KITCHEN:
-						player = new SoarCook(agent, playerId);
-						break;
-					case TAXI:
-						player = new SoarTaxi(agent, playerId);
-
-					}
-					
-					assert player != null;
-					
-					// handle the initial location if necessary
-					int [] initialLocation = playerConfig.pos == null ? null : new int [] { playerConfig.pos[0], playerConfig.pos[1] };
-					
-					// This can fail if there are no open squares on the map, message printed already
-					if (!world.addPlayer(player, initialLocation, false)) {
-						throw new CreationException();
-					}
-		
-					// Scott Lathrop --  register for print events
-					if (Soar2D.config.soarConfig().soar_print) {
-						agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, Soar2D.control.getLogger(), null,true);
-					}
-					
-					// save the agent
-					agents.put(player.getName(), agent);
-					
-					// spawn the debugger if we're supposed to
-					if (Soar2D.config.soarConfig().spawn_debuggers && !isClientConnected(Names.kDebuggerClient)) {
-						ClientConfig debuggerConfig = Soar2D.config.clientConfigs().get(Names.kDebuggerClient);
-						debuggerConfig.command = getDebuggerCommand(player.getName());
-
-						spawnClient(Names.kDebuggerClient, debuggerConfig);
-					}
-					
-				} catch (CreationException e) {
-					// A problem in this block requires agent deletion
-					kernel.DestroyAgent(agent);
-					agent.delete();
-					throw e;
-				}
-			}
-		} catch (CreationException e) {
-			// a problem in this block requires us to free up the color
+			world.addPlayer(playerId, playerConfig);
+		} catch (Exception e) {
 			freeAColor(playerConfig.color);
-			if (e.getMessage() != null) {
-				throw new Exception(e.getMessage());
-			}
-			return;
+			throw e;
 		}
 		
 		// the agent list has changed, notify things that care
 		Soar2D.control.playerEvent();
 	}
 	
+	public Agent createSoarAgent(String name, String productions) throws Exception {
+		Agent agent = kernel.CreateAgent(name);
+		if (agent == null) {
+			throw new Exception("Agent " + name + " creation failed: " + kernel.GetLastErrorDescription());
+		}
+		
+		// now load the productions
+		File productionsFile = new File(productions);
+		if (!agent.LoadProductions(productionsFile.getAbsolutePath())) {
+			throw new Exception("Agent " + name + " production load failed: " + agent.GetLastErrorDescription());
+		}
+		
+		// if requested, set max memory usage
+		int maxmem = Soar2D.config.soarConfig().max_memory_usage;
+		if (maxmem > 0) {
+			agent.ExecuteCommandLine("max-memory-usage " + Integer.toString(maxmem));
+		}
+		
+		// Scott Lathrop --  register for print events
+		if (Soar2D.config.soarConfig().soar_print) {
+			agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, Soar2D.control.getLogger(), null,true);
+		}
+		
+		// save the agent
+		agents.put(name, agent);
+		
+		// spawn the debugger if we're supposed to
+		if (Soar2D.config.soarConfig().spawn_debuggers && !isClientConnected(Names.kDebuggerClient)) {
+			ClientConfig debuggerConfig = Soar2D.config.clientConfigs().get(Names.kDebuggerClient);
+			debuggerConfig.command = getDebuggerCommand(name);
+
+			spawnClient(Names.kDebuggerClient, debuggerConfig);
+		}
+		
+		return agent;
+	}
+
 	/**
 	 * @param client the client in question
 	 * @return true if it is connected
@@ -500,15 +360,11 @@ public class Simulation {
 	 * removes the player from the world and blows away any associated data, 
 	 * frees up its color, etc.
 	 */
-	public void destroyPlayer(Player player) {
-		// remove it from the world, can't fail
+	public void destroyPlayer(Player player) throws Exception {
 		world.removePlayer(player.getName());
 		
 		// free its color
 		freeAColor(player.getColor());
-		
-		// call its shutdown
-		player.shutdown();
 		
 		// get the agent (human agents return null here)
 		Agent agent = agents.remove(player.getName());
@@ -658,7 +514,7 @@ public class Simulation {
 	/**
 	 * update the sim, or, in this case, the world
 	 */
-	public void update() {
+	public void update() throws Exception {
 		world.update();
 	}
 
@@ -699,12 +555,23 @@ public class Simulation {
 	/**
 	 * shuts things down, including the kernel, in preparation for an exit to dos
 	 */
-	public void shutdown() {
-		if (world != null) {
-			world.removeAllPlayers();
+	public void shutdown() throws Exception {
+		for(Entry<String, Agent> entry : agents.entrySet()) {
+			if (world != null) {
+				world.removePlayer(entry.getKey());
+			}
+			if (kernel != null) {
+				Agent agent = entry.getValue();
+				// human agents return null (I think)
+				if (agent != null) {
+					// there was an agent, destroy it
+					kernel.DestroyAgent(agent);
+					agent.delete();
+					agent = null;
+				}
+			}
 		}
-		
-		assert this.agents.size() == 0;
+		agents.clear();
 		
 		if (kernel != null) {
 			logger.trace(Names.Trace.kernelShutdown);
@@ -717,7 +584,7 @@ public class Simulation {
 	 * @return true if there are human agents present
 	 */
 	public boolean hasHumanAgents() {
-		return agents.size() < world.getPlayers().size();
+		return agents.size() < world.numberOfPlayers();
 	}
 	
 	/**
@@ -753,5 +620,17 @@ public class Simulation {
 	}
 	public String getAgentPath() {
 		return Soar2D.simulation.getBasePath() + "agents" + System.getProperty("file.separator");
+	}
+	
+	public void interrupted(String agentName) throws Exception {
+		if (Soar2D.wm.using()) {
+			return;
+		}
+
+		world.interrupted(agentName);
+	}
+	
+	public CommandInfo getHumanCommand(Player player) {
+		return Soar2D.wm.getHumanCommand(player);
 	}
 }

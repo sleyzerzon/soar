@@ -3,6 +3,7 @@ package soar2d.map;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -165,6 +166,7 @@ class GridMapUtil {
 		if (data.rewardInfoObject != null) {
 			assert data.positiveRewardID == 0;
 			data.positiveRewardID = Simulation.random.nextInt(data.cellObjectManager.rewardObjects.size());
+			logger.trace("positiveRewardID: " + data.positiveRewardID);
 			data.positiveRewardID += 1;
 			data.rewardInfoObject.addPropertyApply(soar2d.Names.kPropertyPositiveBoxID, Integer.toString(data.positiveRewardID));
 			
@@ -326,6 +328,8 @@ class GridMapUtil {
 			throw new Exception("object doesn't have name");
 		}
 		
+		logger.trace(Arrays.toString(location) + ": " + name);
+		
 		if (!data.cellObjectManager.hasTemplate(name)) {
 			throw new Exception("object \"" + name + "\" does not map to a cell object");
 		}
@@ -370,39 +374,46 @@ class GridMapUtil {
 			throw new Exception("tried to generate random walls with no blocking types");
 		}
 		
+		logger.trace("Generating random walls.");
+		
 		assert data.cells != null;
 		int size = data.cells.size();
 		
-		// Generate perimiter wall
+		// Generate perimiter wall and remove existing walls
 		int[] xy = new int[2];
 		for (xy[0] = 0; xy[0] < size; ++xy[0]) {
 			for (xy[1] = 0; xy[1] < size; ++xy[1]) {
-				if (xy[0] != 0 || xy[0] != size - 1 || xy[1] != 0 || xy[1] != size - 1) {
-					// not on the edge
+				if (xy[0] == 0 || xy[0] == size - 1 || xy[1] == 0 || xy[1] == size - 1) {
+					logger.trace(Arrays.toString(xy) + ": Confirming perimeter wall.");
+					removeFoodAndAddWall(data, xy, observer);
 					continue;
 				}
-				removeFoodAndAddWall(data, xy, observer);
+				// not on the edge
+				if (data.cells.getCell(xy).removeAllByProperty(soar2d.Names.kPropertyBlock) != null) {
+					logger.trace(Arrays.toString(xy) + ": Removed non-perimiter wall.");
+				}
 			}
 		}
 
-		double probability = Soar2D.config.eatersConfig().low_probability;
 		for (xy[0] = 2; xy[0] < size - 3; ++xy[0]) {
 			for (xy[1] = 2; xy[1] < size - 3; ++xy[1]) {
 
 				if (noWallsOnCorners(data, xy)) {
+					double probability = Soar2D.config.eatersConfig().low_probability;
 					if (wallOnAnySide(data, xy)) {
+						logger.trace(Arrays.toString(xy) + ": High probability.");
 						probability = Soar2D.config.eatersConfig().high_probability;					
 					}
 					if (Simulation.random.nextDouble() < probability) {
 						removeFoodAndAddWall(data, xy, observer);
 					}
-					probability = Soar2D.config.eatersConfig().low_probability;
 				}
 			}
 		}
 	}
 	
 	private static void removeFoodAndAddWall(GridMapData data, int[] xy, CellObjectObserver observer) {
+		logger.trace(Arrays.toString(xy) + ": Changing to wall.");
 		Cell cell = data.cells.getCell(xy);
 		if (cell == null) {
 			cell = Cell.createCell(Soar2D.config.generalConfig().headless, xy);
@@ -462,6 +473,8 @@ class GridMapUtil {
 		if (!data.cellObjectManager.hasTemplatesWithProperty(soar2d.Names.kPropertyEdible)) {
 			throw new Exception("tried to generate random walls with no food types");
 		}
+
+		logger.trace("Generating random food.");
 		
 		int[] xy = new int[2];
 		for (xy[0] = 1; xy[0] < data.cells.size() - 1; ++xy[0]) {
@@ -474,6 +487,7 @@ class GridMapUtil {
 				}
 				
 				if (!cell.hasAnyWithProperty(soar2d.Names.kPropertyBlock)) {
+					logger.trace(Arrays.toString(xy) + "Adding random food.");
 					cell.removeAllByProperty(soar2d.Names.kPropertyEdible);
 					CellObject wall = data.cellObjectManager.createRandomObjectWithProperty(soar2d.Names.kPropertyEdible);
 					cell.addObject(wall);

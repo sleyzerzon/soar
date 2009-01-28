@@ -1,4 +1,4 @@
-package soar2d.players.soar;
+package soar2d.players;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +19,14 @@ import soar2d.Names;
 import soar2d.Soar2D;
 
 public class InputLinkMetadata {
-	public static InputLinkMetadata load(Agent agent) {
+	public static InputLinkMetadata load(Agent agent, File metadataFile) {
 		try {
 			InputLinkMetadata metadata = new InputLinkMetadata(agent);
 			if (Soar2D.config.soarConfig().metadata != null) {
 				metadata.load(Soar2D.config.soarConfig().metadata);
 			}
-			if (Soar2D.simulation.world.getMap().getMetadata() != null) {
-				metadata.load(Soar2D.simulation.world.getMap().getMetadata());
+			if (metadataFile != null) {
+				metadata.load(metadataFile);
 			}
 			return metadata;
 		} catch (Exception e) {

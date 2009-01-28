@@ -222,7 +222,11 @@ public class CreateAgentDialog extends Dialog {
 				playerConfig.color = m_Color.getText();
 				
 				Soar2D.config.playerConfigs().put(playerId, playerConfig);
-				Soar2D.simulation.createPlayer(playerId, playerConfig);
+				try {
+					Soar2D.simulation.createPlayer(playerId, playerConfig);
+				} catch (Exception ex) {
+					Soar2D.wm.errorMessage("Creation failed", ex.getMessage());
+				}
 				dialog.dispose();
 			}
 		});

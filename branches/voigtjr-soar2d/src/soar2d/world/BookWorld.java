@@ -14,10 +14,11 @@ import soar2d.Direction;
 import soar2d.map.BookMap;
 import soar2d.map.CellObject;
 import soar2d.map.GridMap;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
+import soar2d.players.Player;
 import soar2d.players.Player;
 
-public class BookWorld implements IWorld {
+public class BookWorld implements World {
 	private static Logger logger = Logger.getLogger(BookWorld.class);
 
 	public BookWorld(String map) throws Exception {
@@ -42,7 +43,7 @@ public class BookWorld implements IWorld {
 			assert player.getSpeed() == 0;
 			assert player.getVelocity()[0] == 0.0;
 			
-			MoveInfo move = players.getMove(player);
+			CommandInfo move = players.getMove(player);
 			
 			logger.debug("Processing move: " + player.getName());
 			
@@ -118,11 +119,11 @@ public class BookWorld implements IWorld {
 		return null;
 	}
 
-	private void handleCommunication(MoveInfo move, Player player, PlayersManager players) {
+	private void handleCommunication(CommandInfo move, Player player, PlayersManager players) {
 		// handle communication
-		Iterator<MoveInfo.Communication> commIter = move.messages.iterator();
+		Iterator<CommandInfo.Communication> commIter = move.messages.iterator();
 		while (commIter.hasNext()) {
-			MoveInfo.Communication comm = commIter.next();
+			CommandInfo.Communication comm = commIter.next();
 			Player toPlayer = players.get(comm.to);
 			if (toPlayer == null) {
 				logger.warn("Move: communicate: unknown player: " + comm.to);
@@ -133,7 +134,7 @@ public class BookWorld implements IWorld {
 		}
 	}
 
-	private void get(BookMap map, MoveInfo move, Player player) {
+	private void get(BookMap map, CommandInfo move, Player player) {
 		logger.debug("Move: get, location " + move.getLocation[0] + "," + move.getLocation[1]);
 		CellObject block = map.getObject(move.getLocation, Names.kBookObjectName);
 		if (block == null || player.isCarrying()) {
@@ -156,7 +157,7 @@ public class BookWorld implements IWorld {
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
 			Player player = iter.next();
-			MoveInfo move = players.getMove(player);
+			CommandInfo move = players.getMove(player);
 			
 			logger.debug("Processing move: " + player.getName());
 			
@@ -595,6 +596,51 @@ public class BookWorld implements IWorld {
 
 	public GridMap newMap() {
 		return new BookMap();
+	}
+
+	double angleOff(Player left, Player right) {
+		double [] target = new double [] { floatLocations.get(right)[0], floatLocations.get(right)[1] };
+		
+		return angleOff(left, target);
+	}
+
+	double angleOff(Player left, double [] target) {
+		double [] playerVector = new double [] { floatLocations.get(left)[0], floatLocations.get(left)[1] };
+
+		if (Soar2D.config.roomConfig().continuous == false) {
+			// translate the player's location back a little bit to increase peripheral vision
+			playerVector[0] -= Math.cos(left.getHeadingRadians());
+			playerVector[1] -= Math.sin(left.getHeadingRadians());
+		}
+			
+		double [] targetVector = new double [] { target[0], target[1] };
+		
+		// translate target so i'm the origin
+		targetVector[0] -= playerVector[0];
+		targetVector[1] -= playerVector[1];
+		
+		// make target unit vector
+		double targetVectorLength = Math.sqrt(Math.pow(targetVector[0], 2) + Math.pow(targetVector[1], 2));
+		if (targetVectorLength > 0) {
+			targetVector[0] /= targetVectorLength;
+			targetVector[1] /= targetVectorLength;
+		} else {
+			targetVector[0] = 0;
+			targetVector[1] = 0;
+		}
+		
+		// make player facing vector
+		playerVector[0] = Math.cos(left.getHeadingRadians());
+		playerVector[1] = Math.sin(left.getHeadingRadians());
+		
+		double dotProduct = (targetVector[0] * playerVector[0]) + (targetVector[1] * playerVector[1]);
+		double crossProduct = (targetVector[0] * playerVector[1]) - (targetVector[1] * playerVector[0]);
+		
+		// calculate inverse cosine of that for angle
+		if (crossProduct < 0) {
+			return Math.acos(dotProduct);
+		}
+		return Math.acos(dotProduct) * -1;
 	}
 
 }

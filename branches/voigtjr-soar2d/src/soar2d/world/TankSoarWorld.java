@@ -15,10 +15,10 @@ import soar2d.Soar2D;
 import soar2d.map.CellObject;
 import soar2d.map.GridMap;
 import soar2d.map.TankSoarMap;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 
-public class TankSoarWorld implements IWorld {
+public class TankSoarWorld implements World {
 	private static Logger logger = Logger.getLogger(TankSoarWorld.class);
 
 	public TankSoarWorld(String map) throws Exception {
@@ -82,7 +82,7 @@ public class TankSoarWorld implements IWorld {
 		while (playerIter.hasNext()) {
 			Player player = playerIter.next();
 			
-			MoveInfo playerMove = players.getMove(player);
+			CommandInfo playerMove = players.getMove(player);
 			
 			// Check for fire
 			if (playerMove.fire) {
@@ -178,7 +178,7 @@ public class TankSoarWorld implements IWorld {
 			
 			// There is another player, check its move
 			
-			MoveInfo otherMove = players.getMove(other);
+			CommandInfo otherMove = players.getMove(other);
 			if (!otherMove.move) {
 				// they didn't move, cross collision impossible
 				newLocations.put(player, newLocation);
@@ -353,7 +353,7 @@ public class TankSoarWorld implements IWorld {
 			}
 
 			// are any flying toward me?
-			MoveInfo move = players.getMove(player);
+			CommandInfo move = players.getMove(player);
 			for (CellObject missile : missiles) {
 				if (move.moveDirection == Direction.parse(missile.getProperty(Names.kPropertyDirection)).backward()) {
 					missileHit(player, tMap, location, missile, players);
@@ -715,7 +715,7 @@ public class TankSoarWorld implements IWorld {
 	private void cancelMove(Player player, PlayersManager players, 
 			HashMap<Player, int []> newLocations, 
 			ArrayList<Player> movedTanks) {
-		MoveInfo move = players.getMove(player);
+		CommandInfo move = players.getMove(player);
 		move.move = false;
 		movedTanks.remove(player);
 		newLocations.put(player, players.getLocation(player));

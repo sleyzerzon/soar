@@ -68,7 +68,7 @@ public class EatersVisualWorld extends VisualWorld {
 		// Draw world
 		int fill1, fill2, xDraw, yDraw;
 		int [] location = new int [2];
-		for(location[0] = 0; location[0] < map.getSize(); ++location[0]){
+		for(location[0] = 0; location[0] < map.size(); ++location[0]){
 			if (agentLocation != null) {
 				if ((location[0] < agentLocation[0] - Soar2D.config.eatersConfig().vision) 
 						|| (location[0] > agentLocation[0] + Soar2D.config.eatersConfig().vision)) {
@@ -79,7 +79,7 @@ public class EatersVisualWorld extends VisualWorld {
 				xDraw = location[0];
 			}
 			
-			for(location[1] = 0; location[1] < map.getSize(); ++location[1]){
+			for(location[1] = 0; location[1] < map.size(); ++location[1]){
 				if (agentLocation != null) {
 					if ((location[1] < agentLocation[1] - Soar2D.config.eatersConfig().vision) 
 							|| (location[1] > agentLocation[1] + Soar2D.config.eatersConfig().vision)) {
@@ -91,26 +91,26 @@ public class EatersVisualWorld extends VisualWorld {
 				}
 				
 				if (agentLocation == null) {
-					if (!this.map.resetRedraw(location) && painted) {
+					if (!this.map.getCell(location).checkAndResetRedraw() && painted) {
 						continue;
 					}
 				} else {
-					if (!this.map.checkRedraw(location) && painted) {
+					if (!this.map.getCell(location).checkRedraw() && painted) {
 						continue;
 					}
 				}
 				
 				ArrayList<CellObject> drawList;
-				drawList = this.map.getAllWithProperty(location, Names.kPropertyShape);
+				drawList = this.map.getCell(location).getAllWithProperty(Names.kPropertyShape);
 				
-				if (this.map.hasAnyWithProperty(location, Names.kPropertyBlock)) {
+				if (this.map.getCell(location).hasAnyWithProperty(Names.kPropertyBlock)) {
 				    gc.setBackground(WindowManager.black);
 				    gc.fillRectangle(cellSize*xDraw + 1, cellSize*yDraw + 1, cellSize - 2, cellSize - 2);
 					
 				} else {
 					boolean empty = true;
 					
-					Player eater = this.map.getPlayer(location);
+					Player eater = this.map.getCell(location).getPlayer();
 					
 					if (eater != null) {
 						empty = false;
@@ -177,15 +177,16 @@ public class EatersVisualWorld extends VisualWorld {
 					}
 				}
 				
-				if (this.map.hasObject(location, Names.kExplosion)) {
+				if (this.map.getCell(location).hasObject(Names.kExplosion)) {
 					drawExplosion(gc, xDraw, yDraw);
 				}
 			}
 		}
 	}
 	
+	int mouthCount = 0;
 	void drawEaterMouth(int x, int y, int x_mult, int y_mult, int cx_mult, int cy_mult, GC gc){		
-	    switch(Soar2D.simulation.world.getWorldCount() % 8){
+	    switch(++mouthCount % 8){
 			case(0):{
 			    gc.fillPolygon(new int[]{cellSize*x, cellSize*y,
 			            cellSize*x + x_mult*cellSize, cellSize * y + y_mult*cellSize,

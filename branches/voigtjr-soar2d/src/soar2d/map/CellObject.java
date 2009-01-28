@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import soar2d.Names;
-import soar2d.players.Player;
 
 /**
  * @author voigtjr
@@ -245,45 +244,60 @@ public class CellObject {
 		flyMissileUpdate = setting;
 	}
 	
-	/**
-	 * @param player called when this player acted on this object for whatever reason
-	 * @return true if the object should be removed from the cell after the apply
-	 */
-	public boolean apply(Player player) {
+	public void propertiesApply() {
 		for (String key : propertiesApply.keySet()) {
 			String value = propertiesApply.get(key);
 			logger.info(Names.Info.newProperty + key + " --> " + value);
 			properties.put(key, value);
 		}
-		
+	}
+
+	public int pointsApply() {
 		if (pointsApply) {
 			assert properties.containsKey(Names.kPropertyPoints);
-			int points = Integer.parseInt(properties.get(Names.kPropertyPoints));
-			player.adjustPoints(points, name);
+			return Integer.parseInt(properties.get(Names.kPropertyPoints));
 		}
+		return 0;
+	}
 		
+	public int missilesApply() {
 		if (missilesApply) {
 			assert properties.containsKey(Names.kPropertyMissiles);
-			int missiles = Integer.parseInt(properties.get(Names.kPropertyMissiles));
-			player.adjustMissiles(missiles, name);
+			return Integer.parseInt(properties.get(Names.kPropertyMissiles));
 		}
+		return 0;
+	}
 		
+	public int energyApply(boolean shieldsUp) {
 		if (energyApply) {
-			if (!energyApplyShieldsUp || player.shieldsUp()) {
+			if (!energyApplyShieldsUp || shieldsUp) {
 				assert properties.containsKey(Names.kPropertyEnergy);
-				int energy = Integer.parseInt(properties.get(Names.kPropertyEnergy));
-				player.adjustEnergy(energy, name);
+				return Integer.parseInt(properties.get(Names.kPropertyEnergy));
 			}
 		}
+		return 0;
+	}
 		
+	public int healthApply(boolean shieldsUp) {
 		if (healthApply) {
-			if (!healthApplyShieldsDown || !player.shieldsUp()) {
+			if (!healthApplyShieldsDown || !shieldsUp) {
 				assert properties.containsKey(Names.kPropertyHealth);
-				int health = Integer.parseInt(properties.get(Names.kPropertyHealth));
-				player.adjustHealth(health, name);
+				return Integer.parseInt(properties.get(Names.kPropertyHealth));
 			}
 		}
+		return 0;
+	}
 		
+	public static class RewardApply {
+		RewardApply(int points, String message) {
+			this.points = points;
+			this.message = message;
+		}
+		public int points;
+		public String message;
+	}
+	
+	public RewardApply rewardApply() {
 		// Reward apply is only true on the reward boxes, not info boxes
 		if (rewardApply > 0) {
 			// am I the positive box
@@ -300,24 +314,23 @@ public class CellObject {
 				// see if we opened the box correctly
 				if (suppliedOpenCode == openCode) {
 					// reward positively
-					player.adjustPoints(rewardApply, "positive reward");
+					return new RewardApply(rewardApply, "positive reward");
 				} else {
-                    player.adjustPoints(1, "small reward (wrong open code)");
+					return new RewardApply(1, "small reward (wrong open code)");
 				}
 			} else {
 				// I'm  not the positive box, set resetApply false
 				resetApply = false;
 				
 				// reward negatively
-				player.adjustPoints(rewardApply * -1, "negative reward (wrong box)");
+				return new RewardApply(-1, "negative reward (wrong box)");
 			}
 		}
-		
-		if (removeApply) {
-			return true;
-		}
-		
-		return false;
+		return null;
+	}
+	
+	public boolean removeApply() {
+		return removeApply;
 	}
 	
 	boolean rewardBox = false;

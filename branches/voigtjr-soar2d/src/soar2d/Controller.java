@@ -5,6 +5,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 
 import soar2d.visuals.WindowManager;
+import soar2d.world.World;
 import sml.Agent;
 import sml.Kernel;
 import sml.smlPrintEventId;
@@ -113,14 +114,16 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	 * 
 	 * Called to reset the simulation.
 	 */
-	public boolean resetSimulation() {
-		if (!Soar2D.simulation.reset()) {
-			return false;
+	public void resetSimulation() {
+		try {
+			Soar2D.simulation.reset();
+		} catch (Exception e) {
+			error(e.getMessage());
 		}
+		
 		if (Soar2D.wm.using()) {
 			Soar2D.wm.reset();
 		}
-		return true;
 	}
 	
 	/** 
@@ -138,23 +141,22 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 			} else {
 				Soar2D.simulation.runForever();
 			}
-		} else if (Soar2D.config.generalConfig().tosca) {
-			if (step)
-				soar2d.tosca2d.ToscaInterface.getTosca().runStep() ;
-			else
-				soar2d.tosca2d.ToscaInterface.getTosca().runForever() ;
 		} else {
 			
 			// there are no soar agents, call the start event
 			startEvent();
 			
 			// run as necessary
-			if (!step) {
-				while (!stop) {
+			try {
+				if (!step) {
+					while (!stop) {
+						tickEvent();
+					}
+				} else {
 					tickEvent();
 				}
-			} else {
-				tickEvent();
+			} catch (Exception e) {
+				error(e.getMessage());
 			}
 			
 			// call the stop event
@@ -187,7 +189,7 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	 * output callback. If soar is not running things, this is called by run() in 
 	 * a loop if necessary.
 	 */
-	public void tickEvent() {
+	public void tickEvent() throws Exception {
 		// this is 50 except for book, where it is configurable
 		timeSlice = Soar2D.config.generalConfig().cycle_time_slice / 1000.0f;
 		totalTime += timeSlice;
@@ -239,7 +241,11 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
   		}
   		
   		// this updates the world
-  		tickEvent();
+  		try {
+			tickEvent();
+		} catch (Exception e) {
+			error(e.getMessage());
+		}
   		
 		// Test this after the world has been updated, in case it's asking us to stop
 		if (stop) {
@@ -271,10 +277,10 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	 * Create the GUI and show it, and run its loop. Does not return until the 
 	 * GUI is disposed. 
 	 */
-	public void runGUI() {
+	public void runGUI(World world) {
 		if (Soar2D.wm.using()) {
 			// creates, displays and loops the window. returns on shutdown *hopefully
-			Soar2D.wm.run();
+			Soar2D.wm.run(world);
 		}
 	}
 
@@ -288,7 +294,7 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	/**
 	 * Call to shutdown the simulation.
 	 */
-	public void shutdown() {
+	public void shutdown() throws Exception {
 		// we're shutting down
 		shuttingDown = true;
 		
@@ -299,6 +305,7 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 			// closes out the window manager
 			Soar2D.wm.shutdown();
 		}
+		
 		// closes out the simulation
 		Soar2D.simulation.shutdown();
 	}
@@ -348,8 +355,10 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 		Soar2D.config.generalConfig().map = mapFile.getAbsolutePath();
 
 		// the reset will fail if the map fails to load
-		if (!resetSimulation()) {
-			
+		try {
+			resetSimulation();
+		} catch (Exception e) {
+			error(e.getMessage());
 			// and if it fails the map will remain unchanged, set it back
 			Soar2D.config.generalConfig().map = oldMap.getAbsolutePath();
 		}

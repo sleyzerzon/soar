@@ -7,11 +7,11 @@ import soar2d.Direction;
 import soar2d.Soar2D;
 import soar2d.map.GridMap;
 import soar2d.map.TaxiMap;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 import soar2d.players.Taxi;
 
-public class TaxiWorld implements IWorld {
+public class TaxiWorld implements World {
 
 	public TaxiWorld(String map) throws Exception {
 		
@@ -53,7 +53,7 @@ public class TaxiWorld implements IWorld {
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
 			Taxi player = (Taxi)iter.next();
-			MoveInfo move = players.getMove(player);
+			CommandInfo move = players.getMove(player);
 			
 			// for visual world 
 			player.resetPointsChanged();

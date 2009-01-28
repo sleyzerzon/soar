@@ -6,7 +6,7 @@ import soar2d.Soar2D;
 import soar2d.world.PlayersManager;
 import soar2d.world.World;
 
-public class Mouse extends Player {
+public class Mouse {
 
 	public Mouse(String playerId) {
 		super(playerId);
@@ -39,8 +39,8 @@ public class Mouse extends Player {
 		}
 	}
 	
-	public MoveInfo getMove() {
-		MoveInfo move = new MoveInfo();
+	public CommandInfo getMove() {
+		CommandInfo move = new CommandInfo();
 		if (target == null) {
 			move.forward = true;
 			return move;

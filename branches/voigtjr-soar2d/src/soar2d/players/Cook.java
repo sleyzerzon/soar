@@ -5,8 +5,8 @@ import soar2d.Soar2D;
 /**
  * @author voigtjr
  */
-public class Cook extends Player {	
-	private MoveInfo move;
+public class Cook {	
+	private CommandInfo move;
 	
 	public Cook(String playerId) {
 		super(playerId) ;
@@ -22,17 +22,17 @@ public class Cook extends Player {
 	/* (non-Javadoc)
 	 * @see soar2d.player.Player#getMove()
 	 */
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		return move;
 	}
 
 	public boolean getHumanMove() {
 		if (Soar2D.config.generalConfig().headless) {
-			move = new MoveInfo();
+			move = new CommandInfo();
 			return true;
 		}
 
-		move = Soar2D.wm.getHumanMove(this);
+		move = Soar2D.wm.getHumanCommand(this);
 
 		if (move == null) {
 			return false;

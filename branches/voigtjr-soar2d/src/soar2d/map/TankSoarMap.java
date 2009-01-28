@@ -9,6 +9,7 @@ import soar2d.Direction;
 import soar2d.Names;
 import soar2d.Soar2D;
 import soar2d.players.Player;
+import soar2d.players.Player;
 import soar2d.world.TankSoarWorld;
 
 public class TankSoarMap implements GridMap, CellObjectObserver {

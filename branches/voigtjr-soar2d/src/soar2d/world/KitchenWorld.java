@@ -15,10 +15,10 @@ import soar2d.map.CellObject;
 import soar2d.map.GridMap;
 import soar2d.map.KitchenMap;
 import soar2d.players.Cook;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 
-public class KitchenWorld implements IWorld {
+public class KitchenWorld implements World {
 	private static Logger logger = Logger.getLogger(KitchenWorld.class);
 
 	public KitchenWorld(String map) throws Exception {
@@ -48,7 +48,7 @@ public class KitchenWorld implements IWorld {
 		Iterator<Player> iter = players.iterator();
 		while (iter.hasNext()) {
 			Cook player = (Cook)iter.next();
-			MoveInfo move = players.getMove(player);
+			CommandInfo move = players.getMove(player);
 			
 			// for visual world 
 			player.resetPointsChanged();

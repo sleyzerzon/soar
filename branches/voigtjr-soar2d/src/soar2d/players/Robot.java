@@ -6,19 +6,19 @@ import soar2d.map.BookMap;
 import soar2d.map.CellObject;
 import soar2d.world.World;
 
-public class Robot extends Player {
-	private MoveInfo move;
+public class Robot {
+	private CommandInfo move;
 
 	public Robot(String playerId) {
 		super(playerId);
 	}
 	
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		return move;
 	}
 
 	public boolean getHumanMove() {
-		move = Soar2D.wm.getHumanMove(this);
+		move = Soar2D.wm.getHumanCommand(this);
 
 		if (move == null) {
 			return false;

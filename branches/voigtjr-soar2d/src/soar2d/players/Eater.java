@@ -1,45 +1,57 @@
 package soar2d.players;
 
 import soar2d.Soar2D;
+import soar2d.map.EatersMap;
 
-/**
- * @author voigtjr
- *
- * The base eater class, used for human eaters.
- * Soar eaters extend this class because they might one day need to share code with
- * human eaters.
- */
 public class Eater extends Player {	
-	private MoveInfo move;
+	private CommandInfo command;
+	private EaterCommander commander;
 
-	public Eater( String playerId ) {
-		super(playerId) ;
+	public Eater(String playerId) throws Exception {
+		super(playerId);
 	}
 	
-	/* (non-Javadoc)
-	 * @see soar2d.player.Player#update(soar2d.World, int [])
-	 */
-	public void update(int [] location) {
-		super.update(location);
+	public void setCommander(EaterCommander commander) {
+		this.commander = commander;
 	}
-
-	/* (non-Javadoc)
-	 * @see soar2d.player.Player#getMove()
-	 */
-	public MoveInfo getMove() {
-		// the facing depends on the move
-		this.setFacing(move.moveDirection);
-		return move;
-	}
-
-	public boolean getHumanMove() {
-		move = Soar2D.wm.getHumanMove(this);
-
-		if (move == null) {
-			return false;
+	
+	public CommandInfo getCommand(boolean human) throws Exception {
+		if (human || Soar2D.config.generalConfig().force_human) {
+			command = Soar2D.simulation.getHumanCommand(this);
+		} else if (commander != null) {
+			command = commander.getCommand();
+		} else {
+			command = new CommandInfo();
+			command.randomEaters();
 		}
 		
-		return true;
+		// the facing depends on the move
+		if (command.move) { 
+			super.setFacing(command.moveDirection);
+		}
+
+		return command;
 	}
 	
+	public void update(int[] newLocation, EatersMap eatersMap) throws Exception {
+		super.update(newLocation);
+		if (commander != null) {
+			commander.update(eatersMap);
+		}
+		resetPointsChanged();
+	}
+
+	@Override
+	public void reset() throws Exception {
+		super.reset();
+		if (commander != null) {
+			commander.reset();
+		}
+	}
+
+	public void shutdownCommander() throws Exception {
+		if (commander != null) {
+			commander.shutdown();
+		}
+	}
 }

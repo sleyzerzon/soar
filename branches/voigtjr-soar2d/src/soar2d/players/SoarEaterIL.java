@@ -1,4 +1,4 @@
-package soar2d.players.soar;
+package soar2d.players;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import sml.StringElement;
 import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.map.CellObject;
-import soar2d.map.GridMap;
+import soar2d.map.EatersMap;
 import soar2d.players.Player;
 
 class SoarEaterIL {
@@ -180,9 +180,9 @@ class SoarEaterIL {
 			map.put(name, element);
 		}
 		
-		private void updatePlayerContent(int[] view, GridMap map, Cell cell) {
+		private void updatePlayerContent(int[] view, EatersMap map, Cell cell) {
 			// TODO: Keep track of player name so we can blink if it is a different eater.
-			Player playerContent = map.getPlayer(view);
+			Player playerContent = map.getCell(view).getPlayer();
 			if (playerContent != null) {
 				if (cell.eater == null) {
 					cell.eater = agent.CreateStringWME(cell.me, Names.kContentID, Names.kEaterID);
@@ -196,11 +196,11 @@ class SoarEaterIL {
 			}
 		}
 		
-		private void updateFoodContent(int[] view, GridMap map, Cell cell) {
+		private void updateFoodContent(int[] view, EatersMap map, Cell cell) {
 			// Food
 			HashMap<String, StringElement> remaining = new HashMap<String, StringElement>(cell.comestibles);
 			// For each food type in the cell on the map
-			ArrayList<CellObject> comestibles = map.getAllWithProperty(view, Names.kPropertyEdible);
+			ArrayList<CellObject> comestibles = map.getCell(view).getAllWithProperty(Names.kPropertyEdible);
 			if (comestibles != null) {
 				for (CellObject comestible : comestibles) {
 					
@@ -310,7 +310,7 @@ class SoarEaterIL {
 			}
 		}
 		
-		private void update(boolean moved, int[] pos, GridMap map) {
+		private void update(boolean moved, int[] pos, EatersMap map) {
 			if (moved) {
 				clearView();
 			}
@@ -334,7 +334,7 @@ class SoarEaterIL {
 						}
 						
 						// get all things that block
-						ArrayList<CellObject> blockers = map.getAllWithProperty(view, Names.kPropertyBlock);
+						ArrayList<CellObject> blockers = map.getCell(view).getAllWithProperty(Names.kPropertyBlock);
 
 						// Blocking cells are simple, put anything with IDs on the input link
 						if (blockers != null) {
@@ -347,7 +347,7 @@ class SoarEaterIL {
 					} else {
 						
 						// Filter out locations that will not change:
-						if (!map.isInBounds(view) || map.hasAnyWithProperty(view, Names.kPropertyBlock)) {
+						if (!map.isInBounds(view) || map.getCell(view).hasAnyWithProperty(Names.kPropertyBlock)) {
 							continue;
 						}
 					}
@@ -359,7 +359,7 @@ class SoarEaterIL {
 					updateFoodContent(view, map, cell);
 					
 					// TODO: there can only be one (as of right now)
-					ArrayList<CellObject> boxes = map.getAllWithProperty(view, Names.kPropertyBox);
+					ArrayList<CellObject> boxes = map.getCell(view).getAllWithProperty(Names.kPropertyBox);
 					if (boxes != null) {
 						updateBox(boxes.get(0), cell);
 					}
@@ -431,7 +431,7 @@ class SoarEaterIL {
 		}
 	}
 	
-	void update(boolean moved, int[] pos, GridMap map, int points) throws CommitException {
+	void update(boolean moved, int[] pos, EatersMap map, int points) throws CommitException {
 		eater.update(moved, pos, points);
 		myLocation.update(moved, pos, map);
 		random.update();

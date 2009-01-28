@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 import soar2d.config.SimConfig;
 import soar2d.visuals.WindowManager;
+import soar2d.world.World;
 
 import org.apache.log4j.Logger;
 
@@ -66,25 +67,35 @@ public class Soar2D {
 
 		// Initialize simulation
 		logger.trace(Names.Trace.initSimulation);
+		World world = null;
 		try {
-			simulation.initialize(config);
+			world = simulation.initialize(config);
 		} catch (Exception e) {
 			fatalError(Names.Errors.simulationInitFail + e.getMessage());
+			e.printStackTrace();
 		}
 		
 		if (usingGUI) {
 			// Run GUI
 			logger.trace(Names.Trace.startGUI);
-			control.runGUI();
+			control.runGUI(world);
 		} else {
 			// Run simulation
 			logger.trace(Names.Trace.startSimulation);
-			control.startSimulation(false, false);
+			try {
+				control.startSimulation(false, false);
+			} catch (Exception e) {
+				fatalError("Simulation exception: " + e.getMessage());
+			}
 		}
 		
 		// calls wm.shutdown()
 		logger.trace(Names.Trace.shutdown);
-		control.shutdown();
+		try {
+			control.shutdown();
+		} catch (Exception e) {
+			fatalError(e.getMessage());
+		}
 		
 		logger.trace(Names.Trace.savingPreferences);
 		config.savePreferences();

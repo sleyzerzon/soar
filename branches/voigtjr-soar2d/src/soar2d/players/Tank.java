@@ -7,7 +7,7 @@ import soar2d.Simulation;
 import soar2d.Soar2D;
 import soar2d.world.World;
 
-public class Tank extends Player {
+public class Tank {
 	private static Logger logger = Logger.getLogger(Tank.class);
 
 	/**
@@ -47,7 +47,7 @@ public class Tank extends Player {
 	protected int smellDistance;
 	protected String smellColor;
 	
-	private MoveInfo move;
+	private CommandInfo move;
 	protected Direction sound;
 	protected boolean onHealthCharger;
 	protected boolean onEnergyCharger;
@@ -270,7 +270,7 @@ public class Tank extends Player {
 	}
 	
 	public boolean getHumanMove() {
-		move = Soar2D.wm.getHumanMove(this);
+		move = Soar2D.wm.getHumanCommand(this);
 
 		if (move == null) {
 			return false;
@@ -288,7 +288,7 @@ public class Tank extends Player {
 		return true;
 	}
 
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		resetSensors();
 		
 		return move;

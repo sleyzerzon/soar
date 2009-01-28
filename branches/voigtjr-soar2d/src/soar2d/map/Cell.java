@@ -50,6 +50,7 @@ public class Cell {
 	
 	/** The player in the cell. Currently we're limited to one player per cell. */
 	private Player player;
+	
 	// TODO: Compare performance between one HashMap<name, object> vs. this
 	// Iteration performance is paramount
 	private ArrayList<CellObject> cellObjects = new ArrayList<CellObject>();
@@ -206,6 +207,9 @@ public class Cell {
 				ret.add(object);
 				iter.remove();
 			}
+		}
+		if (ret == null) {
+			return null;
 		}
 		for (CellObject cellObject : ret) {
 			// needs to be outside above loop because cellObjects could change.

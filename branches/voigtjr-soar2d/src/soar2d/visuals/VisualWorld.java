@@ -2,7 +2,6 @@ package soar2d.visuals;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -19,22 +18,17 @@ import soar2d.Direction;
 import soar2d.Names;
 import soar2d.Soar2D;
 import soar2d.map.CellObject;
-import soar2d.map.CellObjectManager;
 import soar2d.map.GridMap;
 import soar2d.players.Player;
 import soar2d.players.RadarCell;
-import soar2d.world.PlayersManager;
 
 public abstract class VisualWorld extends Canvas implements PaintListener {
 	
 	public static HashMap<Player, Color> playerColors = new HashMap<Player, Color>();
 	
-	public static void remapPlayerColors() {
-		PlayersManager players = Soar2D.simulation.world.getPlayers();
+	public static void remapPlayerColors(Player[] players) {
 		playerColors.clear();
-		Iterator<Player> iter = players.iterator();
-		while (iter.hasNext()) {
-			Player player = iter.next();
+		for (Player player : players) {
 			String color = player.getColor();
 			playerColors.put(player, WindowManager.getColor(color));
 		}
@@ -94,21 +88,18 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 		
 		painted = false;
 		
-		CellObjectManager manager = this.map.getObjectManager();
-		Iterator<CellObject> iter = manager.getTemplatesWithProperty(Names.kPropertyMiniImage).iterator();
-		while (iter.hasNext()) {
-			CellObject obj = iter.next();
-			Image image = new Image(WindowManager.display, Soar2D.class.getResourceAsStream("/images/tanksoar/" + obj.getProperty(Names.kPropertyMiniImage)));
+		for (CellObject template : map.getTemplatesWithProperty(Names.kPropertyMiniImage)) {
+			Image image = new Image(WindowManager.display, Soar2D.class.getResourceAsStream("/images/tanksoar/" + template.getProperty(Names.kPropertyMiniImage)));
 			assert image != null;
-			if (obj.getName().equals(Names.kEnergy)) {
+			if (template.getName().equals(Names.kEnergy)) {
 				RadarCell.energyImage = image;
-			} else if (obj.getName().equals(Names.kHealth)) {
+			} else if (template.getName().equals(Names.kHealth)) {
 				RadarCell.healthImage = image;
-			} else if (obj.getName().equals(Names.kMissiles)) {
+			} else if (template.getName().equals(Names.kMissiles)) {
 				RadarCell.missilesImage = image;
-			} else if (obj.hasProperty(Names.kPropertyBlock)) {
+			} else if (template.hasProperty(Names.kPropertyBlock)) {
 				RadarCell.obstacleImage = image;
-			} else if (obj.getName().equals(Names.kGround)) {
+			} else if (template.getName().equals(Names.kGround)) {
 				RadarCell.openImage = image;
 			}
 		}
@@ -125,7 +116,11 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 	}
 	
 	Player getPlayerAtPixel(int [] loc) {
-		return this.map.getPlayer(getCellAtPixel(loc));
+		int[] xy = getCellAtPixel(loc);
+		if (xy == null) {
+			return null;
+		}
+		return this.map.getCell(xy).getPlayer();
 	}
 	
 	class DrawMissile {
@@ -195,11 +190,11 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 	}
 	
 	public int getWidth() {
-		return cellSize * this.map.getSize();
+		return cellSize * this.map.size();
 	}
 	
 	public int getHeight() {
-		return cellSize * this.map.getSize();
+		return cellSize * this.map.size();
 	}
 	
 }

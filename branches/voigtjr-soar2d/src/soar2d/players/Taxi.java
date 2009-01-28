@@ -6,8 +6,8 @@ import soar2d.Soar2D;
  * @author voigtjr
  *
  */
-public class Taxi extends Player {	
-	private MoveInfo move;
+public class Taxi {	
+	private CommandInfo move;
 
 	public Taxi(String playerId) {
 		super(playerId) ;
@@ -17,12 +17,12 @@ public class Taxi extends Player {
 		super.update(location);
 	}
 
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		return move;
 	}
 
 	public boolean getHumanMove() {
-		move = Soar2D.wm.getHumanMove(this);
+		move = Soar2D.wm.getHumanCommand(this);
 
 		if (move == null) {
 			return false;

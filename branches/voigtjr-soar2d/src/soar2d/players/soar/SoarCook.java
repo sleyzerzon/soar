@@ -18,7 +18,7 @@ import soar2d.Soar2D;
 import soar2d.map.CellObject;
 import soar2d.map.KitchenMap;
 import soar2d.players.Cook;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.world.World;
 
 public class SoarCook extends Cook {
@@ -291,18 +291,18 @@ public class SoarCook extends Cook {
 	/* (non-Javadoc)
 	 * @see soar2d.player.Eater#getMove()
 	 */
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		// if there was no command issued, that is kind of strange
 		if (agent.GetNumberCommands() == 0) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(getName() + " issued no command.");
 			}
-			return new MoveInfo();
+			return new CommandInfo();
 		}
 
 		// go through the commands
 		// see move info for details
-		MoveInfo move = new MoveInfo();
+		CommandInfo move = new CommandInfo();
 		for (int i = 0; i < agent.GetNumberCommands(); ++i) {
 			Identifier commandId = agent.GetCommand(i);
 			String commandName = commandId.GetAttribute();

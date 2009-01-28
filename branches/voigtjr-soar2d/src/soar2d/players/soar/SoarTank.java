@@ -17,7 +17,7 @@ import soar2d.Direction;
 import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.Soar2D;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 import soar2d.players.RadarCell;
 import soar2d.players.Tank;
@@ -115,7 +115,7 @@ public class SoarTank extends Tank implements Agent.RunEventInterface {
 		if (eventID == smlRunEventId.smlEVENT_AFTER_INTERRUPT.swigValue()) {
 			if (!Soar2D.control.isStopped()) {
 				logger.warn(getName() + ": agent interrupted");
-				Soar2D.simulation.world.interruped(agent.GetAgentName());
+				Soar2D.simulation.interruped(agent.GetAgentName());
 			}
 		} else if (!mem_exceeded && eventID == smlRunEventId.smlEVENT_MAX_MEMORY_USAGE_EXCEEDED.swigValue()) {
 			logger.warn(getName() + ": agent exceeded maximum memory usage");
@@ -171,7 +171,7 @@ public class SoarTank extends Tank implements Agent.RunEventInterface {
 		super.update(location);
 	}
 	
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		if (Soar2D.config.generalConfig().force_human) {
 			return super.getMove();
 		}
@@ -186,11 +186,11 @@ public class SoarTank extends Tank implements Agent.RunEventInterface {
 			if (logger.isDebugEnabled()) {
 				logger.debug(getName() + " issued no command.");
 			}
-			return new MoveInfo();
+			return new CommandInfo();
 		}
 		
 		Identifier moveId = null;
-		MoveInfo move = new MoveInfo();
+		CommandInfo move = new CommandInfo();
 		boolean moveWait = false;
 		for (int i = 0; i < numberOfCommands; ++i) {
 			Identifier commandId = agent.GetCommand(i);

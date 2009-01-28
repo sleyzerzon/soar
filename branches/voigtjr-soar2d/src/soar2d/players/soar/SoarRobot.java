@@ -17,7 +17,7 @@ import soar2d.map.BookMap;
 import soar2d.map.CellObject;
 import soar2d.map.GridMap;
 import soar2d.map.BookMap.Barrier;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 import soar2d.players.Robot;
 import soar2d.world.PlayersManager;
@@ -306,7 +306,7 @@ public class SoarRobot extends Robot {
 	/* (non-Javadoc)
 	 * @see soar2d.player.Eater#getMove()
 	 */
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		if (Soar2D.config.generalConfig().force_human) {
 			return super.getMove();
 		}
@@ -316,7 +316,7 @@ public class SoarRobot extends Robot {
 			if (logger.isDebugEnabled()) {
 				logger.debug(getName() + " issued no command.");
 			}
-			return new MoveInfo();
+			return new CommandInfo();
 		}
 
 		if (Soar2D.config.roomConfig().continuous) 
@@ -324,9 +324,9 @@ public class SoarRobot extends Robot {
 		return getMoveDiscrete();
 	}
 	
-	private MoveInfo getMoveDiscrete() {
+	private CommandInfo getMoveDiscrete() {
 		// go through the commands
-		MoveInfo move = new MoveInfo();
+		CommandInfo move = new CommandInfo();
 		for (int i = 0; i < agent.GetNumberCommands(); ++i) {
 			Identifier commandId = agent.GetCommand(i);
 			String commandName = commandId.GetAttribute();
@@ -476,7 +476,7 @@ public class SoarRobot extends Robot {
 				commandId.AddStatusComplete();
 				
 			} else if (commandName.equalsIgnoreCase("communicate")) {
-				MoveInfo.Communication comm = move.new Communication();
+				CommandInfo.Communication comm = move.new Communication();
 				String toString = commandId.GetParameterValue("to");
 				if (toString == null) {
 					logger.warn(getName() + " communicate command missing to parameter");
@@ -509,10 +509,10 @@ public class SoarRobot extends Robot {
 		return move;
 	}
 	
-	private MoveInfo getMoveContinuous() {
+	private CommandInfo getMoveContinuous() {
 				
 		// go through the commands
-		MoveInfo move = new MoveInfo();
+		CommandInfo move = new CommandInfo();
 		for (int i = 0; i < agent.GetNumberCommands(); ++i) {
 			Identifier commandId = agent.GetCommand(i);
 			String commandName = commandId.GetAttribute();
@@ -758,7 +758,7 @@ public class SoarRobot extends Robot {
 				dropCommandId = commandId;
 				
 			} else if (commandName.equalsIgnoreCase("communicate")) {
-				MoveInfo.Communication comm = move.new Communication();
+				CommandInfo.Communication comm = move.new Communication();
 				String toString = commandId.GetParameterValue("to");
 				if (toString == null) {
 					logger.warn(getName() + " communicate command missing to parameter");

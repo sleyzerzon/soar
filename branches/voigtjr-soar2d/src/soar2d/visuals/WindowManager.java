@@ -1,10 +1,5 @@
 package soar2d.visuals;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -35,23 +30,15 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
 
 import soar2d.Direction;
 import soar2d.Game;
 import soar2d.Names;
 import soar2d.Soar2D;
-import soar2d.config.SimConfig;
-import soar2d.map.BookMap;
-import soar2d.map.CellObject;
 import soar2d.map.EatersMap;
-import soar2d.map.GridMap;
-import soar2d.map.KitchenMap;
-import soar2d.map.TankSoarMap;
-import soar2d.map.TaxiMap;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.players.Player;
+import soar2d.world.World;
 
 public class WindowManager {
 	private static Logger logger = Logger.getLogger(WindowManager.class);
@@ -83,7 +70,7 @@ public class WindowManager {
 	String popUpTitle;
 	String popUpMessage;
 	String statusMessage;
-	MoveInfo humanMove;
+	CommandInfo humanMove;
 	Player human;
 	Composite rhs;
 	Composite currentSide;
@@ -202,7 +189,7 @@ public class WindowManager {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
 		visualWorld = new EatersVisualWorld(worldGroup, SWT.NONE, kEatersMainMapCellSize);
-		visualWorld.setMap(Soar2D.simulation.world.getMap());
+		visualWorld.setMap(world.getMap());
 
 		visualWorld.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -286,7 +273,7 @@ public class WindowManager {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
 		visualWorld = new KitchenVisualWorld(worldGroup, SWT.NONE, kKitchenMainMapCellSize);
-		visualWorld.setMap(Soar2D.simulation.world.getMap());
+		visualWorld.setMap(world.getMap());
 
 		visualWorld.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -367,7 +354,7 @@ public class WindowManager {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
 		visualWorld = new TaxiVisualWorld(worldGroup, SWT.NONE, kTaxiMainMapCellSize);
-		visualWorld.setMap(Soar2D.simulation.world.getMap());
+		visualWorld.setMap(world.getMap());
 
 		visualWorld.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -464,7 +451,7 @@ public class WindowManager {
 		}
 		group1.setText("Simulation");
 		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1);
+		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
 		
 		Group group2 = new Group(currentSide, SWT.NONE);
 		{
@@ -529,7 +516,7 @@ public class WindowManager {
 			mapButtons.setLayoutData(gd);
 		}
 
-		agentDisplay = new EatersAgentDisplay(currentSide);
+		agentDisplay = new EatersAgentDisplay(currentSide, world);
 		{
 			GridData gd = new GridData();
 			agentDisplay.setLayoutData(gd);
@@ -556,7 +543,7 @@ public class WindowManager {
 		}
 		group1.setText("Simulation");
 		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1);
+		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
 		
 		Group group2 = new Group(currentSide, SWT.NONE);
 		{
@@ -620,7 +607,7 @@ public class WindowManager {
 		}
 		group1.setText("Simulation");
 		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1);
+		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
 		
 		Group group2 = new Group(currentSide, SWT.NONE);
 		{
@@ -684,7 +671,7 @@ public class WindowManager {
 		}
 		group1.setText("Simulation");
 		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1);
+		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
 		
 		Group group2 = new Group(currentSide, SWT.NONE);
 		{
@@ -779,7 +766,7 @@ public class WindowManager {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
 		visualWorld = new BookVisualWorld(worldGroup, SWT.NONE, Soar2D.config.roomConfig().cell_size);
-		visualWorld.setMap(Soar2D.simulation.world.getMap());
+		visualWorld.setMap(world.getMap());
 
 		visualWorld.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -818,7 +805,8 @@ public class WindowManager {
 					break;
 				case SWT.KEYPAD_3:
 					humanMove.drop = true;
-					humanMove.dropId = human.getCarryId();
+					// FIXME
+					//humanMove.dropId = human.getCarryId();
 					break;
 				case SWT.KEYPAD_2:
 					humanMove.backward = true;
@@ -853,7 +841,7 @@ public class WindowManager {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
 		visualWorld = new TankSoarVisualWorld(worldGroup, SWT.NONE, kTanksoarMainMapCellSize);
-		visualWorld.setMap(Soar2D.simulation.world.getMap());
+		visualWorld.setMap(world.getMap());
 		
 		visualWorld.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
@@ -968,7 +956,7 @@ public class WindowManager {
 		}
 		group1.setText("Simulation");
 		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1);
+		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
 		
 		Group group2 = new Group(currentSide, SWT.NONE);
 		{
@@ -1015,125 +1003,6 @@ public class WindowManager {
 		}
 	}
 	
-	void processEdit(int [] location) {
-		if (templatesTable.getSelectionIndex() < 0) {
-			return;
-		}
-		
-		if (Soar2D.config.game() == Game.TANKSOAR) {
-			this.editMap.removeAll(location);
-		}
-
-		String newContent = null;
-		
-		if (templatesTable.getSelectionIndex() == 0) {
-			// clear out the cell
-			this.editMap.removeAll(location);
-			
-			if (Soar2D.config.game() == Game.TANKSOAR) {
-				newContent = Names.kGround;
-			}
-		} else {
-			newContent = templatesTable.getSelection()[0].getText();
-		}
-
-		if (newContent != null) {
-			this.editMap.addObjectToCell(location, this.editMap.createObjectByName(newContent));
-		}
-
-		if (Soar2D.config.game() == Game.TANKSOAR) {
-			TankSoarVisualWorld tsVisualWorld = (TankSoarVisualWorld)visualWorld;
-			tsVisualWorld.updateBackground(location);
-		}
-		visualWorld.redraw();
-		return;
-	}
-	
-	Table templatesTable;
-
-	private void createEditSide() {
-		currentSide = new Composite(rhs, SWT.NONE);
-		{
-			GridLayout gl = new GridLayout();
-			gl.marginHeight = 0;
-			gl.marginWidth = 0;
-			currentSide.setLayout(gl);
-			
-			GridData gd = new GridData();
-			currentSide.setLayoutData(gd);
-		}
-		
-		Label templatesLabel = new Label(currentSide, SWT.NONE);
-		templatesLabel.setText("Templates:");
-		
-		templatesTable = new Table(currentSide, SWT.BORDER | SWT.V_SCROLL);
-		{
-			TableItem item = new TableItem(templatesTable, SWT.NONE);
-			item.setText("<empty>");
-		}
-		Iterator<CellObject> templateIter = Soar2D.simulation.world.getMap().getObjectManager().getTemplates().iterator();
-		while(templateIter.hasNext()) {
-			CellObject template = templateIter.next();
-			String templateName = template.getName();
-			
-			if (templateName.equals(Names.kPropertyMissile)
-					|| templateName.equals(Names.kExplosion)
-					|| templateName.equals(Names.kGround)
-					|| templateName.equals(Names.kMissiles)) {
-				continue;
-			}
-			
-			TableItem item = new TableItem(templatesTable, SWT.NONE);
-			item.setText(template.getName());
-		}
-		
-//		Button editTemplateButton = new Button(currentSide, SWT.PUSH);
-//		editTemplateButton.setText("Edit Selected Template");
-//
-//		Button destroyTemplateButton = new Button(currentSide, SWT.PUSH);
-//		destroyTemplateButton.setText("Destroy Selected Template");
-//
-//		Button newTemplateButton = new Button(currentSide, SWT.PUSH);
-//		newTemplateButton.setText("Create New Template");
-		
-		if (Soar2D.config.game() == Game.EATERS) {
-			final Button randomFoodButton = new Button(currentSide, SWT.CHECK);
-			randomFoodButton.setText("Random food");
-			randomFoodButton.setSelection(Soar2D.simulation.world.getMap().getRandomFood());
-			randomFoodButton.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					Soar2D.simulation.world.getMap().setRandomFood(randomFoodButton.getSelection());
-				}
-			});
-			
-			final Button randomWallsButton = new Button(currentSide, SWT.CHECK);
-			randomWallsButton.setText("Random walls");
-			randomWallsButton.setSelection(Soar2D.simulation.world.getMap().getRandomWalls());
-			randomWallsButton.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					Soar2D.simulation.world.getMap().setRandomWalls(randomWallsButton.getSelection());
-				}
-			});
-		}
-		
-		Button saveAsButton = new Button(currentSide, SWT.PUSH);
-		saveAsButton.setText("Save as...");
-		saveAsButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				exitEditMode(true);
-			}
-		});
-		
-		Button cancelButton = new Button(currentSide, SWT.PUSH);
-		cancelButton.setText("Cancel");
-		cancelButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				exitEditMode(false);
-			}
-		});
-
-	}
-	
 	Menu menuBar;
 	Menu fileMenu;
 	Menu mapMenu;
@@ -1147,160 +1016,13 @@ public class WindowManager {
 	MenuItem fileExitItem;
 	
 	MenuItem mapChangeItem;
-	MenuItem mapEditItem;
 	
 	MenuItem helpAboutItem;
-
-	boolean mapEditMode = false;
-
-	private GridMap editMap;
 	
-	private void exitEditMode(boolean save) {
-		assert mapEditMode == true;
-
-		// we're going in to normal mode, destroy current side, create normal side
-		assert this.editMap != null;
-
-		if (save) {
-	   		File mapFile = saveMap();
-			if (mapFile == null) {
-				return;
-			}
-			Soar2D.config.generalConfig().map = mapFile.getAbsolutePath();
-		}
-		
-   		logger.info("Exiting map editor.");
-   		mapEditMode = false;
-   		
-   		mapMenuHeader.setEnabled(true);
-
- 		Soar2D.simulation.world.load(Soar2D.config.game(), Soar2D.config.generalConfig().map, Soar2D.config.generalConfig().runs);
-		this.editMap = null;
-		
-		currentSide.dispose();
-		switch (Soar2D.config.game()) {
-		case EATERS:
-			createEatersSide();
-			break;
-		case TANKSOAR:
-    		createTankSoarSide();
-    		break;
-		case ROOM:
-    		createBookSide();
-    		break;
-		case KITCHEN:
-			createKitchenSide();
-			break;
-		case TAXI:
-			createTaxiSide();
-			break;
-		}
-		
-		this.reset();
-		
-		rhs.layout(true);
-		shell.layout(true);
-	}
+	World world;
 	
-	private void enterEditMode() {
-		assert mapEditMode == false;
-		
-		if (Soar2D.simulation.world.getPlayers().numberOfPlayers() > 0) {
-			Soar2D.control.infoPopUp("Destroy all agents before editing the map.");
-			return;
-		}
-		
-		// flip the bit
-    	mapEditMode = true;
-    	
-		// we're going in to edit mode, destroy current side, create edit side
-
-		logger.info("Entering map editor.");
-	
-		mapMenuHeader.setEnabled(false);
-		
-		switch (Soar2D.config.game()) {
-		case EATERS:
-			this.editMap = new EatersMap();
-			break;
-		case TANKSOAR:
-			this.editMap = new TankSoarMap();
-			break;
-		case ROOM:
-			this.editMap = new BookMap();
-			break;
-		case KITCHEN:
-			this.editMap = new KitchenMap();
-			break;
-		case TAXI:
-			this.editMap = new TaxiMap();
-			break;
-		}
-		
-		try {
-			this.editMap.load(null);
-		} catch (Exception e) {
-			// TODO: handle gracefully
-			assert false;
-		}
-		this.visualWorld.setMap(this.editMap);
-		
-		currentSide.dispose();
-		createEditSide();
-		
-		updateWorldGroup();
-		
-		rhs.layout(true);
-		shell.layout(true);
-
-	}
-	
-	private void error(String message) {
-		logger.error(message);
-		if (using()) {
-			errorMessage(Soar2D.config.title(), message);
-		}
-	}
-	
-	private File saveMap() {
-		String output = this.editMap.generateXMLString();
-
-		if (output == null) {
-			error("Couldn't generate map file.");
-			return null;
-		}
-		
-		FileDialog fd = new FileDialog(shell, SWT.SAVE);
-		fd.setText("Map must be saved to continue...");
-		fd.setFilterPath(Soar2D.simulation.getMapPath());
-		
-		fd.setFilterExtensions(new String[] {"*." + Soar2D.simulation.getMapExt(), "*.*"});
-		
-		String mapFileString = fd.open();
-		if (mapFileString != null) {
-			if (!mapFileString.matches(".*\\..+")) {
-				mapFileString += "." + Soar2D.simulation.getMapExt();
-			}
-			
-			File mapFile = new File(mapFileString);
-			if (mapFile.exists() && !mapFile.canWrite()) {
-				error("Cannot write to file.");
-				return null;
-			}
-			try {
-				FileWriter out = new FileWriter(mapFile);
-				out.write(output);
-				out.close();
-			} catch (IOException exception) {
-				error("Error writing file: " + exception.getMessage());
-				return null;
-			}
-			return mapFile;
-		}
-		return null;
-	}
-	
-	public void run() {
+	public void run(World world) {
+		this.world = world;
 		
 		menuBar = new Menu(shell, SWT.BAR);
 		fileMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
@@ -1309,20 +1031,6 @@ public class WindowManager {
 		fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileMenuHeader.setMenu(fileMenu);
 		
-//		fileConfigurationItem = new MenuItem(fileMenu, SWT.PUSH);
-//		fileConfigurationItem.setText("&Configuration");
-//		fileConfigurationItem.addSelectionListener(new SelectionListener() {
-//		    public void widgetSelected(SelectionEvent event) {
-//		    	ConfigurationEditor ce = new ConfigurationEditor(shell);
-//		    	ce.open();
-//		    }
-//			
-//			public void widgetDefaultSelected(SelectionEvent event) {
-//		    	ConfigurationEditor ce = new ConfigurationEditor(shell);
-//		    	ce.open();
-//			}
-//		});
-
 		fileExitItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileExitItem.setText("&Exit");
 		fileExitItem.addSelectionListener(new SelectionListener() {
@@ -1352,18 +1060,6 @@ public class WindowManager {
 
 		    public void widgetDefaultSelected(SelectionEvent event) {
 		    	mapButtons.changeMap();
-		    }
-		});
-
-		mapEditItem = new MenuItem(mapMenu, SWT.PUSH);
-		mapEditItem.setText("&Edit Map");
-		mapEditItem.addSelectionListener(new SelectionListener() {
-		    public void widgetSelected(SelectionEvent event) {
-		    	enterEditMode();
-		    }
-
-		    public void widgetDefaultSelected(SelectionEvent event) {
-		    	enterEditMode();
 		    }
 		});
 
@@ -1425,22 +1121,17 @@ public class WindowManager {
 		
 		visualWorld.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
-				if (mapEditMode) {
-					int [] location = visualWorld.getCellAtPixel(new int [] { e.x, e.y });
-					processEdit(location);
-				} else {
-					Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
-					if (player == null) {
-						return;
-					}
-					agentDisplay.selectPlayer(player);
+				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
+				if (player == null) {
+					return;
 				}
+				agentDisplay.selectPlayer(player);
 			}
 		});
 		
 		updateWorldGroup();
 
-		VisualWorld.remapPlayerColors();
+		VisualWorld.remapPlayerColors(world.getPlayers());
 
 		shell.addShellListener(new ShellAdapter() {
 			public void shellDeactivated(ShellEvent e) {
@@ -1556,11 +1247,11 @@ public class WindowManager {
 	
 	void updateCounts() {
 		if (Soar2D.config.game() == Game.EATERS) {
-			EatersMap eMap = (EatersMap)Soar2D.simulation.world.getMap();
+			EatersMap eMap = (EatersMap)world.getMap();
 			foodCount.setText(Integer.toString(eMap.getFoodCount()));
 			scoreCount.setText(Integer.toString(eMap.getScoreCount()));
 		}
-		worldCount.setText(Integer.toString(Soar2D.simulation.world.getWorldCount()));
+		worldCount.setText(Integer.toString(world.getWorldCount()));
 	}
 
 	boolean isDisposed() {
@@ -1583,7 +1274,7 @@ public class WindowManager {
 		if (!isDisposed()) {
 			display.syncExec(new Runnable() {
 				public void run() {
-					simButtons.updateButtons();
+					simButtons.updateButtons(world.numberOfPlayers());
 					mapButtons.updateButtons();
 					agentDisplay.updateButtons();
 				}
@@ -1597,7 +1288,7 @@ public class WindowManager {
 				public void run() {
 					visualWorld.setRepaint();
 					visualWorld.redraw();
-					simButtons.updateButtons();
+					simButtons.updateButtons(world.numberOfPlayers());
 					mapButtons.updateButtons();
 					agentDisplay.updateButtons();
 				}
@@ -1609,9 +1300,9 @@ public class WindowManager {
 		if (visualWorld != null && !visualWorld.isDisposed()) {
 			visualWorld.setRepaint();
 			visualWorld.redraw();
-			VisualWorld.remapPlayerColors();
+			VisualWorld.remapPlayerColors(world.getPlayers());
 			updateCounts();
-			simButtons.updateButtons();
+			simButtons.updateButtons(world.numberOfPlayers());
 			agentDisplay.agentEvent();
 		}
 	}
@@ -1620,13 +1311,13 @@ public class WindowManager {
 		if (!isDisposed()) {
 			display.syncExec(new Runnable() {
 				public void run() {
-					visualWorld.setMap(Soar2D.simulation.world.getMap());
-					agentDisplay.setMap(Soar2D.simulation.world.getMap());
+					visualWorld.setMap(world.getMap());
+					agentDisplay.setMap(world.getMap());
 					updateWorldGroup();
 					agentDisplay.worldChangeEvent();
 					visualWorld.redraw();
 					updateCounts();
-					simButtons.updateButtons();
+					simButtons.updateButtons(world.numberOfPlayers());
 				}
 			});
 		}
@@ -1661,19 +1352,19 @@ public class WindowManager {
 		});
 	}
 
-	public MoveInfo getHumanMove(Player player) {
-		humanMove = new MoveInfo();
+	public CommandInfo getHumanCommand(Player player) {
+		humanMove = new CommandInfo();
 		if (Soar2D.config.generalConfig().headless) {
 			return humanMove;
 		}
-		if (player.getRadarSwitch()) {
-			humanMove.radar = true;
-			humanMove.radarSwitch = true;
-		}
-		if (player.getRadarPower() > 0) {
-			humanMove.radarPower = true;
-			humanMove.radarPowerSetting = player.getRadarPower();
-		}
+//		if (player.getRadarSwitch()) {
+//			humanMove.radar = true;
+//			humanMove.radarSwitch = true;
+//		}
+//		if (player.getRadarPower() > 0) {
+//			humanMove.radarPower = true;
+//			humanMove.radarPowerSetting = player.getRadarPower();
+//		}
 		if (!isDisposed()) {
 			human = player;
 			if (player == null) {
@@ -1687,7 +1378,7 @@ public class WindowManager {
 				} catch (InterruptedException e) {}
 			}
 		}
-		MoveInfo theMove = humanMove;
+		CommandInfo theMove = humanMove;
 		humanMove = null;
 		return theMove;
 	}

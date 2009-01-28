@@ -46,6 +46,10 @@ public class AgentDisplay extends Composite {
 		}
 		
 		Soar2D.config.playerConfigs().put(clonePlayerId, clonePlayerConfig);
-		Soar2D.simulation.createPlayer(clonePlayerId, clonePlayerConfig);
+		try {
+			Soar2D.simulation.createPlayer(clonePlayerId, clonePlayerConfig);
+		} catch (Exception e) {
+			Soar2D.wm.errorMessage("Creation failed", e.getMessage());
+		}
 	}
 }

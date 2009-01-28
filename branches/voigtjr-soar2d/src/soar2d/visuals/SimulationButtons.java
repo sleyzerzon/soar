@@ -15,7 +15,7 @@ public class SimulationButtons extends Composite {
 	protected Button m_StepButton;
 	protected Button m_ResetButton;
 
-	public SimulationButtons(Composite parent) {
+	public SimulationButtons(Composite parent, int numberOfPlayers) {
 		super(parent, SWT.NONE);
 		
 		setLayout(new FillLayout());
@@ -59,13 +59,13 @@ public class SimulationButtons extends Composite {
 			}
 		});
 	
-		updateButtons();
+		updateButtons(numberOfPlayers);
 	}
 	
-	void updateButtons() {
+	void updateButtons(int numberOfPlayers) {
 		boolean running = Soar2D.control.isRunning();
 		boolean done = Soar2D.simulation.isDone();
-		boolean eaters = Soar2D.simulation.world.getPlayers().numberOfPlayers() > 0;
+		boolean eaters = numberOfPlayers > 0;
 		
         m_RunButton.setEnabled(!running && !done && eaters);
         m_StopButton.setEnabled(running);

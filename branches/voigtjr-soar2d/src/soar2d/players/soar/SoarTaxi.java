@@ -12,7 +12,7 @@ import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.Soar2D;
 import soar2d.map.TaxiMap;
-import soar2d.players.MoveInfo;
+import soar2d.players.CommandInfo;
 import soar2d.players.Taxi;
 import soar2d.world.World;
 
@@ -283,7 +283,7 @@ public class SoarTaxi extends Taxi {
 		}
 	}
 	
-	public MoveInfo getMove() {
+	public CommandInfo getMove() {
 		if (Soar2D.config.generalConfig().force_human) {
 			return super.getMove();
 		}
@@ -293,12 +293,12 @@ public class SoarTaxi extends Taxi {
 			if (logger.isDebugEnabled()) {
 				logger.debug(getName() + " issued no command.");
 			}
-			return new MoveInfo();
+			return new CommandInfo();
 		}
 
 		// go through the commands
 		// see move info for details
-		MoveInfo move = new MoveInfo();
+		CommandInfo move = new CommandInfo();
 		boolean moveWait = false;
 		if (agent.GetNumberCommands() > 1) {
 			logger.warn(getName() + ": " + agent.GetNumberCommands() 

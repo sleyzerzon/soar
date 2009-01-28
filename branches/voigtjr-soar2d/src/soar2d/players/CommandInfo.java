@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import soar2d.Direction;
 import soar2d.Names;
+import soar2d.Simulation;
 import soar2d.Soar2D;
 
 /**
@@ -12,7 +13,7 @@ import soar2d.Soar2D;
  *
  * output required for interaction with the world
  */
-public class MoveInfo {
+public class CommandInfo {
 	
 	// all
 	public boolean stopSim = false;	// stop the simulation by command
@@ -70,7 +71,15 @@ public class MoveInfo {
 	}
 	public ArrayList<Communication> messages = new ArrayList<Communication>();
 	
-	public MoveInfo() {
+	public CommandInfo() {
+	}
+	
+	public void randomEaters() {
+		move = Simulation.random.nextBoolean();
+		if (move) {
+			jump = Simulation.random.nextBoolean();
+			moveDirection = Direction.values()[Simulation.random.nextInt(Direction.values().length - 1) + 1];
+		}
 	}
 	
 	public String toString() {
