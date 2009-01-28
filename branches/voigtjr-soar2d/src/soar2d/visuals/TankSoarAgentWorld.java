@@ -9,8 +9,9 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import soar2d.Soar2D;
-import soar2d.players.Player;
 import soar2d.players.RadarCell;
+import soar2d.players.Tank;
+import soar2d.players.TankState;
 
 public class TankSoarAgentWorld extends Canvas implements PaintListener {
 
@@ -72,8 +73,9 @@ public class TankSoarAgentWorld extends Canvas implements PaintListener {
 		return RadarCell.openImage;
 	}
 	
-	public void update(Player tank) {
-		if (!tank.getRadarSwitch()) {
+	public void update(Tank tank) {
+		TankState state = tank.getState();
+		if (!state.getRadarSwitch()) {
 			if (blank) {
 				return;
 			}
@@ -85,8 +87,8 @@ public class TankSoarAgentWorld extends Canvas implements PaintListener {
 		
 		blank = false;
 
-		RadarCell[][] tankRadar = tank.getRadar();
-		int distance = tank.getObservedDistance();
+		RadarCell[][] tankRadar = state.getRadar();
+		int distance = state.getObservedPower();
 		for(int x = 0; x < Soar2D.config.tanksoarConfig().radar_width; ++x){
 			for(int y = 0; y < Soar2D.config.tanksoarConfig().radar_height; ++y){
 				if ((y < distance) || (y == distance && x == 1)) {

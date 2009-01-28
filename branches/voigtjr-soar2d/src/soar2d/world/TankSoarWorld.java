@@ -22,6 +22,7 @@ import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 import soar2d.players.SoarTank;
 import soar2d.players.Tank;
+import soar2d.players.TankState;
 
 public class TankSoarWorld implements World {
 	private static Logger logger = Logger.getLogger(TankSoarWorld.class);
@@ -85,14 +86,16 @@ public class TankSoarWorld implements World {
 	
 	private void updatePlayers(boolean playersChanged) throws Exception {
 		for (Tank tank : players.getAll()) {
+			TankState state = tank.getState();
 			
 			if (playersChanged) {
-				tank.playersChanged();
+				tank.playersChanged(players.getAllAsPlayers());
 			}
 			
 			if (players.numberOfPlayers() < 2) {
-				tank.setSmell(0, null);
-				tank.setSound(Direction.NONE);
+				state.setSmellDistance(0);
+				state.setSmellColor(null);
+				state.setSound(Direction.NONE);
 			} else {
 				int distance = 99;
 				String color = null;
@@ -119,15 +122,16 @@ public class TankSoarWorld implements World {
 						}
 					}
 				}
-				tank.setSmell(distance, color);
-				
+				state.setSmellDistance(distance);
+				state.setSmellColor(color);
+
 				if (distance > Soar2D.config.tanksoarConfig().max_sound_distance) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("Skipping sound check, smell was " + distance);
 					}
-					tank.setSound(Direction.NONE);
+					state.setSound(Direction.NONE);
 				} else {
-					tank.setSound(tankSoarMap.getSoundNear(players.getLocation(tank)));
+					state.setSound(tankSoarMap.getSoundNear(tank, players));
 				}
 			}
 				
@@ -156,6 +160,7 @@ public class TankSoarWorld implements World {
 		for (Tank tank : players.getAll()) {
 			CommandInfo command = tank.getCommand();
 			if (command == null) {
+				Soar2D.control.stopSimulation();
 				return;
 			}
 			players.setCommand(tank, command);
@@ -187,13 +192,14 @@ public class TankSoarWorld implements World {
 		// If moving in to a cell with a tank, check that tank for 
 		// a move in the opposite direction
 		for (Tank tank : players.getAll()) {
+			TankState state = tank.getState();
 			
 			CommandInfo playerMove = players.getCommand(tank);
 			
 			// Check for fire
 			if (playerMove.fire) {
-				if (tank.getMissiles() > 0) {
-					tank.adjustMissiles(-1, "fire");
+				if (state.getMissiles() > 0) {
+					state.adjustMissiles(-1, "fire");
 					firedTanks.add(tank);
 				} else {
 					logger.debug(tank + ": fired with no ammo");
@@ -218,15 +224,15 @@ public class TankSoarWorld implements World {
 			
 			// Check shields
 			if (playerMove.shields) {
-				tank.setShields(playerMove.shieldsSetting);
+				state.setShieldsUp(playerMove.shieldsSetting);
 			}
 			
 			// Radar
 			if (playerMove.radar) {
-				tank.setRadarSwitch(playerMove.radarSwitch);
+				state.setRadarSwitch(playerMove.radarSwitch);
 			}
 			if (playerMove.radarPower) {
-				tank.setRadarPower(playerMove.radarPowerSetting);
+				state.setRadarPower(playerMove.radarPowerSetting);
 			}
 
 			// if we exist in the new locations, we can skip ourselves
@@ -259,9 +265,9 @@ public class TankSoarWorld implements World {
 				
 				// take damage
 				String name = tankSoarMap.getCell(newLocation).getAllWithProperty(Names.kPropertyBlock).get(0).getName();
-				tank.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, name);
+				state.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, name);
 				
-				if (tank.getHealth() <= 0) {
+				if (state.getHealth() <= 0) {
 					HashSet<Tank> assailants = killedTanks.get(tank);
 					if (assailants == null) {
 						assailants = new HashSet<Tank>();
@@ -305,20 +311,21 @@ public class TankSoarWorld implements World {
 			
 			// take damage
 			
-			tank.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, "cross collision " + other);
+			state.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, "cross collision " + other);
 			// Getting rammed on a charger is deadly
 			if (tankSoarMap.getCell(players.getLocation(tank)).hasAnyWithProperty(Names.kPropertyCharger)) {
-				tank.adjustHealth(tank.getHealth() * -1, "hit on charger");
+				state.adjustHealth(state.getHealth() * -1, "hit on charger");
 			}
 			
-			other.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, "cross collision " + tank);
+			TankState otherState = other.getState();
+			otherState.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, "cross collision " + tank);
 			// Getting rammed on a charger is deadly
 			if (tankSoarMap.getCell(players.getLocation(other)).hasAnyWithProperty(Names.kPropertyCharger)) {
-				other.adjustHealth(other.getHealth() * -1, "hit on charger");
+				otherState.adjustHealth(otherState.getHealth() * -1, "hit on charger");
 			}
 			
 			
-			if (tank.getHealth() <= 0) {
+			if (state.getHealth() <= 0) {
 				HashSet<Tank> assailants = killedTanks.get(tank);
 				if (assailants == null) {
 					assailants = new HashSet<Tank>();
@@ -326,7 +333,7 @@ public class TankSoarWorld implements World {
 				assailants.add(other);
 				killedTanks.put(tank, assailants);
 			}
-			if (other.getHealth() <= 0) {
+			if (otherState.getHealth() <= 0) {
 				HashSet<Tank> assailants = killedTanks.get(other);
 				if (assailants == null) {
 					assailants = new HashSet<Tank>();
@@ -354,23 +361,25 @@ public class TankSoarWorld implements World {
 		// a charger, so do charging here too
 		// and shields and radar
 		for (Tank tank : players.getAll()) {
+			TankState state = tank.getState();
+			
 			doMoveCollisions(tank, newLocations, collisionMap, movedTanks);
 
 			// chargers
 			chargeUp(tank, newLocations.get(tank));
 
 			// Shields
-			if (tank.shieldsUp()) {
-				if (tank.getEnergy() > 0) {
-					tank.adjustEnergy(Soar2D.config.tanksoarConfig().shield_energy_usage, "shields");
+			if (state.getShieldsUp()) {
+				if (state.getEnergy() > 0) {
+					state.adjustEnergy(Soar2D.config.tanksoarConfig().shield_energy_usage, "shields");
 				} else {
 					logger.debug(tank + ": shields ran out of energy");
-					tank.setShields(false);
+					state.setShieldsUp(false);
 				}
 			}
 			
 			// radar
-			if (tank.getRadarSwitch()) {
+			if (state.getRadarSwitch()) {
 				handleRadarEnergy(tank);
 			}
 		}			
@@ -387,15 +396,17 @@ public class TankSoarWorld implements World {
 				logger.debug("Collision, " + (damage * -1) + " damage:");
 				
 				for (Tank tank : collision) {
-					tank.adjustHealth(damage, "collision");
+					TankState state = tank.getState();
+
+					state.adjustHealth(damage, "collision");
 					
 					// Getting rammed on a charger is deadly
 					if (tankSoarMap.getCell(players.getLocation(tank)).hasAnyWithProperty(Names.kPropertyCharger)) {
-						tank.adjustHealth(tank.getHealth() * -1, "hit on charger");
+						state.adjustHealth(state.getHealth() * -1, "hit on charger");
 					}
 					
 					// check for kill
-					if (tank.getHealth() <= 0) {
+					if (state.getHealth() <= 0) {
 						HashSet<Tank> assailants = killedTanks.get(tank);
 						if (assailants == null) {
 							assailants = new HashSet<Tank>();
@@ -588,6 +599,8 @@ public class TankSoarWorld implements World {
 	}
 	
 	private boolean apply(CellObject object, Tank tank) {
+		TankState state = tank.getState();
+
 		object.propertiesApply();
 		{
 			int points = object.pointsApply();
@@ -598,19 +611,19 @@ public class TankSoarWorld implements World {
 		{
 			int missiles = object.pointsApply();
 			if (missiles != 0) {
-				tank.adjustMissiles(missiles, object.getName());
+				state.adjustMissiles(missiles, object.getName());
 			}
 		}
 		{
 			int health = object.pointsApply();
 			if (health != 0) {
-				tank.adjustHealth(health, object.getName());
+				state.adjustHealth(health, object.getName());
 			}
 		}
 		{
 			int energy = object.pointsApply();
 			if (energy != 0) {
-				tank.adjustEnergy(energy, object.getName());
+				state.adjustEnergy(energy, object.getName());
 			}
 		}
 		{
@@ -623,36 +636,38 @@ public class TankSoarWorld implements World {
 	}
 			
 	private void handleRadarEnergy(Tank tank) {
-		int available = tank.getEnergy();
-		if (available < tank.getRadarPower()) {
+		TankState state = tank.getState();
+		int available = state.getEnergy();
+		if (available < state.getRadarPower()) {
 			if (available > 0) {
 				logger.debug(tank.getName() + ": reducing radar power due to energy shortage");
-				tank.setRadarPower(available);
+				state.setRadarPower(available);
 			} else {
 				logger.debug(tank.getName() + ": radar switched off due to energy shortage");
-				tank.setRadarSwitch(false);
+				state.setRadarSwitch(false);
 				return;
 			}
 		}
-		tank.adjustEnergy(tank.getRadarPower() * -1, "radar");
+		state.adjustEnergy(state.getRadarPower() * -1, "radar");
 	}
 	
 	private void chargeUp(Tank tank, int [] location) {
+		TankState state = tank.getState();
 		// Charge up
 		ArrayList<CellObject> chargers = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyCharger);
 		
 		if (chargers != null) {
 			for (CellObject charger : chargers) {
 				if (charger.hasProperty(Names.kPropertyHealth)) {
-					tank.setOnHealthCharger(true);
-					if (tank.getHealth() < Soar2D.config.tanksoarConfig().default_health) {
-						tank.adjustHealth(charger.getIntProperty(Names.kPropertyHealth), "charger");
+					state.setOnHealthCharger(true);
+					if (state.getHealth() < Soar2D.config.tanksoarConfig().default_health) {
+						state.adjustHealth(charger.getIntProperty(Names.kPropertyHealth), "charger");
 					}
 				}
 				if (charger.hasProperty(Names.kPropertyEnergy)) {
-					tank.setOnEnergyCharger(true);
-					if (tank.getEnergy() < Soar2D.config.tanksoarConfig().default_energy) {
-						tank.adjustEnergy(charger.getIntProperty(Names.kPropertyEnergy), "charger");
+					state.setOnEnergyCharger(true);
+					if (state.getEnergy() < Soar2D.config.tanksoarConfig().default_energy) {
+						state.adjustEnergy(charger.getIntProperty(Names.kPropertyEnergy), "charger");
 					}
 				}
 			}
@@ -701,6 +716,7 @@ public class TankSoarWorld implements World {
 	}
 	
 	public void missileHit(Tank tank, CellObject missile) {
+		TankState state = tank.getState();
 		// Yes, I'm hit
 		apply(missile, tank);
 		
@@ -714,11 +730,11 @@ public class TankSoarWorld implements World {
 		
 		// charger insta-kill
 		if (tankSoarMap.getCell(players.getLocation(tank)).hasAnyWithProperty(Names.kPropertyCharger)) {
-			tank.adjustHealth(tank.getHealth() * -1, "hit on charger");
+			state.adjustHealth(state.getHealth() * -1, "hit on charger");
 		}
 		
 		// check for kill
-		if (tank.getHealth() <= 0) {
+		if (state.getHealth() <= 0) {
 			HashSet<Tank> assailants = killedTanks.get(tank);
 			if (assailants == null) {
 				assailants = new HashSet<Tank>();
@@ -787,7 +803,9 @@ public class TankSoarWorld implements World {
 	
 	public void addPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
 		boolean human = playerConfig.productions == null;
-		Tank tank = new Tank(playerId, playerConfig.missiles, playerConfig.energy, playerConfig.health);
+		Tank tank = new Tank(playerId, Soar2D.config.tanksoarConfig().radar_width, Soar2D.config.tanksoarConfig().radar_height, 
+				playerConfig.missiles, playerConfig.energy, playerConfig.health,
+				Soar2D.config.tanksoarConfig().default_missiles, Soar2D.config.tanksoarConfig().default_energy, Soar2D.config.tanksoarConfig().default_health);
 	
 		players.add(tank, tankSoarMap, playerConfig.pos, human);
 		

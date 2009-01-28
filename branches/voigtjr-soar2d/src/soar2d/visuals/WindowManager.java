@@ -995,7 +995,7 @@ public class WindowManager {
 		
 		updateCounts();
 		
-		agentDisplay = new TankSoarAgentDisplay(currentSide);
+		agentDisplay = new TankSoarAgentDisplay(currentSide, world);
 		{
 			GridData gd = new GridData();
 			gd.horizontalSpan = 2;

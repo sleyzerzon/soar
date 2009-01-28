@@ -1,10 +1,15 @@
 package soar2d.map;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.log4j.Logger;
+
 class GridMapData implements CellObjectObserver {
+	private static Logger logger = Logger.getLogger(GridMapData.class);
+
 	CellObjectManager cellObjectManager;
 	GridMapCells cells;
 	File metadataFile;
@@ -14,6 +19,7 @@ class GridMapData implements CellObjectObserver {
 
 	public void addStateUpdate(int [] location, CellObject added) {
 		if (added.updatable()) {
+			logger.trace("Adding updatable " + added.getName() + " at " + Arrays.toString(location));
 			updatables.add(added);
 			updatablesLocations.put(added, location);
 		}
@@ -21,6 +27,7 @@ class GridMapData implements CellObjectObserver {
 	
 	public void removalStateUpdate(int [] location, CellObject removed) {
 		if (removed.updatable()) {
+			logger.trace("Removing updatable " + removed.getName() + " at " + Arrays.toString(location));
 			updatables.remove(removed);
 			updatablesLocations.remove(removed);
 		}

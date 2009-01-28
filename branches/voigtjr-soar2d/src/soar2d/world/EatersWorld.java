@@ -98,6 +98,7 @@ public class EatersWorld implements World {
 		for (Eater eater : players.getAll()) {
 			CommandInfo command = eater.getCommand();
 			if (command == null) {
+				Soar2D.control.stopSimulation();
 				return;
 			}
 			players.setCommand(eater, command);

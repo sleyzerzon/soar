@@ -21,8 +21,8 @@ public final class SoarEater implements EaterCommander {
 	private Agent agent;
 	private String[] shutdownCommands;
 	boolean fragged = false;
-	InputLinkMetadata metadata;
-	File metadataFile;
+	private InputLinkMetadata metadata;
+	private File metadataFile;
 	
 	public SoarEater(Eater eater, Agent agent, int vision, String[] shutdownCommands, File metadataFile) throws Exception {
 		this.eater = eater;

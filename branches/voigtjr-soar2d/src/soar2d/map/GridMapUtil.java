@@ -301,8 +301,8 @@ class GridMapUtil {
 			Cell newCell = Cell.createCell(Soar2D.config.generalConfig().headless, xy);
 			newCell.addObserver(data);
 			newCell.addObserver(observer);
-			data.cells.setCell(new int[] {rowIndex, colIndex}, newCell);
-			cell(data, child, new int [] { colIndex, rowIndex }, newCell);
+			data.cells.setCell(xy, newCell);
+			cell(data, child, xy, newCell);
 			
 			colIndex += 1;
 		}

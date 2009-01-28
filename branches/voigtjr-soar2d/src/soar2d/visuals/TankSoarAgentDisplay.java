@@ -18,7 +18,9 @@ import org.eclipse.swt.widgets.TableItem;
 import soar2d.Direction;
 import soar2d.Soar2D;
 import soar2d.players.Player;
-import soar2d.world.PlayersManager;
+import soar2d.players.Tank;
+import soar2d.players.TankState;
+import soar2d.world.World;
 
 public class TankSoarAgentDisplay extends AgentDisplay {
 	
@@ -35,7 +37,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	TankSoarAgentWorld m_AgentWorld;
 	Player selectedPlayer;
 	TableItem[] m_Items = new TableItem[0];
-	PlayersManager players;
+	Player[] players;
 	Composite m_AgentButtons;
 	Button m_NewAgentButton;
 	Button m_CloneAgentButton;
@@ -53,15 +55,15 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	BlockedDiagram m_Incoming;
 	ProgressBar m_Smell;
 	ProgressBar m_Radar;
+	World world;
 
-	public TankSoarAgentDisplay(final Composite parent) {
+	public TankSoarAgentDisplay(final Composite parent, World world) {
 		super(parent);
-		
-
+		this.world = world;
 
 		setLayout(new FillLayout());
 		
-		players = Soar2D.simulation.world.getPlayers();
+		players = world.getPlayers();
 		
 		m_Group = new Group(this, SWT.NONE);
 		m_Group.setText("Agents");
@@ -97,7 +99,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 		m_AgentTable.setHeaderVisible(true);
 		m_AgentTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				selectPlayer(players.get(m_AgentTable.getSelectionIndex()));
+				selectPlayer(players[m_AgentTable.getSelectionIndex()]);
 				updateButtons();
 			}
 		});
@@ -145,7 +147,10 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 				if (selectedPlayer == null) {
 					return;
 				}
-				Soar2D.simulation.destroyPlayer(selectedPlayer);
+				try {
+					Soar2D.simulation.destroyPlayer(selectedPlayer);
+				} catch (Exception ignored) {
+				}
 			}
 		});
 		{
@@ -402,26 +407,35 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	
 	void selectPlayer(Player player) {
 		selectedPlayer = player;
-		m_AgentTable.setSelection(players.indexOf(selectedPlayer));
+		int index;
+		for(index = 0; index < players.length; ++index) {
+			if (players[index].equals(selectedPlayer)) {
+				break;
+			}
+		}
+		m_AgentTable.setSelection(index);
 		m_AgentWorld.enable();
-		updateSensors();
+		updateSensors(); 
 		updateButtons();
 	}
 	
 	private void updateSensors() {
-		m_AgentWorld.update(selectedPlayer);
+		Tank tank = (Tank)selectedPlayer; // TODO: shouldn't have to cast in a perfect world
+		TankState state = tank.getState();
+		
+		m_AgentWorld.update(tank);
 		Direction facingDir = selectedPlayer.getFacing();
-		m_Radar.setSelection(selectedPlayer.getRadarPower());
-		m_Radar.setToolTipText(Integer.toString(selectedPlayer.getRadarPower()));
-		m_RWaves.set(selectedPlayer.getRWaves(), facingDir);
-		m_Blocked.set(selectedPlayer.getBlocked(), facingDir);
+		m_Radar.setSelection(state.getRadarPower());
+		m_Radar.setToolTipText(Integer.toString(state.getRadarPower()));
+		m_RWaves.set(state.getRwaves(), facingDir);
+		m_Blocked.set(state.getBlocked(), facingDir);
 		facing.setText(facingDir.id());
-		energyCharger.setText(selectedPlayer.getOnEnergyCharger() ? "yes" : "no");
-		healthCharger.setText(selectedPlayer.getOnHealthCharger() ? "yes" : "no");
-		resurrect.setText(selectedPlayer.getResurrect() ? "yes" : "no");
-		shields.setText(selectedPlayer.shieldsUp() ? "yes" : "no");
-		m_Incoming.set(selectedPlayer.getIncoming(), facingDir);
-		switch (selectedPlayer.getSound()) {
+		energyCharger.setText(state.getOnEnergyCharger() ? "yes" : "no");
+		healthCharger.setText(state.getOnHealthCharger() ? "yes" : "no");
+		resurrect.setText(state.getResurrectFrame() == Soar2D.simulation.getWorldCount() ? "yes" : "no");
+		shields.setText(state.getShieldsUp() ? "yes" : "no");
+		m_Incoming.set(state.getIncoming(), facingDir);
+		switch (state.getSound()) {
 		case NORTH:
 			m_Sound.set(Direction.NORTH.indicator(), facingDir);
 			break;
@@ -437,14 +451,14 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 		default:
 			m_Sound.set(Direction.NONE.indicator(), facingDir);
 		}
-		m_Smell.setSelection(selectedPlayer.getSmellDistance());
-		if (selectedPlayer.getSmellColor() != null) {
-			m_Smell.setForeground(WindowManager.getColor(selectedPlayer.getSmellColor()));
-			m_Smell.setToolTipText(selectedPlayer.getSmellColor() + " is " + Integer.toString(selectedPlayer.getSmellDistance()) + " spaces away");
+		m_Smell.setSelection(state.getSmellDistance());
+		if (state.getSmellColor() != null) {
+			m_Smell.setForeground(WindowManager.getColor(state.getSmellColor()));
+			m_Smell.setToolTipText(state.getSmellColor() + " is " + Integer.toString(state.getSmellDistance()) + " spaces away");
 		} else {
 			m_Smell.setToolTipText("no smell");
 		}
-		int [] playerLocation = players.getLocation(selectedPlayer);
+		int [] playerLocation = selectedPlayer.getLocation();
 		location.setText("(" + playerLocation[0] + "," + playerLocation[1] + ")");
 		m_AgentWorld.redraw();
 	}
@@ -480,32 +494,36 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 		}
 		
 		for (int i = 0; i < m_Items.length; ++i) {
+			Tank tank = (Tank)players[i];
+			TankState state = tank.getState();
 			m_Items[i].setText(new String[] {
-					players.get(i).getName(), 
-					Integer.toString(players.get(i).getPoints()),
-					Integer.toString(players.get(i).getMissiles()),
-					Integer.toString(players.get(i).getHealth()),
-					Integer.toString(players.get(i).getEnergy())					
+					tank.getName(), 
+					Integer.toString(tank.getPoints()),
+					Integer.toString(state.getMissiles()),
+					Integer.toString(state.getHealth()),
+					Integer.toString(state.getEnergy())					
 					});
 		}
 	}
 	
 	void updatePlayerList() {
-		players = Soar2D.simulation.world.getPlayers();
+		players = world.getPlayers();
 		m_AgentTable.removeAll();
 		boolean foundSelected = false;
 		
-		m_Items = new TableItem[players.numberOfPlayers()];
-		for (int i = 0; i < players.numberOfPlayers(); ++i) {
+		m_Items = new TableItem[world.numberOfPlayers()];
+		for (int i = 0; i < world.numberOfPlayers(); ++i) {
 			m_Items[i] = new TableItem(m_AgentTable, SWT.NONE);
+			Tank tank = (Tank)players[i];
+			TankState state = tank.getState();
 			m_Items[i].setText(new String[] {
-					players.get(i).getName(), 
-					Integer.toString(players.get(i).getPoints()),
-					Integer.toString(players.get(i).getMissiles()),
-					Integer.toString(players.get(i).getHealth()),
-					Integer.toString(players.get(i).getEnergy())					
+					tank.getName(), 
+					Integer.toString(tank.getPoints()),
+					Integer.toString(state.getMissiles()),
+					Integer.toString(state.getHealth()),
+					Integer.toString(state.getEnergy())					
 					});
-			if (selectedPlayer == players.get(i)) {
+			if (selectedPlayer == players[i]) {
 				foundSelected = true;
 				m_AgentTable.setSelection(i);
 			}
@@ -520,7 +538,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	void updateButtons() {
 		boolean running = Soar2D.control.isRunning();
 		boolean slotsAvailable = Soar2D.simulation.getUnusedColors().size() > 0;
-		boolean hasPlayers = players.numberOfPlayers() > 0;
+		boolean hasPlayers = world.numberOfPlayers() > 0;
 		boolean selectedEater = (selectedPlayer != null);
 		
 		m_NewAgentButton.setEnabled(!running && slotsAvailable);

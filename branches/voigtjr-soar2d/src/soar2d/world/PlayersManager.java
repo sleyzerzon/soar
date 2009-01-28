@@ -22,7 +22,7 @@ public class PlayersManager<P extends Player> {
 	private HashMap<P, double []> floatLocations = new HashMap<P, double []>(7);
 	private HashMap<P, CommandInfo> lastCommands = new HashMap<P, CommandInfo>(7);
 	
-	int numberOfPlayers() {
+	public int numberOfPlayers() {
 		return players.size();
 	}
 
@@ -46,7 +46,7 @@ public class PlayersManager<P extends Player> {
 		return players.listIterator(index);
 	}
 	
-	int [] getLocation(P player) {
+	public int [] getLocation(P player) {
 		return locations.get(player);
 	}
 	
@@ -62,7 +62,7 @@ public class PlayersManager<P extends Player> {
 		floatLocations.put(player, location);
 	}
 	
-	CommandInfo getCommand(P player) {
+	public CommandInfo getCommand(P player) {
 		return lastCommands.get(player);
 	}
 	

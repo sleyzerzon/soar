@@ -7,6 +7,7 @@ public interface TankCommander {
 	public CommandInfo getCommand() throws Exception;
 	public void reset() throws Exception;
 	public void shutdown() throws Exception;
-	public void playersChanged() throws Exception;
+	public void playersChanged(Player[] players) throws Exception;
 	public void commit() throws Exception;
+	public void fragged();
 }

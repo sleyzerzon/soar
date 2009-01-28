@@ -15,7 +15,8 @@ import soar2d.Names;
 import soar2d.Soar2D;
 import soar2d.map.CellObject;
 import soar2d.map.GridMap;
-import soar2d.players.Player;
+import soar2d.players.Tank;
+import soar2d.players.TankState;
 
 public class TankSoarVisualWorld extends VisualWorld {
 	Image[][] background = null;
@@ -30,23 +31,17 @@ public class TankSoarVisualWorld extends VisualWorld {
         gc.setForeground(WindowManager.black);
 		gc.setLineWidth(1);
 
-		if (Soar2D.control.isRunning()) {
-			if (Soar2D.config.generalConfig().hidemap) {
-				painted = true;
-				return;
-			}
-			
-		} else {
+		if (!Soar2D.control.isRunning()) {
 			if (lastX != e.x || lastY != e.y || internalRepaint) {
 				lastX = e.x;
 				lastY = e.y;
 				painted = false;
 			}
 
-			if (Soar2D.config.generalConfig().hidemap || disabled || !painted) {
+			if (disabled || !painted) {
 				gc.setBackground(WindowManager.widget_background);
 				gc.fillRectangle(0,0, this.getWidth(), this.getHeight());
-				if (disabled || Soar2D.config.generalConfig().hidemap) {
+				if (disabled) {
 					painted = true;
 					return;
 				}
@@ -60,14 +55,14 @@ public class TankSoarVisualWorld extends VisualWorld {
 		// Draw world
 		ArrayList<DrawMissile> drawMissiles = new ArrayList<DrawMissile>();
 		int [] location = new int [2];
-		for(location[0] = 0; location[0] < map.getSize(); ++location[0]){
-			for(location[1] = 0; location[1] < map.getSize(); ++location[1]){
-				if (!this.map.resetRedraw(location) && painted) {
+		for(location[0] = 0; location[0] < map.size(); ++location[0]){
+			for(location[1] = 0; location[1] < map.size(); ++location[1]){
+				if (!this.map.getCell(location).checkAndResetRedraw() && painted) {
 					continue;
 				}
 				
 				ArrayList<CellObject> drawList;
-				drawList = this.map.getAllWithProperty(location, Names.kPropertyImage);
+				drawList = this.map.getCell(location).getAllWithProperty(Names.kPropertyImage);
 				CellObject explosion = null;
 				CellObject object = null;
 				ArrayList<CellObject> missiles = new ArrayList<CellObject>();
@@ -84,7 +79,8 @@ public class TankSoarVisualWorld extends VisualWorld {
 					}
 				}
 				
-				Player tank = this.map.getPlayer(location);
+				Tank tank = (Tank)this.map.getCell(location).getPlayer();
+				TankState state = tank == null ? null : tank.getState();
 				
 				// draw the wall or ground or energy charger or health charger
 				gc.drawImage(background[location[0]][location[1]], location[0]*cellSize, location[1]*cellSize);
@@ -113,7 +109,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 
 					gc.drawImage(image, location[0]*cellSize, location[1]*cellSize);
 
-					if (tank.shieldsUp()) {
+					if (state.getShieldsUp()) {
 				        gc.setForeground(WindowManager.getColor(tank.getColor()));
 						gc.setLineWidth(3);
 						gc.drawOval(cellSize*location[0]+2, cellSize*location[1]+2, cellSize-5, cellSize-5);
@@ -179,7 +175,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 				}
 				
 				// Finally, draw the radar waves
-				ArrayList<CellObject> radarWaves = this.map.getAllWithProperty(location, Names.kPropertyRadarWaves);
+				ArrayList<CellObject> radarWaves = this.map.getCell(location).getAllWithProperty(Names.kPropertyRadarWaves);
 				gc.setForeground(WindowManager.getColor("white"));
 				
 				if (radarWaves != null) {
@@ -226,10 +222,10 @@ public class TankSoarVisualWorld extends VisualWorld {
 	}
 	
 	private void generateBackground() {
-		background = new Image[map.getSize()][map.getSize()];
+		background = new Image[map.size()][map.size()];
 		int [] location = new int [2];
-		for(location[0] = 0; location[0] < map.getSize(); ++location[0]){
-			for(location[1] = 0; location[1] < map.getSize(); ++location[1]){
+		for(location[0] = 0; location[0] < map.size(); ++location[0]){
+			for(location[1] = 0; location[1] < map.size(); ++location[1]){
 				updateBackground(location);
 			}
 		}
@@ -242,7 +238,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 	}
 	
 	public void updateBackground(int [] location) {
-		ArrayList<CellObject> drawList = this.map.getAllWithProperty(location, Names.kPropertyImage);
+		ArrayList<CellObject> drawList = this.map.getCell(location).getAllWithProperty(Names.kPropertyImage);
 		
 		CellObject backgroundObject = null;
 		if (drawList != null) {

@@ -371,10 +371,11 @@ public class CellObject {
 			assert properties.containsKey(Names.kPropertyLinger);
 			int remaining = Integer.parseInt(properties.get(Names.kPropertyLinger));
 			remaining -= 1;
-			properties.put(Names.kPropertyLinger, Integer.toString(remaining));
 			if (remaining == 0) {
+				logger.trace("Linger object expired.");
 				return true;
 			}
+			properties.put(Names.kPropertyLinger, Integer.toString(remaining));
 		}
 		
 		return false;
