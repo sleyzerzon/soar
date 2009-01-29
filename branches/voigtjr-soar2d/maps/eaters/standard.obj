@@ -1,6 +1,6 @@
-objects = [b,n,w];
 objects {
 	b {
+		name = bonusfood;
 		properties = [edible, color, shape, points, id];
 		properties {
 			edible = true;
@@ -15,6 +15,7 @@ objects {
 		}
 	}
 	n {
+		name = normalfood;
 		properties = [edible, color, shape, points, id];
 		properties {
 			edible = true;
@@ -29,6 +30,7 @@ objects {
 		}
 	}
 	w {
+		name = wall;
 		properties = [block, id];
 		properties {
 			block = true;

@@ -13,7 +13,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 	GridMapData data;
 	
 	public EatersMap(File mapFile) throws Exception {
-		data = GridMapUtil.loadFromFile(mapFile, this);
+		data = GridMapUtil.loadFromConfigFile(mapFile, this);
 	}
 	
 	public int size() {

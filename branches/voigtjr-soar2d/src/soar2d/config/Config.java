@@ -32,7 +32,7 @@ public class Config {
 		child.parent = this;
 
 		child.prefix = this.prefix;
-		if (child.prefix.length() > 0)
+		if (child.prefix.length() > 0 && child.prefix.charAt(child.prefix.length() - 1) != '.')
 			child.prefix = child.prefix + ".";
 		child.prefix = child.prefix + childprefix + ".";
 

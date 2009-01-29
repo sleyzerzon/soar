@@ -67,17 +67,26 @@ public class ConfigTest {
 		largeTestData.add(new ConfigTestPair("dashes-ok", "[yes]"));
 		largeTestData.add(new ConfigTestPair("null-array", "[]"));
 		//largeTestData.add(new ConfigTestPair("null-array-values", "[,,,]"));
-		
+		//largeTestData.add(new ConfigTestPair("nested_not_square", "[]"));
 	}
 
 	@Test
 	public void testConfig() throws Exception {
-		ConfigFile cf = new ConfigFile(largeTest);
+		Config cf = new Config(new ConfigFile(largeTest));
 
 		for (ConfigTestPair pair : largeTestData) {
 			System.out.println(pair.key + ": " + Arrays.toString(cf.getStrings(pair.key)));
 			assertEquals(pair.value, Arrays.toString(cf.getStrings(pair.key)));
 		}
+	}
+	
+	@Test
+	public void testDoubleChild() throws Exception {
+		Config cf = new Config(new ConfigFile(largeTest));
+
+		Config grandparent = cf.getChild("grandparent");
+		Config parent = grandparent.getChild("parent");
+		assertEquals("indeed", parent.getString("child"));
 	}
 	
 //	public static void main(String args[]) {

@@ -79,5 +79,14 @@ key6 { subkey6.1 = value6.1; subkey6.2 = value6.2; }
 dashes-ok = yes;
 
 null-array = [];
+
 #doesn't work
 #null-array-values = [,,,,];
+#nested_not_square = [1,[2,3],4];
+
+grandparent {
+	parent {
+		child = indeed;
+	}
+}
+		

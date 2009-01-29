@@ -27,77 +27,128 @@ class GridMapUtil {
 		GridMapData data = new GridMapData();
 		data.cellObjectManager = new CellObjectManager();
 		
-		Config map = new Config(new ConfigFile(mapFile.getAbsolutePath()));
-		File objectsFile = new File(map.getString("objects"));
-		Config objects = new Config(new ConfigFile(objectsFile.getAbsolutePath()));
+		String mapFilePath = mapFile.getAbsolutePath();
+		Config mapConfig = new Config(new ConfigFile(mapFilePath));
 		
-
+		File objectsFile = new File(mapConfig.getString("objects_file"));
+		String mapFileDirectory = mapFilePath.substring(0, mapFilePath.lastIndexOf(File.separatorChar) + 1);
+		
+		Config objectsConfig = new Config(new ConfigFile(mapFileDirectory + objectsFile.getName()));
+		for (String id : mapConfig.getStrings("objects")) {
+			cellObjectConfig(data, objectsConfig.getChild("objects." + id));
+		}
+		
+		cellsConfig(data, mapConfig.getChild("cells"), objectsConfig, observer);
+		
+		if (mapConfig.hasKey("metadata")) {
+			data.metadataFile = new File(mapConfig.getString("metadata"));
+		}
+		
 		buildReferenceMap(data);
 		return data;
 	}
 
-	private static void cellObjectConfig(GridMapData data, Config objects) throws Exception {
-		for (String name : objects.getStrings("objects")) {
-			Config object = objects.getChild("objects." + name);
-			CellObject template = new CellObject(name);
+	private static void cellObjectConfig(GridMapData data, Config object) throws Exception {
+		CellObject template = new CellObject(object.getString("name"));
 
-			for (String property : objects.getStrings("properties", new String[0])) {
-				template.addProperty(property, objects.getString("properties." + property));
-			}
+		for (String property : object.getStrings("properties", new String[0])) {
+			template.addProperty(property, object.getString("properties." + property));
+		}
 
-			if (objects.hasKey("points")) {
-				template.setPointsApply(true);
-			}
-			if (objects.hasKey("energy")) {
-				
-			}
-			if (objects.hasKey("health")) {
-				
-			}
-			if (objects.hasKey("missiles")) {
-				
-			}
-			if (objects.hasKey("energy")) {
-				
-			}
-			if (objects.hasKey("energy")) {
-				
-			}
-			} else if (child.getName().equalsIgnoreCase(Names.kTagHealth)) {
-				health(child, template);
-				
-			} else if (child.getName().equalsIgnoreCase(Names.kTagMissiles)) {
-				template.setMissilesApply(true);
-
-			} else if (child.getName().equalsIgnoreCase(Names.kTagRemove)) {
-				template.setRemoveApply(true);
-
-			} else if (child.getName().equalsIgnoreCase(Names.kTagRewardInfo)) {
-				template.setRewardInfoApply(true);
-				if (child.getChild(Names.kTagUseOpenCode) != null) {
-					data.openCode = Simulation.random.nextInt(data.kOpenCodeRange) + 1;
-					logger.info("The correct open code is: " + data.openCode);
-				}
-
-			} else if (child.getName().equalsIgnoreCase(Names.kTagReward)) {
-				reward(child, template);
-
-			} else if (child.getName().equalsIgnoreCase(Names.kTagReset)) {
-				template.setResetApply(true);
-
-			} else if (child.getName().equalsIgnoreCase(Names.kTagFuel)) {
-				template.setFuelApply(true);
-
-			} else {
-				throw new Exception("Unrecognized tag: " + child.getName());
-			}
-
-			for (String applyProperty : objects.getStrings("apply.properties", new String[0])) {
-				template.addPropertyApply(applyProperty, objects.getString("apply.properties." + applyProperty));
-			}
-		}		
+		Config apply = object.getChild("apply");
+		for (String propertyApply : apply.getStrings("properties", new String[0])) {
+			template.addPropertyApply(propertyApply, apply.getString("properties." + propertyApply));
+		}
+		
+		if (apply.hasKey("points")) {
+			template.setPointsApply(true);
+		}
+		
+		if (apply.hasKey("remove")) {
+			template.setRemoveApply(true);
+		}
 		
 		data.cellObjectManager.registerTemplate(template);
+	}
+	
+	private static void cellsConfig(GridMapData data, Config cellsConfig, Config objectsConfig, CellObjectObserver observer) throws Exception {
+		data.cells = new GridMapCells(cellsConfig.requireInt("size"));
+		
+		data.randomWalls = cellsConfig.getBoolean("random_walls", false);
+		data.randomFood = cellsConfig.getBoolean("random_food", false);
+		
+		// Generate map unless both are true
+		if (!data.randomWalls || !data.randomFood) {
+			Config rows = cellsConfig.getChild("rows");
+			int[] xy = new int[2];
+			for (xy[1] = 0; xy[1] < data.cells.size(); ++xy[1]) {
+
+				String[] cellStrings = rows.getStrings(Integer.toString(xy[1]));
+				if (cellStrings.length != data.cells.size()) {
+					throw new Exception("Not enough cells, row " + xy[1]);
+				}
+				
+				for (xy[0] = 0; xy[0] < data.cells.size(); ++xy[0]) {
+					Cell newCell = Cell.createCell(Soar2D.config.generalConfig().headless, xy);
+					newCell.addObserver(data);
+					newCell.addObserver(observer);
+					data.cells.setCell(xy, newCell);
+					
+					// TODO: multiple objects
+					String objectName = objectsConfig.getString("objects." + cellStrings[xy[0]] + ".name");
+					
+					logger.trace(Arrays.toString(xy) + ": " + objectName);
+					
+					if (!data.cellObjectManager.hasTemplate(objectName)) {
+						throw new Exception("object \"" + objectName + "\" does not map to a cell object");
+					}
+					
+					CellObject cellObject = data.cellObjectManager.createObject(objectName);
+					newCell.addObject(cellObject);
+				}
+			}
+		}
+		
+		// override walls if necessary
+		if (data.randomWalls) {
+			generateRandomWalls(data, observer);
+		}
+		
+		// override food if necessary
+		if (data.randomFood) {
+			generateRandomFood(data, observer);
+		}
+		
+		// pick positive box
+		if (data.rewardInfoObject != null) {
+			assert data.positiveRewardID == 0;
+			data.positiveRewardID = Simulation.random.nextInt(data.cellObjectManager.rewardObjects.size());
+			logger.trace("positiveRewardID: " + data.positiveRewardID);
+			data.positiveRewardID += 1;
+			data.rewardInfoObject.addPropertyApply(soar2d.Names.kPropertyPositiveBoxID, Integer.toString(data.positiveRewardID));
+			
+			// assigning colors like this helps us see the task happen
+			// colors[0] = info box (already assigned)
+			// colors[1] = positive reward box
+			// colors[2..n] = negative reward boxes
+			int negativeColor = 2;
+			for (CellObject aBox : data.cellObjectManager.rewardObjects) {
+				if (aBox.getIntProperty(soar2d.Names.kPropertyBoxID) == data.positiveRewardID) {
+					aBox.setRewardBox();
+					aBox.addProperty(soar2d.Names.kPropertyColor, Soar2D.simulation.kColors[1]);
+				} else {
+					aBox.addProperty(soar2d.Names.kPropertyColor, Soar2D.simulation.kColors[negativeColor]);
+					negativeColor += 1;
+					assert negativeColor < Soar2D.simulation.kColors.length;
+				}
+			}
+
+			// if using an open code, assign that
+			if (data.openCode != 0) {
+				data.rewardInfoObject.setOpenCode(data.openCode);
+				data.rewardInfoObject.addPropertyApply(soar2d.Names.kPropertyOpenCode, Integer.toString(data.openCode));
+			}
+		}
 	}
 	
 	///////////////////////////////////////////////
