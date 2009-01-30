@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 
@@ -254,20 +255,19 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 			}
 		}
 		
-		LinkedList<Cell> searchList = new LinkedList<Cell>();
+		Queue<Cell> searchList = new LinkedList<Cell>();
 		{
 			Cell start = getCell(players.getLocation(tank));
 			start.explored = true;
 			start.distance = 0;
 			start.parent = null;
-			searchList.addLast(start);
+			searchList.add(start);
 		}
 		
 		Direction finalDirection = Direction.NONE;
 		
 		while (searchList.size() > 0) {
-			Cell parentCell = searchList.getFirst();
-			searchList.removeFirst();
+			Cell parentCell = searchList.poll();
 
 			if (logger.isTraceEnabled()) {
 				logger.trace("Sound: new parent " + parentCell);
@@ -363,7 +363,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 				neighbor.parent = parentCell;
 				
 				// add the new cell to the search list
-				searchList.addLast(neighbor);
+				searchList.add(neighbor);
 			}
 			
 			// end condition: this is not Direction.NONE if we found someone

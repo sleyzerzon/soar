@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /** Concrete implementation of ConfigSource using a file. **/
 public class ConfigFile extends ConfigSource {
@@ -273,7 +274,7 @@ public class ConfigFile extends ConfigSource {
 		// tokens belonging to the current line
 		String line;
 		int lineNumber = 0;
-		LinkedList<String> tokens = new LinkedList<String>();
+		Queue<String> tokens = new LinkedList<String>();
 
 		public Tokenizer(String path) throws IOException {
 			ins = new BufferedReader(new FileReader(path));
@@ -301,7 +302,7 @@ public class ConfigFile extends ConfigSource {
 
 					if (c == '\"') {
 						// end of string.
-						tokens.addLast(tok);
+						tokens.add(tok);
 						in_string = false;
 						tok = "";
 						continue;
@@ -334,7 +335,7 @@ public class ConfigFile extends ConfigSource {
 					// new character.
 					tok = tok.trim();
 					if (tok.length() > 0) {
-						tokens.addLast(tok);
+						tokens.add(tok);
 						tok = "";
 					}
 
@@ -345,7 +346,7 @@ public class ConfigFile extends ConfigSource {
 					tok = "" + c;
 					tok = tok.trim();
 					if (tok.length() > 0) {
-						tokens.addLast(tok);
+						tokens.add(tok);
 						tok = "";
 					}
 				}
@@ -353,7 +354,7 @@ public class ConfigFile extends ConfigSource {
 
 			tok = tok.trim();
 			if (tok.length() > 0)
-				tokens.addLast(tok);
+				tokens.add(tok);
 
 		}
 
@@ -391,7 +392,7 @@ public class ConfigFile extends ConfigSource {
 			if (!hasNext())
 				return null;
 
-			String tok = tokens.removeFirst();
+			String tok = tokens.poll();
 			return tok;
 		}
 	}

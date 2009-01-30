@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import soar2d.Direction;
 import soar2d.Names;
@@ -177,7 +178,7 @@ public class BookMap implements GridMap {
 		// Start in upper-left corner
 		// if cell is enterable, flood fill to find boundaries of room
 		// Go from left to right, then to the start of the next line
-		LinkedList<int []> floodQueue = new LinkedList<int []>();
+		Queue<int []> floodQueue = new LinkedList<int []>();
 		HashSet<Integer> explored = new HashSet<Integer>((this.size-2)*2);
 		
 		// this is where we will store gateway barriers for conversion to rooms 
@@ -222,7 +223,7 @@ public class BookMap implements GridMap {
 				// flood and mark all room cells and save walls
 				HashSet<Integer> walls = new HashSet<Integer>();
 				while(floodQueue.size() > 0) {
-					int [] floodLocation = floodQueue.removeFirst();
+					int [] floodLocation = floodQueue.remove();
 
 					if (floodExplored.contains(floodLocation)) {
 						continue;
