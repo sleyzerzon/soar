@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import soar2d.Direction;
 import soar2d.Game;
 import soar2d.Names;
+import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.map.EatersMap;
 import soar2d.players.CommandInfo;
@@ -516,7 +517,7 @@ public class WindowManager {
 			mapButtons.setLayoutData(gd);
 		}
 
-		agentDisplay = new EatersAgentDisplay(currentSide, world);
+		agentDisplay = new EatersAgentDisplay(currentSide, world, soar);
 		{
 			GridData gd = new GridData();
 			agentDisplay.setLayoutData(gd);
@@ -995,7 +996,7 @@ public class WindowManager {
 		
 		updateCounts();
 		
-		agentDisplay = new TankSoarAgentDisplay(currentSide, world);
+		agentDisplay = new TankSoarAgentDisplay(currentSide, world, soar);
 		{
 			GridData gd = new GridData();
 			gd.horizontalSpan = 2;
@@ -1020,6 +1021,8 @@ public class WindowManager {
 	MenuItem helpAboutItem;
 	
 	World world;
+
+	private Soar soar;
 	
 	public void run(World world) {
 		this.world = world;
@@ -1393,5 +1396,9 @@ public class WindowManager {
 		fd.setFileName(Names.configs.eatersCnf);
 		fd.setFilterExtensions(new String[] {"*.cnf", "*.*"});
 		return fd.open();
+	}
+
+	public void setSoar(Soar soar) {
+		this.soar = soar;
 	}
 }

@@ -14,8 +14,4 @@ public class RoomConfig implements GameConfig {
 	public String title() {
 		return "Room";
 	}
-	
-	public boolean runTilOutput() {
-		return false;
-	}
 }

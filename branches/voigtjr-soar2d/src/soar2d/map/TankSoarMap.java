@@ -64,7 +64,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		Cell cell = getCell(location);
 		boolean enterable = !cell.hasAnyWithProperty(Names.kPropertyBlock);
 		boolean noPlayer = cell.getPlayer() == null;
-		boolean noMissilePack = !cell.hasAnyWithProperty(Names.kPropertyMissiles);
+		boolean noMissilePack = !cell.hasObject("missiles");
 		boolean noCharger = !cell.hasAnyWithProperty(Names.kPropertyCharger);
 		return enterable && noPlayer && noMissilePack && noCharger;
 	}
@@ -101,7 +101,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 				energy = false;
 			}
 		}
-		if (removed.hasProperty(Names.kPropertyMissiles)) {
+		if (removed.getName().equals("missiles")) {
 			missilePacks -= 1;
 		}
 	}
@@ -365,7 +365,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 
 	private boolean recentlyMovedOrRotated(Tank tank, PlayersManager<Tank> players) {
 		CommandInfo command = players.getCommand(tank);
-		return command.move || command.rotate;
+		return command != null && (command.move || command.rotate);
 	}
 
 	public CellObject createRandomObjectWithProperty(String property) {

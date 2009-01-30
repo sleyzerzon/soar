@@ -11,8 +11,4 @@ public class EatersConfig implements GameConfig {
 	public String title() {
 		return "Eaters";
 	}
-	
-	public boolean runTilOutput() {
-		return false;
-	}
 }

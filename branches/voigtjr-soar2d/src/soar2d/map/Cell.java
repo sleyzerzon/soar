@@ -166,7 +166,7 @@ public class Cell {
 				return object;
 			}
 		}
-		logger.warn("removeObject didn't find object to remove: " + name);
+		logger.trace("removeObject didn't find object to remove: " + name);
 		return null;
 	}
 

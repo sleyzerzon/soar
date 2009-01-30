@@ -19,7 +19,7 @@ public class Eater extends Player {
 		if (commander != null) {
 			command = commander.getCommand();
 		} else {
-			command = Soar2D.simulation.getHumanCommand(this);
+			command = Soar2D.control.getHumanCommand(this);
 		}
 		
 		// the facing depends on the move

@@ -10,8 +10,4 @@ public class TaxiConfig implements GameConfig{
 	public String title() {
 		return "Taxi";
 	}
-	
-	public boolean runTilOutput() {
-		return false;
-	}
 }

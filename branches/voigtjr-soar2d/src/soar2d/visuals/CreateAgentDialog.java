@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 
 
 import soar2d.Names;
+import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.config.PlayerConfig;
 
@@ -36,9 +37,12 @@ public class CreateAgentDialog extends Dialog {
 	static File lastProductions = null;
 	Button m_SpawnDebuggerButton;
 	static int guiPlayer = 0;
+	private Soar soar;
 	
-	public CreateAgentDialog(Shell parent) {
+	public CreateAgentDialog(Shell parent, Soar soar) {
 		super(parent);
+		
+		this.soar = soar;
 		
 		String lastProductionsString = Soar2D.config.getLastProductions();
 		if (lastProductionsString != null) {
@@ -255,7 +259,7 @@ public class CreateAgentDialog extends Dialog {
 	void updateButtons() {
 		boolean productions = (m_Productions != null);
 		boolean name = false;
-		boolean debuggerConnected = Soar2D.simulation.isClientConnected(Names.kDebuggerClient);
+		boolean debuggerConnected = soar.isClientConnected(Names.kDebuggerClient);
 	
 		String nameText = m_Name.getText();
 		if (nameText != null) {

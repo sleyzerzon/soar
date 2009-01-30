@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 
+import soar2d.players.CommandInfo;
+import soar2d.players.Player;
 import soar2d.visuals.WindowManager;
 import soar2d.world.World;
 import sml.Agent;
@@ -44,6 +46,7 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	
 	private double totalTime = 0;
 	private double timeSlice = 0;
+	private Soar soar;
 
 	/**
 	 * Set to true when a stop is requested
@@ -87,9 +90,6 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 			Soar2D.wm.setStatus("Running", WindowManager.black);
 		}
 		
-		// TOSCA patch -- try a call to tosca code
-		//soar2d.tosca2d.Tosca.test() ;
-		
 		// the old style
 		// spawn a thread or just run it in this one
 		if (newThread) {
@@ -132,14 +132,14 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	public void run() {
 		
 		// if there are soar agents
-		if (Soar2D.simulation.hasSoarAgents()) {
+		if (soar.haveAgents()) {
 			
 			// have soar control things
 			// it will call startEvent, tickEvent, and stopEvent in callbacks.
 			if (step) {
-				Soar2D.simulation.runStep();
+				soar.runStep();
 			} else {
-				Soar2D.simulation.runForever();
+				soar.runForever();
 			}
 		} else {
 			
@@ -310,9 +310,6 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 		Soar2D.simulation.shutdown();
 	}
 
-	/**
-	 * @return True if the simulation is currently running.
-	 */
 	public boolean isRunning() {
 		return running;
 	}
@@ -323,9 +320,6 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 
 	}
 
-	/**
-	 * @param map the name of the map to change to
-	 */
 	public void changeMap(String map) {
 		
 		//TODO: this should take in a File object
@@ -364,6 +358,10 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 		}
 	}
 	
+	
+	public CommandInfo getHumanCommand(Player player) {
+		return Soar2D.wm.getHumanCommand(player);
+	}
 	
 	/**
 	 * Logger for Kernel print events
@@ -408,6 +406,7 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	 */
 	
 	private int runsTerminal = 0;
+
 	public void setRunsTerminal(int runsTerminal) {
 		this.runsTerminal = runsTerminal;
 	}
@@ -421,5 +420,9 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 			}
 		}
 		return stopNow;
+	}
+
+	public void setSoar(Soar soar) {
+		this.soar = soar;
 	}
 }

@@ -1,15 +1,11 @@
 package soar2d.players;
 
-import org.apache.log4j.Logger;
-
 import soar2d.Direction;
 import soar2d.Simulation;
 import soar2d.Soar2D;
 import soar2d.map.TankSoarMap;
 
 public class Tank extends Player {
-	private static Logger logger = Logger.getLogger(Tank.class);
-
 	private CommandInfo command;
 	private TankCommander commander;
 	
@@ -33,13 +29,10 @@ public class Tank extends Player {
 	}
 	
 	public CommandInfo getCommand() throws Exception {
-		logger.warn("Resetting sensors on call to getCommand");
-		state.resetSensors(); // TODO: this is bad
-
 		if (commander != null) {
 			command = commander.getCommand();
 		} else {
-			command = Soar2D.simulation.getHumanCommand(this);
+			command = Soar2D.control.getHumanCommand(this);
 		}
 		
 		return command;

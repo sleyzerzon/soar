@@ -12,6 +12,7 @@ import sml.Agent;
 import soar2d.Direction;
 import soar2d.Names;
 import soar2d.Simulation;
+import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.config.PlayerConfig;
 import soar2d.map.CellObject;
@@ -31,10 +32,12 @@ public class TankSoarWorld implements World {
 	private PlayersManager<Tank> players = new PlayersManager<Tank>();
 	private int maxMissilePacks;
 	private ArrayList<String> stopMessages = new ArrayList<String>();
-
-	public TankSoarWorld(String map, int maxMissilePacks) throws Exception {
+	private Soar soar;
+	
+	public TankSoarWorld(String map, int maxMissilePacks, Soar soar) throws Exception {
 		tankSoarMapFile = new File(map);
 		this.maxMissilePacks = maxMissilePacks;
+		this.soar = soar;
 		
 		if (!tankSoarMapFile.exists()) {
 			throw new Exception("Map file doesn't exist: " + tankSoarMapFile.getAbsolutePath());
@@ -155,8 +158,10 @@ public class TankSoarWorld implements World {
 	private int missileReset = 0;
 
 	public void update(int worldCount) throws Exception {
-		// Collect input
+		// Reset sensors, collect input
 		for (Tank tank : players.getAll()) {
+			tank.getState().resetSensors(); // TODO: can this go somewhere else?
+			
 			CommandInfo command = tank.getCommand();
 			if (command == null) {
 				Soar2D.control.stopSimulation();
@@ -437,14 +442,11 @@ public class TankSoarWorld implements World {
 			tankSoarMap.getCell(location).setPlayer(tank);
 			
 			// get missile pack
-			ArrayList<CellObject> missilePacks = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyMissiles);
-			if (missilePacks != null) {
-				assert missilePacks.size() == 1;
-				CellObject pack = missilePacks.get(0);
-				apply(pack, tank);
-				tankSoarMap.getCell(location).removeAllByProperty(Names.kPropertyMissiles);
+			CellObject missilePack = tankSoarMap.getCell(location).getObject("missiles");
+			if (missilePack != null) {
+				apply(missilePack, tank);
+				tankSoarMap.getCell(location).removeObject("missiles");
 			}
-			
 			
 			// is there a missile in the cell?
 			ArrayList<CellObject> missiles = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyMissile);
@@ -603,15 +605,17 @@ public class TankSoarWorld implements World {
 		object.applyProperties();
 
 		if (object.hasProperty("apply.missiles")) {
-			int points = object.getIntProperty("apply.missiles", 0);
-			tank.adjustPoints(points, object.getName());
+			int missiles = object.getIntProperty("apply.missiles", 0);
+			state.adjustMissiles(missiles, object.getName());
 		}
+		
 		if (object.hasProperty("apply.health")) {
 			if (!object.getBooleanProperty("apply.health.shields-down", false) || !state.getShieldsUp()) {
 				int health = object.getIntProperty("apply.health", 0);
 				state.adjustHealth(health, object.getName());
 			}
 		}
+		
 		if (object.hasProperty("apply.energy")) {
 			if (!object.getBooleanProperty("apply.energy.shields", false) || state.getShieldsUp()) {
 				int energy = object.getIntProperty("apply.energy", 0);
@@ -798,7 +802,7 @@ public class TankSoarWorld implements World {
 		players.add(tank, tankSoarMap, playerConfig.pos, human);
 		
 		if (playerConfig.productions != null) {
-			Agent agent = Soar2D.simulation.createSoarAgent(playerConfig.name, playerConfig.productions);
+			Agent agent = soar.createSoarAgent(playerConfig.name, playerConfig.productions);
 			SoarTank soarTank = new SoarTank(tank, agent, playerConfig.shutdown_commands, tankSoarMap.getMetadataFile());
 			tank.setCommander(soarTank);
 		}

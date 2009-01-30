@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import sml.Agent;
 import soar2d.Direction;
 import soar2d.Names;
+import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.config.PlayerConfig;
 import soar2d.map.CellObject;
@@ -29,8 +30,10 @@ public class EatersWorld implements World {
 	private EatersMap eatersMap;
 	private PlayersManager<Eater> players = new PlayersManager<Eater>();
 	private ArrayList<String> stopMessages = new ArrayList<String>();
-	
-	public EatersWorld(String map) throws Exception {
+	private Soar soar;
+
+	public EatersWorld(String map, Soar soar) throws Exception {
+		this.soar = soar;
 		
 		eatersMapFile = new File(map);
 		if (!eatersMapFile.exists()) {
@@ -431,7 +434,7 @@ public class EatersWorld implements World {
 		players.add(eater, eatersMap, playerConfig.pos, human);
 		
 		if (playerConfig.productions != null) {
-			Agent agent = Soar2D.simulation.createSoarAgent(playerConfig.name, playerConfig.productions);
+			Agent agent = soar.createSoarAgent(playerConfig.name, playerConfig.productions);
 			SoarEater soarEater = new SoarEater(eater, agent, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile());
 			eater.setCommander(soarEater);
 		}

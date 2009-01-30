@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import soar2d.Direction;
+import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.players.Player;
 import soar2d.players.Tank;
@@ -57,7 +58,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	ProgressBar m_Radar;
 	World world;
 
-	public TankSoarAgentDisplay(final Composite parent, World world) {
+	public TankSoarAgentDisplay(final Composite parent, World world, final Soar soar) {
 		super(parent);
 		this.world = world;
 
@@ -120,7 +121,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 		m_NewAgentButton.setText("New");
 		m_NewAgentButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				new CreateAgentDialog(parent.getShell()).open();
+				new CreateAgentDialog(parent.getShell(), soar).open();
 			}
 		});
 		{

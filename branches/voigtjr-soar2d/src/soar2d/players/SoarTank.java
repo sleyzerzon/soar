@@ -652,7 +652,10 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 			if (!Soar2D.control.isStopped()) {
 				logger.warn(tank.getName() + ": agent interrupted");
 				try {
-					Soar2D.simulation.interrupted(agent.GetAgentName());
+					// only penalize interruptions when running headless
+					if (!Soar2D.wm.using()) {
+						Soar2D.simulation.interrupted(agent.GetAgentName());
+					}
 				} catch (Exception ignored) {
 				}
 			}

@@ -277,10 +277,6 @@ public class SimConfig implements GameConfig {
 		}
 	}
 
-	public boolean runTilOutput() {
-		return gameConfig.runTilOutput();
-	}
-
 	public String title() {
 		return gameConfig.title();
 	}

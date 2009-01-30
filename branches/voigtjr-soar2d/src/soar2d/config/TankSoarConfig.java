@@ -21,8 +21,4 @@ public class TankSoarConfig implements GameConfig {
 	public String title() {
 		return "TankSoar";
 	}
-	
-	public boolean runTilOutput() {
-		return true;
-	}
 }
