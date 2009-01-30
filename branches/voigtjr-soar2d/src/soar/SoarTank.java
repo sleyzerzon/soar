@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -814,7 +815,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 			return;
 		}
 
-		HashSet<String> unseen = new HashSet<String>();
+		Set<String> unseen = new HashSet<String>();
 		unseen.add("blue");
 		unseen.add("red");
 		unseen.add("yellow");

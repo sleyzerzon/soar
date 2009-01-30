@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -143,7 +144,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 	}
 	
 	public void updateObjects(TankSoarWorld tsWorld) {
-		HashSet<CellObject> copy = new HashSet<CellObject>(data.updatables);
+		Set<CellObject> copy = new HashSet<CellObject>(data.updatables);
 		List<int []> explosions = new ArrayList<int []>();
 		List<MissileData> newMissiles = new ArrayList<MissileData>();
 		for (CellObject cellObject : copy) {

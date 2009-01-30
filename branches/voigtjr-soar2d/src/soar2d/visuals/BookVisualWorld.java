@@ -3,6 +3,8 @@ package soar2d.visuals;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.GC;
@@ -53,7 +55,7 @@ public class BookVisualWorld extends VisualWorld {
 		// Draw world
 		List<int []> playerLocs = new ArrayList<int []>();
 		int [] location = new int [2];
-		HashSet<Integer> roomIds = new HashSet<Integer>();
+		Set<Integer> roomIds = new HashSet<Integer>();
 		for(location[0] = 0; location[0] < map.getSize(); ++location[0]){
 			for(location[1] = 0; location[1] < map.getSize(); ++location[1]){
 				if (!this.map.resetRedraw(location) && painted) {

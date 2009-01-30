@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -148,7 +149,7 @@ public class TankSoarWorld implements World {
 		tankSoarMap.getCell(xy).addObject(explosion);
 	}
 
-	private HashMap<Tank, HashSet<Tank> > killedTanks = new HashMap<Tank, HashSet<Tank> >(7);
+	private HashMap<Tank, Set<Tank> > killedTanks = new HashMap<Tank, Set<Tank> >(7);
 	private int missileID = 0;
 	private int missileReset = 0;
 
@@ -267,7 +268,7 @@ public class TankSoarWorld implements World {
 				state.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, name);
 				
 				if (state.getHealth() <= 0) {
-					HashSet<Tank> assailants = killedTanks.get(tank);
+					Set<Tank> assailants = killedTanks.get(tank);
 					if (assailants == null) {
 						assailants = new HashSet<Tank>();
 					}
@@ -325,7 +326,7 @@ public class TankSoarWorld implements World {
 			
 			
 			if (state.getHealth() <= 0) {
-				HashSet<Tank> assailants = killedTanks.get(tank);
+				Set<Tank> assailants = killedTanks.get(tank);
 				if (assailants == null) {
 					assailants = new HashSet<Tank>();
 				}
@@ -333,7 +334,7 @@ public class TankSoarWorld implements World {
 				killedTanks.put(tank, assailants);
 			}
 			if (otherState.getHealth() <= 0) {
-				HashSet<Tank> assailants = killedTanks.get(other);
+				Set<Tank> assailants = killedTanks.get(other);
 				if (assailants == null) {
 					assailants = new HashSet<Tank>();
 				}
@@ -406,7 +407,7 @@ public class TankSoarWorld implements World {
 					
 					// check for kill
 					if (state.getHealth() <= 0) {
-						HashSet<Tank> assailants = killedTanks.get(tank);
+						Set<Tank> assailants = killedTanks.get(tank);
 						if (assailants == null) {
 							assailants = new HashSet<Tank>();
 						}
@@ -722,7 +723,7 @@ public class TankSoarWorld implements World {
 		
 		// check for kill
 		if (state.getHealth() <= 0) {
-			HashSet<Tank> assailants = killedTanks.get(tank);
+			Set<Tank> assailants = killedTanks.get(tank);
 			if (assailants == null) {
 				assailants = new HashSet<Tank>();
 			}

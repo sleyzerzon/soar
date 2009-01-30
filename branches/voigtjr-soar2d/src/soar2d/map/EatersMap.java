@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import soar2d.Names;
 import soar2d.Soar2D;
@@ -14,7 +15,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 	GridMapData data;
 	int foodCount;
 	int scoreCount;
-	HashSet<CellObject> unopenedBoxes;
+	Set<CellObject> unopenedBoxes;
 
 	public EatersMap(String mapPath) throws Exception {
 		this.mapPath = new String(mapPath);
@@ -77,7 +78,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 	}
 
 	public void updateObjects() {
-		HashSet<CellObject> copy = new HashSet<CellObject>(data.updatables);
+		Set<CellObject> copy = new HashSet<CellObject>(data.updatables);
 		for (CellObject cellObject : copy) {
 			int [] location = data.updatablesLocations.get(cellObject);
 			Cell cell = getCell(location);

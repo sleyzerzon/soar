@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -295,7 +296,7 @@ public class EatersWorld implements World {
 		}
 		
 		// Optimization to not check the same name twice
-		HashSet<Eater> colliding = new HashSet<Eater>(players.numberOfPlayers());
+		Set<Eater> colliding = new HashSet<Eater>(players.numberOfPlayers());
 		List<Eater> collision = new ArrayList<Eater>(players.numberOfPlayers());
 
 		ListIterator<Eater> leftIter = players.listIterator();

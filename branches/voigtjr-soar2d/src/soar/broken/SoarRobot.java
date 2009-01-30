@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.lang.Math;
 
 import org.apache.log4j.Logger;
@@ -243,7 +244,7 @@ public class SoarRobot extends Robot {
 		agent.Update(selfIL.random, random);
 		
 		// objects
-		HashSet<CellObject> bookObjects = map.getBookObjects();
+		Set<CellObject> bookObjects = map.getBookObjects();
 		Iterator<CellObject> bookObjectIter = bookObjects.iterator();
 		while (bookObjectIter.hasNext()) {
 			CellObject bObj = bookObjectIter.next();

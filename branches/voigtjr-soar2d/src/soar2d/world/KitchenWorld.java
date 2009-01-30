@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -137,7 +138,7 @@ public class KitchenWorld implements World {
 	
 						// ingredients
 						stuffIter = stuff.iterator();
-						HashSet<Integer> ingredients = new HashSet<Integer>(stuff.size());
+						Set<Integer> ingredients = new HashSet<Integer>(stuff.size());
 						while (stuffIter.hasNext()) {
 							CellObject ingredient = stuffIter.next();
 							String name = ingredient.getName();
@@ -264,7 +265,7 @@ public class KitchenWorld implements World {
 							
 							if (ingredient.getName().startsWith("mixture")) {
 								// get ingredient list
-								HashSet<Integer> ingredients = mixtures.get(stuff.get(0).getIntProperty("mixture-id"));
+								Set<Integer> ingredients = mixtures.get(stuff.get(0).getIntProperty("mixture-id"));
 								assert ingredients != null;
 								
 								if (ingredients.remove(kIngredientButter)) {
@@ -390,7 +391,7 @@ public class KitchenWorld implements World {
 		return null;
 	}
 	
-	private String printIngredients(HashSet<Integer> ingredients) {
+	private String printIngredients(Set<Integer> ingredients) {
 		Iterator<Integer> iter = ingredients.iterator();
 		String output = "(";
 		while (iter.hasNext()) {
@@ -429,7 +430,7 @@ public class KitchenWorld implements World {
 	final Integer kIngredientCinnamon = 4;
 	final Integer kIngredientMolasses = 5;
 	
-	HashMap< Integer, HashSet<Integer> > mixtures = new HashMap< Integer, HashSet<Integer> >();
+	HashMap< Integer, Set<Integer> > mixtures = new HashMap< Integer, Set<Integer> >();
 	
 	final int kSmellNone = 0;
 	final int kSmellMild = 1;

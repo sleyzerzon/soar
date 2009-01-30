@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import soar2d.Direction;
 import soar2d.Names;
@@ -19,9 +20,9 @@ public class BookMap implements GridMap {
 	public BookMap() {
 	}
 
-	HashSet<CellObject> bookObjects = new HashSet<CellObject>();
+	Set<CellObject> bookObjects = new HashSet<CellObject>();
 	HashMap<CellObject, BookObjectInfo> bookObjectInfo = new HashMap<CellObject, BookObjectInfo>();
-	public HashSet<CellObject> getBookObjects() {
+	public Set<CellObject> getBookObjects() {
 		return bookObjects;
 	}
 	public BookObjectInfo getBookObjectInfo(CellObject obj) {
@@ -179,7 +180,7 @@ public class BookMap implements GridMap {
 		// if cell is enterable, flood fill to find boundaries of room
 		// Go from left to right, then to the start of the next line
 		Queue<int []> floodQueue = new LinkedList<int []>();
-		HashSet<Integer> explored = new HashSet<Integer>((this.size-2)*2);
+		Set<Integer> explored = new HashSet<Integer>((this.size-2)*2);
 		
 		// this is where we will store gateway barriers for conversion to rooms 
 		// in the second phase of map structure generation. 
@@ -209,7 +210,7 @@ public class BookMap implements GridMap {
 				CellObject roomObject = cellObjectManager.createObject(Names.kRoomID);
 				roomObject.addProperty(Names.kPropertyNumber, Integer.toString(roomNumber));
 
-				HashSet<Integer> floodExplored = new HashSet<Integer>((this.size-2)*2);
+				Set<Integer> floodExplored = new HashSet<Integer>((this.size-2)*2);
 				floodExplored.add(Arrays.hashCode(location));
 				cell.addObject(roomObject);
 				//System.out.print("Room " + roomNumber + ": (" + location[0] + "," + location[1] + ") ");
@@ -221,7 +222,7 @@ public class BookMap implements GridMap {
 				floodQueue.add(new int [] { location[0],location[1]-1 });
 				
 				// flood and mark all room cells and save walls
-				HashSet<Integer> walls = new HashSet<Integer>();
+				Set<Integer> walls = new HashSet<Integer>();
 				while(floodQueue.size() > 0) {
 					int [] floodLocation = floodQueue.remove();
 
