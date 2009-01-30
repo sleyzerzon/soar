@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import soar2d.Soar;
+import soar2d.CognitiveArchitecture;
 import soar2d.Soar2D;
 import soar2d.map.GridMap;
 import soar2d.players.Player;
@@ -41,7 +41,7 @@ public class EatersAgentDisplay extends AgentDisplay {
 	Button m_ReloadProductionsButton;
 	Label location;
 
-	public EatersAgentDisplay(final Composite parent, World world, final Soar soar) {
+	public EatersAgentDisplay(final Composite parent, World world, final CognitiveArchitecture cogArch) {
 		super(parent);
 		this.world = world;
 
@@ -71,7 +71,7 @@ public class EatersAgentDisplay extends AgentDisplay {
 		m_NewAgentButton.setText("New");
 		m_NewAgentButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				new CreateAgentDialog(parent.getShell(), soar).open();
+				new CreateAgentDialog(parent.getShell(), cogArch).open();
 			}
 		});
 		

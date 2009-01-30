@@ -31,10 +31,10 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+import soar2d.CognitiveArchitecture;
 import soar2d.Direction;
 import soar2d.Game;
 import soar2d.Names;
-import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.map.EatersMap;
 import soar2d.players.CommandInfo;
@@ -517,7 +517,7 @@ public class WindowManager {
 			mapButtons.setLayoutData(gd);
 		}
 
-		agentDisplay = new EatersAgentDisplay(currentSide, world, soar);
+		agentDisplay = new EatersAgentDisplay(currentSide, world, cogArch);
 		{
 			GridData gd = new GridData();
 			agentDisplay.setLayoutData(gd);
@@ -996,7 +996,7 @@ public class WindowManager {
 		
 		updateCounts();
 		
-		agentDisplay = new TankSoarAgentDisplay(currentSide, world, soar);
+		agentDisplay = new TankSoarAgentDisplay(currentSide, world, cogArch);
 		{
 			GridData gd = new GridData();
 			gd.horizontalSpan = 2;
@@ -1022,7 +1022,7 @@ public class WindowManager {
 	
 	World world;
 
-	private Soar soar;
+	private CognitiveArchitecture cogArch;
 	
 	public void run(World world) {
 		this.world = world;
@@ -1398,7 +1398,7 @@ public class WindowManager {
 		return fd.open();
 	}
 
-	public void setSoar(Soar soar) {
-		this.soar = soar;
+	public void setCogArch(CognitiveArchitecture cogArch) {
+		this.cogArch = cogArch;
 	}
 }

@@ -22,8 +22,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 
+import soar2d.CognitiveArchitecture;
 import soar2d.Names;
-import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.config.PlayerConfig;
 
@@ -37,12 +37,12 @@ public class CreateAgentDialog extends Dialog {
 	static File lastProductions = null;
 	Button m_SpawnDebuggerButton;
 	static int guiPlayer = 0;
-	private Soar soar;
+	private CognitiveArchitecture cogArch;
 	
-	public CreateAgentDialog(Shell parent, Soar soar) {
+	public CreateAgentDialog(Shell parent, CognitiveArchitecture soar) {
 		super(parent);
 		
-		this.soar = soar;
+		this.cogArch = soar;
 		
 		String lastProductionsString = Soar2D.config.getLastProductions();
 		if (lastProductionsString != null) {
@@ -92,7 +92,7 @@ public class CreateAgentDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(dialog, SWT.OPEN);
 				fd.setText("Open");
-				fd.setFilterPath(Soar2D.simulation.getAgentPath());
+				fd.setFilterPath(cogArch.getAgentPath());
 				if (lastProductions == null) {
 				} else {
 					fd.setFileName(lastProductions.getAbsolutePath());
@@ -259,7 +259,7 @@ public class CreateAgentDialog extends Dialog {
 	void updateButtons() {
 		boolean productions = (m_Productions != null);
 		boolean name = false;
-		boolean debuggerConnected = soar.isClientConnected(Names.kDebuggerClient);
+		boolean debuggerConnected = cogArch.isClientConnected(Names.kDebuggerClient);
 	
 		String nameText = m_Name.getText();
 		if (nameText != null) {

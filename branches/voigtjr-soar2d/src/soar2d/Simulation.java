@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import soar.Soar;
 import soar2d.config.PlayerConfig;
 import soar2d.config.SimConfig;
 import soar2d.players.Player;
@@ -32,7 +33,7 @@ public class Simulation {
 	private World world;
 	private ArrayList<String> unusedColors = new ArrayList<String>(kColors.length);
 	private Game game;
-	private Soar soar;
+	private CognitiveArchitecture cogArch;
 	
 	World initialize(SimConfig config) throws Exception {
 		this.game = config.game();
@@ -43,17 +44,17 @@ public class Simulation {
 		}
 		
 		// Initialize Soar
-		soar = new Soar(config.soarConfig(), game, getBasePath());
-		Soar2D.control.setSoar(soar);
+		cogArch = new Soar(config.soarConfig(), game, getBasePath());
+		Soar2D.control.setCogArch(cogArch);
 		if (Soar2D.wm.using()) {
-			Soar2D.wm.setSoar(soar);
+			Soar2D.wm.setCogArch(cogArch);
 		}
 
 		// Make all runs non-random if asked
 		// For debugging, set this to make all random calls follow the same sequence
 		if (config.hasSeed()) {
 			// seed the generators
-			soar.seed(config.generalConfig().seed);
+			cogArch.seed(config.generalConfig().seed);
 			logger.debug(Names.Debug.seed + config.generalConfig().seed);
 			random = new Random(config.generalConfig().seed);
 		} else {
@@ -65,10 +66,10 @@ public class Simulation {
 		logger.trace(Names.Trace.loadingWorld);
 		switch (game) {
 		case TANKSOAR:
-			world = new TankSoarWorld(config.generalConfig().map, Soar2D.config.tanksoarConfig().max_missile_packs, soar);
+			world = new TankSoarWorld(config.generalConfig().map, Soar2D.config.tanksoarConfig().max_missile_packs, cogArch);
 			break;
 		case EATERS:
-			world = new EatersWorld(config.generalConfig().map, soar);
+			world = new EatersWorld(config.generalConfig().map, cogArch);
 			break;
 		case KITCHEN:
 			world = new KitchenWorld(config.generalConfig().map);
@@ -84,8 +85,8 @@ public class Simulation {
 		Soar2D.control.resetTime();
 		worldCount = 0;
 
-		soar.doBeforeClients();
-		soar.doAfterClients();
+		cogArch.doBeforeClients();
+		cogArch.doAfterClients();
 		
 		// add initial players
 		logger.trace(Names.Trace.initialPlayers);
@@ -215,7 +216,7 @@ public class Simulation {
 		// free its color
 		freeAColor(player.getColor());
 		
-		soar.destroyPlayer(player.getName());
+		cogArch.destroyPlayer(player.getName());
 		
 		// the player list has changed, notify those who care
 		Soar2D.control.playerEvent();
@@ -228,7 +229,7 @@ public class Simulation {
 	 * this re-loads the productions
 	 */
 	public void reloadPlayer(Player player) {
-		soar.reload(player.getName());
+		cogArch.reload(player.getName());
 	}
 	
 	/**
@@ -256,7 +257,7 @@ public class Simulation {
 			destroyPlayer(player);
 		}
 
-		soar.shutdown();
+		cogArch.shutdown();
 	}
 	
 	public boolean isDone() {
@@ -284,10 +285,6 @@ public class Simulation {
 			return "xml";
 		}
 		return null;
-	}
-	
-	public String getAgentPath() {
-		return soar.getAgentPath();
 	}
 	
 	public void interrupted(String agentName) throws Exception {

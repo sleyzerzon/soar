@@ -1,4 +1,4 @@
-package soar2d;
+package soar;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,10 +18,14 @@ import sml.smlRunStepSize;
 import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
 import sml.sml_Names;
+import soar2d.CognitiveArchitecture;
+import soar2d.Game;
+import soar2d.Names;
+import soar2d.Soar2D;
 import soar2d.config.ClientConfig;
 import soar2d.config.SoarConfig;
 
-public class Soar {
+public class Soar implements CognitiveArchitecture {
 	private static Logger logger = Logger.getLogger(Soar.class);
 
 	private boolean runTilOutput = false;
@@ -40,7 +44,7 @@ public class Soar {
 	private HashMap<String, AgentData> agents = new HashMap<String, AgentData>();
 	private String basePath;
 	
-	Soar(SoarConfig config, Game game, String basePath) throws Exception {
+	public Soar(SoarConfig config, Game game, String basePath) throws Exception {
 		this.basePath = basePath;
 		this.runTilOutput = config.runTilOutput(game);
 		
@@ -75,18 +79,18 @@ public class Soar {
 		
 	}
 	
-	void seed(int seed) {
+	public void seed(int seed) {
 		kernel.ExecuteCommandLine("srand " + seed, null) ;
 	}
 	
-	void doBeforeClients() throws Exception {
+	public void doBeforeClients() throws Exception {
 		// Start or wait for clients (false: before agent creation)
 		logger.trace(Names.Trace.beforeClients);
 		doClients(false);
 		
 	}
 	
-	void doAfterClients() throws Exception {
+	public void doAfterClients() throws Exception {
 		// Start or wait for clients (true: after agent creation)
 		logger.trace(Names.Trace.afterClients);
 		doClients(true);
@@ -209,7 +213,7 @@ public class Soar {
 		}
 	}
 
-	void destroyPlayer(String name) {
+	public void destroyPlayer(String name) {
 		// get the agent (human agents return null here)
 		AgentData agentData = agents.remove(name);
 		if (agentData == null) {
@@ -220,7 +224,7 @@ public class Soar {
 		agentData.agent.delete();
 	}
 	
-	void shutdown() {
+	public void shutdown() {
 		if (kernel != null) {
 			logger.trace(Names.Trace.kernelShutdown);
 			kernel.Shutdown();

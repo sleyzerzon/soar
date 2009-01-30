@@ -10,9 +10,9 @@ import java.util.ListIterator;
 import org.apache.log4j.Logger;
 
 import sml.Agent;
+import soar2d.CognitiveArchitecture;
 import soar2d.Direction;
 import soar2d.Names;
-import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.config.PlayerConfig;
 import soar2d.map.CellObject;
@@ -30,10 +30,10 @@ public class EatersWorld implements World {
 	private EatersMap eatersMap;
 	private PlayersManager<Eater> players = new PlayersManager<Eater>();
 	private ArrayList<String> stopMessages = new ArrayList<String>();
-	private Soar soar;
+	private CognitiveArchitecture cogArch;
 
-	public EatersWorld(String map, Soar soar) throws Exception {
-		this.soar = soar;
+	public EatersWorld(String map, CognitiveArchitecture cogArch) throws Exception {
+		this.cogArch = cogArch;
 		
 		eatersMapFile = new File(map);
 		if (!eatersMapFile.exists()) {
@@ -434,7 +434,7 @@ public class EatersWorld implements World {
 		players.add(eater, eatersMap, playerConfig.pos, human);
 		
 		if (playerConfig.productions != null) {
-			Agent agent = soar.createSoarAgent(playerConfig.name, playerConfig.productions);
+			Agent agent = cogArch.createSoarAgent(playerConfig.name, playerConfig.productions);
 			SoarEater soarEater = new SoarEater(eater, agent, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile());
 			eater.setCommander(soarEater);
 		}

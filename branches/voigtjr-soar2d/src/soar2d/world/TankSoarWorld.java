@@ -9,10 +9,10 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 
 import sml.Agent;
+import soar2d.CognitiveArchitecture;
 import soar2d.Direction;
 import soar2d.Names;
 import soar2d.Simulation;
-import soar2d.Soar;
 import soar2d.Soar2D;
 import soar2d.config.PlayerConfig;
 import soar2d.map.CellObject;
@@ -32,12 +32,12 @@ public class TankSoarWorld implements World {
 	private PlayersManager<Tank> players = new PlayersManager<Tank>();
 	private int maxMissilePacks;
 	private ArrayList<String> stopMessages = new ArrayList<String>();
-	private Soar soar;
+	private CognitiveArchitecture cogArch;
 	
-	public TankSoarWorld(String map, int maxMissilePacks, Soar soar) throws Exception {
+	public TankSoarWorld(String map, int maxMissilePacks, CognitiveArchitecture cogArch) throws Exception {
 		tankSoarMapFile = new File(map);
 		this.maxMissilePacks = maxMissilePacks;
-		this.soar = soar;
+		this.cogArch = cogArch;
 		
 		if (!tankSoarMapFile.exists()) {
 			throw new Exception("Map file doesn't exist: " + tankSoarMapFile.getAbsolutePath());
@@ -802,7 +802,7 @@ public class TankSoarWorld implements World {
 		players.add(tank, tankSoarMap, playerConfig.pos, human);
 		
 		if (playerConfig.productions != null) {
-			Agent agent = soar.createSoarAgent(playerConfig.name, playerConfig.productions);
+			Agent agent = cogArch.createSoarAgent(playerConfig.name, playerConfig.productions);
 			SoarTank soarTank = new SoarTank(tank, agent, playerConfig.shutdown_commands, tankSoarMap.getMetadataFile());
 			tank.setCommander(soarTank);
 		}

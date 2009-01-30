@@ -46,7 +46,7 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	
 	private double totalTime = 0;
 	private double timeSlice = 0;
-	private Soar soar;
+	private CognitiveArchitecture cogArch;
 
 	/**
 	 * Set to true when a stop is requested
@@ -132,14 +132,14 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	public void run() {
 		
 		// if there are soar agents
-		if (soar.haveAgents()) {
+		if (cogArch.haveAgents()) {
 			
 			// have soar control things
 			// it will call startEvent, tickEvent, and stopEvent in callbacks.
 			if (step) {
-				soar.runStep();
+				cogArch.runStep();
 			} else {
-				soar.runForever();
+				cogArch.runForever();
 			}
 		} else {
 			
@@ -422,7 +422,7 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 		return stopNow;
 	}
 
-	public void setSoar(Soar soar) {
-		this.soar = soar;
+	public void setCogArch(CognitiveArchitecture cogArch) {
+		this.cogArch = cogArch;
 	}
 }
