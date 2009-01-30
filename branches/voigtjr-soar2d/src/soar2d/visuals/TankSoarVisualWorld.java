@@ -71,7 +71,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 					for (CellObject cellObject : drawList) {
 						if (cellObject.getName().equals(Names.kExplosion)) {
 							explosion = cellObject;
-						} else if (cellObject.hasProperty(Names.kPropertyMissiles)) {
+						} else if (cellObject.getName().equals("missiles")) {
 							object = cellObject;
 						} else if (cellObject.hasProperty(Names.kPropertyMissile)) {
 							missiles.add(cellObject);
@@ -138,7 +138,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 					
 					Color missileColor = WindowManager.getColor(colorName);
 					
-					int flightPhase = missile.getIntProperty(Names.kPropertyFlyPhase);
+					int flightPhase = missile.getIntProperty("update.fly-missile", 0);
 					Direction direction = Direction.parse(missile.getProperty(Names.kPropertyDirection));
 
 					if (flightPhase == 0) {
@@ -259,8 +259,8 @@ public class TankSoarVisualWorld extends VisualWorld {
 		
 		String imageName = backgroundObject.getProperty(Names.kPropertyImage);
 		if (backgroundObject.hasProperty(Names.kPropertyImageMin)) {
-			int min = backgroundObject.getIntProperty(Names.kPropertyImageMin);
-			int max = backgroundObject.getIntProperty(Names.kPropertyImageMax);
+			int min = backgroundObject.getIntProperty(Names.kPropertyImageMin, 0);
+			int max = backgroundObject.getIntProperty(Names.kPropertyImageMax, 0);
 			// Do not use the simulation's random number generator because it will change
 			// headless run behavior
 			Random myRandom = new Random();

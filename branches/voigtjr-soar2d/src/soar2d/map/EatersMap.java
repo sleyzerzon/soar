@@ -68,17 +68,9 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		HashSet<CellObject> copy = new HashSet<CellObject>(data.updatables);
 		for (CellObject cellObject : copy) {
 			int [] location = data.updatablesLocations.get(cellObject);
+			Cell cell = getCell(location);
 			
-			// linger
-			if (cellObject.hasProperty("update.linger")) {
-				int linger = cellObject.getIntProperty("update.linger", 0);
-				linger -= 1;
-				if (linger <= 0) {
-					getCell(location).removeObject(cellObject.getName());
-				} else {
-					cellObject.setIntProperty("update.linger", linger);
-				}
-			}
+			GridMapUtil.lingerUpdate(cellObject, cell);
 
 			// decay
 			if (cellObject.hasProperty("update.decay")) {
@@ -86,7 +78,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 				int decay = cellObject.getIntProperty("update.decay", 1);
 				if (decay >= points) {
 					scoreCount -= points;
-					getCell(location).removeObject(cellObject.getName());
+					cell.removeObject(cellObject.getName());
 				} else {
 					scoreCount -= decay;
 					points -= decay;

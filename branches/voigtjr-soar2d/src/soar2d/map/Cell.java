@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 import soar2d.players.Player;
 
 public class Cell {
+	private static Logger logger = Logger.getLogger(Cell.class);
+
 	static Cell createCell(boolean headless, int[] xy) {
 		if (headless) {
 			// only one thread
@@ -162,6 +166,7 @@ public class Cell {
 				return object;
 			}
 		}
+		logger.warn("removeObject didn't find object to remove: " + name);
 		return null;
 	}
 

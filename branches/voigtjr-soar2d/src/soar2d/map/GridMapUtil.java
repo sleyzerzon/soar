@@ -319,4 +319,16 @@ class GridMapUtil {
 		}
 		return output.toString();
 	}
+
+	static void lingerUpdate(CellObject cellObject, Cell cell) {
+		if (cellObject.hasProperty("update.linger")) {
+			int linger = cellObject.getIntProperty("update.linger", 0);
+			linger -= 1;
+			if (linger <= 0) {
+				cell.removeObject(cellObject.getName());
+			} else {
+				cellObject.setIntProperty("update.linger", linger);
+			}
+		}
+	}
 }

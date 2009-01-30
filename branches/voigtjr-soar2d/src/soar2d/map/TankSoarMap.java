@@ -12,7 +12,6 @@ import soar2d.Direction;
 import soar2d.Names;
 import soar2d.Soar2D;
 import soar2d.players.CommandInfo;
-import soar2d.players.Player;
 import soar2d.players.RadarCell;
 import soar2d.players.Tank;
 import soar2d.players.TankState;
@@ -25,7 +24,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 	GridMapData data;
 
 	public TankSoarMap(File mapFile) throws Exception {
-		data = GridMapUtil.loadFromFile(mapFile, this);
+		data = GridMapUtil.loadFromConfigFile(mapFile, this);
 
 		// Add ground to cells that don't have a background.
 		int size = data.cells.size();
@@ -88,7 +87,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 				energy = true;
 			}
 		}
-		if (added.hasProperty(Names.kPropertyMissiles)) {
+		if (added.getName().equals("missiles")) {
 			missilePacks += 1;
 		}
 	}
@@ -137,68 +136,76 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		ArrayList<MissileData> newMissiles = new ArrayList<MissileData>();
 		for (CellObject cellObject : copy) {
 			int [] location = Arrays.copyOf(data.updatablesLocations.get(cellObject), data.updatablesLocations.get(cellObject).length);
-			
-			if (cellObject.update()) {
-				logger.trace("Update triggered deletion of " + cellObject.getName() + " at " + Arrays.toString(location));
-				
-				// Remove it from the cell
-				CellObject object = getCell(location).removeObject(cellObject.getName());
-				assert object != null;
+			Cell cell = getCell(location);
 
-				// Missiles fly, handle that
-				if (cellObject.hasProperty(Names.kPropertyMissile)) {
+			if (cellObject.hasProperty("update.fly-missile")) {
+				// Remove it from the cell
+				cell.removeObject(cellObject.getName());
+
+				// what direction is it going
+				Direction missileDir = Direction.parse(cellObject.getProperty(Names.kPropertyDirection));
+
+				int phase = cellObject.getIntProperty("update.fly-missile", 0);
+
+				while (true) {
+					// increment its phase
+					phase += 1;
+					phase %= 4;
 					
 					// |*  | * |  *|  <|>  |*  | * |  *|  <|>  |
 					//  0    1    2    3    0    1    2    3
 					// phase 3 threatens two squares
 					// we're in phase 3 when detected in phase 2
-	
-					// what direction is it going
-					Direction missileDir = Direction.parse(cellObject.getProperty(Names.kPropertyDirection));
-					
-					while (true) {
-						int phase = cellObject.getIntProperty(Names.kPropertyFlyPhase);
-						
-						if (phase == 0) {
-							Cell overlapCell = getCell(location);
-							overlapCell = overlapCell.neighbors[missileDir.backward().index()];
-							overlapCell.forceRedraw();
-						}
-						
-						// move it
-						Direction.translate(location, missileDir);
-						
-						// check destination
-						Cell cell = getCell(location);
-						
-						if (cell.hasAnyWithProperty(Names.kPropertyBlock)) {
-							// missile is destroyed
-							explosions.add(location);
-							break;
-						}
-						
-						Tank tank = (Tank)cell.getPlayer();
-						
-						if (tank != null) {
-							// missile is destroyed
-							tsWorld.missileHit(tank, cellObject);
-							explosions.add(location);
-							break;
-						}
-				
-						// missile didn't hit anything
-						
-						// if the missile is not in phase 2, return
-						if (phase != 2) {
-							newMissiles.add(new MissileData(cell, cellObject));
-							break;
-						}
-						
-						// we are in phase 2, call update again, this will move us out of phase 2 to phase 3
-						cellObject.update();
+
+					if (phase == 0) {
+						Cell overlapCell = getCell(location);
+						overlapCell = overlapCell.neighbors[missileDir.backward().index()];
+						overlapCell.forceRedraw();
 					}
+					
+					// move it
+					Direction.translate(location, missileDir);
+					
+					logger.trace("Flying missile " + cellObject.getProperty("owner") + "-" + cellObject.getProperty("missile-id") + " entering " + Arrays.toString(location));
+					
+					// check destination
+					cell = getCell(location);
+					
+					if (cell.hasAnyWithProperty(Names.kPropertyBlock)) {
+						// missile is destroyed
+						explosions.add(location);
+						phase = -1; // don't reset phase on object
+						break;
+					}
+					
+					Tank tank = (Tank)cell.getPlayer();
+					
+					if (tank != null) {
+						// missile is destroyed
+						tsWorld.missileHit(tank, cellObject);
+						explosions.add(location);
+						phase = -1; // don't reset phase on object
+						break;
+					}
+			
+					// missile didn't hit anything
+					
+					// if the missile is not in phase 2, done
+					if (phase != 2) {
+						newMissiles.add(new MissileData(cell, cellObject));
+						break;
+					}
+					
+					// we are in phase 2, update again, this will move us out of phase 2 to phase 3
+				}
+							
+				// done flying, update phase unless destroyed
+				if (phase >= 0) {
+					cellObject.setIntProperty("update.fly-missile", phase);
 				}
 			}
+
+			GridMapUtil.lingerUpdate(cellObject, cell);
 		}
 
 		for (int[] location : explosions) {
@@ -463,11 +470,8 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		boolean noPlayer = radar[1][distance].player == null;
 		
 		if (enterable && noPlayer) {
-			CellObject radarWaves = new CellObject("radar-" + facing.id());
-			radarWaves.addProperty(Names.kPropertyRadarWaves, "true");
-			radarWaves.addProperty(Names.kPropertyDirection, facing.id());
-			radarWaves.addProperty(Names.kPropertyLinger, "1");
-			radarWaves.setLingerUpdate(true);
+			CellObject radarWaves = data.cellObjectManager.createObject("radar-" + facing.id());
+			radarWaves.setProperty(Names.kPropertyDirection, facing.id());
 			logger.trace("Adding " + radarWaves.getName() + " to " + Arrays.toString(location));
 			data.cells.getCell(location).addObject(radarWaves);
 		}

@@ -17,7 +17,6 @@ import soar2d.config.PlayerConfig;
 import soar2d.map.CellObject;
 import soar2d.map.GridMap;
 import soar2d.map.TankSoarMap;
-import soar2d.map.CellObject.RewardApply;
 import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 import soar2d.players.SoarTank;
@@ -498,12 +497,12 @@ public class TankSoarWorld implements World {
 				continue;
 			}
 			
-			CellObject missile = tankSoarMap.createRandomObjectWithProperty(Names.kPropertyMissile);
-			missile.setName(tank + "-" + missileID++);
-			missile.addProperty(Names.kPropertyDirection, direction.id());
-			missile.addProperty(Names.kPropertyFlyPhase, "0");
-			missile.addProperty(Names.kPropertyOwner, tank.getName());
-			missile.addProperty(Names.kPropertyColor, tank.getColor());
+			CellObject missile = tankSoarMap.createObjectByName(Names.kPropertyMissile);
+			missile.setProperty(Names.kPropertyDirection, direction.id());
+			missile.setIntProperty(Names.kPropertyFlyPhase, 0);
+			missile.setProperty(Names.kPropertyOwner, tank.getName());
+			missile.setIntProperty("missile-id", missileID++);
+			missile.setProperty(Names.kPropertyColor, tank.getColor());
 			
 			// If there is a tank there, it is hit
 			Tank other = (Tank)tankSoarMap.getCell(missileLoc).getPlayer();
@@ -601,38 +600,26 @@ public class TankSoarWorld implements World {
 	private boolean apply(CellObject object, Tank tank) {
 		TankState state = tank.getState();
 
-		object.propertiesApply();
-		{
-			int points = object.pointsApply();
-			if (points != 0) {
-				tank.adjustPoints(points, object.getName());
-			}
+		object.applyProperties();
+
+		if (object.hasProperty("apply.missiles")) {
+			int points = object.getIntProperty("apply.missiles", 0);
+			tank.adjustPoints(points, object.getName());
 		}
-		{
-			int missiles = object.pointsApply();
-			if (missiles != 0) {
-				state.adjustMissiles(missiles, object.getName());
-			}
-		}
-		{
-			int health = object.pointsApply();
-			if (health != 0) {
+		if (object.hasProperty("apply.health")) {
+			if (!object.getBooleanProperty("apply.health.shields-down", false) || !state.getShieldsUp()) {
+				int health = object.getIntProperty("apply.health", 0);
 				state.adjustHealth(health, object.getName());
 			}
 		}
-		{
-			int energy = object.pointsApply();
-			if (energy != 0) {
+		if (object.hasProperty("apply.energy")) {
+			if (!object.getBooleanProperty("apply.energy.shields", false) || state.getShieldsUp()) {
+				int energy = object.getIntProperty("apply.energy", 0);
 				state.adjustEnergy(energy, object.getName());
 			}
 		}
-		{
-			RewardApply reward = object.rewardApply();
-			if (reward != null && reward.points != 0) {
-				tank.adjustPoints(reward.points, reward.message);
-			}
-		}
-		return object.removeApply();
+
+		return object.hasProperty("apply.remove");
 	}
 			
 	private void handleRadarEnergy(Tank tank) {
@@ -661,13 +648,13 @@ public class TankSoarWorld implements World {
 				if (charger.hasProperty(Names.kPropertyHealth)) {
 					state.setOnHealthCharger(true);
 					if (state.getHealth() < Soar2D.config.tanksoarConfig().default_health) {
-						state.adjustHealth(charger.getIntProperty(Names.kPropertyHealth), "charger");
+						state.adjustHealth(charger.getIntProperty(Names.kPropertyHealth, 0), "charger");
 					}
 				}
 				if (charger.hasProperty(Names.kPropertyEnergy)) {
 					state.setOnEnergyCharger(true);
 					if (state.getEnergy() < Soar2D.config.tanksoarConfig().default_energy) {
-						state.adjustEnergy(charger.getIntProperty(Names.kPropertyEnergy), "charger");
+						state.adjustEnergy(charger.getIntProperty(Names.kPropertyEnergy, 0), "charger");
 					}
 				}
 			}
@@ -707,7 +694,7 @@ public class TankSoarWorld implements World {
 			
 			// Add a missile pack to a spot
 			logger.info("spawning missile pack at (" + spot[0] + "," + spot[1] + ")");
-			CellObject missiles = theMap.createRandomObjectWithProperty(Names.kPropertyMissiles);
+			CellObject missiles = theMap.createObjectByName("missiles");
 			if (missiles == null) {
 				throw new Exception("Missile creation failed.");
 			}
@@ -721,11 +708,12 @@ public class TankSoarWorld implements World {
 		apply(missile, tank);
 		
 		// apply points
-		tank.adjustPoints(Soar2D.config.tanksoarConfig().missile_hit_penalty, missile.getName());
-		Tank other = players.get(missile.getProperty(Names.kPropertyOwner));
+		String owner = missile.getProperty(Names.kPropertyOwner);
+		tank.adjustPoints(Soar2D.config.tanksoarConfig().missile_hit_penalty, owner + "-" + missile.getProperty("missile-id"));
+		Tank other = players.get(owner);
 		// can be null if the player was deleted after he fired but before the missile hit
 		if (other != null) {
-			other.adjustPoints(Soar2D.config.tanksoarConfig().missile_hit_award, missile.getName());
+			other.adjustPoints(Soar2D.config.tanksoarConfig().missile_hit_award, owner + "-" + missile.getProperty("missile-id"));
 		}
 		
 		// charger insta-kill
