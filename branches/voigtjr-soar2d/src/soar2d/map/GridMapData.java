@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -16,7 +17,7 @@ class GridMapData implements CellObjectObserver {
 	File metadataFile;
 
 	Set<CellObject> updatables = new HashSet<CellObject>();
-	HashMap<CellObject, int []> updatablesLocations = new HashMap<CellObject, int []>();
+	Map<CellObject, int []> updatablesLocations = new HashMap<CellObject, int []>();
 
 	public void addStateUpdate(int [] location, CellObject added) {
 		if (added.updatable()) {

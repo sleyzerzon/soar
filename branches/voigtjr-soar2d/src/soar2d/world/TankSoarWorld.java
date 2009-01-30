@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -149,7 +150,7 @@ public class TankSoarWorld implements World {
 		tankSoarMap.getCell(xy).addObject(explosion);
 	}
 
-	private HashMap<Tank, Set<Tank> > killedTanks = new HashMap<Tank, Set<Tank> >(7);
+	private Map<Tank, Set<Tank> > killedTanks = new HashMap<Tank, Set<Tank> >(7);
 	private int missileID = 0;
 	private int missileReset = 0;
 
@@ -172,7 +173,7 @@ public class TankSoarWorld implements World {
 		WorldUtil.checkNumPlayers(players.numberOfPlayers());
 		
 		// We'll cache the tank new locations
-		HashMap<Tank, int []> newLocations = new HashMap<Tank, int []>();
+		Map<Tank, int []> newLocations = new HashMap<Tank, int []>();
 		
 		// And we'll cache tanks that moved
 		List<Tank> movedTanks = new ArrayList<Tank>(players.numberOfPlayers());
@@ -354,7 +355,7 @@ public class TankSoarWorld implements World {
 		// We've eliminated all cross collisions and walls
 		
 		// We'll need to save where people move, indexed by location
-		HashMap<Integer, List<Tank> > collisionMap = new HashMap<Integer, List<Tank> >();
+		Map<Integer, List<Tank> > collisionMap = new HashMap<Integer, List<Tank> >();
 		
 		// Iterate through players, checking for all other types of collisions
 		// Also, moves are committed at this point and they won't respawn on
@@ -735,8 +736,8 @@ public class TankSoarWorld implements World {
 	}
 	
 	private void doMoveCollisions(Tank player, 
-			HashMap<Tank, int []> newLocations, 
-			HashMap<Integer, List<Tank> > collisionMap, 
+			Map<Tank, int []> newLocations, 
+			Map<Integer, List<Tank> > collisionMap, 
 			List<Tank> movedTanks) {
 		
 		// Get destination location
@@ -781,7 +782,7 @@ public class TankSoarWorld implements World {
 		collisionMap.put(Arrays.hashCode(newLocation), collision);
 	}
 	
-	private void cancelMove(Tank tank, HashMap<Tank, int []> newLocations, 
+	private void cancelMove(Tank tank, Map<Tank, int []> newLocations, 
 			List<Tank> movedTanks) {
 		CommandInfo move = players.getCommand(tank);
 		move.move = false;

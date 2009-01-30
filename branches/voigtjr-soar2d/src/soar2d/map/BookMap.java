@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class BookMap implements GridMap {
 	}
 
 	Set<CellObject> bookObjects = new HashSet<CellObject>();
-	HashMap<CellObject, BookObjectInfo> bookObjectInfo = new HashMap<CellObject, BookObjectInfo>();
+	Map<CellObject, BookObjectInfo> bookObjectInfo = new HashMap<CellObject, BookObjectInfo>();
 	public Set<CellObject> getBookObjects() {
 		return bookObjects;
 	}
@@ -164,13 +165,13 @@ public class BookMap implements GridMap {
 	}
 	
 	// Mapping of room id to the list of the barriers surrounding that room
-	private HashMap<Integer, List<Barrier> > roomBarrierMap = new HashMap<Integer, List<Barrier> >();
+	private Map<Integer, List<Barrier> > roomBarrierMap = new HashMap<Integer, List<Barrier> >();
 	public List<Barrier> getRoomBarrierList(int roomID) {
 		return roomBarrierMap.get(roomID);
 	}
 
 	// Mapping of gateway id to the list of the ids of rooms it connects
-	private HashMap<Integer, List<Integer> > gatewayDestinationMap = new HashMap<Integer, List<Integer> >();
+	private Map<Integer, List<Integer> > gatewayDestinationMap = new HashMap<Integer, List<Integer> >();
 	public List<Integer> getGatewayDestinationList(int gatewayID) {
 		return gatewayDestinationMap.get(gatewayID);
 	}

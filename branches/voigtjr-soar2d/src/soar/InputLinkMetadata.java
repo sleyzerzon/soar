@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -43,7 +44,7 @@ public class InputLinkMetadata {
 	private List<File> files = new ArrayList<File>(1);
 	private Agent agent;
 	private Identifier metadataWME;
-	private HashMap<Integer, Identifier> sharedIdentifierMap = new HashMap<Integer, Identifier>();
+	private Map<Integer, Identifier> sharedIdentifierMap = new HashMap<Integer, Identifier>();
 	
 	private InputLinkMetadata(Agent agent) {
 		assert agent != null;

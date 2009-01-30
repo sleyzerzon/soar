@@ -2,6 +2,7 @@ package soar2d.visuals;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -24,7 +25,7 @@ import soar2d.players.RadarCell;
 
 public abstract class VisualWorld extends Canvas implements PaintListener {
 	
-	public static HashMap<Player, Color> playerColors = new HashMap<Player, Color>();
+	public static Map<Player, Color> playerColors = new HashMap<Player, Color>();
 	
 	public static void remapPlayerColors(Player[] players) {
 		playerColors.clear();
@@ -34,7 +35,7 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 		}
 	}
 	
-	protected static HashMap<String, Image> images = new HashMap<String, Image>();
+	protected static Map<String, Image> images = new HashMap<String, Image>();
 	protected static Image[] tanks = new Image[5];
 
 	public static boolean internalRepaint = false;

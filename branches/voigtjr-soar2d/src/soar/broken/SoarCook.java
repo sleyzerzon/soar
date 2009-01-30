@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -66,7 +67,7 @@ public class SoarCook extends Cook {
 			objectIdentifier = null;
 		}
 	}
-	HashMap<String, ObjectInputLink> objects = new HashMap<String, ObjectInputLink>();
+	Map<String, ObjectInputLink> objects = new HashMap<String, ObjectInputLink>();
 	
 	public SoarCook(Agent agent, String playerId) {
 		super(playerId);
@@ -202,7 +203,7 @@ public class SoarCook extends Cook {
 		
 		// update object information
 		List<CellObject> stuff = map.getAllWithProperty(location, "smell");
-		HashMap<String, ObjectInputLink> newObjects = new HashMap<String, ObjectInputLink>();
+		Map<String, ObjectInputLink> newObjects = new HashMap<String, ObjectInputLink>();
 		if (stuff != null) {
 			for (CellObject item : stuff) {
 				ObjectInputLink itemIL = objects.get(item.getName());

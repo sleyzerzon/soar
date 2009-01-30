@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import soar2d.Names;
 import soar2d.Simulation;
@@ -20,7 +21,7 @@ class CellObjectManager {
 	/**
 	 * The templates, mapped by name.
 	 */
-	private HashMap<String, CellObject> templates = new HashMap<String, CellObject>();
+	private Map<String, CellObject> templates = new HashMap<String, CellObject>();
 	
 	/**
 	 * @param name template object name

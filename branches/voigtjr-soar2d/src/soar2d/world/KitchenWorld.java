@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -430,7 +431,7 @@ public class KitchenWorld implements World {
 	final Integer kIngredientCinnamon = 4;
 	final Integer kIngredientMolasses = 5;
 	
-	HashMap< Integer, Set<Integer> > mixtures = new HashMap< Integer, Set<Integer> >();
+	Map< Integer, Set<Integer> > mixtures = new HashMap< Integer, Set<Integer> >();
 	
 	final int kSmellNone = 0;
 	final int kSmellMild = 1;

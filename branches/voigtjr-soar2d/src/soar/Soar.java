@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -46,7 +47,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		File productions;
 	}
 	
-	private HashMap<String, AgentData> agents = new HashMap<String, AgentData>();
+	private Map<String, AgentData> agents = new HashMap<String, AgentData>();
 	private String basePath;
 	
 	public Soar(SoarConfig config, Game game, String basePath) throws Exception {

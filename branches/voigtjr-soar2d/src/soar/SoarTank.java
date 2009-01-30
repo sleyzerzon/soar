@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -604,7 +605,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 	private IntElement m_ClockWME;
 	private Identifier m_CurrentScoreWME;
 	
-	private HashMap<String, IntElement> m_Scores = new HashMap<String, IntElement>(7);
+	private Map<String, IntElement> m_Scores = new HashMap<String, IntElement>(7);
 	
 	private StringElement m_DirectionWME;
 	private IntElement m_EnergyWME;

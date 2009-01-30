@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import soar2d.Game;
@@ -45,8 +46,8 @@ public class SimConfig implements GameConfig {
 	
 	private GameConfig gameConfig;
 	
-	private HashMap<String, PlayerConfig> playerConfigs = new HashMap<String, PlayerConfig>();
-	private HashMap<String, ClientConfig> clientConfigs = new HashMap<String, ClientConfig>();;
+	private Map<String, PlayerConfig> playerConfigs = new HashMap<String, PlayerConfig>();
+	private Map<String, ClientConfig> clientConfigs = new HashMap<String, ClientConfig>();;
 	
 	private SimConfig(Config config) throws IOException {
 		this.config = config;
@@ -217,11 +218,11 @@ public class SimConfig implements GameConfig {
 		return (TaxiConfig)gameConfig;
 	}
 	
-	public HashMap<String, PlayerConfig> playerConfigs() {
+	public Map<String, PlayerConfig> playerConfigs() {
 		return playerConfigs;
 	}
 	
-	public HashMap<String, ClientConfig> clientConfigs() {
+	public Map<String, ClientConfig> clientConfigs() {
 		return clientConfigs;
 	}
 	

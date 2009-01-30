@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import sml.FloatElement;
@@ -29,8 +30,8 @@ class SelfInputLink {
 	protected Identifier areaDescription;
 	protected List<BarrierInputLink> wallsIL = new ArrayList<BarrierInputLink>();
 	protected List<GatewayInputLink> gatewaysIL = new ArrayList<GatewayInputLink>();
-	protected HashMap<Integer, ObjectInputLink> objectsIL = new HashMap<Integer, ObjectInputLink>();
-	protected HashMap<Player, PlayerInputLink> playersIL = new HashMap<Player, PlayerInputLink>();
+	protected Map<Integer, ObjectInputLink> objectsIL = new HashMap<Integer, ObjectInputLink>();
+	protected Map<Player, PlayerInputLink> playersIL = new HashMap<Player, PlayerInputLink>();
 	protected Set<MessageInputLink> messagesIL = new HashSet<MessageInputLink>();
 	protected Identifier collision;
 	protected StringElement collisionX;

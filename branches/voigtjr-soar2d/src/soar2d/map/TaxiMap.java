@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -152,8 +153,8 @@ public class TaxiMap implements GridMap {
 
 	// end passenger section
 	
-	HashMap<CellObject, int []> destinationLocations = new HashMap<CellObject, int []>();
-	HashMap<Integer, String> destinationMap = new HashMap<Integer, String>();
+	Map<CellObject, int []> destinationLocations = new HashMap<CellObject, int []>();
+	Map<Integer, String> destinationMap = new HashMap<Integer, String>();
 	
 	@Override
 	public boolean isAvailable(int []  location) {

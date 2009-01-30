@@ -2,6 +2,7 @@ package soar;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -48,16 +49,16 @@ class SoarEaterIL {
 			StringElement eater;
 			
 			/** property: edible */
-			HashMap<String, StringElement> comestibles = new HashMap<String, StringElement>();
+			Map<String, StringElement> comestibles = new HashMap<String, StringElement>();
 			
 			/** static content of the cell */
-			HashMap<String, StringElement> staticContent = new HashMap<String, StringElement>();
+			Map<String, StringElement> staticContent = new HashMap<String, StringElement>();
 			
 			/** box in current cell, null if none */
 			Identifier box;
 			
 			/** properties on the box if there is one */
-			HashMap<String, StringElement> boxProperties = new HashMap<String, StringElement>();
+			Map<String, StringElement> boxProperties = new HashMap<String, StringElement>();
 
 			/** id (likely shared) to the cell/wme to the north */
 			Identifier north;
@@ -172,7 +173,7 @@ class SoarEaterIL {
 			createView(x, y + 1);
 		}
 		
-		private void createContent(HashMap<String, StringElement> map, Cell cell, String name) {
+		private void createContent(Map<String, StringElement> map, Cell cell, String name) {
 			// create the wme
 			StringElement element = agent.CreateStringWME(cell.me, Names.kContentID, name);
 			assert element != null;
@@ -199,7 +200,7 @@ class SoarEaterIL {
 		
 		private void updateFoodContent(int[] view, EatersMap map, Cell cell) {
 			// Food
-			HashMap<String, StringElement> remaining = new HashMap<String, StringElement>(cell.comestibles);
+			Map<String, StringElement> remaining = new HashMap<String, StringElement>(cell.comestibles);
 			// For each food type in the cell on the map
 			List<CellObject> comestibles = map.getCell(view).getAllWithProperty(Names.kPropertyEdible);
 			if (comestibles != null) {
@@ -231,7 +232,7 @@ class SoarEaterIL {
 		}
 		
 		private void updateBoxProperties(CellObject box, Cell cell) {
-			HashMap<String, StringElement> remaining = new HashMap<String, StringElement>(cell.boxProperties);
+			Map<String, StringElement> remaining = new HashMap<String, StringElement>(cell.boxProperties);
 			// For each box property
 			for (String property : box.getPropertyList()) {
 				// don't list special ones

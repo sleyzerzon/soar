@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -17,11 +18,11 @@ public class PlayersManager<P extends Player> {
 
 	private List<P> players = new ArrayList<P>(7);
 	private List<P> humanPlayers = new ArrayList<P>(7);
-	private HashMap<String, P> playersMap = new HashMap<String, P>(7);
-	private HashMap<P, int []> initialLocations = new HashMap<P, int []>(7);
-	private HashMap<P, int []> locations = new HashMap<P, int []>(7);
-	private HashMap<P, double []> floatLocations = new HashMap<P, double []>(7);
-	private HashMap<P, CommandInfo> lastCommands = new HashMap<P, CommandInfo>(7);
+	private Map<String, P> playersMap = new HashMap<String, P>(7);
+	private Map<P, int []> initialLocations = new HashMap<P, int []>(7);
+	private Map<P, int []> locations = new HashMap<P, int []>(7);
+	private Map<P, double []> floatLocations = new HashMap<P, double []>(7);
+	private Map<P, CommandInfo> lastCommands = new HashMap<P, CommandInfo>(7);
 	
 	public int numberOfPlayers() {
 		return players.size();

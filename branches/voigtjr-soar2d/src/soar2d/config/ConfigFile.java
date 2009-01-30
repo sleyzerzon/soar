@@ -16,7 +16,7 @@ import java.util.Queue;
 /** Concrete implementation of ConfigSource using a file. **/
 public class ConfigFile extends ConfigSource {
 	String path;
-	HashMap<String, String[]> keys = new HashMap<String, String[]>();
+	Map<String, String[]> keys = new HashMap<String, String[]>();
 
 	public ConfigFile(String path) throws IOException {
 		this.path = path;
