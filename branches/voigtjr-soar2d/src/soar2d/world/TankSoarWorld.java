@@ -1,6 +1,5 @@
 package soar2d.world;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,27 +25,23 @@ import soar2d.players.TankState;
 public class TankSoarWorld implements World {
 	private static Logger logger = Logger.getLogger(TankSoarWorld.class);
 
-	private File tankSoarMapFile;
 	private TankSoarMap tankSoarMap;
 	private PlayersManager<Tank> players = new PlayersManager<Tank>();
 	private int maxMissilePacks;
 	private ArrayList<String> stopMessages = new ArrayList<String>();
 	private CognitiveArchitecture cogArch;
 	
-	public TankSoarWorld(String map, int maxMissilePacks, CognitiveArchitecture cogArch) throws Exception {
-		tankSoarMapFile = new File(map);
+	public TankSoarWorld(int maxMissilePacks, CognitiveArchitecture cogArch) throws Exception {
 		this.maxMissilePacks = maxMissilePacks;
 		this.cogArch = cogArch;
-		
-		if (!tankSoarMapFile.exists()) {
-			throw new Exception("Map file doesn't exist: " + tankSoarMapFile.getAbsolutePath());
-		}
-		
+	}
+	
+	public void setMap(String mapPath) throws Exception {
+		tankSoarMap = new TankSoarMap(mapPath);
 		reset();
 	}
 	
 	public void reset() throws Exception {
-		tankSoarMap = new TankSoarMap(tankSoarMapFile);
 		if (!tankSoarMap.hasEnergyCharger()) {
 			addCharger(false);
 		}

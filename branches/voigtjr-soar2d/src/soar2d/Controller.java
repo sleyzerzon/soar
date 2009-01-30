@@ -1,7 +1,5 @@
 package soar2d;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 
 import soar2d.players.CommandInfo;
@@ -270,45 +268,6 @@ public class Controller implements Runnable {
 
 	}
 
-	public void changeMap(String map) {
-		
-		//TODO: this should take in a File object
-		
-		// make sure it is somewhat valid
-		if ((map == null) || (map.length() <= 0)) {
-			error(Names.Errors.mapRequired);
-		}
-		logger.debug(Names.Debug.changingMap + map);
-		
-		File mapFile = new File(map);
-		// check as absolute
-		if (!mapFile.exists()) {
-			
-			// doesn't exist as absolute, check relative to map dir
-			mapFile = new File(Soar2D.simulation.getMapPath() + map);
-			if (!mapFile.exists()) {
-				
-				// doesn't exist there either
-				error(Names.Errors.findingMap + map);
-				return;
-			}
-		}
-		
-		// save the old map in case the new one is screwed up
-		File oldMap = new File(Soar2D.config.generalConfig().map);
-		Soar2D.config.generalConfig().map = mapFile.getAbsolutePath();
-
-		// the reset will fail if the map fails to load
-		try {
-			resetSimulation();
-		} catch (Exception e) {
-			error(e.getMessage());
-			// and if it fails the map will remain unchanged, set it back
-			Soar2D.config.generalConfig().map = oldMap.getAbsolutePath();
-		}
-	}
-	
-	
 	public CommandInfo getHumanCommand(Player player) {
 		return Soar2D.wm.getHumanCommand(player);
 	}

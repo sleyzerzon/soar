@@ -21,11 +21,24 @@ import soar2d.world.TankSoarWorld;
 public class TankSoarMap implements GridMap, CellObjectObserver {
 	private static Logger logger = Logger.getLogger(TankSoarMap.class);
 
+	String mapPath;
 	GridMapData data;
+	boolean energy;
+	int missilePacks;
+	boolean health;
 
-	public TankSoarMap(File mapFile) throws Exception {
-		data = GridMapUtil.loadFromConfigFile(mapFile, this);
+	public TankSoarMap(String mapPath) throws Exception {
+		this.mapPath = new String(mapPath);
+		
+		reset();
+	}
 
+	public void reset() throws Exception {
+		energy = false;
+		missilePacks = 0;
+		health = false;
+		data = GridMapUtil.loadFromConfigFile(mapPath, this);
+		
 		// Add ground to cells that don't have a background.
 		int size = data.cells.size();
 		int [] xy = new int[2];
@@ -40,7 +53,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 			}
 		}
 	}
-
+	
 	private boolean cellHasBackground(Cell cell) {
 		for (CellObject cellObject : cell.getAll()) {
 			if ((cellObject.getName() == Names.kGround)
@@ -106,17 +119,14 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		}
 	}
 	
-	int missilePacks = 0;	// returns the number of missile packs on the map
 	public int numberMissilePacks() {
 		return missilePacks;
 	}
 	
-	boolean health = false;	// true if there is a health charger
 	public boolean hasHealthCharger() {
 		return health;
 	}
 	
-	boolean energy = false;	// true if there is an energy charger
 	public boolean hasEnergyCharger() {
 		return energy;
 	}
@@ -534,5 +544,5 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		}
 		return blocked;
 	}
-	
+
 }

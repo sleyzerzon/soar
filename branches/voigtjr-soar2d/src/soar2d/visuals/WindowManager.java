@@ -75,6 +75,23 @@ public class WindowManager {
 	Player human;
 	Composite rhs;
 	Composite currentSide;
+	Menu menuBar;
+	Menu fileMenu;
+	Menu mapMenu;
+	Menu helpMenu;
+	
+	MenuItem fileMenuHeader;
+	MenuItem mapMenuHeader;
+	MenuItem helpMenuHeader;
+	
+	//MenuItem fileConfigurationItem;
+	MenuItem fileExitItem;
+	MenuItem mapChangeItem;
+	MenuItem helpAboutItem;
+	World world;
+
+	private CognitiveArchitecture cogArch;
+	
 
 	public static final int kEatersMainMapCellSize = 20;
 	public static final int kTaxiMainMapCellSize = 20;
@@ -190,7 +207,6 @@ public class WindowManager {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
 		visualWorld = new EatersVisualWorld(worldGroup, SWT.NONE, kEatersMainMapCellSize);
-		visualWorld.setMap(world.getMap());
 
 		visualWorld.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -842,7 +858,6 @@ public class WindowManager {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
 		visualWorld = new TankSoarVisualWorld(worldGroup, SWT.NONE, kTanksoarMainMapCellSize);
-		visualWorld.setMap(world.getMap());
 		
 		visualWorld.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
@@ -1004,26 +1019,6 @@ public class WindowManager {
 		}
 	}
 	
-	Menu menuBar;
-	Menu fileMenu;
-	Menu mapMenu;
-	Menu helpMenu;
-	
-	MenuItem fileMenuHeader;
-	MenuItem mapMenuHeader;
-	MenuItem helpMenuHeader;
-	
-	//MenuItem fileConfigurationItem;
-	MenuItem fileExitItem;
-	
-	MenuItem mapChangeItem;
-	
-	MenuItem helpAboutItem;
-	
-	World world;
-
-	private CognitiveArchitecture cogArch;
-	
 	public void run(World world) {
 		this.world = world;
 		
@@ -1110,7 +1105,7 @@ public class WindowManager {
 			setupTaxi();
 			break;
 		}
-		
+
 		statusLine = new Label(shell, SWT.BORDER);
 		statusLine.setText("Ready");
 		{
@@ -1132,10 +1127,6 @@ public class WindowManager {
 			}
 		});
 		
-		updateWorldGroup();
-
-		VisualWorld.remapPlayerColors(world.getPlayers());
-
 		shell.addShellListener(new ShellAdapter() {
 			public void shellDeactivated(ShellEvent e) {
 				agentDisplay.worldChangeEvent();			
@@ -1176,6 +1167,9 @@ public class WindowManager {
 				logger.warn("Ignoring old window location, screen is too small.");
 			}
 		}
+
+		VisualWorld.remapPlayerColors(world.getPlayers());
+		reset();
 
 		rhs.layout(true);
 		shell.layout(true);

@@ -8,6 +8,7 @@ public interface World {
 	// simulation
 	public void update(int worldCount) throws Exception;
 	public void reset() throws Exception;
+	public void setMap(String mapPath) throws Exception;
 	public GridMap getMap();
 	
 	// player management

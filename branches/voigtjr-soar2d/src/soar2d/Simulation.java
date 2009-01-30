@@ -34,7 +34,8 @@ public class Simulation {
 	private ArrayList<String> unusedColors = new ArrayList<String>(kColors.length);
 	private Game game;
 	private CognitiveArchitecture cogArch;
-	
+	private int worldCount;
+
 	World initialize(SimConfig config) throws Exception {
 		this.game = config.game();
 		
@@ -66,10 +67,10 @@ public class Simulation {
 		logger.trace(Names.Trace.loadingWorld);
 		switch (game) {
 		case TANKSOAR:
-			world = new TankSoarWorld(config.generalConfig().map, Soar2D.config.tanksoarConfig().max_missile_packs, cogArch);
+			world = new TankSoarWorld(Soar2D.config.tanksoarConfig().max_missile_packs, cogArch);
 			break;
 		case EATERS:
-			world = new EatersWorld(config.generalConfig().map, cogArch);
+			world = new EatersWorld(cogArch);
 			break;
 		case KITCHEN:
 			world = new KitchenWorld(config.generalConfig().map);
@@ -83,7 +84,8 @@ public class Simulation {
 		}
 		Soar2D.control.setRunsTerminal(config.generalConfig().runs);
 		Soar2D.control.resetTime();
-		worldCount = 0;
+		
+		changeMap(config.generalConfig().map);
 
 		cogArch.doBeforeClients();
 		cogArch.doAfterClients();
@@ -101,6 +103,13 @@ public class Simulation {
 		return unusedColors;
 	}
 	
+	public void changeMap(String mapPath) throws Exception {
+		logger.debug(Names.Debug.changingMap + mapPath);
+		world.setMap(mapPath);
+		worldCount = 0;
+		Soar2D.wm.reset();
+	}
+
 	/**
 	 * @param color the color to use, or null if any will work
 	 * @return null if the color is not available for whatever reason
@@ -235,7 +244,6 @@ public class Simulation {
 	/**
 	 * update the sim, or, in this case, the world
 	 */
-	private int worldCount;
 	public void update() throws Exception {
 		worldCount += 1;
 		world.update(worldCount);
@@ -270,21 +278,6 @@ public class Simulation {
 	
 	public String getMapPath() {
 		return Soar2D.simulation.getBasePath() + "maps" + System.getProperty("file.separator");
-	}
-	
-	public String getMapExt() {
-		switch (Soar2D.config.game()) {
-		case TANKSOAR:
-			return "tmap";
-		case EATERS:
-			return "emap";
-		case ROOM:
-			return "bmap";
-		case KITCHEN:
-		case TAXI:
-			return "xml";
-		}
-		return null;
 	}
 	
 	public void interrupted(String agentName) throws Exception {

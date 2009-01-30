@@ -1,6 +1,5 @@
 package soar2d.world;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,28 +24,36 @@ import soar2d.players.Player;
 public class EatersWorld implements World {
 	private static Logger logger = Logger.getLogger(EatersWorld.class);
 
-	private File eatersMapFile;
 	private EatersMap eatersMap;
 	private PlayersManager<Eater> players = new PlayersManager<Eater>();
 	private ArrayList<String> stopMessages = new ArrayList<String>();
 	private CognitiveArchitecture cogArch;
 
-	public EatersWorld(String map, CognitiveArchitecture cogArch) throws Exception {
+	public EatersWorld(CognitiveArchitecture cogArch) throws Exception {
 		this.cogArch = cogArch;
-		
-		eatersMapFile = new File(map);
-		if (!eatersMapFile.exists()) {
-			throw new Exception("Map file doesn't exist: " + eatersMapFile.getAbsolutePath());
+	}
+	
+	public void setMap(String mapPath) throws Exception {
+		EatersMap oldMap = eatersMap;
+		try {
+			eatersMap = new EatersMap(mapPath);
+		} catch (Exception e) {
+			if (oldMap == null) {
+				throw e;
+			}
+			eatersMap = oldMap;
+			logger.error("Map load failed, restored old map.");
+			return;
 		}
 		
+		// This can throw a more fatal error.
 		reset();
 	}
 	
 	public void reset() throws Exception {
-		eatersMap = new EatersMap(eatersMapFile);
+		eatersMap.reset();
 		stopMessages.clear();
 		resetPlayers();
-		Soar2D.wm.reset();
 	}
 	
 	private void resetPlayers() throws Exception {

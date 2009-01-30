@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public interface GridMap {
+	public void reset() throws Exception;
 	public int size();
 	public Cell getCell(int[] xy);
 	public boolean isAvailable(int[] location);

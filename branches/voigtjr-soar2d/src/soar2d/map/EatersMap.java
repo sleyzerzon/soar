@@ -10,10 +10,22 @@ import soar2d.Soar2D;
 
 public class EatersMap implements GridMap, CellObjectObserver {
 
+	String mapPath;
 	GridMapData data;
-	
-	public EatersMap(File mapFile) throws Exception {
-		data = GridMapUtil.loadFromConfigFile(mapFile, this);
+	int foodCount;
+	int scoreCount;
+	HashSet<CellObject> unopenedBoxes;
+
+	public EatersMap(String mapPath) throws Exception {
+		this.mapPath = new String(mapPath);
+		reset();
+	}
+
+	public void reset() throws Exception {
+		foodCount = 0;
+		scoreCount = 0;
+		unopenedBoxes = new HashSet<CellObject>();
+		data = GridMapUtil.loadFromConfigFile(mapPath, this);
 	}
 	
 	public int size() {
@@ -108,17 +120,14 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		return false;
 	}
 	
-	int scoreCount = 0;
 	public int getScoreCount() {
 		return scoreCount;
 	}
 	
-	int foodCount = 0;
 	public int getFoodCount() {
 		return foodCount;
 	}
 	
-	HashSet<CellObject> unopenedBoxes = new HashSet<CellObject>();
 	public int getUnopenedBoxCount() {
 		return unopenedBoxes.size();
 	}

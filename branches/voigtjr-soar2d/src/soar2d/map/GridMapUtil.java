@@ -15,7 +15,12 @@ import soar2d.config.ConfigFile;
 class GridMapUtil {
 	private static Logger logger = Logger.getLogger(GridMapUtil.class);
 
-	static GridMapData loadFromConfigFile(File mapFile, CellObjectObserver observer) throws Exception {
+	static GridMapData loadFromConfigFile(String mapPath, CellObjectObserver observer) throws Exception {
+		File mapFile = new File(mapPath);
+		if (!mapFile.exists()) {
+			throw new Exception("Map file doesn't exist: " + mapFile.getAbsolutePath());
+		}
+
 		GridMapData data = new GridMapData();
 		data.cellObjectManager = new CellObjectManager();
 		

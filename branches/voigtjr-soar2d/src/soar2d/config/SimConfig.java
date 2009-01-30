@@ -51,6 +51,9 @@ public class SimConfig implements GameConfig {
 	private SimConfig(Config config) throws IOException {
 		this.config = config;
 		
+		// verify we have a map
+		config.requireString("general.map");
+		
 		generalConfig = new GeneralConfig();
 		loadSubConfig(config.getChild(Keys.general), GeneralConfig.class.getFields(), generalConfig);
 
