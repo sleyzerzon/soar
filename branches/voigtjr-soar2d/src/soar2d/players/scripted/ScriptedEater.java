@@ -17,7 +17,7 @@ public class ScriptedEater implements EaterCommander {
 		this.commands = new ArrayList<CommandInfo>(commands);
 	}
 
-	public CommandInfo getCommand() throws Exception {
+	public CommandInfo nextCommand() throws Exception {
 		return commands.get(index++);
 	}
 

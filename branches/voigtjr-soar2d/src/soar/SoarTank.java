@@ -391,7 +391,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		}
 	}
 
-	public CommandInfo getCommand() throws Exception {
+	public CommandInfo nextCommand() throws Exception {
 		attemptedMove = false;
 
 		if (agent.GetNumberCommands() == 0) {

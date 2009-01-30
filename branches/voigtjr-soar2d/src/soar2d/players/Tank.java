@@ -30,7 +30,7 @@ public class Tank extends Player {
 	
 	public CommandInfo getCommand() throws Exception {
 		if (commander != null) {
-			command = commander.getCommand();
+			command = commander.nextCommand();
 		} else {
 			command = Soar2D.control.getHumanCommand(this);
 		}

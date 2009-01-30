@@ -61,7 +61,7 @@ public final class SoarEater implements EaterCommander {
 		}
 	}
 	
-	public CommandInfo getCommand() throws Exception {
+	public CommandInfo nextCommand() throws Exception {
 		// if there was no command issued, that is kind of strange
 		if (agent.GetNumberCommands() == 0) {
 			logger.debug(eater.getName() + " issued no command.");
