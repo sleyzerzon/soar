@@ -1,6 +1,7 @@
 package soar.broken;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import sml.FloatElement;
 import sml.Identifier;
@@ -10,7 +11,7 @@ import soar2d.world.PlayersManager;
 import soar2d.world.World;
 
 class GatewayInputLink extends BarrierInputLink {
-	ArrayList<IntElement> toList = new ArrayList<IntElement>();
+	List<IntElement> toList = new ArrayList<IntElement>();
 	FloatElement range;
 	
 	GatewayInputLink(SoarRobot robot, Identifier parent) {

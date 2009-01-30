@@ -1,9 +1,9 @@
 package soar2d.map;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import soar2d.Names;
 import soar2d.Soar2D;
@@ -140,7 +140,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		return data.metadataFile;
 	}
 
-	public ArrayList<CellObject> getTemplatesWithProperty(String name) {
+	public List<CellObject> getTemplatesWithProperty(String name) {
 		return data.cellObjectManager.getTemplatesWithProperty(name);
 	}
 }

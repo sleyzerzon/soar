@@ -6,8 +6,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -113,7 +113,7 @@ public class CellTest {
 		cell.addObject(objects[1]);
 		cell.addObject(objects[2]);
 		
-		ArrayList<CellObject> removed = cell.removeAll();
+		List<CellObject> removed = cell.removeAll();
 		assertNotNull(removed);
 		assertEquals(removed.size(), 3);
 		
@@ -124,7 +124,7 @@ public class CellTest {
 		cell.addObject(objects[1]);
 		cell.addObject(objects[2]);
 
-		ArrayList<CellObject> gotten = cell.getAll();
+		List<CellObject> gotten = cell.getAll();
 		assertNotNull(gotten);
 		assertEquals(gotten.size(), 3);
 
@@ -198,15 +198,15 @@ public class CellTest {
 		assertNotNull(cell.getAllWithProperty("property2"));
 		assertEquals(cell.getAllWithProperty("property2").size(), 1);
 		
-		ArrayList<CellObject> removals0 = cell.removeAllByProperty("property0");
+		List<CellObject> removals0 = cell.removeAllByProperty("property0");
 		assertNotNull(removals0);
 		assertEquals(removals0.size(), 1);
 
-		ArrayList<CellObject> removals1 = cell.removeAllByProperty("property1");
+		List<CellObject> removals1 = cell.removeAllByProperty("property1");
 		assertNotNull(removals1);
 		assertEquals(removals1.size(), 1);
 
-		ArrayList<CellObject> removals2 = cell.removeAllByProperty("property2");
+		List<CellObject> removals2 = cell.removeAllByProperty("property2");
 		assertNotNull(removals2);
 		assertEquals(removals2.size(), 1);
 
@@ -214,7 +214,7 @@ public class CellTest {
 		cell.addObject(objects[1]);
 		cell.addObject(objects[2]);
 		
-		ArrayList<CellObject> removals = cell.removeAllByProperty("property");
+		List<CellObject> removals = cell.removeAllByProperty("property");
 		assertNotNull(removals);
 		assertEquals(removals.size(), 3);
 	}

@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /** Concrete implementation of ConfigSource using a file. **/
@@ -45,7 +46,7 @@ public class ConfigFile extends ConfigSource {
 		if (!root.equals(""))
 			root += ".";
 
-		ArrayList<String> subkeys = new ArrayList<String>();
+		List<String> subkeys = new ArrayList<String>();
 
 		for (String key : keys.keySet()) {
 			if (key.startsWith(root))
@@ -67,7 +68,7 @@ public class ConfigFile extends ConfigSource {
 	
 	@Override
 	public String[] keyList(String prefix) {
-		ArrayList<String> keyList = new ArrayList<String>();
+		List<String> keyList = new ArrayList<String>();
 		for (String key : keys.keySet()) {
 			if (key.length() <= prefix.length()) {
 				continue;
@@ -217,7 +218,7 @@ public class ConfigFile extends ConfigSource {
 			String[] valuesArray = null;
 			String tok = t.next();
 			if (tok.equals("=")) {
-				ArrayList<String> values = new ArrayList<String>();
+				List<String> values = new ArrayList<String>();
 
 				if (t.consume("[")) {
 					// read a list of values

@@ -1,6 +1,6 @@
 package soar2d.world;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -11,7 +11,7 @@ import soar2d.players.Player;
 class WorldUtil {
 	private static Logger logger = Logger.getLogger(WorldUtil.class);
 
-	static void dumpStats(int[] sortedScores, Player[] players, boolean stopping, ArrayList<String> messages) {
+	static void dumpStats(int[] sortedScores, Player[] players, boolean stopping, List<String> messages) {
 		StringBuilder bigMessage = new StringBuilder(); 
 		for (String message : messages) {
 			System.out.println(message);
@@ -46,7 +46,7 @@ class WorldUtil {
 		}
 	}
 
-	static void checkMaxUpdates(ArrayList<String> stopMessages, int worldCount) {
+	static void checkMaxUpdates(List<String> stopMessages, int worldCount) {
 		if (Soar2D.config.terminalsConfig().max_updates > 0) {
 			if (worldCount >= Soar2D.config.terminalsConfig().max_updates) {
 				stopMessages.add("Reached maximum updates, stopping.");
@@ -54,7 +54,7 @@ class WorldUtil {
 		}
 	}
 	
-	static void checkStopSim(ArrayList<String> stopMessages, CommandInfo command, Player player) {
+	static void checkStopSim(List<String> stopMessages, CommandInfo command, Player player) {
 		if (command.stopSim) {
 			if (Soar2D.config.terminalsConfig().agent_command) {
 				stopMessages.add(player.getName() + " issued simulation stop command.");
@@ -64,7 +64,7 @@ class WorldUtil {
 		}
 	}
 
-	static void checkWinningScore(ArrayList<String> stopMessages, int[] scores) {
+	static void checkWinningScore(List<String> stopMessages, int[] scores) {
 		if (Soar2D.config.terminalsConfig().winning_score > 0) {
 			if (scores[scores.length - 1] >= Soar2D.config.terminalsConfig().winning_score) {
 				stopMessages.add("At least one player has achieved at least " + Soar2D.config.terminalsConfig().winning_score + " points.");

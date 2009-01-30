@@ -192,7 +192,7 @@ public class TaxiMap implements GridMap {
 			return "none";
 		}
 		
-		ArrayList<CellObject> dests = this.getAllWithProperty(location, "destination");
+		List<CellObject> dests = this.getAllWithProperty(location, "destination");
 		if (dests != null) {
 			assert dests.size() == 1;
 			return dests.get(0).getProperty("color");

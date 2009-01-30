@@ -1,7 +1,7 @@
 package soar2d.visuals;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -143,7 +143,7 @@ public class CreateAgentDialog extends Dialog {
 			gd.horizontalSpan = 3;
 			m_Color.setLayoutData(gd);
 		}
-		ArrayList<String> unusedColors = Soar2D.simulation.getUnusedColors();
+		List<String> unusedColors = Soar2D.simulation.getUnusedColors();
 		
 		m_Color.setItems(unusedColors.toArray(new String[0]));
 		if (unusedColors.size() > 0) {

@@ -2,6 +2,7 @@ package soar2d;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Map.Entry;
 
@@ -31,7 +32,7 @@ public class Simulation {
 	public final String kColors[] = { "red", "blue", "yellow", "purple", "orange", "green", "black",  };
 	
 	private World world;
-	private ArrayList<String> unusedColors = new ArrayList<String>(kColors.length);
+	private List<String> unusedColors = new ArrayList<String>(kColors.length);
 	private Game game;
 	private CognitiveArchitecture cogArch;
 	private int worldCount;
@@ -99,7 +100,7 @@ public class Simulation {
 		return world;
 	}
 	
-	public ArrayList<String> getUnusedColors() {
+	public List<String> getUnusedColors() {
 		return unusedColors;
 	}
 	

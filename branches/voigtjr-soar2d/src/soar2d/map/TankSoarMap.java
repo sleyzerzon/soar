@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -142,8 +143,8 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 	
 	public void updateObjects(TankSoarWorld tsWorld) {
 		HashSet<CellObject> copy = new HashSet<CellObject>(data.updatables);
-		ArrayList<int []> explosions = new ArrayList<int []>();
-		ArrayList<MissileData> newMissiles = new ArrayList<MissileData>();
+		List<int []> explosions = new ArrayList<int []>();
+		List<MissileData> newMissiles = new ArrayList<MissileData>();
 		for (CellObject cellObject : copy) {
 			int [] location = Arrays.copyOf(data.updatablesLocations.get(cellObject), data.updatablesLocations.get(cellObject).length);
 			Cell cell = getCell(location);
@@ -235,7 +236,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		return data.metadataFile;
 	}
 
-	public ArrayList<CellObject> getTemplatesWithProperty(String name) {
+	public List<CellObject> getTemplatesWithProperty(String name) {
 		return data.cellObjectManager.getTemplatesWithProperty(name);
 	}
 

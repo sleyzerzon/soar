@@ -1,7 +1,7 @@
 package soar2d.visuals;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
@@ -94,7 +94,7 @@ public class EatersVisualWorld extends VisualWorld {
 					}
 				}
 				
-				ArrayList<CellObject> drawList;
+				List<CellObject> drawList;
 				drawList = this.map.getCell(location).getAllWithProperty(Names.kPropertyShape);
 				
 				if (this.map.getCell(location).hasAnyWithProperty(Names.kPropertyBlock)) {

@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Gateway {
 
-	ArrayList<Integer> locationIDs;
+	List<Integer> locationIDs;
 	int [] leftExtent;
 	int [] rightExtent;
 
@@ -18,7 +18,7 @@ public class Gateway {
 		locationIDs.add(id);
 	}
 	
-	public ArrayList<Integer> getLocationIDs() {
+	public List<Integer> getLocationIDs() {
 		return locationIDs;
 	}
 }

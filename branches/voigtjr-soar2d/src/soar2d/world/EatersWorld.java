@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
@@ -26,7 +27,7 @@ public class EatersWorld implements World {
 
 	private EatersMap eatersMap;
 	private PlayersManager<Eater> players = new PlayersManager<Eater>();
-	private ArrayList<String> stopMessages = new ArrayList<String>();
+	private List<String> stopMessages = new ArrayList<String>();
 	private CognitiveArchitecture cogArch;
 
 	public EatersWorld(CognitiveArchitecture cogArch) throws Exception {
@@ -191,7 +192,7 @@ public class EatersWorld implements World {
 			if (lastCommand.move || lastCommand.jump) {
 				eatersMap.getCell(location).setPlayer(eater);
 
-				ArrayList<CellObject> moveApply = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyMoveApply);
+				List<CellObject> moveApply = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyMoveApply);
 				if (moveApply != null) {
 					for (CellObject object : moveApply) {
 						if (apply(object, eater)) {
@@ -244,7 +245,7 @@ public class EatersWorld implements World {
 	}
 	
 	private void open(Eater eater, int [] location, int openCode) {
-		ArrayList<CellObject> boxes = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyBox);
+		List<CellObject> boxes = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyBox);
 		if (boxes == null) {
 			logger.warn(eater.getName() + " tried to open but there is no box.");
 		}
@@ -274,7 +275,7 @@ public class EatersWorld implements World {
 	}
 	
 	private void eat(Eater eater, int [] location) {
-		ArrayList<CellObject> list = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyEdible);
+		List<CellObject> list = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyEdible);
 		if (list != null) {
 			for (CellObject food : list) {
 				if (apply(food, eater)) {
@@ -285,8 +286,8 @@ public class EatersWorld implements World {
 		}			
 	}
 	
-	private ArrayList<ArrayList<Eater>> findCollisions(PlayersManager<Eater> eaters) {
-		ArrayList<ArrayList<Eater>> collisions = new ArrayList<ArrayList<Eater>>(players.numberOfPlayers() / 2);
+	private List<List<Eater>> findCollisions(PlayersManager<Eater> eaters) {
+		List<List<Eater>> collisions = new ArrayList<List<Eater>>(players.numberOfPlayers() / 2);
 
 		// Make sure collisions are possible
 		if (players.numberOfPlayers() < 2) {
@@ -295,7 +296,7 @@ public class EatersWorld implements World {
 		
 		// Optimization to not check the same name twice
 		HashSet<Eater> colliding = new HashSet<Eater>(players.numberOfPlayers());
-		ArrayList<Eater> collision = new ArrayList<Eater>(players.numberOfPlayers());
+		List<Eater> collision = new ArrayList<Eater>(players.numberOfPlayers());
 
 		ListIterator<Eater> leftIter = players.listIterator();
 		while (leftIter.hasNext()) {
@@ -345,16 +346,16 @@ public class EatersWorld implements World {
 		return collisions;
 	}
 		
-	private void handleEatersCollisions(ArrayList<ArrayList<Eater>> collisions) throws Exception {
+	private void handleEatersCollisions(List<List<Eater>> collisions) throws Exception {
 		
 		// if there are no total collisions, we're done
 		if (collisions.size() < 1) {
 			return;
 		}
 
-		ArrayList<Eater> collision = new ArrayList<Eater>(players.numberOfPlayers());
+		List<Eater> collision = new ArrayList<Eater>(players.numberOfPlayers());
 		
-		Iterator<ArrayList<Eater>> collisionIter = collisions.iterator();
+		Iterator<List<Eater>> collisionIter = collisions.iterator();
 		while (collisionIter.hasNext()) {
 			collision = collisionIter.next();
 

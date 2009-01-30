@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import soar2d.Names;
 import soar2d.Simulation;
@@ -70,8 +71,8 @@ class CellObjectManager {
 	 * @param name the property name
 	 * @return list of cell object templates that have that property
 	 */
-	ArrayList<CellObject> getTemplatesWithProperty(String name) {
-		ArrayList<CellObject> ret = new ArrayList<CellObject>(templates.values());
+	List<CellObject> getTemplatesWithProperty(String name) {
+		List<CellObject> ret = new ArrayList<CellObject>(templates.values());
 		Iterator<CellObject> iter = ret.iterator();
 		while (iter.hasNext()) {
 			CellObject obj = iter.next();
@@ -87,14 +88,14 @@ class CellObjectManager {
 	 * @return true if any templates have that property
 	 */
 	boolean hasTemplatesWithProperty(String name) {
-		ArrayList<CellObject> all = getTemplatesWithProperty(name);
+		List<CellObject> all = getTemplatesWithProperty(name);
 		if (all.size() <= 0) {
 			return false;
 		}
 		return true;
 	}
 	
-	ArrayList<CellObject> rewardObjects = new ArrayList<CellObject>();
+	List<CellObject> rewardObjects = new ArrayList<CellObject>();
 	/**
 	 * @param name object name to create
 	 * @return the new object
@@ -129,7 +130,7 @@ class CellObjectManager {
 	 * could possibly have the same property, this randomly picks one to clone.
 	 */
 	CellObject createRandomObjectWithProperty(String name) {
-		ArrayList<CellObject> all = getTemplatesWithProperty(name);
+		List<CellObject> all = getTemplatesWithProperty(name);
 		if (all.size() <= 0) {
 			return null;
 		}
@@ -143,7 +144,7 @@ class CellObjectManager {
 	 * same as createRandomObjectWithProperty but with two properties
 	 */
 	CellObject createRandomObjectWithProperties(String name1, String name2) {
-		ArrayList<CellObject> all = getTemplatesWithProperty(name1);
+		List<CellObject> all = getTemplatesWithProperty(name1);
 		if (all.size() <= 0) {
 			return null;
 		}

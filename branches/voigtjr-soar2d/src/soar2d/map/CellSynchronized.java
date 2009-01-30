@@ -1,6 +1,6 @@
 package soar2d.map;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import soar2d.players.Player;
 
@@ -30,12 +30,12 @@ class CellSynchronized extends Cell {
 	}
 	
 	@Override
-	public synchronized ArrayList<CellObject> getAllWithProperty(String name) {	
+	public synchronized List<CellObject> getAllWithProperty(String name) {	
 		return super.getAllWithProperty(name);
 	}
 	
 	@Override
-	public synchronized ArrayList<CellObject> getAll() {	
+	public synchronized List<CellObject> getAll() {	
 		return super.getAll();
 	}
 	
@@ -45,12 +45,12 @@ class CellSynchronized extends Cell {
 	}
 	
 	@Override
-	public synchronized ArrayList<CellObject> removeAllByProperty(String name) {
+	public synchronized List<CellObject> removeAllByProperty(String name) {
 		return super.removeAllByProperty(name);
 	}
 	
 	@Override
-	public synchronized ArrayList<CellObject> removeAll() {
+	public synchronized List<CellObject> removeAll() {
 		return super.removeAll();
 	}
 

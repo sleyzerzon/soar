@@ -66,7 +66,7 @@ public class KitchenWorld implements World {
 				
 				// Verify legal move and commit move
 				if (map.isInBounds(newLocation) && !map.hasAnyWithProperty(newLocation, Names.kPropertyBlock)) {
-					ArrayList<CellObject> myStuff = map.getAllWithProperty(oldLocation, "smell");
+					List<CellObject> myStuff = map.getAllWithProperty(oldLocation, "smell");
 
 					// verify I can move with food if I need to
 					if (move.moveWithObject) {
@@ -75,7 +75,7 @@ public class KitchenWorld implements World {
 							// do I have a product?
 							if (myStuff.get(0).hasProperty("product")) {
 								// yes, I have a product, destination cell must be empty
-								ArrayList<CellObject> destStuff  = map.getAllWithProperty(newLocation, "smell");
+								List<CellObject> destStuff  = map.getAllWithProperty(newLocation, "smell");
 								if (destStuff != null) {
 									// move with object fails!
 									player.moveWithObjectFailed();
@@ -84,7 +84,7 @@ public class KitchenWorld implements World {
 								}
 							} else {
 								// I'm moving stuff, destination cell must not contain a product
-								ArrayList<CellObject> destProducts = map.getAllWithProperty(newLocation, "product");
+								List<CellObject> destProducts = map.getAllWithProperty(newLocation, "product");
 								if (destProducts != null) {
 									// dest does contain a product, move with object fails!
 									player.moveWithObjectFailed();
@@ -123,7 +123,7 @@ public class KitchenWorld implements World {
 			
 			if (move.mix) {
 				if (map.isCountertop(players.getLocation(player)) || map.isOven(players.getLocation(player))) {
-					ArrayList<CellObject> stuff = map.getAllWithProperty(players.getLocation(player), "smell");
+					List<CellObject> stuff = map.getAllWithProperty(players.getLocation(player), "smell");
 					if (stuff != null && stuff.size() > 1) {
 						map.removeAllByProperty(players.getLocation(player), "smell");
 	
@@ -247,7 +247,7 @@ public class KitchenWorld implements World {
 			
 			if (move.cook) {
 				if (map.isOven(players.getLocation(player))) {
-					ArrayList<CellObject> stuff = map.getAllWithProperty(players.getLocation(player), "smell");
+					List<CellObject> stuff = map.getAllWithProperty(players.getLocation(player), "smell");
 					if (stuff != null && stuff.size() > 1) {
 						logger.info(player.getName() + ": Too many things to cook, mix first");
 						
@@ -347,7 +347,7 @@ public class KitchenWorld implements World {
 			}
 			
 			if (move.eat) {
-				ArrayList<CellObject> stuff = map.getAllWithProperty(players.getLocation(player), "smell");
+				List<CellObject> stuff = map.getAllWithProperty(players.getLocation(player), "smell");
 				if (stuff != null && stuff.size() > 1) {
 					logger.info(player.getName() + ": Too many things to eat, mix first");
 					

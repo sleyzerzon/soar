@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class ConfigTest {
 	}
 	
 	final String largeTest = "Environments/Soar2D/test/soar2d/config/test.cnf";
-	ArrayList<ConfigTestPair> largeTestData = new ArrayList<ConfigTestPair>();
+	List<ConfigTestPair> largeTestData = new ArrayList<ConfigTestPair>();
 
 	@Before
 	public void setUp() throws Exception {

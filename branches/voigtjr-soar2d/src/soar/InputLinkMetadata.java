@@ -40,7 +40,7 @@ public class InputLinkMetadata {
 	
 	private static Logger logger = Logger.getLogger(InputLinkMetadata.class);
 
-	private ArrayList<File> files = new ArrayList<File>(1);
+	private List<File> files = new ArrayList<File>(1);
 	private Agent agent;
 	private Identifier metadataWME;
 	private HashMap<Integer, Identifier> sharedIdentifierMap = new HashMap<Integer, Identifier>();

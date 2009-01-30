@@ -2,6 +2,7 @@ package soar2d.players;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import soar2d.Direction;
 import soar2d.Names;
@@ -68,7 +69,7 @@ public class CommandInfo {
 		public String to;
 		public String message;
 	}
-	public ArrayList<Communication> messages = new ArrayList<Communication>();
+	public List<Communication> messages = new ArrayList<Communication>();
 	
 	public CommandInfo() {
 	}

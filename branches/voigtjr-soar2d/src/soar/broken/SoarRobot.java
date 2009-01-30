@@ -3,6 +3,7 @@ package soar.broken;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.lang.Math;
 
 import org.apache.log4j.Logger;
@@ -120,7 +121,7 @@ public class SoarRobot extends Robot {
 				}
 				
 				// create new area information
-				ArrayList<Barrier> barrierList = map.getRoomBarrierList(locationId);
+				List<Barrier> barrierList = map.getRoomBarrierList(locationId);
 				assert barrierList != null;
 				assert barrierList.size() > 0;
 				
@@ -136,7 +137,7 @@ public class SoarRobot extends Robot {
 						gateway.initialize(barrier, world);
 						
 						// add destinations
-						ArrayList<Integer> gatewayDestList = map.getGatewayDestinationList(barrier.id);
+						List<Integer> gatewayDestList = map.getGatewayDestinationList(barrier.id);
 						Iterator<Integer> destIter = gatewayDestList.iterator();
 						while(destIter.hasNext()) {
 							gateway.addDest(destIter.next().intValue());

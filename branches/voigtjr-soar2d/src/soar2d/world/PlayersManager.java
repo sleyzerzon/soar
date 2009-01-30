@@ -3,6 +3,7 @@ package soar2d.world;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
@@ -14,8 +15,8 @@ import soar2d.players.Player;
 public class PlayersManager<P extends Player> {
 	private static Logger logger = Logger.getLogger(PlayersManager.class);
 
-	private ArrayList<P> players = new ArrayList<P>(7);
-	private ArrayList<P> humanPlayers = new ArrayList<P>(7);
+	private List<P> players = new ArrayList<P>(7);
+	private List<P> humanPlayers = new ArrayList<P>(7);
 	private HashMap<String, P> playersMap = new HashMap<String, P>(7);
 	private HashMap<P, int []> initialLocations = new HashMap<P, int []>(7);
 	private HashMap<P, int []> locations = new HashMap<P, int []>(7);
@@ -26,7 +27,7 @@ public class PlayersManager<P extends Player> {
 		return players.size();
 	}
 
-	ArrayList<P> getAll() {
+	List<P> getAll() {
 		return players;
 	}
 	

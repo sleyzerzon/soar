@@ -3,6 +3,7 @@ package soar2d.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +28,7 @@ public class Cell {
 		return Arrays.copyOf(location, location.length);
 	}
 	
-	private ArrayList<CellObjectObserver> observers = new ArrayList<CellObjectObserver>();
+	private List<CellObjectObserver> observers = new ArrayList<CellObjectObserver>();
 	void addObserver(CellObjectObserver observer) {
 		observers.add(observer);
 	}
@@ -57,7 +58,7 @@ public class Cell {
 	
 	// TODO: Compare performance between one HashMap<name, object> vs. this
 	// Iteration performance is paramount
-	private ArrayList<CellObject> cellObjects = new ArrayList<CellObject>();
+	private List<CellObject> cellObjects = new ArrayList<CellObject>();
 	
 	// for sound algorithm
 	boolean explored = false;
@@ -87,19 +88,19 @@ public class Cell {
 		}
 	}
 	
-	public ArrayList<CellObject> getAll() {	
+	public List<CellObject> getAll() {	
 		if (cellObjects.size() == 0) {
 			return null;
 		}
 		return new ArrayList<CellObject>(cellObjects);
 	}
 	
-	public ArrayList<CellObject> removeAll() {
+	public List<CellObject> removeAll() {
 		draw = true;
 		if (cellObjects.size() == 0) {
 			return null;
 		}
-		ArrayList<CellObject> ret = cellObjects;
+		List<CellObject> ret = cellObjects;
 		cellObjects = new ArrayList<CellObject>();
 		for (CellObject cellObject : ret) {
 			for (CellObjectObserver observer : observers) {
@@ -177,8 +178,8 @@ public class Cell {
 	 * Returns all objects in the cell with the specified property.
 	 * The returned list is never null but could be length zero.
 	 */
-	public ArrayList<CellObject> getAllWithProperty(String name) {	
-		ArrayList<CellObject> ret = null;
+	public List<CellObject> getAllWithProperty(String name) {	
+		List<CellObject> ret = null;
 		for (CellObject object : cellObjects) {
 			if (object.hasProperty(name)) {
 				if (ret == null) {
@@ -199,9 +200,9 @@ public class Cell {
 		return false;
 	}
 	
-	public ArrayList<CellObject> removeAllByProperty(String name) {
+	public List<CellObject> removeAllByProperty(String name) {
 		draw = true;
-		ArrayList<CellObject> ret = null;
+		List<CellObject> ret = null;
 		Iterator<CellObject> iter = cellObjects.iterator();
 		while(iter.hasNext()) {
 			CellObject object = iter.next();

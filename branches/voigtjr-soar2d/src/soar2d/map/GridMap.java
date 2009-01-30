@@ -1,7 +1,7 @@
 package soar2d.map;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface GridMap {
 	public void reset() throws Exception;
@@ -12,5 +12,5 @@ public interface GridMap {
 	public boolean isInBounds(int[] xy);
 	public CellObject createObjectByName(String name);
 	public File getMetadataFile();
-	public ArrayList<CellObject> getTemplatesWithProperty(String name);
+	public List<CellObject> getTemplatesWithProperty(String name);
 }

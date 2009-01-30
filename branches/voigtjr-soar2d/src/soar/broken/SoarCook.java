@@ -3,6 +3,7 @@ package soar.broken;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -200,7 +201,7 @@ public class SoarCook extends Cook {
 		}
 		
 		// update object information
-		ArrayList<CellObject> stuff = map.getAllWithProperty(location, "smell");
+		List<CellObject> stuff = map.getAllWithProperty(location, "smell");
 		HashMap<String, ObjectInputLink> newObjects = new HashMap<String, ObjectInputLink>();
 		if (stuff != null) {
 			for (CellObject item : stuff) {

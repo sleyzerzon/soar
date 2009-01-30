@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import soar2d.Direction;
 import soar2d.Names;
@@ -29,7 +30,7 @@ public class BookMap implements GridMap {
 	public int getLocationId(int [] location) {
 		assert location != null;
 
-		ArrayList<CellObject> locationObjects = getAllWithProperty(location, Names.kPropertyNumber);
+		List<CellObject> locationObjects = getAllWithProperty(location, Names.kPropertyNumber);
 		assert locationObjects != null;
 		assert locationObjects.size() == 1;
 		return locationObjects.get(0).getIntProperty(Names.kPropertyNumber);
@@ -161,14 +162,14 @@ public class BookMap implements GridMap {
 	}
 	
 	// Mapping of room id to the list of the barriers surrounding that room
-	private HashMap<Integer, ArrayList<Barrier> > roomBarrierMap = new HashMap<Integer, ArrayList<Barrier> >();
-	public ArrayList<Barrier> getRoomBarrierList(int roomID) {
+	private HashMap<Integer, List<Barrier> > roomBarrierMap = new HashMap<Integer, List<Barrier> >();
+	public List<Barrier> getRoomBarrierList(int roomID) {
 		return roomBarrierMap.get(roomID);
 	}
 
 	// Mapping of gateway id to the list of the ids of rooms it connects
-	private HashMap<Integer, ArrayList<Integer> > gatewayDestinationMap = new HashMap<Integer, ArrayList<Integer> >();
-	public ArrayList<Integer> getGatewayDestinationList(int gatewayID) {
+	private HashMap<Integer, List<Integer> > gatewayDestinationMap = new HashMap<Integer, List<Integer> >();
+	public List<Integer> getGatewayDestinationList(int gatewayID) {
 		return gatewayDestinationMap.get(gatewayID);
 	}
 	
@@ -183,7 +184,7 @@ public class BookMap implements GridMap {
 		// in the second phase of map structure generation. 
 		// this will contain duplicates since two different gateways can 
 		// be represented by the same squares
-		ArrayList<Barrier> gatewayBarriers = new ArrayList<Barrier>();
+		List<Barrier> gatewayBarriers = new ArrayList<Barrier>();
 
 		int [] location = new int [2];
 		for (location[1] = 1; location[1] < (this.size - 1); ++location[1]) {
@@ -256,7 +257,7 @@ public class BookMap implements GridMap {
 				Barrier currentBarrier = null;
 				
 				// Keep track of barrier information
-				ArrayList<Barrier> barrierList = new ArrayList<Barrier>();
+				List<Barrier> barrierList = new ArrayList<Barrier>();
 				
 				// I probably should have commented this more when I wrote it.
 				// The comments have been inserted after the initial writing so they may be slightly wrong.
@@ -308,7 +309,7 @@ public class BookMap implements GridMap {
 							//System.out.print("  Gateway " + currentBarrier.id + ": ");
 							
 							// add the current room to the gateway destination list
-							ArrayList<Integer> gatewayDestinations = gatewayDestinationMap.get(new Integer(currentBarrier.id));
+							List<Integer> gatewayDestinations = gatewayDestinationMap.get(new Integer(currentBarrier.id));
 							if (gatewayDestinations == null) {
 								gatewayDestinations = new ArrayList<Integer>();
 							}
@@ -480,7 +481,7 @@ public class BookMap implements GridMap {
 	}
 
 	private void addDestinationToGateway(int roomNumber, int gatewayId) {
-		ArrayList<Integer> gatewayDestinations = gatewayDestinationMap.get(new Integer(gatewayId));
+		List<Integer> gatewayDestinations = gatewayDestinationMap.get(new Integer(gatewayId));
 		assert gatewayDestinations != null;
 		gatewayDestinations.add(new Integer(roomNumber));
 		gatewayDestinationMap.put(new Integer(gatewayId), gatewayDestinations);
@@ -493,7 +494,7 @@ public class BookMap implements GridMap {
 	 * @param direction The direction to go to reach the wall
 	 * @param barrierList The barrier list for our new room
 	 */
-	private void doNewWall(int [] endPoint, Direction direction, ArrayList<Barrier> barrierList) {
+	private void doNewWall(int [] endPoint, Direction direction, List<Barrier> barrierList) {
 		Barrier currentBarrier = new Barrier();
 		currentBarrier.left = Direction.translate(endPoint, direction, new int[2]);
 
@@ -527,7 +528,7 @@ public class BookMap implements GridMap {
 	 * @param roomNumber This is the id number of the room we're in
 	 * @param barrierList This is the list of barriers for the room we're in
 	 */
-	private void doNewGateway(int [] startPoint, int [] endPoint, Direction direction, Direction walkDirection, int roomNumber, ArrayList<Barrier> barrierList) {
+	private void doNewGateway(int [] startPoint, int [] endPoint, Direction direction, Direction walkDirection, int roomNumber, List<Barrier> barrierList) {
 		// next is the gateway to the left of our left endpoint
 		Barrier currentBarrier = new Barrier();
 		currentBarrier.gateway = true;
@@ -559,7 +560,7 @@ public class BookMap implements GridMap {
 			
 			// record the destinations which is the new room and the room the gateway is sitting on
 			// add the current room to the gateway destination list
-			ArrayList<Integer> gatewayDestinations = new ArrayList<Integer>();
+			List<Integer> gatewayDestinations = new ArrayList<Integer>();
 			gatewayDestinations.add(new Integer(roomNumber));
 			gatewayDestinations.add(new Integer(cell.getObject(Names.kRoomID).getIntProperty(Names.kPropertyNumber)));
 			gatewayDestinationMap.put(new Integer(currentBarrier.id), gatewayDestinations);
@@ -577,7 +578,7 @@ public class BookMap implements GridMap {
 	}	
 
 	
-	private void gatewaysToAreasStep(ArrayList<Barrier> gatewayBarriers) {
+	private void gatewaysToAreasStep(List<Barrier> gatewayBarriers) {
 		// make the gateway also a room
 		// add new room to current gateway destination list
 		// create new barrier list for this new room: 2 walls and 2 gateways
@@ -660,7 +661,7 @@ public class BookMap implements GridMap {
 			}
 
 			// now we need to round up the four barriers
-			ArrayList<Barrier> barrierList = new ArrayList<Barrier>();
+			List<Barrier> barrierList = new ArrayList<Barrier>();
 			
 			////////////////////
 			// we can start by walking the wrong direction off the left endpoint
@@ -694,7 +695,7 @@ public class BookMap implements GridMap {
 		return objectNumber; 
 	}
 	
-	public void generateCenterpoints(int roomNumber, ArrayList<Barrier> barrierList) {
+	public void generateCenterpoints(int roomNumber, List<Barrier> barrierList) {
 		System.out.println("Room " + roomNumber + ":");
 		Iterator<Barrier> iter = barrierList.iterator();
 		while (iter.hasNext()) {
@@ -742,7 +743,7 @@ public class BookMap implements GridMap {
 		if (!added.hasProperty("object-id")) {
 			added.addProperty("object-id", Integer.toString(newObjectId()));
 		}
-		ArrayList<CellObject> numbered = getAllWithProperty(info.location, Names.kPropertyNumber);
+		List<CellObject> numbered = getAllWithProperty(info.location, Names.kPropertyNumber);
 		if (numbered != null) {
 			info.area = numbered.get(0).getIntProperty(Names.kPropertyNumber);
 		}

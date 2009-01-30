@@ -2,6 +2,7 @@ package soar2d.config;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /** Base64 encoding and decoding functions. **/
@@ -25,7 +26,7 @@ public class Base64 {
 
 	public static String[] encode(byte in[]) {
 		StringBuilder sb = new StringBuilder();
-		ArrayList<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<String>();
 
 		for (int idx = 0; idx < in.length; idx += 3) {
 			int v0 = in[idx] & 0xff;

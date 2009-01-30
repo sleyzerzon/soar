@@ -55,7 +55,7 @@ public class KitchenVisualWorld extends VisualWorld {
 					continue;
 				}
 
-				ArrayList<CellObject> drawList;
+				List<CellObject> drawList;
 				drawList = this.map.getAllWithProperty(location, Names.kPropertyColor);
 				
 				if (this.map.hasAnyWithProperty(location, Names.kPropertyBlock)) {

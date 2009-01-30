@@ -3,6 +3,7 @@ package soar2d.map;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -288,7 +289,7 @@ class GridMapUtil {
 				return xy;
 			}
 		}
-		ArrayList<int []> locations = new ArrayList<int []>();
+		List<int []> locations = new ArrayList<int []>();
 		for (xy[0] = 0; xy[0] < size; ++xy[0]) {
 			for (xy[1] = 0; xy[1] < size; ++ xy[1]) {
 				if (map.isAvailable(xy)) {

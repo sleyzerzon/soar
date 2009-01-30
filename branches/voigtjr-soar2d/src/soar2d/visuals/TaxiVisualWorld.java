@@ -61,7 +61,7 @@ public class TaxiVisualWorld extends VisualWorld {
 				gc.fillRectangle(cellSize*location[0]+1, cellSize*location[1]+1, cellSize-2, cellSize-2);
 				
 				// destination
-				ArrayList<CellObject> destinationList;
+				List<CellObject> destinationList;
 				destinationList = this.map.getAllWithProperty(location, "destination");
 				if (destinationList != null) {
 					CellObject destination = destinationList.get(0);
@@ -112,7 +112,7 @@ public class TaxiVisualWorld extends VisualWorld {
 				}
 
 				// walls
-				ArrayList<CellObject> wallList;
+				List<CellObject> wallList;
 				wallList = this.map.getAllWithProperty(location, "block");
 				if (wallList != null) {
 					for (CellObject wall : wallList ) {

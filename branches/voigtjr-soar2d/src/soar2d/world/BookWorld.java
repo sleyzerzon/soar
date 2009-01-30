@@ -325,8 +325,8 @@ public class BookWorld implements World {
 		return updateDiscrete((BookMap)_map, players, time);
 	}
 	
-	private ArrayList<ArrayList<Player>> findCollisions(PlayersManager players) {
-		ArrayList<ArrayList<Player>> collisions = new ArrayList<ArrayList<Player>>(players.numberOfPlayers() / 2);
+	private List<List<Player>> findCollisions(PlayersManager players) {
+		List<List<Player>> collisions = new ArrayList<ArrayList<Player>>(players.numberOfPlayers() / 2);
 
 		// Make sure collisions are possible
 		if (players.numberOfPlayers() < 2) {
@@ -335,7 +335,7 @@ public class BookWorld implements World {
 		
 		// Optimization to not check the same name twice
 		HashSet<Player> colliding = new HashSet<Player>(players.numberOfPlayers());
-		ArrayList<Player> collision = new ArrayList<Player>(players.numberOfPlayers());
+		List<Player> collision = new ArrayList<Player>(players.numberOfPlayers());
 
 		ListIterator<Player> leftIter = players.listIterator();
 		while (leftIter.hasNext()) {
@@ -538,7 +538,7 @@ public class BookWorld implements World {
 		map.setPlayer(newLocation, player);
 	}
 	
-	private void handleBookCollisions(PlayersManager players, GridMap map, ArrayList<ArrayList<Player>> collisions) {
+	private void handleBookCollisions(PlayersManager players, GridMap map, List<List<Player>> collisions) {
 		
 		// TODO: this is very similar to eaters code, consider combining to reduce redundancy
 		
@@ -547,9 +547,9 @@ public class BookWorld implements World {
 			return;
 		}
 
-		ArrayList<Player> collision = new ArrayList<Player>(players.numberOfPlayers());
+		List<Player> collision = new ArrayList<Player>(players.numberOfPlayers());
 		
-		Iterator<ArrayList<Player>> collisionIter = collisions.iterator();
+		Iterator<List<Player>> collisionIter = collisions.iterator();
 		while (collisionIter.hasNext()) {
 			collision = collisionIter.next();
 

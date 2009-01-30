@@ -2,6 +2,7 @@ package soar2d.visuals;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.eclipse.swt.events.PaintEvent;
@@ -53,7 +54,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 		}
 		
 		// Draw world
-		ArrayList<DrawMissile> drawMissiles = new ArrayList<DrawMissile>();
+		List<DrawMissile> drawMissiles = new ArrayList<DrawMissile>();
 		int [] location = new int [2];
 		for(location[0] = 0; location[0] < map.size(); ++location[0]){
 			for(location[1] = 0; location[1] < map.size(); ++location[1]){
@@ -61,11 +62,11 @@ public class TankSoarVisualWorld extends VisualWorld {
 					continue;
 				}
 				
-				ArrayList<CellObject> drawList;
+				List<CellObject> drawList;
 				drawList = this.map.getCell(location).getAllWithProperty(Names.kPropertyImage);
 				CellObject explosion = null;
 				CellObject object = null;
-				ArrayList<CellObject> missiles = new ArrayList<CellObject>();
+				List<CellObject> missiles = new ArrayList<CellObject>();
 				
 				if (drawList != null) {
 					for (CellObject cellObject : drawList) {
@@ -175,7 +176,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 				}
 				
 				// Finally, draw the radar waves
-				ArrayList<CellObject> radarWaves = this.map.getCell(location).getAllWithProperty(Names.kPropertyRadarWaves);
+				List<CellObject> radarWaves = this.map.getCell(location).getAllWithProperty(Names.kPropertyRadarWaves);
 				gc.setForeground(WindowManager.getColor("white"));
 				
 				if (radarWaves != null) {
@@ -238,7 +239,7 @@ public class TankSoarVisualWorld extends VisualWorld {
 	}
 	
 	public void updateBackground(int [] location) {
-		ArrayList<CellObject> drawList = this.map.getCell(location).getAllWithProperty(Names.kPropertyImage);
+		List<CellObject> drawList = this.map.getCell(location).getAllWithProperty(Names.kPropertyImage);
 		
 		CellObject backgroundObject = null;
 		if (drawList != null) {

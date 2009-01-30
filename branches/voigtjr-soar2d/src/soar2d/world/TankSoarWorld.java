@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -28,7 +29,7 @@ public class TankSoarWorld implements World {
 	private TankSoarMap tankSoarMap;
 	private PlayersManager<Tank> players = new PlayersManager<Tank>();
 	private int maxMissilePacks;
-	private ArrayList<String> stopMessages = new ArrayList<String>();
+	private List<String> stopMessages = new ArrayList<String>();
 	private CognitiveArchitecture cogArch;
 	
 	public TankSoarWorld(int maxMissilePacks, CognitiveArchitecture cogArch) throws Exception {
@@ -173,10 +174,10 @@ public class TankSoarWorld implements World {
 		HashMap<Tank, int []> newLocations = new HashMap<Tank, int []>();
 		
 		// And we'll cache tanks that moved
-		ArrayList<Tank> movedTanks = new ArrayList<Tank>(players.numberOfPlayers());
+		List<Tank> movedTanks = new ArrayList<Tank>(players.numberOfPlayers());
 		
 		// And we'll cache tanks that fired
-		ArrayList<Tank> firedTanks = new ArrayList<Tank>(players.numberOfPlayers());
+		List<Tank> firedTanks = new ArrayList<Tank>(players.numberOfPlayers());
 		
 		// We need to keep track of killed tanks, reset the list
 		killedTanks.clear();
@@ -352,7 +353,7 @@ public class TankSoarWorld implements World {
 		// We've eliminated all cross collisions and walls
 		
 		// We'll need to save where people move, indexed by location
-		HashMap<Integer, ArrayList<Tank> > collisionMap = new HashMap<Integer, ArrayList<Tank> >();
+		HashMap<Integer, List<Tank> > collisionMap = new HashMap<Integer, List<Tank> >();
 		
 		// Iterate through players, checking for all other types of collisions
 		// Also, moves are committed at this point and they won't respawn on
@@ -383,7 +384,7 @@ public class TankSoarWorld implements World {
 		}			
 		
 		// figure out collision damage
-		for (ArrayList<Tank> collision : collisionMap.values()) {
+		for (List<Tank> collision : collisionMap.values()) {
 			
 			// if there is more than one player, have them all take damage
 			if (collision.size() > 1) {
@@ -443,7 +444,7 @@ public class TankSoarWorld implements World {
 			}
 			
 			// is there a missile in the cell?
-			ArrayList<CellObject> missiles = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyMissile);
+			List<CellObject> missiles = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyMissile);
 			if (missiles == null) {
 				// No, can't collide
 				continue;
@@ -639,7 +640,7 @@ public class TankSoarWorld implements World {
 	private void chargeUp(Tank tank, int [] location) {
 		TankState state = tank.getState();
 		// Charge up
-		ArrayList<CellObject> chargers = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyCharger);
+		List<CellObject> chargers = tankSoarMap.getCell(location).getAllWithProperty(Names.kPropertyCharger);
 		
 		if (chargers != null) {
 			for (CellObject charger : chargers) {
@@ -734,8 +735,8 @@ public class TankSoarWorld implements World {
 	
 	private void doMoveCollisions(Tank player, 
 			HashMap<Tank, int []> newLocations, 
-			HashMap<Integer, ArrayList<Tank> > collisionMap, 
-			ArrayList<Tank> movedTanks) {
+			HashMap<Integer, List<Tank> > collisionMap, 
+			List<Tank> movedTanks) {
 		
 		// Get destination location
 		int [] newLocation = newLocations.get(player);
@@ -743,7 +744,7 @@ public class TankSoarWorld implements World {
 		// Wall collisions checked for earlier
 		
 		// is there a collision in the cell
-		ArrayList<Tank> collision = collisionMap.get(Arrays.hashCode(newLocation));
+		List<Tank> collision = collisionMap.get(Arrays.hashCode(newLocation));
 		if (collision != null) {
 			
 			// there is a collision
@@ -780,7 +781,7 @@ public class TankSoarWorld implements World {
 	}
 	
 	private void cancelMove(Tank tank, HashMap<Tank, int []> newLocations, 
-			ArrayList<Tank> movedTanks) {
+			List<Tank> movedTanks) {
 		CommandInfo move = players.getCommand(tank);
 		move.move = false;
 		movedTanks.remove(tank);

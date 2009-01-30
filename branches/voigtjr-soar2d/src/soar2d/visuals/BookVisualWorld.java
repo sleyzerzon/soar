@@ -51,7 +51,7 @@ public class BookVisualWorld extends VisualWorld {
 		}
 		
 		// Draw world
-		ArrayList<int []> playerLocs = new ArrayList<int []>();
+		List<int []> playerLocs = new ArrayList<int []>();
 		int [] location = new int [2];
 		HashSet<Integer> roomIds = new HashSet<Integer>();
 		for(location[0] = 0; location[0] < map.getSize(); ++location[0]){
@@ -95,12 +95,12 @@ public class BookVisualWorld extends VisualWorld {
 					}
 				}
 
-				ArrayList<CellObject> objectIds = map.getAllWithProperty(location, "object-id");
+				List<CellObject> objectIds = map.getAllWithProperty(location, "object-id");
 				if (objectIds != null) {
 					gc.setForeground(WindowManager.white);
 					gc.drawString(objectIds.get(0).getProperty("object-id"), cellSize*location[0], cellSize*location[1]);
 				} else  {
-					ArrayList<CellObject> numbers = map.getAllWithProperty(location, "number");
+					List<CellObject> numbers = map.getAllWithProperty(location, "number");
 					if (numbers!= null) {
 						if (!roomIds.contains(numbers.get(0).getIntProperty("number"))) {
 							gc.setForeground(WindowManager.black);

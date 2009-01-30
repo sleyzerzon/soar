@@ -1,7 +1,7 @@
 package soar;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -201,7 +201,7 @@ class SoarEaterIL {
 			// Food
 			HashMap<String, StringElement> remaining = new HashMap<String, StringElement>(cell.comestibles);
 			// For each food type in the cell on the map
-			ArrayList<CellObject> comestibles = map.getCell(view).getAllWithProperty(Names.kPropertyEdible);
+			List<CellObject> comestibles = map.getCell(view).getAllWithProperty(Names.kPropertyEdible);
 			if (comestibles != null) {
 				for (CellObject comestible : comestibles) {
 					
@@ -345,7 +345,7 @@ class SoarEaterIL {
 						}
 						
 						// get all things that block
-						ArrayList<CellObject> blockers = map.getCell(view).getAllWithProperty(Names.kPropertyBlock);
+						List<CellObject> blockers = map.getCell(view).getAllWithProperty(Names.kPropertyBlock);
 
 						// Blocking cells are simple, put anything with IDs on the input link
 						if (blockers != null) {
@@ -370,7 +370,7 @@ class SoarEaterIL {
 					updateFoodContent(view, map, cell);
 					
 					// TODO: there can only be one (as of right now)
-					ArrayList<CellObject> boxes = map.getCell(view).getAllWithProperty(Names.kPropertyBox);
+					List<CellObject> boxes = map.getCell(view).getAllWithProperty(Names.kPropertyBox);
 					if (boxes != null) {
 						updateBox(boxes.get(0), cell);
 					}
