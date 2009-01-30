@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 
 import soar2d.Direction;
 import soar2d.Names;
-import soar2d.Soar2D;
 import soar2d.players.CommandInfo;
 import soar2d.players.RadarCell;
 import soar2d.players.Tank;
@@ -29,9 +28,11 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 	boolean energy;
 	int missilePacks;
 	boolean health;
-
-	public TankSoarMap(String mapPath) throws Exception {
+	int maxSoundDistance;
+	
+	public TankSoarMap(String mapPath, int maxSoundDistance) throws Exception {
 		this.mapPath = new String(mapPath);
+		this.maxSoundDistance = maxSoundDistance;
 		
 		reset();
 	}
@@ -275,7 +276,7 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 			}
 			
 			// subtract 1 because we add one later (exploring neighbors)
-			if (parentCell.distance >= Soar2D.config.tanksoarConfig().max_sound_distance) {
+			if (parentCell.distance >= maxSoundDistance) {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Sound: parent distance " + parentCell.distance + " is too far");
 				}

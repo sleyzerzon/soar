@@ -35,13 +35,15 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 	private Agent agent;
 	private String [] shutdownCommands;
 	private InputLinkMetadata metadata;
-	private File metadataFile;
+	private File commonMetadataFile;
+	private File mapMetadataFile;
 	private boolean attemptedMove = false;
 
-	public SoarTank(Tank tank, Agent agent, String[] shutdown_commands, File metadataFile) {
+	public SoarTank(Tank tank, Agent agent, String[] shutdown_commands, File commonMetadataFile, File mapMetadataFile) {
 		this.tank = tank;
 		this.agent = agent;
-		this.metadataFile = metadataFile;
+		this.commonMetadataFile = commonMetadataFile;
+		this.mapMetadataFile = mapMetadataFile;
 		this.shutdownCommands = shutdown_commands;
 
 		TankState state = tank.getState();
@@ -52,7 +54,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		agent.RegisterForRunEvent(smlRunEventId.smlEVENT_MAX_MEMORY_USAGE_EXCEEDED, this, null);
 		m_InputLink = agent.GetInputLink();
 
-		metadata = InputLinkMetadata.load(agent, metadataFile);
+		metadata = InputLinkMetadata.load(agent, commonMetadataFile, mapMetadataFile);
 	}
 	
 	public void commit() throws Exception {
@@ -570,7 +572,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		
 		metadata.destroy();
 		metadata = null;
-		metadata = InputLinkMetadata.load(agent, metadataFile);
+		metadata = InputLinkMetadata.load(agent, commonMetadataFile, mapMetadataFile);
 		
 		agent.InitSoar();
 	}

@@ -20,14 +20,14 @@ import soar2d.Names;
 import soar2d.Soar2D;
 
 public class InputLinkMetadata {
-	public static InputLinkMetadata load(Agent agent, File metadataFile) {
+	public static InputLinkMetadata load(Agent agent, File commonMetadataFile, File mapMetadataFile) {
 		try {
 			InputLinkMetadata metadata = new InputLinkMetadata(agent);
-			if (Soar2D.config.soarConfig().metadata != null) {
-				metadata.load(Soar2D.config.soarConfig().metadata);
+			if (commonMetadataFile != null) {
+				metadata.load(commonMetadataFile);
 			}
-			if (metadataFile != null) {
-				metadata.load(metadataFile);
+			if (mapMetadataFile != null) {
+				metadata.load(mapMetadataFile);
 			}
 			return metadata;
 		} catch (Exception e) {

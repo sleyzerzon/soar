@@ -17,6 +17,10 @@ class GridMapUtil {
 	private static Logger logger = Logger.getLogger(GridMapUtil.class);
 
 	static GridMapData loadFromConfigFile(String mapPath, CellObjectObserver observer) throws Exception {
+		return loadFromConfigFile(mapPath, observer, 0, 0);
+	}
+		
+	static GridMapData loadFromConfigFile(String mapPath, CellObjectObserver observer, double lowProbability, double highProbability) throws Exception {
 		File mapFile = new File(mapPath);
 		if (!mapFile.exists()) {
 			throw new Exception("Map file doesn't exist: " + mapFile.getAbsolutePath());
@@ -48,6 +52,10 @@ class GridMapUtil {
 	}
 
 	private static void cellsConfig(GridMapData data, Config cellsConfig, Config objectsConfig, CellObjectObserver observer) throws Exception {
+		cellsConfig(data, cellsConfig, objectsConfig, observer, 0, 0);
+	}
+	
+	private static void cellsConfig(GridMapData data, Config cellsConfig, Config objectsConfig, CellObjectObserver observer, double lowProbability, double highProbability) throws Exception {
 		data.cells = new GridMapCells(cellsConfig.requireInt("size"));
 		
 		data.randomWalls = cellsConfig.getBoolean("random_walls", false);
@@ -65,7 +73,7 @@ class GridMapUtil {
 				}
 				
 				for (xy[0] = 0; xy[0] < data.cells.size(); ++xy[0]) {
-					Cell newCell = Cell.createCell(Soar2D.config.generalConfig().headless, xy);
+					Cell newCell = Cell.createCell(xy);
 					newCell.addObserver(data);
 					newCell.addObserver(observer);
 					data.cells.setCell(xy, newCell);
@@ -87,7 +95,7 @@ class GridMapUtil {
 		
 		// override walls if necessary
 		if (data.randomWalls) {
-			generateRandomWalls(data, observer);
+			generateRandomWalls(data, observer, lowProbability, highProbability);
 		}
 		
 		// override food if necessary
@@ -149,7 +157,7 @@ class GridMapUtil {
 		}
 	}
 
-	private static void generateRandomWalls(GridMapData data, CellObjectObserver observer) throws Exception {
+	private static void generateRandomWalls(GridMapData data, CellObjectObserver observer, double lowProbability, double highProbability) throws Exception {
 		if (!data.cellObjectManager.hasTemplatesWithProperty(soar2d.Names.kPropertyBlock)) {
 			throw new Exception("tried to generate random walls with no blocking types");
 		}
@@ -179,10 +187,10 @@ class GridMapUtil {
 			for (xy[1] = 2; xy[1] < size - 3; ++xy[1]) {
 
 				if (noWallsOnCorners(data, xy)) {
-					double probability = Soar2D.config.eatersConfig().low_probability;
+					double probability = lowProbability;
 					if (wallOnAnySide(data, xy)) {
 						logger.trace(Arrays.toString(xy) + ": High probability.");
-						probability = Soar2D.config.eatersConfig().high_probability;					
+						probability = highProbability;					
 					}
 					if (Simulation.random.nextDouble() < probability) {
 						removeFoodAndAddWall(data, xy, observer);
@@ -196,7 +204,7 @@ class GridMapUtil {
 		logger.trace(Arrays.toString(xy) + ": Changing to wall.");
 		Cell cell = data.cells.getCell(xy);
 		if (cell == null) {
-			cell = Cell.createCell(Soar2D.config.generalConfig().headless, xy);
+			cell = Cell.createCell(xy);
 			cell.addObserver(data);
 			cell.addObserver(observer);
 		}
@@ -261,7 +269,7 @@ class GridMapUtil {
 			for (xy[1] = 1; xy[1] < data.cells.size() - 1; ++xy[1]) {
 				Cell cell = data.cells.getCell(xy);
 				if (cell == null) {
-					cell = Cell.createCell(Soar2D.config.generalConfig().headless, xy);
+					cell = Cell.createCell(xy);
 					cell.addObserver(data);
 					cell.addObserver(observer);
 				}

@@ -49,10 +49,25 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	
 	private Map<String, AgentData> agents = new HashMap<String, AgentData>();
 	private String basePath;
+	private File commonMetadataFile;
+	private Map<String, ClientConfig> clients;
+	private int maxMemoryUsage;
+	private boolean soarPrint;
+	private boolean spawnDebuggers;
+	private int port;
 	
-	public Soar(SoarConfig config, Game game, String basePath) throws Exception {
+	public Soar(SoarConfig config, Map<String, ClientConfig> clients, Game game, String basePath) throws Exception {
 		this.basePath = basePath;
 		this.runTilOutput = config.runTilOutput(game);
+		if (config.metadata != null) {
+			this.commonMetadataFile = new File(config.metadata);
+		}
+		
+		this.clients = clients;
+		this.maxMemoryUsage = config.max_memory_usage;
+		this.soarPrint = config.soar_print;
+		this.spawnDebuggers = config.spawn_debuggers;
+		this.port = config.port;
 		
 		if (config.remote != null) {
 			kernel = Kernel.CreateRemoteConnection(true, config.remote, config.port);
@@ -104,7 +119,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 	
 	private void doClients(boolean after) throws Exception {
-		for ( Entry<String, ClientConfig> entry : Soar2D.config.clientConfigs().entrySet()) {
+		for (Entry<String, ClientConfig> entry : clients.entrySet()) {
 			if (entry.getValue().after != after) {
 				continue;
 			}
@@ -292,13 +307,13 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		
 		// if requested, set max memory usage
-		int maxmem = Soar2D.config.soarConfig().max_memory_usage;
+		int maxmem = maxMemoryUsage;
 		if (maxmem > 0) {
 			agent.ExecuteCommandLine("max-memory-usage " + Integer.toString(maxmem));
 		}
 		
 		// Scott Lathrop --  register for print events
-		if (Soar2D.config.soarConfig().soar_print) {
+		if (soarPrint) {
 			agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, getLogger(), null,true);
 		}
 		
@@ -306,8 +321,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		agents.put(name, new AgentData(agent, productionsFile));
 		
 		// spawn the debugger if we're supposed to
-		if (Soar2D.config.soarConfig().spawn_debuggers && !isClientConnected(Names.kDebuggerClient)) {
-			ClientConfig debuggerConfig = Soar2D.config.clientConfigs().get(Names.kDebuggerClient);
+		if (spawnDebuggers && !isClientConnected(Names.kDebuggerClient)) {
+			ClientConfig debuggerConfig = clients.get(Names.kDebuggerClient);
 			debuggerConfig.command = getDebuggerCommand(name);
 
 			spawnClient(Names.kDebuggerClient, debuggerConfig);
@@ -346,11 +361,11 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (os.matches(".+indows.*") || os.matches("INDOWS")) {
 			commandLine = "javaw -jar \"" + basePath 
 			+ "..\\..\\SoarLibrary\\bin\\SoarJavaDebugger.jar\" -cascade -remote -agent " 
-			+ agentName + " -port " + Soar2D.config.soarConfig().port;
+			+ agentName + " -port " + port;
 		} else {
 			commandLine = System.getProperty("java.home") + "/bin/java -jar " + basePath
 			+ "../../SoarLibrary/bin/SoarJavaDebugger.jar -XstartOnFirstThread -cascade -remote -agent " 
-			+ agentName + " -port " + Soar2D.config.soarConfig().port;
+			+ agentName + " -port " + port;
 		}
 		
 		return commandLine;
@@ -371,16 +386,16 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 
 	public EaterCommander createEaterCommander(Eater eater, String productions,
-			int vision, String[] shutdownCommands, File metadataFile)
+			int vision, String[] shutdownCommands, File mapMetadataFile)
 			throws Exception {
 		Agent agent = createSoarAgent(eater.getName(), productions);
-		return new SoarEater(eater, agent, vision, shutdownCommands, metadataFile);
+		return new SoarEater(eater, agent, vision, shutdownCommands, commonMetadataFile, mapMetadataFile);
 	}
 
 	public TankCommander createTankCommander(Tank tank, String productions,
-			String[] shutdownCommands, File metadataFile) throws Exception {
+			String[] shutdownCommands, File mapMetadataFile) throws Exception {
 		Agent agent = createSoarAgent(tank.getName(), productions);
-		return new SoarTank(tank, agent, shutdownCommands, metadataFile);
+		return new SoarTank(tank, agent, shutdownCommands, commonMetadataFile, mapMetadataFile);
 	}
 
   	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {

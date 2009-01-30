@@ -12,12 +12,17 @@ import soar2d.players.Player;
 public class Cell {
 	private static Logger logger = Logger.getLogger(Cell.class);
 
-	static Cell createCell(boolean headless, int[] xy) {
-		if (headless) {
-			// only one thread
-			return new Cell(xy);
+	private static boolean useSynchronized = false;
+	
+	public static void setUseSynchronized(boolean useSynchronized) {
+		Cell.useSynchronized = useSynchronized;
+	}
+	
+	static Cell createCell(int[] xy) {
+		if (Cell.useSynchronized) {
+			return new CellSynchronized(xy);
 		}
-		return new CellSynchronized(xy);
+		return new Cell(xy);
 	}
 	
 	protected Cell(int[] xy) {

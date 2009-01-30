@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import soar.Soar;
 import soar2d.config.PlayerConfig;
 import soar2d.config.SimConfig;
+import soar2d.map.Cell;
 import soar2d.players.Player;
 import soar2d.world.BookWorld;
 import soar2d.world.EatersWorld;
@@ -28,7 +29,7 @@ import soar2d.world.TaxiWorld;
 public class Simulation {
 	private static Logger logger = Logger.getLogger(Simulation.class);
 
-	public static Random random = null;
+	public static Random random = new Random();
 	public final String kColors[] = { "red", "blue", "yellow", "purple", "orange", "green", "black",  };
 	
 	private World world;
@@ -46,7 +47,7 @@ public class Simulation {
 		}
 		
 		// Initialize Soar
-		cogArch = new Soar(config.soarConfig(), game, getBasePath());
+		cogArch = new Soar(config.soarConfig(), config.clientConfigs(), game, getBasePath());
 		Soar2D.control.setCogArch(cogArch);
 		if (Soar2D.wm.using()) {
 			Soar2D.wm.setCogArch(cogArch);
@@ -58,13 +59,14 @@ public class Simulation {
 			// seed the generators
 			cogArch.seed(config.generalConfig().seed);
 			logger.debug(Names.Debug.seed + config.generalConfig().seed);
-			random = new Random(config.generalConfig().seed);
+			random.setSeed(config.generalConfig().seed);
 		} else {
 			logger.debug(Names.Debug.noSeed);
-			random = new Random();
 		}
 		
 		// Load the world
+		Cell.setUseSynchronized(!config.generalConfig().headless);
+		
 		logger.trace(Names.Trace.loadingWorld);
 		switch (game) {
 		case TANKSOAR:

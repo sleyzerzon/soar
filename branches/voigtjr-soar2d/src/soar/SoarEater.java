@@ -24,12 +24,14 @@ public final class SoarEater implements EaterCommander {
 	private String[] shutdownCommands;
 	boolean fragged = false;
 	private InputLinkMetadata metadata;
-	private File metadataFile;
+	private File commonMetadataFile;
+	private File mapMetadataFile;
 	
-	public SoarEater(Eater eater, Agent agent, int vision, String[] shutdownCommands, File metadataFile) throws Exception {
+	public SoarEater(Eater eater, Agent agent, int vision, String[] shutdownCommands, File commonMetadataFile, File mapMetadataFile) throws Exception {
 		this.eater = eater;
 		this.agent = agent;
-		this.metadataFile = metadataFile;
+		this.commonMetadataFile = commonMetadataFile;
+		this.mapMetadataFile = mapMetadataFile;
 		agent.SetBlinkIfNoChange(false);
 		
 		this.shutdownCommands = shutdownCommands;
@@ -41,7 +43,7 @@ public final class SoarEater implements EaterCommander {
 			throw new Exception(Names.Errors.commitFail + eater.getName());
 		}
 		
-		metadata = InputLinkMetadata.load(agent, metadataFile);
+		metadata = InputLinkMetadata.load(agent, commonMetadataFile, mapMetadataFile);
 		
 		if (!agent.Commit()) {
 			throw new Exception(Names.Errors.commitFail + eater.getName());
@@ -178,7 +180,7 @@ public final class SoarEater implements EaterCommander {
 
 		metadata.destroy();
 		metadata = null;
-		metadata = InputLinkMetadata.load(agent, metadataFile);
+		metadata = InputLinkMetadata.load(agent, commonMetadataFile, mapMetadataFile);
 
 		if (!agent.Commit()) {
 		}

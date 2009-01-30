@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import soar2d.Names;
-import soar2d.Soar2D;
 
 public class EatersMap implements GridMap, CellObjectObserver {
 
@@ -16,8 +15,11 @@ public class EatersMap implements GridMap, CellObjectObserver {
 	int foodCount;
 	int scoreCount;
 	Set<CellObject> unopenedBoxes;
+	boolean unopenedBoxesTerminal;
+	double lowProbability;
+	double highProbability;
 
-	public EatersMap(String mapPath) throws Exception {
+	public EatersMap(String mapPath, boolean unopenedBoxesTerminal, double lowProbability, double highProbability) throws Exception {
 		this.mapPath = new String(mapPath);
 		reset();
 	}
@@ -63,7 +65,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 	}
 
 	public void removalStateUpdate(int [] location, CellObject removed) {
-		if (Soar2D.config.terminalsConfig().unopened_boxes) {
+		if (unopenedBoxesTerminal) {
 			if (isUnopenedBox(removed)) {
 				unopenedBoxes.remove(removed);
 			}
@@ -100,7 +102,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 			}
 		}
 
-		if (Soar2D.config.terminalsConfig().unopened_boxes) {
+		if (unopenedBoxesTerminal) {
 			Iterator<CellObject> iter = unopenedBoxes.iterator();
 			while (iter.hasNext()) {
 				CellObject box = iter.next();

@@ -22,7 +22,7 @@ public class CellTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		cell = Cell.createCell(true, xyInitial);
+		cell = Cell.createCell(xyInitial);
 		
 		Config config;
 
@@ -165,7 +165,7 @@ public class CellTest {
 	
 	@Test(expected = NullPointerException.class)
 	public void testCreateNull() throws Exception {
-		cell = Cell.createCell(true, null);
+		cell = Cell.createCell(null);
 	}
 	
 	@Test

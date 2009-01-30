@@ -40,7 +40,7 @@ public class TankSoarWorld implements World {
 	}
 	
 	public void setMap(String mapPath) throws Exception {
-		tankSoarMap = new TankSoarMap(mapPath);
+		tankSoarMap = new TankSoarMap(mapPath, Soar2D.config.tanksoarConfig().max_sound_distance);
 		reset();
 	}
 	

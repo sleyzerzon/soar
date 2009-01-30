@@ -38,7 +38,7 @@ public class EatersWorld implements World {
 	public void setMap(String mapPath) throws Exception {
 		EatersMap oldMap = eatersMap;
 		try {
-			eatersMap = new EatersMap(mapPath);
+			eatersMap = new EatersMap(mapPath, Soar2D.config.terminalsConfig().unopened_boxes, Soar2D.config.eatersConfig().low_probability, Soar2D.config.eatersConfig().high_probability);
 		} catch (Exception e) {
 			if (oldMap == null) {
 				throw e;
