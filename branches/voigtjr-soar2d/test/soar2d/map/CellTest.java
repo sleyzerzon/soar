@@ -13,6 +13,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import soar2d.config.Config;
+
 public class CellTest {
 	Cell cell;
 	CellObject[] objects = new CellObject[3];
@@ -22,15 +24,22 @@ public class CellTest {
 	public void setUp() throws Exception {
 		cell = Cell.createCell(true, xyInitial);
 		
-		objects[0] = new CellObject("test0");
-		objects[0].addProperty("property0", "value0");
-		objects[0].addProperty("property", "value");
-		objects[1] = new CellObject("test1");
-		objects[1].addProperty("property1", "value1");
-		objects[1].addProperty("property", "value");
-		objects[2] = new CellObject("test2");
-		objects[2].addProperty("property2", "value2");
-		objects[2].addProperty("property", "value");
+		Config config;
+
+		config = CellObjectHelper.createNewConfig("test0");
+		config.setString("property0", "value0");
+		config.setString("property", "value");
+		objects[0] = new CellObject(config);
+
+		config = CellObjectHelper.createNewConfig("test1");
+		config.setString("property1", "value1");
+		config.setString("property", "value");
+		objects[1] = new CellObject(config);
+		
+		config = CellObjectHelper.createNewConfig("test2");
+		config.setString("property2", "value2");
+		config.setString("property", "value");
+		objects[2] = new CellObject(config);
 	}
 
 	@After

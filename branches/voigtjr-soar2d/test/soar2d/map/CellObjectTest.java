@@ -4,22 +4,24 @@ import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
+import soar2d.config.Config;
+
 public class CellObjectTest {
 	@Test
 	public void testEquals() {
-		CellObject a = new CellObject("a");
-		CellObject b = new CellObject("b");
+		CellObject a = new CellObject(CellObjectHelper.createNewConfig("a"));
+		CellObject b = new CellObject(CellObjectHelper.createNewConfig("b"));
 		assertFalse(a.equals(b));
 
-		CellObject a1 = new CellObject("a");
-		CellObject a2 = new CellObject("a");
+		CellObject a1 = new CellObject(CellObjectHelper.createNewConfig("a"));
+		CellObject a2 = new CellObject(CellObjectHelper.createNewConfig("a"));
 		assertFalse(a1.equals(a2));
 	}
 	
 	@Test(expected = NullPointerException.class)
-	public void testNullName() {
-		String s = null;
-		new CellObject(s);
+	public void testNullConfig() {
+		Config c = null;
+		new CellObject(c);
 	}
 	
 	@Test(expected = NullPointerException.class)
