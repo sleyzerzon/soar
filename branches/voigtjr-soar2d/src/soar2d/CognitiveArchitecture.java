@@ -1,12 +1,18 @@
 package soar2d;
 
-import sml.Agent;
+import java.io.File;
+
+import soar2d.players.Eater;
+import soar2d.players.EaterCommander;
+import soar2d.players.Tank;
+import soar2d.players.TankCommander;
 
 public interface CognitiveArchitecture {
 
 	void seed(int seed);
 
-	Agent createSoarAgent(String name, String productions) throws Exception;
+	EaterCommander createEaterCommander(Eater eater, String productions, int vision, String[] shutdownCommands, File metadataFile) throws Exception;
+	TankCommander createTankCommander(Tank tank, String productions, String[] shutdown_commands, File metadataFile) throws Exception;
 
 	void doBeforeClients() throws Exception;
 

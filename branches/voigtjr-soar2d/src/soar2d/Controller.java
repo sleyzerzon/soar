@@ -8,11 +8,6 @@ import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 import soar2d.visuals.WindowManager;
 import soar2d.world.World;
-import sml.Agent;
-import sml.Kernel;
-import sml.smlPrintEventId;
-import sml.smlRunFlags;
-import sml.smlSystemEventId;
 
 /**
  * @author voigtjr
@@ -20,7 +15,7 @@ import sml.smlSystemEventId;
  * Control keeps track of the simulation, if it is running or not, the update
  * process, etc.
  */
-public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEventInterface, Runnable {
+public class Controller implements Runnable {
 	private static Logger logger = Logger.getLogger(Controller.class);
 
 	/**
@@ -228,51 +223,6 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 		}
 	}
 	
-  	/**
-  	 * Handle an update event from Soar, do not call directly.
-  	 */
-  	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
-
-  		// check for override
-  		int dontUpdate = runFlags & smlRunFlags.sml_DONT_UPDATE_WORLD.swigValue();
-  		if (dontUpdate != 0) {
-  			logger.warn(Names.Warn.noUpdate);
-  			return;
-  		}
-  		
-  		// this updates the world
-  		try {
-			tickEvent();
-		} catch (Exception e) {
-			error(e.getMessage());
-		}
-  		
-		// Test this after the world has been updated, in case it's asking us to stop
-		if (stop) {
-			// the world has asked us to kindly stop running
-  			logger.debug(Names.Debug.stopRequested);
-  			
-  			// note that soar actually controls when we stop
-  			kernel.StopAllAgents();
-  		}
-  	}
-  	
-  	/**
-  	 * Handle a system event from Soar, do not call directly
-  	 */
-   public void systemEventHandler(int eventID, Object data, Kernel kernel) {
-  		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
-  			// soar says go
-  			startEvent();
-  		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
-  			// soar says stop
-  			stopEvent();
-  		} else {
-  			// soar says something we weren't expecting
-  			logger.warn(Names.Warn.unknownEvent + eventID);
- 		}
-   }
-   
 	/**
 	 * Create the GUI and show it, and run its loop. Does not return until the 
 	 * GUI is disposed. 
@@ -362,48 +312,6 @@ public class Controller implements Kernel.UpdateEventInterface, Kernel.SystemEve
 	public CommandInfo getHumanCommand(Player player) {
 		return Soar2D.wm.getHumanCommand(player);
 	}
-	
-	/**
-	 * Logger for Kernel print events
-	 * @author Scott Lathrop
-	 *
-	 */
-	public PrintLogger getLogger() { return PrintLogger.getLogger(); }
-	
-	
-	public static class PrintLogger implements Agent.PrintEventInterface
-	{
-		protected static PrintLogger m_Logger = null;
-		
-		public static PrintLogger getLogger() 
-		{
-			if (m_Logger == null) {
-				m_Logger = new PrintLogger();
-			}
-			
-			return m_Logger;
-		}
-		
-		/**
-		 * @brief - callback from SoarKernel for print events
-		 */
-		public void printEventHandler (int eventID, Object data, Agent agent, String message) 
-		{
-			if (eventID == smlPrintEventId.smlEVENT_PRINT.swigValue()) {
-				logger.info(message);
-			}
-				
-		} // SoarAgentprintEventHandler	
-		
-		private PrintLogger () {}
-		
-	} // Logger
-	
-	/**
-	 * End Logger for Kernel print events
-	 * @author Scott Lathrop
-	 *
-	 */
 	
 	private int runsTerminal = 0;
 

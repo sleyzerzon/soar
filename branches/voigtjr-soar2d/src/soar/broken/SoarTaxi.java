@@ -1,4 +1,4 @@
-package soar2d.players.soar;
+package soar.broken;
 
 import org.apache.log4j.Logger;
 

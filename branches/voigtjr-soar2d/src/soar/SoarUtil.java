@@ -1,4 +1,4 @@
-package soar2d.players;
+package soar;
 
 public class SoarUtil {
 }

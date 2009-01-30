@@ -1,4 +1,4 @@
-package soar2d.players;
+package soar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +15,7 @@ import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.map.CellObject;
 import soar2d.map.EatersMap;
+import soar2d.players.CommitException;
 import soar2d.players.Player;
 
 class SoarEaterIL {

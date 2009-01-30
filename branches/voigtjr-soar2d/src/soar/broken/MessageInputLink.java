@@ -1,4 +1,4 @@
-package soar2d.players.soar;
+package soar.broken;
 
 import sml.Identifier;
 import sml.IntElement;

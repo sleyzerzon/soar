@@ -1,4 +1,4 @@
-package soar2d.players.soar;
+package soar.broken;
 
 import java.util.ArrayList;
 import java.util.HashSet;

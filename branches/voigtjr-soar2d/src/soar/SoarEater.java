@@ -1,4 +1,4 @@
-package soar2d.players;
+package soar;
 
 import java.io.File;
 
@@ -9,8 +9,10 @@ import sml.Identifier;
 import soar2d.Direction;
 import soar2d.Names;
 import soar2d.map.EatersMap;
+import soar2d.players.CommitException;
 import soar2d.players.Eater;
 import soar2d.players.CommandInfo;
+import soar2d.players.EaterCommander;
 
 public final class SoarEater implements EaterCommander {
 	private static Logger logger = Logger.getLogger(SoarEater.class);

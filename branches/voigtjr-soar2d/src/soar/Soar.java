@@ -18,14 +18,19 @@ import sml.smlRunStepSize;
 import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
 import sml.sml_Names;
+import sml.smlRunFlags;
 import soar2d.CognitiveArchitecture;
 import soar2d.Game;
 import soar2d.Names;
 import soar2d.Soar2D;
 import soar2d.config.ClientConfig;
 import soar2d.config.SoarConfig;
+import soar2d.players.Eater;
+import soar2d.players.EaterCommander;
+import soar2d.players.Tank;
+import soar2d.players.TankCommander;
 
-public class Soar implements CognitiveArchitecture {
+public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
 	private static Logger logger = Logger.getLogger(Soar.class);
 
 	private boolean runTilOutput = false;
@@ -66,15 +71,15 @@ public class Soar implements CognitiveArchitecture {
 
 		// Register for events
 		logger.trace(Names.Trace.eventRegistration);
-		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, Soar2D.control, null);
-		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, Soar2D.control, null);
+		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
+		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
 		
 		if (runTilOutput) {
 			logger.debug(Names.Debug.runTilOutput);
-			kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, Soar2D.control, null);
+			kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this, null);
 		} else {
 			logger.debug(Names.Debug.noRunTilOutput);
-			kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, Soar2D.control, null);
+			kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
 		}
 		
 	}
@@ -237,7 +242,43 @@ public class Soar implements CognitiveArchitecture {
 		return basePath + "agents" + System.getProperty("file.separator");
 	}
 	
-	public Agent createSoarAgent(String name, String productions) throws Exception {
+	/**
+	 * Logger for Kernel print events
+	 * @author Scott Lathrop
+	 *
+	 */
+	private PrintLogger getLogger() { return PrintLogger.getLogger(); }
+	
+	
+	private static class PrintLogger implements Agent.PrintEventInterface
+	{
+		protected static PrintLogger m_Logger = null;
+		
+		public static PrintLogger getLogger() 
+		{
+			if (m_Logger == null) {
+				m_Logger = new PrintLogger();
+			}
+			
+			return m_Logger;
+		}
+		
+		/**
+		 * @brief - callback from SoarKernel for print events
+		 */
+		public void printEventHandler (int eventID, Object data, Agent agent, String message) 
+		{
+			if (eventID == smlPrintEventId.smlEVENT_PRINT.swigValue()) {
+				logger.info(message);
+			}
+				
+		} // SoarAgentprintEventHandler	
+		
+		private PrintLogger () {}
+		
+	} // Logger
+	
+	private Agent createSoarAgent(String name, String productions) throws Exception {
 		Agent agent = kernel.CreateAgent(name);
 		if (agent == null) {
 			throw new Exception("Agent " + name + " creation failed: " + kernel.GetLastErrorDescription());
@@ -257,7 +298,7 @@ public class Soar implements CognitiveArchitecture {
 		
 		// Scott Lathrop --  register for print events
 		if (Soar2D.config.soarConfig().soar_print) {
-			agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, Soar2D.control.getLogger(), null,true);
+			agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, getLogger(), null,true);
 		}
 		
 		// save the agent
@@ -327,4 +368,58 @@ public class Soar implements CognitiveArchitecture {
 	public boolean haveAgents() {
 		return agents.size() > 0;
 	}
+
+	public EaterCommander createEaterCommander(Eater eater, String productions,
+			int vision, String[] shutdownCommands, File metadataFile)
+			throws Exception {
+		Agent agent = createSoarAgent(eater.getName(), productions);
+		return new SoarEater(eater, agent, vision, shutdownCommands, metadataFile);
+	}
+
+	public TankCommander createTankCommander(Tank tank, String productions,
+			String[] shutdownCommands, File metadataFile) throws Exception {
+		Agent agent = createSoarAgent(tank.getName(), productions);
+		return new SoarTank(tank, agent, shutdownCommands, metadataFile);
+	}
+
+  	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
+
+  		// check for override
+  		int dontUpdate = runFlags & smlRunFlags.sml_DONT_UPDATE_WORLD.swigValue();
+  		if (dontUpdate != 0) {
+  			logger.warn(Names.Warn.noUpdate);
+  			return;
+  		}
+  		
+  		// this updates the world
+  		try {
+			Soar2D.control.tickEvent();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			Soar2D.control.errorPopUp(e.getMessage());
+		}
+  		
+		// Test this after the world has been updated, in case it's asking us to stop
+		if (Soar2D.control.isStopped()) {
+			// the world has asked us to kindly stop running
+  			logger.debug(Names.Debug.stopRequested);
+  			
+  			// note that soar actually controls when we stop
+  			kernel.StopAllAgents();
+  		}
+  	}
+  	
+   public void systemEventHandler(int eventID, Object data, Kernel kernel) {
+  		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
+  			// soar says go
+  			Soar2D.control.startEvent();
+  		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
+  			// soar says stop
+  			Soar2D.control.stopEvent();
+  		} else {
+  			// soar says something we weren't expecting
+  			logger.warn(Names.Warn.unknownEvent + eventID);
+ 		}
+   }
+   
 }

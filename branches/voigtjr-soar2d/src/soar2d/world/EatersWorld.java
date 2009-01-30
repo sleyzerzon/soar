@@ -9,7 +9,6 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 
-import sml.Agent;
 import soar2d.CognitiveArchitecture;
 import soar2d.Direction;
 import soar2d.Names;
@@ -20,8 +19,8 @@ import soar2d.map.EatersMap;
 import soar2d.map.GridMap;
 import soar2d.players.CommandInfo;
 import soar2d.players.Eater;
+import soar2d.players.EaterCommander;
 import soar2d.players.Player;
-import soar2d.players.SoarEater;
 
 public class EatersWorld implements World {
 	private static Logger logger = Logger.getLogger(EatersWorld.class);
@@ -434,9 +433,8 @@ public class EatersWorld implements World {
 		players.add(eater, eatersMap, playerConfig.pos, human);
 		
 		if (playerConfig.productions != null) {
-			Agent agent = cogArch.createSoarAgent(playerConfig.name, playerConfig.productions);
-			SoarEater soarEater = new SoarEater(eater, agent, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile());
-			eater.setCommander(soarEater);
+			EaterCommander eaterCommander = cogArch.createEaterCommander(eater, playerConfig.productions, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile());
+			eater.setCommander(eaterCommander);
 		}
 
 		int [] location = players.getStartingLocation(eater, eatersMap, true);

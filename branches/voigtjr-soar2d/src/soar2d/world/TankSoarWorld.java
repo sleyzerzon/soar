@@ -8,7 +8,6 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
-import sml.Agent;
 import soar2d.CognitiveArchitecture;
 import soar2d.Direction;
 import soar2d.Names;
@@ -20,8 +19,8 @@ import soar2d.map.GridMap;
 import soar2d.map.TankSoarMap;
 import soar2d.players.CommandInfo;
 import soar2d.players.Player;
-import soar2d.players.SoarTank;
 import soar2d.players.Tank;
+import soar2d.players.TankCommander;
 import soar2d.players.TankState;
 
 public class TankSoarWorld implements World {
@@ -802,9 +801,8 @@ public class TankSoarWorld implements World {
 		players.add(tank, tankSoarMap, playerConfig.pos, human);
 		
 		if (playerConfig.productions != null) {
-			Agent agent = cogArch.createSoarAgent(playerConfig.name, playerConfig.productions);
-			SoarTank soarTank = new SoarTank(tank, agent, playerConfig.shutdown_commands, tankSoarMap.getMetadataFile());
-			tank.setCommander(soarTank);
+			TankCommander tankCommander = cogArch.createTankCommander(tank, playerConfig.productions, playerConfig.shutdown_commands, tankSoarMap.getMetadataFile());
+			tank.setCommander(tankCommander);
 		}
 	
 		int [] location = players.getStartingLocation(tank, tankSoarMap, true);

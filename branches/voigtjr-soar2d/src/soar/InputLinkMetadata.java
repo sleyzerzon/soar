@@ -1,4 +1,4 @@
-package soar2d.players;
+package soar;
 
 import java.io.File;
 import java.io.IOException;

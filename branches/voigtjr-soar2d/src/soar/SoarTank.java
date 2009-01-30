@@ -1,4 +1,4 @@
-package soar2d.players;
+package soar;
 
 import java.io.File;
 import java.util.HashMap;
@@ -19,6 +19,12 @@ import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.Soar2D;
 import soar2d.map.TankSoarMap;
+import soar2d.players.CommandInfo;
+import soar2d.players.Player;
+import soar2d.players.RadarCell;
+import soar2d.players.Tank;
+import soar2d.players.TankCommander;
+import soar2d.players.TankState;
 
 public class SoarTank implements Agent.RunEventInterface, TankCommander {
 	private static Logger logger = Logger.getLogger(SoarTank.class);
