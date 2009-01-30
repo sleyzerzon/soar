@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import soar2d.Direction;
 import soar2d.Names;
-import soar2d.Simulation;
 import soar2d.Soar2D;
 
 /**

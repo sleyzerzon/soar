@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -32,6 +31,16 @@ public class ConfigFile extends ConfigSource {
 		return new Config(this);
 	}
 
+	@Override
+	public ConfigSource copy() {
+		ConfigFile newConfigFile = new ConfigFile();
+		newConfigFile.path = new String(this.path);
+		newConfigFile.keys = new HashMap<String, String[]>(this.keys);
+		
+		return newConfigFile;
+	}
+
+	@Override
 	public String[] getKeys(String root) {
 		if (!root.equals(""))
 			root += ".";
@@ -46,10 +55,32 @@ public class ConfigFile extends ConfigSource {
 		return subkeys.toArray(new String[0]);
 	}
 
+	@Override
 	public boolean hasKey(String key) {
-		return keys.get(key) != null;
+		return keys.containsKey(key);
 	}
 
+	@Override
+	public void removeKey(String key) {
+		keys.remove(key);
+	}
+	
+	@Override
+	public String[] keyList(String prefix) {
+		ArrayList<String> keyList = new ArrayList<String>();
+		for (String key : keys.keySet()) {
+			if (key.length() <= prefix.length()) {
+				continue;
+			}
+			if (key.startsWith(prefix)) {
+				String strippedKey = key.substring(prefix.length());
+				keyList.add(strippedKey);
+			}
+		}
+		return keyList.toArray(new String[keyList.size()]);
+	}
+	
+	@Override
 	public int[] getInts(String key) {
 		String vs[] = keys.get(key);
 		if (vs == null)
@@ -63,6 +94,7 @@ public class ConfigFile extends ConfigSource {
 		return v;
 	}
 
+	@Override
 	public void setInts(String key, int v[]) {
 		String s[] = new String[v.length];
 		for (int i = 0; i < v.length; i++)
@@ -70,6 +102,7 @@ public class ConfigFile extends ConfigSource {
 		keys.put(key, s);
 	}
 
+	@Override
 	public boolean[] getBooleans(String key) {
 		String vs[] = keys.get(key);
 		if (vs == null)
@@ -83,6 +116,7 @@ public class ConfigFile extends ConfigSource {
 		return v;
 	}
 
+	@Override
 	public void setBooleans(String key, boolean v[]) {
 		String s[] = new String[v.length];
 		for (int i = 0; i < v.length; i++)
@@ -90,6 +124,7 @@ public class ConfigFile extends ConfigSource {
 		keys.put(key, s);
 	}
 
+	@Override
 	public String[] getStrings(String key) {
 		String vs[] = keys.get(key);
 		if (vs == null)
@@ -98,10 +133,12 @@ public class ConfigFile extends ConfigSource {
 		return vs;
 	}
 
+	@Override
 	public void setStrings(String key, String v[]) {
 		keys.put(key, v);
 	}
 
+	@Override
 	public double[] getDoubles(String key) {
 		String vs[] = keys.get(key);
 		if (vs == null)
@@ -115,6 +152,7 @@ public class ConfigFile extends ConfigSource {
 		return v;
 	}
 
+	@Override
 	public void setDoubles(String key, double v[]) {
 		String s[] = new String[v.length];
 		for (int i = 0; i < v.length; i++)
@@ -122,6 +160,7 @@ public class ConfigFile extends ConfigSource {
 		keys.put(key, s);
 	}
 
+	@Override
 	public byte[] getBytes(String key) {
 		String lines[] = getStrings(key);
 		if (lines == null)
@@ -130,6 +169,7 @@ public class ConfigFile extends ConfigSource {
 		return Base64.decode(lines);
 	}
 
+	@Override
 	public void setBytes(String key, byte v[]) {
 		keys.put(key, Base64.encode(v));
 	}
@@ -174,32 +214,42 @@ public class ConfigFile extends ConfigSource {
 			}
 
 			// This is a key/value declaration.
+			String[] valuesArray = null;
 			String tok = t.next();
-			if (!tok.equals("=")) {
-				parseError(t, "Expected = got " + tok);
+			if (tok.equals("=")) {
+				ArrayList<String> values = new ArrayList<String>();
+
+				if (t.consume("[")) {
+					// read a list of values
+					while (true) {
+						tok = t.next();
+						if (tok.equals("]"))
+							break;
+						values.add(tok);
+						tok = t.peek();
+						if (tok.equals(","))
+							t.next();
+					}
+				} else {
+					// read a single value
+					values.add(t.next());
+				}
+
+				if (!t.consume(";")) {
+					parseError(t, "Expected ; got " + tok);
+					return;
+				} 
+				
+				valuesArray = values.toArray(new String[values.size()]);
+
+			} else if (tok.equals(";")) {
+				// use null valuesArray
+				valuesArray = null; // redundant, but more clear
+				
+			} else {
+				parseError(t, "Expected = or ; got " + tok);
 				return;
 			}
-
-			ArrayList<String> values = new ArrayList<String>();
-
-			if (t.consume("[")) {
-				// read a list of values
-				while (true) {
-					tok = t.next();
-					if (tok.equals("]"))
-						break;
-					values.add(tok);
-					tok = t.peek();
-					if (tok.equals(","))
-						t.next();
-				}
-			} else {
-				// read a single value
-				values.add(t.next());
-			}
-
-			if (!t.consume(";"))
-				parseError(t, "Expected ; got " + tok);
 
 			String key = keyroot + keypart;
 
@@ -207,7 +257,7 @@ public class ConfigFile extends ConfigSource {
 				parseError(t, "Duplicate key definition for: " + key);
 			}
 
-			keys.put(key, values.toArray(new String[0]));
+			keys.put(key, valuesArray);
 
 			/*
 			 * System.out.println(keyroot+keypart+" = "); for (String s :
@@ -345,6 +395,7 @@ public class ConfigFile extends ConfigSource {
 		}
 	}
 	
+	@Override
 	public void save(String path) throws FileNotFoundException {
 		PrintStream p = null;
 		if (path != null) {
@@ -375,4 +426,5 @@ public class ConfigFile extends ConfigSource {
 	 
 		p.close();
 	}
+
 }

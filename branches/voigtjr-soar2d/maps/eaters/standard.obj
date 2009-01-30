@@ -1,40 +1,25 @@
 objects {
 	b {
 		name = bonusfood;
-		properties = [edible, color, shape, points, id];
-		properties {
-			edible = true;
-			color = red;
-			shape = square;
-			points = 10;
-			id = bonusfood;
-		}
-		apply {
-			points = true;
-			remove = true;
-		}
+		edible = true;
+		color = red;
+		shape = square;
+		id = bonusfood;
+		apply.points = 10;
+		apply.remove;
 	}
 	n {
 		name = normalfood;
-		properties = [edible, color, shape, points, id];
-		properties {
-			edible = true;
-			color = blue;
-			shape = round;
-			points = 10;
-			id = normalfood;
-		}
-		apply {
-			points = true;
-			remove = true;
-		}
+		edible = true;
+		color = blue;
+		shape = round;
+		id = normalfood;
+		apply.points = 5;
+		apply.remove;
 	}
 	w {
 		name = wall;
-		properties = [block, id];
-		properties {
-			block = true;
-			id = wall;
-		}
+		block = true;
+		id = wall;
 	}
 }

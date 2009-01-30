@@ -2,17 +2,11 @@ package soar2d.config;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map.Entry;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,6 +60,7 @@ public class ConfigTest {
 		largeTestData.add(new ConfigTestPair("key6.subkey6.2", "[value6.2]"));
 		largeTestData.add(new ConfigTestPair("dashes-ok", "[yes]"));
 		largeTestData.add(new ConfigTestPair("null-array", "[]"));
+		largeTestData.add(new ConfigTestPair("null-value", null));
 		//largeTestData.add(new ConfigTestPair("null-array-values", "[,,,]"));
 		//largeTestData.add(new ConfigTestPair("nested_not_square", "[]"));
 	}
@@ -76,7 +71,11 @@ public class ConfigTest {
 
 		for (ConfigTestPair pair : largeTestData) {
 			System.out.println(pair.key + ": " + Arrays.toString(cf.getStrings(pair.key)));
-			assertEquals(pair.value, Arrays.toString(cf.getStrings(pair.key)));
+			if (pair.value != null) {
+				assertEquals(pair.value, Arrays.toString(cf.getStrings(pair.key)));
+			} else {
+				assertTrue(cf.hasKey(pair.key));
+			}
 		}
 	}
 	
@@ -89,26 +88,31 @@ public class ConfigTest {
 		assertEquals("indeed", parent.getString("child"));
 	}
 	
-//	public static void main(String args[]) {
-//		if (args.length > 0) {
-//			try {
-//				ConfigFile cf = new ConfigFile(args[0]);
-//				
-//				
-//			} catch (IOException ex) {
-//				System.out.println("ex: " + ex);
-//			}
-//		} else {
-//			// test saving by printing to console
-//			ConfigFile cf = new ConfigFile();
-//			cf.setStrings("testing.one", new String [] { "one" });
-//			cf.setStrings("testing.two", new String [] { "one", "two" });
-//			cf.setStrings("three", new String [] { "one", "two", "three" });
-//			try {
-//				cf.save(null);
-//			} catch (FileNotFoundException e) {
-//				System.out.println("ex: " + e);
-//			}
-//		}
-//	}
+	@Test
+	public void testPropertyRemoval() throws Exception {
+		Config cf = new Config(new ConfigFile(largeTest));
+
+		assertTrue(cf.hasKey("hello"));
+		cf.removeKey("hello");
+		assertFalse(cf.hasKey("hello"));
+	}
+
+	@Test
+	public void testKeyList() throws Exception {
+		Config cf = new Config(new ConfigFile(largeTest));
+
+		String[] keys = cf.keyList();
+		Arrays.sort(keys);
+
+		for (ConfigTestPair pair : largeTestData) {
+			assertTrue(Arrays.binarySearch(keys, pair.key) >= 0);
+		}
+		
+		Config grandparent = cf.getChild("grandparent");
+		Config parent = grandparent.getChild("parent");
+
+		for (String key : parent.keyList()) {
+			assertTrue(key.equals("child"));
+		}
+	}
 }

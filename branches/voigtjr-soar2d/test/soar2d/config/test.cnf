@@ -79,6 +79,7 @@ key6 { subkey6.1 = value6.1; subkey6.2 = value6.2; }
 dashes-ok = yes;
 
 null-array = [];
+null-value;
 
 #doesn't work
 #null-array-values = [,,,,];
@@ -87,6 +88,9 @@ null-array = [];
 grandparent {
 	parent {
 		child = indeed;
+	}
+	sibling {
+		fnord = seen;
 	}
 }
 		

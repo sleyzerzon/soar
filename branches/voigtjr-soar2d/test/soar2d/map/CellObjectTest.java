@@ -27,4 +27,6 @@ public class CellObjectTest {
 		CellObject c = null;
 		new CellObject(c);
 	}
+	
+	// TODO: double check applyProperties works for multiple properties because it deletes during the walk!
 }

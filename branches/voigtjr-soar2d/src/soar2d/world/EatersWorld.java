@@ -17,7 +17,6 @@ import soar2d.config.PlayerConfig;
 import soar2d.map.CellObject;
 import soar2d.map.EatersMap;
 import soar2d.map.GridMap;
-import soar2d.map.CellObject.RewardApply;
 import soar2d.players.CommandInfo;
 import soar2d.players.Eater;
 import soar2d.players.Player;
@@ -204,20 +203,35 @@ public class EatersWorld implements World {
 	}
 	
 	private boolean apply(CellObject object, Eater eater) {
-		object.propertiesApply();
-		{
-			int points = object.pointsApply();
-			if (points != 0) {
-				eater.adjustPoints(points, object.getName());
+		object.applyProperties();
+		
+		if (object.hasProperty("apply.points")) {
+			int points = object.getIntProperty("apply.points", 0);
+			eater.adjustPoints(points, object.getName());
+		}
+		if (object.hasProperty("apply.reward")) {
+			// am I the positive box
+			if (object.hasProperty("apply.reward.correct")) {
+				// if the open code is not zero, get an open code
+				int suppliedOpenCode = object.getIntProperty("open-code", 0);
+
+				// see if we opened the box correctly (will both be 0 if no open code)
+				if (suppliedOpenCode == object.getIntProperty("apply.reward.code", 0)) {
+					// reward positively
+					eater.adjustPoints(object.getIntProperty("apply.reward.positive", 0), "positive reward");
+				} else {
+					eater.adjustPoints(object.getIntProperty("apply.reward.negative", 0), "small reward (wrong open code)");
+				}
+			} else {
+				// I'm  not the positive box, set resetApply false
+				object.removeProperty("apply.reset");
+				
+				// reward negatively
+				eater.adjustPoints(-1 * object.getIntProperty("apply.reward.positive", 0), "negative reward (wrong box)");
 			}
 		}
-		{
-			RewardApply reward = object.rewardApply();
-			if (reward != null && reward.points != 0) {
-				eater.adjustPoints(reward.points, reward.message);
-			}
-		}
-		return object.removeApply();
+		
+		return object.hasProperty("apply.remove");
 	}
 	
 	private void open(Eater eater, int [] location, int openCode) {
@@ -236,7 +250,7 @@ public class EatersWorld implements World {
 			}
 		}
 		if (openCode != 0) {
-			box.addProperty(Names.kPropertyOpenCode, Integer.toString(openCode));
+			box.setIntProperty("open-code", openCode);
 		}
 		if (apply(box, eater)) {
 			eatersMap.getCell(location).removeObject(box.getName());
@@ -245,8 +259,8 @@ public class EatersWorld implements World {
 	}
 
 	private void checkResetApply(CellObject box) {
-		if (box.getResetApply()) {
-			stopMessages.add("Max resets achieved.");
+		if (box.hasProperty("apply.reset")) {
+			stopMessages.add(box.getName() + " called for reset.");
 		}
 	}
 	
@@ -383,8 +397,7 @@ public class EatersWorld implements World {
 
 	private void setExplosion(int[] xy) {
 		CellObject explosion = eatersMap.createObjectByName(Names.kExplosion);
-		explosion.addProperty(Names.kPropertyLinger, "2");
-		explosion.setLingerUpdate(true);
+		explosion.setIntProperty("update.linger", 2);
 		eatersMap.getCell(xy).addObject(explosion);
 	}
 	

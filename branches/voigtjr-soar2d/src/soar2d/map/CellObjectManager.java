@@ -104,17 +104,17 @@ class CellObjectManager {
 	CellObject createObject(String name) {
 		if (templates.containsKey(name)) {
 			CellObject newObject = new CellObject(templates.get(name));
-			if (newObject.rewardApply > 0) {
+			if (newObject.hasProperty("apply.reward")) {
 				// assign identification number
-				newObject.addProperty(Names.kPropertyBoxID, Integer.toString(rewardObjects.size() + 1));
+				newObject.setProperty("box-id", Integer.toString(rewardObjects.size() + 1));
 
 				// keep track of reward objects
 				rewardObjects.add(newObject);
 				
-			} else if (newObject.rewardInfoApply) {
+			} else if (newObject.hasProperty("apply.reward-info")) {
 				// assign identification properties
-				newObject.addProperty(Names.kPropertyColor, Soar2D.simulation.kColors[0]);
-				newObject.addProperty(Names.kPropertyBoxID, "0");
+				newObject.setProperty(Names.kPropertyColor, Soar2D.simulation.kColors[0]);
+				newObject.setProperty("box-id", "0");
 			}
 			return newObject;
 		}

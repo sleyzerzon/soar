@@ -22,6 +22,10 @@ public class Config {
 	public void save(String path) throws FileNotFoundException {
 		source.save(path);
 	}
+	
+	public Config copy() {
+		return new Config(this.source.copy());
+	}
 
 	public Config getParent() {
 		return parent;
@@ -41,6 +45,10 @@ public class Config {
 
 	public boolean hasKey(String key) {
 		return source.hasKey(prefix + key);
+	}
+	
+	public void removeKey(String key) {
+		source.removeKey(key);
 	}
 
 	void missingRequired(String key) {
@@ -222,5 +230,9 @@ public class Config {
 
 	public void setBytes(String key, byte v[]) {
 		source.setBytes(prefix + key, v);
+	}
+
+	public String[] keyList() {
+		return source.keyList(this.prefix);
 	}
 }

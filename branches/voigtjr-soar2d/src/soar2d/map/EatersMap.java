@@ -44,8 +44,8 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		if (added.hasProperty(Names.kPropertyEdible)) {
 			foodCount += 1;
 		}
-		if (added.hasProperty(Names.kPropertyPoints)) {
-			scoreCount += added.getIntProperty(Names.kPropertyPoints);
+		if (added.hasProperty("apply.points")) {
+			scoreCount += added.getIntProperty("apply.points", 0);
 		}
 	}
 
@@ -60,7 +60,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 			foodCount -= 1;
 		}
 		if (removed.hasProperty(Names.kPropertyPoints)) {
-			scoreCount -= removed.getIntProperty(Names.kPropertyPoints);
+			scoreCount -= removed.getIntProperty("apply.points", 0);
 		}
 	}
 
@@ -69,15 +69,29 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		for (CellObject cellObject : copy) {
 			int [] location = data.updatablesLocations.get(cellObject);
 			
-			int previousScore = setPreviousScore(cellObject);
-
-			if (cellObject.update()) {
-				getCell(location).removeObject(cellObject.getName());
+			// linger
+			if (cellObject.hasProperty("update.linger")) {
+				int linger = cellObject.getIntProperty("update.linger", 0);
+				linger -= 1;
+				if (linger <= 0) {
+					getCell(location).removeObject(cellObject.getName());
+				} else {
+					cellObject.setIntProperty("update.linger", linger);
+				}
 			}
 
 			// decay
-			if (cellObject.hasProperty(Names.kPropertyPoints)) {
-				scoreCount += cellObject.getIntProperty(Names.kPropertyPoints) - previousScore;
+			if (cellObject.hasProperty("update.decay")) {
+				int points = cellObject.getIntProperty("apply.points", 0);
+				int decay = cellObject.getIntProperty("update.decay", 1);
+				if (decay >= points) {
+					scoreCount -= points;
+					getCell(location).removeObject(cellObject.getName());
+				} else {
+					scoreCount -= decay;
+					points -= decay;
+					cellObject.setIntProperty("apply.points", points);
+				}
 			}
 		}
 
@@ -115,13 +129,6 @@ public class EatersMap implements GridMap, CellObjectObserver {
 	HashSet<CellObject> unopenedBoxes = new HashSet<CellObject>();
 	public int getUnopenedBoxCount() {
 		return unopenedBoxes.size();
-	}
-	
-	private int setPreviousScore(CellObject cellObject) {
-		if (cellObject.hasProperty(Names.kPropertyPoints)) {
-			return cellObject.getIntProperty(Names.kPropertyPoints);
-		}
-		return 0;
 	}
 	
 	public CellObject createObjectByName(String name) {

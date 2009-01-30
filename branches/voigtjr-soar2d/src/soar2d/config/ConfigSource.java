@@ -29,4 +29,10 @@ public abstract class ConfigSource {
 	public abstract void setBytes(String key, byte v[]);
 	
 	public abstract void save(String path) throws FileNotFoundException;
+	
+	public abstract ConfigSource copy();
+
+	public abstract void removeKey(String key);
+	
+	public abstract String[] keyList(String prefix);
 }

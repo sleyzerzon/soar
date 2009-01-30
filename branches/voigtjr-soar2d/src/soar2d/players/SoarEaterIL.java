@@ -232,7 +232,12 @@ class SoarEaterIL {
 		private void updateBoxProperties(CellObject box, Cell cell) {
 			HashMap<String, StringElement> remaining = new HashMap<String, StringElement>(cell.boxProperties);
 			// For each box property
-			for (String property : box.getPropertyNames()) {
+			for (String property : box.getPropertyList()) {
+				// don't list special ones
+				if (property.startsWith("apply") || property.startsWith("update") || property.startsWith("name")) {
+					continue;
+				}
+				
 				// Do we have it?
 				if (cell.boxProperties.containsKey(property)) {
 					// Keep it and remove it from the remaining
@@ -265,9 +270,14 @@ class SoarEaterIL {
 					assert cell.box != null;
 					
 					// go through the properties and add them
-					for (Entry<String, String> entry : box.getPropertyEntries()) {
-						StringElement element = agent.CreateStringWME(cell.box, entry.getKey(), entry.getValue());
-						cell.boxProperties.put(entry.getKey(), element);
+					for (String property : box.getPropertyList()) {
+						// don't add special ones
+						if (property.startsWith("apply") || property.startsWith("update") || property.startsWith("name")) {
+							continue;
+						}
+
+						StringElement element = agent.CreateStringWME(cell.box, property, box.getProperty(property));
+						cell.boxProperties.put(property, element);
 					}
 				} else {
 					updateBoxProperties(box, cell);
