@@ -10,17 +10,20 @@ import soar2d.Names;
 
 public class EatersMap implements GridMap, CellObjectObserver {
 
-	String mapPath;
-	GridMapData data;
-	int foodCount;
-	int scoreCount;
-	Set<CellObject> unopenedBoxes;
-	boolean unopenedBoxesTerminal;
-	double lowProbability;
-	double highProbability;
+	private String mapPath;
+	private GridMapData data;
+	private int foodCount;
+	private int scoreCount;
+	private Set<CellObject> unopenedBoxes;
+	private boolean unopenedBoxesTerminal;
+	private double lowProbability;
+	private double highProbability;
 
 	public EatersMap(String mapPath, boolean unopenedBoxesTerminal, double lowProbability, double highProbability) throws Exception {
 		this.mapPath = new String(mapPath);
+		this.lowProbability = lowProbability;
+		this.highProbability = highProbability;
+		
 		reset();
 	}
 
@@ -28,7 +31,7 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		foodCount = 0;
 		scoreCount = 0;
 		unopenedBoxes = new HashSet<CellObject>();
-		data = GridMapUtil.loadFromConfigFile(mapPath, this);
+		data = GridMapUtil.loadFromConfigFile(mapPath, this, lowProbability, highProbability);
 	}
 	
 	public int size() {

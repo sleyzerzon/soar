@@ -24,4 +24,15 @@ public class EatersMapTest {
 	public void testLoadDefault() throws Exception {
 		new EatersMap("maps/eaters/random-walls.map", false, .35, .85);
 	}
+	
+	@Test
+	public void testBasicMap() throws Exception {
+		EatersMap eatersMap = new EatersMap("maps/eaters/tiny.map", false, .35, .85);
+		assertEquals(eatersMap.size(), 4);
+
+		int[] xy = new int[2];
+		for (xy[0] = 0; xy[0] < eatersMap.size(); xy[0]++)
+			for (xy[1] = 0; xy[1] < eatersMap.size(); xy[1]++)
+					assertNotNull(eatersMap.getCell(xy));
+	}
 }
