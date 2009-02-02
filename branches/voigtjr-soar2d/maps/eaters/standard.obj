@@ -17,9 +17,67 @@ objects {
 		apply.points = 5;
 		apply.remove;
 	}
+	db {
+		name = bonusfood;
+		edible = true;
+		color = red;
+		shape = square;
+		id = bonusfood;
+		apply.points = 10;
+		apply.remove;
+		update.decay = 1;
+	}
+	dn {
+		name = normalfood;
+		edible = true;
+		color = blue;
+		shape = round;
+		id = normalfood;
+		apply.points = 5;
+		apply.remove;
+		update.decay = 1;
+	}
+	nn {
+		name = normalfood;
+		edible = true;
+		color = blue;
+		shape = round;
+		id = normalfood;
+		apply.points = -1;
+		apply.remove;
+	}
 	w {
 		name = wall;
 		block = true;
 		id = wall;
+	}
+	1 {
+		name = box1;
+		color = green;
+		shape = square;
+		box = true;
+		id = box;
+		apply.points = 20;
+		apply.properties {
+			status = open;
+		}
+	}
+	2 {
+		name = box2
+		color = orange;
+		shape = square;
+		box = true;
+		id = box;
+		apply.points = 10;
+		apply.properties {
+			status = open;
+		}
+	}
+	p {
+		name = permafood;
+		color = purple;
+		shape = round;
+		move-apply = true;
+		apply.points = 1;
 	}
 }

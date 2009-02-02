@@ -1,32 +1,34 @@
 <map>
-  <cell-object name="bonusfood">
-    <property name="edible" value="true" />
-    <property name="color" value="red" />
+  <cell-object name="infobox">
     <property name="shape" value="square" />
-    <property name="points" value="10" />
-    <property name="id" value="bonusfood" />
+    <property name="box" value="true" />
+    <property name="id" value="info-box" />
     <apply>
-      <points />
-      <remove />
+      <property name="status" value="open" />
+      <reward-info>
+        <use-open-code />
+      </reward-info>
     </apply>
   </cell-object>
-  <cell-object name="normalfood">
-    <property name="edible" value="true" />
-    <property name="color" value="blue" />
-    <property name="shape" value="round" />
-    <property name="points" value="5" />
-    <property name="id" value="normalfood" />
+  <cell-object name="rewardbox">
+    <property name="shape" value="square" />
+    <property name="box" value="true" />
+    <property name="id" value="box" />
     <apply>
-      <points />
-      <remove />
+      <property name="status" value="open" />
+      <reward quantity="10" />
+      <reset />
     </apply>
   </cell-object>
   <cell-object name="wall">
     <property name="block" value="true" />
     <property name="id" value="wall" />
   </cell-object>
-  <cells world-size="6" random-walls="false" random-food="false">
+  <cells world-size="7" random-walls="false" random-food="false">
     <row>
+      <cell>
+        <object>wall</object>
+      </cell>
       <cell>
         <object>wall</object>
       </cell>
@@ -50,17 +52,40 @@
       <cell>
         <object>wall</object>
       </cell>
+      <cell />
+      <cell />
+      <cell />
+      <cell />
+      <cell />
+      <cell>
+        <object>wall</object>
+      </cell>
+    </row>
+    <row>
       <cell>
         <object>wall</object>
       </cell>
       <cell>
-        <object>wall</object>
+        <object>rewardbox</object>
       </cell>
+      <cell />
+      <cell />
+      <cell />
+      <cell />
       <cell>
         <object>wall</object>
       </cell>
+    </row>
+    <row>
       <cell>
-        <object>normalfood</object>
+        <object>wall</object>
+      </cell>
+      <cell />
+      <cell />
+      <cell />
+      <cell />
+      <cell>
+        <object>infobox</object>
       </cell>
       <cell>
         <object>wall</object>
@@ -71,17 +96,12 @@
         <object>wall</object>
       </cell>
       <cell>
-        <object>wall</object>
+        <object>rewardbox</object>
       </cell>
-      <cell>
-        <object>normalfood</object>
-      </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>bonusfood</object>
-      </cell>
+      <cell />
+      <cell />
+      <cell />
+      <cell />
       <cell>
         <object>wall</object>
       </cell>
@@ -90,18 +110,11 @@
       <cell>
         <object>wall</object>
       </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>normalfood</object>
-      </cell>
+      <cell />
+      <cell />
+      <cell />
+      <cell />
+      <cell />
       <cell>
         <object>wall</object>
       </cell>
@@ -110,23 +123,6 @@
       <cell>
         <object>wall</object>
       </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-      <cell>
-        <object>wall</object>
-      </cell>
-    </row>
-    <row>
       <cell>
         <object>wall</object>
       </cell>
