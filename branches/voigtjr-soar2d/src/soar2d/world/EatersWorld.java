@@ -22,6 +22,7 @@ import soar2d.players.CommandInfo;
 import soar2d.players.Eater;
 import soar2d.players.EaterCommander;
 import soar2d.players.Player;
+import soar2d.players.scripted.ScriptedEater;
 
 public class EatersWorld implements World {
 	private static Logger logger = Logger.getLogger(EatersWorld.class);
@@ -429,14 +430,15 @@ public class EatersWorld implements World {
 
 	public void addPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
 		
-		boolean human = playerConfig.productions == null;
 		Eater eater = new Eater(playerId);
 
-		players.add(eater, eatersMap, playerConfig.pos, human);
+		players.add(eater, eatersMap, playerConfig.pos);
 		
 		if (playerConfig.productions != null) {
 			EaterCommander eaterCommander = cogArch.createEaterCommander(eater, playerConfig.productions, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile());
 			eater.setCommander(eaterCommander);
+		} else if (playerConfig.script != null) {
+			eater.setCommander(new ScriptedEater(CommandInfo.loadScript(playerConfig.script)));
 		}
 
 		int [] location = players.getStartingLocation(eater, eatersMap, true);

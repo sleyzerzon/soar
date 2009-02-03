@@ -45,6 +45,10 @@ public class AgentDisplay extends Composite {
 			clonePlayerConfig.productions = new String(existingPlayerConfig.productions);
 		}
 		
+		if (existingPlayerConfig.script != null) {
+			clonePlayerConfig.script = new String(existingPlayerConfig.script);
+		}
+		
 		Soar2D.config.playerConfigs().put(clonePlayerId, clonePlayerConfig);
 		try {
 			Soar2D.simulation.createPlayer(clonePlayerId, clonePlayerConfig);

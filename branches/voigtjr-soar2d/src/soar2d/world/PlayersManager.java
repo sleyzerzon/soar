@@ -17,7 +17,6 @@ public class PlayersManager<P extends Player> {
 	private static Logger logger = Logger.getLogger(PlayersManager.class);
 
 	private List<P> players = new ArrayList<P>(7);
-	private List<P> humanPlayers = new ArrayList<P>(7);
 	private Map<String, P> playersMap = new HashMap<String, P>(7);
 	private Map<P, int []> initialLocations = new HashMap<P, int []>(7);
 	private Map<P, int []> locations = new HashMap<P, int []>(7);
@@ -34,10 +33,6 @@ public class PlayersManager<P extends Player> {
 	
 	Player[] getAllAsPlayers() {
 		return players.toArray(new Player[0]);
-	}
-	
-	boolean isHuman(P player) {
-		return humanPlayers.contains(player);
 	}
 	
 	ListIterator<P> listIterator() {
@@ -92,7 +87,6 @@ public class PlayersManager<P extends Player> {
 	void remove(P player) {
 		logger.info("Removing player " + player);
 		players.remove(player);
-		humanPlayers.remove(player);
 		playersMap.remove(player.getName());
 		initialLocations.remove(player);
 		locations.remove(player);
@@ -100,7 +94,7 @@ public class PlayersManager<P extends Player> {
 		lastCommands.remove(player);
 	}
 	
-	void add(P player, GridMap map, int [] initialLocation, boolean human) throws Exception {
+	void add(P player, GridMap map, int [] initialLocation) throws Exception {
 		logger.info("Adding player " + player);
 
 		if(playersMap.containsKey(player.getName())) {
@@ -112,10 +106,6 @@ public class PlayersManager<P extends Player> {
 		
 		if (initialLocation != null) {
 			initialLocations.put(player, Arrays.copyOf(initialLocation, initialLocation.length));
-		}
-		
-		if (human) {
-			humanPlayers.add(player);
 		}
 	}
 	

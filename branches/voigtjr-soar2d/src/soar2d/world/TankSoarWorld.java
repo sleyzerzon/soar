@@ -796,12 +796,11 @@ public class TankSoarWorld implements World {
 	}
 	
 	public void addPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
-		boolean human = playerConfig.productions == null;
 		Tank tank = new Tank(playerId, Soar2D.config.tanksoarConfig().radar_width, Soar2D.config.tanksoarConfig().radar_height, 
 				playerConfig.missiles, playerConfig.energy, playerConfig.health,
 				Soar2D.config.tanksoarConfig().default_missiles, Soar2D.config.tanksoarConfig().default_energy, Soar2D.config.tanksoarConfig().default_health);
 	
-		players.add(tank, tankSoarMap, playerConfig.pos, human);
+		players.add(tank, tankSoarMap, playerConfig.pos);
 		
 		if (playerConfig.productions != null) {
 			TankCommander tankCommander = cogArch.createTankCommander(tank, playerConfig.productions, playerConfig.shutdown_commands, tankSoarMap.getMetadataFile());

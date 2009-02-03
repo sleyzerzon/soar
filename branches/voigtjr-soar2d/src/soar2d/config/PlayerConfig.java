@@ -3,6 +3,7 @@ package soar2d.config;
 public class PlayerConfig {
 	public String name = null;
 	public String productions = null;
+	public String script = null;
 	public String color = null;
 	public int [] pos = null;
 	public String facing = null;

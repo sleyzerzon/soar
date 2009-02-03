@@ -238,7 +238,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		// get the agent (human agents return null here)
 		AgentData agentData = agents.remove(name);
 		if (agentData == null) {
-			logger.warn("Didn't find player to destroy: " + name);
+			return;
 		}
 		// there was an agent, destroy it
 		kernel.DestroyAgent(agentData.agent);
