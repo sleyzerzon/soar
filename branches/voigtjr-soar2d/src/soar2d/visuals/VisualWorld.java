@@ -23,6 +23,7 @@ import soar2d.map.GridMap;
 import soar2d.players.Player;
 import soar2d.players.RadarCell;
 
+// TODO: apply-image
 public abstract class VisualWorld extends Canvas implements PaintListener {
 	
 	public static Map<Player, Color> playerColors = new HashMap<Player, Color>();

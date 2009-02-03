@@ -18,6 +18,9 @@ public class ScriptedEater implements EaterCommander {
 	}
 
 	public CommandInfo nextCommand() throws Exception {
+		if (index >= commands.size()) {
+			return new CommandInfo();
+		}
 		return commands.get(index++);
 	}
 

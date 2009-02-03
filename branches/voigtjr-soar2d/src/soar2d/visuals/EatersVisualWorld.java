@@ -3,6 +3,7 @@ package soar2d.visuals;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -14,6 +15,8 @@ import soar2d.map.CellObject;
 import soar2d.players.Player;
 
 public class EatersVisualWorld extends VisualWorld {
+	private static Logger logger = Logger.getLogger(EatersVisualWorld.class);
+
 	public EatersVisualWorld(Composite parent, int style, int cellSize) {
 		super(parent, style, cellSize);
 	}
@@ -176,6 +179,8 @@ public class EatersVisualWorld extends VisualWorld {
 				}
 			}
 		}
+		
+		painted = true;
 	}
 	
 	int mouthCount = 0;

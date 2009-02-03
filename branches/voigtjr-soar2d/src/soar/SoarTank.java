@@ -45,7 +45,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		this.commonMetadataFile = commonMetadataFile;
 		this.mapMetadataFile = mapMetadataFile;
 		this.shutdownCommands = shutdown_commands;
-
+		// TODO: need blink if no change set to true
 		TankState state = tank.getState();
 		radarCellIDs = new Identifier[state.getRadarWidth()][state.getRadarHeight()];
 		radarColors = new StringElement[state.getRadarWidth()][state.getRadarHeight()];

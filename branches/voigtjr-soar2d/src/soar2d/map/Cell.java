@@ -171,7 +171,6 @@ public class Cell {
 		if (name == null) {
 			throw new NullPointerException();
 		}
-		draw = true;
 		Iterator<CellObject> iter = cellObjects.iterator();
 		while(iter.hasNext()) {
 			CellObject object = iter.next();
@@ -181,6 +180,7 @@ public class Cell {
 					observer.removalStateUpdate(location, object);
 				}
 				// no more iteration, removal state could change cellObjects!
+				draw = true;
 				return object;
 			}
 		}
@@ -218,7 +218,6 @@ public class Cell {
 	}
 	
 	public List<CellObject> removeAllByProperty(String name) {
-		draw = true;
 		List<CellObject> ret = null;
 		Iterator<CellObject> iter = cellObjects.iterator();
 		while(iter.hasNext()) {
@@ -240,6 +239,7 @@ public class Cell {
 				observer.removalStateUpdate(location, cellObject);
 			}
 		}
+		draw = true;
 		return ret;
 	}	
 }
