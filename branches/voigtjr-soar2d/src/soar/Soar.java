@@ -53,8 +53,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	private Map<String, ClientConfig> clients;
 	private int maxMemoryUsage;
 	private boolean soarPrint;
-	private boolean spawnDebuggers;
 	private int port;
+	private boolean debug;
 	
 	public Soar(SoarConfig config, Map<String, ClientConfig> clients, Game game, String basePath) throws Exception {
 		this.basePath = basePath;
@@ -66,8 +66,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		this.clients = clients;
 		this.maxMemoryUsage = config.max_memory_usage;
 		this.soarPrint = config.soar_print;
-		this.spawnDebuggers = config.spawn_debuggers;
 		this.port = config.port;
+		this.debug = config.spawn_debuggers;
 		
 		if (config.remote != null) {
 			kernel = Kernel.CreateRemoteConnection(true, config.remote, config.port);
@@ -98,6 +98,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
 		}
 		
+	}
+	
+	public boolean debug() {
+		return debug;
 	}
 	
 	public void seed(int seed) {
@@ -294,7 +298,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		
 	} // Logger
 	
-	private Agent createSoarAgent(String name, String productions) throws Exception {
+	private Agent createSoarAgent(String name, String productions, boolean debug) throws Exception {
 		Agent agent = kernel.CreateAgent(name);
 		if (agent == null) {
 			throw new Exception("Agent " + name + " creation failed: " + kernel.GetLastErrorDescription());
@@ -321,7 +325,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		agents.put(name, new AgentData(agent, productionsFile));
 		
 		// spawn the debugger if we're supposed to
-		if (spawnDebuggers && !isClientConnected(Names.kDebuggerClient)) {
+		if (debug && !isClientConnected(Names.kDebuggerClient)) {
 			ClientConfig debuggerConfig = clients.get(Names.kDebuggerClient);
 			debuggerConfig.command = getDebuggerCommand(name);
 
@@ -386,15 +390,15 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 
 	public EaterCommander createEaterCommander(Eater eater, String productions,
-			int vision, String[] shutdownCommands, File mapMetadataFile)
+			int vision, String[] shutdownCommands, File mapMetadataFile, boolean debug)
 			throws Exception {
-		Agent agent = createSoarAgent(eater.getName(), productions);
+		Agent agent = createSoarAgent(eater.getName(), productions, debug);
 		return new SoarEater(eater, agent, vision, shutdownCommands, commonMetadataFile, mapMetadataFile);
 	}
 
 	public TankCommander createTankCommander(Tank tank, String productions,
-			String[] shutdownCommands, File mapMetadataFile) throws Exception {
-		Agent agent = createSoarAgent(tank.getName(), productions);
+			String[] shutdownCommands, File mapMetadataFile, boolean debug) throws Exception {
+		Agent agent = createSoarAgent(tank.getName(), productions, debug);
 		return new SoarTank(tank, agent, shutdownCommands, commonMetadataFile, mapMetadataFile);
 	}
 

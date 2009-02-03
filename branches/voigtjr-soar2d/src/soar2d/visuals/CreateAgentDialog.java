@@ -192,11 +192,6 @@ public class CreateAgentDialog extends Dialog {
 			m_SpawnDebuggerButton.setLayoutData(gd);
 		}
 		m_SpawnDebuggerButton.setText("Spawn debugger");
-		m_SpawnDebuggerButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Soar2D.config.soarConfig().spawn_debuggers = m_SpawnDebuggerButton.getSelection();
-			}
-		});		
 		m_SpawnDebuggerButton.setSelection(Soar2D.config.soarConfig().spawn_debuggers);
 
 		Composite okCancel = new Composite(dialog, SWT.NONE);
@@ -227,7 +222,7 @@ public class CreateAgentDialog extends Dialog {
 				
 				Soar2D.config.playerConfigs().put(playerId, playerConfig);
 				try {
-					Soar2D.simulation.createPlayer(playerId, playerConfig);
+					Soar2D.simulation.createPlayer(playerId, playerConfig, m_SpawnDebuggerButton.getSelection());
 				} catch (Exception ex) {
 					Soar2D.wm.errorMessage("Creation failed", ex.getMessage());
 				}

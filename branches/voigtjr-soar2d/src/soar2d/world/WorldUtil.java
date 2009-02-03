@@ -1,14 +1,16 @@
 package soar2d.world;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import soar2d.Soar2D;
+import soar2d.map.GridMap;
 import soar2d.players.CommandInfo;
 import soar2d.players.Player;
 
-class WorldUtil {
+public class WorldUtil {
 	private static Logger logger = Logger.getLogger(WorldUtil.class);
 
 	static void dumpStats(int[] sortedScores, Player[] players, boolean stopping, List<String> messages) {
@@ -78,4 +80,24 @@ class WorldUtil {
 			throw new Exception("Update called with no players.");
 		}
 	}
+	
+	public static int [] getStartingLocation(Player player, GridMap map, int[] initialLocation) throws Exception {
+		int[] location = null;
+		if (initialLocation != null) {
+			location = Arrays.copyOf(initialLocation, initialLocation.length);
+			if (!map.isAvailable(location)) {
+				logger.warn(player.getName() + ": Initial location (" + location[0] + "," + location[1] + ") is blocked, going random.");
+				location = null;
+			}
+		}
+		
+		if (location == null) {
+			location = map.getAvailableLocationAmortized();
+			if (location == null) {
+				throw new Exception("There are no suitable starting locations for " + player.getName() + ".");
+			}
+		}
+		return location;
+	}
+
 }

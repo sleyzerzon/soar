@@ -125,27 +125,6 @@ public class PlayersManager<P extends Player> {
 		return players.size();
 	}
 	
-	int [] getStartingLocation(P player, GridMap map, boolean useInitialLocation) throws Exception {
-		int[] location = null;
-		if (useInitialLocation && hasInitialLocation(player)) {
-			location = getInitialLocation(player);
-			if (!map.isAvailable(location)) {
-				logger.warn(player.getName() + ": Initial location (" + location[0] + "," + location[1] + ") is blocked, going random.");
-				location = null;
-			}
-		}
-		
-		if (location == null) {
-			location = map.getAvailableLocationAmortized();
-			if (location == null) {
-				throw new Exception("There are no suitable starting locations for " + player.getName() + ".");
-			}
-		}
-		
-		setLocation(player, location);
-		return location;
-	}
-
 	int[] getSortedScores() {
 		int[] scores = new int[players.size()];
 		

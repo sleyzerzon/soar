@@ -70,7 +70,8 @@ public class EatersWorld implements World {
 		
 		for (Eater eater : players.getAll()) {
 			// find a suitable starting location
-			int [] startingLocation = players.getStartingLocation(eater, eatersMap, true);
+			int [] startingLocation = WorldUtil.getStartingLocation(eater, eatersMap, players.getInitialLocation(eater));
+			players.setLocation(eater, startingLocation);
 
 			// remove food from it
 			eatersMap.getCell(startingLocation).removeAllByProperty(Names.kPropertyEdible);
@@ -387,7 +388,8 @@ public class EatersWorld implements World {
 			collideeIter = collision.listIterator();
 			while (collideeIter.hasNext()) {
 				Eater eater = collideeIter.next();
-				int [] location = players.getStartingLocation(eater, eatersMap, false);
+				int [] location = WorldUtil.getStartingLocation(eater, eatersMap, null);
+				players.setLocation(eater, location);
 
 				// put the player in it
 				eatersMap.getCell(location).setPlayer(eater);
@@ -428,21 +430,22 @@ public class EatersWorld implements World {
 		return players.numberOfPlayers();
 	}
 
-	public void addPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
+	public void addPlayer(String playerId, PlayerConfig playerConfig, boolean debug) throws Exception {
 		
 		Eater eater = new Eater(playerId);
 
 		players.add(eater, eatersMap, playerConfig.pos);
 		
 		if (playerConfig.productions != null) {
-			EaterCommander eaterCommander = cogArch.createEaterCommander(eater, playerConfig.productions, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile());
+			EaterCommander eaterCommander = cogArch.createEaterCommander(eater, playerConfig.productions, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile(), debug);
 			eater.setCommander(eaterCommander);
 		} else if (playerConfig.script != null) {
 			eater.setCommander(new ScriptedEater(CommandInfo.loadScript(playerConfig.script)));
 		}
 
-		int [] location = players.getStartingLocation(eater, eatersMap, true);
-
+		int [] location = WorldUtil.getStartingLocation(eater, eatersMap, players.getInitialLocation(eater));
+		players.setLocation(eater, location);
+		
 		// remove food from it
 		eatersMap.getCell(location).removeAllByProperty(Names.kPropertyEdible);
 

@@ -13,7 +13,7 @@ public interface World {
 	
 	// player management
 	public int numberOfPlayers();
-	public void addPlayer(String playerId, PlayerConfig playerConfig) throws Exception;
+	public void addPlayer(String playerId, PlayerConfig playerConfig, boolean debug) throws Exception;
 	public void removePlayer(String name) throws Exception;
 	public Player[] getPlayers();
 	

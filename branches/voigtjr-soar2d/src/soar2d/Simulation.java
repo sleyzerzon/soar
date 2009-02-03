@@ -93,10 +93,11 @@ public class Simulation {
 		cogArch.doBeforeClients();
 		cogArch.doAfterClients();
 		
+		
 		// add initial players
 		logger.trace(Names.Trace.initialPlayers);
 		for ( Entry<String, PlayerConfig> entry : config.playerConfigs().entrySet()) {
-			createPlayer(entry.getKey(), entry.getValue());
+			createPlayer(entry.getKey(), entry.getValue(), cogArch.debug());
 		}
 		
 		return world;
@@ -172,7 +173,7 @@ public class Simulation {
 	 * 
 	 * create a player and add it to the simulation and world
 	 */
-	public void createPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
+	public void createPlayer(String playerId, PlayerConfig playerConfig, boolean debug) throws Exception {
 		if (Game.TAXI == game && (world.numberOfPlayers() > 1)) {
 			// if this is removed, revisit white color below!
 			throw new Exception(Names.Errors.taxi1Player);
@@ -206,7 +207,7 @@ public class Simulation {
 		}
 		
 		try {
-			world.addPlayer(playerId, playerConfig);
+			world.addPlayer(playerId, playerConfig, debug);
 		} catch (Exception e) {
 			freeAColor(playerConfig.color);
 			throw e;

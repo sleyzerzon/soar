@@ -75,9 +75,8 @@ public class TankSoarWorld implements World {
 		
 		for (Tank tank : players.getAll()) {
 			// find a suitable starting location
-			int [] startingLocation = players.getStartingLocation(tank, tankSoarMap, true);
-
-			// TODO: remove missile packs?
+			int [] startingLocation = WorldUtil.getStartingLocation(tank, tankSoarMap, players.getInitialLocation(tank));
+			players.setLocation(tank, startingLocation);
 			
 			// put the player in it
 			tankSoarMap.getCell(startingLocation).setPlayer(tank);
@@ -571,19 +570,15 @@ public class TankSoarWorld implements World {
 		}
 	}
 	
-	private void frag(Tank tank) {
+	private void frag(Tank tank) throws Exception {
 		// remove from past cell
 		int [] oldLocation = players.getLocation(tank);
 		setExplosion(oldLocation);
 		tankSoarMap.getCell(oldLocation).setPlayer(null);
 
 		// put the player somewhere
-		int [] location = tankSoarMap.getAvailableLocationAmortized();
-		if (location == null) {
-			logger.error("Couldn't find spot to spawn player!");
-			assert false;
-			return;
-		}
+		int [] location = WorldUtil.getStartingLocation(tank, tankSoarMap, null);
+		players.setLocation(tank, location);
 		
 		tankSoarMap.getCell(location).setPlayer(tank);
 		
@@ -795,7 +790,7 @@ public class TankSoarWorld implements World {
 		newLocations.put(tank, players.getLocation(tank));
 	}
 	
-	public void addPlayer(String playerId, PlayerConfig playerConfig) throws Exception {
+	public void addPlayer(String playerId, PlayerConfig playerConfig, boolean debug) throws Exception {
 		Tank tank = new Tank(playerId, Soar2D.config.tanksoarConfig().radar_width, Soar2D.config.tanksoarConfig().radar_height, 
 				playerConfig.missiles, playerConfig.energy, playerConfig.health,
 				Soar2D.config.tanksoarConfig().default_missiles, Soar2D.config.tanksoarConfig().default_energy, Soar2D.config.tanksoarConfig().default_health);
@@ -803,11 +798,12 @@ public class TankSoarWorld implements World {
 		players.add(tank, tankSoarMap, playerConfig.pos);
 		
 		if (playerConfig.productions != null) {
-			TankCommander tankCommander = cogArch.createTankCommander(tank, playerConfig.productions, playerConfig.shutdown_commands, tankSoarMap.getMetadataFile());
+			TankCommander tankCommander = cogArch.createTankCommander(tank, playerConfig.productions, playerConfig.shutdown_commands, tankSoarMap.getMetadataFile(), debug);
 			tank.setCommander(tankCommander);
 		}
 	
-		int [] location = players.getStartingLocation(tank, tankSoarMap, true);
+		int [] location = WorldUtil.getStartingLocation(tank, tankSoarMap, players.getInitialLocation(tank));
+		players.setLocation(tank, location);
 	
 		// remove food from it
 		tankSoarMap.getCell(location).removeAllByProperty(Names.kPropertyEdible);

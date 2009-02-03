@@ -11,13 +11,15 @@ public interface CognitiveArchitecture {
 
 	void seed(int seed);
 
-	EaterCommander createEaterCommander(Eater eater, String productions, int vision, String[] shutdownCommands, File metadataFile) throws Exception;
-	TankCommander createTankCommander(Tank tank, String productions, String[] shutdown_commands, File metadataFile) throws Exception;
+	EaterCommander createEaterCommander(Eater eater, String productions, int vision, String[] shutdownCommands, File metadataFile, boolean debug) throws Exception;
+	TankCommander createTankCommander(Tank tank, String productions, String[] shutdown_commands, File metadataFile, boolean debug) throws Exception;
 
 	void doBeforeClients() throws Exception;
 
 	void doAfterClients() throws Exception;
 
+	boolean debug();
+	
 	void destroyPlayer(String name);
 
 	void reload(String name);
