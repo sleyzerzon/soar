@@ -257,12 +257,6 @@ public class WindowManager {
 				case SWT.KEYPAD_ADD:
 					humanMove.open = !humanMove.open;
 					break;
-				case SWT.KEYPAD_1:
-					humanMove.openCode = 1;
-					break;
-				case SWT.KEYPAD_3:
-					humanMove.openCode = 2;
-					break;
 				case SWT.KEYPAD_MULTIPLY:
 					humanMove.stopSim = !humanMove.stopSim;
 					break;
@@ -1231,13 +1225,17 @@ public class WindowManager {
 	}
 
 	void updateWorldGroup() {
-		worldGroup.setText("Map: " + Soar2D.config.generalConfig().map);
+		worldGroup.setText("Map: " + Soar2D.simulation.getCurrentMapName());
 		visualWorld.setSize(visualWorld.getWidth(), visualWorld.getHeight());
+		
 		GridData gd = new GridData();
 		gd.widthHint = visualWorld.getWidth();
 		gd.heightHint = visualWorld.getHeight();
+		gd.minimumWidth = visualWorld.getWidth();
+		gd.minimumHeight = visualWorld.getHeight();
 		gd.verticalSpan = 3;
 		worldGroup.setLayoutData(gd);
+		worldGroup.layout();
 
 		shell.setSize(shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}

@@ -13,4 +13,5 @@ public interface GridMap {
 	public CellObject createObjectByName(String name);
 	public File getMetadataFile();
 	public List<CellObject> getTemplatesWithProperty(String name);
+	public String getCurrentMapName();
 }

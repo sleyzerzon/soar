@@ -1,4 +1,4 @@
-objects_file = "standard.obj";
+objects_file = "objects.txt";
 objects = [db,dn,w];
 cells {
 	size = 10;

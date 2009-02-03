@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,8 +23,14 @@ public class EatersMapTest {
 	}
 	
 	@Test
-	public void testLoadDefault() throws Exception {
-		new EatersMap("maps/eaters/random-walls.map", false, .35, .85);
+	public void testLoadAll() throws Exception {
+		File mapDir = new File("maps/eaters");
+		
+		for (File file : mapDir.listFiles()) {
+			if (file.isFile()) {
+				new EatersMap(file.getAbsolutePath(), false, .35, .85);
+			}
+		}
 	}
 	
 	@Test

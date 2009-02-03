@@ -85,9 +85,21 @@ public class Cell {
 		if (cellObject == null) {
 			throw new NullPointerException();
 		}
-		removeObject(cellObject.getName());
-		cellObjects.add(cellObject);
+		Iterator<CellObject> iter = cellObjects.iterator();
+		while(iter.hasNext()) {
+			CellObject object = iter.next();
+			if (object.getName().equals(cellObject.getName())) {
+				logger.trace("Replacing existing " + object.getName() + " with new one.");
+				iter.remove();
+				for (CellObjectObserver observer : observers) {
+					observer.removalStateUpdate(location, object);
+				}
+				// no more iteration, removal state could change cellObjects!
+				break;
+			}
+		}
 		
+		cellObjects.add(cellObject);
 		for (CellObjectObserver observer : observers) {
 			observer.addStateUpdate(location, cellObject);
 		}

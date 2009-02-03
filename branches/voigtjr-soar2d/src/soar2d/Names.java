@@ -153,7 +153,6 @@ public class Names {
 	public static final String kOff = "off";
 	public static final String kOn = "on";
 	public static final String kOpenID = "open";
-	public static final String kOpenCodeID = "open-code";
 	public static final String kPickUpID = "pickup";
 	public static final String kPositionID = "position";
 	public static final String kPutDownID = "putdown";
@@ -209,7 +208,6 @@ public class Names {
 	public static final String kPropertyMissiles = "missiles";
 	public static final String kPropertyMoveApply = "move-apply";
 	public static final String kPropertyNumber = "number";
-	public static final String kPropertyOpenCode = "open-code";
 	public static final String kPropertyOwner = "owner";
 	public static final String kPropertyPoints = "points";
 	public static final String kPropertyPositiveBoxID = "positive-box-id";

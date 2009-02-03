@@ -131,17 +131,6 @@ public final class SoarEater implements EaterCommander {
 				}
 				move.open = true;
 				commandId.AddStatusComplete();
-
-				String openCode = commandId.GetParameterValue(Names.kOpenCodeID);
-				if (openCode != null) {
-					try {
-						move.openCode = Integer.parseInt(openCode);
-					} catch (NumberFormatException e) {	
-						logger.warn(eater.getName() + ": invalid open code");
-						continue;
-					}
-					continue;
-				}
 				continue;
 				
 			} else if (commandName.equalsIgnoreCase(Names.kDontEatID)) {

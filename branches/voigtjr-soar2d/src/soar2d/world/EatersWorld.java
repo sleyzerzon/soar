@@ -49,11 +49,15 @@ public class EatersWorld implements World {
 		}
 		
 		// This can throw a more fatal error.
-		reset();
+		resetState();
 	}
 	
 	public void reset() throws Exception {
 		eatersMap.reset();
+		resetState();
+	}
+	
+	private void resetState() throws Exception {
 		stopMessages.clear();
 		resetPlayers();
 	}
@@ -208,7 +212,7 @@ public class EatersWorld implements World {
 			}
 			
 			if (lastCommand.open) {
-				open(eater, location, lastCommand.openCode);
+				open(eater, location);
 			}
 		}
 	}
@@ -223,16 +227,8 @@ public class EatersWorld implements World {
 		if (object.hasProperty("apply.reward")) {
 			// am I the positive box
 			if (object.hasProperty("apply.reward.correct")) {
-				// if the open code is not zero, get an open code
-				int suppliedOpenCode = object.getIntProperty("open-code", 0);
-
-				// see if we opened the box correctly (will both be 0 if no open code)
-				if (suppliedOpenCode == object.getIntProperty("apply.reward.code", 0)) {
-					// reward positively
-					eater.adjustPoints(object.getIntProperty("apply.reward.positive", 0), "positive reward");
-				} else {
-					eater.adjustPoints(object.getIntProperty("apply.reward.negative", 0), "small reward (wrong open code)");
-				}
+				// reward positively
+				eater.adjustPoints(object.getIntProperty("apply.reward.positive", 0), "positive reward");
 			} else {
 				// I'm  not the positive box, set resetApply false
 				object.removeProperty("apply.reset");
@@ -245,7 +241,7 @@ public class EatersWorld implements World {
 		return object.hasProperty("apply.remove");
 	}
 	
-	private void open(Eater eater, int [] location, int openCode) {
+	private void open(Eater eater, int [] location) {
 		List<CellObject> boxes = eatersMap.getCell(location).getAllWithProperty(Names.kPropertyBox);
 		if (boxes == null) {
 			logger.warn(eater.getName() + " tried to open but there is no box.");
@@ -259,9 +255,6 @@ public class EatersWorld implements World {
 			if (box.getProperty(Names.kPropertyStatus).equalsIgnoreCase(Names.kOpen)) {
 				logger.warn(eater.getName() + " tried to open an open box.");
 			}
-		}
-		if (openCode != 0) {
-			box.setIntProperty("open-code", openCode);
 		}
 		if (apply(box, eater)) {
 			eatersMap.getCell(location).removeObject(box.getName());

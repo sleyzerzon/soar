@@ -3,12 +3,20 @@ package soar2d.map;
 class GridMapCells {
 	private Cell[][] cells;
 	
-	GridMapCells(int size) {
+	GridMapCells(int size, CellObjectObserver[] observers) {
 		assert size > 0;
 		
 		cells = new Cell[size][];
-		for(int x = 0; x < size; ++x) {
-			cells[x] = new Cell[size];
+		int[] xy = new int[2];
+		for(xy[0] = 0; xy[0] < size; ++xy[0]) {
+			cells[xy[0]] = new Cell[size];
+			for(xy[1] = 0; xy[1] < size; ++xy[1]) {
+				Cell newCell = Cell.createCell(xy);
+				for (CellObjectObserver observer : observers) {
+					newCell.addObserver(observer);
+				}
+				setCell(xy, newCell);
+			}
 		}
 	}
 

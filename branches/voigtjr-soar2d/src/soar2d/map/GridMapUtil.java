@@ -41,7 +41,7 @@ class GridMapUtil {
 			data.cellObjectManager.registerTemplate(template);
 		}
 		
-		cellsConfig(data, mapConfig.getChild("cells"), objectsConfig, observer);
+		cellsConfig(data, mapConfig.getChild("cells"), objectsConfig, observer, lowProbability, highProbability);
 		
 		if (mapConfig.hasKey("metadata")) {
 			data.metadataFile = new File(mapConfig.getString("metadata"));
@@ -51,12 +51,8 @@ class GridMapUtil {
 		return data;
 	}
 
-	private static void cellsConfig(GridMapData data, Config cellsConfig, Config objectsConfig, CellObjectObserver observer) throws Exception {
-		cellsConfig(data, cellsConfig, objectsConfig, observer, 0, 0);
-	}
-	
 	private static void cellsConfig(GridMapData data, Config cellsConfig, Config objectsConfig, CellObjectObserver observer, double lowProbability, double highProbability) throws Exception {
-		data.cells = new GridMapCells(cellsConfig.requireInt("size"));
+		data.cells = new GridMapCells(cellsConfig.requireInt("size"), new CellObjectObserver[] { data, observer });
 		
 		data.randomWalls = cellsConfig.getBoolean("random_walls", false);
 		data.randomFood = cellsConfig.getBoolean("random_food", false);
@@ -73,22 +69,21 @@ class GridMapUtil {
 				}
 				
 				for (xy[0] = 0; xy[0] < data.cells.size(); ++xy[0]) {
-					Cell newCell = Cell.createCell(xy);
-					newCell.addObserver(data);
-					newCell.addObserver(observer);
-					data.cells.setCell(xy, newCell);
-					
-					// TODO: multiple objects
-					String objectName = objectsConfig.getString("objects." + cellStrings[xy[0]] + ".name");
-					
-					logger.trace(Arrays.toString(xy) + ": " + objectName);
-					
-					if (!data.cellObjectManager.hasTemplate(objectName)) {
-						throw new Exception("object \"" + objectName + "\" does not map to a cell object");
+					String contents = cellStrings[xy[0]];
+					for (String objectID : contents.split("-")) {
+						String objectName = objectsConfig.getString("objects." + objectID + ".name");
+						logger.trace(Arrays.toString(xy) + ": " + objectName);
+						
+						if (!data.cellObjectManager.hasTemplate(objectName)) {
+							throw new Exception("object \"" + objectName + "\" does not map to a cell object");
+						}
+						
+						CellObject cellObject = data.cellObjectManager.createObject(objectName);
+						if (cellObject.hasProperty("apply.reward-info")) {
+							data.rewardInfoObject = cellObject;
+						}
+						data.cells.getCell(xy).addObject(cellObject);
 					}
-					
-					CellObject cellObject = data.cellObjectManager.createObject(objectName);
-					newCell.addObject(cellObject);
 				}
 			}
 		}
@@ -126,11 +121,6 @@ class GridMapUtil {
 					assert negativeColor < Soar2D.simulation.kColors.length;
 				}
 			}
-
-			// if using an open code, assign that
-			if (data.openCode != 0) {
-				data.rewardInfoObject.setIntProperty("apply.reward-info.code", data.openCode);
-			}
 		}
 	}
 	
@@ -141,14 +131,12 @@ class GridMapUtil {
 		for (xy[0] = 0; xy[0] < data.cells.size(); ++xy[0]) {
 			for (xy[1] = 0; xy[1] < data.cells.size(); ++xy[1]) {
 				Cell cell = data.cells.getCell(xy);
-				logger.trace(cell);
 				for (Direction dir : Direction.values()) {
 					if (dir == Direction.NONE) {
 						continue;
 					}
 					int[] neighborLoc = Direction.translate(cell.location, dir, new int[2]);
 					if (data.cells.isInBounds(neighborLoc)) {
-						logger.trace(dir);
 						Cell neighbor = data.cells.getCell(neighborLoc);
 						cell.neighbors[dir.index()] = neighbor;
 					}
@@ -162,34 +150,29 @@ class GridMapUtil {
 			throw new Exception("tried to generate random walls with no blocking types");
 		}
 		
-		logger.trace("Generating random walls.");
-		
 		assert data.cells != null;
 		int size = data.cells.size();
 		
-		// Generate perimiter wall and remove existing walls
+		logger.trace("Confirming perimeter wall.");
 		int[] xy = new int[2];
 		for (xy[0] = 0; xy[0] < size; ++xy[0]) {
 			for (xy[1] = 0; xy[1] < size; ++xy[1]) {
 				if (xy[0] == 0 || xy[0] == size - 1 || xy[1] == 0 || xy[1] == size - 1) {
-					logger.trace(Arrays.toString(xy) + ": Confirming perimeter wall.");
-					removeFoodAndAddWall(data, xy, observer);
+					if (!data.cells.getCell(xy).hasAnyWithProperty(soar2d.Names.kPropertyBlock)) {
+						removeFoodAndAddWall(data, xy, observer);
+					}
 					continue;
-				}
-				// not on the edge
-				if (data.cells.getCell(xy).removeAllByProperty(soar2d.Names.kPropertyBlock) != null) {
-					logger.trace(Arrays.toString(xy) + ": Removed non-perimiter wall.");
 				}
 			}
 		}
 
+		logger.trace("Generating random walls.");
 		for (xy[0] = 2; xy[0] < size - 3; ++xy[0]) {
 			for (xy[1] = 2; xy[1] < size - 3; ++xy[1]) {
 
 				if (noWallsOnCorners(data, xy)) {
 					double probability = lowProbability;
 					if (wallOnAnySide(data, xy)) {
-						logger.trace(Arrays.toString(xy) + ": High probability.");
 						probability = highProbability;					
 					}
 					if (Simulation.random.nextDouble() < probability) {
@@ -208,7 +191,9 @@ class GridMapUtil {
 			cell.addObserver(data);
 			cell.addObserver(observer);
 		}
-		cell.removeAllByProperty(soar2d.Names.kPropertyEdible);
+		if (cell.hasAnyWithProperty(soar2d.Names.kPropertyEdible)) {
+			cell.removeAllByProperty(soar2d.Names.kPropertyEdible);
+		}
 		CellObject wall = data.cellObjectManager.createRandomObjectWithProperty(soar2d.Names.kPropertyBlock);
 		cell.addObject(wall);
 	}
@@ -344,5 +329,17 @@ class GridMapUtil {
 				cellObject.setIntProperty("update.linger", linger);
 			}
 		}
+	}
+
+	public static String getMapName(String mapPath) {
+		// can't just use system separator, could come from config file which needs to work across systems
+		int index = mapPath.lastIndexOf("/");
+		if (index == -1) {
+			index = mapPath.lastIndexOf("\\");
+			if (index == -1) {
+				return mapPath;
+			}
+		}
+		return mapPath.substring(index + 1);
 	}
 }

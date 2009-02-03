@@ -1,15 +1,4 @@
 <map>
-  <cell-object name="infobox">
-    <property name="shape" value="square" />
-    <property name="box" value="true" />
-    <property name="id" value="info-box" />
-    <apply>
-      <property name="status" value="open" />
-      <reward-info>
-        <use-open-code />
-      </reward-info>
-    </apply>
-  </cell-object>
   <cell-object name="rewardbox">
     <property name="shape" value="square" />
     <property name="box" value="true" />

@@ -37,6 +37,10 @@ public class TankSoarMap implements GridMap, CellObjectObserver {
 		reset();
 	}
 
+	public String getCurrentMapName() {
+		return GridMapUtil.getMapName(this.mapPath);
+	}
+
 	public void reset() throws Exception {
 		energy = false;
 		missilePacks = 0;

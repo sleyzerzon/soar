@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import soar2d.Names;
 import soar2d.Simulation;
 import soar2d.Soar2D;
@@ -18,6 +20,8 @@ import soar2d.Soar2D;
  * These objects are copied to create new objects.
  */
 class CellObjectManager {
+	private static Logger logger = Logger.getLogger(CellObjectManager.class);
+
 	/**
 	 * The templates, mapped by name.
 	 */
@@ -113,10 +117,14 @@ class CellObjectManager {
 				// keep track of reward objects
 				rewardObjects.add(newObject);
 				
+				logger.trace("Reward box: " + newObject.getIntProperty("box-id", -1));
+
 			} else if (newObject.hasProperty("apply.reward-info")) {
 				// assign identification properties
 				newObject.setProperty(Names.kPropertyColor, Soar2D.simulation.kColors[0]);
 				newObject.setProperty("box-id", "0");
+
+				logger.trace("Info box: " + newObject.getIntProperty("box-id", -1));
 			}
 			return newObject;
 		}

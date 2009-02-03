@@ -39,8 +39,6 @@ class GridMapData implements CellObjectObserver {
 	boolean randomFood;
 	
 	CellObject rewardInfoObject; // TODO: move to CellObjectObserver code
-	int openCode = 0; // TODO: move out of here
-	int kOpenCodeRange = 2; // 1..kOpenCodeRange (alternatively expressed as: 0..(kOpenCodeRange - 1) + 1
 	int positiveRewardID = 0;
 }
 

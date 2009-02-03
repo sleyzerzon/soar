@@ -280,10 +280,14 @@ public class Simulation {
 	}
 	
 	public String getMapPath() {
-		return Soar2D.simulation.getBasePath() + "maps" + System.getProperty("file.separator");
+		return Soar2D.simulation.getBasePath() + "maps" + System.getProperty("file.separator") + game.id();
 	}
 	
 	public void interrupted(String agentName) throws Exception {
 		world.interrupted(agentName);
+	}
+
+	public String getCurrentMapName() {
+		return world.getMap().getCurrentMapName();
 	}
 }

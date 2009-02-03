@@ -26,6 +26,10 @@ public class EatersMap implements GridMap, CellObjectObserver {
 		
 		reset();
 	}
+	
+	public String getCurrentMapName() {
+		return GridMapUtil.getMapName(this.mapPath);
+	}
 
 	public void reset() throws Exception {
 		foodCount = 0;
