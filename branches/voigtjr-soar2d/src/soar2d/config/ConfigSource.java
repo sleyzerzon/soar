@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 public abstract class ConfigSource {
 	public abstract boolean hasKey(String key);
 
-	public abstract String[] getKeys(String root);
+	public abstract String[] getKeys(String rootWithDot);
 
 	public abstract int[] getInts(String key);
 
@@ -33,6 +33,4 @@ public abstract class ConfigSource {
 	public abstract ConfigSource copy();
 
 	public abstract void removeKey(String key);
-	
-	public abstract String[] keyList(String prefix);
 }

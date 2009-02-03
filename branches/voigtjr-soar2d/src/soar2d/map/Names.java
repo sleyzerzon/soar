@@ -12,8 +12,6 @@ public class Names {
 	static final String kTagEnergy = "energy";
 	static final String kTagHealth = "health";
 	static final String kTagMissiles = "missiles";
-	static final String kTagRemove = "remove";
-	static final String kTagReset = "reset";
 	static final String kTagFuel = "fuel";
 	static final String kTagRow = "row";
 	static final String kTagCell = "cell";

@@ -625,7 +625,7 @@ public class TankSoarWorld implements World {
 			}
 		}
 
-		return object.hasProperty("apply.remove");
+		return object.getBooleanProperty("apply.remove", false);
 	}
 			
 	private void handleRadarEnergy(Tank tank) {

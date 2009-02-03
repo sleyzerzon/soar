@@ -224,9 +224,9 @@ public class EatersWorld implements World {
 			int points = object.getIntProperty("apply.points", 0);
 			eater.adjustPoints(points, object.getName());
 		}
-		if (object.hasProperty("apply.reward")) {
+		if (object.getBooleanProperty("apply.reward", false)) {
 			// am I the positive box
-			if (object.hasProperty("apply.reward.correct")) {
+			if (object.getBooleanProperty("apply.reward.correct", false)) {
 				// reward positively
 				eater.adjustPoints(object.getIntProperty("apply.reward.positive", 0), "positive reward");
 			} else {
@@ -238,7 +238,7 @@ public class EatersWorld implements World {
 			}
 		}
 		
-		return object.hasProperty("apply.remove");
+		return object.getBooleanProperty("apply.remove", false);
 	}
 	
 	private void open(Eater eater, int [] location) {
@@ -263,7 +263,7 @@ public class EatersWorld implements World {
 	}
 
 	private void checkResetApply(CellObject box) {
-		if (box.hasProperty("apply.reset")) {
+		if (box.getBooleanProperty("apply.reset", false)) {
 			stopMessages.add(box.getName() + " called for reset.");
 		}
 	}

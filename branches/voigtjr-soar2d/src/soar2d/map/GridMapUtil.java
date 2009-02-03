@@ -32,10 +32,10 @@ class GridMapUtil {
 		String mapFilePath = mapFile.getAbsolutePath();
 		Config mapConfig = new Config(new ConfigFile(mapFilePath));
 		
-		File objectsFile = new File(mapConfig.getString("objects_file"));
+		String objectsFileString = mapConfig.getString("objects_file");
 		String mapFileDirectory = mapFilePath.substring(0, mapFilePath.lastIndexOf(File.separatorChar) + 1);
 		
-		Config objectsConfig = new Config(new ConfigFile(mapFileDirectory + objectsFile.getName()));
+		Config objectsConfig = new Config(new ConfigFile(mapFileDirectory + objectsFileString));
 		for (String id : mapConfig.getStrings("objects")) {
 			CellObject template = new CellObject(objectsConfig.getChild("objects." + id));
 			data.cellObjectManager.registerTemplate(template);
@@ -79,7 +79,7 @@ class GridMapUtil {
 						}
 						
 						CellObject cellObject = data.cellObjectManager.createObject(objectName);
-						if (cellObject.hasProperty("apply.reward-info")) {
+						if (cellObject.getBooleanProperty("apply.reward-info", false)) {
 							data.rewardInfoObject = cellObject;
 						}
 						data.cells.getCell(xy).addObject(cellObject);

@@ -60,8 +60,8 @@ public class ConfigTest {
 		largeTestData.add(new ConfigTestPair("key6.subkey6.1", "[value6.1]"));
 		largeTestData.add(new ConfigTestPair("key6.subkey6.2", "[value6.2]"));
 		largeTestData.add(new ConfigTestPair("dashes-ok", "[yes]"));
-		largeTestData.add(new ConfigTestPair("null-array", "[]"));
-		largeTestData.add(new ConfigTestPair("null-value", null));
+		//largeTestData.add(new ConfigTestPair("null-array", "[]"));
+		//largeTestData.add(new ConfigTestPair("null-value", null));
 		//largeTestData.add(new ConfigTestPair("null-array-values", "[,,,]"));
 		//largeTestData.add(new ConfigTestPair("nested_not_square", "[]"));
 	}
@@ -99,10 +99,10 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void testKeyList() throws Exception {
+	public void testGetKeys() throws Exception {
 		Config cf = new Config(new ConfigFile(largeTest));
 
-		String[] keys = cf.keyList();
+		String[] keys = cf.getKeys();
 		Arrays.sort(keys);
 
 		for (ConfigTestPair pair : largeTestData) {
@@ -112,7 +112,7 @@ public class ConfigTest {
 		Config grandparent = cf.getChild("grandparent");
 		Config parent = grandparent.getChild("parent");
 
-		for (String key : parent.keyList()) {
+		for (String key : parent.getKeys()) {
 			assertTrue(key.equals("child"));
 		}
 	}

@@ -110,7 +110,7 @@ class CellObjectManager {
 	CellObject createObject(String name) {
 		if (templates.containsKey(name)) {
 			CellObject newObject = new CellObject(templates.get(name));
-			if (newObject.hasProperty("apply.reward")) {
+			if (newObject.getBooleanProperty("apply.reward", false)) {
 				// assign identification number
 				newObject.setProperty("box-id", Integer.toString(rewardObjects.size() + 1));
 
@@ -119,7 +119,7 @@ class CellObjectManager {
 				
 				logger.trace("Reward box: " + newObject.getIntProperty("box-id", -1));
 
-			} else if (newObject.hasProperty("apply.reward-info")) {
+			} else if (newObject.getBooleanProperty("apply.reward-info", false)) {
 				// assign identification properties
 				newObject.setProperty(Names.kPropertyColor, Soar2D.simulation.kColors[0]);
 				newObject.setProperty("box-id", "0");

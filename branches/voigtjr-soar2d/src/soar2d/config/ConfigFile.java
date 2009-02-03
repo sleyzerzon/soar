@@ -43,18 +43,18 @@ public class ConfigFile extends ConfigSource {
 	}
 
 	@Override
-	public String[] getKeys(String root) {
-		if (!root.equals(""))
-			root += ".";
-
+	public String[] getKeys(String rootWithDot) {
 		List<String> subkeys = new ArrayList<String>();
-
 		for (String key : keys.keySet()) {
-			if (key.startsWith(root))
-				subkeys.add(key);
+			if (key.length() <= rootWithDot.length()) {
+				continue;
+			}
+			if (key.startsWith(rootWithDot)) {
+				String strippedKey = key.substring(rootWithDot.length());
+				subkeys.add(strippedKey);
+			}
 		}
-
-		return subkeys.toArray(new String[0]);
+		return subkeys.toArray(new String[subkeys.size()]);
 	}
 
 	@Override
@@ -65,21 +65,6 @@ public class ConfigFile extends ConfigSource {
 	@Override
 	public void removeKey(String key) {
 		keys.remove(key);
-	}
-	
-	@Override
-	public String[] keyList(String prefix) {
-		List<String> keyList = new ArrayList<String>();
-		for (String key : keys.keySet()) {
-			if (key.length() <= prefix.length()) {
-				continue;
-			}
-			if (key.startsWith(prefix)) {
-				String strippedKey = key.substring(prefix.length());
-				keyList.add(strippedKey);
-			}
-		}
-		return keyList.toArray(new String[keyList.size()]);
 	}
 	
 	@Override
@@ -137,6 +122,9 @@ public class ConfigFile extends ConfigSource {
 
 	@Override
 	public void setStrings(String key, String v[]) {
+		if (v == null) {
+			keys.remove(key);
+		}
 		keys.put(key, v);
 	}
 
@@ -241,15 +229,15 @@ public class ConfigFile extends ConfigSource {
 					parseError(t, "Expected ; got " + tok);
 					return;
 				} 
-				
+
+				if (values.size() == 0) {
+					parseError(t, "Expected values, didn't get any");
+					return;
+				}
 				valuesArray = values.toArray(new String[values.size()]);
 
-			} else if (tok.equals(";")) {
-				// use null valuesArray
-				valuesArray = null; // redundant, but more clear
-				
 			} else {
-				parseError(t, "Expected = or ; got " + tok);
+				parseError(t, "Expected = got " + tok);
 				return;
 			}
 
@@ -257,8 +245,9 @@ public class ConfigFile extends ConfigSource {
 
 			if (keys.get(key) != null) {
 				parseError(t, "Duplicate key definition for: " + key);
+				return;
 			}
-
+			
 			keys.put(key, valuesArray);
 
 			/*

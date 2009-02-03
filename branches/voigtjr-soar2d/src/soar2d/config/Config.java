@@ -232,7 +232,7 @@ public class Config {
 		source.setBytes(prefix + key, v);
 	}
 
-	public String[] keyList() {
-		return source.keyList(this.prefix);
+	public String[] getKeys() {
+		return source.getKeys(this.prefix);
 	}
 }

@@ -34,7 +34,7 @@ public class CellObject {
 		this.config = new Config(new ConfigFile());
 		
 		// copy over its stuff
-		for (String key : config.keyList()) {
+		for (String key : config.getKeys()) {
 			this.config.setStrings(key, config.getStrings(key));
 		}
 		
@@ -52,7 +52,7 @@ public class CellObject {
 	private void updateCachedState() {
 		this.applyable = false;
 		this.updatable = false;
-		for (String key : config.keyList()) {
+		for (String key : config.getKeys()) {
 			// set state
 			this.applyable = this.applyable || key.startsWith("apply");
 			this.updatable = this.updatable || key.startsWith("update");
@@ -70,7 +70,7 @@ public class CellObject {
 	public void applyProperties() {
 		// copy apply properties to regular properties
 		Config applyProperties = this.config.getChild("apply.properties");
-		for (String property : applyProperties.keyList()) {
+		for (String property : applyProperties.getKeys()) {
 			this.config.setStrings(property, applyProperties.requireStrings(property));
 			// TODO: make sure this works!
 			this.config.removeKey(property);
@@ -79,7 +79,7 @@ public class CellObject {
 	}
 
 	public String[] getPropertyList() {
-		return config.keyList();
+		return config.getKeys();
 	}
 	
 	public boolean hasProperty(String name) {
@@ -146,7 +146,7 @@ public class CellObject {
 		StringBuilder builder = new StringBuilder();
 		builder.append(config.getString("name"));
 		builder.append(": ");
-		for (String key : config.keyList()) {
+		for (String key : config.getKeys()) {
 			if (key.equals("name")) {
 				continue;
 			}

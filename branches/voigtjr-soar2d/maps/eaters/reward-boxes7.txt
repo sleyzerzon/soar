@@ -1,4 +1,4 @@
-objects_file = "objects.txt";
+objects_file = "objects/objects.txt";
 objects = [w, r, i];
 cells {
 	size = 7;

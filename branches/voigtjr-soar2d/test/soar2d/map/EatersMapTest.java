@@ -35,7 +35,7 @@ public class EatersMapTest {
 	
 	@Test
 	public void testBasicMap() throws Exception {
-		EatersMap eatersMap = new EatersMap("maps/eaters/tiny.map", false, .35, .85);
+		EatersMap eatersMap = new EatersMap("maps/eaters/tiny.txt", false, .35, .85);
 		assertEquals(eatersMap.size(), 4);
 
 		int[] xy = new int[2];
