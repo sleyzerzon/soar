@@ -1,4 +1,4 @@
-objects_file = "standard-objects.txt";
+objects_file = "objects/objects.txt";
 objects = [e,m,M,t,r,g,h,x,radar-north,radar-south,radar-east,radar-west];
 cells {
 	size = 16;
