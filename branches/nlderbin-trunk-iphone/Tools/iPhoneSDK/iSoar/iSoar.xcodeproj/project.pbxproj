@@ -200,6 +200,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Peregrine MSoar";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -212,6 +214,7 @@
 					"\"$(SRCROOT)/../../../SoarLibrary/lib\"",
 				);
 				PRODUCT_NAME = iSoar;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "503D1CA4-775E-4347-9109-BDDEB65D3F86";
 			};
 			name = Debug;
 		};

@@ -23,16 +23,19 @@ int main(int argc, char *argv[]) {
 	/////////////////////////////////////////////////////////////////
 	// Soar Demo
 	//
-	// 1. scons iphone=yes
+	// 1. scons iphone=yes device=no
 	// 2. Create iPhone project in XCode
 	// 3. Project->Edit Project Settings->Build->Header Search Paths, point to:
 	//    - Core/ClientSML/include
 	//    - Core/ConnectionSML/include
 	//    - Core/ElementXML/include
 	//    - Core/shared
-	// 4. Add all lib*.a in SoarLibrary/lib to project
+	// 4. Add all lib*.a in SoarLibrary/lib to project (by reference)
 	// 5. Relevant source files should be named *.mm instead of *.m (Objective-C++)
-	// 6. Go!
+	// 6. Develop under simulator
+	// 7. When ready for device: 
+	//    - scons iphone=yes device=yes (compiles to arm)
+	//    - target info: build=code signing, properties=identifier/name
 	/////////////////////////////////////////////////////////////////
 	sml::Kernel* pKernel = sml::Kernel::CreateKernelInNewThread();
 	
