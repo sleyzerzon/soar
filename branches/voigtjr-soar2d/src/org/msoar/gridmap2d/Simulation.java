@@ -45,9 +45,9 @@ public class Simulation {
 		
 		// Initialize Soar
 		cogArch = new Soar(config.soarConfig(), config.clientConfigs(), game, getBasePath());
-		Soar2D.control.setCogArch(cogArch);
-		if (Soar2D.wm.using()) {
-			Soar2D.wm.setCogArch(cogArch);
+		Gridmap2D.control.setCogArch(cogArch);
+		if (Gridmap2D.wm.using()) {
+			Gridmap2D.wm.setCogArch(cogArch);
 		}
 
 		// Make all runs non-random if asked
@@ -67,7 +67,7 @@ public class Simulation {
 		logger.trace(Names.Trace.loadingWorld);
 		switch (game) {
 		case TANKSOAR:
-			world = new TankSoarWorld(Soar2D.config.tanksoarConfig().max_missile_packs, cogArch);
+			world = new TankSoarWorld(Gridmap2D.config.tanksoarConfig().max_missile_packs, cogArch);
 			break;
 		case EATERS:
 			world = new EatersWorld(cogArch);
@@ -82,8 +82,8 @@ public class Simulation {
 //			world = new BookWorld(config.generalConfig().map);
 //			break;
 		}
-		Soar2D.control.setRunsTerminal(config.generalConfig().runs);
-		Soar2D.control.resetTime();
+		Gridmap2D.control.setRunsTerminal(config.generalConfig().runs);
+		Gridmap2D.control.resetTime();
 		
 		changeMap(config.generalConfig().map);
 
@@ -108,7 +108,7 @@ public class Simulation {
 		logger.debug(Names.Debug.changingMap + mapPath);
 		world.setMap(mapPath);
 		worldCount = 0;
-		Soar2D.wm.reset();
+		Gridmap2D.wm.reset();
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class Simulation {
 		}
 		
 		// the agent list has changed, notify things that care
-		Soar2D.control.playerEvent();
+		Gridmap2D.control.playerEvent();
 	}
 	
 	/**
@@ -229,7 +229,7 @@ public class Simulation {
 		cogArch.destroyPlayer(player.getName());
 		
 		// the player list has changed, notify those who care
-		Soar2D.control.playerEvent();
+		Gridmap2D.control.playerEvent();
 	}
 	
 	/**
@@ -258,7 +258,7 @@ public class Simulation {
 		logger.info(Names.Info.reset);
 		world.reset();
 		worldCount = 0;
-		Soar2D.control.resetTime();
+		Gridmap2D.control.resetTime();
 	}
 
 	public void shutdown() throws Exception {
@@ -278,7 +278,7 @@ public class Simulation {
 	}
 	
 	public String getMapPath() {
-		return Soar2D.simulation.getBasePath() + "maps" + System.getProperty("file.separator") + game.id();
+		return Gridmap2D.simulation.getBasePath() + "maps" + System.getProperty("file.separator") + game.id();
 	}
 	
 	public void interrupted(String agentName) throws Exception {

@@ -10,7 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.Names;
 import org.msoar.gridmap2d.Simulation;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 
 
 /**
@@ -121,7 +121,7 @@ class CellObjectManager {
 
 			} else if (newObject.getBooleanProperty("apply.reward-info", false)) {
 				// assign identification properties
-				newObject.setProperty(Names.kPropertyColor, Soar2D.simulation.kColors[0]);
+				newObject.setProperty(Names.kPropertyColor, Gridmap2D.simulation.kColors[0]);
 				newObject.setProperty("box-id", "0");
 
 				logger.trace("Info box: " + newObject.getIntProperty("box-id", -1));

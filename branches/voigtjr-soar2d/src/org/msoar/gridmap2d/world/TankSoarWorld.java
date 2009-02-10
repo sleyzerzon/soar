@@ -13,7 +13,7 @@ import org.msoar.gridmap2d.CognitiveArchitecture;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Names;
 import org.msoar.gridmap2d.Simulation;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.config.PlayerConfig;
 import org.msoar.gridmap2d.map.CellObject;
 import org.msoar.gridmap2d.map.GridMap;
@@ -40,7 +40,7 @@ public class TankSoarWorld implements World {
 	}
 	
 	public void setMap(String mapPath) throws Exception {
-		tankSoarMap = new TankSoarMap(mapPath, Soar2D.config.tanksoarConfig().max_sound_distance);
+		tankSoarMap = new TankSoarMap(mapPath, Gridmap2D.config.tanksoarConfig().max_sound_distance);
 		resetState();
 	}
 	
@@ -56,7 +56,7 @@ public class TankSoarWorld implements World {
 		missileReset = 0;
 
 		// Spawn missile packs
-		while (tankSoarMap.numberMissilePacks() < Soar2D.config.tanksoarConfig().max_missile_packs) {
+		while (tankSoarMap.numberMissilePacks() < Gridmap2D.config.tanksoarConfig().max_missile_packs) {
 			spawnMissilePack(tankSoarMap, true);
 		}
 		stopMessages.clear();
@@ -128,7 +128,7 @@ public class TankSoarWorld implements World {
 				state.setSmellDistance(distance);
 				state.setSmellColor(color);
 
-				if (distance > Soar2D.config.tanksoarConfig().max_sound_distance) {
+				if (distance > Gridmap2D.config.tanksoarConfig().max_sound_distance) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("Skipping sound check, smell was " + distance);
 					}
@@ -165,7 +165,7 @@ public class TankSoarWorld implements World {
 			
 			CommandInfo command = tank.getCommand();
 			if (command == null) {
-				Soar2D.control.stopSimulation();
+				Gridmap2D.control.stopSimulation();
 				return;
 			}
 			players.setCommand(tank, command);
@@ -270,7 +270,7 @@ public class TankSoarWorld implements World {
 				
 				// take damage
 				String name = tankSoarMap.getCell(newLocation).getAllWithProperty(Names.kPropertyBlock).get(0).getName();
-				state.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, name);
+				state.adjustHealth(Gridmap2D.config.tanksoarConfig().collision_penalty, name);
 				
 				if (state.getHealth() <= 0) {
 					Set<Tank> assailants = killedTanks.get(tank);
@@ -316,14 +316,14 @@ public class TankSoarWorld implements World {
 			
 			// take damage
 			
-			state.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, "cross collision " + other);
+			state.adjustHealth(Gridmap2D.config.tanksoarConfig().collision_penalty, "cross collision " + other);
 			// Getting rammed on a charger is deadly
 			if (tankSoarMap.getCell(players.getLocation(tank)).hasAnyWithProperty(Names.kPropertyCharger)) {
 				state.adjustHealth(state.getHealth() * -1, "hit on charger");
 			}
 			
 			TankState otherState = other.getState();
-			otherState.adjustHealth(Soar2D.config.tanksoarConfig().collision_penalty, "cross collision " + tank);
+			otherState.adjustHealth(Gridmap2D.config.tanksoarConfig().collision_penalty, "cross collision " + tank);
 			// Getting rammed on a charger is deadly
 			if (tankSoarMap.getCell(players.getLocation(other)).hasAnyWithProperty(Names.kPropertyCharger)) {
 				otherState.adjustHealth(otherState.getHealth() * -1, "hit on charger");
@@ -376,7 +376,7 @@ public class TankSoarWorld implements World {
 			// Shields
 			if (state.getShieldsUp()) {
 				if (state.getEnergy() > 0) {
-					state.adjustEnergy(Soar2D.config.tanksoarConfig().shield_energy_usage, "shields");
+					state.adjustEnergy(Gridmap2D.config.tanksoarConfig().shield_energy_usage, "shields");
 				} else {
 					logger.debug(tank + ": shields ran out of energy");
 					state.setShieldsUp(false);
@@ -396,7 +396,7 @@ public class TankSoarWorld implements World {
 			if (collision.size() > 1) {
 				
 				int damage = collision.size() - 1;
-				damage *= Soar2D.config.tanksoarConfig().collision_penalty;
+				damage *= Gridmap2D.config.tanksoarConfig().collision_penalty;
 				
 				logger.debug("Collision, " + (damage * -1) + " damage:");
 				
@@ -531,13 +531,13 @@ public class TankSoarWorld implements World {
 		// Respawn killed Tanks in safe squares
 		for (Tank tank : killedTanks.keySet()) {
 			// apply points
-			tank.adjustPoints(Soar2D.config.tanksoarConfig().kill_penalty, "fragged");
+			tank.adjustPoints(Gridmap2D.config.tanksoarConfig().kill_penalty, "fragged");
 			assert killedTanks.containsKey(tank);
 			for (Tank assailant : killedTanks.get(tank)) {
 				if (assailant.equals(tank)) {
 					continue;
 				}
-				assailant.adjustPoints(Soar2D.config.tanksoarConfig().kill_award, "fragged " + tank);
+				assailant.adjustPoints(Gridmap2D.config.tanksoarConfig().kill_award, "fragged " + tank);
 			}
 			
 			frag(tank);
@@ -545,7 +545,7 @@ public class TankSoarWorld implements World {
 		
 		// if the missile reset counter is 100 and there were no killed tanks
 		// this turn, reset all tanks
-		if ((missileReset >= Soar2D.config.tanksoarConfig().missile_reset_threshold) && (killedTanks.size() == 0)) {
+		if ((missileReset >= Gridmap2D.config.tanksoarConfig().missile_reset_threshold) && (killedTanks.size() == 0)) {
 			logger.info("missile reset threshold exceeded, resetting all tanks");
 			missileReset = 0;
 			for (Tank tank : players.getAll()) {
@@ -557,15 +557,15 @@ public class TankSoarWorld implements World {
 		updatePlayers(false);
 		
 		if (stopMessages.size() > 0) {
-			boolean stopping = Soar2D.control.checkRunsTerminal();
+			boolean stopping = Gridmap2D.control.checkRunsTerminal();
 			WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), stopping, stopMessages);
 
 			if (stopping) {
-				Soar2D.control.stopSimulation();
+				Gridmap2D.control.stopSimulation();
 			} else {
 				// reset and continue;
 				reset();
-				Soar2D.control.startSimulation(false, false);
+				Gridmap2D.control.startSimulation(false, false);
 			}
 		}
 	}
@@ -648,13 +648,13 @@ public class TankSoarWorld implements World {
 			for (CellObject charger : chargers) {
 				if (charger.hasProperty(Names.kPropertyHealth)) {
 					state.setOnHealthCharger(true);
-					if (state.getHealth() < Soar2D.config.tanksoarConfig().default_health) {
+					if (state.getHealth() < Gridmap2D.config.tanksoarConfig().default_health) {
 						state.adjustHealth(charger.getIntProperty(Names.kPropertyHealth, 0), "charger");
 					}
 				}
 				if (charger.hasProperty(Names.kPropertyEnergy)) {
 					state.setOnEnergyCharger(true);
-					if (state.getEnergy() < Soar2D.config.tanksoarConfig().default_energy) {
+					if (state.getEnergy() < Gridmap2D.config.tanksoarConfig().default_energy) {
 						state.adjustEnergy(charger.getIntProperty(Names.kPropertyEnergy, 0), "charger");
 					}
 				}
@@ -686,7 +686,7 @@ public class TankSoarWorld implements World {
 	}
 	
 	private void spawnMissilePack(TankSoarMap theMap, boolean force) throws Exception {
-		if (force || (Simulation.random.nextInt(100) < Soar2D.config.tanksoarConfig().missile_pack_respawn_chance)) {
+		if (force || (Simulation.random.nextInt(100) < Gridmap2D.config.tanksoarConfig().missile_pack_respawn_chance)) {
 			// I used to call getAvailableLocations but that is slow. Brute force find a spot. Time out in case of crazyness.
 			int [] spot = theMap.getAvailableLocationAmortized();
 			if (spot == null) {
@@ -710,11 +710,11 @@ public class TankSoarWorld implements World {
 		
 		// apply points
 		String owner = missile.getProperty(Names.kPropertyOwner);
-		tank.adjustPoints(Soar2D.config.tanksoarConfig().missile_hit_penalty, owner + "-" + missile.getProperty("missile-id"));
+		tank.adjustPoints(Gridmap2D.config.tanksoarConfig().missile_hit_penalty, owner + "-" + missile.getProperty("missile-id"));
 		Tank other = players.get(owner);
 		// can be null if the player was deleted after he fired but before the missile hit
 		if (other != null) {
-			other.adjustPoints(Soar2D.config.tanksoarConfig().missile_hit_award, owner + "-" + missile.getProperty("missile-id"));
+			other.adjustPoints(Gridmap2D.config.tanksoarConfig().missile_hit_award, owner + "-" + missile.getProperty("missile-id"));
 		}
 		
 		// charger insta-kill
@@ -791,9 +791,9 @@ public class TankSoarWorld implements World {
 	}
 	
 	public void addPlayer(String playerId, PlayerConfig playerConfig, boolean debug) throws Exception {
-		Tank tank = new Tank(playerId, Soar2D.config.tanksoarConfig().radar_width, Soar2D.config.tanksoarConfig().radar_height, 
+		Tank tank = new Tank(playerId, Gridmap2D.config.tanksoarConfig().radar_width, Gridmap2D.config.tanksoarConfig().radar_height, 
 				playerConfig.missiles, playerConfig.energy, playerConfig.health,
-				Soar2D.config.tanksoarConfig().default_missiles, Soar2D.config.tanksoarConfig().default_energy, Soar2D.config.tanksoarConfig().default_health);
+				Gridmap2D.config.tanksoarConfig().default_missiles, Gridmap2D.config.tanksoarConfig().default_energy, Gridmap2D.config.tanksoarConfig().default_health);
 	
 		players.add(tank, tankSoarMap, playerConfig.pos);
 		

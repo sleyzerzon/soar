@@ -47,14 +47,14 @@ public class Controller implements Runnable {
 	public synchronized boolean isStopped() { return this.stop ; }
 	
 	public void errorPopUp(String message) {
-		if (Soar2D.wm.using()) {
-			Soar2D.wm.errorMessage(Soar2D.config.title(), message);
+		if (Gridmap2D.wm.using()) {
+			Gridmap2D.wm.errorMessage(Gridmap2D.config.title(), message);
 		}
 	}
 	
 	public void infoPopUp(String message) {
-		if (Soar2D.wm.using()) {
-			Soar2D.wm.infoMessage(Soar2D.config.title(), message);
+		if (Gridmap2D.wm.using()) {
+			Gridmap2D.wm.infoMessage(Gridmap2D.config.title(), message);
 		}
 	}
 	
@@ -62,8 +62,8 @@ public class Controller implements Runnable {
 	 * Called when there is a change in the number of players.
 	 */
 	public void playerEvent() {
-		if (Soar2D.wm.using()) {
-			Soar2D.wm.playerEvent();
+		if (Gridmap2D.wm.using()) {
+			Gridmap2D.wm.playerEvent();
 		}		
 	}
 	
@@ -78,9 +78,9 @@ public class Controller implements Runnable {
 		
 		// update the status line in the gui
 		if (step) {
-			Soar2D.wm.setStatus("Stepping", WindowManager.black);
+			Gridmap2D.wm.setStatus("Stepping", WindowManager.black);
 		} else {
-			Soar2D.wm.setStatus("Running", WindowManager.black);
+			Gridmap2D.wm.setStatus("Running", WindowManager.black);
 		}
 		
 		// the old style
@@ -109,13 +109,13 @@ public class Controller implements Runnable {
 	 */
 	public void resetSimulation() {
 		try {
-			Soar2D.simulation.reset();
+			Gridmap2D.simulation.reset();
 		} catch (Exception e) {
 			error(e.getMessage());
 		}
 		
-		if (Soar2D.wm.using()) {
-			Soar2D.wm.reset();
+		if (Gridmap2D.wm.using()) {
+			Gridmap2D.wm.reset();
 		}
 	}
 	
@@ -157,7 +157,7 @@ public class Controller implements Runnable {
 		}
 
 		// reset the status message
-		Soar2D.wm.setStatus("Ready", WindowManager.black);
+		Gridmap2D.wm.setStatus("Ready", WindowManager.black);
 	}
 	
 	/**
@@ -171,9 +171,9 @@ public class Controller implements Runnable {
 		stop = false;
 		running = true;
 
-		if (Soar2D.wm.using()) {
+		if (Gridmap2D.wm.using()) {
 			// this updates buttons and what-not
-			Soar2D.wm.start();
+			Gridmap2D.wm.start();
 		}
 	}
 	
@@ -184,12 +184,12 @@ public class Controller implements Runnable {
 	 */
 	public void tickEvent() throws Exception {
 		// this is 50 except for book, where it is configurable
-		timeSlice = Soar2D.config.generalConfig().cycle_time_slice / 1000.0f;
+		timeSlice = Gridmap2D.config.generalConfig().cycle_time_slice / 1000.0f;
 		totalTime += timeSlice;
 
-		Soar2D.simulation.update();
-		if (Soar2D.wm.using()) {
-			Soar2D.wm.update();
+		Gridmap2D.simulation.update();
+		if (Gridmap2D.wm.using()) {
+			Gridmap2D.wm.update();
 		}
 	}
 	
@@ -215,9 +215,9 @@ public class Controller implements Runnable {
 		logger.trace(Names.Trace.stopEvent);
 		running = false;
 		
-		if (Soar2D.wm.using()) {
+		if (Gridmap2D.wm.using()) {
 //			 this updates buttons and what-not
-			Soar2D.wm.stop();
+			Gridmap2D.wm.stop();
 		}
 	}
 	
@@ -226,9 +226,9 @@ public class Controller implements Runnable {
 	 * GUI is disposed. 
 	 */
 	public void runGUI(World world) {
-		if (Soar2D.wm.using()) {
+		if (Gridmap2D.wm.using()) {
 			// creates, displays and loops the window. returns on shutdown *hopefully
-			Soar2D.wm.run(world);
+			Gridmap2D.wm.run(world);
 		}
 	}
 
@@ -249,13 +249,13 @@ public class Controller implements Runnable {
 		// make sure things are stopped, doesn't hurt to call this when stopped
 		stopSimulation();
 		logger.info(Names.Info.shutdown);
-		if (Soar2D.wm.using()) {
+		if (Gridmap2D.wm.using()) {
 			// closes out the window manager
-			Soar2D.wm.shutdown();
+			Gridmap2D.wm.shutdown();
 		}
 		
 		// closes out the simulation
-		Soar2D.simulation.shutdown();
+		Gridmap2D.simulation.shutdown();
 	}
 
 	public boolean isRunning() {
@@ -269,7 +269,7 @@ public class Controller implements Runnable {
 	}
 
 	public CommandInfo getHumanCommand(Player player) {
-		return Soar2D.wm.getHumanCommand(player);
+		return Gridmap2D.wm.getHumanCommand(player);
 	}
 	
 	private int runsTerminal = 0;

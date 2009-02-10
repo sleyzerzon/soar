@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.CognitiveArchitecture;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.config.PlayerConfig;
 import org.msoar.gridmap2d.map.CellObject;
 import org.msoar.gridmap2d.map.EatersMap;
@@ -39,7 +39,7 @@ public class EatersWorld implements World {
 	public void setMap(String mapPath) throws Exception {
 		EatersMap oldMap = eatersMap;
 		try {
-			eatersMap = new EatersMap(mapPath, Soar2D.config.terminalsConfig().unopened_boxes, Soar2D.config.eatersConfig().low_probability, Soar2D.config.eatersConfig().high_probability);
+			eatersMap = new EatersMap(mapPath, Gridmap2D.config.terminalsConfig().unopened_boxes, Gridmap2D.config.eatersConfig().low_probability, Gridmap2D.config.eatersConfig().high_probability);
 		} catch (Exception e) {
 			if (oldMap == null) {
 				throw e;
@@ -86,7 +86,7 @@ public class EatersWorld implements World {
 	}
 
 	private void checkPointsRemaining() {
-		if (Soar2D.config.terminalsConfig().points_remaining) {
+		if (Gridmap2D.config.terminalsConfig().points_remaining) {
 			if (eatersMap.getScoreCount() <= 0) {
 				stopMessages.add("There are no points remaining.");
 			}
@@ -94,7 +94,7 @@ public class EatersWorld implements World {
 	}
 	
 	private void checkFoodRemaining() {
-		if (Soar2D.config.terminalsConfig().food_remaining) {
+		if (Gridmap2D.config.terminalsConfig().food_remaining) {
 			if (eatersMap.getFoodCount() <= 0) {
 				stopMessages.add("All the food is gone.");
 			}
@@ -102,7 +102,7 @@ public class EatersWorld implements World {
 	}
 	
 	private void checkUnopenedBoxes() {
-		if (Soar2D.config.terminalsConfig().unopened_boxes) {
+		if (Gridmap2D.config.terminalsConfig().unopened_boxes) {
 			if (eatersMap.getUnopenedBoxCount() <= 0) {
 				stopMessages.add("All of the boxes are open.");
 			}
@@ -114,7 +114,7 @@ public class EatersWorld implements World {
 		for (Eater eater : players.getAll()) {
 			CommandInfo command = eater.getCommand();
 			if (command == null) {
-				Soar2D.control.stopSimulation();
+				Gridmap2D.control.stopSimulation();
 				return;
 			}
 			players.setCommand(eater, command);
@@ -129,7 +129,7 @@ public class EatersWorld implements World {
 		WorldUtil.checkNumPlayers(players.numberOfPlayers());
 		
 		moveEaters();
-		if (Soar2D.control.isShuttingDown()) {
+		if (Gridmap2D.control.isShuttingDown()) {
 			return;
 		}
 		
@@ -140,15 +140,15 @@ public class EatersWorld implements World {
 		eatersMap.updateObjects();
 
 		if (stopMessages.size() > 0) {
-			boolean stopping = Soar2D.control.checkRunsTerminal();
+			boolean stopping = Gridmap2D.control.checkRunsTerminal();
 			WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), stopping, stopMessages);
 
 			if (stopping) {
-				Soar2D.control.stopSimulation();
+				Gridmap2D.control.stopSimulation();
 			} else {
 				// reset and continue;
 				reset();
-				Soar2D.control.startSimulation(false, false);
+				Gridmap2D.control.startSimulation(false, false);
 			}
 		}
 	}
@@ -181,12 +181,12 @@ public class EatersWorld implements World {
 				eatersMap.getCell(oldLocation).setPlayer(null);
 				
 				if (command.jump) {
-					eater.adjustPoints(Soar2D.config.eatersConfig().jump_penalty, "jump penalty");
+					eater.adjustPoints(Gridmap2D.config.eatersConfig().jump_penalty, "jump penalty");
 				}
 				players.setLocation(eater, newLocation);
 				
 			} else {
-				eater.adjustPoints(Soar2D.config.eatersConfig().wall_penalty, "wall collision");
+				eater.adjustPoints(Gridmap2D.config.eatersConfig().wall_penalty, "wall collision");
 			}
 		}
 	}
@@ -437,7 +437,7 @@ public class EatersWorld implements World {
 		players.add(eater, eatersMap, playerConfig.pos);
 		
 		if (playerConfig.productions != null) {
-			EaterCommander eaterCommander = cogArch.createEaterCommander(eater, playerConfig.productions, Soar2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile(), debug);
+			EaterCommander eaterCommander = cogArch.createEaterCommander(eater, playerConfig.productions, Gridmap2D.config.eatersConfig().vision, playerConfig.shutdown_commands, eatersMap.getMetadataFile(), debug);
 			eater.setCommander(eaterCommander);
 		} else if (playerConfig.script != null) {
 			eater.setCommander(new ScriptedEater(CommandInfo.loadScript(playerConfig.script)));

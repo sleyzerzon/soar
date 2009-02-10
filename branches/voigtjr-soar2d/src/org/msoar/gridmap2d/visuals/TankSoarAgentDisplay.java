@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.msoar.gridmap2d.CognitiveArchitecture;
 import org.msoar.gridmap2d.Direction;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.players.Player;
 import org.msoar.gridmap2d.players.Tank;
 import org.msoar.gridmap2d.players.TankState;
@@ -149,7 +149,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 					return;
 				}
 				try {
-					Soar2D.simulation.destroyPlayer(selectedPlayer);
+					Gridmap2D.simulation.destroyPlayer(selectedPlayer);
 				} catch (Exception ignored) {
 				}
 			}
@@ -166,7 +166,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 				if (selectedPlayer == null) {
 					return;
 				}
-				Soar2D.simulation.reloadPlayer(selectedPlayer);
+				Gridmap2D.simulation.reloadPlayer(selectedPlayer);
 			}
 		});
 		{
@@ -198,7 +198,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 
 		m_Radar = new ProgressBar(row5, SWT.NONE | SWT.VERTICAL);
 		m_Radar.setMinimum(0);
-		m_Radar.setMaximum(Soar2D.config.tanksoarConfig().radar_height);
+		m_Radar.setMaximum(Gridmap2D.config.tanksoarConfig().radar_height);
 		{
 			GridData gd = new GridData();
 			gd.heightHint = m_AgentWorld.getHeight();
@@ -433,7 +433,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 		facing.setText(facingDir.id());
 		energyCharger.setText(state.getOnEnergyCharger() ? "yes" : "no");
 		healthCharger.setText(state.getOnHealthCharger() ? "yes" : "no");
-		resurrect.setText(state.getResurrectFrame() == Soar2D.simulation.getWorldCount() ? "yes" : "no");
+		resurrect.setText(state.getResurrectFrame() == Gridmap2D.simulation.getWorldCount() ? "yes" : "no");
 		shields.setText(state.getShieldsUp() ? "yes" : "no");
 		m_Incoming.set(state.getIncoming(), facingDir);
 		switch (state.getSound()) {
@@ -537,8 +537,8 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	}
 	
 	void updateButtons() {
-		boolean running = Soar2D.control.isRunning();
-		boolean slotsAvailable = Soar2D.simulation.getUnusedColors().size() > 0;
+		boolean running = Gridmap2D.control.isRunning();
+		boolean slotsAvailable = Gridmap2D.simulation.getUnusedColors().size() > 0;
 		boolean hasPlayers = world.numberOfPlayers() > 0;
 		boolean selectedEater = (selectedPlayer != null);
 		

@@ -6,7 +6,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 
 
 public class SimulationButtons extends Composite {
@@ -24,7 +24,7 @@ public class SimulationButtons extends Composite {
 		m_RunButton.setText("Run");
 		m_RunButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Soar2D.control.startSimulation(false, true);
+				Gridmap2D.control.startSimulation(false, true);
 			}
 		});
 		
@@ -32,14 +32,14 @@ public class SimulationButtons extends Composite {
 		m_StopButton.setText("Stop");
 		m_StopButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Soar2D.wm.setVisualWorldFocus();
-				if (Soar2D.wm.humanMove != null) {
-					synchronized(Soar2D.wm.humanMove) {
-						Soar2D.wm.humanMove.notify();
-						Soar2D.wm.humanMove = null;
+				Gridmap2D.wm.setVisualWorldFocus();
+				if (Gridmap2D.wm.humanMove != null) {
+					synchronized(Gridmap2D.wm.humanMove) {
+						Gridmap2D.wm.humanMove.notify();
+						Gridmap2D.wm.humanMove = null;
 					}
 				}
-				Soar2D.control.stopSimulation();
+				Gridmap2D.control.stopSimulation();
 			}
 		});
 		
@@ -47,7 +47,7 @@ public class SimulationButtons extends Composite {
 		m_StepButton.setText("Step");
 		m_StepButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Soar2D.control.startSimulation(true, true);
+				Gridmap2D.control.startSimulation(true, true);
 			}
 		});
 		
@@ -55,7 +55,7 @@ public class SimulationButtons extends Composite {
 		m_ResetButton.setText("Reset");
 		m_ResetButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Soar2D.control.resetSimulation();
+				Gridmap2D.control.resetSimulation();
 			}
 		});
 	
@@ -63,8 +63,8 @@ public class SimulationButtons extends Composite {
 	}
 	
 	void updateButtons(int numberOfPlayers) {
-		boolean running = Soar2D.control.isRunning();
-		boolean done = Soar2D.simulation.isDone();
+		boolean running = Gridmap2D.control.isRunning();
+		boolean done = Gridmap2D.simulation.isDone();
 		boolean eaters = numberOfPlayers > 0;
 		
         m_RunButton.setEnabled(!running && !done && eaters);

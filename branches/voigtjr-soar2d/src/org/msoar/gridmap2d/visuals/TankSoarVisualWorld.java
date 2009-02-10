@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.CellObject;
 import org.msoar.gridmap2d.map.GridMap;
 import org.msoar.gridmap2d.players.Tank;
@@ -32,7 +32,7 @@ public class TankSoarVisualWorld extends VisualWorld {
         gc.setForeground(WindowManager.black);
 		gc.setLineWidth(1);
 
-		if (!Soar2D.control.isRunning()) {
+		if (!Gridmap2D.control.isRunning()) {
 			if (lastX != e.x || lastY != e.y || internalRepaint) {
 				lastX = e.x;
 				lastY = e.y;

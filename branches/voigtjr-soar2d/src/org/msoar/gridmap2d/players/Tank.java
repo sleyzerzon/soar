@@ -2,7 +2,7 @@ package org.msoar.gridmap2d.players;
 
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Simulation;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.TankSoarMap;
 
 public class Tank extends Player {
@@ -32,7 +32,7 @@ public class Tank extends Player {
 		if (commander != null) {
 			command = commander.nextCommand();
 		} else {
-			command = Soar2D.control.getHumanCommand(this);
+			command = Gridmap2D.control.getHumanCommand(this);
 		}
 		
 		return command;

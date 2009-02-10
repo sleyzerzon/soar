@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.msoar.gridmap2d.CognitiveArchitecture;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.config.PlayerConfig;
 
 
@@ -44,7 +44,7 @@ public class CreateAgentDialog extends Dialog {
 		
 		this.cogArch = soar;
 		
-		String lastProductionsString = Soar2D.config.getLastProductions();
+		String lastProductionsString = Gridmap2D.config.getLastProductions();
 		if (lastProductionsString != null) {
 			lastProductions = new File(lastProductionsString);
 		}
@@ -108,7 +108,7 @@ public class CreateAgentDialog extends Dialog {
 					lastProductions = file;
 					m_ProductionsLabel.setText(file.getName());
 				}
-				Soar2D.config.saveLastProductions(lastProductions.getAbsolutePath());
+				Gridmap2D.config.saveLastProductions(lastProductions.getAbsolutePath());
 				updateButtons();
 			}
 		});
@@ -143,7 +143,7 @@ public class CreateAgentDialog extends Dialog {
 			gd.horizontalSpan = 3;
 			m_Color.setLayoutData(gd);
 		}
-		List<String> unusedColors = Soar2D.simulation.getUnusedColors();
+		List<String> unusedColors = Gridmap2D.simulation.getUnusedColors();
 		
 		m_Color.setItems(unusedColors.toArray(new String[0]));
 		if (unusedColors.size() > 0) {
@@ -192,7 +192,7 @@ public class CreateAgentDialog extends Dialog {
 			m_SpawnDebuggerButton.setLayoutData(gd);
 		}
 		m_SpawnDebuggerButton.setText("Spawn debugger");
-		m_SpawnDebuggerButton.setSelection(Soar2D.config.soarConfig().spawn_debuggers);
+		m_SpawnDebuggerButton.setSelection(Gridmap2D.config.soarConfig().spawn_debuggers);
 
 		Composite okCancel = new Composite(dialog, SWT.NONE);
 		{
@@ -220,11 +220,11 @@ public class CreateAgentDialog extends Dialog {
 				}
 				playerConfig.color = m_Color.getText();
 				
-				Soar2D.config.playerConfigs().put(playerId, playerConfig);
+				Gridmap2D.config.playerConfigs().put(playerId, playerConfig);
 				try {
-					Soar2D.simulation.createPlayer(playerId, playerConfig, m_SpawnDebuggerButton.getSelection());
+					Gridmap2D.simulation.createPlayer(playerId, playerConfig, m_SpawnDebuggerButton.getSelection());
 				} catch (Exception ex) {
-					Soar2D.wm.errorMessage("Creation failed", ex.getMessage());
+					Gridmap2D.wm.errorMessage("Creation failed", ex.getMessage());
 				}
 				dialog.dispose();
 			}

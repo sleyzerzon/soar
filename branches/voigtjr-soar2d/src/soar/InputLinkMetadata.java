@@ -14,7 +14,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 
 import sml.Agent;
 import sml.Identifier;
@@ -33,8 +33,8 @@ public class InputLinkMetadata {
 		} catch (Exception e) {
 			String message = Names.Errors.metadata + agent.GetAgentName() + ": " + e.getMessage();
 			logger.error(message);
-			Soar2D.control.errorPopUp(message);
-			Soar2D.control.stopSimulation();
+			Gridmap2D.control.errorPopUp(message);
+			Gridmap2D.control.stopSimulation();
 		}
 		return null;
 	}

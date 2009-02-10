@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.CellObject;
 import org.msoar.gridmap2d.players.Player;
 
@@ -27,11 +27,11 @@ public class EatersVisualWorld extends VisualWorld {
 	}
 	
 	public int getMiniWidth() {
-		return cellSize * ((Soar2D.config.eatersConfig().vision * 2) + 1);
+		return cellSize * ((Gridmap2D.config.eatersConfig().vision * 2) + 1);
 	}
 	
 	public int getMiniHeight() {
-		return cellSize * ((Soar2D.config.eatersConfig().vision * 2) + 1);
+		return cellSize * ((Gridmap2D.config.eatersConfig().vision * 2) + 1);
 	}
 	
 	public void paintControl(PaintEvent e) {
@@ -40,7 +40,7 @@ public class EatersVisualWorld extends VisualWorld {
         gc.setForeground(WindowManager.black);
 		gc.setLineWidth(1);
 
-		if (Soar2D.control.isRunning()) {
+		if (Gridmap2D.control.isRunning()) {
 			if (agentLocation != null) {
 				painted = false;
 			}
@@ -66,22 +66,22 @@ public class EatersVisualWorld extends VisualWorld {
 		int [] location = new int [2];
 		for(location[0] = 0; location[0] < map.size(); ++location[0]){
 			if (agentLocation != null) {
-				if ((location[0] < agentLocation[0] - Soar2D.config.eatersConfig().vision) 
-						|| (location[0] > agentLocation[0] + Soar2D.config.eatersConfig().vision)) {
+				if ((location[0] < agentLocation[0] - Gridmap2D.config.eatersConfig().vision) 
+						|| (location[0] > agentLocation[0] + Gridmap2D.config.eatersConfig().vision)) {
 					continue;
 				} 
-				xDraw = location[0] + Soar2D.config.eatersConfig().vision - agentLocation[0];
+				xDraw = location[0] + Gridmap2D.config.eatersConfig().vision - agentLocation[0];
 			} else {
 				xDraw = location[0];
 			}
 			
 			for(location[1] = 0; location[1] < map.size(); ++location[1]){
 				if (agentLocation != null) {
-					if ((location[1] < agentLocation[1] - Soar2D.config.eatersConfig().vision) 
-							|| (location[1] > agentLocation[1] + Soar2D.config.eatersConfig().vision)) {
+					if ((location[1] < agentLocation[1] - Gridmap2D.config.eatersConfig().vision) 
+							|| (location[1] > agentLocation[1] + Gridmap2D.config.eatersConfig().vision)) {
 						continue;
 					} 
-					yDraw = location[1] + Soar2D.config.eatersConfig().vision - agentLocation[1];
+					yDraw = location[1] + Gridmap2D.config.eatersConfig().vision - agentLocation[1];
 				} else {
 					yDraw = location[1];
 				}

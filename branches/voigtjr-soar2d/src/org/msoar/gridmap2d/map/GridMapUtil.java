@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Simulation;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.config.Config;
 import org.msoar.gridmap2d.config.ConfigFile;
 
@@ -114,11 +114,11 @@ class GridMapUtil {
 			for (CellObject aBox : data.cellObjectManager.rewardObjects) {
 				if (aBox.getIntProperty("box-id", 0) == data.positiveRewardID) {
 					aBox.setProperty("apply.reward.correct", "ignored");
-					aBox.setProperty(org.msoar.gridmap2d.Names.kPropertyColor, Soar2D.simulation.kColors[1]);
+					aBox.setProperty(org.msoar.gridmap2d.Names.kPropertyColor, Gridmap2D.simulation.kColors[1]);
 				} else {
-					aBox.setProperty(org.msoar.gridmap2d.Names.kPropertyColor, Soar2D.simulation.kColors[negativeColor]);
+					aBox.setProperty(org.msoar.gridmap2d.Names.kPropertyColor, Gridmap2D.simulation.kColors[negativeColor]);
 					negativeColor += 1;
-					assert negativeColor < Soar2D.simulation.kColors.length;
+					assert negativeColor < Gridmap2D.simulation.kColors.length;
 				}
 			}
 		}

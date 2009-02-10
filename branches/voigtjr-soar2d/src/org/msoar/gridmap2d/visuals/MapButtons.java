@@ -7,7 +7,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 
 
 public class MapButtons extends Composite {
@@ -32,21 +32,21 @@ public class MapButtons extends Composite {
 	void changeMap() {
 		FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 		fd.setText("Open");
-		fd.setFilterPath(Soar2D.simulation.getMapPath());
+		fd.setFilterPath(Gridmap2D.simulation.getMapPath());
 		VisualWorld.internalRepaint = true;
 		String map = fd.open();
 		VisualWorld.internalRepaint = false;
 		if (map != null) {
 			try {
-				Soar2D.simulation.changeMap(map);
+				Gridmap2D.simulation.changeMap(map);
 			} catch (Exception e) {
-				Soar2D.control.errorPopUp(e.getMessage());
+				Gridmap2D.control.errorPopUp(e.getMessage());
 			}
 		}
 	}
 	
 	public void updateButtons() {
-		boolean running = Soar2D.control.isRunning();
+		boolean running = Gridmap2D.control.isRunning();
 		
 		m_ChangeMapButton.setEnabled(!running);
 	}

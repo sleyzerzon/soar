@@ -2,7 +2,7 @@ package org.msoar.gridmap2d.players;
 
 import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.Direction;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 
 
 public class TankState {
@@ -327,7 +327,7 @@ public class TankState {
 		this.shieldsUp = false;
 		this.radarSwitch = false;
 		this.radarPower = 0;
-		this.resurrectFrame = Soar2D.simulation.getWorldCount();
+		this.resurrectFrame = Gridmap2D.simulation.getWorldCount();
 		this.clearRadar();
 		this.resetSensors();
 	}
@@ -336,7 +336,7 @@ public class TankState {
 		this.energy = this.defaultEnergy;
 		this.health = this.defaultHealth;
 		this.missiles = this.defaultMissiles;
-		this.resurrectFrame = Soar2D.simulation.getWorldCount(); 
+		this.resurrectFrame = Gridmap2D.simulation.getWorldCount(); 
 		this.clearRadar();
 		this.resetSensors();
 	}

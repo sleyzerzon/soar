@@ -7,7 +7,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.msoar.gridmap2d.Direction;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 
 
 public class BlockedDiagram extends Canvas implements PaintListener {
@@ -33,7 +33,7 @@ public class BlockedDiagram extends Canvas implements PaintListener {
 	
 	public BlockedDiagram(Composite parent, int style) {
 		super(parent, style);
-		kDiagram = new Image(parent.getDisplay(), Soar2D.class.getResourceAsStream("/images/tanksoar/blocked-diagram.gif"));
+		kDiagram = new Image(parent.getDisplay(), Gridmap2D.class.getResourceAsStream("/images/tanksoar/blocked-diagram.gif"));
 		disable();
 		addPaintListener(this);		
 	}

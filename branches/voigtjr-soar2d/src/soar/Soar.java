@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.CognitiveArchitecture;
 import org.msoar.gridmap2d.Game;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.config.ClientConfig;
 import org.msoar.gridmap2d.config.SoarConfig;
 import org.msoar.gridmap2d.players.Eater;
@@ -413,14 +413,14 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
   		
   		// this updates the world
   		try {
-			Soar2D.control.tickEvent();
+			Gridmap2D.control.tickEvent();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			Soar2D.control.errorPopUp(e.getMessage());
+			Gridmap2D.control.errorPopUp(e.getMessage());
 		}
   		
 		// Test this after the world has been updated, in case it's asking us to stop
-		if (Soar2D.control.isStopped()) {
+		if (Gridmap2D.control.isStopped()) {
 			// the world has asked us to kindly stop running
   			logger.debug(Names.Debug.stopRequested);
   			
@@ -432,10 +432,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
    public void systemEventHandler(int eventID, Object data, Kernel kernel) {
   		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
   			// soar says go
-  			Soar2D.control.startEvent();
+  			Gridmap2D.control.startEvent();
   		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
   			// soar says stop
-  			Soar2D.control.stopEvent();
+  			Gridmap2D.control.stopEvent();
   		} else {
   			// soar says something we weren't expecting
   			logger.warn(Names.Warn.unknownEvent + eventID);

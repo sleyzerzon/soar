@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.GridMap;
 import org.msoar.gridmap2d.players.CommandInfo;
 import org.msoar.gridmap2d.players.Player;
@@ -24,7 +24,7 @@ public class WorldUtil {
 			}
 		}
 		if (stopping) {
-			Soar2D.control.infoPopUp(bigMessage.toString());
+			Gridmap2D.control.infoPopUp(bigMessage.toString());
 		}
 		
 		boolean draw = false;
@@ -49,8 +49,8 @@ public class WorldUtil {
 	}
 
 	static void checkMaxUpdates(List<String> stopMessages, int worldCount) {
-		if (Soar2D.config.terminalsConfig().max_updates > 0) {
-			if (worldCount >= Soar2D.config.terminalsConfig().max_updates) {
+		if (Gridmap2D.config.terminalsConfig().max_updates > 0) {
+			if (worldCount >= Gridmap2D.config.terminalsConfig().max_updates) {
 				stopMessages.add("Reached maximum updates, stopping.");
 			}
 		}
@@ -58,7 +58,7 @@ public class WorldUtil {
 	
 	static void checkStopSim(List<String> stopMessages, CommandInfo command, Player player) {
 		if (command.stopSim) {
-			if (Soar2D.config.terminalsConfig().agent_command) {
+			if (Gridmap2D.config.terminalsConfig().agent_command) {
 				stopMessages.add(player.getName() + " issued simulation stop command.");
 			} else {
 				logger.warn(player.getName() + " issued illegal simulation stop command.");
@@ -67,16 +67,16 @@ public class WorldUtil {
 	}
 
 	static void checkWinningScore(List<String> stopMessages, int[] scores) {
-		if (Soar2D.config.terminalsConfig().winning_score > 0) {
-			if (scores[scores.length - 1] >= Soar2D.config.terminalsConfig().winning_score) {
-				stopMessages.add("At least one player has achieved at least " + Soar2D.config.terminalsConfig().winning_score + " points.");
+		if (Gridmap2D.config.terminalsConfig().winning_score > 0) {
+			if (scores[scores.length - 1] >= Gridmap2D.config.terminalsConfig().winning_score) {
+				stopMessages.add("At least one player has achieved at least " + Gridmap2D.config.terminalsConfig().winning_score + " points.");
 			}
 		}
 	}
 	
 	static void checkNumPlayers(int numPlayers) throws Exception {
 		if (numPlayers == 0) {
-			Soar2D.control.stopSimulation();
+			Gridmap2D.control.stopSimulation();
 			throw new Exception("Update called with no players.");
 		}
 	}

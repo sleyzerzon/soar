@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.msoar.gridmap2d.CognitiveArchitecture;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.GridMap;
 import org.msoar.gridmap2d.players.Player;
 import org.msoar.gridmap2d.world.World;
@@ -91,7 +91,7 @@ public class EatersAgentDisplay extends AgentDisplay {
 					return;
 				}
 				try {
-					Soar2D.simulation.destroyPlayer(selectedPlayer);
+					Gridmap2D.simulation.destroyPlayer(selectedPlayer);
 				} catch (Exception ignored) {
 				}
 			}
@@ -104,7 +104,7 @@ public class EatersAgentDisplay extends AgentDisplay {
 				if (selectedPlayer == null) {
 					return;
 				}
-				Soar2D.simulation.reloadPlayer(selectedPlayer);
+				Gridmap2D.simulation.reloadPlayer(selectedPlayer);
 			}
 		});
 				
@@ -223,8 +223,8 @@ public class EatersAgentDisplay extends AgentDisplay {
 	}
 	
 	void updateButtons() {
-		boolean running = Soar2D.control.isRunning();
-		boolean slotsAvailable = Soar2D.simulation.getUnusedColors().size() > 0;
+		boolean running = Gridmap2D.control.isRunning();
+		boolean slotsAvailable = Gridmap2D.simulation.getUnusedColors().size() > 0;
 		boolean hasPlayers = world.numberOfPlayers() > 0;
 		boolean selectedEater = (selectedPlayer != null);
 		

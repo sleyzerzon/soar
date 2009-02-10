@@ -1,6 +1,6 @@
 package org.msoar.gridmap2d.players;
 
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.EatersMap;
 
 public class Eater extends Player {	
@@ -19,7 +19,7 @@ public class Eater extends Player {
 		if (commander != null) {
 			command = commander.nextCommand();
 		} else {
-			command = Soar2D.control.getHumanCommand(this);
+			command = Gridmap2D.control.getHumanCommand(this);
 		}
 		
 		// the facing depends on the move

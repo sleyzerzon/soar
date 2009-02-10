@@ -7,7 +7,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.players.RadarCell;
 import org.msoar.gridmap2d.players.Tank;
 import org.msoar.gridmap2d.players.TankState;
@@ -33,11 +33,11 @@ public class TankSoarAgentWorld extends Canvas implements PaintListener {
 	public TankSoarAgentWorld(Composite parent, int style) {
 		super(parent, style);
 		
-		radar = new Image[Soar2D.config.tanksoarConfig().radar_width][Soar2D.config.tanksoarConfig().radar_height];
-		tanks = new Color[Soar2D.config.tanksoarConfig().radar_width][Soar2D.config.tanksoarConfig().radar_height];
+		radar = new Image[Gridmap2D.config.tanksoarConfig().radar_width][Gridmap2D.config.tanksoarConfig().radar_height];
+		tanks = new Color[Gridmap2D.config.tanksoarConfig().radar_width][Gridmap2D.config.tanksoarConfig().radar_height];
 
-		question = new Image(WindowManager.display, Soar2D.class.getResourceAsStream("/images/tanksoar/question.gif"));
-		tankImage = new Image(WindowManager.display, Soar2D.class.getResourceAsStream("/images/tanksoar/tank-mini.gif"));
+		question = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/images/tanksoar/question.gif"));
+		tankImage = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/images/tanksoar/tank-mini.gif"));
 		addPaintListener(this);		
 	}
 	
@@ -89,8 +89,8 @@ public class TankSoarAgentWorld extends Canvas implements PaintListener {
 
 		RadarCell[][] tankRadar = state.getRadar();
 		int distance = state.getObservedPower();
-		for(int x = 0; x < Soar2D.config.tanksoarConfig().radar_width; ++x){
-			for(int y = 0; y < Soar2D.config.tanksoarConfig().radar_height; ++y){
+		for(int x = 0; x < Gridmap2D.config.tanksoarConfig().radar_width; ++x){
+			for(int y = 0; y < Gridmap2D.config.tanksoarConfig().radar_height; ++y){
 				if ((y < distance) || (y == distance && x == 1)) {
 					if (x == 1 && y == 0) {
 						radar[x][y] = tankImage;
@@ -153,11 +153,11 @@ public class TankSoarAgentWorld extends Canvas implements PaintListener {
 	}
 
 	public int getWidth() {
-		return kCellSize * Soar2D.config.tanksoarConfig().radar_width;
+		return kCellSize * Gridmap2D.config.tanksoarConfig().radar_width;
 	}
 	
 	public int getHeight() {
-		return kCellSize * Soar2D.config.tanksoarConfig().radar_height;
+		return kCellSize * Gridmap2D.config.tanksoarConfig().radar_height;
 	}
 
 	public void enable() {

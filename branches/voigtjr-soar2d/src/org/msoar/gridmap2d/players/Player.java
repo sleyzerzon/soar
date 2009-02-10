@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Simulation;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.config.PlayerConfig;
 
 
@@ -26,7 +26,7 @@ public class Player {
 
 	public Player(String playerID) throws Exception {
 		this.playerID = playerID;
-		this.playerConfig = Soar2D.config.playerConfigs().get(playerID);
+		this.playerConfig = Gridmap2D.config.playerConfigs().get(playerID);
 		
 		assert playerConfig.name != null;
 		this.name = playerConfig.name;
@@ -49,7 +49,7 @@ public class Player {
 		if (playerConfig.hasPoints()) {
 			this.points = playerConfig.points;
 		} else {
-			this.points = Soar2D.config.generalConfig().default_points;
+			this.points = Gridmap2D.config.generalConfig().default_points;
 		}
 
 		pointsChanged = true;

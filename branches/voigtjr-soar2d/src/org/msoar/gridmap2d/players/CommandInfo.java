@@ -11,7 +11,7 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 
 
 /**
@@ -245,7 +245,7 @@ public class CommandInfo {
 	public String toString() {
 		String output = new String();
 		
-		switch(Soar2D.config.game()) {
+		switch(Gridmap2D.config.game()) {
 		case EATERS:
 			if (jump) {
 				output += "(" + Names.kJumpID + ")";

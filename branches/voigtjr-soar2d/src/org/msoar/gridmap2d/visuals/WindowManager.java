@@ -34,7 +34,7 @@ import org.msoar.gridmap2d.CognitiveArchitecture;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Game;
 import org.msoar.gridmap2d.Names;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.EatersMap;
 import org.msoar.gridmap2d.players.CommandInfo;
 import org.msoar.gridmap2d.players.Player;
@@ -187,8 +187,8 @@ public class WindowManager {
 					int [] xy = new int[2];
 					xy[0] = shell.getLocation().x;
 					xy[1] = shell.getLocation().y;
-					if (Soar2D.config != null) {
-						Soar2D.config.saveWindowPosition(xy);
+					if (Gridmap2D.config != null) {
+						Gridmap2D.config.saveWindowPosition(xy);
 					}
 				}
 			}
@@ -197,10 +197,10 @@ public class WindowManager {
 	}
 	
 	public boolean using() {
-		if (Soar2D.config == null) {
+		if (Gridmap2D.config == null) {
 			return false;
 		}
-		return !Soar2D.config.generalConfig().headless;
+		return !Gridmap2D.config.generalConfig().headless;
 	}
 	
 	public void setupEaters() {
@@ -264,7 +264,7 @@ public class WindowManager {
 					break;
 				}
 				
-				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
+				Gridmap2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
 				
 				if (go) {
 					synchronized(humanMove) {
@@ -931,7 +931,7 @@ public class WindowManager {
 					break;
 				}
 				
-				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
+				Gridmap2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
 				
 				if (go) {
 					synchronized(humanMove) {
@@ -1080,7 +1080,7 @@ public class WindowManager {
 		gl.numColumns = 2;
 		shell.setLayout(gl);
 
-		switch (Soar2D.config.game()) {
+		switch (Gridmap2D.config.game()) {
 		case EATERS:
 			setupEaters();
 			break;
@@ -1152,7 +1152,7 @@ public class WindowManager {
 			}
 		});
 
-		int [] xy = Soar2D.config.getWindowPosition();
+		int [] xy = Gridmap2D.config.getWindowPosition();
 		if (xy != null && xy.length == 2)
 		{
 			// it shouldn't be created off-screen
@@ -1226,7 +1226,7 @@ public class WindowManager {
 	}
 
 	void updateWorldGroup() {
-		worldGroup.setText("Map: " + Soar2D.simulation.getCurrentMapName());
+		worldGroup.setText("Map: " + Gridmap2D.simulation.getCurrentMapName());
 		visualWorld.setSize(visualWorld.getWidth(), visualWorld.getHeight());
 		
 		GridData gd = new GridData();
@@ -1242,12 +1242,12 @@ public class WindowManager {
 	}
 	
 	void updateCounts() {
-		if (Soar2D.config.game() == Game.EATERS) {
+		if (Gridmap2D.config.game() == Game.EATERS) {
 			EatersMap eMap = (EatersMap)world.getMap();
 			foodCount.setText(Integer.toString(eMap.getFoodCount()));
 			scoreCount.setText(Integer.toString(eMap.getScoreCount()));
 		}
-		worldCount.setText(Integer.toString(Soar2D.simulation.getWorldCount()));
+		worldCount.setText(Integer.toString(Gridmap2D.simulation.getWorldCount()));
 	}
 
 	boolean isDisposed() {
@@ -1353,7 +1353,7 @@ public class WindowManager {
 
 	public CommandInfo getHumanCommand(Player player) {
 		humanMove = new CommandInfo();
-		if (Soar2D.config.generalConfig().headless) {
+		if (Gridmap2D.config.generalConfig().headless) {
 			return humanMove;
 		}
 //		if (player.getRadarSwitch()) {

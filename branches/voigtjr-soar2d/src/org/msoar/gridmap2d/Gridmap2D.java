@@ -33,8 +33,8 @@ import org.msoar.gridmap2d.world.World;
  * the most information, for debugging soar2d
  */
 
-public class Soar2D {
-	private static Logger logger = Logger.getLogger(Soar2D.class);
+public class Gridmap2D {
+	private static Logger logger = Logger.getLogger(Gridmap2D.class);
 	
 	public static SimConfig config = null;
 	public static final WindowManager wm = new WindowManager();
@@ -43,7 +43,7 @@ public class Soar2D {
 
 	private boolean installedAConfig = false;
 	
-	public Soar2D(String[] args) {
+	public Gridmap2D(String[] args) {
 		// Try to install default config files
 		install(Names.configs.tanksoarCnf);
 		install(Names.configs.tanksoarConsoleCnf);
@@ -205,7 +205,7 @@ public class Soar2D {
 	}
 
 	public static void main(String[] args) {
-		new Soar2D(args);
+		new Gridmap2D(args);
 		
 		// Ensure all threads clean up properly.  This is a bit heavy handed but helps ensure we are completely stopped.
 		logger.trace(Names.Trace.exitErrorLevel + 0);

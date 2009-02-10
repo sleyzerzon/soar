@@ -2,7 +2,7 @@ package org.msoar.gridmap2d.visuals;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.config.PlayerConfig;
 import org.msoar.gridmap2d.map.GridMap;
 import org.msoar.gridmap2d.players.Player;
@@ -35,7 +35,7 @@ public class AgentDisplay extends Composite {
 	
 	private static int clonePlayer = 0;
 	void clonePlayer(String playerId) {
-		PlayerConfig existingPlayerConfig = Soar2D.config.playerConfigs().get(playerId);
+		PlayerConfig existingPlayerConfig = Gridmap2D.config.playerConfigs().get(playerId);
 		
 		// create id and configuration
 		String clonePlayerId = "clone" + Integer.toString(++clonePlayer);
@@ -49,11 +49,11 @@ public class AgentDisplay extends Composite {
 			clonePlayerConfig.script = new String(existingPlayerConfig.script);
 		}
 		
-		Soar2D.config.playerConfigs().put(clonePlayerId, clonePlayerConfig);
+		Gridmap2D.config.playerConfigs().put(clonePlayerId, clonePlayerConfig);
 		try {
-			Soar2D.simulation.createPlayer(clonePlayerId, clonePlayerConfig, false);
+			Gridmap2D.simulation.createPlayer(clonePlayerId, clonePlayerConfig, false);
 		} catch (Exception e) {
-			Soar2D.wm.errorMessage("Creation failed", e.getMessage());
+			Gridmap2D.wm.errorMessage("Creation failed", e.getMessage());
 		}
 	}
 }

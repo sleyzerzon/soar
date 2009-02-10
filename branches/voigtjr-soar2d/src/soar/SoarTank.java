@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.msoar.gridmap2d.Direction;
 import org.msoar.gridmap2d.Names;
 import org.msoar.gridmap2d.Simulation;
-import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.Gridmap2D;
 import org.msoar.gridmap2d.map.TankSoarMap;
 import org.msoar.gridmap2d.players.CommandInfo;
 import org.msoar.gridmap2d.players.Player;
@@ -84,7 +84,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		} else {
 			soundString = Names.kSilentID;
 		}
-		int worldCount = Soar2D.simulation.getWorldCount();
+		int worldCount = Gridmap2D.simulation.getWorldCount();
 		String radarStatus = state.getRadarSwitch() ? Names.kOn : Names.kOff;
 		float oldrandom = random;
 		do {
@@ -337,7 +337,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 			Update(m_ClockWME, worldCount);
 
 			// resurrect sensor
-			if (state.getResurrectFrame() != Soar2D.simulation.getWorldCount()) {
+			if (state.getResurrectFrame() != Gridmap2D.simulation.getWorldCount()) {
 				if (!m_ResurrectWME.GetValue().equalsIgnoreCase(Names.kNo)) {
 					Update(m_ResurrectWME, Names.kNo);
 				}
@@ -389,7 +389,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		m_Reset = false;
 		if (!agent.Commit()) {
 			error(Names.Errors.commitFail + tank.getName());
-			Soar2D.control.stopSimulation();
+			Gridmap2D.control.stopSimulation();
 		}
 	}
 
@@ -536,7 +536,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
     	agent.ClearOutputLinkChanges();
 		if (!agent.Commit()) {
 			error(Names.Errors.commitFail + this.tank.getName());
-			Soar2D.control.stopSimulation();
+			Gridmap2D.control.stopSimulation();
 		}
 		
 		// Do not allow a move if we rotated.
@@ -654,17 +654,17 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 
 	private void error(String message) {
 		logger.error(message);
-		Soar2D.control.errorPopUp(message);
+		Gridmap2D.control.errorPopUp(message);
 	}
 	
 	public void runEventHandler(int eventID, Object data, Agent agent, int phase) {
 		if (eventID == smlRunEventId.smlEVENT_AFTER_INTERRUPT.swigValue()) {
-			if (!Soar2D.control.isStopped()) {
+			if (!Gridmap2D.control.isStopped()) {
 				logger.warn(tank.getName() + ": agent interrupted");
 				try {
 					// only penalize interruptions when running headless
-					if (!Soar2D.wm.using()) {
-						Soar2D.simulation.interrupted(agent.GetAgentName());
+					if (!Gridmap2D.wm.using()) {
+						Gridmap2D.simulation.interrupted(agent.GetAgentName());
 					}
 				} catch (Exception ignored) {
 				}
@@ -672,10 +672,10 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		} else if (!mem_exceeded && eventID == smlRunEventId.smlEVENT_MAX_MEMORY_USAGE_EXCEEDED.swigValue()) {
 			logger.warn(tank.getName() + ": agent exceeded maximum memory usage");
 			try {
-				Soar2D.simulation.interrupted(agent.GetAgentName());
+				Gridmap2D.simulation.interrupted(agent.GetAgentName());
 			} catch (Exception ignored) {
 			}
-			Soar2D.control.stopSimulation();
+			Gridmap2D.control.stopSimulation();
 			mem_exceeded = true;
 		} else {
 			assert false;
@@ -806,7 +806,7 @@ public class SoarTank implements Agent.RunEventInterface, TankCommander {
 		
 		if (!agent.Commit()) {
 			error(Names.Errors.commitFail + tank.getName());
-			Soar2D.control.stopSimulation();
+			Gridmap2D.control.stopSimulation();
 		}
 
 		TankState state = tank.getState();
