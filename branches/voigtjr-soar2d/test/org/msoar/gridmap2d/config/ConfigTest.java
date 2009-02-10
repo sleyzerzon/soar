@@ -1,4 +1,4 @@
-package soar2d.config;
+package org.msoar.gridmap2d.config;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;

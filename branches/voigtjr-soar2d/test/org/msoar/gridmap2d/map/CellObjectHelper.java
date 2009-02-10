@@ -1,4 +1,4 @@
-package soar2d.map;
+package org.msoar.gridmap2d.map;
 
 import org.msoar.gridmap2d.config.Config;
 import org.msoar.gridmap2d.config.ConfigFile;
