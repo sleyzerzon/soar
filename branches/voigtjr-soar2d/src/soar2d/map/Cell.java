@@ -19,9 +19,9 @@ public class Cell {
 	}
 	
 	static Cell createCell(int[] xy) {
-//		if (Cell.useSynchronized) {
-//			return new CellSynchronized(xy);
-//		}
+		if (Cell.useSynchronized) {
+			return new CellSynchronized(xy);
+		}
 		return new Cell(xy);
 	}
 	
