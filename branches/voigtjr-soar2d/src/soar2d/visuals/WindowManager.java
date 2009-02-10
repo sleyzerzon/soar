@@ -1385,8 +1385,8 @@ public class WindowManager {
 	public String promptForConfig() {
 		FileDialog fd = new FileDialog(shell, SWT.OPEN);
 		fd.setText("Select configuration file");
-		fd.setFilterPath(System.getProperty("user.dir") + System.getProperty("file.separator"));
-		fd.setFileName(Names.configs.eatersCnf);
+		fd.setFilterPath("config"); // FIXME: broken on linux with swt.jar version 3.3
+		fd.setFileName(Names.configs.tanksoarCnf);
 		fd.setFilterExtensions(new String[] {"*.cnf", "*.*"});
 		return fd.open();
 	}

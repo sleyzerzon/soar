@@ -16,7 +16,7 @@ objects {
 		apply.health = -400;
 		apply.health.shields-down = true;
 		image = missile.gif;
-		update.fly-missile;
+		update.fly-missile = 1;
 	}
 	radar-north {
 		name = radar-north;

@@ -41,17 +41,18 @@ public class Soar2D {
 	public static final Simulation simulation = new Simulation();
 	public static final Controller control = new Controller();
 
+	private boolean installedAConfig = false;
+	
 	public Soar2D(String[] args) {
-
 		// Try to install default config files
 		install(Names.configs.tanksoarCnf);
 		install(Names.configs.tanksoarConsoleCnf);
 		install(Names.configs.eatersCnf);
 		install(Names.configs.eatersConsoleCnf);
-		install(Names.configs.roomCnf);
-		install(Names.configs.roomDiscreteCnf);
-		install(Names.configs.kitchenCnf);
-		install(Names.configs.taxiCnf);
+//		install(Names.configs.roomCnf);
+//		install(Names.configs.roomDiscreteCnf);
+//		install(Names.configs.kitchenCnf);
+//		install(Names.configs.taxiCnf);
 
 		loadConfig(args);
 
@@ -174,7 +175,7 @@ public class Soar2D {
 			}
 			
 			// Create the new file on disk
-			FileOutputStream os = new FileOutputStream(library) ;
+			FileOutputStream os = new FileOutputStream("config" + System.getProperty("file.separator") + library) ;
 			
 			// Copy the file onto disk
 			byte bytes[] = new byte[2048];
@@ -191,10 +192,15 @@ public class Soar2D {
 			is.close() ;
 			os.close() ;
 			
-			System.out.println("Installed " + library + " onto the local disk from JAR file") ;
+			//System.out.println("Installed " + library + " onto the local disk from JAR file") ;
 		} catch (IOException e) {
 			wm.initialize();
 			fatalError(Names.Errors.installingConfig + file + ": " + e.getMessage());
+		}
+		
+		if (!installedAConfig) {
+			installedAConfig = true;
+			System.err.println("Installed at least one config file.\nYou may need to refresh the project if you are working inside of Eclipse.");
 		}
 	}
 
