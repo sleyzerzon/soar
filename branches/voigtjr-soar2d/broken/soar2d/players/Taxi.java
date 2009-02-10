@@ -1,4 +1,4 @@
-package soar2d.players;
+package broken.soar2d.players;
 
 import soar2d.Soar2D;
 

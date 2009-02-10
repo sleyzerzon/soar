@@ -2,10 +2,10 @@ package soar2d;
 
 public enum Game {
 	TANKSOAR, 
-	EATERS, 
-	KITCHEN, 
-	TAXI, 
-	ROOM;
+	EATERS; 
+//	KITCHEN, 
+//	TAXI, 
+//	ROOM;
 	
 	public String id() {
 		return this.toString().toLowerCase();

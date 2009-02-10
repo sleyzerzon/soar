@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -48,29 +47,29 @@ public class CommandInfo {
 	public boolean shields = false;	// change shields status
 	public boolean shieldsSetting = false;	// setting to change shields to
 	
-	// book
-	public boolean forward = false;	// move forward
-	public boolean backward = false;	// move backward
-	public boolean rotateAbsolute = false;	// rotate to a heading
-	public double rotateAbsoluteHeading;	// what heading to stop at
-	public boolean rotateRelative = false;	// rotate tank
-	public double rotateRelativeYaw;		// how far to rotate
-	public boolean get = false;
-	public int [] getLocation = null;
-	public int getId;
-	public boolean drop = false;
-	public int dropId;
-	
-	// kitchen
-	public boolean moveWithObject = false;
-	public boolean mix = false;
-	public boolean cook = false;
-	public boolean eat = false;
-	
-	// taxi
-	public boolean pickup = false;
-	public boolean putdown = false;
-	public boolean fillup = false;
+//	// book
+//	public boolean forward = false;	// move forward
+//	public boolean backward = false;	// move backward
+//	public boolean rotateAbsolute = false;	// rotate to a heading
+//	public double rotateAbsoluteHeading;	// what heading to stop at
+//	public boolean rotateRelative = false;	// rotate tank
+//	public double rotateRelativeYaw;		// how far to rotate
+//	public boolean get = false;
+//	public int [] getLocation = null;
+//	public int getId;
+//	public boolean drop = false;
+//	public int dropId;
+//	
+//	// kitchen
+//	public boolean moveWithObject = false;
+//	public boolean mix = false;
+//	public boolean cook = false;
+//	public boolean eat = false;
+//	
+//	// taxi
+//	public boolean pickup = false;
+//	public boolean putdown = false;
+//	public boolean fillup = false;
 	
 	public class Communication {
 		public String to;
@@ -284,67 +283,67 @@ public class CommandInfo {
 			}
 			break;
 			
-		case ROOM:
-			if (forward) {
-				output += "(" + Names.kForwardID + ")";
-			}
-			if (backward) {
-				output += "(" + Names.kBackwardID + ")";
-			}
-			if (rotate) {
-				output += "(" + Names.kRotateID + ": " + rotateDirection + ")";			
-			}
-			if (rotateAbsolute) {
-				output += "(" + Names.kRotateAbsoluteID + ": " + rotateAbsoluteHeading + ")";			
-			}
-			if (rotateRelative) {
-				output += "(" + Names.kRotateRelativeID + ": " + rotateRelativeYaw + ")";			
-			}
-			if (get) {
-				output += "(" + Names.kGetID + ": " + getId + ": " + getLocation[0] + "," + getLocation[1] + ")";
-			}
-			if (drop) {
-				output += "(" + Names.kDropID + ": " + dropId + ")";
-			}
-			Iterator<Communication> iter = messages.iterator();
-			while (iter.hasNext()) {
-				Communication comm = iter.next();
-				output += "(comm: " + comm.to + ": " + comm.message + ")";
-			}
-			break;
-
-		case KITCHEN:
-			if (move) {
-				output += "(" + Names.kMoveID + ": " + moveDirection.id() + ")";
-			}
-			if (moveWithObject) {
-				output += "(move-with-object)";
-			}
-			if (mix) {
-				output += "(mix)";
-			}
-			if (cook) {
-				output += "(cook)";
-			}
-			if (eat) {
-				output += "(eat)";
-			}
-			break;
-
-		case TAXI:
-			if (move) {
-				output += "(" + Names.kMoveID + ": " + moveDirection.id() + ")";
-			}
-			if (pickup) {
-				output += "(" + Names.kPickUpID + ")";
-			}
-			if (putdown) {
-				output += "(" + Names.kPutDownID + ")";
-			}
-			if (fillup) {
-				output += "(" + Names.kFillUpID + ")";
-			}
-			break;
+//		case ROOM:
+//			if (forward) {
+//				output += "(" + Names.kForwardID + ")";
+//			}
+//			if (backward) {
+//				output += "(" + Names.kBackwardID + ")";
+//			}
+//			if (rotate) {
+//				output += "(" + Names.kRotateID + ": " + rotateDirection + ")";			
+//			}
+//			if (rotateAbsolute) {
+//				output += "(" + Names.kRotateAbsoluteID + ": " + rotateAbsoluteHeading + ")";			
+//			}
+//			if (rotateRelative) {
+//				output += "(" + Names.kRotateRelativeID + ": " + rotateRelativeYaw + ")";			
+//			}
+//			if (get) {
+//				output += "(" + Names.kGetID + ": " + getId + ": " + getLocation[0] + "," + getLocation[1] + ")";
+//			}
+//			if (drop) {
+//				output += "(" + Names.kDropID + ": " + dropId + ")";
+//			}
+//			Iterator<Communication> iter = messages.iterator();
+//			while (iter.hasNext()) {
+//				Communication comm = iter.next();
+//				output += "(comm: " + comm.to + ": " + comm.message + ")";
+//			}
+//			break;
+//
+//		case KITCHEN:
+//			if (move) {
+//				output += "(" + Names.kMoveID + ": " + moveDirection.id() + ")";
+//			}
+//			if (moveWithObject) {
+//				output += "(move-with-object)";
+//			}
+//			if (mix) {
+//				output += "(mix)";
+//			}
+//			if (cook) {
+//				output += "(cook)";
+//			}
+//			if (eat) {
+//				output += "(eat)";
+//			}
+//			break;
+//
+//		case TAXI:
+//			if (move) {
+//				output += "(" + Names.kMoveID + ": " + moveDirection.id() + ")";
+//			}
+//			if (pickup) {
+//				output += "(" + Names.kPickUpID + ")";
+//			}
+//			if (putdown) {
+//				output += "(" + Names.kPutDownID + ")";
+//			}
+//			if (fillup) {
+//				output += "(" + Names.kFillUpID + ")";
+//			}
+//			break;
 			
 		}
 		

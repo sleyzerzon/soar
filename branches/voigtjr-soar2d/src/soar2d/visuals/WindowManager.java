@@ -280,154 +280,154 @@ public class WindowManager {
 		shell.setText("Eaters");
 	}
 	
-	public void setupKitchen() {
-		worldGroup = new Group(shell, SWT.NONE);
-		worldGroup.setLayout(new FillLayout());
-		visualWorld = new KitchenVisualWorld(worldGroup, SWT.NONE, kKitchenMainMapCellSize);
-		visualWorld.setMap(world.getMap());
-
-		visualWorld.addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
-				if (player == null) {
-					return;
-				}
-				agentDisplay.selectPlayer(player);
-			}
-		});
-		visualWorld.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (humanMove == null) {
-					return;
-				}
-				boolean go = false;
-				switch (e.keyCode) {
-				case SWT.KEYPAD_8:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.NORTH;
-					go = true;
-					break;
-				case SWT.KEYPAD_6:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.EAST;
-					go = true;
-					break;
-				case SWT.KEYPAD_2:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.SOUTH;
-					go = true;
-					break;
-				case SWT.KEYPAD_4:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.WEST;
-					go = true;
-					break;
-				case SWT.KEYPAD_5:
-					humanMove.moveWithObject = !humanMove.moveWithObject;
-					break;
-				case SWT.KEYPAD_1:
-					humanMove.mix = true;
-					go = true;
-					break;
-				case SWT.KEYPAD_3:
-					humanMove.cook = true;
-					go = true;
-					break;
-				case SWT.KEYPAD_0:
-					humanMove.eat = true;
-					go = true;
-					break;
-
-				case SWT.KEYPAD_MULTIPLY:
-					humanMove.stopSim = !humanMove.stopSim;
-					break;
-				default:
-					break;
-				}
-				
-				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
-				
-				if (go) {
-					synchronized(humanMove) {
-						humanMove.notify();
-					}
-				}
-			}
-		});
-		
-		createRHS();
-		createKitchenSide();
-
-		shell.setText("Kitchen");
-	}
-	
-	public void setupTaxi() {
-		worldGroup = new Group(shell, SWT.NONE);
-		worldGroup.setLayout(new FillLayout());
-		visualWorld = new TaxiVisualWorld(worldGroup, SWT.NONE, kTaxiMainMapCellSize);
-		visualWorld.setMap(world.getMap());
-
-		visualWorld.addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
-				if (player == null) {
-					return;
-				}
-				agentDisplay.selectPlayer(player);
-			}
-		});
-		visualWorld.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (humanMove == null) {
-					return;
-				}
-				switch (e.keyCode) {
-				case SWT.KEYPAD_8:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.NORTH;
-					break;
-				case SWT.KEYPAD_6:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.EAST;
-					break;
-				case SWT.KEYPAD_2:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.SOUTH;
-					break;
-				case SWT.KEYPAD_4:
-					humanMove.move = true;
-					humanMove.moveDirection = Direction.WEST;
-					break;
-				case SWT.KEYPAD_5:
-					humanMove.fillup = true;
-					break;
-				case SWT.KEYPAD_1:
-					humanMove.pickup = true;
-					break;
-				case SWT.KEYPAD_3:
-					humanMove.putdown = true;
-					break;
-
-				case SWT.KEYPAD_MULTIPLY:
-					humanMove.stopSim = !humanMove.stopSim;
-					break;
-				default:
-					break;
-				}
-				
-				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
-				
-				synchronized(humanMove) {
-					humanMove.notify();
-				}
-			}
-		});
-		
-		createRHS();
-		createTaxiSide();
-
-		shell.setText("Taxi");
-	}
+//	public void setupKitchen() {
+//		worldGroup = new Group(shell, SWT.NONE);
+//		worldGroup.setLayout(new FillLayout());
+//		visualWorld = new KitchenVisualWorld(worldGroup, SWT.NONE, kKitchenMainMapCellSize);
+//		visualWorld.setMap(world.getMap());
+//
+//		visualWorld.addMouseListener(new MouseAdapter() {
+//			public void mouseDown(MouseEvent e) {
+//				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
+//				if (player == null) {
+//					return;
+//				}
+//				agentDisplay.selectPlayer(player);
+//			}
+//		});
+//		visualWorld.addKeyListener(new KeyAdapter() {
+//			public void keyPressed(KeyEvent e) {
+//				if (humanMove == null) {
+//					return;
+//				}
+//				boolean go = false;
+//				switch (e.keyCode) {
+//				case SWT.KEYPAD_8:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.NORTH;
+//					go = true;
+//					break;
+//				case SWT.KEYPAD_6:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.EAST;
+//					go = true;
+//					break;
+//				case SWT.KEYPAD_2:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.SOUTH;
+//					go = true;
+//					break;
+//				case SWT.KEYPAD_4:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.WEST;
+//					go = true;
+//					break;
+//				case SWT.KEYPAD_5:
+//					humanMove.moveWithObject = !humanMove.moveWithObject;
+//					break;
+//				case SWT.KEYPAD_1:
+//					humanMove.mix = true;
+//					go = true;
+//					break;
+//				case SWT.KEYPAD_3:
+//					humanMove.cook = true;
+//					go = true;
+//					break;
+//				case SWT.KEYPAD_0:
+//					humanMove.eat = true;
+//					go = true;
+//					break;
+//
+//				case SWT.KEYPAD_MULTIPLY:
+//					humanMove.stopSim = !humanMove.stopSim;
+//					break;
+//				default:
+//					break;
+//				}
+//				
+//				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
+//				
+//				if (go) {
+//					synchronized(humanMove) {
+//						humanMove.notify();
+//					}
+//				}
+//			}
+//		});
+//		
+//		createRHS();
+//		createKitchenSide();
+//
+//		shell.setText("Kitchen");
+//	}
+//	
+//	public void setupTaxi() {
+//		worldGroup = new Group(shell, SWT.NONE);
+//		worldGroup.setLayout(new FillLayout());
+//		visualWorld = new TaxiVisualWorld(worldGroup, SWT.NONE, kTaxiMainMapCellSize);
+//		visualWorld.setMap(world.getMap());
+//
+//		visualWorld.addMouseListener(new MouseAdapter() {
+//			public void mouseDown(MouseEvent e) {
+//				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
+//				if (player == null) {
+//					return;
+//				}
+//				agentDisplay.selectPlayer(player);
+//			}
+//		});
+//		visualWorld.addKeyListener(new KeyAdapter() {
+//			public void keyPressed(KeyEvent e) {
+//				if (humanMove == null) {
+//					return;
+//				}
+//				switch (e.keyCode) {
+//				case SWT.KEYPAD_8:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.NORTH;
+//					break;
+//				case SWT.KEYPAD_6:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.EAST;
+//					break;
+//				case SWT.KEYPAD_2:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.SOUTH;
+//					break;
+//				case SWT.KEYPAD_4:
+//					humanMove.move = true;
+//					humanMove.moveDirection = Direction.WEST;
+//					break;
+//				case SWT.KEYPAD_5:
+//					humanMove.fillup = true;
+//					break;
+//				case SWT.KEYPAD_1:
+//					humanMove.pickup = true;
+//					break;
+//				case SWT.KEYPAD_3:
+//					humanMove.putdown = true;
+//					break;
+//
+//				case SWT.KEYPAD_MULTIPLY:
+//					humanMove.stopSim = !humanMove.stopSim;
+//					break;
+//				default:
+//					break;
+//				}
+//				
+//				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
+//				
+//				synchronized(humanMove) {
+//					humanMove.notify();
+//				}
+//			}
+//		});
+//		
+//		createRHS();
+//		createTaxiSide();
+//
+//		shell.setText("Taxi");
+//	}
 	
 	private void createRHS() {
 		rhs = new Composite(shell, SWT.NONE);
@@ -534,197 +534,197 @@ public class WindowManager {
 		}
 	}
 	
-	private void createKitchenSide() {
-		
-		currentSide = new Composite(rhs, SWT.NONE);
-		{
-			GridLayout gl = new GridLayout();
-			gl.marginHeight = 0;
-			gl.marginWidth = 0;
-			currentSide.setLayout(gl);
-			
-			GridData gd = new GridData();
-			currentSide.setLayoutData(gd);
-		}
-		
-		Group group1 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group1.setLayoutData(gd);
-		}
-		group1.setText("Simulation");
-		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
-		
-		Group group2 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group2.setLayoutData(gd);
-		}
-		group2.setText("Map");
-		{
-			GridLayout gl = new GridLayout();
-			gl.numColumns = 2;
-			group2.setLayout(gl);
-		}
-		
-		Label worldCountLabel = new Label(group2, SWT.NONE);
-		worldCountLabel.setText(kWorldCount);
-		{
-			GridData gd = new GridData();
-			worldCountLabel.setLayoutData(gd);
-		}
-		
-		worldCount = new Label(group2, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			gd.widthHint = 50;
-			worldCount.setLayoutData(gd);
-		}
-		
-		updateCounts();
-		
-		mapButtons = new MapButtons(group2);
-		{
-			GridData gd = new GridData();
-			gd.horizontalSpan = 2;
-			mapButtons.setLayoutData(gd);
-		}
-
-		agentDisplay = new KitchenAgentDisplay(currentSide);
-		{
-			GridData gd = new GridData();
-			agentDisplay.setLayoutData(gd);
-		}
-	}
+//	private void createKitchenSide() {
+//		
+//		currentSide = new Composite(rhs, SWT.NONE);
+//		{
+//			GridLayout gl = new GridLayout();
+//			gl.marginHeight = 0;
+//			gl.marginWidth = 0;
+//			currentSide.setLayout(gl);
+//			
+//			GridData gd = new GridData();
+//			currentSide.setLayoutData(gd);
+//		}
+//		
+//		Group group1 = new Group(currentSide, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			group1.setLayoutData(gd);
+//		}
+//		group1.setText("Simulation");
+//		group1.setLayout(new FillLayout());
+//		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
+//		
+//		Group group2 = new Group(currentSide, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			group2.setLayoutData(gd);
+//		}
+//		group2.setText("Map");
+//		{
+//			GridLayout gl = new GridLayout();
+//			gl.numColumns = 2;
+//			group2.setLayout(gl);
+//		}
+//		
+//		Label worldCountLabel = new Label(group2, SWT.NONE);
+//		worldCountLabel.setText(kWorldCount);
+//		{
+//			GridData gd = new GridData();
+//			worldCountLabel.setLayoutData(gd);
+//		}
+//		
+//		worldCount = new Label(group2, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			gd.widthHint = 50;
+//			worldCount.setLayoutData(gd);
+//		}
+//		
+//		updateCounts();
+//		
+//		mapButtons = new MapButtons(group2);
+//		{
+//			GridData gd = new GridData();
+//			gd.horizontalSpan = 2;
+//			mapButtons.setLayoutData(gd);
+//		}
+//
+//		agentDisplay = new KitchenAgentDisplay(currentSide);
+//		{
+//			GridData gd = new GridData();
+//			agentDisplay.setLayoutData(gd);
+//		}
+//	}
 	
-	private void createTaxiSide() {
-		
-		currentSide = new Composite(rhs, SWT.NONE);
-		{
-			GridLayout gl = new GridLayout();
-			gl.marginHeight = 0;
-			gl.marginWidth = 0;
-			currentSide.setLayout(gl);
-			
-			GridData gd = new GridData();
-			currentSide.setLayoutData(gd);
-		}
-		
-		Group group1 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group1.setLayoutData(gd);
-		}
-		group1.setText("Simulation");
-		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
-		
-		Group group2 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group2.setLayoutData(gd);
-		}
-		group2.setText("Map");
-		{
-			GridLayout gl = new GridLayout();
-			gl.numColumns = 2;
-			group2.setLayout(gl);
-		}
-		
-		Label worldCountLabel = new Label(group2, SWT.NONE);
-		worldCountLabel.setText(kWorldCount);
-		{
-			GridData gd = new GridData();
-			worldCountLabel.setLayoutData(gd);
-		}
-		
-		worldCount = new Label(group2, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			gd.widthHint = 50;
-			worldCount.setLayoutData(gd);
-		}
-		
-		updateCounts();
-		
-		mapButtons = new MapButtons(group2);
-		{
-			GridData gd = new GridData();
-			gd.horizontalSpan = 2;
-			mapButtons.setLayoutData(gd);
-		}
-
-		agentDisplay = new TaxiAgentDisplay(currentSide);
-		{
-			GridData gd = new GridData();
-			agentDisplay.setLayoutData(gd);
-		}
-	}
-	
-	private void createBookSide() {
-		
-		currentSide = new Composite(rhs, SWT.NONE);
-		{
-			GridLayout gl = new GridLayout();
-			gl.marginHeight = 0;
-			gl.marginWidth = 0;
-			currentSide.setLayout(gl);
-			
-			GridData gd = new GridData();
-			currentSide.setLayoutData(gd);
-		}
-		
-		Group group1 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group1.setLayoutData(gd);
-		}
-		group1.setText("Simulation");
-		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
-		
-		Group group2 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group2.setLayoutData(gd);
-		}
-		group2.setText("Map");
-		{
-			GridLayout gl = new GridLayout();
-			gl.numColumns = 2;
-			group2.setLayout(gl);
-		}
-		
-		Label worldCountLabel = new Label(group2, SWT.NONE);
-		worldCountLabel.setText(kWorldCount);
-		{
-			GridData gd = new GridData();
-			worldCountLabel.setLayoutData(gd);
-		}
-		
-		worldCount = new Label(group2, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			gd.widthHint = 50;
-			worldCount.setLayoutData(gd);
-		}
-		
-		updateCounts();
-		
-		mapButtons = new MapButtons(group2);
-		{
-			GridData gd = new GridData();
-			gd.horizontalSpan = 2;
-			mapButtons.setLayoutData(gd);
-		}
-
-		agentDisplay = new BookAgentDisplay(currentSide);
-		{
-			GridData gd = new GridData();
-			agentDisplay.setLayoutData(gd);
-		}
-	}
+//	private void createTaxiSide() {
+//		
+//		currentSide = new Composite(rhs, SWT.NONE);
+//		{
+//			GridLayout gl = new GridLayout();
+//			gl.marginHeight = 0;
+//			gl.marginWidth = 0;
+//			currentSide.setLayout(gl);
+//			
+//			GridData gd = new GridData();
+//			currentSide.setLayoutData(gd);
+//		}
+//		
+//		Group group1 = new Group(currentSide, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			group1.setLayoutData(gd);
+//		}
+//		group1.setText("Simulation");
+//		group1.setLayout(new FillLayout());
+//		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
+//		
+//		Group group2 = new Group(currentSide, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			group2.setLayoutData(gd);
+//		}
+//		group2.setText("Map");
+//		{
+//			GridLayout gl = new GridLayout();
+//			gl.numColumns = 2;
+//			group2.setLayout(gl);
+//		}
+//		
+//		Label worldCountLabel = new Label(group2, SWT.NONE);
+//		worldCountLabel.setText(kWorldCount);
+//		{
+//			GridData gd = new GridData();
+//			worldCountLabel.setLayoutData(gd);
+//		}
+//		
+//		worldCount = new Label(group2, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			gd.widthHint = 50;
+//			worldCount.setLayoutData(gd);
+//		}
+//		
+//		updateCounts();
+//		
+//		mapButtons = new MapButtons(group2);
+//		{
+//			GridData gd = new GridData();
+//			gd.horizontalSpan = 2;
+//			mapButtons.setLayoutData(gd);
+//		}
+//
+//		agentDisplay = new TaxiAgentDisplay(currentSide);
+//		{
+//			GridData gd = new GridData();
+//			agentDisplay.setLayoutData(gd);
+//		}
+//	}
+//	
+//	private void createBookSide() {
+//		
+//		currentSide = new Composite(rhs, SWT.NONE);
+//		{
+//			GridLayout gl = new GridLayout();
+//			gl.marginHeight = 0;
+//			gl.marginWidth = 0;
+//			currentSide.setLayout(gl);
+//			
+//			GridData gd = new GridData();
+//			currentSide.setLayoutData(gd);
+//		}
+//		
+//		Group group1 = new Group(currentSide, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			group1.setLayoutData(gd);
+//		}
+//		group1.setText("Simulation");
+//		group1.setLayout(new FillLayout());
+//		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
+//		
+//		Group group2 = new Group(currentSide, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			group2.setLayoutData(gd);
+//		}
+//		group2.setText("Map");
+//		{
+//			GridLayout gl = new GridLayout();
+//			gl.numColumns = 2;
+//			group2.setLayout(gl);
+//		}
+//		
+//		Label worldCountLabel = new Label(group2, SWT.NONE);
+//		worldCountLabel.setText(kWorldCount);
+//		{
+//			GridData gd = new GridData();
+//			worldCountLabel.setLayoutData(gd);
+//		}
+//		
+//		worldCount = new Label(group2, SWT.NONE);
+//		{
+//			GridData gd = new GridData();
+//			gd.widthHint = 50;
+//			worldCount.setLayoutData(gd);
+//		}
+//		
+//		updateCounts();
+//		
+//		mapButtons = new MapButtons(group2);
+//		{
+//			GridData gd = new GridData();
+//			gd.horizontalSpan = 2;
+//			mapButtons.setLayoutData(gd);
+//		}
+//
+//		agentDisplay = new BookAgentDisplay(currentSide);
+//		{
+//			GridData gd = new GridData();
+//			agentDisplay.setLayoutData(gd);
+//		}
+//	}
 	
 	public class GetIdDialog extends Dialog {
 		public GetIdDialog(Shell parent) {
@@ -773,81 +773,82 @@ public class WindowManager {
 		}
 	}
 	
-	public void setupBook() {
-		worldGroup = new Group(shell, SWT.NONE);
-		worldGroup.setLayout(new FillLayout());
-		visualWorld = new BookVisualWorld(worldGroup, SWT.NONE, Soar2D.config.roomConfig().cell_size);
-		visualWorld.setMap(world.getMap());
-
-		visualWorld.addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
-				if (player == null) {
-					return;
-				}
-				agentDisplay.selectPlayer(player);
-			}
-		});
-		visualWorld.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (humanMove == null) {
-					return;
-				}
-				boolean go = false;
-				switch (e.keyCode) {
-				case SWT.KEYPAD_9:
-					GetIdDialog getDialog = new GetIdDialog(e.display.getShells()[0]);
-					getDialog.open();
-					break;
-				case SWT.KEYPAD_8:
-					humanMove.forward = true;
-					break;
-				case SWT.KEYPAD_4:
-					humanMove.rotate = true;
-					humanMove.rotateDirection = Names.kRotateLeft;
-					break;
-				case SWT.KEYPAD_5:
-					humanMove.rotate = true;
-					humanMove.rotateDirection = Names.kRotateStop;
-					break;
-				case SWT.KEYPAD_6:
-					humanMove.rotate = true;
-					humanMove.rotateDirection = Names.kRotateRight;
-					break;
-				case SWT.KEYPAD_3:
-					humanMove.drop = true;
-					// FIXME
-					//humanMove.dropId = human.getCarryId();
-					break;
-				case SWT.KEYPAD_2:
-					humanMove.backward = true;
-					break;
-				case SWT.KEYPAD_MULTIPLY:
-					humanMove.stopSim = true;
-					break;
-				case SWT.KEYPAD_CR:
-					go = true;
-					break;
-				default:
-					break;
-				}
-				
-				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
-				
-				if (go) {
-					synchronized(humanMove) {
-						humanMove.notify();
-					}
-				}
-			}
-		});
-		
-		createRHS();
-		createBookSide();
-
-		shell.setText("Book");
+//	public void setupBook() {
+//		worldGroup = new Group(shell, SWT.NONE);
+//		worldGroup.setLayout(new FillLayout());
+//		visualWorld = new BookVisualWorld(worldGroup, SWT.NONE, Soar2D.config.roomConfig().cell_size);
+//		visualWorld.setMap(world.getMap());
+//
+//		visualWorld.addMouseListener(new MouseAdapter() {
+//			public void mouseDown(MouseEvent e) {
+//				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
+//				if (player == null) {
+//					return;
+//				}
+//				agentDisplay.selectPlayer(player);
+//			}
+//		});
+//		visualWorld.addKeyListener(new KeyAdapter() {
+//			public void keyPressed(KeyEvent e) {
+//				if (humanMove == null) {
+//					return;
+//				}
+//				boolean go = false;
+//				switch (e.keyCode) {
+//				case SWT.KEYPAD_9:
+//					GetIdDialog getDialog = new GetIdDialog(e.display.getShells()[0]);
+//					getDialog.open();
+//					break;
+//				case SWT.KEYPAD_8:
+//					humanMove.forward = true;
+//					break;
+//				case SWT.KEYPAD_4:
+//					humanMove.rotate = true;
+//					humanMove.rotateDirection = Names.kRotateLeft;
+//					break;
+//				case SWT.KEYPAD_5:
+//					humanMove.rotate = true;
+//					humanMove.rotateDirection = Names.kRotateStop;
+//					break;
+//				case SWT.KEYPAD_6:
+//					humanMove.rotate = true;
+//					humanMove.rotateDirection = Names.kRotateRight;
+//					break;
+//				case SWT.KEYPAD_3:
+//					humanMove.drop = true;
+//					// FIXME
+//					//humanMove.dropId = human.getCarryId();
+//					break;
+//				case SWT.KEYPAD_2:
+//					humanMove.backward = true;
+//					break;
+//				case SWT.KEYPAD_MULTIPLY:
+//					humanMove.stopSim = true;
+//					break;
+//				case SWT.KEYPAD_CR:
+//					go = true;
+//					break;
+//				default:
+//					break;
+//				}
+//				
+//				Soar2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
+//				
+//				if (go) {
+//					synchronized(humanMove) {
+//						humanMove.notify();
+//					}
+//				}
+//			}
+//		});
+//		
+//		createRHS();
+//		createBookSide();
+//
+//		shell.setText("Book");
+//	
+//	}
 	
-	}
 	public void setupTankSoar() {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
@@ -1087,17 +1088,17 @@ public class WindowManager {
 			setupTankSoar();
 			break;
 			
-		case ROOM:
-			setupBook();
-			break;
-			
-		case KITCHEN:
-			setupKitchen();
-			break;
-			
-		case TAXI:
-			setupTaxi();
-			break;
+//		case ROOM:
+//			setupBook();
+//			break;
+//			
+//		case KITCHEN:
+//			setupKitchen();
+//			break;
+//			
+//		case TAXI:
+//			setupTaxi();
+//			break;
 		}
 
 		statusLine = new Label(shell, SWT.BORDER);

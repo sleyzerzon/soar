@@ -1,4 +1,4 @@
-package soar2d.map;
+package broken.soar2d.map;
 
 import java.util.Arrays;
 

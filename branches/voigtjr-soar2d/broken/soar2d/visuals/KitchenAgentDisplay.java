@@ -1,4 +1,4 @@
-package soar2d.visuals;
+package broken.soar2d.visuals;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;

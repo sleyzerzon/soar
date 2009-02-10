@@ -1,4 +1,4 @@
-package soar.broken;
+package broken.soar;
 
 import sml.Identifier;
 import sml.IntElement;

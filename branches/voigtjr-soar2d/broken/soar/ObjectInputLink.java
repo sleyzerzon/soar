@@ -1,4 +1,4 @@
-package soar.broken;
+package broken.soar;
 
 import sml.FloatElement;
 import sml.Identifier;

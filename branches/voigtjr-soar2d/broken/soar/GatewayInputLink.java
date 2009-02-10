@@ -1,4 +1,4 @@
-package soar.broken;
+package broken.soar;
 
 import java.util.ArrayList;
 import java.util.List;

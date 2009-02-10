@@ -13,12 +13,9 @@ import soar2d.config.PlayerConfig;
 import soar2d.config.SimConfig;
 import soar2d.map.Cell;
 import soar2d.players.Player;
-import soar2d.world.BookWorld;
 import soar2d.world.EatersWorld;
 import soar2d.world.World;
-import soar2d.world.KitchenWorld;
 import soar2d.world.TankSoarWorld;
-import soar2d.world.TaxiWorld;
 
 /**
  * @author voigtjr
@@ -75,15 +72,15 @@ public class Simulation {
 		case EATERS:
 			world = new EatersWorld(cogArch);
 			break;
-		case KITCHEN:
-			world = new KitchenWorld(config.generalConfig().map);
-			break;
-		case TAXI:
-			world = new TaxiWorld(config.generalConfig().map);
-			break;
-		case ROOM:
-			world = new BookWorld(config.generalConfig().map);
-			break;
+//		case KITCHEN:
+//			world = new KitchenWorld(config.generalConfig().map);
+//			break;
+//		case TAXI:
+//			world = new TaxiWorld(config.generalConfig().map);
+//			break;
+//		case ROOM:
+//			world = new BookWorld(config.generalConfig().map);
+//			break;
 		}
 		Soar2D.control.setRunsTerminal(config.generalConfig().runs);
 		Soar2D.control.resetTime();
@@ -174,10 +171,10 @@ public class Simulation {
 	 * create a player and add it to the simulation and world
 	 */
 	public void createPlayer(String playerId, PlayerConfig playerConfig, boolean debug) throws Exception {
-		if (Game.TAXI == game && (world.numberOfPlayers() > 1)) {
-			// if this is removed, revisit white color below!
-			throw new Exception(Names.Errors.taxi1Player);
-		}
+//		if (Game.TAXI == game && (world.numberOfPlayers() > 1)) {
+//			// if this is removed, revisit white color below!
+//			throw new Exception(Names.Errors.taxi1Player);
+//		}
 		
 		// if a color was specified
 		if (playerConfig.color != null) {

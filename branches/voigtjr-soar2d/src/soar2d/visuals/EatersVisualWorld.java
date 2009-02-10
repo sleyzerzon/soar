@@ -15,7 +15,7 @@ import soar2d.map.CellObject;
 import soar2d.players.Player;
 
 public class EatersVisualWorld extends VisualWorld {
-	private static Logger logger = Logger.getLogger(EatersVisualWorld.class);
+	//private static Logger logger = Logger.getLogger(EatersVisualWorld.class);
 
 	public EatersVisualWorld(Composite parent, int style, int cellSize) {
 		super(parent, style, cellSize);

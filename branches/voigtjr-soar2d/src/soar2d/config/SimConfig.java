@@ -86,19 +86,18 @@ public class SimConfig implements GameConfig {
 			gameConfig = new EatersConfig();
 			loadSubConfig(childConfig, EatersConfig.class.getFields(), gameConfig);
 			break;
-		case KITCHEN:
-			gameConfig = new KitchenConfig();
-			loadSubConfig(childConfig, KitchenConfig.class.getFields(), gameConfig);
-			break;
-		case TAXI:
-			gameConfig = new TaxiConfig();
-			loadSubConfig(childConfig, TaxiConfig.class.getFields(), gameConfig);
-			break;
-		case ROOM:
-			gameConfig = new RoomConfig();
-			loadSubConfig(childConfig, RoomConfig.class.getFields(), gameConfig);
-
-			break;
+//		case KITCHEN:
+//			gameConfig = new KitchenConfig();
+//			loadSubConfig(childConfig, KitchenConfig.class.getFields(), gameConfig);
+//			break;
+//		case TAXI:
+//			gameConfig = new TaxiConfig();
+//			loadSubConfig(childConfig, TaxiConfig.class.getFields(), gameConfig);
+//			break;
+//		case ROOM:
+//			gameConfig = new RoomConfig();
+//			loadSubConfig(childConfig, RoomConfig.class.getFields(), gameConfig);
+//			break;
 		}
 
 		try {

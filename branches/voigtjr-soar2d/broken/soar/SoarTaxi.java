@@ -1,4 +1,4 @@
-package soar.broken;
+package broken.soar;
 
 import org.apache.log4j.Logger;
 
