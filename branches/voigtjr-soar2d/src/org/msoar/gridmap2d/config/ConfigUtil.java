@@ -15,6 +15,9 @@ public class ConfigUtil {
 				return null;
 
 			return new ConfigFile(path).getConfig();
+		} catch (ParseError ex) {
+			System.err.println(ex.getMessage());
+			return null;
 		} catch (IOException ex) {
 			return null;
 		}

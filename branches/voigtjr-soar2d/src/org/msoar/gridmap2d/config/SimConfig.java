@@ -106,9 +106,14 @@ public class SimConfig implements GameConfig {
 			} else {
 				preferences = new Config(new ConfigFile());
 			}
+		} catch (ParseError e) {
+			System.err.println(e.getMessage());
 		} catch (IOException e) {
-			System.err.println("Exception loading preferences: " + e.getMessage());
-			preferences = new Config(new ConfigFile());
+			System.err.println(e.getMessage());
+		} finally {
+			if (preferences == null) {
+				preferences = new Config(new ConfigFile());
+			}
 		}
 		
 		if (config.hasKey(Keys.active_players)) {
