@@ -36,8 +36,8 @@ public class TankSoarAgentWorld extends Canvas implements PaintListener {
 		radar = new Image[Gridmap2D.config.tanksoarConfig().radar_width][Gridmap2D.config.tanksoarConfig().radar_height];
 		tanks = new Color[Gridmap2D.config.tanksoarConfig().radar_width][Gridmap2D.config.tanksoarConfig().radar_height];
 
-		question = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/images/tanksoar/question.gif"));
-		tankImage = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/images/tanksoar/tank-mini.gif"));
+		question = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/question.gif"));
+		tankImage = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/tank-mini.gif"));
 		addPaintListener(this);		
 	}
 	
