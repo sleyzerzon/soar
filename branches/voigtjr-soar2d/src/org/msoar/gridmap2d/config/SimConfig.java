@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.msoar.gridmap2d.Game;
 import org.msoar.gridmap2d.Names;
@@ -206,17 +204,17 @@ public class SimConfig implements GameConfig {
 		return (TankSoarConfig)gameConfig;
 	}
 	
-	public KitchenConfig kitchenConfig() {
-		return (KitchenConfig)gameConfig;
-	}
-	
-	public RoomConfig roomConfig() {
-		return (RoomConfig)gameConfig;
-	}
-	
-	public TaxiConfig taxiConfig() {
-		return (TaxiConfig)gameConfig;
-	}
+//	public KitchenConfig kitchenConfig() {
+//		return (KitchenConfig)gameConfig;
+//	}
+//	
+//	public RoomConfig roomConfig() {
+//		return (RoomConfig)gameConfig;
+//	}
+//	
+//	public TaxiConfig taxiConfig() {
+//		return (TaxiConfig)gameConfig;
+//	}
 	
 	public Map<String, PlayerConfig> playerConfigs() {
 		return playerConfigs;
@@ -259,28 +257,6 @@ public class SimConfig implements GameConfig {
 		}
 	}
 		
-	public static void main(String [] args) {
-		try {
-			Config config = new Config(new ConfigFile("Environments/Soar2D/src/soar2d/config/sim-config-test.cnf"));
-			SimConfig sc = new SimConfig(config);
-			System.out.println("title: " + sc.title());
-			RoomConfig rc = sc.roomConfig();
-			System.out.println("colored_rooms: " + rc.colored_rooms);
-			System.out.println("players:");
-			for (Entry<String, PlayerConfig> entry : sc.playerConfigs.entrySet()) {
-				System.out.println(entry.getKey() + ": " + Arrays.toString(entry.getValue().pos) + ", " + Arrays.toString(entry.getValue().shutdown_commands));
-			}
-			System.out.print("clients:");
-			for (String clientName : sc.clientConfigs.keySet()) {
-				System.out.print(" " + clientName);
-			}
-			System.out.println();
-			
-		} catch (Throwable e) {
-			System.err.println("exception: " + e.getMessage());
-		}
-	}
-
 	public String title() {
 		return gameConfig.title();
 	}
