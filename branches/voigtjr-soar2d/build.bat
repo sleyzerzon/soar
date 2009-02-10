@@ -8,7 +8,7 @@ echo ************* Building Soar2D ****************
 echo.
 
 set SOARBIN=..\..\SoarLibrary\bin
-set GRIDMAP2DIMAGES=src\org\msoar\gridmap2d\images
+set IMAGES=org\msoar\gridmap2d\images
 
 IF NOT EXIST %SOARBIN%\swt.jar GOTO no_swt
 IF NOT EXIST %SOARBIN%\sml.jar GOTO no_sml
@@ -16,11 +16,11 @@ IF NOT EXIST %SOARBIN%\sml.jar GOTO no_sml
 echo ----------=====Setting up tmp dir====----------
 IF EXIST tmp rmdir /S /Q tmp
 mkdir tmp
-mkdir tmp\%GRIDMAP2DIMAGES%
-mkdir tmp\%GRIDMAP2DIMAGES%\tanksoar
+mkdir tmp\%IMAGES%
+mkdir tmp\%IMAGES%\tanksoar
 xcopy /q /y src\* tmp
-xcopy /q /y /s src\%GRIDMAP2DIMAGES%\* tmp\%GRIDMAP2DIMAGES%\
-xcopy /q /y /s src\%GRIDMAP2DIMAGES%\tanksoar* tmp\%GRIDMAP2DIMAGES%\tanksoar
+xcopy /q /y /s src\%IMAGES%\* tmp\%IMAGES%\
+xcopy /q /y /s src\%IMAGES%\tanksoar* tmp\%IMAGES%\tanksoar
 
 @echo ----------=========Compiling=========----------
 %2javac -source 1.5 -d tmp -classpath jdom.jar;%SOARBIN%\log4j-1.2.15.jar;%SOARBIN%\swt.jar;%SOARBIN%\sml.jar;%SOARBIN%\tosca.jar -sourcepath src src\org\msoar\gridmap2d\Gridmap2D.java
