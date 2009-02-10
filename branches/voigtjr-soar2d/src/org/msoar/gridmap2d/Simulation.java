@@ -11,11 +11,11 @@ import org.msoar.gridmap2d.config.PlayerConfig;
 import org.msoar.gridmap2d.config.SimConfig;
 import org.msoar.gridmap2d.map.Cell;
 import org.msoar.gridmap2d.players.Player;
+import org.msoar.gridmap2d.soar.Soar;
 import org.msoar.gridmap2d.world.EatersWorld;
 import org.msoar.gridmap2d.world.TankSoarWorld;
 import org.msoar.gridmap2d.world.World;
 
-import soar.Soar;
 
 /**
  * @author voigtjr

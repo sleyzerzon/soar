@@ -1,4 +1,4 @@
-package soar;
+package org.msoar.gridmap2d.soar;
 
 import java.util.HashMap;
 import java.util.List;
