@@ -110,6 +110,8 @@ public class EatersWorld implements World {
 	}
 
 	public void update(int worldCount) throws Exception {
+		WorldUtil.checkNumPlayers(players.numberOfPlayers());
+
 		// Collect input
 		for (Eater eater : players.getAll()) {
 			CommandInfo command = eater.getCommand();
@@ -120,13 +122,6 @@ public class EatersWorld implements World {
 			players.setCommand(eater, command);
 			WorldUtil.checkStopSim(stopMessages, command, eater);
 		}
-		
-		WorldUtil.checkMaxUpdates(stopMessages, worldCount);
-		WorldUtil.checkWinningScore(stopMessages, players.getSortedScores());
-		checkPointsRemaining();
-		checkFoodRemaining();
-		checkUnopenedBoxes();
-		WorldUtil.checkNumPlayers(players.numberOfPlayers());
 		
 		moveEaters();
 		if (Gridmap2D.control.isShuttingDown()) {
@@ -139,6 +134,12 @@ public class EatersWorld implements World {
 		updatePlayers();
 		eatersMap.updateObjects();
 
+		checkPointsRemaining();
+		checkFoodRemaining();
+		checkUnopenedBoxes();
+		WorldUtil.checkMaxUpdates(stopMessages, worldCount);
+		WorldUtil.checkWinningScore(stopMessages, players.getSortedScores());
+		
 		if (stopMessages.size() > 0) {
 			boolean stopping = Gridmap2D.control.checkRunsTerminal();
 			WorldUtil.dumpStats(players.getSortedScores(), players.getAllAsPlayers(), stopping, stopMessages);

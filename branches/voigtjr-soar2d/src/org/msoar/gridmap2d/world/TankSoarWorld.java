@@ -159,6 +159,8 @@ public class TankSoarWorld implements World {
 	private int missileReset = 0;
 
 	public void update(int worldCount) throws Exception {
+		WorldUtil.checkNumPlayers(players.numberOfPlayers());
+
 		// Reset sensors, collect input
 		for (Tank tank : players.getAll()) {
 			tank.getState().resetSensors(); // TODO: can this go somewhere else?
@@ -172,10 +174,6 @@ public class TankSoarWorld implements World {
 			WorldUtil.checkStopSim(stopMessages, command, tank);
 		}
 
-		WorldUtil.checkMaxUpdates(stopMessages, worldCount);
-		WorldUtil.checkWinningScore(stopMessages, players.getSortedScores());
-		WorldUtil.checkNumPlayers(players.numberOfPlayers());
-		
 		// We'll cache the tank new locations
 		Map<Tank, int []> newLocations = new HashMap<Tank, int []>();
 		
@@ -555,6 +553,9 @@ public class TankSoarWorld implements World {
 		
 		// Update tanks
 		updatePlayers(false);
+		
+		WorldUtil.checkMaxUpdates(stopMessages, worldCount);
+		WorldUtil.checkWinningScore(stopMessages, players.getSortedScores());
 		
 		if (stopMessages.size() > 0) {
 			boolean stopping = Gridmap2D.control.checkRunsTerminal();
