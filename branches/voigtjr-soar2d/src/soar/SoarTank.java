@@ -8,6 +8,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.msoar.gridmap2d.Direction;
+import org.msoar.gridmap2d.Names;
+import org.msoar.gridmap2d.Simulation;
+import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.map.TankSoarMap;
+import org.msoar.gridmap2d.players.CommandInfo;
+import org.msoar.gridmap2d.players.Player;
+import org.msoar.gridmap2d.players.RadarCell;
+import org.msoar.gridmap2d.players.Tank;
+import org.msoar.gridmap2d.players.TankCommander;
+import org.msoar.gridmap2d.players.TankState;
 
 import sml.Agent;
 import sml.FloatElement;
@@ -16,17 +27,6 @@ import sml.IntElement;
 import sml.StringElement;
 import sml.WMElement;
 import sml.smlRunEventId;
-import soar2d.Direction;
-import soar2d.Names;
-import soar2d.Simulation;
-import soar2d.Soar2D;
-import soar2d.map.TankSoarMap;
-import soar2d.players.CommandInfo;
-import soar2d.players.Player;
-import soar2d.players.RadarCell;
-import soar2d.players.Tank;
-import soar2d.players.TankCommander;
-import soar2d.players.TankState;
 
 public class SoarTank implements Agent.RunEventInterface, TankCommander {
 	private static Logger logger = Logger.getLogger(SoarTank.class);

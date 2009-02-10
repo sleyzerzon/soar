@@ -8,6 +8,7 @@ import java.io.File;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.msoar.gridmap2d.map.EatersMap;
 
 public class EatersMapTest {
 	@Before

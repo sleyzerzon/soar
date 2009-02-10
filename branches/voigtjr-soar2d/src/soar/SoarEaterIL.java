@@ -6,18 +6,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.msoar.gridmap2d.Names;
+import org.msoar.gridmap2d.Simulation;
+import org.msoar.gridmap2d.map.CellObject;
+import org.msoar.gridmap2d.map.EatersMap;
+import org.msoar.gridmap2d.players.CommitException;
+import org.msoar.gridmap2d.players.Player;
 
 import sml.Agent;
 import sml.FloatElement;
 import sml.Identifier;
 import sml.IntElement;
 import sml.StringElement;
-import soar2d.Names;
-import soar2d.Simulation;
-import soar2d.map.CellObject;
-import soar2d.map.EatersMap;
-import soar2d.players.CommitException;
-import soar2d.players.Player;
 
 class SoarEaterIL {
 	private static Logger logger = Logger.getLogger(SoarEaterIL.class);

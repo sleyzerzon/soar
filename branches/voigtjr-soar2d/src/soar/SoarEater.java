@@ -3,16 +3,16 @@ package soar;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.msoar.gridmap2d.Direction;
+import org.msoar.gridmap2d.Names;
+import org.msoar.gridmap2d.map.EatersMap;
+import org.msoar.gridmap2d.players.CommandInfo;
+import org.msoar.gridmap2d.players.CommitException;
+import org.msoar.gridmap2d.players.Eater;
+import org.msoar.gridmap2d.players.EaterCommander;
 
 import sml.Agent;
 import sml.Identifier;
-import soar2d.Direction;
-import soar2d.Names;
-import soar2d.map.EatersMap;
-import soar2d.players.CommitException;
-import soar2d.players.Eater;
-import soar2d.players.CommandInfo;
-import soar2d.players.EaterCommander;
 
 public final class SoarEater implements EaterCommander {
 	private static Logger logger = Logger.getLogger(SoarEater.class);

@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.msoar.gridmap2d.config.Config;
+import org.msoar.gridmap2d.config.ConfigFile;
 
 public class ConfigTest {
 	class ConfigTestPair {

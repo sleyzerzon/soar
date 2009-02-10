@@ -13,11 +13,11 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.msoar.gridmap2d.Names;
+import org.msoar.gridmap2d.Soar2D;
 
 import sml.Agent;
 import sml.Identifier;
-import soar2d.Names;
-import soar2d.Soar2D;
 
 public class InputLinkMetadata {
 	public static InputLinkMetadata load(Agent agent, File commonMetadataFile, File mapMetadataFile) {

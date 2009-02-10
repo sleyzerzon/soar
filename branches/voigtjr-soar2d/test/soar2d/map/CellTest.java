@@ -12,8 +12,11 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.msoar.gridmap2d.config.Config;
+import org.msoar.gridmap2d.map.Cell;
+import org.msoar.gridmap2d.map.CellObject;
+import org.msoar.gridmap2d.map.CellObjectObserver;
 
-import soar2d.config.Config;
 
 public class CellTest {
 	Cell cell;

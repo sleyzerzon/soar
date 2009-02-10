@@ -3,8 +3,9 @@ package soar2d.map;
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
+import org.msoar.gridmap2d.config.Config;
+import org.msoar.gridmap2d.map.CellObject;
 
-import soar2d.config.Config;
 
 public class CellObjectTest {
 	@Test

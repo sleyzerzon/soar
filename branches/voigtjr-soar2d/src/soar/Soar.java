@@ -10,6 +10,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.msoar.gridmap2d.CognitiveArchitecture;
+import org.msoar.gridmap2d.Game;
+import org.msoar.gridmap2d.Names;
+import org.msoar.gridmap2d.Soar2D;
+import org.msoar.gridmap2d.config.ClientConfig;
+import org.msoar.gridmap2d.config.SoarConfig;
+import org.msoar.gridmap2d.players.Eater;
+import org.msoar.gridmap2d.players.EaterCommander;
+import org.msoar.gridmap2d.players.Tank;
+import org.msoar.gridmap2d.players.TankCommander;
 
 import sml.Agent;
 import sml.ConnectionInfo;
@@ -20,16 +30,6 @@ import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
 import sml.sml_Names;
 import sml.smlRunFlags;
-import soar2d.CognitiveArchitecture;
-import soar2d.Game;
-import soar2d.Names;
-import soar2d.Soar2D;
-import soar2d.config.ClientConfig;
-import soar2d.config.SoarConfig;
-import soar2d.players.Eater;
-import soar2d.players.EaterCommander;
-import soar2d.players.Tank;
-import soar2d.players.TankCommander;
 
 public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
 	private static Logger logger = Logger.getLogger(Soar.class);
