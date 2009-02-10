@@ -53,50 +53,79 @@ public class CellTest {
 	@Test
 	public void testDraw() throws Exception {
 		
+		// starts with redraw
 		assertTrue(cell.checkRedraw());
 		assertTrue(cell.checkAndResetRedraw());
 		assertFalse(cell.checkRedraw());
 
 		cell.forceRedraw();
 		assertTrue(cell.checkRedraw());
-		
 		assertTrue(cell.checkAndResetRedraw());
-		assertFalse(cell.checkRedraw());
 		
 		cell.setPlayer(null);
 		assertTrue(cell.checkAndResetRedraw());
-		assertFalse(cell.checkRedraw());
 		
-		cell.addObject(objects[0]);
-		assertTrue(cell.checkAndResetRedraw());
-		assertFalse(cell.checkRedraw());
-		
-		cell.getAllWithProperty("test");
-		assertFalse(cell.checkAndResetRedraw());
-
+		// no objects
 		cell.getAll();
 		assertFalse(cell.checkAndResetRedraw());
-		
-		cell.hasAnyWithProperty("test");
+		cell.getAllWithProperty("nothing");
 		assertFalse(cell.checkAndResetRedraw());
-		
-		cell.removeAllByProperty("test");
-		assertTrue(cell.checkAndResetRedraw());
-		assertFalse(cell.checkRedraw());
-
+		cell.getAllWithProperty("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.hasAnyWithProperty("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.removeAllByProperty("nothing");
+		assertFalse(cell.checkAndResetRedraw());
 		cell.removeAll();
-		assertTrue(cell.checkAndResetRedraw());
-		assertFalse(cell.checkRedraw());
-		
-		cell.getObject("test");
+		assertFalse(cell.checkAndResetRedraw()); 
+		cell.removeObject("nothing");
+		assertFalse(cell.checkAndResetRedraw());	// nothing was removed
+		cell.getObject("nothing");
 		assertFalse(cell.checkAndResetRedraw());
-		
-		cell.hasObject("test");
+		cell.hasObject("nothing");
 		assertFalse(cell.checkAndResetRedraw());
-		
-		cell.removeObject("test");
+
+		// wrong object
+		cell.addObject(objects[0]);
 		assertTrue(cell.checkAndResetRedraw());
-		assertFalse(cell.checkRedraw());
+		
+		cell.getAllWithProperty("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.getAllWithProperty("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.hasAnyWithProperty("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.removeAllByProperty("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.removeObject("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.getObject("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.hasObject("nothing");
+		assertFalse(cell.checkAndResetRedraw());
+
+		// correct object
+		// object still in there from previous
+		cell.getAll();	
+		assertFalse(cell.checkAndResetRedraw());
+		cell.getAllWithProperty("test0");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.getAllWithProperty("test0");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.hasAnyWithProperty("test0");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.removeAllByProperty("property0");
+		assertTrue(cell.checkAndResetRedraw());
+		cell.addObject(objects[0]);
+		assertTrue(cell.checkAndResetRedraw());
+		cell.removeObject("test0");
+		assertTrue(cell.checkAndResetRedraw());
+		cell.addObject(objects[0]);
+		assertTrue(cell.checkAndResetRedraw());
+		cell.getObject("test0");
+		assertFalse(cell.checkAndResetRedraw());
+		cell.hasObject("test0");
+		assertFalse(cell.checkAndResetRedraw());
 	}
 
 	@Test

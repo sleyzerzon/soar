@@ -22,7 +22,7 @@ public class EatersMapTest {
 	
 	@Test
 	public void testLoadAll() throws Exception {
-		File mapDir = new File("maps/eaters");
+		File mapDir = new File("config/maps/eaters");
 		
 		for (File file : mapDir.listFiles()) {
 			if (file.isFile()) {
@@ -33,7 +33,7 @@ public class EatersMapTest {
 	
 	@Test
 	public void testBasicMap() throws Exception {
-		EatersMap eatersMap = new EatersMap("maps/eaters/tiny.txt", false, .35, .85);
+		EatersMap eatersMap = new EatersMap("config/maps/eaters/tiny.txt", false, .35, .85);
 		assertEquals(eatersMap.size(), 4);
 
 		int[] xy = new int[2];

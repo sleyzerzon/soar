@@ -113,10 +113,10 @@ public class Cell {
 	}
 	
 	public List<CellObject> removeAll() {
-		draw = true;
 		if (cellObjects.size() == 0) {
 			return null;
 		}
+		draw = true;
 		List<CellObject> ret = cellObjects;
 		cellObjects = new ArrayList<CellObject>();
 		for (CellObject cellObject : ret) {

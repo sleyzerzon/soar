@@ -23,7 +23,7 @@ public class ConfigTest {
 		String value;
 	}
 	
-	final String largeTest = "test/soar2d/config/test.cnf";
+	final String largeTest = "test/org/msoar/gridmap2d/config/test.cnf";
 	List<ConfigTestPair> largeTestData = new ArrayList<ConfigTestPair>();
 
 	@Before
