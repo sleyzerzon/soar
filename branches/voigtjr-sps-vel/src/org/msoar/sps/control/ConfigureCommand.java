@@ -36,6 +36,6 @@ final class ConfigureCommand implements Command {
 	}
 
 	public void updateInput(SplinterInput input) {
-		assert false;
+		throw new AssertionError();
 	}
 }

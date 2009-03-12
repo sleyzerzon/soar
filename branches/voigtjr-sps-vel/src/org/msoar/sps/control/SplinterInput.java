@@ -15,14 +15,14 @@ final class SplinterInput {
 	private static final double DISABLED = Double.NEGATIVE_INFINITY;
 	private static final long NO_INPUT = Long.MIN_VALUE; 
 	
-	enum RotateDirection {
-		left, right
-	};
-	
 	private final double[] throttle = new double[2];
 	private double targetYaw;
 	private double targetYawTolerance;
 	private long utime = NO_INPUT;
+	
+	public enum RotateDirection {
+		LEFT, RIGHT;
+	};
 	
 	SplinterInput() {
 		clear();
@@ -62,8 +62,8 @@ final class SplinterInput {
 	
 	void rotate(RotateDirection dir, double throttle) {
 		clear();
-		this.throttle[0] = throttle * (dir == RotateDirection.left ? -1 : 1);
-		this.throttle[1] = throttle * (dir == RotateDirection.right ? -1 : 1);
+		this.throttle[0] = throttle * (dir == RotateDirection.LEFT ? -1 : 1);
+		this.throttle[1] = throttle * (dir == RotateDirection.RIGHT ? -1 : 1);
 		debugOut();
 	}
 	

@@ -37,6 +37,6 @@ final class RemoveWaypointCommand implements Command {
 	}
 
 	public void updateInput(SplinterInput input) {
-		assert false;
+		throw new AssertionError();
 	}
 }

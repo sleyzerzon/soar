@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jmat.LinAlg;
+import jmat.MathUtil;
+
 import org.apache.log4j.Logger;
 
 import com.sun.net.httpserver.Headers;
@@ -26,16 +29,19 @@ final class HttpController {
 	
 	private final String ACTION = "action";
 	private enum Actions {
-		postmessage;
+		postmessage, rotateto;
 	}
 	
 	private enum Keys {
-		message;
+		message, heading, rate;
 	}
 	
 	private IndexHandler indexHandler = new IndexHandler();
+	private final SplinterModel splinter;
 	
-	HttpController() {
+	HttpController(SplinterModel splinter) {
+		this.splinter = splinter;
+		
 		try {
 		    HttpServer server = HttpServer.create(new InetSocketAddress(HTTP_PORT), 0);
 		    server.createContext("/", new IndexHandler());
@@ -116,6 +122,8 @@ final class HttpController {
 			
 			if (properties.get(ACTION).equals(Actions.postmessage.name())) {
 				postMessage(xchg, properties);
+			} else if (properties.get(ACTION).equals(Actions.rotateto.name())) {
+				rotateTo(xchg, properties);
 			} else {
 				logger.error("Unknown action: " + properties.get(ACTION));
 				sendFile(xchg, "/org/msoar/sps/control/html/error.html");
@@ -151,6 +159,30 @@ final class HttpController {
 		    }
 		    
 		    sendResponse(xchg, response.toString());
+		}
+		
+		private void rotateTo(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			String headingString = properties.get(Keys.heading.name());
+			String rateString = properties.get(Keys.rate.name());
+			if (headingString == null || rateString == null) {
+				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+				return;
+			}
+			
+			try {
+				double yaw = Math.toRadians(Double.parseDouble(headingString));
+				yaw = MathUtil.mod2pi(yaw);
+				double rate = Math.toRadians(Double.parseDouble(rateString));
+				if (Double.compare(rate, 0) <= 0) {
+					sendResponse(xchg, "Invalid rate");
+					return;
+				}
+				splinter.rotateTo(yaw, rate, true);
+				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+			} catch (NumberFormatException e) {
+				sendResponse(xchg, "Invalid number");
+				return;
+			}
 		}
 	}
 	

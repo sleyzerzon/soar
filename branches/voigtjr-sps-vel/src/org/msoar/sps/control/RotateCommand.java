@@ -4,6 +4,7 @@
 package org.msoar.sps.control;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.control.SplinterInput.RotateDirection;
 
 import lcmtypes.pose_t;
 import sml.Identifier;
@@ -65,9 +66,9 @@ final class RotateCommand implements Command {
 
 	public void updateInput(SplinterInput input) {
 		if (direction == Direction.left) {
-			input.rotate(SplinterInput.RotateDirection.left, throttle);
+			input.rotate(RotateDirection.LEFT, throttle);
 		} else if (direction == Direction.right) {
-			input.rotate(SplinterInput.RotateDirection.right, throttle);
+			input.rotate(RotateDirection.RIGHT, throttle);
 		} else {
 			assert direction == Direction.stop;
 			input.stop();

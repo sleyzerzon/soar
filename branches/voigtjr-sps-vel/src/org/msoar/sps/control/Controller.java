@@ -23,20 +23,23 @@ final class Controller extends TimerTask implements LCMSubscriber {
 	private static final int DEFAULT_RANGES_COUNT = 5;
 	
 	private final Config config;
-	private final SoarInterface soar;
+//	private final SoarInterface soar;
 	private final Timer timer = new Timer();
 	private final differential_drive_command_t dc = new differential_drive_command_t();
-	private final LCM lcm;
+//	private final LCM lcm;
 	private final Gamepad gp;
 	private FileWriter tagWriter;
 	private long poseUtime;
-	private final HttpController httpController = new HttpController();
+	private final HttpController httpController;
+	private final SplinterModel splinter = SplinterModel.newInstance();
 	
 	private Controller(Config config) {
 		if (config == null) {
 			throw new NullPointerException();
 		}
 		this.config = config;
+		
+		httpController = new HttpController(splinter);
 
 		Gamepad gamepad = null;
 		try {
@@ -47,11 +50,11 @@ final class Controller extends TimerTask implements LCMSubscriber {
 		}
 		gp = gamepad;
 
-		String productions = this.config.getString("productions");
-		int rangesCount = this.config.getInt("ranges_count", DEFAULT_RANGES_COUNT);
-		soar = new SoarInterface(productions, rangesCount);
-		lcm = LCM.getSingleton();
-		lcm.subscribe(SharedNames.POSE_CHANNEL, this);
+//		String productions = this.config.getString("productions");
+//		int rangesCount = this.config.getInt("ranges_count", DEFAULT_RANGES_COUNT);
+//		soar = new SoarInterface(productions, rangesCount);
+//		lcm = LCM.getSingleton();
+//		lcm.subscribe(SharedNames.POSE_CHANNEL, this);
 
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		
@@ -68,8 +71,8 @@ final class Controller extends TimerTask implements LCMSubscriber {
 				}
 			}
 			
-			if (soar != null)
-				soar.shutdown();
+//			if (soar != null)
+//				soar.shutdown();
 
 			System.out.flush();
 			System.err.println("Terminated");
@@ -79,98 +82,101 @@ final class Controller extends TimerTask implements LCMSubscriber {
 
 	@Override
 	public void run() {
-		logger.trace("Controller update");
-		for (Buttons button : Buttons.values()) {
-			button.update();
-		}
+		//splinter.tank(gp.getAxis(1) * -1, gp.getAxis(3) * -1);
+		splinter.update();
 		
-		List<String> messageTokens = httpController.getMessageTokens();
-		if (messageTokens != null) {
-			soar.setStringInput(messageTokens);
-		}
-		
-		if (Buttons.haveGamepad()) {
-			if (Buttons.OVERRIDE.isEnabled()) {
-				getDC(dc);
-			} else {
-				soar.getDC(dc);
-			}
-			
-			if (Buttons.SOAR.checkAndDisable()) {
-				soar.changeRunningState();
-			}
-			
-			if (Buttons.TAG.checkAndDisable()) {
-				try {
-					if (tagWriter == null) {
-						// TODO: use date/time
-						File datafile = File.createTempFile("tags-", ".txt", new File(System.getProperty("user.dir")));
-						tagWriter = new FileWriter(datafile);
-						logger.info("Opened " + datafile.getAbsolutePath());
-					}
-					logger.info("mark " + poseUtime);
-					tagWriter.append(poseUtime + "\n");
-					tagWriter.flush();
-					
-				} catch (IOException e) {
-					logger.error("IOException while recording mark: " + e.getMessage());
-				}
-			}
-			
-		} else {
-			soar.getDC(dc);
-		}	
-		
-		transmit(dc);
+//		logger.trace("Controller update");
+//		for (Buttons button : Buttons.values()) {
+//			button.update();
+//		}
+//		
+//		List<String> messageTokens = httpController.getMessageTokens();
+//		if (messageTokens != null) {
+//			soar.setStringInput(messageTokens);
+//		}
+//		
+//		if (Buttons.haveGamepad()) {
+//			if (Buttons.OVERRIDE.isEnabled()) {
+//				getDC(dc);
+//			} else {
+//				soar.getDC(dc);
+//			}
+//			
+//			if (Buttons.SOAR.checkAndDisable()) {
+//				soar.changeRunningState();
+//			}
+//			
+//			if (Buttons.TAG.checkAndDisable()) {
+//				try {
+//					if (tagWriter == null) {
+//						// TODO: use date/time
+//						File datafile = File.createTempFile("tags-", ".txt", new File(System.getProperty("user.dir")));
+//						tagWriter = new FileWriter(datafile);
+//						logger.info("Opened " + datafile.getAbsolutePath());
+//					}
+//					logger.info("mark " + poseUtime);
+//					tagWriter.append(poseUtime + "\n");
+//					tagWriter.flush();
+//					
+//				} catch (IOException e) {
+//					logger.error("IOException while recording mark: " + e.getMessage());
+//				}
+//			}
+//			
+//		} else {
+//			soar.getDC(dc);
+//		}	
+//		
+//		transmit(dc);
 	}
 	
 	public void messageReceived(LCM lcm, String channel, DataInputStream ins) {
-		if (channel.equals(SharedNames.POSE_CHANNEL)) {
-			try {
-				pose_t pose = new pose_t(ins);
-				poseUtime = pose.utime;
-			} catch (IOException e) {
-				logger.error("Error decoding pose_t message: " + e.getMessage());
-			}
-		}
+//		if (channel.equals(SharedNames.POSE_CHANNEL)) {
+//			try {
+//				pose_t pose = new pose_t(ins);
+//				poseUtime = pose.utime;
+//			} catch (IOException e) {
+//				logger.error("Error decoding pose_t message: " + e.getMessage());
+//			}
+//		}
 	}
 	
-	private void getDC(differential_drive_command_t dc) {
-		dc.utime = soar.getCurrentUtime();
-		dc.left_enabled = true;
-		dc.right_enabled = true;
-		
-		if (Buttons.TANK.isEnabled()) {
-			dc.left = gp.getAxis(1) * -1;
-			dc.right = gp.getAxis(3) * -1;
-		} else {
-			// this should not be linear, it is difficult to precicely control
-			double fwd = -1 * gp.getAxis(3); // +1 = forward, -1 = back
-			double lr = -1 * gp.getAxis(2); // +1 = left, -1 = right
+//	private void getDC(differential_drive_command_t dc) {
+//		dc.utime = soar.getCurrentUtime();
+//		dc.left_enabled = true;
+//		dc.right_enabled = true;
+//		
+//		if (Buttons.TANK.isEnabled()) {
+//			dc.left = gp.getAxis(1) * -1;
+//			dc.right = gp.getAxis(3) * -1;
+//		} else {
+//			// this should not be linear, it is difficult to precicely control
+//			double fwd = -1 * gp.getAxis(3); // +1 = forward, -1 = back
+//			double lr = -1 * gp.getAxis(2); // +1 = left, -1 = right
+//
+//			dc.left = fwd - lr;
+//			dc.right = fwd + lr;
+//
+//			double max = Math.max(Math.abs(dc.left), Math.abs(dc.right));
+//			if (max > 1) {
+//				dc.left /= max;
+//				dc.right /= max;
+//			}
+//		}
+//	}
 
-			dc.left = fwd - lr;
-			dc.right = fwd + lr;
-
-			double max = Math.max(Math.abs(dc.left), Math.abs(dc.right));
-			if (max > 1) {
-				dc.left /= max;
-				dc.right /= max;
-			}
-		}
-	}
-
-	private void transmit(differential_drive_command_t dc) {
-		if (Buttons.SLOW.isEnabled()) {
-			logger.debug("slow mode halving throttle");
-			dc.left /= 2;
-			dc.right /= 2;
-		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("transmit: " + dc.left + "," + dc.right);
-		}
-		lcm.publish(SharedNames.DRIVE_CHANNEL, dc);
-	}
-	
+//	private void transmit(differential_drive_command_t dc) {
+//		if (Buttons.SLOW.isEnabled()) {
+//			logger.debug("slow mode halving throttle");
+//			dc.left /= 2;
+//			dc.right /= 2;
+//		}
+//		if (logger.isTraceEnabled()) {
+//			logger.trace("transmit: " + dc.left + "," + dc.right);
+//		}
+//		lcm.publish(SharedNames.DRIVE_CHANNEL, dc);
+//	}
+//	
 	public static void main(String[] args) {
 		Config config = null;
 		if (args.length > 0) {

@@ -12,7 +12,7 @@ final class CommandLineInterface {
 	private static class Names {
 		private static final String PROMPT = "sm> ";
 		
-		private Names() { assert false; }
+		private Names() { throw new AssertionError(); }
 	}
 
 	private enum Command { EXIT, QUIT, START, STOP, RESTART; }
@@ -44,6 +44,8 @@ final class CommandLineInterface {
 		logger.trace("command: " + command);
 		String[] args = command.split(" "); // TODO: try " +"
 		if (args[0].length() != 0) {
+			// TODO: throws IllegalArgumentException on error
+			// TODO: find all instances
 			Command cmd = Command.valueOf(args[0].toUpperCase());
 			if (cmd == null) {
 				logger.error("Unknown command: " + args[0]);
