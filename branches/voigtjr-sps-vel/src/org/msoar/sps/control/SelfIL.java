@@ -88,7 +88,7 @@ final class SelfIL implements InputLinkInterface {
 		double yawRadians = LinAlg.quatToRollPitchYaw(splinter.getSplinterPose().orientation)[2];
 		yawRadians = MathUtil.mod2pi(yawRadians);
 		updateYawWme(useFloatYawWmes, yawRadians);
-		agent.Update(yawvelwme, splinter.getSplinterPose().rotation_rate[2]);
+		agent.Update(yawvelwme, Math.toDegrees(splinter.getSplinterPose().rotation_rate[2]));
 		
 		waypointsIL.update(splinter);
 		

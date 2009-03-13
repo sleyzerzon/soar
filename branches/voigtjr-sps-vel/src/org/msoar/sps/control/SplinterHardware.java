@@ -110,11 +110,10 @@ final class SplinterHardware extends TimerTask {
 			dc.right += apout;
 
 			double l_gain = P_L_GAIN * dt;
+			
+			// TODO: transform!
 			double lerror = lv - LinAlg.magnitude(pose.vel);
 			double lpout = lerror * l_gain;
-			
-			// TODO: can't handle backing up yet, need to get forward component of velocity vector
-			lpout = Math.max(lpout, 0);
 			
 			dc.left += lpout;
 			dc.right += lpout;
