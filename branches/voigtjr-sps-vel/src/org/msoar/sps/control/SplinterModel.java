@@ -16,6 +16,7 @@ final class SplinterModel {
 	private final LCMProxy lcmProxy;
 	private final SplinterHardware hardware;
 	private final pose_t pose = new pose_t();
+	private DifferentialDriveCommand ddc;
 	
 	private SplinterModel() {
 		this.lcmProxy = LCMProxy.getInstance();
@@ -26,7 +27,9 @@ final class SplinterModel {
 		}
 	}
 	
-	void update(DifferentialDriveCommand command) {
+	void update(DifferentialDriveCommand ddc) {
+		this.ddc = ddc;
+		
 		// elapsed time
 		double dt = updatePose();
 		if (Double.compare(dt, 0) == 0) {
@@ -37,7 +40,37 @@ final class SplinterModel {
 	}
 	
 	private void updateDC(double dt) {
+		hardware.setUTime(pose.utime);
+
+		if (ddc == null) {
+			hardware.estop();
+			return;
+		}
+
+		switch (ddc.getType()) {
+		case ESTOP:
+			hardware.estop();
+			return;
+			
+		case MOTOR:
+			hardware.setMotors(ddc.getLeft(), ddc.getRight());
+			return;
+			
+		case VEL:
+			hardware.setAngularVelocity(ddc.getAngularVelocity());
+			hardware.setLinearVelocity(ddc.getLinearVelocity());
+			return;
+			
+		case LINVEL:
+			hardware.setLinearVelocity(ddc.getLinearVelocity());
+			return;
+			
+		case ANGVEL:
+			hardware.setAngularVelocity(ddc.getAngularVelocity());
+			return;
+		}
 		
+		throw new AssertionError("Not implemented");
 	}
 	
 	private void bootstrapPose(pose_t newPose) {
@@ -60,17 +93,17 @@ final class SplinterModel {
 		// get the new pose
 		pose_t lcmPose = lcmProxy.getPose();
 		if (lcmPose == null) {
-			// haven't gotten one yet
+			logger.trace("No pose yet");
 			return 0;
 		}
 		
 		if (lcmPose.utime <= pose.utime) {
-			// not new information (LCM uses UDP)
+			logger.trace("Received old pose");
 			return 0;
 		}
 		
 		if (pose.utime == 0) {
-			// this is our first message
+			logger.trace("Received first pose");
 			bootstrapPose(lcmPose);
 			return 0;
 		}
@@ -100,11 +133,6 @@ final class SplinterModel {
 		pose.pos[1] = newPose.pos[1];
 		pose.orientation[0] = newPose.orientation[0];
 		pose.orientation[3] = newPose.orientation[3];
-	}
-	
-	int getCommandResult(int id) {
-		// TODO: return result for soar/whoever 
-		return -1;
 	}
 	
 	pose_t getSplinterPose() {

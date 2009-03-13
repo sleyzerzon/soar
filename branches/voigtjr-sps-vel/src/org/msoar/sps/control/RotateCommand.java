@@ -4,74 +4,43 @@
 package org.msoar.sps.control;
 
 import org.apache.log4j.Logger;
-import org.msoar.sps.control.SplinterInput.RotateDirection;
 
-import lcmtypes.pose_t;
 import sml.Identifier;
 
 final class RotateCommand implements Command {
 	private static final Logger logger = Logger.getLogger(RotateCommand.class);
 
-	private enum Direction {
-		left, right, stop;
-	}
-
-	private Direction direction;
-	private double throttle;
+	private double angularVelocity;
 
 	public CommandStatus execute(InputLinkInterface inputLink,
-			Identifier command, pose_t pose, OutputLinkManager outputLinkManager) {
-		command.GetTimeTag();
-		String directionString = command.GetParameterValue("direction");
-		if (directionString == null) {
-			logger.warn("No direction on rotate command");
-			return CommandStatus.error;
-		}
-
-		direction = Direction.valueOf(directionString);
-		if (direction == null) {
-			logger.warn("Unknown direction on rotate command: "
-					+ directionString);
-			return CommandStatus.error;
-		}
-
+			Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+		
 		try {
-			throttle = Double
-					.parseDouble(command.GetParameterValue("throttle"));
+			angularVelocity = Double
+					.parseDouble(command.GetParameterValue("velocity"));
 		} catch (NullPointerException ex) {
-			logger.warn("No throttle on rotate command");
+			logger.warn("No velocity on rotate command");
 			return CommandStatus.error;
 		} catch (NumberFormatException e) {
-			logger.warn("Unable to parse throttle: "
-					+ command.GetParameterValue("throttle"));
+			logger.warn("Unable to parse velocity: "
+					+ command.GetParameterValue("velocity"));
 			return CommandStatus.error;
 		}
 
-		throttle = Math.max(throttle, 0);
-		throttle = Math.min(throttle, 1.0);
+		logger.debug(String.format("rotate: %10.3f", angularVelocity));
 
-		logger.debug(String.format("rotate: %10s %10.3f", direction, throttle));
-
-		return direction == Direction.stop ? CommandStatus.complete
-				: CommandStatus.executing;
+		return CommandStatus.executing;
 	}
 
 	public boolean isInterruptable() {
 		return false;
 	}
 
-	public boolean modifiesInput() {
+	public boolean createsDDC() {
 		return true;
 	}
 
-	public void updateInput(SplinterInput input) {
-		if (direction == Direction.left) {
-			input.rotate(RotateDirection.LEFT, throttle);
-		} else if (direction == Direction.right) {
-			input.rotate(RotateDirection.RIGHT, throttle);
-		} else {
-			assert direction == Direction.stop;
-			input.stop();
-		}
+	public DifferentialDriveCommand getDDC() {
+		return DifferentialDriveCommand.newAngularVelocityCommand(angularVelocity);
 	}
 }

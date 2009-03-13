@@ -5,68 +5,38 @@ package org.msoar.sps.control;
 
 import org.apache.log4j.Logger;
 
-import lcmtypes.pose_t;
 import sml.Identifier;
 
 class MoveCommand implements Command {
 	private static final Logger logger = Logger.getLogger(MoveCommand.class);
 	
-	private enum Direction {
-		forward,
-		backward,
-		stop;
-	}
+	private double linearVelocity;
 	
-	private Direction direction;
-	private double throttle;
-	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, pose_t pose, OutputLinkManager outputLinkManager) {
-		String directionString = command.GetParameterValue("direction");
-		if (directionString == null) {
-			logger.warn("No direction on move command");
-			return CommandStatus.error;
-		}
-		
-		direction = Direction.valueOf(directionString);
-		if (direction == null) {
-			logger.warn("Unknown direction on move command: " + directionString);
-			return CommandStatus.error;
-		}
-
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
 		try {
-			throttle = Double.parseDouble(command.GetParameterValue("throttle"));
+			linearVelocity = Double.parseDouble(command.GetParameterValue("velocity"));
 		} catch (NullPointerException ex) {
-			logger.warn("No throttle on move command");
+			logger.warn("No velocity on move command");
 			return CommandStatus.error;
 		} catch (NumberFormatException e) {
-			logger.warn("Unable to parse throttle: " + command.GetParameterValue("throttle"));
+			logger.warn("Unable to parse velocity: " + command.GetParameterValue("velocity"));
 			return CommandStatus.error;
 		}
 
-		throttle = Math.max(throttle, 0);
-		throttle = Math.min(throttle, 1.0);
+		logger.debug(String.format("move: %10.3f", linearVelocity));
 
-		logger.debug(String.format("move: %10s %10.3f", direction, throttle));
-
-		return direction == Direction.stop ? CommandStatus.complete : CommandStatus.executing;
+		return CommandStatus.executing;
 	}
 
 	public boolean isInterruptable() {
 		return false;
 	}
 
-	public boolean modifiesInput() {
+	public boolean createsDDC() {
 		return true;
 	}
 
-	public void updateInput(SplinterInput input) {
-		if (direction == Direction.backward) {
-			input.move(throttle * -1);
-		} else if (direction == Direction.forward) {
-			input.move(throttle);
-		} else {
-			assert direction == Direction.stop;
-			input.stop();
-		}
+	public DifferentialDriveCommand getDDC() {
+		return DifferentialDriveCommand.newLinearVelocityCommand(linearVelocity);
 	}
 }

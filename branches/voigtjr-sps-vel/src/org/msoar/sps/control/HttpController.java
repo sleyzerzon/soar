@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jmat.LinAlg;
 import jmat.MathUtil;
 
 import org.apache.log4j.Logger;
@@ -27,21 +26,23 @@ final class HttpController {
 	private static final Logger logger = Logger.getLogger(HttpController.class);
 	private static final int HTTP_PORT = 8000;
 	
+	static HttpController newInstance() {
+		return new HttpController();
+	}
+	
 	private final String ACTION = "action";
 	private enum Actions {
-		postmessage, rotateto;
+		postmessage, heading
 	}
 	
 	private enum Keys {
-		message, heading, rate;
+		message, heading
 	}
 	
-	private IndexHandler indexHandler = new IndexHandler();
-	private final SplinterModel splinter;
+	private final IndexHandler indexHandler = new IndexHandler();
+	private DifferentialDriveCommand ddc;
 	
-	HttpController(SplinterModel splinter) {
-		this.splinter = splinter;
-		
+	private HttpController() {
 		try {
 		    HttpServer server = HttpServer.create(new InetSocketAddress(HTTP_PORT), 0);
 		    server.createContext("/", new IndexHandler());
@@ -122,8 +123,8 @@ final class HttpController {
 			
 			if (properties.get(ACTION).equals(Actions.postmessage.name())) {
 				postMessage(xchg, properties);
-			} else if (properties.get(ACTION).equals(Actions.rotateto.name())) {
-				rotateTo(xchg, properties);
+			} else if (properties.get(ACTION).equals(Actions.heading.name())) {
+				heading(xchg, properties);
 			} else {
 				logger.error("Unknown action: " + properties.get(ACTION));
 				sendFile(xchg, "/org/msoar/sps/control/html/error.html");
@@ -161,10 +162,9 @@ final class HttpController {
 		    sendResponse(xchg, response.toString());
 		}
 		
-		private void rotateTo(HttpExchange xchg, Map<String, String> properties) throws IOException {
+		private void heading(HttpExchange xchg, Map<String, String> properties) throws IOException {
 			String headingString = properties.get(Keys.heading.name());
-			String rateString = properties.get(Keys.rate.name());
-			if (headingString == null || rateString == null) {
+			if (headingString == null) {
 				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 				return;
 			}
@@ -172,12 +172,7 @@ final class HttpController {
 			try {
 				double yaw = Math.toRadians(Double.parseDouble(headingString));
 				yaw = MathUtil.mod2pi(yaw);
-				double rate = Math.toRadians(Double.parseDouble(rateString));
-				if (Double.compare(rate, 0) <= 0) {
-					sendResponse(xchg, "Invalid rate");
-					return;
-				}
-				splinter.rotateTo(yaw, rate, true);
+				ddc = DifferentialDriveCommand.newHeadingCommand(yaw);
 				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 			} catch (NumberFormatException e) {
 				sendResponse(xchg, "Invalid number");
@@ -218,6 +213,16 @@ final class HttpController {
 	List<String> getMessageTokens() {
 		List<String> temp = indexHandler.tokens;
 		indexHandler.tokens = null;
+		return temp;
+	}
+
+	boolean hasDDCommand() {
+		return ddc != null;
+	}
+
+	DifferentialDriveCommand getDDCommand() {
+		DifferentialDriveCommand temp = ddc;
+		ddc = null;
 		return temp;
 	}
 	

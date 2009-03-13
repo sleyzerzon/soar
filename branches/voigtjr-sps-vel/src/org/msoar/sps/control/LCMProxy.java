@@ -23,7 +23,7 @@ final class LCMProxy implements LCMSubscriber {
 	private pose_t lcmPose;
 	
 	private LCMProxy() {
-		
+		lcm.subscribe(SharedNames.POSE_CHANNEL, this);
 	}
 
 	void transmitDC(differential_drive_command_t dc) {

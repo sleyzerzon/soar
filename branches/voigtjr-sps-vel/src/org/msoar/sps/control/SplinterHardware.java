@@ -1,10 +1,13 @@
 package org.msoar.sps.control;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import lcmtypes.differential_drive_command_t;
 
 import org.apache.log4j.Logger;
 
-final class SplinterHardware implements Runnable {
+final class SplinterHardware extends TimerTask {
 	private static final Logger logger = Logger.getLogger(SplinterModel.class);
 
 	static SplinterHardware newInstance(LCMProxy lcmProxy) {
@@ -16,6 +19,7 @@ final class SplinterHardware implements Runnable {
 	private final PIDSetting pid = new PIDSetting();
 	private double av;
 	private double lv;
+	private final Timer timer = new Timer(true);
 	
 	private SplinterHardware(LCMProxy lcmProxy) {
 		this.lcmProxy = lcmProxy;
@@ -24,6 +28,13 @@ final class SplinterHardware implements Runnable {
 		this.dc.right_enabled = true;
 		
 		setMotors(0, 0);
+		
+		// TODO: make configurable
+		timer.schedule(this, 0, 1000 / 20); // 20 Hz	
+	}
+	
+	void setUTime(long utime) {
+		dc.utime = utime;
 	}
 	
 	void setAngularVelocity(double av) {
@@ -42,8 +53,8 @@ final class SplinterHardware implements Runnable {
 		pid.disablePID();
 		
 		// set motors
-		this.dc.left = left;
-		this.dc.right = right;
+		dc.left = left;
+		dc.right = right;
 	}
 	
 	void estop() {
@@ -84,6 +95,4 @@ final class SplinterHardware implements Runnable {
 		assert dc.right_enabled == true;
 		lcmProxy.transmitDC(dc);
 	}
-	
-	
 }

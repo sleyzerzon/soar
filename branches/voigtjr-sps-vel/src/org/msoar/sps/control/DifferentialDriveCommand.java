@@ -23,8 +23,8 @@ final class DifferentialDriveCommand {
 		return new SplinterDriveCommandBuilder(CommandType.LINVEL).linearVelocity(linearVelocity).build();
 	}
 	
-	static DifferentialDriveCommand newHeadingCommand(double theta) {
-		return new SplinterDriveCommandBuilder(CommandType.HEADING).heading(theta).build();
+	static DifferentialDriveCommand newHeadingCommand(double heading) {
+		return new SplinterDriveCommandBuilder(CommandType.HEADING).heading(heading).build();
 	}
 	
 	static DifferentialDriveCommand newMoveToCommand(double x, double y, double theta) {
@@ -55,14 +55,14 @@ final class DifferentialDriveCommand {
 			return this;
 		}
 		private SplinterDriveCommandBuilder angularVelocity(double av) {
-			if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL) {
+			if (type.getLevel() != CommandLevel.L2) {
 				throw new IllegalArgumentException();
 			}
 			this.arg0 = av;
 			return this;
 		}
 		private SplinterDriveCommandBuilder linearVelocity(double lv) {
-			if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL) {
+			if (type.getLevel() != CommandLevel.L2) {
 				throw new IllegalArgumentException();
 			}
 			this.arg1 = lv;
@@ -101,8 +101,28 @@ final class DifferentialDriveCommand {
 		}
 	}
 	
-	private enum CommandType {
-		ESTOP, MOTOR, ANGVEL, LINVEL, VEL, HEADING, MOVE_TO;
+	enum CommandLevel {
+		L0, L1, L2, L3
+	}
+	
+	enum CommandType {
+		ESTOP(CommandLevel.L0), 
+		MOTOR(CommandLevel.L1), 
+		ANGVEL(CommandLevel.L2), 
+		LINVEL(CommandLevel.L2), 
+		VEL(CommandLevel.L2), 
+		HEADING(CommandLevel.L3), 
+		MOVE_TO(CommandLevel.L3);
+		
+		private final CommandLevel level;
+		
+		CommandType(CommandLevel level) {
+			this.level = level;
+		}
+		
+		CommandLevel getLevel() {
+			return level;
+		}
 	}
 	
 	private final CommandType type;
@@ -143,14 +163,14 @@ final class DifferentialDriveCommand {
 	}
 	
 	double getAngularVelocity() {
-		if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL) {
+		if (type.getLevel() != CommandLevel.L2) {
 			throw new IllegalStateException();
 		}
 		return arg0;
 	}
 	
 	double getLinearVelocity() {
-		if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL) {
+		if (type.getLevel() != CommandLevel.L2) {
 			throw new IllegalStateException();
 		}
 		return arg1;
@@ -184,7 +204,41 @@ final class DifferentialDriveCommand {
 		return arg2;
 	}
 	
-	public static void main(String[] args) {
-		//SplinterDriveCommand sdc = SplinterDriveCommand.newLinearVelocityCommand(4);
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(type);
+		sb.append("(");
+		switch (type) {
+		case ESTOP:
+			break;
+		case MOTOR:
+			sb.append(getLeft());
+			sb.append(",");
+			sb.append(getRight());
+			break;
+		case VEL:
+			sb.append(getAngularVelocity());
+			sb.append(",");
+			sb.append(getLinearVelocity());
+			break;
+		case ANGVEL:
+			sb.append(getAngularVelocity());
+			break;
+		case LINVEL:
+			sb.append(getLinearVelocity());
+			break;
+		case HEADING:
+			sb.append(getHeading());
+			break;
+		case MOVE_TO:
+			sb.append(getX());
+			sb.append(",");
+			sb.append(getY());
+			sb.append(",");
+			sb.append(getTheta());
+			break;
+		}
+		sb.append(")");
+		return sb.toString();
 	}
 }

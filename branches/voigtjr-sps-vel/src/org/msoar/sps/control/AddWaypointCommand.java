@@ -7,25 +7,24 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
-import lcmtypes.pose_t;
 import sml.Identifier;
 
 final class AddWaypointCommand implements Command {
 	private static final Logger logger = Logger.getLogger(AddWaypointCommand.class);
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, pose_t pose, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
 		String id = command.GetParameterValue("id");
 		if (id == null) {
 			logger.warn("No id on add-waypoint command");
 			return CommandStatus.error;
 		}
 
-		if (pose == null) {
+		if (splinter == null) {
 			logger.error("add-waypoint called with no current pose");
 			return CommandStatus.error;
 		}
 		
-		double[] pos = Arrays.copyOf(pose.pos, pose.pos.length);
+		double[] pos = Arrays.copyOf(splinter.getSplinterPose().pos, splinter.getSplinterPose().pos.length);
 		try {
 			pos[0] = Double.parseDouble(command.GetParameterValue("x"));
 		} catch (NullPointerException ignored) {
@@ -54,11 +53,11 @@ final class AddWaypointCommand implements Command {
 		return false;
 	}
 
-	public boolean modifiesInput() {
+	public boolean createsDDC() {
 		return false;
 	}
 
-	public void updateInput(SplinterInput input) {
+	public DifferentialDriveCommand getDDC() {
 		throw new AssertionError();
 	}
 }

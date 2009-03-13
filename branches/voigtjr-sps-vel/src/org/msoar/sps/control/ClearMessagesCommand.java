@@ -3,11 +3,10 @@
  */
 package org.msoar.sps.control;
 
-import lcmtypes.pose_t;
 import sml.Identifier;
 
 final class ClearMessagesCommand implements Command {
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, pose_t pose, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
 		inputLink.clearMessages();
 		return CommandStatus.complete;
 	}
@@ -16,11 +15,11 @@ final class ClearMessagesCommand implements Command {
 		return false;
 	}
 
-	public boolean modifiesInput() {
+	public boolean createsDDC() {
 		return false;
 	}
 
-	public void updateInput(SplinterInput input) {
+	public DifferentialDriveCommand getDDC() {
 		throw new AssertionError();
 	}
 }
