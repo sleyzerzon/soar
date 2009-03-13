@@ -32,11 +32,11 @@ final class HttpController {
 	
 	private final String ACTION = "action";
 	private enum Actions {
-		postmessage, heading, angvel
+		postmessage, heading, angvel, linvel
 	}
 	
 	private enum Keys {
-		message, heading, angvel
+		message, heading, angvel, linvel
 	}
 	
 	private final IndexHandler indexHandler = new IndexHandler();
@@ -127,6 +127,8 @@ final class HttpController {
 				heading(xchg, properties);
 			} else if (properties.get(ACTION).equals(Actions.angvel.name())) {
 				angvel(xchg, properties);
+			} else if (properties.get(ACTION).equals(Actions.linvel.name())) {
+				linvel(xchg, properties);
 			} else {
 				logger.error("Unknown action: " + properties.get(ACTION));
 				sendFile(xchg, "/org/msoar/sps/control/html/error.html");
@@ -197,6 +199,25 @@ final class HttpController {
 			try {
 				double angvel = Math.toRadians(Double.parseDouble(angvelString));
 				ddc = DifferentialDriveCommand.newAngularVelocityCommand(angvel);
+				logger.debug(ddc);
+				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+			} catch (NumberFormatException e) {
+				sendResponse(xchg, "Invalid number");
+				return;
+			}
+		}
+		
+		private void linvel(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			logger.trace("linvel");
+			String linvelString = properties.get(Keys.linvel.name());
+			if (linvelString == null) {
+				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+				return;
+			}
+			
+			try {
+				double linvel = Double.parseDouble(linvelString);
+				ddc = DifferentialDriveCommand.newLinearVelocityCommand(linvel);
 				logger.debug(ddc);
 				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 			} catch (NumberFormatException e) {

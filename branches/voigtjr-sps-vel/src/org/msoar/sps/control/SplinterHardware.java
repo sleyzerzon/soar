@@ -12,7 +12,8 @@ import org.apache.log4j.Logger;
 
 final class SplinterHardware extends TimerTask {
 	private static final Logger logger = Logger.getLogger(SplinterHardware.class);
-	private static final double PGAIN = 1;
+	private static final double P_A_GAIN = 1;
+	private static final double P_L_GAIN = 2;
 	
 	static SplinterHardware newInstance(LCMProxy lcmProxy) {
 		return new SplinterHardware(lcmProxy);
@@ -57,7 +58,6 @@ final class SplinterHardware extends TimerTask {
 		pid.enablePID();
 		
 		this.lv = lv;
-		throw new AssertionError("Not implemented");
 	}
 	
 	void setMotors(double left, double right) {
@@ -101,21 +101,31 @@ final class SplinterHardware extends TimerTask {
 		
 		// compute
 		if (pose != null && pid.isEnabled()) {
-			double gain = PGAIN * dt;
+			double a_gain = P_A_GAIN * dt;
 			
 			double aerror = av - pose.rotation_rate[2];
-			double apout = aerror * gain;
+			double apout = aerror * a_gain;
 			
 			dc.left -= apout;
 			dc.right += apout;
 
+			double l_gain = P_L_GAIN * dt;
 			double lerror = lv - LinAlg.magnitude(pose.vel);
-			double lpout = lerror * gain;
+			double lpout = lerror * l_gain;
+			
+			// TODO: can't handle backing up yet, need to get forward component of velocity vector
+			lpout = Math.max(lpout, 0);
 			
 			dc.left += lpout;
 			dc.right += lpout;
 
-			logger.trace(String.format("ae%f le%f po%f", aerror, apout, lerror, lpout));
+			dc.left = Math.max(dc.left, -1);
+			dc.right = Math.max(dc.right, -1);
+
+			dc.left = Math.min(dc.left, 1);
+			dc.right = Math.min(dc.right, 1);
+			
+			logger.trace(String.format("a(e%f o%f) l(e%f o%f)", aerror, apout, lerror, lpout));
 		}
 		
 		// transmit dc
