@@ -32,11 +32,11 @@ final class HttpController {
 	
 	private final String ACTION = "action";
 	private enum Actions {
-		postmessage, heading
+		postmessage, heading, angvel
 	}
 	
 	private enum Keys {
-		message, heading
+		message, heading, angvel
 	}
 	
 	private final IndexHandler indexHandler = new IndexHandler();
@@ -125,6 +125,8 @@ final class HttpController {
 				postMessage(xchg, properties);
 			} else if (properties.get(ACTION).equals(Actions.heading.name())) {
 				heading(xchg, properties);
+			} else if (properties.get(ACTION).equals(Actions.angvel.name())) {
+				angvel(xchg, properties);
 			} else {
 				logger.error("Unknown action: " + properties.get(ACTION));
 				sendFile(xchg, "/org/msoar/sps/control/html/error.html");
@@ -133,6 +135,7 @@ final class HttpController {
 		}
 		
 		private void postMessage(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			logger.trace("postMessage");
 			String message = properties.get(Keys.message.name());
 			if (message == null) {
 				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
@@ -159,10 +162,12 @@ final class HttpController {
 		    	response.append("Cleared all messages.\n");
 		    }
 		    
+			logger.debug(response);
 		    sendResponse(xchg, response.toString());
 		}
 		
 		private void heading(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			logger.trace("heading");
 			String headingString = properties.get(Keys.heading.name());
 			if (headingString == null) {
 				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
@@ -173,6 +178,26 @@ final class HttpController {
 				double yaw = Math.toRadians(Double.parseDouble(headingString));
 				yaw = MathUtil.mod2pi(yaw);
 				ddc = DifferentialDriveCommand.newHeadingCommand(yaw);
+				logger.debug(ddc);
+				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+			} catch (NumberFormatException e) {
+				sendResponse(xchg, "Invalid number");
+				return;
+			}
+		}
+		
+		private void angvel(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			logger.trace("angvel");
+			String angvelString = properties.get(Keys.angvel.name());
+			if (angvelString == null) {
+				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+				return;
+			}
+			
+			try {
+				double angvel = Math.toRadians(Double.parseDouble(angvelString));
+				ddc = DifferentialDriveCommand.newAngularVelocityCommand(angvel);
+				logger.debug(ddc);
 				sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 			} catch (NumberFormatException e) {
 				sendResponse(xchg, "Invalid number");

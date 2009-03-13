@@ -10,7 +10,7 @@ import sml.Identifier;
 final class BroadcastMessageCommand implements Command {
 	private static final Logger logger = Logger.getLogger(BroadcastMessageCommand.class);
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		logger.warn("broadcast-message command not implemented, ignoring");
 		return CommandStatus.error;
 	}

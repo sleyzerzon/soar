@@ -13,7 +13,7 @@ final class RotateCommand implements Command {
 	private double angularVelocity;
 
 	public CommandStatus execute(InputLinkInterface inputLink,
-			Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+			Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		
 		try {
 			angularVelocity = Double

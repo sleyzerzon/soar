@@ -12,7 +12,7 @@ class MoveCommand implements Command {
 	
 	private double linearVelocity;
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		try {
 			linearVelocity = Double.parseDouble(command.GetParameterValue("velocity"));
 		} catch (NullPointerException ex) {

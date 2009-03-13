@@ -33,7 +33,7 @@ final class WaypointsIL {
 		return true;
 	}
 
-	boolean enable(String name, SplinterModel splinter) {
+	boolean enable(String name, SplinterState splinter) {
 		WaypointIL waypoint = waypointList.get(name);
 		if (name == null) {
 			return false;
@@ -53,7 +53,7 @@ final class WaypointsIL {
 		return true;
 	}
 
-	void update(SplinterModel splinter) {
+	void update(SplinterState splinter) {
 		for (WaypointIL waypoint : waypointList.values()) {
 			waypoint.update(splinter);
 		}

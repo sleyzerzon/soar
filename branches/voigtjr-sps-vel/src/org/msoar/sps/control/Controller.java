@@ -18,7 +18,7 @@ final class Controller extends TimerTask {
 	private final Timer timer = new Timer();
 	private final HttpController httpController = HttpController.newInstance();
 	private final SplinterModel splinter = SplinterModel.newInstance();
-	private DifferentialDriveCommand ddc;
+	private DifferentialDriveCommand ddc = DifferentialDriveCommand.newEStopCommand();
 	private boolean override = false;
 	
 	private Controller(Config config) {
@@ -68,6 +68,7 @@ final class Controller extends TimerTask {
 
 		if (Buttons.SOAR.checkAndDisable()) {
 			soar.changeRunningState();
+			ddc = DifferentialDriveCommand.newMotorCommand(0, 0);
 		}
 		
 		if (Buttons.OVERRIDE.checkAndDisable()) {

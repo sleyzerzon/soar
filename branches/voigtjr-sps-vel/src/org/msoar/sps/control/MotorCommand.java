@@ -12,7 +12,7 @@ final class MotorCommand implements Command {
 	double left;
 	double right;
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		try {
 			left = Double.parseDouble(command.GetParameterValue("left"));
 		} catch (NullPointerException ex) {

@@ -10,7 +10,7 @@ import sml.Identifier;
 final class DisableWaypointCommand implements Command {
 	private static final Logger logger = Logger.getLogger(DisableWaypointCommand.class);
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		String id = command.GetParameterValue("id");
 		if (id == null) {
 			logger.warn("No id on disable-waypoint command");

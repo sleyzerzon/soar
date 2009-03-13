@@ -12,7 +12,7 @@ final class HeadingCommand implements Command {
 	
 	double yaw;
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		try {
 			yaw = Double.parseDouble(command.GetParameterValue("yaw"));
 		} catch (NullPointerException ex) {

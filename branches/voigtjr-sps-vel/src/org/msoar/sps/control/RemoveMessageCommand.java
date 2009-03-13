@@ -10,7 +10,7 @@ import sml.Identifier;
 final class RemoveMessageCommand implements Command {
 	private static final Logger logger = Logger.getLogger(RemoveMessageCommand.class);
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		int id = -1;
 		try {
 			id = Integer.parseInt(command.GetParameterValue("id"));

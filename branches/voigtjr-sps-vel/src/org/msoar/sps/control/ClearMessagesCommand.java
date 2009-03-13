@@ -6,7 +6,7 @@ package org.msoar.sps.control;
 import sml.Identifier;
 
 final class ClearMessagesCommand implements Command {
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		inputLink.clearMessages();
 		return CommandStatus.complete;
 	}

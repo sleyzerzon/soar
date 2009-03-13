@@ -83,7 +83,7 @@ final class WaypointIL {
 		return other.equals(name);
 	}
 
-	void update(SplinterModel splinter) {
+	void update(SplinterState splinter) {
 		double distanceValue = LinAlg.distance(splinter.getSplinterPose().pos, xyz, 2);
 		double[] delta = LinAlg.subtract(xyz, splinter.getSplinterPose().pos);
 		yawValueRad = Math.atan2(delta[1], delta[0]);

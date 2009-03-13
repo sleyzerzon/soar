@@ -14,7 +14,7 @@ import sml.Identifier;
 final class OutputLinkManager {
 	private static final Logger logger = Logger.getLogger(OutputLinkManager.class);
 
-	private final SplinterModel splinter;
+	private final SplinterState splinter;
 	private final Agent agent;
 	private final InputLinkInterface inputLink;
 	private final HashMap<String, Command> commands = new HashMap<String, Command>();
@@ -22,10 +22,9 @@ final class OutputLinkManager {
 	boolean useFloatYawWmes = true;
 	
 	private Identifier runningCommandWme;
-	private CommandStatus runningCommandStatus;
 	private boolean runningCommandIsInterruptable = false;
 
-	OutputLinkManager(Agent agent, InputLinkInterface inputLink, SplinterModel splinter) {
+	OutputLinkManager(Agent agent, InputLinkInterface inputLink, SplinterState splinter) {
 		this.splinter = splinter;
 		this.agent = agent;
 		this.inputLink = inputLink;
@@ -63,10 +62,11 @@ final class OutputLinkManager {
 	private void setCurrentCommand(Identifier commandWme, boolean interruptable, CommandStatus status) {
 		runningCommandWme = commandWme;
 		runningCommandIsInterruptable = interruptable;
-		runningCommandStatus = status;
 	}
 
 	DifferentialDriveCommand update() {
+		// TODO: update status of running command
+		
 		// process output
 		DifferentialDriveCommand ddc = null;
 		for (int i = 0; i < agent.GetNumberCommands(); ++i) {

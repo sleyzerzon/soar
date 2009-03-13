@@ -10,7 +10,7 @@ import sml.Identifier;
 final class StopCommand implements Command {
 	private static final Logger logger = Logger.getLogger(StopCommand.class);
 	
-	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterModel splinter, OutputLinkManager outputLinkManager) {
+	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		logger.debug("stop:");
 		return CommandStatus.accepted;
 	}

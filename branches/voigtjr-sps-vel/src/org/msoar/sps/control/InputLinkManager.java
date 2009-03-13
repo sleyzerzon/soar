@@ -19,7 +19,7 @@ final class InputLinkManager {
 	private final SelfIL selfIL;
 	private final RangerIL rangerIL;
 
-	InputLinkManager(Agent agent, int rangesCount, SplinterModel splinter) {
+	InputLinkManager(Agent agent, int rangesCount, SplinterState splinter) {
 		this.agent = agent;
 		this.agent.SetBlinkIfNoChange(false);
 

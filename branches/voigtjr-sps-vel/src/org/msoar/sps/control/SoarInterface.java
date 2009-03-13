@@ -16,7 +16,7 @@ final class SoarInterface implements Kernel.UpdateEventInterface, Kernel.SystemE
 
 	private final static int DEFAULT_RANGES_COUNT = 5;
 	
-	static SoarInterface newInstance(Config config, SplinterModel splinter) {
+	static SoarInterface newInstance(Config config, SplinterState splinter) {
 		return new SoarInterface(config, splinter);
 	}
 
@@ -30,7 +30,7 @@ final class SoarInterface implements Kernel.UpdateEventInterface, Kernel.SystemE
 	private List<String> tokens;
 	private DifferentialDriveCommand ddc;
 	
-	private SoarInterface(Config config, SplinterModel splinter) {
+	private SoarInterface(Config config, SplinterState splinter) {
 		kernel = Kernel.CreateKernelInNewThread();
 		if (kernel.HadError()) {
 			logger.error("Soar error: " + kernel.GetLastErrorDescription());
@@ -136,6 +136,9 @@ final class SoarInterface implements Kernel.UpdateEventInterface, Kernel.SystemE
 	}
 
 	boolean hasDDCommand() {
+		if (!running) {
+			return false;
+		}
 		return ddc != null;
 	}
 

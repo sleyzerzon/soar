@@ -6,7 +6,7 @@ import lcmtypes.pose_t;
 
 import org.apache.log4j.Logger;
 
-final class SplinterModel {
+final class SplinterModel implements SplinterState {
 	private static final Logger logger = Logger.getLogger(SplinterModel.class);
 	
 	static SplinterModel newInstance() {
@@ -36,6 +36,8 @@ final class SplinterModel {
 			// invalid state
 			return;
 		}
+		
+		hardware.setPose(pose);
 		updateDC(dt);
 	}
 	
@@ -43,6 +45,7 @@ final class SplinterModel {
 		hardware.setUTime(pose.utime);
 
 		if (ddc == null) {
+			logger.warn("ddc null, sending estop");
 			hardware.estop();
 			return;
 		}
@@ -135,7 +138,7 @@ final class SplinterModel {
 		pose.orientation[3] = newPose.orientation[3];
 	}
 	
-	pose_t getSplinterPose() {
-		return pose;
+	public pose_t getSplinterPose() {
+		return pose.copy();
 	}
 }
