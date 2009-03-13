@@ -3,6 +3,8 @@ package org.msoar.sps.control;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import jmat.LinAlg;
+
 import lcmtypes.differential_drive_command_t;
 import lcmtypes.pose_t;
 
@@ -99,13 +101,21 @@ final class SplinterHardware extends TimerTask {
 		
 		// compute
 		if (pose != null && pid.isEnabled()) {
-			double error = av - pose.rotation_rate[2];
-			double pout = error * PGAIN * dt;
+			double gain = PGAIN * dt;
 			
-			dc.left -= pout;
-			dc.right += pout;
+			double aerror = av - pose.rotation_rate[2];
+			double apout = aerror * gain;
+			
+			dc.left -= apout;
+			dc.right += apout;
 
-			logger.trace(String.format("e%f po%f", error, pout));
+			double lerror = lv - LinAlg.magnitude(pose.vel);
+			double lpout = lerror * gain;
+			
+			dc.left += lpout;
+			dc.right += lpout;
+
+			logger.trace(String.format("ae%f le%f po%f", aerror, apout, lerror, lpout));
 		}
 		
 		// transmit dc
