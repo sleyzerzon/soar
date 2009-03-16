@@ -1,9 +1,11 @@
 package org.msoar.sps.control;
 
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import jmat.LinAlg;
+import jmat.MathUtil;
 
 import lcmtypes.differential_drive_command_t;
 import lcmtypes.pose_t;
@@ -13,7 +15,7 @@ import org.apache.log4j.Logger;
 final class SplinterHardware extends TimerTask {
 	private static final Logger logger = Logger.getLogger(SplinterHardware.class);
 	private static final double P_A_GAIN = 1;
-	private static final double P_L_GAIN = 2;
+	private static final double P_L_GAIN = 3;
 	
 	static SplinterHardware newInstance(LCMProxy lcmProxy) {
 		return new SplinterHardware(lcmProxy);
@@ -110,9 +112,14 @@ final class SplinterHardware extends TimerTask {
 			dc.right += apout;
 
 			double l_gain = P_L_GAIN * dt;
+
+			if (Double.compare(pose.vel[2], 0) != 0) {
+				throw new AssertionError();
+			}
 			
-			// TODO: transform!
-			double lerror = lv - LinAlg.magnitude(pose.vel);
+			double theta = MathUtil.mod2pi(LinAlg.quatToRollPitchYaw(pose.orientation)[2]);
+			double xvel = LinAlg.rotate2(pose.vel, -theta)[0];
+			double lerror = lv - xvel;
 			double lpout = lerror * l_gain;
 			
 			dc.left += lpout;

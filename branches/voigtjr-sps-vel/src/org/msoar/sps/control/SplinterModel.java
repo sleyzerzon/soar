@@ -1,5 +1,7 @@
 package org.msoar.sps.control;
 
+import java.util.Arrays;
+
 import jmat.LinAlg;
 import jmat.MathUtil;
 import lcmtypes.pose_t;
@@ -123,7 +125,8 @@ final class SplinterModel implements SplinterState {
 		pose.rotation_rate[2] = MathUtil.mod2pi(newTheta - oldTheta) * (1.0 / dt);
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace(String.format("dt%f vx%f vy%f r%f", dt, pose.vel[0], pose.vel[1], pose.rotation_rate[2]));
+			double xvel = LinAlg.rotate2(pose.vel, -newTheta)[0];
+			logger.trace(String.format("dt%1.5f vx%1.3f vy%1.3f r%1.3f xv%1.3f", dt, pose.vel[0], pose.vel[1], pose.rotation_rate[2], xvel));
 		}
 		updatePose(lcmPose);
 		
