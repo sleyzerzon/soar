@@ -1,16 +1,17 @@
 package org.msoar.sps.control;
 
-import java.util.Arrays;
-
 import jmat.LinAlg;
 import jmat.MathUtil;
 import lcmtypes.pose_t;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.control.DifferentialDriveCommand.CommandType;
 
 final class SplinterModel implements SplinterState {
 	private static final Logger logger = Logger.getLogger(SplinterModel.class);
-	
+	private static final double P_GAIN = 20;
+	private static final double I_GAIN = .125;
+
 	static SplinterModel newInstance() {
 		return new SplinterModel();
 	}
@@ -19,6 +20,8 @@ final class SplinterModel implements SplinterState {
 	private final SplinterHardware hardware;
 	private final pose_t pose = new pose_t();
 	private DifferentialDriveCommand ddc;
+	private CommandType previousType;
+	private double integral;
 	
 	private SplinterModel() {
 		this.lcmProxy = LCMProxy.getInstance();
@@ -41,6 +44,10 @@ final class SplinterModel implements SplinterState {
 		
 		hardware.setPose(pose);
 		updateDC(dt);
+		
+		if (ddc != null) {
+			this.previousType = ddc.getType();
+		}
 	}
 	
 	private void updateDC(double dt) {
@@ -51,7 +58,7 @@ final class SplinterModel implements SplinterState {
 			hardware.estop();
 			return;
 		}
-
+		
 		switch (ddc.getType()) {
 		case ESTOP:
 			hardware.estop();
@@ -67,11 +74,36 @@ final class SplinterModel implements SplinterState {
 			return;
 			
 		case LINVEL:
+			if (previousType == CommandType.HEADING) {
+				hardware.setAngularVelocity(0);
+			}
 			hardware.setLinearVelocity(ddc.getLinearVelocity());
 			return;
 			
 		case ANGVEL:
+			if (previousType == CommandType.HEADING) {
+				hardware.setLinearVelocity(0);
+			}
 			hardware.setAngularVelocity(ddc.getAngularVelocity());
+			return;
+			
+		case HEADING:
+			if (previousType != CommandType.HEADING) {
+				integral = 0;
+				// TODO: do we want to do this?
+				//hardware.setLinearVelocity(0);
+			}
+			
+			// p
+			double error = ddc.getHeading() - LinAlg.quatToRollPitchYaw(pose.orientation)[2];
+			error = MathUtil.mod2pi(error);
+			
+			// i
+			integral += error*dt;
+
+			double pout = (error * P_GAIN) + (integral * I_GAIN);
+			pout *= dt;
+			hardware.setAngularVelocity(pout);
 			return;
 		}
 		
