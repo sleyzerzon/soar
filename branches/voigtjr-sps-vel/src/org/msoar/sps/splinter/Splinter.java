@@ -27,6 +27,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	private static final int RIGHT = 1;
 	private static final long DELAY_BEFORE_WARN_NO_FIRST_INPUT_MILLIS = 5000;
 	private static final long DELAY_BEFORE_WARN_NO_INPUT_MILLIS = 1000;
+	private static final double NULL_BOUND_ABS = 0.19;
 	
 	//green
 	//public static final double DEFAULT_BASELINE = 0.383;
@@ -137,6 +138,11 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 		commandMotors();
 	}
 	
+	private double mapThrottle(double input) {
+		double output = ((1 - NULL_BOUND_ABS) * Math.abs(input)) + NULL_BOUND_ABS;
+		return Math.signum(input) * output;
+	}
+	
 	private void commandMotors() {
 		if (dc == null) {
 			if (lastSeenDCTime == 0) {
@@ -189,7 +195,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 			}
 
 			command[LEFT] += delta;
-			motor[LEFT].setPWM(command[LEFT]);
+			motor[LEFT].setPWM(mapThrottle(command[LEFT]));
 		} else {
 			motor[LEFT].idle();
 		}
@@ -204,7 +210,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 			}
 
 			command[RIGHT] += delta;
-			motor[RIGHT].setPWM(command[RIGHT]);
+			motor[RIGHT].setPWM(mapThrottle(command[RIGHT]));
 		} else {
 			motor[RIGHT].idle();
 		}
