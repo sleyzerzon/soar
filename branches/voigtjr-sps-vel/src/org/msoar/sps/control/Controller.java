@@ -13,7 +13,7 @@ import org.msoar.sps.config.ConfigFile;
 
 final class Controller extends TimerTask {
 	private static final Logger logger = Logger.getLogger(Controller.class);
-	private static final double LIN_MAX = 0.602;				// experimentally derived
+	private static final double LIN_MAX = 0.5; //0.602;				// experimentally derived
 	private static final double ANG_MAX = Math.toRadians(189);	// experimentally derived
 	private static final double ZERO_THRESHOLD = 0.4; 			// for GAS_AND_WHEEL, what is angvel = 0
 	private enum GamepadInputScheme {
@@ -158,7 +158,7 @@ final class Controller extends TimerTask {
 			break;
 			
 		case JOY_VELOCITIES:
-			double angvel = ANG_MAX * right_x;
+			double angvel = ANG_MAX * right_x * -1;
 			double linvel = LIN_MAX * right_y;
 			ddc = DifferentialDriveCommand.newVelocityCommand(angvel, linvel);
 			break;
