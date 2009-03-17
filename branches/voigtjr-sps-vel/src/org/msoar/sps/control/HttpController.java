@@ -32,7 +32,7 @@ final class HttpController {
 	
 	private final String ACTION = "action";
 	private enum Actions {
-		postmessage, heading, angvel, linvel
+		postmessage, heading, angvel, linvel, estop
 	}
 	
 	private enum Keys {
@@ -129,6 +129,8 @@ final class HttpController {
 				angvel(xchg, properties);
 			} else if (properties.get(ACTION).equals(Actions.linvel.name())) {
 				linvel(xchg, properties);
+			} else if (properties.get(ACTION).equals(Actions.estop.name())) {
+				estop(xchg);
 			} else {
 				logger.error("Unknown action: " + properties.get(ACTION));
 				sendFile(xchg, "/org/msoar/sps/control/html/error.html");
@@ -224,6 +226,12 @@ final class HttpController {
 				sendResponse(xchg, "Invalid number");
 				return;
 			}
+		}
+		
+		private void estop(HttpExchange xchg) throws IOException {
+			logger.trace("estop");
+			ddc = DifferentialDriveCommand.newEStopCommand();
+			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 		}
 	}
 	

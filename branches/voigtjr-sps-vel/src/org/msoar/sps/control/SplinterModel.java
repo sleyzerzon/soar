@@ -22,6 +22,7 @@ final class SplinterModel implements SplinterState {
 	private DifferentialDriveCommand ddc;
 	private CommandType previousType;
 	private double integral;
+	private double previousHeading;
 	
 	private SplinterModel() {
 		this.lcmProxy = LCMProxy.getInstance();
@@ -74,10 +75,7 @@ final class SplinterModel implements SplinterState {
 			return;
 			
 		case LINVEL:
-			if (previousType == CommandType.HEADING) {
-				hardware.setAngularVelocity(0);
-			}
-			hardware.setLinearVelocity(ddc.getLinearVelocity());
+			doLinearVelocity();
 			return;
 			
 		case ANGVEL:
@@ -87,9 +85,14 @@ final class SplinterModel implements SplinterState {
 			hardware.setAngularVelocity(ddc.getAngularVelocity());
 			return;
 			
+		case HEADING_LINVEL:
+			doLinearVelocity();
+			// falls through
+			
 		case HEADING:
-			if (previousType != CommandType.HEADING) {
+			if (previousType != CommandType.HEADING || previousHeading != ddc.getHeading()) {
 				integral = 0;
+				previousHeading = ddc.getHeading();
 				// TODO: do we want to do this?
 				//hardware.setLinearVelocity(0);
 			}
@@ -108,6 +111,13 @@ final class SplinterModel implements SplinterState {
 		}
 		
 		throw new AssertionError("Not implemented");
+	}
+	
+	private void doLinearVelocity() {
+		if (previousType == CommandType.HEADING) {
+			hardware.setAngularVelocity(0);
+		}
+		hardware.setLinearVelocity(ddc.getLinearVelocity());
 	}
 	
 	private void bootstrapPose(pose_t newPose) {

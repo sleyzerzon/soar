@@ -27,6 +27,10 @@ final class DifferentialDriveCommand {
 		return new SplinterDriveCommandBuilder(CommandType.HEADING).heading(heading).build();
 	}
 	
+	static DifferentialDriveCommand newHeadingLinearVelocityCommand(double heading, double linearVelocity) {
+		return new SplinterDriveCommandBuilder(CommandType.HEADING_LINVEL).heading(heading).linearVelocity(linearVelocity).build();
+	}
+	
 	static DifferentialDriveCommand newMoveToCommand(double x, double y, double theta) {
 		return new SplinterDriveCommandBuilder(CommandType.MOVE_TO).x(x).y(y).theta(theta).build();
 	}
@@ -55,21 +59,22 @@ final class DifferentialDriveCommand {
 			return this;
 		}
 		private SplinterDriveCommandBuilder angularVelocity(double av) {
-			if (type.getLevel() != CommandLevel.L2) {
+			if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL) {
 				throw new IllegalArgumentException();
 			}
 			this.arg0 = av;
 			return this;
 		}
 		private SplinterDriveCommandBuilder linearVelocity(double lv) {
-			if (type.getLevel() != CommandLevel.L2) {
+			// TODO this should refer to some grid and bit flags and such
+			if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL && type != CommandType.HEADING_LINVEL) {
 				throw new IllegalArgumentException();
 			}
 			this.arg1 = lv;
 			return this;
 		}
 		private SplinterDriveCommandBuilder heading(double heading) {
-			if (type != CommandType.HEADING) {
+			if (type != CommandType.HEADING && type != CommandType.HEADING_LINVEL) {
 				throw new IllegalArgumentException();
 			}
 			this.arg2 = heading;
@@ -101,28 +106,15 @@ final class DifferentialDriveCommand {
 		}
 	}
 	
-	enum CommandLevel {
-		L0, L1, L2, L3
-	}
-	
 	enum CommandType {
-		ESTOP(CommandLevel.L0), 
-		MOTOR(CommandLevel.L1), 
-		ANGVEL(CommandLevel.L2), 
-		LINVEL(CommandLevel.L2), 
-		VEL(CommandLevel.L2), 
-		HEADING(CommandLevel.L3), 
-		MOVE_TO(CommandLevel.L3);
-		
-		private final CommandLevel level;
-		
-		CommandType(CommandLevel level) {
-			this.level = level;
-		}
-		
-		CommandLevel getLevel() {
-			return level;
-		}
+		ESTOP(), 
+		MOTOR(), 
+		ANGVEL(), 
+		LINVEL(), 
+		VEL(), 
+		HEADING(), 
+		HEADING_LINVEL(), 
+		MOVE_TO();
 	}
 	
 	private final CommandType type;
@@ -163,21 +155,21 @@ final class DifferentialDriveCommand {
 	}
 	
 	double getAngularVelocity() {
-		if (type.getLevel() != CommandLevel.L2) {
+		if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL) {
 			throw new IllegalStateException();
 		}
 		return arg0;
 	}
 	
 	double getLinearVelocity() {
-		if (type.getLevel() != CommandLevel.L2) {
+		if (type != CommandType.ANGVEL && type != CommandType.LINVEL && type != CommandType.VEL && type != CommandType.HEADING_LINVEL) {
 			throw new IllegalStateException();
 		}
 		return arg1;
 	}
 	
 	double getHeading() {
-		if (type != CommandType.HEADING) {
+		if (type != CommandType.HEADING && type != CommandType.HEADING_LINVEL) {
 			throw new IllegalStateException();
 		}
 		return arg2;
