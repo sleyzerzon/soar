@@ -87,12 +87,14 @@ final class Controller extends TimerTask {
 		
 		if (Buttons.OVERRIDE.checkAndDisable()) {
 			override = !override;
+			logger.info("Override " + (override ? "enabled" : "disabled"));
 			ddc = DifferentialDriveCommand.newMotorCommand(0, 0);
 		}
 		
 		if (Buttons.GPMODE.checkAndDisable()) {
 			// new scheme = (current scheme + 1) mod (num schemes)
 			gpInputScheme = GamepadInputScheme.values()[(gpInputScheme.ordinal() + 1) % GamepadInputScheme.values().length];
+			logger.info("GP scheme " + gpInputScheme);
 		}
 
 		if (override) {

@@ -28,7 +28,7 @@ enum Buttons {
 		}
 		boolean temp = modeEnabled;
 		modeEnabled = false;
-		logger.info(name() + " changed to " + (modeEnabled ? "enabled" : "disabled"));
+		logger.debug(name() + " changed to " + (modeEnabled ? "enabled" : "disabled"));
 		return temp;
 	}
 	
@@ -40,7 +40,7 @@ enum Buttons {
 		// change on leading edge
 		if (!buttonState && button) {
 			modeEnabled = !modeEnabled;
-			logger.info(name() + " changed to " + (modeEnabled ? "enabled" : "disabled"));
+			logger.debug(name() + " changed to " + (modeEnabled ? "enabled" : "disabled"));
 		}
 		buttonState = button;
 	}

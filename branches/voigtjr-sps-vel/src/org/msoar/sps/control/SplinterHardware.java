@@ -10,6 +10,7 @@ import lcmtypes.differential_drive_command_t;
 import lcmtypes.pose_t;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.control.PIDController.Gains;
 
 final class SplinterHardware extends TimerTask {
 	private static final Logger logger = Logger.getLogger(SplinterHardware.class);
@@ -26,10 +27,8 @@ final class SplinterHardware extends TimerTask {
 	private final Timer timer = new Timer(true);
 	private pose_t pose;
 	private long lastMillis;
-	//private PIDController aController = new PIDController(0.12, 0, 0.015);	// experimentally derived
-	//private PIDController lController = new PIDController(0.7,  0, 0.1);	// experimentally derived
-	private PIDController aController = new PIDController(0.0238, 0, 0.0025); // experimentally derived in lab
-	private PIDController lController = new PIDController(0.12,  0, 0.025);	// experimentally derived in lab
+	private PIDController aController = new PIDController();
+	private PIDController lController = new PIDController();
 	
 	private SplinterHardware(LCMProxy lcmProxy) {
 		this.lcmProxy = lcmProxy;
@@ -38,23 +37,29 @@ final class SplinterHardware extends TimerTask {
 		this.dc.right_enabled = true;
 		
 		setMotors(0, 0);
-		
+
 		// TODO: make configurable
+		setAGains(new Gains(0.0238, 0, 0.0025));
+		setLGains(new Gains(0.12,  0, 0.025));
 		timer.schedule(this, 0, 1000 / 30); // 30 Hz	
 	}
 	
-	void setAGains(double p, double i, double d) {
-		logger.info(String.format("Angular gains: p%f i%f d%f", p, i, d));
-		aController.setPGain(p);
-		aController.setIGain(i);
-		aController.setDGain(d);
+	void setAGains(Gains g) {
+		logger.info(String.format("Angular gains: p%f i%f d%f", g.p, g.i, g.d));
+		aController.setGains(g);
 	}
 
-	void setLGains(double p, double i, double d) {
-		logger.info(String.format("Linear gains: p%f i%f d%f", p, i, d));
-		lController.setPGain(p);
-		lController.setIGain(i);
-		lController.setDGain(d);
+	void setLGains(Gains g) {
+		logger.info(String.format("Linear gains: p%f i%f d%f", g.p, g.i, g.d));
+		lController.setGains(g);
+	}
+	
+	Gains getAGains() {
+		return aController.getGains();
+	}
+
+	Gains getLGains() {
+		return lController.getGains();
 	}
 
 	void setPose(pose_t pose) {

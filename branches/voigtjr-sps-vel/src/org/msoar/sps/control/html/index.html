@@ -18,9 +18,9 @@
 </form>
 <form action="/" method="post">
 <input type="submit" value="Set Angular PID Gains" />
-<input type="text" name="pgain" size="5" />
-<input type="text" name="igain" size="5" />
-<input type="text" name="dgain" size="5" />
+<input type="text" name="pgain" size="5" value="%apgain%" />
+<input type="text" name="igain" size="5" value="%aigain%" />
+<input type="text" name="dgain" size="5" value="%adgain%" />
 <input type="hidden" name="action" value="agains" />
 </form>
 <hr>
@@ -31,9 +31,9 @@
 </form>
 <form action="/" method="post">
 <input type="submit" value="Set Linear PID Gains" />
-<input type="text" name="pgain" size="5" />
-<input type="text" name="igain" size="5" />
-<input type="text" name="dgain" size="5" />
+<input type="text" name="pgain" size="5" value="%lpgain%" />
+<input type="text" name="igain" size="5" value="%ligain%" />
+<input type="text" name="dgain" size="5" value="%ldgain%" />
 <input type="hidden" name="action" value="lgains" />
 </form>
 <hr>
@@ -43,9 +43,9 @@
 </form>
 <form action="/" method="post">
 <input type="submit" value="Set Heading PID Gains" />
-<input type="text" name="pgain" size="5" />
-<input type="text" name="igain" size="5" />
-<input type="text" name="dgain" size="5" />
+<input type="text" name="pgain" size="5" value="%hpgain%" />
+<input type="text" name="igain" size="5" value="%higain%" />
+<input type="text" name="dgain" size="5" value="%hdgain%" />
 <input type="hidden" name="action" value="hgains" />
 </form>
 </body></html>

@@ -6,6 +6,7 @@ import lcmtypes.pose_t;
 
 import org.apache.log4j.Logger;
 import org.msoar.sps.control.DifferentialDriveCommand.CommandType;
+import org.msoar.sps.control.PIDController.Gains;
 
 final class SplinterModel implements SplinterState {
 	private static final Logger logger = Logger.getLogger(SplinterModel.class);
@@ -19,32 +20,43 @@ final class SplinterModel implements SplinterState {
 	private final pose_t pose = new pose_t();
 	private DifferentialDriveCommand ddc;
 	private CommandType previousType;
-	//private PIDController headingController = new PIDController(12, 0, 2);	// experimentally derived
-	private PIDController headingController = new PIDController(1, 0, 0.125);	// experimentally derived in lab
+	private PIDController headingController = new PIDController();	// experimentally derived in lab
 	private double previousHeading;
 	
 	private SplinterModel() {
 		this.lcmProxy = LCMProxy.getInstance();
 		this.hardware = SplinterHardware.newInstance(this.lcmProxy);
 		
+		headingController.setGains(new Gains(1, 0, 0.125));
+		
 		if (pose.utime != 0) {
 			throw new AssertionError();
 		}
 	}
 	
-	void setAGains(double p, double i, double d) {
-		hardware.setAGains(p, i, d);
+	void setAGains(Gains g) {
+		hardware.setAGains(g);
 	}
 	
-	void setLGains(double p, double i, double d) {
-		hardware.setLGains(p, i, d);
+	void setLGains(Gains g) {
+		hardware.setLGains(g);
 	}
 	
-	void setHGains(double p, double i, double d) {
-		logger.info(String.format("Heading gains: p%f i%f d%f", p, i, d));
-		headingController.setPGain(p);
-		headingController.setIGain(i);
-		headingController.setDGain(d);
+	void setHGains(Gains g) {
+		logger.info(String.format("Heading gains: p%f i%f d%f", g.p, g.i, g.d));
+		headingController.setGains(g);
+	}
+	
+	Gains getAGains() {
+		return hardware.getAGains();
+	}
+	
+	Gains getLGains() {
+		return hardware.getLGains();
+	}
+	
+	Gains getHGains() {
+		return headingController.getGains();
 	}
 	
 	void update(DifferentialDriveCommand ddc) {

@@ -3,9 +3,25 @@ package org.msoar.sps.control;
 import jmat.MathUtil;
 
 class PIDController {
-	private double pGain;
-	private double iGain;
-	private double dGain;
+	static class Gains {
+		Gains() {
+			this.p = 0;
+			this.i = 0;
+			this.d = 0;
+		}
+		
+		Gains(double p, double i, double d) {
+			this.p = p;
+			this.i = i;
+			this.d = d;
+		}
+
+		final double p;
+		final double i;
+		final double d;
+	}
+	
+	private Gains gains = new Gains();
 	private double previousError;
 	private double integral;
 	private double previousTarget;
@@ -13,22 +29,12 @@ class PIDController {
 	PIDController() {
 	}
 	
-	PIDController(double pGain, double iGain, double dGain) {
-		this.pGain = pGain;
-		this.iGain = iGain;
-		this.dGain = dGain;
+	void setGains(Gains gains) {
+		this.gains = gains;
 	}
 	
-	void setPGain(double pGain) {
-		this.pGain = pGain;
-	}
-	
-	void setIGain(double iGain) {
-		this.iGain = iGain;
-	}
-	
-	void setDGain(double dGain) {
-		this.dGain = dGain;
+	Gains getGains() {
+		return gains;
 	}
 	
 	void clearIntegral() {
@@ -59,9 +65,9 @@ class PIDController {
 		integral = integral + error * dt;
 		double derivative = (error - previousError) / dt;
 
-		double output = pGain * error;
-		output += iGain * integral;
-		output += dGain * derivative;
+		double output = gains.p * error;
+		output += gains.i * integral;
+		output += gains.d * derivative;
 
 		previousError = error;
 		previousTarget = target;

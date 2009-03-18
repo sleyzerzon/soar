@@ -16,6 +16,7 @@ import java.util.Set;
 import jmat.MathUtil;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.control.PIDController.Gains;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -84,11 +85,30 @@ final class HttpController {
 
 			String line;
 			while ((line = br.readLine()) != null) {
+				line = performSubstitutions(line);
 				response.append(line);
 				response.append("\n");
 			}
 
 			sendResponse(xchg, response.toString());
+		}
+		
+		private String performSubstitutions(String line) {
+			Gains hgains = splinter.getHGains();
+			line = line.replaceAll("%hpgain%", Double.toString(hgains.p));
+			line = line.replaceAll("%higain%", Double.toString(hgains.i));
+			line = line.replaceAll("%hdgain%", Double.toString(hgains.d));
+
+			Gains agains = splinter.getAGains();
+			line = line.replaceAll("%apgain%", Double.toString(agains.p));
+			line = line.replaceAll("%aigain%", Double.toString(agains.i));
+			line = line.replaceAll("%adgain%", Double.toString(agains.d));
+
+			Gains lgains = splinter.getLGains();
+			line = line.replaceAll("%lpgain%", Double.toString(lgains.p));
+			line = line.replaceAll("%ligain%", Double.toString(lgains.i));
+			line = line.replaceAll("%ldgain%", Double.toString(lgains.d));
+			return line;
 		}
 
 		private void handlePost(HttpExchange xchg) throws IOException {
@@ -270,7 +290,7 @@ final class HttpController {
 				return;
 			}
 			
-			splinter.setAGains(p, i, d);
+			splinter.setAGains(new Gains(p, i, d));
 			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 		}
 		
@@ -289,7 +309,7 @@ final class HttpController {
 				return;
 			}
 			
-			splinter.setLGains(p, i, d);
+			splinter.setLGains(new Gains(p, i, d));
 			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 		}
 		
@@ -308,7 +328,7 @@ final class HttpController {
 				return;
 			}
 			
-			splinter.setHGains(p, i, d);
+			splinter.setHGains(new Gains(p, i, d));
 			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 		}
 		
