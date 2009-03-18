@@ -27,8 +27,8 @@ final class SplinterHardware extends TimerTask {
 	private final Timer timer = new Timer(true);
 	private pose_t pose;
 	private long lastMillis;
-	private PIDController aController = new PIDController();
-	private PIDController lController = new PIDController();
+	private final PIDController aController = new PIDController();
+	private final PIDController lController = new PIDController();
 	
 	private SplinterHardware(LCMProxy lcmProxy) {
 		this.lcmProxy = lcmProxy;
@@ -122,11 +122,16 @@ final class SplinterHardware extends TimerTask {
 		long current = System.currentTimeMillis();
 		double dt = (current - lastMillis) / 1000.0;
 		lastMillis = current;
-		
+	
 		// compute
 		if (pose != null && pid.isEnabled()) {
 			if (Double.compare(pose.vel[2], 0) != 0) {
-				throw new AssertionError();
+				logger.warn("Z velocity is not zero!");
+			}
+
+			if (pose.orientation == null || pose.orientation.length < 3) {
+				logger.error("pose has invalid orientation!");
+				return;
 			}
 
 			double aout = aController.compute(dt, av, pose.rotation_rate[2]);
@@ -146,7 +151,9 @@ final class SplinterHardware extends TimerTask {
 			dc.left = Math.min(dc.left, 1);
 			dc.right = Math.min(dc.right, 1);
 			
-			logger.trace(String.format("a%f l%f", aout, lout));
+			if (logger.isTraceEnabled()) {
+				logger.trace(String.format("a%f l%f", aout, lout));
+			}
 		}
 		
 		// transmit dc

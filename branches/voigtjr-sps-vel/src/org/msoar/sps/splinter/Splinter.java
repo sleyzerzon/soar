@@ -46,7 +46,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	private final double tickMeters;
 	private final double baselineMeters;
 	private final double[] command = { 0, 0 };
-	private final double[] minimumMotion = { 0, 0 };
+	private final double[] minimumMotion = { 0.1299, 0.1481 };
 	private final double maxThrottleChangePerUpdate;
 
 	private OdometryLogger capture;
@@ -56,7 +56,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	private boolean failsafeSpew = false;
 	
 	private enum CalibrateState { NO, STOP1, RIGHT, STOP2, LEFT, YES }
-	private CalibrateState calibrated = CalibrateState.NO;
+	private CalibrateState calibrated = CalibrateState.YES;
 
 	// for odometry update
 	private final Odometry odometry;
@@ -110,9 +110,11 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	}
 	
 	private void calibrate(OrcStatus currentStatus) {
+		double dt = (currentStatus.utime - lastUtime) / 1000000.0;
 		boolean moving = (currentStatus.qeiVelocity[0] != 0) || (currentStatus.qeiVelocity[1] != 0);
 		switch (calibrated) {
 		case NO:
+			logger.info("Calibrating, please wait...");
 			commandFailSafe();
 			calibrated = CalibrateState.STOP1;
 			break;
@@ -126,7 +128,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 
 		case RIGHT:
 			if (!moving) {
-				command[RIGHT] += 0.01;
+				command[RIGHT] += 0.10 * dt;
 				motor[RIGHT].setPWM(command[RIGHT]);
 				break;
 			}
@@ -144,15 +146,24 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 
 		case LEFT:
 			if (!moving) {
-				command[LEFT] += 0.01;
+				command[LEFT] += 0.10 * dt;
 				motor[LEFT].setPWM(command[LEFT]);
 				break;
 			}
+			lastUtime = 0;
 			minimumMotion[LEFT] = command[LEFT];
 			commandFailSafe();
 			calibrated = CalibrateState.YES;
+			// values are always going to be high due to system delay, back of 20%
+			minimumMotion[LEFT] *= .8;
+			minimumMotion[RIGHT] *= .8;
 			logger.info(String.format("Minimum motion throttle l%1.4f r%1.4f", minimumMotion[LEFT], minimumMotion[RIGHT]));
 			break;
+		}
+		if (calibrated == CalibrateState.YES) {
+			lastUtime = 0;
+		} else {
+			lastUtime = currentStatus.utime;
 		}
 	}
 	

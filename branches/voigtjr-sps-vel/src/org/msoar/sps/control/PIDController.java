@@ -51,7 +51,7 @@ class PIDController {
 	
 	private double computeInternal(double dt, double target, double actual, boolean mod2pi) {
 		if (Double.compare(dt, 0) == 0) {
-			throw new IllegalArgumentException();
+			return 0;
 		}
 		
 		if (Math.signum(target) != Math.signum(previousTarget)) {
