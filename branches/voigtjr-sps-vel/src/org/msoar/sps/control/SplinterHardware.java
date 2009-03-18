@@ -26,8 +26,10 @@ final class SplinterHardware extends TimerTask {
 	private final Timer timer = new Timer(true);
 	private pose_t pose;
 	private long lastMillis;
-	private PIDController aController = new PIDController(0.12, 0, 0.015);	// experimentally derived
-	private PIDController lController = new PIDController(0.7,  0, 0.1);	// experimentally derived
+	//private PIDController aController = new PIDController(0.12, 0, 0.015);	// experimentally derived
+	//private PIDController lController = new PIDController(0.7,  0, 0.1);	// experimentally derived
+	private PIDController aController = new PIDController(0.0238, 0, 0.0025); // experimentally derived in lab
+	private PIDController lController = new PIDController(0.12,  0, 0.025);	// experimentally derived in lab
 	
 	private SplinterHardware(LCMProxy lcmProxy) {
 		this.lcmProxy = lcmProxy;

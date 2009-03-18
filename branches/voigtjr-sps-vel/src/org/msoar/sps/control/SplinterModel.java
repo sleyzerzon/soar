@@ -19,7 +19,8 @@ final class SplinterModel implements SplinterState {
 	private final pose_t pose = new pose_t();
 	private DifferentialDriveCommand ddc;
 	private CommandType previousType;
-	private PIDController headingController = new PIDController(12, 0, 2);	// experimentally derived
+	//private PIDController headingController = new PIDController(12, 0, 2);	// experimentally derived
+	private PIDController headingController = new PIDController(1, 0, 0.125);	// experimentally derived in lab
 	private double previousHeading;
 	
 	private SplinterModel() {
