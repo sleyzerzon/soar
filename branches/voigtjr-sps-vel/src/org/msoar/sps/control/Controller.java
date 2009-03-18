@@ -39,6 +39,8 @@ final class Controller extends TimerTask {
 		}
 		this.config = config;
 		
+		httpController.setSplinter(splinter);
+		
 		Gamepad gamepad = null;
 		try {
 			gamepad = new Gamepad();
@@ -53,7 +55,7 @@ final class Controller extends TimerTask {
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 
 		// TODO: make configurable
-		timer.schedule(this, 0, 1000 / 20); // 20 Hz	
+		timer.schedule(this, 0, 1000 / 30); // 30 Hz	
 	}
 	
 	private class ShutdownHook extends Thread {

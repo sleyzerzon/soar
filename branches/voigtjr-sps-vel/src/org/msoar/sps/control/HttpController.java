@@ -32,15 +32,16 @@ final class HttpController {
 	
 	private final String ACTION = "action";
 	private enum Actions {
-		postmessage, heading, angvel, linvel, estop
+		postmessage, heading, angvel, linvel, estop, agains, lgains, hgains
 	}
 	
 	private enum Keys {
-		message, heading, angvel, linvel
+		message, heading, angvel, linvel, pgain, igain, dgain
 	}
 	
 	private final IndexHandler indexHandler = new IndexHandler();
 	private DifferentialDriveCommand ddc;
+	private SplinterModel splinter;
 	
 	private HttpController() {
 		try {
@@ -55,6 +56,10 @@ final class HttpController {
 		}
 		
 		logger.info("http server running on port " + HTTP_PORT);
+	}
+	
+	void setSplinter(SplinterModel splinter) {
+		this.splinter = splinter;
 	}
 	
 	private class IndexHandler implements HttpHandler {
@@ -131,6 +136,12 @@ final class HttpController {
 				linvel(xchg, properties);
 			} else if (properties.get(ACTION).equals(Actions.estop.name())) {
 				estop(xchg);
+			} else if (properties.get(ACTION).equals(Actions.agains.name())) {
+				agains(xchg, properties);
+			} else if (properties.get(ACTION).equals(Actions.lgains.name())) {
+				lgains(xchg, properties);
+			} else if (properties.get(ACTION).equals(Actions.hgains.name())) {
+				hgains(xchg, properties);
 			} else {
 				logger.error("Unknown action: " + properties.get(ACTION));
 				sendFile(xchg, "/org/msoar/sps/control/html/error.html");
@@ -233,6 +244,74 @@ final class HttpController {
 			ddc = DifferentialDriveCommand.newEStopCommand();
 			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
 		}
+
+		private double parseDefault(String value) {
+			double out = 0;
+			try {
+				out = Double.parseDouble(value);
+			} catch (NullPointerException ignored) {
+				// ignored, use 0
+			}
+			return out;
+		}
+		
+		private void agains(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			logger.trace("agains");
+			double p = 0;
+			double i = 0;
+			double d = 0;
+
+			try {
+				p = parseDefault(properties.get(Keys.pgain.name()));
+				i = parseDefault(properties.get(Keys.igain.name()));
+				d = parseDefault(properties.get(Keys.dgain.name()));
+			} catch (NumberFormatException e) {
+				sendResponse(xchg, "Invalid number");
+				return;
+			}
+			
+			splinter.setAGains(p, i, d);
+			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+		}
+		
+		private void lgains(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			logger.trace("lgains");
+			double p = 0;
+			double i = 0;
+			double d = 0;
+
+			try {
+				p = parseDefault(properties.get(Keys.pgain.name()));
+				i = parseDefault(properties.get(Keys.igain.name()));
+				d = parseDefault(properties.get(Keys.dgain.name()));
+			} catch (NumberFormatException e) {
+				sendResponse(xchg, "Invalid number");
+				return;
+			}
+			
+			splinter.setLGains(p, i, d);
+			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+		}
+		
+		private void hgains(HttpExchange xchg, Map<String, String> properties) throws IOException {
+			logger.trace("hgains");
+			double p = 0;
+			double i = 0;
+			double d = 0;
+
+			try {
+				p = parseDefault(properties.get(Keys.pgain.name()));
+				i = parseDefault(properties.get(Keys.igain.name()));
+				d = parseDefault(properties.get(Keys.dgain.name()));
+			} catch (NumberFormatException e) {
+				sendResponse(xchg, "Invalid number");
+				return;
+			}
+			
+			splinter.setHGains(p, i, d);
+			sendFile(xchg, "/org/msoar/sps/control/html/index.html");
+		}
+		
 	}
 	
 	private class DebugHandler implements HttpHandler {

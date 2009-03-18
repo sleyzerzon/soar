@@ -9,8 +9,6 @@ import org.msoar.sps.control.DifferentialDriveCommand.CommandType;
 
 final class SplinterModel implements SplinterState {
 	private static final Logger logger = Logger.getLogger(SplinterModel.class);
-	private static final double P_GAIN = 20;
-	private static final double I_GAIN = .125;
 
 	static SplinterModel newInstance() {
 		return new SplinterModel();
@@ -21,7 +19,7 @@ final class SplinterModel implements SplinterState {
 	private final pose_t pose = new pose_t();
 	private DifferentialDriveCommand ddc;
 	private CommandType previousType;
-	private double integral;
+	private PIDController headingController = new PIDController(12, 0, 2);	// experimentally derived
 	private double previousHeading;
 	
 	private SplinterModel() {
@@ -31,6 +29,21 @@ final class SplinterModel implements SplinterState {
 		if (pose.utime != 0) {
 			throw new AssertionError();
 		}
+	}
+	
+	void setAGains(double p, double i, double d) {
+		hardware.setAGains(p, i, d);
+	}
+	
+	void setLGains(double p, double i, double d) {
+		hardware.setLGains(p, i, d);
+	}
+	
+	void setHGains(double p, double i, double d) {
+		logger.info(String.format("Heading gains: p%f i%f d%f", p, i, d));
+		headingController.setPGain(p);
+		headingController.setIGain(i);
+		headingController.setDGain(d);
 	}
 	
 	void update(DifferentialDriveCommand ddc) {
@@ -91,22 +104,16 @@ final class SplinterModel implements SplinterState {
 			
 		case HEADING:
 			if (previousType != CommandType.HEADING || previousHeading != ddc.getHeading()) {
-				integral = 0;
+				headingController.clearIntegral();
 				previousHeading = ddc.getHeading();
 				// TODO: do we want to do this?
 				//hardware.setLinearVelocity(0);
 			}
 			
-			// p
-			double error = ddc.getHeading() - LinAlg.quatToRollPitchYaw(pose.orientation)[2];
-			error = MathUtil.mod2pi(error);
-			
-			// i
-			integral += error*dt;
-
-			double pout = (error * P_GAIN) + (integral * I_GAIN);
-			pout *= dt;
-			hardware.setAngularVelocity(pout);
+			double target = MathUtil.mod2pi(ddc.getHeading());
+			double actual = MathUtil.mod2pi(LinAlg.quatToRollPitchYaw(pose.orientation)[2]);
+			double out = headingController.computeMod2Pi(dt, target, actual);
+			hardware.setAngularVelocity(out);
 			return;
 		}
 		

@@ -13,8 +13,6 @@ import org.apache.log4j.Logger;
 
 final class SplinterHardware extends TimerTask {
 	private static final Logger logger = Logger.getLogger(SplinterHardware.class);
-	private static final double P_A_GAIN = 1;
-	private static final double P_L_GAIN = 3;
 	
 	static SplinterHardware newInstance(LCMProxy lcmProxy) {
 		return new SplinterHardware(lcmProxy);
@@ -28,6 +26,8 @@ final class SplinterHardware extends TimerTask {
 	private final Timer timer = new Timer(true);
 	private pose_t pose;
 	private long lastMillis;
+	private PIDController aController = new PIDController(0.12, 0, 0.015);	// experimentally derived
+	private PIDController lController = new PIDController(0.7,  0, 0.1);	// experimentally derived
 	
 	private SplinterHardware(LCMProxy lcmProxy) {
 		this.lcmProxy = lcmProxy;
@@ -38,10 +38,24 @@ final class SplinterHardware extends TimerTask {
 		setMotors(0, 0);
 		
 		// TODO: make configurable
-		timer.schedule(this, 0, 1000 / 20); // 20 Hz	
+		timer.schedule(this, 0, 1000 / 30); // 30 Hz	
+	}
+	
+	void setAGains(double p, double i, double d) {
+		logger.info(String.format("Angular gains: p%f i%f d%f", p, i, d));
+		aController.setPGain(p);
+		aController.setIGain(i);
+		aController.setDGain(d);
 	}
 
-	public void setPose(pose_t pose) {
+	void setLGains(double p, double i, double d) {
+		logger.info(String.format("Linear gains: p%f i%f d%f", p, i, d));
+		lController.setPGain(p);
+		lController.setIGain(i);
+		lController.setDGain(d);
+	}
+
+	void setPose(pose_t pose) {
 		this.pose = pose;
 	}
 	
@@ -82,6 +96,8 @@ final class SplinterHardware extends TimerTask {
 			}
 			av = 0;
 			lv = 0;
+			aController.clearIntegral();
+			lController.clearIntegral();
 			
 			pidEnabled = true;
 		}
@@ -102,35 +118,28 @@ final class SplinterHardware extends TimerTask {
 		
 		// compute
 		if (pose != null && pid.isEnabled()) {
-			double a_gain = P_A_GAIN * dt;
-			
-			double aerror = av - pose.rotation_rate[2];
-			double apout = aerror * a_gain;
-			
-			dc.left -= apout;
-			dc.right += apout;
-
-			double l_gain = P_L_GAIN * dt;
-
 			if (Double.compare(pose.vel[2], 0) != 0) {
 				throw new AssertionError();
 			}
-			
+
+			double aout = aController.compute(dt, av, pose.rotation_rate[2]);
+			dc.left -= aout;
+			dc.right += aout;
+
+			// convert vector to local frame and get forward (x) component
 			double theta = MathUtil.mod2pi(LinAlg.quatToRollPitchYaw(pose.orientation)[2]);
 			double xvel = LinAlg.rotate2(pose.vel, -theta)[0];
-			double lerror = lv - xvel;
-			double lpout = lerror * l_gain;
-			
-			dc.left += lpout;
-			dc.right += lpout;
+			double lout = lController.compute(dt, lv, xvel);
+			dc.left += lout;
+			dc.right += lout;
 
+			// clamp -1..1
 			dc.left = Math.max(dc.left, -1);
 			dc.right = Math.max(dc.right, -1);
-
 			dc.left = Math.min(dc.left, 1);
 			dc.right = Math.min(dc.right, 1);
 			
-			logger.trace(String.format("a(e%f o%f) l(e%f o%f)", aerror, apout, lerror, lpout));
+			logger.trace(String.format("a%f l%f", aout, lout));
 		}
 		
 		// transmit dc
