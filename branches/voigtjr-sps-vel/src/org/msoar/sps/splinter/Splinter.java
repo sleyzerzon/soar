@@ -27,7 +27,6 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	private static final int RIGHT = 1;
 	private static final long DELAY_BEFORE_WARN_NO_FIRST_INPUT_MILLIS = 5000;
 	private static final long DELAY_BEFORE_WARN_NO_INPUT_MILLIS = 1000;
-	private static final double NULL_BOUND_ABS = 0.19;
 	
 	//green
 	//public static final double DEFAULT_BASELINE = 0.383;
@@ -47,6 +46,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	private final double tickMeters;
 	private final double baselineMeters;
 	private final double[] command = { 0, 0 };
+	private final double[] minimumMotion = { 0, 0 };
 	private final double maxThrottleChangePerUpdate;
 
 	private OdometryLogger capture;
@@ -54,6 +54,9 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	private long lastSeenDCTime = 0;
 	private long lastUtime = 0;
 	private boolean failsafeSpew = false;
+	
+	private enum CalibrateState { NO, STOP1, RIGHT, STOP2, LEFT, YES }
+	private CalibrateState calibrated = CalibrateState.NO;
 
 	// for odometry update
 	private final Odometry odometry;
@@ -106,10 +109,62 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 		dest.right = currentStatus.qeiPosition[ports[RIGHT]] * (invert[RIGHT] ? 1 : -1);
 	}
 	
+	private void calibrate(OrcStatus currentStatus) {
+		boolean moving = (currentStatus.qeiVelocity[0] != 0) || (currentStatus.qeiVelocity[1] != 0);
+		switch (calibrated) {
+		case NO:
+			commandFailSafe();
+			calibrated = CalibrateState.STOP1;
+			break;
+			
+		case STOP1:
+			if (moving) {
+				break;
+			}
+			calibrated = CalibrateState.RIGHT;
+			// falls through
+
+		case RIGHT:
+			if (!moving) {
+				command[RIGHT] += 0.01;
+				motor[RIGHT].setPWM(command[RIGHT]);
+				break;
+			}
+			minimumMotion[RIGHT] = command[RIGHT];
+			commandFailSafe();
+			calibrated = CalibrateState.STOP2;
+			break;
+			
+		case STOP2:
+			if (moving) {
+				break;
+			}
+			calibrated = CalibrateState.LEFT;
+			// falls through
+
+		case LEFT:
+			if (!moving) {
+				command[LEFT] += 0.01;
+				motor[LEFT].setPWM(command[LEFT]);
+				break;
+			}
+			minimumMotion[LEFT] = command[LEFT];
+			commandFailSafe();
+			calibrated = CalibrateState.YES;
+			logger.info(String.format("Minimum motion throttle l%1.4f r%1.4f", minimumMotion[LEFT], minimumMotion[RIGHT]));
+			break;
+		}
+	}
+	
 	@Override
 	public void run() {
 		// Get OrcStatus
 		OrcStatus currentStatus = orc.getStatus();
+
+		if (calibrated != CalibrateState.YES) {
+			calibrate(currentStatus);
+			return;
+		}
 		
 		boolean moving = (currentStatus.qeiVelocity[0] != 0) || (currentStatus.qeiVelocity[1] != 0);
 		
@@ -138,8 +193,8 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 		commandMotors();
 	}
 	
-	private double mapThrottle(double input) {
-		double output = ((1 - NULL_BOUND_ABS) * Math.abs(input)) + NULL_BOUND_ABS;
+	private double mapThrottle(double input, int motor) {
+		double output = ((1 - minimumMotion[motor]) * Math.abs(input)) + minimumMotion[motor];
 		return Math.signum(input) * output;
 	}
 	
@@ -195,7 +250,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 			}
 
 			command[LEFT] += delta;
-			motor[LEFT].setPWM(mapThrottle(command[LEFT]));
+			motor[LEFT].setPWM(mapThrottle(command[LEFT], LEFT));
 		} else {
 			motor[LEFT].idle();
 		}
@@ -210,7 +265,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 			}
 
 			command[RIGHT] += delta;
-			motor[RIGHT].setPWM(mapThrottle(command[RIGHT]));
+			motor[RIGHT].setPWM(mapThrottle(command[RIGHT], RIGHT));
 		} else {
 			motor[RIGHT].idle();
 		}
@@ -223,6 +278,8 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	}
 	
 	private void commandFailSafe() {
+		command[RIGHT] = 0;
+		command[LEFT] = 0;
 		motor[LEFT].setPWM(0);
 		motor[RIGHT].setPWM(0);
 	}
