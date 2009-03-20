@@ -125,50 +125,60 @@ final class SplinterHardware extends TimerTask {
 	}
 
 	public void run() {
-		if (logger.isDebugEnabled()) {
-			hzChecker.tick();
-		}
-		
-		long current = System.currentTimeMillis();
-		double dt = (current - lastMillis) / 1000.0;
-		lastMillis = current;
-	
-		// compute
-		if (pose != null && pid.isEnabled()) {
-			if (Double.compare(pose.vel[2], 0) != 0) {
-				logger.warn("Z velocity is not zero!");
+		try {
+			if (logger.isDebugEnabled()) {
+				hzChecker.tick();
 			}
-
-			if (pose.orientation == null || pose.orientation.length < 3) {
-				logger.error("pose has invalid orientation!");
-				return;
-			}
-
-			double aout = aController.compute(dt, av, pose.rotation_rate[2]);
-			dc.left -= aout;
-			dc.right += aout;
-
-			// convert vector to local frame and get forward (x) component
-			double theta = MathUtil.mod2pi(LinAlg.quatToRollPitchYaw(pose.orientation)[2]);
-			double xvel = LinAlg.rotate2(pose.vel, -theta)[0];
-			double lout = lController.compute(dt, lv, xvel);
-			dc.left += lout;
-			dc.right += lout;
-
-			// clamp -1..1
-			dc.left = Math.max(dc.left, -1);
-			dc.right = Math.max(dc.right, -1);
-			dc.left = Math.min(dc.left, 1);
-			dc.right = Math.min(dc.right, 1);
 			
-			if (logger.isTraceEnabled()) {
-				logger.trace(String.format("a%f l%f", aout, lout));
-			}
-		}
+			long current = System.currentTimeMillis();
+			double dt = (current - lastMillis) / 1000.0;
+			lastMillis = current;
 		
-		// transmit dc
-		assert dc.left_enabled == true;
-		assert dc.right_enabled == true;
-		lcmProxy.transmitDC(dc);
+			// compute
+			if (pose != null && pid.isEnabled()) {
+				if (Double.compare(pose.vel[2], 0) != 0) {
+					logger.warn("Z velocity is not zero!");
+				}
+	
+				if (pose.orientation == null || pose.orientation.length < 3) {
+					logger.error("pose has invalid orientation!");
+					return;
+				}
+	
+				double aout = aController.compute(dt, av, pose.rotation_rate[2]);
+				dc.left -= aout;
+				dc.right += aout;
+	
+				// convert vector to local frame and get forward (x) component
+				double theta = MathUtil.mod2pi(LinAlg.quatToRollPitchYaw(pose.orientation)[2]);
+				double xvel = LinAlg.rotate2(pose.vel, -theta)[0];
+				double lout = lController.compute(dt, lv, xvel);
+				dc.left += lout;
+				dc.right += lout;
+	
+				// clamp -1..1
+				dc.left = Math.max(dc.left, -1);
+				dc.right = Math.max(dc.right, -1);
+				dc.left = Math.min(dc.left, 1);
+				dc.right = Math.min(dc.right, 1);
+				
+				if (logger.isTraceEnabled()) {
+					logger.trace(String.format("a%f l%f", aout, lout));
+				}
+			}
+			
+			// transmit dc
+			assert dc.left_enabled == true;
+			assert dc.right_enabled == true;
+			lcmProxy.transmitDC(dc);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Uncaught exception: " + e);
+			dc.left_enabled = true;
+			dc.right_enabled = true;
+			dc.left = 0;
+			dc.right = 0;
+			lcmProxy.transmitDC(dc);
+		}
 	}
 }

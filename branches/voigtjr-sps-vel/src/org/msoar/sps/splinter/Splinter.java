@@ -175,43 +175,49 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	
 	@Override
 	public void run() {
-		if (logger.isDebugEnabled()) {
-			hzChecker.tick();
-		}
-		
-		// Get OrcStatus
-		OrcStatus currentStatus = orc.getStatus();
-
-		if (calibrated != CalibrateState.YES) {
-			calibrate(currentStatus);
-			return;
-		}
-		
-		boolean moving = (currentStatus.qeiVelocity[0] != 0) || (currentStatus.qeiVelocity[1] != 0);
-		
-		getOdometry(newOdom, currentStatus);
-		
-		// don't update odom unless moving
-		if (moving) {
-			odometry.propagate(newOdom, oldOdom, pose);
-
-			if (capture != null) {
-				try {
-					capture.record(newOdom);
-				} catch (IOException e) {
-					logger.error("IOException while writing odometry: " + e.getMessage());
+		try {
+			if (logger.isDebugEnabled()) {
+				hzChecker.tick();
+			}
+			
+			// Get OrcStatus
+			OrcStatus currentStatus = orc.getStatus();
+	
+			if (calibrated != CalibrateState.YES) {
+				calibrate(currentStatus);
+				return;
+			}
+			
+			boolean moving = (currentStatus.qeiVelocity[0] != 0) || (currentStatus.qeiVelocity[1] != 0);
+			
+			getOdometry(newOdom, currentStatus);
+			
+			// don't update odom unless moving
+			if (moving) {
+				odometry.propagate(newOdom, oldOdom, pose);
+	
+				if (capture != null) {
+					try {
+						capture.record(newOdom);
+					} catch (IOException e) {
+						logger.error("IOException while writing odometry: " + e.getMessage());
+					}
 				}
 			}
+	
+			// save old state
+			oldOdom.left = newOdom.left;
+			oldOdom.right = newOdom.right;
+			
+			pose.utime = currentStatus.utime;
+			lcm.publish(SharedNames.POSE_CHANNEL, pose);
+			
+			commandMotors();
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Uncaught exception: " + e);
+			commandFailSafe();
 		}
-
-		// save old state
-		oldOdom.left = newOdom.left;
-		oldOdom.right = newOdom.right;
-		
-		pose.utime = currentStatus.utime;
-		lcm.publish(SharedNames.POSE_CHANNEL, pose);
-		
-		commandMotors();
 	}
 	
 	private double mapThrottle(double input, int motor) {

@@ -77,54 +77,60 @@ final class Controller extends TimerTask {
 
 	@Override
 	public void run() {
-		if (logger.isDebugEnabled()) {
-			hzChecker.tick();
-		}
-		
-		for (Buttons button : Buttons.values()) {
-			button.update();
-		}
-
-		List<String> messageTokens = httpController.getMessageTokens();
-		if (messageTokens != null) {
-			soar.setStringInput(messageTokens);
-		}
-
-		if (Buttons.SOAR.checkAndDisable()) {
-			soar.changeRunningState();
-			ddc = DifferentialDriveCommand.newMotorCommand(0, 0);
-		}
-		
-		if (Buttons.OVERRIDE.checkAndDisable()) {
-			override = !override;
-			logger.info("Override " + (override ? "enabled" : "disabled"));
-			ddc = DifferentialDriveCommand.newMotorCommand(0, 0);
-		}
-		
-		if (Buttons.GPMODE.checkAndDisable()) {
-			// new scheme = (current scheme + 1) mod (num schemes)
-			gpInputScheme = GamepadInputScheme.values()[(gpInputScheme.ordinal() + 1) % GamepadInputScheme.values().length];
-			logger.info("GP scheme " + gpInputScheme);
-		}
-
-		if (override) {
-			ddc = getGPDDCommand();
-			logger.trace("gmpd: " + ddc);
-		} else {
-			if (httpController.hasDDCommand()) {
-				ddc = httpController.getDDCommand();
-				logger.trace("http: " + ddc);
+		try {
+			if (logger.isDebugEnabled()) {
+				hzChecker.tick();
+			}
+			
+			for (Buttons button : Buttons.values()) {
+				button.update();
+			}
+	
+			List<String> messageTokens = httpController.getMessageTokens();
+			if (messageTokens != null) {
+				soar.setStringInput(messageTokens);
+			}
+	
+			if (Buttons.SOAR.checkAndDisable()) {
+				soar.changeRunningState();
+				ddc = DifferentialDriveCommand.newMotorCommand(0, 0);
+			}
+			
+			if (Buttons.OVERRIDE.checkAndDisable()) {
+				override = !override;
+				logger.info("Override " + (override ? "enabled" : "disabled"));
+				ddc = DifferentialDriveCommand.newMotorCommand(0, 0);
+			}
+			
+			if (Buttons.GPMODE.checkAndDisable()) {
+				// new scheme = (current scheme + 1) mod (num schemes)
+				gpInputScheme = GamepadInputScheme.values()[(gpInputScheme.ordinal() + 1) % GamepadInputScheme.values().length];
+				logger.info("GP scheme " + gpInputScheme);
+			}
+	
+			if (override) {
+				ddc = getGPDDCommand();
+				logger.trace("gmpd: " + ddc);
 			} else {
-				if (soar.hasDDCommand()) {
-					ddc = soar.getDDCommand();
-					logger.trace("soar: " + ddc);
+				if (httpController.hasDDCommand()) {
+					ddc = httpController.getDDCommand();
+					logger.trace("http: " + ddc);
 				} else {
-					logger.trace("cont: " + ddc);
+					if (soar.hasDDCommand()) {
+						ddc = soar.getDDCommand();
+						logger.trace("soar: " + ddc);
+					} else {
+						logger.trace("cont: " + ddc);
+					}
 				}
 			}
+	
+			splinter.update(ddc);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Uncaught exception: " + e);
+			ddc = DifferentialDriveCommand.newEStopCommand();
 		}
-
-		splinter.update(ddc);
 	}
 	
 	private DifferentialDriveCommand getGPDDCommand() {
