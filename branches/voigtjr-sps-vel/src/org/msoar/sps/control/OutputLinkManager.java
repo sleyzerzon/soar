@@ -30,10 +30,10 @@ final class OutputLinkManager {
 		this.inputLink = inputLink;
 
 		commands.put(MotorCommand.NAME, new MotorCommand());
-		commands.put(MoveCommand.NAME, new MoveCommand());
-		commands.put(RotateCommand.NAME, new RotateCommand());
-		commands.put(HeadingCommand.NAME, new HeadingCommand());
+		commands.put(SetVelocityCommand.NAME, new SetVelocityCommand());
+		commands.put(SetHeadingCommand.NAME, new SetHeadingCommand());
 		commands.put(StopCommand.NAME, new StopCommand());
+		commands.put(EStopCommand.NAME, new EStopCommand());
 		commands.put(AddWaypointCommand.NAME, new AddWaypointCommand());
 		commands.put(RemoveWaypointCommand.NAME, new RemoveWaypointCommand());
 		commands.put(EnableWaypointCommand.NAME, new EnableWaypointCommand());

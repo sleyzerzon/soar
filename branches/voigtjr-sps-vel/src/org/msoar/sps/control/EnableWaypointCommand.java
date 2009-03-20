@@ -14,14 +14,14 @@ final class EnableWaypointCommand implements Command {
 	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
 		String id = command.GetParameterValue("id");
 		if (id == null) {
-			logger.warn("No id on enable-waypoint command");
+			logger.warn(NAME + ": No id on command");
 			return CommandStatus.error;
 		}
 
-		logger.debug(String.format("enable-waypoint: %16s", id));
+		logger.debug(String.format(NAME + ": %16s", id));
 
 		if (inputLink.enableWaypoint(id, splinter) == false) {
-			logger.warn("Unable to enable waypoint " + id + ", no such waypoint");
+			logger.warn(NAME + ": Unable to enable waypoint " + id + ", no such waypoint");
 			return CommandStatus.error;
 		}
 

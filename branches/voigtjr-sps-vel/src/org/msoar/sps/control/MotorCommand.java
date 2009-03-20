@@ -18,20 +18,20 @@ final class MotorCommand implements Command {
 		try {
 			left = Double.parseDouble(command.GetParameterValue("left"));
 		} catch (NullPointerException ex) {
-			logger.warn("No left on motor command");
+			logger.warn(NAME + ":No left on command");
 			return CommandStatus.error;
 		} catch (NumberFormatException e) {
-			logger.warn("Unable to parse left: " + command.GetParameterValue("left"));
+			logger.warn(NAME + ": Unable to parse left: " + command.GetParameterValue("left"));
 			return CommandStatus.error;
 		}
 
 		try {
 			right = Double.parseDouble(command.GetParameterValue("right"));
 		} catch (NullPointerException ex) {
-			logger.warn("No right on motor command");
+			logger.warn(NAME + ":No right on command");
 			return CommandStatus.error;
 		} catch (NumberFormatException e) {
-			logger.warn("Unable to parse right: " + command.GetParameterValue("right"));
+			logger.warn(NAME + ":Unable to parse right: " + command.GetParameterValue("right"));
 			return CommandStatus.error;
 		}
 
@@ -41,7 +41,7 @@ final class MotorCommand implements Command {
 		right = Math.max(right, -1.0);
 		right = Math.min(right, 1.0);
 
-		logger.debug(String.format("motor: %10.3f %10.3f", left, right));
+		logger.debug(String.format(NAME + ": %10.3f %10.3f", left, right));
 		
 		return CommandStatus.executing;
 	}

@@ -19,10 +19,10 @@ final class ConfigureCommand implements Command {
 			} else if (yawFormat.equals("int")) {
 				outputLinkManager.useFloatYawWmes = false;
 			} else {
-				logger.warn("Unknown yaw-format: " + yawFormat);
+				logger.warn(NAME + ": Unknown format: " + yawFormat);
 				return CommandStatus.error;
 			}
-			logger.info("yaw-format set to " + yawFormat);
+			logger.info(NAME + ": set to " + yawFormat);
 		}
 		return CommandStatus.complete;
 	}

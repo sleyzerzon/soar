@@ -12,7 +12,7 @@ final class BroadcastMessageCommand implements Command {
 	static final String NAME = "broadcast-message";
 
 	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
-		logger.warn("broadcast-message command not implemented, ignoring");
+		logger.warn(NAME + ": command not implemented, ignoring");
 		return CommandStatus.error;
 	}
 

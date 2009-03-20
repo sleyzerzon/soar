@@ -12,7 +12,7 @@ final class StopCommand implements Command {
 	static final String NAME = "stop";
 
 	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
-		logger.debug("stop:");
+		logger.debug(NAME + ":");
 		return CommandStatus.accepted;
 	}
 

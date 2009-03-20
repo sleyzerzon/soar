@@ -23,14 +23,14 @@ final class SetOffsetCommand implements Command {
 					Double.parseDouble(command.GetParameterValue("y")),
 			};
 		} catch (NullPointerException ignored) {
-			logger.warn("Missing coordinates on " + NAME);
+			logger.warn(NAME + ": Missing coordinates");
 			return CommandStatus.error;
 		} catch (NumberFormatException e) {
-			logger.warn("Error parsing coordinates on " + NAME);
+			logger.warn(NAME + ": Error parsing coordinates");
 			return CommandStatus.error;
 		}
 		
-		logger.debug(String.format("%s: x%10.3f y%10.3f", offset[0], offset[1]));
+		logger.debug(String.format("%s: x%10.3f y%10.3f", NAME, offset[0], offset[1]));
 		splinter.setOffset(offset);
 		return CommandStatus.complete;
 	}

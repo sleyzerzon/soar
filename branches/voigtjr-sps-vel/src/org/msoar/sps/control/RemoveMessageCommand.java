@@ -16,17 +16,17 @@ final class RemoveMessageCommand implements Command {
 		try {
 			id = Integer.parseInt(command.GetParameterValue("id"));
 		} catch (NullPointerException ignored) {
-			logger.warn("No id on remove-message command");
+			logger.warn(NAME + ": No id on command");
 			return CommandStatus.error;
 		} catch (NumberFormatException e) {
-			logger.warn("Unable to parse id: " + command.GetParameterValue("id"));
+			logger.warn(NAME + ": Unable to parse id: " + command.GetParameterValue("id"));
 			return CommandStatus.error;
 		}
 
-		logger.debug(String.format("remove-message: %d", id));
+		logger.debug(String.format(NAME + ": %d", id));
 		
 		if (inputLink.removeMessage(id) == false) {
-			logger.warn("Unable to remove message " + id + ", no such message");
+			logger.warn(NAME + ": Unable to remove message " + id + ", no such message");
 			return CommandStatus.error;
 		}
 
