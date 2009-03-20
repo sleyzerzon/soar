@@ -10,6 +10,7 @@ import lcmtypes.differential_drive_command_t;
 import lcmtypes.pose_t;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.HzChecker;
 import org.msoar.sps.control.PIDController.Gains;
 
 final class SplinterHardware extends TimerTask {
@@ -29,7 +30,8 @@ final class SplinterHardware extends TimerTask {
 	private long lastMillis;
 	private final PIDController aController = new PIDController();
 	private final PIDController lController = new PIDController();
-	
+	private final HzChecker hzChecker = new HzChecker(logger);
+
 	private SplinterHardware(LCMProxy lcmProxy) {
 		this.lcmProxy = lcmProxy;
 		
@@ -42,6 +44,10 @@ final class SplinterHardware extends TimerTask {
 		setAGains(new Gains(0.0238, 0, 0.0025));
 		setLGains(new Gains(0.12,  0, 0.025));
 		timer.schedule(this, 0, 1000 / 30); // 30 Hz	
+		
+		if (logger.isDebugEnabled()) {
+			timer.schedule(hzChecker, 0, 5000); 
+		}
 	}
 	
 	void setAGains(Gains g) {
@@ -119,6 +125,10 @@ final class SplinterHardware extends TimerTask {
 	}
 
 	public void run() {
+		if (logger.isDebugEnabled()) {
+			hzChecker.tick();
+		}
+		
 		long current = System.currentTimeMillis();
 		double dt = (current - lastMillis) / 1000.0;
 		lastMillis = current;

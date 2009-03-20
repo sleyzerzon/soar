@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import jmat.LinAlg;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.HzChecker;
 import org.msoar.sps.config.Config;
 import org.msoar.sps.config.ConfigFile;
 
@@ -32,7 +33,8 @@ final class Controller extends TimerTask {
 	private DifferentialDriveCommand ddc = DifferentialDriveCommand.newEStopCommand();
 	private boolean override = false;
 	private GamepadInputScheme gpInputScheme = GamepadInputScheme.JOY_MOTOR;
-	
+	private final HzChecker hzChecker = new HzChecker(logger);
+
 	private Controller(Config config) {
 		if (config == null) {
 			throw new NullPointerException();
@@ -56,6 +58,10 @@ final class Controller extends TimerTask {
 
 		// TODO: make configurable
 		timer.schedule(this, 0, 1000 / 30); // 30 Hz	
+		
+		if (logger.isDebugEnabled()) {
+			timer.schedule(hzChecker, 0, 5000); 
+		}
 	}
 	
 	private class ShutdownHook extends Thread {
@@ -71,6 +77,10 @@ final class Controller extends TimerTask {
 
 	@Override
 	public void run() {
+		if (logger.isDebugEnabled()) {
+			hzChecker.tick();
+		}
+		
 		for (Buttons button : Buttons.values()) {
 			button.update();
 		}

@@ -15,6 +15,7 @@ import orc.Orc;
 import orc.OrcStatus;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.HzChecker;
 import org.msoar.sps.SharedNames;
 import org.msoar.sps.Odometry;
 import org.msoar.sps.config.Config;
@@ -38,6 +39,7 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	public static final double DEFAULT_TICKMETERS = 0.0000428528;
 	
 	private final Timer timer = new Timer();
+	private final HzChecker hzChecker = new HzChecker(logger);
 	private final Orc orc;
 	private final Motor[] motor = new Motor[2];
 	private final int[] ports;
@@ -99,8 +101,12 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 		lcm.subscribe(SharedNames.DRIVE_CHANNEL, this);
 	
 		double updatePeriodMS = 1000 / updateHz;
-		logger.debug("Splinter thread running, period " + updatePeriodMS);
+		logger.debug("Splinter thread running, period set to " + updatePeriodMS);
 		timer.schedule(this, 0, (long)updatePeriodMS); 
+		
+		if (logger.isDebugEnabled()) {
+			timer.schedule(hzChecker, 0, 5000); 
+		}
 	}
 	
 	private void getOdometry(odom_t dest, OrcStatus currentStatus) {
@@ -169,6 +175,10 @@ public final class Splinter extends TimerTask implements LCMSubscriber {
 	
 	@Override
 	public void run() {
+		if (logger.isDebugEnabled()) {
+			hzChecker.tick();
+		}
+		
 		// Get OrcStatus
 		OrcStatus currentStatus = orc.getStatus();
 

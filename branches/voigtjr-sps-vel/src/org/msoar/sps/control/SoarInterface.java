@@ -2,8 +2,10 @@ package org.msoar.sps.control;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
 
 import org.apache.log4j.Logger;
+import org.msoar.sps.HzChecker;
 import org.msoar.sps.config.Config;
 
 import sml.Agent;
@@ -20,6 +22,8 @@ final class SoarInterface implements Kernel.UpdateEventInterface, Kernel.SystemE
 		return new SoarInterface(config, splinter);
 	}
 
+	private final Timer timer = new Timer();
+	private final HzChecker hzChecker = new HzChecker(logger);
 	private final Kernel kernel;
 	private final Agent agent;
 	private final InputLinkManager input;
@@ -61,6 +65,10 @@ final class SoarInterface implements Kernel.UpdateEventInterface, Kernel.SystemE
 		kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
 		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
 		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
+		
+		if (logger.isDebugEnabled()) {
+			timer.schedule(hzChecker, 0, 5000); 
+		}
 	}
 	
 	private class SoarRunner implements Runnable {
@@ -84,6 +92,10 @@ final class SoarInterface implements Kernel.UpdateEventInterface, Kernel.SystemE
 	}
 
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int arg3) {
+		if (logger.isDebugEnabled()) {
+			hzChecker.tick();
+		}
+		
 		if (stopSoar) {
 			logger.debug("Stopping Soar");
 			kernel.StopAllAgents();
