@@ -198,7 +198,7 @@ final class SplinterModel implements SplinterState {
 
 	private void updatePose(pose_t newPose) {
 		pose.utime = newPose.utime;
-		pose.pos = LinAlg.add(pose.pos, offset);
+		pose.pos = LinAlg.add(newPose.pos, offset);
 		pose.orientation[0] = newPose.orientation[0];
 		pose.orientation[3] = newPose.orientation[3];
 	}
