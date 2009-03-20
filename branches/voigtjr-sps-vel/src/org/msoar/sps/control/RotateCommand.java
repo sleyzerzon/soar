@@ -9,6 +9,7 @@ import sml.Identifier;
 
 final class RotateCommand implements Command {
 	private static final Logger logger = Logger.getLogger(RotateCommand.class);
+	static final String NAME = "rotate";
 
 	private double angularVelocity;
 

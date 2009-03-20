@@ -9,6 +9,8 @@ import sml.Identifier;
 
 final class MotorCommand implements Command {
 	private static final Logger logger = Logger.getLogger(MotorCommand.class);
+	static final String NAME = "motor";
+
 	double left;
 	double right;
 	

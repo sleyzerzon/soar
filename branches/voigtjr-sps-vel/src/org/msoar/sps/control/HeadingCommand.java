@@ -9,7 +9,8 @@ import sml.Identifier;
 
 final class HeadingCommand implements Command {
 	private static final Logger logger = Logger.getLogger(HeadingCommand.class);
-	
+	static final String NAME = "rotate-to";
+
 	double yaw;
 	
 	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {

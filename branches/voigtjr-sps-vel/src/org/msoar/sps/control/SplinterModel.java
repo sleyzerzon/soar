@@ -22,6 +22,7 @@ final class SplinterModel implements SplinterState {
 	private CommandType previousType;
 	private PIDController headingController = new PIDController();	// experimentally derived in lab
 	private double previousHeading;
+	private final double[] offset = new double[] {0, 0, 0};
 	
 	private SplinterModel() {
 		this.lcmProxy = LCMProxy.getInstance();
@@ -197,13 +198,19 @@ final class SplinterModel implements SplinterState {
 
 	private void updatePose(pose_t newPose) {
 		pose.utime = newPose.utime;
-		pose.pos[0] = newPose.pos[0];
-		pose.pos[1] = newPose.pos[1];
+		pose.pos = LinAlg.add(pose.pos, offset);
 		pose.orientation[0] = newPose.orientation[0];
 		pose.orientation[3] = newPose.orientation[3];
 	}
 	
 	public pose_t getSplinterPose() {
 		return pose.copy();
+	}
+
+	public void setOffset(double[] offset) {
+		if (offset == null) {
+			throw new AssertionError();
+		}
+		System.arraycopy(offset, 0, this.offset, 0, offset.length);
 	}
 }

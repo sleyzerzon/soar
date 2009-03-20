@@ -7,29 +7,31 @@ import org.apache.log4j.Logger;
 
 import sml.Identifier;
 
-final class RemoveMessageCommand implements Command {
-	private static final Logger logger = Logger.getLogger(RemoveMessageCommand.class);
-	static final String NAME = "remove-message";
-
+final class SetOffsetCommand implements Command {
+	private static final Logger logger = Logger.getLogger(SetOffsetCommand.class);
+	static final String NAME = "set-offset";
+	
 	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
-		int id = -1;
+		if (splinter == null) {
+			throw new AssertionError();
+		}
+
+		double[] offset = null;
 		try {
-			id = Integer.parseInt(command.GetParameterValue("id"));
+			offset = new double[] {
+					Double.parseDouble(command.GetParameterValue("x")),
+					Double.parseDouble(command.GetParameterValue("y")),
+			};
 		} catch (NullPointerException ignored) {
-			logger.warn("No id on remove-message command");
+			logger.warn("Missing coordinates on " + NAME);
 			return CommandStatus.error;
 		} catch (NumberFormatException e) {
-			logger.warn("Unable to parse id: " + command.GetParameterValue("id"));
+			logger.warn("Error parsing coordinates on " + NAME);
 			return CommandStatus.error;
 		}
-
-		logger.debug(String.format("remove-message: %d", id));
 		
-		if (inputLink.removeMessage(id) == false) {
-			logger.warn("Unable to remove message " + id + ", no such message");
-			return CommandStatus.error;
-		}
-
+		logger.debug(String.format("%s: x%10.3f y%10.3f", offset[0], offset[1]));
+		splinter.setOffset(offset);
 		return CommandStatus.complete;
 	}
 

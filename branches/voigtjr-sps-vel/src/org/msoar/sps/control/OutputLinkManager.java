@@ -29,19 +29,20 @@ final class OutputLinkManager {
 		this.agent = agent;
 		this.inputLink = inputLink;
 
-		commands.put("motor", new MotorCommand());
-		commands.put("move", new MoveCommand());
-		commands.put("rotate", new RotateCommand());
-		commands.put("rotate-to", new HeadingCommand());
-		commands.put("stop", new StopCommand());
-		commands.put("add-waypoint", new AddWaypointCommand());
-		commands.put("remove-waypoint", new RemoveWaypointCommand());
-		commands.put("enable-waypoint", new EnableWaypointCommand());
-		commands.put("disable-waypoint", new DisableWaypointCommand());
-		commands.put("broadcast-message", new BroadcastMessageCommand());
-		commands.put("remove-message", new RemoveMessageCommand());
-		commands.put("clear-messages", new ClearMessagesCommand());
-		commands.put("configure", new ConfigureCommand());
+		commands.put(MotorCommand.NAME, new MotorCommand());
+		commands.put(MoveCommand.NAME, new MoveCommand());
+		commands.put(RotateCommand.NAME, new RotateCommand());
+		commands.put(HeadingCommand.NAME, new HeadingCommand());
+		commands.put(StopCommand.NAME, new StopCommand());
+		commands.put(AddWaypointCommand.NAME, new AddWaypointCommand());
+		commands.put(RemoveWaypointCommand.NAME, new RemoveWaypointCommand());
+		commands.put(EnableWaypointCommand.NAME, new EnableWaypointCommand());
+		commands.put(DisableWaypointCommand.NAME, new DisableWaypointCommand());
+		commands.put(BroadcastMessageCommand.NAME, new BroadcastMessageCommand());
+		commands.put(RemoveMessageCommand.NAME, new RemoveMessageCommand());
+		commands.put(ClearMessagesCommand.NAME, new ClearMessagesCommand());
+		commands.put(ConfigureCommand.NAME, new ConfigureCommand());
+		commands.put(SetOffsetCommand.NAME, new SetOffsetCommand());
 	}
 
 	boolean getUseFloatYawWmes() {

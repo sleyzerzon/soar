@@ -9,7 +9,8 @@ import sml.Identifier;
 
 class MoveCommand implements Command {
 	private static final Logger logger = Logger.getLogger(MoveCommand.class);
-	
+	static final String NAME = "move";
+
 	private double linearVelocity;
 	
 	public CommandStatus execute(InputLinkInterface inputLink, Identifier command, SplinterState splinter, OutputLinkManager outputLinkManager) {
