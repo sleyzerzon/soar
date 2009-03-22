@@ -139,7 +139,7 @@ class wma_stat_container: public stat_container
 		wma_stat_container( agent *new_agent ): stat_container( new_agent )
 		{
 			// update-error
-			dummy = new integer_stat( "dummy", 0, new f_predicate<int>() );
+			dummy = new integer_stat( "dummy", 0, new f_predicate<long>() );
 			add_stat( dummy );
 		};
 };
