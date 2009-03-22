@@ -314,18 +314,8 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->exploration_params[ EXPLORATION_PARAM_TEMPERATURE ] = exploration_add_parameter( 25, &exploration_validate_temperature, "temperature" );
   
   // rl initialization
-  newAgent->rl_params[ RL_PARAM_LEARNING ] = rl_add_parameter( "learning", RL_LEARNING_OFF, &rl_validate_learning, &rl_convert_learning, &rl_convert_learning );    
-  newAgent->rl_params[ RL_PARAM_DISCOUNT_RATE ] = rl_add_parameter( "discount-rate", 0.9, &rl_validate_discount );  
-  newAgent->rl_params[ RL_PARAM_LEARNING_RATE ] = rl_add_parameter( "learning-rate", 0.3, &rl_validate_learning_rate );
-  newAgent->rl_params[ RL_PARAM_LEARNING_POLICY ] = rl_add_parameter( "learning-policy", RL_LEARNING_SARSA, &rl_validate_learning_policy, &rl_convert_learning_policy, &rl_convert_learning_policy );
-  newAgent->rl_params[ RL_PARAM_ET_DECAY_RATE ] = rl_add_parameter( "eligibility-trace-decay-rate", 0, &rl_validate_decay_rate );
-  newAgent->rl_params[ RL_PARAM_ET_TOLERANCE ] = rl_add_parameter( "eligibility-trace-tolerance", 0.001, &rl_validate_trace_tolerance );
-  newAgent->rl_params[ RL_PARAM_TEMPORAL_EXTENSION ] = rl_add_parameter( "temporal-extension", RL_TE_ON, &rl_validate_te_enabled, &rl_convert_te_enabled, &rl_convert_te_enabled );
-  newAgent->rl_params[ RL_PARAM_HRL_DISCOUNT ] = rl_add_parameter( "hrl-discount", RL_HRL_D_ON, &rl_validate_hrl_discount, &rl_convert_hrl_discount, &rl_convert_hrl_discount );
-
-  newAgent->rl_stats[ RL_STAT_UPDATE_ERROR ] = rl_add_stat( "update-error" );
-  newAgent->rl_stats[ RL_STAT_TOTAL_REWARD ] = rl_add_stat( "total-reward" );
-  newAgent->rl_stats[ RL_STAT_GLOBAL_REWARD ] = rl_add_stat( "global-reward" );
+  newAgent->rl_params = new rl_param_container( newAgent );
+  newAgent->rl_stats = new rl_stat_container( newAgent );  
 
   rl_initialize_template_tracking( newAgent );
   
@@ -340,15 +330,8 @@ agent * create_soar_agent (char * agent_name) {                                 
   predict_init( newAgent );
 
   // wma initialization
-  newAgent->wma_params[ WMA_PARAM_ACTIVATION ] = wma_add_parameter( "activation", WMA_ACTIVATION_ON, &wma_validate_activation, &wma_convert_activation, &wma_convert_activation );
-  newAgent->wma_params[ WMA_PARAM_DECAY_RATE ] = wma_add_parameter( "decay-rate", -0.8, &wma_validate_decay );
-  newAgent->wma_params[ WMA_PARAM_CRITERIA ] = wma_add_parameter( "criteria", WMA_CRITERIA_O_AGENT_ARCH, &wma_validate_criteria, &wma_convert_criteria, &wma_convert_criteria );
-  newAgent->wma_params[ WMA_PARAM_FORGETTING ] = wma_add_parameter( "forgetting", WMA_FORGETTING_OFF, &wma_validate_forgetting, &wma_convert_forgetting, &wma_convert_forgetting );
-  newAgent->wma_params[ WMA_PARAM_I_SUPPORT ] = wma_add_parameter( "i-support", WMA_I_NONE, &wma_validate_i_support, &wma_convert_i_support, &wma_convert_i_support );
-  newAgent->wma_params[ WMA_PARAM_PERSISTENCE ] = wma_add_parameter( "persistence", WMA_PERSISTENCE_OFF, &wma_validate_persistence, &wma_convert_persistence, &wma_convert_persistence );
-  newAgent->wma_params[ WMA_PARAM_PRECISION ] = wma_add_parameter( "precision", WMA_PRECISION_LOW, &wma_validate_precision, &wma_convert_precision, &wma_convert_precision );
-
-  newAgent->wma_stats[ WMA_STAT_DUMMY ] = wma_add_stat( "dummy" );
+  newAgent->wma_params = new wma_param_container( newAgent );
+  newAgent->wma_stats = new wma_stat_container( newAgent );
 
   newAgent->wma_initialized = false;
   newAgent->wma_first = true;
@@ -458,8 +441,8 @@ void destroy_soar_agent (agent * delete_agent)
 	  delete delete_agent->exploration_params[ i ];
 
   // cleanup Soar-RL
-  rl_clean_parameters( delete_agent );
-  rl_clean_stats( delete_agent );
+  delete delete_agent->rl_params;
+  delete delete_agent->rl_stats;
 
   // cleanup select
   select_init( delete_agent );
@@ -469,8 +452,8 @@ void destroy_soar_agent (agent * delete_agent)
   delete delete_agent->prediction;
 
   // cleanup wma
-  wma_clean_parameters( delete_agent );
-  wma_clean_stats( delete_agent );
+  delete delete_agent->wma_params;
+  delete delete_agent->wma_stats;
 
   // JRV: Frees data used by XML generation
   xml_destroy( delete_agent );
