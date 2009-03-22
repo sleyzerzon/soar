@@ -354,6 +354,32 @@ void destroy_soar_agent (agent * delete_agent)
 //  destroy_agent_window (delete_agent);
 //#endif /* USE_X_DISPLAY */
 
+  /////////////////////////////////////////////////////////
+  // Soar Modules
+  /////////////////////////////////////////////////////////
+
+  // cleanup exploration
+  for ( int i=0; i<EXPLORATION_PARAMS; i++ )
+	  delete delete_agent->exploration_params[ i ];
+
+  // cleanup Soar-RL
+  delete delete_agent->rl_params;
+  delete delete_agent->rl_stats;
+
+  // cleanup select
+  select_init( delete_agent );
+  delete delete_agent->select;
+
+  // cleanup predict
+  delete delete_agent->prediction;
+
+  // cleanup wma
+  delete delete_agent->wma_params;
+  delete delete_agent->wma_stats;
+
+  /////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
+
   remove_built_in_rhs_functions(delete_agent);
 
   /* Free structures stored in agent structure */
@@ -435,25 +461,6 @@ void destroy_soar_agent (agent * delete_agent)
   }
 
   /* RPM 9/06 end */
-
-  // cleanup exploration
-  for ( int i=0; i<EXPLORATION_PARAMS; i++ )
-	  delete delete_agent->exploration_params[ i ];
-
-  // cleanup Soar-RL
-  delete delete_agent->rl_params;
-  delete delete_agent->rl_stats;
-
-  // cleanup select
-  select_init( delete_agent );
-  delete delete_agent->select;
-
-  // cleanup predict
-  delete delete_agent->prediction;
-
-  // cleanup wma
-  delete delete_agent->wma_params;
-  delete delete_agent->wma_stats;
 
   // JRV: Frees data used by XML generation
   xml_destroy( delete_agent );

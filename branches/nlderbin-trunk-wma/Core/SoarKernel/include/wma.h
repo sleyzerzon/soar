@@ -21,131 +21,6 @@ using namespace soar_module;
 typedef struct wme_struct wme;
 
 //////////////////////////////////////////////////////////
-// RL Parameters
-//////////////////////////////////////////////////////////
-
-class wma_decay_param: public decimal_param
-{
-	public:
-		wma_decay_param( const char *new_name, double new_value, predicate<double> *new_val_pred, predicate<double> *new_prot_pred ): primitive_param( new_name, new_value, new_val_pred, new_prot_pred ) {};
-
-		virtual void set_value( double new_value ) { value = -new_value; };
-};
-
-template <typename T>
-class wma_activation_predicate: public agent_predicate<T>
-{	
-	public:
-		wma_activation_predicate( agent *new_agent ): agent_predicate( new_agent ) {};
-
-		bool operator() ( T /*val*/ ) { return wma_enabled( my_agent ); };
-};
-
-class wma_param_container: public param_container
-{
-	public:	
-		
-		enum criteria_choices { crit_agent, crit_agent_arch, crit_all };
-		enum isupport_choices { none, no_create, uniform };
-		enum precision_choices { low, high };		
-		
-		boolean_param *activation;
-		wma_decay_param *decay_rate;
-		constant_param<criteria_choices> *criteria;
-		boolean_param *forgetting;
-		constant_param<isupport_choices> *isupport;
-		boolean_param *persistence;
-		constant_param<precision_choices> *precision;
-				
-		wma_param_container( agent *new_agent ): param_container( new_agent )
-		{
-			/**
-			 * WMA on/off
-			 */
-			activation = new boolean_param( "activation", on, new f_predicate<boolean>() );
-			add_param( activation );
-
-			// decay-rate
-			decay_rate = new wma_decay_param( "decay-rate", -0.8, new btw_predicate<double>( 0, 1, true ), new wma_activation_predicate<double>( my_agent ) );
-			add_param( decay_rate );
-
-			/**
-			 * Specifies what WMEs will have decay values.
-			 * O_AGENT - Only o-supported WMEs created by the agent 
-			 *           (i.e., they have a supporting preference)
-			 * O_AGENT_ARCH - All o-supported WMEs including 
-			 *                architecture created WMEs
-			 * ALL - All wmes are activated
-			 */
-			criteria = new constant_param<criteria_choices>( "criteria", crit_all, new wma_activation_predicate<criteria_choices>( my_agent ) );
-			criteria->add_mapping( crit_agent, "o-agent" );
-			criteria->add_mapping( crit_agent_arch, "o-agent-arch" );
-			criteria->add_mapping( crit_all, "all" );
-			add_param( criteria );
-
-			/**
-			 * Are WMEs removed from WM when activation gets too low?
-			 */
-			forgetting = new boolean_param( "forgetting", off, new wma_activation_predicate<boolean>( my_agent ) );
-			add_param( forgetting );
-
-			/**
-			 * Specifies the mode in which i-supported WMEs 
-			 * affect activation levels.
-			 * NONE - i-supported WMEs do not affect activation levels
-			 * NO_CREATE - i-supported WMEs boost the activation levels 
-			 *             of all o-supported WMEs in the instantiations 
-			 *             that test them.  Each WME receives and equal 
-			 *             boost regardless of "distance" (in the backtrace) 
-			 *             from the tested WME.
-			 * UNIFORM - i-supported WMEs boost the activation levels of 
-			 *           all o-supported WMEs in the instantiations that 
-			 *           created or test them.  Each WME receives an equal 
-			 *           boost regardless of "distance" (in the backtrace) 
-			 *           from the tested WME.
-			 */
-			isupport = new constant_param<isupport_choices>( "i-support", uniform, new wma_activation_predicate<isupport_choices>( my_agent ) );
-			isupport->add_mapping( none, "none" );
-			isupport->add_mapping( no_create, "no-create" );
-			isupport->add_mapping( uniform, "uniform" );
-			add_param( isupport );
-
-			/**
-			 * Whether or not an instantiation activates WMEs just once, 
-			 * or every cycle until it is retracted.
-			 */
-			persistence = new boolean_param( "persistence", off, new wma_activation_predicate<boolean>( my_agent ) );
-			add_param( persistence );
-
-			/**
-			 * Level of precision with which activation levels are calculated.
-			 */
-			precision = new constant_param<precision_choices>( "precision", low, new wma_activation_predicate<precision_choices>( my_agent ) );
-			precision->add_mapping( low, "low" );
-			precision->add_mapping( high, "high" );
-			add_param( precision );
-		};
-};
-
-//////////////////////////////////////////////////////////
-// WMA Statistics
-//////////////////////////////////////////////////////////
-
-class wma_stat_container: public stat_container
-{
-	public:	
-		integer_stat *dummy;		
-				
-		wma_stat_container( agent *new_agent ): stat_container( new_agent )
-		{
-			// update-error
-			dummy = new integer_stat( "dummy", 0, new f_predicate<long>() );
-			add_stat( dummy );
-		};
-};
-
-
-//////////////////////////////////////////////////////////
 // WMA Constants
 //////////////////////////////////////////////////////////
 
@@ -190,6 +65,60 @@ class wma_stat_container: public stat_container
  * removed from working memory.
  */
 #define WMA_ACTIVATION_CUTOFF -1.6
+
+
+//////////////////////////////////////////////////////////
+// WMA Parameters
+//////////////////////////////////////////////////////////
+
+class wma_decay_param;
+
+class wma_param_container: public param_container
+{
+	public:	
+		
+		enum criteria_choices { crit_agent, crit_agent_arch, crit_all };
+		enum isupport_choices { none, no_create, uniform };
+		enum precision_choices { low, high };		
+		
+		boolean_param *activation;
+		wma_decay_param *decay_rate;
+		constant_param<criteria_choices> *criteria;
+		boolean_param *forgetting;
+		constant_param<isupport_choices> *isupport;
+		boolean_param *persistence;
+		constant_param<precision_choices> *precision;
+				
+		wma_param_container( agent *new_agent );
+};
+
+class wma_decay_param: public decimal_param
+{
+	public:
+		wma_decay_param( const char *new_name, double new_value, predicate<double> *new_val_pred, predicate<double> *new_prot_pred );
+		virtual void set_value( double new_value );
+};
+
+template <typename T>
+class wma_activation_predicate: public agent_predicate<T>
+{	
+	public:
+		wma_activation_predicate( agent *new_agent );
+		bool operator() ( T val );
+};
+
+//////////////////////////////////////////////////////////
+// WMA Statistics
+//////////////////////////////////////////////////////////
+
+class wma_stat_container: public stat_container
+{
+	public:	
+		integer_stat *dummy;		
+				
+		wma_stat_container( agent *new_agent );
+};
+
 
 //////////////////////////////////////////////////////////
 // WMA Types
