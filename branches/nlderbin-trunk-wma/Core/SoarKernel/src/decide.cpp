@@ -832,7 +832,7 @@ byte require_preference_semantics (agent *thisAgent, slot *s, preference **resul
   if ( candidates && rl_enabled( thisAgent ) )
   {
 	  exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-	  rl_perform_update( thisAgent, candidates->numeric_value, s->id );
+	  rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
   }
 
   return NONE_IMPASSE_TYPE;
@@ -866,7 +866,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 			  if ( !predict && rl_enabled( thisAgent ) )
 			  {
 				  exploration_compute_value_of_candidate( thisAgent, force_result, s, 0 );
-				  rl_perform_update( thisAgent, force_result->numeric_value, s->id );
+				  rl_perform_update( thisAgent, force_result->numeric_value, force_result->rl_contribution, s->id );
 			  }
 
 			  return NONE_IMPASSE_TYPE;
@@ -922,7 +922,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 	{
 		// perform update here for just one candidate
 		exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-		rl_perform_update( thisAgent, candidates->numeric_value, s->id );
+		rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
 	}
 
     return NONE_IMPASSE_TYPE;
@@ -1092,7 +1092,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 	  {
 		  // perform update here for just one candidate
 		  exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-		  rl_perform_update( thisAgent, candidates->numeric_value, s->id );
+		  rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
 	  }
 	  
 	  return NONE_IMPASSE_TYPE;
@@ -1851,6 +1851,12 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
                        POP_CONTEXT_STACK_CALLBACK, 
                        (soar_call_data) goal);
 
+  if ( ( goal != thisAgent->top_goal ) && rl_enabled( thisAgent ) )
+  {
+	rl_tabulate_reward_value_for_goal( thisAgent, goal );
+	rl_perform_update( thisAgent, 0, true, goal ); // this update only sees reward - there is no next state
+  }
+
   /* --- disconnect this goal from the goal stack --- */
   if (goal == thisAgent->top_goal) {
     thisAgent->top_goal = NIL;
@@ -1892,12 +1898,6 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   /* --- remove wmes for this goal, and garbage collect --- */
   remove_wmes_for_context_slot (thisAgent, goal->id.operator_slot);
   update_impasse_items (thisAgent, goal, NIL); /* causes items & fake pref's to go away */
-  
-  if ( rl_enabled( thisAgent ) )
-  {
-	rl_tabulate_reward_value_for_goal( thisAgent, goal );
-	rl_perform_update( thisAgent, 0, goal ); // this update only sees reward - there is no next state
-  }
   
   remove_wme_list_from_wm (thisAgent, goal->id.impasse_wmes);
   goal->id.impasse_wmes = NIL;
@@ -2026,7 +2026,6 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.rl_info->reward_age = 0;
   id->id.rl_info->num_prev_op_rl_rules = 0;
   id->id.rl_info->step = 0;  
-  id->id.rl_info->impasse_type = NONE_IMPASSE_TYPE;
 
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, 
@@ -2237,14 +2236,7 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s, bool predict 
 		rl_store_data( thisAgent, goal, candidates );
 	        
       return TRUE;
-   } 
-   
-   if ( impasse_type != NO_CHANGE_IMPASSE_TYPE ) 
-	   goal->id.rl_info->impasse_type = impasse_type;
-   else if ( s->wmes ) 
-	   goal->id.rl_info->impasse_type = OP_NO_CHANGE_IMPASSE_TYPE;
-   else 
-	   goal->id.rl_info->impasse_type = STATE_NO_CHANGE_IMPASSE_TYPE;
+   }
 
    /* --- no winner; if an impasse of the right type already existed, just
    update the ^item set on it --- */
