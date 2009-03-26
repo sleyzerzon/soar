@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +18,12 @@ import org.apache.log4j.Logger;
 final class LocalRunner implements Runner {
 	private static final Logger logger = Logger.getLogger(LocalRunner.class);
 	
-	static LocalRunner newInstance(String component, List<String> command, String config, Map<String, String> environment, DoneListener done) throws IOException {
-		return new LocalRunner(component, null, command, config, environment, done);
+	static LocalRunner newInstance(PrintWriter writer, String component, List<String> command, String config, Map<String, String> environment, DoneListener done) throws IOException {
+		return new LocalRunner(writer, component, null, command, config, environment, done);
 	}
 	
 	static LocalRunner newSlaveInstance(String component, ClientConnection client, List<String> command, String config, Map<String, String> environment, DoneListener done) throws IOException {
-		return new LocalRunner(component, client, command, config, environment, done);
+		return new LocalRunner(null, component, client, command, config, environment, done);
 	}
 	
 	private final String component;
@@ -30,8 +31,11 @@ final class LocalRunner implements Runner {
 	private final File configFile;
 	private final ClientConnection client;
 	private final DoneListener done;
+	private final PrintWriter writer;
 	
-	private LocalRunner(String component, ClientConnection client, List<String> command, String config, Map<String, String> environment, DoneListener done) throws IOException {
+	private LocalRunner(PrintWriter writer, String component, ClientConnection client, List<String> command, String config, Map<String, String> environment, DoneListener done) throws IOException {
+		this.writer = writer != null ? writer : new PrintWriter(new NullWriter());
+
 		if (component == null) {
 			throw new NullPointerException();
 		}
@@ -51,11 +55,13 @@ final class LocalRunner implements Runner {
 			try {
 				configFile = File.createTempFile(component + "-", ".sps", new File(System.getProperty("user.dir")));
 			} catch (IOException e) {
-				logger.error("Could not create temporary file for configuration!");
+				String message = "Could not create temporary file for configuration!";
+				writer.println(message);
+				logger.error(message);
 				throw new IllegalStateException(e);
 			}
-			
-			logger.info("Created temporary file: " + configFile.getAbsolutePath());
+
+			writer.println("Created temporary file: " + configFile.getAbsolutePath());
 			
 			// write config to temp file
 			try {
@@ -86,7 +92,7 @@ final class LocalRunner implements Runner {
 		}
 		
 		try {
-			logger.info("Starting process " + component);
+			writer.println("Starting process " + component);
 			process = builder.start();
 		} catch (IOException e) {
 			if (configFile != null) {
@@ -118,12 +124,14 @@ final class LocalRunner implements Runner {
 				String line;
 				while((line = procIn.readLine()) != null) {
 					if (client == null) {
-						System.out.println(line);
+						writer.println(line);
 					} else {
 						client.output(line);
 					}
 				}
 			} catch (IOException e) {
+				//e.printStackTrace();
+				writer.println(e.getMessage());
 				logger.warn(e.getMessage());
 			}
 		}
@@ -153,6 +161,8 @@ final class LocalRunner implements Runner {
 				logger.info("Removed temporary file: " + configFile.getAbsolutePath());
 				configFile.delete();
 			}
+			
+			writer.println(component + ": Process terminated.");
 			done.done(component);
 		}
 	}

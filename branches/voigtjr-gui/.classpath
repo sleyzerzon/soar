@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/uorc/user/java/orc.jar"/>
 	<classpathentry kind="lib" path="/SoarSuite/SoarLibrary/bin/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="/SoarSuite/SoarLibrary/bin/sml.jar"/>
+	<classpathentry kind="lib" path="lib/flexdock-0.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

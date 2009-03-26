@@ -42,8 +42,10 @@
       <manifest>
 	<attribute name="Main-Class" value="org.msoar.sps.sm.SessionManager" />
 	<attribute name="Class-Path" value="
+		../lib/flexdock-0.5.1.jar
 		../../SoarSuite/SoarLibrary/bin/sml.jar 
 		../../SoarSuite/SoarLibrary/bin/swt.jar 
+		../../SoarSuite/SoarLibrary/bin/commons-logging-1.1.1.jar
 		../../SoarSuite/SoarLibrary/bin/log4j-1.2.15.jar 
 		../../uorc/user/java/orc.jar 
 		../../april-code/java/jmat/jmat.jar 

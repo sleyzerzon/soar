@@ -1,48 +1,37 @@
 package org.msoar.sps.sm;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
 
 final class CommandLineInterface {
 	private static final Logger logger = Logger.getLogger(CommandLineInterface.class);
 
-	private static class Names {
-		private static final String PROMPT = "sm> ";
-		
-		private Names() { throw new AssertionError(); }
-	}
-
 	private enum Command { EXIT, QUIT, START, STOP, RESTART; }
 	private enum CommandResult { CONTINUE, STOP; }
 	
 	private final Components components;
+    private PrintWriter writer = new PrintWriter(new NullWriter(), true);
 
 	CommandLineInterface(Components components) {
 		this.components = components;
 	}
 	
-	void run(boolean autoStart) throws IOException {
-		if (autoStart) {
-			components.start(null);
+	boolean executeCommand(String command) {
+		if (handleCommand(command) == CommandResult.STOP) {
+			return false;
 		}
-		
-		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-		String command = null;
-		System.out.print(Names.PROMPT);
-		while ((command = input.readLine()) != null) {
-			if (handleCommand(command) == CommandResult.STOP) {
-				break;
-			}
-			System.out.print(Names.PROMPT);
-		}
+		return true;
+	}
+	
+	void setWriter(PrintWriter writer) {
+		this.writer.flush();
+		this.writer = writer != null ? writer : new PrintWriter(new NullWriter(), true);
 	}
 	
 	private CommandResult handleCommand(String command) {
 		logger.trace("command: " + command);
-		String[] args = command.split(" "); // TODO: try " +"
+		String[] args = command.split("\\s+");
 		if (args[0].length() != 0) {
 			Command cmd = null;
 			try {
@@ -50,7 +39,9 @@ final class CommandLineInterface {
 			} catch (IllegalArgumentException ignored) {
 			}
 			if (cmd == null) {
-				logger.error("Unknown command: " + args[0]);
+				String message = "Unknown command: " + args[0];
+				writer.println(message);
+				logger.error(message);
 			} else {
 				String component = args.length > 1 ? args[1] : null;
 				switch (cmd) {
@@ -70,7 +61,9 @@ final class CommandLineInterface {
 				case RESTART:
 					components.stop(component);
 					try {
-						logger.info("Sleeping for 5 seconds.");
+						String message = "Sleeping for 5 seconds.";
+						writer.println(message);
+						logger.info(message);
 						Thread.sleep(5000);
 					} catch (InterruptedException ignored) {
 					}

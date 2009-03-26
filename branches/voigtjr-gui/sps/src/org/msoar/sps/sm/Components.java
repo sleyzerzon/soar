@@ -1,6 +1,7 @@
 package org.msoar.sps.sm;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,14 +25,20 @@ final class Components implements DoneListener {
 	private final Map<String, RemoteConnection> connections = new ConcurrentHashMap<String, RemoteConnection>();
 	private final Map<String, Runner> running = new ConcurrentHashMap<String, Runner>();
 	private final Config config;
-	
+    private PrintWriter writer = new PrintWriter(new NullWriter(), true);
+
 	Components(Config config) {
 		this.config = config;
 	}
 	
+	void setWriter(PrintWriter writer) {
+		this.writer.flush();
+		this.writer = writer != null ? writer : new PrintWriter(new NullWriter(), true);
+	}
+	
 	void newConnection(Socket socket) {
 		try {
-			RemoteConnection rc = RemoteConnection.newInstance(socket, this);
+			RemoteConnection rc = RemoteConnection.newInstance(socket, writer, this);
 			assert rc != null;
 			
 			if (connections.containsKey(rc.getComponentName())) {
@@ -78,7 +85,7 @@ final class Components implements DoneListener {
 			Runner runner;
 			if (rc == null) {
 				logger.debug("Creating new local runner for " + component);
-				runner = LocalRunner.newInstance(component, Arrays.asList(command), getConfigString(component), getEnvironmentString(component), this);
+				runner = LocalRunner.newInstance(writer, component, Arrays.asList(command), getConfigString(component), getEnvironmentString(component), this);
 			} else {
 				logger.debug("Creating new remote runner for " + component);
 				runner = RemoteRunner.newInstance(rc, Arrays.asList(command), getConfigString(component), getEnvironmentString(component));
@@ -154,6 +161,11 @@ final class Components implements DoneListener {
 			rc.close();
 		}
 		connections.clear();
+		try {
+			// TODO: should wait for notifications that things are done running
+			Thread.sleep(2000);
+		} catch (InterruptedException ignored) {
+		}
 	}
 	
 	public void done(String component) {

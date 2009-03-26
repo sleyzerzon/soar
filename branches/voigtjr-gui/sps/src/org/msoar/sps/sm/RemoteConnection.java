@@ -16,18 +16,20 @@ import org.msoar.sps.SharedNames.ServerCommands;
 final class RemoteConnection implements Runnable {
 	private static final Logger logger = Logger.getLogger(RemoteConnection.class);
 	
-	static RemoteConnection newInstance(Socket socket, DoneListener done) throws IOException {
-		return new RemoteConnection(socket, done);
+	static RemoteConnection newInstance(Socket socket, PrintWriter writer, DoneListener done) throws IOException {
+		return new RemoteConnection(socket, writer, done);
 	}
 	
 	private final String component;
 	private final PrintWriter out;
 	private final BufferedReader in;
+	private final PrintWriter writer;
 	private final DoneListener done;
 	
-	private RemoteConnection(Socket socket, DoneListener done) throws IOException {
+	private RemoteConnection(Socket socket, PrintWriter writer, DoneListener done) throws IOException {
 		this.out = new PrintWriter(socket.getOutputStream(), true);
 		this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		this.writer = writer;
 		this.done = done;
 		
 		this.component = in.readLine();
@@ -108,11 +110,12 @@ final class RemoteConnection implements Runnable {
 				}
 				sofar += read;
 			}
-			StringBuilder builder = new StringBuilder();
-			builder.append(this.component);
-			builder.append(": ");
-			builder.append(cbuf);
-			System.out.println(builder.toString());
+			//StringBuilder builder = new StringBuilder();
+			//builder.append(this.component);
+			//builder.append(": ");
+			//builder.append(cbuf);
+			//System.out.println(builder.toString());
+			writer.println(cbuf);
 
 		} catch (NumberFormatException e) {
 			logger.error("malformed argument on output command");
