@@ -1,38 +1,26 @@
 <?xml version="1.0" ?>
 
-<project name="sml" default="build" basedir=".">
+<project name="VisualSoar" default="build" basedir=".">
 
   <target name="build" depends="build-java,build-jar"/>
 
   <target name="clean" depends="clean-java"/>
 
   <target name="distclean" depends="clean">
-    <delete dir="build" quiet="true"/>
-    <delete dir="docs" quiet="true"/>
-  </target>
-
-  <target name="docs">
-    <mkdir dir="docs" />
-    <javadoc sourcepath="src/"
-             packagenames="*"
-             defaultexcludes="yes"
-             destdir="docs/api"
-             Public="yes"
-             source="1.5"
-	     />
+    <delete dir="build" quiet="true" />
   </target>
 
   <target name="build-jar">
-    <jar destfile="sml.jar">
-
+    <jar destfile="VisualSoar.jar">
       <fileset dir="build">
 		<include name="**/*.class" />
       </fileset>
-    	
-      <fileset dir="src">
-		<include name="sml/*" />
-      </fileset>
+      <manifest>
+	<attribute name="Main-Class" value="VisualSoar" />
+	<attribute name="Class-Path" value="../lib/sml.jar" />
+      </manifest>
     </jar>
+    <copy file="VisualSoar.jar" todir="../../SoarLibrary/bin" />
   </target>
 
   <target name="build-java">
@@ -45,11 +33,12 @@
        destdir="build"
        compiler="extJavac"
        deprecation="yes"
-       source="1.5"
-       target="1.5"
+       source="1.4"
+       target="1.4"
        >
       <classpath>
         <pathelement location="src/"/>
+        <pathelement location="../../Core/ClientSMLSWIG/Java/sml.jar"/>
       </classpath>
     </javac>
   </target>
@@ -57,7 +46,8 @@
   <target name="clean-java" >
     <delete quiet="true">
       <fileset dir="build" includes="**/*.class"/>
-      <fileset dir="." includes="sml.jar"/>
+      <fileset dir="." includes="VisualSoar.jar"/>
+      <fileset dir="../../SoarLibrary/bin" includes="VisualSoar.jar"/>
     </delete>
   </target>
 

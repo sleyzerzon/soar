@@ -226,3 +226,12 @@ def ConfigureJNI(env):
     #env['JAR'] = os.environ['JAVA_HOME'] + os.sep + 'bin' + os.sep + 'jar' 
     return 1
 
+def JavaSources(dir):
+	sources = list()
+	for root, dirs, files in os.walk(dir):
+		for f in files:
+			sources.append(os.path.join(root, f))
+		if '.svn' in dirs:
+			dirs.remove('.svn')
+	return sources
+

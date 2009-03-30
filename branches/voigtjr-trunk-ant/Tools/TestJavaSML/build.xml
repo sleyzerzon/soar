@@ -1,14 +1,14 @@
 <?xml version="1.0" ?>
 
-<project name="sml" default="build" basedir=".">
+<project name="TestJavaSML" default="build" basedir=".">
 
   <target name="build" depends="build-java,build-jar"/>
 
   <target name="clean" depends="clean-java"/>
 
   <target name="distclean" depends="clean">
-    <delete dir="build" quiet="true"/>
-    <delete dir="docs" quiet="true"/>
+    <delete dir="build" quiet="true" />
+    <delete dir="docs" quiet="true" />
   </target>
 
   <target name="docs">
@@ -23,16 +23,16 @@
   </target>
 
   <target name="build-jar">
-    <jar destfile="sml.jar">
-
+    <jar destfile="TestJavaSML.jar">
       <fileset dir="build">
 		<include name="**/*.class" />
       </fileset>
-    	
-      <fileset dir="src">
-		<include name="sml/*" />
-      </fileset>
+      <manifest>
+	<attribute name="Main-Class" value="TestJavaSML" />
+	<attribute name="Class-Path" value="../lib/swt.jar ../lib/sml.jar" />
+      </manifest>
     </jar>
+    <copy file="TestJavaSML.jar" todir="../../SoarLibrary/bin" />
   </target>
 
   <target name="build-java">
@@ -50,6 +50,8 @@
        >
       <classpath>
         <pathelement location="src/"/>
+        <pathelement location="../../Core/ClientSMLSWIG/Java/sml.jar"/>
+        <pathelement location="../../SoarLibrary/lib/swt.jar"/>
       </classpath>
     </javac>
   </target>
@@ -57,7 +59,8 @@
   <target name="clean-java" >
     <delete quiet="true">
       <fileset dir="build" includes="**/*.class"/>
-      <fileset dir="." includes="sml.jar"/>
+      <fileset dir="." includes="TestJavaSML.jar"/>
+      <fileset dir="../../SoarLibrary/bin" includes="TestJavaSML.jar"/>
     </delete>
   </target>
 
