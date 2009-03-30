@@ -7,20 +7,10 @@ import sys
 Import('env')
 env = env.Clone()
 
-#if sys.platform == 'cygwin':
-#	SoarSCons.SetJavaPaths(env, '"Core/ClientSMLSWIG/Java/sml.jar;SoarLibrary/bin/swt.jar"')
-#else:
-#	SoarSCons.SetJavaPaths(env, 'Core/ClientSMLSWIG/Java/sml.jar:SoarLibrary/bin/swt.jar')
+theJar = '#Environments/JavaMissionaries/JavaMissionaries.jar';
+sources = glob.glob('src/mac/*')
 
-javacStep = env.Java(target = 'classes', source = 'src')
+env.Command(theJar, sources, 'ant', chdir=1)
+env.Clean(theJar, '#Environments/JavaMissionaries/build')
+env.Install('#SoarLibrary/bin', theJar)
 
-copySources = glob.glob('src/mac/*')
-copyTargets = map(lambda x: x.replace('src', 'classes'), copySources)
-
-copyStep = env.Command(copyTargets, copySources, SoarSCons.DoCopy)
-jarStep = env.Command('#Environments/JavaMissionaries/JavaMissionaries.jar', [copySources, 'classes'], 'jar cfm Environments/JavaMissionaries/JavaMissionaries.jar Environments/JavaMissionaries/JarManifest -C Environments/JavaMissionaries/classes .')
-
-env.Depends(jarStep, copyStep)
-env.Depends(copyStep, javacStep)
-
-env.Clean('classes', 'classes')
