@@ -2,18 +2,14 @@
 
 <project name="sml" default="build" basedir=".">
 
-  <!-- Build everything -->
-  <target name="build" depends="build-java,build-jar"/>
+  <target name="build" depends="build-mkdir,build-java,build-jar"/>
 
-  <!-- Clean everything -->
   <target name="clean" depends="clean-java"/>
 
-  <!-- Dist Clean everyting -->
   <target name="distclean" depends="clean">
-    <delete dir="build"/>
+    <delete dir="build" quiet="true"/>
   </target>
 
-  <!-- Build docs -->
   <target name="docs">
     <javadoc sourcepath="src/"
              packagenames="*"
@@ -24,7 +20,6 @@
 	     />
   </target>
 
-  <!-- Build Jar -->
   <target name="build-jar">
     <jar destfile="sml.jar">
 
@@ -35,18 +30,10 @@
       <fileset dir="src">
 		<include name="sml/*" />
       </fileset>
-
-      <manifest>
-	<attribute name="Main-Class" value="" />
-	<attribute name="Class-Path" value="" />
-      </manifest>
     </jar>
-
-    <copy file="sml.jar" todir="." />
   </target>
 
   <target name="build-java">
-    <!-- This compiles all the java -->
     <javac
        srcdir="src"
        includes="**/*.java"
@@ -64,8 +51,12 @@
     </javac>
   </target>
 
+  <target name="build-mkdir">
+    <mkdir dir="build" />
+  </target>
+
   <target name="clean-java" >
-    <delete>
+    <delete quiet="true">
       <fileset dir="build" includes="**/*.class"/>
       <fileset dir="." includes="sml.jar"/>
     </delete>
