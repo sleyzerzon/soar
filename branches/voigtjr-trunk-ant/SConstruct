@@ -42,14 +42,12 @@ opts = Options()
 opts.AddOptions(
 	BoolOption('scu', 'Build using single compilation units (faster)', 'yes'), 
 	BoolOption('java', 'Build the Soar Java interface (required for debugger)', 'yes'), 
-	BoolOption('swt', 'Build Java SWT projects (required for debugger)', 'yes'), 
 	BoolOption('python', 'Build the Soar Python interface', pythonDefault), 
 	BoolOption('csharp', 'Build the Soar CSharp interface', 'no'), 
 	BoolOption('tcl', 'Build the Soar Tcl interface', 'no'), 
 	BoolOption('debug', 'Build with debugging symbols', 'yes'),
 	BoolOption('warnings', 'Build with warnings', 'yes'),
 	EnumOption('optimization', 'Build with optimization (May cause run-time errors!)', 'full', ['no','partial','full'], {}, 1),
-	BoolOption('eclipse', 'Build everything except the java projects (prepare for eclipse)', 'no'),
 	BoolOption('preprocessor', 'Only run preprocessor', 'no'),
 	BoolOption('verbose', 'Verbose compiler output', 'no'),
 	
@@ -99,13 +97,11 @@ if conf.env['java']:
 		print "You may disable java, see help (scons -h)"
 		print "Java Native Interface is required... Exiting"
 		Exit(1)
-
 	# This checks for the swt.jar and attempts to download it if it doesn't exist
-	if env['swt'] and not SoarSCons.CheckForSWTJar(conf.env):
+	if not SoarSCons.CheckForSWTJar(conf.env):
 		print "Could not find swt.jar. You can obtain the jar here:"
 		print "\thttp://ai.eecs.umich.edu/~soar/sitemaker/misc/jars"
 		print "Place swt.jar in SoarLibrary/bin"
-		print "You may disable swt, see help (scons -h)"
 		print "swt.jar required... Exiting"
 		Exit(1)
 
@@ -198,19 +194,13 @@ if sys.platform == 'cygwin':
 
 if env['java']:
 	SConscript('#Core/ClientSMLSWIG/Java/SConscript')
-
-	# Only build the interface if we're building for eclipse	
-	if not env['eclipse']:
-		SConscript('#Tools/LoggerJava/SConscript')
-		SConscript('#Tools/TestJavaSML/SConscript')
-		
-		SConscript('#Tools/VisualSoar/SConscript')
-			
-		if env['swt']:
-			SConscript('#Tools/SoarJavaDebugger/SConscript')
-			SConscript('#Environments/Soar2D/SConscript')
-			SConscript('#Environments/JavaMissionaries/SConscript')
-			SConscript('#Environments/JavaTOH/SConscript')
+	SConscript('#Tools/LoggerJava/SConscript')
+	SConscript('#Tools/TestJavaSML/SConscript')
+	SConscript('#Tools/VisualSoar/SConscript')
+	SConscript('#Tools/SoarJavaDebugger/SConscript')
+	SConscript('#Environments/Soar2D/SConscript')
+	SConscript('#Environments/JavaMissionaries/SConscript')
+	SConscript('#Environments/JavaTOH/SConscript')
 
 if env['python']:
 	SConscript('#Core/ClientSMLSWIG/Python/SConscript')

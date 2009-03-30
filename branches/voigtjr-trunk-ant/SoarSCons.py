@@ -155,9 +155,9 @@ def ConfigureJNI(env):
     """Configure the given environment for compiling Java Native Interface
        c or c++ language files."""
 
-    if not env.get('JAVAC'):
-        print "The Java compiler must be installed and in the current path."
-        return 0
+    #if not env.get('JAVAC'):
+    #    print "The Java compiler must be installed and in the current path."
+    #    return 0
 
     # first look for a shell variable called JAVA_HOME
     java_base = os.environ.get('JAVA_HOME')
@@ -219,10 +219,10 @@ def ConfigureJNI(env):
     #    env.Append(SHLINKFLAGS = '-mno-cygwin -Wl,--kill-at')
 
     # Add extra potentially useful environment variables
-    env['JAVA_HOME'] = java_base
-    env['JNI_CPPPATH'] = java_headers
-    env['JNI_LIBPATH'] = java_libs
-    env['JAVAC'] = os.environ['JAVA_HOME'] + os.sep + 'bin' + os.sep + 'javac'
-    env['JAR'] = os.environ['JAVA_HOME'] + os.sep + 'bin' + os.sep + 'jar' 
+    #env['JAVA_HOME'] = java_base
+    #env['JNI_CPPPATH'] = java_headers
+    #env['JNI_LIBPATH'] = java_libs
+    #env['JAVAC'] = os.environ['JAVA_HOME'] + os.sep + 'bin' + os.sep + 'javac'
+    #env['JAR'] = os.environ['JAVA_HOME'] + os.sep + 'bin' + os.sep + 'jar' 
     return 1
 

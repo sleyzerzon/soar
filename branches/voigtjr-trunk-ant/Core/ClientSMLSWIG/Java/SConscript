@@ -46,10 +46,8 @@ libpath = [
 	    '#Core/ElementXML', 
 	    ]
 
-swigflags = '-c++ -java -Wall -package sml -ICore/ClientSML/include -ICore/ElementXML/include -ICore/ConnectionSML/include -outdir Core/ClientSMLSWIG/Java/build'
+swigflags = '-c++ -java -Wall -package sml -ICore/ClientSML/include -ICore/ElementXML/include -ICore/ConnectionSML/include -outdir Core/ClientSMLSWIG/Java/src'
 
-###
-# Changes suggested by Markus
 env_jni = env.Clone()
 targetname = 'Java_sml_ClientInterface'
 if sys.platform == 'darwin':
@@ -61,22 +59,15 @@ elif sys.platform == 'cygwin':
     env_jni.Append(SHLINKFLAGS = '-mno-cygwin -Wl,--kill-at')
     targetname = 'Java_sml_ClientInterface'
 
-Java_sml_ClientInterface = env_jni.SharedLibrary(targetname, glob.glob('*.i'), 
-												 LIBS = libadd,LIBPATH = libpath, SWIGFLAGS = swigflags, 
-												 SWIGCXXFILESUFFIX = "_wrap.cpp")
+Java_sml_ClientInterface = env_jni.SharedLibrary(targetname, glob.glob('*.i'), LIBS = libadd,LIBPATH = libpath, SWIGFLAGS = swigflags, SWIGCXXFILESUFFIX = "_wrap.cpp")
 
 #voigtjr: for some reason it isn't picking this dependency up:
 Depends(Java_sml_ClientInterface, '#Core/ElementXML')
 
-#Java_sml_ClientInterface = env.SharedLibrary('Java_sml_ClientInterface', glob.glob('*.i'), LIBS = libadd, LIBPATH = libpath, SWIGFLAGS = swigflags, SWIGCXXFILESUFFIX = "_wrap.cpp")
-# end changes suggested by Markus
-###
-
 env.Install('#SoarLibrary/lib', Java_sml_ClientInterface)
 
-sml_jar_javac = env.Java('classes', 'build')
+# Build SML Jar using ant
+env.Command('#Core/ClientSMLSWIG/Java/sml.jar', Java_sml_ClientInterface, 'ant', chdir=1)
+env.Clean('#Core/ClientSMLSWIG/Java/sml.jar', '#Core/ClientSMLSWIG/Java/build')
+env.Install('#SoarLibrary/bin', '#Core/ClientSMLSWIG/Java/sml.jar')
 
-env['JARCHDIR'] = 'Core/ClientSMLSWIG/Java/classes'
-sml_jar = env.Jar(target = 'sml.jar', source = 'classes')
-
-env.Install('#SoarLibrary/bin', sml_jar)
