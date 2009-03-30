@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<project name="JavaMissionaries" default="build" basedir=".">
+<project name="JavaTOH" default="build" basedir=".">
 
   <!-- Build everything -->
   <target name="build" depends="build-mkdir,build-java,build-jar"/>
@@ -26,23 +26,19 @@
 
   <!-- Build Jar -->
   <target name="build-jar">
-    <jar destfile="JavaMissionaries.jar">
+    <jar destfile="JavaTOH.jar">
 
       <fileset dir="build">
 		<include name="**/*.class" />
       </fileset>
     	
-      <fileset dir="src">
-		<include name="mac/*" />
-      </fileset>
-
       <manifest>
-	<attribute name="Main-Class" value="edu.umich.mac.MissionariesAndCannibals" />
+	<attribute name="Main-Class" value="JavaTOH" />
 	<attribute name="Class-Path" value="swt.jar sml.jar ../../SoarLibrary/bin/swt.jar ../../SoarLibrary/bin/sml.jar" />
       </manifest>
     </jar>
 
-    <copy file="JavaMissionaries.jar" todir="." />
+    <copy file="JavaTOH.jar" todir="." />
   </target>
 
   <target name="build-java">
@@ -73,7 +69,7 @@
   <target name="clean-java" >
     <delete>
       <fileset dir="build" includes="**/*.class"/>
-      <fileset dir="." includes="JavaMissionaries.jar"/>
+      <fileset dir="." includes="JavaTOH.jar"/>
     </delete>
   </target>
 
