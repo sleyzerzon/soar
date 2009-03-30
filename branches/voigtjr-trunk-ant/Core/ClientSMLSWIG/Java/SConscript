@@ -73,5 +73,6 @@ env.Install('#SoarLibrary/lib', Java_sml_ClientInterface)
 theJar = '#Core/ClientSMLSWIG/Java/sml.jar'
 Depends(theJar, 'build.xml')
 env.Command(theJar, Java_sml_ClientInterface, 'ant', chdir=1)
-env.Clean(theJar, '#Core/ClientSMLSWIG/Java/build')
+if env.GetOption('clean'):
+	os.system('ant clean')
 
