@@ -7,5 +7,7 @@ env = env.Clone()
 theJar = '#Environments/Soar2D/Soar2D.jar';
 sources = SoarSCons.JavaSources('src')
 
+Depends(theJar, 'build.xml')
 env.Command(theJar, sources, 'ant', chdir=1)
 env.Clean(theJar, '#Environments/Soar/build')
+

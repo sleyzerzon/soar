@@ -57,17 +57,21 @@ if sys.platform == 'darwin':
 elif sys.platform == 'cygwin':
     env_jni.Append(CCFLAGS = '-mno-cygwin')
     env_jni.Append(SHLINKFLAGS = '-mno-cygwin -Wl,--kill-at')
-    targetname = 'Java_sml_ClientInterface'
 
-Java_sml_ClientInterface = env_jni.SharedLibrary(targetname, glob.glob('*.i'), LIBS = libadd,LIBPATH = libpath, SWIGFLAGS = swigflags, SWIGCXXFILESUFFIX = "_wrap.cpp")
+# BUGBUG: Scons is interpreting the target of this to be "sml.java" I'm unable to fix it.
+Java_sml_ClientInterface = env_jni.SharedLibrary(
+    target = targetname, 
+    source = ("%s.i" % targetname), 
+    LIBS = libadd, LIBPATH = libpath, SWIGFLAGS = swigflags, SWIGCXXFILESUFFIX = "_wrap.cpp")
 
-#voigtjr: for some reason it isn't picking this dependency up:
+# This dependency isn't getting picked up:
 Depends(Java_sml_ClientInterface, '#Core/ElementXML')
 
 env.Install('#SoarLibrary/lib', Java_sml_ClientInterface)
 
 # Build SML Jar using ant
-env.Command('#Core/ClientSMLSWIG/Java/sml.jar', Java_sml_ClientInterface, 'ant', chdir=1)
-env.Clean('#Core/ClientSMLSWIG/Java/sml.jar', '#Core/ClientSMLSWIG/Java/build')
-env.Install('#SoarLibrary/bin', '#Core/ClientSMLSWIG/Java/sml.jar')
+theJar = '#Core/ClientSMLSWIG/Java/sml.jar'
+Depends(theJar, 'build.xml')
+env.Command(theJar, Java_sml_ClientInterface, 'ant', chdir=1)
+env.Clean(theJar, '#Core/ClientSMLSWIG/Java/build')
 

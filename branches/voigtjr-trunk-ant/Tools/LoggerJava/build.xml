@@ -28,7 +28,7 @@
 		<include name="**/*.class" />
       </fileset>
       <manifest>
-	<attribute name="Main-Class" value="LoggerJava" />
+	<attribute name="Main-Class" value="soarLogger.MainFrame" />
 	<attribute name="Class-Path" value="../lib/swt.jar ../lib/sml.jar" />
       </manifest>
     </jar>

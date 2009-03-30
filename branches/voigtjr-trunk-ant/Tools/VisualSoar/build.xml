@@ -16,7 +16,7 @@
 		<include name="**/*.class" />
       </fileset>
       <manifest>
-	<attribute name="Main-Class" value="VisualSoar" />
+	<attribute name="Main-Class" value="edu.umich.visualsoar.VisualSoar" />
 	<attribute name="Class-Path" value="../lib/sml.jar" />
       </manifest>
     </jar>

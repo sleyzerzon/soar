@@ -24,15 +24,14 @@
 
   <target name="build-jar">
     <jar destfile="sml.jar">
-
       <fileset dir="build">
 		<include name="**/*.class" />
       </fileset>
-    	
       <fileset dir="src">
 		<include name="sml/*" />
       </fileset>
     </jar>
+    <copy file="sml.jar" todir="../../../SoarLibrary/lib" />
   </target>
 
   <target name="build-java">
@@ -58,6 +57,7 @@
     <delete quiet="true">
       <fileset dir="build" includes="**/*.class"/>
       <fileset dir="." includes="sml.jar"/>
+      <fileset dir="../../../SoarLibrary/lib" includes="sml.jar"/>
     </delete>
   </target>
 

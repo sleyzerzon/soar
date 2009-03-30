@@ -8,5 +8,7 @@ env = env.Clone()
 theJar = '#Environments/JavaMissionaries/JavaMissionaries.jar';
 sources = SoarSCons.JavaSources('src')
 
+Depends(theJar, 'build.xml')
 env.Command(theJar, sources, 'ant', chdir=1)
 env.Clean(theJar, '#Environments/JavaMissionaries/build')
+

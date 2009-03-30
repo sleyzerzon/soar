@@ -36,10 +36,10 @@ def SetJavaPaths(env, classpath, sourcepath = None):
 		classpath = classpath.replace(':', ';')
 	env['CLASSPATH'] = classpath
 
-def CheckJarmd5(env):
+def CheckJarmd5(env, jarpath):
 	# open the swt.jar file
 	try:
-		f = file("SoarLibrary/bin/swt.jar", 'rb')
+		f = file(jarpath)
 	except:
 		return False
 	
@@ -62,35 +62,36 @@ def CheckJarmd5(env):
 		return GTK_DIGEST == m.hexdigest()
 	
 def CheckForSWTJar(env):
-	if os.path.exists(os.path.join('SoarLibrary', 'bin', 'swt.jar')):
-		if CheckJarmd5(env):
+	jarpath = os.path.join('SoarLibrary', 'lib', 'swt.jar')
+	if os.path.exists(jarpath):
+		if CheckJarmd5(env, jarpath):
 			return True
 		else:
 			print "md5 of swt.jar failed, removing old jar."
-			os.remove("SoarLibrary/bin/swt.jar")
+			os.remove(jarpath)
 		
 	try:
 		if sys.platform == 'darwin':
 			if env['m64']:
-				urllib.urlretrieve('http://winter.eecs.umich.edu/~nlderbin/osx64/swt.jar', 'SoarLibrary/bin/swt.jar')
+				urllib.urlretrieve('http://winter.eecs.umich.edu/~nlderbin/osx64/swt.jar', jarpath)
 			else:
-				urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/osx/swt.jar', 'SoarLibrary/bin/swt.jar')
+				urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/osx/swt.jar', jarpath)
 		elif sys.platform == 'cygwin':
-			urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/windows/swt.jar', 'SoarLibrary/bin/swt.jar')
+			urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/windows/swt.jar', jarpath)
 		else:
-			urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/gtk/swt.jar', 'SoarLibrary/bin/swt.jar')
+			urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/gtk/swt.jar', jarpath)
 	except IOError:
-		print "Error downloading swt.jar to SoarLibrary/bin: IOError"
+		print "Error downloading %s: IOError" % jarpath
 		return False
 	except ContentTooShortError:
-		print "Error downloading swt.jar to SoarLibrary/bin: IOError"
+		print "Error downloading %s: IOError" % jarpath
 		return False
 		
 	if not CheckJarmd5(env):
-		print "Error downloading swt.jar to SoarLibrary/bin, md5 failed again."
+		print "Error downloading %s, md5 failed again." % jarpath
 		return False
 	
-	print "Successfully downloaded swt.jar to SoarLibrary/bin."
+	print "Successfully downloaded", jarpath
 	return True
 
 def osx_copy(dest, source, env):
