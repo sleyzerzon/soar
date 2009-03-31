@@ -29,7 +29,7 @@
       </fileset>
       <manifest>
 	<attribute name="Main-Class" value="edu.umich.toh.TowersOfHanoi" />
-	<attribute name="Class-Path" value="swt.jar sml.jar ../../SoarLibrary/bin/swt.jar ../../SoarLibrary/bin/sml.jar" />
+	<attribute name="Class-Path" value="swt.jar sml.jar ../../SoarLibrary/lib/swt.jar ../../SoarLibrary/lib/sml.jar" />
       </manifest>
     </jar>
   </target>
