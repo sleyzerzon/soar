@@ -87,7 +87,7 @@ def CheckForSWTJar(env):
 		print "Error downloading %s: IOError" % jarpath
 		return False
 		
-	if not CheckJarmd5(env):
+	if not CheckJarmd5(env, jarpath):
 		print "Error downloading %s, md5 failed again." % jarpath
 		return False
 	
