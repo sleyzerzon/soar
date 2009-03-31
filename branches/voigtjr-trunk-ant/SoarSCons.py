@@ -5,7 +5,6 @@
 # swt.jar 3.3 digests
 OSX_DIGEST = '63e66248fed82dcf4bc2639b487ec111'
 OSX64_DIGEST = 'b80f13fccb067323ddc7085b931fff64'
-WIN_DIGEST = '33ac049c1f70126f5fe190da2bd9ff77'
 GTK_DIGEST = '3f5abcc5769c413fc731585b36fe61c2'
 
 import os
@@ -56,8 +55,6 @@ def CheckJarmd5(env, jarpath):
 			return OSX64_DIGEST == m.hexdigest()
 		else:
 			return OSX_DIGEST == m.hexdigest()
-	elif sys.platform == 'cygwin':
-		return WIN_DIGEST == m.hexdigest()
 	else:
 		return GTK_DIGEST == m.hexdigest()
 	
@@ -73,11 +70,9 @@ def CheckForSWTJar(env):
 	try:
 		if sys.platform == 'darwin':
 			if env['m64']:
-				urllib.urlretrieve('http://winter.eecs.umich.edu/~nlderbin/osx64/swt.jar', jarpath)
+				urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/osx64/swt.jar', jarpath)
 			else:
-				urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/osx/swt.jar', jarpath)
-		elif sys.platform == 'cygwin':
-			urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/windows/swt.jar', jarpath)
+				urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/osx32/swt.jar', jarpath)
 		else:
 			urllib.urlretrieve('http://ai.eecs.umich.edu/~soar/sitemaker/misc/jars/gtk/swt.jar', jarpath)
 	except IOError:
@@ -178,13 +173,6 @@ def ConfigureJNI(env):
             java_base = os.path.join(jcdir, "..")
             print "found:", java_base
 
-    if sys.platform == 'cygwin':
-        # Cygwin and Sun Java have different ideas of how path names
-        # are defined. Use cygpath to convert the windows path to
-        # a cygwin path. i.e. C:\jdkX.X to /cygdrive/c/jdkX.X
-        java_base = string.replace( \
-                os.popen("cygpath -up '"+java_base+"'").read(), '\n', '')
-
     if sys.platform == 'darwin':
         # Apple does not use Sun's naming convention
         java_headers = [os.path.join(java_base, 'include')]
@@ -208,23 +196,6 @@ def ConfigureJNI(env):
     # add Java's include and lib directory to the environment
     env.Append(CPPPATH = java_headers)
     env.Append(LIBPATH = java_libs)
-
-    ## The linking flags are specific for building jni libraries.
-    ## They must not be included in the overall environment!
-    # add any special platform-specific compilation or linking flags
-    #if sys.platform == 'darwin':
-    #    env.Append(SHLINKFLAGS = '-dynamiclib -framework JavaVM')
-    #    env['SHLIBSUFFIX'] = '.jnilib'
-    #elif sys.platform == 'cygwin':
-    #    env.Append(CCFLAGS = '-mno-cygwin')
-    #    env.Append(SHLINKFLAGS = '-mno-cygwin -Wl,--kill-at')
-
-    # Add extra potentially useful environment variables
-    #env['JAVA_HOME'] = java_base
-    #env['JNI_CPPPATH'] = java_headers
-    #env['JNI_LIBPATH'] = java_libs
-    #env['JAVAC'] = os.environ['JAVA_HOME'] + os.sep + 'bin' + os.sep + 'javac'
-    #env['JAR'] = os.environ['JAVA_HOME'] + os.sep + 'bin' + os.sep + 'jar' 
     return 1
 
 def JavaSources(dir):
