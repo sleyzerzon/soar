@@ -70,8 +70,5 @@ jar_env.Append(SCANNERS=[SWIGScanner])
 # Java files are a side-effect of the swig step earlier and therefore aren't
 # detected the first time around.
 jar_env.Command(sml_jar_target, [], 'ant', chdir=1)
-jar_env.Clean(sml_jar_target, 'build')
-if jar_env.GetOption('clean'):
-	os.system('ant clean')
 #### (end jar)
 

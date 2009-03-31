@@ -11,6 +11,4 @@ sources = SoarSCons.JavaSources('src')
 Depends(theJar, 'build.xml')
 
 env.Command(theJar, sources, 'ant', chdir=1)
-if env.GetOption('clean'):
-	os.system('ant clean')
 
