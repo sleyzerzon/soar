@@ -15,6 +15,9 @@ SWIGScanner = SCons.Scanner.ClassicCPP("SWIGScan",".i","CPPPATH",'^[ \t]*[%,#][ 
 wrapper_env.Append(SCANNERS=[SWIGScanner])
 java_sml_interface_wrap_target = '#Core/ClientSMLSWIG/Java/Java_sml_ClientInterface_wrap.cpp'
 java_sml_interface_wrap_source = '#Core/ClientSMLSWIG/Java/Java_sml_ClientInterface.i'
+# This directory must exist for the swig command to succeed:
+if not wrapper_env.GetOption('clean'):
+	Execute(Mkdir('src'))
 # Side effect: this produces src/*.java files (the SML Java interface)
 wrapper_env.Command(java_sml_interface_wrap_target, java_sml_interface_wrap_source, 'swig -o Core/ClientSMLSWIG/Java/Java_sml_ClientInterface_wrap.cpp -c++ -java -Wall -package sml -ICore/ClientSML/include -ICore/ElementXML/include -ICore/ConnectionSML/include -outdir Core/ClientSMLSWIG/Java/src Core/ClientSMLSWIG/Java/Java_sml_ClientInterface.i')
 # Removes SML Java interface files
@@ -54,7 +57,13 @@ jar_env = env.Clone()
 sml_jar_target = '#Core/ClientSMLSWIG/Java/sml.jar'
 Depends(sml_jar_target, 'build.xml')
 Depends(sml_jar_target, java_sml_interface_shlib)
-jar_env.Command(sml_jar_target, SoarSCons.JavaSources('src'), 'ant', chdir=1)
+# We have to depend on the product of the swig step because we
+# can't depend on the java files because they might not exist during
+# scons' look-for-source-files phase (since they are produced during the
+# compile phase)
+jar_env.Append(SCANNERS=[SWIGScanner])
+jar_env.Command(sml_jar_target, java_sml_interface_wrap_target, 'ant', chdir=1)
+jar_env.Clean(sml_jar_target, 'build')
 if jar_env.GetOption('clean'):
 	os.system('ant clean')
 #### (end jar)
