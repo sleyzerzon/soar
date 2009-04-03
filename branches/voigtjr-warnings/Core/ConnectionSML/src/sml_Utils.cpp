@@ -241,8 +241,8 @@ void sml::PrintDebugMethod(long indent, char const* pMethodName, char const* pSt
 {
 	indent += 0 ;
 
-	fprintf(stderr, pMethodName) ;
-	fprintf(stderr, pStr) ;
+	fprintf(stderr, "%s", pMethodName) ;
+	fprintf(stderr, "%s", pStr) ;
 	fprintf(stderr, "\n") ;
 }
 
