@@ -1274,7 +1274,7 @@ void chunk_instantiation (agent* thisAgent,
 	  /* If didn't immediately excise the chunk from the rete net   
   then record the temporary structure in the list of explained chunks. */
   
-  if (thisAgent->sysparams[EXPLAIN_SYSPARAM])
+  if (thisAgent->sysparams[EXPLAIN_SYSPARAM]) {
 	  if ((rete_addition_result != DUPLICATE_PRODUCTION) &&
 		  ((prod_type != JUSTIFICATION_PRODUCTION_TYPE) ||
 		  (rete_addition_result != REFRACTED_INST_DID_NOT_MATCH) )) {
@@ -1286,6 +1286,7 @@ void chunk_instantiation (agent* thisAgent,
 		  deallocate_condition_list (thisAgent, temp_explain_chunk.conds);
 		  deallocate_action_list (thisAgent, temp_explain_chunk.actions);
 	  }
+  }
 	  
 	  /* --- deallocate chunks conds and variablized conditions --- */
 	  deallocate_condition_list (thisAgent, lhs_top);

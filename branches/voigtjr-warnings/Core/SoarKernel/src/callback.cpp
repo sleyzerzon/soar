@@ -37,7 +37,7 @@
 #include "print.h"
 #include "utilities.h"
 
-char * soar_callback_names[] = {    /* Must match order of       */
+const char * soar_callback_names[] = {    /* Must match order of       */
   "none",                           /* SOAR_CALLBACK_TYPE        */
   "system-startup",
   "system-termination",
@@ -118,7 +118,7 @@ void soar_add_callback (agent* thisAgent,
   cb->data          = data;
   cb->eventid		= eventid ;
   cb->free_function = free_fn;
-  cb->id            = savestring(id);
+  cb->id            = id;
   
   push(thisAgent, cb, thisAgent->soar_callbacks[callback_type]);
 }
@@ -128,7 +128,7 @@ void soar_callback_data_free_string (soar_callback_data data)
   free((char *) data);
 }
 
-char * soar_callback_enum_to_name (SOAR_CALLBACK_TYPE i, 
+const char * soar_callback_enum_to_name (SOAR_CALLBACK_TYPE i, 
 				   Bool monitorable_only)
 {
   int limit;
@@ -191,33 +191,33 @@ Bool soar_exists_callback(agent* the_agent,
 }
 
 soar_callback * soar_exists_callback_id (agent* the_agent,
-					 SOAR_CALLBACK_TYPE callback_type,
-					 soar_callback_id id)
+										 SOAR_CALLBACK_TYPE callback_type,
+										 soar_callback_id id)
 {
-  cons * c;
+	cons * c;
 
-  for (c = the_agent->soar_callbacks[callback_type];
-       c != NIL;
-       c = c->rest)
-    {
-      soar_callback * cb;
-
-      cb = (soar_callback *) c->first;
-
-      if (!strcmp(cb->id, id))
+	for (c = the_agent->soar_callbacks[callback_type];
+		c != NIL;
+		c = c->rest)
 	{
-	  return cb;
-	}
-    }
+		soar_callback * cb;
 
-  return NULL;
+		cb = (soar_callback *) c->first;
+
+		if (cb->id == id)
+		{
+			return cb;
+		}
+	}
+
+	return NULL;
 }
 
 void soar_destroy_callback(soar_callback * cb)
 {
-  if (cb->id)
+  if (cb->id.length())
   {
-     free(cb->id);
+	  cb->id.clear();
   }
   if (cb->free_function)
   {
@@ -494,7 +494,7 @@ void soar_list_all_callbacks_for_event (agent* thisAgent,
       
       cb = (soar_callback *) c->first;
 
-      print(thisAgent, "%s ", cb->id);
+      print(thisAgent, "%s ", cb->id.c_str());
     }
 }
 
@@ -540,7 +540,7 @@ void soar_push_callback (agent* thisAgent,
   cb->data          = data;
   cb->eventid		= eventid ;
   cb->free_function = free_fn;
-  cb->id            = NULL;
+  cb->id.clear();
   
   push(thisAgent, cb, thisAgent->soar_callbacks[callback_type]);
 }
@@ -593,7 +593,7 @@ void soar_remove_callback (agent* thisAgent,
 
       cb = (soar_callback *) c->first;
 
-      if (!strcmp(cb->id, id))
+      if (cb->id == id)
 	{
 	  if (c != head)
 	    {
@@ -625,13 +625,13 @@ void soar_callback_test_callback (agent* /*the_agent*/,
 void soar_test_all_monitorable_callbacks(agent* thisAgent)
 {
   int i; // i was originally of type SOAR_CALLBACK_TYPE, changed for c++ compatibility (5/1/02)
-  static char * test_callback_name = "test";
+  static const char * test_callback_name = "test";
 
   for(i = 1; i < NUMBER_OF_MONITORABLE_CALLBACKS; i++)
     {
       soar_add_callback(thisAgent, static_cast<SOAR_CALLBACK_TYPE>(i), 
 			(soar_callback_fn) soar_callback_test_callback, i,
-			soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(i), TRUE), 
+			(void*)soar_callback_enum_to_name(static_cast<SOAR_CALLBACK_TYPE>(i), TRUE), 
 			NULL, test_callback_name);
     }
 }
