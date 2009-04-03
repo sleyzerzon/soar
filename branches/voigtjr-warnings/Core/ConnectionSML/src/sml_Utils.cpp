@@ -249,7 +249,7 @@ void sml::PrintDebugMethod(long indent, char const* pMethodName, char const* pSt
 void PrintDebugSimple(char const* pStr)
 {
 	unused(pTraceFile); // quells gcc warning when _DEBUG isn't defined
-	fprintf(stderr, pStr) ;
+	fprintf(stderr, "%s", pStr) ;
 	fprintf(stderr, "\n") ;
 }
 
@@ -257,3 +257,4 @@ void PrintDebugSimple(char const* pStr)
 
 ///// End debug stuff
 ////////////////////////////
+
