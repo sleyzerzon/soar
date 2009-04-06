@@ -1262,7 +1262,8 @@ void chunk_instantiation (agent* thisAgent,
      otherwise some of the variables might get deallocated by the call to
   add_production_to_rete() when it throws away chunk variable names. */
   if (thisAgent->sysparams[EXPLAIN_SYSPARAM]) {
-	  condition *new_top, *new_bottom;
+	  condition *new_top = 0;
+	  condition *new_bottom = 0;
 	  copy_condition_list (thisAgent, lhs_top, &new_top, &new_bottom);
 	  temp_explain_chunk.conds = new_top;
 	  temp_explain_chunk.actions = copy_and_variablize_result_list (thisAgent, results);

@@ -197,6 +197,8 @@ namespace config {
 			this->path = "(in memory)";
 		}
 
+		virtual ~ConfigFile() {}
+
 		Config* getConfig() {
 			return new Config(this);
 		}

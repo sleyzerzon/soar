@@ -3498,6 +3498,8 @@ void fixup_rhs_value_variable_references (agent* thisAgent, rhs_value *rv,
   cons *c;
   Symbol *sym;
   var_location var_loc;
+  var_loc.var_location_struct::levels_up = 0;
+  var_loc.var_location_struct::field_num = 0;
   unsigned long index;
   
   if (rhs_value_is_symbol(*rv)) {

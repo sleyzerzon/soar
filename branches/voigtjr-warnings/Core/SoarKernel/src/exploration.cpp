@@ -417,9 +417,9 @@ bool exploration_valid_reduction_rate( agent *my_agent, const long parameter, co
 			break;
 			
 		default:
-			return false;
 			break;
 	}
+	return false;
 }
 
 /***************************************************************************
