@@ -118,7 +118,7 @@ void soar_add_callback (agent* thisAgent,
   cb->data          = data;
   cb->eventid		= eventid ;
   cb->free_function = free_fn;
-  cb->id            = id;
+  cb->id            = new std::string(id);
   
   push(thisAgent, cb, thisAgent->soar_callbacks[callback_type]);
 }
@@ -204,7 +204,7 @@ soar_callback * soar_exists_callback_id (agent* the_agent,
 
 		cb = (soar_callback *) c->first;
 
-		if (cb->id == id)
+		if (*(cb->id) == id)
 		{
 			return cb;
 		}
@@ -215,9 +215,10 @@ soar_callback * soar_exists_callback_id (agent* the_agent,
 
 void soar_destroy_callback(soar_callback * cb)
 {
-  if (cb->id.length())
+  if (cb->id)
   {
-	  cb->id.clear();
+	  delete cb->id;
+	  cb->id = 0;
   }
   if (cb->free_function)
   {
@@ -494,7 +495,7 @@ void soar_list_all_callbacks_for_event (agent* thisAgent,
       
       cb = (soar_callback *) c->first;
 
-      print(thisAgent, "%s ", cb->id.c_str());
+	  print(thisAgent, "%s ", cb->id->c_str());
     }
 }
 
@@ -540,7 +541,7 @@ void soar_push_callback (agent* thisAgent,
   cb->data          = data;
   cb->eventid		= eventid ;
   cb->free_function = free_fn;
-  cb->id.clear();
+  cb->id            = 0;
   
   push(thisAgent, cb, thisAgent->soar_callbacks[callback_type]);
 }
@@ -593,7 +594,7 @@ void soar_remove_callback (agent* thisAgent,
 
       cb = (soar_callback *) c->first;
 
-      if (cb->id == id)
+      if (*(cb->id) == id)
 	{
 	  if (c != head)
 	    {

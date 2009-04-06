@@ -351,7 +351,7 @@ typedef struct agent_struct agent;
 
 typedef struct callback_struct 
 {
-  std::string           id;
+  std::string*          id;
   soar_callback_fn      function;
   soar_callback_data    data;
   soar_callback_event_id eventid ;
