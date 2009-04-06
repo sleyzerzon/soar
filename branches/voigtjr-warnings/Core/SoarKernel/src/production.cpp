@@ -338,7 +338,7 @@ inline void quickly_deallocate_test(agent* thisAgent, test t)
 
 void add_new_test_to_test (agent* thisAgent, 
 						   test *t, test add_me) {
-  complex_test *ct;
+  complex_test *ct = 0;
   cons *c;
   Bool already_a_conjunctive_test;
 

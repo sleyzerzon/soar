@@ -917,7 +917,8 @@ void chunk_instantiation (agent* thisAgent,
   chunk_cond *top_cc, *bottom_cc;
   
   explain_chunk_str temp_explain_chunk;
-  
+  memset(temp_explain_chunk.name, 0, EXPLAIN_CHUNK_STRUCT_NAME_BUFFER_SIZE);
+
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
   struct timeval saved_start_tv;
