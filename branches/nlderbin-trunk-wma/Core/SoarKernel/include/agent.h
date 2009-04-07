@@ -53,8 +53,8 @@ typedef struct select_info_struct select_info;
 typedef struct wma_timelist_element_struct wma_timelist_element;
 
 #ifdef __cplusplus
-extern "C"
-{
+//extern "C"
+//{
 #endif
 
 /* RBD Need more comments here, or should this stuff be here at all? */
@@ -327,7 +327,7 @@ typedef struct agent_struct {
   /* --- to interrupt at the end of the current phase, set stop_soar to TRUE
      and reason_for_stopping to some appropriate string --- */
   Bool                stop_soar;
-  char              * reason_for_stopping;
+  const char          * reason_for_stopping;
   
   /* --- the RHS action (halt) sets this TRUE --- */
   Bool                system_halted;
@@ -696,8 +696,8 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   //soar_callback_array soar_callbacks;
   ::list			      * soar_callbacks[NUMBER_OF_CALLBACKS];
   
-  char              * alternate_input_string; 
-  char              * alternate_input_suffix; 
+  const char        * alternate_input_string; 
+  const char        * alternate_input_suffix; 
   Bool                alternate_input_exit; /* Soar-Bugs #54, TMH */
   expansion_node    * lex_alias;         /* AGR 568 */
   Bool                load_errors_quit;  /* AGR 527c */
@@ -821,7 +821,7 @@ void init_soar_agent(agent* thisAgent);
 #else
 
 #ifdef __cplusplus
-}
+//}
 #endif
  
 template <typename T>
@@ -847,8 +847,8 @@ inline void push(agent* thisAgent, P item, T * & list_header)
 }
 
 #ifdef __cplusplus
-extern "C"
-{
+//extern "C"
+//{
 #endif
 
 #endif /* USE_MACROS */
@@ -876,7 +876,7 @@ inline Bool reading_from_top_level(agent* soarAgent)
 #endif /* USE_MACROS */
 
 #ifdef __cplusplus
-}
+//}
 #endif
 
 #endif
