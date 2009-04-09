@@ -283,7 +283,9 @@ typedef struct agent_struct {
   Symbol			* output_link_symbol;
   /* RPM 9/06 end */
 
-  Symbol            * reward_link_symbol;
+  Symbol            * rl_sym_reward_link;
+  Symbol            * rl_sym_reward;
+  Symbol            * rl_sym_value;
   
   /* ----------------------- Symbol table stuff -------------------------- */
 
@@ -552,7 +554,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   /* ----------------------- Memory utilities -------------------------- */
   
   /* Counters for memory usage of various types */
-  unsigned long       memory_for_usage[NUM_MEM_USAGE_CODES];
+  size_t       memory_for_usage[NUM_MEM_USAGE_CODES];
   
   /* List of all memory pools being used */
   memory_pool       * memory_pools_in_use;
