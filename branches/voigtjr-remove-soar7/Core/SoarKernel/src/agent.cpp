@@ -203,7 +203,6 @@ agent * create_soar_agent (char * agent_name) {                                 
   /* REW: begin 09.15.96 */
 
   newAgent->did_PE                             = FALSE;
-  newAgent->operand2_mode                      = TRUE;
   newAgent->soar_verbose_flag                  = FALSE;
   newAgent->FIRING_TYPE                        = IE_PRODS;
   newAgent->ms_o_assertions                    = NIL;

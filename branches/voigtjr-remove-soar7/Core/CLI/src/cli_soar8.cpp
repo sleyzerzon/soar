@@ -59,11 +59,11 @@ bool CommandLineInterface::DoSoar8(bool* pSoar8) {
 	if (!pSoar8) {
 		// query
 		if (m_RawOutput) {
-			m_Result << "Soar 8 mode is " << (m_pAgentSoar->operand2_mode ? "on." : "off.");
+			m_Result << "Soar 8 mode is " << (TRUE ? "on." : "off.");
 		}
 		else 
 		{
-			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeBoolean, m_pAgentSoar->operand2_mode ? sml_Names::kTrue : sml_Names::kFalse);
+			AppendArgTagFast(sml_Names::kParamValue, sml_Names::kTypeBoolean, TRUE ? sml_Names::kTrue : sml_Names::kFalse);
 		}
 		return true;
 	}
@@ -84,7 +84,7 @@ bool CommandLineInterface::DoSoar8(bool* pSoar8) {
 
 	if (*pSoar8) {
 		// Turn Soar8 mode ON
-		m_pAgentSoar->operand2_mode = true;
+		//m_pAgentSoar->operand2_mode = true;
 
 		// o-support-mode 4
 		DoOSupportMode(4);
@@ -93,7 +93,7 @@ bool CommandLineInterface::DoSoar8(bool* pSoar8) {
 		if (!DoInitSoar()) return false;
 	} else {
 		// Turn Soar8 mode OFF
-		m_pAgentSoar->operand2_mode = false;
+		//m_pAgentSoar->operand2_mode = false;
 
 		// o-support-mode 0
 		DoOSupportMode(0);

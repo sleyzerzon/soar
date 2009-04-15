@@ -36,7 +36,7 @@ bool CommandLineInterface::ParseAttributePreferencesMode(std::vector<std::string
 
 bool CommandLineInterface::DoAttributePreferencesMode(int* pMode) {
 
-	if (m_pAgentSoar->operand2_mode) return SetError(CLIError::kSoar7Command);
+	if (TRUE) return SetError(CLIError::kSoar7Command);
 
 	if (!pMode) {
 		// query

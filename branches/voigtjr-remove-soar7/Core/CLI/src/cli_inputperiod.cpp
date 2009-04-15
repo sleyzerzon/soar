@@ -33,7 +33,7 @@ bool CommandLineInterface::ParseInputPeriod(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoInputPeriod(int* pPeriod) {
-	if (m_pAgentSoar->operand2_mode) return SetError(CLIError::kSoar7Command);
+	if (TRUE) return SetError(CLIError::kSoar7Command);
 
 	if (!pPeriod) {
 		if (m_RawOutput) {
