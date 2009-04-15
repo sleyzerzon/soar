@@ -265,19 +265,9 @@ Bool is_state_id(agent* thisAgent, Symbol *sym,Symbol *match_state)
    (instead of objects) for states or operators */
 
 void calculate_support_for_instantiation_preferences (agent* thisAgent, instantiation *inst) {
-	Symbol *match_goal, *match_state, *match_operator;
-	wme *match_operator_wme;
-	Bool lhs_tests_operator_installed;
-	Bool lhs_tests_operator_acceptable_or_installed;
-	Bool lhs_is_known_to_test_something_off_match_state;
-	Bool lhs_is_known_to_test_something_off_match_operator;
-	Bool rhs_does_an_operator_creation;
-	Bool oc_support_possible;
-	Bool om_support_possible;
-	Bool oa_support_possible;
-	preference *rhs, *pref;
+	preference *pref;
 	wme *w;
-	condition *lhs, *c;
+	condition *c;
 
 
 	/* RCHONG: begin 10.11 */
