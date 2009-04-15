@@ -65,7 +65,6 @@ namespace cli {
 		static char const* kCLISaveBacktraces;
 		static char const* kCLISelect;
 		static char const* kCLISetLibraryLocation;
-		static char const* kCLISoar8;
 		static char const* kCLISoarNews;
 		static char const* kCLISource;
 		static char const* kCLISP;

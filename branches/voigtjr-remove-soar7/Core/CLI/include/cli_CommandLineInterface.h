@@ -232,7 +232,6 @@ public:
 	bool ParseSaveBacktraces(std::vector<std::string>& argv);
 	bool ParseSelect(std::vector<std::string>& argv);
 	bool ParseSetLibraryLocation(std::vector<std::string>& argv);
-	bool ParseSoar8(std::vector<std::string>& argv);
 	bool ParseSoarNews(std::vector<std::string>& argv);
 	bool ParseSource(std::vector<std::string>& argv);
 	bool ParseSP(std::vector<std::string>& argv);
@@ -608,12 +607,6 @@ public:
 	* @param phase
 	*************************************************************/
 	bool DoSetStopPhase(bool setPhase, bool before, sml::smlPhase phase);
-
-	/*************************************************************
-	* @brief soar8 command
-	* @param pSoar8 True to enable Soar 8, false for Soar 7
-	*************************************************************/
-	bool DoSoar8(bool* pSoar8);
 
 	/*************************************************************
 	* @brief soarnews command

@@ -93,7 +93,6 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLISaveBacktraces]				= &cli::CommandLineInterface::ParseSaveBacktraces;
 	m_CommandMap[Commands::kCLISelect]						= &cli::CommandLineInterface::ParseSelect;
 	m_CommandMap[Commands::kCLISetLibraryLocation]			= &cli::CommandLineInterface::ParseSetLibraryLocation;
-	m_CommandMap[Commands::kCLISoar8]						= &cli::CommandLineInterface::ParseSoar8;
 	m_CommandMap[Commands::kCLISoarNews]					= &cli::CommandLineInterface::ParseSoarNews;
 	m_CommandMap[Commands::kCLISource]						= &cli::CommandLineInterface::ParseSource;
 	m_CommandMap[Commands::kCLISP]							= &cli::CommandLineInterface::ParseSP;
@@ -148,7 +147,6 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIRun]						= true ;
 	m_EchoMap[Commands::kCLISelect]						= true ;
 	m_EchoMap[Commands::kCLISetLibraryLocation]			= true ;
-	m_EchoMap[Commands::kCLISoar8]						= true ;
 	m_EchoMap[Commands::kCLISource]						= true ;
 	m_EchoMap[Commands::kCLISP]							= true ;
 	m_EchoMap[Commands::kCLISRand]						= true ;
