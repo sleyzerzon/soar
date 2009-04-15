@@ -284,7 +284,6 @@ agent * create_soar_agent (char * agent_name) {                                 
 //#ifdef NUMERIC_INDIFFERENCE
   newAgent->numeric_indifferent_mode = NUMERIC_INDIFFERENT_MODE_SUM;
 //#endif
-  newAgent->attribute_preferences_mode = 0; /* RBD 4/17/95 */
 
   /* JC ADDED: Make sure that the RHS functions get initialized correctly */
   newAgent->rhs_functions = NIL;

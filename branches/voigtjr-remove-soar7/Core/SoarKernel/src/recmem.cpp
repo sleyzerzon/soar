@@ -326,7 +326,6 @@ preference *execute_action (agent* thisAgent, action *a, struct token_struct *to
 		if (!referent) goto abort_execute_action;
 	}
 
-	/* --- RBD 4/17/95 added stuff to handle attribute_preferences_mode --- */
 	if (((a->preference_type != ACCEPTABLE_PREFERENCE_TYPE) &&
 		(a->preference_type != REJECT_PREFERENCE_TYPE)) &&
 		(! (id->id.isa_goal && (attr==thisAgent->operator_symbol)) )) {

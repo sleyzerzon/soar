@@ -671,7 +671,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   
   /* ------------------- Experimental features ---------------------- */
   int                 o_support_calculation_type;
-  int                 attribute_preferences_mode;
 
   /* ------------------- Info about the agent itself ---------------------- */
   

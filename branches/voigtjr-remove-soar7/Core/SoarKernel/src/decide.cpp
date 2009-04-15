@@ -906,7 +906,6 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 		}
 	}
 
-	/* === Handling of attribute_preferences_mode 2 === */
 	if (!s->isa_context_slot) {
 		*result_candidates = candidates;
 		return NONE_IMPASSE_TYPE;

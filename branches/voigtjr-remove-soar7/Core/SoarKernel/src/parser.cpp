@@ -1452,11 +1452,7 @@ action *parse_preferences (agent* thisAgent, Symbol *id,
    action list for creating an ACCEPTABLE preference.  If binary 
    preferences are encountered, a warning message is printed and 
    the production is ignored (returns NIL).  It returns NIL if any 
-   other error occurred.  This works in conjunction with the code
-   that supports attribute_preferences_mode == 2.  Anywhere that
-   attribute_preferences_mode == 2 is tested, the code now tests
-   for operand2_mode == TRUE.
-
+   other error occurred.  
 
    <value_make> ::= <rhs_value> <preferences>
    <preferences> ::= [,] | <preference_specifier>+   
