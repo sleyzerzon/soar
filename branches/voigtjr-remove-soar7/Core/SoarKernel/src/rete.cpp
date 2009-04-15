@@ -5699,8 +5699,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
 					operator will do.  this code assumes that such a productions
 					(instantiation) would get i-support.
 
-					Modified 1/00 by KJC for operand2_mode == TRUE  AND
-					o-support-mode == 3:  prods that have ONLY operator 
+					Modified 1/00 by KJC for o-support-mode == 3:  prods that have ONLY operator 
 					elaborations (<o> ^attr ^value) are IE_PROD.  If prod has
 					both operator applications and <o> elabs, then it's PE_PROD 
 					and the user is warned that <o> elabs will be o-supported.

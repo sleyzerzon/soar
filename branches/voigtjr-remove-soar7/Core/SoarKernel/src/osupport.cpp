@@ -1051,15 +1051,11 @@ void calculate_compile_time_o_support (agent* thisAgent, condition *lhs, action 
 
 
 				/* REW: begin 09.15.96 */
-				/*
-				in operand, operator proposals are now only i-supported.
-				*/
-
+				/* in operand, operator proposals are now only i-supported.*/
 				if (thisAgent->soar_verbose_flag == TRUE) {
 					printf("\n         operator creation: setting a->support to I_SUPPORT");
 					xml_generate_verbose(thisAgent, "operator creation: setting a->support to I_SUPPORT");
 				}
-
 				a->support = I_SUPPORT;
 				/* REW: end   09.15.96 */
 
