@@ -34,7 +34,6 @@ char const* Commands::kCLIGP						= "gp";
 char const* Commands::kCLIHelp						= "help";
 char const* Commands::kCLIIndifferentSelection		= "indifferent-selection";
 char const* Commands::kCLIInitSoar					= "init-soar";
-char const* Commands::kCLIInputPeriod				= "input-period";
 char const* Commands::kCLIInternalSymbols			= "internal-symbols";
 char const* Commands::kCLILearn						= "learn";
 char const* Commands::kCLILoadLibrary				= "load-library";

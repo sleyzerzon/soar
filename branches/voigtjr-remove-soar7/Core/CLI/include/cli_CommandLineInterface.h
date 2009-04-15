@@ -200,7 +200,6 @@ public:
 	bool ParseHelp(std::vector<std::string>& argv);
 	bool ParseIndifferentSelection(std::vector<std::string>& argv);
 	bool ParseInitSoar(std::vector<std::string>& argv);
-	bool ParseInputPeriod(std::vector<std::string>& argv);
 	bool ParseInternalSymbols(std::vector<std::string>& argv);
 	bool ParseLearn(std::vector<std::string>& argv);
 	bool ParseLoadLibrary(std::vector<std::string>& argv);
@@ -386,12 +385,6 @@ public:
 	* @brief init-soar command
 	*************************************************************/
 	bool DoInitSoar();
-
-	/*************************************************************
-	* @brief input-period command
-	* @param pPeriod Pointer to the period argument, null for query
-	*************************************************************/
-	bool DoInputPeriod(int* pPeriod = 0);
 
 	/*************************************************************
 	* @brief internal-symbols command

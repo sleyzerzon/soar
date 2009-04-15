@@ -61,7 +61,6 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIHelp]						= &cli::CommandLineInterface::ParseHelp;
 	m_CommandMap[Commands::kCLIIndifferentSelection]		= &cli::CommandLineInterface::ParseIndifferentSelection;
 	m_CommandMap[Commands::kCLIInitSoar]					= &cli::CommandLineInterface::ParseInitSoar;
-	m_CommandMap[Commands::kCLIInputPeriod]					= &cli::CommandLineInterface::ParseInputPeriod;
 	m_CommandMap[Commands::kCLIInternalSymbols]				= &cli::CommandLineInterface::ParseInternalSymbols;
 	m_CommandMap[Commands::kCLILearn]						= &cli::CommandLineInterface::ParseLearn;
 	m_CommandMap[Commands::kCLILoadLibrary]					= &cli::CommandLineInterface::ParseLoadLibrary;
@@ -125,7 +124,6 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_EchoMap[Commands::kCLIGP]							= true ;
 	m_EchoMap[Commands::kCLIIndifferentSelection]		= true ;
 	m_EchoMap[Commands::kCLIInitSoar]					= true ;
-	m_EchoMap[Commands::kCLIInputPeriod]				= true ;
 	m_EchoMap[Commands::kCLILearn]						= true ;
 	m_EchoMap[Commands::kCLILoadLibrary]				= true ; // TODO: figure out if we actually want to echo this
 	m_EchoMap[Commands::kCLIMaxChunks]					= true ;

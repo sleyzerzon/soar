@@ -33,7 +33,6 @@ namespace cli {
 		static char const* kCLIHelp;
 		static char const* kCLIIndifferentSelection;
 		static char const* kCLIInitSoar;
-		static char const* kCLIInputPeriod;
 		static char const* kCLIInternalSymbols;
 		static char const* kCLILearn;
 		static char const* kCLILoadLibrary;
