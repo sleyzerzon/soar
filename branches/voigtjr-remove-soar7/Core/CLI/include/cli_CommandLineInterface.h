@@ -182,7 +182,6 @@ public:
 	// do not call these directly, these should only be called in DoCommandInternal
 	bool ParseAddWME(std::vector<std::string>& argv);
 	bool ParseAlias(std::vector<std::string>& argv);
-	bool ParseAttributePreferencesMode(std::vector<std::string>& argv);
 	bool ParseCaptureInput(std::vector<std::string>& argv);
 	bool ParseCD(std::vector<std::string>& argv);
 	bool ParseChunkNameFormat(std::vector<std::string>& argv);
@@ -266,13 +265,6 @@ public:
 	*        command's (the parameter) alias
 	*************************************************************/
 	bool DoAlias(const std::string* pCommand = 0, const std::vector<std::string>* pSubstitution = 0);
-
-	/*************************************************************
-	* @brief attribute-preferences command
-	* @param pMode Pointer to integer representing new attribute-preferences 
-	*		 mode, use null to query current mode
-	*************************************************************/
-	bool DoAttributePreferencesMode(int* pMode = 0);
 
 	/*************************************************************
 	* @brief capture-input command

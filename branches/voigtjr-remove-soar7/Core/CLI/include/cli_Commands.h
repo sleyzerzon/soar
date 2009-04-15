@@ -15,7 +15,6 @@ namespace cli {
 	struct Commands {
 		static char const* kCLIAddWME;
 		static char const* kCLIAlias;
-		static char const* kCLIAttributePreferencesMode;
 		static char const* kCLICaptureInput;
 		static char const* kCLICD;
 		static char const* kCLIChunkNameFormat;

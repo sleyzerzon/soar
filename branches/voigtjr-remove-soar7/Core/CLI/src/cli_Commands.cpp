@@ -16,7 +16,6 @@ using namespace cli;
 
 char const* Commands::kCLIAddWME					= "add-wme";			
 char const* Commands::kCLIAlias						= "alias";			
-char const* Commands::kCLIAttributePreferencesMode	= "attribute-preferences-mode";			
 char const* Commands::kCLICaptureInput				= "capture-input";			
 char const* Commands::kCLICD						= "cd";			
 char const* Commands::kCLIChunkNameFormat			= "chunk-name-format";			
