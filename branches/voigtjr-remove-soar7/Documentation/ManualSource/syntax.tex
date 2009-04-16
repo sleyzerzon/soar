@@ -1758,12 +1758,14 @@ sp {
 }
 \end{verbatim}
 
-\item [\soarb{div, mod} --- ]
+\item [\soarb{div, mod, atan2} --- ]
         These symbols provide prefix notation binary mathematical functions
         (they each take two arguments). These symbols work similarly to C
         functions: They will take only integer arguments (using reals results
         in an error) and return an integer: \soar{div} takes two integers and
-        returns their integer quotient; \soar{mod} returns their remainder.
+        returns their integer quotient; \soar{mod} returns their remainder;
+        \soar{atan2} returns as a float in radians, the arctangent of
+        (first\_arg / second\_arg).
 
 \begin{verbatim}
 sp {
@@ -1773,7 +1775,7 @@ sp {
          ^remainder (mod <x> <y>)) }
 \end{verbatim}
 
-\item [\soarb{abs, atan2, sqrt, sin, cos} --- ]   
+\item [\soarb{abs, sqrt, sin, cos} --- ]   
         These symbols provide prefix notation unary mathematical functions
         (they each take one argument). These symbols work similarly to C
         functions: They will take either integer or real-number arguments. The
