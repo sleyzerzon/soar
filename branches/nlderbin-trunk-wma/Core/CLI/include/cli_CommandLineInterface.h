@@ -183,7 +183,6 @@ public:
 	// do not call these directly, these should only be called in DoCommandInternal
 	bool ParseAddWME(std::vector<std::string>& argv);
 	bool ParseAlias(std::vector<std::string>& argv);
-	bool ParseAttributePreferencesMode(std::vector<std::string>& argv);
 	bool ParseCaptureInput(std::vector<std::string>& argv);
 	bool ParseCD(std::vector<std::string>& argv);
 	bool ParseChunkNameFormat(std::vector<std::string>& argv);
@@ -202,7 +201,6 @@ public:
 	bool ParseHelp(std::vector<std::string>& argv);
 	bool ParseIndifferentSelection(std::vector<std::string>& argv);
 	bool ParseInitSoar(std::vector<std::string>& argv);
-	bool ParseInputPeriod(std::vector<std::string>& argv);
 	bool ParseInternalSymbols(std::vector<std::string>& argv);
 	bool ParseLearn(std::vector<std::string>& argv);
 	bool ParseLoadLibrary(std::vector<std::string>& argv);
@@ -225,6 +223,7 @@ public:
 	bool ParsePWatch(std::vector<std::string>& argv);
 	bool ParsePWD(std::vector<std::string>& argv);
 	bool ParseQuit(std::vector<std::string>& argv);
+	bool ParseRand(std::vector<std::string>& argv);
 	bool ParseRemoveWME(std::vector<std::string>& argv);
 	bool ParseReplayInput(std::vector<std::string>& argv);
 	bool ParseReteNet(std::vector<std::string>& argv);
@@ -233,7 +232,6 @@ public:
 	bool ParseSaveBacktraces(std::vector<std::string>& argv);
 	bool ParseSelect(std::vector<std::string>& argv);
 	bool ParseSetLibraryLocation(std::vector<std::string>& argv);
-	bool ParseSoar8(std::vector<std::string>& argv);
 	bool ParseSoarNews(std::vector<std::string>& argv);
 	bool ParseSource(std::vector<std::string>& argv);
 	bool ParseSP(std::vector<std::string>& argv);
@@ -269,13 +267,6 @@ public:
 	*        command's (the parameter) alias
 	*************************************************************/
 	bool DoAlias(const std::string* pCommand = 0, const std::vector<std::string>* pSubstitution = 0);
-
-	/*************************************************************
-	* @brief attribute-preferences command
-	* @param pMode Pointer to integer representing new attribute-preferences 
-	*		 mode, use null to query current mode
-	*************************************************************/
-	bool DoAttributePreferencesMode(int* pMode = 0);
 
 	/*************************************************************
 	* @brief capture-input command
@@ -397,12 +388,6 @@ public:
 	* @brief init-soar command
 	*************************************************************/
 	bool DoInitSoar();
-
-	/*************************************************************
-	* @brief input-period command
-	* @param pPeriod Pointer to the period argument, null for query
-	*************************************************************/
-	bool DoInputPeriod(int* pPeriod = 0);
 
 	/*************************************************************
 	* @brief internal-symbols command
@@ -550,6 +535,11 @@ public:
 	bool DoQuit();
 
 	/*************************************************************
+	* @brief rand command
+	*************************************************************/
+	bool DoRand( bool integer, std::string* bound );
+
+	/*************************************************************
 	* @brief remove-wme command
 	* @param timetag The timetag of the wme to remove
 	*************************************************************/
@@ -610,12 +600,6 @@ public:
 	* @param phase
 	*************************************************************/
 	bool DoSetStopPhase(bool setPhase, bool before, sml::smlPhase phase);
-
-	/*************************************************************
-	* @brief soar8 command
-	* @param pSoar8 True to enable Soar 8, false for Soar 7
-	*************************************************************/
-	bool DoSoar8(bool* pSoar8);
 
 	/*************************************************************
 	* @brief soarnews command
@@ -765,11 +749,6 @@ protected:
 	/*************************************************************
 	* @brief 
 	*************************************************************/
-	bool IsInteger(const std::string& s);
-
-	/*************************************************************
-	* @brief 
-	*************************************************************/
 	void HandleSourceError(int errorLine, const std::string* pFilename);
 
 	/*************************************************************
@@ -828,6 +807,9 @@ protected:
 	// These help manage nested CLI calls
 	void PushAgent( sml::AgentSML* pAgent );
 	void PopAgent();
+
+	// For help system
+	bool ListHelpTopics(const std::string& directory, std::list< std::string >& topics);
 
 ////////////////////////////////////////////
 	// New options code
