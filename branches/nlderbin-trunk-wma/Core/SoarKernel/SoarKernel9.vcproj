@@ -1668,6 +1668,42 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\wma.cpp"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\src\wmem.cpp"
 				>
 				<FileConfiguration
@@ -1891,6 +1927,10 @@
 			</File>
 			<File
 				RelativePath=".\include\utilities.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\wma.h"
 				>
 			</File>
 			<File
