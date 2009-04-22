@@ -43,7 +43,7 @@ void wma_decay_param::set_value( double new_value ) { value = -new_value; };
 //
 
 template <typename T>
-wma_activation_predicate<T>::wma_activation_predicate( agent *new_agent ): agent_predicate<T>( new_agent ) {};
+wma_activation_predicate<T>::wma_activation_predicate( agent *new_agent ): soar_module::agent_predicate<T>( new_agent ) {};
 
 template <typename T>
 bool wma_activation_predicate<T>::operator() ( T /*val*/ ) { return wma_enabled( this->my_agent ); };
