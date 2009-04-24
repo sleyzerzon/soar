@@ -236,8 +236,8 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
   }
 
   if (rhs_value_is_reteloc(rv)) {
-    result = get_symbol_from_rete_loc (static_cast<unsigned short>(rhs_value_to_reteloc_levels_up(rv)), 
-                                       static_cast<byte>(rhs_value_to_reteloc_field_num(rv)),
+    result = get_symbol_from_rete_loc (rhs_value_to_reteloc_levels_up(rv), 
+                                       rhs_value_to_reteloc_field_num(rv),
                                        tok, w);
     symbol_add_ref (result);
     return result;
@@ -641,25 +641,6 @@ void create_instantiation (agent* thisAgent, production *prod, struct token_stru
 
 		/* SoarTech changed from an IF stmt to a WHILE loop to support GlobalDeepCpy */
 		while (pref) {   
-      /* The parser assumes that any rhs preference of the form 
-       *
-       * (<s> ^operator <o> = <x>)
-       * 
-       * is a binary indifferent preference, because it assumes <x> is an
-       * operator. However, it could be the case that <x> is actually bound to
-       * a number, which would make this a numeric indifferent preference. The
-       * parser had no way of easily figuring this out, but it's easy to check
-       * here.
-       *
-       * jzxu April 22, 2009
-       */
-      if ((pref->type == BINARY_INDIFFERENT_PREFERENCE_TYPE) &&
-          ((pref->referent->var.common_symbol_info.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) || 
-           (pref->referent->var.common_symbol_info.symbol_type == INT_CONSTANT_SYMBOL_TYPE)))
-      {
-        pref->type = NUMERIC_INDIFFERENT_PREFERENCE_TYPE;
-      }
-
 			pref->inst = inst;
 			insert_at_head_of_dll (inst->preferences_generated, pref,
 				inst_next, inst_prev);
@@ -767,8 +748,8 @@ Bool shouldCreateInstantiation (agent* thisAgent, production *prod, struct token
 			sym = rhs_value_to_symbol(a->id);
 		} else {
 			if (rhs_value_is_reteloc(a->id)) {
-				sym = get_symbol_from_rete_loc (static_cast<unsigned short>(rhs_value_to_reteloc_levels_up(a->id)),
-					static_cast<byte>(rhs_value_to_reteloc_field_num(a->id)),
+				sym = get_symbol_from_rete_loc (rhs_value_to_reteloc_levels_up(a->id),
+					rhs_value_to_reteloc_field_num(a->id),
 					tok, w);
 			}
 		}

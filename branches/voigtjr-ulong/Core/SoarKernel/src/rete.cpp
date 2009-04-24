@@ -4252,8 +4252,8 @@ rhs_value copy_rhs_value_and_substitute_varnames (agent* thisAgent,
   
   if (rhs_value_is_reteloc(rv)) {
     sym = var_bound_in_reconstructed_conds (thisAgent, cond,
-                                 static_cast<byte>(rhs_value_to_reteloc_field_num(rv)),
-                                 static_cast<rete_node_level>(rhs_value_to_reteloc_levels_up(rv)));
+                                 rhs_value_to_reteloc_field_num(rv),
+                                 rhs_value_to_reteloc_levels_up(rv));
     symbol_add_ref (sym);
     return symbol_to_rhs_value (sym);
   }
@@ -5756,7 +5756,7 @@ void p_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w
 														op_elab = TRUE;
 												} else if ( (thisAgent->o_support_calculation_type == 4) 
 													&& (rhs_value_is_reteloc(act->id)) 
-													&& (temp_tok->w->value == get_symbol_from_rete_loc( static_cast<byte>(rhs_value_to_reteloc_levels_up(act->id)),static_cast<byte>(rhs_value_to_reteloc_field_num(act->id)), tok, w ))) {
+													&& (temp_tok->w->value == get_symbol_from_rete_loc( rhs_value_to_reteloc_levels_up(act->id), rhs_value_to_reteloc_field_num(act->id), tok, w ))) {
 														op_elab = TRUE;
 												} else {
 													/* this is not an operator elaboration */
@@ -6284,35 +6284,35 @@ FILE *rete_fs_file;  /* File handle we're using -- "fs" for "fast-save" */
    types (big-endian vs. little-endian).
 ---------------------------------------------------------------------- */
 
-void retesave_one_byte (byte b, FILE* /*f*/) {
+void retesave_one_byte (uint8_t b, FILE* /*f*/) {
   fputc (b, rete_fs_file); 
 }
 
-byte reteload_one_byte (FILE* f) {
-  return static_cast<byte>(fgetc (f));
+uint8_t reteload_one_byte (FILE* f) {
+  return static_cast<uint8_t>(fgetc (f));
 }
 
-void retesave_two_bytes (unsigned long w, FILE* f) {
-  retesave_one_byte (static_cast<byte>(w & 0xFF),f );
-  retesave_one_byte (static_cast<byte>((w >> 8) & 0xFF),f );
+void retesave_two_bytes (uint16_t w, FILE* f) {
+  retesave_one_byte (static_cast<uint8_t>(w & 0xFF), f);
+  retesave_one_byte (static_cast<uint8_t>((w >> 8) & 0xFF), f);
 }
 
-unsigned long reteload_two_bytes (FILE* f) {
-  unsigned long i;
-  i = reteload_one_byte (f);
+uint16_t reteload_two_bytes (FILE* f) {
+  uint16_t i;
+  i = reteload_one_byte(f);
   i += (reteload_one_byte(f) << 8);
   return i;
 }
 
-void retesave_four_bytes (unsigned long w, FILE* f) {
-  retesave_one_byte (static_cast<byte>(w & 0xFF),f);
-  retesave_one_byte (static_cast<byte>((w >> 8) & 0xFF),f);
-  retesave_one_byte (static_cast<byte>((w >> 16) & 0xFF),f);
-  retesave_one_byte (static_cast<byte>((w >> 24) & 0xFF),f);
+void retesave_four_bytes (uint32_t w, FILE* f) {
+  retesave_one_byte (static_cast<uint8_t>(w & 0xFF), f);
+  retesave_one_byte (static_cast<uint8_t>((w >> 8) & 0xFF), f);
+  retesave_one_byte (static_cast<uint8_t>((w >> 16) & 0xFF), f);
+  retesave_one_byte (static_cast<uint8_t>((w >> 24) & 0xFF), f);
 }
 
-unsigned long reteload_four_bytes (FILE* f) {
-  unsigned long i;
+uint32_t reteload_four_bytes (FILE* f) {
+  uint32_t i;
   i = reteload_one_byte (f);
   i += (reteload_one_byte(f) << 8);
   i += (reteload_one_byte(f) << 16);
@@ -6687,7 +6687,7 @@ void retesave_rhs_value (rhs_value rv, FILE* f) {
       retesave_rhs_value (static_cast<rhs_value>(c->first),f);
   } else if (rhs_value_is_reteloc(rv)) {
     retesave_one_byte (2,f);
-    retesave_one_byte (static_cast<byte>(rhs_value_to_reteloc_field_num(rv)),f);
+    retesave_one_byte (rhs_value_to_reteloc_field_num(rv),f);
     retesave_two_bytes (rhs_value_to_reteloc_levels_up(rv),f);
   } else {
     retesave_one_byte (3,f);
@@ -6859,7 +6859,7 @@ void retesave_rete_test (rete_test *rt, FILE* f) {
     retesave_two_bytes (rt->data.variable_referent.levels_up,f);
   } else if (rt->type==DISJUNCTION_RETE_TEST) {
     for (i=0, c=rt->data.disjunction_list; c!=NIL; i++, c=c->rest);
-    retesave_two_bytes (i,f);
+    retesave_two_bytes (static_cast<uint16_t>(i),f);
     for (c=rt->data.disjunction_list; c!=NIL; c=c->rest)
       retesave_four_bytes (static_cast<Symbol *>(c->first)->common.a.retesave_symindex,f);
   }
@@ -6899,7 +6899,7 @@ void retesave_rete_test_list (rete_test *first_rt, FILE* f) {
   rete_test *rt;
 
   for (i=0, rt=first_rt; rt!=NIL; i++, rt=rt->next);
-  retesave_two_bytes (i,f);
+  retesave_two_bytes (static_cast<uint16_t>(i),f);
   for (rt=first_rt; rt!=NIL; rt=rt->next)
     retesave_rete_test (rt,f);
 }
