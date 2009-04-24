@@ -188,7 +188,7 @@ typedef struct alpha_mem_struct {
   Symbol *attr;                /* (NIL if this alpha mem ignores that field) */
   Symbol *value;
   Bool acceptable;             /* does it test for acceptable pref? */
-  unsigned long am_id;            /* id for hashing */
+  uint32_t am_id;            /* id for hashing */
   unsigned long reference_count;  /* number of beta nodes using this mem */
   unsigned long retesave_amindex;
 } alpha_mem;
@@ -409,7 +409,7 @@ typedef struct rete_node_struct {
   /* left_hash_loc_levels_up: 0=current node's alphamem, 1=parent's, etc. */
   rete_node_level left_hash_loc_levels_up; 
   /* node_id: used for hash function */
-  unsigned long node_id;                   
+  uint32_t node_id;                   
 
 #ifdef SHARING_FACTORS
   unsigned long sharing_factor;
@@ -678,14 +678,14 @@ inline void new_left_token(token * New, rete_node * current_node,
 
 /* The return value is modified by the calling function, 
    hence the call by reference, */
-inline token * & left_ht_bucket(agent* thisAgent, unsigned long hv)
+inline token * & left_ht_bucket(agent* thisAgent, uint32_t hv)
 {
-  return (* ( ((token **) thisAgent->left_ht) + ((hv) & LEFT_HT_MASK)));
+  return * (reinterpret_cast<token **>(thisAgent->left_ht) + (hv & LEFT_HT_MASK));
 }
 
-inline right_mem * right_ht_bucket(agent* thisAgent, unsigned long hv)
+inline right_mem * right_ht_bucket(agent* thisAgent, uint32_t hv)
 {
-  return (* ( ((right_mem **) thisAgent->right_ht) + ((hv) & RIGHT_HT_MASK)));
+  return * (reinterpret_cast<right_mem **>(thisAgent->right_ht) + (hv & RIGHT_HT_MASK));
 }
 
 /*#define insert_token_into_left_ht(tok,hv) { \
@@ -693,18 +693,18 @@ inline right_mem * right_ht_bucket(agent* thisAgent, unsigned long hv)
   header_zy37 = ((token **) thisAgent->left_ht) + ((hv) & LEFT_HT_MASK); \
   insert_at_head_of_dll (*header_zy37, (tok), \
                          a.ht.next_in_bucket, a.ht.prev_in_bucket); }*/
-inline void insert_token_into_left_ht(agent* thisAgent, token * tok, unsigned long hv) 
+inline void insert_token_into_left_ht(agent* thisAgent, token * tok, uint32_t hv) 
 {
   token **header_zy37;
-  header_zy37 = ((token **) thisAgent->left_ht) + ((hv) & LEFT_HT_MASK);
-  insert_at_head_of_dll (*header_zy37, (tok),
+  header_zy37 = reinterpret_cast<token **>(thisAgent->left_ht) + (hv & LEFT_HT_MASK);
+  insert_at_head_of_dll (*header_zy37, tok,
                          a.ht.next_in_bucket, a.ht.prev_in_bucket);
 }
 
 /*#define remove_token_from_left_ht(tok,hv) { \
   fast_remove_from_dll (left_ht_bucket(hv), tok, token, \
                         a.ht.next_in_bucket, a.ht.prev_in_bucket); }*/
-inline void remove_token_from_left_ht(agent* thisAgent, token * tok, unsigned long hv)
+inline void remove_token_from_left_ht(agent* thisAgent, token * tok, uint32_t hv)
 {
   fast_remove_from_dll (left_ht_bucket(thisAgent, hv), tok, token,
                         a.ht.next_in_bucket, a.ht.prev_in_bucket);
@@ -1384,7 +1384,7 @@ inline Bool wme_matches_alpha_mem(wme * w, alpha_mem * am)
      ((a) ? ((Symbol *)(a))->common.hash_id : 0) ^ \
      ((v) ? ((Symbol *)(v))->common.hash_id : 0) ) & \
    masks_for_n_low_order_bits[(num_bits)] )*/
-inline unsigned long alpha_hash_value(Symbol * i, Symbol * a, Symbol * v, short num_bits)
+inline uint32_t alpha_hash_value(Symbol * i, Symbol * a, Symbol * v, short num_bits)
 {
   return 
 	  ( ( (i ? i->common.hash_id : 0) ^
@@ -1394,7 +1394,7 @@ inline unsigned long alpha_hash_value(Symbol * i, Symbol * a, Symbol * v, short 
 }
 
 /* --- rehash funciton for resizable hash table routines --- */
-unsigned long hash_alpha_mem (void *item, short num_bits) {
+uint32_t hash_alpha_mem (void *item, short num_bits) {
   alpha_mem *am;
 
   am = static_cast<alpha_mem_struct *>(item);
@@ -1407,16 +1407,16 @@ unsigned long hash_alpha_mem (void *item, short num_bits) {
                                      ((value) ? 4 : 0) + \
                                      ((acceptable) ? 8 : 0) ]*/
 inline hash_table * table_for_tests(agent* thisAgent, 
-                                                                        Symbol * id, Symbol * attr, Symbol * value, 
+                                    Symbol * id, Symbol * attr, Symbol * value, 
                                     Bool acceptable)
 {
-  return thisAgent->alpha_hash_tables [ ((id) ? 1 : 0) + ((attr) ? 2 : 0) +
-    ((value) ? 4 : 0) +
-    ((acceptable) ? 8 : 0) ];
+  return thisAgent->alpha_hash_tables [ (id ? 1 : 0) + (attr ? 2 : 0) +
+    (value ? 4 : 0) +
+    (acceptable ? 8 : 0) ];
 }
 
 //#define get_next_alpha_mem_id() (thisAgent->alpha_mem_id_counter++)
-inline unsigned long get_next_alpha_mem_id(agent* thisAgent)
+inline uint32_t get_next_alpha_mem_id(agent* thisAgent)
 {
   return thisAgent->alpha_mem_id_counter++;
 }
@@ -1425,7 +1425,7 @@ inline unsigned long get_next_alpha_mem_id(agent* thisAgent)
    inform any successors --- */
 void add_wme_to_alpha_mem (agent* thisAgent, wme *w, alpha_mem *am) {
   right_mem **header, *rm;
-  unsigned long hv;
+  uint32_t hv;
 
   /* --- allocate new right_mem, fill it fields --- */
   allocate_with_pool (thisAgent, &thisAgent->right_mem_pool, &rm);
@@ -1434,7 +1434,7 @@ void add_wme_to_alpha_mem (agent* thisAgent, wme *w, alpha_mem *am) {
 
   /* --- add it to dll's for the hash bucket, alpha mem, and wme --- */
   hv = am->am_id ^ w->id->common.hash_id;
-  header = ((right_mem **)thisAgent->right_ht) + (hv & RIGHT_HT_MASK);
+  header = reinterpret_cast<right_mem **>(thisAgent->right_ht) + (hv & RIGHT_HT_MASK);
   insert_at_head_of_dll (*header, rm, next_in_bucket, prev_in_bucket);
   insert_at_head_of_dll (am->right_mems, rm, next_in_am, prev_in_am);
   insert_at_head_of_dll (w->right_mems, rm, next_from_wme, prev_from_wme);
@@ -1445,7 +1445,7 @@ void add_wme_to_alpha_mem (agent* thisAgent, wme *w, alpha_mem *am) {
 void remove_wme_from_alpha_mem (agent* thisAgent, right_mem *rm) {
   wme *w;
   alpha_mem *am;
-  unsigned long hv;
+  uint32_t hv;
   right_mem **header;
 
   w = rm->w;  
@@ -1453,7 +1453,7 @@ void remove_wme_from_alpha_mem (agent* thisAgent, right_mem *rm) {
 
   /* --- remove it from dll's for the hash bucket, alpha mem, and wme --- */
   hv = am->am_id ^ w->id->common.hash_id;
-  header = ((right_mem **)thisAgent->right_ht) + (hv & RIGHT_HT_MASK);
+  header = reinterpret_cast<right_mem **>(thisAgent->right_ht) + (hv & RIGHT_HT_MASK);
   remove_from_dll (*header, rm, next_in_bucket, prev_in_bucket);
   remove_from_dll (am->right_mems, rm, next_in_am, prev_in_am);
   remove_from_dll (w->right_mems, rm, next_from_wme, prev_from_wme);
@@ -1467,7 +1467,7 @@ alpha_mem *find_alpha_mem (agent* thisAgent, Symbol *id, Symbol *attr,
                            Symbol *value, Bool acceptable) {
   hash_table *ht;
   alpha_mem *am;
-  unsigned long hash_value;
+  uint32_t hash_value;
 
   ht = table_for_tests (thisAgent, id, attr, value, acceptable);
   hash_value = alpha_hash_value (id, attr, value, ht->log2size);
@@ -1537,7 +1537,7 @@ alpha_mem *find_or_make_alpha_mem (agent* thisAgent, Symbol *id, Symbol *attr,
 /* --- Using the given hash table and hash value, try to find a 
    matching alpha memory in the indicated hash bucket.  If we find one,
    we add the wme to it and inform successor nodes. --- */
-void add_wme_to_aht (agent* thisAgent, hash_table *ht, unsigned long hash_value, wme *w) {
+void add_wme_to_aht (agent* thisAgent, hash_table *ht, uint32_t hash_value, wme *w) {
   alpha_mem *am;
   rete_node *node, *next;
  
@@ -1561,14 +1561,14 @@ void add_wme_to_aht (agent* thisAgent, hash_table *ht, unsigned long hash_value,
      
 /* We cannot use 'xor' as the name of a function because it is defined in UNIX. */
 //#define xor_op(i,a,v) ((i) ^ (a) ^ (v))
-inline unsigned long xor_op(unsigned long i, unsigned long a, unsigned long v)
+inline uint32_t xor_op(uint32_t i, uint32_t a, uint32_t v)
 {
   return ((i) ^ (a) ^ (v));
 }
 
 /* --- Adds a WME to the Rete. --- */
 void add_wme_to_rete (agent* thisAgent, wme *w) {
-  unsigned long hi, ha, hv;
+  uint32_t hi, ha, hv;
 
   /* --- add w to all_wmes_in_rete --- */
   insert_at_head_of_dll (thisAgent->all_wmes_in_rete, w, rete_next, rete_prev);
@@ -1712,7 +1712,7 @@ void remove_ref_to_alpha_mem (agent* thisAgent, alpha_mem *am) {
 ********************************************************************** */
 
 //#define get_next_beta_node_id() (thisAgent->beta_node_id_counter++)
-inline unsigned long get_next_beta_node_id(agent* thisAgent)
+inline uint32_t get_next_beta_node_id(agent* thisAgent)
 {
   return (thisAgent->beta_node_id_counter++);
 }
@@ -4734,7 +4734,7 @@ void rete_error_right (agent* thisAgent, rete_node *node, wme * /*w*/) {
 
 void beta_memory_node_left_addition (agent* thisAgent, rete_node *node, 
                                                                          token *tok, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   Symbol *referent;
   rete_node *child, *next;
   token *New;
@@ -4775,7 +4775,7 @@ void beta_memory_node_left_addition (agent* thisAgent, rete_node *node,
 void unhashed_beta_memory_node_left_addition (agent* thisAgent, 
                                                                                           rete_node *node, token *tok,
                                               wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   rete_node *child, *next;
   token *New;
 
@@ -4802,7 +4802,7 @@ void unhashed_beta_memory_node_left_addition (agent* thisAgent,
 void positive_node_left_addition (agent* thisAgent, 
                                                                   rete_node *node, token *New,
                                   Symbol *hash_referent) {
-  unsigned long right_hv;
+  uint32_t right_hv;
   right_mem *rm;
   alpha_mem *am;
   rete_test *rt;
@@ -4880,11 +4880,11 @@ rm=rm->next_in_am) {
 }   
 
 void mp_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   Symbol *referent;
   rete_node *child;
   token *New;
-  unsigned long right_hv;
+  uint32_t right_hv;
   right_mem *rm;
   alpha_mem *am;
   rete_test *rt;
@@ -4954,7 +4954,7 @@ void mp_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *
 
 void unhashed_mp_node_left_addition (agent* thisAgent, rete_node *node, 
                                                                          token *tok, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   rete_node *child;
   token *New;
   right_mem *rm;
@@ -5003,7 +5003,7 @@ rm=rm->next_in_am) {
 }
 
 void positive_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   token *tok;
   Symbol *referent;
   rete_test *rt;
@@ -5044,7 +5044,7 @@ void positive_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
 }
 
 void unhashed_positive_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   token *tok;
   rete_test *rt;
   Bool failed_a_test;
@@ -5082,7 +5082,7 @@ void unhashed_positive_node_right_addition (agent* thisAgent, rete_node *node, w
 }
 
 void mp_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   token *tok;
   Symbol *referent;
   rete_test *rt;
@@ -5123,7 +5123,7 @@ void mp_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
 }
 
 void unhashed_mp_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   token *tok;
   rete_test *rt;
   Bool failed_a_test;
@@ -5168,7 +5168,7 @@ void unhashed_mp_node_right_addition (agent* thisAgent, rete_node *node, wme *w)
 
 void negative_node_left_addition (agent* thisAgent, rete_node *node, 
                                                                   token *tok, wme *w) {
-  unsigned long hv, right_hv;
+  uint32_t hv, right_hv;
   Symbol *referent;
   right_mem *rm;
   alpha_mem *am;
@@ -5242,7 +5242,7 @@ void negative_node_left_addition (agent* thisAgent, rete_node *node,
 
 void unhashed_negative_node_left_addition (agent* thisAgent, rete_node *node, 
                                                                                    token *tok, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   rete_test *rt;
   Bool failed_a_test;
   right_mem *rm;
@@ -5296,7 +5296,7 @@ void unhashed_negative_node_left_addition (agent* thisAgent, rete_node *node,
 }
 
 void negative_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   token *tok;
   Symbol *referent;
   rete_test *rt;
@@ -5337,7 +5337,7 @@ void negative_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
 }
 
 void unhashed_negative_node_right_addition (agent* thisAgent, rete_node *node, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   token *tok;
   rete_test *rt;
   Bool failed_a_test;
@@ -5384,14 +5384,14 @@ void unhashed_negative_node_right_addition (agent* thisAgent, rete_node *node, w
 ************************************************************************ */
 
 void cn_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *w) {
-  unsigned long hv;
+  uint32_t hv;
   token *t, *New;
   rete_node *child;
 
   activation_entry_sanity_check();
   left_node_activation(node,TRUE);
 
-  hv = node->node_id ^ reinterpret_cast<unsigned long>(tok) ^ reinterpret_cast<unsigned long>(w);
+  hv = node->node_id ^ reinterpret_cast<uint32_t>(tok) ^ reinterpret_cast<uint32_t>(w);
 
   /* --- look for a matching left token (since the partner node might have
      heard about this new token already, in which case it would have done
@@ -5416,7 +5416,7 @@ void cn_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *
 void cn_partner_node_left_addition (agent* thisAgent, rete_node *node, 
                                                                         token *tok, wme *w) {
   rete_node *partner, *temp;
-  unsigned long hv;
+  uint32_t hv;
   token *left, *negrm_tok;
   
   activation_entry_sanity_check();
@@ -5438,7 +5438,7 @@ void cn_partner_node_left_addition (agent* thisAgent, rete_node *node,
   }
 
   /* --- look for the matching left token --- */
-  hv = partner->node_id ^ reinterpret_cast<unsigned long>(tok) ^ reinterpret_cast<unsigned long>(w);
+  hv = partner->node_id ^ reinterpret_cast<uint32_t>(tok) ^ reinterpret_cast<uint32_t>(w);
   for (left=left_ht_bucket(thisAgent, hv); left!=NIL; left=left->a.ht.next_in_bucket)
     if ((left->node==partner)&&(left->parent==tok)&&(left->w==w)) break;
 
