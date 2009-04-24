@@ -653,17 +653,11 @@ inline void new_left_token(token * New, rete_node * current_node,
 ---------------------------------------------------------------------- */
 
 /* --- Hash table sizes (actual sizes are powers of 2) --- */
-// FIXME: investigate hash table sizes
-//#ifdef _WINDOWS
-//#define LOG2_LEFT_HT_SIZE 13
-//#define LOG2_RIGHT_HT_SIZE 13
-//#else
 #define LOG2_LEFT_HT_SIZE 14
 #define LOG2_RIGHT_HT_SIZE 14
-//#endif
 
-#define LEFT_HT_SIZE (((long) 1) << LOG2_LEFT_HT_SIZE)
-#define RIGHT_HT_SIZE (((long) 1) << LOG2_RIGHT_HT_SIZE)
+#define LEFT_HT_SIZE (1 << LOG2_LEFT_HT_SIZE)
+#define RIGHT_HT_SIZE (1 << LOG2_RIGHT_HT_SIZE)
 
 #define LEFT_HT_MASK (LEFT_HT_SIZE - 1)
 #define RIGHT_HT_MASK (RIGHT_HT_SIZE - 1)
@@ -2327,30 +2321,27 @@ void deallocate_rete_node (agent* thisAgent, rete_node *node) {
 ********************************************************************** */
 
 //#define var_is_bound(v) (((Symbol *)(v))->var.rete_binding_locations != NIL)
-inline Bool var_is_bound(Symbol * v)
+inline bool var_is_bound(Symbol * v)
 {
   return v->var.rete_binding_locations != NIL;
 }
 
-/*
-#define varloc_to_dummy(depth,field_num) ((void *)(((depth)<<2) + (field_num)))
-#define dummy_to_varloc_depth(d)     (((unsigned long)(d))>>2)
-#define dummy_to_varloc_field_num(d) (((unsigned long)(d)) & 3)
-*/
-
+//#define varloc_to_dummy(depth,field_num) ((void *)(((depth)<<2) + (field_num)))
 inline void * varloc_to_dummy(rete_node_level depth, byte field_num)
 {
   return reinterpret_cast<void *>((depth << 2) + field_num);
 }
 
-inline unsigned long dummy_to_varloc_depth(void * d)
+//#define dummy_to_varloc_depth(d)     (((unsigned long)(d))>>2)
+inline rete_node_level dummy_to_varloc_depth(void * d)
 {
-  return reinterpret_cast<unsigned long>(d) >> 2;
+  return static_cast<rete_node_level>(reinterpret_cast<uintptr_t>(d) >> 2);
 }
 
-inline unsigned long dummy_to_varloc_field_num(void * d)
+//#define dummy_to_varloc_field_num(d) (((unsigned long)(d)) & 3)
+inline byte dummy_to_varloc_field_num(void * d)
 {
-  return reinterpret_cast<unsigned long>(d) & 3;
+  return static_cast<byte>(reinterpret_cast<uintptr_t>(d) & 3);
 }
 
 /*#define push_var_binding(v,depth,field_num) { \
@@ -2392,8 +2383,8 @@ Bool find_var_location (Symbol *var, rete_node_level current_depth,
   void *dummy;
   if (! var->var.rete_binding_locations) return FALSE;
   dummy = var->var.rete_binding_locations->first;
-  result->levels_up = current_depth - static_cast<rete_node_level>(dummy_to_varloc_depth (dummy));
-  result->field_num = static_cast<byte>(dummy_to_varloc_field_num (dummy));
+  result->levels_up = current_depth - dummy_to_varloc_depth (dummy);
+  result->field_num = dummy_to_varloc_field_num (dummy);
   return TRUE;
 }
 
