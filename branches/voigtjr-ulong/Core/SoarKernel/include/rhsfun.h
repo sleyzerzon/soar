@@ -150,7 +150,7 @@ inline Symbol * rhs_value_to_symbol(rhs_value rv)
 //#define rhs_value_to_funcall_list(rv) ((list *) (((char *)(rv))-1))
 inline ::list * rhs_value_to_funcall_list(rhs_value rv)
 {
-  return reinterpret_cast<::list *>(reinterpret_cast<char *>(rv) - 1);
+  return reinterpret_cast< ::list * >(reinterpret_cast<char *>(rv) - 1);
 }
 
 //#define rhs_value_to_reteloc_field_num(rv) ((((unsigned long)(rv))>>2) & 3)
