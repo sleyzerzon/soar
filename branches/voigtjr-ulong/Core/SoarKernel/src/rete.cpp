@@ -5391,7 +5391,7 @@ void cn_node_left_addition (agent* thisAgent, rete_node *node, token *tok, wme *
   activation_entry_sanity_check();
   left_node_activation(node,TRUE);
 
-  hv = node->node_id ^ reinterpret_cast<uint32_t>(tok) ^ reinterpret_cast<uint32_t>(w);
+  hv = node->node_id ^ cast_and_possibly_truncate<uint32_t>(tok) ^ cast_and_possibly_truncate<uint32_t>(w);
 
   /* --- look for a matching left token (since the partner node might have
      heard about this new token already, in which case it would have done
@@ -5438,7 +5438,7 @@ void cn_partner_node_left_addition (agent* thisAgent, rete_node *node,
   }
 
   /* --- look for the matching left token --- */
-  hv = partner->node_id ^ reinterpret_cast<uint32_t>(tok) ^ reinterpret_cast<uint32_t>(w);
+  hv = partner->node_id ^ cast_and_possibly_truncate<uint32_t>(tok) ^ cast_and_possibly_truncate<uint32_t>(w);
   for (left=left_ht_bucket(thisAgent, hv); left!=NIL; left=left->a.ht.next_in_bucket)
     if ((left->node==partner)&&(left->parent==tok)&&(left->w==w)) break;
 
