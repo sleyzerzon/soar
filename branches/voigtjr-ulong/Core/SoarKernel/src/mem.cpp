@@ -46,7 +46,7 @@ void *allocate_memory (agent* thisAgent, size_t size, int usage_code) {
 
 	thisAgent->memory_for_usage[usage_code] += size;
 	size += sizeof(size_t);
-	thisAgent->memory_for_usage[STATS_OVERHEAD_MEM_USAGE] += sizeof(char *);
+	thisAgent->memory_for_usage[STATS_OVERHEAD_MEM_USAGE] += sizeof(size_t);
 
 	p = static_cast<char *>(malloc (size));
 	if (p==NULL) {
@@ -55,7 +55,7 @@ void *allocate_memory (agent* thisAgent, size_t size, int usage_code) {
 		msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
 		abort_with_fatal_error (thisAgent, msg);
 	}
-	if (reinterpret_cast<size_t>(p) & 3) {
+	if (reinterpret_cast<uintptr_t>(p) & 3) {
 		char msg[BUFFER_MSG_SIZE];
 		strncpy (msg,"\nmem.c: Error:  Memory allocator returned an address that's not a multiple of 4.\n", BUFFER_MSG_SIZE);
 		msg[BUFFER_MSG_SIZE - 1] = 0; /* ensure null termination */
@@ -67,7 +67,7 @@ void *allocate_memory (agent* thisAgent, size_t size, int usage_code) {
 	*(reinterpret_cast<size_t *>(p)) = size;
 	p += sizeof(size_t);
 
-	return static_cast<void *>(p);
+	return p;
 }
 
 void *allocate_memory_and_zerofill (agent* thisAgent, size_t size, int usage_code) {
