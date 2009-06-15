@@ -1,8 +1,0 @@
-sp {eater*propose*move
-   (state <s> ^name eater
-              ^io.input-link.eater <eater>)
-   (<eater> ^x <x> ^y <y>)
--->
-   (<s> ^operator <op> + =)
-   (<op> ^name move)
-}
