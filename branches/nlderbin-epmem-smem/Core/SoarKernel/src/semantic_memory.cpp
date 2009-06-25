@@ -1827,8 +1827,43 @@ bool smem_parse_chunk( agent *my_agent, smem_str_to_chunk_map *chunks )
 		else
 		{
 			// transfer slots
-			(*p)->slots = new_chunk->slots;
-			new_chunk->slots = NULL;
+			if ( !(*p)->slots )
+			{
+				// if none previously, can just use
+				(*p)->slots = new_chunk->slots;
+				new_chunk->slots = NULL;
+			}
+			else
+			{				
+				// otherwise, copy
+
+				smem_slot_map::iterator ss_p;
+				smem_slot::iterator s_p;
+
+				smem_slot *source_slot;
+				smem_slot *target_slot;
+
+				// for all slots
+				for ( ss_p=new_chunk->slots->begin(); ss_p!=new_chunk->slots->end(); ss_p++ )
+				{
+					target_slot = smem_make_slot( (*p)->slots, ss_p->first );
+					source_slot = ss_p->second;
+
+					// for all values in the slot
+					for ( s_p=source_slot->begin(); s_p!=source_slot->end(); s_p++ )
+					{
+						// copy each value
+						target_slot->push_back( (*s_p) );
+					}
+					
+					// once copied, we no longer need the slot
+					delete source_slot;
+				}
+
+				// we no longer need the slots
+				delete new_chunk->slots;
+				new_chunk->slots = NULL;
+			}			
 
 			// deallocate
 			smem_deallocate_chunk( my_agent, new_chunk );
