@@ -2294,3 +2294,4 @@ void smem_go( agent *my_agent )
 
 	my_agent->smem_timers->total->stop();	
 }
+
