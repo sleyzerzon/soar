@@ -239,7 +239,39 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS ct_lti_attr_val ON ct_lti (attr, val_lti)" );
 
 	add_structure( "CREATE TABLE IF NOT EXISTS activation (lti INTEGER PRIMARY KEY, cycle INTEGER)" );
-	add_structure( "CREATE INDEX IF NOT EXISTS activation_cycle ON activation (cycle)" );	
+	add_structure( "CREATE INDEX IF NOT EXISTS activation_cycle ON activation (cycle)" );
+
+	// adding an ascii table just to make lti queries easier when inspecting database	
+	add_structure( "CREATE TABLE IF NOT EXISTS ascii (ascii_num INTEGER PRIMARY KEY, ascii_chr TEXT)" );
+	add_structure( "DELETE FROM ascii" );
+	{
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (65,'A')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (66,'B')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (67,'C')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (68,'D')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (69,'E')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (70,'F')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (71,'G')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (72,'H')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (73,'I')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (74,'J')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (75,'K')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (76,'L')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (77,'M')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (78,'N')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (79,'O')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (80,'P')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (81,'Q')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (82,'R')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (83,'S')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (84,'T')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (85,'U')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (86,'V')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (87,'W')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (88,'X')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (89,'Y')" );
+		add_structure( "INSERT INTO ascii (ascii_num, ascii_chr) VALUES (90,'Z')" );
+	}
 
 	//
 	
