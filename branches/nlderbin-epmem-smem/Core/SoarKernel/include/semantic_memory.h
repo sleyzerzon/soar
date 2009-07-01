@@ -199,6 +199,10 @@ class smem_statement_container: public soar_module::sqlite_statement_container
 		soar_module::sqlite_statement *act_set;
 		soar_module::sqlite_statement *act_add;
 
+		soar_module::sqlite_statement *vis_lti;
+		soar_module::sqlite_statement *vis_value_const;
+		soar_module::sqlite_statement *vis_value_lti;
+
 		smem_statement_container( agent *new_agent );
 };
 
@@ -320,6 +324,11 @@ typedef std::map<Symbol *, smem_chunk *> smem_sym_to_chunk_map;
 extern inline bool smem_enabled( agent *my_agent );
 
 extern bool smem_parse_chunks( agent *my_agent, const std::string *chunks, std::string **err_msg );
+
+extern std::string *smem_visualize_store( agent *my_agent );
+extern std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth );
+
+extern inline smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long name_number );
 
 extern void smem_reset_id_counters( agent *my_agent );
 extern void smem_close( agent *my_agent );

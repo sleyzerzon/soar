@@ -55,6 +55,8 @@
 // parsing						smem::parse
 // api							smem::api
 
+// visualization				smem::viz
+
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -398,6 +400,17 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 
 	act_add = new soar_module::sqlite_statement( new_db, "INSERT OR IGNORE INTO activation (lti, cycle) VALUES (?,?)" );
 	add( act_add );
+
+	//
+
+	vis_lti = new soar_module::sqlite_statement( new_db, "SELECT id, letter, num FROM lti" );
+	add( vis_lti );
+
+	vis_value_const = new soar_module::sqlite_statement( new_db, "SELECT parent_id, tsh1.sym_type AS attr_type, tsh1.sym_const AS attr_val, tsh2.sym_type AS val_type, tsh2.sym_const AS val_val FROM web w, temporal_symbol_hash tsh1, temporal_symbol_hash tsh2 WHERE (w.attr=tsh1.id) AND (w.val_const=tsh2.id)" );
+	add( vis_value_const );
+
+	vis_value_lti = new soar_module::sqlite_statement( new_db, "SELECT parent_id, tsh.sym_type AS attr_type, tsh.sym_const AS attr_val, val_lti FROM web w, temporal_symbol_hash tsh WHERE (w.attr=tsh.id) AND (val_lti IS NOT NULL)" );
+	add( vis_value_lti );
 }
 
 
@@ -2325,5 +2338,498 @@ void smem_go( agent *my_agent )
 #endif // SMEM_EXPERIMENT
 
 	my_agent->smem_timers->total->stop();	
+}
+
+
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+// Visualization (smem::viz)
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
+std::string *smem_visualize_store( agent *my_agent )
+{
+	std::string *return_val = new std::string;
+
+	// vizualizing the store requires an open semantic database
+	if ( my_agent->smem_db->get_status() == soar_module::disconnected )
+	{
+		smem_init_db( my_agent );
+	}
+
+	// header
+	return_val->append( "digraph smem {" );
+	return_val->append( "\n" );
+
+	// LTIs
+	return_val->append( "node [ shape = doublecircle ];" );
+	return_val->append( "\n" );
+
+	std::map< smem_lti_id, std::string > lti_names;	
+	std::map< smem_lti_id, std::string >::iterator n_p;
+	{
+		soar_module::sqlite_statement *q;
+		
+		smem_lti_id lti_id;
+		char lti_letter;
+		unsigned long lti_number;
+
+		std::string *lti_name;
+		std::string temp_str;
+		intptr_t temp_int;
+		double temp_double;
+
+		// id, letter, number
+		q = my_agent->smem_stmts->vis_lti;
+		while ( q->execute() == soar_module::row )
+		{
+			lti_id = q->column_int( 0 );
+			lti_letter = static_cast<char>( q->column_int( 1 ) );
+			lti_number = static_cast<unsigned long>( q->column_int( 2 ) );
+
+			lti_name =& lti_names[ lti_id ];
+			lti_name->push_back( lti_letter );
+
+			to_string( lti_number, temp_str );
+			lti_name->append( temp_str );
+
+			return_val->append( (*lti_name) );
+			return_val->append( " " );
+		}
+		q->reinitialize();
+
+		if ( !lti_names.empty() )
+		{
+			// terminal nodes first
+			{
+				std::map< smem_lti_id, std::list<std::string> > lti_terminals;
+				std::map< smem_lti_id, std::list<std::string> >::iterator t_p;
+				std::list<std::string>::iterator a_p;
+
+				std::list<std::string> *my_terminals;
+				std::list<std::string>::size_type terminal_num;				
+				
+				return_val->append( ";" );
+				return_val->append( "\n" );
+
+				// proceed to terminal nodes
+				return_val->append( "node [ shape = plaintext ];" );
+				return_val->append( "\n" );
+
+				// parent_id, attr_type, attr_val, val_type, val_val
+				q = my_agent->smem_stmts->vis_value_const;
+				while ( q->execute() == soar_module::row )
+				{
+					lti_id = q->column_int( 0 );
+					my_terminals =& lti_terminals[ lti_id ];
+					lti_name =& lti_names[ lti_id ];
+
+					// parent prefix
+					return_val->append( (*lti_name) );
+					return_val->append( "_" );
+					
+					// terminal count
+					terminal_num = my_terminals->size();
+					to_string( terminal_num, temp_str );
+					return_val->append( temp_str );
+
+					// prepare for value
+					return_val->append( " [ label = \"" );
+
+					// output value
+					{
+						switch ( q->column_int( 3 ) )
+						{
+							case SYM_CONSTANT_SYMBOL_TYPE:
+								temp_str.assign( q->column_text( 4 ) );							
+								break;
+
+							case INT_CONSTANT_SYMBOL_TYPE:
+								temp_int = q->column_int( 4 );
+								to_string( temp_int, temp_str );							
+								break;
+
+							case FLOAT_CONSTANT_SYMBOL_TYPE:
+								temp_double = q->column_double( 4 );
+								to_string( temp_double, temp_str );
+								break;
+
+							default:
+								temp_str.clear();
+								break;
+						}
+
+						return_val->append( temp_str );
+					}
+
+					// store terminal (attribute for edge label)
+					{
+						switch ( q->column_int( 1 ) )
+						{
+							case SYM_CONSTANT_SYMBOL_TYPE:
+								temp_str.assign( q->column_text( 2 ) );							
+								break;
+
+							case INT_CONSTANT_SYMBOL_TYPE:
+								temp_int = q->column_int( 2 );
+								to_string( temp_int, temp_str );							
+								break;
+
+							case FLOAT_CONSTANT_SYMBOL_TYPE:
+								temp_double = q->column_double( 2 );
+								to_string( temp_double, temp_str );
+								break;
+
+							default:
+								temp_str.clear();
+								break;
+						}
+						
+						my_terminals->push_back( temp_str );
+					}
+
+					// footer
+					return_val->append( "\" ];" );
+					return_val->append( "\n" );
+				}
+				q->reinitialize();
+
+				// output edges
+				{
+					unsigned int terminal_counter;
+					
+					for ( n_p=lti_names.begin(); n_p!=lti_names.end(); n_p++ )
+					{
+						t_p = lti_terminals.find( n_p->first );
+
+						if ( t_p != lti_terminals.end() )
+						{
+							terminal_counter = 0;
+							
+							for ( a_p=t_p->second.begin(); a_p!=t_p->second.end(); a_p++ )
+							{
+								return_val->append( n_p->second );
+								return_val ->append( " -> " );
+								return_val->append( n_p->second );
+								return_val->append( "_" );
+
+								to_string( terminal_counter, temp_str );
+								return_val->append( temp_str );
+								return_val->append( " [ label=\"" );
+
+								return_val->append( (*a_p) );
+
+								return_val->append( "\" ];" );
+								return_val->append( "\n" );
+
+								terminal_counter++;
+							}
+						}
+					}
+				}
+			}
+
+			// then links to other LTIs
+			{
+				// parent_id, attr_type, attr_val, val_lti				
+				q = my_agent->smem_stmts->vis_value_lti;
+				while ( q->execute() == soar_module::row )
+				{
+					// source
+					lti_id = q->column_int( 0 );					
+					lti_name =& lti_names[ lti_id ];
+					return_val->append( (*lti_name) );
+					return_val->append( " -> " );
+
+					// destination
+					lti_id = q->column_int( 3 );					
+					lti_name =& lti_names[ lti_id ];
+					return_val->append( (*lti_name) );
+					return_val->append( " [ label =\"" );
+
+					// output attribute
+					{
+						switch ( q->column_int( 1 ) )
+						{
+							case SYM_CONSTANT_SYMBOL_TYPE:
+								temp_str.assign( q->column_text( 2 ) );							
+								break;
+
+							case INT_CONSTANT_SYMBOL_TYPE:
+								temp_int = q->column_int( 2 );
+								to_string( temp_int, temp_str );							
+								break;
+
+							case FLOAT_CONSTANT_SYMBOL_TYPE:
+								temp_double = q->column_double( 2 );
+								to_string( temp_double, temp_str );
+								break;
+
+							default:
+								temp_str.clear();
+								break;
+						}
+
+						return_val->append( temp_str );
+					}
+
+					// footer
+					return_val->append( "\" ];" );
+					return_val->append( "\n" );
+				}
+				q->reinitialize();
+			}
+		}
+	}
+
+	// footer
+	return_val->append( "}" );
+	return_val->append( "\n" );
+
+	return return_val;
+}
+
+std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth )
+{
+	std::string *return_val = new std::string;	
+	soar_module::sqlite_statement *expand_q = my_agent->smem_stmts->web_expand;	
+	
+	unsigned long child_counter;		
+
+	std::string temp_str;
+	std::string temp_str2;
+	intptr_t temp_int;
+	double temp_double;
+	
+	struct vis_lti
+	{
+		public:
+			smem_lti_id lti_id;
+			std::string lti_name;
+			unsigned long level;
+	};
+	std::queue<vis_lti *> bfs;
+	vis_lti *new_lti;
+	vis_lti *parent_lti;
+
+	// header
+	return_val->append( "digraph smem_lti {" );
+	return_val->append( "\n" );
+
+	// root	
+	{			
+		new_lti = new vis_lti;
+		new_lti->lti_id = lti_id;		
+		new_lti->level = 0;
+
+		// fake former linkage
+		{
+			soar_module::sqlite_statement *lti_q = my_agent->smem_stmts->lti_letter_num;
+
+			// get just this lti
+			lti_q->bind_int( 1, lti_id );
+			lti_q->execute();
+
+			// letter
+			new_lti->lti_name.push_back( static_cast<char>( lti_q->column_int( 0 ) ) );
+
+			// number
+			temp_int = lti_q->column_int( 1 );
+			to_string( temp_int, temp_str );
+			new_lti->lti_name.append( temp_str );
+
+			// done with lookup
+			lti_q->reinitialize();
+
+			// output without linkage
+			return_val->append( "node [ shape = doublecircle ];" );
+			return_val->append( "\n" );
+
+			return_val->append( new_lti->lti_name );
+			return_val->append( ";" );
+			return_val->append( "\n" );
+		}
+
+		bfs.push( new_lti );
+		new_lti = NULL;
+	}
+
+	// optionally depth-limited breadth-first-search of children	
+	while ( !bfs.empty() )
+	{
+		parent_lti = bfs.front();
+		bfs.pop();
+
+		child_counter = 0;
+		
+		// get direct children: attr_const, attr_type, value_const, value_type, value_letter, value_num, value_lti
+		expand_q->bind_int( 1, parent_lti->lti_id );
+		while ( expand_q->execute() == soar_module::row )
+		{
+			// identifier vs. constant
+			if ( expand_q->column_type( 2 ) == soar_module::null_t )
+			{
+				new_lti = new vis_lti;
+				new_lti->lti_id = expand_q->column_int( 6 );
+				new_lti->level = ( parent_lti->level + 1 );
+				
+				// add node
+				{
+					// letter
+					new_lti->lti_name.push_back( static_cast<char>( expand_q->column_int( 4 ) ) );
+
+					// number
+					temp_int = expand_q->column_int( 5 );
+					to_string( temp_int, temp_str );
+					new_lti->lti_name.append( temp_str );
+
+					// output node
+					return_val->append( "node [ shape = doublecircle ];" );
+					return_val->append( "\n" );
+
+					return_val->append( new_lti->lti_name );
+					return_val->append( ";" );
+					return_val->append( "\n" );
+				}
+
+
+				// add linkage
+				{
+					// get attribute
+					switch ( expand_q->column_int( 1 ) )
+					{
+						case SYM_CONSTANT_SYMBOL_TYPE:
+							temp_str.assign( expand_q->column_text( 0 ) );							
+							break;
+
+						case INT_CONSTANT_SYMBOL_TYPE:
+							temp_int = expand_q->column_int( 0 );
+							to_string( temp_int, temp_str );							
+							break;
+
+						case FLOAT_CONSTANT_SYMBOL_TYPE:
+							temp_double = expand_q->column_double( 0 );
+							to_string( temp_double, temp_str );
+							break;
+
+						default:
+							temp_str.clear();
+							break;
+					}
+
+					// output linkage
+					return_val->append( parent_lti->lti_name );
+					return_val->append( " -> " );
+					return_val->append( new_lti->lti_name );
+					return_val->append( " [ label = \"" );
+					return_val->append( temp_str );
+					return_val->append( "\" ];" );
+					return_val->append( "\n" );
+				}
+
+				// add to bfs (if still in depth limit)
+				if ( ( depth == 0 ) || ( new_lti->level < depth ) )
+				{
+					bfs.push( new_lti );
+				}
+				else
+				{
+					delete new_lti;
+				}
+
+				new_lti = NULL;
+			}
+			else
+			{
+				// add value node
+				{
+					// get node name
+					{
+						temp_str2.assign( parent_lti->lti_name );
+						temp_str2.append( "_" );
+
+						to_string( child_counter, temp_str );
+						temp_str2.append( temp_str );
+					}					
+					
+					// get value
+					switch ( expand_q->column_int( 3 ) )
+					{
+						case SYM_CONSTANT_SYMBOL_TYPE:
+							temp_str.assign( expand_q->column_text( 2 ) );							
+							break;
+
+						case INT_CONSTANT_SYMBOL_TYPE:
+							temp_int = expand_q->column_int( 2 );
+							to_string( temp_int, temp_str );							
+							break;
+
+						case FLOAT_CONSTANT_SYMBOL_TYPE:
+							temp_double = expand_q->column_double( 2 );
+							to_string( temp_double, temp_str );
+							break;
+
+						default:
+							temp_str.clear();
+							break;
+					}
+					
+					// output node
+					return_val->append( "node [ shape = plaintext ];" );
+					return_val->append( "\n" );
+					return_val->append( temp_str2 );
+					return_val->append( " [ label=\"" );
+					return_val->append( temp_str );
+					return_val->append( "\" ];" );					
+					return_val->append( "\n" );
+				}
+
+				// add linkage
+				{
+					// get attribute
+					switch ( expand_q->column_int( 1 ) )
+					{
+						case SYM_CONSTANT_SYMBOL_TYPE:
+							temp_str.assign( expand_q->column_text( 0 ) );							
+							break;
+
+						case INT_CONSTANT_SYMBOL_TYPE:
+							temp_int = expand_q->column_int( 0 );
+							to_string( temp_int, temp_str );							
+							break;
+
+						case FLOAT_CONSTANT_SYMBOL_TYPE:
+							temp_double = expand_q->column_double( 0 );
+							to_string( temp_double, temp_str );
+							break;
+
+						default:
+							temp_str.clear();
+							break;
+					}
+
+					// output linkage
+					return_val->append( parent_lti->lti_name );
+					return_val->append( " -> " );
+					return_val->append( temp_str2 );
+					return_val->append( " [ label = \"" );
+					return_val->append( temp_str );
+					return_val->append( "\" ];" );
+					return_val->append( "\n" );
+				}
+
+				child_counter++;
+			}			
+		}
+		expand_q->reinitialize();
+
+		delete parent_lti;
+	}
+
+	// footer
+	return_val->append( "}" );
+	return_val->append( "\n" );
+
+	return return_val;
 }
 

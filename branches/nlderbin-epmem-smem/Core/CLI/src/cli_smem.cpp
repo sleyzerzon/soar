@@ -32,6 +32,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 		{'s', "set",		OPTARG_NONE},
 		{'S', "stats",		OPTARG_NONE},
 		{'t', "timers",		OPTARG_NONE},
+		{'v', "viz",		OPTARG_NONE},
 		{0, 0, OPTARG_NONE} // null
 	};
 	SMemBitset options(0);
@@ -63,6 +64,10 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 
 			case 't':
 				options.set( SMEM_TIMER );
+				break;
+
+			case 'v':
+				options.set( SMEM_VIZ );
 				break;
 
 			default:
@@ -171,11 +176,48 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 			return SetError( CLIError::kTooManyArgs );
 	}
 
+	// case: viz does zero or 1/2 non-option arguments
+	else if ( options.test( SMEM_VIZ ) )
+	{
+		if ( m_NonOptionArguments == 0 )
+			return DoSMem( 'v' );
+		else if ( ( m_NonOptionArguments == 1 ) || ( m_NonOptionArguments == 2 ) )
+		{
+			smem_lti_id lti_id = NIL;
+			unsigned long depth = 0;
+
+			get_lexeme_from_string( m_pAgentSoar, argv[2].c_str() );
+			if ( m_pAgentSoar->lexeme.type == IDENTIFIER_LEXEME )
+			{
+				if ( m_pAgentSoar->smem_db->get_status() == soar_module::ready )
+				{
+					lti_id = smem_lti_get_id( m_pAgentSoar, m_pAgentSoar->lexeme.id_letter, m_pAgentSoar->lexeme.id_number );
+
+					if ( ( lti_id != NIL ) && ( m_NonOptionArguments == 2 ) )
+					{
+						from_c_string( depth, argv[3].c_str() );
+					}
+				}
+			}
+
+			if ( lti_id != NIL )
+			{
+				return DoSMem( 'v', NIL, NIL, lti_id, depth );
+			}
+			else
+			{
+				return SetError( CLIError::kInvalidAttribute );
+			}
+		}
+		else
+			return SetError( CLIError::kTooManyArgs );
+	}
+
 	// not sure why you'd get here
 	return false;
 }
 
-bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, const std::string* pVal )
+bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, const std::string* pVal, smem_lti_id lti_id, unsigned long depth )
 {
 	if ( !pOp )
 	{
@@ -385,6 +427,29 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 			else
 				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
 		}
+
+		return true;
+	}
+	else if ( pOp == 'v' )
+	{
+		std::string *viz;
+		
+		if ( lti_id == NIL )
+		{
+			viz = smem_visualize_store( m_pAgentSoar );
+		}
+		else
+		{
+			viz = smem_visualize_lti( m_pAgentSoar, lti_id, depth );
+		}
+
+		if ( m_RawOutput )
+			m_Result << (*viz);
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, viz->c_str() );
+
+		delete viz;
+
 
 		return true;
 	}

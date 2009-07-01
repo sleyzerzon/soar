@@ -29,6 +29,8 @@
 #include "cli_Aliases.h"
 #include "kernel.h"
 
+typedef uintptr_t smem_lti_id;
+
 // For test
 //#define WIN_STATIC_LINK
 
@@ -625,13 +627,12 @@ public:
 	bool DoSetStopPhase(bool setPhase, bool before, sml::smlPhase phase);
 
 	/*************************************************************
-<<<<<<< .working
 	* @brief smem command
 	* @param pOp the smem switch to implement, pass 0 (null) for full parameter configuration
 	* @param pAttr the attribute to get/set/stats, pass 0 (null) only if no pOp (all config) or stats (full stats)
 	* @param pVal the value to set, pass 0 (null) only if no pOp (all config), get, or stats
 	*************************************************************/
-	bool DoSMem(const char pOp = 0, const std::string *pAttr = 0, const std::string *pVal = 0);
+	bool DoSMem(const char pOp = 0, const std::string *pAttr = 0, const std::string *pVal = 0, smem_lti_id lti_id = 0, unsigned long depth = 0);
 
 	/*************************************************************
 	* @brief soar8 command
@@ -640,8 +641,6 @@ public:
 	bool DoSoar8(bool* pSoar8);
 
 	/*************************************************************
-=======
->>>>>>> .merge-right.r10413
 	* @brief soarnews command
 	*************************************************************/
 	bool DoSoarNews();

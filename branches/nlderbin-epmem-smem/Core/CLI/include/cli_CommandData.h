@@ -187,6 +187,7 @@ namespace cli {
 		SMEM_SET,
 		SMEM_STAT,
 		SMEM_TIMER,
+		SMEM_VIZ,
 		SMEM_NUM_OPTIONS,	// must be last
 	};
 
