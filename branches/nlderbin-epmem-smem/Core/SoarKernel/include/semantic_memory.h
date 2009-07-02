@@ -44,13 +44,13 @@ class smem_path_param;
 class smem_param_container: public soar_module::param_container
 {
 	public:
-		enum db_choices { memory, file };		
+		enum db_choices { memory, file };
 
 		soar_module::boolean_param *learning;
 		soar_module::constant_param<db_choices> *database;
 		smem_path_param *path;
 		soar_module::boolean_param *lazy_commit;
-		
+
 		soar_module::constant_param<soar_module::timer::timer_level> *timers;
 
 		smem_param_container( agent *new_agent );
@@ -125,8 +125,8 @@ class smem_timer_container: public soar_module::timer_container
 		soar_module::timer *storage;
 		soar_module::timer *ncb_retrieval;
 		soar_module::timer *query;
-		soar_module::timer *api;		
-		soar_module::timer *init;		
+		soar_module::timer *api;
+		soar_module::timer *init;
 		soar_module::timer *hash;
 
 		smem_timer_container( agent *my_agent );
@@ -258,7 +258,7 @@ enum smem_cue_element_type { attr_t, value_const_t, value_lti_t };
 typedef struct smem_weighted_cue_element_struct
 {
 	uintptr_t weight;
-	
+
 	struct wme_struct *cue_element;
 	smem_hash_id attr_hash;
 	smem_hash_id value_hash;
@@ -291,7 +291,7 @@ struct smem_chunk_struct
 	smem_lti_id lti_id;
 
 	char lti_letter;
-	unsigned long lti_number;	
+	unsigned long lti_number;
 
 	smem_slot_map *slots;
 };
@@ -317,6 +317,16 @@ union smem_chunk_value_union
 typedef std::map<std::string, smem_chunk *> smem_str_to_chunk_map;
 typedef std::map<Symbol *, smem_chunk *> smem_sym_to_chunk_map;
 
+//
+
+typedef struct smem_vis_lti_struct
+{
+	public:
+		smem_lti_id lti_id;
+		std::string lti_name;
+		unsigned long level;
+} smem_vis_lti;
+
 //////////////////////////////////////////////////////////
 // Soar Functions (see cpp for comments)
 //////////////////////////////////////////////////////////
@@ -328,7 +338,7 @@ extern bool smem_parse_chunks( agent *my_agent, const std::string *chunks, std::
 extern std::string *smem_visualize_store( agent *my_agent );
 extern std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth );
 
-extern inline smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long name_number );
+extern smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long name_number );
 
 extern void smem_reset_id_counters( agent *my_agent );
 extern void smem_close( agent *my_agent );

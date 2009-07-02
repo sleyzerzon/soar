@@ -26,7 +26,7 @@ using namespace sml;
 bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 {
 	Options optionsData[] =
-	{		
+	{
 		{'a', "add",		OPTARG_NONE},
 		{'g', "get",		OPTARG_NONE},
 		{'s', "set",		OPTARG_NONE},
@@ -49,7 +49,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 			case 'a':
 				options.set( SMEM_ADD );
 				break;
-		
+
 			case 'g':
 				options.set( SMEM_GET );
 				break;
@@ -91,7 +91,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 	{
 		return DoSMem();
 	}
-	
+
 	// case: add requires one non-option argument
 	else if ( options.test( SMEM_ADD ) )
 	{
@@ -99,10 +99,10 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 			return SetError( CLIError::kTooFewArgs );
 		else if ( m_NonOptionArguments > 1 )
 			return SetError( CLIError::kTooManyArgs );
-		
+
 		return DoSMem( 'a', &( argv[2] ) );
 	}
-	
+
 	// case: get requires one non-option argument
 	else if ( options.test( SMEM_GET ) )
 	{
@@ -189,7 +189,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 			get_lexeme_from_string( m_pAgentSoar, argv[2].c_str() );
 			if ( m_pAgentSoar->lexeme.type == IDENTIFIER_LEXEME )
 			{
-				if ( m_pAgentSoar->smem_db->get_status() == soar_module::ready )
+				if ( m_pAgentSoar->smem_db->get_status() == soar_module::connected )
 				{
 					lti_id = smem_lti_get_id( m_pAgentSoar, m_pAgentSoar->lexeme.id_letter, m_pAgentSoar->lexeme.id_number );
 
@@ -222,7 +222,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 	if ( !pOp )
 	{
 		std::string temp;
-		char *temp2;		
+		char *temp2;
 
 		temp = "SMem learning: ";
 		temp2 = m_pAgentSoar->smem_params->learning->get_string();
@@ -254,7 +254,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 		if ( m_RawOutput )
 			m_Result << temp << "\n";
 		else
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );		
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
 
 		temp = "path: ";
 		temp2 = m_pAgentSoar->smem_params->path->get_string();
@@ -263,7 +263,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 		if ( m_RawOutput )
 			m_Result << temp << "\n";
 		else
-		{			
+		{
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
 		}
 
@@ -319,7 +319,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 	{
 		char *temp2 = m_pAgentSoar->smem_params->get( pAttr->c_str() )->get_string();
 		std::string output( temp2 );
-		delete temp2;		
+		delete temp2;
 
 		if ( m_RawOutput )
 			m_Result << output;
@@ -336,7 +336,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 		// this can only mean the parameter is protected
 		if ( !result )
 		{
-			const char *msg = "ERROR: this parameter is protected while the SMem database is open.";			
+			const char *msg = "ERROR: this parameter is protected while the SMem database is open.";
 
 			if ( m_RawOutput )
 				m_Result << msg;
@@ -349,9 +349,9 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 	else if ( pOp == 'S' )
 	{
 		if ( !pAttr )
-		{			
+		{
 			std::string output;
-			char *temp2;			
+			char *temp2;
 
 			output = "Memory Usage: ";
 			temp2 = m_pAgentSoar->smem_stats->mem_usage->get_string();
@@ -375,7 +375,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 		{
 			char *temp2 = m_pAgentSoar->smem_stats->get( pAttr->c_str() )->get_string();
 			std::string output( temp2 );
-			delete temp2;			
+			delete temp2;
 
 			if ( m_RawOutput )
 				m_Result << output;
@@ -390,19 +390,19 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 		if ( !pAttr )
 		{
 			struct foo: public soar_module::accumulator< soar_module::timer * >
-			{				
+			{
 				private:
 					bool raw;
 					cli::CommandLineInterface *this_cli;
 
-				public:				
+				public:
 					foo( bool m_RawOutput, cli::CommandLineInterface *new_cli ): raw( m_RawOutput ), this_cli( new_cli ) {};
-					
+
 					void operator() ( soar_module::timer *t )
 					{
 						std::string output( t->get_name() );
 						output += ": ";
-						
+
 						char *temp = t->get_string();
 						output += temp;
 						delete temp;
@@ -413,14 +413,14 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 							this_cli->AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
 					}
 			} bar( m_RawOutput, this );
-			
+
 			m_pAgentSoar->smem_timers->for_each( bar );
 		}
 		else
 		{
 			char *temp2 = m_pAgentSoar->smem_timers->get( pAttr->c_str() )->get_string();
 			std::string output( temp2 );
-			delete temp2;			
+			delete temp2;
 
 			if ( m_RawOutput )
 				m_Result << output;
@@ -433,7 +433,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 	else if ( pOp == 'v' )
 	{
 		std::string *viz;
-		
+
 		if ( lti_id == NIL )
 		{
 			viz = smem_visualize_store( m_pAgentSoar );
