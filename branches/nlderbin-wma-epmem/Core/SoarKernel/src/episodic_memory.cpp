@@ -4764,7 +4764,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 			epmem_time_id king_id = EPMEM_MEMID_NONE;
 			double king_score = -1000;
 			unsigned long king_cardinality = 0;
-			unsigned long king_graph_match = 0;
+			bool king_graph_match = false;
 			epmem_constraint_list king_constraints;
 
 			// perform range search if any leaf wmes
@@ -4844,14 +4844,20 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 						// update end
 						current_end = ( ( next_list == EPMEM_RANGE_END )?( end_id + 1 ):( start_id ) );
 						if ( before == EPMEM_MEMID_NONE )
+						{
 							current_valid_end = current_id;
+						}
 						else
+						{
 							current_valid_end = ( ( current_id < before )?( current_id ):( before - 1 ) );
+						}
 
 						while ( ( current_prohibit < prohibit->size() ) && ( current_valid_end >= current_end ) && ( current_valid_end <= (*prohibit)[ current_prohibit ] ) )
 						{
 							if ( current_valid_end == (*prohibit)[ current_prohibit ] )
+							{
 								current_valid_end--;
+							}
 
 							current_prohibit--;
 						}
@@ -4904,18 +4910,20 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										{
 											king_id = current_valid_end;
 											king_score = current_score;
-											king_cardinality = sum_ct;
-											king_graph_match = current_graph_match_counter;
+											king_cardinality = sum_ct;											
 											king_constraints = current_constraints;
 
-											if ( king_graph_match == graph_match_roots->size() )
+											if ( current_graph_match_counter == graph_match_roots->size() )
+											{
+												king_graph_match = true;
 												done = true;
+											}
 
 											// provide trace output
 											if ( my_agent->sysparams[ TRACE_EPMEM_SYSPARAM ] )
 											{
 												char buf[256];
-												SNPRINTF( buf, 254, "NEW KING (perfect, graph-match): (true, %s)", ( ( done )?("true"):("false") ) );
+												SNPRINTF( buf, 254, "NEW KING (perfect, graph-match): (true, %s)", ( ( king_graph_match )?("true"):("false") ) );
 
 												print( my_agent, buf );
 												xml_generate_warning( my_agent, buf );
@@ -4928,8 +4936,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										{
 											king_id = current_valid_end;
 											king_score = current_score;
-											king_cardinality = sum_ct;
-											king_graph_match = 0;
+											king_cardinality = sum_ct;											
 
 											// provide trace output
 											if ( my_agent->sysparams[ TRACE_EPMEM_SYSPARAM ] )
@@ -4964,7 +4971,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 									}
 
 									if ( king_cardinality == perfect_match )
+									{
 										done = true;
+									}
 								}
 							}
 						}
@@ -5096,12 +5105,12 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 				if ( graph_match != soar_module::off )
 				{
 					// graph-match 0/1
-					my_meta = make_int_constant( my_agent, ( ( king_graph_match == perfect_match )?(1):(0) ) );
+					my_meta = make_int_constant( my_agent, ( ( king_graph_match )?(1):(0) ) );
 					epmem_add_meta_wme( my_agent, state, state->id.epmem_result_header, my_agent->epmem_sym_graph_match, my_meta );					
 					symbol_remove_ref( my_agent, my_meta );
 
 					// full mapping if appropriate
-					if ( ( graph_match == soar_module::on ) && ( king_graph_match == perfect_match ) )
+					if ( ( graph_match == soar_module::on ) && king_graph_match )
 					{
 						Symbol *my_meta2;
 						Symbol *my_meta3;
