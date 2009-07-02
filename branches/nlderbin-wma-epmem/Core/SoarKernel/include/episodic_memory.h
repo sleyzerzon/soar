@@ -522,15 +522,9 @@ typedef struct epmem_shared_match_struct
 	unsigned long ct;							// number of contributing literals that are "on"
 } epmem_shared_match;
 
-// represents a list of literals grouped
-// sequentially by cue wme
-typedef struct epmem_shared_literal_group_struct
-{
-	epmem_shared_literal_pair_list *literals;	// vector of sequentially grouped literals
-	epmem_shared_wme_index *wme_index;			// list of indexes to the start of wmes
-
-	wme *c_wme;									// current wme (used during building and using groups)
-} epmem_shared_literal_group;
+// represents a set of literals grouped by cue wme
+typedef std::map< epmem_node_id, epmem_shared_literal_pair * > epmem_shared_literal_map;
+typedef std::map< wme *, epmem_shared_literal_map * > epmem_shared_literal_group;
 
 struct epmem_shared_wme_counter_struct
 {
@@ -556,14 +550,17 @@ struct epmem_shared_literal_struct
 	epmem_shared_literal_group *children;		// grouped child literals, if not leaf wme
 };
 
+// pair in the sense of (debug info, actual literal)
 struct epmem_shared_literal_pair_struct
 {
+	// debug
 	epmem_node_id unique_id;
 	epmem_node_id q0;
 	epmem_node_id q1;
 
 	struct wme_struct *wme;
 
+	// literal
 	epmem_shared_literal *lit;
 };
 

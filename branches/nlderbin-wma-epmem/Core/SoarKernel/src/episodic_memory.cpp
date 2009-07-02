@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <fstream>
 
 #include "episodic_memory.h"
 
@@ -3211,7 +3212,7 @@ epmem_time_id epmem_previous_episode( agent *my_agent, epmem_time_id memory_id )
  * Author		: Nate Derbinsky
  * Notes		: Just a quicky constructor
  **************************************************************************/
-epmem_leaf_node *epmem_create_leaf_node( epmem_node_id leaf_id, double leaf_weight )
+inline epmem_leaf_node *epmem_create_leaf_node( epmem_node_id leaf_id, double leaf_weight )
 {
 	epmem_leaf_node *newbie = new epmem_leaf_node;
 
@@ -3279,7 +3280,7 @@ void epmem_incremental_row( epmem_range_query_list *queries, epmem_time_id &id, 
  * 				  (see above description).
  **************************************************************************/
 void epmem_shared_flip( epmem_shared_literal_pair *flip, const unsigned int list, long &ct, double &v, long &updown )
-{
+{	
 	long ct_change = ( ( list == EPMEM_RANGE_START )?( -1 ):( 1 ) );
 	
 	// if recursive propogation, count change
@@ -3321,11 +3322,15 @@ void epmem_shared_flip( epmem_shared_literal_pair *flip, const unsigned int list
 		{
 			if ( flip->lit->children )
 			{
-				epmem_shared_literal_pair_list::iterator literal_p;
-
-				for ( literal_p=flip->lit->children->literals->begin(); literal_p!=flip->lit->children->literals->end(); literal_p++ )
+				epmem_shared_literal_group::iterator wme_p;
+				epmem_shared_literal_map::iterator lit_p;
+				
+				for ( wme_p=flip->lit->children->begin(); wme_p!= flip->lit->children->end(); wme_p++ )
 				{
-					epmem_shared_flip( (*literal_p), list, ct, v, updown );
+					for ( lit_p=wme_p->second->begin(); lit_p!=wme_p->second->end(); lit_p++ )
+					{
+						epmem_shared_flip( lit_p->second, list, ct, v, updown );
+					}
 				}
 			}
 			else if ( flip->lit->match )
@@ -3432,14 +3437,14 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 	unsigned long return_val = 0;
 
 	// stacks to maintain state within the list
-	std::stack<epmem_shared_literal_list::size_type> c_ps; // literal pointers (position within a WME)
-	std::stack<epmem_constraint_list *> c_cs; // constraints (previously assumed correct)	
+	std::stack< epmem_shared_literal_map::iterator > c_ps; // literal pointers (position within a WME)
+	std::stack< epmem_constraint_list * > c_cs; // constraints (previously assumed correct)	
 
 	// literals are grouped together sequentially by WME.
-	epmem_shared_wme_index::iterator c_f;
+	epmem_shared_literal_group::iterator c_f;
 
 	// current values from the stacks
-	epmem_shared_literal_list::size_type c_p;
+	epmem_shared_literal_map::iterator c_p;
 	epmem_constraint_list *c_c = NULL;
 	epmem_node_id c_id;
 
@@ -3457,13 +3462,12 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 	bool good_pop = false;
 
 	// shouldn't ever happen
-	if ( !literals->literals->empty() )
+	if ( !literals->empty() )
 	{
 		// initialize to the beginning of the list
-		c_p = 0;
-		c_l = literals->literals->front();
-		c_f = literals->wme_index->begin();
-		literals->c_wme = c_l->wme;
+		c_f = literals->begin();
+		c_p = c_f->second->begin();
+		c_l = c_p->second;		
 
 		// current constraints = previous constraints
 		c_c = new epmem_constraint_list( *constraints );
@@ -3500,7 +3504,7 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 								n_c = new epmem_constraint_list( *c_c );
 
 								// try DFS
-								if ( epmem_graph_match( c_l->lit->children, n_c ) == c_l->lit->children->wme_index->size() )
+								if ( epmem_graph_match( c_l->lit->children, n_c ) == c_l->lit->children->size() )
 								{
 									// on success, keep new constraints
 									good_literal = true;									
@@ -3556,7 +3560,7 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 				c_f++;
 
 				// yippee (potential success)
-				if ( c_f == literals->wme_index->end() )
+				if ( c_f == literals->end() )
 				{
 					(*c_c) = (*n_c);
 					delete n_c;
@@ -3570,9 +3574,8 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 					c_ps.push( c_p );
 					c_cs.push( c_c );					
 
-					c_p = (*c_f);
-					c_l = (*literals->literals)[ c_p ];
-					literals->c_wme = c_l->wme;
+					c_p = c_f->second->begin();
+					c_l = c_p->second;				
 
 					c_c = n_c;
 
@@ -3599,28 +3602,26 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 					c_p++;
 
 					// if end of the road, failure
-					if ( c_p < literals->literals->size() )
+
+					// if still within the wme
+					if ( c_p != c_f->second->end() )					
 					{						
-						// else, look at the literal
-						c_l = (*literals->literals)[ c_p ];
+						// load the literal						
+						c_l = c_p->second;
 
-						// if still within the wme, we can try again
-						// with current constraints
-						if ( c_l->wme == literals->c_wme )
+						// we can try again with current constraints
+						good_pop = true;
+
+						// get constraint for this identifier, if exists
+						c_id = EPMEM_NODEID_ROOT;
+						if ( c_l->lit->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 						{
-							good_pop = true;
-
-							// get constraint for this identifier, if exists
-							c_id = EPMEM_NODEID_ROOT;
-							if ( c_l->lit->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
-							{
-								c = c_c->find( c_l->lit->wme->value );
-								if ( c != c_c->end() )
-									c_id = c->second;
-							}
+							c = c_c->find( c_l->lit->wme->value );
+							if ( c != c_c->end() )
+								c_id = c->second;
 						}
 					}
-						
+
 					if ( !good_pop )
 					{
 						// if nothing left on the stack, failure
@@ -3638,8 +3639,7 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 							c_p = c_ps.top();
 							c_ps.pop();
 
-							c_l = (*literals->literals)[ c_p ];
-							literals->c_wme = c_l->wme;
+							c_l = c_p->second;							
 
 							c_f--;
 							return_val--;
@@ -3675,6 +3675,29 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 	}
 
 	return return_val;
+}
+
+inline void epmem_clear_literal_group( epmem_shared_literal_group *del_group )
+{
+	for ( epmem_shared_literal_group::iterator p=del_group->begin(); p!=del_group->end(); p++ )
+	{
+		delete p->second;
+	}
+}
+
+inline void epmem_add_literal_to_group( epmem_shared_literal_group *dest_group, epmem_shared_literal_pair *literal_pair )
+{
+	// refer to appropriate literal map (keyed by cue wme)
+	epmem_shared_literal_map **dest_map =& (*dest_group)[ literal_pair->lit->wme ];
+	
+	// if literal map doesn't exist, create it
+	if ( !(*dest_map) )
+	{
+		(*dest_map) = new epmem_shared_literal_map;
+	}
+
+	// add literal to the map (if id doesn't already exist here)
+	(*dest_map)->insert( std::make_pair( literal_pair->unique_id, literal_pair ) );
 }
 
 /***************************************************************************
@@ -4181,10 +4204,6 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 			if ( graph_match != soar_module::off )
 			{
 				graph_match_roots = new epmem_shared_literal_group;
-
-				graph_match_roots->literals = new epmem_shared_literal_pair_list;
-				graph_match_roots->wme_index = new epmem_shared_wme_index;
-				graph_match_roots->c_wme = NULL;
 			}
 
 			unsigned long leaf_ids[2] = { 0, 0 };
@@ -4239,7 +4258,6 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 				epmem_shared_query *new_query = NULL;
 				epmem_wme_cache_element *new_cache_element = NULL;
 				epmem_shared_literal_pair_list *new_trigger_list = NULL;
-				epmem_shared_literal_group *new_literal_group = NULL;
 				soar_module::timer *new_timer = NULL;
 				soar_module::sqlite_statement *new_stmt = NULL;
 				epmem_shared_literal_pair *new_literal_pair;
@@ -4426,57 +4444,33 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										new_literal_pair->wme = (*w_p);
 										pairs.push_back( new_literal_pair );
 
-										if ( parent_id == EPMEM_NODEID_ROOT )
+										// add literal to appropriate group
 										{
-											// root is always on and satisfies one parental branch
-											new_wme_counter =& (*new_literal->wme_ct)[ (*w_p) ];											
-											
-											(*new_wme_counter) = new epmem_shared_wme_counter;											
-											(*new_wme_counter)->wme_ct = 0;
-											(*new_wme_counter)->lit_ct = new epmem_shared_literal_counter;
-											(*(*new_wme_counter)->lit_ct)[ EPMEM_NODEID_ROOT ] = 1;
-
-											// keep track of root literals for graph-match
-											if ( ( !shared_cue_id ) && ( i == EPMEM_NODE_POS ) && ( graph_match != soar_module::off ) )
+											if ( parent_id == EPMEM_NODEID_ROOT )
 											{
-												// enforce wme grouping
-												if ( new_literal->wme != graph_match_roots->c_wme )
+												// root is always on and satisfies one parental branch
+												new_wme_counter =& (*new_literal->wme_ct)[ (*w_p) ];											
+												
+												(*new_wme_counter) = new epmem_shared_wme_counter;											
+												(*new_wme_counter)->wme_ct = 0;
+												(*new_wme_counter)->lit_ct = new epmem_shared_literal_counter;
+												(*(*new_wme_counter)->lit_ct)[ EPMEM_NODEID_ROOT ] = 1;
+
+												// keep track of root literals for graph-match
+												if ( ( !shared_cue_id ) && ( i == EPMEM_NODE_POS ) && ( graph_match != soar_module::off ) )
 												{
-													graph_match_roots->c_wme = new_literal->wme;
-													graph_match_roots->wme_index->push_back( graph_match_roots->literals->size() );
-												}											
-
-												graph_match_roots->literals->push_back( new_literal_pair );												
-											}
-										}
-										else
-										{
-											// if this is parent's first child we can use some good initial values
-											if ( !parent_literal->children )
-											{
-												new_literal_group = new epmem_shared_literal_group;
-												new_literal_group->literals = new epmem_shared_literal_pair_list;
-												new_literal_group->wme_index = new epmem_shared_wme_index;
-
-												new_literal_group->c_wme = new_literal->wme;
-												new_literal_group->wme_index->push_back( 0 );																							
-												new_literal_group->literals->push_back( new_literal_pair );
-
-												parent_literal->children = new_literal_group;
+													epmem_add_literal_to_group( graph_match_roots, new_literal_pair );
+												}
 											}
 											else
 											{
-												// otherwise, enforce wme grouping
-
-												new_literal_group = parent_literal->children;
-
-												if ( new_literal->wme != new_literal_group->c_wme )
+												// if this is parent's first child, init
+												if ( !parent_literal->children )
 												{
-													new_literal_group->c_wme = new_literal->wme;
-													new_literal_group->wme_index->push_back( new_literal_group->literals->size() );
+													parent_literal->children = new epmem_shared_literal_group;
 												}
-
-												new_literal_group->literals->push_back( new_literal_pair );
+												
+												epmem_add_literal_to_group( parent_literal->children, new_literal_pair );											
 											}
 										}
 
@@ -4617,51 +4611,30 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										new_literal_pair->q0 = parent_id;
 										new_literal_pair->q1 = NULL;
 										new_literal_pair->wme = (*w_p);
-										pairs.push_back( new_literal_pair );
-
-										if ( parent_id == EPMEM_NODEID_ROOT )
+										pairs.push_back( new_literal_pair );										
+										
+										// add to appropriate group
 										{
-											new_literal->ct++;
-
-											if ( ( i == EPMEM_NODE_POS ) && ( graph_match != soar_module::off ) )
+											if ( parent_id == EPMEM_NODEID_ROOT )
 											{
-												// only one literal/root non-identifier
-												graph_match_roots->c_wme = new_literal->wme;
-												graph_match_roots->wme_index->push_back( graph_match_roots->literals->size() );
-												
-												graph_match_roots->literals->push_back( new_literal_pair );
-											}
-										}
-										else
-										{
-											// if this is parent's first child we can use some good initial values
-											if ( !parent_literal->children )
-											{
-												new_literal_group = new epmem_shared_literal_group;
-												new_literal_group->literals = new epmem_shared_literal_pair_list;												
-												new_literal_group->wme_index = new epmem_shared_wme_index;
+												new_literal->ct++;
 
-												new_literal_group->c_wme = new_literal->wme;
-												new_literal_group->wme_index->push_back( 0 );
-												new_literal_group->literals->push_back( new_literal_pair );
-
-												parent_literal->children = new_literal_group;												
+												if ( ( i == EPMEM_NODE_POS ) && ( graph_match != soar_module::off ) )
+												{
+													epmem_add_literal_to_group( graph_match_roots, new_literal_pair );
+												}
 											}
 											else
 											{
-												// else enforce wme grouping
-
-												new_literal_group = parent_literal->children;
-
-												if ( new_literal->wme != new_literal_group->c_wme )
+												// if this is parent's first child, init
+												if ( !parent_literal->children )
 												{
-													new_literal_group->c_wme = new_literal->wme;
-													new_literal_group->wme_index->push_back( new_literal_group->literals->size() );
+													parent_literal->children = new epmem_shared_literal_group;												
 												}
 
-												new_literal_group->literals->push_back( new_literal_pair );
+												epmem_add_literal_to_group( parent_literal->children, new_literal_pair );
 											}
-										}										
+										}
 
 										// create match if necessary
 										wme_match =& wme_to_match[ (*w_p) ];
@@ -4927,7 +4900,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 										if ( ( king_id == EPMEM_MEMID_NONE ) ||
 											 ( current_score > king_score ) ||
-											 ( current_graph_match_counter == graph_match_roots->wme_index->size() ) )
+											 ( current_graph_match_counter == graph_match_roots->size() ) )
 										{
 											king_id = current_valid_end;
 											king_score = current_score;
@@ -4935,18 +4908,18 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 											king_graph_match = current_graph_match_counter;
 											king_constraints = current_constraints;
 
+											if ( king_graph_match == graph_match_roots->size() )
+												done = true;
+
 											// provide trace output
 											if ( my_agent->sysparams[ TRACE_EPMEM_SYSPARAM ] )
 											{
 												char buf[256];
-												SNPRINTF( buf, 254, "NEW KING (perfect, graph-match): (true, %s)", ( ( king_graph_match == graph_match_roots->wme_index->size() )?("true"):("false") ) );
+												SNPRINTF( buf, 254, "NEW KING (perfect, graph-match): (true, %s)", ( ( done )?("true"):("false") ) );
 
 												print( my_agent, buf );
 												xml_generate_warning( my_agent, buf );
-											}
-
-											if ( king_graph_match == graph_match_roots->wme_index->size() )
-												done = true;
+											}											
 										}
 									}
 									else
@@ -5030,9 +5003,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 				{
 					if ( (*literal_p)->children )
 					{
-						delete (*literal_p)->children->literals;
-						delete (*literal_p)->children->wme_index;
-						delete (*literal_p)->children;						
+						epmem_clear_literal_group( (*literal_p)->children );
+						
+						delete (*literal_p)->children;
 					}
 
 					if ( (*literal_p)->wme_ct )
@@ -5080,9 +5053,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 				// graph match
 				if ( graph_match != soar_module::off )
-				{
-					delete graph_match_roots->literals;
-					delete graph_match_roots->wme_index;
+				{					
+					epmem_clear_literal_group( graph_match_roots );
+					
 					delete graph_match_roots;
 				}
 			}
