@@ -2605,6 +2605,9 @@ std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned l
 	smem_vis_lti *new_lti;
 	smem_vis_lti *parent_lti;
 
+	std::set<smem_lti_id> close_list;
+	std::set<smem_lti_id>::iterator cl_p;
+
 	// header
 	return_val->append( "digraph smem_lti {" );
 	return_val->append( "\n" );
@@ -2645,6 +2648,8 @@ std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned l
 
 		bfs.push( new_lti );
 		new_lti = NULL;
+
+		close_list.insert( lti_id );
 	}
 
 	// optionally depth-limited breadth-first-search of children
@@ -2723,7 +2728,17 @@ std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned l
 				// add to bfs (if still in depth limit)
 				if ( ( depth == 0 ) || ( new_lti->level < depth ) )
 				{
-					bfs.push( new_lti );
+					// prevent looping
+					cl_p = close_list.find( new_lti->lti_id );
+					if ( cl_p == close_list.end() )
+					{
+						close_list.insert( new_lti->lti_id );						
+						bfs.push( new_lti );
+					}
+					else
+					{
+						delete new_lti;
+					}				
 				}
 				else
 				{
