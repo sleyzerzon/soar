@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION. 
+ * FOR LICENSE AND COPYRIGHT INFORMATION.
  *************************************************************************/
 
 /* gsysparam.h */
@@ -17,7 +17,7 @@
 
    Most of the parameters are of type "long".  A few parameters are more
    naturally handled as lists; for these, the array value is just a dummy,
-   and callback routines must inspect a global variable to get the real 
+   and callback routines must inspect a global variable to get the real
    value.  Chunk_free_problem_spaces is an example of this.
 
    The array of sysparams[] can be read directly, but should be modified
@@ -161,26 +161,27 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 
 /* SAN */
 #define RL_ON_SYSPARAM							 35
+#define RL_ONPOLICY_SYSPARAM					 36
 
-#ifdef SOAR_WMEM_ACTIVATION
+// #ifdef SOAR_WMEM_ACTIVATION
 
-#define WME_DECAY_SYSPARAM                       36
-#define WME_DECAY_EXPONENT_SYSPARAM              37
-#define WME_DECAY_WME_CRITERIA_SYSPARAM          38
-#define WME_DECAY_ALLOW_FORGETTING_SYSPARAM      39
-#define WME_DECAY_I_SUPPORT_MODE_SYSPARAM        40
-#define WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM 41
-#define WME_DECAY_PRECISION_SYSPARAM             42
-#define WME_DECAY_LOGGING_SYSPARAM               43
+#define WME_DECAY_SYSPARAM                       37
+#define WME_DECAY_EXPONENT_SYSPARAM              38
+#define WME_DECAY_WME_CRITERIA_SYSPARAM          39
+#define WME_DECAY_ALLOW_FORGETTING_SYSPARAM      40
+#define WME_DECAY_I_SUPPORT_MODE_SYSPARAM        41
+#define WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM 42
+#define WME_DECAY_PRECISION_SYSPARAM             43
+#define WME_DECAY_LOGGING_SYSPARAM               44
 
-#define HIGHEST_SYSPARAM_NUMBER                  43
+#define HIGHEST_SYSPARAM_NUMBER                  44
 
-#else
-    
+// #else
+
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  35
+// #define HIGHEST_SYSPARAM_NUMBER                  35
 
-#endif
+// #endif
 
 /* -----------------------------------------
    Sysparams[] stores the parameters; set_sysparam()

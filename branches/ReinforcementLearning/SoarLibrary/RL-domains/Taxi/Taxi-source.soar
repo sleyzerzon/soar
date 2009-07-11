@@ -1,4 +1,5 @@
 RL --gamma 1.0
+exploration --epsilon 0.5
 learn --off
 
 source taxi-task.soar

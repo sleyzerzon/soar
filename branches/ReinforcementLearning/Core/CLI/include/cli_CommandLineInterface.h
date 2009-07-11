@@ -188,7 +188,9 @@ protected:
 	bool ParseAttributePreferencesMode(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseCD(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseChunkNameFormat(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+#ifdef SOAR_WMEM_ACTIVATION
     bool ParseDecay(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
+#endif
 	bool ParseCLog(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseCommandToFile(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
 	bool ParseDefaultWMEDepth(gSKI::IAgent* pAgent, std::vector<std::string>& argv);
@@ -567,7 +569,7 @@ protected:
 	* @param epsilon Assignment to the gamma parameter
 	*****************************************************************/
 
-	bool DoRL(gSKI::IAgent* pAgent, const int RLSetting, const double alpha, const double gamma);
+	bool DoRL(gSKI::IAgent* pAgent, const int RLSetting, const int algSetting, const double alpha, const double gamma, const double lambda);
 
 /*****************************************************************/
 

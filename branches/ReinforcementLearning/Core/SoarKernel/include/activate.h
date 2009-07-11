@@ -6,6 +6,7 @@
 /* =======================================================================
                                activate.h
 ======================================================================= */
+#ifdef SOAR_WMEM_ACTIVATION
 
 #ifndef ACTIVATE_H
 #define ACTIVATE_H
@@ -251,3 +252,5 @@ typedef struct decay_timelist_element_struct
 
 
 #endif  //ACTIVATE_H
+
+#endif //SOAR_WMEM_ACTIVATION

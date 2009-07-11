@@ -42,7 +42,7 @@ sp {apply*pickup*failure*wrong*location
 sp {RL*pickup
   :template
 (state <s> ^superoperator.name get ^info-link <i> ^operator <o> +)
-(<i> ^destination <dest> ^x-coor <x> ^y-coor <y>)
+(<i> ^passenger <pass> ^x-coor <x> ^y-coor <y>)
 (<o> ^name pickup)
 -->
 (<s> ^operator <o> = 0)}

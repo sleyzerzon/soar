@@ -1178,20 +1178,11 @@ namespace gSKI
       virtual void SetExplorationMode(egSKIExplorationMode m, Error* pErr = 0);
 	  virtual egSKIExplorationMode GetExplorationMode(Error* pErr = 0);
 
-	  virtual void SetTemperature(double d, Error* pErr = 0);
-	  virtual double GetTemperature(Error* pErr = 0);
+	  virtual void SetExplorationParameter(egSKIExplorationParameter m, double value, Error* pErr = 0);
+	  virtual double GetExplorationParameter(egSKIExplorationParameter m, Error* pErr = 0);
 
-	  virtual void SetEpsilon(double d, Error* pErr = 0);
-	  virtual double GetEpsilon(Error* pErr = 0);
-
-	  virtual void SetAlpha(double d, Error* pErr = 0);
-	  virtual double GetAlpha(Error* pErr = 0);
-
-	  virtual void SetGamma(double d, Error* pErr = 0);
-	  virtual double GetGamma(Error* pErr = 0);
-
-	  void SetRL(bool on, Error* err = 0);
-	  bool IsRLOn(Error* err = 0);
+	  virtual void SetRLParameter(egSKIRLParameter m, double value, Error* pErr = 0);
+	  virtual double GetRLParameter(egSKIRLParameter m, Error* pErr = 0);
 
 	  virtual bool GetOperand2Mode();
 	  virtual void SetOperand2Mode(bool mode);

@@ -397,24 +397,24 @@ void CommandLineInterface::PrintCurrentDecaySettings(gSKI::IAgent* pAgent)
     if (sp_val)
     {
 //          first_spot = (pAgent->current_decay_timelist_element)->position;
-//          last_spot = (first_spot - 1 + DECAY_ARRAY_SIZE) % DECAY_ARRAY_SIZE;
+//        last_spot = (first_spot - 1 + DECAY_ARRAY_SIZE) % DECAY_ARRAY_SIZE;
 
-//          sprintf(buf, "\nCurrently activated WMEs (cycle %i): \n", (pAgent->current_decay_timelist_element)->time);
-//          m_Result << buf;
+//      sprintf(buf, "\nCurrently activated WMEs (cycle %i): \n", (pAgent->current_decay_timelist_element)->time);
+//         m_Result << buf;
 //          m_Result << "   forget on   decay  kernel                         \n";
 //          m_Result << "     cycle      refs   refs            WME           \n";
 //          m_Result << "   ---------   -----  ------  -----------------------\n";
-        
+//        
 //          i = first_spot;
 //          while(i != last_spot)
 //          {
 //              print_this = (pAgent->decay_timelist[i]).first_decay_element;
-
+//
 //              while(print_this != NIL)
 //              {
 //                  int j;
 //                  int num_refs = print_this->num_references;
-                
+//                
 //                  //If the reference count has already been set to zero, we'll
 //                  //need to calculate how many times this WME was referenced this
 //                  //cycle using the boost_history.
@@ -428,7 +428,7 @@ void CommandLineInterface::PrintCurrentDecaySettings(gSKI::IAgent* pAgent)
 //                          }
 //                      }
 //                  }
-                
+//                
 //                  sprintf(buf, "   %8i   %5i  %6i ", (pAgent->decay_timelist[i]).time, num_refs, print_this->this_wme->reference_count);
 //                  m_Result << buf;
 //                  print_with_symbols(pAgent, "  (%y ^%y %y) ", print_this->this_wme->id, print_this->this_wme->attr, print_this->this_wme->value);
@@ -444,10 +444,10 @@ void CommandLineInterface::PrintCurrentDecaySettings(gSKI::IAgent* pAgent)
 //                  {
 //                      m_Result << " i-supported\n";
 //                  }
-                    
+//                  
 //                  print_this = print_this->next;
 //              }//while
-            
+//          
 //              i = (i + 1) % DECAY_ARRAY_SIZE;
 //          }//while
         m_Result << "\n\n";
@@ -554,4 +554,4 @@ bool CommandLineInterface::DoDecay(gSKI::IAgent* pAgent,
     return true;
 }
 
-#endif
+ #endif // SOAR_WMEM_ACTIVATION

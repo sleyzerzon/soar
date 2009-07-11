@@ -770,4 +770,17 @@
    	   gSKI_NO_EXPLORATION,
    } egSKIExplorationMode;
 
+   typedef enum
+   {
+	   ALPHA,
+	   GAMMA,
+	   LAMBDA,
+   } egSKIRLParameter;
+
+   typedef enum
+   {
+	   EPSILON,
+	   TEMPERATURE,
+   } egSKIExplorationParameter;
+
 #endif

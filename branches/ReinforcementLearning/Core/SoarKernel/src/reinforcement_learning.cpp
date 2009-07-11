@@ -1,5 +1,4 @@
 #include <math.h>
-#include <stdlib.h> // NAG: mem.h included indirectly below references malloc etc., req'd to build on linux
 #include "portability.h"
 #include "reinforcement_learning.h"
 #include "rhsfun.h"
@@ -89,10 +88,10 @@ time steps since the last operator was selected.
 Returns r_t+1 + gamma*Q_t+1 - Q_t.
 **************************************************/
 
-float compute_temp_diff(agent *thisAgent, RL_data* r, float best_op_value){
+float compute_temp_diff(agent *thisAgent, RL_data* r, float op_value){
 	
 	float delta_Q = r->reward;
-	delta_Q += pow(thisAgent->gamma, r->step)*best_op_value;
+	delta_Q += pow(thisAgent->gamma, r->step)*op_value;
 	delta_Q -= r->previous_Q;
 	return delta_Q;
 }
@@ -115,23 +114,20 @@ Finally, we reset all the RL_data in preparation for
 the next operator.
 ***************************************************/
 
-bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal){
-		
-	RL_data *data = goal->id.RL_data;
- 	bool current_pref_changed = FALSE;
+void perform_Bellman_update(agent *thisAgent, float op_value, Symbol *goal){
 	
-	int num_prods = 0;
-	for (cons *c = data->productions_to_be_updated; c ; c = c->rest){
-		if (c->first)
-			num_prods++;
-	}
- 			
-	if (num_prods > 0){  // if there are productions to update
-		/* experimental */
-		if (data->impasse_type != NONE_IMPASSE_TYPE){
-			float sum = 0;
-			for (cons *c = data->productions_to_be_updated ; c ; c = c->rest){
-				Symbol *s = rhs_value_to_symbol(((production *) c->first)->action_list->referent);
+	cons *c;
+	RL_data *data = goal->id.RL_data;
+	eligibility_trace_element *trace = data->current_eligibility_element;
+ //	bool current_pref_changed = FALSE;
+
+/* Eligibility trace */
+	if (trace){
+    float sum = 0;
+	for (c = trace->prods_to_update ; c ; c = c->rest) {            // Iterate over most recently fired RL rules 
+		production *prod = (production *) c->first;
+		if (!prod) continue;
+		Symbol *s = rhs_value_to_symbol(prod->action_list->referent);
 				if (s->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
 					sum += s->fc.value;
 				} else if (s->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
@@ -141,55 +137,150 @@ bool perform_Bellman_update(agent *thisAgent, float best_op_value, Symbol *goal)
 					continue;
 				}
 			}
-			data->previous_Q = sum;
-		}
-		/* end experimental */
+	data->previous_Q = sum;
 
-		float update = compute_temp_diff(thisAgent, data, best_op_value);
-		float increment = thisAgent->alpha*(update / num_prods);
-		cons *c = data->productions_to_be_updated;
+	float update = compute_temp_diff(thisAgent, data, op_value);
+
+	
+
+	for (int i = 0 ; i<data->number_in_list ; i++){
+
+		// int num_prods = 0;
+		// for (c = trace->prods_to_update; c ; c = c->rest){
+		//	if (c->first)
+		//		num_prods++;
+		//}
+		
+		if (trace->num_prods > 0){
+			float increment = thisAgent->alpha*(update / trace->num_prods)*pow(thisAgent->lambda, i)*pow(thisAgent->gamma, i);
+			c = trace->prods_to_update;
 			while(c){
-		 
-				production *prod = (production *) c->first;
-				c = c->rest;
-	 
-				if (!prod) continue;
-
-				prod->copies_awaiting_updates--;
-	  		 		
-				float temp;
-				if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
-					temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
-				} else if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
-					temp = rhs_value_to_symbol(prod->action_list->referent)->ic.value;
-				} else {
-				 // We should never get here. Need to return an error here.
-				}
-			 
-				temp += increment;
-
-				symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
-				prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
-			 
-				if (prod->instantiations){
-					current_pref_changed = TRUE;
-					for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
-						for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
-							symbol_remove_ref(thisAgent, pref->referent);
-							pref->referent = make_float_constant(thisAgent, temp);
-						}
+			
+					production *prod = (production *) c->first;
+					c = c->rest;
+		
+					if (!prod) continue;
+	
+					prod->copies_awaiting_updates--;
+	  			 		
+					float temp;
+					if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
+						temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
+					} else if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
+						temp = rhs_value_to_symbol(prod->action_list->referent)->ic.value;
+					} else {
+					// We should never get here. Need to return an error here.
 					}
-				}	 
+				
+					temp += increment;
+	
+					/* Change value of rule. */
+					symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
+					prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
+				
+					/* Change value of preferences generated by current instantiations of this rule. */
+					if (prod->instantiations){
+						// current_pref_changed = TRUE;
+						for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
+							for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
+								symbol_remove_ref(thisAgent, pref->referent);
+								pref->referent = make_float_constant(thisAgent, temp);
+							}
+						}
+					}	 
+			}
 		}
+
+		trace = trace->previous;
 	}
+}
+	
 	data->reward = 0.0;
 	data->step = 0;
-	data->previous_Q = 0;
 	data->impasse_type = NONE_IMPASSE_TYPE;
-	free_list(thisAgent, data->productions_to_be_updated);
-	data->productions_to_be_updated = NIL;
+
+
+/* End Eligibility trace */
+
+
 	
-	return current_pref_changed;
+
+
+
+//	int num_prods = 0;
+//	for (c = data->productions_to_be_updated; c ; c = c->rest){
+//		if (c->first)
+//			num_prods++;
+//	}
+// 	
+//	
+//	if (num_prods > 0){  // if there are productions to update
+//		/* Compute Q-value of previous operator based on the current values of rules that fired for it. */
+//		// if (data->impasse_type != NONE_IMPASSE_TYPE){
+//			float sum = 0;
+//			for (c = data->productions_to_be_updated ; c ; c = c->rest){
+//				Symbol *s = rhs_value_to_symbol(((production *) c->first)->action_list->referent);
+//				if (s->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE) {
+//					sum += s->fc.value;
+//				} else if (s->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE) {
+//					sum += s->ic.value;
+//				} else {
+//					// this should never happen
+//					continue;
+//				}
+//			}
+//			data->previous_Q = sum;
+//		// }
+//
+//		float update = compute_temp_diff(thisAgent, data, op_value);
+//		float increment = thisAgent->alpha*(update / num_prods);
+//		c = data->productions_to_be_updated;
+//			while(c){
+//		 
+//				production *prod = (production *) c->first;
+//				c = c->rest;
+//	 
+//				if (!prod) continue;
+//
+//				prod->copies_awaiting_updates--;
+//	  		 		
+//				float temp;
+//				if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE){
+//					temp = rhs_value_to_symbol(prod->action_list->referent)->fc.value;
+//				} else if (rhs_value_to_symbol(prod->action_list->referent)->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE){
+//					temp = rhs_value_to_symbol(prod->action_list->referent)->ic.value;
+//				} else {
+//				 // We should never get here. Need to return an error here.
+//				}
+//			 
+//				temp += increment;
+//
+//				/* Change value of rule. */
+//				symbol_remove_ref(thisAgent, rhs_value_to_symbol(prod->action_list->referent));
+//				prod->action_list->referent = symbol_to_rhs_value(make_float_constant(thisAgent, temp));
+//			 
+//				/* Change value of preferences generated by current instantiations of this rule. */
+//				if (prod->instantiations){
+//					// current_pref_changed = TRUE;
+//					for (instantiation *inst = prod->instantiations ; inst ; inst = inst->next){
+//						for (preference *pref = inst->preferences_generated ; pref ; pref = pref->inst_next){
+//							symbol_remove_ref(thisAgent, pref->referent);
+//							pref->referent = make_float_constant(thisAgent, temp);
+//						}
+//					}
+//				}	 
+//		}
+//	}
+//
+//	data->reward = 0.0;
+//	data->step = 0;
+//	// data->previous_Q = 0;
+//	data->impasse_type = NONE_IMPASSE_TYPE;
+//	free_list(thisAgent, data->productions_to_be_updated);
+//	data->productions_to_be_updated = NIL;
+//	
+//	// return current_pref_changed;
+//	return TRUE;
 }
 
 /*************************************************************
@@ -217,7 +308,7 @@ void RL_update_symbolically_chosen(agent *thisAgent, slot *s, preference *candid
 			}
 		}
 	}
-	candidates->sum_of_probability = temp_Q; // store estimate of Q-value to be used to update this operator on the next decision cycle
+	candidates->numeric_value = temp_Q; // store estimate of Q-value to be used to update this operator on the next decision cycle
 	perform_Bellman_update(thisAgent, temp_Q, s->id);
 }
 
@@ -238,14 +329,63 @@ void store_RL_data(agent *thisAgent, Symbol *goal, preference *cand)
 {
 	RL_data *data = goal->id.RL_data;
 	Symbol *op = cand->value;
-    data->previous_Q = cand->sum_of_probability;
+    // data->previous_Q = cand->numeric_value;
+
+/* Eligibility trace */
+	if (data->number_in_list == 0){ // Eligibility trace list is empty
+		data->number_in_list++;
+		eligibility_trace_element *ete = static_cast<eligibility_trace_element_struct *>(allocate_memory(thisAgent, sizeof(eligibility_trace_element_struct),
+												   MISCELLANEOUS_MEM_USAGE));
+		ete->prods_to_update = NIL;
+		ete->num_prods = 0;
+		// data->productions_to_be_updated = dc;
+		// if (data->number_in_list == thisAgent->num_traces){
+		ete->next = ete;
+		ete->previous = ete;
+		// } else dc->next = NIL;
+		data->current_eligibility_element = ete;
+	} else if (data->number_in_list < thisAgent->num_traces) {	// Add a new element to the end of productions_to_be_updated
+		data->number_in_list++;
+		eligibility_trace_element *ete = static_cast<eligibility_trace_element_struct *>(allocate_memory(thisAgent, sizeof(eligibility_trace_element_struct),
+												   MISCELLANEOUS_MEM_USAGE));;
+		ete->prods_to_update = NIL;
+		ete->num_prods = 0;
+    	ete->next = data->current_eligibility_element->next;
+		data->current_eligibility_element->next = ete;
+		ete->previous = data->current_eligibility_element;
+		ete->next->previous = ete;
+		data->current_eligibility_element = ete;
+	} else {
+		data->current_eligibility_element = data->current_eligibility_element->next;
+		while (data->number_in_list > thisAgent->num_traces) {
+			eligibility_trace_element *temp = data->current_eligibility_element;
+			for (cons *c = temp->prods_to_update ; c ; c=c->rest){
+				if (c->first)
+				((production *) c->first)->copies_awaiting_updates--;
+			}
+			free_list(thisAgent, temp->prods_to_update);
+			temp->previous->next = temp->next;
+			temp->next->previous = temp->previous;
+			data->current_eligibility_element = temp->next;
+			free_memory(thisAgent, temp, MISCELLANEOUS_MEM_USAGE);
+			data->number_in_list--;
+		}
+		for (cons *c = data->current_eligibility_element->prods_to_update ; c ; c=c->rest){
+			if (c->first)
+				((production *) c->first)->copies_awaiting_updates--;
+		}
+		free_list(thisAgent, data->current_eligibility_element->prods_to_update);
+		data->current_eligibility_element->num_prods = 0;
+		data->current_eligibility_element->prods_to_update = NIL;
+	}
 
 	for (preference *pref = goal->id.operator_slot->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref ; pref = pref->next){
 			  if (op == pref->value){
 				  instantiation *ist = pref->inst;
 				  production *prod = ist->prod;
 				  if (prod->RL) {
-					  push(thisAgent, prod, data->productions_to_be_updated);
+					  push(thisAgent, prod, data->current_eligibility_element->prods_to_update);
+					  data->current_eligibility_element->num_prods++;
 					  prod->copies_awaiting_updates++;
 				  } 
 			  }
@@ -253,13 +393,37 @@ void store_RL_data(agent *thisAgent, Symbol *goal, preference *cand)
 
 	for (preference *pref = goal->id.operator_slot->preferences[TEMPLATE_PREFERENCE_TYPE]; pref ; pref = pref->next){
 		if (op == pref->value){
-            production *prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
+          production *prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
 			if (prod){
+				push(thisAgent, prod, data->current_eligibility_element->prods_to_update);
+				data->current_eligibility_element->num_prods++;
 				prod->copies_awaiting_updates++;
-				push(thisAgent, prod, data->productions_to_be_updated);
 			}
 		}
 	}
+
+
+
+//	for (preference *pref = goal->id.operator_slot->preferences[NUMERIC_INDIFFERENT_PREFERENCE_TYPE]; pref ; pref = pref->next){
+//			  if (op == pref->value){
+//				  instantiation *ist = pref->inst;
+//				  production *prod = ist->prod;
+//				  if (prod->RL) {
+//					  push(thisAgent, prod, data->productions_to_be_updated);
+//					  prod->copies_awaiting_updates++;
+//				  } 
+//			  }
+//	}
+
+//	for (preference *pref = goal->id.operator_slot->preferences[TEMPLATE_PREFERENCE_TYPE]; pref ; pref = pref->next){
+//		if (op == pref->value){
+//          production *prod = build_production(thisAgent, pref->inst->top_of_instantiated_conditions, pref->inst->nots, pref);
+//			if (prod){
+//				prod->copies_awaiting_updates++;
+//				push(thisAgent, prod, data->productions_to_be_updated);
+//			}
+//		}
+//	}
 }
 
 /*****************************************************************
@@ -271,10 +435,24 @@ Called when reinforcement learning is turned off.
 void reset_RL(agent *thisAgent){
 	Symbol *goal = thisAgent->top_goal;
 	while(goal){
-		RL_data *data = goal->id.RL_data;
-		  free_list(thisAgent, data->productions_to_be_updated);
-		  data->previous_Q = 0;
-		  data->productions_to_be_updated = NIL;
+		  RL_data *data = goal->id.RL_data;
+		//  free_list(thisAgent, data->productions_to_be_updated);
+		  // data->productions_to_be_updated = NIL;
+		  /* Eligibility trace */
+			eligibility_trace_element *traces = data->current_eligibility_element;
+		  	for (int i = 0 ; i<data->number_in_list ; i++){
+				for (cons *c = traces->prods_to_update ; c ; c=c->rest){
+					if (c->first)
+						((production *) c->first)->copies_awaiting_updates--;
+				}
+				free_list(thisAgent, traces->prods_to_update);
+				eligibility_trace_element *temp = traces;
+				traces = traces->next;
+				free_memory(thisAgent, temp, MISCELLANEOUS_MEM_USAGE);
+			}
+		  data->current_eligibility_element = NIL;
+		  data->number_in_list = 0;
+		  /* End Eligibility trace */
 		  data->reward = 0;
 		  data->step = 0;
 		  data->impasse_type = NONE_IMPASSE_TYPE;
@@ -452,3 +630,4 @@ action *copy_and_variablize_pref_list (agent* thisAgent, preference *pref) {
   a->next = copy_and_variablize_pref_list (thisAgent, pref->inst_next);
   return a;  
 }
+

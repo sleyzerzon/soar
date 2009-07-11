@@ -1,9 +1,9 @@
 # learning is irrelevant for this formulation
 l --off
-RL --gamma 0.9
-RL --alpha 0.3
+RL --gamma 1
+RL --alpha 1
 exploration --mode epsilon-greedy
-exploration --epsilon 0.1
+exploration --epsilon 0
 
 watch -i
 

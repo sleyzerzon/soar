@@ -51,6 +51,12 @@ sp {halt*success
  -->
   (halt)}
 
+#sp {halt
+#  (state <s> ^task taxi ^info-link <i>)
+#  (<i> ^destination <x> ^location <x>)
+#  -->
+#  (halt)}
+
 sp {propose*initialize
   (state <s> ^task taxi -^info-link)
   -->

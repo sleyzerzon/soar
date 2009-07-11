@@ -5,7 +5,7 @@
 
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION. 
+ * FOR LICENSE AND COPYRIGHT INFORMATION.
  *************************************************************************/
 
 /*************************************************************************
@@ -54,7 +54,7 @@
 char * soar_version_string;
 
 /* ===================================================================
-   
+
                            Initialization Function
 
 =================================================================== */
@@ -62,7 +62,7 @@ char * soar_version_string;
 void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
 
   /* Updated this from soar_agent to thisAgent. -AJC (8/8/02) */
-  /* JC ADDED: Initialize the gski callbacks. 
+  /* JC ADDED: Initialize the gski callbacks.
      This is mildly frightening.  I hope soar_agent is set correctly
       by this point
   */
@@ -88,10 +88,8 @@ void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
   init_tracing (thisAgent);
   init_explain(thisAgent);  /* AGR 564 */
 
-#ifdef SOAR_WMEM_ACTIVATION
-    decay_init(thisAgent);
-#endif
-  
+
+
 #ifdef REAL_TIME_BEHAVIOR
   /* RMJ */
   init_real_time(thisAgent);
@@ -116,7 +114,11 @@ void init_soar_agent(Kernel* thisKernel, agent* thisAgent) {
                     "%right[6,%dc]: %rsd[   ]   O: %co");
 
   reset_statistics (thisAgent);
-   
+
+  #ifdef SOAR_WMEM_ACTIVATION
+    decay_init(thisAgent);
+#endif
+
   /* RDF: For gSKI */
   init_agent_memory(thisAgent);
   /* END */
@@ -203,13 +205,13 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->print_prompt_flag                  = TRUE;
   newAgent->printer_output_column              = 1;
   newAgent->production_being_fired             = NIL;
-  newAgent->productions_being_traced           = NIL; 
+  newAgent->productions_being_traced           = NIL;
   newAgent->promoted_ids                       = NIL;
   newAgent->reason_for_stopping                = "Startup";
   newAgent->redirecting_to_file                = FALSE;
   newAgent->replay_input_data                  = FALSE;
   newAgent->slots_for_possible_removal         = NIL;
-  newAgent->stop_soar                          = TRUE;           
+  newAgent->stop_soar                          = TRUE;
   newAgent->system_halted                      = FALSE;
   newAgent->token_additions                    = 0;
   newAgent->top_dir_stack                      = NIL;   /* AGR 568 */
@@ -295,9 +297,9 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
   newAgent->top_dir_stack->next = NIL;   /* AGR 568 */
   strcpy(newAgent->top_dir_stack->directory, cur_path);   /* AGR 568 */
 
-  /* changed all references of 'i', a var belonging to a previous for loop, to 'productionTypeCounter' to be unique 
+  /* changed all references of 'i', a var belonging to a previous for loop, to 'productionTypeCounter' to be unique
     stokesd Sept 10 2004*/
-  for (int productionTypeCounter=0; productionTypeCounter<NUM_PRODUCTION_TYPES; productionTypeCounter++) {  
+  for (int productionTypeCounter=0; productionTypeCounter<NUM_PRODUCTION_TYPES; productionTypeCounter++) {
     newAgent->all_productions_of_type[productionTypeCounter] = NIL;
     newAgent->num_productions_of_type[productionTypeCounter] = 0;
   }
@@ -310,7 +312,15 @@ agent * create_soar_agent (Kernel * thisKernel, char * agent_name) {            
 									an exponent to the number 10, and must be stored in a 64 bit double */
   newAgent->epsilon = 0.1;     /* proportion of the time an exploratory action is taken */
   newAgent->gamma = 0.9;       /* discount factor */
-  newAgent->alpha = 0.4;       /* learning rate */
+  newAgent->alpha = 0.3;       /* learning rate */
+/* Eligibility trace */
+  newAgent->lambda = 0;
+  if (newAgent->lambda == 0){
+	  newAgent->num_traces = 1;
+  } else {
+	  newAgent->num_traces = ceil( log(0.01) / log(newAgent->lambda) );
+  }
+/* End Eligibility trace */
   newAgent->RL_count = 1;
 #endif
   newAgent->attribute_preferences_mode = 0; /* RBD 4/17/95 */
@@ -344,7 +354,7 @@ void initialize_soar_agent(Kernel *thisKernel, agent* thisAgent) {
                                          /* of all agents.             */
   push(thisAgent, thisAgent, thisKernel->all_soar_agents);
 
-  soar_invoke_callbacks(thisAgent, thisAgent, 
+  soar_invoke_callbacks(thisAgent, thisAgent,
 			AFTER_INIT_AGENT_CALLBACK,
 			(soar_call_data) NULL);
 }
@@ -359,7 +369,7 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   cons  * c;
   cons  * prev = NULL;   /* Initialized to placate gcc -Wall */
   agent * the_agent;
- 
+
   //print(delete_agent, "\nDestroying agent %s.\n", delete_agent->name);  /* AGR 532 */
 
 //#ifdef USE_X_DISPLAY
@@ -371,7 +381,7 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   remove_built_in_rhs_functions(delete_agent);
 
   /* Splice agent structure out of global list of agents. */
-  for (c = thisKernel->all_soar_agents; c != NIL; c = c->rest) {  
+  for (c = thisKernel->all_soar_agents; c != NIL; c = c->rest) {
     the_agent = (agent *) c->first;
     if (the_agent == delete_agent) {
       if (c == thisKernel->all_soar_agents) {
@@ -394,9 +404,9 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   for ( multi_attribute* curmattr = delete_agent->multi_attributes;
         curmattr != 0;
         curmattr = curmattr->next ) {
-     
+
      symbol_remove_ref(delete_agent, curmattr->symbol);
-     
+
      free_memory(delete_agent, (void*) lastmattr, MISCELLANEOUS_MEM_USAGE);
      lastmattr = curmattr;
   }
@@ -408,17 +418,17 @@ void destroy_soar_agent (Kernel * thisKernel, agent * delete_agent)
   /* Releasing all the predefined symbols */
   release_predefined_symbols(delete_agent);
 
-  /* Cleaning up the various callbacks 
+  /* Cleaning up the various callbacks
      TODO: Not clear why callbacks need to take the agent pointer essentially twice.
   */
   soar_remove_all_monitorable_callbacks(delete_agent, (void*) delete_agent);
 
   /* KNOWN MEMORY LEAK! Need to track down and free ALL structures */
   /* pointed to be fields in the agent structure.                  */
-  
+
 
   /* Free soar agent structure */
   free((void *) delete_agent);
- 
+
   thisKernel->agent_count--;
 }

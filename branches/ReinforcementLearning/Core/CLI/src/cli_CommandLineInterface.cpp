@@ -53,7 +53,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 	m_CommandMap[Commands::kCLIChunkNameFormat]				= &cli::CommandLineInterface::ParseChunkNameFormat;
 #ifdef SOAR_WMEM_ACTIVATION
 	m_CommandMap[Commands::kCLIDecay]                       = &cli::CommandLineInterface::ParseDecay;
-#endif
+#endif SOAR_WMEM_ACTIVATION
 	m_CommandMap[Commands::kCLICLog]						= &cli::CommandLineInterface::ParseCLog;
 	m_CommandMap[Commands::kCLICommandToFile]				= &cli::CommandLineInterface::ParseCommandToFile;
 	m_CommandMap[Commands::kCLIDefaultWMEDepth]				= &cli::CommandLineInterface::ParseDefaultWMEDepth;
@@ -254,7 +254,7 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, sml::E
 
 	if (m_LastError == CLIError::kNoError) {
         // Log output
-        if (m_pLogFile) (*m_pLogFile) << m_Result.str() << endl;
+        // if (m_pLogFile) (*m_pLogFile) << m_Result.str() << endl;
 
         // The command succeeded, so return the result if raw output
 		if (m_RawOutput) {

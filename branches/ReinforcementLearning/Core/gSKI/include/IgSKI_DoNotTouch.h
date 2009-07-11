@@ -296,27 +296,27 @@ typedef byte wme_trace_type;   /* must be one of the above constants */
 
 /* SAN */
 #define RL_ON_SYSPARAM							 35
+#define RL_ONPOLICY_SYSPARAM					 36
 
-#ifdef SOAR_WMEM_ACTIVATION
+// #ifdef SOAR_WMEM_ACTIVATION
 
 //The following constants are used by SOAR_WMEM_ACTIVATION
-#define WME_DECAY_SYSPARAM                       36
-#define WME_DECAY_EXPONENT_SYSPARAM              37
-#define WME_DECAY_WME_CRITERIA_SYSPARAM          38
-#define WME_DECAY_ALLOW_FORGETTING_SYSPARAM      39
-#define WME_DECAY_I_SUPPORT_MODE_SYSPARAM        40
-#define WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM 41
-#define WME_DECAY_PRECISION_SYSPARAM             42
-#define WME_DECAY_LOGGING_SYSPARAM               43
+#define WME_DECAY_SYSPARAM                       37
+#define WME_DECAY_EXPONENT_SYSPARAM              38
+#define WME_DECAY_WME_CRITERIA_SYSPARAM          39
+#define WME_DECAY_ALLOW_FORGETTING_SYSPARAM      40
+#define WME_DECAY_I_SUPPORT_MODE_SYSPARAM        41
+#define WME_DECAY_PERSISTENT_ACTIVATION_SYSPARAM 42
+#define WME_DECAY_PRECISION_SYSPARAM             43
+#define WME_DECAY_LOGGING_SYSPARAM               44
 
-#define HIGHEST_SYSPARAM_NUMBER                  43
-
-#else
+#define HIGHEST_SYSPARAM_NUMBER                  44
+// #else
 
 /* --- Warning: if you add sysparams, be sure to update the next line! --- */
-#define HIGHEST_SYSPARAM_NUMBER                  35
+// #define HIGHEST_SYSPARAM_NUMBER                  35
 
-#endif
+// #endif
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024   /* AGR 536  - from sys/param.h */

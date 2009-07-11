@@ -79,10 +79,10 @@ bool CommandLineInterface::DoExploration(gSKI::IAgent* pAgent, const int modeSet
 
 	
 	if (Temp > 0){
-		pAgent->SetTemperature(Temp);
+		pAgent->SetExplorationParameter(TEMPERATURE, Temp);
 		return true;
 	} else if (epsilon >= 0){
-		pAgent->SetEpsilon(epsilon);
+		pAgent->SetExplorationParameter(EPSILON, epsilon);
 		return true;
 	} else {
 	
@@ -106,10 +106,10 @@ bool CommandLineInterface::DoExploration(gSKI::IAgent* pAgent, const int modeSet
 		m_Result << "Current exploration mode: ";
 		switch (pAgent->GetExplorationMode()) {
 			case gSKI_BOLTZMANN_EXPLORATION:
-				m_Result << "Boltzmann,  Temperature: " << pAgent->GetTemperature();
+				m_Result << "Boltzmann,  Temperature: " << pAgent->GetExplorationParameter(TEMPERATURE);
 				break;
 			case gSKI_EPSILON_GREEDY_EXPLORATION:
-				m_Result << "epsilon-greedy,  epsilon: " << pAgent->GetEpsilon();
+				m_Result << "epsilon-greedy,  epsilon: " << pAgent->GetExplorationParameter(EPSILON);
 				break;
 			case gSKI_NO_EXPLORATION:
 				m_Result << "No exploration.";

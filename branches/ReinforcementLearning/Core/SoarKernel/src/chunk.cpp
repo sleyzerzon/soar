@@ -1322,8 +1322,10 @@ void chunk_instantiation (agent* thisAgent,
 #endif
 	  
 #ifdef SOAR_WMEM_ACTIVATION
+	  if ((thisAgent->sysparams)[WME_DECAY_SYSPARAM]){
     //Boost tested wmes in justification or chunk
-    activate_wmes_in_inst(thisAgent, chunk_inst);
+	  activate_wmes_in_inst(thisAgent, chunk_inst);
+	  }
 #endif 
       
 	  return;

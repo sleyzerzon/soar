@@ -581,11 +581,11 @@ namespace gSKI
 		  m_runState = gSKI_RUNSTATE_HALTED;
 
 		  // fix for BUG 514  01-12-06
-		  PrintNotifier nfHalted(this, "This Agent halted.");
+		  PrintNotifier nfHalted(this, "This Agent halted.\n");
 		  m_printListeners.Notify(gSKIEVENT_PRINT, nfHalted);
 		  XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
 		  m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
-		  XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "This Agent halted.") ;
+		  XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "This Agent halted.\n") ;
 		  m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
 		  XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
 		  m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);
@@ -1848,21 +1848,33 @@ Exploration
       return m;
    }
 
-   void Agent::SetTemperature(double Temp, Error* pErr) {
-	   GetSoarAgent()->Temperature = Temp;
+    void Agent::SetExplorationParameter(egSKIExplorationParameter m, double value, Error* pErr){
+	   switch(m) {
+		   case EPSILON:
+			   GetSoarAgent()->epsilon = value;
+			   break;
+		   case TEMPERATURE:
+			   GetSoarAgent()->Temperature = value;
+			   break;
+		   default:
+			   MegaAssert(false, "Invalid exploration parameter.");
+			   break;
+	   }
    }
 
-   void Agent::SetEpsilon(double epsilon, Error* pErr) {
-	   GetSoarAgent()->epsilon = epsilon;
+	double Agent::GetExplorationParameter(egSKIExplorationParameter m, Error* pErr){
+	   switch(m) {
+		   case EPSILON:
+			   return GetSoarAgent()->epsilon;
+		   case TEMPERATURE:
+			   return GetSoarAgent()->Temperature;
+		   default:
+			   MegaAssert(false, "Invalid exploration parameter.");
+			   return 0;
+	   }
    }
 
-   double Agent::GetTemperature(Error* pErr) {
-	   return GetSoarAgent()->Temperature;
-   }
 
-   double Agent::GetEpsilon(Error* pErr) {
-	   return GetSoarAgent()->epsilon;
-   }
 
    /****************************************************
 
@@ -1870,43 +1882,43 @@ Exploration
 
    ****************************************************/
 
-   void Agent::SetAlpha(double alpha, Error* pErr) {
-	   GetSoarAgent()->alpha = alpha;
+
+   void Agent::SetRLParameter(egSKIRLParameter m, double value, Error* pErr){
+	   switch(m) {
+		   case ALPHA:
+			   GetSoarAgent()->alpha = value;
+			   break;
+		   case GAMMA:
+			   GetSoarAgent()->gamma = value;
+			   break;
+		   case LAMBDA:
+			   GetSoarAgent()->lambda = value;
+			   if (value == 0){
+				   GetSoarAgent()->num_traces = 1;
+			   } else {
+				   GetSoarAgent()->num_traces = ceil( log(0.01) / log(value) );
+			   }
+			   break;
+		   default:
+			   MegaAssert(false, "Invalid RL parameter.");
+			   break;
+	   }
    }
 
-   void Agent::SetGamma(double gamma, Error* pErr) {
-	   GetSoarAgent()->gamma = gamma;
-  }
-
-  double Agent::GetAlpha(Error* pErr) {
-	   return GetSoarAgent()->alpha;
+   double Agent::GetRLParameter(egSKIRLParameter m, Error* pErr){
+	   switch(m) {
+		   case ALPHA:
+			   return GetSoarAgent()->alpha;
+		   case GAMMA:
+			   return GetSoarAgent()->gamma;
+		   case LAMBDA:
+			   return GetSoarAgent()->lambda;
+		   default:
+			   MegaAssert(false, "Invalid RL parameter.");
+			   return 0;
+	   }
    }
-
-  double Agent::GetGamma(Error* pErr) {
-	   return GetSoarAgent()->gamma;
-   }
-
- void Agent::SetRL(bool on, Error* err)
-   {
-      ClearError(err);
-      m_agent->sysparams[RL_ON_SYSPARAM] = on;
-   }
-
-  bool Agent::IsRLOn(Error* err)
-   {
-      ClearError(err);
-      return m_agent->sysparams[RL_ON_SYSPARAM] ? true : false;
-   }
-
-
-
-
-
-
-
-
-
-
+   
    int Agent::GetAttributePreferencesMode(Error* err)
    {
 	   return GetSoarAgent()->attribute_preferences_mode;
@@ -2012,11 +2024,11 @@ Exploration
 		   retVal        = gSKI_RUN_COMPLETED;
 
 		   // fix for BUG 514  01-12-06
-		   PrintNotifier nfHalted(this, "This Agent halted.");
+		   PrintNotifier nfHalted(this, "This Agent halted.\n");
 		   m_printListeners.Notify(gSKIEVENT_PRINT, nfHalted);
 		   XMLNotifier xn1(this, kFunctionBeginTag, kTagMessage, 0) ;
 		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn1);
-		   XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "This Agent halted.") ;
+		   XMLNotifier xn2(this, kFunctionAddAttribute, kTypeString, "This Agent halted.\n") ;
 		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn2);
 		   XMLNotifier xn3(this, kFunctionEndTag, kTagMessage, 0) ;
 		   m_XMLListeners.Notify(gSKIEVENT_XML_TRACE_OUTPUT, xn3);

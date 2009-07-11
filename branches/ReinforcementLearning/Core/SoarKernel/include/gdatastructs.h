@@ -1,6 +1,6 @@
 /*************************************************************************
  * PLEASE SEE THE FILE "COPYING" (INCLUDED WITH THIS SOFTWARE PACKAGE)
- * FOR LICENSE AND COPYRIGHT INFORMATION. 
+ * FOR LICENSE AND COPYRIGHT INFORMATION.
  *************************************************************************/
 
 /* gdatastructs.h */
@@ -53,11 +53,11 @@ typedef cons list;
 
    The GDS is created only when necessary; that is, when an o-suppported WME
    is created in some subgoal and that subgoal has no GDS already.  The
-   instantiations that led to the creation of the o-supported WME are 
-   examined; any supergoal WMEs in these instantiations are added to the 
+   instantiations that led to the creation of the o-supported WME are
+   examined; any supergoal WMEs in these instantiations are added to the
    wmes_in_gds DLL.  The GDS for each goal is examined for every WM change;
    if a WME changes that is on a GDS, the goal that the GDS points to is
-   immediately removed.  
+   immediately removed.
 
    When a goal is removed, the GDS is not immediately removed.  Instead,
    whenever a WME is removed (or when it is added to another GDS), we check
@@ -159,8 +159,6 @@ typedef struct gds_struct {
 #define WORSE_PREFERENCE_TYPE 12
 #define NUMERIC_INDIFFERENT_PREFERENCE_TYPE 13
 #define TEMPLATE_PREFERENCE_TYPE 14
-#define NUM_PREFERENCE_TYPES 15
-
 
 #ifdef USE_MACROS
 
@@ -211,10 +209,10 @@ typedef struct preference_struct {
 
   /* dll of all pref's from the same match goal */
   struct preference_struct *all_of_goal_next, *all_of_goal_prev;
-  
+
   /* dll (without header) of cloned preferences (created when chunking) */
   struct preference_struct *next_clone, *prev_clone;
-    
+
   struct instantiation_struct *inst;
   struct preference_struct *inst_next, *inst_prev;
   struct preference_struct *next_candidate;
@@ -229,7 +227,7 @@ typedef struct preference_struct {
        what we really want from these changes.
      */
   int total_preferences_for_candidate;
-  double sum_of_probability;
+  float numeric_value;
     /* END: REW: 2003-01-08 */
   /////#endif
 
@@ -285,7 +283,7 @@ extern Bool remove_preference_from_clones (agent* thisAgent, preference *pref);
 
       impasse_type:  indicates the type of the impasse for this slot.  This
         is one of NONE_IMPASSE_TYPE, CONSTRAINT_FAILURE_IMPASSE_TYPE, etc.
-  
+
       marked_for_possible_removal:  TRUE iff this slot is on the list of
         slots that might be deallocated at the end of the current top-level
         phase.
@@ -309,7 +307,7 @@ typedef struct slot_struct {
   preference *all_preferences;      /* dll of all pref's in the slot */
   preference *preferences[NUM_PREFERENCE_TYPES]; /* dlls for each type */
   Symbol *impasse_id;               /* NIL if slot is not impassed */
-  Bool isa_context_slot;            
+  Bool isa_context_slot;
   byte impasse_type;
   Bool marked_for_possible_removal;
   dl_cons *changed;   /* for non-context slots: points to the corresponding
@@ -326,7 +324,7 @@ typedef struct slot_struct {
 
 /* -------------------------------------------------------------------
                               Tests
-   
+
    Tests in conditions can be blank (null) tests, tests for equality
    with a variable or constant, or more complicated tests (such as
    not-equal tests, conjunctive tests, etc.).  We use some bit twiddling
@@ -334,7 +332,7 @@ typedef struct slot_struct {
    of test.  For blank tests, this is the NIL pointer.  For equality tests,
    it points to the symbol referent of the test.  For other kinds of tests,
    bit 0 of the pointer is set to 1, and the pointer (minus 1) points to
-   a complex_test structure.  (A field in the complex_test structure 
+   a complex_test structure.  (A field in the complex_test structure
    further indicates the type of the test.)
 ------------------------------------------------------------------- */
 
@@ -355,20 +353,20 @@ typedef char * test;
 
 #define referent_of_equality_test(t) ((Symbol *) (t))
 #define complex_test_from_test(t) ((complex_test *) (((char *)(t))-1))
- 
+
 #else
 
-inline Bool test_is_blank_test(test t) 
-{ 
-  return (t == NIL); 
+inline Bool test_is_blank_test(test t)
+{
+  return (t == NIL);
 }
 
 #ifdef _MSC_VER
 #pragma warning (disable : 4311)
 #endif
 
-inline Bool test_is_complex_test(test t) 
-{ 
+inline Bool test_is_complex_test(test t)
+{
   return (char)(reinterpret_cast<unsigned long>(t) & 1);
 }
 
@@ -471,9 +469,9 @@ enum ComplexTextTypes {
                              Conditions
 
    Conditions are used for two things:  (1) to represent the LHS of newly
-   entered productions (new SP's or chunks); and (2) to represent the 
+   entered productions (new SP's or chunks); and (2) to represent the
    instantiated LHS in production instantiations.
-   
+
    Fields in a condition:
 
       type:  indicates the type of condition:  either POSITIVE_CONDITION,
