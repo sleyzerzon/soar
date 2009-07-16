@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<project name="SoarSuite" default="build" basedir=".">
+<!--project name="SoarSuite" default="build" basedir=".">
 
   <target name="build">
     <ant dir="Core/ClientSMLSWIG/Java" />
@@ -24,4 +24,4 @@
     <ant dir="Tools/SoarJavaDebugger" target="clean" />
   </target>
 
-</project>
+</project-->
