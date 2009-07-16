@@ -1,0 +1,16 @@
+#summary Soar Wiki Home
+#labels Featured,Phase-Support
+Welcome to the Soar Wiki, home of living documentation on Soar.
+
+= Soar =
+  * [http://sitemaker.umich.edu/soar Soar home page with news and general information about Soar].
+  * Publications related to Soar.
+
+= Using Soar =
+  * Getting started with Soar.
+  * [FAQ Frequently asked questions].
+  * Command line interface documentation.
+
+= Developing with Soar =
+  * Frequently asked questions.
+  * Checkout and build procedure details.
