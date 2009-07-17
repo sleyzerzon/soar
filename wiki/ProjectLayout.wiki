@@ -1,0 +1,27 @@
+#summary Big picture of what folders are some files are for in the Soar project source code.
+#labels Phase-Requirements
+
+Note: This is written for the reorganization and may not yet reflect the trunk.
+
+= SoarSuite =
+
+== soar-build ==
+Used to house distribution-related resources.
+
+== soar-core ==
+The main Soar components and language interfaces.
+
+== soar-csharp ==
+Soar CSharp tools, environments, and examples.
+
+== soar-java ==
+Soar Java tools, environments, and examples.
+
+== soar-python ==
+Soar Python tools, environments, and examples.
+
+== soar-tcl ==
+Soar Tcl tools, environments, and examples.
+
+== soar-cpp ==
+Soar C/C++ tools, environments, and examples.
