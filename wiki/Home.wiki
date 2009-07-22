@@ -14,3 +14,6 @@ Welcome to the Soar Wiki, home of living documentation on Soar.
 = Developing with Soar =
   * Frequently asked questions.
   * Checkout and build procedure details.
+
+= Examples and Environments =
+ * [sps Splinter Soar]
