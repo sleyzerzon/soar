@@ -28,26 +28,26 @@ input-link
     * waypoints
       * waypoint (id) one of these for each registered, enabled waypoint
         * id (string) user-defined identifier string
-	* x (float) x position in meters
-	* y (float) y position in meters
-	* z (float) [0] z position in meters
-	* distance (float) [0..] distance to waypoint in meters
-	* yaw (float or int) what yaw to turn to to face the waypoint
-	* relative-bearing (float or int) if positive then turn left
-	* abs-relative-bearing (float or int) [0..] absolute value of relative bearing
+        * x (float) x position in meters
+        * y (float) y position in meters
+        * z (float) [0] z position in meters
+        * distance (float) [0..] distance to waypoint in meters
+        * yaw (float or int) what yaw to turn to to face the waypoint
+        * relative-bearing (float or int) if positive then turn left
+        * abs-relative-bearing (float or int) [0..] absolute value of relative bearing
     * received-messages
       * message (id) one of these for each received event
         * from (string) [http] source of message
         * first (id) starts linked list
-	  * word (string)
-	  * next (id or sting "nil" to end)
-	    * word (string)
-	    * next (id or string "nil" to end) ... etc.
+          * word (string)
+          * next (id or sting "nil" to end)
+            * word (string)
+            * next (id or string "nil" to end) ... etc.
     * ranges
       * range (id) one per range slice
         * start (float or int) [-180..180] starting degree that this range slice covers
-	* end (float or int) [-180..180] ending degree that this range slice covers
-	* distance (float) [0..] distance in meters to closest range in slice
+        * end (float or int) [-180..180] ending degree that this range slice covers
+        * distance (float) [0..] distance in meters to closest range in slice
 
 == Output link specification ==
 
