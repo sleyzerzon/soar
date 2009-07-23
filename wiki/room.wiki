@@ -81,17 +81,17 @@ output-link
   * disable-waypoint (id) disable an enabled waypoint
     * id (string)
     * status (string) [accepted, complete, error]
-  * ~~send-message~~
-    * ~~destination (string) [say] target of message, currently only 'say' is valid, which is text to speech~~
-    * ~~first (id)~~
-    * ~~word (string)~~
-    * ~~next (id or string 'nil' to end)~~
-    * ~~status (string) [accepted, complete, error]~~
-  * ~~remove-message (id) remove a specific message from the received-messages list~~
-    * ~~id (string)~~
-    * ~~status (string) [accepted, complete, error]~~
-  * ~~clear-messages (id) remove all messages from received-messages list~~
-    * ~~status (string) [accepted, complete]~~
+  * send-message
+    * destination (string) [say] target of message, currently only 'say' is valid, which is text to speech
+    * first (id)
+    * word (string)
+    * next (id or string 'nil' to end)
+    * status (string) [accepted, complete, error]
+  * remove-message (id) remove a specific message from the received-messages list
+    * id (string)
+    * status (string) [accepted, complete, error]
+  * clear-messages (id) remove all messages from received-messages list
+    * status (string) [accepted, complete]
   * configure (id) set configuration parameters
     * yaw-format (string) [float, int] use integer data types for yaw
     * offset-x (float) relocate origin
