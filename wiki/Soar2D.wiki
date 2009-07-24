@@ -275,6 +275,9 @@ players
 || terminals.passenger_delivered || boolean  || || false || Passenger successfully delivered (taxi) ||
 || terminals.passenger_pick_up || boolean  || || false || Passenger removed from map (taxi) ||
 
+= Logging =
+http://logging.apache.org/log4j/1.2/index.html
+
 = Map Files =
 
 Maps are now stored in the config/maps/game folder where game is the game type, such as eaters.
