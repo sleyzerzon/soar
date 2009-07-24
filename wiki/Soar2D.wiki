@@ -3,6 +3,8 @@
 
 = Soar2D =
 
+Soar2D includes the Eaters, TankSoar, Taxi and [room Room] environments.
+
 <wiki:toc max_depth="2"/>
 
 ----
