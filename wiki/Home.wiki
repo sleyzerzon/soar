@@ -10,6 +10,7 @@ Welcome to the Soar Wiki, home of living documentation on Soar.
   * Getting started with Soar.
   * [FAQ Frequently asked questions].
   * Command line interface documentation.
+  * [Soar2D]
 
 = Developing with Soar =
   * Frequently asked questions.
