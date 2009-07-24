@@ -7,6 +7,8 @@ The Room environment is included in the soar-java/soar-soar2d folder in the Soar
 
 = Configuration =
 
+See [soar2d-cnf configuration help] for tags common to all Soar2D apps.
+
 = I/O =
 Strikeout denotes not implemented.
 
@@ -14,15 +16,15 @@ Strikeout denotes not implemented.
 input-link
   * time (id) wall clock time that soar has been running
     * seconds (int) seconds
-    * microseconds (int) [[0..1000000]] microsecond fraction of current second
+    * microseconds (int) (0..1000000) microsecond fraction of current second
   * self
     * name (string) agent name
     * area (int) room id
     * pose
       * x (float) current x in meters
       * y (float) current y in meters
-      * z (float) [0] current z in meters
-      * yaw (float or int) [-180..180]
+      * z (float) (0) current z in meters
+      * yaw (float or int) (-180..180)
       * ~~x-velocity (float) meters per second~~
       * ~~y-velocity (float) meters per second~~
       * ~~yaw-velocity (float) degrees per second~~
@@ -31,14 +33,14 @@ input-link
         * id (string) user-defined identifier string
         * x (float) x position in meters
         * y (float) y position in meters
-        * z (float) [0] z position in meters
-        * distance (float) [0..] distance to waypoint in meters
+        * z (float) (0) z position in meters
+        * distance (float) (0..) distance to waypoint in meters
         * yaw (float or int) what yaw to turn to to face the waypoint
         * relative-bearing (float or int) if positive then turn left
-        * abs-relative-bearing (float or int) [0..] absolute value of relative bearing
+        * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
     * received-messages
       * message (id) one of these for each received event
-        * from (string) [http] source of message
+        * from (string) (http) source of message
         * first (id) starts linked list
           * word (string)
           * next (id or sting "nil" to end)
@@ -49,47 +51,47 @@ input-link
 
 output-link
   * ~~motor (id) command motors directly~~
-    * ~~left (float) [-1.0..1.0] percent throttle~~
-    * ~~right (float) [-1.0..1.0] percent throttle~~
-    * ~~status (string) [accepted, executing, complete, error]~~
+    * ~~left (float) (-1.0..1.0) percent throttle~~
+    * ~~right (float) (-1.0..1.0) percent throttle~~
+    * ~~status (string) (accepted, executing, complete, error)~~
   * set-velocity
-    * linear-velocity (float) [-0.5..0.5] meters per second forward or reverse
-    * angular-velocity (float) [-180..180] rotation, degrees per second, positive is left turn
-    * status (string) [accepted, executing, complete, error]
+    * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
+    * angular-velocity (float) (-180..180) rotation, degrees per second, positive is left turn
+    * status (string) (accepted, executing, complete, error)
   * set-heading
-    * yaw (float or int) [-180..180] target yaw (modded, values outside this bounds OK)
-    * status (string) [accepted, executing, interrupted, complete, error]
+    * yaw (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
+    * status (string) (accepted, executing, interrupted, complete, error)
   * stop (id) graceful stop
-    * status (string) [accepted, executing, interrupted, complete, error]
+    * status (string) (accepted, executing, interrupted, complete, error)
   * estop (id) emergency stop
-    * status (string) [accepted, complete]
+    * status (string) (accepted, complete)
   * add-waypoint (id) enter a waypoint into the system, enabled
     * id (string) user-defined identifier string
     * x (float) x position in meters
     * y (float) y position in meters
-    * status (string) [accepted, complete, error]
+    * status (string) (accepted, complete, error)
   * remove-waypoint (id) remove the waypoint from the system
     * id (string)
-    * status (string) [accepted, complete, error]
+    * status (string) (accepted, complete, error)
   * enable-waypoint (id) enable a previously disabled waypoint
     * id (string)
-    * status (string) [accepted, complete, error]
+    * status (string) (accepted, complete, error)
   * disable-waypoint (id) disable an enabled waypoint
     * id (string)
-    * status (string) [accepted, complete, error]
+    * status (string) (accepted, complete, error)
   * send-message
-    * destination (string) [say] target of message, currently only 'say' is valid, which is text to speech
+    * destination (string) (say) target of message, currently only 'say' is valid, which is text to speech
     * first (id)
     * word (string)
     * next (id or string 'nil' to end)
-    * status (string) [accepted, complete, error]
+    * status (string) (accepted, complete, error)
   * remove-message (id) remove a specific message from the received-messages list
     * id (string)
-    * status (string) [accepted, complete, error]
+    * status (string) (accepted, complete, error)
   * clear-messages (id) remove all messages from received-messages list
-    * status (string) [accepted, complete]
+    * status (string) (accepted, complete)
   * configure (id) set configuration parameters
-    * yaw-format (string) [float, int] use integer data types for yaw
+    * yaw-format (string) (float, int) use integer data types for yaw
     * offset-x (float) relocate origin
     * offset-y (float) relocate origin
-    * status (string) [accepted, complete, error]
+    * status (string) (accepted, complete, error)
