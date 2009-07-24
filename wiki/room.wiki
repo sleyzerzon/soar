@@ -7,7 +7,14 @@ The Room environment is included in the soar-java/soar-soar2d folder in the Soar
 
 = Configuration =
 
-See [soar2dcnf configuration help] for tags common to all Soar2D apps.
+See [soar2dcnf configuration help]. Here is an example:
+
+{{{
+general.game = "room";
+general.map = "config/maps/room/default.txt";
+players.active_players = [ "robot" ];
+players.robot.productions = "agents/room/simple-robot.soar";
+}}}
 
 = I/O =
 Strikeout denotes not implemented.
