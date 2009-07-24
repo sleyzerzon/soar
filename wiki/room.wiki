@@ -7,7 +7,7 @@ The Room environment is included in the soar-java/soar-soar2d folder in the Soar
 
 = Configuration =
 
-See [soar2d-cnf configuration help] for tags common to all Soar2D apps.
+See [soar2dcnf configuration help] for tags common to all Soar2D apps.
 
 = I/O =
 Strikeout denotes not implemented.
