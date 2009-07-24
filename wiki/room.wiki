@@ -3,9 +3,9 @@
 
 Note: This help refers to the trunk and future releases, and is not included with the latest round of Soar releases (9.0.1, 9.1.1, 9.2.0).
 
-= Introduction =
-
 The Room environment is included in the soar-java/soar-soar2d folder in the Soar suite.
+
+= Configuration =
 
 = I/O =
 Strikeout denotes not implemented.
@@ -14,7 +14,7 @@ Strikeout denotes not implemented.
 input-link
   * time (id) wall clock time that soar has been running
     * seconds (int) seconds
-    * microseconds (int) [0..1000000] microsecond fraction of current second
+    * microseconds (int) [[0..1000000]] microsecond fraction of current second
   * self
     * name (string) agent name
     * area (int) room id
@@ -48,10 +48,10 @@ input-link
 == Output link specification ==
 
 output-link
-  * motor (id) command motors directly
-    * left (float) [-1.0..1.0] percent throttle
-    * right (float) [-1.0..1.0] percent throttle
-    * status (string) [accepted, executing, complete, error]
+  * ~~motor (id) command motors directly~~
+    * ~~left (float) [-1.0..1.0] percent throttle~~
+    * ~~right (float) [-1.0..1.0] percent throttle~~
+    * ~~status (string) [accepted, executing, complete, error]~~
   * set-velocity
     * linear-velocity (float) [-0.5..0.5] meters per second forward or reverse
     * angular-velocity (float) [-180..180] rotation, degrees per second, positive is left turn
