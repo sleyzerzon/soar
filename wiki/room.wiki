@@ -17,11 +17,12 @@ input-link
     * microseconds (int) [0..1000000] microsecond fraction of current second
   * self
     * name (string) agent name
+    * area (int) room id
     * pose
       * x (float) current x in meters
       * y (float) current y in meters
-      * ~~z (float) [0] current z in meters~~
-      * ~~yaw (float or int) [-180..180]~~
+      * z (float) [0] current z in meters
+      * yaw (float or int) [-180..180]
       * ~~x-velocity (float) meters per second~~
       * ~~y-velocity (float) meters per second~~
       * ~~yaw-velocity (float) degrees per second~~
@@ -30,7 +31,7 @@ input-link
         * id (string) user-defined identifier string
         * x (float) x position in meters
         * y (float) y position in meters
-        * ~~z (float) [0] z position in meters~~
+        * z (float) [0] z position in meters
         * distance (float) [0..] distance to waypoint in meters
         * yaw (float or int) what yaw to turn to to face the waypoint
         * relative-bearing (float or int) if positive then turn left
@@ -43,11 +44,6 @@ input-link
           * next (id or sting "nil" to end)
             * word (string)
             * next (id or string "nil" to end) ... etc.
-    * ~~ranges~~
-      * ~~range (id) one per range slice~~
-        * ~~start (float or int) [-180..180] starting degree that this range slice covers~~
-        * ~~end (float or int) [-180..180] ending degree that this range slice covers~~
-        * ~~distance (float) [0..] distance in meters to closest range in slice~~
 
 == Output link specification ==
 
