@@ -57,6 +57,39 @@ input-link
           * next (id or sting "nil" to end)
             * word (string)
             * next (id or string "nil" to end) ... etc.
+  * area-description
+    * gateway (id) one of these for each gateway
+      * center
+        * angle-off 
+          * yaw (float) relative angle to center
+        * range (float) distance to center
+        * x (float) position in meters
+        * y (float) position in meters
+      * direction (north, east, south, west) which wall the gateway is on
+      * id (int) unique identifying number
+      * to (room id on one side of gateway)
+      * to (room id on other side of gateway)
+    * wall
+      * center
+        * angle-off 
+          * yaw (float) relative angle to center
+        * x (float) position in meters
+        * y (float) position in meters
+      * direction (north, east, south, west) which wall it is on
+      * id (int) unique identifying number
+    * object
+      * id (int) unique identifying number
+      * angle-off 
+        * yaw (float) relative angle to center
+      * position
+        * x (float) position in meters
+        * y (float) position in meters
+      * range (float) distance to center of gateway
+      * visible (yes, no) object stays on input link briefly after it is not visible
+  * configuration
+    * yaw-format (float, int)
+    * offset-x (float)
+    * offset-y (float)
 
 == Output link specification ==
 
