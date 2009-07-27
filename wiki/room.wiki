@@ -58,8 +58,9 @@ input-link
             * word (string)
             * next (id or string "nil" to end) ... etc.
   * area-description
-    * id (int) unique identifying number for area
+    * id (int) unique identifying number
     * gateway (id) one of these for each gateway
+      * id (int) unique identifying number
       * yaw (float) relative angle to center
       * range (float) distance to center
       * x (float) position in meters
@@ -68,6 +69,7 @@ input-link
       * to (room id on one side of gateway)
       * to (room id on other side of gateway)
     * wall (id) one of these for each wall
+      * id (int) unique identifying number
       * yaw (float) relative angle to center
       * x (float) position in meters
       * y (float) position in meters
