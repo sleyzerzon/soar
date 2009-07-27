@@ -58,13 +58,13 @@ input-link
             * word (string)
             * next (id or string "nil" to end) ... etc.
   * area-description
+    * id (int) unique identifying number for area
     * gateway (id) one of these for each gateway
       * yaw (float) relative angle to center
       * range (float) distance to center
       * x (float) position in meters
       * y (float) position in meters
       * direction (string) (north, east, south, west) which wall the gateway is on
-      * id (int) unique identifying number
       * to (room id on one side of gateway)
       * to (room id on other side of gateway)
     * wall (id) one of these for each wall
@@ -72,9 +72,9 @@ input-link
       * x (float) position in meters
       * y (float) position in meters
       * direction (string) (north, east, south, west) which wall it is on
-      * id (int) unique identifying number
   * object (id) one of these for each block, player, etc.
-    * id (int) unique identifying number or (string) agent name
+    * id (int) unique identifying number if object
+    * name (string) agent name if other player
     * yaw (float) relative angle to center
     * x (float) position in meters
     * y (float) position in meters
