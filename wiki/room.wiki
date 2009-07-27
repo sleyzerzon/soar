@@ -65,7 +65,7 @@ input-link
         * range (float) distance to center
         * x (float) position in meters
         * y (float) position in meters
-      * direction (north, east, south, west) which wall the gateway is on
+      * direction (string) (north, east, south, west) which wall the gateway is on
       * id (int) unique identifying number
       * to (room id on one side of gateway)
       * to (room id on other side of gateway)
@@ -75,7 +75,7 @@ input-link
           * yaw (float) relative angle to center
         * x (float) position in meters
         * y (float) position in meters
-      * direction (north, east, south, west) which wall it is on
+      * direction (string) (north, east, south, west) which wall it is on
       * id (int) unique identifying number
     * object
       * id (int) unique identifying number
@@ -85,7 +85,7 @@ input-link
         * x (float) position in meters
         * y (float) position in meters
       * range (float) distance to center of gateway
-      * visible (yes, no) object stays on input link briefly after it is not visible
+      * visible (string) (yes, no) object stays on input link briefly after it is not visible
   * configuration
     * yaw-format (float, int)
     * offset-x (float)
@@ -138,4 +138,10 @@ output-link
     * yaw-format (string) (float, int) use integer data types for yaw
     * offset-x (float) relocate origin
     * offset-y (float) relocate origin
+    * status (string) (accepted, complete, error)
+  * get-object (id) get object by id
+    * id (int) target object id
+    * status (string) (accepted, complete, error)
+  * drop-object (id) drop object by id
+    * id (int) target object id
     * status (string) (accepted, complete, error)
