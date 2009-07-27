@@ -32,9 +32,10 @@ input-link
       * y (float) current y in meters
       * z (float) (0) current z in meters
       * yaw (float or int) (-180..180)
-      * ~~x-velocity (float) meters per second~~
-      * ~~y-velocity (float) meters per second~~
-      * ~~yaw-velocity (float) degrees per second~~
+      * x-velocity (float) meters per second
+      * y-velocity (float) meters per second
+      * z-velocity (float) meters per second
+      * yaw-velocity (float) degrees per second
     * collision
       * x (string) (true, false) colliding on x-axis
       * y (string) (true, false) colliding on y-axis
