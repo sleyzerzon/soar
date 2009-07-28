@@ -61,27 +61,39 @@ input-link
     * id (int) unique identifying number
     * gateway (id) one of these for each gateway
       * id (int) unique identifying number
-      * yaw (float) relative angle to center
-      * range (float) distance to center
-      * x (float) position in meters
-      * y (float) position in meters
       * direction (string) (north, east, south, west) which wall the gateway is on
       * to (room id on one side of gateway)
       * to (room id on other side of gateway)
+      * x (float) x position in meters
+      * y (float) y position in meters
+      * z (float) (0) z position in meters
+      * distance (float) (0..) distance in meters
+      * yaw (float or int) what yaw to turn to to face it
+      * relative-bearing (float or int) if positive then turn left
+      * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
     * wall (id) one of these for each wall
       * id (int) unique identifying number
-      * yaw (float) relative angle to center
-      * x (float) position in meters
-      * y (float) position in meters
       * direction (string) (north, east, south, west) which wall it is on
-  * object (id) one of these for each block, player, etc.
+      * x (float) x position in meters
+      * y (float) y position in meters
+      * z (float) (0) z position in meters
+      * distance (float) (0..) distance in meters
+      * yaw (float or int) what yaw to turn to to face it
+      * relative-bearing (float or int) if positive then turn left
+      * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
+  * object (id) one of these for each block, player
+    * type (string) (block, player) type of object
     * id (int) unique identifying number if object
-    * name (string) agent name if other player
-    * yaw (float) relative angle to center
-    * x (float) position in meters
-    * y (float) position in meters
-    * range (float) distance to center of gateway
-    * visible (string) (yes, no) object stays on input link briefly after it is not visible
+    * name (string) unique agent name if other player
+    * visible (string) (yes, no) object stays on input link briefly after it is not 
+    * x (float) x position in meters
+    * y (float) y position in meters
+    * z (float) (0) z position in meters
+    * distance (float) (0..) distance in meters
+    * yaw (float or int) what yaw to turn to to face it
+    * relative-bearing (float or int) if positive then turn left
+    * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
+visible
   * configuration
     * yaw-format (float, int)
     * offset-x (float)
