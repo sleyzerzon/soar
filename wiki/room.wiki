@@ -110,7 +110,14 @@ A note about status error: most commands that return with status error will have
 
 === Drive Commands ===
 
-Note: only *one* of the drive commands can be issued at a time. If more than one command is issued, the system arbitrarily picks one unless one of them is _estop_, which overrides all other drive commands.
+Only *one* of the drive commands can be issued at a time. If more than one command is issued, the system arbitrarily picks one unless one of them is _estop_, which overrides all other drive commands.
+
+All parameters for the command must be on the same identifier of the command. For example:
+
+{{{
+<s> ^io.output-link.set-velocity <sv>
+<sv> ^linear-velocity 1. ^angular velocity 1.
+}}}
 
   * ~~motor (id) command motors directly~~
     * ~~left (float) (-1.0..1.0) percent throttle~~
