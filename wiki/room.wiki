@@ -119,7 +119,7 @@ Note: only *one* of the drive commands can be issued at a time. If more than one
 
   * set-velocity (id)
     * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
-    * angular-velocity (float) (-180..180) rotation, degrees per second, positive is left turn
+    * angular-velocity (float) rotation, degrees per second, positive is left turn
     * status (string) (accepted, executing, complete, error)
 
   * set-linear-velocity (id)
@@ -127,7 +127,7 @@ Note: only *one* of the drive commands can be issued at a time. If more than one
     * status (string) (accepted, executing, complete, error)
 
   * set-angular-velocity (id)
-    * angular-velocity (float) (-180..180) rotation, degrees per second, positive is left turn
+    * angular-velocity (float) rotation, degrees per second, positive is left turn
     * status (string) (accepted, executing, complete, error)
 
   * set-heading (id)
