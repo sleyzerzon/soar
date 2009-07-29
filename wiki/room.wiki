@@ -101,55 +101,100 @@ visible
 
 == Output link specification ==
 
-output-link
+A note about status error: most commands that return with status error will have an error message attached for debugging. Example, `<m>` below could contain `set-velocity: Unable to parse linear-velocity`
+
+{{{
+<s> ^io.output-link.set-velocity <sv>
+<sv> ^status error ^message <m>
+}}}
+
+=== Drive Commands ===
+
+Note: only *one* of the drive commands can be issued at a time. If more than one command is issued, the system arbitrarily picks one unless one of them is _estop_, which overrides all other drive commands.
+
   * ~~motor (id) command motors directly~~
     * ~~left (float) (-1.0..1.0) percent throttle~~
     * ~~right (float) (-1.0..1.0) percent throttle~~
     * ~~status (string) (accepted, executing, complete, error)~~
-  * set-velocity
+
+  * set-velocity (id)
     * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
     * angular-velocity (float) (-180..180) rotation, degrees per second, positive is left turn
     * status (string) (accepted, executing, complete, error)
-  * set-heading
+
+  * set-linear-velocity (id)
+    * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
+    * status (string) (accepted, executing, complete, error)
+
+  * set-angular-velocity (id)
+    * angular-velocity (float) (-180..180) rotation, degrees per second, positive is left turn
+    * status (string) (accepted, executing, complete, error)
+
+  * set-heading (id)
     * yaw (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
     * status (string) (accepted, executing, interrupted, complete, error)
+
+  * set-heading-linear (id)
+    * yaw (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
+    * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
+    * status (string) (accepted, executing, interrupted, complete, error)
+
   * stop (id) graceful stop
     * status (string) (accepted, executing, interrupted, complete, error)
+
   * estop (id) emergency stop
     * status (string) (accepted, complete)
+
+=== Effector Commands ===
+(Not implemented yet)
+
+  * ~~get-object (id) get object by id~~
+    * ~~id (int) target object id~~
+    * ~~status (string) (accepted, complete, error)~~
+
+  * ~~drop-object (id) drop object by id~~
+    * ~~id (int) target object id~~
+    * ~~status (string) (accepted, complete, error)~~
+
+=== Waypoint Commands ===
+
   * add-waypoint (id) enter a waypoint into the system, enabled
     * id (string) user-defined identifier string
     * x (float) x position in meters
     * y (float) y position in meters
     * status (string) (accepted, complete, error)
+
   * remove-waypoint (id) remove the waypoint from the system
     * id (string)
     * status (string) (accepted, complete, error)
+
   * enable-waypoint (id) enable a previously disabled waypoint
     * id (string)
     * status (string) (accepted, complete, error)
+
   * disable-waypoint (id) disable an enabled waypoint
     * id (string)
     * status (string) (accepted, complete, error)
+
+=== Communication Commands ===
+
   * send-message
     * destination (string) (say) target of message, currently only 'say' is valid, which is text to speech
     * first (id)
     * word (string)
     * next (id or string 'nil' to end)
     * status (string) (accepted, complete, error)
+
   * remove-message (id) remove a specific message from the received-messages list
     * id (string)
     * status (string) (accepted, complete, error)
+
   * clear-messages (id) remove all messages from received-messages list
     * status (string) (accepted, complete)
-  * configure (id) set configuration parameters
+
+=== Other Commands ===
+  * configure (id) set environment configuration parameters
     * yaw-format (string) (float, int) use integer data types for yaw
     * offset-x (float) relocate origin
     * offset-y (float) relocate origin
-    * status (string) (accepted, complete, error)
-  * get-object (id) get object by id
-    * id (int) target object id
-    * status (string) (accepted, complete, error)
-  * drop-object (id) drop object by id
-    * id (int) target object id
     * status (string) (accepted, complete, error)
