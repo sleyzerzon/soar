@@ -156,7 +156,6 @@ All parameters for the command must be on the same identifier of the command. Fo
     * status (string) (accepted, complete)
 
 === Effector Commands ===
-You can get an object that is up to a meter from you. You drop an object in the cell you're in, but just a little bit in front of you so that you can see it on your input link. There is an edge case where, when you drop the object, this "little bit in front of you" will be a different cell than the one you're in, and that cell could be blocked. If that cell is blocked, the drop will fail.
 
   * get-object (id) get object by id
     * id (int) target object id
