@@ -20,93 +20,93 @@ players.robot.productions = "agents/room/simple-robot.soar";
 Strikeout denotes not implemented.
 
 == Input link specification =
-Attributes in _italics_ are identifier WMEs.
+Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leaves.
 
   * _time_ 
-    * seconds (int) seconds
-    * microseconds (int) (0..1000000) microsecond fraction of current second
+    * *seconds* (int) seconds
+    * *microseconds* (int) (0..1000000) microsecond fraction of current second
 
   * _self_
-    * name (string) agent name
-    * area (int) unique identifying number for area/room
+    * *name* (string) agent name
+    * *area* (int) unique identifying number for area/room
     * _carry_ information about carried object, not present if nothing carried
-      * id (int) unique identifying number for object
-      * type (string) type of object (only block, for now)
+      * *id* (int) unique identifying number for object
+      * *type* (string) type of object (only block, for now)
     * _pose_
-      * x (float) current x in meters
-      * y (float) current y in meters
-      * z (float) (0) current z in meters
-      * yaw (float or int) (-180..180)
-      * x-velocity (float) meters per second
-      * y-velocity (float) meters per second
-      * z-velocity (float) meters per second
-      * yaw-velocity (float) degrees per second
+      * *x* (float) current x in meters
+      * *y* (float) current y in meters
+      * *z* (float) (0) current z in meters
+      * *yaw* (float or int) (-180..180)
+      * *x-velocity* (float) meters per second
+      * *y-velocity* (float) meters per second
+      * *z-velocity* (float) meters per second
+      * yaw-velocity* (float) degrees per second
     * _collision_
-      * x (string) (true, false) colliding on x-axis
-      * y (string) (true, false) colliding on y-axis
+      * *x* (string) (true, false) colliding on x-axis
+      * *y* (string) (true, false) colliding on y-axis
     * _waypoints_
       * _waypoint_ one for each registered, enabled waypoint
-        * id (int, float, or string) user-defined unique identifier in user-defined type
-        * x (float) x position in meters
-        * y (float) y position in meters
-        * z (float) (0) z position in meters
-        * distance (float) (0..) distance to waypoint in meters
-        * yaw (float or int) what yaw to turn to to face the waypoint
-        * relative-bearing (float or int) if positive then turn left
-        * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
+        * *id* (int, float, or string) user-defined unique identifier in user-defined type
+        * *x* (float) x position in meters
+        * *y* (float) y position in meters
+        * *z* (float) (0) z position in meters
+        * *distance* (float) (0..) distance to waypoint in meters
+        * *yaw* (float or int) what yaw to turn to to face the waypoint
+        * *relative-bearing* (float or int) if positive then turn left
+        * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
     * _received-messages_
       * _message_ one for each received message
-        * id (int) unique identifying number for message
-        * from (string) (http) source of message
+        * *id* (int) unique identifying number for message
+        * *from* (string) (http) source of message
         * _first_ (id) starts linked list
-          * word (string)
+          * *word* (string)
           * _next_ (identifier *or* string "nil" to end)
-            * word (string)
+            * *word* (string)
             * _next_ (identifier *or* string "nil" to end)
 
   * _area-description_
-    * id (int) unique identifying number for area/room
+    * *id* (int) unique identifying number for area/room
     * _gateway_
-      * id (int) unique identifying number for gateway
-      * direction (string) (north, east, south, west) which wall the gateway is on
-      * to (room id on one side of gateway)
-      * to (room id on other side of gateway)
-      * x (float) x position in meters
-      * y (float) y position in meters
-      * z (float) (0) z position in meters
-      * distance (float) (0..) distance in meters
-      * yaw (float or int) what yaw to turn to to face it
-      * relative-bearing (float or int) if positive then turn left
-      * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
+      * *id* (int) unique identifying number for gateway
+      * *direction* (string) (north, east, south, west) which wall the gateway is on
+      * *to* (room id on one side of gateway)
+      * *to* (room id on other side of gateway)
+      * *x* (float) x position in meters
+      * *y* (float) y position in meters
+      * *z* (float) (0) z position in meters
+      * *distance* (float) (0..) distance in meters
+      * *yaw* (float or int) what yaw to turn to to face it
+      * *relative-bearing* (float or int) if positive then turn left
+      * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
     * _wall_
-      * id (int) unique identifying number for wall
-      * direction (string) (north, east, south, west) which wall it is on
-      * x (float) x position in meters
-      * y (float) y position in meters
-      * z (float) (0) z position in meters
-      * distance (float) (0..) distance in meters
-      * yaw (float or int) what yaw to turn to to face it
-      * relative-bearing (float or int) if positive then turn left
-      * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
+      * *id* (int) unique identifying number for wall
+      * *direction* (string) (north, east, south, west) which wall it is on
+      * *x* (float) x position in meters
+      * *y* (float) y position in meters
+      * *z* (float) (0) z position in meters
+      * *distance* (float) (0..) distance in meters
+      * *yaw* (float or int) what yaw to turn to to face it
+      * *relative-bearing* (float or int) if positive then turn left
+      * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
 
   * _object_
-    * type (string) (block, player) type of object
-    * id (int) unique identifying number for objects
-    * name (string) unique agent name if other player
-    * visible (string) (yes, no) object stays on input link briefly after it is not 
-    * x (float) x position in meters
-    * y (float) y position in meters
-    * z (float) (0) z position in meters
-    * distance (float) (0..) distance in meters
-    * yaw (float or int) what yaw to turn to to face it
-    * relative-bearing (float or int) if positive then turn left
-    * abs-relative-bearing (float or int) (0..) absolute value of relative bearing
+    * *type* (string) (block, player) type of object
+    * *id* (int) unique identifying number for objects
+    * *name* (string) unique agent name if other player
+    * *visible* (string) (yes, no) object stays on input link briefly after it is not 
+    * *x* (float) x position in meters
+    * *y* (float) y position in meters
+    * *z* (float) (0) z position in meters
+    * *distance* (float) (0..) distance in meters
+    * *yaw* (float or int) what yaw to turn to to face it
+    * *relative-bearing* (float or int) if positive then turn left
+    * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
 
   * _configuration_
-    * yaw-format (string) (float, int)
-    * offset-x (float)
-    * offset-y (float)
-    * offset-z (float)
+    * *yaw-format* (string) (float, int)
+    * *offset-x* (float)
+    * *offset-y* (float)
+    * *offset-z* (float)
 
 == Output link specification ==
 
@@ -129,89 +129,89 @@ All parameters for the command must be on the same identifier of the command. Fo
 }}}
 
   * ~~_motor_~~
-    * ~~left (float) (-1.0..1.0) percent throttle~~
-    * ~~right (float) (-1.0..1.0) percent throttle~~
-    * ~~status (string) (accepted, executing, complete, error)~~
+    * ~~*left* (float) (-1.0..1.0) percent throttle~~
+    * ~~*right* (float) (-1.0..1.0) percent throttle~~
+    * ~~*status* (string) (accepted, executing, complete, error)~~
 
   * _set-velocity_
-    * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
-    * angular-velocity (float) rotation, degrees per second, positive is left turn
-    * status (string) (accepted, executing, complete, error)
+    * *linear-velocity* (float) (-0.5..0.5) meters per second forward or reverse
+    * *angular-velocity* (float) rotation, degrees per second, positive is left turn
+    * *status* (string) (accepted, executing, complete, error)
 
   * _set-linear-velocity_
-    * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
-    * status (string) (accepted, executing, complete, error)
+    * *linear-velocity* (float) (-0.5..0.5) meters per second forward or reverse
+    * *status* (string) (accepted, executing, complete, error)
 
   * _set-angular-velocity_
-    * angular-velocity (float) rotation, degrees per second, positive is left turn
-    * status (string) (accepted, executing, complete, error)
+    * *angular-velocity* (float) rotation, degrees per second, positive is left turn
+    * *status* (string) (accepted, executing, complete, error)
 
   * _set-heading_
-    * yaw (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
-    * status (string) (accepted, executing, interrupted, complete, error)
+    * *yaw* (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
+    * *status* (string) (accepted, executing, interrupted, complete, error)
 
   * _set-heading-linear_
-    * yaw (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
-    * linear-velocity (float) (-0.5..0.5) meters per second forward or reverse
-    * status (string) (accepted, executing, interrupted, complete, error)
+    * *yaw* (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
+    * *linear-velocity* (float) (-0.5..0.5) meters per second forward or reverse
+    * *status* (string) (accepted, executing, interrupted, complete, error)
 
   * _stop_ graceful stop
-    * status (string) (accepted, executing, interrupted, complete, error)
+    * *status* (string) (accepted, executing, interrupted, complete, error)
 
   * _estop_ emergency stop
-    * status (string) (accepted, complete)
+    * *status* (string) (accepted, complete)
 
 === Effector Commands ===
 
   * _get-object_
-    * id (int) target object id
-    * status (string) (accepted, complete, error)
+    * *id* (int) target object id
+    * *status* (string) (accepted, complete, error)
 
   * _drop-object_
-    * id (int) target object id
-    * status (string) (accepted, complete, error)
+    * *id* (int) target object id
+    * *status* (string) (accepted, complete, error)
 
 === Waypoint Commands ===
 
   * _add-waypoint_ enter a waypoint into the system, enabled
-    * id (int, float, string) user-defined identifier string, type will be replicated on input-link
-    * x (float) x position in meters
-    * y (float) y position in meters
-    * status (string) (accepted, complete, error)
+    * *id* (int, float, string) user-defined identifier string, type will be replicated on input-link
+    * *x* (float) x position in meters
+    * *y* (float) y position in meters
+    * *status* (string) (accepted, complete, error)
 
   * _remove-waypoint_ remove the waypoint from the system
-    * id (int, float, string)
-    * status (string) (accepted, complete, error)
+    * *id* (int, float, string)
+    * *status* (string) (accepted, complete, error)
 
   * _enable-waypoint_ enable a previously disabled waypoint
-    * id (int, float, string)
-    * status (string) (accepted, complete, error)
+    * *id* (int, float, string)
+    * *status* (string) (accepted, complete, error)
 
   * _disable-waypoint_ disable an enabled waypoint
-    * id (int, float, string)
-    * status (string) (accepted, complete, error)
+    * *id* (int, float, string)
+    * *status* (string) (accepted, complete, error)
 
 === Communication Commands ===
 
   * _send-message_
-    * destination (string) (say) target of message, currently only 'say' is valid, which is text to speech
+    * *destination* (string) (say) target of message, currently only 'say' is valid, which is text to speech
     * _first_
-      * word (string0)
+      * *word* (string0)
       * _next_ (identifier *or* string "nil" to end)
-        * word (string0)
+        * *word* (string0)
         * _next_ (identifier *or* string "nil" to end)
-    * status (string) (accepted, complete, error)
+    * *status* (string) (accepted, complete, error)
 
   * _remove-message_ remove a specific message from the received-messages list
-    * id (string)
-    * status (string) (accepted, complete, error)
+    * *id* (string)
+    * *status* (string) (accepted, complete, error)
 
   * _clear-messages_ (id) remove all messages from received-messages list
-    * status (string) (accepted, complete)
+    * *status* (string) (accepted, complete)
 
 === Other Commands ===
   * _configure_ set environment configuration parameters
-    * yaw-format (string) (float, int) use integer data types for yaw
-    * offset-x (float) relocate origin
-    * offset-y (float) relocate origin
-    * status (string) (accepted, complete, error)
+    * *yaw-format* (string) (float, int) use integer data types for yaw
+    * *offset-x* (float) relocate origin
+    * *offset-y* (float) relocate origin
+    * *status* (string) (accepted, complete, error)
