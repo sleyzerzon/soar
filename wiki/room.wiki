@@ -44,7 +44,7 @@ input-link
       * y (string) (true, false) colliding on y-axis
     * waypoints
       * waypoint (id) one of these for each registered, enabled waypoint
-        * id (string) user-defined identifier string
+        * id (int, float, or string) user-defined identifier string in user-defined type
         * x (float) x position in meters
         * y (float) y position in meters
         * z (float) (0) z position in meters
@@ -168,21 +168,21 @@ All parameters for the command must be on the same identifier of the command. Fo
 === Waypoint Commands ===
 
   * add-waypoint (id) enter a waypoint into the system, enabled
-    * id (string) user-defined identifier string
+    * id (int, float, string) user-defined identifier string, type will be replicated on input-link
     * x (float) x position in meters
     * y (float) y position in meters
     * status (string) (accepted, complete, error)
 
   * remove-waypoint (id) remove the waypoint from the system
-    * id (string)
+    * id (int, float, string)
     * status (string) (accepted, complete, error)
 
   * enable-waypoint (id) enable a previously disabled waypoint
-    * id (string)
+    * id (int, float, string)
     * status (string) (accepted, complete, error)
 
   * disable-waypoint (id) disable an enabled waypoint
-    * id (string)
+    * id (int, float, string)
     * status (string) (accepted, complete, error)
 
 === Communication Commands ===
