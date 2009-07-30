@@ -27,6 +27,9 @@ input-link
   * self
     * name (string) agent name
     * area (int) room id
+    * carry (id) information about carried object, not present if nothing
+      * id (int) id
+      * type (string) type of object (only block, for now)
     * pose
       * x (float) current x in meters
       * y (float) current y in meters
@@ -155,13 +158,13 @@ All parameters for the command must be on the same identifier of the command. Fo
 === Effector Commands ===
 (Not implemented yet)
 
-  * ~~get-object (id) get object by id~~
-    * ~~id (int) target object id~~
-    * ~~status (string) (accepted, complete, error)~~
+  * get-object (id) get object by id
+    * id (int) target object id
+    * status (string) (accepted, complete, error)
 
-  * ~~drop-object (id) drop object by id~~
-    * ~~id (int) target object id~~
-    * ~~status (string) (accepted, complete, error)~~
+  * drop-object (id) drop object by id
+    * id (int) target object id
+    * status (string) (accepted, complete, error)
 
 === Waypoint Commands ===
 
