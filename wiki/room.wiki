@@ -40,7 +40,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
       * *x-velocity* (float) meters per second
       * *y-velocity* (float) meters per second
       * *z-velocity* (float) meters per second
-      * yaw-velocity* (float) degrees per second
+      * *yaw-velocity* (float) degrees per second
     * _collision_
       * *x* (string) (true, false) colliding on x-axis
       * *y* (string) (true, false) colliding on y-axis
