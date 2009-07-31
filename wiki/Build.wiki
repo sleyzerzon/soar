@@ -1,0 +1,13 @@
+#summary Checkout and build procedure
+
+_Note: this is a work in progress._
+
+= Checkout =
+
+See the source tab for instructions on how to check out Soar. Note that most users will only need the `SoarSuite` sub-folder of trunk.
+
+= Prerequisites =
+
+== Java ==
+Most users will want to use Java, as most of the Soar tools and environments are written in Java.
+  * Download and install the latest Java SE 6 JDK from http://java.sun.com/javase/downloads/index.jsp
