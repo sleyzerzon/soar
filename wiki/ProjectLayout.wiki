@@ -3,7 +3,5 @@
 
 Note: This is written for the reorganization and may not yet reflect the trunk.
 
-= SoarSuite =
-
-== soar-java ==
-Soar Java tools, environments, and examples.
+  * soar-java
+    * Soar Java tools, environments, and examples.
