@@ -206,7 +206,7 @@ All parameters for the command must be on the same identifier of the command. Fo
     * *id* (string)
     * *status* (string) (accepted, complete, error)
 
-  * _clear-messages_ (id) remove all messages from received-messages list
+  * _clear-messages_ remove all messages from received-messages list
     * *status* (string) (accepted, complete)
 
 === Other Commands ===
