@@ -57,7 +57,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
     * _received-messages_
       * _message_ one for each received message
         * *id* (int) unique identifying number for message
-        * *from* (string) (http) source of message
+        * *from* (string) source of message
         * _first_ (id) starts linked list
           * *word* (string)
           * _next_ (identifier *or* string "nil" to end)
