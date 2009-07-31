@@ -194,7 +194,7 @@ All parameters for the command must be on the same identifier of the command. Fo
 === Communication Commands ===
 
   * _send-message_
-    * *destination* (string) (say) target of message, currently only 'say' is valid, which is text to speech
+    * *destination* (string) (say) target of message or omit to broadcast to all available listeners
     * _first_
       * *word* (string0)
       * _next_ (identifier *or* string "nil" to end)
