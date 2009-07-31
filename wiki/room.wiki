@@ -57,7 +57,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
     * _received-messages_
       * _message_ one for each received message
         * *id* (int) unique identifying number for message
-        * *from* (string) source of message
+        * *from* (string) source of message (agent name)
         * _first_ (id) starts linked list
           * *word* (string)
           * _next_ (identifier *or* string "nil" to end)
@@ -193,8 +193,16 @@ All parameters for the command must be on the same identifier of the command. Fo
 
 === Communication Commands ===
 
+Messages sent will appear on the input link after a one-decision-cycle delay.
+
+The `destination` parameter for `send-message` is optional. If omitted, message will be broadcast to all listeners, including the sending agent.
+
+The `say` destination is not currently implemented on windows platforms.
+
+The `remove-message` command uses the message id number, available at `io.input-link.self.received-messages.message.id`
+
   * _send-message_
-    * *destination* (string) (say) target of message or omit to broadcast to all available listeners
+    * *destination* (string) target of message or omit to broadcast to all available listeners
     * _first_
       * *word* (string0)
       * _next_ (identifier *or* string "nil" to end)
