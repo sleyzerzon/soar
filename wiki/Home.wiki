@@ -1,4 +1,4 @@
-#summary Soar Wiki Home
+#summary Soar wiki home, documentation portal
 #labels Featured,Phase-Support
 Welcome to the Soar Wiki, home of living documentation on Soar.
 
@@ -14,7 +14,7 @@ Welcome to the Soar Wiki, home of living documentation on Soar.
 
 = Developing with Soar =
   * Frequently asked questions.
-  * Checkout and build procedure details.
+  * [Build Checkout and build procedure details].
 
 = Examples and Environments =
  * [sps Splinter Soar]
