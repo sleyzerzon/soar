@@ -1,13 +1,55 @@
 #summary Checkout and build procedure
 
-_Note: this is a work in progress._
+= Windows =
 
-= Checkout =
+32-bit and 64-bit Windows platforms are supported for Windows XP and Vista. Other versions of 32-bit windows might work but are not officially supported.
+
+== Prerequisites ==
+
+Either Microsoft Visual Studio 2008 or Microsoft Visual C++ 2008 Express Edition is required to build Soar. 
+  * Install Visual Studio 2008 if you have access to it, or download and install Visual C++ 2008 Express Edition from [http://www.microsoft.com/express/vc/ microsoft.com]. 
+
+SWIG is recommended, or required if any of the language interfaces are used (such as Java, Python, or Tcl).
+  * Download the latest version of *swigwin* from [http://www.swig.org/download.html swig.org].
+  * Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`.
+
+Java is recommended for most users, as most of the Soar tools and environments are written in Java.
+  * Download and install the latest Java SE 6 JDK from [http://java.sun.com/javase/downloads/index.jsp java.sun.com].
+    * If targeting 64-bit, download the 64-bit version of the JDK.
+
+The Apache Ant build system is required if using Java applications.
+  * Download ant from [http://ant.apache.org/ ant.apache.org].
+  * Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`.
+
+Eclipse is recommended if doing Java development.
+  * Download the latest version of Eclipse from [http://eclipse.org eclipse.org]
+    * If targeting 64-bit, download the 64-bit version of Eclipse, found on [http://download.eclipse.org/eclipse/downloads/ download.eclipse.org].
+  * Extract anywhere you have write permissions without authentication, such as your home folder. System folders (such as `C:\Program Files`) are not recommended locations for Eclipse.
+
+A Subversion client is required. The Soar group at U of M mainly uses TortoiseSVN and/or Subclipse (within Eclipse).
+  * Download and install TortoiseSVN from [http://tortoisesvn.net/downloads tortoisesvn.net].
+  * Install Subclipse if you're using Eclipse by visiting the Help -> Install new software  dialog and adding the site `http://subclipse.tigris.org/update_1.6.x`.
+    * If targeting 64-bit, you may need to install (the 64-bit version of) SlikSVN to get Subclipse to work correctly, available at [http://www.sliksvn.com/en/download/ sliksvn.com]. Eclipse may need to be restarted to see the SlikSVN libraries.
+
+Python 2.6 is recommended, or required if the Python SML interface is desired. Other versions of Python will not work "out of the box."
+  * Download and install Python *2.6* from [http://www.python.org/download/releases/2.6/ python.org].
+
+Tcl/Tk is optional, or required if the Tcl SML interface is desired.
+  * Download and install Tcl/Tk *8.4* from [http://www.activestate.com/activetcl/downloads/ activestate.com]
+
+== System Settings ==
+
+PATH
+_HOME
+
+== Checkout ==
 
 See the source tab for instructions on how to check out Soar. Note that most users will only need the `SoarSuite` sub-folder of trunk.
 
-= Prerequisites =
+= Linux =
 
 == Java ==
-Most users will want to use Java, as most of the Soar tools and environments are written in Java.
-  * Download and install the latest Java SE 6 JDK from http://java.sun.com/javase/downloads/index.jsp
+
+== Subversion ==
+
+== Ant ==
