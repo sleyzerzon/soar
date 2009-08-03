@@ -66,6 +66,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
 
   * _area-description_
     * *id* (int) unique identifying number for area/room
+    * *type* (string) (door, room) type of room
     * _gateway_
       * *id* (int) unique identifying number for gateway
       * *direction* (string) (north, east, south, west) which wall the gateway is on
