@@ -91,7 +91,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
       * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
 
   * _object_
-    * *type* (string) (block, player) type of object
+    * *type* (string) (block, brick, ball, player) type of object
     * *id* (int) unique identifying number for objects
     * *name* (string) unique agent name if other player
     * *visible* (string) (yes, no) object stays on input link briefly after it is not 
@@ -102,6 +102,8 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
     * *yaw* (float or int) what yaw to turn to to face it
     * *relative-bearing* (float or int) if positive then turn left
     * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
+    * *color* (string) object color
+    * *weight* (float) object weight in kg, only for non-player types
 
   * _configuration_
     * *yaw-format* (string) (float, int)
