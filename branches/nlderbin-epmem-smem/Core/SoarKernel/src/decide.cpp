@@ -757,6 +757,7 @@ void do_demotion (agent* thisAgent) {
     thisAgent->disconnected_ids = thisAgent->disconnected_ids->next;
     id = static_cast<symbol_union *>(dc->item);
     free_with_pool (&thisAgent->dl_cons_pool, dc);
+	id->id.unknown_level = NIL;
     garbage_collect_id (thisAgent, id);
     symbol_remove_ref (thisAgent, id);
   }
