@@ -9,7 +9,7 @@
 
 32-bit and 64-bit Windows platforms are supported for Windows XP and Vista. Other versions of 32-bit windows might work but are not officially supported.
 
-== Prerequisites ==
+== Windows Prerequisites ==
 
 Some of the prerequisites are listed as recommended or optional. Please note that if all are not installed (except Tcl on 64-bit, see below), some ignorable build errors will be encountered as unsupported language interfaces fail to build. Close the related projects to avoid seeing the errors.
 
@@ -48,7 +48,7 @@ Python 2.6 is recommended, or required if the Python SML interface is desired. O
 Tcl/Tk is optional, or required if the Tcl SML interface is desired. Tcl/Tk is not supported for 64-bit targets.
   * Download and install Tcl/Tk *8.4* from [http://www.activestate.com/activetcl/downloads/ activestate.com]
 
-== Environment ==
+== Windows Environment ==
 
 Visual Studio looks at the environment variables for a number of program locations, depending on what language interfaces you are building.
   * `ANT_HOME`: Full path to the Apache Ant folder, which will vary depending on the downloaded Ant version and where it was extracted. Example: `C:\apache-ant-1.7.1`
@@ -61,13 +61,13 @@ The full path to Ant's bin folder should be manually added to the PATH environme
 
 Eclipse users targeting 64-bit should also add SlikSVN's bin folder to the PATH environment variable, usually `C:\Program Files\SlikSvn\bin`
 
-== Checkout ==
+== Windows Checkout ==
 
 See the [http://code.google.com/p/soar/source/checkout source tab] for instructions on how to check out Soar.
 
 Eclipse users, do not import projects in Eclipse by checking them out there. Instead, check everything out outside of Eclipse and import later with the instructions below.
 
-== Build ==
+== Windows Build ==
 
 Open SML9.sln in the project root with Visual Studio and select build options:
   * *Platform*: _win32_, _x64_.
@@ -86,7 +86,7 @@ Next, build the Java apps and associated documentation. This requires Apache Ant
   * cd C:\path\to\soar
   * Execute ant: `ant`
 
-== Eclipse Setup ==
+== Windows Eclipse Setup ==
 
 If you haven't built the Java apps outside of Eclipse, do so now.
 
@@ -100,7 +100,7 @@ Running projects in Eclipse requires that the `PATH` environment variable be set
 
 The only officially supported Linux distribution right now is Ubuntu, though Soar should work on almost any distribution so long as things are configured correctly.
 
-== Prerequisites ==
+== Linux Prerequisites ==
 
 Install Ubuntu and use the update manager or similar tool to make sure all packages are up-to-date.
 
@@ -130,7 +130,7 @@ If you install this version of Subclipse, you will also need to install an updat
   * Inside Eclipse, visit the Help -> Install new software dialog
   * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
 
-== Environment ==
+== Linux Environment ==
 
 Scons needs to be able to find the correct version of Java to build Soar. The discovery process often finds the GNU version of the JDK before the Sun JDK if both are installed on the system. To assist it in finding the correct version, environment `JAVA_HOME` needs to be set.
 
@@ -145,16 +145,16 @@ export LD_LIBRARY_PATH=/home/username/soar/SoarSuite/SoarLibrary/lib
 }}}
 
 
-== Checkout ==
+== Linux Checkout ==
 
 See the [http://code.google.com/p/soar/source/checkout source tab] for instructions on how to check out Soar.
 
 Eclipse users, do not import projects in Eclipse by checking them out there. Instead, check everything out outside of Eclipse and import later with the instructions below.
 
-== Build ==
+== Linux Build ==
 
 Run `scons` in the top-level folder, see the [FAQ] for common solutions to errors.
 
-== Eclipse Setup ==
+== Linux Eclipse Setup ==
 
 This is the same as the [#Eclipse_Setup Windows section above], see that. Be sure to use forward slashes for path separators, however.
