@@ -119,8 +119,12 @@ Eclipse is recommended if doing Java development with Soar. Prefer a manual inst
   * Extract it somewhere convenient, such as your home directory or Desktop.
   * When running Eclipse, it helps to run it with a copy of your environment. Do this by running it in a terminal using a command like: `./eclipse`
 
-Subclipse is recommended if using Eclipse. 
+Subclipse is recommended if using Eclipse.
   * Install Subclipse by visiting the Help -> Install new software  dialog and adding the site `http://subclipse.tigris.org/update_1.6.x`.
+
+If you install this version of Subclipse, you will also need to install an updated subversion client on your system, since the Ubuntu default client is 1.5 and Subclipse (as listed above) is 1.6, and the two versions will not play nice together.
+  * Visit https://launchpad.net/~anders-kaseorg/%2Barchive/subversion-1.6 and follow instructions.
+  * After the repository is installed, subversion will be able to be upgraded to 1.6 in your favorite package manager.
 
 !PyDev for Eclipse is optional, it is for Python development inside Eclipse.
   * Inside Eclipse, visit the Help -> Install new software dialog
