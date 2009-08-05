@@ -41,6 +41,10 @@ A Subversion client is required. The Soar group at U of M mainly uses TortoiseSV
 Python 2.6 is recommended, or required if the Python SML interface is desired. Other versions of Python will not work "out of the box." 
   * Download and install Python *2.6* from [http://www.python.org/download/releases/2.6/ python.org].
 
+PyDev for Eclipse is optional, it is for Python development inside Eclipse.
+  * Inside Eclipse, visit the Help -> Install new software dialog
+  * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
+
 Tcl/Tk is optional, or required if the Tcl SML interface is desired. Tcl/Tk is not supported for 64-bit targets.
   * Download and install Tcl/Tk *8.4* from [http://www.activestate.com/activetcl/downloads/ activestate.com]
 
@@ -114,6 +118,10 @@ Eclipse is recommended if doing Java development with Soar. Prefer a manual inst
 
 Subclipse is recommended if using Eclipse. 
   * Install Subclipse by visiting the Help -> Install new software  dialog and adding the site `http://subclipse.tigris.org/update_1.6.x`.
+
+PyDev for Eclipse is optional, it is for Python development inside Eclipse.
+  * Inside Eclipse, visit the Help -> Install new software dialog
+  * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
 
 == Environment ==
 
