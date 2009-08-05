@@ -41,7 +41,7 @@ A Subversion client is required. The Soar group at U of M mainly uses TortoiseSV
 Python 2.6 is recommended, or required if the Python SML interface is desired. Other versions of Python will not work "out of the box." 
   * Download and install Python *2.6* from [http://www.python.org/download/releases/2.6/ python.org].
 
-PyDev for Eclipse is optional, it is for Python development inside Eclipse.
+!PyDev for Eclipse is optional, it is for Python development inside Eclipse.
   * Inside Eclipse, visit the Help -> Install new software dialog
   * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
 
@@ -98,13 +98,16 @@ Running projects in Eclipse requires that the `PATH` environment variable be set
 
 = Linux =
 
-The only officially supported Linux distribution right now is Ubuntu, though Soar should work on almost all distributions so long as the prerequisites are available.
+The only officially supported Linux distribution right now is Ubuntu, though Soar should work on almost any distribution so long as things are configured correctly.
+
+== Prerequisites ==
 
 Install Ubuntu and use the update manager or similar tool to make sure all packages are up-to-date.
 
 Recommended system setting: _disable_ visual effects: system -> preferences -> appearance -> visual effects
 
-Install these packages using your favorite package manager, such as `apt-get` where the command would be `sudo apt-get install` and the following list:
+Install these packages using your favorite package manager, such as `apt-get` where the command would be `sudo apt-get install` followed by this list:
+
 {{{
 scons swig sun-java6-jdk subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
 }}}
@@ -119,7 +122,7 @@ Eclipse is recommended if doing Java development with Soar. Prefer a manual inst
 Subclipse is recommended if using Eclipse. 
   * Install Subclipse by visiting the Help -> Install new software  dialog and adding the site `http://subclipse.tigris.org/update_1.6.x`.
 
-PyDev for Eclipse is optional, it is for Python development inside Eclipse.
+!PyDev for Eclipse is optional, it is for Python development inside Eclipse.
   * Inside Eclipse, visit the Help -> Install new software dialog
   * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
 
