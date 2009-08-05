@@ -117,7 +117,18 @@ Subclipse is recommended if using Eclipse.
 
 == Environment ==
 
-TODO
+Scons needs to be able to find the correct version of Java to build Soar. The discovery process often finds the GNU version of the JDK before the Sun JDK if both are installed on the system. To assist it in finding the correct version, environment `JAVA_HOME` needs to be set.
+
+{{{
+export JAVA_HOME=/usr/lib/jvm/java-6-sun
+}}}
+
+When Soar is running, it needs to be able to load the relevant dynamic libraries on the fly. Unfortunately, if those libraries are not installed in a system-wide location already on the library path such as `/usr/lib`, Soar will (likely) not be able to find them. The environment variable `LD_LIBRARY_PATH` can be set to point to additional places to look, such as the full path to `SoarLibrary/lib` inside of the checkout folder. Your exact path will vary depending on where you check out Soar.
+
+{{{
+export LD_LIBRARY_PATH=/home/username/soar/SoarSuite/SoarLibrary/lib
+}}}
+
 
 == Checkout ==
 
