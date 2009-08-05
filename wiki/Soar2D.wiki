@@ -196,7 +196,6 @@ Note that there is a default, hidden client named "java-debugger". Don't use thi
 ||soar.port || int || valid TCP ports || 12121 || Connect/listen on this port ||
 ||soar.remote || string || IP address || null || Connect to a remote kernel at this IP ||
 ||soar.spawn_debuggers || boolean || || true || Spawn debuggers on agent creation ||
-||soar.metadata || string || path to file  || null || Items to put on input link ||
 ||soar.soar_print || boolean ||  || false || Log print events to file ||
 
 == players ==
@@ -237,6 +236,10 @@ players
 || players.''id''.missiles || int || || game default || Starting missiles (tanksoar) ||
 || players.''id''.shutdown_commands || string array || valid Soar commands || null || Commands to run before destroying agent ||
 
+== room ==
+
+There are currently no configuration options for the Room environment.
+
 == taxi ==
 
 || *Path* || *Type* || *Values* || *Default* || *Comment* ||
@@ -248,19 +251,17 @@ players
 == tanksoar ==
 
 || *Path* || *Type* || *Values* || *Default* || *Comment* ||
-|| tanksoar.default_missiles || || || 15 || Starting missile count ||
-|| tanksoar.default_energy || || || 1000 || Starting energy count ||
-|| tanksoar.default_health || || || 1000 || Starting health count ||
+|| tanksoar.max_missiles || || || 15 || Maximum missile count ||
+|| tanksoar.max_energy || || || 1000 || Maximum energy count ||
+|| tanksoar.max_health || || || 1000 || Maximum health count ||
 || tanksoar.collision_penalty || || || -100 || Penalty for colliding with another tank or wall ||
 || tanksoar.max_missile_packs || || || 3 || Maximum number of missile packs to spawn at a time ||
 || tanksoar.missile_pack_respawn_chance || || || 5 || Chance per turn that a missile pack spawns when below max ||
 || tanksoar.shield_energy_usage || || || -20 || Energy usage per turn that shields are on ||
 || tanksoar.missile_hit_award || || || 2 || Points awarded when your missile connects with a tank ||
 || tanksoar.missile_hit_penalty || || || -1 || Points lost when hit by a missile ||
-|| tanksoar.kill_award || || || 3 || Points awarded when your missile kills a tank ||
-|| tanksoar.kill_penalty || || || -2 || Points lost when killed by a missile ||
-|| tanksoar.radar_width || || || 3 || Width of radar sensor ||
-|| tanksoar.radar_height || || || 15 || Height (length) of radar sensor ||
+|| tanksoar.frag_award || || || 3 || Points awarded when your missile frags a tank ||
+|| tanksoar.frag_penalty || || || -2 || Points lost when fragged by a missile ||
 || tanksoar.max_sound_distance || || || 7 || Maximum distance for the sound sensor ||
 || tanksoar.missile_reset_threshold || || || 100 || Max amount of updates that can pass without a missile firing before resetting the map ||
 
