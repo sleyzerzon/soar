@@ -3,7 +3,7 @@
 
 = Soar2D =
 
-Soar2D includes the Eaters, TankSoar, Taxi and [room Room] environments.
+Soar2D includes the Eaters, !TankSoar, Taxi and [room Room] environments.
 
 <wiki:toc max_depth="2"/>
 
@@ -337,70 +337,4 @@ Objects are under an objects sub-block, and then an id block where the name of t
 #		?update.linger = <int>;							# decrement update.linger on update, remove at 0
 #	}
 #}
-}}}
-
-= Metadata =
-Shared IDs not supported yet
-
-{{{
-<metadata>
-	*<identifier attribute="string" shared-id="int"> #shared-id optional
-	*<string-element attribute="string" value="string">
-	*<int-element attribute="string" value="int">
-	*<float-element attribute="string" value="float">
-}}}
-
-== examples ==
-
-{{{
-<metadata>
-	<string-element attribute="config" value="experiment-1.xml" />
-	<int-element attribute="run" value="17" />
-</metadata>
-}}}
-
-{{{
-<metadata>
-	<string-element attribute="nested" value="true" />
-	<identifier attribute="one">
-		<identifier attribute="two">
-			<string-element attribute="yarr" value="matey" />
-		 </identifier>
-	</identifier>
-</metadata>
-}}}
-
-{{{
-<metadata>
-	<string-element attribute="simple-shared" value="true" />
-	<identifier attribute="a" shared-id="1">
-		<string-element attribute="direction" value="north" />
-	</identifier>
-	<identifier attribute="b" shared-id="1" />
-</metadata>
-}}}
-
-{{{
-<metadata>
-	<string-element attribute="graph" value="true" />
-	<identifier attribute="cells">
-		<identifier attribute="north" shared-id="1">
-			<string-element attribute="direction" value="north" />
-		 </identifier>
-		<identifier attribute="east" shared-id="2">
-			<string-element attribute="direction" value="east" />
-		 </identifier>
-		<identifier attribute="south" shared-id="400">
-			<string-element attribute="direction" value="south" />
-		 </identifier>
-		<identifier attribute="west" shared-id="70">
-			<string-element attribute="direction" value="west" />
-		 </identifier>
-	 </identifier>
-	 <string-element attribute="valid-direction" value="north" />
-	 <string-element attribute="valid-direction" value="east" />
-	 <string-element attribute="valid-direction" value="south" />
-	 <string-element attribute="valid-direction" value="west" />
-	 <identifier attribute="goal" shared-id="2" />
-</metadata>
 }}}
