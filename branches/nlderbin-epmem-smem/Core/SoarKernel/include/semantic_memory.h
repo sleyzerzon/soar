@@ -281,6 +281,7 @@ typedef std::priority_queue<smem_weighted_cue_element *, std::vector<smem_weight
 //
 
 typedef struct smem_chunk_struct smem_chunk;
+typedef std::set<smem_chunk *> smem_chunk_set;
 typedef union smem_chunk_value_union smem_chunk_value;
 typedef std::list<smem_chunk_value *> smem_slot;
 typedef std::map<Symbol *, smem_slot *> smem_slot_map;
