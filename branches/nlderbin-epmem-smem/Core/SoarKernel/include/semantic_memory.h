@@ -287,7 +287,8 @@ struct smem_compare_weighted_cue_elements
 	}
 };
 
-typedef std::priority_queue<smem_weighted_cue_element *, std::vector<smem_weighted_cue_element *>, smem_compare_weighted_cue_elements> smem_weighted_cue;
+typedef std::priority_queue<smem_weighted_cue_element *, std::vector<smem_weighted_cue_element *>, smem_compare_weighted_cue_elements> smem_prioritized_weighted_cue;
+typedef std::list<smem_weighted_cue_element *> smem_weighted_cue_list;
 
 //
 

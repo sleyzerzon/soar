@@ -1230,11 +1230,9 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 //////////////////////////////////////////////////////////
 
 smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, smem_lti_set *prohibit, smem_query_levels query_level = qry_full )
-{
-	smem_wme_list *cue;
-	smem_weighted_cue weighted_cue;
-	smem_weighted_cue_element *new_cue_element;
-	bool good_cue;
+{	
+	smem_weighted_cue_list weighted_cue;	
+	bool good_cue = true;
 
 	soar_module::sqlite_statement *q = NULL;
 
@@ -1244,11 +1242,12 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 	my_agent->smem_timers->query->start();
 	////////////////////////////////////////////////////////////////////////////
 
-	cue = smem_get_direct_augs_of_id( query );
-	good_cue = true;
-
 	// prepare query stats
 	{
+		smem_prioritized_weighted_cue weighted_pq;
+		smem_weighted_cue_element *new_cue_element;
+		
+		smem_wme_list *cue = smem_get_direct_augs_of_id( query );
 		smem_wme_list::iterator cue_p;
 
 		smem_hash_id attr_hash;
@@ -1322,7 +1321,7 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 
 						new_cue_element->element_type = element_type;
 
-						weighted_cue.push( new_cue_element );
+						weighted_pq.push( new_cue_element );
 						new_cue_element = NULL;
 					}
 					else
@@ -1338,125 +1337,122 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 				}
 			}
 		}
+
+		// if valid cue, transfer priority queue to list
+		if ( good_cue )
+		{
+			while ( !weighted_pq.empty() )
+			{
+				weighted_cue.push_back( weighted_pq.top() );
+				weighted_pq.pop();
+			}
+		}
+		// else deallocate priority queue contents
+		else
+		{
+			while ( !weighted_pq.empty() )
+			{
+				delete weighted_pq.top();
+				weighted_pq.pop();
+			}
+		}
+
+		// clean cue irrespective of validity
+		delete cue;
 	}
 
-	// perform search only if necessary
+	// only search if the cue was valid
 	if ( good_cue && !weighted_cue.empty() )
 	{
-		smem_lti_list candidates;
-		smem_lti_list::iterator cand_p;
+		smem_weighted_cue_list::iterator first_element = weighted_cue.begin();
+		smem_weighted_cue_list::iterator next_element;
+		smem_weighted_cue_list::iterator second_element = first_element;		
+		second_element++;
 
-		// get initial candidate list (most restrictive, minus prohibitions)
+		soar_module::sqlite_statement *q2 = NULL;
+		smem_lti_set::iterator prohibit_p;
+
+		smem_lti_id cand;
+		bool good_cand;
+		
+		// setup first query, which is sorted on activation already
 		{
-			smem_lti_set::iterator prohibit_p;
-			smem_lti_id cand;
-
-			// get most restrictive cue element
-			new_cue_element = weighted_cue.top();
-			weighted_cue.pop();
-
-			if ( new_cue_element->element_type == attr_t )
+			if ( (*first_element)->element_type == attr_t )
 			{
 				// attr=?
 				q = my_agent->smem_stmts->web_attr_all;
 			}
-			else if ( new_cue_element->element_type == value_const_t )
+			else if ( (*first_element)->element_type == value_const_t )
 			{
 				// attr=? AND val_const=?
 				q = my_agent->smem_stmts->web_const_all;
-				q->bind_int( 2, new_cue_element->value_hash );
+				q->bind_int( 2, (*first_element)->value_hash );
 			}
-			else if ( new_cue_element->element_type == value_lti_t )
+			else if ( (*first_element)->element_type == value_lti_t )
 			{
 				// attr=? AND val_lti=?
 				q = my_agent->smem_stmts->web_lti_all;
-				q->bind_int( 2, new_cue_element->value_lti );
+				q->bind_int( 2, (*first_element)->value_lti );
 			}
 
 			// all require hash as first parameter
-			q->bind_int( 1, new_cue_element->attr_hash );
-			while ( q->execute() == soar_module::row )
-			{
-				cand = q->column_int( 0 );
-
-				prohibit_p = prohibit->find( cand );
-				if ( prohibit_p == prohibit->end() )
-				{
-					candidates.push_back( cand );
-				}
-			}
-			q->reinitialize();
-
-			delete new_cue_element;
+			q->bind_int( 1, (*first_element)->attr_hash );
 		}
 
-		// proceed through remainder of cue
-		while ( !candidates.empty() && !weighted_cue.empty() )
+		// outer loop is the first element, ONE AT A TIME
+		while ( ( king_id == NIL ) && ( q->execute() == soar_module::row ) )
 		{
-			new_cue_element = weighted_cue.top();
-			weighted_cue.pop();
+			cand = q->column_int( 0 );
 
-			if ( new_cue_element->element_type == attr_t )
+			// if not prohibited, submit to the remaining cue elements
+			prohibit_p = prohibit->find( cand );
+			if ( prohibit_p == prohibit->end() )
 			{
-				// parent=? AND attr=?
-				q = my_agent->smem_stmts->web_attr_child;
-			}
-			else if ( new_cue_element->element_type == value_const_t )
-			{
-				// parent=? AND attr=? AND val_const=?
-				q = my_agent->smem_stmts->web_const_child;
-				q->bind_int( 3, new_cue_element->value_hash );
-			}
-			else if ( new_cue_element->element_type == value_lti_t )
-			{
-				// parent=? AND attr=? AND val_lti=?
-				q = my_agent->smem_stmts->web_lti_child;
-				q->bind_int( 3, new_cue_element->value_lti );
-			}
+				good_cand = true;
 
-			// all require attribute
-			q->bind_int( 2, new_cue_element->attr_hash );
-
-			// iterate over remaining candidates, submit each to the cue element
-			cand_p = candidates.begin();
-			do
-			{
-				// all require their own id for child search
-				q->bind_int( 1, (*cand_p) );
-
-				if ( q->execute( soar_module::op_reinit ) != soar_module::row )
+				for ( next_element=second_element; ( ( good_cand ) && ( next_element!=weighted_cue.end() ) ); next_element++ )
 				{
-					cand_p = candidates.erase( cand_p );
-				}
-				else
-				{
-					cand_p++;
-				}
-			} while ( cand_p != candidates.end() );
+					if ( (*next_element)->element_type == attr_t )
+					{
+						// parent=? AND attr=?
+						q2 = my_agent->smem_stmts->web_attr_child;
+					}
+					else if ( (*next_element)->element_type == value_const_t )
+					{
+						// parent=? AND attr=? AND val_const=?
+						q2 = my_agent->smem_stmts->web_const_child;
+						q2->bind_int( 3, (*next_element)->value_hash );
+					}
+					else if ( (*next_element)->element_type == value_lti_t )
+					{
+						// parent=? AND attr=? AND val_lti=?
+						q2 = my_agent->smem_stmts->web_lti_child;
+						q2->bind_int( 3, (*next_element)->value_lti );
+					}
 
-			// de-allocate cue element
-			delete new_cue_element;
+					// all require own id, attribute
+					q2->bind_int( 1, cand );
+					q2->bind_int( 2, (*next_element)->attr_hash );
+
+					good_cand = ( q2->execute( soar_module::op_reinit ) == soar_module::row );
+				}
+
+				if ( good_cand )
+				{
+					king_id = cand;
+				}
+			}
 		}
+		q->reinitialize();		
 
-		// if candidates left, front is winner
-		if ( !candidates.empty() )
+		// clean weighted cue
+		for ( next_element=weighted_cue.begin(); next_element!=weighted_cue.end(); next_element++ )
 		{
-			king_id = candidates.front();
+			delete (*next_element);
 		}
 	}
 
-	// clean cue
-	delete cue;
-
-	// clean weighted cue remnants
-	while ( !weighted_cue.empty() )
-	{
-		new_cue_element = weighted_cue.top();
-		weighted_cue.pop();
-
-		delete new_cue_element;
-	}
-
+	// reconstruction depends upon level
 	if ( query_level == qry_full )
 	{
 		// produce results
@@ -1479,6 +1475,12 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 			my_agent->smem_timers->query->stop();
 			////////////////////////////////////////////////////////////////////////////
 		}
+	}
+	else
+	{
+		////////////////////////////////////////////////////////////////////////////
+		my_agent->smem_timers->query->stop();
+		////////////////////////////////////////////////////////////////////////////
 	}
 
 	return king_id;
