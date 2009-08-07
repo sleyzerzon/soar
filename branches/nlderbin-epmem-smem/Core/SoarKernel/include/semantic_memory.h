@@ -45,6 +45,8 @@ class smem_param_container: public soar_module::param_container
 {
 	public:
 		enum db_choices { memory, file };
+		enum cache_choices { cache_S, cache_M, cache_L };
+		enum opt_choices { opt_safety, opt_speed };
 
 		soar_module::boolean_param *learning;
 		soar_module::constant_param<db_choices> *database;
@@ -52,6 +54,15 @@ class smem_param_container: public soar_module::param_container
 		soar_module::boolean_param *lazy_commit;
 
 		soar_module::constant_param<soar_module::timer::timer_level> *timers;
+
+		soar_module::constant_param<cache_choices> *cache;
+		soar_module::constant_param<opt_choices> *opt;
+
+#ifdef SMEM_EXPERIMENT
+		soar_module::integer_param *exp_repeat;
+		soar_module::integer_param *exp_set;
+		soar_module::string_param *exp_result;
+#endif
 
 		smem_param_container( agent *new_agent );
 };
@@ -327,6 +338,11 @@ typedef struct smem_vis_lti_struct
 		std::string lti_name;
 		unsigned long level;
 } smem_vis_lti;
+
+//
+
+enum smem_query_levels { qry_search, qry_full };
+
 
 //////////////////////////////////////////////////////////
 // Soar Functions (see cpp for comments)

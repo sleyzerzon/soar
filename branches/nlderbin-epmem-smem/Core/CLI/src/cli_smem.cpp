@@ -280,6 +280,39 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 		}
 
 
+		temp = "Performance";
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+		temp = "-----------";
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+
+		temp = "cache: ";
+		temp2 = m_pAgentSoar->smem_params->cache->get_string();
+		temp += temp2;
+		delete temp2;
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+		{
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );			
+		}
+
+		temp = "optimization: ";
+		temp2 = m_pAgentSoar->smem_params->opt->get_string();
+		temp += temp2;
+		delete temp2;
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+		{
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );			
+		}
+
 		temp = "timers: ";
 		temp2 = m_pAgentSoar->smem_params->timers->get_string();
 		temp += temp2;

@@ -29,6 +29,7 @@
 #include <queue>
 #include <utility>
 #include <ctype.h>
+#include <fstream>
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -92,6 +93,39 @@ smem_param_container::smem_param_container( agent *new_agent ): soar_module::par
 	timers->add_mapping( soar_module::timer::one, "one" );
 	timers->add_mapping( soar_module::timer::two, "two" );
 	add( timers );
+
+	//
+
+	// cache
+	cache = new soar_module::constant_param<cache_choices>( "cache", cache_L, new smem_db_predicate<cache_choices>( my_agent ) );
+	cache->add_mapping( cache_S, "small" );
+	cache->add_mapping( cache_M, "medium" );
+	cache->add_mapping( cache_L, "large" );
+	add( cache );
+
+	// opt
+	opt = new soar_module::constant_param<opt_choices>( "optimization", opt_speed, new smem_db_predicate<opt_choices>( my_agent ) );
+	opt->add_mapping( opt_safety, "safety" );
+	opt->add_mapping( opt_speed, "performance" );	
+	add( opt );
+
+	//
+
+#ifdef SMEM_EXPERIMENT
+
+	// exp-repeat
+	exp_repeat = new soar_module::integer_param( "exp-repeat", 100, new soar_module::gt_predicate<long>( 1, true ), new soar_module::f_predicate<long>() );
+	add( exp_repeat );
+
+	// exp-set
+	exp_set = new soar_module::integer_param( "exp-set", 1, new soar_module::gt_predicate<long>( 1, true ), new soar_module::f_predicate<long>() );
+	add( exp_set );
+
+	// exp-result
+	exp_result = new soar_module::string_param( "exp-result", "", new soar_module::predicate<const char *>(), new soar_module::f_predicate<const char *>() );
+	add( exp_result );
+
+#endif
 }
 
 //
@@ -586,7 +620,7 @@ inline bool smem_variable_get( agent *my_agent, smem_variable_key variable_id, i
 /***************************************************************************
  * Function     : smem_set_variable
  * Author		: Nate Derbinsky
- * Notes		: Sets an EpMem variable in the database
+ * Notes		: Sets an SMem variable in the database
  **************************************************************************/
 inline void smem_variable_set( agent *my_agent, smem_variable_key variable_id, intptr_t variable_value )
 {
@@ -1195,7 +1229,7 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
-void smem_process_query( agent *my_agent, Symbol *state, Symbol *query, smem_lti_set *prohibit )
+smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, smem_lti_set *prohibit, smem_query_levels query_level = qry_full )
 {
 	smem_wme_list *cue;
 	smem_weighted_cue weighted_cue;
@@ -1423,26 +1457,31 @@ void smem_process_query( agent *my_agent, Symbol *state, Symbol *query, smem_lti
 		delete new_cue_element;
 	}
 
-	// produce results
-	if ( king_id != NIL )
+	if ( query_level == qry_full )
 	{
-		// success!
-		smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_success );
+		// produce results
+		if ( king_id != NIL )
+		{
+			// success!
+			smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_success );
 
-		////////////////////////////////////////////////////////////////////////////
-		my_agent->smem_timers->query->stop();
-		////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////
+			my_agent->smem_timers->query->stop();
+			////////////////////////////////////////////////////////////////////////////
 
-		smem_install_memory( my_agent, state, king_id );
+			smem_install_memory( my_agent, state, king_id );
+		}
+		else
+		{
+			smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_failure );
+
+			////////////////////////////////////////////////////////////////////////////
+			my_agent->smem_timers->query->stop();
+			////////////////////////////////////////////////////////////////////////////
+		}
 	}
-	else
-	{
-		smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_failure );
 
-		////////////////////////////////////////////////////////////////////////////
-		my_agent->smem_timers->query->stop();
-		////////////////////////////////////////////////////////////////////////////
-	}
+	return king_id;
 }
 
 
@@ -1509,8 +1548,61 @@ void smem_init_db( agent *my_agent, bool readonly = false )
 	else
 	{
 		// temporary queries for one-time init actions
-		//soar_module::sqlite_statement *temp_q = NULL;
-		//soar_module::sqlite_statement *temp_q2 = NULL;
+		soar_module::sqlite_statement *temp_q = NULL;
+
+		// apply performance options
+		{
+			// cache
+			{
+				switch ( my_agent->smem_params->cache->get_value() )
+				{
+					// 5MB cache
+					case ( smem_param_container::cache_S ):
+						temp_q = new soar_module::sqlite_statement( my_agent->smem_db, "PRAGMA cache_size = 5000" );
+						break;
+
+					// 20MB cache
+					case ( smem_param_container::cache_M ):
+						temp_q = new soar_module::sqlite_statement( my_agent->smem_db, "PRAGMA cache_size = 20000" );
+						break;
+
+					// 100MB cache
+					case ( smem_param_container::cache_L ):
+						temp_q = new soar_module::sqlite_statement( my_agent->smem_db, "PRAGMA cache_size = 100000" );
+						break;
+				}
+
+				temp_q->prepare();
+				temp_q->execute();
+				delete temp_q;
+				temp_q = NULL;
+			}
+
+			// optimization
+			if ( my_agent->smem_params->opt->get_value() == smem_param_container::opt_speed )
+			{
+				// synchronous - don't wait for writes to complete (can corrupt the db in case unexpected crash during transaction)
+				temp_q = new soar_module::sqlite_statement( my_agent->smem_db, "PRAGMA synchronous = OFF" );
+				temp_q->prepare();
+				temp_q->execute();
+				delete temp_q;
+				temp_q = NULL;
+
+				// journal_mode - no atomic transactions (can result in database corruption if crash during transaction)
+				temp_q = new soar_module::sqlite_statement( my_agent->smem_db, "PRAGMA journal_mode = OFF" );
+				temp_q->prepare();
+				temp_q->execute();
+				delete temp_q;
+				temp_q = NULL;
+				
+				// locking_mode - no one else can view the database after our first write
+				temp_q = new soar_module::sqlite_statement( my_agent->smem_db, "PRAGMA locking_mode = EXCLUSIVE" );
+				temp_q->prepare();
+				temp_q->execute();
+				delete temp_q;
+				temp_q = NULL;
+			}
+		}
 
 		// update validation count
 		my_agent->smem_validation++;
@@ -2374,6 +2466,95 @@ void smem_go( agent *my_agent )
 	smem_respond_to_cmd( my_agent );
 
 #else // SMEM_EXPERIMENT
+	
+	{
+		
+		Symbol *queries_sym = find_sym_constant( my_agent, "queries" );
+		slot *s = find_slot( my_agent->top_state->id.smem_header, queries_sym );		
+
+		// only do experimental stuff if "queries" exists
+		if ( s == NIL )
+		{
+			smem_respond_to_cmd( my_agent );
+		}
+		else
+		{
+			Symbol *queries_id = s->wmes->value;
+			
+			Symbol *query_num;
+			Symbol *query_desc;
+			Symbol *query_cue;
+			smem_lti_id query_result = NIL;
+
+			Symbol *description_sym = find_sym_constant( my_agent, "description" );
+			Symbol *cue_sym = find_sym_constant( my_agent, "cue" );
+			
+			slot *description_slot;
+			slot *cue_slot;
+
+			smem_lti_set prohibit;
+
+			timeval start;
+			timeval total;
+
+			long repeat = my_agent->smem_params->exp_repeat->get_value();
+			long set = my_agent->smem_params->exp_set->get_value();
+			
+			std::ofstream result_file( const_cast<char *>( my_agent->smem_params->exp_result->get_string() ) );
+			
+			for ( slot *query_slot=queries_id->id.slots; query_slot!=NIL; query_slot=query_slot->next )
+			{
+				query_num = query_slot->attr;
+
+				description_slot = find_slot( query_slot->wmes->value, description_sym );
+				query_desc = description_slot->wmes->value;
+
+				//
+				
+				std::string cue_string( query_desc->sc.name );
+				unsigned long cue_cardinality = 0;
+				std::string::size_type cue_pos = cue_string.find_first_of( '1', 0 );
+
+				char qry_easy = ( ( cue_pos ==  ( cue_string.size() - 1 ) )?('Y'):('N') );
+				char qry_hard = ( ( cue_pos ==  ( cue_string.size() - 2 ) )?('Y'):('N') );
+
+				while ( cue_pos != std::string::npos )
+				{
+					cue_cardinality++;
+					cue_pos = cue_string.find_first_of( '1', cue_pos + 1 );
+
+					if ( cue_pos ==  ( cue_string.size() - 1 ) )
+						qry_easy = 'Y';
+
+					if ( cue_pos ==  ( cue_string.size() - 2 ) )
+						qry_hard = 'Y';
+				}
+
+				//
+
+				cue_slot = find_slot( query_slot->wmes->value, cue_sym );
+				query_cue = cue_slot->wmes->value;
+
+				//
+
+				reset_timer( &start );
+				reset_timer( &total );
+
+				start_timer( my_agent, &start );
+
+				for ( int i=0; i<repeat; i++ )
+				{
+					query_result = smem_process_query( my_agent, my_agent->top_state, query_cue, &( prohibit ), qry_search );
+				}
+
+				stop_timer( my_agent, &start, &total );
+
+				result_file << set << "," << query_num->ic.value << ",\"" << query_desc->sc.name << "\"," << cue_cardinality << ",\"" << qry_easy << "\",\"" << qry_hard << "\"," << query_result << "," << ( (double) timer_value( &total ) / (double) repeat ) << std::endl;
+			}
+
+			result_file.close();
+		}
+	}
 
 #endif // SMEM_EXPERIMENT
 
