@@ -262,9 +262,10 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 	add_structure( "CREATE TABLE IF NOT EXISTS lti (id INTEGER PRIMARY KEY, letter INTEGER, num INTEGER)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS lti_letter_num ON lti (letter, num)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS web (parent_id INTEGER, attr INTEGER, val_const INTEGER, val_lti INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS web (parent_id INTEGER, attr INTEGER, val_const INTEGER, val_lti INTEGER, act_cycle INTEGER)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS web_parent_attr_val_lti ON web (parent_id, attr, val_const, val_lti)" );
-	add_structure( "CREATE INDEX IF NOT EXISTS web_attr_val_lti ON web (attr, val_const, val_lti)" );
+	add_structure( "CREATE INDEX IF NOT EXISTS web_attr_val_lti_cycle ON web (attr, val_const, val_lti, act_cycle)" );
+	add_structure( "CREATE INDEX IF NOT EXISTS web_attr_cycle ON web (attr, act_cycle)" );
 
 	add_structure( "CREATE TABLE IF NOT EXISTS ct_attr (attr INTEGER PRIMARY KEY, ct INTEGER)" );
 
@@ -272,10 +273,7 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS ct_const_attr_val ON ct_const (attr, val_const)" );
 
 	add_structure( "CREATE TABLE IF NOT EXISTS ct_lti (attr INTEGER, val_lti INTEGER, ct INTEGER)" );
-	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS ct_lti_attr_val ON ct_lti (attr, val_lti)" );
-
-	add_structure( "CREATE TABLE IF NOT EXISTS activation (lti INTEGER PRIMARY KEY, cycle INTEGER)" );
-	add_structure( "CREATE INDEX IF NOT EXISTS activation_cycle ON activation (cycle)" );
+	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS ct_lti_attr_val ON ct_lti (attr, val_lti)" );	
 
 	// adding an ascii table just to make lti queries easier when inspecting database
 	add_structure( "CREATE TABLE IF NOT EXISTS ascii (ascii_num INTEGER PRIMARY KEY, ascii_chr TEXT)" );
@@ -352,7 +350,7 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 
 	//
 
-	web_add = new soar_module::sqlite_statement( new_db, "INSERT INTO web (parent_id, attr, val_const, val_lti) VALUES (?,?,?,?)" );
+	web_add = new soar_module::sqlite_statement( new_db, "INSERT INTO web (parent_id, attr, val_const, val_lti, act_cycle) VALUES (?,?,?,?,?)" );
 	add( web_add );
 
 	web_truncate = new soar_module::sqlite_statement( new_db, "DELETE FROM web WHERE parent_id=?" );
@@ -374,13 +372,13 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 
 	//
 
-	web_attr_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w INNER JOIN activation a ON w.parent_id=a.lti WHERE attr=? ORDER BY cycle DESC" );
+	web_attr_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w WHERE attr=? ORDER BY act_cycle DESC" );
 	add( web_attr_all );
 
-	web_const_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w INNER JOIN activation a ON w.parent_id=a.lti WHERE attr=? AND val_const=? ORDER BY cycle DESC" );
+	web_const_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w WHERE attr=? AND val_const=? ORDER BY act_cycle DESC" );
 	add( web_const_all );
 
-	web_lti_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w INNER JOIN activation a ON w.parent_id=a.lti WHERE attr=? AND val_const IS NULL AND val_lti=? ORDER BY cycle DESC" );
+	web_lti_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w WHERE attr=? AND val_const IS NULL AND val_lti=? ORDER BY act_cycle DESC" );
 	add( web_lti_all );
 
 	//
@@ -429,11 +427,8 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 
 	//
 
-	act_set = new soar_module::sqlite_statement( new_db, "UPDATE activation SET cycle=? WHERE lti=?" );
+	act_set = new soar_module::sqlite_statement( new_db, "UPDATE web SET act_cycle=? WHERE parent_id=?" );
 	add( act_set );
-
-	act_add = new soar_module::sqlite_statement( new_db, "INSERT OR IGNORE INTO activation (lti, cycle) VALUES (?,?)" );
-	add( act_add );
 
 	//
 
@@ -711,22 +706,12 @@ smem_hash_id smem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail 
 //////////////////////////////////////////////////////////
 
 // activates a new or existing long-term identifier
-inline void smem_lti_activate( agent *my_agent, smem_lti_id lti, bool new_lti )
+inline void smem_lti_activate( agent *my_agent, smem_lti_id lti )
 {
-	if ( new_lti )
-	{
-		// lti, cycle
-		my_agent->smem_stmts->act_add->bind_int( 1, lti );
-		my_agent->smem_stmts->act_add->bind_int( 2, ( my_agent->smem_max_cycle++ ) );
-		my_agent->smem_stmts->act_add->execute( soar_module::op_reinit );
-	}
-	else
-	{
-		// cycle=? WHERE lti=?
-		my_agent->smem_stmts->act_set->bind_int( 1, ( my_agent->smem_max_cycle++ ) );
-		my_agent->smem_stmts->act_set->bind_int( 2, lti );
-		my_agent->smem_stmts->act_set->execute( soar_module::op_reinit );
-	}
+	// cycle=? WHERE lti=?
+	my_agent->smem_stmts->act_set->bind_int( 1, ( my_agent->smem_max_cycle++ ) );
+	my_agent->smem_stmts->act_set->bind_int( 2, lti );
+	my_agent->smem_stmts->act_set->execute( soar_module::op_reinit );
 }
 
 // gets the lti id for an existing lti letter/number pair (or NIL if failure)
@@ -759,9 +744,6 @@ inline smem_lti_id smem_lti_add_id( agent *my_agent, char name_letter, unsigned 
 	my_agent->smem_stmts->lti_add->execute( soar_module::op_reinit );
 
 	return_val = static_cast<smem_lti_id>( my_agent->smem_db->last_insert_rowid() );
-
-	// insert activation
-	smem_lti_activate( my_agent, return_val, true );
 
 	return return_val;
 }
@@ -921,6 +903,8 @@ void smem_store_chunk( agent *my_agent, smem_lti_id parent_id, smem_slot_map *ch
 	std::map<smem_hash_id, std::map<smem_hash_id, unsigned long> > const_ct_adjust;
 	std::map<smem_hash_id, std::map<smem_lti_id, unsigned long> > lti_ct_adjust;
 
+	intptr_t next_act_cycle = ( my_agent->smem_max_cycle++ );
+
 	// clear web, adjust counts
 	if ( remove_old_children )
 	{
@@ -942,11 +926,12 @@ void smem_store_chunk( agent *my_agent, smem_lti_id parent_id, smem_slot_map *ch
 			{
 				value_hash = smem_temporal_hash( my_agent, (*v)->val_const.val_value );
 
-				// parent_id, attr, val_const, val_lti
+				// parent_id, attr, val_const, val_lti, act_cycle
 				my_agent->smem_stmts->web_add->bind_int( 1, parent_id );
 				my_agent->smem_stmts->web_add->bind_int( 2, attr_hash );
 				my_agent->smem_stmts->web_add->bind_int( 3, value_hash );
 				my_agent->smem_stmts->web_add->bind_null( 4 );
+				my_agent->smem_stmts->web_add->bind_int( 5, next_act_cycle );
 				my_agent->smem_stmts->web_add->execute( soar_module::op_reinit );
 
 				const_ct_adjust[ attr_hash ][ value_hash ]++;
@@ -965,11 +950,12 @@ void smem_store_chunk( agent *my_agent, smem_lti_id parent_id, smem_slot_map *ch
 					}
 				}
 
-				// parent_id, attr, val_const, val_lti
+				// parent_id, attr, val_const, val_lti, act_cycle
 				my_agent->smem_stmts->web_add->bind_int( 1, parent_id );
 				my_agent->smem_stmts->web_add->bind_int( 2, attr_hash );
 				my_agent->smem_stmts->web_add->bind_null( 3 );
 				my_agent->smem_stmts->web_add->bind_int( 4, value_lti );
+				my_agent->smem_stmts->web_add->bind_int( 5, next_act_cycle );
 				my_agent->smem_stmts->web_add->execute( soar_module::op_reinit );
 
 				// add to counts
@@ -1040,9 +1026,6 @@ void smem_store_chunk( agent *my_agent, smem_lti_id parent_id, smem_slot_map *ch
 			}
 		}
 	}
-
-	// activate parent
-	smem_lti_activate( my_agent, parent_id, false );
 }
 
 void smem_soar_store( agent *my_agent, Symbol *id, smem_storage_type store_type = store_level, tc_number tc = NIL )
@@ -1175,7 +1158,7 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 	}
 
 	// activate lti
-	smem_lti_activate( my_agent, parent_id, false );
+	smem_lti_activate( my_agent, parent_id );
 
 	// point retrieved to lti
 	smem_add_meta_wme( my_agent, state, result_header, my_agent->smem_sym_retrieved, lti );

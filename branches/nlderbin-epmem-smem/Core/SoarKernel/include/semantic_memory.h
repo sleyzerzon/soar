@@ -208,7 +208,6 @@ class smem_statement_container: public soar_module::sqlite_statement_container
 		soar_module::sqlite_statement *ct_lti_get;
 
 		soar_module::sqlite_statement *act_set;
-		soar_module::sqlite_statement *act_add;
 
 		soar_module::sqlite_statement *vis_lti;
 		soar_module::sqlite_statement *vis_value_const;
