@@ -33,73 +33,73 @@ Wintermute, S., and Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitema
 
 = 2008 =
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird%20-%202008%20-%20Extending%20the%20Soar%20Cognitive%20Architecture.pdf Laird, J. E. (2008). Extending the Soar Cognitive Architecture. In Proceedings of the First Conference on Artificial General Intelligence (AGI-08).]
+Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird%20-%202008%20-%20Extending%20the%20Soar%20Cognitive%20Architecture.pdf Extending the Soar Cognitive Architecture.]_ In Proceedings of the First Conference on Artificial General Intelligence (AGI-08).
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_cogsci_2008_emotionrl.pdf Marinier, R. and Laird, J. E. (2008). Emotion-Driven Reinforcement Learning. !CogSci 2008, Washington, D.C.]
+Marinier, R. and Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_cogsci_2008_emotionrl.pdf Emotion-Driven Reinforcement Learning.]_ !CogSci 2008, Washington, D.C.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_lewis_jcsr_2008_computationalunification.pdf Marinier, R., Laird, J. E., and Lewis, R. L. (2008). A Computational Unification of Cognitive Behavior and Emotion. Journal of Cognitive Systems Research.]
+Marinier, R., Laird, J. E., and Lewis, R. L. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_lewis_jcsr_2008_computationalunification.pdf A Computational Unification of Cognitive Behavior and Emotion.]_ Journal of Cognitive Systems Research.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAI08-motion.pdf Wintermute, S. and Laird, J. E. (2008). Bimodal Spatial Reasoning with Continuous Motion. Proceedings of the Twenty-Third AAAI Conference on Artificial Intelligence (AAAI-08), Chicago, Illinois]
+Wintermute, S. and Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAI08-motion.pdf Bimodal Spatial Reasoning with Continuous Motion.]_ Proceedings of the Twenty-Third AAAI Conference on Artificial Intelligence (AAAI-08), Chicago, Illinois
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAIFS08-mentalimagery.pdf Wintermute, S. and Lathrop, S.D. AI and Mental Imagery. In Papers from the 2008 AAAI Fall Symposium Series: Naturally Inspired AI, Arlington, VA, November 2008. AAAI Press.]
+Wintermute, S. and Lathrop, S.D. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAIFS08-mentalimagery.pdf AI and Mental Imagery.]_ In Papers from the 2008 AAAI Fall Symposium Series: Naturally Inspired AI, Arlington, VA, November 2008. AAAI Press.
 
 = 2007 =
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cohenRH07.pdf Cohen, M. A., Ritter, F. E., Haynes, S. R. (2007). Using Reflective Learning to Master Opponent Strategy in a Competitive Environment. Proceedings of the Eighth International Conference on Cognitive Modeling. Ann Arbor, MI.]
+Cohen, M. A., Ritter, F. E., Haynes, S. R. (2007). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cohenRH07.pdf Using Reflective Learning to Master Opponent Strategy in a Competitive Environment.]_ Proceedings of the Eighth International Conference on Cognitive Modeling. Ann Arbor, MI.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CCA-TR-2007-02.pdf Gorski, N. A. and Laird, J. E. (2007). Investigating Transfer Learning in the Urban Combat Testbed. (Report No. CCA-TR-2007-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.]
+Gorski, N. A. and Laird, J. E. (2007). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CCA-TR-2007-02.pdf Investigating Transfer Learning in the Urban Combat Testbed.]_ (Report No. CCA-TR-2007-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Hogewoning_Broekens_Eggermont_Bovenkamp_IWINAC2007.pdf Hogewoning, E., Broekens, J., Eggermont, J., Bovenkamp, E.G.P. Strategies for Affect-Controlled Action-Selection in Soar-RL. Proceedings of the 2nd. International Work-Conference on the Interplay between Natural and Artificial Computation (IWINAC), 2007. Murcia, Spain. LNCS 4528 (pp. 501-510), Springer.]
+Hogewoning, E., Broekens, J., Eggermont, J., Bovenkamp, E.G.P. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Hogewoning_Broekens_Eggermont_Bovenkamp_IWINAC2007.pdf Strategies for Affect-Controlled Action-Selection in Soar-RL.]_ Proceedings of the 2nd. International Work-Conference on the Interplay between Natural and Artificial Computation (IWINAC), 2007. Murcia, Spain. LNCS 4528 (pp. 501-510), Springer.
 
-Jones, R. M., Lebiere, C., & Crossman, J. A. (2007). Comparing modeling idioms in ACT-R and Soar. Proceedings of the Eighth International Conference on Cognitive Modeling. Ann Arbor, MI.
+Jones, R. M., Lebiere, C., & Crossman, J. A. (2007). _Comparing modeling idioms in ACT-R and Soar._ Proceedings of the Eighth International Conference on Cognitive Modeling. Ann Arbor, MI.
 
-Lathrop, S.D., and Laird, J.E. (2007). Towards Incorporating Visual Imagery into a Cognitive Architecture. Proceedings of the Eighth International Conference on Cognitive Modeling. Ann Arbor, MI.
+Lathrop, S.D., and Laird, J.E. (2007). _Towards Incorporating Visual Imagery into a Cognitive Architecture._ Proceedings of the Eighth International Conference on Cognitive Modeling. Ann Arbor, MI.
 
-Magerko, B. Evaluating Preemptive Story Direction in the Interactive Drama Architecture. Journal of Game Development, vol. 3, 2007. In press.
+Magerko, B. _Evaluating Preemptive Story Direction in the Interactive Drama Architecture._ Journal of Game Development, vol. 3, 2007. In press.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_cogsci_2007_computationalmodeling.pdf Marinier, R.P., Laird, J.E. 2007. Computational Modeling of Mood and Feeling from Emotion. !CogSci 2007. Nashville, TN.]
+Marinier, R.P., Laird, J.E. 2007. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_cogsci_2007_computationalmodeling.pdf Computational Modeling of Mood and Feeling from Emotion.]_ !CogSci 2007. Nashville, TN.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAI2007_NuxollLaird_ver14(final).pdf Nuxoll, A. M. and Laird, J. E. (2007). Extending Cognitive Architecture with Episodic Memory. In Proceedings of the 22nd National Conference on Artificial Intelligence (AAAI).]
+Nuxoll, A. M. and Laird, J. E. (2007). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAI2007_NuxollLaird_ver14(final).pdf Extending Cognitive Architecture with Episodic Memory.]_ In Proceedings of the 22nd National Conference on Artificial Intelligence (AAAI).
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/StormFramework_iccm-07.pdf Pearson, D., Gorski, N. A., Lewis, R. L., and Laird, J. E. (2007). Storm: A Framework for Biologically-Inspired Cognitive Architecture Research. Proceedings of the 8th International Conference on Cognitive Modeling. Ann Arbor, MI.]
+Pearson, D., Gorski, N. A., Lewis, R. L., and Laird, J. E. (2007). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/StormFramework_iccm-07.pdf Storm: A Framework for Biologically-Inspired Cognitive Architecture Research.]_ Proceedings of the 8th International Conference on Cognitive Modeling. Ann Arbor, MI.
 
-Taylor, G., Stensrud, B., Eitelman, S. and Dunham, C. (2007), "Towards Automating Airspace Management," Proceedings of the Computational Intelligence for Security and Defense Applications (CISDA) Conference, Honolulu, Hi. April 1-5, 2007.
+Taylor, G., Stensrud, B., Eitelman, S. and Dunham, C. (2007), _Towards Automating Airspace Management_, Proceedings of the Computational Intelligence for Security and Defense Applications (CISDA) Conference, Honolulu, Hi. April 1-5, 2007.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/ICCM_2007.pdf Wang, Y., and Laird, J.E. 2007. The Importance of Action History in Decision Making and Reinforcement Learning.]
+Wang, Y., and Laird, J.E. 2007. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/ICCM_2007.pdf The Importance of Action History in Decision Making and Reinforcement Learning.]_
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAI07-PredicateProjection.pdf Wintermute, S. and Laird, J.E. Predicate Projection in a Bimodal Spatial Reasoning System. Proceedings of the Twenty-Second AAAI Conference on Artificial Intelligence (AAAI-07), Vancouver, Canada]
+Wintermute, S. and Laird, J.E. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAI07-PredicateProjection.pdf Predicate Projection in a Bimodal Spatial Reasoning System.]_ Proceedings of the Twenty-Second AAAI Conference on Artificial Intelligence (AAAI-07), Vancouver, Canada
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AIIDE07-SORTS.pdf Wintermute, S., Xu, J., and Laird, J.E. SORTS: A Human-Level Approach to Real-Time Strategy AI. Proceedings of the Third Artificial Intelligence and Interactive Digital Entertainment Conference (AIIDE-07), Stanford, California]
+Wintermute, S., Xu, J., and Laird, J.E. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AIIDE07-SORTS.pdf SORTS: A Human-Level Approach to Real-Time Strategy AI.]_ Proceedings of the Third Artificial Intelligence and Interactive Digital Entertainment Conference (AIIDE-07), Stanford, California
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cca-tr-2007-01.pdf Wintermute, S., Xu, J., Irizarry, J. 2007. SORTS: Integrating Soar with a Real-Time Strategy Game (Report No. CCA-TR-2007-01). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.]
+Wintermute, S., Xu, J., Irizarry, J. 2007. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cca-tr-2007-01.pdf SORTS: Integrating Soar with a Real-Time Strategy Game]_ (Report No. CCA-TR-2007-01). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.
 
-Yakir, A., and Kaminka, G. (2007). An Integrated Development Environment and Architecture for Soar-Based Agents. Nineteenth Innovative Applications of Artificial Intelligence Conference (IAAI-07), Vancouver, B.C., Canada.
+Yakir, A., and Kaminka, G. (2007). _An Integrated Development Environment and Architecture for Soar-Based Agents._ Nineteenth Innovative Applications of Artificial Intelligence Conference (IAAI-07), Vancouver, B.C., Canada.
 
 = 2006 =
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/GorskiLaird_icmlTL-06.pdf Gorski, N.A., and Laird, J.E. Experiments in Transfer Across Multiple Learning Mechanisms. Proceedings of the ICML-06 Workshop on Structural Knowledge Transfer for Machine Learning. Pittsburgh, PA.]
+Gorski, N.A., and Laird, J.E. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/GorskiLaird_icmlTL-06.pdf Experiments in Transfer Across Multiple Learning Mechanisms.]_ Proceedings of the ICML-06 Workshop on Structural Knowledge Transfer for Machine Learning. Pittsburgh, PA.
 
-Jones, R. M., & Wray, R. E. (2006). Comparative analysis of frameworks for knowledge-intensive agents. /AI Magazine 27/(2), 45-56.
+Jones, R. M., & Wray, R. E. (2006). _Comparative analysis of frameworks for knowledge-intensive agents._ AI Magazine 27 (2), 45-56.
 
-Jones, R. M., Crossman, J. A., Lebiere, C., & Best, B. J. (2006). An abstract language for cognitive modeling. /Proceedings of the Seventh International Conference on Cognitive Modeling/. Trieste, Italy: Edizioni Goliandiche.
+Jones, R. M., Crossman, J. A., Lebiere, C., & Best, B. J. (2006). _An abstract language for cognitive modeling._ Proceedings of the Seventh International Conference on Cognitive Modeling. Trieste, Italy: Edizioni Goliandiche.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Kennedy-ICCM2006.pdf Kennedy, W.G., and Trafton, J.G. Long-Term Learning in Soar and ACT-R. Proceedings of the Seventh International Conference on Cognitive Modeling, (pp 162-168). Trieste, Italy: Edizioni Goliardiche.]
+Kennedy, W.G., and Trafton, J.G. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Kennedy-ICCM2006.pdf Long-Term Learning in Soar and ACT-R.]_ Proceedings of the Seventh International Conference on Cognitive Modeling, (pp 162-168). Trieste, Italy: Edizioni Goliardiche.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/KonikLaird2006.pdf Konik, T., and Laird, J. 2006. Learning Goal Hierarchies from Structured Observations and Expert Annotations, Machine Learning. 64(1-3) 263-287.]
+Konik, T., and Laird, J. 2006. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/KonikLaird2006.pdf Learning Goal Hierarchies from Structured Observations and Expert Annotations]_, Machine Learning. 64(1-3) 263-287.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cca_tech_report_2006-01.pdf Lathrop, S., and Laird, J.E. 2006. Incorporating Visual Imagery into a Cognitive Architecture: An Initial Theory, Design and Implementation.]
+Lathrop, S., and Laird, J.E. 2006. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cca_tech_report_2006-01.pdf Incorporating Visual Imagery into a Cognitive Architecture: An Initial Theory, Design and Implementation.]_
 
-Magerko, B., Stensrud, B., and Holt, L. Bringing the Schoolhouse Inside the Box - A Tool for Engaging, Individualized Training. 25th Army Science Conference, 2006. Orlando, FL.
+Magerko, B., Stensrud, B., and Holt, L. _Bringing the Schoolhouse Inside the Box - A Tool for Engaging, Individualized Training._ 25th Army Science Conference, 2006. Orlando, FL.
 
-Marinier, R. and Laird, J. A Cognitive Architecture Theory of Comprehension and Appraisal. To be presented at Agent Construction and Emotion 2006, Vienna, Austria, April 2006.
+Marinier, R. and Laird, J. _A Cognitive Architecture Theory of Comprehension and Appraisal._ To be presented at Agent Construction and Emotion 2006, Vienna, Austria, April 2006.
 
-Ritter, F.E., Haynes, S. R., Cohen, M., Howes, A., John, B., Best, B., Lebiere, C., Jones, R. M., Crossman, J., Lewis, R. L., St. Amant, R., !McBride, S. P., Urbas, L., Leuchter, S., & Vera, A. (2006). High-level behavior representation languages revisited. In /Proceedings of the Seventh International Conference on Cognitive Modeling,/ 404-407. Trieste, Italy: Edizioni Goliandiche.
+Ritter, F.E., Haynes, S. R., Cohen, M., Howes, A., John, B., Best, B., Lebiere, C., Jones, R. M., Crossman, J., Lewis, R. L., St. Amant, R., !McBride, S. P., Urbas, L., Leuchter, S., & Vera, A. (2006). _High-level behavior representation languages revisited._ In /Proceedings of the Seventh International Conference on Cognitive Modeling,/ 404-407. Trieste, Italy: Edizioni Goliandiche.
 
-Rosenbloom, R. 2006, A Cognitive Odyssey: From the Power Law of Practice to a General Learning Mechanism and Beyond, in Tutorials in Quantitative Methods for Psychology, 2(2) 6-14.
+Rosenbloom, R. 2006, _A Cognitive Odyssey: From the Power Law of Practice to a General Learning Mechanism and Beyond_, in Tutorials in Quantitative Methods for Psychology, 2(2) 6-14.
 
-Stensrud, B., Taylor, G. and Crossman, J., (2006) "IF-Soar: A Virtual, Speech-Enabled Agent for Indirect Fire Training," Proceedings of the 25th Army Science Conference, Orlando, FL.
+Stensrud, B., Taylor, G. and Crossman, J., (2006) _IF-Soar: A Virtual, Speech-Enabled Agent for Indirect Fire Training_, Proceedings of the 25th Army Science Conference, Orlando, FL.
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/smem_tech.pdf Wang, Y., and Laird, J.E. 2006. Integrating Semantic Memory into a Cognitive Architecture.]
+Wang, Y., and Laird, J.E. 2006.  _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/smem_tech.pdf Integrating Semantic Memory into a Cognitive Architecture.]_
 
 = 2005 =
 
