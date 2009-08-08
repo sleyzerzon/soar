@@ -3,27 +3,33 @@
 
 = 2009 =
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Bloch, M. K. (2009)]
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Bloch, M.K. (2009)]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccbr09.pdf Derbinsky, N., Laird, J.E.: Efficiently Implementing Episodic Memory. Proceedings of the 8th International Conference on Case-Based Reasoning, ICCBR (2009)]
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper130.pdf Fridman, N. & Kaminka, G. A. (2009). Comparing Human and Synthetic Group Behaviors: A Model Based on Social Psychology. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper130.pdf Fridman, N. & Kaminka, G.A. (2009). Comparing Human and Synthetic Group Behaviors: A Model Based on Social Psychology. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/LearningToUseEpMem-ICCM09.pdf Gorski, N.A. & Laird, J.E. (2009). Learning to Use Episodic Memory. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/SPIE.pdf Laird, J.E. (2009). Towards Cognitive Robotics, SPIE Defense and Sensing Conferences, Orlando, FL.]
+
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/ijcai09.pdf Laird, J.E., Derbinsky, N.: A Year of Episodic Memory. Workshop on Grand Challenges for Reasoning from Experiences, 21st IJCAI (2009)]
+
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-agi-09.pdf Laird, J.E., Wray, R.E., Marinier, R.P., Langley, P. (2009) Claims and Challenges in Evaluating Human-Level Intelligent Systems, Proceedings of the Second Conference on Artificial General Intelligence.]
+
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cogarch.cogsys08.pdf Langley, P., Laird, J.E., & Rogers, S. (2009). Cognitive architectures: Research issues and challenges. Cognitive Systems Research 10, 141-160.]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper259.pdf Lonsdale, D., !McGhee, J., Hendrickson, R. & Christensen, C. (2009). Incremental Processing and Resource Usage. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Technical%20report%20_Learning_to_play_Mario.pdf Mohan, S., Laird, J. E.: Learning to Play Mario. (2009)]
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper129.pdf Rosenbloom, P. S. (2009). Towards a New Cognitive Hourglass: Uniform Implementation of a Cognitive Architecture via Factor Graphs. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper129.pdf Rosenbloom, P.S. (2009). Towards a New Cognitive Hourglass: Uniform Implementation of a Cognitive Architecture via Factor Graphs. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AGI09%20simulation.pdf Wintermute, S. (2009). Integrating Reasoning and Action through Simulation. In Proceedings of the Second Conference on Artificial General Intelligence (AGI-09). Arlington, VA.]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/SVS-TR.pdf Wintermute, S. 2009. An Overview of Spatial Processing in Soar/SVS (Report No. CCA-TR-2009-01). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.]
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CogSci09%20imperfect%20representation.pdf Wintermute, S., and Laird, J. E. (2009). Imagery as Compensation for an Imperfect Abstract Problem Representation. In Proceedings of The 31st Annual Conference of the Cognitive Science Society (!CogSci-09)]
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CogSci09%20imperfect%20representation.pdf Wintermute, S., and Laird, J.E. (2009). Imagery as Compensation for an Imperfect Abstract Problem Representation. In Proceedings of The 31st Annual Conference of the Cognitive Science Society (!CogSci-09)]
 
 = 2008 =
 
