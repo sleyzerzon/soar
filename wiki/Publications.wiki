@@ -3,11 +3,19 @@
 
 = 2009 =
 
+#[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Bloch, M. K. (2009)]
+
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccbr09.pdf Derbinsky, N., Laird, J.E.: Efficiently Implementing Episodic Memory. Proceedings of the 8th International Conference on Case-Based Reasoning, ICCBR (2009)]
+
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper130.pdf Fridman, N. & Kaminka, G. A. (2009). Comparing Human and Synthetic Group Behaviors: A Model Based on Social Psychology. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/LearningToUseEpMem-ICCM09.pdf Gorski, N.A. & Laird, J.E. (2009). Learning to Use Episodic Memory. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/ijcai09.pdf Laird, J.E., Derbinsky, N.: A Year of Episodic Memory. Workshop on Grand Challenges for Reasoning from Experiences, 21st IJCAI (2009)]
+
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper259.pdf Lonsdale, D., !McGhee, J., Hendrickson, R. & Christensen, C. (2009). Incremental Processing and Resource Usage. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
+
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Technical report _Learning_to_play_Mario.pdf Mohan, S., Laird, J. E.: Learning to Play Mario. (2009)]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper129.pdf Rosenbloom, P. S. (2009). Towards a New Cognitive Hourglass: Uniform Implementation of a Cognitive Architecture via Factor Graphs. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
