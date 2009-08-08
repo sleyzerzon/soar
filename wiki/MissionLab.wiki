@@ -7,13 +7,13 @@
 = Robot Platforms =
 
   * iRobot ATRV-Jr and Urban Robot
-    * !ActivMedia's !AmigoBot
-    * Pioneer AT
-    * Nomadics Technologies' Nomad 150 & 200
+  * !ActivMedia's !AmigoBot
+  * Pioneer AT
+  * Nomadics Technologies' Nomad 150 & 200
 
 = Description =
 
-MissionLab takes high-level military-style plans and executes them with teams of real or simulated robotic vehicles. MissionLab supports execution of multiple robots in both simulation and actual robotics platforms. Each vehicle executes its portion of the mission using reactive control techniques developed at Georgia Tech.
+!MissionLab takes high-level military-style plans and executes them with teams of real or simulated robotic vehicles. !MissionLab supports execution of multiple robots in both simulation and actual robotics platforms. Each vehicle executes its portion of the mission using reactive control techniques developed at Georgia Tech.
 
 = Components =
 
