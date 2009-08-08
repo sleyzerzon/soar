@@ -3,7 +3,7 @@
 
 = 2009 =
 
-#[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Bloch, M. K. (2009)]
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Bloch, M. K. (2009)]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccbr09.pdf Derbinsky, N., Laird, J.E.: Efficiently Implementing Episodic Memory. Proceedings of the 8th International Conference on Case-Based Reasoning, ICCBR (2009)]
 
