@@ -15,7 +15,7 @@
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper259.pdf Lonsdale, D., !McGhee, J., Hendrickson, R. & Christensen, C. (2009). Incremental Processing and Resource Usage. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
-[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Technical report _Learning_to_play_Mario.pdf Mohan, S., Laird, J. E.: Learning to Play Mario. (2009)]
+[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Technical%20report%20_Learning_to_play_Mario.pdf Mohan, S., Laird, J. E.: Learning to Play Mario. (2009)]
 
 [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper129.pdf Rosenbloom, P. S. (2009). Towards a New Cognitive Hourglass: Uniform Implementation of a Cognitive Architecture via Factor Graphs. Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.]
 
