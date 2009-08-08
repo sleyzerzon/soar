@@ -1,0 +1,48 @@
+#summary Mission Lab environment notes
+#labels Phase-Support
+
+  * [http://www.cc.gatech.edu/ai/robot-lab/research/MissionLab/ Home page]
+  * [http://www.cc.gatech.edu/aimosaic/robot-lab/research/MissionLab/mlab_manual-7.0.pdf Installation]
+
+= Robot Platforms =
+
+  * iRobot ATRV-Jr and Urban Robot
+    * !ActivMedia's !AmigoBot
+    * Pioneer AT
+    * Nomadics Technologies' Nomad 150 & 200
+
+= Description =
+
+MissionLab takes high-level military-style plans and executes them with teams of real or simulated robotic vehicles. MissionLab supports execution of multiple robots in both simulation and actual robotics platforms. Each vehicle executes its portion of the mission using reactive control techniques developed at Georgia Tech.
+
+= Components =
+
+  * !MissionLab: Simulation Environment 2D or 3D; 3D appears to be limited by top-down view. Environment configuration file is in .ovl (overlay file—text file). The file specifies the configuration of the environment (dimensions, objects, start location for robot, etc.)
+  * Cfgedit – “!VisualSoar”; a visual editor (literally visual) to create robot behavior defined as FSA. Compiles the robot behavior into a Configuration Description Language (Text file – a FSA like description language). The CDL is compiled to Configuration Network Language (CNL) when using the Aura Robotic Archtiecture. Compiles into an executable that can be run either in !MissionLab or on one of the robots specified above through a TCP/IP connection or serial port.
+
+= Disadvantages =
+
+  * Heavily tied to !RedHat/Fedora Core Linux and SunOS. Uses the X-Motif widget set GUI requiring X-based window manager (see install notes below). It would require a lot of work to port to Windows.
+  * Appears to be tied to military type tasks
+  * Does have a 3D representation but is not using a scene graph data structure.
+
+= Ubuntu Installation Notes =
+
+  * !MissionLab install: follow instructions on site
+  * Pay attention to the required the packages and changes shown below
+  * Ubuntu peculiarities
+    * Install Ubuntu packages: bison, byacc, flex-old (not the current version), libncurses5-dev, libmotif3, libmotif-dev, libssl-dev, X11proto-print-dev
+    * Install Mesa3D (http://www.mesa3d.org/) separately (the Ubuntu package for Mesa does not have the correct headers or libraries). Follow instructions on site and install under /usr/local/
+    * Because the code is compiled with the -ansi flag (see Makefile) __STRICT_ANSI__ is defined which conflicts with the definition of __s64 in /usr/include/asm-x86_64/types.h. Because /usr/include/linux/joystick.h requires the definition of the__s64 type we must temporarily turn off the _STRICT_ANSI_ flag. Add the following two lines of code to the /src/telop/telop_hw_joystick.c file. NOTE: if you do not add these two lines of code then the telop_hw_joystick.c file will not compile. See http://www.mail-archive.com/lfs-dev@linuxfromscratch.org/msg08535.html for more information on this issue)
+    * #undef __STRICT_ANSI__ // add this line
+    * #include // wrap this line of code
+    * #define __STRICT_ANSI__ // add this line
+  * The Makefile scripts rely /bin/sh and specifically, pushd and popd. Ubuntu verion of /bin/sh does not support those operations so you need to link /bin/sh to /bin/bash
+    * >sudo rm -f /bin/sh
+    * >sudo ln -s /bin/bash /bin/sh
+  * After compiling, Export library load path to the Mesa library install location, e.g.
+export LD_LIBRARY_PATH=/usr/local/lib
+  * Before running demo, comment out the first few lines in the /demos/demo script (so it doesn't override the above LD_LIBRARY_PATH)
+    * #setenv PATH .:${PATH} # Make sure the current directory is in the path
+    * #set LD_LIBRARY_PATH # Make sure LD_LIBRARY_PATH does not
+    * #setenv LD_LIBRARY_PATH
