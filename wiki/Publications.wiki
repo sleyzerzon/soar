@@ -3,7 +3,7 @@
 
 = 2009 =
 
-Bloch, M.K. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Reinforcement Learning Technical Report.]_ Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
+Bloch, M.K. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Hierarchical Reinforcement Learning in the Taxicab Domain.]_ (Report No. CCA-TR-2009-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
 
 Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccbr09.pdf Efficiently Implementing Episodic Memory.]_ Proceedings of the 8th International Conference on Case-Based Reasoning, ICCBR (2009)
 
