@@ -100,6 +100,8 @@ class smem_stat_container: public soar_module::stat_container
 		smem_mem_usage_stat *mem_usage;
 		smem_mem_high_stat *mem_high;
 
+		soar_module::integer_stat *expansions;
+
 		smem_stat_container( agent *my_agent );
 };
 
@@ -140,6 +142,7 @@ class smem_timer_container: public soar_module::timer_container
 		soar_module::timer *api;
 		soar_module::timer *init;
 		soar_module::timer *hash;
+		soar_module::timer *act;
 
 		smem_timer_container( agent *my_agent );
 };

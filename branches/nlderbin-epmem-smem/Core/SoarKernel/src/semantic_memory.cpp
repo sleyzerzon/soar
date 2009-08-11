@@ -92,6 +92,7 @@ smem_param_container::smem_param_container( agent *new_agent ): soar_module::par
 	timers->add_mapping( soar_module::timer::zero, "off" );
 	timers->add_mapping( soar_module::timer::one, "one" );
 	timers->add_mapping( soar_module::timer::two, "two" );
+	timers->add_mapping( soar_module::timer::three, "three" );
 	add( timers );
 
 	//
@@ -181,6 +182,13 @@ smem_stat_container::smem_stat_container( agent *new_agent ): soar_module::stat_
 	// mem-high
 	mem_high = new smem_mem_high_stat( my_agent, "mem-high", 0, new soar_module::predicate<intptr_t>() );
 	add( mem_high );
+
+	//
+
+	// expansions
+	expansions = new soar_module::integer_stat( "expansions", 0, new soar_module::f_predicate<long>() );
+	add( expansions );
+
 }
 
 //
@@ -234,6 +242,9 @@ smem_timer_container::smem_timer_container( agent *new_agent ): soar_module::tim
 
 	hash = new smem_timer( "smem_hash", my_agent, soar_module::timer::two );
 	add( hash );
+
+	act = new smem_timer( "three_activation", my_agent, soar_module::timer::three );
+	add( act );
 }
 
 //
@@ -712,10 +723,18 @@ smem_hash_id smem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail 
 // activates a new or existing long-term identifier
 inline void smem_lti_activate( agent *my_agent, smem_lti_id lti )
 {
+	////////////////////////////////////////////////////////////////////////////
+	my_agent->smem_timers->act->start();
+	////////////////////////////////////////////////////////////////////////////
+	
 	// cycle=? WHERE lti=?
 	my_agent->smem_stmts->act_set->bind_int( 1, ( my_agent->smem_max_cycle++ ) );
 	my_agent->smem_stmts->act_set->bind_int( 2, lti );
 	my_agent->smem_stmts->act_set->execute( soar_module::op_reinit );
+
+	////////////////////////////////////////////////////////////////////////////
+	my_agent->smem_timers->act->stop();
+	////////////////////////////////////////////////////////////////////////////
 }
 
 // gets the lti id for an existing lti letter/number pair (or NIL if failure)
@@ -2189,6 +2208,14 @@ void smem_respond_to_cmd( agent *my_agent )
 	unsigned long wme_count;
 	bool new_cue;
 
+	int tc;	
+
+	Symbol *parent_sym;
+	std::queue<Symbol *> syms;
+
+	int parent_level;
+	std::queue<int> levels;	
+
 	while ( state != NULL )
 	{
 		////////////////////////////////////////////////////////////////////////////
@@ -2196,22 +2223,25 @@ void smem_respond_to_cmd( agent *my_agent )
 		////////////////////////////////////////////////////////////////////////////
 
 		// make sure this state has had some sort of change to the cmd
+		// NOTE: we only care one-level deep!
 		new_cue = false;
 		wme_count = 0;
 		cmds = NIL;
 		{
-			int tc = get_new_tc_number( my_agent );
-			std::queue<Symbol *> syms;
-			Symbol *parent_sym;
+			tc = get_new_tc_number( my_agent );
 
 			// initialize BFS at command
 			syms.push( state->id.smem_cmd_header );
+			levels.push( 0 );			
 
 			while ( !syms.empty() )
 			{
 				// get state
 				parent_sym = syms.front();
 				syms.pop();
+
+				parent_level = levels.front();
+				levels.pop();
 
 				// get children of the current identifier
 				wmes = smem_get_direct_augs_of_id( parent_sym, tc );
@@ -2226,9 +2256,11 @@ void smem_respond_to_cmd( agent *my_agent )
 							state->id.smem_info->last_cmd_time = (*w_p)->timetag;
 						}
 
-						if ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
+						if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
+							 ( parent_level < 2 ) )
 						{
 							syms.push( (*w_p)->value );
+							levels.push( parent_level + 1 );
 						}
 					}
 
@@ -2259,7 +2291,7 @@ void smem_respond_to_cmd( agent *my_agent )
 				// clear old results
 				smem_clear_result( my_agent, state );
 			}
-		}
+		}		
 
 		// a command is issued if the cue is new
 		// and there is something on the cue
@@ -2382,6 +2414,9 @@ void smem_respond_to_cmd( agent *my_agent )
 
 						// install memory directly onto the retrieve identifier
 						smem_install_memory( my_agent, state, retrieve->id.smem_lti, retrieve );
+
+						// add one to the expansions stat
+						my_agent->smem_stats->expansions->set_value( my_agent->smem_stats->expansions->get_value() + 1 );
 					}
 				}
 				// query
