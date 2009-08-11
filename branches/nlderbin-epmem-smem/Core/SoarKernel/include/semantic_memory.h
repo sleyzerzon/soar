@@ -62,6 +62,7 @@ class smem_param_container: public soar_module::param_container
 		soar_module::integer_param *exp_repeat;
 		soar_module::integer_param *exp_set;
 		soar_module::string_param *exp_result;
+		soar_module::string_param *exp_input;
 #endif
 
 		smem_param_container( agent *new_agent );
@@ -350,7 +351,7 @@ enum smem_query_levels { qry_search, qry_full };
 
 extern inline bool smem_enabled( agent *my_agent );
 
-extern bool smem_parse_chunks( agent *my_agent, const std::string *chunks, std::string **err_msg );
+extern bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_msg );
 
 extern std::string *smem_visualize_store( agent *my_agent );
 extern std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth );

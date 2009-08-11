@@ -125,6 +125,10 @@ smem_param_container::smem_param_container( agent *new_agent ): soar_module::par
 	exp_result = new soar_module::string_param( "exp-result", "", new soar_module::predicate<const char *>(), new soar_module::f_predicate<const char *>() );
 	add( exp_result );
 
+	// exp-input
+	exp_input = new soar_module::string_param( "exp-input", "", new soar_module::predicate<const char *>(), new soar_module::f_predicate<const char *>() );
+	add( exp_input );
+
 #endif
 }
 
@@ -2027,7 +2031,7 @@ bool smem_parse_chunk( agent *my_agent, smem_str_to_chunk_map *chunks, smem_chun
 	return return_val;
 }
 
-bool smem_parse_chunks( agent *my_agent, const std::string *chunks, std::string **err_msg )
+bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_msg )
 {
 	bool return_val = false;
 	unsigned long clause_count = 0;
@@ -2039,7 +2043,7 @@ bool smem_parse_chunks( agent *my_agent, const std::string *chunks, std::string 
 	}
 
 	// copied primarily from cli_sp
-	my_agent->alternate_input_string = chunks->c_str();
+	my_agent->alternate_input_string = chunks;
 	my_agent->alternate_input_suffix = const_cast<char *>( ") " );
 	my_agent->current_char = ' ';
 	my_agent->alternate_input_exit = true;
@@ -2452,6 +2456,8 @@ void smem_go( agent *my_agent )
 
 #else // SMEM_EXPERIMENT
 	
+	/*
+	// times execution of queries
 	{
 		
 		Symbol *queries_sym = find_sym_constant( my_agent, "queries" );
@@ -2539,6 +2545,94 @@ void smem_go( agent *my_agent )
 
 			result_file.close();
 		}
+	}
+	*/
+
+	// times storage procedure
+	{
+		// read add file
+		char *add_command;
+		std::string::size_type total_len = 0;
+		std::cout << std::endl << "reading input file... ";
+		{			
+			std::string *temp_str;
+			const char *temp_charstar;
+
+			std::queue<std::string *> lines;			
+
+			std::ifstream input_file( const_cast<char *>( my_agent->smem_params->exp_input->get_string() ) );
+			while ( !input_file.eof() )
+			{			
+				temp_str = new std::string();				
+				std::getline( input_file, (*temp_str) );
+
+				// start with "{" instead of "smem --add {" (simulates CLI)
+				if ( total_len == 0 )
+				{
+					temp_str->clear();
+					temp_str->append( "{" );
+				}
+				
+				total_len += ( temp_str->length() + 1 );				
+
+				lines.push( temp_str );
+			}
+			input_file.close();
+
+			add_command = new char[ total_len ];
+			add_command[ total_len - 1 ] = '\0';
+			unsigned int pos = 0;
+			while ( !lines.empty() )
+			{
+				temp_str = lines.front();
+				lines.pop();
+
+				temp_charstar = temp_str->c_str();
+				strcpy( ( add_command + pos ), temp_charstar );
+				
+				pos += static_cast<unsigned int>( temp_str->length() );
+				if ( !lines.empty() )
+				{
+					add_command[ pos++ ] = ' ';
+				}
+
+				delete temp_str;
+			}
+		}
+		std::cout << "done" << std::endl;
+
+		// parse
+		{
+			std::string *err = NULL;
+			bool result;
+
+			timeval start;
+			timeval total;
+
+			//std::ofstream result_file( const_cast<char *>( my_agent->smem_params->exp_result->get_string() ) );
+
+			long set = my_agent->smem_params->exp_set->get_value();
+
+			reset_timer( &start );
+			reset_timer( &total );
+
+			start_timer( my_agent, &start );
+			
+			result = smem_parse_chunks( my_agent, add_command, &( err ) );
+
+			stop_timer( my_agent, &start, &total );
+
+			std::cout << std::endl << "result: " << set << "," << total_len << "," << (double) timer_value( &total ) << std::endl;
+			//result_file.close();
+
+			if ( !result )
+			{
+				std::cout << (*err);
+				delete err;
+			}
+		}
+
+		delete add_command;
 	}
 
 #endif // SMEM_EXPERIMENT

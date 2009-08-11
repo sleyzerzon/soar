@@ -330,7 +330,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 	else if ( pOp == 'a' )
 	{
 		std::string *err = NULL;
-		bool result = smem_parse_chunks( m_pAgentSoar, pAttr, &( err ) );
+		bool result = smem_parse_chunks( m_pAgentSoar, pAttr->c_str(), &( err ) );
 
 		if ( !result )
 		{
