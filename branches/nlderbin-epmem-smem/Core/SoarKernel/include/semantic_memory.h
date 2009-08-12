@@ -101,6 +101,7 @@ class smem_stat_container: public soar_module::stat_container
 		smem_mem_high_stat *mem_high;
 
 		soar_module::integer_stat *expansions;
+		soar_module::integer_stat *cbr;
 
 		smem_stat_container( agent *my_agent );
 };

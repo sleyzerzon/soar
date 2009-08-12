@@ -189,6 +189,10 @@ smem_stat_container::smem_stat_container( agent *new_agent ): soar_module::stat_
 	expansions = new soar_module::integer_stat( "expansions", 0, new soar_module::f_predicate<long>() );
 	add( expansions );
 
+	// cue-based-retrievals
+	cbr = new soar_module::integer_stat( "cue-based-retrievals", 0, new soar_module::f_predicate<long>() );
+	add( cbr );
+
 }
 
 //
@@ -2431,6 +2435,9 @@ void smem_respond_to_cmd( agent *my_agent )
 					}
 
 					smem_process_query( my_agent, state, query, &( prohibit_lti ) );
+
+					// add one to the cbr stat
+					my_agent->smem_stats->cbr->set_value( my_agent->smem_stats->cbr->get_value() + 1 );
 				}
 				else if ( path == cmd_store )
 				{
