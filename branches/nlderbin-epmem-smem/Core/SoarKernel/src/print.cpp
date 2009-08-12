@@ -231,7 +231,14 @@ char *symbol_to_string (agent* thisAgent, Symbol *sym,
 	  dest=thisAgent->printed_output_string;
 	  dest_size = MAX_LEXEME_LENGTH*2+10; /* from agent.h */
 	}
-    SNPRINTF (dest, dest_size, "%c%lu", sym->id.name_letter, sym->id.name_number);
+	if (sym->id.smem_lti == NIL) {
+		// NOT an lti (long term identifier), print like we always have 
+	    SNPRINTF (dest, dest_size, "%c%lu", sym->id.name_letter, sym->id.name_number);
+	} 
+	else {
+		// IS an lti (long term identifier), prepend an @ symbol
+	    SNPRINTF (dest, dest_size, "@%c%lu", sym->id.name_letter, sym->id.name_number);
+	}
 	dest[dest_size - 1] = 0; /* ensure null termination */
     return dest;
 
