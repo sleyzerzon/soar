@@ -421,6 +421,15 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 				m_Result << output << "\n";
 			else
 				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
+
+			output = "Stores: ";
+			temp2 = m_pAgentSoar->smem_stats->stores->get_string();
+			output += temp2;
+			delete temp2;
+			if ( m_RawOutput )
+				m_Result << output << "\n";
+			else
+				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
 		}
 		else
 		{

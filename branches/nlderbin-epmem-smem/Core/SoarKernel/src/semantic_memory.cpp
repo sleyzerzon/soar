@@ -193,6 +193,10 @@ smem_stat_container::smem_stat_container( agent *new_agent ): soar_module::stat_
 	cbr = new soar_module::integer_stat( "cue-based-retrievals", 0, new soar_module::f_predicate<long>() );
 	add( cbr );
 
+	// stores
+	stores = new soar_module::integer_stat( "stores", 0, new soar_module::f_predicate<long>() );
+	add( stores );
+
 }
 
 //
@@ -2456,6 +2460,9 @@ void smem_respond_to_cmd( agent *my_agent )
 					for ( sym_p=store.begin(); sym_p!=store.end(); sym_p++ )
 					{
 						smem_soar_store( my_agent, (*sym_p) );
+
+						// add one to the store stat
+						my_agent->smem_stats->stores->set_value( my_agent->smem_stats->stores->get_value() + 1 );
 					}
 
 					// commit transaction (if not lazy)

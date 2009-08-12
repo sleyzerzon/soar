@@ -102,6 +102,7 @@ class smem_stat_container: public soar_module::stat_container
 
 		soar_module::integer_stat *expansions;
 		soar_module::integer_stat *cbr;
+		soar_module::integer_stat *stores;
 
 		smem_stat_container( agent *my_agent );
 };
