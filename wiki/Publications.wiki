@@ -21,7 +21,7 @@ Langley, P., Laird, J.E., & Rogers, S. (2009). _[http://www.eecs.umich.edu/~soar
 
 Lonsdale, D., !McGhee, J., Hendrickson, R. & Christensen, C. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper259.pdf Incremental Processing and Resource Usage.]_ Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.
 
-Mohan, S., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Technical%20report%20_Learning_to_play_Mario.pdf Learning to Play Mario.]_ Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
+Mohan, S., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_laird_TR.pdf Learning to Play Mario.]_ (Report No. CCA-TR-2009-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
 
 Rosenbloom, P.S. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper129.pdf  Towards a New Cognitive Hourglass: Uniform Implementation of a Cognitive Architecture via Factor Graphs.]_ Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.
 
