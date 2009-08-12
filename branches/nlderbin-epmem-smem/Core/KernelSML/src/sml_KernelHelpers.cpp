@@ -33,7 +33,7 @@
 #include "soar_TraceNames.h"
 #include "utilities.h"
 
-extern Bool print_sym (agent* thisAgent, void *item, FILE* f);
+extern Bool print_sym (agent* thisAgent, void *item, void* userdata);
 
 using namespace sml ;
 using namespace soarxml ;
@@ -1907,7 +1907,7 @@ bool read_wme_filter_component(agent* pSoarAgent, const char *s, Symbol ** sym)
 			return false;          /* Identifier does not exist */
 		}
 	} else {
-		*sym = make_symbol_for_current_lexeme(pSoarAgent);
+		*sym = make_symbol_for_current_lexeme(pSoarAgent, false);
 	}
 	// Added by voigtjr because if this function can 
 	// legally return success with *sym == 0, my logic in AddWmeFilter will be broken.

@@ -493,10 +493,10 @@ extern void remove_from_hash_table (agent* thisAgent, struct hash_table_struct *
 extern void add_to_hash_table (agent* thisAgent, struct hash_table_struct *ht, void *item);
 
 typedef Bool (*hash_table_callback_fn)(void *item);
-typedef Bool (*hash_table_callback_fn2)(agent* thisAgent, void *item, FILE* f);
+typedef Bool (*hash_table_callback_fn2)(agent* thisAgent, void *item, void* f);
 
 extern void do_for_all_items_in_hash_table (agent* thisAgent, struct hash_table_struct *ht,
-                                            hash_table_callback_fn2 f, FILE* fn);
+                                            hash_table_callback_fn2 f, void* userdata);
 extern void do_for_all_items_in_hash_bucket (struct hash_table_struct *ht,
                                              hash_table_callback_fn f,
                                              uint32_t hash_value);

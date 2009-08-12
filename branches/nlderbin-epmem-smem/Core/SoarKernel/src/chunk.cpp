@@ -181,29 +181,30 @@ preference *get_results_for_instantiation (agent* thisAgent, instantiation *inst
 ===================================================================== */
 
 void variablize_symbol (agent* thisAgent, Symbol **sym) {
-  char prefix[2];
-  Symbol *var;
-  
-  if ((*sym)->common.symbol_type!=IDENTIFIER_SYMBOL_TYPE) return;
-  if (! thisAgent->variablize_this_chunk) return;
-  
-  if ((*sym)->id.tc_num == thisAgent->variablization_tc) {
-    /* --- it's already been variablized, so use the existing variable --- */
-    var = (*sym)->id.variablization;
-    symbol_remove_ref (thisAgent, *sym);
-    *sym = var;
-    symbol_add_ref (var);
-    return;
-  }
+	char prefix[2];
+	Symbol *var;
 
-  /* --- need to create a new variable --- */
-  (*sym)->id.tc_num = thisAgent->variablization_tc;
-  prefix[0] = static_cast<char>(tolower((*sym)->id.name_letter));
-  prefix[1] = 0;
-  var = generate_new_variable (thisAgent, prefix);
-  (*sym)->id.variablization = var;
-  symbol_remove_ref (thisAgent, *sym);
-  *sym = var;
+	if ((*sym)->common.symbol_type!=IDENTIFIER_SYMBOL_TYPE) return;	// only variablize identifiers
+	if (! thisAgent->variablize_this_chunk) return;					// don't variablize (justifications)
+	if ((*sym)->id.smem_lti != NIL) return;							// don't variablize lti (long term identifiers)
+
+	if ((*sym)->id.tc_num == thisAgent->variablization_tc) {
+		/* --- it's already been variablized, so use the existing variable --- */
+		var = (*sym)->id.variablization;
+		symbol_remove_ref (thisAgent, *sym);
+		*sym = var;
+		symbol_add_ref (var);
+		return;
+	}
+
+	/* --- need to create a new variable --- */
+	(*sym)->id.tc_num = thisAgent->variablization_tc;
+	prefix[0] = static_cast<char>(tolower((*sym)->id.name_letter));
+	prefix[1] = 0;
+	var = generate_new_variable (thisAgent, prefix);
+	(*sym)->id.variablization = var;
+	symbol_remove_ref (thisAgent, *sym);
+	*sym = var;
 }
 
 void variablize_test (agent* thisAgent, test *t) {

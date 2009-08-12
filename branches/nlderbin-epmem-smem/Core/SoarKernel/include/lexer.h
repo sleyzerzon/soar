@@ -128,6 +128,7 @@ extern void skip_ahead_to_balanced_parentheses (agent* thisAgent,
 												int parentheses_level);
 extern void fake_rparen_at_next_end_of_line (agent* thisAgent);
 extern void set_lexer_allow_ids (agent* thisAgent, Bool allow_identifiers);
+extern Bool get_lexer_allow_ids (agent* thisAgent);
 
 extern Bool determine_type_of_constituent_string (agent* thisAgent);
 

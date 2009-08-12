@@ -507,10 +507,11 @@ void deallocate_symbol (agent* thisAgent, Symbol *sym) {
    new gensym names).
 ------------------------------------------------------------------- */
 
-Bool print_identifier_ref_info(agent* thisAgent, void* item, FILE* f) {
+Bool print_identifier_ref_info(agent* thisAgent, void* item, void* userdata) {
    Symbol* sym;
    char msg[256];
    sym = static_cast<symbol_union *>(item);
+   FILE* f = reinterpret_cast<FILE*>(userdata);
    
    if ( sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) {
       if ( sym->common.reference_count > 0 ) {
@@ -535,39 +536,47 @@ Bool print_identifier_ref_info(agent* thisAgent, void* item, FILE* f) {
 }
 
 bool reset_id_counters (agent* thisAgent) {
-  int i;
+	int i;
 
-  if (thisAgent->identifier_hash_table->count != 0) {
-    print (thisAgent, "Internal warning:  wanted to reset identifier generator numbers, but\n");
-    print (thisAgent, "there are still some identifiers allocated.  (Probably a memory leak.)\n");
-    print (thisAgent, "(Leaving identifier numbers alone.)\n");
-	xml_generate_warning(thisAgent, "Internal warning:  wanted to reset identifier generator numbers, but\nthere are still some identifiers allocated.  (Probably a memory leak.)\n(Leaving identifier numbers alone.)");
+	if (thisAgent->identifier_hash_table->count != 0) {
+		// As long as all of the existing identifiers are long term identifiers (lti), there's no problem
+		unsigned long ltis = 0;
+		do_for_all_items_in_hash_table( thisAgent, thisAgent->identifier_hash_table, smem_count_ltis, &ltis );
+		if (thisAgent->identifier_hash_table->count != ltis) {
+			print (thisAgent, "Internal warning:  wanted to reset identifier generator numbers, but\n");
+			print (thisAgent, "there are still some identifiers allocated.  (Probably a memory leak.)\n");
+			print (thisAgent, "(Leaving identifier numbers alone.)\n");
+			xml_generate_warning(thisAgent, "Internal warning:  wanted to reset identifier generator numbers, but\nthere are still some identifiers allocated.  (Probably a memory leak.)\n(Leaving identifier numbers alone.)");
 
-    /* RDF 01272003: Added this to improve the output from this error message */
-	//TODO: append this to previous XML string or generate separate output?
-    do_for_all_items_in_hash_table( thisAgent, thisAgent->identifier_hash_table, print_identifier_ref_info, 0);
+			/* RDF 01272003: Added this to improve the output from this error message */
+			//TODO: append this to previous XML string or generate separate output?
+			do_for_all_items_in_hash_table( thisAgent, thisAgent->identifier_hash_table, print_identifier_ref_info, 0);
 
-	// Also dump the ids to a txt file
-	FILE *ids = fopen("leaked-ids.txt", "w") ;
-	if (ids)
+			// Also dump the ids to a txt file
+			FILE *ids = fopen("leaked-ids.txt", "w") ;
+			if (ids)
+			{
+				do_for_all_items_in_hash_table( thisAgent, thisAgent->identifier_hash_table, print_identifier_ref_info, reinterpret_cast<void*>(ids));
+				fclose(ids) ;
+			}
+
+			return false;
+		}
+
+		// Getting here means that there are still identifiers but that 
+		// they are all long-term and (hopefully) exist only in production memory.
+	}
+	for (i=0; i<26; i++) thisAgent->id_counter[i]=1;
+
+	if ( smem_enabled( thisAgent ) )
 	{
-		do_for_all_items_in_hash_table( thisAgent, thisAgent->identifier_hash_table, print_identifier_ref_info, ids);
-		fclose(ids) ;
+		smem_reset_id_counters( thisAgent );
 	}
 
-    return false;
-  }
-  for (i=0; i<26; i++) thisAgent->id_counter[i]=1;
-  
-  if ( smem_enabled( thisAgent ) )
-  {
-	smem_reset_id_counters( thisAgent );
-  }
-
-  return true ;
+	return true ;
 }
 
-Bool reset_tc_num (agent* /*thisAgent*/, void *item, FILE* /*f*/) {
+Bool reset_tc_num (agent* /*thisAgent*/, void *item, void*) {
   Symbol *sym;
 
   sym = static_cast<symbol_union *>(item);
@@ -581,7 +590,7 @@ void reset_id_and_variable_tc_numbers (agent* thisAgent) {
   do_for_all_items_in_hash_table (thisAgent, thisAgent->variable_hash_table, reset_tc_num,0);
 }
 
-Bool reset_gensym_number (agent* /*thisAgent*/, void *item, FILE* /*f*/) {
+Bool reset_gensym_number (agent* /*thisAgent*/, void *item, void*) {
   Symbol *sym;
 
   sym = static_cast<symbol_union *>(item);
@@ -593,7 +602,7 @@ void reset_variable_gensym_numbers (agent* thisAgent) {
   do_for_all_items_in_hash_table (thisAgent, thisAgent->variable_hash_table, reset_gensym_number,0);
 }
 
-Bool print_sym (agent* thisAgent, void *item, FILE* /*f*/) {
+Bool print_sym (agent* thisAgent, void *item, void*) {
   print_string (thisAgent, symbol_to_string (thisAgent, static_cast<symbol_union *>(item), TRUE, NIL, 0));
   print_string (thisAgent, "\n");
   return FALSE;

@@ -6398,8 +6398,9 @@ void reteload_string (FILE* f) {
    Reteload_free_symbol_table() frees up the symbol table when we're done.
 ---------------------------------------------------------------------- */
 
-Bool retesave_symbol_and_assign_index (agent* thisAgent, void *item, FILE* f) {
+Bool retesave_symbol_and_assign_index (agent* thisAgent, void *item, void* userdata) {
   Symbol *sym;
+  FILE* f = reinterpret_cast<FILE*>(userdata);
 
   sym = static_cast<symbol_union *>(item);
   thisAgent->current_retesave_symindex++;
@@ -6514,8 +6515,9 @@ void reteload_free_symbol_table (agent* thisAgent) {
    Reteload_free_am_table() frees up the table when we're done.
 ---------------------------------------------------------------------- */
 
-Bool retesave_alpha_mem_and_assign_index (agent* thisAgent, void *item, FILE* f) {
+Bool retesave_alpha_mem_and_assign_index (agent* thisAgent, void *item, void* userdata) {
   alpha_mem *am;
+  FILE* f = reinterpret_cast<FILE*>(userdata);
 
   am = static_cast<alpha_mem_struct *>(item);
   thisAgent->current_retesave_amindex++;

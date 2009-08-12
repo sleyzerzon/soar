@@ -361,7 +361,9 @@ extern bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string 
 extern std::string *smem_visualize_store( agent *my_agent );
 extern std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth );
 
+extern Bool smem_count_ltis( agent *my_agent, void *item, void *userdata );
 extern smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long name_number );
+extern inline Symbol *smem_lti_soar_make( agent *my_agent, smem_lti_id lti, char name_letter, unsigned long name_number, goal_stack_level level );
 
 extern void smem_reset_id_counters( agent *my_agent );
 extern void smem_close( agent *my_agent );

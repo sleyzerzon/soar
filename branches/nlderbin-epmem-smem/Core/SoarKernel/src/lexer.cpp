@@ -1148,6 +1148,10 @@ void set_lexer_allow_ids (agent* thisAgent, Bool allow_identifiers) {
   thisAgent->current_file->allow_ids = allow_identifiers;
 }
 
+Bool get_lexer_allow_ids(agent* thisAgent) {
+	return thisAgent->current_file->allow_ids;
+}
+
 /* ======================================================================
                Determine possible symbol types for string
 

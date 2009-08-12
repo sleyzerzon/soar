@@ -31,6 +31,8 @@
 #include <ctype.h>
 #include <fstream>
 
+void smem_init_db( agent *my_agent, bool readonly = false );
+
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 // Bookmark strings to help navigate the code
@@ -728,6 +730,21 @@ smem_hash_id smem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
+// instance of hash_table_callback_fn2
+Bool smem_count_ltis( agent * /*my_agent*/, void *item, void *userdata )
+{
+	Symbol *id = static_cast<symbol_union *>(item);
+
+	if ( id->id.smem_lti != NIL )
+	{
+		unsigned long *counter = reinterpret_cast<unsigned long *>( userdata );
+		(*counter)++;
+	}
+
+	return false;
+}
+
+
 // activates a new or existing long-term identifier
 inline void smem_lti_activate( agent *my_agent, smem_lti_id lti )
 {
@@ -750,6 +767,12 @@ smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long na
 {
 	smem_lti_id return_val = NIL;
 
+	// getting lti ids requires an open semantic database
+	if ( my_agent->smem_db->get_status() == soar_module::disconnected )
+	{
+		smem_init_db( my_agent );
+	}
+	
 	// letter=? AND number=?
 	my_agent->smem_stmts->lti_get->bind_int( 1, static_cast<uintptr_t>( name_letter ) );
 	my_agent->smem_stmts->lti_get->bind_int( 2, static_cast<uintptr_t>( name_number ) );
@@ -1535,7 +1558,7 @@ void smem_clear_result( agent *my_agent, Symbol *state )
  *                experimentation where you don't want to alter
  *                previous database state.
  **************************************************************************/
-void smem_init_db( agent *my_agent, bool readonly = false )
+void smem_init_db( agent *my_agent, bool readonly )
 {
 	if ( my_agent->smem_db->get_status() != soar_module::disconnected )
 		return;
