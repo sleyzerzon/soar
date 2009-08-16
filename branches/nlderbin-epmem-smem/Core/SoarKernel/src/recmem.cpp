@@ -208,7 +208,42 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
   Bool nil_arg_found;
   
   if (rhs_value_is_symbol(rv)) {
-    result = rhs_value_to_symbol(rv);
+
+	  result = rhs_value_to_symbol(rv);
+
+	/*
+	  Long-Winded Case-by-Case [Hopeful] Explanation
+
+	  This has to do with long-term identifiers (LTIs) that exist within productions (including chunks/justifications).
+	  The real issue is that identifiers, upon creation, require a goal level (used for promotion/demotion/garbage collection).
+	  At the time of parsing a rule, we don't have this information, so we give it an invalid "unknown" value.
+	  This is OK on the condition side of a rule, since the rete (we think) will just consider it another symbol used for matching.
+	  However, it becomes hairy when LTIs are on the action side of a rule, with respect to the state of the LTI in working memory and the rule LHS.
+	  Consider the following cases:
+
+	  1. Identifier is LTI, does NOT exist as a LHS symbol
+	  - we do NOT support this!!!  bad things will likely happen due to potential for adding an identifier to working memory 
+	    with an unknown goal level.
+
+	  2. Attribute/Value is LTI, does NOT exist as a LHS symbol (!!!!!IMPORTANT CASE!!!!!)
+	  - the caller of this function will supply new_id_level (probably based upon the level of the id).
+	  - if this is valid (i.e. greater than 0), we use it.  else, ignore.
+	  - we have a huge assert on add_wme_to_wm that will kill soar if we try to add an identifier to working memory with an invalid level.
+
+	  3. Identifier/Attribute/Value is LTI, DOES exist as LHS symbol
+	  - in this situation, we are *guaranteed* that the resulting LTI (since it is in WM) has a valid goal level.
+	  - it should be noted that if a value, the level of the LTI may change during promotion/demotion/garbage collection,
+	    but this is natural Soar behavior and outside our perview.
+
+	*/
+	if ( ( result->id.common_symbol_info.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
+		 ( result->id.smem_lti != NIL ) &&
+		 ( result->id.level == SMEM_LTI_UNKNOWN_LEVEL ) &&
+		 ( new_id_level > 0 ) )
+	{
+		result->id.level = new_id_level;
+	}
+    
     symbol_add_ref (result);
     return result;
   }

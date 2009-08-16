@@ -186,7 +186,12 @@ void variablize_symbol (agent* thisAgent, Symbol **sym) {
 
 	if ((*sym)->common.symbol_type!=IDENTIFIER_SYMBOL_TYPE) return;	// only variablize identifiers
 	if (! thisAgent->variablize_this_chunk) return;					// don't variablize (justifications)
-	if ((*sym)->id.smem_lti != NIL) return;							// don't variablize lti (long term identifiers)
+	if ((*sym)->id.smem_lti != NIL)									// don't variablize lti (long term identifiers)
+	{
+		(*sym)->id.tc_num = thisAgent->variablization_tc;
+		(*sym)->id.variablization = (*sym);
+		return;
+	}
 
 	if ((*sym)->id.tc_num == thisAgent->variablization_tc) {
 		/* --- it's already been variablized, so use the existing variable --- */

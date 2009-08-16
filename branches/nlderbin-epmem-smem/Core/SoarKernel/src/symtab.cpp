@@ -508,31 +508,44 @@ void deallocate_symbol (agent* thisAgent, Symbol *sym) {
 ------------------------------------------------------------------- */
 
 Bool print_identifier_ref_info(agent* thisAgent, void* item, void* userdata) {
-   Symbol* sym;
-   char msg[256];
-   sym = static_cast<symbol_union *>(item);
-   FILE* f = reinterpret_cast<FILE*>(userdata);
-   
-   if ( sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) {
-      if ( sym->common.reference_count > 0 ) {
-         SNPRINTF( msg, 256, 
-                  "\t%c%lu --> %lu\n", 
-                  sym->id.name_letter, 
-                  sym->id.name_number, 
-                  sym->common.reference_count);
-		 msg[255] = 0; /* ensure null termination */
-         print (thisAgent, msg);
-		 xml_generate_warning(thisAgent, msg);
+	Symbol* sym;
+	char msg[256];
+	sym = static_cast<symbol_union *>(item);
+	FILE* f = reinterpret_cast<FILE*>(userdata);
 
-		 if (f) {
-			 fprintf(f, "%s", msg) ;
+	if ( sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) {
+		if ( sym->common.reference_count > 0 ) {
+
+			if ( sym->id.smem_lti != NIL )
+			{
+				SNPRINTF( msg, 256, 
+					"\t@%c%lu --> %lu\n", 
+					sym->id.name_letter, 
+					sym->id.name_number, 
+					sym->common.reference_count);
+			}
+			else
+			{
+				SNPRINTF( msg, 256, 
+					"\t%c%lu --> %lu\n", 
+					sym->id.name_letter, 
+					sym->id.name_number, 
+					sym->common.reference_count);
+			}
+
+			msg[255] = 0; /* ensure null termination */
+			print (thisAgent, msg);
+			xml_generate_warning(thisAgent, msg);
+
+			if (f) {
+				fprintf(f, "%s", msg) ;
 		 }
-      }
-   } else {
-      print (thisAgent, "\tERROR: HASHTABLE ITEM IS NOT AN IDENTIFIER!\n");
-      return TRUE;
-   }
-   return FALSE;
+		}
+	} else {
+		print (thisAgent, "\tERROR: HASHTABLE ITEM IS NOT AN IDENTIFIER!\n");
+		return TRUE;
+	}
+	return FALSE;
 }
 
 bool reset_id_counters (agent* thisAgent) {

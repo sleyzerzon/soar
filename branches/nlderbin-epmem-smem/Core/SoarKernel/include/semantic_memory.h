@@ -225,6 +225,7 @@ enum smem_variable_key
 	var_max_cycle
 };
 
+#define SMEM_LTI_UNKNOWN_LEVEL 0
 
 //////////////////////////////////////////////////////////
 // Soar Integration Types

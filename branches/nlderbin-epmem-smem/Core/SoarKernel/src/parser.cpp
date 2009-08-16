@@ -277,7 +277,7 @@ Symbol *make_symbol_for_current_lexeme (agent* thisAgent, bool allow_lti) {
 			  abort_with_fatal_error(thisAgent, msg);
 		  }
 		  else {
-			  return smem_lti_soar_make( thisAgent, lti_id, thisAgent->lexeme.id_letter, thisAgent->lexeme.id_number, 0 );
+			  return smem_lti_soar_make( thisAgent, lti_id, thisAgent->lexeme.id_letter, thisAgent->lexeme.id_number, SMEM_LTI_UNKNOWN_LEVEL );
 		  }
 	  }
 	  break;
@@ -1771,7 +1771,7 @@ action *parse_rhs_action (agent* thisAgent) {
 		  abort_with_fatal_error(thisAgent, msg);
 	  }
 	  else {
-		  var = smem_lti_soar_make( thisAgent, lti_id, thisAgent->lexeme.id_letter, thisAgent->lexeme.id_number, 0 );
+		  var = smem_lti_soar_make( thisAgent, lti_id, thisAgent->lexeme.id_letter, thisAgent->lexeme.id_number, SMEM_LTI_UNKNOWN_LEVEL );
 	  }
 	}
 	else {

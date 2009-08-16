@@ -127,15 +127,19 @@ wme *make_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value, Bool a
 
 void add_wme_to_wm (agent* thisAgent, wme *w) 
 {
-   push (thisAgent, w, thisAgent->wmes_to_add);
-   if (w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE) 
-   {
-      post_link_addition (thisAgent, w->id, w->value);
-      if (w->attr == thisAgent->operator_symbol) 
-      {
-         w->value->id.isa_operator++;
-      }
-   }
+	assert( ( ( w->id->id.common_symbol_info.symbol_type != IDENTIFIER_SYMBOL_TYPE ) || ( w->id->id.level > SMEM_LTI_UNKNOWN_LEVEL ) ) &&
+		( ( w->attr->id.common_symbol_info.symbol_type != IDENTIFIER_SYMBOL_TYPE ) || ( w->attr->id.level > SMEM_LTI_UNKNOWN_LEVEL ) ) &&
+		( ( w->value->id.common_symbol_info.symbol_type != IDENTIFIER_SYMBOL_TYPE ) || ( w->value->id.level > SMEM_LTI_UNKNOWN_LEVEL ) ) );
+
+	push (thisAgent, w, thisAgent->wmes_to_add);
+	if (w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE) 
+	{
+		post_link_addition (thisAgent, w->id, w->value);
+		if (w->attr == thisAgent->operator_symbol) 
+		{
+			w->value->id.isa_operator++;
+		}
+	}
 }
 
 void remove_wme_from_wm (agent* thisAgent, wme *w) 
