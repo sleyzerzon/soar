@@ -1734,17 +1734,14 @@ void smem_deallocate_chunk( agent *my_agent, smem_chunk *chunk, bool free_chunk 
 			smem_slot::iterator v;
 
 			// iterate over slots
-			for ( s=chunk->slots->begin(); s!=chunk->slots->end(); s++ )
+			for ( s=chunk->slots->begin(); s!=chunk->slots->end(); s=chunk->slots->erase(s) )
 			{
 				// proceed to slot contents
 				if ( s->second )
 				{
 					// iterate over each value
-					for ( v=s->second->begin(); v!=s->second->end(); v++ )
+					for ( v=s->second->begin(); v!=s->second->end(); v=s->second->erase(v) )
 					{
-						// deallocate attribute for each corresponding value
-						symbol_remove_ref( my_agent, s->first );
-
 						// de-allocation of value is dependent upon type
 						if ( (*v)->val_const.val_type == value_const_t )
 						{
@@ -1761,6 +1758,9 @@ void smem_deallocate_chunk( agent *my_agent, smem_chunk *chunk, bool free_chunk 
 					}
 				}
 
+				// deallocate attribute for each corresponding value
+				symbol_remove_ref( my_agent, s->first );
+
 				delete s->second;
 			}
 
@@ -1773,6 +1773,7 @@ void smem_deallocate_chunk( agent *my_agent, smem_chunk *chunk, bool free_chunk 
 		if ( free_chunk )
 		{
 			delete chunk;
+			chunk = NULL;
 		}
 	}
 }
@@ -1828,6 +1829,8 @@ bool smem_parse_chunk( agent *my_agent, smem_str_to_chunk_map *chunks, smem_chun
 	bool return_val = false;
 
 	smem_chunk *new_chunk = new smem_chunk;
+	new_chunk->slots = NULL;
+
 	std::string *chunk_name = NULL;
 
 	char temp_letter;
