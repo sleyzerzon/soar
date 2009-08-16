@@ -1737,7 +1737,7 @@ action *parse_attr_value_make (agent* thisAgent, Symbol *id)
 
 action *parse_rhs_action (agent* thisAgent) {
 	action *all_actions, *new_actions, *last;
-	Symbol *var;
+	Symbol *var = NULL;
 	rhs_value funcall_value;
 
 	if (thisAgent->lexeme.type!=L_PAREN_LEXEME) {
