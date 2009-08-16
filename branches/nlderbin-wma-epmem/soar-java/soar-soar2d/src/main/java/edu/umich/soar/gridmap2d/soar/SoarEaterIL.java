@@ -47,6 +47,7 @@ class SoarEaterIL {
 			
 			/** another eater in the cell */
 			StringElement eater;
+			StringElement eaterName;
 			
 			/** property: edible */
 			Map<String, StringElement> comestibles = new HashMap<String, StringElement>();
@@ -78,7 +79,9 @@ class SoarEaterIL {
 			void clearContents() {
 				if (eater != null) {
 					agent.DestroyWME(eater);
+					agent.DestroyWME(eaterName);
 					eater = null;
+					eaterName = null;
 				}
 				
 				for (StringElement element : comestibles.values()) {
@@ -183,17 +186,27 @@ class SoarEaterIL {
 		}
 		
 		private void updatePlayerContent(int[] view, EatersMap map, Cell cell) {
-			// TODO: Keep track of player name so we can blink if it is a different eater.
-			Player playerContent = map.getCell(view).getPlayer();
+			Player playerContent = map.getFirstPlayer(view);
 			if (playerContent != null) {
 				if (cell.eater == null) {
-					cell.eater = agent.CreateStringWME(cell.me, Names.kContentID, Names.kEaterID);
+					cell.eater = cell.me.CreateStringWME(Names.kContentID, Names.kEaterID);
+					cell.eaterName = cell.me.CreateStringWME(Names.kContentNameID, playerContent.getName());
+
+				} else if (!cell.eaterName.GetValue().equals(playerContent.getName())) {
+					// blink eater
+					cell.eater.DestroyWME();
+					cell.eater = cell.me.CreateStringWME(Names.kContentID, Names.kEaterID);
+					
+					// update name
+					cell.eaterName.Update(playerContent.getName());
 				}
 			} else {
 				// Remove any if there
 				if (cell.eater != null) {
 					agent.DestroyWME(cell.eater);
+					agent.DestroyWME(cell.eaterName);
 					cell.eater = null;
+					cell.eaterName = null;
 				}
 			}
 		}
@@ -202,21 +215,18 @@ class SoarEaterIL {
 			// Food
 			Map<String, StringElement> remaining = new HashMap<String, StringElement>(cell.comestibles);
 			// For each food type in the cell on the map
-			List<CellObject> comestibles = map.getCell(view).getAllWithProperty(Names.kPropertyEdible);
-			if (comestibles != null) {
-				for (CellObject comestible : comestibles) {
+			for (CellObject comestible : map.getAllWithProperty(view, Names.kPropertyEdible)) {
+				
+				String id = comestible.getProperty(Names.kPropertyID);
+				
+				// Do we have one?
+				if (cell.comestibles.containsKey(id)) {
+					// Keep it and remove it from the remaining
+					remaining.remove(id);
+				} else {
 					
-					String id = comestible.getProperty(Names.kPropertyID);
-					
-					// Do we have one?
-					if (cell.comestibles.containsKey(id)) {
-						// Keep it and remove it from the remaining
-						remaining.remove(id);
-					} else {
-						
-						// Create it and move on
-						createContent(cell.comestibles, cell, id);
-					}
+					// Create it and move on
+					createContent(cell.comestibles, cell, id);
 				}
 			}
 			
@@ -346,10 +356,10 @@ class SoarEaterIL {
 						}
 						
 						// get all things that block
-						List<CellObject> blockers = map.getCell(view).getAllWithProperty(Names.kPropertyBlock);
+						List<CellObject> blockers = map.getAllWithProperty(view, Names.kPropertyBlock);
 
 						// Blocking cells are simple, put anything with IDs on the input link
-						if (blockers != null) {
+						if (!blockers.isEmpty()) {
 							for (CellObject object : blockers) {
 								// use the id property as its id on the input link
 								createContent(cell.staticContent, cell, object.getProperty(Names.kPropertyID));
@@ -359,7 +369,7 @@ class SoarEaterIL {
 					} else {
 						
 						// Filter out locations that will not change:
-						if (!map.isInBounds(view) || map.getCell(view).hasAnyWithProperty(Names.kPropertyBlock)) {
+						if (!map.isInBounds(view) || map.hasAnyObjectWithProperty(view, Names.kPropertyBlock)) {
 							continue;
 						}
 					}
@@ -371,9 +381,9 @@ class SoarEaterIL {
 					updateFoodContent(view, map, cell);
 					
 					// TODO: there can only be one (as of right now)
-					List<CellObject> boxes = map.getCell(view).getAllWithProperty(Names.kPropertyBox);
-					if (boxes != null) {
-						updateBox(boxes.get(0), cell);
+					CellObject box = map.getFirstObjectWithProperty(view, Names.kPropertyBox);
+					if (box != null) {
+						updateBox(box, cell);
 					}
 					
 					checkEmpty(cell);
@@ -431,33 +441,21 @@ class SoarEaterIL {
 		myLocation = new MyLocationIL(vision);
 	}
 	
-	void create(String name, int initialScore) throws CommitException {
+	void create(String name, int initialScore) {
 		eater.create(name, initialScore);
 		myLocation.create();
 		random.create();
-		
-		if (!agent.Commit()) {
-			throw new CommitException();
-		}
 	}
 	
-	void update(boolean moved, int[] pos, EatersMap map, int points) throws CommitException {
+	void update(boolean moved, int[] pos, EatersMap map, int points) {
 		eater.update(moved, pos, points);
 		myLocation.update(moved, pos, map);
 		random.update();
-		
-		if (!agent.Commit()) {
-			throw new CommitException();
-		}
 	}
 	
-	void destroy() throws CommitException {
+	void destroy() {
 		eater.destroy();
 		myLocation.destroy();
 		random.destroy();
-		
-		if (!agent.Commit()) {
-			throw new CommitException();
-		}
 	}
 }

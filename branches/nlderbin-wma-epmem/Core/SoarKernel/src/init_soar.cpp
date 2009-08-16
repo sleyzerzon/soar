@@ -393,14 +393,9 @@ bool reinitialize_soar (agent* thisAgent) {
 	set_sysparam(thisAgent, TRACE_WM_CHANGES_SYSPARAM,               FALSE);
 	/* kjh (CUSP-B4) end */
 
-	free_list(thisAgent, thisAgent->chunk_free_problem_spaces);
-	thisAgent->chunk_free_problem_spaces = NIL;
-	free_list(thisAgent, thisAgent->chunky_problem_spaces);
-	thisAgent->chunky_problem_spaces = NIL;
-
-	rl_reset_data( thisAgent );
-	wma_deinit( thisAgent );
+	rl_reset_data( thisAgent );	
 	clear_goal_stack (thisAgent);
+	wma_deinit( thisAgent );
 	thisAgent->rl_stats->reset();
 	thisAgent->wma_stats->reset();
 	thisAgent->epmem_stats->reset();

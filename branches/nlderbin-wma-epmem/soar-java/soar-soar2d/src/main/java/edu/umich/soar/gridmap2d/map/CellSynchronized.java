@@ -4,69 +4,114 @@ import java.util.List;
 
 import edu.umich.soar.gridmap2d.players.Player;
 
-
-class CellSynchronized extends Cell {
-	protected CellSynchronized(int[] xy) {
-		super(xy);
+class CellSynchronized<E extends Cell> implements Cell {
+	final E c;
+	protected CellSynchronized(E c) {
+		this.c = c;
 	}
 	
 	@Override
-	void addObserver(CellObjectObserver observer) {
-		super.addObserver(observer);
+	public synchronized Player getFirstPlayer() {
+		return c.getFirstPlayer();
 	}
 	
 	@Override
-	public synchronized Player getPlayer() {
-		return super.getPlayer();
+	public synchronized List<Player> getPlayers() {
+		return c.getPlayers();
 	}
 	
 	@Override
 	public synchronized void setPlayer(Player player) {
-		super.setPlayer(player);
+		c.setPlayer(player);
 	}
 	
 	@Override
-	public synchronized void addObject(CellObject cellObject) {
-		super.addObject(cellObject);
+	public synchronized void addPlayer(Player player) {
+		c.addPlayer(player);
 	}
 	
 	@Override
-	public synchronized List<CellObject> getAllWithProperty(String name) {	
-		return super.getAllWithProperty(name);
+	public synchronized void removePlayer(Player player) {
+		c.removePlayer(player);
 	}
 	
 	@Override
-	public synchronized List<CellObject> getAll() {	
-		return super.getAll();
+	public synchronized void removeAllPlayers() {
+		c.removeAllPlayers();
 	}
 	
 	@Override
-	public synchronized boolean hasAnyWithProperty(String name) {	
-		return super.hasAnyWithProperty(name);
-	}
-	
-	@Override
-	public synchronized List<CellObject> removeAllByProperty(String name) {
-		return super.removeAllByProperty(name);
-	}
-	
-	@Override
-	public synchronized List<CellObject> removeAll() {
-		return super.removeAll();
+	public synchronized boolean hasPlayers() {
+		return c.hasPlayers();
 	}
 
 	@Override
-	public synchronized CellObject getObject(String name) {
-		return super.getObject(name);
+	public synchronized void addObject(CellObject cellObject) {
+		c.addObject(cellObject);
 	}
 	
 	@Override
-	public synchronized boolean hasObject(String name) {
-		return super.hasObject(name);
+	public synchronized List<CellObject> getAllObjectsWithProperty(String property) {	
+		return c.getAllObjectsWithProperty(property);
 	}
 	
 	@Override
-	public synchronized CellObject removeObject(String name) {
-		return super.removeObject(name);
+	public synchronized List<CellObject> getAllObjects() {	
+		return c.getAllObjects();
+	}
+	
+	@Override
+	public synchronized boolean hasAnyObjectWithProperty(String property) {	
+		return c.hasAnyObjectWithProperty(property);
+	}
+	
+	@Override
+	public synchronized List<CellObject> removeAllObjectsByProperty(String property) {
+		return c.removeAllObjectsByProperty(property);
+	}
+	
+	@Override
+	public synchronized List<CellObject> removeAllObjects() {
+		return c.removeAllObjects();
+	}
+
+	@Override
+	public synchronized void addObserver(CellObjectObserver observer) {
+		c.addObserver(observer);
+	}
+
+	@Override
+	public synchronized boolean checkAndResetRedraw() {
+		return c.checkAndResetRedraw();
+	}
+
+	@Override
+	public synchronized boolean checkRedraw() {
+		return c.checkRedraw();
+	}
+
+	@Override
+	public synchronized void forceRedraw() {
+		c.forceRedraw();
+	}
+
+	@Override
+	public synchronized boolean removeObject(CellObject cellObject) {
+		return c.removeObject(cellObject);
+	}
+
+	@Override
+	public synchronized boolean hasObject(CellObject cellObject) {
+		return c.hasObject(cellObject);
+	}
+
+	@Override
+	public synchronized void removeObserver(CellObjectObserver observer) {
+		c.removeObserver(observer);
+	}
+
+	@Override
+	public synchronized CellObject getFirstObjectWithProperty(String property) {
+		return c.getFirstObjectWithProperty(property);
 	}
 }

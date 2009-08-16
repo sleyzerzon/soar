@@ -7,7 +7,7 @@ import sml.Identifier;
 import sml.IntElement;
 import sml.StringElement;
 import edu.umich.soar.gridmap2d.players.CarryInterface;
-import edu.umich.soar.gridmap2d.players.RoomPlayer;
+import edu.umich.soar.gridmap2d.players.Robot;
 import edu.umich.soar.robot.OffsetPose;
 import edu.umich.soar.robot.ConfigureInterface;
 import edu.umich.soar.robot.WaypointsIL;
@@ -70,8 +70,8 @@ public class SoarRobotSelfIL {
 
 		if (ci.hasObject()) {
 			carry = self.CreateIdWME("carry");
-			carryid = carry.CreateIntWME("id", ci.getObject().getIntProperty("object-id", -1));
-			carry.CreateStringWME("type", ci.getObject().getProperty("id"));
+			carryid = carry.CreateIntWME("id", ci.getRoomObject().getId());
+			carry.CreateStringWME("type", ci.getRoomObject().getCellObject().getProperty("name"));
 		}
 	}
 	
@@ -102,7 +102,7 @@ public class SoarRobotSelfIL {
 		self.DestroyWME();
 	}
 
-	public void update(RoomPlayer player) {
+	public void update(Robot player) {
 		x.Update(opose.getPose().pos[0]);
 		y.Update(opose.getPose().pos[1]);
 		z.Update(opose.getPose().pos[2]);
@@ -118,7 +118,7 @@ public class SoarRobotSelfIL {
 		messagesIL.update();
 
 		if (ci.hasObject()) {
-			int objectId = ci.getObject().getIntProperty("object-id", -1);
+			int objectId = ci.getRoomObject().getId();
 			if (carry != null) {
 				if (carryid.GetValue() != objectId) {
 					carry.DestroyWME();
@@ -129,7 +129,7 @@ public class SoarRobotSelfIL {
 			if (carry == null) {
 				carry = self.CreateIdWME("carry");
 				carryid = carry.CreateIntWME("id", objectId);
-				carry.CreateStringWME("type", ci.getObject().getProperty("id"));
+				carry.CreateStringWME("type", ci.getRoomObject().getCellObject().getProperty("name"));
 			}
 		} else {
 			if (carry != null) {

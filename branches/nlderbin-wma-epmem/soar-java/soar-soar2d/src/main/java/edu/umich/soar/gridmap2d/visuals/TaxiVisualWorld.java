@@ -1,7 +1,5 @@
 package edu.umich.soar.gridmap2d.visuals;
 
-import java.util.List;
-
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -50,7 +48,7 @@ public class TaxiVisualWorld extends VisualWorld {
 		int [] location = new int [2];
 		for(location[0] = 0; location[0] < map.size(); ++location[0]){			
 			for(location[1] = 0; location[1] < map.size(); ++location[1]){				
-				if (!this.map.getCell(location).checkAndResetRedraw() && painted) {
+				if (!this.map.checkAndResetRedraw(location) && painted) {
 					//continue;
 				}
 
@@ -58,10 +56,8 @@ public class TaxiVisualWorld extends VisualWorld {
 				gc.fillRectangle(cellSize*location[0]+1, cellSize*location[1]+1, cellSize-2, cellSize-2);
 				
 				// destination
-				List<CellObject> destinationList;
-				destinationList = this.map.getCell(location).getAllWithProperty("destination");
-				if (destinationList != null) {
-					CellObject destination = destinationList.get(0);
+				CellObject destination = this.map.getFirstObjectWithProperty(location, "destination");
+				if (destination != null) {
 					String colorString = destination.getProperty(Names.kPropertyColor);
 					Color color = WindowManager.getColor(colorString);
 					gc.setBackground(color);
@@ -76,7 +72,7 @@ public class TaxiVisualWorld extends VisualWorld {
 			    	gc.setForeground(WindowManager.black);
 				}
 				
-				if (this.map.getCell(location).hasObject("fuel")) {
+				if (this.map.hasAnyObjectWithProperty(location, "fuel")) {
 					int size = 14;
 					fill = cellSize/2 - size/2;
 
@@ -91,10 +87,9 @@ public class TaxiVisualWorld extends VisualWorld {
 
 				}
 				
-				Taxi taxi = (Taxi)this.map.getCell(location).getPlayer();
+				Taxi taxi = (Taxi)this.map.getFirstPlayer(location);
 				
 				if (taxi != null) {
-					// TODO: if multiple players are supported, this needs to be changed
 					gc.setBackground(WindowManager.getColor("white"));
 
 					int size = 12;
@@ -110,7 +105,7 @@ public class TaxiVisualWorld extends VisualWorld {
 					}
 				}
 				
-				if (this.map.getCell(location).hasObject("passenger")) {
+				if (this.map.hasAnyObjectWithProperty(location, "passenger")) {
 
 					int size = 8;
 					fill = cellSize/2 - size/2;
@@ -120,30 +115,25 @@ public class TaxiVisualWorld extends VisualWorld {
 				}
 
 				// walls
-				List<CellObject> wallList;
-				wallList = this.map.getCell(location).getAllWithProperty("block");
-				if (wallList != null) {
-					for (CellObject wall : wallList ) {
-						switch(Direction.parse(wall.getProperty("direction"))) {
-						case NORTH:
-							gc.drawLine(cellSize*location[0], cellSize*location[1], cellSize*location[0] + cellSize-1, cellSize*location[1]);
-							break; 
-						case SOUTH:
-							gc.drawLine(cellSize*location[0], cellSize*location[1] + cellSize-1, cellSize*location[0] + cellSize-1, cellSize*location[1] + cellSize-1);
-							break;
-						case EAST:
-							gc.drawLine(cellSize*location[0] + cellSize-1, cellSize*location[1], cellSize*location[0] + cellSize-1, cellSize*location[1] + cellSize-1);
-							break;
-						case WEST:
-							gc.drawLine(cellSize*location[0], cellSize*location[1], cellSize*location[0], cellSize*location[1] + cellSize-1);
-							break;
-						default:
-							assert false;
-							break;	
-						}
+				for (CellObject wall : this.map.getAllWithProperty(location, "block") ) {
+					switch(Direction.parse(wall.getProperty("direction"))) {
+					case NORTH:
+						gc.drawLine(cellSize*location[0], cellSize*location[1], cellSize*location[0] + cellSize-1, cellSize*location[1]);
+						break; 
+					case SOUTH:
+						gc.drawLine(cellSize*location[0], cellSize*location[1] + cellSize-1, cellSize*location[0] + cellSize-1, cellSize*location[1] + cellSize-1);
+						break;
+					case EAST:
+						gc.drawLine(cellSize*location[0] + cellSize-1, cellSize*location[1], cellSize*location[0] + cellSize-1, cellSize*location[1] + cellSize-1);
+						break;
+					case WEST:
+						gc.drawLine(cellSize*location[0], cellSize*location[1], cellSize*location[0], cellSize*location[1] + cellSize-1);
+						break;
+					default:
+						assert false;
+						break;	
 					}
 				}
-				
 			}
 		}
 	}

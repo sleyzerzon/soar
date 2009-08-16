@@ -15,7 +15,7 @@ public class Player {
 	
 	private String playerID;
 	private PlayerConfig playerConfig;
-	private String name;	// player name
+	private final String name;	// player name
 	private int points;	// current point count
 	private boolean pointsChanged;
 	private int pointsDelta;
@@ -25,7 +25,7 @@ public class Player {
 	protected boolean moved;
 	private boolean fragged;
 
-	public Player(String playerID) throws Exception {
+	public Player(String playerID) {
 		this.playerID = playerID;
 		this.playerConfig = Gridmap2D.config.playerConfigs().get(playerID);
 		
@@ -38,7 +38,7 @@ public class Player {
 		this.reset();
 	}
 	
-	public void reset() throws Exception {
+	public void reset() {
 		location = new int[] { -1, -1 };
 		
 		if (playerConfig.facing != null) {
@@ -60,11 +60,6 @@ public class Player {
 
 	public String getName() {
 		return this.name;
-	}
-	public void setName(String name) {
-		String previous = this.name;
-		this.name = name;
-		logger.warn(previous + " name changed to: " + this.name);
 	}
 	
 	public Direction getFacing() {
@@ -127,20 +122,26 @@ public class Player {
 		logger.warn(this.name + " (" + previous + ") color changed to: " + this.name);
 	}
 	
+	@Override
 	public int hashCode() {
 		return name.hashCode();
 	}
 
-	public boolean equals(Object other) {
-		Player player = null;
-		try {
-			player = (Player)other;
-		} catch (ClassCastException c) {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		
+		if (!(o instanceof Player)) {
 			return false;
 		}
+		Player player = (Player)o;
+		
 		return name.equals(player.name);
 	}
 
+	@Override
 	public String toString() {
 		return getName();
 	}

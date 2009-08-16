@@ -37,7 +37,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	Group m_Group;
 	Table m_AgentTable;
 	TankSoarAgentWorld m_AgentWorld;
-	Player selectedPlayer;
+	Tank selectedPlayer;
 	TableItem[] m_Items = new TableItem[0];
 	Player[] players;
 	Composite m_AgentButtons;
@@ -149,10 +149,10 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 				if (selectedPlayer == null) {
 					return;
 				}
-				try {
+//				try {
 					Gridmap2D.simulation.destroyPlayer(selectedPlayer);
-				} catch (Exception ignored) {
-				}
+//				} catch (Exception ignored) {
+//				}
 			}
 		});
 		{
@@ -199,7 +199,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 
 		m_Radar = new ProgressBar(row5, SWT.NONE | SWT.VERTICAL);
 		m_Radar.setMinimum(0);
-		m_Radar.setMaximum(Gridmap2D.config.tanksoarConfig().radar_height);
+		m_Radar.setMaximum(TankState.RADAR_HEIGHT);
 		{
 			GridData gd = new GridData();
 			gd.heightHint = m_AgentWorld.getHeight();
@@ -220,9 +220,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 		}
 		m_Smell = new ProgressBar(smellGroup, SWT.VERTICAL);
 		m_Smell.setMinimum(0);
-		// TODO: 
-		//m_Smell.setMaximum(m_Simulation.getTankSoarWorld().getMaxManhattanDistance());
-		m_Smell.setMaximum(25);
+		m_Smell.setMaximum((world.getMap().size() - 1 * 2));
 		{
 			GridData gd = new GridData();
 			gd.heightHint = m_AgentWorld.getHeight();
@@ -408,7 +406,8 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	}
 	
 	void selectPlayer(Player player) {
-		selectedPlayer = player;
+		selectedPlayer = (Tank)player;
+		assert selectedPlayer != null;
 		int index;
 		for(index = 0; index < players.length; ++index) {
 			if (players[index].equals(selectedPlayer)) {
@@ -422,7 +421,7 @@ public class TankSoarAgentDisplay extends AgentDisplay {
 	}
 	
 	private void updateSensors() {
-		Tank tank = (Tank)selectedPlayer; // TODO: shouldn't have to cast in a perfect world
+		Tank tank = selectedPlayer;
 		TankState state = tank.getState();
 		
 		m_AgentWorld.update(tank);

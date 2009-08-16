@@ -1,9 +1,9 @@
 package edu.umich.soar.gridmap2d.soar;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import jmat.LinAlg;
 
@@ -17,9 +17,10 @@ import edu.umich.soar.gridmap2d.Gridmap2D;
 import edu.umich.soar.gridmap2d.Names;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.RoomMap;
+import edu.umich.soar.gridmap2d.map.RoomObject;
 import edu.umich.soar.gridmap2d.players.CarryInterface;
 import edu.umich.soar.gridmap2d.players.Player;
-import edu.umich.soar.gridmap2d.players.RoomPlayer;
+import edu.umich.soar.gridmap2d.players.Robot;
 import edu.umich.soar.gridmap2d.world.RoomWorld;
 import edu.umich.soar.robot.PointRelationship;
 import edu.umich.soar.robot.ReceiveMessagesInterface;
@@ -102,7 +103,7 @@ public class SoarRobotInputLinkManager {
 		return selfIL.getMessagesIL();
 	}
 
-	public void update(RoomPlayer player, RoomWorld world, RoomMap roomMap,
+	public void update(Robot player, RoomWorld world, RoomMap roomMap,
 			boolean floatYawWmes) {
 		
 		configurationIL.update();
@@ -120,26 +121,38 @@ public class SoarRobotInputLinkManager {
 			}
 			
 			Identifier areaDescription = agent.GetInputLink().CreateIdWME("area-description");
-			boolean door = roomMap.getCell(player.getLocation()).hasAnyWithProperty(Names.kPropertyGatewayRender);
+			boolean door = roomMap.hasAnyObjectWithProperty(player.getLocation(), Names.kPropertyGatewayRender);
 			areaIL = new SoarRobotAreaDescriptionIL(areaDescription, player.getState().getLocationId(), opose, roomMap, door);
 		}
 		
 		// objects
-		Set<CellObject> roomObjects = roomMap.getRoomObjects();
-		for (CellObject obj : roomObjects) {
-			RoomMap.RoomObjectInfo info = roomMap.getRoomObjectInfo(obj);
-			if (info.pose == null) {
-				continue;
+		Collection<RoomObject> roomObjects = roomMap.getRoomObjects();
+		for (RoomObject rObj : roomObjects) {
+			pose_t pose = rObj.getPose();
+			if (pose == null) {
+				continue; // not on map
 			}
-			if (info.area == player.getState().getLocationId()) {
-				double maxAngleOff = Math.PI / 2;
-				pose_t temp = info.pose.copy();
-				LinAlg.scaleEquals(temp.pos, SoarRobot.PIXELS_2_METERS);
-				PointRelationship r = PointRelationship.calculate(opose.getPose(), temp.pos);
-				if (Math.abs(r.getRelativeBearing()) <= maxAngleOff) {
-					int id = info.object.getIntProperty("object-id", -1);
-					String type = info.object.getProperty("id");
-					addOrUpdateObject(id, type, temp, world, r);
+			if (rObj.getArea() == player.getState().getLocationId()) {
+				final double MAX_ANGLE_OFF = Math.PI / 2;
+				LinAlg.scaleEquals(pose.pos, SoarRobot.PIXELS_2_METERS);
+				PointRelationship r = PointRelationship.calculate(opose.getPose(), pose.pos);
+				if (Math.abs(r.getRelativeBearing()) <= MAX_ANGLE_OFF) {
+					CellObject cObj = rObj.getCellObject();
+					SoarRobotObjectIL oIL = objects.get(rObj.getId());
+					if (oIL == null) {
+						// create new object
+						Identifier inputLink = agent.GetInputLink();
+						Identifier parent = inputLink.CreateIdWME("object");
+						oIL = new SoarRobotObjectIL(parent);
+						oIL.initialize(pose, r);
+						oIL.addProperty("type", cObj.getProperty("name"));
+						oIL.addProperty("id", rObj.getId());
+						oIL.addProperty("color", cObj.getProperty("color"));
+						oIL.addProperty("weight", cObj.getDoubleProperty("weight", 0));
+						objects.put(rObj.getId(), oIL);
+					} else {
+						oIL.update(pose, r);
+					}
 				}
 			}
 		}
@@ -147,7 +160,7 @@ public class SoarRobotInputLinkManager {
 		// players
 		if (world.getPlayers().length > 1) {
 			for (Player temp : world.getPlayers()) {
-				RoomPlayer rTarget = (RoomPlayer)temp;
+				Robot rTarget = (Robot)temp;
 				if (rTarget.equals(player)) {
 					continue;
 				}
@@ -155,7 +168,22 @@ public class SoarRobotInputLinkManager {
 				LinAlg.scaleEquals(rTargetPose.pos, SoarRobot.PIXELS_2_METERS);
 				LinAlg.scaleEquals(rTargetPose.vel, SoarRobot.PIXELS_2_METERS);
 				PointRelationship r = PointRelationship.calculate(opose.getPose(), rTargetPose.pos);
-				addOrUpdatePlayer(player, rTarget.getName(), rTargetPose, world, r);
+				String rName = rTarget.getName();
+				SoarRobotObjectIL pIL = players.get(rName);
+				if (pIL == null) {
+					// create new player
+					Identifier inputLink = agent.GetInputLink();
+					Identifier parent = inputLink.CreateIdWME("object");
+					pIL = new SoarRobotObjectIL(parent);
+					pIL.initialize(rTargetPose, r);
+					pIL.addProperty("type", "player");
+					pIL.addProperty("name", rName);
+					pIL.addProperty("color", rTarget.getColor());
+					players.put(rName, pIL);
+				
+				} else {
+					pIL.update(rTargetPose, r);
+				}
 			}
 		}
 
@@ -164,35 +192,6 @@ public class SoarRobotInputLinkManager {
 		areaIL.update();
 	}
 
-	private void addOrUpdatePlayer(RoomPlayer self, String targetName, pose_t targetPose, RoomWorld world, PointRelationship r) {
-		SoarRobotObjectIL pIL = players.get(targetName);
-		if (pIL == null) {
-			// create new player
-			Identifier inputLink = agent.GetInputLink();
-			Identifier parent = inputLink.CreateIdWME("object");
-			pIL = new SoarRobotObjectIL(parent);
-			pIL.initialize(targetName, targetPose, r);
-			players.put(targetName, pIL);
-		
-		} else {
-			pIL.update(targetPose, r);
-		}
-	}
-	
-	private void addOrUpdateObject(int objectId, String type, pose_t objectPose, RoomWorld world, PointRelationship r) {
-		SoarRobotObjectIL oIL = objects.get(objectId);
-		if (oIL == null) {
-			// create new object
-			Identifier inputLink = agent.GetInputLink();
-			Identifier parent = inputLink.CreateIdWME("object");
-			oIL = new SoarRobotObjectIL(parent);
-			oIL.initialize(objectId, type, objectPose, r);
-			objects.put(objectId, oIL);
-		} else {
-			oIL.update(objectPose, r);
-		}
-	}
-	
 	private void purge(int cycle) {
 		{
 			Iterator<SoarRobotObjectIL> oiter = objects.values().iterator();
