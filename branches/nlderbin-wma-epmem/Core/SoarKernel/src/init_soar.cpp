@@ -987,6 +987,10 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  } else 
 #endif //AGRESSIVE_ONC
+	  
+      if ( epmem_enabled( thisAgent ) && ( thisAgent->epmem_params->phase->get_value() == epmem_param_container::phase_selection ) )
+        epmem_go( thisAgent );
+	  
 	  {
 		  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])			 
 			  print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
@@ -1003,9 +1007,6 @@ void do_one_top_level_phase (agent* thisAgent)
 		  &thisAgent->decision_cycle_phase_timers[DECISION_PHASE]);
       #endif
 	  /* REW: end 28.07.96 */
-
-	  if ( epmem_enabled( thisAgent ) && ( thisAgent->epmem_params->phase->get_value() == epmem_param_container::phase_selection ) )
-		epmem_go( thisAgent );
 
 	  break;  /* end DECISION phase */
 	  

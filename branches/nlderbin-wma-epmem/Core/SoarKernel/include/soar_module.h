@@ -43,7 +43,7 @@ namespace soar_module
 	
 	wme *add_module_wme( agent *my_agent, Symbol *id, Symbol *attr, Symbol *value );
 	void remove_module_wme( agent *my_agent, wme *w );
-	preference *make_fake_preference( agent *my_agent, Symbol *state, wme *w, wme_set *conditions );
+	preference *make_fake_preference( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Symbol *value, wme_set *conditions );
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Predicates

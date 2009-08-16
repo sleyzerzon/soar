@@ -2246,7 +2246,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.epmem_info->cue_wmes = new std::set<wme *>();
   
   id->id.epmem_info->last_memory = EPMEM_MEMID_NONE;  
-  id->id.epmem_info->epmem_wmes = new std::stack<wme *>();
+  id->id.epmem_info->epmem_wmes = new std::stack<preference *>();
 
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, 

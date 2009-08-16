@@ -88,11 +88,11 @@ namespace soar_module
 		}
 	}
 
-	preference *make_fake_preference( agent *my_agent, Symbol *state, wme *w, wme_set *conditions )
+	preference *make_fake_preference( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Symbol *value, wme_set *conditions )
 	{
 		// make fake preference
-		preference *pref = make_preference( my_agent, ACCEPTABLE_PREFERENCE_TYPE, w->id, w->attr, w->value, NIL );
-		pref->o_supported = TRUE;
+		preference *pref = make_preference( my_agent, ACCEPTABLE_PREFERENCE_TYPE, id, attr, value, NIL );
+		pref->o_supported = true;
 		symbol_add_ref( pref->id );
 		symbol_add_ref( pref->attr );
 		symbol_add_ref( pref->value );

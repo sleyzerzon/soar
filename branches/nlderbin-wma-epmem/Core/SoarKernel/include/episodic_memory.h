@@ -411,16 +411,16 @@ typedef struct epmem_rit_state_struct
 // data associated with each state
 typedef struct epmem_data_struct
 {
-	unsigned long last_ol_time;		// last update to output-link
-	unsigned long last_ol_count;	// last count of output-link
+	unsigned long last_ol_time;				// last update to output-link
+	unsigned long last_ol_count;			// last count of output-link
 
-	unsigned long last_cmd_time;	// last update to epmem.command
-	unsigned long last_cmd_count;	// last update to epmem.command
+	unsigned long last_cmd_time;			// last update to epmem.command
+	unsigned long last_cmd_count;			// last update to epmem.command
 
-	epmem_time_id last_memory;		// last retrieved memory
+	epmem_time_id last_memory;				// last retrieved memory
 
-	std::set<wme *> *cue_wmes;		// wmes in last cue
-	std::stack<wme *> *epmem_wmes;	// wmes in last epmem
+	std::set<wme *> *cue_wmes;				// wmes in last cue
+	std::stack<preference *> *epmem_wmes;	// wmes in last epmem
 } epmem_data;
 
 
