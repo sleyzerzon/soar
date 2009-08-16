@@ -1199,6 +1199,7 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 	Symbol *result_header = state->id.smem_result_header;
 
 	// get identifier if not known
+	bool lti_created_here = false;
 	if ( lti == NIL )
 	{
 		soar_module::sqlite_statement *q = my_agent->smem_stmts->lti_letter_num;
@@ -1209,6 +1210,8 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 		lti = smem_lti_soar_make( my_agent, parent_id, static_cast<char>( q->column_int( 0 ) ), static_cast<unsigned long>( q->column_int( 1 ) ), result_header->id.level );
 
 		q->reinitialize();
+
+		lti_created_here = true;
 	}
 
 	// activate lti
@@ -1216,7 +1219,14 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 
 	// point retrieved to lti
 	smem_add_meta_wme( my_agent, state, result_header, my_agent->smem_sym_retrieved, lti );
-	symbol_remove_ref( my_agent, lti );
+	if ( lti_created_here )
+	{
+		// if the identifier was created above we need to
+		// remove a single ref count AFTER the wme
+		// is added (such as to not deallocate the symbol
+		// prematurely)
+		symbol_remove_ref( my_agent, lti );
+	}	
 
 	// if no children, then retrieve children
 	if ( ( lti->id.impasse_wmes == NIL ) &&
@@ -1247,7 +1257,8 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 			// add wme
 			smem_add_retrieved_wme( my_agent, state, lti, attr_sym, value_sym );
 
-			// deal with ref counts
+			// deal with ref counts - attribute/values are always created in this function
+			// (thus an extra ref count is set before adding a wme)
 			symbol_remove_ref( my_agent, attr_sym );
 			symbol_remove_ref( my_agent, value_sym );
 		}
