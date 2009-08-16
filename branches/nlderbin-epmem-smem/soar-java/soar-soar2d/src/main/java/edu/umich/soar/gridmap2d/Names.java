@@ -19,12 +19,9 @@ public class Names {
 		public static final String initDisplayfail = "Failed to initialize display.";
 		public static final String simulationInitFail = "Failed to initialize simulation: ";
 		public static final String noConfig = "No configuration file specified. Please specify a configuration file on the command line.";
-		public static final String loadingConfig = "Error loading configuration file, it might not exist.";
 		public static final String installingConfig = "IOException installing default configuration file: ";
 		public static final String kernelCreation = "Error creating kernel: ";
 		public static final String taxi1Player = "Taxi game type only supports 1 player.";
-		public static final String usedColor = "Color used or not available: ";
-		public static final String noMoreSlots = "There are no more player slots available.";
 		public static final String clientSpawn = "Client spawn failed: ";
 		public static final String mapRequired = "Map is required.";
 		public static final String findingMap = "Error finding map: ";
@@ -119,6 +116,7 @@ public class Names {
 	public static final String kClockID = "clock";
 	public static final String kColorID = "color";
 	public static final String kContentID = "content";
+	public static final String kContentNameID = "content-name";
 	public static final String kCurrentScoreID = "current-score";
 	public static final String kDirectionID = "direction";
 	public static final String kDistanceID = "distance";
@@ -219,6 +217,34 @@ public class Names {
 	public static final String kDog = "dog";
 	public static final String kMouse = "mouse";
 	
-	public static final String kRoomObjectName = "mblock";
+	public static final String kRoomObjectMovable = "movable";
 	
+	static final String kTagMap = "map";
+	static final String kTagCellObject = "cell-object";
+	static final String kTagCells = "cells";
+	static final String kTagMetadata = "metadata";
+	static final String kTagProperty = "property";
+	static final String kTagApply = "apply";
+	static final String kTagUpdate = "update";
+	static final String kTagPoints = "points";
+	static final String kTagEnergy = "energy";
+	static final String kTagHealth = "health";
+	static final String kTagMissiles = "missiles";
+	static final String kTagFuel = "fuel";
+	static final String kTagRow = "row";
+	static final String kTagCell = "cell";
+	static final String kTagObject = "object";
+	static final String kTagDecay = "decay";
+	static final String kTagFlyMissile = "fly-missile";
+	static final String kTagLinger = "linger";
+	
+	static final String kAttrWorldSize = "world-size";
+	static final String kAttrRandomWalls = "random-walls";
+	static final String kAttrRandomFood = "random-food";
+	static final String kAttrName = "name";
+	static final String kAttrValue = "value";
+	static final String kAttrShields = "shields";
+	static final String kAttrShieldsDown = "shields-down";
+	static final String kAttrQuantity = "quantity";
+
 }

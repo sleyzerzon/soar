@@ -585,7 +585,7 @@ inline Symbol *smem_statement_to_symbol( agent *my_agent, soar_module::sqlite_st
 void _smem_add_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Symbol *value, bool meta )
 {
 	wme *w = soar_module::add_module_wme( my_agent, id, attr, value );
-	w->preference = soar_module::make_fake_preference( my_agent, state, w, state->id.smem_info->cue_wmes );
+	w->preference = soar_module::make_fake_preference( my_agent, state, w->id, w->attr, w->value, state->id.smem_info->cue_wmes );
 
 	if ( w->preference )
 		add_preference_to_tm( my_agent, w->preference );

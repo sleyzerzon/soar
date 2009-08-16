@@ -19,8 +19,8 @@ import edu.umich.soar.gridmap2d.config.ClientConfig;
 import edu.umich.soar.gridmap2d.config.SoarConfig;
 import edu.umich.soar.gridmap2d.players.Eater;
 import edu.umich.soar.gridmap2d.players.EaterCommander;
-import edu.umich.soar.gridmap2d.players.RoomCommander;
-import edu.umich.soar.gridmap2d.players.RoomPlayer;
+import edu.umich.soar.gridmap2d.players.RobotCommander;
+import edu.umich.soar.gridmap2d.players.Robot;
 import edu.umich.soar.gridmap2d.players.Tank;
 import edu.umich.soar.gridmap2d.players.TankCommander;
 import edu.umich.soar.gridmap2d.players.Taxi;
@@ -56,19 +56,23 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	
 	private Map<String, AgentData> agents = new HashMap<String, AgentData>();
 	private String basePath;
-	private File commonMetadataFile;
 	private Map<String, ClientConfig> clients;
 	private int maxMemoryUsage;
 	private boolean soarPrint;
 	private int port;
 	private boolean debug;
 	
-	public Soar(SoarConfig config, Map<String, ClientConfig> clients, Game game, String basePath) throws Exception {
+	/**
+	 * @param config
+	 * @param clients
+	 * @param game
+	 * @param basePath
+	 * 
+	 * @throws IllegalStateException If there is an unrecoverable error initializing Soar
+	 */
+	public Soar(SoarConfig config, Map<String, ClientConfig> clients, Game game, String basePath) {
 		this.basePath = basePath;
 		this.runTilOutput = config.runTilOutput(game);
-		if (config.metadata != null) {
-			this.commonMetadataFile = new File(config.metadata);
-		}
 		
 		this.clients = clients;
 		this.maxMemoryUsage = config.max_memory_usage;
@@ -85,7 +89,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 
 		if (kernel.HadError()) {
-			throw new Exception(Names.Errors.kernelCreation + kernel.GetLastErrorDescription());
+			throw new IllegalStateException(Names.Errors.kernelCreation + kernel.GetLastErrorDescription());
 		}
 		
 		// We want the most performance
@@ -107,29 +111,33 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		
 	}
 	
+	@Override
 	public boolean debug() {
 		return debug;
 	}
 	
+	@Override
 	public void seed(int seed) {
 		kernel.ExecuteCommandLine("srand " + seed, null) ;
 	}
 	
-	public void doBeforeClients() throws Exception {
+	@Override
+	public void doBeforeClients() {
 		// Start or wait for clients (false: before agent creation)
 		logger.trace(Names.Trace.beforeClients);
 		doClients(false);
 		
 	}
 	
-	public void doAfterClients() throws Exception {
+	@Override
+	public void doAfterClients() {
 		// Start or wait for clients (true: after agent creation)
 		logger.trace(Names.Trace.afterClients);
 		doClients(true);
 		
 	}
 	
-	private void doClients(boolean after) throws Exception {
+	private void doClients(boolean after) {
 		for (Entry<String, ClientConfig> entry : clients.entrySet()) {
 			if (entry.getValue().after != after) {
 				continue;
@@ -143,7 +151,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 				spawnClient(entry.getKey(), entry.getValue());
 			} else {
 				if (!waitForClient(entry.getKey(), entry.getValue())) {
-					throw new Exception(Names.Errors.clientSpawn + entry.getKey());
+					Gridmap2D.control.errorPopUp(Names.Errors.clientSpawn + entry.getKey());
+					return;
 				}
 			}
 		}
@@ -155,6 +164,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			this.br = br;
 		}
 		
+		@Override
 		public void run() {
 			String line;
 			try {
@@ -162,12 +172,12 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 					System.out.println(line);
 				}
 			} catch (IOException e) {
-				System.err.println(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void spawnClient(String clientID, ClientConfig clientConfig) throws Exception {
+	public void spawnClient(String clientID, ClientConfig clientConfig) {
 		Runtime r = java.lang.Runtime.getRuntime();
 		logger.trace(Names.Trace.spawningClient + clientID);
 
@@ -187,11 +197,14 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			rd.start();
 			
 			if (!waitForClient(clientID, clientConfig)) {
-				throw new Exception(Names.Errors.clientSpawn + clientID);
+				Gridmap2D.control.errorPopUp(Names.Errors.clientSpawn + clientID);
+				return;
 			}
 			
 		} catch (IOException e) {
-			throw new Exception(Names.Errors.clientSpawn + clientID + ": " + e.getMessage());
+			e.printStackTrace();
+			Gridmap2D.control.errorPopUp("IOException spawning client: " + clientID);
+			return;
 		}
 	}
 	
@@ -228,6 +241,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		return ready;
 	}
 	
+	@Override
 	public void runForever() {
 		if (runTilOutput) {
 			kernel.RunAllAgentsForever(smlRunStepSize.sml_UNTIL_OUTPUT);
@@ -237,6 +251,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		
 	}
 
+	@Override
 	public void runStep() {
 		if (runTilOutput) {
 			kernel.RunAllTilOutput(smlRunStepSize.sml_UNTIL_OUTPUT);
@@ -245,6 +260,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 	}
 
+	@Override
 	public void destroyPlayer(String name) {
 		// get the agent (human agents return null here)
 		AgentData agentData = agents.remove(name);
@@ -256,6 +272,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		agentData.agent.delete();
 	}
 	
+	@Override
 	public void shutdown() {
 		if (kernel != null) {
 			logger.trace(Names.Trace.kernelShutdown);
@@ -265,6 +282,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	}
 
+	@Override
 	public String getAgentPath() {
 		return basePath + "agents" + System.getProperty("file.separator");
 	}
@@ -293,6 +311,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		/**
 		 * @brief - callback from SoarKernel for print events
 		 */
+		@Override
 		public void printEventHandler (int eventID, Object data, Agent agent, String message) 
 		{
 			if (eventID == smlPrintEventId.smlEVENT_PRINT.swigValue()) {
@@ -305,16 +324,18 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		
 	} // Logger
 	
-	private Agent createSoarAgent(String name, String productions, boolean debug) throws Exception {
+	private Agent createSoarAgent(String name, String productions, boolean debug) {
 		Agent agent = kernel.CreateAgent(name);
 		if (agent == null) {
-			throw new Exception("Agent " + name + " creation failed: " + kernel.GetLastErrorDescription());
+			Gridmap2D.control.errorPopUp("Error creating agent " + name + ", " + kernel.GetLastErrorDescription());
+			return null;
 		}
 		
 		// now load the productions
 		File productionsFile = new File(productions);
 		if (!agent.LoadProductions(productionsFile.getAbsolutePath())) {
-			throw new Exception("Agent " + name + " production load failed: " + agent.GetLastErrorDescription());
+			Gridmap2D.control.errorPopUp("Error loading productions " + productionsFile + " for " + name + ", " + agent.GetLastErrorDescription());
+			return null;
 		}
 		
 		// if requested, set max memory usage
@@ -348,6 +369,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	 * 
 	 * check to see if the client specified by the client config is connected or not
 	 */
+	@Override
 	public boolean isClientConnected(String clientId) {
 		boolean connected = false;
 		kernel.GetAllConnectionInfo();
@@ -382,6 +404,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		return commandLine;
 	}
 
+	@Override
 	public void reload(String player) {
 		AgentData agentData = agents.get(player);
 		if (agentData == null) {
@@ -392,38 +415,52 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		agentData.agent.LoadProductions(agentData.productions.getAbsolutePath());
 	}
 
+	@Override
 	public boolean haveAgents() {
 		return agents.size() > 0;
 	}
 
+	@Override
 	public EaterCommander createEaterCommander(Eater eater, String productions,
-			int vision, String[] shutdownCommands, File mapMetadataFile, boolean debug)
-			throws Exception {
+			int vision, String[] shutdownCommands, boolean debug) {
 		Agent agent = createSoarAgent(eater.getName(), productions, debug);
-		return new SoarEater(eater, agent, vision, shutdownCommands, commonMetadataFile, mapMetadataFile);
+		if (agent == null) {
+			return null;
+		}
+		return new SoarEater(eater, agent, vision, shutdownCommands);
 	}
 
+	@Override
 	public TankCommander createTankCommander(Tank tank, String productions,
-			String[] shutdownCommands, File mapMetadataFile, boolean debug) throws Exception {
+			String[] shutdownCommands, boolean debug) {
 		Agent agent = createSoarAgent(tank.getName(), productions, debug);
-		return new SoarTank(tank, agent, shutdownCommands, commonMetadataFile, mapMetadataFile);
+		if (agent == null) {
+			return null;
+		}
+		return new SoarTank(tank, agent, shutdownCommands);
 	}
 
+	@Override
 	public TaxiCommander createTaxiCommander(Taxi taxi, String productions,
-			String[] shutdownCommands, File mapMetadataFile, boolean debug)
-			throws Exception {
+			String[] shutdownCommands, boolean debug) {
 		Agent agent = createSoarAgent(taxi.getName(), productions, debug);
-		return new SoarTaxi(taxi, agent, shutdownCommands, commonMetadataFile, mapMetadataFile);
+		if (agent == null) {
+			return null;
+		}
+		return new SoarTaxi(taxi, agent, shutdownCommands);
 	}
 	   
 	@Override
-	public RoomCommander createRoomCommander(RoomPlayer player, RoomWorld world, String productions,
-			String[] shutdownCommands, File metadataFile, boolean debug)
-			throws Exception {
+	public RobotCommander createRoomCommander(Robot player, RoomWorld world, String productions,
+			String[] shutdownCommands, boolean debug) {
 		Agent agent = createSoarAgent(player.getName(), productions, debug);
-		return new SoarRobot(player, agent, kernel, world, shutdownCommands, commonMetadataFile, metadataFile);
+		if (agent == null) {
+			return null;
+		}
+		return new SoarRobot(player, agent, kernel, world, shutdownCommands);
 	}
 
+	@Override
   	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
 
   		// check for override
@@ -434,13 +471,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
   		}
   		
   		// this updates the world
-  		try {
-			Gridmap2D.control.tickEvent();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			Gridmap2D.control.errorPopUp(e.getMessage());
-		}
+  		Gridmap2D.control.tickEvent();
   		
 		// Test this after the world has been updated, in case it's asking us to stop
 		if (Gridmap2D.control.isStopped()) {
@@ -452,6 +483,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
   		}
   	}
   	
+	@Override
    public void systemEventHandler(int eventID, Object data, Kernel kernel) {
   		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
   			// soar says go

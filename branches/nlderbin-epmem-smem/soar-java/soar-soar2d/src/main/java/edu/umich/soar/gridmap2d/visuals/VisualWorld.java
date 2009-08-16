@@ -23,8 +23,6 @@ import edu.umich.soar.gridmap2d.map.GridMap;
 import edu.umich.soar.gridmap2d.players.Player;
 import edu.umich.soar.gridmap2d.players.RadarCell;
 
-
-// TODO: apply-image
 public abstract class VisualWorld extends Canvas implements PaintListener {
 	
 	public static Map<Player, Color> playerColors = new HashMap<Player, Color>();
@@ -61,10 +59,10 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 
 		switch(Gridmap2D.config.game()) {
 		case TANKSOAR:
-			tanks[Direction.SOUTH.index()] = new Image(display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/tank_down.gif"));
-			tanks[Direction.NORTH.index()] = new Image(display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/tank_up.gif"));
-			tanks[Direction.EAST.index()] = new Image(display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/tank_right.gif"));
-			tanks[Direction.WEST.index()] = new Image(display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/tank_left.gif"));
+			tanks[Direction.SOUTH.ordinal()] = new Image(display, Gridmap2D.class.getResourceAsStream("/edu/umich/soar/gridmap2d/images/tanksoar/tank_down.gif"));
+			tanks[Direction.NORTH.ordinal()] = new Image(display, Gridmap2D.class.getResourceAsStream("/edu/umich/soar/gridmap2d/images/tanksoar/tank_up.gif"));
+			tanks[Direction.EAST.ordinal()] = new Image(display, Gridmap2D.class.getResourceAsStream("/edu/umich/soar/gridmap2d/images/tanksoar/tank_right.gif"));
+			tanks[Direction.WEST.ordinal()] = new Image(display, Gridmap2D.class.getResourceAsStream("/edu/umich/soar/gridmap2d/images/tanksoar/tank_left.gif"));
 			break;
 			
 		case ROOM:
@@ -85,17 +83,17 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 		painted = false;
 		
 		for (CellObject template : map.getTemplatesWithProperty(Names.kPropertyMiniImage)) {
-			Image image = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/" + template.getProperty(Names.kPropertyMiniImage)));
+			Image image = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/edu/umich/soar/gridmap2d/images/tanksoar/" + template.getProperty(Names.kPropertyMiniImage)));
 			assert image != null;
-			if (template.getName().equals(Names.kEnergy)) {
+			if (template.hasProperty(Names.kEnergy)) {
 				RadarCell.energyImage = image;
-			} else if (template.getName().equals(Names.kHealth)) {
+			} else if (template.hasProperty(Names.kHealth)) {
 				RadarCell.healthImage = image;
-			} else if (template.getName().equals(Names.kMissiles)) {
+			} else if (template.hasProperty(Names.kMissiles)) {
 				RadarCell.missilesImage = image;
 			} else if (template.hasProperty(Names.kPropertyBlock)) {
 				RadarCell.obstacleImage = image;
-			} else if (template.getName().equals(Names.kGround)) {
+			} else if (template.hasProperty(Names.kGround)) {
 				RadarCell.openImage = image;
 			}
 		}
@@ -116,7 +114,7 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 		if (xy == null) {
 			return null;
 		}
-		return this.map.getCell(xy).getPlayer();
+		return this.map.getFirstPlayer(xy);
 	}
 	
 	class DrawMissile {
@@ -148,7 +146,7 @@ public abstract class VisualWorld extends Canvas implements PaintListener {
 	}
 	
 	Image bootstrapImage(String imageName) {
-		Image image = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/org/msoar/gridmap2d/images/tanksoar/" + imageName));
+		Image image = new Image(WindowManager.display, Gridmap2D.class.getResourceAsStream("/edu/umich/soar/gridmap2d/images/tanksoar/" + imageName));
 		assert image != null;
 		images.put(imageName, image);
 		return image;

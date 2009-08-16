@@ -863,6 +863,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
   uintptr_t epmem_validation;
   bool epmem_first_switch;
+  bool epmem_made_changes;
 
 
   // smem

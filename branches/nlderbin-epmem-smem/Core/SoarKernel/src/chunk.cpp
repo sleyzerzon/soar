@@ -909,7 +909,7 @@ Symbol *generate_chunk_name_sym_constant (agent* thisAgent, instantiation *inst)
 ==================================================================== */
 
 
-void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_variablization) 
+void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_variablization, instantiation **custom_inst_list) 
 {
 	Bool making_topmost_chunk = FALSE;   /* RCHONG:  10.11 */
 	goal_stack_level grounds_level;
@@ -1398,12 +1398,12 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 	}
 
 	/* --- assert the preferences --- */
-	chunk_inst->next = thisAgent->newly_created_instantiations;
-	thisAgent->newly_created_instantiations = chunk_inst;
+	chunk_inst->next = (*custom_inst_list);
+	(*custom_inst_list) = chunk_inst;
 
 	/* MVP 6-8-94 */
 	if (!thisAgent->max_chunks_reached)
-		chunk_instantiation (thisAgent, chunk_inst, thisAgent->variablize_this_chunk);
+		chunk_instantiation (thisAgent, chunk_inst, thisAgent->variablize_this_chunk, custom_inst_list);
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS

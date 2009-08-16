@@ -2184,9 +2184,10 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
 
   /* REW: end   08.20.97 */
 
-  /* We have to remove this state from the list of states to learn in 
+  /* We have to remove this state from the list of states to learn in (NLD: and free cons)
    * jzxu April 24, 2009 */
-  extract_list_elements(thisAgent, &thisAgent->chunky_problem_spaces, cons_equality_fn, reinterpret_cast<void*>(goal));
+  free_list( thisAgent, extract_list_elements(thisAgent, &thisAgent->chunky_problem_spaces, cons_equality_fn, reinterpret_cast<void*>(goal)) );
+  free_list( thisAgent, extract_list_elements(thisAgent, &thisAgent->chunk_free_problem_spaces, cons_equality_fn, reinterpret_cast<void*>(goal)) );
 
   post_link_removal (thisAgent, NIL, goal);  /* remove the special link */
   symbol_remove_ref (thisAgent, goal);
@@ -2264,7 +2265,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.epmem_info->cue_wmes = new std::set<wme *>();
   
   id->id.epmem_info->last_memory = EPMEM_MEMID_NONE;  
-  id->id.epmem_info->epmem_wmes = new std::stack<wme *>();
+  id->id.epmem_info->epmem_wmes = new std::stack<preference *>();
 
 
   id->id.smem_info = static_cast<smem_data *>( allocate_memory( thisAgent, sizeof( smem_data ), MISCELLANEOUS_MEM_USAGE ) );  

@@ -392,14 +392,9 @@ bool reinitialize_soar (agent* thisAgent) {
 	set_sysparam(thisAgent, TRACE_WM_CHANGES_SYSPARAM,               FALSE);
 	/* kjh (CUSP-B4) end */
 
-	free_list(thisAgent, thisAgent->chunk_free_problem_spaces);
-	thisAgent->chunk_free_problem_spaces = NIL;
-	free_list(thisAgent, thisAgent->chunky_problem_spaces);
-	thisAgent->chunky_problem_spaces = NIL;
-
-	rl_reset_data( thisAgent );
-	wma_deinit( thisAgent );
+	rl_reset_data( thisAgent );	
 	clear_goal_stack (thisAgent);
+	wma_deinit( thisAgent );
 	thisAgent->rl_stats->reset();
 	thisAgent->wma_stats->reset();
 	thisAgent->epmem_stats->reset();
@@ -994,6 +989,10 @@ void do_one_top_level_phase (agent* thisAgent)
 
 	  } else 
 #endif //AGRESSIVE_ONC
+	  
+      if ( epmem_enabled( thisAgent ) && ( thisAgent->epmem_params->phase->get_value() == epmem_param_container::phase_selection ) )
+        epmem_go( thisAgent );
+	  
 	  {
 		  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])			 
 			  print_phase (thisAgent, "\n--- END Decision Phase ---\n",1);
@@ -1010,9 +1009,6 @@ void do_one_top_level_phase (agent* thisAgent)
 		  &thisAgent->decision_cycle_phase_timers[DECISION_PHASE]);
       #endif
 	  /* REW: end 28.07.96 */
-
-	  if ( epmem_enabled( thisAgent ) && ( thisAgent->epmem_params->phase->get_value() == epmem_param_container::phase_selection ) )
-		epmem_go( thisAgent );
 
 	  break;  /* end DECISION phase */
 	  

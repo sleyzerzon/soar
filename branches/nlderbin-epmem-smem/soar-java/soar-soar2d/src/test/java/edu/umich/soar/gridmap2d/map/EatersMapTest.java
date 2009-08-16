@@ -13,33 +13,30 @@ import edu.umich.soar.gridmap2d.map.EatersMap;
 
 public class EatersMapTest {
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 	}
 	
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		
 	}
 	
 	@Test
-	public void testLoadAll() throws Exception {
+	public void testLoadAll() {
 		File mapDir = new File("config/maps/eaters");
 		
 		for (File file : mapDir.listFiles()) {
 			if (file.isFile()) {
-				new EatersMap(file.getAbsolutePath(), false, .35, .85);
+				EatersMap map = EatersMap.generateInstance(file.getAbsolutePath(), false, .35, .85);
+				assertNotNull(map);
 			}
 		}
 	}
 	
 	@Test
-	public void testBasicMap() throws Exception {
-		EatersMap eatersMap = new EatersMap("config/maps/eaters/tiny.txt", false, .35, .85);
+	public void testBasicMap() {
+		EatersMap eatersMap = EatersMap.generateInstance("config/maps/eaters/tiny.txt", false, .35, .85);
+		assertNotNull(eatersMap);
 		assertEquals(eatersMap.size(), 4);
-
-		int[] xy = new int[2];
-		for (xy[0] = 0; xy[0] < eatersMap.size(); xy[0]++)
-			for (xy[1] = 0; xy[1] < eatersMap.size(); xy[1]++)
-					assertNotNull(eatersMap.getCell(xy));
 	}
 }

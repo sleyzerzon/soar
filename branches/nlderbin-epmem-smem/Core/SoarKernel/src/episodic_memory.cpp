@@ -811,15 +811,63 @@ epmem_wme_list *epmem_get_augs_of_id( Symbol * id, tc_number tc )
 }
 
 void _epmem_add_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Symbol *value, bool meta )
-{		
-	wme *w = soar_module::add_module_wme( my_agent, id, attr, value );
-	w->preference = soar_module::make_fake_preference( my_agent, state, w, state->id.epmem_info->cue_wmes );
+{
+	// this fake preference is just for this state.
+	// it serves the purpose of simulating a completely
+	// local production firing to provide backtracing
+	// information, making the result wmes dependent
+	// upon the cue wmes.
+	preference *pref = soar_module::make_fake_preference( my_agent, state, id, attr, value, state->id.epmem_info->cue_wmes );
 
-	if ( w->preference )
-		add_preference_to_tm( my_agent, w->preference );
+	// add the preference to temporary memory
+	add_preference_to_tm( my_agent, pref );
+
+	// and add it to the list of preferences to be removed
+	// when the goal is removed
+	insert_at_head_of_dll( state->id.preferences_from_goal, pref, all_of_goal_next, all_of_goal_prev );
+	pref->on_goal_list = true;
+
 
 	if ( meta )
-		state->id.epmem_info->epmem_wmes->push( w );
+	{
+		// if this is a meta wme, then it is completely local
+		// to the state and thus we will manually remove it
+		// (via preference removal) when the time comes
+		state->id.epmem_info->epmem_wmes->push( pref );
+	}
+	else
+	{
+		// otherwise, we submit the fake instantiation to backtracing
+		// such as to potentially produce justifications that can follow
+		// it to future adventures (potentially on new states)
+
+		instantiation *my_justification_list = NIL;
+		chunk_instantiation( my_agent, pref->inst, false, &my_justification_list );
+
+		// if any justifications are created, assert their preferences manually
+		// (copied mainly from assert_new_preferences with respect to our circumstances)
+		if ( my_justification_list != NIL )
+		{
+			preference *just_pref = NIL;
+			instantiation *next_justification = NIL;
+			
+			for ( instantiation *my_justification=my_justification_list;
+				  my_justification!=NIL;
+				  my_justification=next_justification )
+			{
+				next_justification = my_justification->next;
+				insert_at_head_of_dll( my_justification->prod->instantiations, my_justification, next, prev );					
+
+				for ( just_pref=my_justification->preferences_generated; just_pref!=NIL; just_pref=just_pref->inst_next ) 
+				{
+					add_preference_to_tm( my_agent, just_pref );						
+					
+					if ( wma_enabled( my_agent ) )
+						wma_activate_wmes_in_pref( my_agent, just_pref );
+				}
+			}
+		}
+	}
 }
 
 void epmem_add_retrieved_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Symbol *value )
@@ -1276,18 +1324,17 @@ void epmem_close( agent *my_agent )
  **************************************************************************/
 void epmem_clear_result( agent *my_agent, Symbol *state )
 {
-	wme *w;
-	
+	preference *pref;
+
 	while ( !state->id.epmem_info->epmem_wmes->empty() )
 	{
-		w = state->id.epmem_info->epmem_wmes->top();
-
-		if ( w->preference )
-			remove_preference_from_tm( my_agent, w->preference );
-
-		soar_module::remove_module_wme( my_agent, w );
-
+		pref = state->id.epmem_info->epmem_wmes->top();
 		state->id.epmem_info->epmem_wmes->pop();
+
+		if ( pref->in_tm )
+		{
+			remove_preference_from_tm( my_agent, pref );
+		}
 	}
 }
 
@@ -1315,9 +1362,13 @@ void epmem_reset( agent *my_agent, Symbol *state )
 		data->last_memory = EPMEM_MEMID_NONE;
 
 		data->cue_wmes->clear();
-
-		// clear off any result stuff (takes care of epmem_wmes)
-		epmem_clear_result( my_agent, state );
+		
+		// this will be called after prefs from goal are already removed,
+		// so just clear out result stack
+		while ( !data->epmem_wmes->empty() )
+		{
+			data->epmem_wmes->pop();
+		}		
 
 		state = state->id.lower_goal;
 	}
@@ -5350,6 +5401,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 
 				// clear old results
 				epmem_clear_result( my_agent, state );
+
+				// change is afoot!
+				my_agent->epmem_made_changes = true;
 			}
 		}
 
@@ -5537,12 +5591,16 @@ void epmem_respond_to_cmd( agent *my_agent )
  **************************************************************************/
 void epmem_go( agent *my_agent )
 {
+	// after we are done we will perform a wm phase
+	// if any adds/removes
+	my_agent->epmem_made_changes = false;
+
 	my_agent->epmem_timers->total->start();
 
-#ifndef EPMEM_EXPERIMENT
-
+#ifndef EPMEM_EXPERIMENT	
+	
 	if ( !epmem_in_transaction( my_agent ) )
-		epmem_transaction_begin( my_agent );
+		epmem_transaction_begin( my_agent );	
 
 	epmem_consider_new_episode( my_agent );
 	epmem_respond_to_cmd( my_agent );
@@ -5552,124 +5610,12 @@ void epmem_go( agent *my_agent )
 
 #else // EPMEM_EXPERIMENT
 
-	// storing database snapshots at commit intervals
-	/*
-	if ( !epmem_in_transaction( my_agent ) )
-		epmem_transaction_begin( my_agent );
-
-	epmem_consider_new_episode( my_agent );
-	epmem_respond_to_cmd( my_agent );
-
-	if ( !epmem_in_transaction( my_agent ) )
-	{
-		epmem_transaction_end( my_agent, true );
-
-		long counter = epmem_get_stat( my_agent, EPMEM_STAT_NCB_WMES );
-		epmem_set_stat( my_agent, EPMEM_STAT_NCB_WMES, ( counter + 1 ) );
-		std::string path( "cp " );
-		path.append( epmem_get_parameter( my_agent, EPMEM_PARAM_PATH, EPMEM_RETURN_STRING ) );
-		path.append( " " );
-		path.append( epmem_get_parameter( my_agent, EPMEM_PARAM_PATH, EPMEM_RETURN_STRING ) );
-		path.append( "_" );
-		path.append( *to_string( counter ) );
-
-		system( path.c_str() );
-	}
-	*/
-
-	// retrieving lots of episodes (commit = number of repeats)
-	/*
-	{
-		const int max_queries = 10;
-		const int repeat = (long) epmem_get_parameter( my_agent, EPMEM_PARAM_COMMIT );
-		epmem_time_id queries[ max_queries ] = { 10, 50, 100, 250, 500, 1000, 2500, 5000, 6000, 8200 };
-
-		epmem_init_db( my_agent, true );
-		epmem_transaction_begin( my_agent );
-
-		timeval start;
-		timeval total;
-
-		for ( int j=0; j<max_queries; j++ )
-		{
-			reset_timer( &start );
-			reset_timer( &total );
-
-			start_timer( my_agent, &start );
-
-			for ( int i=0; i<repeat; i++ )
-			{
-				epmem_install_memory( my_agent, my_agent->top_goal, queries[j], NULL );
-				epmem_clear_result( my_agent, my_agent->top_goal );
-			}
-
-			stop_timer( my_agent, &start, &total );
-
-			std::cout << (j) << "," << ( (double) timer_value( &total ) / (double) repeat ) << std::endl;
-		}
-
-		stop_timer( my_agent, &start, &total );
-
-		epmem_transaction_end( my_agent, false );
-		epmem_close( my_agent );
-	}
-	*/
-
-	// cue matching over lots of cues (numerical wmes under "queries" wme, commit=level)
-	/*{
-		long level = (long) epmem_get_parameter( my_agent, EPMEM_PARAM_COMMIT );
-		const int repeat = 20;
-
-		epmem_time_list *prohibit = new epmem_time_list;
-		unsigned long max_queries;
-		wme **wmes;
-		{
-			Symbol *queries = NULL;
-			wmes = epmem_get_augs_of_id( my_agent, my_agent->top_goal, get_new_tc_number( my_agent ), &max_queries );
-			for ( int i=0; i<max_queries; i++ )
-			{
-				if ( ( wmes[i]->attr->sc.common_symbol_info.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) && !strcmp( wmes[i]->attr->sc.name, "queries" ) )
-					queries = wmes[i]->value;
-			}
-			free_memory( my_agent, wmes, MISCELLANEOUS_MEM_USAGE );
-
-			wmes = epmem_get_augs_of_id( my_agent, queries, get_new_tc_number( my_agent ), &max_queries );
-		}
-
-		{
-			int real_query;
-			timeval start;
-			timeval total;
-
-			epmem_init_db( my_agent, true );
-			epmem_transaction_begin( my_agent );
-
-			for ( int i=0; i<max_queries; i++ )
-			{
-				real_query = wmes[i]->attr->ic.value;
-
-				reset_timer( &start );
-				reset_timer( &total );
-
-				start_timer( my_agent, &start );
-
-				for ( int j=0; j<repeat; j++ )
-				{
-					epmem_process_query( my_agent, my_agent->top_goal, wmes[i]->value, NULL, prohibit, EPMEM_MEMID_NONE, EPMEM_MEMID_NONE, level );
-					epmem_clear_result( my_agent, my_agent->top_goal );
-				}
-
-				stop_timer( my_agent, &start, &total );
-
-				std::cout << ( real_query ) << "," << ( (double) timer_value( &total ) / (double) repeat ) << std::endl;
-			}
-
-			epmem_transaction_end( my_agent, false );
-			epmem_close( my_agent );
-		}
-	}*/
-
 #endif // EPMEM_EXPERIMENT
 
-	my_agent->epmem_timers->total->stop();	
+	my_agent->epmem_timers->total->stop();
+
+	if ( my_agent->epmem_made_changes )
+	{
+		do_working_memory_phase( my_agent );
+	}
 }
