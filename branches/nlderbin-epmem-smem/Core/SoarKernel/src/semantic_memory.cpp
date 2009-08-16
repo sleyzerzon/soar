@@ -1790,8 +1790,10 @@ void smem_deallocate_chunk( agent *my_agent, smem_chunk *chunk, bool free_chunk 
 			smem_slot::iterator v;
 
 			// iterate over slots
-			for ( s=chunk->slots->begin(); s!=chunk->slots->end(); s=chunk->slots->erase(s) )
+			while ( !chunk->slots->empty() )
 			{
+				s = chunk->slots->begin();
+
 				// proceed to slot contents
 				if ( s->second )
 				{
@@ -1812,12 +1814,14 @@ void smem_deallocate_chunk( agent *my_agent, smem_chunk *chunk, bool free_chunk 
 
 						delete (*v);
 					}
+
+					delete s->second;
 				}
 
 				// deallocate attribute for each corresponding value
 				symbol_remove_ref( my_agent, s->first );
 
-				delete s->second;
+				chunk->slots->erase( s );
 			}
 
 			// remove slots
