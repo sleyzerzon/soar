@@ -29,6 +29,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 	{
 		{'a', "add",		OPTARG_NONE},
 		{'g', "get",		OPTARG_NONE},
+		{'i', "init",		OPTARG_NONE},
 		{'s', "set",		OPTARG_NONE},
 		{'S', "stats",		OPTARG_NONE},
 		{'t', "timers",		OPTARG_NONE},
@@ -52,6 +53,10 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 
 			case 'g':
 				options.set( SMEM_GET );
+				break;
+
+			case 'i':
+				options.set( SMEM_INIT );
 				break;
 
 			case 's':
@@ -117,6 +122,15 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 			return DoSMem( 'g', &( argv[2] ) );
 		else
 			return SetError( CLIError::kInvalidAttribute );
+	}
+
+	// case: init takes no arguments
+	else if ( options.test( SMEM_INIT ) )
+	{		
+		if ( m_NonOptionArguments > 0 )
+			return SetError( CLIError::kTooManyArgs );
+
+		return DoSMem( 'i' );		
 	}
 
 	// case: set requires two non-option arguments
@@ -358,6 +372,21 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 			m_Result << output;
 		else
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
+
+		return true;
+	}
+	else if ( pOp == 'i' )
+	{
+		// Because of LTIs, re-initializing requires all other memories to be reinitialized.		
+		
+		// epmem - close before working/production memories to get re-init benefits
+		this->DoCommandInternal( "epmem --close" );		
+		
+		// smem - close before working/production memories to prevent id counter mess-ups
+		smem_close( m_pAgentSoar );
+
+		// production memory (automatic init-soar clears working memory as a result)		
+		this->DoCommandInternal( "excise --all" );
 
 		return true;
 	}

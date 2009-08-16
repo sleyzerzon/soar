@@ -185,6 +185,7 @@ namespace cli {
 		SMEM_ADD,
 		SMEM_GET,		
 		SMEM_SET,
+		SMEM_INIT,
 		SMEM_STAT,
 		SMEM_TIMER,
 		SMEM_VIZ,

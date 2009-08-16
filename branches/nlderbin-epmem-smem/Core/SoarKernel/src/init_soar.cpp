@@ -351,7 +351,8 @@ void reset_statistics (agent* thisAgent) {
      reset_timer (&thisAgent->gds_cpu_time[ii]);
   }
 
-  thisAgent->epmem_timers->reset();  
+  thisAgent->epmem_timers->reset(); 
+  thisAgent->smem_timers->reset();
 }
 
 bool reinitialize_soar (agent* thisAgent) {
@@ -398,6 +399,7 @@ bool reinitialize_soar (agent* thisAgent) {
 	thisAgent->rl_stats->reset();
 	thisAgent->wma_stats->reset();
 	thisAgent->epmem_stats->reset();
+	thisAgent->smem_stats->reset();
 
 	thisAgent->active_level = 0; /* Signal that everything should be retracted */
 	thisAgent->FIRING_TYPE = IE_PRODS;
