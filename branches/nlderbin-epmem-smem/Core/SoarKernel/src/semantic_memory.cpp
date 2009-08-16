@@ -111,28 +111,6 @@ smem_param_container::smem_param_container( agent *new_agent ): soar_module::par
 	opt->add_mapping( opt_safety, "safety" );
 	opt->add_mapping( opt_speed, "performance" );	
 	add( opt );
-
-	//
-
-#ifdef SMEM_EXPERIMENT
-
-	// exp-repeat
-	exp_repeat = new soar_module::integer_param( "exp-repeat", 100, new soar_module::gt_predicate<long>( 1, true ), new soar_module::f_predicate<long>() );
-	add( exp_repeat );
-
-	// exp-set
-	exp_set = new soar_module::integer_param( "exp-set", 1, new soar_module::gt_predicate<long>( 1, true ), new soar_module::f_predicate<long>() );
-	add( exp_set );
-
-	// exp-result
-	exp_result = new soar_module::string_param( "exp-result", "", new soar_module::predicate<const char *>(), new soar_module::f_predicate<const char *>() );
-	add( exp_result );
-
-	// exp-input
-	exp_input = new soar_module::string_param( "exp-input", "", new soar_module::predicate<const char *>(), new soar_module::f_predicate<const char *>() );
-	add( exp_input );
-
-#endif
 }
 
 //
@@ -584,14 +562,62 @@ inline Symbol *smem_statement_to_symbol( agent *my_agent, soar_module::sqlite_st
 
 void _smem_add_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Symbol *value, bool meta )
 {
-	wme *w = soar_module::add_module_wme( my_agent, id, attr, value );
-	w->preference = soar_module::make_fake_preference( my_agent, state, w->id, w->attr, w->value, state->id.smem_info->cue_wmes );
+	// this fake preference is just for this state.
+	// it serves the purpose of simulating a completely
+	// local production firing to provide backtracing
+	// information, making the result wmes dependent
+	// upon the cue wmes.
+	preference *pref = soar_module::make_fake_preference( my_agent, state, id, attr, value, state->id.smem_info->cue_wmes );
 
-	if ( w->preference )
-		add_preference_to_tm( my_agent, w->preference );
+	// add the preference to temporary memory
+	add_preference_to_tm( my_agent, pref );
+
+	// and add it to the list of preferences to be removed
+	// when the goal is removed
+	insert_at_head_of_dll( state->id.preferences_from_goal, pref, all_of_goal_next, all_of_goal_prev );
+	pref->on_goal_list = true;
+
 
 	if ( meta )
-		state->id.smem_info->smem_wmes->push( w );
+	{
+		// if this is a meta wme, then it is completely local
+		// to the state and thus we will manually remove it
+		// (via preference removal) when the time comes
+		state->id.smem_info->smem_wmes->push( pref );
+	}
+	else
+	{
+		// otherwise, we submit the fake instantiation to backtracing
+		// such as to potentially produce justifications that can follow
+		// it to future adventures (potentially on new states)
+
+		instantiation *my_justification_list = NIL;
+		chunk_instantiation( my_agent, pref->inst, false, &my_justification_list );
+
+		// if any justifications are created, assert their preferences manually
+		// (copied mainly from assert_new_preferences with respect to our circumstances)
+		if ( my_justification_list != NIL )
+		{
+			preference *just_pref = NIL;
+			instantiation *next_justification = NIL;
+			
+			for ( instantiation *my_justification=my_justification_list;
+				  my_justification!=NIL;
+				  my_justification=next_justification )
+			{
+				next_justification = my_justification->next;
+				insert_at_head_of_dll( my_justification->prod->instantiations, my_justification, next, prev );					
+
+				for ( just_pref=my_justification->preferences_generated; just_pref!=NIL; just_pref=just_pref->inst_next ) 
+				{
+					add_preference_to_tm( my_agent, just_pref );						
+					
+					if ( wma_enabled( my_agent ) )
+						wma_activate_wmes_in_pref( my_agent, just_pref );
+				}
+			}
+		}
+	}
 }
 
 void smem_add_retrieved_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Symbol *value )
@@ -1543,19 +1569,49 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 
 void smem_clear_result( agent *my_agent, Symbol *state )
 {
-	wme *w;
+	preference *pref;
 
-	// removes meta-wmes
 	while ( !state->id.smem_info->smem_wmes->empty() )
 	{
-		w = state->id.smem_info->smem_wmes->top();
-
-		if ( w->preference )
-			remove_preference_from_tm( my_agent, w->preference );
-
-		soar_module::remove_module_wme( my_agent, w );
-
+		pref = state->id.smem_info->smem_wmes->top();
 		state->id.smem_info->smem_wmes->pop();
+
+		if ( pref->in_tm )
+		{
+			remove_preference_from_tm( my_agent, pref );
+		}
+	}
+}
+
+/***************************************************************************
+ * Function     : smem_reset
+ * Author		: Nate Derbinsky
+ * Notes		: Performs cleanup when a state is removed
+ **************************************************************************/
+void smem_reset( agent *my_agent, Symbol *state )
+{
+	if ( state == NULL )
+	{
+		state = my_agent->top_goal;
+	}
+
+	while( state )
+	{
+		smem_data *data = state->id.smem_info;
+		
+		data->last_cmd_time = 0;
+		data->last_cmd_count = 0;
+
+		data->cue_wmes->clear();
+		
+		// this will be called after prefs from goal are already removed,
+		// so just clear out result stack
+		while ( !data->smem_wmes->empty() )
+		{
+			data->smem_wmes->pop();
+		}		
+
+		state = state->id.lower_goal;
 	}
 }
 
@@ -2335,6 +2391,9 @@ void smem_respond_to_cmd( agent *my_agent )
 
 				// clear old results
 				smem_clear_result( my_agent, state );
+
+				// change is afoot!
+				my_agent->smem_made_changes = true;
 			}
 		}		
 
@@ -2534,6 +2593,10 @@ void smem_respond_to_cmd( agent *my_agent )
 
 void smem_go( agent *my_agent )
 {
+	// after we are done we will perform a wm phase
+	// if any adds/removes
+	my_agent->smem_made_changes = false;
+	
 	my_agent->smem_timers->total->start();
 
 #ifndef SMEM_EXPERIMENT
@@ -2541,189 +2604,15 @@ void smem_go( agent *my_agent )
 	smem_respond_to_cmd( my_agent );
 
 #else // SMEM_EXPERIMENT
-	
-	/*
-	// times execution of queries
-	{
-		
-		Symbol *queries_sym = find_sym_constant( my_agent, "queries" );
-		slot *s = find_slot( my_agent->top_state->id.smem_header, queries_sym );		
-
-		// only do experimental stuff if "queries" exists
-		if ( s == NIL )
-		{
-			smem_respond_to_cmd( my_agent );
-		}
-		else
-		{
-			Symbol *queries_id = s->wmes->value;
-			
-			Symbol *query_num;
-			Symbol *query_desc;
-			Symbol *query_cue;
-			smem_lti_id query_result = NIL;
-
-			Symbol *description_sym = find_sym_constant( my_agent, "description" );
-			Symbol *cue_sym = find_sym_constant( my_agent, "cue" );
-			
-			slot *description_slot;
-			slot *cue_slot;
-
-			smem_lti_set prohibit;
-
-			timeval start;
-			timeval total;
-
-			long repeat = my_agent->smem_params->exp_repeat->get_value();
-			long set = my_agent->smem_params->exp_set->get_value();
-			
-			std::ofstream result_file( const_cast<char *>( my_agent->smem_params->exp_result->get_string() ) );
-			
-			for ( slot *query_slot=queries_id->id.slots; query_slot!=NIL; query_slot=query_slot->next )
-			{
-				query_num = query_slot->attr;
-
-				description_slot = find_slot( query_slot->wmes->value, description_sym );
-				query_desc = description_slot->wmes->value;
-
-				//
-				
-				std::string cue_string( query_desc->sc.name );
-				unsigned long cue_cardinality = 0;
-				std::string::size_type cue_pos = cue_string.find_first_of( '1', 0 );
-
-				char qry_easy = ( ( cue_pos ==  ( cue_string.size() - 1 ) )?('Y'):('N') );
-				char qry_hard = ( ( cue_pos ==  ( cue_string.size() - 2 ) )?('Y'):('N') );
-
-				while ( cue_pos != std::string::npos )
-				{
-					cue_cardinality++;
-					cue_pos = cue_string.find_first_of( '1', cue_pos + 1 );
-
-					if ( cue_pos ==  ( cue_string.size() - 1 ) )
-						qry_easy = 'Y';
-
-					if ( cue_pos ==  ( cue_string.size() - 2 ) )
-						qry_hard = 'Y';
-				}
-
-				//
-
-				cue_slot = find_slot( query_slot->wmes->value, cue_sym );
-				query_cue = cue_slot->wmes->value;
-
-				//
-
-				reset_timer( &start );
-				reset_timer( &total );
-
-				start_timer( my_agent, &start );
-
-				for ( int i=0; i<repeat; i++ )
-				{
-					query_result = smem_process_query( my_agent, my_agent->top_state, query_cue, &( prohibit ), qry_search );
-				}
-
-				stop_timer( my_agent, &start, &total );
-
-				result_file << set << "," << query_num->ic.value << ",\"" << query_desc->sc.name << "\"," << cue_cardinality << ",\"" << qry_easy << "\",\"" << qry_hard << "\"," << query_result << "," << ( (double) timer_value( &total ) / (double) repeat ) << std::endl;
-			}
-
-			result_file.close();
-		}
-	}
-	*/
-
-	// times storage procedure
-	{
-		// read add file
-		char *add_command;
-		std::string::size_type total_len = 0;
-		std::cout << std::endl << "reading input file... ";
-		{			
-			std::string *temp_str;
-			const char *temp_charstar;
-
-			std::queue<std::string *> lines;			
-
-			std::ifstream input_file( const_cast<char *>( my_agent->smem_params->exp_input->get_string() ) );
-			while ( !input_file.eof() )
-			{			
-				temp_str = new std::string();				
-				std::getline( input_file, (*temp_str) );
-
-				// start with "{" instead of "smem --add {" (simulates CLI)
-				if ( total_len == 0 )
-				{
-					temp_str->clear();
-					temp_str->append( "{" );
-				}
-				
-				total_len += ( temp_str->length() + 1 );				
-
-				lines.push( temp_str );
-			}
-			input_file.close();
-
-			add_command = new char[ total_len ];
-			add_command[ total_len - 1 ] = '\0';
-			unsigned int pos = 0;
-			while ( !lines.empty() )
-			{
-				temp_str = lines.front();
-				lines.pop();
-
-				temp_charstar = temp_str->c_str();
-				strcpy( ( add_command + pos ), temp_charstar );
-				
-				pos += static_cast<unsigned int>( temp_str->length() );
-				if ( !lines.empty() )
-				{
-					add_command[ pos++ ] = ' ';
-				}
-
-				delete temp_str;
-			}
-		}
-		std::cout << "done" << std::endl;
-
-		// parse
-		{
-			std::string *err = NULL;
-			bool result;
-
-			timeval start;
-			timeval total;
-
-			//std::ofstream result_file( const_cast<char *>( my_agent->smem_params->exp_result->get_string() ) );
-
-			long set = my_agent->smem_params->exp_set->get_value();
-
-			reset_timer( &start );
-			reset_timer( &total );
-
-			start_timer( my_agent, &start );
-			
-			result = smem_parse_chunks( my_agent, add_command, &( err ) );
-
-			stop_timer( my_agent, &start, &total );
-
-			std::cout << std::endl << "result: " << set << "," << total_len << "," << (double) timer_value( &total ) << std::endl;
-			//result_file.close();
-
-			if ( !result )
-			{
-				std::cout << (*err);
-				delete err;
-			}
-		}
-
-		delete add_command;
-	}
 
 #endif // SMEM_EXPERIMENT
 
 	my_agent->smem_timers->total->stop();
+
+	if ( my_agent->smem_made_changes )
+	{
+		do_working_memory_phase( my_agent );
+	}
 }
 
 

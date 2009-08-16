@@ -2109,6 +2109,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   update_impasse_items (thisAgent, goal, NIL); /* causes items & fake pref's to go away */
 
   epmem_reset( thisAgent, goal );
+  smem_reset( thisAgent, goal );
   
   remove_wme_list_from_wm (thisAgent, goal->id.impasse_wmes);
   goal->id.impasse_wmes = NIL;
@@ -2272,7 +2273,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.smem_info->last_cmd_time = 0;
   id->id.smem_info->last_cmd_count = 0;
   id->id.smem_info->cue_wmes = new std::set<wme *>();
-  id->id.smem_info->smem_wmes = new std::stack<wme *>();
+  id->id.smem_info->smem_wmes = new std::stack<preference *>();
 
 
   /* --- invoke callback routine --- */

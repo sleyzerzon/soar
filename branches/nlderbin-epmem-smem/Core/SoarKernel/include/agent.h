@@ -876,6 +876,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
   uintptr_t smem_validation;
   bool smem_first_switch;
+  bool smem_made_changes;
   intptr_t smem_max_cycle;
 
 

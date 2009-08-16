@@ -1401,6 +1401,7 @@ void init_agent_memory(agent* thisAgent)
   }
 
   thisAgent->epmem_timers->reset();
+  thisAgent->smem_timers->reset();
 
   // This is an important part of the state of the agent for io purposes
   // (see io.cpp for details)

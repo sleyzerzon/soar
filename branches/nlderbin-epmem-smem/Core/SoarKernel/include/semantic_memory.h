@@ -58,13 +58,6 @@ class smem_param_container: public soar_module::param_container
 		soar_module::constant_param<cache_choices> *cache;
 		soar_module::constant_param<opt_choices> *opt;
 
-#ifdef SMEM_EXPERIMENT
-		soar_module::integer_param *exp_repeat;
-		soar_module::integer_param *exp_set;
-		soar_module::string_param *exp_result;
-		soar_module::string_param *exp_input;
-#endif
-
 		smem_param_container( agent *new_agent );
 };
 
@@ -164,7 +157,7 @@ class smem_timer: public soar_module::timer
 
 
 //////////////////////////////////////////////////////////
-// EpMem Statements
+// SMem Statements
 //////////////////////////////////////////////////////////
 
 class smem_statement_container: public soar_module::sqlite_statement_container
@@ -260,11 +253,11 @@ typedef std::list<wme *> smem_wme_list;
 // data associated with each state
 typedef struct smem_data_struct
 {
-	unsigned long last_cmd_time;	// last update to smem.command
-	unsigned long last_cmd_count;	// last update to smem.command
+	unsigned long last_cmd_time;			// last update to smem.command
+	unsigned long last_cmd_count;			// last update to smem.command
 
-	std::set<wme *> *cue_wmes;		// wmes in last cue
-	std::stack<wme *> *smem_wmes;	// wmes in last smem
+	std::set<wme *> *cue_wmes;				// wmes in last cue
+	std::stack<preference *> *smem_wmes;	// wmes in last smem
 } smem_data;
 
 //
@@ -365,6 +358,7 @@ extern Bool smem_count_ltis( agent *my_agent, void *item, void *userdata );
 extern smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long name_number );
 extern inline Symbol *smem_lti_soar_make( agent *my_agent, smem_lti_id lti, char name_letter, unsigned long name_number, goal_stack_level level );
 
+extern void smem_reset( agent *my_agent, Symbol *state );
 extern void smem_reset_id_counters( agent *my_agent );
 extern void smem_close( agent *my_agent );
 
