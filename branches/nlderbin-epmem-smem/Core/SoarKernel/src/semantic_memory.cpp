@@ -1383,27 +1383,30 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 						}
 					}
 
-					if ( q->execute() == soar_module::row )
+					if ( good_cue )
 					{
-						new_cue_element = new smem_weighted_cue_element;
+						if ( q->execute() == soar_module::row )
+						{
+							new_cue_element = new smem_weighted_cue_element;
 
-						new_cue_element->weight = q->column_int( 0 );
-						new_cue_element->attr_hash = attr_hash;
-						new_cue_element->value_hash = value_hash;
-						new_cue_element->value_lti = value_lti;
-						new_cue_element->cue_element = w;
+							new_cue_element->weight = q->column_int( 0 );
+							new_cue_element->attr_hash = attr_hash;
+							new_cue_element->value_hash = value_hash;
+							new_cue_element->value_lti = value_lti;
+							new_cue_element->cue_element = w;
 
-						new_cue_element->element_type = element_type;
+							new_cue_element->element_type = element_type;
 
-						weighted_pq.push( new_cue_element );
-						new_cue_element = NULL;
+							weighted_pq.push( new_cue_element );
+							new_cue_element = NULL;
+						}
+						else
+						{
+							good_cue = false;
+						}
+
+						q->reinitialize();
 					}
-					else
-					{
-						good_cue = false;
-					}
-
-					q->reinitialize();
 				}
 				else
 				{
@@ -1533,7 +1536,7 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 		if ( king_id != NIL )
 		{
 			// success!
-			smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_success );
+			smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_success, query );
 
 			////////////////////////////////////////////////////////////////////////////
 			my_agent->smem_timers->query->stop();
@@ -1543,7 +1546,7 @@ smem_lti_id smem_process_query( agent *my_agent, Symbol *state, Symbol *query, s
 		}
 		else
 		{
-			smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_failure );
+			smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_failure, query );
 
 			////////////////////////////////////////////////////////////////////////////
 			my_agent->smem_timers->query->stop();
@@ -2513,12 +2516,12 @@ void smem_respond_to_cmd( agent *my_agent )
 					if ( retrieve->id.smem_lti == NIL )
 					{
 						// retrieve is not pointing to an lti!
-						smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_failure );
+						smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_failure, retrieve );
 					}
 					else
 					{
 						// status: success
-						smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_success );
+						smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_success, retrieve );
 
 						// install memory directly onto the retrieve identifier
 						smem_install_memory( my_agent, state, retrieve->id.smem_lti, retrieve );
@@ -2561,6 +2564,9 @@ void smem_respond_to_cmd( agent *my_agent )
 					{
 						smem_soar_store( my_agent, (*sym_p) );
 
+						// status: success
+						smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_success, (*sym_p) );
+
 						// add one to the store stat
 						my_agent->smem_stats->stores->set_value( my_agent->smem_stats->stores->get_value() + 1 );
 					}
@@ -2578,7 +2584,7 @@ void smem_respond_to_cmd( agent *my_agent )
 			}
 			else
 			{
-				smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_status, my_agent->smem_sym_bad_cmd );
+				smem_add_meta_wme( my_agent, state, state->id.smem_result_header, my_agent->smem_sym_bad_cmd, state->id.smem_cmd_header );
 			}
 		}
 		else

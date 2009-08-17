@@ -10,7 +10,7 @@ sp {apply*check*new
    (state <s> ^operator <op>
               ^smem <smem>)
    (<op> ^name check)
-   (<smem> ^result.status failure
+   (<smem> ^result.failure <q>
            ^command <cmd>)
    (<cmd> ^query <q>)
 -->
@@ -22,7 +22,7 @@ sp {apply*check*new
 
 sp {apply*check*existing
    (state <s> ^operator <op>
-              ^smem.result.status success
+              ^smem.result.success <q>
               ^superstate <ss>)
    (<op> ^name check)
    (<ss> ^operator <ss-op>)
