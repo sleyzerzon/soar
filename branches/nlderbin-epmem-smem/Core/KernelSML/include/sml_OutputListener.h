@@ -76,6 +76,9 @@ public:
 	// re-initialize handler
 	void ReinitializeEvent(smlAgentEventId eventId) ;
 
+	// Fine-grained re-initialize handler, see comments in agentsml where this is called
+	void SendOutputInitEvent();
+
 } ;
 
 }

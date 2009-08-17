@@ -76,6 +76,7 @@ class FullTests : public CPPUNIT_NS::TestCase
 	CPPUNIT_TEST( testNegatedConjunctiveTestReorder );
 	CPPUNIT_TEST( testNegatedConjunctiveTestUnbound ); // bug 517
 	CPPUNIT_TEST( testCommandToFile ); 
+	CPPUNIT_TEST( testSMemIO ); 
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -112,6 +113,7 @@ public:
 	TEST_DECLARATION( testNegatedConjunctiveTestReorder );
 	TEST_DECLARATION( testNegatedConjunctiveTestUnbound );
 	TEST_DECLARATION( testCommandToFile );
+	TEST_DECLARATION( testSMemIO );
 
 	void testShutdownHandlerShutdown();
 
@@ -1672,4 +1674,21 @@ TEST_DEFINITION( testCommandToFile )
 	CPPUNIT_ASSERT(result);
 	const std::string resultString("#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*\nTotal: 144 productions sourced. 144 productions excised.\nSource finished.\n");
 	CPPUNIT_ASSERT(result == resultString);
+}
+
+TEST_DEFINITION( testSMemIO )
+{
+	m_pAgent->ExecuteCommandLine("smem --add { (<id> ^id 1) }");
+	sml::Identifier* pID = m_pAgent->GetInputLink()->CreateIdWME("plane");
+	m_pAgent->RunSelf(1);
+	m_pAgent->InitSoar();
+	m_pAgent->ExecuteCommandLine("sp {test (state <s> ^io.input-link.plane.type |747|) --> (halt) }");
+	sml::StringElement* pType = pID->CreateStringWME("type", "747");
+	m_pAgent->RunSelfForever();
+	{
+		sml::ClientAnalyzedXML response;
+		m_pAgent->ExecuteCommandLineXML("stats", &response);
+		CPPUNIT_ASSERT(response.GetArgInt(sml::sml_Names::kParamStatsCycleCountDecision, -1) == 0);
+		CPPUNIT_ASSERT(response.GetArgInt(sml::sml_Names::kParamStatsCycleCountElaboration, -1) == 1);
+	}
 }
