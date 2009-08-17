@@ -1683,7 +1683,7 @@ TEST_DEFINITION( testSMemIO )
 	m_pAgent->RunSelf(1);
 	m_pAgent->InitSoar();
 	m_pAgent->ExecuteCommandLine("sp {test (state <s> ^io.input-link.plane.type |747|) --> (halt) }");
-	sml::StringElement* pType = pID->CreateStringWME("type", "747");
+	/*sml::StringElement* pType =*/ pID->CreateStringWME("type", "747");
 	m_pAgent->RunSelfForever();
 	{
 		sml::ClientAnalyzedXML response;
