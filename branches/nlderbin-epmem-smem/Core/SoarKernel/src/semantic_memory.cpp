@@ -831,8 +831,11 @@ bool smem_valid_production( condition *lhs_top, action *rhs_top )
 	// collect valid ltis
 	for ( condition *c=lhs_top; c!=NIL; c=c->next )
 	{
-		_smem_lti_from_test( c->data.tests.attr_test, &valid_ltis );
-		_smem_lti_from_test( c->data.tests.value_test, &valid_ltis );
+		if ( c->type == POSITIVE_CONDITION )
+		{
+			_smem_lti_from_test( c->data.tests.attr_test, &valid_ltis );
+			_smem_lti_from_test( c->data.tests.value_test, &valid_ltis );
+		}
 	}
 
 	// validate ltis in actions
@@ -855,39 +858,6 @@ bool smem_valid_production( condition *lhs_top, action *rhs_top )
 						return_val = false;
 						break;
 					}
-				}
-
-				// check attr
-				if ( !_smem_lti_from_rhs_value( a->attr, &valid_ltis ) )
-				{
-					return_val = false;
-					break;
-				}
-
-				// check value
-				if ( !_smem_lti_from_rhs_value( a->value, &valid_ltis ) )
-				{
-					return_val = false;
-					break;
-				}
-
-				// check preference
-				if ( preference_is_binary( a->preference_type ) )
-				{
-					if ( !_smem_lti_from_rhs_value( a->referent, &valid_ltis ) )
-					{
-						return_val = false;
-						break;
-					}
-				}
-			}
-			else
-			{
-				// function call
-				if ( !_smem_lti_from_rhs_value( a->value, &valid_ltis ) )
-				{
-					return_val = false;
-					break;
 				}
 			}
 		}
