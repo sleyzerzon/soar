@@ -1163,6 +1163,30 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 		nots = get_nots_for_instantiated_conditions (thisAgent, thisAgent->instantiations_with_nots, tc_for_grounds);
 	}
 
+	/* --- check for LTI validity --- */
+	if ( thisAgent->variablize_this_chunk )
+	{
+		if ( top_cc )
+		{
+			// need a temporary copy of the actions
+			rhs = copy_and_variablize_result_list (thisAgent, results);
+
+			if ( !smem_valid_production( top_cc->variablized_cond, rhs ) )
+			{
+				thisAgent->variablize_this_chunk = false;
+
+				if (thisAgent->sysparams[TRACE_BACKTRACING_SYSPARAM]) 
+				{
+					print( thisAgent, "\nWarning: LTI validation failed, creating justification instead." );
+					xml_generate_warning( thisAgent, "LTI validation failed, creating justification instead." );
+				}
+			}
+
+			// remove temporary copy
+			deallocate_action_list (thisAgent, rhs);
+		}
+	}
+
 	/* --- get symbol for name of new chunk or justification --- */
 	if (thisAgent->variablize_this_chunk) 
 	{

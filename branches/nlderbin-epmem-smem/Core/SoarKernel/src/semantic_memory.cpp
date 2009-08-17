@@ -756,6 +756,146 @@ smem_hash_id smem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
+// copied primarily from add_bound_variables_in_test
+void _smem_lti_from_test( test t, std::set<Symbol *> *valid_ltis )
+{
+	if ( test_is_blank_test(t) ) return;
+	
+	if ( test_is_blank_or_equality_test(t) )
+	{
+		Symbol *referent = referent_of_equality_test(t);
+		if ( ( referent->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) && ( referent->id.smem_lti != NIL ) )
+		{
+			valid_ltis->insert( referent );
+		}
+      
+		return;
+	}
+
+	{		
+		complex_test *ct = complex_test_from_test(t);
+
+		if ( ct->type==CONJUNCTIVE_TEST ) 
+		{
+			for ( cons *c=ct->data.conjunct_list; c!=NIL; c=c->rest )
+			{
+				_smem_lti_from_test( static_cast<test>( c->first ), valid_ltis );
+			}				
+		}
+	}
+}
+
+// copied primarily from add_all_variables_in_rhs_value
+bool _smem_lti_from_rhs_value( rhs_value rv, std::set<Symbol *> *valid_ltis )
+{
+	bool return_val = true;
+	std::set<Symbol *>::iterator lti_p;
+
+	if ( rhs_value_is_symbol( rv ) )
+	{
+		Symbol *sym = rhs_value_to_symbol( rv );
+		if ( ( sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) && ( sym->id.smem_lti != NIL ) )
+		{
+			lti_p = valid_ltis->find( sym );
+
+			if ( lti_p == valid_ltis->end() )
+			{
+				return_val = false;
+			}
+		}
+	}
+	else
+	{
+		list *fl = rhs_value_to_funcall_list( rv );
+		for ( cons *c=fl->rest; c!=NIL; c=c->rest )
+		{
+			if ( !_smem_lti_from_rhs_value( static_cast<rhs_value>( c->first ), valid_ltis ) )
+			{
+				return_val = false;
+				break;
+			}
+		}
+	}
+
+	return return_val;
+}
+
+// make sure ltis in actions are grounded
+bool smem_valid_production( condition *lhs_top, action *rhs_top )
+{
+	bool return_val = true;
+	
+	std::set<Symbol *> valid_ltis;
+	std::set<Symbol *>::iterator lti_p;
+	
+	// collect valid ltis
+	for ( condition *c=lhs_top; c!=NIL; c=c->next )
+	{
+		_smem_lti_from_test( c->data.tests.attr_test, &valid_ltis );
+		_smem_lti_from_test( c->data.tests.value_test, &valid_ltis );
+	}
+
+	// validate ltis in actions
+	// copied primarily from add_all_variables_in_action
+	{
+		Symbol *id;
+		
+		for ( action *a=rhs_top; a!=NIL; a=a->next )
+		{
+			if ( a->type == MAKE_ACTION )
+			{
+				// check id
+				id = rhs_value_to_symbol( a->id );
+				if ( ( id->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) && ( id->id.smem_lti != NIL ) )
+				{
+					lti_p = valid_ltis.find( id );
+
+					if ( lti_p == valid_ltis.end() )
+					{
+						return_val = false;
+						break;
+					}
+				}
+
+				// check attr
+				if ( !_smem_lti_from_rhs_value( a->attr, &valid_ltis ) )
+				{
+					return_val = false;
+					break;
+				}
+
+				// check value
+				if ( !_smem_lti_from_rhs_value( a->value, &valid_ltis ) )
+				{
+					return_val = false;
+					break;
+				}
+
+				// check preference
+				if ( preference_is_binary( a->preference_type ) )
+				{
+					if ( !_smem_lti_from_rhs_value( a->referent, &valid_ltis ) )
+					{
+						return_val = false;
+						break;
+					}
+				}
+			}
+			else
+			{
+				// function call
+				if ( !_smem_lti_from_rhs_value( a->value, &valid_ltis ) )
+				{
+					return_val = false;
+					break;
+				}
+			}
+		}
+	}
+
+	return return_val;
+}
+
 // instance of hash_table_callback_fn2
 Bool smem_count_ltis( agent * /*my_agent*/, void *item, void *userdata )
 {
