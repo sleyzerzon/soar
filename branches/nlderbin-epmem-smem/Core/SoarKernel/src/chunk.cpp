@@ -1163,12 +1163,13 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 		nots = get_nots_for_instantiated_conditions (thisAgent, thisAgent->instantiations_with_nots, tc_for_grounds);
 	}
 
-	/* --- check for LTI validity --- */
+	/* --- check for LTI validity --- */	
 	if ( thisAgent->variablize_this_chunk )
 	{
 		if ( top_cc )
 		{
 			// need a temporary copy of the actions
+			thisAgent->variablization_tc = get_new_tc_number(thisAgent);
 			rhs = copy_and_variablize_result_list (thisAgent, results);
 
 			if ( !smem_valid_production( top_cc->variablized_cond, rhs ) )
