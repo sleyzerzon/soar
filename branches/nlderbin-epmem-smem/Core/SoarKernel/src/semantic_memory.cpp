@@ -790,22 +790,14 @@ void _smem_lti_from_test( test t, std::set<Symbol *> *valid_ltis )
 }
 
 // copied primarily from add_all_variables_in_rhs_value
-bool _smem_lti_from_rhs_value( rhs_value rv, std::set<Symbol *> *valid_ltis )
+void _smem_lti_from_rhs_value( rhs_value rv, std::set<Symbol *> *valid_ltis )
 {
-	bool return_val = true;
-	std::set<Symbol *>::iterator lti_p;
-
 	if ( rhs_value_is_symbol( rv ) )
 	{
 		Symbol *sym = rhs_value_to_symbol( rv );
 		if ( ( sym->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) && ( sym->id.smem_lti != NIL ) )
 		{
-			lti_p = valid_ltis->find( sym );
-
-			if ( lti_p == valid_ltis->end() )
-			{
-				return_val = false;
-			}
+			valid_ltis->insert( sym );
 		}
 	}
 	else
@@ -813,15 +805,9 @@ bool _smem_lti_from_rhs_value( rhs_value rv, std::set<Symbol *> *valid_ltis )
 		list *fl = rhs_value_to_funcall_list( rv );
 		for ( cons *c=fl->rest; c!=NIL; c=c->rest )
 		{
-			if ( !_smem_lti_from_rhs_value( static_cast<rhs_value>( c->first ), valid_ltis ) )
-			{
-				return_val = false;
-				break;
-			}
+			_smem_lti_from_rhs_value( static_cast<rhs_value>( c->first ), valid_ltis );
 		}
 	}
-
-	return return_val;
 }
 
 // make sure ltis in actions are grounded
@@ -846,25 +832,77 @@ bool smem_valid_production( condition *lhs_top, action *rhs_top )
 	// copied primarily from add_all_variables_in_action
 	{
 		Symbol *id;
-		
-		for ( action *a=rhs_top; a!=NIL; a=a->next )
-		{
-			if ( a->type == MAKE_ACTION )
-			{
-				// check id
-				id = rhs_value_to_symbol( a->id );
-				if ( ( id->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) && ( id->id.smem_lti != NIL ) )
-				{
-					lti_p = valid_ltis.find( id );
+		action *a;		
+		int action_counter = 0;
 
-					if ( lti_p == valid_ltis.end() )
+		for ( a=rhs_top; a!=NIL; a=a->next )
+		{		
+			a->already_in_tc = false;
+			action_counter++;
+		}
+
+		bool good_pass = true;		
+		while ( good_pass && action_counter )
+		{
+			good_pass = false;
+			
+			for ( a=rhs_top; a!=NIL; a=a->next )
+			{
+				if ( !a->already_in_tc )
+				{
+					if ( a->type == MAKE_ACTION )
 					{
-						return_val = false;
+						id = rhs_value_to_symbol( a->id );
+
+						// non-identifiers are ok
+						if ( id->common.symbol_type != IDENTIFIER_SYMBOL_TYPE )
+						{
+							good_pass = true;
+						}
+						// short-term identifiers are ok
+						else if ( id->id.smem_lti == NIL )
+						{
+							good_pass = true;
+						}
+						// valid long-term identifiers are ok
+						else if ( valid_ltis.find( id ) != valid_ltis.end() )
+						{
+							good_pass = true;
+						}
+					}
+					else
+					{
+						good_pass = true;
+					}
+
+					// we've found a new good action
+					// mark as good, collect all goodies
+					if ( good_pass )
+					{
+						a->already_in_tc = true;
+
+						// everyone has values
+						_smem_lti_from_rhs_value( a->value, &valid_ltis );
+						
+						// function calls don't have attributes
+						if ( a->type == MAKE_ACTION )
+						{
+							_smem_lti_from_rhs_value( a->attr, &valid_ltis );
+						}
+
+						// next pass
 						break;
 					}
 				}
 			}
-		}
+			
+			if ( good_pass )
+			{
+				action_counter--;
+			}
+		};
+
+		return_val = ( action_counter == 0 );
 	}
 
 	return return_val;
