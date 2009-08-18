@@ -606,7 +606,11 @@ void _smem_add_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Sy
 				  my_justification=next_justification )
 			{
 				next_justification = my_justification->next;
-				insert_at_head_of_dll( my_justification->prod->instantiations, my_justification, next, prev );					
+
+				if ( my_justification->in_ms )
+				{
+					insert_at_head_of_dll( my_justification->prod->instantiations, my_justification, next, prev );
+				}
 
 				for ( just_pref=my_justification->preferences_generated; just_pref!=NIL; just_pref=just_pref->inst_next ) 
 				{
