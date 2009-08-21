@@ -941,7 +941,7 @@ inline void smem_lti_activate( agent *my_agent, smem_lti_id lti )
 }
 
 // gets the lti id for an existing lti letter/number pair (or NIL if failure)
-smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long name_number )
+smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, uint64_t name_number )
 {
 	smem_lti_id return_val = NIL;
 
@@ -966,7 +966,7 @@ smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, unsigned long na
 }
 
 // adds a new lti id for a letter/number pair
-inline smem_lti_id smem_lti_add_id( agent *my_agent, char name_letter, unsigned long name_number )
+inline smem_lti_id smem_lti_add_id( agent *my_agent, char name_letter, uint64_t name_number )
 {
 	smem_lti_id return_val;
 
@@ -1000,7 +1000,7 @@ inline smem_lti_id smem_lti_soar_add( agent *my_agent, Symbol *id )
 }
 
 // returns a reference to an lti
-inline Symbol *smem_lti_soar_make( agent *my_agent, smem_lti_id lti, char name_letter, unsigned long name_number, goal_stack_level level )
+inline Symbol *smem_lti_soar_make( agent *my_agent, smem_lti_id lti, char name_letter, uint64_t name_number, goal_stack_level level )
 {
 	Symbol *return_val;
 
@@ -1030,14 +1030,14 @@ inline void smem_reset_id_counters( agent *my_agent )
 		// letter, max
 		while ( my_agent->smem_stmts->lti_max->execute() == soar_module::row )
 		{
-			unsigned long name_letter = static_cast<unsigned long>( my_agent->smem_stmts->lti_max->column_int( 0 ) );
-			unsigned long letter_max = static_cast<unsigned long>( my_agent->smem_stmts->lti_max->column_int( 1 ) );
+			uint64_t name_letter = static_cast<uint64_t>( my_agent->smem_stmts->lti_max->column_int( 0 ) );
+			uint64_t letter_max = static_cast<uint64_t>( my_agent->smem_stmts->lti_max->column_int( 1 ) );
 
 			// shift to alphabet
-			name_letter -= static_cast<unsigned long>( 'A' );
+			name_letter -= static_cast<uint64_t>( 'A' );
 
 			// get count
-			unsigned long *letter_ct =& my_agent->id_counter[ name_letter ];
+			uint64_t *letter_ct =& my_agent->id_counter[ name_letter ];
 
 			// adjust if necessary
 			if ( (*letter_ct) <= letter_max )

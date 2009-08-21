@@ -92,9 +92,9 @@ uint32_t hash_variable_raw_info (const char *name, short num_bits) {
 }
 
 uint32_t hash_identifier_raw_info (char name_letter,
-                                        uint32_t name_number,
+                                        uint64_t name_number,
                                         short num_bits) {
-  return compress (name_number | (name_letter << 24), num_bits);
+  return compress (static_cast<uint32_t>(name_number) | (name_letter << 24), num_bits); // FIXME: casting from 64 to 32 bits
 }
 
 uint32_t hash_sym_constant_raw_info (const char *name, short num_bits) {
@@ -122,7 +122,7 @@ uint32_t hash_variable (void *item, short num_bits) {
 uint32_t hash_identifier (void *item, short num_bits) {
   identifier *id;
   id = static_cast<identifier_struct *>(item);
-  return compress (id->name_number ^ (id->name_letter << 24), num_bits);
+  return compress (static_cast<uint32_t>(id->name_number) ^ (static_cast<uint32_t>(id->name_letter) << 24), num_bits); // FIXME: cast from 64 to 32 bits
 }
 
 uint32_t hash_sym_constant (void *item, short num_bits) {
@@ -202,7 +202,7 @@ Symbol *find_variable (agent* thisAgent, const char *name) {
   return NIL;
 }
 
-Symbol *find_identifier (agent* thisAgent, char name_letter, unsigned long name_number) {
+Symbol *find_identifier (agent* thisAgent, char name_letter, uint64_t name_number) {
   uint32_t hash_value;
   Symbol *sym;
 
@@ -280,7 +280,7 @@ Symbol *make_variable (agent* thisAgent, const char *name) {
   return sym;
 }
 
-Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_level level, unsigned long name_number) {
+Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_level level, uint64_t name_number) {
   Symbol *sym;
 
   if (isalpha(name_letter)) {
@@ -301,7 +301,7 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   }
   else
   {
-    unsigned long *current_number = &( thisAgent->id_counter[ name_letter - 'A' ] );
+    uint64_t *current_number = &( thisAgent->id_counter[ name_letter - 'A' ] );
 	if ( name_number >= (*current_number) )
 	{
 	  (*current_number) = ( name_number + 1 );
@@ -519,7 +519,7 @@ Bool print_identifier_ref_info(agent* thisAgent, void* item, void* userdata) {
 			if ( sym->id.smem_lti != NIL )
 			{
 				SNPRINTF( msg, 256, 
-					"\t@%c%lu --> %lu\n", 
+					"\t@%c%llu --> %lu\n", 
 					sym->id.name_letter, 
 					sym->id.name_number, 
 					sym->common.reference_count);
@@ -527,7 +527,7 @@ Bool print_identifier_ref_info(agent* thisAgent, void* item, void* userdata) {
 			else
 			{
 				SNPRINTF( msg, 256, 
-					"\t%c%lu --> %lu\n", 
+					"\t%c%llu --> %lu\n", 
 					sym->id.name_letter, 
 					sym->id.name_number, 
 					sym->common.reference_count);
