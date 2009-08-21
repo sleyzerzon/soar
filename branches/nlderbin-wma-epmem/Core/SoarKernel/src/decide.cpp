@@ -928,7 +928,8 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 	{
 		if ( select_get_operator( thisAgent ) != NULL )
 		{
-			preference *force_result = select_force( thisAgent, s->all_preferences, !predict );
+			preference *force_result = select_force( thisAgent, s->preferences[ACCEPTABLE_PREFERENCE_TYPE], !predict );
+			force_result->next_candidate = NIL;
 
 			if ( force_result )
 			{
@@ -2768,11 +2769,10 @@ void add_wme_to_gds(agent* agentPtr, goal_dependency_set* gds, wme* wme_to_add)
                 
    if (agentPtr->soar_verbose_flag || agentPtr->sysparams[TRACE_WM_CHANGES_SYSPARAM]) 
    {
-	   print(agentPtr, "Adding to GDS for S%ld: ", wme_to_add->gds->goal->id.name_number);    
+	   print(agentPtr, "Adding to GDS for S%lu: ", wme_to_add->gds->goal->id.name_number);    
 	   print(agentPtr, " WME: "); 
 	   char buf[256];
-
-	   SNPRINTF(buf, 254, "Adding to GDS for S%ld: ", wme_to_add->gds->goal->id.name_number);
+	   SNPRINTF(buf, 254, "Adding to GDS for S%lu: ", wme_to_add->gds->goal->id.name_number);
 
 	   xml_begin_tag(agentPtr, kTagVerbose);
 	   xml_att_val(agentPtr, kTypeString, buf);
