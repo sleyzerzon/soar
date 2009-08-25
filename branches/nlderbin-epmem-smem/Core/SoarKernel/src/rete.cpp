@@ -1576,7 +1576,21 @@ void add_wme_to_rete (agent* thisAgent, wme *w) {
   }
 
   w->epmem_id = NIL;  
-  w->epmem_valid = NIL;
+  w->epmem_valid = NIL; 
+  {
+	if ( thisAgent->epmem_db->get_status() == soar_module::connected )
+	{
+	  if ( thisAgent->epmem_params->mode->get_value() == epmem_param_container::graph )
+	  {
+	    if ( ( w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
+			 ( w->value->id.epmem_id != NIL ) &&
+			 ( w->value->id.epmem_valid == thisAgent->epmem_validation ) )
+	    {
+		  (*thisAgent->epmem_id_ref_counts)[ w->value->id.epmem_id ]++;
+	    }
+	  }
+	}
+  }
 }
 
 /* --- Removes a WME from the Rete. --- */

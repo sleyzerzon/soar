@@ -112,6 +112,7 @@ namespace soar_module
 		inst->okay_to_variablize = TRUE;
 		inst->backtrace_number = 0;
 		inst->in_ms = FALSE;
+		inst->GDS_evaluated_already = FALSE;
 		
 		condition *cond = NULL;
 		condition *prev_cond = NULL;	
