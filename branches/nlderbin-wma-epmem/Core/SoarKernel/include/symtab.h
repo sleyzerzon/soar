@@ -260,6 +260,8 @@ typedef struct identifier_struct {
   int depth; /* used to track depth of print (bug 988) RPM 4/07 */
 
   epmem_node_id epmem_id;
+  uintptr_t epmem_valid;
+
 } identifier;
 
 typedef union symbol_union {

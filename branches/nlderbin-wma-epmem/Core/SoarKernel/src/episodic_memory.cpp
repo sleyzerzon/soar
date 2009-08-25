@@ -2241,6 +2241,7 @@ void epmem_new_episode( agent *my_agent )
 		std::map<wme *, epmem_id_reservation *> id_reservations;
 		std::map<wme *, epmem_id_reservation *>::iterator r_p;
 		epmem_id_reservation *new_id_reservation;
+		std::set<Symbol *> new_identifiers;
 
 		// children of the current identifier
 		epmem_wme_list *wmes;
@@ -2272,7 +2273,7 @@ void epmem_new_episode( agent *my_agent )
 				{
 					if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
 						 ( ( (*w_p)->epmem_id == NIL ) || ( (*w_p)->epmem_valid != my_agent->epmem_validation ) ) &&
-						 ( (*w_p)->value->id.epmem_id ) )
+						 ( ( (*w_p)->value->id.epmem_id ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) ) )
 					{
 						// prevent exclusions from being recorded
 						if ( my_agent->epmem_params->exclusions->in_set( (*w_p)->attr ) )
@@ -2329,7 +2330,7 @@ void epmem_new_episode( agent *my_agent )
 							my_id_repo2 = NIL;
 
 							// in the case of a known child, we already have a reservation (case 1)						
-							if ( (*w_p)->value->id.epmem_id )
+							if ( ( (*w_p)->value->id.epmem_id != NIL ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) )
 							{
 								r_p = id_reservations.find( (*w_p) );
 
@@ -2384,6 +2385,9 @@ void epmem_new_episode( agent *my_agent )
 							// case 3
 							else
 							{
+								// UNKNOWN identifier
+								new_identifiers.insert( (*w_p)->value );
+								
 								// get temporal hash
 								my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
 
@@ -2402,6 +2406,7 @@ void epmem_new_episode( agent *my_agent )
 											{
 												(*w_p)->epmem_id = pool_p->second;
 												(*w_p)->value->id.epmem_id = pool_p->first;
+												(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
 												(*my_id_repo)->erase( pool_p );
 												(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = (*my_id_repo);
 
@@ -2427,10 +2432,11 @@ void epmem_new_episode( agent *my_agent )
 							// add path if no success above
 							if ( (*w_p)->epmem_id == NIL )
 							{
-								if ( (*w_p)->value->id.epmem_id == NIL )
+								if ( ( (*w_p)->value->id.epmem_id == NIL ) || ( (*w_p)->value->id.epmem_valid != my_agent->epmem_validation ) )
 								{
 									// update next id
 									(*w_p)->value->id.epmem_id = my_agent->epmem_stats->next_id->get_value();
+									(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
 									my_agent->epmem_stats->next_id->set_value( (*w_p)->value->id.epmem_id + 1 );
 									epmem_set_variable( my_agent, var_next_id, (*w_p)->value->id.epmem_id + 1 );
 
@@ -2465,15 +2471,18 @@ void epmem_new_episode( agent *my_agent )
 								}
 							}
 
-							// if we are in this block, the wme (with id value) was new.
-							// this means that we add a ref-count to the shared-id of the
-							// identifier, irrespective of the case above.
-							(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ]++;
+							// at this point we have successfully added a new wme
+							// whose value was an identifier.  IF the identifier was
+							// unknown at the beginning of this episode, then we need
+							// to update its ref count for each WME added.
+							if ( new_identifiers.find( (*w_p)->value ) != new_identifiers.end() )
+							{
+								(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ]++;
+							}
 						}						
 
-						// path id in cache?
-						seen_p = seen_ids.find( (*w_p)->value->id.epmem_id );
-						if ( seen_p == seen_ids.end() )
+						// continue to children?						
+						if ( (*w_p)->value->id.tc_num != tc )
 						{
 							// future exploration
 							parent_syms.push( (*w_p)->value );
