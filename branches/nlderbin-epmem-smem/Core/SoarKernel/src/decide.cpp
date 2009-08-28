@@ -2271,8 +2271,10 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
 
 
   id->id.smem_info = static_cast<smem_data *>( allocate_memory( thisAgent, sizeof( smem_data ), MISCELLANEOUS_MEM_USAGE ) );  
-  id->id.smem_info->last_cmd_time = 0;
-  id->id.smem_info->last_cmd_count = 0;
+  id->id.smem_info->last_cmd_time[0] = 0;
+  id->id.smem_info->last_cmd_time[1] = 0;
+  id->id.smem_info->last_cmd_count[0] = 0;
+  id->id.smem_info->last_cmd_count[1] = 0;
   id->id.smem_info->cue_wmes = new std::set<wme *>();
   id->id.smem_info->smem_wmes = new std::stack<preference *>();
 

@@ -254,8 +254,8 @@ typedef std::list<wme *> smem_wme_list;
 // data associated with each state
 typedef struct smem_data_struct
 {
-	unsigned long last_cmd_time;			// last update to smem.command
-	unsigned long last_cmd_count;			// last update to smem.command
+	unsigned long last_cmd_time[2];			// last update to smem.command
+	unsigned long last_cmd_count[2];		// last update to smem.command
 
 	std::set<wme *> *cue_wmes;				// wmes in last cue
 	std::stack<preference *> *smem_wmes;	// wmes in last smem
@@ -366,6 +366,6 @@ extern void smem_reset_id_counters( agent *my_agent );
 extern void smem_close( agent *my_agent );
 
 // perform smem actions
-extern void smem_go( agent *my_agent );
+extern void smem_go( agent *my_agent, bool store_only );
 
 #endif

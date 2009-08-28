@@ -1754,8 +1754,10 @@ void smem_reset( agent *my_agent, Symbol *state )
 	{
 		smem_data *data = state->id.smem_info;
 		
-		data->last_cmd_time = 0;
-		data->last_cmd_count = 0;
+		data->last_cmd_time[0] = 0;
+		data->last_cmd_time[1] = 0;
+		data->last_cmd_count[0] = 0;
+		data->last_cmd_count[1] = 0;
 
 		data->cue_wmes->clear();
 		
@@ -2448,7 +2450,7 @@ bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_m
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
-void smem_respond_to_cmd( agent *my_agent )
+void smem_respond_to_cmd( agent *my_agent, bool store_only )
 {
 	// start at the bottom and work our way up
 	// (could go in the opposite direction as well)
@@ -2465,6 +2467,7 @@ void smem_respond_to_cmd( agent *my_agent )
 
 	enum path_type { blank_slate, cmd_bad, cmd_retrieve, cmd_query, cmd_store } path;
 
+	unsigned int time_slot = ( ( store_only )?(1):(0) );
 	unsigned long wme_count;
 	bool new_cue;
 
@@ -2508,19 +2511,24 @@ void smem_respond_to_cmd( agent *my_agent )
 				{
 					for ( w_p=wmes->begin(); w_p!=wmes->end(); w_p++ )
 					{
-						wme_count++;
+						if ( ( ( store_only ) && ( ( parent_level != 0 ) || ( ( (*w_p)->attr != my_agent->smem_sym_query ) && ( (*w_p)->attr != my_agent->smem_sym_retrieve ) ) ) ) || 
+							 ( ( !store_only ) && ( ( parent_level != 0 ) || ( (*w_p)->attr != my_agent->smem_sym_store ) ) ) )
+						{						
+							wme_count++;
 
-						if ( (*w_p)->timetag > state->id.smem_info->last_cmd_time )
-						{
-							new_cue = true;
-							state->id.smem_info->last_cmd_time = (*w_p)->timetag;
-						}
+							if ( (*w_p)->timetag > state->id.smem_info->last_cmd_time[ time_slot ] )
+							{
+								new_cue = true;
+								state->id.smem_info->last_cmd_time[ time_slot ] = (*w_p)->timetag;
+							}
 
-						if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-							 ( parent_level < 2 ) )
-						{
-							syms.push( (*w_p)->value );
-							levels.push( parent_level + 1 );
+							if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
+								 ( parent_level == 0 ) &&
+								 ( ( (*w_p)->attr == my_agent->smem_sym_query ) || ( (*w_p)->attr == my_agent->smem_sym_store ) ) )								 
+							{
+								syms.push( (*w_p)->value );
+								levels.push( parent_level + 1 );
+							}
 						}
 					}
 
@@ -2536,12 +2544,13 @@ void smem_respond_to_cmd( agent *my_agent )
 				}
 			}
 
-			// see if any WMEs were removed
-			if ( state->id.smem_info->last_cmd_count != wme_count )
+			// see if any WMEs were removed			
+			if ( state->id.smem_info->last_cmd_count[ time_slot ] != wme_count )
 			{
 				new_cue = true;
-				state->id.smem_info->last_cmd_count = wme_count;
+				state->id.smem_info->last_cmd_count[ time_slot ] = wme_count;
 			}
+			
 
 			if ( new_cue )
 			{
@@ -2753,7 +2762,7 @@ void smem_respond_to_cmd( agent *my_agent )
 	}
 }
 
-void smem_go( agent *my_agent )
+void smem_go( agent *my_agent, bool store_only )
 {
 	// after we are done we will perform a wm phase
 	// if any adds/removes
@@ -2763,7 +2772,7 @@ void smem_go( agent *my_agent )
 
 #ifndef SMEM_EXPERIMENT
 
-	smem_respond_to_cmd( my_agent );
+	smem_respond_to_cmd( my_agent, store_only );
 
 #else // SMEM_EXPERIMENT
 

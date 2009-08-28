@@ -635,6 +635,9 @@ void do_one_top_level_phase (agent* thisAgent)
 		  do_preference_phase(thisAgent);
 		  do_working_memory_phase(thisAgent);
 
+		  if ( smem_enabled( thisAgent ) )
+			smem_go( thisAgent, true );
+
 		  /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
           thisAgent->e_cycles_this_d_cycle++;
@@ -799,6 +802,9 @@ void do_one_top_level_phase (agent* thisAgent)
 		  do_preference_phase(thisAgent);
 		  do_working_memory_phase(thisAgent);
 
+		  if ( smem_enabled( thisAgent ) )
+			smem_go( thisAgent, true );
+
 		  /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
           thisAgent->e_cycles_this_d_cycle++;
@@ -862,7 +868,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  do_output_cycle(thisAgent);
 
 	  if ( smem_enabled( thisAgent ) )
-		  smem_go( thisAgent );
+		  smem_go( thisAgent, false );
 
 	  if ( wma_enabled( thisAgent ) )
 		  wma_move_and_remove_wmes( thisAgent );
