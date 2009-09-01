@@ -49,6 +49,7 @@ enum epmem_variable_key
 // algorithm constants
 #define EPMEM_MEMID_NONE							0
 #define EPMEM_NODEID_ROOT							0
+#define EPMEM_HASH_ACCEPTABLE						1
 
 #define EPMEM_NODE_POS								0
 #define EPMEM_NODE_NEG								1
