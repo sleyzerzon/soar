@@ -527,8 +527,10 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 	add_structure( "CREATE TABLE IF NOT EXISTS temporal_symbol_hash (id INTEGER PRIMARY KEY, sym_const NONE, sym_type INTEGER)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS temporal_symbol_hash_const_type ON temporal_symbol_hash (sym_type,sym_const)" );
 	
-	// workaround for tree: 1 = IDENTIFIER_SYMBOL_TYPE
+	// workaround for tree: type 1 = IDENTIFIER_SYMBOL_TYPE
+	// workaround for acceptable preference wmes: id 1 = "operator+"
 	add_structure( "INSERT OR IGNORE INTO temporal_symbol_hash (id,sym_const,sym_type) VALUES (0,NULL,1)" );
+	add_structure( "INSERT OR IGNORE INTO temporal_symbol_hash (id,sym_const,sym_type) VALUES (1,'operator*',2)" );
 
 	//
 	
@@ -764,8 +766,7 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 /***************************************************************************
  * Function     : epmem_get_augs_of_id
  * Author		: Nate Derbinsky
- * Notes		: This routine gets all non-acceptable preference wmes
- *                associated with an id.
+ * Notes		: This routine gets all wmes rooted at an id.
  **************************************************************************/
 epmem_wme_list *epmem_get_augs_of_id( Symbol * id, tc_number tc )
 {
@@ -782,10 +783,7 @@ epmem_wme_list *epmem_get_augs_of_id( Symbol * id, tc_number tc )
 		// impasse wmes
 		for ( w=id->id.impasse_wmes; w!=NIL; w=w->next )
 		{
-			if ( !w->acceptable )
-			{
-				return_val->push_back( w );
-			}
+			return_val->push_back( w );
 		}
 
 		// input wmes
@@ -799,10 +797,12 @@ epmem_wme_list *epmem_get_augs_of_id( Symbol * id, tc_number tc )
 		{
 			for ( w=s->wmes; w!=NIL; w=w->next )
 			{
-				if ( !w->acceptable )
-				{				
-					return_val->push_back( w );
-				}
+				return_val->push_back( w );
+			}
+
+			for ( w=s->acceptable_preference_wmes; w!=NIL; w=w->next )
+			{
+				return_val->push_back( w );
 			}
 		}
 	}
@@ -2089,7 +2089,14 @@ void epmem_new_episode( agent *my_agent )
 						}
 						else
 						{
-							my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+							if ( (*w_p)->acceptable )
+							{
+								my_hash = EPMEM_HASH_ACCEPTABLE;
+							}
+							else
+							{
+								my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+							}
 
 							// parent_id=? AND attr=? AND value IS NULL
 							my_agent->epmem_stmts_tree->find_identifier->bind_int( 1, parent_id );
@@ -2280,10 +2287,18 @@ void epmem_new_episode( agent *my_agent )
 							continue;
 
 						// if still here, create reservation (case 1)
-						new_id_reservation = new epmem_id_reservation;
-						new_id_reservation->my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+						new_id_reservation = new epmem_id_reservation;						
 						new_id_reservation->my_id = EPMEM_NODEID_ROOT;
 						new_id_reservation->my_pool = NULL;
+
+						if ( (*w_p)->acceptable )
+						{
+							new_id_reservation->my_hash = EPMEM_HASH_ACCEPTABLE;
+						}
+						else
+						{
+							new_id_reservation->my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+						}
 
 						// try to find appropriate reservation
 						my_id_repo =& (*(*my_agent->epmem_id_repository)[ parent_id ])[ new_id_reservation->my_hash ];
@@ -2354,7 +2369,14 @@ void epmem_new_episode( agent *my_agent )
 								else
 								{
 									// get temporal hash
-									my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+									if ( (*w_p)->acceptable )
+									{
+										my_hash = EPMEM_HASH_ACCEPTABLE;
+									}
+									else
+									{
+										my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+									}
 
 									// try to get an id that matches new information
 									my_id_repo =& (*(*my_agent->epmem_id_repository)[ parent_id ])[ my_hash ];
@@ -2389,7 +2411,14 @@ void epmem_new_episode( agent *my_agent )
 								new_identifiers.insert( (*w_p)->value );
 								
 								// get temporal hash
-								my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+								if ( (*w_p)->acceptable )
+								{
+									my_hash = EPMEM_HASH_ACCEPTABLE;
+								}
+								else
+								{
+									my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+								}
 
 								// try to find node
 								my_id_repo =& (*(*my_agent->epmem_id_repository)[ parent_id ])[ my_hash ];

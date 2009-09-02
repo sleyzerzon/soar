@@ -218,6 +218,7 @@ public:
 	bool ParseMatches(std::vector<std::string>& argv);
 	bool ParseMaxChunks(std::vector<std::string>& argv);
 	bool ParseMaxElaborations(std::vector<std::string>& argv);
+	bool ParseMaxGoalDepth(std::vector<std::string>& argv);
 	bool ParseMaxMemoryUsage(std::vector<std::string>& argv);
 	bool ParseMaxNilOutputCycles(std::vector<std::string>& argv);
 	bool ParseMemories(std::vector<std::string>& argv);
@@ -459,6 +460,12 @@ public:
 	bool DoMaxElaborations(const int n = 0);
 
 	/*************************************************************
+	* @brief max-goal-depth command
+	* @param n The new max goal depth value, use 0 to query
+	*************************************************************/
+	bool DoMaxGoalDepth(const int n = 0);
+
+	/*************************************************************
 	* @brief max-memory-usage command
 	* @param n The new memory usage value, in bytes
 	*************************************************************/
@@ -468,7 +475,7 @@ public:
 	* @brief max-nil-output-cycles command
 	* @param n The new max nil output cycles value, use 0 to query
 	*************************************************************/
-	bool DoMaxNilOutputCycles(const int n);
+	bool DoMaxNilOutputCycles(const int n = 0);
 
 	/*************************************************************
 	* @brief memories command
@@ -833,7 +840,9 @@ protected:
 
 	void GetSystemStats(); // for stats
 	void GetMemoryStats(); // for stats
+	void GetMaxStats(); // for stats
 	void GetReteStats(); // for stats
+	void ResetMaxStats(); // for stats
 
 	bool StreamSource( std::istream& soarStream, const std::string* pFilename );
 

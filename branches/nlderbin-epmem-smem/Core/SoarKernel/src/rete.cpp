@@ -1599,8 +1599,7 @@ void remove_wme_from_rete (agent* thisAgent, wme *w) {
   alpha_mem *am;
   rete_node *node, *next, *child;
   token *tok, *left;
-
-  if ( ( w->epmem_id != NIL ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
+  
   {
 	if ( thisAgent->epmem_db->get_status() == soar_module::connected )
 	{
@@ -1608,24 +1607,30 @@ void remove_wme_from_rete (agent* thisAgent, wme *w) {
 	  {
 	    if ( w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 	    {
-	      (*thisAgent->epmem_edge_removals)[ w->epmem_id ] = true;
+	      if ( ( w->epmem_id != NIL ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
+		  {
+		    (*thisAgent->epmem_edge_removals)[ w->epmem_id ] = true;
 		
-		  // return to the id pool
-		  epmem_return_id_pool::iterator p = thisAgent->epmem_id_replacement->find( w->epmem_id );
-		  (*p->second)[ w->value->id.epmem_id ] = w->epmem_id;
-		  thisAgent->epmem_id_replacement->erase( p );
+		    // return to the id pool
+		    epmem_return_id_pool::iterator p = thisAgent->epmem_id_replacement->find( w->epmem_id );
+		    (*p->second)[ w->value->id.epmem_id ] = w->epmem_id;
+		    thisAgent->epmem_id_replacement->erase( p );
+		  }
 
 		  // reduce the ref count on the identifier
 		  (*thisAgent->epmem_id_ref_counts)[ w->value->id.epmem_id ]--;
 	    }
-	    else
+	    else if ( ( w->epmem_id != NIL ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
 		{
 	      (*thisAgent->epmem_node_removals)[ w->epmem_id ] = true;
 		}
 	  }
 	  else
 	  {
-	    (*thisAgent->epmem_node_removals)[ w->epmem_id ] = true;
+	    if ( ( w->epmem_id != NIL ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
+		{
+		  (*thisAgent->epmem_node_removals)[ w->epmem_id ] = true;
+	    }
 	  }
 	}
   }

@@ -522,7 +522,7 @@ Bool print_identifier_ref_info(agent* thisAgent, void* item, void* userdata) {
 				SNPRINTF( msg, 256, 
 					"\t@%c%llu --> %lu\n", 
 					sym->id.name_letter, 
-					sym->id.name_number, 
+					static_cast<unsigned long long>(sym->id.name_number), 
 					sym->common.reference_count);
 			}
 			else
@@ -530,7 +530,7 @@ Bool print_identifier_ref_info(agent* thisAgent, void* item, void* userdata) {
 				SNPRINTF( msg, 256, 
 					"\t%c%llu --> %lu\n", 
 					sym->id.name_letter, 
-					sym->id.name_number, 
+					static_cast<unsigned long long>(sym->id.name_number), 
 					sym->common.reference_count);
 			}
 
@@ -702,8 +702,16 @@ void create_predefined_symbols (agent* thisAgent) {
   /* RPM 9/06 end */
 
   thisAgent->rl_sym_reward_link = make_sym_constant( thisAgent, "reward-link" );
-  thisAgent->rl_sym_reward = make_sym_constant( thisAgent, "reward" );
-  thisAgent->rl_sym_value = make_sym_constant( thisAgent, "value" );
+  thisAgent->rl_sym_reward = make_sym_constant( thisAgent, "reward" ); //< reward-link/reward
+  thisAgent->rl_sym_value = make_sym_constant( thisAgent, "value" ); //< reward-link/reward/value
+  thisAgent->rl_gc_sym_learning = make_sym_constant( thisAgent, "learning" ); //< reward-link/learning
+  thisAgent->rl_gc_sym_temporal_extension = make_sym_constant( thisAgent, "temporal-extension" ); //< reward-link/temporal-extension
+  thisAgent->rl_gc_sym_discount_rate = make_sym_constant( thisAgent, "discount-rate" ); //< reward-link/discount-rate
+  thisAgent->rl_gc_sym_learning_rate = make_sym_constant( thisAgent, "learning-rate" ); //< reward-link/learning-rate
+  thisAgent->rl_gc_sym_learning_policy = make_sym_constant( thisAgent, "learning-policy" ); //< reward-link/learning-policy
+  thisAgent->rl_gc_sym_hrl_discount = make_sym_constant( thisAgent, "hrl-discount" ); //< reward-link/hrl-discount
+  thisAgent->rl_gc_sym_et_decay_rate = make_sym_constant( thisAgent, "eligibility-trace-decay-rate" ); //< reward-link/eligibility-trace-decay-rate
+  thisAgent->rl_gc_sym_et_tolerance = make_sym_constant( thisAgent, "eligibility-trace-tolerance" ); //< reward-link/eligibility-trace-tolerance
 
   thisAgent->epmem_sym = make_sym_constant( thisAgent, "epmem" );
   thisAgent->epmem_sym_cmd = make_sym_constant( thisAgent, "command" );
@@ -806,6 +814,15 @@ void release_predefined_symbols(agent* thisAgent) {
   release_helper( thisAgent, &( thisAgent->rl_sym_reward ) );
   release_helper( thisAgent, &( thisAgent->rl_sym_value ) );
 
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_learning ) );
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_temporal_extension ) );
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_discount_rate ) );
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_learning_rate ) );
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_learning_policy ) );
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_hrl_discount ) );
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_et_decay_rate ) );
+  release_helper( thisAgent, &( thisAgent->rl_gc_sym_et_tolerance ) );
+
   release_helper( thisAgent, &( thisAgent->epmem_sym ) );
   release_helper( thisAgent, &( thisAgent->epmem_sym_cmd ) );
   release_helper( thisAgent, &( thisAgent->epmem_sym_result ) );
@@ -835,7 +852,6 @@ void release_predefined_symbols(agent* thisAgent) {
   release_helper( thisAgent, &( thisAgent->epmem_sym_before ) );
   release_helper( thisAgent, &( thisAgent->epmem_sym_after ) );
   release_helper( thisAgent, &( thisAgent->epmem_sym_prohibit ) );
-
 
   release_helper( thisAgent, &( thisAgent->smem_sym ) );
   release_helper( thisAgent, &( thisAgent->smem_sym_cmd ) );

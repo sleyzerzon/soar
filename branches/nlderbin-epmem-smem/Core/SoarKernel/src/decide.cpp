@@ -1424,6 +1424,46 @@ void add_impasse_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value,
    and all the extra stuff for goal identifiers.
 ------------------------------------------------------------------ */
 
+inline void create_new_impasse_rl_wme( agent * const &thisAgent, Symbol * const &id, Symbol * &attr, const char * const &str ) {
+	Symbol * const value = make_sym_constant( thisAgent, str );
+	soar_module::add_module_wme( thisAgent, id->id.reward_header, attr, value );
+	symbol_remove_ref( thisAgent, value );
+}
+
+inline void create_new_impasse_rl_wme( agent * const &thisAgent, Symbol * const &id, Symbol * &attr, const double &num ) {
+	Symbol * const value = make_float_constant( thisAgent, num );
+	soar_module::add_module_wme( thisAgent, id->id.reward_header, attr, value );
+	symbol_remove_ref( thisAgent, value );
+}
+
+inline void create_new_impasse_rl_gc( agent * const &thisAgent, Symbol * const &id ) {
+	/*if ( level > 1 ) {
+		// if superstate found, use its values if it has them
+	}
+	else*/
+
+	if ( thisAgent->rl_params->granular_control->get_value() != soar_module::on )
+		return;
+
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_learning, thisAgent->rl_params->learning->get_string() );
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_temporal_extension, thisAgent->rl_params->temporal_extension->get_string() );
+
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_discount_rate, thisAgent->rl_params->discount_rate->get_value() );
+
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_learning_rate, thisAgent->rl_params->learning_rate->get_value() );
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_learning_policy, thisAgent->rl_params->learning_policy->get_string() );
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_hrl_discount, thisAgent->rl_params->hrl_discount->get_string() );
+
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_et_decay_rate, thisAgent->rl_params->et_decay_rate->get_value() );
+	create_new_impasse_rl_wme( thisAgent, id, thisAgent->rl_gc_sym_et_tolerance, thisAgent->rl_params->et_tolerance->get_value() );
+}
+
+inline void create_new_impasse_rl( agent * const &thisAgent, Symbol * const &id, const goal_stack_level &level ) {
+	id->id.reward_header = make_new_identifier( thisAgent, 'R', level );
+	soar_module::add_module_wme( thisAgent, id, thisAgent->rl_sym_reward_link, id->id.reward_header );
+	create_new_impasse_rl_gc ( thisAgent, id );
+}
+
 Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Symbol *attr,
                             byte impasse_type, goal_stack_level level) {
   Symbol *id;
@@ -1437,9 +1477,7 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
   if (isa_goal)
   {
     add_impasse_wme (thisAgent, id, thisAgent->superstate_symbol, object, NIL);
-
-	id->id.reward_header = make_new_identifier( thisAgent, 'R', level );	
-	soar_module::add_module_wme( thisAgent, id, thisAgent->rl_sym_reward_link, id->id.reward_header );	
+    create_new_impasse_rl (thisAgent, id, level);
 
 	id->id.epmem_header = make_new_identifier( thisAgent, 'E', level );		
 	soar_module::add_module_wme( thisAgent, id, thisAgent->epmem_sym, id->id.epmem_header );
@@ -1460,7 +1498,7 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
     add_impasse_wme (thisAgent, id, thisAgent->object_symbol, object, NIL);
 
   if (attr) add_impasse_wme (thisAgent, id, thisAgent->attribute_symbol, attr, NIL);
-  
+
   switch (impasse_type) {
   case NONE_IMPASSE_TYPE:
     break;    /* this happens only when creating the top goal */
@@ -2047,14 +2085,22 @@ void remove_wmes_for_context_slot (agent* thisAgent, slot *s) {
    entire context stack is removed.)
 ------------------------------------------------------------------ */
 
+inline void remove_existing_context_and_descendents_rl( agent * const &thisAgent, Symbol * const &goal ) {
+  delete goal->id.rl_info->eligibility_traces;
+  delete goal->id.rl_info->prev_op_rl_rules;
+  symbol_remove_ref( thisAgent, goal->id.reward_header );
+  free_memory( thisAgent, goal->id.rl_info, MISCELLANEOUS_MEM_USAGE );
+}
+
 void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   preference *p;
 
   ms_change *head, *tail;  /* REW:   08.20.97 */
 
   /* --- remove descendents of this goal --- */
+  // BUGBUG this recursion causes a stack overflow if the goal depth is large
   if (goal->id.lower_goal)
-    remove_existing_context_and_descendents (thisAgent, goal->id.lower_goal);
+    remove_existing_context_and_descendents (thisAgent, goal->id.lower_goal); 
 
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, 
@@ -2155,10 +2201,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
     }
   }
 
-  delete goal->id.rl_info->eligibility_traces;
-  delete goal->id.rl_info->prev_op_rl_rules;  
-  symbol_remove_ref( thisAgent, goal->id.reward_header );
-  free_memory( thisAgent, goal->id.rl_info, MISCELLANEOUS_MEM_USAGE );
+  remove_existing_context_and_descendents_rl(thisAgent, goal);
 
   delete goal->id.epmem_info->cue_wmes;
   delete goal->id.epmem_info->epmem_wmes;
@@ -2204,7 +2247,17 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
    the top and bottom goal.
 ------------------------------------------------------------------ */
 
-void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse_type) 
+inline void create_new_context_rl( agent * const &thisAgent, Symbol * const &id ) {
+  id->id.rl_info = static_cast<rl_data *>( allocate_memory( thisAgent, sizeof( rl_data ), MISCELLANEOUS_MEM_USAGE ) );
+  id->id.rl_info->eligibility_traces = new rl_et_map;
+  id->id.rl_info->prev_op_rl_rules = new rl_rule_list;
+  id->id.rl_info->previous_q = 0;
+  id->id.rl_info->reward = 0;
+  id->id.rl_info->gap_age = 0;
+  id->id.rl_info->hrl_age = 0;
+}
+
+void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse_type)
 {
   Symbol *id;
     
@@ -2252,13 +2305,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.operator_slot = make_slot (thisAgent, id, thisAgent->operator_symbol);
   id->id.allow_bottom_up_chunks = TRUE;
 
-  id->id.rl_info = static_cast<rl_data *>( allocate_memory( thisAgent, sizeof( rl_data ), MISCELLANEOUS_MEM_USAGE ) );
-  id->id.rl_info->eligibility_traces = new rl_et_map;
-  id->id.rl_info->prev_op_rl_rules = new rl_rule_list;
-  id->id.rl_info->previous_q = 0;
-  id->id.rl_info->reward = 0;
-  id->id.rl_info->gap_age = 0;
-  id->id.rl_info->hrl_age = 0;  
+  create_new_context_rl(thisAgent, id);
 
   id->id.epmem_info = static_cast<epmem_data *>( allocate_memory( thisAgent, sizeof( epmem_data ), MISCELLANEOUS_MEM_USAGE ) );
   id->id.epmem_info->last_ol_time = 0;  
@@ -2802,7 +2849,9 @@ void add_wme_to_gds(agent* agentPtr, goal_dependency_set* gds, wme* wme_to_add)
 	   print(agentPtr, "Adding to GDS for S%lu: ", wme_to_add->gds->goal->id.name_number);    
 	   print(agentPtr, " WME: "); 
 	   char buf[256];
-	   SNPRINTF(buf, 254, "Adding to GDS for S%llu: ", wme_to_add->gds->goal->id.name_number);
+
+	   // BADBAD: static casting for llu portability
+	   SNPRINTF(buf, 254, "Adding to GDS for S%llu: ", static_cast<unsigned long long>(wme_to_add->gds->goal->id.name_number));
 
 	   xml_begin_tag(agentPtr, kTagVerbose);
 	   xml_att_val(agentPtr, kTypeString, buf);

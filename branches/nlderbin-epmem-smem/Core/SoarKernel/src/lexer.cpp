@@ -143,7 +143,7 @@ void get_next_char (agent* thisAgent) {
 	if ( thisAgent->alternate_input_exit &&
 		(thisAgent->alternate_input_string == NULL) &&
 		(thisAgent->alternate_input_suffix == NULL)   ) {
-			thisAgent->current_char = EOF_AS_CHAR;
+			thisAgent->current_char = EOF;
 			assert(0 && "error in lexer.cpp (control_c_handler() used to be called here)");
 			return;
 	}
@@ -168,7 +168,7 @@ void get_next_char (agent* thisAgent) {
 			thisAgent->alternate_input_suffix = NIL;
 
 			if ( thisAgent->alternate_input_exit ) {
-				thisAgent->current_char = EOF_AS_CHAR;
+				thisAgent->current_char = EOF;
 				assert(0 && "error in lexer.cpp (control_c_handler() used to be called here)");
 				return;
 			}
@@ -187,7 +187,7 @@ void get_next_char (agent* thisAgent) {
 
 	if ((thisAgent->current_file->current_column == BUFSIZE) &&
 		(thisAgent->current_file->buffer[BUFSIZE-2] != '\n') &&
-		(thisAgent->current_file->buffer[BUFSIZE-2] != EOF_AS_CHAR)) {
+		(thisAgent->current_file->buffer[BUFSIZE-2] != EOF)) {
 			char msg[512];
 			SNPRINTF (msg, 512,
 				"lexer.c: Error:  line too long (max allowed is %d chars)\nFile %s, line %lu\n",
@@ -216,8 +216,7 @@ void get_next_char (agent* thisAgent) {
 					thisAgent->current_file->filename);
 			}
 		}
-		thisAgent->current_file->buffer[0] = EOF_AS_CHAR;
-		thisAgent->current_file->buffer[1] = 0;
+		thisAgent->current_file->buffer[0] = 0;
 	}
 	thisAgent->current_char = thisAgent->current_file->buffer[0];
 	thisAgent->current_file->current_column = 1;
@@ -254,7 +253,7 @@ inline void record_position_of_start_of_lexeme(agent* thisAgent)
   get_next_char(); }*/
 inline void store_and_advance(agent* thisAgent)
 {
-  thisAgent->lexeme.string[thisAgent->lexeme.length++] = thisAgent->current_char;
+  thisAgent->lexeme.string[thisAgent->lexeme.length++] = char(thisAgent->current_char);
   get_next_char(thisAgent);
 }
 
@@ -270,7 +269,7 @@ void read_constituent_string (agent* thisAgent) {
 	int i,len;
 #endif
 
-  while ((thisAgent->current_char!=EOF_AS_CHAR) &&
+  while ((thisAgent->current_char!=EOF) &&
          constituent_char[static_cast<unsigned char>(thisAgent->current_char)])
     store_and_advance(thisAgent);
   finish(thisAgent);
@@ -671,7 +670,7 @@ void lex_unknown (agent* thisAgent) {
     if (! reading_from_top_level(thisAgent)) {
       //respond_to_load_errors (thisAgent);
       if (thisAgent->load_errors_quit)
-	thisAgent->current_char = EOF_AS_CHAR;
+	thisAgent->current_char = EOF;
     }
   }
     get_next_char(thisAgent);
@@ -687,26 +686,26 @@ void lex_vbar (agent* thisAgent) {
   thisAgent->lexeme.type = SYM_CONSTANT_LEXEME;
   get_next_char(thisAgent);
   do {
-    if ((thisAgent->current_char==EOF_AS_CHAR)||
+    if ((thisAgent->current_char==EOF)||
         (thisAgent->lexeme.length==MAX_LEXEME_LENGTH)) {
       print (thisAgent, "Error:  opening '|' without closing '|'\n");
       print_location_of_most_recent_lexeme(thisAgent);
       /* BUGBUG if reading from top level, don't want to signal EOF */
       thisAgent->lexeme.type = EOF_LEXEME;
-      thisAgent->lexeme.string[0]=EOF_AS_CHAR;
+      thisAgent->lexeme.string[0]=EOF;
       thisAgent->lexeme.string[1]=0;
       thisAgent->lexeme.length = 1;
       return;
     }
     if (thisAgent->current_char=='\\') {
       get_next_char(thisAgent);
-      thisAgent->lexeme.string[thisAgent->lexeme.length++] = thisAgent->current_char;
+      thisAgent->lexeme.string[thisAgent->lexeme.length++] = char(thisAgent->current_char);
       get_next_char(thisAgent);
     } else if (thisAgent->current_char=='|') {
       get_next_char(thisAgent);
       break;
     } else {
-      thisAgent->lexeme.string[thisAgent->lexeme.length++] = thisAgent->current_char;
+      thisAgent->lexeme.string[thisAgent->lexeme.length++] = char(thisAgent->current_char);
       get_next_char(thisAgent);
     }
   } while(TRUE);
@@ -717,25 +716,24 @@ void lex_quote (agent* thisAgent) {
   thisAgent->lexeme.type = QUOTED_STRING_LEXEME;
   get_next_char(thisAgent);
   do {
-    if ((thisAgent->current_char==EOF_AS_CHAR)||(thisAgent->lexeme.length==MAX_LEXEME_LENGTH)) {
+    if ((thisAgent->current_char==EOF)||(thisAgent->lexeme.length==MAX_LEXEME_LENGTH)) {
       print (thisAgent, "Error:  opening '\"' without closing '\"'\n");
       print_location_of_most_recent_lexeme(thisAgent);
       /* BUGBUG if reading from top level, don't want to signal EOF */
       thisAgent->lexeme.type = EOF_LEXEME;
-      thisAgent->lexeme.string[0]=EOF_AS_CHAR;
-      thisAgent->lexeme.string[1]=0;
+      thisAgent->lexeme.string[0]=0;
       thisAgent->lexeme.length = 1;
       return;
     }
     if (thisAgent->current_char=='\\') {
       get_next_char(thisAgent);
-      thisAgent->lexeme.string[thisAgent->lexeme.length++] = thisAgent->current_char;
+      thisAgent->lexeme.string[thisAgent->lexeme.length++] = char(thisAgent->current_char);
       get_next_char(thisAgent);
     } else if (thisAgent->current_char=='"') {
       get_next_char(thisAgent);
       break;
     } else {
-      thisAgent->lexeme.string[thisAgent->lexeme.length++] = thisAgent->current_char;
+      thisAgent->lexeme.string[thisAgent->lexeme.length++] = char(thisAgent->current_char);
       get_next_char(thisAgent);
     }
   } while(TRUE);
@@ -765,10 +763,10 @@ void lex_dollar (agent* thisAgent) {
   thisAgent->lexeme.length = 1;
   get_next_char(thisAgent);   /* consume the '$' */
   while ((thisAgent->current_char!='\n') &&
-	 (thisAgent->current_char!=EOF_AS_CHAR) &&
+	 (thisAgent->current_char!=EOF) &&
 	 (thisAgent->lexeme.length < MAX_LEXEME_LENGTH-1)) {
     thisAgent->lexeme.string[thisAgent->lexeme.length++] =
-      thisAgent->current_char;
+      char(thisAgent->current_char);
     get_next_char(thisAgent);
   }
   thisAgent->lexeme.string[thisAgent->lexeme.length] = '\0';
@@ -814,7 +812,7 @@ void get_lexeme (agent* thisAgent) {
   thisAgent->load_errors_quit = FALSE;  /* AGR 527c */
 
   while (thisAgent->load_errors_quit==FALSE) {   /* AGR 527c */
-    if (thisAgent->current_char==EOF_AS_CHAR) break;
+    if (thisAgent->current_char==EOF) break;
     if (whitespace[static_cast<unsigned char>(thisAgent->current_char)]) {
       if (thisAgent->current_char == '\n')
       {    
@@ -836,26 +834,26 @@ void get_lexeme (agent* thisAgent) {
     if (thisAgent->current_char=='#') {
       /* --- read from hash to end-of-line --- */
       while ((thisAgent->current_char!='\n') &&
-             (thisAgent->current_char!=EOF_AS_CHAR))
+             (thisAgent->current_char!=EOF))
         get_next_char(thisAgent);
       if (thisAgent->current_file->fake_rparen_at_eol) {
         do_fake_rparen(thisAgent);
         return;
       }
-      if (thisAgent->current_char!=EOF_AS_CHAR) get_next_char(thisAgent);
+      if (thisAgent->current_char!=EOF) get_next_char(thisAgent);
       continue;
     }
 //#else
 //    if (thisAgent->current_char==';') {
 //      /* --- read from semicolon to end-of-line --- */
 //      while ((thisAgent->current_char!='\n') &&
-//             (thisAgent->current_char!=EOF_AS_CHAR))
+//             (thisAgent->current_char!=EOF))
 //        get_next_char(thisAgent);
 //      if (thisAgent->current_file->fake_rparen_at_eol) {
 //        do_fake_rparen(thisAgent);
 //        return;
 //      }
-//      if (thisAgent->current_char!=EOF_AS_CHAR) get_next_char(thisAgent);
+//      if (thisAgent->current_char!=EOF) get_next_char(thisAgent);
 //      continue;
 //    }
 //    if (thisAgent->current_char=='#') {
@@ -869,7 +867,7 @@ void get_lexeme (agent* thisAgent) {
 //      }
 //      get_next_char(thisAgent);  /* consume the vbar */
 //      while (TRUE) {
-//        if (thisAgent->current_char==EOF_AS_CHAR) {
+//        if (thisAgent->current_char==EOF) {
 //          print ("Error: '#|' without terminating '|#'\n");
 //          print_location_of_most_recent_lexeme(thisAgent);
 //          break;
@@ -886,7 +884,7 @@ void get_lexeme (agent* thisAgent) {
   }
   /* --- no more whitespace, so go get the actual lexeme --- */
   record_position_of_start_of_lexeme(thisAgent);
-  if (thisAgent->current_char!=EOF_AS_CHAR)
+  if (thisAgent->current_char!=EOF)
     (*(lexer_routines[static_cast<unsigned char>(thisAgent->current_char)]))(thisAgent);
   else
     lex_eof(thisAgent);
@@ -1089,7 +1087,7 @@ void print_location_of_most_recent_lexeme (agent* thisAgent) {
     if (! reading_from_top_level(thisAgent)) {
       //respond_to_load_errors (thisAgent); /* AGR 527a */
       if (thisAgent->load_errors_quit)
-	thisAgent->current_char = EOF_AS_CHAR;
+	thisAgent->current_char = EOF;
     }
 
 /* AGR 527a  The respond_to_load_errors call came too early (above),
@@ -1105,7 +1103,7 @@ void print_location_of_most_recent_lexeme (agent* thisAgent) {
     if (! reading_from_top_level(thisAgent)) {
       //respond_to_load_errors (thisAgent);
       if (thisAgent->load_errors_quit)
-	thisAgent->current_char = EOF_AS_CHAR;
+	thisAgent->current_char = EOF;
     }
   }
 }

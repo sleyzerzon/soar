@@ -11,8 +11,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.widgets.Composite;
 
-import com.commsen.stopwatch.Stopwatch;
-
 import edu.umich.soar.gridmap2d.Gridmap2D;
 import edu.umich.soar.gridmap2d.Names;
 import edu.umich.soar.gridmap2d.map.CellObject;
@@ -148,7 +146,7 @@ public class RoomVisualWorld extends VisualWorld {
 			painted = false;
 
 		// Draw world
-		long id = Stopwatch.start("paintControl", "draw world");
+		//long id = Stopwatch.start("paintControl", "draw world");
 		RoomMap rmap = (RoomMap)map;
 		loc.reset();
 		while (loc.next()) {
@@ -168,6 +166,11 @@ public class RoomVisualWorld extends VisualWorld {
 			}
 			
 			gc.fillRectangle(loc.getDraw()[0], loc.getDraw()[1], cellSize, cellSize);
+			
+			//if (painted) {
+			//	gc.setForeground(WindowManager.brown);
+			//	gc.drawRectangle(loc.getDraw()[0], loc.getDraw()[1], cellSize, cellSize);
+			//}
 		}
 		
 		// draw objects
@@ -200,11 +203,6 @@ public class RoomVisualWorld extends VisualWorld {
 			float [] offset = new float [] { 0, 0 };
 			float [] pathTemp = new float [2];
 			
-			int left = (int)pose.pos[0];
-			int right = (int)pose.pos[0];
-			int top = (int)pose.pos[1];
-			int bottom = (int)pose.pos[1];
-			
 			Path path = new Path(gc.getDevice());
 			float heading = (float)player.getState().getYaw();
 
@@ -215,10 +213,13 @@ public class RoomVisualWorld extends VisualWorld {
 			pathTemp[1] = map.size() * cellSize - (center[1] + offset[1]);
 			float [] original = Arrays.copyOf(pathTemp, pathTemp.length);
 			path.moveTo(pathTemp[0], pathTemp[1]);
-			left = Math.min((int)pathTemp[0], left);
-			right = Math.max((int)pathTemp[0], right);
-			top = Math.max((int)pathTemp[1], top);
-			bottom = Math.min((int)pathTemp[1], bottom);
+			//System.out.print(Arrays.toString(pathTemp));
+			//System.out.print("-");
+			
+			int left = (int)pathTemp[0];
+			int right = (int)pathTemp[0];
+			int top = (int)pathTemp[1];
+			int bottom = (int)pathTemp[1];
 
 			// next draw a line to the corner
 			offset[1] = kDotSize/2.0f * (float)Math.sin(heading + (3*Math.PI)/4);
@@ -226,10 +227,12 @@ public class RoomVisualWorld extends VisualWorld {
 			pathTemp[0] = center[0] + offset[0];
 			pathTemp[1] = map.size() * cellSize - (center[1] + offset[1]);
 			path.lineTo(pathTemp[0], pathTemp[1]);
-			left = Math.min((int)pathTemp[0], left);
-			right = Math.max((int)pathTemp[0], right);
-			top = Math.max((int)pathTemp[1], top);
-			bottom = Math.min((int)pathTemp[1], bottom);
+			//System.out.print(Arrays.toString(pathTemp));
+			//System.out.print("-");
+			left = Math.min((int)Math.floor(pathTemp[0]), left);
+			right = Math.max((int)Math.ceil(pathTemp[0]), right);
+			top = Math.max((int)Math.ceil(pathTemp[1]), top);
+			bottom = Math.min((int)Math.floor(pathTemp[1]), bottom);
 
 			// next draw a line to the other corner
 			offset[1] = kDotSize/2.0f * (float)Math.sin(heading - (3*Math.PI)/4);
@@ -237,17 +240,26 @@ public class RoomVisualWorld extends VisualWorld {
 			pathTemp[0] = center[0] + offset[0];
 			pathTemp[1] = map.size() * cellSize - (center[1] + offset[1]);
 			path.lineTo(pathTemp[0], pathTemp[1]);
-			//System.out.println("Third: " + offset);
-			left = Math.min((int)pathTemp[0], left);
-			right = Math.max((int)pathTemp[0], right);
-			top = Math.max((int)pathTemp[1], top);
-			bottom = Math.min((int)pathTemp[1], bottom);
-
+			//System.out.print(Arrays.toString(pathTemp));
+			//System.out.print("-");
+			left = Math.min((int)Math.floor(pathTemp[0]), left);
+			right = Math.max((int)Math.ceil(pathTemp[0]), right);
+			top = Math.max((int)Math.ceil(pathTemp[1]), top);
+			bottom = Math.min((int)Math.floor(pathTemp[1]), bottom);
+			
 			// finally a line back to the original
 			path.lineTo(original[0], original[1]);
-			
+					
 			gc.setForeground(WindowManager.getColor(player.getColor()));
 			gc.drawPath(path);
+			
+			//System.out.println(": lrtb: " + left + "-" + right + "-" + top + "-" + bottom);
+
+			// clean up more drawing errors
+			right += 1;
+			left -= 1;
+			top += 1;
+			bottom -= 1;
 			
 			map.getCell(getCellAtPixel(new int[] {left, top})).setModified(true);
 			map.getCell(getCellAtPixel(new int[] {left, bottom})).setModified(true);
@@ -257,11 +269,11 @@ public class RoomVisualWorld extends VisualWorld {
 			// draw waypoints
 			List<double[]> waypoints = world.getWaypointList(player);
 			for (double[] wp : waypoints) {
-				left = (int)wp[0] - 2;
-				top = cellSize*map.size() - (int)wp[1] - 2;
+				left = (int)Math.floor(wp[0]) - 2;
+				top = cellSize*map.size() - (int)Math.ceil(wp[1]) - 2;
 				right = left + 4;
 				bottom = top + 4;
-				
+
 				gc.setForeground(WindowManager.getColor(player.getColor()));
 				gc.drawOval(left, top, 4, 4);
 				
@@ -272,19 +284,20 @@ public class RoomVisualWorld extends VisualWorld {
 				map.getCell(getCellAtPixel(new int[] {right, bottom})).setModified(true);
 			}
 		}
-		Stopwatch.stop(id);	
+		//Stopwatch.stop(id);	
 		
 		painted = true;
 	}
 	
 	@Override
-	Player getPlayerAtPixel(int [] loc) {
+	int [] getCellAtPixel(int [] loc) {
 		loc[1] = map.size() * cellSize - loc[1];
-		int[] xy = getCellAtPixel(loc);
-		if (xy == null) {
-			return null;
+		int [] pixelLoc = Arrays.copyOf(loc, loc.length);
+		pixelLoc[0] /= cellSize;
+		pixelLoc[1] /= cellSize;
+		if (map.isInBounds(pixelLoc)) {
+			return pixelLoc;
 		}
-		return this.map.getCell(xy).getFirstPlayer();
+		return null;
 	}
-	
 }

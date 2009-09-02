@@ -50,6 +50,7 @@ class rl_param_container: public soar_module::param_container
 		soar_module::decimal_param *et_tolerance;
 		soar_module::boolean_param *temporal_extension;
 		soar_module::boolean_param *hrl_discount;
+		soar_module::boolean_param *granular_control;
 
 		rl_param_container( agent *new_agent );
 };
@@ -92,7 +93,7 @@ typedef std::list<production *> rl_rule_list;
 
 // rl data associated with each state
 typedef struct rl_data_struct {
- 	rl_et_map *eligibility_traces;			// traces associated with productions	
+	rl_et_map *eligibility_traces;			// traces associated with productions
 	rl_rule_list *prev_op_rl_rules;			// rl rules associated with the previous operator
 	
 	double previous_q;						// q-value of the previous state
