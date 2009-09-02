@@ -181,7 +181,8 @@ char *symbolToString (Symbol *sym,
 		return dest;
 
 	case IDENTIFIER_SYMBOL_TYPE:
-		sprintf (dest, "%c%llu", sym->id.name_letter, sym->id.name_number);
+		// BADBAD: static casting for llu portability
+		sprintf (dest, "%c%llu", sym->id.name_letter, static_cast<unsigned long long>(sym->id.name_number));
 		return dest;
 
 	case INT_CONSTANT_SYMBOL_TYPE:
@@ -1866,6 +1867,7 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 #ifndef NO_TIMING_STUFF
 #ifndef KERNEL_TIME_ONLY
 		stop_timer(pSoarAgent, &(pSoarAgent->start_phase_tv), &(pSoarAgent->decision_cycle_phase_timers[(pSoarAgent->current_phase)]));
+		stop_timer(pSoarAgent, &(pSoarAgent->start_phase_tv), &(pSoarAgent->decision_cycle_timer));
 #endif // KERNEL_TIME_ONLY
 		stop_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv), &(pSoarAgent->total_kernel_time));
 		start_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv));
