@@ -378,7 +378,7 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 	web_attr_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w WHERE attr=? ORDER BY act_cycle DESC" );
 	add( web_attr_all );
 
-	web_const_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w WHERE attr=? AND val_const=? ORDER BY act_cycle DESC" );
+	web_const_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w WHERE attr=? AND val_const=? AND val_lti IS NULL ORDER BY act_cycle DESC" );
 	add( web_const_all );
 
 	web_lti_all = new soar_module::sqlite_statement( new_db, "SELECT parent_id FROM web w WHERE attr=? AND val_const IS NULL AND val_lti=? ORDER BY act_cycle DESC" );
