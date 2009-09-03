@@ -379,6 +379,9 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->smem_validation = 0;
   newAgent->smem_first_switch = true;
 
+  // statistics initialization
+  newAgent->dc_stat_tracking = false;
+  newAgent->stats_db = new soar_module::sqlite_database();
 
   return newAgent;
 }
@@ -448,6 +451,10 @@ void destroy_soar_agent (agent * delete_agent)
 
   delete delete_agent->smem_db;
 
+  // cleanup statistics db
+  stats_close( delete_agent );
+  delete delete_agent->stats_db;
+  delete_agent->stats_db = 0;
 
   /////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////

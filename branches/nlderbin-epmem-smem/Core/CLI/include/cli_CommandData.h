@@ -204,6 +204,9 @@ namespace cli {
 		STATS_SYSTEM,
 		STATS_MAX,
 		STATS_RESET,
+		STATS_TRACK,
+		STATS_CYCLE,
+		STATS_CSV,
 		STATS_NUM_OPTIONS, // must be last
 	};
 

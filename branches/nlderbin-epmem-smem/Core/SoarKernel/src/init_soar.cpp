@@ -460,6 +460,11 @@ bool reinitialize_soar (agent* thisAgent) {
 	thisAgent->did_PE = FALSE;
 	/* REW: end 09.15.96 */
 
+	// reset old stats information
+	stats_close(thisAgent);
+	delete thisAgent->stats_db;
+	thisAgent->stats_db = new soar_module::sqlite_database();
+
 	// voigtjr: WARN_IF_TIMERS_REPORT_ZERO block goes here in other kernel
 	return ok ;
 }
@@ -922,7 +927,7 @@ void do_one_top_level_phase (agent* thisAgent)
 
       // Update per-cycle statistics
 	  {
-		  double dc_time = timer_value(&thisAgent->decision_cycle_timer);
+		  unsigned long dc_time = timer_value_msec(&thisAgent->decision_cycle_timer);
 		  if (thisAgent->max_dc_time_value < dc_time) {
 			  thisAgent->max_dc_time_value = dc_time;
 			  thisAgent->max_dc_time_cycle = thisAgent->d_cycle_count;
@@ -944,7 +949,11 @@ void do_one_top_level_phase (agent* thisAgent)
 			  thisAgent->max_dc_production_firing_count_cycle = thisAgent->d_cycle_count;
 		  }
 		  thisAgent->start_dc_production_firing_count = thisAgent->production_firing_count;
-		  
+
+		  // Commit per-cycle stats to db
+		  if (thisAgent->dc_stat_tracking) {
+			  stats_db_store(thisAgent, dc_time, dc_wm_changes, dc_firing_counts);
+		  }
 	  }
 
 	  if (thisAgent->sysparams[TRACE_PHASES_SYSPARAM])

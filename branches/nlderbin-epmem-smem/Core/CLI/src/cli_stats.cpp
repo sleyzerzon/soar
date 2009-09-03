@@ -21,6 +21,7 @@
 #include "utilities.h" // for timer_value
 #include "print.h"
 #include "rete.h" // for get_node_count_statistics
+#include "soar_db.h"
 
 extern const char *bnode_type_names[256];
 
@@ -36,10 +37,15 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 		{'r', "rete",	OPTARG_NONE},
 		{'s', "system",	OPTARG_NONE},
 		{'R', "reset",	OPTARG_NONE},
+		{'t', "track",	OPTARG_NONE},
+		{'c', "cycle",	OPTARG_NONE},
+		{'C', "cycle-csv",	OPTARG_NONE},
+		{'S', "sort",	OPTARG_REQUIRED},
 		{0, 0, OPTARG_NONE}
 	};
 
 	StatsBitset options(0);
+	int sort = 0;
 
 	for (;;) {
 		if (!ProcessOptions(argv, optionsData)) return false;
@@ -61,6 +67,21 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 			case 's':
 				options.set(STATS_SYSTEM);
 				break;
+			case 't':
+				options.set(STATS_TRACK);
+				break;
+			case 'c':
+				options.set(STATS_CYCLE);
+				break;
+			case 'C':
+				options.set(STATS_CSV);
+				break;
+			case 'S':
+				options.set(STATS_CYCLE);
+				if (!from_string(sort, m_OptionArgument)) {
+					return SetError(CLIError::kIntegerExpected);
+				}
+				break;
 			default:
 				return SetError(CLIError::kGetOptError);
 		}
@@ -69,11 +90,29 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 	// No arguments
 	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
 
-	return DoStats(options);
+	return DoStats(options, sort);
 }
 
 
-bool CommandLineInterface::DoStats(const StatsBitset& options) {
+bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
+
+	if ( options.test(STATS_CSV) )
+	{
+		if (m_pAgentSoar->stats_db->get_status() == soar_module::disconnected) {
+			return true; // FIXME: warn
+		}
+
+		m_Result << "dc,time,wm_changes,firing_count\n";
+		while( m_pAgentSoar->stats_stmts->sel_dc_inc->execute() == soar_module::row ) {
+			m_Result << m_pAgentSoar->stats_stmts->sel_dc_inc->column_int(0) << ",";
+			m_Result << m_pAgentSoar->stats_stmts->sel_dc_inc->column_int(1) << ",";
+			m_Result << m_pAgentSoar->stats_stmts->sel_dc_inc->column_int(2) << ",";
+			m_Result << m_pAgentSoar->stats_stmts->sel_dc_inc->column_int(3) << "\n";
+		}
+
+		m_pAgentSoar->stats_stmts->sel_dc_inc->reinitialize();
+		return true;
+	}
 
 	// Set precision now, RESET BEFORE RETURN
 	size_t oldPrecision = m_Result.precision(3);
@@ -91,7 +130,56 @@ bool CommandLineInterface::DoStats(const StatsBitset& options) {
 	{
 		GetReteStats();
 	}
-	if ( (!options.test(STATS_MEMORY) && !options.test(STATS_RETE) && !options.test(STATS_MAX) && !options.test(STATS_RESET)) 
+	if ( options.test(STATS_CYCLE) )
+	{
+		if (m_pAgentSoar->stats_db->get_status() == soar_module::disconnected) {
+			return true; // FIXME: warn
+		}
+
+		bool desc = sort < 0;
+		sort = abs(sort);
+
+		soar_module::sqlite_statement* select = 0;
+
+		switch (sort) {
+			default:
+			case 0: // default sort
+			case 1: // sort dc
+				select = desc ? m_pAgentSoar->stats_stmts->sel_dc_dec : m_pAgentSoar->stats_stmts->sel_dc_inc;
+				break;
+			case 2: // sort time
+				select = desc ? m_pAgentSoar->stats_stmts->sel_time_dec : m_pAgentSoar->stats_stmts->sel_time_inc;
+				break;
+			case 3: // sort wm_changes
+				select = desc ? m_pAgentSoar->stats_stmts->sel_wm_changes_dec : m_pAgentSoar->stats_stmts->sel_wm_changes_inc;
+				break;
+			case 4: // sort firing_count
+				select = desc ? m_pAgentSoar->stats_stmts->sel_firing_count_dec : m_pAgentSoar->stats_stmts->sel_firing_count_inc;
+				break;
+		}
+
+		for(int count = 0; select->execute() == soar_module::row; ++count) {
+			if (count % 20 == 0) {
+				m_Result << "\n";
+				m_Result << "----------- ----------- ----------- -----------\n";
+				m_Result << "DC          Time (msec) WM Changes  Firing Cnt\n";
+				m_Result << "----------- ----------- ----------- -----------\n";
+			}
+
+			m_Result << std::setw(11) << select->column_int(0) << " ";
+			m_Result << std::setw(11) << select->column_int(1) << " ";
+			m_Result << std::setw(11) << select->column_int(2) << " ";
+			m_Result << std::setw(11) << select->column_int(3) << "\n";
+		}
+
+		select->reinitialize();
+
+	}
+	if ( options.test(STATS_TRACK) )
+	{
+		this->m_pAgentSoar->dc_stat_tracking = true;
+	}
+	if ( (!options.test(STATS_CYCLE) && !options.test(STATS_TRACK) && !options.test(STATS_MEMORY) && !options.test(STATS_RETE) && !options.test(STATS_MAX) && !options.test(STATS_RESET)) 
 		|| options.test(STATS_SYSTEM) )
 	{
 		GetSystemStats();
@@ -158,7 +246,7 @@ bool CommandLineInterface::DoStats(const StatsBitset& options) {
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsagePool,						sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[POOL_MEM_USAGE], temp));
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsageStatsOverhead,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[STATS_OVERHEAD_MEM_USAGE], temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeCycle,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_cycle, temp));
-	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeValue,			sml_Names::kTypeDouble,	to_string(m_pAgentSoar->max_dc_time_value, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeValue,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_value, temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleWMChangesCycle,		sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_wm_changes_cycle, temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleWMChangesValue,		sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_wm_changes_value, temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleFireCountCycle,		sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_production_firing_count_cycle, temp));
@@ -365,7 +453,7 @@ void CommandLineInterface::GetMaxStats()
 	m_Result << "Stat          Value       Cycle\n";
 	m_Result << "------------- ----------- -----------\n";
 
-	m_Result << "Time (sec)    "
+	m_Result << "Time (msec)   "
 		<< std::setw(11) << m_pAgentSoar->max_dc_time_value << " "
 		<< std::setw(11) << m_pAgentSoar->max_dc_time_cycle << "\n";
 

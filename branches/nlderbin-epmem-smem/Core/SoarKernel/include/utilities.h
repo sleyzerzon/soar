@@ -66,6 +66,7 @@ extern Symbol *read_identifier_or_context_variable (agent* agnt);
 --------------------------------------------------------------------- */
 
 extern double timer_value (struct timeval *tv);
+extern unsigned long timer_value_msec (struct timeval *tv);
 extern void reset_timer (struct timeval *tv_to_reset);
 #ifndef NO_TIMING_STUFF
 extern void start_timer (agent* thisAgent, struct timeval *tv_for_recording_start_time);
@@ -129,5 +130,35 @@ template <class X, class Y> bool is_set( std::map<X,Y> *my_map, X *key )
 
 // get a numeric value from a symbol
 extern double get_number_from_symbol( Symbol *sym );
+
+//////////////////////////////////////////////////////////
+// Statistics database
+//////////////////////////////////////////////////////////
+
+class stats_statement_container: public soar_module::sqlite_statement_container
+{
+	public:
+		soar_module::sqlite_statement *insert;
+
+		soar_module::sqlite_statement *cache5;
+		soar_module::sqlite_statement *cache20;
+		soar_module::sqlite_statement *cache100;
+
+		soar_module::sqlite_statement *sel_dc_inc;
+		soar_module::sqlite_statement *sel_dc_dec;
+		soar_module::sqlite_statement *sel_time_inc;
+		soar_module::sqlite_statement *sel_time_dec;
+		soar_module::sqlite_statement *sel_wm_changes_inc;
+		soar_module::sqlite_statement *sel_wm_changes_dec;
+		soar_module::sqlite_statement *sel_firing_count_inc;
+		soar_module::sqlite_statement *sel_firing_count_dec;
+
+		stats_statement_container( agent *new_agent );
+};
+
+// Store statistics in to database
+extern void stats_db_store(agent* thisAgent, const unsigned long& dc_time, const unsigned long& dc_wm_changes, const unsigned long& dc_firing_counts);
+
+extern void stats_close( agent *my_agent );
 
 #endif //UTILITIES_H

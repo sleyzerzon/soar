@@ -136,6 +136,8 @@ typedef struct alpha_mem_struct alpha_mem;
 typedef struct token_struct token;
 typedef char * test;
 
+class stats_statement_container;
+
 typedef struct agent_struct {
   /* After v8.6.1, all conditional compilations were removed
    * from struct definitions, including the agent struct below
@@ -557,7 +559,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   struct timeval      output_function_cpu_time; 
 
   struct timeval      decision_cycle_timer; // Used to calculate the maximum amount of decision cycle time
-  double              max_dc_time_value;    // Holds timer_value of maximum amount of decision cycle time
+  unsigned long       max_dc_time_value;    // Holds timer_value of maximum amount of decision cycle time
   unsigned long       max_dc_time_cycle;    // Holds cycle_count that maximum amount of decision cycle time happened
 
   /* accumulated cpu time spent in various parts of the system */
@@ -906,6 +908,11 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   xml_handle xml_destination;		// The current destination for all XML generation, essentially either == to xml_trace or xml_commands
   xml_handle xml_trace;				// During a run, xml_destination will be set to this pointer.
   xml_handle xml_commands;			// During commands, xml_destination will be set to this pointer.
+
+  // stats database
+  bool dc_stat_tracking;
+  soar_module::sqlite_database *stats_db;
+  stats_statement_container *stats_stmts;
 
 } agent;
 /*************** end of agent struct *****/

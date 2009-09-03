@@ -249,9 +249,14 @@ Symbol *read_identifier_or_context_variable (agent* agnt)
    (in seconds).
 =================================================================== */
 #define ONE_MILLION (1000000)
+#define ONE_THOUSAND (1000)
 
 double timer_value (struct timeval *tv) {
   return tv->tv_sec + tv->tv_usec/static_cast<double>(ONE_MILLION);
+}
+
+unsigned long timer_value_msec (struct timeval *tv) {
+  return tv->tv_sec + tv->tv_usec/ONE_THOUSAND;
 }
 
 void reset_timer (struct timeval *tv_to_reset) {
@@ -495,3 +500,116 @@ double get_number_from_symbol( Symbol *sym )
 	
 	return 0.0;
 }
+
+
+
+
+
+
+void stats_init_db( agent *my_agent )
+{
+	if ( my_agent->stats_db->get_status() != soar_module::disconnected )
+		return;
+
+	const char *db_path = ":memory:";
+	//const char *db_path = "C:\\Users\\voigtjr\\Desktop\\stats_debug.db";
+
+	// attempt connection
+	my_agent->stats_db->connect( db_path );
+
+	if ( my_agent->stats_db->get_status() == soar_module::problem )
+	{
+		char buf[256];
+		SNPRINTF( buf, 254, "DB ERROR: %s", my_agent->stats_db->get_errmsg() );
+
+		print( my_agent, buf );
+		xml_generate_warning( my_agent, buf );
+	}
+	else
+	{
+		// setup common structures/queries
+		my_agent->stats_stmts = new stats_statement_container( my_agent );
+		my_agent->stats_stmts->structure();
+		my_agent->stats_stmts->prepare();
+	}
+}
+
+
+void stats_db_store(agent* my_agent, const unsigned long& dc_time, const unsigned long& dc_wm_changes, const unsigned long& dc_firing_counts) 
+{
+	if ( my_agent->stats_db->get_status() == soar_module::disconnected )
+	{
+		stats_init_db( my_agent );
+	}
+
+	my_agent->stats_stmts->insert->bind_int(1, my_agent->d_cycle_count);
+	my_agent->stats_stmts->insert->bind_int(2, dc_time);
+	my_agent->stats_stmts->insert->bind_int(3, dc_wm_changes);
+	my_agent->stats_stmts->insert->bind_int(4, dc_firing_counts);
+
+	my_agent->stats_stmts->insert->execute( soar_module::op_reinit ); // makes it ready for next execution
+}
+
+stats_statement_container::stats_statement_container( agent *new_agent ): soar_module::sqlite_statement_container( new_agent->stats_db )
+{
+	soar_module::sqlite_database *new_db = new_agent->stats_db;
+
+	//
+
+	add_structure( "CREATE TABLE IF NOT EXISTS stats (dc INTEGER PRIMARY KEY, time INTEGER, wm_changes INTEGER, firing_count INTEGER)" );
+	add_structure( "CREATE INDEX IF NOT EXISTS stats_time ON stats (time)" );
+	add_structure( "CREATE INDEX IF NOT EXISTS stats_wm_changes ON stats (wm_changes)" );
+	add_structure( "CREATE INDEX IF NOT EXISTS stats_firing_count ON stats (firing_count)" );
+
+	//
+
+	insert = new soar_module::sqlite_statement( new_db, "INSERT INTO stats (dc, time, wm_changes, firing_count) VALUES (?,?,?,?)" );
+	add( insert );
+
+	cache5 = new soar_module::sqlite_statement( new_db, "PRAGMA cache_size = 5000" );
+	add( cache5 );
+
+	cache20 = new soar_module::sqlite_statement( new_db, "PRAGMA cache_size = 20000" );
+	add( cache20 );
+
+	cache100 = new soar_module::sqlite_statement( new_db, "PRAGMA cache_size = 100000" );
+	add( cache100 );
+
+	sel_dc_inc = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY dc" );
+	add( sel_dc_inc );
+
+	sel_dc_dec = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY dc DESC" );
+	add( sel_dc_dec );
+
+	sel_time_inc = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY time" );
+	add( sel_time_inc );
+
+	sel_time_dec = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY time DESC" );
+	add( sel_time_dec );
+
+	sel_wm_changes_inc = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY wm_changes" );
+	add( sel_wm_changes_inc );
+
+	sel_wm_changes_dec = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY wm_changes DESC" );
+	add( sel_wm_changes_dec );
+
+	sel_firing_count_inc = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY firing_count" );
+	add( sel_firing_count_inc );
+
+	sel_firing_count_dec = new soar_module::sqlite_statement( new_db, "SELECT * FROM stats ORDER BY firing_count DESC" );
+	add( sel_firing_count_dec );
+}
+
+void stats_close( agent *my_agent )
+{
+	if ( my_agent->stats_db->get_status() == soar_module::connected )
+	{
+		// de-allocate common statements
+		delete my_agent->stats_stmts;
+		my_agent->stats_stmts = 0;
+
+		// close the database
+		my_agent->stats_db->disconnect();
+	}
+}
+

@@ -674,8 +674,9 @@ public:
 	/*************************************************************
 	* @brief stats command
 	* @param options The options for the stats command, see cli_CommandData.h
+	* @param sort The column to sort by
 	*************************************************************/
-	bool DoStats(const StatsBitset& options);
+	bool DoStats(const StatsBitset& options, int sort = 0);
 
 	/*************************************************************
 	* @brief stop-soar command
