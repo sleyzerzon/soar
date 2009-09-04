@@ -1,49 +1,67 @@
 #summary Conferences that are relevant to the Soar group at UM.
 
-= Upcoming Submission Deadlines =
+= Submission Deadlines =
 
-* AAAI 2010 -- papers due January 19th, 2010
+Deadlines: 
+  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010] -- papers due October 13th, 2009
+  * [http://cbrtrack-flairs-23.info/ FLAIRS 2010] -- papers due November 23rd, 2009
+  * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
+  * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
+  * [http://ecai2010.appia.pt/ ECAI 2010] -- papers due February 22nd, 2010
+  * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
 
-* NIPS
+To be determined
+  * [http://agi-conf.org/ AGI 2010]
+  * [http://aigicrv.site.uottawa.ca/ CAI 2010]
+  * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010]
+  * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010]
+  * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010]
+  * [http://iccm2010.cs.drexel.edu/ ICCM 2010]
+  * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010]
+  * [http://nips.cc/ NIPS 2010]
+  * [http://www.ecmlpkdd2009.net/ ECML 2010]
+  * [http://www.ecal2009.org/ ECAL 2009]
+  * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010]
+  * [http://ijcai-11.iiia.csic.es/ IJCAI 2011]
 
-* IJCAI
+= Information =
 
-* ICML
-
-* CogSci
-
-* UAI
-
-* GECCO
-
-* AIIDE
-
-* ICAI
-
-* AAMAS
-
-* IAAI
-
-* ECML
-
-* ECAI
-
-* CAAI
-
-* ICCBR
-
-* ICDL
-
-* ECAL
-
-= Conference Information =
-
-* [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI 2010]
-
-  July 11-15, 2010
+Top-tier AI
+  * [http://nips.cc/ NIPS 2009], December 7-12, 2009 in Vancouver, BC
   
-  Atlanta, GA
+    (EIC 0.98)
+    
+  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010], May 10-14, 2010 in Toronto, Canada
+  * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010], TBD: June?, 2010 in ?
+  * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010], TBD: June?, 2010 in ?
+  * [http://www.sigevo.org/gecco-2010/ GECCO 2010], July 7-11, 2010 in Portland, OR
+  * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010], July 11-15, 2010 in Atlanta, GA
+  * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010], August 11-14, 2010 in Portland, OR
+  * [http://ijcai-11.iiia.csic.es/ IJCAI 2011], July 16-22, 2011 in Barcelona, Spain
+  
+Cognitive Science / Modeling
+  * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 6-8, 2010 in Philadelphia, PA 
+
+General AI
+  * [http://www.ecmlpkdd2009.net/ ECML 2009], September 7-11, 2009 in Bled, Slovenia
+  * [http://www.ecal2009.org/ ECAL 2009], September 13-16, 2009 in Budapest, Hungary
+  * [http://agi-conf.org/ AGI 2010], TBD: March?, 2010 in ?
+  * [http://cbrtrack-flairs-23.info/ FLAIRS 2010], May 19-21, 2010 in Daytona Beach, FL
+  * [http://aigicrv.site.uottawa.ca/ CAI 2010], May 31 - June 2, 2010 in Ottowa, Canada
+  * [http://ecai2010.appia.pt/ ECAI 2010], August 16-20, 2010 in Lisbon, Portugal
+  * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010], August 18-21, 2010 in Ann Arbor, MI
+  
+Specialties
+  * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
+  * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010], July 19-22, 2010 in Alessandria, Italy
+ 
+  
+   
+  
+  
+  
+  
 
 = Workshop and Symposium Information =
 
-* a
+* AAAI Spring Symposiua
