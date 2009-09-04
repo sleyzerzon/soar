@@ -1,13 +1,31 @@
 #summary Conferences that are relevant to the Soar group at UM.
 
-= Introduction =
+= Upcoming Submission Deadlines =
 
-Add your content here.
+* AAAI 2010 -- papers due January 19th, 2010
+* NIPS
+* IJCAI
+* ICML
+* CogSci
+* UAI
+* GECCO
+* AIIDE
+* ICAI
+* AAMAS
+* IAAI
+* ECML
+* ECAI
+* CAAI
+* ICCBR
+* ICDL
+* ECAL
 
+= Conference Information =
 
-= Details =
+* [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI 2010]
+  July 11-15, 2010
+  Atlanta, GA
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= Workshop and Symposium Information =
+
+* a
