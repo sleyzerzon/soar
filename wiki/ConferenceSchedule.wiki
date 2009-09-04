@@ -3,27 +3,45 @@
 = Upcoming Submission Deadlines =
 
 * AAAI 2010 -- papers due January 19th, 2010
+
 * NIPS
+
 * IJCAI
+
 * ICML
+
 * CogSci
+
 * UAI
+
 * GECCO
+
 * AIIDE
+
 * ICAI
+
 * AAMAS
+
 * IAAI
+
 * ECML
+
 * ECAI
+
 * CAAI
+
 * ICCBR
+
 * ICDL
+
 * ECAL
 
 = Conference Information =
 
 * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI 2010]
+
   July 11-15, 2010
+  
   Atlanta, GA
 
 = Workshop and Symposium Information =
