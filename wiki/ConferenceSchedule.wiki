@@ -28,10 +28,10 @@ These deadlines are official for a particular conference year:
   * [http://cbrtrack-flairs-23.info/ FLAIRS 2010] -- papers due November 23rd, 2009
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
   * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artifical Agents] -- papers due January 15th, 2010
+  * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
   * [http://www.wcci2010.org/index.php WCCI 2010] -- papers due January 31st, 2010
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
   * [http://ecai2010.appia.pt/ ECAI 2010] -- papers due February 22nd, 2010
-  * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
 
 These conferences have yet to announce official deadlines:
   * [http://agi-conf.org/ AGI 2010]
