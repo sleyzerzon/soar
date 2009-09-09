@@ -9,7 +9,7 @@ table below lists typical conference deadlines by month.
 || *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.cs.mcgill.ca/~icml2009/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO], [http://aigicrv.site.uottawa.ca/ CAI], [http://www.wcci2010.org/index.php WCCI] ||
 || *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://ecai2010.appia.pt/ ECAI], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR] ||
 || *March* || [http://www.cs.mcgill.ca/~uai2009/ UAI] ||
-|| *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010], [http://www.ecmlpkdd2009.net/ ECML] ||
+|| *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE], [http://www.ecmlpkdd2009.net/ ECML] ||
 || *May* || [http://www.ecal2009.org/ ECAL] ||
 || *June* || [http://nips.cc/ NIPS] ||
 || *July* || ||
@@ -27,6 +27,7 @@ These deadlines are official for a particular conference year:
   * [http://www.kr.org/KR2010/ KR&R 2010] -- papers due November 30, 2009
   * [http://cbrtrack-flairs-23.info/ FLAIRS 2010] -- papers due November 23rd, 2009
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
+  * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artifical Agents] -- papers due January 15th, 2010
   * [http://www.wcci2010.org/index.php WCCI 2010] -- papers due January 31st, 2010
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
   * [http://ecai2010.appia.pt/ ECAI 2010] -- papers due February 22nd, 2010
@@ -49,7 +50,7 @@ These conferences have yet to announce official deadlines:
 
 = Information =
 
-Top-tier AI
+=== Top-tier AI ===
   * [http://nips.cc/ NIPS 2009], December 7-12, 2009 in Vancouver, BC
     * Neural Information Processing Systems Conference
     * (EIC 0.98)
@@ -74,11 +75,11 @@ Top-tier AI
     * International Joint Conferences on Artifical Intelligence
     * (EIC 0.96)
   
-Cognitive Science / Modeling
+=== Cognitive Science / Modeling ===
   * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 6-8, 2010 in Philadelphia, PA 
     * International Conference on Cognitive Modeling
 
-General AI
+=== General AI ===
   * [http://www.ecmlpkdd2009.net/ ECML 2009], September 7-11, 2009 in Bled, Slovenia
     * European Conference on Machine Learning
     * (EIC 0.76)
@@ -106,7 +107,7 @@ General AI
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010], August 18-21, 2010 in Ann Arbor, MI
     * International Conference on Development and Learning
   
-Specialties
+=== Specialties ===
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
     * Artificial Intelligence and Interactive Digital Entertainment Conference
   * [http://www.kr.org/KR2010/ KR&R 2010], May 9-13, 2010 in Toronto, CA
@@ -116,7 +117,13 @@ Specialties
  
 = Workshop and Symposium Information =
 
+One-teim workshops / symposia:
+  * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artificial Agents]
+
+Recurring workshops / symposia:
   * [http://msoar.org/ Soar Workshop]
   * [http://act-r.psy.cmu.edu/workshops/ ACT-R Workshop]
+  * [http://www.cns.bu.edu/meetings/ International Conference on Cognitive and Neural Systems (ICCNS)]
   * [http://www.aaai.org/Symposia/Spring/spring-symposia.php AAAI Spring Symposia]
   * [http://www.aaai.org/Symposia/Fall/fall-symposia.php AAAI Fall Symposia]
+  * [http://www.engin.umich.edu/students/gradsymposium/ Engineering Graduate Symposium @ UM]
