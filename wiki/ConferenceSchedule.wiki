@@ -6,7 +6,7 @@ Year to year, conference submission deadlines remain relatively constant. The
 table below lists typical conference deadlines by month.
 
 || *Month* || *Conferences* ||
-|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.cs.mcgill.ca/~icml2009/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO], [http://aigicrv.site.uottawa.ca/ CAI] ||
+|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.cs.mcgill.ca/~icml2009/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO], [http://aigicrv.site.uottawa.ca/ CAI], [http://www.wcci2010.org/index.php WCCI] ||
 || *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://ecai2010.appia.pt/ ECAI], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR] ||
 || *March* || [http://www.cs.mcgill.ca/~uai2009/ UAI] ||
 || *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010], [http://www.ecmlpkdd2009.net/ ECML] ||
@@ -14,22 +14,25 @@ table below lists typical conference deadlines by month.
 || *June* || [http://nips.cc/ NIPS] ||
 || *July* || ||
 || *August* || ||
-|| *September* || || 
+|| *September* || [http://www.icaart.org/ ICAART] || 
 || *October* || [http://www.cse.yorku.ca/AAMAS2010/ AAMAS] ||
-|| *November* || [http://agi-conf.org/ AGI], [http://www.flairs.com/ FLAIRS] ||
+|| *November* || [http://agi-conf.org/ AGI], [http://www.flairs.com/ FLAIRS], [http://www.kr.org/KR2010/ KR&R] ||
 || *December* || ||
+
 
 = Submission Deadlines =
 
-Deadlines: 
+These deadlines are official for a particular conference year:
   * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010] -- papers due October 13th, 2009
+  * [http://www.kr.org/KR2010/ KR&R 2010] -- papers due November 30, 2009
   * [http://cbrtrack-flairs-23.info/ FLAIRS 2010] -- papers due November 23rd, 2009
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
+  * [http://www.wcci2010.org/index.php WCCI 2010] -- papers due January 31st, 2010
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
   * [http://ecai2010.appia.pt/ ECAI 2010] -- papers due February 22nd, 2010
   * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
 
-To be determined
+These conferences have yet to announce official deadlines:
   * [http://agi-conf.org/ AGI 2010]
   * [http://aigicrv.site.uottawa.ca/ CAI 2010]
   * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010]
@@ -95,6 +98,8 @@ General AI
   * [http://aigicrv.site.uottawa.ca/ CAI 2010], May 31 - June 2, 2010 in Ottowa, Canada
     * Canadian Artifical Intelligence Conference
     * (EIC 0.60)
+  * [http://www.wcci2010.org/index.php WCCI 2010], July 18-23, 2010 in Barcelona, Spain
+    * IEEE World Congress on Computational Intelligence
   * [http://ecai2010.appia.pt/ ECAI 2010], August 16-20, 2010 in Lisbon, Portugal
     * European Conference on Artificial Intelligence
     * (EIC 0.76)
@@ -103,9 +108,15 @@ General AI
   
 Specialties
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
+    * Artificial Intelligence and Interactive Digital Entertainment Conference
+  * [http://www.kr.org/KR2010/ KR&R 2010], May 9-13, 2010 in Toronto, CA
+    * International Conference on the Principles of Knowledge Representation and Reasoning
   * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010], July 19-22, 2010 in Alessandria, Italy
+    * International Conference on Case-Based Reasoning
  
 = Workshop and Symposium Information =
 
-* AAAI Spring Symposia
-* AAAI Fall Symposia
+  * [http://msoar.org/ Soar Workshop]
+  * [http://act-r.psy.cmu.edu/workshops/ ACT-R Workshop]
+  * [http://www.aaai.org/Symposia/Spring/spring-symposia.php AAAI Spring Symposia]
+  * [http://www.aaai.org/Symposia/Fall/fall-symposia.php AAAI Fall Symposia]
