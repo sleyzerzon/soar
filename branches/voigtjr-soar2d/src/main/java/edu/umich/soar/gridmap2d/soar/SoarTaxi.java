@@ -1,29 +1,32 @@
 package edu.umich.soar.gridmap2d.soar;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.Simulation;
+import edu.umich.soar.gridmap2d.map.Taxi;
+import edu.umich.soar.gridmap2d.map.TaxiCommand;
+import edu.umich.soar.gridmap2d.map.TaxiCommander;
 import edu.umich.soar.gridmap2d.map.TaxiMap;
-import edu.umich.soar.gridmap2d.players.CommandInfo;
-import edu.umich.soar.gridmap2d.players.Taxi;
-import edu.umich.soar.gridmap2d.players.TaxiCommander;
 
 import sml.Agent;
 import sml.Identifier;
 
 public class SoarTaxi implements TaxiCommander {
-	private static Logger logger = Logger.getLogger(SoarTaxi.class);
+	private static Log logger = LogFactory.getLog(SoarTaxi.class);
 
 	private Taxi player;
 	private Agent agent;
 	private String [] shutdownCommands;
 	private SoarTaxiIL input;
+	private final Simulation sim;
 
-	public SoarTaxi(Taxi taxi, Agent agent, String[] shutdown_commands) {
+	public SoarTaxi(Simulation sim, Taxi taxi, Agent agent, String[] shutdown_commands) {
 		this.player = taxi;
 		this.agent = agent;
+		this.sim = sim;
 		this.shutdownCommands = shutdown_commands;
 		
 		agent.SetBlinkIfNoChange(false);
@@ -32,32 +35,33 @@ public class SoarTaxi implements TaxiCommander {
 		input.create();
 
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + taxi.getName());
+			sim.error("Soar Taxi", Names.Errors.commitFail + taxi.getName());
 		}
 	}
 
+	@Override
 	public void update(TaxiMap taxiMap) {
 		input.update(player.getMoved(), player.getLocation(), taxiMap, player.getPointsDelta(), player.getFuel());
 		
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
-			Gridmap2D.control.stopSimulation();
+			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
+			sim.stop();
 		}
 	}
 
-	public CommandInfo nextCommand() {
+	@Override
+	public TaxiCommand nextCommand() {
 		// if there was no command issued, that is kind of strange
 		if (agent.GetNumberCommands() == 0) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(player.getName() + " issued no command.");
 			}
-			return new CommandInfo();
+			return TaxiCommand.NULL;
 		}
 
 		// go through the commands
 		// see move info for details
-		CommandInfo move = new CommandInfo();
-		boolean moveWait = false;
+		TaxiCommand.Builder builder = new TaxiCommand.Builder();
 		if (agent.GetNumberCommands() > 1) {
 			logger.debug(player.getName() + ": " + agent.GetNumberCommands() 
 					+ " commands detected, all but the first will be ignored");
@@ -67,65 +71,36 @@ public class SoarTaxi implements TaxiCommander {
 			String commandName = commandId.GetAttribute();
 			
 			if (commandName.equalsIgnoreCase(Names.kMoveID)) {
-				if (move.move || moveWait) {
-					logger.debug(player.getName() + ": multiple move commands detected");
-					commandId.AddStatusError();
-					continue;
-				}
-				move.move = true;
-				
 				String direction = commandId.GetParameterValue(Names.kDirectionID);
 				if (direction != null) {
 					if (direction.equals(Names.kNone)) {
 						// legal wait
-						move.move = false;
-						moveWait = true;
 						commandId.AddStatusComplete();
 						continue;
 					} else {
-						move.moveDirection = Direction.parse(direction); 
+						builder.move(Direction.parse(direction));
 						commandId.AddStatusComplete();
 						continue;
 					}
 				}
 				
 			} else if (commandName.equalsIgnoreCase(Names.kStopSimID)) {
-				if (move.stopSim) {
-					logger.debug(player.getName() + ": multiple stop commands detected, ignoring");
-					commandId.AddStatusError();
-					continue;
-				}
-				move.stopSim = true;
+				builder.stopSim();
 				commandId.AddStatusComplete();
 				continue;
 				
 			} else if (commandName.equalsIgnoreCase(Names.kPickUpID)) {
-				if (move.pickup) {
-					logger.debug(player.getName() + ": multiple " + Names.kPickUpID + " commands detected, ignoring");
-					commandId.AddStatusError();
-					continue;
-				}
-				move.pickup = true;
+				builder.pickup();
 				commandId.AddStatusComplete();
 				continue;
 				
 			} else if (commandName.equalsIgnoreCase(Names.kPutDownID)) {
-				if (move.putdown) {
-					logger.debug(player.getName() + ": multiple " + Names.kPutDownID + " commands detected, ignoring");
-					commandId.AddStatusError();
-					continue;
-				}
-				move.putdown = true;
+				builder.putdown();
 				commandId.AddStatusComplete();
 				continue;
 				
 			} else if (commandName.equalsIgnoreCase(Names.kFillUpID)) {
-				if (move.fillup) {
-					logger.debug(player.getName() + ": multiple " + Names.kFillUpID + " commands detected, ignoring");
-					commandId.AddStatusError();
-					continue;
-				}
-				move.fillup = true;
+				builder.fillup();
 				commandId.AddStatusComplete();
 				continue;
 				
@@ -141,13 +116,14 @@ public class SoarTaxi implements TaxiCommander {
 		agent.ClearOutputLinkChanges();
 		
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
-			Gridmap2D.control.stopSimulation();
+			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
+			sim.stop();
 		}
 		
-		return move;
+		return builder.build();
 	}
 
+	@Override
 	public void reset() {
 		if (agent == null) {
 			return;
@@ -156,8 +132,8 @@ public class SoarTaxi implements TaxiCommander {
 		input.destroy();
 
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
-			Gridmap2D.control.stopSimulation();
+			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
+			sim.stop();
 		}
 
 		agent.InitSoar();
@@ -165,12 +141,13 @@ public class SoarTaxi implements TaxiCommander {
 		input.create();
 			 
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
-			Gridmap2D.control.stopSimulation();
+			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
+			sim.stop();
 		}
 
 	}
 
+	@Override
 	public void shutdown() {
 		assert agent != null;
 		if (shutdownCommands != null) { 
@@ -179,7 +156,7 @@ public class SoarTaxi implements TaxiCommander {
 				String result = player.getName() + ": result: " + agent.ExecuteCommandLine(command, true);
 				logger.info(player.getName() + ": shutdown command: " + command);
 				if (agent.HadError()) {
-					Gridmap2D.control.errorPopUp(result);
+					sim.error("Soar Taxi", result);
 				} else {
 					logger.info(player.getName() + ": result: " + result);
 				}

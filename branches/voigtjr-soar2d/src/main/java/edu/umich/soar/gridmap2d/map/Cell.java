@@ -3,7 +3,6 @@ package edu.umich.soar.gridmap2d.map;
 import java.util.List;
 import java.util.Set;
 
-import edu.umich.soar.gridmap2d.players.Player;
 
 public interface Cell {
 

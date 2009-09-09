@@ -1,5 +1,7 @@
 package edu.umich.soar.gridmap2d.visuals;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -31,21 +33,21 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.umich.soar.gridmap2d.CognitiveArchitecture;
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.Game;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.Game;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.map.EatersMap;
+import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.RoomWorld;
+import edu.umich.soar.gridmap2d.map.World;
 import edu.umich.soar.gridmap2d.players.CommandInfo;
-import edu.umich.soar.gridmap2d.players.Player;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
-import edu.umich.soar.gridmap2d.world.World;
 import edu.umich.soar.robot.DifferentialDriveCommand;
 
 
 public class WindowManager {
-	private static Logger logger = Logger.getLogger(WindowManager.class);
+	private static Log logger = LogFactory.getLog(WindowManager.class);
 
 	public static Color white = null;
 	public static Color widget_background = null;

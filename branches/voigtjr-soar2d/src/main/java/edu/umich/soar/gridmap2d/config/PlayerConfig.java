@@ -1,10 +1,12 @@
 package edu.umich.soar.gridmap2d.config;
 
+import edu.umich.soar.gridmap2d.core.PlayerColor;
+
 public class PlayerConfig {
 	public String name = null;
 	public String productions = null;
 	public String script = null;
-	public String color = null;
+	public PlayerColor color = null;
 	public int [] pos = null;
 	public String facing = null;
 	public int points = -1;			// keep in synch with SimConfig.Keys.points

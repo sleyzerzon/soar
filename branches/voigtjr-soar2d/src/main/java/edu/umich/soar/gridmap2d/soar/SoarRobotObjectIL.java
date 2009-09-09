@@ -4,7 +4,7 @@ import lcmtypes.pose_t;
 import sml.FloatElement;
 import sml.Identifier;
 import sml.StringElement;
-import edu.umich.soar.gridmap2d.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.robot.PointRelationship;
 
 class SoarRobotObjectIL {
@@ -17,9 +17,11 @@ class SoarRobotObjectIL {
 	private StringElement visible;
 	
 	private int cycleTouched;
+	private final Simulation sim;
 	
-	SoarRobotObjectIL(Identifier parent) {
+	SoarRobotObjectIL(Simulation sim, Identifier parent) {
 		this.parent = parent;
+		this.sim = sim;
 	}
 	
 	void initialize(pose_t pose, PointRelationship r) {
@@ -50,7 +52,7 @@ class SoarRobotObjectIL {
 		this.relativeBearing = this.parent.CreateFloatWME("relative-bearing", Math.toDegrees(r.getRelativeBearing()));
 		this.absRelativeBearing = this.parent.CreateFloatWME("abs-relative-bearing", Math.abs(Math.toDegrees(r.getRelativeBearing())));
 		
-		touch(Gridmap2D.simulation.getWorldCount());
+		touch(sim.getWorldCount());
 	}
 	
 	void update(pose_t pose, PointRelationship r) {
@@ -63,7 +65,7 @@ class SoarRobotObjectIL {
 		this.relativeBearing.Update(Math.toDegrees(r.getRelativeBearing()));
 		this.absRelativeBearing.Update(Math.abs(Math.toDegrees(r.getRelativeBearing())));
 		
-		touch(Gridmap2D.simulation.getWorldCount());
+		touch(sim.getWorldCount());
 	}
 	
 	void destroy() {

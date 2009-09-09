@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.soar.gridmap2d.Simulation;
+import edu.umich.soar.gridmap2d.core.Simulation;
 
 /**
  * This object keeps track of the "object templates" or prototypes. These

@@ -1,29 +1,193 @@
 package edu.umich.soar.gridmap2d.config;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.umich.soar.config.Config;
 import edu.umich.soar.config.ConfigFile;
 import edu.umich.soar.config.ParseError;
-import edu.umich.soar.gridmap2d.Game;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.Application;
+import edu.umich.soar.gridmap2d.core.Game;
+import edu.umich.soar.gridmap2d.core.Names;
 
 
 public class SimConfig implements GameConfig {	
+	private static final Log logger = LogFactory.getLog(SimConfig.class);
+	
+	private static final String EATERS_CNF = "eaters.cnf";
+	private static final String EATERS_CONSOLE_CNF = "eaters-console.cnf";
+	private static final String TANKSOAR_CNF = "tanksoar.cnf";
+	private static final String TANKSOAR_CONSOLE_CNF = "tanksoar-console.cnf";
+	private static final String ROOM_CNF = "room.cnf";
+	private static final String TAXI_CNF = "taxi.cnf";
+
+	private static final File home;
+	
+	static {
+		home = figureOutHome();
+		
+		try {
+			boolean installed = false; 
+			installed |= install(TANKSOAR_CNF);
+			installed |= install(TANKSOAR_CONSOLE_CNF);
+			installed |= install(EATERS_CNF);
+			installed |= install(EATERS_CONSOLE_CNF);
+			installed |= install(ROOM_CNF);
+			installed |= install(TAXI_CNF);
+			if (installed) {
+				System.err.println("Installed at least one config file." +
+						"\nYou may need to refresh the project if you are working inside of Eclipse.");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error("Unable to install config file(s): " + e.getMessage());
+		}
+	}
+	
+	private static File figureOutHome() {
+		File home = null;
+		String homeProperty = System.getProperty("soar2d.home");
+		if (homeProperty != null) {
+			home = new File(homeProperty);
+			return home;
+		}
+
+		try {
+			home = new File(SimConfig.class.getProtectionDomain()
+					.getCodeSource().getLocation().toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			throw new IllegalStateException("Internal error: getCodeSource returned bad URL");
+		}
+
+		// should point to parent of jar file
+		if (!home.isDirectory()) {
+			home = home.getParentFile();
+		}
+
+		// usually, we'll be in SoarLibrary/lib or SoarLibrary/bin
+		String soarlib = "SoarLibrary";
+		String soarjava = "soar-java";
+		String soar2d = "soar-soar2d";
+		String hstr = home.toString();
+		int pos = hstr.lastIndexOf(soarlib);
+		if (pos >= 0) {
+			home = new File(home.toString().substring(0, pos) + soarjava
+					+ File.separator + soar2d);
+		} else {
+			// sometimes in soar-java somewhere
+			pos = hstr.lastIndexOf(soarjava);
+			if (pos >= 0) {
+				home = new File(home.toString().substring(0,
+						pos + soarjava.length())
+						+ File.separator + soar2d);
+			} else {
+				// maybe in SoarSuite root?
+				home = new File(home.toString() + File.separator + soarjava
+						+ File.separator + soar2d);
+			}
+		}
+
+		// verify exists
+		if (!home.exists()) {
+			throw new IllegalStateException("Can't figure out where the " + soar2d + " folder is.");
+		}
+		return home;
+	}
+	
+	public static File getHome() {
+		return home;
+	}
+
+	private static boolean install(String file) throws IOException {
+		File cnf = new File(file);
+		File cnfDest = new File(home + File.separator + "config"
+				+ File.separator + file);
+
+		if (cnfDest.exists()) {
+			return false;
+		}
+
+		// Get the DLL from inside the JAR file
+		// It should be placed at the root of the JAR (not in a subfolder)
+		String jarpath = "/" + cnf.getPath();
+		InputStream is = SimConfig.class.getResourceAsStream(jarpath);
+
+		if (is == null) {
+			System.err.println("Failed to find " + jarpath
+					+ " in the JAR file");
+			return false;
+		}
+
+		// Create the new file on disk
+		FileOutputStream os = new FileOutputStream(cnfDest);
+
+		// Copy the file onto disk
+		byte bytes[] = new byte[2048];
+		int read;
+		while (true) {
+			read = is.read(bytes);
+
+			// EOF
+			if (read == -1)
+				break;
+
+			os.write(bytes, 0, read);
+		}
+
+		is.close();
+		os.close();
+		return true;
+	}
+
 	/**
 	 * @param path
 	 * @return
 	 * 
-	 * @throws ParseError If there is an error parsing the config file specified by path
-	 * @throws IOException If there is an error finding or reading the config file specified by path
-	 * @throws IllegalArgumentException If an unknown game type is passed.
+	 * @throws IllegalStateException If there is an error loading the config file
+	 * @throws FileNotFoundException If the specified path doesn't point to a valid file
 	 */
-	public static SimConfig newInstance(String path) throws ParseError, IOException {
-		return new SimConfig(new Config(new ConfigFile(path)));
+	public static SimConfig getInstance(String path) throws FileNotFoundException {
+		// See if it exists:
+		File configFile = new File(path);
+		if (!configFile.exists()) {
+			configFile = new File(home + File.separator + path);
+			if (!configFile.exists()) {
+				configFile = new File(home + File.separator + "config"
+						+ File.separator + path);
+				if (!configFile.exists()) {
+					throw new FileNotFoundException(path);
+				}
+			}
+		}
+
+		if (!configFile.isFile()) {
+			throw new FileNotFoundException(path);
+		}
+
+		// Read config file
+		SimConfig config = null;
+		try {
+			config = new SimConfig(new Config(new ConfigFile(path)));
+		} catch (IOException e) {
+			throw new IllegalStateException("Error loading " + path, e);
+		} catch (ParseError e) {
+			throw new IllegalStateException("Error loading " + path, e);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalStateException("Error loading " + path, e);
+		}
+
+		return config;
 	}
 	
 	private static class Keys {
@@ -85,7 +249,6 @@ public class SimConfig implements GameConfig {
 				sb.append(" ");
 				sb.append(gameType.id());
 			}
-			Gridmap2D.control.errorPopUp(sb.toString());
 			throw new IllegalArgumentException(sb.toString(), e);
 		}
 		
@@ -220,26 +383,27 @@ public class SimConfig implements GameConfig {
 	
 	public void saveLastProductions(String productionsPath) {
 		String game_specific_key = game.id() + "." + Keys.last_productions;
-		Gridmap2D.preferences.put(game_specific_key, productionsPath);
+		Application.PREFERENCES.put(game_specific_key, productionsPath);
 	}
 	
 	public String getLastProductions() {
 		String game_specific_key = game.id() + "." + Keys.last_productions;
-		return Gridmap2D.preferences.get(game_specific_key, null);
+		return Application.PREFERENCES.get(game_specific_key, null);
 	}
 	
 	public void saveWindowPosition(int [] xy) {
-		Gridmap2D.preferences.putInt(Keys.window_position_x, xy[0]);
-		Gridmap2D.preferences.putInt(Keys.window_position_y, xy[1]);
+		Application.PREFERENCES.putInt(Keys.window_position_x, xy[0]);
+		Application.PREFERENCES.putInt(Keys.window_position_y, xy[1]);
 	}
 	
 	public int [] getWindowPosition() {
 		int [] xy = new int[] { 0, 0 };
-		xy[0] = Gridmap2D.preferences.getInt(Keys.window_position_x, xy[0]);
-		xy[1] = Gridmap2D.preferences.getInt(Keys.window_position_y, xy[1]);
+		xy[0] = Application.PREFERENCES.getInt(Keys.window_position_x, xy[0]);
+		xy[1] = Application.PREFERENCES.getInt(Keys.window_position_y, xy[1]);
 		return xy;
 	}
 	
+	@Override
 	public String title() {
 		return gameConfig.title();
 	}

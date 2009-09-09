@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.umich.soar.gridmap2d.Direction;
+import edu.umich.soar.gridmap2d.core.Direction;
 
 public class DirectionTest {
 

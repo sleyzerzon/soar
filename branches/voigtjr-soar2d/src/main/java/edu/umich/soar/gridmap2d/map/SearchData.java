@@ -1,6 +1,6 @@
 package edu.umich.soar.gridmap2d.map;
 
-import edu.umich.soar.gridmap2d.Direction;
+import edu.umich.soar.gridmap2d.core.Direction;
 
 public class SearchData {
 	public static SearchData[][] newMap(GridMapCells cells) {

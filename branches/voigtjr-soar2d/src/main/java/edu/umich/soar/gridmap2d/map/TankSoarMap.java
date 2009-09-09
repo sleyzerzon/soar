@@ -8,20 +8,15 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.Names;
-import edu.umich.soar.gridmap2d.players.CommandInfo;
-import edu.umich.soar.gridmap2d.players.RadarCell;
-import edu.umich.soar.gridmap2d.players.Tank;
-import edu.umich.soar.gridmap2d.players.TankState;
-import edu.umich.soar.gridmap2d.world.PlayersManager;
-import edu.umich.soar.gridmap2d.world.TankSoarWorld;
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.Names;
 
 public class TankSoarMap extends GridMapBase implements GridMap,
 		CellObjectObserver {
-	private static Logger logger = Logger.getLogger(TankSoarMap.class);
+	private static Log logger = LogFactory.getLog(TankSoarMap.class);
 
 	public static TankSoarMap generateInstance(String mapPath,
 			int maxSoundDistance) {
@@ -251,7 +246,7 @@ public class TankSoarMap extends GridMapBase implements GridMap,
 		return getData().cellObjectManager.getTemplatesWithProperty(name);
 	}
 
-	public Direction getSoundNear(Tank tank, PlayersManager<Tank> players) {
+	public Direction getSoundNear(Tank tank, PlayersManager<Tank, TankCommand> players) {
 		if (players.numberOfPlayers() < 2) {
 			return Direction.NONE;
 		}
@@ -391,9 +386,9 @@ public class TankSoarMap extends GridMapBase implements GridMap,
 	}
 
 	private boolean recentlyMovedOrRotated(Tank tank,
-			PlayersManager<Tank> players) {
-		CommandInfo command = players.getCommand(tank);
-		return command != null && (command.move || command.rotate);
+			PlayersManager<Tank, TankCommand> players) {
+		TankCommand command = players.getCommand(tank);
+		return command != null && (command.isMove() || command.isRotate());
 	}
 
 	public CellObject createRandomObjectWithProperty(String property) {

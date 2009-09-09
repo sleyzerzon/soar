@@ -7,7 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="/soar-smljava/lib/swt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/lcmtypes.jar"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/jmat.jar"/>
@@ -15,5 +14,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/soar-smljava"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/sml.jar"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/stopwatch-0.4-with-deps.jar"/>
+	<classpathentry kind="lib" path="lib/flexdock-0.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

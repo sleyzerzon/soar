@@ -5,13 +5,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import edu.umich.soar.gridmap2d.Names;
-import edu.umich.soar.gridmap2d.Simulation;
+import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.EatersMap;
-import edu.umich.soar.gridmap2d.players.Player;
+import edu.umich.soar.gridmap2d.map.Player;
 
 import sml.Agent;
 import sml.FloatElement;
@@ -20,7 +21,7 @@ import sml.IntElement;
 import sml.StringElement;
 
 class SoarEaterIL {
-	private static Logger logger = Logger.getLogger(SoarEaterIL.class);
+	private static Log logger = LogFactory.getLog(SoarEaterIL.class);
 	
 	private class RandomIL {
 		private FloatElement randomWME;

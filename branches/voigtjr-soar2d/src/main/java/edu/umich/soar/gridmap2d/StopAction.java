@@ -1,0 +1,22 @@
+package edu.umich.soar.gridmap2d;
+
+import java.awt.event.ActionEvent;
+
+public class StopAction extends AbstractGridmap2DAction {
+
+	private static final long serialVersionUID = 7887235085533160856L;
+
+	public StopAction(ActionManager manager) {
+		super(manager, "Stop");
+	}
+
+	@Override
+	public void update() {
+//        setEnabled(!getApplication().getAgent().isRunning());
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	}
+
+}

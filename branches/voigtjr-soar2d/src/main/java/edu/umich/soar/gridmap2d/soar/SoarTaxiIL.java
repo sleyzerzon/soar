@@ -1,8 +1,8 @@
 package edu.umich.soar.gridmap2d.soar;
 
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.Names;
-import edu.umich.soar.gridmap2d.Simulation;
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.TaxiMap;
 
 import sml.Agent;

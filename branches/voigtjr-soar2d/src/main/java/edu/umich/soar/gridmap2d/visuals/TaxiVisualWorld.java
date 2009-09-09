@@ -5,12 +5,12 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.map.CellObject;
+import edu.umich.soar.gridmap2d.map.Taxi;
 import edu.umich.soar.gridmap2d.map.TaxiMap;
-import edu.umich.soar.gridmap2d.players.Taxi;
 
 public class TaxiVisualWorld extends VisualWorld {
 	public TaxiVisualWorld(Composite parent, int style, int cellSize) {

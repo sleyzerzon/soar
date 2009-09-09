@@ -11,16 +11,16 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.GridMap;
+import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RoomMap;
 import edu.umich.soar.gridmap2d.map.RoomObject;
-import edu.umich.soar.gridmap2d.players.Player;
-import edu.umich.soar.gridmap2d.players.Robot;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
-import edu.umich.soar.gridmap2d.world.World;
+import edu.umich.soar.gridmap2d.map.RoomWorld;
+import edu.umich.soar.gridmap2d.map.World;
 
 public class RoomVisualWorld extends VisualWorld {
 

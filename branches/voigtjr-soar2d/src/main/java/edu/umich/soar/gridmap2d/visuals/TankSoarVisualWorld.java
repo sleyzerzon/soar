@@ -11,13 +11,13 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.GridMap;
-import edu.umich.soar.gridmap2d.players.Tank;
-import edu.umich.soar.gridmap2d.players.TankState;
+import edu.umich.soar.gridmap2d.map.Tank;
+import edu.umich.soar.gridmap2d.map.TankState;
 
 
 public class TankSoarVisualWorld extends VisualWorld {

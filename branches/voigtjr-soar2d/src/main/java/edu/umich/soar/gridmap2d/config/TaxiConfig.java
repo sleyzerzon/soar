@@ -6,6 +6,7 @@ public class TaxiConfig implements GameConfig{
 	public int fuel_starting_maximum = 12;
 	public int fuel_maximum = 14;
 	
+	@Override
 	public String title() {
 		return "Taxi";
 	}

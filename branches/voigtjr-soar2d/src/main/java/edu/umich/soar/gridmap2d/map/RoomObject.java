@@ -1,10 +1,8 @@
 package edu.umich.soar.gridmap2d.map;
 
-import org.eclipse.swt.graphics.Color;
+import java.awt.Color;
 
-import edu.umich.soar.gridmap2d.Names;
-import edu.umich.soar.gridmap2d.visuals.WindowManager;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
+import edu.umich.soar.gridmap2d.core.Names;
 import lcmtypes.pose_t;
 
 public class RoomObject {
@@ -21,11 +19,11 @@ public class RoomObject {
 		// TODO: make colors enum, use valueOf
 		String color = object.getProperty("color");
 		if (color.equals("red")) {
-			this.color = WindowManager.red;
+			this.color = Color.red;
 		} else if (color.equals("green")) {
-			this.color = WindowManager.green;
+			this.color = Color.green;
 		} else if (color.equals("gray")) {
-			this.color = WindowManager.darkGray;
+			this.color = Color.darkGray;
 		}
 	}
 

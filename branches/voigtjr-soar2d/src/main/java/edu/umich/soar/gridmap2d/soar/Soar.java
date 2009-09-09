@@ -8,150 +8,176 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import edu.umich.soar.gridmap2d.CognitiveArchitecture;
-import edu.umich.soar.gridmap2d.Game;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
 import edu.umich.soar.gridmap2d.config.ClientConfig;
+import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.config.SoarConfig;
-import edu.umich.soar.gridmap2d.players.Eater;
-import edu.umich.soar.gridmap2d.players.EaterCommander;
-import edu.umich.soar.gridmap2d.players.RobotCommander;
-import edu.umich.soar.gridmap2d.players.Robot;
-import edu.umich.soar.gridmap2d.players.Tank;
-import edu.umich.soar.gridmap2d.players.TankCommander;
-import edu.umich.soar.gridmap2d.players.Taxi;
-import edu.umich.soar.gridmap2d.players.TaxiCommander;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
+import edu.umich.soar.gridmap2d.core.AfterTickEvent;
+import edu.umich.soar.gridmap2d.core.BeforeTickEvent;
+import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
+import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.Simulation;
+import edu.umich.soar.gridmap2d.core.StartEvent;
+import edu.umich.soar.gridmap2d.core.StopEvent;
+import edu.umich.soar.gridmap2d.events.SimEvent;
+import edu.umich.soar.gridmap2d.events.SimEventListener;
+import edu.umich.soar.gridmap2d.map.Eater;
+import edu.umich.soar.gridmap2d.map.EaterCommander;
+import edu.umich.soar.gridmap2d.map.Robot;
+import edu.umich.soar.gridmap2d.map.RobotCommander;
+import edu.umich.soar.gridmap2d.map.RoomWorld;
+import edu.umich.soar.gridmap2d.map.Tank;
+import edu.umich.soar.gridmap2d.map.TankCommander;
+import edu.umich.soar.gridmap2d.map.Taxi;
+import edu.umich.soar.gridmap2d.map.TaxiCommander;
 
 import sml.Agent;
 import sml.ConnectionInfo;
 import sml.Kernel;
 import sml.smlPrintEventId;
 import sml.smlRunStepSize;
-import sml.smlSystemEventId;
 import sml.smlUpdateEventId;
 import sml.sml_Names;
 import sml.smlRunFlags;
 
-public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface, Kernel.SystemEventInterface {
+public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface, SimEventListener {
 
-	private static Logger logger = Logger.getLogger(Soar.class);
+	private static Log logger = LogFactory.getLog(Soar.class);
 
 	private boolean runTilOutput = false;
 	private Kernel kernel = null;
-	
+
 	private class AgentData {
 		AgentData(Agent agent, File productions) {
 			this.agent = agent;
 			this.productions = productions;
 		}
-		
+
 		Agent agent;
 		File productions;
 	}
-	
-	private Map<String, AgentData> agents = new HashMap<String, AgentData>();
-	private String basePath;
-	private Map<String, ClientConfig> clients;
-	private int maxMemoryUsage;
-	private boolean soarPrint;
-	private int port;
-	private boolean debug;
-	
+
+	private final Map<String, AgentData> agents = new HashMap<String, AgentData>();
+	private final Map<String, ClientConfig> clients;
+	private final int maxMemoryUsage;
+	private final boolean soarPrint;
+	private final int port;
+	private final boolean debug;
+	private final Simulation sim;
+
 	/**
 	 * @param config
 	 * @param clients
 	 * @param game
 	 * @param basePath
 	 * 
-	 * @throws IllegalStateException If there is an unrecoverable error initializing Soar
+	 * @throws IllegalStateException
+	 *             If there is an unrecoverable error initializing Soar
 	 */
-	public Soar(SoarConfig config, Map<String, ClientConfig> clients, Game game, String basePath) {
-		this.basePath = basePath;
-		this.runTilOutput = config.runTilOutput(game);
-		
-		this.clients = clients;
+	public Soar(Simulation sim) {
+		this.sim = sim;
+		SoarConfig config = sim.getConfig().soarConfig();
+		this.runTilOutput = config.runTilOutput(sim.getConfig().game());
+
+		this.clients = sim.getConfig().clientConfigs();
 		this.maxMemoryUsage = config.max_memory_usage;
 		this.soarPrint = config.soar_print;
 		this.port = config.port;
 		this.debug = config.spawn_debuggers;
-		
+
 		if (config.remote != null) {
-			kernel = Kernel.CreateRemoteConnection(true, config.remote, config.port);
+			kernel = Kernel.CreateRemoteConnection(true, config.remote,
+					config.port);
 		} else {
 			// Create kernel
-			kernel = Kernel.CreateKernelInNewThread("SoarKernelSML", config.port);
-			//kernel = Kernel.CreateKernelInCurrentThread("SoarKernelSML", true);
+			kernel = Kernel.CreateKernelInNewThread("SoarKernelSML",
+					config.port);
+			// kernel = Kernel.CreateKernelInCurrentThread("SoarKernelSML",
+			// true);
 		}
 
 		if (kernel.HadError()) {
-			throw new IllegalStateException(Names.Errors.kernelCreation + kernel.GetLastErrorDescription());
+			throw new IllegalStateException(Names.Errors.kernelCreation
+					+ kernel.GetLastErrorDescription());
 		}
-		
+
 		// We want the most performance
 		logger.debug(Names.Debug.autoCommit);
 		kernel.SetAutoCommit(false);
 
-		// Register for events
+		// Register for Soar events
 		logger.trace(Names.Trace.eventRegistration);
-		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, this, null);
-		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, this, null);
-		
 		if (runTilOutput) {
 			logger.debug(Names.Debug.runTilOutput);
-			kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this, null);
+			kernel.RegisterForUpdateEvent(
+					smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this,
+					null);
 		} else {
 			logger.debug(Names.Debug.noRunTilOutput);
-			kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this, null);
+			kernel.RegisterForUpdateEvent(
+					smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this,
+					null);
 		}
-		
+
+		// Register for Sim events
+		sim.getEvents().addListener(StartEvent.class, this);
+		//sim.getEvents().addListener(StopEvent.class, this);
+		sim.getEvents().addListener(BeforeTickEvent.class, this);
+		sim.getEvents().addListener(AfterTickEvent.class, this);
 	}
-	
+
 	@Override
 	public boolean debug() {
 		return debug;
 	}
-	
+
 	@Override
 	public void seed(int seed) {
-		kernel.ExecuteCommandLine("srand " + seed, null) ;
+		kernel.ExecuteCommandLine("srand " + seed, null);
 	}
-	
+
 	@Override
 	public void doBeforeClients() {
 		// Start or wait for clients (false: before agent creation)
 		logger.trace(Names.Trace.beforeClients);
 		doClients(false);
-		
+
 	}
-	
+
 	@Override
 	public void doAfterClients() {
 		// Start or wait for clients (true: after agent creation)
 		logger.trace(Names.Trace.afterClients);
 		doClients(true);
-		
+
 	}
-	
+
 	private void doClients(boolean after) {
 		for (Entry<String, ClientConfig> entry : clients.entrySet()) {
 			if (entry.getValue().after != after) {
 				continue;
 			}
-			
+
 			if (entry.getKey().equals(Names.kDebuggerClient)) {
 				continue;
 			}
-			
+
 			if (entry.getValue().command != null) {
 				spawnClient(entry.getKey(), entry.getValue());
 			} else {
 				if (!waitForClient(entry.getKey(), entry.getValue())) {
-					Gridmap2D.control.errorPopUp(Names.Errors.clientSpawn + entry.getKey());
+					sim
+							.error("Soar", Names.Errors.clientSpawn
+									+ entry.getKey());
 					return;
 				}
 			}
@@ -160,10 +186,11 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	private class Redirector extends Thread {
 		BufferedReader br;
+
 		public Redirector(BufferedReader br) {
 			this.br = br;
 		}
-		
+
 		@Override
 		public void run() {
 			String line;
@@ -176,14 +203,14 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			}
 		}
 	}
-	
+
 	public void spawnClient(String clientID, ClientConfig clientConfig) {
 		Runtime r = java.lang.Runtime.getRuntime();
 		logger.trace(Names.Trace.spawningClient + clientID);
 
 		try {
 			Process p = r.exec(clientConfig.command);
-			
+
 			InputStream is = p.getInputStream();
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
@@ -195,35 +222,39 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			br = new BufferedReader(isr);
 			rd = new Redirector(br);
 			rd.start();
-			
+
 			if (!waitForClient(clientID, clientConfig)) {
-				Gridmap2D.control.errorPopUp(Names.Errors.clientSpawn + clientID);
+				sim.error("Soar", Names.Errors.clientSpawn + clientID);
 				return;
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
-			Gridmap2D.control.errorPopUp("IOException spawning client: " + clientID);
+			sim.error("Soar", "IOException spawning client: " + clientID);
 			return;
 		}
 	}
-	
+
 	/**
-	 * @param client the client to wait for
+	 * @param client
+	 *            the client to wait for
 	 * @return true if the client connected within the timeout
 	 * 
-	 * waits for a client to report ready
+	 *         waits for a client to report ready
 	 */
 	public boolean waitForClient(String clientID, ClientConfig clientConfig) {
 		boolean ready = false;
-		// do this loop if timeout seconds is 0 (code for wait indefinitely) or if we have tries left
-		for (int tries = 0; (clientConfig.timeout == 0) || (tries < clientConfig.timeout); ++tries) {
+		// do this loop if timeout seconds is 0 (code for wait indefinitely) or
+		// if we have tries left
+		for (int tries = 0; (clientConfig.timeout == 0)
+				|| (tries < clientConfig.timeout); ++tries) {
 			kernel.GetAllConnectionInfo();
 			if (kernel.HasConnectionInfoChanged()) {
 				for (int i = 0; i < kernel.GetNumberConnections(); ++i) {
-					ConnectionInfo info =  kernel.GetConnectionInfo(i);
+					ConnectionInfo info = kernel.GetConnectionInfo(i);
 					if (info.GetName().equalsIgnoreCase(clientID)) {
-						if (info.GetAgentStatus().equalsIgnoreCase(sml_Names.getKStatusReady())) {
+						if (info.GetAgentStatus().equalsIgnoreCase(
+								sml_Names.getKStatusReady())) {
 							ready = true;
 							break;
 						}
@@ -233,31 +264,13 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 					break;
 				}
 			}
-			try { 
+			try {
 				logger.trace(Names.Trace.waitClient + clientID);
-				Thread.sleep(1000); 
-			} catch (InterruptedException ignored) {}
+				Thread.sleep(1000);
+			} catch (InterruptedException ignored) {
+			}
 		}
 		return ready;
-	}
-	
-	@Override
-	public void runForever() {
-		if (runTilOutput) {
-			kernel.RunAllAgentsForever(smlRunStepSize.sml_UNTIL_OUTPUT);
-		} else {
-			kernel.RunAllAgentsForever();
-		}
-		
-	}
-
-	@Override
-	public void runStep() {
-		if (runTilOutput) {
-			kernel.RunAllTilOutput(smlRunStepSize.sml_UNTIL_OUTPUT);
-		} else {
-			kernel.RunAllAgents(1);
-		}
 	}
 
 	@Override
@@ -271,7 +284,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		kernel.DestroyAgent(agentData.agent);
 		agentData.agent.delete();
 	}
-	
+
 	@Override
 	public void shutdown() {
 		if (kernel != null) {
@@ -282,99 +295,101 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	}
 
-	@Override
-	public String getAgentPath() {
-		return basePath + "agents" + System.getProperty("file.separator");
-	}
-	
 	/**
 	 * Logger for Kernel print events
+	 * 
 	 * @author Scott Lathrop
-	 *
+	 * 
 	 */
-	private PrintLogger getLogger() { return PrintLogger.getLogger(); }
-	
-	
-	private static class PrintLogger implements Agent.PrintEventInterface
-	{
+	private PrintLogger getLogger() {
+		return PrintLogger.getLogger();
+	}
+
+	private static class PrintLogger implements Agent.PrintEventInterface {
 		protected static PrintLogger m_Logger = null;
-		
-		public static PrintLogger getLogger() 
-		{
+
+		public static PrintLogger getLogger() {
 			if (m_Logger == null) {
 				m_Logger = new PrintLogger();
 			}
-			
+
 			return m_Logger;
 		}
-		
+
 		/**
 		 * @brief - callback from SoarKernel for print events
 		 */
 		@Override
-		public void printEventHandler (int eventID, Object data, Agent agent, String message) 
-		{
+		public void printEventHandler(int eventID, Object data, Agent agent,
+				String message) {
 			if (eventID == smlPrintEventId.smlEVENT_PRINT.swigValue()) {
 				logger.info(message);
 			}
-				
-		} // SoarAgentprintEventHandler	
-		
-		private PrintLogger () {}
-		
+
+		} // SoarAgentprintEventHandler
+
+		private PrintLogger() {
+		}
+
 	} // Logger
-	
-	private Agent createSoarAgent(String name, String productions, boolean debug) {
+
+	private Agent createSoarAgent(String name, String productions, boolean spawnDebuggers) {
 		Agent agent = kernel.CreateAgent(name);
 		if (agent == null) {
-			Gridmap2D.control.errorPopUp("Error creating agent " + name + ", " + kernel.GetLastErrorDescription());
+			sim.error("Soar", "Error creating agent " + name + ", "
+					+ kernel.GetLastErrorDescription());
 			return null;
 		}
-		
+
 		// now load the productions
 		File productionsFile = new File(productions);
 		if (!agent.LoadProductions(productionsFile.getAbsolutePath())) {
-			Gridmap2D.control.errorPopUp("Error loading productions " + productionsFile + " for " + name + ", " + agent.GetLastErrorDescription());
+			sim.error("Soar", "Error loading productions " + productionsFile
+					+ " for " + name + ", " + agent.GetLastErrorDescription());
 			return null;
 		}
-		
+
 		// if requested, set max memory usage
 		int maxmem = maxMemoryUsage;
 		if (maxmem > 0) {
-			agent.ExecuteCommandLine("max-memory-usage " + Integer.toString(maxmem));
+			agent.ExecuteCommandLine("max-memory-usage "
+					+ Integer.toString(maxmem));
 		}
-		
-		// Scott Lathrop --  register for print events
+
+		// Scott Lathrop -- register for print events
 		if (soarPrint) {
-			agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT, getLogger(), null,true);
+			agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT,
+					getLogger(), null, true);
 		}
-		
+
 		// save the agent
 		agents.put(name, new AgentData(agent, productionsFile));
-		
+
 		// spawn the debugger if we're supposed to
-		if (debug && !isClientConnected(Names.kDebuggerClient)) {
+		if (spawnDebuggers && !isClientConnected(Names.kDebuggerClient)) {
 			ClientConfig debuggerConfig = clients.get(Names.kDebuggerClient);
 			debuggerConfig.command = getDebuggerCommand(name);
 
 			spawnClient(Names.kDebuggerClient, debuggerConfig);
 		}
-		
+
 		return agent;
 	}
 
 	/**
-	 * @param client the client in question
+	 * @param client
+	 *            the client in question
 	 * @return true if it is connected
 	 * 
-	 * check to see if the client specified by the client config is connected or not
+	 *         check to see if the client specified by the client config is
+	 *         connected or not
 	 */
 	@Override
 	public boolean isClientConnected(String clientId) {
 		boolean connected = false;
 		kernel.GetAllConnectionInfo();
 		for (int i = 0; i < kernel.GetNumberConnections(); ++i) {
-			ConnectionInfo info =  kernel.GetConnectionInfo(i);
+			ConnectionInfo info = kernel.GetConnectionInfo(i);
 			if (info.GetName().equalsIgnoreCase(clientId)) {
 				connected = true;
 				break;
@@ -382,9 +397,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		return connected;
 	}
-	
+
 	/**
-	 * @param agentName tailor the command to this agent name
+	 * @param agentName
+	 *            tailor the command to this agent name
 	 * @return a string command line to execute to spawn the debugger
 	 */
 	public String getDebuggerCommand(String agentName) {
@@ -392,15 +408,20 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		String os = System.getProperty("os.name");
 		String commandLine;
 		if (os.matches(".+indows.*") || os.matches("INDOWS")) {
-			commandLine = "javaw -jar \"" + basePath 
-			+ "..\\..\\SoarLibrary\\bin\\SoarJavaDebugger.jar\" -cascade -remote -agent " 
-			+ agentName + " -port " + port;
+			commandLine = "javaw -jar \""
+					+ SimConfig.getHome()
+					+ File.separator
+					+ "..\\..\\SoarLibrary\\bin\\SoarJavaDebugger.jar\" -cascade -remote -agent "
+					+ agentName + " -port " + port;
 		} else {
-			commandLine = System.getProperty("java.home") + "/bin/java -jar " + basePath
-			+ "../../SoarLibrary/bin/SoarJavaDebugger.jar -XstartOnFirstThread -cascade -remote -agent " 
-			+ agentName + " -port " + port;
+			commandLine = System.getProperty("java.home")
+					+ "/bin/java -jar "
+					+ SimConfig.getHome()
+					+ File.separator
+					+ "../../SoarLibrary/bin/SoarJavaDebugger.jar -XstartOnFirstThread -cascade -remote -agent "
+					+ agentName + " -port " + port;
 		}
-		
+
 		return commandLine;
 	}
 
@@ -411,90 +432,128 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			logger.warn("Didn't find player to reload: " + player);
 			return;
 		}
-		
-		agentData.agent.LoadProductions(agentData.productions.getAbsolutePath());
-	}
 
-	@Override
-	public boolean haveAgents() {
-		return agents.size() > 0;
+		agentData.agent
+				.LoadProductions(agentData.productions.getAbsolutePath());
 	}
 
 	@Override
 	public EaterCommander createEaterCommander(Eater eater, String productions,
-			int vision, String[] shutdownCommands, boolean debug) {
+			int vision, String[] shutdownCommands) {
 		Agent agent = createSoarAgent(eater.getName(), productions, debug);
 		if (agent == null) {
 			return null;
 		}
-		return new SoarEater(eater, agent, vision, shutdownCommands);
+		return new SoarEater(sim, eater, agent, vision, shutdownCommands);
 	}
 
 	@Override
 	public TankCommander createTankCommander(Tank tank, String productions,
-			String[] shutdownCommands, boolean debug) {
+			String[] shutdownCommands) {
 		Agent agent = createSoarAgent(tank.getName(), productions, debug);
 		if (agent == null) {
 			return null;
 		}
-		return new SoarTank(tank, agent, shutdownCommands);
+		return new SoarTank(sim, tank, agent, shutdownCommands);
 	}
 
 	@Override
 	public TaxiCommander createTaxiCommander(Taxi taxi, String productions,
-			String[] shutdownCommands, boolean debug) {
+			String[] shutdownCommands) {
 		Agent agent = createSoarAgent(taxi.getName(), productions, debug);
 		if (agent == null) {
 			return null;
 		}
-		return new SoarTaxi(taxi, agent, shutdownCommands);
+		return new SoarTaxi(sim, taxi, agent, shutdownCommands);
 	}
-	   
+
 	@Override
-	public RobotCommander createRoomCommander(Robot player, RoomWorld world, String productions,
-			String[] shutdownCommands, boolean debug) {
+	public RobotCommander createRoomCommander(Robot player, RoomWorld world,
+			String productions, String[] shutdownCommands) {
 		Agent agent = createSoarAgent(player.getName(), productions, debug);
 		if (agent == null) {
 			return null;
 		}
-		return new SoarRobot(player, agent, kernel, world, shutdownCommands);
+		return new SoarRobot(sim, player, agent, kernel, world, shutdownCommands);
 	}
 
-	@Override
-  	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
+	private static final ExecutorService exec = Executors
+			.newSingleThreadExecutor();
+	
 
-  		// check for override
-  		int dontUpdate = runFlags & smlRunFlags.sml_DONT_UPDATE_WORLD.swigValue();
-  		if (dontUpdate != 0) {
-  			logger.warn(Names.Warn.noUpdate);
-  			return;
-  		}
-  		
-  		// this updates the world
-  		Gridmap2D.control.tickEvent();
-  		
-		// Test this after the world has been updated, in case it's asking us to stop
-		if (Gridmap2D.control.isStopped()) {
-			// the world has asked us to kindly stop running
-  			logger.debug(Names.Debug.stopRequested);
-  			
-  			// note that soar actually controls when we stop
-  			kernel.StopAllAgents();
-  		}
-  	}
-  	
+	private AtomicBoolean stopRequested = new AtomicBoolean(false);
+	private BlockingQueue<Boolean> tickQueue = new SynchronousQueue<Boolean>();
+	private BlockingQueue<Boolean> updateQueue = new SynchronousQueue<Boolean>();
+	
 	@Override
-   public void systemEventHandler(int eventID, Object data, Kernel kernel) {
-  		if (eventID == smlSystemEventId.smlEVENT_SYSTEM_START.swigValue()) {
-  			// soar says go
-  			Gridmap2D.control.startEvent();
-  		} else if (eventID == smlSystemEventId.smlEVENT_SYSTEM_STOP.swigValue()) {
-  			// soar says stop
-  			Gridmap2D.control.stopEvent();
-  		} else {
-  			// soar says something we weren't expecting
-  			logger.warn(Names.Warn.unknownEvent + eventID);
- 		}
-   }
+	public void onEvent(SimEvent event) {
+		if (event instanceof StartEvent) {
+			if (agents.size() != 0) {
+				exec.submit(new Callable<Void>() {
+					@Override
+					public Void call() {
+						logger.trace("soar alive");
+						if (!stopRequested.compareAndSet(true, false)) {
+							logger.trace("committing");
+							for (AgentData ad : agents.values()) {
+								ad.agent.Commit();
+							}
+							logger.trace("running all agents forever");
+							logger.trace(kernel.RunAllAgentsForever());
+							logger.trace("run returned");
+						}
+						return null;
+					}
+				});
+			}
+		} else if (event instanceof BeforeTickEvent) {
+			try {
+				// wait for update
+				logger.trace("before tick, waiting for update");
+				tickQueue.put(Boolean.TRUE);
+			} catch (InterruptedException e) {
+				// TODO: handle correctly
+			}
+			logger.trace("before tick, returning");
+		} else if (event instanceof AfterTickEvent) {
+			try {
+				logger.trace("after tick, notifying done");
+				// tell that tick is done
+				updateQueue.take();
+			} catch (InterruptedException e) {
+				// TODO: handle correctly
+			}
+			logger.trace("after tick returning");
+		}
+	}
+	
+	@Override
+	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
+		if (stopRequested.getAndSet(false)) {
+			logger.trace("issuing stop");
+			kernel.StopAllAgents();
+		}
+		
+		Boolean tick = tickQueue.poll();
+		if (tick == null) {
+			logger.trace("tick not ready");
+			//tick not ready
+			return;
+		}
 
+		// let the environment tick
+		try {
+			logger.trace("waiting for tick to complete");
+			updateQueue.put((runFlags & smlRunFlags.sml_DONT_UPDATE_WORLD.swigValue()) == 0);
+		} catch (InterruptedException e) {
+			// TODO handle correctly
+		}
+
+		logger.trace("committing");
+		for (AgentData ad : agents.values()) {
+			ad.agent.Commit();
+		}
+		
+		logger.trace("update done");
+	}
 }

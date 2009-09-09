@@ -16,6 +16,7 @@ public class TankSoarConfig implements GameConfig {
 	public int max_sound_distance = 7;
 	public int missile_reset_threshold = 100;
 	
+	@Override
 	public String title() {
 		return "TankSoar";
 	}

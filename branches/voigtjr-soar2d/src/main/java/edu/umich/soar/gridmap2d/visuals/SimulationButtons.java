@@ -7,7 +7,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.umich.soar.gridmap2d.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
 
 
 public class SimulationButtons extends Composite {

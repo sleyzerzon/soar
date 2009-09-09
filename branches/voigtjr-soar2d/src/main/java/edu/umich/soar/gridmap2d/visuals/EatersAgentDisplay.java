@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import edu.umich.soar.gridmap2d.CognitiveArchitecture;
-import edu.umich.soar.gridmap2d.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
 import edu.umich.soar.gridmap2d.map.GridMap;
-import edu.umich.soar.gridmap2d.players.Player;
-import edu.umich.soar.gridmap2d.world.World;
+import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.World;
 
 
 public class EatersAgentDisplay extends AgentDisplay {

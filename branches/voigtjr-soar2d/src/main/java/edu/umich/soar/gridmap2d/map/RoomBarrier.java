@@ -3,8 +3,7 @@ package edu.umich.soar.gridmap2d.map;
 import java.util.Arrays;
 
 import lcmtypes.pose_t;
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
+import edu.umich.soar.gridmap2d.core.Direction;
 
 public class RoomBarrier {
 	public int id = -1;

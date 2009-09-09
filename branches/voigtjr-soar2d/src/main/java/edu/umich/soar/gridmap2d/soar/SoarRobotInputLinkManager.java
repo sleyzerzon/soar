@@ -13,15 +13,15 @@ import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
 import sml.smlSystemEventId;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.Simulation;
+import edu.umich.soar.gridmap2d.map.CarryInterface;
 import edu.umich.soar.gridmap2d.map.CellObject;
+import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RoomMap;
 import edu.umich.soar.gridmap2d.map.RoomObject;
-import edu.umich.soar.gridmap2d.players.CarryInterface;
-import edu.umich.soar.gridmap2d.players.Player;
-import edu.umich.soar.gridmap2d.players.Robot;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
+import edu.umich.soar.gridmap2d.map.RoomWorld;
 import edu.umich.soar.robot.PointRelationship;
 import edu.umich.soar.robot.ReceiveMessagesInterface;
 import edu.umich.soar.robot.OffsetPose;
@@ -43,8 +43,10 @@ public class SoarRobotInputLinkManager {
 	private final Map<Integer, SoarRobotObjectIL> objects = new HashMap<Integer, SoarRobotObjectIL>();
 	private long runtime;
 	private final CarryInterface ci;
+	private final Simulation sim;
 	
-	public SoarRobotInputLinkManager(Agent agent, Kernel kernel, OffsetPose opose, CarryInterface ci) {
+	public SoarRobotInputLinkManager(Simulation sim, Agent agent, Kernel kernel, OffsetPose opose, CarryInterface ci) {
+		this.sim = sim;
 		this.agent = agent;
 		this.kernel = kernel;
 		this.opose = opose;
@@ -109,7 +111,7 @@ public class SoarRobotInputLinkManager {
 		configurationIL.update();
 		// FIXME: should be configurable
 		//timeIL.update();
-		runtime += (long)(Gridmap2D.control.getTimeSlice() * 1000000000L);
+		runtime += (long)(sim.getTimeSlice() * 1000000000L);
 		timeIL.updateExact(runtime);
 		selfIL.update(player);
 		
@@ -143,7 +145,7 @@ public class SoarRobotInputLinkManager {
 						// create new object
 						Identifier inputLink = agent.GetInputLink();
 						Identifier parent = inputLink.CreateIdWME("object");
-						oIL = new SoarRobotObjectIL(parent);
+						oIL = new SoarRobotObjectIL(sim, parent);
 						oIL.initialize(pose, r);
 						oIL.addProperty("type", cObj.getProperty("name"));
 						oIL.addProperty("id", rObj.getId());
@@ -174,11 +176,11 @@ public class SoarRobotInputLinkManager {
 					// create new player
 					Identifier inputLink = agent.GetInputLink();
 					Identifier parent = inputLink.CreateIdWME("object");
-					pIL = new SoarRobotObjectIL(parent);
+					pIL = new SoarRobotObjectIL(sim, parent);
 					pIL.initialize(rTargetPose, r);
 					pIL.addProperty("type", "player");
 					pIL.addProperty("name", rName);
-					pIL.addProperty("color", rTarget.getColor());
+					pIL.addProperty("color", rTarget.getColor().toString().toLowerCase());
 					players.put(rName, pIL);
 				
 				} else {
@@ -187,7 +189,7 @@ public class SoarRobotInputLinkManager {
 			}
 		}
 
-		purge(Gridmap2D.simulation.getWorldCount());
+		purge(sim.getWorldCount());
 
 		areaIL.update();
 	}

@@ -1,6 +1,6 @@
 package edu.umich.soar.gridmap2d.config;
 
-import edu.umich.soar.gridmap2d.Game;
+import edu.umich.soar.gridmap2d.core.Game;
 
 public class SoarConfig {
 	public int max_memory_usage = -1;

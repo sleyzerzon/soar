@@ -15,13 +15,13 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import edu.umich.soar.gridmap2d.Direction;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.GridMap;
-import edu.umich.soar.gridmap2d.players.Player;
-import edu.umich.soar.gridmap2d.players.RadarCell;
+import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.RadarCell;
 
 public abstract class VisualWorld extends Canvas implements PaintListener {
 	

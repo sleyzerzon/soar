@@ -7,18 +7,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.commsen.stopwatch.Report;
 import com.commsen.stopwatch.Stopwatch;
 
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
-import edu.umich.soar.gridmap2d.Simulation;
+import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.PlayerColor;
+import edu.umich.soar.gridmap2d.core.Simulation;
 
 public class EatersMap extends GridMapBase implements GridMap,
 		CellObjectObserver {
-	private static Logger logger = Logger.getLogger(EatersMap.class);
+	private static Log logger = LogFactory.getLog(EatersMap.class);
 
 	public static EatersMap generateInstance(String mapPath,
 			boolean unopenedBoxesTerminal, double lowProbability,
@@ -86,12 +87,12 @@ public class EatersMap extends GridMapBase implements GridMap,
 				if (aBox.getProperty("box-id", 0, Integer.class) == positiveRewardID) {
 					aBox.setProperty("apply.reward.correct", "ignored");
 					aBox.setProperty(Names.kPropertyColor,
-							Gridmap2D.simulation.kColors[1]);
+							PlayerColor.values()[1].toString().toLowerCase());
 				} else {
 					aBox.setProperty(Names.kPropertyColor,
-							Gridmap2D.simulation.kColors[negativeColor]);
+							PlayerColor.values()[negativeColor].toString().toLowerCase());
 					negativeColor += 1;
-					assert negativeColor < Gridmap2D.simulation.kColors.length;
+					assert negativeColor < PlayerColor.values().length;
 				}
 			}
 		}
@@ -265,7 +266,7 @@ public class EatersMap extends GridMapBase implements GridMap,
 					Boolean.class)) {
 				// assign identification properties
 				added.setProperty(Names.kPropertyColor,
-						Gridmap2D.simulation.kColors[0]);
+						PlayerColor.values()[0].toString().toLowerCase());
 				added.setProperty("box-id", "0");
 
 				logger.trace("Info box: "

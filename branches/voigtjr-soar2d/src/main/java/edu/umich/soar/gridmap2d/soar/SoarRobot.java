@@ -4,17 +4,18 @@ import java.util.List;
 
 import jmat.LinAlg;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.commsen.stopwatch.Stopwatch;
 
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.Simulation;
+import edu.umich.soar.gridmap2d.map.Robot;
+import edu.umich.soar.gridmap2d.map.RobotCommand;
+import edu.umich.soar.gridmap2d.map.RobotCommander;
 import edu.umich.soar.gridmap2d.map.RoomMap;
-import edu.umich.soar.gridmap2d.players.CommandInfo;
-import edu.umich.soar.gridmap2d.players.RobotCommander;
-import edu.umich.soar.gridmap2d.players.Robot;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
+import edu.umich.soar.gridmap2d.map.RoomWorld;
 import edu.umich.soar.robot.ObjectManipulationInterface;
 import edu.umich.soar.robot.OutputLinkManager;
 import edu.umich.soar.robot.ConfigureInterface;
@@ -27,7 +28,7 @@ import sml.Agent;
 import sml.Kernel;
 
 public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose, ObjectManipulationInterface  {
-	private static Logger logger = Logger.getLogger(SoarRobot.class);
+	private static Log logger = LogFactory.getLog(SoarRobot.class);
 
 	private Robot player;
 	private Agent agent;
@@ -44,22 +45,25 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 	public static final double PIXELS_2_METERS = 1.0 / 16.0;
 	public static final double METERS_2_PIXELS = 16.0;
 	
-	public SoarRobot(Robot player, Agent agent, Kernel kernel,
+	private final Simulation sim;
+	
+	public SoarRobot(Simulation sim, Robot player, Agent agent, Kernel kernel,
 			RoomWorld world, String[] shutdownCommands) {
 		this.player = player;
+		this.sim = sim;
 		this.agent = agent;
 		this.world = world;
 		this.shutdownCommands = shutdownCommands;
 		
 		agent.SetBlinkIfNoChange(false);
 		
-		input = new SoarRobotInputLinkManager(agent, kernel, this, player.getState());
+		input = new SoarRobotInputLinkManager(sim, agent, kernel, this, player.getState());
 		input.create();
 		output = new OutputLinkManager(agent);
 		output.create(input.getWaypointInterface(), world, input.getReceiveMessagesInterface(), this, this, this);
 		
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
+			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
 		}
 	}
 
@@ -73,7 +77,7 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		output.destroy();
 
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
+			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
 		}
 
 		agent.InitSoar();
@@ -82,7 +86,7 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		output.create(input.getWaypointInterface(), world, input.getReceiveMessagesInterface(), this, this, this);
 
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
+			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
 		}
 	}
 
@@ -99,20 +103,19 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		
 		long id3 = Stopwatch.start("soar update", "commit");
 		if (!agent.Commit()) {
-			Gridmap2D.control.errorPopUp(Names.Errors.commitFail + player.getName());
-			Gridmap2D.control.stopSimulation();
+			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
+			sim.stop();
 		}
 		Stopwatch.stop(id3);
 	}
 
 	@Override
-	public CommandInfo nextCommand() {
-		return new CommandInfo(ddc);
+	public RobotCommand nextCommand() {
+		return new RobotCommand.Builder(ddc).build();
 	}
 
 	private void error(String message) {
-		logger.error(message);
-		Gridmap2D.control.errorPopUp(message);
+		sim.error("Soar Robot", message);
 	}
 	
 	@Override

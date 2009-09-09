@@ -3,10 +3,10 @@ package edu.umich.soar.gridmap2d.visuals;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.umich.soar.gridmap2d.Gridmap2D;
 import edu.umich.soar.gridmap2d.config.PlayerConfig;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
 import edu.umich.soar.gridmap2d.map.GridMap;
-import edu.umich.soar.gridmap2d.players.Player;
+import edu.umich.soar.gridmap2d.map.Player;
 
 
 public class AgentDisplay extends Composite {

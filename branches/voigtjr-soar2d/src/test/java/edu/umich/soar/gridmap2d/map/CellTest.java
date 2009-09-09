@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.CellObjectObserver;
-import edu.umich.soar.gridmap2d.players.Player;
 
 public class CellTest {
 	Cell cell;

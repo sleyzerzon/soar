@@ -6,18 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import com.commsen.stopwatch.Stopwatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.umich.soar.config.Config;
 import edu.umich.soar.config.ConfigFile;
 import edu.umich.soar.config.ParseError;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Simulation;
+import edu.umich.soar.gridmap2d.core.Simulation;
 
 abstract class GridMapBase implements GridMap, CellObjectObserver {
-	private static Logger logger = Logger.getLogger(GridMapBase.class);
+	private static Log logger = LogFactory.getLog(GridMapBase.class);
 	
 	private GridMapData data;
 	private final String mapPath;
@@ -100,8 +98,7 @@ abstract class GridMapBase implements GridMap, CellObjectObserver {
 		
 		File mapFile = new File(mapPath);
 		if (!mapFile.exists()) {
-			Gridmap2D.control.errorPopUp("Map file doesn't exist: " + mapFile.getAbsolutePath());
-			return false;
+			throw new IllegalStateException("Map file doesn't exist during reload");
 		}
 
 		data.cellObjectManager = new CellObjectManager();
@@ -124,24 +121,19 @@ abstract class GridMapBase implements GridMap, CellObjectObserver {
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
-			Gridmap2D.control.errorPopUp(e.toString());
-			return false;
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
 		} 
 		catch (ParseError e) {
 			e.printStackTrace();
-			Gridmap2D.control.errorPopUp(e.toString());
-			return false;
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
 		}
 		catch (IllegalStateException e) {
 			e.printStackTrace();
-			Gridmap2D.control.errorPopUp(e.toString());
-			return false;
-
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
 		} 
 		catch (IndexOutOfBoundsException e) {
 			e.printStackTrace();
-			Gridmap2D.control.errorPopUp(e.toString());
-			return false;
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
 		}
 	}
 

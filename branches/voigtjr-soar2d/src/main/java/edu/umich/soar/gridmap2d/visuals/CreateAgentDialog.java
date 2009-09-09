@@ -21,10 +21,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.umich.soar.gridmap2d.CognitiveArchitecture;
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
 import edu.umich.soar.gridmap2d.config.PlayerConfig;
+import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Names;
 
 
 

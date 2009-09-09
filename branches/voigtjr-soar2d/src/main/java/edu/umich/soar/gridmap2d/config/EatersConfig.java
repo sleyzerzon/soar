@@ -8,6 +8,7 @@ public class EatersConfig implements GameConfig {
 	public double low_probability = 0.25;
 	public double high_probability = 0.75;
 	
+	@Override
 	public String title() {
 		return "Eaters";
 	}

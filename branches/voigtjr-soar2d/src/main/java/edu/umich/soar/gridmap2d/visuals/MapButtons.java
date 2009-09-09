@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 
-import edu.umich.soar.gridmap2d.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
 
 
 public class MapButtons extends Composite {

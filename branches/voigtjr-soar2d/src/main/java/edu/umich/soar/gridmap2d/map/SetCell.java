@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import edu.umich.soar.gridmap2d.players.Player;
 
 class SetCell implements Cell {
 	private final List<Player> players = new ArrayList<Player>();

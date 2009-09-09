@@ -3,19 +3,20 @@ package edu.umich.soar.gridmap2d.visuals;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.umich.soar.gridmap2d.Gridmap2D;
-import edu.umich.soar.gridmap2d.Names;
+import edu.umich.soar.gridmap2d.core.Gridmap2D;
+import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.map.CellObject;
-import edu.umich.soar.gridmap2d.players.Player;
+import edu.umich.soar.gridmap2d.map.Player;
 
 
 public class EatersVisualWorld extends VisualWorld {
-	//private static Logger logger = Logger.getLogger(EatersVisualWorld.class);
+	//private static Log logger = LogFactory.getLog(EatersVisualWorld.class);
 
 	public EatersVisualWorld(Composite parent, int style, int cellSize) {
 		super(parent, style, cellSize);
