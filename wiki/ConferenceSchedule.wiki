@@ -6,27 +6,17 @@ Year to year, conference submission deadlines remain relatively constant. The
 table below lists typical conference deadlines by month.
 
 || *Month* || *Conferences* ||
-|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], 
-                [http://ijcai-11.iiia.csic.es/ IJCAI],
-                [http://www.cs.mcgill.ca/~icml2009/ ICML], 
-                [http://www.sigevo.org/gecco-2010/ GECCO], 
-                [http://aigicrv.site.uottawa.ca/ CAI] ||
-|| *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci],
-                 [http://sitemaker.umich.edu/icdl2010/home ICDL],
-                 [http://ecai2010.appia.pt/ ECAI],
-                 [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR] ||
+|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.cs.mcgill.ca/~icml2009/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO], [http://aigicrv.site.uottawa.ca/ CAI] ||
+|| *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://ecai2010.appia.pt/ ECAI], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR] ||
 || *March* || [http://www.cs.mcgill.ca/~uai2009/ UAI] ||
-|| *April* || [http://iccm2010.cs.drexel.edu/ ICCM], 
-              [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010],
-              [http://www.ecmlpkdd2009.net/ ECML] ||
+|| *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010], [http://www.ecmlpkdd2009.net/ ECML] ||
 || *May* || [http://www.ecal2009.org/ ECAL] ||
 || *June* || [http://nips.cc/ NIPS] ||
 || *July* || ||
 || *August* || ||
 || *September* || || 
 || *October* || [http://www.cse.yorku.ca/AAMAS2010/ AAMAS] ||
-|| *November* || [http://agi-conf.org/ AGI],
-                 [http://www.flairs.com/ FLAIRS] ||
+|| *November* || [http://agi-conf.org/ AGI], [http://www.flairs.com/ FLAIRS] ||
 || *December* || ||
 
 = Submission Deadlines =
