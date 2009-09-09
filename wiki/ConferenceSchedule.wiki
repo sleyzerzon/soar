@@ -54,23 +54,29 @@ These conferences have yet to announce official deadlines:
   * [http://nips.cc/ NIPS 2009], December 7-12, 2009 in Vancouver, BC
     * Neural Information Processing Systems Conference
     * (EIC 0.98)
+    
   * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010], TBD: June?, 2010 in ?
     * International Conference on Machine Learning
     * (EIC 0.95)
+    
   * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010], TBD: June?, 2010 in ?
     * Conference for Uncertainty in Artificial Intelligence
     * (EIC 0.91)
+    
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010], July 7-11, 2010 in Portland, OR
     * Genetic and Evolutionary Computation Conference
     * (EIC 0.85)
+    
   * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010], July 11-15, 2010 in Atlanta, GA
     * Conference of the Association for the Advancement of Artificial Intelligence
     * (EIC 0.99)
+    
   * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010], August 11-14, 2010 in Portland, OR
     * Also known as CSSAC
     * The Annual Conference of the Cognitive Science Society
     * 2011: Boston, MA on July 20-23
     * (EIC 0.92)
+    
   * [http://ijcai-11.iiia.csic.es/ IJCAI 2011], July 16-22, 2011 in Barcelona, Spain
     * International Joint Conferences on Artifical Intelligence
     * (EIC 0.96)
@@ -83,41 +89,52 @@ These conferences have yet to announce official deadlines:
   * [http://www.ecmlpkdd2009.net/ ECML 2009], September 7-11, 2009 in Bled, Slovenia
     * European Conference on Machine Learning
     * (EIC 0.76)
+    
   * [http://www.ecal2009.org/ ECAL 2009], September 13-16, 2009 in Budapest, Hungary  
     * European Conference on Artificial Life
     * (EIC 0.53)
+    
   * [http://www.icaart.org/ ICAART 2010], January 22-24, 2010 in Valencia, Spain
     * International Conference on Agents and Artificial Intelligence
+    
   * [http://agi-conf.org/ AGI 2010], TBD: March 5-8, 2010 in Lugano, Switzerland
     * Artificial General Intelligence
     * 2011: San Francisco Bay area
+    
   * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010], May 10-14, 2010 in Toronto, Canada
     * International Conference on Autonomous Agents and Multiagent Systems
     * (EIC 0.76)
+    
   * [http://cbrtrack-flairs-23.info/ FLAIRS 2010], May 19-21, 2010 in Daytona Beach, FL
     * Florida Artificial Intelligence Research Society Conference
+    
   * [http://aigicrv.site.uottawa.ca/ CAI 2010], May 31 - June 2, 2010 in Ottowa, Canada
     * Canadian Artifical Intelligence Conference
     * (EIC 0.60)
+    
   * [http://www.wcci2010.org/index.php WCCI 2010], July 18-23, 2010 in Barcelona, Spain
     * IEEE World Congress on Computational Intelligence
+    
   * [http://ecai2010.appia.pt/ ECAI 2010], August 16-20, 2010 in Lisbon, Portugal
     * European Conference on Artificial Intelligence
     * (EIC 0.76)
+    
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010], August 18-21, 2010 in Ann Arbor, MI
     * International Conference on Development and Learning
   
 === Specialties ===
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
     * Artificial Intelligence and Interactive Digital Entertainment Conference
+    
   * [http://www.kr.org/KR2010/ KR&R 2010], May 9-13, 2010 in Toronto, CA
     * International Conference on the Principles of Knowledge Representation and Reasoning
+    
   * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010], July 19-22, 2010 in Alessandria, Italy
     * International Conference on Case-Based Reasoning
  
 = Workshop and Symposium Information =
 
-One-teim workshops / symposia:
+One-time workshops / symposia:
   * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artificial Agents]
 
 Recurring workshops / symposia:
