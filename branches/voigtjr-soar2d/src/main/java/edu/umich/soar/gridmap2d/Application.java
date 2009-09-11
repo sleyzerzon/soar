@@ -5,6 +5,8 @@ import java.awt.GraphicsEnvironment;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -21,6 +23,9 @@ import org.flexdock.view.Viewport;
 
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.core.Simulation;
+import edu.umich.soar.gridmap2d.core.StopEvent;
+import edu.umich.soar.gridmap2d.events.SimEvent;
+import edu.umich.soar.gridmap2d.events.SimEventListener;
 
 public class Application extends JPanel implements Adaptable {
 	private static final long serialVersionUID = 4313201967156814057L;
@@ -31,10 +36,29 @@ public class Application extends JPanel implements Adaptable {
 		try {
 			final SimConfig config = SimConfig.getInstance(args[0]);
 			final Simulation sim = new Simulation();
+			final BlockingQueue<Boolean> doneQueue = new SynchronousQueue<Boolean>();
 			
 			if (GraphicsEnvironment.isHeadless() || config.generalConfig().headless) {
 				sim.initialize(config);
 				sim.run();
+				sim.getEvents().addListener(StopEvent.class, new SimEventListener() {
+					@Override
+					public void onEvent(SimEvent event) {
+						try {
+							doneQueue.put(Boolean.TRUE);
+						} catch (InterruptedException e) {
+							// TODO handle correctly
+							e.printStackTrace();
+						}
+					}
+				});
+				
+				try {
+					doneQueue.take();
+				} catch (InterruptedException e) {
+					// TODO handle correctly
+					e.printStackTrace();
+				}
 				sim.shutdown();
 			} else {
 				try {

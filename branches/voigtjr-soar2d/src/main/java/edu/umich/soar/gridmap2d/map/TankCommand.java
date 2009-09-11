@@ -174,11 +174,15 @@ public class TankCommand {
 		}
 		Commands.memberAppend(sb, isRotate(), Names.kRotateID, getRotateDirection());
 		Commands.memberAppend(sb, isFire(), Names.kFireID);
-		Commands.memberAppend(sb, isRadarSwitch(), Names.kRadarID, getRadarSwitch() ? "on" : "off");
+		if (isRadarSwitch()) {
+			Commands.memberAppend(sb, isRadarSwitch(), Names.kRadarID, getRadarSwitch() ? "on" : "off");
+		}
 		if (isRadarPower()) {
 			Commands.memberAppend(sb, isRadarPower(), Names.kRadarPowerID, Integer.toString(getRadarPower()));
 		}
-		Commands.memberAppend(sb, isShields(), Names.kShieldsID, getShields() ? "on" : "off");
+		if (isShields()) {
+			Commands.memberAppend(sb, isShields(), Names.kShieldsID, getShields() ? "on" : "off");
+		}
 		Commands.memberAppend(sb, isStopSim(), Names.kStopSimID);
 		return sb.toString();
 	}
