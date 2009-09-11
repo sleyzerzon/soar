@@ -35,8 +35,4 @@ public class ScriptedEater implements EaterCommander {
 	@Override
 	public void shutdown() {
 	}
-
-	@Override
-	public void update(EatersMap eatersMap) {
-	}
 }

@@ -38,7 +38,9 @@ public class TankState {
 	private int maxMissiles;
 	private int maxEnergy;
 	private int maxHealth;
-	
+	private Direction initialFacing;	
+	private Direction facing;	// what direction I'm currently facing
+
 	TankState(Simulation sim, String name, Tank.Builder builder) {
 		
 		this.name = name;
@@ -63,6 +65,24 @@ public class TankState {
 		}
 		health = builder.health;
 		initialHealth = builder.health;
+		
+		initialFacing = builder.facing;
+		if (initialFacing != null) {
+			setFacing(initialFacing);
+		} else {
+			setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
+		}
+	}
+	
+	void update(TankSoarMap tankSoarMap, int[] location) {
+		if (getRadarSwitch()) {
+			setObservedPower(tankSoarMap.getRadar(getRadar(), location, getFacing(), getRadarPower()));
+		} else {
+			clearRadar();
+			setObservedPower(0);
+		}
+		
+		setBlocked(tankSoarMap.getBlocked(location));
 	}
 	
 	public void resetSensors() {
@@ -74,6 +94,7 @@ public class TankState {
 		sound = Direction.NONE;
 		onHealthCharger = false;
 		onEnergyCharger = false;
+		
 	}
 
 	public int getEnergy() {
@@ -313,6 +334,14 @@ public class TankState {
 		this.onEnergyCharger = onEnergyCharger;
 	}
 
+	public Direction getFacing() {
+		return facing;
+	}
+	
+	public void setFacing(Direction facing) {
+		this.facing = facing;
+	}
+
 	public void reset(int worldCount) {
 		if (initialMissiles > 0) {
 			missiles = initialMissiles;
@@ -336,6 +365,11 @@ public class TankState {
 		resurrectFrame = worldCount;
 		clearRadar();
 		resetSensors();
+		if (initialFacing != null) {
+			setFacing(initialFacing);
+		} else {
+			setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
+		}
 	}
 
 	public void fragged(int worldCount) {
@@ -345,6 +379,7 @@ public class TankState {
 		resurrectFrame = worldCount;
 		clearRadar();
 		resetSensors();
+		setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
 	}
 }
 

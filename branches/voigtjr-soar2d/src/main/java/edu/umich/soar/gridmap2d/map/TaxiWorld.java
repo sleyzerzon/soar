@@ -70,12 +70,12 @@ public class TaxiWorld implements World {
 			taxi.reset();
 		}
 		
-		updatePlayers();
+		setLocations();
 	}
 
-	private void updatePlayers() {
+	private void setLocations() {
 		for (Taxi taxi : players.getAll()) {
-			taxi.update(players.getLocation(taxi), map);
+			taxi.setLocation(players.getLocation(taxi));
 		}
 	}
 
@@ -157,7 +157,7 @@ public class TaxiWorld implements World {
 		if (sim.isShuttingDown()) {
 			return;
 		}
-		updatePlayers();
+		setLocations();
 		
 		checkFuelRemaining();
 		checkPassengerDelivered();
@@ -208,14 +208,14 @@ public class TaxiWorld implements World {
 	}
 	
 	@Override
-	public boolean addPlayer(String id, PlayerConfig cfg) {
+	public boolean addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("Taxi", "There are no suitable starting locations.");
 			return false;
 		}
 
-		Taxi player = new Taxi(sim, id, fuelStartMin, fuelStartMax, refuel, disableFuel);
+		Taxi player = new Taxi(sim, cfg.name, cfg.color, fuelStartMin, fuelStartMax, refuel, disableFuel);
 		players.add(player, cfg.pos);
 		
 		if (cfg.productions != null) {
@@ -234,7 +234,7 @@ public class TaxiWorld implements World {
 		
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
-		updatePlayers();
+		setLocations();
 		return true;
 	}
 
@@ -270,6 +270,6 @@ public class TaxiWorld implements World {
 		map.getCell(players.getLocation(taxi)).clearPlayers();
 		players.remove(taxi);
 		taxi.shutdownCommander();
-		updatePlayers();
+		setLocations();
 	}
 }

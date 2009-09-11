@@ -1,13 +1,31 @@
 package edu.umich.soar.gridmap2d.map;
 
 
+import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.gridmap2d.core.Simulation;
 
 public class Eater extends Player {	
 	private EaterCommander commander;
+	private Direction initialFacing;	
+	private Direction facing;	// what direction I'm currently facing
 
-	public Eater(Simulation sim, String playerId) {
-		super(sim, playerId);
+	public Eater(Simulation sim, String name, PlayerColor color, String initialFacing) {
+		super(sim, name, color);
+		if (initialFacing != null) {
+			this.initialFacing = Direction.parse(initialFacing);
+			setFacing(this.initialFacing);
+		} else {
+			setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
+		}
+	}
+	
+	public Direction getFacing() {
+		return facing;
+	}
+	
+	public void setFacing(Direction facing) {
+		this.facing = facing;
 	}
 	
 	public void setCommander(EaterCommander commander) {
@@ -21,23 +39,22 @@ public class Eater extends Player {
 		
 		// the facing depends on the move
 		if (command.isMove()) { 
-			super.setFacing(command.getMoveDirection());
+			setFacing(command.getMoveDirection());
 		}
 
 		return command;
 	}
 	
-	public void update(int[] newLocation, EatersMap eatersMap) {
-		super.update(newLocation);
-		
-		if (commander != null) {
-			commander.update(eatersMap);
-		}
-	}
-
 	@Override
 	public void reset() {
 		super.reset();
+
+		if (initialFacing != null) {
+			setFacing(initialFacing);
+		} else {
+			setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
+		}
+
 		if (commander != null) {
 			commander.reset();
 		}

@@ -82,7 +82,7 @@ public class EatersWorld implements World {
 			eater.reset();
 		}
 		
-		updatePlayers();
+		setLocations();
 	}
 
 	private void checkPointsRemaining() {
@@ -135,7 +135,7 @@ public class EatersWorld implements World {
 		updateMapAndEatFood();
 		
 		handleEatersCollisions(findCollisions(players));	
-		updatePlayers();
+		setLocations();
 		map.updateObjects();
 
 		checkPointsRemaining();
@@ -154,9 +154,9 @@ public class EatersWorld implements World {
 		}
 	}
 	
-	private void updatePlayers() {
+	private void setLocations() {
 		for (Eater eater : players.getAll()) {
-			eater.update(players.getLocation(eater), map);
+			eater.setLocation(players.getLocation(eater));
 		}
 	}
 
@@ -424,7 +424,7 @@ public class EatersWorld implements World {
 		map.getCell(players.getLocation(eater)).clearPlayers();
 		players.remove(eater);
 		eater.shutdownCommander();
-		updatePlayers();
+		setLocations();
 	}
 	
 	@Override
@@ -444,7 +444,7 @@ public class EatersWorld implements World {
 	}
 	
 	@Override
-	public boolean addPlayer(String id, PlayerConfig cfg) {
+	public boolean addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("There are no suitable starting locations.");
@@ -460,8 +460,9 @@ public class EatersWorld implements World {
 				return false;
 			}
 		}
+
 		
-		Eater player = new Eater(sim, id);  
+		Eater player = new Eater(sim, cfg.name, cfg.color, cfg.facing);
 		players.add(player, cfg.pos);
 		
 		if (cfg.productions != null) {
@@ -488,7 +489,7 @@ public class EatersWorld implements World {
 		
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
-		updatePlayers();
+		setLocations();
 		return true;
 	}
 

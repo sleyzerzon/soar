@@ -5,7 +5,6 @@ import java.util.List;
 import edu.umich.soar.robot.ReceiveMessagesInterface;
 
 public interface RobotCommander extends Commander {
-	public void update(RoomMap roomMap);
 	public List<double[]> getWaypointList();
 	public ReceiveMessagesInterface getReceiveMessagesInterface();
 	public RobotCommand nextCommand();

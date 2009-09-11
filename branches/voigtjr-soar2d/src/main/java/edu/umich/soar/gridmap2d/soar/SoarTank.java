@@ -18,7 +18,6 @@ import edu.umich.soar.gridmap2d.map.RadarCell;
 import edu.umich.soar.gridmap2d.map.Tank;
 import edu.umich.soar.gridmap2d.map.TankCommand;
 import edu.umich.soar.gridmap2d.map.TankCommander;
-import edu.umich.soar.gridmap2d.map.TankSoarMap;
 import edu.umich.soar.gridmap2d.map.TankState;
 
 import sml.Agent;
@@ -57,10 +56,9 @@ public class SoarTank implements TankCommander {
 		}
 	}
 	
-	@Override
-	public void commit() {
+	void update() {
 		TankState state = player.getState();
-		Direction facing = player.getFacing();
+		Direction facing = state.getFacing();
 		String facingString = facing.id();
 
 		String shieldStatus = state.getShieldsUp() ? Names.kOn : Names.kOff;
@@ -393,6 +391,8 @@ public class SoarTank implements TankCommander {
 			sim.error("Soar Tank", Names.Errors.commitFail + player.getName());
 			sim.stop();
 		}
+		
+		player.resetPointsChanged();
 	}
 
 	@Override
@@ -419,13 +419,13 @@ public class SoarTank implements TankCommander {
 				}
 
 				if (moveDirection.equalsIgnoreCase(Names.kForwardID)) {
-					builder.move(player.getFacing());
+					builder.move(player.getState().getFacing());
 				} else if (moveDirection.equalsIgnoreCase(Names.kBackwardID)) {
-					builder.move(player.getFacing().backward());
+					builder.move(player.getState().getFacing().backward());
 				} else if (moveDirection.equalsIgnoreCase(Names.kLeftID)) {
-					builder.move(player.getFacing().left());
+					builder.move(player.getState().getFacing().left());
 				} else if (moveDirection.equalsIgnoreCase(Names.kRightID)) {
-					builder.move(player.getFacing().right());
+					builder.move(player.getState().getFacing().right());
 				} else if (moveDirection.equalsIgnoreCase(Names.kNone)) {
 					// legal wait
 					commandId.AddStatusComplete();
@@ -511,11 +511,6 @@ public class SoarTank implements TankCommander {
 		}
 
 		return move;
-	}
-
-	@Override
-	public void update(TankSoarMap tankSoarMap) {
-		// update happens in "commit", after all tanks' states have been updated.
 	}
 
 	@Override

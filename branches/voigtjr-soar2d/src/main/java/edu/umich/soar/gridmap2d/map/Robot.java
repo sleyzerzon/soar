@@ -2,6 +2,7 @@ package edu.umich.soar.gridmap2d.map;
 
 import java.util.List;
 
+import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.robot.ReceiveMessagesInterface;
 
@@ -9,8 +10,8 @@ public class Robot extends Player {
 	private RobotCommander commander;
 	private RobotState state;
 	
-	public Robot(Simulation sim, String playerID) {
-		super(sim, playerID);
+	public Robot(Simulation sim, String name, PlayerColor color) {
+		super(sim, name, color);
 		
 		state = new RobotState();
 		state.reset();
@@ -35,14 +36,6 @@ public class Robot extends Player {
 //		}
 		
 		return command;
-	}
-	
-	public void update(int[] newLocation, RoomMap roomMap) {
-		super.update(newLocation);
-		moved = true;
-		if (commander != null) {
-			commander.update(roomMap);
-		}
 	}
 	
 	@Override

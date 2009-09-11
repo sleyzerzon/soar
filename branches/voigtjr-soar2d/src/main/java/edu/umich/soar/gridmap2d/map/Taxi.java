@@ -3,6 +3,7 @@ package edu.umich.soar.gridmap2d.map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.gridmap2d.core.Simulation;
 
 public class Taxi extends Player {	
@@ -16,8 +17,8 @@ public class Taxi extends Player {
 	private int refuel;
 	private boolean disableFuel;
 
-	public Taxi(Simulation sim, String playerId, int fuelStartMin, int fuelStartMax, int refuel, boolean disableFuel) {
-		super(sim, playerId);
+	public Taxi(Simulation sim, String name, PlayerColor color, int fuelStartMin, int fuelStartMax, int refuel, boolean disableFuel) {
+		super(sim, name, color);
 		
 		this.fuelStartMin = fuelStartMin;
 		this.fuelStartMax = fuelStartMax;
@@ -32,21 +33,7 @@ public class Taxi extends Player {
 	}
 	
 	public TaxiCommand getCommand() {
-		TaxiCommand command;
-//		if (commander != null) {
-			command = commander.nextCommand();
-//		} else {
-//			command = Gridmap2D.control.getHumanCommand(this);
-//		}
-		
-		return command;
-	}
-	
-	public void update(int[] newLocation, TaxiMap taxiMap) {
-		super.update(newLocation);
-		if (commander != null) {
-			commander.update(taxiMap);
-		}
+		return commander.nextCommand();
 	}
 	
 	@Override

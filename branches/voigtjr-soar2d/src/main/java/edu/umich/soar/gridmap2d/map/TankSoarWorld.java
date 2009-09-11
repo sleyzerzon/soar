@@ -142,15 +142,13 @@ public class TankSoarWorld implements World {
 				}
 			}
 				
-			tank.update(players.getLocation(tank), map);
+			tank.setLocation(players.getLocation(tank));
 		}
 		
-		for (Tank tank : players.getAll()) {
-			tank.commit(players.getLocation(tank));
-		}
-		for (Tank tank : players.getAll()) {
-			tank.resetPointsChanged();
-		}
+		// FIXME remove
+		//for (Tank tank : players.getAll()) {
+		//	tank.commit(players.getLocation(tank));
+		//}
 	}
 
 	public void setExplosion(int [] xy) {
@@ -219,7 +217,7 @@ public class TankSoarWorld implements World {
 			// Check for rotate
 			if (playerMove.isRotate()) {
 				map.getCell(oldLocation).setModified(true);
-				Direction facing = tank.getFacing();
+				Direction facing = state.getFacing();
 				if (playerMove.getRotateDirection().equals(Names.kRotateLeft)) {
 					facing = facing.left();
 				} else if (playerMove.getRotateDirection().equals(Names.kRotateRight)) {
@@ -227,7 +225,7 @@ public class TankSoarWorld implements World {
 				} else {
 					logger.warn(tank + ": unknown rotation command: " + playerMove.getRotateDirection());
 				}
-				tank.setFacing(facing);
+				state.setFacing(facing);
 			}
 			
 			// Check shields
@@ -493,7 +491,7 @@ public class TankSoarWorld implements World {
 		for (Tank tank : firedTanks) {
 			int [] missileLoc = Arrays.copyOf(players.getLocation(tank), players.getLocation(tank).length);
 			
-			Direction direction = tank.getFacing();
+			Direction direction = tank.getState().getFacing();
 			Direction.translate(missileLoc, direction);
 			
 			if (!map.isInBounds(missileLoc)) {
@@ -599,7 +597,7 @@ public class TankSoarWorld implements World {
 	
 	private void printSpawnMessage(Tank tank, int [] location) {
 		logger.info(tank.getName() + ": Spawning at (" + 
-				location[0] + "," + location[1] + "), facing " + tank.getFacing().id());
+				location[0] + "," + location[1] + "), facing " + tank.getState().getFacing().id());
 	}
 	
 	private boolean apply(CellObject object, Tank tank) {
@@ -802,15 +800,20 @@ public class TankSoarWorld implements World {
 	}
 	
 	@Override
-	public boolean addPlayer(String id, PlayerConfig cfg) {
+	public boolean addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("TankSoar", "There are no suitable starting locations.");
 			return false;
 		}
 
-		Tank.Builder builder = new Tank.Builder(id, sim);
-		Tank player = builder.missiles(cfg.missiles).energy(cfg.energy).health(cfg.health).build();
+		Tank.Builder builder = new Tank.Builder(sim, cfg.name, cfg.color);
+		builder.missiles(cfg.missiles).energy(cfg.energy).health(cfg.health);
+		if (cfg.facing != null) {
+			builder.facing(Direction.parse(cfg.facing));
+		}
+		Tank player = builder.build();
+		
 		players.add(player, cfg.pos);
 		
 		if (cfg.productions != null) {

@@ -1,22 +1,26 @@
 package edu.umich.soar.gridmap2d.map;
 
 import edu.umich.soar.gridmap2d.core.Direction;
+import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.gridmap2d.core.Simulation;
 
 public class Tank extends Player {
 	public static class Builder {
 		// Required parameters
-		private final String id;
 		private final Simulation sim;
+		private final String name;
+		private final PlayerColor color;
 		
 		// Optional parameters
 		Integer missiles;
 		Integer energy;
 		Integer health;
+		Direction facing;
 		
-		public Builder(String id, Simulation sim) {
-			this.id = id;
+		public Builder(Simulation sim, String name, PlayerColor color) {
 			this.sim = sim;
+			this.name = name;
+			this.color = color;
 		}
 		
 		public Builder missiles(int missiles) {
@@ -34,6 +38,11 @@ public class Tank extends Player {
 			return this;
 		}
 		
+		public Builder facing(Direction facing) {
+			this.facing = facing;
+			return this;
+		}
+		
 		public Tank build() {
 			return new Tank(sim, this);
 		}
@@ -42,9 +51,9 @@ public class Tank extends Player {
 	private TankCommander commander;
 	private final TankState state;
 	private final Simulation sim;
-	
 	private Tank(Simulation sim, Builder builder) {
-		super(sim, builder.id);
+	
+		super(sim, builder.name, builder.color);
 		this.sim = sim;
 
 		this.state = new TankState(sim, getName(), builder);
@@ -85,26 +94,8 @@ public class Tank extends Player {
 		return state;
 	}
 
-	public void update(int [] newLocation, TankSoarMap tankSoarMap) {
-		super.update(newLocation);
-		
-		if (state.getRadarSwitch()) {
-			state.setObservedPower(tankSoarMap.getRadar(state.getRadar(), newLocation, getFacing(), state.getRadarPower()));
-		} else {
-			state.clearRadar();
-			state.setObservedPower(0);
-		}
-		
-		state.setBlocked(tankSoarMap.getBlocked(newLocation));
-		
-		if (commander != null) {
-			commander.update(tankSoarMap);
-		}
-}
-	
 	public void fragged() {
 		state.fragged(sim.getWorldCount());
-		setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
 		if (commander != null) {
 			commander.fragged();
 		}
@@ -113,12 +104,6 @@ public class Tank extends Player {
 	public void playersChanged(Player[] players) {
 		if (commander != null) {
 			commander.playersChanged(players);
-		}
-	}
-
-	public void commit(int[] location) {
-		if (commander != null) {
-			commander.commit();
 		}
 	}
 

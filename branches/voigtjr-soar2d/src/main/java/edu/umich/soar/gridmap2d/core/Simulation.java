@@ -3,8 +3,6 @@ package edu.umich.soar.gridmap2d.core;
 import java.io.File;
 import java.util.Random;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +15,7 @@ import edu.umich.soar.gridmap2d.config.PlayerConfig;
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.events.SimEventManager;
 import edu.umich.soar.gridmap2d.map.EatersWorld;
+import edu.umich.soar.gridmap2d.map.GridMap;
 import edu.umich.soar.gridmap2d.map.Player;
 import edu.umich.soar.gridmap2d.map.RoomWorld;
 import edu.umich.soar.gridmap2d.map.TankSoarWorld;
@@ -125,7 +124,7 @@ public class Simulation {
 			return;
 		}
 
-		if (!world.addPlayer(playerId, playerConfig)) {
+		if (!world.addPlayer(playerConfig)) {
 			playerConfig.color.free();
 			return;
 		}
@@ -195,10 +194,10 @@ public class Simulation {
 		world.interrupted(agentName);
 	}
 
-	public String getCurrentMapName() {
-		return world.getMap().getCurrentMapName();
+	public GridMap getMap() {
+		return world.getMap();
 	}
-
+	
 	private static final ScheduledExecutorService exec = Executors
 			.newSingleThreadScheduledExecutor();
 	private AtomicBoolean running = new AtomicBoolean(false);

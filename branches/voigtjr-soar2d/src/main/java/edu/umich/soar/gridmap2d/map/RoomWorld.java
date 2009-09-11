@@ -44,14 +44,14 @@ public class RoomWorld implements World, SendMessagesInterface {
 	}
 	
 	@Override
-	public boolean addPlayer(String id, PlayerConfig cfg) {
+	public boolean addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("Room Environment", "There are no suitable starting locations.");
 			return false;
 		}
 
-		Robot player = new Robot(sim, id);
+		Robot player = new Robot(sim, cfg.name, cfg.color);
 		players.add(player, cfg.pos);
 		
 		if (cfg.productions != null) {
@@ -76,7 +76,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + "), (" + floatLocation[0] + "," + floatLocation[1] + ")");
 		
-		updatePlayers();
+		setLocations();
 		return true;
 	}
 
@@ -112,7 +112,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 		map.getCell(players.getLocation(player)).removePlayer(player);
 		players.remove(player);
 		player.shutdownCommander();
-		updatePlayers();
+		setLocations();
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 			logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + "), (" + floatLocation[0] + "," + floatLocation[1] + ")");
 		}
 		
-		updatePlayers();
+		setLocations();
 	}
 	
 	private double [] defaultFloatLocation(int [] location) {
@@ -206,7 +206,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 		Stopwatch.stop(id2);
 		
 		long id3 = Stopwatch.start("update", "update");
-		updatePlayers();
+		setLocations();
 		Stopwatch.stop(id3);
 	}
 
@@ -259,9 +259,11 @@ public class RoomWorld implements World, SendMessagesInterface {
 		}
 	}
 
-	private void updatePlayers() {
+	private void setLocations() {
 		for (Robot player : players.getAll()) {
-			player.update(players.getLocation(player), map);
+			player.setLocation(players.getLocation(player));
+			// FIXME: hackish
+			player.moved = true;
 		}
 	}
 

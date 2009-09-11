@@ -90,15 +90,14 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		}
 	}
 
-	@Override
-	public void update(RoomMap roomMap) {
+	void update() {
 
 		long id1 = Stopwatch.start("soar update", "output");
 		ddc = output.update();
 		Stopwatch.stop(id1);
 
 		long id2 = Stopwatch.start("soar update", "input");
-		input.update(player, world, roomMap, this.isFloatYawWmes());	
+		input.update(player, world, (RoomMap)sim.getMap(), this.isFloatYawWmes());	
 		Stopwatch.stop(id2);
 		
 		long id3 = Stopwatch.start("soar update", "commit");

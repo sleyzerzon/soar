@@ -39,9 +39,8 @@ public class SoarTaxi implements TaxiCommander {
 		}
 	}
 
-	@Override
-	public void update(TaxiMap taxiMap) {
-		input.update(player.getMoved(), player.getLocation(), taxiMap, player.getPointsDelta(), player.getFuel());
+	void update() {
+		input.update(player.getMoved(), player.getLocation(), (TaxiMap)sim.getMap(), player.getPointsDelta(), player.getFuel());
 		
 		if (!agent.Commit()) {
 			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());

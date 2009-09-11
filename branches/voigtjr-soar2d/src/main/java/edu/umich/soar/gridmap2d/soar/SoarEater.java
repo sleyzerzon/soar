@@ -41,9 +41,8 @@ public final class SoarEater implements EaterCommander {
 		}
 	}
 	
-	@Override
-	public void update(EatersMap eatersMap) {
-		input.update(player.getMoved(), player.getLocation(), eatersMap, player.getPoints());
+	void update() {
+		input.update(player.getMoved(), player.getLocation(), (EatersMap)sim.getMap(), player.getPoints());
 		
 		// commit everything
 //		if (!agent.Commit()) {

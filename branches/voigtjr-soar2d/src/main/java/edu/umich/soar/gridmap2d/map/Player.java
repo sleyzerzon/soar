@@ -5,8 +5,6 @@ import java.util.Arrays;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.umich.soar.gridmap2d.config.PlayerConfig;
-import edu.umich.soar.gridmap2d.core.Direction;
 import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.gridmap2d.core.Simulation;
 
@@ -14,44 +12,43 @@ import edu.umich.soar.gridmap2d.core.Simulation;
 public class Player {
 	private static Log logger = LogFactory.getLog(Player.class);
 	
-	private String playerID;
-	private PlayerConfig playerConfig;
 	private final String name;	// player name
+	private Integer initialPoints;
 	private int points;	// current point count
 	private boolean pointsChanged;
 	private int pointsDelta;
-	private Direction facing;	// what direction I'm currently facing
 	private PlayerColor color;	// valid color string
 	private int[] location;
 	protected boolean moved;
 	private boolean fragged;
 
-	public Player(Simulation sim, String playerID) {
-		this.playerID = playerID;
-		this.playerConfig = sim.getConfig().playerConfigs().get(playerID);
-		if (!playerConfig.hasPoints()) {
-			this.playerConfig.points = sim.getConfig().generalConfig().default_points;
+	public Player(Simulation sim, String name, PlayerColor color) {
+		if (name == null) {
+			throw new NullPointerException("name is null");
 		}
+		this.name = name;
 		
-		assert playerConfig.name != null;
-		this.name = playerConfig.name;
+		if (color == null) {
+			throw new NullPointerException("color is null");
+		}
+		this.color = color;
 		
-		assert playerConfig.color != null;
-		this.color = playerConfig.color;
-
 		this.reset();
+	}
+	
+	public void setInitialPoints(Integer initialPoints) {
+		this.initialPoints = initialPoints;
+		defaultPoints();
+	}
+	
+	private void defaultPoints() {
+		points = initialPoints == null ? 0 : initialPoints;
 	}
 	
 	public void reset() {
 		location = new int[] { -1, -1 };
 		
-		if (playerConfig.facing != null) {
-			this.setFacing(Direction.parse(playerConfig.facing));
-		} else {
-			this.setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
-		}
-		
-		this.points = playerConfig.points;
+		defaultPoints();
 
 		pointsChanged = true;
 		pointsDelta = 0;
@@ -60,14 +57,6 @@ public class Player {
 
 	public String getName() {
 		return this.name;
-	}
-	
-	public Direction getFacing() {
-		return facing;
-	}
-	
-	public void setFacing(Direction facing) {
-		this.facing = facing;
 	}
 	
 	public boolean pointsChanged() {
@@ -79,6 +68,7 @@ public class Player {
 	}
 	
 	public void resetPointsChanged() {
+		// this state needs to be saved by soar side
 		pointsChanged = false;
 		pointsDelta = 0;
 	}
@@ -117,9 +107,7 @@ public class Player {
 	}
 
 	public void setColor(PlayerColor color) {
-		PlayerColor previous = this.color;
 		this.color = color;
-		logger.warn(this.name + " (" + previous + ") color changed to: " + this.color.toString().toLowerCase());
 	}
 	
 	@Override
@@ -146,12 +134,8 @@ public class Player {
 		return getName();
 	}
 
-	public String getID() {
-		return playerID;
-	}
-
-	protected void update(int[] newLocation) {
-		moved = (newLocation[0] != this.location[0]) || (newLocation[1] != this.location[1]);
+	void setLocation(int[] newLocation) {
+		moved = !Arrays.equals(newLocation, this.location);
 		if (moved) {
 			this.location = Arrays.copyOf(newLocation, newLocation.length);
 		}
