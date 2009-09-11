@@ -27,7 +27,9 @@ Rosenbloom, P.S. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/p
 
 Wintermute, S. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AGI09%20simulation.pdf Integrating Reasoning and Action through Simulation.]_ In Proceedings of the Second Conference on Artificial General Intelligence (AGI-09). Arlington, VA.
 
-Wintermute, S. 2009. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/SVS-TR.pdf An Overview of Spatial Processing in Soar/SVS]_ (Report No. CCA-TR-2009-01). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.
+Wintermute, S. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/SVS-TR.pdf An Overview of Spatial Processing in Soar/SVS]_ (Report No. CCA-TR-2009-01). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.
+
+Wintermute, S. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAIFS09-ProblemRepresentation.pdf Representing Problems (and Plans) Using Imagery]_ In Papers from the 2009 AAAI Fall Symposium Series: Multi-Representational Architectures for Human-Level Intelligence, Arlington, VA, November 2009. AAAI Press.
 
 Wintermute, S., and Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CogSci09%20imperfect%20representation.pdf Imagery as Compensation for an Imperfect Abstract Problem Representation.]_ In Proceedings of The 31st Annual Conference of the Cognitive Science Society (!CogSci-09)
 
