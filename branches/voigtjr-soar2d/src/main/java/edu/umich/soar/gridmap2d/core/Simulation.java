@@ -3,8 +3,8 @@ package edu.umich.soar.gridmap2d.core;
 import java.io.File;
 import java.util.Random;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -174,6 +174,14 @@ public class Simulation {
 	}
 
 	public void shutdown() {
+		exec.shutdown();
+		try {
+			exec.awaitTermination(5, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		for (Player player : world.getPlayers()) {
 			destroyPlayer(player);
 		}
@@ -198,15 +206,15 @@ public class Simulation {
 		return world.getMap();
 	}
 	
-	private static final ScheduledExecutorService exec = Executors
-			.newSingleThreadScheduledExecutor();
+	private static final ExecutorService exec = Executors
+		.newSingleThreadExecutor();
 	private AtomicBoolean running = new AtomicBoolean(false);
 	private AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private SimEventManager eventManager = new SimEventManager();
 	
 	public void run() {
 		if (!running.getAndSet(true)) {
-			exec.scheduleAtFixedRate(new Runnable() {
+			exec.submit(new Runnable() {
 				@Override
 				public void run() {
 					// TODO: thread interruption
@@ -224,7 +232,7 @@ public class Simulation {
 					eventManager.fireEvent(new StopEvent());
 					running.set(false);
 				}
-			}, 0, 1, TimeUnit.SECONDS);
+			});
 		} else {
 			logger.trace("run called while running");
 		}

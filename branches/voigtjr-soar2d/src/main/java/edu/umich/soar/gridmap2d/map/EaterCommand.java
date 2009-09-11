@@ -104,7 +104,9 @@ public class EaterCommand {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		Commands.memberAppend(sb, isJump(), Names.kJumpID);
-		Commands.memberAppend(sb, isMove(), Names.kMoveID, getMoveDirection().id());
+		if (isMove()) {
+			Commands.memberAppend(sb, isMove(), Names.kMoveID, getMoveDirection().id());
+		}
 		Commands.memberAppend(sb, isDontEat(), Names.kDontEatID);
 		Commands.memberAppend(sb, isOpen(), Names.kOpenID);
 		Commands.memberAppend(sb, isStopSim(), Names.kStopSimID);

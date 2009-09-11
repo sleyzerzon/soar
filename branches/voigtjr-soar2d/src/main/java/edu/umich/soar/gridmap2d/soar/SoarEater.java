@@ -14,7 +14,7 @@ import edu.umich.soar.gridmap2d.map.EatersMap;
 import sml.Agent;
 import sml.Identifier;
 
-public final class SoarEater implements EaterCommander {
+public final class SoarEater implements EaterCommander, SoarAgent {
 	private static Log logger = LogFactory.getLog(SoarEater.class);
 
 	private Eater player;
@@ -24,6 +24,7 @@ public final class SoarEater implements EaterCommander {
 	private String[] shutdownCommands;
 	boolean fragged = false;
 	private final Simulation sim;
+	private EaterCommand command;
 	
 	public SoarEater(Simulation sim, Eater player, Agent agent, int vision, String[] shutdownCommands) {
 		this.sim = sim;
@@ -35,28 +36,55 @@ public final class SoarEater implements EaterCommander {
 		
 		input = new SoarEaterIL(agent, vision);
 		input.create(player.getName(), player.getPoints());
-		
-		if (!agent.Commit()) {
-			sim.error("Soar Eater", Names.Errors.commitFail + player.getName());
-		}
-	}
-	
-	void update() {
-		input.update(player.getMoved(), player.getLocation(), (EatersMap)sim.getMap(), player.getPoints());
-		
-		// commit everything
-//		if (!agent.Commit()) {
-//			sim.error("Soar Eater", Names.Errors.commitFail + player.getName());
-//			sim.stop();
-//		}
 	}
 	
 	@Override
 	public EaterCommand nextCommand() {
+		EaterCommand temp = command;
+		command = null;
+		return temp;
+	}
+	
+	@Override
+	public void reset() {
+		if (agent == null) {
+			return;
+		}
+		command = null;
+		input.destroy();
+		agent.InitSoar();
+		input.create(player.getName(), player.getPoints());
+	}
+
+	@Override
+	public void shutdown() {
+		assert agent != null;
+		if (shutdownCommands != null) { 
+			// execute the pre-shutdown commands
+			for (String command : shutdownCommands) {
+				String result = player.getName() + ": result: " + agent.ExecuteCommandLine(command, true);
+				logger.info(player.getName() + ": shutdown command: " + command);
+				if (agent.HadError()) {
+					sim.error("Soar Eater", result);
+				} else {
+					logger.info(player.getName() + ": result: " + result);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void updateSoarInput() {
+		input.update(player.getMoved(), player.getLocation(), (EatersMap)sim.getMap(), player.getPoints());
+	}
+
+	@Override
+	public void processSoarOuput() {
 		// if there was no command issued, that is kind of strange
 		if (agent.GetNumberCommands() == 0) {
 			logger.debug(player.getName() + " issued no command.");
-			return EaterCommand.NULL;
+			command = EaterCommand.NULL;
+			return;
 		}
 
 		// go through the commands
@@ -114,47 +142,6 @@ public final class SoarEater implements EaterCommander {
 
 		agent.ClearOutputLinkChanges();
 
-//		if (!agent.Commit()) {
-//			sim.error("Soar Eater", Names.Errors.commitFail + player.getName());
-//			sim.stop();
-//		}
-
-		return builder.build();
-	}
-	
-	public void reset() {
-		if (agent == null) {
-			return;
-		}
-		
-		input.destroy();
-
-		if (!agent.Commit()) {
-			sim.error(Names.Errors.commitFail + player.getName());
-		}
-
-		agent.InitSoar();
-			
-		input.create(player.getName(), player.getPoints());
-
-		if (!agent.Commit()) {
-			sim.error("Soar Eater", Names.Errors.commitFail + player.getName());
-		}
-	}
-
-	public void shutdown() {
-		assert agent != null;
-		if (shutdownCommands != null) { 
-			// execute the pre-shutdown commands
-			for (String command : shutdownCommands) {
-				String result = player.getName() + ": result: " + agent.ExecuteCommandLine(command, true);
-				logger.info(player.getName() + ": shutdown command: " + command);
-				if (agent.HadError()) {
-					sim.error("Soar Eater", result);
-				} else {
-					logger.info(player.getName() + ": result: " + result);
-				}
-			}
-		}
+		command = builder.build();
 	}
 }

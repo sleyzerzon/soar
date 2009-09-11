@@ -169,11 +169,15 @@ public class TankCommand {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		Commands.memberAppend(sb, isMove(), Names.kMoveID, getMoveDirection().id());
+		if (isMove()) {
+			Commands.memberAppend(sb, isMove(), Names.kMoveID, getMoveDirection().id());
+		}
 		Commands.memberAppend(sb, isRotate(), Names.kRotateID, getRotateDirection());
 		Commands.memberAppend(sb, isFire(), Names.kFireID);
 		Commands.memberAppend(sb, isRadarSwitch(), Names.kRadarID, getRadarSwitch() ? "on" : "off");
-		Commands.memberAppend(sb, isRadarPower(), Names.kRadarPowerID, Integer.toString(getRadarPower()));
+		if (isRadarPower()) {
+			Commands.memberAppend(sb, isRadarPower(), Names.kRadarPowerID, Integer.toString(getRadarPower()));
+		}
 		Commands.memberAppend(sb, isShields(), Names.kShieldsID, getShields() ? "on" : "off");
 		Commands.memberAppend(sb, isStopSim(), Names.kStopSimID);
 		return sb.toString();

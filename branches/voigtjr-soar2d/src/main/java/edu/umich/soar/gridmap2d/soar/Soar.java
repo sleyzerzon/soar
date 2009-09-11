@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
@@ -44,7 +45,6 @@ import sml.Agent;
 import sml.ConnectionInfo;
 import sml.Kernel;
 import sml.smlPrintEventId;
-import sml.smlRunStepSize;
 import sml.smlUpdateEventId;
 import sml.sml_Names;
 import sml.smlRunFlags;
@@ -64,6 +64,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 		Agent agent;
 		File productions;
+		SoarAgent sa;
 	}
 
 	private final Map<String, AgentData> agents = new HashMap<String, AgentData>();
@@ -130,7 +131,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 		// Register for Sim events
 		sim.getEvents().addListener(StartEvent.class, this);
-		//sim.getEvents().addListener(StopEvent.class, this);
+		sim.getEvents().addListener(StopEvent.class, this);
 		sim.getEvents().addListener(BeforeTickEvent.class, this);
 		sim.getEvents().addListener(AfterTickEvent.class, this);
 	}
@@ -287,6 +288,14 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	@Override
 	public void shutdown() {
+		exec.shutdown();
+		try {
+			exec.awaitTermination(5, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		if (kernel != null) {
 			logger.trace(Names.Trace.kernelShutdown);
 			kernel.Shutdown();
@@ -444,7 +453,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (agent == null) {
 			return null;
 		}
-		return new SoarEater(sim, eater, agent, vision, shutdownCommands);
+		SoarEater commander = new SoarEater(sim, eater, agent, vision, shutdownCommands);
+		agents.get(eater.getName()).sa = commander;
+		agents.get(eater.getName()).agent.Commit();
+		return commander;
 	}
 
 	@Override
@@ -454,7 +466,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (agent == null) {
 			return null;
 		}
-		return new SoarTank(sim, tank, agent, shutdownCommands);
+		SoarTank commander = new SoarTank(sim, tank, agent, shutdownCommands);
+		agents.get(tank.getName()).sa = commander;
+		agents.get(tank.getName()).agent.Commit();
+		return commander;
 	}
 
 	@Override
@@ -464,7 +479,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (agent == null) {
 			return null;
 		}
-		return new SoarTaxi(sim, taxi, agent, shutdownCommands);
+		SoarTaxi commander = new SoarTaxi(sim, taxi, agent, shutdownCommands);
+		agents.get(taxi.getName()).sa = commander;
+		agents.get(taxi.getName()).agent.Commit();
+		return commander;
 	}
 
 	@Override
@@ -474,7 +492,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (agent == null) {
 			return null;
 		}
-		return new SoarRobot(sim, player, agent, kernel, world, shutdownCommands);
+		SoarRobot commander = new SoarRobot(sim, player, agent, kernel, world, shutdownCommands);
+		agents.get(player.getName()).sa = commander;
+		agents.get(player.getName()).agent.Commit();
+		return commander;
 	}
 
 	private static final ExecutorService exec = Executors
@@ -494,10 +515,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 					public Void call() {
 						logger.trace("soar alive");
 						if (!stopRequested.compareAndSet(true, false)) {
-							logger.trace("committing");
-							for (AgentData ad : agents.values()) {
-								ad.agent.Commit();
-							}
 							logger.trace("running all agents forever");
 							logger.trace(kernel.RunAllAgentsForever());
 							logger.trace("run returned");
@@ -506,6 +523,9 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 					}
 				});
 			}
+		} else if (event instanceof StopEvent) {
+			stopRequested.set(true);
+			
 		} else if (event instanceof BeforeTickEvent) {
 			try {
 				// wait for update
@@ -534,10 +554,14 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			kernel.StopAllAgents();
 		}
 		
+		for (AgentData ad : agents.values()) {
+			logger.trace("processing output for " + ad.agent.GetAgentName());
+			ad.sa.processSoarOuput();
+		}
+		
 		Boolean tick = tickQueue.poll();
 		if (tick == null) {
 			logger.trace("tick not ready");
-			//tick not ready
 			return;
 		}
 
@@ -549,8 +573,9 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			// TODO handle correctly
 		}
 
-		logger.trace("committing");
 		for (AgentData ad : agents.values()) {
+			logger.trace("updating input for " + ad.agent.GetAgentName());
+			ad.sa.updateSoarInput();
 			ad.agent.Commit();
 		}
 		

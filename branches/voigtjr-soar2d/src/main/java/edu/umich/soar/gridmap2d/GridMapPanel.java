@@ -1,9 +1,7 @@
 package edu.umich.soar.gridmap2d;
 
 import java.awt.Graphics;
-import java.net.URL;
 
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 public class GridMapPanel extends JPanel {

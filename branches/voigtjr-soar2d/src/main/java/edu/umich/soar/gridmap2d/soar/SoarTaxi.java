@@ -14,7 +14,7 @@ import edu.umich.soar.gridmap2d.map.TaxiMap;
 import sml.Agent;
 import sml.Identifier;
 
-public class SoarTaxi implements TaxiCommander {
+public class SoarTaxi implements TaxiCommander, SoarAgent {
 	private static Log logger = LogFactory.getLog(SoarTaxi.class);
 
 	private Taxi player;
@@ -22,7 +22,8 @@ public class SoarTaxi implements TaxiCommander {
 	private String [] shutdownCommands;
 	private SoarTaxiIL input;
 	private final Simulation sim;
-
+	private TaxiCommand command;
+	
 	public SoarTaxi(Simulation sim, Taxi taxi, Agent agent, String[] shutdown_commands) {
 		this.player = taxi;
 		this.agent = agent;
@@ -33,29 +34,57 @@ public class SoarTaxi implements TaxiCommander {
 		
 		input = new SoarTaxiIL(agent);
 		input.create();
-
-		if (!agent.Commit()) {
-			sim.error("Soar Taxi", Names.Errors.commitFail + taxi.getName());
-		}
 	}
 
 	void update() {
-		input.update(player.getMoved(), player.getLocation(), (TaxiMap)sim.getMap(), player.getPointsDelta(), player.getFuel());
-		
-		if (!agent.Commit()) {
-			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
-			sim.stop();
-		}
 	}
 
 	@Override
 	public TaxiCommand nextCommand() {
+		TaxiCommand temp = command;
+		command = null;
+		return temp;
+	}
+	
+	@Override
+	public void reset() {
+		if (agent == null) {
+			return;
+		}
+		command = null;
+		input.destroy();
+
+		agent.InitSoar();
+			
+		input.create();
+	}
+
+	@Override
+	public void shutdown() {
+		assert agent != null;
+		if (shutdownCommands != null) { 
+			// execute the pre-shutdown commands
+			for (String command : shutdownCommands) {
+				String result = player.getName() + ": result: " + agent.ExecuteCommandLine(command, true);
+				logger.info(player.getName() + ": shutdown command: " + command);
+				if (agent.HadError()) {
+					sim.error("Soar Taxi", result);
+				} else {
+					logger.info(player.getName() + ": result: " + result);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void processSoarOuput() {
 		// if there was no command issued, that is kind of strange
 		if (agent.GetNumberCommands() == 0) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(player.getName() + " issued no command.");
 			}
-			return TaxiCommand.NULL;
+			command = TaxiCommand.NULL;
+			return;
 		}
 
 		// go through the commands
@@ -113,53 +142,11 @@ public class SoarTaxi implements TaxiCommander {
 			commandId.AddStatusError();
 		}
 		agent.ClearOutputLinkChanges();
-		
-		if (!agent.Commit()) {
-			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
-			sim.stop();
-		}
-		
-		return builder.build();
+		command = builder.build();
 	}
 
 	@Override
-	public void reset() {
-		if (agent == null) {
-			return;
-		}
-		
-		input.destroy();
-
-		if (!agent.Commit()) {
-			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
-			sim.stop();
-		}
-
-		agent.InitSoar();
-			
-		input.create();
-			 
-		if (!agent.Commit()) {
-			sim.error("Soar Taxi", Names.Errors.commitFail + player.getName());
-			sim.stop();
-		}
-
-	}
-
-	@Override
-	public void shutdown() {
-		assert agent != null;
-		if (shutdownCommands != null) { 
-			// execute the pre-shutdown commands
-			for (String command : shutdownCommands) {
-				String result = player.getName() + ": result: " + agent.ExecuteCommandLine(command, true);
-				logger.info(player.getName() + ": shutdown command: " + command);
-				if (agent.HadError()) {
-					sim.error("Soar Taxi", result);
-				} else {
-					logger.info(player.getName() + ": result: " + result);
-				}
-			}
-		}
+	public void updateSoarInput() {
+		input.update(player.getMoved(), player.getLocation(), (TaxiMap)sim.getMap(), player.getPointsDelta(), player.getFuel());
 	}
 }

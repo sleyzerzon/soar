@@ -38,7 +38,7 @@ public class Eater extends Player {
 		command = commander.nextCommand();
 		
 		// the facing depends on the move
-		if (command.isMove()) { 
+		if (command != null && command.isMove()) { 
 			setFacing(command.getMoveDirection());
 		}
 

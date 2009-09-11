@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.commsen.stopwatch.Stopwatch;
 
-import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RobotCommand;
@@ -27,7 +26,7 @@ import lcmtypes.pose_t;
 import sml.Agent;
 import sml.Kernel;
 
-public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose, ObjectManipulationInterface  {
+public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose, ObjectManipulationInterface, SoarAgent  {
 	private static Log logger = LogFactory.getLog(SoarRobot.class);
 
 	private Robot player;
@@ -47,6 +46,8 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 	
 	private final Simulation sim;
 	
+	private RobotCommand command;
+	
 	public SoarRobot(Simulation sim, Robot player, Agent agent, Kernel kernel,
 			RoomWorld world, String[] shutdownCommands) {
 		this.player = player;
@@ -61,10 +62,6 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		input.create();
 		output = new OutputLinkManager(agent);
 		output.create(input.getWaypointInterface(), world, input.getReceiveMessagesInterface(), this, this, this);
-		
-		if (!agent.Commit()) {
-			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
-		}
 	}
 
 	@Override
@@ -72,47 +69,23 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		if (agent == null) {
 			return;
 		}
-		
+		command = null;
 		input.destroy();
 		output.destroy();
-
-		if (!agent.Commit()) {
-			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
-		}
 
 		agent.InitSoar();
 
 		input.create();
 		output.create(input.getWaypointInterface(), world, input.getReceiveMessagesInterface(), this, this, this);
-
-		if (!agent.Commit()) {
-			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
-		}
-	}
-
-	void update() {
-
-		long id1 = Stopwatch.start("soar update", "output");
-		ddc = output.update();
-		Stopwatch.stop(id1);
-
-		long id2 = Stopwatch.start("soar update", "input");
-		input.update(player, world, (RoomMap)sim.getMap(), this.isFloatYawWmes());	
-		Stopwatch.stop(id2);
-		
-		long id3 = Stopwatch.start("soar update", "commit");
-		if (!agent.Commit()) {
-			sim.error("Soar Robot", Names.Errors.commitFail + player.getName());
-			sim.stop();
-		}
-		Stopwatch.stop(id3);
 	}
 
 	@Override
 	public RobotCommand nextCommand() {
-		return new RobotCommand.Builder(ddc).build();
+		RobotCommand temp = command;
+		command = null;
+		return temp;
 	}
-
+	
 	private void error(String message) {
 		sim.error("Soar Robot", message);
 	}
@@ -195,5 +168,21 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 	@Override
 	public ReceiveMessagesInterface getReceiveMessagesInterface() {
 		return input.getReceiveMessagesInterface();
+	}
+
+	@Override
+	public void processSoarOuput() {
+		command = new RobotCommand.Builder(ddc).build();
+	}
+
+	@Override
+	public void updateSoarInput() {
+		long id1 = Stopwatch.start("soar update", "output");
+		ddc = output.update();
+		Stopwatch.stop(id1);
+
+		long id2 = Stopwatch.start("soar update", "input");
+		input.update(player, world, (RoomMap)sim.getMap(), this.isFloatYawWmes());	
+		Stopwatch.stop(id2);
 	}
 }

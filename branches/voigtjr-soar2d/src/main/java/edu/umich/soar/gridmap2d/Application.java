@@ -20,9 +20,7 @@ import org.flexdock.docking.DockingManager;
 import org.flexdock.view.Viewport;
 
 import edu.umich.soar.gridmap2d.config.SimConfig;
-import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
 import edu.umich.soar.gridmap2d.core.Simulation;
-import edu.umich.soar.gridmap2d.soar.Soar;
 
 public class Application extends JPanel implements Adaptable {
 	private static final long serialVersionUID = 4313201967156814057L;
@@ -37,6 +35,7 @@ public class Application extends JPanel implements Adaptable {
 			if (GraphicsEnvironment.isHeadless() || config.generalConfig().headless) {
 				sim.initialize(config);
 				sim.run();
+				sim.shutdown();
 			} else {
 				try {
 					// Use the look and feel of the system we're running on rather
