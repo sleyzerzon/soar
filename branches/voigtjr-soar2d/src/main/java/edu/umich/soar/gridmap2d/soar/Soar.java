@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,13 +21,13 @@ import org.apache.commons.logging.LogFactory;
 import edu.umich.soar.gridmap2d.config.ClientConfig;
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.config.SoarConfig;
-import edu.umich.soar.gridmap2d.core.AfterTickEvent;
-import edu.umich.soar.gridmap2d.core.BeforeTickEvent;
 import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
-import edu.umich.soar.gridmap2d.core.StartEvent;
-import edu.umich.soar.gridmap2d.core.StopEvent;
+import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
+import edu.umich.soar.gridmap2d.core.events.BeforeTickEvent;
+import edu.umich.soar.gridmap2d.core.events.StartEvent;
+import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
 import edu.umich.soar.gridmap2d.map.Eater;
@@ -455,7 +454,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		SoarEater commander = new SoarEater(sim, eater, agent, vision, shutdownCommands);
 		agents.get(eater.getName()).sa = commander;
-		agents.get(eater.getName()).agent.Commit();
 		return commander;
 	}
 
@@ -468,7 +466,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		SoarTank commander = new SoarTank(sim, tank, agent, shutdownCommands);
 		agents.get(tank.getName()).sa = commander;
-		agents.get(tank.getName()).agent.Commit();
 		return commander;
 	}
 
@@ -481,7 +478,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		SoarTaxi commander = new SoarTaxi(sim, taxi, agent, shutdownCommands);
 		agents.get(taxi.getName()).sa = commander;
-		agents.get(taxi.getName()).agent.Commit();
 		return commander;
 	}
 
@@ -494,7 +490,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		SoarRobot commander = new SoarRobot(sim, player, agent, kernel, world, shutdownCommands);
 		agents.get(player.getName()).sa = commander;
-		agents.get(player.getName()).agent.Commit();
 		return commander;
 	}
 
@@ -502,81 +497,110 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			.newSingleThreadExecutor();
 	
 
-	private AtomicBoolean stopRequested = new AtomicBoolean(false);
-	private BlockingQueue<Boolean> tickQueue = new SynchronousQueue<Boolean>();
-	private BlockingQueue<Boolean> updateQueue = new SynchronousQueue<Boolean>();
+	private BlockingQueue<TickStatus> tickReady = new SynchronousQueue<TickStatus>();
+	private BlockingQueue<Boolean> outputReady = new SynchronousQueue<Boolean>();
+	private BlockingQueue<Boolean> tickDone = new SynchronousQueue<Boolean>();
 	
 	@Override
 	public void onEvent(SimEvent event) {
 		if (event instanceof StartEvent) {
 			if (agents.size() != 0) {
+				firstUpdate = true;
 				exec.submit(new Callable<Void>() {
 					@Override
 					public Void call() {
-						logger.trace("soar alive");
-						if (!stopRequested.compareAndSet(true, false)) {
-							logger.trace("running all agents forever");
-							logger.trace(kernel.RunAllAgentsForever());
-							logger.trace("run returned");
+						logger.trace("soar alive, committing");
+
+						for (AgentData ad : agents.values()) {
+							ad.agent.Commit();
 						}
+						
+						logger.trace("running all agents forever");
+						logger.trace(kernel.RunAllAgentsForever());
+						logger.trace("run returned");
 						return null;
 					}
 				});
 			}
-		} else if (event instanceof StopEvent) {
-			stopRequested.set(true);
-			
 		} else if (event instanceof BeforeTickEvent) {
 			try {
 				// wait for update
 				logger.trace("before tick, waiting for update");
-				tickQueue.put(Boolean.TRUE);
+				tickReady.put(TickStatus.GO);
+				outputReady.take();
 			} catch (InterruptedException e) {
 				// TODO: handle correctly
 			}
 			logger.trace("before tick, returning");
+
 		} else if (event instanceof AfterTickEvent) {
 			try {
 				logger.trace("after tick, notifying done");
 				// tell that tick is done
-				updateQueue.take();
+				tickDone.take();
+				
 			} catch (InterruptedException e) {
 				// TODO: handle correctly
 			}
 			logger.trace("after tick returning");
+
+		} else if (event instanceof StopEvent) {
+			try {
+				logger.trace("stop event issuing notice");
+				tickReady.put(TickStatus.STOP);
+			} catch (InterruptedException e) {
+				// TODO: handle correctly
+			}
+			logger.trace("before tick, returning");
 		}
 	}
 	
+	private enum TickStatus { GO, STOP };
+	
+	boolean firstUpdate;
+	
 	@Override
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
-		if (stopRequested.getAndSet(false)) {
-			logger.trace("issuing stop");
-			kernel.StopAllAgents();
-		}
-		
 		for (AgentData ad : agents.values()) {
 			logger.trace("processing output for " + ad.agent.GetAgentName());
 			ad.sa.processSoarOuput();
 		}
 		
-		Boolean tick = tickQueue.poll();
-		if (tick == null) {
-			logger.trace("tick not ready");
-			return;
-		}
-
-		// let the environment tick
 		try {
-			logger.trace("waiting for tick to complete");
-			updateQueue.put((runFlags & smlRunFlags.sml_DONT_UPDATE_WORLD.swigValue()) == 0);
-		} catch (InterruptedException e) {
-			// TODO handle correctly
-		}
+			if (firstUpdate) {
+				firstUpdate = false;
+				logger.trace("waiting for tick to become ready");
+				TickStatus tick = tickReady.take();
+				if (tick == TickStatus.GO) {
+					logger.trace("tick is ready");
+				} else {
+					throw new IllegalStateException("before-tick event must follow start event");
+				}
+			}
 
-		for (AgentData ad : agents.values()) {
-			logger.trace("updating input for " + ad.agent.GetAgentName());
-			ad.sa.updateSoarInput();
-			ad.agent.Commit();
+			// let the environment tick
+			outputReady.put((runFlags & smlRunFlags.sml_DONT_UPDATE_WORLD.swigValue()) == 0);
+			
+			logger.trace("waiting for tick to complete");
+			tickDone.put(Boolean.TRUE);
+			
+			for (AgentData ad : agents.values()) {
+				logger.trace("updating input for " + ad.agent.GetAgentName());
+				ad.sa.updateSoarInput();
+				ad.agent.Commit();
+			}
+			
+			logger.trace("waiting for tick or stop");
+			TickStatus tick = tickReady.take();
+			
+			if (tick == TickStatus.STOP) {
+				logger.trace("issuing stop");
+				kernel.StopAllAgents();
+			} else {
+				logger.trace("tick is ready");
+			}
+		} catch (InterruptedException e1) {
+			// TODO handle correctly
 		}
 		
 		logger.trace("update done");

@@ -1,4 +1,4 @@
-package edu.umich.soar.gridmap2d.visuals;
+package edu.umich.soar.gridmap2d;
 
 import java.util.HashMap;
 import java.util.Map;

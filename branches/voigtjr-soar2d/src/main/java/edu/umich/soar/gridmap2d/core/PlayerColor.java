@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum PlayerColor {
-	RED, BLUE, GREEN, PURPLE, ORANGE, BLACK, YELLOW;
+	RED, 
+	BLUE, 
+	GREEN, 
+	PURPLE, 
+	ORANGE, 
+	BLACK, 
+	YELLOW;
 	
 	private static final List<PlayerColor> unusedColors = new ArrayList<PlayerColor>(PlayerColor.values().length);
 

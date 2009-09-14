@@ -12,11 +12,12 @@ public class StepAction extends AbstractGridmap2DAction {
 
 	@Override
 	public void update() {
-//        setEnabled(!getApplication().getAgent().isRunning());
+        setEnabled(!getApplication().getSim().isRunning());
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		getApplication().getSim().run(1);
 	}
 
 }

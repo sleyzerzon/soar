@@ -2,6 +2,8 @@ package edu.umich.soar.gridmap2d;
 
 import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ import org.flexdock.view.Viewport;
 
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.core.Simulation;
-import edu.umich.soar.gridmap2d.core.StopEvent;
+import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
 
@@ -40,7 +42,6 @@ public class Application extends JPanel implements Adaptable {
 			
 			if (GraphicsEnvironment.isHeadless() || config.generalConfig().headless) {
 				sim.initialize(config);
-				sim.run();
 				sim.getEvents().addListener(StopEvent.class, new SimEventListener() {
 					@Override
 					public void onEvent(SimEvent event) {
@@ -52,6 +53,7 @@ public class Application extends JPanel implements Adaptable {
 						}
 					}
 				});
+				sim.run();
 				
 				try {
 					doneQueue.take();
@@ -74,7 +76,7 @@ public class Application extends JPanel implements Adaptable {
 				}
 				
 				SwingUtilities.invokeLater(new Runnable() {
-					
+					@Override
 					public void run() {
 						initialize(args, sim, config);
 					}
@@ -88,6 +90,8 @@ public class Application extends JPanel implements Adaptable {
 	
 	public static Application initialize(String[] args, Simulation sim, SimConfig config) {
 		DockingManager.setFloatingEnabled(true);
+		
+		sim.initialize(config);
 		
 		Application app = new Application(sim, config);
 		final JFrame frame = new JFrame();
@@ -103,26 +107,33 @@ public class Application extends JPanel implements Adaptable {
 	private final ActionManager actionManager = new ActionManager(this);
     private final List<AbstractAdaptableView> views = new ArrayList<AbstractAdaptableView>();
     private final Simulation sim;
-    private final SimConfig config;
+    //private final SimConfig config;
 
     private Application(Simulation sim, SimConfig config) {
     	super(new BorderLayout());
     	
 		this.sim = sim;
-		this.config = config;
+		//this.config = config;
     }
     
     private void initialize(JFrame frame) {
 		this.frame = frame;
 		
-		frame.setSize(600, 600);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                exit();
+            }});
+
+        frame.setSize(600, 600);
 		frame.setTitle("Gridmap2D");
 		
+		initActions();
 		initToolbar();
 
 		add(viewport, BorderLayout.CENTER);
-
-		initActions();
 
 		initViews();
 		initMenuBar();
@@ -139,6 +150,10 @@ public class Application extends JPanel implements Adaptable {
     }
     
 	private void initActions() {
+		new RunAction(actionManager);
+		new StepAction(actionManager);
+		new StopAction(actionManager);
+		new ResetAction(actionManager);
 		new ExitAction(actionManager);
 	}
 
@@ -162,12 +177,22 @@ public class Application extends JPanel implements Adaptable {
     }
     
 	void exit() {
-		System.exit(0);
+		frame.dispose();
+		sim.shutdown();
 	}
 
 	@Override
 	public Object getAdapter(Class<?> klass) {
-		assert false;
+        if(klass.equals(Simulation.class)) {
+        	return sim;
+        }
+        if(klass.equals(ActionManager.class)) {
+        	return actionManager;
+        }
+        Object o = Adaptables.findAdapter(views, klass);
+        if(o != null) {
+            return o;
+        }
 		return null;
 	}
 	

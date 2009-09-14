@@ -13,6 +13,13 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.umich.soar.gridmap2d.config.PlayerConfig;
 import edu.umich.soar.gridmap2d.config.SimConfig;
+import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
+import edu.umich.soar.gridmap2d.core.events.BeforeTickEvent;
+import edu.umich.soar.gridmap2d.core.events.ErrorEvent;
+import edu.umich.soar.gridmap2d.core.events.InfoEvent;
+import edu.umich.soar.gridmap2d.core.events.ResetEvent;
+import edu.umich.soar.gridmap2d.core.events.StartEvent;
+import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEventManager;
 import edu.umich.soar.gridmap2d.map.EatersWorld;
 import edu.umich.soar.gridmap2d.map.GridMap;
@@ -171,6 +178,7 @@ public class Simulation {
 		logger.info(Names.Info.reset);
 		world.reset();
 		worldCount = 0;
+		eventManager.fireEvent(new ResetEvent());
 	}
 
 	public void shutdown() {
@@ -211,8 +219,9 @@ public class Simulation {
 	private AtomicBoolean running = new AtomicBoolean(false);
 	private AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private SimEventManager eventManager = new SimEventManager();
-	
-	public void run() {
+
+	public void run(final int ticks) {
+		
 		if (!running.getAndSet(true)) {
 			exec.submit(new Runnable() {
 				@Override
@@ -220,13 +229,23 @@ public class Simulation {
 					// TODO: thread interruption
 					logger.trace("firing start");
 					eventManager.fireEvent(new StartEvent());
+					int ticksDone = 0;
 					do {
 						logger.trace("firing before tick");
 						eventManager.fireEvent(new BeforeTickEvent());
-						logger.trace("tick");
 						tick();
+						
+						if (ticks > 0) {
+							ticksDone += 1;
+							if (ticksDone >= ticks) {
+								logger.trace("requesting stop due to tick count");
+								stopRequested.set(true);
+							}
+						}
+
 						logger.trace("firing after tick");
 						eventManager.fireEvent(new AfterTickEvent());
+						
 					} while(!stopRequested.getAndSet(false));
 					logger.trace("firing stop");
 					eventManager.fireEvent(new StopEvent());
@@ -236,6 +255,10 @@ public class Simulation {
 		} else {
 			logger.trace("run called while running");
 		}
+	}
+	
+	public void run() {
+		run(0);
 	}
 	
 	public CognitiveArchitecture getCogArch() {
@@ -256,6 +279,7 @@ public class Simulation {
 	
 	private void tick() {
 		worldCount += 1;
+		logger.trace("tick " + worldCount);
 		world.update(worldCount);
 	}
 

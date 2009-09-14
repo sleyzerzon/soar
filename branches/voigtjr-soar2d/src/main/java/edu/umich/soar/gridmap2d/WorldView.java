@@ -18,7 +18,7 @@ public class WorldView extends AbstractAdaptableView {
         
         addAction(DockingConstants.PIN_ACTION);
         
-        gridMapPanel = new GridMapPanel();
+        gridMapPanel = new GridMapPanel(this.app);
         setContentPane(gridMapPanel);
         
     }

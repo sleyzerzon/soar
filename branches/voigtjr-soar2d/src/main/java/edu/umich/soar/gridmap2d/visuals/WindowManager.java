@@ -120,46 +120,6 @@ public class WindowManager {
 		darkGray = new Color(d, 100, 100, 100);
 	}
 	
-	public static Color getColor(String color) {
-		if (color == null) {
-			return null;
-		}
-		if (color.equalsIgnoreCase("white")) {
-			return white;
-		}
-		if (color.equalsIgnoreCase("blue")) {
-			return blue;
-		}
-		if (color.equalsIgnoreCase("red")) {
-			return red;
-		}
-		if (color.equalsIgnoreCase("yellow")) {
-			return yellow;
-		}
-		if (color.equalsIgnoreCase("green")) {
-			return green;
-		}
-		if (color.equalsIgnoreCase("purple")) {
-			return purple;
-		}
-		if (color.equalsIgnoreCase("orange")) {
-			return orange;
-		}
-		if (color.equalsIgnoreCase("black")) {
-			return black;
-		}
-		if (color.equalsIgnoreCase("brown")) {
-			return brown;
-		}
-		if (color.equalsIgnoreCase("lightGray")) {
-			return lightGray;
-		}
-		if (color.equalsIgnoreCase("darkGray")) {
-			return darkGray;
-		}
-		return null;
-	}
-
 	public boolean initialize() {
 		// can be called multiple times
 		if (display != null) {
