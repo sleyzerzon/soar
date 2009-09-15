@@ -97,6 +97,9 @@ class smem_stat_container: public soar_module::stat_container
 		soar_module::integer_stat *cbr;
 		soar_module::integer_stat *stores;
 
+		soar_module::intptr_stat *chunks;
+		soar_module::intptr_stat *slots;
+
 		smem_stat_container( agent *my_agent );
 };
 
@@ -222,7 +225,7 @@ class smem_statement_container: public soar_module::sqlite_statement_container
 
 enum smem_variable_key
 {
-	var_max_cycle
+	var_max_cycle, var_num_nodes, var_num_edges
 };
 
 #define SMEM_LTI_UNKNOWN_LEVEL 0

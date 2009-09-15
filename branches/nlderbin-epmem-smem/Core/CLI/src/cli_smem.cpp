@@ -433,7 +433,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 			else
 				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
 
-			output = "Expansions: ";
+			output = "Retrieves: ";
 			temp2 = m_pAgentSoar->smem_stats->expansions->get_string();
 			output += temp2;
 			delete temp2;
@@ -442,7 +442,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 			else
 				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
 
-			output = "Cue-Based Retrievals: ";
+			output = "Queries: ";
 			temp2 = m_pAgentSoar->smem_stats->cbr->get_string();
 			output += temp2;
 			delete temp2;
@@ -453,6 +453,24 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 
 			output = "Stores: ";
 			temp2 = m_pAgentSoar->smem_stats->stores->get_string();
+			output += temp2;
+			delete temp2;
+			if ( m_RawOutput )
+				m_Result << output << "\n";
+			else
+				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
+
+			output = "Nodes: ";
+			temp2 = m_pAgentSoar->smem_stats->chunks->get_string();
+			output += temp2;
+			delete temp2;
+			if ( m_RawOutput )
+				m_Result << output << "\n";
+			else
+				AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
+
+			output = "Edges: ";
+			temp2 = m_pAgentSoar->smem_stats->slots->get_string();
 			output += temp2;
 			delete temp2;
 			if ( m_RawOutput )
