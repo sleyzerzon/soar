@@ -17,10 +17,12 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.Eater;
+import edu.umich.soar.gridmap2d.selection.SelectionListener;
+import edu.umich.soar.gridmap2d.selection.SelectionManager;
 import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 import edu.umich.soar.gridmap2d.selection.TableSelectionProvider;
 
-public class EatersAgentView extends AbstractAdaptableView implements Refreshable {
+public class EatersAgentView extends AbstractAdaptableView implements Refreshable, SelectionListener {
 	
 	private static final long serialVersionUID = -2209482143387576390L;
 	
@@ -35,6 +37,7 @@ public class EatersAgentView extends AbstractAdaptableView implements Refreshabl
         addAction(DockingConstants.PIN_ACTION);
 
         this.sim = Adaptables.adapt(app, Simulation.class);
+        Adaptables.adapt(app, Application.class).getSelectionManager().addListener(this);
         
         this.addAction(DockingConstants.PIN_ACTION);
 
@@ -115,5 +118,14 @@ public class EatersAgentView extends AbstractAdaptableView implements Refreshabl
             table.getSelectionModel().setSelectionInterval(index, index);
             table.scrollRowToVisible(index);
         }
+	}
+
+	@Override
+	public void selectionChanged(SelectionManager manager) {
+    	final Eater eater = (Eater)manager.getSelectedObject();
+    	if (eater != null) {
+    		selectEater(eater);
+    		updateEaterProperties();
+    	}
 	}
 }

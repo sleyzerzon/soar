@@ -218,4 +218,8 @@ public class TankSoarPanel extends GridMapPanel {
 			}
 		}
 	}
+	@Override
+	int getCellSize() {
+		return cellSize;
+	}
 }

@@ -218,4 +218,8 @@ public class TaxiPanel extends GridMapPanel {
 			}
 		}
 	}
+	@Override
+	int getCellSize() {
+		return cellSize;
+	}
 }

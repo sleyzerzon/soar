@@ -237,4 +237,9 @@ public class EatersPanel extends GridMapPanel {
 			}
 		}
 	}
+
+	@Override
+	int getCellSize() {
+		return cellSize;
+	}
 }

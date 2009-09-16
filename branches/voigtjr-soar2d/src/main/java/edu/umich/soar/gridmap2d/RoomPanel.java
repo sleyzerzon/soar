@@ -218,4 +218,8 @@ public class RoomPanel extends GridMapPanel {
 			}
 		}
 	}
+	@Override
+	int getCellSize() {
+		return cellSize;
+	}
 }

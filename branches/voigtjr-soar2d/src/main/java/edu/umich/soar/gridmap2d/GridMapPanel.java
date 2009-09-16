@@ -13,4 +13,6 @@ abstract class GridMapPanel extends JPanel implements SimEventListener {
 	public void onEvent(SimEvent event) {
 		repaint();
 	}
+	
+	abstract int getCellSize();
 }
