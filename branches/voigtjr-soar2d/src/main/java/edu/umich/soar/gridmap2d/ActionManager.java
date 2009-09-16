@@ -12,6 +12,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.umich.soar.gridmap2d.selection.SelectionListener;
+import edu.umich.soar.gridmap2d.selection.SelectionManager;
+
+/**
+ * @author ray
+ */
 public class ActionManager {
 	private static final Log logger = LogFactory.getLog(ActionManager.class);
 
@@ -33,6 +39,14 @@ public class ActionManager {
 	 */
 	public ActionManager(Application app) {
 		this.app = app;
+		
+        SelectionManager selectionManager = this.app.getSelectionManager();
+        selectionManager.addListener(new SelectionListener() {
+
+            public void selectionChanged(SelectionManager manager)
+            {
+                updateActions();
+            }});
 	}
 
 	/**
@@ -42,6 +56,14 @@ public class ActionManager {
 		return app;
 	}
 
+    /**
+     * @return the selection manager
+     */
+    public SelectionManager getSelectionManager()
+    {
+        return app.getSelectionManager();
+    }
+    
 	public AbstractGridmap2DAction getAction(String id) {
 		AbstractGridmap2DAction r = actionCache.get(id);
 		if (r != null) {

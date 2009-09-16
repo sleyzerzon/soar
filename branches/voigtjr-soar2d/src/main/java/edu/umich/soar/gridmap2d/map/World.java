@@ -15,7 +15,7 @@ public interface World {
 	// player management
 	public int numberOfPlayers();
 	public boolean hasPlayer(String name);
-	public boolean addPlayer(PlayerConfig playerConfig);
+	public Player addPlayer(PlayerConfig playerConfig);
 	public void removePlayer(String name);
 	public List<? extends Player> getPlayers();
 	

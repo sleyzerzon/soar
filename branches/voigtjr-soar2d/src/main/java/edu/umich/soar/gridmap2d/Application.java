@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.flexdock.docking.Dockable;
 import org.flexdock.docking.DockingConstants;
 import org.flexdock.docking.DockingManager;
+import org.flexdock.docking.activation.ActiveDockableTracker;
 import org.flexdock.view.Viewport;
 
 import edu.umich.soar.gridmap2d.config.SimConfig;
@@ -31,6 +34,8 @@ import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
+import edu.umich.soar.gridmap2d.selection.SelectionManager;
+import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 
 public class Application extends JPanel implements Adaptable {
 	private static final long serialVersionUID = 4313201967156814057L;
@@ -107,11 +112,13 @@ public class Application extends JPanel implements Adaptable {
 
 	private JFrame frame;
     private final Viewport viewport = new Viewport();
+    private final SelectionManager selectionManager = new SelectionManager();
 	private final ActionManager actionManager = new ActionManager(this);
     private final List<AbstractAdaptableView> views = new ArrayList<AbstractAdaptableView>();
     private final Simulation sim;
     private final List<SimEventListener> simEventListeners = new ArrayList<SimEventListener>();
     //private final SimConfig config;
+    private PropertyChangeListener dockTrackerListener = null;
 
     private Application(Simulation sim, SimConfig config) {
     	super(new BorderLayout());
@@ -142,7 +149,22 @@ public class Application extends JPanel implements Adaptable {
 		initViews();
 		initMenuBar();
 		
-		sim.getEvents().addListener(AfterTickEvent.class, saveListener(new SimEventListener() {
+        // Track selection to active view
+        ActiveDockableTracker.getTracker(frame).addPropertyChangeListener(
+                dockTrackerListener = new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt)
+            {
+                Dockable newDockable = (Dockable) evt.getNewValue();
+                SelectionProvider provider = Adaptables.adapt(newDockable, SelectionProvider.class);
+                if(provider != null)
+                {
+                    selectionManager.setSelectionProvider(provider);
+                }
+            }});
+
+        sim.getEvents().addListener(AfterTickEvent.class, saveListener(new SimEventListener() {
             @Override
             public void onEvent(SimEvent event)
             {
@@ -213,8 +235,39 @@ public class Application extends JPanel implements Adaptable {
     }
     
 	void exit() {
+		detatch();
 		frame.dispose();
 		sim.shutdown();
+	}
+	
+	public void detatch() {
+        // clean up dock property listener
+        ActiveDockableTracker.getTracker(frame).removePropertyChangeListener(dockTrackerListener);
+        dockTrackerListener = null;
+        
+//        // clean up soar prop listeners
+//        for(PropertyListenerHandle<?> listener : propertyListeners)
+//        {
+//            listener.removeListener();
+//        }
+        
+        // clean up soar event listener
+        for(SimEventListener listener : simEventListeners)
+        {
+            sim.getEvents().removeListener(null, listener);
+        }
+        simEventListeners.clear();
+
+        for(Disposable d : Adaptables.adaptCollection(views, Disposable.class))
+        {
+            d.dispose();
+        }
+        views.clear();
+
+        if(frame.isVisible())
+        {
+            frame.setVisible(false);
+        }
 	}
 
 	@Override
@@ -224,6 +277,10 @@ public class Application extends JPanel implements Adaptable {
         }
         if(klass.equals(ActionManager.class)) {
         	return actionManager;
+        }
+        if(klass.equals(SelectionManager.class))
+        {
+            return selectionManager;
         }
         Object o = Adaptables.findAdapter(views, klass);
         if(o != null) {
@@ -250,4 +307,8 @@ public class Application extends JPanel implements Adaptable {
     public Simulation getSim() {
     	return sim;
     }
+
+	public SelectionManager getSelectionManager() {
+        return selectionManager;
+	}
 }

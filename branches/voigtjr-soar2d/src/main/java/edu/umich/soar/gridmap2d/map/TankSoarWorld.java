@@ -800,11 +800,11 @@ public class TankSoarWorld implements World {
 	}
 	
 	@Override
-	public boolean addPlayer(PlayerConfig cfg) {
+	public Player addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("TankSoar", "There are no suitable starting locations.");
-			return false;
+			return null;
 		}
 
 		Tank.Builder builder = new Tank.Builder(sim, cfg.name, cfg.color);
@@ -820,7 +820,7 @@ public class TankSoarWorld implements World {
 			TankCommander cmdr = sim.getCogArch().createTankCommander(player, cfg.productions, cfg.shutdown_commands);
 			if (cmdr == null) {
 				players.remove(player);
-				return false;
+				return null;
 			}
 			player.setCommander(cmdr);
 		}
@@ -836,7 +836,7 @@ public class TankSoarWorld implements World {
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
 		updatePlayers(true);
-		return true;
+		return player;
 	}
 
 	@Override

@@ -160,7 +160,7 @@ public class SoarRobotInputLinkManager {
 		}
 		
 		// players
-		if (world.getPlayers().length > 1) {
+		if (!world.getPlayers().isEmpty()) {
 			for (Player temp : world.getPlayers()) {
 				Robot rTarget = (Robot)temp;
 				if (rTarget.equals(player)) {

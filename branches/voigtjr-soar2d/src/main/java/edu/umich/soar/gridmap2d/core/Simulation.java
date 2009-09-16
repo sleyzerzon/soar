@@ -1,6 +1,9 @@
 package edu.umich.soar.gridmap2d.core;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +20,8 @@ import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
 import edu.umich.soar.gridmap2d.core.events.BeforeTickEvent;
 import edu.umich.soar.gridmap2d.core.events.ErrorEvent;
 import edu.umich.soar.gridmap2d.core.events.InfoEvent;
+import edu.umich.soar.gridmap2d.core.events.PlayerAddedEvent;
+import edu.umich.soar.gridmap2d.core.events.PlayerRemovedEvent;
 import edu.umich.soar.gridmap2d.core.events.ResetEvent;
 import edu.umich.soar.gridmap2d.core.events.StartEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
@@ -131,13 +136,13 @@ public class Simulation {
 			return;
 		}
 
-		if (!world.addPlayer(playerConfig)) {
+		Player player = world.addPlayer(playerConfig);
+		if (player == null) {
 			playerConfig.color.free();
 			return;
 		}
-
-		// the agent list has changed, notify things that care
-		// TODO: Gridmap2D.control.playerEvent();
+		
+		eventManager.fireEvent(new PlayerAddedEvent(player));
 	}
 
 	/**
@@ -155,8 +160,7 @@ public class Simulation {
 
 		cogArch.destroyPlayer(player.getName());
 
-		// the player list has changed, notify those who care
-		// TODO: Gridmap2D.control.playerEvent();
+		eventManager.fireEvent(new PlayerRemovedEvent(player));
 	}
 
 	/**
@@ -189,8 +193,10 @@ public class Simulation {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		for (Player player : world.getPlayers()) {
+
+		List<Player> players = new ArrayList<Player>(7);
+		players.addAll(world.getPlayers());
+		for (Player player : players) {
 			destroyPlayer(player);
 		}
 

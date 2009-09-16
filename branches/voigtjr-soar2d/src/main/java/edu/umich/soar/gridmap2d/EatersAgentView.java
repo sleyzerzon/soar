@@ -17,11 +17,10 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.Eater;
-import edu.umich.soar.gridmap2d.selection.SelectionListener;
-import edu.umich.soar.gridmap2d.selection.SelectionManager;
+import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 import edu.umich.soar.gridmap2d.selection.TableSelectionProvider;
 
-public class EatersAgentView extends AbstractAdaptableView implements Refreshable, SelectionListener {
+public class EatersAgentView extends AbstractAdaptableView implements Refreshable {
 	
 	private static final long serialVersionUID = -2209482143387576390L;
 	
@@ -37,9 +36,16 @@ public class EatersAgentView extends AbstractAdaptableView implements Refreshabl
 
         this.sim = Adaptables.adapt(app, Simulation.class);
         
+        this.addAction(DockingConstants.PIN_ACTION);
+
         this.model = new PlayerTableModel(this.sim);
         this.model.initialize();
         this.table = new JXTable(this.model);
+            
+        this.table.setShowGrid(false);
+        this.table.setHighlighters(HighlighterFactory.createAlternateStriping());
+        this.table.setColumnControlVisible(true);
+
         this.selectionProvider = new TableSelectionProvider(this.table) {
 
             @Override
@@ -48,10 +54,7 @@ public class EatersAgentView extends AbstractAdaptableView implements Refreshabl
                 super.valueChanged(e);
                 updateEaterProperties();
             }};
-        this.table.setShowGrid(false);
-        this.table.setHighlighters(HighlighterFactory.createAlternateStriping());
-        this.table.setColumnControlVisible(true);
-
+        
         final JPanel p = new JPanel(new BorderLayout());
         p.add(new JScrollPane(table), BorderLayout.NORTH);
 
@@ -63,17 +66,18 @@ public class EatersAgentView extends AbstractAdaptableView implements Refreshabl
 
         setContentPane(p);
     }
-
+    
     private void updateEaterProperties() {
-    	final Eater eater = Adaptables.adapt(selectionProvider.getSelectedObject(), Eater.class);
+    	final Eater eater = (Eater)selectionProvider.getSelectedObject();
     	if (eater != null) {
 	    	SwingUtilities.invokeLater(new Runnable() {
 	    		@Override
 	    		public void run() {
 	    			//final String spaces = "&nbsp;&nbsp;&nbsp;";
-	    			StringBuilder sb = new StringBuilder();
+	    			StringBuilder sb = new StringBuilder("<html>");
 	    			sb.append("<b>Location:</b>&nbsp;");
 	    			sb.append(Arrays.toString(eater.getLocation()));
+	    			sb.append("</html>");
 	    			properties.setText(sb.toString());
 	    		}
 	    	});
@@ -88,24 +92,28 @@ public class EatersAgentView extends AbstractAdaptableView implements Refreshabl
         updateEaterProperties();
 	}
 	
+    /* (non-Javadoc)
+     * @see org.jsoar.debugger.AbstractAdaptableView#getAdapter(java.lang.Class)
+     */
+    @Override
+    public Object getAdapter(Class<?> klass)
+    {
+        if(SelectionProvider.class.equals(klass))
+        {
+            return selectionProvider;
+        }
+        else if(PlayerTableModel.class.equals(klass))
+        {
+            return model;
+        }
+        return super.getAdapter(klass);
+    }
+
 	public void selectEater(Eater eater) {
 		int index = model.getPlayers().indexOf(eater);
         if(index != -1) {
             table.getSelectionModel().setSelectionInterval(index, index);
             table.scrollRowToVisible(index);
         }
-	}
-
-	@Override
-	public void selectionChanged(SelectionManager manager) {
-        if(selectionProvider.isActive()) // ignore our own selection
-        {
-            return;
-        }
-        
-		final Eater eater = Adaptables.adapt(manager.getSelectedObject(), Eater.class);
-		if (eater != null) {
-			selectEater(eater);
-		}
 	}
 }

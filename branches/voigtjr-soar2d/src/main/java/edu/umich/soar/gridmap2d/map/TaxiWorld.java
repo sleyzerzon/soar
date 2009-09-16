@@ -208,11 +208,11 @@ public class TaxiWorld implements World {
 	}
 	
 	@Override
-	public boolean addPlayer(PlayerConfig cfg) {
+	public Player addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("Taxi", "There are no suitable starting locations.");
-			return false;
+			return null;
 		}
 
 		Taxi player = new Taxi(sim, cfg.name, cfg.color, fuelStartMin, fuelStartMax, refuel, disableFuel);
@@ -222,7 +222,7 @@ public class TaxiWorld implements World {
 			TaxiCommander cmdr = sim.getCogArch().createTaxiCommander(player, cfg.productions, cfg.shutdown_commands );
 			if (cmdr == null) {
 				players.remove(player);
-				return false;
+				return null;
 			}
 			player.setCommander(cmdr);
 		}
@@ -235,7 +235,7 @@ public class TaxiWorld implements World {
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
 		setLocations();
-		return true;
+		return player;
 	}
 
 	@Override

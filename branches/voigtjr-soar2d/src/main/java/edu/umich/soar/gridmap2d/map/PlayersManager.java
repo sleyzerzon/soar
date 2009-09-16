@@ -14,11 +14,11 @@ import org.apache.commons.logging.LogFactory;
 public class PlayersManager<P extends Player, T> {
 	private static Log logger = LogFactory.getLog(PlayersManager.class);
 
-	private List<P> players = new ArrayList<P>(7);
-	private Map<String, P> playersMap = new HashMap<String, P>(7);
-	private Map<P, int []> initialLocations = new HashMap<P, int []>(7);
-	private Map<P, int []> locations = new HashMap<P, int []>(7);
-	private Map<P, T> lastCommands = new HashMap<P, T>(7);
+	private final List<P> players = new ArrayList<P>(7);
+	private final Map<String, P> playersMap = new HashMap<String, P>(7);
+	private final Map<P, int []> initialLocations = new HashMap<P, int []>(7);
+	private final Map<P, int []> locations = new HashMap<P, int []>(7);
+	private final Map<P, T> lastCommands = new HashMap<P, T>(7);
 	
 	public int numberOfPlayers() {
 		return players.size();

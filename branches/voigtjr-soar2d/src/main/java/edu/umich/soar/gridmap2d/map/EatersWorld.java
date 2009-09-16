@@ -444,11 +444,11 @@ public class EatersWorld implements World {
 	}
 	
 	@Override
-	public boolean addPlayer(PlayerConfig cfg) {
+	public Player addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("There are no suitable starting locations.");
-			return false;
+			return null;
 		}
 		
 		List<EaterCommand> script = null;
@@ -457,7 +457,7 @@ public class EatersWorld implements World {
 				script = EaterCommands.loadScript(cfg.script);
 			} catch (IOException e) {
 				sim.error("IOException loading script " + cfg.script);
-				return false;
+				return null;
 			}
 		}
 
@@ -469,7 +469,7 @@ public class EatersWorld implements World {
 			EaterCommander cmdr = sim.getCogArch().createEaterCommander(player, cfg.productions, sim.getConfig().eatersConfig().vision, cfg.shutdown_commands);
 			if (cmdr == null) {
 				players.remove(player);
-				return false;
+				return null;
 			}
 			player.setCommander(cmdr);
 		} else if (cfg.script != null) {
@@ -490,7 +490,7 @@ public class EatersWorld implements World {
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
 		setLocations();
-		return true;
+		return player;
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import edu.umich.soar.gridmap2d.map.Player;
 
 public class PlayerRemovedEvent extends AbstractPlayerEvent {
 
-	PlayerRemovedEvent(Player player) {
+	public PlayerRemovedEvent(Player player) {
 		super(player);
 	}
 }

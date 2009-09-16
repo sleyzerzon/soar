@@ -3,6 +3,7 @@ package edu.umich.soar.gridmap2d.soar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,7 +62,7 @@ public class SoarTank implements TankCommander, SoarAgent {
 	}
 	
 	@Override
-	public void playersChanged(Player[] players) {
+	public void playersChanged(List<? extends Player> players) {
 		this.players = players;
 		playersChanged = true;
 	}
@@ -162,7 +163,7 @@ public class SoarTank implements TankCommander, SoarAgent {
 	private boolean m_Reset = true;
 	
 	private boolean playersChanged = false;
-	private Player[] players = null;
+	private List<? extends Player> players = null;
 	//private boolean mem_exceeded = false;
 	
 //	@Override

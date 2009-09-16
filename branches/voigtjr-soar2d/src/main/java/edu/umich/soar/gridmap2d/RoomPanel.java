@@ -15,6 +15,8 @@ import edu.umich.soar.gridmap2d.map.EatersMap;
 
 public class RoomPanel extends GridMapPanel {
 	
+	private static final long serialVersionUID = -8083633808532173643L;
+
 	private final Adaptable app;
 	private final int cellSize = 20; // FIXME
 	private int mouthCount = 0;

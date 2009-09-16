@@ -44,11 +44,11 @@ public class RoomWorld implements World, SendMessagesInterface {
 	}
 	
 	@Override
-	public boolean addPlayer(PlayerConfig cfg) {
+	public Player addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("Room Environment", "There are no suitable starting locations.");
-			return false;
+			return null;
 		}
 
 		Robot player = new Robot(sim, cfg.name, cfg.color);
@@ -58,7 +58,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 			RobotCommander cmdr = sim.getCogArch().createRoomCommander(player, this, cfg.productions, cfg.shutdown_commands);
 			if (cmdr == null) {
 				players.remove(player);
-				return false;
+				return null;
 			}
 			player.setCommander(cmdr);
 		} else if (cfg.script != null) {
@@ -77,7 +77,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + "), (" + floatLocation[0] + "," + floatLocation[1] + ")");
 		
 		setLocations();
-		return true;
+		return player;
 	}
 
 	@Override
