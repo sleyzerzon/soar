@@ -1,5 +1,7 @@
 package edu.umich.soar.gridmap2d.map;
 
+import java.util.List;
+
 import edu.umich.soar.gridmap2d.core.Direction;
 import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.gridmap2d.core.Simulation;
@@ -101,7 +103,7 @@ public class Tank extends Player {
 		}
 	}
 	
-	public void playersChanged(Player[] players) {
+	public void playersChanged(List<? extends Player> players) {
 		if (commander != null) {
 			commander.playersChanged(players);
 		}

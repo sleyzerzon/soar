@@ -205,6 +205,10 @@ public class Simulation {
 		return SimConfig.getHome() + "config" + File.separator + "maps"
 				+ File.separator + game.id();
 	}
+	
+	public Game getGame() {
+		return game;
+	}
 
 	public void interrupted(String agentName) {
 		world.interrupted(agentName);
@@ -325,5 +329,9 @@ public class Simulation {
 
 	public double getTimeSlice() {
 		return 0.005;
+	}
+
+	public World getWorld() {
+		return world;
 	}
 }

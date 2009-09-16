@@ -28,8 +28,8 @@ public class PlayersManager<P extends Player, T> {
 		return players;
 	}
 	
-	Player[] getAllAsPlayers() {
-		return players.toArray(new Player[0]);
+	List<? extends Player> getAllAsPlayers() {
+		return players;
 	}
 	
 	ListIterator<P> listIterator() {

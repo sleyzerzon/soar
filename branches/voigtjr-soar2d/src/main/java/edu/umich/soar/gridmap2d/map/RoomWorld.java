@@ -86,7 +86,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 	}
 
 	@Override
-	public Player[] getPlayers() {
+	public List<? extends Player> getPlayers() {
 		return players.getAllAsPlayers();
 	}
 

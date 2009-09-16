@@ -499,7 +499,7 @@ public class EatersWorld implements World {
 	}
 
 	@Override
-	public Player[] getPlayers() {
+	public List<? extends Player> getPlayers() {
 		return players.getAllAsPlayers();
 	}
 }

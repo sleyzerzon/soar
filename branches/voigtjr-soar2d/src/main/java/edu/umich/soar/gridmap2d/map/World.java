@@ -1,6 +1,8 @@
 package edu.umich.soar.gridmap2d.map;
 
 
+import java.util.List;
+
 import edu.umich.soar.gridmap2d.config.PlayerConfig;
 
 public interface World {
@@ -15,7 +17,7 @@ public interface World {
 	public boolean hasPlayer(String name);
 	public boolean addPlayer(PlayerConfig playerConfig);
 	public void removePlayer(String name);
-	public Player[] getPlayers();
+	public List<? extends Player> getPlayers();
 	
 	// control
 	public boolean isTerminal();

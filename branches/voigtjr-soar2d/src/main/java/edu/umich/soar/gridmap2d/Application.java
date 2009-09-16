@@ -20,11 +20,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.flexdock.docking.Dockable;
+import org.flexdock.docking.DockingConstants;
 import org.flexdock.docking.DockingManager;
 import org.flexdock.view.Viewport;
 
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.core.Simulation;
+import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
@@ -107,6 +110,7 @@ public class Application extends JPanel implements Adaptable {
 	private final ActionManager actionManager = new ActionManager(this);
     private final List<AbstractAdaptableView> views = new ArrayList<AbstractAdaptableView>();
     private final Simulation sim;
+    private final List<SimEventListener> simEventListeners = new ArrayList<SimEventListener>();
     //private final SimConfig config;
 
     private Application(Simulation sim, SimConfig config) {
@@ -137,8 +141,37 @@ public class Application extends JPanel implements Adaptable {
 
 		initViews();
 		initMenuBar();
+		
+		sim.getEvents().addListener(AfterTickEvent.class, saveListener(new SimEventListener() {
+            @Override
+            public void onEvent(SimEvent event)
+            {
+            	SwingUtilities.invokeLater(new Runnable() {
+            		@Override
+            		public void run() {
+            			update();
+            		}
+            	});
+            }}));
 	}
-	
+    
+    private void update()
+    {
+        updateActionsAndStatus();
+        
+        List<Refreshable> refreshables = Adaptables.adaptCollection(views, Refreshable.class);
+        for(Refreshable r : refreshables)
+        {
+            r.refresh();
+        }
+    }
+    
+    private SimEventListener saveListener(SimEventListener listener)
+    {
+        simEventListeners.add(listener);
+        return listener;
+    }
+    
     private void initToolbar()
     {
         JToolBar bar = new JToolBar();
@@ -168,6 +201,9 @@ public class Application extends JPanel implements Adaptable {
 	private void initViews() {
 		final WorldView worldView = addView(new WorldView(this));
 		viewport.dock(worldView);
+		
+		final EatersAgentView eatersAgentView = addView(new EatersAgentView(this));
+		viewport.dock((Dockable)eatersAgentView, DockingConstants.EAST_REGION);
 	}
 
     private <T extends AbstractAdaptableView> T addView(T view)

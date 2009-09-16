@@ -10,7 +10,7 @@ public abstract class AbstractPlayerEvent implements SimEvent {
 		this.player = player;
 	}
 	
-	Player getPlayer() {
+	public Player getPlayer() {
 		return player;
 	}
 }

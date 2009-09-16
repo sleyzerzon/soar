@@ -244,7 +244,7 @@ public class TaxiWorld implements World {
 	}
 
 	@Override
-	public Player[] getPlayers() {
+	public List<? extends Player> getPlayers() {
 		return players.getAllAsPlayers();
 	}
 
