@@ -71,7 +71,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	private final int maxMemoryUsage;
 	private final boolean soarPrint;
 	private final int port;
-	private final boolean debug;
+	private boolean debug;
 	private final Simulation sim;
 
 	/**
@@ -604,5 +604,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		
 		logger.trace("update done");
+	}
+
+	@Override
+	public void setDebug(boolean setting) {
+		this.debug = setting;
 	}
 }

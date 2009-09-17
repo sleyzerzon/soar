@@ -12,7 +12,7 @@ public class StopAction extends AbstractGridmap2DAction {
 
 	@Override
 	public void update() {
-        //setEnabled(getApplication().getSim().isRunning());
+        setEnabled(getApplication().getSim().isRunning());
 	}
 
 	@Override

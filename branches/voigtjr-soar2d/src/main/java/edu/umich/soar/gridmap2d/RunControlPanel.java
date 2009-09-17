@@ -7,7 +7,7 @@ import javax.swing.JToolBar;
 
 public class RunControlPanel extends JPanel {
 
-	private static final long serialVersionUID = -7260588716833856406L;
+	private static final long serialVersionUID = -5768132637851782263L;
 
 	public RunControlPanel(Adaptable app) {
         super(new BorderLayout());

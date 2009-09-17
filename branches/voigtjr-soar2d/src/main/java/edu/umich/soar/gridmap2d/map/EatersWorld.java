@@ -179,13 +179,15 @@ public class EatersWorld implements World {
 			// Verify legal move and commit move
 			if (map.isInBounds(newLocation) && !map.getCell(newLocation).hasObjectWithProperty(Names.kPropertyBlock)) {
 				// remove from cell
-				map.getCell(oldLocation).clearPlayers();
+				map.getCell(oldLocation).removePlayer(eater);
 				
 				if (command.isJump()) {
 					eater.adjustPoints(sim.getConfig().eatersConfig().jump_penalty, "jump penalty");
 				}
 				players.setLocation(eater, newLocation);
-				
+				if (logger.isTraceEnabled()) {
+					logger.trace(eater + " from " + Arrays.toString(oldLocation) + " to " + Arrays.toString(newLocation));
+				}
 			} else {
 				eater.adjustPoints(sim.getConfig().eatersConfig().wall_penalty, "wall collision");
 			}
@@ -198,7 +200,6 @@ public class EatersWorld implements World {
 			int [] location = players.getLocation(eater);
 			
 			if (lastCommand.isMove() || lastCommand.isJump()) {
-				assert map.getCell(location).hasPlayers() == false;
 				map.getCell(location).addPlayer(eater);
 
 				Set<CellObject> moveApply = map.getCell(location).getAllObjectsWithProperty(Names.kPropertyMoveApply);

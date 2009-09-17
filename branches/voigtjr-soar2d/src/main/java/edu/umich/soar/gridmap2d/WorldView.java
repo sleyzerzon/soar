@@ -35,9 +35,11 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
             gridMapPanel = new EatersPanel(app);
             break;
         case TANKSOAR:
+        	assert false;
             gridMapPanel = new TankSoarPanel(app);
             break;
         case TAXI:
+        	assert false;
             gridMapPanel = new TaxiPanel(app);
             break;
         case ROOM:

@@ -138,7 +138,7 @@ public class EatersPanel extends GridMapPanel {
 					}
 					
 					if (empty) {
-						g.setColor(SystemColor.window);
+						g.setColor(SystemColor.control);
 						g.fillRect(cellSize*xDraw, cellSize*yDraw, cellSize, cellSize);
 					}
 				}

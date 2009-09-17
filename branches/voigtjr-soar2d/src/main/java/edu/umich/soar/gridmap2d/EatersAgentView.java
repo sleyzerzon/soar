@@ -122,6 +122,10 @@ public class EatersAgentView extends AbstractAdaptableView implements Refreshabl
 
 	@Override
 	public void selectionChanged(SelectionManager manager) {
+		if (this.selectionProvider.isActive()) {
+			return;
+		}
+		
     	final Eater eater = (Eater)manager.getSelectedObject();
     	if (eater != null) {
     		selectEater(eater);

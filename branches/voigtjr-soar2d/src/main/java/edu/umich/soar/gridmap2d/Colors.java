@@ -29,7 +29,7 @@ public class Colors {
 			return Color.GREEN;
 		}
 		if (color.equalsIgnoreCase("purple")) {
-			return Color.getColor("0xA020F0");
+			return Color.decode("0xA020F0");
 		}
 		if (color.equalsIgnoreCase("orange")) {
 			return Color.ORANGE;
@@ -38,7 +38,7 @@ public class Colors {
 			return Color.BLACK;
 		}
 		if (color.equalsIgnoreCase("brown")) {
-			return Color.getColor("0xA52A2A");
+			return Color.decode("0xA52A2A");
 		}
 		if (color.equalsIgnoreCase("lightGray")) {
 			return Color.LIGHT_GRAY;

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -91,9 +90,8 @@ public class Simulation {
 
 		// add initial players
 		logger.trace(Names.Trace.initialPlayers);
-		for (Entry<String, PlayerConfig> entry : config.playerConfigs()
-				.entrySet()) {
-			createPlayer(entry.getKey(), entry.getValue());
+		for (PlayerConfig playerConfig : config.playerConfigs().values()) {
+			createPlayer(playerConfig);
 		}
 
 		return world;
@@ -115,7 +113,7 @@ public class Simulation {
 	 * 
 	 *             create a player and add it to the simulation and world
 	 */
-	public void createPlayer(String playerId, PlayerConfig playerConfig) {
+	public void createPlayer(PlayerConfig playerConfig) {
 
 		if ((playerConfig.color == null) || (playerConfig.color != null && playerConfig.color.isUsed())) {
 			playerConfig.color = PlayerColor.useNext();
@@ -243,7 +241,6 @@ public class Simulation {
 						logger.trace("firing before tick");
 						eventManager.fireEvent(new BeforeTickEvent());
 						tick();
-						
 						if (ticks > 0) {
 							ticksDone += 1;
 							if (ticksDone >= ticks) {
@@ -257,8 +254,8 @@ public class Simulation {
 						
 					} while(!stopRequested.getAndSet(false));
 					logger.trace("firing stop");
-					eventManager.fireEvent(new StopEvent());
 					running.set(false);
+					eventManager.fireEvent(new StopEvent());
 				}
 			});
 		} else {

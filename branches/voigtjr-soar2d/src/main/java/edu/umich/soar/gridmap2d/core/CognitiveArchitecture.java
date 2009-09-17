@@ -24,6 +24,7 @@ public interface CognitiveArchitecture {
 
 	void doAfterClients();
 
+	void setDebug(boolean setting);
 	boolean debug();
 	
 	void destroyPlayer(String name);

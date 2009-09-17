@@ -31,6 +31,7 @@ import org.flexdock.view.Viewport;
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
+import edu.umich.soar.gridmap2d.core.events.ResetEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
@@ -164,18 +165,22 @@ public class Application extends JPanel implements Adaptable {
                 }
             }});
 
-        sim.getEvents().addListener(AfterTickEvent.class, saveListener(new SimEventListener() {
-            @Override
-            public void onEvent(SimEvent event)
-            {
-            	SwingUtilities.invokeLater(new Runnable() {
-            		@Override
-            		public void run() {
-            			update();
-            		}
-            	});
-            }}));
+        sim.getEvents().addListener(AfterTickEvent.class, saveListener(new UpdateListener()));
+        sim.getEvents().addListener(StopEvent.class, saveListener(new UpdateListener()));
+        sim.getEvents().addListener(ResetEvent.class, saveListener(new UpdateListener()));
 	}
+    
+    private class UpdateListener implements SimEventListener {
+    	@Override
+    	public void onEvent(SimEvent event) {
+        	SwingUtilities.invokeLater(new Runnable() {
+        		@Override
+        		public void run() {
+        			update();
+        		}
+        	});
+    	}
+    }
     
     private void update()
     {
@@ -200,6 +205,7 @@ public class Application extends JPanel implements Adaptable {
         bar.setFloatable(false);
         
         bar.add(new RunControlPanel(this));
+        bar.add(new AgentControlPanel(this));
         
         add(bar, BorderLayout.NORTH);
     }
@@ -209,7 +215,12 @@ public class Application extends JPanel implements Adaptable {
 		new StepAction(actionManager);
 		new StopAction(actionManager);
 		new ResetAction(actionManager);
+		
 		new ExitAction(actionManager);
+		
+		new CreatePlayerAction(actionManager);
+		new ClonePlayerAction(actionManager);
+		new RemovePlayerAction(actionManager);
 	}
 
 	private void initMenuBar() {
@@ -224,8 +235,8 @@ public class Application extends JPanel implements Adaptable {
 		final WorldView worldView = addView(new WorldView(this));
 		viewport.dock(worldView);
 		
-		final EatersAgentView eatersAgentView = addView(new EatersAgentView(this));
-		viewport.dock((Dockable)eatersAgentView, DockingConstants.EAST_REGION);
+//		final EatersAgentView eatersAgentView = addView(new EatersAgentView(this));
+//		viewport.dock((Dockable)eatersAgentView, DockingConstants.EAST_REGION);
 	}
 
     private <T extends AbstractAdaptableView> T addView(T view)
@@ -310,5 +321,10 @@ public class Application extends JPanel implements Adaptable {
 
 	public SelectionManager getSelectionManager() {
         return selectionManager;
+	}
+
+	public void createPlayer() {
+		CreatePlayerDialog cpd = new CreatePlayerDialog(frame, sim);
+		cpd.setVisible(true);
 	}
 }
