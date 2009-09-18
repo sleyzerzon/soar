@@ -3610,8 +3610,8 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 									delete n_c;
 								}								
 							}
-							// otherwise winner by default, pass along constraint
-							else
+							// if cue didn't have substructure, winner by default, pass along constraint
+							else if ( !c_l->lit->wme_kids )
 							{
 								good_literal = true;
 
