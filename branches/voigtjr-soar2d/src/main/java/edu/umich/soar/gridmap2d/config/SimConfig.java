@@ -19,6 +19,7 @@ import edu.umich.soar.config.ParseError;
 import edu.umich.soar.gridmap2d.Application;
 import edu.umich.soar.gridmap2d.core.Game;
 import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.PlayerColor;
 
 
 public class SimConfig implements GameConfig {	
@@ -314,6 +315,9 @@ public class SimConfig implements GameConfig {
 					
 				} else if (f.getType().getName() == "java.lang.String") {
 					f.set(target, childConfig.getString(f.getName(), (String)f.get(target)));
+					
+				} else if (f.getType().getName() == "edu.umich.soar.gridmap2d.core.PlayerColor") {
+					f.set(target, PlayerColor.valueOf(childConfig.getString(f.getName(), null).toUpperCase()));
 					
 				} else 	if (f.getType().getName() == "[Z") {
 					f.set(target, childConfig.getBooleans(f.getName(), (boolean [])f.get(target)));

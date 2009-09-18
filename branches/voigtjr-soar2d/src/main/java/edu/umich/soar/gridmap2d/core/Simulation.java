@@ -197,7 +197,9 @@ public class Simulation {
 			destroyPlayer(player);
 		}
 
-		cogArch.shutdown();
+		if (cogArch != null) {
+			cogArch.shutdown();
+		}
 	}
 
 	public boolean isDone() {
