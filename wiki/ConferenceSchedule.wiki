@@ -15,8 +15,8 @@ table below lists typical conference deadlines by month.
 || *July* || ||
 || *August* || ||
 || *September* || [http://www.icaart.org/ ICAART] || 
-|| *October* || [http://www.cse.yorku.ca/AAMAS2010/ AAMAS] ||
-|| *November* || [http://agi-conf.org/ AGI], [http://www.flairs.com/ FLAIRS], [http://www.kr.org/KR2010/ KR&R] ||
+|| *October* || [http://www.cse.yorku.ca/AAMAS2010/ AAMAS], [http://agi-conf.org/2010/ AGI] ||
+|| *November* || [http://www.flairs.com/ FLAIRS], [http://www.kr.org/KR2010/ KR&R] ||
 || *December* || ||
 
 
@@ -24,6 +24,7 @@ table below lists typical conference deadlines by month.
 
 These deadlines are official for a particular conference year:
   * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010] -- papers due October 13th, 2009
+  * [http://agi-conf.org/2010/ AGI 2010] -- papers due October 15th, 2009
   * [http://www.kr.org/KR2010/ KR&R 2010] -- papers due November 30, 2009
   * [http://cbrtrack-flairs-23.info/ FLAIRS 2010] -- papers due November 23rd, 2009
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
@@ -34,7 +35,6 @@ These deadlines are official for a particular conference year:
   * [http://ecai2010.appia.pt/ ECAI 2010] -- papers due February 22nd, 2010
 
 These conferences have yet to announce official deadlines:
-  * [http://agi-conf.org/ AGI 2010]
   * [http://aigicrv.site.uottawa.ca/ CAI 2010]
   * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010]
   * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010]
@@ -97,7 +97,7 @@ These conferences have yet to announce official deadlines:
   * [http://www.icaart.org/ ICAART 2010], January 22-24, 2010 in Valencia, Spain
     * International Conference on Agents and Artificial Intelligence
     
-  * [http://agi-conf.org/ AGI 2010], TBD: March 5-8, 2010 in Lugano, Switzerland
+  * [http://agi-conf.org/2010/ AGI 2010], TBD: March 5-8, 2010 in Lugano, Switzerland
     * Artificial General Intelligence
     * 2011: San Francisco Bay area
     
