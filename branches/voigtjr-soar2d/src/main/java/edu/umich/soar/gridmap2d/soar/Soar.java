@@ -14,9 +14,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.commsen.stopwatch.Report;
+import com.commsen.stopwatch.Stopwatch;
 
 import edu.umich.soar.gridmap2d.config.ClientConfig;
 import edu.umich.soar.gridmap2d.config.SimConfig;
@@ -46,7 +50,6 @@ import sml.Kernel;
 import sml.smlPrintEventId;
 import sml.smlUpdateEventId;
 import sml.sml_Names;
-import sml.smlRunFlags;
 
 public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface, SimEventListener {
 
@@ -287,11 +290,14 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	@Override
 	public void shutdown() {
+		for (Report report : Stopwatch.getAllReports()) {
+			System.out.println(report);
+		}
+		
 		exec.shutdown();
 		try {
 			exec.awaitTermination(5, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -300,7 +306,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			kernel.Shutdown();
 			kernel.delete();
 		}
-
 	}
 
 	/**
@@ -495,117 +500,162 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	private static final ExecutorService exec = Executors
 			.newSingleThreadExecutor();
-	
 
-	private BlockingQueue<TickStatus> tickReady = new SynchronousQueue<TickStatus>();
+	private BlockingQueue<Boolean> tickReady = new SynchronousQueue<Boolean>();
 	private BlockingQueue<Boolean> outputReady = new SynchronousQueue<Boolean>();
-	private BlockingQueue<Boolean> tickDone = new SynchronousQueue<Boolean>();
-	
+	private BlockingQueue<Boolean> inputReady = new SynchronousQueue<Boolean>();
+	private BlockingQueue<Boolean> inputProcessed = new SynchronousQueue<Boolean>();
+
 	@Override
 	public void onEvent(SimEvent event) {
-		if (event instanceof StartEvent) {
-			if (agents.size() != 0) {
-				firstUpdate = true;
-				exec.submit(new Callable<Void>() {
-					@Override
-					public Void call() {
-						logger.trace("soar alive, committing");
-
-						for (AgentData ad : agents.values()) {
-							ad.agent.Commit();
-						}
-						
-						logger.trace("running all agents forever");
-						logger.trace(kernel.RunAllAgentsForever());
-						logger.trace("run returned");
-						return null;
-					}
-				});
+		try {
+			if (event instanceof StartEvent) {
+				onStartEvent();
+			} else {
+				if (interrupted.get()) {
+					logger.trace("Ignoring event due to interrupted flag");
+					return;
+				}
+				if (event instanceof BeforeTickEvent) {
+					onBeforeTickEvent();
+				} else if (event instanceof AfterTickEvent) {
+					onAfterTickEvent();
+				} else if (event instanceof StopEvent) {
+					onStopEvent();
+				}
 			}
-		} else if (event instanceof BeforeTickEvent) {
-			try {
-				// wait for update
-				logger.trace("before tick, waiting for update");
-				tickReady.put(TickStatus.GO);
-				outputReady.take();
-			} catch (InterruptedException e) {
-				// TODO: handle correctly
-			}
-			logger.trace("before tick, returning");
-
-		} else if (event instanceof AfterTickEvent) {
-			try {
-				logger.trace("after tick, notifying done");
-				// tell that tick is done
-				tickDone.take();
-				
-			} catch (InterruptedException e) {
-				// TODO: handle correctly
-			}
-			logger.trace("after tick returning");
-
-		} else if (event instanceof StopEvent) {
-			try {
-				logger.trace("stop event issuing notice");
-				tickReady.put(TickStatus.STOP);
-			} catch (InterruptedException e) {
-				// TODO: handle correctly
-			}
-			logger.trace("before tick, returning");
+		} catch (InterruptedException e) {
+			logger.trace("event interrupted");
+			interrupted.set(true);
+			flushLocks();
+		} finally {
+			logger.trace("event returning");
 		}
 	}
 	
-	private enum TickStatus { GO, STOP };
+	private void onStartEvent() {
+		firstUpdate = true;
+		interrupted.set(false);
+		if (agents.size() != 0) {
+			exec.submit(new Callable<Void>() {
+				@Override
+				public Void call() {
+					logger.trace("Soar alive");
+					for (AgentData ad : agents.values()) {
+						ad.agent.Commit();
+					}
+					logger.trace("Soar run start");
+					logger.trace("Run result: " + kernel.RunAllAgentsForever());
+					logger.trace("Soar run returning");
+					return null;
+				}
+			});
+		}
+	}
 	
-	boolean firstUpdate;
+	private void onBeforeTickEvent() throws InterruptedException {
+		logger.trace("onBeforeTickEvent tickReady");
+		tickReady.put(Boolean.TRUE);
+		if (interrupted.get()) {
+			logger.trace("onBeforeTickEvent interrupted flag is set");
+			return;
+		}
+		logger.trace("onBeforeTickEvent wait for outputReady");
+		outputReady.take();
+	}
+	
+	private void onAfterTickEvent() throws InterruptedException {
+		logger.trace("onAfterTickEvent inputReady");
+		inputReady.put(Boolean.TRUE);
+		if (interrupted.get()) {
+			logger.trace("onAfterTickEvent interrupted flag is set");
+			return;
+		}
+		logger.trace("onAfterTickEvent wait for inputProcessed");
+		inputProcessed.take();
+	}
+	
+	private void onStopEvent() throws InterruptedException {
+		logger.trace("StopEvent tickReady");
+		tickReady.put(Boolean.FALSE);
+	}
+	
+	private boolean firstUpdate;
+	private boolean synchronous = false;
+	private AtomicBoolean interrupted = new AtomicBoolean();
 	
 	@Override
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
-		for (AgentData ad : agents.values()) {
-			logger.trace("processing output for " + ad.agent.GetAgentName());
-			ad.sa.processSoarOuput();
-		}
-		
+		long id = Stopwatch.start("Soar", "updateEventHandler");
 		try {
-			if (firstUpdate) {
+			if (synchronous && firstUpdate) {
+				logger.trace("Soar update first update");
 				firstUpdate = false;
-				logger.trace("waiting for tick to become ready");
-				TickStatus tick = tickReady.take();
-				if (tick == TickStatus.GO) {
-					logger.trace("tick is ready");
-				} else {
-					throw new IllegalStateException("before-tick event must follow start event");
+				tickReady.take();
+			} else if (!synchronous) {
+				//logger.trace("Soar poll tickReady");
+				Boolean go = tickReady.poll();
+				if (go == Boolean.FALSE) {
+					logger.trace("Soar update async stop");
+					stop();
+					return;
+				} else if (go == null) {
+					//logger.trace("Soar update async not ready");
+					return;
 				}
+				logger.trace("Soar update async");
 			}
 
-			// let the environment tick
-			outputReady.put((runFlags & smlRunFlags.sml_DONT_UPDATE_WORLD.swigValue()) == 0);
-			
-			logger.trace("waiting for tick to complete");
-			tickDone.put(Boolean.TRUE);
-			
 			for (AgentData ad : agents.values()) {
-				logger.trace("updating input for " + ad.agent.GetAgentName());
+				logger.trace("Soar update processing output for " + ad.agent.GetAgentName());
+				ad.sa.processSoarOuput();
+			}
+			outputReady.put(Boolean.TRUE);
+			logger.trace("Soar wait inputReady");
+			inputReady.take();
+			for (AgentData ad : agents.values()) {
+				logger.trace("Soar updating input for " + ad.agent.GetAgentName());
 				ad.sa.updateSoarInput();
 				ad.agent.Commit();
 			}
+			logger.trace("Soar inputProcessed");
+			inputProcessed.put(Boolean.TRUE);
 			
-			logger.trace("waiting for tick or stop");
-			TickStatus tick = tickReady.take();
-			
-			if (tick == TickStatus.STOP) {
-				logger.trace("issuing stop");
-				kernel.StopAllAgents();
-			} else {
-				logger.trace("tick is ready");
+			if (synchronous) {
+				logger.trace("Soar wait tickReady");
+				Boolean go = tickReady.take();
+				if (go == Boolean.FALSE) {
+					logger.trace("Soar update sync stop");
+					stop();
+					return;
+				}
 			}
-		} catch (InterruptedException e1) {
-			// TODO handle correctly
+			
+		} catch (InterruptedException e) {
+			logger.trace("Soar update interrupted");
+			interrupted.set(true);
+			stop();
+			sim.stop();
+			flushLocks();
+			
+		} finally {
+			logger.trace("Soar update done");
+			Stopwatch.stop(id);	
 		}
-		
-		logger.trace("update done");
 	}
-
+	
+	private void flushLocks() {
+		tickReady.poll();
+		outputReady.offer(Boolean.FALSE);
+		inputReady.poll();
+		inputProcessed.offer(Boolean.FALSE);
+	}
+	
+	private void stop() {
+		logger.trace("issuing stop");
+		kernel.StopAllAgents();
+	}
+	
 	@Override
 	public void setDebug(boolean setting) {
 		this.debug = setting;

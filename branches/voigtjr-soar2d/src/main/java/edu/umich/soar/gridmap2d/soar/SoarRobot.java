@@ -7,8 +7,6 @@ import jmat.LinAlg;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.commsen.stopwatch.Stopwatch;
-
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RobotCommand;
@@ -177,12 +175,8 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 
 	@Override
 	public void updateSoarInput() {
-		long id1 = Stopwatch.start("soar update", "output");
 		ddc = output.update();
-		Stopwatch.stop(id1);
 
-		long id2 = Stopwatch.start("soar update", "input");
 		input.update(player, world, (RoomMap)sim.getMap(), this.isFloatYawWmes());	
-		Stopwatch.stop(id2);
 	}
 }

@@ -13,8 +13,6 @@ import lcmtypes.pose_t;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.commsen.stopwatch.Stopwatch;
-
 import edu.umich.soar.gridmap2d.config.PlayerConfig;
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
@@ -181,7 +179,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 	public void update(int worldCount) {
 		WorldUtil.checkNumPlayers(sim, players.numberOfPlayers());
 
-		long id1 = Stopwatch.start("update", "input");
 		// Collect input
 		for (Robot player : players.getAll()) {
 			player.resetPointsChanged();
@@ -194,20 +191,15 @@ public class RoomWorld implements World, SendMessagesInterface {
 			players.setCommand(player, command);
 			WorldUtil.checkStopSim(sim, stopMessages, command.isStopSim(), player);
 		}
-		Stopwatch.stop(id1);
 		
-		long id2 = Stopwatch.start("update", "move");
 		moveRoomPlayers(0.005);
 		
 		for (Message message : messages) {
 			message.recipient.getReceiveMessagesInterface().newMessage(message.from, message.tokens);
 		}
 		messages.clear();
-		Stopwatch.stop(id2);
 		
-		long id3 = Stopwatch.start("update", "update");
 		setLocations();
-		Stopwatch.stop(id3);
 	}
 
 	private void moveRoomPlayers(double time) {

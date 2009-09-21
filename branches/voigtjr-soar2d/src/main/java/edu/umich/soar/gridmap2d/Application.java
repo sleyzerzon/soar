@@ -23,6 +23,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.flexdock.docking.Dockable;
+import org.flexdock.docking.DockingConstants;
 import org.flexdock.docking.DockingManager;
 import org.flexdock.docking.activation.ActiveDockableTracker;
 import org.flexdock.view.Viewport;
@@ -30,6 +31,8 @@ import org.flexdock.view.Viewport;
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
+import edu.umich.soar.gridmap2d.core.events.PlayerAddedEvent;
+import edu.umich.soar.gridmap2d.core.events.PlayerRemovedEvent;
 import edu.umich.soar.gridmap2d.core.events.ResetEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
@@ -167,6 +170,8 @@ public class Application extends JPanel implements Adaptable {
         sim.getEvents().addListener(AfterTickEvent.class, saveListener(new UpdateListener()));
         sim.getEvents().addListener(StopEvent.class, saveListener(new UpdateListener()));
         sim.getEvents().addListener(ResetEvent.class, saveListener(new UpdateListener()));
+        sim.getEvents().addListener(PlayerAddedEvent.class, saveListener(new UpdateListener()));
+        sim.getEvents().addListener(PlayerRemovedEvent.class, saveListener(new UpdateListener()));
 	}
     
     private class UpdateListener implements SimEventListener {
@@ -234,8 +239,21 @@ public class Application extends JPanel implements Adaptable {
 		final WorldView worldView = addView(new WorldView(this));
 		viewport.dock(worldView);
 		
-//		final EatersAgentView eatersAgentView = addView(new EatersAgentView(this));
-//		viewport.dock((Dockable)eatersAgentView, DockingConstants.EAST_REGION);
+		final AbstractAdaptableView agentView = addView(getAgentView());
+		worldView.dock((Dockable)agentView, DockingConstants.EAST_REGION, 0.75f);
+	}
+	
+	private AbstractAdaptableView getAgentView() {
+		switch (sim.getConfig().game()) {
+		case EATERS:
+			return new EatersAgentView(this);
+		case ROOM:
+			return new RoomAgentView(this);
+		default:
+			break;
+		}
+		assert false;
+		return null;
 	}
 
     private <T extends AbstractAdaptableView> T addView(T view)

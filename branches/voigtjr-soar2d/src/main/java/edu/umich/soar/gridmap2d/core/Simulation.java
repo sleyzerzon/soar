@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -185,9 +186,9 @@ public class Simulation {
 	public void shutdown() {
 		exec.shutdown();
 		try {
+			// The delay is high here so that headless runs can complete.
 			exec.awaitTermination(5, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -225,38 +226,61 @@ public class Simulation {
 	
 	private static final ExecutorService exec = Executors
 		.newSingleThreadExecutor();
+	private static final ScheduledExecutorService schexec = Executors
+		.newSingleThreadScheduledExecutor();
 	private AtomicBoolean running = new AtomicBoolean(false);
 	private AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private SimEventManager eventManager = new SimEventManager();
 
-	public void run(final int ticks) {
-		
+	public void run(final int ticks, final long period, final TimeUnit unit) {
 		if (!running.getAndSet(true)) {
 			exec.submit(new Runnable() {
 				@Override
 				public void run() {
-					// TODO: thread interruption
-					logger.trace("firing start");
+					logger.trace("firing StartEvent");
 					eventManager.fireEvent(new StartEvent());
-					int ticksDone = 0;
-					do {
-						logger.trace("firing before tick");
-						eventManager.fireEvent(new BeforeTickEvent());
-						tick();
-						if (ticks > 0) {
-							ticksDone += 1;
-							if (ticksDone >= ticks) {
-								logger.trace("requesting stop due to tick count");
-								stopRequested.set(true);
+					
+					final int initialWorldCount = worldCount;
+					
+					if (period <= 0) {
+						do {
+							tick();
+							if (ticks > 0) {
+								if (worldCount - initialWorldCount >= ticks) {
+									logger.trace("requesting stop due to tick count");
+									stopRequested.set(true);
+								}
 							}
-						}
-
-						logger.trace("firing after tick");
-						eventManager.fireEvent(new AfterTickEvent());
+						} while(!stopRequested.getAndSet(false));
+					} else {
+						schexec.scheduleAtFixedRate(new Runnable() {
+							
+							@Override
+							public void run() {
+								tick();
+								if (ticks > 0) {
+									if (worldCount - initialWorldCount >= ticks) {
+										logger.trace("requesting stop due to tick count");
+										stopRequested.set(true);
+									}
+								}
+								
+								if (stopRequested.getAndSet(false)) {
+									schexec.shutdown();
+								}
+							}
+						}, period, period, unit);
 						
-					} while(!stopRequested.getAndSet(false));
-					logger.trace("firing stop");
+						try {
+							schexec.awaitTermination(10, TimeUnit.MINUTES);
+						} catch (InterruptedException e) {
+							logger.trace("awaitTermination interrupted");
+						}
+					}
+					
 					running.set(false);
+					
+					logger.trace("firing StopEvent");
 					eventManager.fireEvent(new StopEvent());
 				}
 			});
@@ -265,8 +289,12 @@ public class Simulation {
 		}
 	}
 	
+	public void run(final int ticks) {
+		run(ticks, 0, null);
+	}
+	
 	public void run() {
-		run(0);
+		run(0, 50, TimeUnit.MILLISECONDS);
 	}
 	
 	public CognitiveArchitecture getCogArch() {
@@ -286,9 +314,16 @@ public class Simulation {
 	}
 	
 	private void tick() {
+		logger.trace("firing BeforeTickEvent");
+		eventManager.fireEvent(new BeforeTickEvent());
+		
 		worldCount += 1;
+		
 		logger.trace("tick " + worldCount);
 		world.update(worldCount);
+
+		logger.trace("firing AfterTickEvent");
+		eventManager.fireEvent(new AfterTickEvent());
 	}
 
 	public boolean isRunning() {

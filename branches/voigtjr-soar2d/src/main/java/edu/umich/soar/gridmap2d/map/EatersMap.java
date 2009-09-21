@@ -10,9 +10,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.commsen.stopwatch.Report;
-import com.commsen.stopwatch.Stopwatch;
-
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.gridmap2d.core.Simulation;
@@ -98,9 +95,6 @@ public class EatersMap extends GridMapBase implements GridMap,
 		}
 
 		generatePhase = false;
-		for (Report report : Stopwatch.getAllReports()) {
-			System.out.println(report);
-		}
 	}
 
 	/**

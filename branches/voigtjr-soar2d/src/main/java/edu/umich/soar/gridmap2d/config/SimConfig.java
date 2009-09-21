@@ -317,7 +317,10 @@ public class SimConfig implements GameConfig {
 					f.set(target, childConfig.getString(f.getName(), (String)f.get(target)));
 					
 				} else if (f.getType().getName() == "edu.umich.soar.gridmap2d.core.PlayerColor") {
-					f.set(target, PlayerColor.valueOf(childConfig.getString(f.getName(), null).toUpperCase()));
+					String colorString = childConfig.getString(f.getName(), null);
+					if (colorString != null) {
+						f.set(target, PlayerColor.valueOf(colorString.toUpperCase()));
+					}
 					
 				} else 	if (f.getType().getName() == "[Z") {
 					f.set(target, childConfig.getBooleans(f.getName(), (boolean [])f.get(target)));

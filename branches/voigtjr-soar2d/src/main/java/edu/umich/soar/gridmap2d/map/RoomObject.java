@@ -27,6 +27,18 @@ public class RoomObject {
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(id);
+		if (object.hasProperty("name")) {
+			sb.append(" (");
+			sb.append(object.getProperty("name", String.class));
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
 	void update(GridMapCells cells) {
 		Cell container = object.getCell();
 		int[] location = container.getLocation();

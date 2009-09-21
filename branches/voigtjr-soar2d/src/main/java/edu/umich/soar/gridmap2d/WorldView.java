@@ -13,7 +13,7 @@ import edu.umich.soar.gridmap2d.map.Player;
 import edu.umich.soar.gridmap2d.selection.SelectionManager;
 import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 
-public class WorldView extends AbstractAdaptableView implements SelectionProvider {
+public class WorldView extends AbstractAdaptableView implements SelectionProvider, Refreshable {
 	
 	private static final long serialVersionUID = 4612350578042898852L;
 	
@@ -56,22 +56,12 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
         });
     }
 
-	private int [] getCellAtPixel(int x, int y) {
-		int [] loc = new int [] {x, y};
-		loc[0] /= gridMapPanel.getCellSize();
-		loc[1] /= gridMapPanel.getCellSize();
-		if (sim.getMap().isInBounds(loc)) {
-			return loc;
+	private Player getPlayerAtPixel(int x, int y) {
+		int[] xy = gridMapPanel.getCellAtPixel(x, y);
+		if (sim.getMap().isInBounds(xy)) {
+			return this.sim.getMap().getCell(xy).getFirstPlayer();
 		}
 		return null;
-	}
-	
-	private Player getPlayerAtPixel(int x, int y) {
-		int[] xy = getCellAtPixel(x, y);
-		if (xy == null) {
-			return null;
-		}
-		return this.sim.getMap().getCell(xy).getFirstPlayer();
 	}
 	
 	private void selectPlayer(Player player) {
@@ -101,5 +91,10 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
 		List<Object> selection = new ArrayList<Object>(1);
 		selection.add(selectedPlayer);
 		return selection;
+	}
+
+	@Override
+	public void refresh() {
+		this.gridMapPanel.repaint();
 	}
 }

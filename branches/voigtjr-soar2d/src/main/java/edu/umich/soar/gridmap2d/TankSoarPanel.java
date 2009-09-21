@@ -7,8 +7,6 @@ import java.util.Set;
 
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
-import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
-import edu.umich.soar.gridmap2d.core.events.ResetEvent;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.Eater;
 import edu.umich.soar.gridmap2d.map.EatersMap;
@@ -23,10 +21,6 @@ public class TankSoarPanel extends GridMapPanel {
 
 	public TankSoarPanel(Adaptable app) {
 		this.app = app;
-		
-		Simulation sim = Adaptables.adapt(app, Simulation.class);
-		sim.getEvents().addListener(AfterTickEvent.class, this);
-		sim.getEvents().addListener(ResetEvent.class, this);
 	}
 	
 	@Override

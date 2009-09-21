@@ -1,6 +1,5 @@
 package edu.umich.soar.gridmap2d;
 
-
 import java.awt.BorderLayout;
 import java.util.Arrays;
 
@@ -16,15 +15,15 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import edu.umich.soar.gridmap2d.core.Simulation;
-import edu.umich.soar.gridmap2d.map.Eater;
+import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.selection.SelectionListener;
 import edu.umich.soar.gridmap2d.selection.SelectionManager;
 import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 import edu.umich.soar.gridmap2d.selection.TableSelectionProvider;
 
-public class EatersAgentView extends AbstractAgentView implements Refreshable, SelectionListener {
+public class RoomAgentView extends AbstractAgentView implements SelectionListener {
 	
-	private static final long serialVersionUID = -2209482143387576390L;
+	private static final long serialVersionUID = 88497381529040370L;
 	
 	private final Simulation sim;
 	private final PlayerTableModel model;
@@ -32,8 +31,8 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
 	private final JLabel properties = new JLabel();
 	private final TableSelectionProvider selectionProvider;
 	
-    public EatersAgentView(Adaptable app) {
-        super("eatersAgentView", "Agent View");
+    public RoomAgentView(Adaptable app) {
+        super("roomAgentView", "Agent View");
         addAction(DockingConstants.PIN_ACTION);
 
         this.sim = Adaptables.adapt(app, Simulation.class);
@@ -55,31 +54,33 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
             public void valueChanged(ListSelectionEvent e)
             {
                 super.valueChanged(e);
-                updateEaterProperties();
+                updateRobotProperties();
             }};
         
         final JPanel p = new JPanel(new BorderLayout());
         p.add(new JScrollPane(table), BorderLayout.NORTH);
 
-        properties.setBorder(BorderFactory.createTitledBorder("Eater Properties"));
+        properties.setBorder(BorderFactory.createTitledBorder("Robot Properties"));
         p.add(properties, BorderLayout.CENTER);
         
-        //GridMapPanel gridMapPanel = new EatersPanel(app);
-        //p.add(gridMapPanel, BorderLayout.SOUTH);
-
         setContentPane(p);
     }
     
-    private void updateEaterProperties() {
-    	final Eater eater = (Eater)selectionProvider.getSelectedObject();
-    	if (eater != null) {
+    private void updateRobotProperties() {
+    	final Robot robot = (Robot)selectionProvider.getSelectedObject();
+    	if (robot != null) {
 	    	SwingUtilities.invokeLater(new Runnable() {
 	    		@Override
 	    		public void run() {
-	    			//final String spaces = "&nbsp;&nbsp;&nbsp;";
+	    			final String BR = "&nbsp;&nbsp;&nbsp;";
 	    			StringBuilder sb = new StringBuilder("<html>");
-	    			sb.append("<b>Location:</b>&nbsp;");
-	    			sb.append(Arrays.toString(eater.getLocation()));
+	    			sb.append(" <b>Cell:</b>&nbsp;" + Arrays.toString(robot.getLocation()) + BR);
+	    			sb.append(" <b>Area:</b>&nbsp;" + robot.getState().getLocationId() + BR);
+	    			sb.append(" <b>Location:</b>&nbsp;" + String.format("[%2.1f,%2.1f]", robot.getState().getPose().pos[0], robot.getState().getPose().pos[1]) + BR);
+	    			sb.append(" <b>Yaw:</b>&nbsp;" + String.format("%2.1f", robot.getState().getYaw()) + BR);
+	    			sb.append(" <b>X&nbsp;Collision:</b>&nbsp;" + robot.getState().isCollisionX() + BR);
+	    			sb.append(" <b>Y&nbsp;Collision:</b>&nbsp;" + robot.getState().isCollisionY() + BR);
+	    			sb.append(" <b>Carried:</b>&nbsp;" + (robot.getState().hasObject() ? robot.getState().getRoomObject() : "-") + BR);
 	    			sb.append("</html>");
 	    			properties.setText(sb.toString());
 	    		}
@@ -89,10 +90,10 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
 
 	@Override
 	public void refresh() {
-        table.repaint();
-        table.packAll();
+        this.table.repaint();
+        this.table.packAll();
 
-        updateEaterProperties();
+        updateRobotProperties();
 	}
 	
     /* (non-Javadoc)
@@ -112,8 +113,8 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
         return super.getAdapter(klass);
     }
 
-	public void selectEater(Eater eater) {
-		int index = model.getPlayers().indexOf(eater);
+	public void selectRobot(Robot robot) {
+		int index = model.getPlayers().indexOf(robot);
         if(index != -1) {
             table.getSelectionModel().setSelectionInterval(index, index);
             table.scrollRowToVisible(index);
@@ -126,10 +127,10 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
 			return;
 		}
 		
-    	final Eater eater = (Eater)manager.getSelectedObject();
-    	if (eater != null) {
-    		selectEater(eater);
-    		updateEaterProperties();
+    	final Robot robot = (Robot)manager.getSelectedObject();
+    	if (robot != null) {
+    		selectRobot(robot);
+    		updateRobotProperties();
     	}
 	}
 }
