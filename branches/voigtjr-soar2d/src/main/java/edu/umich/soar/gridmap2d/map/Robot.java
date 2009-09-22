@@ -26,16 +26,7 @@ public class Robot extends Player {
 	}
 	
 	public RobotCommand getCommand() {
-		RobotCommand command;
-		
-		// TODO
-//		if (commander != null) {
-			command = commander.nextCommand();
-//		} else {
-//			command = Gridmap2D.control.getHumanCommand(this);
-//		}
-		
-		return command;
+		return commander.nextCommand();
 	}
 	
 	@Override

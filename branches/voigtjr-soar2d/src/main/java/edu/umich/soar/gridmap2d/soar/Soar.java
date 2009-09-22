@@ -554,30 +554,45 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 	
 	private void onBeforeTickEvent() throws InterruptedException {
-		logger.trace("onBeforeTickEvent tickReady");
-		tickReady.put(Boolean.TRUE);
-		if (interrupted.get()) {
-			logger.trace("onBeforeTickEvent interrupted flag is set");
-			return;
+		if (synchronous) {
+			logger.trace("onBeforeTickEvent tickReady");
+			tickReady.put(Boolean.TRUE);
+			if (interrupted.get()) {
+				logger.trace("onBeforeTickEvent interrupted flag is set");
+				return;
+			}
+			logger.trace("onBeforeTickEvent wait for outputReady");
+			outputReady.take();
 		}
-		logger.trace("onBeforeTickEvent wait for outputReady");
-		outputReady.take();
 	}
 	
 	private void onAfterTickEvent() throws InterruptedException {
-		logger.trace("onAfterTickEvent inputReady");
-		inputReady.put(Boolean.TRUE);
-		if (interrupted.get()) {
-			logger.trace("onAfterTickEvent interrupted flag is set");
-			return;
+		if (synchronous) {
+			logger.trace("onAfterTickEvent inputReady");
+			inputReady.put(Boolean.TRUE);
+			if (interrupted.get()) {
+				logger.trace("onAfterTickEvent interrupted flag is set");
+				return;
+			}
+			logger.trace("onAfterTickEvent wait for inputProcessed");
+			inputProcessed.take();
+		} else {
+			logger.trace("onAfterTickEvent inputReady offer");
+			if (inputReady.offer(Boolean.TRUE)) {
+				logger.trace("onAfterTickEvent wait for inputProcessed");
+				inputProcessed.take();
+			}
 		}
-		logger.trace("onAfterTickEvent wait for inputProcessed");
-		inputProcessed.take();
 	}
 	
 	private void onStopEvent() throws InterruptedException {
-		logger.trace("StopEvent tickReady");
-		tickReady.put(Boolean.FALSE);
+		if (synchronous) {
+			logger.trace("StopEvent sync tickReady");
+			tickReady.put(Boolean.FALSE);
+		} else {
+			logger.trace("StopEvent async inputReady");
+			inputReady.put(Boolean.FALSE);
+		}
 	}
 	
 	private boolean firstUpdate;
@@ -588,49 +603,11 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
 		long id = Stopwatch.start("Soar", "updateEventHandler");
 		try {
-			if (synchronous && firstUpdate) {
-				logger.trace("Soar update first update");
-				firstUpdate = false;
-				tickReady.take();
-			} else if (!synchronous) {
-				//logger.trace("Soar poll tickReady");
-				Boolean go = tickReady.poll();
-				if (go == Boolean.FALSE) {
-					logger.trace("Soar update async stop");
-					stop();
-					return;
-				} else if (go == null) {
-					//logger.trace("Soar update async not ready");
-					return;
-				}
-				logger.trace("Soar update async");
-			}
-
-			for (AgentData ad : agents.values()) {
-				logger.trace("Soar update processing output for " + ad.agent.GetAgentName());
-				ad.sa.processSoarOuput();
-			}
-			outputReady.put(Boolean.TRUE);
-			logger.trace("Soar wait inputReady");
-			inputReady.take();
-			for (AgentData ad : agents.values()) {
-				logger.trace("Soar updating input for " + ad.agent.GetAgentName());
-				ad.sa.updateSoarInput();
-				ad.agent.Commit();
-			}
-			logger.trace("Soar inputProcessed");
-			inputProcessed.put(Boolean.TRUE);
-			
 			if (synchronous) {
-				logger.trace("Soar wait tickReady");
-				Boolean go = tickReady.take();
-				if (go == Boolean.FALSE) {
-					logger.trace("Soar update sync stop");
-					stop();
-					return;
-				}
+				synchronousUpdate();
+			} else {
+				asynchronousUpdate();
 			}
-			
 		} catch (InterruptedException e) {
 			logger.trace("Soar update interrupted");
 			interrupted.set(true);
@@ -642,6 +619,63 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			logger.trace("Soar update done");
 			Stopwatch.stop(id);	
 		}
+	}
+	
+	private void synchronousUpdate() throws InterruptedException {
+		if (firstUpdate) {
+			logger.trace("Soar synch update first update");
+			firstUpdate = false;
+			tickReady.take();
+		}
+
+		for (AgentData ad : agents.values()) {
+			logger.trace("Soar synch update processing output for " + ad.agent.GetAgentName());
+			ad.sa.processSoarOuput();
+		}
+		outputReady.put(Boolean.TRUE);
+
+		logger.trace("Soar synch wait inputReady");
+		inputReady.take();
+		for (AgentData ad : agents.values()) {
+			logger.trace("Soar synch updating input for " + ad.agent.GetAgentName());
+			ad.sa.updateSoarInput();
+			ad.agent.Commit();
+		}
+		logger.trace("Soar synch inputProcessed");
+		inputProcessed.put(Boolean.TRUE);
+		
+		logger.trace("Soar synch wait tickReady");
+		Boolean go = tickReady.take();
+		if (go == Boolean.FALSE) {
+			logger.trace("Soar synch update sync stop");
+			stop();
+			return;
+		}
+	}
+	
+	private void asynchronousUpdate() throws InterruptedException {
+		for (AgentData ad : agents.values()) {
+			logger.trace("Soar asynch update processing output for " + ad.agent.GetAgentName());
+			ad.sa.processSoarOuput();
+		}
+		
+		logger.trace("Soar asynch poll inputReady");
+		Boolean go = inputReady.poll();
+		if (go == null) {
+			return;
+		} else if (go == Boolean.FALSE) {
+			logger.trace("Soar asynch update sync stop");
+			stop();
+			return;
+		}
+
+		for (AgentData ad : agents.values()) {
+			logger.trace("Soar asynch updating input for " + ad.agent.GetAgentName());
+			ad.sa.updateSoarInput();
+			ad.agent.Commit();
+		}
+		logger.trace("Soar asynch inputProcessed");
+		inputProcessed.put(Boolean.TRUE);
 	}
 	
 	private void flushLocks() {

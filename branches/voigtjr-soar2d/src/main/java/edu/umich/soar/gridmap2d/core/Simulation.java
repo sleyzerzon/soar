@@ -4,9 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -191,6 +194,14 @@ public class Simulation {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		schexec.shutdown();
+		try {
+			// The delay is high here so that headless runs can complete.
+			schexec.awaitTermination(5, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		List<Player> players = new ArrayList<Player>(7);
 		players.addAll(world.getPlayers());
@@ -231,7 +242,8 @@ public class Simulation {
 	private AtomicBoolean running = new AtomicBoolean(false);
 	private AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private SimEventManager eventManager = new SimEventManager();
-
+	private BlockingQueue<Boolean> canceller = new SynchronousQueue<Boolean>();
+	
 	public void run(final int ticks, final long period, final TimeUnit unit) {
 		if (!running.getAndSet(true)) {
 			exec.submit(new Runnable() {
@@ -253,29 +265,31 @@ public class Simulation {
 							}
 						} while(!stopRequested.getAndSet(false));
 					} else {
-						schexec.scheduleAtFixedRate(new Runnable() {
+						final ScheduledFuture<?> ticker = schexec.scheduleAtFixedRate(new Runnable() {
 							
 							@Override
 							public void run() {
+								if (stopRequested.get() == true) {
+									canceller.offer(Boolean.TRUE);
+									return;
+								}
 								tick();
 								if (ticks > 0) {
 									if (worldCount - initialWorldCount >= ticks) {
 										logger.trace("requesting stop due to tick count");
-										stopRequested.set(true);
+										canceller.offer(Boolean.TRUE);
 									}
-								}
-								
-								if (stopRequested.getAndSet(false)) {
-									schexec.shutdown();
 								}
 							}
 						}, period, period, unit);
 						
 						try {
-							schexec.awaitTermination(10, TimeUnit.MINUTES);
+							canceller.take();
 						} catch (InterruptedException e) {
-							logger.trace("awaitTermination interrupted");
+						} finally {
+							ticker.cancel(false);
 						}
+						stopRequested.set(false);
 					}
 					
 					running.set(false);
@@ -294,7 +308,7 @@ public class Simulation {
 	}
 	
 	public void run() {
-		run(0, 50, TimeUnit.MILLISECONDS);
+		run(0, 100, TimeUnit.MILLISECONDS);
 	}
 	
 	public CognitiveArchitecture getCogArch() {

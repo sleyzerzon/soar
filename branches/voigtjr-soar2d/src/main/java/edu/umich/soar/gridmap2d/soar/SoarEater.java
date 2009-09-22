@@ -40,6 +40,9 @@ public final class SoarEater implements EaterCommander, SoarAgent {
 	
 	@Override
 	public EaterCommand nextCommand() {
+		if (command == null) {
+			return EaterCommand.NULL;
+		}
 		EaterCommand temp = command;
 		command = null;
 		return temp;

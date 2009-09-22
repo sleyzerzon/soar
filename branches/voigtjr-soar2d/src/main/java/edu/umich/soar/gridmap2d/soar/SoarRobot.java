@@ -79,6 +79,9 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 
 	@Override
 	public RobotCommand nextCommand() {
+		if (command == null) {
+			return RobotCommand.NULL;
+		}
 		RobotCommand temp = command;
 		command = null;
 		return temp;

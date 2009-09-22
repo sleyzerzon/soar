@@ -41,6 +41,9 @@ public class SoarTaxi implements TaxiCommander, SoarAgent {
 
 	@Override
 	public TaxiCommand nextCommand() {
+		if (command == null) {
+			return TaxiCommand.NULL;
+		}
 		TaxiCommand temp = command;
 		command = null;
 		return temp;

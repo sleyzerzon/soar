@@ -69,14 +69,7 @@ public class Tank extends Player {
 	}
 	
 	public TankCommand getCommand() {
-		TankCommand command;
-//		if (commander != null) {
-			command = commander.nextCommand();
-//		} else {
-//			command = Gridmap2D.control.getHumanCommand(this);
-//		}
-		
-		return command;
+		return commander.nextCommand();
 	}
 	
 	@Override

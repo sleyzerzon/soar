@@ -56,6 +56,9 @@ public class SoarTank implements TankCommander, SoarAgent {
 	
 	@Override
 	public TankCommand nextCommand() {
+		if (command == null) {
+			return TankCommand.NULL;
+		}
 		TankCommand temp = command;
 		command = null;
 		return temp;
