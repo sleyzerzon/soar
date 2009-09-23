@@ -4,7 +4,7 @@ Group email alias: acthackers@umich.edu.
 
 = Schedule =
 
-The group meets every Tuesday from 12:30-3:30 in room XXXX of the CSE building on North campus.
+The group meets every Tuesday from 12:30-3:30 in room 2733 of the CSE building on North campus.
 
 || Date || Unit || Tutorial Name || Leader ||
 || 9/29 || 1 || Understanding Production Systems || Nick Gorski ||
