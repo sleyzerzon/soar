@@ -23,5 +23,10 @@ The group meets every Tuesday from 12:30-3:30 in room XXXX of the CSE building o
 Note: using the ACT-R architecture requires having a LISP environment installed.
 
 Downloads:
-  * [http://act-r.psy.cmu.edu/actr6/actr6.zip PC software]
-  * [http://act-r.psy.cmu.edu/actr6/actr6.dmg MAC disk image]
+  * [http://act-r.psy.cmu.edu/actr6/win-standalone.zip PC ACT-R (standalone w/ Lisp)]
+  * [http://act-r.psy.cmu.edu/actr6/actr6.zip PC ACT-R (no Lisp)]
+  * [http://act-r.psy.cmu.edu/actr6/actr6standalonex86.dmg MAC disk image (standalone w/ Lisp)]
+  * [http://act-r.psy.cmu.edu/actr6/actr6.dmg MAC disk image (no Lisp)]
+  * [http://act-r.psy.cmu.edu/actr6/units.zip Tutorial PDFs only]
+
+[http://act-r.psy.cmu.edu/actr6/ ACT-R homepage]
