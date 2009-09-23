@@ -1,0 +1,27 @@
+Information for the student group working through the ACT-R tutorials.
+
+Group email alias: acthackers@umich.edu.
+
+= Schedule =
+
+The group meets every Tuesday from 12:30-3:30 in room XXXX of the CSE building on North campus.
+
+|| Date || Unit || Tutorial Name || Leader ||
+|| 9/29 || 1 || Understanding Production Systems || Nick Gorski ||
+|| 10/6 || 2 || Perception and Motor Actions in ACT-R ||  ||
+|| 10/13 || 3 || Attention ||  ||
+|| 10/20 || 4 || Activation of Chunks and Base-Level Learning ||  ||
+|| 10/27 || 5 || Activation and Context ||  ||
+|| 11/3 || 6 || Production Utilities: Selection & Learning ||  ||
+|| 11/10 || 7 || Production Rule Learning ||  ||
+|| 11/17 || ? || If needed ||  ||
+
+= ACT-R Resources =
+
+[http://act-r.psy.cmu.edu/actr6/QuickStart.txt ACT-R Quickstart Guide]
+
+Note: using the ACT-R architecture requires having a LISP environment installed.
+
+Downloads:
+  * [http://act-r.psy.cmu.edu/actr6/actr6.zip PC software]
+  * [http://act-r.psy.cmu.edu/actr6/actr6.dmg MAC disk image]
