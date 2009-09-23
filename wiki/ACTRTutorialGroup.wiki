@@ -16,6 +16,7 @@ The group meets every Tuesday from 12:30-3:30 in room XXXX of the CSE building o
 || 11/10 || 7 || Production Rule Learning ||  ||
 || 11/17 || ? || If needed ||  ||
 
+
 = ACT-R Resources =
 
 [http://act-r.psy.cmu.edu/actr6/QuickStart.txt ACT-R Quickstart Guide]
