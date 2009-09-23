@@ -14,16 +14,17 @@ import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
 import edu.umich.soar.gridmap2d.events.SimEventManager;
 import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 
-public class PlayerTableModel extends AbstractTableModel {
+public class RobotTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 8818379571567684870L;
 
 	private final Simulation sim;
 	private final Listener listener = new Listener();
-	private final List<Player> players = Collections.synchronizedList(new ArrayList<Player>());
+	private final List<Robot> players = Collections.synchronizedList(new ArrayList<Robot>());
 	
-	public PlayerTableModel(Simulation sim) {
+	public RobotTableModel(Simulation sim) {
 		this.sim = sim;
 	}
 	
@@ -32,7 +33,9 @@ public class PlayerTableModel extends AbstractTableModel {
 		eventManager.addListener(PlayerAddedEvent.class, listener);
 		eventManager.addListener(PlayerRemovedEvent.class, listener);
 		
-		players.addAll(sim.getWorld().getPlayers());
+		for (Player player : sim.getWorld().getPlayers()) {
+			players.add((Robot)player);
+		}
 	}
 	
 	@Override
@@ -48,10 +51,10 @@ public class PlayerTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int row, int column) {
 		synchronized(players) {
-			Player p = players.get(row);
+			Robot p = players.get(row);
 			switch (column) {
 			case 0: return p;
-			case 1: return p.getPoints();
+			case 1: return p.getState().getLocationId();
 			}
 		}
 		return null;
@@ -71,7 +74,7 @@ public class PlayerTableModel extends AbstractTableModel {
         fireTableRowsDeleted(row, row);
 	}
 
-	private void handlePlayerAdded(Player player) {
+	private void handlePlayerAdded(Robot player) {
 		int row = 0;
 		synchronized (players) {
 			row = players.size();
@@ -96,7 +99,7 @@ public class PlayerTableModel extends AbstractTableModel {
         switch(c)
         {
         case 0: return "Name";
-        case 1: return "Score";
+        case 1: return "Location ID";
         }
         return super.getColumnName(c);
     }
@@ -108,7 +111,7 @@ public class PlayerTableModel extends AbstractTableModel {
 				Runnable runnable = new Runnable() {
 					public void run() {
 						if (event instanceof PlayerAddedEvent) {
-							handlePlayerAdded(((PlayerAddedEvent) event)
+							handlePlayerAdded((Robot)((PlayerAddedEvent) event)
 									.getPlayer());
 						} else {
 							handlePlayerRemoved(((PlayerRemovedEvent) event)
@@ -127,7 +130,7 @@ public class PlayerTableModel extends AbstractTableModel {
 		}
 	}
 
-	public List<Player> getPlayers() {
+	public List<Robot> getPlayers() {
 		return players;
 	}
 }

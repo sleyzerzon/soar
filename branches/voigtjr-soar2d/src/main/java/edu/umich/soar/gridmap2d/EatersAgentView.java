@@ -27,7 +27,7 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
 	private static final long serialVersionUID = -2209482143387576390L;
 	
 	private final Simulation sim;
-	private final PlayerTableModel model;
+	private final EaterTableModel model;
     private final JXTable table;
 	private final JLabel properties = new JLabel();
 	private final TableSelectionProvider selectionProvider;
@@ -41,7 +41,7 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
         
         this.addAction(DockingConstants.PIN_ACTION);
 
-        this.model = new PlayerTableModel(this.sim);
+        this.model = new EaterTableModel(this.sim);
         this.model.initialize();
         this.table = new JXTable(this.model);
             
@@ -79,7 +79,7 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
 	    			//final String spaces = "&nbsp;&nbsp;&nbsp;";
 	    			StringBuilder sb = new StringBuilder("<html>");
 	    			sb.append("<b>Location:</b>&nbsp;");
-	    			sb.append(Arrays.toString(eater.getLocation()));
+	    			sb.append(Arrays.toString(eater.getState().getLocation()));
 	    			sb.append("</html>");
 	    			properties.setText(sb.toString());
 	    		}
@@ -105,7 +105,7 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
         {
             return selectionProvider;
         }
-        else if(PlayerTableModel.class.equals(klass))
+        else if(EaterTableModel.class.equals(klass))
         {
             return model;
         }

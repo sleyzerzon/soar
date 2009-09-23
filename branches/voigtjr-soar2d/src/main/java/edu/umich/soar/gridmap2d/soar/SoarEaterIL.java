@@ -333,8 +333,8 @@ class SoarEaterIL {
 			}
 		}
 		
-		private void update(boolean moved, int[] pos, EatersMap map) {
-			if (moved) {
+		private void update(int[] pos, EatersMap map) {
+			if (eater.getMoved()) {
 				clearView();
 			}
 
@@ -346,7 +346,7 @@ class SoarEaterIL {
 					
 					Cell cell = cells[i][j];
 					
-					if (moved) {
+					if (eater.getMoved()) {
 						
 						// if out of bounds, create wall
 						if (!map.isInBounds(view)) {
@@ -403,6 +403,7 @@ class SoarEaterIL {
 		Identifier eaterWME;
 		IntElement scoreWME;
 		IntElement[] posWMEs;
+		boolean moved;
 		
 		void create(String name, int initialScore) {
 			eaterWME = agent.CreateIdWME(agent.GetInputLink(), Names.kEaterID);
@@ -412,11 +413,19 @@ class SoarEaterIL {
 					agent.CreateIntWME(eaterWME, Names.kYID, 0)
 			};
 			agent.CreateStringWME(eaterWME, Names.kNameID, name);
+			moved = true;
 		}
 		
-		void update(boolean moved, int[] pos, int points) {
+		public boolean getMoved() {
+			return moved;
+		}
+
+		void update(int[] pos, int points) {
+			moved = false;
 			agent.Update(scoreWME, points);
+			moved |= posWMEs[0].GetValue() != pos[0];
 			agent.Update(posWMEs[0], pos[0]);
+			moved |= posWMEs[1].GetValue() != pos[1];
 			agent.Update(posWMEs[1], pos[1]);
 			
 		}
@@ -433,8 +442,8 @@ class SoarEaterIL {
 	}
 	
 	private Agent agent;
-	private EaterIL eater = new EaterIL();
 	private MyLocationIL myLocation;
+	private EaterIL eater = new EaterIL();
 	private RandomIL random = new RandomIL();
 
 	SoarEaterIL(Agent agent, int vision) {
@@ -448,9 +457,9 @@ class SoarEaterIL {
 		random.create();
 	}
 	
-	void update(boolean moved, int[] pos, EatersMap map, int points) {
-		eater.update(moved, pos, points);
-		myLocation.update(moved, pos, map);
+	void update(int[] pos, EatersMap map, int points) {
+		eater.update(pos, points);
+		myLocation.update(pos, map);
 		random.update();
 	}
 	

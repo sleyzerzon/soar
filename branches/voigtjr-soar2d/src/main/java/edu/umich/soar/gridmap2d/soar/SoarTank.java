@@ -331,11 +331,12 @@ public class SoarTank implements TankCommander, SoarAgent {
 		unseen.add("black");
 		
 		for (Player p : players) {
-			IntElement scoreElement = m_Scores.get(p.getColor());
-			unseen.remove(p.getColor());
+			Tank t = (Tank)p;
+			IntElement scoreElement = m_Scores.get(t.getColor());
+			unseen.remove(t.getColor());
 			if (scoreElement == null) {
-				scoreElement = agent.CreateIntWME(m_CurrentScoreWME, p.getColor().toString().toLowerCase(), p.getPoints());
-				m_Scores.put(p.getColor(), scoreElement);
+				scoreElement = agent.CreateIntWME(m_CurrentScoreWME, t.getColor().toString().toLowerCase(), t.getState().getPoints().getPoints());
+				m_Scores.put(t.getColor(), scoreElement);
 			}
 		}
 		
@@ -664,7 +665,7 @@ public class SoarTank implements TankCommander, SoarAgent {
 
 		if (logger.isTraceEnabled()) {
 			logger.trace(player.getName() + " input dump: ");
-			logger.trace(player.getName() + ": x,y: " + player.getLocation()[0] + "," + player.getLocation()[1]);
+			logger.trace(player.getName() + ": x,y: " + player.getState().getLocation()[0] + "," + player.getState().getLocation()[1]);
 			logger.trace(player.getName() + ": " + Names.kEnergyRechargerID + ": " + (state.getOnEnergyCharger() ? Names.kYes : Names.kNo));
 			logger.trace(player.getName() + ": " + Names.kHealthRechargerID + ": " + (state.getOnHealthCharger() ? Names.kYes : Names.kNo));
 			logger.trace(player.getName() + ": " + Names.kDirectionID + ": " + facingString);
@@ -675,7 +676,7 @@ public class SoarTank implements TankCommander, SoarAgent {
 			logger.trace(player.getName() + ": blocked (backward): " + blockedBackward);
 			logger.trace(player.getName() + ": blocked (left): " + blockedLeft);
 			logger.trace(player.getName() + ": blocked (right): " + blockedRight);
-			logger.trace(player.getName() + ": " + Names.kCurrentScoreID + ": " + player.getPoints());
+			logger.trace(player.getName() + ": " + Names.kCurrentScoreID + ": " + player.getState().getPoints().getPoints());
 			logger.trace(player.getName() + ": incoming (forward): " + incomingForward);
 			logger.trace(player.getName() + ": incoming (backward): " + incomingBackward);
 			logger.trace(player.getName() + ": incoming (left): " + incomingLeft);
@@ -698,8 +699,8 @@ public class SoarTank implements TankCommander, SoarAgent {
 
 		if (m_Reset) {
 			// location
-			m_xWME = CreateIntWME(m_InputLink, Names.kXID, player.getLocation()[0]);
-			m_yWME = CreateIntWME(m_InputLink, Names.kYID, player.getLocation()[1]);
+			m_xWME = CreateIntWME(m_InputLink, Names.kXID, player.getState().getLocation()[0]);
+			m_yWME = CreateIntWME(m_InputLink, Names.kYID, player.getState().getLocation()[1]);
 			
 			// charger detection
 			String energyRecharger = state.getOnEnergyCharger() ? Names.kYes : Names.kNo;
@@ -784,14 +785,17 @@ public class SoarTank implements TankCommander, SoarAgent {
 			m_RWavesRightWME = CreateStringWME(m_RWavesWME, Names.kRightID, rwavesRight);
 
 		} else {
-			if (player.getMoved()) {
+			boolean moved = player.getState().getLocation()[0] != m_xWME.GetValue();
+			moved |= player.getState().getLocation()[1] != m_yWME.GetValue();
+			
+			if (moved) {
 				// location
-				if (player.getLocation()[0] != m_xWME.GetValue()) {
-					Update(m_xWME, player.getLocation()[0]);
+				if (player.getState().getLocation()[0] != m_xWME.GetValue()) {
+					Update(m_xWME, player.getState().getLocation()[0]);
 				}
 				
-				if (player.getLocation()[1] != m_yWME.GetValue()) {
-					Update(m_yWME, player.getLocation()[1]);
+				if (player.getState().getLocation()[1] != m_yWME.GetValue()) {
+					Update(m_yWME, player.getState().getLocation()[1]);
 				}
 				
 				// charger detection
@@ -845,9 +849,9 @@ public class SoarTank implements TankCommander, SoarAgent {
 				initScoreWMEs();
 			}
 			for (Player p : players) {
-				if (p.pointsChanged()) {
-					Update(m_Scores.get(p.getColor()), p.getPoints());
-				}
+				Tank t = (Tank)p;
+				
+				Update(m_Scores.get(p.getColor()), t.getState().getPoints().getPoints());
 			}
 
 			// incoming sensor
@@ -919,7 +923,7 @@ public class SoarTank implements TankCommander, SoarAgent {
 					m_RadarWME = agent.CreateIdWME(m_InputLink, Names.kRadarID);
 					generateNewRadar(state);
 				} else {
-					updateRadar(player.getMoved() || rotated, state);
+					updateRadar(moved || rotated, state);
 				}
 			} else {
 				if (m_RadarWME != null) {
@@ -954,6 +958,5 @@ public class SoarTank implements TankCommander, SoarAgent {
 		}
 		
 		m_Reset = false;
-		player.resetPointsChanged();
 	}
 }

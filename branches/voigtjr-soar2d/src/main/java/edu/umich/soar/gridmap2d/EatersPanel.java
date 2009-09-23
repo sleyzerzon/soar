@@ -3,15 +3,19 @@ package edu.umich.soar.gridmap2d;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.SystemColor;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import com.commsen.stopwatch.Stopwatch;
 
+import edu.umich.soar.gridmap2d.core.Direction;
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.Cell;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.Eater;
+import edu.umich.soar.gridmap2d.map.EaterCommand;
 import edu.umich.soar.gridmap2d.map.EatersMap;
 
 public class EatersPanel extends GridMapPanel {
@@ -20,14 +24,15 @@ public class EatersPanel extends GridMapPanel {
 	
 	private final Simulation sim;
 	private final int cellSize = 20; // FIXME
-	private Eater eater;
+	private Eater focusEater;
+	private Map<Eater, Direction> facingMap = new HashMap<Eater, Direction>();
 	
 	public EatersPanel(Adaptable app) {
 		sim = Adaptables.adapt(app, Simulation.class);
 	}
 	
 	public void setEater(Eater eater) {
-		this.eater = eater;
+		this.focusEater = eater;
 	}
 	
 	@Override
@@ -42,25 +47,25 @@ public class EatersPanel extends GridMapPanel {
 			int fill1, fill2, xDraw, yDraw;
 			int [] location = new int [2];
 			for(location[0] = 0; location[0] < map.size(); ++location[0]){
-				if (eater == null) {
+				if (focusEater == null) {
 					xDraw = location[0];
 				} else {
-					if ((location[0] < eater.getLocation()[0] - sim.getConfig().eatersConfig().vision)
-							|| (location[0] > eater.getLocation()[0] + sim.getConfig().eatersConfig().vision)) {
+					if ((location[0] < focusEater.getState().getLocation()[0] - sim.getConfig().eatersConfig().vision)
+							|| (location[0] > focusEater.getState().getLocation()[0] + sim.getConfig().eatersConfig().vision)) {
 						continue;
 					}
-					xDraw = location[0] + sim.getConfig().eatersConfig().vision - eater.getLocation()[0];
+					xDraw = location[0] + sim.getConfig().eatersConfig().vision - focusEater.getState().getLocation()[0];
 				}
 				
 				for(location[1] = 0; location[1] < map.size(); ++location[1]){
-					if (eater == null) {
+					if (focusEater == null) {
 						yDraw = location[1];
 					} else {
-						if ((location[1] < eater.getLocation()[1] - sim.getConfig().eatersConfig().vision)
-								|| (location[1] > eater.getLocation()[1] + sim.getConfig().eatersConfig().vision)) {
+						if ((location[1] < focusEater.getState().getLocation()[1] - sim.getConfig().eatersConfig().vision)
+								|| (location[1] > focusEater.getState().getLocation()[1] + sim.getConfig().eatersConfig().vision)) {
 							continue;
 						}
-						yDraw = location[1] + sim.getConfig().eatersConfig().vision - eater.getLocation()[1];
+						yDraw = location[1] + sim.getConfig().eatersConfig().vision - focusEater.getState().getLocation()[1];
 					}
 					
 					Cell cell = map.getCell(location);
@@ -87,7 +92,19 @@ public class EatersPanel extends GridMapPanel {
 							g.setColor(Colors.getColor(eater.getColor()));
 							g.fillOval(cellSize*xDraw, cellSize*yDraw, cellSize, cellSize);
 							
-							switch (eater.getFacing()) {
+							EaterCommand cmd = eater.getState().getLastCommand();
+							Direction facing = null;
+							if (cmd == null || !cmd.isMove()) {
+								facing = facingMap.get(eater);
+								if (facing == null) {
+									facing = Direction.getRandom();
+								}
+							} else {
+								facing = cmd.getMoveDirection();
+							}
+							facingMap.put(eater, facing);
+							
+							switch (facing) {
 							case NORTH:
 								drawEaterMouth(g, xDraw, yDraw, 1, 0, 1, 1);
 								break;

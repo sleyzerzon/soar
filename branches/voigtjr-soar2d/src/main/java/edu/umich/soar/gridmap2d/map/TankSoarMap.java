@@ -261,8 +261,7 @@ public class TankSoarMap extends GridMapBase implements GridMap,
 
 		Queue<SearchData> searchList = new LinkedList<SearchData>();
 		{
-			SearchData start = SearchData.getCell(searchData, players
-					.getLocation(tank));
+			SearchData start = SearchData.getCell(searchData, tank.getState().getLocation());
 			start.setExplored(true);
 			start.setDistance(0);
 			start.setParent(null);

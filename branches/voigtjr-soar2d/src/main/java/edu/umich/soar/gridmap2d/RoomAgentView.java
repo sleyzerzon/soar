@@ -26,7 +26,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
 	private static final long serialVersionUID = 88497381529040370L;
 	
 	private final Simulation sim;
-	private final PlayerTableModel model;
+	private final RobotTableModel model;
     private final JXTable table;
 	private final JLabel properties = new JLabel();
 	private final TableSelectionProvider selectionProvider;
@@ -40,7 +40,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         
         this.addAction(DockingConstants.PIN_ACTION);
 
-        this.model = new PlayerTableModel(this.sim);
+        this.model = new RobotTableModel(this.sim);
         this.model.initialize();
         this.table = new JXTable(this.model);
             
@@ -74,7 +74,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
 	    		public void run() {
 	    			final String BR = "&nbsp;&nbsp;&nbsp;";
 	    			StringBuilder sb = new StringBuilder("<html>");
-	    			sb.append(" <b>Cell:</b>&nbsp;" + Arrays.toString(robot.getLocation()) + BR);
+	    			sb.append(" <b>Cell:</b>&nbsp;" + Arrays.toString(robot.getState().getLocation()) + BR);
 	    			sb.append(" <b>Area:</b>&nbsp;" + robot.getState().getLocationId() + BR);
 	    			sb.append(" <b>Location:</b>&nbsp;" + String.format("[%2.1f,%2.1f]", robot.getState().getPose().pos[0], robot.getState().getPose().pos[1]) + BR);
 	    			sb.append(" <b>Yaw:</b>&nbsp;" + String.format("%2.1f", robot.getState().getYaw()) + BR);
@@ -106,7 +106,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         {
             return selectionProvider;
         }
-        else if(PlayerTableModel.class.equals(klass))
+        else if(RobotTableModel.class.equals(klass))
         {
             return model;
         }

@@ -31,8 +31,6 @@ public class Robot extends Player {
 	
 	@Override
 	public void reset() {
-		super.reset();
-		
 		if (state != null) {
 			state.reset();
 		}

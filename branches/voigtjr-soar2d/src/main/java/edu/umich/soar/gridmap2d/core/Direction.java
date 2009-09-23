@@ -139,4 +139,8 @@ public enum Direction {
 		}
 		return result;
 	}
+
+	public static Direction getRandom() {
+		return Direction.values()[Simulation.random.nextInt((Direction.values().length - 1) + 1)];
+	}
 }

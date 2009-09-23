@@ -63,8 +63,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 			sim.info("Room Environment", "Scripted robots not implemented.");
 		}
 
-		players.setLocation(player, location);
-		
 		// put the player in it
 		map.getCell(location).addPlayer(player);
 		
@@ -73,8 +71,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 		player.getState().setPos(floatLocation);
 
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + "), (" + floatLocation[0] + "," + floatLocation[1] + ")");
-		
-		setLocations();
 		return player;
 	}
 
@@ -86,12 +82,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 	@Override
 	public List<? extends Player> getPlayers() {
 		return players.getAllAsPlayers();
-	}
-
-	@Override
-	public void interrupted(String agentName) {
-		players.interrupted(agentName);
-		stopMessages.add("interrupted");
 	}
 
 	@Override
@@ -107,10 +97,9 @@ public class RoomWorld implements World, SendMessagesInterface {
 	@Override
 	public void removePlayer(String name) {
 		Robot player = players.get(name);
-		map.getCell(players.getLocation(player)).removePlayer(player);
+		map.getCell(player.getState().getLocation()).removePlayer(player);
 		players.remove(player);
 		player.shutdownCommander();
-		setLocations();
 	}
 
 	@Override
@@ -148,7 +137,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 			if (location == null) {
 				throw new IllegalStateException("no empty locations available for spawn");
 			}
-			players.setLocation(player, location);
 
 			// put the player in it
 			map.getCell(location).addPlayer(player);
@@ -160,8 +148,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 
 			logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + "), (" + floatLocation[0] + "," + floatLocation[1] + ")");
 		}
-		
-		setLocations();
 	}
 	
 	private double [] defaultFloatLocation(int [] location) {
@@ -181,8 +167,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 
 		// Collect input
 		for (Robot player : players.getAll()) {
-			player.resetPointsChanged();
-
 			RobotCommand command = player.getCommand();
 			if (command == null) {
 				sim.stop();
@@ -198,8 +182,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 			message.recipient.getReceiveMessagesInterface().newMessage(message.from, message.tokens);
 		}
 		messages.clear();
-		
-		setLocations();
 	}
 
 	private void moveRoomPlayers(double time) {
@@ -251,14 +233,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 		}
 	}
 
-	private void setLocations() {
-		for (Robot player : players.getAll()) {
-			player.setLocation(players.getLocation(player));
-			// FIXME: hackish
-			player.moved = true;
-		}
-	}
-
 	private boolean checkBlocked(int [] location) {
 		if (map.getCell(location).hasObjectWithProperty(Names.kPropertyBlock)) {
 			return true;
@@ -267,7 +241,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 	}
 	
 	private void roomMovePlayer(Robot player, double time) {
-		int [] oldLocation = players.getLocation(player);
+		int [] oldLocation = player.getState().getLocation();
 		int [] newLocation = Arrays.copyOf(oldLocation, oldLocation.length);
 
 		RobotState state = player.getState();
@@ -355,7 +329,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 			state.setPos(pose.pos);
 			
 			map.getCell(oldLocation).removePlayer(player);
-			players.setLocation(player, newLocation);
 			state.setLocationId(map.getLocationId(newLocation));
 			map.getCell(newLocation).addPlayer(player);
 		}
@@ -373,7 +346,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 		RoomObject object = state.getRoomObject();
 		state.drop();
 		object.setPose(state.getPose());
-		map.getCell(player.getLocation()).addObject(object.getCellObject());
+		map.getCell(player.getState().getLocation()).addObject(object.getCellObject());
 		return true;
 	}
 

@@ -23,6 +23,7 @@ public class SoarTaxi implements TaxiCommander, SoarAgent {
 	private SoarTaxiIL input;
 	private final Simulation sim;
 	private TaxiCommand command;
+	private int previousPoints;
 	
 	public SoarTaxi(Simulation sim, Taxi taxi, Agent agent, String[] shutdown_commands) {
 		this.player = taxi;
@@ -31,6 +32,8 @@ public class SoarTaxi implements TaxiCommander, SoarAgent {
 		this.shutdownCommands = shutdown_commands;
 		
 		agent.SetBlinkIfNoChange(false);
+		
+		previousPoints = 0;
 		
 		input = new SoarTaxiIL(agent);
 		input.create();
@@ -56,7 +59,9 @@ public class SoarTaxi implements TaxiCommander, SoarAgent {
 		}
 		command = null;
 		input.destroy();
-
+		
+		previousPoints = player.getState().getPoints().getPoints();
+		
 		agent.InitSoar();
 			
 		input.create();
@@ -150,6 +155,8 @@ public class SoarTaxi implements TaxiCommander, SoarAgent {
 
 	@Override
 	public void updateSoarInput() {
-		input.update(player.getMoved(), player.getLocation(), (TaxiMap)sim.getMap(), player.getPointsDelta(), player.getFuel());
+		int pointsDelta = player.getState().getPoints().getPoints() - previousPoints;
+		input.update(player.getState().getLocation(), (TaxiMap)sim.getMap(), pointsDelta, player.getFuel());
+		previousPoints = player.getState().getPoints().getPoints();
 	}
 }

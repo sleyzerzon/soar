@@ -1,5 +1,7 @@
 package edu.umich.soar.gridmap2d.map;
 
+import java.util.Arrays;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,6 +42,8 @@ public class TankState {
 	private int maxHealth;
 	private Direction initialFacing;	
 	private Direction facing;	// what direction I'm currently facing
+	private int[] location;
+	private final Points points = new Points();
 
 	TankState(Simulation sim, String name, Tank.Builder builder) {
 		
@@ -72,6 +76,12 @@ public class TankState {
 		} else {
 			setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
 		}
+		
+		location = new int[] { -1, -1 };
+	}
+	
+	public Points getPoints() {
+		return points;
 	}
 	
 	void update(TankSoarMap tankSoarMap, int[] location) {
@@ -94,7 +104,14 @@ public class TankState {
 		sound = Direction.NONE;
 		onHealthCharger = false;
 		onEnergyCharger = false;
-		
+	}
+
+	void setLocation(int[] newLocation) {
+		this.location = Arrays.copyOf(newLocation, newLocation.length);
+	}
+	
+	public int[] getLocation() {
+		return Arrays.copyOf(location, location.length);
 	}
 
 	public int getEnergy() {
@@ -370,6 +387,8 @@ public class TankState {
 		} else {
 			setFacing(Direction.values()[Simulation.random.nextInt(4) + 1]);
 		}
+		
+		points.reset();
 	}
 
 	public void fragged(int worldCount) {

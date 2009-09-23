@@ -29,8 +29,8 @@ class SoarTaxiIL {
 		cheat.create();
 	}
 	
-	void update(boolean moved, int[] pos, TaxiMap map, int reward, int fuel) {
-		self.update(moved, pos, map, reward, fuel);
+	void update(int[] pos, TaxiMap map, int reward, int fuel) {
+		self.update(pos, map, reward, fuel);
 		view.update(pos, map);
 		cell.update(pos, map);
 		cheat.update(map);
@@ -94,13 +94,11 @@ class SoarTaxiIL {
 			random.create();
 		}
 	
-		private void update(boolean moved, int[] pos, TaxiMap map, int reward, int fuel) {
+		private void update(int[] pos, TaxiMap map, int reward, int fuel) {
 			assert selfWME != null;
 
-			if (moved) {
-				agent.Update(xWME, pos[0]);
-				agent.Update(yWME, map.size() - 1 - pos[1]);
-			}
+			agent.Update(xWME, pos[0]);
+			agent.Update(yWME, map.size() - 1 - pos[1]);
 			
 			// force blink
 			agent.DestroyWME(this.reward);

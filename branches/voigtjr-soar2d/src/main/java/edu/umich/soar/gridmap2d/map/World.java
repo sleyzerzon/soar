@@ -21,5 +21,4 @@ public interface World {
 	
 	// control
 	public boolean isTerminal();
-	public void interrupted(String agentName);
 }

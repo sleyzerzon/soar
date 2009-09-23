@@ -596,7 +596,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 	
 	private boolean firstUpdate;
-	private boolean synchronous = false;
+	private boolean synchronous = true;
 	private AtomicBoolean interrupted = new AtomicBoolean();
 	
 	@Override

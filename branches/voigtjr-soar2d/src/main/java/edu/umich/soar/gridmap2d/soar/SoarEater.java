@@ -35,7 +35,7 @@ public final class SoarEater implements EaterCommander, SoarAgent {
 		this.shutdownCommands = shutdownCommands;
 		
 		input = new SoarEaterIL(agent, vision);
-		input.create(player.getName(), player.getPoints());
+		input.create(player.getName(), player.getState().getPoints().getPoints());
 	}
 	
 	@Override
@@ -56,7 +56,7 @@ public final class SoarEater implements EaterCommander, SoarAgent {
 		command = null;
 		input.destroy();
 		agent.InitSoar();
-		input.create(player.getName(), player.getPoints());
+		input.create(player.getName(), player.getState().getPoints().getPoints());
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public final class SoarEater implements EaterCommander, SoarAgent {
 
 	@Override
 	public void updateSoarInput() {
-		input.update(player.getMoved(), player.getLocation(), (EatersMap)sim.getMap(), player.getPoints());
+		input.update(player.getState().getLocation(), (EatersMap)sim.getMap(), player.getState().getPoints().getPoints());
 	}
 
 	@Override

@@ -30,6 +30,10 @@ public class RobotState implements CarryInterface {
 		resetDestYaw();
 	}
 	
+	public int[] getLocation() {
+		return new int [] { (int)pose.pos[0] / RoomWorld.CELL_SIZE, (int)pose.pos[1] / RoomWorld.CELL_SIZE };
+	}
+	
 	public void setCollisionX(boolean collisionX) {
 		this.collisionX = collisionX;
 	}

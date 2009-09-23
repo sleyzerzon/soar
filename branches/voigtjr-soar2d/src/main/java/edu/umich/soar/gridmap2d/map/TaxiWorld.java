@@ -62,20 +62,12 @@ public class TaxiWorld implements World {
 			if (location == null) {
 				throw new IllegalStateException("no empty locations available for spawn");
 			}
-			players.setLocation(taxi, location);
+			taxi.getState().setLocation(location);
 
 			// put the player in it
 			map.getCell(location).addPlayer(taxi);
 
 			taxi.reset();
-		}
-		
-		setLocations();
-	}
-
-	private void setLocations() {
-		for (Taxi taxi : players.getAll()) {
-			taxi.setLocation(players.getLocation(taxi));
 		}
 	}
 
@@ -83,7 +75,7 @@ public class TaxiWorld implements World {
 		for (Taxi taxi : players.getAll()) {
 			TaxiCommand command = players.getCommand(taxi);			
 
-			int [] location = players.getLocation(taxi);
+			int [] location = taxi.getState().getLocation();
 			if (command.isMove()) {
 				// Calculate new location
 				int [] newLocation = Arrays.copyOf(location, location.length);
@@ -93,24 +85,24 @@ public class TaxiWorld implements World {
 				if (map.isInBounds(newLocation) && map.exitable(location, command.getMoveDirection())) {
 					taxi.consumeFuel();
 					if (taxi.getFuel() < 0) {
-						taxi.adjustPoints(-20, "fuel fell below zero");
+						Players.adjustPoints(taxi, taxi.getState().getPoints(), -20, "fuel fell below zero");
 					} else {
 						// remove from cell
 						map.getCell(newLocation).clearPlayers();
-						players.setLocation(taxi, newLocation);
+						taxi.getState().setLocation(newLocation);
 						
 						map.getCell(newLocation).addPlayer(taxi);
-						taxi.adjustPoints(-1, "legal move");
+						Players.adjustPoints(taxi, taxi.getState().getPoints(), -1, "legal move");
 					}
 				} else {
-					taxi.adjustPoints(-1, "illegal move");
+					Players.adjustPoints(taxi, taxi.getState().getPoints(), -1, "illegal move");
 				}
 				
 			} else if (command.isPickup()) {
 				if (map.pickUp(location)) {
-					taxi.adjustPoints(-1, "legal pickup");
+					Players.adjustPoints(taxi, taxi.getState().getPoints(), -1, "legal pickup");
 				} else {
-					taxi.adjustPoints(-10, "illegal pickup");
+					Players.adjustPoints(taxi, taxi.getState().getPoints(), -10, "illegal pickup");
 				}
 				
 			} else if (command.isPutdown()) {
@@ -118,20 +110,20 @@ public class TaxiWorld implements World {
 				{
 					if (map.isCorrectPassengerDestination(location)) {
 						map.deliverPassenger();
-						taxi.adjustPoints(20, "successful delivery");
+						Players.adjustPoints(taxi, taxi.getState().getPoints(), 20, "successful delivery");
 					} else {
-						taxi.adjustPoints(-10, "incorrect destination");
+						Players.adjustPoints(taxi, taxi.getState().getPoints(), -10, "incorrect destination");
 					}
 				} else {
-					taxi.adjustPoints(-10, "illegal putdown");
+					Players.adjustPoints(taxi, taxi.getState().getPoints(), -10, "illegal putdown");
 				}
 				
 			} else if (command.isFillup()) {
 				if (map.isFuel(location)) {
 					taxi.fillUp();
-					taxi.adjustPoints(-1, "legal fillup");
+					Players.adjustPoints(taxi, taxi.getState().getPoints(), -1, "legal fillup");
 				} else {
-					taxi.adjustPoints(-10, "illegal fillup");
+					Players.adjustPoints(taxi, taxi.getState().getPoints(), -10, "illegal fillup");
 				}
 			}
 		}
@@ -143,7 +135,6 @@ public class TaxiWorld implements World {
 
 		// Collect input
 		for (Taxi taxi : players.getAll()) {
-			taxi.resetPointsChanged();
 			TaxiCommand command = taxi.getCommand();
 			if (command == null) {
 				sim.stop();
@@ -157,17 +148,27 @@ public class TaxiWorld implements World {
 		if (sim.isShuttingDown()) {
 			return;
 		}
-		setLocations();
 		
 		checkFuelRemaining();
 		checkPassengerDelivered();
 		checkPassengerPickedUp();
 		WorldUtil.checkMaxUpdates(sim, stopMessages, worldCount);
-		WorldUtil.checkWinningScore(sim, stopMessages, players.getSortedScores());
+		WorldUtil.checkWinningScore(sim, stopMessages, getSortedScores());
 		
 		if (stopMessages.size() > 0) {
 			sim.stop();
 		}
+	}
+	
+	private int[] getSortedScores() {
+		int[] scores = new int[players.size()];
+		
+		for (int i = 0; i < players.size(); ++i) {
+			Taxi player = players.get(i);
+			scores[i] = player.getState().getPoints().getPoints();
+		}
+		Arrays.sort(scores);
+		return scores;
 	}
 	
 	private void checkFuelRemaining() {
@@ -227,14 +228,13 @@ public class TaxiWorld implements World {
 			player.setCommander(cmdr);
 		}
 
-		players.setLocation(player, location);
+		player.getState().setLocation(location);
 		
 		// put the player in it
 		map.getCell(location).addPlayer(player);
 		
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
-		setLocations();
 		return player;
 	}
 
@@ -246,12 +246,6 @@ public class TaxiWorld implements World {
 	@Override
 	public List<? extends Player> getPlayers() {
 		return players.getAllAsPlayers();
-	}
-
-	@Override
-	public void interrupted(String agentName) {
-		players.interrupted(agentName);
-		stopMessages.add("interrupted");
 	}
 
 	@Override
@@ -267,9 +261,8 @@ public class TaxiWorld implements World {
 	@Override
 	public void removePlayer(String name) {
 		Taxi taxi = players.get(name);
-		map.getCell(players.getLocation(taxi)).clearPlayers();
+		map.getCell(taxi.getState().getLocation()).clearPlayers();
 		players.remove(taxi);
 		taxi.shutdownCommander();
-		setLocations();
 	}
 }

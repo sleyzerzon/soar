@@ -10,22 +10,18 @@ public class Taxi extends Player {
 	private static Log logger = LogFactory.getLog(Taxi.class);
 
 	private TaxiCommander commander;
-
-	private int fuel;
-	private int fuelStartMin;
-	private int fuelStartMax;
-	private int refuel;
-	private boolean disableFuel;
+	private TaxiState state;
 
 	public Taxi(Simulation sim, String name, PlayerColor color, int fuelStartMin, int fuelStartMax, int refuel, boolean disableFuel) {
 		super(sim, name, color);
 		
-		this.fuelStartMin = fuelStartMin;
-		this.fuelStartMax = fuelStartMax;
-		this.refuel = refuel;
-		this.disableFuel = disableFuel;
+		state = new TaxiState(fuelStartMin, fuelStartMax, refuel, disableFuel);
 		
 		reset();
+	}
+	
+	public TaxiState getState() {
+		return state;
 	}
 	
 	public void setCommander(TaxiCommander commander) {
@@ -38,10 +34,7 @@ public class Taxi extends Player {
 	
 	@Override
 	public void reset() {
-		super.reset();
-
-		fuel = Simulation.random.nextInt(1 + fuelStartMax - fuelStartMin);
-		fuel += fuelStartMin;
+		state.reset();
 		
 		if (commander != null) {
 			commander.reset();
@@ -55,20 +48,20 @@ public class Taxi extends Player {
 	}
 	
 	public void consumeFuel() {
-		if (disableFuel) {
+		if (state.isDisableFuel()) {
 			logger.info("fuel consuption disabled");
 			return;
 		}
-		logger.info("fuel: " + Integer.toString(fuel) + " -> " + Integer.toString(fuel-1));
-		fuel -= 1;
+		logger.info("fuel: " + Integer.toString(state.getFuel()) + " -> " + Integer.toString(state.getFuel()-1));
+		state.setFuel(state.getFuel() - 1);
 	}
 	
 	public int getFuel() {
-		return fuel;
+		return state.getFuel();
 	}
 
 	public void fillUp() {
-		logger.info("fuel: " + Integer.toString(fuel) + " -> " + refuel + " (fillup)");
-		fuel = refuel;
+		logger.info("fuel: " + Integer.toString(state.getFuel()) + " -> " + state.getRefuel() + " (fillup)");
+		state.setFuel(state.getRefuel());
 	}
 }

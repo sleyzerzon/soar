@@ -123,7 +123,7 @@ public class SoarRobotInputLinkManager {
 			}
 			
 			Identifier areaDescription = agent.GetInputLink().CreateIdWME("area-description");
-			boolean door = roomMap.getCell(player.getLocation()).hasObjectWithProperty(Names.kPropertyGatewayRender);
+			boolean door = roomMap.getCell(player.getState().getLocation()).hasObjectWithProperty(Names.kPropertyGatewayRender);
 			areaIL = new SoarRobotAreaDescriptionIL(areaDescription, player.getState().getLocationId(), opose, roomMap, door);
 		}
 		

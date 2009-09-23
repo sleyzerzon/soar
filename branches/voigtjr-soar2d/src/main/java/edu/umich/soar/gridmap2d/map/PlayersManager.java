@@ -17,7 +17,6 @@ public class PlayersManager<P extends Player, T> {
 	private final List<P> players = new ArrayList<P>(7);
 	private final Map<String, P> playersMap = new HashMap<String, P>(7);
 	private final Map<P, int []> initialLocations = new HashMap<P, int []>(7);
-	private final Map<P, int []> locations = new HashMap<P, int []>(7);
 	private final Map<P, T> lastCommands = new HashMap<P, T>(7);
 	
 	public int numberOfPlayers() {
@@ -38,14 +37,6 @@ public class PlayersManager<P extends Player, T> {
 	
 	ListIterator<P> listIterator(int index) {
 		return players.listIterator(index);
-	}
-	
-	public int [] getLocation(P player) {
-		return locations.get(player);
-	}
-	
-	void setLocation(P player, int [] location) {
-		locations.put(player, location);
 	}
 	
 	public T getCommand(P player) {
@@ -78,7 +69,6 @@ public class PlayersManager<P extends Player, T> {
 		players.remove(player);
 		playersMap.remove(player.getName());
 		initialLocations.remove(player);
-		locations.remove(player);
 		lastCommands.remove(player);
 	}
 	
@@ -118,35 +108,4 @@ public class PlayersManager<P extends Player, T> {
 		return players.size();
 	}
 	
-	int[] getSortedScores() {
-		int[] scores = new int[players.size()];
-		
-		for (int i = 0; i < players.size(); ++i) {
-			scores[i] = players.get(i).getPoints();
-		}
-		Arrays.sort(scores);
-		return scores;
-	}
-	
-	void interrupted(String interruptedName) {
-		P interruptedPlayer = get(interruptedName);
-		if (numberOfPlayers() <= 1) {
-			return;
-		}
-
-		// set the player to the lowest score - 1
-		Integer lowestScore = null;
-		for (P player : players) {
-			if (!player.getName().equals(interruptedName)) {
-				if (lowestScore == null) {
-					lowestScore = new Integer(player.getPoints());
-				} else {
-					lowestScore = Math.min(lowestScore, player.getPoints());
-				}
-			}
-		}
-		
-		lowestScore -= 1;
-		interruptedPlayer.setPoints(lowestScore, "interrupted");
-	}
 }

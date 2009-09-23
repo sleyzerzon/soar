@@ -67,7 +67,8 @@ public class EatersWorld implements World {
 			if (location == null) {
 				throw new IllegalStateException("no empty locations available for spawn");
 			}
-			players.setLocation(eater, location);
+			
+			eater.getState().setLocation(location);
 
 			// remove food from it
 			map.getCell(location).removeAllObjectsByProperty(Names.kPropertyEdible);
@@ -78,8 +79,6 @@ public class EatersWorld implements World {
 
 			eater.reset();
 		}
-		
-		setLocations();
 	}
 
 	private void checkPointsRemaining() {
@@ -112,9 +111,7 @@ public class EatersWorld implements World {
 
 		// Collect input
 		for (Eater eater : players.getAll()) {
-			eater.resetPointsChanged();
-
-			EaterCommand command = eater.getCommand();
+			EaterCommand command = eater.nextCommand();
 			if (command == null) {
 				sim.stop();
 				return;
@@ -124,6 +121,7 @@ public class EatersWorld implements World {
 		}
 		
 		moveEaters();
+		
 		// TODO: what is this for
 		if (sim.isShuttingDown()) {
 			return;
@@ -132,26 +130,30 @@ public class EatersWorld implements World {
 		updateMapAndEatFood();
 		
 		handleEatersCollisions(findCollisions(players));	
-		setLocations();
 		map.updateObjects();
 
 		checkPointsRemaining();
 		checkFoodRemaining();
 		checkUnopenedBoxes();
 		WorldUtil.checkMaxUpdates(sim, stopMessages, worldCount);
-		WorldUtil.checkWinningScore(sim, stopMessages, players.getSortedScores());
+		WorldUtil.checkWinningScore(sim, stopMessages, getSortedScores());
 		
 		if (stopMessages.size() > 0) {
 			sim.stop();
 		}
 	}
 	
-	private void setLocations() {
-		for (Eater eater : players.getAll()) {
-			eater.setLocation(players.getLocation(eater));
+	private int[] getSortedScores() {
+		int[] scores = new int[players.size()];
+		
+		for (int i = 0; i < players.size(); ++i) {
+			Eater player = players.get(i);
+			scores[i] = player.getState().getPoints().getPoints();
 		}
+		Arrays.sort(scores);
+		return scores;
 	}
-
+	
 	private void moveEaters() {
 		for (Eater eater : players.getAll()) {
 			EaterCommand command = players.getCommand(eater);			
@@ -161,8 +163,8 @@ public class EatersWorld implements World {
 			}
 
 			// Calculate new location
-			int [] oldLocation = players.getLocation(eater);
-			int [] newLocation = Arrays.copyOf(oldLocation, oldLocation.length);
+			int [] oldLocation = eater.getState().getLocation();
+			int [] newLocation = eater.getState().getLocation();
 			Direction.translate(newLocation, command.getMoveDirection());
 			if (command.isJump()) {
 				Direction.translate(newLocation, command.getMoveDirection());
@@ -174,22 +176,22 @@ public class EatersWorld implements World {
 				map.getCell(oldLocation).removePlayer(eater);
 				
 				if (command.isJump()) {
-					eater.adjustPoints(sim.getConfig().eatersConfig().jump_penalty, "jump penalty");
+					Players.adjustPoints(eater, eater.getState().getPoints(), sim.getConfig().eatersConfig().jump_penalty, "jump penalty");
 				}
-				players.setLocation(eater, newLocation);
+				eater.getState().setLocation(newLocation);
 				if (logger.isTraceEnabled()) {
 					logger.trace(eater + " from " + Arrays.toString(oldLocation) + " to " + Arrays.toString(newLocation));
 				}
 			} else {
-				eater.adjustPoints(sim.getConfig().eatersConfig().wall_penalty, "wall collision");
+				Players.adjustPoints(eater, eater.getState().getPoints(), sim.getConfig().eatersConfig().wall_penalty, "wall collision");
 			}
 		}
 	}
-
+	
 	private void updateMapAndEatFood() {
 		for (Eater eater : players.getAll()) {
 			EaterCommand lastCommand = players.getCommand(eater);
-			int [] location = players.getLocation(eater);
+			int [] location = eater.getState().getLocation();
 			
 			if (lastCommand.isMove() || lastCommand.isJump()) {
 				map.getCell(location).addPlayer(eater);
@@ -217,19 +219,19 @@ public class EatersWorld implements World {
 		
 		if (object.hasProperty("apply.points")) {
 			int points = object.getProperty("apply.points", 0, Integer.class);
-			eater.adjustPoints(points, object.getProperty("name"));
+			Players.adjustPoints(eater, eater.getState().getPoints(), points, object.getProperty("name"));
 		}
 		if (object.getProperty("apply.reward", false, Boolean.class)) {
 			// am I the positive box
 			if (object.getProperty("apply.reward.correct", false, Boolean.class)) {
 				// reward positively
-				eater.adjustPoints(object.getProperty("apply.reward.positive", 0, Integer.class), "positive reward");
+				Players.adjustPoints(eater, eater.getState().getPoints(), object.getProperty("apply.reward.positive", 0, Integer.class), "positive reward");
 			} else {
 				// I'm  not the positive box, set resetApply false
 				object.removeProperty("apply.reset");
 				
 				// reward negatively
-				eater.adjustPoints(-1 * object.getProperty("apply.reward.positive", 0, Integer.class), "negative reward (wrong box)");
+				Players.adjustPoints(eater, eater.getState().getPoints(), -1 * object.getProperty("apply.reward.positive", 0, Integer.class), "negative reward (wrong box)");
 			}
 		}
 		
@@ -303,7 +305,7 @@ public class EatersWorld implements World {
 				}
 				
 				// If the locations match, we have a collision
-				if (Arrays.equals(players.getLocation(left), players.getLocation(right))) {
+				if (Arrays.equals(left.getState().getLocation(), right.getState().getLocation())) {
 					
 					// Add to this set to avoid checking same player again
 					colliding.add(left);
@@ -313,7 +315,7 @@ public class EatersWorld implements World {
 					if (collision.size() == 0) {
 						collision.add(left);
 						
-						logger.debug("collision at " + players.getLocation(left));
+						logger.debug("collision at " + left.getState().getLocation());
 					}
 					// Add each right as it is detected
 					collision.add(right);
@@ -353,7 +355,7 @@ public class EatersWorld implements World {
 			int cash = 0;			
 			ListIterator<Eater> collideeIter = collision.listIterator();
 			while (collideeIter.hasNext()) {
-				cash += collideeIter.next().getPoints();
+				cash += collideeIter.next().getState().getPoints().getPoints();
 			}
 			if (cash > 0) {
 				int trash = cash % collision.size();
@@ -361,13 +363,13 @@ public class EatersWorld implements World {
 				logger.debug("Cash to each: " + cash + " (" + trash + " lost in division)");
 				collideeIter = collision.listIterator();
 				while (collideeIter.hasNext()) {
-					collideeIter.next().setPoints(cash, "collision");
+					Players.setPoints(collideeIter.next(), collideeIter.next().getState().getPoints(), cash, "collision");
 				}
 			} else {
 				logger.debug("Sum of cash is negative.");
 			}
 			
-			int [] collisionLocation = players.getLocation(collision.get(0));
+			int [] collisionLocation = collision.get(0).getState().getLocation();
 
 			// Add the boom on the map
 			setExplosion(collisionLocation);
@@ -385,13 +387,12 @@ public class EatersWorld implements World {
 					throw new IllegalStateException("no empty locations available for spawn");
 				}
 				
-				players.setLocation(eater, location);
+				eater.getState().setLocation(location);
 
 				// put the player in it
 				assert map.getCell(location).hasPlayers() == false;
 				map.getCell(location).addPlayer(eater);
 				
-				eater.setFragged(true);
 				if (!players.getCommand(eater).isDontEat()) {
 					eat(eater, location);
 				}
@@ -414,18 +415,11 @@ public class EatersWorld implements World {
 	@Override
 	public void removePlayer(String name) {
 		Eater eater = players.get(name);
-		map.getCell(players.getLocation(eater)).clearPlayers();
+		map.getCell(eater.getState().getLocation()).clearPlayers();
 		players.remove(eater);
 		eater.shutdownCommander();
-		setLocations();
 	}
 	
-	@Override
-	public void interrupted(String agentName) {
-		players.interrupted(agentName);
-		stopMessages.add("interrupted");
-	}
-
 	@Override
 	public int numberOfPlayers() {
 		return players.numberOfPlayers();
@@ -470,7 +464,7 @@ public class EatersWorld implements World {
 			player.setCommander(new ScriptedEater(script));
 		}
 
-		players.setLocation(player, location);
+		player.getState().setLocation(location);
 		
 		// remove food from it
 		map.getCell(location).removeAllObjectsByProperty(Names.kPropertyEdible);
@@ -482,7 +476,6 @@ public class EatersWorld implements World {
 		
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
-		setLocations();
 		return player;
 	}
 

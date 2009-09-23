@@ -227,10 +227,6 @@ public class Simulation {
 		return game;
 	}
 
-	public void interrupted(String agentName) {
-		world.interrupted(agentName);
-	}
-
 	public GridMap getMap() {
 		return world.getMap();
 	}
