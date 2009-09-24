@@ -1,4 +1,4 @@
-<project name="soar-soar2d" default="build" basedir=".">
+<project name="soar-room" default="build" basedir=".">
 
 	<import file="../soar-smljava/build-version.xml" />
 
