@@ -1,10 +1,11 @@
 package edu.umich.soar.gridmap2d.core.events;
 
-import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
+
 
 public class HumanInputEvent extends AbstractPlayerEvent {
 
-	HumanInputEvent(Player player) {
+	HumanInputEvent(Robot player) {
 		super(player);
 	}
 }

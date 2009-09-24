@@ -15,7 +15,6 @@ import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.Cell;
 import edu.umich.soar.gridmap2d.map.CellObject;
-import edu.umich.soar.gridmap2d.map.Player;
 import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RoomMap;
 import edu.umich.soar.gridmap2d.map.RoomObject;
@@ -200,7 +199,7 @@ public class RoomPanel extends GridMapPanel {
 			}
 			
 			// draw entities now so they appear on top
-			for (Player p : world.getPlayers()) {
+			for (Robot p : world.getPlayers()) {
 				Robot player = (Robot)p;
 				pose_t pose = player.getState().getPose();
 				

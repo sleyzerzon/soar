@@ -1,16 +1,16 @@
 package edu.umich.soar.gridmap2d.core.events;
 
 import edu.umich.soar.gridmap2d.events.SimEvent;
-import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 
 public abstract class AbstractPlayerEvent implements SimEvent {
-	private final Player player;
+	private final Robot player;
 	
-	AbstractPlayerEvent(Player player) {
+	AbstractPlayerEvent(Robot player) {
 		this.player = player;
 	}
 	
-	public Player getPlayer() {
+	public Robot getPlayer() {
 		return player;
 	}
 }

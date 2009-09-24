@@ -19,11 +19,11 @@ import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.robot.DifferentialDriveCommand;
 import edu.umich.soar.robot.SendMessagesInterface;
 
-public class RoomWorld implements World, SendMessagesInterface {
+public class RoomWorld implements SendMessagesInterface {
 	private static Log logger = LogFactory.getLog(RoomWorld.class);
 
 	private RoomMap map;
-	private PlayersManager<Robot, RobotCommand> players = new PlayersManager<Robot, RobotCommand>();
+	private PlayersManager players = new PlayersManager();
 	private List<String> stopMessages = new ArrayList<String>();
 	private final double LIN_SPEED = 16;
 	public static final int CELL_SIZE = 16;
@@ -36,13 +36,11 @@ public class RoomWorld implements World, SendMessagesInterface {
 		this.sim = sim;
 	}
 
-	@Override
 	public boolean hasPlayer(String name) {
 		return players.get(name) != null;
 	}
 	
-	@Override
-	public Player addPlayer(PlayerConfig cfg) {
+	public Robot addPlayer(PlayerConfig cfg) {
 		int [] location = WorldUtil.getStartingLocation(map, cfg.pos);
 		if (location == null) {
 			sim.error("Room Environment", "There are no suitable starting locations.");
@@ -75,27 +73,22 @@ public class RoomWorld implements World, SendMessagesInterface {
 		return player;
 	}
 
-	@Override
 	public GridMap getMap() {
 		return map;
 	}
 
-	@Override
-	public List<? extends Player> getPlayers() {
-		return players.getAllAsPlayers();
+	public List<Robot> getPlayers() {
+		return players.getAll();
 	}
 
-	@Override
 	public boolean isTerminal() {
 		return stopMessages.size() > 0;
 	}
 
-	@Override
 	public int numberOfPlayers() {
 		return players.numberOfPlayers();
 	}
 
-	@Override
 	public void removePlayer(String name) {
 		Robot player = players.get(name);
 		map.getCell(player.getState().getLocation()).removePlayer(player);
@@ -103,7 +96,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 		player.shutdown();
 	}
 
-	@Override
 	public void reset() {
 		blockManipulationReason = null;
 		messages.clear();
@@ -111,7 +103,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 		resetState();
 	}
 
-	@Override
 	public void setAndResetMap(String mapPath) {
 		map = new RoomMap(mapPath);
 		resetState();
@@ -162,7 +153,6 @@ public class RoomWorld implements World, SendMessagesInterface {
 		return floatLocation;
 	}
 	
-	@Override
 	public void update(int worldCount) {
 		WorldUtil.checkNumPlayers(sim, players.numberOfPlayers());
 
@@ -440,7 +430,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 			}
 			messages.add(message);
 		} else {
-			for (Player p : getPlayers()) {
+			for (Robot p : getPlayers()) {
 				Robot recipient = (Robot)p;
 				Message message = new Message();
 				message.from = from;

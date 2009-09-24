@@ -26,13 +26,9 @@ import edu.umich.soar.gridmap2d.core.events.ResetEvent;
 import edu.umich.soar.gridmap2d.core.events.StartEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEventManager;
-import edu.umich.soar.gridmap2d.map.EatersWorld;
 import edu.umich.soar.gridmap2d.map.GridMap;
-import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RoomWorld;
-import edu.umich.soar.gridmap2d.map.TankSoarWorld;
-import edu.umich.soar.gridmap2d.map.TaxiWorld;
-import edu.umich.soar.gridmap2d.map.World;
 import edu.umich.soar.gridmap2d.soar.Soar;
 
 /**
@@ -47,15 +43,13 @@ public class Simulation {
 	private static Log logger = LogFactory.getLog(Simulation.class);
 
 	public static Random random = new Random();
-	private World world;
-	private Game game;
+	private RoomWorld world;
 	private CognitiveArchitecture cogArch;
 	private int worldCount;
 	private SimConfig config;
 
-	public World initialize(SimConfig config) {
+	public RoomWorld initialize(SimConfig config) {
 		this.config = config;
-		this.game = config.game();
 
 		// Make all runs non-random if asked
 		// For debugging, set this to make all random calls follow the same
@@ -69,20 +63,7 @@ public class Simulation {
 		}
 
 		logger.trace(Names.Trace.loadingWorld);
-		switch (game) {
-		case TANKSOAR:
-			world = new TankSoarWorld(this);
-			break;
-		case EATERS:
-			world = new EatersWorld(this);
-			break;
-		case TAXI:
-			world = new TaxiWorld(this);
-			break;
-		case ROOM:
-			world = new RoomWorld(this);
-			break;
-		}
+		world = new RoomWorld(this);
 		
 		changeMap(config.generalConfig().map);
 
@@ -125,7 +106,7 @@ public class Simulation {
 			return;
 		}
 
-		Player player = world.addPlayer(playerConfig);
+		Robot player = world.addPlayer(playerConfig);
 		if (player == null) {
 			playerConfig.color.free();
 			return;
@@ -141,7 +122,7 @@ public class Simulation {
 	 *            removes the player from the world and blows away any
 	 *            associated data, frees up its color, etc.
 	 */
-	public void destroyPlayer(Player player) {
+	public void destroyPlayer(Robot player) {
 		world.removePlayer(player.getName());
 
 		// free its color
@@ -159,7 +140,7 @@ public class Simulation {
 	 *            reload the player. only currently makes sense to reload a soar
 	 *            agent. this re-loads the productions
 	 */
-	public void reloadPlayer(Player player) {
+	public void reloadPlayer(Robot player) {
 		cogArch.reload(player.getName());
 	}
 
@@ -191,7 +172,7 @@ public class Simulation {
 			e.printStackTrace();
 		}
 
-		for (Player player : world.getPlayers()) {
+		for (Robot player : world.getPlayers()) {
 			destroyPlayer(player);
 		}
 
@@ -206,13 +187,9 @@ public class Simulation {
 
 	public String getMapPath() {
 		return SimConfig.getHome() + "config" + File.separator + "maps"
-				+ File.separator + game.id();
+				+ File.separator + "room";
 	}
 	
-	public Game getGame() {
-		return game;
-	}
-
 	public GridMap getMap() {
 		return world.getMap();
 	}
@@ -365,7 +342,7 @@ public class Simulation {
 		return 0.005;
 	}
 
-	public World getWorld() {
+	public RoomWorld getWorld() {
 		return world;
 	}
 }

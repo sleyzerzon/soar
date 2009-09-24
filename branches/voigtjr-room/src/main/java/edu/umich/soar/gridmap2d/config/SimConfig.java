@@ -17,12 +17,11 @@ import edu.umich.soar.config.Config;
 import edu.umich.soar.config.ConfigFile;
 import edu.umich.soar.config.ParseError;
 import edu.umich.soar.gridmap2d.Application;
-import edu.umich.soar.gridmap2d.core.Game;
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.PlayerColor;
 
 
-public class SimConfig implements GameConfig {	
+public class SimConfig {	
 	private static final Log logger = LogFactory.getLog(SimConfig.class);
 	
 	private static final String EATERS_CNF = "eaters.cnf";
@@ -205,15 +204,11 @@ public class SimConfig implements GameConfig {
 		private static final String points = "points"; // keep in synch with PlayerConfig
 	}
 	
-	private Game game;
-
 	private Config config;
 	
 	private GeneralConfig generalConfig;
 	private SoarConfig soarConfig;
 	private TerminalsConfig terminalsConfig;
-	
-	private GameConfig gameConfig;
 	
 	private Map<String, PlayerConfig> playerConfigs = new HashMap<String, PlayerConfig>();
 	private Map<String, ClientConfig> clientConfigs = new HashMap<String, ClientConfig>();;
@@ -237,41 +232,6 @@ public class SimConfig implements GameConfig {
 
 		terminalsConfig = new TerminalsConfig();
 		loadSubConfig(config.getChild(Keys.terminals), TerminalsConfig.class.getFields(), terminalsConfig);
-
-		try {
-			game = Game.valueOf(generalConfig.game.toUpperCase());
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			StringBuilder sb = new StringBuilder();
-			sb.append("Unknown game type: ");
-			sb.append(generalConfig.game);
-			sb.append("\nKnown game types:");
-			for (Game gameType : Game.values()) {
-				sb.append(" ");
-				sb.append(gameType.id());
-			}
-			throw new IllegalArgumentException(sb.toString(), e);
-		}
-		
-		Config childConfig = config.getChild(game.id());
-		switch (game) {
-		case TANKSOAR:
-			gameConfig = new TankSoarConfig();
-			loadSubConfig(childConfig, TankSoarConfig.class.getFields(), gameConfig);
-			break;
-		case EATERS:
-			gameConfig = new EatersConfig();
-			loadSubConfig(childConfig, EatersConfig.class.getFields(), gameConfig);
-			break;
-		case TAXI:
-			gameConfig = new TaxiConfig();
-			loadSubConfig(childConfig, TaxiConfig.class.getFields(), gameConfig);
-			break;
-		case ROOM:
-			gameConfig = new RoomConfig();
-			loadSubConfig(childConfig, RoomConfig.class.getFields(), gameConfig);
-			break;
-		}
 
 		if (config.hasKey(Keys.active_players)) {
 			for (String playerID : config.getStrings(Keys.active_players)) {
@@ -348,10 +308,6 @@ public class SimConfig implements GameConfig {
 		return config.hasKey("general.seed");
 	}
 	
-	public Game game() {
-		return game;
-	}
-	
 	public GeneralConfig generalConfig() {
 		return generalConfig;
 	}
@@ -364,22 +320,6 @@ public class SimConfig implements GameConfig {
 		return terminalsConfig;
 	}
 	
-	public EatersConfig eatersConfig() {
-		return (EatersConfig)gameConfig;
-	}
-	
-	public TankSoarConfig tanksoarConfig() {
-		return (TankSoarConfig)gameConfig;
-	}
-	
-	public TaxiConfig taxiConfig() {
-		return (TaxiConfig)gameConfig;
-	}
-	
-	public RoomConfig roomConfig() {
-		return (RoomConfig)gameConfig;
-	}
-	
 	public Map<String, PlayerConfig> playerConfigs() {
 		return playerConfigs;
 	}
@@ -389,12 +329,12 @@ public class SimConfig implements GameConfig {
 	}
 	
 	public void saveLastProductions(String productionsPath) {
-		String game_specific_key = game.id() + "." + Keys.last_productions;
+		String game_specific_key = "room" + "." + Keys.last_productions;
 		Application.PREFERENCES.put(game_specific_key, productionsPath);
 	}
 	
 	public String getLastProductions() {
-		String game_specific_key = game.id() + "." + Keys.last_productions;
+		String game_specific_key = "room" + "." + Keys.last_productions;
 		return Application.PREFERENCES.get(game_specific_key, null);
 	}
 	
@@ -408,10 +348,5 @@ public class SimConfig implements GameConfig {
 		xy[0] = Application.PREFERENCES.getInt(Keys.window_position_x, xy[0]);
 		xy[1] = Application.PREFERENCES.getInt(Keys.window_position_y, xy[1]);
 		return xy;
-	}
-	
-	@Override
-	public String title() {
-		return gameConfig.title();
 	}
 }

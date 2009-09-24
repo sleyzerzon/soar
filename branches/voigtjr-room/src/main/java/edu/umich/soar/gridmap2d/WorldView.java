@@ -9,7 +9,7 @@ import java.util.List;
 import org.flexdock.docking.DockingConstants;
 
 import edu.umich.soar.gridmap2d.core.Simulation;
-import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.selection.SelectionManager;
 import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 
@@ -20,7 +20,7 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
 	private final GridMapPanel gridMapPanel;
 	private SelectionManager manager;
 	private final Simulation sim;
-	private Player selectedPlayer;
+	private Robot selectedPlayer;
 
     public WorldView(Adaptable app) {
         super("worldView", "World View");
@@ -29,23 +29,7 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
 		
         addAction(DockingConstants.PIN_ACTION);
 
-        switch (sim.getGame()) {
-        default:
-        case EATERS:
-            gridMapPanel = new EatersPanel(app);
-            break;
-        case TANKSOAR:
-        	assert false;
-            gridMapPanel = new TankSoarPanel(app);
-            break;
-        case TAXI:
-        	assert false;
-            gridMapPanel = new TaxiPanel(app);
-            break;
-        case ROOM:
-            gridMapPanel = new RoomPanel(app);
-        	break;
-        }
+        gridMapPanel = new RoomPanel(app);
         setContentPane(gridMapPanel);
         
         gridMapPanel.addMouseListener(new MouseAdapter() {
@@ -56,7 +40,7 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
         });
     }
 
-	private Player getPlayerAtPixel(int x, int y) {
+	private Robot getPlayerAtPixel(int x, int y) {
 		int[] xy = gridMapPanel.getCellAtPixel(x, y);
 		if (sim.getMap().isInBounds(xy)) {
 			return this.sim.getMap().getCell(xy).getFirstPlayer();
@@ -64,7 +48,7 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
 		return null;
 	}
 	
-	private void selectPlayer(Player player) {
+	private void selectPlayer(Robot player) {
 		selectedPlayer = player;
 		if (this.manager != null) {
 			manager.fireSelectionChanged();

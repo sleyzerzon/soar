@@ -55,7 +55,7 @@ public class WorldUtil {
 		}
 	}
 	
-	static void checkStopSim(Simulation sim, List<String> stopMessages, boolean stopSim, Player player) {
+	static void checkStopSim(Simulation sim, List<String> stopMessages, boolean stopSim, Robot player) {
 		if (stopSim) {
 			if (sim.getConfig().terminalsConfig().agent_command) {
 				stopMessages.add(player.getName() + " issued simulation stop command.");

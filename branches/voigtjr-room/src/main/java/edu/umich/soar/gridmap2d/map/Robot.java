@@ -5,12 +5,55 @@ import java.util.List;
 import edu.umich.soar.gridmap2d.core.PlayerColor;
 import edu.umich.soar.robot.ReceiveMessagesInterface;
 
-public class Robot extends Player {
+public class Robot {
 	private RobotCommander commander;
 	private RobotState state;
 	
+	private final String name;	
+	private final PlayerColor color;	
+
+	public PlayerColor getColor() {
+		return this.color;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		
+		if (!(o instanceof Robot)) {
+			return false;
+		}
+		Robot player = (Robot)o;
+		
+		return name.equals(player.name);
+	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
+	
 	public Robot(String name, PlayerColor color) {
-		super(name, color);
+		if (name == null) {
+			throw new NullPointerException("name is null");
+		}
+		this.name = name;
+		
+		if (color == null) {
+			throw new NullPointerException("color is null");
+		}
+		this.color = color;
 		
 		state = new RobotState();
 		state.reset();
@@ -28,7 +71,6 @@ public class Robot extends Player {
 		return commander.nextCommand();
 	}
 	
-	@Override
 	public void reset() {
 		if (state != null) {
 			state.reset();
@@ -39,7 +81,6 @@ public class Robot extends Player {
 		}
 	}
 
-	@Override
 	public void shutdown() {
 		if (commander != null) {
 			commander.shutdown();

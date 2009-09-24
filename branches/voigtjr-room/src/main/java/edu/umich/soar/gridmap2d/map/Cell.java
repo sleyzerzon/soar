@@ -8,13 +8,13 @@ public interface Cell {
 
 	public int[] getLocation();
 
-	public Player getFirstPlayer();
+	public Robot getFirstPlayer();
 
-	public List<Player> getAllPlayers();
+	public List<Robot> getAllPlayers();
 
-	public void addPlayer(Player player);
+	public void addPlayer(Robot player);
 
-	public void removePlayer(Player player);
+	public void removePlayer(Robot player);
 
 	public void clearPlayers();
 

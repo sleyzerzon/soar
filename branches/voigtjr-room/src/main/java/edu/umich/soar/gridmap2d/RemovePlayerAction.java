@@ -3,7 +3,7 @@ package edu.umich.soar.gridmap2d;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 
 public class RemovePlayerAction extends AbstractGridmap2DAction {
 
@@ -20,11 +20,11 @@ public class RemovePlayerAction extends AbstractGridmap2DAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		List<Player> players = Adaptables.adaptCollection(getApplication().getSelectionManager().getSelection(), Player.class);
+		List<Robot> players = Adaptables.adaptCollection(getApplication().getSelectionManager().getSelection(), Robot.class);
 		if (players.isEmpty()) {
 			return;
 		}
-		for (Player player : players) {
+		for (Robot player : players) {
 			getApplication().getSim().destroyPlayer(player);
 		}
 	}

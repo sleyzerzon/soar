@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import edu.umich.soar.gridmap2d.config.PlayerConfig;
 import edu.umich.soar.gridmap2d.core.Simulation;
-import edu.umich.soar.gridmap2d.map.Player;
+import edu.umich.soar.gridmap2d.map.Robot;
 
 public class ClonePlayerAction extends AbstractGridmap2DAction {
 
@@ -23,7 +23,7 @@ public class ClonePlayerAction extends AbstractGridmap2DAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Player player = Adaptables.adapt(getApplication().getSelectionManager().getSelectedObject(), Player.class);
+		Robot player = Adaptables.adapt(getApplication().getSelectionManager().getSelectedObject(), Robot.class);
 		if (player == null) {
 			return;
 		}

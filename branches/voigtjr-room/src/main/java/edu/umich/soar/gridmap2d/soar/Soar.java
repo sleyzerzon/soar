@@ -34,15 +34,9 @@ import edu.umich.soar.gridmap2d.core.events.StartEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
-import edu.umich.soar.gridmap2d.map.Eater;
-import edu.umich.soar.gridmap2d.map.EaterCommander;
 import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RobotCommander;
 import edu.umich.soar.gridmap2d.map.RoomWorld;
-import edu.umich.soar.gridmap2d.map.Tank;
-import edu.umich.soar.gridmap2d.map.TankCommander;
-import edu.umich.soar.gridmap2d.map.Taxi;
-import edu.umich.soar.gridmap2d.map.TaxiCommander;
 
 import sml.Agent;
 import sml.ConnectionInfo;
@@ -55,7 +49,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	private static Log logger = LogFactory.getLog(Soar.class);
 
-	private boolean runTilOutput = false;
 	private Kernel kernel = null;
 
 	private class AgentData {
@@ -89,7 +82,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	public Soar(Simulation sim) {
 		this.sim = sim;
 		SoarConfig config = sim.getConfig().soarConfig();
-		this.runTilOutput = config.runTilOutput(sim.getConfig().game());
 
 		this.clients = sim.getConfig().clientConfigs();
 		this.maxMemoryUsage = config.max_memory_usage;
@@ -119,17 +111,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 		// Register for Soar events
 		logger.trace(Names.Trace.eventRegistration);
-		if (runTilOutput) {
-			logger.debug(Names.Debug.runTilOutput);
-			kernel.RegisterForUpdateEvent(
-					smlUpdateEventId.smlEVENT_AFTER_ALL_GENERATED_OUTPUT, this,
-					null);
-		} else {
-			logger.debug(Names.Debug.noRunTilOutput);
-			kernel.RegisterForUpdateEvent(
-					smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this,
-					null);
-		}
+		logger.debug(Names.Debug.noRunTilOutput);
+		kernel.RegisterForUpdateEvent(
+				smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, this,
+				null);
 
 		// Register for Sim events
 		sim.getEvents().addListener(StartEvent.class, this);
@@ -448,42 +433,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 		agentData.agent
 				.LoadProductions(agentData.productions.getAbsolutePath());
-	}
-
-	@Override
-	public EaterCommander createEaterCommander(Eater eater, String productions,
-			int vision, String[] shutdownCommands) {
-		Agent agent = createSoarAgent(eater.getName(), productions, debug);
-		if (agent == null) {
-			return null;
-		}
-		SoarEater commander = new SoarEater(sim, eater, agent, vision, shutdownCommands);
-		agents.get(eater.getName()).sa = commander;
-		return commander;
-	}
-
-	@Override
-	public TankCommander createTankCommander(Tank tank, String productions,
-			String[] shutdownCommands) {
-		Agent agent = createSoarAgent(tank.getName(), productions, debug);
-		if (agent == null) {
-			return null;
-		}
-		SoarTank commander = new SoarTank(sim, tank, agent, shutdownCommands);
-		agents.get(tank.getName()).sa = commander;
-		return commander;
-	}
-
-	@Override
-	public TaxiCommander createTaxiCommander(Taxi taxi, String productions,
-			String[] shutdownCommands) {
-		Agent agent = createSoarAgent(taxi.getName(), productions, debug);
-		if (agent == null) {
-			return null;
-		}
-		SoarTaxi commander = new SoarTaxi(sim, taxi, agent, shutdownCommands);
-		agents.get(taxi.getName()).sa = commander;
-		return commander;
 	}
 
 	@Override

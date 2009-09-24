@@ -13,7 +13,6 @@ import edu.umich.soar.gridmap2d.core.events.PlayerRemovedEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
 import edu.umich.soar.gridmap2d.events.SimEventManager;
-import edu.umich.soar.gridmap2d.map.Player;
 import edu.umich.soar.gridmap2d.map.Robot;
 
 public class RobotTableModel extends AbstractTableModel {
@@ -33,7 +32,7 @@ public class RobotTableModel extends AbstractTableModel {
 		eventManager.addListener(PlayerAddedEvent.class, listener);
 		eventManager.addListener(PlayerRemovedEvent.class, listener);
 		
-		for (Player player : sim.getWorld().getPlayers()) {
+		for (Robot player : sim.getWorld().getPlayers()) {
 			players.add((Robot)player);
 		}
 	}
@@ -60,7 +59,7 @@ public class RobotTableModel extends AbstractTableModel {
 		return null;
 	}
 	
-	private void handlePlayerRemoved(Player player) {
+	private void handlePlayerRemoved(Robot player) {
         int row = 0;
         synchronized (players)
         {
@@ -87,7 +86,7 @@ public class RobotTableModel extends AbstractTableModel {
     public Class<?> getColumnClass(int c)
     {
     	switch(c) {
-    	case 0: return Player.class;
+    	case 0: return Robot.class;
     	case 1: return Integer.class;
     	}
     	return super.getColumnClass(c);

@@ -249,23 +249,10 @@ public class Application extends JPanel implements Adaptable {
 		final WorldView worldView = addView(new WorldView(this));
 		viewport.dock(worldView);
 		
-		final AbstractAdaptableView agentView = addView(getAgentView());
+		final AbstractAdaptableView agentView = addView(new RoomAgentView(this));
 		worldView.dock((Dockable)agentView, DockingConstants.EAST_REGION, 0.75f);
 	}
 	
-	private AbstractAdaptableView getAgentView() {
-		switch (sim.getConfig().game()) {
-		case EATERS:
-			return new EatersAgentView(this);
-		case ROOM:
-			return new RoomAgentView(this);
-		default:
-			break;
-		}
-		assert false;
-		return null;
-	}
-
     private <T extends AbstractAdaptableView> T addView(T view)
     {
         views.add(view);

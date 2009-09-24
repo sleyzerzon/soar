@@ -11,41 +11,35 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public class PlayersManager<P extends Player, T> {
+public class PlayersManager {
 	private static Log logger = LogFactory.getLog(PlayersManager.class);
 
-	private final List<P> players = new ArrayList<P>(7);
-	private final Map<String, P> playersMap = new HashMap<String, P>(7);
-	private final Map<P, int []> initialLocations = new HashMap<P, int []>(7);
-	private final Map<P, T> lastCommands = new HashMap<P, T>(7);
+	private final List<Robot> players = new ArrayList<Robot>(7);
+	private final Map<String, Robot> playersMap = new HashMap<String, Robot>(7);
+	private final Map<Robot, int []> initialLocations = new HashMap<Robot, int []>(7);
+	private final Map<Robot, RobotCommand> lastCommands = new HashMap<Robot, RobotCommand>(7);
 	
 	public int numberOfPlayers() {
 		return players.size();
 	}
 
-	List<P> getAll() {
+	List<Robot> getAll() {
 		return players;
 	}
 	
-	List<? extends Player> getAllAsPlayers() {
-		List<Player> copy = new ArrayList<Player>();
-		copy.addAll(players);
-		return copy;
-	}
-	
-	ListIterator<P> listIterator() {
+	ListIterator<Robot> listIterator() {
 		return players.listIterator();
 	}
 	
-	ListIterator<P> listIterator(int index) {
+	ListIterator<Robot> listIterator(int index) {
 		return players.listIterator(index);
 	}
 	
-	public T getCommand(P player) {
+	public RobotCommand getCommand(Robot player) {
 		return lastCommands.get(player);
 	}
 	
-	void setCommand(P player, T move) {
+	void setCommand(Robot player, RobotCommand move) {
 		lastCommands.put(player, move);
 
 		String moveString = move.toString();
@@ -54,19 +48,19 @@ public class PlayersManager<P extends Player, T> {
 		}
 	}
 	
-	P get(String name) {
+	Robot get(String name) {
 		return playersMap.get(name);
 	}
 	
-	P get(int index) {
+	Robot get(int index) {
 		return players.get(index);
 	}
 	
-	int indexOf(P player) {
+	int indexOf(Robot player) {
 		return players.indexOf(player);
 	}
 	
-	void remove(P player) {
+	void remove(Robot player) {
 		logger.info("Removing player " + player);
 		players.remove(player);
 		playersMap.remove(player.getName());
@@ -80,7 +74,7 @@ public class PlayersManager<P extends Player, T> {
 	 * 
 	 * @throws IllegalStateException If the player name is already in use.
 	 */
-	void add(P player, int [] initialLocation) {
+	void add(Robot player, int [] initialLocation) {
 		if(playersMap.containsKey(player.getName())) {
 			throw new IllegalStateException(player.getName() + " already exists");
 		}
@@ -94,11 +88,11 @@ public class PlayersManager<P extends Player, T> {
 		}
 	}
 	
-	boolean hasInitialLocation(P player) {
+	boolean hasInitialLocation(Robot player) {
 		return initialLocations.containsKey(player);
 	}
 
-	int [] getInitialLocation(P player) {
+	int [] getInitialLocation(Robot player) {
 		return initialLocations.get(player);
 	}
 	

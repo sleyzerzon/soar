@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 
 class SetCell implements Cell {
-	private final List<Player> players = new ArrayList<Player>();
+	private final List<Robot> players = new ArrayList<Robot>();
 	private final Set<CellObject> cellObjects = new ConcurrentSkipListSet<CellObject>();
 
 	// Weakly consistent, many races below. This is acceptable: used only for
@@ -38,21 +38,21 @@ class SetCell implements Cell {
 	}
 
 	@Override
-	public Player getFirstPlayer() {
+	public Robot getFirstPlayer() {
 		synchronized (players) {
 			return players.size() > 0 ? players.get(0) : null;
 		}
 	}
 
 	@Override
-	public List<Player> getAllPlayers() {
+	public List<Robot> getAllPlayers() {
 		synchronized (players) {
-			return new ArrayList<Player>(players);
+			return new ArrayList<Robot>(players);
 		}
 	}
 
 	@Override
-	public void addPlayer(Player player) {
+	public void addPlayer(Robot player) {
 		if (player == null) {
 			throw new NullPointerException();
 		}
@@ -62,7 +62,7 @@ class SetCell implements Cell {
 	}
 
 	@Override
-	public void removePlayer(Player player) {
+	public void removePlayer(Robot player) {
 		synchronized (players) {
 			modified = players.remove(player) || modified;
 		}

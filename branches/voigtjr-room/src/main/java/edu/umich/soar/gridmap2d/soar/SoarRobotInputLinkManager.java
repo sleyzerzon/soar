@@ -17,7 +17,6 @@ import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.CarryInterface;
 import edu.umich.soar.gridmap2d.map.CellObject;
-import edu.umich.soar.gridmap2d.map.Player;
 import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RoomMap;
 import edu.umich.soar.gridmap2d.map.RoomObject;
@@ -161,7 +160,7 @@ public class SoarRobotInputLinkManager {
 		
 		// players
 		if (!world.getPlayers().isEmpty()) {
-			for (Player temp : world.getPlayers()) {
+			for (Robot temp : world.getPlayers()) {
 				Robot rTarget = (Robot)temp;
 				if (rTarget.equals(player)) {
 					continue;
