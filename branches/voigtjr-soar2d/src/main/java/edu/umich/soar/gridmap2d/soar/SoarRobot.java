@@ -58,6 +58,7 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		
 		input = new SoarRobotInputLinkManager(sim, agent, kernel, this, player.getState());
 		input.create();
+		input.update(player, world, (RoomMap)sim.getMap(), this.isFloatYawWmes());	
 		output = new OutputLinkManager(agent);
 		output.create(input.getWaypointInterface(), world, input.getReceiveMessagesInterface(), this, this, this);
 	}

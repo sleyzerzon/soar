@@ -17,7 +17,7 @@ public class RunAction extends AbstractGridmap2DAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getApplication().getSim().run();
+		getApplication().doRunForever();
 	}
 
 }

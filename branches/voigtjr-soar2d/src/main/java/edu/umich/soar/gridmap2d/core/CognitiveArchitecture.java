@@ -11,8 +11,8 @@ import edu.umich.soar.gridmap2d.map.Taxi;
 import edu.umich.soar.gridmap2d.map.TaxiCommander;
 
 
-public interface CognitiveArchitecture {
 
+public interface CognitiveArchitecture {
 	void seed(int seed);
 
 	EaterCommander createEaterCommander(Eater eater, String productions, int vision, String[] shutdownCommands);

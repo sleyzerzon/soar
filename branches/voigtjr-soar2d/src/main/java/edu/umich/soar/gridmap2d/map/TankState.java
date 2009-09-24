@@ -359,7 +359,7 @@ public class TankState {
 		this.facing = facing;
 	}
 
-	public void reset(int worldCount) {
+	public void reset() {
 		if (initialMissiles > 0) {
 			missiles = initialMissiles;
 		} else {
@@ -379,7 +379,7 @@ public class TankState {
 		shieldsUp = false;
 		radarSwitch = false;
 		radarPower = 0;
-		resurrectFrame = worldCount;
+		resurrectFrame = 0;
 		clearRadar();
 		resetSensors();
 		if (initialFacing != null) {

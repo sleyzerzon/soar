@@ -28,7 +28,9 @@ public class PlayersManager<P extends Player, T> {
 	}
 	
 	List<? extends Player> getAllAsPlayers() {
-		return players;
+		List<Player> copy = new ArrayList<Player>();
+		copy.addAll(players);
+		return copy;
 	}
 	
 	ListIterator<P> listIterator() {

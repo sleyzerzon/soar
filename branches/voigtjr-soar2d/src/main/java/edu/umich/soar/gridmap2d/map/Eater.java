@@ -1,14 +1,13 @@
 package edu.umich.soar.gridmap2d.map;
 
 import edu.umich.soar.gridmap2d.core.PlayerColor;
-import edu.umich.soar.gridmap2d.core.Simulation;
 
 public class Eater extends Player {	
 	private EaterCommander commander;
 	final private EaterState state;
 	
-	Eater(Simulation sim, String name, PlayerColor color, String initialFacing) {
-		super(sim, name, color);
+	Eater(String name, PlayerColor color) {
+		super(name, color);
 		state = new EaterState();
 	}
 	
@@ -21,6 +20,10 @@ public class Eater extends Player {
 		return state.getLastCommand();
 	}
 	
+	public EaterState getState() {
+		return state;
+	}
+	
 	@Override
 	void reset() {
 		state.reset();
@@ -30,14 +33,11 @@ public class Eater extends Player {
 		}
 	}
 
-	void shutdownCommander() {
+	@Override
+	void shutdown() {
 		if (commander != null) {
 			commander.shutdown();
 		}
 	}
 	
-	public EaterState getState() {
-		// TODO: make private
-		return state;
-	}
 }

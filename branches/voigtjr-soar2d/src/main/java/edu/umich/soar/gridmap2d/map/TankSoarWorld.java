@@ -590,7 +590,7 @@ public class TankSoarWorld implements World {
 		map.getCell(location).addPlayer(tank);
 		
 		// reset the player state
-		tank.fragged();
+		tank.fragged(sim.getWorldCount());
 
 		printSpawnMessage(tank, location);
 	}
@@ -816,20 +816,21 @@ public class TankSoarWorld implements World {
 		
 		players.add(player, cfg.pos);
 		
+		player.getState().setLocation(location);
+		
+		// put the player in it
+		map.getCell(location).addPlayer(player);
+		
 		if (cfg.productions != null) {
 			TankCommander cmdr = sim.getCogArch().createTankCommander(player, cfg.productions, cfg.shutdown_commands);
 			if (cmdr == null) {
 				players.remove(player);
+				map.getCell(location).removePlayer(player);
 				return null;
 			}
 			player.setCommander(cmdr);
 		}
 	
-		player.getState().setLocation(location);
-	
-		// put the player in it
-		map.getCell(location).addPlayer(player);
-		
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
 		updatePlayers(true);
@@ -861,7 +862,7 @@ public class TankSoarWorld implements World {
 		Tank tank = players.get(name);
 		map.getCell(tank.getState().getLocation()).clearPlayers();
 		players.remove(tank);
-		tank.shutdownCommander();
+		tank.shutdown();
 		updatePlayers(true);
 	}
 }

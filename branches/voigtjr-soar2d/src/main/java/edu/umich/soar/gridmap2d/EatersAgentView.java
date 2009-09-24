@@ -57,7 +57,7 @@ public class EatersAgentView extends AbstractAgentView implements Refreshable, S
                 super.valueChanged(e);
                 updateEaterProperties();
             }};
-        
+            
         final JPanel p = new JPanel(new BorderLayout());
         p.add(new JScrollPane(table), BorderLayout.NORTH);
 

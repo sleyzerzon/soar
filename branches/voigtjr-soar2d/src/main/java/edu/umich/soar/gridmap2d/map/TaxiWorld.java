@@ -216,23 +216,24 @@ public class TaxiWorld implements World {
 			return null;
 		}
 
-		Taxi player = new Taxi(sim, cfg.name, cfg.color, fuelStartMin, fuelStartMax, refuel, disableFuel);
+		Taxi player = new Taxi(cfg.name, cfg.color, fuelStartMin, fuelStartMax, refuel, disableFuel);
 		players.add(player, cfg.pos);
 		
-		if (cfg.productions != null) {
-			TaxiCommander cmdr = sim.getCogArch().createTaxiCommander(player, cfg.productions, cfg.shutdown_commands );
-			if (cmdr == null) {
-				players.remove(player);
-				return null;
-			}
-			player.setCommander(cmdr);
-		}
-
 		player.getState().setLocation(location);
 		
 		// put the player in it
 		map.getCell(location).addPlayer(player);
 		
+		if (cfg.productions != null) {
+			TaxiCommander cmdr = sim.getCogArch().createTaxiCommander(player, cfg.productions, cfg.shutdown_commands );
+			if (cmdr == null) {
+				players.remove(player);
+				map.getCell(location).removePlayer(player);
+				return null;
+			}
+			player.setCommander(cmdr);
+		}
+
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
 		return player;
@@ -263,6 +264,6 @@ public class TaxiWorld implements World {
 		Taxi taxi = players.get(name);
 		map.getCell(taxi.getState().getLocation()).clearPlayers();
 		players.remove(taxi);
-		taxi.shutdownCommander();
+		taxi.shutdown();
 	}
 }

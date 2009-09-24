@@ -32,10 +32,6 @@ public class EaterTableModel extends AbstractTableModel {
 		final SimEventManager eventManager = sim.getEvents();
 		eventManager.addListener(PlayerAddedEvent.class, listener);
 		eventManager.addListener(PlayerRemovedEvent.class, listener);
-		
-		for (Player player : sim.getWorld().getPlayers()) {
-			players.add((Eater)player);
-		}
 	}
 	
 	@Override

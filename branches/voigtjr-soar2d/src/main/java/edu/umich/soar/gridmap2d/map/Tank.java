@@ -52,11 +52,9 @@ public class Tank extends Player {
 	
 	private TankCommander commander;
 	private final TankState state;
-	private final Simulation sim;
 	private Tank(Simulation sim, Builder builder) {
 	
-		super(sim, builder.name, builder.color);
-		this.sim = sim;
+		super(builder.name, builder.color);
 
 		this.state = new TankState(sim, getName(), builder);
 
@@ -75,7 +73,7 @@ public class Tank extends Player {
 	@Override
 	public void reset() {
 		if (state != null) {
-			state.reset(sim.getWorldCount());
+			state.reset();
 		}
 
 		if (commander != null) {
@@ -87,8 +85,8 @@ public class Tank extends Player {
 		return state;
 	}
 
-	public void fragged() {
-		state.fragged(sim.getWorldCount());
+	public void fragged(int worldCount) {
+		state.fragged(worldCount);
 		if (commander != null) {
 			commander.fragged();
 		}
@@ -100,7 +98,8 @@ public class Tank extends Player {
 		}
 	}
 
-	public void shutdownCommander() {
+	@Override
+	public void shutdown() {
 		if (commander != null) {
 			commander.shutdown();
 		}

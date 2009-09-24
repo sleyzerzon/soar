@@ -131,7 +131,7 @@ public class EatersWorld implements World {
 		
 		handleEatersCollisions(findCollisions(players));	
 		map.updateObjects();
-
+		
 		checkPointsRemaining();
 		checkFoodRemaining();
 		checkUnopenedBoxes();
@@ -417,7 +417,7 @@ public class EatersWorld implements World {
 		Eater eater = players.get(name);
 		map.getCell(eater.getState().getLocation()).clearPlayers();
 		players.remove(eater);
-		eater.shutdownCommander();
+		eater.shutdown();
 	}
 	
 	@Override
@@ -449,13 +449,27 @@ public class EatersWorld implements World {
 		}
 
 		
-		Eater player = new Eater(sim, cfg.name, cfg.color, cfg.facing);
+		Eater player = new Eater(cfg.name, cfg.color);
 		players.add(player, cfg.pos);
+		
+		player.getState().setLocation(location);
+		
+		// remove food from it
+		Set<CellObject> food = map.getCell(location).removeAllObjectsByProperty(Names.kPropertyEdible);
+		assert map.getCell(location).hasObjectWithProperty(Names.kPropertyEdible) == false;
+		
+		// put the player in it
+		assert map.getCell(location).hasPlayers() == false;
+		map.getCell(location).addPlayer(player);
 		
 		if (cfg.productions != null) {
 			EaterCommander cmdr = sim.getCogArch().createEaterCommander(player, cfg.productions, sim.getConfig().eatersConfig().vision, cfg.shutdown_commands);
 			if (cmdr == null) {
 				players.remove(player);
+				map.getCell(location).removePlayer(player);
+				for (CellObject f : food) {
+					map.getCell(location).addObject(f);
+				}
 				return null;
 			}
 			player.setCommander(cmdr);
@@ -464,16 +478,6 @@ public class EatersWorld implements World {
 			player.setCommander(new ScriptedEater(script));
 		}
 
-		player.getState().setLocation(location);
-		
-		// remove food from it
-		map.getCell(location).removeAllObjectsByProperty(Names.kPropertyEdible);
-		assert map.getCell(location).hasObjectWithProperty(Names.kPropertyEdible) == false;
-
-		// put the player in it
-		assert map.getCell(location).hasPlayers() == false;
-		map.getCell(location).addPlayer(player);
-		
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + ")");
 		
 		return player;

@@ -3,6 +3,10 @@ package edu.umich.soar.gridmap2d.map;
 public class Points {
 	private int points;
 	
+	void setPoints(Points points) {
+		this.points = points.points;
+	}
+	
 	public int getPoints() {
 		return points;
 	}
@@ -17,5 +21,10 @@ public class Points {
 	
 	void reset() {
 		this.points = 0;
+	}
+	
+	@Override
+	public String toString() {
+		return Integer.toString(this.points);
 	}
 }

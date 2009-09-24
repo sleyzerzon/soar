@@ -31,7 +31,6 @@ public class Names {
 		public static final String eventRegistration = "Registering for Soar events.";
 		public static final String loadingWorld = "Loading world.";
 		public static final String beforeClients = "Spawning clients before agent creation.";
-		public static final String initialPlayers = "Creating players.";
 		public static final String afterClients = "Spawning clients after agent creation.";
 		public static final String spawningClient = "Spawning client: ";
 		public static final String waitClient = "Waiting for client: ";

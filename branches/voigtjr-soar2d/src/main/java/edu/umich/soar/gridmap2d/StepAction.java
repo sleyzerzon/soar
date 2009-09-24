@@ -17,7 +17,7 @@ public class StepAction extends AbstractGridmap2DAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getApplication().getSim().run(1);
+		getApplication().doRunStep();
 	}
 
 }

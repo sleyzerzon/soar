@@ -49,26 +49,27 @@ public class RoomWorld implements World, SendMessagesInterface {
 			return null;
 		}
 
-		Robot player = new Robot(sim, cfg.name, cfg.color);
+		Robot player = new Robot(cfg.name, cfg.color);
 		players.add(player, cfg.pos);
 		
-		if (cfg.productions != null) {
-			RobotCommander cmdr = sim.getCogArch().createRoomCommander(player, this, cfg.productions, cfg.shutdown_commands);
-			if (cmdr == null) {
-				players.remove(player);
-				return null;
-			}
-			player.setCommander(cmdr);
-		} else if (cfg.script != null) {
-			sim.info("Room Environment", "Scripted robots not implemented.");
-		}
-
 		// put the player in it
 		map.getCell(location).addPlayer(player);
 		
 		player.getState().setLocationId(map.getLocationId(location));
 		double [] floatLocation = defaultFloatLocation(location);
 		player.getState().setPos(floatLocation);
+
+		if (cfg.productions != null) {
+			RobotCommander cmdr = sim.getCogArch().createRoomCommander(player, this, cfg.productions, cfg.shutdown_commands);
+			if (cmdr == null) {
+				players.remove(player);
+				map.getCell(location).removePlayer(player);
+				return null;
+			}
+			player.setCommander(cmdr);
+		} else if (cfg.script != null) {
+			sim.info("Room Environment", "Scripted robots not implemented.");
+		}
 
 		logger.info(player.getName() + ": Spawning at (" + location[0] + "," + location[1] + "), (" + floatLocation[0] + "," + floatLocation[1] + ")");
 		return player;
@@ -99,7 +100,7 @@ public class RoomWorld implements World, SendMessagesInterface {
 		Robot player = players.get(name);
 		map.getCell(player.getState().getLocation()).removePlayer(player);
 		players.remove(player);
-		player.shutdownCommander();
+		player.shutdown();
 	}
 
 	@Override

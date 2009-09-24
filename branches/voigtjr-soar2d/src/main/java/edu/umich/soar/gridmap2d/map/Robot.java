@@ -3,15 +3,14 @@ package edu.umich.soar.gridmap2d.map;
 import java.util.List;
 
 import edu.umich.soar.gridmap2d.core.PlayerColor;
-import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.robot.ReceiveMessagesInterface;
 
 public class Robot extends Player {
 	private RobotCommander commander;
 	private RobotState state;
 	
-	public Robot(Simulation sim, String name, PlayerColor color) {
-		super(sim, name, color);
+	public Robot(String name, PlayerColor color) {
+		super(name, color);
 		
 		state = new RobotState();
 		state.reset();
@@ -40,7 +39,8 @@ public class Robot extends Player {
 		}
 	}
 
-	public void shutdownCommander() {
+	@Override
+	public void shutdown() {
 		if (commander != null) {
 			commander.shutdown();
 		}

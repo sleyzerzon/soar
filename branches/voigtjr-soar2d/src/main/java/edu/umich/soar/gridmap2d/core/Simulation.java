@@ -1,8 +1,6 @@
 package edu.umich.soar.gridmap2d.core;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -87,16 +85,6 @@ public class Simulation {
 		}
 		
 		changeMap(config.generalConfig().map);
-
-		// TODO: reimplement
-//		cogArch.doBeforeClients();
-//		cogArch.doAfterClients();
-
-		// add initial players
-		logger.trace(Names.Trace.initialPlayers);
-		for (PlayerConfig playerConfig : config.playerConfigs().values()) {
-			createPlayer(playerConfig);
-		}
 
 		return world;
 	}
@@ -203,9 +191,7 @@ public class Simulation {
 			e.printStackTrace();
 		}
 
-		List<Player> players = new ArrayList<Player>(7);
-		players.addAll(world.getPlayers());
-		for (Player player : players) {
+		for (Player player : world.getPlayers()) {
 			destroyPlayer(player);
 		}
 
@@ -299,14 +285,6 @@ public class Simulation {
 		}
 	}
 	
-	public void run(final int ticks) {
-		run(ticks, 0, null);
-	}
-	
-	public void run() {
-		run(0, 100, TimeUnit.MILLISECONDS);
-	}
-	
 	public CognitiveArchitecture getCogArch() {
 		if (cogArch == null) {
 			initCogArch();
@@ -352,6 +330,13 @@ public class Simulation {
 		return config;
 	}
 
+	public void addInitialPlayers() {
+		// add initial players
+		for (PlayerConfig playerConfig : config.playerConfigs().values()) {
+			createPlayer(playerConfig);
+		}
+	}
+	
 	public void error(String title, String message) {
 		logger.error(title + ": " + message);
 		eventManager.fireEvent(new ErrorEvent(title, message));

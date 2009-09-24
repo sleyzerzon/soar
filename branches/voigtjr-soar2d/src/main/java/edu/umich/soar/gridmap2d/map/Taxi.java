@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.umich.soar.gridmap2d.core.PlayerColor;
-import edu.umich.soar.gridmap2d.core.Simulation;
 
 public class Taxi extends Player {	
 	private static Log logger = LogFactory.getLog(Taxi.class);
@@ -12,8 +11,8 @@ public class Taxi extends Player {
 	private TaxiCommander commander;
 	private TaxiState state;
 
-	public Taxi(Simulation sim, String name, PlayerColor color, int fuelStartMin, int fuelStartMax, int refuel, boolean disableFuel) {
-		super(sim, name, color);
+	public Taxi(String name, PlayerColor color, int fuelStartMin, int fuelStartMax, int refuel, boolean disableFuel) {
+		super(name, color);
 		
 		state = new TaxiState(fuelStartMin, fuelStartMax, refuel, disableFuel);
 		
@@ -41,7 +40,8 @@ public class Taxi extends Player {
 		}
 	}
 
-	public void shutdownCommander() {
+	@Override
+	public void shutdown() {
 		if (commander != null) {
 			commander.shutdown();
 		}

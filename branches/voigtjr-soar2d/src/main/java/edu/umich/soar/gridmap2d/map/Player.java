@@ -1,13 +1,12 @@
 package edu.umich.soar.gridmap2d.map;
 
 import edu.umich.soar.gridmap2d.core.PlayerColor;
-import edu.umich.soar.gridmap2d.core.Simulation;
 
 public abstract class Player {
-	private final String name;	// player name
-	private PlayerColor color;	// valid color string
+	private final String name;	
+	private final PlayerColor color;	
 
-	public Player(Simulation sim, String name, PlayerColor color) {
+	public Player(String name, PlayerColor color) {
 		if (name == null) {
 			throw new NullPointerException("name is null");
 		}
@@ -23,15 +22,12 @@ public abstract class Player {
 		return this.color;
 	}
 
-	public void setColor(PlayerColor color) {
-		this.color = color;
-	}
-	
 	public String getName() {
 		return this.name;
 	}
 	
 	abstract void reset();
+	abstract void shutdown();
 	
 	@Override
 	public int hashCode() {

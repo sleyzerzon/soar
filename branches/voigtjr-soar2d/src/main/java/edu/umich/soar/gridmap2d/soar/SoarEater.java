@@ -9,6 +9,7 @@ import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.map.Eater;
 import edu.umich.soar.gridmap2d.map.EaterCommand;
 import edu.umich.soar.gridmap2d.map.EaterCommander;
+import edu.umich.soar.gridmap2d.map.EaterState;
 import edu.umich.soar.gridmap2d.map.EatersMap;
 
 import sml.Agent;
@@ -78,7 +79,8 @@ public final class SoarEater implements EaterCommander, SoarAgent {
 
 	@Override
 	public void updateSoarInput() {
-		input.update(player.getState().getLocation(), (EatersMap)sim.getMap(), player.getState().getPoints().getPoints());
+		EaterState state = player.getState();
+		input.update(state.getLocation(), (EatersMap)sim.getMap(), state.getPoints().getPoints());
 	}
 
 	@Override

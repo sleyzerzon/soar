@@ -64,7 +64,9 @@ public class Application extends JPanel implements Adaptable {
 						}
 					}
 				});
-				sim.run();
+				
+				sim.addInitialPlayers();
+				doRunForever(sim);
 				
 				try {
 					doneQueue.take();
@@ -99,12 +101,20 @@ public class Application extends JPanel implements Adaptable {
 		}
 	}
 	
+	private static void doRunForever(Simulation sim) {
+		sim.run(0, 0, null);
+	}
+	
+	private static void doRunStep(Simulation sim) {
+		sim.run(1, 0, null);
+	}
+	
 	public static Application initialize(String[] args, Simulation sim, SimConfig config) {
 		DockingManager.setFloatingEnabled(true);
 		
 		sim.initialize(config);
 		
-		Application app = new Application(sim, config);
+		Application app = new Application(sim);
 		final JFrame frame = new JFrame();
 		frame.setContentPane(app);
 		
@@ -120,14 +130,12 @@ public class Application extends JPanel implements Adaptable {
     private final List<AbstractAdaptableView> views = new ArrayList<AbstractAdaptableView>();
     private final Simulation sim;
     private final List<SimEventListener> simEventListeners = new ArrayList<SimEventListener>();
-    //private final SimConfig config;
     private PropertyChangeListener dockTrackerListener = null;
 
-    private Application(Simulation sim, SimConfig config) {
+    private Application(Simulation sim) {
     	super(new BorderLayout());
     	
 		this.sim = sim;
-		//this.config = config;
     }
     
     private void initialize(JFrame frame) {
@@ -172,6 +180,8 @@ public class Application extends JPanel implements Adaptable {
         sim.getEvents().addListener(ResetEvent.class, saveListener(new UpdateListener()));
         sim.getEvents().addListener(PlayerAddedEvent.class, saveListener(new UpdateListener()));
         sim.getEvents().addListener(PlayerRemovedEvent.class, saveListener(new UpdateListener()));
+        
+        sim.addInitialPlayers();
 	}
     
     private class UpdateListener implements SimEventListener {
@@ -344,4 +354,13 @@ public class Application extends JPanel implements Adaptable {
 		CreatePlayerDialog cpd = new CreatePlayerDialog(frame, sim);
 		cpd.setVisible(true);
 	}
+	
+	void doRunForever() {
+		doRunForever(sim);
+	}
+	
+	void doRunStep() {
+		doRunStep(sim);
+	}
+	
 }
