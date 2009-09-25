@@ -1,5 +1,7 @@
 package edu.umich.soar.gridmap2d.map;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,10 +17,14 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.umich.soar.config.Config;
+import edu.umich.soar.config.ConfigFile;
+import edu.umich.soar.config.ParseError;
 import edu.umich.soar.gridmap2d.core.Direction;
 import edu.umich.soar.gridmap2d.core.Names;
+import edu.umich.soar.gridmap2d.core.Simulation;
 
-public class RoomMap extends GridMapBase implements GridMap, CellObjectObserver {
+public class RoomMap implements CellObjectObserver {
 	private static Log logger = LogFactory.getLog(RoomMap.class);
 
 	private static class Counts {
@@ -66,12 +72,11 @@ public class RoomMap extends GridMapBase implements GridMap, CellObjectObserver 
 	private final List<CellObject> mobs = new ArrayList<CellObject>();
 
 	public RoomMap(String mapPath) {
-		super(mapPath);
+		this.mapPath = mapPath;
 
 		reset();
 	}
 
-	@Override
 	public boolean isAvailable(int[] location) {
 		Cell cell = getData().cells.getCell(location);
 		boolean enterable = cell
@@ -82,7 +87,6 @@ public class RoomMap extends GridMapBase implements GridMap, CellObjectObserver 
 		return enterable && noPlayer && !movable;
 	}
 
-	@Override
 	public void reset() {
 		counts.reset();
 		gatewayDestinationMap.clear();
@@ -91,7 +95,7 @@ public class RoomMap extends GridMapBase implements GridMap, CellObjectObserver 
 		mobs.clear();
 
 		generatePhase = true;
-		super.reload();
+		reload();
 		generateRoomStructure();
 		generatePhase = false;
 	}
@@ -768,5 +772,167 @@ public class RoomMap extends GridMapBase implements GridMap, CellObjectObserver 
 		gatewayDestinations.add(new Integer(roomNumber));
 		gatewayDestinationMap.put(new Integer(gatewayId), gatewayDestinations);
 	}
+	
+	private GridMapData data;
+	private final String mapPath;
 
+	protected GridMapData getData() {
+		return data;
+	}
+	
+	protected String getMapPath() {
+		return mapPath;
+	}
+	
+	public boolean isInBounds(int[] xy) {
+		return data.cells.isInBounds(xy);
+	}
+	
+	public String getCurrentMapName() {
+		// can't just use system separator, could come from config file which needs to work across systems
+		int index = mapPath.lastIndexOf("/");
+		if (index == -1) {
+			index = mapPath.lastIndexOf("\\");
+			if (index == -1) {
+				return mapPath;
+			}
+		}
+		return mapPath.substring(index + 1);
+	}
+
+	public int size() {
+		return data.cells.size();
+	}
+
+	public int[] getAvailableLocationAmortized() {
+		int size = size();
+		
+		// Loop in case there are no free spots, the 100 is totally arbitrary
+		int [] xy = new int [2];
+		for (int counter = 0; counter < 100; ++counter) {
+			xy[0] = Simulation.random.nextInt(size - 2) + 1;
+			xy[1] = Simulation.random.nextInt(size - 2) + 1;
+			
+			if (isAvailable(xy)) {
+				return xy;
+			}
+		}
+		List<int []> locations = new ArrayList<int []>();
+		for (xy[0] = 0; xy[0] < size; ++xy[0]) {
+			for (xy[1] = 0; xy[1] < size; ++ xy[1]) {
+				if (isAvailable(xy)) {
+					locations.add(xy);
+				}
+			}
+		}
+		if (locations.size() == 0) {
+			return null;
+		}
+		return locations.get(Simulation.random.nextInt(locations.size()));
+	}
+
+	public CellObject createObjectByName(String name) {
+		return data.cellObjectManager.createObject(name);
+	}
+
+	public List<CellObject> getTemplatesWithProperty(String name) {
+		return data.cellObjectManager.getTemplatesWithProperty(name);
+	}
+
+	protected boolean reload() {
+		data = new GridMapData();
+		
+		File mapFile = new File(mapPath);
+		if (!mapFile.exists()) {
+			throw new IllegalStateException("Map file doesn't exist during reload");
+		}
+
+		data.cellObjectManager = new CellObjectManager();
+		
+		String mapFilePath = mapFile.getAbsolutePath();
+		try {
+			Config mapConfig = new Config(new ConfigFile(mapFilePath));
+			String objectsFileString = mapConfig.getString("objects_file");
+			String mapFileDirectory = mapFilePath.substring(0, mapFilePath.lastIndexOf(File.separatorChar) + 1);
+			
+			Config objectsConfig = new Config(new ConfigFile(mapFileDirectory + objectsFileString));
+			
+			for (String id : mapConfig.getStrings("objects")) {
+				CellObject template = new CellObject(objectsConfig.getChild("objects." + id));
+				data.cellObjectManager.registerTemplate(template);
+			}
+			
+			cellsConfig(mapConfig.getChild("cells"), objectsConfig);
+			return true;
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
+		} 
+		catch (ParseError e) {
+			e.printStackTrace();
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
+		}
+		catch (IllegalStateException e) {
+			e.printStackTrace();
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
+		} 
+		catch (IndexOutOfBoundsException e) {
+			e.printStackTrace();
+			throw new IllegalStateException("During reload: " + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * @param cellsConfig
+	 * @param objectsConfig
+	 * 
+	 * @throws IndexOutOfBoundsException If rows do not contain enough cell data
+	 * @throws IllegalArgumentException If encountered object that isn't registered
+	 */
+	private void cellsConfig(Config cellsConfig, Config objectsConfig) {
+		data.cells = new GridMapCells(cellsConfig.requireInt("size"), new CellObjectObserver[] { data, this });
+		
+		// Generate map unless both are true
+		Config rows = cellsConfig.getChild("rows");
+		int[] xy = new int[2];
+		for (xy[1] = 0; xy[1] < data.cells.size(); ++xy[1]) {
+
+			String[] cellStrings = rows.getStrings(Integer.toString(xy[1]));
+			if (cellStrings.length != data.cells.size()) {
+				throw new IndexOutOfBoundsException("Not enough cells, row " + xy[1]);
+			}
+			
+			for (xy[0] = 0; xy[0] < data.cells.size(); ++xy[0]) {
+				String contents = cellStrings[xy[0]];
+				for (String objectID : contents.split("-")) {
+					String objectName = objectsConfig.getString("objects." + objectID + ".name");
+					logger.trace(Arrays.toString(xy) + ": " + objectName);
+					
+					if (!data.cellObjectManager.hasTemplate(objectName)) {
+						throw new IllegalArgumentException("object \"" + objectName + "\" does not map to a cell object");
+					}
+					
+					CellObject cellObject = data.cellObjectManager.createObject(objectName);
+					data.cells.getCell(xy).addObject(cellObject);
+				}
+			}
+		}
+	}
+	
+	protected void lingerUpdate(CellObject cellObject, Cell cell) {
+		if (cellObject.hasProperty("update.linger")) {
+			int linger = cellObject.getProperty("update.linger", 0, Integer.class);
+			linger -= 1;
+			if (linger <= 0) {
+				cell.removeObject(cellObject);
+			} else {
+				cellObject.setProperty("update.linger", linger);
+			}
+		}
+	}
+	
+	public Cell getCell(int[] xy) {
+		return data.cells.getCell(xy);
+	}
 }

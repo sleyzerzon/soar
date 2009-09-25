@@ -26,8 +26,8 @@ import edu.umich.soar.gridmap2d.core.events.ResetEvent;
 import edu.umich.soar.gridmap2d.core.events.StartEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEventManager;
-import edu.umich.soar.gridmap2d.map.GridMap;
 import edu.umich.soar.gridmap2d.map.Robot;
+import edu.umich.soar.gridmap2d.map.RoomMap;
 import edu.umich.soar.gridmap2d.map.RoomWorld;
 import edu.umich.soar.gridmap2d.soar.Soar;
 
@@ -65,7 +65,11 @@ public class Simulation {
 		logger.trace(Names.Trace.loadingWorld);
 		world = new RoomWorld(this);
 		
-		changeMap(config.generalConfig().map);
+		String map = config.generalConfig().map;
+		if (map == null) {
+			map = "config/maps/room/default.txt";
+		}
+		changeMap(map);
 
 		return world;
 	}
@@ -190,7 +194,7 @@ public class Simulation {
 				+ File.separator + "room";
 	}
 	
-	public GridMap getMap() {
+	public RoomMap getMap() {
 		return world.getMap();
 	}
 	

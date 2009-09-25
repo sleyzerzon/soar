@@ -73,7 +73,7 @@ public class RoomWorld implements SendMessagesInterface {
 		return player;
 	}
 
-	public GridMap getMap() {
+	public RoomMap getMap() {
 		return map;
 	}
 

@@ -20,6 +20,10 @@ public enum PlayerColor {
 		}
 	}
 	
+	public static List<PlayerColor> getUnusedColors() {
+		return new ArrayList<PlayerColor>(unusedColors);
+	}
+	
 	public boolean use() {
 		synchronized(unusedColors) {
 			return unusedColors.remove(this);

@@ -85,7 +85,7 @@ public class WorldUtil {
 	 * @param initialLocation The desired starting location.
 	 * @return The starting location or null if there are none available.
 	 */
-	public static int [] getStartingLocation(GridMap map, int[] initialLocation) {
+	public static int [] getStartingLocation(RoomMap map, int[] initialLocation) {
 		int[] location = null;
 		if (initialLocation != null) {
 			location = Arrays.copyOf(initialLocation, initialLocation.length);

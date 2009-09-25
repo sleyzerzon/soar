@@ -24,12 +24,7 @@ import edu.umich.soar.gridmap2d.core.PlayerColor;
 public class SimConfig {	
 	private static final Log logger = LogFactory.getLog(SimConfig.class);
 	
-	private static final String EATERS_CNF = "eaters.cnf";
-	private static final String EATERS_CONSOLE_CNF = "eaters-console.cnf";
-	private static final String TANKSOAR_CNF = "tanksoar.cnf";
-	private static final String TANKSOAR_CONSOLE_CNF = "tanksoar-console.cnf";
 	private static final String ROOM_CNF = "room.cnf";
-	private static final String TAXI_CNF = "taxi.cnf";
 
 	private static final File home;
 	
@@ -38,12 +33,7 @@ public class SimConfig {
 		
 		try {
 			boolean installed = false; 
-			installed |= install(TANKSOAR_CNF);
-			installed |= install(TANKSOAR_CONSOLE_CNF);
-			installed |= install(EATERS_CNF);
-			installed |= install(EATERS_CONSOLE_CNF);
 			installed |= install(ROOM_CNF);
-			installed |= install(TAXI_CNF);
 			if (installed) {
 				System.err.println("Installed at least one config file." +
 						"\nYou may need to refresh the project if you are working inside of Eclipse.");
@@ -56,7 +46,7 @@ public class SimConfig {
 	
 	private static File figureOutHome() {
 		File home = null;
-		String homeProperty = System.getProperty("soar2d.home");
+		String homeProperty = System.getProperty("room.home");
 		if (homeProperty != null) {
 			home = new File(homeProperty);
 			return home;
@@ -78,29 +68,29 @@ public class SimConfig {
 		// usually, we'll be in SoarLibrary/lib or SoarLibrary/bin
 		String soarlib = "SoarLibrary";
 		String soarjava = "soar-java";
-		String soar2d = "soar-soar2d";
+		String room = "soar-room";
 		String hstr = home.toString();
 		int pos = hstr.lastIndexOf(soarlib);
 		if (pos >= 0) {
 			home = new File(home.toString().substring(0, pos) + soarjava
-					+ File.separator + soar2d);
+					+ File.separator + room);
 		} else {
 			// sometimes in soar-java somewhere
 			pos = hstr.lastIndexOf(soarjava);
 			if (pos >= 0) {
 				home = new File(home.toString().substring(0,
 						pos + soarjava.length())
-						+ File.separator + soar2d);
+						+ File.separator + room);
 			} else {
 				// maybe in SoarSuite root?
 				home = new File(home.toString() + File.separator + soarjava
-						+ File.separator + soar2d);
+						+ File.separator + room);
 			}
 		}
 
 		// verify exists
 		if (!home.exists()) {
-			throw new IllegalStateException("Can't figure out where the " + soar2d + " folder is.");
+			throw new IllegalStateException("Can't figure out where the " + room + " folder is.");
 		}
 		return home;
 	}
@@ -150,6 +140,10 @@ public class SimConfig {
 		return true;
 	}
 
+	public static SimConfig newInstance() {
+		return new SimConfig(new Config(new ConfigFile()));
+	}
+	
 	/**
 	 * @param path
 	 * @return
@@ -220,9 +214,6 @@ public class SimConfig {
 	 */
 	private SimConfig(Config config) {
 		this.config = config;
-		
-		// verify we have a map
-		config.requireString("general.map");
 		
 		generalConfig = new GeneralConfig();
 		loadSubConfig(config.getChild(Keys.general), GeneralConfig.class.getFields(), generalConfig);

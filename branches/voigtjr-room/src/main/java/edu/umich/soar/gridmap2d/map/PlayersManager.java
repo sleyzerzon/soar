@@ -24,7 +24,7 @@ public class PlayersManager {
 	}
 
 	List<Robot> getAll() {
-		return players;
+		return new ArrayList<Robot>(players);
 	}
 	
 	ListIterator<Robot> listIterator() {

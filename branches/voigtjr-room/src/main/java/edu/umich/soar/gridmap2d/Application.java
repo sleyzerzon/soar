@@ -47,7 +47,7 @@ public class Application extends JPanel implements Adaptable {
 
 	public static void main(final String[] args) {
 		try {
-			final SimConfig config = SimConfig.getInstance(args[0]);
+			final SimConfig config = args.length > 0 ? SimConfig.getInstance(args[0]) : SimConfig.newInstance();
 			final Simulation sim = new Simulation();
 			final BlockingQueue<Boolean> doneQueue = new SynchronousQueue<Boolean>();
 			
@@ -338,7 +338,7 @@ public class Application extends JPanel implements Adaptable {
 	}
 
 	public void createPlayer() {
-		CreatePlayerDialog cpd = new CreatePlayerDialog(frame, sim);
+		CreateRobotDialog cpd = new CreateRobotDialog(frame, sim);
 		cpd.setVisible(true);
 	}
 	
