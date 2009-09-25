@@ -139,7 +139,7 @@ namespace soar_module
 				cond->data.tests.id_test = make_equality_test( (*p)->id );
 				cond->data.tests.attr_test = make_equality_test( (*p)->attr );
 				cond->data.tests.value_test = make_equality_test( (*p)->value );
-				cond->test_for_acceptable_preference = TRUE;
+				cond->test_for_acceptable_preference = (*p)->acceptable;
 				cond->bt.wme_ = (*p);
 				wme_add_ref( (*p) );
 				cond->bt.level = (*p)->id->id.level;
