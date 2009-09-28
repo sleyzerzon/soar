@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +28,6 @@ import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
-import edu.umich.soar.gridmap2d.core.events.BeforeTickEvent;
 import edu.umich.soar.gridmap2d.core.events.StartEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
@@ -119,7 +117,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		// Register for Sim events
 		sim.getEvents().addListener(StartEvent.class, this);
 		sim.getEvents().addListener(StopEvent.class, this);
-		sim.getEvents().addListener(BeforeTickEvent.class, this);
 		sim.getEvents().addListener(AfterTickEvent.class, this);
 	}
 
@@ -131,45 +128,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	@Override
 	public void seed(int seed) {
 		kernel.ExecuteCommandLine("srand " + seed, null);
-	}
-
-	@Override
-	public void doBeforeClients() {
-		// Start or wait for clients (false: before agent creation)
-		logger.trace(Names.Trace.beforeClients);
-		doClients(false);
-
-	}
-
-	@Override
-	public void doAfterClients() {
-		// Start or wait for clients (true: after agent creation)
-		logger.trace(Names.Trace.afterClients);
-		doClients(true);
-
-	}
-
-	private void doClients(boolean after) {
-		for (Entry<String, ClientConfig> entry : clients.entrySet()) {
-			if (entry.getValue().after != after) {
-				continue;
-			}
-
-			if (entry.getKey().equals(Names.kDebuggerClient)) {
-				continue;
-			}
-
-			if (entry.getValue().command != null) {
-				spawnClient(entry.getKey(), entry.getValue());
-			} else {
-				if (!waitForClient(entry.getKey(), entry.getValue())) {
-					sim
-							.error("Soar", Names.Errors.clientSpawn
-									+ entry.getKey());
-					return;
-				}
-			}
-		}
 	}
 
 	private class Redirector extends Thread {
@@ -450,8 +408,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	private static final ExecutorService exec = Executors
 			.newSingleThreadExecutor();
 
-	private BlockingQueue<Boolean> tickReady = new SynchronousQueue<Boolean>();
-	private BlockingQueue<Boolean> outputReady = new SynchronousQueue<Boolean>();
 	private BlockingQueue<Boolean> inputReady = new SynchronousQueue<Boolean>();
 	private BlockingQueue<Boolean> inputProcessed = new SynchronousQueue<Boolean>();
 
@@ -465,9 +421,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 					logger.trace("Ignoring event due to interrupted flag");
 					return;
 				}
-				if (event instanceof BeforeTickEvent) {
-					onBeforeTickEvent();
-				} else if (event instanceof AfterTickEvent) {
+				if (event instanceof AfterTickEvent) {
 					onAfterTickEvent();
 				} else if (event instanceof StopEvent) {
 					onStopEvent();
@@ -483,7 +437,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 	
 	private void onStartEvent() {
-		firstUpdate = true;
 		interrupted.set(false);
 		if (agents.size() != 0) {
 			exec.submit(new Callable<Void>() {
@@ -502,134 +455,59 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 	}
 	
-	private void onBeforeTickEvent() throws InterruptedException {
-		if (synchronous) {
-			logger.trace("onBeforeTickEvent tickReady");
-			tickReady.put(Boolean.TRUE);
-			if (interrupted.get()) {
-				logger.trace("onBeforeTickEvent interrupted flag is set");
-				return;
-			}
-			logger.trace("onBeforeTickEvent wait for outputReady");
-			outputReady.take();
-		}
-	}
-	
 	private void onAfterTickEvent() throws InterruptedException {
-		if (synchronous) {
-			logger.trace("onAfterTickEvent inputReady");
-			inputReady.put(Boolean.TRUE);
-			if (interrupted.get()) {
-				logger.trace("onAfterTickEvent interrupted flag is set");
-				return;
-			}
-			logger.trace("onAfterTickEvent wait for inputProcessed");
-			inputProcessed.take();
-		} else {
-			logger.trace("onAfterTickEvent inputReady offer");
-			if (inputReady.offer(Boolean.TRUE)) {
-				logger.trace("onAfterTickEvent wait for inputProcessed");
-				inputProcessed.take();
-			}
-		}
+		logger.trace("onAfterTickEvent inputReady");
+		inputReady.put(Boolean.TRUE);
+		logger.trace("onAfterTickEvent wait for inputProcessed");
+		inputProcessed.take();
 	}
 	
 	private void onStopEvent() throws InterruptedException {
-		if (synchronous) {
-			logger.trace("StopEvent sync tickReady");
-			tickReady.put(Boolean.FALSE);
-		} else {
-			logger.trace("StopEvent async inputReady");
-			inputReady.put(Boolean.FALSE);
-		}
+		logger.trace("StopEvent inputReady");
+		inputReady.put(Boolean.FALSE);
 	}
 	
-	private boolean firstUpdate;
-	private boolean synchronous = true;
 	private AtomicBoolean interrupted = new AtomicBoolean();
 	
 	@Override
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
 		long id = Stopwatch.start("Soar", "updateEventHandler");
 		try {
-			if (synchronous) {
-				synchronousUpdate();
-			} else {
-				asynchronousUpdate();
+			logger.trace("Soar poll inputReady");
+			Boolean go = inputReady.poll();
+			if (go == null) {
+				return;
+			} else if (go == Boolean.FALSE) {
+				logger.trace("Soar update stop");
+				stop();
+				return;
 			}
+
+			for (AgentData ad : agents.values()) {
+				logger.trace("Soar update processing output for " + ad.agent.GetAgentName());
+				ad.sa.processSoarOuput();
+			}
+			
+			for (AgentData ad : agents.values()) {
+				logger.trace("Soar updating input for " + ad.agent.GetAgentName());
+				ad.sa.updateSoarInput();
+				ad.agent.Commit();
+			}
+			logger.trace("Soar inputProcessed");
+			inputProcessed.put(Boolean.TRUE);
 		} catch (InterruptedException e) {
 			logger.trace("Soar update interrupted");
 			interrupted.set(true);
 			stop();
 			sim.stop();
 			flushLocks();
-			
 		} finally {
 			logger.trace("Soar update done");
 			Stopwatch.stop(id);	
 		}
 	}
 	
-	private void synchronousUpdate() throws InterruptedException {
-		if (firstUpdate) {
-			logger.trace("Soar synch update first update");
-			firstUpdate = false;
-			tickReady.take();
-		}
-
-		for (AgentData ad : agents.values()) {
-			logger.trace("Soar synch update processing output for " + ad.agent.GetAgentName());
-			ad.sa.processSoarOuput();
-		}
-		outputReady.put(Boolean.TRUE);
-
-		logger.trace("Soar synch wait inputReady");
-		inputReady.take();
-		for (AgentData ad : agents.values()) {
-			logger.trace("Soar synch updating input for " + ad.agent.GetAgentName());
-			ad.sa.updateSoarInput();
-			ad.agent.Commit();
-		}
-		logger.trace("Soar synch inputProcessed");
-		inputProcessed.put(Boolean.TRUE);
-		
-		logger.trace("Soar synch wait tickReady");
-		Boolean go = tickReady.take();
-		if (go == Boolean.FALSE) {
-			logger.trace("Soar synch update sync stop");
-			stop();
-			return;
-		}
-	}
-	
-	private void asynchronousUpdate() throws InterruptedException {
-		for (AgentData ad : agents.values()) {
-			logger.trace("Soar asynch update processing output for " + ad.agent.GetAgentName());
-			ad.sa.processSoarOuput();
-		}
-		
-		logger.trace("Soar asynch poll inputReady");
-		Boolean go = inputReady.poll();
-		if (go == null) {
-			return;
-		} else if (go == Boolean.FALSE) {
-			logger.trace("Soar asynch update sync stop");
-			stop();
-			return;
-		}
-
-		for (AgentData ad : agents.values()) {
-			logger.trace("Soar asynch updating input for " + ad.agent.GetAgentName());
-			ad.sa.updateSoarInput();
-			ad.agent.Commit();
-		}
-		logger.trace("Soar asynch inputProcessed");
-		inputProcessed.put(Boolean.TRUE);
-	}
-	
 	private void flushLocks() {
-		tickReady.poll();
-		outputReady.offer(Boolean.FALSE);
 		inputReady.poll();
 		inputProcessed.offer(Boolean.FALSE);
 	}

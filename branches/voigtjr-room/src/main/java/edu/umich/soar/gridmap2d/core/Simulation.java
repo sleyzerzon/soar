@@ -343,7 +343,7 @@ public class Simulation {
 	}
 
 	public double getTimeSlice() {
-		return 0.005;
+		return 0.05;
 	}
 
 	public RoomWorld getWorld() {

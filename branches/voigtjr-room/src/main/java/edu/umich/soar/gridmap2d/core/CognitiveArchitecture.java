@@ -9,10 +9,6 @@ public interface CognitiveArchitecture {
 
 	RobotCommander createRoomCommander(Robot player, RoomWorld world, String productions, String[] shutdown_commands);
 
-	void doBeforeClients();
-
-	void doAfterClients();
-
 	void setDebug(boolean setting);
 	boolean debug();
 	

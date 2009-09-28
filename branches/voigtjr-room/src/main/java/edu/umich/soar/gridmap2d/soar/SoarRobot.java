@@ -174,13 +174,12 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 
 	@Override
 	public void processSoarOuput() {
+		ddc = output.update();
 		command = new RobotCommand.Builder(ddc).build();
 	}
 
 	@Override
 	public void updateSoarInput() {
-		ddc = output.update();
-
 		input.update(player, world, (RoomMap)sim.getMap(), this.isFloatYawWmes());	
 	}
 }
