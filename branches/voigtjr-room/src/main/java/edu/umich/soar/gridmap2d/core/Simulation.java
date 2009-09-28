@@ -209,6 +209,7 @@ public class Simulation {
 	
 	public void run(final int ticks, final long period, final TimeUnit unit) {
 		if (!running.getAndSet(true)) {
+			stopRequested.set(false);
 			exec.submit(new Runnable() {
 				@Override
 				public void run() {
@@ -226,13 +227,15 @@ public class Simulation {
 									stopRequested.set(true);
 								}
 							}
-						} while(!stopRequested.getAndSet(false));
+						} while(!stopRequested.get());
+						logger.trace("ending tick loop due to stop request");
+						
 					} else {
 						final ScheduledFuture<?> ticker = schexec.scheduleAtFixedRate(new Runnable() {
 							
 							@Override
 							public void run() {
-								if (stopRequested.get() == true) {
+								if (stopRequested.get()) {
 									canceller.offer(Boolean.TRUE);
 									return;
 								}
@@ -252,7 +255,6 @@ public class Simulation {
 						} finally {
 							ticker.cancel(false);
 						}
-						stopRequested.set(false);
 					}
 					
 					running.set(false);
@@ -300,6 +302,7 @@ public class Simulation {
 	}
 	
 	public void stop() {
+		logger.trace("stop received");
 		stopRequested.compareAndSet(false, true);
 	}
 	

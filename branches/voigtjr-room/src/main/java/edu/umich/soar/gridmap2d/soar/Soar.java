@@ -444,10 +444,17 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 				public Void call() {
 					logger.trace("Soar alive");
 					for (AgentData ad : agents.values()) {
-						ad.agent.Commit();
+						boolean commitResult = ad.agent.Commit();
+						if (!commitResult) {
+							assert false;
+						}
 					}
 					logger.trace("Soar run start");
 					logger.trace("Run result: " + kernel.RunAllAgentsForever());
+					logger.trace("Soar run stop, stopping sim and flushing locks");
+					interrupted.set(true);
+					sim.stop();
+					flushLocks();
 					logger.trace("Soar run returning");
 					return null;
 				}
@@ -458,6 +465,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	private void onAfterTickEvent() throws InterruptedException {
 		logger.trace("onAfterTickEvent inputReady");
 		inputReady.put(Boolean.TRUE);
+		if (interrupted.get()) {
+			logger.trace("onAfterTickEvent returning due to interrupted true");
+			return;
+		}
 		logger.trace("onAfterTickEvent wait for inputProcessed");
 		inputProcessed.take();
 	}
@@ -486,15 +497,17 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			for (AgentData ad : agents.values()) {
 				logger.trace("Soar update processing output for " + ad.agent.GetAgentName());
 				ad.sa.processSoarOuput();
-			}
-			
-			for (AgentData ad : agents.values()) {
 				logger.trace("Soar updating input for " + ad.agent.GetAgentName());
 				ad.sa.updateSoarInput();
-				ad.agent.Commit();
+				boolean commitResult = ad.agent.Commit();
+				if (!commitResult) {
+					assert false;
+				}
 			}
+
 			logger.trace("Soar inputProcessed");
 			inputProcessed.put(Boolean.TRUE);
+
 		} catch (InterruptedException e) {
 			logger.trace("Soar update interrupted");
 			interrupted.set(true);
