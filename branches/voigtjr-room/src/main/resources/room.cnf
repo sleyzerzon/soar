@@ -1,3 +1,5 @@
-general.map = "config/maps/room/default.txt";
-#players.active_players = [ "robot" ];
-#players.robot.productions = "agents/room/robot-template.soar";
+players.active_players = [ "robot" ];
+players.robot.productions = "agents/empty.soar";
+players.robot.pos = [1,9];
+#general.seed = 1;
+#soar.spawn_debuggers = true;

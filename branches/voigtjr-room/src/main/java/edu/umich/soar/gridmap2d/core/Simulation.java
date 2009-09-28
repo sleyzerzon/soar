@@ -67,7 +67,7 @@ public class Simulation {
 		
 		String map = config.generalConfig().map;
 		if (map == null) {
-			map = "config/maps/room/default.txt";
+			map = "config/maps/default.txt";
 		}
 		changeMap(map);
 

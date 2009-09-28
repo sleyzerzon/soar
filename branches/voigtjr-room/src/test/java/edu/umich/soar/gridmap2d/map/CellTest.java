@@ -150,7 +150,7 @@ public class CellTest {
 	
 	@Test(expected = NullPointerException.class)
 	public void testAddPlayerNull() {
-		cell.addPlayer((Player)null);
+		cell.addPlayer((Robot)null);
 	}
 	
 	@Test(expected = NullPointerException.class)
