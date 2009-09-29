@@ -179,17 +179,6 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
 		}
 
-		temp = "criteria: ";
-		temp2 = m_pAgentSoar->wma_params->criteria->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-		{
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		}
-
 		temp = "forgetting: ";
 		temp2 = m_pAgentSoar->wma_params->forgetting->get_string();
 		temp += temp2;

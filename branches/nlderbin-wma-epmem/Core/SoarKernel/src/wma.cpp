@@ -63,20 +63,6 @@ wma_param_container::wma_param_container( agent *new_agent ): soar_module::param
 	add( decay_rate );
 
 	/**
-	 * Specifies what WMEs will have decay values.
-	 * O_AGENT - Only o-supported WMEs created by the agent
-	 *           (i.e., they have a supporting preference)
-	 * O_AGENT_ARCH - All o-supported WMEs including
-	 *                architecture created WMEs
-	 * ALL - All wmes are activated
-	 */
-	criteria = new soar_module::constant_param<criteria_choices>( "criteria", crit_all, new wma_activation_predicate<criteria_choices>( my_agent ) );
-	criteria->add_mapping( crit_agent, "o-agent" );
-	criteria->add_mapping( crit_agent_arch, "o-agent-arch" );
-	criteria->add_mapping( crit_all, "all" );
-	add( criteria );
-
-	/**
 	 * Are WMEs removed from WM when activation gets too low?
 	 */
 	forgetting = new soar_module::boolean_param( "forgetting", soar_module::off, new wma_activation_predicate<soar_module::boolean>( my_agent ) );
@@ -511,27 +497,7 @@ void wma_update_new_wme( agent *my_agent, wme *w, int num_refs )
 	wma_decay_element_t *temp_el;
 
 	// should this be an activated wme?
-	bool good_wme = true;
-
-	// Step 1: Verify that this WME meets the criteria for being an activated wme
-	const long criteria = my_agent->wma_params->criteria->get_value();
-	switch( criteria )
-	{
-		case wma_param_container::crit_all:
-			break;
-
-		case wma_param_container::crit_agent_arch:
-			if ( ( w->preference != NIL ) && ( w->preference->o_supported != TRUE ) )
-				good_wme = false;
-			break;
-
-		case wma_param_container::crit_agent:
-			if ( ( w->preference == NIL ) || ( w->preference->o_supported != TRUE ) )
-				good_wme = false;
-			break;
-	}
-
-	if ( !good_wme )
+	if ( ( w->preference == NIL ) || ( w->preference->o_supported != TRUE ) )
 	{
 		// However, the creation of an i-supported WME may activate the WMEs that
 		// led to its creation.
@@ -1047,63 +1013,18 @@ void wma_reposition_wme( agent *my_agent, wma_decay_element_t *cur_decay_el, lon
  * Notes		: This routine removes an activated WME from working memory
  *                and performs all necessary cleanup related to that removal.
  **************************************************************************/
-void wma_forget_wme( agent *my_agent, wme *w )
+bool wma_forget_wme( agent *my_agent, wme *w )
 {
-	wme *w2;
-	slot *s;
-	Symbol *id;
-	preference *p;
-
-	id = w->id;
-
-	// what lists will w be on?  acceptable preferences??
-	for ( s=id->id.slots; s!=NIL; s=s->next )
+	if ( w->preference && w->preference->in_tm )
 	{
-		for ( w2=s->wmes; w2!=NIL; w2=w2->next )
-			if ( w == w2 ) break;
+		remove_preference_from_tm( my_agent, w->preference );
 
-		if ( w2 )
-			remove_from_dll( s->wmes, w, next, prev );
-
-		for ( w2=s->acceptable_preference_wmes; w2!=NIL; w2=w2->next )
-		{
-			if ( w == w2 )
-			{
-				remove_from_dll( s->acceptable_preference_wmes, w, next, prev );
-				break;
-			}
-		}
-
-		// %%%once a preference is made into a wme, is it removed from the
-		// preference lists in that slot, or kept there?  If kept, it must
-		// be removed here. -MRJ
-
-		// %%%do we need to deallocate this pref, or is that taken care of
-		// automatically? -MRJ
-
-		for( p=s->all_preferences; p!=NIL; p=p->all_of_slot_next )
-		{
-			// if p matches this wme, remove p...
-			if( ( p->id == w->id )
-				&& ( p->attr == w->attr )
-				&& ( p->value == w->value ) )
-			{
-				remove_preference_from_tm( my_agent, p );
-			}
-		}
+		return true;
 	}
-	
+	else
 	{
-		if ( w->gds )
-		{
-			if ( w->gds->goal != NIL )
-			{
-				gds_invalid_so_remove_goal( my_agent, w );
-			}
-		}
+		return false;
 	}
-
-	remove_wme_from_wm( my_agent, w );
 }
 
 /***************************************************************************
@@ -1164,6 +1085,7 @@ void wma_move_and_remove_wmes( agent *my_agent )
 	//         decay timelist.  This is the actual forgetting mechanism
 	//         associated with decay.
 	bool forgetting = ( my_agent->wma_params->forgetting->get_value() == soar_module::on );
+	bool forgot_something = false;
 	cur_decay_el = my_agent->wma_timelist_current->first_decay_element;
 	while( cur_decay_el != NIL )
 	{
@@ -1171,9 +1093,14 @@ void wma_move_and_remove_wmes( agent *my_agent )
 		next = cur_decay_el->next;
 
 		if ( forgetting )
-			wma_forget_wme( my_agent, cur_decay_el->this_wme );
+		{
+			if ( wma_forget_wme( my_agent, cur_decay_el->this_wme ) )
+				forgot_something = true;
+		}
 		else
+		{
 			wma_remove_decay_element( my_agent, cur_decay_el->this_wme );
+		}
 
 		cur_decay_el = next;
 	}
@@ -1181,8 +1108,16 @@ void wma_move_and_remove_wmes( agent *my_agent )
 	// Update working memory with all the WME removals that were done in the
 	// loop above.  This has to be done before changing first_decay_element at
 	// current time, otherwise it will cause pointer problems.
-	if ( forgetting )
-		do_buffered_wm_and_ownership_changes( my_agent );
+	if ( forgot_something )
+	{
+		if ( my_agent->sysparams[ TRACE_WM_CHANGES_SYSPARAM ] )
+			print( my_agent, "\n\nWMA: BEGIN FORGOTTEN WME LIST\n" );
+
+		do_working_memory_phase( my_agent );
+
+		if ( my_agent->sysparams[ TRACE_WM_CHANGES_SYSPARAM ] )
+			print( my_agent, "\nWMA: END FORGOTTEN WME LIST\n\n" );
+	}
 
 	// update position that just had removals
 	my_agent->wma_timelist_current->time += ( WMA_MAX_TIMELIST + 1 );
