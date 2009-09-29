@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -102,7 +103,7 @@ public class Application extends JPanel implements Adaptable {
 	}
 	
 	private static void doRunForever(Simulation sim) {
-		sim.run(0, 0, null);
+		sim.run(0, 50, TimeUnit.MILLISECONDS);
 	}
 	
 	private static void doRunStep(Simulation sim) {
@@ -150,7 +151,7 @@ public class Application extends JPanel implements Adaptable {
             }});
 
         frame.setSize(600, 600);
-		frame.setTitle("Gridmap2D");
+		frame.setTitle("Room Environment");
 		
 		initActions();
 		initToolbar();

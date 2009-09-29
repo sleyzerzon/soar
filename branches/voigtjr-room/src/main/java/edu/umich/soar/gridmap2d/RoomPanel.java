@@ -1,11 +1,15 @@
 package edu.umich.soar.gridmap2d;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Stroke;
 import java.awt.SystemColor;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.commsen.stopwatch.Stopwatch;
 
@@ -13,6 +17,9 @@ import lcmtypes.pose_t;
 
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
+import edu.umich.soar.gridmap2d.core.events.ResetEvent;
+import edu.umich.soar.gridmap2d.events.SimEvent;
+import edu.umich.soar.gridmap2d.events.SimEventListener;
 import edu.umich.soar.gridmap2d.map.Cell;
 import edu.umich.soar.gridmap2d.map.CellObject;
 import edu.umich.soar.gridmap2d.map.Robot;
@@ -20,7 +27,7 @@ import edu.umich.soar.gridmap2d.map.RoomMap;
 import edu.umich.soar.gridmap2d.map.RoomObject;
 import edu.umich.soar.gridmap2d.map.RoomWorld;
 
-public class RoomPanel extends GridMapPanel {
+public class RoomPanel extends GridMapPanel implements SimEventListener {
 	
 	private static final long serialVersionUID = -8083633808532173643L;
 
@@ -52,6 +59,8 @@ public class RoomPanel extends GridMapPanel {
 		
 		// FIXME this needs to be called on map event
 		setMap((RoomMap)sim.getMap());
+		
+		sim.getEvents().addListener(ResetEvent.class, this);
 	}
 	
 	private static class IdLabel {
@@ -59,7 +68,8 @@ public class RoomPanel extends GridMapPanel {
 		String label;
 	}
 	
-	private final HashMap<Integer, IdLabel> rmids = new HashMap<Integer, IdLabel>();
+	private final Map<Integer, IdLabel> rmids = new HashMap<Integer, IdLabel>();
+	private final Map<Robot, Breadcrumbs> breadcrumbs = new HashMap<Robot, Breadcrumbs>();
 	
 	private static class Location {
 		private final int CELL_SIZE;
@@ -202,22 +212,111 @@ public class RoomPanel extends GridMapPanel {
 			for (Robot p : world.getPlayers()) {
 				Robot player = (Robot)p;
 				pose_t pose = player.getState().getPose();
+				g2d.setColor(Colors.getColor(player.getColor()));
 				
 				double x = pose.pos[0];
 				double y = map.size() * cellSize - pose.pos[1];
 				
+				int[] bcX;
+				int[] bcY;
+				int bcS;
+				synchronized(breadcrumbs) {
+					if (!breadcrumbs.containsKey(player)) {
+						breadcrumbs.put(player, new Breadcrumbs());
+					}
+					Breadcrumbs bc = breadcrumbs.get(player);
+					bcX = bc.getX();
+					bcY = bc.getY();
+					bcS = bc.getSteps();
+
+					// add new
+					bc.addBreadcrumb(x, y);
+				}
+				
+				// draw breadcrumbs
+				g2d.setStroke(DOTTED_STROKE);
+				g2d.drawPolyline(bcX, bcY, bcS);
+				g2d.setStroke(new BasicStroke());
+
+				// draw player
 				g2d.translate(x, y);
 				g2d.rotate(-player.getState().getYaw());
-				g2d.setColor(Colors.getColor(player.getColor()));
 				g2d.drawPolygon(TRIANGLE);
 				g2d.rotate(player.getState().getYaw());
 				g2d.translate(-x, -y);
+				
+				// draw waypoints on top of that
+				List<double[]> waypoints = world.getWaypointList(player);
+				for (double[] wp : waypoints) {
+					g2d.drawOval((int)Math.floor(wp[0]) - 2, cellSize*map.size() - (int)Math.ceil(wp[1]) - 2, 4, 4);
+				}
+				
 			}
+			
 		} finally {
 			Stopwatch.stop(id);
 		}
 	}
+	
+	private static final Stroke DOTTED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] {3}, 0);
+	
+	private static class Breadcrumbs {
+		private int[] x;
+		private int[] y;
+		private int size;
+		private int steps;
+		private final int CLUMP = 1000;
+		
+		Breadcrumbs() {
+			clear();
+		}
+		
+		private void addBreadcrumb(double x, double y) {
+			int ix = (int)Math.round(x);
+			int iy = (int)Math.round(y);
+			if (steps > 0 && this.x[steps-1] == ix && this.y[steps-1] == iy) {
+				return;
+			}
+			if (steps == size) {
+				grow();
+			}
+			this.x[steps] = ix;
+			this.y[steps] = iy;
+			steps += 1;
+		}
+		
+		int[] getX() {
+			return x;
+		}
+		
+		int[] getY() {
+			return y;
+		}
+		
+		int getSteps() {
+			return steps;
+		}
+		
+		void clear() {
+			size = CLUMP;
+			steps = 0;
+			x = new int[size];
+			y = new int[size];
+		}
 
+		private void grow() {
+			int stemp = size;
+			int[] temp = x;
+			size += CLUMP;
+			x = new int[size];
+			System.arraycopy(temp, 0, x, 0, stemp);
+			temp = y;
+			y = new int[size];
+			System.arraycopy(temp, 0, y, 0, stemp);
+		}
+		
+	}
+	
 	@Override
 	int [] getCellAtPixel(int x, int y) {
 		RoomMap map = (RoomMap)sim.getMap();
@@ -225,4 +324,10 @@ public class RoomPanel extends GridMapPanel {
 		return super.getCellAtPixel(x, y);
 	}
 
+	@Override
+	public void onEvent(SimEvent event) {
+		synchronized(breadcrumbs) {
+			breadcrumbs.clear();
+		}
+	}
 }

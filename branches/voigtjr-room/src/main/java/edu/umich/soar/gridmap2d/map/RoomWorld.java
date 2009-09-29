@@ -25,9 +25,9 @@ public class RoomWorld implements SendMessagesInterface {
 	private RoomMap map;
 	private PlayersManager players = new PlayersManager();
 	private List<String> stopMessages = new ArrayList<String>();
-	private final double LIN_SPEED = 16;
+	private final double LIN_SPEED = 64;
 	public static final int CELL_SIZE = 16;
-	private double ANG_SPEED = Math.PI / 4.0;
+	private double ANG_SPEED = Math.PI / 1.0;
 	private String blockManipulationReason;
 	private Queue<Message> messages = new LinkedList<Message>();
 	private final Simulation sim;

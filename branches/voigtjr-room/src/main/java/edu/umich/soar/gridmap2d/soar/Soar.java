@@ -244,6 +244,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			e.printStackTrace();
 		}
 		
+		for (AgentData ad : agents.values()) {
+			kernel.DestroyAgent(ad.agent);
+		}
+		
 		if (kernel != null) {
 			logger.trace(Names.Trace.kernelShutdown);
 			kernel.Shutdown();
@@ -402,6 +406,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 		SoarRobot commander = new SoarRobot(sim, player, agent, kernel, world, shutdownCommands);
 		agents.get(player.getName()).sa = commander;
+		boolean commitResult = agents.get(player.getName()).agent.Commit();
+		if (!commitResult) {
+			assert false;
+		}
 		return commander;
 	}
 
@@ -483,8 +491,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	@Override
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
 		long id = Stopwatch.start("Soar", "updateEventHandler");
+		logger.trace("Soar update");
 		try {
-			logger.trace("Soar poll inputReady");
 			Boolean go = inputReady.poll();
 			if (go == null) {
 				return;
@@ -515,7 +523,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			sim.stop();
 			flushLocks();
 		} finally {
-			logger.trace("Soar update done");
 			Stopwatch.stop(id);	
 		}
 	}

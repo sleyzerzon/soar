@@ -61,6 +61,8 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         p.add(new JScrollPane(table), BorderLayout.NORTH);
 
         properties.setBorder(BorderFactory.createTitledBorder("Robot Properties"));
+        properties.setHorizontalAlignment(LEFT);
+        properties.setVerticalAlignment(TOP);
         p.add(properties, BorderLayout.CENTER);
         
         setContentPane(p);
