@@ -73,15 +73,13 @@ class wma_decay_param;
 
 class wma_param_container: public soar_module::param_container
 {
-	public:	
+	public:			
 		
-		enum criteria_choices { crit_agent, crit_agent_arch, crit_all };
 		enum isupport_choices { none, no_create, uniform };
 		enum precision_choices { low, high };		
 		
 		soar_module::boolean_param *activation;
 		wma_decay_param *decay_rate;
-		soar_module::constant_param<criteria_choices> *criteria;
 		soar_module::boolean_param *forgetting;
 		soar_module::constant_param<isupport_choices> *isupport;
 		soar_module::boolean_param *persistence;
