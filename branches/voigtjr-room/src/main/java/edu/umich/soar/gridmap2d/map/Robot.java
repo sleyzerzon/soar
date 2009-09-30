@@ -1,5 +1,6 @@
 package edu.umich.soar.gridmap2d.map;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.soar.gridmap2d.core.PlayerColor;
@@ -87,8 +88,12 @@ public class Robot {
 		}
 	}
 
+	private static final List<double[]> EMPTY_LIST = new ArrayList<double[]>(0);
 	public List<double[]> getWaypointList() {
-		return commander.getWaypointList();
+		if (commander != null) {
+			return commander.getWaypointList();
+		}
+		return EMPTY_LIST;
 	}
 
 	public ReceiveMessagesInterface getReceiveMessagesInterface() {

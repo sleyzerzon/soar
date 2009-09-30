@@ -92,10 +92,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 					config.port);
 		} else {
 			// Create kernel
-			kernel = Kernel.CreateKernelInNewThread("SoarKernelSML",
-					config.port);
-			// kernel = Kernel.CreateKernelInCurrentThread("SoarKernelSML",
-			// true);
+			kernel = Kernel.CreateKernelInNewThread("SoarKernelSML", config.port);
+			//kernel = Kernel.CreateKernelInCurrentThread("SoarKernelSML", true);
 		}
 
 		if (kernel.HadError()) {
@@ -251,7 +249,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (kernel != null) {
 			logger.trace(Names.Trace.kernelShutdown);
 			kernel.Shutdown();
-			kernel.delete();
 		}
 	}
 

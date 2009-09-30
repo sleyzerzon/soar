@@ -183,6 +183,15 @@ public class Simulation {
 		if (cogArch != null) {
 			cogArch.shutdown();
 		}
+		
+		// FIXME BADBAD: hack: stepping in the debugger spawns a mysterious non-daemon
+		// thread that won't shut down. This allows everything else to shut down
+		// before killing itself off.
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException ignored) {
+		}
+		System.exit(0);
 	}
 
 	public boolean isDone() {

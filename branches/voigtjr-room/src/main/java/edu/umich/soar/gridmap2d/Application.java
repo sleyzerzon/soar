@@ -44,7 +44,7 @@ import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 public class Application extends JPanel implements Adaptable {
 	private static final long serialVersionUID = 4313201967156814057L;
 
-	public static final Preferences PREFERENCES = Preferences.userNodeForPackage(Application.class);
+	public static final Preferences PREFERENCES = Preferences.userRoot().node("edu/umich/RoomEnvironment");
 
 	public static void main(final String[] args) {
 		try {

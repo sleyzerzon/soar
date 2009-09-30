@@ -3,6 +3,7 @@ package edu.umich.soar.gridmap2d;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -40,4 +41,9 @@ public abstract class AbstractAdaptableView extends View implements Adaptable {
 	public Object getAdapter(Class<?> klass) {
 		return Adaptables.adapt(this, klass, false);
 	}
+	
+    public Preferences getPreferences()
+    {
+        return Application.PREFERENCES.node("views/" + getPersistentId());
+    }
 }

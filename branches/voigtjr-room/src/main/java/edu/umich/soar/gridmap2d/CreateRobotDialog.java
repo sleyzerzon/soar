@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JFileChooser;
@@ -47,7 +48,15 @@ class CreateRobotDialog extends JDialog {
 	private JButton jCancelButton = null;
 
 	private final Simulation sim;
+	private final Preferences pref;
 	private final String HUMAN = "<human>";  //  @jve:decl-index=0:
+	
+	private final String KEY_PRODUCTIONS = "productions";
+	private final String KEY_RANDOM = "random";  //  @jve:decl-index=0:
+	private final String KEY_SOURCE_DIR = "sourcedir";  //  @jve:decl-index=0:
+	private final String KEY_X = "x";  //  @jve:decl-index=0:
+	private final String KEY_Y = "y";  //  @jve:decl-index=0:
+	private final String KEY_SPAWN = "spawn";  //  @jve:decl-index=0:
 	
 	/**
 	 * @param owner
@@ -55,7 +64,26 @@ class CreateRobotDialog extends JDialog {
 	public CreateRobotDialog(Frame owner, Simulation sim) {
 		super(owner);
 		this.sim = sim;
+		this.pref = Application.PREFERENCES.node("createAgent");
 		initialize();
+
+		setProductions(pref.get(KEY_PRODUCTIONS, ""));
+		jSpawnCheckBox.setSelected(pref.getBoolean(KEY_SPAWN, true));
+		jTextFieldX.setText(pref.get(KEY_X, ""));
+		jTextFieldY.setText(pref.get(KEY_Y, ""));
+		jRandomCheckBox.setSelected(pref.getBoolean(KEY_RANDOM, true));
+		randomStateChanged();
+	}
+	
+	private void setProductions(String absolutePath) {
+		if (absolutePath != null && !absolutePath.isEmpty()) {
+			productions = new File(absolutePath);
+	        jProductionsLabel.setText(productions.getName());
+		} else {
+			productions = null;
+	        jProductionsLabel.setText(HUMAN);
+		}
+		jSpawnCheckBox.setEnabled(productions != null);
 	}
 
 	/**
@@ -258,9 +286,7 @@ class CreateRobotDialog extends JDialog {
 			jHumanButton.setText("Human");
 			jHumanButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					productions = null;
-					jSpawnCheckBox.setEnabled(false);
-					jProductionsLabel.setText(HUMAN);
+					setProductions("");
 				}
 			});
 		}
@@ -378,19 +404,22 @@ class CreateRobotDialog extends JDialog {
 		if (jRandomCheckBox == null) {
 			jRandomCheckBox = new JCheckBox();
 			jRandomCheckBox.setText("Random");
-			jRandomCheckBox.setSelected(true);
 			jRandomCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) 
 				{
-					boolean enabled = !jRandomCheckBox.isSelected();
-					jTextFieldX.setEnabled(enabled);
-					jTextFieldY.setEnabled(enabled);
-					jColFieldLabel.setEnabled(enabled);
-					jRowFieldLabel.setEnabled(enabled);
+					randomStateChanged();
 				}
 			});
 		}
 		return jRandomCheckBox;
+	}
+	
+	private void randomStateChanged() {
+		boolean enabled = !jRandomCheckBox.isSelected();
+		jTextFieldX.setEnabled(enabled);
+		jTextFieldY.setEnabled(enabled);
+		jColFieldLabel.setEnabled(enabled);
+		jRowFieldLabel.setEnabled(enabled);
 	}
 
 	/**
@@ -451,6 +480,18 @@ class CreateRobotDialog extends JDialog {
 			        }
 			        sim.getCogArch().setDebug(jSpawnCheckBox.isSelected());
 			        sim.createPlayer(playerConfig);
+
+			        if (productions == null) {
+			        	pref.put(KEY_PRODUCTIONS, "");
+			        } else {
+			        	pref.put(KEY_PRODUCTIONS, productions.getAbsolutePath());
+			        	pref.put(KEY_SOURCE_DIR, productions.getParent());
+			        }
+			        pref.putBoolean(KEY_RANDOM, jRandomCheckBox.isSelected());
+			        pref.put(KEY_X, jTextFieldX.getText());
+			        pref.put(KEY_Y, jTextFieldY.getText());
+			        pref.putBoolean(KEY_SPAWN, jSpawnCheckBox.isSelected());
+
 			        dispose();
 				}
 			});
@@ -477,9 +518,10 @@ class CreateRobotDialog extends JDialog {
 	}
 	
 	
-	private File productions;
+	private File productions;  //  @jve:decl-index=0:
 	private void choose() {
-        JFileChooser chooser = new JFileChooser(System.getProperty("user.dir", "."));
+		
+        JFileChooser chooser = new JFileChooser(pref.get(KEY_SOURCE_DIR, System.getProperty("user.dir", ".")));
         chooser.setFileFilter(new FileFilter() {
 
             @Override
@@ -509,9 +551,6 @@ class CreateRobotDialog extends JDialog {
             return;
         }
         
-        productions = chooser.getSelectedFile();
-    	jSpawnCheckBox.setEnabled(true);
-        jProductionsLabel.setText(productions.getName());
+        setProductions(chooser.getSelectedFile().getAbsolutePath());
 	}
-
 }
