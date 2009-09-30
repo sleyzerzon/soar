@@ -69,6 +69,7 @@ typedef struct wme_struct wme;
 // WMA Parameters
 //////////////////////////////////////////////////////////
 
+class wma_activation_param;
 class wma_decay_param;
 
 class wma_param_container: public soar_module::param_container
@@ -78,7 +79,7 @@ class wma_param_container: public soar_module::param_container
 		enum isupport_choices { none, no_create, uniform };
 		enum precision_choices { low, high };		
 		
-		soar_module::boolean_param *activation;
+		wma_activation_param *activation;
 		wma_decay_param *decay_rate;
 		soar_module::boolean_param *forgetting;
 		soar_module::constant_param<isupport_choices> *isupport;
@@ -86,6 +87,16 @@ class wma_param_container: public soar_module::param_container
 		soar_module::constant_param<precision_choices> *precision;
 				
 		wma_param_container( agent *new_agent );
+};
+
+class wma_activation_param: public soar_module::boolean_param
+{
+	public:
+		wma_activation_param( const char *new_name, soar_module::boolean new_value, soar_module::predicate<soar_module::boolean> *new_prot_pred, agent *new_agent );
+		virtual void set_value( soar_module::boolean new_value );
+
+	private:
+		agent *my_agent;
 };
 
 class wma_decay_param: public soar_module::decimal_param
