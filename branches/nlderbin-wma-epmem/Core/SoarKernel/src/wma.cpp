@@ -1009,22 +1009,28 @@ void wma_reposition_wme( agent *my_agent, wma_decay_element_t *cur_decay_el, lon
 
 /***************************************************************************
  * Function     : wma_forget_wme
- * Author		: Andy Nuxoll?
+ * Author		: Nate Derbinsky
  * Notes		: This routine removes an activated WME from working memory
  *                and performs all necessary cleanup related to that removal.
  **************************************************************************/
 bool wma_forget_wme( agent *my_agent, wme *w )
 {
-	if ( w->preference && w->preference->in_tm )
+	bool return_val = false;
+	
+	if ( w->preference )
 	{
-		remove_preference_from_tm( my_agent, w->preference );
+		for ( preference *p=w->preference->slot->all_preferences; p; p=p->all_of_slot_next )
+		{
+			if ( p->o_supported && p->in_tm && ( p->value == w->value ) )
+			{
+				return_val = true;
 
-		return true;
+				remove_preference_from_tm( my_agent, p );
+			}
+		}
 	}
-	else
-	{
-		return false;
-	}
+
+	return return_val;
 }
 
 /***************************************************************************
