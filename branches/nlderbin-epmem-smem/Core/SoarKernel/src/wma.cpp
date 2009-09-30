@@ -36,6 +36,27 @@
 // Parameters
 /////////////////////////////////////////////////////
 
+wma_activation_param::wma_activation_param( const char *new_name, soar_module::boolean new_value, soar_module::predicate<soar_module::boolean> *new_prot_pred, agent *new_agent ): soar_module::boolean_param( new_name, new_value, new_prot_pred ), my_agent( new_agent ) {};
+
+void wma_activation_param::set_value( soar_module::boolean new_value ) 
+{ 
+	if ( new_value != value )
+	{
+		value = new_value;
+
+		if ( new_value == soar_module::on )
+		{
+			wma_init( my_agent );
+		}
+		else
+		{
+			wma_deinit( my_agent );
+		}
+	}
+};
+
+//
+
 wma_decay_param::wma_decay_param( const char *new_name, double new_value, soar_module::predicate<double> *new_val_pred, soar_module::predicate<double> *new_prot_pred ): soar_module::decimal_param( new_name, new_value, new_val_pred, new_prot_pred ) {};
 
 void wma_decay_param::set_value( double new_value ) { value = -new_value; };
@@ -55,7 +76,7 @@ wma_param_container::wma_param_container( agent *new_agent ): soar_module::param
 	/**
 	 * WMA on/off
 	 */
-	activation = new soar_module::boolean_param( "activation", soar_module::on, new soar_module::f_predicate<soar_module::boolean>() );
+	activation = new wma_activation_param( "activation", soar_module::on, new soar_module::f_predicate<soar_module::boolean>(), new_agent );
 	add( activation );
 
 	// decay-rate
@@ -1009,22 +1030,28 @@ void wma_reposition_wme( agent *my_agent, wma_decay_element_t *cur_decay_el, lon
 
 /***************************************************************************
  * Function     : wma_forget_wme
- * Author		: Andy Nuxoll?
+ * Author		: Nate Derbinsky
  * Notes		: This routine removes an activated WME from working memory
  *                and performs all necessary cleanup related to that removal.
  **************************************************************************/
 bool wma_forget_wme( agent *my_agent, wme *w )
 {
-	if ( w->preference && w->preference->in_tm )
+	bool return_val = false;
+	
+	if ( w->preference )
 	{
-		remove_preference_from_tm( my_agent, w->preference );
+		for ( preference *p=w->preference->slot->all_preferences; p; p=p->all_of_slot_next )
+		{
+			if ( p->o_supported && p->in_tm && ( p->value == w->value ) )
+			{
+				return_val = true;
 
-		return true;
+				remove_preference_from_tm( my_agent, p );
+			}
+		}
 	}
-	else
-	{
-		return false;
-	}
+
+	return return_val;
 }
 
 /***************************************************************************
@@ -1186,9 +1213,7 @@ void wma_print_activated_wmes( agent *my_agent, long n )
 				decay_element = decay_element->next;
 			}
 		}
-
-		printf( "\n" );
 	}
 
-	print( my_agent, "END OF ACTIVATED WME LIST" );
+	print( my_agent, "\nEND OF ACTIVATED WME LIST\n" );
 }
