@@ -56,7 +56,7 @@ typedef struct wme_struct wme;
  * of a WME that is not activated, then this is the value that
  * is returned.
  */
-#define WMA_ACTIVATION_NONE 99999999.9999
+#define WMA_ACTIVATION_NONE 1.0
 
 /**
  * If a WME's activation falls below this level it will be 
