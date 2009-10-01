@@ -10,5 +10,6 @@
 <mapEntry key="PATH" value="../../SoarLibrary/bin"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="edu.umich.soar.debugger.Application"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-remote"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="soar-debugger"/>
 </launchConfiguration>
