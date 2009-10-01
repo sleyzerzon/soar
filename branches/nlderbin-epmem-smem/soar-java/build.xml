@@ -7,6 +7,7 @@
 		<ant dir="soar-missionaries" />
 		<ant dir="soar-soar2d" />
 		<ant dir="soar-toh" />
+		<ant dir="soar-room" />
 		<ant dir="soar-visualsoar" />
 		<!--ant dir="soar-sps" /-->
 	</target>
@@ -18,6 +19,7 @@
 		<ant dir="soar-missionaries" target="build-nodoc" />
 		<ant dir="soar-soar2d" target="build-nodoc" />
 		<ant dir="soar-toh" target="build-nodoc" />
+		<ant dir="soar-room" target="build-nodoc" />
 		<ant dir="soar-visualsoar" target="build-nodoc" />
 		<!--ant dir="soar-sps" target="build-nodoc" /-->
 	</target>
