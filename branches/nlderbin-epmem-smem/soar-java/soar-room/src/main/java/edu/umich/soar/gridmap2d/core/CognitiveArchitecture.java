@@ -19,4 +19,6 @@ public interface CognitiveArchitecture {
 	void shutdown();
 
 	boolean isClientConnected(String debuggerClient);
+	boolean isAsync();
+	void setAsync(boolean setting);
 }

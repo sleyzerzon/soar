@@ -10,10 +10,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.prefs.Preferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.umich.soar.gridmap2d.Application;
 import edu.umich.soar.gridmap2d.config.PlayerConfig;
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
@@ -47,7 +49,9 @@ public class Simulation {
 	private CognitiveArchitecture cogArch;
 	private int worldCount;
 	private SimConfig config;
-
+	private Preferences pref;
+	private final String KEY_TICK_MSEC = "tickMsec";
+	
 	public RoomWorld initialize(SimConfig config) {
 		this.config = config;
 
@@ -70,6 +74,9 @@ public class Simulation {
 			map = "config/maps/default.txt";
 		}
 		changeMap(map);
+		
+		this.pref = Application.PREFERENCES.node("simulation");
+		tickMsec = pref.getInt(KEY_TICK_MSEC, 50);
 
 		return world;
 	}
@@ -160,6 +167,8 @@ public class Simulation {
 	}
 
 	public void shutdown() {
+		pref.putInt(KEY_TICK_MSEC, tickMsec);
+		
 		exec.shutdown();
 		try {
 			// The delay is high here so that headless runs can complete.
@@ -216,7 +225,15 @@ public class Simulation {
 	private SimEventManager eventManager = new SimEventManager();
 	private BlockingQueue<Boolean> canceller = new SynchronousQueue<Boolean>();
 	
-	public void run(final int ticks, final long period, final TimeUnit unit) {
+	public void run() {
+		run(0,tickMsec,TimeUnit.MILLISECONDS);
+	}
+	
+	public void step(int quantity) {
+		run(quantity,0,null);
+	}
+	
+	private void run(final int ticks, final long period, final TimeUnit unit) {
 		if (!running.getAndSet(true)) {
 			stopRequested.set(false);
 			exec.submit(new Runnable() {
@@ -240,7 +257,7 @@ public class Simulation {
 						logger.trace("ending tick loop due to stop request");
 						
 					} else {
-						final ScheduledFuture<?> ticker = schexec.scheduleAtFixedRate(new Runnable() {
+						final ScheduledFuture<?> ticker = schexec.scheduleWithFixedDelay(new Runnable() {
 							
 							@Override
 							public void run() {
@@ -354,8 +371,13 @@ public class Simulation {
 		eventManager.fireEvent(new InfoEvent(title, message));
 	}
 
-	public double getTimeSlice() {
-		return 0.05;
+	int tickMsec;
+	public int getTickMSec() {
+		return tickMsec;
+	}
+
+	public void setTickMSec(int setting) {
+		tickMsec = setting;
 	}
 
 	public RoomWorld getWorld() {

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -67,7 +66,7 @@ public class Application extends JPanel implements Adaptable {
 				});
 				
 				sim.addInitialPlayers();
-				doRunForever(sim);
+				sim.run();
 				
 				try {
 					doneQueue.take();
@@ -100,14 +99,6 @@ public class Application extends JPanel implements Adaptable {
 			e.printStackTrace();
 			return;
 		}
-	}
-	
-	private static void doRunForever(Simulation sim) {
-		sim.run(0, 50, TimeUnit.MILLISECONDS);
-	}
-	
-	private static void doRunStep(Simulation sim) {
-		sim.run(1, 0, null);
 	}
 	
 	public static Application initialize(String[] args, Simulation sim, SimConfig config) {
@@ -150,7 +141,7 @@ public class Application extends JPanel implements Adaptable {
                 exit();
             }});
 
-        frame.setSize(600, 600);
+        frame.setSize(700, 600);
 		frame.setTitle("Room Environment");
 		
 		initActions();
@@ -230,6 +221,7 @@ public class Application extends JPanel implements Adaptable {
 		new StepAction(actionManager);
 		new StopAction(actionManager);
 		new ResetAction(actionManager);
+		new GoAction(actionManager);
 		
 		new ExitAction(actionManager);
 		
@@ -251,7 +243,10 @@ public class Application extends JPanel implements Adaptable {
 		viewport.dock(worldView);
 		
 		final AbstractAdaptableView agentView = addView(new RoomAgentView(this));
-		worldView.dock((Dockable)agentView, DockingConstants.EAST_REGION, 0.75f);
+		worldView.dock((Dockable)agentView, DockingConstants.EAST_REGION, 0.6f);
+
+		final AbstractAdaptableView simulationControlView = addView(new SimulationControlView(this));
+		agentView.dock((Dockable)simulationControlView, DockingConstants.SOUTH_REGION, 0.4f);
 	}
 	
     private <T extends AbstractAdaptableView> T addView(T view)
@@ -344,11 +339,15 @@ public class Application extends JPanel implements Adaptable {
 	}
 	
 	void doRunForever() {
-		doRunForever(sim);
+		sim.run();
 	}
 	
-	void doRunStep() {
-		doRunStep(sim);
+	void doRunStep(int quantity) {
+		sim.step(quantity);
+	}
+	
+	void doRunTick(int quantity) {
+		sim.step(quantity);
 	}
 	
 }

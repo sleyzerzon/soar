@@ -38,11 +38,10 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         this.sim = Adaptables.adapt(app, Simulation.class);
         Adaptables.adapt(app, Application.class).getSelectionManager().addListener(this);
         
-        this.addAction(DockingConstants.PIN_ACTION);
-
         this.model = new RobotTableModel(this.sim);
         this.model.initialize();
         this.table = new JXTable(this.model);
+        this.table.setVisibleRowCount(2);
             
         this.table.setShowGrid(false);
         this.table.setHighlighters(HighlighterFactory.createAlternateStriping());
@@ -58,7 +57,8 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
             }};
         
         final JPanel p = new JPanel(new BorderLayout());
-        p.add(new JScrollPane(table), BorderLayout.NORTH);
+        final JScrollPane pane = new JScrollPane(table);
+        p.add(pane, BorderLayout.NORTH);
 
         properties.setBorder(BorderFactory.createTitledBorder("Robot Properties"));
         properties.setHorizontalAlignment(LEFT);

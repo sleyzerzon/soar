@@ -167,7 +167,7 @@ public class RoomWorld implements SendMessagesInterface {
 			WorldUtil.checkStopSim(sim, stopMessages, command.isStopSim(), player);
 		}
 		
-		moveRoomPlayers(0.05);
+		moveRoomPlayers(sim.getTickMSec() / 1000.0);
 		
 		for (Message message : messages) {
 			message.recipient.getReceiveMessagesInterface().newMessage(message.from, message.tokens);

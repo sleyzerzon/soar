@@ -110,7 +110,7 @@ public class SoarRobotInputLinkManager {
 		configurationIL.update();
 		// FIXME: should be configurable
 		//timeIL.update();
-		runtime += (long)(sim.getTimeSlice() * 1000000000L);
+		runtime += sim.getTickMSec() * 1000000L;
 		timeIL.updateExact(runtime);
 		selfIL.update(player);
 		

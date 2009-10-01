@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.prefs.Preferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import com.commsen.stopwatch.Report;
 import com.commsen.stopwatch.Stopwatch;
 
+import edu.umich.soar.gridmap2d.Application;
 import edu.umich.soar.gridmap2d.config.ClientConfig;
 import edu.umich.soar.gridmap2d.config.SimConfig;
 import edu.umich.soar.gridmap2d.config.SoarConfig;
@@ -67,6 +69,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	private final int port;
 	private boolean debug;
 	private final Simulation sim;
+	private final Preferences pref;
+	private final String KEY_ASYNC = "async";
 
 	/**
 	 * @param config
@@ -86,6 +90,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		this.soarPrint = config.soar_print;
 		this.port = config.port;
 		this.debug = config.spawn_debuggers;
+		this.pref = Application.PREFERENCES.node("soar");
+		this.async = pref.getBoolean(KEY_ASYNC, true);
 
 		if (config.remote != null) {
 			kernel = Kernel.CreateRemoteConnection(true, config.remote,
@@ -231,6 +237,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	@Override
 	public void shutdown() {
+		pref.putBoolean(KEY_ASYNC, async);
+		
 		for (Report report : Stopwatch.getAllReports()) {
 			System.out.println(report);
 		}
@@ -537,5 +545,16 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	@Override
 	public void setDebug(boolean setting) {
 		this.debug = setting;
+	}
+
+	boolean async = true;
+	@Override
+	public boolean isAsync() {
+		return async;
+	}
+
+	@Override
+	public void setAsync(boolean setting) {
+		async = setting;
 	}
 }
