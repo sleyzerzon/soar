@@ -6,8 +6,8 @@ Year to year, conference submission deadlines remain relatively constant. The
 table below lists typical conference deadlines by month.
 
 || *Month* || *Conferences* ||
-|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.cs.mcgill.ca/~icml2009/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO] ||
-|| *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR] ||
+|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.icml2010.org/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO] ||
+|| *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR], [http://www.spatial-cognition-2010.com/ SC], [http://www.fdg2010.org/FDG_2010_Home.html FDG] ||
 || *March* || [http://www.cs.mcgill.ca/~uai2009/ UAI] ||
 || *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE] ||
 || *May* || [http://www.ecal2009.org/ ECAL] ||
@@ -28,16 +28,18 @@ These deadlines are official for a particular conference year:
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
   * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artifical Agents] -- papers due January 15th, 2010
   * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
+  * [http://www.fdg2010.org/FDG_2010_Home.html FDG 2010] -- papers due February 5, 2010
+  * [http://www.spatial-cognition-2010.com/ SC 2010] -- papers due February 15, 2010
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
 
 These conferences have yet to announce official deadlines:
-  * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010]
+  * [http://www.icml2010.org/ ICML 2010]
   * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010]
   * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010]
   * [http://iccm2010.cs.drexel.edu/ ICCM 2010]
   * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010]
   * [http://nips.cc/ NIPS 2010]
-  * [http://www.ecal2009.org/ ECAL 2009]
+  * [http://www.ecal2009.org/ ECAL 2010]
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010]
   * [http://ijcai-11.iiia.csic.es/ IJCAI 2011]
 
@@ -52,7 +54,7 @@ These conferences have yet to announce official deadlines:
     * International Conference on Autonomous Agents and Multiagent Systems
     * (EIC 0.76)    
     
-  * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010], TBD: June?, 2010 in ?
+  * [http://www.icml2010.org/ ICML 2010], June 21-24, 2010 in Haifa, Israel
     * International Conference on Machine Learning
     * (EIC 0.95)
     
@@ -78,10 +80,6 @@ These conferences have yet to announce official deadlines:
     * International Joint Conferences on Artifical Intelligence
     * (EIC 0.96)
   
-=== Cognitive Science / Modeling ===
-  * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 6-8, 2010 in Philadelphia, PA 
-    * International Conference on Cognitive Modeling
-  
 === Specialties ===
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
     * Artificial Intelligence and Interactive Digital Entertainment Conference
@@ -93,9 +91,18 @@ These conferences have yet to announce official deadlines:
   * [http://www.kr.org/KR2010/ KR&R 2010], May 9-13, 2010 in Toronto, CA
     * International Conference on the Principles of Knowledge Representation and Reasoning
     
+  * [http://www.fdg2010.org/FDG_2010_Home.html FDG 2010], June 19-21, 2010 Monterey, CA
+    * Foundations of Digital Games
+    
   * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010], July 19-22, 2010 in Alessandria, Italy
     * International Conference on Case-Based Reasoning
 
+  * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 6-8, 2010 in Philadelphia, PA 
+    * International Conference on Cognitive Modeling
+    
+  * [http://www.spatial-cognition-2010.com/ SC 2010], August 15-19, 2010 in Portland, OR
+    * International Conference on Spatial Cognition
+    
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010], August 18-21, 2010 in Ann Arbor, MI
     * International Conference on Development and Learning
     
