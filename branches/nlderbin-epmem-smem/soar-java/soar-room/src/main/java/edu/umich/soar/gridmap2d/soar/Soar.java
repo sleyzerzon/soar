@@ -30,6 +30,7 @@ import edu.umich.soar.gridmap2d.core.CognitiveArchitecture;
 import edu.umich.soar.gridmap2d.core.Names;
 import edu.umich.soar.gridmap2d.core.Simulation;
 import edu.umich.soar.gridmap2d.core.events.AfterTickEvent;
+import edu.umich.soar.gridmap2d.core.events.ResetEvent;
 import edu.umich.soar.gridmap2d.core.events.StartEvent;
 import edu.umich.soar.gridmap2d.core.events.StopEvent;
 import edu.umich.soar.gridmap2d.events.SimEvent;
@@ -122,6 +123,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		sim.getEvents().addListener(StartEvent.class, this);
 		sim.getEvents().addListener(StopEvent.class, this);
 		sim.getEvents().addListener(AfterTickEvent.class, this);
+		sim.getEvents().addListener(ResetEvent.class, this);
 	}
 
 	@Override
@@ -311,6 +313,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (!agent.LoadProductions(productionsFile.getAbsolutePath())) {
 			sim.error("Soar", "Error loading productions " + productionsFile
 					+ " for " + name + ", " + agent.GetLastErrorDescription());
+			kernel.DestroyAgent(agent);
 			return null;
 		}
 
@@ -429,6 +432,8 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		try {
 			if (event instanceof StartEvent) {
 				onStartEvent();
+			} else if (event instanceof ResetEvent) {
+				updateCount = 0;
 			} else {
 				if (interrupted.get()) {
 					logger.trace("Ignoring event due to interrupted flag");
@@ -493,10 +498,11 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	
 	private AtomicBoolean interrupted = new AtomicBoolean();
 	
+	int updateCount = 0;
 	@Override
 	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
 		long id = Stopwatch.start("Soar", "updateEventHandler");
-		logger.trace("Soar update");
+		logger.trace("Soar update " + ++updateCount);
 		try {
 			Boolean go = inputReady.poll();
 			if (go == null) {
@@ -556,5 +562,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	@Override
 	public void setAsync(boolean setting) {
 		async = setting;
+	}
+
+	@Override
+	public int getUpdateCount() {
+		return updateCount;
 	}
 }

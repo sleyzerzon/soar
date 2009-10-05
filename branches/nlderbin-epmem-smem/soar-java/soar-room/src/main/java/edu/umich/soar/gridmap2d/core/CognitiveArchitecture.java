@@ -21,4 +21,6 @@ public interface CognitiveArchitecture {
 	boolean isClientConnected(String debuggerClient);
 	boolean isAsync();
 	void setAsync(boolean setting);
+
+	int getUpdateCount();
 }

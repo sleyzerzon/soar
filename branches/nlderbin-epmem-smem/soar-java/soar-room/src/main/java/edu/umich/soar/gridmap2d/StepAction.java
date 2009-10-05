@@ -12,7 +12,9 @@ public class StepAction extends AbstractGridmap2DAction {
 
 	@Override
 	public void update() {
-        setEnabled(!getApplication().getSim().isRunning());
+		boolean running = getApplication().getSim().isRunning();
+		boolean players = !getApplication().getSim().getWorld().getPlayers().isEmpty();
+        setEnabled(!running && players);
 	}
 
 	@Override

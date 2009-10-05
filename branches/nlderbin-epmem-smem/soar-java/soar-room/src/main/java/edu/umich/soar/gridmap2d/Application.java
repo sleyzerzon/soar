@@ -174,6 +174,8 @@ public class Application extends JPanel implements Adaptable {
         sim.getEvents().addListener(PlayerRemovedEvent.class, saveListener(new UpdateListener()));
         
         sim.addInitialPlayers();
+        
+        update();
 	}
     
     private class UpdateListener implements SimEventListener {

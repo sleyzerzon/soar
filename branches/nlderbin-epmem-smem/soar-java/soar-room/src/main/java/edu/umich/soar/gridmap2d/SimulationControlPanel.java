@@ -12,6 +12,7 @@ import javax.swing.JSlider;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import edu.umich.soar.gridmap2d.GoAction.GoProvider;
 import edu.umich.soar.gridmap2d.GoAction.GoType;
@@ -34,12 +35,14 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	private JPanel jDelayPanel = null;
 	private JSlider jDelaySlider = null;
 	private JLabel jMsecPerTickLabel = null;
+	private JPanel jInfoPanel = null;
+	private JLabel jCountsLabel = null;
 
-	private ButtonGroup typeButtonGroup = new ButtonGroup();  //  @jve:decl-index=0:
-	private ButtonGroup runButtonGroup = new ButtonGroup();  //  @jve:decl-index=0:
+	private ButtonGroup typeButtonGroup = new ButtonGroup();  
+	private ButtonGroup runButtonGroup = new ButtonGroup(); 
 	
 	private final String KEY_RUN_QTY = "runQty";
-	private final String KEY_RUN_TYPE = "runType";  //  @jve:decl-index=0:
+	private final String KEY_RUN_TYPE = "runType"; 
 	private final Simulation sim;
 	private final Preferences pref;
 	private final ActionManager am;
@@ -70,6 +73,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 
 		foreverChanged();
 		delayChanged();
+		updateCounts();
 	}
 
 	/**
@@ -94,11 +98,18 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		gridBagConstraints2.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints2.anchor = GridBagConstraints.NORTHWEST;
 		gridBagConstraints2.gridy = 1;
+		GridBagConstraints gridBagConstraints52 = new GridBagConstraints();
+		gridBagConstraints52.gridx = 0;
+		gridBagConstraints52.gridheight = 2;
+		gridBagConstraints52.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints52.anchor = GridBagConstraints.NORTHWEST;
+		gridBagConstraints52.gridy = 4;
 		this.setSize(242, 208);
 		this.setLayout(new GridBagLayout());
 		this.add(getJRunPanel(), gridBagConstraints2);
 		this.add(getJIntegrationPanel(), gridBagConstraints51);
 		this.add(getJDelayPanel(), gridBagConstraints10);
+		this.add(getJInfoPanel(), gridBagConstraints52);
 	}
 
 	/**
@@ -111,7 +122,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			jSyncRadioButton = new JRadioButton();
 			jSyncRadioButton.setText("Synchronous");
 			typeButtonGroup.add(jSyncRadioButton);
-			jSyncRadioButton.setEnabled(false);//TODO
+			jSyncRadioButton.setEnabled(false);
 		}
 		return jSyncRadioButton;
 	}
@@ -342,6 +353,22 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		return jTypePanel;
 	}
 
+	private JPanel getJInfoPanel() {
+		if (jInfoPanel == null) {
+			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
+			gridBagConstraints1.gridx = 0;
+			gridBagConstraints1.gridy = 0;
+			jInfoPanel = new JPanel();
+			jInfoPanel.setLayout(new GridBagLayout());
+			jInfoPanel.setBorder(BorderFactory.createTitledBorder("Info"));
+			jCountsLabel = new JLabel();
+			jCountsLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			jCountsLabel.setVerticalAlignment(SwingConstants.TOP);
+			jInfoPanel.add(jCountsLabel, gridBagConstraints1);
+		}
+		return jInfoPanel;
+	}
+
 	/**
 	 * This method initializes jDelayPanel	
 	 * 	
@@ -419,6 +446,18 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	@Override
 	public int getQuantity() {
 		return Integer.valueOf(jQuantityTextField.getText());
+	}
+
+	public void updateCounts() {
+		StringBuilder countsText = new StringBuilder();
+		countsText.append("<html> <b>World&nbsp;Count:</b>&nbsp;");
+		countsText.append(sim.getWorldCount());
+		countsText.append("&nbsp;&nbsp;&nbsp;");
+		countsText.append(" <br /><b>Soar&nbsp;Update&nbsp;Count:</b>&nbsp;");
+		countsText.append(sim.getCogArch().getUpdateCount());
+		countsText.append("&nbsp;&nbsp;&nbsp;");
+		countsText.append(" </html>");
+		jCountsLabel.setText(countsText.toString());
 	}
 } 
 
