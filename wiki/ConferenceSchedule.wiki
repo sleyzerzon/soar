@@ -6,19 +6,18 @@ Year to year, conference submission deadlines remain relatively constant. The
 table below lists typical conference deadlines by month.
 
 || *Month* || *Conferences* ||
-|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.cs.mcgill.ca/~icml2009/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO], [http://aigicrv.site.uottawa.ca/ CAI], [http://www.wcci2010.org/index.php WCCI] ||
-|| *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://ecai2010.appia.pt/ ECAI], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR] ||
+|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.cs.mcgill.ca/~icml2009/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO] ||
+|| *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR] ||
 || *March* || [http://www.cs.mcgill.ca/~uai2009/ UAI] ||
-|| *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE], [http://www.ecmlpkdd2009.net/ ECML] ||
+|| *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE] ||
 || *May* || [http://www.ecal2009.org/ ECAL] ||
 || *June* || [http://nips.cc/ NIPS] ||
 || *July* || ||
 || *August* || ||
-|| *September* || [http://www.icaart.org/ ICAART] || 
+|| *September* || || 
 || *October* || [http://www.cse.yorku.ca/AAMAS2010/ AAMAS], [http://agi-conf.org/2010/ AGI] ||
-|| *November* || [http://www.flairs.com/ FLAIRS], [http://www.kr.org/KR2010/ KR&R] ||
+|| *November* || [http://www.kr.org/KR2010/ KR&R] ||
 || *December* || ||
-
 
 = Submission Deadlines =
 
@@ -26,26 +25,20 @@ These deadlines are official for a particular conference year:
   * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010] -- papers due October 13th, 2009
   * [http://agi-conf.org/2010/ AGI 2010] -- papers due October 15th, 2009
   * [http://www.kr.org/KR2010/ KR&R 2010] -- papers due November 30, 2009
-  * [http://cbrtrack-flairs-23.info/ FLAIRS 2010] -- papers due November 23rd, 2009
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
   * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artifical Agents] -- papers due January 15th, 2010
   * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
-  * [http://www.wcci2010.org/index.php WCCI 2010] -- papers due January 31st, 2010
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
-  * [http://ecai2010.appia.pt/ ECAI 2010] -- papers due February 22nd, 2010
 
 These conferences have yet to announce official deadlines:
-  * [http://aigicrv.site.uottawa.ca/ CAI 2010]
   * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010]
   * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010]
   * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010]
   * [http://iccm2010.cs.drexel.edu/ ICCM 2010]
   * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010]
   * [http://nips.cc/ NIPS 2010]
-  * [http://www.ecmlpkdd2009.net/ ECML 2010]
   * [http://www.ecal2009.org/ ECAL 2009]
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010]
-  * [http://www.icaart.org/ ICAART 2010]
   * [http://ijcai-11.iiia.csic.es/ IJCAI 2011]
 
 = Information =
@@ -54,6 +47,10 @@ These conferences have yet to announce official deadlines:
   * [http://nips.cc/ NIPS 2009], December 7-12, 2009 in Vancouver, BC
     * Neural Information Processing Systems Conference
     * (EIC 0.98)
+    
+  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010], May 10-14, 2010 in Toronto, Canada
+    * International Conference on Autonomous Agents and Multiagent Systems
+    * (EIC 0.76)    
     
   * [http://www.cs.mcgill.ca/~icml2009/ ICML 2010], TBD: June?, 2010 in ?
     * International Conference on Machine Learning
@@ -84,53 +81,27 @@ These conferences have yet to announce official deadlines:
 === Cognitive Science / Modeling ===
   * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 6-8, 2010 in Philadelphia, PA 
     * International Conference on Cognitive Modeling
-
-=== General AI ===
-  * [http://www.ecmlpkdd2009.net/ ECML 2009], September 7-11, 2009 in Bled, Slovenia
-    * European Conference on Machine Learning
-    * (EIC 0.76)
-    
-  * [http://www.ecal2009.org/ ECAL 2009], September 13-16, 2009 in Budapest, Hungary  
-    * European Conference on Artificial Life
-    * (EIC 0.53)
-    
-  * [http://www.icaart.org/ ICAART 2010], January 22-24, 2010 in Valencia, Spain
-    * International Conference on Agents and Artificial Intelligence
-    
-  * [http://agi-conf.org/2010/ AGI 2010], TBD: March 5-8, 2010 in Lugano, Switzerland
-    * Artificial General Intelligence
-    * 2011: San Francisco Bay area
-    
-  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010], May 10-14, 2010 in Toronto, Canada
-    * International Conference on Autonomous Agents and Multiagent Systems
-    * (EIC 0.76)
-    
-  * [http://cbrtrack-flairs-23.info/ FLAIRS 2010], May 19-21, 2010 in Daytona Beach, FL
-    * Florida Artificial Intelligence Research Society Conference
-    
-  * [http://aigicrv.site.uottawa.ca/ CAI 2010], May 31 - June 2, 2010 in Ottowa, Canada
-    * Canadian Artifical Intelligence Conference
-    * (EIC 0.60)
-    
-  * [http://www.wcci2010.org/index.php WCCI 2010], July 18-23, 2010 in Barcelona, Spain
-    * IEEE World Congress on Computational Intelligence
-    
-  * [http://ecai2010.appia.pt/ ECAI 2010], August 16-20, 2010 in Lisbon, Portugal
-    * European Conference on Artificial Intelligence
-    * (EIC 0.76)
-    
-  * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010], August 18-21, 2010 in Ann Arbor, MI
-    * International Conference on Development and Learning
   
 === Specialties ===
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
     * Artificial Intelligence and Interactive Digital Entertainment Conference
+    
+  * [http://agi-conf.org/2010/ AGI 2010], TBD: March 5-8, 2010 in Lugano, Switzerland
+    * Artificial General Intelligence
+    * 2011: San Francisco Bay area    
     
   * [http://www.kr.org/KR2010/ KR&R 2010], May 9-13, 2010 in Toronto, CA
     * International Conference on the Principles of Knowledge Representation and Reasoning
     
   * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010], July 19-22, 2010 in Alessandria, Italy
     * International Conference on Case-Based Reasoning
+
+  * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010], August 18-21, 2010 in Ann Arbor, MI
+    * International Conference on Development and Learning
+    
+  * [http://www.ecal2009.org/ ECAL 2009], September 2010? in TBD?
+    * European Conference on Artificial Life
+    * (EIC 0.53)    
  
 = Workshop and Symposium Information =
 
