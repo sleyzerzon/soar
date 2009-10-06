@@ -818,7 +818,7 @@ void do_buffered_link_changes (agent* thisAgent) {
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-  struct timeval saved_start_tv;
+  stlsoft_processtimes_counter local_timer;
 #endif
 #endif
 
@@ -829,14 +829,15 @@ void do_buffered_link_changes (agent* thisAgent) {
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS  
-  start_timer (thisAgent, &saved_start_tv);
+  local_timer.counter.start();
 #endif
 #endif
   do_promotion (thisAgent);  
   do_demotion (thisAgent);
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-  stop_timer (thisAgent, &saved_start_tv, &thisAgent->ownership_cpu_time[thisAgent->current_phase]);
+  local_timer.counter.stop();
+  thisAgent->timers_ownership_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif
 }
@@ -1837,7 +1838,7 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 				/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-				start_timer(thisAgent, &thisAgent->start_gds_tv);
+				thisAgent->timers_gds.counter.start();
 #endif 
 #endif
 				/* REW: end   11.25.96 */ 
@@ -1965,8 +1966,8 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 				/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-				stop_timer(thisAgent, &thisAgent->start_gds_tv, 
-					&thisAgent->gds_cpu_time[thisAgent->current_phase]);
+				thisAgent->timers_gds.counter.stop();
+				thisAgent->timers_gds_cpu_time[thisAgent->current_phase].update(thisAgent->timers_gds);
 #endif
 #endif
 				/* REW: end   11.25.96 */ 
@@ -3324,7 +3325,7 @@ void gds_invalid_so_remove_goal (agent* thisAgent, wme *w) {
 	/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	start_timer(thisAgent, &thisAgent->start_gds_tv);
+	thisAgent->timers_gds.counter.start();
 #endif
 #endif
 	/* REW: end   11.25.96 */ 
@@ -3389,7 +3390,8 @@ void gds_invalid_so_remove_goal (agent* thisAgent, wme *w) {
 	/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	stop_timer(thisAgent, &thisAgent->start_gds_tv, &thisAgent->gds_cpu_time[thisAgent->current_phase]);
+	thisAgent->timers_gds.counter.stop();
+	thisAgent->timers_gds_cpu_time[thisAgent->current_phase].update(thisAgent->timers_gds);
 #endif
 #endif
 	/* REW: end   11.25.96 */ 

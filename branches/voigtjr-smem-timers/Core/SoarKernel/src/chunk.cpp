@@ -938,7 +938,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	struct timeval saved_start_tv;
+	stlsoft_processtimes_counter local_timer;
 #endif
 #endif
 
@@ -957,7 +957,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	start_timer (thisAgent, &saved_start_tv);
+	local_timer.counter.start();
 #endif
 #endif
 
@@ -1437,7 +1437,8 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	stop_timer(thisAgent, &saved_start_tv, &thisAgent->chunking_cpu_time[thisAgent->current_phase]);
+	local_timer.counter.stop();
+	thisAgent->timers_chunking_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif
 
@@ -1449,7 +1450,8 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 chunking_done: {}
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	stop_timer (thisAgent, &saved_start_tv, &thisAgent->chunking_cpu_time[thisAgent->current_phase]);
+	local_timer.counter.stop();
+	thisAgent->timers_chunking_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif
 }

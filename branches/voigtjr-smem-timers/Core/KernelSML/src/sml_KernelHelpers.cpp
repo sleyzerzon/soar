@@ -1856,10 +1856,8 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 
 	if (pSoarAgent->current_phase != INPUT_PHASE) {
 #ifndef NO_TIMING_STUFF
-		//start_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv));
 		pSoarAgent->timers_kernel.counter.start();
 #ifndef KERNEL_TIME_ONLY
-		//start_timer(pSoarAgent, &(pSoarAgent->start_phase_tv));
 		pSoarAgent->timers_phase.counter.start();
 #endif // KERNEL_TIME_ONLY
 #endif // NO_TIMING_STUFF
@@ -1868,14 +1866,10 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 
 #ifndef NO_TIMING_STUFF
 #ifndef KERNEL_TIME_ONLY
-		//stop_timer(pSoarAgent, &(pSoarAgent->start_phase_tv), &(pSoarAgent->decision_cycle_phase_timers[(pSoarAgent->current_phase)]));
-		//stop_timer(pSoarAgent, &(pSoarAgent->start_phase_tv), &(pSoarAgent->decision_cycle_timer));
 		pSoarAgent->timers_phase.counter.stop();
 		pSoarAgent->timers_decision_cycle_phase[pSoarAgent->current_phase].update(pSoarAgent->timers_phase);
 		pSoarAgent->timers_decision_cycle.update(pSoarAgent->timers_phase);
 #endif // KERNEL_TIME_ONLY
-		//stop_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv), &(pSoarAgent->total_kernel_time));
-		//start_timer(pSoarAgent, &(pSoarAgent->start_kernel_tv));
 		pSoarAgent->timers_kernel.counter.stop();
 		pSoarAgent->timers_total_kernel_time.update(pSoarAgent->timers_kernel);
 		pSoarAgent->timers_kernel.counter.start();

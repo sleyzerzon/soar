@@ -275,11 +275,6 @@ void soar_invoke_callbacks (agent* thisAgent,
     /* for above two: thisAgent->current_phase = APPLY_PHASE soar8 only */
   case AFTER_DECISION_CYCLE_CALLBACK:
     /* for soar7: thisAgent->current_phase = DECISION_PHASE; for soar8 it's OUTPUT_PHASE */
-	    //stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-        //            &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
-	    //stop_timer (thisAgent, &thisAgent->start_phase_tv, &thisAgent->decision_cycle_timer);
-	    //stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
-        //start_timer (thisAgent, &thisAgent->start_phase_tv);
 	    thisAgent->timers_phase.counter.stop();
 		thisAgent->timers_kernel.counter.stop();
 		thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
@@ -290,11 +285,6 @@ void soar_invoke_callbacks (agent* thisAgent,
   case INPUT_PHASE_CALLBACK:
        /* Stop the kernel and phase timers for the input function. 
 	    *   the output function is done in do_output_phase */
-       //stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-       //            &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
-       //stop_timer (thisAgent, &thisAgent->start_phase_tv, &thisAgent->decision_cycle_timer);
-       //stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
-       //start_timer (thisAgent, &thisAgent->start_kernel_tv);
 	   thisAgent->timers_phase.counter.stop();
        thisAgent->timers_kernel.counter.stop();
        thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
@@ -343,24 +333,16 @@ void soar_invoke_callbacks (agent* thisAgent,
   case AFTER_APPLY_PHASE_CALLBACK:
   case AFTER_DECISION_CYCLE_CALLBACK:
     /* for soar7: thisAgent->current_phase = DECISION_PHASE; for soar8 it's OUTPUT_PHASE */
-       //stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-       //             &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
 	   thisAgent->timers_phase.counter.stop();
 	   thisAgent->timers_monitors_cpu_time[thisAgent->current_phase].update(thisAgent->timers_phase);
-       //start_timer(thisAgent, &thisAgent->start_kernel_tv);
 	   thisAgent->timers_kernel.counter.start();
-       //start_timer(thisAgent, &thisAgent->start_phase_tv);
 	   thisAgent->timers_phase.counter.start();
        break;
   case INPUT_PHASE_CALLBACK:
     /* Stop input_function_cpu_time timer.  Restart kernel and phase timers */
-       //stop_timer (thisAgent, &thisAgent->start_kernel_tv, 
-                   //&thisAgent->input_function_cpu_time);
        thisAgent->timers_kernel.counter.stop();
        thisAgent->timers_input_function_cpu_time.update(thisAgent->timers_kernel);
-       //start_timer (thisAgent, &thisAgent->start_kernel_tv);
 	   thisAgent->timers_kernel.counter.start();
-       //start_timer (thisAgent, &thisAgent->start_phase_tv); 
 	   thisAgent->timers_phase.counter.start();
        break;
  
@@ -410,11 +392,6 @@ void soar_invoke_first_callback (agent* thisAgent,
     /* for above two: thisAgent->current_phase = APPLY_PHASE soar8 only */
   case AFTER_DECISION_CYCLE_CALLBACK:
     /* for soar7: thisAgent->current_phase = DECISION_PHASE; for soar8 it's OUTPUT_PHASE */
-	   //stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-       //             &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
-	   //stop_timer (thisAgent, &thisAgent->start_phase_tv, &thisAgent->decision_cycle_timer);
-	   //stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
-       //start_timer (thisAgent, &thisAgent->start_phase_tv);
 	   thisAgent->timers_phase.counter.stop();
 	   thisAgent->timers_kernel.counter.stop();
 	   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
@@ -425,11 +402,6 @@ void soar_invoke_first_callback (agent* thisAgent,
   case INPUT_PHASE_CALLBACK:
        /* Stop the kernel and phase timers for the input function. 
 	    *   the output function is done in do_output_phase */
-       //stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-       //            &thisAgent->decision_cycle_phase_timers[thisAgent->current_phase]);
-       //stop_timer (thisAgent, &thisAgent->start_phase_tv, &thisAgent->decision_cycle_timer);
-       //stop_timer (thisAgent, &thisAgent->start_kernel_tv, &thisAgent->total_kernel_time);
-       //start_timer (thisAgent, &thisAgent->start_kernel_tv);
 	   thisAgent->timers_phase.counter.stop();
 	   thisAgent->timers_kernel.counter.stop();
 	   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
@@ -469,24 +441,16 @@ void soar_invoke_first_callback (agent* thisAgent,
   case BEFORE_APPLY_PHASE_CALLBACK:
   case AFTER_APPLY_PHASE_CALLBACK:
   case AFTER_DECISION_CYCLE_CALLBACK:
-       //stop_timer (thisAgent, &thisAgent->start_phase_tv, 
-       //            &thisAgent->monitors_cpu_time[thisAgent->current_phase]);
 	   thisAgent->timers_phase.counter.stop();
 	   thisAgent->timers_monitors_cpu_time[thisAgent->current_phase].update(thisAgent->timers_phase);
-       //start_timer(thisAgent, &thisAgent->start_kernel_tv);
 	   thisAgent->timers_kernel.counter.start();
-       //start_timer(thisAgent, &thisAgent->start_phase_tv);
 	   thisAgent->timers_phase.counter.start();
        break;
   case INPUT_PHASE_CALLBACK:
     /* Stop input_function_cpu_time timer.  Restart kernel and phase timers */
-       //stop_timer (thisAgent, &thisAgent->start_kernel_tv, 
-       //            &thisAgent->input_function_cpu_time);
 	   thisAgent->timers_kernel.counter.stop();
 	   thisAgent->timers_input_function_cpu_time.update(thisAgent->timers_kernel);
-       //start_timer (thisAgent, &thisAgent->start_kernel_tv);
 	   thisAgent->timers_kernel.counter.start();
-       //start_timer (thisAgent, &thisAgent->start_phase_tv); 
 	   thisAgent->timers_phase.counter.start();
        break;
 
