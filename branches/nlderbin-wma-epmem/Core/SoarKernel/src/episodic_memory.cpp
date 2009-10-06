@@ -3781,7 +3781,7 @@ inline void epmem_clear_literal_group( epmem_shared_literal_group *del_group )
 inline void epmem_add_literal_to_group( epmem_shared_literal_group *dest_group, epmem_shared_literal_pair *literal_pair )
 {
 	// refer to appropriate literal map (keyed by cue wme)
-	epmem_shared_literal_map **dest_map =& (*dest_group)[ literal_pair->lit->wme ];
+	epmem_shared_literal_map **dest_map =& (*dest_group)[ literal_pair->wme ];
 	
 	// if literal map doesn't exist, create it
 	if ( !(*dest_map) )
@@ -4405,6 +4405,10 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 								{
 									parent_syms.push( (*w_p)->value );
 								}
+								else
+								{
+									leaf_ids[i]++;
+								}
 							}
 
 							while ( !parent_syms.empty() )
@@ -4433,7 +4437,15 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 											{
 												parent_syms.push( (*w_p)->value );
 											}
+											else
+											{
+												leaf_ids[i]++;
+											}
 										}
+									}
+									else
+									{
+										leaf_ids[i]++;
 									}
 
 									new_cache_element = NULL;
@@ -4650,8 +4662,6 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 												wme_match =& wme_to_match[ new_literal->wme ];
 												if ( !(*wme_match) )
 												{
-													leaf_ids[i]++;
-
 													new_match = new epmem_shared_match;
 													matches.push_back( new_match );
 													new_match->ct = 0;
@@ -4733,8 +4743,6 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										wme_match =& wme_to_match[ (*w_p) ];
 										if ( !(*wme_match) )
 										{
-											leaf_ids[i]++;
-
 											new_match = new epmem_shared_match;
 											matches.push_back( new_match );
 											new_match->ct = 0;
@@ -4861,7 +4869,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 			epmem_constraint_list king_constraints;
 
 			// perform range search if any leaf wmes
-			if ( ( level > 1 ) && cue_size )
+			if ( ( level > 1 ) && cue_size && !matches.empty() )
 			{
 				double balance = my_agent->epmem_params->balance->get_value();
 				double balance_inv = 1 - balance;
