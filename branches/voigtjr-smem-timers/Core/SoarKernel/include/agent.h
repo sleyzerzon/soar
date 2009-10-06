@@ -547,20 +547,28 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
    * then these timevals will be just wasted space...
    * Usually they are enabled, so conditional compiles removed. July 05
    */
-  ////#ifndef NO_TIMING_STUFF
-  struct timeval      start_total_tv;
-  struct timeval      total_cpu_time;
-  struct timeval      start_kernel_tv, start_phase_tv;
-  struct timeval      total_kernel_time;
+  //struct timeval      start_total_tv;
+  //struct timeval      total_cpu_time;
+  //struct timeval      start_kernel_tv;
+  //struct timeval      total_kernel_time;
+  //struct timeval      start_phase_tv;
+  stlsoft_processtimes_counter timers_cpu;										// start_total_tv
+  stlsoft_processtimes_counter timers_kernel;									// start_kernel_tv
+  stlsoft_processtimes_counter timers_phase;									// start_phase_tv
+  stlsoft_accumulator<stlsoft_processtimes_counter> timers_total_cpu_time;		// total_cpu_time
+  stlsoft_accumulator<stlsoft_processtimes_counter> timers_total_kernel_time;	// total_kernel_time
+  stlsoft_accumulator<stlsoft_processtimes_counter> timers_decision_cycle_phase[NUM_PHASE_TYPES]; // decision_cycle_phase_timers
 
-  struct timeval      decision_cycle_phase_timers[NUM_PHASE_TYPES];
-  struct timeval      monitors_cpu_time[NUM_PHASE_TYPES]; 
-  struct timeval      input_function_cpu_time; 
-  struct timeval      output_function_cpu_time; 
+  //struct timeval      decision_cycle_phase_timers[NUM_PHASE_TYPES];
+  //struct timeval      monitors_cpu_time[NUM_PHASE_TYPES]; 
+  stlsoft_accumulator<stlsoft_processtimes_counter> timers_monitors_cpu_time[NUM_PHASE_TYPES];	// monitors_cpu_time, uses timers_phase
+  stlsoft_accumulator<stlsoft_processtimes_counter> timers_input_function_cpu_time;				// input_function_cpu_time, uses timers_kernel
+  stlsoft_accumulator<stlsoft_processtimes_counter> timers_output_function_cpu_time;			// output_function_cpu_time, uses timers_kernel
 
-  struct timeval      decision_cycle_timer; // Used to calculate the maximum amount of decision cycle time
-  unsigned long       max_dc_time_value;    // Holds timer_value of maximum amount of decision cycle time
-  unsigned long       max_dc_time_cycle;    // Holds cycle_count that maximum amount of decision cycle time happened
+  //struct timeval      decision_cycle_timer; // Used to calculate the maximum amount of decision cycle time
+  stlsoft_accumulator<stlsoft_processtimes_counter> timers_decision_cycle;	// decision_cycle_timer
+  stlsoft_accumulator<stlsoft_processtimes_counter>::interval_type max_dc_time_usec;    // Holds timer_value of maximum amount of decision cycle time
+  stlsoft_accumulator<stlsoft_processtimes_counter>::interval_type max_dc_time_cycle;    // Holds cycle_count that maximum amount of decision cycle time happened
 
   /* accumulated cpu time spent in various parts of the system */
   /* only used if DETAILED_TIMING_STATS is #def'd in kernel.h */
@@ -570,7 +578,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   struct timeval      start_gds_tv, total_gds_time; 
   struct timeval      gds_cpu_time[NUM_PHASE_TYPES];
   /* REW: end 28.07.96 */
-  ////#endif
 
    /* RMJ */
    /* Keep track of real time steps for constant real-time per decision */

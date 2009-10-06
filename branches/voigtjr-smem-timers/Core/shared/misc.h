@@ -193,4 +193,90 @@ struct Dangerous_Pointer_Cast {
 	}
 };
 
+//////////////////////////////////////////////////////////
+// STLSoft Timers
+//////////////////////////////////////////////////////////
+
+#ifdef WIN32
+#include <winstl/performance/performance_counter.hpp>
+#include <winstl/performance/processtimes_counter.hpp>
+#else // WIN32
+#include <unixstl/performance/performance_counter.hpp>
+#include <unixstl/performance/processtimes_counter.hpp>
+#endif // WIN32
+
+class stlsoft_performance_counter 
+{
+public:
+#ifdef WIN32
+	winstl::performance_counter counter;
+	typedef winstl::performance_counter::interval_type interval_type;
+#else // WIN32
+	unixstl::performance_counter counter;
+	typedef unixstl::performance_counter::interval_type interval_type;
+#endif // WIN32
+};
+
+class stlsoft_processtimes_counter 
+{
+public:
+#ifdef WIN32
+	winstl::processtimes_counter counter;
+	typedef winstl::processtimes_counter::interval_type interval_type;
+#else // WIN32
+	unixstl::processtimes_counter counter;
+	typedef unixstl::processtimes_counter::interval_type interval_type;
+#endif // WIN32
+};
+
+template <class C>
+class stlsoft_accumulator
+{
+#ifdef WIN32
+public:
+	typedef typename C::interval_type interval_type;
+
+private:
+	C counter;
+#else // WIN32
+public:
+	typedef typename C::interval_type interval_type;
+
+private:
+	C counter;
+#endif // WIN32
+
+	interval_type total;
+
+	stlsoft_accumulator(const stlsoft_accumulator&) {};
+	stlsoft_accumulator& operator=(const stlsoft_accumulator&) {};
+
+public:
+	stlsoft_accumulator() 
+		: total(0)
+	{
+	}
+
+	void reset()
+	{
+		total = 0;
+	}
+
+	void update(const C& counter)
+	{
+		total += counter.counter.get_microseconds();
+	}
+
+	interval_type get_microseconds()
+	{
+		return total;
+	}
+};
+
+template <class C>
+double get_timer_seconds(C& timer)
+{
+	return timer.get_microseconds() / 1000000.0;
+}
+
 #endif /*MISC_H_*/

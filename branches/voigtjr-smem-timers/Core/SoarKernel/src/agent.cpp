@@ -252,26 +252,36 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->lexeme.id_number = 0;
 
   /* Initializing all the timer structures */
-  reset_timer(&(newAgent->start_total_tv));
-  reset_timer(&(newAgent->total_cpu_time));
-  reset_timer(&(newAgent->start_kernel_tv));
-  reset_timer(&(newAgent->start_phase_tv));
-  reset_timer(&(newAgent->total_kernel_time));
+  //reset_timer(&(newAgent->start_total_tv));
+  //reset_timer(&(newAgent->total_cpu_time));
+  //reset_timer(&(newAgent->start_kernel_tv));
+  //reset_timer(&(newAgent->start_phase_tv));
+  //reset_timer(&(newAgent->total_kernel_time));
+  newAgent->timers_cpu.counter.stop();
+  newAgent->timers_kernel.counter.stop();
+  newAgent->timers_phase.counter.stop();
+  newAgent->timers_total_cpu_time.reset();
+  newAgent->timers_total_kernel_time.reset();
 
-  reset_timer(&(newAgent->input_function_cpu_time));
-  reset_timer(&(newAgent->output_function_cpu_time));
+  //reset_timer(&(newAgent->input_function_cpu_time));
+  //reset_timer(&(newAgent->output_function_cpu_time));
+  newAgent->timers_input_function_cpu_time.reset();
+  newAgent->timers_output_function_cpu_time.reset();
   reset_timer(&(newAgent->start_gds_tv));
   reset_timer(&(newAgent->total_gds_time));
 
   for (int ii=0;ii < NUM_PHASE_TYPES; ii++) {
-     reset_timer(&(newAgent->decision_cycle_phase_timers[ii]));
-     reset_timer(&(newAgent->monitors_cpu_time[ii]));
+     //reset_timer(&(newAgent->decision_cycle_phase_timers[ii]));
+     //reset_timer(&(newAgent->monitors_cpu_time[ii]));
+     newAgent->timers_decision_cycle_phase[ii].reset();
+     newAgent->timers_monitors_cpu_time[ii].reset();
      reset_timer(&(newAgent->ownership_cpu_time[ii]));
      reset_timer(&(newAgent->chunking_cpu_time[ii]));
      reset_timer(&(newAgent->match_cpu_time[ii]));
      reset_timer(&(newAgent->gds_cpu_time[ii]));
   }
-  reset_timer(&(newAgent->decision_cycle_timer));
+  //reset_timer(&(newAgent->decision_cycle_timer));
+  newAgent->timers_decision_cycle.reset();
 
   newAgent->real_time_tracker = 0;
   newAgent->attention_lapse_tracker = 0;

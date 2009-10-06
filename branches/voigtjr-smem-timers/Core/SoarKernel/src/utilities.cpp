@@ -12,6 +12,7 @@
 #include "gdatastructs.h"
 #include "wmem.h"
 #include "print.h"
+#include "xml.h"
 
 #include <time.h>
 
