@@ -1856,9 +1856,9 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 
 	if (pSoarAgent->current_phase != INPUT_PHASE) {
 #ifndef NO_TIMING_STUFF
-		pSoarAgent->timers_kernel.counter.start();
+		pSoarAgent->timers_kernel.start();
 #ifndef KERNEL_TIME_ONLY
-		pSoarAgent->timers_phase.counter.start();
+		pSoarAgent->timers_phase.start();
 #endif // KERNEL_TIME_ONLY
 #endif // NO_TIMING_STUFF
 
@@ -1866,13 +1866,13 @@ int RemoveWme(agent* pSoarAgent, wme* pWme)
 
 #ifndef NO_TIMING_STUFF
 #ifndef KERNEL_TIME_ONLY
-		pSoarAgent->timers_phase.counter.stop();
+		pSoarAgent->timers_phase.stop();
 		pSoarAgent->timers_decision_cycle_phase[pSoarAgent->current_phase].update(pSoarAgent->timers_phase);
 		pSoarAgent->timers_decision_cycle.update(pSoarAgent->timers_phase);
 #endif // KERNEL_TIME_ONLY
-		pSoarAgent->timers_kernel.counter.stop();
+		pSoarAgent->timers_kernel.stop();
 		pSoarAgent->timers_total_kernel_time.update(pSoarAgent->timers_kernel);
-		pSoarAgent->timers_kernel.counter.start();
+		pSoarAgent->timers_kernel.start();
 #endif // NO_TIMING_STUFF
 	}
 

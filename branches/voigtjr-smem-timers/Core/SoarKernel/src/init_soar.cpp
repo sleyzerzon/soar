@@ -339,16 +339,16 @@ void reset_statistics (agent* thisAgent) {
  * KJC June 2005
  */
   /* Initializing all the timer structures */
-  thisAgent->timers_cpu.counter.stop();
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_phase.counter.stop();
+  thisAgent->timers_cpu.reset();
+  thisAgent->timers_kernel.reset();
+  thisAgent->timers_phase.reset();
   thisAgent->timers_total_cpu_time.reset();
   thisAgent->timers_total_kernel_time.reset();
 
   thisAgent->timers_input_function_cpu_time.reset();
   thisAgent->timers_output_function_cpu_time.reset();
 
-  thisAgent->timers_gds.counter.stop();
+  thisAgent->timers_gds.reset();
 
   for (int ii=0;ii < NUM_PHASE_TYPES; ii++) {
      thisAgent->timers_decision_cycle_phase[ii].reset();
@@ -545,7 +545,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	 thisAgent->chunks_this_d_cycle = 0;
 	 thisAgent->e_cycles_this_d_cycle = 0;
 	 #ifndef NO_TIMING_STUFF   /* REW:  28.07.96 */
-	 thisAgent->timers_phase.counter.start();
+	 thisAgent->timers_phase.start();
      #endif
 
 	  /* we check e_cycle_count because Soar 7 runs multiple input cycles per decision */
@@ -584,7 +584,7 @@ void do_one_top_level_phase (agent* thisAgent)
         print_phase (thisAgent, "\n--- END Input Phase --- \n",1);
 
      #ifndef NO_TIMING_STUFF  /* REW:  28.07.96 */
-		thisAgent->timers_phase.counter.stop();
+		thisAgent->timers_phase.stop();
 	    thisAgent->timers_decision_cycle_phase[INPUT_PHASE].update(thisAgent->timers_phase);
 		thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
      #endif
@@ -598,7 +598,7 @@ void do_one_top_level_phase (agent* thisAgent)
   case PROPOSE_PHASE:   /* added in 8.6 to clarify Soar8 decision cycle */
 	  
       #ifndef NO_TIMING_STUFF
-	  thisAgent->timers_phase.counter.start();
+	  thisAgent->timers_phase.start();
       #endif
 
 	  /* e_cycles_this_d_cycle will always be zero UNLESS we are 
@@ -688,7 +688,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  }
 
 	  #ifndef NO_TIMING_STUFF
-	  thisAgent->timers_phase.counter.stop();
+	  thisAgent->timers_phase.stop();
 	  thisAgent->timers_decision_cycle_phase[PROPOSE_PHASE].update(thisAgent->timers_phase);
 	  thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
       #endif
@@ -705,7 +705,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	 soar_invoke_callbacks(thisAgent, BEFORE_ELABORATION_CALLBACK, NULL ) ;
 
       #ifndef NO_TIMING_STUFF       /* REW: 28.07.96 */
-	  thisAgent->timers_phase.counter.start();
+	  thisAgent->timers_phase.start();
       #endif
 
  	   soar_invoke_callbacks(thisAgent, 
@@ -722,7 +722,7 @@ void do_one_top_level_phase (agent* thisAgent)
  	  thisAgent->current_phase = WM_PHASE;
 
       #ifndef NO_TIMING_STUFF       /* REW:  28.07.96 */
-	  thisAgent->timers_phase.counter.stop();
+	  thisAgent->timers_phase.stop();
 	  thisAgent->timers_decision_cycle_phase[PREFERENCE_PHASE].update(thisAgent->timers_phase);
 	  thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
       #endif
@@ -739,7 +739,7 @@ void do_one_top_level_phase (agent* thisAgent)
     /*  we need to tell gSKI WM Phase beginning... */
 
       #ifndef NO_TIMING_STUFF  	  /* REW: begin 28.07.96 */
-	  thisAgent->timers_phase.counter.start();
+	  thisAgent->timers_phase.start();
       #endif	
 
  	  soar_invoke_callbacks(thisAgent, 
@@ -757,7 +757,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  thisAgent->current_phase = OUTPUT_PHASE;
  
       #ifndef NO_TIMING_STUFF      /* REW:  28.07.96 */
-	  thisAgent->timers_phase.counter.stop();
+	  thisAgent->timers_phase.stop();
 	  thisAgent->timers_decision_cycle_phase[WM_PHASE].update(thisAgent->timers_phase);
 	  thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
       #endif
@@ -771,7 +771,7 @@ void do_one_top_level_phase (agent* thisAgent)
   case APPLY_PHASE:   /* added in 8.6 to clarify Soar8 decision cycle */
 
       #ifndef NO_TIMING_STUFF
-	  thisAgent->timers_phase.counter.start();
+	  thisAgent->timers_phase.start();
       #endif
 
 	  /* e_cycle_count will always be zero UNLESS we are running by ELABORATIONS.
@@ -863,7 +863,7 @@ void do_one_top_level_phase (agent* thisAgent)
 	  }
 
 	  #ifndef NO_TIMING_STUFF
-	  thisAgent->timers_phase.counter.stop();
+	  thisAgent->timers_phase.stop();
 	  thisAgent->timers_decision_cycle_phase[APPLY_PHASE].update(thisAgent->timers_phase);
 	  thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
       #endif
@@ -877,7 +877,7 @@ void do_one_top_level_phase (agent* thisAgent)
           print_phase (thisAgent, "\n--- Output Phase ---\n",0);
       
       #ifndef NO_TIMING_STUFF      /* REW:  28.07.96 */
-	  thisAgent->timers_phase.counter.start();
+	  thisAgent->timers_phase.start();
       #endif   
 
  	  soar_invoke_callbacks(thisAgent, 
@@ -919,14 +919,14 @@ void do_one_top_level_phase (agent* thisAgent)
 		  AFTER_DECISION_CYCLE_CALLBACK,
 		  reinterpret_cast<soar_call_data>(OUTPUT_PHASE) );
       #ifndef NO_TIMING_STUFF    /* timers stopped KJC 10-04-98 */
-	  thisAgent->timers_phase.counter.stop();
+	  thisAgent->timers_phase.stop();
 	  thisAgent->timers_decision_cycle_phase[OUTPUT_PHASE].update(thisAgent->timers_phase);
 	  thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
       #endif
 
       // Update per-cycle statistics
 	  {
-		  unsigned long dc_time = static_cast<unsigned long>(thisAgent->timers_decision_cycle.get_microseconds());
+		  unsigned long dc_time = static_cast<unsigned long>(thisAgent->timers_decision_cycle.get_usec());
 		  if (thisAgent->max_dc_time_usec < dc_time) {
 			  thisAgent->max_dc_time_usec = dc_time;
 			  thisAgent->max_dc_time_cycle = thisAgent->d_cycle_count;
@@ -970,7 +970,7 @@ void do_one_top_level_phase (agent* thisAgent)
 		  print_phase (thisAgent, "\n--- Decision Phase ---\n",0);
 	  	 
       #ifndef NO_TIMING_STUFF   /* REW:  28.07.96 */
-	  thisAgent->timers_phase.counter.start();
+	  thisAgent->timers_phase.start();
       #endif
 
 	  thisAgent->decision_phases_count++;  /* counts decisions, not cycles, for more accurate stats */
@@ -1041,7 +1041,7 @@ void do_one_top_level_phase (agent* thisAgent)
 
 		  /* REW: begin 28.07.96 */
 #ifndef NO_TIMING_STUFF
-		  thisAgent->timers_phase.counter.stop();
+		  thisAgent->timers_phase.stop();
 		  thisAgent->timers_decision_cycle_phase[DECISION_PHASE].update(thisAgent->timers_phase);
 		  thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
 #endif
@@ -1067,7 +1067,7 @@ void do_one_top_level_phase (agent* thisAgent)
  
 	  /* REW: begin 28.07.96 */
       #ifndef NO_TIMING_STUFF
-	  thisAgent->timers_phase.counter.stop();
+	  thisAgent->timers_phase.stop();
 	  thisAgent->timers_decision_cycle_phase[DECISION_PHASE].update(thisAgent->timers_phase);
 	  thisAgent->timers_decision_cycle.update(thisAgent->timers_phase);
       #endif
@@ -1116,8 +1116,8 @@ void do_one_top_level_phase (agent* thisAgent)
 
 void run_forever (agent* thisAgent) {
     #ifndef NO_TIMING_STUFF
-	thisAgent->timers_cpu.counter.start();
-	thisAgent->timers_kernel.counter.start();
+	thisAgent->timers_cpu.start();
+	thisAgent->timers_kernel.start();
     #endif
 
 	thisAgent->stop_soar = FALSE;
@@ -1127,8 +1127,8 @@ void run_forever (agent* thisAgent) {
 	}
 
     #ifndef NO_TIMING_STUFF
-	thisAgent->timers_kernel.counter.stop();
-	thisAgent->timers_cpu.counter.stop();
+	thisAgent->timers_kernel.stop();
+	thisAgent->timers_cpu.stop();
 	thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
 	thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
     #endif
@@ -1138,8 +1138,8 @@ void run_for_n_phases (agent* thisAgent, long n) {
   if (n == -1) { run_forever(thisAgent); return; }
   if (n < -1) return;
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_cpu.counter.start();
-  thisAgent->timers_kernel.counter.start();
+  thisAgent->timers_cpu.start();
+  thisAgent->timers_kernel.start();
 #endif
   thisAgent->stop_soar = FALSE;
   thisAgent->reason_for_stopping = "";
@@ -1148,8 +1148,8 @@ void run_for_n_phases (agent* thisAgent, long n) {
     n--;
   }
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_cpu.counter.stop();
+  thisAgent->timers_kernel.stop();
+  thisAgent->timers_cpu.stop();
   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
   thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
 #endif
@@ -1162,8 +1162,8 @@ void run_for_n_elaboration_cycles (agent* thisAgent, long n) {
   if (n == -1) { run_forever(thisAgent); return; }
   if (n < -1) return;
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_cpu.counter.start();
-  thisAgent->timers_kernel.counter.start();
+  thisAgent->timers_cpu.start();
+  thisAgent->timers_kernel.start();
 #endif
   thisAgent->stop_soar = FALSE;
   thisAgent->reason_for_stopping = 0;
@@ -1182,8 +1182,8 @@ void run_for_n_elaboration_cycles (agent* thisAgent, long n) {
   thisAgent->go_type = save_go_type;
 
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_cpu.counter.stop();
+  thisAgent->timers_kernel.stop();
+  thisAgent->timers_cpu.stop();
   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
   thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
 #endif
@@ -1196,8 +1196,8 @@ void run_for_n_modifications_of_output (agent* thisAgent, long n) {
   if (n == -1) { run_forever(thisAgent); return; }
   if (n < -1) return;
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_cpu.counter.start();
-  thisAgent->timers_kernel.counter.start();
+  thisAgent->timers_cpu.start();
+  thisAgent->timers_kernel.start();
 #endif
   thisAgent->stop_soar = FALSE;
   thisAgent->reason_for_stopping = 0;
@@ -1217,8 +1217,8 @@ void run_for_n_modifications_of_output (agent* thisAgent, long n) {
 	}
   }
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_cpu.counter.stop();
+  thisAgent->timers_kernel.stop();
+  thisAgent->timers_cpu.stop();
   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
   thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
 #endif
@@ -1230,8 +1230,8 @@ void run_for_n_decision_cycles (agent* thisAgent, long n) {
   if (n == -1) { run_forever(thisAgent); return; }
   if (n < -1) return;
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_cpu.counter.start();
-  thisAgent->timers_kernel.counter.start();
+  thisAgent->timers_cpu.start();
+  thisAgent->timers_kernel.start();
 #endif
   thisAgent->stop_soar = FALSE;
   thisAgent->reason_for_stopping = 0;
@@ -1244,8 +1244,8 @@ void run_for_n_decision_cycles (agent* thisAgent, long n) {
     do_one_top_level_phase(thisAgent);
   }
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_cpu.counter.stop();
+  thisAgent->timers_kernel.stop();
+  thisAgent->timers_cpu.stop();
   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
   thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
 #endif
@@ -1264,8 +1264,8 @@ void run_for_n_selections_of_slot (agent* thisAgent, long n, Symbol *attr_of_slo
   if (n == -1) { run_forever(thisAgent); return; }
   if (n < -1) return;
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_cpu.counter.start();
-  thisAgent->timers_kernel.counter.start();
+  thisAgent->timers_cpu.start();
+  thisAgent->timers_kernel.start();
 #endif
   thisAgent->stop_soar = FALSE;
   thisAgent->reason_for_stopping = 0;
@@ -1277,8 +1277,8 @@ void run_for_n_selections_of_slot (agent* thisAgent, long n, Symbol *attr_of_slo
       if (attr_of_slot_just_decided(thisAgent)==attr_of_slot) count++;
   }
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_cpu.counter.stop();
+  thisAgent->timers_kernel.stop();
+  thisAgent->timers_cpu.stop();
   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
   thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
 #endif
@@ -1293,8 +1293,8 @@ void run_for_n_selections_of_slot_at_level (agent* thisAgent, long n,
   if (n == -1) { run_forever(thisAgent); return; }
   if (n < -1) return;
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_cpu.counter.start();
-  thisAgent->timers_kernel.counter.start();
+  thisAgent->timers_cpu.start();
+  thisAgent->timers_kernel.start();
 #endif
   thisAgent->stop_soar = FALSE;
   thisAgent->reason_for_stopping = 0;
@@ -1310,8 +1310,8 @@ void run_for_n_selections_of_slot_at_level (agent* thisAgent, long n,
     }
   }
 #ifndef NO_TIMING_STUFF
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_cpu.counter.stop();
+  thisAgent->timers_kernel.stop();
+  thisAgent->timers_cpu.stop();
   thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
   thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
 #endif
@@ -1456,16 +1456,16 @@ void init_agent_memory(agent* thisAgent)
 
   /* executing the IO cycles above, increments the timers, so reset */
   /* Initializing all the timer structures */
-  thisAgent->timers_cpu.counter.stop();
-  thisAgent->timers_kernel.counter.stop();
-  thisAgent->timers_phase.counter.stop();
+  thisAgent->timers_cpu.reset();
+  thisAgent->timers_kernel.reset();
+  thisAgent->timers_phase.reset();
   thisAgent->timers_total_cpu_time.reset();
   thisAgent->timers_total_kernel_time.reset();
 
   thisAgent->timers_input_function_cpu_time.reset();
   thisAgent->timers_output_function_cpu_time.reset();
 
-  thisAgent->timers_gds.counter.stop();
+  thisAgent->timers_gds.reset();
 
   for (int ii=0;ii < NUM_PHASE_TYPES; ii++) {
      thisAgent->timers_decision_cycle_phase[ii].reset();

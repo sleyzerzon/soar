@@ -43,7 +43,7 @@ void remove_operator_if_necessary(agent* thisAgent, slot *s, wme *w){
 /* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-thisAgent->timers_gds.counter.start();
+thisAgent->timers_gds.start();
 #endif
 #endif
 /* REW: end   11.25.96 */ 
@@ -105,7 +105,7 @@ if (s->wmes) { /* If there is something in the context slot */
 /* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-thisAgent->timers_gds.counter.stop();
+thisAgent->timers_gds.stop();
 thisAgent->timers_gds_cpu_time[thisAgent->current_phase].update(thisAgent->timers_gds);
 #endif
 #endif
@@ -539,7 +539,7 @@ Bool goal_stack_consistent_through_goal(agent* thisAgent, Symbol *goal) {
    
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-   thisAgent->timers_gds.counter.start();
+   thisAgent->timers_gds.start();
 #endif
 #endif
    
@@ -563,7 +563,7 @@ Bool goal_stack_consistent_through_goal(agent* thisAgent, Symbol *goal) {
    
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-   thisAgent->timers_gds.counter.stop();
+   thisAgent->timers_gds.stop();
    thisAgent->timers_gds_cpu_time[thisAgent->current_phase].update(thisAgent->timers_gds);
 #endif
 #endif

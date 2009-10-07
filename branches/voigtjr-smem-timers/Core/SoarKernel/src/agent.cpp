@@ -130,7 +130,8 @@ void init_soar_agent(agent* thisAgent) {
 agent * create_soar_agent (char * agent_name) {                                          /* loop index */
   char cur_path[MAXPATHLEN];   /* AGR 536 */
 
-  agent* newAgent = static_cast<agent *>(malloc(sizeof(agent)));
+  //agent* newAgent = static_cast<agent *>(malloc(sizeof(agent)));
+  agent* newAgent = new agent();
 
   newAgent->current_tc_number = 0;
 
@@ -252,15 +253,15 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->lexeme.id_number = 0;
 
   /* Initializing all the timer structures */
-  newAgent->timers_cpu.counter.stop();
-  newAgent->timers_kernel.counter.stop();
-  newAgent->timers_phase.counter.stop();
+  newAgent->timers_cpu.reset();
+  newAgent->timers_kernel.reset();
+  newAgent->timers_phase.reset();
   newAgent->timers_total_cpu_time.reset();
   newAgent->timers_total_kernel_time.reset();
 
   newAgent->timers_input_function_cpu_time.reset();
   newAgent->timers_output_function_cpu_time.reset();
-  newAgent->timers_gds.counter.stop();
+  newAgent->timers_gds.reset();
 
   for (int ii=0;ii < NUM_PHASE_TYPES; ii++) {
      newAgent->timers_decision_cycle_phase[ii].reset();

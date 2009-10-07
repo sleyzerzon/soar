@@ -203,7 +203,7 @@ void do_buffered_wm_changes (agent* thisAgent)
   
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-  stlsoft_processtimes_counter local_timer;
+  soar_process_timer local_timer;
 #endif
 #endif
 
@@ -221,7 +221,7 @@ void do_buffered_wm_changes (agent* thisAgent)
   /* --- stuff wme changes through the rete net --- */
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-  local_timer.counter.start();
+  local_timer.start();
 #endif
 #endif
   for (c=thisAgent->wmes_to_add; c!=NIL; c=c->rest) 
@@ -234,7 +234,7 @@ void do_buffered_wm_changes (agent* thisAgent)
   }
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-  local_timer.counter.stop();
+  local_timer.stop();
   thisAgent->timers_match_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif

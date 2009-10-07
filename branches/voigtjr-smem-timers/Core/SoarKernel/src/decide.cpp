@@ -818,7 +818,7 @@ void do_buffered_link_changes (agent* thisAgent) {
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-  stlsoft_processtimes_counter local_timer;
+  soar_process_timer local_timer;
 #endif
 #endif
 
@@ -829,14 +829,14 @@ void do_buffered_link_changes (agent* thisAgent) {
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS  
-  local_timer.counter.start();
+  local_timer.start();
 #endif
 #endif
   do_promotion (thisAgent);  
   do_demotion (thisAgent);
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-  local_timer.counter.stop();
+  local_timer.stop();
   thisAgent->timers_ownership_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif
@@ -1838,7 +1838,7 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 				/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-				thisAgent->timers_gds.counter.start();
+				thisAgent->timers_gds.start();
 #endif 
 #endif
 				/* REW: end   11.25.96 */ 
@@ -1966,7 +1966,7 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 				/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-				thisAgent->timers_gds.counter.stop();
+				thisAgent->timers_gds.stop();
 				thisAgent->timers_gds_cpu_time[thisAgent->current_phase].update(thisAgent->timers_gds);
 #endif
 #endif
@@ -3325,7 +3325,7 @@ void gds_invalid_so_remove_goal (agent* thisAgent, wme *w) {
 	/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	thisAgent->timers_gds.counter.start();
+	thisAgent->timers_gds.start();
 #endif
 #endif
 	/* REW: end   11.25.96 */ 
@@ -3390,7 +3390,7 @@ void gds_invalid_so_remove_goal (agent* thisAgent, wme *w) {
 	/* REW: begin 11.25.96 */ 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	thisAgent->timers_gds.counter.stop();
+	thisAgent->timers_gds.stop();
 	thisAgent->timers_gds_cpu_time[thisAgent->current_phase].update(thisAgent->timers_gds);
 #endif
 #endif

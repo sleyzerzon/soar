@@ -938,7 +938,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	stlsoft_processtimes_counter local_timer;
+	soar_process_timer local_timer;
 #endif
 #endif
 
@@ -957,7 +957,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	local_timer.counter.start();
+	local_timer.start();
 #endif
 #endif
 
@@ -1437,7 +1437,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	local_timer.counter.stop();
+	local_timer.stop();
 	thisAgent->timers_chunking_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif
@@ -1450,7 +1450,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 chunking_done: {}
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
-	local_timer.counter.stop();
+	local_timer.stop();
 	thisAgent->timers_chunking_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif

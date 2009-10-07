@@ -201,45 +201,45 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 	AppendArgTagFast(sml_Names::kParamStatsWmeCount,							sml_Names::kTypeInt,	to_string(m_pAgentSoar->num_wmes_in_rete, temp));
 	AppendArgTagFast(sml_Names::kParamStatsWmeCountAverage,						sml_Names::kTypeDouble, to_string((m_pAgentSoar->num_wm_sizes_accumulated ? (m_pAgentSoar->cumulative_wm_size / m_pAgentSoar->num_wm_sizes_accumulated) : 0.0), temp));
 	AppendArgTagFast(sml_Names::kParamStatsWmeCountMax,							sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_wm_size, temp));
-	AppendArgTagFast(sml_Names::kParamStatsKernelCPUTime,						sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_total_kernel_time), temp));
-	AppendArgTagFast(sml_Names::kParamStatsTotalCPUTime,						sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_total_cpu_time), temp));
-	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeInputPhase,					sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE]), temp)); 
-	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeProposePhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE]), temp)); 
-	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeDecisionPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeApplyPhase,					sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE]), temp));  
-	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeOutputPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE]), temp)); 
-	AppendArgTagFast(sml_Names::kParamStatsPhaseTimePreferencePhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[PREFERENCE_PHASE]), temp)); 
-	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeWorkingMemoryPhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[WM_PHASE]), temp)); 
-	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeInputPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeProposePhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeDecisionPhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeApplyPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeOutputPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMonitorTimePreferencePhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[PREFERENCE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeWorkingMemoryPhase,		sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[WM_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsInputFunctionTime,					sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_input_function_cpu_time), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOutputFunctionTime,					sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_output_function_cpu_time), temp));	
-	AppendArgTagFast(sml_Names::kParamStatsMatchTimeInputPhase,					sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_match_cpu_time[INPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMatchTimePreferencePhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_match_cpu_time[PREFERENCE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMatchTimeWorkingMemoryPhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_match_cpu_time[WM_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMatchTimeOutputPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_match_cpu_time[OUTPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMatchTimeDecisionPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_match_cpu_time[DECISION_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMatchTimeProposePhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_match_cpu_time[PROPOSE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsMatchTimeApplyPhase,					sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_match_cpu_time[APPLY_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeInputPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_ownership_cpu_time[INPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimePreferencePhase,		sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_ownership_cpu_time[PREFERENCE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeWorkingMemoryPhase,		sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_ownership_cpu_time[WM_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeOutputPhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_ownership_cpu_time[OUTPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeDecisionPhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_ownership_cpu_time[DECISION_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeProposePhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_ownership_cpu_time[PROPOSE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeApplyPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_ownership_cpu_time[APPLY_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeInputPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_chunking_cpu_time[INPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsChunkingTimePreferencePhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_chunking_cpu_time[PREFERENCE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeWorkingMemoryPhase,		sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_chunking_cpu_time[WM_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeOutputPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_chunking_cpu_time[OUTPUT_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeDecisionPhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_chunking_cpu_time[DECISION_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeProposePhase,			sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_chunking_cpu_time[PROPOSE_PHASE]), temp));
-	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeApplyPhase,				sml_Names::kTypeDouble, to_string(get_timer_seconds(m_pAgentSoar->timers_chunking_cpu_time[APPLY_PHASE]), temp));
+	AppendArgTagFast(sml_Names::kParamStatsKernelCPUTime,						sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_total_kernel_time.get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsTotalCPUTime,						sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_total_cpu_time.get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeInputPhase,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE].get_sec(), temp)); 
+	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeProposePhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE].get_sec(), temp)); 
+	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeDecisionPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeApplyPhase,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE].get_sec(), temp));  
+	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeOutputPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE].get_sec(), temp)); 
+	AppendArgTagFast(sml_Names::kParamStatsPhaseTimePreferencePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_decision_cycle_phase[PREFERENCE_PHASE].get_sec(), temp)); 
+	AppendArgTagFast(sml_Names::kParamStatsPhaseTimeWorkingMemoryPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_decision_cycle_phase[WM_PHASE].get_sec(), temp)); 
+	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeInputPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeProposePhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeDecisionPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeApplyPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeOutputPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMonitorTimePreferencePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[PREFERENCE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeWorkingMemoryPhase,		sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[WM_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsInputFunctionTime,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_input_function_cpu_time.get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOutputFunctionTime,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_output_function_cpu_time.get_sec(), temp));	
+	AppendArgTagFast(sml_Names::kParamStatsMatchTimeInputPhase,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[INPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMatchTimePreferencePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[PREFERENCE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMatchTimeWorkingMemoryPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[WM_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMatchTimeOutputPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[OUTPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMatchTimeDecisionPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[DECISION_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMatchTimeProposePhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[PROPOSE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsMatchTimeApplyPhase,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[APPLY_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeInputPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_ownership_cpu_time[INPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimePreferencePhase,		sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_ownership_cpu_time[PREFERENCE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeWorkingMemoryPhase,		sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_ownership_cpu_time[WM_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeOutputPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_ownership_cpu_time[OUTPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeDecisionPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_ownership_cpu_time[DECISION_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeProposePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_ownership_cpu_time[PROPOSE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsOwnershipTimeApplyPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_ownership_cpu_time[APPLY_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeInputPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[INPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsChunkingTimePreferencePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[PREFERENCE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeWorkingMemoryPhase,		sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[WM_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeOutputPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[OUTPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeDecisionPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[DECISION_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeProposePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[PROPOSE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeApplyPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[APPLY_PHASE].get_sec(), temp));
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsageMiscellaneous,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[MISCELLANEOUS_MEM_USAGE], temp));
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsageHash,						sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[HASH_TABLE_MEM_USAGE], temp));
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsageString,					sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[STRING_MEM_USAGE], temp));
@@ -284,7 +284,7 @@ void CommandLineInterface::GetSystemStats()
 	// Time
 	time_t current_time = time(NULL);
 
-	double total_kernel_time = get_timer_seconds(m_pAgentSoar->timers_total_kernel_time);
+	double total_kernel_time = m_pAgentSoar->timers_total_kernel_time.get_sec();
 	double total_kernel_msec = total_kernel_time * 1000.0;
 
 	/* derived_kernel_time := Total of the time spent in the phases of the decision cycle, 
@@ -292,49 +292,49 @@ void CommandLineInterface::GetSystemStats()
 	This computed time should be roughly equal to total_kernel_time, 
 	as determined above. */
 
-	double derived_kernel_time = get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE] )
-		+ get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE] )
-		+ get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE] )
-		+ get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[PREFERENCE_PHASE] )
-		+ get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[WM_PHASE] )
-		+ get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE] )
-		+ get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE] );
+	double derived_kernel_time = m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE].get_sec()
+		+ m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE].get_sec()
+		+ m_pAgentSoar->timers_decision_cycle_phase[PREFERENCE_PHASE].get_sec()
+		+ m_pAgentSoar->timers_decision_cycle_phase[WM_PHASE].get_sec()
+		+ m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE].get_sec();
 
-	double input_function_time = get_timer_seconds(m_pAgentSoar->timers_input_function_cpu_time);
-	double output_function_time = get_timer_seconds(m_pAgentSoar->timers_output_function_cpu_time);
+	double input_function_time = m_pAgentSoar->timers_input_function_cpu_time.get_sec();
+	double output_function_time = m_pAgentSoar->timers_output_function_cpu_time.get_sec();
 
 	/* Total of the time spent in callback routines. */
-	double monitors_sum = get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[PREFERENCE_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[WM_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE]);
+	double monitors_sum = m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[PREFERENCE_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[WM_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE].get_sec();
 
 	double derived_total_cpu_time = derived_kernel_time + monitors_sum + input_function_time + output_function_time;
 
 	/* Total time spent in the input phase */
-	double input_phase_total_time = get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_input_function_cpu_time);
+	double input_phase_total_time = m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_input_function_cpu_time.get_sec();
 
 	/* Total time spent in the propose phase */
-	double propose_phase_total_time = get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE]);
+	double propose_phase_total_time = m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE].get_sec();
 
 	/* Total time spent in the apply phase */
-	double apply_phase_total_time = get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE]);
+	double apply_phase_total_time = m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE].get_sec();
 
 	/* Total time spent in the output phase */
-	double output_phase_total_time = get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_output_function_cpu_time);
+	double output_phase_total_time = m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE].get_sec()
+		+ m_pAgentSoar->timers_output_function_cpu_time.get_sec();
 
 	/* Total time spent in the decision phase */
-	double decision_phase_total_time = get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE])
-		+ get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE]);
+	double decision_phase_total_time = m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE].get_sec()
+		+ m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE].get_sec();
 
 	/* The sum of these phase timers is exactly equal to the 
 	* derived_total_cpu_time
@@ -364,11 +364,11 @@ void CommandLineInterface::GetSystemStats()
 	m_Result << "========================================================|===========\n";
 
 	m_Result << "Kernel:   "
-		<< std::setw(8)  << get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE] ) << " "
-		<< std::setw(8)  << get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE] ) << " "
-		<< std::setw(8)  << get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE] ) << " "
-		<< std::setw(8)  << get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE] ) << " "
-		<< std::setw(8)  << get_timer_seconds(m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE] ) << "  | "
+		<< std::setw(8)  << m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE].get_sec() << " "
+		<< std::setw(8)  << m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE].get_sec() << " "
+		<< std::setw(8)  << m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE].get_sec() << " "
+		<< std::setw(8)  << m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE].get_sec() << " "
+		<< std::setw(8)  << m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE].get_sec() << "  | "
 		<< std::setw(10) << derived_kernel_time << "\n";
 
 	m_Result << "========================================================|===========\n";
@@ -385,11 +385,11 @@ void CommandLineInterface::GetSystemStats()
 	m_Result << "========================================================|===========\n";
 
 	m_Result << "Callbcks: "
-		<< std::setw(8) << get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE] ) << " "
-		<< std::setw(8) << get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE] ) << " "
-		<< std::setw(8) << get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE] ) << " "
-		<< std::setw(8) << get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE] ) << " "
-		<< std::setw(8) << get_timer_seconds(m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE] ) << "  | "
+		<< std::setw(8) << m_pAgentSoar->timers_monitors_cpu_time[INPUT_PHASE].get_sec() << " "
+		<< std::setw(8) << m_pAgentSoar->timers_monitors_cpu_time[PROPOSE_PHASE].get_sec() << " "
+		<< std::setw(8) << m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE].get_sec() << " "
+		<< std::setw(8) << m_pAgentSoar->timers_monitors_cpu_time[APPLY_PHASE].get_sec() << " "
+		<< std::setw(8) << m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE].get_sec() << "  | "
 		<< std::setw(10) << monitors_sum << "\n";
 
 	m_Result << "========================================================|===========\n";
@@ -408,7 +408,7 @@ void CommandLineInterface::GetSystemStats()
 		<< std::setw(11) << total_kernel_time << " sec. \n";
 
 	m_Result << " Total  CPU Time: "
-		<< std::setw(11) << get_timer_seconds(m_pAgentSoar->timers_total_cpu_time) << " sec.\n\n";
+		<< std::setw(11) << m_pAgentSoar->timers_total_cpu_time.get_sec() << " sec.\n\n";
 
 	///* v8.6.2: print out decisions executed, not # full cycles */
 

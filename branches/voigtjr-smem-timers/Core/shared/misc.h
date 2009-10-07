@@ -200,83 +200,65 @@ struct Dangerous_Pointer_Cast {
 #ifdef WIN32
 #include <winstl/performance/performance_counter.hpp>
 #include <winstl/performance/processtimes_counter.hpp>
+typedef winstl::performance_counter performance_counter;
+typedef winstl::processtimes_counter processtimes_counter;
 #else // WIN32
 #include <unixstl/performance/performance_counter.hpp>
 #include <unixstl/performance/processtimes_counter.hpp>
+typedef unixstl::performance_counter performance_counter;
+typedef unixstl::processtimes_counter processtimes_counter;
 #endif // WIN32
 
-class stlsoft_performance_counter 
+class soar_timer
 {
 public:
-#ifdef WIN32
-	winstl::performance_counter counter;
-	typedef winstl::performance_counter::interval_type interval_type;
-#else // WIN32
-	unixstl::performance_counter counter;
-	typedef unixstl::performance_counter::interval_type interval_type;
-#endif // WIN32
-};
+	virtual void start() = 0;
+	virtual void stop() = 0;
+	virtual void reset() = 0;
+	virtual uint64_t get_usec() = 0;
 
-class stlsoft_processtimes_counter 
-{
-public:
-#ifdef WIN32
-	winstl::processtimes_counter counter;
-	typedef winstl::processtimes_counter::interval_type interval_type;
-#else // WIN32
-	unixstl::processtimes_counter counter;
-	typedef unixstl::processtimes_counter::interval_type interval_type;
-#endif // WIN32
+protected:
+	soar_timer() {}
+	virtual ~soar_timer() {}
 };
 
 template <class C>
-class stlsoft_accumulator
+class soar_timer_impl
+	: public soar_timer
 {
-#ifdef WIN32
 public:
-	typedef typename C::interval_type interval_type;
+	soar_timer_impl() {}
+	~soar_timer_impl() {}
+
+	void start() { timer.start(); }
+	void stop() { timer.stop(); }
+	void reset() { stop(); }
+	uint64_t get_usec() { return static_cast<uint64_t>(timer.get_microseconds()); }
 
 private:
-	C counter;
-#else // WIN32
-public:
-	typedef typename C::interval_type interval_type;
+	C timer;
 
-private:
-	C counter;
-#endif // WIN32
-
-	interval_type total;
-
-	stlsoft_accumulator(const stlsoft_accumulator&) {};
-	stlsoft_accumulator& operator=(const stlsoft_accumulator&) {};
-
-public:
-	stlsoft_accumulator() 
-		: total(0)
-	{
-	}
-
-	void reset()
-	{
-		total = 0;
-	}
-
-	void update(const C& counter)
-	{
-		total += counter.counter.get_microseconds();
-	}
-
-	interval_type get_microseconds()
-	{
-		return total;
-	}
+	soar_timer_impl(const soar_timer_impl&);
+	soar_timer_impl& operator=(const soar_timer_impl&);
 };
 
-template <class C>
-double get_timer_seconds(C& timer)
+typedef soar_timer_impl<performance_counter> soar_wallclock_timer;
+typedef soar_timer_impl<processtimes_counter> soar_process_timer;
+
+class soar_timer_accumulator
 {
-	return timer.get_microseconds() / 1000000.0;
-}
+private:
+	uint64_t total;
+
+public:
+	soar_timer_accumulator() 
+		: total(0) {}
+
+	void reset() { total = 0; }
+	void update(soar_timer& timer) { total += timer.get_usec(); }
+	double get_sec() { return total / 1000000.0; }
+	uint64_t get_usec() { return total; }
+	uint64_t get_msec() { return total / 1000; }
+};
 
 #endif /*MISC_H_*/

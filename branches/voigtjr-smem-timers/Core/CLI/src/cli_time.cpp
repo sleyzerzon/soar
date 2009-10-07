@@ -36,22 +36,20 @@ bool CommandLineInterface::ParseTime(std::vector<std::string>& argv) {
 
 bool CommandLineInterface::DoTime(std::vector<std::string>& argv) {
 
-	stlsoft_performance_counter real;
-	stlsoft_processtimes_counter proc;
+	soar_wallclock_timer real;
+	soar_process_timer proc;
 
-	proc.counter.start();
-	real.counter.start();
+	proc.start();
+	real.start();
 
 	// Execute command
 	bool ret = DoCommandInternal(argv);
 
-	real.counter.stop();
-	proc.counter.stop();
+	real.stop();
+	proc.stop();
 
-	double realElapsed = static_cast<double>(real.counter.get_microseconds());
-	realElapsed /= 1000000.0;
-	double procElapsed = static_cast<double>(proc.counter.get_microseconds());
-	procElapsed /= 1000000.0;
+	double realElapsed = real.get_usec() / 1000000.0;
+	double procElapsed = proc.get_usec() / 1000000.0;
 
 	// Print elapsed time and return
 	if (m_RawOutput) {
