@@ -232,7 +232,7 @@ public:
 
 	void start() { timer.start(); }
 	void stop() { timer.stop(); }
-	void reset() { stop(); }
+	void reset() { start(); stop(); }
 	uint64_t get_usec() { return static_cast<uint64_t>(timer.get_microseconds()); }
 
 private:
