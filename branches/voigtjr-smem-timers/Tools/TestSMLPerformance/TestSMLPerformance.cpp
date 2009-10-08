@@ -22,6 +22,7 @@
 #include "sml_Client.h"
 #include "sml_Connection.h"
 #include "thread_OSspecific.h"
+#include "misc.h"
 
 using namespace sml;
 using namespace std;
@@ -85,19 +86,19 @@ class Environment {
 	int numAgents;
 	int numWmes;
 
-	soar_thread::OSSpecificTimer* m_pTimer ;
+	soar_process_timer m_Timer ;
 
 public:
-	double m_InputTime ;
-	double m_OutputTime ;
+	soar_timer_accumulator m_InputTime ;
+	soar_timer_accumulator m_OutputTime ;
 
 public:
 	Environment(Kernel *kernel, int na, int nw) {
 		numAgents = na;
 		numWmes = nw;
-		m_pTimer = soar_thread::MakeTimer() ;
-		m_InputTime = 0.0 ;
-		m_OutputTime = 0.0 ;
+		m_Timer.reset();
+		m_InputTime.reset();
+		m_OutputTime.reset();
 
 		// Create agents
 		pAgents = new vector<TestAgent*>();
@@ -134,12 +135,13 @@ public:
 	}
 
 	void UpdateAll() {
-		m_pTimer->Start() ;
+		m_Timer.start();
 		UpdateEnvironment();
 		for(int i=0; i<numAgents; i++) {
 			UpdateAgent(i);
 		}
-		m_InputTime += m_pTimer->Elapsed() ;
+		m_Timer.stop();
+		m_InputTime.update(m_Timer);
 	}
 
 	~Environment() {
@@ -148,8 +150,6 @@ public:
 			delete inputs[i];
 		}
 		delete pAgents;
-
-		delete m_pTimer ;
 	}
 
 };
@@ -211,10 +211,9 @@ void RunTest1(int numAgents, int numWmes, int numCycles) {
 	cout << "Num Input Events : " << numInputEvents << endl;
 
 #ifdef PROFILE_CONNECTIONS  // from sml_Connection.h
-	double incoming = kernel->GetConnection()->GetIncomingTime() ;
-	cout << "Incoming time: " << incoming/1000.0 << endl ;
+	cout << "Incoming time (sec): " << kernel->GetConnection()->GetIncomingTime() << endl ;
 #endif
-	cout << "Input time : " << pEnv->m_InputTime/1000.0 << endl ;
+	cout << "Input time (sec)   : " << pEnv->m_InputTime.get_sec() << endl ;
 
 
 	delete pEnv;
@@ -246,8 +245,7 @@ void RunTest2(int numAgents, int numWmes, int numCycles) {
 	cout << "Num Input Events : " << numInputEvents << endl;
 
 #ifdef PROFILE_CONNECTIONS  // from sml_Connection.h
-	double incoming = kernel->GetConnection()->GetIncomingTime() ;
-	cout << "Incoming time: " << incoming/1000.0 << endl ;
+	cout << "Incoming time (sec): " << kernel->GetConnection()->GetIncomingTime() << endl ;
 #endif
 
    // Doesn't make sense to include this, since the time is only updated in Environment::UpdateAll, which isn't used in this test
@@ -281,10 +279,9 @@ void RunTest3(int numAgents, int numWmes, int numCycles) {
 	cout << "Num Input Events : " << numInputEvents << endl;
 
 #ifdef PROFILE_CONNECTIONS  // from sml_Connection.h
-	double incoming = kernel->GetConnection()->GetIncomingTime() ;
-	cout << "Incoming time: " << incoming/1000.0 << endl ;
+	cout << "Incoming time (sec): " << kernel->GetConnection()->GetIncomingTime() << endl ;
 #endif
-	cout << "Input time : " << pEnv->m_InputTime/1000.0 << endl ;
+	cout << "Input time (sec)   : " << pEnv->m_InputTime.get_sec() << endl ;
 
 
 	delete pEnv;
@@ -316,8 +313,7 @@ void RunTest4(int numAgents, int numWmes, int numCycles) {
 	cout << "Num Input Events : " << numInputEvents << endl;
 
 #ifdef PROFILE_CONNECTIONS  // from sml_Connection.h
-	double incoming = kernel->GetConnection()->GetIncomingTime() ;
-	cout << "Incoming time: " << incoming/1000.0 << endl ;
+	cout << "Incoming time (sec): " << kernel->GetConnection()->GetIncomingTime() << endl ;
 #endif
 
    // Doesn't make sense to include this, since the time is only updated in Environment::UpdateAll, which isn't used in this test
