@@ -11,6 +11,23 @@
 || -r, --rete || report statistics about the rete structure ||
 || -s, --system || report the system (agent) statistics (default) ||
 
+== SMem Branch Only ==
+|| -M, --max || report the per-cycle maximum statistics (decision cycle time, WM changes, production fires) ||
+|| -R, --reset || zero out the per-cycle maximum statistics reported by `--max` command  ||
+|| -t, --track || begin tracking the per-cycle maximum statistics reported by `--max` for each cycle (instead of only the max value) ||
+|| c, --cycle || print out collected per-cycle maximum statistics saved by `--track` in human-readable form ||
+|| C, --cycle-csv || print out collected per-cycle maximum statistics saved by `--track` in comma-separated form ||
+|| S, --sort _N_ || sort the tracked cycle stats by column number N ||
+
+=== Tracked Cycle Stats Columns ===
+For use with `--sort` option. *Negative values sorts descending.*
+
+|| 0 || Use default sort ||
+|| 1, -1 || Sort by decision cycle ||
+|| 2, -2 || Sort by DC time ||
+|| 3, -3 || Sort by WM changes ||
+|| 4, -4 || Sort by production firings ||
+
 = Description =
 
 This command prints Soar internal statistics. The argument indicates the component of interest.
