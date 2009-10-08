@@ -79,6 +79,30 @@ performance cost of the timers, all the run time timing calculations
 can be compiled out of the code by defining NO_TIMING_STUFF (in
 soarkernel.h) before compilation.
 
+= Examples =
+Track per-cycle stats then print them out using default sort:
+{{{
+stats --track
+run
+stop
+stats --cycle
+}}}
+
+Print out per-cycle stats sorting by decision cycle time
+{{{
+stats --cycle --sort 2
+}}}
+
+Print out per-cycle stats sorting by firing counts, descending
+{{{
+stats --cycle --sort -4
+}}}
+
+Save per-cycle stats to file `stats.csv`
+{{{
+ctf stats.csv stats --cycle-csv
+}}}
+
 = Default Aliases =
 || Alias || Maps to ||
 || st || stats ||
