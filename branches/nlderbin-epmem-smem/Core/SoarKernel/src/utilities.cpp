@@ -7,11 +7,14 @@
 
 /* utilities.cpp */
 
+#include "misc.h"
+
 #include "stl_support.h"
 #include "utilities.h"
 #include "gdatastructs.h"
 #include "wmem.h"
 #include "print.h"
+#include "xml.h"
 
 #include <time.h>
 
@@ -230,144 +233,8 @@ Symbol *read_identifier_or_context_variable (agent* agnt)
 	return NIL;
 }		
 
-/* ===================================================================
-
-                       Timer Utility Routines
-
-   These are utility routines for using timers.  We use (struct timeval)'s
-   (defined in a system include file) for keeping track of the cumulative
-   time spent in one part of the system or another.  Reset_timer()
-   clears a timer to 0.  Start_timer() and stop_timer() are used for
-   timing an interval of code--the usage is:
-   
-     start_timer (&timeval_to_record_the_start_time_in); 
-     ... other code here ...
-     stop_timer (&timeval_to_record_the_start_time_in,
-                 &timeval_holding_accumulated_time_for_this_code);
-
-   Finally, timer_value() returns the accumulated value of a timer
-   (in seconds).
-=================================================================== */
-#define ONE_MILLION (1000000)
-#define ONE_THOUSAND (1000)
-
-double timer_value (struct timeval *tv) {
-  return tv->tv_sec + tv->tv_usec/static_cast<double>(ONE_MILLION);
-}
-
-unsigned long timer_value_msec (struct timeval *tv) {
-  return tv->tv_sec + tv->tv_usec/ONE_THOUSAND;
-}
-
-void reset_timer (struct timeval *tv_to_reset) {
-  tv_to_reset->tv_sec = 0;
-  tv_to_reset->tv_usec = 0;
-}
-
-#ifndef NO_TIMING_STUFF
-
-#ifdef WIN32
-
-/* A fake implementation of rusage for WIN32. Taken from cygwin. */
-#define RUSAGE_SELF 0
-struct rusage {
-   struct timeval ru_utime;
-   struct timeval ru_stime;
-};
-#define NSPERSEC 10000000LL
-#define FACTOR (0x19db1ded53e8000LL)
-
-static uint64_t
-__to_clock_t (FILETIME * src, int flag)
-{
-  uint64_t total = (static_cast<uint64_t>(src->dwHighDateTime) << 32) + static_cast<uint32_t>(src->dwLowDateTime);
-
-  /* Convert into clock ticks - the total is in 10ths of a usec.  */
-  if (flag)
-    total -= FACTOR;
-  
-  total /= NSPERSEC / CLOCKS_PER_SEC;
-  return total;
-}
-static void totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
-{
-  uint64_t x = __to_clock_t (src, flag);
-
-  x *= ONE_MILLION / CLOCKS_PER_SEC; /* Turn x into usecs */
-  x -= sub * ONE_MILLION;
-  
-  dst->tv_usec = static_cast<long>(x % ONE_MILLION); /* And split */
-  dst->tv_sec = static_cast<long>(x / ONE_MILLION);
-}
-
-int getrusage(int /*who*/, struct rusage* r)
-{
-   FILETIME creation_time = {0,0};
-   FILETIME exit_time = {0,0};
-   FILETIME kernel_time = {0,0};
-   FILETIME user_time = {0,0};
-
-   memset (r, 0, sizeof (*r));
-   GetProcessTimes (GetCurrentProcess(), &creation_time, &exit_time, &kernel_time, &user_time);
-   totimeval (&r->ru_stime, &kernel_time, 0, 0);
-   totimeval (&r->ru_utime, &user_time, 0, 0);
-   return 0;
-}
-#endif // WIN32
-
-void get_cputime_from_rusage (struct rusage *r, struct timeval *dest_tv) {
-  dest_tv->tv_sec = r->ru_utime.tv_sec + r->ru_stime.tv_sec;
-  dest_tv->tv_usec = r->ru_utime.tv_usec + r->ru_stime.tv_usec;
-  if (dest_tv->tv_usec >= ONE_MILLION) {
-    dest_tv->tv_usec -= ONE_MILLION;
-    dest_tv->tv_sec++;
-  }
-}
-
-void start_timer (agent* thisAgent, struct timeval *tv_for_recording_start_time) {
-
-    if(thisAgent && !thisAgent->sysparams[TIMERS_ENABLED]) {
-        return;
-    }
-    struct rusage temp_rusage;
- 
-    getrusage (RUSAGE_SELF, &temp_rusage);
-    get_cputime_from_rusage (&temp_rusage, tv_for_recording_start_time);
-}
-
-void stop_timer (agent* thisAgent,
-struct timeval *tv_with_recorded_start_time,
-struct timeval *tv_with_accumulated_time) {
-
-    if(thisAgent && !thisAgent->sysparams[TIMERS_ENABLED]) {
-        return;
-    }
-
-    struct rusage end_rusage;
-    struct timeval end_tv;
-    long delta_sec, delta_usec;
- 
-    getrusage (RUSAGE_SELF, &end_rusage);
-    get_cputime_from_rusage (&end_rusage, &end_tv);
-
-    delta_sec = end_tv.tv_sec - tv_with_recorded_start_time->tv_sec;
-    delta_usec = end_tv.tv_usec - tv_with_recorded_start_time->tv_usec;
-    if (delta_usec < 0) {
-        delta_usec += ONE_MILLION;
-        delta_sec--;
-    }
-
-    tv_with_accumulated_time->tv_sec += delta_sec;
-    tv_with_accumulated_time->tv_usec += delta_usec;
-    if (tv_with_accumulated_time->tv_usec >= ONE_MILLION) {
-        tv_with_accumulated_time->tv_usec -= ONE_MILLION;
-        tv_with_accumulated_time->tv_sec++;
-    }
-}
-#endif // NO_TIMING_STUFF
-
 #ifdef REAL_TIME_BEHAVIOR
-/* RMJ */
+* RMJ */
 void init_real_time (agent* thisAgent) {
    thisAgent->real_time_tracker =
          (struct timeval *) malloc(sizeof(struct timeval));
@@ -407,7 +274,7 @@ void test_for_input_delay (agent* thisAgent) {
 #endif // REAL_TIME_BEHAVIOR
 
 #ifdef ATTENTION_LAPSE
-/* RMJ */
+* RMJ */
 
 void init_attention_lapse (void) {
    thisAgent->attention_lapse_tracker =
@@ -453,7 +320,7 @@ void determine_lapsing (agent* thisAgent) {
       }
    }
 }
-/* RMJ;
+* RMJ;
    When doing attentional lapsing, we need a function that determines
    when (and for how long) attentional lapses should occur.  This
    will normally be provided as a user-defined TCL procedure.  But

@@ -358,6 +358,9 @@ extern bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string 
 extern std::string *smem_visualize_store( agent *my_agent );
 extern std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth );
 
+typedef struct condition_struct condition;
+typedef struct action_struct action;
+
 extern Bool smem_count_ltis( agent *my_agent, void *item, void *userdata );
 extern bool smem_valid_production( condition *lhs_top, action *rhs_top );
 

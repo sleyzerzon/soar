@@ -193,4 +193,77 @@ struct Dangerous_Pointer_Cast {
 	}
 };
 
+//////////////////////////////////////////////////////////
+// STLSoft Timers
+//////////////////////////////////////////////////////////
+
+#ifdef WIN32
+#include <winstl/performance/performance_counter.hpp>
+typedef winstl::performance_counter performance_counter;
+#define USE_PERFORMANCE_FOR_BOTH 1
+#ifdef USE_PERFORMANCE_FOR_BOTH
+typedef winstl::performance_counter processtimes_counter;	// it turns out this has higher resolution
+#else // USE_PERFORMANCE_FOR_BOTH
+#include <winstl/performance/processtimes_counter.hpp>
+typedef winstl::processtimes_counter processtimes_counter;
+#endif // USE_PERFORMANCE_FOR_BOTH
+#else // WIN32
+#include <unixstl/performance/performance_counter.hpp>
+#include <unixstl/performance/processtimes_counter.hpp>
+typedef unixstl::performance_counter performance_counter;
+typedef unixstl::processtimes_counter processtimes_counter;
+#endif // WIN32
+
+class soar_timer
+{
+public:
+	virtual void start() = 0;
+	virtual void stop() = 0;
+	virtual void reset() = 0;
+	virtual uint64_t get_usec() = 0;
+
+protected:
+	soar_timer() {}
+	virtual ~soar_timer() {}
+};
+
+template <class C>
+class soar_timer_impl
+	: public soar_timer
+{
+public:
+	soar_timer_impl() {}
+	~soar_timer_impl() {}
+
+	void start() { timer.start(); }
+	void stop() { timer.stop(); }
+	void reset() { start(); stop(); }
+	uint64_t get_usec() { return static_cast<uint64_t>(timer.get_microseconds()); }
+
+private:
+	C timer;
+
+	soar_timer_impl(const soar_timer_impl&);
+	soar_timer_impl& operator=(const soar_timer_impl&);
+};
+
+typedef soar_timer_impl<performance_counter> soar_wallclock_timer;
+typedef soar_timer_impl<processtimes_counter> soar_process_timer;
+
+class soar_timer_accumulator
+{
+private:
+	uint64_t total;
+
+public:
+	soar_timer_accumulator() 
+		: total(0) {}
+
+	void reset() { total = 0; }
+	void update(soar_timer& timer) { total += timer.get_usec(); }
+	double get_sec() { return total / 1000000.0; }
+	uint64_t get_usec() { return total; }
+	uint64_t get_msec() { return total / 1000; }
+};
+
 #endif /*MISC_H_*/

@@ -130,7 +130,8 @@ void init_soar_agent(agent* thisAgent) {
 agent * create_soar_agent (char * agent_name) {                                          /* loop index */
   char cur_path[MAXPATHLEN];   /* AGR 536 */
 
-  agent* newAgent = static_cast<agent *>(malloc(sizeof(agent)));
+  //agent* newAgent = static_cast<agent *>(malloc(sizeof(agent)));
+  agent* newAgent = new agent();
 
   newAgent->current_tc_number = 0;
 
@@ -252,26 +253,25 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->lexeme.id_number = 0;
 
   /* Initializing all the timer structures */
-  reset_timer(&(newAgent->start_total_tv));
-  reset_timer(&(newAgent->total_cpu_time));
-  reset_timer(&(newAgent->start_kernel_tv));
-  reset_timer(&(newAgent->start_phase_tv));
-  reset_timer(&(newAgent->total_kernel_time));
+  newAgent->timers_cpu.reset();
+  newAgent->timers_kernel.reset();
+  newAgent->timers_phase.reset();
+  newAgent->timers_total_cpu_time.reset();
+  newAgent->timers_total_kernel_time.reset();
 
-  reset_timer(&(newAgent->input_function_cpu_time));
-  reset_timer(&(newAgent->output_function_cpu_time));
-  reset_timer(&(newAgent->start_gds_tv));
-  reset_timer(&(newAgent->total_gds_time));
+  newAgent->timers_input_function_cpu_time.reset();
+  newAgent->timers_output_function_cpu_time.reset();
+  newAgent->timers_gds.reset();
 
   for (int ii=0;ii < NUM_PHASE_TYPES; ii++) {
-     reset_timer(&(newAgent->decision_cycle_phase_timers[ii]));
-     reset_timer(&(newAgent->monitors_cpu_time[ii]));
-     reset_timer(&(newAgent->ownership_cpu_time[ii]));
-     reset_timer(&(newAgent->chunking_cpu_time[ii]));
-     reset_timer(&(newAgent->match_cpu_time[ii]));
-     reset_timer(&(newAgent->gds_cpu_time[ii]));
+     newAgent->timers_decision_cycle_phase[ii].reset();
+     newAgent->timers_monitors_cpu_time[ii].reset();
+     newAgent->timers_ownership_cpu_time[ii].reset();
+     newAgent->timers_chunking_cpu_time[ii].reset();
+     newAgent->timers_match_cpu_time[ii].reset();
+     newAgent->timers_gds_cpu_time[ii].reset();
   }
-  reset_timer(&(newAgent->decision_cycle_timer));
+  newAgent->timers_decision_cycle.reset();
 
   newAgent->real_time_tracker = 0;
   newAgent->attention_lapse_tracker = 0;

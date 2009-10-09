@@ -304,17 +304,17 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
     // stop the kernel timer while doing RHS funcalls  KJC 11/04
     // the total_cpu timer needs to be updated in case RHS fun is statsCmd
     #ifndef NO_TIMING_STUFF
-    stop_timer (thisAgent, &thisAgent->start_kernel_tv,
-		&thisAgent->total_kernel_time);
-    stop_timer (thisAgent, &thisAgent->start_total_tv,
-		    &thisAgent->total_cpu_time);
-    start_timer (thisAgent, &thisAgent->start_total_tv);
+	thisAgent->timers_kernel.stop();
+	thisAgent->timers_cpu.stop();
+	thisAgent->timers_total_kernel_time.update(thisAgent->timers_kernel);
+	thisAgent->timers_total_cpu_time.update(thisAgent->timers_cpu);
+	thisAgent->timers_cpu.start();
     #endif
 
     result = (*(rf->f))(thisAgent, arglist, rf->user_data);
 
     #ifndef NO_TIMING_STUFF  // restart the kernel timer
-    start_timer (thisAgent, &thisAgent->start_kernel_tv);
+	thisAgent->timers_kernel.start();
     #endif
 
   } else

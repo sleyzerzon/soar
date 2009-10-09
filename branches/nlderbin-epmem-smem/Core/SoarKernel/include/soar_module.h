@@ -26,11 +26,6 @@
 typedef struct wme_struct wme;
 typedef struct preference_struct preference;
 
-double timer_value( struct timeval * );
-void reset_timer( struct timeval * );
-void start_timer( agent*, struct timeval * );
-void stop_timer( agent* ,  struct timeval *, struct timeval * );
-
 // separates this functionality
 // just for Soar modules
 namespace soar_module
@@ -727,8 +722,8 @@ namespace soar_module
 		protected:
 			agent *my_agent;
 			
-			struct timeval start_t;
-			struct timeval total_t;
+			soar_process_timer stopwatch;
+			soar_timer_accumulator accumulator;
 
 			timer_level level;
 			predicate<timer_level> *pred;			
@@ -759,13 +754,13 @@ namespace soar_module
 
 			virtual void reset()
 			{
-				reset_timer( &start_t );
-				reset_timer( &total_t );
+				stopwatch.stop();
+				accumulator.reset();
 			}
 
 			virtual double value()
 			{
-				return timer_value( &total_t );
+				return accumulator.get_sec();
 			}
 
 			//
@@ -773,13 +768,16 @@ namespace soar_module
 			virtual void start()
 			{
 				if ( (*pred)( level ) )
-					start_timer( my_agent, &start_t );
+					stopwatch.start();
 			}
 
 			virtual void stop()
 			{
 				if ( (*pred)( level ) )
-					stop_timer( my_agent, &start_t, &total_t );
+				{
+					stopwatch.stop();
+					accumulator.update(stopwatch);
+				}
 			}
 	};
 

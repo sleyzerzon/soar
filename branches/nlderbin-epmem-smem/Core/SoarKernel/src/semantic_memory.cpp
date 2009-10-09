@@ -23,6 +23,9 @@
 #include "print.h"
 #include "xml.h"
 #include "lexer.h"
+#include "instantiations.h"
+#include "rhsfun.h"
+#include "decide.h"
 
 #include <list>
 #include <map>

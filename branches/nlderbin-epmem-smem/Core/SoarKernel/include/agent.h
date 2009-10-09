@@ -547,30 +547,30 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
    * then these timevals will be just wasted space...
    * Usually they are enabled, so conditional compiles removed. July 05
    */
-  ////#ifndef NO_TIMING_STUFF
-  struct timeval      start_total_tv;
-  struct timeval      total_cpu_time;
-  struct timeval      start_kernel_tv, start_phase_tv;
-  struct timeval      total_kernel_time;
+  soar_process_timer timers_cpu;	// start_total_tv
+  soar_process_timer timers_kernel;	// start_kernel_tv
+  soar_process_timer timers_phase;	// start_phase_tv
 
-  struct timeval      decision_cycle_phase_timers[NUM_PHASE_TYPES];
-  struct timeval      monitors_cpu_time[NUM_PHASE_TYPES]; 
-  struct timeval      input_function_cpu_time; 
-  struct timeval      output_function_cpu_time; 
+  soar_timer_accumulator timers_total_cpu_time;							// total_cpu_time
+  soar_timer_accumulator timers_total_kernel_time;						// total_kernel_time
+  soar_timer_accumulator timers_decision_cycle_phase[NUM_PHASE_TYPES];	// decision_cycle_phase_timers
 
-  struct timeval      decision_cycle_timer; // Used to calculate the maximum amount of decision cycle time
-  unsigned long       max_dc_time_value;    // Holds timer_value of maximum amount of decision cycle time
-  unsigned long       max_dc_time_cycle;    // Holds cycle_count that maximum amount of decision cycle time happened
+  soar_timer_accumulator timers_monitors_cpu_time[NUM_PHASE_TYPES];	// monitors_cpu_time, uses timers_phase
+  soar_timer_accumulator timers_input_function_cpu_time;			// input_function_cpu_time, uses timers_kernel
+  soar_timer_accumulator timers_output_function_cpu_time;			// output_function_cpu_time, uses timers_kernel
+
+  soar_timer_accumulator timers_decision_cycle;	// decision_cycle_timer
+  uint64_t max_dc_time_usec;					// Holds maximum amount of decision cycle time
+  uint64_t max_dc_time_cycle;					// Holds cycle_count that maximum amount of decision cycle time happened
 
   /* accumulated cpu time spent in various parts of the system */
   /* only used if DETAILED_TIMING_STATS is #def'd in kernel.h */
-  struct timeval      ownership_cpu_time[NUM_PHASE_TYPES];
-  struct timeval      chunking_cpu_time[NUM_PHASE_TYPES];
-  struct timeval      match_cpu_time[NUM_PHASE_TYPES];
-  struct timeval      start_gds_tv, total_gds_time; 
-  struct timeval      gds_cpu_time[NUM_PHASE_TYPES];
+  soar_process_timer timers_gds;										// start_gds_tv
+  soar_timer_accumulator timers_ownership_cpu_time[NUM_PHASE_TYPES];	// ownership_cpu_time
+  soar_timer_accumulator timers_chunking_cpu_time[NUM_PHASE_TYPES];		// chunking_cpu_time
+  soar_timer_accumulator timers_match_cpu_time[NUM_PHASE_TYPES];		// match_cpu_time
+  soar_timer_accumulator timers_gds_cpu_time[NUM_PHASE_TYPES];			// gds_cpu_time
   /* REW: end 28.07.96 */
-  ////#endif
 
    /* RMJ */
    /* Keep track of real time steps for constant real-time per decision */

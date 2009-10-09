@@ -44,16 +44,13 @@
 #include "ElementXML.h"
 #include "sml_AnalyzeXML.h"
 #include "sml_Names.h"
+#include "misc.h"
 
 namespace sock
 {
 	// Forward declarations
 	class DataSender ;
 }
-
-namespace soar_thread {
-	class OSSpecificTimer ;
-} 
 
 namespace soarxml
 {
@@ -188,9 +185,9 @@ protected:
 	long		m_InitialTimeTagCounter ;
 
 	// High resolution timer -- useful for profiling
-	soar_thread::OSSpecificTimer*	m_pTimer ;
-	double							m_IncomingTime ;
-	double							m_OutgoingTime ;
+	soar_process_timer		m_Timer ;
+	soar_timer_accumulator	m_IncomingTime ;
+	soar_timer_accumulator	m_OutgoingTime ;
 
 public:
 	Connection() ;
@@ -605,8 +602,8 @@ public:
 	void SetInitialTimeTagCounter(long value)	{ m_InitialTimeTagCounter = value ; }
 	long GetInitialTimeTagCounter()				{ return m_InitialTimeTagCounter ; } 
 
-	double GetIncomingTime() { return m_IncomingTime ; }
-	double GetOutgoingTime() { return m_OutgoingTime ; }
+	double GetIncomingTime() { return m_IncomingTime.get_sec() ; }
+	double GetOutgoingTime() { return m_OutgoingTime.get_sec() ; }
 
 protected:
 	/*************************************************************
