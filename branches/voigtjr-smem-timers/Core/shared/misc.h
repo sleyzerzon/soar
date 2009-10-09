@@ -199,9 +199,14 @@ struct Dangerous_Pointer_Cast {
 
 #ifdef WIN32
 #include <winstl/performance/performance_counter.hpp>
-#include <winstl/performance/processtimes_counter.hpp>
 typedef winstl::performance_counter performance_counter;
+#define USE_PERFORMANCE_FOR_BOTH 1
+#ifdef USE_PERFORMANCE_FOR_BOTH
+typedef winstl::performance_counter processtimes_counter;	// it turns out this has higher resolution
+#else // USE_PERFORMANCE_FOR_BOTH
+#include <winstl/performance/processtimes_counter.hpp>
 typedef winstl::processtimes_counter processtimes_counter;
+#endif // USE_PERFORMANCE_FOR_BOTH
 #else // WIN32
 #include <unixstl/performance/performance_counter.hpp>
 #include <unixstl/performance/processtimes_counter.hpp>
