@@ -114,6 +114,7 @@ These conferences have yet to announce official deadlines:
 
 One-time workshops / symposia:
   * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artificial Agents]
+  * [http://dream.inf.ed.ac.uk/events/wmm-2010 Workshop on Matching and Meaning: Automated development, evolution and interpretation of ontologies]
 
 Recurring workshops / symposia:
   * [http://msoar.org/ Soar Workshop]
