@@ -363,7 +363,7 @@ void reset_statistics (agent* thisAgent) {
   thisAgent->smem_timers->reset();
   thisAgent->timers_decision_cycle.reset();
   thisAgent->max_dc_time_cycle = 0;
-  thisAgent->max_dc_time_usec = 0;
+  thisAgent->max_dc_time_msec = 0;
 }
 
 bool reinitialize_soar (agent* thisAgent) {
@@ -926,9 +926,9 @@ void do_one_top_level_phase (agent* thisAgent)
 
       // Update per-cycle statistics
 	  {
-		  unsigned long dc_time = static_cast<unsigned long>(thisAgent->timers_decision_cycle.get_usec());
-		  if (thisAgent->max_dc_time_usec < dc_time) {
-			  thisAgent->max_dc_time_usec = dc_time;
+		  unsigned long dc_time_msec = static_cast<unsigned long>(thisAgent->timers_decision_cycle.get_msec());
+		  if (thisAgent->max_dc_time_msec < dc_time_msec) {
+			  thisAgent->max_dc_time_msec = dc_time_msec;
 			  thisAgent->max_dc_time_cycle = thisAgent->d_cycle_count;
 		  }
 		  thisAgent->timers_decision_cycle.reset();
@@ -951,7 +951,7 @@ void do_one_top_level_phase (agent* thisAgent)
 
 		  // Commit per-cycle stats to db
 		  if (thisAgent->dc_stat_tracking) {
-			  stats_db_store(thisAgent, dc_time, dc_wm_changes, dc_firing_counts);
+			  stats_db_store(thisAgent, dc_time_msec, dc_wm_changes, dc_firing_counts);
 		  }
 	  }
 

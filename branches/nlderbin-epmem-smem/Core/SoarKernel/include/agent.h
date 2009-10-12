@@ -560,7 +560,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   soar_timer_accumulator timers_output_function_cpu_time;			// output_function_cpu_time, uses timers_kernel
 
   soar_timer_accumulator timers_decision_cycle;	// decision_cycle_timer
-  uint64_t max_dc_time_usec;					// Holds maximum amount of decision cycle time
+  uint64_t max_dc_time_msec;					// Holds maximum amount of decision cycle time
   uint64_t max_dc_time_cycle;					// Holds cycle_count that maximum amount of decision cycle time happened
 
   /* accumulated cpu time spent in various parts of the system */

@@ -246,7 +246,7 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsagePool,						sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[POOL_MEM_USAGE], temp));
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsageStatsOverhead,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[STATS_OVERHEAD_MEM_USAGE], temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeCycle,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_cycle, temp));
-	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeValue,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_usec, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeValue,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_msec, temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleWMChangesCycle,		sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_wm_changes_cycle, temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleWMChangesValue,		sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_wm_changes_value, temp));
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleFireCountCycle,		sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_production_firing_count_cycle, temp));
@@ -268,7 +268,7 @@ void CommandLineInterface::ResetMaxStats()
 	m_pAgentSoar->max_dc_wm_changes_value = 0;
 	m_pAgentSoar->max_dc_wm_changes_cycle = 0;
 	m_pAgentSoar->max_dc_time_cycle = 0;
-	m_pAgentSoar->max_dc_time_usec = 0;
+	m_pAgentSoar->max_dc_time_msec = 0;
 }
 
 void CommandLineInterface::GetSystemStats()
@@ -454,7 +454,7 @@ void CommandLineInterface::GetMaxStats()
 	m_Result << "------------- ----------- -----------\n";
 
 	m_Result << "Time (msec)   "
-		<< std::setw(11) << m_pAgentSoar->max_dc_time_usec / 1000 << " "
+		<< std::setw(11) << m_pAgentSoar->max_dc_time_msec << " "
 		<< std::setw(11) << m_pAgentSoar->max_dc_time_cycle << "\n";
 
 	m_Result << "WM changes    "
