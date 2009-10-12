@@ -17,7 +17,7 @@ table below lists typical conference deadlines by month.
 || *September* || || 
 || *October* || [http://www.cse.yorku.ca/AAMAS2010/ AAMAS], [http://agi-conf.org/2010/ AGI] ||
 || *November* || [http://www.kr.org/KR2010/ KR&R] ||
-|| *December* || ||
+|| *December* || [http://www.brimsconference.org/ BRIMS] ||
 
 = Submission Deadlines =
 
@@ -25,6 +25,7 @@ These deadlines are official for a particular conference year:
   * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010] -- papers due October 13th, 2009
   * [http://agi-conf.org/2010/ AGI 2010] -- papers due October 15th, 2009
   * [http://www.kr.org/KR2010/ KR&R 2010] -- papers due November 30, 2009
+  * [http://www.brimsconference.org/ BRIMS 2010] -- papers due December 21, 2009
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
   * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artifical Agents] -- papers due January 15th, 2010
   * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
@@ -84,9 +85,12 @@ These conferences have yet to announce official deadlines:
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
     * Artificial Intelligence and Interactive Digital Entertainment Conference
     
-  * [http://agi-conf.org/2010/ AGI 2010], TBD: March 5-8, 2010 in Lugano, Switzerland
+  * [http://agi-conf.org/2010/ AGI 2010], March 5-8, 2010 in Lugano, Switzerland
     * Artificial General Intelligence
     * 2011: San Francisco Bay area    
+
+  * [http://www.brimsconference.org/ BRIMS 2010], March 22-25, 2010 in Charleston, SC
+    * Behavior Representation in Modeling & Simulation
     
   * [http://www.kr.org/KR2010/ KR&R 2010], May 9-13, 2010 in Toronto, CA
     * International Conference on the Principles of Knowledge Representation and Reasoning
