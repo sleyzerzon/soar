@@ -2,5 +2,4 @@
 
 = Potential Readings =
 
-[http://bit.ly/rScGq Acquisition of hierarchical reactive skills in a unified cognitive
-architecture], {Pat Langley, Dongkyu Choi, Seth Rogers}, Cog Sys Research, 10, 4, 316-332
+  * [http://bit.ly/rScGq Acquisition of hierarchical reactive skills in a unified CA], {Pat Langley, Dongkyu Choi, Seth Rogers}, Cog Sys Research, 10, 4, 316-332
