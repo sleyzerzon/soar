@@ -5,5 +5,4 @@ public class SoarConfig {
 	public int port = 12121;
 	public String remote = null;
 	public boolean spawn_debuggers = true;
-	public boolean soar_print = false;
 }

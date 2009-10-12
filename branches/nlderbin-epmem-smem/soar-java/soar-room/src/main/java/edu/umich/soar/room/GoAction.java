@@ -12,12 +12,8 @@ public class GoAction extends AbstractGridmap2DAction {
 		super(manager, "Go");
 	}
 	
-	public enum GoType {
-		FOREVER, STEP, TICK;
-	}
-	
 	public interface GoProvider {
-		public GoType getGoType();
+		public boolean isRunForever();
 		public int getQuantity();
 		public double getTimeScale();
 	}
@@ -38,16 +34,10 @@ public class GoAction extends AbstractGridmap2DAction {
 		if (gop == null) {
 			getApplication().doRunForever(gop.getTimeScale());
 		} else {
-			switch (gop.getGoType()) {
-			case FOREVER:
+			if (gop.isRunForever()) {
 				getApplication().doRunForever(gop.getTimeScale());
-				break;
-			case STEP:
-				getApplication().doRunStep(gop.getQuantity(), gop.getTimeScale());
-				break;
-			case TICK:
+			} else {
 				getApplication().doRunTick(gop.getQuantity(), gop.getTimeScale());
-				break;
 			}
 		}
 	}

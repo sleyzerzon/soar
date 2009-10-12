@@ -15,7 +15,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import edu.umich.soar.room.GoAction.GoProvider;
-import edu.umich.soar.room.GoAction.GoType;
 import edu.umich.soar.room.core.Simulation;
 
 public class SimulationControlPanel extends JPanel implements GoProvider {
@@ -25,7 +24,6 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	private JRadioButton jAsyncRadioButton = null;
 	private JPanel jRunPanel = null;
 	private JRadioButton jForeverRadioButton = null;
-	private JRadioButton jStepsRadioButton = null;
 	private JRadioButton jTicksRadioButton = null;
 	private JTextField jQuantityTextField = null;
 	private JButton jRunButton = null;
@@ -42,7 +40,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	private ButtonGroup runButtonGroup = new ButtonGroup(); 
 	
 	private final String KEY_RUN_QTY = "runQty";
-	private final String KEY_RUN_TYPE = "runType"; 
+	private final String KEY_RUN_FOREVER = "runForever"; 
 	private final Simulation sim;
 	private final Preferences pref;
 	private final ActionManager am;
@@ -59,15 +57,14 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		initialize();
 
         int runQty = pref.getInt(KEY_RUN_QTY, 1);
-    	int runType = pref.getInt(KEY_RUN_TYPE, 0);
+    	boolean runForever = pref.getBoolean(KEY_RUN_FOREVER, true);
 
 		jAsyncRadioButton.setSelected(this.sim.getCogArch().isAsync());
 		jSyncRadioButton.setSelected(!this.sim.getCogArch().isAsync());
 		
 		jQuantityTextField.setText(Integer.toString(runQty));
-		jForeverRadioButton.setSelected(runType == 0);
-		jStepsRadioButton.setSelected(runType == 1);
-		jTicksRadioButton.setSelected(runType == 2);
+		jForeverRadioButton.setSelected(runForever);
+		jTicksRadioButton.setSelected(!runForever);
 		
 		jDelaySlider.setValue(100);
 
@@ -121,8 +118,12 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		if (jSyncRadioButton == null) {
 			jSyncRadioButton = new JRadioButton();
 			jSyncRadioButton.setText("Synchronous");
+			jSyncRadioButton.addChangeListener(new javax.swing.event.ChangeListener() {
+				public void stateChanged(javax.swing.event.ChangeEvent e) {
+					typeChanged();
+				}
+			});
 			typeButtonGroup.add(jSyncRadioButton);
-			jSyncRadioButton.setEnabled(false);
 		}
 		return jSyncRadioButton;
 	}
@@ -136,7 +137,6 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		if (jAsyncRadioButton == null) {
 			jAsyncRadioButton = new JRadioButton();
 			jAsyncRadioButton.setText("Asynchronous");
-			jAsyncRadioButton.setSelected(true);
 			jAsyncRadioButton.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
 					typeChanged();
@@ -182,10 +182,6 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			gridBagConstraints5.gridx = 1;
 			gridBagConstraints5.anchor = GridBagConstraints.WEST;
 			gridBagConstraints5.gridy = 2;
-			GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
-			gridBagConstraints4.gridx = 1;
-			gridBagConstraints4.anchor = GridBagConstraints.WEST;
-			gridBagConstraints4.gridy = 1;
 			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
 			gridBagConstraints3.gridx = 1;
 			gridBagConstraints3.anchor = GridBagConstraints.WEST;
@@ -194,7 +190,6 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			jRunPanel.setLayout(new GridBagLayout());
 			jRunPanel.setBorder(BorderFactory.createTitledBorder("Run"));
 			jRunPanel.add(getJForeverRadioButton(), gridBagConstraints3);
-			jRunPanel.add(getJStepsRadioButton(), gridBagConstraints4);
 			jRunPanel.add(getJTicksRadioButton(), gridBagConstraints5);
 			jRunPanel.add(getJQuantityTextField(), gridBagConstraints6);
 			jRunPanel.add(getJGoButton(), gridBagConstraints7);
@@ -226,25 +221,6 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	
 	private void foreverChanged() {
 		jQuantityTextField.setEnabled(!jForeverRadioButton.isSelected());
-	}
-
-	/**
-	 * This method initializes jStepsRadioButton	
-	 * 	
-	 * @return javax.swing.JRadioButton	
-	 */
-	private JRadioButton getJStepsRadioButton() {
-		if (jStepsRadioButton == null) {
-			jStepsRadioButton = new JRadioButton();
-			jStepsRadioButton.setText("Steps");
-			runButtonGroup.add(jStepsRadioButton);
-			jStepsRadioButton.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					jQuantityTextField.setEnabled(true);
-				}
-			});
-		}
-		return jStepsRadioButton;
 	}
 
 	/**
@@ -433,18 +409,15 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			pref.putInt(KEY_RUN_QTY, 0);
 		}
 		
-    	pref.putInt(KEY_RUN_TYPE, getGoType().ordinal());
+    	pref.putBoolean(KEY_RUN_FOREVER, runButtonGroup.isSelected(jTicksRadioButton.getModel()));
 	}
 
 	@Override
-	public GoType getGoType() {
-		GoType gt = GoType.FOREVER;
-		if (runButtonGroup.isSelected(jStepsRadioButton.getModel())) {
-			gt = GoType.STEP;
-		} else if (runButtonGroup.isSelected(jTicksRadioButton.getModel())) {
-			gt = GoType.TICK;
+	public boolean isRunForever() {
+		if (runButtonGroup.isSelected(jTicksRadioButton.getModel())) {
+			return false;
 		}
-		return gt;
+		return true;
 	}
 
 	@Override

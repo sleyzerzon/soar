@@ -349,10 +349,6 @@ public class Application extends JPanel implements Adaptable {
 		sim.run(Simulation.RUN_FOREVER, timeScale);
 	}
 	
-	void doRunStep(int quantity, double timeScale) {
-		sim.run(quantity, timeScale);
-	}
-	
 	void doRunTick(int quantity, double timeScale) {
 		sim.run(quantity, timeScale);
 	}

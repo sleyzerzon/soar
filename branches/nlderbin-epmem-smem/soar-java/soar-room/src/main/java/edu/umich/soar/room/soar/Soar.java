@@ -30,6 +30,7 @@ import edu.umich.soar.room.core.CognitiveArchitecture;
 import edu.umich.soar.room.core.Names;
 import edu.umich.soar.room.core.Simulation;
 import edu.umich.soar.room.core.events.AfterTickEvent;
+import edu.umich.soar.room.core.events.BeforeTickEvent;
 import edu.umich.soar.room.core.events.ResetEvent;
 import edu.umich.soar.room.core.events.StartEvent;
 import edu.umich.soar.room.core.events.StopEvent;
@@ -42,7 +43,6 @@ import edu.umich.soar.room.map.RoomWorld;
 import sml.Agent;
 import sml.ConnectionInfo;
 import sml.Kernel;
-import sml.smlPrintEventId;
 import sml.smlUpdateEventId;
 import sml.sml_Names;
 
@@ -66,7 +66,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	private final Map<String, AgentData> agents = new HashMap<String, AgentData>();
 	private final Map<String, ClientConfig> clients;
 	private final int maxMemoryUsage;
-	private final boolean soarPrint;
 	private final int port;
 	private boolean debug;
 	private final Simulation sim;
@@ -88,7 +87,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 		this.clients = sim.getConfig().clientConfigs();
 		this.maxMemoryUsage = config.max_memory_usage;
-		this.soarPrint = config.soar_print;
 		this.port = config.port;
 		this.debug = config.spawn_debuggers;
 		this.pref = Application.PREFERENCES.node("soar");
@@ -122,6 +120,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		// Register for Sim events
 		sim.getEvents().addListener(StartEvent.class, this);
 		sim.getEvents().addListener(StopEvent.class, this);
+		sim.getEvents().addListener(BeforeTickEvent.class, this);
 		sim.getEvents().addListener(AfterTickEvent.class, this);
 		sim.getEvents().addListener(ResetEvent.class, this);
 	}
@@ -262,44 +261,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 	}
 
-	/**
-	 * Logger for Kernel print events
-	 * 
-	 * @author Scott Lathrop
-	 * 
-	 */
-	private PrintLogger getLogger() {
-		return PrintLogger.getLogger();
-	}
-
-	private static class PrintLogger implements Agent.PrintEventInterface {
-		protected static PrintLogger m_Logger = null;
-
-		public static PrintLogger getLogger() {
-			if (m_Logger == null) {
-				m_Logger = new PrintLogger();
-			}
-
-			return m_Logger;
-		}
-
-		/**
-		 * @brief - callback from SoarKernel for print events
-		 */
-		@Override
-		public void printEventHandler(int eventID, Object data, Agent agent,
-				String message) {
-			if (eventID == smlPrintEventId.smlEVENT_PRINT.swigValue()) {
-				logger.info(message);
-			}
-
-		} // SoarAgentprintEventHandler
-
-		private PrintLogger() {
-		}
-
-	} // Logger
-
 	private Agent createSoarAgent(String name, String productions, boolean spawnDebuggers) {
 		Agent agent = kernel.CreateAgent(name);
 		if (agent == null) {
@@ -322,12 +283,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		if (maxmem > 0) {
 			agent.ExecuteCommandLine("max-memory-usage "
 					+ Integer.toString(maxmem));
-		}
-
-		// Scott Lathrop -- register for print events
-		if (soarPrint) {
-			agent.RegisterForPrintEvent(smlPrintEventId.smlEVENT_PRINT,
-					getLogger(), null, true);
 		}
 
 		// save the agent
@@ -426,7 +381,10 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 
 	private BlockingQueue<Boolean> inputReady = new SynchronousQueue<Boolean>();
 	private BlockingQueue<Boolean> inputProcessed = new SynchronousQueue<Boolean>();
-
+	private BlockingQueue<Boolean> tickReady = new SynchronousQueue<Boolean>();
+	private BlockingQueue<Boolean> tickProcessed = new SynchronousQueue<Boolean>();
+	private boolean firstUpdate = false;
+	
 	@Override
 	public void onEvent(SimEvent event) {
 		try {
@@ -439,7 +397,9 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 					logger.trace("Ignoring event due to interrupted flag");
 					return;
 				}
-				if (event instanceof AfterTickEvent) {
+				if (event instanceof BeforeTickEvent) {
+					onBeforeTickEvent();
+				} else if (event instanceof AfterTickEvent) {
 					onAfterTickEvent();
 				} else if (event instanceof StopEvent) {
 					onStopEvent();
@@ -455,6 +415,7 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 	
 	private void onStartEvent() {
+		firstUpdate = true;
 		interrupted.set(false);
 		if (agents.size() != 0) {
 			exec.submit(new Callable<Void>() {
@@ -480,6 +441,21 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		}
 	}
 	
+	private void onBeforeTickEvent() throws InterruptedException {
+		if (async) {
+			return;
+		}
+		
+        logger.trace("onBeforeTickEvent tickReady");
+        tickReady.put(Boolean.TRUE);
+        if (interrupted.get()) {
+                logger.trace("onBeforeTickEvent interrupted flag is set");
+                return;
+        }
+        logger.trace("onBeforeTickEvent wait for tickProcessed");
+        tickProcessed.take();
+	}
+	
 	private void onAfterTickEvent() throws InterruptedException {
 		logger.trace("onAfterTickEvent inputReady");
 		inputReady.put(Boolean.TRUE);
@@ -492,8 +468,13 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 	
 	private void onStopEvent() throws InterruptedException {
-		logger.trace("StopEvent inputReady");
-		inputReady.put(Boolean.FALSE);
+		if (async) {
+			logger.trace("StopEvent inputReady");
+			inputReady.put(Boolean.FALSE);
+		} else {
+			logger.trace("StopEvent tickReady");
+			tickReady.put(Boolean.FALSE);
+		}
 	}
 	
 	private AtomicBoolean interrupted = new AtomicBoolean();
@@ -504,29 +485,11 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		long id = Stopwatch.start("Soar", "updateEventHandler");
 		logger.trace("Soar update " + ++updateCount);
 		try {
-			Boolean go = inputReady.poll();
-			if (go == null) {
-				return;
-			} else if (go == Boolean.FALSE) {
-				logger.trace("Soar update stop");
-				stop();
-				return;
+			if (async) {
+				asynchronousUpdate();
+			} else {
+				synchronousUpdate();
 			}
-
-			for (AgentData ad : agents.values()) {
-				logger.trace("Soar update processing output for " + ad.agent.GetAgentName());
-				ad.sa.processSoarOuput();
-				logger.trace("Soar updating input for " + ad.agent.GetAgentName());
-				ad.sa.updateSoarInput();
-				boolean commitResult = ad.agent.Commit();
-				if (!commitResult) {
-					assert false;
-				}
-			}
-
-			logger.trace("Soar inputProcessed");
-			inputProcessed.put(Boolean.TRUE);
-
 		} catch (InterruptedException e) {
 			logger.trace("Soar update interrupted");
 			interrupted.set(true);
@@ -535,6 +498,63 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 			flushLocks();
 		} finally {
 			Stopwatch.stop(id);	
+		}
+	}
+	
+	private void asynchronousUpdate() throws InterruptedException {
+		Boolean go = inputReady.poll();
+		if (go == null) {
+			return;
+		} else if (go == Boolean.FALSE) {
+			logger.trace("Soar update stop");
+			stop();
+			return;
+		}
+
+		for (AgentData ad : agents.values()) {
+			logger.trace("Soar update processing output for " + ad.agent.GetAgentName());
+			ad.sa.processSoarOuput();
+			logger.trace("Soar updating input for " + ad.agent.GetAgentName());
+			ad.sa.updateSoarInput();
+			boolean commitResult = ad.agent.Commit();
+			if (!commitResult) {
+				assert false;
+			}
+		}
+
+		logger.trace("Soar inputProcessed");
+		inputProcessed.put(Boolean.TRUE);
+	}
+	
+	private void synchronousUpdate() throws InterruptedException {
+        if (firstUpdate) {
+            logger.trace("Soar synch update first update");
+            firstUpdate = false;
+            tickReady.take();
+		}
+		
+		for (AgentData ad : agents.values()) {
+		        logger.trace("Soar synch update processing output for " + ad.agent.GetAgentName());
+		        ad.sa.processSoarOuput();
+		}
+		tickProcessed.put(Boolean.TRUE);
+		
+		logger.trace("Soar synch wait inputReady");
+		inputReady.take();
+		for (AgentData ad : agents.values()) {
+		        logger.trace("Soar synch updating input for " + ad.agent.GetAgentName());
+		        ad.sa.updateSoarInput();
+		        ad.agent.Commit();
+		}
+		logger.trace("Soar synch inputProcessed");
+		inputProcessed.put(Boolean.TRUE);
+		
+		logger.trace("Soar synch wait tickReady");
+		Boolean go = tickReady.take();
+		if (go == Boolean.FALSE) {
+		        logger.trace("Soar synch update sync stop");
+		        stop();
+		        return;
 		}
 	}
 	
