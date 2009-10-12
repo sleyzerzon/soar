@@ -104,13 +104,14 @@ public class SoarRobotInputLinkManager {
 		return selfIL.getMessagesIL();
 	}
 
+	public static final long FIFTY_MSEC_IN_NANOS = 50000000L;
 	public void update(Robot player, RoomWorld world, RoomMap roomMap,
 			boolean floatYawWmes) {
 		
 		configurationIL.update();
 		// FIXME: should be configurable
 		//timeIL.update();
-		runtime += sim.getTickMSec() * 1000000L;
+		runtime += FIFTY_MSEC_IN_NANOS; 
 		timeIL.updateExact(runtime);
 		selfIL.update(player);
 		

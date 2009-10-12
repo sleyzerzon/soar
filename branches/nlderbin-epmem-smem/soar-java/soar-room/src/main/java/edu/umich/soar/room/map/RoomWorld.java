@@ -167,7 +167,7 @@ public class RoomWorld implements SendMessagesInterface {
 			WorldUtil.checkStopSim(sim, stopMessages, command.isStopSim(), player);
 		}
 		
-		moveRoomPlayers(sim.getTickMSec() / 1000.0);
+		moveRoomPlayers();
 		
 		for (Message message : messages) {
 			message.recipient.getReceiveMessagesInterface().newMessage(message.from, message.tokens);
@@ -175,7 +175,7 @@ public class RoomWorld implements SendMessagesInterface {
 		messages.clear();
 	}
 
-	private void moveRoomPlayers(double time) {
+	private void moveRoomPlayers() {
 		for (Robot player : players.getAll()) {
 			RobotCommand command = players.getCommand(player);	
 			RobotState state = player.getState();
@@ -220,7 +220,7 @@ public class RoomWorld implements SendMessagesInterface {
 			state.setCollisionX(false);
 			state.setCollisionY(false);
 
-			roomMovePlayer(player, time);
+			roomMovePlayer(player);
 		}
 	}
 
@@ -231,12 +231,12 @@ public class RoomWorld implements SendMessagesInterface {
 		return false;
 	}
 	
-	private void roomMovePlayer(Robot player, double time) {
+	private void roomMovePlayer(Robot player) {
 		int [] oldLocation = player.getState().getLocation();
 		int [] newLocation = Arrays.copyOf(oldLocation, oldLocation.length);
 
 		RobotState state = player.getState();
-		state.update(time);
+		state.update();
 		pose_t pose = state.getPose();
 		
 		newLocation[0] = (int)pose.pos[0] / CELL_SIZE;

@@ -2,6 +2,8 @@ package edu.umich.soar.room.map;
 
 import java.util.Arrays;
 
+import edu.umich.soar.room.core.Simulation;
+
 
 import jmat.LinAlg;
 import jmat.MathUtil;
@@ -67,7 +69,7 @@ public class RobotState implements CarryInterface {
 		return MathUtil.mod2pi(LinAlg.quatToRollPitchYaw(pose.orientation)[2]);
 	}
 	
-	public void update(double elapsed) {
+	public void update() {
 		// rotate
 		double[] rpy = LinAlg.quatToRollPitchYaw(pose.orientation);
 		rpy[2] = MathUtil.mod2pi(rpy[2]);
@@ -81,7 +83,7 @@ public class RobotState implements CarryInterface {
 				pose.rotation_rate[2] = destYawSpeed;
 			}
 		}
-		double change = pose.rotation_rate[2] * elapsed;
+		double change = pose.rotation_rate[2] * (Simulation.TICK_ELAPSED_MSEC / 1000.0);
 		if (hasDestYaw) {
 			if (Math.abs(change) > Math.abs(togo)) {
 				change = togo;
@@ -96,7 +98,7 @@ public class RobotState implements CarryInterface {
 		pose.orientation = LinAlg.rollPitchYawToQuat(rpy);
 
 		// translate
-		LinAlg.add(pose.pos, LinAlg.scale(pose.vel, elapsed), pose.pos);
+		LinAlg.add(pose.pos, LinAlg.scale(pose.vel, (Simulation.TICK_ELAPSED_MSEC / 1000.0)), pose.pos);
 	}
 	
 	public void setAngularVelocity(double angvel) {

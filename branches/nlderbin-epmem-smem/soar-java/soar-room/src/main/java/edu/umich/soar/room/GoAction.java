@@ -19,6 +19,7 @@ public class GoAction extends AbstractGridmap2DAction {
 	public interface GoProvider {
 		public GoType getGoType();
 		public int getQuantity();
+		public double getTimeScale();
 	}
 	
 	public void setGoProvider(GoProvider gop) {
@@ -35,17 +36,17 @@ public class GoAction extends AbstractGridmap2DAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (gop == null) {
-			getApplication().doRunForever();
+			getApplication().doRunForever(gop.getTimeScale());
 		} else {
 			switch (gop.getGoType()) {
 			case FOREVER:
-				getApplication().doRunForever();
+				getApplication().doRunForever(gop.getTimeScale());
 				break;
 			case STEP:
-				getApplication().doRunStep(gop.getQuantity());
+				getApplication().doRunStep(gop.getQuantity(), gop.getTimeScale());
 				break;
 			case TICK:
-				getApplication().doRunTick(gop.getQuantity());
+				getApplication().doRunTick(gop.getQuantity(), gop.getTimeScale());
 				break;
 			}
 		}

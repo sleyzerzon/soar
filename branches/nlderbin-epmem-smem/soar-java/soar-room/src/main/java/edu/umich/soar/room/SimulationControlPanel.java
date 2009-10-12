@@ -69,7 +69,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		jStepsRadioButton.setSelected(runType == 1);
 		jTicksRadioButton.setSelected(runType == 2);
 		
-		jDelaySlider.setValue(this.sim.getTickMSec());
+		jDelaySlider.setValue(100);
 
 		foreverChanged();
 		delayChanged();
@@ -380,7 +380,6 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			gridBagConstraints12.gridx = 0;
 			gridBagConstraints12.gridy = 1;
 			jMsecPerTickLabel = new JLabel();
-			jMsecPerTickLabel.setText("msec per tick");
 			GridBagConstraints gridBagConstraints11 = new GridBagConstraints();
 			gridBagConstraints11.fill = GridBagConstraints.VERTICAL;
 			gridBagConstraints11.gridy = 0;
@@ -388,7 +387,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			gridBagConstraints11.gridx = 0;
 			jDelayPanel = new JPanel();
 			jDelayPanel.setLayout(new GridBagLayout());
-			jDelayPanel.setBorder(BorderFactory.createTitledBorder("Delay"));
+			jDelayPanel.setBorder(BorderFactory.createTitledBorder("Simulation Speed"));
 
 			jDelayPanel.add(getJDelaySlider(), gridBagConstraints11);
 			jDelayPanel.add(jMsecPerTickLabel, gridBagConstraints12);
@@ -404,10 +403,10 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	private JSlider getJDelaySlider() {
 		if (jDelaySlider == null) {
 			jDelaySlider = new JSlider();
-			jDelaySlider.setValue(50);
-			jDelaySlider.setExtent(10);
-			jDelaySlider.setMaximum(510);
-			jDelaySlider.setMinimum(10);
+			jDelaySlider.setValue(100);
+			jDelaySlider.setExtent(25);
+			jDelaySlider.setMaximum(500);
+			jDelaySlider.setMinimum(0);
 			jDelaySlider.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
 					delayChanged();
@@ -417,9 +416,14 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		return jDelaySlider;
 	}
 	
+	@Override
+	public double getTimeScale() {
+		return jDelaySlider.getValue() / 100.0;
+	}
+	
 	private void delayChanged() {
-		jMsecPerTickLabel.setText(Integer.toString(jDelaySlider.getValue()) + " msec per tick");
-		sim.setTickMSec(jDelaySlider.getValue());
+		double timeScale = getTimeScale();
+		jMsecPerTickLabel.setText(String.format("%1.1f", timeScale) + "x real");
 	}
 
 	public void dispose() {

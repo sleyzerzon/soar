@@ -67,7 +67,7 @@ public class Application extends JPanel implements Adaptable {
 				});
 				
 				sim.addInitialPlayers();
-				sim.run();
+				sim.run(Simulation.RUN_FOREVER, Simulation.RUN_FULL_SPEED);
 				
 				try {
 					doneQueue.take();
@@ -345,16 +345,16 @@ public class Application extends JPanel implements Adaptable {
 		cpd.setVisible(true);
 	}
 	
-	void doRunForever() {
-		sim.run();
+	void doRunForever(double timeScale) {
+		sim.run(Simulation.RUN_FOREVER, timeScale);
 	}
 	
-	void doRunStep(int quantity) {
-		sim.step(quantity);
+	void doRunStep(int quantity, double timeScale) {
+		sim.run(quantity, timeScale);
 	}
 	
-	void doRunTick(int quantity) {
-		sim.step(quantity);
+	void doRunTick(int quantity, double timeScale) {
+		sim.run(quantity, timeScale);
 	}
 	
 }

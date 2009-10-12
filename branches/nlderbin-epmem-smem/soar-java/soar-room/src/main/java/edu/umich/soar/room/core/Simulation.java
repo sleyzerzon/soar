@@ -10,13 +10,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.prefs.Preferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.umich.soar.robot.SendMessagesInterface;
-import edu.umich.soar.room.Application;
 import edu.umich.soar.room.config.PlayerConfig;
 import edu.umich.soar.room.config.SimConfig;
 import edu.umich.soar.room.core.events.AfterTickEvent;
@@ -50,8 +48,7 @@ public class Simulation {
 	private CognitiveArchitecture cogArch;
 	private int worldCount;
 	private SimConfig config;
-	private Preferences pref;
-	private final String KEY_TICK_MSEC = "tickMsec";
+	//private Preferences pref;
 	
 	public RoomWorld initialize(SimConfig config) {
 		this.config = config;
@@ -76,8 +73,7 @@ public class Simulation {
 		}
 		changeMap(map);
 		
-		this.pref = Application.PREFERENCES.node("simulation");
-		tickMsec = pref.getInt(KEY_TICK_MSEC, 50);
+		//this.pref = Application.PREFERENCES.node("simulation");
 
 		return world;
 	}
@@ -168,8 +164,6 @@ public class Simulation {
 	}
 
 	public void shutdown() {
-		pref.putInt(KEY_TICK_MSEC, tickMsec);
-		
 		exec.shutdown();
 		try {
 			// The delay is high here so that headless runs can complete.
@@ -198,7 +192,7 @@ public class Simulation {
 		// thread that won't shut down. This allows everything else to shut down
 		// before killing itself off.
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(3000);
 		} catch (InterruptedException ignored) {
 		}
 		System.exit(0);
@@ -225,16 +219,11 @@ public class Simulation {
 	private AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private SimEventManager eventManager = new SimEventManager();
 	private BlockingQueue<Boolean> canceller = new SynchronousQueue<Boolean>();
-	
-	public void run() {
-		run(0,tickMsec,TimeUnit.MILLISECONDS);
-	}
-	
-	public void step(int quantity) {
-		run(quantity,0,null);
-	}
-	
-	private void run(final int ticks, final long period, final TimeUnit unit) {
+	public static final int RUN_FOREVER = 0;
+	public static final double RUN_FULL_SPEED = 0;
+	public static final double RUN_NORMAL_SPEED = 1;
+
+	public void run(final int ticks, final double timeScale) {
 		if (!running.getAndSet(true)) {
 			stopRequested.set(false);
 			exec.submit(new Runnable() {
@@ -244,44 +233,31 @@ public class Simulation {
 					eventManager.fireEvent(new StartEvent());
 					
 					final int initialWorldCount = worldCount;
+					long period = Math.round(TICK_ELAPSED_MSEC / timeScale);
 					
-					if (period <= 0) {
-						do {
+					final ScheduledFuture<?> ticker = schexec.scheduleWithFixedDelay(new Runnable() {
+						
+						@Override
+						public void run() {
+							if (stopRequested.get()) {
+								canceller.offer(Boolean.TRUE);
+								return;
+							}
 							tick();
 							if (ticks > 0) {
 								if (worldCount - initialWorldCount >= ticks) {
 									logger.trace("requesting stop due to tick count");
-									stopRequested.set(true);
-								}
-							}
-						} while(!stopRequested.get());
-						logger.trace("ending tick loop due to stop request");
-						
-					} else {
-						final ScheduledFuture<?> ticker = schexec.scheduleWithFixedDelay(new Runnable() {
-							
-							@Override
-							public void run() {
-								if (stopRequested.get()) {
 									canceller.offer(Boolean.TRUE);
-									return;
-								}
-								tick();
-								if (ticks > 0) {
-									if (worldCount - initialWorldCount >= ticks) {
-										logger.trace("requesting stop due to tick count");
-										canceller.offer(Boolean.TRUE);
-									}
 								}
 							}
-						}, period, period, unit);
-						
-						try {
-							canceller.take();
-						} catch (InterruptedException e) {
-						} finally {
-							ticker.cancel(false);
 						}
+					}, period, period, TimeUnit.MILLISECONDS);
+					
+					try {
+						canceller.take();
+					} catch (InterruptedException e) {
+					} finally {
+						ticker.cancel(false);
 					}
 					
 					running.set(false);
@@ -372,14 +348,7 @@ public class Simulation {
 		eventManager.fireEvent(new InfoEvent(title, message));
 	}
 
-	int tickMsec;
-	public int getTickMSec() {
-		return tickMsec;
-	}
-
-	public void setTickMSec(int setting) {
-		tickMsec = setting;
-	}
+	public static final int TICK_ELAPSED_MSEC = 50;
 
 	public RoomWorld getWorld() {
 		return world;
