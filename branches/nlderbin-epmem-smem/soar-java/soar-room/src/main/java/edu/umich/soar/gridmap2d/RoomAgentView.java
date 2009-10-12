@@ -2,11 +2,14 @@ package edu.umich.soar.gridmap2d;
 
 import java.awt.BorderLayout;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 
@@ -20,6 +23,8 @@ import edu.umich.soar.gridmap2d.selection.SelectionListener;
 import edu.umich.soar.gridmap2d.selection.SelectionManager;
 import edu.umich.soar.gridmap2d.selection.SelectionProvider;
 import edu.umich.soar.gridmap2d.selection.TableSelectionProvider;
+import edu.umich.soar.robot.SendMessages;
+import edu.umich.soar.robot.SendMessagesInterface;
 
 public class RoomAgentView extends AbstractAgentView implements SelectionListener {
 	
@@ -30,6 +35,8 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
     private final JXTable table;
 	private final JLabel properties = new JLabel();
 	private final TableSelectionProvider selectionProvider;
+	private final JTextField commInput = new JTextField();
+	private final SendMessagesInterface sendMessages;
 	
     public RoomAgentView(Adaptable app) {
         super("roomAgentView", "Agent View");
@@ -37,6 +44,8 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
 
         this.sim = Adaptables.adapt(app, Simulation.class);
         Adaptables.adapt(app, Application.class).getSelectionManager().addListener(this);
+
+        this.sendMessages = Adaptables.adapt(app, SendMessagesInterface.class);
         
         this.model = new RobotTableModel(this.sim);
         this.model.initialize();
@@ -64,8 +73,37 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         properties.setHorizontalAlignment(LEFT);
         properties.setVerticalAlignment(TOP);
         p.add(properties, BorderLayout.CENTER);
-        
+
+        final JPanel commPanel = new JPanel(new BorderLayout());
+        commPanel.setBorder(BorderFactory.createTitledBorder("Direct Communication"));
+        commInput.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyTyped(java.awt.event.KeyEvent e) {
+				if (e.getKeyChar() == '\n') {
+					e.consume();
+					sendMessage();
+				}
+			}
+		});
+
+        commPanel.add(commInput, BorderLayout.CENTER);
+        final JButton commSend = new JButton("Send");
+        commSend.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				sendMessage();
+			}
+        });
+        commPanel.add(commSend, BorderLayout.EAST);
+
+        p.add(commPanel, BorderLayout.SOUTH);
         setContentPane(p);
+    }
+    
+    private void sendMessage() {
+    	List<String> tokens = SendMessages.toTokens(commInput.getText());
+    	if (!tokens.isEmpty()) {
+    		sendMessages.sendMessage("operator", null, tokens);
+    		commInput.setText("");
+    	}
     }
     
     private void updateRobotProperties() {

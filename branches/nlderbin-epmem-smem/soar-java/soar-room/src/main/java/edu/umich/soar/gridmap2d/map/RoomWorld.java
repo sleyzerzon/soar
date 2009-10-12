@@ -2,9 +2,9 @@ package edu.umich.soar.gridmap2d.map;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import jmat.LinAlg;
 
@@ -29,7 +29,7 @@ public class RoomWorld implements SendMessagesInterface {
 	public static final int CELL_SIZE = 16;
 	private double ANG_SPEED = Math.PI / 1.0;
 	private String blockManipulationReason;
-	private Queue<Message> messages = new LinkedList<Message>();
+	private Queue<Message> messages = new ConcurrentLinkedQueue<Message>();
 	private final Simulation sim;
 	
 	public RoomWorld(Simulation sim) {
@@ -397,20 +397,12 @@ public class RoomWorld implements SendMessagesInterface {
 	
 	@Override
 	public void sendMessage(String from, String to, List<String> tokens) {
+		if (from == null || tokens == null) {
+			throw new NullPointerException();
+		}
 		if (to != null) {
 			Robot recipient = players.get(to);
 			if (recipient == null) {
-				Robot sender = players.get(from);
-				if (sender == null) {
-					StringBuilder sb = new StringBuilder();
-					sb.append("Unknown sender ").append(from).append(" for message: ");
-					for (String token : tokens) {
-						sb.append(token);
-						sb.append(" ");
-					}
-					logger.error(sb);
-					return;
-				}
 				StringBuilder sb = new StringBuilder();
 				sb.append("Unknown recipient ").append(to).append(" for message: ");
 				for (String token : tokens) {
@@ -430,6 +422,7 @@ public class RoomWorld implements SendMessagesInterface {
 			}
 			messages.add(message);
 		} else {
+			// broadcast
 			for (Robot p : getPlayers()) {
 				Robot recipient = (Robot)p;
 				Message message = new Message();

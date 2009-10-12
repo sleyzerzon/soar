@@ -39,6 +39,7 @@ import edu.umich.soar.gridmap2d.events.SimEvent;
 import edu.umich.soar.gridmap2d.events.SimEventListener;
 import edu.umich.soar.gridmap2d.selection.SelectionManager;
 import edu.umich.soar.gridmap2d.selection.SelectionProvider;
+import edu.umich.soar.robot.SendMessagesInterface;
 
 public class Application extends JPanel implements Adaptable {
 	private static final long serialVersionUID = 4313201967156814057L;
@@ -304,6 +305,10 @@ public class Application extends JPanel implements Adaptable {
         if(klass.equals(SelectionManager.class))
         {
             return selectionManager;
+        }
+        if(klass.equals(SendMessagesInterface.class))
+        {
+            return sim.getSendMessageInterface();
         }
         Object o = Adaptables.findAdapter(views, klass);
         if(o != null) {

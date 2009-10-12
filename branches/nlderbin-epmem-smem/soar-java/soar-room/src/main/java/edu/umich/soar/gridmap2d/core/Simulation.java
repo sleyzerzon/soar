@@ -32,6 +32,7 @@ import edu.umich.soar.gridmap2d.map.Robot;
 import edu.umich.soar.gridmap2d.map.RoomMap;
 import edu.umich.soar.gridmap2d.map.RoomWorld;
 import edu.umich.soar.gridmap2d.soar.Soar;
+import edu.umich.soar.robot.SendMessagesInterface;
 
 /**
  * Keeps track of the meta simulation state. The world keeps track of more state
@@ -381,6 +382,10 @@ public class Simulation {
 	}
 
 	public RoomWorld getWorld() {
+		return world;
+	}
+
+	public SendMessagesInterface getSendMessageInterface() {
 		return world;
 	}
 }
