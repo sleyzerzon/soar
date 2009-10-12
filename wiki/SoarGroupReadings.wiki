@@ -2,5 +2,5 @@
 
 = Potential Readings =
 
-[http://www.sciencedirect.com/science?_ob=GatewayURL&_method=citationSearch&_urlVersion=4&_origin=SDVIALERTASCII&_version=1&_uoikey=B6W6C-4V3SY9N-1&md5=3b4bf58586cc4ce4460d2365e514ad98 Acquisition of hierarchical reactive skills in a unified cognitive
+[http://bit.ly/rScGq Acquisition of hierarchical reactive skills in a unified cognitive
 architecture], {Pat Langley, Dongkyu Choi, Seth Rogers}, Cog Sys Research, 10, 4, 316-332
