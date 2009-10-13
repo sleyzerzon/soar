@@ -1,0 +1,13 @@
+= Name =
+'''soarnews''' - Prints information about the current release.
+
+= Synopsis =
+ soarnews
+
+= Default Aliases =
+{| border="1" cellpadding="2"
+| Alias || Maps to
+|-
+| sn || soarnews
+|}
+

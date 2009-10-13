@@ -1,0 +1,43 @@
+= Name =
+'''clog''' - Record all user-interface input and output to a file.
+
+= Synopsis =
+ clog -[Ae] <u>filename</u>
+ clog -a <u>string</u>
+ clog [-cdoq]
+
+= Options =
+{| border="1" cellpadding="2"
+| filename || Open filename and begin logging.
+|-
+| -c, --close, -o, --off, -d, --disable || Stop logging, close the file.
+|-
+| -a, --add  string || Add the given string to the open log file.
+|-
+| -q, --query || Returns <i>open</i> if logging is active or <i>closed</i> if logging is not active.
+|-
+| -A, --append, -e, --existing || Opens existing log file named <u>filename</u>  and  logging is added at the end of the file.
+|}
+
+= Description =
+The '''clog''' command allows users to save all user-interface input and
+output to a file. When
+Soar is logging to a file, everything typed by the user and everything 
+printed by Soar is written to the file (in addition to the screen).
+
+Invoke '''clog''' with no arguments (or with '''-q''') to query the current logging status. Pass a filename to start logging to that file (relative to the command line interface's home directory (see the [[home]] command)). Use the '''close''' option to stop logging.
+
+= Examples = 
+To initiate logging and place the record in foo.log:
+ clog foo.log
+To append log data to an existing foo.log file:
+ clog -A foo.log
+To terminate logging and close the open log file:
+ clog -c
+
+= Known Issues =
+Does not log everything when structured output is selected.
+
+= See also =
+[[command-to-file]]
+

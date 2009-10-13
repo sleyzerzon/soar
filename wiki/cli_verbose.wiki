@@ -1,0 +1,17 @@
+= Name =
+'''verbose''' - Control detailed information printed as Soar runs.
+
+= Synopsis =
+ verbose [-ed]
+
+= Options =
+{| border="1" cellpadding="2"
+| -d, --disable, --off || Turn verbosity off.
+|-
+| -e, --enable, --on || Turn verbosity on.
+|}
+
+= Description =
+Invoke with no arguments to query.
+(fix this) - More about what this command does?
+
