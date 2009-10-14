@@ -63,6 +63,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
           * _next_ (identifier *or* string "nil" to end)
             * *word* (string)
             * _next_ (identifier *or* string "nil" to end)
+    * *malfunction* (string) (true, false) true indicates systems malfunction
 
   * _area-description_
     * *id* (int) unique identifying number for area/room
@@ -104,6 +105,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
     * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
     * *color* (string) object color
     * *weight* (float) object weight in kg, only for non-player types
+    * *diffusible* (string) (true, false) object can be diffused
 
   * _configuration_
     * *yaw-format* (string) (float, int)
@@ -166,11 +168,15 @@ All parameters for the command must be on the same identifier of the command. Fo
 
 === Effector Commands ===
 
-  * _get-object_
+  * _get-object_ pick up an object
     * *id* (int) target object id
     * *status* (string) (accepted, complete, error)
 
-  * _drop-object_
+  * _drop-object_ drop a carried object
+    * *id* (int) target object id
+    * *status* (string) (accepted, complete, error)
+
+  * _diffuse-object_ engage in a domain-specific diffuse task
     * *id* (int) target object id
     * *status* (string) (accepted, complete, error)
 
