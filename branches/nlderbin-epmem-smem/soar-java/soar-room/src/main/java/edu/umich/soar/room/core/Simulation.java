@@ -1,7 +1,6 @@
 package edu.umich.soar.room.core;
 
 import java.io.File;
-import java.io.Writer;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;

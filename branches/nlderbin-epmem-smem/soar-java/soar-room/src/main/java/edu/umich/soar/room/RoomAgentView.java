@@ -1,19 +1,12 @@
 package edu.umich.soar.room;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 
@@ -21,8 +14,6 @@ import org.flexdock.docking.DockingConstants;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
-import edu.umich.soar.robot.SendMessages;
-import edu.umich.soar.robot.SendMessagesInterface;
 import edu.umich.soar.room.core.Simulation;
 import edu.umich.soar.room.map.Robot;
 import edu.umich.soar.room.selection.SelectionListener;
@@ -39,46 +30,6 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
     private final JXTable table;
 	private final JLabel properties = new JLabel();
 	private final TableSelectionProvider selectionProvider;
-	private final JTextField commInput = new JTextField();
-	private final SendMessagesInterface sendMessages;
-	private final JTextArea commOutput = new JTextArea();
-    private final Writer outputWriter = new Writer()
-    {
-        private StringBuilder buffer = new StringBuilder();
-        private AtomicBoolean flushing = new AtomicBoolean(false);
-        
-        @Override
-        public void close() throws IOException
-        {
-        }
-
-        @Override
-        synchronized public void flush() throws IOException
-        {
-            // If there's already a runnable headed for the UI thread, don't send another
-        	if (!flushing.compareAndSet(false, true)) {
-        		return;
-        	}
-            
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    synchronized(outputWriter) // synchronized on outer.this like the flush() method
-                    {
-                    	commOutput.append(buffer.toString());
-                    	commOutput.setCaretPosition(commOutput.getDocument().getLength());
-                        buffer.setLength(0);
-                        flushing.set(false);
-                    }
-                }
-            });
-        }
-
-        @Override
-        synchronized public void write(char[] cbuf, int off, int len) throws IOException
-        {
-            buffer.append(cbuf, off, len);
-        }
-    };
 
     public RoomAgentView(Adaptable app) {
         super("roomAgentView", "Agent View");
@@ -87,8 +38,6 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         this.sim = Adaptables.adapt(app, Simulation.class);
         Adaptables.adapt(app, Application.class).getSelectionManager().addListener(this);
 
-        this.sendMessages = Adaptables.adapt(app, SendMessagesInterface.class);
-        
         this.model = new RobotTableModel(this.sim);
         this.model.initialize();
         this.table = new JXTable(this.model);
@@ -116,43 +65,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         properties.setVerticalAlignment(TOP);
         p.add(properties, BorderLayout.CENTER);
 
-        final JPanel commPanel = new JPanel(new BorderLayout());
-        commPanel.setBorder(BorderFactory.createTitledBorder("Direct Communication"));
-        
-        commOutput.setEditable(false);
-        commOutput.setRows(2);
-        commOutput.setLineWrap(true);
-        this.sim.getWorld().setCommWriter(outputWriter);
-        commPanel.add(new JScrollPane(commOutput), BorderLayout.NORTH);
-        
-        commInput.addKeyListener(new java.awt.event.KeyAdapter() {
-			public void keyTyped(java.awt.event.KeyEvent e) {
-				if (e.getKeyChar() == '\n') {
-					e.consume();
-					sendMessage();
-				}
-			}
-		});
-
-        commPanel.add(commInput, BorderLayout.CENTER);
-        final JButton commSend = new JButton("Send");
-        commSend.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
-				sendMessage();
-			}
-        });
-        commPanel.add(commSend, BorderLayout.EAST);
-
-        p.add(commPanel, BorderLayout.SOUTH);
         setContentPane(p);
-    }
-    
-    private void sendMessage() {
-    	List<String> tokens = SendMessages.toTokens(commInput.getText());
-    	if (!tokens.isEmpty()) {
-    		sendMessages.sendMessage("operator", null, tokens);
-    		commInput.setText("");
-    	}
     }
     
     private void updateRobotProperties() {
