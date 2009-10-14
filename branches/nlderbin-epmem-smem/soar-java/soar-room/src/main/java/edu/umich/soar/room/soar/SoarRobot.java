@@ -154,6 +154,11 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 	}
 
 	@Override
+	public boolean diffuse(int id) {
+		return world.diffuseObject(player, id);
+	}
+	
+	@Override
 	public String reason() {
 		return world.reason();
 	}
@@ -182,4 +187,5 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 	public void updateSoarInput() {
 		input.update(player, world, (RoomMap)sim.getMap(), this.isFloatYawWmes());	
 	}
+
 }

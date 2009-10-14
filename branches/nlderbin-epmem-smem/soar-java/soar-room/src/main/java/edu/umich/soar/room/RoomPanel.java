@@ -195,9 +195,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 			// draw objects
 			for (RoomObject ro : map.getRoomObjects()) {
 				pose_t pose = ro.getPose();
-				if (pose == null) {
-					continue;
-				}
+				assert pose != null;
 				g2d.setColor(ro.getColor());
 				g2d.fillOval((int)pose.pos[0] - 2, cellSize*map.size() - (int)pose.pos[1] - 2, 4, 4);
 			}

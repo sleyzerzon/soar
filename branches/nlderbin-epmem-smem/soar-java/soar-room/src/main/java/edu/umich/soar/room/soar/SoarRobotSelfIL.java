@@ -36,6 +36,7 @@ public class SoarRobotSelfIL {
 	private Identifier carry;
 	private IntElement carryid;
 	private final CarryInterface ci;
+	private final StringElement malfunction;
 	
 	public SoarRobotSelfIL(Agent agent, Identifier self, 
 			OffsetPose opose, ConfigureInterface configure, CarryInterface ci) {
@@ -73,6 +74,8 @@ public class SoarRobotSelfIL {
 			carryid = carry.CreateIntWME("id", ci.getRoomObject().getId());
 			carry.CreateStringWME("type", ci.getRoomObject().getCellObject().getProperty("name"));
 		}
+		
+		malfunction = self.CreateStringWME("malfunction", ci.isMalfunctioning() ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
 	}
 	
 	private void setYaw(double radians) {
@@ -112,10 +115,11 @@ public class SoarRobotSelfIL {
 		yawvel.Update(Math.toDegrees(opose.getPose().rotation_rate[2]));
 		setYaw(LinAlg.quatToRollPitchYaw(opose.getPose().orientation)[2]);
 		area.Update(player.getState().getLocationId());
-		cx.Update(player.getState().isCollisionX() ? "true" : "false");
-		cy.Update(player.getState().isCollisionY() ? "true" : "false");
+		cx.Update(player.getState().isCollisionX() ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
+		cy.Update(player.getState().isCollisionY() ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
 		waypointsIL.update();
 		messagesIL.update();
+		malfunction.Update(ci.isMalfunctioning() ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
 
 		if (ci.hasObject()) {
 			int objectId = ci.getRoomObject().getId();

@@ -3,7 +3,9 @@ package edu.umich.soar.room.soar;
 import lcmtypes.pose_t;
 import sml.FloatElement;
 import sml.Identifier;
+import sml.IntElement;
 import sml.StringElement;
+import sml.WMElement;
 import edu.umich.soar.robot.PointRelationship;
 import edu.umich.soar.room.core.Simulation;
 
@@ -30,18 +32,54 @@ class SoarRobotObjectIL {
 		initInternal(pose, r);
 	}
 	
-	void addProperty(String key, String value) {
-		this.parent.CreateStringWME(key, value);
-	}
+	<T> void updateProperty(String key, T value) {
+		if (key == null) {
+			throw new NullPointerException("updateProperty key is null");
+		}
 		
-	void addProperty(String key, int value) {
-		this.parent.CreateIntWME(key, value);
-	}
+		WMElement wme = this.parent.FindByAttribute(key, 0);
+
+		if (value == null) {
+			if (wme != null) {
+				wme.DestroyWME();
+			}
+		}
 		
-	void addProperty(String key, double value) {
-		this.parent.CreateFloatWME(key, value);
+		if (value instanceof String) {
+			if (wme == null) {
+				this.parent.CreateStringWME(key, (String)value);
+			} else {
+				StringElement e = wme.ConvertToStringElement();
+				e.Update((String)value);
+			}
+			
+		} else if (value instanceof Integer) {
+			if (wme == null) {
+				this.parent.CreateIntWME(key, (Integer)value);
+			} else {
+				IntElement e = wme.ConvertToIntElement();
+				e.Update((Integer)value);
+			}
+			
+		} else if (value instanceof Double) {
+			if (wme == null) {
+				this.parent.CreateFloatWME(key, (Double)value);
+			} else {
+				FloatElement e = wme.ConvertToFloatElement();
+				e.Update((Double)value);
+			}
+			
+		} else if (value instanceof Boolean) {
+			String bstring = (Boolean)value ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
+			if (wme == null) {
+				this.parent.CreateStringWME(key, bstring);
+			} else {
+				StringElement e = wme.ConvertToStringElement();
+				e.Update(bstring);
+			}
+		}
 	}
-		
+	
 	private void initInternal(pose_t pose, PointRelationship r) {
 		this.x = this.parent.CreateFloatWME("x", pose.pos[0]);
 		this.y = this.parent.CreateFloatWME("y", pose.pos[1]);

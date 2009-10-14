@@ -11,7 +11,8 @@ public class RoomObject {
 	private final int id;
 	private final CellObject object;
 	private Color color;
-
+	private boolean destroyed = false;
+	
 	public RoomObject(CellObject object, int id) {
 		this.object = object;
 		this.id = id;
@@ -34,12 +35,18 @@ public class RoomObject {
 		if (object.hasProperty("name")) {
 			sb.append(" (");
 			sb.append(object.getProperty("name", String.class));
+			if (destroyed) {
+				sb.append("(destroyed)");
+			}
 			sb.append(")");
 		}
 		return sb.toString();
 	}
 	
 	void update(GridMapCells cells) {
+		if (destroyed) {
+			return;
+		}
 		Cell container = object.getCell();
 		int[] location = container.getLocation();
 
@@ -86,5 +93,15 @@ public class RoomObject {
 
 	public Color getColor() {
 		return color;
+	}
+	
+	public void destroy() {
+		area = -1;
+		pose = null;
+		destroyed = true;
+	}
+	
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 }

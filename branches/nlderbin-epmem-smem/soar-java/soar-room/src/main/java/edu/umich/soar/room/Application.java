@@ -67,7 +67,7 @@ public class Application extends JPanel implements Adaptable {
 				});
 				
 				sim.addInitialPlayers();
-				sim.run(Simulation.RUN_FOREVER, Simulation.RUN_FULL_SPEED);
+				sim.run(Simulation.RUN_FOREVER, Double.MAX_VALUE);
 				
 				try {
 					doneQueue.take();

@@ -381,7 +381,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			jDelaySlider = new JSlider();
 			jDelaySlider.setValue(100);
 			jDelaySlider.setExtent(25);
-			jDelaySlider.setMaximum(500);
+			jDelaySlider.setMaximum(SLIDER_MAX);
 			jDelaySlider.setMinimum(0);
 			jDelaySlider.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
@@ -392,14 +392,23 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		return jDelaySlider;
 	}
 	
+	private final int SLIDER_MAX = 500;
+	
 	@Override
 	public double getTimeScale() {
+		if (jDelaySlider.getValue() == SLIDER_MAX) {
+			return Double.MAX_VALUE;
+		}
 		return jDelaySlider.getValue() / 100.0;
 	}
 	
 	private void delayChanged() {
 		double timeScale = getTimeScale();
-		jMsecPerTickLabel.setText(String.format("%1.1f", timeScale) + "x real");
+		if (timeScale == Double.MAX_VALUE) {
+			jMsecPerTickLabel.setText("maximum");
+		} else {
+			jMsecPerTickLabel.setText(String.format("%1.1f", timeScale) + "x real");
+		}
 	}
 
 	public void dispose() {

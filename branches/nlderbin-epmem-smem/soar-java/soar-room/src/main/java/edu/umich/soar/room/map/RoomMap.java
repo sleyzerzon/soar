@@ -123,7 +123,12 @@ public class RoomMap implements CellObjectObserver {
 	}
 
 	@Override
-	public void removalStateUpdate(CellObject object) {
+	public void removalStateUpdate(CellObject removed) {
+		if (!removed.hasProperty(Names.kRoomObjectMovable)) {
+			return;
+		}
+
+		roomObjects.remove(removed);
 	}
 
 	public int getLocationId(int[] location) {

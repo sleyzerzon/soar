@@ -220,8 +220,6 @@ public class Simulation {
 	private SimEventManager eventManager = new SimEventManager();
 	private BlockingQueue<Boolean> canceller = new SynchronousQueue<Boolean>();
 	public static final int RUN_FOREVER = 0;
-	public static final double RUN_FULL_SPEED = 0;
-	public static final double RUN_NORMAL_SPEED = 1;
 
 	public void run(final int ticks, final double timeScale) {
 		if (!running.getAndSet(true)) {
@@ -233,7 +231,17 @@ public class Simulation {
 					eventManager.fireEvent(new StartEvent());
 					
 					final int initialWorldCount = worldCount;
-					long period = Math.round(TICK_ELAPSED_MSEC / timeScale);
+					
+					// Default to real time.
+					long period = TICK_ELAPSED_MSEC;
+					
+					// if timeScale is not positive or MAX_VALUE, go full speed
+					if (timeScale == Double.MAX_VALUE || Double.compare(timeScale, 0) <= 0) {
+						period = 1;
+					} else {
+						// otherwise, scale it
+						period = Math.round(TICK_ELAPSED_MSEC / timeScale);
+					}
 					
 					final ScheduledFuture<?> ticker = schexec.scheduleWithFixedDelay(new Runnable() {
 						

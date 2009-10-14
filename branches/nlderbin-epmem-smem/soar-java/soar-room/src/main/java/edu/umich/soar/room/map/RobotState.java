@@ -21,6 +21,7 @@ public class RobotState implements CarryInterface {
 	private double destYaw;
 	private double destYawSpeed;
 	private RoomObject carry;
+	private boolean malfunction = false;
 
 	public void reset() {
 		pose = new pose_t();
@@ -148,5 +149,14 @@ public class RobotState implements CarryInterface {
 	public void drop() {
 		assert carry != null;
 		carry = null;
+	}
+
+	public void setMalfunction(boolean malfunction) {
+		this.malfunction = malfunction;
+	}
+	
+	@Override
+	public boolean isMalfunctioning() {
+		return malfunction;
 	}
 }

@@ -180,7 +180,7 @@ public class RoomWorld implements SendMessagesInterface {
 			RobotCommand command = players.getCommand(player);	
 			RobotState state = player.getState();
 			
-			DifferentialDriveCommand ddc = command.getDdc();
+			DifferentialDriveCommand ddc = state.isMalfunctioning() ? DifferentialDriveCommand.newEStopCommand() : command.getDdc();
 			if (ddc != null) {
 				switch(ddc.getType()) {
 				case ANGVEL:
@@ -329,6 +329,11 @@ public class RoomWorld implements SendMessagesInterface {
 		blockManipulationReason = null;
 		RobotState state = player.getState();
 
+		if (state.isMalfunctioning()) {
+			blockManipulationReason = "Malfunction";
+			return false;
+		}
+		
 		if (!state.hasObject()) {
 			blockManipulationReason = "Not carrying an object";
 			return false;
@@ -350,6 +355,11 @@ public class RoomWorld implements SendMessagesInterface {
 	public boolean getObject(Robot player, int id) {
 		blockManipulationReason = null;
 		
+		if (player.getState().isMalfunctioning()) {
+			blockManipulationReason = "Malfunction";
+			return false;
+		}
+		
 		if (player.getState().hasObject()) {
 			blockManipulationReason = "Already carrying an object";
 			return false;
@@ -357,23 +367,83 @@ public class RoomWorld implements SendMessagesInterface {
 		
 		// note: This is a stupid way to do this.
 		for (RoomObject rObj : map.getRoomObjects()) {
+			CellObject cObj = rObj.getCellObject();
+			
+			if (rObj.getId() == id) {
+				if (!isWithinTouchDistance(player, rObj)) {
+					blockManipulationReason = "Object is too far";
+					return false;
+				}
+				
+				if (!cObj.getProperty("diffused", Boolean.TRUE, Boolean.class)) {
+					blockManipulationReason = "Object was not diffused and exploded.";
+					player.getState().setMalfunction(true);
+					
+					if (!cObj.getCell().removeObject(cObj)) {
+						throw new IllegalStateException("Remove object failed for exploded object that should be there.");
+					}
+					rObj.destroy();
+					return false;
+				}
+				
+				// success
+				if (!cObj.getCell().removeObject(cObj)) {
+					throw new IllegalStateException("Remove object failed for got object that should be there.");
+				}
+				rObj.setPose(null);
+				player.getState().pickUp(rObj);
+				return true;
+			}
+		}
+		blockManipulationReason = "No such object ID";
+		return false;
+	}
+
+	private boolean isWithinTouchDistance(Robot player, RoomObject rObj) {
+		double distance = LinAlg.distance(player.getState().getPose().pos, rObj.getPose().pos);
+		return Double.compare(distance, CELL_SIZE) <= 0;
+	}
+	
+	/**
+	 * @param player
+	 * @param id
+	 * @return
+	 */
+	public boolean diffuseObject(Robot player, int id) {
+		blockManipulationReason = null;
+		
+		if (player.getState().isMalfunctioning()) {
+			blockManipulationReason = "Malfunction";
+			return false;
+		}
+		
+		// note: This is a stupid way to do this.
+		for (RoomObject rObj : map.getRoomObjects()) {
 			if (rObj.getPose() == null) {
-				// already carried by someone
+				// carried by someone
 				continue;
 			}
 			CellObject cObj = rObj.getCellObject();
 			
 			if (rObj.getId() == id) {
-				double distance = LinAlg.distance(player.getState().getPose().pos, rObj.getPose().pos);
-				if (Double.compare(distance, CELL_SIZE) <= 0) {
-					if (!cObj.getCell().removeObject(cObj)) {
-						throw new IllegalStateException("Remove object failed for object that should be there.");
-					}
-					rObj.setPose(null);
-					player.getState().pickUp(rObj);
+				if (!isWithinTouchDistance(player, rObj)) {
+					blockManipulationReason = "Object is too far";
+					return false;
+				}
+				
+				Boolean diffusible = cObj.getProperty("diffusible", false, Boolean.class);
+				if (diffusible) {
+					// success
+					cObj.setProperty("diffused", Boolean.TRUE.toString());
 					return true;
 				}
-				blockManipulationReason = "Object is too far";
+
+				blockManipulationReason = "Object was not diffusable and has been destroyed";
+
+				if (!cObj.getCell().removeObject(cObj)) {
+					throw new IllegalStateException("Diffuse object failed for object that should be there.");				
+				}
+				rObj.destroy();
 				return false;
 			}
 		}

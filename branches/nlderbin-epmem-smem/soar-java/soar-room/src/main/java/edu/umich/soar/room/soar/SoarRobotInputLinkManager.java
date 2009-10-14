@@ -131,9 +131,7 @@ public class SoarRobotInputLinkManager {
 		Collection<RoomObject> roomObjects = roomMap.getRoomObjects();
 		for (RoomObject rObj : roomObjects) {
 			pose_t pose = rObj.getPose();
-			if (pose == null) {
-				continue; // not on map
-			}
+			assert pose != null;
 			if (rObj.getArea() == player.getState().getLocationId()) {
 				final double MAX_ANGLE_OFF = Math.PI / 2;
 				LinAlg.scaleEquals(pose.pos, SoarRobot.PIXELS_2_METERS);
@@ -147,12 +145,16 @@ public class SoarRobotInputLinkManager {
 						Identifier parent = inputLink.CreateIdWME("object");
 						oIL = new SoarRobotObjectIL(sim, parent);
 						oIL.initialize(pose, r);
-						oIL.addProperty("type", cObj.getProperty("name"));
-						oIL.addProperty("id", rObj.getId());
-						oIL.addProperty("color", cObj.getProperty("color"));
-						oIL.addProperty("weight", cObj.getProperty("weight", 0d, Double.class));
+						oIL.updateProperty("type", cObj.getProperty("name"));
+						oIL.updateProperty("id", rObj.getId());
+						oIL.updateProperty("color", cObj.getProperty("color"));
+						oIL.updateProperty("weight", cObj.getProperty("weight", 0d, Double.class));
+						oIL.updateProperty("diffusible", cObj.getProperty("diffusible", false, Boolean.class));
+						oIL.updateProperty("diffused", cObj.getProperty("diffused", Boolean.class));
 						objects.put(rObj.getId(), oIL);
+						
 					} else {
+						oIL.updateProperty("diffused", cObj.getProperty("diffused", Boolean.class));
 						oIL.update(pose, r);
 					}
 				}
@@ -178,9 +180,9 @@ public class SoarRobotInputLinkManager {
 					Identifier parent = inputLink.CreateIdWME("object");
 					pIL = new SoarRobotObjectIL(sim, parent);
 					pIL.initialize(rTargetPose, r);
-					pIL.addProperty("type", "player");
-					pIL.addProperty("name", rName);
-					pIL.addProperty("color", rTarget.getColor().toString().toLowerCase());
+					pIL.updateProperty("type", "player");
+					pIL.updateProperty("name", rName);
+					pIL.updateProperty("color", rTarget.getColor().toString().toLowerCase());
 					players.put(rName, pIL);
 				
 				} else {
