@@ -164,6 +164,7 @@ public class Simulation {
 	}
 
 	public void shutdown() {
+		stop();
 		exec.shutdown();
 		try {
 			// The delay is high here so that headless runs can complete.
