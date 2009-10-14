@@ -106,6 +106,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
     * *color* (string) object color
     * *weight* (float) object weight in kg, only for non-player types
     * *diffusible* (string) (true, false) object can be diffused
+    * *diffused* (string) (true, false) object (diffusible only) is diffused
 
   * _configuration_
     * *yaw-format* (string) (float, int)
