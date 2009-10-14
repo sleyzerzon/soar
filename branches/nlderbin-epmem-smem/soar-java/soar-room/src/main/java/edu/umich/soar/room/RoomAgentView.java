@@ -1,14 +1,18 @@
 package edu.umich.soar.room;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -37,7 +41,45 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
 	private final TableSelectionProvider selectionProvider;
 	private final JTextField commInput = new JTextField();
 	private final SendMessagesInterface sendMessages;
-	
+	private final JTextArea commOutput = new JTextArea();
+    private final Writer outputWriter = new Writer()
+    {
+        private StringBuilder buffer = new StringBuilder();
+        private AtomicBoolean flushing = new AtomicBoolean(false);
+        
+        @Override
+        public void close() throws IOException
+        {
+        }
+
+        @Override
+        synchronized public void flush() throws IOException
+        {
+            // If there's already a runnable headed for the UI thread, don't send another
+        	if (!flushing.compareAndSet(false, true)) {
+        		return;
+        	}
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    synchronized(outputWriter) // synchronized on outer.this like the flush() method
+                    {
+                    	commOutput.append(buffer.toString());
+                    	commOutput.setCaretPosition(commOutput.getDocument().getLength());
+                        buffer.setLength(0);
+                        flushing.set(false);
+                    }
+                }
+            });
+        }
+
+        @Override
+        synchronized public void write(char[] cbuf, int off, int len) throws IOException
+        {
+            buffer.append(cbuf, off, len);
+        }
+    };
+
     public RoomAgentView(Adaptable app) {
         super("roomAgentView", "Agent View");
         addAction(DockingConstants.PIN_ACTION);
@@ -76,6 +118,13 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
 
         final JPanel commPanel = new JPanel(new BorderLayout());
         commPanel.setBorder(BorderFactory.createTitledBorder("Direct Communication"));
+        
+        commOutput.setEditable(false);
+        commOutput.setRows(2);
+        commOutput.setLineWrap(true);
+        this.sim.getWorld().setCommWriter(outputWriter);
+        commPanel.add(new JScrollPane(commOutput), BorderLayout.NORTH);
+        
         commInput.addKeyListener(new java.awt.event.KeyAdapter() {
 			public void keyTyped(java.awt.event.KeyEvent e) {
 				if (e.getKeyChar() == '\n') {

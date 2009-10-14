@@ -249,7 +249,7 @@ public class Application extends JPanel implements Adaptable {
 		worldView.dock((Dockable)agentView, DockingConstants.EAST_REGION, 0.6f);
 
 		final AbstractAdaptableView simulationControlView = addView(new SimulationControlView(this));
-		agentView.dock((Dockable)simulationControlView, DockingConstants.SOUTH_REGION, 0.4f);
+		agentView.dock((Dockable)simulationControlView, DockingConstants.SOUTH_REGION, 0.48f);
 	}
 	
     private <T extends AbstractAdaptableView> T addView(T view)

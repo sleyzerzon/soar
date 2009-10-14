@@ -1,5 +1,7 @@
 package edu.umich.soar.room.map;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -463,6 +465,23 @@ public class RoomWorld implements SendMessagesInterface {
 		String from;
 		Robot recipient;
 		List<String> tokens;
+		
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(from);
+			if (recipient != null) {
+				sb.append(" -> ");
+				sb.append(recipient);
+			}
+			sb.append(":");
+			for (String token : tokens) {
+				sb.append(" ");
+				sb.append(token);
+				
+			}
+			return sb.toString();
+		}
 	}
 	
 	@Override
@@ -491,17 +510,39 @@ public class RoomWorld implements SendMessagesInterface {
 				message.tokens.add(token);
 			}
 			messages.add(message);
+			if (commWriter != null) {
+				try {
+					commWriter.append("\n");
+					commWriter.append(message.toString());
+					commWriter.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		} else {
 			// broadcast
-			for (Robot p : getPlayers()) {
-				Robot recipient = (Robot)p;
-				Message message = new Message();
-				message.from = from;
+			Message message = new Message();
+			message.from = from;
+			message.tokens = new ArrayList<String>();
+			message.tokens.addAll(tokens);
+			if (commWriter != null) {
+				try {
+					commWriter.append("\n");
+					commWriter.append(message.toString());
+					commWriter.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			for (Robot recipient : getPlayers()) {
 				message.recipient = recipient;
-				message.tokens = new ArrayList<String>();
-				message.tokens.addAll(tokens);
 				messages.add(message);
 			}
 		}
+	}
+
+	private Writer commWriter;
+	public void setCommWriter(Writer commWriter) {
+		this.commWriter = commWriter;
 	}
 }
