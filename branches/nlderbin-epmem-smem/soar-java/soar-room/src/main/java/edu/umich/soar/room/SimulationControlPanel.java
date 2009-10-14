@@ -382,7 +382,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			jDelaySlider.setValue(100);
 			jDelaySlider.setExtent(25);
 			jDelaySlider.setMaximum(SLIDER_MAX);
-			jDelaySlider.setMinimum(0);
+			jDelaySlider.setMinimum(SLIDER_MIN);
 			jDelaySlider.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
 					delayChanged();
@@ -393,6 +393,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	}
 	
 	private final int SLIDER_MAX = 500;
+	private final int SLIDER_MIN = 0;
 	
 	@Override
 	public double getTimeScale() {

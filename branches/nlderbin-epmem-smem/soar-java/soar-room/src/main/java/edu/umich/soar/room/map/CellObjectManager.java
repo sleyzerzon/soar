@@ -79,7 +79,7 @@ class CellObjectManager {
 		Iterator<CellObject> iter = ret.iterator();
 		while (iter.hasNext()) {
 			CellObject obj = iter.next();
-			if (!obj.hasProperty(name)) {
+			if (name != null && !obj.hasProperty(name)) {
 				iter.remove();
 			}
 		}

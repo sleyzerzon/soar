@@ -79,6 +79,7 @@ public class CommView extends AbstractAgentView {
         commOutput.setEditable(false);
         commOutput.setRows(4);
         commOutput.setLineWrap(true);
+        commOutput.setWrapStyleWord(true);
         this.sim.getWorld().setCommWriter(outputWriter);
         p.add(new JScrollPane(commOutput), BorderLayout.CENTER);
         

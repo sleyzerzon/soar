@@ -35,17 +35,32 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
         gridMapPanel.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mousePressed(MouseEvent e) {
-        		selectPlayer(getPlayerAtPixel(e.getX(), e.getY()));
+        		int[] xy = gridMapPanel.getCellAtPixel(e.getX(), e.getY());
+        		if (sim.getMap().isInBounds(xy)) {
+            		
+            		if (e.isPopupTrigger()) {
+            			showPopupMenu(e, xy);
+            		} else {
+                		selectPlayer(getPlayerAtCell(xy));
+            			
+            		}
+        		}
+        	}
+
+        	public void mouseReleased(MouseEvent e) {
+        		int[] xy = gridMapPanel.getCellAtPixel(e.getX(), e.getY());
+        		if (sim.getMap().isInBounds(xy)) {
+            		
+            		if (e.isPopupTrigger()) {
+            			showPopupMenu(e, xy);
+            		}
+        		}
         	}
         });
     }
 
-	private Robot getPlayerAtPixel(int x, int y) {
-		int[] xy = gridMapPanel.getCellAtPixel(x, y);
-		if (sim.getMap().isInBounds(xy)) {
-			return this.sim.getMap().getCell(xy).getFirstPlayer();
-		}
-		return null;
+	private Robot getPlayerAtCell(int[] xy) {
+		return this.sim.getMap().getCell(xy).getFirstPlayer();
 	}
 	
 	private void selectPlayer(Robot player) {
@@ -54,6 +69,12 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
 			manager.fireSelectionChanged();
 		}
 	}
+
+	private void showPopupMenu(MouseEvent e, int[] xy)
+    {
+		final WorldMenu menu = new WorldMenu(this, this.sim, xy);
+		menu.getPopupMenu().show(e.getComponent(), e.getX(), e.getY());
+    }
 
 	@Override
 	public void activate(SelectionManager manager) {

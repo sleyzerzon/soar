@@ -118,6 +118,7 @@ public class RoomMap implements CellObjectObserver {
 		RoomObject ro = roomObjects.get(added);
 		if (ro == null) {
 			ro = new RoomObject(added, counts.nextObject());
+			roomObjects.put(added, ro);
 		}
 		ro.update(getData().cells);
 	}
@@ -842,6 +843,10 @@ public class RoomMap implements CellObjectObserver {
 
 	public List<CellObject> getTemplatesWithProperty(String name) {
 		return data.cellObjectManager.getTemplatesWithProperty(name);
+	}
+
+	public List<CellObject> getAllTemplates() {
+		return data.cellObjectManager.getTemplatesWithProperty(null);
 	}
 
 	protected boolean reload() {
