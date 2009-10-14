@@ -38,26 +38,26 @@ public class RoomMap implements CellObjectObserver {
 		}
 
 		void reset() {
-			roomCount = 0;
-			gatewayCount = 0;
-			wallCount = 0;
-			objectCount = 0;
+			roomCount = 1;
+			gatewayCount = 1;
+			wallCount = 1;
+			objectCount = 1;
 		}
 
 		int nextRoom() {
-			return roomCount++ + gatewayCount + wallCount + objectCount;
+			return roomCount++/* + gatewayCount + wallCount + objectCount*/;
 		}
 
 		int nextGateway() {
-			return roomCount + gatewayCount++ + wallCount + objectCount;
+			return /*roomCount + */gatewayCount++/* + wallCount + objectCount*/;
 		}
 
 		int nextWall() {
-			return roomCount + gatewayCount + wallCount++ + objectCount;
+			return /*roomCount + gatewayCount + */wallCount++/* + objectCount*/;
 		}
 
 		int nextObject() {
-			return roomCount + gatewayCount + wallCount + objectCount++;
+			return /*roomCount + gatewayCount + wallCount + */objectCount++;
 		}
 	}
 
