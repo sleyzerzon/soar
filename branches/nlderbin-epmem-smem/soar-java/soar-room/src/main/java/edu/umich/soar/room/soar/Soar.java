@@ -527,8 +527,12 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	}
 	
 	private void synchronousUpdate() throws InterruptedException {
+		// if stepped through output from debugger and the sim isn't running, 
+		// do no synchronization.
+		boolean running = this.sim.isRunning();
+		
         if (firstUpdate) {
-            logger.trace("Soar synch update first update");
+            logger.trace("Soar synch update first update since start event");
             firstUpdate = false;
             tickReady.take();
 		}
@@ -537,25 +541,27 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		        logger.trace("Soar synch update processing output for " + ad.agent.GetAgentName());
 		        ad.sa.processSoarOuput();
 		}
-		tickProcessed.put(Boolean.TRUE);
-		
-		logger.trace("Soar synch wait inputReady");
-		inputReady.take();
+		if (running) {
+			tickProcessed.put(Boolean.TRUE);
+			logger.trace("Soar synch wait inputReady");
+			inputReady.take();
+		}
 		for (AgentData ad : agents.values()) {
 		        logger.trace("Soar synch updating input for " + ad.agent.GetAgentName());
 		        ad.sa.updateSoarInput();
 		        ad.agent.Commit();
 		}
-		logger.trace("Soar synch inputProcessed");
-		inputProcessed.put(Boolean.TRUE);
-		
-		logger.trace("Soar synch wait tickReady");
-		Boolean go = tickReady.take();
-		if (go == Boolean.FALSE) {
-		        logger.trace("Soar synch update sync stop");
-		        stop();
-		        return;
-		}
+		if (running) {
+			logger.trace("Soar synch inputProcessed");
+			inputProcessed.put(Boolean.TRUE);
+			logger.trace("Soar synch wait tickReady");
+			Boolean go = tickReady.take();
+			if (go == Boolean.FALSE) {
+			        logger.trace("Soar synch update sync stop");
+			        stop();
+			        return;
+			}
+		}		
 	}
 	
 	private void flushLocks() {

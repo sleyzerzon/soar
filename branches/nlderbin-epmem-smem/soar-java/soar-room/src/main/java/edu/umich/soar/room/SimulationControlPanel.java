@@ -418,7 +418,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			pref.putInt(KEY_RUN_QTY, 0);
 		}
 		
-    	pref.putBoolean(KEY_RUN_FOREVER, runButtonGroup.isSelected(jTicksRadioButton.getModel()));
+    	pref.putBoolean(KEY_RUN_FOREVER, runButtonGroup.isSelected(jForeverRadioButton.getModel()));
 	}
 
 	@Override
