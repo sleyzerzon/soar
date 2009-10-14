@@ -43,7 +43,9 @@ public class RobotCommand {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(ddc);
+		if (ddc != null) {
+			sb.append(ddc);
+		}
 		Commands.memberAppend(sb, isStopSim(), Names.kStopSimID);
 		return sb.toString();
 	}

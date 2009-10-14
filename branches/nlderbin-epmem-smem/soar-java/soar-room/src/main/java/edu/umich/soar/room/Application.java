@@ -246,13 +246,18 @@ public class Application extends JPanel implements Adaptable {
 		viewport.dock(worldView);
 		
 		final AbstractAdaptableView agentView = addView(new RoomAgentView(this));
-		worldView.dock((Dockable)agentView, DockingConstants.EAST_REGION, 0.6f);
+		worldView.dock(agentView, DockingConstants.EAST_REGION, 0.6f);
 
 		final AbstractAdaptableView simulationControlView = addView(new SimulationControlView(this));
-		agentView.dock((Dockable)simulationControlView, DockingConstants.SOUTH_REGION, 0.48f);
+		agentView.dock(simulationControlView, DockingConstants.SOUTH_REGION, 0.48f);
 
 		final AbstractAdaptableView commView = addView(new CommView(this));
-		worldView.dock((Dockable)commView, DockingConstants.SOUTH_REGION, 0.7f);
+		worldView.dock(commView, DockingConstants.SOUTH_REGION, 0.7f);
+		
+		final AbstractAdaptableView logView = addView(new LogView(this));
+		commView.dock(logView);
+		
+		commView.setActive(true);
 	}
 	
     private <T extends AbstractAdaptableView> T addView(T view)
