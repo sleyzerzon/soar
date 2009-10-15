@@ -119,6 +119,9 @@ public class RoomMap implements CellObjectObserver {
 		if (ro == null) {
 			ro = new RoomObject(added, counts.nextObject());
 			roomObjects.put(added, ro);
+			logger.info("created new room object " + ro);
+		} else {
+			logger.info("re-adding " + ro);
 		}
 		ro.update(getData().cells);
 	}
@@ -128,8 +131,6 @@ public class RoomMap implements CellObjectObserver {
 		if (!removed.hasProperty(Names.kRoomObjectMovable)) {
 			return;
 		}
-
-		roomObjects.remove(removed);
 	}
 
 	public int getLocationId(int[] location) {

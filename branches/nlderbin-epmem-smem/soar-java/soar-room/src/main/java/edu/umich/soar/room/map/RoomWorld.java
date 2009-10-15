@@ -369,6 +369,10 @@ public class RoomWorld implements SendMessagesInterface {
 		
 		// note: This is a stupid way to do this.
 		for (RoomObject rObj : map.getRoomObjects()) {
+			if (rObj.getPose() == null) {
+				// not on map
+				continue;
+			}
 			CellObject cObj = rObj.getCellObject();
 			
 			if (rObj.getId() == id) {
@@ -422,7 +426,7 @@ public class RoomWorld implements SendMessagesInterface {
 		// note: This is a stupid way to do this.
 		for (RoomObject rObj : map.getRoomObjects()) {
 			if (rObj.getPose() == null) {
-				// carried by someone
+				// not on map
 				continue;
 			}
 			CellObject cObj = rObj.getCellObject();

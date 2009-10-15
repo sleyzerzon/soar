@@ -131,7 +131,10 @@ public class SoarRobotInputLinkManager {
 		Collection<RoomObject> roomObjects = roomMap.getRoomObjects();
 		for (RoomObject rObj : roomObjects) {
 			pose_t pose = rObj.getPose();
-			assert pose != null;
+			if (rObj.getPose() == null) {
+				// not on map
+				continue;
+			}
 			if (rObj.getArea() == player.getState().getLocationId()) {
 				final double MAX_ANGLE_OFF = Math.PI / 2;
 				LinAlg.scaleEquals(pose.pos, SoarRobot.PIXELS_2_METERS);
