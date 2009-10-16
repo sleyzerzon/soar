@@ -11,7 +11,6 @@ public class Names {
 		public static final String eatersConsoleCnf = "eaters-console.cnf";
 		public static final String tanksoarCnf = "tanksoar.cnf";
 		public static final String tanksoarConsoleCnf = "tanksoar-console.cnf";
-		public static final String roomCnf = "room.cnf";
 		public static final String taxiCnf = "taxi.cnf";
 	}
 	

@@ -16,7 +16,6 @@ import edu.umich.soar.gridmap2d.config.TaxiConfig;
 import edu.umich.soar.gridmap2d.players.Player;
 import edu.umich.soar.gridmap2d.soar.Soar;
 import edu.umich.soar.gridmap2d.world.EatersWorld;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
 import edu.umich.soar.gridmap2d.world.TankSoarWorld;
 import edu.umich.soar.gridmap2d.world.TaxiWorld;
 import edu.umich.soar.gridmap2d.world.World;
@@ -80,9 +79,6 @@ public class Simulation {
 		case TAXI:
 			TaxiConfig tc = Gridmap2D.config.taxiConfig();
 			world = new TaxiWorld(cogArch, tc.fuel_starting_minimum, tc.fuel_starting_maximum, tc.fuel_maximum, tc.disable_fuel);
-			break;
-		case ROOM:
-			world = new RoomWorld(cogArch);
 			break;
 		}
 		world.setForceHumanInput(config.generalConfig().force_human);

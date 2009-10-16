@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.commsen.stopwatch.Stopwatch;
-
 import edu.umich.soar.config.Config;
 import edu.umich.soar.config.ConfigFile;
 import edu.umich.soar.config.ParseError;

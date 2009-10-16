@@ -2,13 +2,10 @@ package edu.umich.soar.gridmap2d;
 
 import edu.umich.soar.gridmap2d.players.Eater;
 import edu.umich.soar.gridmap2d.players.EaterCommander;
-import edu.umich.soar.gridmap2d.players.RobotCommander;
-import edu.umich.soar.gridmap2d.players.Robot;
 import edu.umich.soar.gridmap2d.players.Tank;
 import edu.umich.soar.gridmap2d.players.TankCommander;
 import edu.umich.soar.gridmap2d.players.Taxi;
 import edu.umich.soar.gridmap2d.players.TaxiCommander;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
 
 
 public interface CognitiveArchitecture {
@@ -18,7 +15,6 @@ public interface CognitiveArchitecture {
 	EaterCommander createEaterCommander(Eater eater, String productions, int vision, String[] shutdownCommands, boolean debug);
 	TankCommander createTankCommander(Tank tank, String productions, String[] shutdown_commands, boolean debug);
 	TaxiCommander createTaxiCommander(Taxi taxi, String productions, String[] shutdown_commands, boolean debug);
-	RobotCommander createRoomCommander(Robot player, RoomWorld world, String productions, String[] shutdown_commands, boolean debug);
 
 	void doBeforeClients();
 

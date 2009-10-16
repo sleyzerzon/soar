@@ -19,13 +19,10 @@ import edu.umich.soar.gridmap2d.config.ClientConfig;
 import edu.umich.soar.gridmap2d.config.SoarConfig;
 import edu.umich.soar.gridmap2d.players.Eater;
 import edu.umich.soar.gridmap2d.players.EaterCommander;
-import edu.umich.soar.gridmap2d.players.RobotCommander;
-import edu.umich.soar.gridmap2d.players.Robot;
 import edu.umich.soar.gridmap2d.players.Tank;
 import edu.umich.soar.gridmap2d.players.TankCommander;
 import edu.umich.soar.gridmap2d.players.Taxi;
 import edu.umich.soar.gridmap2d.players.TaxiCommander;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
 
 import sml.Agent;
 import sml.ConnectionInfo;
@@ -450,16 +447,6 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 		return new SoarTaxi(taxi, agent, shutdownCommands);
 	}
 	   
-	@Override
-	public RobotCommander createRoomCommander(Robot player, RoomWorld world, String productions,
-			String[] shutdownCommands, boolean debug) {
-		Agent agent = createSoarAgent(player.getName(), productions, debug);
-		if (agent == null) {
-			return null;
-		}
-		return new SoarRobot(player, agent, kernel, world, shutdownCommands);
-	}
-
 	@Override
   	public void updateEventHandler(int eventID, Object data, Kernel kernel, int runFlags) {
 

@@ -39,9 +39,7 @@ import edu.umich.soar.gridmap2d.Names;
 import edu.umich.soar.gridmap2d.map.EatersMap;
 import edu.umich.soar.gridmap2d.players.CommandInfo;
 import edu.umich.soar.gridmap2d.players.Player;
-import edu.umich.soar.gridmap2d.world.RoomWorld;
 import edu.umich.soar.gridmap2d.world.World;
-import edu.umich.soar.robot.DifferentialDriveCommand;
 
 
 public class WindowManager {
@@ -519,71 +517,7 @@ public class WindowManager {
 			agentDisplay.setLayoutData(gd);
 		}
 	}
-	
-	private void createRoomSide() {
 		
-		currentSide = new Composite(rhs, SWT.NONE);
-		{
-			GridLayout gl = new GridLayout();
-			gl.marginHeight = 0;
-			gl.marginWidth = 0;
-			currentSide.setLayout(gl);
-			
-			GridData gd = new GridData();
-			currentSide.setLayoutData(gd);
-		}
-		
-		Group group1 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group1.setLayoutData(gd);
-		}
-		group1.setText("Simulation");
-		group1.setLayout(new FillLayout());
-		simButtons = new SimulationButtons(group1, world.numberOfPlayers());
-		
-		Group group2 = new Group(currentSide, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			group2.setLayoutData(gd);
-		}
-		group2.setText("Map");
-		{
-			GridLayout gl = new GridLayout();
-			gl.numColumns = 2;
-			group2.setLayout(gl);
-		}
-		
-		Label worldCountLabel = new Label(group2, SWT.NONE);
-		worldCountLabel.setText(kWorldCount);
-		{
-			GridData gd = new GridData();
-			worldCountLabel.setLayoutData(gd);
-		}
-		
-		worldCount = new Label(group2, SWT.NONE);
-		{
-			GridData gd = new GridData();
-			gd.widthHint = 50;
-			worldCount.setLayoutData(gd);
-		}
-		
-		updateCounts();
-		
-		mapButtons = new MapButtons(group2);
-		{
-			GridData gd = new GridData();
-			gd.horizontalSpan = 2;
-			mapButtons.setLayoutData(gd);
-		}
-
-		agentDisplay = new RoomAgentDisplay(currentSide, world, cogArch);
-		{
-			GridData gd = new GridData();
-			agentDisplay.setLayoutData(gd);
-		}
-	}
-	
 	public class GetIdDialog extends Dialog {
 		public GetIdDialog(Shell parent) {
 			super(parent);
@@ -630,81 +564,7 @@ public class WindowManager {
 			}
 		}
 	}
-	
-	public void setupRoom() {
-		worldGroup = new Group(shell, SWT.NONE);
-		worldGroup.setLayout(new FillLayout());
-		visualWorld = new RoomVisualWorld(worldGroup, SWT.NONE, RoomWorld.CELL_SIZE, world);
-		visualWorld.setMap(world.getMap());
-
-		visualWorld.addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				Player player = visualWorld.getPlayerAtPixel(new int [] { e.x, e.y });
-				if (player == null) {
-					return;
-				}
-				agentDisplay.selectPlayer(player);
-			}
-		});
-		visualWorld.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (humanMove == null) {
-					return;
-				}
-				boolean go = false;
-				switch (e.keyCode) {
-//				case SWT.KEYPAD_9:
-//					GetIdDialog getDialog = new GetIdDialog(e.display.getShells()[0]);
-//					getDialog.open();
-//					break;
-				case SWT.KEYPAD_8:
-					humanMove.ddc = DifferentialDriveCommand.newLinearVelocityCommand(1);
-					break;
-				case SWT.KEYPAD_5:
-					humanMove.ddc = DifferentialDriveCommand.newEStopCommand();
-					break;
-				case SWT.KEYPAD_2:
-					humanMove.ddc = DifferentialDriveCommand.newLinearVelocityCommand(-1);
-					break;
-				case SWT.KEYPAD_4:
-					humanMove.ddc = DifferentialDriveCommand.newAngularVelocityCommand(1);
-					break;
-				case SWT.KEYPAD_6:
-					humanMove.ddc = DifferentialDriveCommand.newAngularVelocityCommand(-1);
-					break;
-				case SWT.KEYPAD_1:
-					humanMove.ddc = DifferentialDriveCommand.newHeadingCommand(0);
-					break;
-				case SWT.KEYPAD_3:
-					humanMove.ddc = DifferentialDriveCommand.newHeadingCommand(Math.PI);
-					break;
-				case SWT.KEYPAD_MULTIPLY:
-					humanMove.stopSim = true;
-					break;
-				case SWT.KEYPAD_CR:
-					go = true;
-					break;
-				default:
-					break;
-				}
-				
-				Gridmap2D.wm.setStatus(human.getColor() + ": " + humanMove.toString(), black);
-				
-				if (go) {
-					synchronized(humanMove) {
-						humanMove.notify();
-					}
-				}
-			}
-		});
 		
-		createRHS();
-		createRoomSide();
-
-		shell.setText("Room");
-	
-	}
-	
 	public void setupTankSoar() {
 		worldGroup = new Group(shell, SWT.NONE);
 		worldGroup.setLayout(new FillLayout());
@@ -945,10 +805,6 @@ public class WindowManager {
 			setupTankSoar();
 			break;
 			
-		case ROOM:
-			setupRoom();
-			break;
-
 		case TAXI:
 			setupTaxi();
 			break;

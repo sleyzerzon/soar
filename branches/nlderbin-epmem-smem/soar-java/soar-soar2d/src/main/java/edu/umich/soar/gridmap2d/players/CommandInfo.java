@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import edu.umich.soar.gridmap2d.Direction;
 import edu.umich.soar.gridmap2d.Gridmap2D;
 import edu.umich.soar.gridmap2d.Names;
-import edu.umich.soar.robot.DifferentialDriveCommand;
 
 
 /**
@@ -49,19 +48,12 @@ public class CommandInfo {
 	public boolean shields = false;	// change shields status
 	public boolean shieldsSetting = false;	// setting to change shields to
 	
-	// room
-	public DifferentialDriveCommand ddc;
-
 	// taxi
 	public boolean pickup = false;
 	public boolean putdown = false;
 	public boolean fillup = false;
 	
 	public CommandInfo() {
-	}
-	
-	public CommandInfo(DifferentialDriveCommand ddc) {
-		this.ddc = ddc;
 	}
 	
 	private static void parseError(Tokenizer t, String msg) {
@@ -296,10 +288,6 @@ public class CommandInfo {
 			}
 			break;
 			
-		case ROOM:
-			output += ddc;
-			break;
-
 		case TAXI:
 			if (move) {
 				output += "(" + Names.kMoveID + ": " + moveDirection.id() + ")";

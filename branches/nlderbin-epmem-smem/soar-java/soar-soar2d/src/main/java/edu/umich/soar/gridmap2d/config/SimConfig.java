@@ -103,10 +103,6 @@ public class SimConfig implements GameConfig {
 			gameConfig = new TaxiConfig();
 			loadSubConfig(childConfig, TaxiConfig.class.getFields(), gameConfig);
 			break;
-		case ROOM:
-			gameConfig = new RoomConfig();
-			loadSubConfig(childConfig, RoomConfig.class.getFields(), gameConfig);
-			break;
 		}
 
 		if (config.hasKey(Keys.active_players)) {
@@ -204,10 +200,6 @@ public class SimConfig implements GameConfig {
 	
 	public TaxiConfig taxiConfig() {
 		return (TaxiConfig)gameConfig;
-	}
-	
-	public RoomConfig roomConfig() {
-		return (RoomConfig)gameConfig;
 	}
 	
 	public Map<String, PlayerConfig> playerConfigs() {
