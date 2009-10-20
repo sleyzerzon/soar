@@ -334,10 +334,7 @@ void reset_statistics (agent* thisAgent) {
 
   reset_production_firing_counts(thisAgent);
 
-/* These are ALWAYS created in create_soar_agent, so might as 
- * well remove the compiler directives and always reset them.
- * KJC June 2005
- */
+#ifndef NO_TIMING_STUFF
   /* Initializing all the timer structures */
   thisAgent->timers_cpu.reset();
   thisAgent->timers_kernel.reset();
@@ -359,11 +356,12 @@ void reset_statistics (agent* thisAgent) {
      thisAgent->timers_gds_cpu_time[ii].reset();
   }
 
-  thisAgent->epmem_timers->reset(); 
-  thisAgent->smem_timers->reset();
   thisAgent->timers_decision_cycle.reset();
   thisAgent->max_dc_time_cycle = 0;
   thisAgent->max_dc_time_msec = 0;
+#endif // NO_TIMING_STUFF
+  thisAgent->epmem_timers->reset(); 
+  thisAgent->smem_timers->reset();
 }
 
 bool reinitialize_soar (agent* thisAgent) {
@@ -926,12 +924,15 @@ void do_one_top_level_phase (agent* thisAgent)
 
       // Update per-cycle statistics
 	  {
-		  unsigned long dc_time_msec = static_cast<unsigned long>(thisAgent->timers_decision_cycle.get_msec());
+		  unsigned long dc_time_msec = 0;
+#ifndef NO_TIMING_STUFF
+		  dc_time_msec = static_cast<unsigned long>(thisAgent->timers_decision_cycle.get_msec());
 		  if (thisAgent->max_dc_time_msec < dc_time_msec) {
 			  thisAgent->max_dc_time_msec = dc_time_msec;
 			  thisAgent->max_dc_time_cycle = thisAgent->d_cycle_count;
 		  }
 		  thisAgent->timers_decision_cycle.reset();
+#endif // NO_TIMING_STUFF
 
 		  unsigned long dc_wm_changes = thisAgent->wme_addition_count - thisAgent->start_dc_wme_addition_count;
 		  dc_wm_changes += thisAgent->wme_removal_count - thisAgent->start_dc_wme_removal_count;
@@ -1456,6 +1457,7 @@ void init_agent_memory(agent* thisAgent)
 
   /* executing the IO cycles above, increments the timers, so reset */
   /* Initializing all the timer structures */
+#ifndef NO_TIMING_STUFF
   thisAgent->timers_cpu.reset();
   thisAgent->timers_kernel.reset();
   thisAgent->timers_phase.reset();
@@ -1476,6 +1478,8 @@ void init_agent_memory(agent* thisAgent)
      thisAgent->timers_gds_cpu_time[ii].reset();
   }
   thisAgent->timers_decision_cycle.reset();
+#endif // NO_TIMING_STUFF
+
   thisAgent->epmem_timers->reset();
   thisAgent->smem_timers->reset();
 

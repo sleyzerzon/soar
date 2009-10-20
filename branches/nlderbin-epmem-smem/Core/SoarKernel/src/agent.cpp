@@ -253,6 +253,7 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->lexeme.id_number = 0;
 
   /* Initializing all the timer structures */
+#ifndef NO_TIMING_STUFF
   newAgent->timers_cpu.reset();
   newAgent->timers_kernel.reset();
   newAgent->timers_phase.reset();
@@ -272,6 +273,7 @@ agent * create_soar_agent (char * agent_name) {                                 
      newAgent->timers_gds_cpu_time[ii].reset();
   }
   newAgent->timers_decision_cycle.reset();
+#endif // NO_TIMING_STUFF
 
   newAgent->real_time_tracker = 0;
   newAgent->attention_lapse_tracker = 0;

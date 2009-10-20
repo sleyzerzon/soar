@@ -111,12 +111,14 @@ typedef union symbol_union Symbol;
 
 /* Uncomment the following line to eliminate all timing statistics.
    The "stats" command will have much shorter output as well. */
-/* #define NO_TIMING_STUFF  */
+//#define NO_TIMING_STUFF
 
 /* Comment out the following line to avoid the overhead of keeping statistics
    on how much time is spent in various parts of the system.  If you
    have DETAILED_TIMING_STATS defined, you must NOT define NO_TIMING_STUFF */
+#ifndef NO_TIMING_STUFF
 #define DETAILED_TIMING_STATS
+#endif // NO_TIMING_STUFF
 
 /* UNcomment the following line to have Soar maintain reference counts 
    on wmes and prefs at the top level.  This can result in larger

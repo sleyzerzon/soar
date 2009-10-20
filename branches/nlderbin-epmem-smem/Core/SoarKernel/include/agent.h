@@ -543,10 +543,7 @@ total_kernel_time should always be slightly greater than the derived total
 kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
   /* REW: begin 28.07.96 */  
-  /* If in kernel.h, the timers are disabled by #define NO_TIMING_STUFF,
-   * then these timevals will be just wasted space...
-   * Usually they are enabled, so conditional compiles removed. July 05
-   */
+#ifndef NO_TIMING_STUFF
   soar_process_timer timers_cpu;	// start_total_tv
   soar_process_timer timers_kernel;	// start_kernel_tv
   soar_process_timer timers_phase;	// start_phase_tv
@@ -571,6 +568,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   soar_timer_accumulator timers_match_cpu_time[NUM_PHASE_TYPES];		// match_cpu_time
   soar_timer_accumulator timers_gds_cpu_time[NUM_PHASE_TYPES];			// gds_cpu_time
   /* REW: end 28.07.96 */
+#endif // NO_TIMING_STUFF
 
    /* RMJ */
    /* Keep track of real time steps for constant real-time per decision */
