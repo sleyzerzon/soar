@@ -83,9 +83,13 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 		if (command == null) {
 			return RobotCommand.NULL;
 		}
-		RobotCommand temp = command;
-		command = null;
-		return temp;
+		
+		// TODO: this is useful for non-sim environments, it is more fail-safe.
+		// Having it here, however, makes the sync -> async changeover lose commands.
+//		RobotCommand temp = command;
+//		command = null;
+//		return temp;
+		return command;
 	}
 	
 	private void error(String message) {

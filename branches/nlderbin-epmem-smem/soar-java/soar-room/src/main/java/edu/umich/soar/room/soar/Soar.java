@@ -528,20 +528,20 @@ public class Soar implements CognitiveArchitecture, Kernel.UpdateEventInterface,
 	
 	private void synchronousUpdate() throws InterruptedException {
 		// if stepped through output from debugger and the sim isn't running, 
-		// do no synchronization.
+		// do no synchronization, and don't process output link.
 		boolean running = this.sim.isRunning();
 		
-        if (firstUpdate) {
-            logger.trace("Soar synch update first update since start event");
-            firstUpdate = false;
-            tickReady.take();
-		}
-		
-		for (AgentData ad : agents.values()) {
+		if (running) {
+	        if (firstUpdate) {
+	            logger.trace("Soar synch update first update since start event");
+	            firstUpdate = false;
+	            tickReady.take();
+			}
+			
+			for (AgentData ad : agents.values()) {
 		        logger.trace("Soar synch update processing output for " + ad.agent.GetAgentName());
 		        ad.sa.processSoarOuput();
-		}
-		if (running) {
+			}
 			tickProcessed.put(Boolean.TRUE);
 			logger.trace("Soar synch wait inputReady");
 			inputReady.take();
