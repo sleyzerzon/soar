@@ -1,4 +1,4 @@
-<project name="soar-java" default="build" basedir=".">
+<project name="soar-java" default="build-nodoc" basedir=".">
 
 	<target name="build">
 		<ant dir="soar-smljava" />
