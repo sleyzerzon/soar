@@ -20,6 +20,6 @@ public class AgentControlPanel extends JPanel {
         bar.add(am.getAction(ClonePlayerAction.class));
         bar.add(am.getAction(RemovePlayerAction.class));
         
-        add(bar, BorderLayout.EAST);
+        add(bar, BorderLayout.WEST);
 	}
 }

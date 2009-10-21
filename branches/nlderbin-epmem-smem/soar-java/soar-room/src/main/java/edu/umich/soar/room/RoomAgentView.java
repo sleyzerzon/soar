@@ -7,6 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 
@@ -57,13 +58,19 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
             }};
         
         final JPanel p = new JPanel(new BorderLayout());
+		
+        JToolBar bar = new JToolBar();
+		bar.setFloatable(false);
+		bar.add(new AgentControlPanel(app));     
+		p.add(bar, BorderLayout.NORTH);
+		
         final JScrollPane pane = new JScrollPane(table);
-        p.add(pane, BorderLayout.NORTH);
+        p.add(pane, BorderLayout.CENTER);
 
         properties.setBorder(BorderFactory.createTitledBorder("Robot Properties"));
         properties.setHorizontalAlignment(LEFT);
         properties.setVerticalAlignment(TOP);
-        p.add(properties, BorderLayout.CENTER);
+        p.add(properties, BorderLayout.SOUTH);
 
         setContentPane(p);
     }

@@ -17,7 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -146,7 +145,7 @@ public class Application extends JPanel implements Adaptable {
 		frame.setTitle("Room Environment");
 		
 		initActions();
-		initToolbar();
+		//initToolbar();
 
 		add(viewport, BorderLayout.CENTER);
 
@@ -208,20 +207,20 @@ public class Application extends JPanel implements Adaptable {
         return listener;
     }
     
-    private void initToolbar()
-    {
-        JToolBar bar = new JToolBar();
-        bar.setFloatable(false);
-        
-        bar.add(new RunControlPanel(this));
-        bar.add(new AgentControlPanel(this));
-        
-        add(bar, BorderLayout.NORTH);
-    }
+//    private void initToolbar()
+//    {
+//        JToolBar bar = new JToolBar();
+//        bar.setFloatable(false);
+//        
+//        bar.add(new RunControlPanel(this));
+//        bar.add(new AgentControlPanel(this));
+//        
+//        add(bar, BorderLayout.NORTH);
+//    }
     
 	private void initActions() {
-		new RunAction(actionManager);
-		new StepAction(actionManager);
+		//new RunAction(actionManager);
+		//new StepAction(actionManager);
 		new StopAction(actionManager);
 		new ResetAction(actionManager);
 		new GoAction(actionManager);
