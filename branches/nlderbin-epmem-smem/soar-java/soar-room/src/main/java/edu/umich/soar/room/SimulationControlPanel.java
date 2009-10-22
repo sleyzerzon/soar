@@ -1,5 +1,6 @@
 package edu.umich.soar.room;
 
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -59,14 +60,14 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
         int runQty = pref.getInt(KEY_RUN_QTY, 1);
     	boolean runForever = pref.getBoolean(KEY_RUN_FOREVER, true);
 
-		jAsyncRadioButton.setSelected(this.sim.getCogArch().isAsync());
-		jSyncRadioButton.setSelected(!this.sim.getCogArch().isAsync());
+		getJAsyncRadioButton().setSelected(this.sim.getCogArch().isAsync());
+		getJSyncRadioButton().setSelected(!this.sim.getCogArch().isAsync());
 		
-		jQuantityTextField.setText(Integer.toString(runQty));
-		jForeverRadioButton.setSelected(runForever);
-		jTicksRadioButton.setSelected(!runForever);
+		getJQuantityTextField().setText(Integer.toString(runQty));
+		getJForeverRadioButton().setSelected(runForever);
+		getJTicksRadioButton().setSelected(!runForever);
 		
-		jDelaySlider.setValue(100);
+		getJDelaySlider().setValue(100);
 
 		foreverChanged();
 		delayChanged();
@@ -79,32 +80,33 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	 * @return void
 	 */
 	private void initialize() {
-		GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
-		gridBagConstraints10.gridx = 0;
-		gridBagConstraints10.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints10.anchor = GridBagConstraints.NORTHWEST;
-		gridBagConstraints10.gridy = 3;
 		GridBagConstraints gridBagConstraints51 = new GridBagConstraints();
-		gridBagConstraints51.gridx = 0;
-		gridBagConstraints51.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints51.anchor = GridBagConstraints.NORTHWEST;
+		gridBagConstraints51.fill = GridBagConstraints.BOTH;
 		gridBagConstraints51.gridy = 0;
+		gridBagConstraints51.weightx = 1;
+		gridBagConstraints51.weighty = 1;
+		
 		GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
-		gridBagConstraints2.gridx = 0;
-		gridBagConstraints2.gridheight = 2;
-		gridBagConstraints2.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints2.anchor = GridBagConstraints.NORTHWEST;
+		gridBagConstraints2.fill = GridBagConstraints.BOTH;
 		gridBagConstraints2.gridy = 1;
+		gridBagConstraints2.weightx = 1;
+		gridBagConstraints2.weighty = 1;
+		
+		GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
+		gridBagConstraints10.fill = GridBagConstraints.BOTH;
+		gridBagConstraints10.gridy = 2;
+		gridBagConstraints10.weightx = 1;
+		gridBagConstraints10.weighty = 1;
+
 		GridBagConstraints gridBagConstraints52 = new GridBagConstraints();
-		gridBagConstraints52.gridx = 0;
-		gridBagConstraints52.gridheight = 2;
-		gridBagConstraints52.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints52.anchor = GridBagConstraints.NORTHWEST;
-		gridBagConstraints52.gridy = 4;
-		this.setSize(242, 208);
+		gridBagConstraints52.fill = GridBagConstraints.BOTH;
+		gridBagConstraints52.gridy = 3;
+		gridBagConstraints52.weightx = 1;
+		gridBagConstraints52.weighty = 1;
+		
 		this.setLayout(new GridBagLayout());
-		this.add(getJRunPanel(), gridBagConstraints2);
 		this.add(getJIntegrationPanel(), gridBagConstraints51);
+		this.add(getJRunPanel(), gridBagConstraints2);
 		this.add(getJDelayPanel(), gridBagConstraints10);
 		this.add(getJInfoPanel(), gridBagConstraints52);
 	}
@@ -158,42 +160,47 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	 */
 	private JPanel getJRunPanel() {
 		if (jRunPanel == null) {
-			GridBagConstraints gridBagConstraints9 = new GridBagConstraints();
-			gridBagConstraints9.gridx = 3;
-			gridBagConstraints9.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints9.gridy = 2;
-			GridBagConstraints gridBagConstraints8 = new GridBagConstraints();
-			gridBagConstraints8.gridx = 3;
-			gridBagConstraints8.fill = GridBagConstraints.BOTH;
-			gridBagConstraints8.gridheight = 2;
-			gridBagConstraints8.gridy = 0;
-			GridBagConstraints gridBagConstraints7 = new GridBagConstraints();
-			gridBagConstraints7.gridx = 2;
-			gridBagConstraints7.gridheight = 3;
-			gridBagConstraints7.fill = GridBagConstraints.BOTH;
-			gridBagConstraints7.gridy = 0;
-			GridBagConstraints gridBagConstraints6 = new GridBagConstraints();
-			gridBagConstraints6.fill = GridBagConstraints.BOTH;
-			gridBagConstraints6.gridy = 1;
-			gridBagConstraints6.weightx = 1.0;
-			gridBagConstraints6.gridheight = 2;
-			gridBagConstraints6.gridx = 0;
-			GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
-			gridBagConstraints5.gridx = 1;
-			gridBagConstraints5.anchor = GridBagConstraints.WEST;
-			gridBagConstraints5.gridy = 2;
-			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-			gridBagConstraints3.gridx = 1;
-			gridBagConstraints3.anchor = GridBagConstraints.WEST;
-			gridBagConstraints3.gridy = 0;
 			jRunPanel = new JPanel();
 			jRunPanel.setLayout(new GridBagLayout());
 			jRunPanel.setBorder(BorderFactory.createTitledBorder("Run"));
+
+			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			gridBagConstraints3.gridx = 0;
+			gridBagConstraints3.anchor = GridBagConstraints.WEST;
+			gridBagConstraints3.gridy = 0;
 			jRunPanel.add(getJForeverRadioButton(), gridBagConstraints3);
+			
+			GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
+			gridBagConstraints5.gridx = 0;
+			gridBagConstraints5.anchor = GridBagConstraints.WEST;
+			gridBagConstraints5.gridy = 1;
 			jRunPanel.add(getJTicksRadioButton(), gridBagConstraints5);
+
+			GridBagConstraints gridBagConstraints6 = new GridBagConstraints();
+			gridBagConstraints6.fill = GridBagConstraints.BOTH;
+			gridBagConstraints6.gridx = 1;
+			gridBagConstraints6.gridy = 1;
+			gridBagConstraints6.weightx = 1.0;
+			//gridBagConstraints6.gridheight = 2;
 			jRunPanel.add(getJQuantityTextField(), gridBagConstraints6);
+
+			GridBagConstraints gridBagConstraints7 = new GridBagConstraints();
+			gridBagConstraints7.gridx = 2;
+			gridBagConstraints7.gridheight = 2;
+			gridBagConstraints7.fill = GridBagConstraints.BOTH;
+			gridBagConstraints7.gridy = 0;
 			jRunPanel.add(getJGoButton(), gridBagConstraints7);
+
+			GridBagConstraints gridBagConstraints8 = new GridBagConstraints();
+			gridBagConstraints8.gridx = 3;
+			gridBagConstraints8.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints8.gridy = 0;
 			jRunPanel.add(getJStopButton(), gridBagConstraints8);
+			
+			GridBagConstraints gridBagConstraints9 = new GridBagConstraints();
+			gridBagConstraints9.gridx = 3;
+			gridBagConstraints9.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints9.gridy = 1;
 			jRunPanel.add(getJResetButton(), gridBagConstraints9);
 		}
 		return jRunPanel;
@@ -252,6 +259,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			jQuantityTextField = new JTextField();
 			jQuantityTextField.setText("1");
 			jQuantityTextField.setColumns(4);
+			jQuantityTextField.setMinimumSize(new Dimension(25, 0));
 			jQuantityTextField.addKeyListener(new java.awt.event.KeyAdapter() {
 				public void keyTyped(java.awt.event.KeyEvent e) {
 					if (!Character.isDigit(e.getKeyChar())) {
@@ -317,9 +325,15 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 0;
 			gridBagConstraints1.gridy = 0;
+			//gridBagConstraints1.weightx = 1;
+			gridBagConstraints1.anchor = GridBagConstraints.WEST;
 			GridBagConstraints gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = -1;
+			gridBagConstraints.weightx = 1;
+			gridBagConstraints.anchor = GridBagConstraints.WEST;
+			gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+			
 			jTypePanel = new JPanel();
 			jTypePanel.setLayout(new GridBagLayout());
 			jTypePanel.setBorder(BorderFactory.createTitledBorder("Type"));
@@ -334,6 +348,10 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 0;
 			gridBagConstraints1.gridy = 0;
+			gridBagConstraints1.weightx = 1;
+			gridBagConstraints1.weighty = 1;
+			gridBagConstraints1.fill = GridBagConstraints.BOTH;
+			gridBagConstraints1.anchor = GridBagConstraints.WEST;
 			jInfoPanel = new JPanel();
 			jInfoPanel.setLayout(new GridBagLayout());
 			jInfoPanel.setBorder(BorderFactory.createTitledBorder("Info"));
@@ -357,7 +375,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			gridBagConstraints12.gridy = 1;
 			jMsecPerTickLabel = new JLabel();
 			GridBagConstraints gridBagConstraints11 = new GridBagConstraints();
-			gridBagConstraints11.fill = GridBagConstraints.VERTICAL;
+			gridBagConstraints11.fill = GridBagConstraints.BOTH;
 			gridBagConstraints11.gridy = 0;
 			gridBagConstraints11.weightx = 1.0;
 			gridBagConstraints11.gridx = 0;
