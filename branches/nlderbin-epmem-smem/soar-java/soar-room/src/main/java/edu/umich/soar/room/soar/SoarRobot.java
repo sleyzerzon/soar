@@ -161,6 +161,11 @@ public class SoarRobot implements RobotCommander, ConfigureInterface, OffsetPose
 	public boolean diffuse(int id) {
 		return world.diffuseObject(player, id);
 	}
+
+	@Override
+	public boolean diffuseByWire(int id, String color) {
+		return world.diffuseObjectByWire(player, id, color);
+	}
 	
 	@Override
 	public String reason() {

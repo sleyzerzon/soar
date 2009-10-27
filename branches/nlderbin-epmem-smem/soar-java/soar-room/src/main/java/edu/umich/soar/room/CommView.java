@@ -68,6 +68,7 @@ public class CommView extends AbstractAgentView {
     public CommView(Adaptable app) {
         super("commView", "Communication");
         addAction(DockingConstants.PIN_ACTION);
+        addAction(DockingConstants.CLOSE_ACTION);
 
         this.sim = Adaptables.adapt(app, Simulation.class);
 

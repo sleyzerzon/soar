@@ -64,6 +64,7 @@ public class LogView extends AbstractAgentView {
         super("logView", "Log");
         
         addAction(DockingConstants.PIN_ACTION);
+        addAction(DockingConstants.CLOSE_ACTION);
 
         final JPanel p = new JPanel(new BorderLayout());
         

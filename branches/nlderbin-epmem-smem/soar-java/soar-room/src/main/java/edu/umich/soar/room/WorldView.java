@@ -28,6 +28,7 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
 		sim = Adaptables.adapt(app, Simulation.class);
 		
         addAction(DockingConstants.PIN_ACTION);
+        addAction(DockingConstants.CLOSE_ACTION);
 
         gridMapPanel = new RoomPanel(app);
         setContentPane(gridMapPanel);

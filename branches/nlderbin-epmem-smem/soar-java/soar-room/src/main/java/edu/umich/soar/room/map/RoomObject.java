@@ -21,10 +21,18 @@ public class RoomObject {
 		String color = object.getProperty("color");
 		if (color.equals("red")) {
 			this.color = Color.red;
+		} else if (color.equals("orange")) {
+			this.color = Color.orange;
+		} else if (color.equals("yellow")) {
+			this.color = Color.yellow;
 		} else if (color.equals("green")) {
 			this.color = Color.green;
+		} else if (color.equals("blue")) {
+			this.color = Color.blue;
 		} else if (color.equals("gray")) {
 			this.color = Color.darkGray;
+		} else if (color.equals("violet")) {
+			this.color = Color.decode("0x8000ff");
 		}
 	}
 

@@ -151,8 +151,12 @@ public class SoarRobotInputLinkManager {
 						oIL.updateProperty("type", cObj.getProperty("name"));
 						oIL.updateProperty("id", rObj.getId());
 						oIL.updateProperty("color", cObj.getProperty("color"));
+						oIL.updateProperty("height", cObj.getProperty("height"));
+						oIL.updateProperty("smell", cObj.getProperty("smell"));
+						oIL.updateProperty("shape", cObj.getProperty("shape"));
 						oIL.updateProperty("weight", cObj.getProperty("weight", 0d, Double.class));
 						oIL.updateProperty("diffusible", cObj.getProperty("diffusible", false, Boolean.class));
+						oIL.updateProperty("diffuse-wire", cObj.getProperty("diffuse-wire"));
 						oIL.updateProperty("diffused", cObj.getProperty("diffused", Boolean.class));
 						objects.put(rObj.getId(), oIL);
 						

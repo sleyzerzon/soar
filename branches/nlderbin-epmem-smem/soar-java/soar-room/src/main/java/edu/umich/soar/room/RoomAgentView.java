@@ -35,6 +35,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
     public RoomAgentView(Adaptable app) {
         super("roomAgentView", "Agent View");
         addAction(DockingConstants.PIN_ACTION);
+        addAction(DockingConstants.CLOSE_ACTION);
 
         this.sim = Adaptables.adapt(app, Simulation.class);
         Adaptables.adapt(app, Application.class).getSelectionManager().addListener(this);
@@ -58,19 +59,21 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
             }};
         
         final JPanel p = new JPanel(new BorderLayout());
+        final JPanel pTop = new JPanel(new BorderLayout());
 		
         JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
 		bar.add(new AgentControlPanel(app));     
-		p.add(bar, BorderLayout.NORTH);
+		pTop.add(bar, BorderLayout.NORTH);
 		
         final JScrollPane pane = new JScrollPane(table);
-        p.add(pane, BorderLayout.CENTER);
+        pTop.add(pane, BorderLayout.SOUTH);
+        p.add(pTop, BorderLayout.NORTH);
 
         properties.setBorder(BorderFactory.createTitledBorder("Robot Properties"));
         properties.setHorizontalAlignment(LEFT);
         properties.setVerticalAlignment(TOP);
-        p.add(properties, BorderLayout.SOUTH);
+        p.add(properties, BorderLayout.CENTER);
 
         setContentPane(p);
     }

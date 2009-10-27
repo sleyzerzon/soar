@@ -15,6 +15,7 @@ public class SimulationControlView extends AbstractAdaptableView implements Disp
     public SimulationControlView(Adaptable app) {
         super("simulationControlView", "Simulation Control");
         addAction(DockingConstants.PIN_ACTION);
+        addAction(DockingConstants.CLOSE_ACTION);
 
         //this.sim = Adaptables.adapt(app, Simulation.class);
 

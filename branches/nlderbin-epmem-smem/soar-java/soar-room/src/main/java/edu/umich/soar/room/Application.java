@@ -234,9 +234,23 @@ public class Application extends JPanel implements Adaptable {
 
 	private void initMenuBar() {
 		JMenuBar menubar = new JMenuBar();
-		JMenu fileMenu = new JMenu("File");
-		fileMenu.add(actionManager.getAction(ExitAction.class));
-		menubar.add(fileMenu);
+
+		{
+			JMenu fileMenu = new JMenu("File");
+			fileMenu.add(actionManager.getAction(ExitAction.class));
+			menubar.add(fileMenu);
+		}
+//		{
+//			JMenu viewMenu = new JMenu("View");
+//			for (AbstractAdaptableView view : views) {
+//				AbstractGridmap2DAction action = Adaptables.adapt(view, AbstractGridmap2DAction.class);
+//				if (action != null) {
+//					viewMenu.add(action);
+//				}
+//			}
+//			menubar.add(viewMenu);
+//		}		
+		
 		frame.setJMenuBar(menubar);
 	}
 	

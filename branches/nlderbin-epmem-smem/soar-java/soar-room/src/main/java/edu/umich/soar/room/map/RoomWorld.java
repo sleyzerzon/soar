@@ -439,9 +439,83 @@ public class RoomWorld implements SendMessagesInterface {
 				
 				Boolean diffusible = cObj.getProperty("diffusible", false, Boolean.class);
 				if (diffusible) {
-					// success
-					cObj.setProperty("diffused", Boolean.TRUE.toString());
-					return true;
+					if (cObj.getProperty("diffuse-wire") == null) {
+						// success
+						cObj.setProperty("diffused", Boolean.TRUE.toString());
+						return true;
+					} else {
+						// Boom!
+						blockManipulationReason = "Diffusal failed (needed wire command) and object exploded.";
+						
+						player.getState().setMalfunction(true);
+						
+						if (!cObj.getCell().removeObject(cObj)) {
+							throw new IllegalStateException("Remove object failed for exploded object that should be there.");
+						}
+						rObj.destroy();
+						return false;
+					}
+				}
+
+				blockManipulationReason = "Object was not diffusable and has been destroyed";
+
+				if (!cObj.getCell().removeObject(cObj)) {
+					throw new IllegalStateException("Diffuse object failed for object that should be there.");				
+				}
+				rObj.destroy();
+				return false;
+			}
+		}
+		blockManipulationReason = "No such object ID";
+		return false;
+	}
+
+	/**
+	 * @param player
+	 * @param id
+	 * @return
+	 */
+	public boolean diffuseObjectByWire(Robot player, int id, String color) {
+		blockManipulationReason = null;
+		
+		if (player.getState().isMalfunctioning()) {
+			blockManipulationReason = "Malfunction";
+			return false;
+		}
+		
+		// note: This is a stupid way to do this.
+		for (RoomObject rObj : map.getRoomObjects()) {
+			if (rObj.getPose() == null) {
+				// not on map
+				continue;
+			}
+			CellObject cObj = rObj.getCellObject();
+			
+			if (rObj.getId() == id) {
+				if (!isWithinTouchDistance(player, rObj)) {
+					blockManipulationReason = "Object is too far";
+					return false;
+				}
+				
+				Boolean diffusible = cObj.getProperty("diffusible", false, Boolean.class);
+				if (diffusible) {
+					Boolean diffused = cObj.getProperty("diffused", true, Boolean.class);
+					if (diffused || color.equals(cObj.getProperty("diffuse-wire"))) {
+						// success
+						cObj.setProperty("diffused", Boolean.TRUE.toString());
+						return true;
+					} else {
+						// Boom!
+						blockManipulationReason = "Diffusal failed (wrong wire) and object exploded.";
+						
+						player.getState().setMalfunction(true);
+						
+						if (!cObj.getCell().removeObject(cObj)) {
+							throw new IllegalStateException("Remove object failed for exploded object that should be there.");
+						}
+						rObj.destroy();
+						return false;
+					}
 				}
 
 				blockManipulationReason = "Object was not diffusable and has been destroyed";
