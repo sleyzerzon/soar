@@ -544,6 +544,17 @@ public class RoomWorld implements SendMessagesInterface {
 		Robot recipient;
 		List<String> tokens;
 		
+		public Message copy() {
+			Message tmp = new Message();
+			tmp.from = this.from;
+			tmp.recipient = this.recipient;
+			tmp.tokens = new ArrayList<String>();
+			for (String tok : this.tokens) {
+				tmp.tokens.add(tok);
+			}
+			return tmp;
+		}
+		
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
@@ -615,6 +626,7 @@ public class RoomWorld implements SendMessagesInterface {
 			for (Robot recipient : getPlayers()) {
 				message.recipient = recipient;
 				messages.add(message);
+				message = message.copy();
 			}
 		}
 	}

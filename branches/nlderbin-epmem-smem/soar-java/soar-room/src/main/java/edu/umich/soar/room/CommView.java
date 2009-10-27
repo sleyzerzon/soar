@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -19,6 +20,7 @@ import org.flexdock.docking.DockingConstants;
 import edu.umich.soar.robot.SendMessages;
 import edu.umich.soar.robot.SendMessagesInterface;
 import edu.umich.soar.room.core.Simulation;
+import edu.umich.soar.room.map.Robot;
 
 public class CommView extends AbstractAgentView {
 	
@@ -27,6 +29,9 @@ public class CommView extends AbstractAgentView {
 	private final JTextField commInput = new JTextField();
 	private final SendMessagesInterface sendMessages;
 	private final JTextArea commOutput = new JTextArea();
+	private final JComboBox commDestination = new JComboBox();
+	private static final String DESTINATION_ALL = "<all>";
+	
     private final Writer outputWriter = new Writer()
     {
         private StringBuilder buffer = new StringBuilder();
@@ -77,6 +82,9 @@ public class CommView extends AbstractAgentView {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Direct Communication"));
         
+        refresh();
+        p.add(commDestination, BorderLayout.NORTH);
+        
         commOutput.setEditable(false);
         commOutput.setRows(4);
         commOutput.setLineWrap(true);
@@ -105,14 +113,26 @@ public class CommView extends AbstractAgentView {
     }
     
     private void sendMessage() {
+    	Object selectedObject = commDestination.getSelectedItem();
+    	String dest = null;
+    	if (selectedObject != null) {
+    		if (selectedObject instanceof Robot) {
+    			dest = selectedObject.toString();
+    		}
+    	}
     	List<String> tokens = SendMessages.toTokens(commInput.getText());
     	if (!tokens.isEmpty()) {
-    		sendMessages.sendMessage("operator", null, tokens);
+    		sendMessages.sendMessage("operator", dest, tokens);
     		commInput.setText("");
     	}
     }
 
 	@Override
 	public void refresh() {
+		commDestination.removeAllItems();
+        commDestination.addItem(DESTINATION_ALL);
+        for (Robot robot : sim.getWorld().getPlayers()) {
+        	commDestination.addItem(robot);
+        }
 	}
 }
