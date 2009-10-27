@@ -104,8 +104,12 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
     * *relative-bearing* (float or int) if positive then turn left
     * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
     * *color* (string) object color
+    * *height* (string) object height
+    * *smell* (string) object smell
+    * *shape* (string) object shape
     * *weight* (float) object weight in kg, only for non-player types
     * *diffusible* (string) (true, false) object can be diffused
+    * *diffuse-wire* (string) (red, green, blue) which wire diffuses it
     * *diffused* (string) (true, false) object (diffusible only) is diffused
 
   * _configuration_
@@ -179,6 +183,11 @@ All parameters for the command must be on the same identifier of the command. Fo
 
   * _diffuse-object_ engage in a domain-specific diffuse task
     * *id* (int) target object id
+    * *status* (string) (accepted, complete, error)
+
+  * _diffuse-object-by-wire_ engage in a domain-specific diffuse task
+    * *id* (int) target object id
+    * *color* (string) (red, green, blue) what wire to cut
     * *status* (string) (accepted, complete, error)
 
 === Waypoint Commands ===
