@@ -4,7 +4,8 @@ objects {
 		name = block;	# internal soar2d name and input-link type
 		movable = true;	# movable object
 		color = gray;	# input-link color
-		weight = 0.25;	# input-link weight (kg?)
+		
+		# doesn't contain any interesting properties, for test
 	}
 	
 	b {					# symbol for map file, must be unique in this file
@@ -12,6 +13,11 @@ objects {
 		movable = true;	# movable object
 		color = green;	# input-link color
 		weight = 0.05;	# input-link weight (kg?)
+		height = short;
+		smell = sulfur;
+		shape = sphere;
+		diffusible = true;
+		diffuse-wire = blue;
 	}
 	
 	k {					# symbol for map file, must be unique in this file
@@ -19,6 +25,59 @@ objects {
 		movable = true;	# movable object
 		color = red;	# input-link color
 		weight = 0.20;	# input-link weight (kg?)
+		height = short;
+		smell = sulfur;
+		shape = sphere;
+		diffusible = true;
+		#diffuse-wire = blue;
+	}
+	
+	o {					
+		name = oscar;	
+		movable = true;	
+		color = orange;	
+		weight = 0.20;	
+		height = short;
+		smell = sulfur;
+		shape = sphere;
+		diffusible = true;
+		diffuse-wire = blue;
+	}
+	
+	y {					
+		name = yankee;	
+		movable = true;	
+		color = yellow;	
+		weight = 0.20;	
+		height = short;
+		smell = sulfur;
+		shape = sphere;
+		diffusible = true;
+		diffuse-wire = blue;
+	}
+	
+	l {					
+		name = bravo;	
+		movable = true;	
+		color = blue;	
+		weight = 0.20;	
+		height = short;
+		smell = sulfur;
+		shape = sphere;
+		diffusible = true;
+		diffuse-wire = blue;
+	}
+	
+	v {					
+		name = victor;	
+		movable = true;	
+		color = violet;	
+		weight = 0.20;	
+		height = short;
+		smell = sulfur;
+		shape = sphere;
+		diffusible = true;
+		diffuse-wire = blue;
 	}
 	
 # Don't modify below here
