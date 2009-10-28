@@ -255,6 +255,8 @@ public class SimConfig {
 		// use reflection to load fields
 		try {
 			for (Field f : fields) {
+				System.out.println(f.getType().getName());
+				
 				if (f.getType().getName() == "boolean") {
 					f.set(target, childConfig.getBoolean(f.getName(), f.getBoolean(target)));
 					
@@ -267,7 +269,7 @@ public class SimConfig {
 				} else if (f.getType().getName() == "java.lang.String") {
 					f.set(target, childConfig.getString(f.getName(), (String)f.get(target)));
 					
-				} else if (f.getType().getName() == "edu.umich.soar.gridmap2d.core.PlayerColor") {
+				} else if (f.getType().getName() == "edu.umich.soar.room.core.PlayerColor") {
 					String colorString = childConfig.getString(f.getName(), null);
 					if (colorString != null) {
 						f.set(target, PlayerColor.valueOf(colorString.toUpperCase()));
