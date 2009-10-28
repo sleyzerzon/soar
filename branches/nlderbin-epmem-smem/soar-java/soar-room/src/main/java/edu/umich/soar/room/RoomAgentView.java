@@ -1,9 +1,13 @@
 package edu.umich.soar.room;
 
 import java.awt.BorderLayout;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Arrays;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,7 +35,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
     private final JXTable table;
 	private final JLabel properties = new JLabel();
 	private final TableSelectionProvider selectionProvider;
-
+	
     public RoomAgentView(Adaptable app) {
         super("roomAgentView", "Agent View");
         addAction(DockingConstants.PIN_ACTION);
@@ -50,17 +54,17 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         this.table.setColumnControlVisible(true);
 
         this.selectionProvider = new TableSelectionProvider(this.table) {
-
             @Override
             public void valueChanged(ListSelectionEvent e)
             {
                 super.valueChanged(e);
                 updateRobotProperties();
-            }};
+            }
+        };
         
-        final JPanel p = new JPanel(new BorderLayout());
+    	final JPanel p = new JPanel(new BorderLayout());
         final JPanel pTop = new JPanel(new BorderLayout());
-		
+
         JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
 		bar.add(new AgentControlPanel(app));     
@@ -73,6 +77,8 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
         properties.setBorder(BorderFactory.createTitledBorder("Robot Properties"));
         properties.setHorizontalAlignment(LEFT);
         properties.setVerticalAlignment(TOP);
+        properties.setHorizontalTextPosition(JLabel.CENTER);
+        properties.setVerticalTextPosition(JLabel.BOTTOM);
         p.add(properties, BorderLayout.CENTER);
 
         setContentPane(p);

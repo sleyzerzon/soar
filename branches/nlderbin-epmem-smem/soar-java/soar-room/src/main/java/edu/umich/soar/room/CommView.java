@@ -6,9 +6,13 @@ import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -30,13 +34,17 @@ public class CommView extends AbstractAgentView implements SimEventListener {
 	
 	private static final long serialVersionUID = -1676542480621263207L;
 	private final Simulation sim;
+	private final JLabel commWarn = new JLabel();
 	private final JTextField commInput = new JTextField();
 	private final SendMessagesInterface sendMessages;
 	private final JTextArea commOutput = new JTextArea();
 	private final JComboBox commDestination = new JComboBox();
 	private static final String DESTINATION_ALL = "-ALL-";
 	private static final String OPERATOR = "operator";
-	
+	private static final String ACTIVATE_WARNING = "activate warning";
+	private static final String DEACTIVATE_WARNING = "deactivate warning";
+	private Icon warnIcon;
+
     private final Writer outputWriter = new Writer()
     {
         private StringBuilder buffer = new StringBuilder();
@@ -59,6 +67,12 @@ public class CommView extends AbstractAgentView implements SimEventListener {
                 public void run() {
                     synchronized(outputWriter) // synchronized on outer.this like the flush() method
                     {
+                    	String out = buffer.toString();
+                    	if (out.contains(DEACTIVATE_WARNING)) {
+                    		deactivateWarning();
+                    	} else if (out.contains(ACTIVATE_WARNING)) {
+                    		activateWarning();
+                    	}
                     	commOutput.append(buffer.toString());
                     	commOutput.setCaretPosition(commOutput.getDocument().getLength());
                         buffer.setLength(0);
@@ -86,6 +100,14 @@ public class CommView extends AbstractAgentView implements SimEventListener {
 
         this.sendMessages = Adaptables.adapt(app, SendMessagesInterface.class);
         
+        try {
+			warnIcon = new ImageIcon(ImageIO.read(RoomAgentView.class.getResourceAsStream("/edu/umich/soar/room/images/soar2009.png")));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			warnIcon = new ImageIcon();
+		}
+
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Direct Communication"));
         
@@ -117,6 +139,8 @@ public class CommView extends AbstractAgentView implements SimEventListener {
 			}
         });
         p.add(commSend, BorderLayout.EAST);
+        p.add(commWarn, BorderLayout.WEST);
+        
         setContentPane(p);
     }
     
@@ -133,6 +157,14 @@ public class CommView extends AbstractAgentView implements SimEventListener {
     		sendMessages.sendMessage(OPERATOR, dest, tokens);
     		commInput.setText("");
     	}
+    }
+    
+    private void activateWarning() {
+    	commWarn.setIcon(warnIcon);
+    }
+
+    private void deactivateWarning() {
+    	commWarn.setIcon(null);
     }
 
 	@Override
