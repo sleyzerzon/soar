@@ -146,6 +146,7 @@ final public class OutputLinkManager {
 			commands.put(GetObjectCommand.NAME, GetObjectCommand.newInstance(manip));
 			commands.put(DropObjectCommand.NAME, DropObjectCommand.newInstance(manip));
 			commands.put(DiffuseObjectCommand.NAME, DiffuseObjectCommand.newInstance(manip));
+			commands.put(DiffuseObjectByWireCommand.NAME, DiffuseObjectByWireCommand.newInstance(manip));
 		} else {
 			logger.debug("omitting manipulation commands");
 		}
