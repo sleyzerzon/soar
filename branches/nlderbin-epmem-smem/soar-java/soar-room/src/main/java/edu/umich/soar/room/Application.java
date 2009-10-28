@@ -13,10 +13,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.prefs.Preferences;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -181,13 +183,17 @@ public class Application extends JPanel implements Adaptable {
     private class UpdateListener implements SimEventListener {
     	@Override
     	public void onEvent(SimEvent event) {
-        	SwingUtilities.invokeLater(new Runnable() {
-        		@Override
-        		public void run() {
-        			update();
-        		}
-        	});
+    		fireUpdate();
     	}
+    }
+    
+    void fireUpdate() {
+    	SwingUtilities.invokeLater(new Runnable() {
+    		@Override
+    		public void run() {
+    			update();
+    		}
+    	});
     }
     
     private void update()
@@ -226,6 +232,8 @@ public class Application extends JPanel implements Adaptable {
 		new GoAction(actionManager);
 		
 		new ExitAction(actionManager);
+		new ToggleBreadcrumbsAction(actionManager);
+		new ClearBreadcrumbsAction(actionManager);
 		
 		new CreatePlayerAction(actionManager);
 		new ClonePlayerAction(actionManager);
@@ -240,16 +248,20 @@ public class Application extends JPanel implements Adaptable {
 			fileMenu.add(actionManager.getAction(ExitAction.class));
 			menubar.add(fileMenu);
 		}
-//		{
-//			JMenu viewMenu = new JMenu("View");
+		{
+			JMenu viewMenu = new JMenu("View");
+			
+			viewMenu.add(new JCheckBoxMenuItem(actionManager.getAction(ToggleBreadcrumbsAction.class)));
+			viewMenu.add(actionManager.getAction(ClearBreadcrumbsAction.class));
+			
 //			for (AbstractAdaptableView view : views) {
 //				AbstractGridmap2DAction action = Adaptables.adapt(view, AbstractGridmap2DAction.class);
 //				if (action != null) {
 //					viewMenu.add(action);
 //				}
 //			}
-//			menubar.add(viewMenu);
-//		}		
+			menubar.add(viewMenu);
+		}		
 		
 		frame.setJMenuBar(menubar);
 	}

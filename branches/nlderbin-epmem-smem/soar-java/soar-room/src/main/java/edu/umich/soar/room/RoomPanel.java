@@ -31,7 +31,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 	
 	private static final long serialVersionUID = -8083633808532173643L;
 
-	private final int cellSize = 16;
+	private final int cellSize = 24;
 	private final Simulation sim;
 	private static final int DOT_SIZE = 7;
 	private static final Polygon TRIANGLE = new Polygon();
@@ -70,6 +70,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 	
 	private final Map<Integer, IdLabel> rmids = new HashMap<Integer, IdLabel>();
 	private final Map<Robot, Breadcrumbs> breadcrumbs = new HashMap<Robot, Breadcrumbs>();
+	private boolean breadcrumbsEnabled = true;
 	
 	private static class Location {
 		private final int CELL_SIZE;
@@ -234,10 +235,12 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 				}
 				
 				// draw breadcrumbs
-				g2d.setStroke(DOTTED_STROKE);
-				g2d.drawPolyline(bcX, bcY, bcS);
-				g2d.setStroke(new BasicStroke());
-
+				if (breadcrumbsEnabled) {
+					g2d.setStroke(DOTTED_STROKE);
+					g2d.drawPolyline(bcX, bcY, bcS);
+					g2d.setStroke(new BasicStroke());
+				}
+				
 				// draw player
 				g2d.translate(x, y);
 				g2d.rotate(-player.getState().getYaw());
@@ -329,5 +332,22 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 		synchronized(breadcrumbs) {
 			breadcrumbs.clear();
 		}
+	}
+
+	@Override
+	public boolean areBreadcrumbsEnabled() {
+		return breadcrumbsEnabled;
+	}
+
+	@Override
+	public void clearBreadcrumbs() {
+		synchronized(breadcrumbs) {
+			breadcrumbs.clear();
+		}
+	}
+
+	@Override
+	public void setBreadcrumbsEnabled(boolean setting) {
+		breadcrumbsEnabled = setting;
 	}
 }

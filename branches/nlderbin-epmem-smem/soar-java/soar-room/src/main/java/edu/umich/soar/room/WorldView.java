@@ -13,7 +13,7 @@ import edu.umich.soar.room.map.Robot;
 import edu.umich.soar.room.selection.SelectionManager;
 import edu.umich.soar.room.selection.SelectionProvider;
 
-public class WorldView extends AbstractAdaptableView implements SelectionProvider, Refreshable {
+public class WorldView extends AbstractAdaptableView implements SelectionProvider, Refreshable, BreadcrumbsProvider {
 	
 	private static final long serialVersionUID = 4612350578042898852L;
 	
@@ -26,6 +26,9 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
         super("worldView", "World View");
 
 		sim = Adaptables.adapt(app, Simulation.class);
+		ActionManager am = Adaptables.adapt(app, ActionManager.class);
+		am.getAction(ClearBreadcrumbsAction.class).setBreadcrumbsProvider(this);
+		am.getAction(ToggleBreadcrumbsAction.class).setBreadcrumbsProvider(this);
 		
         addAction(DockingConstants.PIN_ACTION);
         addAction(DockingConstants.CLOSE_ACTION);
@@ -103,4 +106,20 @@ public class WorldView extends AbstractAdaptableView implements SelectionProvide
 	public void refresh() {
 		this.gridMapPanel.repaint();
 	}
+
+	@Override
+	public boolean areBreadcrumbsEnabled() {
+		return gridMapPanel.areBreadcrumbsEnabled();
+	}
+
+	@Override
+	public void clearBreadcrumbs() {
+		gridMapPanel.clearBreadcrumbs();
+	}
+
+	@Override
+	public void setBreadcrumbsEnabled(boolean setting) {
+		gridMapPanel.setBreadcrumbsEnabled(setting);
+	}
+	
 }
