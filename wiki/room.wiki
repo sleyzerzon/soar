@@ -103,7 +103,7 @@ Attributes in _italics_ are identifier WMEs, *bold* are leaves or possible leave
     * *yaw* (float or int) what yaw to turn to to face it
     * *relative-bearing* (float or int) if positive then turn left
     * *abs-relative-bearing* (float or int) (0..) absolute value of relative bearing
-    * *color* (string) object color
+    * *color* (string) (red orange yellow green blue gray violet) object color
     * *height* (string) object height
     * *smell* (string) object smell
     * *shape* (string) object shape
