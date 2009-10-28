@@ -255,8 +255,6 @@ public class SimConfig {
 		// use reflection to load fields
 		try {
 			for (Field f : fields) {
-				System.out.println(f.getType().getName());
-				
 				if (f.getType().getName() == "boolean") {
 					f.set(target, childConfig.getBoolean(f.getName(), f.getBoolean(target)));
 					

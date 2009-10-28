@@ -31,9 +31,11 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 	
 	private static final long serialVersionUID = -8083633808532173643L;
 
-	private final int cellSize = 16;
+	private static final double SCALE = 1.5;
+	private static final int CELL_SIZE = (int)(RoomWorld.CELL_SIZE * SCALE);
+	private static final float DOT_SCALE = 0.4375f;
+	private static final float DOT_SIZE = CELL_SIZE * DOT_SCALE;
 	private final Simulation sim;
-	private static final int DOT_SIZE = 7;
 	private static final Polygon TRIANGLE = new Polygon();
 	
 	static {
@@ -73,14 +75,12 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 	private boolean breadcrumbsEnabled = true;
 	
 	private static class Location {
-		private final int CELL_SIZE;
 		private final int MAP_SIZE;
 		private final int [] loc = new int [2];
 		private final int [] dloc = new int [2];
 		private boolean first;
 		
-		Location(int cellSize, int mapSize) {
-			this.CELL_SIZE = cellSize;
+		Location(int mapSize) {
 			this.MAP_SIZE = mapSize;
 			reset();
 		}
@@ -89,7 +89,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 			loc[0] = 0;
 			loc[1] = 0;
 			dloc[0] = 0;
-			dloc[1] = CELL_SIZE*(MAP_SIZE - 1);
+			dloc[1] = CELL_SIZE * (MAP_SIZE - 1);
 			first = true;
 		}
 		
@@ -127,7 +127,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 	
 	void setMap(RoomMap map) {
 		rmids.clear();
-		loc = new Location(cellSize, map.size());
+		loc = new Location(map.size());
 		
 		walls = new boolean[map.size()][];
 		for (int i = 0; i < walls.length; ++i) {
@@ -158,9 +158,26 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 	
 	@Override
 	int getCellSize() {
-		return cellSize;
+		return CELL_SIZE;
 	}
 	
+	double[] worldToScreenPos(double[] world) {
+		double[] screen = new double[world.length];
+		System.arraycopy(world, 0, screen, 0, world.length);
+		screen[0] *= SCALE;
+		screen[1] *= SCALE;
+		RoomMap map = (RoomMap)sim.getMap();
+		screen[1] = CELL_SIZE * map.size() - (int)screen[1];
+		return screen;
+	}
+	
+	@Override
+	int [] getCellAtPixel(int x, int y) {
+		RoomMap map = (RoomMap)sim.getMap();
+		y = map.size() * CELL_SIZE - y;
+		return super.getCellAtPixel(x, y);
+	}
+
 	@Override
 	protected void paintComponent(Graphics gr) {
 		long id = Stopwatch.start("RoomPanel", "paintComponent");
@@ -190,7 +207,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 					g2d.setColor(SystemColor.control);
 				}
 				
-				g2d.fillRect(loc.getDraw()[0], loc.getDraw()[1], cellSize, cellSize);
+				g2d.fillRect(loc.getDraw()[0], loc.getDraw()[1], CELL_SIZE, CELL_SIZE);
 			}
 			
 			// draw objects
@@ -200,13 +217,14 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 					continue;
 				}
 				g2d.setColor(ro.getColor());
-				g2d.fillOval((int)pose.pos[0] - 2, cellSize*map.size() - (int)pose.pos[1] - 2, 4, 4);
+				double[] screen = worldToScreenPos(pose.pos);
+				g2d.fillOval((int)screen[0] - (int)(DOT_SIZE/2), (int)screen[1] - (int)(DOT_SIZE/2), (int)DOT_SIZE, (int)DOT_SIZE);
 			}
 	
 			// draw id labels on top of map
 			for (IdLabel label : rmids.values()) {
 				g2d.setColor(Color.BLACK);
-				g2d.drawString(label.label, label.loc[0], label.loc[1] + cellSize - 2);
+				g2d.drawString(label.label, label.loc[0], label.loc[1] + CELL_SIZE - 2);
 			}
 			
 			// draw entities now so they appear on top
@@ -215,9 +233,8 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 				pose_t pose = player.getState().getPose();
 				g2d.setColor(Colors.getColor(player.getColor()));
 				
-				double x = pose.pos[0];
-				double y = map.size() * cellSize - pose.pos[1];
-				
+				double[] screen = worldToScreenPos(pose.pos);
+
 				int[] bcX;
 				int[] bcY;
 				int bcS;
@@ -231,7 +248,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 					bcS = bc.getSteps();
 
 					// add new
-					bc.addBreadcrumb(x, y);
+					bc.addBreadcrumb(screen[0], screen[1]);
 				}
 				
 				// draw breadcrumbs
@@ -242,18 +259,18 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 				}
 				
 				// draw player
-				g2d.translate(x, y);
+				g2d.translate(screen[0], screen[1]);
 				g2d.rotate(-player.getState().getYaw());
 				g2d.drawPolygon(TRIANGLE);
 				g2d.rotate(player.getState().getYaw());
-				g2d.translate(-x, -y);
+				g2d.translate(-screen[0], -screen[1]);
 				
 				// draw waypoints on top of that
 				List<double[]> waypoints = world.getWaypointList(player);
 				for (double[] wp : waypoints) {
-					g2d.drawOval((int)Math.floor(wp[0]) - 2, cellSize*map.size() - (int)Math.ceil(wp[1]) - 2, 4, 4);
+					double[] wpScreen = worldToScreenPos(wp);
+					g2d.drawOval((int)wpScreen[0] - 2, (int)wpScreen[1] - 2, 4, 4);
 				}
-				
 			}
 			
 		} finally {
@@ -320,13 +337,6 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 		
 	}
 	
-	@Override
-	int [] getCellAtPixel(int x, int y) {
-		RoomMap map = (RoomMap)sim.getMap();
-		y = map.size() * cellSize - y;
-		return super.getCellAtPixel(x, y);
-	}
-
 	@Override
 	public void onEvent(SimEvent event) {
 		synchronized(breadcrumbs) {

@@ -142,7 +142,7 @@ public class Application extends JPanel implements Adaptable {
                 exit();
             }});
 
-        frame.setSize(700, 700);
+        frame.setSize(900, 900);
 		frame.setTitle("Room Environment");
 		
 		initActions();
@@ -270,13 +270,13 @@ public class Application extends JPanel implements Adaptable {
 		viewport.dock(worldView);
 		
 		final AbstractAdaptableView agentView = addView(new RoomAgentView(this));
-		worldView.dock(agentView, DockingConstants.EAST_REGION, 0.6f);
+		worldView.dock(agentView, DockingConstants.EAST_REGION, 0.7f);
 
 		final AbstractAdaptableView simulationControlView = addView(new SimulationControlView(this));
 		agentView.dock(simulationControlView, DockingConstants.SOUTH_REGION, 0.48f);
 
 		final AbstractAdaptableView commView = addView(new CommView(this));
-		worldView.dock(commView, DockingConstants.SOUTH_REGION, 0.7f);
+		worldView.dock(commView, DockingConstants.SOUTH_REGION, 0.76f);
 		
 		final AbstractAdaptableView logView = addView(new LogView(this));
 		commView.dock(logView);
