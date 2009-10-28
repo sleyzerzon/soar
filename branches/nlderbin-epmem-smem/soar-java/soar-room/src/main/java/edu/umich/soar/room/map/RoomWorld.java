@@ -172,7 +172,10 @@ public class RoomWorld implements SendMessagesInterface {
 		moveRoomPlayers();
 		
 		for (Message message : messages) {
-			message.recipient.getReceiveMessagesInterface().newMessage(message.from, message.tokens);
+			if (message.recipient instanceof Robot) {
+				Robot robot = (Robot)message.recipient;
+				robot.getReceiveMessagesInterface().newMessage(message.from, message.tokens);
+			}
 		}
 		messages.clear();
 	}
@@ -541,7 +544,7 @@ public class RoomWorld implements SendMessagesInterface {
 
 	private static class Message {
 		String from;
-		Robot recipient;
+		Object recipient;
 		List<String> tokens;
 		
 		public Message copy() {
@@ -579,16 +582,20 @@ public class RoomWorld implements SendMessagesInterface {
 			throw new NullPointerException();
 		}
 		if (to != null) {
-			Robot recipient = players.get(to);
+			Object recipient = players.get(to);
 			if (recipient == null) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("Unknown recipient ").append(to).append(" for message: ");
-				for (String token : tokens) {
-					sb.append(token);
-					sb.append(" ");
+				if (operatorName != null && operatorName.equals(to)) {
+					recipient = operatorName;
+				} else {
+					StringBuilder sb = new StringBuilder();
+					sb.append("Unknown recipient ").append(to).append(" for message: ");
+					for (String token : tokens) {
+						sb.append(token);
+						sb.append(" ");
+					}
+					logger.error(sb);
+					return;
 				}
-				logger.error(sb);
-				return;
 			}
 			
 			Message message = new Message();
@@ -632,7 +639,13 @@ public class RoomWorld implements SendMessagesInterface {
 	}
 
 	private Writer commWriter;
+	private String operatorName;
 	public void setCommWriter(Writer commWriter) {
 		this.commWriter = commWriter;
 	}
+	
+	public void setCommOperator(String operatorName) {
+		this.operatorName = operatorName;
+	}
+
 }

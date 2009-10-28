@@ -20,9 +20,13 @@ import org.flexdock.docking.DockingConstants;
 import edu.umich.soar.robot.SendMessages;
 import edu.umich.soar.robot.SendMessagesInterface;
 import edu.umich.soar.room.core.Simulation;
+import edu.umich.soar.room.core.events.PlayerAddedEvent;
+import edu.umich.soar.room.core.events.PlayerRemovedEvent;
+import edu.umich.soar.room.events.SimEvent;
+import edu.umich.soar.room.events.SimEventListener;
 import edu.umich.soar.room.map.Robot;
 
-public class CommView extends AbstractAgentView {
+public class CommView extends AbstractAgentView implements SimEventListener {
 	
 	private static final long serialVersionUID = -1676542480621263207L;
 	private final Simulation sim;
@@ -30,7 +34,8 @@ public class CommView extends AbstractAgentView {
 	private final SendMessagesInterface sendMessages;
 	private final JTextArea commOutput = new JTextArea();
 	private final JComboBox commDestination = new JComboBox();
-	private static final String DESTINATION_ALL = "<all>";
+	private static final String DESTINATION_ALL = "-ALL-";
+	private static final String OPERATOR = "operator";
 	
     private final Writer outputWriter = new Writer()
     {
@@ -76,6 +81,8 @@ public class CommView extends AbstractAgentView {
         addAction(DockingConstants.CLOSE_ACTION);
 
         this.sim = Adaptables.adapt(app, Simulation.class);
+        this.sim.getEvents().addListener(PlayerAddedEvent.class, this);
+        this.sim.getEvents().addListener(PlayerRemovedEvent.class, this);
 
         this.sendMessages = Adaptables.adapt(app, SendMessagesInterface.class);
         
@@ -90,6 +97,7 @@ public class CommView extends AbstractAgentView {
         commOutput.setLineWrap(true);
         commOutput.setWrapStyleWord(true);
         this.sim.getWorld().setCommWriter(outputWriter);
+        this.sim.getWorld().setCommOperator(OPERATOR);
         p.add(new JScrollPane(commOutput), BorderLayout.CENTER);
         
         commInput.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -122,13 +130,17 @@ public class CommView extends AbstractAgentView {
     	}
     	List<String> tokens = SendMessages.toTokens(commInput.getText());
     	if (!tokens.isEmpty()) {
-    		sendMessages.sendMessage("operator", dest, tokens);
+    		sendMessages.sendMessage(OPERATOR, dest, tokens);
     		commInput.setText("");
     	}
     }
 
 	@Override
 	public void refresh() {
+	}
+
+	@Override
+	public void onEvent(SimEvent event) {
 		commDestination.removeAllItems();
         commDestination.addItem(DESTINATION_ALL);
         for (Robot robot : sim.getWorld().getPlayers()) {
