@@ -31,7 +31,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 	
 	private static final long serialVersionUID = -8083633808532173643L;
 
-	private final int cellSize = 24;
+	private final int cellSize = 16;
 	private final Simulation sim;
 	private static final int DOT_SIZE = 7;
 	private static final Polygon TRIANGLE = new Polygon();
