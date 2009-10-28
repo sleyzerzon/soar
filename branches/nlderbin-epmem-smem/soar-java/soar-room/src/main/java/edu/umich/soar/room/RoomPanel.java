@@ -33,25 +33,50 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 
 	private static final double SCALE = 1.5;
 	private static final int CELL_SIZE = (int)(RoomWorld.CELL_SIZE * SCALE);
-	private static final float DOT_SCALE = 0.4375f;
+	private static final float DOT_SCALE = 0.3f;
 	private static final float DOT_SIZE = CELL_SIZE * DOT_SCALE;
 	private final Simulation sim;
 	private static final Polygon TRIANGLE = new Polygon();
+	private static final Polygon OBJECT_PYRAMID = new Polygon();
+	private static final Polygon OBJECT_CUBE = new Polygon();
 	
 	static {
-		float x = DOT_SIZE;
-		float y = 0;
-		TRIANGLE.addPoint(Math.round(x), Math.round(y));
-		
-		// next draw a line to the corner
-		x = DOT_SIZE/2.0f * (float)Math.cos((3*Math.PI)/4);
-		y = DOT_SIZE/2.0f * (float)Math.sin((3*Math.PI)/4);
-		TRIANGLE.addPoint(Math.round(x), Math.round(y));
-
-		// next draw a line to the other corner
-		x = DOT_SIZE/2.0f * (float)Math.cos((-3*Math.PI)/4);
-		y = DOT_SIZE/2.0f * (float)Math.sin((-3*Math.PI)/4);
-		TRIANGLE.addPoint(Math.round(x), Math.round(y));
+		{
+			float x = DOT_SIZE;
+			float y = 0;
+			TRIANGLE.addPoint(Math.round(x), Math.round(y));
+			
+			// next draw a line to the corner
+			x = DOT_SIZE/2.0f * (float)Math.cos((3*Math.PI)/4);
+			y = DOT_SIZE/2.0f * (float)Math.sin((3*Math.PI)/4);
+			TRIANGLE.addPoint(Math.round(x), Math.round(y));
+	
+			// next draw a line to the other corner
+			x = DOT_SIZE/2.0f * (float)Math.cos((-3*Math.PI)/4);
+			y = DOT_SIZE/2.0f * (float)Math.sin((-3*Math.PI)/4);
+			TRIANGLE.addPoint(Math.round(x), Math.round(y));
+		}
+		{
+			float x = DOT_SIZE;
+			float y = 0;
+			OBJECT_PYRAMID.addPoint(Math.round(x), Math.round(y));
+			
+			x = DOT_SIZE * (float)Math.cos((2*Math.PI)/3);
+			y = DOT_SIZE * (float)Math.sin((2*Math.PI)/3);
+			OBJECT_PYRAMID.addPoint(Math.round(x), Math.round(y));
+	
+			// next draw a line to the other corner
+			x = DOT_SIZE * (float)Math.cos((-2*Math.PI)/3);
+			y = DOT_SIZE * (float)Math.sin((-2*Math.PI)/3);
+			OBJECT_PYRAMID.addPoint(Math.round(x), Math.round(y));
+		}
+		{
+			int half = Math.round(DOT_SIZE / 2.0f);
+			OBJECT_CUBE.addPoint(half, half);
+			OBJECT_CUBE.addPoint(-half, half);
+			OBJECT_CUBE.addPoint(-half, -half);
+			OBJECT_CUBE.addPoint(half, -half);
+		}
 	}
 	
 	public RoomPanel(Adaptable app) {
@@ -218,7 +243,18 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 				}
 				g2d.setColor(ro.getColor());
 				double[] screen = worldToScreenPos(pose.pos);
-				g2d.fillOval((int)screen[0] - (int)(DOT_SIZE/2), (int)screen[1] - (int)(DOT_SIZE/2), (int)DOT_SIZE, (int)DOT_SIZE);
+				String shape = ro.getCellObject().getProperty("shape");
+				if (shape != null && shape.equals("pyramid")) {
+					g2d.translate(screen[0], screen[1]);
+					g2d.fillPolygon(OBJECT_PYRAMID);
+					g2d.translate(-screen[0], -screen[1]);
+				} else if (shape != null && shape.equals("cube")) {
+					g2d.translate(screen[0], screen[1]);
+					g2d.fillPolygon(OBJECT_CUBE);
+					g2d.translate(-screen[0], -screen[1]);
+				} else {
+					g2d.fillOval((int)screen[0] - (int)(DOT_SIZE/2), (int)screen[1] - (int)(DOT_SIZE/2), (int)DOT_SIZE, (int)DOT_SIZE);
+				}
 			}
 	
 			// draw id labels on top of map

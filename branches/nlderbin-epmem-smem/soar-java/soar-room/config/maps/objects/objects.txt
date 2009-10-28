@@ -15,7 +15,7 @@ objects {
 		weight = 0.05;	# input-link weight (kg?)
 		height = short;
 		smell = sulfur;
-		shape = sphere;
+		shape = pyramid;
 		diffusible = true;
 		diffuse-wire = blue;
 	}
@@ -27,7 +27,7 @@ objects {
 		weight = 0.20;	# input-link weight (kg?)
 		height = short;
 		smell = sulfur;
-		shape = sphere;
+		shape = cube;
 		diffusible = true;
 		#diffuse-wire = blue;
 	}
