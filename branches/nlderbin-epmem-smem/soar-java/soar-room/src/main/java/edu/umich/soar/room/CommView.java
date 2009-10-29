@@ -1,10 +1,16 @@
 package edu.umich.soar.room;
 
 import java.awt.BorderLayout;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -19,6 +25,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.flexdock.docking.DockingConstants;
 
 import edu.umich.soar.robot.SendMessages;
@@ -31,6 +39,7 @@ import edu.umich.soar.room.events.SimEventListener;
 import edu.umich.soar.room.map.Robot;
 
 public class CommView extends AbstractAgentView implements SimEventListener {
+	private static final Log logger = LogFactory.getLog(CommView.class);
 	
 	private static final long serialVersionUID = -1676542480621263207L;
 	private final Simulation sim;
@@ -41,9 +50,9 @@ public class CommView extends AbstractAgentView implements SimEventListener {
 	private final JComboBox commDestination = new JComboBox();
 	private static final String DESTINATION_ALL = "-ALL-";
 	private static final String OPERATOR = "operator";
-	private static final String ACTIVATE_WARNING = "activate warning";
-	private static final String DEACTIVATE_WARNING = "deactivate warning";
-	private Icon warnIcon;
+	private static final String WIRES = "WIRES";
+	private static final String PICTURE = "PICTURE";
+	private static final String CLEAR_IMAGE = "CLEAR";
 
     private final Writer outputWriter = new Writer()
     {
@@ -68,10 +77,18 @@ public class CommView extends AbstractAgentView implements SimEventListener {
                     synchronized(outputWriter) // synchronized on outer.this like the flush() method
                     {
                     	String out = buffer.toString();
-                    	if (out.contains(DEACTIVATE_WARNING)) {
-                    		deactivateWarning();
-                    	} else if (out.contains(ACTIVATE_WARNING)) {
-                    		activateWarning();
+                    	if (out.contains(CLEAR_IMAGE)) {
+                    		clearImage();
+                    	} else if (out.contains(WIRES)) {
+                    		activateImage(WIRES);
+                    	} else if (out.contains(PICTURE)) {
+                    		Pattern p = Pattern.compile(".*PICTURE\\s+(\\S+)\\s*");
+                    		for (String line : out.split("\n")) {
+                        		Matcher m = p.matcher(line);
+                        		if (m.matches()) {
+                            		activateImage(m.group(1));
+                        		}
+                    		}
                     	}
                     	commOutput.append(buffer.toString());
                     	commOutput.setCaretPosition(commOutput.getDocument().getLength());
@@ -88,6 +105,34 @@ public class CommView extends AbstractAgentView implements SimEventListener {
             buffer.append(cbuf, off, len);
         }
     };
+    
+    private final Map<String, Icon> images = new HashMap<String, Icon>();
+    
+    private Icon getIcon(String key) {
+    	Icon ret = images.get(key);
+    	if (ret == null) {
+        	File file = sim.getConfig().getImageFile(key);
+        	if (file == null) {
+        		logger.warn("Undefined image key '" + key + "'.");
+        		return null;
+        	}
+        	
+            try {
+            	ret = new ImageIcon(ImageIO.read(new FileInputStream(file)));
+            	if (ret == null) {
+            		logger.warn("Error loading image '" + file + "'.");
+            		return null;
+            	}
+            	images.put(key, ret);
+    		} catch (IOException e1) {
+    			// TODO Auto-generated catch block
+    			e1.printStackTrace();
+        		logger.warn("IOException loading image '" + file + "'.");
+        		return null;
+    		}
+    	}
+    	return ret;
+    }
 
     public CommView(Adaptable app) {
         super("commView", "Communication");
@@ -100,27 +145,25 @@ public class CommView extends AbstractAgentView implements SimEventListener {
 
         this.sendMessages = Adaptables.adapt(app, SendMessagesInterface.class);
         
-        try {
-			warnIcon = new ImageIcon(ImageIO.read(RoomAgentView.class.getResourceAsStream("/edu/umich/soar/room/images/soar2009.png")));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			warnIcon = new ImageIcon();
-		}
-
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Direct Communication"));
         
         refresh();
         p.add(commDestination, BorderLayout.NORTH);
         
+        
+        final JPanel outputPanel = new JPanel(new BorderLayout());
+
         commOutput.setEditable(false);
         commOutput.setRows(4);
         commOutput.setLineWrap(true);
         commOutput.setWrapStyleWord(true);
         this.sim.getWorld().setCommWriter(outputWriter);
         this.sim.getWorld().setCommOperator(OPERATOR);
-        p.add(new JScrollPane(commOutput), BorderLayout.CENTER);
+        outputPanel.add(new JScrollPane(commOutput), BorderLayout.CENTER);
+        outputPanel.add(commWarn, BorderLayout.EAST);
+
+        p.add(outputPanel, BorderLayout.CENTER);
         
         commInput.addKeyListener(new java.awt.event.KeyAdapter() {
 			public void keyTyped(java.awt.event.KeyEvent e) {
@@ -139,7 +182,6 @@ public class CommView extends AbstractAgentView implements SimEventListener {
 			}
         });
         p.add(commSend, BorderLayout.EAST);
-        p.add(commWarn, BorderLayout.WEST);
         
         setContentPane(p);
     }
@@ -159,11 +201,11 @@ public class CommView extends AbstractAgentView implements SimEventListener {
     	}
     }
     
-    private void activateWarning() {
-    	commWarn.setIcon(warnIcon);
+    private void activateImage(String key) {
+    	commWarn.setIcon(getIcon(key));
     }
 
-    private void deactivateWarning() {
+    private void clearImage() {
     	commWarn.setIcon(null);
     }
 

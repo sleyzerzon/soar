@@ -193,6 +193,8 @@ public class SimConfig {
 		private static final String terminals = "terminals";
 		private static final String players = "players";
 		private static final String active_players = players + ".active_players";
+		private static final String images = "images";
+		private static final String active_images = images + ".active_images";
 		private static final String clients = "clients";
 		private static final String active_clients = clients + ".active_clients";
 		private static final String points = "points"; // keep in synch with PlayerConfig
@@ -206,6 +208,7 @@ public class SimConfig {
 	
 	private Map<String, PlayerConfig> playerConfigs = new HashMap<String, PlayerConfig>();
 	private Map<String, ClientConfig> clientConfigs = new HashMap<String, ClientConfig>();;
+	private Map<String, File> images = new HashMap<String, File>();
 	
 	/**
 	 * @param config
@@ -236,6 +239,28 @@ public class SimConfig {
 			}
 		}
 
+		if (config.hasKey(Keys.active_images)) {
+			for (String imageID : config.getStrings(Keys.active_images)) {
+				String fileString = config.getString(Keys.images + "." + imageID);
+				if (fileString == null) {
+					logger.warn("Unable to load active image key '" + imageID + "', key is not defined in config file.");
+					continue;
+				}
+				
+				File file = new File(fileString);
+				if (!file.exists()) {
+					file = new File(getHome() + File.separator + fileString);
+					if (!file.exists()) {
+						logger.warn("Unable to load active image key '" + imageID + "', file does not exist.");
+						continue;
+					}
+				}
+				
+				logger.info(imageID + " -> " + file.getAbsolutePath());
+				images.put(imageID, file);
+			}
+		}
+
 		if (config.hasKey(Keys.active_clients)) {
 			for(String clientName : config.getStrings(Keys.active_clients)) {
 				ClientConfig clientConfig = new ClientConfig();
@@ -249,6 +274,10 @@ public class SimConfig {
 		ClientConfig clientConfig = new ClientConfig();
 		clientConfig.timeout = 15;
 		clientConfigs.put(Names.kDebuggerClient, clientConfig);
+	}
+	
+	public File getImageFile(String key) {
+		return images.get(key);
 	}
 	
 	private void loadSubConfig(Config childConfig, Field [] fields, Object target) {
