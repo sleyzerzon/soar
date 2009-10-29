@@ -56,7 +56,7 @@ public class OperatorCommView extends AbstractAgentView implements SimEventListe
     	@Override
         public void write(final CommMessage message)
         {
-    		if (message.isBroadcast() || message.getDestination().equals(OPERATOR)) {
+    		if (message.isBroadcast() || message.getDestination().equals(OPERATOR) || message.getFrom().equals(OPERATOR)) {
 	            SwingUtilities.invokeLater(new Runnable() {
 	                public void run() {
 	                    synchronized(outputListener) // synchronized on outer.this like the flush() method
@@ -65,15 +65,12 @@ public class OperatorCommView extends AbstractAgentView implements SimEventListe
 	                    	boolean picture = false;
 	                    	for (String tok : tokens) {
 	                    		if (picture) {
-	                    			activateImage(tok);
-	                    			return;
+	                    			activateImage(tok, message.getId(), message.getFrom());
 	                    		}
 	                    		if (tok.equals(CLEAR_IMAGE)) {
 	                    			clearImage();
-	                    			return;
 	                    		} else if (tok.equals(WIRES)) {
-	                        		activateImage(WIRES);
-	                        		return;
+	                        		activateImage(WIRES, message.getId(), message.getFrom());
 	                    		} else if (tok.equals(PICTURE)) {
 	                    			picture = true;
 	                    		}
@@ -143,6 +140,9 @@ public class OperatorCommView extends AbstractAgentView implements SimEventListe
         commOutput.setWrapStyleWord(true);
         this.sim.getWorld().addCommListener(outputListener);
         outputPanel.add(new JScrollPane(commOutput), BorderLayout.CENTER);
+        
+        commWarn.setHorizontalTextPosition(JLabel.CENTER);
+        commWarn.setVerticalTextPosition(JLabel.BOTTOM);
         outputPanel.add(commWarn, BorderLayout.EAST);
 
         p.add(outputPanel, BorderLayout.CENTER);
@@ -183,12 +183,14 @@ public class OperatorCommView extends AbstractAgentView implements SimEventListe
     	}
     }
     
-    private void activateImage(String key) {
+    private void activateImage(String key, long id, String from) {
     	commWarn.setIcon(getIcon(key));
+    	commWarn.setText(String.format("From: %s, Message: %d", from, id));
     }
 
     private void clearImage() {
     	commWarn.setIcon(null);
+    	commWarn.setText(null);
     }
 
 	@Override

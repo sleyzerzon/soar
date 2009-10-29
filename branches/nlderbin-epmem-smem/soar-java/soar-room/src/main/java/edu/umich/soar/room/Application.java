@@ -273,10 +273,10 @@ public class Application extends JPanel implements Adaptable {
 		worldView.dock(agentView, DockingConstants.EAST_REGION, 0.7f);
 
 		final AbstractAdaptableView simulationControlView = addView(new SimulationControlView(this));
-		agentView.dock(simulationControlView, DockingConstants.SOUTH_REGION, 0.48f);
+		agentView.dock(simulationControlView, DockingConstants.SOUTH_REGION, 0.7f);
 
 		final AbstractAdaptableView logView = addView(new LogView(this));
-		worldView.dock(logView, DockingConstants.SOUTH_REGION, 0.76f);
+		worldView.dock(logView, DockingConstants.SOUTH_REGION, 0.74f);
 		
 		final AbstractAdaptableView commView = addView(new CommView(this));
 		logView.dock(commView);

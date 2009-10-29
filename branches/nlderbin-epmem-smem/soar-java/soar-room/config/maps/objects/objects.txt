@@ -3,7 +3,7 @@ objects {
 	a {
 		name = green-short-sulfur-cube;
 		movable = true;
-		color = green;
+		color = red;
 		weight = 0.5;
 		diffusible = true;
 		diffused = false;
