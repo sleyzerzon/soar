@@ -1,7 +1,5 @@
 package edu.umich.soar.room.map;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +29,7 @@ public class RoomWorld implements SendMessagesInterface {
 	public static final int CELL_SIZE = 16;
 	private double ANG_SPEED = Math.PI / 1.0;
 	private String blockManipulationReason;
-	private Queue<Message> messages = new ConcurrentLinkedQueue<Message>();
+	private Queue<CommMessage> messages = new ConcurrentLinkedQueue<CommMessage>();
 	private final Simulation sim;
 	
 	public RoomWorld(Simulation sim) {
@@ -171,10 +169,19 @@ public class RoomWorld implements SendMessagesInterface {
 		
 		moveRoomPlayers();
 		
-		for (Message message : messages) {
-			if (message.recipient instanceof Robot) {
-				Robot robot = (Robot)message.recipient;
-				robot.getReceiveMessagesInterface().newMessage(message.from, message.tokens);
+		for (CommMessage message : messages) {
+			for (CommListener listener : commListeners) {
+				listener.write(message);
+			}
+			if (message.isBroadcast()) {
+				for (Robot recipient : players.getAll()) {
+					recipient.getReceiveMessagesInterface().newMessage(message.getFrom(), message.getTokens());
+				}
+			} else {
+				Robot recipient = players.get(message.getDestination());
+				if (recipient != null) {
+					recipient.getReceiveMessagesInterface().newMessage(message.getFrom(), message.getTokens());
+				}
 			}
 		}
 		messages.clear();
@@ -542,110 +549,25 @@ public class RoomWorld implements SendMessagesInterface {
 		return player.getWaypointList();
 	}
 
-	private static class Message {
-		String from;
-		Object recipient;
-		List<String> tokens;
-		
-		public Message copy() {
-			Message tmp = new Message();
-			tmp.from = this.from;
-			tmp.recipient = this.recipient;
-			tmp.tokens = new ArrayList<String>();
-			for (String tok : this.tokens) {
-				tmp.tokens.add(tok);
-			}
-			return tmp;
-		}
-		
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append(from);
-			if (recipient != null) {
-				sb.append(" -> ");
-				sb.append(recipient);
-			}
-			sb.append(":");
-			for (String token : tokens) {
-				sb.append(" ");
-				sb.append(token);
-				
-			}
-			return sb.toString();
-		}
-	}
-	
 	@Override
 	public void sendMessage(String from, String to, List<String> tokens) {
 		if (from == null || tokens == null) {
 			throw new NullPointerException();
 		}
 		if (to != null) {
-			Object recipient = players.get(to);
-			if (recipient == null) {
-				if (operatorName != null && operatorName.equals(to)) {
-					recipient = operatorName;
-				} else {
-					StringBuilder sb = new StringBuilder();
-					sb.append("Unknown recipient ").append(to).append(" for message: ");
-					for (String token : tokens) {
-						sb.append(token);
-						sb.append(" ");
-					}
-					logger.error(sb);
-					return;
-				}
-			}
-			
-			Message message = new Message();
-			message.from = from;
-			message.recipient = recipient;
-			message.tokens = new ArrayList<String>(tokens.size());
-			for (String token : tokens) {
-				message.tokens.add(token);
-			}
+			CommMessage message = new CommMessage(from, to, tokens);
 			messages.add(message);
-			if (commWriter != null) {
-				try {
-					commWriter.append("\n");
-					commWriter.append(message.toString());
-					commWriter.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		} else {
 			// broadcast
-			Message message = new Message();
-			message.from = from;
-			message.tokens = new ArrayList<String>();
-			message.tokens.addAll(tokens);
-			if (commWriter != null) {
-				try {
-					commWriter.append("\n");
-					commWriter.append(message.toString());
-					commWriter.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			for (Robot recipient : getPlayers()) {
-				message.recipient = recipient;
-				messages.add(message);
-				message = message.copy();
-			}
+			CommMessage message = new CommMessage(from, tokens);
+			messages.add(message);
 		}
 	}
 
-	private Writer commWriter;
-	private String operatorName;
-	public void setCommWriter(Writer commWriter) {
-		this.commWriter = commWriter;
+	private final List<CommListener> commListeners = new ArrayList<CommListener>();;
+	public void addCommListener(CommListener commListener) {
+		this.commListeners.add(commListener);
+		// TODO: removeCommListener
 	}
 	
-	public void setCommOperator(String operatorName) {
-		this.operatorName = operatorName;
-	}
-
 }
