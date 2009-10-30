@@ -24,7 +24,7 @@ public class RoomObject {
 		} else if (color.equals("orange")) {
 			this.color = Color.orange;
 		} else if (color.equals("yellow")) {
-			this.color = Color.yellow;
+			this.color = Color.decode("0xffd700");
 		} else if (color.equals("green")) {
 			this.color = Color.green.darker().darker();
 		} else if (color.equals("blue")) {

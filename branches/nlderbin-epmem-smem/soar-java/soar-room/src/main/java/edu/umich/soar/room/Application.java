@@ -253,12 +253,12 @@ public class Application extends JPanel implements Adaptable {
 			viewMenu.add(new JCheckBoxMenuItem(actionManager.getAction(ToggleBreadcrumbsAction.class)));
 			viewMenu.add(actionManager.getAction(ClearBreadcrumbsAction.class));
 			
+//			viewMenu.add(new JSeparator());
+//			
 //			for (AbstractAdaptableView view : views) {
-//				AbstractGridmap2DAction action = Adaptables.adapt(view, AbstractGridmap2DAction.class);
-//				if (action != null) {
-//					viewMenu.add(action);
-//				}
+//				viewMenu.add(new RestoreViewAction(view));
 //			}
+
 			menubar.add(viewMenu);
 		}		
 		

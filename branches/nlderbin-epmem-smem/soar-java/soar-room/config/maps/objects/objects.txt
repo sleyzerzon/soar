@@ -1,11 +1,11 @@
 objects {
 
 	a {
-		name = brown-short-sulfur-pyramid;
+		name = yellow-short-sulfur-pyramid;
 		movable = true;
 		image = "config/images/ied1.jpg";
-		color = brown;
-		weight = 0.5;
+		color = yellow;
+		weight = 1.5;
 		diffusible = true;
 		diffused = false;
 		diffuse-wire = green;
@@ -16,17 +16,15 @@ objects {
 
 
 	b {
-		name = green-short-burn-sphere;
+		name = teddy-bear;
 		movable = true;
-		image = "config/images/ied2.jpg";
-		color = green;
-		weight = 0.5;
-		diffusible = true;
-		diffused = false;
-		diffuse-wire = blue;
-		height = short;
-		smell = burn;
+		image = "config/images/teddy.jpg";
+		color = brown;
+		weight = 0.2;
+		height = medium;
 		shape = sphere;
+		smell = laundry;
+		diffusible = false;
 	}
 
 	

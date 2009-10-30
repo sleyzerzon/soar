@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
-import java.awt.SystemColor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,10 +226,11 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 					g2d.setColor(Color.BLACK);
 				} 
 				else if (gateways[loc.getLoc()[0]][loc.getLoc()[1]]) {
-					g2d.setColor(Color.WHITE);
+					//g2d.setColor(SystemColor.control);
+					g2d.setColor(Color.decode("0xd3d3d3"));
 				} 
 				else {
-					g2d.setColor(SystemColor.control);
+					g2d.setColor(Color.WHITE);
 				}
 				
 				g2d.fillRect(loc.getDraw()[0], loc.getDraw()[1], CELL_SIZE, CELL_SIZE);
