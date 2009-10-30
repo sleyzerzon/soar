@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.umich.soar.config.Config;
 import edu.umich.soar.config.ConfigFile;
 import edu.umich.soar.config.ParseError;
+import edu.umich.soar.room.config.SimConfig;
 import edu.umich.soar.room.core.Direction;
 import edu.umich.soar.room.core.Names;
 import edu.umich.soar.room.core.Simulation;
@@ -70,9 +71,11 @@ public class RoomMap implements CellObjectObserver {
 
 	private boolean generatePhase = false;
 	private final List<CellObject> mobs = new ArrayList<CellObject>();
-
-	public RoomMap(String mapPath) {
+	private final SimConfig simConfig;
+	
+	public RoomMap(String mapPath, SimConfig simConfig) {
 		this.mapPath = mapPath;
+		this.simConfig = simConfig;
 
 		reset();
 	}
@@ -871,6 +874,11 @@ public class RoomMap implements CellObjectObserver {
 			for (String id : mapConfig.getStrings("objects")) {
 				CellObject template = new CellObject(objectsConfig.getChild("objects." + id));
 				data.cellObjectManager.registerTemplate(template);
+				String name = template.getProperty("name");
+				String fileString = template.getProperty("image");
+				if (name != null && fileString != null) {
+					this.simConfig.mapImage(name, fileString);
+				}
 			}
 			
 			cellsConfig(mapConfig.getChild("cells"), objectsConfig);

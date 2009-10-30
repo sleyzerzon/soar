@@ -26,13 +26,15 @@ public class RoomObject {
 		} else if (color.equals("yellow")) {
 			this.color = Color.yellow;
 		} else if (color.equals("green")) {
-			this.color = Color.green;
+			this.color = Color.green.darker().darker();
 		} else if (color.equals("blue")) {
 			this.color = Color.blue;
 		} else if (color.equals("gray")) {
 			this.color = Color.darkGray;
 		} else if (color.equals("violet")) {
 			this.color = Color.decode("0x8000ff");
+		} else if (color.equals("brown")) {
+			this.color = Color.decode("0x987654");
 		}
 	}
 

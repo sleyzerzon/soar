@@ -104,7 +104,7 @@ public class RoomWorld implements SendMessagesInterface {
 	}
 
 	public void setAndResetMap(String mapPath) {
-		map = new RoomMap(mapPath);
+		map = new RoomMap(mapPath, sim.getConfig());
 		resetState();
 	}
 

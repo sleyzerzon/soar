@@ -1,23 +1,25 @@
 objects {
 
 	a {
-		name = green-short-sulfur-cube;
+		name = brown-short-sulfur-pyramid;
 		movable = true;
-		color = red;
+		image = "config/images/ied1.jpg";
+		color = brown;
 		weight = 0.5;
 		diffusible = true;
 		diffused = false;
 		diffuse-wire = green;
 		height = short;
 		smell = sulfur;
-		shape = cube;
+		shape = pyramid;
 	}
 
 
 	b {
-		name = blue-short-burn-sphere;
+		name = green-short-burn-sphere;
 		movable = true;
-		color = blue;
+		image = "config/images/ied2.jpg";
+		color = green;
 		weight = 0.5;
 		diffusible = true;
 		diffused = false;

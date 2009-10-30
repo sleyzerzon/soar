@@ -33,8 +33,9 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 
 	private static final double SCALE = 1.5;
 	private static final int CELL_SIZE = (int)(RoomWorld.CELL_SIZE * SCALE);
-	private static final float DOT_SCALE = 0.3f;
+	private static final float DOT_SCALE = 0.6f;
 	private static final float DOT_SIZE = CELL_SIZE * DOT_SCALE;
+	private static final float PYRAMID_SIZE = DOT_SIZE * 0.65f;
 	private final Simulation sim;
 	private static final Polygon TRIANGLE = new Polygon();
 	private static final Polygon OBJECT_PYRAMID = new Polygon();
@@ -57,17 +58,17 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 			TRIANGLE.addPoint(Math.round(x), Math.round(y));
 		}
 		{
-			float x = DOT_SIZE;
+			float x = PYRAMID_SIZE;
 			float y = 0;
 			OBJECT_PYRAMID.addPoint(Math.round(x), Math.round(y));
 			
-			x = DOT_SIZE * (float)Math.cos((2*Math.PI)/3);
-			y = DOT_SIZE * (float)Math.sin((2*Math.PI)/3);
+			x = PYRAMID_SIZE * (float)Math.cos((2*Math.PI)/3);
+			y = PYRAMID_SIZE * (float)Math.sin((2*Math.PI)/3);
 			OBJECT_PYRAMID.addPoint(Math.round(x), Math.round(y));
 	
 			// next draw a line to the other corner
-			x = DOT_SIZE * (float)Math.cos((-2*Math.PI)/3);
-			y = DOT_SIZE * (float)Math.sin((-2*Math.PI)/3);
+			x = PYRAMID_SIZE * (float)Math.cos((-2*Math.PI)/3);
+			y = PYRAMID_SIZE * (float)Math.sin((-2*Math.PI)/3);
 			OBJECT_PYRAMID.addPoint(Math.round(x), Math.round(y));
 		}
 		{
@@ -297,7 +298,7 @@ public class RoomPanel extends GridMapPanel implements SimEventListener {
 				// draw player
 				g2d.translate(screen[0], screen[1]);
 				g2d.rotate(-player.getState().getYaw());
-				g2d.drawPolygon(TRIANGLE);
+				g2d.fillPolygon(TRIANGLE);
 				g2d.rotate(player.getState().getYaw());
 				g2d.translate(-screen[0], -screen[1]);
 				

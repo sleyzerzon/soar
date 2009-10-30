@@ -240,24 +240,14 @@ public class SimConfig {
 		}
 
 		if (config.hasKey(Keys.active_images)) {
-			for (String imageID : config.getStrings(Keys.active_images)) {
-				String fileString = config.getString(Keys.images + "." + imageID);
+			for (String imageId : config.getStrings(Keys.active_images)) {
+				String fileString = config.getString(Keys.images + "." + imageId);
 				if (fileString == null) {
-					logger.warn("Unable to load active image key '" + imageID + "', key is not defined in config file.");
+					logger.warn("Unable to load active image key '" + imageId + "', key is not defined in config file.");
 					continue;
 				}
 				
-				File file = new File(fileString);
-				if (!file.exists()) {
-					file = new File(getHome() + File.separator + fileString);
-					if (!file.exists()) {
-						logger.warn("Unable to load active image key '" + imageID + "', file does not exist.");
-						continue;
-					}
-				}
-				
-				logger.info(imageID + " -> " + file.getAbsolutePath());
-				images.put(imageID, file);
+				mapImage(imageId, fileString);
 			}
 		}
 
@@ -274,6 +264,20 @@ public class SimConfig {
 		ClientConfig clientConfig = new ClientConfig();
 		clientConfig.timeout = 15;
 		clientConfigs.put(Names.kDebuggerClient, clientConfig);
+	}
+	
+	public void mapImage(String imageId, String fileString) {
+		File file = new File(fileString);
+		if (!file.exists()) {
+			file = new File(getHome() + File.separator + fileString);
+			if (!file.exists()) {
+				logger.warn("Unable to load active image key '" + imageId + "', file does not exist.");
+				return;
+			}
+		}
+		
+		logger.info(imageId + " -> " + file.getAbsolutePath());
+		images.put(imageId, file);
 	}
 	
 	public File getImageFile(String key) {
