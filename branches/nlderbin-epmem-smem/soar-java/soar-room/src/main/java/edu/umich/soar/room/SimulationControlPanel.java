@@ -13,6 +13,7 @@ import javax.swing.JSlider;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 import edu.umich.soar.room.GoAction.GoProvider;
@@ -21,6 +22,8 @@ import edu.umich.soar.room.core.Simulation;
 public class SimulationControlPanel extends JPanel implements GoProvider {
 
 	private static final long serialVersionUID = 1L;
+	private JToggleButton jToggleBreadcrumbsButton = null;
+	private JButton jClearBreadcrumbsButton = null;
 	private JRadioButton jSyncRadioButton = null;
 	private JRadioButton jAsyncRadioButton = null;
 	private JPanel jRunPanel = null;
@@ -31,6 +34,7 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 	private JButton jStopButton = null;
 	private JButton jResetButton = null;
 	private JPanel jTypePanel = null;
+	private JPanel jBreadcrumbsPanel = null;
 	private JPanel jDelayPanel = null;
 	private JSlider jDelaySlider = null;
 	private JLabel jMsecPerTickLabel = null;
@@ -104,11 +108,18 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 		gridBagConstraints52.weightx = 1;
 		gridBagConstraints52.weighty = 1;
 		
+		GridBagConstraints gridBagConstraints53 = new GridBagConstraints();
+		gridBagConstraints53.fill = GridBagConstraints.BOTH;
+		gridBagConstraints53.gridy = 4;
+		gridBagConstraints53.weightx = 1;
+		gridBagConstraints53.weighty = 1;
+		
 		this.setLayout(new GridBagLayout());
 		this.add(getJIntegrationPanel(), gridBagConstraints51);
 		this.add(getJRunPanel(), gridBagConstraints2);
 		this.add(getJDelayPanel(), gridBagConstraints10);
 		this.add(getJInfoPanel(), gridBagConstraints52);
+		this.add(getJBreadcrumbsPanel(), gridBagConstraints53);
 	}
 
 	/**
@@ -128,6 +139,20 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			typeButtonGroup.add(jSyncRadioButton);
 		}
 		return jSyncRadioButton;
+	}
+
+	private JToggleButton getJToggleBreadcrumbsButton() {
+		if (jToggleBreadcrumbsButton == null) {
+			jToggleBreadcrumbsButton = new JToggleButton(this.am.getAction(ToggleBreadcrumbsAction.class));
+		}
+		return jToggleBreadcrumbsButton;
+	}
+
+	private JButton getJClearBreadcrumbsButton() {
+		if (jClearBreadcrumbsButton == null) {
+			jClearBreadcrumbsButton = new JButton(this.am.getAction(ClearBreadcrumbsAction.class));
+		}
+		return jClearBreadcrumbsButton;
 	}
 
 	/**
@@ -341,6 +366,30 @@ public class SimulationControlPanel extends JPanel implements GoProvider {
 			jTypePanel.add(getJAsyncRadioButton(), gridBagConstraints1);
 		}
 		return jTypePanel;
+	}
+
+	private JPanel getJBreadcrumbsPanel() {
+		if (jBreadcrumbsPanel == null) {
+			
+			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
+			gridBagConstraints1.gridx = 0;
+			gridBagConstraints1.gridy = 0;
+			gridBagConstraints1.anchor = GridBagConstraints.WEST;
+			
+			GridBagConstraints gridBagConstraints = new GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = -1;
+			gridBagConstraints.weightx = 1;
+			gridBagConstraints.anchor = GridBagConstraints.WEST;
+			gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+			
+			jBreadcrumbsPanel = new JPanel();
+			jBreadcrumbsPanel.setLayout(new GridBagLayout());
+			jBreadcrumbsPanel.setBorder(BorderFactory.createTitledBorder("Breadcrumbs"));
+			jBreadcrumbsPanel.add(getJToggleBreadcrumbsButton(), gridBagConstraints);
+			jBreadcrumbsPanel.add(getJClearBreadcrumbsButton(), gridBagConstraints1);
+		}
+		return jBreadcrumbsPanel;
 	}
 
 	private JPanel getJInfoPanel() {

@@ -14,8 +14,6 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.flexdock.docking.DockingConstants;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -81,7 +79,7 @@ public class RoomAgentView extends AbstractAgentView implements SelectionListene
 		private JTextArea createTextArea() {
 	        JTextArea ta = new JTextArea();
 	        ta.setEditable(false);
-	        ta.setRows(16);
+	        ta.setRows(12);
 	        ta.setLineWrap(true);
 	        ta.setWrapStyleWord(true);
 	        return ta;
