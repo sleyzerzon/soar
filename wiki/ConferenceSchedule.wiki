@@ -31,12 +31,12 @@ These deadlines are official for a particular conference year:
   * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- papers due January 19th, 2010
   * [http://www.fdg2010.org/FDG_2010_Home.html FDG 2010] -- papers due February 5, 2010
   * [http://www.spatial-cognition-2010.com/ SC 2010] -- papers due February 15, 2010
+  * [http://www.iccbr.org/iccbr2010 ICCBR 2010] -- papers due February 15, 2010
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
 
 These conferences have yet to announce official deadlines:
   * [http://www.icml2010.org/ ICML 2010]
   * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010]
-  * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010]
   * [http://iccm2010.cs.drexel.edu/ ICCM 2010]
   * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010]
   * [http://nips.cc/ NIPS 2010]
