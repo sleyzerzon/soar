@@ -7,8 +7,17 @@
       
 	<import file="../soar-smljava/build-common.xml" />
 
-	<target name="build" depends="jar,doc" />
-	<target name="build-nodoc" depends="jar" />
+	<target name="alias-jar" depends="jar">
+		<jar destfile="${soarlib.bin}/VisualSoar.jar">
+			<manifest>
+				<attribute name="Main-Class" value="${jar.main.class}" />
+				<attribute name="Class-Path" value="../lib/${jar.name}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="build" depends="alias-jar,doc" />
+	<target name="build-nodoc" depends="alias-jar" />
 
 </project>
 

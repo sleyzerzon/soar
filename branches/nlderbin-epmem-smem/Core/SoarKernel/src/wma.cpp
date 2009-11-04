@@ -76,7 +76,7 @@ wma_param_container::wma_param_container( agent *new_agent ): soar_module::param
 	/**
 	 * WMA on/off
 	 */
-	activation = new wma_activation_param( "activation", soar_module::on, new soar_module::f_predicate<soar_module::boolean>(), new_agent );
+	activation = new wma_activation_param( "activation", soar_module::off, new soar_module::f_predicate<soar_module::boolean>(), new_agent );
 	add( activation );
 
 	// decay-rate

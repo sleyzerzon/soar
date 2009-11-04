@@ -106,7 +106,7 @@ const char *epmem_range_queries[2][2][3] =
 epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::param_container( new_agent )
 {
 	// learning
-	learning = new soar_module::boolean_param( "learning", soar_module::on, new soar_module::f_predicate<soar_module::boolean>() );
+	learning = new soar_module::boolean_param( "learning", soar_module::off, new soar_module::f_predicate<soar_module::boolean>() );
 	add( learning );
 
 	// database

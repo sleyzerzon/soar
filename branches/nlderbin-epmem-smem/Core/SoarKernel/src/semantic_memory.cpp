@@ -73,7 +73,7 @@ void smem_init_db( agent *my_agent, bool readonly = false );
 smem_param_container::smem_param_container( agent *new_agent ): soar_module::param_container( new_agent )
 {
 	// learning
-	learning = new soar_module::boolean_param( "learning", soar_module::on, new soar_module::f_predicate<soar_module::boolean>() );
+	learning = new soar_module::boolean_param( "learning", soar_module::off, new soar_module::f_predicate<soar_module::boolean>() );
 	add( learning );
 
 	// database
