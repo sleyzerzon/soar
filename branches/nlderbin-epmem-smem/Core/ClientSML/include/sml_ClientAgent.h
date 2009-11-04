@@ -779,6 +779,11 @@ public:
 	*************************************************************/
 	bool KillDebugger();
 
+	/*************************************************************
+	* @brief Convert a client-side identifier string to kernel-side.
+	*************************************************************/
+	char const* ConvertIdentifier(char const* pClientIdentifier);
+
 protected:
 	// for {Spawn, Kill}Debugger()
 	bool WaitForDebugger();

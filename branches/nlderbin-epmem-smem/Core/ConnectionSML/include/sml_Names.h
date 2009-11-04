@@ -418,6 +418,7 @@ public:
 	static char const* const kCommand_GetResultOfLastRun ;
 	static char const* const kCommand_GetInitialTimeTag ;
 	static char const* const kCommand_OutputInit ;
+	static char const* const kCommand_ConvertIdentifier ;
 
 	// Command line interface
 	static char const* const kCommand_CommandLine ;

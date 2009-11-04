@@ -429,6 +429,7 @@ char const* const sml_Names::kCommand_WasAgentOnRunList		= "on_run_list" ;
 char const* const sml_Names::kCommand_GetResultOfLastRun	= "last_run_result" ;
 char const* const sml_Names::kCommand_GetInitialTimeTag		= "initial_time_tag" ;
 char const* const sml_Names::kCommand_OutputInit			= "output_init" ;
+char const* const sml_Names::kCommand_ConvertIdentifier		= "convert_identifier";
 
 // command line interface
 char const* const sml_Names::kCommand_CommandLine		 = "cmdline" ;

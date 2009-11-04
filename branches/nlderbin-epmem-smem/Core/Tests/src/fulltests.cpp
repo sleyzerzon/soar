@@ -23,8 +23,7 @@
 #include <sys/wait.h>
 #endif // !_WIN32
 
-enum eTestOptions
-{
+enum eTestOptions{
 	NONE,
 	USE_CLIENT_THREAD,
 	FULLY_OPTIMIZED,
@@ -76,6 +75,7 @@ class FullTests : public CPPUNIT_NS::TestCase
 	CPPUNIT_TEST( testNegatedConjunctiveTestReorder );
 	CPPUNIT_TEST( testNegatedConjunctiveTestUnbound ); // bug 517
 	CPPUNIT_TEST( testCommandToFile ); 
+	CPPUNIT_TEST( testConvertIdentifier ); 
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -112,6 +112,7 @@ public:
 	TEST_DECLARATION( testNegatedConjunctiveTestReorder );
 	TEST_DECLARATION( testNegatedConjunctiveTestUnbound );
 	TEST_DECLARATION( testCommandToFile );
+	TEST_DECLARATION( testConvertIdentifier );
 
 	void testShutdownHandlerShutdown();
 
@@ -1673,4 +1674,28 @@ TEST_DEFINITION( testCommandToFile )
 	const std::string resultString("#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*\nTotal: 144 productions sourced. 144 productions excised.\nSource finished.\n");
 	CPPUNIT_ASSERT(result == resultString);
 	remove("testCommandToFile-output.soar");
+}
+
+TEST_DEFINITION( testConvertIdentifier )
+{
+	m_pAgent->ExecuteCommandLine("sp {test (state <s> ^io.output-link <out>) --> (<out> ^a b)}");
+	m_pAgent->ExecuteCommandLine("sp {fnord (state <s> ^io.output-link <out>) (<out> ^foo <f>) --> (<out> ^bar <f>)}");
+	m_pKernel->RunAllAgents(2);
+
+	sml::Identifier* pOutputLink = m_pAgent->GetOutputLink();
+	sml::Identifier* pFoo = pOutputLink->CreateIdWME("foo");
+
+	char const* pConvertedId = m_pAgent->ConvertIdentifier(pFoo->GetValueAsString());
+	CPPUNIT_ASSERT(pConvertedId == 0);
+
+	m_pAgent->Commit();
+	m_pKernel->RunAllAgents(2);
+
+	sml::WMElement* pBarWme = pOutputLink->FindByAttribute("bar", 0);
+	
+	pConvertedId = m_pAgent->ConvertIdentifier(pFoo->GetValueAsString());
+	CPPUNIT_ASSERT(pConvertedId);
+	std::string convertedId(pConvertedId);
+	CPPUNIT_ASSERT(convertedId == pBarWme->GetValueAsString());
+
 }
