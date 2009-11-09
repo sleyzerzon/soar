@@ -33,6 +33,8 @@ Wintermute, S. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAA
 
 Wintermute, S., and Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CogSci09%20imperfect%20representation.pdf Imagery as Compensation for an Imperfect Abstract Problem Representation.]_ In Proceedings of The 31st Annual Conference of the Cognitive Science Society (!CogSci-09)
 
+Xu, J., Wintermute, S., Wang, Y. J., Laird, J. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CCA-TR-2009-04.pdf Transferring Learned Search Heuristics]_ (Report No. CCA-TR-2009-04). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
+
 = 2008 =
 
 Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird%20-%202008%20-%20Extending%20the%20Soar%20Cognitive%20Architecture.pdf Extending the Soar Cognitive Architecture.]_ In Proceedings of the First Conference on Artificial General Intelligence (AGI-08).
