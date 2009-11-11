@@ -290,14 +290,6 @@ typedef struct agent_struct {
   Symbol            * rl_sym_reward_link;
   Symbol            * rl_sym_reward;
   Symbol            * rl_sym_value;
-  Symbol            * rl_gc_sym_learning;
-  Symbol            * rl_gc_sym_temporal_extension;
-  Symbol            * rl_gc_sym_discount_rate;
-  Symbol            * rl_gc_sym_learning_rate;
-  Symbol            * rl_gc_sym_learning_policy;
-  Symbol            * rl_gc_sym_hrl_discount;
-  Symbol            * rl_gc_sym_et_decay_rate;
-  Symbol            * rl_gc_sym_et_tolerance;
   
   Symbol            * epmem_sym;
   Symbol            * epmem_sym_cmd;
@@ -993,3 +985,4 @@ inline Bool reading_from_top_level(agent* soarAgent)
 #endif
 
 #endif
+
