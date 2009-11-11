@@ -1,5 +1,6 @@
 watch 0
 
+epmem --set learning on
 epmem --set balance 1
 epmem --set trigger none
 watch --epmem
