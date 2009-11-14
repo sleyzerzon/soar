@@ -17,6 +17,8 @@
 #include "symtab.h" /* needed for definition of symbol_union */
 #include "kernel.h" /* needed for definition of NIL */
 
+#include <set>
+
 #ifdef __cplusplus
 //extern "C"
 //{
@@ -220,6 +222,8 @@ typedef struct preference_struct {
   unsigned int total_preferences_for_candidate;
   double numeric_value;
   bool rl_contribution;
+
+  std::set< wme* >* wma_o_set;
 
 } preference;
 

@@ -16,6 +16,7 @@
 
 #include "wma.h"
 
+#include <set>
 #include <cmath>
 #include <cstdlib>
 
@@ -434,7 +435,7 @@ void wma_calculate_average_history( agent* my_agent, wme *w, wma_decay_element_t
  *                order for the given WME to exist.  Each of these activated
  *                WMEs is given a reference.
  **************************************************************************/
-void wma_decay_reference_wme( agent *my_agent, wme *w, int depth = 0 )
+void wma_decay_reference_wme( agent *my_agent, wme *w, int depth = 0, std::set< wme* >* o_set = NIL )
 {
 	preference *pref = w->preference;
 	instantiation *inst;
@@ -451,7 +452,15 @@ void wma_decay_reference_wme( agent *my_agent, wme *w, int depth = 0 )
 	// count and return
 	if ( w->wma_has_decay_element )
 	{
-		w->wma_decay_element->num_references++;
+		if ( o_set != NIL )
+		{
+			o_set->insert( w );
+		}
+		else
+		{
+			w->wma_decay_element->num_references++;
+		}
+
 		return;
 	}
 	// Architectural WMEs without decay elements are ignored
@@ -461,23 +470,32 @@ void wma_decay_reference_wme( agent *my_agent, wme *w, int depth = 0 )
 	}
 	else if ( pref->o_supported == TRUE )
 	{
-		/*
-		It's possible that there is an o-supported wme out there which does
-		not have a decay_element.  Possible causes for this are:
-		1.  The wme was i-supported and is just now being o-supported
-		2.  Decay was turned off, and turned back on, so the wme never got a
-		chance to make the decay_element
-		3.  Forgetting has been disabled so the WME's decay element was
-		removed but the WME was not removed from working memory.
+		if ( o_set != NIL )
+		{
+			o_set->insert( w );
+		}
+		else
+		{
+			/*
+			It's possible that there is an o-supported wme out there which does
+			not have a decay_element.  Possible causes for this are:
+			1.  The wme was i-supported and is just now being o-supported
+			2.  Decay was turned off, and turned back on, so the wme never got a
+			chance to make the decay_element
+			3.  Forgetting has been disabled so the WME's decay element was
+			removed but the WME was not removed from working memory.
 
-		Regardless of how this happened, we need to create a new decay element
-		for this WME here.
-		*/
+			Regardless of how this happened, we need to create a new decay element
+			for this WME here.
+			*/
 
-		// Add a decay element to this WME
-		// MRJ: The 1 in the next call is not always right. It's a
-		//      rare case, but maybe look at it...
-		wma_update_new_wme( my_agent, w, 1 );
+			// Add a decay element to this WME
+			// MRJ: The 1 in the next call is not always right. It's a
+			//      rare case, but maybe look at it...		
+			
+			wma_update_new_wme( my_agent, w, 1 );
+		}
+
 		return;
 	}
 	// If i-support mode is 'none' then we can stop here
@@ -490,17 +508,51 @@ void wma_decay_reference_wme( agent *my_agent, wme *w, int depth = 0 )
 	// Step 2:  In this case we have an i-supported WME that has been
 	//          referenced.  We need to find the supporting o-supported WMEs and
 	//          reference them instead.
-
-	inst = pref->inst;
-	c = inst->top_of_instantiated_conditions;
-	while( c != NIL )
+	
 	{
-		// BUGBUG: How to handle negative conditions?  Ignore for now.
-		if ( c->type == POSITIVE_CONDITION )
-		{
-			wma_decay_reference_wme( my_agent, c->bt.wme_, depth + 1 );
+		if ( pref->wma_o_set )
+		{			
+			for ( std::set< wme* >::iterator p=pref->wma_o_set->begin(); p!=pref->wma_o_set->end(); p++ )
+			{
+				if ( o_set != NIL )
+				{
+					o_set->insert( (*p) );
+				}
+				else
+				{
+					wma_decay_reference_wme( my_agent, (*p), depth + 1 );
+				}
+			}
 		}
-		c = c->next;
+		else
+		{
+			pref->wma_o_set = new std::set< wme* >;
+			
+			inst = pref->inst;
+			c = inst->top_of_instantiated_conditions;
+			while( c != NIL )
+			{
+				// BUGBUG: How to handle negative conditions?  Ignore for now.
+				if ( c->type == POSITIVE_CONDITION )
+				{
+					wma_decay_reference_wme( my_agent, c->bt.wme_, depth + 1, pref->wma_o_set );
+				}
+				c = c->next;
+			}
+
+			
+			for ( std::set< wme* >::iterator p=pref->wma_o_set->begin(); p!=pref->wma_o_set->end(); p++ )
+			{
+				if ( o_set != NIL )
+				{
+					o_set->insert( (*p) );
+				}
+				else
+				{
+					wma_decay_reference_wme( my_agent, (*p), depth + 1 );
+				}
+			}			
+		}
 	}
 
 }
