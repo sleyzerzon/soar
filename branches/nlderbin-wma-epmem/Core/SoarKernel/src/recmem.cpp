@@ -957,6 +957,11 @@ void deallocate_instantiation (agent* thisAgent, instantiation *inst)
 			symbol_remove_ref( thisAgent, temp->bt.trace->referent );
 		}
 
+		if ( temp->bt.trace->wma_o_set )
+		{
+		  delete temp->bt.trace->wma_o_set;
+		}
+
 		/* --- free the memory --- */
 		free_with_pool( &thisAgent->preference_pool, temp->bt.trace );
 	}
