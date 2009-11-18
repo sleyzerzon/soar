@@ -3,11 +3,201 @@
 <wiki:toc max_depth="1" />
 
 ----
+= memories =
+Print memory usage for partial matches.
+
+== Synopsis ==
+{{{
+memories [options] [number]
+memories production_name
+}}}
+
+== Options ==
+|| `-c, --chunks` || Print memory usage of chunks. ||
+|| `-d, --default` || Print memory usage of default productions. ||
+|| `-j, --justifications` || Print memory usage of justifications. ||
+|| `-u, --user` || Print memory usage of user-defined productions. ||
+|| `production_name` || Print memory usage for a specific production. ||
+|| `number` || Number of productions to print, sorted by those that use the most memory. ||
+|| `-T, --template` || Print memory usage of Soar-RL templates. ||
+
+== Description ==
+The `memories` command prints out the internal memory usage for full and partial 
+matches of production instantiations, with the productions using the most memory 
+printed first. With no arguments, the memories command prints memory usage for all productions. 
+If a `production_name` is specified, memory usage will be printed only for that 
+production.  If a positive integer `number` is given, only `number` productions will be 
+printed: the `number` productions that use the most memory. Output may be restricted to print memory usage for particular types of productions using the command options.
+
+Memory usage is recorded according to the tokens that are allocated in the rete 
+network for the given production(s). This number is a function of the number of elements
+in working memory that match each production. Therefore, this command will not
+provide useful information at the beginning of a Soar run (when working memory
+is empty) and should be called in the middle (or at the end) of a Soar run.
+
+The `memories` command is used to find the productions that are using the
+most memory and, therefore, may be taking the longest time to match (this is
+only a heuristic). By identifying these productions, you may be able to
+rewrite your program so that it will run more quickly. Note that memory usage
+is just a heuristic measure of the match time: A production might not use much
+memory relative to others but may still be time-consuming to match, and
+excising a production that uses a large number of tokens may not speed up your
+program, because the Rete matcher shares common structure among different
+productions.
+
+As a rule of thumb, numbers less than 100 mean that the production is using a
+small amount of memory, numbers above 1000 mean that the production is using a
+large amount of memory, and numbers above 10,000 mean that the production is
+using a *very* large amount of memory.
+
+== See Also ==
+[CommandLineInterface#matches matches]
+
+----
+= popd =
+Pop the current working directory off the stack and change to the next directory on the stack. Can be relative pathname or fully specified path.
+
+== Synopsis ==
+{{{
+popd
+}}}
+
+== Description =
+This command pops a directory off of the directory stack and [CommandLineInterface#cd changes to it]. See the [CommandLineInterface#dirs dirs] command for an explanation of the directory stack.
+
+== See Also ==
+[CommandLineInterface#cd cd] [CommandLineInterface#dirs dirs] [CommandLineInterface#home home] [CommandLineInterface#ls ls] [CommandLineInterface#pushd pushd] [CommandLineInterface#source source] [CommandLineInterface#pwd pwd]
+
+----
+= preferences =
+Examine details about the preferences that support the specified _identifier_ and _attribute_.
+
+== Synopsis ==
+{{{
+preferences [options] [identifier [attribute]]
+}}}
+
+== Options ==
+|| `-0, -n, --none` || Print just the preferences themselves ||
+|| `-1, -N, --names` || Print the preferences and the names of the productions that generated them ||
+|| `-2, -t, --timetags` ||  Print the information for the `--names` option above plus the timetags of the wmes matched by the LHS of the indicated productions ||
+|| `-3, -w, --wmes` ||  Print the information for the `--timetags` option above plus the entire WME matched on the LHS. ||
+|| `-o, --object` ||  Print the support for all the WMEs that comprise the object (the specified _identifier_). ||
+|| `identifier` || Must be an existing Soar object _identifier_. ||
+|| `attribute` || Must be an existing _attribute_ of the specified _identifier_. ||
+
+== Description ==
+The `preferences` command prints all the preferences for the given object identifier and attribute.   If identifier and attribute are not specified, they default to the current state and the current operator. The Soar syntax attribute carat (`^`) is optional when specifying the attribute. The optional arguments indicates the level of detail to print about each preference. 
+
+This command is useful for examining which candidate operators have
+been proposed and what relationships, if any, exist among them.
+If a preference has O-support, the string, `:O` will also be printed.
+
+When only the identifier is specified on the commandline, if the identifier is a state, Soar uses the default attribute `^operator`.  If the identifier is not a state, Soar prints the support information for all WMEs whose value is the identifier.
+
+When an identifier and the `--object` flag are specified, Soar prints the preferences / WME support for all WMEs comprising the specified identifier.
+
+For the time being, _numeric-indifferent_ preferences are listed under the heading
+`binary indifferents:`.
+
+By default, using the `--wmes` option with a WME on the top state will only print the timetags.  To change this, the kernel can be recompiled with `DO_TOP_LEVEL_REF_CTS`, but this has other consequences (see comments in `kernel.h`).
+
+== Examples ==
+This example prints the preferences on `(S1 ^operator)` and the production names which created the preferences:
+{{{
+soar> preferences S1 operator --names
+Preferences for S1 ^operator:
+acceptables:
+ O2 (fill) +
+   From waterjug*propose*fill
+ O3 (fill) +
+   From waterjug*propose*fill
+unary indifferents:
+ O2 (fill) =
+   From waterjug*propose*fill
+ O3 (fill) =
+   From waterjug*propose*fill
+}}}
+
+If the current state is `S1`, then the above syntax is equivalent to:
+{{{
+preferences -n
+}}}
+
+This example shows the support for the WMEs with the ^jug attribute:
+{{{
+soar> preferences s1 jug
+ 
+Preferences for S1 ^jug:
+  
+acceptables:
+  (S1 ^jug I4)  :O 
+  (S1 ^jug J1)  :O 
+}}}
+
+This example shows the support for the WMEs with value `J1`, and the productions that generated them:
+{{{
+soar> pref J1 -1
+
+ Support for (31: O3 ^jug J1)
+   (O3 ^jug J1) 
+     From water-jug*propose*fill
+
+ Support for (11: S1 ^jug J1)
+   (S1 ^jug J1)  :O 
+     From water-jug*apply*initialize-water-jug-look-ahead
+}}}
+
+This example shows the support for all WMEs that make up the object `S1`:
+{{{
+soar> pref -o s1
+
+Support for S1 ^problem-space:
+  (S1 ^problem-space P1) 
+Support for S1 ^name:
+  (S1 ^name water-jug)  :O 
+Support for S1 ^jug:
+  (S1 ^jug I4)  :O 
+  (S1 ^jug J1)  :O 
+Support for S1 ^desired:
+  (S1 ^desired D1)  :O 
+Support for S1 ^superstate-set:
+  (S1 ^superstate-set nil) 
+Preferences for S1 ^operator:
+acceptables:
+  O2 (fill) +
+  O3 (fill) +
+Arch-created wmes for S1 :
+(2: S1 ^superstate nil)
+(1: S1 ^type state)
+Input (IO) wmes for S1 :
+(3: S1 ^io I1)
+}}}
+
+----
+= pushd =
+Push a directory onto the directory stack, changing to it.
+
+== Synopsis ==
+{{{
+pushd directory
+}}}
+
+== Description ==
+Maintain a stack of working directories and push the directory on to the stack. 
+Can be relative path name or fully specified.
+
+== See Also ==
+[CommandLineInterface#cd cd] [CommandLineInterface#dirs dirs] [CommandLineInterface#home home] [CommandLineInterface#ls ls] [CommandLineInterface#popd popd] [CommandLineInterface#source source] [CommandLineInterface#pwd pwd]
+
+----
 = stats =
 Print information on Soar's runtime statistics.
 
 == Synopsis ==
-`stats [options]`
+{{{
+stats [options]
+}}}
 
 === Default Aliases ===
 `st`
@@ -84,8 +274,8 @@ always be greater than than the corresponding derived time.
 Additionally, as execution time increases, the difference between
 these two values will also increase. For those concerned about the
 performance cost of the timers, all the run time timing calculations
-can be compiled out of the code by defining NO_TIMING_STUFF (in
-soarkernel.h) before compilation.
+can be compiled out of the code by defining `NO_TIMING_STUFF` (in
+`soarkernel.h`) before compilation.
 
 == Examples ==
 Track per-cycle stats then print them out using default sort:
@@ -119,7 +309,9 @@ ctf stats.csv stats --cycle-csv
 Returns the version number of the Soar kernel.
 
 == Synopsis ==
-`version`
+{{{
+version
+}}}
 
 == Description ==
 This command gives version information about the current Soar kernel.  It returns the version number and build date which can then be stored by the agent or the application.
