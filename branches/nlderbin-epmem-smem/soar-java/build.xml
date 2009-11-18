@@ -1,4 +1,4 @@
-<project name="soar-java" default="build-nodoc" basedir=".">
+<project name="soar-java" default="build" basedir=".">
 
 	<target name="sml">
 		<ant dir="soar-smljava" />
@@ -14,14 +14,14 @@
 		<ant dir="soar-visualsoar" />
 	</target>
 
-	<target name="build-nodoc">
-		<ant dir="soar-smljava" target="build-nodoc" />
-		<ant dir="soar-debugger" target="build-nodoc" />
-		<ant dir="soar-loggerjava" target="build-nodoc" />
-		<ant dir="soar-missionaries" target="build-nodoc" />
-		<ant dir="soar-soar2d" target="build-nodoc" />
-		<ant dir="soar-toh" target="build-nodoc" />
-		<ant dir="soar-visualsoar" target="build-nodoc" />
+	<target name="doc">
+		<ant dir="soar-smljava" target="doc" />
+		<ant dir="soar-debugger" target="doc" />
+		<ant dir="soar-loggerjava" target="doc" />
+		<ant dir="soar-missionaries" target="doc" />
+		<ant dir="soar-soar2d" target="doc" />
+		<ant dir="soar-toh" target="doc" />
+		<ant dir="soar-visualsoar" target="doc" />
 	</target>
 
 	<target name="clean">

@@ -7,9 +7,9 @@
 	<property name="src" location="src/main/java" />
 	<property name="lib" location="lib" />
 	<property name="doc" location="doc" />
-	<property name="sml.lib" location="../../Core/ClientSMLSWIG/Java" />
-	<property name="smljava.lib" location="../soar-smljava/lib" />
-	<property name="soarlib" location="../../SoarLibrary" />
+	<property name="sml.lib" location="${soar}/Core/ClientSMLSWIG/Java" />
+	<property name="smljava.lib" location="${soar}/soar-java/soar-smljava/lib" />
+	<property name="soarlib" location="${soar}/SoarLibrary" />
 	<property name="soarlib.lib" location="${soarlib}/lib" />
 	<property name="soarlib.bin" location="${soarlib}/bin" />
 
@@ -31,7 +31,7 @@
 	<property name="doc.destdir" location="${doc}/${ant.project.name}/api"/>
 	<property name="doc.windowtitle" value="${ant.project.name} ${version}"/>
 
-	<target name="init">
+	<target name="init" unless="aprilsoar">
 		<mkdir dir="${target}" />
 		<mkdir dir="${target.classes}" />
 
@@ -49,7 +49,31 @@
 		</path>
 	</target>
 
-	<target name="compile" depends="init">
+	<target name="init-aprilsoar" if="aprilsoar">
+		<mkdir dir="${target}" />
+		<mkdir dir="${target.classes}" />
+
+		<!-- Set up the build path used throughout the build script  -->
+		<path id="compile.libs">
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${sml.lib}">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${smljava.lib}">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="../soar-sps/lib">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${soar}/soar-java/soar-debugger/lib">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+	</target>
+
+	<target name="compile" depends="init,init-aprilsoar">
 		<javac destdir="${target.classes}" debug="on" optimize="on" target="${java.target.level}" source="${java.source.level}">
 			<src path="${src}" />
 			<classpath refid="compile.libs"/>
