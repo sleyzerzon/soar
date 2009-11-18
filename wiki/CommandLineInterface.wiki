@@ -110,7 +110,7 @@ ctf stats.csv stats --cycle-csv
 || st || stats ||
 
 == See Also ==
-timers, [CommandLineInterface#version version]
+timers
 
 ----
 
@@ -121,4 +121,3 @@ This command gives version information about the current Soar kernel.  It return
 
 == Synopsis ==
 `version`
-
