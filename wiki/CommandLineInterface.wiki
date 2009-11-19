@@ -1,6 +1,48 @@
 #summary Experimental one-file command line interface help file.
 
+When issuing commands, the command name can be shortened so long as there is no ambiguity (e.g., `pref` instead of `preferences`). Arbitrary aliases may also be assigned using the `alias` command. Some of the more common shortcuts are listed with each command's synopsis under "Default aliases".
+
 <wiki:toc max_depth="1" />
+
+----
+= excise =
+Delete Soar productions from production memory.
+
+== Synopsis ==
+{{{
+ excise production_name
+ excise options
+}}}
+
+=== Default aliases ===
+|| `ex` || `excise` ||
+
+== Options ==
+|| `-a, --all` || Remove all  productions  from  memory  *and*  perform  an init-soar command ||
+|| `-c, --chunks` || Remove all chunks (learned productions) and  justifications from memory ||
+|| `-d, --default` || Remove all default productions (:default) from memory ||
+|| `-r, --rl` || Excise Soar-RL rules ||
+|| `-t, --task` || Remove chunks, justifications, and user productions from memory ||
+|| `-T, --templates` || Excise Soar-RL templates ||
+|| `-u, --user` || Remove all user productions (but not chunks or default rules) from memory ||
+|| `production_name` || Remove the specific production with this name. ||
+
+== Description ==
+This command removes productions from Soar's memory.  The command must be called with either a specific production name or with a flag that indicates a particular group of productions to be removed.  Using the flag `-a` or `--all` also causes an init-soar.
+
+== Examples ==
+This command removes the production `my*first*production` and all chunks:
+{{{
+excise my*first*production --chunks
+}}}
+
+This removes all productions and does an init-soar:
+{{{
+excise --all
+}}}
+
+== See Also ==
+[CommandLineInterface#init-soar init-soar]
 
 ----
 = help =
@@ -11,10 +53,78 @@ Provide formatted usage information about Soar commands.
 help [command_name]
 }}}
 
-Default aliases: `? h man`
+=== Default aliases ===
+|| `?` || `help` ||
+|| `h` || `help` ||
+|| `man` || `help` ||
 
 == Description ==
 This command prints formatted help for the given command name. Issue alone to see what topics have help available.
+
+----
+= ls =
+List the contents of the current working directory.
+
+== Synopsis ==
+{{{
+ls
+}}}
+
+=== Default aliases ===
+|| `dir` || `ls` ||
+
+== Description ==
+List the contents of the working directory.
+
+== See Also ==
+[CommandLineInterface#cd cd] [CommandLineInterface#dirs dirs] [CommandLineInterface#home home] [CommandLineInterface#pushd pushd] [CommandLineInterface#popd popd] [CommandLineInterface#source source] [CommandLineInterface#pwd pwd]
+
+----
+= matches =
+Prints information about partial matches and the match set.
+
+== Synopsis ==
+{{{
+matches [options] production_name
+matches [options] -[a|r]
+}}}
+
+== Options ==
+|| `production_name` || Print partial match information for the named production. ||
+|| `-n, --names, -c, --count` || For the match set, print only the names of the productions that are about to fire or retract (the default).  If printing partial matches for a production, just list the partial match counts. ||
+|| `-t, --timetags` || Also print the timetags of the wmes at the first failing condition ||
+|| `-w, --wmes` || Also print the full wmes, not just the timetags, at the first failing condition. ||
+|| `-a, --assertions` || List only productions about to fire. ||
+|| `-r, --retractions` || List only productions about to retract. ||
+
+== Description ==
+The `matches` command prints a list of productions that have instantiations in the match set, i.e., those productions that will retract or fire in the next Propose or Apply phase.  It also will print partial match information for a single, named production.
+
+=== Printing the match set ===
+When printing the match set (i.e., no production name is specified), the default action prints only the names of the productions which are about to fire or retract.  If there are multiple instantiations of a production, the total number of instantiations of that production is printed after the production name, unless `--timetags` or `--wmes` are specified, in which case each instantiation is printed on a separate line.
+
+When printing the match set, the `--assertions` and `--retractions` arguments may be specified to restrict the output to print only the assertions or retractions.
+
+=== Printing partial matches for productions ===
+In addition to printing the current match set, the `matches` command can be used to print information about partial matches for a named production. In this case, the conditions of the production are listed, each preceded by the number of currently active matches for that condition. If a condition is negated, it is preceded by a minus sign `-`. The pointer `>>>>` before a condition indicates that this is the first condition that failed to match.
+
+When printing partial matches, the default action is to print only the counts of the number of WME's that match, and is a handy tool for determining which condition failed to match for a production that you thought should have fired. At levels `--timetags` and `--wmes` the `matches` command displays the WME's immediately after the first condition that failed to match--temporarily interrupting the printing of the production conditions themselves.
+
+=== Notes ===
+When printing partial match information, some of the matches displayed by this command may have already fired, depending on when in the execution cycle this command is called. To check for the matches that are about to fire, use the `matches` command without a named production.
+
+In Soar 8, the execution cycle (decision cycle) is input, propose, decide, apply output; it no longer stops for user input after the decision phase when running by decision cycles (`run -d 1`). If a user wishes to print the match set immediately after the decision phase and before the apply phase, then the user must run Soar by _phases_ (`run -p 1`).
+
+== Examples ==
+This example prints the productions which are about to  fire and  the  wmes that match the productions on their left-hand sides:
+{{{
+ matches --assertions --wmes
+}}}
+
+This example prints the wme timetags for  a  single  production.   
+{{{
+ matches -t my*first*production
+}}}
 
 ----
 = memories =
@@ -90,6 +200,9 @@ Examine details about the preferences that support the specified _identifier_ an
 {{{
 preferences [options] [identifier [attribute]]
 }}}
+
+=== Default aliases ===
+|| `pref` || `preferences` ||
 
 == Options ==
 || `-0, -n, --none` || Print just the preferences themselves ||
@@ -189,6 +302,97 @@ Input (IO) wmes for S1 :
 }}}
 
 ----
+= print =
+Print items in working memory or production memory.
+
+== Synopsis ==
+{{{
+print [options] [production_name]
+print [options] identifier|timetag|pattern
+}}}
+
+=== Default aliases ===
+|| `p` || `print` ||
+|| `pc` || `print --chunks` ||
+|| `wmes` || `print --internal` ||
+
+== Options ==
+=== Printing items in production memory ===
+|| `-a, --all` ||  print the names of all productions currently loaded ||
+|| `-c, --chunks` ||  print the names of all chunks currently loaded ||
+|| `-D, --defaults` ||  print the names of all default productions currently loaded ||
+|| `-f, --full` ||  When printing productions, print the whole production. This is the default when printing a named production. ||
+|| `-F, --filename` || also prints the name of the file that contains the production. ||
+|| `-i, --internal` ||  items should be printed in their internal form.  For productions, this means leaving conditions in their reordered (rete net) form.   ||
+|| `-j, --justifications` ||  print the names of all justifications currently loaded.   ||
+|| `-n, --name` ||  When printing productions, print only the name and not the whole production. This is the default when printing any category of productions, as opposed to a named production. ||
+|| `-r, --rl` || Print Soar-RL rules ||
+|| `-T, --template` || Print Soar-RL templates ||
+|| `-u, --user` ||  print the names of all user productions currently loaded ||
+|| `production_name` ||  print the production named `production-name` ||
+
+=== Printing items in working memory ===
+|| `-d, --depth n` ||  This option overrides the default printing depth (see the [CommandLineInterface#default-wme-depth default-wme-depth] command for more detail). ||
+|| `-e, --exact` || Print only the wmes that match the pattern ||
+|| `-i, --internal` ||  items should be printed in their internal form. For working memory, this means printing the individual elements with their timetags, rather than the objects. ||
+|| `-t, --tree` ||  wmes should be printed in in a tree form (one wme per line). ||
+|| `-v, --varprint` || Print identifiers enclosed in angle brackets. ||
+|| `identifier` ||  print the object `identifier`. `identifier` must be a valid Soar symbol such as _S1_ ||
+|| `pattern` ||  print the object whose working memory elements matching the given `pattern`.  See Description for more information on printing objects matching a specific `pattern`. ||
+|| `timetag` ||  print the object in working memory with the given `timetag` ||
+
+=== Printing the current subgoal stack ===
+|| `-s, --stack` ||  Specifies that the Soar goal stack should be printed. By default this includes both states and operators.  ||
+|| `-o, --operators` || When printing the stack, print only _operators_. ||
+|| `-S, --states` || When printing the stack, print only _states_. ||
+
+== Description ==
+The `print` command is used to print items from production memory or working memory. It can take several kinds of arguments. When printing items from working memory, the Soar objects are printed unless the `--internal` flag is used, in which case the wmes themselves are printed.  
+{{{
+ (identifier ^attribute value [+])
+}}}
+The pattern is surrounded by parentheses. The `identifier`, `attribute`, and `value` must be valid Soar symbols or the wildcard symbol `*` which matches all occurrences. The optional `+` symbol restricts pattern matches to acceptable preferences. If wildcards are included, an object will be printed for each pattern match, even if this results in the same object being printed multiple times.
+
+== Examples ==
+Print the objects in working memory (and their timetags) which have wmes with identifier `s1` and value `v2` (note: this will print the entire `s1` object for each match found):
+{{{
+print --internal (s1 ^* v2)
+}}}
+
+Print the Soar stack which includes states and operators:
+{{{
+print --stack
+}}}
+
+Print the named production in its RETE form:
+{{{
+print -if named*production
+}}}
+
+Print the names of all user productions currently loaded:
+{{{
+print -u
+}}}
+
+Default print vs tree print:
+{{{
+print s1 --depth 2
+(S1 ^io I1 ^reward-link R1 ^superstate nil ^type state)
+  (I1 ^input-link I2 ^output-link I3)
+
+print s1 --depth 2 --tree
+(S1 ^io I1)
+  (I1 ^input-link I2)
+  (I1 ^output-link I3)
+(S1 ^reward-link R1)
+(S1 ^superstate nil)
+(S1 ^type state)
+}}}
+
+== See Also ==
+[CommandLineInterface#default-wme-depth default-wme-depth], [CommandLineInterface#predefined-aliases predefined-aliases]
+
+----
 = pushd =
 Push a directory onto the directory stack, changing to it.
 
@@ -205,6 +409,88 @@ Can be relative path name or fully specified.
 [CommandLineInterface#cd cd] [CommandLineInterface#dirs dirs] [CommandLineInterface#home home] [CommandLineInterface#ls ls] [CommandLineInterface#popd popd] [CommandLineInterface#source source] [CommandLineInterface#pwd pwd]
 
 ----
+= source =
+Load and evaluate the contents of a file.
+
+== Synopsis ==
+{{{
+source [options] filename
+}}}
+
+== Options ==
+|| `filename` || The file of Soar productions and commands to load. ||
+|| `-a, --all` || Enable a summary for each file sourced ||
+|| `-d, --disable` || Disable all summaries ||
+|| `-v, --verbose` || Print excised production names ||
+
+== Description ==
+Load and evaluate the contents of a file.  The `filename` can be a relative path or a fully qualified path.  `source` will generate an implicit push to the new directory, execute the command, and then pop back to the current working directory from which the command was issued.
+
+After the source completes, the number of productions sourced and excised is printed:
+{{{
+agent> source demos/mac/mac.soar
+******************
+Total: 18 productions sourced.
+Source finished.
+agent> source demos/mac/mac.soar
+#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
+Total: 18 productions sourced. 18 productions excised.
+Source finished.
+}}}
+
+This can be disabled by using the `-d` flag:
+{{{
+agent> source demos/mac/mac.soar -d
+******************
+Source finished.
+agent> source demos/mac/mac.soar -d
+#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
+Source finished.
+}}}
+
+A list of excised productions is available using the `-v` flag:
+{{{
+agent> source demos/mac/mac.soar -v
+#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
+Total: 18 productions sourced. 18 productions excised.
+Excised productions:
+        mac*detect*state*success
+        mac*evaluate*state*failure*more*cannibals
+        monitor*move-boat
+        monitor*state*left
+...
+}}}
+
+A separate summary for each file sourced can be enabled using the `-a` flag:
+{{{
+agent> source demos/mac/mac.soar -a
+_firstload.soar: 0 productions sourced.
+all_source.soar: 0 productions sourced.
+**
+goal-test.soar: 2 productions sourced.
+***
+monitor.soar: 3 productions sourced.
+****
+search-control.soar: 4 productions sourced.
+top-state.soar: 0 productions sourced.
+elaborations_source.soar: 0 productions sourced.
+_readme.soar: 0 productions sourced.
+**
+initialize-mac.soar: 2 productions sourced.
+*******
+move-boat.soar: 7 productions sourced.
+mac_source.soar: 0 productions sourced.
+mac.soar: 0 productions sourced.
+Total: 18 productions sourced.
+Source finished.
+}}}
+
+Combining the `-a` and `-v` flags add excised production names to the output for each file.
+
+== See Also ==
+[CommandLineInterface#cd cd] [CommandLineInterface#dirs dirs] [CommandLineInterface#home home] [CommandLineInterface#ls ls] [CommandLineInterface#pushd pushd] [CommandLineInterface#popd popd] [CommandLineInterface#pwd pwd]
+
+----
 = stats =
 Print information on Soar's runtime statistics.
 
@@ -213,7 +499,8 @@ Print information on Soar's runtime statistics.
 stats [options]
 }}}
 
-Default aliases: `st`
+=== Default aliases ===
+|| `st` || `stats` ||
 
 == Options ==
 || `-m, --memory` || report usage for Soar's memory pools ||
@@ -318,6 +605,42 @@ ctf stats.csv stats --cycle-csv
 [CommandLineInterface#timers timers]
 
 ----
+= time =
+Use a default system clock timer to record the wall time required while executing a command.
+
+== Synopsis ==
+{{{
+time command [arguments]
+}}}
+
+== Options ==
+|| command || The command to execute. ||
+|| arguments || Optional command arguments. ||
+
+----
+= timers =
+Toggle on or off the internal timers used to profile Soar.
+
+== Synopsis ==
+{{{
+timers [options]
+}}}
+
+== Options ==
+|| `-d, --disable, --off` || Disable all timers. ||
+|| `-e, --enable, --on` || Enable timers as compiled. ||
+
+== Description ==
+This command is used to control the timers that collect internal profiling 
+information while Soar is running.  With no arguments, this command prints out 
+the current timer status.  Timers are ENABLED by default.  The default 
+compilation flags for soar enable the basic timers and disable the detailed 
+timers.  The `timers` command can only enable or disable timers that have already been enabled with compiler directives.  See the [CommandLineInterface#stats stats] command for more info on the Soar timing system.
+
+== See Also ==
+[CommandLineInterface#stats stats]
+
+----
 = version =
 Returns the version number of the Soar kernel.
 
@@ -364,7 +687,8 @@ watch [options]
 watch level
 }}}
 
-Default aliases: `w`
+=== Default aliases ===
+|| `w` || `watch` ||
 
 == Options ==
 When appropriate, a specific option may be turned off using the `remove` argument. This argument has a numeric alias; you can use `0` for `remove`.  A mix of formats is acceptable, even in the same command line.
@@ -514,8 +838,6 @@ watch -f -l 3 -u 0 -j 0
 == See Also ==
 
 [CommandLineInterface#pwatch pwatch] [CommandLineInterface#print print] [CommandLineInterface#run run] [CommandLineInterface#watch-wmes watch-wmes]
-
-
 
 
 
