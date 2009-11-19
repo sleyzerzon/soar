@@ -22,8 +22,6 @@ table below lists typical conference deadlines by month.
 = Submission Deadlines =
 
 These deadlines are official for a particular conference year:
-  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010] -- papers due October 13th, 2009
-  * [http://agi-conf.org/2010/ AGI 2010] -- papers due October 15th, 2009
   * [http://www.kr.org/KR2010/ KR&R 2010] -- papers due November 30, 2009
   * [http://www.brimsconference.org/ BRIMS 2010] -- papers due December 21, 2009
   * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
@@ -33,16 +31,18 @@ These deadlines are official for a particular conference year:
   * [http://www.spatial-cognition-2010.com/ SC 2010] -- papers due February 15, 2010
   * [http://www.iccbr.org/iccbr2010 ICCBR 2010] -- papers due February 15, 2010
   * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
+  * [http://iccm2010.cs.drexel.edu/ ICCM 2010] -- papers due April 13th, 2010
 
 These conferences have yet to announce official deadlines:
   * [http://www.icml2010.org/ ICML 2010]
   * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010]
-  * [http://iccm2010.cs.drexel.edu/ ICCM 2010]
   * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010]
   * [http://nips.cc/ NIPS 2010]
   * [http://www.ecal2009.org/ ECAL 2010]
   * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010]
   * [http://ijcai-11.iiia.csic.es/ IJCAI 2011]
+  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2011]
+  * [http://agi-conf.org/ AGI 2011]
 
 = Information =
 
@@ -101,7 +101,7 @@ These conferences have yet to announce official deadlines:
   * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010], July 19-22, 2010 in Alessandria, Italy
     * International Conference on Case-Based Reasoning
 
-  * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 6-8, 2010 in Philadelphia, PA 
+  * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 5-8, 2010 in Philadelphia, PA 
     * International Conference on Cognitive Modeling
     
   * [http://www.spatial-cognition-2010.com/ SC 2010], August 15-19, 2010 in Portland, OR
