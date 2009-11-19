@@ -424,6 +424,50 @@ quit
 This command stops the run, quits the log and closes Soar.
 
 ----
+= rl =
+Get/Set Soar-RL parameters and statistics.
+
+== Synopsis ==
+{{{
+rl [options parameter|statstic]
+}}}
+
+== Options ==
+|| `-g, --get` || Retrieve a Soar-RL parameter value ||
+|| `-s, --set` || Set a Soar-RL parameter value ||
+|| `-S, --stats` || Access Soar-RL statistics ||
+
+== Description ==
+This command is used to get/set all parameters in Soar-RL.  Additionally used to access statistics.  See tables below for available parameters, full information is in the Soar-RL manual.
+
+== Parameters ==
+Without any options: summary table of parameter settings.
+
+|| *Parameter Name* || *Acceptable Values* || *Default* ||
+|| `learning` || `on, off` || `off` ||
+|| `temporal-extension` || `on, off` || `on` ||
+|| || || ||
+|| `discount-rate` || `[0, 1]` || `0.9` ||
+|| || || ||
+|| `learning-rate` || `[0, 1]` || `0.3` ||
+|| `learning-policy` || `sarsa, q-learning` || `sarsa` ||
+|| `hrl-discount` || `on, off` || `on` ||
+|| || || ||
+|| `eligibility-trace-decay-rate` || `[0, 1]` || `0` ||
+|| `eligibility-trace-tolerance` || `(0, inf)` || `0.001` ||
+
+== Examples == 
+This command gets the value of the learning-rate parameter:
+{{{
+rl --get learning-rate
+}}}
+
+This command sets the value of the learning-rate parameter to 0.5:
+{{{
+rl --set learning-rate 0.5
+}}}
+
+----
 = source =
 Load and evaluate the contents of a file.
 
@@ -853,7 +897,6 @@ watch -f -l 3 -u 0 -j 0
 == See Also ==
 
 [CommandLineInterface#pwatch pwatch] [CommandLineInterface#print print] [CommandLineInterface#run run] [CommandLineInterface#watch-wmes watch-wmes]
-
 
 
 
