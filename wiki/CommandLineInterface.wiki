@@ -409,6 +409,21 @@ Can be relative path name or fully specified.
 [CommandLineInterface#cd cd] [CommandLineInterface#dirs dirs] [CommandLineInterface#home home] [CommandLineInterface#ls ls] [CommandLineInterface#popd popd] [CommandLineInterface#source source] [CommandLineInterface#pwd pwd]
 
 ----
+= quit =
+Close log file, terminate Soar, and return user to the operating system.
+
+== Synopsis ==
+{{{
+quit
+}}}
+
+== Default aliases ==
+|| `exit` || `quit` ||
+
+== Description ==
+This command stops the run, quits the log and closes Soar.
+
+----
 = source =
 Load and evaluate the contents of a file.
 
@@ -838,7 +853,6 @@ watch -f -l 3 -u 0 -j 0
 == See Also ==
 
 [CommandLineInterface#pwatch pwatch] [CommandLineInterface#print print] [CommandLineInterface#run run] [CommandLineInterface#watch-wmes watch-wmes]
-
 
 
 
