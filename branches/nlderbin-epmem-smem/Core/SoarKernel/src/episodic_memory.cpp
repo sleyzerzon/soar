@@ -5217,6 +5217,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 					{
 						Symbol *my_meta2;
 						Symbol *my_meta3;
+						epmem_id_mapping::iterator idm_p;
 
 						my_meta = make_new_identifier( my_agent, 'M', state->id.epmem_result_header->id.level );
 						epmem_add_meta_wme( my_agent, state, state->id.epmem_result_header, my_agent->epmem_sym_graph_match_mapping, my_meta );						
@@ -5233,11 +5234,21 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 							// point to the cue identifier
 							epmem_add_meta_wme( my_agent, state, my_meta2, my_agent->epmem_sym_graph_match_mapping_cue, c_p->first );							
 
-							// create and store away the [yet-to-be-retrieved] identifier
-							my_meta3 = make_new_identifier( my_agent, c_p->first->id.name_letter, my_meta2->id.level );
+							// create (if appropriate) and store away the [yet-to-be-retrieved] identifier
+							idm_p = my_mapping->find( c_p->second );
+							if ( idm_p == my_mapping->end() )
+							{
+								my_meta3 = make_new_identifier( my_agent, c_p->first->id.name_letter, my_meta2->id.level );
+								(*my_mapping)[ c_p->second ] = my_meta3;
+							}
+							else
+							{
+								my_meta3 = idm_p->second;
+								symbol_add_ref( my_meta3 );
+							}
+							
 							epmem_add_meta_wme( my_agent, state, my_meta2, my_agent->epmem_sym_retrieved, my_meta3 );							
-							symbol_remove_ref( my_agent, my_meta3 );
-							(*my_mapping)[ c_p->second ] = my_meta3;
+							symbol_remove_ref( my_agent, my_meta3 );							
 						}
 					}
 				}
