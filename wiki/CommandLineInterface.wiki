@@ -13,7 +13,7 @@ Manually add an element to working memory.
 add-wme id [^]attribute value [+]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `aw` || `add-wme` ||
 
 == Options ==
@@ -24,12 +24,12 @@ add-wme id [^]attribute value [+]
 || `+` || If the optional preference is specified, its value must be `+` (acceptable). ||
 
 == Description ==
-Manually add an element to working memory. `add-wme` is often used by an input function to update Soar's information about the state of the external world.
+Manually add an element to working memory. add-wme is often used by an input function to update Soar's information about the state of the external world.
 
-`add-wme` adds a new wme with the given id, attribute, value and optional preference. The given id must be an existing identifier. The attribute and value fields can be any Soar symbol. If `*` is given in the attribute or value field, Soar creates a new identifier (symbol) for that field. If the preference is given, it can only have the value `+` to indicate that an acceptable preference should be created for this wme.
+add-wme adds a new wme with the given id, attribute, value and optional preference. The given id must be an existing identifier. The attribute and value fields can be any Soar symbol. If `*` is given in the attribute or value field, Soar creates a new identifier (symbol) for that field. If the preference is given, it can only have the value `+` to indicate that an acceptable preference should be created for this wme.
 
 Note that because the id must already exist in working memory, the WME that you are adding will be attached (directly or indirectly) to the top-level state. As with other WME's, any WME added
-via a call to `add-wme` will automatically be removed from working memory once it is no longer attached to the top-level state.
+via a call to add-wme will automatically be removed from working memory once it is no longer attached to the top-level state.
 
 == Examples ==
 This example adds the attribute/value pair `^message-status received` to the identifier (symbol) S1:
@@ -43,7 +43,7 @@ add-wme Z2 message * +
 }}}
 
 == Warnings ==
-Be careful how you use this command. It may have weird side effects (possibly even including system crashes). For example, the chunker can't backtrace through wmes created via `add-wme` nor will such wmes ever be removed thru Soar's garbage collection. Manually removing context/impasse wmes may have unexpected side effects.
+Be careful how you use this command. It may have weird side effects (possibly even including system crashes). For example, the chunker can't backtrace through wmes created via add-wme nor will such wmes ever be removed thru Soar's garbage collection. Manually removing context/impasse wmes may have unexpected side effects.
 
 == See Also ==
 [CommandLineInterface#remove-wme remove-wme]
@@ -54,15 +54,14 @@ Define a new alias, or command, using existing commands and arguments.
 
 == Synopsis ==
 {{{
-alias name [cmd [args]]
-alias
+alias [name [cmd [args]]]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `a` || `alias` ||
 
 == Description ==
-This command defines new aliases by creating Soar procedures with the given name. The new procedure can then take an arbitrary number of arguments which are post-pended to the given definition and then that entire string is executed as a command. The definition must be a single command, multiple commands are not allowed. The `alias` procedure checks to see if the name already exists, and does not destroy existing procedures or aliases by the same name. Existing aliases can be removed by using the [CommandLineInterface#unalias unalias] command. With no arguments, `alias` returns the list of defined aliases. With only the name given, `alias` returns the current definition.
+This command defines new aliases by creating Soar procedures with the given name. The new procedure can then take an arbitrary number of arguments which are post-pended to the given definition and then that entire string is executed as a command. The definition must be a single command, multiple commands are not allowed. The alias procedure checks to see if the name already exists, and does not destroy existing procedures or aliases by the same name. Existing aliases can be removed by using the [CommandLineInterface#unalias unalias] command. With no arguments, alias returns the list of defined aliases. With only the name given, alias returns the current definition.
 
 == Examples ==
 The alias `wmes` is defined as:
@@ -96,7 +95,7 @@ Store the input wmes in a file for reloading later.
 {{{
 capture-input --open filename [--flush]
 capture-input [--query]
-capture-input .-close
+capture-input --close
 }}}
 
 == Options ==
@@ -125,7 +124,7 @@ Change directory.
 cd [directory]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `chdir` || `cd` ||
 
 == Options ==
@@ -134,10 +133,10 @@ cd [directory]
 == Description ==
 Change the current working directory. If run with no arguments, returns to the
 directory that the command line interface was started in, often referred to as the
-`home` directory.
+_home_ directory.
 
 == Examples ==
-To move to the relative directory named ../home/soar/agents
+To move to the relative directory named `../home/soar/agents`:
 {{{
 cd ../home/soar/agents
 }}}
@@ -158,29 +157,26 @@ chunk-name-format [-sl] -c [<count>]
 == Options ==
 || `-s, --short` || Use the short format for naming chunks ||
 || `-l, --long` || Use the long format for naming chunks (default) ||
-|| `-p, --prefix [<prefix>]` || If <prefix> is given, use <prefix> as the prefix for naming chunks. Otherwise, return the current `prefix`. (defaults to "`chunk` ||
-|| `-c, --count [<count>]` || If <count> is given, set the chunk counter for naming chunks to <count>. Otherwise, return the current value of the chunk counter. ||
+|| `-p, --prefix [p]` || If given, use `p` as the prefix for naming chunks. Otherwise, return the current prefix. (defaults to _chunk_) ||
+|| `-c, --count [c]` || If given, set the chunk counter for naming chunks to `c`. Otherwise, return the current value of the chunk counter. ||
 
 == Description ==
-The short format for naming newly-created chunks is:
-
-`prefixChunknum`
+The short format for naming newly-created chunks is: 
+{{{
+<prefix><chunknum>
+}}}
 
 The long (default) format for naming chunks is:
-
-prefix-Chunknum*ddc*impassetype*dcChunknum
+{{{
+<prefix>-<chunknum>*<dc>*<impassetype>*<dcChunknum>
+}}}
 
 where:
-
-`prefix` is a user-definable prefix string; `prefix` defaults to "chunk" when unspecified by the user. It many not contain the character *,
-
-`Chunknum` is <count> for the first chunk created, <count>+1 for the second chunk created, etc.
-
-`dc` is the number of the decision cycle in which the chunk was formed,
-
-`impassetype` is one of `[tie | conflict | cfailure | snochange | opnochange]`,
-
-`dcChunknum` is the number of the chunk within that specific decision cycle.
+  * `prefix` is a user-definable prefix string; `prefix` defaults to _chunk_ when unspecified by the user. It many not contain the character `*`,
+  * `chunknum` is a counter set by `--count` or starting at 1 for the first chunk created,
+  * `dc` is the number of the decision cycle in which the chunk was formed,
+  * `impassetype` is one of `tie`, `conflict`, `cfailure`, `snochange`, `opnochange`,
+  * `dcChunknum` is the number of the chunk within that specific decision cycle.
 
 ----
 = clog =
@@ -264,7 +260,7 @@ Set the level of detail used to print WMEs.
 default-wme-depth [depth]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `set-default-depth` || `default-wme-depth` ||
 
 == Options ==
@@ -272,36 +268,11 @@ default-wme-depth [depth]
 
 == Description ==
 
-The `default-wme-depth` command reflects the default depth used when
-working memory elements are printed (using the `print` command or
-`wmes` alias). The default value is 1. When the command is issued
-with no arguments, `default-wme-depth` returns the current value
-of the default depth. When followed by an integer value,
-`default-wme-depth` sets the default depth to the specified value.
-This default depth can be overridden on any particular call to the
-`print` or `wmes` command by explicitly using the `--depth`
-flag, e.g.,`print --depth 10 args`.
+The default-wme-depth command reflects the default depth used when working memory elements are printed (using the [CommandLineInterface#print print]). The default value is 1. When the command is issued with no arguments, default-wme-depth returns the current value of the default depth. When followed by an integer value, default-wme-depth sets the default depth to the specified value. This default depth can be overridden on any particular call to the [CommandLineInterface#print print] command by explicitly using the `--depth` flag, e.g. `print --depth 10 args`.
 
-By default, the `print` command prints `objects`
-in working memory, not just the individual working memory element.
-To limit the output to individual working memory elements, the
-`--internal` flag must also be specified in the `print`
-command. Thus when the print depth is `0`, by default Soar
-prints the entire object, which is the same behavior as when the
-print depth is `1`. But if `--internal` is also specified,
-then a depth of `0` prints just the individual WME, while
-a depth of `1` prints all WMEs which share that same identifier.
-This is true when printing timetags, identifiers or WME patterns.
+By default, the [CommandLineInterface#print print] command prints _objects_ in working memory, not just the individual working memory element. To limit the output to individual working memory elements, the `--internal` flag must also be specified in the [CommandLineInterface#print print] command. Thus when the print depth is `0`, by default Soar prints the entire object, which is the same behavior as when the print depth is `1`. But if `--internal` is also specified, then a depth of `0` prints just the individual WME, while a depth of `1` prints all WMEs which share that same identifier. This is true when printing timetags, identifiers or WME patterns.
 
-When the depth is greater than `1`, the identifier links from
-the specified WME's
-will be followed, so that additional substructure is printed. For example, a
-depth of `2` means that the object specified by the identifier,
-wme-pattern, or timetag will be printed, along with all other objects
-whose identifiers appear as values of the first object. This may
-result in multiple copies of the same object being printed out.
-If `--internal` is also specified, then individuals WMEs and
-their timetags will be printed instead of the full objects.
+When the depth is greater than `1`, the identifier links from the specified WME's will be followed, so that additional substructure is printed. For example, a depth of `2` means that the object specified by the identifier, wme-pattern, or timetag will be printed, along with all other objects whose identifiers appear as values of the first object. This may result in multiple copies of the same object being printed out. If `--internal` is also specified, then individuals WMEs and their timetags will be printed instead of the full objects.
 
 == See Also ==
 [CommandLineInterface#print print]
@@ -316,9 +287,9 @@ dirs
 }}}
 
 == Description ==
-This command lists the directory stack. Agents can move through a directory structure by pushing and popping directory names. The `dirs` command returns the stack.
+This command lists the directory stack. Agents can move through a directory structure by pushing and popping directory names. The dirs command returns the stack.
 
-The command `pushd` places a new "agent current directory" on top of the directory stack and cd's to it. The command `popd` removes the directory at the top of the directory stack and cd's to the previous directory which now appears at the top of the stack.
+The command [CommandLineInterface#pushd pushd] places a new "agent current directory" on top of the directory stack and changes to it. The command [CommandLineInterface#popd popd] removes the directory at the top of the directory stack and changes to the previous directory which now appears at the top of the stack.
 
 == See Also ==
 [CommandLineInterface#cd cd] [CommandLineInterface#home home] [CommandLineInterface#ls ls] [CommandLineInterface#pushd pushd] [CommandLineInterface#popd popd] [CommandLineInterface#source source] [CommandLineInterface#pwd pwd]
@@ -329,14 +300,15 @@ Print a string to the current output device.
 
 == Synopsis ==
 {{{
-echo string
+echo [--nonewline] [string]
 }}}
 
 == Options ==
 || `string` || The string to print. ||
+|| `-n, --nonewline` || Supress printing of the newline character ||
 
 == Description ==
-This command echos the args to the current output stream. This is normally stdout but can be set to a variety of channels. If an arg is --nonewline then no newline is printed at the end of the printed strings. Otherwise a newline is printed after printing all the given args. Echo is the easiest way to add user comments or identification strings in a log file.
+This command echos the args to the current output stream. This is normally stdout but can be set to a variety of channels. If an arg is `--nonewline` then no newline is printed at the end of the printed strings. Otherwise a newline is printed after printing all the given args. Echo is the easiest way to add user comments or identification strings in a log file.
 
 == Examples ==
 This example will add these comments to the screen and any open log file.
@@ -375,7 +347,7 @@ edit-production production_name
 }}}
 
 == Options ==
-`production_name` The name of the production to edit.
+|| `production_name` || The name of the production to edit. ||
 
 == Description ==
 If an editor (currently limited to Visual Soar) is open and connected to Soar, this command causes the editor to open the file containing this production and move the cursor to the start of the production.
@@ -400,13 +372,13 @@ excise production_name
 excise options
 }}}
 
-=== Default Aliases ===
+==== Default Aliases ====
 || `ex` || `excise` ||
 
 == Options ==
-|| `-a, --all` || Remove all productions from memory *and* perform an init-soar command ||
+|| `-a, --all` || Remove all productions from memory *and* perform an [CommandLineInterface#init-soar init-soar] command ||
 || `-c, --chunks` || Remove all chunks (learned productions) and justifications from memory ||
-|| `-d, --default` || Remove all default productions (:default) from memory ||
+|| `-d, --default` || Remove all default productions (`:default`) from memory ||
 || `-r, --rl` || Excise Soar-RL rules ||
 || `-t, --task` || Remove chunks, justifications, and user productions from memory ||
 || `-T, --templates` || Excise Soar-RL templates ||
@@ -422,7 +394,7 @@ This command removes the production `my*first*production` and all chunks:
 excise my*first*production --chunks
 }}}
 
-This removes all productions and does an init-soar:
+This removes all productions and does an [CommandLineInterface#init-soar init-soar]:
 {{{
 excise --all
 }}}
@@ -436,15 +408,13 @@ Print information about chunk and justification backtraces.
 
 == Synopsis ==
 {{{
-explain-backtraces -f prod_name
-explain-backtraces [-c n] prod_name
+explain-backtraces [options] [prod_name]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `eb` || `explain-backtraces` ||
 
 == Options ==
-|| `(no args)` || List all productions that can be "explained" ||
 || `prod_name` || List all conditions and grounds for the chunk or justification. ||
 || `-c, --condition` || Explain why condition number `n` is in the chunk or justification. ||
 || `-f, --full` || Print the full backtrace for the named production ||
@@ -458,9 +428,11 @@ explain-backtraces prodname
 explain-backtraces -c n prodname
 }}}
 
-The first variant prints a numbered list of all the conditions for the named chunk or justification, and the ground which resulted in inclusion in the chunk/justification. A `ground` is a working memory element (WME) which was tested in the supergoal. Just knowing which WME was tested may be enough to explain why the chunk/justification exists. If not, the second variant, `explain-backtraces -c n prodname`, where `n` is the condition of interest, can be used to obtain a list of the productions which fired to obtain this condition in the chunk/justification (and the crucial WMEs tested along the way).
+The first variant prints a numbered list of all the conditions for the named chunk or justification, and the _ground_ which resulted in inclusion in the chunk/justification. A _ground_ is a working memory element (WME) which was tested in the supergoal. Just knowing which WME was tested may be enough to explain why the chunk/justification exists. If not, the second variant, where `n` is the condition of interest, can be used to obtain a list of the productions which fired to obtain this condition in the chunk/justification (and the crucial WMEs tested along the way).
 
-`save-backtraces` mode must be on when a chunk or justification is created or no explanation will be available. Calling `explain-backtraces` with no argument prints a list of all chunks and justifications for which backtracing information is available.
+[CommandLineInterface#save-backtraces save-backtraces] mode must be on when a chunk or justification is created or no explanation will be available. Calling explain-backtraces with no argument prints a list of all chunks and justifications for which backtracing information is available.
+
+Use with no arguments to list all productions that can be "explained."
 
 == Examples ==
 Examining the chunk `chunk-65*d13*tie*2` generated in a water-jug task:
@@ -529,7 +501,7 @@ firing-counts [n]
 firing-counts production_name
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `fc` || `firing-counts` ||
 
 == Options ==
@@ -538,28 +510,26 @@ If given, an option can take one of two forms -- an integer or a production name
 || `production_name ` || Print how many times the production has fired ||
 
 == Description ==
-The `firing-counts` command prints the number of times each production has fired; production names are given from most requently fired to least frequently fired. With no arguments, it lists all productions. If an integer argument, `n`, is given, only the top `n` productions are listed.
+The firing-counts command prints the number of times each production has fired; production names are given from most requently fired to least frequently fired. With no arguments, it lists all productions. If an integer argument, `n`, is given, only the top `n` productions are listed.
 If `n` is zero (0), only the productions that haven't fired at all are listed. If a production name is given as an argument, the firing count for that production is printed.
 
-Note that firing counts are reset by a call to `init-soar`.
+Note that firing counts are reset by a call to [CommandLineInterface#init-soar init-soar].
 
 == Examples ==
 This example prints the 10 productions which have fired the most times along with their firing counts:
-
 {{{
 firing-counts 10
 }}}
 
-This example prints the firing counts of production my*first*production:
-
+This example prints the firing counts of production `my*first*production`:
 {{{
 firing-counts my*first*production
 }}}
 
 == Warnings ==
-Firing-counts are reset to zero after an init-soar.
+Firing-counts are reset to zero after an [CommandLineInterface#init-soar init-soar].
 
-NB: This command is slow, because the sorting takes time O(n*log n)
+NB: This command is slow, because the sorting takes time `O(n*log n)`
 
 == See Also ==
 [CommandLineInterface#init-soar init-soar]
@@ -573,7 +543,7 @@ Print the WMEs in the goal dependency set for each goal.
 gds-print
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `gds_print` || `gds-print` ||
 
 == Description ==
@@ -581,7 +551,7 @@ The Goal Dependency Set (GDS) is described in an appendix of the Soar manual.
 This command is a debugging command for examining the GDS
 for each goal in the stack. First it steps through all
 the working memory elements in the rete, looking for any that are
-included in `any` goal dependency set, and prints each one. Then
+included in _any_ goal dependency set, and prints each one. Then
 it also lists each goal in the stack and prints the wmes in the goal
 dependency set for that particular goal. This command is useful when
 trying to determine why subgoals are disappearing unexpectedly: often
@@ -601,13 +571,13 @@ gp { production_body }
 }}}
 
 == Description ==
-The `gp` command defines a pattern used to generate and source a set of Soar productions. `production_body` is a single argument that looks almost identical to a standard Soar rule that would be used with the sp command. Indeed, any syntax that is allowed in sp is also allowed in gp.
+The gp command defines a pattern used to generate and source a set of Soar productions. `production_body` is a single argument that looks almost identical to a standard Soar rule that would be used with the [CommandLineInterface#sp sp] command. Indeed, any syntax that is allowed in [CommandLineInterface#sp sp] is also allowed in gp.
 
 Patterns in gp are specified with sets of whitespace-seprated values in square brackets. Every combination of values across all square-bracketed value lists will be generated. Values with whitespaces can be used if wrapped in pipes. Characters can also be escaped with a backslash (so string literals with embedded pipes and spaces outside of string literals are both possible).
 
 gp is primarily intended as an alternative to :template rules for reinforcement learning. :template rules generate new rules as patterns occur at run time. Unfortunately, this incurs a high run time cost. If all possible values are known in advance, then the rules can be generated using gp at source time, thus allowing code to run faster. gp is not appropriate when all possible values are not known or if the total number of possible rules is very large (and the system is likely to encounter only a small subset at run time). It is also possible to combine gp and :template (e.g., if some of the values are known and not others). This should reduce the run time cost of :template.
 
-There is nothing that actually restricts gp to being used for RL, although for non-RL rules, a disjunction list (using << and >>) is better where it can be used. More esoteric uses may include multiple bracketed value lists inside a disjunction list, or even variables in bracketed value lists.
+There is nothing that actually restricts gp to being used for RL, although for non-RL rules, a disjunction list (using `<<` and `>>`) is better where it can be used. More esoteric uses may include multiple bracketed value lists inside a disjunction list, or even variables in bracketed value lists.
 
 Each rule generated by gp has `*integer` appended to its name (where `integer` is some incrementing number).
 
@@ -648,7 +618,7 @@ gp {strange-example
 }
 }}}
 
-`SoarLibrary/Tests/testgp.soar` contains many more examples.
+`testgp.soar` contains many more examples.
 
 == See Also ==
 [CommandLineInterface#sp sp]
@@ -666,7 +636,7 @@ Provide formatted usage information about Soar commands.
 help [command_name]
 }}}
 
-=== Default Aliases ===
+==== Default Aliases ====
 || `?` || `help` ||
 || `h` || `help` ||
 || `man` || `help` ||
@@ -689,7 +659,7 @@ indifferent-selection [-r] <parameter> <reduction policy> [reduction rate]
 indifferent-selection [-a] [setting]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `inds` || `indifferent-selection` ||
 
 == Options ==
@@ -701,17 +671,17 @@ indifferent-selection [-a] [setting]
 || `-a, --auto-reduce [on,off]` || Get/Set auto-reduction setting (if setting not provided, returns the current) ||
 
 == Description ==
-The `indifferent-selection` command allows the user to set options relating to selection
+The indifferent-selection command allows the user to set options relating to selection
 between operator proposals that are mutually indifferent in preference memory.
 
 The primary option is the exploration policy (each is covered below). When Soar starts,
-`softmax` is the default policy. The first time Soar-RL is enabled, the architecture
-automatically changes the policy to `epsilon-greedy` and issues a message to the trace.
+_softmax_ is the default policy. The first time Soar-RL is enabled, the architecture
+automatically changes the policy to _epsilon-greedy_ and issues a message to the trace.
 
-Some policies have parameters to temper behavior. The `indifferent-selection` command
+Some policies have parameters to temper behavior. The indifferent-selection command
 provides basic facilities to automatically reduce these parameters exponentially and linearly
 each decision cycle by a fixed rate. In addition to setting these policies/rates, the
-`auto-reduce` option enables the automatic reduction system (disabled by default),
+_auto-reduce_ option enables the automatic reduction system (disabled by default),
 for which the Soar decision cycle incurs a small performance cost.
 
 == Exploration Policies ==
@@ -722,14 +692,14 @@ for which the Soar decision cycle incurs a small performance cost.
 || `-l, --last` || Deterministic, last indifferent preference is selected ||
 
 == Exploration Policy Parameters ==
-|| `Parameter Name` || `Acceptable Values` || `Default Value` ||
-|| `-e, --epsilon` || `[0, 1]` || 0.1 ||
-|| `-t, --temperature` || `(0, inf)` || 25 ||
+|| *Parameter Name* || *Acceptable Values* || *Default Value* ||
+|| `-e, --epsilon` || `[0, 1]` || `0.1` ||
+|| `-t, --temperature` || `(0, inf)` || `25` ||
 
 == Exploration Policy Parameter Auto-Reduction Policies ==
-|| `Policy Name` || `Valid Rates` || `Default Rate` ||
-|| `exponential <font color="red">default</font>` || `[0, 1]` || 1 ||
-|| `linear` || `[0, inf]` || 0 ||
+|| *Policy Name* || *Valid Rates* || *Default Rate* ||
+|| `exponential default` || `[0, 1]` || `1` ||
+|| `linear` || `[0, inf]` || `0` ||
 
 
 == See Also ==
@@ -744,18 +714,18 @@ Empties working memory and resets run-time statistics.
 init-soar
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `init` || `init-soar` ||
 || `is` || `init-soar` ||
 
 == Description ==
-The `init-soar` command initializes Soar. It removes all elements from working memory,
+The init-soar command initializes Soar. It removes all elements from working memory,
 wiping out the goal stack, and resets all runtime statistics. The firing counts for all
-productions are reset to zero. The `init-soar` command allows a Soar program that
+productions are reset to zero. The init-soar command allows a Soar program that
 has been halted to be reset and start its execution from the beginning.
 
-`init-soar` does not remove any productions from production memory; to do this,
-use the `excise` command. Note however, that all justifications will be removed
+init-soar does not remove any productions from production memory; to do this,
+use the [CommandLineInterface#excise excise] command. Note however, that all justifications will be removed
 because they will no longer be supported.
 
 == See Also ==
@@ -771,12 +741,11 @@ internal-symbols
 }}}
 
 == Description ==
-The `internal-symbols` command prints information about the Soar symbol
+The internal-symbols command prints information about the Soar symbol
 table. Such information is typically only useful for users attempting to debug
 Soar by locating memory leaks or examining I/O structure.
 
 == Example ==
-
 {{{
  soar> internal-symbols
  --- Symbolic Constants: ---
@@ -814,26 +783,24 @@ learn [-d|E|o]
 learn [-eabnN]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `l` || `learn` ||
 
 == Options ==
-|| `-e, --enable, --on` || Turn chunking on. Can be modified by -a or -b. ||
+|| `-e, --enable, --on` || Turn chunking on. Can be modified by `-a` or `-b`. ||
 || `-d, --disable, --off` || Turn all chunking off. (default) ||
 || `-E, --except` || Learning is on, except as specified by RHS `dont-learn` actions. ||
 || `-o, --only` || Chunking is on only as specified by RHS `force-learn` actions. ||
-|| `-l, --list` || Prints listings of dont-learn and force-learn states. ||
-|| `-a, --all-levels` || Build chunks whenever a subgoal returns a result. Learning must be --enabled. ||
-|| `-b, --bottom-up` || Build chunks only for subgoals that have not yet had any subgoals with chunks built. Learning must be --enabled. ||
+|| `-l, --list` || Prints listings of `dont-learn` and `force-learn` states. ||
+|| `-a, --all-levels` || Build chunks whenever a subgoal returns a result. Learning must be enabled. ||
+|| `-b, --bottom-up` || Build chunks only for subgoals that have not yet had any subgoals with chunks built. Learning must be enabled. ||
 || `-n, --enable-through-local-negations` || Build chunks when local negation encountered in backtrace. (default) ||
 || `-N, --disable-through-local-negations` || Do not build chunks when local negation encountered in backtrace. ||
 
 == Description ==
-The learn command controls the parameters for chunking (Soar's learning mechanism). With no arguments, this command prints out the current learning environment status. If arguments are provided, they will alter the learning environment as described in the options and arguments table. The [CommandLineInterface#watch watch] command can be used to provide various levels of detail when productions are learned. Learning is `disabled` by default.
+The learn command controls the parameters for chunking (Soar's learning mechanism). With no arguments, this command prints out the current learning environment status. If arguments are provided, they will alter the learning environment as described in the options and arguments table. The [CommandLineInterface#watch watch] command can be used to provide various levels of detail when productions are learned. Learning is _disabled_ by default.
 
-With the `--on` flag, chunking is on all the time. With the `--except` flag, chunking is on, but Soar will not create chunks for states that have had
-RHS `dont-learn` actions executed in them. With the `--only` flag, chunking is off, but Soar will create chunks for only those states that have
-had RHS `force-learn` actions executed in them. With the `--off` flag, chunking is off all the time.
+With the `--on` flag, chunking is on all the time. With the `--except` flag, chunking is on, but Soar will not create chunks for states that have had RHS `dont-learn` actions executed in them. With the `--only` flag, chunking is off, but Soar will create chunks for only those states that have had RHS `force-learn` actions executed in them. With the `--off` flag, chunking is off all the time. 
 
 The `--only` flag and its companion `force-learn` RHS action allow Soar developers to turn learning on in a particular problem space, so that
 they can focus on debugging the learning problems in that particular problem space without having to address the problems elsewhere in their programs at
@@ -845,8 +812,8 @@ be used in combination with them. With bottom-up learning, chunks are learned on
 has yet generated a chunk. In this mode, chunks are learned only for the "bottom" of the subgoal hierarchy and not the intermediate levels. With
 experience, the subgoals at the bottom will be replaced by the chunks, allowing higher level subgoals to be chunked.
 
-Similarly, "--enable-through-local-negations" and
-"--disable-though-local-negations" are orthogonal to the rest of the
+Similarly, `--enable-through-local-negations` and
+`--disable-though-local-negations` are orthogonal to the rest of the
 learn options. These options control whether or not chunks can be
 created that are derived from rules that check for negated WMEs on the
 substate (local negations). Chunking through local negations can
@@ -855,7 +822,7 @@ the number of chunks formed. The default is to enable chunking through
 local negations.
 
 If chunking through local negations is disabled, to see when chunks
-are discarded (and why), set "watch --learning print".
+are discarded (and why), set `watch --learning print` (see [CommandLineInterface#watch watch] command).
 
 Learning can be turned on or off at any point during a run.
 
@@ -886,7 +853,7 @@ List the contents of the current working directory.
 ls
 }}}
 
-=== Default Aliases ===
+==== Default Aliases ====
 || `dir` || `ls` ||
 
 == Description ==
@@ -914,7 +881,7 @@ matches [options] -[a|r]
 || `-r, --retractions` || List only productions about to retract. ||
 
 == Description ==
-The `matches` command prints a list of productions that have instantiations in the match set, i.e., those productions that will retract or fire in the next Propose or Apply phase. It also will print partial match information for a single, named production.
+The matches command prints a list of productions that have instantiations in the match set, i.e., those productions that will retract or fire in the next Propose or Apply phase. It also will print partial match information for a single, named production.
 
 === Printing the match set ===
 When printing the match set (i.e., no production name is specified), the default action prints only the names of the productions which are about to fire or retract. If there are multiple instantiations of a production, the total number of instantiations of that production is printed after the production name, unless `--timetags` or `--wmes` are specified, in which case each instantiation is printed on a separate line.
@@ -922,14 +889,14 @@ When printing the match set (i.e., no production name is specified), the default
 When printing the match set, the `--assertions` and `--retractions` arguments may be specified to restrict the output to print only the assertions or retractions.
 
 === Printing partial matches for productions ===
-In addition to printing the current match set, the `matches` command can be used to print information about partial matches for a named production. In this case, the conditions of the production are listed, each preceded by the number of currently active matches for that condition. If a condition is negated, it is preceded by a minus sign `-`. The pointer `>>>>` before a condition indicates that this is the first condition that failed to match.
+In addition to printing the current match set, the matches command can be used to print information about partial matches for a named production. In this case, the conditions of the production are listed, each preceded by the number of currently active matches for that condition. If a condition is negated, it is preceded by a minus sign `-`. The pointer `>>>>` before a condition indicates that this is the first condition that failed to match.
 
-When printing partial matches, the default action is to print only the counts of the number of WME's that match, and is a handy tool for determining which condition failed to match for a production that you thought should have fired. At levels `--timetags` and `--wmes` the `matches` command displays the WME's immediately after the first condition that failed to match--temporarily interrupting the printing of the production conditions themselves.
+When printing partial matches, the default action is to print only the counts of the number of WME's that match, and is a handy tool for determining which condition failed to match for a production that you thought should have fired. At levels `--timetags` and `--wmes` the matches command displays the WME's immediately after the first condition that failed to match--temporarily interrupting the printing of the production conditions themselves.
 
 === Notes ===
-When printing partial match information, some of the matches displayed by this command may have already fired, depending on when in the execution cycle this command is called. To check for the matches that are about to fire, use the `matches` command without a named production.
+When printing partial match information, some of the matches displayed by this command may have already fired, depending on when in the execution cycle this command is called. To check for the matches that are about to fire, use the matches command without a named production.
 
-In Soar 8, the execution cycle (decision cycle) is input, propose, decide, apply output; it no longer stops for user input after the decision phase when running by decision cycles (`run -d 1`). If a user wishes to print the match set immediately after the decision phase and before the apply phase, then the user must run Soar by _phases_ (`run -p 1`).
+In Soar 8, the execution cycle (decision cycle) is input, propose, decide, apply output; it no longer stops for user input after the decision phase when [CommandLineInterface#run running] by decision cycles (`run -d 1`). If a user wishes to print the match set immediately after the decision phase and before the apply phase, then the user must run Soar by _phases_ (`run -p 1`).
 
 == Examples ==
 This example prints the productions which are about to fire and the wmes that match the productions on their left-hand sides:
@@ -955,12 +922,12 @@ max-chunks [n]
 || `n` || Maximum number of chunks allowed during a decision cycle. ||
 
 == Description ==
-The `max-chunks` command is used to limit the maximum number of chunks that may be
+The max-chunks command is used to limit the maximum number of chunks that may be
 created during a decision cycle. The initial value of this variable is 50;
 allowable settings are any integer greater than 0.
 
-The chunking process will end after `max-chunks` chunks have been
-created, `even if there are more results that have not been backtraced through to create chunks`, and Soar will proceed to the next phase. A warning message is printed to notify the user that the limit has been reached.
+The chunking process will end after max-chunks chunks have been
+created, _even if there are more results that have not been backtraced through to create chunks_, and Soar will proceed to the next phase. A warning message is printed to notify the user that the limit has been reached.
 
 This limit is included in Soar to prevent getting stuck in an infinite loop
 during the chunking process. This could conceivably happen because newly-built
@@ -985,23 +952,21 @@ max-elaborations [n]
 || `n` || Maximum allowed elaboration cycles, must be a positive integer. ||
 
 == Description ==
-This command sets and prints the maximum number of elaboration cycles allowed. If `n` is given, it must be a positive integer and is used to reset the number of allowed elaboration cycles. The default value is 100. `max-elaborations` with no arguments prints the current value.
+This command sets and prints the maximum number of elaboration cycles allowed. If `n` is given, it must be a positive integer and is used to reset the number of allowed elaboration cycles. The default value is 100. max-elaborations with no arguments prints the current value.
 
-`max-elaborations` controls the maximum number of elaborations allowed in a single decision cycle. The elaboration phase will end after `max-elaboration` cycles have completed, even if there are more productions eligible to fire or retract; and Soar will proceed to the next phase after a warning message is printed to notify the user. This limits the total number of cycles of parallel production firing but does not limit the total number of productions that can fire during elaboration.
+max-elaborations controls the maximum number of elaborations allowed in a single decision cycle. The elaboration phase will end after max-elaboration cycles have completed, even if there are more productions eligible to fire or retract; and Soar will proceed to the next phase after a warning message is printed to notify the user. This limits the total number of cycles of parallel production firing but does not limit the total number of productions that can fire during elaboration.
 
-This limit is included in Soar to prevent getting stuck in infinite loops (such as a production that repeatedly fires in one elaboration cycle and retracts in the next); if you see the warning message, it may be a signal that you have a bug your code. However some Soar programs are designed to require a large number of elaboration cycles, so rather than a bug, you may need to increase the value of `max-elaborations`.
+This limit is included in Soar to prevent getting stuck in infinite loops (such as a production that repeatedly fires in one elaboration cycle and retracts in the next); if you see the warning message, it may be a signal that you have a bug your code. However some Soar programs are designed to require a large number of elaboration cycles, so rather than a bug, you may need to increase the value of max-elaborations.
 
-In Soar8, `max-elaborations` is checked during both the Propose Phase and the Apply Phase. If Soar8 runs more than the max-elaborations limit in either of these phases, Soar8 proceeds to the next phase (either Decision or Output) even if quiescence has not been reached.
+max-elaborations is checked during both the Propose Phase and the Apply Phase. If Soar runs more than the max-elaborations limit in either of these phases, Soar proceeds to the next phase (either Decision or Output) even if quiescence has not been reached.
 
 == Examples ==
 The command issued with no arguments, returns the max elaborations allowed:
-
 {{{
 max-elaborations
 }}}
 
 to set the maximum number of elaborations in one phase to 50:
-
 {{{
 max-elaborations 50
 }}}
@@ -1019,7 +984,7 @@ max-memory-usage [n]
 || `n` || Size of limit in bytes. ||
 
 == Description ==
-The `max-memory-usage` command is used to trigger the memory usage exceeded event. The initial value of this is 100MB (100,000,000); allowable settings are any integer greater than 0. The code supporting this event is commented out by default in the release build. The test can be computationally expensive and is needed only for specific embedded applications. Users may enable the test and event generation by uncommenting code in SoarKernel/src/mem.cpp.
+The max-memory-usage command is used to trigger the memory usage exceeded event. The initial value of this is 100MB (100,000,000); allowable settings are any integer greater than 0. The code supporting this event is not enabled by default because the test can be computationally expensive and is needed only for specific embedded applications. Users may enable the test and event generation by uncommenting code in `mem.cpp`.
 
 Using the command with no arguments displays the current limit.
 
@@ -1036,27 +1001,22 @@ max-nil-output-cycles [n]
 || `n` || Maximum number of consecutive output cycles allowed without producing output. Must be a positive integer. ||
 
 == Description ==
-This command sets and prints the maximum number of nil output cycles (output cycles that put nothing on the output link) allowed when running using run-til-output (run --output). If `n` is not given, this command prints the current number of nil-output-cycles allowed. If `n` is given, it must be a positive integer and is used to reset the maximum number of allowed nil output cycles.
+This command sets and prints the maximum number of nil output cycles (output cycles that put nothing on the output link) allowed when [CommandLineInterface#run running] using run-til-output (`run --output`). If `n` is not given, this command prints the current number of nil-output-cycles allowed. If `n` is given, it must be a positive integer and is used to reset the maximum number of allowed nil output cycles.
 
-`max-nil-output-cycles` controls the maximum number of output cycles that generate no output allowed when a `run --out` command is issued. After this limit has been reached, Soar stops. The default initial setting of `n` is 15.
+max-nil-output-cycles controls the maximum number of output cycles that generate no output allowed when a `run --out` command is issued. After this limit has been reached, Soar stops. The default initial setting of `n` is 15.
 
 == Examples ==
 The command issued with no arguments, returns the max empty output cycles allowed:
-
 {{{
 max-nil-output-cycles
 }}}
 
 to set the maximum number of empty output cycles in one phase to 25:
-
 {{{
 max-nil-output-cycles 25
 }}}
 
-
-
 == See Also ==
-
 [CommandLineInterface#run run]
 
 ----
@@ -1079,7 +1039,7 @@ memories production_name
 || `-T, --template` || Print memory usage of Soar-RL templates. ||
 
 == Description ==
-The `memories` command prints out the internal memory usage for full and partial
+The memories command prints out the internal memory usage for full and partial
 matches of production instantiations, with the productions using the most memory
 printed first. With no arguments, the memories command prints memory usage for all productions.
 If a `production_name` is specified, memory usage will be printed only for that
@@ -1092,7 +1052,7 @@ in working memory that match each production. Therefore, this command will not
 provide useful information at the beginning of a Soar run (when working memory
 is empty) and should be called in the middle (or at the end) of a Soar run.
 
-The `memories` command is used to find the productions that are using the
+The memories command is used to find the productions that are using the
 most memory and, therefore, may be taking the longest time to match (this is
 only a heuristic). By identifying these productions, you may be able to
 rewrite your program so that it will run more quickly. Note that memory usage
@@ -1121,10 +1081,11 @@ multi-attributes [symbol [n]]
 
 == Options ==
 || `symbol` || Any Soar attribute. ||
-|| `n` || Integer > 1, estimate of degree of simultaneous values for attribute. ||
+|| `n` || Integer greater than 1, estimate of degree of simultaneous values for attribute. ||
 
 == Description ==
-This command declares the given symbol to be an attribute which can take on multiple values. The optional `n` is an integer (>1) indicating an upper limit on the number of expected values that will appear for an attribute. If `n` is not specified, the value 10 is used for each declared multi-attribute. More informed values will tend to result in greater efficiency.
+This command declares the given symbol to be an attribute which can take on multiple values. The optional `n` is an integer (greater than 1) indicating an upper limit on the number of expected values that will appear for an attribute. If `n` is not specified, the value 10 is used for each declared multi-attribute. More informed values will tend to result in greater efficiency.
+
 This command is used only to provide hints to the production condition reorderer so it can produce better condition orderings. Better orderings enable the rete network to run faster. This command has no effect on the actual contents of working memory and most users needn't use this at all.
 
 Note that multi-attributes declarations must be made before productions
@@ -1132,7 +1093,6 @@ are loaded into soar or this command will have no effect.
 
 == Examples ==
 Declare the symbol "thing" to be an attribute likely to take more than 1 but no more than 4 values:
-
 {{{
 multi-attributes thing 4
 }}}
@@ -1152,19 +1112,18 @@ numeric-indifferent-mode [-as]
 
 == Description ==
 The numeric-indifferent-mode command is used to select the method for combining
-numeric preferences. This command is only meaningful in `indifferent-selection --random` mode.
+numeric preferences. This command is only meaningful in [CommandLineInterface#indifferent-selection indifferent-selection] random mode.
 
 The default procedure is `--avg` (average) which assigns a final value to an operator
 according to the rule:
-
-* If the operator has at least one numeric preference, assign it the value that is the average of all of its numeric preferences.
-* If the operator has no numeric preferences (but has been included in the indifferent selection through some combination of non-numeric preferences), assign it the value 50.
+  * If the operator has at least one numeric preference, assign it the value that is the average of all of its numeric preferences.
+  * If the operator has no numeric preferences (but has been included in the indifferent selection through some combination of non-numeric preferences), assign it the value 50.
 
 The intended range of numeric-preference values for `--avg` mode is 0-100.
 
 The other combination option `--sum` assigns a final value according to the rule:
-* Add together any numeric preferences for the operator (defaulting to 0 if there are none).
-* Assign the operator the value e^{PreferenceSum / AgentTemperature}, where AgentTemperature is a compile-time constant currently set at 25.0.
+  * Add together any numeric preferences for the operator (defaulting to 0 if there are none).
+  * Assign the operator the value e^{ preference_sum / agent_temperature}, where agent_temperature is a compile-time constant currently set at 25.0.
 
 Any real-numbered preference may be used in `--sum` mode.
 
@@ -1177,18 +1136,15 @@ Choose experimental variations of o-support.
 
 == Synopsis ==
 {{{
-o-support-mode [0|1|2|3|4]
+o-support-mode [n]
 }}}
 
 == Options ==
-|| `0` || Mode 0 is the base mode. O-support is calculated based on the structure of working memory that is tested and modified. Testing an operator or operator acceptable preference results in state or operator augmentations being o-supported. The support computation is very complex (see Soar manual). ||
-|| `1` || Mode 1 is the same as mode 2, but a message is printed whenever the alternative scheme would have made a difference in the Soar program. ||
-|| `2` || Mode 2 is the same as mode 0 except that all support is calculated the production structure, not from working memory structure. Augmentations of operators are still o-supported. ||
 || `3` || Mode 3 is the same as mode 2 except that operator elaborations (adding attributes to operators) now get i-support even though you have to test the operator to elaborate an operator. In cases where the rule mixes support types, support defaults to o-support (and a warning is printed). ||
 || `4` || Mode 4 is the default. It is the same as mode 3 except where a rule mixes support types, support defaults to i-support (and a warning is still printed). ||
 
 == Description ==
-The `o-support-mode` command is used to control the way that o-support is determined for preferences. Only o-support modes 3 & 4 can be considered current to Soar8, and o-support mode 4 should be considered an improved version of mode 3. The default o-support mode is mode 4.
+The o-support-mode command is used to control the way that o-support is determined for preferences. Only o-support modes 3 & 4 are valid (other modes require Soar 7, which is no longer supported). O-support mode 4 should be considered an improved version of mode 3. The default o-support mode is mode 4.
 
 In o-support modes 3 & 4, support is given production by production; that is, all preferences generated by the RHS of a single instantiated production will have the same support. The difference between the two modes is in how they handle productions with both operator and non-operator augmentations on the RHS. For more information on o-support calculations, see the relevant appendix in the Soar manual.
 
@@ -1241,7 +1197,7 @@ Examine details about the preferences that support the specified _identifier_ an
 preferences [options] [identifier [attribute]]
 }}}
 
-=== Default Aliases ===
+==== Default Aliases ====
 || `pref` || `preferences` ||
 
 == Options ==
@@ -1254,7 +1210,7 @@ preferences [options] [identifier [attribute]]
 || `attribute` || Must be an existing _attribute_ of the specified _identifier_. ||
 
 == Description ==
-The `preferences` command prints all the preferences for the given object identifier and attribute. If identifier and attribute are not specified, they default to the current state and the current operator. The Soar syntax attribute carat (`^`) is optional when specifying the attribute. The optional arguments indicates the level of detail to print about each preference.
+The preferences command prints all the preferences for the given object identifier and attribute. If identifier and attribute are not specified, they default to the current state and the current operator. The Soar syntax attribute carat (`^`) is optional when specifying the attribute. The optional arguments indicates the level of detail to print about each preference.
 
 This command is useful for examining which candidate operators have
 been proposed and what relationships, if any, exist among them.
@@ -1264,7 +1220,7 @@ When only the identifier is specified on the commandline, if the identifier is a
 
 When an identifier and the `--object` flag are specified, Soar prints the preferences / WME support for all WMEs comprising the specified identifier.
 
-For the time being, _numeric-indifferent_ preferences are listed under the heading
+For the time being, [CommandLineInterface#numeric-indifferent-mode numeric-indifferent] preferences are listed under the heading
 `binary indifferents:`.
 
 By default, using the `--wmes` option with a WME on the top state will only print the timetags. To change this, the kernel can be recompiled with `DO_TOP_LEVEL_REF_CTS`, but this has other consequences (see comments in `kernel.h`).
@@ -1352,7 +1308,7 @@ print [options] [production_name]
 print [options] identifier|timetag|pattern
 }}}
 
-=== Default Aliases ===
+==== Default Aliases ====
 || `p` || `print` ||
 || `pc` || `print --chunks` ||
 || `wmes` || `print --internal` ||
@@ -1388,7 +1344,7 @@ print [options] identifier|timetag|pattern
 || `-S, --states` || When printing the stack, print only _states_. ||
 
 == Description ==
-The `print` command is used to print items from production memory or working memory. It can take several kinds of arguments. When printing items from working memory, the Soar objects are printed unless the `--internal` flag is used, in which case the wmes themselves are printed.
+The print command is used to print items from production memory or working memory. It can take several kinds of arguments. When printing items from working memory, the Soar objects are printed unless the `--internal` flag is used, in which case the wmes themselves are printed.
 {{{
 (identifier ^attribute value [+])
 }}}
@@ -1443,9 +1399,9 @@ production-find [-lrs[n|c]] pattern
 }}}
 
 == Options ==
-|| `-c, --chunks` || Look `only` for chunks that match the pattern. ||
+|| `-c, --chunks` || Look _only_ for chunks that match the pattern. ||
 || `-l, --lhs` || Match pattern only against the conditions (left-hand side) of productions (default). ||
-|| `-n, --nochunks` || `Disregard` chunks when looking for the pattern. ||
+|| `-n, --nochunks` || _Disregard_ chunks when looking for the pattern. ||
 || `-r, --rhs` || Match pattern against the actions (right-hand side) of productions. ||
 || `-s, --show-bindings` || Show the bindings associated with a wildcard pattern. ||
 || `pattern` || Any pattern that can appear in productions. ||
@@ -1463,9 +1419,7 @@ types of productions, or to look only at the conditions or only at the actions
 of productions by using the flags.
 
 == Examples ==
-
 Find productions that test that some object `gumby` has an attribute `alive` with value `t`. In addition, limit the rules to only those that test an operator named `foo`:
-
 {{{
 production-find (<state> ^gumby <gv> ^operator.name foo)(<gv> ^alive t)
 }}}
@@ -1473,13 +1427,11 @@ production-find (<state> ^gumby <gv> ^operator.name foo)(<gv> ^alive t)
 Note that in the above command, `<state>` does not have to match the exact variable name used in the production.
 
 Find productions that propose the operator `foo`:
-
 {{{
 production-find --rhs (<x> ^operator <op> +)(<op> ^name foo)
 }}}
 
 Find chunks that test the attribute ^pokey:
-
 {{{
 production-find --chunks (<x> ^pokey *)
 }}}
@@ -1520,7 +1472,7 @@ Trace firings and retractions of specific productions.
 pwatch [-d|e] [production name]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `pw` || `pwatch` ||
 
 == Options ==
@@ -1529,13 +1481,13 @@ pwatch [-d|e] [production name]
 || `production name` || The name of the production to watch. ||
 
 == Description ==
-The `pwatch` command enables and disables the tracing of the firings and retractions of individual productions. This is a companion command to `watch`, which cannot specify individual productions by name.
+The pwatch command enables and disables the tracing of the firings and retractions of individual productions. This is a companion command to [CommandLineInterface#watch watch], which cannot specify individual productions by name.
 
-With no arguments, `pwatch` lists the productions currently being traced. With one production-name argument, `pwatch` enables tracing the production; `--enable` can be explicitly stated, but it is the default action.
+With no arguments, pwatch lists the productions currently being traced. With one production-name argument, pwatch enables tracing the production; `--enable` can be explicitly stated, but it is the default action.
 
-If `--disable` is specified followed by a production-name, tracing is turned off for the production. When no production-name is specified, `pwatch --enable` lists all productions currently being traced, and `pwatch --disable` disables tracing of all productions.
+If `--disable` is specified followed by a production-name, tracing is turned off for the production. When no production-name is specified, `--enable` lists all productions currently being traced, and `--disable` disables tracing of all productions.
 
-Note that `pwatch` now only takes one production per command. Use multiple times to watch multiple functions.
+Note that pwatch now only takes one production per command. Use multiple times to watch multiple functions.
 
 == See Also ==
 [CommandLineInterface#watch watch]
@@ -1549,7 +1501,7 @@ Print the current working directory.
 pwd
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `topd` || `pwd` ||
 
 == Description ==
@@ -1564,7 +1516,7 @@ Close log file, terminate Soar, and return user to the operating system.
 quit
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `exit` || `quit` ||
 
 == Description ==
@@ -1576,10 +1528,10 @@ Generate a random number.
 
 == Synopsis ==
 {{{
-rand             : returns a real number in [0,1] (calls SoarRand())
-rand n           : returns a real number in [0,n] (calls SoarRand(max))
-rand --integer   : returns an integer in [0,2^32-1] (calls SoarRandInt)
-rand --integer n : returns an integer in [0,n], n<2^32 (calls SoarRandInt(max))
+rand                # returns a real number in [0,1] (calls SoarRand())
+rand n              # returns a real number in [0,n] (calls SoarRand(max))
+rand --integer      # returns an integer in [0,2^32-1] (calls SoarRandInt)
+rand --integer n    # returns an integer in [0,n], n<2^32 (calls SoarRandInt(max))
 }}}
 
 == Options ==
@@ -1604,7 +1556,7 @@ Manually remove an element from working memory.
 remove-wme timetag
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `rw` || `remove-wme` ||
 
 == Options ==
@@ -1613,20 +1565,19 @@ remove-wme timetag
 == Description ==
 The remove-wme command removes the working memory element with the given
 timetag. This command is provided primarily for use in Soar input functions;
-although there is no programming enforcement, `remove-wme` should only be called
+although there is no programming enforcement, remove-wme should only be called
 from registered input functions to delete working memory elements on Soar's
 input link.
 
 Beware of weird side effects, including system crashes.
 
-== See Also ==
-
-[CommandLineInterface#add-wme add-wme]
-
 == Warnings ==
-`remove-wme` should never be called from the RHS: if you try to match a wme on the LHS of a production, and then remove the matched wme on the RHS, Soar will crash.
+remove-wme should never be called from the RHS: if you try to match a wme on the LHS of a production, and then remove the matched wme on the RHS, Soar will crash.
 
 If used other than by input and output functions interfaced with Soar, this command may have weird side effects (possibly even including system crashes). Removing input wmes or context/impasse wmes may have unexpected side effects. You've been warned.
+
+== See Also ==
+[CommandLineInterface#add-wme add-wme]
 
 ----
 = replay-input =
@@ -1661,20 +1612,20 @@ Save the current Rete net, or restore a previous one.
 rete-net -s|l filename
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `rn` || `rete-net` ||
 
 == Options ==
 || `-s, --save` || Save the Rete net in the named file. Cannot be saved when there are justifications present. Use `excise -j` ||
-|| `-l, -r, --load, --restore` || Load the named file into the Rete network. working memory and production memory must both be empty. Use `excise -a` ||
+|| `-l, -r, --load, --restore` || Load the named file into the Rete network. working memory and production memory must both be empty. Use [CommandLineInterface#excise excise] ||
 || `filename` || The name of the file to save or load. ||
 
 == Description ==
 The rete-net command saves the current Rete net to a file or restores a Rete net previously saved. The Rete net is Soar's internal representation of production and working memory; the conditions of productions are reordered and common substructures are shared across different productions. This command provides a fast method of saving and loading productions since a special format is used and no parsing is necessary. Rete-net files are portable across platforms that support Soar.
 
-Normally users wish to save only production memory. Note that justifications cannot be present when saving the Rete net. Issuing an `init-soar` before saving a Rete net will remove all justifications and working memory elements.
-<br>
-If the filename contains a suffix of ".Z", then the file is compressed automatically when it is saved and uncompressed when it is loaded. Compressed files may not be portable to another platform if that platform does not support the same uncompress utility.
+Normally users wish to save only production memory. Note that justifications cannot be present when saving the Rete net. Issuing an [CommandLineInterface#init-soar init-soar] before saving a Rete net will remove all justifications and working memory elements.
+
+If the filename contains a suffix of `.Z`, then the file is compressed automatically when it is saved and uncompressed when it is loaded. Compressed files may not be portable to another platform if that platform does not support the same uncompress utility.
 
 == See Also ==
 [CommandLineInterface#excise excise] [CommandLineInterface#init-soar init-soar]
@@ -1734,7 +1685,7 @@ run -[d|e|o|p][s][un] [f|count]
 run -[d|e|o|p][un] count [-i <e|p|d|o>]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `d` || `run -d 1` ||
 || `e` || `run -e 1` ||
 || `step` || `run 1` ||
@@ -1742,29 +1693,29 @@ run -[d|e|o|p][un] count [-i <e|p|d|o>]
 == Options ==
 || `-d, --decision` || Run Soar for count decision cycles. ||
 || `-e, --elaboration` || Run Soar for count elaboration cycles. ||
-|| `-o, --output` || Run Soar until the nth time output is generated by the agent. Limited by the value of max-nil-output-cycles. ||
+|| `-o, --output` || Run Soar until the nth time output is generated by the agent. Limited by the value of [CommandLineInterface#max-nil-output-cycles max-nil-output-cycles]. ||
 || `-p, --phase` || Run Soar by phases. A phase is either an input phase, proposal phase, decision phase, apply phase, or output phase. ||
 || `-s, --self` || If other agents exist within the kernel, do not run them at this time. ||
-|| `-u, --update` || Sets a flag in the update event callback requesting that an environment updates. This is the default if --self is not specified. ||
-|| `-n, --noupdate` || Sets a flag in the update event callback requesting that an environment does not update. This is the default if --self is specified. ||
+|| `-u, --update` || Sets a flag in the update event callback requesting that an environment updates. This is the default if `--self` is not specified. ||
+|| `-n, --noupdate` || Sets a flag in the update event callback requesting that an environment does not update. This is the default if `--self` is specified. ||
 || `-f, forever` || Run until halted by problem-solving completion or until stopped by an interrupt. ||
 || `count` || A single integer which specifies the number of cycles to run Soar. ||
-|| `-i, --interleave` || Support round robin execution across agents at a finer grain than the run-size parameter. e = elaboration, p = phase, d = decision, o = output ||
+|| `-i, --interleave` || Support round robin execution across agents at a finer grain than the run-size parameter. `e` = elaboration, `p` = phase, `d` = decision, `o` = output ||
 
-== Deprecated Options ==
+=== Deprecated Options ===
 These may be reimplemented in the future.
 || `--operator` || Run Soar until the nth time an operator is selected. ||
 || `--state` || Run Soar until the nth time a state is selected. ||
 
 == Description ==
-The `run` command starts the Soar execution cycle or continues any execution that was temporarily stopped. The default behavior of
-`run`, with no arguments, is to cause Soar to execute until it is halted or interrupted by an action of a production, or until an external interrupt is issued by the user. The `run` command can also specify that Soar should run only for a specific number of Soar cycles or phases (which may also be prematurely stopped by a production action or the [CommandLineInterface#stop-soar stop-soar] command). This is helpful for debugging sessions, where users may want to pay careful attention to the specific productions that are firing and retracting.
+The run command starts the Soar execution cycle or continues any execution that was temporarily stopped. The default behavior of
+run, with no arguments, is to cause Soar to execute until it is halted or interrupted by an action of a production, or until an external interrupt is issued by the user. The run command can also specify that Soar should run only for a specific number of Soar cycles or phases (which may also be prematurely stopped by a production action or the [CommandLineInterface#stop-soar stop-soar] command). This is helpful for debugging sessions, where users may want to pay careful attention to the specific productions that are firing and retracting.
 
-The `run` command takes optional arguments: an integer, `count`, which specifies how many units to run; and a `units` flag indicating what steps or increments to use. If `count` is specified, but no `units` are specified, then Soar is run by decision cycles. If `units` are specified, but `count` is unpecified, then `count` defaults to '1'. The argument <b>forever</b> (can be shortened to <b>f</b>) is a keyword used instead of an integer `count` and indicates Soar should be run indefinitely, until halted by problem-solving completion, or stopped by an interrupt.
+The run command takes optional arguments: an integer, `count`, which specifies how many units to run; and a `units` flag indicating what steps or increments to use. If `count` is specified, but no `units` are specified, then Soar is run by decision cycles. If `units` are specified, but `count` is unpecified, then `count` defaults to '1'. The argument `forever` (can be shortened to `f`) is a keyword used instead of an integer `count` and indicates Soar should be run indefinitely, until halted by problem-solving completion, or stopped by an interrupt.
 
-If there are multiple Soar agents that exist in the same Soar process, then issuing a `run` command in any agent will cause all agents to run with the same set of parameters, unless the flag `--self` is specified, in which case only that agent will execute.
+If there are multiple Soar agents that exist in the same Soar process, then issuing a run command in any agent will cause all agents to run with the same set of parameters, unless the flag `--self` is specified, in which case only that agent will execute.
 
-If an environment is registered for the kernel's update event, then when the event it triggered, the environment will get information about how the `run` was executed. If a `run` was executed with the --update option, then then event sends a flag requesting that the environment actually update itself. If a `run` was executed with the --noupdate option, then the event sends a flag requesting that the environment not update itself. The --update option is the default when run is specified without the --self option is not specified. If the --self option is specified, then the --noupdate option is on by default. It is up to the environment to check for these flags and honor them.
+If an environment is registered for the kernel's update event, then when the event it triggered, the environment will get information about how the run was executed. If a run was executed with the `--update` option, then then event sends a flag requesting that the environment actually update itself. If a run was executed with the --noupdate option, then the event sends a flag requesting that the environment not update itself. The `--update` option is the default when run is specified without the `--self` option is not specified. If the `--self` option is specified, then the `--noupdate` option is on by default. It is up to the environment to check for these flags and honor them.
 
 Some use cases include:
 || `run --self` || runs one agent but not the environment ||
@@ -1772,19 +1723,17 @@ Some use cases include:
 || `run` || runs all agents and the environment ||
 || `run --noupdate` || runs all agents but not the environment ||
 
-
-
 == Setting an interleave size ==
-When there are multiple agents running within the same process, it may be useful to keep agents more closely aligned in their execution cycle than the run increment (--elaboration, --phases, --decisions, --output) specifies. For instance, it may be necessary to keep agents in "lock step" at the phase level, eventhough the <b>run</b> command issued is for 5 decisions. Some use cases include:
+When there are multiple agents running within the same process, it may be useful to keep agents more closely aligned in their execution cycle than the run increment (`--elaboration, --phases, --decisions, --output`) specifies. For instance, it may be necessary to keep agents in "lock step" at the phase level, eventhough the run command issued is for 5 decisions. Some use cases include:
 
-|width="150" | run -d 5 -inteleave p || run the agent one phase and then move to the next agent, looping over agents until they have run for 5 decision cycles
-|| `run -o 3 -interleave d ` || run the agent one decision cycle and then move to the next agent. When an agent generates output for the 3rd time, it no longer runs even if other agents continue. ||
+|| 1run -d 5 -inteleave p` || run the agent one phase and then move to the next agent, looping over agents until they have run for 5 decision cycles
+|| `run -o 3 -interleave d` || run the agent one decision cycle and then move to the next agent. When an agent generates output for the 3rd time, it no longer runs even if other agents continue. ||
 
-The <b>interleave</b> parameter must always be equal to or smaller than the specified <b>run</b> parameter.
-This option is not currently compatible with the <b>forever</b> option.
+The `interleave` parameter must always be equal to or smaller than the specified run parameter.
+This option is not currently compatible with the `forever` option.
 
 === Note ===
-If Soar has been stopped due to a `halt` action, an `init-soar` command must be issued before Soar can be restarted with the `run` command.
+If Soar has been stopped due to a `halt` action, an [CommandLineInterface#init-soar init-soar] command must be issued before Soar can be restarted with the run command.
 
 ----
 = save-backtraces =
@@ -1800,12 +1749,12 @@ save-backtraces [-ed]
 || `-d, --disable, --off` || Turn explain sysparam off. ||
 
 == Description ==
-The `save-backtraces` variable is a toggle that controls whether or not
+The save-backtraces variable is a toggle that controls whether or not
 backtracing information (from chunks and justifications) is saved.
 
-When `save-backtraces` is set to `off`, backtracing information
+When save-backtraces is set to `off`, backtracing information
 is not saved and explanations of the chunks and justifications that are formed
-can not be retrieved. When `save-backtraces` is set to `on`,
+can not be retrieved. When save-backtraces is set to `on`,
 backtracing information can be retrieved by using the
 [CommandLineInterface#explain-backtraces explain-backtraces] command. Saving backtracing information may slow down
 the execution of your Soar program, but it can be a very useful tool in
@@ -1837,15 +1786,12 @@ command returns the operator id currently forced for selection (by a previous ca
 select), if one exists.
 
 == Examples ==
-
 Assuming operator "O2" is a valid operator, this would select it as the next operator to be selected:
-
 {{{
 select O2
 }}}
 
 After this command, issuing just "select" will get "O2" as a return:
-
 {{{
 select
 }}}
@@ -1881,9 +1827,9 @@ set-stop-phase -[ABadiop]
 }}}
 
 == Options ==
-Options -A and -B are optional and mutually exclusive. If not specified, the default is -B.
+Options `-A` and `-B` are optional and mutually exclusive. If not specified, the default is `-B`.
 
-Only one of -a, -d, -i, -o, -p must be selected.
+Only one of `-a`, `-d`, `-i`, `-o`, `-p` must be selected.
 
 With no options, reports the current stop phase.
 
@@ -1922,7 +1868,7 @@ Prints information about the current release.
 soarnews
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `sn` || `soarnews` ||
 
 ----
@@ -1941,7 +1887,7 @@ source [options] filename
 || `-v, --verbose` || Print excised production names ||
 
 == Description ==
-Load and evaluate the contents of a file. The `filename` can be a relative path or a fully qualified path. `source` will generate an implicit push to the new directory, execute the command, and then pop back to the current working directory from which the command was issued.
+Load and evaluate the contents of a file. The `filename` can be a relative path or a fully qualified path. source will generate an implicit push to the new directory, execute the command, and then pop back to the current working directory from which the command was issued.
 
 After the source completes, the number of productions sourced and excised is printed:
 {{{
@@ -2020,7 +1966,7 @@ sp {production_body}
 || `production_body` || A Soar production. ||
 
 == Description ==
-The `sp` command creates a new production and loads it into production memory. `production_body` is a single argument parsed by the Soar kernel, so it should be enclosed in curly braces to avoid being parsed by other scripting languages that might be in the same process. The overall syntax of a rule is as follows:
+The sp command creates a new production and loads it into production memory. `production_body` is a single argument parsed by the Soar kernel, so it should be enclosed in curly braces to avoid being parsed by other scripting languages that might be in the same process. The overall syntax of a rule is as follows:
 
 {{{
   name
@@ -2113,7 +2059,7 @@ Print information on Soar's runtime statistics.
 stats [options]
 }}}
 
-=== Default Aliases ===
+==== Default Aliases ====
 || `st` || `stats` ||
 
 == Options ==
@@ -2142,7 +2088,7 @@ For use with `--sort` option. *Negative values sorts descending.*
 
 This command prints Soar internal statistics. The argument indicates the component of interest, `--system` is used by default.
 
-With the `--system` flag, the `stats` command lists a summary of run statistics, including the following:
+With the `--system` flag, the stats command lists a summary of run statistics, including the following:
   * *Version* --- The Soar version number, hostname, and date of the run.
   * *Number of productions* --- The total number of productions loaded in the system, including all chunks built during problem solving and all default productions.
   * *Timing Information* --- Might be quite detailed depending on the flags set at compile time. See note on timers below.
@@ -2152,9 +2098,9 @@ With the `--system` flag, the `stats` command lists a summary of run statistics,
   * *Working Memory Changes* --- This is the total number of changes to working memory. This includes all additions and deletions from working memory. Also prints the average match time.
   * *Working Memory Size* --- This gives the current, mean and maximum number of working memory elements.
 
-The `stats` argument `--memory` provides information about memory usage and Soar's memory pools, which are used to allocate space for the various data structures used in Soar.
+The stats argument `--memory` provides information about memory usage and Soar's memory pools, which are used to allocate space for the various data structures used in Soar.
 
-The `stats` argument `--rete` provides information about node usage in the Rete net, the large data structure used for efficient matching in Soar.
+The stats argument `--rete` provides information about node usage in the Rete net, the large data structure used for efficient matching in Soar.
 
 TODO: Document new SMem branch options.
 
@@ -2227,7 +2173,7 @@ Pause Soar.
 stop-soar [-s] [reason string]
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `interrupt` || `stop-soar` ||
 || `ss` || `stop-soar` ||
 || `stop` || `stop-soar` ||
@@ -2237,7 +2183,7 @@ stop-soar [-s] [reason string]
 || `reason_string` || An optional string which will be printed when Soar is stopped, to indicate why it was stopped. If left blank, no message will be printed when Soar is stopped. ||
 
 == Description ==
-The `stop-soar` command stops any running Soar agents. It sets a flag in the
+The stop-soar command stops any running Soar agents. It sets a flag in the
 Soar kernel so that Soar will stop running at a "safe" point and return control to the user.
 This command is usually not issued at the command line prompt - a more common use of this command would be, for instance, as a side-effect of pressing a button on a Graphical User Interface (GUI).
 
@@ -2278,7 +2224,7 @@ This command is used to control the timers that collect internal profiling
 information while Soar is running. With no arguments, this command prints out
 the current timer status. Timers are ENABLED by default. The default
 compilation flags for soar enable the basic timers and disable the detailed
-timers. The `timers` command can only enable or disable timers that have already been enabled with compiler directives. See the [CommandLineInterface#stats stats] command for more info on the Soar timing system.
+timers. The timers command can only enable or disable timers that have already been enabled with compiler directives. See the [CommandLineInterface#stats stats] command for more info on the Soar timing system.
 
 == See Also ==
 [CommandLineInterface#stats stats]
@@ -2292,7 +2238,7 @@ Undefine an existing alias
 unalias name
 }}}
 
-== Default Aliases ==
+=== Default Aliases ===
 || `un` || `[CommandLineInterface#unalias unalias]` ||
 
 == Description ==
@@ -2350,11 +2296,11 @@ wait -[e|d]
 
 == Description ==
 In some systems, espcially those that model expert (fully chunked) knowledge,
-a state-no-change may represent a `wait state` rather than an impasse.
-The `waitsnc` command allows the user to switch to a mode where a state-no-change that would normally generate an impasse (and subgoaling), instead generates a `wait` state. At a `wait` state, the decision cycle will repeat (and
-the decision cycle count is incremented) but no `state-no-change` impasse (and therefore no substate) will be generated.
+a state-no-change may represent a _wait state_ rather than an impasse.
+The waitsnc command allows the user to switch to a mode where a state-no-change that would normally generate an impasse (and subgoaling), instead generates a _wait_ state. At a _wait_ state, the decision cycle will repeat (and
+the decision cycle count is incremented) but no _state-no-change_ impasse (and therefore no substate) will be generated.
 
-When issued with no arguments, `waitsnc` returns its current setting.
+When issued with no arguments, waitsnc returns its current setting.
 
 ----
 = warnings =
@@ -2377,9 +2323,9 @@ notify the user when they are not in the correct syntax. When a lefthand side
 error is discovered (such as conditions that are not linked to a common state
 or impasse object), the production is generally loaded into production memory
 anyway, although this production may never match or may seriously slow down
-the matching process. In this case, a warning would be printed only if `warnings` were `--on`.
+the matching process. In this case, a warning would be printed only if warnings were `--on`.
 Righthand side errors, such as preferences that are not
-linked to the state, usually result in the production not being loaded, and a warning regardless of the `warnings` setting.
+linked to the state, usually result in the production not being loaded, and a warning regardless of the warnings setting.
 
 ----
 = watch =
@@ -2391,7 +2337,7 @@ watch [options]
 watch level
 }}}
 
-=== Default Aliases ===
+==== Default Aliases ====
 || `w` || `watch` ||
 
 == Options ==
@@ -2420,7 +2366,7 @@ It is important to note that watch level `0` turns off ALL watch options, includ
 
 === Watching Productions ===
 By default, the names of the productions are printed as each production
-fires and retracts (at `watch` levels `3` and higher). However,
+fires and retracts (at watch levels `3` and higher). However,
 it may be more helpful to watch only a specific _type_ of production.
 The tracing of firings and retractions of productions can be limited
 to only certain types by the use of the following flags:
@@ -2447,9 +2393,9 @@ that are being watched.
 || `-L, --learning` || `noprint`, `print`, or `fullprint` (see table below) || Controls the printing of chunks/justifications as they are created ||
 
 As Soar is running, it may create justifications and chunks which
-are added to production memory. The `watch` command allows
+are added to production memory. The watch command allows
 users to monitor when chunks and justifications are created by
-specifying one of the following arguments to the `watch --learning`
+specifying one of the following arguments to the `--learning`
 command:
 || *Argument* || *Alias* || *Effect* ||
 || `noprint` || `0` || Print nothing about new chunks or justifications (default) ||
@@ -2463,14 +2409,14 @@ command:
 || `-R, --rl` || remove (optional) || Soar-RL debugging trace ||
 
 == Description ==
-The `watch` command controls the amount of information that is printed out as Soar runs. The basic functionality of this command is to trace various `levels` of information about Soar's internal workings.
-The higher the `level`, the more information is printed as Soar runs. At the lowest setting, `0` (`--none`), nothing is printed.
+The watch command controls the amount of information that is printed out as Soar runs. The basic functionality of this command is to trace various _levels_ of information about Soar's internal workings.
+The higher the _level_, the more information is printed as Soar runs. At the lowest setting, `0` (`--none`), nothing is printed.
 The levels are cumulative, so that each successive level prints the information from the previous level as
-well as some additional information. The default setting for the `level` is `1`, (`--decisions`).
+well as some additional information. The default setting for the _level_ is `1`, (`--decisions`).
 
-The numerical arguments _inclusively_ turn on all levels up to the number specified. To use numerical arguments to turn off a level, specify a number which is less than the level to be turned off. For instance, to turn off watching of productions, specify `watch --level 2` (or 1 or 0). Numerical arguments are provided for shorthand convenience. For more detailed control over the watch settings, the named arguments should be used.
+The numerical arguments _inclusively_ turn on all levels up to the number specified. To use numerical arguments to turn off a level, specify a number which is less than the level to be turned off. For instance, to turn off watching of productions, specify `--level 2` (or 1 or 0). Numerical arguments are provided for shorthand convenience. For more detailed control over the watch settings, the named arguments should be used.
 
-With no arguments, this command prints information about the current `watch` status, i.e., the values of each parameter.
+With no arguments, this command prints information about the current watch status, i.e., the values of each parameter.
 
 For the named arguments, including the named argument turns on only that setting. To turn off a specific setting, follow the named argument with `remove` or `0`.
 
@@ -2580,10 +2526,10 @@ When issuing a `-R` or `-l`, the `-t` flag is optional. Its absence is equivalen
 This commands allows users to improve state tracing by issuing filter-options that are applied when watching wmes. Users can selectively define which `object-attribute-value` triplets are monitored and whether they are monitored for
 addition, removal or both, as they go in and out of working memory.
 
-`Note:` The functionality of `watch-wmes` resided in the `watch` command prior to Soar 8.6.
+*Note:* The functionality of watch-wmes resided in the [CommandLineInterface#watch watch] command prior to Soar 8.6.
 
 == Examples ==
-Users can `watch` an `attribute` of a particular object
+Users can watch an `attribute` of a particular object
 (as long as that object already exists):
 {{{
 soar> watch-wmes --add-filter -t both D1 speed *
