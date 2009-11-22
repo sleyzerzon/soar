@@ -221,8 +221,8 @@ Specify format of the name to use for new chunks.
 == Synopsis ==
 
 {{{
-chunk-name-format [-sl] -p [<prefix>]
-chunk-name-format [-sl] -c [<count>]
+chunk-name-format [-sl] -p [prefix]
+chunk-name-format [-sl] -c [count]
 }}}
 
 == Options ==
@@ -906,8 +906,8 @@ indifferent-selection
 indifferent-selection [-s]
 indifferent-selection [-bgfxl]
 indifferent-selection [-et] [value]
-indifferent-selection [-p] <parameter> [reduction policy]
-indifferent-selection [-r] <parameter> <reduction policy> [reduction rate]
+indifferent-selection [-p] parameter [reduction_policy]
+indifferent-selection [-r] parameter reduction_policy [reduction_rate]
 indifferent-selection [-a] [setting]
 }}}
 
@@ -918,10 +918,10 @@ indifferent-selection [-a] [setting]
 == Options ==
 
 || `-s, --stats` || Summary of settings ||
-|| `<policy>` || Set exploration policy ||
-|| `<parameter> [value]` || Get/Set exploration policy parameters (if value not given, returns the current value) ||
-|| `<parameter> [reduction policy]` || Get/Set exploration policy parameter reduction policy (if policy not given, returns the current) ||
-|| `<parameter> <reduction policy> [reduction rate]` || Get/Set exploration policy parameter reduction rate for a policy (if rate not give, returns the current) ||
+|| `policy` || Set exploration policy ||
+|| `parameter [value]` || Get/Set exploration policy parameters (if value not given, returns the current value) ||
+|| `parameter [reduction_policy]` || Get/Set exploration policy parameter reduction policy (if policy not given, returns the current) ||
+|| `parameter reduction_policy [reduction_rate]` || Get/Set exploration policy parameter reduction rate for a policy (if rate not give, returns the current) ||
 || `-a, --auto-reduce [on,off]` || Get/Set auto-reduction setting (if setting not provided, returns the current) ||
 
 == Description ==
@@ -2300,7 +2300,7 @@ Begin Soar's execution cycle.
 {{{
 run  [-f|count]
 run -[d|e|o|p][s][un] [f|count]
-run -[d|e|o|p][un] count [-i <e|p|d|o>]
+run -[d|e|o|p][un] count [-i e|p|d|o]
 }}}
 
 === Default Aliases ===
@@ -2434,7 +2434,7 @@ Force the next selected operator
 == Synopsis ==
 
 {{{
-select <id>
+select id
 }}}
 
 == Options ==
@@ -2531,9 +2531,9 @@ With no options, reports the current stop phase.
 
 When running by decision cycle it can be helpful to have agents stop at a
 particular point in its execution cycle. This command allows the user to
-control which phase Soar stops in. The precise definition is that `running for
-<n> decisions and stopping before phase <ph>` means to run until the decision
-cycle counter has increased by <n> and then stop when the next phase is <ph>.
+control which phase Soar stops in. The precise definition is that "running for
+_n_ decisions and stopping before phase _ph_ means to run until the decision
+cycle counter has increased by _n_ and then stop when the next phase is _ph_".
 The phase sequence (as of this writing) is: input, proposal, decision, apply,
 output. Stopping after one phase is exactly equivalent to stopping before the
 next phase.
@@ -3375,8 +3375,8 @@ removed.
 == Synopsis ==
 
 {{{
-watch-wmes -[a|r]  -t <type>  pattern
-watch-wmes -[l|R] [-t <type>]
+watch-wmes -[a|r]  -t type  pattern
+watch-wmes -[l|R] [-t type]
 }}}
 
 == Options ==
