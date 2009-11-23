@@ -1,3 +1,31 @@
 #summary Getting started with Soar
 
-TODO: port from Sitemaker site.
+The easiest way to get started with Soar is to read through the Soar Tutorial
+and to do all of the exercises. Although it's tempting to skip the exercises,
+they're very useful and even fun. This page will walk you through the steps
+necessary to get you up and running with Soar.
+
+== Step 1: Download Soar ==
+
+Download the latest version of Soar from [Downloads the download page]. Be sure
+to install the appropriate version of Java for your system (32-bit downloads
+will not work with 64-bit Java virtual machines and vice versa).
+
+== Step 2: Start reading the tutorial ==
+
+Check out the tutorial documents (parts 1 through 6) in the
+`SoarSuite/Documentation` directory of the Soar project. Also included in the
+documentation directory is the Soar manual. The Soar manual is not required for
+the tutorial but is a handy reference.
+
+The [http://www.adobe.com/ Adobe Reader] is needed to view the tutorial and
+much of our other documentation (.pdf format).
+
+== Questions about Soar? ==
+
+The best places for help with Soar are listed on the
+[http://code.google.com/p/soar project home page] under the heading _Help and
+Documentation_.
+
+Please feel free to email questions to the Soar Group mailing list,
+`soar-group@lists.sourceforge.net`.
