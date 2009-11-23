@@ -8,17 +8,21 @@ Wiki index is [http://code.google.com/p/soar/w/list here].
 
 = Soar =
   * [http://sitemaker.umich.edu/soar Soar home page with news and general information about Soar].
-  * Publications related to Soar.
+  * [Publications Publications related to Soar].
 
 = Using Soar =
-  * Getting started with Soar.
+  * [GettingStarted Getting started with Soar].
   * [FAQ Frequently asked questions].
   * [CommandLineInterface Command line interface documentation].
   * [Soar2D]
+  * [sps Splinter Soar]
 
-= Developing with Soar =
-  * Frequently asked questions.
+= Developing Soar =
+  * [FAQ Frequently asked questions].
   * [Build Checkout and build procedure details].
+  * [ProjectLayout Organization of Soar repository].
 
-= Examples and Environments =
- * [sps Splinter Soar]
+= Soar at Michigan =
+  * [SoarGroupReadings List of potential readings].
+  * [ConferenceSchedule Relevant conferences].
+  * [Publications Publications related to Soar].
