@@ -1,0 +1,136 @@
+#summary Soar Release Notes
+
+<wiki:toc max_depth="1" />
+
+----
+= 9.2.0 =
+
+This release of Soar continues the 9.x series of releases during which we
+expect to introduce several new mechanisms. 
+
+Soar can be downloaded from the Soar homepage at: http://sitemaker.umich.edu/soar
+
+These Soar releases include all source code, many demo programs, and a number
+of applications that serve as examples of how to interface Soar to an external
+environment.  There is support for integrating Soar with C++, Java, Tcl, Python
+and C# applications.  Many tools that aid in development of Soar programs are
+also included.
+
+== 9.2: Semantic Memory ==
+
+Soar 9.2 includes a Semantic Memory module, and this release of Soar 9.2.0 is
+the first official release of Soar with semantic memory capabilities. 9.2 also
+includes all features from 9.1 (!EpMem) and 9.0 (Soar-RL).
+
+Soar-SMem is a task-independent, architectural integration of an artificial
+semantic memory (SMem) with Soar.  The SMem mechanism facilitates deliberate
+recording and querying of semantic chunks as a Soar agent executes.
+
+== Installation Requirements ==
+
+These releases are generated for Windows, Linux, and OSX systems. Windows XP
+and Vista are supported, as well as 32- and 64-bit architectures.
+
+  * *IMPORTANT NOTE ABOUT 64-BIT BINARIES*: To use the 64-bit Soar tools with Java (such as the Java debugger) you must be using the 64-bit JVM. Attempting to start 64-bit Soar programs with the 32-bit JVM on Windows will cause a javaw.exe process to hang open (terminate it using task manager). Also note: attempting to start 32-bit Java tools, such as those included in previous distributions of Soar, with a 64-bit JVM will also result in the hanging javaw.exe process.
+
+  * Sun Java 1.5 or newer is required to use the Java applications, including the debugger (Java must be available in the path). Get it at [http://java.sun.com/ java.sun.com]. Most operating systems probably already have Java installed. NOTE: Java 1.4.2 is no longer supported.
+
+  * The Soar Suite needs under 100 MB for regular use, but closer to 1 GB of disk space for object and debugging files if rebuilding all projects.
+
+  * Due to path length limits on some versions of Windows, it is recommended to extract Soar to the `C:\` root or similar. Some parts of the Soar Suite directory structure are deep, so users wishing to put Soar in a deep location on their machines (such as `C:\Documents and Settings\username\My Documents\Visual Studio Projects`) may  run into issues. 
+
+  * Tcl version 8.4 is required for the Tcl SML interface. Threaded Tcl builds are not supported. Windows 64-bit does not include the Tcl SML interface. Your installed Tcl architecture must be the same (32 or 64 bit) as the Soar binaries for the Tcl SML interface to load correctly.
+
+  * The included Python libraries support Python 2.5.  Python 2.6 and 3 support requires a rebuild of the ClientSMLPython project. Your installed Python architecture must be the same (32 or 64 bit) as the Soar binaries for the Python SML interface to load correctly.
+
+= 9.1.1 =
+
+This release of Soar continues the 9.x series of releases during which we
+expect to introduce several new mechanisms. 
+
+Soar can be downloaded from the Soar homepage at: http://sitemaker.umich.edu/soar
+
+These Soar releases include all source code, many demo programs, and a number
+of applications that serve as examples of how to interface Soar to an external
+environment.  There is support for integrating Soar with C++, Java, Tcl, Python
+and C# applications.  Many tools that aid in development of Soar programs are
+also included.
+
+== 9.1: Episodic Memory ==
+
+Soar 9.1 includes an Episodic Memory module, which was first released as Soar
+9.1.0.  Soar 9.1.1 is primarily a maintenance release with bugs fixed and minor
+features added. 9.1 also includes all of the features from 9.0 (Soar-RL).
+
+Soar-!EpMem is a task-independent, architectural integration of an artificial
+episodic memory (!EpMem) with Soar.  The !EpMem mechanism will automatically
+record episodes as a Soar agent executes.  These episodes can later be queried
+and retrieved in order to improve performance on future tasks. See the !EpMem
+manual for details.
+
+== Installation Requirements ==
+
+These releases are generated for Windows, Linux, and OSX systems. Windows XP
+and Vista are supported, as well as 32- and 64-bit architectures.
+
+  * *IMPORTANT NOTE ABOUT 64-BIT BINARIES*: To use the 64-bit Soar tools with Java (such as the Java debugger) you must be using the 64-bit JVM. Attempting to start 64-bit Soar programs with the 32-bit JVM on Windows will cause a javaw.exe process to hang open (terminate it using task manager). Also note: attempting to start 32-bit Java tools, such as those included in previous distributions of Soar, with a 64-bit JVM will also result in the hanging javaw.exe process.
+
+  * Sun Java 1.5 or newer is required to use the Java applications, including the debugger (Java must be available in the path). Get it at [http://java.sun.com/ java.sun.com]. Most operating systems probably already have Java installed. NOTE: Java 1.4.2 is no longer supported.
+
+  * The Soar Suite needs under 100 MB for regular use, but closer to 1 GB of disk space for object and debugging files if rebuilding all projects.
+
+  * Due to path length limits on some versions of Windows, it is recommended to extract Soar to the `C:\` root or similar. Some parts of the Soar Suite directory structure are deep, so users wishing to put Soar in a deep location on their machines (such as `C:\Documents and Settings\username\My Documents\Visual Studio Projects`) may  run into issues. 
+
+  * Tcl version 8.4 is required for the Tcl SML interface. Threaded Tcl builds are not supported. Windows 64-bit does not include the Tcl SML interface. Your installed Tcl architecture must be the same (32 or 64 bit) as the Soar binaries for the Tcl SML interface to load correctly.
+
+  * The included Python libraries support Python 2.5.  Python 2.6 and 3 support requires a rebuild of the ClientSMLPython project. Your installed Python architecture must be the same (32 or 64 bit) as the Soar binaries for the Python SML interface to load correctly.
+
+= 9.0.1 =
+
+This release of Soar continues the 9.x series of releases during which we
+expect to introduce several new mechanisms. 
+
+Soar can be downloaded from the Soar homepage at: http://sitemaker.umich.edu/soar
+
+These Soar releases include all source code, many demo programs, and a number
+of applications that serve as examples of how to interface Soar to an external
+environment.  There is support for integrating Soar with C++, Java, Tcl, Python
+and C# applications.  Many tools that aid in development of Soar programs are
+also included.
+
+== 9.0: Soar-RL ==
+
+Soar 9.0 includes reinforcement learning code (Soar-RL), which was first
+released alongside the 8.6.4 beta. Soar 9.0.1 is primarily a maintenance
+release, although many bugs have been fixed and minor features added.
+
+Soar-RL is the architectural integration of reinforcement learning (RL) with
+Soar. The RL mechanism will automatically tune the values of
+numeric-indifferent preference rules based on reward generated while a Soar
+agent executes.  These values represent the expected discounted sum of future
+rewards the agent will receive if it selects that operator for states matched
+by the condition of the rule.  See the RL manual and tutorial in Documentation.
+
+To see Soar-RL in action right away, try the Water Jug RL demo (it can be
+loaded from the Demos->Water Jug menu in the Java Debugger). To see the effects
+of RL, run it to completion, then init-soar and run it again. Repeat 4-5 times
+to see it reach optimal behavior. (Note: the agent may occasionally perform
+non-optimal behavior even after it has converged because of its exploration
+policy. See the RL manual and tutorial for details).
+
+== Installation Requirements ==
+
+These releases are generated for Windows, Linux, and OSX systems. Windows XP
+and Vista are supported, as well as 32- and 64-bit architectures.
+
+  * *IMPORTANT NOTE ABOUT 64-BIT BINARIES*: To use the 64-bit Soar tools with Java (such as the Java debugger) you must be using the 64-bit JVM. Attempting to start 64-bit Soar programs with the 32-bit JVM on Windows will cause a javaw.exe process to hang open (terminate it using task manager). Also note: attempting to start 32-bit Java tools, such as those included in previous distributions of Soar, with a 64-bit JVM will also result in the hanging javaw.exe process.
+
+  * Sun Java 1.5 or newer is required to use the Java applications, including the debugger (Java must be available in the path). Get it at [http://java.sun.com/ java.sun.com]. Most operating systems probably already have Java installed. NOTE: Java 1.4.2 is no longer supported.
+
+  * The Soar Suite needs under 100 MB for regular use, but closer to 1 GB of disk space for object and debugging files if rebuilding all projects.
+
+  * Due to path length limits on some versions of Windows, it is recommended to extract Soar to the `C:\` root or similar. Some parts of the Soar Suite directory structure are deep, so users wishing to put Soar in a deep location on their machines (such as `C:\Documents and Settings\username\My Documents\Visual Studio Projects`) may  run into issues. 
+
+  * Tcl version 8.4 is required for the Tcl SML interface. Threaded Tcl builds are not supported. Windows 64-bit does not include the Tcl SML interface. Your installed Tcl architecture must be the same (32 or 64 bit) as the Soar binaries for the Tcl SML interface to load correctly.
+
+  * The included Python libraries support Python 2.5.  Python 2.6 and 3 support requires a rebuild of the ClientSMLPython project. Your installed Python architecture must be the same (32 or 64 bit) as the Soar binaries for the Python SML interface to load correctly.
