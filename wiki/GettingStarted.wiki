@@ -1,0 +1,3 @@
+#summary Getting started with Soar
+
+TODO: port from Sitemaker site.
