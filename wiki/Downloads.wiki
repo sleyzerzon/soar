@@ -19,4 +19,4 @@ Downloading and installing [http://java.sun.com Java] is recommended since most 
 
 == Other Versions ==
 
-There are other versions of Soar (including betas with episodic and semantic memory modules) available on the [SoarSoftware Soar software page].
+There are other versions of Soar (including betas with episodic and semantic memory modules) available on the [SoarSoftware Soar software page]. Or, click [http://code.google.com/p/soar/downloads/list here] for a full list of files hosted on Google Code.
