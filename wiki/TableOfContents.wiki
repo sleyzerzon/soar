@@ -1,0 +1,4 @@
+  * [GettingStarted Getting started with Soar]
+  * [FAQ Frequently asked questions]
+  * [CommandLineInterface Command line interface documentation]
+  
