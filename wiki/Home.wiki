@@ -2,6 +2,8 @@
 #labels Featured,Phase-Support
 #sidebar TableOfContents
 
+[http://code.google.com/p/soar/w/list Wiki index is here].
+
 = What is Soar? =
 
 Soar is a general cognitive architecture for developing systems that exhibit intelligent behavior. Researchers all over the world are using Soar.
@@ -28,5 +30,3 @@ Visit the [Downloads] page to download Soar.
   * [SoarGroupReadings List of potential readings].
   * [ConferenceSchedule Relevant conferences].
   * [Publications Publications related to Soar].
-
-Wiki index is [http://code.google.com/p/soar/w/list here].
