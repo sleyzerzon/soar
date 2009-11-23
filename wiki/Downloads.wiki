@@ -1,4 +1,4 @@
-#summary Downloads page
+#summary Soar software download page
 
 = Download Soar =
 
