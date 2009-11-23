@@ -1,12 +1,9 @@
   * [Home Soar Wiki Home]
-  * [Downloads Soar Downloads]
+  * [Downloads Downloads]
   * [Publications]
-
   * [GettingStarted Getting Started]
-  * [CommandLineInterface Command Line Help]
   * [FAQ]
-
+  * [CommandLineInterface Command Line Help]
   * [Build Developer Build Procedure]
-
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
