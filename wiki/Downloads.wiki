@@ -4,7 +4,9 @@
 
 The most stable version of Soar is *9.0.1* (Soar-RL). This version includes the reinforcement learning module.
 
-Downloading and installing [http://java.sun.com Java] is recommended since most users will want to use the Soar Java Debugger and other Soar components written in Java. The [http://java.sun.com/javase/downloads/index.jsp latest version of the Sun JRE or JDK] is recommended. Important: the 64-bit Soar downloads require 64-bit Java!
+Downloading and installing [http://java.sun.com Java] is recommended since most users will want to use the Soar Java Debugger and other Soar components written in Java. The [http://java.sun.com/javase/downloads/index.jsp latest version of the Sun JRE or JDK] is recommended. 
+
+_Important: the 64-bit Soar downloads require 64-bit Java!_
 
   * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-windows.zip 9.0.1 for Windows, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-windows-x64.zip 9.0.1 for Windows, 64-bit]
@@ -27,6 +29,6 @@ Beta versions of Soar that include [SoarSoftware#9.1 episodic] and [SoarSoftware
 
 Old, unsupported versions of Soar are archived on the [SoarSoftware Soar software page].
 
-[http://code.google.com/p/soar/downloads/list Full listing of files hosted on Google Code].
+[http://code.google.com/p/soar/downloads/list?can=1&q=&colspec=Filename+Summary+Uploaded+Size+DownloadCount Full listing of files hosted on Google Code].
 
 [http://sourceforge.net/projects/soar/files/ Full listing of files hosted on SourceForge.Net].
