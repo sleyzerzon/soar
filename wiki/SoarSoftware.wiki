@@ -1,4 +1,4 @@
-#summary All Soar software
+﻿#summary All Soar software
 
 <wiki:toc max_depth="1" />
 
@@ -20,11 +20,13 @@ recording and querying of semantic chunks as a Soar agent executes.
   * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-windows.zip 9.2.0 for Windows, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-windows-x64.zip 9.2.0 for Windows, 64-bit]
 
-  * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-osx.tar.gz 9.2.0 for Mac, 32-bit] (use this if not sure)
-  * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-osx-x64.tar.gz 9.2.0 for Mac, 64-bit]
+  * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-osx.tar.gz 9.2.0 for Mac OS X, 32-bit] (use this if not sure)
+  * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-osx-x64.tar.gz 9.2.0 for Mac OS X, 64-bit]
 
   * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-linux.tar.gz 9.2.0 for Linux, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-linux-x64.tar.gz 9.2.0 for Linux, 64-bit]
+
+  * [http://soar.googlecode.com/files/Soar-Suite-9.2.0-source.tar.bz2 9.2.0 platform-independent source]
 
 = 9.1 Episodic Memory (Beta) =
 
@@ -45,16 +47,24 @@ manual for details.
   * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-windows.zip 9.1.1 for Windows, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-windows-x64.zip 9.1.1 for Windows, 64-bit]
 
-  * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-osx.tar.gz 9.1.1 for Mac, 32-bit] (use this if not sure)
-  * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-osx-x64.tar.gz 9.1.1 for Mac, 64-bit]
+  * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-osx.tar.gz 9.1.1 for Mac OS X, 32-bit] (use this if not sure)
+  * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-osx-x64.tar.gz 9.1.1 for Mac OS X, 64-bit]
 
   * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-linux.tar.gz 9.1.1 for Linux, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-linux-x64.tar.gz 9.1.1 for Linux, 64-bit]
+
+  * [http://soar.googlecode.com/files/Soar-Suite-9.1.1-source.tar.bz2 9.1.1 platform-independent source]
 
 == 9.1.0 ==
 
 [ReleaseNotes#9.1.0 Full release notes for 9.1.0].
 
+  * [http://sourceforge.net/projects/soar/files/Soar%209/9.1.0/Soar-Suite-9.1.0-beta-osx-intel.tar.gz/download 9.1.0 for Mac OS X, Intel, 32-bit]
+  * [http://sourceforge.net/projects/soar/files/Soar%209/9.1.0/Soar-Suite-9.1.0-beta-osx-ppc.tar.gz/download 9.1.0 for Mac OS X, PPC, 32-bit]
+
+  * [http://sourceforge.net/projects/soar/files/Soar%209/9.1.0/Soar-Suite-9.1.0-beta-windows.zip/download 9.1.0 for Windows, 32-bit]
+
+  * [http://sourceforge.net/projects/soar/files/Soar%209/9.1.0/Soar-Suite-9.1.0-beta-linux.tar.gz/download 9.1.0 for Linux, 32-bit]
 
 = 9.0 Reinforcement Learning =
 
@@ -83,41 +93,71 @@ policy. See the RL manual and tutorial for details).
   * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-windows.zip 9.0.1 for Windows, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-windows-x64.zip 9.0.1 for Windows, 64-bit]
 
-  * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-osx.tar.gz 9.0.1 for Mac, 32-bit] (use this if not sure)
-  * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-osx-x64.tar.gz 9.0.1 for Mac, 64-bit]
+  * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-osx.tar.gz 9.0.1 for Mac OS X, 32-bit] (use this if not sure)
+  * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-osx-x64.tar.gz 9.0.1 for Mac OS X, 64-bit]
 
   * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-linux.tar.gz 9.0.1 for Linux, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-linux-x64.tar.gz 9.0.1 for Linux, 64-bit]
+
+  * [http://soar.googlecode.com/files/Soar-Suite-9.0.1-source.tar.bz2 9.0.1 platform-independent source]
 
 == 9.0.0 ==
 
 [ReleaseNotes#9.0.0 Full release notes for 9.0.0].
 
+  * [http://sourceforge.net/projects/soar/files/Soar%209/9.0.0/Soar-Suite-9.0.0-linux-fixed.tar.gz/download 9.0.0 for Linux, 32-bit]
+  * [http://sourceforge.net/projects/soar/files/Soar%209/9.0.0/Soar-Suite-9.0.0-osx-intel.tar.gz/download 9.0.0 for Mac OS X, Intel, 32-bit]
+  * [http://sourceforge.net/projects/soar/files/Soar%209/9.0.0/Soar-Suite-9.0.0-windows.zip/download 9.0.0 for Windows, 32-bit]
+
 = 8.6 SML =
 
 Soar 8.6 introduced SML (Soar Markup Language), a new XML-based API for interfacing with Soar, along with many stability updates, performance and feature enhancements.
 
+_Soar releases before 9.x are 32-bit only._
+
 == 8.6.4 ==
 
-Initial Soar-RL beta limited release.
+A beta release and a separate, initial Soar-RL limited release.
 
 [ReleaseNotes#8.6.4 Full release notes for 8.6.4].
+
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-beta-linux.tar.gz 8.6.4 for Linux]
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-beta-osx-intel.tar.gz 8.6.4 for Mac OS X, Intel]
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-beta-osx-ppc.tar.gz 8.6.4 for Mac OS X, PPC]
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-beta.zip 8.6.4 for Windows]
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-rl.7z 8.6.4 Soar-RL for Windows]
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-rl-linux-x86.tar.gz 8.6.4 Soar-RL for Linux]
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-rl-osx-intel.tar.gz 8.6.4 Soar-RL for Mac OS X, Intel]
+  * [http://soar.googlecode.com/files/Soar-Suite-8.6.4-rl-osx-ppc.tar.gz 8.6.4 Soar-RL for Mac OS X, PPC]
 
 == 8.6.3 ==
 
 [ReleaseNotes#8.6.3 Full release notes for 8.6.3].
 
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.3/Soar-Suite-8.6.3.exe/download 8.6.3 for Windows (installer)]
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.3/soarsuite-8.6.3.tar.gz/download 8.6.3 platform-independent source]
+
 == 8.6.2 ==
 
 [ReleaseNotes#8.6.2 Full release notes for 8.6.2].
+
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.2/Soar-Suite-8.6.2.exe/download 8.6.2 for Windows (installer)]
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.2/soarsuite-8.6.2.tar.gz/download 8.6.2 platform-independent source]
 
 == 8.6.1 ==
 
 [ReleaseNotes#8.6.1 Full release notes for 8.6.1].
 
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.1/Soar-Suite-8.6.1.exe/download 8.6.1 for Windows (installer)]
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.1/Soar8.6.1-libs.zip/download 8.6.1 Windows Library binaries]
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.1/Soar-Suite-8.6.1.dmg/download 8.6.1 for Mac OS X (dmg)]
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.1/Soar-Suite-8.6.1.tar.bz2/download 8.6.1 platform-independent source]
+
 == 8.6.0 ==
 
 [ReleaseNotes#8.6.0 Full release notes for 8.6.0].
+
+  * [http://sourceforge.net/projects/soar/files/Soar%208/soar-suite-8.6.0/Soar-Suite-8.6.0.exe/download 8.6.0 for Windows (installer)]
 
 = 8.5.2 =
 
