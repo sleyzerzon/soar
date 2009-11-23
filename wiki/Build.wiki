@@ -1,8 +1,7 @@
 ﻿#summary Checkout and build procedure
 #labels Phase-Implementation,Phase-Support
 
-Just need the URL? [http://code.google.com/p/soar/source/checkout Here's the
-old, default Source tab content], however, be sure to review the checkout notes
+Just need the URL? The old, default source tab content is [http://code.google.com/p/soar/source/checkout here], however, be sure to review the checkout notes
 on this page for your platform:
 
   * [Build#Windows_Checkout Windows]
