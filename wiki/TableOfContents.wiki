@@ -1,6 +1,7 @@
   * [Home Soar Wiki Home]
   * [Downloads Downloads]
     * [SoarSoftware All Downloads]
+    * [ReleaseNotes All Release Notes]
   * [Publications]
   * [GettingStarted Getting Started]
   * [FAQ]
