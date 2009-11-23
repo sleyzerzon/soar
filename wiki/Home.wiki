@@ -1,5 +1,7 @@
 #summary Soar wiki home, documentation portal
 #labels Featured,Phase-Support
+#sidebar TableOfContents
+
 Welcome to the Soar Wiki, home of living documentation on Soar.
 
 = Soar =
