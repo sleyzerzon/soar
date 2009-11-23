@@ -1,5 +1,5 @@
 #summary Frequently Asked Questions
-#labels Featured,Phase-Support,Phase-Implementation
+#labels Phase-Support,Phase-Implementation
 
 <wiki:toc max_depth="2"/>
 
