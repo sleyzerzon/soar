@@ -3186,9 +3186,12 @@ verbose [-ed]
 
 The verbose command enables tracing of a number of low-level Soar execution
 details during a run. The details printed by verbose are usually only valuable
-when debugging the internals of Soar agents, or to help with figuring out
-strange agent behavior.  Invoke with no arguments to query the current setting.
-Most users will be fine having verbose disabled.
+to developers debugging Soar implementation details.  Invoke with no arguments
+to query the current setting.
+
+== See Also ==
+
+[CommandLineInterface#watch watch]
 
 ----
 = version =
