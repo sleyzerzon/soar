@@ -2,7 +2,9 @@
 #labels Featured,Phase-Support
 #sidebar TableOfContents
 
-Welcome to the Soar Wiki, home of living documentation on Soar.
+Welcome to the Soar Wiki, home of living documentation on Soar. 
+
+Wiki index is [http://code.google.com/p/soar/w/list here].
 
 = Soar =
   * [http://sitemaker.umich.edu/soar Soar home page with news and general information about Soar].
