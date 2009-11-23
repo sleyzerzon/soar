@@ -23,7 +23,7 @@ _Important: the 64-bit Soar downloads require 64-bit Java!_
 
 == Episodic & Semantic Memory ==
 
-Beta versions of Soar that include [SoarSoftware#9.1 episodic] and [SoarSoftware#9.2 semantic memory] modules are available on the [SoarSoftware Soar software page].
+Beta versions of Soar that include [SoarSoftware#9.1_Episodic_Memory_(Beta) episodic] and [SoarSoftware#9.2_Semantic_Memory_(Beta) semantic memory] modules are available on the [SoarSoftware Soar software page].
 
 == Other Versions ==
 
