@@ -1,4 +1,4 @@
-﻿#summary Soar Release Notes
+﻿#summary Soar release notes archive
 
 <wiki:toc max_depth="1" />
 
@@ -2343,4 +2343,3 @@ Other changes for Soar 8.5 made after the above document was written:
   * Decision cycle bug fix.
   * All demos are in VisualSoar format now.
   * Fixed a kernel crash related to justifications.
-
