@@ -53,6 +53,9 @@ manual for details.
 
 == 9.1.0 ==
 
+[ReleaseNotes#9.1.0 Full release notes for 9.1.0].
+
+
 = 9.0 Reinforcement Learning =
 
 Soar 9.0 includes reinforcement learning code (Soar-RL), which was first
@@ -88,24 +91,45 @@ policy. See the RL manual and tutorial for details).
 
 == 9.0.0 ==
 
+[ReleaseNotes#9.0.0 Full release notes for 9.0.0].
 
 = 8.6 SML =
 
+Soar 8.6 introduced SML (Soar Markup Language), a new XML-based API for interfacing with Soar, along with many stability updates, performance and feature enhancements.
+
 == 8.6.4 ==
+
+Initial Soar-RL beta limited release.
+
+[ReleaseNotes#8.6.4 Full release notes for 8.6.4].
 
 == 8.6.3 ==
 
+[ReleaseNotes#8.6.3 Full release notes for 8.6.3].
+
 == 8.6.2 ==
+
+[ReleaseNotes#8.6.2 Full release notes for 8.6.2].
 
 == 8.6.1 ==
 
+[ReleaseNotes#8.6.1 Full release notes for 8.6.1].
+
 == 8.6.0 ==
+
+[ReleaseNotes#8.6.0 Full release notes for 8.6.0].
 
 = 8.5.2 =
 
+[ReleaseNotes#8.5.2 Full release notes for 8.5.2].
+
 = 8.5.1 =
 
+[ReleaseNotes#8.5.1 Full release notes for 8.5.1].
+
 = 8.5.0 =
+
+[ReleaseNotes#8.5.0 Full release notes for 8.5.0].
 
 = 8.4.5 =
 
