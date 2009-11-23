@@ -19,6 +19,14 @@ Downloading and installing [http://java.sun.com Java] is recommended since most 
 
 [ReleaseNotes#9.0.1 Here are full release notes for the 9.0.1 release].
 
+== Episodic & Semantic Memory ==
+
+Beta versions of Soar that include [SoarSoftware#9.1 episodic] and [SoarSoftware#9.2 semantic memory] modules are available on the [SoarSoftware Soar software page].
+
 == Other Versions ==
 
-There are other versions of Soar (including betas with episodic and semantic memory modules) available on the [SoarSoftware Soar software page]. Or, click [http://code.google.com/p/soar/downloads/list here] for a full list of files hosted on Google Code.
+Old, unsupported versions of Soar are archived on the [SoarSoftware Soar software page].
+
+[http://code.google.com/p/soar/downloads/list Full listing of files hosted on Google Code].
+
+[http://sourceforge.net/projects/soar/files/ Full listing of files hosted on SourceForge.Net].
