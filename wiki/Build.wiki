@@ -1,12 +1,12 @@
 ﻿#summary Checkout and build procedure
 #labels Phase-Implementation,Phase-Support
 
-[http://code.google.com/p/soar/source/browse *Browse* online here],
-[http://code.google.com/p/soar/source/list recent *changes* here].
+[http://code.google.com/p/soar/source/browse Browse online here],
+[http://code.google.com/p/soar/source/list recent changes here].
 
 The old, default checkout content is
 [http://code.google.com/p/soar/source/checkout here], however, be sure to
-review the checkout notes on this page for your platform:
+review these checkout notes at least once:
 
 *Do not check out the entire trunk*, it is very large and contains much legacy
 code. Instead, most users will want to check out the `SoarSuite` subfolder of
@@ -16,7 +16,7 @@ options.
 
 Another thing to consider when naming the folder to check Soar out to is what
 versions you will be working with. If you will only be working with one version
-of Soar, any name (such as `SoarSuite`, `soar`, or `trunk` should be fine.
+of Soar, any name (such as `SoarSuite`, `soar`, or `trunk`) should be fine.
 However, if you plan on working on the main trunk and the semantic memory
 branch, for example, you may want to name the two destination folders `trunk`
 and `smem`.
@@ -31,7 +31,7 @@ using Subclipse. Instead, check everything out outside of Eclipse and import
 later with the instructions below. Once things are imported, it is OK to check
 in changes using Subclipse.
 
-*Soar robotics users* may also want to check out `aprilsoar`, but first see the
+*Soar robotics users* may also want to check out `aprilsoar` as well, but first see the
 [AprilSoar aprilsoar page] for more information.
 
 The [ProjectLayout project layout page] describes the folder layout and may be
@@ -156,10 +156,6 @@ This can and should be changed in the future.
   * `cd C:\path\to\soar`
   * Execute ant: `ant`
 
-== Windows Eclipse Setup ==
-
-See [Build#Eclipse Eclipse], below.
-
 = Linux =
 
 The only officially supported Linux distribution right now is
@@ -233,15 +229,11 @@ export LD_LIBRARY_PATH=/home/username/soar/SoarSuite/SoarLibrary/lib
 Run `scons` in the top-level folder, see the [FAQ] for common solutions to
 errors.
 
-== Linux Eclipse Setup ==
-
-See [Build#Eclipse Eclipse], below.
-
 = Mac OS X =
 
 TODO
 
-= Mac OS X Prerequisites =
+== Mac OS X Prerequisites ==
 
 TODO
 
@@ -250,10 +242,6 @@ TODO
 TODO
 
 == Mac OS X Build ==
-
-TODO
-
-== Mac OS X Eclipse Setup ==
 
 TODO
 
@@ -270,4 +258,3 @@ be a child of your workspace folder.
 Import existing projects in to workspace without copying them in to the
 workspace folder. Point the import wizard to the `soar-java` subfolder. Import
 all projects.
-
