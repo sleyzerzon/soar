@@ -1,0 +1,3 @@
+#summary Soar projects using April.
+
+Information about Soar projects using [http://april.eecs.umich.edu/ April] code (such as robotics stuff) go here. TODO
