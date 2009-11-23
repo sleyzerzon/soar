@@ -1,71 +1,130 @@
-#summary Checkout and build procedure
+﻿#summary Checkout and build procedure
 #labels Phase-Implementation,Phase-Support
 
-<wiki:toc max_depth="2"/>
+Just need the URL? [http://code.google.com/p/soar/source/checkout Here's the
+old, default Source tab content], however, be sure to review the checkout notes
+on this page for your platform:
+
+  * [Build#Windows_Checkout Windows]
+  * [Build#Linux_Checkout Linux]
+  * [Build#Mac_OS_X_Checkout Mac OS X]
+
+The [ProjectLayout project layout page] describes the folder layout and may be
+helpful to look at when checking out the source.
+
+Please help keep this page up to date.  If you see an error or notice an
+omission, [http://code.google.com/p/soar/w/edit/Build correct it yourself] or
+do not hesitate to send a note to `soar-sml-list@lists.sourceforge.net`.
+
+<wiki:toc max_depth="1"/>
 
 ----
 
 = Windows =
 
-32-bit and 64-bit Windows platforms are supported for Windows XP and Vista. Other versions of 32-bit windows might work but are not officially supported.
+32-bit and 64-bit Windows platforms are supported for Windows XP, Vista, and 7.
+Other versions of 32-bit windows might work but are not officially supported.
 
 == Windows Prerequisites ==
 
-Some of the prerequisites are listed as recommended or optional. Please note that if all are not installed (except Tcl on 64-bit, see below), some ignorable build errors will be encountered as unsupported language interfaces fail to build. Close the related projects to avoid seeing the errors.
+Some of the prerequisites are listed as _recommended_ or _optional_. Please
+note that if all prerequisites are not installed (except Tcl on 64-bit, see
+below), some (ignorable) build errors will be encountered as unsupported
+language interfaces fail to build. *Close the related projects to avoid seeing
+the errors*.
 
-Either Microsoft Visual Studio 2008 or Microsoft Visual C++ 2008 Express Edition is required to build Soar. 
+Either Microsoft Visual Studio 2008 or Microsoft Visual C++ 2008 Express
+Edition is _required_ to build Soar.
+
   * Install Visual Studio 2008 if you have access to it, or download and install Visual C++ 2008 Express Edition from [http://www.microsoft.com/express/vc/ microsoft.com]. 
 
-SWIG is recommended, or required if any of the language interfaces are used (such as Java, Python, CSharp, or Tcl) since it acts as a bridge between the C++ libraries and the various other languages. CSharp has no other prerequisites.
+SWIG is _recommended_, or _required if any of the language interfaces are used_
+(such as Java, Python, CSharp, or Tcl) since it acts as a bridge between the
+C++ libraries and the various other languages. CSharp has no other
+prerequisites.
+
   * Download the latest version of *swigwin* from [http://www.swig.org/download.html swig.org].
   * Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`.
 
-Java is recommended for most users, as most of the Soar tools and environments are written in Java.
+Java is _recommended_ for most users, as most of the Soar tools and environments are written in Java.
+
   * Download and install the latest Java SE 6 JDK from [http://java.sun.com/javase/downloads/index.jsp java.sun.com].
     * If targeting 64-bit, download the 64-bit version of the JDK.
 
-The Apache Ant build system is required if using Java applications.
+The Apache Ant build system is _required if using Java applications_.
+
   * Download ant from [http://ant.apache.org/ ant.apache.org].
   * Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`.
+  * Helpful: add ant's `bin` folder to your PATH environment variable.
 
-Eclipse is recommended if doing Java development.
+Eclipse is _recommended_ if doing Java development.
+
   * Download the latest version of Eclipse from [http://eclipse.org eclipse.org]
     * If targeting 64-bit, download the 64-bit version of Eclipse, found on [http://download.eclipse.org/eclipse/downloads/ download.eclipse.org].
   * Extract anywhere you have write permissions without authentication, such as your home folder. System folders (such as `C:\Program Files`) are not recommended locations for Eclipse.
 
-A Subversion client is required. The Soar group at U of M mainly uses TortoiseSVN and/or Subclipse (within Eclipse).
+A Subversion client is _required if checking things out from Google Code_. The
+Soar group at Michigan mainly uses TortoiseSVN and/or Subclipse (within Eclipse).
+
   * Download and install TortoiseSVN from [http://tortoisesvn.net/downloads tortoisesvn.net].
   * Install Subclipse if you're using Eclipse by visiting the Help -> Install new software  dialog and adding the site `http://subclipse.tigris.org/update_1.6.x`.
-    * If targeting 64-bit, you may need to install (the 64-bit version of) SlikSVN to get Subclipse to work correctly, available at [http://www.sliksvn.com/en/download/ sliksvn.com]. Eclipse may need to be restarted to see the SlikSVN libraries.
+    * _Important:_ If targeting 64-bit, you may need to install (the 64-bit version of) SlikSVN to get Subclipse to work correctly, available at [http://www.sliksvn.com/en/download/ sliksvn.com]. Eclipse may need to be restarted to see the SlikSVN libraries.
 
-Python 2.6 is recommended, or required if the Python SML interface is desired. Other versions of Python will not work "out of the box." 
+Python 2.6 is _recommended_, or required if the Python SML interface is
+desired.  Other versions of Python will not work "out of the box." 
+
   * Download and install Python *2.6* from [http://www.python.org/download/releases/2.6/ python.org].
+    * If targeting 64-bit, download the 64-bit version of Python.
+  * If you are planning on a debug build including Python, you will need Python debug libraries. These are helpfully available [http://www.eecs.umich.edu/~soar/sitemaker/misc/python here]. Save the correct one for your architecture in `Python26\libs`.
 
 !PyDev for Eclipse is optional, it is for Python development inside Eclipse.
+
   * Inside Eclipse, visit the Help -> Install new software dialog
   * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
 
-Tcl/Tk is optional, or required if the Tcl SML interface is desired. Tcl/Tk is not supported for 64-bit targets.
+Tcl/Tk is _optional_, or _required if the Tcl SML interface is desired_. Tcl/Tk
+is not supported for 64-bit targets.
+
   * Download and install Tcl/Tk *8.4* from [http://www.activestate.com/activetcl/downloads/ activestate.com]
 
 == Windows Environment ==
 
-Visual Studio looks at the environment variables for a number of program locations, depending on what language interfaces you are building.
+Visual Studio looks at the environment variables for a number of program
+locations, depending on what language interfaces you are building.
+
   * `ANT_HOME`: Full path to the Apache Ant folder, which will vary depending on the downloaded Ant version and where it was extracted. Example: `C:\apache-ant-1.7.1`
   * `SWIG_HOME`: Full path to the Swig folder, which will vary depending on the downloaded Ant version and where it was extracted. Example: `C:\swigwin-1.3.39`
   * `JAVA_HOME`: Full path to the JDK home folder, which will vary depending on the downloaded version. Example: `C:\Program Files\Java\jdk1.6.0_14`
   * `PYTHON_HOME`: Full path to Python's folder, usually `C:\Python26`
   * `TCL_HOME`: Full path to Tcl's folder, usually `C:\Tcl`
 
-The full path to Ant's bin folder should be manually added to the PATH environment variable to facilitate command line Java builds. Example: `C:\apache-ant-1.7.1\bin`
+The full path to Ant's bin folder should be manually added to the `PATH`
+environment variable to facilitate command line Java builds. Example:
+`C:\apache-ant-1.7.1\bin`
 
-Eclipse users targeting 64-bit should also add SlikSVN's bin folder to the PATH environment variable, usually `C:\Program Files\SlikSvn\bin`
+Eclipse users targeting 64-bit should also add SlikSVN's bin folder to the `PATH` environment variable, usually `C:\Program Files\SlikSvn\bin`
 
 == Windows Checkout ==
 
-See the [http://code.google.com/p/soar/source/checkout source tab] for instructions on how to check out Soar.
+*Do not check out the entire trunk*, it is very large and contains much legacy
+code. Instead, most users will want to check out the `SoarSuite` subfolder of
+trunk. Check `SoarSuite` out to a writable folder on your drive that isn't too
+deep. `C:\Users\username\SoarSuite` or `C:\Users\username\dev\SoarSuite` are
+good options.
 
-Eclipse users, do not import projects in Eclipse by checking them out there. Instead, check everything out outside of Eclipse and import later with the instructions below.
+Another thing to consider when naming the folder to check Soar out to is what
+versions you will be working with. If you will only be working with one version
+of Soar, any name (such as `SoarSuite`, `soar`, or `trunk` should be fine.
+However, if you plan on working on the main trunk and the semantic memory
+branch, for example, you may want to name the two destination folders `trunk`
+and `smem`.
+
+  * The checkout URL is: `https://soar.googlecode.com/svn/trunk/SoarSuite`
+  * The destination folder should be `SoarSuite`, `soar`, or `trunk`
+  * Your username is your Google account name without the `@` or domain
+  * Your password is your googlecode.com password, [http://code.google.com/hosting/settings available here].
+
+*Eclipse users*, do not import projects in Eclipse by checking them out there using Subclipse. Instead, check everything out outside of Eclipse and import later with the instructions below. Once things are imported, it is OK to check in changes using Subclipse.
 
 == Windows Build ==
 
