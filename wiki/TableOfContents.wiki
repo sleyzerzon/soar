@@ -10,5 +10,8 @@
     * [Build Checkout and Build Procedure]
     * [UsingElementXML Using ElementXML]
     * [SoarJavaDebugger Soar Java Debugger]
+    * [SoarKernel Soar Kernel]
+      * [Symbols]
+      * [Links]
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
