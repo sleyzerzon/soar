@@ -9,5 +9,6 @@
   * [Developers Developers]
     * [Build Checkout and Build Procedure]
     * [UsingElementXML Using ElementXML]
+    * [SoarJavaDebugger Soar Java Debugger]
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
