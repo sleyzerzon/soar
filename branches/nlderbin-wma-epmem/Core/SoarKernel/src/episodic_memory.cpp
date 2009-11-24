@@ -3567,9 +3567,9 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 
 		// get constraint for this identifier, if exists
 		c_id = EPMEM_NODEID_ROOT;
-		if ( c_l->lit->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
+		if ( c_l->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 		{
-			c = c_c->find( c_l->lit->wme->value );
+			c = c_c->find( c_l->wme->value );
 			if ( c != c_c->end() )
 				c_id = c->second;
 		}
@@ -3603,7 +3603,7 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 									good_literal = true;									
 
 									// update constraints with this literal
-									(*n_c)[ c_l->lit->wme->value ] = c_l->lit->shared_id;
+									(*n_c)[ c_l->wme->value ] = c_l->lit->shared_id;
 								}
 								else
 								{
@@ -3616,7 +3616,7 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 								good_literal = true;
 
 								n_c = new epmem_constraint_list( *c_c );
-								(*n_c)[ c_l->lit->wme->value ] = c_l->lit->shared_id;
+								(*n_c)[ c_l->wme->value ] = c_l->lit->shared_id;
 							}
 						}
 						else
@@ -3674,9 +3674,9 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 
 					// get constraint for this identifier, if exists
 					c_id = EPMEM_NODEID_ROOT;
-					if ( c_l->lit->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
+					if ( c_l->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 					{
-						c = c_c->find( c_l->lit->wme->value );
+						c = c_c->find( c_l->wme->value );
 						if ( c != c_c->end() )
 							c_id = c->second;
 					}
@@ -3707,9 +3707,9 @@ unsigned long epmem_graph_match( epmem_shared_literal_group *literals, epmem_con
 
 						// get constraint for this identifier, if exists
 						c_id = EPMEM_NODEID_ROOT;
-						if ( c_l->lit->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
+						if ( c_l->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 						{
-							c = c_c->find( c_l->lit->wme->value );
+							c = c_c->find( c_l->wme->value );
 							if ( c != c_c->end() )
 								c_id = c->second;
 						}
@@ -4529,11 +4529,11 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 											new_literal->wme_ct = new epmem_shared_wme_book;
 
 											new_literal->shared_id = shared_identity;
+											new_literal->shared_sym = (*w_p)->value;
 
-											new_literal->wme = (*w_p);
 											new_literal->wme_kids = ( (*cache_hit)->wmes->size() != 0 );
-
 											new_literal->children = NULL;
+
 											new_literal->match = NULL;
 
 											literals.push_back( new_literal );
@@ -4652,21 +4652,21 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										{
 											if ( new_literal->wme_kids )
 											{
-												parent_syms.push( new_literal->wme->value );
+												parent_syms.push( (*w_p)->value );
 												parent_ids.push( shared_identity );
 												parent_literals.push( new_literal );
 											}
 											else
 											{
 												// create match if necessary
-												wme_match =& wme_to_match[ new_literal->wme ];
+												wme_match =& wme_to_match[ (*w_p) ];
 												if ( !(*wme_match) )
 												{
 													new_match = new epmem_shared_match;
 													matches.push_back( new_match );
 													new_match->ct = 0;
 													new_match->value_ct = ( ( i == EPMEM_NODE_POS )?( 1 ):( -1 ) );
-													new_match->value_weight = ( ( i == EPMEM_NODE_POS )?( 1 ):( -1 ) ) * wma_get_wme_activation( my_agent, new_literal->wme );
+													new_match->value_weight = ( ( i == EPMEM_NODE_POS )?( 1 ):( -1 ) ) * wma_get_wme_activation( my_agent, (*w_p) );
 
 													(*wme_match) = new_match;
 													new_match = NULL;
@@ -4702,8 +4702,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										new_literal->wme_ct = NULL;
 
 										new_literal->shared_id = EPMEM_NODEID_ROOT;
-										new_literal->wme_kids = 0;
-										new_literal->wme = (*w_p);
+										new_literal->shared_sym = NULL;
+
+										new_literal->wme_kids = 0;										
 										new_literal->children = NULL;
 
 										literals.push_back( new_literal );

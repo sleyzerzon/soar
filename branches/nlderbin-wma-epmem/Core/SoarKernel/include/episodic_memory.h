@@ -539,16 +539,16 @@ struct epmem_shared_wme_counter_struct
 struct epmem_shared_literal_struct
 {
 	epmem_node_id shared_id;					// shared q1, if identifier
+	Symbol* shared_sym;							// identifier symbol, if literal represents an identifier
 
 	unsigned long ct;							// number of contributing literals that are "on"
 	unsigned long max;							// number of contributing literals that *need* to be on	
 	epmem_shared_wme_book *wme_ct;				// bookkeeping to ensure literal count
-
-	struct wme_struct *wme;						// associated cue wme
-	bool wme_kids;								// does the cue wme have children (indicative of leaf wme status)	
-
-	epmem_shared_match *match;					// associated match, if leaf wme
+	
+	bool wme_kids;								// does the cue wme have children (indicative of leaf wme status)
 	epmem_shared_literal_group *children;		// grouped child literals, if not leaf wme
+
+	epmem_shared_match *match;					// associated match, if leaf wme	
 };
 
 // pair in the sense of (debug info, actual literal)
