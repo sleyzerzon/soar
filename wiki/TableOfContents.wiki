@@ -8,5 +8,6 @@
   * [CommandLineInterface Command Line Help]
   * [Developers Developers]
     * [Build Checkout and Build Procedure]
+    * [UsingElementXML Using ElementXML]
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
