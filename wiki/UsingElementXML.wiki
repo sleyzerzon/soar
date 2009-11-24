@@ -1,0 +1,53 @@
+#summary ElementXML Notes
+
+Consider the following XML file:
+
+{{{
+<alpha>
+  <bravo uno="1" dos="two"></bravo>
+  <charlie></charlie>
+</alpha>
+}}}
+
+Here is one way to parse it (missing some error handling code):
+{{{
+import sml.ElementXML;
+...
+ElementXML rootTag = ElementXML.ParseXMLFromFile(theFileName);
+if (rootTag == null) {
+  throw new Exception("Error parsing file: " + ElementXML.GetLastParseErrorDescription());
+}
+
+if (rootTag.IsTag("alpha")) {
+
+  ElementXML mainTag = null;
+  for (int rootTagIndex = 0 ; rootTagIndex < rootTag.GetNumberChildren() ; ++rootTagIndex) {
+
+    mainTag = new ElementXML();
+    rootTag.GetChild(mainTag, rootTagIndex);
+
+    if (mainTag.IsTag("bravo")) {
+
+      for (int attrIndex = 0; attrIndex < foodTypeTag.GetNumberAttributes(); ++attrIndex) {
+
+        String attribute = foodTypeTag.GetAttributeName(attrIndex);
+        String value = foodTypeTag.GetAttributeValue(attrIndex);
+
+        if (attribute.equalsIgnoreCase("uno")) {
+          // yada
+        } else if (attribute.equalsIgnoreCase("dos")) {
+          // yada
+        }
+      }
+    } else if (mainTag.IsTag("charlie")) {
+      // yada
+    }
+
+    mainTag.delete(); // we own these tags (created using new)
+    mainTag = null;
+  }
+} 
+
+rootTag.ReleaseRefOnHandle(); // we do not own this tag (created using factory)
+rootTag = null;
+}}}
