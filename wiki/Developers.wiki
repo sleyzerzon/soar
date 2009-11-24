@@ -1,0 +1,3 @@
+#summary Resources for Soar kernel and interface developers
+
+[Build Checkout and Build procedure] 
