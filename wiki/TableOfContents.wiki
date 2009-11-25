@@ -6,6 +6,8 @@
   * [Publications]
   * [FAQ]
   * [CommandLineInterface Command Line Help]
+  * [ProgrammingSoar Programming Soar]
+    * [SoarDogma Soar Dogma]
   * [Environments]
     * [AprilSoar April Soar]
     * [room Room Environment]
