@@ -1,0 +1,8 @@
+#summary Soar Environments
+
+  * April Soar, Splinter, Robotics
+  * Room Environment
+  * Soar2D
+  * MissionLab
+  * Microsoft Robotics Studio
+  * USARSim
