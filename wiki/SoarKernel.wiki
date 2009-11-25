@@ -190,3 +190,156 @@ of date terminology."
   * Explain transitive closure and tc_num
   * What all the Soar kernel STL-like data structures are (e.g. lists, hash tables, growable strings, others?) and how to use them.
   * Ref counting (link to [[Development/Memory Leaks|Tracking down memory leaks]])
+
+
+= Old Kernel TODO/BUGBUG audit =
+
+== TODOs ==
+
+{{{
+agent.cpp:405:     TODO: Not clear why callbacks need to take the agent pointer essentially twice.
+
+init_soar.cpp:1650:    // TODO: Make sure that this ifdef is neccessary for the timeing code
+
+rhsfun.cpp:647:   /* TODO: We need a serious reference counting audit of the kernel But I think
+}}}
+
+== BUGBUGs ==
+
+{{{
+agent.h:59:/* RBD BUGBUG more comments here, or should this stuff be here at all? */
+   some #define's for enums -- might want to fix this...
+
+backtrace.h:46: /* RBD BUGBUG more comments here */ 
+   changed to "NOTE"
+
+chunk.cpp:57:   "next_result" field of the preference structures.  (BUGBUG: to save space 
+   Old comment to use a cons to store result.  Changed "BUGBUG" to "NOTE"
+
+chunk.h:23:/* RBD BUGBUG more comments here */ 
+   regarding #defs for CHUNK_COND_TABLE sizes.  could add comments, or move def's
+
+decide.cpp:791:  BUGBUG There is a problem here:  since the require/acceptable priority <br>
+decide.cpp:1765:   potentially break some code, but it avoids the BUGBUG condition
+   First comment anticipates the case where a WME has multiple prefs where REQUIRE is
+   lower in the goalstack than an ACCEPTABLE, the stack gets popped, but the pref is
+   referencing the defunct REQUIRE instead of the ACCEPTABLE.  The second comment refers
+   to a code change in fake instantiations, changing the pref from REQUIRE to ACCEPTABLE,
+   so as not to create the potential bug situation.   This is a tricky part of the code,
+   so I left the BUGBUGs as is.
+
+decide.cpp:3514:       BUGBUGBUG 
+   This occurs in probabilistically_select routine, which was implemented for 
+   NUMERIC_INDIFFERENCE mode.  Refers to need for error checking.
+
+explain.cpp:272:  /* BUGBUG *** shouldn't have user interface stuff in kernel!! */ 
+   yeah, right.  This is noting a place where info is printed to the user.  changed to bug noted:
+
+explain.h:77:/* BUGBUG ms changes only really need tok (the tok from the p-node) 
+   The ms_change_struct has pointers to both 'tok' and 'wme' and the comment says
+   don't need both, but would have to change firer code.  We can live with as is.
+
+lexer.cpp:52: *  BUGBUG There are still problems with Soar not being very friendly 
+   Not a specific bug, just a comment that more support for users could be coded;  
+   eg: balanced parens, bugs in productions, etc.  Maybe the clients can help...
+
+lexer.cpp:369:/* --- BUGBUG: these routines are here because the ANSI routine strtod() isn't <br>
+lexer.cpp:376:  /* BUGBUG without ANSI's strtod(), there's no way to check for floating
+   These are some compiler-def'd checks for string support for strtod and strtoul
+
+lexer.cpp:760:      /* BUGBUG if reading from top level, don't want to signal EOF */  <br>
+lexer.cpp:789:      /* BUGBUG if reading from top level, don't want to signal EOF */ 
+  in lex_vbar and lex_quote, this is a comment that we might incorrectly signal an EOF
+  when we shouldn't.  This is a VERY old comment and doesn't seem to have been a problem.
+
+lexer.cpp:1167:  BUGBUG: if the input line contains any tabs, the pointer comes out in 
+  this is in print_location_of_most_recent_lexeme, which aids in debugging productions
+  that can't be processed due to some error.  Not a critical bug...
+
+osupport.cpp:256:   BUGBUG the code does a check of whether the lhs tests the match state via 
+  pertains to longtime code for runtime o-support calculations
+
+osupport.cpp:350:	   BUGBUG this check only looks at positive conditions.  we
+  not an actual known bug, just anticipating that possibly ignoring negations could
+  yield in this calculation, although it is assumed that any such production would get
+  i-support
+
+osupport.cpp:573:	   BUGBUG: this is not fully general; it does not rule out assiging
+  SBH (Scott Huffman comment?) in section where calculating runtime o-support for
+  operators, operator acceptable prefs are explicitly ruled out, but BUGBUG notes that
+  it is not done in fully general way.  An example is provided.
+  -- This is old code, so leave until future explorations of o-support
+
+osupport.cpp:674:    /* BUGBUG With Doug's scheme, o_support_tc no longer needs to be a 
+  a global agent variable o_support_tc could possibly be declared only locally.
+
+osupport.cpp:777:   BUGBUG should follow ^object links up the goal stack if possible
+  in find_known_goals.  routine finds variables that are certain to be bound to goals, 
+  but doesn't follow any ^objects up the goal stack.  old code.
+
+prefmem.cpp:15: *  BUGBUG  need some comments here
+  changed to NOTE:    Problem is no header or file comments included...
+
+prefmem.cpp:110:  /* BUGBUG check to make sure the pref doesn't have
+  in make_preference, the comment specifies that should check value or referent
+  to make sure doesn't have .isa_goal or .isa_impasse.  hmmm, ok thus far...
+
+prefmem.cpp:335:  pref->slot = NIL;      /* BUGBUG use pref->slot in place of pref->in_tm? *?
+  in remove_preference_from_tm.  need to investigate before changing.  not a problem?
+  removed bugbug, left comment
+
+print.cpp:173:    /* BUGBUG doesn't handle tabs correctly */ 
+  in print_string, only if #ifdef __SC__, mishandles /t when setting printer_output_column
+
+print.cpp:514:      /* BUGBUG if in context where id's could occur, should check possible id_flag
+  in symbol_to_string when converting SYM_CONSTANT_SYMBOL_TYPE.  old issue, not sure if problem
+
+print.h:200:extern void print_list_of_conditions(agent* thisAgent, condition *cond); /* BUGBUG comments */ 
+  note to programmer to add comments.  deleted it.
+
+production.h:50:      OPERAND_which_assert_list: (BUGBUG need info from REW or RCHONG) 
+  variable in a struct which has no associated comments.  removed BUGBUG, left note.
+
+recmem.cpp:198:   (BUGBUG I'm not sure this is really needed.)
+  instantiate_rhs_value might have an extraneous parameter in arg list.  removed BUGBUG
+  but left comment
+
+recmem.h:47:/* RBD BUGBUG more comments here */
+  somehow, I don't think Bob Doorenbos intends to add more comments at this point. removed.
+
+reorder.cpp:16: *  BUGBUG comments here
+  in head of file, no comments or description.  removed BUGBUG, left note.
+
+reorder.cpp:850:      /* BUGBUG I'm not sure whether this can ever happen. */
+  in reorder_simplified_conditions (code I've NEVER had occasion to look at!) this is
+  a test to see if some LHS conditions are not connected, which may not be possible.  old code.
+
+reorder.cpp:1059:    /* BUGBUG most people aren't going to understand this error message */
+  in reorder_lhs.  I've never heard of people even SEEING this error message.  old code. left alone
+
+reorder.h:8:   BUGBUG comments here
+  in head of file, no comments or description.  removed BUGBUG, left note.
+
+rete.cpp:3509:   BUGBUG should we check for duplicate justifications?
+  pertains to add_production_to_rete.  valid comment, left alone.
+ 
+rete.cpp:4104:/* BUGBUG clean this procedure up somehow? */
+  pertains to rete_node_to_conditions, which is a lot if nested if-then stmts.
+  old code.  left alone.  (LOTS of other code could be cleaned up first...)
+
+rete.cpp:5601:  BUGBUG i haven't tested this with a production that has more than
+  found in p_node_left_addition.  Comment left from RChong code for Operand, but not
+  sure if still applies to Operand 2 (Soar 8), but I'll bet it does.  Left alone for now.
+  Might ask Bob Wray to review it.  Or Ron.  applies when determining whether a match is IE or PE
+
+rete.cpp:5675:			BUGBUG this check only looks at positive conditions.  we
+  same section of code, determining support for a match.  here, we're looking at prods
+  that aren't operator proposals to see how to classify them
+
+rete.cpp:5851:/* BUGBUG shouldn't need to pass in both tok and w -- should have the
+  in p_node_left_removal, could possibly pass one less arg.  left alone.
+
+rhsfun_math.cpp:16: *  BUGBUG more comments here.  Nothing in soarkernel.h either.
+  in head of file, no comments or description.  removed BUGBUG, left note.
+}}}
+
