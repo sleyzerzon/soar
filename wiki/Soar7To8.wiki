@@ -1,4 +1,4 @@
-﻿#summary One-sentence summary of this page.
+﻿#summary Changes to make to Soar 7 programs so that they run under Soar 8
 
 = List of changes required in upgrading from Soar 7 to Soar 8. ==
 
@@ -82,4 +82,3 @@ In the section on the new decision cycle, we should indicate that
 the TSI includes a facility to allow users to stop after the decision
 phase.  We could also include the info needed to set up callbacks 
 after the decision phase.
-
