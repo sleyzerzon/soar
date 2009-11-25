@@ -1,7 +1,47 @@
-#summary Big picture of what folders are some files are for in the Soar project source code.
+#summary Repository Layout
 #labels Phase-Requirements
 
-Note: This is written for the reorganization and may not yet reflect the trunk.
+Browse the repository [http://code.google.com/p/soar/source/browse here].
 
-  * soar-java
-    * Soar Java tools, environments, and examples.
+= Top Level =
+
+  * `trunk`: The main line of development for Soar projects. Most people work directly on the trunk.
+  * `branches`: New major features and experimental ideas go here, originally copied from the trunk. Disruptive stuff. Some of it never makes it back to the trunk.
+  * `tags`: Milestones such as releases or snapshots before major refactoring get copied here for future reference. 
+  * `wiki`: The wiki pages are stored here with extension .wiki. No support for folders is available at the time of writing. More help is [http://code.google.com/p/support/wiki/WikiSyntax here].
+
+= trunk/SoarSuite =
+
+The main "stable" kernel. Recently reorganized, probably getting reorganized again soon, so this documentation may be a bit old. Quickly:
+
+  * `Core`: The "core" components of Soar, needed by most configurations. The most controversial pieces here are the SWIG projects. Moving these out and grouping them with other utilities in their languages is possible in the future.
+    * `CLI`: Command line interface component of KernelSML. 
+    * `ClientSML`: The client-side Soar interface, mirrors a lot of what happens on the Kernel side. This is where SML is implemented from the environment's perspective.
+    * `ClientSMLSWIG`: Projects that use SWIG to generate a bridge between ClientSML and various supported languages.
+    * `ConnectionSML`: A utility library used on both sides (client and kernel) of SML and in various other places in the code. Originally was only dealing with connections between client and kernel, but also contains many other things that need to be seen by both sides of SML, such as threading and synchronization code, string constants, utility functions, etc. The SoarKernel itself does not reference ConnectionSML.
+    * `ElementXML`: A custom, lightweight XML library tailored for the Soar markup language (SML).
+    * `KernelSML`: The kernel side of SML, interfaces with the SoarKernel directly or via the command line interface. Handles agent scheduling, mapping of client-side identifiers and timetags to kernel-side. Fires many events that don't exist in the kernel.
+    * `SoarKernel`: The core Soar kernel.
+    * `Tests`: Unit tests for Core projects, uses CPPUNIT. This could change.
+    * `pcre`: A BSD-licensed regular expression library required on Windows.
+    * `shared`: Header-only global code intended to be shared by all projects. Portability issues are dealt with here, along with useful header-only library code for everyone, including the Soar kernel.
+  * `Documentation`: Sources for much documentation are stored here, along with a pdf rendering of the Soar manual. Much of this is out of date and should be moved online.
+  * `SoarLibrary`: Runtime resource folder for Soar, holds executables, libraries, demo code, other resources.
+    * `CLIHelp`: Help text files, likely will change.
+    * `Demos`: Example Soar agents.
+    * `Tests`: Soar code used for testing.
+    * `bin`: Output folder for binaries, dlls, jars, other resources. Working directory for many binaries.
+    * `lib`: Output folder for libraries, jars, other resources. Needs to be on library loader path on unix systems.
+  * `Tools`: Mostly C++ tools, example environments, and utilities. Arguably should be called `soar-cpp` or something.
+    * `FilterC`: TODO
+    * `LoggerWinC`: A logging client application. When running Soar, this can be used to connect to a running kernel, gathering and logging data without any other clients being aware of it.
+    * `QuickLink`: TODO: post docs
+    * `SoarTextIO`: TODO: post docs
+    * `TOHSML`: An example SML environment using SML's native C++ interface.
+    * `TestCLI`: A simple command line Soar debugger, initially created to simply test the command line but usable as a lightweight debugger.
+    * `TestExternalLibraryLib`: An example library for the load-library command.
+    * `TestSMLEvents`: Interactive event testing for SML.
+    * `TestSMLPerformance`: Automatic performance test.
+    * `TestSoarPerformance`: Automatic performance test.
+    * `vimplugin`: TODO: jzxu
+  * `soar-csharp`: 
