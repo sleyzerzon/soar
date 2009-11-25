@@ -1,5 +1,5 @@
-#summary Repository Layout
 #labels Phase-Requirements
+ #summary Repository Layout
 
 Browse the repository [http://code.google.com/p/soar/source/browse here].
 
@@ -10,7 +10,11 @@ Browse the repository [http://code.google.com/p/soar/source/browse here].
   * `tags`: Milestones such as releases or snapshots before major refactoring get copied here for future reference. 
   * `wiki`: The wiki pages are stored here with extension .wiki. No support for folders is available at the time of writing. More help is [http://code.google.com/p/support/wiki/WikiSyntax here].
 
-= trunk/SoarSuite =
+= `SoarSuite` =
+
+{{{
+trunk/SoarSuite
+}}}
 
 The main "stable" kernel. Recently reorganized, probably getting reorganized again soon, so this documentation may be a bit old. Quickly:
 
@@ -44,4 +48,70 @@ The main "stable" kernel. Recently reorganized, probably getting reorganized aga
     * `TestSMLPerformance`: Automatic performance test.
     * `TestSoarPerformance`: Automatic performance test.
     * `vimplugin`: TODO: jzxu
-  * `soar-csharp`: 
+  * `soar-csharp`: CSharp projects.
+  * `soar-java`: Java projects.
+    * `soar-debugger`: The Soar Java debugger.
+    * `soar-loggerjava`: Logger application similar to LoggerWinC above but implemented in Java.
+    * `soar-missionaries`: Missionaries and Cannibals example SML environment.
+    * `soar-smljava`: Utility library for shared code within Java projects. Recently added so quite small.
+    * `soar-soar2d`: Soar2D project.
+    * `soar-toh`: Towers of Hanoi example SML environment.
+    * `soar-visualsoar`: The VisualSoar editor.
+  * `soar-python`: Python projects.
+  * `soar-tcl`: Tcl projects.
+
+= `nlderbin-wma-epmem` =
+
+{{{
+branches/nlderbin-wma-epmem
+}}}
+
+Episodic memory branch, source of 9.1 series of releases. Branched from `trunk/SoarSuite` (originally branched from a working memory activation branch).
+
+= `nlderbin-epmem-smem` =
+
+{{{
+branches/nlderbin-epmem-smem
+}}}
+
+Semantic memory branch, source of 9.2 series of releases. Branched from `nlderbin-wma-epmem`.
+
+= `aprilsoar` =
+
+{{{
+trunk/aprilsoar
+}}}
+
+Projects using software from [http://april.eecs.umich.edu April]. Has it's own page [AprilSoar here].
+
+= `SoarPre8.6` =
+
+{{{
+trunk/SoarPre8.6
+}}}
+
+This is an archive of the 8.5.x kernel. Goes back pretty far.
+
+= `SoarWorkshop` =
+
+{{{
+trunk/SoarWorkshop
+}}}
+
+Old Soar Workshop web stuff.
+
+= `buildbot` =
+
+{{{
+trunk/buildbot
+}}}
+
+Holds configuration files for buildbot system, but not current ones. The current config files need to be stored here TODO.
+
+= `msr` = 
+
+{{{
+trunk/msr
+}}}
+
+Soar and Microsoft Robotics Studio environment. Old.
