@@ -1,214 +1,250 @@
-#summary Symbols in the Soar Kernel
+﻿#summary Symbols in the Soar Kernel
 
-=Introduction=
-Symbols are the basic elements used in the kernel.  For example, a WME has 3 Symbols: identifier, attribute, and value.  The name of a productions is also a Symbol.  And so on.  The kernel defines 5 kinds of Symbols:
+= Introduction =
 
-{| border="1"
-|-
-! Type
-! Description
-|-
-| identifier || A capital letter and a number
-|-
-| sym_constant || A string constant
-|-
-| int_constant || An integer constant
-|-
-| float_constant || A floating-point constant
-|-
-| variable || Used to represent variables in conditions and actions
-|}
+Symbols are the basic elements used in the kernel.  For example, a WME has 3
+Symbols: identifier, attribute, and value.  The name of a productions is also a
+Symbol.  And so on.  The kernel defines 5 kinds of Symbols:
+
+|| *Type* || *Description* ||
+|| identifier || A capital letter and a number ||
+|| sym_constant || A string constant ||
+|| int_constant || An integer constant ||
+|| float_constant || A floating-point constant ||
+|| variable || Used to represent variables in conditions and actions ||
 
 = Kernel Implementation =
-The implementation was designed for C (so no classes) and for speed.  Basically, each kind of symbol is defined as a structure, and then all of the structures are put together in a union:
 
- typedef union symbol_union {
-   variable var;
-   identifier id;
-   sym_constant sc;
-   int_constant ic;
-   float_constant fc;
- } Symbol;
+The implementation was designed for C (so no classes) and for speed.
+Basically, each kind of symbol is defined as a structure, and then all of the
+structures are put together in a union:
 
-Each symbol type shares some common information, which is defined in the common_symbol_data structure.  Note that some of this in unnecessary for a basic implementation (i.e., the decider and fastsave/load stuff):
+{{{
+typedef union symbol_union {
+  variable var;
+  identifier id;
+  sym_constant sc;
+  int_constant ic;
+  float_constant fc;
+} Symbol;
+}}}
 
- typedef struct symbol_common_data_struct {
-   union symbol_union *next_in_hash_table;  /* next item in hash bucket */
-   unsigned long reference_count;
-   byte symbol_type;                /* one of the above xxx_SYMBOL_TYPE's */
-   byte decider_flag;               /* used only by the decider */
-   union a_union {
-     struct wme_struct *decider_wme;  /* used only by the decider */
-     unsigned long retesave_symindex; /* used for rete fastsave/fastload */
-   } a;
-   unsigned long hash_id;           /* used for hashing in the rete */
- } symbol_common_data;
+Each symbol type shares some common information, which is defined in the
+common_symbol_data structure.  Note that some of this in unnecessary for a
+basic implementation (i.e., the decider and fastsave/load stuff):
 
-For each symbol type's structure, this structure is the first member.  That way, no matter what kind of symbol it is, these common members can be accessed uniformly without needing to know the symbol type ahead of time.
+{{{
+typedef struct symbol_common_data_struct {
+  union symbol_union *next_in_hash_table;  /* next item in hash bucket */
+  unsigned long reference_count;
+  byte symbol_type;                /* one of the above xxx_SYMBOL_TYPE's */
+  byte decider_flag;               /* used only by the decider */
+  union a_union {
+    struct wme_struct *decider_wme;  /* used only by the decider */
+    unsigned long retesave_symindex; /* used for rete fastsave/fastload */
+  } a;
+  unsigned long hash_id;           /* used for hashing in the rete */
+} symbol_common_data;
+}}}
 
-Below are the definitions of the various kinds of symbols.  Note that, as far as I know, the actual symbol value itself (e.g., the string, integer, etc.) is intended to be write-once:  
+For each symbol type's structure, this structure is the first member.  That
+way, no matter what kind of symbol it is, these common members can be accessed
+uniformly without needing to know the symbol type ahead of time.
 
- typedef struct sym_constant_struct {
-   symbol_common_data common_symbol_info;
-   char *name;
-   struct production_struct *production;  /* NIL if no prod. has this name */
- } sym_constant;
+Below are the definitions of the various kinds of symbols.  Note that, as far
+as I know, the actual symbol value itself (e.g., the string, integer, etc.) is
+intended to be write-once:  
 
- typedef struct int_constant_struct {
-   symbol_common_data common_symbol_info;
-   long value;
- } int_constant;
+{{{
+typedef struct sym_constant_struct {
+  symbol_common_data common_symbol_info;
+  char *name;
+  struct production_struct *production;  /* NIL if no prod. has this name */
+} sym_constant;
 
- typedef struct float_constant_struct {
-   symbol_common_data common_symbol_info;
-   double value;
- } float_constant;
+typedef struct int_constant_struct {
+  symbol_common_data common_symbol_info;
+  long value;
+} int_constant;
 
- typedef struct variable_struct {
-   symbol_common_data common_symbol_info;
-   char *name;
-   tc_number tc_num;
-   union symbol_union *current_binding_value;
-   unsigned long gensym_number;
-   list *rete_binding_locations;
- } variable;
+typedef struct float_constant_struct {
+  symbol_common_data common_symbol_info;
+  double value;
+} float_constant;
 
-The identifier structure is the most complex.  Note that most of the structure is used to assist various other aspects of the implementation of Soar; the core aspects of the identifier are really just the first 3 members.  Also note that a "dll" is a "doubly-linked list":
+typedef struct variable_struct {
+  symbol_common_data common_symbol_info;
+  char *name;
+  tc_number tc_num;
+  union symbol_union *current_binding_value;
+  unsigned long gensym_number;
+  list *rete_binding_locations;
+} variable;
+}}}
 
- /* Note: I arranged the fields below to try to minimize space */
- typedef struct identifier_struct {
-   symbol_common_data common_symbol_info;
-   unsigned long name_number;
-   char name_letter;
- 
-   Bool isa_goal;        /* TRUE iff this is a goal identifier */
-   Bool isa_impasse;     /* TRUE iff this is an attr. impasse identifier */
- 
-   Bool did_PE;   /* RCHONG: 10.11 */
- 
-   unsigned short isa_operator;
- 
-   Bool allow_bottom_up_chunks;
- 
-   /* --- ownership, promotion, demotion, & garbage collection stuff --- */
-   Bool could_be_a_link_from_below;
-   goal_stack_level level;
-   goal_stack_level promotion_level;
-   unsigned long link_count;
-   dl_cons *unknown_level;
- 
-   struct slot_struct *slots;  /* dll of slots for this identifier */
-   tc_number tc_num;           /* used for transitive closures, marking, etc. */
-   union symbol_union *variablization;  /* used by the chunker */
- 
-   /* --- fields used only on goals and impasse identifiers --- */
-   struct wme_struct *impasse_wmes;
- 
-   /* --- fields used only on goals --- */
-   union symbol_union *higher_goal, *lower_goal;
-   struct slot_struct *operator_slot;
-   struct preference_struct *preferences_from_goal;
- 
-   union symbol_union *reward_header;		// pointer to reward_link
-   struct rl_data_struct *rl_info;			// various Soar-RL information
- 
-   /* REW: begin 09.15.96 */
-   struct gds_struct *gds;    /* Pointer to a goal's dependency set */
-   /* REW: begin 09.15.96 */
- 
-   /* REW: begin 08.20.97 */
-   int saved_firing_type;     /* FIRING_TYPE that must be restored if Waterfall
+The identifier structure is the most complex.  Note that most of the structure
+is used to assist various other aspects of the implementation of Soar; the core
+aspects of the identifier are really just the first 3 members.  Also note that
+a "dll" is a "doubly-linked list":
+
+{{{
+/* Note: I arranged the fields below to try to minimize space */
+typedef struct identifier_struct {
+  symbol_common_data common_symbol_info;
+  unsigned long name_number;
+  char name_letter;
+
+  Bool isa_goal;        /* TRUE iff this is a goal identifier */
+  Bool isa_impasse;     /* TRUE iff this is an attr. impasse identifier */
+
+  Bool did_PE;   /* RCHONG: 10.11 */
+
+  unsigned short isa_operator;
+
+  Bool allow_bottom_up_chunks;
+
+  /* --- ownership, promotion, demotion, & garbage collection stuff --- */
+  Bool could_be_a_link_from_below;
+  goal_stack_level level;
+  goal_stack_level promotion_level;
+  unsigned long link_count;
+  dl_cons *unknown_level;
+
+  struct slot_struct *slots;  /* dll of slots for this identifier */
+  tc_number tc_num;           /* used for transitive closures, marking, etc. */
+  union symbol_union *variablization;  /* used by the chunker */
+
+  /* --- fields used only on goals and impasse identifiers --- */
+  struct wme_struct *impasse_wmes;
+
+  /* --- fields used only on goals --- */
+  union symbol_union *higher_goal, *lower_goal;
+  struct slot_struct *operator_slot;
+  struct preference_struct *preferences_from_goal;
+
+  union symbol_union *reward_header;		// pointer to reward_link
+  struct rl_data_struct *rl_info;			// various Soar-RL information
+
+  /* REW: begin 09.15.96 */
+  struct gds_struct *gds;    /* Pointer to a goal's dependency set */
+  /* REW: begin 09.15.96 */
+
+  /* REW: begin 08.20.97 */
+  int saved_firing_type;     /* FIRING_TYPE that must be restored if Waterfall
  				processing returns to this level.
- 				See consistency.cpp */
-   struct ms_change_struct *ms_o_assertions; /* dll of o assertions at this level */
-   struct ms_change_struct *ms_i_assertions; /* dll of i assertions at this level */
-   struct ms_change_struct *ms_retractions;  /* dll of retractions at this level */
-   /* REW: end   08.2097 */
- 
-   /* --- fields used for Soar I/O stuff --- */
-   list *associated_output_links;
-   struct wme_struct *input_wmes;
- 
-   int depth; /* used to track depth of print (bug 988) RPM 4/07 */
- } identifier;
+				See consistency.cpp */
+  struct ms_change_struct *ms_o_assertions; /* dll of o assertions at this level */
+  struct ms_change_struct *ms_i_assertions; /* dll of i assertions at this level */
+  struct ms_change_struct *ms_retractions;  /* dll of retractions at this level */
+  /* REW: end   08.2097 */
+
+  /* --- fields used for Soar I/O stuff --- */
+  list *associated_output_links;
+  struct wme_struct *input_wmes;
+
+  int depth; /* used to track depth of print (bug 988) RPM 4/07 */
+} identifier;
+}}}
 
 = C++-ifying Symbols =
-Why change Symbol?  The primary reasons are type safety (nothing enforces getting the right type out of a symbol) and maintainability (very few incoming grad students know what a union is, none of the functionality is packaged with the data, etc.)
 
-Ideally, we would improve the maintainability while keep all or nearly all of the performance.  Some implementation options include: unions, class hierarchy, static polymorphism, and boost::variant.
+Why change Symbol?  The primary reasons are type safety (nothing enforces
+getting the right type out of a symbol) and maintainability (very few incoming
+grad students know what a union is, none of the functionality is packaged with
+the data, etc.)
 
-{| border="1"
-|-
-! Implementation Style
-! Speed
-! Maintainability
-|-
-| union 
-| fast
-| type unsafe
-|-
-| class hierarchy 
-| slow
-| runtime type safety
-|-
-| static polymorphism 
-| fast
-| compile-time type safety?, requires templates
-|-
-| boost::variant 
-| fast
-| compile-time type safety?, requires templates
-|}
+Ideally, we would improve the maintainability while keep all or nearly all of
+the performance.  Some implementation options include: unions, class hierarchy,
+static polymorphism, and boost::variant.
 
-Below are some brief thoughts/descriptions of various approaches.  Ideally, each of these could be expanded into a full example that supports the basic Symbol stuff (i.e., the value) and demonstrates how it would be used (both pros and cons).  Some kind of performance measurement would be good as well (e.g., setting/getting the Symbol values in a loop).
+|| Implementation Style || Speed || Maintainability ||
+|| union || fast || type unsafe ||
+|| class hierarchy  || slow || runtime type safety ||
+|| static polymorphism  || fast || compile-time type safety?, requires templates ||
+|| boost::variant  || fast || compile-time type safety?, requires templates ||
+
+Below are some brief thoughts/descriptions of various approaches.  Ideally,
+each of these could be expanded into a full example that supports the basic
+Symbol stuff (i.e., the value) and demonstrates how it would be used (both pros
+and cons).  Some kind of performance measurement would be good as well (e.g.,
+setting/getting the Symbol values in a loop).
 
 == union ==
-Even if we stick with the current style, the syntax can be cleaned up a bit since we're in C++ now.  In particular, the typedefs can be removed, so that, e.g., identifier_struct can just be identifer, and symbol_union can just be Symbol.  That would make the code a bit more readable.
 
-Also, in C++, unions can have public/protected/private member functions (although they cannot participate in a class hierarchy).
+Even if we stick with the current style, the syntax can be cleaned up a bit
+since we're in C++ now.  In particular, the typedefs can be removed, so that,
+e.g., identifier_struct can just be identifer, and symbol_union can just be
+Symbol.  That would make the code a bit more readable.
+
+Also, in C++, unions can have public/protected/private member functions
+(although they cannot participate in a class hierarchy).
 
 == class hierarchy ==
-A class hierarchy might take the form of an abstract base class with subclasses for each type:
 
- class Symbol {
- };
- 
- class IntSymbol : Symbol {
- public:
-   long m_Symbol;
- }
- 
- ...
+A class hierarchy might take the form of an abstract base class with subclasses
+for each type:
 
-If virtual functions are used, this can be slow and use more memory because the vtable must be traversed and stored.  Additionally, dynamic downcasting may be required, which means there can be runtime failures.
+{{{
+class Symbol {
+};
+
+class IntSymbol : Symbol {
+public:
+  long m_Symbol;
+}
+
+...
+}}}
+
+If virtual functions are used, this can be slow and use more memory because the
+vtable must be traversed and stored.  Additionally, dynamic downcasting may be
+required, which means there can be runtime failures.
 
 == static polymorphism ==
-[http://en.wikipedia.org/wiki/Template_metaprogramming#Static_polymorphism Static polymorphism] is designed to mimic a class hierarchy, but it uses templates to generate everything as static casts, which avoids (at least some of) the runtime performance issues associated with a standard class hierarchy.  For example, there are no virtual functions, and thus no virtual tables to store and traverse.
+
+[http://en.wikipedia.org/wiki/Template_metaprogramming#Static_polymorphism
+Static polymorphism] is designed to mimic a class hierarchy, but it uses
+templates to generate everything as static casts, which avoids (at least some
+of) the runtime performance issues associated with a standard class hierarchy.
+For example, there are no virtual functions, and thus no virtual tables to
+store and traverse.
 
 The general pattern looks like this:
 
- template <class Derived>
- struct base
- {
-   void interface()
-   {
-     // ...
-     static_cast<Derived*>(this)->implementation();
-     // ...
-   }
- };
- 
- struct derived : base<derived>
- {
-   void implementation();
- };
+{{{
+template <class Derived>
+struct base
+{
+  void interface()
+  {
+    // ...
+    static_cast<Derived*>(this)->implementation();
+    // ...
+  }
+};
 
-Unfortunately, as this uses templates, the compiler error messages can be difficult to understand.
-It also isn't clear to me how to actually use these (e.g., is dynamic casting still required?  For what kinds of manipulations must the type be known?)
+struct derived : base<derived>
+{
+  void implementation();
+};
+}}}
+
+Unfortunately, as this uses templates, the compiler error messages can be
+difficult to understand.  It also isn't clear to me how to actually use these
+(e.g., is dynamic casting still required?  For what kinds of manipulations must
+the type be known?)
 
 == boost::variant ==
-[http://www.boost.org/doc/libs/1_35_0/doc/html/variant.html boost::variant] is a safe (downcast errors are detected at compile time) alternative to unions that supports user-defined types instead of just POD types.  We might use it like this:
 
- typedef boost::variant< variable, identifier, sym_constant int_constant float_constant > Symbol;
+[http://www.boost.org/doc/libs/1_35_0/doc/html/variant.html boost::variant] is
+a safe (downcast errors are detected at compile time) alternative to unions
+that supports user-defined types instead of just POD types.  We might use it
+like this:
 
-The problem is that it uses templates heavily, so compile errors can be incomprehensible (perhaps this will be improved in C++0x).
+{{{
+typedef boost::variant< variable, identifier, sym_constant int_constant float_constant > Symbol;
+}}}
+
+The problem is that it uses templates heavily, so compile errors can be
+incomprehensible (perhaps this will be improved in C++0x).
+
