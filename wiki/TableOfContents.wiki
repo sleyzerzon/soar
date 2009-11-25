@@ -8,6 +8,7 @@
   * [CommandLineInterface Command Line Help]
   * [ProgrammingSoar Programming Soar]
     * [SoarDogma Soar Dogma]
+    * [Soar7To8 Soar 7 to Soar 8 Conversion]
   * [Environments]
     * [AprilSoar April Soar]
     * [room Room Environment]
