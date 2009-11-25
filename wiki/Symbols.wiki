@@ -202,8 +202,7 @@ required, which means there can be runtime failures.
 
 == static polymorphism ==
 
-[http://en.wikipedia.org/wiki/Template_metaprogramming#Static_polymorphism
-Static polymorphism] is designed to mimic a class hierarchy, but it uses
+Static polymorphism ([http://en.wikipedia.org/wiki/Template_metaprogramming#Static_polymorphism link]) is designed to mimic a class hierarchy, but it uses
 templates to generate everything as static casts, which avoids (at least some
 of) the runtime performance issues associated with a standard class hierarchy.
 For example, there are no virtual functions, and thus no virtual tables to
@@ -247,4 +246,3 @@ typedef boost::variant< variable, identifier, sym_constant int_constant float_co
 
 The problem is that it uses templates heavily, so compile errors can be
 incomprehensible (perhaps this will be improved in C++0x).
-
