@@ -7,7 +7,9 @@
 Here's a list of terms and abbreviations used in the source code of the Soar
 kernel whose meanings might not be obvious.
 
+----
 *slot*
+
 From John Laird: 
 
  We used to select more than just the operator (state, problem space, and goal)
@@ -23,15 +25,18 @@ have multiple slots, which can be accessed via the `prev` and `next` fields
 in the slot structure. Operator preferences are held in `context` slots,
 which are identified by the isa_context_slot flag.
 
+----
 *tc*
 
 transitive closure
 
+----
 *match goal*
 
 The lowest goal (biggest number after the "S") that an instantiation of the LHS
 of a production matches on. Part of the instantiation structure.
 
+----
 *potential* (backtracing) 
 
 condition whose id is instantiated on a symbol linked from both the current
@@ -59,10 +64,12 @@ sp {example
 
 then `(<b> ^baz <z>)` would be a potential condition.
 
+----
 *potential* (life)
 
 abstract invented concept that actually has no real meaning
 
+----
 *tm*
 
 temporary memory. I believe that any preference that is currently valid in Soar
@@ -72,6 +79,7 @@ taken out of temporary memory (which involves setting the `in_tm` flag to
 false, and taking them off the `preferences` array and `all_preferences`
 lists on the slot they're on).
 
+----
 *clone* (preference)
 
 a copy of a preference that is the result of a subgoal. While the inst pointer
@@ -80,16 +88,19 @@ in the subgoal to create the result, the inst pointer of the clone points to
 the newly created chunk or justification. Therefore, the preference and its
 clone exist on different match goals, and hence different match goal levels.
 
+----
 *instantiation*
 
 a particular match of a production in working memory, and the preferences
 generated
 
+----
 *DEBUG_MEMORY*
 
 if this flag is defined, the contents of freed memory locations in the memory
 pools are memset to 0xBB
 
+----
 = Old Soar Kernel Code Guide =
 
 No, really, this page is under development. --Karen 12:25, 13 Feb 2007 (EST)
@@ -179,4 +190,3 @@ of date terminology."
   * Explain transitive closure and tc_num
   * What all the Soar kernel STL-like data structures are (e.g. lists, hash tables, growable strings, others?) and how to use them.
   * Ref counting (link to [[Development/Memory Leaks|Tracking down memory leaks]])
-
