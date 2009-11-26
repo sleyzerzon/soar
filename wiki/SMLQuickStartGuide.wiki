@@ -38,8 +38,8 @@ Windows) are:
   * Static libraries: ClientSML.lib, ElementXML.lib and ConnectionSML.lib
   * Shared libraries (dynamically loaded): SoarKernelSML.dll, ElementXML.dll.
 
-Also if youre working in Java you need !Java_sml_ClientInterface.dll, in Tcl
-youd need !Tcl_sml_ClientInterface.dll.  You get the idea.
+Also if youre working in Java you need `Java_sml_ClientInterface.dll`, in Tcl
+youd need `Tcl_sml_ClientInterface.dll`.  You get the idea.
 
 The required include files are all found in `ClientSML/include`.
 
@@ -1019,4 +1019,3 @@ slow process, so these tips will be less helpful while youre still debugging.
   * Avoid running agents separately.  Instead of calling `RunSelf` or `RunSelfTilOutput` on each agent, just call `RunAllAgents` on the kernel itself.  This runs all agents together and avoids the overhead of running them separately.  The absolute best you can do is to call `RunAllAgentsForever` as described in section 2.4 -- this avoids repeatedly calling the run functions at all and will make it easier to stop and restart your application from the debugger (or other clients).
 
   * In the case where the absolute best performance under SML is desired, use `CreateKernelInCurrentThread` instead of `CreateKernelInNewThread` and set the "optimized" flag to true in the parameters passed to `CreateKernelInCurrentThread`.  This means Soar will execute in the same thread as your application.  Without this each call to and from the Soar kernel requires a context switch (assuming a single processor machine).  This method also eliminates the thread which polls for new events.  This means you must poll for the events yourself by periodically calling `CheckForIncommingCommands`, which is a little more work for the programmer.
-
