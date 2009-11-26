@@ -27,7 +27,7 @@ However, we dont expect many clients will have to go down to this level.
 Instead, we provide a series of classes that together hide the details of the
 XML messaging system while allowing the client full control over Soar.  This
 guide will provide a quick introduction to using those classes which we call
-the "ClientSML" module.
+the `ClientSML` module.
 
 == Required Libraries ==
 
@@ -38,10 +38,10 @@ Windows) are:
   * Static libraries: ClientSML.lib, ElementXML.lib and ConnectionSML.lib
   * Shared libraries (dynamically loaded): SoarKernelSML.dll, ElementXML.dll.
 
-Also if youre working in Java you need Java_sml_ClientInterface.dll, in Tcl
-youd need Tcl_sml_ClientInterface.dll.  You get the idea.
+Also if youre working in Java you need !Java_sml_ClientInterface.dll, in Tcl
+youd need !Tcl_sml_ClientInterface.dll.  You get the idea.
 
-The required include files are all found in "ClientSML/include".
+The required include files are all found in `ClientSML/include`.
 
 Configuring Visual Studio to use these libraries can be a bit confusing if
 youre not used to it.  Heres some specific steps:
@@ -63,7 +63,7 @@ youre not used to it.  Heres some specific steps:
 == Simple SML example ==
 
 This example is something of a "hello world" example of how to use the major
-elements of ClientSML.  Once you understand this example, youll be pretty much
+elements of ClientSML.  Once you understand this example, you'll be pretty much
 ready to dive in.
 
 {{{
@@ -192,9 +192,9 @@ large, perhaps a factor of two on the cost of making a call -- which will often
 be dwarfed by the cost of matching productions or updating the environment.
 
 As you are just reading the "SML Quick Start Guide" I would strongly recommend
-you use CreateKernelInNewThread until you are somewhat familiar with the
+you use `CreateKernelInNewThread` until you are somewhat familiar with the
 system.  If you find you need higher performance later, switching over to the
-"CurrentThread" model later only requires changing this one line of code.
+`CurrentThread` model later only requires changing this one line of code.
 
 === Creating input link wmes ===
 
@@ -208,17 +208,17 @@ StringElement* pWME1 = pAgent->CreateStringWME(pID, "type", "Boeing747") ;
 The client can build up an arbitrarily complex graph of working memory elements
 (WMEs) attached to the input-link.  Each WME consists of a triplet: (identifier
 ^attribute value).  The first identifier comes from "getInputLink" and then new
-identifiers are created by CreateIdWME() and new simple WMEs are created
-through CreateStringWME/CreateIntWME/CreateFloatWME.
+identifiers are created by `CreateIdWME()` and new simple WMEs are created
+through `CreateStringWME`/`CreateIntWME`/`CreateFloatWME`.
 
-A WMEs value can be updated through the pAgent->Update() method and it can be
-removed through pAgent->DestroyWME() which also makes the working memory object
-invalid.
+A WMEs value can be updated through the `pAgent->Update()` method and it can
+be removed through `pAgent->DestroyWME()` which also makes the working memory
+object invalid.
 
 A graph (rather than a simple tree) can be created through
-pAgent->CreateSharedIdWME().  This creates a new identifier WME with the same
-value as an existing identifier.  (E.g. given pOrig = (P7 ^object O3) then
-CreateSharedIdWME(pInputLink, "same", pOrig) would create (I1 ^same O3)).
+`pAgent->CreateSharedIdWME()`.  This creates a new identifier WME with the same
+value as an existing identifier.  (E.g. given `pOrig = (P7 ^object O3)` then
+`CreateSharedIdWME(pInputLink, "same", pOrig)` would create `(I1 ^same O3)`).
 
 === Committing changes ===
 
@@ -233,7 +233,7 @@ efficient, by collecting all changes together and sending them as a single
 command.  With 8.6.2 changes are sent over immediately they are made so
 `Commit()` is unnecessary.  This produces slightly worse performance (as
 changes are not collected together into a single packet) so to get maximum
-performance call SetAutoCommit(false) and write the manual commit calls.
+performance call `SetAutoCommit(false)` and write the manual commit calls.
 
 === Running Soar ===
 
@@ -282,29 +282,29 @@ the output-link identifier is O1 then the agent might add a move command with
 If you choose to adopt this model for the agents actions then it is possible
 to query the agent for the number of commands added since the last time Soar
 was run and to retrieve each Command in turn, its name and parameter values.
-In this example, pCommand would point to M1, the name would be "move" and the
-parameter value for "speed" would be 20.
+In this example, pCommand would point to M1, the name would be `move` and the
+parameter value for `speed` would be 20.
 
 If you wish to adopt a different model for agent actions, that is also
 supported, but the support is less direct.   
 
-First, notice that GetCommand() returns a standard Identifier WME, so this can
-be manipulated in the same manner as any other WME.  In particular Identifiers
-offer "GetNumberChildren" and "GetChild" methods, so using these it is possible
-to start from the output link and examine all of working memory beneath the
-output link.  There are also other methods (such as FindByAttribute) that can
-make this search more efficient.
+First, notice that `GetCommand()` returns a standard Identifier WME, so this
+can be manipulated in the same manner as any other WME.  In particular
+Identifiers offer `GetNumberChildren` and `GetChild` methods, so using these
+it is possible to start from the output link and examine all of working memory
+beneath the output link.  There are also other methods (such as
+`FindByAttribute`) that can make this search more efficient.
 
-Secondly, you can use "IsJustAdded()" and "AreChildrenModified()" on WMEs on
+Secondly, you can use `IsJustAdded()` and `AreChildrenModified()` on WMEs on
 the output-link (and below) to determine what has changed since the last time
 Soar was run.
 
-Third, you can call AddOutputHandler() to register a function that is called
+Third, you can call `AddOutputHandler()` to register a function that is called
 whenever a specific attribute is added to the output link.
 
 Finally, if that is not sufficient, it is possible to call
-GetNumberOutputLinkChanges() and GetOutputLinkChange() to get a list of all of
-the WMEs to have been added or removed since the last time Soar was run.
+`GetNumberOutputLinkChanges()` and `GetOutputLinkChange()` to get a list of all
+of the WMEs to have been added or removed since the last time Soar was run.
 
 From this collection of methods it should be possible to support just about any
 manner of output model you wish to adopt, but we would recommend the "Command"
@@ -321,11 +321,11 @@ char const* pResult = pKernel->ExecuteCommandLine(cmd.c_str(),pAgent->GetAgentNa
 }}}
 
 To this point the discussion has been purely about environments and supporting
-I/O.  However, the "ExecuteCommandLine" methods allow a client to send any
+I/O.  However, the `ExecuteCommandLine` methods allow a client to send any
 command to Soar that can be typed at the Soar command prompt.  Using this
 method, productions can be loaded, excised, printed out etc.
 
-ExecuteCommandLineXML() is also available which returns the output as a
+`ExecuteCommandLineXML()` is also available which returns the output as a
 structured XML message, making it easier and safer for a client to parse values
 from the output.  See the online documentation (currently at
 http://soar.googlecode.com/) for details the format of that XML output for each
@@ -333,7 +333,7 @@ command.
 
 === Capturing print output ===
 
-To capture output during a run you need to register for the smlEVENT_PRINT
+To capture output during a run you need to register for the `smlEVENT_PRINT`
 event which will be called periodically during the course of the run. To do
 this you need to define a handler function which will be called during the run.
 Heres a simple example:
@@ -348,7 +348,7 @@ void MyPrintEventHandler(smlPrintEventId id, void* pUserData, Agent* pAgent, cha
 }
 }}}
 
-The method includes a piece of userData which is defined by you when you
+The method includes a piece of "userData" which is defined by you when you
 register for the event.  In this case we would have:
 
 {{{
@@ -368,7 +368,7 @@ would run Soar for 4 decisions and the trace output would be collected in the
 string "trace".
 
 There is now also another way to get this output by registering for
-smlEVENT_XML_TRACE_OUTPUT.  This event sends XML objects rather than text
+`smlEVENT_XML_TRACE_OUTPUT`.  This event sends XML objects rather than text
 strings.  Displaying these to the user requires more work by the client, but if
 the client wishes to parse the text working with XML is much easier.  This is
 the approach taken in the Java debugger.
@@ -531,7 +531,7 @@ public String testRhsHandler(int eventID, Object data, String agentName, String 
 }
 }}}
 
-To see more about events look at the sml_ClientEvents.h header file or the
+To see more about events look at the `sml_ClientEvents.h` header file or the
 TestSMLEvents test program (currently located in the Tools folder).
 
 === Events in Tcl ===
@@ -560,7 +560,7 @@ proc checkForEvents {k} {
 }}}
 
 This assumes `$_kernel` is a variable set to the SML kernel object.  Note, the
-`after 10` triggers another call to the checkForEvents() method after a 10ms
+`after 10` triggers another call to the `checkForEvents()` method after a 10ms
 delay.  Making this value larger will make Tcl less responsive to events.
 Making it smaller will consume more CPU time checking for events.
 
@@ -577,11 +577,11 @@ other languages (currently Tcl or C++).
 == Initialization ==
 
 The first step is to create an instance of the kernel and then create an agent.
-The name passed to "CreateKernelInNewThread" is the name of the library to load
-(DLL on Windows).  This is optional in 8.6.2 and defaults to SoarKernelSML.
+The name passed to `CreateKernelInNewThread` is the name of the library to load
+(DLL on Windows).  This is optional in 8.6.2 and defaults to `SoarKernelSML`.
 
-It is important to check for an error using the "kernel.HadError()" method.
-CreateKernel will not return an empty kernel object even if initialization
+It is important to check for an error using the `kernel.HadError()` method.
+`CreateKernel` will not return an empty kernel object even if initialization
 fails.  This is deliberate design to ensure that meaningful errors can be
 reported to the user.
 
@@ -619,18 +619,18 @@ agent.DestroyWME
 
 Working memory elements are linked together to form a tree (actually a graph)
 with the input link as the root of the tree.  To get the input link identifier
-(the top of the tree) call agent.GetInputLink().
+(the top of the tree) call `agent.GetInputLink()`.
 
 A key step after making multiple calls to modify the input link is to call
-"Commit()".  All changes to working memory are buffered (in the environment)
+`Commit()`.  All changes to working memory are buffered (in the environment)
 until the moment Commit is called, at which point they are all sent over as a
 single large message to the kernel.  This greatly improves performance, but you
 must remember to call Commit before running the agent or your changes wont
 actually appear on the agents input link.  This was changed in 8.6.2 so the
-default now is that Commit() is called automatically each time a wme is
+default now is that `Commit()` is called automatically each time a wme is
 modified on the input link.  To enable the faster version which then requires
-manual calls to Commit() call "SetAutoCommit(false)".  Calling Commit multiple
-times during a single input cycle will not cause problems.
+manual calls to `Commit()` call `SetAutoCommit(false)`.  Calling Commit
+multiple times during a single input cycle will not cause problems.
 
 == Output ==
 
@@ -696,10 +696,10 @@ private void updateWorld()
 }
 }}}
 
-The method "GetCommandName" and "GetParameterValue" extract the appropriate
+The method `GetCommandName` and `GetParameterValue` extract the appropriate
 attributes and values from the output link and return them to the environment.
 
-The method "AddStatusComplete" adds (C1 ^status complete) to the command
+The method `AddStatusComplete` adds `(C1 ^status complete)` to the command
 structure, indicating to the agent that this command has executed and can now
 be removed by the agent.
 
@@ -711,28 +711,28 @@ next input cycle as with all input).
 
 In order for the Commands method to work, the system has to keep track of
 changes to working memory as only newly added commands are reported through the
-"GetCommand" method.  For this process to work, the environment must call
-"ClearOutputLinkChanges()" before running the agent again.
+`GetCommand` method.  For this process to work, the environment must call
+`ClearOutputLinkChanges()` before running the agent again.
 
 While this Command model should be sufficient for almost all environments, if
 there is a need to process other structures, the environment can always choose
-to ignore this model partially or completely.  First, the method "GetCommand"
+to ignore this model partially or completely.  First, the method `GetCommand`
 returns an Identifier object.  The environment can use the methods
-"GetNumberChildren" and "GetChild" to walk this Identifier and locate any
+`GetNumberChildren` and `GetChild` to walk this Identifier and locate any
 arbitrary working memory element beneath an Identifier or the environment can
-use the "FindByAttribute" method to retrieve the values of working memory
+use the `FindByAttribute` method to retrieve the values of working memory
 elements that have a particular attribute.
 
 In fact a environment can abandon the Command model completely and simply call
-GetOutputLink() to get the Identifier object at the top of the output link and
-proceed to examine the tree (graph) from there.
+`GetOutputLink()` to get the Identifier object at the top of the output link
+and proceed to examine the tree (graph) from there.
 
 == Running the agent(s) ==
 
 There are two main methods for running an agent:
 
-  * RunSelfForever() and its twin RunAllAgentsForever()
-  * RunSelf(1) and RunAllAgents(1) (to step the environment rather than running it).
+  * `RunSelfForever()` and its twin `RunAllAgentsForever()`
+  * `RunSelf(1)` and `RunAllAgents(1)` (to step the environment rather than running it).
 
 The trick here is that the code for running the agents should be separate from
 the code for updating the world (collecting output; updating world state;
@@ -740,7 +740,7 @@ sending input).  By separating the two we can either issue the run from the
 environment or from a debugger (or other client) and everything works
 correctly.
 
-Lets assume we have the updateWorld() method from above, which should have the form:
+Lets assume we have the `updateWorld()` method from above, which should have the form:
 
 {{{
 void updateWorld()
@@ -752,7 +752,7 @@ void updateWorld()
 }}}
 
 Then the code samples below show how to connect up the system so that
-updateWorld() is only called once all agents have completed the output phase
+`updateWorld()` is only called once all agents have completed the output phase
 (i.e. at the end of a decision cycle).
 
 *Run Sample Code*
@@ -811,11 +811,12 @@ public void updateEventHandler(int eventID, Object data, Kernel kernel, int runF
 
 The Run code is pretty simple.  The only issues to be aware of are:
 
-  * RunAllAgentsForever() is currently (8.6.2) a blocking call, so we usually spawn a thread and issue this call in that thread.
-  * StopAllAgents() cant currently be called from an arbitrary thread (or it blocks waiting for the Run to terminate).  This may be fixed in a later version, but for now calling it from an event callback solves this problem.
+  * `RunAllAgentsForever()` is currently (8.6.2) a blocking call, so we usually spawn a thread and issue this call in that thread.
+  * `StopAllAgents()` cant currently be called from an arbitrary thread (or it blocks waiting for the Run to terminate).  This may be fixed in a later version, but for now calling it from an event callback solves this problem.
 
-The way updateWorld() is called is after the `smlEVENT_AFTER_ALL_OUTPUT_PHASES`
-event fires.  Why bother to do this rather than writing run as:
+The way `updateWorld()` is called is after the
+`smlEVENT_AFTER_ALL_OUTPUT_PHASES` event fires.  Why bother to do this rather
+than writing run as:
 
 {{{
 while (!stopped)
@@ -829,7 +830,7 @@ There are two basic reasons.  First, there are no guarantees that `run(1)` will
 run for a decision.  If we include breakpoints on productions or phase
 transitions this call may run for less time, possibly confusing the environment
 (as the agents have not progressed as far as expected).  Second, by making the
-call to updateWorld() event based, we can issue arbitrary run commands from a
+call to `updateWorld()` event based, we can issue arbitrary run commands from a
 debugger and the environment will function correctly.  For more on this see the
 "Event-Driven Environments Proposal.doc" file.
 
@@ -844,7 +845,7 @@ or having reached a particular situation in the world, stopping and wanting to
 step slowly to observe the reasoning.
 
 To support this the environment should check the runFlags parameter passed to
-the updateEventHandler.  This is a bit field which currently consists of the
+the `updateEventHandler`.  This is a bit field which currently consists of the
 values in this enum:
 
 *Run Flags*
@@ -865,15 +866,15 @@ We leave this entirely to the discretion of the designer because different
 combinations may make sense for different situations but this might be a
 typical set (for a multi-agent environment):
 
-if sml_RUN_SELF set and SML_UPDATE_WORLD not set or sml_DONT_UPDATE_WORLD set
-then dont call updateWorld().
+if `sml_RUN_SELF` set and `SML_UPDATE_WORLD` not set or `sml_DONT_UPDATE_WORLD`
+set then dont call `updateWorld()`.
 
 The meaning of this would be that:
 
-`run --self` would cause the agent to run but not the environment
-`run --noupdate` would cause all agents to run but not the environment
-`run --self --update` would cause  one agent to run and update the environment
-`run` would cause all agents to run and update the environment.
+  * `run --self` would cause the agent to run but not the environment
+  * `run --noupdate` would cause all agents to run but not the environment
+  * `run --self --update` would cause  one agent to run and update the environment
+  * `run` would cause all agents to run and update the environment.
  
 You are free to make other choices if theres a compelling reason.
 
@@ -886,7 +887,7 @@ user runs Soar from the debugger and not the environment (e.g. disabling the
 There are two approaches to this.  First, ignore the problem and dont
 enable/disable controls.  Instead, just handle errors if the user tries to
 issue a second run while a run is already going ahead.  The second option is to
-register for the smlEVENT_SYSTEM_START and smlEVENT_SYSTEM_STOP events and use
+register for the `smlEVENT_SYSTEM_START` and `smlEVENT_SYSTEM_STOP` events and use
 these to enable/disable the UI in the environment in appropriate ways.
 
 Heres an example for implementing this support:
@@ -933,23 +934,23 @@ public void updateButtons(boolean running)
  
 = Further details =
 
-To learn more about ClientSML and SML in general, the best documentation is the
-header files for the methods in ClientSML.  In particular, sml_ClientKernel.h,
-sml_ClientAgent.h and sml_ClientIdentifier.h contain a lot of useful methods
-and explanations.
+To learn more about `ClientSML` and SML in general, the best documentation is
+the header files for the methods in `ClientSML`.  In particular,
+`sml_ClientKernel.h`, `sml_ClientAgent.h` and `sml_ClientIdentifier.h` contain
+a lot of useful methods and explanations.
 
 Beyond that check the Soar XML Interface Spec and any other documentation in
 its vicinity.
 
 = Using other languages =
 
-The Tcl and Java interfaces were generated by SWIG (www.swig.org).  We have
-provided some custom code to help SWIG out in a few places, mostly with
+The Tcl and Java interfaces were generated by SWIG (http://www.swig.org).  We
+have provided some custom code to help SWIG out in a few places, mostly with
 callbacks.  If youre interested in creating interfaces for other languages
 that SWIG supports, check out the SWIG documentation and try to follow our
 existing solutions.
 
-A Tcl package, called Tcl_sml_ClientInterface is available.  On Windows it is
+A Tcl package, called `Tcl_sml_ClientInterface` is available.  On Windows it is
 located in the soar-library directory.  This can be used by including the
 following line in your Tcl code:
 
@@ -959,14 +960,15 @@ package require tcl_sml_clientinterface
 
 Note that the directory where the package resides must be added to Tcls
 auto_path variable.  The available functions are direct translations of their
-C++ counterparts.  See TOHtest.tcl in soar-library for examples showing how to
-use the Tcl interface.  The Tcl package includes Tcl_sml_ClientInterface.dll
-(or the equivalent for other platforms), which is required.
+C++ counterparts.  See `TOHtest.tcl` in soar-library for examples showing how
+to use the Tcl interface.  The Tcl package includes
+`Tcl_sml_ClientInterface.dll` (or the equivalent for other platforms), which is
+required.
 
-The Java interface is available via a collection of .java files which directly
-mirror their C++ counterparts.  See SoarIO/examples/TestJavaSML for an example
-showing the usage.  Java must have access to the Java_sml_ClientInterface.dll
-(or the equivalent for other platforms).
+The Java interface is available via a collection of `.java` files which
+directly mirror their C++ counterparts.  See `SoarIO/examples/TestJavaSML` for
+an example showing the usage.  Java must have access to the
+`Java_sml_ClientInterface.dll` (or the equivalent for other platforms).
 
 = Helpful Tips =
 
@@ -987,9 +989,9 @@ allocated through a call to new.  In Java and Tcl, this generally means you can
 just let things go out of scope when youre done with them.  There are a couple
 special cases you should be aware of, though:
 
-  * Agent objects are automatically deleted when the owning Kernel object is deleted (actually, when the call to Kernel::Shutdown is made, which you should always make before deleting the kernel). If you want to destroy an agent earlier, you can by making a call to Kernel::DestroyAgent. Under no circumstances should you delete (in the C++ sense) an Agent object.
+  * Agent objects are automatically deleted when the owning Kernel object is deleted (actually, when the call to `Kernel::Shutdown` is made, which you should always make before deleting the kernel). If you want to destroy an agent earlier, you can by making a call to `Kernel::DestroyAgent`. Under no circumstances should you delete (in the C++ sense) an `Agent` object.
 
-  * In Java if you create a ClientXML object through "xml = new ClientXML()" you should call xml.delete() on it when you're done. This isn't strictly required (the garbage collector will get it eventually) but is good practice and will avoid messages about leaked memory when the application shuts down. As per the general rule, in C++ if you create it with new youre responsible for destroying it with delete.
+  * In Java if you create a `ClientXML` object through `xml = new ClientXML()` you should call `xml.delete()` on it when you're done. This isn't strictly required (the garbage collector will get it eventually) but is good practice and will avoid messages about leaked memory when the application shuts down. As per the general rule, in C++ if you create it with new youre responsible for destroying it with delete.
 
   * Since there can be multiple clients interacting with the same kernel and agents, your application needs to be listening for the appropriate events so if some other client deletes/destroys a kernel or agent your application is using, you dont crash. Specifically, listen for the BEFORE_AGENT_DESTOYED and BEFORE_SHUTDOWN events so you can clean things up as needed in your application.
 
@@ -1002,7 +1004,7 @@ slow process, so these tips will be less helpful while youre still debugging.
 
   * Compile with optimizations turned on.  In Visual Studio this means doing a release build. On Linux and OS X, the default settings are probably sufficient, but you can experiment with new settings if you want (let us know if you find better settings).
 
-  * Put primary application and Soar in the same process.  That is, use CreateInNewThread or CreateInCurrentThread, not CreateRemoteConnection.  Using a remote kernel means socket communications are used, which is slow.
+  * Put primary application and Soar in the same process.  That is, use `CreateInNewThread` or `CreateInCurrentThread`, not `CreateRemoteConnection`.  Using a remote kernel means socket communications are used, which is slow.
 
   * Dont register for unnecessary events.  Every event that is registered for causes extra work to be done.  Try to find an appropriate event to register for so you dont end up getting more event calls than you actually need -- that is, try to avoid registering for events which occur more frequently than you need and then filtering them on the application side.
 
@@ -1012,9 +1014,9 @@ slow process, so these tips will be less helpful while youre still debugging.
 
   * Disable monitor productions.  Again, even if no client is registered to print out the text of monitor productions, work is still done internally to prepare the text.  Monitor productions can be disabled by excising them or commenting them out, but an easier method is to have each monitor production test a debug flag in working memory which is set by some initialization production or operator.  Thus all of the monitor productions can be turned on or off by changing one line of code.
 
-  * Disable timers.  Soar uses timers internally to generate the output of the stats command.  If you dont need this information, you can use the `timers --off" command to disable this bookkeeping.  This can make a significant difference in the watch 0 case.
+  * Disable timers.  Soar uses timers internally to generate the output of the stats command.  If you dont need this information, you can use the `timers --off` command to disable this bookkeeping.  This can make a significant difference in the watch 0 case.
 
-  * Avoid running agents separately.  Instead of calling RunSelf or RunSelfTilOutput on each agent, just call RunAllAgents on the kernel itself.  This runs all agents together and avoids the overhead of running them separately.  The absolute best you can do is to call RunAllAgentsForever as described in section 2.4 -- this avoids repeatedly calling the run functions at all and will make it easier to stop and restart your application from the debugger (or other clients).
+  * Avoid running agents separately.  Instead of calling `RunSelf` or `RunSelfTilOutput` on each agent, just call `RunAllAgents` on the kernel itself.  This runs all agents together and avoids the overhead of running them separately.  The absolute best you can do is to call `RunAllAgentsForever` as described in section 2.4 -- this avoids repeatedly calling the run functions at all and will make it easier to stop and restart your application from the debugger (or other clients).
 
-  * In the case where the absolute best performance under SML is desired, use CreateKernelInCurrentThread instead of CreateKernelInNewThread and set the "optimized" flag to true in the parameters passed to CreateKernelInCurrentThread.  This means Soar will execute in the same thread as your application.  Without this each call to and from the Soar kernel requires a context switch (assuming a single processor machine).  This method also eliminates the thread which polls for new events.  This means you must poll for the events yourself by periodically calling CheckForIncommingCommands, which is a little more work for the programmer.
+  * In the case where the absolute best performance under SML is desired, use `CreateKernelInCurrentThread` instead of `CreateKernelInNewThread` and set the "optimized" flag to true in the parameters passed to `CreateKernelInCurrentThread`.  This means Soar will execute in the same thread as your application.  Without this each call to and from the Soar kernel requires a context switch (assuming a single processor machine).  This method also eliminates the thread which polls for new events.  This means you must poll for the events yourself by periodically calling `CheckForIncommingCommands`, which is a little more work for the programmer.
 
