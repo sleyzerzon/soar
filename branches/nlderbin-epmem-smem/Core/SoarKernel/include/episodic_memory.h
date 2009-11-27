@@ -49,6 +49,7 @@ enum epmem_variable_key
 // algorithm constants
 #define EPMEM_MEMID_NONE							0
 #define EPMEM_NODEID_ROOT							0
+#define EPMEM_NODEID_BAD							-1
 #define EPMEM_HASH_ACCEPTABLE						1
 
 #define EPMEM_NODE_POS								0
@@ -469,18 +470,10 @@ typedef std::vector<epmem_shared_literal *> epmem_shared_literal_list;
 typedef std::vector<epmem_shared_literal_pair *> epmem_shared_literal_pair_list;
 typedef std::list<epmem_shared_literal_list::size_type> epmem_shared_wme_index;
 typedef std::vector<wme *> epmem_shared_wme_list;
-typedef struct epmem_shared_wme_counter_struct epmem_shared_wme_counter;
-typedef std::map<epmem_node_id, unsigned long> epmem_shared_literal_counter;
-typedef std::map<wme *, epmem_shared_wme_counter *> epmem_shared_wme_book;
 
 // lookup tables to facilitate shared identifiers
 typedef std::map<epmem_node_id, Symbol *> epmem_id_mapping;
 typedef std::map<epmem_node_id, epmem_shared_literal *> epmem_literal_mapping;
-
-// lookup table to propagate constrained identifiers during
-// full graph-match
-typedef std::map<Symbol *, epmem_node_id> epmem_constraint_list;
-typedef std::map<epmem_node_id, Symbol *> epmem_reverse_constraint_list;
 
 // types/structures to facilitate re-use of identifiers
 typedef std::map<epmem_node_id, epmem_node_id> epmem_id_pool;
@@ -508,7 +501,7 @@ typedef struct epmem_edge_struct
 typedef struct epmem_wme_cache_element_struct
 {
 	epmem_wme_list *wmes;						// child wmes	
-	unsigned long parents;						// number of parents
+	epmem_wme_list *parents;					// number of parents
 
 	epmem_literal_mapping *lits;				// child literals
 } epmem_wme_cache_element;
@@ -527,11 +520,50 @@ typedef struct epmem_shared_match_struct
 typedef std::map< epmem_node_id, epmem_shared_literal_pair * > epmem_shared_literal_map;
 typedef std::map< wme *, epmem_shared_literal_map * > epmem_shared_literal_group;
 
-struct epmem_shared_wme_counter_struct
+//
+// structures necessary to maintain bookkeeping information
+// about incoming WMEs for identifiers in the DNF
+//
+
+typedef std::set< epmem_node_id > epmem_shared_literal_set;
+typedef struct epmem_shared_incoming_id_book_struct
+{	
+	epmem_wme_list* outgoing;
+	epmem_shared_literal_set* satisfactory;
+} epmem_shared_incoming_id_book;
+typedef std::map< Symbol*, epmem_shared_incoming_id_book* > epmem_shared_incoming_ids_book; 
+
+typedef std::map< wme*, unsigned long > epmem_shared_incoming_wme_counter_map;
+typedef struct epmem_shared_incoming_identity_counter_struct
 {
-	unsigned long wme_ct;
-	epmem_shared_literal_counter *lit_ct;
-};
+	unsigned long ct;
+	epmem_shared_incoming_wme_counter_map* cts;
+} epmem_shared_incoming_identity_counter;
+typedef std::map< Symbol*, epmem_shared_incoming_identity_counter* > epmem_shared_incoming_wme_map;
+typedef std::map< epmem_node_id, epmem_shared_incoming_wme_map* > epmem_shared_incoming_book_map;
+
+typedef struct epmem_shared_incoming_book_struct
+{
+	
+	// aggregatation
+	epmem_shared_incoming_ids_book *parents;
+
+	// mapping
+	epmem_shared_incoming_book_map* book;
+
+} epmem_shared_incoming_book;
+
+//
+// structures necessary to represent constraints during graph-match
+//
+
+typedef std::map< wme*, epmem_shared_literal_pair_list* > epmem_shared_literal_pair_map;
+
+typedef std::map< Symbol*, epmem_node_id > epmem_gm_assignment_map;
+typedef std::map< Symbol*, epmem_shared_literal_set > epmem_gm_sym_constraints;
+
+//
+
 
 // represents state of one historical
 // identity of a cue wme at a particular
@@ -539,16 +571,17 @@ struct epmem_shared_wme_counter_struct
 struct epmem_shared_literal_struct
 {
 	epmem_node_id shared_id;					// shared q1, if identifier
+	Symbol* shared_sym;							// identifier symbol, if literal represents an identifier
 
 	unsigned long ct;							// number of contributing literals that are "on"
 	unsigned long max;							// number of contributing literals that *need* to be on	
-	epmem_shared_wme_book *wme_ct;				// bookkeeping to ensure literal count
 
-	struct wme_struct *wme;						// associated cue wme
-	bool wme_kids;								// does the cue wme have children (indicative of leaf wme status)	
-
-	epmem_shared_match *match;					// associated match, if leaf wme
+	epmem_shared_incoming_book* incoming;		// bookkeeping to support correct distribution of incoming edges
+	
+	bool wme_kids;								// does the cue wme have children (indicative of leaf wme status)
 	epmem_shared_literal_group *children;		// grouped child literals, if not leaf wme
+
+	epmem_shared_match *match;					// associated match, if leaf wme	
 };
 
 // pair in the sense of (debug info, actual literal)
