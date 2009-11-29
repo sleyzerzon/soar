@@ -1,0 +1,8 @@
+epmem --set database memory
+epmem --set trigger output
+epmem --set phase output
+epmem --set graph-match on
+epmem --set timers two
+epmem --set learning on
+watch 0
+
