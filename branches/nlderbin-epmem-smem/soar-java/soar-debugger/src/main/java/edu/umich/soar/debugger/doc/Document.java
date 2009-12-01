@@ -13,6 +13,7 @@ package edu.umich.soar.debugger.doc;
 
 import sml.* ;
 import sml.Kernel.RhsFunctionInterface;
+import sml.Kernel.UpdateEventInterface;
 import edu.umich.soar.debugger.FrameList;
 import edu.umich.soar.debugger.MainFrame;
 import edu.umich.soar.debugger.doc.DocumentThread2.CommandExecCommandLine;
@@ -358,6 +359,20 @@ public class Document implements Kernel.AgentEventInterface, Kernel.SystemEventI
 		m_Kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_INTERRUPT_CHECK, this, this) ;
 		
 		m_Kernel.SetInterruptCheckRate(50) ;
+		
+		// Prevents the update changes from growing monotonically
+		// in case the agent touches the output link
+		m_Kernel.RegisterForUpdateEvent(smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES, new UpdateEventInterface() {
+			@Override
+			public void updateEventHandler(int eventID, Object data,
+					Kernel kernel, int runFlags) {
+				for (int i = 0; i < m_Kernel.GetNumberAgents(); ++i)
+				{
+					m_Kernel.GetAgentByIndex(i).ClearOutputLinkChanges();
+				}
+			}
+		}, null);
+		
 	}
 
 	/********************************************************************************************

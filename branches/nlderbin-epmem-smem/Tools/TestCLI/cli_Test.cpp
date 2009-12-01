@@ -429,6 +429,8 @@ int main(int argc, char** argv)
 		pAgent = pKernel->CreateAgent(AGENT_NAME) ;
 		assert(pAgent);
 
+		// NOTE: if we go multiple agent, must update RegisterForUpdateEvent below
+
 		assert(!g_pInputQueue);
 		g_pInputQueue = new queue<char>;
 
@@ -446,7 +448,9 @@ int main(int argc, char** argv)
 		// Register for necessary callbacks
 		int callbackID1 = pAgent->RegisterForRunEvent(sml::smlEVENT_BEFORE_DECISION_CYCLE, RunCallbackHandler, 0);
 		g_TraceCallbackID = pAgent->RegisterForPrintEvent(sml::smlEVENT_PRINT, PrintCallbackHandler, 0);
-		pKernel->RegisterForUpdateEvent( sml::smlEVENT_AFTER_ALL_OUTPUT_PHASES, UpdateCallbackHandler, pAgent );
+
+		// agent as user data required for ClearOutputLinkChanges
+		pKernel->RegisterForUpdateEvent( sml::smlEVENT_AFTER_ALL_OUTPUT_PHASES, UpdateCallbackHandler, pAgent ); // NOTE: doesn't support multiple agents
 
 		// Do script if any
 		bool good = true;
