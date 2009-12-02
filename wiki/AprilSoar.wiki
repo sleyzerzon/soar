@@ -1,3 +1,9 @@
 #summary Soar projects using April.
 
-Information about Soar projects using [http://april.eecs.umich.edu/ April] code (such as robotics stuff) go here. TODO
+[http://april.eecs.umich.edu Edwin Olson's April group projects and libraries] are used with some Soar projects. These projects have been recently moved to a new top-level module `aprilsoar`.
+
+= Checkout and Build =
+
+  * First, follow the instructions to check out and build the Semantic Memory branch of Soar. Technically, `aprilsoar` can be used against the trunk or other Soar branches, but the SMem branch will provide the least resistance.
+
+More TODO
