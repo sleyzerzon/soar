@@ -1922,6 +1922,8 @@ print [options] identifier|timetag|pattern
 || `-u, --user` || print the names of all user productions currently loaded ||
 || `production_name` || print the production named `production-name` ||
 
+Note that only one of the options c,D,j,r,t or U can be used at a time for correct behavior.
+
 === Printing items in working memory ===
 
 || `-d, --depth n` || This option overrides the default printing depth (see the [CommandLineInterface#default-wme-depth default-wme-depth] command for more detail). ||
@@ -3561,8 +3563,6 @@ or watch any relationship between objects:
 {{{
 soar> watch-wmes --add-filter -t both * ontop *
 }}}
-
-
 
 
 
