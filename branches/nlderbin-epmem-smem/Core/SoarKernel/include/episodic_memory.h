@@ -596,6 +596,9 @@ struct epmem_shared_literal_pair_struct
 
 	// literal
 	epmem_shared_literal *lit;
+
+	// parent literal
+	epmem_shared_literal *parent_lit;
 };
 
 // maintains state within sqlite b-trees

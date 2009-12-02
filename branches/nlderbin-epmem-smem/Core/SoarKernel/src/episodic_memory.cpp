@@ -3585,110 +3585,102 @@ inline bool epmem_gm_identity_used( epmem_node_id needle, epmem_shared_literal_s
 	return ( haystack->find( needle ) != haystack->end() );
 }
 
-inline bool epmem_graph_match( epmem_shared_literal_pair_map*, epmem_gm_assignment_map*, epmem_shared_literal_set*, epmem_gm_sym_constraints* );
-inline bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_map::iterator, epmem_shared_literal_pair_map::iterator, epmem_gm_assignment_map*, epmem_shared_literal_set*, epmem_gm_sym_constraints* );
-
-// an id pair is satisfied if:
-// - the literal is satisfied AND
-// - EITHER
-//   - the symbol of the literal has been assigned AND
-//   - this literal agrees with that assignment
-// - OR
-//   - this literal's identity has not been previously used AND
-//   - for all incoming edges...
-//   - EITHER
-//     - the identifier of the edge has been assigned AND
-//     - the assignment satisfies this literal
-//   - OR
-//     - the identifier of the edge has not been assigned AND
-//     - the intersection of this literal's satisfying identities for the identifier and any existing constraints is non-empty
-//
-//  if an id pair is satisfied:
-//  - a new assignment will be added
-//  - the assigned id will be marked as used
-//  - constraints for unassigned identifiers of incoming edges will be modified (as the intersection noted above)
-bool epmem_gm_id_pair_satisfied( epmem_shared_literal_pair* pair, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
+// does a quick check on literal ct vs. max on id and value
+inline bool epmem_gm_pair_satisfiable( epmem_shared_literal_pair* pair )
 {
-	assert( pair );
-	assert( pair->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE );
-	
-	bool return_val = false;
-	epmem_shared_literal* lit = pair->lit;
+	return ( ( ( !pair->parent_lit ) || ( pair->parent_lit->ct == pair->parent_lit->max ) ) && ( pair->lit->ct == pair->lit->max ) );
+}
 
-	// ignore if unsatisfied
-	if ( lit->ct == lit->max )
+inline bool epmem_gm_assign_identifier( epmem_shared_literal* lit, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
+{
+	bool return_val = false;
+	
+	Symbol* id = lit->shared_sym;
+	epmem_node_id assignment = lit->shared_id;	
+
 	{
 		// find if the value has already been assigned
-		epmem_node_id existing_assignment = epmem_gm_find_assignment( lit->shared_sym, id_assignments );
+		epmem_node_id existing_assignment = epmem_gm_find_assignment( id, id_assignments );
 
 		// if so, satisfied only if this literal agrees
 		if ( existing_assignment != EPMEM_NODEID_BAD )
 		{
-			return_val = ( existing_assignment == lit->shared_id );		
+			return_val = ( existing_assignment == assignment );		
 		}
 		else
 		{
 			// we know the value of the wme is not assigned,
 			// so for consistency our shared_id cannot have
 			// already been given out
-			if ( !epmem_gm_identity_used( lit->shared_id, used_ids ) )
+			if ( !epmem_gm_identity_used( assignment, used_ids ) )
 			{
-				// confirm all incoming wme constraints
-				epmem_shared_literal_set constraint_intersection;
-				epmem_gm_sym_constraints::iterator existing_constraint;
-				epmem_shared_incoming_ids_book::iterator incoming_p = lit->incoming->parents->begin();
 				bool good_state = true;
-
-				while ( good_state && ( incoming_p != lit->incoming->parents->end() ) )
+				epmem_gm_sym_constraints::iterator existing_constraint;
+				
+				// and we can't violate constraints on the symbol
+				existing_constraint = sym_constraints->find( id );
+				if ( existing_constraint != sym_constraints->end() )
 				{
-					// see if the id of the incoming wme has already been assigned
-					existing_assignment = epmem_gm_find_assignment( incoming_p->first, id_assignments );
-					if ( existing_assignment != EPMEM_NODEID_BAD )
-					{
-						// if so, it must be in the satisfied set
-						good_state = ( incoming_p->second->satisfactory->find( existing_assignment ) != incoming_p->second->satisfactory->end() );
-					}
-					else
-					{
-						// make sure the added constraint will allow for a valid parent identifier (i.e. intersection is not null)						
-						existing_constraint = sym_constraints->find( incoming_p->first );
-						if ( existing_constraint != sym_constraints->end() )
-						{
-							constraint_intersection.clear();							
-							set_intersection( existing_constraint->second.begin(), existing_constraint->second.end(), incoming_p->second->satisfactory->begin(), incoming_p->second->satisfactory->end(), inserter( constraint_intersection, constraint_intersection.begin() ) );
+					good_state = ( existing_constraint->second.find( assignment ) != existing_constraint->second.end() );
+				}
+				
+				// and no parents can violate constraints
+				if ( good_state )
+				{
+					epmem_shared_literal_set constraint_intersection;				
+					epmem_shared_incoming_ids_book::iterator incoming_p = lit->incoming->parents->begin();				
 
-							if ( !constraint_intersection.empty() )
-							{
-								// if the intersection is non-null, propogate the intersection to future assignments
-								existing_constraint->second = constraint_intersection;
-							}
-							else
-							{
-								good_state = false;
-							}
+					while ( good_state && ( incoming_p != lit->incoming->parents->end() ) )
+					{
+						// see if the id of the incoming wme has already been assigned
+						existing_assignment = epmem_gm_find_assignment( incoming_p->first, id_assignments );
+						if ( existing_assignment != EPMEM_NODEID_BAD )
+						{
+							// if so, it must be in the satisfied set
+							good_state = ( incoming_p->second->satisfactory->find( existing_assignment ) != incoming_p->second->satisfactory->end() );
 						}
 						else
 						{
-							// if there are no existing constraints, just copy this literal's satisfying set for the edge
-							sym_constraints->insert( std::make_pair( incoming_p->first, (*incoming_p->second->satisfactory) ) );
-						}						
+							// make sure the added constraint will allow for a valid parent identifier (i.e. intersection is not null)						
+							existing_constraint = sym_constraints->find( incoming_p->first );
+							if ( existing_constraint != sym_constraints->end() )
+							{
+								constraint_intersection.clear();							
+								set_intersection( existing_constraint->second.begin(), existing_constraint->second.end(), incoming_p->second->satisfactory->begin(), incoming_p->second->satisfactory->end(), inserter( constraint_intersection, constraint_intersection.begin() ) );
+
+								if ( !constraint_intersection.empty() )
+								{
+									// if the intersection is non-null, propogate the intersection to future assignments
+									existing_constraint->second = constraint_intersection;
+								}
+								else
+								{
+									good_state = false;
+								}
+							}
+							else
+							{
+								// if there are no existing constraints, just copy this literal's satisfying set for the edge
+								sym_constraints->insert( std::make_pair( incoming_p->first, (*incoming_p->second->satisfactory) ) );
+							}						
+						}
+
+						if ( good_state )
+						{
+							incoming_p++;
+						}
 					}
 
+					// all constraints are satisfied!
+					// add assignment, add used id, (constraints are added above)
 					if ( good_state )
-					{
-						incoming_p++;
+					{					
+						id_assignments->insert( std::make_pair( id, assignment ) );
+						used_ids->insert( assignment );
+
+						return_val = true;
 					}
 				}
-
-				// all constraints are satisfied!
-				// add assignment, add used id, (constraints are added above)
-				if ( good_state )
-				{					
-					id_assignments->insert( std::make_pair( lit->shared_sym, lit->shared_id ) );
-					used_ids->insert( lit->shared_id );
-
-					return_val = true;
-				}
 			}
 		}
 	}
@@ -3696,95 +3688,22 @@ bool epmem_gm_id_pair_satisfied( epmem_shared_literal_pair* pair, epmem_gm_assig
 	return return_val;
 }
 
-// a wme with an identifier as its value is satisfied if:
-// - one of its pairs is satisfied AND
-// - the next WME is satisfied (given propogated constraints)
-bool epmem_gm_id_wme_satisfied( epmem_shared_literal_pair_map::iterator wme_p, epmem_shared_literal_pair_map::iterator end_wme_p, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
+inline bool epmem_gm_pair_satisfied( epmem_shared_literal_pair* pair, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
 {
-	assert( wme_p != end_wme_p );
-	assert( wme_p->first->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE );
-	
-	bool return_val = false;	
-	epmem_shared_literal_pair_list* pairs = wme_p->second;
-	epmem_shared_literal_pair_list::iterator pair_p = pairs->begin();
-
-	epmem_shared_literal_pair_map::iterator next_wme_p = wme_p;
-	next_wme_p++;
-
-	// the id_pair call can modify these
-	// note: we only propogate if the rest of the wmes are satisfied
-	epmem_gm_assignment_map temp_id_assignments;
-	epmem_shared_literal_set temp_used_ids;
-	epmem_gm_sym_constraints temp_sym_constraints;
-
-	while ( ( !return_val ) && ( pair_p != pairs->end() ) )
+	if ( pair->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 	{
-		if ( (*pair_p)->lit->ct == (*pair_p)->lit->max )
-		{
-			temp_id_assignments = (*id_assignments);
-			temp_used_ids = (*used_ids);
-			temp_sym_constraints = (*sym_constraints);
-
-			return_val = ( epmem_gm_id_pair_satisfied( (*pair_p), &( temp_id_assignments ), &( temp_used_ids ), &( temp_sym_constraints ) ) && epmem_gm_wme_satisfied( next_wme_p, end_wme_p, &( temp_id_assignments ), &( temp_used_ids ), &( temp_sym_constraints ) ) );
-			
-			if ( !return_val )
-			{
-				pair_p++;
-			}
-		}
-		else
-		{
-			// a small optimization to prevent unnecessary copying
-			// and function calls
-			pair_p++;
-		}
+		return ( ( ( !pair->parent_lit ) || epmem_gm_assign_identifier( pair->parent_lit, id_assignments, used_ids, sym_constraints ) ) &&
+			epmem_gm_assign_identifier( pair->lit, id_assignments, used_ids, sym_constraints ) );
 	}
-
-	// if all went well, pass back the constraints
-	if ( return_val )
+	else
 	{
-		(*id_assignments) = temp_id_assignments;
-		(*used_ids) = temp_used_ids;
-		(*sym_constraints) = temp_sym_constraints;
+		return ( ( !pair->parent_lit ) || epmem_gm_assign_identifier( pair->parent_lit, id_assignments, used_ids, sym_constraints ) );
 	}
-	
-	return return_val;
-}
-
-// a wme with a constant value is satisfied if:
-// - one of its pairs is satisfied (ct=max) AND
-// - the next WME is satisfied (note: const wmes cause no constraint modification/propagation)
-bool epmem_gm_const_wme_satisfied( epmem_shared_literal_pair_map::iterator wme_p, epmem_shared_literal_pair_map::iterator end_wme_p, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
-{
-	assert( wme_p != end_wme_p );
-	assert( wme_p->first->value->common.symbol_type != IDENTIFIER_SYMBOL_TYPE );
-	
-	bool return_val = false;
-	epmem_shared_literal* lit;
-	epmem_shared_literal_pair_list* pairs = wme_p->second;
-	epmem_shared_literal_pair_list::iterator pair_p = pairs->begin();
-	
-	epmem_shared_literal_pair_map::iterator next_wme_p = wme_p;
-	next_wme_p++;
-
-	while ( ( !return_val ) && ( pair_p != pairs->end() ) )
-	{
-		lit = (*pair_p)->lit;
-		
-		return_val = ( ( lit->ct == lit->max ) && epmem_gm_wme_satisfied( next_wme_p, end_wme_p, id_assignments, used_ids, sym_constraints ) );
-		
-		if ( !return_val )
-		{
-			pair_p++;
-		}
-	}
-	
-	return return_val;
 }
 
 // a wme is satisfied if:
 // - it is the end of the list of wmes OR
-// - specialized const vs. id processing says so
+// - a pair in the WME is satisfied AND the rest of the list is satisfied
 bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_map::iterator wme_p, epmem_shared_literal_pair_map::iterator end_wme_p, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
 {
 	bool return_val = false;
@@ -3795,13 +3714,47 @@ bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_map::iterator wme_p, epme
 	}
 	else
 	{
-		if ( wme_p->first->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
+		epmem_shared_literal_pair_list* pairs = wme_p->second;
+		epmem_shared_literal_pair_list::iterator pair_p = pairs->begin();
+
+		epmem_shared_literal_pair_map::iterator next_wme_p = wme_p;
+		next_wme_p++;
+
+		// the pair call can modify these
+		// note: we only propogate if the rest of the wmes are satisfied	
+		epmem_gm_assignment_map temp_id_assignments;
+		epmem_shared_literal_set temp_used_ids;
+		epmem_gm_sym_constraints temp_sym_constraints;
+
+		while ( ( !return_val ) && ( pair_p != pairs->end() ) )
 		{
-			return_val = epmem_gm_id_wme_satisfied( wme_p, end_wme_p, id_assignments, used_ids, sym_constraints );
+			if ( epmem_gm_pair_satisfiable( (*pair_p) ) )
+			{			
+				temp_id_assignments = (*id_assignments);
+				temp_used_ids = (*used_ids);
+				temp_sym_constraints = (*sym_constraints);
+				
+				return_val = ( epmem_gm_pair_satisfied( (*pair_p), &( temp_id_assignments ), &( temp_used_ids ), &( temp_sym_constraints ) ) && epmem_gm_wme_satisfied( next_wme_p, end_wme_p, &( temp_id_assignments ) , &( temp_used_ids ), &( temp_sym_constraints ) ) );
+
+				if ( !return_val )
+				{
+					pair_p++;
+				}
+			}
+			else
+			{
+				// a small optimization to prevent unnecessary copying
+				// and function calls
+				pair_p++;
+			}	
 		}
-		else
-		{
-			return_val = epmem_gm_const_wme_satisfied( wme_p, end_wme_p, id_assignments, used_ids, sym_constraints );
+
+		// if all went well, pass back the constraints
+		if ( return_val )
+		{		
+			(*id_assignments) = temp_id_assignments;
+			(*used_ids) = temp_used_ids;
+			(*sym_constraints) = temp_sym_constraints;
 		}
 	}
 
@@ -4635,6 +4588,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 										new_literal_pair = new epmem_shared_literal_pair;
 										new_literal_pair->lit = new_literal;
+										new_literal_pair->parent_lit = parent_literal;
 										new_literal_pair->unique_id = unique_identity;
 										new_literal_pair->q0 = parent_id;
 										new_literal_pair->q1 = shared_identity;
@@ -4787,6 +4741,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 										new_literal_pair = new epmem_shared_literal_pair;
 										new_literal_pair->lit = new_literal;
+										new_literal_pair->parent_lit = parent_literal;
 										new_literal_pair->unique_id = unique_identity;
 										new_literal_pair->q0 = parent_id;
 										new_literal_pair->q1 = NULL;
