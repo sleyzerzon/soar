@@ -19,4 +19,13 @@ Next, download the JOGL zip appropriate for your platform from [http://download.
 
 Unzip the JOGL file in the `april` folder. 
 
-More TODO
+TODO: building only with ant
+
+Eclipse: import existing projects in to workspace:
+
+  * `aprilsoar/soar-room`
+  * `aprilsoar/soar-sps`
+  * `smem/soar-java/soar-smljava`
+  * `smem/soar-java/soar-debugger`
+
+Set APRIL_MEGA build path variable to point to the `april-mega.jar` file.
