@@ -4,28 +4,37 @@
 
 = Windows =
 
-[Build Follow the instructions to check out and build] the Semantic Memory branch of Soar. Technically, `aprilsoar` can be used against the trunk or other Soar branches, but the SMem branch will provide the least resistance.
+[Build Follow the instructions to check out and build] the Semantic Memory branch of Soar in to a folder named `smem`. Technically, `aprilsoar` can be used against the trunk or other Soar branches, but the SMem branch will provide the least resistance.
 
-Check out the `trunk/aprilsoar` module next to the checked out copy of Soar. `aprilsoar` cannot be built until all of the April dependencies are on the system. April tools and libraries are obtained from the [http://april.eecs.umich.edu/resources.php April resource pages] (details below).
+Check out the `trunk/aprilsoar` module next to `smem`. `aprilsoar` cannot be built until all of the April dependencies are on the system. April tools and libraries are obtained from the [http://april.eecs.umich.edu/resources.php April resource pages].
 
 Create a top-level `april` folder next to `aprilsoar` and `smem`. Download the [http://april.eecs.umich.edu/packages/april-mega.jar april-mega.jar] and place in to the `april` folder. The mega jar includes many tools and a few dependencies for the april project.
 
-The mega jar depends on [http://kenai.com/projects/jogl/pages/Home JOGL]. To satisfy this dependency, first download two jars from [http://download.java.net/media/gluegen/webstart-2.x/ this gluegen folder] and place them in the `april` folder:
+The mega jar depends on [http://kenai.com/projects/jogl/pages/Home JOGL]. To satisfy this dependency, download the JOGL zip appropriate for your platform from [http://download.java.net/media/jogl/builds/archive/jsr-231-1.1.1a/ this JOGL builds folder]. Unzip the JOGL file and place the contents in its `libs` folder in to the `april` folder. My `april` folder looks like this:
 
+  * `april-mega.jar`
+  * `gluegen-rt.dll`
   * `gluegen-rt.jar`
-  * The platform-specific `gluegen-rt-natives` jar for your platform.
+  * `jogl.dll`
+  * `jogl.jar`
+  * `jogl_awt.dll`
+  * `jogl_cd.dll`
 
-Next, download the JOGL zip appropriate for your platform from [http://download.java.net/media/jogl/builds/archive/jsr-231-1.1.1a/ this JOGL builds folder].
-
-Unzip the JOGL file in the `april` folder. 
-
-TODO: building only with ant
-
-Eclipse: import existing projects in to workspace:
+The ant build scripts have not been fully updated. For now, use Eclipse. Start by creating a new workspace and importing existing projects in to it:
 
   * `aprilsoar/soar-room`
-  * `aprilsoar/soar-sps`
   * `smem/soar-java/soar-smljava`
   * `smem/soar-java/soar-debugger`
+  * `aprilsoar/soar-sps`
+    * `soar-sps` is currently Linux only but that may change soon. You may omit this from the import to simplify things.
 
-Set APRIL_MEGA build path variable to point to the `april-mega.jar` file.
+Set a few build path variables for the `soar-room` and `soar-sps` (if applicable) projects:
+
+  * `APRIL_MEGA`
+    * Path to `april-mega.jar`
+  * `GLUEGEN_RT`
+    * Path to `gluegen-rt.jar`
+  * `JOGL`
+    * Path to `jogl.jar`
+
+Update the `PATH` environment variable for the _room_ launch configuration to include the `april` folder. Note: this may be unnecessary if I can get relative paths working correctly.
