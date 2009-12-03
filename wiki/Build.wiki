@@ -4,9 +4,8 @@
 [http://code.google.com/p/soar/source/browse Browse online here],
 [http://code.google.com/p/soar/source/list recent changes here].
 
-The old, default checkout content is
-[http://code.google.com/p/soar/source/checkout here], however, be sure to
-review these checkout notes at least once:
+[http://code.google.com/p/soar/source/checkout The old, default checkout content is here], however, be sure to review these checkout notes at least 
+once:
 
 *Do not check out the entire trunk*, it is very large and contains much legacy
 code. Instead, most users will want to check out the `SoarSuite` subfolder of
@@ -24,7 +23,7 @@ and `smem`.
   * The checkout URL is: `https://soar.googlecode.com/svn/trunk/SoarSuite`
   * The destination folder should be `SoarSuite`, `soar`, or `trunk`
   * Your username is your Google account name without the `@` or domain
-  * Your password is your googlecode.com password, [http://code.google.com/hosting/settings available here].
+  * [http://code.google.com/hosting/settings Your password is your googlecode.com password].
 
 *Eclipse users*, do not import projects in Eclipse by checking them out there
 using Subclipse. Instead, check everything out outside of Eclipse and import
@@ -37,9 +36,8 @@ in changes using Subclipse.
 The [ProjectLayout project layout page] describes the folder layout and may be
 helpful to look at when checking out the source.
 
-Please help keep this page up to date.  If you see an error or notice an
-omission, [http://code.google.com/p/soar/w/edit/Build correct it yourself] or
-do not hesitate to send a note to `soar-sml-list@lists.sourceforge.net`.
+Please help keep this page up to date. [http://code.google.com/p/soar/w/edit/Build If you see an error or notice an omission, correct it yourself] or do not hesitate
+to [mailto:soar-sml-list@lists.sourceforge.net send a note to the soar-sml-list].
 
 <wiki:toc max_depth="1"/>
 
@@ -101,7 +99,7 @@ desired.  Other versions of Python will not work "out of the box."
 
   * Download and install Python *2.6* from [http://www.python.org/download/releases/2.6/ python.org].
     * If targeting 64-bit, download the 64-bit version of Python.
-  * If you are planning on a debug build including Python, you will need Python debug libraries. These are helpfully available [http://www.eecs.umich.edu/~soar/sitemaker/misc/python here]. Save the correct one for your architecture in `Python26\libs`.
+  * If you are planning on a debug build including Python, [http://www.eecs.umich.edu/~soar/sitemaker/misc/python you will need Python debug libraries]. Save the correct one for your architecture in `Python26\libs`.
 
 !PyDev for Eclipse is optional, it is for Python development inside Eclipse.
 
