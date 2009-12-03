@@ -2,8 +2,21 @@
 
 [http://april.eecs.umich.edu Edwin Olson's April group projects and libraries] are used with some Soar projects. These projects have been recently moved to a new top-level module `aprilsoar`.
 
-= Checkout and Build =
+= Windows =
 
-  * First, follow the instructions to check out and build the Semantic Memory branch of Soar. Technically, `aprilsoar` can be used against the trunk or other Soar branches, but the SMem branch will provide the least resistance.
+[Build Follow the instructions to check out and build] the Semantic Memory branch of Soar. Technically, `aprilsoar` can be used against the trunk or other Soar branches, but the SMem branch will provide the least resistance.
+
+Check out the `trunk/aprilsoar` module next to the checked out copy of Soar. `aprilsoar` cannot be built until all of the April dependencies are on the system. April tools and libraries are obtained from the [http://april.eecs.umich.edu/resources.php April resource pages] (details below).
+
+Create a top-level `april` folder next to `aprilsoar` and `smem`. Download the [http://april.eecs.umich.edu/packages/april-mega.jar april-mega.jar] and place in to the `april` folder. The mega jar includes many tools and a few dependencies for the april project.
+
+The mega jar depends on [http://kenai.com/projects/jogl/pages/Home JOGL]. To satisfy this dependency, first download two jars from [http://download.java.net/media/gluegen/webstart-2.x/ this gluegen folder] and place them in the `april` folder:
+
+  * `gluegen-rt.jar`
+  * The platform-specific `gluegen-rt-natives` jar for your platform.
+
+Next, download the JOGL zip appropriate for your platform from [http://download.java.net/media/jogl/builds/archive/jsr-231-1.1.1a/ this JOGL builds folder].
+
+Unzip the JOGL file in the `april` folder. 
 
 More TODO
