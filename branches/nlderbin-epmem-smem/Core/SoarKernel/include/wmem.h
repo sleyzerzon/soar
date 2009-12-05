@@ -156,7 +156,7 @@ typedef struct wme_struct {
   epmem_node_id epmem_id;
   uintptr_t epmem_valid;
 
-  wma_decay_element* wma_decay_element;
+  wma_decay_element* wma_decay_el;
   tc_number wma_tc_value;
   
 } wme;

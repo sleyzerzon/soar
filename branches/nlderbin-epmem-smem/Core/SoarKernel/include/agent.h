@@ -837,7 +837,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   wma_stat_container* wma_stats;
   
   wma_wme_set* wma_touched_elements;  
-  wma_forget_p_queue* wma_forget_p_queue;
+  wma_forget_p_queue* wma_forget_pq;
 
   double wma_power_array[ WMA_POWER_SIZE ];  
   bool wma_initialized;

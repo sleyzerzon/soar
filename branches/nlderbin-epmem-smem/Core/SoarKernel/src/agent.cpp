@@ -342,7 +342,7 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->wma_params = new wma_param_container( newAgent );
   newAgent->wma_stats = new wma_stat_container( newAgent );
 
-  newAgent->wma_forget_p_queue = new wma_forget_p_queue;
+  newAgent->wma_forget_pq = new wma_forget_p_queue;
   newAgent->wma_touched_elements = new wma_wme_set;  
   newAgent->wma_initialized = false;
   newAgent->wma_tc_counter = 2;
@@ -426,7 +426,7 @@ void destroy_soar_agent (agent * delete_agent)
 
   // cleanup wma
   wma_deinit( delete_agent );
-  delete delete_agent->wma_forget_p_queue;
+  delete delete_agent->wma_forget_pq;
   delete delete_agent->wma_touched_elements;  
   delete delete_agent->wma_params;
   delete delete_agent->wma_stats;

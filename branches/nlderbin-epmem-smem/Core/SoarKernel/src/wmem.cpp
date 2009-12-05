@@ -116,7 +116,7 @@ wme *make_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value, Bool a
   w->gds_next = NIL;
 /* REW: end 09.15.96 */
 
-  w->wma_decay_element = NIL;
+  w->wma_decay_el = NIL;
   w->wma_tc_value = 0;
 
   return w;

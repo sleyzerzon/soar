@@ -172,7 +172,7 @@ void wma_deinit( agent *my_agent )
 	my_agent->wma_touched_elements->clear();
 
 	// clear forgetting priority queue
-	my_agent->wma_forget_p_queue->clear();
+	my_agent->wma_forget_pq->clear();
 
 	my_agent->wma_initialized = false;
 }
@@ -267,9 +267,9 @@ inline wma_reference wma_calculate_initial_boost( agent* my_agent, wme* w )
 			cond_wme = cond->bt.wme_;
 			cond_wme->wma_tc_value = tc;
 
-			if ( cond_wme->wma_decay_element )
+			if ( cond_wme->wma_decay_el )
 			{
-				if ( !cond_wme->wma_decay_element->just_created )
+				if ( !cond_wme->wma_decay_el->just_created )
 				{
 					num_cond_wmes++;
 					combined_activation += wma_get_wme_activation( my_agent, cond_wme );
@@ -281,7 +281,7 @@ inline wma_reference wma_calculate_initial_boost( agent* my_agent, wme* w )
 				{
 					for ( wme_p=cond_wme->preference->wma_o_set->begin(); wme_p!=cond_wme->preference->wma_o_set->end(); wme_p++ )
 					{
-						if ( ( (*wme_p)->wma_tc_value != tc ) && ( !(*wme_p)->wma_decay_element || !(*wme_p)->wma_decay_element->just_created ) )
+						if ( ( (*wme_p)->wma_tc_value != tc ) && ( !(*wme_p)->wma_decay_el || !(*wme_p)->wma_decay_el->just_created ) )
 						{
 							num_cond_wmes++;
 							combined_activation += wma_get_wme_activation( my_agent, (*wme_p) );
@@ -311,7 +311,7 @@ void wma_activate_wme( agent* my_agent, wme* w, wma_reference num_references, wm
 {	
 	if ( wma_should_have_decay_element( w ) )
 	{
-		wma_decay_element* temp_el = w->wma_decay_element;
+		wma_decay_element* temp_el = w->wma_decay_el;
 
 		if ( !temp_el )
 		{
@@ -326,7 +326,7 @@ void wma_activate_wme( agent* my_agent, wme* w, wma_reference num_references, wm
 			temp_el->touches.history_ct = 0;
 			temp_el->touches.next_p = 0;
 
-			w->wma_decay_element = temp_el;
+			w->wma_decay_el = temp_el;
 		}
 
 		if ( o_set )
@@ -389,7 +389,7 @@ void wma_activate_wme( agent* my_agent, wme* w, wma_reference num_references, wm
 inline void wma_forgetting_remove_from_p_queue( agent* my_agent, wma_decay_element* decay_el );
 void wma_deactivate_element( agent* my_agent, wme* w )
 {
-	wma_decay_element* temp_el = w->wma_decay_element;
+	wma_decay_element* temp_el = w->wma_decay_el;
 
 	if ( temp_el )
 	{	
@@ -409,7 +409,7 @@ void wma_deactivate_element( agent* my_agent, wme* w )
 
 void wma_remove_decay_element( agent* my_agent, wme* w )
 {
-	wma_decay_element* temp_el = w->wma_decay_element;
+	wma_decay_element* temp_el = w->wma_decay_el;
 	
 	if ( temp_el )
 	{
@@ -420,7 +420,7 @@ void wma_remove_decay_element( agent* my_agent, wme* w )
 		}		
 
 		free_with_pool( &( my_agent->wma_decay_element_pool ), temp_el );
-		w->wma_decay_element = NULL;
+		w->wma_decay_el = NULL;
 	}
 }
 
@@ -455,7 +455,7 @@ inline void wma_forgetting_add_to_p_queue( agent* my_agent, wma_decay_element* d
 	if ( decay_el )
 	{
 		decay_el->forget_cycle = new_cycle;
-		(*my_agent->wma_forget_p_queue)[ new_cycle ].insert( decay_el );
+		(*my_agent->wma_forget_pq)[ new_cycle ].insert( decay_el );
 	}
 }
 
@@ -464,8 +464,8 @@ inline void wma_forgetting_remove_from_p_queue( agent* my_agent, wma_decay_eleme
 	if ( decay_el )
 	{
 		// try to find set for the element per cycle		
-		wma_forget_p_queue::iterator pq_p = my_agent->wma_forget_p_queue->find( decay_el->forget_cycle );
-		if ( pq_p != my_agent->wma_forget_p_queue->end() )
+		wma_forget_p_queue::iterator pq_p = my_agent->wma_forget_pq->find( decay_el->forget_cycle );
+		if ( pq_p != my_agent->wma_forget_pq->end() )
 		{
 			wma_decay_set::iterator d_p = pq_p->second.find( decay_el );
 			if ( d_p != pq_p->second.end() )
@@ -474,7 +474,7 @@ inline void wma_forgetting_remove_from_p_queue( agent* my_agent, wma_decay_eleme
 
 				if ( pq_p->second.empty() )
 				{
-					my_agent->wma_forget_p_queue->erase( pq_p );
+					my_agent->wma_forget_pq->erase( pq_p );
 				}
 			}
 		}
@@ -537,9 +537,9 @@ inline bool wma_forgetting_update_p_queue( agent* my_agent )
 {
 	bool return_val = false;
 	
-	if ( !my_agent->wma_forget_p_queue->empty() )
+	if ( !my_agent->wma_forget_pq->empty() )
 	{
-		wma_forget_p_queue::iterator pq_p = my_agent->wma_forget_p_queue->begin();
+		wma_forget_p_queue::iterator pq_p = my_agent->wma_forget_pq->begin();
 		wma_d_cycle current_cycle = my_agent->d_cycle_count;
 
 		if ( pq_p->first == current_cycle )
@@ -559,7 +559,7 @@ inline bool wma_forgetting_update_p_queue( agent* my_agent )
 				}
 			}
 
-			my_agent->wma_forget_p_queue->erase( pq_p );
+			my_agent->wma_forget_pq->erase( pq_p );
 		}
 	}
 
@@ -646,7 +646,7 @@ inline void wma_update_decay_histories( agent* my_agent )
 	// add to history for changed elements
 	for ( wme_p=my_agent->wma_touched_elements->begin(); wme_p!=my_agent->wma_touched_elements->end(); wme_p++ )
 	{
-		temp_el = (*wme_p)->wma_decay_element;			
+		temp_el = (*wme_p)->wma_decay_el;			
 		
 		// set history
 		temp_el->touches.access_history[ temp_el->touches.next_p ].d_cycle = current_cycle;
@@ -694,9 +694,9 @@ double wma_get_wme_activation( agent* my_agent, wme* w )
 {
 	double return_val = static_cast<double>( WMA_ACTIVATION_NONE );
 
-	if ( w->wma_decay_element )
+	if ( w->wma_decay_el )
 	{
-		return_val = wma_calculate_decay_activation( my_agent, w->wma_decay_element, my_agent->d_cycle_count );
+		return_val = wma_calculate_decay_activation( my_agent, w->wma_decay_el, my_agent->d_cycle_count );
 	}
 
 	return return_val;
