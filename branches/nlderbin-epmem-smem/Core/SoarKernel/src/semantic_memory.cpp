@@ -629,7 +629,9 @@ void _smem_add_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Sy
 					add_preference_to_tm( my_agent, just_pref );						
 					
 					if ( wma_enabled( my_agent ) )
+					{
 						wma_activate_wmes_in_pref( my_agent, just_pref );
+					}
 				}
 			}
 		}

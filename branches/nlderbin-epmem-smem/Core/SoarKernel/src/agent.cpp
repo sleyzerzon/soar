@@ -84,6 +84,9 @@ void init_soar_agent(agent* thisAgent) {
   select_init(thisAgent);
   predict_init(thisAgent);
 
+  init_memory_pool( thisAgent, &( thisAgent->wma_decay_element_pool ), sizeof( wma_decay_element ), "wma_decay" );
+  wma_init(thisAgent);
+
   thisAgent->epmem_params->exclusions->set_value( "epmem" );
   thisAgent->epmem_params->exclusions->set_value( "smem" );
 
@@ -111,9 +114,6 @@ void init_soar_agent(agent* thisAgent) {
                     "%right[6,%dc]: %rsd[   ]   O: %co");
 
   reset_statistics (thisAgent);
-
-  // should come after reset_statistics
-  wma_init(thisAgent);
 
   /* RDF: For gSKI */
   init_agent_memory(thisAgent);
@@ -342,8 +342,10 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->wma_params = new wma_param_container( newAgent );
   newAgent->wma_stats = new wma_stat_container( newAgent );
 
+  newAgent->wma_forget_p_queue = new wma_forget_p_queue;
+  newAgent->wma_touched_elements = new wma_wme_set;  
   newAgent->wma_initialized = false;
-  newAgent->wma_first = true;
+  newAgent->wma_tc_counter = 2;
 
 
   // epmem initialization
@@ -423,6 +425,9 @@ void destroy_soar_agent (agent * delete_agent)
   delete delete_agent->prediction;
 
   // cleanup wma
+  wma_deinit( delete_agent );
+  delete delete_agent->wma_forget_p_queue;
+  delete delete_agent->wma_touched_elements;  
   delete delete_agent->wma_params;
   delete delete_agent->wma_stats;
 

@@ -51,9 +51,6 @@ typedef struct rhs_function_struct rhs_function;
 // select types
 typedef struct select_info_struct select_info;
 
-// WMA types
-typedef struct wma_timelist_element_struct wma_timelist_element;
-
 #ifdef __cplusplus
 //extern "C"
 //{
@@ -836,16 +833,14 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   std::string *prediction;
 
   // wma
-  wma_param_container *wma_params;
-  wma_stat_container *wma_stats;
-
-  wma_timelist_element wma_timelist[ WMA_MAX_TIMELIST + 1 ];
-  wma_timelist_element *wma_timelist_current;
+  wma_param_container* wma_params;
+  wma_stat_container* wma_stats;
   
-  double wma_power_array[ WMA_POWER_SIZE ];
-  int wma_quick_boost[ WMA_DECAY_HISTORY + 1 ];
+  wma_wme_set* wma_touched_elements;  
+  wma_forget_p_queue* wma_forget_p_queue;
+
+  double wma_power_array[ WMA_POWER_SIZE ];  
   bool wma_initialized;
-  bool wma_first;
   tc_number wma_tc_counter;
 
   // epmem

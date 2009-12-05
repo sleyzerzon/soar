@@ -110,6 +110,9 @@ slot *make_slot (agent* thisAgent, Symbol *id, Symbol *attr)
    s->impasse_id = NIL;
    s->acceptable_preference_wmes = NIL;
    s->marked_for_possible_removal = FALSE;
+
+   s->wma_num_references = 0;
+
    return s;  
 }
 
@@ -131,14 +134,11 @@ void mark_slot_as_changed (agent* thisAgent, slot *s) {
       dc->item = s;
       s->changed = dc;
 
-	  s->wma_num_changes = 1;
+	  s->wma_num_references = 1;
 
       insert_at_head_of_dll (thisAgent->changed_slots, dc, next, prev);
-    }
-	else
-	{
-	  if ( s->wma_num_changes < WMA_DECAY_HISTORY )
-		  s->wma_num_changes++;
+	} else {
+	  s->wma_num_references++;
 	}
   }
 }

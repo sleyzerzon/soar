@@ -1788,6 +1788,11 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 				insert_at_head_of_dll (s->wmes, w, next, prev);
 				w->preference = cand;
 
+				if ( wma_enabled( thisAgent ) )
+				{
+					wma_activate_wme( thisAgent, w, s->wma_num_references );
+				}
+
 				/* REW: begin 09.15.96 */
 				/* Whenever we add a WME to WM, we also want to check and see if
 				this new WME is o-supported.  If so, then we want to add the
@@ -1933,10 +1938,6 @@ void decide_non_context_slot (agent* thisAgent, slot *s)
 #endif
 				/* REW: end   11.25.96 */ 
 				/* REW: end   09.15.96 */
-
-
-				if ( wma_enabled( thisAgent ) )
-					wma_update_new_wme( thisAgent, w, s->wma_num_changes );
 
 				add_wme_to_wm (thisAgent, w);
 			}

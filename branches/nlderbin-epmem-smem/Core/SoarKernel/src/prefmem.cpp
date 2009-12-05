@@ -34,6 +34,7 @@
 #include "decide.h"
 #include "prefmem.h"
 #include "print.h"
+#include "wma.h"
 
 const char * preference_name[] =
 { "acceptable",
@@ -131,7 +132,7 @@ void deallocate_preference (agent* thisAgent, preference *pref) {
 
   if ( pref->wma_o_set )
   {
-	delete pref->wma_o_set;
+	wma_remove_pref_o_set( thisAgent, pref );
   }
   
   /* --- free the memory --- */

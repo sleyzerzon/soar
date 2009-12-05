@@ -887,13 +887,19 @@ void do_one_top_level_phase (agent* thisAgent)
 	  do_output_cycle(thisAgent);
 
 	  if ( smem_enabled( thisAgent ) )
+	  {
 		  smem_go( thisAgent, false );
-
-	  if ( wma_enabled( thisAgent ) )
-		  wma_move_and_remove_wmes( thisAgent );
+	  }	  
 
 	  if ( epmem_enabled( thisAgent ) && ( thisAgent->epmem_params->phase->get_value() == epmem_param_container::phase_output ) )
+	  {
 		  epmem_go( thisAgent );
+	  }
+
+	  if ( wma_enabled( thisAgent ) )
+	  {
+		  wma_go( thisAgent );
+	  }
 
 	  // Count the outputs the agent generates (or times reaching max-nil-outputs without sending output)
 	  if (thisAgent->output_link_changed || ((++(thisAgent->run_last_output_count)) >= static_cast<unsigned long>(thisAgent->sysparams[MAX_NIL_OUTPUT_CYCLES_SYSPARAM])))

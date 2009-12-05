@@ -994,7 +994,7 @@ void deallocate_instantiation (agent* thisAgent, instantiation *inst)
 
 		if ( temp->bt.trace->wma_o_set )
 		{
-		  delete temp->bt.trace->wma_o_set;
+			wma_remove_pref_o_set( thisAgent, temp->bt.trace );
 		}
 
 		/* --- free the memory --- */
@@ -1037,9 +1037,6 @@ void retract_instantiation (agent* thisAgent, instantiation *inst) {
   retracted_a_preference = FALSE;
   
   trace_it = trace_firings_of_inst (thisAgent, inst);
-
-  if ( wma_enabled( thisAgent ) )
-    wma_update_wmes_in_retracted_inst( thisAgent, inst );
 
   /* --- retract any preferences that are in TM and aren't o-supported --- */
   pref = inst->preferences_generated;
@@ -1231,7 +1228,9 @@ void assert_new_preferences (agent* thisAgent)
 			}
 
 			if ( wma_enabled( thisAgent ) )
+			{
 				wma_activate_wmes_in_pref( thisAgent, pref );
+			}
 		}
 	}
 #ifndef O_REJECTS_FIRST
@@ -1279,7 +1278,9 @@ void do_preference_phase (agent* thisAgent) {
   }
 
   if ( wma_enabled( thisAgent ) )
-	  wma_update_wmes_tested_in_prods( thisAgent );
+  {
+	  wma_activate_wmes_tested_in_prods( thisAgent );
+  }
 
   /* New waterfall model: */
   // Save previous active level for usage on next elaboration cycle.

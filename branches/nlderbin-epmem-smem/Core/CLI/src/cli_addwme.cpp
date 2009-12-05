@@ -142,7 +142,9 @@ bool CommandLineInterface::DoAddWME(const std::string& id, std::string attribute
 	insert_at_head_of_dll( pWme->id->id.input_wmes, pWme, next, prev );
 
 	if ( wma_enabled( m_pAgentSoar ) )
-		wma_update_new_wme( m_pAgentSoar, pWme, 1 );
+	{
+		wma_activate_wme( m_pAgentSoar, pWme );
+	}
 
 	add_wme_to_wm( m_pAgentSoar, pWme );
 

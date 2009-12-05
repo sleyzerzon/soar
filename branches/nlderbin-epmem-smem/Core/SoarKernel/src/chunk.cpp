@@ -1441,9 +1441,6 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 	thisAgent->timers_chunking_cpu_time[thisAgent->current_phase].update(local_timer);
 #endif
 #endif
-
-	  if ( wma_enabled( thisAgent ) )
-		  wma_activate_wmes_in_inst( thisAgent, chunk_inst );
 	  
 	  return;
 	  

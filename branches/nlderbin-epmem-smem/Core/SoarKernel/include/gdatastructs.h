@@ -35,6 +35,9 @@ typedef struct wme_struct wme;
 typedef union symbol_union Symbol;
 typedef cons list;
 
+typedef std::set< wme* > wma_wme_set;
+typedef unsigned long wma_reference;
+
 /* REW: begin 09.15.96 */
 
 /* ------------------------------------------------------------------------
@@ -223,7 +226,7 @@ typedef struct preference_struct {
   double numeric_value;
   bool rl_contribution;
 
-  std::set< wme* >* wma_o_set;
+  wma_wme_set* wma_o_set;
 
 } preference;
 
@@ -309,7 +312,8 @@ typedef struct slot_struct {
                                              or points to dl_cons if the slot
                                              has changed + or ! pref's */
 
-  unsigned long wma_num_changes;
+  wma_reference wma_num_references;
+
 } slot;
 
 /* -------------------------------------------------------------------

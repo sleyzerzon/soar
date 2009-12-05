@@ -138,11 +138,27 @@ namespace soar_module
 				cond->data.tests.value_test = make_equality_test( (*p)->value );
 				cond->test_for_acceptable_preference = (*p)->acceptable;
 				cond->bt.wme_ = (*p);
-				wme_add_ref( (*p) );
+
+				#ifndef DO_TOP_LEVEL_REF_CTS
+				if ( inst->match_goal_level > TOP_GOAL_LEVEL )
+				#endif
+				{
+					wme_add_ref( (*p) );
+				}			
+				
 				cond->bt.level = (*p)->id->id.level;
 				cond->bt.trace = (*p)->preference;
+				
 				if ( cond->bt.trace )
-					preference_add_ref( cond->bt.trace );
+				{
+					#ifndef DO_TOP_LEVEL_REF_CTS
+					if ( inst->match_goal_level > TOP_GOAL_LEVEL )
+					#endif
+					{
+						preference_add_ref( cond->bt.trace );
+					}
+				}				
+
 				cond->bt.prohibits = NULL;
 
 				prev_cond = cond;

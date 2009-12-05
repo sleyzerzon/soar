@@ -117,7 +117,6 @@ wme *make_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value, Bool a
 /* REW: end 09.15.96 */
 
   w->wma_decay_element = NIL;
-  w->wma_has_decay_element = false;
   w->wma_tc_value = 0;
 
   return w;
@@ -283,9 +282,6 @@ void do_buffered_wm_changes (agent* thisAgent)
       filtered_print_wme_remove (thisAgent, w);  /* kjh(CUSP-B2) begin */
     }
 
-	if ( wma_enabled( thisAgent ) )
-	  wma_deactivate_element( thisAgent, w );
-
     wme_remove_ref (thisAgent, w);
     free_cons (thisAgent, c);
     thisAgent->wme_removal_count++;
@@ -301,7 +297,9 @@ void deallocate_wme (agent* thisAgent, wme *w) {
 #endif
 
   if ( wma_enabled( thisAgent ) )
+  {
     wma_remove_decay_element( thisAgent, w );
+  }
 
   symbol_remove_ref (thisAgent, w->id);
   symbol_remove_ref (thisAgent, w->attr);

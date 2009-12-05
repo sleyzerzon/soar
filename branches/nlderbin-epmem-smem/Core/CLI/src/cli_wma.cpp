@@ -27,7 +27,6 @@ bool CommandLineInterface::ParseWMA( std::vector<std::string>& argv )
 	Options optionsData[] = 
 	{
 		{'g', "get",	OPTARG_NONE},
-		{'p', "print",  OPTARG_NONE},
 		{'s', "set",	OPTARG_NONE},
 		{'S', "stats",	OPTARG_NONE},		
 		{0, 0, OPTARG_NONE} // null
@@ -46,10 +45,6 @@ bool CommandLineInterface::ParseWMA( std::vector<std::string>& argv )
 			case 'g':
 				options.set( WMA_GET );
 				break;
-
-			case 'p':				
-				wma_print_activated_wmes( m_pAgentSoar, WMA_MAX_TIMELIST );
-				return true;
 			
 			case 's':
 				options.set( WMA_SET );
@@ -181,39 +176,6 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
 
 		temp = "forgetting: ";
 		temp2 = m_pAgentSoar->wma_params->forgetting->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-		{
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		}
-
-		temp = "i-support: ";
-		temp2 = m_pAgentSoar->wma_params->isupport->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-		{
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		}
-
-		temp = "persistence: ";
-		temp2 = m_pAgentSoar->wma_params->persistence->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-		{
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		}
-
-		temp = "precision: ";
-		temp2 = m_pAgentSoar->wma_params->precision->get_string();
 		temp += temp2;
 		delete temp2;
 		if ( m_RawOutput )

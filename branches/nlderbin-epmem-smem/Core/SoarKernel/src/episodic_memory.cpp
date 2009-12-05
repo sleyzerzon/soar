@@ -870,7 +870,9 @@ void _epmem_add_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, S
 					add_preference_to_tm( my_agent, just_pref );						
 					
 					if ( wma_enabled( my_agent ) )
+					{
 						wma_activate_wmes_in_pref( my_agent, just_pref );
+					}
 				}
 			}
 		}
@@ -3917,7 +3919,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										my_agent->epmem_stmts_tree->find_node_unique->bind_int( 3, my_hash2 );
 
 										if ( my_agent->epmem_stmts_tree->find_node_unique->execute() == soar_module::row )
+										{
 											leaf_ids[i].push_back( epmem_create_leaf_node( my_agent->epmem_stmts_tree->find_node_unique->column_int( 0 ), wma_get_wme_activation( my_agent, (*w_p) ) ) );
+										}
 
 										my_agent->epmem_stmts_tree->find_node_unique->reinitialize();
 									}
@@ -3943,7 +3947,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 							else
 							{
 								if ( !just_started )
+								{
 									leaf_ids[i].push_back( epmem_create_leaf_node( parent_id, wma_get_wme_activation( my_agent, parent_wme ) ) );
+								}
 							}
 
 							// free space from aug list

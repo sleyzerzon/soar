@@ -210,7 +210,9 @@ wme *add_input_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value) {
   insert_at_head_of_dll (id->id.input_wmes, w, next, prev);
 
   if ( wma_enabled( thisAgent ) )
-    wma_update_new_wme( thisAgent, w, 1 );
+  {
+    wma_activate_wme( thisAgent, w );
+  }
 
   add_wme_to_wm (thisAgent, w);
 
