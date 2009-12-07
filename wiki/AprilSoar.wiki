@@ -4,6 +4,12 @@
 
 = Windows =
 
+== Updated Jars ==
+
+Right now, the libraries posted on april.eecs.umich.edu as described below are not sufficiently up to date. Until they are updated, the jars [http://www.eecs.umich.edu/~soar/sitemaker/misc/april/ need to be downloaded from a secondary site].
+
+== Procedure ==
+
 [Build Follow the instructions to check out and build] the Semantic Memory branch of Soar in to a folder named `smem`. Technically, `aprilsoar` can be used against the trunk or other Soar branches, but the SMem branch will provide the least resistance.
 
 Check out the `trunk/aprilsoar` module next to `smem`. `aprilsoar` cannot be built until all of the April dependencies are on the system. April tools and libraries are obtained from the [http://april.eecs.umich.edu/resources.php April resource pages].
