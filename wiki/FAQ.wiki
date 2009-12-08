@@ -3,7 +3,7 @@
 
 [http://acs.ist.psu.edu/soar-faq/soar-faq.html Soar FAQ hosted at PSU is here].
 
-<wiki:toc max_depth="2"/>
+<wiki:toc max_depth="3"/>
 
 ----
 
@@ -52,6 +52,31 @@ There are several ways to do this:
   * If your production is in Visual Soar, you can do "Soar Runtime" -> "Connect" to connect to the debugger. Then, open the file with your production and do "Runtime" -> "Send Production" or "Send File" to load your production(s) into Soar.
 
 == Developing Soar ==
+
+=== SCons is adding a lot of ridiculous include directories and the build fails ===
+
+Seeing something like this means you should define `JAVA_HOME`:
+
+{{{
+g++ -o Core/CLI/CommandLineInterface.o -c -DSCONS -fvisibility=hidden
+-g3 -Wall -Werror -O3 -m64 -fPIC -ICore/CLI/src -ICore/CLI/include
+-ICore/SoarKernel/include -ICore/ElementXML/include
+-ICore/ConnectionSML/include -ICore/KernelSML/include -ICore/shared
+-I/usr/include -I/usr/include/netatalk -I/usr/include/netinet
+-I/usr/include/protocols -I/usr/include/dbus-1.0 -I/usr/include/blkid
+-I/usr/include/netax25 -I/usr/include/nfs -I/usr/include/rdma
+-I/usr/include/netpacket -I/usr/include/X11 -I/usr/include/c++
+-I/usr/include/neteconet -I/usr/include/xen -I/usr/include/rpc
+-I/usr/include/gnu -I/usr/include/netash -I/usr/include/asm
+-I/usr/include/sound -I/usr/include/mtd -I/usr/include/asm-generic
+-I/usr/include/netrom -I/usr/include/compiz -I/usr/include/arpa
+-I/usr/include/net -I/usr/include/rpcsvc -I/usr/include/netiucv
+-I/usr/include/linux -I/usr/include/netrose -I/usr/include/video
+-I/usr/include/bits -I/usr/include/netipx -I/usr/include/uuid
+-I/usr/include/python2.5 -I/usr/include/sys -I/usr/include/python2.6
+}}}
+
+See [Build#Linux_Environment the environment section of the Linux build instructions].
 
 ===How can I use Eclipse to work with SML Java apps?===
 If you get an error like this:
