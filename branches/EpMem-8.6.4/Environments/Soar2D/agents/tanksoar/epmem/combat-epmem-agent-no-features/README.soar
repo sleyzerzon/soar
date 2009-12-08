@@ -1,5 +1,0 @@
-#####
-#This agent is a modification of the base epmem
-#combat tank.  The use of heuristically selected
-#features for the cue has been replaced with 
-#the use of the agent's entire input link

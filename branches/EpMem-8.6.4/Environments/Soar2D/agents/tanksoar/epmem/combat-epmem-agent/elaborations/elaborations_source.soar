@@ -1,9 +1,0 @@
-source _all.soar
-source debugging.soar
-source enemy-direction.soar
-source heuristics.soar
-source meta-evaluation.soar
-source monitor.soar
-source output.soar
-source shields.soar
-source top-state.soar

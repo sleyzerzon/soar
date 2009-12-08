@@ -1,3 +1,0 @@
-pushd combat-epmem-agent
-source combat-epmem-agent_source.soar
-popd

@@ -1,5 +1,0 @@
-source elaborations.soar
-source evaluate-op.soar
-pushd evaluate-op
-source evaluate-op_source.soar
-popd
