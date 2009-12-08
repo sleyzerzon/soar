@@ -1,7 +1,0 @@
-#sp {elaborate*state*score
-#   :monitor
-#   (state <s> ^io.input-link.eater.score <score>)
-#-->
-#   (write (crlf) |Current Score: | <score> |.|)
-#}
-#

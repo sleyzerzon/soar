@@ -1,3 +1,0 @@
-pushd greedy
-source greedy_source.soar
-popd

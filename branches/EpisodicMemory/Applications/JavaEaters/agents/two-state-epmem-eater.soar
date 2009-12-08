@@ -1,3 +1,0 @@
-pushd two-state-epmem-eater
-source two-state-epmem-eater_source.soar
-popd

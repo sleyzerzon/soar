@@ -1,3 +1,0 @@
-pushd epmem-eater
-source epmem-eater_source.soar
-popd
