@@ -181,9 +181,7 @@ Recommended system setting: _disable_ visual effects: system -> preferences ->
 appearance -> visual effects
 
 Install these packages using your favorite package manager, such as `apt-get`
-where the command would be `sudo apt-get install` followed by this list: `scons
-swig sun-java6-jdk subversion libc6-dev g++ ant manpages-dev python-all-dev
-libsvn-java subversion-tools`
+where the command would be `sudo apt-get install` followed by this list: `scons swig sun-java6-jdk subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools`
 
 Make sure the Sun JDK is in use: `sudo update-java-alternatives -s java-6-sun`
 
