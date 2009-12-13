@@ -939,6 +939,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 #ifndef NO_TIMING_STUFF
 #ifdef DETAILED_TIMING_STATS
 	soar_process_timer local_timer;
+	local_timer.set_enabled( &( thisAgent->sysparams[ TIMERS_ENABLED ] ) );
 #endif
 #endif
 

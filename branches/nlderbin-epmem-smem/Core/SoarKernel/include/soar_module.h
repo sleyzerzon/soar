@@ -729,10 +729,8 @@ namespace soar_module
 			predicate<timer_level> *pred;			
 
 		public:
-			timer( const char *new_name, agent *new_agent, timer_level new_level, predicate<timer_level> *new_pred ): named_object( new_name ), my_agent( new_agent ), level( new_level ), pred( new_pred )
-			{
-				reset();
-			}
+
+			timer( const char *new_name, agent *new_agent, timer_level new_level, predicate<timer_level> *new_pred );
 
 			virtual ~timer()
 			{
@@ -768,7 +766,9 @@ namespace soar_module
 			virtual void start()
 			{
 				if ( (*pred)( level ) )
+				{
 					stopwatch.start();
+				}
 			}
 
 			virtual void stop()

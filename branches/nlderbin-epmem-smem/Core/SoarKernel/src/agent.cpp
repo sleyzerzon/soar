@@ -254,6 +254,12 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   /* Initializing all the timer structures */
 #ifndef NO_TIMING_STUFF
+
+  newAgent->timers_cpu.set_enabled( &( newAgent->sysparams[ TIMERS_ENABLED ] ) );
+  newAgent->timers_kernel.set_enabled( &( newAgent->sysparams[ TIMERS_ENABLED ] ) );
+  newAgent->timers_phase.set_enabled( &( newAgent->sysparams[ TIMERS_ENABLED ] ) );
+  newAgent->timers_gds.set_enabled( &( newAgent->sysparams[ TIMERS_ENABLED ] ) );
+
   newAgent->timers_cpu.reset();
   newAgent->timers_kernel.reset();
   newAgent->timers_phase.reset();
@@ -552,5 +558,5 @@ void destroy_soar_agent (agent * delete_agent)
   xml_destroy( delete_agent );
 
   /* Free soar agent structure */
-  free(delete_agent);
+  delete delete_agent;
 }

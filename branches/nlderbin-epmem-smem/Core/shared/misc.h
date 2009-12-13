@@ -279,16 +279,19 @@ class soar_timer_impl
 	: public soar_timer
 {
 public:
-	soar_timer_impl() {}
+	soar_timer_impl() { enabled_ptr=NULL; }
 	~soar_timer_impl() {}
 
-	void start() { timer.start(); }
-	void stop() { timer.stop(); }
-	void reset() { start(); stop(); }
-	uint64_t get_usec() { return static_cast<uint64_t>(timer.get_microseconds()); }
+	void set_enabled( long* new_enabled ) { enabled_ptr=new_enabled; }
+
+	void start() { if ( (!enabled_ptr) || (*enabled_ptr) ) { timer.start(); } }
+	void stop() { if ( (!enabled_ptr) || (*enabled_ptr) ) { timer.stop(); } }
+	void reset() { if ( (!enabled_ptr) || (*enabled_ptr) ) { start(); stop(); } }
+	uint64_t get_usec() { return static_cast<uint64_t>( ( ( (!enabled_ptr) || (*enabled_ptr) )?( timer.get_microseconds() ):( 0 ) ) ); }
 
 private:
 	C timer;
+	long* enabled_ptr;
 
 	soar_timer_impl(const soar_timer_impl&);
 	soar_timer_impl& operator=(const soar_timer_impl&);
