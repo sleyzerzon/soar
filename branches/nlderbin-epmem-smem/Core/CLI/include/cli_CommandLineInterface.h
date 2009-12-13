@@ -29,6 +29,7 @@
 #include "cli_Aliases.h"
 #include "kernel.h"
 
+typedef uintptr_t epmem_time_id;
 typedef uintptr_t smem_lti_id;
 
 // For test
@@ -349,7 +350,7 @@ public:
 	* @param pAttr the attribute to get/set/stats, pass 0 (null) only if no pOp (all config) or stats (full stats)
 	* @param pVal the value to set, pass 0 (null) only if no pOp (all config), get, or stats
 	*************************************************************/
-	bool DoEpMem(const char pOp = 0, const std::string *pAttr = 0, const std::string *pVal = 0);
+	bool DoEpMem(const char pOp = 0, const std::string *pAttr = 0, const std::string *pVal = 0, const epmem_time_id memory_id = 0);
 
 	/*************************************************************
 	* @brief excise command

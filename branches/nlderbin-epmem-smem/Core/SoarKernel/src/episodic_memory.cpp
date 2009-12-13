@@ -57,6 +57,8 @@
 // non-cue-based queries		epmem::ncb
 // cue-based queries			epmem::cbr
 
+// vizualization				epmem::viz
+
 // high-level api				epmem::api
 
 
@@ -4315,6 +4317,250 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 	}
 }
 
+
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+// Visualization (epmem::viz)
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
+void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::string* buf )
+{
+	// if this is before the first episode, initialize db components
+	if ( my_agent->epmem_db->get_status() == soar_module::disconnected )
+	{
+		epmem_init_db( my_agent );
+	}
+
+	// if bad memory, bail
+	buf->clear();
+	if ( ( memory_id == EPMEM_MEMID_NONE ) ||
+		 !epmem_valid_episode( my_agent, memory_id ) )
+	{		
+		return;
+	}
+
+	// init
+	{
+		buf->append( "digraph epmem {\n" );
+	}
+
+	// taken heavily from install
+	{
+		soar_module::sqlite_statement *my_q;
+
+		// first identifiers (i.e. reconstruct)
+		my_q = my_agent->epmem_stmts_graph->get_edges;		
+		{
+			std::set< epmem_node_id > ids;
+			std::list< std::string > edges;
+			
+			// relates to finite automata: q1 = d(q0, w)
+			epmem_node_id q0; // id
+			epmem_node_id q1; // attribute
+			intptr_t w_type; // we support any constant attribute symbol
+			std::string temp, temp2;
+			double temp_d;
+			long temp_i;
+
+			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ] ) );
+
+			my_q->bind_int( 1, memory_id );
+			my_q->bind_int( 2, memory_id );
+			my_q->bind_int( 3, memory_id );
+			my_q->bind_int( 4, memory_id );
+			while ( my_q->execute() == soar_module::row )
+			{				
+				// q0, w, q1, w_type
+				q0 = my_q->column_int( 0 );
+				q1 = my_q->column_int( 2 );
+				w_type = my_q->column_int( 3 );
+
+				ids.insert( q0 );
+				ids.insert( q1 );
+
+				temp.assign( "STI_" );
+				to_string( q0, temp2 );
+				temp.append( temp2 );
+				temp.append( " -> STI_" );
+				to_string( q1, temp2 );
+				temp.append( temp2 );
+				temp.append( " [ label=\"" );
+
+				switch ( w_type )
+				{
+					case INT_CONSTANT_SYMBOL_TYPE:
+						temp_i = static_cast<long>( my_q->column_int( 1 ) );
+						to_string( temp_i, temp2 );
+						break;
+
+					case FLOAT_CONSTANT_SYMBOL_TYPE:
+						temp_d = my_q->column_double( 1 );
+						to_string( temp_d, temp2 );
+						break;
+
+					case SYM_CONSTANT_SYMBOL_TYPE:
+						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 1 ) ) ) );
+						break;
+				}
+
+				temp.append( temp2 );
+				temp.append( "\" ];\n" );
+
+				edges.push_back( temp );
+
+			}
+			my_q->reinitialize();			
+			epmem_rit_clear_left_right( my_agent );
+
+			// identifiers
+			{
+				std::set< epmem_node_id >::iterator id_p;				
+
+				buf->append( "node [ shape = circle ];\n" );
+				for ( id_p=ids.begin(); id_p!=ids.end(); id_p++ )
+				{
+					buf->append( "STI_" );
+					
+					to_string( (*id_p), temp );
+					temp.append( " " );
+
+					buf->append( temp );
+				}
+				buf->append( ";\n" );
+			}
+
+			// edges
+			{
+				std::list< std::string >::iterator e_p;
+
+				for ( e_p=edges.begin(); e_p!=edges.end(); e_p++ )
+				{
+					buf->append( (*e_p) );
+				}
+			}
+		}
+
+		// then node_unique
+		my_q = my_agent->epmem_stmts_graph->get_nodes;
+		{
+			epmem_node_id child_id;
+			epmem_node_id parent_id;
+			intptr_t attr_type;
+			intptr_t value_type;
+
+			std::list< std::string > edges;
+			std::list< std::string > consts;
+
+			std::string temp, temp2;
+			double temp_d;
+			long temp_i;
+
+			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ] ) );
+
+			my_q->bind_int( 1, memory_id );
+			my_q->bind_int( 2, memory_id );
+			my_q->bind_int( 3, memory_id );
+			my_q->bind_int( 4, memory_id );
+			while ( my_q->execute() == soar_module::row )
+			{
+				// f.child_id, f.parent_id, f.name, f.value, f.attr_type, f.value_type
+				child_id = my_q->column_int( 0 );
+				parent_id = my_q->column_int( 1 );
+				attr_type = my_q->column_int( 4 );
+				value_type = my_q->column_int( 5 );
+
+				temp.assign( "STI_" );
+				to_string( parent_id, temp2 );
+				temp.append( temp2 );
+				temp.append( " -> C_" );
+				to_string( child_id, temp2 );
+				temp.append( temp2 );
+				temp.append( " [ label=\"" );
+
+				// make a symbol to represent the attribute
+				switch ( attr_type )
+				{
+					case INT_CONSTANT_SYMBOL_TYPE:
+						temp_i = static_cast<long>( my_q->column_int( 2 ) );
+						to_string( temp_i, temp2 );						
+						break;
+
+					case FLOAT_CONSTANT_SYMBOL_TYPE:
+						temp_d = my_q->column_double( 2 );
+						to_string( temp_d, temp2 );						
+						break;
+
+					case SYM_CONSTANT_SYMBOL_TYPE:
+						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 2 ) ) ) );
+						break;
+				}
+
+				temp.append( temp2 );
+				temp.append( "\" ];\n" );
+				edges.push_back( temp );
+
+				temp.assign( "C_" );
+				to_string( child_id, temp2 );
+				temp.append( temp2 );
+				temp.append( " [ label=\"" );
+
+				// make a symbol to represent the value
+				switch ( value_type )
+				{
+					case INT_CONSTANT_SYMBOL_TYPE:
+						temp_i = static_cast<long>( my_q->column_int( 3 ) );
+						to_string( temp_i, temp2 );						
+						break;
+
+					case FLOAT_CONSTANT_SYMBOL_TYPE:
+						temp_d = my_q->column_double( 3 );
+						to_string( temp_d, temp2 );						
+						break;
+
+					case SYM_CONSTANT_SYMBOL_TYPE:
+						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 3 ) ) ) );						
+						break;
+				}
+
+				temp.append( temp2 );
+				temp.append( "\" ];\n" );
+
+				consts.push_back( temp );
+				
+			}
+			my_q->reinitialize();
+			epmem_rit_clear_left_right( my_agent );
+
+			// constant nodes
+			{
+				std::list< std::string >::iterator e_p;
+
+				buf->append( "node [ shape = plaintext ];\n" );
+
+				for ( e_p=consts.begin(); e_p!=consts.end(); e_p++ )
+				{
+					buf->append( (*e_p) );
+				}
+			}
+
+			// edges
+			{
+				std::list< std::string >::iterator e_p;				
+
+				for ( e_p=edges.begin(); e_p!=edges.end(); e_p++ )
+				{
+					buf->append( (*e_p) );
+				}
+			}
+		}
+	}
+
+	// close
+	{
+		buf->append( "\n}\n" );
+	}
+}
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////

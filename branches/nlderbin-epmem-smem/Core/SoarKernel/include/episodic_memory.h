@@ -606,4 +606,7 @@ extern void epmem_close( agent *my_agent );
 // perform epmem actions
 extern void epmem_go( agent *my_agent );
 
+// visualization
+extern void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::string* buf );
+
 #endif

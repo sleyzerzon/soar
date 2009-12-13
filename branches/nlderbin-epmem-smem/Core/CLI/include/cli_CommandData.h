@@ -19,6 +19,7 @@ namespace cli {
 		EPMEM_SET,
 		EPMEM_STAT,
 		EPMEM_TIMER,
+		EPMEM_VIZ,
 		EPMEM_NUM_OPTIONS,	// must be last
 	};
 
