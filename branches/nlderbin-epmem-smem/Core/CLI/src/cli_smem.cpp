@@ -244,9 +244,10 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 		temp += temp2;
 		delete temp2;
 		if ( m_RawOutput )
-			m_Result << temp << "\n\n";
+			m_Result << "\n" << temp << "\n\n";
 		else
 		{
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
 		}

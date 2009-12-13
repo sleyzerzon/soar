@@ -176,7 +176,7 @@ sp {apply*test-result*query*failure*success
    (<st> ^id <step>
          ^type query
          ^status failure)
-   (<e-result> ^status failure)
+   (<e-result> ^failure)
 -->
    (<s> ^result success
         ^sub-phase result -
@@ -201,7 +201,7 @@ sp {apply*test-result*query*failure*failure
    (<st> ^id <step>
          ^type query
          ^status failure)
-   (<e-result> ^status success
+   (<e-result> ^success
                ^retrieved <retrieved>)
    (<retrieved> ^observing <observed>)
    (<entry2> ^id <observed>
@@ -234,7 +234,7 @@ sp {apply*test-result*query*success*failure
          ^type query
          ^status success
          ^expected <expected>)
-   (<e-result> ^status failure)
+   (<e-result> ^failure)
    (<entry1> ^id <expected>
              ^name <entry1-name>
              ^scientific-name <entry1-s-name>)

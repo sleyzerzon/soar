@@ -43,7 +43,7 @@ enum epmem_variable_key
 {
 	var_rit_offset_1, var_rit_leftroot_1, var_rit_rightroot_1, var_rit_minstep_1,
 	var_rit_offset_2, var_rit_leftroot_2, var_rit_rightroot_2, var_rit_minstep_2,
-	var_mode, var_next_id
+	var_next_id
 };
 
 // algorithm constants
@@ -89,38 +89,47 @@ typedef uintptr_t epmem_time_id;
 //////////////////////////////////////////////////////////
 
 class epmem_path_param;
-class epmem_graph_match_param;
-class epmem_mode_param;
 
 class epmem_param_container: public soar_module::param_container
 {
 	public:
+		
+		// storage
 		enum db_choices { memory, file };
-		enum mode_choices { tree, graph };
+		
+		// encoding
 		enum phase_choices { phase_output, phase_selection };
 		enum trigger_choices { none, output, dc };
 		enum force_choices { remember, ignore, force_off };
 
+		// performance
 		enum cache_choices { cache_S, cache_M, cache_L };
 		enum opt_choices { opt_safety, opt_speed };
 
-		soar_module::boolean_param *learning;
+		////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////
+
+		soar_module::boolean_param *learning;	
+		
+		// encoding
+		soar_module::constant_param<phase_choices> *phase;
+		soar_module::constant_param<trigger_choices> *trigger;
+		soar_module::constant_param<force_choices> *force;
+		soar_module::set_param *exclusions;
+
+		// storage
 		soar_module::constant_param<db_choices> *database;
 		epmem_path_param *path;
 		soar_module::integer_param *commit;
 
-		epmem_mode_param *mode;
-		epmem_graph_match_param *graph_match;
-
-		soar_module::constant_param<phase_choices> *phase;
-		soar_module::constant_param<trigger_choices> *trigger;
-		soar_module::constant_param<force_choices> *force;
+		// retrieval
+		soar_module::boolean_param *graph_match;
 		soar_module::decimal_param *balance;
-		soar_module::set_param *exclusions;
-		soar_module::constant_param<soar_module::timer::timer_level> *timers;
 
+		// performance
 		soar_module::constant_param<cache_choices> *cache;
 		soar_module::constant_param<opt_choices> *opt;
+		soar_module::constant_param<soar_module::timer::timer_level> *timers;
 
 		epmem_param_container( agent *new_agent );
 };
@@ -133,26 +142,6 @@ class epmem_path_param: public soar_module::string_param
 	public:
 		epmem_path_param( const char *new_name, const char *new_value, soar_module::predicate<const char *> *new_val_pred, soar_module::predicate<const char *> *new_prot_pred, agent *new_agent );
 		virtual void set_value( const char *new_value );
-};
-
-class epmem_graph_match_param: public soar_module::boolean_param
-{
-	protected:
-		agent *my_agent;
-
-	public:
-		epmem_graph_match_param( const char *new_name, soar_module::boolean new_value, soar_module::predicate<soar_module::boolean> *new_prot_pred, agent *new_agent );
-		virtual bool validate_string( const char *new_string );
-};
-
-class epmem_mode_param: public soar_module::constant_param<epmem_param_container::mode_choices>
-{
-	protected:
-		agent *my_agent;
-
-	public:
-		epmem_mode_param( const char *new_name, epmem_param_container::mode_choices new_value, soar_module::predicate<epmem_param_container::mode_choices> *new_prot_pred, agent *new_agent );
-		virtual void set_value( epmem_param_container::mode_choices new_value );
 };
 
 template <typename T>
@@ -304,37 +293,6 @@ class epmem_common_statement_container: public soar_module::sqlite_statement_con
 		soar_module::sqlite_statement *hash_add;
 
 		epmem_common_statement_container( agent *new_agent );
-};
-
-class epmem_tree_statement_container: public soar_module::sqlite_statement_container
-{
-	public:
-		soar_module::sqlite_statement *add_time;
-
-		//
-		
-		soar_module::sqlite_statement *add_node_now;
-		soar_module::sqlite_statement *delete_node_now;
-		soar_module::sqlite_statement *add_node_point;
-		soar_module::sqlite_statement *add_node_range;
-
-		//
-
-		soar_module::sqlite_statement *add_node_unique;
-		soar_module::sqlite_statement *find_node_unique;
-		soar_module::sqlite_statement *find_identifier;
-
-		//
-
-		soar_module::sqlite_statement *valid_episode;
-		soar_module::sqlite_statement *next_episode;
-		soar_module::sqlite_statement *prev_episode;
-
-		soar_module::sqlite_statement *get_episode;
-
-		//
-
-		epmem_tree_statement_container( agent *new_agent );
 };
 
 class epmem_graph_statement_container: public soar_module::sqlite_statement_container

@@ -360,8 +360,7 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->epmem_timers = new epmem_timer_container( newAgent );
 
   newAgent->epmem_db = new soar_module::sqlite_database();
-  newAgent->epmem_stmts_common = NULL;
-  newAgent->epmem_stmts_tree = NULL;
+  newAgent->epmem_stmts_common = NULL;  
   newAgent->epmem_stmts_graph = NULL;
   
   newAgent->epmem_node_removals = new std::map<epmem_node_id, bool>();

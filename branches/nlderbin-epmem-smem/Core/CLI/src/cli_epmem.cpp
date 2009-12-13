@@ -182,85 +182,20 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
 		temp += temp2;
 		delete temp2;
 		if ( m_RawOutput )
-			m_Result << temp << "\n\n";
+			m_Result << "\n" << temp << "\n\n";
 		else
 		{
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
 		}
 
-		temp = "Storage";
+		temp = "Encoding";
 		if ( m_RawOutput )
 			m_Result << temp << "\n";
 		else
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		temp = "-------";
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-
-		temp = "database: ";
-		temp2 = m_pAgentSoar->epmem_params->database->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-
-		temp = "commit: ";
-		temp2 = m_pAgentSoar->epmem_params->commit->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-		{
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		}
-
-		temp = "path: ";
-		temp2 = m_pAgentSoar->epmem_params->path->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n\n";
-		else
-		{
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
-		}
-
-		temp = "Representation";
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		temp = "--------------";
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-
-		temp = "mode: ";
-		temp2 = m_pAgentSoar->epmem_params->mode->get_string();
-		temp += temp2;
-		delete temp2;
-		if ( m_RawOutput )
-			m_Result << temp << "\n\n";
-		else
-		{
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
-		}
-
-		temp = "Space";
-		if ( m_RawOutput )
-			m_Result << temp << "\n";
-		else
-			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
-		temp = "-----";
+		temp = "--------";
 		if ( m_RawOutput )
 			m_Result << temp << "\n";
 		else
@@ -311,6 +246,59 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
 			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
 		}
 
+		temp = "Storage";
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+		temp = "-------";
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+
+		temp = "database: ";
+		temp2 = m_pAgentSoar->epmem_params->database->get_string();
+		temp += temp2;
+		delete temp2;
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+
+		temp = "commit: ";
+		temp2 = m_pAgentSoar->epmem_params->commit->get_string();
+		temp += temp2;
+		delete temp2;
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+		{
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+		}
+
+		temp = "path: ";
+		temp2 = m_pAgentSoar->epmem_params->path->get_string();
+		temp += temp2;
+		delete temp2;
+		if ( m_RawOutput )
+			m_Result << temp << "\n\n";
+		else
+		{
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, "" );
+		}
+
+		temp = "Retrieval";
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+		temp = "---------";
+		if ( m_RawOutput )
+			m_Result << temp << "\n";
+		else
+			AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
 
 		temp = "balance: ";
 		temp2 = m_pAgentSoar->epmem_params->balance->get_string();

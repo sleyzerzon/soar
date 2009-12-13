@@ -18,7 +18,7 @@ sp {apply*initialize-kb*params
         ^current-entry 1
         ^current-test 1
         ^max-entries 5        
-        ^max-tests 15
+        ^max-tests 14
         ^entries <e>
         ^tests <t>)
 }
@@ -48,7 +48,6 @@ sp {apply*intialize-kb*fill
         ^test <t9>
         ^test <t10>
         ^test <t11>
-        ^test <t12>
         ^test <t13>
         ^test <t14>
         ^test <t15>)
@@ -534,46 +533,9 @@ sp {apply*intialize-kb*fill
             ^after 3)
    (<q11-7> ^observing 3)
    ###
-   (<t12> ^id 12
-          ^name |neg tests|
-          ^note |bad state name, failure; good state name, last; 1, 1; last, last|
-          ^steps 4
-          ^step <st12-1>
-          ^step <st12-2>
-          ^step <st12-3>
-          ^step <st12-4>)
-   (<st12-1> ^id 1
-             ^type query
-             ^status failure
-             ^command <c12-1>)
-   (<c12-1> ^neg-query <nq12-1>)
-   (<nq12-1> ^name bad-state-name)
-   (<st12-2> ^id 2
-             ^type query
-             ^status success
-             ^command <c12-2>
-             ^expected <max-entries>
-             ^score -1.)
-   (<c12-2> ^neg-query <nq12-2>)
-   (<nq12-2> ^name kb)
-   (<st12-3> ^id 3
-             ^type query
-             ^status success
-             ^command <c12-3>
-             ^expected 1
-             ^score -1.)
-   (<c12-3> ^neg-query <nq12-3>)
-   (<nq12-3> ^observing 1)
-   (<st12-4> ^id 4
-             ^type query
-             ^status success
-             ^command <c12-4>
-             ^expected <max-entries>
-             ^score -1.)
-   (<c12-4> ^neg-query <nq12-4>)
-   (<nq12-4> ^observing <max-entries>)
+   
    ###
-   (<t13> ^id 13
+   (<t13> ^id 12
           ^name |pos+neg tests|
           ^note |+good state -bad state, last; +bad stat -good state, last; +good state -last, last-1; +last -good state, last; +last -last, last; +1 last -last, 1|
           ^steps 6
@@ -645,7 +607,7 @@ sp {apply*intialize-kb*fill
             ^observing 1)
    (<nq13-6> ^observing <max-entries>)
    ###
-   (<t14> ^id 14
+   (<t14> ^id 13
           ^name |all together now!|
           ^note |+state, last; +state -last, last-1; +state -last before last after 1, last-1; +state -last before last-1 after 1, last-2; +state -last before last-1 prohibit last-2, last-3; +state +1, 1; +state +1 +2 +3 +4, 4; +state +1 +2 +3 +4 -4, 3; +state +1 +2 +3 +4 -4 before 3, 2; +state +1 +2 +3 +4 -4 before 3 prohibit 2, 1; +state +1 +2 +3 +4 -4 after 3 prohibit 2, last; +state +1 +2 +3 +4 -4 after 3 before last prohibit 2, last-1; next, last; previous, last-1|            
           ^steps 14
@@ -833,7 +795,7 @@ sp {apply*intialize-kb*fill
               ^expected (- <max-entries> 1))
    (<c14-14> ^previous <p14-14>)
    ###
-  (<t15> ^id 15
+  (<t15> ^id 14
           ^name |mode 3 checks|
           ^note |warm-blooded, score 1; warm-blooded and Cetacea, score 2; warm-blooded, rabies, not Cetacea, score 1; warm-blooded, rabies, not beaked whale, score 2|
           ^steps 4
