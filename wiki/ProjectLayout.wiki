@@ -60,14 +60,6 @@ The main "stable" kernel. Recently reorganized, probably getting reorganized aga
   * `soar-python`: Python projects.
   * `soar-tcl`: Tcl projects.
 
-= `nlderbin-wma-epmem` =
-
-{{{
-branches/nlderbin-wma-epmem
-}}}
-
-Episodic memory branch, source of 9.1 series of releases. Branched from `trunk/SoarSuite` (originally branched from a working memory activation branch).
-
 = `nlderbin-epmem-smem` =
 
 {{{
