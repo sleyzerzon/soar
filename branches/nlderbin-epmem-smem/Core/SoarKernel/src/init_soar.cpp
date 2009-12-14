@@ -651,7 +651,9 @@ void do_one_top_level_phase (agent* thisAgent)
 		  do_working_memory_phase(thisAgent);
 
 		  if ( smem_enabled( thisAgent ) )
+		  {
 			smem_go( thisAgent, true );
+		  }
 
 		  /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;
@@ -821,7 +823,9 @@ void do_one_top_level_phase (agent* thisAgent)
 		  do_working_memory_phase(thisAgent);
 
 		  if ( smem_enabled( thisAgent ) )
+		  {
 			smem_go( thisAgent, true );
+		  }
 
 		  /* Update accounting.  Moved here by KJC 04/05/05 */
           thisAgent->e_cycle_count++;

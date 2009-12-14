@@ -1299,7 +1299,9 @@ void epmem_reset( agent *my_agent, Symbol *state )
 void epmem_init_db( agent *my_agent, bool readonly = false )
 {
 	if ( my_agent->epmem_db->get_status() != soar_module::disconnected )
+	{
 		return;
+	}
 
 	////////////////////////////////////////////////////////////////////////////
 	my_agent->epmem_timers->init->start();	
@@ -1535,7 +1537,9 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 							temp_q->execute( soar_module::op_reinit );
 						}
 						else
+						{
 							epmem_rit_insert_interval( my_agent, range_start, time_last, temp_q2->column_int( 0 ), &( my_agent->epmem_rit_state_graph[i] ) );
+						}
 					}
 					delete temp_q2;
 					temp_q2 = NULL;
@@ -1749,11 +1753,15 @@ void epmem_new_episode( agent *my_agent )
 {
 	// if this is the first episode, initialize db components
 	if ( my_agent->epmem_db->get_status() == soar_module::disconnected )
+	{
 		epmem_init_db( my_agent );
+	}
 
 	// add the episode only if db is properly initialized
 	if ( my_agent->epmem_db->get_status() != soar_module::connected )
+	{
 		return;
+	}
 
 	////////////////////////////////////////////////////////////////////////////
 	my_agent->epmem_timers->storage->start();	
@@ -2090,7 +2098,9 @@ void epmem_new_episode( agent *my_agent )
 								my_agent->epmem_stmts_graph->find_node_unique->bind_int( 3, my_hash2 );
 
 								if ( my_agent->epmem_stmts_graph->find_node_unique->execute() == soar_module::row )
+								{
 									(*w_p)->epmem_id = my_agent->epmem_stmts_graph->find_node_unique->column_int( 0 );
+								}
 
 								my_agent->epmem_stmts_graph->find_node_unique->reinitialize();								
 							}
@@ -2200,7 +2210,9 @@ void epmem_new_episode( agent *my_agent )
 					}
 					// node
 					else
+					{
 						epmem_rit_insert_interval( my_agent, range_start, range_end, r->first, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ] ) );
+					}
 
 					// update max
 					(*my_agent->epmem_node_maxes)[ r->first - 1 ] = true;
@@ -2233,7 +2245,9 @@ void epmem_new_episode( agent *my_agent )
 					}
 					// node
 					else
+					{
 						epmem_rit_insert_interval( my_agent, range_start, range_end, r->first, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ] ) );
+					}
 
 					// update max
 					(*my_agent->epmem_edge_maxes)[ r->first - 1 ] = true;
@@ -2459,7 +2473,9 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 					symbol_remove_ref( my_agent, attr );
 
 					if ( !existing_identifier )
+					{
 						symbol_remove_ref( my_agent, (*value) );
+					}
 				}
 				else
 				{
@@ -2501,7 +2517,9 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 					symbol_remove_ref( my_agent, orphan->w );
 
 					if ( !existing_identifier )
+					{
 						symbol_remove_ref( my_agent, (*value) );
+					}
 
 					delete orphan;
 				}
@@ -3748,7 +3766,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 													position = 1;
 
 													if ( ( m == EPMEM_RANGE_NOW ) && ( k == EPMEM_RANGE_END ) )
+													{
 														new_stmt->bind_int( position++, time_now );
+													}
 													new_stmt->bind_int( position, unique_identity );													
 
 													// take first step
@@ -3796,7 +3816,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 					for ( cache_p=wme_cache.begin(); cache_p!=wme_cache.end(); cache_p++ )
 					{
 						if ( cache_p->second->wmes )
+						{
 							delete cache_p->second->wmes;
+						}
 
 						delete cache_p->second->lits;
 						delete cache_p->second->parents;
@@ -4275,10 +4297,14 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 				// actual memory
 				if ( level > 2 )
+				{
 					epmem_install_memory( my_agent, state, king_id, my_mapping );
+				}
 
 				if ( my_mapping )
+				{
 					delete my_mapping;
+				}
 			}
 			else
 			{
@@ -4781,7 +4807,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 1;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else if ( (*w_p)->attr == my_agent->epmem_sym_next )
 					{
@@ -4792,7 +4820,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 2;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else if ( (*w_p)->attr == my_agent->epmem_sym_prev )
 					{
@@ -4803,7 +4833,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 2;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else if ( (*w_p)->attr == my_agent->epmem_sym_query )
 					{
@@ -4816,7 +4848,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 3;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else if ( (*w_p)->attr == my_agent->epmem_sym_negquery )
 					{
@@ -4829,7 +4863,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 3;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else if ( (*w_p)->attr == my_agent->epmem_sym_before )
 					{
@@ -4840,7 +4876,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 3;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else if ( (*w_p)->attr == my_agent->epmem_sym_after )
 					{
@@ -4851,7 +4889,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 3;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else if ( (*w_p)->attr == my_agent->epmem_sym_prohibit )
 					{
@@ -4862,10 +4902,14 @@ void epmem_respond_to_cmd( agent *my_agent )
 							path = 3;
 						}
 						else
+						{
 							good_cue = false;
+						}
 					}
 					else
+					{
 						good_cue = false;
+					}
 				}
 			}
 

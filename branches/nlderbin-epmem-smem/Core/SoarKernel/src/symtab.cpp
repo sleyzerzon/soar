@@ -582,7 +582,7 @@ bool reset_id_counters (agent* thisAgent) {
 	}
 	for (i=0; i<26; i++) thisAgent->id_counter[i]=1;
 
-	if ( smem_enabled( thisAgent ) )
+	if ( thisAgent->smem_db->get_status() == soar_module::connected )
 	{
 		smem_reset_id_counters( thisAgent );
 	}

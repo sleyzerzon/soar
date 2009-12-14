@@ -1815,7 +1815,9 @@ void smem_reset( agent *my_agent, Symbol *state )
 void smem_init_db( agent *my_agent, bool readonly )
 {
 	if ( my_agent->smem_db->get_status() != soar_module::disconnected )
+	{
 		return;
+	}
 
 	////////////////////////////////////////////////////////////////////////////
 	my_agent->smem_timers->init->start();
@@ -1823,9 +1825,13 @@ void smem_init_db( agent *my_agent, bool readonly )
 
 	const char *db_path;
 	if ( my_agent->smem_params->database->get_value() == smem_param_container::memory )
+	{
 		db_path = ":memory:";
+	}
 	else
+	{
 		db_path = my_agent->smem_params->path->get_value();
+	}
 
 	// attempt connection
 	my_agent->smem_db->connect( db_path );
