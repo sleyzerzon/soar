@@ -330,7 +330,12 @@ class epmem_graph_statement_container: public soar_module::sqlite_statement_cont
 		soar_module::sqlite_statement *get_nodes;
 		soar_module::sqlite_statement *get_edges;
 
-		//		
+		//
+
+		soar_module::sqlite_statement *promote_id;
+		soar_module::sqlite_statement *find_lti;
+
+		//
 		
 		epmem_graph_statement_container( agent *new_agent );
 };
@@ -450,9 +455,15 @@ typedef struct epmem_id_reservation_struct
 // follows cs theory notation of finite automata: q1 = d( q0, w )
 typedef struct epmem_edge_struct
 {
+	
 	epmem_node_id q0;							// id
 	Symbol *w;									// attr
 	epmem_node_id q1;							// value
+
+	bool val_is_short_term;
+	char val_letter;
+	unsigned long val_num;
+
 } epmem_edge;
 
 // represents cached children of an identifier in working memory

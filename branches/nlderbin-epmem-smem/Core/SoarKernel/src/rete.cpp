@@ -1575,14 +1575,15 @@ void add_wme_to_rete (agent* thisAgent, wme *w) {
     add_wme_to_aht (thisAgent, thisAgent->alpha_hash_tables[7],  xor_op(hi,ha,hv), w);
   }
 
-  w->epmem_id = NIL;  
+  w->epmem_id = EPMEM_NODEID_BAD;  
   w->epmem_valid = NIL; 
   {
 	if ( thisAgent->epmem_db->get_status() == soar_module::connected )
 	{
       if ( ( w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-	       ( w->value->id.epmem_id != NIL ) &&
-		   ( w->value->id.epmem_valid == thisAgent->epmem_validation ) )
+	       ( w->value->id.epmem_id != EPMEM_NODEID_BAD ) &&
+		   ( w->value->id.epmem_valid == thisAgent->epmem_validation ) &&
+		   ( !w->value->id.smem_lti ) )
       {
 	    (*thisAgent->epmem_id_ref_counts)[ w->value->id.epmem_id ]++;
       }
@@ -1602,20 +1603,28 @@ void remove_wme_from_rete (agent* thisAgent, wme *w) {
 	{
 	  if ( w->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 	  {
-	    if ( ( w->epmem_id != NIL ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
+		bool lti = ( w->value->id.smem_lti != NIL );
+		  
+		if ( ( w->epmem_id != EPMEM_NODEID_BAD ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
 	    {
 		  (*thisAgent->epmem_edge_removals)[ w->epmem_id ] = true;
 
 		  // return to the id pool
-		  epmem_return_id_pool::iterator p = thisAgent->epmem_id_replacement->find( w->epmem_id );
-		  (*p->second)[ w->value->id.epmem_id ] = w->epmem_id;
-		  thisAgent->epmem_id_replacement->erase( p );
+		  if ( !lti )
+		  {
+		    epmem_return_id_pool::iterator p = thisAgent->epmem_id_replacement->find( w->epmem_id );
+		    (*p->second)[ w->value->id.epmem_id ] = w->epmem_id;
+		    thisAgent->epmem_id_replacement->erase( p );
+		  }
 		}
 
 		// reduce the ref count on the identifier
-		(*thisAgent->epmem_id_ref_counts)[ w->value->id.epmem_id ]--;
+		if ( !lti )
+		{
+		  (*thisAgent->epmem_id_ref_counts)[ w->value->id.epmem_id ]--;
+		}
 	  }
-	  else if ( ( w->epmem_id != NIL ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
+	  else if ( ( w->epmem_id != EPMEM_NODEID_BAD ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
 	  {
 	    (*thisAgent->epmem_node_removals)[ w->epmem_id ] = true;
 	  }

@@ -39,6 +39,7 @@
 #include "soar_TraceNames.h"
 
 #include "wma.h"
+#include "episodic_memory.h"
 
 using namespace soar_TraceNames;
 
@@ -118,6 +119,9 @@ wme *make_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value, Bool a
 
   w->wma_decay_el = NIL;
   w->wma_tc_value = 0;
+
+  w->epmem_id = EPMEM_NODEID_BAD;
+  w->epmem_valid = NIL;
 
   return w;
 }

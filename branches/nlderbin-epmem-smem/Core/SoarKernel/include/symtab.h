@@ -277,6 +277,8 @@ typedef struct identifier_struct {
   uintptr_t epmem_valid;
 
   smem_lti_id smem_lti;
+  epmem_time_id smem_time_id;
+  uintptr_t smem_valid;
 } identifier;
 
 typedef union symbol_union {

@@ -508,6 +508,8 @@ void do_one_top_level_phase (agent* thisAgent)
 		return;
 	}
 
+	smem_attach( thisAgent );
+
   /*
    *  This code was commented by SoarTech with the addition of gSKI
    *  because gSKI requires the existence of a ^state and ^io link

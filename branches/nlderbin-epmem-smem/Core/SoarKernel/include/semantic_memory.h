@@ -352,11 +352,12 @@ enum smem_query_levels { qry_search, qry_full };
 //////////////////////////////////////////////////////////
 
 extern inline bool smem_enabled( agent *my_agent );
+extern inline void smem_attach( agent *my_agent );
 
 extern bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_msg );
 
-extern std::string *smem_visualize_store( agent *my_agent );
-extern std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth );
+extern void smem_visualize_store( agent *my_agent, std::string *return_val );
+extern void smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth, std::string *return_val );
 
 typedef struct condition_struct condition;
 typedef struct action_struct action;

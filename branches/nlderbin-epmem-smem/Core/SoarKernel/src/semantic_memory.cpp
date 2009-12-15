@@ -34,8 +34,6 @@
 #include <ctype.h>
 #include <fstream>
 
-void smem_init_db( agent *my_agent, bool readonly = false );
-
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 // Bookmark strings to help navigate the code
@@ -674,7 +672,9 @@ inline bool smem_variable_get( agent *my_agent, smem_variable_key variable_id, i
 	status = var_get->execute();
 
 	if ( status == soar_module::row )
+	{
 		(*variable_value) = var_get->column_int( 0 );
+	}
 
 	var_get->reinitialize();
 
@@ -960,10 +960,7 @@ smem_lti_id smem_lti_get_id( agent *my_agent, char name_letter, uint64_t name_nu
 	smem_lti_id return_val = NIL;
 
 	// getting lti ids requires an open semantic database
-	if ( my_agent->smem_db->get_status() == soar_module::disconnected )
-	{
-		smem_init_db( my_agent );
-	}
+	smem_attach( my_agent );
 	
 	// letter=? AND number=?
 	my_agent->smem_stmts->lti_get->bind_int( 1, static_cast<uintptr_t>( name_letter ) );
@@ -1010,6 +1007,9 @@ inline smem_lti_id smem_lti_soar_add( agent *my_agent, Symbol *id )
 		if ( id->id.smem_lti == NIL )
 		{
 			id->id.smem_lti = smem_lti_add_id( my_agent, id->id.name_letter, id->id.name_number );
+
+			id->id.smem_time_id = my_agent->epmem_stats->time->get_value();
+			id->id.smem_valid = my_agent->epmem_validation;
 		}
 	}
 
@@ -1204,6 +1204,9 @@ void smem_store_chunk( agent *my_agent, smem_lti_id parent_id, smem_slot_map *ch
 					if ( (*v)->val_lti.val_value->soar_id != NIL )
 					{
 						(*v)->val_lti.val_value->soar_id->id.smem_lti = value_lti;
+
+						(*v)->val_lti.val_value->soar_id->id.smem_time_id = my_agent->epmem_stats->time->get_value();
+						(*v)->val_lti.val_value->soar_id->id.smem_valid = my_agent->epmem_validation;
 					}
 				}
 
@@ -1812,7 +1815,7 @@ void smem_reset( agent *my_agent, Symbol *state )
  *                experimentation where you don't want to alter
  *                previous database state.
  **************************************************************************/
-void smem_init_db( agent *my_agent, bool readonly )
+void smem_init_db( agent *my_agent, bool readonly = false )
 {
 	if ( my_agent->smem_db->get_status() != soar_module::disconnected )
 	{
@@ -1960,6 +1963,14 @@ void smem_init_db( agent *my_agent, bool readonly )
 	////////////////////////////////////////////////////////////////////////////
 	my_agent->smem_timers->init->stop();
 	////////////////////////////////////////////////////////////////////////////
+}
+
+void smem_attach( agent *my_agent )
+{
+	if ( my_agent->smem_db->get_status() == soar_module::disconnected )
+	{
+		smem_init_db( my_agent );
+	}
 }
 
 /***************************************************************************
@@ -2412,10 +2423,7 @@ bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_m
 	unsigned long clause_count = 0;
 
 	// parsing chunks requires an open semantic database
-	if ( my_agent->smem_db->get_status() == soar_module::disconnected )
-	{
-		smem_init_db( my_agent );
-	}
+	smem_attach( my_agent );
 
 	// copied primarily from cli_sp
 	my_agent->alternate_input_string = chunks;
@@ -2476,6 +2484,9 @@ bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_m
 									{
 										// if so we make it an lti manually
 										id_parent->id.smem_lti = (*c_new)->lti_id;
+
+										id_parent->id.smem_time_id = my_agent->epmem_stats->time->get_value();
+										id_parent->id.smem_valid = my_agent->epmem_validation;
 									}
 								}
 							}
@@ -2760,10 +2771,7 @@ void smem_respond_to_cmd( agent *my_agent, bool store_only )
 			if ( path != cmd_bad )
 			{
 				// performing any command requires an initialized database
-				if ( my_agent->smem_db->get_status() == soar_module::disconnected )
-				{
-					smem_init_db( my_agent );
-				}
+				smem_attach( my_agent );
 
 				// retrieve
 				if ( path == cmd_retrieve )
@@ -2887,15 +2895,10 @@ void smem_go( agent *my_agent, bool store_only )
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
-std::string *smem_visualize_store( agent *my_agent )
+void smem_visualize_store( agent *my_agent, std::string *return_val )
 {
-	std::string *return_val = new std::string;
-
 	// vizualizing the store requires an open semantic database
-	if ( my_agent->smem_db->get_status() == soar_module::disconnected )
-	{
-		smem_init_db( my_agent );
-	}
+	smem_attach( my_agent );
 
 	// header
 	return_val->append( "digraph smem {" );
@@ -3125,13 +3128,10 @@ std::string *smem_visualize_store( agent *my_agent )
 	// footer
 	return_val->append( "}" );
 	return_val->append( "\n" );
-
-	return return_val;
 }
 
-std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth )
+void smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth, std::string *return_val )
 {
-	std::string *return_val = new std::string;
 	soar_module::sqlite_statement *expand_q = my_agent->smem_stmts->web_expand;
 
 	unsigned long child_counter;
@@ -3377,7 +3377,5 @@ std::string *smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned l
 	// footer
 	return_val->append( "}" );
 	return_val->append( "\n" );
-
-	return return_val;
 }
 

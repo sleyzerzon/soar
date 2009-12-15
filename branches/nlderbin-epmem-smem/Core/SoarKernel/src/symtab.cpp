@@ -342,7 +342,7 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   sym->id.epmem_header = NIL;
   sym->id.epmem_cmd_header = NIL;
   sym->id.epmem_result_header = NIL;
-  sym->id.epmem_id = NIL;
+  sym->id.epmem_id = EPMEM_NODEID_BAD;
   sym->id.epmem_valid = NIL;
 
 
@@ -350,6 +350,8 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   sym->id.smem_cmd_header = NIL;
   sym->id.smem_result_header = NIL;
   sym->id.smem_lti = NIL;
+  sym->id.smem_time_id = EPMEM_MEMID_NONE;
+  sym->id.smem_valid = NIL;
 
 
   add_to_hash_table (thisAgent, thisAgent->identifier_hash_table, sym);
