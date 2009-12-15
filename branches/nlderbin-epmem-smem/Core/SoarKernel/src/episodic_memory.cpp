@@ -3700,6 +3700,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 								{
 									my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
 									good_q = false;
+									my_q = NULL;
 
 									if ( (*w_p)->value->id.smem_lti )
 									{
