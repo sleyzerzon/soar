@@ -1,4 +1,4 @@
-113
+115
 SOAR_ID 0
 SOAR_ID 1
 SOAR_ID 2
@@ -112,7 +112,9 @@ INTEGER_RANGE 109 -2147483648 2147483647
 INTEGER_RANGE 110 -2147483648 2147483647
 SOAR_ID 111
 ENUMERATION 112 2 convert power
-124
+SOAR_ID 113
+ENUMERATION 114 1 storing
+126
 0 convert-result 94
 0 counter 86
 0 digit 33
@@ -136,6 +138,7 @@ ENUMERATION 112 2 convert power
 0 operator 77
 0 operator 79
 0 operator 111
+0 operator 113
 0 size 33
 0 superstate 6
 0 symbolic 44
@@ -237,3 +240,4 @@ ENUMERATION 112 2 convert power
 101 number 103
 101 word 102
 111 type 112
+113 name 114

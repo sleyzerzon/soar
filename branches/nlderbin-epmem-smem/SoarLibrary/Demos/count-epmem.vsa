@@ -24,8 +24,9 @@ VERSION 4
 21	0	HLOPERATOR recording recording.soar recording 65 22
 22	21	FOPERATOR elaborations elaborations.soar 23
 23	21	OPERATOR recording-convert recording-convert.soar 24
-24	0	OPERATOR switch switch.soar 25
-25	0	HLOPERATOR testing testing.soar testing 81 26
-26	25	FOPERATOR elaborations elaborations.soar 27
-27	25	OPERATOR testing-convert testing-convert.soar 28
+24	0	OPERATOR storing storing.soar 29
+25	0	OPERATOR switch switch.soar 25
+26	0	HLOPERATOR testing testing.soar testing 81 26
+27	26	FOPERATOR elaborations elaborations.soar 27
+28	26	OPERATOR testing-convert testing-convert.soar 28
 END

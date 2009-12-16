@@ -21,6 +21,7 @@ source recording.soar
 pushd recording
 source recording_source.soar
 popd
+source storing.soar
 source switch.soar
 source testing.soar
 pushd testing
