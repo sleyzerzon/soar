@@ -2445,45 +2445,43 @@ bool epmem_valid_episode( agent *my_agent, epmem_time_id memory_id )
 	return return_val;
 }
 
-inline void _epmem_install_id_wme( agent* my_agent, Symbol* state, Symbol* parent, Symbol* attr, epmem_id_mapping* ids, epmem_node_id q1, bool val_is_short_term, char val_letter, unsigned long val_num, epmem_id_mapping* id_record )
+inline void _epmem_install_id_wme( agent* my_agent, Symbol* state, Symbol* parent, Symbol* attr, std::map< epmem_node_id, std::pair< Symbol*, bool > >* ids, epmem_node_id q1, bool val_is_short_term, char val_letter, unsigned long val_num, epmem_id_mapping* id_record )
 {
-	epmem_id_mapping::iterator id_p = ids->find( q1 );
+	std::map< epmem_node_id, std::pair< Symbol*, bool > >::iterator id_p = ids->find( q1 );
 	bool existing_identifier = ( id_p != ids->end() );
 	
 	if ( val_is_short_term )
 	{
 		if ( !existing_identifier )
 		{
-			id_p = ids->insert( std::make_pair< epmem_node_id, Symbol* >( q1, make_new_identifier( my_agent, ( ( attr->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE )?( attr->sc.name[0] ):('E') ), parent->id.level ) ) ).first;
+			id_p = ids->insert( std::make_pair< epmem_node_id, std::pair< Symbol*, bool > >( q1, std::make_pair< Symbol*, bool >( make_new_identifier( my_agent, ( ( attr->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE )?( attr->sc.name[0] ):('E') ), parent->id.level ), true ) ) ).first;
 			if ( id_record )
 			{
 				epmem_id_mapping::iterator rec_p = id_record->find( q1 );
 				if ( rec_p != id_record->end() )
 				{
-					rec_p->second = id_p->second;
+					rec_p->second = id_p->second.first;
 				}
 			}
 		}
 
-		epmem_add_retrieved_wme( my_agent, state, parent, attr, id_p->second );
+		epmem_add_retrieved_wme( my_agent, state, parent, attr, id_p->second.first );
 
 		if ( !existing_identifier )
 		{
-			symbol_remove_ref( my_agent, id_p->second );
+			symbol_remove_ref( my_agent, id_p->second.first );
 		}
 	}
 	else
 	{
 		if ( existing_identifier )
 		{
-			if ( id_p->second )
-			{
-				epmem_add_retrieved_wme( my_agent, state, parent, attr, id_p->second );
-			}
+			epmem_add_retrieved_wme( my_agent, state, parent, attr, id_p->second.first );
 		}
 		else
 		{
-			Symbol* value = smem_lti_soar_make( my_agent, q1, val_letter, val_num, parent->id.level );
+			Symbol* value = smem_lti_soar_make( my_agent, q1, val_letter, val_num, parent->id.level );			
+
 			if ( id_record )
 			{
 				epmem_id_mapping::iterator rec_p = id_record->find( q1 );
@@ -2495,15 +2493,8 @@ inline void _epmem_install_id_wme( agent* my_agent, Symbol* state, Symbol* paren
 
 			epmem_add_retrieved_wme( my_agent, state, parent, attr, value );
 			symbol_remove_ref( my_agent, value );
-
-			if ( ( value->id.impasse_wmes ) ||
-				 ( value->id.input_wmes ) ||
-				 ( value->id.slots ) )
-			{
-				value = NULL;
-			}
 			
-			ids->insert( std::make_pair< epmem_node_id, Symbol* >( q1, value ) );
+			ids->insert( std::make_pair< epmem_node_id, std::pair< Symbol*, bool > >( q1, std::make_pair< Symbol*, bool >( value, !( ( value->id.impasse_wmes ) || ( value->id.input_wmes ) || ( value->id.slots ) ) ) ) );
 		}
 	}
 }
@@ -2590,7 +2581,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		// I just hope this isn't a common case...
 
 		// shared identifier lookup table
-		epmem_id_mapping ids;
+		std::map< epmem_node_id, std::pair< Symbol*, bool > > ids;
 
 		// symbols used to create WMEs		
 		Symbol *attr = NULL;
@@ -2599,7 +2590,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		soar_module::sqlite_statement *my_q;
 
 		// initialize the lookup table
-		ids[ EPMEM_NODEID_ROOT ] = retrieved_header;		
+		ids[ EPMEM_NODEID_ROOT ] = std::make_pair< Symbol*, bool >( retrieved_header, true );
 
 		// first identifiers (i.e. reconstruct)
 		my_q = my_agent->epmem_stmts_graph->get_edges;		
@@ -2614,10 +2605,11 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			unsigned long val_num = NIL;
 
 			// used to lookup shared identifiers
-			epmem_id_mapping::iterator id_p;
+			// the bool in the pair refers to if children are allowed on this id (re: lti)
+			std::map< epmem_node_id, std::pair< Symbol*, bool> >::iterator id_p;
 
 			// orphaned children
-			std::queue<epmem_edge *> orphans;
+			std::queue< epmem_edge* > orphans;
 			epmem_edge *orphan;			
 
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ] ) );
@@ -2661,12 +2653,11 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 				id_p = ids.find( q0 );
 				if ( id_p != ids.end() )
 				{
-					// parent == NIL => existing lti with kids (so don't touch)
-					if ( id_p->second )
+					// if existing lti with kids don't touch
+					if ( id_p->second.second )
 					{
-						_epmem_install_id_wme( my_agent, state, id_p->second, attr, &( ids ), q1, val_is_short_term, val_letter, val_num, id_record );
-
-						num_wmes++;						
+						_epmem_install_id_wme( my_agent, state, id_p->second.first, attr, &( ids ), q1, val_is_short_term, val_letter, val_num, id_record );
+						num_wmes++;
 					}
 
 					symbol_remove_ref( my_agent, attr );
@@ -2714,9 +2705,12 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 						id_p = ids.find( orphan->q0 );
 						if ( id_p != ids.end() )
 						{
-							_epmem_install_id_wme( my_agent, state, id_p->second, orphan->w, &( ids ), orphan->q1, orphan->val_is_short_term, orphan->val_letter, orphan->val_num, id_record );
-							
-							num_wmes++;
+							if ( id_p->second.second )
+							{
+								_epmem_install_id_wme( my_agent, state, id_p->second.first, orphan->w, &( ids ), orphan->q1, orphan->val_is_short_term, orphan->val_letter, orphan->val_num, id_record );							
+								num_wmes++;
+							}
+
 							symbol_remove_ref( my_agent, orphan->w );
 
 							delete orphan;
@@ -2755,7 +2749,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			intptr_t attr_type;
 			intptr_t value_type;
 
-			Symbol *parent = NULL;
+			std::pair< Symbol*, bool > parent;
 			Symbol *value = NULL;			
 
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ] ) );
@@ -2775,7 +2769,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 				// get a reference to the parent
 				parent = ids[ parent_id ];
 
-				if ( parent )
+				if ( parent.second )
 				{
 					// make a symbol to represent the attribute
 					switch ( attr_type )
@@ -2809,7 +2803,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 							break;
 					}
 
-					epmem_add_retrieved_wme( my_agent, state, parent, attr, value );
+					epmem_add_retrieved_wme( my_agent, state, parent.first, attr, value );
 					num_wmes++;
 
 					symbol_remove_ref( my_agent, attr );
