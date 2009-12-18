@@ -11,6 +11,7 @@
     * [Soar7To8 Soar 7 to Soar 8 Conversion]
   * [Environments]
     * [AprilSoar April Soar]
+    * [Sproom]
     * [room Room Environment]
     * [Soar2D]
     * [MissionLab Mission Lab]
