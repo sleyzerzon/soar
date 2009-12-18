@@ -164,10 +164,10 @@ All parameters for the command must be on the same identifier of the command. Fo
 
 For all drive commands:
 
-| *throttle* || _float_ || A number from -1.0 to 1.0 representing percent throttle (or effort), negative is reverse. |
-| *linear velocity* || _float_ ||  Velocity, positive for forward or negative for reverse, in units defined by configuration. Subject to limitations defined in configuration. |
-| *angular velocity* || _float_ || Rotation, degrees or radians (as defined in configuration) per second, subject to limitations defined in configuration. *Positive is left turn.* |
-| *yaw* || _float_ or _int_ || Absolute yaw. Ranges outside of normal limits (such as 720 degrees or -3*pi) are OK (and will be reduced internally to the usual ranges). |
+|| *throttle* || _float_ || A number from -1.0 to 1.0 representing percent throttle (or effort), negative is reverse. ||
+|| *linear velocity* || _float_ ||  Velocity, positive for forward or negative for reverse, in units defined by configuration. Subject to limitations defined in configuration. ||
+|| *angular velocity* || _float_ || Rotation, degrees or radians (as defined in configuration) per second, subject to limitations defined in configuration. *Positive is left turn.* ||
+|| *yaw* || _float_ or _int_ || Absolute yaw. Ranges outside of normal limits (such as 720 degrees or -3*pi) are OK (and will be reduced internally to the usual ranges). ||
 
   * _motor_
     * *left* (_float_): Throttle, described above.
