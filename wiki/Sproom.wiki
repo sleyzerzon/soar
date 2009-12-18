@@ -1,5 +1,9 @@
 ﻿#summary Documentation on new simulation/room environment hybrid.
 
+<wiki:toc max_depth="3"/>
+
+----
+
 = I/O =
 
 == Input Link ==
@@ -273,4 +277,3 @@ The *remove-message* command uses the message id number, available at *io.input-
     * *status* (_string_) (accepted, complete, error)
 
 Configures the Soar interface. See the input link *configuration* identifier. Since there is only one *status* result, it is best to issue configure commands separately so that any errors will be easily traced.
-
