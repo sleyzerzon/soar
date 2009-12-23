@@ -63,23 +63,29 @@ Additionally, some non-configurable information is presented on the *configurati
       * *y-velocity* (_float_)
       * *z-velocity* (_float_)
       * *yaw-velocity* (_float_) (positive for left turn, negative for right turn)
-    * _waypoints_
-      * _waypoint_: One for each registered and enabled waypoint.
-        * *id* (_any type_): User-defined unique identifier in user-defined type.
-        * [Sproom#Point_Data Point data, as described above].
-    * _received-messages_
-      * _message_: One for each received message.
-        * *id* (_int_): Unique identifying number for message.
-        * *from* (_string_): Source of message (such as agent name).
-        * _first_: Starts linked list.
-          * *word* (_string_): The word data.
-          * _next_ (_identifier_ *or* _string_ "nil" to end): Under this identifier are more *word* and *next* WMEs, terminated when *next* is "nil".
 
-Self contains data about the robot itself. Some of the sections under self should probably be moved out to the top-level.
+Self contains data about the robot itself.
 
 *self.pose* gives information about the robot's position and velocity. This information is an aggregate of mapping and navigational subsystems (such as odometry or external localizers) between the interface and the simulation or hardware. The origin can be configured using the [Sproom#Configure_Commands configure command].
 
+=== Waypoints ===
+
+  * _waypoints_
+    * _waypoint_: One for each registered and enabled waypoint.
+      * *id* (_any type_): User-defined unique identifier in user-defined type.
+      * [Sproom#Point_Data Point data, as described above].
+
 The Soar interface allows agents to define arbitrary points in space as named waypoints. Waypoints that are defined and enabled (they are enabled by default when defined) show up under the *waypoints* identifier. Distance to and useful angles are calculated to the waypoint.
+
+=== Received Messages ===
+
+  * _received-messages_
+    * _message_: One for each received message.
+      * *id* (_int_): Unique identifying number for message.
+      * *from* (_string_): Source of message (such as agent name).
+      * _first_: Starts linked list.
+        * *word* (_string_): The word data.
+        * _next_ (_identifier_ *or* _string_ "nil" to end): Under this identifier are more *word* and *next* WMEs, terminated when *next* is "nil".
 
 The messaging system places messages to and from the agent under the *received-messages* identifier. Each message has a unique id number (used with the messaging commands) and a *from* field and a linked list of space-delimited words ended when *next* is set to a string instead of being an identifier pointing to the next *word*. For example:
 
