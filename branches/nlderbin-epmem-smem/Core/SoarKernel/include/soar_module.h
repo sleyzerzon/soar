@@ -436,27 +436,29 @@ namespace soar_module
 				{
 					Symbol *my_sym = test_sym;
 
-					if ( test_sym->common.symbol_type != SYM_CONSTANT_SYMBOL_TYPE )
+					if ( my_sym->common.symbol_type != SYM_CONSTANT_SYMBOL_TYPE )
 					{
 						std::string temp_str;
 
-						if ( test_sym->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE )
+						if ( my_sym->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE )
 						{
-							to_string( test_sym->ic.value, temp_str );
+							to_string( my_sym->ic.value, temp_str );
 						}
 						else
 						{
-							to_string( test_sym->fc.value, temp_str );
+							to_string( my_sym->fc.value, temp_str );
 						}
 
-						test_sym = make_sym_constant( my_agent, temp_str.c_str() );
+						my_sym = make_sym_constant( my_agent, temp_str.c_str() );
 					}
 
 					std::set<Symbol *>::iterator p = my_set->find( my_sym );
 					return_val = ( p != my_set->end() );
 
 					if ( test_sym != my_sym )
+					{
 						symbol_remove_ref( my_agent, my_sym );
+					}
 				}
 
 				return return_val;
