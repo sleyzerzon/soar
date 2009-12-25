@@ -1,293 +1,327 @@
 package edu.umich.soar.config;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.lang.reflect.Field;
-
 /**
- * A view into a ConfigSource. The view can have a specific "scope", i.e., a
- * prefix that is automatically added to every get/set request.
- * 
+ * A view into a ConfigSource. The view can have a specific
+ * "scope", i.e., a prefix that is automatically added to every
+ * get/set request.
+ *
  **/
-public class Config {
-	ConfigSource source;
-	Config parent;
+public class Config
+{
+    ConfigSource source;
+    Config       parent;
 
-	String prefix; // has a trailing "." as necessary.
+    String       prefix; // either empty or has a trailing "." so that prefix+key is always well-formed.
 
-	public Config(ConfigSource source) {
-		this.source = source;
-		this.parent = null;
-		this.prefix = "";
-	}
+    boolean      inherit = true; // can a.c be an answer to a.b.c?
+
+    public Config(ConfigSource source)
+    {
+	this.source = source;
+	this.prefix = "";
+	this.parent = this;
+    }
+
+    public Config getParent()
+    {
+	return parent;
+    }
+
+    public Config getChild(String childprefix)
+    {
+	Config child = new Config(source);
+	child.parent = this.parent;
 	
-	public void save(String path) throws FileNotFoundException {
-		source.save(path, this.prefix);
-	}
-	
-	public Config copy() {
-		return new Config(this.source.copy());
+	child.prefix = this.prefix;
+	if (child.prefix.length() > 0 && !child.prefix.endsWith("."))
+	    child.prefix = child.prefix+".";
+	child.prefix = child.prefix+childprefix+".";
+	child.inherit = inherit;
+
+	return child;
+    }
+
+    public boolean hasKey(String key)
+    {
+	return resolveKey(key) != null;
+    }
+
+    public String[] getKeys()
+    {
+	if (prefix.isEmpty())
+	    return source.getKeys(prefix);
+	else
+	    return source.getKeys(prefix.substring(0, prefix.length() - 1));
+    }
+
+    void missingRequired(String key)
+    {
+	System.out.println("Config: Required key '"+key+"' missing.");
+	assert(false);
+    }
+
+    // find the the fully-resolved key that is the most recent
+    // ancestor of the key.  i.e., abc.def.ghi returns abc.def.ghi if
+    // it exists, else abc.ghi, else ghi.
+    //
+    // Returns a resolved key if it exists, otherwise null.
+    String resolveKey(String key)
+    {
+	String keypath = prefix+key;
+	if (!inherit) {
+	    if (source.hasKey(keypath))
+		return keypath;
+	    return null;
 	}
 
-	public Config getParent() {
-		return parent;
+	String toks[] = (keypath).split("\\.");
+
+	for (int i = toks.length-1; i >= 0; i--) {
+	    String kp = "";
+
+	    for (int j = 0; j < i; j++) {
+		kp = kp + toks[j] + ".";
+	    }
+
+	    kp += toks[toks.length-1];
+
+	    if (source.hasKey(kp))
+		return kp;
 	}
 
-	public Config getChild(String childprefix) {
-		Config child = new Config(source);
-		child.parent = this;
+	return null;
+    }
 
-		child.prefix = this.prefix;
-		if (child.prefix.length() > 0 && child.prefix.charAt(child.prefix.length() - 1) != '.')
-			child.prefix = child.prefix + ".";
-		child.prefix = child.prefix + childprefix + ".";
+    ////////////////////////////
+    // int
+    public int[] getInts(String key)
+    {
+	return getInts(key, null);
+    }
 
-		return child;
-	}
+    public int[] getInts(String key, int defaults[])
+    {
+	int v[] = source.getInts(resolveKey(key));
+	return (v==null) ? defaults : v;
+    }
 
-	public boolean hasKey(String key) {
-		return source.hasKey(prefix + key);
-	}
-	
-	public void removeKey(String key) {
-		source.removeKey(key);
-	}
+    public int[] requireInts(String key)
+    {
+	int v[] = getInts(key, null);
+	if (v == null) 
+	    missingRequired(key);
+	return v;
+    }
 
-	void missingRequired(String key) {
-		System.out.println("Config: Required key '" + key + "' missing.");
-		assert (false);
-		throw new IllegalArgumentException("Config: Required key '" + key + "' missing.");
-	}
+    public int getInt(String key, int def)
+    {
+	return getInts(key, new int[] { def })[0];
+    }
 
-	// //////////////////////////
-	// int
-	public int[] getInts(String key) {
-		return getInts(key, null);
-	}
+    public int requireInt(String key)
+    { 
+	int v[] = getInts(key, null);
+	if (v == null) 
+	    missingRequired(key);
+	return v[0];
+    }
 
-	public int[] getInts(String key, int defaults[]) {
-		int v[] = source.getInts(prefix + key);
-		return (v == null) ? defaults : v;
-	}
+    public void setInt(String key, int v)
+    {
+	source.setInts(key, new int[] {v});
+    }
 
-	public int[] requireInts(String key) throws IllegalArgumentException {
-		int v[] = source.getInts(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v;
-	}
+    public void setInts(String key, int v[])
+    {
+	source.setInts(key, v);
+    }
+    
+    ///////////////////////////
+    // Paths
+    public String getPath(String key, String def)
+    {
+	String path = getString(key, def);
+	if (path == null) 
+	    return null;
 
-	public int getInt(String key, int def) {
-		int v[] = source.getInts(prefix + key);
-		return (v == null) ? def : v[0];
-	}
+	path = path.trim(); // remove white space
+	if (!path.startsWith("/")) 
+	    return source.getPrefixPath() + path;
 
-	public int requireInt(String key) throws IllegalArgumentException {
-		int v[] = source.getInts(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v[0];
-	}
+	return path; 
+    }
 
-	public void setInt(String key, int v) {
-		source.setInts(prefix + key, new int[] { v });
-	}
+    public String getPath(String key)
+    {
+	return getPath(key, null);
+    }
 
-	public void setInts(String key, int v[]) {
-		source.setInts(prefix + key, v);
-	}
+    ///////////////////////////
+    // String
 
-	// /////////////////////////
-	// String
-	public String[] getStrings(String key) {
-		return getStrings(key, null);
-	}
+    // All other string ops written in terms of this one.
+    public String[] getStrings(String key, String defaults[])
+    {
+	String v[] = source.getStrings(resolveKey(key));
+	return (v==null) ? defaults : v;
+    }
 
-	public String[] getStrings(String key, String defaults[]) {
-		String v[] = source.getStrings(prefix + key);
-		return (v == null) ? defaults : v;
-	}
+    public String[] getStrings(String key)
+    {
+	return getStrings(key, null);
+    }
 
-	public String[] requireStrings(String key) throws IllegalArgumentException {
-		String v[] = source.getStrings(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v;
-	}
+    public String[] requireStrings(String key)
+    {
+	String v[] = getStrings(key, null);
+	if (v == null) 
+	    missingRequired(key);
+	return v;
+    }
 
-	public String getString(String key) {
-		return getString(key, null);
-	}
+    public String getString(String key)
+    {
+	return getString(key, null);
+    }
 
-	public String getString(String key, String def) {
-		String v[] = source.getStrings(prefix + key);
-		return (v == null) ? def : v[0];
-	}
+    public String getString(String key, String def)
+    {
+	return getStrings(key, new String[] { def })[0];
+    }
 
-	public String requireString(String key) throws IllegalArgumentException {
-		String v[] = source.getStrings(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
+    public String requireString(String key)
+    { 
+	String v[] = getStrings(key, null);
+	if (v == null) 
+	    missingRequired(key);
 
-		return v[0];
-	}
+	return v[0];
+    }
 
-	public void setString(String key, String v) {
-		source.setStrings(prefix + key, new String[] { v });
-	}
+    public void setString(String key, String v)
+    {
+	source.setStrings(prefix+key, new String[] {v});
+    }
 
-	public void setStrings(String key, String v[]) {
-		source.setStrings(prefix + key, v);
-	}
+    public void setStrings(String key, String v[])
+    {
+	source.setStrings(prefix+key, v);
+    }
 
-	// //////////////////////////
-	// boolean
-	public boolean[] getBooleans(String key) {
-		return getBooleans(key, null);
-	}
+    ////////////////////////////
+    // boolean
 
-	public boolean[] getBooleans(String key, boolean defaults[]) {
-		boolean v[] = source.getBooleans(prefix + key);
-		return (v == null) ? defaults : v;
-	}
+    public boolean[] getBooleans(String key, boolean defaults[])
+    {
+	boolean v[] = source.getBooleans(resolveKey(key));
+	return (v==null) ? defaults : v;
+    }
 
-	public boolean[] requireBooleans(String key) throws IllegalArgumentException {
-		boolean v[] = source.getBooleans(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v;
-	}
+    public boolean[] getBooleans(String key)
+    {
+	return getBooleans(key, null);
+    }
 
-	public boolean getBoolean(String key, boolean def) {
-		boolean v[] = source.getBooleans(prefix + key);
-		return (v == null) ? def : v[0];
-	}
+    public boolean[] requireBooleans(String key)
+    {
+	boolean v[] = getBooleans(key, null);
+	if (v == null) 
+	    missingRequired(key);
+	return v;
+    }
 
-	public boolean requireBoolean(String key) throws IllegalArgumentException {
-		boolean v[] = source.getBooleans(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v[0];
-	}
+    public boolean getBoolean(String key, boolean def)
+    {
+	return getBooleans(key, new boolean[] { def })[0];
+    }
 
-	public void setBoolean(String key, boolean v) {
-		source.setBooleans(prefix + key, new boolean[] { v });
-	}
+    public boolean requireBoolean(String key)
+    { 
+	boolean v[] = getBooleans(key);
+	if (v == null) 
+	    missingRequired(key);
+	return v[0];
+    }
 
-	public void setBooleans(String key, boolean v[]) {
-		source.setBooleans(prefix + key, v);
-	}
+    public void setBoolean(String key, boolean v)
+    {
+	source.setBooleans(prefix+key, new boolean[] {v});
+    }
 
-	// //////////////////////////
-	// double
-	public double[] getDoubles(String key) {
-		return getDoubles(key, null);
-	}
+    public void setBooleans(String key, boolean v[])
+    {
+	source.setBooleans(prefix+key, v);
+    }
 
-	public double[] getDoubles(String key, double defaults[]) {
-		double v[] = source.getDoubles(prefix + key);
-		return (v == null) ? defaults : v;
-	}
+    ////////////////////////////
+    // double
+    public double[] getDoubles(String key, double defaults[])
+    {
+	double v[] = source.getDoubles(resolveKey(key));
+	return (v==null) ? defaults : v;
+    }
 
-	public double[] requireDoubles(String key) throws IllegalArgumentException {
-		double v[] = source.getDoubles(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v;
-	}
+    public double[] getDoubles(String key)
+    {
+	return getDoubles(key, null);
+    }
 
-	public double getDouble(String key, double def) {
-		double v[] = source.getDoubles(prefix + key);
-		return (v == null) ? def : v[0];
-	}
+    public double[] requireDoubles(String key)
+    {
+	double v[] = getDoubles(key, null);
+	if (v == null) 
+	    missingRequired(key);
+	return v;
+    }
 
-	public double requireDouble(String key) throws IllegalArgumentException {
-		double v[] = source.getDoubles(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v[0];
-	}
+    public double getDouble(String key, double def)
+    {
+	return getDoubles(key, new double[] {def})[0];
+    }
 
-	public void setDouble(String key, double v) {
-		source.setDoubles(prefix + key, new double[] { v });
-	}
+    public double requireDouble(String key)
+    { 
+	double v[] = getDoubles(key, null);
+	if (v == null) 
+	    missingRequired(key);
+	return v[0];
+    }
 
-	public void setDoubles(String key, double v[]) {
-		source.setDoubles(prefix + key, v);
-	}
+    public void setDouble(String key, double v)
+    {
+	source.setDoubles(prefix+key, new double[] {v});
+    }
 
-	// //////////////////////////
-	// double
-	public byte[] getBytes(String key, byte defaults[]) {
-		byte v[] = source.getBytes(prefix + key);
-		return (v == null) ? defaults : v;
-	}
+    public void setDoubles(String key, double v[])
+    {
+	source.setDoubles(prefix+key, v);
+    }
 
-	public byte[] requireBytes(String key) throws IllegalArgumentException {
-		byte v[] = source.getBytes(prefix + key);
-		if (v == null)
-			missingRequired(prefix + key);
-		return v;
-	}
+    ////////////////////////////
+    // double
+    public byte[] getBytes(String key, byte defaults[])
+    {
+	byte v[] = source.getBytes(resolveKey(key));
+	return (v==null) ? defaults : v;
+    }
 
-	public void setBytes(String key, byte v[]) {
-		source.setBytes(prefix + key, v);
-	}
+    public byte[] requireBytes(String key)
+    {
+	byte v[] = getBytes(key, null);
+	if (v == null) 
+	    missingRequired(key);
+	return v;
+    }
 
-	public String[] getKeys() {
-		return source.getKeys(this.prefix);
-	}
-	
-	public static void loadSubConfig(Config childConfig, Field [] fields, Object target) {
-		// use reflection to load fields
-		try {
-			for (Field f : fields) {
-				if (f.getType().getName() == "boolean") {
-					f.set(target, childConfig.getBoolean(f.getName(), f.getBoolean(target)));
-					
-				} else if (f.getType().getName() == "double") {
-					f.set(target, childConfig.getDouble(f.getName(), f.getDouble(target)));
-					
-				} else if (f.getType().getName() == "int") {
-					f.set(target, childConfig.getInt(f.getName(), f.getInt(target)));
-					
-				} else if (f.getType().getName() == "java.lang.String") {
-					f.set(target, childConfig.getString(f.getName(), (String)f.get(target)));
-					
-				} else 	if (f.getType().getName() == "[Z") {
-					f.set(target, childConfig.getBooleans(f.getName(), (boolean [])f.get(target)));
-					
-				} else if (f.getType().getName() == "[D") {
-					f.set(target, childConfig.getDoubles(f.getName(), (double [])f.get(target)));
-					
-				} else if (f.getType().getName() == "[I") {
-					f.set(target, childConfig.getInts(f.getName(), (int [])f.get(target)));
-					
-				} else if (f.getType().getName() == "[Ljava.lang.String;") {
-					f.set(target, childConfig.getStrings(f.getName(), (String [])f.get(target)));
-				} else {
-					throw new IllegalStateException("Unsupported type encountered: " + f.getType().getName());
-				}
-			}
-		} catch (IllegalAccessException e) {
-			// This shouldn't happen as long as all fields are public.
-			throw new AssertionError();
-		}
-	}
+    public void setBytes(String key, byte v[])
+    {
+	source.setBytes(prefix+key, v);
+    }
 
-	public void merge(Config includedConfig) {
-		for (String key : includedConfig.getKeys()) {
-			this.setStrings(key, includedConfig.getStrings(key));
-		}
+    public void merge(Config includedConfig) {
+	for (String key : includedConfig.getKeys()) {
+	    this.setStrings(key, includedConfig.getStrings(key));
 	}
-	
-	@Override
-	public String toString() {
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		PrintStream p = new PrintStream(stream);
-		source.writeToStream(p, prefix);
-		return stream.toString();
-	}
-	
+    }
 }
+

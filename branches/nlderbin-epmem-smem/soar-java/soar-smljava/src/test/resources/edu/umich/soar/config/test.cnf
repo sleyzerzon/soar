@@ -92,4 +92,23 @@ grandparent {
 		fnord = seen;
 	}
 }
+
+path_test = "sim/objects.txt";
+
+nested_root
+{
+	# should not have anonymous
+	nested_parent 
+	{
+		# should have anonymous
+		{
+			anonymous = something;
+	
+			nested_child 
+			{
+				# should have anonymous
+			}
+		}
+	}
+}	
 		
