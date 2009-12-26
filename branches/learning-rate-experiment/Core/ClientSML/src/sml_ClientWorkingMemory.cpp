@@ -1233,7 +1233,9 @@ void WorkingMemory::Refresh()
 		// Send the new input link over to the kernel
 		Commit() ;
 	}
-
+	
+	m_OutputDeltaList.Clear(true);
+	
 	// At one time we deleted the output link at the end of an init-soar but the current
 	// implementation of init-soar recreates the output link (in the kernel) at the end of reinitializing the agent
 	// so the output link should not be deleted but it's children need to be.

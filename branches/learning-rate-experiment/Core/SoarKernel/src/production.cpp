@@ -1622,14 +1622,12 @@ production *make_production (agent* thisAgent,
   // Soar-RL stuff
   p->rl_update_count = 0;
   p->rl_rule = false;
-  p->rl_ecr = 0.0;
-  p->rl_efr = 0.0;
   if ( ( type != JUSTIFICATION_PRODUCTION_TYPE ) && ( type != TEMPLATE_PRODUCTION_TYPE ) )  
   {
     p->rl_rule = rl_valid_rule( p );
 	if ( p->rl_rule )
 	{
-	  p->rl_efr = get_number_from_symbol( rhs_value_to_symbol( p->action_list->referent ) );
+	  p->qvalue = get_number_from_symbol( rhs_value_to_symbol( p->action_list->referent ) );
 	}
   }
   

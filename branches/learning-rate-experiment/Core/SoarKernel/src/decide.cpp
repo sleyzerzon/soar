@@ -899,8 +899,7 @@ byte require_preference_semantics (agent *thisAgent, slot *s, preference **resul
   if ( candidates && rl_enabled( thisAgent ) )
   {
 	  rl_tabulate_reward_values( thisAgent );
-	  exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-	  rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
+	  rl_update( thisAgent, s->id, candidates);
   }
 
   return NONE_IMPASSE_TYPE;
@@ -935,8 +934,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 				if ( !predict && rl_enabled( thisAgent ) )
 				{
 					rl_tabulate_reward_values( thisAgent );
-					exploration_compute_value_of_candidate( thisAgent, force_result, s, 0 );
-					rl_perform_update( thisAgent, force_result->numeric_value, force_result->rl_contribution, s->id );
+					rl_update( thisAgent,  s->id , force_result);
 				}
 
 				return NONE_IMPASSE_TYPE;
@@ -989,8 +987,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 		{
 			// perform update here for just one candidate
 			rl_tabulate_reward_values( thisAgent );
-			exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-			rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
+			rl_update( thisAgent, s->id, candidates);
 		}
 
 		return NONE_IMPASSE_TYPE;
@@ -1271,8 +1268,7 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 		{
 			// perform update here for just one candidate
 			rl_tabulate_reward_values( thisAgent );
-			exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-			rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
+			rl_update( thisAgent, s->id, candidates);
 		}
 
 		return NONE_IMPASSE_TYPE;
@@ -2023,6 +2019,7 @@ void remove_wmes_for_context_slot (agent* thisAgent, slot *s) {
 ------------------------------------------------------------------ */
 
 inline void remove_existing_context_and_descendents_rl( agent * const &thisAgent, Symbol * const &goal ) {
+  thisAgent->dp->end_trace(goal->id.rl_info->trace);
   delete goal->id.rl_info->eligibility_traces;
   delete goal->id.rl_info->prev_op_rl_rules;
   symbol_remove_ref( thisAgent, goal->id.reward_header );
@@ -2047,7 +2044,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   if ( ( goal != thisAgent->top_goal ) && rl_enabled( thisAgent ) )
   {
 	  rl_tabulate_reward_value_for_goal( thisAgent, goal );
-	  rl_perform_update( thisAgent, 0, true, goal, false ); // this update only sees reward - there is no next state
+	  rl_update_terminal( thisAgent, goal);
   }
 
   /* --- disconnect this goal from the goal stack --- */
@@ -2173,6 +2170,7 @@ inline void create_new_context_rl( agent * const &thisAgent, Symbol * const &id 
   id->id.rl_info->reward = 0;
   id->id.rl_info->gap_age = 0;
   id->id.rl_info->hrl_age = 0;
+  id->id.rl_info->trace = thisAgent->dp->new_trace();
 }
 
 void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse_type)

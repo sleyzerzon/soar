@@ -30,3 +30,5 @@
 #include "src/utilities.cpp"
 #include "src/wmem.cpp"
 #include "src/xml.cpp"
+#include "src/rli.cpp"
+#include "src/rtdp.cpp"

@@ -323,7 +323,9 @@ agent * create_soar_agent (char * agent_name) {                                 
   // predict initialization
   newAgent->prediction = new std::string();
   predict_init( newAgent );
-
+  
+  newAgent->dp = new rtdp();
+  
   return newAgent;
 }
 
@@ -449,6 +451,8 @@ void destroy_soar_agent (agent * delete_agent)
   // JRV: Frees data used by XML generation
   xml_destroy( delete_agent );
 
+  delete delete_agent->dp;
+  
   /* Free soar agent structure */
   free(delete_agent);
 }

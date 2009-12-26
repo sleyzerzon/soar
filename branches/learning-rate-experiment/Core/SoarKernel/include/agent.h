@@ -34,6 +34,7 @@
 
 #include "exploration.h"
 #include "reinforcement_learning.h"
+#include "rtdp.h"
 
 #include <string>
 #include <map>
@@ -787,6 +788,8 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   xml_handle xml_trace;				// During a run, xml_destination will be set to this pointer.
   xml_handle xml_commands;			// During commands, xml_destination will be set to this pointer.
 
+  rtdp *dp;
+  
 } agent;
 /*************** end of agent struct *****/
 

@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <map>
+#include <fstream>
 
 #include "cli_CommandLineInterface.h"
 #include "cli_Commands.h"
@@ -33,6 +34,8 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 		{'g', "get",	OPTARG_NONE},
 		{'s', "set",	OPTARG_NONE},
 		{'S', "stats",	OPTARG_NONE},
+		{'m', "model",  OPTARG_NONE},
+		{'v', "values", OPTARG_NONE},
 		{0, 0, OPTARG_NONE} // null
 	};
 	RLBitset options(0);
@@ -56,6 +59,14 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 				
 			case 'S':
 				options.set( RL_STAT );
+				break;
+				
+			case 'm':
+				options.set( RL_MODEL );
+				break;
+			
+			case 'v':
+				options.set( RL_VALUES );
 				break;
 				
 			default:
@@ -132,6 +143,22 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 		}
 		else
 			return SetError( CLIError::kTooManyArgs );
+	}
+	else if (options.test(RL_MODEL)) {
+		if ( m_NonOptionArguments == 1 ) {
+			return DoRL( 'm', &( argv[2] ) );
+		}
+		else {
+			return SetError( CLIError::kTooManyArgs );
+		}
+	}
+	else if (options.test(RL_VALUES)) {
+		if ( m_NonOptionArguments == 1 ) {
+			return DoRL( 'v', &( argv[2] ) );
+		}
+		else {
+			return SetError( CLIError::kTooManyArgs );
+		}
 	}
 	
 	// not sure why you'd get here
@@ -234,6 +261,18 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 				CLI_DoRL_generate_output( "", m_pAgentSoar->rl_stats->get( pAttr->c_str() )->get_string() ), false );
 		}
 
+		return true;
+	}
+	else if ( pOp == 'm' ) {
+		std::ofstream outfile(pAttr->c_str());
+		m_pAgentSoar->dp->print_model(outfile);
+		outfile.close();
+		return true;
+	}
+	else if ( pOp == 'v' ) {
+		std::ofstream outfile(pAttr->c_str());
+		m_pAgentSoar->dp->print_svals(outfile);
+		outfile.close();
 		return true;
 	}
 

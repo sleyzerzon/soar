@@ -100,6 +100,8 @@ typedef struct rl_data_struct {
 
 	unsigned int gap_age;					// the number of steps since a cycle containing rl rules
 	unsigned int hrl_age;					// the number of steps in a subgoal
+	
+	int trace;                              // trace number for rtdp
 } rl_data;
 
 
@@ -180,9 +182,9 @@ extern void rl_tabulate_reward_values( agent *my_agent );
 extern void rl_store_data( agent *my_agent, Symbol *goal, preference *cand );
 
 // update the value of Soar-RL rules
-extern void rl_perform_update( agent *my_agent, double op_value, bool op_rl, Symbol *goal, bool update_efr = true );
+extern void rl_update( agent *my_agent, Symbol *g, preference *chosen );
 
-// clears eligibility traces in accordance with watkins
-extern void rl_watkins_clear( agent *my_agent, Symbol *goal );
+// update the value of RL rules for a terminal state
+extern void rl_update_terminal(agent *a, Symbol *g);
 
 #endif

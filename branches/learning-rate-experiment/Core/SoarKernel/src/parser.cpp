@@ -1986,6 +1986,10 @@ production *parse_production (agent* thisAgent, unsigned char* rete_addition_res
     excise_production (thisAgent, p, FALSE);
     p = NIL;
   }
+  
+  if (p && p->rl_rule) {
+    thisAgent->dp->register_rule(p, p->qvalue);
+  }
 
   return p;
 }

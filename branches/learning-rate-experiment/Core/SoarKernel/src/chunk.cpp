@@ -1394,6 +1394,10 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, Bool allow_vari
 		chunk_inst->in_ms = FALSE;
 	}
 
+	if (prod->rl_rule) {
+		thisAgent->dp->register_rule(prod, prod->qvalue);
+	}
+	
 	/* --- assert the preferences --- */
 	chunk_inst->next = thisAgent->newly_created_instantiations;
 	thisAgent->newly_created_instantiations = chunk_inst;

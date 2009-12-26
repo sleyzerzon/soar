@@ -149,6 +149,8 @@ namespace cli {
 		RL_GET,
 		RL_SET,
 		RL_STAT,
+		RL_MODEL,
+		RL_VALUES,
 		RL_NUM_OPTIONS,	// must be last
 	};
 

@@ -30,6 +30,7 @@
 #include "utilities.h"
 #include "instantiations.h"
 
+#include <iostream>
 #include <list>
 
 using namespace soar_TraceNames;
@@ -265,9 +266,10 @@ bool exploration_set_auto_update( agent *my_agent, bool setting )
 	return true;
 }
 
-/***************************************************************************
- * Function     : exploration_update_parameters
- **************************************************************************/
+/*
+ * Update parameters such as epsilon or Boltzmann temperature based on
+ * the specified schedule (exponential or linear reduction)
+ */
 void exploration_update_parameters( agent *my_agent )
 {	
 	if ( exploration_get_auto_update( my_agent ) )
@@ -506,27 +508,9 @@ preference *exploration_choose_according_to_policy( agent *my_agent, slot *s, pr
 
 	const bool my_rl_enabled = rl_enabled( my_agent );
 
-	const rl_param_container::learning_choices my_learning_policy = my_rl_enabled ? my_agent->rl_params->learning_policy->get_value() : rl_param_container::q;
-
 	// get preference values for each candidate
 	for ( preference *cand = candidates; cand; cand = cand->next_candidate )
 		exploration_compute_value_of_candidate( my_agent, cand, s );
-
-	double top_value = candidates->numeric_value;
-	bool top_rl = candidates->rl_contribution;
-
-	// should find highest valued candidate in q-learning
-	if ( my_rl_enabled && my_learning_policy == rl_param_container::q )
-	{
-		for ( const preference * cand = candidates; cand; cand = cand->next_candidate )
-		{
-			if ( cand->numeric_value > top_value )
-			{
-				top_value = cand->numeric_value;
-				top_rl = cand->rl_contribution;
-			}
-		}
-	}
 
 	switch ( exploration_policy )
 	{
@@ -559,18 +543,7 @@ preference *exploration_choose_according_to_policy( agent *my_agent, slot *s, pr
 	if ( my_rl_enabled )
 	{
 		rl_tabulate_reward_values( my_agent );
-
-		if ( my_learning_policy == rl_param_container::sarsa )
-		{
-			rl_perform_update( my_agent, return_val->numeric_value, return_val->rl_contribution, s->id );
-		}
-		else if ( my_learning_policy == rl_param_container::q )
-		{
-			if ( return_val->numeric_value != top_value )
-				rl_watkins_clear( my_agent, s->id );
-
-			rl_perform_update( my_agent, top_value, top_rl, s->id );
-		}
+		rl_update( my_agent, s->id, return_val);
 	}
 
 	return return_val;
@@ -815,4 +788,7 @@ void exploration_compute_value_of_candidate( agent *my_agent, preference *cand, 
 	// accomodate average mode
 	if ( my_agent->numeric_indifferent_mode == NUMERIC_INDIFFERENT_MODE_AVG )
 		cand->numeric_value = cand->numeric_value / cand->total_preferences_for_candidate;
+	
+	//std::cout << "Value of " << cand->value->id.name_letter << cand->value->id.name_number;
+	//std::cout << ": " << cand->numeric_value << std::endl;
 }
