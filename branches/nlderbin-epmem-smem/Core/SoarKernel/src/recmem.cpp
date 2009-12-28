@@ -242,6 +242,7 @@ Symbol *instantiate_rhs_value (agent* thisAgent, rhs_value rv,
 		 ( new_id_level > 0 ) )
 	{
 		result->id.level = new_id_level;
+		result->id.promotion_level = new_id_level;
 	}
     
     symbol_add_ref (result);
