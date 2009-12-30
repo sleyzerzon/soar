@@ -396,7 +396,7 @@ void rl_get_template_constants( condition* p_conds, condition* i_conds, rl_symbo
 	}
 
 	// try to insert into instantiation set
-	if ( !constant_map.empty() )
+	//if ( !constant_map.empty() )
 	{
 		std::pair< rl_symbol_map_set::iterator, bool > ins_result = my_template_instance->prod->rl_template_instantiations->insert( constant_map );
 		if ( ins_result.second )
