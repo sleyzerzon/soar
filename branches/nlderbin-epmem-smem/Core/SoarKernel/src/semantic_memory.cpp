@@ -1032,6 +1032,12 @@ inline Symbol *smem_lti_soar_make( agent *my_agent, smem_lti_id lti, char name_l
 	else
 	{
 		symbol_add_ref( return_val );
+
+		if ( ( return_val->id.level == SMEM_LTI_UNKNOWN_LEVEL ) && ( level != SMEM_LTI_UNKNOWN_LEVEL ) )
+		{
+			return_val->id.level = level;
+			return_val->id.promotion_level = level;
+		}
 	}
 
 	// set lti field irrespective
