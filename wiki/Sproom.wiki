@@ -106,7 +106,7 @@ The messaging system places messages to and from the agent under the *received-m
     * _range_
       * *id* (_int_)
       * *distance* (_float_)
-      * *yaw* (_angle-resolution type_)
+      * *relative-bearing* (_angle-resolution type_)
 
 === Area Description ===
 
