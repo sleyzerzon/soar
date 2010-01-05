@@ -100,6 +100,14 @@ The messaging system places messages to and from the agent under the *received-m
 (<w4> ^word alpha ^next nil)
 }}}
 
+=== Lidar ===
+
+  * _lidar_
+    * _range_
+      * *id* (_int_)
+      * *distance* (_float_)
+      * *yaw* (_angle-resolution type_)
+
 === Area Description ===
 
   * _area-description_
