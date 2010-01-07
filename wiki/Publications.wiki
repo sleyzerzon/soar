@@ -9,6 +9,8 @@ Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pub
 
 Fridman, N. & Kaminka, G.A. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper130.pdf Comparing Human and Synthetic Group Behaviors: A Model Based on Social Psychology.]_ Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.
 
+Gorski, N.A., and Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/cca-tr-2009-05.pdf Evaluating Evaluations: A Comparative Study of Metrics for Comparing Learning Performances]_ (Report No. CCA-TR-2009-05). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.
+
 Gorski, N.A. & Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/LearningToUseEpMem-ICCM09.pdf Learning to Use Episodic Memory.]_ Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.
 
 Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/SPIE.pdf Towards Cognitive Robotics]_, SPIE Defense and Sensing Conferences, Orlando, FL.
