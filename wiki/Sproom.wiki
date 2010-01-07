@@ -120,7 +120,6 @@ The messaging system places messages to and from the agent under the *received-m
       * *to* (_int_): Area id on other side of gateway.
       * [Sproom#Point_Data Point data, as described above].
     * _wall_
-      * *id* (_int_): Unique identifying number for wall.
       * *direction* (_string_) (north, east, south, west): Which wall it is.
       * [Sproom#Point_Data Point data, as described above].
 
