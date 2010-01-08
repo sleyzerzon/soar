@@ -253,7 +253,7 @@ Eclipse. Only cocoa for 64-bit.
 
 == Mac OS X Environment ==
 
-Set JAVA_HOME to something like /System/Library/Frameworks/JavaVM.framework/Versions/Current
+Set JAVA_HOME to something like /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
 
 Set DYLD_LIBRARY_PATH
 
