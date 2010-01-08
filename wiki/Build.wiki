@@ -239,19 +239,27 @@ errors.
 
 = Mac OS X =
 
-TODO
+Check that java preferences is set to what you want it to, sets current.
 
 == Mac OS X Prerequisites ==
 
-TODO
+Install XCode.
+
+Install SCons from http://www.scons.org/ (tarball)
+
+sudo python setup.py install
+
+Eclipse. Only cocoa for 64-bit.
 
 == Mac OS X Environment ==
 
-TODO
+Set JAVA_HOME to something like /System/Library/Frameworks/JavaVM.framework/Versions/Current
+
+Set DYLD_LIBRARY_PATH
 
 == Mac OS X Build ==
 
-TODO
+make
 
 = Eclipse =
 
