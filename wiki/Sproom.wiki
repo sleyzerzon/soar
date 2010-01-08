@@ -283,6 +283,7 @@ The *remove-message* command uses the message id number, available at *io.input-
     * *length-units* (_string_) (meters, feet): Units to use for length in I/O (globally).
     * *angle-units* (_string_) (radians, degrees): Units to use for angle measurement in I/O (globally).
     * *angle-resolution* (_string_) (int, float): Use integers or floating-point types for angle measurements in I/O (globally). Note that radians are always measured in floating-point.
+    * *speed-units* (_string_) (meters_per_sec, feet_per_sec, miles_per_hour): Units to use for linear speed measurement (globally).
     * _pose-translation_: Translation to relocate origin of *self.pose*.
       * *x* (_float_)
       * *y* (_float_)
