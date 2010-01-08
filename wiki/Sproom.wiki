@@ -103,10 +103,10 @@ The messaging system places messages to and from the agent under the *received-m
 === Lidar ===
 
   * _lidar_
-    * _range_
-      * *id* (_int_)
-      * *distance* (_float_)
-      * *relative-bearing* (_angle-resolution type_)
+    * _range_: One per range to be measured (default is 5).
+      * *id* (_int_): `-nranges / 2 to nranges / 2`, 0 is straight ahead (so, with 5, -2, -1, 0, 1, 2).
+      * *distance* (_float_): Measured distance.
+      * *relative-bearing* (_angle-resolution type_): Relative bearing to measured distance.
 
 === Area Description ===
 
