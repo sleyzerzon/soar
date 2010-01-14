@@ -1,0 +1,37 @@
+<project name="soar-java" default="build" basedir=".">
+
+	<target name="sml">
+		<ant dir="soar-smljava" />
+	</target>
+
+	<target name="build">
+		<ant dir="soar-smljava" />
+		<ant dir="soar-debugger" />
+		<ant dir="soar-loggerjava" />
+		<ant dir="soar-missionaries" />
+		<ant dir="soar-soar2d" />
+		<ant dir="soar-toh" />
+		<ant dir="soar-visualsoar" />
+	</target>
+
+	<target name="doc">
+		<ant dir="soar-smljava" target="doc" />
+		<ant dir="soar-debugger" target="doc" />
+		<ant dir="soar-loggerjava" target="doc" />
+		<ant dir="soar-missionaries" target="doc" />
+		<ant dir="soar-soar2d" target="doc" />
+		<ant dir="soar-toh" target="doc" />
+		<ant dir="soar-visualsoar" target="doc" />
+	</target>
+
+	<target name="clean">
+		<ant dir="soar-smljava" target="clean" />
+		<ant dir="soar-debugger" target="clean" />
+		<ant dir="soar-loggerjava" target="clean" />
+		<ant dir="soar-missionaries" target="clean" />
+		<ant dir="soar-soar2d" target="clean" />
+		<ant dir="soar-toh" target="clean" />
+		<ant dir="soar-visualsoar" target="clean" />
+	</target>
+
+</project>
