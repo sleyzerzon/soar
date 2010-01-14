@@ -1,3 +1,0 @@
-pushd test-new-format
-source test-new-format_source.soar
-popd
