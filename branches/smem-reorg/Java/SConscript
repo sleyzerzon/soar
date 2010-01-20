@@ -86,14 +86,21 @@ if not CheckForSWTJar(env):
 	print "swt.jar required for Soar Java debugger... Exiting"
 	Exit(1)
 
-smljar = env['PREFIX'] + '/share/java/sml.jar'
+sharejava = env['PREFIX'] + '/share/java'
+smljar = sharejava + '/sml.jar'
 jars = [
-	env['PREFIX'] + '/share/java/smljava-*.jar',
+	sharejava + '/smljava-*.jar',
 	]
 
 thisdir = env.Dir('#../Java')
-env.Depends(jars, smljar)
-env.Command(jars, smljar, 'ant -v -Dsoarprefix=$PREFIX', chdir=thisdir)
+env.Command(jars, smljar, 'ant -Dsoarprefix=$PREFIX', chdir=thisdir)
 
-#TODO: clean
+#TODO: clean doesn't work quite right with the target jars
+# Clean java stuff
+if env.GetOption('clean'):
+	for x in BUILD_TARGETS:
+		targetpath = os.path.realpath(str(x))
+		if sharejava.startswith(targetpath):
+			env.Execute('ant -Dsoarprefix=$PREFIX -q clean', chdir=thisdir)
+
 
