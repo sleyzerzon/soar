@@ -1,4 +1,4 @@
-<project name="soar-build-version" basedir=".">
+<project name="Version" basedir=".">
 	<property name="version" value="9.0.2"/>
 </project>
 

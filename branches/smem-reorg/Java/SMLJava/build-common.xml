@@ -1,17 +1,16 @@
 <project name="soar-build-common" basedir=".">
 
 	<property name="manifest.vendor" value="University of Michigan"/>
-	<property name="copyright" value="(c) The Regents of the University of Michigan, 2009"/>
-	<property name="version" value="9.0.2"/>
+	<property name="copyright" value="(c) The Regents of the University of Michigan, 2010"/>
 
 	<property name="src" location="src/main/java" />
 	<property name="lib" location="lib" />
 	<property name="doc" location="doc" />
-	<property name="sml.lib" location="${soar}/Core/ClientSMLSWIG/Java" />
-	<property name="smljava.lib" location="${soar}/soar-java/soar-smljava/lib" />
-	<property name="soarlib" location="${soar}/SoarLibrary" />
-	<property name="soarlib.lib" location="${soarlib}/lib" />
-	<property name="soarlib.bin" location="${soarlib}/bin" />
+
+	<property name="soarprefix" location="../../out" />
+	<property name="soarprefix.java" location="${soarprefix}/share/java" />
+	<property name="soarprefix.lib" location="${soarprefix}/lib" />
+	<property name="soarprefix.bin" location="${soarprefix}/bin" />
 
 	<property name="target" location="target" />
 	<property name="target.classes" location="${target}/classes" />
@@ -31,49 +30,30 @@
 	<property name="doc.destdir" location="${doc}/${ant.project.name}/api"/>
 	<property name="doc.windowtitle" value="${ant.project.name} ${version}"/>
 
-	<target name="init" unless="aprilsoar">
+	<target name="init" >
 		<mkdir dir="${target}" />
 		<mkdir dir="${target.classes}" />
 
-		<!-- Set up the build path used throughout the build script  -->
-		<path id="compile.libs">
+		<mkdir dir="${soarprefix.java}" />
+		<copy todir="${soarprefix.java}">
 			<fileset dir="${lib}">
 				<include name="*.jar" />
 			</fileset>
-			<fileset dir="${sml.lib}">
+		</copy>
+		<copy todir="${soarprefix.java}">
+			<fileset dir="${lib}">
 				<include name="*.jar" />
 			</fileset>
-			<fileset dir="${smljava.lib}">
+		</copy>
+
+		<path id="compile.libs">
+			<fileset dir="${soarprefix.java}">
 				<include name="*.jar" />
 			</fileset>
 		</path>
 	</target>
 
-	<target name="init-aprilsoar" if="aprilsoar">
-		<mkdir dir="${target}" />
-		<mkdir dir="${target.classes}" />
-
-		<!-- Set up the build path used throughout the build script  -->
-		<path id="compile.libs">
-			<fileset dir="${lib}">
-				<include name="*.jar" />
-			</fileset>
-			<fileset dir="${sml.lib}">
-				<include name="*.jar" />
-			</fileset>
-			<fileset dir="${smljava.lib}">
-				<include name="*.jar" />
-			</fileset>
-			<fileset dir="../soar-sps/lib">
-				<include name="*.jar" />
-			</fileset>
-			<fileset dir="${soar}/soar-java/soar-debugger/lib">
-				<include name="*.jar" />
-			</fileset>
-		</path>
-	</target>
-
-	<target name="compile" depends="init,init-aprilsoar">
+	<target name="compile" depends="init">
 		<javac destdir="${target.classes}" debug="on" optimize="on" target="${java.target.level}" source="${java.source.level}">
 			<src path="${src}" />
 			<classpath refid="compile.libs"/>
@@ -86,9 +66,9 @@
 		</copy>
 	</target>
 
-	<target name="create-jar" depends="compile">
+	<target name="jar" depends="compile">
 		<tstamp />
-		<jar destfile="${lib}/${jar.name}">
+		<jar destfile="${soarprefix.java}/${jar.name}">
 			<fileset dir="${target.classes}"/>
 			<manifest>
 				<attribute name="Title" value="${ant.project.name} ${version}" />
@@ -103,22 +83,17 @@
 		</jar>
 			
 		<!-- Create source jar -->
-		<jar destfile="${lib}/${jar.source.name}">
+		<jar destfile="${soarprefix.java}/${jar.source.name}">
 			<fileset dir="${src}">
 				<exclude name="**/.svn" />
 			</fileset>
 		</jar>
 	</target>
 
-	<target name="jar" depends="create-jar">
-		<copy todir="${soarlib.lib}">
-			<fileset dir="${lib}" />
-		</copy>
-	</target>
-
 	<target name="clean">
 		<delete dir="${target}" />
-		<delete dir="${lib}/${jar.name}" />
+		<delete dir="${soarprefix.java}/${jar.name}" />
+		<delete dir="${soarprefix.java}/${jar.source.name}" />
 	</target>
 
 	<target name="doc" depends="init" description="Generate API documentation">
