@@ -44,7 +44,6 @@ def CheckJarmd5(env, jarpath):
                         return GTK_DIGEST == m.hexdigest()
 
 def CheckForSWTJar(env):
-	print os.getcwd()
         jarpath = os.path.join('SMLJava', 'lib', 'swt.jar')
         if os.path.exists(jarpath):
                 if CheckJarmd5(env, jarpath):
