@@ -88,11 +88,16 @@ if not CheckForSWTJar(env):
 sharejava = env['PREFIX'] + '/share/java'
 smljar = sharejava + '/sml.jar'
 jars = [
-	sharejava + '/smljava-*.jar',
+	sharejava + '/soar-smljava-' + env['SOAR_VERSION'] + '.jar',
+	sharejava + '/soar-smljava-' + env['SOAR_VERSION'] + '.src.jar',
+	sharejava + '/soar-debugger-' + env['SOAR_VERSION'] + '.jar',
+	sharejava + '/soar-debugger-' + env['SOAR_VERSION'] + '.src.jar',
+	sharejava + '/soar-visualsoar-' + env['SOAR_VERSION'] + '.jar',
+	sharejava + '/soar-visualsoar-' + env['SOAR_VERSION'] + '.src.jar',
 	]
 
 thisdir = env.Dir('#../Java')
-env.Command(jars, smljar, 'ant -q -Dsoarprefix=$PREFIX', chdir=thisdir)
+env.Command(jars, smljar, 'ant -q -Dsoarprefix=$PREFIX -Dversion=' + env['SOAR_VERSION'], chdir=thisdir)
 
 #TODO: clean doesn't work quite right with the target jars
 # Clean java stuff
@@ -100,6 +105,5 @@ if env.GetOption('clean'):
 	for x in BUILD_TARGETS:
 		targetpath = os.path.realpath(str(x))
 		if sharejava.startswith(targetpath):
-			env.Execute('ant -q -Dsoarprefix=$PREFIX clean', chdir=thisdir)
-
+			env.Execute('ant -q -Dsoarprefix=$PREFIX clean -Dversion=' + env['SOAR_VERSION'], chdir=thisdir)
 

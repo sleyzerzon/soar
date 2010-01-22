@@ -1,5 +1,7 @@
 <project name="soar-build-common" basedir=".">
 
+	<property name="version" value="snapshot-${DSTAMP}" />
+
 	<property name="manifest.vendor" value="University of Michigan"/>
 	<property name="copyright" value="(c) The Regents of the University of Michigan, 2010"/>
 
