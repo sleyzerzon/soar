@@ -92,7 +92,7 @@ jars = [
 	]
 
 thisdir = env.Dir('#../Java')
-env.Command(jars, smljar, 'ant -Dsoarprefix=$PREFIX', chdir=thisdir)
+env.Command(jars, smljar, 'ant -q -Dsoarprefix=$PREFIX', chdir=thisdir)
 
 #TODO: clean doesn't work quite right with the target jars
 # Clean java stuff
@@ -100,6 +100,6 @@ if env.GetOption('clean'):
 	for x in BUILD_TARGETS:
 		targetpath = os.path.realpath(str(x))
 		if sharejava.startswith(targetpath):
-			env.Execute('ant -Dsoarprefix=$PREFIX -q clean', chdir=thisdir)
+			env.Execute('ant -q -Dsoarprefix=$PREFIX clean', chdir=thisdir)
 
 
