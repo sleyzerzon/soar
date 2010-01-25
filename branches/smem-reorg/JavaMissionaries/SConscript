@@ -1,5 +1,7 @@
 #!/usr/bin/python
+import os
 
+Import('env')
 sharejava = env['PREFIX'] + '/share/java'
 smljar = sharejava + '/sml.jar'
 jars = [ 
@@ -17,5 +19,4 @@ if env.GetOption('clean'):
                 targetpath = os.path.realpath(str(x))
                 if sharejava.startswith(targetpath):
                         env.Execute('ant -q -Dsoarprefix=$PREFIX clean -Dversion=' + env['SOAR_VERSION'], chdir=thisdir)
-
 
