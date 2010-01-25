@@ -27,6 +27,12 @@ checkout-soar2d:
 checkout-soartextio:
 	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/SoarTextIO
 
+checkout-sproom:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/Sproom
+
+checkout-sps:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/Sps
+
 checkout-tcl:
 	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/Tcl
 
