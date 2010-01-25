@@ -12,16 +12,29 @@ checkout-filterc:
 checkout-javamissionaries:
 	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/JavaMissionaries
 
-checkout-tohsml:
-	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/TOHSML
+checkout-javatoh:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/JavaTOH
+
+checkout-loggerjava:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/LoggerJava
+
+checkout-quicklink:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/QuickLink
+
+checkout-soar2d:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/Soar2D
+
+checkout-soartextio:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/SoarTextIO
 
 checkout-tcl:
 	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/Tcl
 
+checkout-tohsml:
+	svn checkout https://soar.googlecode.com/svn/branches/smem-reorg/TOHSML
+
 update:
-	cd Core && svn update
-	cd Java && svn update
-	cd Python && svn update
+	svn update *
 
 clean:
 	cd Core && scons -c
