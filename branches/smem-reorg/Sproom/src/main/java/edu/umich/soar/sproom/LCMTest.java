@@ -21,7 +21,7 @@ public class LCMTest {
 				assert channel.equals(TEST_CHANNEL);
 				try {
 					pose_t pose = new pose_t(ins);
-					System.out.println(String.format("Received %d%n", pose.utime));
+					System.out.println(String.format("Received %d", pose.utime));
 				} catch (IOException e) {
 					System.out.println("IOException");
 					e.printStackTrace();
@@ -35,6 +35,7 @@ public class LCMTest {
 			for(long count = 0; true; ++count) {
 				pose_t pose = new pose_t();
 				pose.utime = count;
+				System.out.println(String.format("Sending %d", pose.utime));
 				lcm.publish(TEST_CHANNEL, pose);
 				Thread.sleep(SLEEP_MSEC);
 			}

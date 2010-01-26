@@ -61,40 +61,40 @@ public class Command {
 		try {
 			gp = new Gamepad();
 			Buttons.setGamepad(gp);
-			shexec.scheduleAtFixedRate(new Runnable() {
-				@Override
-				public void run() {
-					if (logger.isDebugEnabled()) {
-						hzChecker.tick();
-					}
-
-					Buttons.OVERRIDE.update();
-					if (override) {
-						if (Buttons.OVERRIDE.checkAndDisable()) {
-							soar.addDriveListener(drive3);
-							override = false;
-							logger.info("Override disabled.");
-						} else {
-							drive3.handleDriveEvent(getGamepadDDC());
-						}
-					} else {
-						if (Buttons.OVERRIDE.checkAndDisable()) {
-							soar.removeDriveListener(drive3);
-							override = true;
-							drive3.handleDriveEvent(getGamepadDDC());
-							logger.info("Override enabled.");
-						}
-					}
-					
-					Buttons.SOAR.update();
-					if (Buttons.SOAR.checkAndDisable()) {
-						soar.toggleRunState();
-					}
-				}
-			}, 0, 30, TimeUnit.MILLISECONDS);
 		} catch (IllegalStateException e) {
 			logger.warn("No joystick.");
 		}
+		shexec.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				if (logger.isDebugEnabled()) {
+					hzChecker.tick();
+				}
+
+				Buttons.OVERRIDE.update();
+				if (override) {
+					if (Buttons.OVERRIDE.checkAndDisable()) {
+						soar.addDriveListener(drive3);
+						override = false;
+						logger.info("Override disabled.");
+					} else {
+						drive3.handleDriveEvent(getGamepadDDC());
+					}
+				} else {
+					if (Buttons.OVERRIDE.checkAndDisable()) {
+						soar.removeDriveListener(drive3);
+						override = true;
+						drive3.handleDriveEvent(getGamepadDDC());
+						logger.info("Override enabled.");
+					}
+				}
+				
+				Buttons.SOAR.update();
+				if (Buttons.SOAR.checkAndDisable()) {
+					soar.toggleRunState();
+				}
+			}
+		}, 0, 30, TimeUnit.MILLISECONDS);
 	}
 	
 	private DifferentialDriveCommand getGamepadDDC() {

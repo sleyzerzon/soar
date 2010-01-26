@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry combineaccessrules="false" kind="src" path="/vis"/>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
@@ -10,7 +11,6 @@
 	<classpathentry kind="var" path="JOGL"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/soar-smljava/lib/log4j-1.2.15.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/soar-debugger"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/soar-smljava"/>
 	<classpathentry kind="lib" path="lib/orc.jar"/>
 	<classpathentry kind="var" path="SML"/>

@@ -35,7 +35,6 @@ public class SoarInterface implements SoarControlListener, Adaptable {
 	private final Kernel kernel;
 	private final Agent agent;
 	private final AtomicBoolean stopSoar = new AtomicBoolean(true);
-	private final ExecutorService debuggerExec = Executors.newSingleThreadExecutor();
 	private final ExecutorService exec = Executors.newSingleThreadExecutor();
 	private Future<?> soarTask;
 	private DifferentialDriveCommand ddcPrev;
@@ -98,13 +97,6 @@ public class SoarInterface implements SoarControlListener, Adaptable {
 		kernel.RegisterForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, systemHandler, null);
 
 		agent.Commit();
-		
-		debuggerExec.submit(new Runnable() {
-			@Override
-			public void run() {
-				new edu.umich.soar.debugger.Application(new String[] { "-remote" }, false);
-			}
-		});
 	}
 	
 	Kernel.SystemEventInterface systemHandler = new Kernel.SystemEventInterface() {
