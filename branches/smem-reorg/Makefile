@@ -42,6 +42,9 @@ checkout-tohsml:
 update:
 	svn update *
 
+status:
+	svn status *
+
 clean:
 	cd Core && scons -c
 
