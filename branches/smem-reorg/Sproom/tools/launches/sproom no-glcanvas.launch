@@ -7,8 +7,7 @@
 <listEntry value="1"/>
 </listAttribute>
 <mapAttribute key="org.eclipse.debug.core.environmentVariables">
-<mapEntry key="LD_LIBRARY_PATH" value="../../smem/SoarLibrary/lib"/>
-<mapEntry key="PATH" value="../../smem/SoarLibrary/bin;../../april"/>
+<mapEntry key="LD_LIBRARY_PATH" value="/home/voigtjr/sandbox/lib"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="edu.umich.soar.sproom.Application"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="config/splinter.config"/>

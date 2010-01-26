@@ -12,7 +12,7 @@
 	<classpathentry kind="lib" path="/soar-smljava/lib/log4j-1.2.15.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/soar-debugger"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/soar-smljava"/>
-	<classpathentry kind="lib" path="/soar-smljava/lib/sml.jar"/>
 	<classpathentry kind="lib" path="lib/orc.jar"/>
+	<classpathentry kind="var" path="SML"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
