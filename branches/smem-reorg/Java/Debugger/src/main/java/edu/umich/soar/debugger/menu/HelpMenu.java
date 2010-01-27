@@ -33,15 +33,15 @@ public class HelpMenu {
 	private AbstractAction m_Wiki 	 	= new AbstractAction("Online - Soar Wiki") 				{ public void actionPerformed(ActionEvent e) { open("http://winter.eecs.umich.edu/soarwiki/Main_Page") ; } } ;
 	private AbstractAction m_CLI 	 	= new AbstractAction("Online - Soar Command Line Help") { public void actionPerformed(ActionEvent e) { open("http://winter.eecs.umich.edu/soarwiki/Soar_Command_Line_Interface") ; } } ;
 	private AbstractAction m_FAQ 	 	= new AbstractAction("Online - Soar FAQ") 				{ public void actionPerformed(ActionEvent e) { open("http://acs.ist.psu.edu/projects/soar-faq/soar-faq.html") ; } } ;
-	private AbstractAction m_Manual 	= new AbstractAction("Soar Manual") 			{ public void actionPerformed(ActionEvent e) { local("../Documentation/Soar8Manual.pdf") ; } } ;
-	private AbstractAction m_Tutorial1 	= new AbstractAction("Soar Tutorial - Part 1") 	{ public void actionPerformed(ActionEvent e) { local("../Documentation/Soar Tutorial Part 1.pdf") ; } } ;
-	private AbstractAction m_Tutorial2 	= new AbstractAction("Soar Tutorial - Part 2") 	{ public void actionPerformed(ActionEvent e) { local("../Documentation/Soar Tutorial Part 2.pdf") ; } } ;
-	private AbstractAction m_Tutorial3 	= new AbstractAction("Soar Tutorial - Part 3") 	{ public void actionPerformed(ActionEvent e) { local("../Documentation/Soar Tutorial Part 3.pdf") ; } } ;
-	private AbstractAction m_Tutorial4 	= new AbstractAction("Soar Tutorial - Part 4") 	{ public void actionPerformed(ActionEvent e) { local("../Documentation/Soar Tutorial Part 4.pdf") ; } } ;
-	private AbstractAction m_Tutorial5 	= new AbstractAction("Soar Tutorial - Part 5") 	{ public void actionPerformed(ActionEvent e) { local("../Documentation/Soar Tutorial Part 5.pdf") ; } } ;
-	private AbstractAction m_Tutorial6 	= new AbstractAction("Soar Tutorial - Part 6") 	{ public void actionPerformed(ActionEvent e) { local("../Documentation/Soar Tutorial Part 6.pdf") ; } } ;
-	private AbstractAction m_DebuggerHelp = new AbstractAction("Intro to the Debugger") { public void actionPerformed(ActionEvent e) { local("../Documentation/Intro to the Soar Debugger in Java.pdf") ; } } ;
-	private AbstractAction m_SMLHelp      = new AbstractAction("General Intro to Soar Markup Language (SML)") { public void actionPerformed(ActionEvent e) { local("../Documentation/SML Quick Start Guide.pdf") ; } } ;	
+	private AbstractAction m_Manual 	= new AbstractAction("Soar Manual") 			{ public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Soar8Manual.pdf") ; } } ;
+	private AbstractAction m_Tutorial1 	= new AbstractAction("Soar Tutorial - Part 1") 	{ public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Soar Tutorial Part 1.pdf") ; } } ;
+	private AbstractAction m_Tutorial2 	= new AbstractAction("Soar Tutorial - Part 2") 	{ public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Soar Tutorial Part 2.pdf") ; } } ;
+	private AbstractAction m_Tutorial3 	= new AbstractAction("Soar Tutorial - Part 3") 	{ public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Soar Tutorial Part 3.pdf") ; } } ;
+	private AbstractAction m_Tutorial4 	= new AbstractAction("Soar Tutorial - Part 4") 	{ public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Soar Tutorial Part 4.pdf") ; } } ;
+	private AbstractAction m_Tutorial5 	= new AbstractAction("Soar Tutorial - Part 5") 	{ public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Soar Tutorial Part 5.pdf") ; } } ;
+	private AbstractAction m_Tutorial6 	= new AbstractAction("Soar Tutorial - Part 6") 	{ public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Soar Tutorial Part 6.pdf") ; } } ;
+	private AbstractAction m_DebuggerHelp = new AbstractAction("Intro to the Debugger") { public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/Intro to the Soar Debugger in Java.pdf") ; } } ;
+	private AbstractAction m_SMLHelp      = new AbstractAction("General Intro to Soar Markup Language (SML)") { public void actionPerformed(ActionEvent e) { local("/share/soar/Documentation/SML Quick Start Guide.pdf") ; } } ;	
 	
 	/** Create this menu */
 	public static HelpMenu createMenu(MainFrame frame, Document doc, String title)
@@ -134,11 +134,11 @@ public class HelpMenu {
 	
 	private void local(String relativeUrl)
 	{
-		String path = m_Frame.getLibraryLocation() ;
+		String path = m_Frame.getLibraryLocation();
 		
 		if (path == null || path == "")
 		{
-			m_Frame.ShowMessageBox("Error launching URL " + relativeUrl, "Need to be running a Soar kernel so we can find the files") ;
+			m_Frame.ShowMessageBox("Error launching URL " + relativeUrl, "Can't find Soar library location") ;
 			return ;
 		}
 		

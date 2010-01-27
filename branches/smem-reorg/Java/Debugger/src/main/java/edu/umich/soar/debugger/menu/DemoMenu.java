@@ -16,6 +16,7 @@ import java.io.File;
 import org.eclipse.swt.widgets.*;
 import sml.sml_Names;
 
+import edu.umich.soar.SoarProperties;
 import edu.umich.soar.debugger.MainFrame;
 import edu.umich.soar.debugger.doc.Document;
 
@@ -132,7 +133,7 @@ public class DemoMenu
 		
 		File filePath = null ;
 
-		String libraryPath = getLibraryLocation() ;
+		String libraryPath = getLibraryLocation();
 		File demoPath = new File(libraryPath + File.separator + "share" + File.separator + "soar", "Demos") ;
 		filePath = new File(demoPath, filename.getPath()) ;
 		
@@ -146,37 +147,7 @@ public class DemoMenu
 	
 	public String getLibraryLocation()
 	{
-		if (!m_Document.isConnected())
-			return "" ;
-		
-		String getLocation = m_Document.getSoarCommands().getLibraryLocationCommand() ;
-		
-		sml.ClientAnalyzedXML response = new sml.ClientAnalyzedXML() ;
-		boolean ok = m_Frame.executeCommandXML(getLocation, response) ;
-
-		// Check if the command failed
-		if (!ok)
-		{
-			response.delete() ;
-			return "" ;
-		}
-		
-		// Debug code to look at the result of the command in XML
-		//String check = response.GenerateXMLString(true) ;
-		String location = response.GetArgString(sml_Names.getKParamDirectory()) ;
-		
-		// BADBAD: Need to strip quotes - they shouldn't really be added
-		if (location != null && location.length() > 2 && location.charAt(0) == '"')
-		{
-			// Chop leading and trailing quote
-			location = location.substring(1, location.length() - 1) ;
-		}
-		
-		// We do explicit clean up so we can check for memory leaks when debugger exits.
-		// (See executeCommandXMLcomment for more).
-		response.delete() ;
-		
-		return location ;
+		return SoarProperties.getProperties().getProperty("soar.home");
 	}
 	
 	/*
