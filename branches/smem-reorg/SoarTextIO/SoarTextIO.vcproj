@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -46,7 +46,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Core\ClientSML\include;..\..\Tools\SoarTextIO\include;..\..\Core\ConnectionSML\include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -65,11 +65,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 			/>
@@ -93,14 +93,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -125,7 +125,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Core\ClientSML\include;..\..\Tools\SoarTextIO\include;..\..\Core\ConnectionSML\include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -144,11 +144,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -171,14 +171,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -208,7 +208,7 @@
 				OmitFramePointers="false"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Core\ClientSML\include;..\..\Tools\SoarTextIO\include;..\..\Core\ConnectionSML\include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -228,10 +228,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
@@ -258,14 +258,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -296,7 +296,7 @@
 				OmitFramePointers="false"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Core\ClientSML\include;..\..\Tools\SoarTextIO\include;..\..\Core\ConnectionSML\include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -316,10 +316,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
@@ -345,23 +345,23 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{3EDBED11-A1B3-4E00-8B6E-652523D482F0}"
-			RelativePathToProject=".\Core\ClientSML\ClientSML9.vcproj"
+			RelativePathToProject=".\ClientSML\ClientSML9.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{161DC1AD-FB4B-4370-9FD5-B02E2A0D8A36}"
-			RelativePathToProject=".\Core\ConnectionSML\ConnectionSML9.vcproj"
+			RelativePathToProject=".\ConnectionSML\ConnectionSML9.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{E9AB0B6E-F1CA-4A63-817B-AB47F7E5417E}"
-			RelativePathToProject=".\Core\ElementXML\ElementXML9.vcproj"
+			RelativePathToProject=".\ElementXML\ElementXML9.vcproj"
 		/>
 	</References>
 	<Files>
@@ -371,17 +371,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\Tools\SoarTextIO\src\SoarTextIO.cpp"
+				RelativePath=".\src\SoarTextIO.cpp"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
 			<File
-				RelativePath="..\..\Tools\SoarTextIO\include\SoarTextIO.h"
+				RelativePath=".\src\SoarTextIO.h"
 				>
 			</File>
 		</Filter>

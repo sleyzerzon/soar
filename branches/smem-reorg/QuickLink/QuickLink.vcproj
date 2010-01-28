@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -46,7 +46,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -65,11 +65,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 			/>
@@ -93,14 +93,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -125,7 +125,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -144,11 +144,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -171,14 +171,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -208,7 +208,7 @@
 				OmitFramePointers="false"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -228,10 +228,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
@@ -258,14 +258,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -296,7 +296,7 @@
 				OmitFramePointers="false"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -316,10 +316,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
@@ -345,14 +345,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Debug SCU|Win32"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -376,7 +376,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -395,11 +395,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 			/>
@@ -423,14 +423,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Debug SCU|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -455,7 +455,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -474,11 +474,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -501,14 +501,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release SCU|Win32"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -538,7 +538,7 @@
 				OmitFramePointers="false"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -558,10 +558,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
@@ -588,14 +588,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release SCU|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)"
+			OutputDirectory="..\out\bin"
+			IntermediateDirectory="..\build\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -626,7 +626,7 @@
 				OmitFramePointers="false"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\Core\shared;..\..\Tools\QuickLink\include;../../Core/ClientSML/include;../../Core/ConnectionSML/include"
+				AdditionalIncludeDirectories="..\Core\ClientSML\src;..\Core\ElementXML\src;..\Core\ConnectionSML\src;..\Core\shared"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -646,10 +646,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(ProjectName).exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="build\$(PlatformName)\$(ConfigurationName)\$(TargetName).pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
@@ -675,23 +675,23 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copy target to bin"
-				CommandLine="xcopy /Y $(TargetFileName) &quot;$(SolutionDir)\SoarLibrary\bin&quot;"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{3EDBED11-A1B3-4E00-8B6E-652523D482F0}"
-			RelativePathToProject=".\Core\ClientSML\ClientSML9.vcproj"
+			RelativePathToProject=".\ClientSML\ClientSML9.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{161DC1AD-FB4B-4370-9FD5-B02E2A0D8A36}"
-			RelativePathToProject=".\Core\ConnectionSML\ConnectionSML9.vcproj"
+			RelativePathToProject=".\ConnectionSML\ConnectionSML9.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{E9AB0B6E-F1CA-4A63-817B-AB47F7E5417E}"
-			RelativePathToProject=".\Core\ElementXML\ElementXML9.vcproj"
+			RelativePathToProject=".\ElementXML\ElementXML9.vcproj"
 		/>
 	</References>
 	<Files>
@@ -701,7 +701,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\Input_Console.cpp"
+				RelativePath=".\src\Input_Console.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -737,7 +737,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\Input_Controller.cpp"
+				RelativePath=".\src\Input_Console.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\Input_Controller.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -773,7 +809,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\Input_File.cpp"
+				RelativePath=".\src\Input_Controller.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\Input_File.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -809,7 +881,79 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\QL_Controller.cpp"
+				RelativePath=".\src\Input_File.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\Input_Type.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\QL_Controller.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -845,7 +989,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\QL_Interface.cpp"
+				RelativePath=".\src\QL_Interface.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -881,7 +1025,79 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\Utilities.cpp"
+				RelativePath=".\src\QL_Interface.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\Smart_Pointer.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\Utilities.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -917,7 +1133,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\View_Console.cpp"
+				RelativePath=".\src\Utilities.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\View_Console.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -953,7 +1205,79 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\WME_Float.cpp"
+				RelativePath=".\src\View_Console.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\View_Type.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\WME_Float.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -989,7 +1313,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\WME_Id.cpp"
+				RelativePath=".\src\WME_Float.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\WME_Id.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -1025,7 +1385,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\WME_Int.cpp"
+				RelativePath=".\src\WME_Id.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\WME_Int.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -1061,7 +1457,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\WME_Shared.cpp"
+				RelativePath=".\src\WME_Int.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\WME_Shared.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -1097,7 +1529,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\WME_String.cpp"
+				RelativePath=".\src\WME_Shared.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\WME_String.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -1133,7 +1601,43 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\Tools\QuickLink\src\WME_Type.cpp"
+				RelativePath=".\src\WME_String.h"
+				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\WME_Type.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -1168,84 +1672,48 @@
 					/>
 				</FileConfiguration>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
 			<File
-				RelativePath="..\..\Tools\QuickLink\include\Input_Console.h"
+				RelativePath=".\src\WME_Type.h"
 				>
+				<FileConfiguration
+					Name="Debug SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release SCU|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\Input_Controller.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\Input_File.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\Input_Type.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\QL_Interface.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\Smart_Pointer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\Utilities.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\View_Console.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\View_Type.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\WME_Float.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\WME_Id.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\WME_Int.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\WME_Shared.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\WME_String.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Tools\QuickLink\include\WME_Type.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 		<Filter
 			Name="SCU Files"
 			>
 			<File
-				RelativePath="..\..\Tools\QuickLink\QuickLink.cxx"
+				RelativePath=".\QuickLink.cxx"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
