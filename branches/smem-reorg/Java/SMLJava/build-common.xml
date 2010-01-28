@@ -32,22 +32,22 @@
 	<property name="doc.destdir" location="${doc}/${ant.project.name}/api"/>
 	<property name="doc.windowtitle" value="${ant.project.name} ${version}"/>
 
-	<target name="init" >
+	<target name="init-haslib">
+		<available file="${lib}" property="haslib" />
+	</target>
+
+	<target name="init-copylib" depends="init-haslib" if="haslib">
+		<copy todir="${soarprefix.java}">
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="init" depends="init-copylib">
 		<mkdir dir="${target}" />
 		<mkdir dir="${target.classes}" />
-
 		<mkdir dir="${soarprefix.java}" />
-		<copy todir="${soarprefix.java}">
-			<fileset dir="${lib}">
-				<include name="*.jar" />
-			</fileset>
-		</copy>
-		<copy todir="${soarprefix.java}">
-			<fileset dir="${lib}">
-				<include name="*.jar" />
-			</fileset>
-		</copy>
-
 		<path id="compile.libs">
 			<fileset dir="${soarprefix.java}">
 				<include name="*.jar" />
