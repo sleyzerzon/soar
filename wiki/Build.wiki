@@ -1,43 +1,80 @@
 ﻿#summary Checkout and build procedure
 #labels Phase-Implementation,Phase-Support
 
-[http://code.google.com/p/soar/source/browse Browse online here],
-[http://code.google.com/p/soar/source/list recent changes here].
+[http://code.google.com/p/soar/source/browse BROWSE],
+[http://code.google.com/p/soar/source/list Recent Changes],
+[http://code.google.com/p/soar/source/checkout Google Code Checkout Page].
 
-[http://code.google.com/p/soar/source/checkout The old, default checkout content is here], however, be sure to review these checkout notes at least 
-once:
+*Avoid checking out the entire trunk. Check out only the `SoarSuite` subfolder non-recursively.*
 
-*Do not check out the entire trunk*, it is very large and contains much legacy
-code. Instead, most users will want to check out the `SoarSuite` subfolder of
-trunk. Check `SoarSuite` out to a writable folder on your drive that isn't too
-deep. Your home folder or a `dev` subfolder out of your home folder are good
-options.
+  * Command line: `svn checkout https://soar.googlecode.com/svn/trunk/SoarSuite --depth files`
+  * TortoiseSVN: Change the _Checkout Depth_ option to _Only file children_.
 
-Another thing to consider when naming the folder to check Soar out to is what
-versions you will be working with. If you will only be working with one version
-of Soar, any name (such as `SoarSuite`, `soar`, or `trunk`) should be fine.
-However, if you plan on working on the main trunk and the semantic memory
-branch, for example, you may want to name the two destination folders `trunk`
-and `smem`.
-
-  * The checkout URL is: `https://soar.googlecode.com/svn/trunk/SoarSuite`
-  * The destination folder should be `SoarSuite`, `soar`, or `trunk`
   * Your username is your Google account name without the `@` or domain
   * [http://code.google.com/hosting/settings Your password is your googlecode.com password].
 
-*Eclipse users*, do not import projects in Eclipse by checking them out there
-using Subclipse. Instead, check everything out outside of Eclipse and import
-later with the instructions below. Once things are imported, it is OK to check
-in changes using Subclipse.
+Once the top level folder is checked out, sub-modules need to be checked out. On unix systems, there
+are shortcuts available in the `Makefile` in the top level folder:
 
-*Soar robotics users* may also want to check out `aprilsoar` as well, but first see the
-[AprilSoar aprilsoar page] for more information.
+{{{
+# Note: these do not work on windows
+make checkout        # Checkout core modules
+make checkout-soar2d # Checkout Soar2D (not required, here for example)
+make update          # svn update everywhere
+make status          # svn status everywhere (there is no "make commit")
+make                 # build all checked-out modules (there is no "make install")
+make clean           # clean all checked-out modules
+cat Makefile         # See other examples
+}}}
 
-The [ProjectLayout project layout page] describes the folder layout and may be
-helpful to look at when checking out the source.
+To checkout specific modules from the command line, substitute `ModuleName`
+with the name of the module, such as `Core`:
 
-Please help keep this page up to date. [http://code.google.com/p/soar/w/edit/Build If you see an error or notice an omission, correct it yourself] or do not hesitate
-to [mailto:soar-sml-list@lists.sourceforge.net send a note to the soar-sml-list].
+{{{
+cd SoarSuite
+svn checkout https://soar.googlecode.com/svn/trunk/SoarSuite/ModuleName
+}}}
+
+If on Windows and using TortoiseSVN, this is a bit more difficult:
+
+  * Check out the module (fully recursive) in a folder _other than_ `SoarSuite`
+  * Move the folder in to `SoarSuite` after the checkout is complete.
+
+Module list and description (incomplete):
+
+  * *Core*: *Required* module to develop with Soar. All other modules depend on this. Includes the Soar kernel and related interface layers for C++ integration.
+    * Depends on Visual Studio (Windows) or SCons, G++, various other libraries (see operating system below).
+  * *Java*: *Recommended* module, used to interface with Java. Contains the Soar Java Debugger, !VisualSoar, and some useful utilities.
+    * Depends on Sun JDK 6, Apache ant, SWIG.
+  * *Python*: *Recommended* module, used to interface with Python. Contains some example Python code.
+    * Depends on Python 2.6, SWIG.
+
+  * *CSharp*: Optional module, used to interface with CSharp. Contains some example CSharp code.
+    * Depends on Visual Studio, SWIG. Microsoft only (no Mono support).
+  * *Tcl*: Optional module, used to interface with Tcl.
+    * Depends on Tcl 8.4, SWIG.
+
+  * *!QuickLink*: Tool for experimenting with the Soar I/O link.
+  * *SoarTextIO*: Tool for interacting with a running agent.
+  * *FilterC*: Example C++ Soar filter.
+  * *LoggerWinC*: Example Soar logger, implemented in C++.
+  * *TOHSML*: C++ Towers of Hanoi example environment.
+
+  * *!JavaMissionaries*: Java Missionaries and Canabals. Example Java envrionment (GUI).
+  * *JavaTOH*: Java Towers of Hanoi. Example Java envrionment (GUI).
+  * *!LoggerJava*: Example Soar logger, implemented in Java.
+  * *Soar2D*: Java !TankSoar and Eaters environments.
+  * *Sproom*: Java Splinter-Room robotics environment.
+
+All Soar users and developers need Core, and most will need Java because the
+debugger is implemented using the Java interface. Some users will need Python,
+CSharp and Tcl depending on what programs they are using. The rest of the
+modules are optional tools, environments and example code.
+
+Please help keep this page up to date.
+[http://code.google.com/p/soar/w/edit/Build If you see an error or notice an
+omission, correct it yourself] or do not hesitate to
+[mailto:soar-sml-list@lists.sourceforge.net send a note to the soar-sml-list].
 
 <wiki:toc max_depth="1"/>
 
@@ -51,10 +88,9 @@ Other versions of 32-bit windows might work but are not officially supported.
 == Windows Prerequisites ==
 
 Some of the prerequisites are listed as _recommended_ or _optional_. Please
-note that if all prerequisites are not installed (except Tcl on 64-bit, see
-below), some (ignorable) build errors will be encountered as unsupported
-language interfaces fail to build. *Close the related projects to avoid seeing
-the errors*.
+note that *if all _recommended_ prerequisites are not installed, some build
+errors will be encountered as unsupported language interfaces fail to build*.
+Open the solution and remove the related projects to fix the errors.
 
 A Subversion client is _required if checking things out from Google Code_. The
 Soar group at Michigan mainly uses TortoiseSVN and/or Subclipse (within
@@ -65,7 +101,8 @@ Eclipse).
     * _Important:_ If targeting 64-bit, you may need to install (the 64-bit version of) SlikSVN to get Subclipse to work correctly, available at [http://www.sliksvn.com/en/download/ sliksvn.com]. Eclipse may need to be restarted to see the SlikSVN libraries.
 
 Either Microsoft Visual Studio 2008 or Microsoft Visual C++ 2008 Express
-Edition is _required_ to build Soar.
+Edition is _required_ to build Soar. Visual C# Express is necessary for C#
+projects.
 
   * Install Visual Studio 2008 if you have access to it, or download and install Visual C++ 2008 Express Edition from [http://www.microsoft.com/express/vc/ microsoft.com]. 
 
@@ -101,7 +138,7 @@ desired.  Other versions of Python will not work "out of the box."
     * If targeting 64-bit, download the 64-bit version of Python.
   * If you are planning on a debug build including Python, [http://www.eecs.umich.edu/~soar/sitemaker/misc/python you will need Python debug libraries]. Save the correct one for your architecture in `Python26\libs`.
 
-!PyDev for Eclipse is optional, it is for Python development inside Eclipse.
+!PyDev for Eclipse is _optional_, it is for Python development inside Eclipse.
 
   * Inside Eclipse, visit the Help -> Install new software dialog
   * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
@@ -141,36 +178,23 @@ PATH = C:\apache-ant-1.7.1\bin
 
 == Windows Build ==
 
-Open SML.sln in the project root with Visual Studio and select build options:
+Double-click `build.bat` to build everything. You will see many errors about
+projects not being loaded unless you checked out the entire SoarSuite, which is
+not recommended.
 
-  * *Platform*: _win32_, _x64_.
-  * *Configuration*: _Debug SCU_, _Release SCU_, _Distribution SCU_. These are listed in order of increasing optimization and decreasing debugging facilities.
+If you need CSharp or Tcl, you will have to open the solution and add those
+projects to the solution file.
 
-If you did not install the Java, Python or Tcl or Swig prerequisites, close
-related projects now.
-
-  * Java: ClientSMLJava
-  * Python: ClientSMLPython
-  * Tcl: ClientSMLTcl
-  * CSharp: ClientSMLCSharp
-
-Build everything, see the [FAQ] for common solutions to errors.
-
-Next, build the Java apps and associated documentation. This requires Apache
-Ant to be located in the path (see Environment above) and generates all of the
-jars necessary to run Soar. *Eclipse users* should note that this step is
-required even if Eclipse development is planned because it will look for Jars.
-This can and should be changed in the future.
-
-  * Open up a command prompt (start -> run -> cmd).
-  * `cd C:\path\to\soar`
-  * Execute ant: `ant`
+See the [FAQ] for common solutions to build errors.
 
 = Linux =
 
 The only officially supported Linux distribution right now is
 [http://www.ubuntu.com/ Ubuntu], though Soar should work on almost any
 distribution so long as things are configured correctly.
+
+Make sure to see the Makefile checkout shortcuts in the top section of this
+file.
 
 == Linux Prerequisites ==
 
@@ -204,12 +228,15 @@ nice together.
   * Visit https://launchpad.net/~anders-kaseorg/%2Barchive/subversion-1.6 and follow instructions.
   * After the repository is installed, subversion will be able to be upgraded to 1.6 in your favorite package manager.
 
-!PyDev for Eclipse is optional, it is for Python development inside Eclipse.
+!PyDev for Eclipse is _optional_, it is for Python development inside Eclipse.
 
   * Inside Eclipse, visit the Help -> Install new software dialog
   * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
 
 == Linux Environment ==
+
+To make these changes permenant, edit your `.bashrc` file and put them at the
+bottom.
 
 Scons needs to be able to find the correct version of Java to build Soar. The
 discovery process often finds the GNU version of the JDK before the Sun JDK if
@@ -220,57 +247,114 @@ environment variable `JAVA_HOME` needs to be set.
 export JAVA_HOME=/usr/lib/jvm/java-6-sun
 }}}
 
-When Soar is running, it needs to be able to load the relevant dynamic
-libraries on the fly. Unfortunately, if those libraries are not installed in a
-system-wide location already on the library path such as `/usr/lib`, Soar will
-(likely) not be able to find them. The environment variable `LD_LIBRARY_PATH`
-can be set to point to additional places to look, such as the full path to
-`SoarLibrary/lib` inside of the checkout folder. Your exact path will vary
-depending on where you check out Soar.
+Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  When
+Soar is running, it needs to be able to load the relevant dynamic libraries on
+the fly. Unfortunately, if those libraries are not installed in a system-wide
+prefix already on the library path such as `/usr/lib`, Soar will (likely) not
+be able to find them. The environment variable `LD_LIBRARY_PATH` can be set to
+point to additional places to look, such as the full path to
+`SoarSuite/out/lib`.
 
 {{{
-export LD_LIBRARY_PATH=/home/username/soar/SoarSuite/SoarLibrary/lib
+# The exact path here will depend on your system settings.
+export LD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/lib
+}}}
+
+The executables are also installed in that same prefix, and, if added to the PATH
+environment variable, will be able to be executed from anywhere. Usually you want to
+retain your current path:
+
+{{{
+export PATH=$PATH:/home/$USER/soar/SoarSuite/out/bin
+}}}
+
+Alternatively, you can change the prefix to have it install binaries to a more
+well-known location by using `SOAR_HOME`. Although you can do this to send
+binaries to a place like `/usr/local`, this is not recommended. Many people use
+sandboxes in their home directories:
+
+{{{
+export SOAR_HOME=/home/$USER/sandbox
+export PATH=$PATH=/home/$USER/sandbox/bin
+export LD_LIBRARY_PATH=/home/$USER/sandbox/lib
 }}}
 
 == Linux Build ==
 
-Run `scons` in the top-level folder, see the [FAQ] for common solutions to
+Run `make` in the top-level folder, see the [FAQ] for common solutions to
 errors.
 
 = Mac OS X =
 
-Check that java preferences is set to what you want it to, sets current.
-
 == Mac OS X Prerequisites ==
 
-Install XCode.
+Open spotlight: Java preferences, make sure that the appropriate JVM is selected. This is apparently not an issue on snow leopard.
 
-Install SCons from http://www.scons.org/ (tarball)
+Install [http://developer.apple.com/tools/xcode/ XCode].
 
+Install SCons. Download the tarball from the [http://www.scons.org/ SCons site]
+and open (extract) it. Open a terminal and navigate to the extracted folder
+(likely in Downloads). Run:
+
+{{{
 sudo python setup.py install
+}}}
 
-Eclipse. Only cocoa for 64-bit.
+Install Eclipse from the [http://www.eclipse.org/downloads/ download site]. Get
+the 64- or 32-bit *Carbon* version, depending on your system (likely 64bit).
+Install by dropping it in to your Applications folder, or your home folder.
 
 == Mac OS X Environment ==
 
-Set JAVA_HOME to something like /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+To make these changes permenant, edit your `.bash_profile` file and put them at
+the bottom.
 
-Set DYLD_LIBRARY_PATH
+SCons needs to find the Java development libraries, you help it by setting the
+`JAVA_HOME` variable to:
+
+{{{
+export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+}}}
+
+The binaries are installed to `SoarSuite/out` by default and need to be in the
+library path during execution, tell the loader where to look by setting:
+
+{{{
+# Note: your exact path will vary depending on the location of SoarSuite
+export DYLD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/lib
+}}}
+
+If you add the `SoarSuite/out/bin` file to the path, you can execute binaries
+from anywhere:
+
+{{{
+export PATH=$PATH=/home/$USER/sandbox/bin
+}}}
+
+Alternatively you can install things to a well-known location like `/usr/local`
+though this is not recommended. Many users do have sandboxes in their home
+directories, you can do that by using the `SOAR_HOME` variable:
+
+{{{
+export SOAR_HOME=/home/$USER/sandbox
+export PATH=$PATH=/home/$USER/sandbox/bin
+export DYLD_LIBRARY_PATH=/home/$USER/sandbox/lib
+}}}
 
 == Mac OS X Build ==
 
-make
+Run `make` in the top-level folder, see the [FAQ] for common solutions to
+errors.
 
 = Eclipse =
 
 If you are not planning on using Eclipse, skip this section.
-
-If you haven't built the Java apps outside of Eclipse, do so now.
 
 Run Eclipse and either use the default workspace or make a new one next to
 where you checked out Soar. Do not have the folder where you checked out Soar
 be a child of your workspace folder.
 
 Import existing projects in to workspace without copying them in to the
-workspace folder. Point the import wizard to the `soar-java` subfolder. Import
-all projects.
+workspace folder. Point the import wizard to the `SoarSuite` folder. Import all
+projects.
+
