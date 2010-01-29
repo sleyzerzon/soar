@@ -184,6 +184,8 @@ projects to the solution file.
 
 See the [FAQ] for common solutions to build errors.
 
+----
+
 = Linux =
 
 The only officially supported Linux distribution right now is
@@ -281,6 +283,8 @@ export LD_LIBRARY_PATH=/home/$USER/sandbox/lib
 Run `make` in the top-level folder, see the [FAQ] for common solutions to
 errors.
 
+----
+
 = Mac OS X =
 
 == Mac OS X Prerequisites ==
@@ -343,6 +347,8 @@ export DYLD_LIBRARY_PATH=/home/$USER/sandbox/lib
 Run `make` in the top-level folder, see the [FAQ] for common solutions to
 errors.
 
+----
+
 = Eclipse =
 
 If you are not planning on using Eclipse, skip this section.
@@ -370,3 +376,4 @@ I'm not sure if there's another generic way to get to variables (since they are 
 
 Here, press _New_ and create the variable `SML` and point it to where you installed `sml.jar`. This will be in your Soar home as defined in the build procedure. The default location is the `out` folder in the top level of your checkout, in a subfolder `share/java`.
 
+Once this variable is defined, things should build.
