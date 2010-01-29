@@ -90,12 +90,9 @@ errors will be encountered as unsupported language interfaces fail to build*.
 Open the solution and remove the related projects to fix the errors.
 
 A Subversion client is _required if checking things out from Google Code_. The
-Soar group at Michigan mainly uses TortoiseSVN and/or Subclipse (within
-Eclipse).
+Soar group at Michigan mainly uses TortoiseSVN.
 
   * Download and install TortoiseSVN from [http://tortoisesvn.net/downloads tortoisesvn.net].
-  * Install Subclipse if you're using Eclipse by visiting the Help -> Install new software  dialog and adding the site `http://subclipse.tigris.org/update_1.6.x`.
-    * _Important:_ If targeting 64-bit, you may need to install (the 64-bit version of) SlikSVN to get Subclipse to work correctly, available at [http://www.sliksvn.com/en/download/ sliksvn.com]. Eclipse may need to be restarted to see the SlikSVN libraries.
 
 Either Microsoft Visual Studio 2008 or Microsoft Visual C++ 2008 Express
 Edition is _required_ to build Soar. Visual C# Express is necessary for C#
@@ -377,3 +374,10 @@ I'm not sure if there's another generic way to get to variables (since they are 
 Here, press _New_ and create the variable `SML` and point it to where you installed `sml.jar`. This will be in your Soar home as defined in the build procedure. The default location is the `out` folder in the top level of your checkout, in a subfolder `share/java`.
 
 Once this variable is defined, things should build.
+
+== Subclipse ==
+
+Having Subclipse installed is handy when doing dev inside Eclipse.
+
+  * Install Subclipse if you're using Eclipse by visiting the Help -> Install new software  dialog and adding the site `http://subclipse.tigris.org/update_1.6.x`.
+    * _Important (Windows only):_ If targeting 64-bit, you may need to install (the 64-bit version of) SlikSVN to get Subclipse to work correctly, available at [http://www.sliksvn.com/en/download/ sliksvn.com]. Eclipse may need to be restarted to see the SlikSVN libraries.
