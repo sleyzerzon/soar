@@ -132,6 +132,7 @@ Area descriptions currently assume square rooms with walls and gateways aligned 
     * *id* (_int_): Unique identifying number for objects.
     * *name* (_string_): Unique agent name if other player.
     * *visible* (_string_) (true, false): Object stays on input link briefly after it is not visible. 
+    * [Sproom#Point_Data Point data, as described above].
     * Optional properties (see below).
 
 Objects in the world are sensed with some of these application-specific properties.
