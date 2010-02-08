@@ -19,7 +19,9 @@ are shortcuts available in the `Makefile` in the top level folder:
 {{{
 # Note: these do not work on windows
 make checkout        # Checkout core modules
+make public-checkout        # Checkout core modules from public svn (login not required)
 make checkout-soar2d # Checkout Soar2D (not required, here for example)
+make public-checkout-soar2d # Checkout Soar2D from public svn (not required, here for example)
 make update          # svn update everywhere
 make status          # svn status everywhere (there is no "make commit")
 make                 # build all checked-out modules (there is no "make install")
@@ -36,9 +38,8 @@ svn checkout https://soar.googlecode.com/svn/trunk/SoarSuite/ModuleName
 }}}
 
 If on Windows and using TortoiseSVN, this is a bit more difficult:
-
-  * Check out the module (fully recursive) in a folder _other than_ `SoarSuite`
-  * Move the folder in to `SoarSuite` after the checkout is complete.
+  * Create an empty folder, name it the module's name (such as `Java` or `Sproom`)
+  * Right-click that folder and check out the module (fully recursive).
 
 Module list and description (incomplete):
 
