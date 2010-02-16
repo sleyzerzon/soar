@@ -1,0 +1,14 @@
+#summary How to program a simple, external environment for Soar in Java.
+
+This document is not an introduction to Soar programming. Please refer to the Soar Tutorial documents included with the release if you are new to Soar.
+
+This document does describe how to create simple external environments with Soar using Java.
+
+= Hello World =
+
+`trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/HelloWorld.java` [http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/HelloWorld.java Link]
+
+This is a very simple Soar environment that adds a WME to the agent's input link with attribute "hello" and value "world" and then stops when any command from the agent is received.
+
+== Setup ==
+
