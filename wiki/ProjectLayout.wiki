@@ -1,109 +1,109 @@
-#labels Phase-Requirements
- #summary Repository Layout
+﻿#labels Phase-Requirements
+#summary Repository Layout
 
-Browse the repository [http://code.google.com/p/soar/source/browse here].
+[http://code.google.com/p/soar/source/browse BROWSE THE REPOSITORY HERE].
 
-= Top Level =
+[Build Full build instructions here].
 
-  * `trunk`: The main line of development for Soar projects. Most people work directly on the trunk.
-  * `branches`: New major features and experimental ideas go here, originally copied from the trunk. Disruptive stuff. Some of it never makes it back to the trunk.
-  * `tags`: Milestones such as releases or snapshots before major refactoring get copied here for future reference. 
-  * `wiki`: The wiki pages are stored here with extension .wiki. No support for folders is available at the time of writing. More help is [http://code.google.com/p/support/wiki/WikiSyntax here].
+<wiki:toc max_depth="1" />
 
-= `SoarSuite` =
+----
+= trunk =
 
-{{{
-trunk/SoarSuite
-}}}
+The main line of development for Soar projects.
 
-The main "stable" kernel. Recently reorganized, probably getting reorganized again soon, so this documentation may be a bit old. Quickly:
+== !SoarSuite ==
 
-  * `Core`: The "core" components of Soar, needed by most configurations. The most controversial pieces here are the SWIG projects. Moving these out and grouping them with other utilities in their languages is possible in the future.
-    * `CLI`: Command line interface component of KernelSML. 
-    * `ClientSML`: The client-side Soar interface, mirrors a lot of what happens on the Kernel side. This is where SML is implemented from the environment's perspective.
-    * `ClientSMLSWIG`: Projects that use SWIG to generate a bridge between ClientSML and various supported languages.
-    * `ConnectionSML`: A utility library used on both sides (client and kernel) of SML and in various other places in the code. Originally was only dealing with connections between client and kernel, but also contains many other things that need to be seen by both sides of SML, such as threading and synchronization code, string constants, utility functions, etc. The SoarKernel itself does not reference ConnectionSML.
-    * `ElementXML`: A custom, lightweight XML library tailored for the Soar markup language (SML).
-    * `KernelSML`: The kernel side of SML, interfaces with the SoarKernel directly or via the command line interface. Handles agent scheduling, mapping of client-side identifiers and timetags to kernel-side. Fires many events that don't exist in the kernel.
-    * `SoarKernel`: The core Soar kernel.
-    * `Tests`: Unit tests for Core projects, uses CPPUNIT. This could change.
-    * `pcre`: A BSD-licensed regular expression library required on Windows.
-    * `shared`: Header-only global code intended to be shared by all projects. Portability issues are dealt with here, along with useful header-only library code for everyone, including the Soar kernel.
-  * `Documentation`: Sources for much documentation are stored here, along with a pdf rendering of the Soar manual. Much of this is out of date and should be moved online.
-  * `SoarLibrary`: Runtime resource folder for Soar, holds executables, libraries, demo code, other resources.
-    * `CLIHelp`: Help text files, likely will change.
-    * `Demos`: Example Soar agents.
-    * `Tests`: Soar code used for testing.
-    * `bin`: Output folder for binaries, dlls, jars, other resources. Working directory for many binaries.
-    * `lib`: Output folder for libraries, jars, other resources. Needs to be on library loader path on unix systems.
-  * `Tools`: Mostly C++ tools, example environments, and utilities. Arguably should be called `soar-cpp` or something.
-    * `FilterC`: TODO
-    * `LoggerWinC`: A logging client application. When running Soar, this can be used to connect to a running kernel, gathering and logging data without any other clients being aware of it.
-    * `QuickLink`: TODO: post docs
-    * `SoarTextIO`: TODO: post docs
-    * `TOHSML`: An example SML environment using SML's native C++ interface.
-    * `TestCLI`: A simple command line Soar debugger, initially created to simply test the command line but usable as a lightweight debugger.
-    * `TestExternalLibraryLib`: An example library for the load-library command.
-    * `TestSMLEvents`: Interactive event testing for SML.
-    * `TestSMLPerformance`: Automatic performance test.
-    * `TestSoarPerformance`: Automatic performance test.
-    * `vimplugin`: TODO: jzxu
-  * `soar-csharp`: CSharp projects.
-  * `soar-java`: Java projects.
-    * `soar-debugger`: The Soar Java debugger.
-    * `soar-loggerjava`: Logger application similar to LoggerWinC above but implemented in Java.
-    * `soar-missionaries`: Missionaries and Cannibals example SML environment.
-    * `soar-smljava`: Utility library for shared code within Java projects. Recently added so quite small.
-    * `soar-soar2d`: Soar2D project.
-    * `soar-toh`: Towers of Hanoi example SML environment.
-    * `soar-visualsoar`: The VisualSoar editor.
-  * `soar-python`: Python projects.
-  * `soar-tcl`: Tcl projects.
+!SoarSuite contains many Soar-related components and is not intended to be checked-out recursively. Each subfolder is a separate component and can be checked out independently, depending on what features and programs are necessary.
 
-= `nlderbin-epmem-smem` =
+Checking out this folder is not strictly required but is recommended ([http://svnbook.red-bean.com/en/1.5/svn.advanced.sparsedirs.html with the --depth files switch]) for a couple of convenience files it contains:
 
-{{{
-branches/nlderbin-epmem-smem
-}}}
+  * There is a Makefile in this folder with shortcuts to assist checking out and building components on unix systems.
+  * There are batch files to assist building the project using Visual Studio on Windows.
 
-Semantic memory branch, source of 9.2 series of releases. Branched from `nlderbin-wma-epmem`.
+For more information on the build procedure, see the [Build] document.
 
-= `aprilsoar` =
+=== Components ===
 
-{{{
-trunk/aprilsoar
-}}}
+  * *Core*: Core contains the Soar kernel, interfaces and build files. Core must be checked out with any other modules because they all depend on it. Core also contains some test programs and other low-level utilites. Special sibling components to Core (such as Java and Python) enable the building of the Soar SWIG language interface for that language. The SCons build file will also build any SConscript in any of these sibling components.
+    * *CLI*: Command line interface component of KernelSML. 
+    * *ClientSML*: The client-side Soar interface, mirrors a lot of what happens on the Kernel side. This is where SML is implemented from the environment's perspective.
+    * *ClientSMLSWIG*: Projects that use SWIG to generate a bridge between ClientSML and various supported languages.
+    * *ConnectionSML*: A utility library used on both sides (client and kernel) of SML and in various other places in the code. Originally was only dealing with connections between client and kernel, but also contains many other things that need to be seen by both sides of SML, such as threading and synchronization code, string constants, utility functions, etc. The !SoarKernel itself does not reference ConnectionSML.
+    * *ElementXML*: A custom, lightweight XML library tailored for the Soar markup language (SML).
+    * *KernelSML*: The kernel side of SML, interfaces with the !SoarKernel directly or via the command line interface. Handles agent scheduling, mapping of client-side identifiers and timetags to kernel-side. Fires many events that don't exist in the kernel.
+    * *!SoarKernel*: The core Soar kernel.
+    * *Tests*: Unit tests for Core projects, uses CPPUNIT. This could change.
+    * *pcre*: A BSD-licensed regular expression library required on Windows.
+    * *shared*: Header-only global code intended to be shared by all projects. Portability issues are dealt with here, along with useful header-only library code for everyone, including the Soar kernel.
+    * *Documentation*: Sources for much documentation are stored here, along with a pdf rendering of the Soar manual. Much of this is out of date and should be moved online.
 
-Projects using software from [http://april.eecs.umich.edu April]. Has it's own page [AprilSoar here].
+  * *Java*: Triggers building of the Soar/Java interface via SWIG in Core. Most users will want this since it contains the Soar Java Debugger. Any Soar Java projects (such as Sproom or Soar2D) will also depend on this.
 
-= `SoarPre8.6` =
+  * *Python*: Triggers building of the Soar/Python interface via SWIG in Core. Also contains a few utility and test scripts that use Soar with Python.
 
-{{{
-trunk/SoarPre8.6
-}}}
+  * *CSharp*: Triggers building of the Soar/CSharp interface vis SWIG in Core. Also contains a test program for running Soar with CSharp.
+
+  * *!JavaMissionaries*: The [http://en.wikipedia.org/wiki/Missionaries_and_cannibals_problem missionaries and cannibals problem] implemented as an external environment for Soar in Java. Depends on the Java component.
+
+  * *JavaTOH*: The [http://en.wikipedia.org/wiki/Tower_of_Hanoi Towers of Hanoi puzzle] implemented as an external environment for Soar in Java. Depends on the Java component.
+
+  * *!LoggerJava*: An example detailing how to hook an external logger to Soar, implemented in Java. When running soar, this can be used to connect to a running kernel, gathering and logging data without any other clients being aware of it.
+
+  * *LoggerWinC*: An example detailing how to hook an external logger to Soar, implemented in C++ on Windows. See !LoggerJava.
+
+  * *!ManualSource*: Source !LaTeX files and other resources for the Soar Manual.
+
+  * *!QuickLink*: TODO
+
+  * *Room*: The room environment. Obsolete, currently all functionality here is being merged with Sps and ported to Sproom, an environment with more realistic robotics and physics.
+
+  * *Soar2D*: Home of Eaters and Tanksoar, external environments for Soar agents implemented in Java.
+
+  * *!Soar2Soar*: A tool to quickly implement external Soar environments using other Soar agents.
+
+  * *SoarTextIO*: TODO
+
+  * *Sproom*: External robotics environment for Soar. Hooks up with actual hardware or runs in simulation. See [AprilSoar].
+
+  * *Sps*: Old Splinter/Soar environment. Obsolete, currently all functionality here is being merged with Room and being ported to Sproom.
+
+  * *TOHSML*: The [http://en.wikipedia.org/wiki/Tower_of_Hanoi Towers of Hanoi puzzle] implemented as an external environment for Soar in C++.
+
+== Folders created by build ==
+
+  * *out*: The default target build directory for executable binaries, dlls, libs, jars, and other resources. Also known as a prefix in GNU installer lingo. This can be changed using SCons switches or by modifying the Visual Studio build files. More build information is available on the [Build] document.
+
+  * *build*: The default directory for intermediate and object files, keeps the source and output trees clean.
+
+== SoarPre8.6 ==
 
 This is an archive of the 8.5.x kernel. Goes back pretty far.
 
-= `SoarWorkshop` =
-
-{{{
-trunk/SoarWorkshop
-}}}
+== SoarWorkshop ==
 
 Old Soar Workshop web stuff.
 
-= `buildbot` =
-
-{{{
-trunk/buildbot
-}}}
+== buildbot ==
 
 Holds configuration files for buildbot system, but not current ones. The current config files need to be stored here TODO.
 
-= `msr` = 
-
-{{{
-trunk/msr
-}}}
+== msr ==
 
 Soar and Microsoft Robotics Studio environment. Old.
+
+----
+= branches =
+
+New major features and experimental ideas go here, originally copied from the trunk. Disruptive stuff. Some of it never makes it back to the trunk.
+
+----
+= tags =
+
+Milestones such as releases or snapshots before major refactoring get copied here for future reference. 
+
+----
+= wiki =
+
+The wiki pages are stored here with extension .wiki. No support for folders is available at the time of writing. More help is [http://code.google.com/p/support/wiki/WikiSyntax here].
+
