@@ -1,46 +1,30 @@
 #summary Soar projects using April.
 
-[http://april.eecs.umich.edu Edwin Olson's April group projects and libraries] are used with some Soar projects. These projects have been recently moved to a new top-level module `aprilsoar`.
+[http://april.eecs.umich.edu Edwin Olson's April group projects and libraries] are used with some Soar projects (currentl Sproom).
 
-= Windows =
+= Setup Procedure =
 
-== Updated Jars ==
+  * Follow the [Build build] procedure to get Soar checked out and built.
+    * Necessary components: Core, Java, Sproom (and/or other April-related projects).
+    * Eclipse setup and usage is recommended.
 
-Right now, the libraries posted on april.eecs.umich.edu as described below are not sufficiently up to date. Until they are updated, the jars [http://www.eecs.umich.edu/~soar/sitemaker/misc/april/ need to be downloaded from a secondary site].
+  * Visit [http://www.eecs.umich.edu/~soar/sitemaker/misc/april/ the secondary site hosting updated april jars] and download them to your output directory's `share/java` folder. Usually `SoarSuite/out/share/java` or `~/sandbox/share/java`.
+    * The libraries currently posted on the April resources page are not as up to date as they need to be.
 
-== Procedure ==
+  * Download the JOGL zip file appropriate to you platform from [http://download.java.net/media/jogl/builds/archive/jsr-231-1.1.1a/ this JOGL builds folder].
+    * Unzip and place jars in `share/java`, shared libraries (Linux/Mac) in `share/lib`, and DLLs (Windows) in `share/bin`.
 
-[Build Follow the instructions to check out and build] the Semantic Memory branch of Soar in to a folder named `smem`. Technically, `aprilsoar` can be used against the trunk or other Soar branches, but the SMem branch will provide the least resistance.
+  * If running outside of Eclipse, be sure to add all relevant jars to your classpath.
 
-Check out the `trunk/aprilsoar` module next to `smem`. `aprilsoar` cannot be built until all of the April dependencies are on the system. April tools and libraries are obtained from the [http://april.eecs.umich.edu/resources.php April resource pages].
 
-Create a top-level `april` folder next to `aprilsoar` and `smem`. Download the [http://april.eecs.umich.edu/packages/april-mega.jar april-mega.jar] and place in to the `april` folder. The mega jar includes many tools and a few dependencies for the april project.
+= Build =
 
-The mega jar depends on [http://kenai.com/projects/jogl/pages/Home JOGL]. To satisfy this dependency, download the JOGL zip appropriate for your platform from [http://download.java.net/media/jogl/builds/archive/jsr-231-1.1.1a/ this JOGL builds folder]. Unzip the JOGL file and place the contents in its `libs` folder in to the `april` folder. My `april` folder looks like this:
+*The ant build scripts have not been fully updated*. For now, use Eclipse. Set up Eclipse as outlined in [Build the build document]. Additionally:
 
-  * `april-mega.jar`
-  * `gluegen-rt.dll`
-  * `gluegen-rt.jar`
-  * `jogl.dll`
-  * `jogl.jar`
-  * `jogl_awt.dll`
-  * `jogl_cd.dll`
+  * Import the Sproom project in to the Eclipse workspace.
 
-The ant build scripts have not been fully updated. For now, use Eclipse. Start by creating a new workspace and importing existing projects in to it:
+  * Set a few more build path variables:
+    * `APRIL_MEGA`: Path to `april-mega.jar`
+    * `GLUEGEN_RT`: Path to `gluegen-rt.jar`
+    * `JOGL`: Path to `jogl.jar`
 
-  * `aprilsoar/soar-room`
-  * `smem/soar-java/soar-smljava`
-  * `smem/soar-java/soar-debugger`
-  * `aprilsoar/soar-sps`
-    * `soar-sps` is currently Linux only but that may change soon. You may omit this from the import to simplify things.
-
-Set a few build path variables for the `soar-room` and `soar-sps` (if applicable) projects:
-
-  * `APRIL_MEGA`
-    * Path to `april-mega.jar`
-  * `GLUEGEN_RT`
-    * Path to `gluegen-rt.jar`
-  * `JOGL`
-    * Path to `jogl.jar`
-
-Update the `PATH` environment variable for the _room_ launch configuration to include the `april` folder. Note: this may be unnecessary if I can get relative paths working correctly.
