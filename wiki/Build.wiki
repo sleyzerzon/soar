@@ -41,31 +41,18 @@ If on Windows and using TortoiseSVN, this is a bit more difficult:
   * Create an empty folder, name it the module's name (such as `Java` or `Sproom`)
   * Right-click that folder and check out the module (fully recursive).
 
-Module list and description (incomplete):
+For a complete module list and description, [ProjectLayout see the project layout document]. Here is a partial list with some dependencies:
 
-  * *Core*: *Required* module to develop with Soar. All other modules depend on this. Includes the Soar kernel and related interface layers for C++ integration.
+  * *Core*: *Required* module to develop with Soar.
     * Depends on Visual Studio (Windows) or SCons, G++, various other libraries (see operating system below).
-  * *Java*: *Recommended* module, used to interface with Java. Contains the Soar Java Debugger, !VisualSoar, and some useful utilities.
+  * *Java*: *Recommended* module, used to interface with Java.
     * Depends on Sun JDK 6, Apache ant, SWIG.
-  * *Python*: *Recommended* module, used to interface with Python. Contains some example Python code.
+  * *Python*: *Recommended* module, used to interface with Python.
     * Depends on Python 2.6, SWIG.
-
-  * *CSharp*: Optional module, used to interface with CSharp. Contains some example CSharp code.
+  * *CSharp*: Optional module, used to interface with CSharp.
     * Depends on Visual Studio, SWIG. Microsoft only (no Mono support).
   * *Tcl*: Optional module, used to interface with Tcl.
     * Depends on Tcl 8.4, SWIG.
-
-  * *!QuickLink*: Tool for experimenting with the Soar I/O link.
-  * *SoarTextIO*: Tool for interacting with a running agent.
-  * *FilterC*: Example C++ Soar filter.
-  * *LoggerWinC*: Example Soar logger, implemented in C++.
-  * *TOHSML*: C++ Towers of Hanoi example environment.
-
-  * *!JavaMissionaries*: Java Missionaries and Canabals. Example Java envrionment (GUI).
-  * *JavaTOH*: Java Towers of Hanoi. Example Java envrionment (GUI).
-  * *!LoggerJava*: Example Soar logger, implemented in Java.
-  * *Soar2D*: Java !TankSoar and Eaters environments.
-  * *Sproom*: Java Splinter-Room robotics environment.
 
 All Soar users and developers need Core, and most will need Java because the
 debugger is implemented using the Java interface. Some users will need Python,
