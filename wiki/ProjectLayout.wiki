@@ -1,5 +1,5 @@
-﻿#labels Phase-Requirements
-#summary Repository Layout
+﻿#summary Repository Layout
+#labels Phase-Requirements
 
 [http://code.google.com/p/soar/source/browse BROWSE THE REPOSITORY HERE].
 
@@ -76,11 +76,11 @@ For more information on the build procedure, see the [Build] document.
 
   * *build*: The default directory for intermediate and object files, keeps the source and output trees clean.
 
-== SoarPre8.6 ==
+== !SoarPre8.6 ==
 
 This is an archive of the 8.5.x kernel. Goes back pretty far.
 
-== SoarWorkshop ==
+== !SoarWorkshop ==
 
 Old Soar Workshop web stuff.
 
@@ -106,4 +106,3 @@ Milestones such as releases or snapshots before major refactoring get copied her
 = wiki =
 
 The wiki pages are stored here with extension .wiki. No support for folders is available at the time of writing. More help is [http://code.google.com/p/support/wiki/WikiSyntax here].
-
