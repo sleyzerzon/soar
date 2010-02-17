@@ -15,18 +15,5 @@ Visit the [http://sitemaker.umich.edu/soar Soar home page] for news and general 
 Visit the [Downloads] page to download Soar.
 
 = Documentation =
-  * [GettingStarted Getting started with Soar].
-  * [CommandLineInterface Command line interface documentation].
-  * [FAQ Frequently asked questions].
-  * [Soar2D]
-  * [sps Splinter Soar]
 
-= Developer Resources =
-  * [FAQ Frequently asked questions].
-  * [Build Checkout and build procedure details].
-  * [ProjectLayout Organization of Soar repository].
-
-= Soar at Michigan =
-  * [SoarGroupReadings List of potential readings].
-  * [ConferenceSchedule Relevant conferences].
-  * [Publications Publications related to Soar].
+Use the table of contents to the left to view documentation topics, or [http://code.google.com/p/soar/w/list browse all wiki documents here].
