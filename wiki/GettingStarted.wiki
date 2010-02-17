@@ -26,6 +26,3 @@ much of our other documentation (.pdf format).
 The best places for help with Soar are listed on the
 [http://code.google.com/p/soar project home page] under the heading _Help and
 Documentation_.
-
-Please feel free to email questions to the Soar Group mailing list,
-`soar-group@lists.sourceforge.net`.
