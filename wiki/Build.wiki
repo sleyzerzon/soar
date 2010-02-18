@@ -340,6 +340,8 @@ errors.
 
 If you are not planning on using Eclipse, skip this section.
 
+Linux and Mac users might want to launch Eclipse from the command prompt so that it inherits environment variables such as SOAR_HOME.
+
 == Eclipse Import ==
 
 Run Eclipse and either use the default workspace or make a new one next to
