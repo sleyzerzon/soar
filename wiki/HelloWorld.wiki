@@ -8,7 +8,7 @@ These examples are written in Java but should be helpful to those looking to imp
 
 = Setup =
 
-[Build Checkout and build] at least the Core and Java components. You will need `sml.jar` and `soar-smljava-(version).jar` in your classpath to run the examples. On unix systems, don't forget to update your environment for loading shared libraries.
+If you would like to run these environments, [Build checkout and build] at least the Core and Java components. You will need `sml.jar` and `soar-smljava-(version).jar` in your classpath to run the examples. On unix systems, don't forget to update your environment for loading shared libraries.
 
 = Hello World =
 
