@@ -1,3 +1,0 @@
-#summary Help with Soar programming
-
-TODO
