@@ -30,6 +30,7 @@
       * [Symbols]
       * [Links]
     * [MemoryLeaks Memory Leak Debugging]
+    * [ReleasePreparation Release Preparation]
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
   * [ACTRTutorialGroup ACT-R Tutorial Group]
