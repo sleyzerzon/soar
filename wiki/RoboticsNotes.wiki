@@ -1,5 +1,7 @@
 #summary Notes on potential robotics environments and capabilities.
 
+<wiki:toc max_depth="1" />
+
 =Challenges=
 
 These are some of the challenges we may face, both in simulation and in transitioning to the real world.
@@ -211,4 +213,3 @@ The data can be in several possible formats:
 The data may actually be in multiple formats (e.g., an image with instructions on how to interpret it).
 
 An agent may use any of these sources as part of a specific problem-solving strategy or as part of some generic strategy when it gets "stuck". At least for external sources, the queries can be asynchronous, so it can continue querying alternative sources while waiting for responses to earlier queries.
-
