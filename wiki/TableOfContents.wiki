@@ -18,6 +18,7 @@
     * [Soar2D]
     * [MissionLab Mission Lab]
     * [msrs Microsoft Robotics Studio]
+    * [PlayerStageGazebo Player/Stage/Gazebo]
   * Developers
     * [Build Checkout and Build Procedure]
     * [ProjectLayout Project Layout]
