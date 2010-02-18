@@ -3,6 +3,7 @@
 This document is not an introduction to Soar programming. Please refer to the Soar Tutorial documents included with the release if you are new to Soar.
 
 These examples are written in Java but should be helpful to those looking to implement Soar environments in other languages. See also:
+
   * [SMLQuickStartGuide]
   * [ThreadsInSML]
 
@@ -12,12 +13,12 @@ If you would like to run these environments, [Build checkout and build] at least
 
 = Hello World =
 
-[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/HelloWorld.java HelloWorld.java] is a very simple Soar environment intended to explain the basics of using SML with Java. The source file is verbosely commented with explanations.
+[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/HelloWorld.java HelloWorld.java] ([http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/HelloWorld.java view with markup]) is a very simple Soar environment intended to explain the basics of using SML with Java. The source file is verbosely commented with explanations.
 
 [http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/resources/helloworld.soar helloworld.soar] is the source file for use with the environment and is also commented with explanation.
 
 = Simple Asynchronous Interactive Environment =
 
-[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/SimpleAsyncEnv.java SimpleAsyncEnv.java] is a more complex interactive asynchronous environment. The source file is verbosely commented with explanations.
+[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/SimpleAsyncEnv.java SimpleAsyncEnv.java] ([http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/SimpleAsyncEnv.java view with markup]) is a more complex interactive asynchronous environment. The source file is verbosely commented with explanations.
 
 [http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/resources/simpleasyncenv.soar simpleasyncenv.soar] is the source file for use with the environment and is also commented with explanation.
