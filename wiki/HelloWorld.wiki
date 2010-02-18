@@ -1,14 +1,14 @@
-#summary How to program a simple, external environment for Soar in Java.
+#summary How to program a simple, external environments for Soar
 
 This document is not an introduction to Soar programming. Please refer to the Soar Tutorial documents included with the release if you are new to Soar.
 
-This document does point to resources explaining how to create simple external environments with Soar using Java.
+These examples are written in Java but should be helpful to those looking to implement Soar environments in other languages. See also:
+  * [SMLQuickStartGuide]
+  * [ThreadsInSML]
 
 = Setup =
 
 [Build Checkout and build] at least the Core and Java components. You will need `sml.jar` and `soar-smljava-(version).jar` in your classpath to run the examples. On unix systems, don't forget to update your environment for loading shared libraries.
-
-
 
 = Hello World =
 
