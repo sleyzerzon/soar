@@ -1,0 +1,214 @@
+#summary Notes on potential robotics environments and capabilities.
+
+=Challenges=
+
+These are some of the challenges we may face, both in simulation and in transitioning to the real world.
+
+==Scene graphs==
+
+Currently, much of the visual system's theory relies on access to scene graphs (as opposed to, say, raw images). We may be able to get away with this in simulation, but real robots will need some way to convert raw image information into scene graphs. Without some ideas about how to do this, it's not clear that we can use scene graphs at all.
+
+If we provide the agent with a mostly complete scene graph to start with, recognizing things in it and making changes to it based on sensor data may be easier than making the agent start from scratch.
+
+==Terrain==
+
+Terrain will at least be 2.5D, and may be 3D in some cases (e.g., a bridge that can be walked over or under). Furthermore, what is considered obstacles or not may vary depending on the specific robot or conditions (e.g., when it's dry, a 20-degree grade is ok, but when it's wet, only 10-degree grades work). We need to figure out how to represent this terrain so the agent can reason about it. One possibility is to use topographic maps, from which the grade can be inferred. Sam also suggested using scene graphs as maps.
+
+===Navigation Challenge Levels===
+
+To start, we'll make various simplifying assumptions.
+
+Assumptions:
+
+  # Single agent
+  # 2D terrain
+  # Agent gets location (e.g., GPS) and heading (e.g., compass) information for free
+  # No/minimal sensor noise
+  # Agent has internal, annotated map (e.g., nodes with known coordinates and headings to adjacent nodes).
+
+Levels:
+
+0: The world exactly matches the agent's internal map.
+1: Static differences exist.
+1.1: Unimportant static differences (e.g., a car on the side of the road).
+Can probably just ignore.
+1.2: Blocking static differences (e.g., a car blocking the road, or an unexpected wall).
+Need to remove nodes/links from map.
+1.3: Unblocking static differences (e.g., a wall or building is missing, which opens up new paths).
+Can add nodes/links to map.
+2: Dynamic differences exist (e.g., moving cars, people, etc.).
+As a first pass, may be able to model these using above static map manipulations.
+3+: Relax some assumptions (e.g., 2.5D or 3D terrain, etc.)
+
+===Kinds of Maps===
+
+We may be constrained by the military as to what kinds of maps are available. But here are some ideas:
+
+  * Topographic map: Displays the altitudes in an area. Would probably need to be pretty fine-grained to be useful in a town. Could be stored/used in visual memory, or perhaps discretized into a grid and stored symbolically.
+  * Gradient map: Displays the change in altitude in an area. Can be derived from a topographic map. Can help the agent determine, e.g., if a slope is too steep for it to climb.
+  * Connectivity graph: AKA cognitive map. A graph of nodes for locations and their connectivity (e.g., nodes A and B are joined by an edge if it is possible to reach node A from node B). Can be used to do path planning. Can be represented hierarchically (e.g., a high-level map might show A->B, whereas a lower map might show A->C->D->E->B). Also, individual nodes can be entire maps themselves. Easy to represent symbolically. Not restricted to spatial/location maps (e.g., can have maps showing concept relationships).
+  * Scene graph: Typically used to represent relationships of objects in a scene, for rendering purposes (includes metric information such as relative coordinates of objects). In some sense, this is a special case of a connectivity graph (which need not use metric coordinates or be in a tree structure). Can theoretically be used for any connectivity graph so long as metric information can be generated (e.g., could be used to visualize concept relationships, or route planning, etc.)
+
+In general, maps can be treated as data sources capable of answering various kinds of questions (e.g., Where is X? How do I get there? How steep is this road? Can I see A from X? etc.) We can develop query interfaces for different map types. Multiple maps may be able to answer some of the same questions, but with varying levels of detail, etc.
+
+==Communication==
+
+In real robots, communication may be limited based on battery power, terrain (both altitude and whether there are obstacles between the communicators), etc. Communication with humans may also be necessary. If we know ahead of time what kinds of communication difficulties might arise, we can design agents to deal with them (e.g., the route an agent takes to get somewhere may take into account whether terrain along the way will interfere with communications).
+
+=Potential Capabilities=
+
+This is a list of some of the capabilities we think Soar should bring to robots. The categories are overlapping.
+
+==Capabilities==
+
+These are listed in rough order of importance.
+
+===Robust===
+
+In general, avoid failure or stop conditions. Be able to handle unexpected or novel situations. Small variations in situations do not lead to failure. Contrast to the brittleness normally associated with 1. expert systems where they have a very limited area of expertise and they cannot handle anything outside of that, and 2. scripted systems that have very rigid expectations as the the situations they will encountered and they assume that their plans will always execute successfully. They are somewhat open loop and they are unable to replan or handle novel situations.
+
+Recover from failure: If executing plan-like behavior, be able to replan or at least work way out of an unexpected plan failure. Relies on making predictions and progress detection.
+
+Multiple available responses: Many different responses to a general situation are available to the agent, and the exact one is determined by the details of the situations.
+
+Some available responses: Even in novel situations, the agent has some responses it can generate to muddle its way through a problem. It doesn't give up. Often there is very general knowledge available it can draw on - similar to common sense knowledge. For example, if the agent is navigating via GPS and it loses its GPS signal, it can navigate by measuring the distance its wheels turn or by recognition with a camera. Similarly, if the agent loses its brakes, it can stop by accelerating in the opposite direction.
+
+Avoid cyclical behavior: For example, avoid running into the wall over and over forever. This is often a special case of recover from failure. It relies on making predictions and progress detection.
+
+Use external knowledge sources: When the agent's internal knowledge sources fail, it should query external knowledge sources (e.g., other agents, people, the internet, etc.). The agent would then learn that knowledge so it doesn't have to look it up again in the future. For example, it can look up location coordinates on Google maps, or facts in a general search engine.
+
+===Learning===
+
+From mistakes: related to robustness, the agent needs to avoid doing bad things repeatedly.
+
+About regularities: the agent needs to learn to recognize recurring patterns that may be useful to reason about directly. For example, if the agent consistently fails to make it up some slopes on rainy days, it may be useful to learn the concept "slippery" and use that when its reasoning about paths it can take.
+
+From instruction: The agent needs to be able to take hierarchical instructions, where subparts may not need to be reexplained in future instructions (since it has already learned how to do them from previous instructions). For example, a mission statement might say, "Go to X. The way to go to X is to follow route A, B, C." A later mission statement could then just say, "Go to X."
+
+Correcting prior knowledge: For example, a map provided to the agent may not be 100% accurate; as the agent finds new or missing obstacles, the map needs to be updated.
+
+From external sources: See Robustness.
+
+===Vast amounts of knowledge===
+
+World: The agent needs to know maps (possibly of several types), various objects or people it might encounter, dangers and opportunities.
+
+Dynamics: The agent needs to know how the world might change over time, both on its own (e.g., that cars move, clouds might mean rain is coming) and as a result of its actions (e.g., if it opens a gate, that gate is likely to stay open).
+
+Options: The agent needs to know what it can do in various situations (e.g., tactics and doctrine).
+
+Self: The agent needs knowledge of its own capabilities and limitations(e.g., what kinds of things can it manipulate, or ask others to manipulate, what kinds of terrain can it traverse and in what weather, how noisy its sensors are and what their ranges are, etc.)
+
+External: See Robustness.
+
+===Long-running agents===
+
+No software failures: The agent shouldn't crash, overflow numbers, run out of memory, slow down as knowledge accumulates, etc. This is related to robustness, but specific to the system (as opposed to behavior). Currently we are aiming for 1 week of continuous uptime (which is considerably easier than trying to guarantee infinite uptime).
+
+===Multiagent===
+
+Communication
+
+Cooperation: The agents need to cooperate to achieve their goals. This will probably involve issues similar to multithreading (e.g., synchronization). Some way to resolve conflicts must exist (e.g., ranking the robots).
+
+Information sharing: The agents can share information about things they have learned, like map updates and routes.
+
+===Emotion===
+
+Generate intrinsic reward: The agent can learn quickly based on how well it thinks things are going without needing an explicit external signal.
+
+Set priorities: The agent may have several goals at any one time. Emotional responses can be generated to any or all of those, which may help the agent prioritize which to pursue next. The appraisal dimension urgency should play a role.
+
+Knowing when to give up: Due to incomplete or bad knowledge, or simply limited ability, the agent may be unable to accomplish its goal. After trying the available options (perhaps a few times), the agent needs to give up (or at least get help). Emotions may provide a natural way to determine when to give up (e.g., when the agent gets frustrated by its lack of progress).
+
+Trust: At any time, other agents may become sources of bad information. This could be due to a glitch, system failure, or even hackers. Constant evaluation of the actions being taken by others is necessary to determine if the information they provide can be trusted. Possibly the sources of previous information should also be tracked so they can be re-evaluated if trust later becomes an issue. This sort of analysis could also be applied to the agent itself, leading the agent to take itself out of service if necessary (although maybe human authorization should be required to make it harder for hackers to get all the agents to shut themselves down). Appraisal information like causal agency/motive and group/self standards compatibility should play a role.
+
+==Scenarios==
+
+===Action failure===
+
+General description: The agent knows how to do action A in situation X. It is in situation X', which differs from X in ways that are not immediately obvious to the agent (so it treats them the same). However, when it tries to do action A in X', it fails.
+
+Concrete description: The agent is trying to move up a slope. It knows it can normally do this, but today it's not working (because the ground is wet, although it doesn't have a way to detect this).
+
+What can the agent do?
+
+We don't expect the agent to try to make it up the slope forever (Robustness). After trying to make it up the slope a few times, it gives up because it gets frustrated (Emotion).
+
+In the worst case, the agent may mark it's knowledge as incorrect (Learning), but ideally it will infer from the whether report that the ground may be wet (Knowledge) and thus this may be a critical feature that distinguishes the current situation from the situation it already knows about -- thus, it will conclude that this route is impassable when it is wet (Learning). It may request the assistance of other agents (multiagent); for example, to see if another agent can make it up the slope (if so, it could indicate some sort of mechanical failure) or to get the agents to rearrange to provide adequate coverage if it can't make it to its destination, or some other agent is closer to the alternative route (e.g., the helicopter agent may take position over that area instead).
+
+===Knowledge failure===
+
+General description: The agent is told to do A, but doesn't know how.
+
+Concrete description: The agent is told to go to the market, but doesn't know where that is. There is no useful information in any of its memories.
+
+What can the agent do?
+
+Clearly, doing nothing is not an option (Robustness). The agent can query an online mapping service as to the location of the market (Vast amounts of knowledge, technically Multiagent). The agent may be able to find the route itself, or take advantage of the mapping service's route-finding service. It can then learn this information (Learning) to avoid having to look it up again in the future.
+
+=Tasks=
+
+==Clean Town==
+
+This is essentially identical to the Clean House task used in Bob's thesis:
+
+There are blocks (or whatever) throughout town. The robot does not know the quantity or locations of the blocks.
+Some location is designated as the storage area. The robot may not know the storage area's location.
+The robot needs to find all of the blocks and bring them to the storage area.
+
+Pros: Laird's existing code may be able to be adapted without too much difficulty.
+
+Cons: Requires a robot that can pick things up, or push them (pushing might be hard). Also not a militarily interesting task.
+
+==IED Visit Task==
+
+This is a modification of the Clean Town task. Basically, the boxes are IEDs, and there is no storage room. The agent's task is to visit all of the IEDs.
+
+Pros: Militarily interesting.
+
+Cons: Simpler than the Clean Town task.
+
+==IED Disable Task==
+
+This combines the Clean Town and IED Visit tasks. The storage area is replaced by the agent's base. The agent's task is to pick up an item (e.g., to disable the IEDs) from its base and bring it to each of the IEDs. The item need not physically exist -- it can merely be a flag in the agent's memory that says whether it has it or not.
+
+Pros: Militarily interesting. Equal in complexity to original Clean House task.
+
+Cons: Doesn't demonstrate physically realistic object manipulation.
+
+==Future Extensions==
+
+Any of these tasks could be extended to be multiagent.
+
+=Thoughts=
+
+==Data Sources==
+
+The agent could have access to several kinds of data:
+
+  * maps
+  * background facts
+  * mission info
+  * weather
+  * ...
+
+The data can come from several possible sources:
+
+  * internal memories (working, procedural, semantic, episodic, visual)
+  * external sources
+  * database
+  * other agents
+  * internet
+  * humans
+
+The data can be in several possible formats:
+
+  * semantic facts
+  * instructions (procedures)
+  * images
+
+The data may actually be in multiple formats (e.g., an image with instructions on how to interpret it).
+
+An agent may use any of these sources as part of a specific problem-solving strategy or as part of some generic strategy when it gets "stuck". At least for external sources, the queries can be asynchronous, so it can continue querying alternative sources while waiting for responses to earlier queries.
+
