@@ -8,13 +8,16 @@ This document does point to resources explaining how to create simple external e
 
 [Build Checkout and build] at least the Core and Java components. You will need `sml.jar` and `soar-smljava-(version).jar` in your classpath to run the examples. On unix systems, don't forget to update your environment for loading shared libraries.
 
+
+
 = Hello World =
 
-[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/HelloWorld.java HelloWorld.java] is a very simple Soar environment intended to explain the basics of using SML with Java. The source file is verbosely commented with explanations.
+[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/HelloWorld.java HelloWorld.java] is a very simple Soar environment intended to explain the basics of using SML with Java. The source file is verbosely commented with explanations.
 
 [http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/resources/helloworld.soar helloworld.soar] is the source file for use with the environment and is also commented with explanation.
 
-= More examples coming =
+= Simple Asynchronous Interactive Environment =
 
-As long as the execution environment is set up correctly and Java can find the Java_smlClientInterface library, this will return a kernel object even if there is an error. In the event of an error, the kernel object will have diagnostic information in it for retreival. If the execution environment isn't set up correctly, a runtime exception will be thrown here when it cannot load the shared library.
+[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/java/edu/umich/soar/examples/SimpleAsyncEnv.java SimpleAsyncEnv.java] is a more complex interactive asynchronous environment. The source file is verbosely commented with explanations.
 
+[http://soar.googlecode.com/svn/trunk/SoarSuite/Java/SMLJava/src/main/resources/simpleasyncenv.soar simpleasyncenv.soar] is the source file for use with the environment and is also commented with explanation.
