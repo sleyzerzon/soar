@@ -14,6 +14,7 @@
     * [AprilSoar April Soar]
     * [Sproom]
     * [Soar2D]
+    * [RoboticsNotes Robotics Notes]
     * Unsupported Environments
       * [sps Splinter Soar (old)]
       * [room Room Environment (old)]
