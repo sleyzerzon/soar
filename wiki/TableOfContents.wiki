@@ -20,6 +20,7 @@
       * [MissionLab Mission Lab]
       * [msrs Microsoft Robotics Studio]
       * [PlayerStageGazebo Player/Stage/Gazebo]
+      * [USARSim USARSim]
   * Developers
     * [Build Checkout and Build Procedure]
     * [ProjectLayout Project Layout]
