@@ -23,6 +23,7 @@
     * [ProjectLayout Project Layout]
     * [SMLQuickStartGuide SML Quick Start Guide]
     * [ThreadsInSML Threads in SML]
+    * [HelloWorld Simple Environment Examples]
     * [UsingElementXML Using ElementXML]
     * [SoarJavaDebugger Soar Java Debugger]
     * [SoarKernel Soar Kernel]
