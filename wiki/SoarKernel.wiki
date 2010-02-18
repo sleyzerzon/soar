@@ -343,3 +343,286 @@ rhsfun_math.cpp:16: *  BUGBUG more comments here.  Nothing in soarkernel.h eithe
   in head of file, no comments or description.  removed BUGBUG, left note.
 }}}
 
+= Thoughts on a potential rewrite =
+
+Description From Bob Marinier 2003-10-23 22:50:51 (-) [reply]
+
+This is some of my thoughts on a potential rewrite of Soar. This bug is NOT
+for discussing whether we should do a rewrite, it is for thinking about what
+kinds of implementation details we may need to consider if we do decide to
+rewrite Soar.
+
+1. Written in C++
+1.1 Object-oriented language will allow us to more easily create intuitive
+structures (i.e. classes) which will make the code easier to understand, more
+intuitive, more maintainable, and more extensible. The language will also
+enforce certain constraints for us (i.e. private members, etc) which will help
+limit instances of bad programming. We will also be able to use the STL,
+which will make certain parts of the code much easier to write (and
+potentially faster). The STL gives us much more power than Soar's current
+home-grown containers (growable strings, doubly linked lists and hash tables).
+
+1.2 While other tools (i.e. VisualSoar, the upcoming debugger) are written in
+Java, I think that Java is a bad idea for this project. The first reason is
+performance. While we should be prepared to accept a certain amount of
+performance loss (we may have to trade some performance for maintainability),
+we should still strive for high performance as much as we reasonably can.
+While Java has made significant improvements in the last few years, it still
+isn't as fast as well-written C++. But the biggest reason to go with C++ over
+Java is for ease of hooking up to external environments like
+UnrealTournament. While it's possible to call C/C++ code from Java via JNI,
+it's not clear to me that it's easy to go the other way. Furthermore, even if
+it's possible, there is probably a severe performance hit from doing so.
+While we may be able to accept severe performance hits while debugging (like
+we do now with Haunt and MOUT), we do not want the connection to Soar to be
+inherently slow.
+
+2. Use the newer .NET C++ for Windows development
+2.1 The newer .NET IDE is significantly better than the old IDE for Windows
+developers.
+2.2 The newer .NET C++ is more standards compliant which will make writing
+portable code easier.
+2.3 Do NOT use the managed C++ stuff (i.e. C++ with garbage collection).
+While this may become part of the C++ standard in the future, it isn't now so
+we can't sacrifice the portability.
+
+3. Use the STLPort version of the STL
+3.1 STLPort is a freely available version of the STL based on SGI's
+implementation. It is available at http://www.stlport.org/
+3.2 STLPort is significantly faster than Microsoft's implementation and much
+more portable than SGI's implementation.
+3.3 STLPort has a "debugging" mode which can check array bounds, etc at run
+time. Read about it here: http://www.stlport.org/doc/debug_mode.html
+3.4 STLPort (like SGI's implementation), besides being fully compliant with
+the ANSI standard, has important extensions to the current standard, including
+ropes and hash tables. These extensions will very likely be made part of the
+ANSI standard in the future.
+
+4. Object Pooling
+4.1 The current version of Soar uses object pools to make memory allocation
+more efficient. However, it also makes many memory leaks impossible to detect
+with standard tools like Purify (since the leak is to the pool and not the OS).
+4.2 On the one hand it seems reasonable to not use object pooling unless
+profiling reveals that it is necessary. However, by the time that we get to a
+stage where we can test that, it may be very difficult to implement object
+pooling. Perhaps we could implement object pooling using a check-out/check-in
+model. In this model, the pool does not maintain pointers to the objects once
+they are checked out. Instead, it relinquishes the pointer to whatever is
+requesting the object. When the object is checked back in, then the pool
+takes the pointer back. If the object is not checked in later when it is no
+longer being used, then the leak will be to the OS and thus detectable. If
+the object is checked in but some external reference is maintained and later
+used, it should wreak havoc on the system and thus be easy to track down (as
+opposed to the silent leaks we know we are getting now but can't track down).
+Finally, because we are using the pools, we can still track object statistics
+like memory usage (although some statistics, like number of objects created
+since start, should be tracked in static class variables, not by the pools).
+
+5. Use an autodocumenting tool
+5.1 We should agree on and use some autodocumenting tool like Doxygen
+(http://www.doxygen.org). These tools require the comments for classes,
+methods, etc to be in a standard format using tags to identify various things
+like parameters, etc. If we pick a tool to use, it will make documenting what
+we do and understanding the code during the process and after it is done much
+easier.
+
+6. Some performance loss is acceptable
+6.1 When Soar was rewritten in C from Lisp, it was 80 times faster. We may
+not be able to maintain this high level of performance. Of course, we should
+try, but if it comes down to maintainability versus speed, I vote for
+maintainability. There are many places in the current version of Soar where
+things are intertwined at too low of a level. For example, doing certain
+kinds of calculations directly in the rete may be fast, but it makes
+understanding (and modifying) that code very difficult. Of course, we should
+have limits on how much slow down we are willing to accept. Off the top of my
+head I think a 2x slow down is acceptable but a 10x is not. Profiling at
+various stages during development should be done and will give us insight into
+what parts of the developing code need work (or even a redesign) before we get
+so far along that we can't do anything about it. Other large projects (for
+example, Mozilla) actually do automatic profiling every day so that
+performance loss can be tracked to particular check-ins, etc. I don't think
+we need to be that vigorous about it, but some level of regular testing will
+help a lot in minimizing performance loss (and who knows, it may even be
+faster).
+
+------- Comment #1 From Andrew Nuxoll 2003-10-24 12:46:23 (-) [reply] -------
+
+Summary: In terms of man hours, the most overwhelming part of
+rewriting Soar will be verifying what we have written. This outweighs
+(by at least an order of magnitude) considerations like what language
+we are writing in or what development tools we use.
+
+As was stated in the meeting, a rewritten Soar must have near 100% of
+the functionality of the current Soar or it will not be accepted. One
+has only to look at how many users are still using Soar7 to understand
+the power of inertia.
+
+This has two hidden, but overwhelming ramifications:
+1. We must examine the existing source code completely to make sure
+we are fully aware of its capabilities. A lot of functionality
+has been added to the Soar kernel since it was written in C. Can
+anyone, even John Laird, claim to know all of it. Clearly not.
+2. We must be able to *PROVE* to ourselves and to the Soar community
+that what we have written is virtually, functionally identical to
+the Soar we are replacing.
+
+To accomplish this, I recommend the following steps:
+
+1. (estimated 6 man months) Examine Soar and document its
+functionality entirely using a complete specification document.
+
+2. (estimated 6 man months) Write a design document for a new Soar.
+
+3. (estimated 1 man year) Build unit tests that link to the Soar
+kernel library and test specific units of functionality as
+documented in step 1.
+
+4. (estimated 6 man months) Create a multitude of small Soar programs
+that test high level functionality (e.g. chunking, sub-goaling,
+stack unwind, GDS, i-support & o-support, etc.). These programs
+should also act as unit tests (i.e., they output a success or fail
+code depending upon whether they run successfully or not.)
+
+5. (estimated 8 man months) Collect multiple (~10-20) existing Soar7
+and Soar8 programs and projects of signficant size. Ideally this
+collection would include Tac-Air Soar. Run them in a
+deterministic manner (which will require tweaking them so that
+Soar settles indifferent preferences and gensym calls
+deterministically) in verbose mode. Record these log files.
+
+6. (estimated 4 man years) Reimplement Soar. As each set of
+functionality is implemented run the unit test to verify each
+functional unit as it is completed.
+
+7. (estimated 1 man year) Run all of the small soar programs created
+in step 4 and verify them. Fix bugs.
+
+8. (estimated 1 man year) Run all of the large soar programs from
+step 5 and verify them. Fix bugs.
+
+Total Verification/Documentation effort: ~7 man years
+Total Development effort: ~2 man years
+Total effort required: ~9 man years
+
+No I am not exaggerating. I have a fair amount of confidence in this
+estimate. I also believe that if we skip any of these steps we will
+make the project *longer* and much more painful. Now there are
+multiple competent developers in the Soar research group now. I think
+that if we all stopped doing research and focused on this project, we
+could complete it in about 3 years. Given that we're all doing
+research, I think it's reasonable to estimate it will take more than
+double that time.
+
+This is not an argument for or against rewriting Soar. I agree that a
+rewritten, object-oriented Soar would be a nice boon. In fact, I
+predict the following benefits:
+
+1. The new Soar will run *faster* (not slower) than the old Soar due
+to the efficiency of tighter rebuild and despite the overhead of
+using C++.
+2. A better documented Soar kernel. All of the following would
+probably exist in better form and more up to date:
+- general source code documentation
+- API documentation (see Bob's doxygen paragraph)
+- better developer/advanced soar user documentation
+3. Tight, clean integration with new tools (e.g., SoarDoc,
+VisualSoar, a Soar Debugger and gSki)
+4. A better organized development environment for future
+development. We've been slowly moving this way for a while. I
+think a redevelopment effort would help us cement that. (also see
+Bob's comments)
+
+I also predict the following costs:
+1. 6 years of real time required to produce a stable, functionally
+equivalent rewrite (see above)
+2. Loss of a significant number of Soar users due to stagnant
+development with the existing Soar.
+
+:AMN:
+
+------- Comment #2 From Bob Marinier 2003-10-24 14:24:45 (-) [reply] -------
+
+I agree that Andy's effort estimates are very realistic. I have the following
+additional comments:
+
+Even if we ultimately don't do the rewrite (i.e. lack of funding, John gets
+hit by a bus, etc), it is still very valuable to complete steps 1-5. So, if
+we get part way through the steps Andy has laid out but still fail to complete
+the project, it won't be a complete waste by any means.
+
+The one thing I'm not sure I agree with is that we would lose a significant
+number of users. This presumes two things:
+
+1) People want new releases of Soar fairly frequently. Given that a
+significant number of people still use Soar7, I don't think this is true.
+
+2) Development on the old version will stop during development of the new
+version. Given that several people have research which depends on the
+modifying the current kernel, I think that development on the old system will
+continue. This gives us a moving target which makes things harder, but with
+careful management I think we can still do this. We will have to require that
+people who make permanent changes to the kernel (i.e. changes which will
+become part of the official release) work with us to document their code at
+the same level that we will have documented the preexisting code. We will
+also require that they submit test programs which can be used to verify their
+code. Given that they will already be doing this for their own purposes, it
+should not be a big deal to make the process a little more formal.
+
+What I'm thinking is that, just because we are doing a new version does not
+mean that the old version has to be completely stagnant. It may be slowed
+down significantly, but if we want to take a large step forward we may have to
+risk taking a small step back.
+
+Also, I think the idea of test suites which output a pass/fail for various
+components is an excellent idea. This sort of thing can be automated; see,
+for example:
+
+http://porting.openoffice.org/irix/testing/OO641.html
+
+I think if we start with the right tools it will make our lives a lot easier.
+
+Finally, is there a standard way to document the specs for a software project
+(i.e. for step 1)? I was just wondering what the most effective method for
+documenting and understanding the current functionality was without resorting
+to "the code is the documentation."
+
+------- Comment #3 From Bob Marinier 2003-10-24 14:25:44 (-) [reply] -------
+
+Added Jon Voigt to CC list.
+
+------- Comment #4 From Bob Marinier 2004-04-01 09:08:56 (-) [reply] -------
+
+Sorry, I just need to get some of this out of my system :)
+
+Here's some pointers to coding techniques that may be useful:
+
+Object pooling:
+http://www.brent.worden.org/articles/1999/objectPools.html
+Overrides new and delete to provide the pool. Also provides some simple
+empirical results.
+
+auto_ptr:
+http://www.gotw.ca/publications/using_auto_ptr_effectively.htm
+The standard auto_ptr seems pretty cool. It can't be used with the STL, and
+there can only be one auto_ptr per pointer, but it still seems useful.
+Combined with the object pooling, it seems like it will automatically return
+objects to the pool. This page gives some do's and don't of auto_ptrs.
+
+Memory leak detection:
+http://www.flipcode.com/tutorials/tut_memleak.shtml
+This page describes overridden versions of new and delete. It should be
+combinable with the object pool versions of new and delete.
+
+http://www.cfxweb.net/modules.php?name=News&file=article&sid=1920
+This page also contains info on auto_ptr's, but also on a different kind of
+smart pointer that does reference counting and also different versions of new
+and delete that keeps track of memory allocations and deallocations.
+
+------- Comment #5 From Bob Marinier 2008-04-14 20:55:41 (-) [reply] -------
+
+We might consider running each agent in a multiagent system in its own thread.
+This would be a major parallelization win for multiagent systems. Also, there
+was some discussion a while ago about making the kernel single agent. This is
+probably a good idea, to keep things simple, but we'd still need an extra layer
+that can generate events like AFTER_ALL_GENERATED_OUTPUT (maybe an "agent" will
+be what we call a kernel now, and a "kernel" will be a group of "agents").
