@@ -1,0 +1,283 @@
+#summary USARSim environment notes.
+
+= Linux =
+
+==Unreal Tournament 2004==
+
+Installation of Midway release on Ubuntu 7.04
+
+  * Update ubuntu
+  * install glx drivers (nvidia-glx in my case)
+  * activate glx drivers (system -> administration -> restricted driver manager)
+  * reboot
+
+Summary of forum thread
+
+  * http://utforums.epicgames.com/showthread.php?t=558146
+  * Install package unshield
+  * Copy relevant files
+
+{{{
+voigtjr@cuckoo:~$ mkdir ut2004dvd
+voigtjr@cuckoo:~$ cd ut2004dvd/
+voigtjr@cuckoo:~/ut2004dvd$ cp /media/cdrom/Disk?/data?.* .
+}}}
+
+  * extract/install
+
+{{{
+voigtjr@cuckoo:~/ut2004dvd$ unshield -d /home/voigtjr/ut2004 -D3 x data1.cab
+}}}
+
+  * remove sources
+
+{{{
+voigtjr@cuckoo:~$ rm -rf ut2004dvd/
+}}}
+
+  * directory stuff
+
+{{{
+voigtjr@cuckoo:~$ cd ut2004/
+voigtjr@cuckoo:~/ut2004$ rm -rf _* All_UT2004.EXE
+voigtjr@cuckoo:~/ut2004$ cd English_Sounds_Speech_System_Help
+voigtjr@cuckoo:~/ut2004/English_Sounds_Speech_System_Help$ mv Sounds/ Speech/ System/ ..
+voigtjr@cuckoo:~/ut2004/English_Sounds_Speech_System_Help$ cd ..
+voigtjr@cuckoo:~/ut2004$ mv All_Animations Animations
+voigtjr@cuckoo:~/ut2004$ mv All_Benchmark Benchmark
+voigtjr@cuckoo:~/ut2004$ mv All_ForceFeedback ForceFeedback
+voigtjr@cuckoo:~/ut2004$ mv All_Help Help
+voigtjr@cuckoo:~/ut2004$ mv All_KarmaData KarmaData
+voigtjr@cuckoo:~/ut2004$ mv All_Maps Maps
+voigtjr@cuckoo:~/ut2004$ mv All_Music Music
+voigtjr@cuckoo:~/ut2004$ mv All_StaticMeshes StaticMeshes
+voigtjr@cuckoo:~/ut2004$ mv All_Textures Textures
+voigtjr@cuckoo:~/ut2004$ mv All_Web Web
+}}}
+
+  * download and apply patch
+
+{{{
+voigtjr@cuckoo:~/ut2004$ mv ../Desktop/ut2004-lnxpatch3369-2.tar.bz2 .
+voigtjr@cuckoo:~/ut2004$ tar -jxf ut2004-lnxpatch3369.tar.bz2
+voigtjr@cuckoo:~/ut2004$ cd UT2004-Patch
+voigtjr@cuckoo:~/ut2004/UT2004-Patch$ tar cf - . |( cd .. ; tar xvf -)
+}}}
+
+  * Install package libopenal0a
+  * sdl
+
+{{{
+voigtjr@cuckoo:~/ut2004/UT2004-Patch$ cd ~/ut2004/System
+voigtjr@cuckoo:~/ut2004/System$ cp /usr/lib/libSDL-1.2.so.0 .
+}}}
+
+  * openal
+
+{{{
+voigtjr@cuckoo:~/ut2004/System$ cp /usr/lib/libopenal.so.0.0.0 ./openal.so
+}}}
+
+  * cdkey
+
+{{{
+voigtjr@cuckoo:~/ut2004/System$ vi CDkey
+}}}
+
+  * input key by itself with dashes
+  * run it
+
+{{{
+voigtjr@cuckoo:~/ut2004/System$ ./ut2004-bin
+}}}
+
+  * Installation of dedicated server on ubuntu server
+
+This is undocumented, I'm giving it a shot though on winter. download the dedicated server: http://download.beyondunreal.com/fileworks.php/official/ut2004/dedicated...
+
+Update: Doesn't seem to work.
+
+==USARSim==
+
+  * http://usarsim.sourceforge.net/
+  * http://sourceforge.net/projects/usarsim
+  * Before installing usarsim, it may be a good idea to back up a working unreal installation (this takes a lot of space)
+  * tar cf ut2004.tar ut2004
+  * Prereq software
+    * Install package cvs
+    * Install package wine
+  * CVS Checkout
+    * Check out the usarsim module right in to the UT folder
+    * cvs -d:pserver:anonymous@usarsim.cvs.sourceforge.net:/cvsroot/usarsim login
+    * cvs -z3 -d:pserver:anonymous@usarsim.cvs.sourceforge.net:/cvsroot/usarsim co -P -d ut2004 usarsim
+  * Other files
+    * Download from sourceforge:
+      * AAA_MapBaseFiles_V3.1.zip DM-spqrSoccer2006_V3.0.zip
+      * DM-Arda_V3.1.zip DM-TallTestWorld_V3.0.zip
+      * DM-BlackArena_V3.0.zip DM-TestValidationRooms_V3.1.zip
+      * DM-ElementaryTestWorlds_V3.11.zip DM-YellowArena_V3.1.zip
+      * DM-OrangeArena_V3.0.zip ONS-AMS_V3.0.zip
+      * DM-PlywoodCornerMaze_V3.0.zip ONS-PointLookout_V3.0.zip
+      * DM-RedArena_V3.0.zip USARSimBaseFiles_3.14.zip
+      * DM-RoboCup06Worlds_V3.1.zip
+    * Unzip all of that in to same ut2004 folder
+      * Command line something like this:
+      * unzip -d ut2004 USARSimBaseFiles_3.14.zip
+  * build stuff
+    * from ut2004/System/make.csh (wine line changed):
+      * run these commands in the System folder
+        * rm -f USARBotAPI.u
+        * rm -f USARBot.u
+        * rm -f USARModels.u
+        * rm -f USARVictims.u
+        * rm -f USARMisPkg.u
+        * wine UCC.exe make -ini=USARSim.ini
+    * Test run
+      * create new file start_usar.sh
+        * #!/bin/sh
+        * ./ut2004-bin DM-USAR_yellow_250?game=USARBot.USARDeathMatch?spectatoronly=1?TimeLimit=0?quickstart=true -ini=usarsim.ini
+        * #./ut2004-bin ONS-PointLookout_250?game=USARBot.USARDeathMatch?spectatoronly=1?TimeLimit=0?quickstart=true -ini=usarsim.ini
+        * #./ut2004-bin DM-ISA_Pit_250?game=USARBot.USARDeathMatch?spectatoronly=1?TimeLimit=0?quickstart=true -ini=usarsim.ini
+        * #./ut2004-bin DM-compWorldDay2_250?game=USARBot.USARDeathMatch?spectatoronly=1?TimeLimit=0?quickstart=true -ini=usarsim.ini
+        * #./ut2004-bin DM-MixanYellow?game=USARBot.USARDeathMatch?spectatoronly=1?TimeLimit=0?quickstart=true -ini=usarsim.ini
+  * chmod to 755
+  * ./start_usar.sh should run
+
+==MOAST==
+
+  * http://moast.sourceforge.net/
+  * Prereq
+    * Best thing to do is get Soar running on your system at this point, because it will resolve some prereqs.
+    * Install package graphviz
+    * Install package libgtk2.0-dev
+    * Install package tcl8.4-dev
+    * Install package tk8.4-dev
+    * Install package libsdl1.2-dev
+    * Install package tcsh
+  * rcslib
+    * Download Moast's rcslib: http://sourceforge.net/project/showfiles.php?group_id=148555
+    * extract, configure, build, install
+      * ./configure
+      * make
+      * sudo make install prefix=/usr/local/rcslib
+      * cd src/java
+      * make
+    * Update lib path: export LD_LIBRARY_PATH=/path/to/SoarSuite/SoarLibrary/lib:/usr/local/rcslib/lib
+  * moast
+    * Get tarball: http://sourceforge.net/project/showfiles.php?group_id=148555
+    * build, install
+      * ./configure
+      * make
+  * Java components
+    * cd src/java
+      * export JDK_DIR=$JAVA_HOME
+      * make PLAT=java
+  * install
+    * cd ../..
+    * make install
+
+==Player==
+
+  * I install before Pyro because Pyro asks about it.
+  * http://sourceforge.net/project/showfiles.php?group_id=42445
+  * The manual says to download 1.4 but the readme in Tools mentions 2.0.3: http://downloads.sourceforge.net/playerstage/player-2.0.3.tar.bz2
+  * Extract
+  * Copy the contents of ut2004/Tools/player to extracted folder, overwriting the server folder contents where necessary.
+  * Install packages
+    * autoconf
+    * automake
+    * libtool
+    * tofrodos
+    * chmod 755 autogen_usarsim.sh
+    * dos2unix autogen_usarsim.sh
+    * ./autogen_usarsim.sh
+  * Configure, optionally with --prefix switch, defaults to /usr/local
+    * ./configure
+    * make
+    * sudo make install
+
+==Pyro==
+
+  * I install this after Player because it seems to want to rely on it.
+  * Check it out:
+    * cvs -d :pserver:anonymous@cvs.cs.brynmawr.edu:/cvs login
+    * cvs -d :pserver:anonymous@cvs.cs.brynmawr.edu:/cvs -d pyro co pyrobot
+  * Install packages:
+    * libjpeg-dev
+    * libncurses5-dev
+    * python-tk
+  * Copy all the files from usarsim ut2004/Tools/pyro directory to the pyro directory (or dont?!)
+  * ./configure.py
+    * I just accepted all defaults, except this one:
+    * 3. What is Python's binary? (enter path and name)
+    * Default = [/usr/bin/python2.5-config]: /usr/bin/python2.5
+  * make
+  * remove "-e " from the first line of each of these:
+    * bin/pyrobot
+    * system/version.py
+  * inside of the pyro folder, copy the path of the current folder:
+    * pwd
+  * add that path to the PYTHONPATH variable:
+    * export PYTHONPATH=/home/voigtjr/usarsim-files
+
+==Running==
+
+  * Create startup scripts
+  * usar_s.sh:
+    * #!/bin/sh
+    * ./ucc-bin server DM-ARDA_250?game=USARBot.USARDeathMatch?TimeLimit=0?GameStats=False -ini=USARSim.ini -log=usar_server.log
+    * #./ucc-bin server DM-USAR_yellow_250?game=USARBot.USARDeathMatch?TimeLimit=0?GameStats=False -ini=USARSim.ini -log=usar_server.log
+    * #./ucc-bin server DM-Metrology?game=USARBot.USARDeathMatch?TimeLimit=0 -ini=USARSim.ini -log=usar_server.log
+  * usar_c.sh:
+    * #!/bin/sh
+    * ./ut2004-bin 127.0.0.1?spectatoronly=1?quickstart=true -ini=USARSim.ini
+  * make executable
+    * chmod +x usar_s.sh usar_c.sh
+  * run server
+    * ./usar_s.sh
+  * run client
+    * ./usar_c.sh
+
+= Windows =
+
+==Unreal Tournament 2004==
+
+Install unreal tournament. To make things easier, change the installation location to
+C:\ut2004
+
+  * download and install patch 3369
+  * example site: http://www.unrealadmin.org/forums/showthread.php?t=12874
+  * if that link doesn't work, google for it
+
+==USARSim==
+
+  * Use TortoiseCVS to check out USARSim.
+    * http://www.tortoisecvs.org/download.shtml TortoiseCVS
+  * Right click the C: drive
+  * Select CVS Checkout
+  * Protocol: Password server
+  * Server: usarsim.cvs.sourceforge.net
+  * Repository folder: /cvsroot/usarsim
+  * User name: anonymous
+  * Module: usarsim
+  * Options tab: Name of folder: Enter your own folder name: ut2004
+
+==Additional files==
+
+  * Extract these in to the ut2004 folder, they will place files in the ut2004 tree:
+  * AAA_MapBaseFiles_V3.1.zip DM-spqrSoccer2006_V3.0.zip
+  * DM-Arda_V3.1.zip DM-TallTestWorld_V3.0.zip
+  * DM-BlackArena_V3.0.zip DM-TestValidationRooms_V3.1.zip
+  * DM-ElementaryTestWorlds_V3.11.zip DM-YellowArena_V3.1.zip
+  * DM-OrangeArena_V3.0.zip ONS-AMS_V3.0.zip
+  * DM-PlywoodCornerMaze_V3.0.zip ONS-PointLookout_V3.0.zip
+  * DM-RedArena_V3.0.zip USARSimBaseFiles_3.14.zip
+  * DM-RoboCup06Worlds_V3.1.zip
+
+==Make==
+
+Run C:\ut2004\System\make.bat
+
+==Test run==
+
+Run C:\ut2004\System\start_usar.bat
