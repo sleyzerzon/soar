@@ -1,5 +1,7 @@
 ﻿#summary Soar Kernel notes
 
+<wiki:toc max_depth="1" />
+
 = List of Terms =
 
 (jzxu)
@@ -343,6 +345,8 @@ rhsfun_math.cpp:16: *  BUGBUG more comments here.  Nothing in soarkernel.h eithe
   in head of file, no comments or description.  removed BUGBUG, left note.
 }}}
 
+----
+
 = Thoughts on a potential rewrite =
 
 Description From Bob Marinier 2003-10-23 22:50:51 (-) [reply]
@@ -626,3 +630,108 @@ was some discussion a while ago about making the kernel single agent. This is
 probably a good idea, to keep things simple, but we'd still need an extra layer
 that can generate events like AFTER_ALL_GENERATED_OUTPUT (maybe an "agent" will
 be what we call a kernel now, and a "kernel" will be a group of "agents").
+
+----
+
+= Thoughts on parallelizing Soar =
+
+Currently, while SML uses some threads to handle message passing, Soar itself
+is single threaded. This means it won't scale well on multicore/multiprocessor
+systems, which are becoming increasingly common.
+
+There are many possible ways to introduce parallelism to Soar. Earlier work
+has looked at parallelizing the rete itself, for example. This kind of very
+low level parallelism is probably more appropriate for a complete rewrite of
+Soar. Another possibility is for some of the new modules we're working on to
+be designed to run in parallel with Soar or internally. This might apply
+particularly well to episodic and semantic memory. At a higher level, we can
+simply run multiple agents in parallel (e.g., the scheduler would run each
+agent simultaneously in its own thread). I suspect that the agent level would
+be the easiest place to start (although it will only benefit multiagent
+systems).
+
+At the agent level, the primary issue is that there are 20-30 global variables
+(most data is agent-specific, and thus not subject to conflicts). Many of these
+globals are read-only after initialization; for the rest, we can use locks to
+avoid conflicts, or move them into the agent structure.
+
+Another possible issue is callbacks. If multiple agents are calling the same
+callback at the same time, and those callbacks reference global/static data,
+that will likely cause problems. I don't know if anything in SML falls into
+this category, but it at least implies restrictions on client code. It would
+be interesting to hear from anyone who thinks this might be a problem for them.
+We could serialize callbacks, but that's likely to negate much of the benefit
+we get from threading in the first place (but maybe we can make it an option).
+
+Anyway, I'm hardly a threading expert, so please share any thoughts or gotchas
+that I'm oblivious to.
+
+------- Comment #1 From Dave Ray 2008-05-29 11:53:06 (-) [reply] -------
+
+Another possible approach that I think would be a little less work than running
+agents in separate threads would be to remove the one-kernel-per-process
+restriction that currently exists in SML. Then you could create as many
+kernels as you like, hopefully running on different cores, while still allowing
+multiple agents to run on a single core.
+
+I think the main hurdle is global variables in both SML (I think the lock is
+global) and the globals you mention in the kernel. I think I would trust an
+approach that eliminates the globals more than one that tries to protect them
+with locks.
+
+Also, since callbacks are specific to a kernel you wouldn't have to worry about
+the synchronization problems you'd get with callbacks being invoked by
+different agents from different threads.
+
+Not sure how this impacts remote debugging. An initial, naive approach would be
+to just have each kernel accessible on a separate port.
+
+------- Comment #2 From Bob Marinier 2008-05-29 11:58:39 (-) [reply] -------
+
+This actually brings up related design issue that comes up from time to time --
+namely that each kernel can have multiple agents. Certain aspects of the code
+might be simplified if we enforced one agent per kernel. But it may be that
+this just pushes the complexity of dealing with multiple agents into a
+different layer (e.g., into SML or client code).
+
+------- Comment #3 From Dave Ray 2008-05-29 12:04:42 (-) [reply] -------
+
+Well, if you have one agent per kernel, then you don't really have a kernel
+anymore do you :) Is there even really a kernel now, or is it just a list of
+agents and some globals for rete tokens and stuff.
+
+I'm not necessarily opposed to this idea, but allowing multiple kernels in a
+process seems like a smaller conceptual (and API) change with a clearer payoff.
+
+------- Comment #4 From Bob Marinier 2008-05-29 12:41:25 (-) [reply] -------
+
+I realize that I wasn't clear before. When we talk about one agent per kernel,
+we mean at the Soar level. And as you say, there already isn't really a kernel
+at that level. It looks like the gSKI guys added a kernel struct, but all it
+did was keep a list of agents and (two!) agent counts. Since no one actually
+used the kernel struct, we just removed it. So completing the transition to
+"no kernel" at the Soar level probably just means eliminating globals and
+whatever else might need to happen such that agents can be used without
+conflicts.
+
+At the SML level, a kernel object is definitely useful. We often want to
+register for events that involve multiple agents (e.g.,
+after_all_generated_output) or that are about agents (e.g.,
+after_agent_destroyed). But since the scheduler lives in SML now, I don't
+think that changes we make at the Soar level will require much change at the
+SML level (perhaps none at all).
+
+So anyway, I think you're right in that we're essentially single agent now.
+
+------- Comment #5 From Douglas Pearson 2008-05-29 16:43:37 (-) [reply] -------
+
+I think if we try to parallelize at the agent level (or the kernel level) it
+shouldn't be too bad. I don't think we'll need to serialize the callbacks.
+It's just up to the environment/client to make sure their code is thread-safe
+-- so you don't have two threads modifying the same object within the
+environment.
+
+(BTW, if we ever decide we want multiple KernelSML objects for some
+reason--like Bob I'm not sure we would--the only global I'm aware of is the
+KernelSML singleton itself. If you pulled that out and passed it around
+instead you could have multiple kernels).
