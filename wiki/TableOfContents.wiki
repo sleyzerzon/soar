@@ -16,10 +16,10 @@
     * [Soar2D]
     * [RoboticsNotes Robotics Notes]
     * Unsupported Environments
-      * [sps Splinter Soar (old)]
-      * [room Room Environment (old)]
+      * [Sps Splinter Soar (old)]
+      * [Room Room Environment (old)]
       * [MissionLab Mission Lab]
-      * [msrs Microsoft Robotics Studio]
+      * [Msrs Microsoft Robotics Studio]
       * [PlayerStageGazebo Player/Stage/Gazebo]
       * [USARSim USARSim]
   * Developers

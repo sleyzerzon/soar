@@ -3,7 +3,7 @@
 
 = Soar2D =
 
-Soar2D includes the Eaters, !TankSoar, Taxi and [room Room] environments.
+Soar2D includes the Eaters, !TankSoar, Taxi and [Room] environments.
 
 <wiki:toc max_depth="2"/>
 
