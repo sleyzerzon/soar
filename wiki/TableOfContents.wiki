@@ -32,6 +32,7 @@
     * [SoarKernel Soar Kernel]
       * [Symbols]
       * [Links]
+      * [Waterfall]
     * [MemoryLeaks Memory Leak Debugging]
     * [ReleasePreparation Release Preparation]
   * [SoarGroupReadings Readings]
