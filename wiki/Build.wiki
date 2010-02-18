@@ -295,6 +295,8 @@ Install by dropping it in to your Applications folder, or your home folder.
 To make these changes permenant, edit your `.bash_profile` file and put them at
 the bottom.
 
+Note for Eclipse users: Eclipse will not inherit these environment variables unless you launch Eclipse from the shell. Alternatively [http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPRuntimeConfig/Articles/EnvironmentVars.html#//apple_ref/doc/uid/20002093-BCIJIJBH look here for other ways to get environment variables to Eclipse].
+
 SCons needs to find the Java development libraries, you help it by setting the
 `JAVA_HOME` variable to:
 
