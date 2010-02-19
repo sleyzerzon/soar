@@ -6,12 +6,15 @@
 
   * Follow the [Build build] procedure to get Soar checked out and built.
     * Necessary components: Core, Java, Sproom (and/or other April-related projects).
-    * Eclipse setup and usage is recommended.
+    * Eclipse setup and usage is required to build (ant build scripts don't work yet).
 
   * Visit [http://www.eecs.umich.edu/~soar/sitemaker/misc/april/ the secondary site hosting updated april jars] and download them to your output directory's `share/java` folder. Usually `SoarSuite/out/share/java` or `~/sandbox/share/java`.
     * The libraries currently posted on the April resources page are not as up to date as they need to be.
 
   * Download the JOGL zip file appropriate to you platform from [http://download.java.net/media/jogl/builds/archive/jsr-231-1.1.1a/ this JOGL builds folder].
+    * Unzip and place jars in `share/java`, shared libraries (Linux/Mac) in `share/lib`, and DLLs (Windows) in `share/bin`.
+
+  * Download [https://jinput.dev.java.net/ the latest jinput binaries from the jinput site].
     * Unzip and place jars in `share/java`, shared libraries (Linux/Mac) in `share/lib`, and DLLs (Windows) in `share/bin`.
 
   * If running outside of Eclipse, be sure to add all relevant jars to your classpath.
