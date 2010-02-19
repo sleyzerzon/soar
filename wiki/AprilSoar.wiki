@@ -30,3 +30,4 @@
     * `APRIL_MEGA`: Path to `april-mega.jar`
     * `GLUEGEN_RT`: Path to `gluegen-rt.jar`
     * `JOGL`: Path to `jogl.jar`
+    * `JINPUT`: Path to `jinput.jar`
