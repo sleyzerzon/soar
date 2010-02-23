@@ -5,43 +5,66 @@
 [http://code.google.com/p/soar/source/list Recent Changes],
 [http://code.google.com/p/soar/source/checkout Google Code Checkout Page].
 
-*Avoid checking out the entire trunk. Check out only the `SoarSuite` subfolder non-recursively.*
+[http://code.google.com/hosting/settings Your Google Code Password].
+
+Please help keep this page up to date. [http://code.google.com/p/soar/w/edit/Build If you see an error or notice an omission, correct it yourself] or do not hesitate to [mailto:soar-sml-list@lists.sourceforge.net send a note to the soar-sml-list].
+
+<wiki:toc max_depth="1"/>
+
+= Getting the Source =
+
+To build Soar:
+
+  * Download the latest release, or checkout the code from SVN.
+
+If you download the latest release, skip down to your operating system notes below:
+
+  * [http://code.google.com/p/soar/wiki/Build#Windows Windows]
+  * [http://code.google.com/p/soar/wiki/Build#Linux Linux]
+  * [http://code.google.com/p/soar/wiki/Build#Mac Mac]
+
+To checkout Soar from the Google Code subversion repository:
+
+  * Install a subversion client,
+  * Check out `SoarSuite` *non-recursively*,
+  * Check out module *Core* and probably *Java* and maybe a few more depending on your application.
+
+== Subversion ==
+
+  * Windows users: get [http://tortoisesvn.net/downloads TortoiseSVN] (GUI) and/or [http://www.sliksvn.com/en/download SlikSVN] (command line).
+    * Windows 64-bit users: Installing both of those side-by-side is helpful.
+  * Ubuntu Linux: Install package `subversion`
+  * Mac: Subversion ships with Leopard and newer.
+
+== Checkout ==
+
+  * *Do not check out the entire trunk like the default source page tells you to.*
+  * *Instead, check out only the `SoarSuite` subfolder non-recursively (also known as: depth files).* 
+
+To check out `SoarSuite` non-recursively:
 
   * Command line: `svn checkout https://soar.googlecode.com/svn/trunk/SoarSuite --depth files`
-  * TortoiseSVN: Change the _Checkout Depth_ option to _Only file children_.
+  * TortoiseSVN (Windows): Change the _Checkout Depth_ option in [http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-checkout.html the checkout dialog] to _Only file children_.
 
-  * Your username is your Google account name without the `@` or domain
-  * [http://code.google.com/hosting/settings Your password is your googlecode.com password].
+  * *Your username* is your Google account name without the `@` or domain
+  * *[http://code.google.com/hosting/settings Your password is your googlecode.com password]*.
 
-Once the top level folder is checked out, sub-modules need to be checked out. On unix systems, there
-are shortcuts available in the `Makefile` in the top level folder:
+=== Module Checkout ===
 
-{{{
-# Note: these do not work on windows
-make checkout        # Checkout core modules
-make public-checkout        # Checkout core modules from public svn (login not required)
-make checkout-soar2d # Checkout Soar2D (not required, here for example)
-make public-checkout-soar2d # Checkout Soar2D from public svn (not required, here for example)
-make update          # svn update everywhere
-make status          # svn status everywhere (there is no "make commit")
-make                 # build all checked-out modules (there is no "make install")
-make clean           # clean all checked-out modules
-cat Makefile         # See other examples
-}}}
+Once the top level folder is checked out, sub-modules need to be checked out, definitely Core, probably Java, potentially others.
 
-To checkout specific modules from the command line, substitute `ModuleName`
-with the name of the module, such as `Core`:
+*To check out modules on Mac/Linux*, there are shortcuts in the [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Makefile] at the top level.
 
-{{{
-cd SoarSuite
-svn checkout https://soar.googlecode.com/svn/trunk/SoarSuite/ModuleName
-}}}
+  * If you are a Soar Google Code project developer and intend to check in changes: `make checkout`
+  * If you are a public user, check out read-only: `make public-checkout`
+  * [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Look at the contents of Makefile for more shortcuts and information].
 
-If on Windows and using TortoiseSVN, this is a bit more difficult:
-  * Create an empty folder, name it the module's name (such as `Java` or `Sproom`)
-  * Right-click that folder and check out the module (fully recursive).
+*To check out modules on Windows* with TortoiseSVN:
 
-For a complete module list and description, [ProjectLayout see the project layout document]. Here is a partial list with some dependencies:
+  * Create an empty folder, name it the module's name (such as `Core` or `Java`),
+  * Right-click that folder and check out the module (with a URL like http://soar.googlecode.com/svn/trunk/SoarSuite/Core).
+
+[ProjectLayout A full list of modules is available here], a partial list is below:
 
   * *Core*: *Required* module to develop with Soar.
     * Depends on Visual Studio (Windows) or SCons, G++, various other libraries (see operating system below).
@@ -59,9 +82,11 @@ debugger is implemented using the Java interface. Some users will need Python,
 CSharp and Tcl depending on what programs they are using. The rest of the
 modules are optional tools, environments and example code.
 
-Please help keep this page up to date. [http://code.google.com/p/soar/w/edit/Build If you see an error or notice an omission, correct it yourself] or do not hesitate to [mailto:soar-sml-list@lists.sourceforge.net send a note to the soar-sml-list].
+Next, skip to your operating system notes:
 
-<wiki:toc max_depth="1"/>
+  * [http://code.google.com/p/soar/wiki/Build#Windows Windows]
+  * [http://code.google.com/p/soar/wiki/Build#Linux Linux]
+  * [http://code.google.com/p/soar/wiki/Build#Mac Mac]
 
 ----
 
@@ -76,11 +101,6 @@ Some of the prerequisites are listed as _recommended_ or _optional_. Please
 note that *if all _recommended_ prerequisites are not installed, some build
 errors will be encountered as unsupported language interfaces fail to build*.
 Open the solution and remove the related projects to fix the errors.
-
-A Subversion client is _required if checking things out from Google Code_. The
-Soar group at Michigan mainly uses TortoiseSVN.
-
-  * Download and install TortoiseSVN from [http://tortoisesvn.net/downloads tortoisesvn.net].
 
 Either Microsoft Visual Studio 2008 or Microsoft Visual C++ 2008 Express
 Edition is _required_ to build Soar. Visual C# Express is necessary for C#
