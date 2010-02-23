@@ -11,13 +11,14 @@ Please help keep this page up to date. [http://code.google.com/p/soar/w/edit/Bui
 
 <wiki:toc max_depth="1"/>
 
+----
 = Getting the Source =
 
 To build Soar:
 
   * Download the latest release, or checkout the code from SVN.
 
-If you download the latest release, skip down to your operating system notes below (noting that the source code is in the SoarSuite subfolder of the release archive):
+If you download the latest release, skip down to your operating system notes below (noting that the source code is in the !SoarSuite subfolder of the release archive):
 
   * [http://code.google.com/p/soar/wiki/Build#Windows Windows]
   * [http://code.google.com/p/soar/wiki/Build#Linux Linux]
