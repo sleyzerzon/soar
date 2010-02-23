@@ -17,7 +17,7 @@ To build Soar:
 
   * Download the latest release, or checkout the code from SVN.
 
-If you download the latest release, skip down to your operating system notes below:
+If you download the latest release, skip down to your operating system notes below (noting that the source code is in the SoarSuite subfolder of the release archive):
 
   * [http://code.google.com/p/soar/wiki/Build#Windows Windows]
   * [http://code.google.com/p/soar/wiki/Build#Linux Linux]
@@ -38,12 +38,12 @@ To checkout Soar from the Google Code subversion repository:
 
 == Checkout ==
 
-  * *Do not check out the entire trunk like the default source page tells you to.*
+  * *Do not check out the entire trunk.*
   * *Instead, check out only the `SoarSuite` subfolder non-recursively (also known as: depth files).* 
 
 To check out `SoarSuite` non-recursively:
 
-  * Command line: `svn checkout https://soar.googlecode.com/svn/trunk/SoarSuite --depth files`
+  * Command line (use http*s* for write access): `svn checkout http://soar.googlecode.com/svn/trunk/SoarSuite --depth files`
   * TortoiseSVN (Windows): Change the _Checkout Depth_ option in [http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-checkout.html the checkout dialog] to _Only file children_.
 
   * *Your username* is your Google account name without the `@` or domain
@@ -55,14 +55,13 @@ Once the top level folder is checked out, sub-modules need to be checked out, de
 
 *To check out modules on Mac/Linux*, there are shortcuts in the [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Makefile] at the top level.
 
-  * If you are a Soar Google Code project developer and intend to check in changes: `make checkout`
-  * If you are a public user, check out read-only: `make public-checkout`
+  * Check out read-only: `make public-checkout` (use `make checkout` for write access)
   * [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Look at the contents of Makefile for more shortcuts and information].
 
 *To check out modules on Windows* with TortoiseSVN:
 
   * Create an empty folder, name it the module's name (such as `Core` or `Java`),
-  * Right-click that folder and check out the module (with a URL like http://soar.googlecode.com/svn/trunk/SoarSuite/Core).
+  * Right-click that folder and check out the module (with a URL like http://soar.googlecode.com/svn/trunk/SoarSuite/Core) (use http*s* for write access).
 
 [ProjectLayout A full list of modules is available here], a partial list is below:
 
