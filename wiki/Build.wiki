@@ -27,7 +27,7 @@ To checkout Soar from the Google Code subversion repository:
 
   * Install a subversion client,
   * Check out `SoarSuite` *non-recursively*,
-  * Check out module *Core* and probably *Java* and maybe a few more depending on your application.
+  * Check out component *Core* and probably *Java* and maybe a few more depending on your application.
 
 == Subversion ==
 
@@ -43,27 +43,27 @@ To checkout Soar from the Google Code subversion repository:
 
 To check out `SoarSuite` non-recursively:
 
-  * Command line (use http*s* for write access): `svn checkout http://soar.googlecode.com/svn/trunk/SoarSuite --depth files`
+  * Command line (use *https* for write access): `svn checkout http://soar.googlecode.com/svn/trunk/SoarSuite --depth files`
   * TortoiseSVN (Windows): Change the _Checkout Depth_ option in [http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-checkout.html the checkout dialog] to _Only file children_.
 
   * *Your username* is your Google account name without the `@` or domain
   * *[http://code.google.com/hosting/settings Your password is your googlecode.com password]*.
 
-=== Module Checkout ===
+=== Component Checkout ===
 
-Once the top level folder is checked out, sub-modules need to be checked out, definitely Core, probably Java, potentially others.
+Once the top level folder is checked out, sub-components need to be checked out, definitely Core, probably Java, potentially others.
 
-*To check out modules on Mac/Linux*, there are shortcuts in the [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Makefile] at the top level.
+*To check out components on Mac/Linux*, there are shortcuts in the [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Makefile] at the top level.
 
   * Check out read-only: `make public-checkout` (use `make checkout` for write access)
   * [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Look at the contents of Makefile for more shortcuts and information].
 
-*To check out modules on Windows* with TortoiseSVN:
+*To check out components on Windows* with TortoiseSVN:
 
   * Create an empty folder, name it the module's name (such as `Core` or `Java`),
-  * Right-click that folder and check out the module (with a URL like http://soar.googlecode.com/svn/trunk/SoarSuite/Core) (use http*s* for write access).
+  * Right-click that folder and check out the component (with a URL like http://soar.googlecode.com/svn/trunk/SoarSuite/Core for Core) (use *https* for write access).
 
-[ProjectLayout A full list of modules is available here], a partial list is below:
+[ProjectLayout#Components A full list of components is available here], a partial list is below:
 
   * *Core*: *Required* module to develop with Soar.
     * Depends on Visual Studio (Windows) or SCons, G++, various other libraries (see operating system below).
@@ -79,7 +79,7 @@ Once the top level folder is checked out, sub-modules need to be checked out, de
 All Soar users and developers need Core, and most will need Java because the
 debugger is implemented using the Java interface. Some users will need Python,
 CSharp and Tcl depending on what programs they are using. The rest of the
-modules are optional tools, environments and example code.
+components are optional tools, environments and example code.
 
 Next, skip to your operating system notes:
 
