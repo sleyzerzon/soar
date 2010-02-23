@@ -21,7 +21,7 @@ If you download the latest release, skip down to your operating system notes bel
 
   * [http://code.google.com/p/soar/wiki/Build#Windows Windows]
   * [http://code.google.com/p/soar/wiki/Build#Linux Linux]
-  * [http://code.google.com/p/soar/wiki/Build#Mac Mac]
+  * [http://code.google.com/p/soar/wiki/Build#Mac_OS_X Mac OS X]
 
 To checkout Soar from the Google Code subversion repository:
 
@@ -86,7 +86,7 @@ Next, skip to your operating system notes:
 
   * [http://code.google.com/p/soar/wiki/Build#Windows Windows]
   * [http://code.google.com/p/soar/wiki/Build#Linux Linux]
-  * [http://code.google.com/p/soar/wiki/Build#Mac Mac]
+  * [http://code.google.com/p/soar/wiki/Build#Mac_OS_X Mac OS X]
 
 ----
 
