@@ -861,7 +861,7 @@ gp {strange-example
 }
 }}}
 
-`testgp.soar` contains many more examples.
+[http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Core/Tests/Agents/testgp.soar testgp.soar] contains many more examples.
 
 == See Also ==
 
@@ -3563,8 +3563,6 @@ or watch any relationship between objects:
 {{{
 soar> watch-wmes --add-filter -t both * ontop *
 }}}
-
-
 
 
 
