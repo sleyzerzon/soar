@@ -9,9 +9,21 @@
 
 = Getting Soar =
 
+== Where are the latest Soar releases? ==
+
+Check the [Downloads downloads page] for pointers to downloads and release notes. Alternatively you can check out the development trunk from SVN, see the [Build build document].
+
 = Installing Soar =
 
+== How do I install Soar? ==
+
+As of Soar 9.x, simply extract the package somewhere writable. There is no installer.
+
 = Running Soar =
+
+== How do I run Soar? ==
+
+If you downloaded a Soar release, navigate inside the extracted archive and run the shell scripts or batch files to run the various Soar components. The scripts set essential environment variables so the different Soar components can find their libraries and resources.
 
 == Java: What JREs/JDKs can I use? ==
 
@@ -91,32 +103,7 @@ See [Build the build document] for more details.
 
 ==How can I use Eclipse to work with SML Java apps?==
 
-If you get an error like this:
-
-{{{
-Native code library failed to load. 
-java.lang.UnsatisfiedLinkError: no Java_sml_ClientInterface in java.library.path
-java.lang.UnsatisfiedLinkError: no Java_sml_ClientInterface in java.library.path
-at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1517)
-at java.lang.Runtime.loadLibrary0(Runtime.java:788)
-at java.lang.System.loadLibrary(System.java:834)
-at sml.smlJNI.<clinit>(smlJNI.java:15)
-at sml.Kernel.CreateKernelInNewThread(Kernel.java:92)
-at edu.umich.toh.Game.<init>(Game.java:56)
-at edu.umich.toh.TowersOfHanoi.main(TowersOfHanoi.java:114)
-Exception in thread "main" 
-}}}
-
-the problem is that Eclipse is failing to find the Java_sml_ClientInterface.dll. On Windows a simple solution is to place the folder ("soar-library" in 8.6.1, "SoarLibrary/bin" in 8.6.2, "SoarSuite/out/bin" in 9.3) onto your Windows PATH. (It's best to do this with a batch file that sets the path and then launches Eclipse, so you're not modifying your global path which could cause problems if you install multiple versions of Soar at once).
-
-Linux/Mac need to put the lib folder in to their LD_LIBRARY_PATH variable (Linux) or DYLD_LIBRARY_PATH (Mac):
-
-{{{
-export LD_LIBRARY_PATH=/path/to/SoarLibrary/lib # 8.6.2 Linux
-export LD_LIBRARY_PATH=/path/to/SoarSuite/out/lib # 9.3 Linux
-export DYLD_LIBRARY_PATH=/path/to/SoarLibrary/lib # 8.6.2 Mac
-export DYLD_LIBRARY_PATH=/path/to/SoarSuite/out/lib # 9.3 Mac
-}}}
+See [Build#Eclipse the Eclipse section on the build document] for information on how to get Eclipse running with Soar projects.
 
 ==How do I get the trace for the initial S1 creation?==
 
@@ -202,10 +189,31 @@ The complete documentation for the SML interface is provided in the ClientSML C+
   * At this point you should be able to build the project to create MyProject.exe
   * Remove TestClientSML.cpp from the project and start adding your own code.
 
-==What are the required Visual Studio project settings for my SML application?==
+== What are the required Visual Studio project settings for my SML application? ==
 
-If you want to create a Visual Studio project for a new SML application, you can either install and use the templates included with the release or copy an existing project. By copying an existing project you'll get all of the settings and library dependencies set up automatically without any effort on your part.
+Your project needs to reference the ClientSML, ConnectionSML, and ElementXML projects. Additionally, add the include directories for the src folder of each of those projects.
 
 == What are the different modules in the Visual Studio SML solution? ==
 
 See the [ProjectLayout Project Layout] document.
+
+== The Java Virtual Machine segfaults when running Soar ==
+
+See the next question.
+
+== SML WMElement/Identifier/StringElement/IntElement/FloatElement pointers become invalid without my knowledge ==
+
+First, usage of WMElement in this answer refers to any of WMElement/Identifier/StringElement/IntElement/FloatElement (all of which are or extend WMElement).
+
+A few things to remember about WMElement pointers returned by SML methods such as CreateIdentifier:
+
+  * WMElement objects returned by pointers are owned by SML (don't `delete` them),
+  * Pointers to WMElement objects may be destroyed without calling DestroyWME,
+  * Pointers to WMElement objects may be destroyed by SML triggered by the agent as it runs.
+
+A general rule: you need to keep track of whether or not a WMElement is valid before you use it. It will stay valid if
+
+  * You do not call DestroyWME on it or on a WME that causes it to get disconnected,
+  * You do not return control back to Soar letting it run.
+
+If you call DestroyWME, you need to be sure that you don't hang on to any WMElement objects that the WME you destroyed was keeping valid. Most of the time your working memory structure is a tree so you only need to keep track of the children of any Identifier you destroy.
