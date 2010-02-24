@@ -201,9 +201,9 @@ See the [ProjectLayout Project Layout] document.
 
 See the next question.
 
-== SML WMElement/Identifier/StringElement/IntElement/FloatElement pointers become invalid without my knowledge ==
+== SML WMElement/Identifier/!StringElement/!IntElement/!FloatElement pointers become invalid without my knowledge ==
 
-First, usage of WMElement in this answer refers to any of WMElement/Identifier/StringElement/IntElement/FloatElement (all of which are or extend WMElement).
+First, usage of WMElement in this answer refers to any of WMElement/Identifier/!StringElement/!IntElement/!FloatElement (all of which are or extend WMElement).
 
 A few things to remember about WMElement pointers returned by SML methods such as CreateIdentifier:
 
