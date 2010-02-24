@@ -181,17 +181,17 @@ The complete documentation for the SML interface is provided in the ClientSML C+
 
 ==How do I make a copy of an existing project?==
 
-  * Go into the SoarSuite\Tools folder and copy the TestClientSML folder as MyProject
-  * Within that folder, rename TestClientSML.vcproj as MyProject.vcproj
-  * Open the SoarSuite\SML.sln solution file (or make a copy of this file and open that)
-  * Select "File | Add Project | Existing Project" and add the MyProject.vcproj to the solution
-  ** It will be added as "TestClientSML". Select it in Solution Explorer, right click and choose Rename to rename it as MyProject. (Make sure you're not accidentally renaming the real TestClientSML project--you can open the TestClientSML.cpp file in the editor and then move your mouse over the tab at the top of the editor window for the open file to see the path just to be sure).
-  * At this point you should be able to build the project to create MyProject.exe
+  * Go into the !SoarSuite\Tools folder and copy the TestClientSML folder as !MyProject
+  * Within that folder, rename TestClientSML.vcproj as !MyProject.vcproj
+  * Open the !SoarSuite\SML.sln solution file (or make a copy of this file and open that)
+  * Select "File | Add Project | Existing Project" and add the !MyProject.vcproj to the solution
+  ** It will be added as "TestClientSML". Select it in Solution Explorer, right click and choose Rename to rename it as !MyProject. (Make sure you're not accidentally renaming the real TestClientSML project--you can open the TestClientSML.cpp file in the editor and then move your mouse over the tab at the top of the editor window for the open file to see the path just to be sure).
+  * At this point you should be able to build the project to create !MyProject.exe
   * Remove TestClientSML.cpp from the project and start adding your own code.
 
 == What are the required Visual Studio project settings for my SML application? ==
 
-Your project needs to reference the ClientSML, ConnectionSML, and ElementXML projects. Additionally, add the include directories for the src folder of each of those projects.
+Your project needs to reference the !ClientSML, !ConnectionSML, and !ElementXML projects. Additionally, add the include directories for the src folder of each of those projects.
 
 == What are the different modules in the Visual Studio SML solution? ==
 
@@ -205,7 +205,7 @@ See the next question.
 
 First, usage of WMElement in this answer refers to any of WMElement/Identifier/!StringElement/!IntElement/!FloatElement (all of which are or extend WMElement).
 
-A few things to remember about WMElement pointers returned by SML methods such as CreateIdentifier:
+A few things to remember about WMElement pointers returned by SML methods such as !CreateIdentifier:
 
   * WMElement objects returned by pointers are owned by SML (don't `delete` them),
   * Pointers to WMElement objects may be destroyed without calling DestroyWME,
@@ -217,3 +217,11 @@ A general rule: you need to keep track of whether or not a WMElement is valid be
   * You do not return control back to Soar letting it run.
 
 If you call DestroyWME, you need to be sure that you don't hang on to any WMElement objects that the WME you destroyed was keeping valid. Most of the time your working memory structure is a tree so you only need to keep track of the children of any Identifier you destroy.
+
+== In Java/Python/Tcl/CSharp, WMElement !ConvertToIdentifier or other Convert- function returns something that should be equal to something else but isn't  ==
+
+In our language interfaces covered by SWIG, such as Java, Python, Tcl, and CSharp, !ConvertToIdentifier, !ConvertToStringElement, !ConvertToIntElement, and !ConvertToFloatElement issue references to objects that wrap pointers. If these pointers were compared, they would be equal. Unfortunately, comparing references to these objects wrapping equivalent pointers returns false--that they are unequal.
+
+A workaround is to not compare references, or use other language supported reference equality in this case. Instead, compare the time tags by calling !GetTimeTag on the reference.
+
+http://code.google.com/p/soar/issues/detail?id=46
