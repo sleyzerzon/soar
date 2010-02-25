@@ -28,6 +28,7 @@
     * [SMLQuickStartGuide SML Quick Start Guide]
     * [ThreadsInSML Threads in SML]
     * [HelloWorld Simple Environment Examples]
+    * [SMLOutputLinkGuide SML Output Link Guide]
     * [UsingElementXML Using ElementXML]
     * [SoarJavaDebugger Soar Java Debugger]
     * [SoarKernel Soar Kernel]
