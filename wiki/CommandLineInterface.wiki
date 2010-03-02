@@ -2272,7 +2272,7 @@ Load input wmes for each decision cycle from a file.
 {{{
 replay-input --open filename
 replay-input [--query]
-replay-input .-close
+replay-input --close
 }}}
 
 == Options ==
@@ -3563,8 +3563,6 @@ or watch any relationship between objects:
 {{{
 soar> watch-wmes --add-filter -t both * ontop *
 }}}
-
-
 
 
 
