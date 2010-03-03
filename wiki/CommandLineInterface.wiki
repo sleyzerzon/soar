@@ -2399,7 +2399,7 @@ Begin Soar's execution cycle.
 
 {{{
 run  [-f|count]
-run -[d|e|o|p][s][un] [f|count]
+run -[d|e|o|p][s][un][g] [f|count]
 run -[d|e|o|p][un] count [-i e|p|d|o]
 }}}
 
@@ -2421,6 +2421,7 @@ run -[d|e|o|p][un] count [-i e|p|d|o]
 || `-f, forever` || Run until halted by problem-solving completion or until stopped by an interrupt. ||
 || `count` || A single integer which specifies the number of cycles to run Soar. ||
 || `-i, --interleave` || Support round robin execution across agents at a finer grain than the run-size parameter. `e` = elaboration, `p` = phase, `d` = decision, `o` = output ||
+|| `-g, --goal` || Run agent until a goal retracts ||
 
 === Deprecated Options ===
 
@@ -3563,8 +3564,6 @@ or watch any relationship between objects:
 {{{
 soar> watch-wmes --add-filter -t both * ontop *
 }}}
-
-
 
 
 
