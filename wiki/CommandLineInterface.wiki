@@ -1723,6 +1723,17 @@ dirs] command for an explanation of the directory stack.
 [CommandLineInterface#pwd pwd]
 
 ----
+= port =
+
+Returns the IP address and port of the kernel instance.
+
+== Synopsis ==
+
+{{{
+port
+}}}
+
+----
 = predict =
 
 Predict the next selected operator
