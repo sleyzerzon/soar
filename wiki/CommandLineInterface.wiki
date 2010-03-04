@@ -1725,7 +1725,7 @@ dirs] command for an explanation of the directory stack.
 ----
 = port =
 
-Returns the IP address and port of the kernel instance.
+Returns the port the kernel instance is listening on.
 
 == Synopsis ==
 
@@ -3575,6 +3575,4 @@ or watch any relationship between objects:
 {{{
 soar> watch-wmes --add-filter -t both * ontop *
 }}}
-
-
 
