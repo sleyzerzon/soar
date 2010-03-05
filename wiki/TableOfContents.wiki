@@ -7,6 +7,7 @@
   * [FAQ]
   * [CommandLineInterface Command Line Help]
   * Programming Soar
+    * [IntroSoarDebugger Intro to the Soar Debugger]
     * [SoarDogma Soar Dogma]
     * [Soar7To8 Soar 7 to Soar 8 Conversion]
     * [VSKeyBindings VisualSoar Key Bindings Help]
