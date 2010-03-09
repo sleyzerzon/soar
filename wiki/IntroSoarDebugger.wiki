@@ -53,17 +53,17 @@ The other observation is that the new debugger is substantially faster than the 
 
 On launch you should see a display similar to this:
 
-TODO screenshot 1
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/1.png
 
 The window on the left side is the main trace window.  As Soar executes, debug information is streamed to this window.
 
 On the right are a series of other utility windows which we’ll discuss later.
 
-To get things going load the towers of Hanoi demo.  This can be done by either pressing the “towers of Hanoi” button or from the “Demos” menu.  Then type “run 20” into the line marked “<Type commands here>” (shown in blue above).
+To get things going load the towers of Hanoi demo.  This can be done by either pressing the “towers of Hanoi” button or from the “Demos” menu.  Then type “run 20” into the line to the left of the Expand button.
 
 You should be rewarded with a display like this:
 
-TODO screenshot 2
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/2.png
 
 This is hard to read but the trace window on the left shows the series of operators that have just fired during the course of the first 20 decisions.  You should also have noticed that at the end of the run the windows on the right updated automatically to print the current state and stack.  In fact, they are just issuing the command typed at the top of the window, so you can customize the window to print any values you’d like to see at the end of a run.  Because the windows only update after the run completes there is no performance hit from these windows during a run.
 
@@ -73,11 +73,11 @@ The default layout that you started with uses a tree view for the main trace win
 
 This should result in a display like this:
 
-TODO screenshot 3
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/3.png
 
 The trace looks similar, but doing the obvious thing of expanding the tree nodes will reveal the detailed trace information collected during the run:
 
-TODO screenshot 4
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/4.png
 
 You can also expand the current page of trace information using the “expand” button or the drop down menu next to it.  (Once the expand button has been pressed future trace output will appear in the window already expanded until collapse is pressed).
 
@@ -91,7 +91,7 @@ The debugger can be used with multiple agents.  To see this, select “Agents | 
 
 If you load another demo here (e.g. “Water Jug Demo”) and then type “run 20” you will see both sets of windows updating as both agents run.
 
-TODO screenshot 5
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/5.png
 
 The relationship between a top level debugger window (a frame) and the agent is pretty loose.  For instance, we can switch the second window to observe the first agent (Agent | Select Agent and choose “soar1”).  This gives you two windows pointed at the same agent.  Probably not very useful, but it illustrates the point that the debugger windows and the agent are separate entities.
 
@@ -109,7 +109,7 @@ All Soar kernels (using the SML interface) support this sort of remote connectio
 
 On the debugger launched second choose “Kernel | Connect to remote Soar”.  You’ll get a warning that there’s a local kernel running.  Say “OK” to shut that down.  You’ll see a dialog like this:
 
-TODO screenshot 6
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/6.png
 
 This allows you to enter an IP address (for a truly remote machine) or a different port number (which requires a change to the kernel you are connecting to).  For this example and in almost all cases you’ll want to leave these as the default settings.
 
@@ -127,7 +127,7 @@ There’s nothing special about the way the debugger is doing this.  All instanc
 
 To walkthrough this demonstration, start by launching the Java version of Towers of Hanoi:
 
-TODO screenshot 7
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/7.png
 
 The simulation starts an embedded Soar kernel when it’s launched.  You can run the environment by pressing “run”/”stop” as you’d expect.
 
@@ -135,11 +135,11 @@ To debug what’s happening launch the debugger and then choose Kernel | Connect
 
 You should now see the name of the agent (in the title bar of the debugger) change to “remote TOH” like this:
 
-TODO screenshot 8
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/8.png
 
 At this point pressing run in the environment will generate trace output in the debugger.  (The agent starts at watch 0 in this simulation so you just see “write” statements from productions).
 
-TODO screenshot 9
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/9.png
 
 Pressing “stop” in the environment again stops the run.  So far this is simple enough.
 
@@ -183,15 +183,15 @@ A particular arrangement of windows within the debugger is referred to as a layo
 
 You can also create your own preferred window layout.  To start this process, right click on a window in the debugger.  The context menu will either look like this:
 
-TODO screenshot 10
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/10.png
 
 Or it will have offer this menu as a “Window” pop out on the context menu like this:
 
-TODO screenshot 11
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/11.png
 
 This window menu allows you to customize the collection of windows by adding, removing or replacing windows.  The types of windows you can add is based on the list of modules loaded into the debugger and should grow in time.  Right now there are just five:
 
-TODO screenshot 12
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/12.png
 
 Creating a new layout can take a while as we don’t yet have a “Move Window” option.  This is something to be added in the future.  Once you’ve created a new layout it will be saved automatically as your layout for the future (technically it’s the layout of the last frame window closed if you’re using multiple agent windows).
 
@@ -205,7 +205,7 @@ The window right-click menu from above includes a “Properties…” item which
 
 For instance, right clicking and choosing “Properties” for one of the automatically updating windows (top right in the default layout) brings up these properties:
 
-TODO screenshot 13
+http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/13.png
 
 By adjusting these properties you can allow the results to collect in the window rather than being cleared each time a command is executed or you can have a window that updates every 10th decision during a run rather than just at the end of a run.
 
@@ -220,5 +220,3 @@ If you run Soar from within the debugger for long periods of time (i.e. tens of 
 java.exe –Xmx256m –jar SoarJavaDebugger.jar
 
 On Windows you can use javaw.exe if you prefer.  This and other X options are non-standard and may not exist on non-Sun JVMs.  Also, note that the default value is only 64m (64 megabytes).
-
-
