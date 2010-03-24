@@ -10,7 +10,7 @@ This is usually accomplished by registering for an event that fires in this rang
 
 Working memory elements can be removed by the Soar agent and freed by SML. Referring to them (to add, say `^status complete`) will cause a segmentation fault.
 
-  * Be careful not to dereference working memory elements you have disconnected with !DestroyWME.
+  * Be careful not to dereference working memory elements you have disconnected with DestroyWME.
 
 Destroyed pointers are freed by SML and will cause a segmentation fault if used.
 
@@ -34,6 +34,8 @@ Update Events:
 smlEVENT_AFTER_ALL_OUTPUT_PHASES    # Fires after all agents' output phases are done
 smlEVENT_AFTER_ALL_GENERATED_OUTPUT # Fires as above but only after all agents also have output or reached max-nil-output-cycles
 }}}
+
+----
 
 = Reading the Output Link =
 
