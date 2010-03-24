@@ -127,6 +127,8 @@ Cons:
   * Not good for commands that span multiple decision cycles, retained so that `^status complete` can be added.
   * Must follow "command" format: top level identifier. See [SMLOutputLinkGuide#Command_Interface Command Interface] above.
 
+----
+
 = IO Without Event Handlers =
 
 *Not recommended*. Reading the output link without event registration is possible. Generalized steps for this are:
