@@ -38,6 +38,8 @@
       * [Waterfall]
     * [MemoryLeaks Memory Leak Debugging]
     * [ReleasePreparation Release Preparation]
+    * [EventDrivenEnvironmentsProposal Event Driven Environments Proposal]
+    * [MovingFromSGIOToSML Moving from SGIO to SML]
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
   * [ACTRTutorialGroup ACT-R Tutorial Group]
