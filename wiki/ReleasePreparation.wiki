@@ -1,0 +1,43 @@
+#summary Preparing a release
+
+== Update help document ==
+ 
+  * `wget http://code.google.com/p/soar/wiki/CommandLineInterface`
+  * Edit with vim or something, remove everything before and after the main content
+  * Find and replace `/p/soar/wiki/CommandLineInterface` with empty string
+  * Save to `Java/Debugger/src/main/resources/CommandLineInterface.html`
+
+A script to do this would be great.
+
+== announce.txt ==
+
+See a previous version's release notes for a template. 
+
+  * http://code.google.com/p/soar/wiki/ReleaseNotes
+
+== Windows Release ==
+
+  * completely remove old output and intermediate directories
+  * run `build.bat`
+  * copy all of `Release/` in to `out/`
+  * copy all of `Release/win` in to `out/`
+  * remove `bin/*.pdb`
+  * remove `share/java/*.src.jar`
+  * copy `out/` to `Soar-Suite-<version>-win-<arch>[-rcN]`
+    * example version: 9.3.0
+    * example arch: x86 x64
+  * convert `share/soar/Documentation/*.doc(x)` -> `.pdf`
+
+== osx release ==
+
+  * completely remove old output and intermediate directories
+  * cd Core, run `scons --prefix ../out`
+  * copy all of `Release/` in to `out/`
+  * copy all of `Release/osx` in to `out/`
+  * remove `share/java/*.src.jar`
+  * replace documentation with pdfs
+  * copy `out/` to `Soar-Suite-<version>-osx-<arch>[-rcN]`
+    * example version: 9.3.0
+    * example arch: x86 x64
+  * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
+
