@@ -22,7 +22,7 @@ See a previous version's release notes for a template.
   * copy all of `Release/` in to `out/`
   * copy all of `Release/win` in to `out/`
   * remove `bin/*.pdb`
-  * remove `share/java/*.src.jar`
+  * remove `out/share/java/*.src.jar`
   * copy `out/` to `Soar-Suite-<version>-win-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x64
@@ -34,9 +34,22 @@ See a previous version's release notes for a template.
   * cd Core, run `scons --prefix ../out`
   * copy all of `Release/` in to `out/`
   * copy all of `Release/osx` in to `out/`
-  * remove `share/java/*.src.jar`
+  * remove `out/share/java/*.src.jar`
   * replace documentation with pdfs
   * copy `out/` to `Soar-Suite-<version>-osx-<arch>[-rcN]`
+    * example version: 9.3.0
+    * example arch: x86 x64
+  * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
+
+== linux release ==
+
+  * completely remove old output and intermediate directories
+  * cd Core, run `scons --prefix ../out`
+  * copy all of `Release/` in to `out/`
+  * copy all of `Release/linux` in to `out/`
+  * remove `out/share/java/*.src.jar`
+  * replace documentation with pdfs
+  * copy `out/` to `Soar-Suite-<version>-linux-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x64
   * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
