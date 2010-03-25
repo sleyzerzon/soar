@@ -40,6 +40,7 @@
     * [ReleasePreparation Release Preparation]
     * [EventDrivenEnvironmentsProposal Event Driven Environments Proposal]
     * [MovingFromSGIOToSML Moving from SGIO to SML]
+    * [SoarXMLInterfaceSpecification SoarXMLInterfaceSpecification]
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
   * [ACTRTutorialGroup ACT-R Tutorial Group]
