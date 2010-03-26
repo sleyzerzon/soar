@@ -16,6 +16,7 @@
     * [Sproom]
     * [Soar2D]
     * [QuickLinkTutorial Quick Link]
+    * [SoarTextIO Soar Text IO]
     * [RoboticsNotes Robotics Notes]
     * Unsupported Environments
       * [Sps Splinter Soar (old)]
