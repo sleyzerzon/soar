@@ -29,7 +29,7 @@ See a previous version's release notes for a template.
     * example arch: x86 x86_64
   * replace docs with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
 
-== osx release ==
+== OS X release ==
 
   * completely remove old output and intermediate directories
   * cd Core, run `scons --prefix ../out`
@@ -42,7 +42,7 @@ See a previous version's release notes for a template.
     * example arch: x86 x86_64
   * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
 
-== linux release ==
+== Linux release ==
 
   * completely remove old output and intermediate directories
   * cd Core, run `scons --prefix ../out`
@@ -54,3 +54,10 @@ See a previous version's release notes for a template.
     * example version: 9.3.0
     * example arch: x86 x86_64
   * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
+
+== Source release ==
+
+  * Use linux to do this, usually winter
+  * tag the release `tags/Soar-Suite-9.3.0`
+  * *export* the tag
+  * move `Release/*` to top-level
