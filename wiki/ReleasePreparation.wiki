@@ -27,7 +27,7 @@ See a previous version's release notes for a template.
   * copy `out/` to `Soar-Suite-<version>-win-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x64
-  * convert `share/soar/Documentation/*.doc(x)` -> `.pdf`
+  * replace docs with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
 
 == osx release ==
 
@@ -36,7 +36,7 @@ See a previous version's release notes for a template.
   * copy all of `Release/` in to `out/`
   * copy all of `Release/osx` in to `out/`
   * remove `out/share/java/*.src.jar`
-  * replace documentation with pdfs
+  * replace documentation with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-osx-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x64
@@ -49,7 +49,7 @@ See a previous version's release notes for a template.
   * copy all of `Release/` in to `out/`
   * copy all of `Release/linux` in to `out/`
   * remove `out/share/java/*.src.jar`
-  * replace documentation with pdfs
+  * replace documentation with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-linux-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x64
