@@ -26,7 +26,7 @@ See a previous version's release notes for a template.
   * remove `out/share/java/*.src.jar`
   * copy `out/` to `Soar-Suite-<version>-win-<arch>[-rcN]`
     * example version: 9.3.0
-    * example arch: x86 x64
+    * example arch: x86 x86_64
   * replace docs with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
 
 == osx release ==
@@ -39,7 +39,7 @@ See a previous version's release notes for a template.
   * replace documentation with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-osx-<arch>[-rcN]`
     * example version: 9.3.0
-    * example arch: x86 x64
+    * example arch: x86 x86_64
   * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
 
 == linux release ==
@@ -52,5 +52,5 @@ See a previous version's release notes for a template.
   * replace documentation with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-linux-<arch>[-rcN]`
     * example version: 9.3.0
-    * example arch: x86 x64
+    * example arch: x86 x86_64
   * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
