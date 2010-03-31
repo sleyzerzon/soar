@@ -19,6 +19,7 @@
 
   * If running outside of Eclipse, be sure to add all relevant jars to your classpath.
 
+  * Optional: You'll only need this if trying to build april inside eclipse on non-linux platforms: [http://www.eecs.umich.edu/~soar/sitemaker/misc/april/ jzlib.jar]
 
 = Build =
 
