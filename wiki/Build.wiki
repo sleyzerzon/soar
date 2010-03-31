@@ -279,7 +279,7 @@ sandboxes in their home directories:
 
 {{{
 export SOAR_HOME=/home/$USER/sandbox
-export PATH=$PATH=/home/$USER/sandbox/bin
+export PATH=$PATH:/home/$USER/sandbox/bin
 export LD_LIBRARY_PATH=/home/$USER/sandbox/lib
 }}}
 
