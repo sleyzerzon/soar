@@ -37,6 +37,7 @@ For more information on the build procedure, see the [Build] document.
     * *pcre*: A BSD-licensed regular expression library required on Windows.
     * *shared*: Header-only global code intended to be shared by all projects. Portability issues are dealt with here, along with useful header-only library code for everyone, including the Soar kernel.
     * *Documentation*: Sources for much documentation are stored here, along with a pdf rendering of the Soar manual. Much of this is out of date and should be moved online.
+  * *CoreTests*: Simple tests for Core.
 
   * *Java*: Triggers building of the Soar/Java interface via SWIG in Core. Most users will want this since it contains the Soar Java Debugger. Any Soar Java projects (such as Sproom or Soar2D) will also depend on this.
 
