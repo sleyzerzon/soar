@@ -309,3 +309,12 @@ The *remove-message* command uses the message id number, available at *io.input-
     * *status* (_string_) (accepted, complete, error)
 
 Configures the Soar interface. See the input link *configuration* identifier. Since there is only one *status* result, it is best to issue configure commands separately so that any errors will be easily traced.
+
+----
+= Splinter =
+
+Tested only with Linux.
+
+Compile software as outlined on the April wiki: http://april.eecs.umich.edu/wiki
+
+Add `/usr/local/lib` to `LD_LIBRARY_PATH`, update `.bashrc`
