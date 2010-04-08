@@ -1,0 +1,21 @@
+#summary WordNet for Soar
+
+= Introduction =
+
+We have done some preliminary work importing a WordNet (http://wordnet.princeton.edu/) translation into Soar's Semantic Memory. Read on for our data source, the conversion process, and links to download the relevant file(s).
+
+= Data Source =
+
+We are using data from the WN-LEXICAL project:
+ * Project: http://sourceforge.net/projects/actr-wn-lexical/
+ * Paper: http://act-r.psy.cmu.edu/publications/pubinfo.php?id=648
+
+From the project page, download the wn-lexical-data for the version of WordNet of interest. Once extracted, WNChunks.data is the file of interest.
+
+= Conversion =
+
+The data files in this project contain ACT-R chunks. The conversion to Soar's semantic memory declarative add is basically string replacement. We have a PHP script to perform this conversion in SVN (trunk/wn/WNSoar.php). The script takes via standard-in a data file from WN-LEXICAL and outputs a valid semantic memory declarative add statement. For example: 
+
+cat WNChunks.data | php WNSoar.php > wn.soar
+
+This conversion is very fast (~30s) and produces about 84MB of text data. Sourcing the resulting data into Soar takes a few minutes and a good amount of memory (~1GB). To make this a one-time cost, switch semantic memory to write to a file (smem --set path /path/to/wn.db) before sourcing the data. 
