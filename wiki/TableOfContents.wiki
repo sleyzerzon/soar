@@ -2,6 +2,7 @@
   * [Downloads Downloads]
     * [SoarSoftware All Downloads]
     * [ReleaseNotes All Release Notes]
+    * [WordNet WordNet]
   * [GettingStarted Getting Started]
   * [Publications]
   * [FAQ]
