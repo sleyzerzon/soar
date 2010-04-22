@@ -22,5 +22,4 @@ The Soar Tutorial is available in any recent download's `share/soar/Documentatio
 
 See the links to the left, also:
   * [http://soar.googlecode.com/files/dogma.pdf Soar Dogma]: Things nobody told you about coding in Soar that you probably ought to know.
-  * [Publications]: Soar publications.
   * [http://sitemaker.umich.edu/soar/soar_workshops Soar Workshop Proceedings].
