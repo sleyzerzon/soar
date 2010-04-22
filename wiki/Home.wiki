@@ -10,10 +10,17 @@ Soar is a general cognitive architecture for developing systems that exhibit int
 
 Visit the [http://sitemaker.umich.edu/soar Soar home page] for news and general information about Soar. Many research papers and other publications are available on the [Publications Soar publications] page.
 
-= Download =
+= Soar Manual =
 
-Visit the [Downloads] page to download Soar.
+The Soar Users Manual is available here: http://soar.googlecode.com/svn/tags/Soar-Suite-9.3.0/Core/Documentation/SoarManual.pdf
 
-= Documentation =
+= Tutorial =
 
-Use the table of contents to the left to view documentation topics, or [http://code.google.com/p/soar/w/list browse all wiki documents here].
+The Soar Tutorial is available in any recent download's `share/soar/Documentation` folder. See the [Downloads] page for links to recent versions.
+
+= Other Documentation =
+
+See the links to the left, also:
+  * [http://soar.googlecode.com/files/dogma.pdf Soar Dogma]: Things nobody told you about coding in Soar that you probably ought to know.
+  * [Publications]: Soar publications.
+  * [http://sitemaker.umich.edu/soar/soar_workshops Soar Workshop Proceedings].
