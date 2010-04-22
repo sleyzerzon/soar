@@ -3,6 +3,31 @@
 <wiki:toc max_depth="1" />
 
 ----
+= 9.3.0 =
+
+This release of Soar includes modules for reinforcement learning
+(introduced in 9.0), episodic memory (introduced in 9.1), and semantic
+memory (introduced in 9.2), along with many new features and stability
+updates. All learning mechanisms are now disabled by default.
+
+Downloading and installing [http://java.sun.com Java] is recommended since most users will want to use the Soar Java Debugger and other Soar components written in Java. The [http://java.sun.com/javase/downloads/index.jsp latest version of the Sun JRE or JDK] is recommended. 
+
+_Important: the 64-bit Soar downloads require 64-bit Java!_
+
+  * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-win-x86.zip 9.3.0 for Windows, 32-bit] (use this if not sure)
+  * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-win-x86_64.zip 9.3.0 for Windows, 64-bit]
+
+  * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-osx-x86.zip 9.3.0 for Mac, 32-bit] (use this if not sure)
+  * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-osx-x86_64.zip 9.3.0 for Mac, 64-bit]
+
+  * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-linux-x86.tar.gz 9.3.0 for Linux, 32-bit] (use this if not sure)
+  * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-linux-x86_64.tar.gz 9.3.0 for Linux, 64-bit]
+
+  * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-source.tar.gz 9.3.0 platform-independent source]
+
+[ReleaseNotes#9.3.0 Here are full release notes for the 9.3.0 release].
+
+----
 = 9.2 Semantic Memory =
 
 _Beta release_.
