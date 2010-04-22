@@ -24,10 +24,10 @@ See a previous version's release notes for a template.
   * remove `out/bin/*.pdb`
   * copy `Python/*.py` to `out/bin`
   * remove `out/share/java/*.src.jar`
+  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-win-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x86_64
-  * replace docs with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
 
 == OS X release ==
 
@@ -36,7 +36,7 @@ See a previous version's release notes for a template.
   * copy all of `Release/` in to `out/`
   * copy all of `Release/osx` in to `out/`
   * remove `out/share/java/*.src.jar`
-  * replace documentation with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
+  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-osx-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x86_64
@@ -49,7 +49,7 @@ See a previous version's release notes for a template.
   * copy all of `Release/` in to `out/`
   * copy all of `Release/linux` in to `out/`
   * remove `out/share/java/*.src.jar`
-  * replace documentation with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
+  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-linux-<arch>[-rcN]`
     * example version: 9.3.0
     * example arch: x86 x86_64
