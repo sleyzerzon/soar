@@ -26,6 +26,10 @@ _Important: the 64-bit Soar downloads require 64-bit Java!_
 
 [ReleaseNotes#9.3.0 Here are full release notes for the 9.3.0 release].
 
+=== Usage ===
+
+Download, extract, navigate in to folder, double click batch/shell/command files such as `Soar Java Debugger`.
+
 == Other Versions ==
 
 Old, unsupported versions of Soar are archived on the [SoarSoftware Soar software page].
