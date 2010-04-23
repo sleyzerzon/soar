@@ -13,19 +13,23 @@ Downloading and installing [http://java.sun.com Java] is recommended since most 
 
 _Important: the 64-bit Soar downloads require 64-bit Java!_
 
+== Windows ==
   * [http://windows.microsoft.com/en-US/windows-vista/32-bit-and-64-bit-Windows-frequently-asked-questions How to tell 32- or 64-bit Windows]
   * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-win-x86.zip 9.3.0 for Windows, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-win-x86_64.zip 9.3.0 for Windows, 64-bit] (be sure to check your Java version)
 
+== OS X ==
   * [http://support.apple.com/kb/HT3696 How to tell 32- or 64-bit OS X]
   * [http://developer.apple.com/java/faq/#multiple How to check/switch Java version]
   * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-osx-x86.zip 9.3.0 for Mac, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-osx-x86_64.zip 9.3.0 for Mac, 64-bit] (be sure your Java version is 64-bit)
 
-  * If the command `uname -m` yields `x86_64`, you have a 64-bit OS.
+== Linux ==
+  * If the command `uname -m` yields `x86_64`, you have a 64-bit Linux OS.
   * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-linux-x86.tar.gz 9.3.0 for Linux, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-linux-x86_64.tar.gz 9.3.0 for Linux, 64-bit]
 
+== Others ==
   * [http://soar.googlecode.com/files/Soar-Suite-9.3.0-source.tar.gz 9.3.0 platform-independent source]
 
 [ReleaseNotes#9.3.0 Here are full release notes for the 9.3.0 release].
