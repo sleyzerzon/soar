@@ -1,6 +1,12 @@
 #summary Publications related to the Soar project.
 #labels Phase-Support
 
+= 2010 =
+
+Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_soar9.pdf Extending Soar with Dissociated Symbolic Memories.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
+
+Derbinsky, N., Gorski, N.A.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_exploring.pdf Exploring the Space of Computational Memory Models.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
+
 = 2009 =
 
 Bloch, M.K. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Hierarchical Reinforcement Learning in the Taxicab Domain.]_ (Report No. CCA-TR-2009-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
