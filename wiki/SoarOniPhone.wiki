@@ -1,0 +1,40 @@
+#summary Soar on the iPhone OS
+
+= Introduction =
+
+This page will guide you through the process of having a Soar-enabled application on the iPhone OS. Here are the basic steps, with more detail below:
+
+  # Add Soar includes to the XCode header search path
+  # Add static Soar libraries to the XCode project
+  # Rename appropriate source files to .mm (to enable C++)
+  # Include the appropriate headers in your source
+
+= Soar Includes =
+
+The easiest way to do this is to download a release and point XCode to the "include" directory. The location of this option is... Project -> Edit Project Settings -> Build -> Header Search Paths (under Search Paths group).
+
+= Soar Static Libraries =
+
+The basic process is to compile Soar statically for an iPhone-specific architecture and SDK:
+
+  # Checkout Core from SVN
+  # Modify Core/SConstruct compilation to match the following compiler/linker flags: '-m32 -arch i386 -isysroot /path/to/sdk -mmacosx-version-min=10.5' (basically what XCode uses for your app)
+  # Compile statically: scons --static --platform=32
+
+All lib`a`.a files in the out/lib folder should be added to your project (drag+drop).
+
+= Rename Source Files =
+
+XCode allows you to use C++ if your source file is named with a .mm (vs. .m) extension. This will make for the easiest transition for non-Objective-C programmers.
+
+= Include Headers =
+
+In addition to the usual SML headers:
+
+  * sml_Connection.h
+  * sml_Client.h
+  * ElementXML.h
+
+XCode needs one more:
+
+  * portability.h
