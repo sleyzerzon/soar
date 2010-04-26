@@ -11,7 +11,7 @@ This page will guide you through the process of having a Soar-enabled applicatio
 
 = Soar Includes =
 
-The easiest way to do this is to download a release and point XCode to the "include" directory. The location of this option is... Project -> Edit Project Settings -> Build -> Header Search Paths (under Search Paths group).
+The easiest way to do this is to download a release and point XCode to the "include" directory. The location of this option is... Project menu -> Edit Project Settings -> Build -> Header Search Paths (under Search Paths group).
 
 = Soar Static Libraries =
 
@@ -38,3 +38,63 @@ In addition to the usual SML headers:
 XCode needs one more:
 
   * portability.h
+
+= Example =
+
+In a new XCode iPhone Application project, rename main.m to main.mm and place the following code in the main function just above creating the NSAutoreleasePool (I know, very bad placement):
+{{{
+sml::Kernel* pKernel = sml::Kernel::CreateKernelInNewThread(sml::Kernel::kDefaultLibraryName, 0);
+sml::Agent* pAgent = pKernel->CreateAgent( "iSoar" ) ;
+pAgent->ExecuteCommandLine("smem --set learning on");
+pAgent->ExecuteCommandLine("sp {create*fb (state <s> ^superstate nil) --> (<s> ^foo.bar barr)}");
+pAgent->ExecuteCommandLine("sp {store*fb (state <s> ^smem.command <c> ^foo <f>) --> (<c> ^store <f>)}");
+pAgent->ExecuteCommandLine("d");
+std::cout << pAgent->ExecuteCommandLine( "p --full" );
+std::cout << pAgent->ExecuteCommandLine( "print --depth 100 --tree s1" );
+std::cout << pAgent->ExecuteCommandLine( "smem -v" );
+delete pKernel;
+}}}
+
+Once you complete the steps above (I used 9.3.0), your app will do nothing but print the following to the console (Run menu -> Console):
+{{{
+sp {store*fb
+    (state <s> ^foo <f> ^smem <s*1>)
+    (<s*1> ^command <c>)
+    -->
+    (<c> ^store <f> +)
+}
+
+
+sp {create*fb
+    (state <s> ^superstate nil)
+    -->
+    (<s> ^foo <f*1> +)
+    (<f*1> ^bar barr +)
+}
+
+
+(S1 ^epmem E1)
+  (E1 ^command C1)
+  (E1 ^result R2)
+(S1 ^foo @F1)
+  (@F1 ^bar barr)
+(S1 ^io I1)
+  (I1 ^input-link I2)
+  (I1 ^output-link I3)
+(S1 ^reward-link R1)
+(S1 ^smem S2)
+  (S2 ^command C2)
+    (C2 ^store @F1)
+  (S2 ^result R3)
+    (R3 ^success @F1)
+(S1 ^superstate nil)
+(S1 ^type state)
+
+digraph smem {
+node [ shape = doublecircle ];
+F1 ;
+node [ shape = plaintext ];
+F1_0 [ label = "barr" ];
+F1 -> F1_0 [ label="bar" ];
+}
+}}}
