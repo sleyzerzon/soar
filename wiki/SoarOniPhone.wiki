@@ -23,6 +23,8 @@ The basic process is to compile Soar statically for an iPhone-specific architect
 
 All lib`a`.a files in the out/lib folder should be added to your project (drag+drop).
 
+To help get folks started, I've uploaded some [http://www.eecs.umich.edu/~soar/sitemaker/misc/iphone-libs.tar.gz sample libraries]. These will likely be out of date by the time you read this. I compiled these on Snow Leopard using Soar 9.3.0 and XCode iPhone SDK 3.2 (works with iPhone and iPad) for the simulator (i.e. arch=i386).
+
 = Rename Source Files =
 
 XCode allows you to use C++ if your source file is named with a .mm (vs. .m) extension. This will make for the easiest transition for non-Objective-C programmers.
