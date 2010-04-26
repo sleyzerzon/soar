@@ -21,7 +21,7 @@ The basic process is to compile Soar statically for an iPhone-specific architect
   # Modify Core/SConstruct compilation to match the following compiler/linker flags: '-m32 -arch i386 -isysroot /path/to/sdk -mmacosx-version-min=10.5' (basically what XCode uses for your app)
   # Compile statically: scons --static --platform=32
 
-All lib`a`.a files in the out/lib folder should be added to your project (drag+drop).
+All lib`*`.a files in the out/lib folder should be added to your project (drag+drop).
 
 To help get folks started, I've uploaded some [http://www.eecs.umich.edu/~soar/sitemaker/misc/iphone-libs.tar.gz sample libraries]. These will likely be out of date by the time you read this. I compiled these on Snow Leopard using Soar 9.3.0 and XCode iPhone SDK 3.2 (works with iPhone and iPad) for the simulator (i.e. arch=i386).
 
