@@ -1,4 +1,5 @@
 #summary Soar software download page
+#labels Featured
 
 = Download Soar =
 
