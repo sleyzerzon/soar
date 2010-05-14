@@ -44,7 +44,7 @@ There are a number of different ways to read information from the output link, e
 == Examine In Detail ==
 
   * Use `GetOutputLink`, `GetNumberChildren`, `GetChild`, and other similar methods to examine working memory in its raw state. 
-  * Use `IsJustAdded` and `AreChildrenModified` to see what WMEs have changed, or track timetags.
+  * Can't use `IsJustAdded` and `AreChildrenModified` -- these require `SetTrackOutputLinkChanges` `true`
 
 Pros:
 
