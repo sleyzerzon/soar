@@ -106,3 +106,7 @@ F1 -> F1_0 [ label="bar" ];
 The following link allows you to download a self-contained sample application that works out-of-the-box on the iPhone simulator. Read the included README file for greater detail.
 
 [http://www.eecs.umich.edu/~soar/sitemaker/misc/iphone-tictactoe.tar.gz tictactoe]
+
+You can reference the following presentation for context/sample play:
+
+[http://www.eecs.umich.edu/~nlderbin/platforms_soarworkshop_2010.pdf Soar Workshop 30 Talk]
