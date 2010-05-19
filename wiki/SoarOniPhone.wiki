@@ -41,7 +41,7 @@ XCode needs one more:
 
   * portability.h
 
-= Example =
+= Minimalist Example =
 
 In a new XCode iPhone Application project, rename main.m to main.mm and place the following code in the main function just above creating the NSAutoreleasePool (I know, very bad placement):
 {{{
@@ -100,3 +100,9 @@ F1_0 [ label = "barr" ];
 F1 -> F1_0 [ label="bar" ];
 }
 }}}
+
+= Demo Application =
+
+The following link allows you to download a self-contained sample application that works out-of-the-box on the iPhone simulator. Read the included README file for greater detail.
+
+[http://www.eecs.umich.edu/~soar/sitemaker/misc/iphone-tictactoe.tar.gz tictactoe]
