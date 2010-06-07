@@ -44,7 +44,7 @@
     * [EventDrivenEnvironmentsProposal Event Driven Environments Proposal]
     * [MovingFromSGIOToSML Moving from SGIO to SML]
     * [SoarXMLInterfaceSpecification SoarXMLInterfaceSpecification]
-    * [SoarOniPhone Soar on the iPhone OS]
+    * [SoarOniPhone Soar on iOS]
   * [SoarGroupReadings Readings]
   * [ConferenceSchedule Conferences]
   * [ACTRTutorialGroup ACT-R Tutorial Group]
