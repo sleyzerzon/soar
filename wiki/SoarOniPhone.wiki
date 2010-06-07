@@ -1,4 +1,4 @@
-#summary Soar on the iPhone OS
+#summary Soar on iOS
 
 = Introduction =
 
