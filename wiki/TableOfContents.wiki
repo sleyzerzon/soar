@@ -46,5 +46,6 @@
     * [SoarXMLInterfaceSpecification SoarXMLInterfaceSpecification]
     * [SoarOniPhone Soar on iOS]
   * [SoarGroupReadings Readings]
+  * [SoarGroupTalks Talks]
   * [ConferenceSchedule Conferences]
   * [ACTRTutorialGroup ACT-R Tutorial Group]
