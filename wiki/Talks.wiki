@@ -1,0 +1,7 @@
+#summary Various talks given at weekly meetings of the Soar group at UofM
+
+Various talks given at weekly meetings of the Soar group at UofM
+
+= 2010 =
+
+Modifying Soar-RL to Guarantee Convergence with Linear Function Approximation [http://www.eecs.umich.edu/~soar/talks/rlapprox.pdf PDF]
