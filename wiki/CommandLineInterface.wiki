@@ -1954,20 +1954,23 @@ print [options] identifier|timetag|pattern
 
 === Printing items in production memory ===
 
+==== What productions to print: ====
+
 || `-a, --all` || print the names of all productions currently loaded ||
 || `-c, --chunks` || print the names of all chunks currently loaded ||
 || `-D, --defaults` || print the names of all default productions currently loaded ||
-|| `-f, --full` || When printing productions, print the whole production. This is the default when printing a named production. ||
-|| `-F, --filename` || also prints the name of the file that contains the production. ||
-|| `-i, --internal` || items should be printed in their internal form. For productions, this means leaving conditions in their reordered (rete net) form. ||
 || `-j, --justifications` || print the names of all justifications currently loaded. ||
-|| `-n, --name` || When printing productions, print only the name and not the whole production. This is the default when printing any category of productions, as opposed to a named production. ||
 || `-r, --rl` || Print Soar-RL rules ||
 || `-T, --template` || Print Soar-RL templates ||
 || `-u, --user` || print the names of all user productions currently loaded ||
 || `production_name` || print the production named `production-name` ||
 
-Note that only one of the options c,D,j,r,t or U can be used at a time for correct behavior.
+==== How to print the productions: ====
+
+|| `-f, --full` || When printing productions, print the whole production. This is the default when printing a named production. ||
+|| `-F, --filename` || also prints the name of the file that contains the production. ||
+|| `-i, --internal` || items should be printed in their internal form. For productions, this means leaving conditions in their reordered (rete net) form. ||
+|| `-n, --name` || When printing productions, print only the name and not the whole production. This is the default when printing any category of productions, as opposed to a named production. ||
 
 === Printing items in working memory ===
 
@@ -3609,4 +3612,3 @@ or watch any relationship between objects:
 {{{
 soar> watch-wmes --add-filter -t both * ontop *
 }}}
-
