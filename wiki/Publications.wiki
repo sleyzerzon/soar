@@ -19,6 +19,8 @@ Gorski, N.A., and Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemake
 
 Gorski, N.A. & Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/LearningToUseEpMem-ICCM09.pdf Learning to Use Episodic Memory.]_ Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.
 
+Jones, R.M., Stensrud, B.S. and Taylor, G. (2009), _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/sofic-2009-soartech-paper.pdf Knowledge-Rich Intelligent Agents for Special Operations Forces (SOF) Training]_ Proceedings of the 2009 Special Operations Forces Industry Conference (SOFIC), Tampa, FL.  June 2-4, 2009.
+
 Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/SPIE.pdf Towards Cognitive Robotics]_, SPIE Defense and Sensing Conferences, Orlando, FL.
 
 Laird, J.E., Derbinsky, N.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/ijcai09.pdf A Year of Episodic Memory.]_ Workshop on Grand Challenges for Reasoning from Experiences, 21st IJCAI (2009)
@@ -50,6 +52,8 @@ Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird
 Marinier, R. and Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_cogsci_2008_emotionrl.pdf Emotion-Driven Reinforcement Learning.]_ !CogSci 2008, Washington, D.C.
 
 Marinier, R., Laird, J. E., and Lewis, R. L. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/marinier_laird_lewis_jcsr_2008_computationalunification.pdf A Computational Unification of Cognitive Behavior and Emotion.]_ Journal of Cognitive Systems Research.
+
+Stensrud, B., Taylor, G., Schricker, B., Montefusco, J. and Maddox, J. (2008), _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/08F-SIW-039.pdf An Intelligent User Interface for Enhancing Computer Generated Forces]_ Proceedings of the 2008 Fall Simulation Interoperability Workshop (SIW), Orlando, FL, September 15-19, 2008.
 
 Wintermute, S. and Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AAAI08-motion.pdf Bimodal Spatial Reasoning with Continuous Motion.]_ Proceedings of the Twenty-Third AAAI Conference on Artificial Intelligence (AAAI-08), Chicago, Illinois
 
