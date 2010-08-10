@@ -41,10 +41,13 @@ class GroundedObject {
     virtual CGALDirection getIntrinsicFront() = 0;
 
     // Build a WM3 geometry object, where the coordinates are in the FOR where
-    // 0,0,0 is the centroid, and the Local transform places everything at the
-    // right grounded location (i.e., it is the global transformation from the real
-    // 0,0,0).
+    // 0,0,0 is the centroid and 0,1,0 points to the front.
+    // Caller owns the new object.
     virtual Geometry* makeNewGeometry() = 0;
+
+    // Build a WM3 transformation, going from the global FOR to place the
+    // object at its grounded location.
+    virtual Transformation makeTransformation();
 
 };
 

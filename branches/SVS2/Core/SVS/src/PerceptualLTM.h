@@ -1,7 +1,7 @@
 
 class PerceptualLTM {
 public:
-  // read a set of model files and textures from disc during construction
+  // read a set of model files (and textures?) from disc during construction
   //
   // note: geometry of models must be normalized at some point prior to
   // retrieval, so the centroid is the origin of the local FOR

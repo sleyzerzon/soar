@@ -5,7 +5,7 @@
 class SVSObject {
 public:
   SVSObject(GroundedObject* source, SVSObject* _parent, string _id, string _classId, bool _imagined);
-  SVSObject(Spatial* source, SVSObject* _parent, string _id, string _classId, bool _imagined);
+  SVSObject(SpatialPtr source, SVSObject* _parent, string _id, string _classId, bool _imagined);
 
     
   ~SVSObject();
@@ -28,6 +28,21 @@ public:
   // Wm3 scene graph.
   bool addChild(SVSObject* child); // return false if this is primitive 
   bool removeChild(SVSObject* child); // return false if child not present
+
+  // This returns an error if the object is already inhibited at a higher level
+  // (but then, so should all commands referencing the object below that level)
+  bool inhibit(int level);
+  
+  // Level is necessary here due to glitching. Object should only be actually
+  // uninhibited if the level passed is the lower than the current inhibit
+  // level (but this is NOT an error).
+  // For example, if the agent inhibits at level 3,
+  // and then again at level 2, at the next decision, support for the level-3 inhibit
+  // command will go away (since the object is no longer at level 3), and
+  // uninhibit will be called by that command's watcher. But the level 2
+  // command is still valid, so it should remain inhibited.
+  bool uninhibit(int level);
+  int getInhibitionLevel();
 
   // getChild(int) or getChildren() may be necessary
 
@@ -57,11 +72,17 @@ public:
 private:
   SVSObject* parent;
   vector< SVSObject* > children;
-  Spatial* wm3Unit;
+  
+  // Note that this is a Wm3 smart pointer. These are used internally in Wm3,
+  // so we need them here so that system doesn't delete them. This (along with
+  // pLTM) are the only places smart ptrs need to be, since that is where the
+  // pointers are owned.
+  SpatialPtr wm3Unit;
   string id;
   string classId;
   bool imagined;
   bool primitive;
+  int inhibitedLevel;
 
   GroundedObjectPolyhedron3d* poly3;
   GroundedObjectPolygon2d* poly2;
