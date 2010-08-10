@@ -19,11 +19,19 @@ class GroundedObject {
   public:
 
     // ALL of these are pure virtual:
-    // constructor taking a Spatial*: this poly will be the convex hull of the
+    
+    // constructor taking a SVSObject*: this poly will be the convex hull of the
     // scene graph below the given node, at the global location.
+    virtual GroundedObject(SVSObject* shape) = 0;
 
-    // constructor taking a point list
+    // constructor taking a Spatial* and an SVSObject*: the poly will be the
+    // convex hull of the scene graph below the given node, ground at its
+    // location in the FOR of the frameSource
+//    virtual GroundedObject(SVSObject* shape, SVSObject* frameSource) = 0;
+//    DO WE NEED THIS?
+
     // constructor taking a (generic) GroundedObject
+    virtual GroundedObject(GroundedObject*) = 0;
     // The last will be used, e.g., to get a centroid:
     // GroundedObjectPoint3 centroid(Some3dPolyhedronGroundedObject);
     
@@ -38,7 +46,9 @@ class GroundedObject {
     // Get the grounded direction corresponding to the "front" of the object.
     // The local FOR of the object has an origin at the centroid, and a front
     // direction pointing to 0,1,0. 
-    virtual CGALDirection getIntrinsicFront() = 0;
+    //
+    // This is implicit in the transform
+    //virtual CGALDirection getIntrinsicFront() = 0; May be unnecessary
 
     // Build a WM3 geometry object, where the coordinates are in the FOR where
     // 0,0,0 is the centroid and 0,1,0 points to the front.
@@ -47,7 +57,10 @@ class GroundedObject {
 
     // Build a WM3 transformation, going from the global FOR to place the
     // object at its grounded location.
-    virtual Transformation makeTransformation();
+    virtual Transformation getGlobalTransformation();
+
+  private:
+    Transformation transform;
 
 };
 
