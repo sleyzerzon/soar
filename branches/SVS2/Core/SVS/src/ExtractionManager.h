@@ -1,6 +1,9 @@
 
 // This singleton class handles connecting extract command watchers to the
 // functions that actually do the geometry processing
+//
+// This should probably all be static. Some internal state is needed to
+// associate strings to function ptrs.
 
 // This helps insulate qualitative/SVSObject representations in the system from
 // geometric representations.

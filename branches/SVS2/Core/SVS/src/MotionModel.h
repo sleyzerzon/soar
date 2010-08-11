@@ -31,6 +31,7 @@ class Simulation {
 public:
   // this process updates the spatial scene (via the appropriate interface) in
   // arbitrary ways
+  Simulation(vector< Parameter > parameters);
   virtual bool updateSimulation(vector< Parameter > parameters, double time) = 0;
 private:
   // arbitrary internal state is allowed here (but remember not to keep
@@ -51,7 +52,7 @@ public:
   // The current time (in terms of an environmental event counter) is provided.
   // Parameters referring to objects will already have been processed to
   // GroundedObjects.
-  virtual void startSession(vector< Parameter > parameters,
+  virtual bool startSession(vector< Parameter > parameters,
                             double time) = 0;
   
   // Learn is called every time a new datapoint (may) available. The model is
@@ -59,15 +60,15 @@ public:
   // startSession() call or the last learn() call and handling it
   // appropriately. This difference may be zero,
   // if the agent is ignoring the environment.
-  virtual void learn(vector< Parameter> parameters, double time) = 0;
+  virtual bool learn(vector< Parameter> parameters, double time) = 0;
   
   // Some models may require at least one datapoint before doing anything. This
   // queries the model to determine if a simulation is yet possible.
   virtual bool isReady() = 0;
 
-  // Spawn a SpatialSimulator object (owned by the caller) instantiating the
+  // Spawn a Simulation object (owned by the caller) instantiating the
   // motion
-  virtual SpatialSimulator* createNewSimulation(vector< Parameter > parameters) = 0;
+  virtual Simulation* createNewSimulation(vector< Parameter > parameters) = 0;
 
 
   // below here is handled by the base class, subclasses need not be concerned
@@ -99,7 +100,7 @@ protected:
 
 
 // MotionControllers are a subset of motion models, that spawn
-// ControllerInstances, which are a derived class of SpatialSimulator
+// ControllerInstances, which are a derived class of Simulation
 //
 // TODO: determine what a MotionSimulation should return, and how to get it to
 // the environment
@@ -114,30 +115,83 @@ class MotionController : public MotionModel {
     virtual ControllerInstance* createNewControllerInstance(vector< Parameter > parameters) = 0;
 };
 
-// Example complex learning application: learn how the cursor moves relative to the screen as a
-// function of how the mouse moves relative to the table
+// The motion model interface above is much lower-level than that used for
+// extraction/projection. The SimpleSimulation and SimpleMotionModel classes are
+// more constrained, but provide an easier interface at the same level as
+// extraction/generation.
 //
-// The tracking process would take the cursor as its object, and some
-// parameters:
-// target-motion-reference-object screen
-// source-motion-object mouse
-// source-motion-reference-object table
+// - a SimpleMotionModel captures the movement of exactly one object
+// - implementation code sees everything in terms of GroundedObjects
+// - SimpleMotionModels do not support simulations/tracking processes where the
+// set of objects changes, so the implementation can keep internal state that
+// has GroundedObject*s in it. These might move through space, but the ptrs
+// will be guaranteed valid.
 //
-// These all show up in the learning process as GroundedObject parameters.
-// The GroundedObjects are current at every learning step.
-// 
-// To learn the motion, at each update, the model would get the transformation
-// from the desk to the mouse in the FOR of the desk, using relateInFrame in GeometryHelpers.h
+// Something similar could be done for controllers.
 //
-// The model would also get the transformation from the screen to the pointer
-// in the FOR of the screen using the same function.
-//
-// The learning process would determine how the quantities are varying relative
-// to one another, somehow.
-//
-// Once enough data is present, the learning process would set ready=true.
-// At this point, a simulation could be spawned. The agent would set up a
-// simulation command specifying to imagine the motion of the pointer.
-//
-// step motion of the mouse
-// respond with motion of the pointer
+// This might be commented out for the initial release, but I think having a
+// clean, simple interface here would be very useful to others making their own
+// motion models, so they don't have to know any parts of the system beyond
+// geometry.
+class SimpleSimulation : public MotionSimulation {
+public:
+  // Call the derived class init function. 
+  // Remove the (required) parameter for the moving object from
+  // the list and pass it specially.
+  //
+  // Object parameters will already be ground at this point by
+  // SimpleMotionModel::createNewSimulation()
+  SimpleSimulation(vector< Parameter > parameters);
+
+  // Take the parameters, and ground all objects. Ensure that the objects at
+  // each update are the same objects that were passed to the constructor, otherwise
+  // fail. Call updateSimpleSimulation with the time, it will change the GroundedObject 
+  // for the moving object. Manipulate the spatial scene accordingly.
+  bool updateSimulation(vector< Parameter > parameters, double time);
+
+  // Derived class init function sees all grounded parameters, and does
+  // initialization processing (if any). It must store the moving GroundedObject
+  // and any parameters internally, as they won't be seen again.
+  virtual bool init(GroundedObject* movingObject, vector< Parameter > parameters) = 0;
+
+  // Derived class update just sees a time step. It manipulates the position of the
+  // movingObject accordingly.
+  virtual bool updateSimpleSimulation(double time) = 0;
+private:
+};
+
+class SimpleMotionModel : public MotionModel {
+  // startSession() for this class will ground all parameters and call the
+  // derived class startSession() (below) that takes grounded parameters and
+  // specifies the movingObject. Similar to SimpleSimulation, this class needs
+  // to monitor all objects it gets over updates, so it can ensure the
+  // GroundedObject*s it passes during startSession remain valid (erroring out
+  // otherwise).
+  bool startSession(vector< Parameter > parameters, double time) = 0;
+  
+  // Derived class must implement this, from its perspective, all objects are
+  // grounded, and all ptrs passed at init are guaranteed valid (although the
+  // objects themselves may change).
+  virtual bool startSession(GroundedObject* movingObject, 
+      vector< Parameter > parameters, double time) = 0;
+
+  // SimpleMotionModel learn function checks that the objects are the same as
+  // passed to init and grounds them, also confirming that the GroundedObject*s
+  // don't change from time to time.
+  bool learn(vector< Parameter> parameters, double time);
+  
+  // Derived class learn function just sees a time, it should have cached the
+  // GroundedObject*s passed to it in init, and they are guaranteed still
+  // valid.
+  virtual bool learn(double time) = 0;
+  
+  // SimpleMotionModel createNewSimulation grounds all parameters and calls
+  // derived class createNewSimpleSimulation(), returning its result.
+  Simulation* createNewSimulation(vector< Parameter > parameters);
+
+  // Derived class createNewSimpleSimulation sees only ground parameters, and
+  // adds its own internal params to the list (ie, whatever it learned during
+  // tracking) before constructing a new SimpleSimulation and returning it.
+  virtual SimpleSimulation* createNewSimpleSimulation(vector< Parameter > parameters) = 0;
+
+};

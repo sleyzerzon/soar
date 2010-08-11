@@ -1,6 +1,8 @@
 
 // This singleton class handles connecting generate command watchers to the
 // functions that actually do the geometry processing
+//
+// This should probably all be static.
 
 // This helps insulate qualitative/SVSObject representations in the system from
 // geometric representations.
