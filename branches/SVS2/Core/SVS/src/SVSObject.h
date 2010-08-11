@@ -3,10 +3,10 @@
 // encapsulated within here and pLTM, only accessed by the GUI and GroundedObject.
 
 class SVSObject {
+  friend class SpatialScene; // see setGlobalTransformation()
 public:
   SVSObject(GroundedObject* source, SVSObject* _parent, string _id, string _classId, bool _imagined);
   SVSObject(SpatialPtr source, SVSObject* _parent, string _id, string _classId, bool _imagined);
-
     
   ~SVSObject();
 
@@ -52,11 +52,6 @@ public:
   // this object owns the dynamically allocated polyhedron
   GroundedObject* getGroundedObject(string interpretation);
 
-  // Move the object so the global transformation to its centroid is this.
-  // Local transformation will be calculated accordingly.
-  // This is the main way of moving objects.
-  void setGlobalTransformation(Transformation tx);
-
   // Set the texture of this object to be that of the source.
   // Return false if either this or the other isn't primitive.
   bool setTexture(SVSObject* source);
@@ -94,5 +89,14 @@ private:
   // this must be called whenever the object structurally changes
   // (a decendant is added or removed)
   void invalidateGroundedObjects(); 
+  
+  // Move the object so the global transformation to its centroid is this.
+  // Local transformation will be calculated accordingly.
+  // This is the main way of moving objects.
+  // This should only be called by SpatialScene, who is a friend,
+  // since the scene needs to determine the change set of everything below this
+  // node and tell other modules about it
+  void setGlobalTransformation(Transformation tx);
+
 
 };
