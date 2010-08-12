@@ -20,6 +20,12 @@
     // Again, the local tx on the new object will become its global, this
     // function will take care of adjusting the local on it and on its new
     // child (so the new child stays stationary).
+    //
+    // This is only allowed at top state! It is a nonmonotonic change, since
+    // the child (and all its decendents) will be effected. To allow this at
+    // lower states, lots of meta information would be needed to encode what
+    // each substate thinks the graph looks like, instead of just pruning off
+    // the ends of the tree at higher states.
     bool addObjectInterior(string child, SVSObject* object);
     
     bool removeObject(string rootName);
@@ -41,6 +47,7 @@
     // the scene is read.
     // Returns null if id isn't present.
     // Caller does NOT own the pointer.
+    // Pointer is only guaranteed valid for the current decision
     SVSObject* retrieve(string id);
 
     // The scene has to handle these (rather than the SVSObjects themselves) so

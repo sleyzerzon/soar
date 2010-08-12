@@ -60,8 +60,13 @@ public:
   //
   // this object owns the dynamically allocated polyhedron
   // the pointer is guaranteed valid for the duration of the current decision,
+  // or until getGroundedObject is called again on the same object from a
+  // different goalLevel
   // but may be obsolete after (even if the SVSObject is still present)
-  GroundedObject* getGroundedObject(string interpretation);
+  GroundedObject* getGroundedObject(string interpretation, int goalLevel);
+
+  // GroundedObjects are goal-level specific, since lower subgoals may add
+  // structure that is invisible to higher subgoals (e.g., object parts)
 
   // Set the texture of this object to be that of the source.
   // Return false if either this or the other isn't primitive.

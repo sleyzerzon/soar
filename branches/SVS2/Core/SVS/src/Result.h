@@ -6,8 +6,14 @@
 
 class Result {
 public:
+  // use similar enum-based types and casting functions as Parameter
   Result();
-  bool isError();
+};
+
+// this simply indicates that an error occurred
+class ErrorResult: public Result {
+public:
+  ErrorResult();
 };
 
 

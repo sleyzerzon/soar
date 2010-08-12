@@ -20,7 +20,7 @@ private:
 
 // example extraction header
 
-Result rccDR(vector< Parameter > parameters);
+Result rccDR(ParameterSet& parameters);
              // should contain two object parameters
 
 // extractors get parameters where the objects are ungrounded, but can call

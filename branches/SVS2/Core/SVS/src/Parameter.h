@@ -3,27 +3,54 @@
 class Parameter {
 public:
   Parameter();
+  enum Type {
+    int,
+    string,
+    float,
+    SVSObject,
+    GroundedObject
+  };
+  
+  virtual Type getType() = 0;
+
+  // each subclass implements all of these,
+  // return "this" if the type matches, null otherwise
+  virtual IntParameter* pointerAsIntType() = 0;
+  virtual StringParameter* pointerAsStringType() = 0;
+  virtual FloatParameter* pointerAsFloatType() = 0;
+  virtual SVSObjectParameter* pointerAsSVSObjectType() = 0;
+  virtual GroundedObjectParameter* pointerAsGroundedObjectType() = 0;
+
+  // ALTERNATE VERSION
+  // each subclass implements all of these,
+  // return "this" if the type matches, null otherwise
+  virtual int* intValue() = 0;
+  virtual string* stringValue() = 0;
+  virtual float* floatValue() = 0;
+  virtual SVSObject* SVSObjectValue() = 0;
+  virtual GroundedObject* GroundedObjectValue() = 0;
+
 };
 
 class GroundedObjectParameter: public Parameter {
 public:
   GroundedObjectParameter(string _name, GroundedObject* _val);
   string name;
-  GroundedObject* val;
+  GroundedObject* value;
 };
 
 class SVSObjectParameter: public Parameter {
 public:
   SVSObjectParameter(string _name, SVSObject* _val);
   string name;
-  SVSObject* val;
+  SVSObject* value;
 };
 
 class IntParameter: public Parameter {
 public:
   IntParameter(string _name, int _val);
   string name;
-  int val;
+  int value;
 };
 
 // etc. for Identifiers, strings, floats, and bools
