@@ -59,6 +59,7 @@
 
 #include "episodic_memory.h"
 #include "semantic_memory.h"
+#include "svs.h"
 
 #include "assert.h"
 
@@ -2194,7 +2195,13 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
 	symbol_remove_ref( thisAgent, goal->id.svs_ltm_command_header );
 	symbol_remove_ref( thisAgent, goal->id.svs_ltm_header );
   }
+
+  delete goal->id.svs_info->new_command_list;
+  delete goal->id.svs_info->modified_command_list;
+  delete goal->id.svs_info->removed_command_list;
+  delete goal->id.svs_info->command_map;
   symbol_remove_ref( thisAgent, goal->id.svs_header );
+  free_memory( thisAgent, goal->id.svs_info, MISCELLANEOUS_MEM_USAGE );
 
   /* REW: BUG
    * Tentative assertions can exist for removed goals.  However, it looks
@@ -2308,6 +2315,12 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.smem_info->cue_wmes = new std::set<wme *>();
   id->id.smem_info->smem_wmes = new std::stack<preference *>();
 
+
+  id->id.svs_info = static_cast<svs_data *>( allocate_memory( thisAgent, sizeof( svs_data ), MISCELLANEOUS_MEM_USAGE ) );  
+  id->id.svs_info->new_command_list = new std::list<svs_command_id>();
+  id->id.svs_info->modified_command_list = new std::list<svs_command_id>();
+  id->id.svs_info->removed_command_list = new std::list<svs_command_id>();
+  id->id.svs_info->command_map = new std::map< svs_command_id, Symbol* >();
 
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, 

@@ -891,6 +891,10 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   intptr_t smem_max_cycle;
 
 
+  // svs
+  svs_command_id svs_command_counter;
+
+
   // JRV: Added to support XML management inside Soar
   // These handles should not be used directly, see xml.h
   xml_handle xml_destination;		// The current destination for all XML generation, essentially either == to xml_trace or xml_commands

@@ -359,7 +359,9 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   sym->id.svs_ltm_command_header = NIL;
   sym->id.svs_spatial_scene_command_header = NIL;
   sym->id.svs_spatial_scene_contents_header = NIL;
-
+  sym->id.svs_id = SVS_NEW_COMMAND;
+  sym->id.svs_last_count = 0;
+  sym->id.svs_last_tt = 0;
 
   add_to_hash_table (thisAgent, thisAgent->identifier_hash_table, sym);
 #ifdef DEBUG_SYMBOL_REFCOUNTS

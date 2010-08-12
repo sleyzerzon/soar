@@ -388,6 +388,9 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->smem_validation = 0;
   newAgent->smem_first_switch = true;
 
+  // svs initialization
+  newAgent->svs_command_counter = 1;
+
   // statistics initialization
   newAgent->dc_stat_tracking = false;
   newAgent->stats_db = new soar_module::sqlite_database();

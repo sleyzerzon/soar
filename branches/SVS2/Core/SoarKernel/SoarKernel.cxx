@@ -26,6 +26,7 @@
 #include "src/semantic_memory.cpp"
 #include "src/soar_module.cpp"
 #include "src/soar_rand.cpp"
+#include "src/svs.cpp"
 #include "src/symtab.cpp"
 #include "src/tempmem.cpp"
 #include "src/trace.cpp"
