@@ -18,7 +18,10 @@ public:
   // Return "" if the id is invalid (does not refer to an LTM motion), or if
   // storeInLTM is true and the model is already tracking something.
   //
-  string startTracking(string motionLTId, bool storeInLTM, vector< Parameter > parameters);
+  // Time is likely the decision count, but could be an environmental time which may be
+  // nonuniform between steps.
+  string startTracking(string motionLTId, bool storeInLTM, 
+      ParameterSet parameters, double time);
   
   // The tracking, simulation, and control processes will take some parameters, 
   // which will typically include at least an
@@ -35,11 +38,15 @@ public:
   // step
   // - models aren't limited to tracking/simulating/controlling a single object
 
-  // Stop the tracking process. The id is the STM id
+  // updateTracking is called every decision by the watcher. Parameters may
+  // have changed!
+  bool updateTracking(string motionSTId, ParameterSet parameters, double time);
+  // Stop the tracking process, and throw out the STM model instantiation, if
+  // it is not a reference to an LTM model (ie, storeInLTM == false).
   void stopTracking(string motionSTId);
 
   // make a new simulation instantiation
-  string startSimulation(string motionId, vector< Parameter > parameters);
+  string startSimulation(string motionId, ParameterSet parameters);
 
   // simulation steps are deliberately controlled by the agent
   // (for tracking and control, agent only says start and stop, and MMM handles
@@ -47,17 +54,14 @@ public:
   // 
   // the simulation step will modify the spatial scene in arbitrary ways as a
   // side effect
-  bool stepSimulation(string simulation, vector< Parameter > parameters, double time);
+  bool stepSimulation(string simulation, ParameterSet parameters, double time);
   bool stopSimulation(string simulationId);
 
   // make a new control instantiation (controllerId must refer to a MM that is
-  // a controller)
-  string startControl(string controllerId, vector< Parameter > parameters);
+  // a controller). interface is similar to tracking and simulation
+  string startControl(string controllerId, ParameterSet parameters, double time);
+  bool updateControl(string controllerId, ParameterSet parameters, double time);
   bool stopControl(string controllerId);
-
-  // this must be called every step, the MMM will go through all active tracking and
-  // control processes to issue their updates
-  void updateTrackingAndControl(double time);
 
   // interface to SoarIO so the agent has a list of all motion models in STM
   // these are cleared when read

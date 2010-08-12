@@ -24,6 +24,15 @@ public:
     return parent;
   }
 
+  // any SVSObject may optionally have a name, which is an arbitrary string
+  // assigned to it. This is different from the id, which is a string that
+  // never makes it to WM. The name is used during imagery, the agent can
+  // specify a name for every object in the generate command, and the name of
+  // the resulting object will appear in the metainfo in
+  // spatial-scene.contents.object
+  string getName();
+  void setName(string nm);
+
   // These add and remove child nodes, including handling linking within the
   // Wm3 scene graph.
   bool addChild(SVSObject* child); // return false if this is primitive 
@@ -44,25 +53,48 @@ public:
   bool uninhibit(int level);
   int getInhibitionLevel();
 
-  // getChild(int) or getChildren() may be necessary
+  vector< SVSObject* > getChildren(); // needed to parse the tree
 
   // this will generate the appropriate grounded object if it
   // isn't current, or return it if it is
   //
   // this object owns the dynamically allocated polyhedron
+  // the pointer is guaranteed valid for the duration of the current decision,
+  // but may be obsolete after (even if the SVSObject is still present)
   GroundedObject* getGroundedObject(string interpretation);
 
   // Set the texture of this object to be that of the source.
   // Return false if either this or the other isn't primitive.
   bool setTexture(SVSObject* source);
+
+  // This causes the object to assume the intrinsic reference frame of another
+  // object. That is, the local transform is copied from the other object, and
+  // the shape coordinates or the local transforms of the children are
+  // manipulated such that the grounded locations of everything remain
+  // unchanged.
+  //
+  // This is useful for since predicate projection operations (e.g., a convex
+  // hull) have no meaningful way of determining why one reference frame should
+  // be used over another (what is the "front"?), so the agent can choose one
+  // instead (e.g., imagine the convex hull two objects, and give it the FOR of
+  // one)
+  void assumeReferenceFrameOf(SVSObject* other);
   
   // This clones the tree from this object to below, creating new SVSObjects
-  // that the caller has ownership of. Children are implicit in the tree, but
-  // also listed flatly to prevent reparsing.
+  // that the caller has ownership of. This actually returns a set of
+  // SVSObject*s, the tree must be parsed to get them all. Caller owns all of
+  // them.
   //
-  // pLTM retrievals use this:
+  // pLTM retrievals, for example, use this:
   // SVSObject* myNewSceneObject = SVSObject::clone(perceptualLTM->retrieve("something"));
-  static SVSObject* clone(SVSObject* source, vector<SVSObject*>& out_children);
+  static SVSObject* clone(SVSObject* source);
+
+  // interface to Wm3 bounding collision checker
+  // implementation (from SVS1):
+  // wm3Unit->UpdateGS();
+  // other->wm3Unit->UpdateGS();
+  // return wm3Unit->WorldBound->TestIntersection(other->WorldBound);
+  bool possiblyCollidesWith(SVSObject* other);
 
 private:
   SVSObject* parent;
@@ -75,6 +107,7 @@ private:
   SpatialPtr wm3Unit;
   string id;
   string classId;
+  string name;
   bool imagined;
   bool primitive;
   int inhibitedLevel;

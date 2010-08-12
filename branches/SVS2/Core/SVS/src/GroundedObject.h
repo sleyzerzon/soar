@@ -24,12 +24,6 @@ class GroundedObject {
     // scene graph below the given node, at the global location.
     virtual GroundedObject(SVSObject* shape) = 0;
 
-    // constructor taking a Spatial* and an SVSObject*: the poly will be the
-    // convex hull of the scene graph below the given node, ground at its
-    // location in the FOR of the frameSource
-//    virtual GroundedObject(SVSObject* shape, SVSObject* frameSource) = 0;
-//    DO WE NEED THIS?
-
     // constructor taking a (generic) GroundedObject
     virtual GroundedObject(GroundedObject*) = 0;
     // The last will be used, e.g., to get a centroid:
@@ -38,29 +32,54 @@ class GroundedObject {
     // in addition, each derived must have its own constructor taking, E.g., a
     // CGALPolygon2 for the 2d polygon object class
     
-    // Move the shape through space
-    // This is used to efficiently update grounded shapes (e.g., do not recalculate the
-    // convex hull of the Wm3 structure at every movement).
-    virtual void setGlobalTransformation(Transformation newTx) = 0;
 
-    // Get the grounded direction corresponding to the "front" of the object.
-    // The local FOR of the object has an origin at the centroid, and a front
-    // direction pointing to 0,1,0. 
+    // The GroundedObject must contain all info necessary to build an
+    // SVSObject. This means it must be able to determine the
+    // local coordinate frame of the object once it is placed in the scene
+    // graph. To simplify this, the origin of the local frame is always the
+    // centroid of the object (which is implicit in its grounded coordinates).
+    // The frontOffsetPoint summarizes the rest of the transform (rotation and
+    // scaling). 
     //
-    // This is implicit in the transform
-    //virtual CGALDirection getIntrinsicFront() = 0; May be unnecessary
+    // The frontOffsetPoint, when added to the centroid of the shape, produces
+    // the point that will be considered one unit in front of the centroid in
+    // its local coordinate frame in the scene graph (local coordinate 0,1,0).
+    //
+    // It can be any value other than the centroid. If it is unimportant, the
+    // value 0,1,0 allows the simplest computations.
+    //
+    // This point not only allows the GroundedObject to be converted back to an
+    // SVSObject, but also allows processes that access only GroundedObjects to
+    // know what the front of a given object is and manipulate that.
+    //
+    virtual CGALPoint getCentroid() = 0;
+    virtual CGALPoint getFrontOffsetPoint() = 0;
+    virtual void setFrontOffsetPoint(CGALPoint point) = 0;
+
 
     // Build a WM3 geometry object, where the coordinates are in the FOR where
     // 0,0,0 is the centroid and 0,1,0 points to the front.
     // Caller owns the new object.
     virtual Geometry* makeNewGeometry() = 0;
 
-    // Build a WM3 transformation, going from the global FOR to place the
+    // Get a WM3 transformation, going from the global FOR to place the
     // object at its grounded location.
     virtual Transformation getGlobalTransformation();
+    
+    // Move the shape through space
+    // This is used to efficiently update grounded shapes (e.g., do not recalculate the
+    // convex hull of the Wm3 structure at every movement).
+    // To apply this, apply the inverse of the global transformation to each
+    // point, then apply newTx to each.
+    virtual void setGlobalTransformation(Transformation newTx) = 0;
 
   private:
-    Transformation transform;
+    CGALPoint frontOffsetPoint;
+    
+    // again, the globalTransform is implicit in the centroid and the
+    // frontOffsetPoint, but it should probably be cached, since
+    // setGlobalTransformation() will probably be called often.
+    Transformation globalTransform;
 
 };
 

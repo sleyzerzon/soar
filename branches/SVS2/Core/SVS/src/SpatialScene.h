@@ -10,15 +10,23 @@
     // Add a new object to the tree bottom of the tree below parent.
     // The local transformation on the new object should become its global
     // transformation, addObject() will take care of deriving a new local.
-    bool addObject(string parent, SVSObject* object, vector< SVSObject* > substructure);
+    //
+    // The object passed in may have substructure, addObject() must parse it
+    // all so all subobjects are on the added list.
+    bool addObject(string parent, SVSObject* object);
     
-    // Add a new object to the middle of the tree, above the child given.
+    // Add a new object, possibly with substructure, to the middle of the tree, 
+    // above the child given.
     // Again, the local tx on the new object will become its global, this
     // function will take care of adjusting the local on it and on its new
     // child (so the new child stays stationary).
-    bool addObjectInterior(string child, SVSObject* object, vector< SVSObject* > substructure);
+    bool addObjectInterior(string child, SVSObject* object);
     
     bool removeObject(string rootName);
+
+    // This undoes an addObjectInterior, it reconnects the childToKeep to
+    // rootName->parent.
+    bool removeObjectInterior(string rootName, string childToKeep);
 
     // This is the interface for moving objects, either a new local or global
     // transformation can be provided. Additionally, if positionOnly=true, the
@@ -50,17 +58,19 @@
 
     // interface to re-evaluate queries. This is different from the
     // above getChangeNodes():
-    // -this is set recursively to the leaves, since changes above can impact the
-    // coordinates of things below
-    // -this is cleared delibrately, since all queries need to get all the changes
+    // -This is set recursive to the leaves, since changes above can impact the
+    // coordinates of things below. Changes reported to the contents link only
+    // need to cover the root object changed.
+    // -This is cleared delibrately, since all queries need to get all the changes
     // (ChangeObjects are cleared when read)
-    set< string > getChangedObjectsForQueries();
-    void clearChangedObjects();
-    // also used for error reporting: if a command references an object that
+    // This is also used for error reporting: if a command references an object that
     // is missing, that can be OK if it just changed (implying it was
     // removed this decision, which the agent hasn't had a chance to react to
     // yet)
-    bool isChangedObject(string object);
+    bool isObjectChangedThisDecision(string object);
+    // this is called at the end of every decision to clear the changed set
+    // accessed above
+    void nextDecision();
 
   private:
   };
