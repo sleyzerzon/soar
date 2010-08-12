@@ -254,6 +254,13 @@ typedef struct identifier_struct {
   struct smem_data_struct *smem_info;		// various SMem information
 
 
+  union symbol_union *svs_header;
+  union symbol_union *svs_ltm_header;
+  union symbol_union *svs_spatial_scene_header;
+  union symbol_union *svs_ltm_command_header;
+  union symbol_union *svs_spatial_scene_command_header;
+  union symbol_union *svs_spatial_scene_contents_header;
+
   /* REW: begin 09.15.96 */
   struct gds_struct *gds;    /* Pointer to a goal's dependency set */
   /* REW: begin 09.15.96 */

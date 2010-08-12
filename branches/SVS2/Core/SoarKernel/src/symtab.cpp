@@ -353,6 +353,13 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   sym->id.smem_time_id = EPMEM_MEMID_NONE;
   sym->id.smem_valid = NIL;
 
+  sym->id.svs_header = NIL;
+  sym->id.svs_ltm_header = NIL;
+  sym->id.svs_spatial_scene_header = NIL;
+  sym->id.svs_ltm_command_header = NIL;
+  sym->id.svs_spatial_scene_command_header = NIL;
+  sym->id.svs_spatial_scene_contents_header = NIL;
+
 
   add_to_hash_table (thisAgent, thisAgent->identifier_hash_table, sym);
 #ifdef DEBUG_SYMBOL_REFCOUNTS
@@ -752,6 +759,13 @@ void create_predefined_symbols (agent* thisAgent) {
   thisAgent->smem_sym_query = make_sym_constant( thisAgent, "query" );
   thisAgent->smem_sym_prohibit = make_sym_constant( thisAgent, "prohibit" );
   thisAgent->smem_sym_store = make_sym_constant( thisAgent, "store" );
+
+
+  thisAgent->svs_sym = make_sym_constant( thisAgent, "svs" );
+  thisAgent->svs_sym_ltm = make_sym_constant( thisAgent, "ltm" );
+  thisAgent->svs_sym_command = make_sym_constant( thisAgent, "command" );
+  thisAgent->svs_sym_spatial_scene = make_sym_constant( thisAgent, "spatial-scene" );
+  thisAgent->svs_sym_contents = make_sym_constant( thisAgent, "contents" );
 }
 
 void release_helper(agent* thisAgent, Symbol** sym) {
@@ -852,4 +866,10 @@ void release_predefined_symbols(agent* thisAgent) {
   release_helper( thisAgent, &( thisAgent->smem_sym_query ) );
   release_helper( thisAgent, &( thisAgent->smem_sym_prohibit ) );
   release_helper( thisAgent, &( thisAgent->smem_sym_store ) );
+
+  release_helper( thisAgent, &( thisAgent->svs_sym ) );
+  release_helper( thisAgent, &( thisAgent->svs_sym_ltm ) );
+  release_helper( thisAgent, &( thisAgent->svs_sym_command ) );
+  release_helper( thisAgent, &( thisAgent->svs_sym_spatial_scene ) );
+  release_helper( thisAgent, &( thisAgent->svs_sym_contents ) );
 }

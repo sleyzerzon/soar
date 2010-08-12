@@ -333,6 +333,12 @@ typedef struct agent_struct {
   Symbol			* smem_sym_prohibit;
   Symbol			* smem_sym_store;
 
+  Symbol            * svs_sym;
+  Symbol            * svs_sym_ltm;
+  Symbol            * svs_sym_command;
+  Symbol            * svs_sym_spatial_scene;
+  Symbol            * svs_sym_contents;
+
 
   /* ----------------------- Symbol table stuff -------------------------- */
 
