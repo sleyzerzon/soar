@@ -1,0 +1,7 @@
+VERSION 4
+/svs-common/svs-common.dm
+0	ROOT svs-common svs-common 1
+1	0	FOLDER all all 2
+2	0	FOLDER elaborations elaborations 3
+3	0	FOPERATOR README README.soar 22
+END

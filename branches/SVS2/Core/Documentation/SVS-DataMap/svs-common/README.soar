@@ -1,0 +1,5 @@
+# This project exists solely to hold the datamap outlining the SVS interface
+# In the DM, these abbreviations are used:
+# (A) indicates the WME is architectural (added by SVS)
+# (MV) indicates a multi-valued attribute
+# (O) indicates an optional attribute
