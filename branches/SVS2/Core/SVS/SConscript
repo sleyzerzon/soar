@@ -1,0 +1,18 @@
+#!/usr/bin/python
+# Project: Soar <http://soar.googlecode.com>
+# Author: Jonathan Voigt <voigtjr@gmail.com>
+#
+Import('env')
+clone = env.Clone()
+
+if env['SCU']:
+	svs = clone.StaticLibrary('svs', 'svs.cxx')
+else:
+	svs = clone.StaticLibrary('svs', Glob('src/*.cpp'))
+
+env.Install('$PREFIX/lib', svs)
+
+# Install resources
+Import('InstallDir')
+InstallDir(svs, '$PREFIX/include', '#SVS/src', '*.h')
+

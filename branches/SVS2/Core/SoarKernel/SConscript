@@ -6,7 +6,7 @@ Import('env')
 clone = env.Clone()
 
 clone.Append(CPPFLAGS = ['-fno-strict-aliasing'])
-clone.Prepend(CPPPATH = Split('src #ElementXML/src'))
+clone.Prepend(CPPPATH = Split('src #ElementXML/src #SVS/src'))
 
 sqlclone = clone.Clone()
 sqlclone.Append(CPPFLAGS = ['-w'])

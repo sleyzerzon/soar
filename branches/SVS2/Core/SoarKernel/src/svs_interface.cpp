@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include "svs.h"
+#include "svs_interface.h"
 
 inline bool _svs_detect_id_changes(Symbol* id, tc_number tc)
 {

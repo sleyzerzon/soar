@@ -1,6 +1,6 @@
 
-#ifndef SVS_H
-#define SVS_H
+#ifndef SVS_INTERFACE_H
+#define SVS_INTERFACE_H
 
 #include <list>
 #include <map>
@@ -19,4 +19,4 @@ typedef struct svs_data_struct
 	std::map< svs_command_id, wme* >* command_map;			// association between namespaced id and identifiers 
 } svs_data;
 
-#endif // SVS_H
+#endif // SVS_INTERFACE_H

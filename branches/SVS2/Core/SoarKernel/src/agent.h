@@ -135,6 +135,8 @@ typedef char * test;
 
 class stats_statement_container;
 
+class svs;
+
 typedef struct agent_struct {
   /* After v8.6.1, all conditional compilations were removed
    * from struct definitions, including the agent struct below
@@ -893,7 +895,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
   // svs
   svs_command_id svs_command_counter;
-
+  svs *svs_instance;
 
   // JRV: Added to support XML management inside Soar
   // These handles should not be used directly, see xml.h

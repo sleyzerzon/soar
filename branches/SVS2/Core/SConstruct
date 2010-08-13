@@ -369,6 +369,7 @@ if swig and not CheckSWIG(conf.env):
 #################
 # Build core modules
 subdirs= [ 
+	'SVS',
 	'SoarKernel',
 	'ConnectionSML',
 	'ElementXML',

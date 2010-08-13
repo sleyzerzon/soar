@@ -2268,7 +2268,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\svs.cpp"
+				RelativePath=".\src\svs_interface.cpp"
 				>
 				<FileConfiguration
 					Name="Debug SCU|Win32"
@@ -2304,7 +2304,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\svs.h"
+				RelativePath=".\src\svs_interface.h"
 				>
 			</File>
 			<File
