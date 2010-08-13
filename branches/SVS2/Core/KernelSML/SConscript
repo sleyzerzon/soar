@@ -5,10 +5,10 @@
 Import('env')
 clone = env.Clone()
 
-clone.Prepend(CPPPATH = Split('src #SoarKernel/src #CLI/src #ElementXML/src #ConnectionSML/src'))
+clone.Prepend(CPPPATH = Split('src #SoarKernel/src #CLI/src #ElementXML/src #ConnectionSML/src #SVS/src'))
 
 if not env['STATIC_LINKED']:
-	clone.Append(LIBS = Split('ElementXML CommandLineInterface ConnectionSML SoarKernel sqlite3'))
+	clone.Append(LIBS = Split('ElementXML CommandLineInterface ConnectionSML SoarKernel sqlite3 svs'))
 	clone.Append(LIBPATH = ['$PREFIX/lib'])
 
 if env['SCU']:
