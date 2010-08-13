@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="SVS"
+	ProjectGUID="{9EFB8699-6F2E-4A3E-93CC-11051C559C39}"
 	RootNamespace="SVS"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
@@ -631,6 +632,14 @@
 			Filter="cpp;c;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\src\svs.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\svs.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="SCU Files"

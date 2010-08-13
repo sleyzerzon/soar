@@ -765,6 +765,10 @@
 			ReferencedProjectIdentifier="{6B0AE9F9-575C-4230-875A-3996BF2AC1E6}"
 			RelativePathToProject=".\pcre\pcre9.vcproj"
 		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{9EFB8699-6F2E-4A3E-93CC-11051C559C39}"
+			RelativePathToProject=".\SVS\SVS9.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
