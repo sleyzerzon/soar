@@ -10,16 +10,17 @@ inline bool _svs_detect_id_changes(Symbol* id, tc_number tc)
 	std::stack< Symbol* > to_process;
 	slot* s;
 	wme* w;
+	Symbol* parent;
 	unsigned long my_counter = 0;
 
 	to_process.push(id);
 
 	while (!to_process.empty())
 	{
-		id = to_process.top();
+		parent = to_process.top();
 		to_process.pop();
 		
-		for (s=id->id.slots; s!=NIL; s=s->next)
+		for (s=parent->id.slots; s!=NIL; s=s->next)
 		{
 			for (w=s->wmes; w!=NIL; w=w->next)
 			{
