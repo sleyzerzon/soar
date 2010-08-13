@@ -83,6 +83,17 @@ class GroundedObject {
 
 };
 
+struct GroundedObjectSet {
+  GroundedObjectPolyhedron3d* poly3;
+  GroundedObjectPolygon2d* poly2;
+  GroundedObjectBoundingBox3* bbox3;
+  GroundedObjectBoundingBox2* bbox2;
+  GroundedObjectPoint3* point3;
+  GroundedObjectPoint2* point2;
+  int minimumGoalLevel;
+};
+
+
 // TODO: fill these all in
 // they should all cache internal state and update when transform() is called
 

@@ -60,9 +60,8 @@ public:
   //
   // this object owns the dynamically allocated polyhedron
   // the pointer is guaranteed valid for the duration of the current decision,
-  // or until getGroundedObject is called again on the same object from a
-  // different goalLevel
-  // but may be obsolete after (even if the SVSObject is still present)
+  //
+  // The goalLevel is necessary, see below for why.
   GroundedObject* getGroundedObject(string interpretation, int goalLevel);
 
   // GroundedObjects are goal-level specific, since lower subgoals may add
@@ -117,13 +116,24 @@ private:
   bool primitive;
   int inhibitedLevel;
 
-  GroundedObjectPolyhedron3d* poly3;
-  GroundedObjectPolygon2d* poly2;
-  GroundedObjectBoundingBox3* bbox3;
-  GroundedObjectBoundingBox2* bbox2;
-  GroundedObjectPoint3* point3;
-  GroundedObjectPoint2* point2;
-  
+  // GroundedObject pointers are stored (and owned) here. Since subgoals can add
+  // structure to the ends of the scene tree, the GroundedObjects can be
+  // different based on what goal level they are retrieved from.
+  //
+  // This map associates a goal level with a set of groundedObjects. The level
+  // is the lowest level (closest to the top) for which the objects are valid.
+  // The highest level for which they are valid is one less than the next highest 
+  // int in the map.
+  //
+  // When a new object is added, the scene graph must recursively, for every
+  // object above to the root, add a new (empty) set of groundedObjects
+  // associated with the level the object is added at, if there isn't already
+  // such a set. When an object is removed, the opposite happens (the sets are
+  // deleted).
+  map< int, GroundedObjectSet > groundedObjects;
+
+
+
   // this must be called whenever the object structurally changes
   // (a decendant is added or removed)
   void invalidateGroundedObjects(); 
