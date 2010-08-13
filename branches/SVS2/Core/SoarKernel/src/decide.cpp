@@ -2320,7 +2320,7 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.svs_info->new_command_list = new std::list<svs_command_id>();
   id->id.svs_info->modified_command_list = new std::list<svs_command_id>();
   id->id.svs_info->removed_command_list = new std::list<svs_command_id>();
-  id->id.svs_info->command_map = new std::map< svs_command_id, Symbol* >();
+  id->id.svs_info->command_map = new std::map< svs_command_id, wme* >();
 
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, 
