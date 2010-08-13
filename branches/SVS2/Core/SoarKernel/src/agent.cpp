@@ -51,6 +51,7 @@
 #include "wma.h"
 #include "episodic_memory.h"
 #include "semantic_memory.h"
+#include "svs.h"
 
 
 /* ================================================================== */
@@ -390,6 +391,7 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   // svs initialization
   newAgent->svs_command_counter = 1;
+  newAgent->svs_instance = new svs();
 
   // statistics initialization
   newAgent->dc_stat_tracking = false;
@@ -467,6 +469,8 @@ void destroy_soar_agent (agent * delete_agent)
   delete delete_agent->smem_timers;
 
   delete delete_agent->smem_db;
+
+  delete delete_agent->svs_instance;
 
   // cleanup statistics db
   stats_close( delete_agent );

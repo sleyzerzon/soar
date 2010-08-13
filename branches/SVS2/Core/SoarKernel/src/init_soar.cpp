@@ -52,6 +52,7 @@
 #include "episodic_memory.h"
 #include "semantic_memory.h"
 #include "svs_interface.h"
+#include "svs.h"
 
 #define INIT_FILE       "init.soar"
 
@@ -572,6 +573,8 @@ void do_one_top_level_phase (agent* thisAgent)
 		  BEFORE_INPUT_PHASE_CALLBACK,
 		  reinterpret_cast<soar_call_data>(INPUT_PHASE));
 
+	  thisAgent->svs_instance->post_env_callback();
+
       do_input_cycle(thisAgent);
 
 	  thisAgent->run_phase_count++ ;
@@ -892,6 +895,8 @@ void do_one_top_level_phase (agent* thisAgent)
 			 BEFORE_OUTPUT_PHASE_CALLBACK,
 			 reinterpret_cast<soar_call_data>(OUTPUT_PHASE) );
  
+	  thisAgent->svs_instance->pre_env_callback();
+
 	  /** KJC June 05:  moved output function timers into do_output_cycle ***/
 
 	  do_output_cycle(thisAgent);
