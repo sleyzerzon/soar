@@ -25,7 +25,7 @@ public:
 	virtual Vector3     get_scale() = 0;
 	virtual void        clear_transforms() = 0;
 	
-	virtual Poly3*      get_convex_hull() = 0;
+	virtual ConvexPoly3 get_convex_hull() = 0;
 	//virtual BBox3*      get_bbox() = 0;
 };
 

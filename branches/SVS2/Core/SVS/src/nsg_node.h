@@ -8,7 +8,37 @@
 
 class nsg_node : public sg_node {
 public:
-	nsg_node(std::string nm);
+	nsg_node(std::string nm) 
+	: name(nm),
+	  parent(NULL),
+	  tdirty(false),
+	  chdirty(false),
+	  isgroup(true),
+	  pos(CGAL::NULL_VECTOR),
+	  rot(CGAL::NULL_VECTOR),
+	  scale(CGAL::NULL_VECTOR),
+	  ltransform(CGAL::IDENTITY),
+	  wtransform(CGAL::IDENTITY),
+	  lhull(),
+	  whull()
+	{ }
+
+	template<class InputIter>
+	nsg_node(std::string nm, InputIter begin, InputIter end)
+	: name(nm),
+	  parent(NULL),
+	  tdirty(false),
+	  chdirty(false),
+	  isgroup(false),
+	  pos(CGAL::NULL_VECTOR),
+	  rot(CGAL::NULL_VECTOR),
+	  scale(CGAL::NULL_VECTOR),
+	  ltransform(CGAL::IDENTITY),
+	  wtransform(CGAL::IDENTITY)
+	{
+		CGAL::convex_hull_3(begin, end, lhull);
+		whull = lhull;
+	}
 	
 	std::string get_name();
 	void        set_name(std::string nm);
@@ -27,15 +57,14 @@ public:
 	Vector3     get_scale();
 	void        clear_transforms();
 	
-	Poly3*      get_convex_hull();
-	//BBox3*      get_bbox();
+	ConvexPoly3 get_convex_hull();
 
-protected:
-	void       set_transform_dirty();
-	void       set_convex_hull_dirty();
-	Transform3 get_world_transform();
-	
 private:
+	void       set_transform_dirty();
+	void       update_transform();
+	void       set_convex_hull_dirty();
+	void       update_convex_hull();
+	
 	std::string            name;
 	nsg_node*              parent;
 	std::vector<nsg_node*> childs;
@@ -44,14 +73,13 @@ private:
 	Vector3                rot;
 	Vector3                scale;
 	Transform3             wtransform;
-	Transform3             lpos;
-	Transform3             lrot;
-	Transform3             lscale;
+	Transform3             ltransform;
 	
 	bool                   tdirty;       // transforms dirty
 	bool                   chdirty;      // convex hull dirty
 	
-	ConvexPoly3*           convex_hull;
+	ConvexPoly3            whull;
+	ConvexPoly3            lhull;
 	//BBox3*               bbox
 	
 };

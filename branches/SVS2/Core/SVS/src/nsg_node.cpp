@@ -3,21 +3,9 @@
 #include "cgalsupport.h"
 #include "nsg_node.h"
 
-using std::vector;
-using std::list;
+using namespace std;
 
 typedef vector<nsg_node*>::iterator childiter;
-
-nsg_node::nsg_node(std::string nm) 
-	: name(nm),
-	  parent(NULL),
-	  tdirty(false),
-	  chdirty(false),
-	  pos(CGAL::NULL_VECTOR),
-	  rot(CGAL::NULL_VECTOR),
-	  scale(CGAL::NULL_VECTOR)
-{
-}
 
 std::string nsg_node::get_name() {
 	return name;
@@ -79,7 +67,6 @@ bool nsg_node::del_child(sg_node *c) {
 
 void nsg_node::nsg_node::set_pos(Vector3 &xyz) {
 	pos = xyz;
-	lpos = Transform3(CGAL::TRANSLATION, pos);
 	set_transform_dirty();
 }
 
@@ -89,7 +76,6 @@ Vector3 nsg_node::get_pos() {
 
 void nsg_node::set_rot(Vector3 &ypr) {
 	rot = ypr;
-	lrot = euler_ypr_transform(rot);
 	set_transform_dirty();
 }
 
@@ -99,7 +85,6 @@ Vector3 nsg_node::get_rot() {
 
 void nsg_node::set_scale(Vector3 &xyz) {
 	scale = xyz;
-	lscale = scaling_transform(scale);
 	set_transform_dirty();
 }
 
@@ -108,11 +93,6 @@ Vector3 nsg_node::get_scale() {
 }
 
 void nsg_node::clear_transforms() {
-	wtransform = Transform3();
-	lpos = wtransform;
-	lrot = wtransform;
-	lscale = wtransform;
-	
 	pos   = CGAL::NULL_VECTOR;
 	rot   = CGAL::NULL_VECTOR;
 	scale = CGAL::NULL_VECTOR;
@@ -120,42 +100,65 @@ void nsg_node::clear_transforms() {
 	set_transform_dirty();
 }
 
-Transform3 nsg_node::get_world_transform() {
-	if (tdirty) {
-		wtransform = lpos * lrot * lscale;
-		if (parent) {
-			wtransform = parent->get_world_transform() * wtransform;
-		}
-	}
-	return wtransform;
-}
-
-ConvexPoly3* nsg_node::get_convex_hull() {
-	list<ConvexPoly3*> cpolys;
-	
-	if (!isgroup) {
-		return convex_hull;
-	}
-	
-	if (chdirty) {
-		for (childiter ci = childs.begin(); ci != childs.end(); ++ci) {
-			cpolys.push_back((**ci).get_convex_hull());
-		}
-		delete convex_hull;
-		convex_hull = hull_of_hulls(cpolys.begin(), cpolys.end());
-	}
+ConvexPoly3 nsg_node::get_convex_hull() {
+	update_convex_hull();
+	return whull;
 }
 
 void nsg_node::set_transform_dirty() {
 	tdirty = true;
+	if (parent) {
+		parent->set_convex_hull_dirty();
+	}
 	for (childiter i = childs.begin(); i != childs.end(); ++i) {
 		(**i).set_transform_dirty();
 	}
 }
 
+void nsg_node::update_transform() {
+	if (!tdirty) {
+		return;
+	}
+	ltransform = Transform3(CGAL::TRANSLATION, pos) * euler_ypr_transform(rot) * scaling_transform(scale);
+	if (parent) {
+		parent->update_transform();
+		wtransform = parent->wtransform * ltransform;
+	} else {
+		wtransform = ltransform;
+	}
+}
+
 void nsg_node::set_convex_hull_dirty() {
+	if (!isgroup) {  // may change if we allow modifying primitive geometries
+		return;
+	}
 	chdirty = true;
 	if (parent) {
 		parent->set_convex_hull_dirty();
 	}
+}
+
+void nsg_node::update_convex_hull() {
+	list<Point3> pts;
+	back_insert_iterator<list<Point3> > pbi(pts);
+	ConvexPoly3::Point_iterator cpi;
+	
+	if (!isgroup || !chdirty) {
+		return;
+	}
+	
+	update_transform();
+	
+	for (childiter i = childs.begin(); i != childs.end(); ++i) {
+		(**i).update_convex_hull();
+		transform_set(ltransform, (**i).lhull.points_begin(), (**i).lhull.points_end(), pbi);
+	}
+	convex_hull_3(pts.begin(), pts.end(), lhull);
+	
+	whull = lhull;
+	for(cpi = whull.points_begin(); cpi != whull.points_end(); ++cpi) {
+		*cpi = cpi->transform(wtransform);
+	}
+	
+	chdirty = false;
 }
