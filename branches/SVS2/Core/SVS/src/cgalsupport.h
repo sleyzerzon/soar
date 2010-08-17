@@ -4,6 +4,10 @@
 /* typedefs and utility functions for using CGAL */
 
 #include <assert.h>
+#include <iostream>
+#include <list>
+#include <algorithm>
+
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/algorithm.h>
@@ -14,8 +18,6 @@
 #include <CGAL/Convex_hull_traits_3.h>
 #include <CGAL/convex_hull_3.h>
 #include <CGAL/Bbox_3.h>
-#include <list>
-#include <algorithm>
 
 //typedef CGAL::Exact_predicates_inexact_constructions_kernel CGALKernel;
 typedef CGAL::Simple_cartesian<double>                       CGALKernel;
@@ -28,10 +30,12 @@ typedef CGAL::Aff_transformation_3<CGALKernel>               Transform3;
 typedef CGAL::Convex_hull_traits_3<CGALKernel>::Polyhedron_3 ConvexPoly3;
 typedef ConvexPoly3::Vertex_iterator                         VertexIter;
 
-template<class InputIter, class OutputIter>
-void transform_set(Transform3 &t, InputIter begin, InputIter end, OutputIter out) {
-	for ( ; begin != end; ++begin) {
-		*out++ = begin->transform(t);
+inline void print_transform(Transform3 &t, std::ostream &os) {
+	for (int i = 0; i <= 2; i++) {
+		for (int j = 0; j <= 3; j++) {
+			os << t.m(i, j) << " ";
+		}
+		os << std::endl;
 	}
 }
 

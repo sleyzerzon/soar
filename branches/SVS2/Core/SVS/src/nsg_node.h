@@ -12,15 +12,13 @@ public:
 	: name(nm),
 	  parent(NULL),
 	  tdirty(false),
-	  chdirty(false),
+	  pdirty(false),
 	  isgroup(true),
 	  pos(CGAL::NULL_VECTOR),
 	  rot(CGAL::NULL_VECTOR),
-	  scale(CGAL::NULL_VECTOR),
+	  scale(1.0, 1.0, 1.0),
 	  ltransform(CGAL::IDENTITY),
-	  wtransform(CGAL::IDENTITY),
-	  lhull(),
-	  whull()
+	  wtransform(CGAL::IDENTITY)
 	{ }
 
 	template<class InputIter>
@@ -28,16 +26,15 @@ public:
 	: name(nm),
 	  parent(NULL),
 	  tdirty(false),
-	  chdirty(false),
+	  pdirty(false),
 	  isgroup(false),
 	  pos(CGAL::NULL_VECTOR),
 	  rot(CGAL::NULL_VECTOR),
-	  scale(CGAL::NULL_VECTOR),
+	  scale(1.0, 1.0, 1.0),
 	  ltransform(CGAL::IDENTITY),
 	  wtransform(CGAL::IDENTITY)
 	{
-		CGAL::convex_hull_3(begin, end, lhull);
-		whull = lhull;
+		copy(begin, end, back_inserter(pts));
 	}
 	
 	std::string get_name();
@@ -46,24 +43,25 @@ public:
 	sg_node*    get_parent();
 	int         get_nchilds();
 	sg_node*    get_child(int i);
-	bool        add_child(sg_node *c);
-	bool        del_child(sg_node *c);
+	bool        attach_child(sg_node *c);
+	bool        detach_child(sg_node *c);
 
-	void        set_pos(Vector3 &xyz);
+	void        set_pos(Vector3 xyz);
 	Vector3     get_pos();
-	void        set_rot(Vector3 &ypr);
+	void        set_rot(Vector3 ypr);
 	Vector3     get_rot();
-	void        set_scale(Vector3 &xyz);
+	void        set_scale(Vector3 xyz);
 	Vector3     get_scale();
 	void        clear_transforms();
 	
-	ConvexPoly3 get_convex_hull();
+	void        get_local_points(std::list<Point3> &result);
+	void        get_world_points(std::list<Point3> &result);
 
 private:
 	void       set_transform_dirty();
 	void       update_transform();
-	void       set_convex_hull_dirty();
-	void       update_convex_hull();
+	void       set_points_dirty();
+	void       update_points();
 	
 	std::string            name;
 	nsg_node*              parent;
@@ -76,12 +74,9 @@ private:
 	Transform3             ltransform;
 	
 	bool                   tdirty;       // transforms dirty
-	bool                   chdirty;      // convex hull dirty
+	bool                   pdirty;       // convex hull dirty
 	
-	ConvexPoly3            whull;
-	ConvexPoly3            lhull;
-	//BBox3*               bbox
-	
+	std::list<Point3>      pts;
 };
 
 #endif
