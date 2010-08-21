@@ -103,9 +103,7 @@ void nsg_node::clear_transforms() {
 }
 
 void nsg_node::get_local_points(list<Point3> &result) {
-	cout << pts.size() << endl;
 	update_points();
-	cout << pts.size() << endl;
 	copy(pts.begin(), pts.end(), back_inserter(result));
 }
 
@@ -137,9 +135,6 @@ void nsg_node::update_transform() {
 	} else {
 		wtransform = ltransform;
 	}
-	cout << "transform:" << endl;
-	print_transform(wtransform, cout);
-	cout << "transform done" << endl;
 }
 
 void nsg_node::set_points_dirty() {
