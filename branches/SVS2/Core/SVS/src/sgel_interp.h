@@ -9,14 +9,16 @@
 
 class sgel_interp {
 public:
-	sgel_interp(sg_node *w);
+	sgel_interp(sg_node *root);
 	
 	/* stops at first error and returns position, or -1 for success */
-	int parse(std::string s);
-
-	int parse_add(std::vector<std::string> &f);
+	int parse_line(std::string s);
 
 private:
+	int parse_attach(std::vector<std::string> &f);
+	int parse_detach(std::vector<std::string> &f);
+	int parse_change(std::vector<std::string> &f);
+
 	std::map<std::string, sg_node*> nodes;
 };
 

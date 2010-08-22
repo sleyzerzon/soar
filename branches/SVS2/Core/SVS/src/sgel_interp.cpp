@@ -7,6 +7,22 @@
 using namespace std;
 typedef map<string, sg_node*>::iterator node_iter;
 
+void split(string s, vector<string> &fields) {
+	int start, end = 0;
+	fields.clear();
+	while (end < s.size()) {
+		start = s.find_first_not_of(" \t", end);
+		if (start == string::npos) {
+			return;
+		}
+		end = s.find_first_of(" \t", start);
+		if (end == string::npos) {
+			end = s.size();
+		}
+		fields.push_back(s.substr(start, end - start));
+	}
+}
+
 bool parse_n_floats(vector<string> &f, int &start, int n, double *x) {
 	const char *cs;
 	char *e;
@@ -71,11 +87,33 @@ bool parse_transforms(vector<string> &f, int &start, sg_node *n) {
 	return true;
 }
 
-sgel_interp::sgel_interp(sg_node *world) {
-	nodes["world"] = world;
+sgel_interp::sgel_interp(sg_node *root) {
+	nodes[root->get_name()] = root;
 }
 
-int sgel_interp::parse_add(vector<string> &f) {
+int sgel_interp::parse_line(string s) {
+	vector<string> f;
+	char cmd;
+	
+	split(s, f);
+	if (f.size() == 0) {
+		return -1;
+	}
+	if (f[0].size() != 1) {
+		return 0;
+	}
+	cmd = f[0][0];
+	f.erase(f.begin());
+	
+	switch(cmd) {
+		case 'a':
+			return parse_attach(f);
+		default:
+			return 0;
+	}
+}
+
+int sgel_interp::parse_attach(vector<string> &f) {
 	sg_node *n, *par;
 	node_iter i;
 	string name;
@@ -85,13 +123,16 @@ int sgel_interp::parse_add(vector<string> &f) {
 	if (f.size() < 2) {
 		return f.size();
 	}
-	name = f[0];
+	i = nodes.find(f[0]);
+	if (i != nodes.end()) {
+		return 0;
+	}
 	i = nodes.find(f[1]);
 	if (i == nodes.end()) {
 		return 1;
-	} else {
-		par = i->second;
 	}
+	name = f[0];
+	par = i->second;
 	
 	pos = 2;
 	if (!parse_verts(f, pos, verts)) {
@@ -107,6 +148,44 @@ int sgel_interp::parse_add(vector<string> &f) {
 		return pos;
 	}
 	par->attach_child(n);
+	nodes[name] = n;
+	return -1;
+}
+
+int sgel_interp::parse_detach(vector<string> &f) {
+	node_iter i;
+	sg_node* p;
+	if (f.size() != 1) {
+		return 0;
+	}
+	i = nodes.find(f[0]);
+	if (i == nodes.end()) {
+		return 0;
+	}
+	p = i->second->get_parent();
+	if (!p) {
+		return 0;
+	}
+	p->detach_child(i->second);
+	return -1;
+}
+
+int sgel_interp::parse_change(vector<string> &f) {
+	node_iter i;
+	list<Point3> verts;
+	int pos;
+
+	if (f.size() < 1) {
+		return f.size();
+	}
+	i = nodes.find(f[0]);
+	if (i == nodes.end()) {
+		return 0;
+	}
+	pos = 1;
+	if (!parse_transforms(f, pos, i->second)) {
+		return pos;
+	}
 	return -1;
 }
 

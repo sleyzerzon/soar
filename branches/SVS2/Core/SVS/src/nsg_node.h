@@ -39,6 +39,7 @@ public:
 	
 	std::string get_name();
 	void        set_name(std::string nm);
+	bool        is_group();
 
 	sg_node*    get_parent();
 	int         get_nchilds();

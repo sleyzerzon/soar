@@ -17,6 +17,10 @@ void nsg_node::set_name(std::string nm) {
 	name = nm;
 }
 
+bool nsg_node::is_group() {
+	return isgroup;
+}
+
 sg_node* nsg_node::get_parent() {
 	return parent;
 }
@@ -104,12 +108,14 @@ void nsg_node::clear_transforms() {
 
 void nsg_node::get_local_points(list<Point3> &result) {
 	update_points();
+	result.clear();
 	copy(pts.begin(), pts.end(), back_inserter(result));
 }
 
 void nsg_node::get_world_points(list<Point3> &result) {
 	update_points();
 	update_transform();
+	result.clear();
 	transform(pts.begin(), pts.end(), back_inserter(result), wtransform);
 }
 

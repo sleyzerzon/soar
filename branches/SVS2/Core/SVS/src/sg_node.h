@@ -10,6 +10,7 @@ class sg_node {
 public:
 	virtual void        set_name(std::string nm) = 0;
 	virtual std::string get_name() = 0;
+	virtual bool        is_group() = 0;
 
 	virtual sg_node*    get_parent() = 0;
 	virtual int         get_nchilds() = 0;
@@ -27,7 +28,6 @@ public:
 	
 	virtual void        get_local_points(std::list<Point3> &result) = 0;
 	virtual void        get_world_points(std::list<Point3> &result) = 0;
-	//virtual BBox3      get_bbox() = 0;
 };
 
 #endif

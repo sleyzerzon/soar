@@ -19,8 +19,8 @@
 #include <CGAL/convex_hull_3.h>
 #include <CGAL/Bbox_3.h>
 
-//typedef CGAL::Exact_predicates_inexact_constructions_kernel CGALKernel;
-typedef CGAL::Simple_cartesian<double>                       CGALKernel;
+typedef CGAL::Exact_predicates_inexact_constructions_kernel CGALKernel;
+//typedef CGAL::Simple_cartesian<double>                       CGALKernel;
 typedef CGALKernel::Point_3                                  Point3;
 typedef CGAL::Vector_3<CGALKernel>                           Vector3;
 typedef CGAL::Bbox_3                                         Bbox3;
@@ -48,13 +48,13 @@ inline Transform3 euler_ypr_transform(Vector3 &ypr) {
 	
 	Transform3 rp( cos(p),     0.0,  sin(p),
 	                  0.0,     1.0,     0.0,
-	              -sin(y),     0.0,  cos(p));
+	              -sin(p),     0.0,  cos(p));
 	
 	Transform3 rr(    1.0,     0.0,     0.0,
 	                  0.0,  cos(r), -sin(r),
 	                  0.0,  sin(r),  cos(r));
 	
-	return ry * rp * rr;
+	return rr * rp * ry;
 }
 
 inline Transform3 scaling_transform(Vector3 &s) {
