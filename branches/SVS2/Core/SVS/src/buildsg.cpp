@@ -4,10 +4,11 @@
 
 #include <iostream>
 #include <iomanip>
+#include <iterator>
 #include <list>
-#include "cgalsupport.h"
 #include "nsg_node.h"
 #include "sgel_interp.h"
+#include "linalg.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ void print_structure(sg_node *root) {
 
 void print_points(sg_node *root) {
 	sg_node *c;
-	list<Point3> pts;
+	list<vec3> pts;
 
 	//cout << setiosflags(ios::fixed) << setprecision(3);
 	for (int i = 0; i < root->get_nchilds(); ++i) {
@@ -36,7 +37,7 @@ void print_points(sg_node *root) {
 		} else {
 			c->get_world_points(pts);
 			cout << c->get_name() << endl;
-			copy(pts.begin(), pts.end(), ostream_iterator<Point3>(cout, "\n"));
+			copy(pts.begin(), pts.end(), ostream_iterator<vec3>(cout, "\n"));
 		}
 	}
 }

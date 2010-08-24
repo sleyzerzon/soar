@@ -1,13 +1,12 @@
 #include <list>
 #include <vector>
 #include <algorithm>
-#include "cgalsupport.h"
 #include "nsg_node.h"
 
 using namespace std;
 
 typedef vector<nsg_node*>::iterator childiter;
-typedef list<Point3>::iterator ptsiter;
+typedef list<vec3>::iterator ptsiter;
 
 std::string nsg_node::get_name() {
 	return name;
@@ -66,40 +65,40 @@ void nsg_node::detach() {
 	send_update(sg_node::DETACH);
 }
 
-void nsg_node::nsg_node::set_pos(Vector3 xyz) {
+void nsg_node::nsg_node::set_pos(vec3 xyz) {
 	pos = xyz;
 	set_transform_dirty();
 }
 
-Vector3 nsg_node::get_pos() {
+vec3 nsg_node::get_pos() {
 	return pos;
 }
 
-void nsg_node::set_rot(Vector3 ypr) {
+void nsg_node::set_rot(vec3 ypr) {
 	rot = ypr;
 	set_transform_dirty();
 }
 
-Vector3 nsg_node::get_rot() {
+vec3 nsg_node::get_rot() {
 	return rot;
 }
 
-void nsg_node::set_scale(Vector3 xyz) {
+void nsg_node::set_scale(vec3 xyz) {
 	scale = xyz;
 	set_transform_dirty();
 }
 
-Vector3 nsg_node::get_scale() {
+vec3 nsg_node::get_scale() {
 	return scale;
 }
 
-void nsg_node::get_local_points(list<Point3> &result) {
+void nsg_node::get_local_points(list<vec3> &result) {
 	update_points();
 	result.clear();
 	copy(pts.begin(), pts.end(), back_inserter(result));
 }
 
-void nsg_node::get_world_points(list<Point3> &result) {
+void nsg_node::get_world_points(list<vec3> &result) {
 	update_points();
 	update_transform();
 	result.clear();
@@ -133,7 +132,9 @@ void nsg_node::update_transform() {
 		return;
 	}
 	
-	ltransform = Transform3(CGAL::TRANSLATION, pos) * euler_ypr_transform(rot) * scaling_transform(scale);
+	ltransform = transform3(transform_tags::TRANSLATION, pos) * 
+	             transform3(transform_tags::ROTATION, rot) * 
+	             transform3(transform_tags::SCALING, scale);
 	if (parent) {
 		parent->update_transform();
 		wtransform = parent->wtransform * ltransform;
@@ -154,7 +155,7 @@ void nsg_node::set_points_dirty() {
 }
 
 void nsg_node::update_points() {
-	back_insert_iterator<list<Point3> > pbi(pts);
+	back_insert_iterator<list<vec3> > pbi(pts);
 	
 	if (!isgroup || !pdirty) {
 		return;

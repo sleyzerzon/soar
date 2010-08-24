@@ -1,5 +1,6 @@
 #include "sgel_interp.h"
 #include "nsg_node.h"
+#include <stdlib.h>
 #include <map>
 #include <list>
 #include <vector>
@@ -40,7 +41,7 @@ bool parse_n_floats(vector<string> &f, int &start, int n, double *x) {
 	return true;
 }
 
-bool parse_verts(vector<string> &f, int &start, list<Point3> &verts) {
+bool parse_verts(vector<string> &f, int &start, list<vec3> &verts) {
 	double x[3];
 	verts.clear();
 	int i;
@@ -53,13 +54,12 @@ bool parse_verts(vector<string> &f, int &start, list<Point3> &verts) {
 		if (!parse_n_floats(f, start, 3, x)) {
 			return (i == start);  // end of list
 		}
-		verts.push_back(Point3(x[0], x[1], x[2]));
+		verts.push_back(vec3(x[0], x[1], x[2]));
 	}
 	return true;
 }
 
 bool parse_transforms(vector<string> &f, int &start, sg_node *n) {
-	Vector3 v;
 	double x[3];
 	char type;
 	while (start < f.size()) {
@@ -71,16 +71,15 @@ bool parse_transforms(vector<string> &f, int &start, sg_node *n) {
 		if (!parse_n_floats(f, start, 3, x)) {
 			return false;
 		}
-		v = Vector3(x[0], x[1], x[2]);
 		switch (type) {
 			case 'p':
-				n->set_pos(v);
+				n->set_pos(vec3(x[0], x[1], x[2]));
 				break;
 			case 'r':
-				n->set_rot(v);
+				n->set_rot(vec3(x[0], x[1], x[2]));
 				break;
 			case 's':
-				n->set_scale(v);
+				n->set_scale(vec3(x[0], x[1], x[2]));
 				break;
 		}
 	}
@@ -117,7 +116,7 @@ int sgel_interp::parse_attach(vector<string> &f) {
 	sg_node *n, *par;
 	node_iter i;
 	string name;
-	list<Point3> verts;
+	list<vec3> verts;
 	int pos;
 
 	if (f.size() < 2) {
@@ -168,7 +167,7 @@ int sgel_interp::parse_detach(vector<string> &f) {
 
 int sgel_interp::parse_change(vector<string> &f) {
 	node_iter i;
-	list<Point3> verts;
+	list<vec3> verts;
 	int pos;
 
 	if (f.size() < 1) {

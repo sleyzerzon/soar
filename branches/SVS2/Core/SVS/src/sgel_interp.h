@@ -5,6 +5,7 @@
 
 #include <istream>
 #include <map>
+#include <vector>
 #include "sg_node.h"
 
 class sgel_interp {

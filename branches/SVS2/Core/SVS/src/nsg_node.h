@@ -3,22 +3,21 @@
 
 /* native scene graph implementation */
 
-#include <vector>
 #include "sg_node.h"
+#include "linalg.h"
+#include <vector>
 
 class nsg_node : public sg_node {
 public:
 	nsg_node(std::string nm) 
 	: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(true),
-	  pos(CGAL::NULL_VECTOR), rot(CGAL::NULL_VECTOR), scale(1.0, 1.0, 1.0),
-	  ltransform(CGAL::IDENTITY), wtransform(CGAL::IDENTITY)
-	{ }
+	pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
+	{}
 
 	template<class InputIter>
 	nsg_node(std::string nm, InputIter begin, InputIter end)
 	: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(false),
-	  pos(CGAL::NULL_VECTOR), rot(CGAL::NULL_VECTOR), scale(1.0, 1.0, 1.0),
-	  ltransform(CGAL::IDENTITY), wtransform(CGAL::IDENTITY)
+	pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
 	{
 		copy(begin, end, back_inserter(pts));
 	}
@@ -33,15 +32,15 @@ public:
 	bool        attach_child(sg_node *c);
 	void        detach();
 
-	void        set_pos(Vector3 xyz);
-	Vector3     get_pos();
-	void        set_rot(Vector3 ypr);
-	Vector3     get_rot();
-	void        set_scale(Vector3 xyz);
-	Vector3     get_scale();
+	void        set_pos(vec3 xyz);
+	vec3        get_pos();
+	void        set_rot(vec3 ypr);
+	vec3        get_rot();
+	void        set_scale(vec3 xyz);
+	vec3        get_scale();
 	
-	void        get_local_points(std::list<Point3> &result);
-	void        get_world_points(std::list<Point3> &result);
+	void        get_local_points(std::list<vec3> &result);
+	void        get_world_points(std::list<vec3> &result);
 	
 	void        observe(sg_observer *o);
 	void        unobserve(sg_observer *o);
@@ -56,14 +55,14 @@ private:
 	
 	std::string             name;
 	nsg_node*               parent;
-	std::list<Point3>       pts;
+	std::list<vec3>         pts;
 	std::vector<nsg_node*>  childs;
 	bool                    isgroup;
-	Vector3                 pos;
-	Vector3                 rot;
-	Vector3                 scale;
-	Transform3              wtransform;
-	Transform3              ltransform;
+	vec3                    pos;
+	vec3                    rot;
+	vec3                    scale;
+	transform3              wtransform;
+	transform3              ltransform;
 	
 	bool                    tdirty;       // transforms dirty
 	bool                    pdirty;       // convex hull dirty

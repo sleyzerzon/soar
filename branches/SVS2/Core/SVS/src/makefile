@@ -1,30 +1,24 @@
 #CXXFLAGS+=-g
-LIBS=-lCGAL -lboost_thread-mt
+LIBS=
 
-srcs=nsg_node.cpp sgel_interp.cpp
+srcs=nsg_node.cpp sgel_interp.cpp linalg.cpp
 objs=$(srcs:.cpp=.o)
-headers=sg_node.h nsg_node.h cgalsupport.h sgel_interp.h
-#pcheaders=sg_node.h.gch nsg_node.h.gch cgalsupport.h.gch sgel_interp.h.gch
-pcheaders=$(headers:.h=.h.gch)
+headers=sg_node.h nsg_node.h sgel_interp.h linalg.h
 
 .SUFFIXES: # delete default suffix rules
-.PRECIOUS: $(pcheaders)
 
 all: buildsg
 
 buildsg: buildsg.cpp $(objs)
 	$(CXX) -o $@ $^ $(LIBS)
-
-%.o: %.cpp $(pcheaders)
+	
+%.o: %.cpp $(headers)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
-
-%.h.gch: %.h
-	$(CXX) $<
 
 .PHONY: clean tests
 
 clean:
-	$(RM) *.o *.gch $(tests)
+	$(RM) *.o *.gch $(tests) buildsg
 
 tests:
 	cd tests && ./test_sgel

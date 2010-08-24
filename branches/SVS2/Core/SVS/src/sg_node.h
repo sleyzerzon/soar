@@ -4,7 +4,8 @@
 /* Implementation neutral scene graph interface */
 
 #include <string>
-#include "cgalsupport.h"
+#include <list>
+#include "linalg.h"
 
 class sg_observer;
 
@@ -26,15 +27,15 @@ public:
 	virtual bool        attach_child(sg_node *c) = 0;
 	virtual void        detach() = 0;
 
-	virtual void        set_pos(Vector3 xyz) = 0;
-	virtual Vector3     get_pos() = 0;
-	virtual void        set_rot(Vector3 ypr) = 0;   // yaw-pitch-roll
-	virtual Vector3     get_rot() = 0;
-	virtual void        set_scale(Vector3 xyz) = 0;
-	virtual Vector3     get_scale() = 0;
+	virtual void        set_pos(vec3 xyz) = 0;
+	virtual vec3        get_pos() = 0;
+	virtual void        set_rot(vec3 ypr) = 0;   // yaw-pitch-roll
+	virtual vec3        get_rot() = 0;
+	virtual void        set_scale(vec3 xyz) = 0;
+	virtual vec3        get_scale() = 0;
 	
-	virtual void        get_local_points(std::list<Point3> &result) = 0;
-	virtual void        get_world_points(std::list<Point3> &result) = 0;
+	virtual void        get_local_points(std::list<vec3> &result) = 0;
+	virtual void        get_world_points(std::list<vec3> &result) = 0;
 	
 	virtual void        observe(sg_observer *o) = 0;
 	virtual void        unobserve(sg_observer *o) = 0;
