@@ -162,11 +162,7 @@ int sgel_interp::parse_detach(vector<string> &f) {
 	if (i == nodes.end()) {
 		return 0;
 	}
-	p = i->second->get_parent();
-	if (!p) {
-		return 0;
-	}
-	p->detach_child(i->second);
+	i->second->detach();
 	return -1;
 }
 

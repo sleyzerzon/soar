@@ -52,23 +52,18 @@ bool nsg_node::attach_child(sg_node *c) {
 	t->parent = this;
 	t->set_transform_dirty();
 	set_points_dirty();
+	
+	send_update(sg_node::ADDCHILD);
+	
 	return true;
 }
 
-bool nsg_node::detach_child(sg_node *c) {
-	nsg_node *t = dynamic_cast<nsg_node*>(c);
-	if (!t) { return false; }
-	
-	for (childiter i = childs.begin(); i != childs.end(); ++i) {
-		if (t == *i) {
-			childs.erase(i);
-			t->parent = NULL;
-			t->set_transform_dirty();
-			set_points_dirty();
-			return true;
-		}
+void nsg_node::detach() {
+	if (parent) {
+		parent->detach_child(this);
+		parent = NULL;
 	}
-	return false;
+	send_update(sg_node::DETACH);
 }
 
 void nsg_node::nsg_node::set_pos(Vector3 xyz) {
@@ -98,14 +93,6 @@ Vector3 nsg_node::get_scale() {
 	return scale;
 }
 
-void nsg_node::clear_transforms() {
-	pos   = CGAL::NULL_VECTOR;
-	rot   = CGAL::NULL_VECTOR;
-	scale = CGAL::NULL_VECTOR;
-	
-	set_transform_dirty();
-}
-
 void nsg_node::get_local_points(list<Point3> &result) {
 	update_points();
 	result.clear();
@@ -119,6 +106,17 @@ void nsg_node::get_world_points(list<Point3> &result) {
 	transform(pts.begin(), pts.end(), back_inserter(result), wtransform);
 }
 
+void nsg_node::detach_child(nsg_node *c) {
+	childiter i;
+	for (i = childs.begin(); i != childs.end(); ++i) {
+		if (*i == c) {
+			childs.erase(i);
+			set_points_dirty();
+			return;
+		}
+	}
+}
+
 void nsg_node::set_transform_dirty() {
 	tdirty = true;
 	if (parent) {
@@ -127,6 +125,7 @@ void nsg_node::set_transform_dirty() {
 	for (childiter i = childs.begin(); i != childs.end(); ++i) {
 		(**i).set_transform_dirty();
 	}
+	send_update(sg_node::PTSCHANGE);
 }
 
 void nsg_node::update_transform() {
@@ -151,6 +150,7 @@ void nsg_node::set_points_dirty() {
 	if (parent) {
 		parent->set_points_dirty();
 	}
+	send_update(sg_node::PTSCHANGE);
 }
 
 void nsg_node::update_points() {
@@ -168,4 +168,23 @@ void nsg_node::update_points() {
 	}
 	
 	pdirty = false;
+}
+
+/* if updates result in observers removing themselves, the iteration may
+ * screw up, so make a copy of the list first */
+void nsg_node::send_update(sg_node::change_type t) {
+	list<sg_observer*>::iterator i;
+	list<sg_observer*> c;
+	copy(observers.begin(), observers.end(), back_inserter(c));
+	for (i = c.begin(); i != c.end(); ++i) {
+		(**i).update(this, t);
+	}
+}
+
+void nsg_node::observe(sg_observer *o) {
+	observers.push_back(o);
+}
+
+void nsg_node::unobserve(sg_observer *o) {
+	observers.remove(o);
 }

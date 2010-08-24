@@ -9,30 +9,16 @@
 class nsg_node : public sg_node {
 public:
 	nsg_node(std::string nm) 
-	: name(nm),
-	  parent(NULL),
-	  tdirty(false),
-	  pdirty(false),
-	  isgroup(true),
-	  pos(CGAL::NULL_VECTOR),
-	  rot(CGAL::NULL_VECTOR),
-	  scale(1.0, 1.0, 1.0),
-	  ltransform(CGAL::IDENTITY),
-	  wtransform(CGAL::IDENTITY)
+	: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(true),
+	  pos(CGAL::NULL_VECTOR), rot(CGAL::NULL_VECTOR), scale(1.0, 1.0, 1.0),
+	  ltransform(CGAL::IDENTITY), wtransform(CGAL::IDENTITY)
 	{ }
 
 	template<class InputIter>
 	nsg_node(std::string nm, InputIter begin, InputIter end)
-	: name(nm),
-	  parent(NULL),
-	  tdirty(false),
-	  pdirty(false),
-	  isgroup(false),
-	  pos(CGAL::NULL_VECTOR),
-	  rot(CGAL::NULL_VECTOR),
-	  scale(1.0, 1.0, 1.0),
-	  ltransform(CGAL::IDENTITY),
-	  wtransform(CGAL::IDENTITY)
+	: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(false),
+	  pos(CGAL::NULL_VECTOR), rot(CGAL::NULL_VECTOR), scale(1.0, 1.0, 1.0),
+	  ltransform(CGAL::IDENTITY), wtransform(CGAL::IDENTITY)
 	{
 		copy(begin, end, back_inserter(pts));
 	}
@@ -45,7 +31,7 @@ public:
 	int         get_nchilds();
 	sg_node*    get_child(int i);
 	bool        attach_child(sg_node *c);
-	bool        detach_child(sg_node *c);
+	void        detach();
 
 	void        set_pos(Vector3 xyz);
 	Vector3     get_pos();
@@ -53,31 +39,36 @@ public:
 	Vector3     get_rot();
 	void        set_scale(Vector3 xyz);
 	Vector3     get_scale();
-	void        clear_transforms();
 	
 	void        get_local_points(std::list<Point3> &result);
 	void        get_world_points(std::list<Point3> &result);
-
+	
+	void        observe(sg_observer *o);
+	void        unobserve(sg_observer *o);
+	
 private:
-	void       set_transform_dirty();
-	void       update_transform();
-	void       set_points_dirty();
-	void       update_points();
+	void detach_child(nsg_node *c);
+	void set_transform_dirty();
+	void update_transform();
+	void set_points_dirty();
+	void update_points();
+	void send_update(sg_node::change_type t);
 	
-	std::string            name;
-	nsg_node*              parent;
-	std::vector<nsg_node*> childs;
-	bool                   isgroup;
-	Vector3                pos;
-	Vector3                rot;
-	Vector3                scale;
-	Transform3             wtransform;
-	Transform3             ltransform;
+	std::string             name;
+	nsg_node*               parent;
+	std::list<Point3>       pts;
+	std::vector<nsg_node*>  childs;
+	bool                    isgroup;
+	Vector3                 pos;
+	Vector3                 rot;
+	Vector3                 scale;
+	Transform3              wtransform;
+	Transform3              ltransform;
 	
-	bool                   tdirty;       // transforms dirty
-	bool                   pdirty;       // convex hull dirty
+	bool                    tdirty;       // transforms dirty
+	bool                    pdirty;       // convex hull dirty
 	
-	std::list<Point3>      pts;
+	std::list<sg_observer*> observers;
 };
 
 #endif

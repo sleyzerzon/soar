@@ -4,6 +4,7 @@
 #
 Import('env')
 clone = env.Clone()
+clone.Prepend(CPPPATH = Split('src #SoarKernel/src'))
 
 if env['SCU']:
 	svs = clone.StaticLibrary('svs', 'svs.cxx')
