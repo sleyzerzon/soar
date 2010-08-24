@@ -43,7 +43,7 @@ public:
 
 class sg_observer {
 public:
-	virtual void update(sg_node *n, sg_node::change_type t);
+	virtual void update(sg_node *n, sg_node::change_type t) = 0;
 };
 
 #endif

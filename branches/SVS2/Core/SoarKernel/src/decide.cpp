@@ -2190,7 +2190,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   symbol_remove_ref( thisAgent, goal->id.svs_spatial_scene_command_header );
   symbol_remove_ref( thisAgent, goal->id.svs_spatial_scene_contents_header );
   symbol_remove_ref( thisAgent, goal->id.svs_spatial_scene_header );
-  if (goal==thisAgent->top_goal)
+  if (goal->id.svs_ltm_header)
   {
 	symbol_remove_ref( thisAgent, goal->id.svs_ltm_command_header );
 	symbol_remove_ref( thisAgent, goal->id.svs_ltm_header );

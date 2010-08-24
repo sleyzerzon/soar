@@ -391,7 +391,7 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   // svs initialization
   newAgent->svs_command_counter = 1;
-  newAgent->svs_instance = new svs();
+  newAgent->svs_instance = new svs(newAgent);
 
   // statistics initialization
   newAgent->dc_stat_tracking = false;

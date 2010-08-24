@@ -6,13 +6,12 @@
 using namespace std;
 
 typedef vector<nsg_node*>::iterator childiter;
-typedef list<vec3>::iterator ptsiter;
 
 std::string nsg_node::get_name() {
 	return name;
 }
 
-void nsg_node::set_name(std::string nm) {
+void nsg_node::set_name(string nm) {
 	name = nm;
 }
 
@@ -92,13 +91,13 @@ vec3 nsg_node::get_scale() {
 	return scale;
 }
 
-void nsg_node::get_local_points(list<vec3> &result) {
+void nsg_node::get_local_points(std::list<vec3> &result) {
 	update_points();
 	result.clear();
 	copy(pts.begin(), pts.end(), back_inserter(result));
 }
 
-void nsg_node::get_world_points(list<vec3> &result) {
+void nsg_node::get_world_points(std::list<vec3> &result) {
 	update_points();
 	update_transform();
 	result.clear();
@@ -155,7 +154,7 @@ void nsg_node::set_points_dirty() {
 }
 
 void nsg_node::update_points() {
-	back_insert_iterator<list<vec3> > pbi(pts);
+	back_insert_iterator<std::list<vec3> > pbi(pts);
 	
 	if (!isgroup || !pdirty) {
 		return;
@@ -172,10 +171,10 @@ void nsg_node::update_points() {
 }
 
 /* if updates result in observers removing themselves, the iteration may
- * screw up, so make a copy of the list first */
+ * screw up, so make a copy of the std::list first */
 void nsg_node::send_update(sg_node::change_type t) {
-	list<sg_observer*>::iterator i;
-	list<sg_observer*> c;
+	std::list<sg_observer*>::iterator i;
+	std::list<sg_observer*> c;
 	copy(observers.begin(), observers.end(), back_inserter(c));
 	for (i = c.begin(); i != c.end(); ++i) {
 		(**i).update(this, t);

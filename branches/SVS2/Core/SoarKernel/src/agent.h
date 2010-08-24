@@ -340,6 +340,7 @@ typedef struct agent_struct {
   Symbol            * svs_sym_command;
   Symbol            * svs_sym_spatial_scene;
   Symbol            * svs_sym_contents;
+  Symbol            * svs_sym_child;
 
 
   /* ----------------------- Symbol table stuff -------------------------- */

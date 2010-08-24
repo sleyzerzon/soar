@@ -768,6 +768,7 @@ void create_predefined_symbols (agent* thisAgent) {
   thisAgent->svs_sym_command = make_sym_constant( thisAgent, "command" );
   thisAgent->svs_sym_spatial_scene = make_sym_constant( thisAgent, "spatial-scene" );
   thisAgent->svs_sym_contents = make_sym_constant( thisAgent, "contents" );
+  thisAgent->svs_sym_child = make_sym_constant( thisAgent, "child" );
 }
 
 void release_helper(agent* thisAgent, Symbol** sym) {
@@ -874,4 +875,5 @@ void release_predefined_symbols(agent* thisAgent) {
   release_helper( thisAgent, &( thisAgent->svs_sym_command ) );
   release_helper( thisAgent, &( thisAgent->svs_sym_spatial_scene ) );
   release_helper( thisAgent, &( thisAgent->svs_sym_contents ) );
+  release_helper( thisAgent, &( thisAgent->svs_sym_child ) );
 }
