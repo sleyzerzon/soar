@@ -1,26 +1,25 @@
-#include <portability.h>
-
 #include "svs.h"
-#include "agent.h"
 #include "nsg_node.h"
 #include "wm_sgo.h"
+#include "soar_interface.h"
 
-svs::svs(agent *a) 
-: agnt(a)
+using namespace std;
+
+svs::svs(soar_interface *si)
+: soarint(si), scn("world"), interp(&scn)
 {
+	wm_sgo_root = NULL;
 }
 
-void svs::pre_env_callback()
-{
+void svs::pre_env_callback() {
+	if (!wm_sgo_root) {
+		wm_sgo_root = new wm_sgo(soarint, soarint->get_scene_root(), NULL, scn.get_node("world"));
+	}
 }
 
-void svs::post_env_callback()
-{
-	static bool init = false;
-	if (!init) {
-		nsg_node *n = new nsg_node("blah"), *n1 = new nsg_node("child");
-		wm_sgo *root = new wm_sgo(agnt, agnt->top_goal->id.svs_spatial_scene_contents_header, NULL, n);
-		root->add_child(n1);
-		init = true;
+void svs::post_env_callback() {
+	string line;
+	while (soarint->get_env_line(line)) {
+		interp.parse_line(line);
 	}
 }

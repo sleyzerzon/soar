@@ -1,12 +1,11 @@
 #include "sgel_interp.h"
 #include "nsg_node.h"
+#include "scene.h"
 #include <stdlib.h>
-#include <map>
 #include <list>
 #include <vector>
 
 using namespace std;
-typedef map<string, sg_node*>::iterator node_iter;
 
 void split(string s, vector<string> &fields) {
 	int start, end = 0;
@@ -41,7 +40,7 @@ bool parse_n_floats(vector<string> &f, int &start, int n, double *x) {
 	return true;
 }
 
-bool parse_verts(vector<string> &f, int &start, list<vec3> &verts) {
+bool parse_verts(vector<string> &f, int &start, ptlist &verts) {
 	double x[3];
 	verts.clear();
 	int i;
@@ -52,7 +51,7 @@ bool parse_verts(vector<string> &f, int &start, list<vec3> &verts) {
 	while (start < f.size()) {
 		i = start;
 		if (!parse_n_floats(f, start, 3, x)) {
-			return (i == start);  // end of list
+			return (i == start);  // end of std::list
 		}
 		verts.push_back(vec3(x[0], x[1], x[2]));
 	}
@@ -86,9 +85,9 @@ bool parse_transforms(vector<string> &f, int &start, sg_node *n) {
 	return true;
 }
 
-sgel_interp::sgel_interp(sg_node *root) {
-	nodes[root->get_name()] = root;
-}
+sgel_interp::sgel_interp(scene *_scn) 
+: scn(_scn)
+{}
 
 int sgel_interp::parse_line(string s) {
 	vector<string> f;
@@ -107,78 +106,68 @@ int sgel_interp::parse_line(string s) {
 	switch(cmd) {
 		case 'a':
 			return parse_attach(f);
+		case 'd':
+			return parse_detach(f);
+		case 'c':
+			return parse_change(f);
 		default:
 			return 0;
 	}
 }
 
 int sgel_interp::parse_attach(vector<string> &f) {
-	sg_node *n, *par;
-	node_iter i;
-	string name;
-	list<vec3> verts;
+	sg_node *n;
+	ptlist verts;
 	int pos;
 
 	if (f.size() < 2) {
 		return f.size();
 	}
-	i = nodes.find(f[0]);
-	if (i != nodes.end()) {
-		return 0;
+	if (scn->get_node(f[0])) {
+		return 0;  // already exists
 	}
-	i = nodes.find(f[1]);
-	if (i == nodes.end()) {
-		return 1;
+	if (!scn->get_node(f[1])) {
+		return 1;  // parent doesn't exist
 	}
-	name = f[0];
-	par = i->second;
 	
 	pos = 2;
 	if (!parse_verts(f, pos, verts)) {
 		return pos;
 	}
 	if (verts.size() == 0) {
-		n = new nsg_node(name);
+		n = scn->add_group(f[0], f[1]);
 	} else {
-		n = new nsg_node(name, verts.begin(), verts.end());
+		n = scn->add_geometry(f[0], f[1], verts);
 	}
 
 	if (!parse_transforms(f, pos, n)) {
 		return pos;
 	}
-	par->attach_child(n);
-	nodes[name] = n;
 	return -1;
 }
 
 int sgel_interp::parse_detach(vector<string> &f) {
-	node_iter i;
-	sg_node* p;
 	if (f.size() != 1) {
 		return 0;
 	}
-	i = nodes.find(f[0]);
-	if (i == nodes.end()) {
+	if (!scn->del_tree(f[0])) {
 		return 0;
 	}
-	i->second->detach();
 	return -1;
 }
 
 int sgel_interp::parse_change(vector<string> &f) {
-	node_iter i;
-	list<vec3> verts;
+	sg_node *n;
 	int pos;
 
 	if (f.size() < 1) {
 		return f.size();
 	}
-	i = nodes.find(f[0]);
-	if (i == nodes.end()) {
+	if (!(n = scn->get_node(f[0]))) {
 		return 0;
 	}
 	pos = 1;
-	if (!parse_transforms(f, pos, i->second)) {
+	if (!parse_transforms(f, pos, n)) {
 		return pos;
 	}
 	return -1;

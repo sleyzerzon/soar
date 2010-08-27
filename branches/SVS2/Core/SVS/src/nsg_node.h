@@ -9,19 +9,10 @@
 
 class nsg_node : public sg_node {
 public:
-	nsg_node(std::string nm) 
-	: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(true),
-	pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
-	{}
+	nsg_node(std::string nm);
+	nsg_node(std::string nm, ptlist &points);
+	~nsg_node();
 
-	template<class InputIter>
-	nsg_node(std::string nm, InputIter begin, InputIter end)
-	: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(false),
-	pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
-	{
-		copy(begin, end, back_inserter(pts));
-	}
-	
 	std::string get_name();
 	void        set_name(std::string nm);
 	bool        is_group();
@@ -39,11 +30,11 @@ public:
 	void        set_scale(vec3 xyz);
 	vec3        get_scale();
 	
-	void        get_local_points(std::list<vec3> &result);
-	void        get_world_points(std::list<vec3> &result);
+	void        get_local_points(ptlist &result);
+	void        get_world_points(ptlist &result);
 	
-	void        observe(sg_observer *o);
-	void        unobserve(sg_observer *o);
+	void        listen(sg_listener *o);
+	void        unlisten(sg_listener *o);
 	
 private:
 	void detach_child(nsg_node *c);
@@ -55,7 +46,7 @@ private:
 	
 	std::string             name;
 	nsg_node*               parent;
-	std::list<vec3>         pts;
+	ptlist                  pts;
 	std::vector<nsg_node*>  childs;
 	bool                    isgroup;
 	vec3                    pos;
@@ -67,7 +58,7 @@ private:
 	bool                    tdirty;       // transforms dirty
 	bool                    pdirty;       // convex hull dirty
 	
-	std::list<sg_observer*> observers;
+	std::list<sg_listener*> listeners;
 };
 
 #endif

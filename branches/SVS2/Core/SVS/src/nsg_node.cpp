@@ -7,6 +7,20 @@ using namespace std;
 
 typedef vector<nsg_node*>::iterator childiter;
 
+nsg_node::nsg_node(std::string nm) 
+: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(true),
+  pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
+{}
+
+nsg_node::nsg_node(std::string nm, ptlist &points)
+: name(nm), parent(NULL), tdirty(false), pdirty(false), isgroup(false), pts(points),
+  pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
+{ }
+
+nsg_node::~nsg_node() {
+	send_update(sg_node::DEL);
+}
+
 std::string nsg_node::get_name() {
 	return name;
 }
@@ -50,7 +64,6 @@ bool nsg_node::attach_child(sg_node *c) {
 	t->parent = this;
 	t->set_transform_dirty();
 	set_points_dirty();
-	
 	send_update(sg_node::ADDCHILD);
 	
 	return true;
@@ -91,16 +104,16 @@ vec3 nsg_node::get_scale() {
 	return scale;
 }
 
-void nsg_node::get_local_points(std::list<vec3> &result) {
+void nsg_node::get_local_points(ptlist &result) {
 	update_points();
-	result.clear();
-	copy(pts.begin(), pts.end(), back_inserter(result));
+	result = pts;
 }
 
-void nsg_node::get_world_points(std::list<vec3> &result) {
+void nsg_node::get_world_points(ptlist &result) {
 	update_points();
 	update_transform();
 	result.clear();
+	result.reserve(pts.size());
 	transform(pts.begin(), pts.end(), back_inserter(result), wtransform);
 }
 
@@ -154,7 +167,7 @@ void nsg_node::set_points_dirty() {
 }
 
 void nsg_node::update_points() {
-	back_insert_iterator<std::list<vec3> > pbi(pts);
+	back_insert_iterator<ptlist> pbi(pts);
 	
 	if (!isgroup || !pdirty) {
 		return;
@@ -173,18 +186,18 @@ void nsg_node::update_points() {
 /* if updates result in observers removing themselves, the iteration may
  * screw up, so make a copy of the std::list first */
 void nsg_node::send_update(sg_node::change_type t) {
-	std::list<sg_observer*>::iterator i;
-	std::list<sg_observer*> c;
-	copy(observers.begin(), observers.end(), back_inserter(c));
+	std::list<sg_listener*>::iterator i;
+	std::list<sg_listener*> c;
+	copy(listeners.begin(), listeners.end(), back_inserter(c));
 	for (i = c.begin(); i != c.end(); ++i) {
 		(**i).update(this, t);
 	}
 }
 
-void nsg_node::observe(sg_observer *o) {
-	observers.push_back(o);
+void nsg_node::listen(sg_listener *o) {
+	listeners.push_back(o);
 }
 
-void nsg_node::unobserve(sg_observer *o) {
-	observers.remove(o);
+void nsg_node::unlisten(sg_listener *o) {
+	listeners.remove(o);
 }

@@ -4,16 +4,16 @@
 /* Implementation neutral scene graph interface */
 
 #include <string>
-#include <list>
 #include "linalg.h"
 
-class sg_observer;
+class sg_listener;
 
 class sg_node {
 public:
 	enum change_type {
 		ADDCHILD,  // get_child(get_nchilds()-1) is the added child
-		DETACH, 
+		DETACH,
+		DEL,       // sent from destructor
 		PTSCHANGE
 	};
 	
@@ -34,14 +34,14 @@ public:
 	virtual void        set_scale(vec3 xyz) = 0;
 	virtual vec3        get_scale() = 0;
 	
-	virtual void        get_local_points(std::list<vec3> &result) = 0;
-	virtual void        get_world_points(std::list<vec3> &result) = 0;
+	virtual void        get_local_points(ptlist &result) = 0;
+	virtual void        get_world_points(ptlist &result) = 0;
 	
-	virtual void        observe(sg_observer *o) = 0;
-	virtual void        unobserve(sg_observer *o) = 0;
+	virtual void        listen(sg_listener *o) = 0;
+	virtual void        unlisten(sg_listener *o) = 0;
 };
 
-class sg_observer {
+class sg_listener {
 public:
 	virtual void update(sg_node *n, sg_node::change_type t) = 0;
 };

@@ -3,14 +3,13 @@
 
 /* Scene graph editing language interpreter */
 
-#include <istream>
 #include <map>
 #include <vector>
-#include "sg_node.h"
+#include "scene.h"
 
 class sgel_interp {
 public:
-	sgel_interp(sg_node *root);
+	sgel_interp(scene *_scn);
 	
 	/* stops at first error and returns position, or -1 for success */
 	int parse_line(std::string s);
@@ -19,8 +18,8 @@ private:
 	int parse_attach(std::vector<std::string> &f);
 	int parse_detach(std::vector<std::string> &f);
 	int parse_change(std::vector<std::string> &f);
-
-	std::map<std::string, sg_node*> nodes;
+	
+	scene *scn;
 };
 
 #endif
