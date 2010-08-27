@@ -335,9 +335,6 @@ Symbol *make_new_identifier (agent* thisAgent, char name_letter, goal_stack_leve
   sym->id.tc_num = 0;
   sym->id.associated_output_links = NIL;
   sym->id.input_wmes = NIL;
-	
-  sym->id.rl_info = NIL;
-  sym->id.reward_header = NIL;
 
   sym->id.epmem_header = NIL;
   sym->id.epmem_cmd_header = NIL;
@@ -703,10 +700,6 @@ void create_predefined_symbols (agent* thisAgent) {
   thisAgent->output_link_symbol = make_sym_constant(thisAgent, "output-link");
   /* RPM 9/06 end */
 
-  thisAgent->rl_sym_reward_link = make_sym_constant( thisAgent, "reward-link" );
-  thisAgent->rl_sym_reward = make_sym_constant( thisAgent, "reward" );
-  thisAgent->rl_sym_value = make_sym_constant( thisAgent, "value" );
-
   thisAgent->epmem_sym = make_sym_constant( thisAgent, "epmem" );
   thisAgent->epmem_sym_cmd = make_sym_constant( thisAgent, "command" );
   thisAgent->epmem_sym_result = make_sym_constant( thisAgent, "result" );
@@ -803,10 +796,6 @@ void release_predefined_symbols(agent* thisAgent) {
   release_helper(thisAgent,&(thisAgent->input_link_symbol));
   release_helper(thisAgent,&(thisAgent->output_link_symbol));
   /* RPM 9/06 end */
-
-  release_helper( thisAgent, &( thisAgent->rl_sym_reward_link ) );
-  release_helper( thisAgent, &( thisAgent->rl_sym_reward ) );
-  release_helper( thisAgent, &( thisAgent->rl_sym_value ) );
 
   release_helper( thisAgent, &( thisAgent->epmem_sym ) );
   release_helper( thisAgent, &( thisAgent->epmem_sym_cmd ) );

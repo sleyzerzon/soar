@@ -23,15 +23,6 @@
 #include "production.h"
 
 //////////////////////////////////////////////////////////
-// RL Constants
-//////////////////////////////////////////////////////////
-
-// more specific forms of no change impasse types
-// made negative to never conflict with impasse constants
-#define STATE_NO_CHANGE_IMPASSE_TYPE -1
-#define OP_NO_CHANGE_IMPASSE_TYPE -2
-
-//////////////////////////////////////////////////////////
 // RL Parameters
 //////////////////////////////////////////////////////////
 
@@ -57,6 +48,9 @@ class rl_param_container: public soar_module::param_container
 
 class rl_learning_param: public soar_module::boolean_param
 {
+	private:
+		bool first_switch;
+
 	protected:
 		agent *my_agent;
 
@@ -86,106 +80,98 @@ class rl_stat_container: public soar_module::stat_container
 //////////////////////////////////////////////////////////
 
 // map of eligibility traces
-typedef std::map<production *, double> rl_et_map;
+typedef std::map< production*, double > rl_et_map;
 
 // list of rules associated with the last operator
-typedef std::list<production *> rl_rule_list;
+typedef std::list< production* > rl_rule_list;
 
 // rl data associated with each state
-typedef struct rl_data_struct {
-	rl_et_map *eligibility_traces;			// traces associated with productions
-	rl_rule_list *prev_op_rl_rules;			// rl rules associated with the previous operator
+typedef struct rl_state_data_struct {
+	Symbol* reward_header;					// reward-link identifier
+	
+	rl_et_map eligibility_traces;			// traces associated with productions
+	rl_rule_list prev_op_rl_rules;			// rl rules associated with the previous operator
 	
 	double previous_q;						// q-value of the previous state
 	double reward;							// accumulated discounted reward
 
 	unsigned int gap_age;					// the number of steps since a cycle containing rl rules
 	unsigned int hrl_age;					// the number of steps in a subgoal
-} rl_data;
+} rl_state_data;
 
 typedef std::map< Symbol*, Symbol* > rl_symbol_map;
 typedef std::set< rl_symbol_map > rl_symbol_map_set;
 
-//////////////////////////////////////////////////////////
-// Parameter Maintenance
-//////////////////////////////////////////////////////////
+typedef std::map< Symbol*, rl_state_data* > rl_state_map;
 
-// reinitialize Soar-RL data structures
-extern void rl_reset_data( agent *my_agent );
-
-// remove Soar-RL references to a production
-extern void rl_remove_refs_for_prod( agent *my_agent, production *prod );
 
 //////////////////////////////////////////////////////////
-// Parameter Get/Set/Validate
+// RL Module
 //////////////////////////////////////////////////////////
 
-// shortcut for determining if Soar-RL is enabled
-extern bool rl_enabled( agent *my_agent );
+class rl_module: public soar_module::module
+{
+public:
+	rl_module(agent* my_agent);
+	
+	// run events
+	void on_create_soar_agent();
+	void on_init_soar_agent();
+	void on_reinitialize_soar();
 
-//////////////////////////////////////////////////////////
-// Production Validation
-//////////////////////////////////////////////////////////
+	void on_create_state( Symbol* goal, goal_stack_level level, bool is_top );
+	void on_retract_state( Symbol* goal );
 
-// validate template
-extern bool rl_valid_template( production *prod );
+	// publicly available information
+	rl_param_container params;
+	rl_stat_container stats;
 
-// validate rl rule
-extern bool rl_valid_rule( production *prod );
+	// shortcut to the learning parameter
+	bool enabled();
 
-// template instantiation
-extern int rl_get_template_id( const char *prod_name );
+	// maintenance on excise
+	void remove_refs_for_prod( production *prod );
 
-//////////////////////////////////////////////////////////
-// Template Tracking
-//////////////////////////////////////////////////////////
+	// rule format validation
+	static bool valid_template( production *prod );
+	static bool valid_rule( production *prod );
 
-// initializes agent's tracking of template-originated rl-rules
-extern void rl_initialize_template_tracking( agent *my_agent );
+	// templates
+	void initialize_template_tracking();
+	void update_template_tracking( const char *rule_name );	
+	Symbol* build_template_instantiation( instantiation *my_template_instance, struct token_struct *tok, wme *w );
 
-// updates the agent's tracking of template-originated rl-rules
-extern void rl_update_template_tracking( agent *my_agent, const char *rule_name );
+	// reward
+	void tabulate_reward_values();
+	void tabulate_reward_value_for_goal( Symbol *goal );
 
-// get the next id for a template (increments internal counter)
-extern int rl_next_template_id( agent *my_agent );
+	// updates
+	void store_data( Symbol *goal, preference *cand );
+	void perform_update( double op_value, bool op_rl, Symbol *goal, bool update_efr = true );
+	void watkins_clear( Symbol *goal );
 
-// reverts internal counter
-extern void rl_revert_template_id( agent *my_agent );
+private:
+	
+	// templates
+	int get_template_id( const char *prod_name );
+	int next_template_id();
+	void revert_template_id();
+	void get_template_constants( condition* p_conds, condition* i_conds, rl_symbol_map* constants );
+	void add_goal_or_impasse_tests_to_conds( condition *all_conds );
+	action* make_simple_action( Symbol *id_sym, Symbol *attr_sym, Symbol *val_sym, Symbol *ref_sym );
+	void get_test_constant( test* p_test, test* i_test, rl_symbol_map* constants );
+	void get_symbol_constant( Symbol* p_sym, Symbol* i_sym, rl_symbol_map* constants );
 
-//////////////////////////////////////////////////////////
-// Template Behavior
-//////////////////////////////////////////////////////////
+	// symbol constants
+	Symbol* sc_reward_link;
+	Symbol* sc_reward;
+	Symbol* sc_value;
 
-// builds a new Soar-RL rule from a template instantiation
-extern Symbol *rl_build_template_instantiation( agent *my_agent, instantiation *my_template_instance, struct token_struct *tok, wme *w );
-
-// creates an incredibly simple action
-extern action *rl_make_simple_action( agent *my_gent, Symbol *id_sym, Symbol *attr_sym, Symbol *val_sym, Symbol *ref_sym );
-
-// adds a test to a condition list for goals or impasses contained within the condition list
-extern void rl_add_goal_or_impasse_tests_to_conds(agent *my_agent, condition *all_conds);
-
-//////////////////////////////////////////////////////////
-// Reward
-//////////////////////////////////////////////////////////
-
-// tabulation of a single goal's reward
-extern void rl_tabulate_reward_value_for_goal( agent *my_agent, Symbol *goal );
-
-// tabulation of all agent goal reward
-extern void rl_tabulate_reward_values( agent *my_agent );
-
-//////////////////////////////////////////////////////////
-// Updates
-//////////////////////////////////////////////////////////
-
-// Store and update data that will be needed later to perform a Bellman update for the current operator
-extern void rl_store_data( agent *my_agent, Symbol *goal, preference *cand );
-
-// update the value of Soar-RL rules
-extern void rl_perform_update( agent *my_agent, double op_value, bool op_rl, Symbol *goal, bool update_efr = true );
-
-// clears eligibility traces in accordance with watkins
-extern void rl_watkins_clear( agent *my_agent, Symbol *goal );
+	// state data
+	rl_state_data* get_state_data( Symbol* goal );
+	rl_state_map state_info;
+	
+	int template_count;
+};
 
 #endif

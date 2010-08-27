@@ -143,7 +143,7 @@ bool CommandLineInterface::DoExcise(const ExciseBitset& options, const std::stri
 		   }
 	   }
 	   
-	   rl_initialize_template_tracking( m_pAgentSoar );
+	   m_pAgentSoar->rl->initialize_template_tracking();
 	}
 	if (options.test(EXCISE_TASK)) {
 		exciseCount += m_pAgentSoar->num_productions_of_type[USER_PRODUCTION_TYPE];

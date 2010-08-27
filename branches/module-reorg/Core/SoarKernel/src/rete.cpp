@@ -7232,7 +7232,7 @@ void reteload_node_and_children (agent* thisAgent, rete_node *parent, FILE* f) {
 	prod->rl_efr = 0.0;
 	if ( ( prod->type != JUSTIFICATION_PRODUCTION_TYPE ) && ( prod->type != TEMPLATE_PRODUCTION_TYPE ) )
 	{
-	  prod->rl_rule = rl_valid_rule( prod );
+      prod->rl_rule = rl_module::valid_rule( prod );
 	  if ( prod->rl_rule )
 	  {
 	    prod->rl_efr = get_number_from_symbol( rhs_value_to_symbol( prod->action_list->referent ) );

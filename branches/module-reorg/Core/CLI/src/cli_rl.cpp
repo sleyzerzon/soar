@@ -87,7 +87,7 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 			return SetError( CLIError::kTooManyArgs );
 		
 		// check attribute name here
-		soar_module::param *my_param = m_pAgentSoar->rl_params->get( argv[2].c_str() );
+		soar_module::param *my_param = m_pAgentSoar->rl->params.get( argv[2].c_str() );
 		if ( my_param )
 			return DoRL( 'g', &( argv[2] ) );		
 		else
@@ -103,7 +103,7 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 			return SetError( CLIError::kTooManyArgs );
 		
 		// check attribute name/potential vals here
-		soar_module::param *my_param = m_pAgentSoar->rl_params->get( argv[2].c_str() );
+		soar_module::param *my_param = m_pAgentSoar->rl->params.get( argv[2].c_str() );
 		if ( my_param )
 		{
 			if ( !my_param->validate_string( argv[3].c_str() ) )
@@ -123,7 +123,7 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 		else if ( m_NonOptionArguments == 1 )
 		{
 			// check attribute name
-			soar_module::stat *my_stat = m_pAgentSoar->rl_stats->get( argv[2].c_str() );
+			soar_module::stat *my_stat = m_pAgentSoar->rl->stats.get( argv[2].c_str() );
 
 			if ( my_stat )
 				return DoRL( 'S', &( argv[2] ) );
@@ -164,40 +164,40 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 	if ( !pOp )
 	{
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "Soar-RL learning: ", m_pAgentSoar->rl_params->learning->get_string() ) );
+			CLI_DoRL_generate_output( "Soar-RL learning: ", m_pAgentSoar->rl->params.learning->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "temporal-extension: ", m_pAgentSoar->rl_params->temporal_extension->get_string() ) );
+			CLI_DoRL_generate_output( "temporal-extension: ", m_pAgentSoar->rl->params.temporal_extension->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "Discount" );
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "--------" );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "discount-rate: ", m_pAgentSoar->rl_params->discount_rate->get_string() ) );
+			CLI_DoRL_generate_output( "discount-rate: ", m_pAgentSoar->rl->params.discount_rate->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "Learning" );
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "--------" );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "learning-policy: ", m_pAgentSoar->rl_params->learning_policy->get_string() ) );
+			CLI_DoRL_generate_output( "learning-policy: ", m_pAgentSoar->rl->params.learning_policy->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "learning-rate: ", m_pAgentSoar->rl_params->learning_rate->get_string() ) );
+			CLI_DoRL_generate_output( "learning-rate: ", m_pAgentSoar->rl->params.learning_rate->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "hrl-discount: ", m_pAgentSoar->rl_params->hrl_discount->get_string() ) );
+			CLI_DoRL_generate_output( "hrl-discount: ", m_pAgentSoar->rl->params.hrl_discount->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "Eligibility Traces" );
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "------------------" );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "eligibility-trace-decay-rate: ", m_pAgentSoar->rl_params->et_decay_rate->get_string() ) );
+			CLI_DoRL_generate_output( "eligibility-trace-decay-rate: ", m_pAgentSoar->rl->params.et_decay_rate->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "eligibility-trace-tolerance: ", m_pAgentSoar->rl_params->et_tolerance->get_string() ) );
+			CLI_DoRL_generate_output( "eligibility-trace-tolerance: ", m_pAgentSoar->rl->params.et_tolerance->get_string() ) );
 
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
 
@@ -206,13 +206,13 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 	else if ( pOp == 'g' )
 	{
 		CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-			CLI_DoRL_generate_output( "", m_pAgentSoar->rl_params->get( pAttr->c_str() )->get_string() ), false );
+			CLI_DoRL_generate_output( "", m_pAgentSoar->rl->params.get( pAttr->c_str() )->get_string() ), false );
 
 		return true;
 	}
 	else if ( pOp == 's' )
 	{
-		soar_module::param *my_param = m_pAgentSoar->rl_params->get( pAttr->c_str() );
+		soar_module::param *my_param = m_pAgentSoar->rl->params.get( pAttr->c_str() );
 		return my_param->set_string( pVal->c_str() );
 	}
 	else if ( pOp == 'S' )
@@ -220,18 +220,18 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
 		if ( !pAttr )
 		{
 			CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-				CLI_DoRL_generate_output( "Error from last update: ", m_pAgentSoar->rl_stats->update_error->get_string() ) );
+				CLI_DoRL_generate_output( "Error from last update: ", m_pAgentSoar->rl->stats.update_error->get_string() ) );
 
 			CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-				CLI_DoRL_generate_output( "Total reward in last cycle: ", m_pAgentSoar->rl_stats->total_reward->get_string() ) );
+				CLI_DoRL_generate_output( "Total reward in last cycle: ", m_pAgentSoar->rl->stats.total_reward->get_string() ) );
 
 			CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-				CLI_DoRL_generate_output( "Global reward since init: ", m_pAgentSoar->rl_stats->global_reward->get_string() ) );
+				CLI_DoRL_generate_output( "Global reward since init: ", m_pAgentSoar->rl->stats.global_reward->get_string() ) );
 		}
 		else
 		{
 			CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
-				CLI_DoRL_generate_output( "", m_pAgentSoar->rl_stats->get( pAttr->c_str() )->get_string() ), false );
+				CLI_DoRL_generate_output( "", m_pAgentSoar->rl->stats.get( pAttr->c_str() )->get_string() ), false );
 		}
 
 		return true;

@@ -18,6 +18,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <vector>
 #include <functional>
 
 #include "misc.h"
@@ -802,6 +803,59 @@ namespace soar_module
 			}
 	};
 
+
+	///////////////////////////////////////////////////////////////////////////
+	// Run Event Listener Interface
+	///////////////////////////////////////////////////////////////////////////
+
+	class run_event_listener
+	{
+	public:
+		virtual void on_create_soar_agent() = 0;		
+		virtual void on_destroy_soar_agent() = 0;
+		virtual void on_init_soar_agent() = 0;
+		virtual void on_reinitialize_soar() = 0;
+
+		virtual void on_create_state( Symbol* goal, goal_stack_level level, bool is_top ) = 0;
+		virtual void on_retract_state( Symbol* goal ) = 0;
+	};
+
+	typedef std::vector< run_event_listener* > run_event_listener_list;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	// Useful types
+	///////////////////////////////////////////////////////////////////////////
+
+	typedef std::map< Symbol**, const char* > sc_map;
+
+	///////////////////////////////////////////////////////////////////////////
+	// Module Class
+	///////////////////////////////////////////////////////////////////////////
+
+	class module: public run_event_listener
+	{
+	public:
+		module(agent* my_agent);
+		
+		// run_event_listener
+		void on_create_soar_agent();
+		void on_destroy_soar_agent();
+		void on_init_soar_agent();
+		void on_reinitialize_soar();
+
+		void on_create_state( Symbol* goal, goal_stack_level, bool is_top );
+		void on_retract_state( Symbol* goal );
+
+	protected:
+		void add_agent_symbolic_constant( Symbol** sym_ref, const char* sym_string );
+
+		agent* my_agent;
+
+	private:
+		sc_map agent_symbolic_constants;
+
+	};
 }
 
 #endif

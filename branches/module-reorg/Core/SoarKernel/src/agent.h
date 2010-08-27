@@ -283,10 +283,6 @@ typedef struct agent_struct {
   Symbol			* input_link_symbol;
   Symbol			* output_link_symbol;
   /* RPM 9/06 end */
-
-  Symbol            * rl_sym_reward_link;
-  Symbol            * rl_sym_reward;
-  Symbol            * rl_sym_value;
   
   Symbol            * epmem_sym;
   Symbol            * epmem_sym_cmd;
@@ -817,13 +813,10 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   
   // exploration
   exploration_parameter *exploration_params[ EXPLORATION_PARAMS ];
-  
-  // reinforcement learning
-  rl_param_container *rl_params;
-  rl_stat_container *rl_stats;
 
-  int rl_template_count;
-  bool rl_first_switch;
+  // module stuff
+  soar_module::run_event_listener_list* module_listeners;
+  rl_module* rl;
 
   // select
   select_info *select;

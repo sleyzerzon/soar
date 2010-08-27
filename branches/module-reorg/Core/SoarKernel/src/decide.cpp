@@ -903,11 +903,11 @@ byte require_preference_semantics (agent *thisAgent, slot *s, preference **resul
     if (p->value == value) return CONSTRAINT_FAILURE_IMPASSE_TYPE;
   
   /* --- the lone require is the winner --- */
-  if ( !consistency && candidates && rl_enabled( thisAgent ) )
+  if ( !consistency && candidates && thisAgent->rl->enabled() )
   {
-	  rl_tabulate_reward_values( thisAgent );
+	  thisAgent->rl->tabulate_reward_values();
 	  exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-	  rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
+	  thisAgent->rl->perform_update( candidates->numeric_value, candidates->rl_contribution, s->id );
   }
 
   return NONE_IMPASSE_TYPE;
@@ -939,11 +939,11 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 				force_result->next_candidate = NIL;
 				*result_candidates = force_result;
 
-				if ( !predict && rl_enabled( thisAgent ) )
+				if ( !predict && thisAgent->rl->enabled() )
 				{
-					rl_tabulate_reward_values( thisAgent );
+					thisAgent->rl->tabulate_reward_values();
 					exploration_compute_value_of_candidate( thisAgent, force_result, s, 0 );
-					rl_perform_update( thisAgent, force_result->numeric_value, force_result->rl_contribution, s->id );
+					thisAgent->rl->perform_update( force_result->numeric_value, force_result->rl_contribution, s->id );
 				}
 
 				return NONE_IMPASSE_TYPE;
@@ -987,12 +987,12 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 	if ((!candidates) || (! candidates->next_candidate)) {
 		*result_candidates = candidates;
 
-		if ( !consistency && rl_enabled( thisAgent ) && candidates )
+		if ( !consistency && thisAgent->rl->enabled() && candidates )
 		{
 			// perform update here for just one candidate
-			rl_tabulate_reward_values( thisAgent );
+			thisAgent->rl->tabulate_reward_values();
 			exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-			rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
+			thisAgent->rl->perform_update( candidates->numeric_value, candidates->rl_contribution, s->id );
 		}
 
 		return NONE_IMPASSE_TYPE;
@@ -1269,12 +1269,12 @@ byte run_preference_semantics (agent* thisAgent, slot *s, preference **result_ca
 	{
 		*result_candidates = candidates;
 
-		if ( !consistency && rl_enabled( thisAgent ) && candidates )
+		if ( !consistency && thisAgent->rl->enabled() && candidates )
 		{
 			// perform update here for just one candidate
-			rl_tabulate_reward_values( thisAgent );
+			thisAgent->rl->tabulate_reward_values();
 			exploration_compute_value_of_candidate( thisAgent, candidates, s, 0 );
-			rl_perform_update( thisAgent, candidates->numeric_value, candidates->rl_contribution, s->id );
+			thisAgent->rl->perform_update( candidates->numeric_value, candidates->rl_contribution, s->id );
 		}
 
 		return NONE_IMPASSE_TYPE;
@@ -1434,8 +1434,11 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
   if (isa_goal)
   {
     add_impasse_wme (thisAgent, id, thisAgent->superstate_symbol, object, NIL);
-	id->id.reward_header = make_new_identifier( thisAgent, 'R', level );
-	soar_module::add_module_wme( thisAgent, id, thisAgent->rl_sym_reward_link, id->id.reward_header );
+
+	for ( soar_module::run_event_listener_list::iterator it=thisAgent->module_listeners->begin(); it!=thisAgent->module_listeners->end(); it++ )
+	{
+		(*it)->on_create_state( id, level, level == TOP_GOAL_LEVEL );
+	}
 
 	id->id.epmem_header = make_new_identifier( thisAgent, 'E', level );		
 	soar_module::add_module_wme( thisAgent, id, thisAgent->epmem_sym, id->id.epmem_header );
@@ -2032,13 +2035,6 @@ void remove_wmes_for_context_slot (agent* thisAgent, slot *s) {
    entire context stack is removed.)
 ------------------------------------------------------------------ */
 
-inline void remove_existing_context_and_descendents_rl( agent * const &thisAgent, Symbol * const &goal ) {
-  delete goal->id.rl_info->eligibility_traces;
-  delete goal->id.rl_info->prev_op_rl_rules;
-  symbol_remove_ref( thisAgent, goal->id.reward_header );
-  free_memory( thisAgent, goal->id.rl_info, MISCELLANEOUS_MEM_USAGE );
-}
-
 void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   preference *p;
 
@@ -2054,10 +2050,10 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
                        POP_CONTEXT_STACK_CALLBACK, 
                        static_cast<soar_call_data>(goal) );
 
-  if ( ( goal != thisAgent->top_goal ) && rl_enabled( thisAgent ) )
+  if ( ( goal != thisAgent->top_goal ) && thisAgent->rl->enabled() )
   {
-	  rl_tabulate_reward_value_for_goal( thisAgent, goal );
-	  rl_perform_update( thisAgent, 0, true, goal, false ); // this update only sees reward - there is no next state
+	  thisAgent->rl->tabulate_reward_value_for_goal( goal );
+	  thisAgent->rl->perform_update( 0, true, goal, false ); // this update only sees reward - there is no next state
   }
 
   /* --- disconnect this goal from the goal stack --- */
@@ -2148,7 +2144,10 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
     }
   }
 
-  remove_existing_context_and_descendents_rl(thisAgent, goal);
+  for ( soar_module::run_event_listener_list::iterator it=thisAgent->module_listeners->begin(); it!=thisAgent->module_listeners->end(); it++ )
+  {
+    (*it)->on_retract_state( goal );
+  }
 
   delete goal->id.epmem_info->cue_wmes;
   delete goal->id.epmem_info->epmem_wmes;
@@ -2200,16 +2199,6 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
    the top and bottom goal.
 ------------------------------------------------------------------ */
 
-inline void create_new_context_rl( agent * const &thisAgent, Symbol * const &id ) {
-  id->id.rl_info = static_cast<rl_data *>( allocate_memory( thisAgent, sizeof( rl_data ), MISCELLANEOUS_MEM_USAGE ) );
-  id->id.rl_info->eligibility_traces = new rl_et_map;
-  id->id.rl_info->prev_op_rl_rules = new rl_rule_list;
-  id->id.rl_info->previous_q = 0;
-  id->id.rl_info->reward = 0;
-  id->id.rl_info->gap_age = 0;
-  id->id.rl_info->hrl_age = 0;
-}
-
 void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse_type)
 {
   Symbol *id;
@@ -2257,8 +2246,6 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.isa_goal = TRUE;
   id->id.operator_slot = make_slot (thisAgent, id, thisAgent->operator_symbol);
   id->id.allow_bottom_up_chunks = TRUE;
-
-  create_new_context_rl(thisAgent, id);
 
   id->id.epmem_info = static_cast<epmem_data *>( allocate_memory( thisAgent, sizeof( epmem_data ), MISCELLANEOUS_MEM_USAGE ) );
   id->id.epmem_info->last_ol_time = 0;  
@@ -2489,8 +2476,8 @@ Bool decide_context_slot (agent* thisAgent, Symbol *goal, slot *s, bool predict 
 		for(temp = candidates; temp; temp = temp->next_candidate)
 			preference_remove_ref(thisAgent, temp);
 
-		if ( rl_enabled( thisAgent ) )
-			rl_store_data( thisAgent, goal, candidates );
+		if ( thisAgent->rl->enabled() )
+			thisAgent->rl->store_data( goal, candidates );
 
 		return TRUE;
 	}

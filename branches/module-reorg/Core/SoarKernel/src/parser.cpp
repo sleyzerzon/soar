@@ -2033,7 +2033,7 @@ production *parse_production (agent* thisAgent, unsigned char* rete_addition_res
 
   if ( prod_type == TEMPLATE_PRODUCTION_TYPE )
   {
-	  if ( !rl_valid_template( p ) )
+	  if ( !rl_module::valid_template( p ) )
 	  {
 		  print_with_symbols( thisAgent, "Invalid Soar-RL template (%y)\n\n", name );
 		  excise_production( thisAgent, p, false );

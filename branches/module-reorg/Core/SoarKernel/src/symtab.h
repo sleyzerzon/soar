@@ -239,9 +239,6 @@ typedef struct identifier_struct {
   struct slot_struct *operator_slot;
   struct preference_struct *preferences_from_goal;
 
-  union symbol_union *reward_header;		// pointer to reward_link
-  struct rl_data_struct *rl_info;			// various Soar-RL information
-
   union symbol_union *epmem_header;
   union symbol_union *epmem_cmd_header;
   union symbol_union *epmem_result_header;

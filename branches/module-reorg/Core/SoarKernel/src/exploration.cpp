@@ -505,9 +505,9 @@ preference *exploration_choose_according_to_policy( agent *my_agent, slot *s, pr
 	const long exploration_policy = exploration_get_policy( my_agent );
 	preference *return_val = NULL;
 
-	const bool my_rl_enabled = rl_enabled( my_agent );
+	const bool my_rl_enabled = my_agent->rl->enabled();
 
-	const rl_param_container::learning_choices my_learning_policy = my_rl_enabled ? my_agent->rl_params->learning_policy->get_value() : rl_param_container::q;
+	const rl_param_container::learning_choices my_learning_policy = my_rl_enabled ? my_agent->rl->params.learning_policy->get_value() : rl_param_container::q;
 
 	// get preference values for each candidate
 	// see soar_ecPrintPreferences
@@ -560,18 +560,18 @@ preference *exploration_choose_according_to_policy( agent *my_agent, slot *s, pr
 	// should perform update here for chosen candidate in sarsa	
 	if ( my_rl_enabled )
 	{
-		rl_tabulate_reward_values( my_agent );
+		my_agent->rl->tabulate_reward_values();
 
 		if ( my_learning_policy == rl_param_container::sarsa )
 		{
-			rl_perform_update( my_agent, return_val->numeric_value, return_val->rl_contribution, s->id );
+			my_agent->rl->perform_update( return_val->numeric_value, return_val->rl_contribution, s->id );
 		}
 		else if ( my_learning_policy == rl_param_container::q )
 		{
-			rl_perform_update( my_agent, top_value, top_rl, s->id );
+			my_agent->rl->perform_update( top_value, top_rl, s->id );
 
 			if ( return_val->numeric_value != top_value )
-				rl_watkins_clear( my_agent, s->id );
+				my_agent->rl->watkins_clear( s->id );
 		}
 	}
 

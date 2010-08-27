@@ -90,6 +90,11 @@ void init_soar_agent(agent* thisAgent) {
   thisAgent->epmem_params->exclusions->set_value( "epmem" );
   thisAgent->epmem_params->exclusions->set_value( "smem" );
 
+  for ( soar_module::run_event_listener_list::iterator it=thisAgent->module_listeners->begin(); it!=thisAgent->module_listeners->end(); it++ )
+  {
+    (*it)->on_init_soar_agent();
+  }
+
 #ifdef REAL_TIME_BEHAVIOR
   /* RMJ */
   init_real_time(thisAgent);
@@ -325,14 +330,16 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->exploration_params[ EXPLORATION_PARAM_EPSILON ] = exploration_add_parameter( 0.1, &exploration_validate_epsilon, "epsilon" );
   newAgent->exploration_params[ EXPLORATION_PARAM_TEMPERATURE ] = exploration_add_parameter( 25, &exploration_validate_temperature, "temperature" );
 
-  // rl initialization
-  newAgent->rl_params = new rl_param_container( newAgent );
-  newAgent->rl_stats = new rl_stat_container( newAgent ); 
+  // module stuff
+  newAgent->module_listeners = new std::vector< soar_module::run_event_listener* >();
+  
+  newAgent->rl = new rl_module( newAgent );
+  newAgent->module_listeners->push_back( dynamic_cast< soar_module::run_event_listener* >( newAgent->rl ) );
 
-  rl_initialize_template_tracking( newAgent );
-
-  newAgent->rl_first_switch = true;
-
+  for ( soar_module::run_event_listener_list::iterator it=newAgent->module_listeners->begin(); it!=newAgent->module_listeners->end(); it++ )
+  {
+    (*it)->on_create_soar_agent();
+  }
 
   // select initialization
   newAgent->select = new select_info;
@@ -416,13 +423,15 @@ void destroy_soar_agent (agent * delete_agent)
   // Soar Modules - could potentially rely on hash tables
   /////////////////////////////////////////////////////////
 
+  for ( soar_module::run_event_listener_list::iterator it=delete_agent->module_listeners->begin(); it!=delete_agent->module_listeners->end(); it++ )
+  {
+    (*it)->on_destroy_soar_agent();
+  }
+  delete delete_agent->module_listeners;
+
   // cleanup exploration
   for ( int i=0; i<EXPLORATION_PARAMS; i++ )
 	  delete delete_agent->exploration_params[ i ];
-
-  // cleanup Soar-RL
-  delete delete_agent->rl_params;
-  delete delete_agent->rl_stats;
 
   // cleanup select
   select_init( delete_agent );
@@ -557,6 +566,9 @@ void destroy_soar_agent (agent * delete_agent)
 
   // JRV: Frees data used by XML generation
   xml_destroy( delete_agent );
+
+  // free module stuff
+  delete delete_agent->rl;
 
   /* Free soar agent structure */
   delete delete_agent;

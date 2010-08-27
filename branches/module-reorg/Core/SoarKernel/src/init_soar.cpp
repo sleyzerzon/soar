@@ -407,7 +407,7 @@ bool reinitialize_soar (agent* thisAgent) {
 
 	clear_goal_stack (thisAgent);
 	wma_deinit( thisAgent );
-	thisAgent->rl_stats->reset();
+	
 	thisAgent->wma_stats->reset();
 	thisAgent->epmem_stats->reset();
 	thisAgent->smem_stats->reset();
@@ -426,6 +426,11 @@ bool reinitialize_soar (agent* thisAgent) {
 
 	// JRV: For XML generation
 	xml_reset( thisAgent );
+
+	for ( soar_module::run_event_listener_list::iterator it=thisAgent->module_listeners->begin(); it!=thisAgent->module_listeners->end(); it++ )
+	{
+		(*it)->on_reinitialize_soar();
+	}
 
 
 	/* RDF 01282003: Reinitializing the various halt and stop flags */
@@ -1114,12 +1119,12 @@ void do_one_top_level_phase (agent* thisAgent)
 		  reinterpret_cast<soar_call_data>(thisAgent->current_phase) );
 
 	  // To model episodic task, after halt, perform RL update with next-state value 0
-	  if ( rl_enabled( thisAgent ) )
+	  if ( thisAgent->rl->enabled() )
 	  {
 		  for ( Symbol *g = thisAgent->bottom_goal; g; g = g->id.higher_goal)
 		  {
-			  rl_tabulate_reward_value_for_goal( thisAgent, g );
-			  rl_perform_update( thisAgent, 0, true, g );			  
+			  thisAgent->rl->tabulate_reward_value_for_goal( g );
+			  thisAgent->rl->perform_update( 0, true, g );			  
 		  }
 	  }
   }

@@ -31,6 +31,8 @@
 #include "wma.h"
 
 wme *make_wme (agent* thisAgent, Symbol *id, Symbol *attr, Symbol *value, Bool acceptable);
+void release_helper(agent* thisAgent, Symbol** sym);
+
 typedef struct agent_struct agent;
 
 namespace soar_module
@@ -161,6 +163,54 @@ namespace soar_module
 		}
 
 		return pref;
+	}
+
+
+	/////////////////////////////////////////////////////////////
+	// Module function definitions
+	/////////////////////////////////////////////////////////////
+
+	module::module(agent* my_agent)
+	{
+		this->my_agent = my_agent;
+	}
+
+	void module::on_create_soar_agent()
+	{		
+	}
+
+	void module::on_init_soar_agent()
+	{
+		for ( sc_map::iterator it=agent_symbolic_constants.begin(); it!=agent_symbolic_constants.end(); it++ )
+		{
+			(*(it->first)) = make_sym_constant( my_agent, it->second );
+		}
+	}
+
+	void module::on_destroy_soar_agent()
+	{
+		for ( sc_map::iterator it=agent_symbolic_constants.begin(); it!=agent_symbolic_constants.end(); it++ )
+		{
+			release_helper( my_agent, it->first );
+		}
+	}
+
+	void module::on_reinitialize_soar()
+	{
+	}
+
+	void module::on_create_state( Symbol* /*goal*/, goal_stack_level /*level*/, bool /*is_top*/ )
+	{
+	}
+
+	void module::on_retract_state( Symbol* /*goal*/ )
+	{
+	}
+
+	void module::add_agent_symbolic_constant( Symbol** sym_ref, const char* sym_string )
+	{
+		agent_symbolic_constants[ sym_ref ] = sym_string;
+		*sym_ref = 0;
 	}
 }
 
