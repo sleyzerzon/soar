@@ -15,6 +15,19 @@ public:
 	: x(_x), y(_y), z(_z)
 	{}
 	
+	double operator[](int i) {
+		switch (i) {
+			case 0:
+				return x;
+			case 1:
+				return y;
+			case 2:
+				return z;
+			default:
+				return 0.0;
+		}
+	}
+	
 	double x; double y; double z;
 };
 

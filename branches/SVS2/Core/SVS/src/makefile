@@ -1,7 +1,7 @@
 #CXXFLAGS+=-g
 LIBS=
 
-srcs=nsg_node.cpp sgel_interp.cpp linalg.cpp scene.cpp wm_sgo.cpp svs.cpp
+srcs=nsg_node.cpp sgel_interp.cpp linalg.cpp scene.cpp wm_sgo.cpp svs.cpp soar_interface.cpp
 objs=$(srcs:.cpp=.o)
 headers=sg_node.h nsg_node.h sgel_interp.h linalg.h scene.h wm_sgo.h soar_interface.h svs.h
 testprogs=tests/test_svs tests/buildsg
@@ -13,7 +13,7 @@ all: $(testprogs)
 tests/test_svs: tests/test_svs.cpp tests/test_interface.cpp tests/test_interface.h $(objs)
 	$(CXX) -o $@ $^ $(LIBS)
 
-tests/buildsg: tests/buildsg.cpp $(objs)
+tests/buildsg: tests/buildsg.cpp tests/test_interface.cpp $(objs)
 	$(CXX) -o $@ $^ $(LIBS)
 	
 %.o: %.cpp $(headers)

@@ -335,14 +335,6 @@ typedef struct agent_struct {
   Symbol			* smem_sym_prohibit;
   Symbol			* smem_sym_store;
 
-  Symbol            * svs_sym;
-  Symbol            * svs_sym_ltm;
-  Symbol            * svs_sym_command;
-  Symbol            * svs_sym_spatial_scene;
-  Symbol            * svs_sym_contents;
-  Symbol            * svs_sym_child;
-
-
   /* ----------------------- Symbol table stuff -------------------------- */
 
   uint32_t       current_symbol_hash_id;
@@ -893,9 +885,6 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
   bool smem_made_changes;
   intptr_t smem_max_cycle;
 
-
-  // svs
-  svs_command_id svs_command_counter;
   svs *svs_instance;
 
   // JRV: Added to support XML management inside Soar

@@ -1,10 +1,10 @@
 #include "wm_sgo.h"
 #include "assert.h"
-#include "soar_interface.h"
+#include "soar_int.h"
 
 using namespace std;
 
-typedef map<wm_sgo*, int>::iterator child_iter;
+typedef map<wm_sgo*, wme_hnd>::iterator child_iter;
 
 wm_sgo::wm_sgo(soar_interface *si, sym_hnd ident, wm_sgo *parent, sg_node *node) 
 : soarint(si), id(ident), par(parent), n(node)

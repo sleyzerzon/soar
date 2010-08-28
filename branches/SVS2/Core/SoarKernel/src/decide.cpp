@@ -59,7 +59,6 @@
 
 #include "episodic_memory.h"
 #include "semantic_memory.h"
-#include "svs_interface.h"
 
 #include "assert.h"
 
@@ -1451,28 +1450,8 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
 	soar_module::add_module_wme( thisAgent, id->id.smem_header, thisAgent->smem_sym_cmd, id->id.smem_cmd_header );	
 	id->id.smem_result_header = make_new_identifier( thisAgent, 'R', level );
 	soar_module::add_module_wme( thisAgent, id->id.smem_header, thisAgent->smem_sym_result, id->id.smem_result_header );
-
-
-	id->id.svs_header = make_new_identifier( thisAgent, 'S', level );
-	soar_module::add_module_wme( thisAgent, id, thisAgent->svs_sym, id->id.svs_header );
 	
-	if (!thisAgent->top_goal)
-	{
-		id->id.svs_ltm_header = make_new_identifier( thisAgent, 'L', level );
-		soar_module::add_module_wme( thisAgent, id->id.svs_header, thisAgent->svs_sym_ltm, id->id.svs_ltm_header );
-
-		id->id.svs_ltm_command_header = make_new_identifier( thisAgent, 'C', level );
-		soar_module::add_module_wme( thisAgent, id->id.svs_ltm_header, thisAgent->svs_sym_command, id->id.svs_ltm_command_header );
-	}
-
-	id->id.svs_spatial_scene_header = make_new_identifier( thisAgent, 'S', level );
-	soar_module::add_module_wme( thisAgent, id->id.svs_header, thisAgent->svs_sym_spatial_scene, id->id.svs_spatial_scene_header );
-
-	id->id.svs_spatial_scene_command_header = make_new_identifier( thisAgent, 'C', level );
-	soar_module::add_module_wme( thisAgent, id->id.svs_spatial_scene_header, thisAgent->svs_sym_command, id->id.svs_spatial_scene_command_header );
-
-	id->id.svs_spatial_scene_contents_header = make_new_identifier( thisAgent, 'C', level );
-	soar_module::add_module_wme( thisAgent, id->id.svs_spatial_scene_header, thisAgent->svs_sym_contents, id->id.svs_spatial_scene_contents_header );
+	thisAgent->svs_instance->goal_creation_callback(id);
   }
   else
     add_impasse_wme (thisAgent, id, thisAgent->object_symbol, object, NIL);
@@ -2187,22 +2166,8 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   symbol_remove_ref( thisAgent, goal->id.smem_header );
   free_memory( thisAgent, goal->id.smem_info, MISCELLANEOUS_MEM_USAGE );
 
-  symbol_remove_ref( thisAgent, goal->id.svs_spatial_scene_command_header );
-  symbol_remove_ref( thisAgent, goal->id.svs_spatial_scene_contents_header );
-  symbol_remove_ref( thisAgent, goal->id.svs_spatial_scene_header );
-  if (goal->id.svs_ltm_header)
-  {
-	symbol_remove_ref( thisAgent, goal->id.svs_ltm_command_header );
-	symbol_remove_ref( thisAgent, goal->id.svs_ltm_header );
-  }
-
-  delete goal->id.svs_info->new_command_list;
-  delete goal->id.svs_info->modified_command_list;
-  delete goal->id.svs_info->removed_command_list;
-  delete goal->id.svs_info->command_map;
-  symbol_remove_ref( thisAgent, goal->id.svs_header );
-  free_memory( thisAgent, goal->id.svs_info, MISCELLANEOUS_MEM_USAGE );
-
+  thisAgent->svs_instance->goal_deletion_callback(goal);
+  
   /* REW: BUG
    * Tentative assertions can exist for removed goals.  However, it looks
    * like the removal forces a tentative retraction, which then leads to
@@ -2315,12 +2280,6 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   id->id.smem_info->cue_wmes = new std::set<wme *>();
   id->id.smem_info->smem_wmes = new std::stack<preference *>();
 
-
-  id->id.svs_info = static_cast<svs_data *>( allocate_memory( thisAgent, sizeof( svs_data ), MISCELLANEOUS_MEM_USAGE ) );  
-  id->id.svs_info->new_command_list = new std::list<svs_command_id>();
-  id->id.svs_info->modified_command_list = new std::list<svs_command_id>();
-  id->id.svs_info->removed_command_list = new std::list<svs_command_id>();
-  id->id.svs_info->command_map = new std::map< svs_command_id, wme* >();
 
   /* --- invoke callback routine --- */
   soar_invoke_callbacks(thisAgent, 

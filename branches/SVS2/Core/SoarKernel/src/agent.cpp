@@ -52,6 +52,7 @@
 #include "episodic_memory.h"
 #include "semantic_memory.h"
 #include "svs.h"
+#include "soar_interface.h"
 
 
 /* ================================================================== */
@@ -389,9 +390,7 @@ agent * create_soar_agent (char * agent_name) {                                 
   newAgent->smem_validation = 0;
   newAgent->smem_first_switch = true;
 
-  // svs initialization
-  newAgent->svs_command_counter = 1;
-  newAgent->svs_instance = new svs(newAgent);
+  newAgent->svs_instance = new svs(new soar_interface(newAgent));
 
   // statistics initialization
   newAgent->dc_stat_tracking = false;

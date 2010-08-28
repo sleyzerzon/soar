@@ -156,8 +156,6 @@ typedef uintptr_t epmem_time_id;
 typedef uintptr_t smem_lti_id;
 typedef uintptr_t smem_hash_id;
 
-typedef unsigned long svs_command_id;
-
 /* WARNING:  In the following structure, next_in_hash_table MUST be the
    first field.  This field is used by the resizable hash table routines. */
 
@@ -255,15 +253,6 @@ typedef struct identifier_struct {
   union symbol_union *smem_result_header;
   struct smem_data_struct *smem_info;		// various SMem information
 
-
-  union symbol_union *svs_header;
-  union symbol_union *svs_ltm_header;
-  union symbol_union *svs_spatial_scene_header;
-  union symbol_union *svs_ltm_command_header;
-  union symbol_union *svs_spatial_scene_command_header;
-  union symbol_union *svs_spatial_scene_contents_header;
-  struct svs_data_struct *svs_info;			// various SVS information
-
   /* REW: begin 09.15.96 */
   struct gds_struct *gds;    /* Pointer to a goal's dependency set */
   /* REW: begin 09.15.96 */
@@ -290,9 +279,6 @@ typedef struct identifier_struct {
   epmem_time_id smem_time_id;
   uintptr_t smem_valid;
 
-  svs_command_id svs_id;
-  unsigned long svs_last_tt;
-  unsigned long svs_last_count;
 } identifier;
 
 typedef union symbol_union {

@@ -6,7 +6,7 @@
 #include <map>
 #include <utility>
 #include "sg_node.h"
-#include "soar_interface.h"
+#include "soar_int.h"
 
 class wm_sgo : public sg_listener {
 public:
