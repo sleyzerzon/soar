@@ -9,6 +9,10 @@ svs::svs(soar_interface *si)
 : soarint(si)
 { }
 
+svs::~svs() {
+	delete soarint;
+}
+
 void svs::goal_creation_callback(sym_hnd goal) {
 	soarint->prepare_new_goal(goal);
 }

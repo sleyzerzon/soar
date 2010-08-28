@@ -14,6 +14,7 @@ typedef struct svs_goal_struct {
 class svs {
 public:
 	svs(soar_interface *soarinterface);
+	~svs();
 	
 	void goal_creation_callback(sym_hnd goal);
 	void goal_deletion_callback(sym_hnd goal);

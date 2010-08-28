@@ -66,8 +66,6 @@ public:
 	void         prepare_del_goal(sym_hnd goal);
 	
 private:
-	wme_hnd make_wme(Symbol *id, Symbol *attr, Symbol *val);
-	
 	void process_cmds      ();
 	void process_goal_cmds (goal_info &g, std::set<wme*>& all_cmds);
 	void parse_cmd_id      (goal_info &g, Symbol* id, std::set<wme*>& all_cmds);
