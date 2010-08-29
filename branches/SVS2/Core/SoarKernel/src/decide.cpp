@@ -1451,7 +1451,7 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
 	id->id.smem_result_header = make_new_identifier( thisAgent, 'R', level );
 	soar_module::add_module_wme( thisAgent, id->id.smem_header, thisAgent->smem_sym_result, id->id.smem_result_header );
 	
-	thisAgent->svs_instance->goal_creation_callback(id);
+	thisAgent->svs_instance->state_creation_callback(id);
   }
   else
     add_impasse_wme (thisAgent, id, thisAgent->object_symbol, object, NIL);
@@ -2166,7 +2166,7 @@ void remove_existing_context_and_descendents (agent* thisAgent, Symbol *goal) {
   symbol_remove_ref( thisAgent, goal->id.smem_header );
   free_memory( thisAgent, goal->id.smem_info, MISCELLANEOUS_MEM_USAGE );
 
-  thisAgent->svs_instance->goal_deletion_callback(goal);
+  thisAgent->svs_instance->state_deletion_callback(goal);
   
   /* REW: BUG
    * Tentative assertions can exist for removed goals.  However, it looks

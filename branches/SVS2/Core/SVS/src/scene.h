@@ -14,7 +14,7 @@ public:
 	sg_node* get_node(std::string name);
 	sg_node* add_group(std::string name, std::string par);
 	sg_node* add_geometry(std::string name, std::string par, ptlist &points);
-	bool     del_tree(std::string name);
+	bool     del_node(std::string name);
 	
 private:
 	bool add_node(std::string par, sg_node *n);

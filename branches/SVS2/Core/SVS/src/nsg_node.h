@@ -12,6 +12,8 @@ public:
 	nsg_node(std::string nm);
 	nsg_node(std::string nm, ptlist &points);
 	~nsg_node();
+	
+	sg_node*    copy();
 
 	std::string get_name();
 	void        set_name(std::string nm);
@@ -21,7 +23,6 @@ public:
 	int         get_nchilds();
 	sg_node*    get_child(int i);
 	bool        attach_child(sg_node *c);
-	void        detach();
 
 	void        set_pos(vec3 xyz);
 	vec3        get_pos();

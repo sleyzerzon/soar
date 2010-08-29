@@ -3,6 +3,5 @@
 #include "src/linalg.cpp"
 #include "src/wm_sgo.cpp"
 #include "src/sgel_interp.cpp"
-#include "src/scene.cpp"
 #include "src/soar_interface.cpp"
-
+#include "src/scene.cpp"

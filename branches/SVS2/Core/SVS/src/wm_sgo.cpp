@@ -9,8 +9,12 @@ typedef map<wm_sgo*, wme_hnd>::iterator child_iter;
 wm_sgo::wm_sgo(soar_interface *si, sym_hnd ident, wm_sgo *parent, sg_node *node) 
 : soarint(si), id(ident), par(parent), n(node)
 {
-	name_wme = soarint->make_str_wme(id, "name", node->get_name());
+	int i;
 	n->listen(this);
+	name_wme = soarint->make_str_wme(id, "name", node->get_name());
+	for (i = 0; i < n->get_nchilds(); ++i) {
+		add_child(n->get_child(i));
+	}
 }
 
 wm_sgo::~wm_sgo() {

@@ -56,20 +56,11 @@ sg_node* scene::add_geometry(string name, string par, ptlist &points) {
 	return n;
 }
 
-bool scene::del_tree(string name) {
-	std::list<sg_node*> subtree;
-	std::list<sg_node*>::iterator i;
-	
+bool scene::del_node(string name) {
 	sg_node *n = get_node(name);
 	if (!n) {
 		return false;
 	}
-	n->detach();
-	collect_subtree(n, subtree);
-	for (i = subtree.begin(); i != subtree.end(); ++i) {
-		string name = (**i).get_name();
-		nodes.erase(name);
-		delete *i;
-	}
+	delete n;
 	return true;
 }

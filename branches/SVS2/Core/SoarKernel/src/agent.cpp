@@ -117,6 +117,8 @@ void init_soar_agent(agent* thisAgent) {
 
   reset_statistics (thisAgent);
 
+  thisAgent->svs_instance = new svs(new soar_interface(thisAgent));
+
   /* RDF: For gSKI */
   init_agent_memory(thisAgent);
   /* END */
@@ -389,8 +391,6 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   newAgent->smem_validation = 0;
   newAgent->smem_first_switch = true;
-
-  newAgent->svs_instance = new svs(new soar_interface(newAgent));
 
   // statistics initialization
   newAgent->dc_stat_tracking = false;

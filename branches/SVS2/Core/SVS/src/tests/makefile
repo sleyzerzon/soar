@@ -27,8 +27,10 @@ test_svs: test_svs.cpp test_interface.cpp test_interface.h $(objs)
 	$(CXX) $(CXXFLAGS) -c $(CXXFLAGS) -o $@ $<
 
 clean:
-	$(RM) *.o $(testprogs)
+	$(RM) *.o *.out $(testprogs)
 
-tests:
-	cd tests && ./test_sgel
-	@echo All tests passed
+tests: $(testprogs)
+	@./test_bbox || echo bbox fail
+	@./test_filter || echo filter fail
+	@./test_nsg || echo nsg fail
+	

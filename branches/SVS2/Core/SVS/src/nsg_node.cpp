@@ -18,7 +18,35 @@ nsg_node::nsg_node(std::string nm, ptlist &points)
 { }
 
 nsg_node::~nsg_node() {
+	vector<nsg_node*>::iterator i;
+	
+	if (parent) {
+		parent->detach_child(this);
+	}
+	for (i = childs.begin(); i != childs.end(); ++i) {
+		(**i).parent = NULL;  // so it doesn't try to detach itself
+		delete *i;
+	}
 	send_update(sg_node::DEL);
+}
+
+sg_node* nsg_node::copy() {
+	nsg_node *c;
+	vector<nsg_node*>::iterator i;
+	
+	if (isgroup) {
+		c = new nsg_node(name);
+	} else {
+		c = new nsg_node(name, pts);
+	}
+	c->set_pos(pos);
+	c->set_rot(rot);
+	c->set_scale(scale);
+	
+	for(i = childs.begin(); i != childs.end(); ++i) {
+		c->attach_child((**i).copy());
+	}
+	return c;
 }
 
 std::string nsg_node::get_name() {
@@ -67,14 +95,6 @@ bool nsg_node::attach_child(sg_node *c) {
 	send_update(sg_node::ADDCHILD);
 	
 	return true;
-}
-
-void nsg_node::detach() {
-	if (parent) {
-		parent->detach_child(this);
-		parent = NULL;
-	}
-	send_update(sg_node::DETACH);
 }
 
 void nsg_node::nsg_node::set_pos(vec3 xyz) {
@@ -188,7 +208,7 @@ void nsg_node::update_points() {
 void nsg_node::send_update(sg_node::change_type t) {
 	std::list<sg_listener*>::iterator i;
 	std::list<sg_listener*> c;
-	copy(listeners.begin(), listeners.end(), back_inserter(c));
+	std::copy(listeners.begin(), listeners.end(), back_inserter(c));
 	for (i = c.begin(); i != c.end(); ++i) {
 		(**i).update(this, t);
 	}

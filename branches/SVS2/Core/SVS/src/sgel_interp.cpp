@@ -2,7 +2,6 @@
 #include "nsg_node.h"
 #include "scene.h"
 #include <stdlib.h>
-#include <list>
 #include <vector>
 
 using namespace std;
@@ -51,7 +50,7 @@ bool parse_verts(vector<string> &f, int &start, ptlist &verts) {
 	while (start < f.size()) {
 		i = start;
 		if (!parse_n_floats(f, start, 3, x)) {
-			return (i == start);  // end of std::list
+			return (i == start);  // end of list
 		}
 		verts.push_back(vec3(x[0], x[1], x[2]));
 	}
@@ -150,7 +149,7 @@ int sgel_interp::parse_detach(vector<string> &f) {
 	if (f.size() != 1) {
 		return 0;
 	}
-	if (!scn->del_tree(f[0])) {
+	if (!scn->del_node(f[0])) {
 		return 0;
 	}
 	return -1;

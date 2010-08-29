@@ -17,6 +17,7 @@ public:
 		PTSCHANGE
 	};
 	
+	virtual sg_node*    copy() = 0;  // deep copy, copy doesn't inherit listeners
 	virtual void        set_name(std::string nm) = 0;
 	virtual std::string get_name() = 0;
 	virtual bool        is_group() = 0;
@@ -25,7 +26,7 @@ public:
 	virtual int         get_nchilds() = 0;
 	virtual sg_node*    get_child(int i) = 0;
 	virtual bool        attach_child(sg_node *c) = 0;
-	virtual void        detach() = 0;
+	                    // detach by deleting
 
 	virtual void        set_pos(vec3 xyz) = 0;
 	virtual vec3        get_pos() = 0;
