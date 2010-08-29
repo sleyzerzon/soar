@@ -658,10 +658,10 @@ void rl_module::perform_update( double op_value, bool op_rl, Symbol *goal, bool 
 						ss << "RL update " << prod->name->sc.name << " "
 						   << old_ecr << " " << old_efr << " " << old_ecr + old_efr << " -> "
 						   << new_ecr << " " << new_efr << " " << new_combined ;
-						
-						std::string temp_string( ss.str().c_str() );
-						print( my_agent, "%s\n", temp_string.c_str() );
-						xml_generate_message( my_agent, temp_string.c_str() );
+
+						std::string temp_str( ss.str() );						
+						print( my_agent, "%s\n", temp_str.c_str() );
+						xml_generate_message( my_agent, temp_str.c_str() );
 					}
 
 					// Change value of rule
