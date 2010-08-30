@@ -83,11 +83,15 @@ bool bbox_filter::get_result_string(string &r) {
 sg_node_filter::sg_node_filter(sg_node *node)
 : n(node)
 {
-	n->listen(this);
+	if (n) {
+		n->listen(this);
+	}
 }
 
 sg_node_filter::~sg_node_filter() {
-	n->unlisten(this);
+	if (n) {
+		n->unlisten(this);
+	}
 }
 
 bool sg_node_filter::get_result(ptlist &r) {
@@ -100,9 +104,8 @@ bool sg_node_filter::get_result(ptlist &r) {
 
 string sg_node_filter::get_error() { 
 	if (!n) {
-		return "invalid node";
+		return "NODE_NONEXISTENT";
 	}
-	return "unknown error";
 }
 
 void sg_node_filter::update(sg_node *n, sg_node::change_type t) {

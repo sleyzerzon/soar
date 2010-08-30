@@ -78,9 +78,9 @@ void svs_state::update_cmd_results() {
 	for (i = curr_cmds.begin(); i != curr_cmds.end(); ++i) {
 		v = si->get_wme_val(i->first);
 		if (!i->second.fltr) {
-			r = "invalid command";
+			r = "PARSE_ERROR";
 		} else if (!(i->second.fltr->get_result_string(r))) {
-			r = "error: " + i->second.fltr->get_error();
+			r = i->second.fltr->get_error();
 		}
 		cout << "RESULT '" << r << "'" << endl;
 		if (r == i->second.last_result) {

@@ -37,7 +37,7 @@ public:
 	void        update(filter *u);
 	
 private:
-	bbox_filter *qa, *qb;
+	bbox_filter *ia, *ib;
 	bool result;
 	bool dirty;
 	bool error;

@@ -6,7 +6,7 @@
 using namespace std;
 
 ptlist_bbox_filter::ptlist_bbox_filter(vector<ptlist_filter*> inputs)
-: in(inputs), box(NULL)
+: in(inputs), box(NULL), error(false)
 {
 	vector<ptlist_filter*>::iterator i;
 	for (i = in.begin(); i != in.end(); ++i) {
@@ -33,7 +33,7 @@ bool ptlist_bbox_filter::get_result(bbox &r) {
 		i = in.begin();
 		if (i == in.end()) {
 			error = true;
-			errmsg = "No inputs";
+			errmsg = "BBOX_NO_INPUTS";
 			return false;
 		}
 		if (!(**i).get_result(l)) {
@@ -66,17 +66,17 @@ void ptlist_bbox_filter::update(filter *u) {
 }
 
 bbox_int_filter::bbox_int_filter(bbox_filter *a, bbox_filter *b)
-: qa(a), qb(b), dirty(true), error(false)
+: ia(a), ib(b), dirty(true), error(false)
 {
-	add_child(qa);
-	add_child(qb);
-	qa->listen(this);
-	qb->listen(this);
+	add_child(ia);
+	add_child(ib);
+	ia->listen(this);
+	ib->listen(this);
 }
 
 bbox_int_filter::~bbox_int_filter() {
-	qa->unlisten(this);
-	qb->unlisten(this);
+	ia->unlisten(this);
+	ib->unlisten(this);
 }
 
 void bbox_int_filter::update(filter *u) {
@@ -89,15 +89,15 @@ bool bbox_int_filter::get_result(bool &r) {
 	if (dirty) {
 		bbox a, b;
 
-		if (!qa->get_result(a)) {
+		if (!ia->get_result(a)) {
 			error = true;
-			errmsg = qa->get_error();
+			errmsg = ia->get_error();
 			return false;
 		}
 		
-		if (!qb->get_result(b)) {
+		if (!ib->get_result(b)) {
 			error = true;
-			errmsg = qb->get_error();
+			errmsg = ib->get_error();
 			return false;
 		}
 		result = a.intersects(b);
