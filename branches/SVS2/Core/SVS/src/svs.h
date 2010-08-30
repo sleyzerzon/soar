@@ -4,41 +4,62 @@
 #include "sg_node.h"
 #include "soar_int.h"
 #include "wm_sgo.h"
-#include "sgel_interp.h"
-#include <list>
+#include "filter.h"
+#include <vector>
 
 typedef std::map<std::string,sg_node*> node_name_map;
 
-class cmd_stats {
+
+class cmd_data {
 public:
-	cmd_stats() 
-	: subtree_size(0), max_time_tag(0)
+	cmd_data() 
+	: subtree_size(0), max_time_tag(0), fltr(NULL), result_wme(NULL)
 	{}
 	
-	int subtree_size;
-	int max_time_tag;
+	int         subtree_size;
+	int         max_time_tag;
+	filter*     fltr;
+	std::string last_result;
+	wme_hnd     result_wme;
 };
 
-typedef struct common_syms_struct {
-	sym_hnd svs_sym;
-	sym_hnd ltm_sym;
-	sym_hnd cmd_sym;
-	sym_hnd scene_sym;
-	sym_hnd contents_sym;
-	sym_hnd child_sym;
-} common_syms;
+class common_syms {
+public:
+	common_syms() {
+		svs      = NULL;
+		ltm      = NULL;
+		cmd      = NULL;
+		scene    = NULL;
+		contents = NULL;
+		child    = NULL;
+		result   = NULL;
+	}
+	
+	sym_hnd svs;
+	sym_hnd ltm;
+	sym_hnd cmd;
+	sym_hnd scene;
+	sym_hnd contents;
+	sym_hnd child;
+	sym_hnd result;
+};
 
 class svs_state {
 public:
-	svs_state(sym_hnd state, svs_state *parent, soar_interface *interface, common_syms *cs);
+	svs_state(sym_hnd state, svs_state *parent, soar_interface *interface, common_syms *syms);
 	~svs_state();
 	
 	void    process_cmds();
+	void    update_cmd_results();
 	sym_hnd get_state() { return state; }
-
+	
 private:
-	void parse_cmd_id      (Symbol* id, std::set<wme*>& all_cmds);
-	bool detect_id_changes (Symbol* id, cmd_stats &stats);
+	void    parse_cmd_id(Symbol* id, std::set<wme*>& all_cmds);
+	bool    detect_id_changes(Symbol* id, cmd_data &data);
+
+	filter* make_cmd_filter(sym_hnd cmd);
+	bool    get_filter_params_wm(sym_hnd id, filter_params &p);
+    filter* get_node_filter(sym_hnd s);
 	
 	soar_interface *si;
 
@@ -46,6 +67,8 @@ private:
 	wm_sgo*       wm_sg_root;
 	node_name_map nodes;
 
+	common_syms *cs;
+	
 	/* svs link identifiers */
 	sym_hnd state;
 	sym_hnd link;
@@ -56,10 +79,10 @@ private:
 	sym_hnd scene_contents;
 
 	/* command changes per decision cycle */
-	std::list<wme_hnd>          new_cmds;
-	std::list<wme_hnd>          modified_cmds;
-	std::list<wme_hnd>          removed_cmds;
-	std::map<wme_hnd,cmd_stats> curr_cmds;
+	wme_list new_cmds;
+	wme_list modified_cmds;
+	wme_list removed_cmds;
+	std::map<wme_hnd,cmd_data> curr_cmds;
 };
 
 class svs {
@@ -76,10 +99,10 @@ private:
 	void make_common_syms();
 	void del_common_syms();
 	
-	soar_interface*       si;
-	std::list<svs_state*> state_stack;
+	soar_interface*         si;
+	common_syms             cs;
+	std::vector<svs_state*> state_stack;
 
-	common_syms cs;
 };
 
 #endif

@@ -27,6 +27,7 @@ public:
 	sym_wme_pair make_id_wme(sym_hnd id, std::string attr);
 	sym_wme_pair make_id_wme(sym_hnd id, sym_hnd attr);
 	wme_hnd      make_str_wme(sym_hnd id, std::string attr, std::string val);
+	wme_hnd      make_str_wme(sym_hnd id, sym_hnd attr, std::string val);
 	void         remove_wme(wme_hnd w);
 	bool         get_child_wmes(sym_hnd id, wme_list &childs);
 	
@@ -41,6 +42,7 @@ public:
 	bool         get_val(sym_hnd sym, long &v);
 	bool         get_val(sym_hnd sym, float &v);
 	
+	sym_hnd      get_wme_attr(wme_hnd w);
 	sym_hnd      get_wme_val(wme_hnd w);
 
 	tc_num       new_tc_num();
@@ -108,6 +110,10 @@ inline bool soar_interface::get_val(sym_hnd sym, float &v) {
 		return true;
 	}
 	return false;
+}
+
+inline sym_hnd soar_interface::get_wme_attr(wme_hnd w) {
+	return w->attr;
 }
 
 inline sym_hnd soar_interface::get_wme_val(wme_hnd w) {

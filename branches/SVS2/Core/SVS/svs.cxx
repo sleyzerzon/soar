@@ -5,3 +5,5 @@
 #include "src/sgel_interp.cpp"
 #include "src/soar_interface.cpp"
 #include "src/scene.cpp"
+#include "src/filter.cpp"
+#include "src/bbox_filter.cpp"
