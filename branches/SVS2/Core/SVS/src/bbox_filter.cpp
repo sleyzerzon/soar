@@ -22,6 +22,10 @@ ptlist_bbox_filter::~ptlist_bbox_filter() {
 	}
 }
 
+bool ptlist_bbox_filter::changed() {
+	return box == NULL;
+}
+
 bool ptlist_bbox_filter::get_result(bbox &r) {
 	vector<ptlist_filter*>::iterator i;
 	ptlist l;

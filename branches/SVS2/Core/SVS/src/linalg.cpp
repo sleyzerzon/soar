@@ -87,7 +87,7 @@ vec3 transform3::operator()(const vec3 &v) {
 }
 
 /*
-Used to generate the unrolled matrix multiplication
+# Used to generate the unrolled matrix multiplication
 
 awk 'BEGIN {
 	for (i = 0; i <= 3; i++) {
@@ -109,5 +109,83 @@ awk 'BEGIN {
 	}
 	exit
 }'
+
+# "Symbolic" matrix multiplication with awk. Actually correctly unrolled
+# the transform matrix for 3D rotation using yaw, pitch, and roll.
+
+awk 'BEGIN {
+	ys="cos(y) -sin(y) 0.0 0.0 " \
+	   "sin(y)  cos(y) 0.0 0.0 " \
+	   "   0.0     0.0 1.0 0.0 " \
+	   "   0.0     0.0 0.0 1.0 "
+
+	ps=" cos(p) 0.0 sin(p) 0.0 " \
+	   "    0.0 1.0    0.0 0.0 " \
+	   "-sin(p) 0.0 cos(p) 0.0 " \
+	   "    0.0 0.0    0.0 1.0 "
+
+	rs="1.0    0.0     0.0 0.0 " \
+	   "0.0 cos(r) -sin(r) 0.0 " \
+	   "0.0 sin(r)  cos(r) 0.0 " \
+	   "0.0    0.0     0.0 1.0 "
+	
+	parse(RY, ys)
+	parse(RP, ps)
+	parse(RR, rs)
+	
+	printmat(RY)
+	printmat(RP)
+	printmat(RR)
+	
+	mult(RR, RP, F)
+	mult(F, RY, FF)
+	
+	printmat(FF)
+	exit
+}
+
+function printmat(M) {
+	for (i = 0; i <= 3; i++) {
+		sep = ""
+		for (j = 0; j <= 3; j++) {
+			printf sep M[i,j]
+			sep = ", "
+		}
+		print ""
+	}
+}
+
+function parse(M, s) {
+	split(s, xxx)
+	for (i = 0; i <= 3; i++)
+		for (j = 0; j <= 3; j++)
+			M[i, j] = xxx[i * 4 + j + 1]
+}
+
+function mult(A, B, AB) {
+	for (i = 0; i <= 3; i++) {
+		for (j = 0; j <= 3; j++) {
+			line=""
+			op = ""
+			for (r = 0; r <= 3; r++) {
+				if (A[i,r] == 0.0 || B[r,j] == 0.0)
+					continue
+				if (A[i,r] == 1.0) {
+					line = line sprintf("%s%s", op, B[r, j])
+				} else if (B[r, j] == 1.0) {
+					line = line sprintf("%s%s", op, A[i, r])
+				} else {
+					line = line sprintf("%s%s*%s", op, A[i, r], B[r, j])
+				}
+				op = "+"
+			}
+			if (length(line) == 0)
+				AB[i,j] = 0.0
+			else
+				AB[i,j]=line
+		}
+	}
+}'
+
 
 */

@@ -27,6 +27,7 @@ public:
 	virtual ~filter();
 	
 	virtual bool        get_result_string(std::string &r) = 0;
+	virtual bool        changed() = 0;
 	virtual std::string get_error() = 0;
 
 	/* all derived classes need to call this for each input filter */
@@ -53,23 +54,31 @@ public:
 	virtual bool get_result(ptlist &r) = 0;
 };
 
+class node_filter : public filter {
+public:
+	bool get_result_string(std::string &r);
+	virtual bool get_result(sg_node* &r) = 0;
+};
+
 class bbox_filter : public filter {
 public:
 	bool get_result_string(std::string &r);
 	virtual bool get_result(bbox &r) = 0;
 };
 
-/* filter interface for scene graph nodes */
-class sg_node_filter : public ptlist_filter, public sg_listener {
+/* extract ptlist from scene graph nodes */
+class node_ptlist_filter : public ptlist_filter, public sg_listener {
 public:
-	sg_node_filter(sg_node *node);
-	~sg_node_filter();
+	node_ptlist_filter(sg_node *node);
+	~node_ptlist_filter();
 
 	bool        get_result(ptlist &r);
+	bool        changed();
 	std::string get_error();
 	void        update(sg_node *n, sg_node::change_type t);
 	
 private:
+	bool dirty;
 	sg_node *n;
 };
 

@@ -70,27 +70,39 @@ svs_state::~svs_state() {
 	delete sg_root; // results in wm_sg_root being deleted also
 }
 
+void svs_state::update_extract_result(sym_hnd id, cmd_data &d) {
+	if (!d.fltr) {
+		r = "PARSE_ERROR";
+	} else if (!d.fltr->changed()) {
+		return;
+	} else if (!f->get_result_string(r)) {
+		r = f->get_error();
+	}
+	if (d.result_wme) {
+		si->remove_wme(d.result_wme);
+	}
+	d.result_wme = si->make_str_wme(id, cs->result, r);
+}
+
+void svs_state::update_generate_result(sym_hnd id, cmd_data &d) {
+}
+
 void svs_state::update_cmd_results() {
-	sym_hnd v;
-	string r, errmsg;
+	sym_hnd a, v;
+	string cmdtype;
 	map<wme_hnd,cmd_data>::iterator i;
 
 	for (i = curr_cmds.begin(); i != curr_cmds.end(); ++i) {
+		a = si->get_wme_attr(i->first);
 		v = si->get_wme_val(i->first);
-		if (!i->second.fltr) {
-			r = "PARSE_ERROR";
-		} else if (!(i->second.fltr->get_result_string(r))) {
-			r = i->second.fltr->get_error();
-		}
-		cout << "RESULT '" << r << "'" << endl;
-		if (r == i->second.last_result) {
+		if (!si->get_val(a, cmdtype)) {
 			continue;
 		}
-		if (i->second.result_wme) {
-			si->remove_wme(i->second.result_wme);
+		if (cmdtype == "extract") {
+			update_extract_result(v, i->second);
+		} else if (cmdtype == "generate") {
+			update_generate_result(v, i->second);
 		}
-		i->second.result_wme = si->make_str_wme(v, cs->result, r);
-		i->second.last_result = r;
 	}
 }
 
@@ -309,7 +321,7 @@ filter* svs_state::get_node_filter(sym_hnd s) {
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return NULL;
 	}
-	return new sg_node_filter(i->second);
+	return new node_ptlist_filter(i->second);
 }
 
 svs::svs(soar_interface *interface)

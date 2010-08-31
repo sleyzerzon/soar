@@ -6,6 +6,7 @@
 #include "linalg.h"
 #include "sg_node.h"
 #include "filter.h"
+#include "gen_filter.h"
 
 using namespace std;
 
@@ -18,8 +19,9 @@ extern filter* make_bbox_filter(filter_params&);
 extern filter* make_bbox_int_filter(filter_params&);
 
 static filter_cons_entry filter_cons_tab[] = {
-	{ "bbox",     make_bbox_filter },
-	{ "bbox_int", make_bbox_int_filter }
+	{ "bbox",     make_bbox_filter     },
+	{ "bbox_int", make_bbox_int_filter },
+	{ "gen",      make_gen_filter      }
 };
 
 filter::~filter() {
@@ -80,7 +82,7 @@ bool bbox_filter::get_result_string(string &r) {
 	return true;
 }
 
-sg_node_filter::sg_node_filter(sg_node *node)
+node_ptlist_filter::node_ptlist_filter(sg_node *node)
 : n(node)
 {
 	if (n) {
@@ -88,13 +90,13 @@ sg_node_filter::sg_node_filter(sg_node *node)
 	}
 }
 
-sg_node_filter::~sg_node_filter() {
+node_ptlist_filter::~node_ptlist_filter() {
 	if (n) {
 		n->unlisten(this);
 	}
 }
 
-bool sg_node_filter::get_result(ptlist &r) {
+bool node_ptlist_filter::get_result(ptlist &r) {
 	if (n) {
 		n->get_world_points(r);
 		return true;
@@ -102,16 +104,26 @@ bool sg_node_filter::get_result(ptlist &r) {
 	return false;
 }
 
-string sg_node_filter::get_error() { 
+bool node_ptlist_filter::changed() {
+	if (dirty) {
+		dirty = false;
+		return true;
+	}
+	return false;
+}
+
+
+string node_ptlist_filter::get_error() { 
 	if (!n) {
 		return "NODE_NONEXISTENT";
 	}
 }
 
-void sg_node_filter::update(sg_node *n, sg_node::change_type t) {
+void node_ptlist_filter::update(sg_node *n, sg_node::change_type t) {
 	if (t == sg_node::DEL || t == sg_node::DETACH) {
 		n = NULL;
 	}
+	dirty = true;
 	notify();
 }
 

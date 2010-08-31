@@ -19,7 +19,6 @@ public:
 	int         subtree_size;
 	int         max_time_tag;
 	filter*     fltr;
-	std::string last_result;
 	wme_hnd     result_wme;
 };
 
@@ -60,6 +59,9 @@ private:
 	filter* make_cmd_filter(sym_hnd cmd);
 	bool    get_filter_params_wm(sym_hnd id, filter_params &p);
     filter* get_node_filter(sym_hnd s);
+    
+    void    update_extract_result(sym_hnd id, cmd_data &d);
+	void    update_generate_result(sym_hnd id, cmd_data &d);
 	
 	soar_interface *si;
 

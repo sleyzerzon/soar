@@ -26,7 +26,6 @@ public:
 	virtual int         get_nchilds() = 0;
 	virtual sg_node*    get_child(int i) = 0;
 	virtual bool        attach_child(sg_node *c) = 0;
-	                    // detach by deleting
 
 	virtual void        set_pos(vec3 xyz) = 0;
 	virtual vec3        get_pos() = 0;

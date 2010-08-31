@@ -14,6 +14,7 @@ public:
 	~ptlist_bbox_filter();
 	
 	bool        get_result(bbox &r);
+	bool        changed();
 	std::string get_error();
 	void        update(filter *u);
 
@@ -33,6 +34,7 @@ public:
 	~bbox_int_filter();
 	
 	bool        get_result(bool &r);
+	bool        changed();
 	std::string get_error();
 	void        update(filter *u);
 	
