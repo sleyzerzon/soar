@@ -2,24 +2,28 @@
 #define SCENE_H
 
 #include <string>
-#include <list>
 #include <map>
-#include "linalg.h"
 #include "sg_node.h"
+#include "nsg_node.h"
 
-class scene {
+typedef std::map<std::string, sg_node*> node_map;
+
+class scene : public sg_listener {
 public:
 	scene(std::string rootname);
+	scene(scene *c);
+	~scene();
 	
+	sg_node* get_root();
 	sg_node* get_node(std::string name);
-	sg_node* add_group(std::string name, std::string par);
-	sg_node* add_geometry(std::string name, std::string par, ptlist &points);
-	bool     del_node(std::string name);
+	
+	void     update(sg_node *n, sg_node::change_type t);
 	
 private:
-	bool add_node(std::string par, sg_node *n);
+	void update_names(sg_node *n);
 	
-	std::map<std::string, sg_node*> nodes;
+	sg_node* root;
+	node_map nodes;
 };
 
 #endif

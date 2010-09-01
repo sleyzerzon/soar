@@ -14,12 +14,12 @@ transform3::transform3()
   m20(0.0), m21(0.0), m22(1.0), m23(0.0)
 {}
 
-transform3::transform3(double _00, double _01, double _02, double _03,
-           double _10, double _11, double _12, double _13,
-           double _20, double _21, double _22, double _23 )
-: m00(_00), m01(_01), m02(_02), m03(_03),
-  m10(_10), m11(_11), m12(_12), m13(_13),
-  m20(_20), m21(_21), m22(_22), m23(_23)
+transform3::transform3(double m00, double m01, double m02, double m03,
+                       double m10, double m11, double m12, double m13,
+                       double m20, double m21, double m22, double m23 )
+: m00(m00), m01(m01), m02(m02), m03(m03),
+  m10(m10), m11(m11), m12(m12), m13(m13),
+  m20(m20), m21(m21), m22(m22), m23(m23)
 {}
 
 transform3::transform3(transform_tags::Translation t, vec3 v)

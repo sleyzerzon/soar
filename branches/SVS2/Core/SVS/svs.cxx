@@ -4,6 +4,7 @@
 #include "src/wm_sgo.cpp"
 #include "src/sgel_interp.cpp"
 #include "src/soar_interface.cpp"
-#include "src/scene.cpp"
 #include "src/filter.cpp"
 #include "src/bbox_filter.cpp"
+#include "src/cmd_watcher.cpp"
+#include "src/scene.cpp"

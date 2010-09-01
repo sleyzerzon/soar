@@ -39,7 +39,7 @@ public:
 	virtual void        get_local_points(ptlist &result) = 0;
 	virtual void        get_world_points(ptlist &result) = 0;
 	
-	virtual void        listen(sg_listener *o) = 0;
+	virtual void        listen(sg_listener *o) = 0;   // must handle repeats
 	virtual void        unlisten(sg_listener *o) = 0;
 };
 

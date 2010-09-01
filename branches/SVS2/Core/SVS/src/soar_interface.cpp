@@ -15,7 +15,7 @@ soar_interface::soar_interface(agent *a)
 soar_interface::~soar_interface() {
 }
 
-wme_hnd soar_interface::make_str_wme(sym_hnd id, string attr, string val) {
+wme_hnd soar_interface::make_str_wme(sym_hnd id, const string &attr, const string &val) {
 	Symbol *attrsym = make_sym_constant(agnt, attr.c_str());
 	Symbol *valsym = make_sym_constant(agnt, val.c_str());
 	wme* w = soar_module::add_module_wme(agnt, id, attrsym, valsym);
@@ -24,14 +24,14 @@ wme_hnd soar_interface::make_str_wme(sym_hnd id, string attr, string val) {
 	return w;
 }
 
-wme_hnd soar_interface::make_str_wme(sym_hnd id, sym_hnd attr, string val) {
+wme_hnd soar_interface::make_str_wme(sym_hnd id, sym_hnd attr, const string &val) {
 	Symbol *valsym = make_sym_constant(agnt, val.c_str());
 	wme* w = soar_module::add_module_wme(agnt, id, attr, valsym);
 	symbol_remove_ref(agnt, valsym);
 	return w;
 }
 
-sym_wme_pair soar_interface::make_id_wme(sym_hnd id, string attr) {
+sym_wme_pair soar_interface::make_id_wme(sym_hnd id, const string &attr) {
 	sym_wme_pair p;
 	Symbol *attrsym = make_sym_constant(agnt, attr.c_str());
 	Symbol *valsym = make_new_identifier(agnt, attr[0], id->id.level);

@@ -6,6 +6,7 @@
 #include "sg_node.h"
 #include "linalg.h"
 #include <vector>
+#include <set>
 
 class nsg_node : public sg_node {
 public:
@@ -59,7 +60,7 @@ private:
 	bool                    tdirty;       // transforms dirty
 	bool                    pdirty;       // convex hull dirty
 	
-	std::list<sg_listener*> listeners;
+	std::set<sg_listener*>  listeners;
 };
 
 #endif

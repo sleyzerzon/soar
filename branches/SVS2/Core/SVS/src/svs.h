@@ -1,26 +1,17 @@
 #ifndef SVS_H
 #define SVS_H
 
-#include "sg_node.h"
 #include "soar_int.h"
+#include "sg_node.h"
+#include "scene.h"
 #include "wm_sgo.h"
 #include "filter.h"
+#include "cmd_watcher.h"
 #include <vector>
+#include <map>
+#include <set>
 
 typedef std::map<std::string,sg_node*> node_name_map;
-
-
-class cmd_data {
-public:
-	cmd_data() 
-	: subtree_size(0), max_time_tag(0), fltr(NULL), result_wme(NULL)
-	{}
-	
-	int         subtree_size;
-	int         max_time_tag;
-	filter*     fltr;
-	wme_hnd     result_wme;
-};
 
 class common_syms {
 public:
@@ -53,38 +44,28 @@ public:
 	sym_hnd get_state() { return state; }
 	
 private:
-	void    parse_cmd_id(Symbol* id, std::set<wme*>& all_cmds);
-	bool    detect_id_changes(Symbol* id, cmd_data &data);
-
-	filter* make_cmd_filter(sym_hnd cmd);
-	bool    get_filter_params_wm(sym_hnd id, filter_params &p);
-    filter* get_node_filter(sym_hnd s);
-    
-    void    update_extract_result(sym_hnd id, cmd_data &d);
-	void    update_generate_result(sym_hnd id, cmd_data &d);
+	void collect_cmds(Symbol* id, std::set<wme*>& all_cmds);
 	
 	soar_interface *si;
 
-	sg_node*      sg_root;
+	scene*        scn;
 	wm_sgo*       wm_sg_root;
-	node_name_map nodes;
 
 	common_syms *cs;
 	
 	/* svs link identifiers */
 	sym_hnd state;
-	sym_hnd link;
-	sym_hnd ltm;
-	sym_hnd ltm_cmd;
-	sym_hnd scene;
-	sym_hnd scene_cmd;
-	sym_hnd scene_contents;
+	sym_hnd svs_link;
+	sym_hnd ltm_link;
+	sym_hnd ltm_cmd_link;
+	sym_hnd scene_link;
+	sym_hnd scene_cmd_link;
+	sym_hnd scene_contents_link;
 
 	/* command changes per decision cycle */
 	wme_list new_cmds;
-	wme_list modified_cmds;
 	wme_list removed_cmds;
-	std::map<wme_hnd,cmd_data> curr_cmds;
+	std::map<wme_hnd, cmd_watcher*> curr_cmds;
 };
 
 class svs {

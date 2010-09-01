@@ -215,9 +215,9 @@ void nsg_node::send_update(sg_node::change_type t) {
 }
 
 void nsg_node::listen(sg_listener *o) {
-	listeners.push_back(o);
+	listeners.insert(o);
 }
 
 void nsg_node::unlisten(sg_listener *o) {
-	listeners.remove(o);
+	listeners.erase(o);
 }

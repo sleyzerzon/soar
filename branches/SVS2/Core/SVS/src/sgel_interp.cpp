@@ -115,7 +115,7 @@ int sgel_interp::parse_line(string s) {
 }
 
 int sgel_interp::parse_attach(vector<string> &f) {
-	sg_node *n;
+	sg_node *n, *p;
 	ptlist verts;
 	int pos;
 
@@ -125,7 +125,7 @@ int sgel_interp::parse_attach(vector<string> &f) {
 	if (scn->get_node(f[0])) {
 		return 0;  // already exists
 	}
-	if (!scn->get_node(f[1])) {
+	if (!(p = scn->get_node(f[1]))) {
 		return 1;  // parent doesn't exist
 	}
 	
@@ -134,24 +134,29 @@ int sgel_interp::parse_attach(vector<string> &f) {
 		return pos;
 	}
 	if (verts.size() == 0) {
-		n = scn->add_group(f[0], f[1]);
+		n = new nsg_node(f[0]);
 	} else {
-		n = scn->add_geometry(f[0], f[1], verts);
+		n = new nsg_node(f[0], verts);
 	}
 
 	if (!parse_transforms(f, pos, n)) {
+		delete n;
 		return pos;
 	}
+	p->attach_child(n);
+	
 	return -1;
 }
 
 int sgel_interp::parse_detach(vector<string> &f) {
+	sg_node *n;
 	if (f.size() != 1) {
 		return 0;
 	}
-	if (!scn->del_node(f[0])) {
+	if (!(n = scn->get_node(f[0]))) {
 		return 0;
 	}
+	delete n;
 	return -1;
 }
 

@@ -1,66 +1,51 @@
 #include "scene.h"
 #include "nsg_node.h"
 #include <map>
-#include <list>
 
 using namespace std;
 
-typedef map<string, sg_node*>::iterator node_iter;
+scene::scene(std::string rootname) {
+	root = new nsg_node(rootname);
+	update_names(root);
+}
 
-void collect_subtree(sg_node* root, std::list<sg_node*> &n) {
-	n.push_back(root);
-	for (int i = 0; i < root->num_children(); ++i) {
-		collect_subtree(root->get_child(i), n);
+scene::scene(scene *c) {
+	root = c->root->copy();
+	update_names(root);
+}
+
+scene::~scene() {
+	delete root;
+}
+
+void scene::update_names(sg_node *n) {
+	int i;
+	nodes[n->get_name()] = n;
+	n->listen(this);
+	for (i = 0; i < n->num_children(); ++i) {
+		update_names(n->get_child(i));
 	}
 }
 
-scene::scene(string rootname) {
-	nodes[rootname] = new nsg_node(rootname);
+sg_node* scene::get_root() {
+	return root;
 }
 
-sg_node* scene::get_node(string name) {
-	node_iter i;
+sg_node* scene::get_node(std::string name) {
+	node_map::iterator i;
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return NULL;
 	}
 	return i->second;
 }
 
-bool scene::add_node(string par, sg_node *n) {
-	sg_node *p = get_node(par);
-	if (!p || !p->attach_child(n)) {
-		return false;
+void scene::update(sg_node *n, sg_node::change_type t) {
+	switch(t) {
+		case sg_node::CHILD_ADDED:
+			update_names(n);
+			break;
+		case sg_node::DELETED:
+			nodes.erase(n->get_name());
+			break;
 	}
-	if (get_node(n->get_name())) {
-		return false;
-	}
-	nodes[n->get_name()] = n;
-	return true;
-}
-
-sg_node* scene::add_group(string name, string par) {
-	sg_node *n = new nsg_node(name);
-	if (!add_node(par, n)) {
-		delete n;
-		return NULL;
-	}
-	return n;
-}
-
-sg_node* scene::add_geometry(string name, string par, ptlist &points) {
-	sg_node *n = new nsg_node(name, points);
-	if (!add_node(par, n)) {
-		delete n;
-		return NULL;
-	}
-	return n;
-}
-
-bool scene::del_node(string name) {
-	sg_node *n = get_node(name);
-	if (!n) {
-		return false;
-	}
-	delete n;
-	return true;
 }

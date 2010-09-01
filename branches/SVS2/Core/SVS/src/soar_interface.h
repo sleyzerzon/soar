@@ -21,13 +21,13 @@ public:
 	soar_interface(agent *a);
 	~soar_interface();
 
-	sym_hnd      make_string_sym(std::string val);
+	sym_hnd      make_string_sym(const std::string &val);
 	void         del_string_sym(sym_hnd s);
 	
-	sym_wme_pair make_id_wme(sym_hnd id, std::string attr);
+	sym_wme_pair make_id_wme(sym_hnd id, const std::string &attr);
 	sym_wme_pair make_id_wme(sym_hnd id, sym_hnd attr);
-	wme_hnd      make_str_wme(sym_hnd id, std::string attr, std::string val);
-	wme_hnd      make_str_wme(sym_hnd id, sym_hnd attr, std::string val);
+	wme_hnd      make_str_wme(sym_hnd id, const std::string &attr, const std::string &val);
+	wme_hnd      make_str_wme(sym_hnd id, sym_hnd attr, const std::string &val);
 	void         remove_wme(wme_hnd w);
 	bool         get_child_wmes(sym_hnd id, wme_list &childs);
 	
@@ -56,7 +56,7 @@ private:
 
 };
 
-inline sym_hnd soar_interface::make_string_sym(std::string val) {
+inline sym_hnd soar_interface::make_string_sym(const std::string &val) {
 	make_sym_constant(agnt, val.c_str());
 }
 
