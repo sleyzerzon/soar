@@ -9,7 +9,7 @@ typedef map<string, sg_node*>::iterator node_iter;
 
 void collect_subtree(sg_node* root, std::list<sg_node*> &n) {
 	n.push_back(root);
-	for (int i = 0; i < root->get_nchilds(); ++i) {
+	for (int i = 0; i < root->num_children(); ++i) {
 		collect_subtree(root->get_child(i), n);
 	}
 }

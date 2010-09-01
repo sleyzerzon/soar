@@ -10,7 +10,7 @@
 
 class wm_sgo : public sg_listener {
 public:
-	wm_sgo(soar_interface *soarinterface, sym_hnd ident, wm_sgo *parent, sg_node *n);
+	wm_sgo(soar_interface *soarinterface, sym_hnd ident, wm_sgo *parent, sg_node *node);
 	~wm_sgo();
 	
 	void update(sg_node *n, sg_node::change_type t);
@@ -19,8 +19,8 @@ public:
 private:
 	void detach();
 	
-	wm_sgo*         par;
-	sg_node*        n;
+	wm_sgo*         parent;
+	sg_node*        node;
 	sym_hnd         id;
 	wme_hnd         name_wme;
 	soar_interface* soarint;

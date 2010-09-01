@@ -10,7 +10,7 @@ using namespace std;
 void update_node_name_map(sg_node *n, node_name_map &m) {
 	int i;
 	m[n->get_name()] = n;
-	for (i = 0; i < n->get_nchilds(); ++i) {
+	for (i = 0; i < n->num_children(); ++i) {
 		update_node_name_map(n->get_child(i), m);
 	}
 }

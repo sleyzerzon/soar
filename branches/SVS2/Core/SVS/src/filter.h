@@ -56,7 +56,7 @@ public:
 
 class node_filter : public filter {
 public:
-	bool get_result_string(std::string &r);
+	virtual bool get_result_string(std::string &r) = 0;
 	virtual bool get_result(sg_node* &r) = 0;
 };
 
@@ -78,8 +78,8 @@ public:
 	void        update(sg_node *n, sg_node::change_type t);
 	
 private:
-	bool dirty;
-	sg_node *n;
+	bool     dirty;
+	sg_node* node;
 };
 
 typedef std::multimap<std::string,filter*> filter_params;

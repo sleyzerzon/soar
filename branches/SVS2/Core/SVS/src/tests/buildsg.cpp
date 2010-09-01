@@ -17,7 +17,7 @@ void print_structure(sg_node *root) {
 		cout << root->get_name();
 	} else {
 		cout << "(" << root->get_name() << " ";
-		for (int i = 0; i < root->get_nchilds(); ++i) {
+		for (int i = 0; i < root->num_children(); ++i) {
 			print_structure(root->get_child(i));
 			cout << " ";
 		}
@@ -30,7 +30,7 @@ void print_points(sg_node *root) {
 	ptlist pts;
 
 	//cout << setiosflags(ios::fixed) << setprecision(3);
-	for (int i = 0; i < root->get_nchilds(); ++i) {
+	for (int i = 0; i < root->num_children(); ++i) {
 		c = root->get_child(i);
 		if (c->is_group()) {
 			print_points(c);

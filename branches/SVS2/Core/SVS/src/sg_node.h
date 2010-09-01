@@ -11,11 +11,13 @@ class sg_listener;
 class sg_node {
 public:
 	enum change_type {
-		ADDCHILD,  // get_child(get_nchilds()-1) is the added child
-		DETACH,
-		DEL,       // sent from destructor
-		PTSCHANGE
+		CHILD_ADDED,    // get_child(get_nchilds()-1) is the added child
+		DETACHED,
+		DELETED,        // sent from destructor
+		POINTS_CHANGED
 	};
+	
+	virtual ~sg_node() {}
 	
 	virtual sg_node*    copy() = 0;  // deep copy, copy doesn't inherit listeners
 	virtual void        set_name(std::string nm) = 0;
@@ -23,7 +25,7 @@ public:
 	virtual bool        is_group() = 0;
 
 	virtual sg_node*    get_parent() = 0;
-	virtual int         get_nchilds() = 0;
+	virtual int         num_children() = 0;
 	virtual sg_node*    get_child(int i) = 0;
 	virtual bool        attach_child(sg_node *c) = 0;
 

@@ -15,7 +15,7 @@ public:
 class gen_filter : public node_filter, public filter_listener {
 public:
 	gen_filter(std::string name, ptlist_filter *pts, transform_filter *trans, std::vector<node_filter*> &childs)
-	:nm(name), pf(pts), tf(trans), cf(childs) 
+	:name(name), pf(pts), tf(trans), cf(childs) 
 	{
 		std::vector<node_filter*>::iterator i;
 		
@@ -27,6 +27,10 @@ public:
 	}
 
 	void update(filter *u) {
+	}
+	
+	bool changed() {
+		return true;
 	}
 	
 	bool get_result(sg_node* &r) {
@@ -57,9 +61,9 @@ public:
 				error = true;
 				return false;
 			}
-			n = new nsg_node(nm, pts);
+			n = new nsg_node(name, pts);
 		} else {
-			n = new nsg_node(nm);
+			n = new nsg_node(name);
 		}
 		for (i = cf.begin(); i != cf.end(); ++i) {
 			if (!(**i).get_result(c)) {
@@ -89,7 +93,7 @@ public:
 	}
 	
 private:
-	std::string nm, errmsg;
+	std::string name, errmsg;
 	bool error;
 	ptlist_filter *pf;
 	transform_filter *tf;

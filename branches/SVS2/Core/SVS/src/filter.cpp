@@ -83,22 +83,22 @@ bool bbox_filter::get_result_string(string &r) {
 }
 
 node_ptlist_filter::node_ptlist_filter(sg_node *node)
-: n(node)
+: node(node)
 {
-	if (n) {
-		n->listen(this);
+	if (node) {
+		node->listen(this);
 	}
 }
 
 node_ptlist_filter::~node_ptlist_filter() {
-	if (n) {
-		n->unlisten(this);
+	if (node) {
+		node->unlisten(this);
 	}
 }
 
 bool node_ptlist_filter::get_result(ptlist &r) {
-	if (n) {
-		n->get_world_points(r);
+	if (node) {
+		node->get_world_points(r);
 		return true;
 	}
 	return false;
@@ -114,14 +114,14 @@ bool node_ptlist_filter::changed() {
 
 
 string node_ptlist_filter::get_error() { 
-	if (!n) {
+	if (!node) {
 		return "NODE_NONEXISTENT";
 	}
 }
 
 void node_ptlist_filter::update(sg_node *n, sg_node::change_type t) {
-	if (t == sg_node::DEL || t == sg_node::DETACH) {
-		n = NULL;
+	if (t == sg_node::DELETED || t == sg_node::DETACHED) {
+		node = NULL;
 	}
 	dirty = true;
 	notify();
@@ -131,7 +131,6 @@ filter* make_filter(string name, filter_params &params) {
 	int tabsize = sizeof(filter_cons_tab) / sizeof(filter_cons_entry);
 	for(int i = 0; i < tabsize; ++i) {
 		if (name == filter_cons_tab[i].name) {
-			cout << "Making FILTER " << name << endl;
 			return filter_cons_tab[i].cons_func(params);
 		}
 	}

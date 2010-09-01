@@ -7,33 +7,33 @@ using namespace std;
 typedef map<wm_sgo*, wme_hnd>::iterator child_iter;
 
 wm_sgo::wm_sgo(soar_interface *si, sym_hnd ident, wm_sgo *parent, sg_node *node) 
-: soarint(si), id(ident), par(parent), n(node)
+: soarint(si), id(ident), parent(parent), node(node)
 {
 	int i;
 	n->listen(this);
 	name_wme = soarint->make_str_wme(id, "name", node->get_name());
-	for (i = 0; i < n->get_nchilds(); ++i) {
-		add_child(n->get_child(i));
+	for (i = 0; i < node->num_children(); ++i) {
+		add_child(node->get_child(i));
 	}
 }
 
 wm_sgo::~wm_sgo() {
 	soarint->remove_wme(name_wme);
-	if (par) {
-		child_iter ci = par->childs.find(this);
-		assert(ci != par->childs.end());
+	if (parent) {
+		child_iter ci = parent->childs.find(this);
+		assert(ci != parent->childs.end());
 		soarint->remove_wme(ci->second);
 	}
-	n->unlisten(this);
+	node->unlisten(this);
 }
 
 void wm_sgo::update(sg_node *n, sg_node::change_type t) {
 	switch (t) {
-		case sg_node::ADDCHILD:
-			add_child(n->get_child(n->get_nchilds()-1));
+		case sg_node::CHILD_ADDED:
+			add_child(node->get_child(node->num_children()-1));
 			break;
-		case sg_node::DETACH:
-		case sg_node::DEL:
+		case sg_node::DETACHED:
+		case sg_node::DELETED:
 			delete this;
 			break;
 	};

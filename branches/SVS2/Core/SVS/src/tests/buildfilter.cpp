@@ -18,6 +18,10 @@ public:
 		return true;
 	}
 	
+	bool changed() {
+		return true;
+	}
+	
 	string get_error() { return ""; }
 	
 	ptlist pts;

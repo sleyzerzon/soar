@@ -9,8 +9,8 @@
 
 class nsg_node : public sg_node {
 public:
-	nsg_node(std::string nm);
-	nsg_node(std::string nm, ptlist &points);
+	nsg_node(std::string name);
+	nsg_node(std::string name, const ptlist &points);
 	~nsg_node();
 	
 	sg_node*    copy();
@@ -20,7 +20,7 @@ public:
 	bool        is_group();
 
 	sg_node*    get_parent();
-	int         get_nchilds();
+	int         num_children();
 	sg_node*    get_child(int i);
 	bool        attach_child(sg_node *c);
 
@@ -47,8 +47,8 @@ private:
 	
 	std::string             name;
 	nsg_node*               parent;
-	ptlist                  pts;
-	std::vector<nsg_node*>  childs;
+	ptlist                  points;
+	std::vector<nsg_node*>  children;
 	bool                    isgroup;
 	vec3                    pos;
 	vec3                    rot;

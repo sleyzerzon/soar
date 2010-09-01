@@ -41,9 +41,9 @@ namespace transform_tags {
 	class Scaling {};
 	class Identity {};
 	
-	extern Translation TRANSLATION;
-	extern Rotation    ROTATION;
-	extern Scaling     SCALING;
+	extern const Translation TRANSLATION;
+	extern const Rotation    ROTATION;
+	extern const Scaling     SCALING;
 };
 
 class transform3 {

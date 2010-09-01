@@ -88,6 +88,10 @@ void bbox_int_filter::update(filter *u) {
 	notify();
 }
 
+bool bbox_int_filter::changed() {
+	return dirty;
+}
+
 bool bbox_int_filter::get_result(bool &r) {
 	if (error) { return false; }
 	if (dirty) {

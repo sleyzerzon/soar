@@ -17,7 +17,7 @@ bbox: bbox.cpp
 buildsg: buildsg.cpp test_interface.cpp nsg_node.o sgel_interp.o linalg.o scene.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-buildfilter: buildfilter.cpp filter.o bbox_filter.o linalg.o
+buildfilter: buildfilter.cpp filter.o bbox_filter.o linalg.o nsg_node.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 test_svs: test_svs.cpp test_interface.cpp test_interface.h $(objs)
