@@ -923,6 +923,11 @@ public:
 	std::string GetLibraryLocation() ;
 
 	/*************************************************************
+	* @brief Send a string to SVS
+	*************************************************************/
+	std::string SendSVSInput(const char* agentName, std::string txt) ;
+
+	/*************************************************************
 	* @brief The Soar kernel version is based on sending a request
 	*		 to the kernel asking for its version and returning the
 	*		 result.

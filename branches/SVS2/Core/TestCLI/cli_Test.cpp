@@ -434,6 +434,10 @@ int main(int argc, char** argv)
 		sml::Agent* pAgent;
 		pAgent = pKernel->CreateAgent(AGENT_NAME) ;
 		assert(pAgent);
+		
+		cout << pAgent->SendSVSInput("a blah world") << endl;
+		cout << pAgent->SendSVSInput("a foo blah v 1 2 3 4 5 6 7 8 9") << endl;
+		cout << pAgent->SendSVSInput("a bar blah v 1 2 3 4 5 6 7 8 9") << endl;
 
 		// NOTE: if we go multiple agent, must update RegisterForUpdateEvent below
 

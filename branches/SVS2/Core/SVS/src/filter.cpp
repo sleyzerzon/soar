@@ -138,7 +138,9 @@ string const_string_filter::get_error() {
 
 const_node_filter::const_node_filter(sg_node *node)
 : node(node)
-{}
+{
+	node->listen(this);
+}
 
 const_node_filter::~const_node_filter() {
 	if (node) {
@@ -168,11 +170,14 @@ bool const_node_filter::get_result(sg_node* &r) {
 	return false;
 }
 
-// local points
+// node ptlist
 
 node_ptlist_filter::node_ptlist_filter(bool local, const_node_filter *nf)
 : local(local), node_filter(nf)
-{ }
+{
+	node_filter->listen(this);
+	add_child(node_filter);
+}
 
 bool node_ptlist_filter::get_result(ptlist &r) {
 	sg_node *n;
@@ -189,6 +194,7 @@ bool node_ptlist_filter::get_result(ptlist &r) {
 }
 
 void node_ptlist_filter::update(filter *f) {
+	notify();
 }
 
 string node_ptlist_filter::get_error() {
@@ -219,7 +225,6 @@ filter* make_node_world_ptlist_filter(const filter_params &params) {
 filter* make_filter(string name, const filter_params &params) {
 	int tabsize = sizeof(filter_cons_tab) / sizeof(filter_cons_entry);
 	
-	cout << "MAKING " << name << endl;
 	for(int i = 0; i < tabsize; ++i) {
 		if (name == filter_cons_tab[i].name) {
 			return filter_cons_tab[i].cons_func(params);

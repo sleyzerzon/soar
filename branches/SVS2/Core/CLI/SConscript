@@ -5,7 +5,7 @@
 Import('env')
 clone = env.Clone()
 
-clone.Prepend(CPPPATH = Split('src #SoarKernel/src #ElementXML/src #ConnectionSML/src #KernelSML/src'))
+clone.Prepend(CPPPATH = Split('src #SoarKernel/src #ElementXML/src #ConnectionSML/src #KernelSML/src #SVS/src'))
 
 if env['SCU']:
 	CommandLineInterface = clone.Library('CommandLineInterface', 'CommandLineInterface.cxx')

@@ -6,7 +6,7 @@
 using namespace std;
 
 ptlist_bbox_filter::ptlist_bbox_filter(vector<ptlist_filter*> inputs)
-: in(inputs), box(NULL), error(false)
+: in(inputs), box(NULL)
 {
 	vector<ptlist_filter*>::iterator i;
 	for (i = in.begin(); i != in.end(); ++i) {
@@ -26,25 +26,21 @@ bool ptlist_bbox_filter::get_result(bbox &r) {
 	vector<ptlist_filter*>::iterator i;
 	ptlist l;
 	
-	if (error) {
-		return false;
-	}
 	if (!box) {
 		i = in.begin();
 		if (i == in.end()) {
-			error = true;
 			errmsg = "BBOX_NO_INPUTS";
 			return false;
 		}
 		if (!(**i).get_result(l)) {
-			error = true;
 			errmsg = (**i).get_error();
 			return false;
 		}
 		box = new bbox(l);
 		for (++i; i != in.end(); ++i) {
 			if (!(**i).get_result(l)) {
-				error = true;
+				delete box;
+				box = NULL;
 				errmsg = (**i).get_error();
 				return false;
 			}
@@ -118,11 +114,11 @@ bbox_on_pos_filter::bbox_on_pos_filter(bbox_filter *bf, bbox_filter *tf)
 	add_child(topfilter);
 	bottomfilter->listen(this);
 	topfilter->listen(this);
-
 }
 
 void bbox_on_pos_filter::update(filter *f) {
 	dirty = true;
+	notify();
 }
 
 string bbox_on_pos_filter::get_error() {
@@ -164,11 +160,11 @@ bbox_ontop_filter::bbox_ontop_filter(bbox_filter *bf, bbox_filter *tf)
 	add_child(topfilter);
 	bottomfilter->listen(this);
 	topfilter->listen(this);
-
 }
 
 void bbox_ontop_filter::update(filter *f) {
 	dirty = true;
+	notify();
 }
 
 string bbox_ontop_filter::get_error() {
@@ -194,6 +190,7 @@ bool bbox_ontop_filter::get_result(bool &r) {
 		top.get_vals(tx1, ty1, tz1, tx2, ty2, tz2);
 		
 		ontop = bot.intersects(top) && bz2 == tz1;
+		dirty = false;
 	}
 	r = ontop;
 	return true;

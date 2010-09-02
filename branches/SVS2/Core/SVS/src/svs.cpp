@@ -46,6 +46,7 @@ svs_state::svs_state(sym_hnd state, svs_state *parent, soar_interface *interface
 	} else {
 		scn = new scene(parent->scn);
 	}
+	/*
 	if (!parent) {
 		ptlist pts;
 
@@ -68,6 +69,7 @@ svs_state::svs_state(sym_hnd state, svs_state *parent, soar_interface *interface
 		scn->get_root()->attach_child(n1);
 		scn->get_root()->attach_child(n2);
 	}
+	*/
 	wm_sg_root = new wm_sgo(si, scene_contents_link, (wm_sgo*) NULL, scn->get_root());
 }
 
@@ -101,7 +103,6 @@ void svs_state::process_cmds() {
 		if ((j = all_cmds.find(i->first)) == all_cmds.end()) {
 			delete i->second;
 			curr_cmds.erase(i++);
-			cerr << "COMMAND REMOVED" << endl;
 		} else {
 			all_cmds.erase(j);
 			++i;
@@ -113,7 +114,6 @@ void svs_state::process_cmds() {
 		cmd_watcher *cw = make_cmd_watcher(si, scn, *j);
 		if (cw) {
 			curr_cmds.insert(pair<wme_hnd,cmd_watcher*>(*j, cw));
-			cerr << "COMMAND ADDED" << endl;
 		}
 	}
 }
@@ -175,7 +175,7 @@ void svs::post_env_callback() {
 		(**i).update_cmd_results();
 	}
 	cout << endl << "SCENE START" << endl;
-	print_tree(state_stack.front()->get_scene()->get_root());
+	print_tree(state_stack.back()->get_scene()->get_root());
 	cout << "SCENE END" << endl;
 }
 

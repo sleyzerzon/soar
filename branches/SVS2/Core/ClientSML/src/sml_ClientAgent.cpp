@@ -1226,6 +1226,11 @@ char const* Agent::ExecuteCommandLine(char const* pCommandLine, bool echoResults
 	return GetKernel()->ExecuteCommandLine(pCommandLine, GetAgentName(), echoResults, noFilter) ;
 }
 
+std::string Agent::SendSVSInput(std::string txt)
+{
+	return GetKernel()->SendSVSInput(GetAgentName(), txt);
+}
+
 bool Agent::ExecuteCommandLineXML(char const* pCommandLine, ClientAnalyzedXML* pResponse)
 {
 	return GetKernel()->ExecuteCommandLineXML(pCommandLine, GetAgentName(), pResponse) ;

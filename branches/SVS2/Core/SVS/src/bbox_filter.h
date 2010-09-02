@@ -16,7 +16,6 @@ public:
 	void        update(filter *u);
 
 private:
-	bool                        error;
 	std::string                 errmsg;
 	bbox*                       box;
 	std::vector<ptlist_filter*> in;

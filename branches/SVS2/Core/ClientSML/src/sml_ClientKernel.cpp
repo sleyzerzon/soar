@@ -1602,6 +1602,19 @@ std::string Kernel::GetLibraryLocation()
 	}
 }
 
+std::string Kernel::SendSVSInput(const char* agentName, std::string txt)
+{
+	AnalyzeXML response;
+	if (GetConnection()->SendAgentCommand(&response, sml_Names::kCommand_SVSInput, agentName, sml_Names::kParamLine, txt.c_str() ))
+	{
+		return response.GetResultString();
+	}
+	else
+	{
+		return "" ;
+	}
+}
+
 /*************************************************************
 * @brief If this is an embedded connection using "synchronous execution"
 *		 then we need to call this periodically to look for commands

@@ -788,6 +788,8 @@ public:
 	*************************************************************/
 	char const* ExecuteCommandLine(char const* pCommandLine, bool echoResults = false, bool noFilter = false) ;
 
+	std::string SendSVSInput(std::string txt);
+
 	/*************************************************************
 	* @brief Execute a command line command and return the result
 	*		 as an XML object.

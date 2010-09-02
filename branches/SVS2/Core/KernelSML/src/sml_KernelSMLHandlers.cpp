@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <map>
 #include <stdlib.h>
 #include <assert.h>
@@ -69,6 +70,7 @@ void KernelSML::BuildCommandMap()
 	m_CommandMap[sml_Names::kCommand_ConvertIdentifier] = &sml::KernelSML::HandleConvertIdentifier;
 	m_CommandMap[sml_Names::kCommand_GetListenerPort]	= &sml::KernelSML::HandleGetListenerPort;
 	m_CommandMap[sml_Names::kCommand_GetLibraryLocation]= &sml::KernelSML::HandleGetLibraryLocation;
+	m_CommandMap[sml_Names::kCommand_SVSInput]			= &sml::KernelSML::HandleSVSInput;
 }
 
 /*************************************************************
@@ -953,5 +955,22 @@ bool KernelSML::HandleGetListenerPort(AgentSML* /*pAgentSML*/, char const* /*pCo
 bool KernelSML::HandleGetLibraryLocation(AgentSML* /*pAgentSML*/, char const* /*pCommandName*/, Connection* pConnection, AnalyzeXML* /*pIncoming*/, soarxml::ElementXML* pResponse)
 {
 	return this->ReturnResult(pConnection, pResponse, this->GetLibraryLocation() ) ;
+}
+
+bool KernelSML::HandleSVSInput(AgentSML* pAgentSML, char const* pCommandName, Connection* pConnection, AnalyzeXML* pIncoming, soarxml::ElementXML* pResponse)
+{
+	// Get the parameters
+	char const* pLine = pIncoming->GetArgString(sml_Names::kParamLine) ;
+
+	if (!pLine)
+	{
+		return InvalidArg(pConnection, pResponse, pCommandName, "Command line missing") ;
+	}
+	
+	std::stringstream ss;
+
+	ss << pAgentSML->GetSoarAgent()->svs_instance->get_env_input(pLine);
+	std::string t = ss.str();
+	return this->ReturnResult(pConnection, pResponse, t.c_str()) ;
 }
 

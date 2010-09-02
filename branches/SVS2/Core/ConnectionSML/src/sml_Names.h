@@ -423,6 +423,7 @@ public:
 	static char const* const kCommand_ConvertIdentifier ;
 	static char const* const kCommand_GetListenerPort ;
 	static char const* const kCommand_GetLibraryLocation ;
+	static char const* const kCommand_SVSInput ;
 
 	// Command line interface
 	static char const* const kCommand_CommandLine ;
