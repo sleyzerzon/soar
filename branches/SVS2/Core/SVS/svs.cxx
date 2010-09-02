@@ -8,3 +8,4 @@
 #include "src/bbox_filter.cpp"
 #include "src/cmd_watcher.cpp"
 #include "src/scene.cpp"
+#include "src/gen_filter.cpp"

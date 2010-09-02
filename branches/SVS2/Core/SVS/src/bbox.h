@@ -56,6 +56,13 @@ public:
 		return true;
 	}
 	
+	void get_vals(double &x1, double &y1, double &z1, 
+	              double &x2, double &y2, double &z2)
+	{
+		x1 = min[0]; y1 = min[1]; z1 = min[2];
+		x2 = max[0]; y2 = max[1]; z2 = max[2];
+	}
+	
 	friend std::ostream& operator<<(std::ostream &os, bbox &b);
 	
 private:

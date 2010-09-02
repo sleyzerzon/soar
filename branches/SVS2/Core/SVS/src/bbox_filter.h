@@ -5,8 +5,6 @@
 #include "filter.h"
 #include <vector>
 
-filter* make_bbox_filter(std::vector<filter*> inputs);
-
 /* bbox from a bunch of ptlists */
 class ptlist_bbox_filter : public bbox_filter, public filter_listener {
 public:
@@ -14,7 +12,6 @@ public:
 	~ptlist_bbox_filter();
 	
 	bool        get_result(bbox &r);
-	bool        changed();
 	std::string get_error();
 	void        update(filter *u);
 
@@ -25,8 +22,6 @@ private:
 	std::vector<ptlist_filter*> in;
 };
 
-filter* make_bbox_int_filter(std::vector<filter*> inputs);
-
 /* bbox intersection */
 class bbox_int_filter : public bool_filter, public filter_listener {
 public:
@@ -34,7 +29,6 @@ public:
 	~bbox_int_filter();
 	
 	bool        get_result(bool &r);
-	bool        changed();
 	std::string get_error();
 	void        update(filter *u);
 	
@@ -46,5 +40,20 @@ private:
 	std::string errmsg;
 };
 
+class bbox_on_pos_filter : public vec3_filter, public filter_listener {
+public:
+	bbox_on_pos_filter(bbox_filter *bf, bbox_filter *tf);
+	
+	void   update(filter *f);
+	string get_error();
+	bool   get_result(vec3 &r);
+	
+private:
+	bbox_filter* bottomfilter;
+	bbox_filter* topfilter;
+	bool         dirty;
+	vec3         pos;
+	std::string  errmsg;
+};
 
 #endif

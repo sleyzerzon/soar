@@ -5,11 +5,24 @@
 #include "wm_sgo.h"
 #include "soar_int.h"
 
+#include <iterator>
+
 using namespace std;
 
 typedef map<wme_hnd,cmd_watcher*>::iterator cmd_iter;
 
-
+void print_tree(sg_node *n) {
+	if (n->is_group()) {
+		for(int i = 0; i < n->num_children(); ++i) {
+			print_tree(n->get_child(i));
+		}
+	} else {
+		ptlist pts;
+		n->get_world_points(pts);
+		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(cout, ","));
+		cout << endl;
+	}
+}
 
 svs_state::svs_state(sym_hnd state, svs_state *parent, soar_interface *interface, common_syms *syms)
 : state(state), si(interface), cs(syms)
@@ -34,34 +47,36 @@ svs_state::svs_state(sym_hnd state, svs_state *parent, soar_interface *interface
 		scn = new scene(parent->scn);
 	}
 	if (!parent) {
-		ptlist b1pts, b2pts;
+		ptlist pts;
 
-		b1pts.push_back(vec3(0, 0, 0));
-		b1pts.push_back(vec3(1, 0, 0));
-		b1pts.push_back(vec3(1, 1, 0));
-		b1pts.push_back(vec3(0, 1, 0));
-		b1pts.push_back(vec3(0, 0, 1));
-		b1pts.push_back(vec3(1, 0, 1));
-		b1pts.push_back(vec3(1, 1, 1));
-		b1pts.push_back(vec3(0, 1, 1));
+		pts.push_back(vec3(0, 0, 0));
+		pts.push_back(vec3(1, 0, 0));
+		pts.push_back(vec3(1, 1, 0));
+		pts.push_back(vec3(0, 1, 0));
+		pts.push_back(vec3(0, 0, 1));
+		pts.push_back(vec3(1, 0, 1));
+		pts.push_back(vec3(1, 1, 1));
+		pts.push_back(vec3(0, 1, 1));
 		
-		b2pts.push_back(vec3(0, 0, 1.5));
-		b2pts.push_back(vec3(1, 0, 1.5));
-		b2pts.push_back(vec3(1, 1, 1.5));
-		b2pts.push_back(vec3(0, 1, 1.5));
-		b2pts.push_back(vec3(0, 0, 2.5));
-		b2pts.push_back(vec3(1, 0, 2.5));
-		b2pts.push_back(vec3(1, 1, 2.5));
-		b2pts.push_back(vec3(0, 1, 2.5));
+		sg_node *n1, *n2;
+		n1 = new nsg_node("block1", pts);
+		n1->set_pos(vec3(0, 0, 0));
 		
-		scn->get_root()->attach_child(new nsg_node("block1", b1pts));
-		scn->get_root()->attach_child(new nsg_node("block2", b2pts));
+		n2 = new nsg_node("block2", pts);
+		n2->set_pos(vec3(5, 0, 0));
+		
+		scn->get_root()->attach_child(n1);
+		scn->get_root()->attach_child(n2);
 	}
 	wm_sg_root = new wm_sgo(si, scene_contents_link, (wm_sgo*) NULL, scn->get_root());
 }
 
 svs_state::~svs_state() {
 	delete scn; // results in wm_sg_root being deleted also
+}
+
+scene* svs_state::get_scene() {
+	return scn;
 }
 
 void svs_state::update_cmd_results() {
@@ -115,7 +130,7 @@ inline void svs_state::collect_cmds(sym_hnd id, set<wme_hnd>& all_cmds) {
 }
 
 svs::svs(soar_interface *interface)
-: si(interface)
+: si(interface), input_interp(NULL)
 {
 	make_common_syms();
 }
@@ -133,6 +148,9 @@ void svs::state_creation_callback(sym_hnd state) {
 		p = state_stack.back();
 	}
 	s = new svs_state(state, p, si, &cs);
+	if (!input_interp) {
+		input_interp = new sgel_interp(s->get_scene());
+	}
 	state_stack.push_back(s);
 }
 
@@ -156,6 +174,9 @@ void svs::post_env_callback() {
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results();
 	}
+	cout << endl << "SCENE START" << endl;
+	print_tree(state_stack.front()->get_scene()->get_root());
+	cout << "SCENE END" << endl;
 }
 
 void svs::make_common_syms() {
@@ -177,3 +198,11 @@ void svs::del_common_syms() {
 	si->del_string_sym(cs.result);
 }
 
+int svs::get_env_input(const string &line) {
+	if (input_interp) {
+		return input_interp->parse_line(line);
+	} else {
+		assert(false);
+		return 0;
+	}
+}

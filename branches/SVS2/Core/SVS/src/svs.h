@@ -7,6 +7,7 @@
 #include "wm_sgo.h"
 #include "filter.h"
 #include "cmd_watcher.h"
+#include "sgel_interp.h"
 #include <vector>
 #include <map>
 #include <set>
@@ -41,6 +42,7 @@ public:
 	
 	void    process_cmds();
 	void    update_cmd_results();
+	scene*  get_scene();
 	sym_hnd get_state() { return state; }
 	
 private:
@@ -78,6 +80,8 @@ public:
 	void pre_env_callback();
 	void post_env_callback();
 
+	int  get_env_input(const std::string &line);
+	
 private:
 	void make_common_syms();
 	void del_common_syms();
@@ -85,7 +89,8 @@ private:
 	soar_interface*         si;
 	common_syms             cs;
 	std::vector<svs_state*> state_stack;
-
+	
+	sgel_interp* input_interp;
 };
 
 #endif

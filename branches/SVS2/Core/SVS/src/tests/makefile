@@ -1,5 +1,5 @@
-headers=$(addprefix ../,sg_node.h nsg_node.h sgel_interp.h linalg.h scene.h wm_sgo.h soar_interface.h svs.h)
-srcs=$(addprefix ../,nsg_node.cpp sgel_interp.cpp linalg.cpp scene.cpp wm_sgo.cpp svs.cpp soar_interface.cpp)
+headers=$(addprefix ../,sg_node.h nsg_node.h sgel_interp.h linalg.h scene.h wm_sgo.h soar_interface.h svs.h bbox_filter.h gen_filter.h)
+srcs=$(addprefix ../,nsg_node.cpp sgel_interp.cpp linalg.cpp scene.cpp wm_sgo.cpp svs.cpp soar_interface.cpp bbox_filter.cpp gen_filter.cpp)
 objs=$($(notdir srcs):.cpp=.o)
 
 testprogs=bbox buildsg buildfilter
@@ -17,7 +17,7 @@ bbox: bbox.cpp
 buildsg: buildsg.cpp test_interface.cpp nsg_node.o sgel_interp.o linalg.o scene.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-buildfilter: buildfilter.cpp filter.o bbox_filter.o linalg.o nsg_node.o
+buildfilter: buildfilter.cpp linalg.o nsg_node.o filter.o bbox_filter.o gen_filter.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 test_svs: test_svs.cpp test_interface.cpp test_interface.h $(objs)

@@ -22,10 +22,6 @@ ptlist_bbox_filter::~ptlist_bbox_filter() {
 	}
 }
 
-bool ptlist_bbox_filter::changed() {
-	return box == NULL;
-}
-
 bool ptlist_bbox_filter::get_result(bbox &r) {
 	vector<ptlist_filter*>::iterator i;
 	ptlist l;
@@ -88,10 +84,6 @@ void bbox_int_filter::update(filter *u) {
 	notify();
 }
 
-bool bbox_int_filter::changed() {
-	return dirty;
-}
-
 bool bbox_int_filter::get_result(bool &r) {
 	if (error) { return false; }
 	if (dirty) {
@@ -114,13 +106,62 @@ bool bbox_int_filter::get_result(bool &r) {
 	r = result;
 	return true;
 }
+
 string bbox_int_filter::get_error() {
 	return errmsg;
 }
 
-filter* make_bbox_filter(filter_params &inputs) {
+bbox_on_pos_filter::bbox_on_pos_filter(bbox_filter *bf, bbox_filter *tf) 
+: bottomfilter(bf), topfilter(tf), dirty(true)
+{
+	add_child(bottomfilter);
+	add_child(topfilter);
+	bottomfilter->listen(this);
+	topfilter->listen(this);
+
+}
+
+void bbox_on_pos_filter::update(filter *f) {
+	dirty = true;
+}
+
+string bbox_on_pos_filter::get_error() {
+	return errmsg;
+}
+
+bool bbox_on_pos_filter::get_result(vec3 &r) {
+	bbox bot, top;
+	ptlist nodepts;
+	double tx1, ty1, tz1, tx2, ty2, tz2, tcx, tcy;
+	double bx1, by1, bz1, bx2, by2, bz2, bcx, bcy;
+	
+	if (dirty) {
+		if (!bottomfilter->get_result(bot)) {
+			errmsg = bottomfilter->get_error();
+			return false;
+		}
+		bot.get_vals(bx1, by1, bz1, bx2, by2, bz2);
+		bcx = (bx1+bx2)/2;
+		bcy = (by1+by2)/2;
+		
+		if (!topfilter->get_result(top)) {
+			errmsg = topfilter->get_error();
+			return false;
+		}
+		top.get_vals(tx1, ty1, tz1, tx2, ty2, tz2);
+		tcx = (tx1+tx2)/2;
+		tcy = (ty1+ty2)/2;
+		
+		pos = vec3(bcx - tcx, bcy - tcy, bz2 - tz1);
+	}
+	r = pos;
+	return true;
+}
+
+
+filter* make_bbox_filter(const filter_params &inputs) {
 	vector<ptlist_filter*> casted;
-	filter_params::iterator i;
+	filter_params::const_iterator i;
 	
 	ptlist_filter *q;
 
@@ -135,8 +176,8 @@ filter* make_bbox_filter(filter_params &inputs) {
 	return new ptlist_bbox_filter(casted);
 }
 
-filter* make_bbox_int_filter(filter_params &inputs) {
-	filter_params::iterator i;
+filter* make_bbox_int_filter(const filter_params &inputs) {
+	filter_params::const_iterator i;
 	bbox_filter *a, *b;
 
 	if (inputs.size() < 2) {
@@ -150,4 +191,26 @@ filter* make_bbox_int_filter(filter_params &inputs) {
 		return NULL;
 	}
 	return new bbox_int_filter(a, b);
+}
+
+filter* make_bbox_on_pos_filter(const filter_params &p) {
+	filter_params::const_iterator i;
+	bbox_filter *bf, *tf;
+	
+	if ((i = p.find("bottom")) == p.end()) {
+		return NULL;
+	}
+	bf = dynamic_cast<bbox_filter*>(i->second);
+	if (!bf) {
+		return NULL;
+	}
+	if ((i = p.find("top")) == p.end()) {
+		return NULL;
+	}
+	tf = dynamic_cast<bbox_filter*>(i->second);
+	if (!tf) {
+		return NULL;
+	}
+	
+	return new bbox_on_pos_filter(bf, tf);
 }

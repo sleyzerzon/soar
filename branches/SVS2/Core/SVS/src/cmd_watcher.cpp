@@ -94,69 +94,67 @@ bool cmd_utils::cmd_changed() {
 	return changed;
 }
 
-filter* cmd_utils::make_filter() {
-	return rec_make_filter(cmd_root);
-}
-
-
 /* Filters are specified in WM like this:
 
    (<cmd> ^filtername1 <f1>)
-   (<f1> ^arg1 <subfilter1> ^arg2 <subfilter2> ^arg3 node_name)
-   (<subfilter1> ^filtername2 <f2>)
+   (<f1> ^_named-param1 <f2> 
+         ^_named-param1 node_name1
+         ^filtername2 <f3>)
+   (<f2> ^filtername3 <f4>)
+   (<f3> ^filtername4 node_name2)
    ...
+   
+   Parameters can be named or anonymous ("" will be the param name), and
+   filters can either be identifiers, in which case substructure will be
+   parsed recursively, or string constants that specify node filters.
 */
-filter* cmd_utils::rec_make_filter(sym_hnd cmd) {
-	sym_hnd v;
-	string filter_name, node_name, attr;
+filter* cmd_utils::make_filter() {
 	wme_list children;
 	wme_list::iterator i;
-	wme_hnd w;
-	filter_params p;
-	filter *nf;
+	string attr;
 	
-	/* a string symbol specifies a node filter */
-	if (si->get_val(cmd, node_name)) {
-		return make_node_filter(cmd);
-	}
-	
-	si->get_child_wmes(cmd, children);
-	w = NULL;
+	si->get_child_wmes(cmd_root, children);
 	for (i = children.begin(); i != children.end(); ++i) {
-		if (!si->get_val(si->get_wme_attr(*i), filter_name)) {
-			continue;
-		}
-		if (!is_reserved_param(filter_name)) {
-			w = *i;
-			break;
+		if (si->get_val(si->get_wme_attr(*i), attr)) {
+			if (!is_reserved_param(attr)) {
+				return rec_make_filter(*i);
+			}
 		}
 	}
-	if (!w) {
+	return NULL;
+}
+
+filter* cmd_utils::rec_make_filter(wme_hnd cmd) {
+	string filter_name, node_name;
+	filter_params p;
+	
+	if (!si->get_val(si->get_wme_attr(cmd), filter_name)) {
 		return NULL;
 	}
-
-	v = si->get_wme_val(w);
-	nf = make_node_filter(v);  // query wme with string value is shorthand for single node filter as param
-	if (nf) {
-		p.insert(pair<string,filter*>("",nf));
-	} else {
-		if (!si->is_identifier(v)) {
-			return NULL;
-		}
-		if (!get_filter_params(v, p)) {
-			return NULL;
-		}
+	
+	if (!get_filter_params(si->get_wme_val(cmd), p)) {
+		return NULL;
 	}
 	
 	return ::make_filter(filter_name, p);
 }
 
 bool cmd_utils::get_filter_params(sym_hnd id, filter_params &p) {
-	wme_list childs;
+	wme_list childs, param_childs;
 	wme_list::iterator i;
 	filter *f;
-	string attr;
+	string attr, node_name, param_name;
 	bool fail;
+
+	if (si->get_val(id, node_name)) {
+		f = make_node_filter(node_name);   // string constant indicates node filter
+		p.insert(pair<string,filter*>("", f));
+		return true;
+	}
+	
+	if (!si->is_identifier(id)) {
+		return false;
+	}
 	
 	si->get_child_wmes(id, childs);
 	fail = false;
@@ -165,12 +163,23 @@ bool cmd_utils::get_filter_params(sym_hnd id, filter_params &p) {
 			fail = true;
 			break;
 		}
-		f = rec_make_filter(si->get_wme_val(*i));
+		if (attr.size() > 0 && attr[0] == '_') {       // named param
+			param_name = attr.substr(1);
+			si->get_child_wmes(si->get_wme_val(*i), param_childs);
+			if (param_childs.size() != 1) {
+				fail = true;
+				break;
+			}
+			f = rec_make_filter(param_childs.front());
+		} else {                                       // anonymous param
+			param_name = "";
+			f = rec_make_filter(*i);
+		}
 		if (!f) {
 			fail = true;
 			break;
 		}
-		p.insert(pair<string,filter*>(attr, f));
+		p.insert(pair<string,filter*>(param_name, f));
 	}
 	
 	if (fail) {
@@ -185,19 +194,14 @@ bool cmd_utils::get_filter_params(sym_hnd id, filter_params &p) {
 	return true;
 }
 
-filter* cmd_utils::make_node_filter(sym_hnd s) {
-	string name;
+filter* cmd_utils::make_node_filter(string name) {
 	sg_node *n;
 	
-	if (!si->get_val(s, name)) {
-		return NULL;
-	}
 	n = scn->get_node(name);
 	if (!n) {
-		cerr << "NODE " << name << " NOT FOUND" << endl;
 		return NULL;
 	}
-	return new node_ptlist_filter(n);
+	return new const_node_filter(n);
 }
 
 extract_cmd_watcher::extract_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn)

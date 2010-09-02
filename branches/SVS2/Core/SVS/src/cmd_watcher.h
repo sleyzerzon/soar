@@ -14,8 +14,8 @@ public:
 	filter* make_filter();
 
 private:
-	filter* rec_make_filter(sym_hnd cmd);
-	filter* make_node_filter(sym_hnd s);
+	filter* rec_make_filter(wme_hnd cmd);
+	filter* make_node_filter(std::string name);
 	bool    get_filter_params(sym_hnd id, filter_params &p);
 
 	sym_hnd         cmd_root;
