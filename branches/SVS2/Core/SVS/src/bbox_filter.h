@@ -56,4 +56,20 @@ private:
 	std::string  errmsg;
 };
 
+class bbox_ontop_filter : public bool_filter, public filter_listener {
+public:
+	bbox_ontop_filter(bbox_filter *bf, bbox_filter *tf);
+	
+	void   update(filter *f);
+	string get_error();
+	bool   get_result(bool &r);
+	
+private:
+	bbox_filter* bottomfilter;
+	bbox_filter* topfilter;
+	bool         dirty;
+	bool         ontop;
+	std::string  errmsg;
+};
+
 #endif

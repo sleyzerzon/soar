@@ -131,7 +131,6 @@ string bbox_on_pos_filter::get_error() {
 
 bool bbox_on_pos_filter::get_result(vec3 &r) {
 	bbox bot, top;
-	ptlist nodepts;
 	double tx1, ty1, tz1, tx2, ty2, tz2, tcx, tcy;
 	double bx1, by1, bz1, bx2, by2, bz2, bcx, bcy;
 	
@@ -158,6 +157,47 @@ bool bbox_on_pos_filter::get_result(vec3 &r) {
 	return true;
 }
 
+bbox_ontop_filter::bbox_ontop_filter(bbox_filter *bf, bbox_filter *tf) 
+: bottomfilter(bf), topfilter(tf), dirty(true)
+{
+	add_child(bottomfilter);
+	add_child(topfilter);
+	bottomfilter->listen(this);
+	topfilter->listen(this);
+
+}
+
+void bbox_ontop_filter::update(filter *f) {
+	dirty = true;
+}
+
+string bbox_ontop_filter::get_error() {
+	return errmsg;
+}
+
+bool bbox_ontop_filter::get_result(bool &r) {
+	bbox bot, top;
+	double tx1, ty1, tz1, tx2, ty2, tz2;
+	double bx1, by1, bz1, bx2, by2, bz2;
+	
+	if (dirty) {
+		if (!bottomfilter->get_result(bot)) {
+			errmsg = bottomfilter->get_error();
+			return false;
+		}
+		bot.get_vals(bx1, by1, bz1, bx2, by2, bz2);
+		
+		if (!topfilter->get_result(top)) {
+			errmsg = topfilter->get_error();
+			return false;
+		}
+		top.get_vals(tx1, ty1, tz1, tx2, ty2, tz2);
+		
+		ontop = bot.intersects(top) && bz2 == tz1;
+	}
+	r = ontop;
+	return true;
+}
 
 filter* make_bbox_filter(const filter_params &inputs) {
 	vector<ptlist_filter*> casted;
@@ -213,4 +253,26 @@ filter* make_bbox_on_pos_filter(const filter_params &p) {
 	}
 	
 	return new bbox_on_pos_filter(bf, tf);
+}
+
+filter* make_bbox_ontop_filter(const filter_params &p) {
+	filter_params::const_iterator i;
+	bbox_filter *bf, *tf;
+	
+	if ((i = p.find("bottom")) == p.end()) {
+		return NULL;
+	}
+	bf = dynamic_cast<bbox_filter*>(i->second);
+	if (!bf) {
+		return NULL;
+	}
+	if ((i = p.find("top")) == p.end()) {
+		return NULL;
+	}
+	tf = dynamic_cast<bbox_filter*>(i->second);
+	if (!tf) {
+		return NULL;
+	}
+	
+	return new bbox_ontop_filter(bf, tf);
 }

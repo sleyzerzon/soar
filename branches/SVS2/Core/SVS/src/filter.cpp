@@ -22,6 +22,7 @@ extern filter* make_bbox_filter(const filter_params&);
 extern filter* make_bbox_int_filter(const filter_params&);
 extern filter* make_gen_filter(const filter_params&);
 extern filter* make_bbox_on_pos_filter(const filter_params&);
+extern filter* make_bbox_ontop_filter(const filter_params&);
 
 static filter_cons_entry filter_cons_tab[] = {
 	{ "local",       make_node_local_ptlist_filter },
@@ -29,7 +30,8 @@ static filter_cons_entry filter_cons_tab[] = {
 	{ "bbox",        make_bbox_filter              },
 	{ "bbox_int",    make_bbox_int_filter          },
 	{ "gen",         make_gen_filter               },
-	{ "bbox_on_pos", make_bbox_on_pos_filter       }
+	{ "bbox_on_pos", make_bbox_on_pos_filter       },
+	{ "bbox_ontop",  make_bbox_ontop_filter        }
 };
 
 filter::~filter() {
