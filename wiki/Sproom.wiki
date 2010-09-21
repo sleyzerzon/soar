@@ -55,6 +55,8 @@ Additionally, some non-configurable information is presented on the *configurati
   * _self_
     * *name* (_string_): Agent name.
     * *area* (_int_): Unique identifying number for area/room.
+    * *headlight* (_string_) (on, off): Headlight state.
+    * *battery* (_float_) (100.0-0.0): Percent battery life.
     * _pose_
       * *x* (_float_)
       * *y* (_float_)
@@ -217,7 +219,7 @@ For all drive commands:
   * _estop_: Emergency/all stop.
     * *status* (_string_) (accepted, complete)
 
-=== Effector Commands ===
+=== Effector and Robot State Commands ===
 
   * _get-object_: Pick up an object.
     * *id* (_int_): Target object id.
@@ -234,6 +236,14 @@ For all drive commands:
   * _diffuse-object-by-wire_: Engage in a domain-specific diffuse task.
     * *id* (_int_): Target object id.
     * *color* (_string_) (red, green, blue): What wire to cut
+    * *status* (_string_) (accepted, complete, error)
+
+  * _set-headlight_: Turn headlight on/off.
+    * *setting* (_string_) (on, off): Desired setting.
+    * *status* (_string_) (accepted, complete, error)
+
+  * _set-room-light_: Turn room light on/off.
+    * *setting* (_string_) (on, off): Desired setting.
     * *status* (_string_) (accepted, complete, error)
 
 === Waypoint Commands ===
