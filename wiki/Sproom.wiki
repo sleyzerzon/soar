@@ -119,7 +119,6 @@ The messaging system places messages to and from the agent under the *received-m
   * _area-description_
     * *id* (_int_): Unique identifying number for area/room.
     * *type* (_string_) (door, room): Type of room.
-    * *connected* (_int_) (potentially *multi-valued*): All areas in larger room composition, could be only current area or potentailly many areas.
     * _gateway_ (*multi-valued*): One for each exit from the room.
       * *id* (_int_): Unique identifying number for gateway.
       * *direction* (_string_) (north, east, south, west): Which wall the gateway is on.
