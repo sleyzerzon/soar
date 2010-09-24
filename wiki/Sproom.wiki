@@ -124,6 +124,9 @@ The messaging system places messages to and from the agent under the *received-m
       * *direction* (_string_) (north, east, south, west): Which wall the gateway is on.
       * *to* (_int_): Area id on *this* side of gateway.
       * *to* (_int_): Area id on *other* side of gateway.
+      * _door_: Details about the door
+        * *id* (_int_): Door id number.
+        * *state* (_string_) (open, closed, locked): State of door.
       * [Sproom#Point_Data Point data, as described above].
     * _wall_
       * *direction* (_string_) (north, east, south, west): Which wall it is.
@@ -249,6 +252,24 @@ For all drive commands:
 
   * _set-room-light_: Turn room light on/off.
     * *setting* (_string_) (on, off): Desired setting.
+    * *status* (_string_) (accepted, complete, error)
+
+  * _open-door_: Open a closed, unlocked door.
+    * *id* (_int_): Target door id.
+    * *status* (_string_) (accepted, complete, error)
+
+  * _close-door_: Close an open door.
+    * *id* (_int_): Target door id.
+    * *status* (_string_) (accepted, complete, error)
+
+  * _lock-door_: Lock a closed, unlocked door.
+    * *id* (_int_): Target door id.
+    * *code* (_int_): Passcode.
+    * *status* (_string_) (accepted, complete, error)
+
+  * _unlock-door_: Unlock a locked door.
+    * *id* (_int_): Target door id.
+    * *code* (_int_): Passcode.
     * *status* (_string_) (accepted, complete, error)
 
 === Waypoint Commands ===
