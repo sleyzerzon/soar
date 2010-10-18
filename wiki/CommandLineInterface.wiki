@@ -2971,9 +2971,6 @@ stats [options]
 || `-m, --memory` || report usage for Soar's memory pools ||
 || `-r, --rete` || report statistics about the rete structure ||
 || `-s, --system` || report the system (agent) statistics (default) ||
-
-SMem branch only:
-
 || `-M, --max` || report the per-cycle maximum statistics (decision cycle time, WM changes, production fires) ||
 || `-R, --reset` || zero out the per-cycle maximum statistics reported by `--max` command ||
 || `-t, --track` || begin tracking the per-cycle maximum statistics reported by `--max` for each cycle (instead of only the max value) ||
