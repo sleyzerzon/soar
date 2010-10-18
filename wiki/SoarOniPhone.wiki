@@ -25,6 +25,20 @@ All lib`*`.a files in the out/lib folder should be added to your project (drag+d
 
 To help get folks started, I've uploaded some [http://www.eecs.umich.edu/~soar/sitemaker/misc/iphone-libs.tar.gz sample libraries]. These will likely be out of date by the time you read this. I compiled these on Snow Leopard using Soar 9.3.0 and XCode iPhone SDK 3.2 (works with iPhone and iPad) for the simulator (i.e. arch=i386).
 
+I also uploaded some [http://www.eecs.umich.edu/~soar/sitemaker/misc/iphone-libs-device.tar.gz device libraries]. These do not include sqlite3, for which you should reference the iPhone SDK built-in framework. These were created using Soar 9.3.0 and iPhone SDK 4.1 (works with iPhone and iPad). The process for the device, at least at the time of writing, is painful. Here are the highlights:
+
+{{{
+# Clear out stuff for Darwin, m32, mnative, etc. 
+
+env.Append(CPPFLAGS = ['-DSTATIC_LINKED','-DIPHONE_SDK', '-D__LLP64__']); # (the last is for STLSOFT)
+env['CC'] = '/Developer/Platforms/iPhoneOS.platform/usr/bin/llvm-gcc-4.2'
+env['CXX'] = '/Developer/Platforms/iPhoneOS.platform/usr/bin/llvm-g++-4.2'
+env.Append(CPPFLAGS = Split('-arch armv6 -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.1.sdk'))
+env.Append(LINKFLAGS = Split('-arch armv6 -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.1.sdk'))
+}}}
+
+As long as the compile gets you the .a files (sans sqlite3), you are fine.
+
 = Rename Source Files =
 
 XCode allows you to use C++ if your source file is named with a .mm (vs. .m) extension. This will make for the easiest transition for non-Objective-C programmers.
