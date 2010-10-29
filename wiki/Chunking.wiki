@@ -1,0 +1,122 @@
+#summary Rules and definitions that govern chunking and backtracing
+
+= Introduction =
+
+The code in the files chunk.cpp and backtrace.cpp is some of the most
+confusing in Soar, and the definition of correct behavior of chunking
+and backtracing has been obscured by the less than award-winning code
+quality. This page is an attempt to clearly lay out these definitions as
+a precursor to implementing them in a clearer fashion.
+
+= Definitions =
+
+*Instantiation*
+
+	Information about a production firing. The instantiation includes
+	information about all wmes matched by the conditions of the
+	production and the preferences created as actions of the production.
+	Instantiations remain in memory as long as the created preferences
+	are in memory because they are needed for backtracing.
+
+*Condition*
+
+	A test on the LHS of a production.
+
+*Instantiated condition*
+
+	A condition and the wme that it matches in an instantiation.
+
+*Match goal*
+
+	The lowest goal (biggest number after the "S") that a condition in
+	an instantiation matches on. Each instantiation has exactly one
+	match goal. The preferences created as actions of the instantiation
+	inherit its match goal.
+
+*Result*
+
+	A preference created by an instantiation in a higher goal (usually
+	the superstate, but could be higher) than the match goal of the
+	instantiation.
+
+*Variablization*
+
+	The act of replacing the identifiers matched by the conditions of an
+	instantiation with variables so that the conditions will match any
+	working memory structure identical to that matched by the
+	instantiation modulo identifier names. The result of the
+	variablization is used to create a chunk.
+
+*Backtracing*
+
+	The process of identifying the instantiated conditions of the
+	instantiation that created a particular preference. Backtracing is
+	usually recursively applied during chunking.
+
+*Ground (instantiated condition)*
+
+	During backtracing, an instantiated condition whose preference has
+	the same match goal as the instantiation being backtraced.
+
+*Potential (instantiated condition)*
+
+	During backtracing, an instantiated condition whose wme is supported
+	by another preference in a goal higher than the match goal of the
+	instantiation being backtraced.
+
+	For example, if the following wmes are in working memory
+
+{{{
+(S1 ^foo F1)
+(S2 ^bar F1)
+(F1 ^baz B1)
+(S2 ^superstate S1)
+}}}
+
+	and this production was backtraced through
+
+{{{
+sp {example
+   (<s> ^bar <b>)
+   (<b> ^baz <z>)
+-->
+   ...}
+}}}
+
+	then `(<b> ^baz <z>)` would be a potential condition.
+
+*Local (instantiated condition)*
+
+	During backtracing, an instantiated condition in the match goal of
+	the instantiation being backtraced.
+
+*Chunking*
+
+	The process of creating a production that summarizes a sequence of
+	production firings in a subgoal leading to a result.
+
+= Conditions for learning a chunk =
+
+A chunk is learned when the instantiation INST if and only if all these
+conditions hold
+
+	* the RHS of INST creates a result
+	* the [CommandLineInterface#learn learn parameter] is set to
+		# `-e`, `--enable`, `--on`, or
+		# `-o`, `--only`, and the match goal of INST is in the `force-learn` list, or
+		# `-E`, `--except`, and the match goal of INST is not in the `dont-learn` list
+	* the learn parameter is modified with
+		# `-a`, `--all-levels`, the default, or
+		# `-b`, `--bottom-up`, and no subgoals below the match goal of INST has learned any chunks
+	* the learn parameter is modified with
+		# `-n`, `--enable-through-local-negations`, the default, or
+		# `-N`, `--disable-through-local-negations`, and the backtrace did not encounter any local negated conditions
+	* `^quiescence t` is not encountered in the backtrace
+	* the backtrace does not trace through any justifications
+	* the chunk is not a duplicate of an existing production, including other chunks
+
+The `dont-learn` and `force-learn` lists can be modified with the
+corresponding RHS functions. See the manual for details.
+
+This list is copied from the manual, with the backtracing through
+justifications condition and the `learn --only` conditions appended.
