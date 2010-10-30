@@ -112,19 +112,19 @@ conditions hold
 		# `-n`, `--enable-through-local-negations`, the default, or
 		# `-N`, `--disable-through-local-negations`, and the backtrace did not encounter any local negated conditions
 	* `^quiescence t` is not encountered in the backtrace
-	* the backtrace does not trace through any instantiations whose `okay_to_variablize` flag is false
+	* the backtrace does not trace through any justification whose `reliable` flag is false
 	* the chunk is not a duplicate of an existing production, including other chunks
 
 The `dont-learn` and `force-learn` lists can be modified with the
 corresponding RHS functions. See the manual for details.
 
-`okay_to_variablize` is a flag on instantiations that is set to true if
-any of the following are encountered in the backtrace of an
-instantiation:
+`reliable` is a flag on justifications that is set to false if any of
+the following are encountered in the backtrace while creating the
+justification:
 
 	*  `^quiescence t` 
 	* a local negation and `learn -N` is set
-	* another instantiation whose `okay_to_variablize` flag is set to false
+	* another instantiation whose `reliable` flag is set to false
 
 This list is copied from the manual, with the backtracing through
 justifications condition and the `learn --only` conditions appended.
