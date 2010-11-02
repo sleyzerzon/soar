@@ -294,6 +294,8 @@ errors.
 
 == Mac OS X Prerequisites ==
 
+Install the latest Java Developer Package for your OS (10.6 is the only one we support). You can find this at http://connect.apple.com/ under Java downloads. [http://discussions.apple.com/thread.jspa?threadID=2630649&tstart=0 More information here].
+
 Open spotlight: Java preferences, make sure that the appropriate JVM is selected. This is apparently not an issue on snow leopard.
 
 Install [http://developer.apple.com/tools/xcode/ XCode].
@@ -316,13 +318,6 @@ To make these changes permenant, edit your `.bash_profile` file and put them at
 the bottom.
 
 Note for Eclipse users: Eclipse will not inherit these environment variables unless you launch Eclipse from the shell. Alternatively [http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPRuntimeConfig/Articles/EnvironmentVars.html#//apple_ref/doc/uid/20002093-BCIJIJBH look here for other ways to get environment variables to Eclipse].
-
-SCons needs to find the Java development libraries, you help it by setting the
-`JAVA_HOME` variable to:
-
-{{{
-export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
-}}}
 
 The binaries are installed to `SoarSuite/out` by default and need to be in the
 library path during execution, tell the loader where to look by setting:
