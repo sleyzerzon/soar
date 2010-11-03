@@ -43,9 +43,9 @@ class bbox_on_pos_filter : public vec3_filter, public filter_listener {
 public:
 	bbox_on_pos_filter(bbox_filter *bf, bbox_filter *tf);
 	
-	void   update(filter *f);
-	string get_error();
-	bool   get_result(vec3 &r);
+	void        update(filter *f);
+	std::string get_error();
+	bool        get_result(vec3 &r);
 	
 private:
 	bbox_filter* bottomfilter;
@@ -59,9 +59,9 @@ class bbox_ontop_filter : public bool_filter, public filter_listener {
 public:
 	bbox_ontop_filter(bbox_filter *bf, bbox_filter *tf);
 	
-	void   update(filter *f);
-	string get_error();
-	bool   get_result(bool &r);
+	void        update(filter *f);
+	std::string get_error();
+	bool        get_result(bool &r);
 	
 private:
 	bbox_filter* bottomfilter;

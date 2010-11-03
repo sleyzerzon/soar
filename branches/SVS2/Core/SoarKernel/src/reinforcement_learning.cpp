@@ -413,9 +413,6 @@ void rl_get_template_constants( condition* p_conds, condition* i_conds, rl_symbo
 			double init_value = 0;
 			condition *cond_top, *cond_bottom;
 
-			Bool chunk_var = my_agent->variablize_this_chunk;
-			my_agent->variablize_this_chunk = TRUE;
-
 			// make unique production name
 			Symbol *new_name_symbol;
 			std::string new_name = "";
@@ -457,7 +454,6 @@ void rl_get_template_constants( condition* p_conds, condition* i_conds, rl_symbo
 
 			// make new production
 			production *new_production = make_production( my_agent, USER_PRODUCTION_TYPE, new_name_symbol, &cond_top, &cond_bottom, &new_action, false );
-			my_agent->variablize_this_chunk = chunk_var; // restored to original value
 
 			// set initial expected reward values
 			{
@@ -807,14 +803,14 @@ void rl_perform_update( agent *my_agent, double op_value, bool op_rl, Symbol *go
 					// print as necessary
 					if ( my_agent->sysparams[ TRACE_RL_SYSPARAM ] ) 
 					{
-						std::ostringstream ss;
-						char *cs;
+						std::ostringstream ss;						
 						ss << "RL update " << prod->name->sc.name << " "
 						   << old_ecr << " " << old_efr << " " << old_ecr + old_efr << " -> "
 						   << new_ecr << " " << new_efr << " " << new_combined ;
-						cs = const_cast<char *>( ss.str().c_str() );
-						print( my_agent, "%s\n", cs );
-						xml_generate_message( my_agent, cs );
+
+						std::string temp_str( ss.str() );						
+						print( my_agent, "%s\n", temp_str.c_str() );
+						xml_generate_message( my_agent, temp_str.c_str() );
 					}
 
 					// Change value of rule

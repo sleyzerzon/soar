@@ -174,9 +174,7 @@ void svs::post_env_callback() {
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results();
 	}
-	cout << endl << "SCENE START" << endl;
 	print_tree(state_stack.back()->get_scene()->get_root());
-	cout << "SCENE END" << endl;
 }
 
 void svs::make_common_syms() {

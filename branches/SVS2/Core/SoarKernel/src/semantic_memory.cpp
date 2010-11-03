@@ -116,6 +116,12 @@ smem_param_container::smem_param_container( agent *new_agent ): soar_module::par
 	// thresh
 	thresh = new soar_module::integer_param( "thresh", 100, new soar_module::predicate<long>(), new smem_db_predicate<long>( my_agent ) );
 	add( thresh );
+
+	// merge
+	merge = new soar_module::constant_param<merge_choices>( "merge", merge_none, new soar_module::f_predicate<merge_choices>() );
+	merge->add_mapping( merge_none, "none" );
+	merge->add_mapping( merge_add, "add" );
+	add( merge );
 }
 
 //
@@ -615,7 +621,7 @@ void _smem_add_wme( agent *my_agent, Symbol *state, Symbol *id, Symbol *attr, Sy
 		// it to future adventures (potentially on new states)
 
 		instantiation *my_justification_list = NIL;
-		chunk_instantiation( my_agent, pref->inst, false, &my_justification_list );
+		chunk_instantiation( my_agent, pref->inst, true, &my_justification_list );
 
 		// if any justifications are created, assert their preferences manually
 		// (copied mainly from assert_new_preferences with respect to our circumstances)
@@ -869,6 +875,7 @@ inline intptr_t smem_reverse_hash_int( agent* my_agent, smem_hash_id hash_value 
 	
 	my_agent->smem_stmts->hash_rev_int->bind_int( 1, hash_value );
 	soar_module::exec_result res = my_agent->smem_stmts->hash_rev_int->execute();
+	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
 	return_val = my_agent->smem_stmts->hash_rev_int->column_int(0);
 	my_agent->smem_stmts->hash_rev_int->reinitialize();
@@ -882,6 +889,7 @@ inline double smem_reverse_hash_float( agent* my_agent, smem_hash_id hash_value 
 	
 	my_agent->smem_stmts->hash_rev_float->bind_int( 1, hash_value );
 	soar_module::exec_result res = my_agent->smem_stmts->hash_rev_float->execute();
+	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
 	return_val = my_agent->smem_stmts->hash_rev_float->column_double(0);
 	my_agent->smem_stmts->hash_rev_float->reinitialize();
@@ -893,6 +901,7 @@ inline void smem_reverse_hash_str( agent* my_agent, smem_hash_id hash_value, std
 {
 	my_agent->smem_stmts->hash_rev_str->bind_int( 1, hash_value );
 	soar_module::exec_result res = my_agent->smem_stmts->hash_rev_str->execute();
+	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
 	dest.assign( my_agent->smem_stmts->hash_rev_str->column_text(0) );
 	my_agent->smem_stmts->hash_rev_str->reinitialize();
@@ -1688,9 +1697,11 @@ void smem_install_memory( agent *my_agent, Symbol *state, smem_lti_id parent_id,
 	}	
 
 	// if no children, then retrieve children
-	if ( ( lti->id.impasse_wmes == NIL ) &&
+	// merge may override this behavior
+	if ( ( my_agent->smem_params->merge->get_value() == smem_param_container::merge_add ) || 
+		 ( ( lti->id.impasse_wmes == NIL ) &&
 		 ( lti->id.input_wmes == NIL ) &&
-		 ( lti->id.slots == NIL ) )
+		 ( lti->id.slots == NIL ) ) )
 	{
 		soar_module::sqlite_statement *expand_q = my_agent->smem_stmts->web_expand;
 		Symbol *attr_sym;
