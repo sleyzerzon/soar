@@ -2974,6 +2974,7 @@ stats [options]
 || `-M, --max` || report the per-cycle maximum statistics (decision cycle time, WM changes, production fires) ||
 || `-R, --reset` || zero out the per-cycle maximum statistics reported by `--max` command ||
 || `-t, --track` || begin tracking the per-cycle maximum statistics reported by `--max` for each cycle (instead of only the max value) ||
+|| `-T, --stop-track` || stop and clear tracking of the per-cycle maximum statistics ||
 || `-c, --cycle` || print out collected per-cycle maximum statistics saved by `--track` in human-readable form ||
 || `-C, --cycle-csv` || print out collected per-cycle maximum statistics saved by `--track` in comma-separated form ||
 || `-S, --sort N` || sort the tracked cycle stats by column number `N`, see table below ||
@@ -3027,7 +3028,8 @@ The `--track` argument starts tracking the same stats as the `--max` argument
 but records all data for each cycle instead of the maximum values. This data
 can be printed using the `--cycle` or `--cycle-csv` arguments. When printing
 the data with `--cycle`, it may be sorted using the `--sort` argument and a
-column integer. Use negative numbers for descending sort.
+column integer. Use negative numbers for descending sort. Issue `--stop-track`
+to reset and clear this data.
 
 === A Note on Timers ===
 
