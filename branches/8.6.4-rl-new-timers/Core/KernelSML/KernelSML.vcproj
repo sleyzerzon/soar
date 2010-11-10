@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="KernelSML"
 	ProjectGUID="{4C6CC3DE-C022-4043-8E73-72FE1E1224C4}"
 	RootNamespace="KernelSML"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -73,6 +74,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
@@ -93,9 +96,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -163,6 +163,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
@@ -185,9 +187,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -195,27 +194,21 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{6B2CBC5A-4A7A-46BB-9274-6C91262E9374}"
-			RelativePathToProject=".\Core\CLI\CommandLineInterface.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{161DC1AD-FB4B-4370-9FD5-B02E2A0D8A36}"
-			RelativePathToProject=".\Core\ConnectionSML\ConnectionSML.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{E9AB0B6E-F1CA-4A63-817B-AB47F7E5417E}"
-			RelativePathToProject=".\Core\ElementXML\ElementXML.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{0F4205EE-35EA-4421-8F74-513603FF003F}"
-			RelativePathToProject=".\Core\gSKI\gSKI.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{844AB204-F1B2-43D5-A6E5-1EA19FF289F2}"
-			RelativePathToProject=".\Core\SoarKernel\SoarKernel.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{6B0AE9F9-575C-4230-875A-3996BF2AC1E6}"
-			RelativePathToProject=".\Core\pcre\pcre.vcproj"
 		/>
 	</References>
 	<Files>
