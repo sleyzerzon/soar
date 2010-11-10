@@ -1366,7 +1366,7 @@ void AgentPerformanceMonitor::printTimingInfo()
     print(a, "timed using Soar's timers....\n");
     reset_timer(&stop);
     start_timer(a, &start);
-    sys_sleep(3);
+    Sleep(3000);
     stop_timer(a, &start, &stop);
     print(a, "Sleep interval  -->   3 seconds\n");
 #ifndef NO_TIMING_STUFF
