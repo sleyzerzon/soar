@@ -133,10 +133,10 @@ The messaging system places messages to and from the agent under the *received-m
       * _door_: Details about the door
         * *id* (_int_): Door id number.
         * *state* (_string_) (open, closed, locked): State of door.
-      * *x* (_float)
-      * *y* (_float)
-      * *z* (_float)
-      * *distance* (_float)
+      * *x* (_float): To center of wall
+      * *y* (_float): To center of wall
+      * *z* (_float): To center of wall
+      * *distance* (_float): To center of wall
     * _wall_
       * *direction* (_string_) (north, east, south, west): Which wall it is.
       * *open* (_string_) (true, false): If the entire length of wall is virtual (part of a larger room).
@@ -151,10 +151,10 @@ Area descriptions currently assume rectangular rooms with walls and gateways ali
       * *type* (_string_) (block, brick, ball, player): Type of object.
       * *id* (_int_): Unique identifying number for objects.
       * *name* (_string_): Unique agent name if other player.
-      * *x* (_float)
-      * *y* (_float)
-      * *z* (_float)
-      * *distance* (_float)
+      * *x* (_float): To center of object
+      * *y* (_float): To center of object
+      * *z* (_float): To center of object
+      * *distance* (_float): To center of object
       * *visible* (_string_) (true, false): Object stays on input link briefly after it is not visible. 
       * Optional properties (see below).
 
