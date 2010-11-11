@@ -8,19 +8,19 @@
 
 == Input Link ==
 
-=== Point Data ===
+At the top level there are the following identifiers:
 
-Objects, waypoints, and walls, and gateways share the following structure when described on the input link:
-
-  * *x* (_float_)
-  * *y* (_float_)
-  * *z* (_float_)
-  * *distance* (_float_) (positive): Distance to point.
-  * *yaw* (_angle-resolution type_)  (-180 to 180, or -pi to pi): What absolute yaw to turn to to face the point.
-  * *relative-bearing* (_angle-resolution type_) (-180 to 180, or -pi to pi): Which way to turn to face the point, positive means turn left. 0 means the point is straight ahead.
-  * *abs-relative-bearing* (_angle-resolution type_) (0 to 180 or 0 to pi): Magnitude of relative bearing, represents how far to turn.
+  * _time_: [Sproom#Time World clock]
+  * _configuration_: [Sproom#Configuration Simulator and robot settings and configuration]
+  * _self_: [Sproom#Self Information about the robot]
+  * _waypoints_: [Sproom#Waypoints Navigation point data as set by the robot]
+  * _received-messages_: [Sproom#Received_Messages Messages received by the robot]
+  * _lidar_: [Sproom#Lidar Laser range finder data]
+  * _area-description_: [Sproom#Area_Description Information about the map based on the robot's current location]
+  * _objects_: [Sproom#Objects Information about objects detected by the simulated object sensor]
 
 === Time ===
+
   * _time_
     * *seconds* (_int_) (positive seconds): Use to measure elapsed time only.
     * *microseconds* (_int_) (microseconds 0 to 999999): Fraction of second, use to measure elapsed time only.
@@ -79,7 +79,13 @@ Self contains data about the robot itself.
   * _waypoints_
     * _waypoint_: One for each registered and enabled waypoint.
       * *id* (_any type_): User-defined unique identifier in user-defined type.
-      * [Sproom#Point_Data Point data, as described above].
+      * *x* (_float_)
+      * *y* (_float_)
+      * *z* (_float_)
+      * *distance* (_float_) (positive): Distance to point.
+      * *yaw* (_angle-resolution type_)  (-180 to 180, or -pi to pi): What absolute yaw to turn to to face the point.
+      * *relative-bearing* (_angle-resolution type_) (-180 to 180, or -pi to pi): Which way to turn to face the point, positive means turn left. 0 means the point is straight ahead.
+      * *abs-relative-bearing* (_angle-resolution type_) (0 to 180 or 0 to pi): Magnitude of relative bearing, represents how far to turn.
 
 The Soar interface allows agents to define arbitrary points in space as named waypoints. Waypoints that are defined and enabled (they are enabled by default when defined) show up under the *waypoints* identifier. Distance to and useful angles are calculated to the waypoint.
 
@@ -127,24 +133,30 @@ The messaging system places messages to and from the agent under the *received-m
       * _door_: Details about the door
         * *id* (_int_): Door id number.
         * *state* (_string_) (open, closed, locked): State of door.
-      * [Sproom#Point_Data Point data, as described above].
+      * *x* (_float)
+      * *y* (_float)
+      * *z* (_float)
+      * *distance* (_float)
     * _wall_
       * *direction* (_string_) (north, east, south, west): Which wall it is.
       * *open* (_string_) (true, false): If the entire length of wall is virtual (part of a larger room).
       * *to* (_int_) (potentially *multi-valued*): One area id for each area connected on the other side of this wall, usually only one area. Does not include this area.
-      * [Sproom#Point_Data Point data, as described above].
 
 Area descriptions currently assume rectangular rooms with walls and gateways aligned with the x/y axes. The rooms may be comprised of multiple areas connected with virtual or "open" walls so that more complex (non-rectangular) rooms may be represented as compositions of rectangular rooms.
 
 === Objects ===
 
-  * _object_
-    * *type* (_string_) (block, brick, ball, player): Type of object.
-    * *id* (_int_): Unique identifying number for objects.
-    * *name* (_string_): Unique agent name if other player.
-    * *visible* (_string_) (true, false): Object stays on input link briefly after it is not visible. 
-    * [Sproom#Point_Data Point data, as described above].
-    * Optional properties (see below).
+  * _objects_
+    * _object_: One for each detected object
+      * *type* (_string_) (block, brick, ball, player): Type of object.
+      * *id* (_int_): Unique identifying number for objects.
+      * *name* (_string_): Unique agent name if other player.
+      * *x* (_float)
+      * *y* (_float)
+      * *z* (_float)
+      * *distance* (_float)
+      * *visible* (_string_) (true, false): Object stays on input link briefly after it is not visible. 
+      * Optional properties (see below).
 
 Objects in the world are sensed with some of these application-specific properties.
 
