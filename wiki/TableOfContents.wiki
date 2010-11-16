@@ -45,6 +45,7 @@
     * [MovingFromSGIOToSML Moving from SGIO to SML]
     * [SoarXMLInterfaceSpecification SoarXMLInterfaceSpecification]
     * [SoarOniPhone Soar on iOS]
+    * [SoarTimers Timers in Soar]
   * [SoarGroupReadings Readings]
   * [SoarGroupTalks Talks]
   * [ConferenceSchedule Conferences]
