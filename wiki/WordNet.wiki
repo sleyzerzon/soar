@@ -14,8 +14,10 @@ From the project page, download the wn-lexical-data for the version of WordNet o
 
 = Conversion =
 
-The data files in this project contain ACT-R chunks. The conversion to Soar's semantic memory declarative add is basically string replacement. We have a PHP script to perform this conversion in SVN (trunk/wn/WNSoar.php). The script takes via standard-in a data file from WN-LEXICAL and outputs a valid semantic memory declarative add statement. For example: 
+The data files in this project contain ACT-R chunks. The conversion to Soar's semantic memory declarative add is basically string replacement. We have a PHP script to perform this conversion in SVN (trunk/wn/wnlexical.php). The script takes via standard-in a data file from WN-LEXICAL and outputs a valid semantic memory declarative add statement. For example: 
 
-cat WNChunks.data | php WNSoar.php > wn.soar
+cat WNChunks.data | php wnlexical.php smem > wn.soar
 
 This conversion is very fast (~30s) and produces about 84MB of text data. Sourcing the resulting data into Soar takes a few minutes and a good amount of memory (~1GB). To make this a one-time cost, switch semantic memory to write to a file (smem --set path /path/to/wn.db) before sourcing the data. 
+
+This script also can create SQL statements to populate a "sqlite" or "mysql" database (swap the quoted strings for "smem" in the above command). This may be useful to search/analyze/understand the WordNet chunks.
