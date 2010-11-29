@@ -1,0 +1,31 @@
+#summary Introduction the using the selection space rules
+
+= What it is =
+
+The selection space is a generic problem space in which the agent performs look-ahead search to evaluate the goodness of candidate operators and assign preferences to them. Conceptually, the selection space is analogous to a depth-first search through the task problem space. It is a universal weak method that applies to a large number of tasks.
+
+A set of source files included in the distribution directory Core/Demos/default (as of 9.3.0) implement this behavior. These rules were originally written by John Laird in the late 80s and have undergone small modifications throughout the years. The base rules have been extended for various projects to do things like iterative deepening and IDA`*`.
+
+= Concepts =
+
+The base rules implement three major functions:
+
+== The "evaluate-operator" Operator ==
+
+The selection space rules come into play only when an operator tie impasse occurs. This means the agent doesn't have enough knowledge to determine which operator should be chosen in a specific situation, so the selection space rules kick in to perform a look-ahead search. For each tied operator in some random order, the selection space rules propose and select an "evaluate-operator" operator dedicated to generating an evaluation for the tied operator. The evaluate-operator operator will cause an operator no-change impasse and generate a new state. This new state is used as the look-ahead state. The contents of the state in which the tie occurred is copied into this new state (see below) and then one of the tied operators is applied to the state to make a prediction about how the result of applying the operator. The hope is that the agent has the knowledge to determine which outcome of the tied operators is most desired and thus choose the correct operator.
+
+It's often the case that the agent won't know which outcome is best with just a single step look-ahead and furthermore will face more choices it doesn't know how to make in the look-ahead state. This means that an evaluation for the look-ahead operator will not be generated and instead another operator tie will occur. In this case the selection space rules naturally apply to recursively resolve the new tie, resulting in a depth-first search.
+
+== Copying the State and Operator ==
+
+Since applying operators during look-ahead can destructively modify the state, the rules provide the functionality to automatically make depth-1 and depth-2 copies of the original state. A depth-1 copy just copies the wmes hanging off the state without making any new identifiers, while a depth-2 copy creates copies of all identifiers immediately connected to the state and then does a depth-1 copy on every identifier. Unfortunately there's no way to write a fixed set of rules that will perform arbitrarily deep copying using only elaborations.
+
+== Translating Operator Evaluations to Preferences ==
+
+The selection space rules themselves are task independent and therefore don't know what success or failure is in your particular problem. You have to provide rules that elaborate the evaluation structures for each operator with categories like "success", "failure", and "partial-failure", or numeric values. The selection space rules will automatically take those values and generate preferences on the tied operators to ultimately resolve the impasse. The preferences are assigned as you would expect, for example, a success operator is preferred over a failure operator, and an operator with numeric value 1.2 is preferred over one with value 0.5, if you specify that higher values are desired (using the desired structure explained below).
+
+= WME Structures =
+
+The behavior of the selection space rules is controlled by creating certain WME structures on the state. 
+
+to be continued ...
