@@ -1,4 +1,4 @@
-#summary Introduction the using the selection space rules
+#summary Introduction to using the selection space rules
 
 = What it is =
 
