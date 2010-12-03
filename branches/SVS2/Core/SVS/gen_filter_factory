@@ -1,0 +1,46 @@
+#!/bin/sh
+
+srcs=`ls src/filters/*.cpp`
+filters=`
+for f in $srcs
+do
+	egrep -o '_make_[a-zA-Z0-9_]*_filter_' $f
+done | sort | uniq | awk '{print substr($0,7,length($0)-14)}'`
+
+sigs=`echo "$filters" | awk '
+	{ print "filter* _make_" $0 "_filter_(const filter_params &params);" }'`
+
+arrayents=`echo "$filters" | awk '
+	{ print "{ \"" $0 "\", _make_" $0 "_filter_ }," }'`
+
+cat  >src/filter_factory.cpp <<EOF
+#include <string>
+#include <map>
+#include "filter.h"
+
+typedef struct filter_cons_entry_struct {
+	std::string name;
+	filter* (*cons_func)(const filter_params&);
+} filter_cons_entry;
+
+$sigs
+
+static filter_cons_entry filter_cons_tab[] = {
+$arrayents
+};
+
+filter* make_filter(const std::string &name, const filter_params &params) {
+	int tabsize = sizeof(filter_cons_tab) / sizeof(filter_cons_entry);
+	
+	for(int i = 0; i < tabsize; ++i) {
+		if (name == filter_cons_tab[i].name) {
+			return filter_cons_tab[i].cons_func(params);
+		}
+	}
+	
+	return NULL;
+}
+EOF
+
+cp svs.static.cxx svs.cxx
+echo "$srcs" | awk '{print "#include \"" $0 "\""}' >> svs.cxx

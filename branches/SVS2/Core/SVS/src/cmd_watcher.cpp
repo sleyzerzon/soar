@@ -1,9 +1,54 @@
+#include <stdlib.h>
+#include <ctype.h>
+#include <sstream>
 #include "cmd_watcher.h"
 #include "filter.h"
-#include "gen_filter.h"
+#include "filters/gen_filter.h"
+
+using namespace std;
+
+extern int parse_state_update(string s, scene *scn);
 
 bool is_reserved_param(const string &name) {
 	return name == "result" || name == "parent";
+}
+
+/* Remove weird characters from string */
+void cleanstring(string &s) {
+	string::iterator i;
+	for (i = s.begin(); i != s.end();) {
+		if (!isalnum(*i) && *i != '.' && *i != '-' && *i != '_') {
+			i = s.erase(i);
+		} else {
+			++i;
+		}
+	}
+}
+
+cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
+	sym_hnd        id;
+	string         attr;
+	soar_interface *si   = state->get_soar_interface();
+	scene          *scn  = state->get_scene();
+	int            level = state->get_level();
+	ipcsocket      *ipc  = state->get_ipc();
+	
+	if (!si->get_val(si->get_wme_attr(w), attr)) {
+		return NULL;
+	}
+	id = si->get_wme_val(w);
+	if (!si->is_identifier(id)) {
+		return NULL;
+	}
+	
+	if (attr == "extract") {
+		return new extract_cmd_watcher(si, id, scn);
+	} else if (attr == "generate") {
+		return new gen_cmd_watcher(si, id, scn);
+	} else if (attr == "control") {
+		return new ctrl_cmd_watcher(si, id, scn, level, ipc);
+	}
+	return NULL;
 }
 
 cmd_utils::cmd_utils(soar_interface *si, sym_hnd cmd_root, scene *scn)
@@ -20,7 +65,7 @@ void cmd_utils::set_result(const string &r) {
 		}
 		si->remove_wme(result_wme);
 	}
-	result_wme = si->make_str_wme(cmd_root, "result", r);
+	result_wme = si->make_wme(cmd_root, "result", r);
 }
 
 bool cmd_utils::get_str_param(const string &name, string &val) {
@@ -85,8 +130,7 @@ bool cmd_utils::cmd_changed() {
 		}
 	}
 
-	if (new_subtree_size != subtree_size)
-	{
+	if (new_subtree_size != subtree_size) {
 		changed = true;
 		subtree_size = new_subtree_size;
 	}
@@ -146,12 +190,6 @@ bool cmd_utils::get_filter_params(sym_hnd id, filter_params &p) {
 	string attr, node_name, param_name;
 	bool fail;
 
-	if (si->get_val(id, node_name)) {
-		f = make_node_filter(node_name);   // string constant indicates node filter
-		p.insert(pair<string,filter*>("", f));
-		return true;
-	}
-	
 	if (!si->is_identifier(id)) {
 		return false;
 	}
@@ -163,23 +201,21 @@ bool cmd_utils::get_filter_params(sym_hnd id, filter_params &p) {
 			fail = true;
 			break;
 		}
-		if (attr.size() > 0 && attr[0] == '_') {       // named param
-			param_name = attr.substr(1);
+		if (si->get_val(si->get_wme_val(*i), node_name)) {  // scene graph node
+			f = make_node_filter(node_name); 
+		} else {   // another filter
 			si->get_child_wmes(si->get_wme_val(*i), param_childs);
 			if (param_childs.size() != 1) {
 				fail = true;
 				break;
 			}
 			f = rec_make_filter(param_childs.front());
-		} else {                                       // anonymous param
-			param_name = "";
-			f = rec_make_filter(*i);
 		}
 		if (!f) {
 			fail = true;
 			break;
 		}
-		p.insert(pair<string,filter*>(param_name, f));
+		p.insert(pair<string,filter*>(attr, f));
 	}
 	
 	if (fail) {
@@ -219,7 +255,7 @@ void extract_cmd_watcher::update(filter *f) {
 }
 
 bool extract_cmd_watcher::update_result() {
-	string r;
+	filter_result *r;
 	
 	if (utils.cmd_changed()) {
 		if (result_filter) {
@@ -227,7 +263,7 @@ bool extract_cmd_watcher::update_result() {
 		}
 		result_filter = utils.make_filter();
 		if (!result_filter) {
-			utils.set_result("COMMAND_ERROR");
+			utils.set_result("command error");
 			return false;
 		}
 		result_filter->listen(this);
@@ -236,11 +272,11 @@ bool extract_cmd_watcher::update_result() {
 	
 	if (result_filter && dirty) {
 		dirty = false;
-		if (!result_filter->get_result_string(r)) {
+		if (!(r = result_filter->get_result())) {
 			utils.set_result(result_filter->get_error());
 			return false;
 		} else {
-			utils.set_result(r);
+			utils.set_result(r->get_string());
 		}
 	}
 	return true;
@@ -297,21 +333,13 @@ void gen_cmd_watcher::update(filter *f) {
 }
 
 bool gen_cmd_watcher::update_result() {
-	filter *f;
-	
+	filter_result *r;
 	if (utils.cmd_changed()) {
 		if (result_filter) {
 			delete result_filter;
 		}
-		f = utils.make_filter();
-		if (!f) {
-			utils.set_result("COMMAND_ERROR");
-			return false;
-		}
-		result_filter = dynamic_cast<node_filter*>(f);
-		if (!result_filter) {
-			delete f;
-			utils.set_result("NOT_NODE_FILTER");
+		if (!(result_filter = utils.make_filter())) {
+			utils.set_result("command error");
 			return false;
 		}
 		dirty = true;
@@ -320,7 +348,7 @@ bool gen_cmd_watcher::update_result() {
 	}
 	
 	if (!parent) {
-		utils.set_result("NO_PARENT");
+		utils.set_result("no parent");
 		return false;
 	}
 	
@@ -330,34 +358,128 @@ bool gen_cmd_watcher::update_result() {
 			delete generated;
 			generated = NULL;
 		}
-		if (!result_filter->get_result(generated)) {
+		if (!get_node_filter_result_value(NULL, result_filter, generated)) {
 			utils.set_result(result_filter->get_error());
 			return false;
-		} else {
-			parent->attach_child(generated);
-			utils.set_result("t");
 		}
+		parent->attach_child(generated);
+		utils.set_result("t");
 	}
 	
 	return true;
 }
 
-cmd_watcher* make_cmd_watcher(soar_interface *si, scene *scn, wme_hnd w) {
-	sym_hnd v;
-	string attr;
+ctrl_cmd_watcher::ctrl_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn, int level, ipcsocket *ipc)
+: utils(si, cmd_root, scn), si(si), cmd_root(cmd_root), scn(scn), 
+  ipc(ipc), level(level), step(0), stepwme(NULL), broken(false)
+{
+	wme_hnd w;
+	string type, msg;
+	int r;
 	
-	if (!si->get_val(si->get_wme_attr(w), attr)) {
-		return NULL;
-	}
-	v = si->get_wme_val(w);
-	if (!si->is_identifier(v)) {
-		return NULL;
+	r = parse_objective(msg);
+	if (r == 0) {
+		ipc->send("seek", level, msg);
+	} else if (r == 2) {
+		broken = true;
+		utils.set_result("objective syntax");
+		return;
+	} else {
+		r = parse_replay(msg);
+		if (r == 0) {
+			ipc->send("replay", level, msg);
+		} else if (r == 2) {
+			broken = true;
+			utils.set_result("replay syntax");
+			return;
+		} else {
+			ipc->send("random", level, "");
+		}
 	}
 	
-	if (attr == "extract") {
-		return new extract_cmd_watcher(si, v, scn);
-	} else if (attr == "generate") {
-		return new gen_cmd_watcher(si, v, scn);
+	ipc->receive(type, msg);
+	if (type == "error") {
+		broken = true;
+		utils.set_result(msg);
+		return;
+	} 
+	
+	assert(type == "id");
+	id = atoi(msg.c_str());
+	si->make_wme(cmd_root, "trajectory", id);
+	update_step();
+}
+
+/* returns 0 if parsed successfully, 1 if not a seek command, 2 if
+   syntax error
+ */
+int ctrl_cmd_watcher::parse_objective(string &msg) {
+	wme_hnd w;
+	wme_list objargs;
+	wme_list::iterator i;
+	sym_hnd objid;
+	string astr, vstr, name;
+	stringstream ss;
+	
+	if (!si->find_child_wme(cmd_root, "objective", w))
+		return 1;
+	objid = si->get_wme_val(w);
+	if (!si->get_child_wmes(objid, objargs))
+		return 2;
+	for(i = objargs.begin(); i != objargs.end(); ++i) {
+		if (!si->get_val(si->get_wme_attr(*i), astr) ||
+		    !si->get_val(si->get_wme_val(*i), vstr))
+			return 2;
+		if (astr == "name") {
+			name = vstr;
+		} else {
+			cleanstring(astr); cleanstring(vstr);
+			ss << astr << ' ' << vstr << endl;
+		}
 	}
-	return NULL;
+	msg = name + "\n" + ss.str();
+	return 0;
+}
+
+/* return values same as parse_objective */
+int ctrl_cmd_watcher::parse_replay(string &msg) {
+	wme_hnd w;
+	long trajectoryid;
+	stringstream ss;
+	
+	if (!si->find_child_wme(cmd_root, "replay", w))
+		return 1;
+	if (!si->get_val(si->get_wme_val(w), trajectoryid))
+		return 2;
+	ss << trajectoryid;
+	msg = ss.str();
+	return 0;
+}
+
+bool ctrl_cmd_watcher::update_result() {
+	string type, msg, obj;
+	stringstream ss;
+	
+	if (broken) {
+		return false;
+	}
+	ss << id << endl;
+	ipc->send("stepctrl", level, ss.str());
+	ipc->receive(type, msg);
+	if (type == "error") {
+		utils.set_result(msg);
+		return false;
+	}
+	assert(type == "stateupdate");
+	parse_state_update(msg, scn);
+	utils.set_result("success");
+	step++;
+	update_step();
+	return true;
+}
+
+void ctrl_cmd_watcher::update_step() {
+	if (stepwme)
+		si->remove_wme(stepwme);
+	stepwme = si->make_wme(cmd_root, "step", step);
 }

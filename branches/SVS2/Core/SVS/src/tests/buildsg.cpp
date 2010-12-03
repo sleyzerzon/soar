@@ -6,11 +6,12 @@
 #include <iomanip>
 #include <iterator>
 #include <list>
-#include "../sgel_interp.h"
 #include "../scene.h"
 #include "../linalg.h"
 
 using namespace std;
+
+int parse_state_update(string s, scene *scn);
 
 void print_structure(sg_node *root) {
 	if (!root->is_group()) {
@@ -45,12 +46,10 @@ void print_points(sg_node *root) {
 int main(int argc, char *argv[]) {
 	int lineno = 1, pos;
 	string line;
-	scene scn("0");
-	
-	sgel_interp interp(&scn);
+	scene scn("test", "0", false);
 	
 	while(getline(cin, line)) {
-		if ((pos = interp.parse_line(line)) >= 0) {
+		if ((pos = parse_state_update(line, &scn)) >= 0) {
 			cout << "Error at " << lineno << ":" << pos << endl;
 			return 1;
 		}

@@ -2,7 +2,10 @@
 #define CMD_HANDLER_H
 
 #include "filter.h"
-#include "soar_int.h"
+
+class soar_interface;
+class svs_state;
+class ipcsocket;
 
 class cmd_utils {
 public:
@@ -29,8 +32,11 @@ private:
 class cmd_watcher {
 public:
 	virtual bool update_result() = 0;
+	virtual bool early() = 0;
 	virtual ~cmd_watcher() {};
 };
+
+cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w);
 
 class extract_cmd_watcher : public cmd_watcher, public filter_listener {
 public:
@@ -39,6 +45,7 @@ public:
 	
 	void update(filter *f);
 	bool update_result();
+	bool early() { return false; }
 	
 private:
 	cmd_utils utils;
@@ -54,19 +61,43 @@ public:
 	void update(sg_node* n, sg_node::change_type t);
 	void update(filter *f);
 	bool update_result();
+	bool early() { return false; }
 	
 private:
 	bool get_parent();
 	
-	cmd_utils    utils;
-	sym_hnd      cmd_root;
-	scene*       scn;
-	sg_node*     parent;
-	sg_node*     generated;
-	node_filter* result_filter;
-	bool         dirty;
+	cmd_utils utils;
+	sym_hnd   cmd_root;
+	scene     *scn;
+	sg_node   *parent;
+	sg_node   *generated;
+	filter    *result_filter;
+	bool      dirty;
 };
 
-cmd_watcher* make_cmd_watcher(soar_interface *si, scene *scn, wme_hnd w);
+class ctrl_cmd_watcher : public cmd_watcher {
+public:
+	ctrl_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn, int level, ipcsocket *ipc);
+	
+	bool update_result();
+	
+	bool early() { return true; }
+	
+private:
+	int  parse_objective(std::string &msg);
+	int  parse_replay(std::string &msg);
+	void update_step();
+	
+	ipcsocket      *ipc;
+	soar_interface *si;
+	sym_hnd        cmd_root;
+	wme_hnd        stepwme;
+	cmd_utils      utils;
+	scene          *scn;
+	int            level;
+	int            id;
+	int            step;
+	bool           broken;
+};
 
 #endif

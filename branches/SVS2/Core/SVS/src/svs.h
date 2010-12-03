@@ -1,72 +1,73 @@
 #ifndef SVS_H
 #define SVS_H
 
-#include "soar_int.h"
-#include "sg_node.h"
-#include "scene.h"
-#include "wm_sgo.h"
-#include "filter.h"
-#include "cmd_watcher.h"
-#include "sgel_interp.h"
 #include <vector>
 #include <map>
 #include <set>
+#include "ipcsocket.h"
+#include "soar_int.h"
+
+class cmd_watcher;
+class wm_sgo;
+class scene;
+class sg_node;
 
 typedef std::map<std::string,sg_node*> node_name_map;
 
 class common_syms {
 public:
 	common_syms() {
-		svs      = NULL;
-		ltm      = NULL;
-		cmd      = NULL;
-		scene    = NULL;
-		contents = NULL;
-		child    = NULL;
-		result   = NULL;
+		svs        = NULL;
+		ltm        = NULL;
+		scene      = NULL;
+		cmd        = NULL;
+		child      = NULL;
+		result     = NULL;
 	}
 	
 	sym_hnd svs;
 	sym_hnd ltm;
 	sym_hnd cmd;
 	sym_hnd scene;
-	sym_hnd contents;
 	sym_hnd child;
 	sym_hnd result;
 };
 
 class svs_state {
 public:
-	svs_state(sym_hnd state, svs_state *parent, soar_interface *interface, common_syms *syms);
+	svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common_syms *syms);
+	svs_state(sym_hnd state, svs_state *parent);
+
 	~svs_state();
 	
-	void    process_cmds();
-	void    update_cmd_results();
-	scene*  get_scene();
-	sym_hnd get_state() { return state; }
+	void           process_cmds();
+	void           update_cmd_results(bool early);
+	int            get_level()           { return level; }
+	scene          *get_scene()          { return scn;   }
+	sym_hnd        get_state()           { return state; }
+	soar_interface *get_soar_interface() { return si;    }
+	ipcsocket      *get_ipc()            { return ipc;   }
 	
 private:
+	void init();
 	void collect_cmds(Symbol* id, std::set<wme*>& all_cmds);
 	
+	svs_state      *parent;
+	int            level;
+	scene*         scn;
+	wm_sgo*        wm_sg_root;
 	soar_interface *si;
-
-	scene*        scn;
-	wm_sgo*       wm_sg_root;
-
-	common_syms *cs;
+	ipcsocket      *ipc;
+	common_syms    *cs;
 	
 	/* svs link identifiers */
 	sym_hnd state;
 	sym_hnd svs_link;
 	sym_hnd ltm_link;
-	sym_hnd ltm_cmd_link;
 	sym_hnd scene_link;
-	sym_hnd scene_cmd_link;
-	sym_hnd scene_contents_link;
+	sym_hnd cmd_link;
 
 	/* command changes per decision cycle */
-	wme_list new_cmds;
-	wme_list removed_cmds;
 	std::map<wme_hnd, cmd_watcher*> curr_cmds;
 };
 
@@ -89,8 +90,7 @@ private:
 	soar_interface*         si;
 	common_syms             cs;
 	std::vector<svs_state*> state_stack;
-	
-	sgel_interp* input_interp;
+	ipcsocket               ipc;
 };
 
 #endif

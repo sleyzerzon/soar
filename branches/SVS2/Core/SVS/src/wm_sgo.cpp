@@ -11,7 +11,7 @@ wm_sgo::wm_sgo(soar_interface *si, sym_hnd ident, wm_sgo *parent, sg_node *node)
 {
 	int i;
 	node->listen(this);
-	name_wme = soarint->make_str_wme(id, "name", node->get_name());
+	name_wme = soarint->make_wme(id, "name", node->get_name());
 	for (i = 0; i < node->num_children(); ++i) {
 		add_child(node->get_child(i));
 	}

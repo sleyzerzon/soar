@@ -3,26 +3,19 @@
 #include <iterator>
 #include <map>
 #include "../filter.h"
-#include "../bbox_filter.h"
+#include "../filters/bbox_filter.h"
 
 using namespace std;
 
 map<string, filter*> ftable;
 
-class ptlist_src : public ptlist_filter {
+class ptlist_src : public filter {
 public:
 	ptlist_src(ptlist _pts) : pts(_pts) {}
 	
-	bool get_result(ptlist &r) {
-		r = pts;
-		return true;
+	filter_result *calc_result() {
+		return new ptlist_filter_result(pts);
 	}
-	
-	bool changed() {
-		return true;
-	}
-	
-	string get_error() { return ""; }
 	
 	ptlist pts;
 };
@@ -87,9 +80,9 @@ bool add_filter(stringstream &ss) {
 }
 
 bool print_val(stringstream &ss) {
-	bool_filter   *bf; bool   bval;
-	bbox_filter   *xf; bbox   xval;
-	ptlist_filter *pf; ptlist pval;
+	filter *bf; bool   bval;
+	filter *xf; bbox   xval;
+	filter *pf; ptlist *pval;
 
 	string name;
 	char type;
@@ -103,37 +96,25 @@ bool print_val(stringstream &ss) {
 	
 	switch (type) {
 		case 'b':
-			if(!(bf = dynamic_cast<bool_filter*>(i->second))) {
+			if(!get_bool_filter_result_value(NULL, i->second, bval)) {
 				cerr << name << " is not of type " << type << endl;
-				return false;
-			}
-			if (!bf->get_result(bval)) {
-				cerr << name << " error: " << bf->get_error() << endl;
 				return false;
 			}
 			cout << bval << endl;
 			return true;
 		case 'x':
-			if(!(xf = dynamic_cast<bbox_filter*>(i->second))) {
+			if(!get_bbox_filter_result_value(NULL, i->second, xval)) {
 				cerr << name << " is not of type " << type << endl;
-				return false;
-			}
-			if (!xf->get_result(xval)) {
-				cerr << name << " error: " << xf->get_error() << endl;
 				return false;
 			}
 			cout << xval << endl;
 			return true;
 		case 'p':
-			if(!(pf = dynamic_cast<ptlist_filter*>(i->second))) {
+			if(!get_ptlist_filter_result_value(NULL, i->second, pval)) {
 				cerr << name << " is not of type " << type << endl;
 				return false;
 			}
-			if (!pf->get_result(pval)) {
-				cerr << name << " error: " << pf->get_error() << endl;
-				return false;
-			}
-			copy(pval.begin(), pval.end(), ostream_iterator<vec3>(cout, " "));
+			copy(pval->begin(), pval->end(), ostream_iterator<vec3>(cout, " "));
 			cout << endl;
 			return true;
 		default:

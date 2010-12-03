@@ -1,4 +1,3 @@
-#include "sgel_interp.h"
 #include "nsg_node.h"
 #include "scene.h"
 #include <stdlib.h>
@@ -84,37 +83,7 @@ bool parse_transforms(vector<string> &f, int &start, sg_node *n) {
 	return true;
 }
 
-sgel_interp::sgel_interp(scene *_scn) 
-: scn(_scn)
-{}
-
-int sgel_interp::parse_line(string s) {
-	vector<string> f;
-	char cmd;
-	
-	split(s, f);
-	if (f.size() == 0) {
-		return -1;
-	}
-	if (f[0].size() != 1) {
-		return 0;
-	}
-	cmd = f[0][0];
-	f.erase(f.begin());
-	
-	switch(cmd) {
-		case 'a':
-			return parse_attach(f);
-		case 'd':
-			return parse_detach(f);
-		case 'c':
-			return parse_change(f);
-		default:
-			return 0;
-	}
-}
-
-int sgel_interp::parse_attach(vector<string> &f) {
+int parse_attach(vector<string> &f, scene *scn) {
 	sg_node *n, *p;
 	ptlist verts;
 	int pos;
@@ -148,7 +117,7 @@ int sgel_interp::parse_attach(vector<string> &f) {
 	return -1;
 }
 
-int sgel_interp::parse_detach(vector<string> &f) {
+int parse_detach(vector<string> &f, scene *scn) {
 	sg_node *n;
 	if (f.size() != 1) {
 		return 0;
@@ -160,7 +129,7 @@ int sgel_interp::parse_detach(vector<string> &f) {
 	return -1;
 }
 
-int sgel_interp::parse_change(vector<string> &f) {
+int parse_change(vector<string> &f, scene *scn) {
 	sg_node *n;
 	int pos;
 
@@ -177,3 +146,36 @@ int sgel_interp::parse_change(vector<string> &f) {
 	return -1;
 }
 
+int parse_state_update(string s, scene *scn) {
+	vector<string> f;
+	char cmd;
+	int lineend;
+	
+	do {
+		lineend = s.find('\n');
+		split(s.substr(0, lineend), f);
+		s.erase(0, lineend+1);
+		
+		if (f.size() == 0)
+			continue;
+		if (f[0].size() != 1)
+			return 0;
+		
+		cmd = f[0][0];
+		f.erase(f.begin());
+		
+		switch(cmd) {
+			case 'a':
+				parse_attach(f, scn);
+				break;
+			case 'd':
+				parse_detach(f, scn);
+				break;
+			case 'c':
+				parse_change(f, scn);
+				break;
+			default:
+				return 0;
+		}
+	} while (lineend != string::npos);
+}

@@ -2,18 +2,18 @@
 # Project: Soar <http://soar.googlecode.com>
 # Author: Jonathan Voigt <voigtjr@gmail.com>
 #
+import os
+
 Import('env')
+
+os.system('cd ' + GetLaunchDir() + '/SVS; make')
+
 clone = env.Clone()
-clone.Prepend(CPPPATH = Split('src #SoarKernel/src'))
+clone.Prepend(CPPPATH = Split('src src/filters #SoarKernel/src'))
 
 if env['SCU']:
 	svs = clone.StaticLibrary('svs', 'svs.cxx')
 else:
-	svs = clone.StaticLibrary('svs', Glob('src/*.cpp'))
+	svs = clone.StaticLibrary('svs', Glob('src/*.cpp', 'src/filters/*.cpp'))
 
 env.Install('$PREFIX/lib', svs)
-
-# Install resources
-Import('InstallDir')
-InstallDir(svs, '$PREFIX/include', '#SVS/src', '*.h')
-
