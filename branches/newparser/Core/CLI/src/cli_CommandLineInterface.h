@@ -855,6 +855,8 @@ protected:
 	// stats, allocate
 	void GetMemoryPoolStatistics();
 
+    void PrintSourceSummary(int sourced, const std::list< std::string >& excised, int ignored);
+
 ////////////////////////////////////////////
 	// New options code
 
@@ -868,15 +870,11 @@ protected:
 	std::string m_OptionArgument;
 	int			m_NonOptionArguments;
 
-	std::list< std::string > m_ExcisedDuringSource;
-	bool		m_SourceVerbose;
-
 ////////////////////////////////////////////
 
 	bool				m_Initialized;			// True if state has been cleared for a new command execution
 	static std::ostringstream m_Result;			// Raw output from the command
 	bool				m_RawOutput;			// True if we want string output.
-	std::stack< std::string > m_SourceFileStack;	// Stack of source calls, if zero then command line
 	cli::ErrorCode		m_LastError;			// Last error code (see cli_CLIError.h)
 	std::string			m_LastErrorDetail;		// Additional detail concerning the last error
 	bool				m_TrapPrintEvents;		// True when print events should be trapped
@@ -897,8 +895,18 @@ protected:
 	StringStack			m_DirectoryStack;		// Directory stack for pushd/popd
 	std::string			m_LogFilename;			// Used for logging to a file.
 	std::ofstream*		m_pLogFile;				// The log file stream
+
+    SourceBitset*       m_pSourceOptions;
+	std::stack< std::string > m_SourceFileStack;	// Stack of source calls, if zero then command line
     std::string         m_SourceErrorDetail;    // holds the source stack output
-    SourceBitset*       m_pSourceOptions;       // holds top-level source command options
+
+    int                 m_NumProductionsSourced;
+	std::list< std::string > m_ExcisedDuringSource;
+    int                 m_NumProductionsIgnored;
+
+    int                 m_NumTotalProductionsSourced;
+	std::list< std::string > m_TotalExcisedDuringSource;
+    int                 m_NumTotalProductionsIgnored;
 };
 
 } // namespace cli

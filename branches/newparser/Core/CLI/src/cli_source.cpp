@@ -31,55 +31,105 @@ using namespace std;
 
 bool CommandLineInterface::ParseSource(std::vector<std::string>& argv) 
 {
-	Options optionsData[] = 
+    Options optionsData[] = 
     {
-		{'a', "all",			OPTARG_NONE},
-		{'d', "disable",		OPTARG_NONE},
-		{'v', "verbose",		OPTARG_NONE},
-		{0, 0, OPTARG_NONE}
-	};
+        {'a', "all",			OPTARG_NONE},
+        {'d', "disable",		OPTARG_NONE},
+        {'v', "verbose",		OPTARG_NONE},
+        {0, 0, OPTARG_NONE}
+    };
 
     SourceBitset options(0);
 
-	for (;;) 
+    for (;;) 
     {
-		if (!ProcessOptions(argv, optionsData)) return false;
-		if (m_Option == -1) break;
+        if (!ProcessOptions(argv, optionsData)) return false;
+        if (m_Option == -1) break;
 
-		switch (m_Option) 
+        switch (m_Option) 
         {
-			case 'd':
-                options.set(SOURCE_DISABLE);
-				break;
-			case 'a':
-                options.set(SOURCE_ALL);
-				break;
-			case 'v':
-                options.set(SOURCE_VERBOSE);
-				break;
-			default:
-				return SetError(CLIError::kGetOptError);
-		}
-	}
+        case 'd':
+            options.set(SOURCE_DISABLE);
+            break;
+        case 'a':
+            options.set(SOURCE_ALL);
+            break;
+        case 'v':
+            options.set(SOURCE_VERBOSE);
+            break;
+        default:
+            return SetError(CLIError::kGetOptError);
+        }
+    }
 
-	if (m_NonOptionArguments < 1) 
+    if (m_NonOptionArguments < 1) 
     {
-		SetErrorDetail("Please supply one file to source.");
-		return SetError(CLIError::kTooFewArgs);
+        SetErrorDetail("Please supply one file to source.");
+        return SetError(CLIError::kTooFewArgs);
 
-	} 
+    } 
     else if (m_NonOptionArguments > 2) 
     {
-		SetErrorDetail("Please supply one file to source. If there are spaces in the path, enclose it in quotes.");
-		return SetError(CLIError::kSourceOnlyOneFile);
-	}
+        SetErrorDetail("Please supply one file to source. If there are spaces in the path, enclose it in quotes.");
+        return SetError(CLIError::kSourceOnlyOneFile);
+    }
 
     return DoSource(argv[m_Argument - m_NonOptionArguments], &options);
 }
 
 bool CommandHandler(std::vector<std::string>& argv, uintptr_t userData);
 
-bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions) {
+void CommandLineInterface::PrintSourceSummary(int sourced, const std::list< std::string >& excised, int ignored)
+{
+    if (!m_SourceFileStack.empty())
+        AppendArgTagFast(sml_Names::kParamFilename, sml_Names::kTypeString, m_SourceFileStack.top());
+    std::string temp;
+    AppendArgTag(sml_Names::kParamSourcedProductionCount, sml_Names::kTypeInt, to_string(sourced, temp));
+    AppendArgTag(sml_Names::kParamExcisedProductionCount, sml_Names::kTypeInt, to_string(excised.size(), temp));
+    AppendArgTag(sml_Names::kParamIgnoredProductionCount, sml_Names::kTypeInt, to_string(ignored, temp));
+
+    if (!excised.empty())
+    {
+        std::list< std::string >::const_iterator iter = excised.begin();
+        while (iter != excised.end()) 
+        {
+            AppendArgTagFast( sml_Names::kParamName, sml_Names::kTypeString, *iter );
+            ++iter;
+        }
+    }
+
+    if (m_RawOutput) 
+    {
+        if (m_SourceFileStack.empty())
+            m_Result << "Total";
+        else
+            m_Result << m_SourceFileStack.top();
+        m_Result << ": " << sourced << " production" << ((sourced == 1) ? " " : "s ") << "sourced.";
+
+        if (!excised.empty()) 
+        {
+            m_Result << " " << excised.size() << " production" << ((excised.size() == 1) ? " " : "s ") << "excised.";
+            if (m_pSourceOptions && m_pSourceOptions->test(SOURCE_VERBOSE)) 
+            {
+                // print excised production names
+                m_Result << "\nExcised productions:";
+
+                std::list< std::string >::const_iterator iter = excised.begin();
+                while (iter != excised.end()) 
+                {
+                    m_Result << "\n\t" << (*iter);
+                    ++iter;
+                }
+            }
+        }
+        if (ignored) 
+            m_Result << " " << ignored << " production" << ((ignored == 1) ? " " : "s ") << "ignored.";
+        m_Result << "\n";
+    }
+}
+
+bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions) 
+{
     if (m_SourceFileStack.size() >= 100)
         return SetError(CLIError::kSourceDepthExceeded);
 
@@ -95,21 +145,21 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions) {
         filename.replace(j, 1, get_directory_separator());
 #endif
 
-	// Separate the path out of the filename if any
+    // Separate the path out of the filename if any
     std::string filename;
-	std::string folder;
+    std::string folder;
     std::string::size_type lastSeparator = path.rfind(get_directory_separator());
-	if (lastSeparator == std::string::npos) 
+    if (lastSeparator == std::string::npos) 
         filename.assign(path);
     else
     {
-		++lastSeparator;
-		if (lastSeparator < path.length()) 
+        ++lastSeparator;
+        if (lastSeparator < path.length()) 
         {
-			folder = path.substr(0, lastSeparator);
+            folder = path.substr(0, lastSeparator);
             filename.assign(path.substr(lastSeparator, path.length() - lastSeparator));
-		}
-	}
+        }
+    }
 
     if (!folder.empty()) if (!DoPushD(folder)) return false;
 
@@ -154,9 +204,27 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions) {
     if (m_SourceFileStack.empty())
     {
         m_pSourceOptions = pOptions;
+
+        m_NumProductionsSourced = 0;
+        m_ExcisedDuringSource.clear();
+        m_NumProductionsIgnored = 0;
+
+        m_NumTotalProductionsSourced = 0;
+        m_TotalExcisedDuringSource.clear();
+        m_NumTotalProductionsIgnored = 0;
+
         m_SourceErrorDetail.clear();
+
+        // Need to listen for excise callbacks
+		if (m_pAgentSML)
+    		this->RegisterWithKernel(smlEVENT_BEFORE_PRODUCTION_REMOVED);
     }
-	m_SourceFileStack.push(path);
+
+    std::string temp;
+    GetCurrentWorkingDirectory(temp);
+    temp.append(get_directory_separator());
+    temp.append(filename);
+    m_SourceFileStack.push(temp);
 
     cli::Interp interp;
     interp.SetHandler(CommandHandler, reinterpret_cast<uintptr_t>(this));
@@ -171,18 +239,32 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions) {
         }
 
         m_SourceErrorDetail.append("\n\t");
-        std::string temp;
-        GetCurrentWorkingDirectory(temp);
-        m_SourceErrorDetail.append(temp);
-        m_SourceErrorDetail.append(get_directory_separator());
-        m_SourceErrorDetail.append(filename);
+        m_SourceErrorDetail.append(m_SourceFileStack.top());
         m_SourceErrorDetail.append(":");
         m_SourceErrorDetail.append(to_string(interp.GetLineNumber(), temp));
     }
 
+    if (m_pSourceOptions && m_pSourceOptions->test(SOURCE_ALL))
+        PrintSourceSummary(m_NumProductionsSourced, m_ExcisedDuringSource, m_NumProductionsIgnored);
+
     m_SourceFileStack.pop();
+
+    m_NumTotalProductionsSourced += m_NumProductionsSourced;
+    m_TotalExcisedDuringSource.insert(m_TotalExcisedDuringSource.end(), m_ExcisedDuringSource.begin(), m_ExcisedDuringSource.end());
+    m_NumTotalProductionsIgnored += m_NumProductionsIgnored;
+
+    m_NumProductionsSourced = 0;
+    m_ExcisedDuringSource.clear();
+    m_NumProductionsIgnored = 0;
+
     if (m_SourceFileStack.empty())
     {
+		if (m_pAgentSML)
+			this->UnregisterWithKernel(smlEVENT_BEFORE_PRODUCTION_REMOVED);
+
+        if (m_pSourceOptions && !m_pSourceOptions->test(SOURCE_DISABLE))
+            PrintSourceSummary(m_NumTotalProductionsSourced, m_TotalExcisedDuringSource, m_NumTotalProductionsIgnored);
+
         m_pSourceOptions = 0;
         if (!m_SourceErrorDetail.empty())
             m_LastErrorDetail.append(m_SourceErrorDetail);

@@ -44,32 +44,32 @@ class FullTests : public CPPUNIT_NS::TestCase
 {
 	CPPUNIT_TEST_SUITE( FullTests );
 
-	//CPPUNIT_TEST( testInit );
-	//CPPUNIT_TEST( testProductions );
-	//CPPUNIT_TEST( testRHSHandler );
-	//CPPUNIT_TEST( testClientMessageHandler );
-	//CPPUNIT_TEST( testFilterHandler );
-	//CPPUNIT_TEST( testWMEs );
-	//CPPUNIT_TEST( testAlias );
-	//CPPUNIT_TEST( testXML );
-	//CPPUNIT_TEST( testAgent );
-	//CPPUNIT_TEST( testSimpleCopy );
-	//CPPUNIT_TEST( testSimpleReteNetLoader );
-	//CPPUNIT_TEST( test64BitReteNet );
-	//CPPUNIT_TEST( testOSupportCopyDestroy );
-	//CPPUNIT_TEST( testOSupportCopyDestroyCircularParent );
-	//CPPUNIT_TEST( testOSupportCopyDestroyCircular );
-	//CPPUNIT_TEST( testSynchronize );
-	//CPPUNIT_TEST( testRunningAgentCreation );  // bug 952
-	////CPPUNIT_TEST( testShutdownHandlerShutdown );
-	//CPPUNIT_TEST( testEventOrdering ); // bug 1100
-	//CPPUNIT_TEST( testStatusCompleteDuplication ); // bug 1042
-	//CPPUNIT_TEST( testStopSoarVsInterrupt ); // bug 782
-	//CPPUNIT_TEST( testSharedWmeSetViolation ); // bug 1060
-	//CPPUNIT_TEST( testEchoEquals ); // bug 1028
-	//CPPUNIT_TEST( testFindAttrPipes ); // bug 1138
-	//CPPUNIT_TEST( testTemplateVariableNameBug ); // bug 1121
-	//CPPUNIT_TEST( testNegatedConjunctiveChunkLoopBug510 ); // bug 510
+	CPPUNIT_TEST( testInit );
+	CPPUNIT_TEST( testProductions );
+	CPPUNIT_TEST( testRHSHandler );
+	CPPUNIT_TEST( testClientMessageHandler );
+	CPPUNIT_TEST( testFilterHandler );
+	CPPUNIT_TEST( testWMEs );
+	CPPUNIT_TEST( testAlias );
+	CPPUNIT_TEST( testXML );
+	CPPUNIT_TEST( testAgent );
+	CPPUNIT_TEST( testSimpleCopy );
+	CPPUNIT_TEST( testSimpleReteNetLoader );
+	CPPUNIT_TEST( test64BitReteNet );
+	CPPUNIT_TEST( testOSupportCopyDestroy );
+	CPPUNIT_TEST( testOSupportCopyDestroyCircularParent );
+	CPPUNIT_TEST( testOSupportCopyDestroyCircular );
+	CPPUNIT_TEST( testSynchronize );
+	CPPUNIT_TEST( testRunningAgentCreation );  // bug 952
+	//CPPUNIT_TEST( testShutdownHandlerShutdown );
+	CPPUNIT_TEST( testEventOrdering ); // bug 1100
+	CPPUNIT_TEST( testStatusCompleteDuplication ); // bug 1042
+	CPPUNIT_TEST( testStopSoarVsInterrupt ); // bug 782
+	CPPUNIT_TEST( testSharedWmeSetViolation ); // bug 1060
+	CPPUNIT_TEST( testEchoEquals ); // bug 1028
+	CPPUNIT_TEST( testFindAttrPipes ); // bug 1138
+	CPPUNIT_TEST( testTemplateVariableNameBug ); // bug 1121
+	CPPUNIT_TEST( testNegatedConjunctiveChunkLoopBug510 ); // bug 510
 	CPPUNIT_TEST( testGDSBug1144 ); // bug 1144
 	CPPUNIT_TEST( testGDSBug1011 ); // bug 1011
 	CPPUNIT_TEST( testLearn ); // bug 1145
@@ -1688,7 +1688,7 @@ TEST_DEFINITION( testCommandToFile )
 	CPPUNIT_ASSERT(m_pAgent->GetLastCommandLineResult());
 	const char* result = m_pAgent->ExecuteCommandLine( "source testCommandToFile-output.soar" );
 	CPPUNIT_ASSERT(result);
-	const std::string resultString("#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*\nTotal: 144 productions sourced. 144 productions excised.\nSource finished.\n");
+	const std::string resultString("#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*Total: 144 productions sourced. 144 productions excised.\n");
 	CPPUNIT_ASSERT(result == resultString);
 	remove("testCommandToFile-output.soar");
 }

@@ -1105,6 +1105,14 @@ void CommandLineInterface::OnKernelEvent(int eventID, AgentSML*, void* pCallData
 			}
 		}
 	}
+    else if (eventID == smlEVENT_BEFORE_PRODUCTION_REMOVED)
+    {
+		// Only called when source command is active
+		production* p = static_cast<production*>(pCallData);
+		assert(p);
+		assert(p->name->sc.name);
+		m_ExcisedDuringSource.push_back(std::string(p->name->sc.name));
+    }
 	else
 	{
 		assert(false);

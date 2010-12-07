@@ -76,11 +76,13 @@ bool CommandLineInterface::DoSP(const std::string& productionString) {
 		  return SetError( CLIError::kProductionAddFailed );
 		}
 		// production ignored
+		m_NumProductionsIgnored += 1;
 	} else {
 		if (!m_SourceFileStack.empty())
 			p->filename = make_memory_block_for_string(m_pAgentSoar, m_SourceFileStack.top().c_str());
 
 		// production was sourced
+        m_NumProductionsSourced += 1;
 		if (m_RawOutput) {
 			m_Result << '*';
 		}
