@@ -124,7 +124,7 @@ protected:
 	void testInterp34();
 	void testInterp35();
 
-    void evaluate(CallData& cd);
+    void evaluate(CallData cd);
 
     cli::Interp* interp;
 };
@@ -152,7 +152,7 @@ bool CommandHandler(std::vector<std::string>& argv, uintptr_t userData)
     return true;
 }
 
-void InterpTest::evaluate(CallData& cd)
+void InterpTest::evaluate(CallData cd)
 {
     interp->SetHandler(&CommandHandler, reinterpret_cast<uintptr_t>(&cd));
     CPPUNIT_ASSERT_MESSAGE(cd.input, interp->Evaluate(cd.input));

@@ -141,8 +141,8 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
     while ((j = path.find('/')) != std::string::npos)
         path.replace(j, 1, get_directory_separator());
 #else
-    while ((j = filename.find('\\')) != std::string::npos)
-        filename.replace(j, 1, get_directory_separator());
+    while ((j = path.find('\\')) != std::string::npos)
+        path.replace(j, 1, get_directory_separator());
 #endif
 
     // Separate the path out of the filename if any
