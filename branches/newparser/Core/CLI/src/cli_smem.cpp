@@ -146,7 +146,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             if ( !my_timer )
                 return SetError( CLIError::kInvalidAttribute );
 
-            return DoSMem( 't', &( argv[2] ) );
+            return DoSMem( option, &( argv[2] ) );
         }
 
     case 'v':
@@ -155,7 +155,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             if (!CheckNumNonOptArgs(0, 2)) return false;
 
             if ( m_NonOptionArguments == 0 )
-                return DoSMem( 'v' );
+                return DoSMem( option );
 
             smem_lti_id lti_id = NIL;
             unsigned int depth = 0;
@@ -177,11 +177,12 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             if ( lti_id == NIL )
                 return SetError( CLIError::kInvalidAttribute );
 
-            return DoSMem( 'v', NIL, NIL, lti_id, depth );
+            return DoSMem( option, NIL, NIL, lti_id, depth );
         }
     }
 
-    if ( argv.size() > 1 ) // bad: no option, but more than one argument
+    // bad: no option, but more than one argument
+    if ( argv.size() > 1 ) 
         return SetError( CLIError::kTooManyArgs );
 
     // case: nothing = full configuration information
@@ -632,5 +633,5 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
         return true;
     }
 
-    return SetError( CLIError::kUnrecognizedOption );
+    return SetError( CLIError::kCommandNotImplemented );
 }

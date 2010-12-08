@@ -98,7 +98,6 @@ typedef std::bitset<SOURCE_NUM_OPTIONS> SourceBitset;
 typedef std::bitset<STATS_NUM_OPTIONS> StatsBitset;
 typedef std::bitset<WATCH_NUM_OPTIONS> WatchBitset;
 typedef std::bitset<WATCH_WMES_TYPE_NUM_OPTIONS> WatchWMEsTypeBitset;
-typedef std::bitset<WMA_NUM_OPTIONS> WMABitset;
 
 // For option parsing
 enum eOptionArgument {
