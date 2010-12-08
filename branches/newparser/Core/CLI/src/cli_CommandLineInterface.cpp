@@ -36,8 +36,6 @@ using namespace cli;
 using namespace sml;
 using namespace soarxml;
 
-std::ostringstream CommandLineInterface::m_Result;	
-
 EXPORT CommandLineInterface::CommandLineInterface() {
 
 	// Map command names to processing function pointers

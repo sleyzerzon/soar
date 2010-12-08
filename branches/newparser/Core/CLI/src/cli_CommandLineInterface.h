@@ -865,7 +865,7 @@ protected:
 ////////////////////////////////////////////
 
 	bool				m_Initialized;			// True if state has been cleared for a new command execution
-	static std::ostringstream m_Result;			// Raw output from the command
+	std::ostringstream  m_Result;			    // Raw output from the command
 	bool				m_RawOutput;			// True if we want string output.
 	cli::ErrorCode		m_LastError;			// Last error code (see cli_CLIError.h)
 	std::string			m_LastErrorDetail;		// Additional detail concerning the last error

@@ -624,9 +624,13 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
             private:
                 bool raw;
                 cli::CommandLineInterface *this_cli;
+                std::ostringstream& m_Result;
+
+                foo& operator=(const foo&) { return *this; }
 
             public:				
-                foo( bool m_RawOutput, cli::CommandLineInterface *new_cli ): raw( m_RawOutput ), this_cli( new_cli ) {};
+                foo( bool m_RawOutput, cli::CommandLineInterface *new_cli, std::ostringstream& m_Result ): raw( m_RawOutput ), this_cli( new_cli ), m_Result( m_Result ) {};
+
 
                 void operator() ( soar_module::timer *t )
                 {
@@ -646,7 +650,7 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
                         this_cli->AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, output.c_str() );
                     }
                 }
-            } bar( m_RawOutput, this );
+            } bar( m_RawOutput, this, m_Result );
 
             m_pAgentSoar->epmem_timers->for_each( bar );
         }
