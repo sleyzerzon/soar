@@ -19,7 +19,6 @@
 #include "sml_Events.h"
 #include "cli_CLIError.h"
 #include "misc.h"
-#include "cli_Interp.h"
 
 #include <algorithm>
 
@@ -77,8 +76,6 @@ bool CommandLineInterface::ParseSource(std::vector<std::string>& argv)
     return DoSource(argv[m_Argument - m_NonOptionArguments], &options);
 }
 
-bool CommandHandler(std::vector<std::string>& argv, uintptr_t userData);
-
 void CommandLineInterface::PrintSourceSummary(int sourced, const std::list< std::string >& excised, int ignored)
 {
     if (!m_SourceFileStack.empty())
@@ -133,22 +130,12 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
     if (m_SourceFileStack.size() >= 100)
         return SetError(CLIError::kSourceDepthExceeded);
 
-    StripQuotes(path);
-
-    // Normalize separator chars.
-    std::string::size_type j; 
-#ifdef WIN32
-    while ((j = path.find('/')) != std::string::npos)
-        path.replace(j, 1, get_directory_separator());
-#else
-    while ((j = path.find('\\')) != std::string::npos)
-        path.replace(j, 1, get_directory_separator());
-#endif
+    normalize_separators(path);
 
     // Separate the path out of the filename if any
     std::string filename;
     std::string folder;
-    std::string::size_type lastSeparator = path.rfind(get_directory_separator());
+    std::string::size_type lastSeparator = path.rfind('/');
     if (lastSeparator == std::string::npos) 
         filename.assign(path);
     else
@@ -222,26 +209,28 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
 
     std::string temp;
     GetCurrentWorkingDirectory(temp);
-    temp.append(get_directory_separator());
+    temp.push_back('/');
     temp.append(filename);
     m_SourceFileStack.push(temp);
 
-    cli::Interp interp;
-    interp.SetHandler(CommandHandler, reinterpret_cast<uintptr_t>(this));
-    bool ret = interp.Evaluate(buffer);
+    cli::Tokenizer tokenizer;
+    tokenizer.SetHandler(this);
+    bool ret = tokenizer.Evaluate(buffer);
     if (!ret)
     {
+        int line = tokenizer.GetCommandLineNumber();
         if (m_LastError == CLIError::kNoError)
         {
             // Parse error
             // TODO: more error detail.
             SetError(CLIError::kParseError);
+            line = tokenizer.GetCurrentLineNumber();
         }
 
         m_SourceErrorDetail.append("\n\t");
         m_SourceErrorDetail.append(m_SourceFileStack.top());
         m_SourceErrorDetail.append(":");
-        m_SourceErrorDetail.append(to_string(interp.GetLineNumber(), temp));
+        m_SourceErrorDetail.append(to_string(line, temp));
     }
 
     if (m_pSourceOptions && m_pSourceOptions->test(SOURCE_ALL))

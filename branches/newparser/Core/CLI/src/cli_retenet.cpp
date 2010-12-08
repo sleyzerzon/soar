@@ -62,8 +62,6 @@ bool CommandLineInterface::ParseReteNet(std::vector<std::string>& argv) {
 bool CommandLineInterface::DoReteNet(bool save, std::string filename) {
 	if (!filename.size()) return SetError(CLIError::kMissingFilenameArg);
 
-	StripQuotes(filename);
-
 	if ( save ) 
 	{
 		FILE* file = fopen( filename.c_str(), "wb" );

@@ -27,6 +27,7 @@
 
 #include "cli_CommandData.h"
 #include "cli_Aliases.h"
+#include "cli_Tokenizer.h"
 #include "kernel.h"
 
 typedef uint64_t epmem_time_id;
@@ -121,7 +122,7 @@ struct CallData {
 	bool rawOutput;
 };
 
-class CommandLineInterface : public sml::KernelCallback {
+class CommandLineInterface : public sml::KernelCallback, public cli::TokenizerCallback {
 public:
 
 	EXPORT CommandLineInterface();
@@ -188,7 +189,7 @@ public:
 	bool XMLMoveCurrentToLastChild() ;
 
 	// The internal Parse functions follow
-	// do not call these directly, these should only be called in DoCommandInternal
+	// do not call these directly, these should only be called in HandleCommand
 	bool ParseAddWME(std::vector<std::string>& argv);
 	bool ParseAlias(std::vector<std::string>& argv);
 	bool ParseAllocate(std::vector<std::string>& argv);
@@ -760,7 +761,7 @@ public:
 
 	bool GetCurrentWorkingDirectory(std::string& directory);
 
-	bool DoCommandInternal(std::vector<std::string>& argv);
+    virtual bool HandleCommand(std::vector<std::string>& argv);
 
 protected:
 
@@ -821,13 +822,6 @@ protected:
 	*		 if the call requested that commands be echoed.
 	*************************************************************/ 	 
 	void EchoString(sml::Connection* pConnection, char const* pString);	
-
-	/************************************************************* 	 
-	* @brief Strip quotes off of a string.  Must start and end with
-    *        a '"' character.
-    * @return True if quotes were removed from the string.
-	*************************************************************/ 	 
-	bool StripQuotes(std::string& str); 	 
 
 	bool SetError(cli::ErrorCode code);				// always returns false
 	bool SetErrorDetail(const std::string detail);	// always returns false

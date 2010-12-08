@@ -19,7 +19,7 @@
 using namespace cli;
 
 bool CommandLineInterface::ParseGP(std::vector<std::string>& argv) {
-	// One argument (in brackets)
+	// One argument
 	if (argv.size() < 2) {
 		return SetError(CLIError::kTooFewArgs);
 	}
@@ -39,10 +39,8 @@ struct iterTriple
 	valueCollection::iterator end;
 };
 
-bool CommandLineInterface::DoGP(const std::string& productionString) {
-
-	// productionString comments are trimmed off at this point.
-
+bool CommandLineInterface::DoGP(const std::string& productionString) 
+{
 	// set up collection of collections of strings segments:
 	std::list< valueCollection > topLevel;
 
@@ -303,8 +301,6 @@ bool CommandLineInterface::DoGP(const std::string& productionString) {
 		}
 
 		//std::cout << std::endl << "++++++" << std::endl << generatedProduction <<  std::endl << "++++++" << std::endl;
-		// Remove first and last characters (the braces)
-		generatedProduction = generatedProduction.substr(1, generatedProduction.length() - 2);
 		if(!DoSP(generatedProduction))
 		{
 			return false;

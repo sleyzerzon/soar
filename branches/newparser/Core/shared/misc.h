@@ -27,6 +27,14 @@ inline const char* get_directory_separator()
 #endif
 }
 
+inline void normalize_separators(std::string& path)
+{
+    // Normalize separator chars.
+    std::string::size_type j; 
+    while ((j = path.find('\\')) != std::string::npos)
+        path.replace(j, 1, "/");
+}
+
 // Conversion of value to string
 template<class T> std::string& to_string( const T& x, std::string& dest )
 {

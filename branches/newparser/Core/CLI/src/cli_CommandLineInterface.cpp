@@ -18,7 +18,6 @@
 
 #include "cli_Commands.h"
 #include "cli_CLIError.h"
-#include "cli_Interp.h"
 
 // SML includes
 #include "sml_Connection.h"
@@ -38,14 +37,6 @@ using namespace sml;
 using namespace soarxml;
 
 std::ostringstream CommandLineInterface::m_Result;	
-
-bool CommandHandler(std::vector<std::string>& argv, uintptr_t userData)
-{
-    if (!userData) return false;
-    CommandLineInterface* cli = reinterpret_cast<CommandLineInterface*>(userData);
-    if (!cli) return false;
-    return cli->DoCommandInternal(argv);
-}
 
 EXPORT CommandLineInterface::CommandLineInterface() {
 
@@ -256,9 +247,9 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
     m_LastErrorDetail.clear();
 
 	// Process the command, ignoring its result (errors detected with m_LastError)
-    cli::Interp interp;
-    interp.SetHandler(CommandHandler, reinterpret_cast<uintptr_t>(this));
-	interp.Evaluate(pCommandLine);
+    cli::Tokenizer tokenizer;
+    tokenizer.SetHandler(this);
+	tokenizer.Evaluate(pCommandLine);
 
 	SetTrapPrintCallbacks( false );
 
@@ -587,7 +578,7 @@ bool CommandLineInterface::PartialMatch(std::vector<std::string>& argv) {
 	return true;
 }
 
-bool CommandLineInterface::DoCommandInternal(std::vector<std::string>& argv) {
+bool CommandLineInterface::HandleCommand(std::vector<std::string>& argv) {
     if (argv.empty()) return true;
 
 	// Check for help flags
@@ -654,6 +645,7 @@ bool CommandLineInterface::GetCurrentWorkingDirectory(std::string& directory) {
 
 	// Store directory in output parameter and return success
 	directory = buf;
+    normalize_separators(directory);
 	return true;
 }
 
@@ -712,14 +704,6 @@ bool CommandLineInterface::SetError(cli::ErrorCode code) {
 bool CommandLineInterface::SetErrorDetail(const std::string detail) {
 	m_LastErrorDetail = detail;
 	return false;
-}
-
-bool CommandLineInterface::StripQuotes(std::string& str) {
-    if ((str.size() >= 2) && (str[0] == '"') && (str[str.length() - 1] == '"')) {
-        str.assign(str.substr(1, str.length() - 2));
-        return true;
-    }
-    return false;
 }
 
 void CommandLineInterface::ResetOptions() {

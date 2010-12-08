@@ -78,8 +78,6 @@ bool CommandLineInterface::DoCaptureInput(eCaptureInputMode mode, bool autoflush
 				if (!pathname) return SetError(CLIError::kMissingFilenameArg);
 				if (!pathname->size()) return SetError(CLIError::kMissingFilenameArg);
 
-				StripQuotes(*pathname);
-
 				uint32_t seed = SoarRandInt();
 
 				if (!m_pAgentSML->StartCaptureInput(*pathname, autoflush, seed))

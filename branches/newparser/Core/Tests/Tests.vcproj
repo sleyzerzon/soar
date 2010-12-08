@@ -395,10 +395,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\interptest.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\iotest.cpp"
 				>
 			</File>
@@ -424,6 +420,10 @@
 			</File>
 			<File
 				RelativePath=".\src\simplelistener.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\tokenizertest.cpp"
 				>
 			</File>
 		</Filter>

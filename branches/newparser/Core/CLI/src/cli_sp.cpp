@@ -22,7 +22,7 @@
 using namespace cli;
 
 bool CommandLineInterface::ParseSP(std::vector<std::string>& argv) {
-	// One argument (in brackets)
+	// One argument (the stuff in the brackets, minus the brackets
 	if (argv.size() < 2) {
 		return SetError(CLIError::kTooFewArgs);
 	}
@@ -31,14 +31,7 @@ bool CommandLineInterface::ParseSP(std::vector<std::string>& argv) {
 		return SetError(CLIError::kTooManyArgs);
 	}
 
-	// Remove first and last characters (the braces)
-	std::string production = argv[1];
-	if (production.length() < 3) {
-		return SetError(CLIError::kInvalidProduction);
-	}
-	production = production.substr(1, production.length() - 2);
-
-	return DoSP(production);
+	return DoSP(argv[1]);
 }
 
 // FIXME: copied from gSKI

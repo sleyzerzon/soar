@@ -71,8 +71,6 @@ bool CommandLineInterface::DoReplayInput(eReplayInputMode mode, std::string* pat
 			if (!pathname) return SetError(CLIError::kMissingFilenameArg);
 			if (!pathname->size()) return SetError(CLIError::kMissingFilenameArg);
 
-			StripQuotes(*pathname);
-
 			if (!m_pAgentSML->StartReplayInput(*pathname))
 			{
 				return SetError(CLIError::kOpenFileFail);

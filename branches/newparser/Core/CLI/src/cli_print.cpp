@@ -132,30 +132,34 @@ bool CommandLineInterface::ParsePrint(std::vector<std::string>& argv) {
 		// d and t options require an argument
 		if (options.test(PRINT_TREE) || options.test(PRINT_DEPTH)) return SetError(CLIError::kTooFewArgs);
 		return DoPrint(options, depth);
-	} else if (m_NonOptionArguments == 1) {
-		// the acDjus options don't allow an argument
-		if (options.test(PRINT_ALL) 
-			|| options.test(PRINT_CHUNKS) 
-			|| options.test(PRINT_DEFAULTS) 
-			|| options.test(PRINT_JUSTIFICATIONS)
-			|| options.test(PRINT_RL)
-			|| options.test(PRINT_TEMPLATE)
-			|| options.test(PRINT_USER) 
-			|| options.test(PRINT_STACK)) 
-		{
-			SetErrorDetail("No argument allowed when printing all/chunks/defaults/justifications/rl/template/user/stack.");
-			return SetError(CLIError::kTooManyArgs);
-		}
-		if (options.test(PRINT_EXACT) && (options.test(PRINT_DEPTH) || options.test(PRINT_TREE))) 
-		{
-			SetErrorDetail("No depth/tree flags allowed when printing exact.");
-			return SetError(CLIError::kTooManyArgs);
-		}
-		return DoPrint(options, depth, &(argv[m_Argument - m_NonOptionArguments]));
-	}
+	} 
 
-	// more than one arg
-	return SetError(CLIError::kTooManyArgs);
+    // the acDjus options don't allow an argument
+    if (options.test(PRINT_ALL) 
+	    || options.test(PRINT_CHUNKS) 
+	    || options.test(PRINT_DEFAULTS) 
+	    || options.test(PRINT_JUSTIFICATIONS)
+	    || options.test(PRINT_RL)
+	    || options.test(PRINT_TEMPLATE)
+	    || options.test(PRINT_USER) 
+	    || options.test(PRINT_STACK)) 
+    {
+	    SetErrorDetail("No argument allowed when printing all/chunks/defaults/justifications/rl/template/user/stack.");
+	    return SetError(CLIError::kTooManyArgs);
+    }
+    if (options.test(PRINT_EXACT) && (options.test(PRINT_DEPTH) || options.test(PRINT_TREE))) 
+    {
+	    SetErrorDetail("No depth/tree flags allowed when printing exact.");
+	    return SetError(CLIError::kTooManyArgs);
+    }
+    std::string arg;
+    for (int i = m_Argument - m_NonOptionArguments; i < argv.size(); ++i)
+    {
+        if (!arg.empty())
+            arg.push_back(' ');
+        arg.append(argv[i]);
+    }
+    return DoPrint(options, depth, &arg);
 }
 
 void print_stack_trace(agent* thisAgent, bool print_states, bool print_operators)

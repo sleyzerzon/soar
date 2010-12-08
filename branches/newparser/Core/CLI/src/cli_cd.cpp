@@ -42,9 +42,8 @@ bool CommandLineInterface::DoCD(const std::string* pDirectory) {
 	}
    
     std::string dir = *pDirectory;
-    StripQuotes(dir);
 
-	// Change to directory
+    // Change to directory
 	if (chdir(dir.c_str())) {
 		SetErrorDetail("Error changing to " + dir);
 		return SetError(CLIError::kchdirFail);

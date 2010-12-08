@@ -143,7 +143,6 @@ bool CommandLineInterface::DoCLog(const eLogMode mode, const std::string* pFilen
 
             {
                 std::string filename = *pFilename;
-                StripQuotes(filename);
 
 			    m_pLogFile = new std::ofstream(filename.c_str(), openmode);
 			    if (!m_pLogFile) {

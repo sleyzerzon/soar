@@ -87,7 +87,7 @@ bool CommandLineInterface::ParseCommandToFile(std::vector<std::string>& argv) {
 	std::string wtf(m_Result.str());
 
 	// Fire off command
-	bool ret = DoCommandInternal(newArgv);
+	bool ret = HandleCommand(newArgv);
 
 	std::string ctfOutput;
 	if (ret)

@@ -749,7 +749,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\cli_Interp.h"
+				RelativePath=".\src\cli_Tokenizer.h"
 				>
 			</File>
 			<Filter

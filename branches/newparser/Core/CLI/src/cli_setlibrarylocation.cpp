@@ -37,7 +37,6 @@ bool CommandLineInterface::DoSetLibraryLocation(std::string* pLocation) {
 			AppendArgTagFast(sml_Names::kParamDirectory, sml_Names::kTypeString, m_pKernelSML->GetLibraryLocation());
 		}
 	} else {
-		StripQuotes(*pLocation);
 		m_pKernelSML->SetLibraryLocation(*pLocation);
 	}
 	return true;
