@@ -94,7 +94,6 @@ typedef std::bitset<PRINT_NUM_OPTIONS> PrintBitset;
 typedef std::bitset<PRODUCTION_FIND_NUM_OPTIONS> ProductionFindBitset;
 typedef std::bitset<RL_NUM_OPTIONS> RLBitset;
 typedef std::bitset<RUN_NUM_OPTIONS> RunBitset;
-typedef std::bitset<SMEM_NUM_OPTIONS> SMemBitset;
 typedef std::bitset<SOURCE_NUM_OPTIONS> SourceBitset;
 typedef std::bitset<STATS_NUM_OPTIONS> StatsBitset;
 typedef std::bitset<WATCH_NUM_OPTIONS> WatchBitset;
@@ -850,6 +849,8 @@ protected:
 	void GetMemoryPoolStatistics();
 
     void PrintSourceSummary(int sourced, const std::list< std::string >& excised, int ignored);
+
+    bool CheckNumNonOptArgs(int min, int max);
 
 ////////////////////////////////////////////
 	// New options code

@@ -183,17 +183,6 @@ namespace cli {
 		RUN_INTERLEAVE_OUTPUT,
 	};
 
-	enum eSMemOptions {		
-		SMEM_ADD,
-		SMEM_GET,		
-		SMEM_SET,
-		SMEM_INIT,
-		SMEM_STAT,
-		SMEM_TIMER,
-		SMEM_VIZ,
-		SMEM_NUM_OPTIONS,	// must be last
-	};
-
 	enum eSourceOptions {		
 		SOURCE_ALL,
 		SOURCE_DISABLE,		

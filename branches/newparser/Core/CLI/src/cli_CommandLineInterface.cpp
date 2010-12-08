@@ -894,6 +894,16 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 	return true;
 }
 
+bool CommandLineInterface::CheckNumNonOptArgs(int min, int max)
+{
+    if ( m_NonOptionArguments < min )
+        return SetError( CLIError::kTooFewArgs );
+    else if ( m_NonOptionArguments > max )
+        return SetError( CLIError::kTooManyArgs );
+    return true;
+}
+
+
 /*************************************************************
 * @brief Methods to create an XML element by starting a tag, adding attributes and
 *		 closing the tag.

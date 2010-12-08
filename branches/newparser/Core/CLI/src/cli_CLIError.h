@@ -102,6 +102,7 @@ namespace cli {
 			kValuesError						= 97,
 			kGPMaxExceeded						= 98,
 			kParseError 						= 99,
+			kSMemError 						    = 100,
 		};
 
 		static char const* GetErrorDescription(ErrorCode code) {
@@ -191,6 +192,7 @@ namespace cli {
 				case kValuesError:						return "gp values error.";
 				case kGPMaxExceeded:					return "gp maximum exceeded. Set it to higher value with gp-max command.";
 				case kParseError:   					return "Parse error.";
+				case kSMemError:   					return "SMem error.";
 				default:								return "Unknown error code.";
 			}
 		}
