@@ -104,6 +104,8 @@ namespace cli {
             kParseError 						= 99,
             kSMemError 						    = 100,
             kWmaError 						    = 101,
+            kRlError 						    = 102,
+            kEpMemError 					    = 103,
         };
 
         static char const* GetErrorDescription(ErrorCode code) {
@@ -193,8 +195,10 @@ namespace cli {
                 case kValuesError:						return "gp values error.";
                 case kGPMaxExceeded:					return "gp maximum exceeded. Set it to higher value with gp-max command.";
                 case kParseError:   					return "Parse error.";
-                case kSMemError:                        return "SMem command error.";
-                case kWmaError:                         return "Wma command error.";
+                case kSMemError:                        return "smem command error.";
+                case kWmaError:                         return "wma command error.";
+                case kRlError:                          return "rl command error.";
+                case kEpMemError:                          return "epmem command error.";
                 default:								return "Unknown error code.";
             }
         }

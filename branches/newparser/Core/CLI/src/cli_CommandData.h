@@ -13,16 +13,6 @@
 #define COMMAND_DATA_H
 
 namespace cli {
-	enum eEpMemOptions {
-		EPMEM_CLOSE,
-		EPMEM_GET,		
-		EPMEM_SET,
-		EPMEM_STAT,
-		EPMEM_TIMER,
-		EPMEM_VIZ,
-		EPMEM_NUM_OPTIONS,	// must be last
-	};
-
 	enum eCaptureInputMode {
 		CAPTURE_INPUT_OPEN,
 		CAPTURE_INPUT_QUERY,
@@ -154,13 +144,6 @@ namespace cli {
 		PRODUCTION_FIND_NUM_OPTIONS, // must be last
 	};
 	
-	enum eRLOptions {
-		RL_GET,
-		RL_SET,
-		RL_STAT,
-		RL_NUM_OPTIONS,	// must be last
-	};
-
 	enum eRunOptions {
 		RUN_DECISION,
 		RUN_ELABORATION,

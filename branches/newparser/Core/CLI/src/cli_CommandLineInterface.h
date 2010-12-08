@@ -85,14 +85,12 @@ typedef std::list<soarxml::ElementXML*> ElementXMLList;
 typedef ElementXMLList::iterator ElementXMLListIter;
 
 // Define bitsets for various commands
-typedef std::bitset<EPMEM_NUM_OPTIONS> EpMemBitset;
 typedef std::bitset<EXCISE_NUM_OPTIONS> ExciseBitset;
 typedef std::bitset<INDIFFERENT_NUM_OPTIONS> IndifferentBitset;
 typedef std::bitset<LEARN_NUM_OPTIONS> LearnBitset;
 typedef std::bitset<MEMORIES_NUM_OPTIONS> MemoriesBitset;
 typedef std::bitset<PRINT_NUM_OPTIONS> PrintBitset;
 typedef std::bitset<PRODUCTION_FIND_NUM_OPTIONS> ProductionFindBitset;
-typedef std::bitset<RL_NUM_OPTIONS> RLBitset;
 typedef std::bitset<RUN_NUM_OPTIONS> RunBitset;
 typedef std::bitset<SOURCE_NUM_OPTIONS> SourceBitset;
 typedef std::bitset<STATS_NUM_OPTIONS> StatsBitset;
