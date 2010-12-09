@@ -24,7 +24,7 @@ bool CommandLineInterface::ParseSRand(std::vector<std::string>& argv) {
 
 	if (argv.size() < 2) return DoSRand();
 
-	if (argv.size() > 2) return SetError(CLIError::kTooManyArgs);
+	if (argv.size() > 2) return SetError(kTooManyArgs);
 
 	uint32_t seed = 0;
 	sscanf(argv[1].c_str(), "%u", &seed);

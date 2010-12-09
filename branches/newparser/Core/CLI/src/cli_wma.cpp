@@ -49,13 +49,13 @@ bool CommandLineInterface::ParseWMA( std::vector<std::string>& argv )
             if (option != 0)
             {
                 SetErrorDetail( "wma takes only one option at a time." );
-                return SetError( CLIError::kTooManyArgs );
+                return SetError( kTooManyArgs );
             }
             option = static_cast<char>(m_Option);
             break;
 
         default:
-            return SetError( CLIError::kGetOptError );
+            return SetError( kGetOptError );
         }
     }
 
@@ -74,7 +74,7 @@ bool CommandLineInterface::ParseWMA( std::vector<std::string>& argv )
             // check attribute name here
             soar_module::param *my_param = m_pAgentSoar->wma_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoWMA( option, &( argv[2] ) );
         }
@@ -87,10 +87,10 @@ bool CommandLineInterface::ParseWMA( std::vector<std::string>& argv )
             // check attribute name/potential vals here
             soar_module::param *my_param = m_pAgentSoar->wma_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             if ( !my_param->validate_string( argv[3].c_str() ) )
-                return SetError( CLIError::kInvalidValue );
+                return SetError( kInvalidValue );
 
             return DoWMA( option, &( argv[2] ), &( argv[3] ) );
         }
@@ -106,7 +106,7 @@ bool CommandLineInterface::ParseWMA( std::vector<std::string>& argv )
             // check attribute name
             soar_module::stat *my_stat = m_pAgentSoar->wma_stats->get( argv[2].c_str() );
             if ( !my_stat )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoWMA( option, &( argv[2] ) );
         }
@@ -114,7 +114,7 @@ bool CommandLineInterface::ParseWMA( std::vector<std::string>& argv )
 
     // bad: no option, but more than one argument
     if ( argv.size() > 1 ) 
-        return SetError( CLIError::kTooManyArgs );
+        return SetError( kTooManyArgs );
 
     // case: nothing = full configuration information
     return DoWMA();	
@@ -206,7 +206,7 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
         // this can only mean the parameter is protected
         if ( !result )
         {
-            SetError( CLIError::kWmaError );
+            SetError( kWmaError );
             SetErrorDetail( "ERROR: this parameter is protected while WMA is on." );
         }
 
@@ -246,5 +246,5 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
         return true;
     }
 
-    return SetError( CLIError::kCommandNotImplemented );
+    return SetError( kCommandNotImplemented );
 }

@@ -25,7 +25,7 @@ bool CommandLineInterface::ParseLoadLibrary(std::vector<std::string>& argv) {
 
 	if (argv.size() < 2) {
 		SetErrorDetail("Library command expected.");
-		return SetError(CLIError::kTooFewArgs);
+		return SetError(kTooFewArgs);
 	}
 
 	// strip the command name, combine the rest
@@ -48,6 +48,6 @@ bool CommandLineInterface::DoLoadLibrary(const std::string& libraryCommand) {
 	}
 
 	SetErrorDetail(result);
-	return SetError(CLIError::kLoadLibraryError);
+	return SetError(kLoadLibraryError);
 }
 

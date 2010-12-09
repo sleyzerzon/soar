@@ -24,11 +24,11 @@ using namespace cli;
 bool CommandLineInterface::ParseSP(std::vector<std::string>& argv) {
 	// One argument (the stuff in the brackets, minus the brackets
 	if (argv.size() < 2) {
-		return SetError(CLIError::kTooFewArgs);
+		return SetError(kTooFewArgs);
 	}
 	if (argv.size() > 2) {
 		SetErrorDetail("Expected one argument (the production) enclosed in braces.");
-		return SetError(CLIError::kTooManyArgs);
+		return SetError(kTooManyArgs);
 	}
 
 	return DoSP(argv[1]);
@@ -66,7 +66,7 @@ bool CommandLineInterface::DoSP(const std::string& productionString) {
 	if (!p) { 
 		// There was an error, but duplicate production is just a warning
 		if (rete_addition_result != DUPLICATE_PRODUCTION) {
-		  return SetError( CLIError::kProductionAddFailed );
+		  return SetError( kProductionAddFailed );
 		}
 		// production ignored
 		m_NumProductionsIgnored += 1;

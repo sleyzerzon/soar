@@ -53,13 +53,13 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
             if (option != 0)
             {
                 SetErrorDetail( "rl takes only one option at a time." );
-                return SetError( CLIError::kTooManyArgs );
+                return SetError( kTooManyArgs );
             }
             option = static_cast<char>(m_Option);
             break;
 
         default:
-            return SetError( CLIError::kGetOptError );
+            return SetError( kGetOptError );
         }
     }
 
@@ -78,7 +78,7 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
             // check attribute name here
             soar_module::param *my_param = m_pAgentSoar->rl_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoRL( option, &( argv[2] ) );		
         }
@@ -91,10 +91,10 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
             // check attribute name/potential vals here
             soar_module::param *my_param = m_pAgentSoar->rl_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             if ( !my_param->validate_string( argv[3].c_str() ) )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoRL( option, &( argv[2] ), &( argv[3] ) );
         }
@@ -110,7 +110,7 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
             // check attribute name
             soar_module::stat *my_stat = m_pAgentSoar->rl_stats->get( argv[2].c_str() );
             if ( !my_stat )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoRL( option, &( argv[2] ) );
         }
@@ -118,7 +118,7 @@ bool CommandLineInterface::ParseRL( std::vector<std::string>& argv )
 
     // bad: no option, but more than one argument
     if ( argv.size() > 1 ) 
-        return SetError( CLIError::kTooManyArgs );
+        return SetError( kTooManyArgs );
 
     // case: nothing = full configuration information
     return DoRL();	
@@ -200,7 +200,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
     {
         soar_module::param *my_param = m_pAgentSoar->rl_params->get( pAttr->c_str() );
         if (!my_param->set_string( pVal->c_str() ))
-            return SetError( CLIError::kRlError );
+            return SetError( kRlError );
 
         return true;
     }
@@ -226,5 +226,5 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
         return true;
     }
 
-    return SetError( CLIError::kCommandNotImplemented );
+    return SetError( kCommandNotImplemented );
 }

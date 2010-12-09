@@ -27,7 +27,7 @@ bool CommandLineInterface::ParsePredict( std::vector<std::string>& argv )
 	if ( argv.size() != 1 ) 
 	{
 		SetErrorDetail( "predict takes no arguments." );
-		return SetError( CLIError::kTooManyArgs );
+		return SetError( kTooManyArgs );
 	}
 	
 	return DoPredict( );

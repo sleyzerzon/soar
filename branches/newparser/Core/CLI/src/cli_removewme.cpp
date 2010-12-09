@@ -34,16 +34,16 @@ bool CommandLineInterface::ParseRemoveWME(std::vector<std::string>& argv) {
 	// Exactly one argument
 	if (argv.size() < 2) {
 		SetErrorDetail("Please supply a timetag.");
-		return SetError(CLIError::kTooFewArgs);
+		return SetError(kTooFewArgs);
 	}
 	if (argv.size() > 2) {
 		SetErrorDetail("Please supply only one timetag.");
-		return SetError(CLIError::kTooManyArgs);
+		return SetError(kTooManyArgs);
 	}
 
 	uint64_t timetag = 0;
 	from_string(timetag, argv[1]);
-	if (!timetag) return SetError(CLIError::kIntegerMustBePositive);
+	if (!timetag) return SetError(kIntegerMustBePositive);
 
 	return DoRemoveWME(timetag);
 }

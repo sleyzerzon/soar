@@ -19,7 +19,7 @@ using namespace cli;
 bool CommandLineInterface::ParsePopD(std::vector<std::string>& argv) {
 	// No arguments
 	if (argv.size() != 1) {
-		return SetError(CLIError::kTooManyArgs);
+		return SetError(kTooManyArgs);
 	}
 	return DoPopD();
 }
@@ -27,7 +27,7 @@ bool CommandLineInterface::ParsePopD(std::vector<std::string>& argv) {
 bool CommandLineInterface::DoPopD() {
 
 	// There must be a directory on the stack to pop
-	if (m_DirectoryStack.empty()) return SetError(CLIError::kDirectoryStackEmpty);
+	if (m_DirectoryStack.empty()) return SetError(kDirectoryStackEmpty);
 
 	// Change to the directory
 	if (!DoCD(&(m_DirectoryStack.top()))) return false;	// error handled in DoCD

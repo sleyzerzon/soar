@@ -45,7 +45,7 @@ bool CommandLineInterface::DoAlias(const std::string* pCommand, const std::vecto
 			std::string result = m_Aliases.List();
 			if (!result.size()) {
 				SetErrorDetail("No aliases in alias database.");
-				return SetError(CLIError::kAliasNotFound);
+				return SetError(kAliasNotFound);
 			}
 			m_Result << result;
 			return true;
@@ -71,14 +71,14 @@ bool CommandLineInterface::DoAlias(const std::string* pCommand, const std::vecto
 	// command needs to have a size
 	if (!pCommand || !pCommand->size()) {
 		SetErrorDetail("No alias parameter received.");
-		return SetError(CLIError::kAliasNotFound);
+		return SetError(kAliasNotFound);
 	}
 
 	if (!pSubstitution) {
 		// no substitution, remove
 		if (!m_Aliases.RemoveAlias(*pCommand)) {
 			SetErrorDetail("Didn't find '" + *pCommand + "' in alias database.");
-			return SetError(CLIError::kAliasNotFound);
+			return SetError(kAliasNotFound);
 		}
 		return true;
 	} 
@@ -89,7 +89,7 @@ bool CommandLineInterface::DoAlias(const std::string* pCommand, const std::vecto
 			std::string result = m_Aliases.List(pCommand);
 			if (!result.size()) {
 				SetErrorDetail("Didn't find '" + *pCommand + "' in alias database.");
-				return SetError(CLIError::kAliasNotFound);
+				return SetError(kAliasNotFound);
 			}
 			m_Result << result;
 		} else {
@@ -111,7 +111,7 @@ bool CommandLineInterface::DoAlias(const std::string* pCommand, const std::vecto
 			}
 			if (citer == m_Aliases.GetAliasMapEnd()) {
 				SetErrorDetail("Didn't find '" + *pCommand + "' in alias database.");
-				return SetError(CLIError::kAliasNotFound);
+				return SetError(kAliasNotFound);
 			}
 		}
 		return true;

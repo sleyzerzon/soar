@@ -22,7 +22,7 @@ using namespace sml;
 bool CommandLineInterface::ParseSetLibraryLocation(std::vector<std::string>& argv) {
 	if (argv.size() > 2) {
 		SetErrorDetail("Expected a path, please enclose in quotes if there are spaces in the path.");
-		return SetError(CLIError::kTooManyArgs);
+		return SetError(kTooManyArgs);
 	}
 	if (argv.size() == 2) return DoSetLibraryLocation(&(argv[1]));
 	return DoSetLibraryLocation();

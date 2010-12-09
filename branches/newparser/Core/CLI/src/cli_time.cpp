@@ -25,7 +25,7 @@ bool CommandLineInterface::ParseTime(std::vector<std::string>& argv) {
 	// There must at least be a command
 	if (argv.size() < 2) {
 		SetErrorDetail("Please supply a command to time.");
-		return SetError(CLIError::kTooFewArgs);
+		return SetError(kTooFewArgs);
 	}
 
 	std::vector<std::string>::iterator iter = argv.begin();

@@ -47,21 +47,21 @@ bool CommandLineInterface::ParseExplainBacktraces(std::vector<std::string>& argv
 				break;
 
 			case 'c':
-				if ( !from_string( condition, m_OptionArgument ) ) return SetError(CLIError::kIntegerExpected);
-				if (condition <= 0) return SetError(CLIError::kIntegerMustBePositive);
+				if ( !from_string( condition, m_OptionArgument ) ) return SetError(kIntegerExpected);
+				if (condition <= 0) return SetError(kIntegerMustBePositive);
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// never more than one arg
-	if (m_NonOptionArguments > 1) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments > 1) return SetError(kTooManyArgs);
 
 	// we need a production if full or condition given
 	if (condition) if (m_NonOptionArguments < 1) {
 		SetErrorDetail("Production name required for that option.");
-		return SetError(CLIError::kTooFewArgs);
+		return SetError(kTooFewArgs);
 	}
 
 	// we have a production
@@ -155,7 +155,7 @@ bool ExplainChunks(agent* thisAgent, const char* pProduction, int mode)
 
 bool CommandLineInterface::DoExplainBacktraces(const std::string* pProduction, const int condition) {
 	// quick sanity check
-	if (condition < -1) return SetError(CLIError::kInvalidConditionNumber);
+	if (condition < -1) return SetError(kInvalidConditionNumber);
 
 	if (!pProduction) {
 		// no production means query, ignore other args

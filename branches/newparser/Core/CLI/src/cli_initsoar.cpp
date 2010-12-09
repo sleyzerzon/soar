@@ -43,7 +43,7 @@ bool CommandLineInterface::DoInitSoar() {
 	if (!ok)
 	{
 		m_Result << "Agent failed to reinitialize" ;
-		return SetError(CLIError::kInitSoarFailed);
+		return SetError(kInitSoarFailed);
 	}
 
 	if (m_RawOutput) m_Result << "Agent reinitialized.";

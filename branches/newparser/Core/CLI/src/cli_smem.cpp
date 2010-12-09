@@ -59,13 +59,13 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             if (option != 0)
             {
                 SetErrorDetail( "smem takes only one option at a time." );
-                return SetError( CLIError::kTooManyArgs );
+                return SetError( kTooManyArgs );
             }
             option = static_cast<char>(m_Option);
             break;
 
         default:
-            return SetError( CLIError::kGetOptError );
+            return SetError( kGetOptError );
         }
     }
 
@@ -90,7 +90,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             // check attribute name here
             soar_module::param *my_param = m_pAgentSoar->smem_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoSMem( option, &( argv[2] ) );
         }
@@ -109,10 +109,10 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             // check attribute name/potential vals here
             soar_module::param *my_param = m_pAgentSoar->smem_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             if ( !my_param->validate_string( argv[3].c_str() ) )
-                return SetError( CLIError::kInvalidValue );
+                return SetError( kInvalidValue );
 
             return DoSMem( option, &( argv[2] ), &( argv[3] ) );
         }
@@ -128,7 +128,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             // check attribute name
             soar_module::stat *my_stat = m_pAgentSoar->smem_stats->get( argv[2].c_str() );
             if ( !my_stat )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoSMem( option, &( argv[2] ) );
         }
@@ -144,7 +144,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             // check attribute name
             soar_module::timer *my_timer = m_pAgentSoar->smem_timers->get( argv[2].c_str() );
             if ( !my_timer )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoSMem( option, &( argv[2] ) );
         }
@@ -175,7 +175,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
             }
 
             if ( lti_id == NIL )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoSMem( option, NIL, NIL, lti_id, depth );
         }
@@ -183,7 +183,7 @@ bool CommandLineInterface::ParseSMem( std::vector<std::string>& argv )
 
     // bad: no option, but more than one argument
     if ( argv.size() > 1 ) 
-        return SetError( CLIError::kTooManyArgs );
+        return SetError( kTooManyArgs );
 
     // case: nothing = full configuration information
     return DoSMem();
@@ -385,7 +385,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 
         if ( !result )
         {
-            SetError( CLIError::kSMemError );
+            SetError( kSMemError );
             SetErrorDetail( *err );
             delete err;
         }
@@ -433,7 +433,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
         // this can only mean the parameter is protected
         if ( !result )
         {
-            SetError( CLIError::kSMemError );
+            SetError( kSMemError );
             SetErrorDetail( "ERROR: this parameter is protected while the SMem database is open." );
         }
 
@@ -636,5 +636,5 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
         return true;
     }
 
-    return SetError( CLIError::kCommandNotImplemented );
+    return SetError( kCommandNotImplemented );
 }

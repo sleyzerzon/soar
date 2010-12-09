@@ -21,11 +21,11 @@ using namespace cli;
 bool CommandLineInterface::ParseGP(std::vector<std::string>& argv) {
 	// One argument
 	if (argv.size() < 2) {
-		return SetError(CLIError::kTooFewArgs);
+		return SetError(kTooFewArgs);
 	}
 	if (argv.size() > 2) {
 		SetErrorDetail("Expected one argument (the production) enclosed in braces.");
-		return SetError(CLIError::kTooManyArgs);
+		return SetError(kTooManyArgs);
 	}
 
 	return DoGP(argv[1]);
@@ -96,12 +96,12 @@ bool CommandLineInterface::DoGP(const std::string& productionString)
 					if ( productionString.size() < pos + 2 )
 					{
 						SetErrorDetail( "gp production ends with [");
-						return SetError( CLIError::kValuesError );
+						return SetError( kValuesError );
 					}
 					if ( productionString[ pos + 1 ] == ']' )
 					{
 						SetErrorDetail( "gp can't have empty value collections");
-						return SetError( CLIError::kValuesError );;
+						return SetError( kValuesError );;
 					}
 
 					// we've started a values list, finish and save the previous segment
@@ -130,12 +130,12 @@ bool CommandLineInterface::DoGP(const std::string& productionString)
 					if ( productionString.size() < pos + 2 )
 					{
 						SetErrorDetail( "gp production ends with ]");
-						return SetError( CLIError::kValuesError );
+						return SetError( kValuesError );
 					}
 					if ( productionString[ pos + 1 ] == '[' )
 					{
 						SetErrorDetail( "gp production requires space between value lists");
-						return SetError( CLIError::kValuesError );;
+						return SetError( kValuesError );;
 					}
 
 					// end of values list
@@ -245,7 +245,7 @@ bool CommandLineInterface::DoGP(const std::string& productionString)
 		}
 		message << ".";
 		SetErrorDetail( message.str() );
-		return SetError( CLIError::kValuesError );;
+		return SetError( kValuesError );;
 	}
 
 	if (m_GPMax != 0) {
@@ -253,7 +253,7 @@ bool CommandLineInterface::DoGP(const std::string& productionString)
 			std::ostringstream message;
 			message << "Current production produces " << total << " productions.";
 			SetErrorDetail( message.str() );
-			return SetError( CLIError::kGPMaxExceeded );
+			return SetError( kGPMaxExceeded );
 		}
 	}
 

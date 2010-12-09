@@ -75,12 +75,12 @@ bool CommandLineInterface::ParseLearn(std::vector<std::string>& argv) {
 				options.set(LEARN_DISABLE_THROUGH_LOCAL_NEGATIONS);
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// No non-option arguments
-	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments) return SetError(kTooManyArgs);
 
 	return DoLearn(options);
 }

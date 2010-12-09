@@ -83,16 +83,16 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 			case 'S':
 				options.set(STATS_CYCLE);
 				if (!from_string(sort, m_OptionArgument)) {
-					return SetError(CLIError::kIntegerExpected);
+					return SetError(kIntegerExpected);
 				}
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// No arguments
-	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments) return SetError(kTooManyArgs);
 
 	return DoStats(options, sort);
 }

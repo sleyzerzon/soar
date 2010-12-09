@@ -45,14 +45,14 @@ bool CommandLineInterface::ParseEchoCommands(std::vector<std::string>& argv) {
 				onlyGetValue = false ;
 				break ;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	if (m_NonOptionArguments)
 	{
 		SetErrorDetail("Format is 'echo-commands [--yes | --no]") ;
-		return SetError(CLIError::kGetOptError) ;
+		return SetError(kGetOptError) ;
 	}
 
 	return DoEchoCommands(onlyGetValue, echoCommands);

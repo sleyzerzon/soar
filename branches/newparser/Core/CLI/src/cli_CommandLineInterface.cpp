@@ -168,7 +168,7 @@ EXPORT CommandLineInterface::CommandLineInterface() {
 
 	// Initialize other members
 	m_pLogFile = 0;
-	m_LastError = CLIError::kNoError;
+	m_LastError = kNoError;
 	m_Initialized = true;
 	m_TrapPrintEvents = false;
 	m_EchoResult = false ;
@@ -241,7 +241,7 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
 
 	SetTrapPrintCallbacks( true );
 
-    m_LastError = CLIError::kNoError;
+    m_LastError = kNoError;
     m_LastErrorDetail.clear();
 
 	// Process the command, ignoring its result (errors detected with m_LastError)
@@ -370,7 +370,7 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, soarxm
 	assert(pConnection);
 	assert(pResponse);
 
-	if (m_LastError == CLIError::kNoError) {
+	if (m_LastError == kNoError) {
         // Log output
         if (m_pLogFile) (*m_pLogFile) << m_Result.str() << std::endl;
 
@@ -418,13 +418,13 @@ void CommandLineInterface::GetLastResultSML(sml::Connection* pConnection, soarxm
 	}
 	m_ResponseTags.clear();	
 
-	m_LastError = CLIError::kNoError;	
+	m_LastError = kNoError;	
 	m_LastErrorDetail.clear();			
 }
 
 std::string CommandLineInterface::GenerateErrorString()
 {
-	std::string errorDescription = CLIError::GetErrorDescription(m_LastError);
+	std::string errorDescription = GetErrorDescription(m_LastError);
 	if (m_LastErrorDetail.size()) {
 		errorDescription += "\nError detail: ";
 		errorDescription += m_LastErrorDetail;
@@ -477,7 +477,7 @@ private:
 *************************************************************/
 bool CommandLineInterface::ExpandCommandToString(const char* pCommandLine, std::string* pExpandedLine)
 {
-	SetError(CLIError::kNoError);
+	SetError(kNoError);
 
 	// 1) Parse command
     cli::Tokenizer tokenizer;
@@ -569,7 +569,7 @@ bool CommandLineInterface::PartialMatch(std::vector<std::string>& argv) {
 		if (!possibilities.size()) {
 			// Not implemented
 			SetErrorDetail("(No such command: " + argv[0] + ")");
-			return SetError(CLIError::kCommandNotImplemented);
+			return SetError(kCommandNotImplemented);
 
 		} 
 	}
@@ -585,7 +585,7 @@ bool CommandLineInterface::PartialMatch(std::vector<std::string>& argv) {
 				++liter;
 			}
 			SetErrorDetail(detail.str());
-			return SetError(CLIError::kAmbiguousCommand);
+			return SetError(kAmbiguousCommand);
 
 		} else {
 			// We have a partial match
@@ -610,7 +610,7 @@ bool CommandLineInterface::HandleCommand(std::vector<std::string>& argv) {
 		// Is the alias target implemented?
 		if (m_CommandMap.find(argv[0]) == m_CommandMap.end()) {
 			SetErrorDetail("(No such command: " + argv[0] + ")");
-			return SetError(CLIError::kCommandNotImplemented);
+			return SetError(kCommandNotImplemented);
 		}
 
 	} else {
@@ -659,7 +659,7 @@ bool CommandLineInterface::GetCurrentWorkingDirectory(std::string& directory) {
 	char* ret = getcwd(buf, 1024);
 
 	// If getcwd returns 0, that is bad
-	if (!ret) return SetError(CLIError::kgetcwdFail);
+	if (!ret) return SetError(kgetcwdFail);
 
 	// Store directory in output parameter and return success
 	directory = buf;
@@ -715,7 +715,7 @@ void CommandLineInterface::PrependArgTagFast(const char* pParam, const char* pTy
 	m_ResponseTags.push_front(pTag);
 }
 
-bool CommandLineInterface::SetError(cli::ErrorCode code) {
+bool CommandLineInterface::SetError(cli::CLIError code) {
 	m_LastError = code;
 	return false;
 }
@@ -795,7 +795,7 @@ bool CommandLineInterface::ProcessOptions(std::vector<std::string>& argv, Option
 
 						if (!possibilities.size()) {
 							SetErrorDetail("No such option: " + longOption);
-							return SetError(CLIError::kUnrecognizedOption);
+							return SetError(kUnrecognizedOption);
 						} 
 					}
 
@@ -809,7 +809,7 @@ bool CommandLineInterface::ProcessOptions(std::vector<std::string>& argv, Option
 							++liter;
 						}
 						SetErrorDetail(detail.str());
-						return SetError(CLIError::kAmbiguousOption);
+						return SetError(kAmbiguousOption);
 
 					}
 					// We have a partial match
@@ -846,7 +846,7 @@ bool CommandLineInterface::ProcessOptions(std::vector<std::string>& argv, Option
 			}
 			char theOption = argv.at( m_Argument ).at( 1 );
 			SetErrorDetail( std::string("No such option: ") + theOption );
-			return SetError(CLIError::kUnrecognizedOption);
+			return SetError(kUnrecognizedOption);
 		}
 		++m_NonOptionArguments;
 	}
@@ -888,7 +888,7 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 			if (static_cast<unsigned>(++m_Argument) >= argv.size()) {
 				std::string detail(option);
 				SetErrorDetail("Option '" + detail + "' requires an argument.");
-				return SetError(CLIError::kMissingOptionArg);
+				return SetError(kMissingOptionArg);
 			}
 			m_OptionArgument = argv[m_Argument];
 			MoveBack(argv, m_Argument, m_NonOptionArguments);
@@ -915,9 +915,9 @@ bool CommandLineInterface::HandleOptionArgument(std::vector<std::string>& argv, 
 bool CommandLineInterface::CheckNumNonOptArgs(int min, int max)
 {
     if ( m_NonOptionArguments < min )
-        return SetError( CLIError::kTooFewArgs );
+        return SetError( kTooFewArgs );
     else if ( m_NonOptionArguments > max )
-        return SetError( CLIError::kTooManyArgs );
+        return SetError( kTooManyArgs );
     return true;
 }
 

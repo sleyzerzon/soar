@@ -70,8 +70,8 @@ bool CommandLineInterface::ParsePrint(std::vector<std::string>& argv) {
 				break;
 			case 'd':
 				options.set(PRINT_DEPTH);
-				if ( !from_string( depth, m_OptionArgument ) ) return SetError(CLIError::kIntegerExpected);
-				if (depth < 0) return SetError(CLIError::kIntegerMustBeNonNegative);
+				if ( !from_string( depth, m_OptionArgument ) ) return SetError(kIntegerExpected);
+				if (depth < 0) return SetError(kIntegerMustBeNonNegative);
 				break;
 			case 'D':
 				options.set(PRINT_DEFAULTS);
@@ -119,18 +119,18 @@ bool CommandLineInterface::ParsePrint(std::vector<std::string>& argv) {
 				options.set(PRINT_VARPRINT);
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// STATES and OPERATORS are sub-options of STACK
 	if (options.test(PRINT_OPERATORS) || options.test(PRINT_STATES)) {
-		if (!options.test(PRINT_STACK)) return SetError(CLIError::kPrintSubOptionsOfStack);
+		if (!options.test(PRINT_STACK)) return SetError(kPrintSubOptionsOfStack);
 	}
 
 	if (m_NonOptionArguments == 0) {
 		// d and t options require an argument
-		if (options.test(PRINT_TREE) || options.test(PRINT_DEPTH)) return SetError(CLIError::kTooFewArgs);
+		if (options.test(PRINT_TREE) || options.test(PRINT_DEPTH)) return SetError(kTooFewArgs);
 		return DoPrint(options, depth);
 	} 
 
@@ -145,12 +145,12 @@ bool CommandLineInterface::ParsePrint(std::vector<std::string>& argv) {
 	    || options.test(PRINT_STACK)) 
     {
 	    SetErrorDetail("No argument allowed when printing all/chunks/defaults/justifications/rl/template/user/stack.");
-	    return SetError(CLIError::kTooManyArgs);
+	    return SetError(kTooManyArgs);
     }
     if (options.test(PRINT_EXACT) && (options.test(PRINT_DEPTH) || options.test(PRINT_TREE))) 
     {
 	    SetErrorDetail("No depth/tree flags allowed when printing exact.");
-	    return SetError(CLIError::kTooManyArgs);
+	    return SetError(kTooManyArgs);
     }
     std::string arg;
     for (int i = m_Argument - m_NonOptionArguments; i < argv.size(); ++i)

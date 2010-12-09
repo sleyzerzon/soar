@@ -51,10 +51,10 @@ bool CommandLineInterface::ParsePWatch(std::vector<std::string>& argv) {
 				setting = true;
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
-	if (m_NonOptionArguments > 1) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments > 1) return SetError(kTooManyArgs);
 
 	if (m_NonOptionArguments == 1) return DoPWatch(false, &argv[m_Argument - m_NonOptionArguments], setting);
 	return DoPWatch(query, 0);
@@ -116,7 +116,7 @@ bool CommandLineInterface::DoPWatch(bool query, const std::string* pProduction, 
 
 	if (!sym || !(sym->sc.production))
 	{
-		return SetError(CLIError::kProductionNotFound);
+		return SetError(kProductionNotFound);
 	}
 
 	// we have a production

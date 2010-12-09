@@ -20,11 +20,11 @@ bool CommandLineInterface::ParsePushD(std::vector<std::string>& argv) {
 	// Only takes one argument, the directory to change into
 	if (argv.size() < 2) {
 		SetErrorDetail("Expected directory to change to.");
-		return SetError(CLIError::kTooFewArgs);
+		return SetError(kTooFewArgs);
 	}
 	if (argv.size() > 2) {
 		SetErrorDetail("Expected directory to change to, enclose in quotes if there are spaces in the path.");
-		return SetError(CLIError::kTooManyArgs);
+		return SetError(kTooManyArgs);
 	}
 	return DoPushD(argv[1]);
 }

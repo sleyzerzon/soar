@@ -64,7 +64,7 @@ class GetOpt;
 typedef int ErrorCode;
 
 namespace cli {
-using ::ErrorCode;
+enum CLIError;
 
 // Define the CommandFunction which we'll call to process commands
 typedef bool (CommandLineInterface::*CommandFunction)(std::vector<std::string>& argv);
@@ -816,7 +816,7 @@ protected:
 	*************************************************************/ 	 
 	void EchoString(sml::Connection* pConnection, char const* pString);	
 
-	bool SetError(cli::ErrorCode code);				// always returns false
+    bool SetError(cli::CLIError code);				// always returns false
 	bool SetErrorDetail(const std::string detail);	// always returns false
 
 	void XMLResultToResponse(char const* pCommandName) ; // clears m_XMLResult
@@ -864,7 +864,7 @@ protected:
 	bool				m_Initialized;			// True if state has been cleared for a new command execution
 	std::ostringstream  m_Result;			    // Raw output from the command
 	bool				m_RawOutput;			// True if we want string output.
-	cli::ErrorCode		m_LastError;			// Last error code (see cli_CLIError.h)
+    cli::CLIError 		m_LastError;			// Last error code (see cli_CLIError.h)
 	std::string			m_LastErrorDetail;		// Additional detail concerning the last error
 	bool				m_TrapPrintEvents;		// True when print events should be trapped
 	bool				m_EchoResult;			// If true, copy result of command to echo event stream

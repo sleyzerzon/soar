@@ -45,12 +45,12 @@ bool CommandLineInterface::ParseWaitSNC(std::vector<std::string>& argv) {
 				enable = true;
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// No additional arguments
-	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);		
+	if (m_NonOptionArguments) return SetError(kTooManyArgs);		
 
 	return DoWaitSNC(query ? 0 : &enable);
 }

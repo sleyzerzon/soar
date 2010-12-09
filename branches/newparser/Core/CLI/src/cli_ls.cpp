@@ -22,7 +22,7 @@ using namespace sml;
 bool CommandLineInterface::ParseLS(std::vector<std::string>& argv) {
 	// No arguments
 	if (argv.size() != 1) {
-		return SetError(CLIError::kTooManyArgs);
+		return SetError(kTooManyArgs);
 	}
 	return DoLS();
 }
@@ -63,7 +63,7 @@ bool CommandLineInterface::DoLS() {
 	if (!GetCurrentWorkingDirectory(dir)) return false;
 
 	// Open the directory for reading
-	if ((directoryPointer = opendir(dir.c_str())) == 0) return SetError(CLIError::kDirectoryOpenFailure);
+	if ((directoryPointer = opendir(dir.c_str())) == 0) return SetError(kDirectoryOpenFailure);
 
 	// Read the files
 	errno = 0;
@@ -73,7 +73,7 @@ bool CommandLineInterface::DoLS() {
 	}
 
 	// Check for error
-	if (errno != 0) return SetError(CLIError::kDirectoryEntryReadFailure);
+	if (errno != 0) return SetError(kDirectoryEntryReadFailure);
 
 	// Ignoring close error
 	closedir(directoryPointer);

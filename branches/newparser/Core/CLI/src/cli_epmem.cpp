@@ -55,13 +55,13 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
             if (option != 0)
             {
                 SetErrorDetail( "epmem takes only one option at a time." );
-                return SetError( CLIError::kTooManyArgs );
+                return SetError( kTooManyArgs );
             }
             option = static_cast<char>(m_Option);
             break;
 
         default:
-            return SetError( CLIError::kGetOptError );
+            return SetError( kGetOptError );
         }
     }
 
@@ -89,7 +89,7 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
             // check attribute name here
             soar_module::param *my_param = m_pAgentSoar->epmem_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoEpMem( option, &( argv[2] ) );
         }
@@ -102,10 +102,10 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
             // check attribute name/potential vals here
             soar_module::param *my_param = m_pAgentSoar->epmem_params->get( argv[2].c_str() );
             if ( !my_param )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             if ( !my_param->validate_string( argv[3].c_str() ) )
-                return SetError( CLIError::kInvalidValue );
+                return SetError( kInvalidValue );
 
             return DoEpMem( 's', &( argv[2] ), &( argv[3] ) );
         }
@@ -121,7 +121,7 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
             // check attribute name
             soar_module::stat *my_stat = m_pAgentSoar->epmem_stats->get( argv[2].c_str() );
             if ( !my_stat )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoEpMem( option, &( argv[2] ) );
         }
@@ -137,7 +137,7 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
             // check attribute name
             soar_module::timer *my_timer = m_pAgentSoar->epmem_timers->get( argv[2].c_str() );
             if ( !my_timer )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoEpMem( option, &( argv[2] ) );
         }
@@ -151,7 +151,7 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
             epmem_time_id memory_id;		
 
             if ( !from_string( memory_id, temp_str ) )
-                return SetError( CLIError::kInvalidAttribute );
+                return SetError( kInvalidAttribute );
 
             return DoEpMem( option, 0, 0, memory_id );
         }
@@ -159,7 +159,7 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
 
     // bad: no option, but more than one argument
     if ( argv.size() > 1 ) 
-        return SetError( CLIError::kTooManyArgs );
+        return SetError( kTooManyArgs );
 
     // case: nothing = full configuration information
     return DoEpMem();	
@@ -467,7 +467,7 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
         // this can only mean the parameter is protected
         if ( !result )
         {
-            SetError( CLIError::kEpMemError );
+            SetError( kEpMemError );
             SetErrorDetail( "ERROR: this parameter is protected while the EpMem database is open." );
         }
 
@@ -681,7 +681,7 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
         {
             viz.assign( "Invalid episode." );
             SetErrorDetail( "epmem viz: Invalid episode." );
-            return SetError( CLIError::kEpMemError );
+            return SetError( kEpMemError );
         }
 
         if ( m_RawOutput )
@@ -696,5 +696,5 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
         return true;
     }
 
-    return SetError( CLIError::kCommandNotImplemented );
+    return SetError( kCommandNotImplemented );
 }

@@ -57,20 +57,20 @@ bool CommandLineInterface::ParseSource(std::vector<std::string>& argv)
             options.set(SOURCE_VERBOSE);
             break;
         default:
-            return SetError(CLIError::kGetOptError);
+            return SetError(kGetOptError);
         }
     }
 
     if (m_NonOptionArguments < 1) 
     {
         SetErrorDetail("Please supply one file to source.");
-        return SetError(CLIError::kTooFewArgs);
+        return SetError(kTooFewArgs);
 
     } 
     else if (m_NonOptionArguments > 2) 
     {
         SetErrorDetail("Please supply one file to source. If there are spaces in the path, enclose it in quotes.");
-        return SetError(CLIError::kSourceOnlyOneFile);
+        return SetError(kSourceOnlyOneFile);
     }
 
     return DoSource(argv[m_Argument - m_NonOptionArguments], &options);
@@ -128,7 +128,7 @@ void CommandLineInterface::PrintSourceSummary(int sourced, const std::list< std:
 bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions) 
 {
     if (m_SourceFileStack.size() >= 100)
-        return SetError(CLIError::kSourceDepthExceeded);
+        return SetError(kSourceDepthExceeded);
 
     normalize_separators(path);
 
@@ -155,7 +155,7 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
     {
         if (!folder.empty()) DoPopD();
         SetErrorDetail(path);
-        return SetError(CLIError::kOpenFileFail);
+        return SetError(kOpenFileFail);
     }
 
     // obtain file size:
@@ -170,7 +170,7 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
         if (!folder.empty()) DoPopD();
         path.insert(0, "Memory allocation failed: ");
         SetErrorDetail(path);
-        return SetError(CLIError::kOpenFileFail);
+        return SetError(kOpenFileFail);
     }
 
     // copy the file into the buffer:
@@ -181,7 +181,7 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
         if (!folder.empty()) DoPopD();
         path.insert(0, "Read failed: ");
         SetErrorDetail(path);
-        return SetError(CLIError::kOpenFileFail);
+        return SetError(kOpenFileFail);
     }
     buffer[lSize] = 0;
 
@@ -220,9 +220,9 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
     {
         int line = tokenizer.GetCommandLineNumber();
         int offset = -1;
-        if (m_LastError == CLIError::kNoError)
+        if (m_LastError == kNoError)
         {
-            SetError(CLIError::kParseError);
+            SetError(kParseError);
             SetErrorDetail(tokenizer.GetErrorString());
             line = tokenizer.GetCurrentLineNumber();
             offset = tokenizer.GetOffset();

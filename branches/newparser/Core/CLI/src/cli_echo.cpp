@@ -36,7 +36,7 @@ bool CommandLineInterface::ParseEcho(std::vector<std::string>& argv) {
 				echoNewline = false;
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 

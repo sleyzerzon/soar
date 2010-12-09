@@ -82,12 +82,12 @@ bool CommandLineInterface::ParseRun(std::vector<std::string>& argv) {
 				options.set(RUN_NO_UPDATE) ;
 				break ;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// Only one non-option argument allowed, count
-	if (m_NonOptionArguments > 1) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments > 1) return SetError(kTooManyArgs);
 
 	// Decide if we explicitly indicated how to run
 	bool specifiedType = (options.test(RUN_FOREVER) || options.test(RUN_ELABORATION) || options.test(RUN_DECISION) || options.test(RUN_PHASE) || options.test(RUN_OUTPUT)) ;
@@ -96,9 +96,9 @@ bool CommandLineInterface::ParseRun(std::vector<std::string>& argv) {
 	int count = -1;
 	if (m_NonOptionArguments == 1) {
 		int optind = m_Argument - m_NonOptionArguments;
-		if ( !from_string( count, argv[optind] ) ) return SetError(CLIError::kIntegerExpected);
+		if ( !from_string( count, argv[optind] ) ) return SetError(kIntegerExpected);
 		// Allow "run 0" for decisions -- which means run agents to the current stop-before phase
-		if (count < 0 || (count == 0 && specifiedType && !options.test(RUN_DECISION))) return SetError(CLIError::kIntegerMustBePositive);
+		if (count < 0 || (count == 0 && specifiedType && !options.test(RUN_DECISION))) return SetError(kIntegerMustBePositive);
 	} 
 
 	return DoRun(options, count, interleaveMode);
@@ -116,7 +116,7 @@ eRunInterleaveMode CommandLineInterface::ParseRunInterleaveOptarg() {
 	}
 
 	SetErrorDetail("Invalid switch: " + m_OptionArgument);
-	SetError(CLIError::kInvalidRunInterleaveSetting);
+	SetError(kInvalidRunInterleaveSetting);
 	return RUN_INTERLEAVE_DEFAULT;
 }
 
@@ -202,7 +202,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	}
 
 	if (!pScheduler->VerifyStepSizeForRunType(forever, runType, interleave) ) {
-		SetError(CLIError::kInvalidRunInterleaveSetting);
+		SetError(kInvalidRunInterleaveSetting);
 		SetErrorDetail("Run type and interleave setting incompatible.");
 		return false;
 	}
@@ -228,10 +228,10 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 	switch (runResult) {
 		case sml_RUN_ERROR_ALREADY_RUNNING:
 			SetErrorDetail( "Soar is already running" );
-			return SetError(CLIError::kRunFailed);
+			return SetError(kRunFailed);
 
 		case sml_RUN_ERROR:
-			return SetError(CLIError::kRunFailed);
+			return SetError(kRunFailed);
 
 		case sml_RUN_EXECUTING:
 			if (m_RawOutput) {
@@ -279,7 +279,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 
 		default:
 			assert(false);
-			return SetError(CLIError::kRunFailed);
+			return SetError(kRunFailed);
 	}
 	return true;
 }

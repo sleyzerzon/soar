@@ -37,7 +37,7 @@ bool CommandLineInterface::ParseStopSoar(std::vector<std::string>& argv) {
 				self = true;
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 

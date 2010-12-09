@@ -72,12 +72,12 @@ bool CommandLineInterface::ParsePreferences(std::vector<std::string>& argv) {
 				object = true;
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// Up to two non-option arguments allowed, id/attribute
-	if (m_NonOptionArguments > 2) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments > 2) return SetError(kTooManyArgs);
 
 	int optind = m_Argument - m_NonOptionArguments;
 	if (m_NonOptionArguments == 2) {
@@ -401,7 +401,7 @@ bool CommandLineInterface::DoPreferences(const ePreferencesDetail detail, bool o
 
 	if (soar_ecPrintPreferences(m_pAgentSoar, id, attr, object, print_productions, wtt)) {
 		print(m_pAgentSoar, "An Error occured trying to print the prefs.");
-		return SetError(CLIError::kPreferencesError);
+		return SetError(kPreferencesError);
 	}
 	return true;
 }

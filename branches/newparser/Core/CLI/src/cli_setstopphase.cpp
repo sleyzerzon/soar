@@ -69,14 +69,14 @@ bool CommandLineInterface::ParseSetStopPhase(std::vector<std::string>& argv) {
 				countPhaseArgs++ ;
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	if (m_NonOptionArguments || countPhaseArgs > 1)
 	{
 		SetErrorDetail("Format is 'set-stop-phase [--Before | --After] <phase>' where <phase> is --input | --proposal | --decision | --apply | --output\ne.g. set-stop-phase --before --input") ;
-		return SetError(CLIError::kGetOptError) ;
+		return SetError(kGetOptError) ;
 	}
 
 	return DoSetStopPhase(countPhaseArgs == 1, before, phase);
