@@ -219,18 +219,24 @@ bool CommandLineInterface::DoSource(std::string path, SourceBitset* pOptions)
     if (!ret)
     {
         int line = tokenizer.GetCommandLineNumber();
+        int offset = -1;
         if (m_LastError == CLIError::kNoError)
         {
-            // Parse error
-            // TODO: more error detail.
             SetError(CLIError::kParseError);
+            SetErrorDetail(tokenizer.GetErrorString());
             line = tokenizer.GetCurrentLineNumber();
+            offset = tokenizer.GetOffset();
         }
 
         m_SourceErrorDetail.append("\n\t");
         m_SourceErrorDetail.append(m_SourceFileStack.top());
         m_SourceErrorDetail.append(":");
         m_SourceErrorDetail.append(to_string(line, temp));
+        if (offset > 0)
+        {
+            m_SourceErrorDetail.append(":");
+            m_SourceErrorDetail.append(to_string(line, temp));
+        }
     }
 
     if (m_pSourceOptions && m_pSourceOptions->test(SOURCE_ALL))

@@ -26,20 +26,33 @@ namespace cli
     {
     private:
         int line;
+        int offset;
         const char* current;
 
     public:
         TokenizerCurrent()
-            : line(1), current(0)
-        {}
+        {
+            SetCurrent(0);
+        }
         TokenizerCurrent(const char* initial)
-            : line(1), current(initial)
-        {}
+        {
+            SetCurrent(initial);
+        }
         virtual ~TokenizerCurrent() {}
         
         void SetCurrent(const char* initial)
         {
             current = initial;
+            if (current && *current)
+            {
+                line = 1;
+                offset = 1;
+            }
+            else
+            {
+                line = 0;
+                offset = 0;
+            }
         }
 
         void Fail()
@@ -50,20 +63,22 @@ namespace cli
         void Increment()
         {
             if (*current == '\n')
+            {
                 line += 1;
+                offset = 0;
+            }
             current += 1;
-        }
-
-        void Decrement()
-        {
-            current -= 1;
-            if (*current == '\n')
-                line -= 1;
+            offset += 1;
         }
 
         int GetLine()
         {
             return line;
+        }
+
+        int GetOffset()
+        {
+            return offset;
         }
 
         bool Good()
@@ -93,10 +108,11 @@ namespace cli
         TokenizerCurrent current;
         TokenizerCallback* callback;
         int commandStartLine;
+        const char* error;
 
     public:
         Tokenizer()
-            : callback(0) 
+            : callback(0), error(0) 
         {}
         virtual ~Tokenizer() {}
 
@@ -109,6 +125,7 @@ namespace cli
         {
             current.SetCurrent(input);
             commandStartLine = 1;
+            error = 0;
 
             while (current.Good())
             {
@@ -127,6 +144,16 @@ namespace cli
         int GetCurrentLineNumber()
         {
             return current.GetLine();
+        }
+
+        const char* GetErrorString()
+        {
+            return error;
+        }
+
+        int GetOffset()
+        {
+            return current.GetOffset();
         }
 
     private:
@@ -150,8 +177,13 @@ namespace cli
             std::cout << "]" << std::endl;
 #endif
             if (callback)
+            {
                 if (!callback->HandleCommand(argv))
+                {
+                    error = "callback returned error";
                     current.Fail();
+                }
+            }
         }
 
         bool ParseWord(std::vector< std::string >& argv)
@@ -162,29 +194,59 @@ namespace cli
             std::string word;
             if (argv.empty())
                 commandStartLine = current.GetLine();
-            argv.push_back(word);
 
             switch (current.Get())
             {
+            case ';':
+                break;
+
             case '"':
+                argv.push_back(word);
                 ReadQuotedString(argv);
                 break;
 
             case '{':
+                argv.push_back(word);
                 ReadBraces(argv);
                 break;
 
             default:
-                do
-                {
-                    argv.back().push_back(current.Get());
-                    current.Increment();
-                }
-                while (!current.Eof() && !isspace(current.Get()));
+                argv.push_back(word);
+                ReadNormalWord(argv);
                 break;
             }
 
             return !AtEndOfCommand();
+        }
+
+        void ReadNormalWord(std::vector< std::string >& argv)
+        {
+            do
+            {
+                char c = current.Get();
+                bool semi = false;
+                switch (c)
+                {
+                case '\\':
+                    c = ParseEscapeSequence();
+                    if (current.Bad())
+                        return;
+                    break;
+
+                case ';':
+                    semi = true;
+                    // falls to be consumed
+                default:
+                    current.Increment();
+                    break;
+                }
+
+                if (semi)
+                    return;
+
+                argv.back().push_back(c);
+            }
+            while (!current.Eof() && !isspace(current.Get()));
         }
 
         bool AtEndOfCommand()
@@ -193,8 +255,10 @@ namespace cli
             {
                 switch (current.Get())
                 {
-                case 0:
                 case '\n':
+                case ';':
+                    current.Increment();
+                case 0:
                     return true;
 
                 default:
@@ -217,7 +281,8 @@ namespace cli
             {
                 switch (current.Get())
                 {
-                case 0: // unexpected eof
+                case 0: 
+                    error = "unexpected eof";
                     current.Fail();
                     return;
 
@@ -231,9 +296,9 @@ namespace cli
 
                 default:
                     argv.back().push_back(current.Get());
+                    current.Increment();
                     break;
                 }
-                current.Increment();
             }
 
             current.Increment(); // consume "
@@ -246,9 +311,11 @@ namespace cli
             // future work? newline, octal, hex, wide hex
 
             char ret = 0;
+            bool increment = true;
             switch (current.Get())
             {
-            case 0: // unexpected eof
+            case 0:
+                error = "unexpected eof";
                 current.Fail();
                 return 0;
             case 'a':
@@ -275,13 +342,14 @@ namespace cli
             case '\n':
                 SkipWhitespace();
                 ret = ' ';
-                current.Decrement(); // SkipWhitespace leaves us past where we want to be
+                increment = false; // SkipWhitespace leaves us past where we want to be
                 break;
             default:
                 ret = current.Get();
                 break;
             }
-            current.Increment();
+            if (increment)
+                current.Increment();
             return ret;
         }
 
@@ -293,7 +361,8 @@ namespace cli
             {
                 switch (current.Get())
                 {
-                case 0: // unexpected eof, unmatched brace
+                case 0:
+                    error = "unexpected eof, unmatched opening brace";
                     current.Fail();
                     return;
 

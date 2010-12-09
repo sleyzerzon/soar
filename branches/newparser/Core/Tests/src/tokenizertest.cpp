@@ -80,6 +80,16 @@ class TokenizerTest : public CPPUNIT_NS::TestCase, public cli::TokenizerCallback
 	CPPUNIT_TEST( testTokenizer33 );
 	CPPUNIT_TEST( testTokenizer34 );
 	CPPUNIT_TEST( testTokenizer35 );
+	CPPUNIT_TEST( testTokenizer36 );
+	CPPUNIT_TEST( testTokenizer37 );
+	CPPUNIT_TEST( testTokenizer38 );
+	CPPUNIT_TEST( testTokenizer39 );
+	CPPUNIT_TEST( testTokenizer40 );
+	CPPUNIT_TEST( testTokenizer41 );
+	CPPUNIT_TEST( testTokenizer42 );
+	CPPUNIT_TEST( testTokenizer43 );
+	CPPUNIT_TEST( testTokenizer44 );
+	CPPUNIT_TEST( testTokenizer45 );
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -129,6 +139,16 @@ protected:
 	void testTokenizer33();
 	void testTokenizer34();
 	void testTokenizer35();
+	void testTokenizer36();
+	void testTokenizer37();
+	void testTokenizer38();
+	void testTokenizer39();
+	void testTokenizer40();
+	void testTokenizer41();
+	void testTokenizer42();
+	void testTokenizer43();
+	void testTokenizer44();
+	void testTokenizer45();
 
     void evaluate(CallData& cd);
 
@@ -394,5 +414,71 @@ void TokenizerTest::testTokenizer35()
     rule.append(body);
     rule.append("}");
     CallData cd(rule.c_str(), 2, "sp", body);
+    evaluate(cd); 
+}
+void TokenizerTest::testTokenizer36()
+{
+    CPPUNIT_ASSERT(!tokenizer->Evaluate("sp a\" \""));
+    CPPUNIT_ASSERT(tokenizer->GetErrorString());
+    CPPUNIT_ASSERT(tokenizer->GetCurrentLineNumber() == 1);
+    CPPUNIT_ASSERT(tokenizer->GetCommandLineNumber() == 1);
+    CPPUNIT_ASSERT(tokenizer->GetOffset() == 8);
+}
+void TokenizerTest::testTokenizer37()
+{
+    CPPUNIT_ASSERT(!tokenizer->Evaluate(" \t\nsp a\" \""));
+    CPPUNIT_ASSERT(tokenizer->GetErrorString());
+    CPPUNIT_ASSERT(tokenizer->GetCurrentLineNumber() == 2);
+    CPPUNIT_ASSERT(tokenizer->GetCommandLineNumber() == 2);
+    CPPUNIT_ASSERT(tokenizer->GetOffset() == 8);
+}
+void TokenizerTest::testTokenizer38()
+{
+    CPPUNIT_ASSERT(!tokenizer->Evaluate(" \t\n  sp a {\n\\n \""));
+    CPPUNIT_ASSERT(tokenizer->GetErrorString());
+    CPPUNIT_ASSERT(tokenizer->GetCurrentLineNumber() == 3);
+    CPPUNIT_ASSERT(tokenizer->GetCommandLineNumber() == 2);
+    CPPUNIT_ASSERT(tokenizer->GetOffset() == 5);
+}
+void TokenizerTest::testTokenizer39()
+{
+    CPPUNIT_ASSERT(!tokenizer->Evaluate("\\n\\"));
+    CPPUNIT_ASSERT(tokenizer->GetErrorString());
+    CPPUNIT_ASSERT(tokenizer->GetCurrentLineNumber() == 1);
+    CPPUNIT_ASSERT(tokenizer->GetCommandLineNumber() == 1);
+    CPPUNIT_ASSERT(tokenizer->GetOffset() == 4);
+}
+void TokenizerTest::testTokenizer40()
+{
+    CallData cd("\0");
+    evaluate(cd);
+}
+void TokenizerTest::testTokenizer41()
+{
+    CallData cd("\\nv\\\n t", 1, "\nv t"); 
+    evaluate(cd); 
+}
+void TokenizerTest::testTokenizer42()
+{
+    CallData cd("sp a\" \\\"", 3, "sp", "a\"", "\""); 
+    evaluate(cd); 
+}
+void TokenizerTest::testTokenizer43()
+{
+    CallData cd("{} { } {  } \"\" \" \" \"  \"", 6, "", " ", "  ", "", " ", "  "); 
+    evaluate(cd); 
+}
+void TokenizerTest::testTokenizer44()
+{
+    CallData cd("{\\\"} \"\\\"\"", 2, "\\\"", "\""); 
+    evaluate(cd); 
+}
+void TokenizerTest::testTokenizer45()
+{
+    CallData cd("a ; b\n;c;;d"); 
+    cd.addResult(1, "a");
+    cd.addResult(1, "b");
+    cd.addResult(1, "c");
+    cd.addResult(1, "d");
     evaluate(cd); 
 }
