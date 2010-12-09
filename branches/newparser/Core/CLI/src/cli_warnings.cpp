@@ -17,7 +17,6 @@
 
 #include "sml_KernelSML.h"
 #include "gsysparam.h"
-#include "cli_CLIError.h"
 #include "agent.h"
 
 using namespace cli;

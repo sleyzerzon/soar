@@ -12,7 +12,6 @@
 
 #include "cli_Commands.h"
 #include "sml_Names.h"
-#include "cli_CLIError.h"
 
 #include "agent.h"
 

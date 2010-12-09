@@ -10,7 +10,6 @@
 
 #include "sml_Utils.h"
 #include "cli_CommandLineInterface.h"
-#include "cli_CLIError.h"
 #include "cli_Commands.h"
 
 #include "sml_Names.h"

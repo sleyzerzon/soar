@@ -12,7 +12,6 @@
 
 #include "cli_Commands.h"
 #include "agent.h"
-#include "cli_CLIError.h"
 
 using namespace cli;
 using namespace sml;

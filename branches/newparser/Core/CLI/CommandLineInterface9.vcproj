@@ -661,10 +661,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\cli_CLIError.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\cli_CommandData.h"
 				>
 			</File>

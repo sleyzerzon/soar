@@ -16,7 +16,6 @@
 #include "sml_KernelSML.h"
 #include "sml_Events.h"
 #include "sml_RunScheduler.h"
-#include "cli_CLIError.h"
 
 #include "misc.h"
 #include "agent.h"

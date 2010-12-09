@@ -17,7 +17,6 @@
 #include "sml_StringOps.h"
 #include "sml_Names.h"
 #include "sml_Events.h"
-#include "cli_CLIError.h"
 #include "misc.h"
 
 #include <algorithm>

@@ -49,22 +49,96 @@ namespace soarxml
 	class XMLTrace;
 }
 
-namespace sml {
+namespace sml 
+{
 	class KernelSML;
 	class Connection ;
 	class AgentSML;
 }
 
-namespace cli {
-
-// Forward declarations
-class CommandLineInterface;
-class GetOpt;
+namespace cli 
+{
+    // Forward declarations
+    class CommandLineInterface;
+    class GetOpt;
 }
-typedef int ErrorCode;
 
-namespace cli {
-enum CLIError;
+namespace cli 
+{
+    enum CLIError 
+    {
+        kNoError                                = 0,
+        kGetOptError                            = 3,
+        kCommandNotImplemented                  = 4,
+        kProductionNotFound                     = 5,
+        kNotImplemented                         = 8,
+        kTooManyArgs                            = 14,
+        kTooFewArgs                             = 15,
+        kUnrecognizedOption                     = 16,
+        kMissingOptionArg                       = 17,
+        kgetcwdFail                             = 18,
+        kgettimeofdayFail                       = 19,
+        kchdirFail                              = 20,
+        kAliasNotFound                          = 23,
+        kIntegerExpected                        = 28,
+        kIntegerMustBePositive                  = 29,
+        kIntegerMustBeNonNegative               = 30,
+        kIntegerOutOfRange                      = 31,
+        kInvalidOperation                       = 32,
+        kInvalidNumericIndifferentMode          = 34,
+        kInvalidIndifferentSelectionMode        = 35,
+        kNoProdTypeWhenProdName                 = 37,
+        kSourceOnlyOneFile                      = 38,
+        kLogAlreadyOpen                         = 39,
+        kLogOpenFailure                         = 40,
+        kLogNotOpen                             = 41,
+        kDirectoryOpenFailure                   = 42,
+        kDirectoryEntryReadFailure              = 43,
+        kDirectoryStackEmpty                    = 44,
+        kMissingFilenameArg                     = 45,
+        kOpenFileFail                           = 46,
+        kReteSaveOperationFail                  = 49,
+        kReteLoadOperationFail                  = 50,
+        kInvalidLearnSetting                    = 52,
+        kRemoveOrZeroExpected                   = 53,
+        kInvalidID                              = 54,
+        kInvalidAttribute                       = 55,
+        kInvalidValue                           = 56,
+        kInvalidWMEFilterType                   = 59,
+        kFilterExpected                         = 60,
+        kDuplicateWMEFilter                     = 61, 
+        kInvalidMode                            = 62,
+        kTypeRequired                           = 63,
+        kWMEFilterNotFound                      = 64,
+        kProductionRequired                     = 65,
+        kInvalidConditionNumber                 = 66,
+        kInvalidPrefix                          = 67,
+        kCountGreaterThanMaxChunks              = 68,
+        kCountLessThanChunks                    = 69,
+        kAcceptableOrNothingExpected            = 70,
+        kMustSaveOrLoad                         = 72,
+        kPrintSubOptionsOfStack                 = 73,
+        kRunFailed                              = 77,
+        kAmbiguousCommand                       = 79,
+        kAmbiguousOption                        = 80, 
+        kInitSoarFailed                         = 84, 
+        kPreferencesError                       = 85,
+        kInvalidRunInterleaveSetting            = 86,
+        kLoadLibraryError                       = 87,
+        kProductionAddFailed                    = 90, 
+        kSourceDepthExceeded                    = 92,
+        kCloseFileFail                          = 93,
+        kFileOpen                               = 94,
+        kFileNotOpen                            = 95,
+        kRealExpected                           = 96,
+        kValuesError                            = 97,
+        kGPMaxExceeded                          = 98,
+        kParseError                             = 99,
+        kSMemError                              = 100,
+        kWmaError                               = 101,
+        kRlError                                = 102,
+        kEpMemError                             = 103,
+    };
 
 // Define the CommandFunction which we'll call to process commands
 typedef bool (CommandLineInterface::*CommandFunction)(std::vector<std::string>& argv);
@@ -818,6 +892,7 @@ protected:
 
     bool SetError(cli::CLIError code);				// always returns false
 	bool SetErrorDetail(const std::string detail);	// always returns false
+    const char* GetErrorDescription(CLIError code);
 
 	void XMLResultToResponse(char const* pCommandName) ; // clears m_XMLResult
 
