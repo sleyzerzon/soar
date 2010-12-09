@@ -769,9 +769,6 @@ protected:
 
 	virtual void OnKernelEvent(int eventID, sml::AgentSML* pAgentSML, void* pCallData) ;
 
-	// Wrapped to handle errors more easily
-	int CLITokenize(std::string cmdline, std::vector<std::string>& argumentVector);
-
 	/*************************************************************
 	* @brief Standard parsing of -h and --help flags.  Returns
 	*		 true if the flag is present.

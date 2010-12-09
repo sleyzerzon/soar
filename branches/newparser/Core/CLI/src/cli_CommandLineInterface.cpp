@@ -450,6 +450,25 @@ void CommandLineInterface::EchoString(sml::Connection* pConnection, char const* 
 		m_pAgentSML->FireEchoEvent(pConnection, pString) ;
 }
 
+class ExpandHandler : public cli::TokenizerCallback
+{
+public:
+    ExpandHandler(std::vector< std::string >& argv)
+        : argv(argv) {}
+    virtual ~ExpandHandler() {}
+
+    virtual bool HandleCommand(std::vector< std::string >& argv)
+    {
+        this->argv.assign(argv.begin(), argv.end());
+        return true;
+    }
+
+private:
+    std::vector< std::string >& argv;
+
+    ExpandHandler& operator=(const ExpandHandler&) { return *this; }
+};
+
 /*************************************************************
 * @brief Takes a command line and expands any aliases and returns
 *		 the result.  The command is NOT executed.
@@ -460,11 +479,12 @@ bool CommandLineInterface::ExpandCommandToString(const char* pCommandLine, std::
 {
 	SetError(CLIError::kNoError);
 
-	std::vector<std::string> argv;
-
 	// 1) Parse command
-	if (CLITokenize(pCommandLine, argv) == -1)
-		return false ;
+    cli::Tokenizer tokenizer;
+	std::vector<std::string> argv;
+    ExpandHandler handler(argv);
+    tokenizer.SetHandler(&handler);
+	tokenizer.Evaluate(pCommandLine);
 
 	if (!argv.empty())
 	{
@@ -971,84 +991,6 @@ void CommandLineInterface::XMLResultToResponse(char const* pCommandName)
 
 	// Clear the XML result, so it's ready for use again.
 	m_XMLResult->Reset() ;
-}
-
-int CommandLineInterface::CLITokenize(std::string cmdline, std::vector<std::string>& argumentVector) 
-{
-	// bug 987: echo needs special handling
-	TrimLeadingWhitespace(cmdline);
-
-	// if it is echo, put echo in first arg and everything else in second arg
-	if (cmdline.substr(0, 4) == "echo")
-	{
-		argumentVector.push_back("echo");
-		std::string::size_type pos = cmdline.find_first_not_of(" \t", 4);
-		if (pos != std::string::npos)
-		{
-			argumentVector.push_back(cmdline.substr(pos));
-		}
-		return 0;
-	}
-
-	int ret = Tokenize(cmdline, argumentVector);
-	
-	if (ret >= 0) {
-		return ret; // no error
-	}
-
-	// there is an error
-
-	// handle easy errors with a switch
-	switch (ret) {
-		case -1:
-			SetError(CLIError::kNewlineBeforePipe);
-			break;
-
-		case -2:
-			SetErrorDetail("An extra '}' was found.");
-			SetError(CLIError::kExtraClosingParen);
-			break;
-
-		case -3:
-			SetErrorDetail("An extra ')' was found.");
-			SetError(CLIError::kExtraClosingParen);
-			break;
-
-		default:
-			{
-				int errorCode = abs(ret);
-
-				const int QUOTES_MASK = 4;
-				const int BRACKETS_MASK = 8;
-				const int PARENS_MASK = 16;
-				const int PIPES_MASK = 32;
-
-				std::string errorDetail = "These quoting characters were not closed: ";
-				bool foundError = false;
-				if (QUOTES_MASK & errorCode) {
-					foundError = true;
-					errorDetail += "\"";
-				}
-				if (BRACKETS_MASK & errorCode) {
-					foundError = true;
-					errorDetail += "{";
-				}
-				if (PARENS_MASK & errorCode) {
-					foundError = true;
-					errorDetail += "(";
-				}
-				if (PIPES_MASK & errorCode) {
-					foundError = true;
-					errorDetail += "|";
-				}
-				assert(foundError);
-				SetErrorDetail(errorDetail);
-			}
-			SetError(CLIError::kUnmatchedBracketOrQuote);
-			break;
-	}
-
-	return ret;
 }
 
 void CommandLineInterface::OnKernelEvent(int eventID, AgentSML*, void* pCallData)
