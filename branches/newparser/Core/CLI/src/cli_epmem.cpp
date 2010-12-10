@@ -96,7 +96,7 @@ bool CommandLineInterface::ParseEpMem( std::vector<std::string>& argv )
     case 's':
         // case: set requires two non-option arguments
         {
-            if (!CheckNumNonOptArgs(0, 1)) return false;
+            if (!CheckNumNonOptArgs(2, 2)) return false;
 
             // check attribute name/potential vals here
             soar_module::param *my_param = m_pAgentSoar->epmem_params->get( argv[2].c_str() );
