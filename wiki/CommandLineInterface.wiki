@@ -569,7 +569,7 @@ excise production_name
 excise options
 }}}
 
-==== Default Aliases ====
+=== Default Aliases ===
 
 || `ex` || `excise` ||
 
@@ -944,7 +944,7 @@ Provide formatted usage information about Soar commands.
 help [command_name]
 }}}
 
-==== Default Aliases ====
+=== Default Aliases ===
 
 || `?` || `help` ||
 || `h` || `help` ||
@@ -1289,7 +1289,7 @@ List the contents of the current working directory.
 ls
 }}}
 
-==== Default Aliases ====
+=== Default Aliases ===
 
 || `dir` || `ls` ||
 
@@ -1808,7 +1808,7 @@ and _attribute_.
 preferences [options] [identifier [attribute]]
 }}}
 
-==== Default Aliases ====
+=== Default Aliases ===
 
 || `pref` || `preferences` ||
 
@@ -1944,7 +1944,7 @@ print [options] [production_name]
 print [options] identifier|timetag|pattern
 }}}
 
-==== Default Aliases ====
+=== Default Aliases ===
 
 || `p` || `print` ||
 || `pc` || `print --chunks` ||
@@ -3334,7 +3334,7 @@ watch [options]
 watch level
 }}}
 
-==== Default Aliases ====
+=== Default Aliases ===
 
 || `w` || `watch` ||
 
