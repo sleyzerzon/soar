@@ -1149,7 +1149,7 @@ growable_string trace_format_list_to_string (agent* thisAgent, trace_format *tf,
 
     case DECISION_CYCLE_COUNT_TFT:
       if (tparams.allow_cycle_counts) {
-        SNPRINTF (buf,GROWABLE_STRING_TRACE_FORMAT_LIST_TO_STRING_BUFFER_SIZE, "%lu", thisAgent->d_cycle_count);
+        SNPRINTF (buf,GROWABLE_STRING_TRACE_FORMAT_LIST_TO_STRING_BUFFER_SIZE, "%lu", static_cast<long unsigned int>(thisAgent->d_cycle_count));
 		buf[GROWABLE_STRING_TRACE_FORMAT_LIST_TO_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
         add_to_growable_string (thisAgent, &result, buf);
       } else {
@@ -1158,7 +1158,7 @@ growable_string trace_format_list_to_string (agent* thisAgent, trace_format *tf,
       break;
     case ELABORATION_CYCLE_COUNT_TFT:
       if (tparams.allow_cycle_counts) {
-        SNPRINTF (buf,GROWABLE_STRING_TRACE_FORMAT_LIST_TO_STRING_BUFFER_SIZE, "%lu", thisAgent->e_cycle_count);
+        SNPRINTF (buf,GROWABLE_STRING_TRACE_FORMAT_LIST_TO_STRING_BUFFER_SIZE, "%lu", static_cast<long unsigned int>(thisAgent->e_cycle_count));
 		buf[GROWABLE_STRING_TRACE_FORMAT_LIST_TO_STRING_BUFFER_SIZE - 1] = 0; /* ensure null termination */
         add_to_growable_string (thisAgent, &result, buf);
       } else {
@@ -1391,7 +1391,7 @@ void print_stack_trace_xml(agent* thisAgent, Symbol *object, Symbol *state, int 
 		case FOR_STATES_TF:
 			//create XML trace for state object
 			xml_begin_tag( thisAgent, kTagState );
-			xml_att_val( thisAgent, kState_StackLevel, static_cast<unsigned long>(state->id.level - 1) );
+			xml_att_val( thisAgent, kState_StackLevel, state->id.level - 1 );
 			xml_att_val( thisAgent, kState_DecisionCycleCt, thisAgent->d_cycle_count );
 			xml_att_val( thisAgent, kState_ID, object );
 			
@@ -1418,7 +1418,7 @@ void print_stack_trace_xml(agent* thisAgent, Symbol *object, Symbol *state, int 
 		case FOR_OPERATORS_TF:
 			//create XML trace for operator object
 			xml_begin_tag( thisAgent, kTagOperator );
-			xml_att_val( thisAgent, kState_StackLevel, static_cast<unsigned long>(object->id.level - 1) );
+			xml_att_val( thisAgent, kState_StackLevel, object->id.level - 1 );
 			xml_att_val( thisAgent, kOperator_DecisionCycleCt, thisAgent->d_cycle_count );
 			
 			if (state->id.operator_slot->wmes)

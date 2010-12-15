@@ -9,7 +9,7 @@ class ipcsocket;
 
 class cmd_utils {
 public:
-	cmd_utils(soar_interface *si, sym_hnd cmd_root, scene *scn);
+	cmd_utils(svs_state *state, sym_hnd cmd_root);
 	
 	void    set_result(const std::string &r);
 	bool    cmd_changed();
@@ -21,8 +21,8 @@ private:
 	filter* make_node_filter(std::string name);
 	bool    get_filter_params(sym_hnd id, filter_params &p);
 
+	svs_state       *state;
 	sym_hnd         cmd_root;
-	scene*          scn;
 	wme_hnd         result_wme;
 	soar_interface* si;
 	int             subtree_size;
@@ -40,7 +40,7 @@ cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w);
 
 class extract_cmd_watcher : public cmd_watcher, public filter_listener {
 public:
-	extract_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn);
+	extract_cmd_watcher(svs_state *state, sym_hnd cmd_root);
 	~extract_cmd_watcher();
 	
 	void update(filter *f);
@@ -48,6 +48,7 @@ public:
 	bool early() { return false; }
 	
 private:
+	svs_state *state;
 	cmd_utils utils;
 	filter*   result_filter;
 	bool      dirty;
@@ -55,7 +56,7 @@ private:
 
 class gen_cmd_watcher : public cmd_watcher, public filter_listener, public sg_listener {
 public:
-	gen_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn);
+	gen_cmd_watcher(svs_state *state, sym_hnd cmd_root);
 	~gen_cmd_watcher();
 	
 	void update(sg_node* n, sg_node::change_type t);
@@ -66,18 +67,29 @@ public:
 private:
 	bool get_parent();
 	
+	svs_state *state;
 	cmd_utils utils;
 	sym_hnd   cmd_root;
-	scene     *scn;
 	sg_node   *parent;
 	sg_node   *generated;
 	filter    *result_filter;
 	bool      dirty;
 };
 
+class recall_cmd_watcher : public cmd_watcher {
+public:
+	recall_cmd_watcher(svs_state *state, sym_hnd cmd_root);
+	bool update_result();
+	bool early() { return true; }
+
+private:
+	svs_state *state;
+	cmd_utils utils;
+};
+
 class ctrl_cmd_watcher : public cmd_watcher {
 public:
-	ctrl_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn, int level, ipcsocket *ipc);
+	ctrl_cmd_watcher(svs_state *state, sym_hnd cmd_root);
 	
 	bool update_result();
 	
@@ -88,13 +100,12 @@ private:
 	int  parse_replay(std::string &msg);
 	void update_step();
 	
+	svs_state      *state;
 	ipcsocket      *ipc;
 	soar_interface *si;
 	sym_hnd        cmd_root;
 	wme_hnd        stepwme;
 	cmd_utils      utils;
-	scene          *scn;
-	int            level;
 	int            id;
 	int            step;
 	bool           broken;

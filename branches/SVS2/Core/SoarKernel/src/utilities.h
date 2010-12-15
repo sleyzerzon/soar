@@ -57,7 +57,7 @@ extern struct timeval *current_real_time;
 /* RMJ */
 extern void wake_from_attention_lapse ();
 extern void init_attention_lapse ();
-extern void start_attention_lapse (long duration);
+extern void start_attention_lapse (int64_t duration);
 #endif // ATTENTION_LAPSE
 
 // formerly in misc.h:
@@ -126,11 +126,18 @@ class stats_statement_container: public soar_module::sqlite_statement_container
 };
 
 // Store statistics in to database
-extern void stats_db_store(agent* thisAgent, const unsigned long& dc_time, const unsigned long& dc_wm_changes, const unsigned long& dc_firing_counts);
+extern void stats_db_store(agent* thisAgent, const uint64_t& dc_time, const uint64_t& dc_wm_changes, const uint64_t& dc_firing_counts);
 
 extern void stats_close( agent *my_agent );
 
 // Useful for converting enumerations to string
 #define stringify( name ) # name
+
+/* derived_kernel_time := Total of the time spent in the phases of the decision cycle, 
+excluding Input Function, Output function, and pre-defined callbacks. 
+This computed time should be roughly equal to total_kernel_time, 
+as determined above. */
+uint64_t get_derived_kernel_time_usec(agent* thisAgent);
+
 
 #endif //UTILITIES_H

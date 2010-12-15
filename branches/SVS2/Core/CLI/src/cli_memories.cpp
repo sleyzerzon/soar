@@ -14,7 +14,6 @@
 
 #include "cli_Commands.h"
 #include "sml_Names.h"
-#include "cli_CLIError.h"
 
 #include "agent.h"
 #include "production.h"
@@ -25,7 +24,7 @@ using namespace cli;
 using namespace sml;
 
 struct MemoriesSort {
-	bool operator()(std::pair< std::string, unsigned long > a, std::pair< std::string, unsigned long > b) const {
+	bool operator()(std::pair< std::string, uint64_t > a, std::pair< std::string, uint64_t > b) const {
 		return a.second < b.second;
 	}
 };
@@ -64,14 +63,14 @@ bool CommandLineInterface::ParseMemories(std::vector<std::string>& argv) {
 				options.set(MEMORIES_USER);
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// Max one additional argument
 	if (m_NonOptionArguments > 1) {
 		SetErrorDetail("Expected at most one additional argument, either a production or a number.");
-		return SetError(CLIError::kTooManyArgs);		
+		return SetError(kTooManyArgs);		
 	}
 
 	// It is either a production or a number
@@ -80,10 +79,10 @@ bool CommandLineInterface::ParseMemories(std::vector<std::string>& argv) {
 		int optind = m_Argument - m_NonOptionArguments;
 		if ( from_string( n, argv[optind] ) ) {
 			// number
-			if (n <= 0) return SetError(CLIError::kIntegerMustBePositive);
+			if (n <= 0) return SetError(kIntegerMustBePositive);
 		} else {
 			// production
-			if (options.any()) return SetError(CLIError::kNoProdTypeWhenProdName);
+			if (options.any()) return SetError(kNoProdTypeWhenProdName);
 			return DoMemories(options, 0, &argv[optind]);
 		}
 	}
@@ -96,24 +95,24 @@ bool CommandLineInterface::ParseMemories(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoMemories(const MemoriesBitset options, int n, const std::string* pProduction) {
-	std::vector< std::pair< std::string, unsigned long > > memories;
+	std::vector< std::pair< std::string, uint64_t > > memories;
 
 	// get either one production or all of them
 	if (options.none()) {
 		if (!pProduction)
 		{
-			return SetError(CLIError::kProductionRequired);
+			return SetError(kProductionRequired);
 		}
 
 		Symbol* sym = find_sym_constant( m_pAgentSoar, pProduction->c_str() );
 
 		if (!sym || !(sym->sc.production))
 		{
-			return SetError(CLIError::kProductionNotFound);
+			return SetError(kProductionNotFound);
 		}
 
 		// save the tokens/name pair
-		std::pair< std::string, unsigned long > memory;
+		std::pair< std::string, uint64_t > memory;
 		memory.first = *pProduction;
 		memory.second = count_rete_tokens_for_production(m_pAgentSoar, sym->sc.production);
 		memories.push_back(memory);
@@ -175,14 +174,14 @@ bool CommandLineInterface::DoMemories(const MemoriesBitset options, int n, const
 				foundProduction = true;
 				
 				// save the tokens/name pair
-				std::pair< std::string, unsigned long > memory;
+				std::pair< std::string, uint64_t > memory;
 				memory.first = pSoarProduction->name->sc.name;
 				memory.second = count_rete_tokens_for_production(m_pAgentSoar, pSoarProduction);
 				memories.push_back(memory);
 			}
 		}
 	
-		if (!foundProduction) return SetError(CLIError::kProductionNotFound);
+		if (!foundProduction) return SetError(kProductionNotFound);
 	}
 
 	// sort them
@@ -191,7 +190,7 @@ bool CommandLineInterface::DoMemories(const MemoriesBitset options, int n, const
 
 	// print them
 	int i = 0;
-	for (std::vector< std::pair< std::string, unsigned long > >::reverse_iterator j = memories.rbegin(); 
+	for (std::vector< std::pair< std::string, uint64_t > >::reverse_iterator j = memories.rbegin(); 
 		j != memories.rend() && (n == 0 || i < n); 
 		++j, ++i) 
 	{

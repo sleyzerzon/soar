@@ -40,13 +40,17 @@ public:
 
 	~svs_state();
 	
+	void           update(const std::string &msg);
 	void           process_cmds();
 	void           update_cmd_results(bool early);
-	int            get_level()           { return level; }
-	scene          *get_scene()          { return scn;   }
-	sym_hnd        get_state()           { return state; }
-	soar_interface *get_soar_interface() { return si;    }
-	ipcsocket      *get_ipc()            { return ipc;   }
+	void           update_scene_num();
+	
+	int            get_level()           { return level;     }
+	int            get_scene_num()       { return scene_num; }
+	scene          *get_scene()          { return scn;       }
+	sym_hnd        get_state()           { return state;     }
+	soar_interface *get_soar_interface() { return si;        }
+	ipcsocket      *get_ipc()            { return ipc;       }
 	
 private:
 	void init();
@@ -67,6 +71,9 @@ private:
 	sym_hnd scene_link;
 	sym_hnd cmd_link;
 
+	int scene_num;
+	wme_hnd scene_num_wme;
+	
 	/* command changes per decision cycle */
 	std::map<wme_hnd, cmd_watcher*> curr_cmds;
 };

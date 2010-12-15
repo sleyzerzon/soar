@@ -166,6 +166,9 @@ void filter::notify() {
 
 filter_result *filter::get_result() {
 	if (dirty) {
+		if (cached) {
+			delete cached;
+		}
 		cached = calc_result();
 		dirty = false;
 	}
@@ -174,6 +177,7 @@ filter_result *filter::get_result() {
 
 void filter::set_dirty() {
 	dirty = true;
+	notify();
 }
 
 string filter::get_error() {

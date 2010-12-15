@@ -79,7 +79,7 @@ void IdentifierSymbol::AddChild(WMElement* pWME)
 	}
 }
 
-WMElement* IdentifierSymbol::GetChildByTimeTag(long timeTag)
+WMElement* IdentifierSymbol::GetChildByTimeTag(long long timeTag)
 {
 	Identifier::ChildrenIter iter = std::find_if( m_Children.begin(), m_Children.end(), WMEFinderTimeTag( timeTag ) );
 	if ( iter != m_Children.end() )
@@ -154,7 +154,7 @@ void IdentifierSymbol::DebugString(std::string& result)
 }
 
 // This version is only needed at the top of the tree (e.g. the input link)
-Identifier::Identifier(Agent* pAgent, char const* pAttributeName, char const* pIdentifier, long timeTag) 
+Identifier::Identifier(Agent* pAgent, char const* pAttributeName, char const* pIdentifier, long long timeTag) 
 : WMElement(pAgent, NULL, pIdentifier, pAttributeName, timeTag)
 {
 	//m_pSymbol = GetAgent()->GetWM()->FindIdentifierSymbol(pIdentifier);
@@ -173,7 +173,7 @@ Identifier::Identifier(Agent* pAgent, char const* pAttributeName, char const* pI
 }
 
 // The normal case (where there is a parent id)
-Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char const* pAttributeName, char const* pIdentifier, long timeTag) 
+Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char const* pAttributeName, char const* pIdentifier, long long timeTag) 
 : WMElement(pAgent, pParent->GetSymbol(), pID, pAttributeName, timeTag)
 {
 	//m_pSymbol = GetAgent()->GetWM()->FindIdentifierSymbol(pIdentifier);
@@ -191,7 +191,7 @@ Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char
 	//	<< " " << this->GetValueAsString() << ": " << this->GetTimeTag() << ")" << std::endl;
 }
 
-Identifier::Identifier(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, char const* pIdentifier, long timeTag) 
+Identifier::Identifier(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, char const* pIdentifier, long long timeTag) 
 : WMElement(pAgent, pParentSymbol, pID, pAttributeName, timeTag)
 {
 	//m_pSymbol = GetAgent()->GetWM()->FindIdentifierSymbol(pIdentifier);
@@ -210,7 +210,7 @@ Identifier::Identifier(Agent* pAgent, IdentifierSymbol* pParentSymbol, char cons
 }
 
 // Creating one identifier to have the same value as another
-Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char const* pAttributeName, Identifier* pLinkedIdentifier, long timeTag) 
+Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char const* pAttributeName, Identifier* pLinkedIdentifier, long long timeTag) 
 : WMElement(pAgent, pParent->GetSymbol(), pID, pAttributeName, timeTag)
 {
 	m_pSymbol = pLinkedIdentifier->m_pSymbol ;
@@ -220,7 +220,7 @@ Identifier::Identifier(Agent* pAgent, Identifier* pParent, char const* pID, char
 	//	<< " " << this->GetValueAsString() << ": " << this->GetTimeTag() << ")" << std::endl;
 }
 
-Identifier::Identifier(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, IdentifierSymbol* pLinkedIdentifierSymbol, long timeTag) 
+Identifier::Identifier(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, IdentifierSymbol* pLinkedIdentifierSymbol, long long timeTag) 
 : WMElement(pAgent, pParentSymbol, pID, pAttributeName, timeTag)
 {
 	m_pSymbol = pLinkedIdentifierSymbol;
@@ -335,7 +335,7 @@ void Identifier::AddErrorCode(int errorCode)
 *
 * @param timeTag	The tag to look for (e.g. +12 for kernel side or -15 for client side)
 *************************************************************/
-WMElement* Identifier::FindFromTimeTag(long timeTag) const
+WMElement* Identifier::FindFromTimeTag(long long timeTag) const
 {
 	// SLOWSLOW: We could use a hash table to speed this up and replace O(n) with O(1).
 	// Right now that will only impact performance when elements are removed from the output link,
@@ -412,7 +412,7 @@ void Identifier::Refresh()
 }
 
 #ifdef SML_DIRECT
-void Identifier::DirectAdd(Direct_AgentSML_Handle pAgentSML, long timeTag)
+void Identifier::DirectAdd(Direct_AgentSML_Handle pAgentSML, long long timeTag)
 {
 	EmbeddedConnection* pConnection = static_cast<EmbeddedConnection*>(GetAgent()->GetConnection());
 	pConnection->DirectAddID( pAgentSML, m_ID->GetIdentifierSymbol(), GetAttribute(), GetValueAsString(), timeTag);
@@ -424,7 +424,7 @@ StringElement* Identifier::CreateStringWME(char const* pAttribute, char const* p
 	return this->m_Agent->GetWM()->CreateStringWME(this, pAttribute, pValue);
 }
 
-IntElement* Identifier::CreateIntWME(char const* pAttribute, int value)
+IntElement* Identifier::CreateIntWME(char const* pAttribute, long long value)
 {
 	return this->m_Agent->GetWM()->CreateIntWME(this, pAttribute, value);
 }

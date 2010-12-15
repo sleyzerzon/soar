@@ -19,9 +19,9 @@ bool direction_filter::get_direction(vec3 &result) {
 	b.get_vals(b1[0], b1[1], b1[2], b2[0], b2[1], b2[2]);
 	
 	for(i = 0; i < 3; i++) {
-		if (a2[i] < b1[i]) {
+		if (a2[i] <= b1[i]) {
 			r[i] = -1;
-		} else if (b2[i] < a1[i]) {
+		} else if (b2[i] <= a1[i]) {
 			r[i] = 1;
 		} else {
 			r[i] = 0;
@@ -41,16 +41,22 @@ filter_result *direction_filter::calc_result() {
 	switch (dir) {
 		case 'v':  // vertically aligned
 			result = (d[0] == 0);
+			break;
 		case 'e':
 			result = (d[0] == 1);
+			break;
 		case 'w':
 			result = (d[0] == -1);
+			break;
 		case 'h': // horizontally aligned
 			result = (d[1] == 0);
+			break;
 		case 'n':
 			result = (d[1] == 1);
+			break;
 		case 's':
 			result = (d[1] == -1);
+			break;
 	}
 	return new bool_filter_result(result);
 }

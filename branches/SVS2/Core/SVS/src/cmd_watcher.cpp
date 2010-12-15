@@ -7,8 +7,6 @@
 
 using namespace std;
 
-extern int parse_state_update(string s, scene *scn);
-
 bool is_reserved_param(const string &name) {
 	return name == "result" || name == "parent";
 }
@@ -28,10 +26,7 @@ void cleanstring(string &s) {
 cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
 	sym_hnd        id;
 	string         attr;
-	soar_interface *si   = state->get_soar_interface();
-	scene          *scn  = state->get_scene();
-	int            level = state->get_level();
-	ipcsocket      *ipc  = state->get_ipc();
+	soar_interface *si = state->get_soar_interface();
 	
 	if (!si->get_val(si->get_wme_attr(w), attr)) {
 		return NULL;
@@ -42,17 +37,19 @@ cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
 	}
 	
 	if (attr == "extract") {
-		return new extract_cmd_watcher(si, id, scn);
+		return new extract_cmd_watcher(state, id);
 	} else if (attr == "generate") {
-		return new gen_cmd_watcher(si, id, scn);
+		return new gen_cmd_watcher(state, id);
 	} else if (attr == "control") {
-		return new ctrl_cmd_watcher(si, id, scn, level, ipc);
+		return new ctrl_cmd_watcher(state, id);
+	} else if (attr == "recall") {
+		return new recall_cmd_watcher(state, id);
 	}
 	return NULL;
 }
 
-cmd_utils::cmd_utils(soar_interface *si, sym_hnd cmd_root, scene *scn)
-: si(si), cmd_root(cmd_root), result_wme(NULL), scn(scn), subtree_size(0), max_time_tag(0)
+cmd_utils::cmd_utils(svs_state *state, sym_hnd cmd_root)
+: state(state), si(state->get_soar_interface()), cmd_root(cmd_root), result_wme(NULL), subtree_size(0), max_time_tag(0)
 { }
 
 void cmd_utils::set_result(const string &r) {
@@ -233,15 +230,15 @@ bool cmd_utils::get_filter_params(sym_hnd id, filter_params &p) {
 filter* cmd_utils::make_node_filter(string name) {
 	sg_node *n;
 	
-	n = scn->get_node(name);
+	n = state->get_scene()->get_node(name);
 	if (!n) {
 		return NULL;
 	}
 	return new const_node_filter(n);
 }
 
-extract_cmd_watcher::extract_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn)
-: utils(si, cmd_root, scn), dirty(true), result_filter(NULL)
+extract_cmd_watcher::extract_cmd_watcher(svs_state *state, sym_hnd cmd_root)
+: state(state), utils(state, cmd_root), dirty(true), result_filter(NULL)
 {}
 
 extract_cmd_watcher::~extract_cmd_watcher() {
@@ -282,8 +279,8 @@ bool extract_cmd_watcher::update_result() {
 	return true;
 }
 
-gen_cmd_watcher::gen_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn) 
-: utils(si, cmd_root, scn), cmd_root(cmd_root), parent(NULL), generated(NULL), scn(scn), result_filter(NULL)
+gen_cmd_watcher::gen_cmd_watcher(svs_state *state, sym_hnd cmd_root) 
+: state(state), utils(state, cmd_root), cmd_root(cmd_root), parent(NULL), generated(NULL), result_filter(NULL)
 { }
 
 gen_cmd_watcher::~gen_cmd_watcher() {
@@ -305,7 +302,7 @@ bool gen_cmd_watcher::get_parent() {
 	}
 	
 	node_name_map::iterator j;
-	if (!(new_parent = scn->get_node(name))) {
+	if (!(new_parent = state->get_scene()->get_node(name))) {
 		return false;
 	}
 	
@@ -369,9 +366,9 @@ bool gen_cmd_watcher::update_result() {
 	return true;
 }
 
-ctrl_cmd_watcher::ctrl_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *scn, int level, ipcsocket *ipc)
-: utils(si, cmd_root, scn), si(si), cmd_root(cmd_root), scn(scn), 
-  ipc(ipc), level(level), step(0), stepwme(NULL), broken(false)
+ctrl_cmd_watcher::ctrl_cmd_watcher(svs_state *state, sym_hnd cmd_root)
+: state(state), si(state->get_soar_interface()), ipc(state->get_ipc()), cmd_root(cmd_root), 
+  utils(state, cmd_root), step(0), stepwme(NULL), broken(false)
 {
 	wme_hnd w;
 	string type, msg;
@@ -379,7 +376,7 @@ ctrl_cmd_watcher::ctrl_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *
 	
 	r = parse_objective(msg);
 	if (r == 0) {
-		ipc->send("seek", level, msg);
+		ipc->send("seek", state->get_level(), msg);
 	} else if (r == 2) {
 		broken = true;
 		utils.set_result("objective syntax");
@@ -387,13 +384,13 @@ ctrl_cmd_watcher::ctrl_cmd_watcher(soar_interface *si, sym_hnd cmd_root, scene *
 	} else {
 		r = parse_replay(msg);
 		if (r == 0) {
-			ipc->send("replay", level, msg);
+			ipc->send("replay", state->get_level(), msg);
 		} else if (r == 2) {
 			broken = true;
 			utils.set_result("replay syntax");
 			return;
 		} else {
-			ipc->send("random", level, "");
+			ipc->send("random", state->get_level(), "");
 		}
 	}
 	
@@ -464,14 +461,14 @@ bool ctrl_cmd_watcher::update_result() {
 		return false;
 	}
 	ss << id << endl;
-	ipc->send("stepctrl", level, ss.str());
+	ipc->send("stepctrl", state->get_level(), ss.str());
 	ipc->receive(type, msg);
 	if (type == "error") {
 		utils.set_result(msg);
 		return false;
 	}
 	assert(type == "stateupdate");
-	parse_state_update(msg, scn);
+	state->update(msg);
 	utils.set_result("success");
 	step++;
 	update_step();
@@ -482,4 +479,37 @@ void ctrl_cmd_watcher::update_step() {
 	if (stepwme)
 		si->remove_wme(stepwme);
 	stepwme = si->make_wme(cmd_root, "step", step);
+}
+
+recall_cmd_watcher::recall_cmd_watcher(svs_state *state, sym_hnd cmd_root)
+: state(state), utils(state, cmd_root)
+{
+	wme_hnd w;
+	long state_num;
+	stringstream ss;
+	string type, msg;
+	
+	ipcsocket *ipc = state->get_ipc();
+	soar_interface *si = state->get_soar_interface();
+	
+	if (!si->find_child_wme(cmd_root, "state_num", w)) {
+		utils.set_result("missing state_num parameter");
+		return;
+	}
+	
+	if (!si->get_val(si->get_wme_val(w), state_num)) {
+		utils.set_result("state_num not integer type");
+		return;
+	}
+	
+	ss << state_num;
+	ipc->send("recall", state->get_level(), ss.str());
+	ipc->receive(type, msg);
+	
+	assert(type == "stateupdate");
+	state->update(msg);
+}
+
+bool recall_cmd_watcher::update_result() {
+	return true;
 }

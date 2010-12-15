@@ -1,17 +1,14 @@
+#include <iostream>
 #include "../filter.h"
 #include "bbox_filter.h"
 
+using namespace std;
+
 class bbox_int_filter : public filter {
 public:
-	bbox_int_filter(filter *a, filter *b) 
-	: container(this)
-	{
-		bbox_filter *ab, *bb;
-		ab = new bbox_filter(a);
-		bb = new bbox_filter(b);
-		container.add(ab);
-		container.add(bb);
-	}
+	bbox_int_filter(filter *node_a, filter *node_b) 
+	: container(this, new bbox_filter(node_a), new bbox_filter(node_b))
+	{}
 	
 	filter_result* calc_result() {
 		bbox a, b;

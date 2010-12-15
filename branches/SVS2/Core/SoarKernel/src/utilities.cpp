@@ -285,7 +285,7 @@ void init_attention_lapse (void) {
          (struct timeval *) malloc(sizeof(struct timeval));
 #endif // REAL_TIME_BEHAVIOR
 }
-void start_attention_lapse (long duration) {
+void start_attention_lapse (int64_t duration) {
    /* Set tracker to time we should wake up */
    start_timer (thisAgent->attention_lapse_tracker);
    thisAgent->attention_lapse_tracker->tv_usec += 1000 * duration;
@@ -307,7 +307,7 @@ void determine_lapsing (agent* thisAgent) {
       if (thisAgent->attention_lapsing) {
          /* If lapsing, is it time to stop? */
          start_timer (thisAgent, current_real_time);
-         if (timercmp(current_real_time,
+         if (`cmp(current_real_time,
                       thisAgent->attention_lapse_tracker, >)) {
             wake_from_attention_lapse();
          }
@@ -326,7 +326,7 @@ void determine_lapsing (agent* thisAgent) {
    will normally be provided as a user-defined TCL procedure.  But
    we need to put a placeholder function here just to be safe.
 */
-long init_lapse_duration(struct timeval *tv) {
+int64_t init_lapse_duration(struct timeval *tv) {
    return 0;
 }
 #endif // ATTENTION_LAPSE
@@ -368,11 +368,6 @@ double get_number_from_symbol( Symbol *sym )
 	return 0.0;
 }
 
-
-
-
-
-
 void stats_init_db( agent *my_agent )
 {
 	if ( my_agent->stats_db->get_status() != soar_module::disconnected )
@@ -402,7 +397,7 @@ void stats_init_db( agent *my_agent )
 }
 
 
-void stats_db_store(agent* my_agent, const unsigned long& dc_time, const unsigned long& dc_wm_changes, const unsigned long& dc_firing_counts) 
+void stats_db_store(agent* my_agent, const uint64_t& dc_time, const uint64_t& dc_wm_changes, const uint64_t& dc_firing_counts) 
 {
 	if ( my_agent->stats_db->get_status() == soar_module::disconnected )
 	{
@@ -478,5 +473,19 @@ void stats_close( agent *my_agent )
 		// close the database
 		my_agent->stats_db->disconnect();
 	}
+}
+
+uint64_t get_derived_kernel_time_usec(agent* thisAgent) {
+#ifndef NO_TIMING_STUFF
+    return thisAgent->timers_decision_cycle_phase[INPUT_PHASE].get_usec()
+        + thisAgent->timers_decision_cycle_phase[PROPOSE_PHASE].get_usec()
+        + thisAgent->timers_decision_cycle_phase[APPLY_PHASE].get_usec()
+        + thisAgent->timers_decision_cycle_phase[PREFERENCE_PHASE].get_usec()
+        + thisAgent->timers_decision_cycle_phase[WM_PHASE].get_usec()
+        + thisAgent->timers_decision_cycle_phase[OUTPUT_PHASE].get_usec()
+        + thisAgent->timers_decision_cycle_phase[DECISION_PHASE].get_usec();
+#else
+    return 0;
+#endif
 }
 

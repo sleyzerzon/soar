@@ -13,7 +13,6 @@
 #include <algorithm>
 
 #include "cli_Commands.h"
-#include "cli_CLIError.h"
 
 #include "sml_Names.h"
 
@@ -25,7 +24,7 @@ using namespace cli;
 using namespace sml;
 
 struct FiringsSort {
-	bool operator()(std::pair< std::string, unsigned long > a, std::pair< std::string, unsigned long > b) const {
+	bool operator()(std::pair< std::string, uint64_t > a, std::pair< std::string, uint64_t > b) const {
 		return a.second < b.second;
 	}
 };
@@ -39,12 +38,12 @@ bool CommandLineInterface::ParseFiringCounts(std::vector<std::string>& argv) {
 	std::string* pProduction = 0;
 
 	// no more than 1 arg
-	if (argv.size() > 2) return SetError(CLIError::kTooManyArgs);
+	if (argv.size() > 2) return SetError(kTooManyArgs);
 
 	if (argv.size() == 2) {
 		// one argument, figure out if it is a non-negative integer or a production
 		if ( from_string( numberToList, argv[1] ) ){
-			if (numberToList < 0) return SetError(CLIError::kIntegerMustBeNonNegative);
+			if (numberToList < 0) return SetError(kIntegerMustBeNonNegative);
 
 		} else {
 			numberToList = -1;
@@ -58,7 +57,7 @@ bool CommandLineInterface::ParseFiringCounts(std::vector<std::string>& argv) {
 }
 
 bool CommandLineInterface::DoFiringCounts(const int numberToList, const std::string* pProduction) {
-	std::vector< std::pair< std::string, unsigned long > > firings;
+	std::vector< std::pair< std::string, uint64_t > > firings;
 
 	// if we have a production, just get that one, otherwise get them all
 	if (pProduction) 
@@ -67,10 +66,10 @@ bool CommandLineInterface::DoFiringCounts(const int numberToList, const std::str
 
 		if (!sym || !(sym->sc.production))
 		{
-			return SetError(CLIError::kProductionNotFound);
+			return SetError(kProductionNotFound);
 		}
 
-		std::pair< std::string, unsigned long > firing;
+		std::pair< std::string, uint64_t > firing;
 		firing.first = *pProduction;
 		firing.second = sym->sc.production->firing_count;
 		firings.push_back(firing);
@@ -95,14 +94,14 @@ bool CommandLineInterface::DoFiringCounts(const int numberToList, const std::str
 				foundProduction = true;
 
 				// store the name and count
-				std::pair< std::string, unsigned long > firing;
+				std::pair< std::string, uint64_t > firing;
 				firing.first = pSoarProduction->name->sc.name;
 				firing.second = pSoarProduction->firing_count;
 				firings.push_back(firing);
 			}
 		}
 	
-		if (!foundProduction) return SetError(CLIError::kProductionNotFound);
+		if (!foundProduction) return SetError(kProductionNotFound);
 	}
 
 	// Sort the list
@@ -111,7 +110,7 @@ bool CommandLineInterface::DoFiringCounts(const int numberToList, const std::str
 
 	// print the list
 	int i = 0;
-	for (std::vector< std::pair< std::string, unsigned long > >::reverse_iterator j = firings.rbegin(); 
+	for (std::vector< std::pair< std::string, uint64_t > >::reverse_iterator j = firings.rbegin(); 
 		j != firings.rend() && (numberToList <= 0 || i < numberToList); 
 		++j, ++i) 
 	{

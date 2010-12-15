@@ -12,15 +12,14 @@ if not env['STATIC_LINKED']:
 	clone.Append(LIBPATH = ['$PREFIX/lib'])
 
 if env['SCU']:
-	if env['STATIC_LINKED']:
-		SoarKernelSML = clone.Library('SoarKernelSML', 'KernelSML.cxx')
-	else:
-		SoarKernelSML = clone.SharedLibrary('SoarKernelSML', 'KernelSML.cxx')
+	srcs = 'KernelSML.cxx'
 else:
-	if env['STATIC_LINKED']:
-		SoarKernelSML = clone.Library('SoarKernelSML', Glob('src/*.cpp'))
-	else:
-		SoarKernelSML = clone.SharedLibrary('SoarKernelSML', Glob('src/*.cpp'))
+	srcs = Glob('src/*.cpp')
+
+if env['STATIC_LINKED']:
+	SoarKernelSML = clone.Library('SoarKernelSML', srcs)
+else:
+	SoarKernelSML = clone.SharedLibrary('SoarKernelSML', srcs)
 
 env.Install('$PREFIX/lib', SoarKernelSML)
 

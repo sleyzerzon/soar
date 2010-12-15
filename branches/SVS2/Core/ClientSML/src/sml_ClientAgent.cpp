@@ -63,7 +63,6 @@ Agent::Agent(Kernel* pKernel, char const* pName)
 	m_BlinkIfNoChange = true ;
 
 	m_WorkingMemory.SetAgent(this) ;
-	m_WorkingMemory.SetOutputLinkChangeTracking(true);
 
 	m_pDPI = 0;
 
@@ -218,21 +217,20 @@ void Agent::ReceivedProductionEvent(smlProductionEventId id, AnalyzeXML* pIncomi
 
 bool Agent::LoadProductions(char const* pFilename, bool echoResults)
 {
-	// gSKI's LoadProductions command doesn't support all of the command line commands we need,
-	// so we'll send this through the command line processor instead by creating a "source" command.
-	std::stringstream cmd;
-	cmd << "source ";
-	if (strlen(pFilename) && (pFilename[0] == '\"') && (pFilename[strlen(pFilename) - 1] == '\"'))
-	{
-		cmd << pFilename ;
-	} else {
-		cmd << '\"';
-		cmd << pFilename ;
-		cmd << '\"';
-	}
+    if (!pFilename)
+        return false;
 
-	// Execute the source command
-	char const* pResult = ExecuteCommandLine(cmd.str().c_str(), echoResults) ;
+    // remove quotes or braces if they exist
+    std::string cmd("source {");
+    size_t len = strlen(pFilename);
+    if ((pFilename[0] == '\"' && pFilename[len - 1] == '\"') || (pFilename[0] == '{' && pFilename[len - 1] == '}'))
+        cmd.append(pFilename + 1, len - 2);
+    else
+        cmd.append(pFilename, len);
+    cmd.push_back('}');
+
+	// Execute the source command, insert braces
+    char const* pResult = ExecuteCommandLine(cmd.c_str(), echoResults) ;
 
 	bool ok = GetLastCommandLineResult() ;
 
@@ -967,7 +965,7 @@ Identifier*	Agent::CreateSharedIdWME(Identifier* parent, char const* pAttribute,
 	return GetWM()->CreateSharedIdWME(parent, pAttribute, pSharedValue) ;
 }
 
-IntElement* Agent::CreateIntWME(Identifier* parent, char const* pAttribute, int value)
+IntElement* Agent::CreateIntWME(Identifier* parent, char const* pAttribute, long long value)
 {
 	if (!parent || parent->GetAgent() != this)
 		return NULL ;
@@ -987,7 +985,7 @@ void Agent::Update(StringElement* pWME, char const* pValue)
 { 
 	GetWM()->UpdateString(pWME, pValue) ; 
 }
-void Agent::Update(IntElement* pWME, int value)				
+void Agent::Update(IntElement* pWME, long long value)				
 { 
 	GetWM()->UpdateInt(pWME, value) ; 
 }
@@ -1044,7 +1042,7 @@ char const*	Agent::StopSelf()
 	return pResult ;
 }
 
-char const* Agent::RunSelf(unsigned long numberSteps, smlRunStepSize stepSize)
+char const* Agent::RunSelf(uint64_t numberSteps, smlRunStepSize stepSize)
 {
 	if (IsCommitRequired())
 	{

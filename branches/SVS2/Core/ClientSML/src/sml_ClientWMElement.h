@@ -44,7 +44,7 @@ protected:
 	
 	// The time tag (a unique id for this WME)
 	// We used negative values so it's clear that this time tag is a client side tag.
-	long	m_TimeTag ;
+	long long	m_TimeTag ;
 
 	// The identifier symbol as a string.  This can be necessary when connecting up
 	// disconnected segments of a graph.
@@ -79,7 +79,7 @@ public:
 	// Returns a string form of the value stored here.
 	virtual char const* GetValueAsString() const = 0 ;
 
-	long		GetTimeTag() const	{ return m_TimeTag ; }
+	long long GetTimeTag() const	{ return m_TimeTag ; }
 
 	// The Identifier class overrides this to return true.  (The poor man's RTTI).
 	virtual bool IsIdentifier() const { return false ; }
@@ -132,7 +132,7 @@ protected:
 	// Keep these protected, so user can only create and destroy WMEs through
 	// the methods exposed in the agent class.  This makes it clear that the
 	// agent owns all objects.
-	WMElement(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, long timeTag);
+	WMElement(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, long long timeTag);
 	virtual ~WMElement(void);
 
 	void	SetJustAdded(bool state) { m_JustAdded = state ; }
@@ -154,7 +154,7 @@ protected:
 	virtual void Refresh() ;
 
 #ifdef SML_DIRECT
-	virtual void DirectAdd(Direct_AgentSML_Handle pAgentSML, long timeTag) = 0 ;
+	virtual void DirectAdd(Direct_AgentSML_Handle pAgentSML, long long timeTag) = 0 ;
 #endif
 
 private:
@@ -182,7 +182,7 @@ struct WMEFinder
 
 struct WMEFinderTimeTag
 {
-	WMEFinderTimeTag( long timeTag )
+	WMEFinderTimeTag( long long timeTag )
 	: timeTag( timeTag )
 	{
 	}
@@ -192,7 +192,7 @@ struct WMEFinderTimeTag
 		return timeTag == wme->GetTimeTag();
 	}
 
-	long timeTag;
+	long long timeTag;
 };
 
 }	// namespace

@@ -12,7 +12,6 @@
 #include "cli_CommandLineInterface.h"
 
 #include "cli_Commands.h"
-#include "cli_CLIError.h"
 
 #include "sml_Names.h"
 
@@ -49,12 +48,12 @@ bool CommandLineInterface::ParseTimers(std::vector<std::string>& argv) {
 				setting = false; // disable timers
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// No non-option arguments
-	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments) return SetError(kTooManyArgs);
 
 	return DoTimers(print ? 0 : &setting);
 }
@@ -67,7 +66,20 @@ bool CommandLineInterface::DoTimers(bool* pSetting) {
 	} else {
 		// print current setting
 		if (m_RawOutput) {
-			m_Result << (m_pAgentSoar->sysparams[TIMERS_ENABLED] ? "Timers are enabled." : "Timers are disabled.");
+#ifdef NO_TIMING_STUFF
+            m_Result << "Timers are disabled (compiled out).";
+#else // NO_TIMING_STUFF
+#ifdef USE_PERFORMANCE_FOR_BOTH
+			m_Result << "High-resolution timers are ";
+#else // USE_PERFORMANCE_FOR_BOTH
+			m_Result << "Timers are ";
+#endif // USE_PERFORMANCE_FOR_BOTH
+			m_Result << (m_pAgentSoar->sysparams[TIMERS_ENABLED] ? "enabled" : "disabled");
+#ifdef DETAILED_TIMING_STATS
+			m_Result << ", detailed stats are on";
+#endif // DETAILED_TIMING_STATS
+#endif // NO_TIMING_STUFF
+            m_Result << ".";
 		} else {
 			// adds <arg name="timers">true</arg> (or false) if the timers are
 			// enabled (or disabled)

@@ -21,7 +21,7 @@
 
 using namespace sml ;
 
-WMElement::WMElement(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, long timeTag)
+WMElement::WMElement(Agent* pAgent, IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttributeName, long long timeTag)
 {
 	m_TimeTag = timeTag;
 	m_Agent = pAgent;

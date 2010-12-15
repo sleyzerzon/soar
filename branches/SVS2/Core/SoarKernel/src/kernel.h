@@ -59,8 +59,8 @@ struct rete_node_struct;
 //  int     window_y;
 //  int     width;
 //  int     height;
-//  unsigned long foreground;
-//  unsigned long background;
+//  uint64_t foreground;
+//  uint64_t background;
 //  int     borderwidth;
 //  Symbol * last_op_id; /* Used in monitors */
 //} x_info;
@@ -117,7 +117,7 @@ typedef union symbol_union Symbol;
    on how much time is spent in various parts of the system.  If you
    have DETAILED_TIMING_STATS defined, you must NOT define NO_TIMING_STUFF */
 #ifndef NO_TIMING_STUFF
-#define DETAILED_TIMING_STATS
+//#define DETAILED_TIMING_STATS
 #endif // NO_TIMING_STUFF
 
 /* UNcomment the following line to have Soar maintain reference counts 
@@ -224,7 +224,7 @@ typedef signed short goal_stack_level;
 -------------------------------------------------------------------- */
 
 typedef char Bool;
-typedef unsigned long tc_number;
+typedef uint64_t tc_number;
 typedef unsigned char byte;
 typedef struct agent_struct agent;
 

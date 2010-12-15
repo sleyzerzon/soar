@@ -107,13 +107,7 @@ void KernelSML::InitializeLibraryLocation()
 
 	m_LibraryDirectory.assign(dllpath);
 
-	// This chops off the dll part to get just the path (/path/to/out/bin)
-	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.find_last_of(get_directory_separator()));
-
-	// This takes the parent directory to get (/path/to/out)
-	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.find_last_of(get_directory_separator()));
-	m_LibraryDirectory.append(get_directory_separator());
-	return;
+    normalize_separators(m_LibraryDirectory);
 
 #else // WIN32
 	struct stat statbuf;
@@ -142,14 +136,16 @@ void KernelSML::InitializeLibraryLocation()
 
 	// Get parent directory
 	buf[size-1] = 0;
-	m_LibraryDirectory = buf;
-	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.find_last_of(get_directory_separator()));
-	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.find_last_of(get_directory_separator()));
-	//std::cout << m_LibraryDirectory << std::endl;
-	m_LibraryDirectory.append(get_directory_separator());
-	return;
+	m_LibraryDirectory.assign(buf);
 
 #endif // WIN32
+
+    // This chops off the dll part to get just the path (/path/to/out/bin)
+	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.rfind('/'));
+
+	// This takes the parent directory to get (/path/to/out)
+	m_LibraryDirectory = m_LibraryDirectory.substr(0, m_LibraryDirectory.rfind('/'));
+	m_LibraryDirectory.push_back('/');
 }
 
 const char* KernelSML::GetLibraryLocation()
@@ -512,7 +508,7 @@ bool KernelSML::ReturnResult(Connection* pConnection, soarxml::ElementXML* pResp
 /*************************************************************
 * @brief	Return an integer result to the caller.
 *************************************************************/
-bool KernelSML::ReturnIntResult(Connection* pConnection, soarxml::ElementXML* pResponse, int result)
+bool KernelSML::ReturnIntResult(Connection* pConnection, soarxml::ElementXML* pResponse, int64_t result)
 {
 	char buf[TO_C_STRING_BUFSIZE];
 	pConnection->AddSimpleResultToSMLResponse( pResponse, to_c_string( result, buf ) ) ;
@@ -794,7 +790,7 @@ void KernelSML::PrintDebugSymbol(Symbol* pSymbol, bool refCounts ) {
 * @param pAttribute The attribute name to use
 * @param value		The value to use
 *************************************************************/
-EXPORT void sml_DirectAddWME_String(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, char const* pValue, long clientTimetag)
+EXPORT void sml_DirectAddWME_String(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, char const* pValue, int64_t clientTimetag)
 {
 	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
 	assert(pAgentSML);
@@ -802,7 +798,7 @@ EXPORT void sml_DirectAddWME_String(Direct_AgentSML_Handle pAgentSMLIn, char con
 	pAgentSML->BufferedAddStringInputWME( pId, pAttribute, pValue, clientTimetag );
 }
 
-EXPORT void sml_DirectAddWME_Int(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, int value, long clientTimetag)
+EXPORT void sml_DirectAddWME_Int(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, int64_t value, int64_t clientTimetag)
 {
 	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
 	assert(pAgentSML);
@@ -810,7 +806,7 @@ EXPORT void sml_DirectAddWME_Int(Direct_AgentSML_Handle pAgentSMLIn, char const*
 	pAgentSML->BufferedAddIntInputWME( pId, pAttribute, value, clientTimetag );
 }
 
-EXPORT void sml_DirectAddWME_Double(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, double value, long clientTimetag)
+EXPORT void sml_DirectAddWME_Double(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, double value, int64_t clientTimetag)
 {
 	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
 	assert(pAgentSML);
@@ -824,7 +820,7 @@ EXPORT void sml_DirectAddWME_Double(Direct_AgentSML_Handle pAgentSMLIn, char con
 * @param wm			The working memory object (either input or output)
 * @param wme		The wme we're removing
 *************************************************************/
-EXPORT void sml_DirectRemoveWME(Direct_AgentSML_Handle pAgentSMLIn, long clientTimetag)
+EXPORT void sml_DirectRemoveWME(Direct_AgentSML_Handle pAgentSMLIn, int64_t clientTimetag)
 {
 	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
 	assert(pAgentSML);
@@ -838,7 +834,7 @@ EXPORT void sml_DirectRemoveWME(Direct_AgentSML_Handle pAgentSMLIn, long clientT
 * @param parent		The identifier (WMObject) we're adding to.
 * @param pAttribute	The attribute to add
 *************************************************************/
-EXPORT void sml_DirectAddID(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, char const* pValueId, long clientTimetag)
+EXPORT void sml_DirectAddID(Direct_AgentSML_Handle pAgentSMLIn, char const* pId, char const* pAttribute, char const* pValueId, int64_t clientTimetag)
 {
 	AgentSML* pAgentSML = reinterpret_cast<AgentSML*>(pAgentSMLIn);
 	assert(pAgentSML);

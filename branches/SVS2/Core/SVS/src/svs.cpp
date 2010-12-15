@@ -1,8 +1,10 @@
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <iterator>
 #include <utility>
 #include <algorithm>
-#include <assert.h>
 
 #include "svs.h"
 #include "cmd_watcher.h"
@@ -31,7 +33,7 @@ void print_tree(sg_node *n) {
 }
 
 svs_state::svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common_syms *syms)
-: parent(NULL), state(state), si(soar), cs(syms), ipc(ipc), level(0)
+: parent(NULL), state(state), si(soar), cs(syms), ipc(ipc), level(0), scene_num(-1), scene_num_wme(NULL)
 {
 	string type, msg;
 	
@@ -40,22 +42,29 @@ svs_state::svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common
 	init();
 	ipc->receive(type, msg);
 	assert(type == "initscene");
-	parse_state_update(msg, scn);
+	update(msg);
 	
 	ipc->receive(type, msg);
 	cout << type << endl << msg << endl;
 	assert(type == "stateupdate");
-	parse_state_update(msg, scn);
+	update(msg);
 }
 
 svs_state::svs_state(sym_hnd state, svs_state *parent)
-: parent(parent), state(state), si(parent->si), cs(parent->cs), ipc(parent->ipc), level(parent->level+1)
+: parent(parent), state(state), si(parent->si), 
+  cs(parent->cs), ipc(parent->ipc), level(parent->level+1), 
+  scene_num(parent->scene_num), scene_num_wme(NULL)
 {
 	
 	assert (si->get_parent_state(state) == parent->state);
 	
 	init();
+	update_scene_num();
 	ipc->send("newstate",level, "");
+}
+
+svs_state::~svs_state() {
+	delete scn; // results in wm_sg_root being deleted also
 }
 
 void svs_state::init() {
@@ -79,8 +88,32 @@ void svs_state::init() {
 	
 }
 
-svs_state::~svs_state() {
-	delete scn; // results in wm_sg_root being deleted also
+void svs_state::update(const string &msg) {
+	size_t p = msg.find_first_of('\n');
+	int n;
+	
+	if (sscanf(msg.c_str(), "%d", &n) != 1) {
+		perror("svs_state::update");
+		cout << msg << endl;
+		exit(1);
+	}
+	scene_num = n;
+	update_scene_num();
+	parse_state_update(msg.substr(p+1), scn);
+}
+
+void svs_state::update_scene_num() {
+	long curr;
+	if (scene_num_wme) {
+		if (!si->get_val(si->get_wme_val(scene_num_wme), curr)) {
+			exit(1);
+		}
+		if (curr == scene_num) {
+			return;
+		}
+		si->remove_wme(scene_num_wme);
+	}
+	scene_num_wme = si->make_wme(scene_link, "scene_num", scene_num);
 }
 
 void svs_state::update_cmd_results(bool early) {

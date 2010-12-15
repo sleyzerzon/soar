@@ -866,17 +866,17 @@ Symbol *generate_chunk_name_sym_constant (agent* thisAgent, instantiation *inst)
 
   SNPRINTF (name, BUFFER_GEN_CHUNK_NAME_SIZE, "%s-%lu*d%lu*%s*%lu", 
           thisAgent->chunk_name_prefix,
-          thisAgent->chunk_count++,
-          thisAgent->d_cycle_count,
+          static_cast<long unsigned int>(thisAgent->chunk_count++),
+          static_cast<long unsigned int>(thisAgent->d_cycle_count),
           impass_name,
-          thisAgent->chunks_this_d_cycle
+          static_cast<long unsigned int>(thisAgent->chunks_this_d_cycle)
           );
   name[BUFFER_GEN_CHUNK_NAME_SIZE - 1] = 0; /* ensure null termination */
 
  
   /* Any user who named a production like this deserves to be burned, but we'll have mercy: */
   if (find_sym_constant (thisAgent, name)) {
-    unsigned long collision_count;
+    uint64_t collision_count;
     
     collision_count = 1;
     print (thisAgent, "Warning: generated chunk name already exists.  Will find unique name.\n");
@@ -884,11 +884,11 @@ Symbol *generate_chunk_name_sym_constant (agent* thisAgent, instantiation *inst)
     do {
       SNPRINTF (name, BUFFER_GEN_CHUNK_NAME_SIZE, "%s-%lu*d%lu*%s*%lu*%lu", 
               thisAgent->chunk_name_prefix,
-              thisAgent->chunk_count++,
-              thisAgent->d_cycle_count,
+              static_cast<long unsigned int>(thisAgent->chunk_count++),
+              static_cast<long unsigned int>(thisAgent->d_cycle_count),
               impass_name,
-              thisAgent->chunks_this_d_cycle,
-              collision_count++
+              static_cast<long unsigned int>(thisAgent->chunks_this_d_cycle),
+              static_cast<long unsigned int>(collision_count++)
               );
       name[BUFFER_GEN_CHUNK_NAME_SIZE - 1] = 0; /* ensure null termination */
 
@@ -1177,7 +1177,7 @@ void chunk_instantiation (agent* thisAgent, instantiation *inst, bool dont_varia
 	}
 
 	/* MVP 6-8-94 */
-	if (thisAgent->chunks_this_d_cycle > static_cast<unsigned long>(thisAgent->sysparams[MAX_CHUNKS_SYSPARAM]) ) 
+	if (thisAgent->chunks_this_d_cycle > static_cast<uint64_t>(thisAgent->sysparams[MAX_CHUNKS_SYSPARAM]) ) 
 	{
 		if (thisAgent->sysparams[PRINT_WARNINGS_SYSPARAM]) 
 		{

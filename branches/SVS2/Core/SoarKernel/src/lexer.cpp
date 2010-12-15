@@ -190,9 +190,9 @@ void get_next_char (agent* thisAgent) {
 		(thisAgent->current_file->buffer[BUFSIZE-2] != EOF)) {
 			char msg[512];
 			SNPRINTF (msg, 512,
-				"lexer.c: Error:  line too long (max allowed is %d chars)\nFile %s, line %lu\n",
+				"lexer.c: Error:  line too long (max allowed is %d chars)\nFile %s, line %llu\n",
 				MAX_LEXER_LINE_LENGTH, thisAgent->current_file->filename,
-				thisAgent->current_file->current_line);
+				static_cast<long long unsigned>(thisAgent->current_file->current_line));
 			msg[511] = 0; /* ensure null termination */
 
 			abort_with_fatal_error(thisAgent, msg);

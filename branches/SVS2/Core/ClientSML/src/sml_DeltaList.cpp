@@ -20,7 +20,7 @@
 
 using namespace sml ;
 
-void DeltaList::RemoveWME(long timeTag)
+void DeltaList::RemoveWME(long long timeTag)
 {
 // BADBAD: We should scan the existing list of tags and if we are adding this value
 // just delete that tag and don't add anything to the delta list.

@@ -12,7 +12,6 @@
 #include "cli_CommandLineInterface.h"
 
 #include "cli_Commands.h"
-#include "cli_CLIError.h"
 
 #include "sml_Names.h"
 
@@ -35,7 +34,7 @@ bool CommandLineInterface::ParseChunkNameFormat(std::vector<std::string>& argv) 
 
 	bool changeFormat = false;
 	bool countFlag = false;
-	int count = -1;
+	int64_t count = -1;
 	bool patternFlag = false;
 	std::string pattern;
 	bool longFormat = true;
@@ -48,8 +47,8 @@ bool CommandLineInterface::ParseChunkNameFormat(std::vector<std::string>& argv) 
 			case 'c': 
 				countFlag = true;
 				if (m_OptionArgument.size()) {
-					if ( !from_string( count, m_OptionArgument ) ) return SetError(CLIError::kIntegerExpected);
-					if (count < 0) return SetError(CLIError::kIntegerMustBeNonNegative);
+					if ( !from_string( count, m_OptionArgument ) ) return SetError(kIntegerExpected);
+					if (count < 0) return SetError(kIntegerMustBeNonNegative);
 				}
 				break;
 			case 'p': 
@@ -67,16 +66,16 @@ bool CommandLineInterface::ParseChunkNameFormat(std::vector<std::string>& argv) 
 				longFormat = false;
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
-	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments) return SetError(kTooManyArgs);
 
 	return DoChunkNameFormat(changeFormat ? &longFormat : 0, countFlag ? &count : 0, patternFlag ? &pattern : 0);
 }
 
-bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int* pCount, const std::string* pPrefix) {
+bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int64_t* pCount, const std::string* pPrefix) {
 	if (!pLongFormat && !pCount && !pPrefix) {
 		if (m_RawOutput) {
 			m_Result << "Using " << (m_pAgentSoar->sysparams[USE_LONG_CHUNK_NAMES] ? "long" : "short") << " chunk format.";
@@ -90,9 +89,9 @@ bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int*
 
 	if (pCount) {
 		if (*pCount >= 0) {
-			if (*pCount >= m_pAgentSoar->sysparams[MAX_CHUNKS_SYSPARAM]) return SetError(CLIError::kCountGreaterThanMaxChunks);
-			if (static_cast<unsigned long>(*pCount) < m_pAgentSoar->chunk_count ) return SetError(CLIError::kCountLessThanChunks);
-			m_pAgentSoar->chunk_count = *pCount;
+			if (*pCount >= m_pAgentSoar->sysparams[MAX_CHUNKS_SYSPARAM]) return SetError(kCountGreaterThanMaxChunks);
+			if (static_cast<uint64_t>(*pCount) < m_pAgentSoar->chunk_count ) return SetError(kCountLessThanChunks);
+			m_pAgentSoar->chunk_count = static_cast<uint64_t>(*pCount);
 		} else {
 			// query
 			if (m_RawOutput) {
@@ -108,7 +107,7 @@ bool CommandLineInterface::DoChunkNameFormat(const bool* pLongFormat, const int*
 		if (pPrefix->size()) {
 			if ( strchr(pPrefix->c_str(), '*') ) 
 			{
-				return SetError(CLIError::kInvalidPrefix);
+				return SetError(kInvalidPrefix);
 			}
 			
 			strcpy( m_pAgentSoar->chunk_name_prefix, pPrefix->c_str() );

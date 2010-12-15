@@ -11,7 +11,6 @@
 #include <time.h>
 
 #include "cli_CommandLineInterface.h"
-#include "cli_CLIError.h"
 
 #include "cli_Commands.h"
 #include "sml_Names.h"
@@ -32,15 +31,17 @@ using namespace sml;
 
 bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 	Options optionsData[] = {
-		{'m', "memory",	OPTARG_NONE},
-		{'M', "max",	OPTARG_NONE},
-		{'r', "rete",	OPTARG_NONE},
-		{'s', "system",	OPTARG_NONE},
-		{'R', "reset",	OPTARG_NONE},
-		{'t', "track",	OPTARG_NONE},
-		{'c', "cycle",	OPTARG_NONE},
-		{'C', "cycle-csv",	OPTARG_NONE},
-		{'S', "sort",	OPTARG_REQUIRED},
+		{'d', "decision",   OPTARG_NONE},
+		{'m', "memory",     OPTARG_NONE},
+		{'M', "max",        OPTARG_NONE},
+		{'r', "rete",       OPTARG_NONE},
+		{'s', "system",     OPTARG_NONE},
+		{'R', "reset",      OPTARG_NONE},
+		{'t', "track",      OPTARG_NONE},
+		{'T', "stop-track", OPTARG_NONE},
+		{'c', "cycle",      OPTARG_NONE},
+		{'C', "cycle-csv",  OPTARG_NONE},
+		{'S', "sort",       OPTARG_REQUIRED},
 		{0, 0, OPTARG_NONE}
 	};
 
@@ -52,6 +53,9 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 		if (m_Option == -1) break;
 
 		switch (m_Option) {
+			case 'd':
+				options.set(STATS_DECISION);
+				break;
 			case 'm':
 				options.set(STATS_MEMORY);
 				break;
@@ -70,6 +74,9 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 			case 't':
 				options.set(STATS_TRACK);
 				break;
+			case 'T':
+				options.set(STATS_STOP_TRACK);
+				break;
 			case 'c':
 				options.set(STATS_CYCLE);
 				break;
@@ -79,16 +86,16 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 			case 'S':
 				options.set(STATS_CYCLE);
 				if (!from_string(sort, m_OptionArgument)) {
-					return SetError(CLIError::kIntegerExpected);
+					return SetError(kIntegerExpected);
 				}
 				break;
 			default:
-				return SetError(CLIError::kGetOptError);
+				return SetError(kGetOptError);
 		}
 	}
 
 	// No arguments
-	if (m_NonOptionArguments) return SetError(CLIError::kTooManyArgs);
+	if (m_NonOptionArguments) return SetError(kTooManyArgs);
 
 	return DoStats(options, sort);
 }
@@ -97,6 +104,12 @@ bool CommandLineInterface::ParseStats(std::vector<std::string>& argv) {
 bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 
 	//soar_print_detailed_callback_stats();
+
+	if ( options.test(STATS_DECISION) )
+	{
+		m_Result << m_pAgentSoar->decision_phases_count;
+		return true;
+	}
 
 	if ( options.test(STATS_CSV) )
 	{
@@ -132,6 +145,7 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 	{
 		GetReteStats();
 	}
+
 	if ( options.test(STATS_CYCLE) )
 	{
 		if (m_pAgentSoar->stats_db->get_status() == soar_module::disconnected) {
@@ -164,12 +178,12 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 			if (count % 20 == 0) {
 				m_Result << "\n";
 				m_Result << "----------- ----------- ----------- -----------\n";
-				m_Result << "DC          Time (msec) WM Changes  Firing Cnt\n";
+				m_Result << "DC          Time (sec)  WM Changes  Firing Cnt\n";
 				m_Result << "----------- ----------- ----------- -----------\n";
 			}
 
 			m_Result << std::setw(11) << select->column_int(0) << " ";
-			m_Result << std::setw(11) << select->column_int(1) << " ";
+			m_Result << std::setw(11) << (select->column_int(1) / 1000000.0) << " ";
 			m_Result << std::setw(11) << select->column_int(2) << " ";
 			m_Result << std::setw(11) << select->column_int(3) << "\n";
 		}
@@ -177,11 +191,17 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 		select->reinitialize();
 
 	}
-	if ( options.test(STATS_TRACK) )
-	{
+	
+    if ( options.test(STATS_TRACK) )
 		this->m_pAgentSoar->dc_stat_tracking = true;
-	}
-	if ( (!options.test(STATS_CYCLE) && !options.test(STATS_TRACK) && !options.test(STATS_MEMORY) && !options.test(STATS_RETE) && !options.test(STATS_MAX) && !options.test(STATS_RESET)) 
+
+	if ( options.test(STATS_STOP_TRACK) ) 
+    {
+        stats_close( this->m_pAgentSoar );
+		this->m_pAgentSoar->dc_stat_tracking = false;
+    }
+
+	if ( (!options.test(STATS_CYCLE) && !options.test(STATS_TRACK) && !options.test(STATS_STOP_TRACK) && !options.test(STATS_MEMORY) && !options.test(STATS_RETE) && !options.test(STATS_MAX) && !options.test(STATS_RESET)) 
 		|| options.test(STATS_SYSTEM) )
 	{
 		GetSystemStats();
@@ -222,6 +242,8 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 	AppendArgTagFast(sml_Names::kParamStatsMonitorTimeWorkingMemoryPhase,		sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_monitors_cpu_time[WM_PHASE].get_sec(), temp));
 	AppendArgTagFast(sml_Names::kParamStatsInputFunctionTime,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_input_function_cpu_time.get_sec(), temp));
 	AppendArgTagFast(sml_Names::kParamStatsOutputFunctionTime,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_output_function_cpu_time.get_sec(), temp));	
+
+#ifdef DETAILED_TIMING_STATS
 	AppendArgTagFast(sml_Names::kParamStatsMatchTimeInputPhase,					sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[INPUT_PHASE].get_sec(), temp));
 	AppendArgTagFast(sml_Names::kParamStatsMatchTimePreferencePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[PREFERENCE_PHASE].get_sec(), temp));
 	AppendArgTagFast(sml_Names::kParamStatsMatchTimeWorkingMemoryPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_match_cpu_time[WM_PHASE].get_sec(), temp));
@@ -243,9 +265,22 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeDecisionPhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[DECISION_PHASE].get_sec(), temp));
 	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeProposePhase,			sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[PROPOSE_PHASE].get_sec(), temp));
 	AppendArgTagFast(sml_Names::kParamStatsChunkingTimeApplyPhase,				sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_chunking_cpu_time[APPLY_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsGDSTimeInputPhase,         sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_gds_cpu_time[INPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsGDSTimePreferencePhase,    sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_gds_cpu_time[PREFERENCE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsGDSTimeWorkingMemoryPhase, sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_gds_cpu_time[WM_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsGDSTimeOutputPhase,        sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_gds_cpu_time[OUTPUT_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsGDSTimeDecisionPhase,      sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_gds_cpu_time[DECISION_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsGDSTimeProposePhase,       sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_gds_cpu_time[PROPOSE_PHASE].get_sec(), temp));
+	AppendArgTagFast(sml_Names::kParamStatsGDSTimeApplyPhase,         sml_Names::kTypeDouble, to_string(m_pAgentSoar->timers_gds_cpu_time[APPLY_PHASE].get_sec(), temp));
+#endif // DETAILED_TIMING_STATS
 
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeCycle,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_cycle, temp));
-	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeValue,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_msec, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeValueSec,        sml_Names::kTypeDouble,	to_string(m_pAgentSoar->max_dc_time_usec / 100000.0, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleTimeValueUSec,       sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_time_usec, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleEpMemTimeCycle,      sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_epmem_time_cycle, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleEpMemTimeValueSec,   sml_Names::kTypeDouble,	to_string(m_pAgentSoar->max_dc_epmem_time_sec, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleSMemTimeCycle,       sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_smem_time_cycle, temp));
+	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleSMemTimeValueSec,    sml_Names::kTypeDouble,	to_string(m_pAgentSoar->max_dc_smem_time_sec, temp));
 #endif // NO_TIMING_STUFF
 
 	AppendArgTagFast(sml_Names::kParamStatsMaxDecisionCycleWMChangesCycle,		sml_Names::kTypeInt,	to_string(m_pAgentSoar->max_dc_wm_changes_cycle, temp));
@@ -260,23 +295,9 @@ bool CommandLineInterface::DoStats(const StatsBitset& options, int sort) {
 	AppendArgTagFast(sml_Names::kParamStatsMemoryUsageStatsOverhead,			sml_Names::kTypeInt,	to_string(m_pAgentSoar->memory_for_usage[STATS_OVERHEAD_MEM_USAGE], temp));
 
 	if ( options.test(STATS_RESET) )
-	{
-		ResetMaxStats();
-	}
+        reset_max_stats(m_pAgentSoar);
 
 	return true;
-}
-
-void CommandLineInterface::ResetMaxStats()
-{
-	m_pAgentSoar->max_dc_production_firing_count_cycle = 0;
-	m_pAgentSoar->max_dc_production_firing_count_value = 0;
-	m_pAgentSoar->max_dc_wm_changes_value = 0;
-	m_pAgentSoar->max_dc_wm_changes_cycle = 0;
-#ifndef NO_TIMING_STUFF
-	m_pAgentSoar->max_dc_time_cycle = 0;
-	m_pAgentSoar->max_dc_time_msec = 0;
-#endif // NO_TIMING_STUFF
 }
 
 void CommandLineInterface::GetSystemStats()
@@ -296,19 +317,6 @@ void CommandLineInterface::GetSystemStats()
 	double total_kernel_time = m_pAgentSoar->timers_total_kernel_time.get_sec();
 	double total_kernel_msec = total_kernel_time * 1000.0;
 
-	/* derived_kernel_time := Total of the time spent in the phases of the decision cycle, 
-	excluding Input Function, Output function, and pre-defined callbacks. 
-	This computed time should be roughly equal to total_kernel_time, 
-	as determined above. */
-
-	double derived_kernel_time = m_pAgentSoar->timers_decision_cycle_phase[INPUT_PHASE].get_sec()
-		+ m_pAgentSoar->timers_decision_cycle_phase[PROPOSE_PHASE].get_sec()
-		+ m_pAgentSoar->timers_decision_cycle_phase[APPLY_PHASE].get_sec()
-		+ m_pAgentSoar->timers_decision_cycle_phase[PREFERENCE_PHASE].get_sec()
-		+ m_pAgentSoar->timers_decision_cycle_phase[WM_PHASE].get_sec()
-		+ m_pAgentSoar->timers_decision_cycle_phase[OUTPUT_PHASE].get_sec()
-		+ m_pAgentSoar->timers_decision_cycle_phase[DECISION_PHASE].get_sec();
-
 	double input_function_time = m_pAgentSoar->timers_input_function_cpu_time.get_sec();
 	double output_function_time = m_pAgentSoar->timers_output_function_cpu_time.get_sec();
 
@@ -321,6 +329,7 @@ void CommandLineInterface::GetSystemStats()
 		+ m_pAgentSoar->timers_monitors_cpu_time[OUTPUT_PHASE].get_sec()
 		+ m_pAgentSoar->timers_monitors_cpu_time[DECISION_PHASE].get_sec();
 
+    double derived_kernel_time = get_derived_kernel_time_usec(m_pAgentSoar) / 1000000.0;
 	double derived_total_cpu_time = derived_kernel_time + monitors_sum + input_function_time + output_function_time;
 
 	/* Total time spent in the input phase */
@@ -352,7 +361,7 @@ void CommandLineInterface::GetSystemStats()
 
 	m_Result << "Soar " << sml_Names::kSoarVersionValue << " on " << hostname << " at " << ctime(&current_time) << "\n";
 
-	unsigned long totalProductions = m_pAgentSoar->num_productions_of_type[DEFAULT_PRODUCTION_TYPE];
+	uint64_t totalProductions = m_pAgentSoar->num_productions_of_type[DEFAULT_PRODUCTION_TYPE];
 	totalProductions += m_pAgentSoar->num_productions_of_type[USER_PRODUCTION_TYPE];
 	totalProductions += m_pAgentSoar->num_productions_of_type[CHUNK_PRODUCTION_TYPE];
 
@@ -446,7 +455,7 @@ void CommandLineInterface::GetSystemStats()
 		<< " msec/pf)\n";
 #endif // NO_TIMING_STUFF
 
-	unsigned long wme_changes = m_pAgentSoar->wme_addition_count + m_pAgentSoar->wme_removal_count;
+	uint64_t wme_changes = m_pAgentSoar->wme_addition_count + m_pAgentSoar->wme_removal_count;
 	m_Result << wme_changes << " wme changes ("
 		<< m_pAgentSoar->wme_addition_count << " additions, "
 		<< m_pAgentSoar->wme_removal_count << " removals)\n";
@@ -462,20 +471,28 @@ void CommandLineInterface::GetMaxStats()
 {
 	m_Result << "Single decision cycle maximums:\n";
 
-	m_Result << "Stat          Value       Cycle\n";
-	m_Result << "------------- ----------- -----------\n";
+	m_Result << "Stat             Value       Cycle\n";
+	m_Result << "---------------- ----------- -----------\n";
 
 #ifndef NO_TIMING_STUFF
-	m_Result << "Time (msec)   "
-		<< std::setw(11) << m_pAgentSoar->max_dc_time_msec << " "
+	m_Result << std::setw(16) << "Time (sec)"
+        << std::setw(11) << std::setprecision(6) << (m_pAgentSoar->max_dc_time_usec / 1000000.0) << " "
 		<< std::setw(11) << m_pAgentSoar->max_dc_time_cycle << "\n";
+
+	m_Result << std::setw(16) << "EpMem Time (sec)"
+		<< std::setw(11) << std::setprecision(6) << m_pAgentSoar->max_dc_epmem_time_sec << " "
+		<< std::setw(11) << m_pAgentSoar->max_dc_epmem_time_cycle << "\n";
+
+	m_Result << std::setw(16) << "SMem Time (sec)"
+		<< std::setw(11) << std::setprecision(6) << m_pAgentSoar->max_dc_smem_time_sec << " "
+		<< std::setw(11) << m_pAgentSoar->max_dc_smem_time_cycle << "\n";
 #endif // NO_TIMING_STUFF
 
-	m_Result << "WM changes    "
+	m_Result << std::setw(16) << "WM changes"
 		<< std::setw(11) << m_pAgentSoar->max_dc_wm_changes_value << " "
 		<< std::setw(11) << m_pAgentSoar->max_dc_wm_changes_cycle << "\n";
 
-	m_Result << "Firing count  "
+	m_Result << std::setw(16) << "Firing count"
 		<< std::setw(11) << m_pAgentSoar->max_dc_production_firing_count_value << " "
 		<< std::setw(11) << m_pAgentSoar->max_dc_production_firing_count_cycle << "\n";
 
@@ -515,7 +532,7 @@ void CommandLineInterface::GetMemoryPoolStatistics()
 		m_Result << std::setw(MAX_POOL_NAME_LENGTH) << p->name; 
 #ifdef MEMORY_POOL_STATS
 		m_Result << "  " << std::setw(10) << p->used_count;
-		long total_items = p->num_blocks * p->items_per_block;
+		size_t total_items = p->num_blocks * p->items_per_block;
 		m_Result << "  " << std::setw(10) << total_items - p->used_count;
 #endif
 		m_Result << "  " << std::setw(9) << p->item_size;
@@ -533,7 +550,7 @@ void CommandLineInterface::GetReteStats()
 #endif
 
 	int i;
-	unsigned long tot;
+	uint64_t tot;
 
 	get_all_node_count_stats( m_pAgentSoar );
 

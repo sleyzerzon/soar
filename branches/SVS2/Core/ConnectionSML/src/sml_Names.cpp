@@ -364,15 +364,28 @@ char const* const sml_Names::kParamStatsChunkingTimeDecisionPhase			= "statschun
 char const* const sml_Names::kParamStatsChunkingTimeProposePhase			= "statschunkingtimedecisionphase" ;
 char const* const sml_Names::kParamStatsChunkingTimeApplyPhase			= "statschunkingtimedecisionphase" ;
 
+char const* const sml_Names::kParamStatsGDSTimeInputPhase         = "statsgdstimeinputphase" ;
+char const* const sml_Names::kParamStatsGDSTimePreferencePhase    = "statsgdstimepreferencephase" ;
+char const* const sml_Names::kParamStatsGDSTimeWorkingMemoryPhase = "statsgdstimeworkingmemoryphase" ;
+char const* const sml_Names::kParamStatsGDSTimeOutputPhase        = "statsgdstimeoutputphase" ;
+char const* const sml_Names::kParamStatsGDSTimeDecisionPhase      = "statsgdstimedecisionphase" ;
+char const* const sml_Names::kParamStatsGDSTimeProposePhase       = "statsgdstimedecisionphase" ;
+char const* const sml_Names::kParamStatsGDSTimeApplyPhase         = "statsgdstimedecisionphase" ;
+
 char const* const sml_Names::kParamStatsMemoryUsageMiscellaneous			= "statsmemoryusagemiscellaneous" ;
 char const* const sml_Names::kParamStatsMemoryUsageHash						= "statsmemoryusagehash" ;
 char const* const sml_Names::kParamStatsMemoryUsageString					= "statsmemoryusagestring" ;
 char const* const sml_Names::kParamStatsMemoryUsagePool						= "statsmemoryusagepool" ;
 char const* const sml_Names::kParamStatsMemoryUsageStatsOverhead			= "statsmemoryusagestatsoverhead" ;
-char const* const sml_Names::kParamStatsMaxDecisionCycleTimeValue           = "statsmaxdecisioncycletimevalue" ;
+char const* const sml_Names::kParamStatsMaxDecisionCycleTimeValueSec        = "statsmaxdecisioncycletimevaluesec" ;
+char const* const sml_Names::kParamStatsMaxDecisionCycleTimeValueUSec       = "statsmaxdecisioncycletimevalueusec" ;
 char const* const sml_Names::kParamStatsMaxDecisionCycleTimeCycle           = "statsmaxdecisioncycletimecycle" ;
 char const* const sml_Names::kParamStatsMaxDecisionCycleWMChangesCycle		= "statsmaxdecisioncyclewmchangescycle" ;
 char const* const sml_Names::kParamStatsMaxDecisionCycleWMChangesValue		= "statsmaxdecisioncyclewmchangesvalue" ;
+char const* const sml_Names::kParamStatsMaxDecisionCycleEpMemTimeCycle      = "statsmaxdecisioncycleepmemtimecycle" ;
+char const* const sml_Names::kParamStatsMaxDecisionCycleEpMemTimeValueSec   = "statsmaxdecisioncycleepmemtimevaluesec" ;
+char const* const sml_Names::kParamStatsMaxDecisionCycleSMemTimeCycle       = "statsmaxdecisioncyclesmemtimecycle" ;
+char const* const sml_Names::kParamStatsMaxDecisionCycleSMemTimeValueSec    = "statsmaxdecisioncyclesmemtimevaluesec" ;
 char const* const sml_Names::kParamStatsMaxDecisionCycleFireCountCycle		= "statsmaxdecisioncyclefirecountcycle" ;
 char const* const sml_Names::kParamStatsMaxDecisionCycleFireCountValue		= "statsmaxdecisioncyclefirecountvalue" ;
 

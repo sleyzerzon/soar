@@ -103,32 +103,32 @@ class smem_stat_container: public soar_module::stat_container
 		soar_module::integer_stat *cbr;
 		soar_module::integer_stat *stores;
 
-		soar_module::intptr_stat *chunks;
-		soar_module::intptr_stat *slots;
+		soar_module::integer_stat *chunks;
+		soar_module::integer_stat *slots;
 
 		smem_stat_container( agent *my_agent );
 };
 
-class smem_mem_usage_stat: public soar_module::intptr_stat
+class smem_mem_usage_stat: public soar_module::integer_stat
 {
 	protected:
 		agent *my_agent;
 
 	public:
-		smem_mem_usage_stat( agent *new_agent, const char *new_name, intptr_t new_value, soar_module::predicate<intptr_t> *new_prot_pred );
-		intptr_t get_value();
+		smem_mem_usage_stat( agent *new_agent, const char *new_name, int64_t new_value, soar_module::predicate<int64_t> *new_prot_pred );
+		int64_t get_value();
 };
 
 //
 
-class smem_mem_high_stat: public soar_module::intptr_stat
+class smem_mem_high_stat: public soar_module::integer_stat
 {
 	protected:
 		agent *my_agent;
 
 	public:
-		smem_mem_high_stat( agent *new_agent, const char *new_name, intptr_t new_value, soar_module::predicate<intptr_t> *new_prot_pred );
-		intptr_t get_value();
+		smem_mem_high_stat( agent *new_agent, const char *new_name, int64_t new_value, soar_module::predicate<int64_t> *new_prot_pred );
+		int64_t get_value();
 };
 
 
@@ -200,9 +200,7 @@ class smem_statement_container: public soar_module::sqlite_statement_container
 		soar_module::sqlite_statement *web_truncate;
 		soar_module::sqlite_statement *web_expand;
 
-		soar_module::sqlite_statement *web_attr_ct;
-		soar_module::sqlite_statement *web_const_ct;
-		soar_module::sqlite_statement *web_lti_ct;
+		soar_module::sqlite_statement *web_all;
 
 		soar_module::sqlite_statement *web_attr_all;
 		soar_module::sqlite_statement *web_const_all;
@@ -251,9 +249,12 @@ enum smem_variable_key
 	var_max_cycle, var_num_nodes, var_num_edges, var_act_thresh
 };
 
-#define SMEM_ACT_MAX static_cast<uintptr_t>( static_cast<uintptr_t>( 0 - 1 ) / static_cast<uintptr_t>(2) )
+#define SMEM_ACT_MAX static_cast<uint64_t>( static_cast<uint64_t>( 0 - 1 ) / static_cast<uint64_t>(2) )
 
 #define SMEM_LTI_UNKNOWN_LEVEL 0
+
+#define SMEM_WEB_NULL 0
+#define SMEM_WEB_NULL_STR "0"
 
 // provides a distinct prefix to be used by all
 // tables for two reasons:
@@ -270,10 +271,10 @@ enum smem_variable_key
 
 // represents the unique identification of a
 // long-term identifier
-typedef uintptr_t smem_lti_id;
+typedef uint64_t smem_lti_id;
 
 // represents a temporal hash
-typedef uintptr_t smem_hash_id;
+typedef uint64_t smem_hash_id;
 
 // represents a collection of long-term identifiers
 typedef std::list<smem_lti_id> smem_lti_list;
@@ -291,8 +292,8 @@ typedef std::list<wme *> smem_wme_list;
 // data associated with each state
 typedef struct smem_data_struct
 {
-	unsigned long last_cmd_time[2];			// last update to smem.command
-	unsigned long last_cmd_count[2];		// last update to smem.command
+	uint64_t last_cmd_time[2];			// last update to smem.command
+	uint64_t last_cmd_count[2];		// last update to smem.command
 
 	std::set<wme *> *cue_wmes;				// wmes in last cue
 	std::stack<preference *> *smem_wmes;	// wmes in last smem
@@ -304,7 +305,7 @@ enum smem_cue_element_type { attr_t, value_const_t, value_lti_t };
 
 typedef struct smem_weighted_cue_element_struct
 {
-	uintptr_t weight;
+	uint64_t weight;
 
 	struct wme_struct *cue_element;
 	smem_hash_id attr_hash;
@@ -326,7 +327,7 @@ struct smem_compare_weighted_cue_elements
 typedef std::priority_queue<smem_weighted_cue_element *, std::vector<smem_weighted_cue_element *>, smem_compare_weighted_cue_elements> smem_prioritized_weighted_cue;
 typedef std::list<smem_weighted_cue_element *> smem_weighted_cue_list;
 
-typedef std::pair< intptr_t, smem_lti_id > smem_activated_lti;
+typedef std::pair< int64_t, smem_lti_id > smem_activated_lti;
 
 struct smem_compare_activated_lti
 {
@@ -385,7 +386,7 @@ typedef struct smem_vis_lti_struct
 	public:
 		smem_lti_id lti_id;
 		std::string lti_name;
-		unsigned long level;
+		unsigned int level;
 } smem_vis_lti;
 
 //
@@ -403,7 +404,7 @@ extern void smem_attach( agent *my_agent );
 extern bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_msg );
 
 extern void smem_visualize_store( agent *my_agent, std::string *return_val );
-extern void smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned long depth, std::string *return_val );
+extern void smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned int depth, std::string *return_val );
 
 typedef struct condition_struct condition;
 typedef struct action_struct action;

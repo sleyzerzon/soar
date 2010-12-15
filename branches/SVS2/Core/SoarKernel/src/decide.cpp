@@ -1451,7 +1451,6 @@ Symbol *create_new_impasse (agent* thisAgent, Bool isa_goal, Symbol *object, Sym
 	id->id.smem_result_header = make_new_identifier( thisAgent, 'R', level );
 	soar_module::add_module_wme( thisAgent, id->id.smem_header, thisAgent->smem_sym_result, id->id.smem_result_header );
 	
-	thisAgent->svs_instance->state_creation_callback(id);
   }
   else
     add_impasse_wme (thisAgent, id, thisAgent->object_symbol, object, NIL);
@@ -2285,6 +2284,8 @@ void create_new_context (agent* thisAgent, Symbol *attr_of_impasse, byte impasse
   soar_invoke_callbacks(thisAgent, 
                        CREATE_NEW_CONTEXT_CALLBACK, 
                        static_cast<soar_call_data>(id) );
+  
+  thisAgent->svs_instance->state_creation_callback(id);
 }
 
 /* ------------------------------------------------------------------

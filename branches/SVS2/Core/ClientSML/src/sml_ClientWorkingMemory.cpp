@@ -53,7 +53,7 @@ WorkingMemory::WorkingMemory()
 
 	m_Deleting = false;
 
-	m_changeListHandlerId = -1;
+	m_changeListHandlerId = CHANGE_LIST_AUTO_DISABLED;
 }
 
 WorkingMemory::~WorkingMemory()
@@ -91,6 +91,10 @@ IdentifierSymbol* WorkingMemory::FindIdentifierSymbol(char const* pID)
 
 void WorkingMemory::SetOutputLinkChangeTracking(bool setting)
 {
+    // switch out of auto-disable as soon as this is called
+    if (m_changeListHandlerId == CHANGE_LIST_AUTO_DISABLED)
+        m_changeListHandlerId = CHANGE_LIST_USER_DISABLED;
+
 	if (IsTrackingOutputLinkChanges() == setting)
 		return;
 
@@ -98,7 +102,7 @@ void WorkingMemory::SetOutputLinkChangeTracking(bool setting)
 	{
 		// turning off
 		GetAgent()->UnregisterForRunEvent(m_changeListHandlerId);
-		m_changeListHandlerId = -1;
+		m_changeListHandlerId = CHANGE_LIST_USER_DISABLED;
 		ClearOutputLinkChanges();
 	}
 	else
@@ -152,7 +156,7 @@ WMElement* WorkingMemory::SearchWmeListForID(WmeList* pWmeList, char const* pID,
 }
 
 // Create a new WME of the appropriate type based on this information.
-WMElement* WorkingMemory::CreateWME(IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttribute, char const* pValue, char const* pType, long timeTag)
+WMElement* WorkingMemory::CreateWME(IdentifierSymbol* pParentSymbol, char const* pID, char const* pAttribute, char const* pValue, char const* pType, long long timeTag)
 {
 	// Value is an identifier
 	if (strcmp(pType, sml_Names::kTypeID) == 0)
@@ -177,7 +181,7 @@ WMElement* WorkingMemory::CreateWME(IdentifierSymbol* pParentSymbol, char const*
 	// Value is an int
 	if (strcmp(pType, sml_Names::kTypeInt) == 0)
 	{
-		int value = 0;
+		int64_t value = 0;
 		from_c_string(value, pValue);
 		return new IntElement(GetAgent(), pParentSymbol, pID, pAttribute, value, timeTag) ;
 	}
@@ -266,7 +270,7 @@ bool WorkingMemory::ReceivedOutputAddition(ElementXML* pWmeXML, bool tracing)
 		sml::PrintDebugFormat("Received output wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
 	}
 
-	long timeTag = 0;
+	int64_t timeTag = 0;
 	from_c_string(timeTag, pTimeTag);
 
 	// Find the parent wme that we're adding this new wme to
@@ -404,7 +408,7 @@ bool WorkingMemory::ReceivedOutputRemoval(ElementXML* pWmeXML, bool tracing)
 	// We're removing structure from the output link
 	char const* pTimeTag = pWmeXML->GetAttribute(sml_Names::kWME_TimeTag) ;	// These will usually be kernel side time tags (e.g. +5 not -7)
 
-	long timeTag = 0;
+	int64_t timeTag = 0;
 	from_c_string(timeTag, pTimeTag);
 
 	// If we have no output link we can't delete things from it.
@@ -658,7 +662,7 @@ bool WorkingMemory::SynchronizeInputLink()
 			sml::PrintDebugFormat("Received input wme: %s ^%s %s (time tag %s)", pID, pAttribute, pValue, pTimeTag) ;
 		}
 
-		long timeTag = 0;
+		int64_t timeTag = 0;
 		from_c_string(timeTag, pTimeTag);
 
 		// Find the parent wme that we're adding this new wme to
@@ -752,6 +756,10 @@ bool WorkingMemory::SynchronizeOutputLink()
 *************************************************************/
 Identifier* WorkingMemory::GetOutputLink()
 {
+    // auto-enable output link change tracking only if the user hasn't specifically disabled it.
+    if (m_changeListHandlerId == CHANGE_LIST_AUTO_DISABLED)
+        SetOutputLinkChangeTracking(true);
+
 	return m_OutputLink ;
 }
 
@@ -799,7 +807,7 @@ StringElement* WorkingMemory::CreateStringWME(Identifier* parent, char const* pA
 * @brief Same as CreateStringWME but for a new WME that has
 *		 an int as its value.
 *************************************************************/
-IntElement* WorkingMemory::CreateIntWME(Identifier* parent, char const* pAttribute, int value)
+IntElement* WorkingMemory::CreateIntWME(Identifier* parent, char const* pAttribute, long long value)
 {
 	assert(m_Agent == parent->GetAgent()) ;
 
@@ -886,7 +894,7 @@ void WorkingMemory::UpdateString(StringElement* pWME, char const* pValue)
 	// Changing the value logically is a remove and then an add
 
 	// Get the tag of the value to remove
-	long removeTimeTag = pWME->GetTimeTag() ;
+	long long removeTimeTag = pWME->GetTimeTag() ;
 
 	// Change the value and the time tag (this is equivalent to us deleting the old object
 	// and then creating a new one).
@@ -914,7 +922,7 @@ void WorkingMemory::UpdateString(StringElement* pWME, char const* pValue)
 		Commit() ;
 }
 
-void WorkingMemory::UpdateInt(IntElement* pWME, int value)
+void WorkingMemory::UpdateInt(IntElement* pWME, long long value)
 {
 	if (!pWME)
 		return ;
@@ -932,7 +940,7 @@ void WorkingMemory::UpdateInt(IntElement* pWME, int value)
 	// Changing the value logically is a remove and then an add
 
 	// Get the tag of the value to remove
-	long removeTimeTag = pWME->GetTimeTag() ;
+	long long removeTimeTag = pWME->GetTimeTag() ;
 
 	// Change the value and the time tag (this is equivalent to us deleting the old object
 	// and then creating a new one).
@@ -980,7 +988,7 @@ void WorkingMemory::UpdateFloat(FloatElement* pWME, double value)
 	// Changing the value logically is a remove and then an add
 
 	// Get the tag of the value to remove
-	long removeTimeTag = pWME->GetTimeTag() ;
+	long long removeTimeTag = pWME->GetTimeTag() ;
 
 	// Change the value and the time tag (this is equivalent to us deleting the old object
 	// and then creating a new one).
@@ -1020,7 +1028,7 @@ void WorkingMemory::UpdateFloat(FloatElement* pWME, double value)
 *************************************************************/
 void WorkingMemory::GenerateNewID(char const* pAttribute, std::string* pID)
 {
-	int id = GetAgent()->GetKernel()->GenerateNextID() ;
+	long long id = GetAgent()->GetKernel()->GenerateNextID() ;
 
 	// we'll start our ids with lower case so we can distinguish them
 	// from soar id's.  We'll take the first letter of the attribute,
@@ -1187,11 +1195,11 @@ bool WorkingMemory::DestroyWME(WMElement* pWME)
 /*************************************************************
 * @brief Generate a unique integer id (a time tag)
 *************************************************************/
-long WorkingMemory::GenerateTimeTag()
+long long WorkingMemory::GenerateTimeTag()
 {
 	// We use negative tags on the client, so we don't mistake them
 	// for ones from the real kernel.
-	int tag = GetAgent()->GetKernel()->GenerateNextTimeTag() ;
+	long long tag = GetAgent()->GetKernel()->GenerateNextTimeTag() ;
 
 	return tag ;
 }
