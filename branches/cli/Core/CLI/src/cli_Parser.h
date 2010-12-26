@@ -52,12 +52,11 @@ namespace cli
             return command->Parse(argv);
         }
 
-        ParserCommand* Parser::PartialMatch(const std::vector<std::string>& argv)
+        ParserCommand* PartialMatch(const std::vector<std::string>& argv)
         {
             // TODO: use the ordered map to find the command
 
             std::vector< std::pair< std::string, ParserCommand* > > possibilities;
-            std::vector< std::pair< std::string, ParserCommand* > >::const_iterator liter;
 
             for(unsigned index = 0; index < argv[0].size(); ++index) 
             {
@@ -76,7 +75,7 @@ namespace cli
                 else 
                 {
                     // Update the vector of possiblities
-                    liter = possibilities.begin();
+                    std::vector< std::pair< std::string, ParserCommand* > >::iterator liter = possibilities.begin();
                     while (liter != possibilities.end()) 
                     {
                         if (liter->first[index] != argv[0][index]) 
@@ -104,7 +103,7 @@ namespace cli
             if (possibilities.size() != 1) 
             {
                 error = "Ambiguous command, possibilities: ";
-                for (liter = possibilities.begin(); liter != possibilities.end(); ++liter)
+                for (std::vector< std::pair< std::string, ParserCommand* > >::const_iterator liter = possibilities.begin(); liter != possibilities.end(); ++liter)
                     error.append("'" + liter->first + "' ");
                 return 0;
             }
