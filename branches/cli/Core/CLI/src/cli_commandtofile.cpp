@@ -26,16 +26,17 @@ bool CommandLineInterface::DoCommandToFile(const eLogMode mode, const std::strin
         m_Result << std::endl;
 
     m_Result << m_LastError;
+	std::string res = m_Result.str();
+	m_Result << oldResult;
 
     if (!DoCLog(mode, &filename, 0, true))
         return false;
 
-    if (!DoCLog(LOG_ADD, 0, &m_Result.str(), true))
+    if (!DoCLog(LOG_ADD, 0, &res, true))
         return false;
 
     if (!DoCLog(LOG_CLOSE, 0, 0, true))
         return false;
 
-    m_Result << oldResult;
-    return ret;
+	return ret;
 }

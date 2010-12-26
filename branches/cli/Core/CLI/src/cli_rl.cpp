@@ -33,7 +33,6 @@ inline std::string CLI_DoRL_generate_output( const std::string &name, char * con
 }
 
 inline void CLI_DoRL_print( CommandLineInterface &cli, const bool &RawOutput, std::ostringstream &Result,
-                           void (CommandLineInterface::* const AppendArgTagFast)(const char*, const char*, const std::string&),
                            const std::string &text, const bool &newline = true )
 {
     if ( RawOutput ) {
@@ -43,7 +42,7 @@ inline void CLI_DoRL_print( CommandLineInterface &cli, const bool &RawOutput, st
             Result << text;
     }
     else
-        (*AppendArgTagFast)( sml_Names::kParamValue, sml_Names::kTypeString, text );
+        cli.AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, text );
 }
 
 bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const std::string* pVal ) 
@@ -51,43 +50,43 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
     agent* agnt = m_pAgentSML->GetSoarAgent();
     if ( !pOp )
     {
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "Soar-RL learning: ", agnt->rl_params->learning->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "temporal-extension: ", agnt->rl_params->temporal_extension->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "Discount" );
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "--------" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "Discount" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "--------" );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "discount-rate: ", agnt->rl_params->discount_rate->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "Learning" );
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "--------" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "Learning" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "--------" );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "learning-policy: ", agnt->rl_params->learning_policy->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "learning-rate: ", agnt->rl_params->learning_rate->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "hrl-discount: ", agnt->rl_params->hrl_discount->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "Eligibility Traces" );
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "------------------" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "Eligibility Traces" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "------------------" );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "eligibility-trace-decay-rate: ", agnt->rl_params->et_decay_rate->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "eligibility-trace-tolerance: ", agnt->rl_params->et_tolerance->get_string() ) );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast, "" );
+        CLI_DoRL_print( *this, m_RawOutput, m_Result, "" );
 
         return true;
     }
@@ -97,7 +96,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
         if ( !my_param )
             return SetError( "Invalid attribute." );
 
-        CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+        CLI_DoRL_print( *this, m_RawOutput, m_Result,
             CLI_DoRL_generate_output( "", my_param->get_string() ), false );
 
         return true;
@@ -120,13 +119,13 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
     {
         if ( !pAttr )
         {
-            CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+            CLI_DoRL_print( *this, m_RawOutput, m_Result,
                 CLI_DoRL_generate_output( "Error from last update: ", agnt->rl_stats->update_error->get_string() ) );
 
-            CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+            CLI_DoRL_print( *this, m_RawOutput, m_Result,
                 CLI_DoRL_generate_output( "Total reward in last cycle: ", agnt->rl_stats->total_reward->get_string() ) );
 
-            CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+            CLI_DoRL_print( *this, m_RawOutput, m_Result,
                 CLI_DoRL_generate_output( "Global reward since init: ", agnt->rl_stats->global_reward->get_string() ) );
         }
         else
@@ -136,7 +135,7 @@ bool CommandLineInterface::DoRL( const char pOp, const std::string* pAttr, const
             if ( !my_stat )
                 return SetError( "Invalid statistic." );
 
-            CLI_DoRL_print( *this, m_RawOutput, m_Result, &CommandLineInterface::AppendArgTagFast,
+            CLI_DoRL_print( *this, m_RawOutput, m_Result,
                 CLI_DoRL_generate_output( "", my_stat->get_string() ), false );
         }
 

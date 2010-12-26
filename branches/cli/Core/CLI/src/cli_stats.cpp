@@ -242,6 +242,8 @@ void CommandLineInterface::GetSystemStats()
 	// Time
 	time_t current_time = time(NULL);
 
+	agent* agnt = m_pAgentSML->GetSoarAgent();
+
 #ifndef NO_TIMING_STUFF
 	double total_kernel_time = agnt->timers_total_kernel_time.get_sec();
 	double total_kernel_msec = total_kernel_time * 1000.0;
@@ -398,6 +400,7 @@ void CommandLineInterface::GetSystemStats()
 
 void CommandLineInterface::GetMaxStats() 
 {
+    agent* agnt = m_pAgentSML->GetSoarAgent();
 	m_Result << "Single decision cycle maximums:\n";
 
 	m_Result << "Stat             Value       Cycle\n";
@@ -429,6 +432,7 @@ void CommandLineInterface::GetMaxStats()
 
 void CommandLineInterface::GetMemoryStats()
 {
+    agent* agnt = m_pAgentSML->GetSoarAgent();
 	size_t total = 0;
 	for (int i = 0; i < NUM_MEM_USAGE_CODES; i++)
 	{
@@ -447,6 +451,7 @@ void CommandLineInterface::GetMemoryStats()
 
 void CommandLineInterface::GetMemoryPoolStatistics()
 {
+    agent* agnt = m_pAgentSML->GetSoarAgent();
 	m_Result << "Memory pool statistics:\n\n";
 #ifdef MEMORY_POOL_STATS
 	m_Result << "Pool Name        Used Items  Free Items  Item Size  Itm/Blk  Blocks  Total Bytes\n";
@@ -474,6 +479,7 @@ void CommandLineInterface::GetMemoryPoolStatistics()
 
 void CommandLineInterface::GetReteStats()
 {
+    agent* agnt = m_pAgentSML->GetSoarAgent();
 #ifdef TOKEN_SHARING_STATS
 	m_Result << "Token additions: " << agnt->token_additions << "   If no sharing: " << agnt->token_additions_without_sharing << "\n";
 #endif

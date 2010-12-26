@@ -26,8 +26,7 @@ namespace cli
     public:
         virtual ~Parser() 
         {
-            std::map<std::string, ParserCommand*>::iterator iter = cmds.begin();
-            while (iter != cmds.end())
+            for (std::map<std::string, ParserCommand*>::iterator iter = cmds.begin(); iter != cmds.end(); ++iter)
                 delete iter->second;
             cmds.clear();
         }

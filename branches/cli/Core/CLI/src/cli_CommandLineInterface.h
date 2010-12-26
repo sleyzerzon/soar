@@ -166,7 +166,6 @@ namespace cli
         virtual bool DoSetLibraryLocation(std::string* pLocation = 0);
         virtual bool DoSetStopPhase(bool setPhase, bool before, sml::smlPhase phase);
         virtual bool DoSMem(const char pOp = 0, const std::string *pAttr = 0, const std::string *pVal = 0);
-        virtual bool DoSoar8(bool* pSoar8);
         virtual bool DoSoarNews();
         virtual bool DoSource(std::string filename, SourceBitset* pOptions = 0);
         virtual bool DoSP(const std::string& production);
@@ -191,6 +190,18 @@ namespace cli
 
         virtual bool SetError(const std::string& error);
 
+        void AppendArgTag(const char* pParam, const char* pType, const char* pValue);
+        void AppendArgTag(const char* pParam, const char* pType, const std::string& value);
+
+        void AppendArgTagFast(const char* pParam, const char* pType, const char* pValue);
+        void AppendArgTagFast(const char* pParam, const char* pType, const std::string& value);
+
+        void PrependArgTag(const char* pParam, const char* pType, const char* pValue);
+        void PrependArgTag(const char* pParam, const char* pType, const std::string& value);
+
+        void PrependArgTagFast(const char* pParam, const char* pType, const char* pValue);
+        void PrependArgTagFast(const char* pParam, const char* pType, const std::string& value);
+
     protected:
 
         void GetLastResultSML(sml::Connection* pConnection, soarxml::ElementXML* pResponse, bool echoResults);
@@ -210,18 +221,6 @@ namespace cli
         *        Return true if successful, set error and return false if not.
         *************************************************************/
         bool GetHelpString(const std::string& helpFile);
-
-        void AppendArgTag(const char* pParam, const char* pType, const char* pValue);
-        void AppendArgTag(const char* pParam, const char* pType, const std::string& value);
-
-        void AppendArgTagFast(const char* pParam, const char* pType, const char* pValue);
-        void AppendArgTagFast(const char* pParam, const char* pType, const std::string& value);
-
-        void PrependArgTag(const char* pParam, const char* pType, const char* pValue);
-        void PrependArgTag(const char* pParam, const char* pType, const std::string& value);
-
-        void PrependArgTagFast(const char* pParam, const char* pType, const char* pValue);
-        void PrependArgTagFast(const char* pParam, const char* pType, const std::string& value);
 
         /*************************************************************      
         * @brief This is a utility function used by DoLS      
@@ -265,7 +264,6 @@ namespace cli
         std::ofstream*          m_pLogFile;                   // The log file stream
         SourceBitset*           m_pSourceOptions;
         std::stack<std::string> m_SourceFileStack;            // Stack of source calls, if zero then command line
-        std::string             m_SourceErrorDetail;          // holds the source stack output
         int                     m_NumProductionsSourced;
         std::list<std::string>  m_ExcisedDuringSource;
         int                     m_NumProductionsIgnored;

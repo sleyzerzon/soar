@@ -53,7 +53,7 @@ bool CommandLineInterface::DoSP(const std::string& productionString) {
 	if (!p) { 
 		// There was an error, but duplicate production is just a warning
 		if (rete_addition_result != DUPLICATE_PRODUCTION) {
-		  return SetError( kProductionAddFailed );
+		  return SetError("Production addition failed.");
 		}
 		// production ignored
 		m_NumProductionsIgnored += 1;

@@ -29,7 +29,7 @@ bool CommandLineInterface::DoTime(std::vector<std::string>& argv) {
 	real.start();
 
 	// Execute command
-	bool ret = handle_command(argv);
+	bool ret = m_Parser.handle_command(argv);
 
 	real.stop();
 	proc.stop();

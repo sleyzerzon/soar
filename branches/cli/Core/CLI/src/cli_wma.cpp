@@ -89,7 +89,7 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
     {
         soar_module::param *my_param = agnt->wma_params->get( pAttr->c_str() );
         if ( !my_param )
-            return cli.SetError( "Invalid attribute." );
+            return SetError( "Invalid attribute." );
 
         char *temp2 = my_param->get_string();
         std::string output( temp2 );
@@ -106,10 +106,10 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
     {
         soar_module::param *my_param = agnt->wma_params->get( pAttr->c_str() );
         if ( !my_param )
-            return cli.SetError( "Invalid attribute." );
+            return SetError( "Invalid attribute." );
 
         if ( !my_param->validate_string( pVal->c_str() ) )
-            return cli.SetError( "Invalid value." );
+            return SetError( "Invalid value." );
 
         bool result = my_param->set_string( pVal->c_str() );		
 
@@ -141,7 +141,7 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
         {
             soar_module::stat *my_stat = agnt->wma_stats->get( pAttr->c_str() );
             if ( !my_stat )
-                return cli.SetError( "Invalid statistic." );
+                return SetError( "Invalid statistic." );
 
             char *temp2 = my_stat->get_string();
             std::string output( temp2 );
@@ -156,5 +156,5 @@ bool CommandLineInterface::DoWMA( const char pOp, const std::string* pAttr, cons
         return true;
     }
 
-    return SetError( kCommandNotImplemented );
+    return SetError( "Unknown option." );
 }

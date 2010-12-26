@@ -190,7 +190,8 @@ void AliasTest::testSimpleCommand()
     public:
         virtual ~TestCommand() {}
 
-        virtual const char* GetString() { return "test"; }
+        virtual const char* GetString() const { return "test"; }
+        virtual const char* GetSyntax() const { return "Syntax"; }
 
         virtual bool Parse(std::vector<std::string>& argv)
         {
@@ -201,7 +202,7 @@ void AliasTest::testSimpleCommand()
             return true;
         }
     };
-    parser.AddCommand(TestCommand());
+    parser.AddCommand(new TestCommand());
 
     tok.evaluate("test one two");
 }

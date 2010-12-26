@@ -220,7 +220,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 
         if ( !result )
         {
-            SetError( kSMemError, *err );
+            SetError( *err );
             delete err;
         }
 
@@ -506,5 +506,5 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
         return true;
     }
 
-    return SetError( kCommandNotImplemented );
+    return SetError( "Option not implemented." );
 }

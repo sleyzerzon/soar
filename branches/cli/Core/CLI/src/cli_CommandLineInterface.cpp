@@ -150,7 +150,6 @@ EXPORT bool CommandLineInterface::DoCommand(Connection* pConnection, sml::AgentS
 
     m_LastError.clear();
 
-    // Process the command
     soar::tokenizer tokenizer;
     tokenizer.set_handler(&m_Parser);
     if (!tokenizer.evaluate(pCommandLine))

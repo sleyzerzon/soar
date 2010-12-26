@@ -129,10 +129,10 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 
 	switch (runResult) {
 		case sml_RUN_ERROR_ALREADY_RUNNING:
-			return SetError(kRunFailed, "Soar is already running");
+			return SetError("Soar is already running");
 
 		case sml_RUN_ERROR:
-			return SetError(kRunFailed);
+			return SetError("Run failed.");
 
 		case sml_RUN_EXECUTING:
 			if (m_RawOutput) {
@@ -180,7 +180,7 @@ bool CommandLineInterface::DoRun(const RunBitset& options, int count, eRunInterl
 
 		default:
 			assert(false);
-			return SetError(kRunFailed);
+			return SetError("Run failed.");
 	}
 	return true;
 }
