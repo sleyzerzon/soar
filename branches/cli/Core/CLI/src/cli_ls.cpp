@@ -55,7 +55,7 @@ bool CommandLineInterface::DoLS() {
 	if (!GetCurrentWorkingDirectory(dir)) return false;
 
 	// Open the directory for reading
-	if ((directoryPointer = opendir(dir.c_str())) == 0) return SetError(kDirectoryOpenFailure);
+	if ((directoryPointer = opendir(dir.c_str())) == 0) return SetError("Error opening directory.");
 
 	// Read the files
 	errno = 0;
@@ -65,7 +65,7 @@ bool CommandLineInterface::DoLS() {
 	}
 
 	// Check for error
-	if (errno != 0) return SetError(kDirectoryEntryReadFailure);
+	if (errno != 0) return SetError("Error reading directory.");
 
 	// Ignoring close error
 	closedir(directoryPointer);
