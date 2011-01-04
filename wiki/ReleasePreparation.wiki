@@ -31,7 +31,7 @@ Timing stats should be on but not detailed. SoarKernel/src/kernel.h:
   * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-win-<arch>[-rcN]`
     * example version: 9.3.0
-    * example arch: x86 x86_64
+    * example arch: 32-bit 64-bit
 
 == OS X release ==
 
@@ -43,7 +43,7 @@ Timing stats should be on but not detailed. SoarKernel/src/kernel.h:
   * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-osx-<arch>[-rcN]`
     * example version: 9.3.0
-    * example arch: x86 x86_64
+    * example arch: 32-bit 64-bit
   * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
 
 == Linux release ==
@@ -56,7 +56,7 @@ Timing stats should be on but not detailed. SoarKernel/src/kernel.h:
   * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
   * copy `out/` to `Soar-Suite-<version>-linux-<arch>[-rcN]`
     * example version: 9.3.0
-    * example arch: x86 x86_64
+    * example arch: 32-bit 64-bit
   * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
 
 == Source release ==
