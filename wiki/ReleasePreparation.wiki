@@ -1,5 +1,14 @@
 #summary Preparing a release
 
+== version bump ==
+
+Many places to change the version number (this list is shorter than it used to be):
+  * Core/shared/soarversion.h
+  * rename Java/Debugger/src/main/resources/*.dlf files
+  * Java/SMLJava/ edu.umich.soar.SoarProperties.VERSION
+  * Inside the root SConstruct file
+  * Inside all Java launchers in Release/ subfolders
+
 == readme.txt ==
 
 See a previous version's release notes for a template. 
