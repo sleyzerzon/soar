@@ -41,10 +41,15 @@ duplicates first):
 
 [Important Changes for 9.3.1]
 
+Inequality comparisons on string constants and identifiers are now
+evaluated lexically rather than always returning false. Watch out--we
+found that this changed the behavior on some agents that relied on the
+old, broken behavior.
+
 Improvements in stability and performance for the learning modules that
-rely on databases (EpMem and SMem). Sqlite, the backing database,
-upgraded to 3.7.4. Database schemas have been changed breaking backwards
-compatibility.
+rely on databases (EpMem and SMem). Sqlite, the backing database, has
+been upgraded to 3.7.4. Database schemas have been changed breaking
+backwards compatibility.
 
 The Soar kernel and SML interface now uses 64-bit integers for things
 like WME values, timetags, stats, counters, and rete data structures.
