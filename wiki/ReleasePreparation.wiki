@@ -1,6 +1,6 @@
 #summary Preparing a release
 
-== announce.txt ==
+== readme.txt ==
 
 See a previous version's release notes for a template. 
 
