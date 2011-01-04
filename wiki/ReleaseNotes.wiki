@@ -19,10 +19,10 @@ Soar can be downloaded from the Soar home page at:
 	http://sitemaker.umich.edu/soar
 
 Soar releases include source code, demo programs, and a number of
-applications that serve as examples of how to interface Soar to an external
-environment.  There is support for integrating Soar with C++, Java, and
-Python applications.  Many tools that aid in development of Soar programs
-are also included.
+applications that serve as examples of how to interface Soar to an
+external environment.  There is support for integrating Soar with C++,
+Java, and Python applications.  Many tools that aid in development of
+Soar programs are also included.
 
 [Help and Contact information]
 
@@ -39,10 +39,10 @@ duplicates first):
 
 	http://code.google.com/p/soar/issues/list	
 
-[Important Changes]
+[Important Changes for 9.3.1]
 
-Improvements in stability and performance for the learning modules
-that rely on databases (EpMem and SMem). Sqlite, the backing database,
+Improvements in stability and performance for the learning modules that
+rely on databases (EpMem and SMem). Sqlite, the backing database,
 upgraded to 3.7.4. Database schemas have been changed breaking backwards
 compatibility.
 
@@ -55,9 +55,9 @@ warnings (because of loss of precision) may be encountered.
 
 The command line interface has been updated to behave much more like it
 behaved before 8.6.0. The parsing is simplified and follows most of the
-rules of the Tcl language, and its behavior is much easier to validate
-now (and many tests have been added). This should be mostly transparent
-to the end user. 
+rules of the Tcl language and its behavior is now much easier to
+validate (and many tests have been added). This should be mostly
+transparent to the end user. 
 
 A more comprehensive list of changes is below.
 
@@ -73,8 +73,8 @@ systems:
   * Ubuntu Linux 9.10
   * Mac OS X 10.5, 10.6
 
-Other platforms may work but have not specifically been tested, you can try
-binaries or attempt to compile from source:
+Other platforms may work but have not specifically been tested, you can
+try binaries or attempt to compile from source:
 
 	http://code.google.com/p/soar/wiki/Build
 
@@ -84,18 +84,18 @@ extract Soar to C:\ -- watch for errors during the extraction process.
 [Java]
 
 Java is required to use the Java applications distributed with Soar,
-including the debugger. Java must be available in the path. Some operating
-systems already have Java installed, but be aware that we only develop and
-test our applications using the Sun Java runtime environment 6 and other
-JVMs (such as GCJ) may not work:
+including the debugger. Java must be available in the path. Some
+operating systems already have Java installed, but be aware that we only
+develop and test our applications using the Sun Java runtime environment
+6 and other JVMs (such as GCJ) may not work:
 
 	http://www.oracle.com/technetwork/indexes/downloads/index.html
 
-IMPORTANT NOTE ABOUT 64-BIT BINARIES: 32-bit Java virtual machines cannot
-load 64-bit shared libraries. Please download appropriate binaries for your
-installed virtual machine. Attempting to open tools such as the Soar Java
-Debugger with the wrong JVM can cause the java process to hang on Windows
-(use task manager to terminate it).
+IMPORTANT NOTE ABOUT 64-BIT BINARIES: 32-bit Java virtual machines
+cannot load 64-bit shared libraries. Please download appropriate
+binaries for your installed virtual machine. Attempting to open tools
+such as the Soar Java Debugger with the wrong JVM can cause the java
+process to hang on Windows (use task manager to terminate it).
 
 OS X USERS CAN CHECK/SELECT WHAT JVM THEY ARE USING WITH A UTILITY: Use
 spotlight or look for the utility application "Java Preferences". More
@@ -106,7 +106,8 @@ information:
 [Python]
 
 The included Python libraries support Python 2.6. Your installed Python
-architecture (32- or 64-bit) must be the same as the binaries you download.
+architecture (32- or 64-bit) must be the same as the binaries you
+download.
 
 Changes for 9.3.1
 =================
@@ -141,14 +142,14 @@ only GDS messages. These messages were lumped in to wm-changes before.
 vsnprintf_with_symbols was not null-terminating strings converted from
 ids causing overruns. Fixed.
 
-Kernel production structs' field for filename is now filled out
+Kernel production struct's field for filename is now filled out
 correctly, easing debugging and troubleshooting. The filename is
 reported when inspected with the print command.
 
 Experimental JMX API interface added for debugger for Soar IDE
 integration. Not officially supported.
 
-smem database schema changed breaking backwards compatability but for
+smem database schema changed breaking backwards compatibility but for
 good reasons detailed in r12070.
 
 Support for swig 2 added.
@@ -156,7 +157,7 @@ Support for swig 2 added.
 Client SML identifier symbol bug fixed that was causing crashes
 (r12087).
 
-SoarQnA bugfixes and updates.
+SoarQnA bug fixes and updates.
 
 Fixed a crash caused by disabling output link change tracking. The order
 that wmes were getting deleted was depending on them being sorted on
@@ -164,7 +165,7 @@ that list.
 
 Fixed a memory leak caused during chunking (r12151).
 
-New, experimental merge parameter added to smem allwing modification of
+New, experimental merge parameter added to smem allowing modification of
 long-term identifiers in working memory.
 
 Fixed error in GDS where multiple references to removed states weren't
@@ -202,8 +203,8 @@ New -d flag to stat returns the current decision count.
 Inequality comparisons on string constants and identifiers are now
 evaluated lexically rather than always returning false.
 
-Many more tests added, specifically regarding the command line
-interface changes.
+Many more tests added, specifically regarding the command line interface
+changes.
 
 The TestCLI program has been rewritten, is much cleaner and a good
 example of a lightweight debugger.
