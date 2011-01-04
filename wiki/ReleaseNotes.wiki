@@ -71,7 +71,7 @@ systems:
 
   * Windows XP, Vista, 7
   * Ubuntu Linux 9.10
-  * Mac OS X 10.5, 10.6
+  * Mac OS X 10.6
 
 Other platforms may work but have not specifically been tested, you can
 try binaries or attempt to compile from source:
