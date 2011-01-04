@@ -13,6 +13,12 @@ High-performance timers should be disabled: comment out this line in shared/misc
 //#define USE_PERFORMANCE_FOR_BOTH 1
 }}}
 
+Timing stats should be on but not detailed. SoarKernel/src/kernel.h:
+{{{
+//#define NO_TIMING_STUFF
+//#define DETAILED_TIMING_STATS
+}}}
+
 == Windows Release ==
 
   * completely remove old output and intermediate directories
