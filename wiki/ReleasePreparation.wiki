@@ -6,6 +6,13 @@ See a previous version's release notes for a template.
 
   * http://code.google.com/p/soar/wiki/ReleaseNotes
 
+== Compiler Switches ==
+
+High-performance timers should be disabled: comment out this line in shared/misc.h:
+{{{
+//#define USE_PERFORMANCE_FOR_BOTH 1
+}}}
+
 == Windows Release ==
 
   * completely remove old output and intermediate directories
