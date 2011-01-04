@@ -8,6 +8,7 @@ Many places to change the version number (this list is shorter than it used to b
   * Java/SMLJava/ edu.umich.soar.!SoarProperties.VERSION
   * Inside the root SConstruct file
   * Inside all Java launchers in Release/ subfolders
+  * soar-vars.bat in root
 
 == readme.txt ==
 
