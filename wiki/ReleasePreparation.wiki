@@ -1,14 +1,5 @@
 #summary Preparing a release
 
-== Update help document ==
- 
-  * `wget http://code.google.com/p/soar/wiki/CommandLineInterface`
-  * Edit with vim or something, remove everything before and after the main content
-  * Find and replace `/p/soar/wiki/CommandLineInterface` with empty string
-  * Save to `Java/Debugger/src/main/resources/CommandLineInterface.html`
-
-A script to do this would be great.
-
 == announce.txt ==
 
 See a previous version's release notes for a template. 
