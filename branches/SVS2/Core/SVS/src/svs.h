@@ -33,6 +33,21 @@ public:
 	sym_hnd result;
 };
 
+class svs_stats {
+public:
+	svs_stats(sym_hnd svs_link, soar_interface *si);
+	void update(const std::string &msg);
+
+private:
+	sym_hnd                                          svs_link;
+	sym_hnd                                          stats_link;
+	sym_hnd                                          models_link;
+	soar_interface                                   *si;
+	wme_hnd                                          currmodel;
+	std::map<std::string,wme_hnd>                    modelwmes;
+	std::map<std::pair<sym_hnd,std::string>,wme_hnd> statwmes;
+};
+
 class svs_state {
 public:
 	svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common_syms *syms);
@@ -44,6 +59,8 @@ public:
 	void           process_cmds();
 	void           update_cmd_results(bool early);
 	void           update_scene_num();
+	void           wipe_scene();
+	void           update_stats(const std::string &msg);
 	
 	int            get_level()           { return level;     }
 	int            get_scene_num()       { return scene_num; }
@@ -51,7 +68,7 @@ public:
 	sym_hnd        get_state()           { return state;     }
 	soar_interface *get_soar_interface() { return si;        }
 	ipcsocket      *get_ipc()            { return ipc;       }
-	
+
 private:
 	void init();
 	void collect_cmds(Symbol* id, std::set<wme*>& all_cmds);
@@ -63,8 +80,8 @@ private:
 	soar_interface *si;
 	ipcsocket      *ipc;
 	common_syms    *cs;
+	svs_stats      *stats;
 	
-	/* svs link identifiers */
 	sym_hnd state;
 	sym_hnd svs_link;
 	sym_hnd ltm_link;

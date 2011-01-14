@@ -7,25 +7,11 @@
 
 using namespace std;
 
-scene::scene(string name, string rootname, bool display) 
-: name(name)
-{
-	if (display) {
-		disp = new ipcsocket("/tmp/svsdisp");
-		disp->send("newscene", name);
-	} else {
-		disp = NULL;
-	}
-	if (disp) 
-	root = new nsg_node(rootname);
-	handle_add(root);
-}
-
-scene::scene(string name, scene *p)
-: name(name), disp(p->disp)
+scene::scene(string name, string rootname, ipcsocket *disp) 
+: name(name), rootname(rootname), disp(disp)
 {
 	if (disp) disp->send("newscene", name);
-	root = p->root->copy();
+	root = new nsg_node(rootname);
 	handle_add(root);
 }
 
@@ -93,5 +79,12 @@ void scene::update(sg_node *n, sg_node::change_type t) {
 		case sg_node::POINTS_CHANGED:
 			handle_ptschange(n);
 			break;
+	}
+}
+
+void scene::wipe() {
+	int i;
+	for (i = 0; i < root->num_children(); ++i) {
+		delete root->get_child(i);
 	}
 }

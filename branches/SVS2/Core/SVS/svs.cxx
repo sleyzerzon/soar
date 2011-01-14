@@ -7,6 +7,7 @@
 #include "src/cmd_watcher.cpp"
 #include "src/scene.cpp"
 #include "src/ipcsocket.cpp"
+#include "src/common.cpp"
 #include "src/filter.cpp"
 #include "src/filter_factory.cpp"
 #include "src/filters/bbox_filter.cpp"

@@ -12,12 +12,15 @@
 #include "wm_sgo.h"
 #include "soar_int.h"
 #include "scene.h"
+#include "common.h"
 
 using namespace std;
 
 typedef map<wme_hnd,cmd_watcher*>::iterator cmd_iter;
 
 extern int parse_state_update(string msg, scene *scn);
+
+ipcsocket *disp = NULL;
 
 void print_tree(sg_node *n) {
 	if (n->is_group()) {
@@ -32,35 +35,96 @@ void print_tree(sg_node *n) {
 	}
 }
 
-svs_state::svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common_syms *syms)
-: parent(NULL), state(state), si(soar), cs(syms), ipc(ipc), level(0), scene_num(-1), scene_num_wme(NULL)
+svs_stats::svs_stats(sym_hnd svs_link, soar_interface *si) 
+: svs_link(svs_link), si(si), currmodel(NULL)
 {
-	string type, msg;
+	stats_link = si->make_id_wme(svs_link, "stats").first;
+	models_link = si->make_id_wme(stats_link, "models").first;
+}
+
+/* First line is current model number. Subsequent lines have form
+   <model num> <stat>:<val> <stat>:<val> ..
+ */
+void svs_stats::update(const string &msg) {
+	vector<string> lines, fields, stat;
+	vector<string>::iterator i, j;
+	map<string, wme_hnd>::iterator wi;
+	map<pair<sym_hnd,string>, wme_hnd>::iterator wj;
+	sym_wme_pair tmp;
+	pair<sym_hnd, string> statkey;
+	const char *b;
+	char *e;
+	int intval;
+	double floatval;
+	wme_hnd w;
+	sym_hnd modelid;
+	
+	split(msg, "\n", lines);
+	if (currmodel != NULL) {
+		si->remove_wme(currmodel);
+	}
+	currmodel = si->make_wme(stats_link, "current-model", lines[0]);
+	
+	for (i = lines.begin() + 1; i != lines.end(); ++i) {
+		split(*i, " \t", fields);
+		assert(fields.size() > 1);
+		wi = modelwmes.find(fields[0]);
+		if (wi == modelwmes.end()) {
+			tmp = si->make_id_wme(models_link, fields[0]);
+			modelid = tmp.first;
+			modelwmes[fields[0]] = tmp.second;
+		} else {
+			modelid = si->get_wme_val(wi->second);
+		}
+		for (j = fields.begin() + 1 ; j != fields.end(); ++j) {
+			split(*j, ":", stat);
+			statkey = make_pair(modelid, stat[0]);
+			wj = statwmes.find(statkey);
+			if (wj != statwmes.end()) {
+				si->remove_wme(wj->second);
+			}
+			b = stat[1].c_str();
+			intval = strtol(b, &e, 10);
+			if (*e == '\0') {
+				w = si->make_wme(modelid, stat[0], intval);
+			} else {
+				floatval = strtod(b, &e);
+				if (*e == '\0') {
+					w = si->make_wme(modelid, stat[0], floatval);
+				} else {
+					w = si->make_wme(modelid, stat[0], stat[1]);
+				}
+			}
+			statwmes[statkey] = w;
+		}
+	}
+}
+
+svs_state::svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common_syms *syms)
+: parent(NULL), state(state), si(soar), cs(syms), ipc(ipc), level(0),
+  scene_num(-1), scene_num_wme(NULL), scn(NULL), scene_link(NULL),
+  ltm_link(NULL), stats(NULL)
+{
+	string resp;
 	
 	assert (si->is_top_state(state));
 	
 	init();
-	ipc->receive(type, msg);
-	assert(type == "initscene");
-	update(msg);
-	
-	ipc->receive(type, msg);
-	cout << type << endl << msg << endl;
-	assert(type == "stateupdate");
-	update(msg);
+	if (ipc->communicate("initscene", 0, "", resp) == "error") {
+		assert(false);
+	}
+	update(resp);
 }
 
 svs_state::svs_state(sym_hnd state, svs_state *parent)
-: parent(parent), state(state), si(parent->si), 
-  cs(parent->cs), ipc(parent->ipc), level(parent->level+1), 
-  scene_num(parent->scene_num), scene_num_wme(NULL)
+: parent(parent), state(state), si(parent->si), cs(parent->cs),
+  ipc(parent->ipc), level(parent->level+1), scene_num(-1),
+  scene_num_wme(NULL), scn(NULL), scene_link(NULL), ltm_link(NULL),
+  stats(NULL)
 {
 	
 	assert (si->get_parent_state(state) == parent->state);
-	
 	init();
-	update_scene_num();
-	ipc->send("newstate",level, "");
 }
 
 svs_state::~svs_state() {
@@ -72,20 +136,17 @@ void svs_state::init() {
 	
 	si->get_name(state, name);
 	svs_link = si->make_id_wme(state, cs->svs).first;
-	if (parent) {
-		level = parent->level + 1;
-		scn = new scene(name, parent->scn);
-		ltm_link = NULL;
-	} else {
-		level = 0;
-		scn = new scene(name, "world", true);
-		ltm_link = si->make_id_wme(svs_link, cs->ltm).first;
-	}
-	scene_link = si->make_id_wme(svs_link, cs->scene).first;
 	cmd_link = si->make_id_wme(svs_link, cs->cmd).first;
-	
+	scene_link = si->make_id_wme(svs_link, cs->scene).first;
+	if (disp == NULL) {
+		disp = new ipcsocket("/tmp/svsdisp");
+	}
+	scn = new scene(name, "world", disp);
 	wm_sg_root = new wm_sgo(si, scene_link, (wm_sgo*) NULL, scn->get_root());
-	
+	if (!parent) {
+		ltm_link = si->make_id_wme(svs_link, cs->ltm).first;
+		stats = new svs_stats(svs_link, si);
+	}
 }
 
 void svs_state::update(const string &msg) {
@@ -151,6 +212,16 @@ void svs_state::process_cmds() {
 	}
 }
 
+void svs_state::wipe_scene() {
+	scn->wipe();
+}
+
+void svs_state::update_stats(const string &msg) {
+	if (stats) {
+		stats->update(msg);
+	}
+}
+
 svs::svs(soar_interface *interface)
 : si(interface), ipc("/tmp/svsipc")
 {
@@ -177,11 +248,15 @@ void svs::state_creation_callback(sym_hnd state) {
 }
 
 void svs::state_deletion_callback(sym_hnd state) {
+	string resp;
 	svs_state *s;
 	s = state_stack.back();
 	assert(state == s->get_state());
 	state_stack.pop_back();
-	ipc.send("delstate", s->get_level(), "");
+	if (ipc.communicate("delstate", s->get_level(), "", resp) == "error") {
+		cout << resp << endl;
+		assert(false);
+	}
 	delete s;
 }
 
@@ -196,10 +271,15 @@ void svs::pre_env_callback() {
 }
 
 void svs::post_env_callback() {
+	string resp;
 	vector<svs_state*>::iterator i;
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results(false);
 	}
+	if (ipc.communicate("updatestats", 0, "", resp) == "error") {
+		assert(false);
+	}
+	state_stack[0]->update_stats(resp);
 	//print_tree(state_stack.back()->get_scene()->get_root());
 }
 

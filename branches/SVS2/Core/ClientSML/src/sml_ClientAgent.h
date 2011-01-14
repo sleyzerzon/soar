@@ -16,6 +16,7 @@
 #include "sml_ListMap.h"
 #include "sml_ClientEvents.h"
 
+#include <stdint.h>
 #include <string>
 #include <map>
 #include <list>

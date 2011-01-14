@@ -18,13 +18,21 @@ wm_sgo::wm_sgo(soar_interface *si, sym_hnd ident, wm_sgo *parent, sg_node *node)
 }
 
 wm_sgo::~wm_sgo() {
+	map<wm_sgo*,wme_hnd>::iterator i;
+
+	if (node) {
+		node->unlisten(this);
+	}
 	soarint->remove_wme(name_wme);
+	for (i = childs.begin(); i != childs.end(); ++i) {
+		i->first->parent = NULL;
+		soarint->remove_wme(i->second);
+	}
 	if (parent) {
 		child_iter ci = parent->childs.find(this);
 		assert(ci != parent->childs.end());
 		soarint->remove_wme(ci->second);
 	}
-	node->unlisten(this);
 }
 
 void wm_sgo::update(sg_node *n, sg_node::change_type t) {
@@ -34,6 +42,7 @@ void wm_sgo::update(sg_node *n, sg_node::change_type t) {
 			break;
 		case sg_node::DETACHED:
 		case sg_node::DELETED:
+			node = NULL;
 			delete this;
 			break;
 	};

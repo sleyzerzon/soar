@@ -91,3 +91,10 @@ void ipcsocket::receive(string &header, string &msg) {
 	msg.assign(recvbuf.substr(p1+1, p2-p1-1));
 	recvbuf.erase(0, p2+strlen(TERMSTRING));
 }
+
+string ipcsocket::communicate(const string &header, int level, const string &msg, string &response) {
+	string responseheader;
+	send(header, level, msg);
+	receive(responseheader, response);
+	return responseheader;
+}

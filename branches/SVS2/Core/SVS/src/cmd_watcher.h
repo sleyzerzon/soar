@@ -1,5 +1,5 @@
-#ifndef CMD_HANDLER_H
-#define CMD_HANDLER_H
+#ifndef CMD_WATCHER_H
+#define CMD_WATCHER_H
 
 #include "filter.h"
 
@@ -96,9 +96,8 @@ public:
 	bool early() { return true; }
 	
 private:
-	int  parse_objective(std::string &msg);
-	int  parse_replay(std::string &msg);
-	void update_step();
+	std::string parse(std::string &msg);
+	void        update_step();
 	
 	svs_state      *state;
 	ipcsocket      *ipc;
@@ -109,6 +108,22 @@ private:
 	int            id;
 	int            step;
 	bool           broken;
+};
+
+class model_cmd_watcher : public cmd_watcher {
+public:
+	model_cmd_watcher(svs_state *state, sym_hnd cmd_root);
+	
+	bool update_result();
+	
+	bool early() { return true; }
+	
+private:
+	svs_state      *state;
+	sym_hnd        cmd_root;
+	ipcsocket      *ipc;
+	soar_interface *si;
+	cmd_utils      utils;
 };
 
 #endif

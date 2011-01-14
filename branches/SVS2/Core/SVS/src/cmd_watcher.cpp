@@ -44,6 +44,10 @@ cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
 		return new ctrl_cmd_watcher(state, id);
 	} else if (attr == "recall") {
 		return new recall_cmd_watcher(state, id);
+	} else if (attr == "model") {
+		return new model_cmd_watcher(state, id);
+	} else {
+		assert(false);
 	}
 	return NULL;
 }
@@ -371,104 +375,87 @@ ctrl_cmd_watcher::ctrl_cmd_watcher(svs_state *state, sym_hnd cmd_root)
   utils(state, cmd_root), step(0), stepwme(NULL), broken(false)
 {
 	wme_hnd w;
-	string type, msg;
+	string type, msg, resp;
 	int r;
 	
-	r = parse_objective(msg);
-	if (r == 0) {
-		ipc->send("seek", state->get_level(), msg);
-	} else if (r == 2) {
-		broken = true;
-		utils.set_result("objective syntax");
-		return;
-	} else {
-		r = parse_replay(msg);
-		if (r == 0) {
-			ipc->send("replay", state->get_level(), msg);
-		} else if (r == 2) {
-			broken = true;
-			utils.set_result("replay syntax");
-			return;
-		} else {
-			ipc->send("random", state->get_level(), "");
-		}
-	}
-	
-	ipc->receive(type, msg);
+	type = parse(msg);
 	if (type == "error") {
 		broken = true;
 		utils.set_result(msg);
 		return;
-	} 
-	
-	assert(type == "id");
-	id = atoi(msg.c_str());
+	}
+	if (ipc->communicate(type, state->get_level(), msg, resp) == "error") {
+		broken = true;
+		utils.set_result(msg);
+		return;
+	}
+	id = atoi(resp.c_str());
 	si->make_wme(cmd_root, "trajectory", id);
 	update_step();
 }
 
-/* returns 0 if parsed successfully, 1 if not a seek command, 2 if
-   syntax error
- */
-int ctrl_cmd_watcher::parse_objective(string &msg) {
+string ctrl_cmd_watcher::parse(string &msg) {
 	wme_hnd w;
 	wme_list objargs;
 	wme_list::iterator i;
 	sym_hnd objid;
-	string astr, vstr, name;
+	string astr, vstr, name, negate;
 	stringstream ss;
-	
-	if (!si->find_child_wme(cmd_root, "objective", w))
-		return 1;
-	objid = si->get_wme_val(w);
-	if (!si->get_child_wmes(objid, objargs))
-		return 2;
-	for(i = objargs.begin(); i != objargs.end(); ++i) {
-		if (!si->get_val(si->get_wme_attr(*i), astr) ||
-		    !si->get_val(si->get_wme_val(*i), vstr))
-			return 2;
-		if (astr == "name") {
-			name = vstr;
-		} else {
-			cleanstring(astr); cleanstring(vstr);
-			ss << astr << ' ' << vstr << endl;
-		}
-	}
-	msg = name + "\n" + ss.str();
-	return 0;
-}
-
-/* return values same as parse_objective */
-int ctrl_cmd_watcher::parse_replay(string &msg) {
-	wme_hnd w;
 	long trajectoryid;
-	stringstream ss;
 	
-	if (!si->find_child_wme(cmd_root, "replay", w))
-		return 1;
-	if (!si->get_val(si->get_wme_val(w), trajectoryid))
-		return 2;
-	ss << trajectoryid;
-	msg = ss.str();
-	return 0;
+	if (si->find_child_wme(cmd_root, "objective", w)) {
+		objid = si->get_wme_val(w);
+		if (!si->get_child_wmes(objid, objargs)) {
+			msg = "invalid objective";
+			return "error";
+		}
+		for(i = objargs.begin(); i != objargs.end(); ++i) {
+			if (!si->get_val(si->get_wme_attr(*i), astr) ||
+			    !si->get_val(si->get_wme_val(*i), vstr))
+			{
+				msg = "invalid objective";
+				return "error";
+			}
+			if (astr == "name") {
+				name = vstr;
+			} else if (astr == "negate") {
+				negate = vstr;
+				if (negate != "t" && negate != "f") {
+					msg = "invalid negate value";
+					return "error";
+				}
+			} else {
+				cleanstring(astr); cleanstring(vstr);
+				ss << astr << ' ' << vstr << endl;
+			}
+		}
+		msg = name + " " + negate + "\n" + ss.str();
+		return "seek";
+	} else if (si->find_child_wme(cmd_root, "replay", w)) {
+		if (!si->get_val(si->get_wme_val(w), trajectoryid)) {
+			return "error";
+		}
+		ss << trajectoryid;
+		msg = ss.str();
+		return "replay";
+	}
+	
+	return "random";
 }
 
 bool ctrl_cmd_watcher::update_result() {
-	string type, msg, obj;
+	string resp, obj;
 	stringstream ss;
 	
 	if (broken) {
 		return false;
 	}
 	ss << id << endl;
-	ipc->send("stepctrl", state->get_level(), ss.str());
-	ipc->receive(type, msg);
-	if (type == "error") {
-		utils.set_result(msg);
+	if (ipc->communicate("stepctrl", state->get_level(), ss.str(), resp) == "error") {
+		utils.set_result(resp);
 		return false;
 	}
-	assert(type == "stateupdate");
-	state->update(msg);
+	state->update(resp);
 	utils.set_result("success");
 	step++;
 	update_step();
@@ -487,7 +474,7 @@ recall_cmd_watcher::recall_cmd_watcher(svs_state *state, sym_hnd cmd_root)
 	wme_hnd w;
 	long state_num;
 	stringstream ss;
-	string type, msg;
+	string resp;
 	
 	ipcsocket *ipc = state->get_ipc();
 	soar_interface *si = state->get_soar_interface();
@@ -503,13 +490,53 @@ recall_cmd_watcher::recall_cmd_watcher(svs_state *state, sym_hnd cmd_root)
 	}
 	
 	ss << state_num;
-	ipc->send("recall", state->get_level(), ss.str());
-	ipc->receive(type, msg);
 	
-	assert(type == "stateupdate");
-	state->update(msg);
+	if (ipc->communicate("recall", state->get_level(), ss.str(), resp) == "error") {
+		utils.set_result(resp);
+	} else {
+		state->wipe_scene();
+		state->update(resp);
+		utils.set_result("success");
+	}
 }
 
 bool recall_cmd_watcher::update_result() {
+	return true;
+}
+
+model_cmd_watcher::model_cmd_watcher(svs_state *state, sym_hnd cmd_root)
+: state(state), cmd_root(cmd_root), ipc(state->get_ipc()), si(state->get_soar_interface()), utils(state, cmd_root)
+{ }
+
+bool model_cmd_watcher::update_result() {
+	wme_hnd hashwme;
+	sym_hnd hashid;
+	wme_list childs;
+	wme_list::iterator i;
+	stringstream ss;
+	string attr, val, resp;
+	
+	if (!utils.cmd_changed()) {
+		return true;
+	}
+	if (!si->find_child_wme(cmd_root, "hash", hashwme)) {
+		utils.set_result("no hash");
+		return false;
+	}
+	
+	si->get_child_wmes(si->get_wme_val(hashwme), childs);
+	for (i = childs.begin(); i != childs.end(); ++i) {
+		if (!si->get_val(si->get_wme_attr(*i), attr) ||
+		    !si->get_val(si->get_wme_val(*i), val))
+		{
+			utils.set_result("invalid child");
+			return false;
+		}
+		ss << attr << " " << val << endl;
+	}
+	if (ipc->communicate("model", state->get_level(), ss.str(), resp) == "error") {
+		utils.set_result(resp);
+		return false;
+	}
 	return true;
 }

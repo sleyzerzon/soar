@@ -1,25 +1,10 @@
-#include "nsg_node.h"
-#include "scene.h"
 #include <stdlib.h>
 #include <vector>
+#include "nsg_node.h"
+#include "scene.h"
+#include "common.h"
 
 using namespace std;
-
-void split(string s, vector<string> &fields) {
-	int start, end = 0;
-	fields.clear();
-	while (end < s.size()) {
-		start = s.find_first_not_of(" \t", end);
-		if (start == string::npos) {
-			return;
-		}
-		end = s.find_first_of(" \t", start);
-		if (end == string::npos) {
-			end = s.size();
-		}
-		fields.push_back(s.substr(start, end - start));
-	}
-}
 
 bool parse_n_floats(vector<string> &f, int &start, int n, double *x) {
 	const char *cs;
@@ -147,35 +132,34 @@ int parse_change(vector<string> &f, scene *scn) {
 }
 
 int parse_state_update(string s, scene *scn) {
-	vector<string> f;
+	vector<string> lines, fields;
+	vector<string>::iterator i;
 	char cmd;
-	int lineend;
 	
-	do {
-		lineend = s.find('\n');
-		split(s.substr(0, lineend), f);
-		s.erase(0, lineend+1);
+	split(s, "\n", lines);
+	for (i = lines.begin(); i != lines.end(); ++i) {
+		split(*i, " \t", fields);
 		
-		if (f.size() == 0)
+		if (fields.size() == 0)
 			continue;
-		if (f[0].size() != 1)
+		if (fields[0].size() != 1)
 			return 0;
 		
-		cmd = f[0][0];
-		f.erase(f.begin());
+		cmd = fields[0][0];
+		fields.erase(fields.begin());
 		
 		switch(cmd) {
 			case 'a':
-				parse_attach(f, scn);
+				parse_attach(fields, scn);
 				break;
 			case 'd':
-				parse_detach(f, scn);
+				parse_detach(fields, scn);
 				break;
 			case 'c':
-				parse_change(f, scn);
+				parse_change(fields, scn);
 				break;
 			default:
 				return 0;
 		}
-	} while (lineend != string::npos);
+	}
 }
