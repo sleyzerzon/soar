@@ -10,7 +10,7 @@
 #include "cmd_watcher.h"
 #include "nsg_node.h"
 #include "wm_sgo.h"
-#include "soar_int.h"
+#include "soar_interface.h"
 #include "scene.h"
 #include "common.h"
 
@@ -222,9 +222,10 @@ void svs_state::update_stats(const string &msg) {
 	}
 }
 
-svs::svs(soar_interface *interface)
-: si(interface), ipc("/tmp/svsipc")
+svs::svs(agent *a)
+: ipc("/tmp/svsipc")
 {
+	si = new soar_interface(a);
 	make_common_syms();
 }
 

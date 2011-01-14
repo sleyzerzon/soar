@@ -11,7 +11,7 @@ clone.Prepend(CPPPATH = Split('src #ClientSML/src #KernelSML/src #CLI/src #SoarK
 
 libadd = Split('ClientSML ConnectionSML ElementXML') 
 if env['STATIC_LINKED']:
-	libadd.append(Split('SoarKernelSML SoarKernel CommandLineInterface sqlite3'))
+	libadd.append(Split('SoarKernelSML SoarKernel CommandLineInterface sqlite3 svs'))
 
 if sys.platform == "darwin":
 	if GetOption('platform') == '64':

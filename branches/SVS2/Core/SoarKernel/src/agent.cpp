@@ -52,7 +52,6 @@
 #include "episodic_memory.h"
 #include "semantic_memory.h"
 #include "svs.h"
-#include "soar_interface.h"
 
 
 /* ================================================================== */
@@ -117,7 +116,7 @@ void init_soar_agent(agent* thisAgent) {
 
   reset_statistics (thisAgent);
 
-  thisAgent->svs_instance = new svs(new soar_interface(thisAgent));
+  thisAgent->svs_instance = new svs(thisAgent);
 
   /* RDF: For gSKI */
   init_agent_memory(thisAgent);

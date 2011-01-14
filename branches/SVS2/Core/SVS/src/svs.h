@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 #include "ipcsocket.h"
-#include "soar_int.h"
+#include "soar_interface.h"
 
 class cmd_watcher;
 class wm_sgo;
@@ -97,7 +97,7 @@ private:
 
 class svs {
 public:
-	svs(soar_interface *soarinterface);
+	svs(agent *a);
 	~svs();
 	
 	void state_creation_callback(sym_hnd goal);
