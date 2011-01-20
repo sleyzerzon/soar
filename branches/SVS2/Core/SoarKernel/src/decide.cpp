@@ -59,6 +59,7 @@
 
 #include "episodic_memory.h"
 #include "semantic_memory.h"
+#include "svs.h"
 
 #include "assert.h"
 

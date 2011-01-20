@@ -1,4 +1,4 @@
-
+#include <string>
 #include <utility>
 #include <algorithm>
 #include <assert.h>
@@ -7,6 +7,8 @@
 #include "symtab.h"
 #include "wmem.h"
 #include "soar_interface.h"
+
+using namespace std;
 
 soar_interface::soar_interface(agent *a)
 : agnt(a)

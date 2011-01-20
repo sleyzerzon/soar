@@ -20,6 +20,8 @@
    ================================================================= */
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "print.h"
 #include "kernel.h"
@@ -34,8 +36,6 @@
 #include "instantiations.h"
 #include "xml.h"
 #include "soar_TraceNames.h"
-
-#include <stdarg.h>
 
 using namespace soar_TraceNames;
 
@@ -84,7 +84,9 @@ void print_string (agent* thisAgent, const char *s) {
 			thisAgent->printer_output_column++;
 	}
 
-	soar_invoke_callbacks(thisAgent, PRINT_CALLBACK, static_cast<soar_call_data>(const_cast<char *>(s)));
+	printf(s);
+	fflush(stdout);
+	//soar_invoke_callbacks(thisAgent, PRINT_CALLBACK, static_cast<soar_call_data>(const_cast<char *>(s)));
 }
 
 /* ---------------------------------------------------------------

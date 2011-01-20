@@ -56,6 +56,16 @@ public:
 		return true;
 	}
 	
+	bool contains(bbox &b) {
+		int d;
+		for (d = 0; d < 3; ++d) {
+			if (max[d] < b.max[d] || min[d] > b.min[d]) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	void get_vals(double &x1, double &y1, double &z1, 
 	              double &x2, double &y2, double &z2)
 	{

@@ -9,3 +9,4 @@
 #include "src/ipcsocket.cpp"
 #include "src/filter.cpp"
 #include "src/filter_factory.cpp"
+#include "src/common.cpp"

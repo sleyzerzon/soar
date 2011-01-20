@@ -1,8 +1,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <sstream>
+
 #include "cmd_watcher.h"
 #include "filter.h"
+#include "svs.h"
+#include "scene.h"
+
 #include "filters/gen_filter.h"
 
 using namespace std;
@@ -46,8 +50,6 @@ cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
 		return new recall_cmd_watcher(state, id);
 	} else if (attr == "model") {
 		return new model_cmd_watcher(state, id);
-	} else {
-		assert(false);
 	}
 	return NULL;
 }
@@ -472,24 +474,24 @@ recall_cmd_watcher::recall_cmd_watcher(svs_state *state, sym_hnd cmd_root)
 : state(state), utils(state, cmd_root)
 {
 	wme_hnd w;
-	long state_num;
+	long scene_num;
 	stringstream ss;
 	string resp;
 	
 	ipcsocket *ipc = state->get_ipc();
 	soar_interface *si = state->get_soar_interface();
 	
-	if (!si->find_child_wme(cmd_root, "state_num", w)) {
+	if (!si->find_child_wme(cmd_root, "scene-num", w)) {
 		utils.set_result("missing state_num parameter");
 		return;
 	}
 	
-	if (!si->get_val(si->get_wme_val(w), state_num)) {
-		utils.set_result("state_num not integer type");
+	if (!si->get_val(si->get_wme_val(w), scene_num)) {
+		utils.set_result("scene-num not integer type");
 		return;
 	}
 	
-	ss << state_num;
+	ss << scene_num;
 	
 	if (ipc->communicate("recall", state->get_level(), ss.str(), resp) == "error") {
 		utils.set_result(resp);

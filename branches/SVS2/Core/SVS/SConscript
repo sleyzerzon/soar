@@ -14,6 +14,6 @@ clone.Prepend(CPPPATH = Split('src src/filters #SoarKernel/src'))
 if env['SCU']:
 	svs = clone.StaticLibrary('svs', 'svs.cxx')
 else:
-	svs = clone.StaticLibrary('svs', Glob('src/*.cpp', 'src/filters/*.cpp'))
+	svs = clone.StaticLibrary('svs', Glob('src/*.cpp') + Glob('src/filters/*.cpp'))
 
 env.Install('$PREFIX/lib', svs)

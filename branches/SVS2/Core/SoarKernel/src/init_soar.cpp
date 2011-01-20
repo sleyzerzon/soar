@@ -42,6 +42,7 @@
 #include "wma.h"
 #include "episodic_memory.h"
 #include "semantic_memory.h"
+#include "svs.h"
 
 #define INIT_FILE       "init.soar"
 

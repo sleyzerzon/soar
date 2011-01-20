@@ -174,7 +174,9 @@ void svs_state::update_scene_num() {
 		}
 		si->remove_wme(scene_num_wme);
 	}
-	scene_num_wme = si->make_wme(scene_link, "scene_num", scene_num);
+	if (scene_num >= 0) {
+		scene_num_wme = si->make_wme(svs_link, "scene-num", scene_num);
+	}
 }
 
 void svs_state::update_cmd_results(bool early) {

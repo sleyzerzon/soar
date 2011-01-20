@@ -2,6 +2,7 @@
 #define CMD_WATCHER_H
 
 #include "filter.h"
+#include "soar_interface.h"
 
 class soar_interface;
 class svs_state;

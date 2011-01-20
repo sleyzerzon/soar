@@ -1,4 +1,6 @@
 #include "direction_filter.h"
+#include "bbox.h"
+#include "bbox_filter.h"
 
 direction_filter::direction_filter(char dir, filter *a, filter *b)
 : dir(dir), container(this, new bbox_filter(a), new bbox_filter(b))
