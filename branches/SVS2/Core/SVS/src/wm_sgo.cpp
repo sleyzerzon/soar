@@ -32,6 +32,7 @@ wm_sgo::~wm_sgo() {
 		child_iter ci = parent->childs.find(this);
 		assert(ci != parent->childs.end());
 		soarint->remove_wme(ci->second);
+		parent->childs.erase(ci);
 	}
 }
 

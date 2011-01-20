@@ -115,7 +115,7 @@ void repl() {
 	string cmd;
 	
 	while (cin) {
-		cout << "# ";
+		cout << endl << "# ";
 		if (!readcmd(cmd)) {
 			cout << "?" << endl;
 			continue;
