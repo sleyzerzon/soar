@@ -127,4 +127,20 @@ private:
 	cmd_utils      utils;
 };
 
+class hold_cmd_watcher : public cmd_watcher {
+public:
+	hold_cmd_watcher(svs_state *state, sym_hnd cmd_root);
+	
+	bool update_result();
+	
+	bool early() { return true; }
+	
+private:
+	svs_state      *state;
+	sym_hnd        cmd_root;
+	ipcsocket      *ipc;
+	soar_interface *si;
+	cmd_utils      utils;
+};
+
 #endif

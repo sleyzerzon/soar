@@ -50,6 +50,8 @@ cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
 		return new recall_cmd_watcher(state, id);
 	} else if (attr == "model") {
 		return new model_cmd_watcher(state, id);
+	} else if (attr == "hold") {
+		return new hold_cmd_watcher(state, id);
 	}
 	return NULL;
 }
@@ -537,6 +539,38 @@ bool model_cmd_watcher::update_result() {
 		ss << attr << " " << val << endl;
 	}
 	if (ipc->communicate("model", state->get_level(), ss.str(), resp) == "error") {
+		utils.set_result(resp);
+		return false;
+	}
+	return true;
+}
+
+hold_cmd_watcher::hold_cmd_watcher(svs_state *state, sym_hnd cmd_root)
+: state(state), cmd_root(cmd_root), ipc(state->get_ipc()), si(state->get_soar_interface()), utils(state, cmd_root)
+{ }
+
+bool hold_cmd_watcher::update_result() {
+	wme_hnd idwme;
+	sym_hnd hashid;
+	wme_list childs;
+	wme_list::iterator i;
+	stringstream ids;
+	string n, resp;
+	
+	if (!utils.cmd_changed()) {
+		return true;
+	}
+	if (!si->get_child_wmes(cmd_root, childs)) {
+		utils.set_result("error");
+		return false;
+	}
+	for (i = childs.begin(); i != childs.end(); ++i) {
+		if (!si->get_val(si->get_wme_val(*i), n)) {
+			continue;
+		}
+		ids << n << " ";
+	}
+	if (ipc->communicate("hold", state->get_level(), ids.str(), resp) == "error") {
 		utils.set_result(resp);
 		return false;
 	}
