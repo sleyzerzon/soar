@@ -130,6 +130,7 @@ private:
 class hold_cmd_watcher : public cmd_watcher {
 public:
 	hold_cmd_watcher(svs_state *state, sym_hnd cmd_root);
+	~hold_cmd_watcher();
 	
 	bool update_result();
 	
@@ -141,6 +142,7 @@ private:
 	ipcsocket      *ipc;
 	soar_interface *si;
 	cmd_utils      utils;
+	std::vector<std::string> ids;
 };
 
 #endif

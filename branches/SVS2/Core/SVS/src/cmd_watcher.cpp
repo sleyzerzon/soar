@@ -549,13 +549,18 @@ hold_cmd_watcher::hold_cmd_watcher(svs_state *state, sym_hnd cmd_root)
 : state(state), cmd_root(cmd_root), ipc(state->get_ipc()), si(state->get_soar_interface()), utils(state, cmd_root)
 { }
 
+hold_cmd_watcher::~hold_cmd_watcher() {
+	stringstream s;
+	string r;
+	copy(ids.begin(), ids.end(), ostream_iterator<string>(s, " "));
+	ipc->communicate("unhold", state->get_level(), s.str(), r);
+}
+
 bool hold_cmd_watcher::update_result() {
-	wme_hnd idwme;
-	sym_hnd hashid;
 	wme_list childs;
 	wme_list::iterator i;
-	stringstream ids;
-	string n, resp;
+	stringstream s;
+	string n, r;
 	
 	if (!utils.cmd_changed()) {
 		return true;
@@ -564,14 +569,24 @@ bool hold_cmd_watcher::update_result() {
 		utils.set_result("error");
 		return false;
 	}
+	
+	if (ids.size() > 0) {
+		copy(ids.begin(), ids.end(), ostream_iterator<string>(s, " "));
+		if (ipc->communicate("unhold", state->get_level(), s.str(), r) == "error") {
+			utils.set_result(r);
+			return false;
+		}
+	}
+	ids.clear();
 	for (i = childs.begin(); i != childs.end(); ++i) {
 		if (!si->get_val(si->get_wme_val(*i), n)) {
 			continue;
 		}
-		ids << n << " ";
+		ids.push_back(n);
+		s << n << " ";
 	}
-	if (ipc->communicate("hold", state->get_level(), ids.str(), resp) == "error") {
-		utils.set_result(resp);
+	if (ipc->communicate("hold", state->get_level(), s.str(), r) == "error") {
+		utils.set_result(r);
 		return false;
 	}
 	return true;
