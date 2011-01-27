@@ -1441,14 +1441,13 @@ max-dc-time -d
 == Options ==
 
 || `n` || Maximum decision cycle time in *microseconds* ||
-|| `-d`, --disable || Disable this interrupt. ||
+|| `-d`, `--disable` || Disable this interrupt. ||
 || `-s`, `--seconds` || Interpret n as seconds (floating point OK) ||
 
 == Description ==
 
 After output phase, the elapsed decision cycle time is checked to see if it 
-is greater than the old maximum, and the maximum dc time stat is updated (see
-[[stats]]). At this time, this threshold is also checked. If met or exceeded,
+is greater than the old maximum, and the maximum dc time stat is updated (see [CommandLineInterface#stats stats]). At this time, this threshold is also checked. If met or exceeded,
 Soar stops at the end of the current output phase with an interrupted state.
 
 == Examples ==
