@@ -1426,6 +1426,39 @@ build more chunks or whether you've discovered a bug (in your program or in
 Soar itself).
 
 ----
+= max-dc-time =
+
+Control a threshold that causes Soar to stop running after a decision cycle
+that breaks the threshold.
+
+== Synopsis ==
+
+{{{
+max-dc-time [--seconds] [n]
+max-dc-time -d
+}}}
+
+== Options ==
+
+|| `n` || Maximum decision cycle time in *microseconds* ||
+|| `-d`, --disable || Disable this interrupt. ||
+|| `-s`, `--seconds` || Interpret n as seconds (floating point OK) ||
+
+== Description ==
+
+After output phase, the elapsed decision cycle time is checked to see if it 
+is greater than the old maximum, and the maximum dc time stat is updated (see
+[[stats]]). At this time, this threshold is also checked. If met or exceeded,
+Soar stops at the end of the current output phase with an interrupted state.
+
+== Examples ==
+
+{{{
+max-dc-time -s 0.05
+max-dc-time 4000
+}}}
+
+----
 = max-elaborations =
 
 Limit the maximum number of elaboration cycles in a given phase. Print a
