@@ -145,10 +145,17 @@ void siginthandler(int sig) {
 	signal(SIGINT, siginthandler);
 }
 
+string exit_handler(smlRhsEventId id, void *pUserData, Agent *pAgent, char const *pFunctionName, char const *pArgument) {
+	int code = atoi(pArgument);
+	exit(code);
+}
+
 int main(int argc, char *argv[]) {
 	string src = "source ";
 	
 	kernel = Kernel::CreateKernelInCurrentThread(Kernel::kDefaultLibraryName, true, 0);
+	kernel->AddRhsFunction("exit", exit_handler, NULL);
+	
 	agent = kernel->CreateAgent("soar1");
 	agent->RegisterForPrintEvent(smlEVENT_PRINT, printcb, NULL);
 	agent->SetOutputLinkChangeTracking(false);

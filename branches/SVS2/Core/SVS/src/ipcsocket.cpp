@@ -14,7 +14,7 @@ using namespace std;
 const char TERMSTRING[] = "\n***\n";
 const int BUFFERSIZE = 10240;
 
-ipcsocket::ipcsocket(const char *socketfile) 
+ipcsocket::ipcsocket(string socketfile) 
 : recvbuf()
 {
 	int listenfd;
@@ -27,7 +27,7 @@ ipcsocket::ipcsocket(const char *socketfile)
 	}
 	
 	addr.sun_family = AF_UNIX;
-	strcpy(addr.sun_path, socketfile);
+	strcpy(addr.sun_path, socketfile.c_str());
 	unlink(addr.sun_path);
 	len = strlen(addr.sun_path) + sizeof(addr.sun_family);
 	if (bind(listenfd, (struct sockaddr *) &addr, len) == -1) {

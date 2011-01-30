@@ -139,7 +139,7 @@ void svs_state::init() {
 	cmd_link = si->make_id_wme(svs_link, cs->cmd).first;
 	scene_link = si->make_id_wme(svs_link, cs->scene).first;
 	if (disp == NULL) {
-		disp = new ipcsocket("/tmp/svsdisp");
+		disp = new ipcsocket(getnamespace() + "disp");
 	}
 	scn = new scene(name, "world", disp);
 	wm_sg_root = new wm_sgo(si, scene_link, (wm_sgo*) NULL, scn->get_root());
@@ -225,8 +225,9 @@ void svs_state::update_stats(const string &msg) {
 }
 
 svs::svs(agent *a)
-: ipc("/tmp/svsipc")
+: ipc(getnamespace() + "ctrl")
 {
+	
 	si = new soar_interface(a);
 	make_common_syms();
 }
@@ -258,7 +259,7 @@ void svs::state_deletion_callback(sym_hnd state) {
 	state_stack.pop_back();
 	if (ipc.communicate("delstate", s->get_level(), "", resp) == "error") {
 		cout << resp << endl;
-		assert(false);
+		exit(1);
 	}
 	delete s;
 }

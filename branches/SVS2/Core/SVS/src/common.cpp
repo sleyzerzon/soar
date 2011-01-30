@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string>
 #include <vector>
 
@@ -17,4 +18,12 @@ void split(const string &s, const string &delim, vector<string> &fields) {
 		}
 		fields.push_back(s.substr(start, end - start));
 	}
+}
+
+string getnamespace() {
+	string ns = getenv("SVSNAMESPACE");
+	if (ns.size() > 0 && *ns.rbegin() != '/') {
+		ns.push_back('/');
+	}
+	return ns;
 }

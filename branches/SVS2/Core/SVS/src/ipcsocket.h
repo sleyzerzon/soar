@@ -6,7 +6,7 @@ class sg_node;
 
 class ipcsocket {
 public:
-	ipcsocket(const char *socketfile);
+	ipcsocket(std::string socketfile);
 	~ipcsocket();
 	
 	void        send(const std::string &header, const std::string &msg);
