@@ -35,6 +35,23 @@ void print_tree(sg_node *n) {
 	}
 }
 
+bool usedisplay() {
+	return (getenv("SVSDISPLAY") != NULL);
+}
+
+string getnamespace() {
+	char *s;
+	if ((s = getenv("SVSNAMESPACE")) == NULL) {
+		return "";
+	}
+	
+	string ns(s);
+	if (ns.size() > 0 && *ns.rbegin() != '/') {
+		ns.push_back('/');
+	}
+	return ns;
+}
+
 svs_stats::svs_stats(sym_hnd svs_link, soar_interface *si) 
 : svs_link(svs_link), si(si), currmodel(NULL)
 {
@@ -138,7 +155,7 @@ void svs_state::init() {
 	svs_link = si->make_id_wme(state, cs->svs).first;
 	cmd_link = si->make_id_wme(svs_link, cs->cmd).first;
 	scene_link = si->make_id_wme(svs_link, cs->scene).first;
-	if (disp == NULL) {
+	if (disp == NULL && usedisplay()) {
 		disp = new ipcsocket(getnamespace() + "disp");
 	}
 	scn = new scene(name, "world", disp);
