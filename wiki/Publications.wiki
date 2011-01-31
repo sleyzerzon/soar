@@ -3,6 +3,10 @@
 
 = 2010 =
 
+Laird, J. E., Xu, J. Z., and Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-ICCM-final.pdf Using Diverse Cognitive Mechanisms for Action Modeling]_. Proceedings of the Tenth International Conference on Cognitive Modeling, Philadelphia, PA.
+
+Laird, J. E., Wray III, R. E.  (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-Wray-AGI.pdf Cognitive Architecture Requirements for Achieving AGI]_. Proceedings of the Third Conference on Artificial General Intelligence (AGI)
+
 Derbinsky, N., Laird, J. E., Smith, B.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm2010_smem.pdf Towards Efficiently Supporting Large Symbolic Declarative Memories.]_
 International Conference on Cognitive Modeling, ICCM (2010)
 
