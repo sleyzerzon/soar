@@ -13,7 +13,6 @@ using namespace sml;
 
 Kernel* kernel = NULL;
 Agent* agent = NULL;
-string lastcmd;
 
 string strip(string s, string lc, string rc) {
 	size_t b, e;
@@ -115,7 +114,7 @@ void repl() {
 	string cmd;
 	
 	while (cin) {
-		cout << endl << "# ";
+		cout << endl << "% ";
 		if (!readcmd(cmd)) {
 			cout << "?" << endl;
 			continue;
@@ -123,18 +122,9 @@ void repl() {
 		if (!cin) {
 			return;
 		}
-		if (cmd.empty()) {
-			if (lastcmd.empty()) {
-				continue;
-			}
-			cmd = lastcmd;
-		} else {
-			if (isidentifier(cmd)) {
-				cmd.insert(0, "print ");
-			}
-			lastcmd = cmd;
+		if (!cmd.empty()) {
+			execcmd(cmd);
 		}
-		execcmd(cmd);
 	}
 }
 
@@ -151,8 +141,6 @@ string exit_handler(smlRhsEventId id, void *pUserData, Agent *pAgent, char const
 }
 
 int main(int argc, char *argv[]) {
-	string src = "source ";
-	
 	kernel = Kernel::CreateKernelInCurrentThread(Kernel::kDefaultLibraryName, true, 0);
 	kernel->AddRhsFunction("exit", exit_handler, NULL);
 	
@@ -164,10 +152,6 @@ int main(int argc, char *argv[]) {
 		signal(SIGINT, siginthandler);
 	}
 	
-	for(int i = 1; i < argc; ++i) {
-		execcmd(src + argv[i]);
-	}
-		
 	repl();
 	return 0;
 }

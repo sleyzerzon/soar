@@ -21,7 +21,12 @@ void split(const string &s, const string &delim, vector<string> &fields) {
 }
 
 string getnamespace() {
-	string ns = getenv("SVSNAMESPACE");
+	char *s;
+	if ((s = getenv("SVSNAMESPACE")) == NULL) {
+		return "";
+	}
+	
+	string ns(s);
 	if (ns.size() > 0 && *ns.rbegin() != '/') {
 		ns.push_back('/');
 	}
