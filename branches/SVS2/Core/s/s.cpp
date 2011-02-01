@@ -128,11 +128,11 @@ void repl() {
 	}
 }
 
-void siginthandler(int sig) {
+void sigstophandler(int sig) {
 	if (agent) {
 		agent->StopSelf();
 	}
-	signal(SIGINT, siginthandler);
+	signal(SIGTSTP, sigstophandler);
 }
 
 string exit_handler(smlRhsEventId id, void *pUserData, Agent *pAgent, char const *pFunctionName, char const *pArgument) {
@@ -148,8 +148,8 @@ int main(int argc, char *argv[]) {
 	agent->RegisterForPrintEvent(smlEVENT_PRINT, printcb, NULL);
 	agent->SetOutputLinkChangeTracking(false);
 	
-	if (signal(SIGINT, SIG_IGN) != SIG_IGN) {
-		signal(SIGINT, siginthandler);
+	if (signal(SIGTSTP, SIG_IGN) != SIG_IGN) {
+		signal(SIGTSTP, sigstophandler);
 	}
 	
 	repl();
