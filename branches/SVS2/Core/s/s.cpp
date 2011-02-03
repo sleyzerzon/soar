@@ -1,10 +1,11 @@
 /* Minimal Soar CLI suitable for scripting
    Last modified Aug 30 2010
 */
-
+#include <ctype.h>
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <signal.h>
 #include "sml_Client.h"
 
@@ -135,14 +136,55 @@ void sigstophandler(int sig) {
 	signal(SIGTSTP, sigstophandler);
 }
 
-string exit_handler(smlRhsEventId id, void *pUserData, Agent *pAgent, char const *pFunctionName, char const *pArgument) {
-	int code = atoi(pArgument);
+string exit_handler(smlRhsEventId id, void *userdata, Agent *agent, char const *fname, char const *args) {
+	int code = atoi(args);
 	exit(code);
+}
+
+string log_handler(smlRhsEventId id, void *userdata, Agent *agent, char const *fname, char const *args) {
+	istringstream ss(args);
+	ofstream f;
+	bool iscmd, append;
+	string fn, text;
+	int c;
+	
+	iscmd = false; append = false;
+	while (true) {
+		ss >> fn;
+		if (fn == "-c") {
+			iscmd = true;
+		} else if (fn == "-a") {
+			append = true;
+		} else {
+			break;
+		}
+	}
+	while (isblank(c = ss.get()));  // ignore leading whitespace
+	ss.putback(c);
+	
+	if (iscmd) {
+		text = agent->ExecuteCommandLine(args + ss.tellg());
+	} else {
+		text = (args + ss.tellg());
+	}
+	
+	f.open(fn.c_str(), ios_base::out | (append ? ios_base::app : ios_base::trunc));
+	if (!f) {
+		cerr << "Failed to open " << fn << " for writing" << endl;
+		return "";
+	}
+	if (!(f << text)) {
+		cerr << "Write error " << fn << endl;
+		return "";
+	}
+	f.close();
+	return "";
 }
 
 int main(int argc, char *argv[]) {
 	kernel = Kernel::CreateKernelInCurrentThread(Kernel::kDefaultLibraryName, true, 0);
 	kernel->AddRhsFunction("exit", exit_handler, NULL);
+	kernel->AddRhsFunction("log", log_handler, NULL);
 	
 	agent = kernel->CreateAgent("soar1");
 	agent->RegisterForPrintEvent(smlEVENT_PRINT, printcb, NULL);

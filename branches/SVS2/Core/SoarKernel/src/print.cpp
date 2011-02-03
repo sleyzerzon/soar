@@ -84,9 +84,7 @@ void print_string (agent* thisAgent, const char *s) {
 			thisAgent->printer_output_column++;
 	}
 
-	printf(s);
-	fflush(stdout);
-	//soar_invoke_callbacks(thisAgent, PRINT_CALLBACK, static_cast<soar_call_data>(const_cast<char *>(s)));
+	soar_invoke_callbacks(thisAgent, PRINT_CALLBACK, static_cast<soar_call_data>(const_cast<char *>(s)));
 }
 
 /* ---------------------------------------------------------------
