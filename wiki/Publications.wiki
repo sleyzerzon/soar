@@ -1,18 +1,26 @@
 #summary Publications related to the Soar project.
 #labels Phase-Support
 
+= 2011 =
+
+Wang, Y. (2011). _[http://www.eecs.umich.edu/~yongjiaw/WangThesis.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
+
 = 2010 =
 
-Laird, J. E., Xu, J. Z., and Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-ICCM-final.pdf Using Diverse Cognitive Mechanisms for Action Modeling]_. Proceedings of the Tenth International Conference on Cognitive Modeling, Philadelphia, PA.
-
-Laird, J. E., Wray III, R. E.  (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-Wray-AGI.pdf Cognitive Architecture Requirements for Achieving AGI]_. Proceedings of the Third Conference on Artificial General Intelligence (AGI)
+Derbinsky, N., Gorski, N.A.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_exploring.pdf Exploring the Space of Computational Memory Models.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
 
 Derbinsky, N., Laird, J. E., Smith, B.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm2010_smem.pdf Towards Efficiently Supporting Large Symbolic Declarative Memories.]_
 International Conference on Cognitive Modeling, ICCM (2010)
 
 Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_soar9.pdf Extending Soar with Dissociated Symbolic Memories.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
 
-Derbinsky, N., Gorski, N.A.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_exploring.pdf Exploring the Space of Computational Memory Models.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
+Laird, J. E., Wray III, R. E.  (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-Wray-AGI.pdf Cognitive Architecture Requirements for Achieving AGI]_. Proceedings of the Third Conference on Artificial General Intelligence (AGI)
+
+Laird, J. E., Xu, J. Z., and Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-ICCM-final.pdf Using Diverse Cognitive Mechanisms for Action Modeling]_. Proceedings of the Tenth International Conference on Cognitive Modeling, Philadelphia, PA.
+
+Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~yongjiaw/WangIAT10.pdf Efficient Value Function Approximation with Unsupervised Hierarchical Categorization for a Reinforcement Learning Agent.]_ International Conference on Intelligent Agent Technology (IAT-10), Toronto. (Best Paper Award Nomination)
+
+Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~yongjiaw/WangICCM10.pdf A Computational Model of Functional Category Learning in a Cognitive Architecture.]_ Proceedings of the Tenth International Conference on Cognitive Modeling (ICCM-10), Philadelphia, PA.
 
 = 2009 =
 
