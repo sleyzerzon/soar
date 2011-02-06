@@ -64,6 +64,7 @@
 // high-level api				epmem::api
 
 std::map<epmem_time_id, bool> gm_cache;
+typedef std::list<std::pair<wme*, epmem_shared_literal_pair_list*> > ep_pair_list;
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -3319,7 +3320,7 @@ inline bool epmem_gm_pair_satisfied( epmem_shared_literal_pair* pair, epmem_gm_a
 // a wme is satisfied if:
 // - it is the end of the list of wmes OR
 // - a pair in the WME is satisfied AND the rest of the list is satisfied
-bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_map::iterator wme_p, epmem_shared_literal_pair_map::iterator end_wme_p, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
+bool epmem_gm_wme_satisfied( ep_pair_list::iterator wme_p, ep_pair_list::iterator end_wme_p, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
 {
 	bool return_val = false;
 
@@ -3332,7 +3333,7 @@ bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_map::iterator wme_p, epme
 		epmem_shared_literal_pair_list* pairs = wme_p->second;
 		epmem_shared_literal_pair_list::iterator pair_p = pairs->begin();
 
-		epmem_shared_literal_pair_map::iterator next_wme_p = wme_p;
+		ep_pair_list::iterator next_wme_p = wme_p;
 		next_wme_p++;
 
 		// the pair call can modify these
@@ -3376,11 +3377,48 @@ bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_map::iterator wme_p, epme
 	return return_val;
 }
 
+void depth_first_order_wmes(wme* w, std::list<wme*> &ordered) {
+	slot *s;
+	wme *wc;
+	
+	if (std::find(ordered.begin(), ordered.end(), w) != ordered.end()) {
+		return;
+	}
+	ordered.push_back(w);
+	if (w->value->var.common_symbol_info.symbol_type != IDENTIFIER_SYMBOL_TYPE) {
+		return;
+	}
+	for (s = w->value->id.slots; s; s = s->next) {
+		for (wc = s->wmes; wc; wc = wc->next) {
+			depth_first_order_wmes(wc, ordered);
+		}
+	}
+}
+
 // graph match is achieved if we can develop a set of assignments/constraints
 // that satisfies the entire list of wmes
 bool epmem_graph_match( epmem_shared_literal_pair_map* pairs, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
 {
-	return epmem_gm_wme_satisfied( pairs->begin(), pairs->end(), id_assignments, used_ids, sym_constraints );
+	ep_pair_list ordered_pairs;
+	std::list<wme*> ordered_wmes;
+	epmem_shared_literal_pair_map::iterator i;
+	std::list<wme*>::iterator j;
+	
+	for (i = pairs->begin(); i != pairs->end(); ++i) {
+		if (strcmp(i->first->attr->sc.name, "action") == 0 ||
+		    strcmp(i->first->attr->sc.name, "predicates") == 0)
+		{
+			depth_first_order_wmes(i->first, ordered_wmes);
+		}
+	}
+	assert(ordered_wmes.size() == pairs->size());
+	
+	for (j = ordered_wmes.begin(); j != ordered_wmes.end(); ++j) {
+		i = pairs->find(*j);
+		assert (i != pairs->end());
+		ordered_pairs.push_back(*i);
+	}
+	return epmem_gm_wme_satisfied( ordered_pairs.begin(), ordered_pairs.end(), id_assignments, used_ids, sym_constraints );
 }
 
 //////////////////////////////////////////////////////////
