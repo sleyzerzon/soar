@@ -63,6 +63,7 @@
 
 // high-level api				epmem::api
 
+std::map<epmem_time_id, bool> gm_cache;
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -4271,7 +4272,12 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										my_agent->epmem_timers->query_graph_match->start();
 										////////////////////////////////////////////////////////////////////////////
 
-										graph_match_result = epmem_graph_match( gm_pairs, &( current_assignments ), &( current_used_ids ), &( current_sym_constraints ) );
+										if (gm_cache.find(current_valid_end) == gm_cache.end()) {
+											graph_match_result = epmem_graph_match( gm_pairs, &( current_assignments ), &( current_used_ids ), &( current_sym_constraints ) );
+											gm_cache[current_valid_end] = graph_match_result;
+										} else {
+											graph_match_result = gm_cache[current_valid_end];
+										}
 
 										////////////////////////////////////////////////////////////////////////////
 										my_agent->epmem_timers->query_graph_match->stop();
