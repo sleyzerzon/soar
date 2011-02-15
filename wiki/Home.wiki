@@ -23,3 +23,10 @@ The Soar Tutorial is available in any recent download's `share/soar/Documentatio
 See the links to the left, also:
   * [http://soar.googlecode.com/files/dogma.pdf Soar Dogma]: Things nobody told you about coding in Soar that you probably ought to know.
   * [http://sitemaker.umich.edu/soar/soar_workshops Soar Workshop Proceedings].
+  * Laird, J. E. (2008) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird%20-%202008%20-%20Extending%20the%20Soar%20Cognitive%20Architecture.pdf Extending the Soar Cognitive Architecture]. In Proceedings of the First Conference on Artificial General Intelligence (AGI-08).
+    * Abstract: One approach in pursuit of general intelligent agents has been to concentrate on the underlying cognitive architecture, of which Soar is a prime example. In the past, Soar has relied on a minimal number of architectural modules together with purely symbolic representations of knowledge. This paper presents the cognitive architecture approach to general intelligence and the traditional, symbolic Soar architecture. This is followed by major additions to Soar: nonsymbolic representations, new learning mechanisms, and long-term memories.
+  * Lewis, R.L. (2001) [http://www-personal.umich.edu/~rickl/Documents/cognitive-theory-soar.pdf Cognitive theory, Soar]. In International Encylopedia of the Social and Behavioral Sciences. Amsterdam: Pergamon (Elsevier Science).
+  * Lewis, R.L. (1999). [http://www-personal.umich.edu/~rickl/Documents/mitecs-article.pdf Cognitive modeling, symbolic]. In Wilson, R. and Keil, F. (eds.), The MIT Encyclopedia of the Cognitive Sciences. Cambridge, MA: MIT Press.
+  * [http://www.eecs.umich.edu/~soar/sitemaker/docs/misc/SoarFunctionalOverview.pdf Soar: A Functional Approach to General Intelligence]
+  * [http://www.eecs.umich.edu/~soar/sitemaker/docs/misc/SoarRBSComparison.pdf Soar: A comparison with Rule-Based Systems]
+  * [http://www.eecs.umich.edu/~soar/sitemaker/docs/misc/FutureSoarResearch.pdf Soar: Along the Frontiers] (regarding future research)
