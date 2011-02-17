@@ -44,6 +44,7 @@
     * [SoarXMLInterfaceSpecification SoarXMLInterfaceSpecification]
     * [SoarOniPhone Soar on iOS]
     * [SoarTimers Timers in Soar]
+    * [CliDev Command Line Interface Development]
   * [SoarGroupReadings Readings]
   * [SoarGroupTalks Talks]
   * [ConferenceSchedule Conferences]
