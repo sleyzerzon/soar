@@ -1,0 +1,113 @@
+#summary Adding and changing commands, debugging the CLI core
+
+= Overview =
+
+The command line interface (CLI) described in this document has no
+relation to the lexer/parser inside the Soar kernel. CLI often refers to
+the actual object instance (a member of KernelSML) but sometimes can
+refer to the whole component.
+
+The CLI takes an arbitrary string and transforms it in to method calls
+providing a general interface to Soar as described by the help document
+on the Soar wiki (on Google Code).
+
+A command line in this context can actually be many commands, or an
+entire file. In this document it will be called a command line. The
+syntax of what is legal closely follows the Tcl language and is spelled
+out in the doxygen help in Core/shared/tokenizer.h. 
+
+The command line enters the CLI at CommandLineInterface::DoCommand. Some
+quick state is updated but then it is passed to Source (defined in
+cli_source.cpp), a same function used by the source command in Soar.
+This is why command lines and files are interchangable.
+
+Source then uses the tokenizer utility to split out the command name and
+its arguments. The critical piece used by tokenizer to do this is the
+parser instance (cli::Parser, cli_Parser.h, a member of CLI) which knows
+what all the commands and aliases are.
+
+The parser expands aliases, performs a partial match if necessary and
+then, if there is no ambiguity, calls the appropriate command's Parse
+function with a vector of the tokens used for the command. Sometimes
+this vector is only of length 1 (the command name). Again, Tcl rules are
+used to tokenize each command (and to split commands).
+
+These commands' Parse functions are defined in cli_Commands.h and
+registered with the parser with the CLI is first created. The parser is
+also aware of aliases, which are initially defined in the Alias
+constructor executed when the Parser is first created. Aliases can
+change down the road when commands access the parser's aliases member. 
+
+The purpose of the parse function is to process the command's options
+(if any) and report syntax errors as necessary. Some input checking is
+done here but some is saved for the next Do step (below). Few command
+(such as dirs) have no parsing--most have plenty of stuff to do in this
+phase.
+
+  * Example of command that takes no arguments:
+    * dirs
+
+Some commands just need to test for the presence of and get an argument
+or two off of the command line before proceeding. An example of this is
+the max-elaborations command. These commands are simple--the vector of
+tokens can be inspected and used directly.
+
+  * Example of command that has arguments:
+    * max-elaborations 15
+      * Non-option argument: 15
+
+Other commands have options which are handled using the option utilities
+on the Parser instance, sometimes in addition to other, non-option
+arguments.
+
+  * More common commands (with options):
+    * echo-commands -y
+      * Option (short): y
+    * learn --off
+      * Option (long): off
+    * echo -n Hello world!
+      * Option (short): n
+      * Arguments: [Hello, world!]
+    * watch --chunks -L print
+      * Option (long): chunks
+      * Option (short) with argument: L, print
+
+Options always have both long and short forms, and a required argument,
+optional argument, or no argument setting expected. These are all
+defined in the top of the Parse function before the option handling code
+is called.
+
+Once the command and options are parsed, a function call is made to
+actually process the command. These are all declared initially on the
+Cli interface defined in cli_Cli.h. This interface exists to facilitate
+context-free testing of the command parsing. By convention, these
+processing functions all start with Do so they are easily spotted on the
+CLI.
+
+The CLI implements this interface, and defines the functions and their
+related helper functions in their own files. DoSource, for example, is
+defined in cli_source.cpp.
+
+The meat of the command happens in these Do functions. The function
+signatures vary depending on what the commands need. Enumerations are
+used to pass modes from the parsing step to the Do step. Null pointers
+are used often when some parameter is optional, to indicate that it was
+omitted. Bit vectors are often used to pass a number of flags from the
+parsing step to the processing step.
+
+The motivation behind splitting the parsing from the processing in the
+commands is both for testing and so that other parts of Soar/SML can
+call these interface functions directly without having to render command
+lines.
+
+When commands complete, they return text to be printed after they
+execute. Traditionally, little or nothing is printed when there is
+success.
+
+There is support for more structured output for commands so that callers
+can pull specific values out of command results (instead of parsing the
+stringified results). This mode is optional and is tested by checking
+the m_RawOutput member on the CLI. Structured output is built up using a
+form of XML.
+
+
