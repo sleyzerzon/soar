@@ -28,33 +28,15 @@ transform3::transform3(transform_tags::Translation t, vec3 v)
   m20(0.0), m21(0.0), m22(1.0), m23(v.z)
 {}
 
-/* this is from http://planning.cs.uiuc.edu/node102.html but it
-   doesn't match up with my reference from cgkit. It must have
-   something to do with the order of the component rotations.
-   
-transform3::transform3(transform_tags::Rotation t, vec3 v)
-{
-	double sina = sin(v.x), sinb = sin(v.y), sing = sin(v.z),
-	       cosa = cos(v.x), cosb = cos(v.y), cosg = cos(v.z);
-	
-	m00=cosa*cosb; m01=cosa*sinb*sing-sina*cosg; m02=cosa*sinb*cosg+sina*sing; m03=0.0;
-	m10=sina*cosb; m11=sina*sinb*sing+cosa*cosg; m12=sina*sinb*cosg-cosa*sing; m13=0.0;
-	m20=-sinb;     m21=cosb*sing;                m22=cosb*cosg;                m23=0.0;
-}
-
-*/	
-
-/* this one passes the tests, and agrees with 
-   http://mathworld.wolfram.com/EulerAngles.html up to some sign differences
- */
+/* http://mathworld.wolfram.com/EulerAngles.html */
 transform3::transform3(transform_tags::Rotation t, vec3 v)
 {
 	double siny = sin(v.x), sinp = sin(v.y), sinr = sin(v.z),
 	       cosy = cos(v.x), cosp = cos(v.y), cosr = cos(v.z);
 	
-	m00=cosp*cosy; m01=cosp*-siny; m02=sinp; m03=0;
-	m10=sinr*sinp*cosy+cosr*siny; m11=-sinr*sinp*siny+cosr*cosy; m12=-sinr*cosp; m13=0;
-	m20=cosr*-sinp*cosy+sinr*siny; m21=cosr*sinp*siny+sinr*cosy; m22=cosr*cosp; m23=0;
+	m00=cosp*cosy;                 m01=cosp*-siny;                m02=sinp;       m03=0;
+	m10=sinr*sinp*cosy+cosr*siny;  m11=-sinr*sinp*siny+cosr*cosy; m12=-sinr*cosp; m13=0;
+	m20=cosr*-sinp*cosy+sinr*siny; m21=cosr*sinp*siny+sinr*cosy;  m22=cosr*cosp;  m23=0;
 }
 
 transform3::transform3(transform_tags::Scaling t, vec3 v)

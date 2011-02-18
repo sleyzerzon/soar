@@ -18,6 +18,7 @@ public:
 	sg_node* get_node(std::string name);
 	
 	void     update(sg_node *n, sg_node::change_type t);
+	void     update_sgel(std::string s);
 	void     wipe();
 	
 private:
@@ -25,6 +26,10 @@ private:
 	void handle_del(sg_node *n);
 	void handle_ptschange(sg_node *n);
 	void update_object(sg_node *n);
+
+	int parse_attach(std::vector<std::string> &f);
+	int parse_detach(std::vector<std::string> &f);
+	int parse_change(std::vector<std::string> &f);
 
 	std::string name;
 	std::string rootname;

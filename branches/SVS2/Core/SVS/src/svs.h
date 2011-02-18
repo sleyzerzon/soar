@@ -4,13 +4,12 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "sg_node.h"
 #include "ipcsocket.h"
 #include "soar_interface.h"
 
 class cmd_watcher;
-class wm_sgo;
 class scene;
-class sg_node;
 
 typedef std::map<std::string,sg_node*> node_name_map;
 
@@ -48,6 +47,28 @@ private:
 	std::map<std::pair<sym_hnd,std::string>,wme_hnd> statwmes;
 };
 
+/* working memory scene graph object - mediates between wmes and scene graph nodes */
+class wmsgo : public sg_listener {
+public:
+	wmsgo(soar_interface *soarinterface, sym_hnd ident, wmsgo *parent, sg_node *node);
+	~wmsgo();
+	
+	void update(sg_node *n, sg_node::change_type t);
+	wmsgo* add_child(sg_node *c);
+	
+private:
+	void detach();
+	
+	wmsgo*         parent;
+	sg_node*        node;
+	sym_hnd         id;
+	wme_hnd         name_wme;
+	soar_interface* soarint;
+
+	std::map<wmsgo*,wme_hnd> childs;
+
+};
+
 class svs_state {
 public:
 	svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common_syms *syms);
@@ -73,10 +94,10 @@ private:
 	void init();
 	void collect_cmds(Symbol* id, std::set<wme*>& all_cmds);
 	
-	svs_state      *parent;
 	int            level;
-	scene*         scn;
-	wm_sgo*        wm_sg_root;
+	svs_state      *parent;
+	scene          *scn;
+	wmsgo         *wm_sg_root;
 	soar_interface *si;
 	ipcsocket      *ipc;
 	common_syms    *cs;

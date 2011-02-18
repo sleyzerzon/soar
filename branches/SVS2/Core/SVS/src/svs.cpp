@@ -9,7 +9,6 @@
 #include "svs.h"
 #include "cmd_watcher.h"
 #include "nsg_node.h"
-#include "wm_sgo.h"
 #include "soar_interface.h"
 #include "scene.h"
 #include "common.h"
@@ -17,8 +16,6 @@
 using namespace std;
 
 typedef map<wme_hnd,cmd_watcher*>::iterator cmd_iter;
-
-extern int parse_state_update(string msg, scene *scn);
 
 ipcsocket *disp = NULL;
 
@@ -51,6 +48,68 @@ string getnamespace() {
 	}
 	return ns;
 }
+
+wmsgo::wmsgo(soar_interface *si, sym_hnd ident, wmsgo *parent, sg_node *node) 
+: soarint(si), id(ident), parent(parent), node(node)
+{
+	int i;
+	node->listen(this);
+	name_wme = soarint->make_wme(id, "id", node->get_name());
+	for (i = 0; i < node->num_children(); ++i) {
+		add_child(node->get_child(i));
+	}
+}
+
+wmsgo::~wmsgo() {
+	map<wmsgo*,wme_hnd>::iterator i;
+
+	if (node) {
+		node->unlisten(this);
+	}
+	soarint->remove_wme(name_wme);
+	for (i = childs.begin(); i != childs.end(); ++i) {
+		i->first->parent = NULL;
+		soarint->remove_wme(i->second);
+	}
+	if (parent) {
+		map<wmsgo*, wme_hnd>::iterator ci = parent->childs.find(this);
+		assert(ci != parent->childs.end());
+		soarint->remove_wme(ci->second);
+		parent->childs.erase(ci);
+	}
+}
+
+void wmsgo::update(sg_node *n, sg_node::change_type t) {
+	switch (t) {
+		case sg_node::CHILD_ADDED:
+			add_child(node->get_child(node->num_children()-1));
+			break;
+		case sg_node::DETACHED:
+		case sg_node::DELETED:
+			node = NULL;
+			delete this;
+			break;
+	};
+}
+
+wmsgo* wmsgo::add_child(sg_node *c) {
+	sym_wme_pair cid_wme;
+	char letter;
+	string cname = c->get_name();
+	wmsgo *child;
+	
+	if (cname.size() == 0 || !isalpha(cname[0])) {
+		letter = 'n';
+	} else {
+		letter = cname[0];
+	}
+	cid_wme = soarint->make_id_wme(id, "child");
+	
+	child = new wmsgo(soarint, cid_wme.first, this, c);
+	childs[child] = cid_wme.second;
+	return child;
+}
+
 
 svs_stats::svs_stats(sym_hnd svs_link, soar_interface *si) 
 : svs_link(svs_link), si(si), currmodel(NULL)
@@ -159,7 +218,7 @@ void svs_state::init() {
 		disp = new ipcsocket(getnamespace() + "disp");
 	}
 	scn = new scene(name, "world", disp);
-	wm_sg_root = new wm_sgo(si, scene_link, (wm_sgo*) NULL, scn->get_root());
+	wm_sg_root = new wmsgo(si, scene_link, (wmsgo*) NULL, scn->get_root());
 	if (!parent) {
 		ltm_link = si->make_id_wme(svs_link, cs->ltm).first;
 		stats = new svs_stats(svs_link, si);
@@ -172,12 +231,12 @@ void svs_state::update(const string &msg) {
 	
 	if (sscanf(msg.c_str(), "%d", &n) != 1) {
 		perror("svs_state::update");
-		cout << msg << endl;
+		cerr << msg << endl;
 		exit(1);
 	}
 	scene_num = n;
 	update_scene_num();
-	parse_state_update(msg.substr(p+1), scn);
+	scn->update_sgel(msg.substr(p+1));
 }
 
 void svs_state::update_scene_num() {

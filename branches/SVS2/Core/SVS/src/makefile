@@ -1,9 +1,9 @@
 #CXXFLAGS+=-g
 LIBS=
 
-srcs=nsg_node.cpp sgel_interp.cpp linalg.cpp scene.cpp wm_sgo.cpp svs.cpp soar_interface.cpp
+srcs=nsg_node.cpp linalg.cpp scene.cpp svs.cpp soar_interface.cpp
 objs=$(srcs:.cpp=.o)
-headers=sg_node.h nsg_node.h sgel_interp.h linalg.h scene.h wm_sgo.h soar_interface.h svs.h
+headers=sg_node.h nsg_node.h linalg.h scene.h soar_interface.h svs.h
 testprogs=tests/test_svs tests/buildsg
 
 .SUFFIXES: # delete default suffix rules
