@@ -3,6 +3,8 @@
 
 = 2011 =
 
+Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/laird_brims2011.pdf Performance Evaluation of Declarative Memory Systems in Soar]_, Proceedings of BRIMS 2011, Sundance, UT.
+
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~yongjiaw/WangThesis.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
 = 2010 =
@@ -21,6 +23,10 @@ Laird, J. E., Xu, J. Z., and Wintermute, S. (2010). _[http://www.eecs.umich.edu/
 Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~yongjiaw/WangIAT10.pdf Efficient Value Function Approximation with Unsupervised Hierarchical Categorization for a Reinforcement Learning Agent.]_ International Conference on Intelligent Agent Technology (IAT-10), Toronto. (Best Paper Award Nomination)
 
 Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~yongjiaw/WangICCM10.pdf A Computational Model of Functional Category Learning in a Cognitive Architecture.]_ Proceedings of the Tenth International Conference on Cognitive Modeling (ICCM-10), Philadelphia, PA.
+
+Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute_aaai2010.pdf Using Imagery to Simplify Perceptual Abstraction in Reinforcement Learning Agents]_. Proceedings of the Twenty-Fourth AAAI Conference on Artificial Intelligence (AAAI-10), Atlanta, Georgia
+
+Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute_thesis.pdf Abstraction, Imagery, and Control in Cognitive Architecture]_. PhD Thesis, University of Michigan, Ann Arbor.
 
 = 2009 =
 
