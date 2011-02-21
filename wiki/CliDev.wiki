@@ -16,7 +16,7 @@ entire file. In this document it will be called a command line. The
 syntax of what is legal closely follows the Tcl language and is spelled
 out in the doxygen help in Core/shared/tokenizer.h. 
 
-The command line enters the CLI at CommandLineInterface::DoCommand. Some
+The command line enters the CLI at !CommandLineInterface::!DoCommand. Some
 quick state is updated but then it is passed to Source (defined in
 cli_source.cpp), a same function used by the source command in Soar.
 This is why command lines and files are interchangable.
@@ -67,7 +67,7 @@ arguments.
       * Option (long): off
     * echo -n Hello world!
       * Option (short): n
-      * Arguments: [Hello, world!]
+      * Arguments: Hello, world!
     * watch --chunks -L print
       * Option (long): chunks
       * Option (short) with argument: L, print
@@ -85,7 +85,7 @@ processing functions all start with Do so they are easily spotted on the
 CLI.
 
 The CLI implements this interface, and defines the functions and their
-related helper functions in their own files. DoSource, for example, is
+related helper functions in their own files. !DoSource, for example, is
 defined in cli_source.cpp.
 
 The meat of the command happens in these Do functions. The function
@@ -106,8 +106,8 @@ success.
 
 There is support for more structured output for commands so that callers
 can pull specific values out of command results (instead of parsing the
-stringified results). This mode is optional and is tested by checking
-the m_RawOutput member on the CLI. Structured output is built up using a
-form of XML.
+stringified results). This mode is optional (skip doing this until you
+know you need it) and is tested by checking the m_!RawOutput member on
+the CLI. Structured output is built up using a form of XML.
 
 
