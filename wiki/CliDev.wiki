@@ -229,8 +229,7 @@ Two dashes are followed by one long option
 
 All options have a short form and a long form.
   
-  * `--level` and `-l` both represent the "level" option in the `watch`
-  command.
+  * `--level` and `-l` both represent the "level" option in the `watch` command.
 
 Options can have arguments associated with them. The argument, if it
 accepts one, can be required or optional. This is specified when the
@@ -247,8 +246,7 @@ Options with arguments generally accept whatever comes after them as its
 argument. Optional arguments are trickier, refer to cli_Options.h for
 details.
 
-  * `--level 4`: `level` takes a required argument, `4` is consumed as
-  its argument.
+  * `--level 4`: `level` takes a required argument, `4` is consumed as its argument.
 
 Options can occur anywhere in the command line, except after special
 option `--` which forces an end to option parsing. *Options and any of
@@ -389,10 +387,8 @@ if (!pScheduler->VerifyStepSizeForRunType(forever, runType, interleave))
 = Implementing New Command Checklist =
 
   * Open cli_Cli.h and define your command's functional interface.
-  * Open cli_Commands.h and create a new `cli::ParserCommand` instance
-  for your command.
-    * Find a similar command and copy and paste it, changing what you
-    need, or use a template:
+  * Open cli_Commands.h and create a new `cli::ParserCommand` instance for your command.
+    * Find a similar command and copy and paste it, changing what you need, or use a template:
 
 {{{
 // no option parsing
@@ -499,8 +495,5 @@ private:
 };
 }}}
 
-  * Open up cli_CommandLineInterface.cpp and add your command in the
-  constructor.
-  * Create cli_the.cpp for your command and implement the command
-  execution.
-
+  * Open up `cli_CommandLineInterface.cpp` and add your command in the constructor.
+  * Create `cli_the.cpp` for your command and implement the command execution.
