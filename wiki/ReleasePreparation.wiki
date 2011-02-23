@@ -52,10 +52,9 @@ sure these are commented out in `SoarKernel/src/kernel.h`:
 = Documentation =
 
 Many of the documents in the documentation folder are stored in the
-repository as google documents. Many of these should probably be
-converted to living documentation on the wiki or something, reducing
-this burden. Arguably some shouldn't, like the tutorial, which are
-really nice as fully functional word documents.
+repository as Word documents. Many of these should probably be
+converted to living documentation on the wiki or something, eliminating this step. Arguably some shouldn't, like the tutorial, which are
+really nice as fully functional Word documents.
 
 At any rate, they should all be converted to PDF for the release. This
 is probably scriptable using PDFCreator or similar. Macs can print to
