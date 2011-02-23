@@ -75,7 +75,7 @@ these as noted below.
   * remove `out/bin/*.pdb`
   * copy `Python/*.py` to `out/bin`
   * remove `out/share/java/*.src.jar`
-  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
+  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs
   * copy `out/` to `Soar-Suite-<version>-win<arch>[-rcN]`
     * example version: 9.3.1
     * example arch: 32 64
@@ -87,7 +87,7 @@ these as noted below.
   * copy all of `Release/` in to `out/`
   * copy all of `Release/osx` in to `out/`
   * remove `out/share/java/*.src.jar`
-  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
+  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs
   * copy `out/` to `Soar-Suite-<version>-osx<arch>[-rcN]`
     * example version: 9.3.1
     * example arch: 32-bit 64
@@ -100,7 +100,7 @@ these as noted below.
   * copy all of `Release/` in to `out/`
   * copy all of `Release/linux` in to `out/`
   * remove `out/share/java/*.src.jar`
-  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs http://www.eecs.umich.edu/~soar/rc/docs.zip
+  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs 
   * copy `out/` to `Soar-Suite-<version>-linux<arch>[-rcN]`
     * example version: 9.3.1
     * example arch: 32 64
