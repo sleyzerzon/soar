@@ -1,8 +1,10 @@
 #summary Preparing a release
 
-== version bump ==
+= Version Bump =
 
-Many places to change the version number (this list is shorter than it used to be):
+Many places to change the version number (this list is shorter than it
+used to be):
+
   * Core/shared/soarversion.h
   * rename Java/Debugger/src/main/resources/.dlf files
   * Java/SMLJava/ edu.umich.soar.!SoarProperties.VERSION
@@ -10,24 +12,59 @@ Many places to change the version number (this list is shorter than it used to b
   * Inside all Java launchers in Release/ subfolders
   * soar-vars.bat in root
 
-== readme.txt ==
+= Readme.txt =
 
 See a previous version's release notes for a template. 
 
   * http://code.google.com/p/soar/wiki/ReleaseNotes
 
-== Compiler Switches ==
+A great (and tedious) way to prepare for this is to find out the date of
+the previous release and to go through the Subversion repository from
+that date to the current release, and summarize as many changes as you
+can. Break major changes out and include those near the top of the file.
+List the smaller changes (and the big ones, again, with shorter text)
+later in the file in a bulletted list.
 
-High-performance timers should be disabled: comment out this line in shared/misc.h:
+I usually email the people involved with changes that are complex,
+obscure, or insufficiently documented and have them write summaries for
+those.
+
+= Compiler Switches =
+
+High-performance timers should be disabled but are often checked in
+enabled. They carry an unacceptable performance penalty on many
+platforms, but we need them when doing research. This should be a
+runtime switch in the timers command. Make sure this line is commented
+out in `shared/misc.h`:
+
 {{{
 //#define USE_PERFORMANCE_FOR_BOTH 1
 }}}
 
-Timing stats should be on but not detailed. SoarKernel/src/kernel.h:
+Timing stats should be on but not detailed. Same reasons as above. Make
+sure these are commented out in `SoarKernel/src/kernel.h`:
+
 {{{
 //#define NO_TIMING_STUFF
 //#define DETAILED_TIMING_STATS
 }}}
+
+= Documentation =
+
+Many of the documents in the documentation folder are stored in the
+repository as google documents. Many of these should probably be
+converted to living documentation on the wiki or something, reducing
+this burden. Arguably some shouldn't, like the tutorial, which are
+really nice as fully functional word documents.
+
+At any rate, they should all be converted to PDF for the release. This
+is probably scriptable using PDFCreator or similar. Macs can print to
+PDF easily and out of the box but I don't know how scriptable that is.
+
+Before releasing, *convert all `.doc` and `.docx` files to PDF*. Replace
+these as noted below.
+
+= Platform Release Procedures =
 
 == Windows Release ==
 
