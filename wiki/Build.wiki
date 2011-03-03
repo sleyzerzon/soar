@@ -9,6 +9,12 @@
 
 Please help keep this page up to date. [http://code.google.com/p/soar/w/edit/Build If you see an error or notice an omission, correct it yourself] or do not hesitate to [mailto:soar-sml-list@lists.sourceforge.net send a note to the soar-sml-list].
 
+== A Note about SCons ==
+
+If you are planning on building Soar on Linux or OS X, you need SCons (details are below). Unfortunately, *SCons version 2.x does not work*. 
+
+Fortunately, Linux package managers will probably not change the `scons` default package to 2.x any time soon. On OS X, however, be careful not to install 2.x. If you do, just install the latest 1.x version over it (it will become the default and seems to work fine).
+
 <wiki:toc max_depth="1"/>
 
 ----
@@ -300,7 +306,7 @@ Open spotlight: Java preferences, make sure that the appropriate JVM is selected
 
 Install [http://developer.apple.com/tools/xcode/ XCode].
 
-Install SCons. Download the tarball from the [http://www.scons.org/ SCons site]
+Install SCons *version 1.x*. If you have 2.x installed, you can install 1.x over it, but this may break any applications that require 2.x. Download the tarball from the [http://www.scons.org/ SCons site]
 and open (extract) it. Open a terminal and navigate to the extracted folder
 (likely in Downloads). Run:
 
