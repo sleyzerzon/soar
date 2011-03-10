@@ -5,6 +5,8 @@
 
 Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2011_smem.pdf A Preliminary Functional Analysis of Memory in the Word Sense Disambiguation Task.]_ The 2nd Symposium on Human Memory for Artificial Agents, AISB (2011)
 
+Gorski, N. A., Laird, J. E. (2011) [http://www.sciencedirect.com/science?_ob=MImg&_imagekey=B6W6C-50R6KGK-1-1&_cdi=6595&_user=99318&_pii=S1389041710000537&_origin=browse&_zone=rslt_list_item&_coverDate=06%2F30%2F2011&_sk=999879997&wchp=dGLzVlb-zSkzS&md5=4e9b6c793735b716156e24816ce49574&ie=/sdarticle.pdf Learning to use episodic memory] _Cognitive Systems Research_, 12, 144-153. doi:10.1016/j.cogsys.2010.08.001
+
 Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/laird_brims2011.pdf Performance Evaluation of Declarative Memory Systems in Soar]_, Proceedings of BRIMS 2011, Sundance, UT.
 
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~yongjiaw/WangThesis.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
