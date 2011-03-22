@@ -1428,8 +1428,7 @@ Soar itself).
 ----
 = max-dc-time =
 
-Control a threshold that causes Soar to stop running after a decision cycle
-that breaks the threshold.
+Set a wall-clock time limit such that the agent will be interrupted when a single decision cycle exceeds this limit.
 
 == Synopsis ==
 
