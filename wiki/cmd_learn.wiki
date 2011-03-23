@@ -91,6 +91,4 @@ learn -l
 
 == See Also ==
 
-[cmd_watch watch] [cmd_explain_backtraces
-explain-backtraces] [cmd_save_backtraces save-backtraces]
-
+[cmd_watch watch] [cmd_explain_backtraces explain-backtraces] [cmd_save_backtraces save-backtraces]
