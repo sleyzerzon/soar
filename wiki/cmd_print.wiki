@@ -120,5 +120,3 @@ print s1 --depth 2 --tree
 == See Also ==
 
 [cmd_default_wme_depth default-wme-depth]
-[cmd_predefined_aliases predefined-aliases]
-
