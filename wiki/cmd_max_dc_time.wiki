@@ -1,0 +1,31 @@
+#summary max-dc-time command documentation
+= max-dc-time =
+
+Set a wall-clock time limit such that the agent will be interrupted when a single decision cycle exceeds this limit.
+
+== Synopsis ==
+
+{{{
+max-dc-time [--seconds] [n]
+max-dc-time -d
+}}}
+
+== Options ==
+
+|| `n` || Maximum decision cycle time in *microseconds* ||
+|| `-d`, `--disable` || Disable this interrupt. ||
+|| `-s`, `--seconds` || Interpret n as seconds (floating point OK) ||
+
+== Description ==
+
+After output phase, the elapsed decision cycle time is checked to see if it 
+is greater than the old maximum, and the maximum dc time stat is updated (see [cmd_stats stats]). At this time, this threshold is also checked. If met or exceeded,
+Soar stops at the end of the current output phase with an interrupted state.
+
+== Examples ==
+
+{{{
+max-dc-time -s 0.05
+max-dc-time 4000
+}}}
+

@@ -1,0 +1,25 @@
+#summary popd command documentation
+= popd =
+
+Pop the current working directory off the stack and change to the next
+directory on the stack. Can be relative pathname or fully specified path.
+
+== Synopsis ==
+
+{{{
+popd
+}}}
+
+== Description =
+
+This command pops a directory off of the directory stack and
+[cmd_cd changes to it]. See the [cmd_dirs
+dirs] command for an explanation of the directory stack.
+
+== See Also ==
+
+[cmd_cd cd] [cmd_dirs dirs]
+[cmd_home home] [cmd_ls ls]
+[cmd_pushd pushd] [cmd_source source]
+[cmd_pwd pwd]
+

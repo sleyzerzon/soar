@@ -1,0 +1,23 @@
+#summary pushd command documentation
+= pushd =
+
+Push a directory onto the directory stack, changing to it.
+
+== Synopsis ==
+
+{{{
+pushd directory
+}}}
+
+== Description ==
+
+Maintain a stack of working directories and push the directory on to the stack.
+Can be relative path name or fully specified.
+
+== See Also ==
+
+[cmd_cd cd] [cmd_dirs dirs]
+[cmd_home home] [cmd_ls ls]
+[cmd_popd popd] [cmd_source source]
+[cmd_pwd pwd]
+

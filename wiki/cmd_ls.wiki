@@ -1,0 +1,26 @@
+#summary ls command documentation
+= ls =
+
+List the contents of the current working directory.
+
+== Synopsis ==
+
+{{{
+ls
+}}}
+
+=== Default Aliases ===
+
+|| `dir` || `ls` ||
+
+== Description ==
+
+List the contents of the working directory.
+
+== See Also ==
+
+[cmd_cd cd] [cmd_dirs dirs]
+[cmd_home home] [cmd_pushd pushd]
+[cmd_popd popd] [cmd_source source]
+[cmd_pwd pwd]
+

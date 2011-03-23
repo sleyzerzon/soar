@@ -1,0 +1,30 @@
+#summary dirs command documentation
+= dirs =
+
+List the directory stack.
+
+== Synopsis ==
+
+{{{
+dirs
+}}}
+
+== Description ==
+
+This command lists the directory stack. Agents can move through a directory
+structure by pushing and popping directory names. The dirs command returns the
+stack.
+
+The command [cmd_pushd pushd] places a new "agent current
+directory" on top of the directory stack and changes to it. The command
+[cmd_popd popd] removes the directory at the top of the
+directory stack and changes to the previous directory which now appears at the
+top of the stack.
+
+== See Also ==
+
+[cmd_cd cd] [cmd_home home]
+[cmd_ls ls] [cmd_pushd pushd]
+[cmd_popd popd] [cmd_source source]
+[cmd_pwd pwd]
+

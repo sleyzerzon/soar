@@ -1,0 +1,32 @@
+#summary unalias command documentation
+= unalias =
+
+Undefine an existing alias
+
+== Synopsis ==
+
+{{{
+unalias name
+}}}
+
+=== Default Aliases ===
+
+|| `un` || `[cmd_unalias unalias]` ||
+
+== Description ==
+
+This command undefines a previously created alias. This command takes exactly
+one argument: the name of the alias to remove. Use the
+[cmd_alias alias] command by itself to list all defined
+aliases.
+
+== Examples ==
+
+{{{
+unalias varprint
+}}}
+
+== See Also ==
+
+[cmd_alias alias]
+
