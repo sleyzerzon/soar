@@ -6,7 +6,7 @@
   * [GettingStarted Getting Started]
   * [Publications]
   * [FAQ]
-  * [CommandLineInterface Command Line Help]
+  * [CommandIndex Command Line Help]
   * Programming Soar
     * [IntroSoarDebugger Intro to the Soar Debugger]
     * [SoarDogma Soar Dogma]
