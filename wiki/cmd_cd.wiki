@@ -33,9 +33,4 @@ cd ../home/soar/agents
 
 == See Also ==
 
-[cmd_dirs dirs] [cmd_home home]
-[cmd_ls ls] [cmd_pushd pushd]
-[cmd_popd popd] [cmd_source source]
-[cmd_pwd pwd]
-
-
+[cmd_dirs dirs] [cmd_ls ls] [cmd_pushd pushd] [cmd_popd popd] [cmd_source source] [cmd_pwd pwd]
