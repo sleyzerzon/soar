@@ -18,6 +18,7 @@ listed with each command's synopsis under "Default Aliases".
  * [cmd_echo echo]
  * [cmd_echo_commands echo-commands]
  * [cmd_edit_production edit-production]
+ * [cmd_epmem epmem]
  * [cmd_excise excise]
  * [cmd_explain_backtraces explain-backtraces]
  * [cmd_firing_counts firing-counts]
