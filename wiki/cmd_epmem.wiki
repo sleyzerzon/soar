@@ -1,0 +1,33 @@
+#summary Documentation for epmem command
+
+= epmem =
+
+Control the behavior of the episodic memory module.
+
+
+== Synopsis ==
+
+{{{
+epmem [-g] <parameter>
+epmem [-s] <parameter>
+epmem [-S] <statistic>
+epmem [-t] <timer>
+epmem [-c]
+epmem [-v]
+}}}
+
+== Parameters ==
+
+|| *Parameter* || *Description*            || *Possible values* || *Default* ||
+|| learning || Enable epmem learning  || on, off || off ||
+|| phase || Set the phase in the decision cycle during which new episodes are encoded and commands are processed || output, selection || output ||
+|| trigger || Set what triggers encoding of new episodes || dc, output, none || output ||
+|| force || Forces episode encoding/ignoring in the next storage phase || ignore, remember, off || off ||
+|| exclusions || Toggle the exclusion of an attribute string constant || * || epmem, smem ||
+|| database || Set storage location of the database || file, memory || memory ||
+|| path || Set the file system path for the database file || <none>, <path> || <none> ||
+|| commit || Set the number of episode encodings between committing changes to disk || 1, 2, ... || 1 ||
+|| balance || Set the weight of match cardinality in calculating match score || [0, 1] || 0.5 ||
+|| graph-match || Enable graph matching || on, off || on ||
+|| page_size || Set the size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
+|| cache_size || Set the number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
