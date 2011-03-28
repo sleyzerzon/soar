@@ -4,32 +4,39 @@
 
 Control the behavior of the episodic memory module.
 
-
 == Synopsis ==
 
 {{{
-epmem [-g] <parameter>
-epmem [-s] <parameter>
-epmem [-S] <statistic>
-epmem [-t] <timer>
-epmem [-c]
-epmem [-v]
+epmem -g|--get <parameter>
+epmem -s|--set <parameter> <value>
+epmem -S|--stats [<statistic>]
+epmem -t|--timers [<timer>]
+epmem -c|--close
+epmem -v|--viz <episode id>
 }}}
+
+== Options ==
+
+|| -g, --get || Print current parameter setting ||
+|| -s, --set || Set parameter value ||
+|| -S, --stats || Print statistic summary or specific statistic ||
+|| -c, --close || Close epmem database and commit to disk (if applicable) ||
+|| -v, --viz || Print episode in graphviz format ||
 
 == Parameters ==
 
 || *Parameter* || *Description*            || *Possible values* || *Default* ||
-|| learning || Enable epmem learning  || on, off || off ||
-|| phase || Set the phase in the decision cycle during which new episodes are encoded and commands are processed || output, selection || output ||
-|| trigger || Set what triggers encoding of new episodes || dc, output, none || output ||
-|| force || Forces episode encoding/ignoring in the next storage phase || ignore, remember, off || off ||
-|| exclusions || Toggle the exclusion of an attribute string constant || * || epmem, smem ||
-|| database || Set storage location of the database || file, memory || memory ||
-|| path || Set the file system path for the database file || <none>, <path> || <none> ||
-|| commit || Set the number of episode encodings between committing changes to disk || 1, 2, ... || 1 ||
-|| balance || Set the weight of match cardinality in calculating match score || [0, 1] || 0.5 ||
-|| graph-match || Enable graph matching || on, off || on ||
-|| page_size || Set the size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
+|| balance || Set the weight of match cardinality in calculating match score || `[`0, 1`]` || 0.5 ||
 || cache_size || Set the number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
+|| commit || Set the number of episode encodings between committing changes to disk || 1, 2, ... || 1 ||
+|| database || Set storage location of the database || file, memory || memory ||
+|| exclusions || Toggle the exclusion of an attribute string constant || _any string_ || epmem, smem ||
+|| force || Forces episode encoding/ignoring in the next storage phase || ignore, remember, off || off ||
+|| graph-match || Enable graph matching || on, off || on ||
+|| learning || Enable epmem learning  || on, off || off ||
 || optimization || Set database policy to optimize performance or file system safety || safety, performance || performance ||
+|| page_size || Set the size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
+|| path || Set the file system path for the database file || _empty_, _some path_ || _empty_ ||
+|| phase || Set the decision cycle phase for encoding new episodes and processing epmem link commands || output, selection || output ||
 || timers || Set granularity of timers || off, one, two, three || off ||
+|| trigger || Set what triggers encoding of new episodes || dc, output, none || output ||
