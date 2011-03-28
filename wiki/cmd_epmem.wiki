@@ -31,3 +31,5 @@ epmem [-v]
 || graph-match || Enable graph matching || on, off || on ||
 || page_size || Set the size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
 || cache_size || Set the number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
+|| optimization || Set database policy to optimize performance or file system safety || safety, performance || performance ||
+|| timers || Set granularity of timers || off, one, two, three || off ||
