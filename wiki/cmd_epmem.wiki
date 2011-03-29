@@ -17,11 +17,11 @@ epmem -v|--viz <episode id>
 
 == Options ==
 
-|| -g, --get || Print current parameter setting ||
-|| -s, --set || Set parameter value ||
-|| -S, --stats || Print statistic summary or specific statistic ||
-|| -c, --close || Close epmem database and commit to disk (if applicable) ||
-|| -v, --viz || Print episode in graphviz format ||
+|| `-g, --get` || Print current parameter setting ||
+|| `-s, --set` || Set parameter value ||
+|| `-S, --stats` || Print statistic summary or specific statistic ||
+|| `-c, --close` || Close epmem database and commit to disk (if applicable) ||
+|| `-v, --viz` || Print episode in graphviz format ||
 
 == Description ==
 
@@ -37,20 +37,20 @@ switches for each parameter.  Running `epmem` without any switches
 displays a summary of the parameter settings.
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
-|| balance || Set the weight of match cardinality in calculating match score || `[`0, 1`]` || 0.5 ||
-|| cache_size || Set the number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
-|| commit || Set the number of episode encodings between committing changes to disk || 1, 2, ... || 1 ||
-|| database || Set storage location of the database || file, memory || memory ||
-|| exclusions || Toggle the exclusion of an attribute string constant || _any string_ || epmem, smem ||
-|| force || Forces episode encoding/ignoring in the next storage phase || ignore, remember, off || off ||
-|| graph-match || Enable graph matching || on, off || on ||
-|| learning || Enable epmem learning  || on, off || off ||
-|| optimization || Set database policy to optimize performance or file system safety || safety, performance || performance ||
-|| page_size || Set the size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
-|| path || Set the file system path for the database file || _empty_, _some path_ || _empty_ ||
-|| phase || Set the decision cycle phase for encoding new episodes and processing epmem link commands || output, selection || output ||
-|| timers || Set granularity of timers || off, one, two, three || off ||
-|| trigger || Set what triggers encoding of new episodes || dc, output, none || output ||
+|| `balance` || Set the weight of match cardinality in calculating match score || `[`0, 1`]` || `0.5` ||
+|| `cache_size` || Set the number of memory pages used in the SQLite cache || `1, 2, ...` || `10000` ||
+|| `commit` || Set the number of episode encodings between committing changes to disk || `1, 2, ...` || `1` ||
+|| `database` || Set storage location of the database || `file, memory` || `memory` ||
+|| `exclusions` || Toggle the exclusion of an attribute string constant || _any string_ || `epmem, smem` ||
+|| `force` || Forces episode encoding/ignoring in the next storage phase || `ignore, remember, off` || `off` ||
+|| `graph-match` || Enable graph matching || `on, off` || `on` ||
+|| `learning` || Enable epmem learning  || `on, off` || `off` ||
+|| `optimization` || Set database policy to optimize performance or file system safety || `safety, performance` || `performance` ||
+|| `page_size` || Set the size of each memory page used in the SQLite cache || `1k, 2k, 4k, 8k, 16k, 32k, 64k` || `8k` ||
+|| `path` || Set the file system path for the database file || _empty_, _some path_ || _empty_ ||
+|| `phase` || Set the decision cycle phase for encoding new episodes and processing epmem link commands || `output, selection` || `output` ||
+|| `timers` || Set granularity of timers || `off, one, two, three` || `off` ||
+|| `trigger` || Set what triggers encoding of new episodes || `dc, output, none` || `output` ||
 
 
 The `learning` parameter turns the episodic memory module on or off.
@@ -107,16 +107,16 @@ statistics.  Unlike timers, statistics will always be updated.
 Available statistics are:
 
 || *Name* || *Label* || *Description* ||
-|| time || Time || Current episode ID ||
-|| mem-usage || Memory Usage || Current SQLite memory usage in bytes ||
-|| mem-high || Memory Highwater || High SQLite memory usage watermark in bytes ||
-|| queries || Queries || Number of times the *query* command has been processed ||
-|| ncb-wmes || Last Retrieval WMEs || Number of WMEs added to working memory in last reconstruction ||
-|| qry-pos || Last Query Positive || Number of leaf WMEs in the *query* cue of last cue-based retrieval ||
-|| qry-neg || Last Query Negative || Number of leaf WMEs in the *neg-query* cue of the last cue-based retrieval ||
-|| qry-ret || Last Query Retrieved || Episode ID of last retrieval ||
-|| qry-card || Last Query Cardinality || Match cardinality of last cue-based retrieval ||
-|| qry-lits || Last Query Literals || Number of literals in the DNF graph of last cue-based retrieval ||
+|| `time` || Time || Current episode ID ||
+|| `mem-usage` || Memory Usage || Current SQLite memory usage in bytes ||
+|| `mem-high` || Memory Highwater || High SQLite memory usage watermark in bytes ||
+|| `queries` || Queries || Number of times the *query* command has been processed ||
+|| `ncb-wmes` || Last Retrieval WMEs || Number of WMEs added to working memory in last reconstruction ||
+|| `qry-pos` || Last Query Positive || Number of leaf WMEs in the *query* cue of last cue-based retrieval ||
+|| `qry-neg` || Last Query Negative || Number of leaf WMEs in the *neg-query* cue of the last cue-based retrieval ||
+|| `qry-ret` || Last Query Retrieved || Episode ID of last retrieval ||
+|| `qry-card` || Last Query Cardinality || Match cardinality of last cue-based retrieval ||
+|| `qry-lits` || Last Query Literals || Number of literals in the DNF graph of last cue-based retrieval ||
 
 === Timers ===
 
