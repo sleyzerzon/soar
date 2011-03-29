@@ -110,6 +110,7 @@ Available statistics are:
 || time || Time || Current episode ID ||
 || mem-usage || Memory Usage || Current SQLite memory usage in bytes ||
 || mem-high || Memory Highwater || High SQLite memory usage watermark in bytes ||
+|| queries || Queries || Number of times the *query* command has been processed ||
 || ncb-wmes || Last Retrieval WMEs || Number of WMEs added to working memory in last reconstruction ||
 || qry-pos || Last Query Positive || Number of leaf WMEs in the *query* cue of last cue-based retrieval ||
 || qry-neg || Last Query Negative || Number of leaf WMEs in the *neg-query* cue of the last cue-based retrieval ||
@@ -143,6 +144,7 @@ Level two
 || `epmem_query` || Cue-based query ||
 || `epmem_storage` || Encoding new episodes ||
 || `epmem_trigger` || Deciding whether new episodes should be encoded ||
+|| `epmem_wm_phase` || Converting preference assertions to working memory changes ||
 
 Level three
 
