@@ -125,12 +125,12 @@ When debugging agents using semantic memory it is often useful to
 inspect the contents of the semantic store.  Running 
 `smem --viz [<ltid>] [<depth>]`
 will output the concept rooted at `<ltid>` to depth `<depth>` in
-graphviz format.  If `<ltid>` is omitted, ?.  For more information on
+graphviz format, including concept activation levels.  If `<ltid>` is omitted, the entire contents of the semantic store are outputted.  For more information on
 this format and visualization tools, see http://www.graphviz.org .
 
 === Reinitialization ===
 
-Why reinitialize?  For semantic memory to be reinitialized, all
+If, for experimentation/debugging, it is necessary to reinitialize an agent, including its long-term memory, semantic memory supports reinitialization.  For semantic memory to be reinitialized, all
 references to long-term identifiers in all of Soar's memories must be
 removed.  Consequently,
 `smem --init`
