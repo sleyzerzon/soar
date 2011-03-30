@@ -96,9 +96,11 @@ justifications are created by specifying one of the following arguments to the
 === Watching other Functions ===
 
 || *Option Flag* || *Argument to Option* || *Description* ||
-|| `-b, --backtracing` || `remove` (optional) || Controls the printing of backtracing information when a chunk or justification is created ||
-|| `-i, --indifferent-selection` || `remove` (optional) || Controls the printing of the scores for tied operators in random indifferent selection mode ||
-|| `-R, --rl` || `remove` (optional) || Soar-RL debugging trace ||
+|| `-b, --backtracing` || `remove` (optional) || Print backtracing information when a chunk or justification is created ||
+|| `-e, --epmem` || `remove` (optional) || Print episodic retrieval traces and IDs of newly encoded episodes  ||
+|| `-i, --indifferent-selection` || `remove` (optional) || Print scores for tied operators in random indifferent selection mode ||
+|| `-R, --rl` || `remove` (optional) || Print RL debugging output ||
+
 
 == Description ==
 
@@ -213,4 +215,3 @@ watch -f -l 3 -u 0 -j 0
 
 [cmd_pwatch pwatch] [cmd_print print]
 [cmd_run run] [cmd_watch_wmes watch-wmes]
-
