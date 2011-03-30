@@ -1,4 +1,4 @@
-#summary Documentation for epmem command
+#summary epmem command documentation
 
 = epmem =
 
