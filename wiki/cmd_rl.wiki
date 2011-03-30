@@ -1,54 +1,56 @@
 #summary rl command documentation
+
 = rl =
 
-Get/Set Soar-RL parameters and statistics.
+Control how numeric indifferent preference values in RL rules are
+updated via reinforcement learning.
 
 == Synopsis ==
 
 {{{
-rl [options parameter|statstic]
+rl -g|--get <parameter>
+rl -s|--set <parameter> <value>
+rl -S|--stats <statistic>
 }}}
 
 == Options ==
 
-|| `-g, --get` || Retrieve a Soar-RL parameter value ||
-|| `-s, --set` || Set a Soar-RL parameter value ||
-|| `-S, --stats` || Access Soar-RL statistics ||
+|| `-g, --get` || Print current parameter setting ||
+|| `-s, --set` || Set parameter value ||
+|| `-S, --stats` || Print statistic summary or specific statistic ||
 
 == Description ==
 
-This command is used to get/set all parameters in Soar-RL. Additionally used to
-access statistics. See tables below for available parameters, full information
-is in the Soar-RL manual.
+The `rl` command sets parameters and displays information related to
+reinforcement learning.  The `print` and `watch` commands display
+additional RL related information not covered by this command.
 
-== Parameters ==
+=== Parameters ===
 
-Without any options: summary table of parameter settings.
+Due to the large number of parameters, the `rl` command uses the
+`--get|--set <parameter> <value>` convention rather than individual
+switches for each parameter.  Running `rl` without any switches
+displays a summary of the parameter settings.
 
-|| *Parameter Name* || *Acceptable Values* || *Default* ||
-|| `learning` || `on, off` || `off` ||
-|| `temporal-extension` || `on, off` || `on` ||
-|| || || ||
-|| `discount-rate` || `[0, 1]` || `0.9` ||
-|| || || ||
-|| `learning-rate` || `[0, 1]` || `0.3` ||
-|| `learning-policy` || `sarsa, q-learning` || `sarsa` ||
-|| `hrl-discount` || `on, off` || `on` ||
-|| || || ||
-|| `eligibility-trace-decay-rate` || `[0, 1]` || `0` ||
-|| `eligibility-trace-tolerance` || `(0, inf)` || `0.001` ||
+|| `discount-rate` || Temporal discount (gamma) || `[`0, 1`]` || 0.9 ||
+|| `eligibility-trace-decay-rate` || Eligibility trace decay factor (lambda) || `[`0, 1`]` || 0 ||
+|| `eligibility-trace-tolerance` || Smallest eligibility trace value not considered 0 || (0, inf) || 0.001 ||
+|| `hrl-discount` || Discounting of RL updates over time in impassed states || `on`, `off` || `on` ||
+|| `learning` || Reinforcement learning enabled || `on`, `off` || `off` ||
+|| `learning-rate` || Learning rate (alpha) || `[`0, 1`]` || 0.3 ||
+|| `learning-policy` || Value update policy || `sarsa`, `q-learning` || `sarsa` ||
+|| `temporal-extension` || Propagation of RL updates over gaps  || `on`, `off` || `on` ||
 
-== Examples ==
+=== Statistics ===
 
-This command gets the value of the learning-rate parameter:
+Soar tracks some RL statistics over the lifetime of the agent.  These
+can be accessed using `rl --stats <statistic>`.  Running `rl --stats`
+without a statistic will list the values of all statistics.
 
-{{{
-rl --get learning-rate
-}}}
+|| `update-error` || Difference between target and current values in last RL update ||
+|| `total-reward` || Total accumulated reward in the last update ||
+|| `global-reward` || Total accumulated reward since agent initialization ||
 
-This command sets the value of the learning-rate parameter to 0.5:
+== See Also ==
 
-{{{
-rl --set learning-rate 0.5
-}}}
-
+[cmd_excise excise] [cmd_print print] [cmd_watch watch]
