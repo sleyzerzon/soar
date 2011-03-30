@@ -62,6 +62,7 @@ listed with each command's synopsis under "Default Aliases".
  * [cmd_select select]
  * [cmd_set_library_location set-library-location]
  * [cmd_set_stop_phase set-stop-phase]
+ * [cmd_smem smem]
  * [cmd_soarnews soarnews]
  * [cmd_source source]
  * [cmd_sp sp]
