@@ -1,0 +1,149 @@
+#summary smem command documentation
+
+= smem =
+
+Control the behavior of semantic memory.
+
+== Synopsis ==
+
+{{{
+smem
+smem -g|--get <parameter>
+smem -s|--set <parameter> <value>
+smem -S|--stats [<statistic>]
+smem -t|--timers [<timer>]
+smem -a|--add <concept>
+smem -v|--viz [<lti>] [<depth>]
+smem -i|--init
+}}}
+
+== Options ==
+
+|| `-g, --get` || Print current parameter setting ||
+|| `-s, --set` || Set parameter value ||
+|| `-S, --stats` || Print statistic summary or specific statistic ||
+|| `-a, --add` || Add concepts to semantic memory ||
+|| `-v, --viz` || Print semantic store in graphviz format ||
+|| `-i, --init` || Reinitialize ALL memories ||
+
+== Description ==
+
+The `smem` command changes the behavior of and displays information
+about semantic memory.  The command `watch --smem` displays additional
+trace information for semantic memory not controlled by this command.
+
+=== Parameters ===
+
+Due to the large number of parameters, the `smem` command uses the
+`--get|--set <parameter> <value>` convention rather than individual
+switches for each parameter.  Running `smem` without any switches
+displays a summary of the parameter settings.
+
+|| *Parameter* || *Description* || *Possible values* || *Default* ||
+|| `cache_size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
+|| `database` || Database storage method || `file`, `memory` || `memory` ||
+|| `lazy-commit` || Delay writing semantic store changes to file until agent exits || `on`, `off` || `on` ||
+|| `learning` || Semantic memory enabled || `on`, `off` || `off` ||
+|| `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
+|| `page_size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
+|| `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
+|| `thresh` || Threshold for activation locality || 0, 1, ... || 100 ||
+|| `timers` || Timer granularity || `off`, `one`, `two`, `three` || `off` ||
+
+=== Statistics ===
+
+Semantic memory tracks statistics over the lifetime of the agent.
+These can be accessed using `smem --stats <statistic>`.  Running
+`smem --stats` without a statistic will list the values of all
+statistics.  Unlike timers, statistics will always be updated.
+Available statistics are:
+
+|| *Name* || *Label* || *Description* ||
+|| `edges` || Edges || Number of edges in the semantic store ||
+|| `mem-usage` || Memory Usage || Current SQLite memory usage in bytes ||
+|| `mem-high` || Memory Highwater || High SQLite memory usage watermark in bytes ||
+|| `nodes` || Nodes || Number of nodes in the semantic store ||
+|| `queries` || Queries || Number of times the *query* command has been issued ||
+|| `retrieves` || Retrieves || Number of times the *retrieve* command has been issued ||
+|| `stores` || Stores || Number of times the *store* command has been issued ||
+
+=== Timers ===
+
+Semantic memory also has a set of internal timers that record the
+durations of certain operations.  Because fine-grained timing can
+incur runtime costs, semantic memory timers are off by default.
+Timers of different levels of detail can be turned on by issuing
+`smem --set timers <level>`, 
+where the levels can be `off`, `one`, `two`, or `three`, `three` being
+most detailed and resulting in all timers being turned on.  Note that
+none of the semantic memory statistics nor timing information is
+reported by the `stats` command.
+
+Level one
+
+|| `_total` || Total smem operations ||
+
+Level two
+
+|| `smem_api` || Agent command validation ||
+|| `smem_hash` || Hashing symbols ||
+|| `smem_init` || Semantic store initialization ||
+|| `smem_ncb_retrieval` || Adding concepts (and children) to working memory ||
+|| `smem_query` || Cue-based queries ||
+|| `smem_storage` || Concept storage ||
+
+Level three
+
+|| three_activation || Recency information maintenance ||
+
+=== Manual Storage ===
+
+Concepts can be manually added to the semantic store using the 
+`smem --add <concept>`
+command.  The format for specifying the concept is similar to that of
+adding WMEs to working memory on the RHS of productions.  For example:
+
+{{{
+smem --add {
+   (<arithmetic> ^add10-facts <a01> <a02> <a03>)
+   (<a01> ^digit1 1 ^digit-10 11)
+   (<a02> ^digit1 2 ^digit-10 12)
+   (<a03> ^digit1 3 ^digit-10 13)
+}
+}}}
+
+Although not shown here, the common "dot-notation" format used in
+writing productions can also be used for this command.  Unlike agent
+storage, manual storage is automatically recursive.  Thus, the above
+example will add a new concept (represented by the temporary
+"arithmetic" variable) with three children.  Each child will be its
+own concept with two constant attribute/value pairs.
+
+=== Graphviz ===
+
+When debugging agents using semantic memory it is often useful to
+inspect the contents of the semantic store.  Running 
+`smem --viz [<ltid>] [<depth>]`
+will output the concept rooted at `<ltid>` to depth `<depth>` in
+graphviz format.  If `<ltid>` is omitted, ?.  For more information on
+this format and visualization tools, see http://www.graphviz.org .
+
+=== Reinitialization ===
+
+Why reinitialize?  For semantic memory to be reinitialized, all
+references to long-term identifiers in all of Soar's memories must be
+removed.  Consequently,
+`smem --init`
+will reinitialize episodic, semantic, procedural, and working
+memories.  It is equivalent to wiping the semantic store and executing
+these commands:
+
+{{{
+epmem --close
+excise --all
+init-soar
+}}}
+
+== Also See ==
+
+[cmd_watch watch]
