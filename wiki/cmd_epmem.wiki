@@ -37,20 +37,20 @@ switches for each parameter.  Running `epmem` without any switches
 displays a summary of the parameter settings.
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
-|| `balance` || Set the weight of match cardinality in calculating match score || `[`0, 1`]` || `0.5` ||
-|| `cache_size` || Set the number of memory pages used in the SQLite cache || `1, 2, ...` || `10000` ||
-|| `commit` || Set the number of episode encodings between committing changes to disk || `1, 2, ...` || `1` ||
-|| `database` || Set storage location of the database || `file, memory` || `memory` ||
+|| `balance` || Weight of match cardinality used in calculating match score || `[`0, 1`]` || `0.5` ||
+|| `cache_size` || Number of memory pages used in the SQLite cache || `1, 2, ...` || `10000` ||
+|| `commit` || Number of episode encodings between committing changes to disk || `1, 2, ...` || `1` ||
+|| `database` || Database storage method || `file, memory` || `memory` ||
 || `exclusions` || Toggle the exclusion of an attribute string constant || _any string_ || `epmem, smem` ||
 || `force` || Forces episode encoding/ignoring in the next storage phase || `ignore, remember, off` || `off` ||
-|| `graph-match` || Enable graph matching || `on, off` || `on` ||
-|| `learning` || Enable epmem learning  || `on, off` || `off` ||
-|| `optimization` || Set database policy to optimize performance or file system safety || `safety, performance` || `performance` ||
-|| `page_size` || Set the size of each memory page used in the SQLite cache || `1k, 2k, 4k, 8k, 16k, 32k, 64k` || `8k` ||
-|| `path` || Set the file system path for the database file || _empty_, _some path_ || _empty_ ||
-|| `phase` || Set the decision cycle phase for encoding new episodes and processing epmem link commands || `output, selection` || `output` ||
-|| `timers` || Set granularity of timers || `off, one, two, three` || `off` ||
-|| `trigger` || Set what triggers encoding of new episodes || `dc, output, none` || `output` ||
+|| `graph-match` || Graph matching enabled || `on, off` || `on` ||
+|| `learning` ||  Episodic memory enabled  || `on, off` || `off` ||
+|| `optimization` ||  Policy for committing data to disk || `safety, performance` || `performance` ||
+|| `page_size` || Size of each memory page used in the SQLite cache || `1k, 2k, 4k, 8k, 16k, 32k, 64k` || `8k` ||
+|| `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
+|| `phase` || Decision cycle phase to encode new episodes and process epmem link commands || `output, selection` || `output` ||
+|| `timers` || Timer granularity || `off, one, two, three` || `off` ||
+|| `trigger` || How episode encoding is triggered || `dc, output, none` || `output` ||
 
 
 The `learning` parameter turns the episodic memory module on or off.
@@ -174,3 +174,7 @@ inspect the contents of individual episodes.  Running `epmem --viz
 <episode id>` will output the contents of an episode in graphviz
 format.  For more information on this format and visualization tools,
 see http://www.graphviz.org .
+
+== See Also ==
+
+[cmd_watch watch]
