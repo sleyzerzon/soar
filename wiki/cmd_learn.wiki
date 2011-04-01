@@ -1,7 +1,7 @@
 #summary learn command documentation
 = learn =
 
-Set the parameters for chunking, Soar's learning mechanism.
+Set the parameters for chunking.
 
 == Synopsis ==
 
@@ -29,8 +29,8 @@ learn [-eabnN]
 
 == Description ==
 
-The learn command controls the parameters for chunking (Soar's learning
-mechanism). With no arguments, this command prints out the current learning
+The learn command controls the parameters for chunking. 
+With no arguments, this command prints out the current learning
 environment status. If arguments are provided, they will alter the learning
 environment as described in the options and arguments table. The
 [cmd_watch watch] command can be used to provide various
