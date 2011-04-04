@@ -13,8 +13,8 @@ gp { production_body }
 
 The gp command defines a pattern used to generate and source a set of Soar
 productions. `production_body` is a single argument that looks almost identical
-to a standard Soar rule that would be used with the [cmd_sp
-sp] command. Indeed, any syntax that is allowed in [cmd_sp sp]
+to a standard Soar rule that would be used with the [cmd_sp sp] 
+command. Indeed, any syntax that is allowed in [cmd_sp sp]
 is also allowed in gp.
 
 Patterns in gp are specified with sets of whitespace-seprated values in square
@@ -87,4 +87,3 @@ gp {strange-example
 == See Also ==
 
 [cmd_sp sp]
-
