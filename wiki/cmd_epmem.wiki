@@ -171,8 +171,9 @@ Level three
 === Graphviz ===
 
 When debugging agents using episodic memory it is often useful to
-inspect the contents of individual episodes.  Running `epmem --viz
-<episode id>` will output the contents of an episode in graphviz
+inspect the contents of individual episodes.  Running 
+`epmem --viz <episode id>` 
+will output the contents of an episode in graphviz
 format.  For more information on this format and visualization tools,
 see http://www.graphviz.org .
 
