@@ -179,4 +179,4 @@ see http://www.graphviz.org .
 
 == See Also ==
 
-[cmd_watch watch]
+[cmd_watch watch] [cmd_wma wma]
