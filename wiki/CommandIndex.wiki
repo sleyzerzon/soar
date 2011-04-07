@@ -78,3 +78,4 @@ listed with each command's synopsis under "Default Aliases".
  * [cmd_warnings warnings]
  * [cmd_watch watch]
  * [cmd_watch_wmes watch-wmes]
+ * [cmd_wma wma]
