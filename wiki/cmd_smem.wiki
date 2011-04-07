@@ -144,6 +144,6 @@ excise --all
 init-soar
 }}}
 
-== Also See ==
+== See Also ==
 
 [cmd_watch watch]
