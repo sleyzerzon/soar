@@ -19,3 +19,16 @@ void split(const string &s, const string &delim, vector<string> &fields) {
 		fields.push_back(s.substr(start, end - start));
 	}
 }
+
+string getnamespace() {
+	char *s;
+	if ((s = getenv("SVSNAMESPACE")) == NULL) {
+		return "";
+	}
+	
+	string ns(s);
+	if (ns.size() > 0 && *ns.rbegin() != '/') {
+		ns.push_back('/');
+	}
+	return ns;
+}

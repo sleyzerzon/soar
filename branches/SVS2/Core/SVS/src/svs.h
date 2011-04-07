@@ -80,7 +80,7 @@ public:
 	void           process_cmds();
 	void           update_cmd_results(bool early);
 	void           update_scene_num();
-	void           wipe_scene();
+	void           clear_scene();
 	void           update_stats(const std::string &msg);
 	
 	int            get_level()           { return level;     }
@@ -97,7 +97,7 @@ private:
 	int            level;
 	svs_state      *parent;
 	scene          *scn;
-	wmsgo         *wm_sg_root;
+	wmsgo          *wm_sg_root;
 	soar_interface *si;
 	ipcsocket      *ipc;
 	common_syms    *cs;
@@ -128,6 +128,8 @@ public:
 
 	int  get_env_input(const std::string &line);
 	
+	ipcsocket *get_envsock()  { return &envsock; }
+	
 private:
 	void make_common_syms();
 	void del_common_syms();
@@ -135,7 +137,7 @@ private:
 	soar_interface*         si;
 	common_syms             cs;
 	std::vector<svs_state*> state_stack;
-	ipcsocket               ipc;
+	ipcsocket               envsock;
 };
 
 #endif

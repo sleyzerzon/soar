@@ -4,13 +4,20 @@
 #include "scene.h"
 #include "nsg_node.h"
 #include "linalg.h"
+#include "ipcsocket.h"
+#include "common.h"
 
 using namespace std;
 
-scene::scene(string name, string rootname, ipcsocket *disp) 
-: name(name), rootname(rootname), disp(disp)
+ipcsocket *disp = NULL;
+
+scene::scene(string name, string rootname) 
+: name(name), rootname(rootname)
 {
-	if (disp) disp->send("newscene", name);
+	if (!disp) {
+		disp = new ipcsocket(getnamespace() + "disp");
+	}
+	disp->send("newscene", name);
 	root = new nsg_node(rootname);
 	handle_add(root);
 }
@@ -24,7 +31,7 @@ sg_node* scene::get_root() {
 	return root;
 }
 
-sg_node* scene::get_node(std::string name) {
+sg_node* scene::get_node(string name) {
 	node_map::iterator i;
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return NULL;
@@ -32,57 +39,44 @@ sg_node* scene::get_node(std::string name) {
 	return i->second;
 }
 
-void scene::update_object(sg_node *n) {
-	stringstream ss;
-	ptlist pts;
+bool scene::add_node(string parent, string name, const ptlist &points) {
+	sg_node *p = get_node(parent);
+	nsg_node *n;
 	
-	if (n->is_group()) {
-		return;
+	if (!p) {
+		return false;
 	}
-	ss << name << '\n' << n->get_name() << '\n';
-	n->get_world_points(pts);
-	copy(pts.begin(), pts.end(), ostream_iterator<vec3>(ss, "\n"));
-	if (disp) disp->send("updateobject", ss.str());
-}
-
-void scene::handle_add(sg_node *n) {
-	int i;
-	
-	update_object(n);
-	nodes[n->get_name()] = n;
-	n->listen(this);
-	for (i = 0; i < n->num_children(); ++i) {
-		handle_add(n->get_child(i));
+	if (points.size() == 0) {
+		n = new nsg_node(name, points);
+	} else {
+		n = new nsg_node(name);
 	}
-}
-
-void scene::handle_del(sg_node *n) {
-	if (!n->is_group()) {
-		if (disp) disp->send("delobject", name + '\n' + n->get_name());
+	if (!p->attach_child(n)) {
+		delete n;
+		return false;
 	}
-	nodes.erase(n->get_name());
+	disp_update_node(n);
+	return true;
 }
 
-void scene::handle_ptschange(sg_node *n) {
-	update_object(n);
-}
-
-
-void scene::update(sg_node *n, sg_node::change_type t) {
-	switch(t) {
-		case sg_node::CHILD_ADDED:
-			handle_add(n);
-			break;
-		case sg_node::DELETED:
-			handle_del(n);
-			break;
-		case sg_node::POINTS_CHANGED:
-			handle_ptschange(n);
-			break;
+bool scene::del_node(string name) {
+	node_map::iterator i;
+	if ((i = nodes.find(name)) == nodes.end()) {
+		return false;
 	}
+	delete i->second;
+	disp_del_node(name);
+	return true;
 }
 
-void scene::wipe() {
+bool scene::set_node_trans(string name, char type, vec3 trans) {
+	sg_node *n = get_node(name);
+	if (!n) return false;
+	n->set_trans(type, trans);
+	return true;
+}
+
+void scene::clear() {
 	int i;
 	for (i = 0; i < root->num_children(); ++i) {
 		delete root->get_child(i);
@@ -124,7 +118,7 @@ bool parse_verts(vector<string> &f, int &start, ptlist &verts) {
 	return true;
 }
 
-bool parse_transforms(vector<string> &f, int &start, sg_node *n) {
+bool scene::parse_transforms(vector<string> &f, int &start) {
 	double x[3];
 	char type;
 	while (start < f.size()) {
@@ -136,23 +130,12 @@ bool parse_transforms(vector<string> &f, int &start, sg_node *n) {
 		if (!parse_n_floats(f, start, 3, x)) {
 			return false;
 		}
-		switch (type) {
-			case 'p':
-				n->set_pos(vec3(x[0], x[1], x[2]));
-				break;
-			case 'r':
-				n->set_rot(vec3(x[0], x[1], x[2]));
-				break;
-			case 's':
-				n->set_scale(vec3(x[0], x[1], x[2]));
-				break;
-		}
+		set_node_trans(f[0], type, vec3(x[0], x[1], x[2]));
 	}
 	return true;
 }
 
-int scene::parse_attach(vector<string> &f) {
-	sg_node *n, *p;
+int scene::parse_add(vector<string> &f) {
 	ptlist verts;
 	int pos;
 
@@ -162,59 +145,53 @@ int scene::parse_attach(vector<string> &f) {
 	if (get_node(f[0])) {
 		return 0;  // already exists
 	}
-	if (!(p = get_node(f[1]))) {
-		return 1;  // parent doesn't exist
-	}
 	
 	pos = 2;
 	if (!parse_verts(f, pos, verts)) {
 		return pos;
 	}
-	if (verts.size() == 0) {
-		n = new nsg_node(f[0]);
-	} else {
-		n = new nsg_node(f[0], verts);
-	}
-
-	if (!parse_transforms(f, pos, n)) {
-		delete n;
+	if (!add_node(f[1], f[0], verts)) {
 		return pos;
 	}
-	p->attach_child(n);
+	if (!parse_transforms(f, pos)) {
+		del_node(f[0])
+		return pos;
+	}
+	if (!add_node(f[1], n)) {
+		delete n;
+		return f.size();
+	}
 	
 	return -1;
 }
 
-int scene::parse_detach(vector<string> &f) {
-	sg_node *n;
+int scene::parse_del(vector<string> &f) {
 	if (f.size() != 1) {
 		return f.size();
 	}
-	if (!(n = get_node(f[0]))) {
+	if (!del_node(f[0])) {
 		return 0;
 	}
-	delete n;
 	return -1;
 }
 
 int scene::parse_change(vector<string> &f) {
-	sg_node *n;
 	int pos;
 
 	if (f.size() < 1) {
 		return f.size();
 	}
-	if (!(n = get_node(f[0]))) {
+	if (!get_node(f[0])) {
 		return 0;
 	}
 	pos = 1;
-	if (!parse_transforms(f, pos, n)) {
+	if (!parse_transforms(f, pos)) {
 		return pos;
 	}
 	return -1;
 }
 
-void scene::update_sgel(string s) {
+void scene::parse_sgel(string s) {
 	vector<string> lines, fields;
 	vector<string>::iterator i;
 	char cmd;
@@ -236,10 +213,10 @@ void scene::update_sgel(string s) {
 		
 		switch(cmd) {
 			case 'a':
-				errfield = parse_attach(fields);
+				errfield = parse_add(fields);
 				break;
 			case 'd':
-				errfield = parse_detach(fields);
+				errfield = parse_del(fields);
 				break;
 			case 'c':
 				errfield = parse_change(fields);
@@ -253,5 +230,23 @@ void scene::update_sgel(string s) {
 			cerr << "error in field " << errfield << " of line '" << *i << "' " << endl;
 			exit(1);
 		}
+	}
+}
+
+void scene::disp_update_node(sg_node *n) {
+	stringstream ss;
+	ptlist pts;
+	
+	if (!n->is_group() && disp) {
+		ss << name << '\n' << n->get_name() << '\n';
+		n->get_world_points(pts);
+		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(ss, "\n"));
+		disp->send("updateobject", name + '\n' + n->get_name());
+	}
+}
+
+void scene::disp_del_node(sg_node *n){
+	if (!n->is_group() && disp) {
+		disp->send("delobject", name + '\n' + n->get_name());
 	}
 }

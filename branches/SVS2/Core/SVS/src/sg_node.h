@@ -29,12 +29,8 @@ public:
 	virtual sg_node*    get_child(int i) = 0;
 	virtual bool        attach_child(sg_node *c) = 0;
 
-	virtual void        set_pos(vec3 xyz) = 0;
-	virtual vec3        get_pos() = 0;
-	virtual void        set_rot(vec3 ypr) = 0;   // yaw-pitch-roll
-	virtual vec3        get_rot() = 0;
-	virtual void        set_scale(vec3 xyz) = 0;
-	virtual vec3        get_scale() = 0;
+	virtual void        set_trans(char type, vec3 trans) = 0;
+	virtual vec3        get_trans(char type) = 0;
 	
 	virtual void        get_local_points(ptlist &result) = 0;
 	virtual void        get_world_points(ptlist &result) = 0;
@@ -45,7 +41,7 @@ public:
 
 class sg_listener {
 public:
-	virtual void update(sg_node *n, sg_node::change_type t) = 0;
+	virtual void update(sg_node *n, sg_node::change_type t, std::string added_child) = 0;
 };
 
 #endif

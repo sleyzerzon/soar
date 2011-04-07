@@ -17,8 +17,6 @@ using namespace std;
 
 typedef map<wme_hnd,cmd_watcher*>::iterator cmd_iter;
 
-ipcsocket *disp = NULL;
-
 void print_tree(sg_node *n) {
 	if (n->is_group()) {
 		for(int i = 0; i < n->num_children(); ++i) {
@@ -30,23 +28,6 @@ void print_tree(sg_node *n) {
 		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(cout, ","));
 		cout << endl;
 	}
-}
-
-bool usedisplay() {
-	return (getenv("SVSDISPLAY") != NULL);
-}
-
-string getnamespace() {
-	char *s;
-	if ((s = getenv("SVSNAMESPACE")) == NULL) {
-		return "";
-	}
-	
-	string ns(s);
-	if (ns.size() > 0 && *ns.rbegin() != '/') {
-		ns.push_back('/');
-	}
-	return ns;
 }
 
 wmsgo::wmsgo(soar_interface *si, sym_hnd ident, wmsgo *parent, sg_node *node) 
@@ -176,29 +157,21 @@ void svs_stats::update(const string &msg) {
 	}
 }
 
-svs_state::svs_state(sym_hnd state, soar_interface *soar, ipcsocket *ipc, common_syms *syms)
-: parent(NULL), state(state), si(soar), cs(syms), ipc(ipc), level(0),
+svs_state::svs_state(sym_hnd state, soar_interface *soar, common_syms *syms)
+: parent(NULL), state(state), si(soar), cs(syms), level(0),
   scene_num(-1), scene_num_wme(NULL), scn(NULL), scene_link(NULL),
   ltm_link(NULL), stats(NULL)
 {
-	string resp;
-	
 	assert (si->is_top_state(state));
-	
 	init();
-	if (ipc->communicate("initscene", 0, "", resp) == "error") {
-		assert(false);
-	}
-	update(resp);
 }
 
 svs_state::svs_state(sym_hnd state, svs_state *parent)
 : parent(parent), state(state), si(parent->si), cs(parent->cs),
-  ipc(parent->ipc), level(parent->level+1), scene_num(-1),
+  level(parent->level+1), scene_num(-1),
   scene_num_wme(NULL), scn(NULL), scene_link(NULL), ltm_link(NULL),
   stats(NULL)
 {
-	
 	assert (si->get_parent_state(state) == parent->state);
 	init();
 }
@@ -214,10 +187,7 @@ void svs_state::init() {
 	svs_link = si->make_id_wme(state, cs->svs).first;
 	cmd_link = si->make_id_wme(svs_link, cs->cmd).first;
 	scene_link = si->make_id_wme(svs_link, cs->scene).first;
-	if (disp == NULL && usedisplay()) {
-		disp = new ipcsocket(getnamespace() + "disp");
-	}
-	scn = new scene(name, "world", disp);
+	scn = new scene(name, "world");
 	wm_sg_root = new wmsgo(si, scene_link, (wmsgo*) NULL, scn->get_root());
 	if (!parent) {
 		ltm_link = si->make_id_wme(svs_link, cs->ltm).first;
@@ -236,7 +206,7 @@ void svs_state::update(const string &msg) {
 	}
 	scene_num = n;
 	update_scene_num();
-	scn->update_sgel(msg.substr(p+1));
+	scn->parse_sgel(msg.substr(p+1));
 }
 
 void svs_state::update_scene_num() {
@@ -290,8 +260,8 @@ void svs_state::process_cmds() {
 	}
 }
 
-void svs_state::wipe_scene() {
-	scn->wipe();
+void svs_state::clear_scene() {
+	scn->clear();
 }
 
 void svs_state::update_stats(const string &msg) {
@@ -301,9 +271,8 @@ void svs_state::update_stats(const string &msg) {
 }
 
 svs::svs(agent *a)
-: ipc(getnamespace() + "ctrl")
+: envsock(getnamespace() + "env")
 {
-	
 	si = new soar_interface(a);
 	make_common_syms();
 }
@@ -318,7 +287,7 @@ void svs::state_creation_callback(sym_hnd state) {
 	svs_state *s;
 	
 	if (state_stack.empty()) {
-		s = new svs_state(state, si, &ipc, &cs);
+		s = new svs_state(state, si, &cs);
 	} else {
 		s = new svs_state(state, state_stack.back());
 	}
@@ -333,10 +302,6 @@ void svs::state_deletion_callback(sym_hnd state) {
 	s = state_stack.back();
 	assert(state == s->get_state());
 	state_stack.pop_back();
-	if (ipc.communicate("delstate", s->get_level(), "", resp) == "error") {
-		cout << resp << endl;
-		exit(1);
-	}
 	delete s;
 }
 
@@ -356,11 +321,6 @@ void svs::post_env_callback() {
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results(false);
 	}
-	if (ipc.communicate("updatestats", 0, "", resp) == "error") {
-		assert(false);
-	}
-	state_stack[0]->update_stats(resp);
-	//print_tree(state_stack.back()->get_scene()->get_root());
 }
 
 void svs::make_common_syms() {

@@ -319,12 +319,10 @@ public:
 			}
 			dirty = true;
 			result_filter->listen(this);
-			get_parent();
-		}
-		
-		if (!parent) {
-			set_result("no parent");
-			return false;
+			if (!get_parent()) {
+				set_result("no parent");
+				return false;
+			}
 		}
 		
 		if (result_filter && dirty) {
@@ -337,7 +335,10 @@ public:
 				set_result(result_filter->get_error());
 				return false;
 			}
-			parent->attach_child(generated);
+			if (!state->get_scene()->add_node(parent, generated)) {
+				set_result("could not attach child");
+				return false;
+			}
 			set_result("t");
 		}
 		
@@ -349,32 +350,19 @@ public:
 private:
 
 	bool get_parent() {
-		string name;
-		sg_node *new_parent;
+		sg_node *p;
 		
-		if (!get_str_param("parent", name)) {
-			parent = NULL;
+		if (!get_str_param("parent", parent)) {
 			return false;
 		}
-		
-		node_name_map::iterator j;
-		if (!(new_parent = state->get_scene()->get_node(name))) {
+		if (!(p = state->get_scene()->get_node(parent))) {
 			return false;
 		}
-		
-		if (parent == new_parent) {
-			return true;
-		}
-		
-		if (parent) {
-			parent->unlisten(this);
-		}
-		new_parent->listen(this);
-		parent = new_parent;
+
 		return true;
 	}
 	
-	sg_node   *parent;
+	string    parent;
 	sg_node   *generated;
 	filter    *result_filter;
 	bool      dirty;
@@ -407,7 +395,7 @@ public:
 		if (ipc->communicate("recall", state->get_level(), ss.str(), resp) == "error") {
 			set_result(resp);
 		} else {
-			state->wipe_scene();
+			state->clear_scene();
 			state->update(resp);
 			set_result("success");
 		}

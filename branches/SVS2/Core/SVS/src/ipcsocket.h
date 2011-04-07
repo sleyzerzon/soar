@@ -15,10 +15,12 @@ public:
 	std::string communicate(const std::string &header, int level, const std::string &msg, std::string &resp);
 	
 private:
+	bool accept();
 	void sendall(const std::string &s);
 	
 	std::string recvbuf;
-	int fd;
+	int listenfd, fd;
+	bool connected;
 };
 
 #endif

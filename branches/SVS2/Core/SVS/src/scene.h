@@ -4,38 +4,37 @@
 #include <string>
 #include <map>
 #include "sg_node.h"
-#include "nsg_node.h"
-#include "ipcsocket.h"
+#include "linalg.h"
 
 typedef std::map<std::string, sg_node*> node_map;
 
-class scene : public sg_listener {
+class scene {
 public:
-	scene(std::string name, std::string rootname, ipcsocket *disp);
+	scene(std::string name, std::string rootname);
 	~scene();
 	
 	sg_node* get_root();
 	sg_node* get_node(std::string name);
-	
-	void     update(sg_node *n, sg_node::change_type t);
-	void     update_sgel(std::string s);
-	void     wipe();
+	bool     add_node(std::string parent, std::string name, const ptlist &points);
+	bool     del_node(std::string name);
+	bool     set_node_trans(std::string name, char type, vec3 trans);
+	void     clear();
+
+	void     parse_sgel(std::string s);
 	
 private:
-	void handle_add(sg_node *n);
-	void handle_del(sg_node *n);
-	void handle_ptschange(sg_node *n);
-	void update_object(sg_node *n);
+	void disp_update_node(sg_node *n);
+	void disp_del_node(sg_node *n);
 
-	int parse_attach(std::vector<std::string> &f);
-	int parse_detach(std::vector<std::string> &f);
-	int parse_change(std::vector<std::string> &f);
+	int  parse_add(std::vector<std::string> &f);
+	int  parse_del(std::vector<std::string> &f);
+	int  parse_change(std::vector<std::string> &f);
+    bool parse_transforms(std::vector<string> &f, int &start);
 
 	std::string name;
 	std::string rootname;
 	sg_node     *root;
 	node_map    nodes;
-	ipcsocket   *disp;
 };
 
 #endif

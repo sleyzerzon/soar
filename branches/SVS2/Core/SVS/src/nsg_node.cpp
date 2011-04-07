@@ -97,9 +97,34 @@ bool nsg_node::attach_child(sg_node *c) {
 	return true;
 }
 
-void nsg_node::nsg_node::set_pos(vec3 xyz) {
-	pos = xyz;
+void nsg_node::set_trans(char type, vec3 trans) {
+	switch (type) {
+		case 'p':
+			pos = trans;
+			break;
+		case 'r':
+			rot = trans;
+			break;
+		case 's':
+			scale = trans;
+			break;
+		default:
+			assert(false);
+	}
 	set_transform_dirty();
+}
+
+vec3 nsg_node::get_trans(char type) {
+	switch (type) {
+		case 'p':
+			return pos;
+		case 'r':
+			return rot;
+		case 's':
+			return scale;
+		default:
+			assert (false);
+	}
 }
 
 vec3 nsg_node::get_pos() {

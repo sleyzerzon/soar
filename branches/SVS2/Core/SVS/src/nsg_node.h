@@ -25,12 +25,8 @@ public:
 	sg_node*    get_child(int i);
 	bool        attach_child(sg_node *c);
 
-	void        set_pos(vec3 xyz);
-	vec3        get_pos();
-	void        set_rot(vec3 ypr);
-	vec3        get_rot();
-	void        set_scale(vec3 xyz);
-	vec3        get_scale();
+	void        set_trans(char type, vec3 trans);
+	vec3        get_trans(char type);
 	
 	void        get_local_points(ptlist &result);
 	void        get_world_points(ptlist &result);

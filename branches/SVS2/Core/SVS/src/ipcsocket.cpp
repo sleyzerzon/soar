@@ -17,9 +17,8 @@ const int BUFFERSIZE = 10240;
 ipcsocket::ipcsocket(string socketfile) 
 : recvbuf()
 {
-	int listenfd;
 	socklen_t len;
-	struct sockaddr_un addr, remote;
+	struct sockaddr_un addr;
 	
 	if ((listenfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		perror("ipcsocket::ipcsocket");
@@ -39,48 +38,72 @@ ipcsocket::ipcsocket(string socketfile)
 		perror("ipcsocket::ipcsocket");
 		exit(1);
 	}
-	
-	len = sizeof(struct sockaddr_un);
-	if ((fd = accept(listenfd, (struct sockaddr *) &remote, &len)) == -1) {
-		perror("ipcsocket::ipcsocket");
-		exit(1);
+	fcntl(listenfd, F_SETFL, O_NONBLOCK);
+	connected = false;
+}
+
+ipcsocket::~ipcsocket() {
+	if (connected) {
+		disconnect();
 	}
 	close(listenfd);
 }
 
-ipcsocket::~ipcsocket() {
-	close(fd);
+bool ipcsocket::accept() {
+	socklen_t len;
+	struct sockaddr_un remote;
+	len = sizeof(struct sockaddr_un);
+	if ((fd = accept(listenfd, (struct sockaddr *) &remote, &len)) == -1) {
+		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+			perror("ipcsocket::ipcsocket");
+			exit(1);
+		}
+		return false;
+	}
+	connected = true;
+	return true;
 }
 
-void ipcsocket::sendall(const string &s) {
+void ipcsocket::disconnect() {
+	close(fd);
+	connected = false;
+}
+
+bool ipcsocket::sendall(const string &s) {
 	int n, t = 0;
+	
+	if (!connected && !accept()) return;
+	
 	while (t < s.size()) {
 		if ((n = ::send(fd, s.c_str() + t, s.size() - t, 0)) < 0) {
-			perror("ipcsocket::sendall");
-			exit(1);
+			disconnect();
+			return false;
 		}
 		t += n;
 	}
+	return true;
 }
 
-void ipcsocket::send(const string &header, int level, const string &msg) {
+bool ipcsocket::send(const string &header, int level, const string &msg) {
 	stringstream ss;
 	ss << header << ' ' << level << '\n' << msg << TERMSTRING;
-	sendall(ss.str());
+	return sendall(ss.str());
 }
 
-void ipcsocket::send(const string &header, const string &msg) {
-	sendall(header + '\n' + msg + TERMSTRING);
+bool ipcsocket::send(const string &header, const string &msg) {
+	return sendall(header + '\n' + msg + TERMSTRING);
 }
 
-void ipcsocket::receive(string &header, string &msg) {
+bool ipcsocket::receive(string &header, string &msg) {
 	char buf[BUFFERSIZE+1];
 	size_t p1, p2, n;
 	
+	if (!connected && !accept()) return;
+	
 	while((p2 = recvbuf.find(TERMSTRING)) == string::npos) {
 		if ((n = recv(fd, buf, BUFFERSIZE, 0)) == -1) {
-			perror("ipcsocket::receive");
-			exit(1);
+			disconnect();
+			return false;
 		}
 		buf[n] = '\0';
 		recvbuf += buf;
@@ -94,6 +117,9 @@ void ipcsocket::receive(string &header, string &msg) {
 
 string ipcsocket::communicate(const string &header, int level, const string &msg, string &response) {
 	string responseheader;
+	
+	if (!connected && !accept()) return "";
+	
 	send(header, level, msg);
 	receive(responseheader, response);
 	return responseheader;
