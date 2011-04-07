@@ -213,5 +213,5 @@ watch -f -l 3 -u 0 -j 0
 
 == See Also ==
 
-[cmd_pwatch pwatch] [cmd_print print]
+[cmd_epmem epmem] [cmd_pwatch pwatch] [cmd_print print]
 [cmd_run run] [cmd_watch_wmes watch-wmes]
