@@ -1,5 +1,7 @@
 ﻿#summary Command Line Interface help file.
 
+*_This page is deprecated. The new documentation pages can be accessed at [CommandIndex]._*
+
 When issuing commands, the command name can be shortened so long as there is no
 ambiguity (e.g., `pref` instead of `preferences`). Arbitrary aliases may also
 be assigned using the `alias` command. Some of the more common shortcuts are
