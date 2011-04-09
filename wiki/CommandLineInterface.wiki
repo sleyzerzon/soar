@@ -598,8 +598,7 @@ This command removes the production `my*first*production` and all chunks:
 excise my*first*production --chunks
 }}}
 
-This removes all productions and does an [CommandLineInterface#init-soar
-init-soar]:
+This removes all productions and does an [CommandLineInterface#init-soar init-soar]:
 
 {{{
 excise --all
@@ -749,8 +748,7 @@ given, only the top `n` productions are listed.  If `n` is zero (0), only the
 productions that haven't fired at all are listed. If a production name is given
 as an argument, the firing count for that production is printed.
 
-Note that firing counts are reset by a call to [CommandLineInterface#init-soar
-init-soar].
+Note that firing counts are reset by a call to [CommandLineInterface#init-soar init-soar].
 
 == Examples ==
 
@@ -769,8 +767,7 @@ firing-counts my*first*production
 
 == Warnings ==
 
-Firing-counts are reset to zero after an [CommandLineInterface#init-soar
-init-soar].
+Firing-counts are reset to zero after an [CommandLineInterface#init-soar init-soar].
 
 NB: This command is slow, because the sorting takes time `O(n*log n)`
 
@@ -825,8 +822,7 @@ gp { production_body }
 
 The gp command defines a pattern used to generate and source a set of Soar
 productions. `production_body` is a single argument that looks almost identical
-to a standard Soar rule that would be used with the [CommandLineInterface#sp
-sp] command. Indeed, any syntax that is allowed in [CommandLineInterface#sp sp]
+to a standard Soar rule that would be used with the [CommandLineInterface#sp sp] command. Indeed, any syntax that is allowed in [CommandLineInterface#sp sp]
 is also allowed in gp.
 
 Patterns in gp are specified with sets of whitespace-seprated values in square
@@ -1198,8 +1194,7 @@ learn -l
 
 == See Also ==
 
-[CommandLineInterface#watch watch] [CommandLineInterface#explain-backtraces
-explain-backtraces] [CommandLineInterface#save-backtraces save-backtraces]
+[CommandLineInterface#watch watch] [CommandLineInterface#explain-backtraces explain-backtraces] [CommandLineInterface#save-backtraces save-backtraces]
 
 ----
 = load-library =
@@ -1776,8 +1771,7 @@ popd
 == Description =
 
 This command pops a directory off of the directory stack and
-[CommandLineInterface#cd changes to it]. See the [CommandLineInterface#dirs
-dirs] command for an explanation of the directory stack.
+[CommandLineInterface#cd changes to it]. See the [CommandLineInterface#dirs dirs] command for an explanation of the directory stack.
 
 == See Also ==
 
@@ -1872,8 +1866,7 @@ identifier.
 When an identifier and the `--object` flag are specified, Soar prints the
 preferences / WME support for all WMEs comprising the specified identifier.
 
-For the time being, [CommandLineInterface#numeric-indifferent-mode
-numeric-indifferent] preferences are listed under the heading `binary
+For the time being, [CommandLineInterface#numeric-indifferent-mode numeric-indifferent] preferences are listed under the heading `binary
 indifferents:`.
 
 By default, using the `--wmes` option with a WME on the top state will only
