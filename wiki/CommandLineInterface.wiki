@@ -2589,8 +2589,7 @@ backtracing information (from chunks and justifications) is saved.
 When save-backtraces is set to `off`, backtracing information is not saved and
 explanations of the chunks and justifications that are formed can not be
 retrieved. When save-backtraces is set to `on`, backtracing information can be
-retrieved by using the [CommandLineInterface#explain-backtraces
-explain-backtraces] command. Saving backtracing information may slow down the
+retrieved by using the [CommandLineInterface#explain-backtraces explain-backtraces] command. Saving backtracing information may slow down the
 execution of your Soar program, but it can be a very useful tool in
 understanding how chunks are formed.
 
@@ -3200,8 +3199,7 @@ information while Soar is running. With no arguments, this command prints out
 the current timer status. Timers are ENABLED by default. The default
 compilation flags for soar enable the basic timers and disable the detailed
 timers. The timers command can only enable or disable timers that have already
-been enabled with compiler directives. See the [CommandLineInterface#stats
-stats] command for more info on the Soar timing system.
+been enabled with compiler directives. See the [CommandLineInterface#stats stats] command for more info on the Soar timing system.
 
 == See Also ==
 
@@ -3220,7 +3218,7 @@ unalias name
 
 === Default Aliases ===
 
-|| `un` || `[CommandLineInterface#unalias unalias]` ||
+|| `un` || `unalias` ||
 
 == Description ==
 
