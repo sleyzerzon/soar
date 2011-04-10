@@ -1,5 +1,7 @@
+#include <stdlib.h>
 #include <map>
 #include <iterator>
+#include <iostream>
 #include <sstream>
 #include "scene.h"
 #include "nsg_node.h"
@@ -19,7 +21,7 @@ scene::scene(string name, string rootname)
 	}
 	add_node("", rootname);
 	root = nodes[rootname];
-	disp->send("newscene", name);
+	disp_new_scene(name);
 }
 
 scene::scene(scene &other)
@@ -36,8 +38,8 @@ scene::scene(scene &other)
 }
 
 scene::~scene() {
+	disp_del_scene(name);
 	delete root;
-	if (disp) disp->send("delscene", name);
 }
 
 sg_node* scene::get_root() {
@@ -101,16 +103,14 @@ void scene::clear() {
 }
 
 bool parse_n_floats(vector<string> &f, int &start, int n, double *x) {
-	const char *cs;
-	char *e;
+	stringstream ss;
 	if (start + n > f.size()) {
 		start = f.size();
 		return false;
 	}
 	for (int i = 0; i < n; ++start, ++i) {
-		cs = f[start].c_str();
-		x[i] = strtod(cs, &e);
-		if (e == cs) {  // conversion failure
+		ss << f[start] << endl;
+		if (!(ss >> x[i])) {  // conversion failure
 			return false;
 		}
 	}
@@ -257,15 +257,26 @@ void scene::disp_update_node(sg_node *n) {
 	ptlist pts;
 	
 	if (!n->is_group() && disp) {
-		ss << name << '\n' << n->get_name() << '\n';
+		ss << "updateobject\n" << name << '\n' << n->get_name() << '\n';
 		n->get_world_points(pts);
 		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(ss, "\n"));
-		disp->send("updateobject", name + '\n' + n->get_name());
+		disp->send(ss.str());
 	}
 }
 
 void scene::disp_del_node(sg_node *n){
+	stringstream ss;
 	if (!n->is_group() && disp) {
-		disp->send("delobject", name + '\n' + n->get_name());
+		ss << "delobject\n" << name << '\n' << n->get_name();
+		disp->send(ss.str());
 	}
 }
+
+void scene::disp_new_scene(string name) {
+	if (disp) disp->send("newscene\n" + name);
+}
+
+void scene::disp_del_scene(string name) {
+	if (disp) disp->send("delscene\n" + name);
+}
+

@@ -235,12 +235,16 @@ void svs::state_deletion_callback(sym_hnd state) {
 
 void svs::pre_env_callback() {
 	vector<svs_state*>::iterator i;
+	string sgel;
+	
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).process_cmds();
 	}
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results(true);
 	}
+	env.input(sgel);
+	state_stack.front()->get_scene()->parse_sgel(sgel);
 }
 
 void svs::post_env_callback() {

@@ -44,10 +44,10 @@ environment::environment(string path)
 bool environment::output(env_output &out) {
 	string s;
 	out.serialize(s);
-	return sock.send("output", s);
+	return sock.send(s);
 }
 
 bool environment::input(string &sgel) {
 	string type;
-	return sock.receive(type, sgel);
+	return sock.receive(sgel);
 }

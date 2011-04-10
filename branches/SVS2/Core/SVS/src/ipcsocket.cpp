@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sstream>
-#include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#include <iostream>
+#include <sstream>
+#include <string>
+
 #include "ipcsocket.h"
 #include "sg_node.h"
 #include "linalg.h"
@@ -69,58 +74,42 @@ void ipcsocket::disconnect() {
 	connected = false;
 }
 
-bool ipcsocket::sendall(const string &s) {
-	int n, t = 0;
+bool ipcsocket::send(const string &s) {
+	int n, l, t = 0;
+	char *buf; 
 	
 	if (!connected && !accept()) return false;
 	
-	while (t < s.size()) {
-		if ((n = ::send(fd, s.c_str() + t, s.size() - t, 0)) < 0) {
+	l = s.size() + strlen(TERMSTRING);
+	buf = new char[l];
+	strcpy(buf, s.c_str());
+	strcpy(buf + s.size(), TERMSTRING);
+	while (t < l) {
+		if ((n = ::send(fd, buf + t, l - t, 0)) <= 0) {
 			disconnect();
+			delete[] buf;
 			return false;
 		}
 		t += n;
 	}
+	delete[] buf;
 	return true;
 }
 
-bool ipcsocket::send(const string &header, int level, const string &msg) {
-	stringstream ss;
-	ss << header << ' ' << level << '\n' << msg << TERMSTRING;
-	return sendall(ss.str());
-}
-
-bool ipcsocket::send(const string &header, const string &msg) {
-	return sendall(header + '\n' + msg + TERMSTRING);
-}
-
-bool ipcsocket::receive(string &header, string &msg) {
+bool ipcsocket::receive(string &msg) {
 	char buf[BUFFERSIZE+1];
-	size_t p1, p2, n;
+	size_t p, n;
 	
 	if (!connected && !accept()) return false;
 	
-	while((p2 = recvbuf.find(TERMSTRING)) == string::npos) {
-		if ((n = recv(fd, buf, BUFFERSIZE, 0)) == -1) {
+	while((p = recvbuf.find(TERMSTRING)) == string::npos) {
+		if ((n = recv(fd, buf, BUFFERSIZE, 0)) <= 0) {
 			disconnect();
 			return false;
 		}
 		buf[n] = '\0';
 		recvbuf += buf;
 	}
-	
-	p1 = recvbuf.find('\n');
-	header.assign(recvbuf.substr(0, p1));
-	msg.assign(recvbuf.substr(p1+1, p2-p1-1));
-	recvbuf.erase(0, p2+strlen(TERMSTRING));
-}
-
-string ipcsocket::communicate(const string &header, int level, const string &msg, string &response) {
-	string responseheader;
-	
-	if (!connected && !accept()) return "";
-	
-	send(header, level, msg);
-	receive(responseheader, response);
-	return responseheader;
+	msg.assign(recvbuf.substr(0, p));
+	recvbuf.erase(0, p+strlen(TERMSTRING));
 }

@@ -27,8 +27,11 @@ public:
 	
 private:
 	bool add_node(std::string parent, sg_node *n);
+	
 	void disp_update_node(sg_node *n);
 	void disp_del_node(sg_node *n);
+	void disp_new_scene(std::string name);
+	void disp_del_scene(std::string name);
 
 	int  parse_add(std::vector<std::string> &f);
 	int  parse_del(std::vector<std::string> &f);
