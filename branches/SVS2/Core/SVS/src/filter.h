@@ -120,7 +120,7 @@ public:
 	const_node_filter(sg_node *node);
 	virtual ~const_node_filter();
 	
-	void update(sg_node *n, sg_node::change_type t);
+	void update(sg_node *n, sg_node::change_type t, int added);
 	filter_result *calc_result();
 
 private:

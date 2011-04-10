@@ -39,7 +39,7 @@ public:
 	void         remove_wme(wme_hnd w);
 	bool         get_child_wmes(sym_hnd id, wme_list &childs);
 	bool         find_child_wme(sym_hnd id, const std::string &attr, wme_hnd &w);
-	
+
 	bool         is_identifier(sym_hnd sym);
 	bool         is_string(sym_hnd sym);
 	bool         is_int(sym_hnd sym);

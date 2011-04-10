@@ -4,6 +4,7 @@
 /* Implementation neutral scene graph interface */
 
 #include <string>
+#include <list>
 #include "linalg.h"
 
 class sg_listener;
@@ -28,6 +29,7 @@ public:
 	virtual int         num_children() = 0;
 	virtual sg_node*    get_child(int i) = 0;
 	virtual bool        attach_child(sg_node *c) = 0;
+	virtual void        walk(std::list<sg_node*> &result) = 0;
 
 	virtual void        set_trans(char type, vec3 trans) = 0;
 	virtual vec3        get_trans(char type) = 0;
@@ -41,7 +43,7 @@ public:
 
 class sg_listener {
 public:
-	virtual void update(sg_node *n, sg_node::change_type t, std::string added_child) = 0;
+	virtual void update(sg_node *n, sg_node::change_type t, int added_child) = 0;
 };
 
 #endif

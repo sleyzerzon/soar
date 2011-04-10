@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <sstream>
+#include <limits>
 
 #include "cmd_watcher.h"
 #include "filter.h"
@@ -281,173 +282,220 @@ private:
 	bool    dirty;
 };
 
-class gen_cmd_watcher : public cmd_base, public filter_listener, public sg_listener {
+class gen_cmd_watcher : public cmd_base {
 public:
 	gen_cmd_watcher(svs_state *state, sym_hnd cmd_root)
-	: cmd_base(state, cmd_root), parent(NULL), generated(NULL), result_filter(NULL)
+	: cmd_base(state, cmd_root)
 	{}
 	
-	~gen_cmd_watcher() {
-		if (result_filter) {
-			delete result_filter;
-		}
-		if (generated) {
-			delete generated;
-		}
-	}
-	
-	void update(sg_node* n, sg_node::change_type t) {
-		if (t == sg_node::DELETED) {
-			parent = NULL;
-			generated = NULL;  // only valid if node deletion is recursive, may change
-		}
-	}
-	
-	void update(filter *f) {
-		dirty = true;
-	}
-
 	bool update_result() {
-		filter_result *r;
-		if (cmd_changed()) {
-			if (result_filter) {
-				delete result_filter;
-			}
-			if (!(result_filter = make_filter())) {
-				set_result("command error");
-				return false;
-			}
-			dirty = true;
-			result_filter->listen(this);
-			if (!get_parent()) {
-				set_result("no parent");
-				return false;
-			}
-		}
-		
-		if (result_filter && dirty) {
-			dirty = false;
-			if (generated) {
-				delete generated;
-				generated = NULL;
-			}
-			if (!get_node_filter_result_value(NULL, result_filter, generated)) {
-				set_result(result_filter->get_error());
-				return false;
-			}
-			if (!state->get_scene()->add_node(parent, generated)) {
-				set_result("could not attach child");
-				return false;
-			}
-			set_result("t");
-		}
-		
-		return true;
+		return false;
 	}
 	
 	bool early() { return false; }
 	
 private:
-
-	bool get_parent() {
-		sg_node *p;
-		
-		if (!get_str_param("parent", parent)) {
-			return false;
-		}
-		if (!(p = state->get_scene()->get_node(parent))) {
-			return false;
-		}
-
-		return true;
-	}
-	
 	string    parent;
-	sg_node   *generated;
-	filter    *result_filter;
 	bool      dirty;
 };
 
-class recall_cmd_watcher : public cmd_base {
-public:
-	recall_cmd_watcher(svs_state *state, sym_hnd cmd_root)
-	: cmd_base(state, cmd_root)
-	{
-		wme_hnd w;
-		long scene_num;
-		stringstream ss;
-		string resp;
-		
-		ipcsocket *ipc = state->get_ipc();
-		
-		if (!si->find_child_wme(cmd_root, "scene-num", w)) {
-			set_result("missing state_num parameter");
-			return;
-		}
-		
-		if (!si->get_val(si->get_wme_val(w), scene_num)) {
-			set_result("scene-num not integer type");
-			return;
-		}
-		
-		ss << scene_num;
-		
-		if (ipc->communicate("recall", state->get_level(), ss.str(), resp) == "error") {
-			set_result(resp);
-		} else {
-			state->clear_scene();
-			state->update(resp);
-			set_result("success");
+
+/* Parses a WME structure that describes the output the environment expects.
+   Assumes this format:
+
+	^outputs (
+		^<name1> (
+			^min <val>
+			^max <val>
+			^inc <val>
+		)
+		^<name2> (
+			^min <val>
+			^max <val>
+			^inc <val>
+		)
+		...
+	)
+*/
+bool parse_output_desc_struct(soar_interface *si, sym_hnd root, env_output_desc &desc) {
+	wme_list dim_wmes;
+	wme_list::iterator i;
+	string dim_name;
+	sym_hnd dim_id;
+	wme_hnd min_wme, max_wme, inc_wme;
+	dim_desc d;
+	
+	if (!si->is_identifier(root)) {
+		return false;
+	}
+	si->get_child_wmes(root, dim_wmes);
+	for (i = dim_wmes.begin(); i != dim_wmes.end(); ++i) {
+		dim_id = si->get_wme_val(*i);
+		if (si->get_val(si->get_wme_attr(*i), dim_name)  &&
+		    si->is_identifier(dim_id)                    &&
+		    si->find_child_wme(dim_id, "min", min_wme)   &&
+		    si->get_val(si->get_wme_val(min_wme), d.min) &&
+		    si->find_child_wme(dim_id, "max", max_wme)   &&
+		    si->get_val(si->get_wme_val(max_wme), d.max) &&
+		    si->find_child_wme(dim_id, "min", inc_wme)   &&
+		    si->get_val(si->get_wme_val(inc_wme), d.inc))
+		{
+			desc[dim_name] = d;
 		}
 	}
+	return true;
+}
 
-	bool update_result() {
-		return true;
+class objective {
+public:
+	virtual double eval(scene *scn) = 0;
+};
+
+vec3 calc_centroid(const ptlist &pts) {
+	ptlist::const_iterator i;
+	int d;
+	double c[3];
+	
+	for (i = pts.begin(); i != pts.end(); ++i) {
+		for (d = 0; d < 3; ++d) {
+			c[d] += (*i)[d];
+		}
+		c[d] /= pts.size();
+	}
+	return vec3(c[0], c[1], c[2]);
+}
+
+/* Squared Euclidean distance between centroids of two objects */
+class euclidean_obj : public objective {
+public:
+	euclidean_obj(string obj1, string obj2)
+	: obj1(obj1), obj2(obj2) {}
+	
+	double eval(scene *scn) {
+		sg_node *n1, *n2;
+		ptlist p1, p2;
+		vec3 c1, c2;
+		
+		if ((n1 = scn->get_node(obj1)) == NULL ||
+		    (n2 = scn->get_node(obj2)) == NULL)
+		{
+			return numeric_limits<double>::infinity();
+		}
+		
+		n1->get_world_points(p1);
+		n2->get_world_points(p2);
+		c1 = calc_centroid(p1);
+		c2 = calc_centroid(p2);
+
+		return pow(c1[0]-c2[0], 2) + pow(c1[1]-c2[1], 2) + pow(c1[2]-c2[2], 2);
 	}
 	
-	bool early() {
-		return true;
+private:
+	string obj1, obj2;
+};
+
+/* Parse a WME structure and return the appropriate objective function.
+   Assumes this format:
+
+   ^objective (
+       ^name <name>
+       ^<param1> <val1>
+       ^<param2> <val2>
+	   ...
+   )
+*/
+objective *parse_obj_struct(soar_interface *si, sym_hnd root) {
+	wme_list param_wmes;
+	wme_list::iterator i;
+	map<string, string> params;
+	string name, attr, val;
+	
+	if (!si->is_identifier(root)) {
+		return NULL;
 	}
+	if (!si->get_child_wmes(root, param_wmes)) {
+		return NULL;
+	}
+	for (i = param_wmes.begin(); i != param_wmes.end(); ++i) {
+		if (si->get_val(si->get_wme_attr(*i), attr) &&
+		    si->get_val(si->get_wme_val(*i), val))
+		{
+			params[attr] = val;
+		}
+	}
+	name = params["name"];
+	if (name == "euclidean") {
+		if (params.find("a") == params.end() || params.find("b") == params.end()) {
+			return NULL;
+		}
+		return new euclidean_obj(params["a"], params["b"]);
+	}
+	return NULL;
+}
+
+class controller {
+public:
+	controller(model *mdl, objective *obj, const env_output_desc &outdesc)
+	: mdl(mdl), obj(obj), outdesc(outdesc), step(0) {}
+
+	/* Don't forget to make this a PID controller later */
+	env_output *seek(scene *scn) {
+		env_output curr(outdesc);
+		env_output *bestout = NULL;
+		double eval, best;
+		scene *next;
+		
+		while (curr.increment()) {
+			next = new scene(*scn);
+			mdl->predict(next, curr);
+			eval = obj->eval(next);
+			if (!bestout || eval > best) {
+				if (!bestout) {
+					delete bestout;
+				}
+				bestout = new env_output(curr);
+				best = eval;
+			}
+			delete next;
+		}
+		step++;
+		return bestout;
+	}
+	
+private:
+	model *mdl;
+	objective *obj;
+	env_output_desc outdesc;
+	int step;
 };
 
 class ctrl_cmd_watcher : public cmd_base {
 public:
 	ctrl_cmd_watcher(svs_state *state, sym_hnd cmd_root)
-	: cmd_base(state, cmd_root), ipc(state->get_ipc()), step(0), stepwme(NULL), broken(false)
+	: cmd_base(state, cmd_root), step(0), stepwme(NULL), broken(false)
 	{
 		wme_hnd w;
-		string type, msg, resp;
 		int r;
 		
-		type = parse(msg);
-		if (type == "error") {
+		if (!parse_cmd()) {
 			broken = true;
-			set_result(msg);
 			return;
 		}
-		if (ipc->communicate(type, state->get_level(), msg, resp) == "error") {
-			broken = true;
-			set_result(msg);
-			return;
-		}
-		id = atoi(resp.c_str());
-		si->make_wme(cmd_root, "trajectory", id);
 		update_step();
 	}
 	
 	bool update_result() {
-		string resp, obj;
-		stringstream ss;
-		
+		env_output *out;
 		if (broken) {
 			return false;
 		}
-		ss << id << endl;
-		if (ipc->communicate("stepctrl", state->get_level(), ss.str(), resp) == "error") {
-			set_result(resp);
-			return false;
+		out = ctrl->seek(state->get_scene());
+		if (state->get_level() == 0) {
+			state->get_svs()->get_env()->output(*out);
 		}
-		state->update(resp);
+		// need to update scene with model otherwise
+		delete out;
+		
 		set_result("success");
 		step++;
 		update_step();
@@ -457,53 +505,29 @@ public:
 	bool early() { return true; }
 	
 private:
-	string parse(string &msg) {
-		wme_hnd w;
-		wme_list objargs;
-		wme_list::iterator i;
-		sym_hnd objid;
-		string astr, vstr, name, negate;
-		stringstream ss;
-		long trajectoryid;
+	/* Assumes this format:
+	   C1 ^outputs ( ... )
+	      ^objective ( ... )
+	*/
+	bool parse_cmd() {
+		env_output_desc desc;
+		objective *obj;
+		wme_hnd outputs_wme, objective_wme;
 		
-		if (si->find_child_wme(cmd_root, "objective", w)) {
-			objid = si->get_wme_val(w);
-			if (!si->get_child_wmes(objid, objargs)) {
-				msg = "invalid objective";
-				return "error";
-			}
-			for(i = objargs.begin(); i != objargs.end(); ++i) {
-				if (!si->get_val(si->get_wme_attr(*i), astr) ||
-				    !si->get_val(si->get_wme_val(*i), vstr))
-				{
-					msg = "invalid objective";
-					return "error";
-				}
-				if (astr == "name") {
-					name = vstr;
-				} else if (astr == "negate") {
-					negate = vstr;
-					if (negate != "t" && negate != "f") {
-						msg = "invalid negate value";
-						return "error";
-					}
-				} else {
-					cleanstring(astr); cleanstring(vstr);
-					ss << astr << ' ' << vstr << endl;
-				}
-			}
-			msg = name + " " + negate + "\n" + ss.str();
-			return "seek";
-		} else if (si->find_child_wme(cmd_root, "replay", w)) {
-			if (!si->get_val(si->get_wme_val(w), trajectoryid)) {
-				return "error";
-			}
-			ss << trajectoryid;
-			msg = ss.str();
-			return "replay";
+		if (!si->find_child_wme(cmd_root, "outputs", outputs_wme) ||
+		    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
+		    !si->find_child_wme(cmd_root, "objective", objective_wme) ||
+			!si->is_identifier(si->get_wme_val(objective_wme)))
+		{
+			return false;
 		}
-		
-		return "random";
+		if ((obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL) {
+			return false;
+		}
+		if (!parse_output_desc_struct(si, si->get_wme_val(outputs_wme), desc)) {
+			return false;
+		}
+		ctrl = new controller(state->get_svs()->get_model(), obj, desc);
 	}
 
 	void update_step() {
@@ -511,119 +535,12 @@ private:
 			si->remove_wme(stepwme);
 		stepwme = si->make_wme(cmd_root, "step", step);
 	}
-	
-	ipcsocket *ipc;
+
+	controller *ctrl;
 	wme_hnd   stepwme;
-	int       id;
 	int       step;
 	bool      broken;
 };
-
-class model_cmd_watcher : public cmd_base {
-public:
-	model_cmd_watcher(svs_state *state, sym_hnd cmd_root)
-	: cmd_base(state, cmd_root), ipc(state->get_ipc())
-	{ }
-	
-	bool update_result() {
-		wme_hnd hashwme;
-		sym_hnd hashid;
-		wme_list childs;
-		wme_list::iterator i;
-		stringstream ss;
-		string attr, val, resp;
-		
-		if (!cmd_changed()) {
-			return true;
-		}
-		if (!si->find_child_wme(cmd_root, "hash", hashwme)) {
-			set_result("no hash");
-			return false;
-		}
-		
-		si->get_child_wmes(si->get_wme_val(hashwme), childs);
-		for (i = childs.begin(); i != childs.end(); ++i) {
-			if (!si->get_val(si->get_wme_attr(*i), attr) ||
-			    !si->get_val(si->get_wme_val(*i), val))
-			{
-				set_result("invalid child");
-				return false;
-			}
-			ss << attr << " " << val << endl;
-		}
-		if (ipc->communicate("model", state->get_level(), ss.str(), resp) == "error") {
-			set_result(resp);
-			return false;
-		}
-		return true;
-	}
-	
-	bool early() {
-		return true;
-	}
-	
-private:
-	ipcsocket *ipc;
-};
-
-class hold_cmd_watcher : public cmd_base {
-public:
-	hold_cmd_watcher(svs_state *state, sym_hnd cmd_root)
-	: cmd_base(state, cmd_root), ipc(state->get_ipc())
-	{ }
-	
-	~hold_cmd_watcher() {
-		stringstream s;
-		string r;
-		copy(ids.begin(), ids.end(), ostream_iterator<string>(s, " "));
-		ipc->communicate("unhold", state->get_level(), s.str(), r);
-	}
-	
-	bool update_result() {
-		wme_list childs;
-		wme_list::iterator i;
-		stringstream s;
-		string n, r;
-		
-		if (!cmd_changed()) {
-			return true;
-		}
-		if (!si->get_child_wmes(cmd_root, childs)) {
-			set_result("error");
-			return false;
-		}
-		
-		if (ids.size() > 0) {
-			copy(ids.begin(), ids.end(), ostream_iterator<string>(s, " "));
-			if (ipc->communicate("unhold", state->get_level(), s.str(), r) == "error") {
-				set_result(r);
-				return false;
-			}
-		}
-		ids.clear();
-		for (i = childs.begin(); i != childs.end(); ++i) {
-			if (!si->get_val(si->get_wme_val(*i), n)) {
-				continue;
-			}
-			ids.push_back(n);
-			s << n << " ";
-		}
-		if (ipc->communicate("hold", state->get_level(), s.str(), r) == "error") {
-			set_result(r);
-			return false;
-		}
-		return true;
-	}
-	
-	bool early() {
-		return true;
-	}
-	
-private:
-	ipcsocket      *ipc;
-	vector<string> ids;
-};
-
 
 cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
 	sym_hnd id;
@@ -644,15 +561,6 @@ cmd_watcher* make_cmd_watcher(svs_state *state, wme_hnd w) {
 		return new gen_cmd_watcher(state, id);
 	} else if (attr == "control") {
 		return new ctrl_cmd_watcher(state, id);
-	} else if (attr == "recall") {
-		return new recall_cmd_watcher(state, id);
-	} else if (attr == "model") {
-		return new model_cmd_watcher(state, id);
-	} else if (attr == "hold") {
-		return new hold_cmd_watcher(state, id);
 	}
 	return NULL;
 }
-
-
-

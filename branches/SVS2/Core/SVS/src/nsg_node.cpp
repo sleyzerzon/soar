@@ -39,9 +39,9 @@ sg_node* nsg_node::copy() {
 	} else {
 		c = new nsg_node(name, points);
 	}
-	c->set_pos(pos);
-	c->set_rot(rot);
-	c->set_scale(scale);
+	c->set_trans('p', pos);
+	c->set_trans('r', rot);
+	c->set_trans('s', scale);
 	
 	for(i = children.begin(); i != children.end(); ++i) {
 		c->attach_child((**i).copy());
@@ -79,6 +79,14 @@ sg_node* nsg_node::get_child(int i) {
 	return NULL;
 }
 
+void nsg_node::walk(std::list<sg_node*> &result) {
+	childiter i;
+	result.push_back(this);
+	for(i = children.begin(); i != children.end(); ++i) {
+		(**i).walk(result);
+	}
+}
+
 bool nsg_node::attach_child(sg_node *c) {
 	nsg_node* t;
 	if (!isgroup) {
@@ -92,7 +100,7 @@ bool nsg_node::attach_child(sg_node *c) {
 	t->parent = this;
 	t->set_transform_dirty();
 	set_points_dirty();
-	send_update(sg_node::CHILD_ADDED);
+	send_update(sg_node::CHILD_ADDED, children.size() - 1);
 	
 	return true;
 }
@@ -125,28 +133,6 @@ vec3 nsg_node::get_trans(char type) {
 		default:
 			assert (false);
 	}
-}
-
-vec3 nsg_node::get_pos() {
-	return pos;
-}
-
-void nsg_node::set_rot(vec3 ypr) {
-	rot = ypr;
-	set_transform_dirty();
-}
-
-vec3 nsg_node::get_rot() {
-	return rot;
-}
-
-void nsg_node::set_scale(vec3 xyz) {
-	scale = xyz;
-	set_transform_dirty();
-}
-
-vec3 nsg_node::get_scale() {
-	return scale;
 }
 
 void nsg_node::get_local_points(ptlist &result) {
@@ -230,12 +216,12 @@ void nsg_node::update_points() {
 
 /* if updates result in observers removing themselves, the iteration may
  * screw up, so make a copy of the std::list first */
-void nsg_node::send_update(sg_node::change_type t) {
+void nsg_node::send_update(sg_node::change_type t, int added) {
 	std::list<sg_listener*>::iterator i;
 	std::list<sg_listener*> c;
 	std::copy(listeners.begin(), listeners.end(), back_inserter(c));
 	for (i = c.begin(); i != c.end(); ++i) {
-		(**i).update(this, t);
+		(**i).update(this, t, added);
 	}
 }
 

@@ -53,7 +53,7 @@ bool ipcsocket::accept() {
 	socklen_t len;
 	struct sockaddr_un remote;
 	len = sizeof(struct sockaddr_un);
-	if ((fd = accept(listenfd, (struct sockaddr *) &remote, &len)) == -1) {
+	if ((fd = ::accept(listenfd, (struct sockaddr *) &remote, &len)) == -1) {
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
 			perror("ipcsocket::ipcsocket");
 			exit(1);
@@ -72,7 +72,7 @@ void ipcsocket::disconnect() {
 bool ipcsocket::sendall(const string &s) {
 	int n, t = 0;
 	
-	if (!connected && !accept()) return;
+	if (!connected && !accept()) return false;
 	
 	while (t < s.size()) {
 		if ((n = ::send(fd, s.c_str() + t, s.size() - t, 0)) < 0) {
@@ -98,7 +98,7 @@ bool ipcsocket::receive(string &header, string &msg) {
 	char buf[BUFFERSIZE+1];
 	size_t p1, p2, n;
 	
-	if (!connected && !accept()) return;
+	if (!connected && !accept()) return false;
 	
 	while((p2 = recvbuf.find(TERMSTRING)) == string::npos) {
 		if ((n = recv(fd, buf, BUFFERSIZE, 0)) == -1) {

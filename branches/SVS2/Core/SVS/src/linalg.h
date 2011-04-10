@@ -15,7 +15,7 @@ public:
 	: x(_x), y(_y), z(_z)
 	{}
 	
-	double operator[](int i) {
+	double operator[](int i) const {
 		switch (i) {
 			case 0:
 				return x;

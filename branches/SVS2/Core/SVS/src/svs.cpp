@@ -11,6 +11,8 @@
 #include "nsg_node.h"
 #include "soar_interface.h"
 #include "scene.h"
+#include "env.h"
+#include "model.h"
 #include "common.h"
 
 using namespace std;
@@ -30,7 +32,7 @@ void print_tree(sg_node *n) {
 	}
 }
 
-wmsgo::wmsgo(soar_interface *si, sym_hnd ident, wmsgo *parent, sg_node *node) 
+sgwme::sgwme(soar_interface *si, sym_hnd ident, sgwme *parent, sg_node *node) 
 : soarint(si), id(ident), parent(parent), node(node)
 {
 	int i;
@@ -41,8 +43,8 @@ wmsgo::wmsgo(soar_interface *si, sym_hnd ident, wmsgo *parent, sg_node *node)
 	}
 }
 
-wmsgo::~wmsgo() {
-	map<wmsgo*,wme_hnd>::iterator i;
+sgwme::~sgwme() {
+	map<sgwme*,wme_hnd>::iterator i;
 
 	if (node) {
 		node->unlisten(this);
@@ -53,17 +55,17 @@ wmsgo::~wmsgo() {
 		soarint->remove_wme(i->second);
 	}
 	if (parent) {
-		map<wmsgo*, wme_hnd>::iterator ci = parent->childs.find(this);
+		map<sgwme*, wme_hnd>::iterator ci = parent->childs.find(this);
 		assert(ci != parent->childs.end());
 		soarint->remove_wme(ci->second);
 		parent->childs.erase(ci);
 	}
 }
 
-void wmsgo::update(sg_node *n, sg_node::change_type t) {
+void sgwme::update(sg_node *n, sg_node::change_type t, int added_child) {
 	switch (t) {
 		case sg_node::CHILD_ADDED:
-			add_child(node->get_child(node->num_children()-1));
+			add_child(node->get_child(added_child));
 			break;
 		case sg_node::DETACHED:
 		case sg_node::DELETED:
@@ -73,11 +75,11 @@ void wmsgo::update(sg_node *n, sg_node::change_type t) {
 	};
 }
 
-wmsgo* wmsgo::add_child(sg_node *c) {
+void sgwme::add_child(sg_node *c) {
 	sym_wme_pair cid_wme;
 	char letter;
 	string cname = c->get_name();
-	wmsgo *child;
+	sgwme *child;
 	
 	if (cname.size() == 0 || !isalpha(cname[0])) {
 		letter = 'n';
@@ -86,98 +88,30 @@ wmsgo* wmsgo::add_child(sg_node *c) {
 	}
 	cid_wme = soarint->make_id_wme(id, "child");
 	
-	child = new wmsgo(soarint, cid_wme.first, this, c);
+	child = new sgwme(soarint, cid_wme.first, this, c);
 	childs[child] = cid_wme.second;
-	return child;
 }
 
-
-svs_stats::svs_stats(sym_hnd svs_link, soar_interface *si) 
-: svs_link(svs_link), si(si), currmodel(NULL)
-{
-	stats_link = si->make_id_wme(svs_link, "stats").first;
-	models_link = si->make_id_wme(stats_link, "models").first;
-}
-
-/* First line is current model number. Subsequent lines have form
-   <model num> <stat>:<val> <stat>:<val> ..
- */
-void svs_stats::update(const string &msg) {
-	vector<string> lines, fields, stat;
-	vector<string>::iterator i, j;
-	map<string, wme_hnd>::iterator wi;
-	map<pair<sym_hnd,string>, wme_hnd>::iterator wj;
-	sym_wme_pair tmp;
-	pair<sym_hnd, string> statkey;
-	const char *b;
-	char *e;
-	int intval;
-	double floatval;
-	wme_hnd w;
-	sym_hnd modelid;
-	
-	split(msg, "\n", lines);
-	if (currmodel != NULL) {
-		si->remove_wme(currmodel);
-	}
-	currmodel = si->make_wme(stats_link, "current-model", lines[0]);
-	
-	for (i = lines.begin() + 1; i != lines.end(); ++i) {
-		split(*i, " \t", fields);
-		assert(fields.size() > 1);
-		wi = modelwmes.find(fields[0]);
-		if (wi == modelwmes.end()) {
-			tmp = si->make_id_wme(models_link, fields[0]);
-			modelid = tmp.first;
-			modelwmes[fields[0]] = tmp.second;
-		} else {
-			modelid = si->get_wme_val(wi->second);
-		}
-		for (j = fields.begin() + 1 ; j != fields.end(); ++j) {
-			split(*j, ":", stat);
-			statkey = make_pair(modelid, stat[0]);
-			wj = statwmes.find(statkey);
-			if (wj != statwmes.end()) {
-				si->remove_wme(wj->second);
-			}
-			b = stat[1].c_str();
-			intval = strtol(b, &e, 10);
-			if (*e == '\0') {
-				w = si->make_wme(modelid, stat[0], intval);
-			} else {
-				floatval = strtod(b, &e);
-				if (*e == '\0') {
-					w = si->make_wme(modelid, stat[0], floatval);
-				} else {
-					w = si->make_wme(modelid, stat[0], stat[1]);
-				}
-			}
-			statwmes[statkey] = w;
-		}
-	}
-}
-
-svs_state::svs_state(sym_hnd state, soar_interface *soar, common_syms *syms)
-: parent(NULL), state(state), si(soar), cs(syms), level(0),
+svs_state::svs_state(svs *svsp, sym_hnd state, soar_interface *si, common_syms *syms)
+: svsp(svsp), parent(NULL), state(state), si(si), cs(syms), level(0),
   scene_num(-1), scene_num_wme(NULL), scn(NULL), scene_link(NULL),
-  ltm_link(NULL), stats(NULL)
+  ltm_link(NULL)
 {
 	assert (si->is_top_state(state));
 	init();
 }
 
 svs_state::svs_state(sym_hnd state, svs_state *parent)
-: parent(parent), state(state), si(parent->si), cs(parent->cs),
+: parent(parent), state(state), svsp(parent->svsp), si(parent->si), cs(parent->cs),
   level(parent->level+1), scene_num(-1),
-  scene_num_wme(NULL), scn(NULL), scene_link(NULL), ltm_link(NULL),
-  stats(NULL)
+  scene_num_wme(NULL), scn(NULL), scene_link(NULL), ltm_link(NULL)
 {
 	assert (si->get_parent_state(state) == parent->state);
 	init();
 }
 
 svs_state::~svs_state() {
-	delete scn; // results in wm_sg_root being deleted also
+	delete scn; // results in root being deleted also
 }
 
 void svs_state::init() {
@@ -188,10 +122,9 @@ void svs_state::init() {
 	cmd_link = si->make_id_wme(svs_link, cs->cmd).first;
 	scene_link = si->make_id_wme(svs_link, cs->scene).first;
 	scn = new scene(name, "world");
-	wm_sg_root = new wmsgo(si, scene_link, (wmsgo*) NULL, scn->get_root());
+	root = new sgwme(si, scene_link, (sgwme*) NULL, scn->get_root());
 	if (!parent) {
 		ltm_link = si->make_id_wme(svs_link, cs->ltm).first;
-		stats = new svs_stats(svs_link, si);
 	}
 }
 
@@ -264,16 +197,11 @@ void svs_state::clear_scene() {
 	scn->clear();
 }
 
-void svs_state::update_stats(const string &msg) {
-	if (stats) {
-		stats->update(msg);
-	}
-}
-
 svs::svs(agent *a)
-: envsock(getnamespace() + "env")
+: env(getnamespace() + "env")
 {
 	si = new soar_interface(a);
+	mdl = new null_model();
 	make_common_syms();
 }
 
@@ -287,7 +215,7 @@ void svs::state_creation_callback(sym_hnd state) {
 	svs_state *s;
 	
 	if (state_stack.empty()) {
-		s = new svs_state(state, si, &cs);
+		s = new svs_state(this, state, si, &cs);
 	} else {
 		s = new svs_state(state, state_stack.back());
 	}
@@ -340,7 +268,6 @@ void svs::del_common_syms() {
 	si->del_sym(cs.result);
 }
 
-int svs::get_env_input(const string &line) {
-	return 0;
+string svs::get_env_input(const string &sgel) {
+	return "";
 }
-

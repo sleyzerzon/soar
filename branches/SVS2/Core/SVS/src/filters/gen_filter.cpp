@@ -55,9 +55,9 @@ filter_result *gen_filter::calc_result() {
 	} else {
 		n = new nsg_node(name);
 	}
-	n->set_pos(pos);
-	n->set_rot(rot);
-	n->set_scale(scale);
+	n->set_trans('p', pos);
+	n->set_trans('r', rot);
+	n->set_trans('s', scale);
 	
 	if (!attach_children(n)) {
 		delete n;

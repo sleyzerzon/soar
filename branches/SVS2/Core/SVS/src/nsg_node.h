@@ -23,8 +23,9 @@ public:
 	sg_node*    get_parent();
 	int         num_children();
 	sg_node*    get_child(int i);
+	void        walk(std::list<sg_node*> &result);
 	bool        attach_child(sg_node *c);
-
+	
 	void        set_trans(char type, vec3 trans);
 	vec3        get_trans(char type);
 	
@@ -40,7 +41,7 @@ private:
 	void update_transform();
 	void set_points_dirty();
 	void update_points();
-	void send_update(sg_node::change_type t);
+	void send_update(sg_node::change_type t, int added=-1);
 	
 	std::string             name;
 	nsg_node*               parent;

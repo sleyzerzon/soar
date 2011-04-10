@@ -206,7 +206,7 @@ const_node_filter::~const_node_filter() {
 	}
 }
 
-void const_node_filter::update(sg_node *n, sg_node::change_type t) {
+void const_node_filter::update(sg_node *n, sg_node::change_type t, int added) {
 	set_dirty();
 	if (t == sg_node::DELETED) {
 		node = NULL;

@@ -17,9 +17,22 @@ scene::scene(string name, string rootname)
 	if (!disp) {
 		disp = new ipcsocket(getnamespace() + "disp");
 	}
+	add_node("", rootname);
+	root = nodes[rootname];
 	disp->send("newscene", name);
-	root = new nsg_node(rootname);
-	handle_add(root);
+}
+
+scene::scene(scene &other)
+: name(other.name), rootname(other.rootname)
+{
+	std::list<sg_node*> all_nodes;
+	std::list<sg_node*>::iterator i;
+	
+	root = other.root->copy();
+	root->walk(all_nodes);
+	for(i = all_nodes.begin(); i != all_nodes.end(); ++i) {
+		nodes[(**i).get_name()] = *i;
+	}
 }
 
 scene::~scene() {
@@ -39,24 +52,27 @@ sg_node* scene::get_node(string name) {
 	return i->second;
 }
 
-bool scene::add_node(string parent, string name, const ptlist &points) {
+bool scene::add_node(string parent, sg_node *n) {
 	sg_node *p = get_node(parent);
-	nsg_node *n;
 	
-	if (!p) {
+	if (parent != "" && !p) {
 		return false;
 	}
-	if (points.size() == 0) {
-		n = new nsg_node(name, points);
-	} else {
-		n = new nsg_node(name);
-	}
-	if (!p->attach_child(n)) {
+	if (parent != "" && !p->attach_child(n)) {
 		delete n;
 		return false;
 	}
+	nodes[n->get_name()] = n;
 	disp_update_node(n);
 	return true;
+}
+
+bool scene::add_node(string parent, string name) {
+	return add_node(parent, new nsg_node(name));
+}
+
+bool scene::add_node(string parent, string name, const ptlist &points) {
+	return add_node(parent, new nsg_node(name, points));
 }
 
 bool scene::del_node(string name) {
@@ -64,8 +80,9 @@ bool scene::del_node(string name) {
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return false;
 	}
+	disp_del_node(i->second);
 	delete i->second;
-	disp_del_node(name);
+	nodes.erase(i);
 	return true;
 }
 
@@ -150,16 +167,18 @@ int scene::parse_add(vector<string> &f) {
 	if (!parse_verts(f, pos, verts)) {
 		return pos;
 	}
-	if (!add_node(f[1], f[0], verts)) {
-		return pos;
+	if (verts.size() == 0) {
+		if (!add_node(f[1], f[0])) {
+			return pos;
+		}
+	} else {
+		if (!add_node(f[1], f[0], verts)) {
+			return pos;
+		}
 	}
 	if (!parse_transforms(f, pos)) {
-		del_node(f[0])
+		del_node(f[0]);
 		return pos;
-	}
-	if (!add_node(f[1], n)) {
-		delete n;
-		return f.size();
 	}
 	
 	return -1;
