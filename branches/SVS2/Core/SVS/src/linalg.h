@@ -11,8 +11,12 @@ public:
 	: x(0.0), y(0.0), z(0.0)
 	{}
 	
-	vec3(double _x, double _y, double _z)
-	: x(_x), y(_y), z(_z)
+	vec3(double x, double y, double z)
+	: x(x), y(y), z(z)
+	{}
+	
+	vec3(const vec3 &v)
+	: x(v.x), y(v.y), z(v.z)
 	{}
 	
 	double operator[](int i) const {
@@ -26,6 +30,10 @@ public:
 			default:
 				return 0.0;
 		}
+	}
+	
+	vec3 operator+(const vec3 &v) const {
+		return vec3(x + v.x, y + v.y, z + v.z);
 	}
 	
 	double x; double y; double z;

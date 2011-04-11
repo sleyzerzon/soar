@@ -12,7 +12,6 @@
 #include "soar_interface.h"
 #include "scene.h"
 #include "env.h"
-#include "model.h"
 #include "common.h"
 
 using namespace std;
@@ -201,7 +200,6 @@ svs::svs(agent *a)
 : env(getnamespace() + "env")
 {
 	si = new soar_interface(a);
-	mdl = new null_model();
 	make_common_syms();
 }
 

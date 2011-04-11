@@ -16,6 +16,22 @@ env_output::env_output(const env_output &other)
 : value(other.value), desc(other.desc)
 { }
 
+double env_output::get(const string &dim) {
+	map<string, double>::iterator i;
+	if ((i = value.find(dim)) == value.end()) {
+		assert(false);
+	}
+	return i->second;
+}
+
+void env_output::set(const string &dim, double val) {
+	map<string, double>::iterator i;
+	if ((i = value.find(dim)) == value.end()) {
+		assert(false);
+	}
+	i->second = val;
+}
+
 bool env_output::increment() {
 	env_output_desc::iterator i;
 	for (i = desc.begin(); i != desc.end(); ++i) {
@@ -28,7 +44,7 @@ bool env_output::increment() {
 }
 
 void env_output::serialize(string &out) {
-	map<string, float>::iterator i;
+	map<string, double>::iterator i;
 	stringstream ss;
 	
 	for (i = value.begin(); i != value.end(); ++i) {

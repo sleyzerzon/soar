@@ -69,19 +69,19 @@ public:
 	void           update_scene_num();
 	void           clear_scene();
 	
-	int            get_level()           { return level;     }
-	int            get_scene_num()       { return scene_num; }
+	int             get_level()          { return level;     }
+	int             get_scene_num()      { return scene_num; }
 	scene          *get_scene()          { return scn;       }
-	sym_hnd        get_state()           { return state;     }
+	sym_hnd         get_state()          { return state;     }
 	soar_interface *get_soar_interface() { return si;        }
-	svs            *get_svs()            { return svsp;       }
+	svs            *get_svs()            { return svsp;      }
 
 private:
 	void init();
 	void collect_cmds(Symbol* id, std::set<wme*>& all_cmds);
 
 	svs            *svsp;
-	int            level;
+	int             level;
 	svs_state      *parent;
 	scene          *scn;
 	sgwme          *root;
@@ -112,8 +112,6 @@ public:
 	void pre_env_callback();
 	void post_env_callback();
 
-	model *get_model() { return mdl; }
-	
 	environment *get_env() { return &env; }
 
 	std::string get_env_input(const std::string &sgel);
@@ -126,7 +124,6 @@ private:
 	common_syms             cs;
 	std::vector<svs_state*> state_stack;
 	environment             env;
-	model                   *mdl;
 };
 
 #endif

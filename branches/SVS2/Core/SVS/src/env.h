@@ -7,9 +7,9 @@
 #include "ipcsocket.h"
 
 typedef struct dim_desc_struct {
-	float min;
-	float max;
-	float inc;
+	double min;
+	double max;
+	double inc;
 } dim_desc;
 
 typedef std::map<std::string, dim_desc> env_output_desc;
@@ -19,11 +19,14 @@ public:
 	env_output(const env_output_desc &d);
 	env_output(const env_output &other);
 	
+	double get(const std::string &dim);
+	void   set(const std::string &dim, double val);
+	
 	bool increment();
 	void serialize(std::string &out);
 	
 private:
-	std::map<std::string, float> value;
+	std::map<std::string, double> value;
 	env_output_desc desc;
 };
 

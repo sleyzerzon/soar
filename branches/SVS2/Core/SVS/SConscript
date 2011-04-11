@@ -7,6 +7,6 @@ Import('env')
 clone = env.Clone()
 clone.Prepend(CPPPATH = Split('src src/filters #SoarKernel/src'))
 
-Command('src/filter_factory.cpp', Glob('src/filters/*.h') + Glob('src/filters/*.cpp'), './gen_filter_factory', chdir='SVS')
+Command('#SVS/src/filter_factory.cpp', Glob('src/filters/*.cpp'), './gen_filter_factory', chdir='SVS')
 svs = clone.StaticLibrary('svs', Glob('src/*.cpp') + Glob('src/filters/*.cpp'))
 env.Install('$PREFIX/lib', svs)

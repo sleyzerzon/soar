@@ -6,14 +6,7 @@
 
 class model {
 public:
-	virtual void predict(scene *scn, env_output out) = 0;
-};
-
-/* Doesn't do anything */
-class null_model : public model {
-public:
-	null_model() { }
-	void predict(scene *scn, env_output out) {}
+	virtual void predict(scene *scn, const env_output &out) = 0;
 };
 
 #endif
