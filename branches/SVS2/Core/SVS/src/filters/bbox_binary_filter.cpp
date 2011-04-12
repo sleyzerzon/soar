@@ -3,7 +3,8 @@
 */
 
 #include <iostream>
-#include "../filter.h"
+#include "filter.h"
+#include "scene.h"
 #include "bbox_filter.h"
 
 using namespace std;
@@ -56,10 +57,10 @@ static filter* make_bbox_binary_filter(const filter_params &inputs, char type) {
 	return new bbox_binary_filter(a, b, type);
 }
 
-filter* _make_bbox_int_filter_(const filter_params &inputs) {
+filter* _make_bbox_int_filter_(scene *scn, const filter_params &inputs) {
 	return make_bbox_binary_filter(inputs, 'i');
 }
 
-filter* _make_bbox_contains_filter_(const filter_params &inputs) {
+filter* _make_bbox_contains_filter_(scene *scn, const filter_params &inputs) {
 	return make_bbox_binary_filter(inputs, 'c');
 }

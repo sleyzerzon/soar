@@ -28,7 +28,5 @@ private:
 	filter_container     container;
 };
 
-filter* make_gen_filter(const filter_params &p);
-
 #endif
 

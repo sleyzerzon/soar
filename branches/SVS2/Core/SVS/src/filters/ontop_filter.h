@@ -1,7 +1,7 @@
 #ifndef ONTOP_H
 #define ONTOP_H
 
-#include "../filter.h"
+#include "filter.h"
 
 class ontop_filter : public filter {
 public:

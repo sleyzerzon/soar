@@ -2,8 +2,8 @@
 #define BBOX_FILTER_H
 
 #include <vector>
-#include "../bbox.h"
-#include "../filter.h"
+#include "bbox.h"
+#include "filter.h"
 
 class bbox_filter_result : public filter_result {
 public:

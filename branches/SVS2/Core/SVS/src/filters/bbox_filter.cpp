@@ -1,7 +1,8 @@
 #include <vector>
 #include <sstream>
-#include "../linalg.h"
-#include "../filter.h"
+#include "linalg.h"
+#include "filter.h"
+#include "scene.h"
 #include "bbox_filter.h"
 #include "ptlist_filter.h"
 
@@ -68,7 +69,7 @@ filter_result *bbox_filter::calc_result() {
 }
 
 
-filter* _make_bbox_filter_(const filter_params &inputs) {
+filter* _make_bbox_filter_(scene *scn, const filter_params &inputs) {
 	vector<filter*> filters;
 	filter_params::const_iterator i;
 	

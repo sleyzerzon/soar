@@ -4,8 +4,13 @@
 #include <string>
 #include <list>
 #include <map>
+#include <sstream>
+#include <iterator>
+
 #include "linalg.h"
 #include "sg_node.h"
+#include "scene.h"
+#include "soar_interface.h"
 
 class filter;
 
@@ -30,47 +35,81 @@ public:
 
 class bool_filter_result : public filter_result {
 public:
-	bool_filter_result(bool r);
-	std::string get_string();
-	bool get_value();
+	bool_filter_result(bool v) : v(v) {}
+	std::string get_string() { return v ? "true" : "false"; }
+	bool get_value() { return v; }
 private:
-	bool r;
+	bool v;
 };
 
 class string_filter_result : public filter_result {
 public:
-	string_filter_result(const std::string &r);
-	std::string get_string();
-	std::string get_value();
+	string_filter_result(const std::string &v) : v(v) {}
+	std::string get_string() { return v; }
+	std::string get_value() { return v; }
 private:
-	std::string r;
+	std::string v;
+};
+
+class int_filter_result : public filter_result {
+public:
+	int_filter_result(int v) : v(v) {}
+	std::string get_string() {
+		std::stringstream ss;
+		ss << v;
+		return ss.str();
+	}
+	int get_value() { return v; }
+private:
+	int v;
+};
+
+class float_filter_result : public filter_result {
+public:
+	float_filter_result(float v) : v(v) {}
+	std::string get_string() {
+		std::stringstream ss;
+		ss << v;
+		return ss.str();
+	}
+	float get_value() { return v; }
+private:
+	float v;
 };
 
 class vec3_filter_result : public filter_result {
 public:
-	vec3_filter_result(const vec3 &r);
-	std::string get_string();
-	vec3 get_value();
+	vec3_filter_result(const vec3 &v) : v(v) {}
+	std::string get_string() {
+		std::stringstream ss;
+		ss << v;
+		return ss.str();
+	}
+	vec3 get_value() { return v; }
 private:
-	vec3 r;
+	vec3 v;
 };
 
 class ptlist_filter_result : public filter_result {
 public:
-	ptlist_filter_result(const ptlist &r);
-	std::string get_string();
-	ptlist *get_value();
+	ptlist_filter_result(ptlist *v) : v(v) {}
+	std::string get_string() {
+		std::stringstream ss;
+		copy(v->begin(), v->end(), std::ostream_iterator<vec3>(ss, ", "));
+		return ss.str();
+	}
+	ptlist *get_value() { return v; }
 private:
-	ptlist r;
+	ptlist *v;
 };
 
 class node_filter_result : public filter_result {
 public:
-	node_filter_result(sg_node *r);
-	std::string get_string();
-	sg_node *get_value();
+	node_filter_result(sg_node *v) : v(v) {}
+	std::string get_string() { return v->get_name(); }
+	sg_node *get_value() { return v; }
 private:
-	sg_node *r;
+	sg_node *v;
 };
 
 /* Convenience functions for getting filter results as specific values
@@ -109,22 +148,26 @@ private:
 
 class const_string_filter : public filter {
 public:
-	const_string_filter(const std::string &s);
-	filter_result *calc_result();
+	const_string_filter(const std::string &v) : v(v) {}
+	filter_result *calc_result() { return new string_filter_result(v); }
 private:
-	std::string s;
+	std::string v;
 };
 
-class const_node_filter : public filter, public sg_listener {
+class const_int_filter : public filter {
 public:
-	const_node_filter(sg_node *node);
-	virtual ~const_node_filter();
-	
-	void update(sg_node *n, sg_node::change_type t, int added);
-	filter_result *calc_result();
-
+	const_int_filter(int v) : v(v) {}
+	filter_result *calc_result() { return new int_filter_result(v); }
 private:
-	sg_node *node;
+	int v;
+};
+
+class const_float_filter : public filter {
+public:
+	const_float_filter(float v) : v(v) {}
+	filter_result *calc_result() { return new float_filter_result(v); }
+private:
+	float v;
 };
 
 class filter_container : public filter_listener {
@@ -145,5 +188,8 @@ private:
 	filter *owner; 
 	std::vector<filter*> filters;
 };
+
+/* Create a filter from a WM structure. Recursive. */
+filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn);
 
 #endif

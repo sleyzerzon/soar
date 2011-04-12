@@ -10,7 +10,7 @@
 #include "env.h"
 #include "model.h"
 
-class cmd_watcher;
+class command;
 class scene;
 
 typedef std::map<std::string,sg_node*> node_name_map;
@@ -99,7 +99,7 @@ private:
 	wme_hnd scene_num_wme;
 	
 	/* command changes per decision cycle */
-	std::map<wme_hnd, cmd_watcher*> curr_cmds;
+	std::map<wme_hnd, command*> curr_cmds;
 };
 
 class svs {

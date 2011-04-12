@@ -1,5 +1,6 @@
 #include <sstream>
-#include "../nsg_node.h"
+#include "nsg_node.h"
+#include "scene.h"
 #include "ptlist_filter.h"
 #include "gen_filter.h"
 
@@ -66,7 +67,7 @@ filter_result *gen_filter::calc_result() {
 	return new node_filter_result(n);
 }
 
-filter* _make_gen_filter_(const filter_params &p) {
+filter* _make_gen_filter_(scene *scn, const filter_params &p) {
 	static int counter = 0;
 	stringstream ss;
 	filter_params::const_iterator i;

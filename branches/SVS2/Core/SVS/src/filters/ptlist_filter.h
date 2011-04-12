@@ -1,9 +1,9 @@
 #ifndef PTLIST_FILTER_H
 #define PTLIST_FILTER_H
 
-#include "../sg_node.h"
-#include "../linalg.h"
-#include "../filter.h"
+#include "sg_node.h"
+#include "linalg.h"
+#include "filter.h"
 
 class ptlist_filter : public filter {
 public:

@@ -1,7 +1,7 @@
 #ifndef DIRECTION_FILTER_H
 #define DIRECTION_FILTER_H
 
-#include "../filter.h"
+#include "filter.h"
 
 class direction_filter : public filter {
 public:

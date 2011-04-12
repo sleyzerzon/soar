@@ -16,7 +16,7 @@
 
 using namespace std;
 
-typedef map<wme_hnd,cmd_watcher*>::iterator cmd_iter;
+typedef map<wme_hnd,command*>::iterator cmd_iter;
 
 void print_tree(sg_node *n) {
 	if (n->is_group()) {
@@ -185,9 +185,9 @@ void svs_state::process_cmds() {
 	
 	// all now contains only new commands
 	for (i = all.begin(); i != all.end(); ++i) {
-		cmd_watcher *cw = make_cmd_watcher(this, *i);
-		if (cw) {
-			curr_cmds.insert(make_pair(*i, cw));
+		command *c = make_command(this, *i);
+		if (c) {
+			curr_cmds.insert(make_pair(*i, c));
 		}
 	}
 }

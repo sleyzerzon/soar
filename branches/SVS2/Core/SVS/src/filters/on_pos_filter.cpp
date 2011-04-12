@@ -1,4 +1,5 @@
-#include "../filter.h"
+#include "filter.h"
+#include "scene.h"
 #include "on_pos_filter.h"
 
 on_pos_filter::on_pos_filter(filter *bottom_node, filter *top_node) 
@@ -35,7 +36,7 @@ filter_result *on_pos_filter::calc_result() {
 	return new vec3_filter_result(vec3(bcx - tcx, bcy - tcy, bz2 - tz1));
 }
 
-filter* _make_on_pos_filter_(const filter_params &p) {
+filter* _make_on_pos_filter_(scene *scn, const filter_params &p) {
 	filter_params::const_iterator i, j;
 	
 	if ((i = p.find("bottom")) == p.end()) {

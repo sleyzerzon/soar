@@ -1,63 +1,10 @@
 #include <sstream>
 #include <iterator>
+#include <utility>
+
 #include "filter.h"
 
 using namespace std;
-
-/* filter result stuff */
-bool_filter_result::bool_filter_result(bool r) : r(r) {}
-	
-string bool_filter_result::get_string() {
-	return r ? "t" : "f";
-}
-
-bool bool_filter_result::get_value() {
-	return r;
-}
-
-string_filter_result::string_filter_result(const std::string &r) : r(r) {}
-	
-string string_filter_result::get_string() {
-	return r;
-}
-
-string string_filter_result::get_value() {
-	return r;
-}
-
-vec3_filter_result::vec3_filter_result(const vec3 &r) : r(r) {}
-	
-string vec3_filter_result::get_string() {
-	stringstream ss;
-	ss << r;
-	return ss.str();
-}
-
-vec3 vec3_filter_result::get_value() {
-	return r;
-}
-
-ptlist_filter_result::ptlist_filter_result(const ptlist &r) : r(r) {}
-
-string ptlist_filter_result::get_string() {
-	stringstream ss;
-	copy(r.begin(), r.end(), ostream_iterator<vec3>(ss, ", "));
-	return ss.str();
-}
-
-ptlist *ptlist_filter_result::get_value() {
-	return &r;
-}
-
-node_filter_result::node_filter_result(sg_node *r) : r(r) {}
-	
-std::string node_filter_result::get_string() {
-	return r->get_name();
-}
-
-sg_node *node_filter_result::get_value() {
-	return r;
-}
 
 bool get_bool_filter_result_value(filter *requester, filter *f, bool &v) {
 	filter_result *fr;
@@ -140,7 +87,6 @@ bool get_node_filter_result_value(filter *requester, filter *f, sg_node *&v) {
 }
 
 
-/* filter stuff */
 filter::filter() : dirty(true), cached(NULL) {}
 
 filter::~filter() {
@@ -186,39 +132,6 @@ string filter::get_error() {
 
 void filter::set_error(string msg) {
 	errmsg = msg;
-}
-
-const_string_filter::const_string_filter(const std::string &s) : s(s) {}
-
-filter_result *const_string_filter::calc_result() {
-	return new string_filter_result(s);
-}
-
-const_node_filter::const_node_filter(sg_node *node) : node(node) {
-	if (node) {
-		node->listen(this);
-	}
-}
-
-const_node_filter::~const_node_filter() {
-	if (node) {
-		node->unlisten(this);
-	}
-}
-
-void const_node_filter::update(sg_node *n, sg_node::change_type t, int added) {
-	set_dirty();
-	if (t == sg_node::DELETED) {
-		node = NULL;
-		set_error("node deleted");
-	}
-}
-
-filter_result *const_node_filter::calc_result() {
-	if (node) {
-		return new node_filter_result(node);
-	}
-	return NULL;
 }
 
 filter_container::filter_container(filter *owner) 
@@ -272,4 +185,56 @@ void filter_container::add(filter *f) {
 
 int filter_container::size() {
 	return filters.size();
+}
+
+/*
+(<c> ^on-top <ot>)
+(<ot> ^a <ota> ^b <otb>)
+(<ota> ^type node ^name box1)
+(<otb> ^type node ^name box2)
+*/
+filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn) {
+	wme_list children;
+	wme_list::iterator i;
+	Symbol* cval;
+	string strval, pname, type;
+	long intval;
+	float floatval;
+	filter_params params;
+	filter_params::iterator j;
+	bool fail;
+	
+	fail = false;
+	si->get_child_wmes(root, children);
+	for (i = children.begin(); i != children.end(); ++i) {
+		if (!si->get_val(si->get_wme_attr(*i), pname)) {
+			continue;
+		}
+		cval = si->get_wme_val(*i);
+		if (pname == "type" && !si->get_val(cval, type)) {
+			fail = true;
+			break;
+		}
+		
+		if (si->get_val(cval, strval)) {
+			params.insert(make_pair(pname, new const_string_filter(strval)));
+		} else if (si->get_val(cval, intval)) {
+			params.insert(make_pair(pname, new const_int_filter(intval)));
+		} else if (si->get_val(cval, floatval)) {
+			params.insert(make_pair(pname, new const_float_filter(floatval)));
+		} else {
+			// must be identifier
+			params.insert(make_pair(pname, parse_filter_struct(si, cval, scn)));
+		}
+	}
+	
+	if (fail) {
+		for (j = params.begin(); j != params.end(); ++j) {
+			if (j->second) {
+				delete j->second;
+			}
+		}
+		return NULL;
+	}
+	return make_filter(type, params);
 }

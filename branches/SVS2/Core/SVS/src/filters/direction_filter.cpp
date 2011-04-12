@@ -77,27 +77,27 @@ filter *make_direction_filter(const filter_params &p, char dir) {
 	return new direction_filter(dir, a, b);
 }
 
-filter *_make_north_of_filter_(const filter_params &p) {
+filter *_make_north_of_filter_(scene *scn, const filter_params &p) {
 	return make_direction_filter(p, 'n');
 }
 
-filter *_make_south_of_filter_(const filter_params &p) {
+filter *_make_south_of_filter_(scene *scn, const filter_params &p) {
 	return make_direction_filter(p, 's');
 }
 
-filter *_make_east_of_filter_(const filter_params &p) {
+filter *_make_east_of_filter_(scene *scn, const filter_params &p) {
 	return make_direction_filter(p, 'e');
 }
 
-filter *_make_west_of_filter_(const filter_params &p) {
+filter *_make_west_of_filter_(scene *scn, const filter_params &p) {
 	return make_direction_filter(p, 'w');
 }
 
-filter *_make_vertically_aligned_filter_(const filter_params &p) {
+filter *_make_vertically_aligned_filter_(scene *scn, const filter_params &p) {
 	return make_direction_filter(p, 'v');
 }
 
-filter *_make_horizontally_aligned_filter_(const filter_params &p) {
+filter *_make_horizontally_aligned_filter_(scene *scn, const filter_params &p) {
 	return make_direction_filter(p, 'h');
 }
 
