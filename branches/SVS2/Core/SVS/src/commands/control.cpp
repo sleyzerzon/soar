@@ -1,4 +1,12 @@
+#include <string>
+#include <limits>
 #include "cmd_watcher.h"
+#include "svs.h"
+#include "env.h"
+#include "scene.h"
+#include "model.h"
+
+using namespace std;
 
 /* Parses a WME structure that describes the output the environment expects.
    Assumes this format:
@@ -172,7 +180,7 @@ private:
 class control_command : public command {
 public:
 	control_command(svs_state *state, Symbol *root)
-	: state(state), utils(state, root), step(0), stepwme(NULL), broken(false)
+	: state(state), utils(state, root), si(state->get_svs()->get_soar_interface()), step(0), stepwme(NULL), broken(false)
 	{
 		wme_hnd w;
 		int r;
@@ -196,7 +204,7 @@ public:
 		// need to update scene with model otherwise
 		delete out;
 		
-		set_result("success");
+		utils.set_result("success");
 		step++;
 		update_step();
 		return true;
@@ -212,12 +220,13 @@ private:
 	bool parse_cmd() {
 		env_output_desc desc;
 		objective *obj;
-		wme_hnd outputs_wme, objective_wme;
+		wme *outputs_wme, *objective_wme, *model_wme;
 		
 		if (!si->find_child_wme(root, "outputs", outputs_wme) ||
 		    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
 		    !si->find_child_wme(root, "objective", objective_wme) ||
-			!si->is_identifier(si->get_wme_val(objective_wme)))
+			!si->is_identifier(si->get_wme_val(objective_wme)) ||
+			!si->find_child_wme(root, "model", model_wme))
 		{
 			return false;
 		}
@@ -227,7 +236,7 @@ private:
 		if (!parse_output_desc_struct(si, si->get_wme_val(outputs_wme), desc)) {
 			return false;
 		}
-		ctrl = new controller(state->get_svs()->get_model(), obj, desc);
+		ctrl = new controller(parse_model_struct(si->get_wme_val(model_wme)), obj, desc);
 	}
 
 	void update_step() {
@@ -236,12 +245,16 @@ private:
 		stepwme = si->make_wme(root, "step", step);
 	}
 
-private:
-	cmd_utils   utils;
-	svs_state  *state;
-	Symbol     *root;
-	controller *ctrl;
-	wme_hnd     stepwme;
-	int         step;
-	bool        broken;
+	soar_interface *si;
+	cmd_utils       utils;
+	svs_state      *state;
+	Symbol         *root;
+	controller     *ctrl;
+	wme_hnd         stepwme;
+	int             step;
+	bool            broken;
 };
+
+command *_make_control_command_(svs_state *state, Symbol *root) {
+	return new control_command(state, root);
+}

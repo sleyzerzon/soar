@@ -203,6 +203,7 @@ filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn) {
 	filter_params params;
 	filter_params::iterator j;
 	bool fail;
+	filter *f;
 	
 	fail = false;
 	si->get_child_wmes(root, children);
@@ -211,9 +212,13 @@ filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn) {
 			continue;
 		}
 		cval = si->get_wme_val(*i);
-		if (pname == "type" && !si->get_val(cval, type)) {
-			fail = true;
-			break;
+		if (pname == "type") {
+			if (!si->get_val(cval, type)) {
+				fail = true;
+				break;
+			} else {
+				continue;
+			}
 		}
 		
 		if (si->get_val(cval, strval)) {
@@ -228,7 +233,7 @@ filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn) {
 		}
 	}
 	
-	if (fail) {
+	if (fail || type == "" || !(f = make_filter(type, scn, params))) {
 		for (j = params.begin(); j != params.end(); ++j) {
 			if (j->second) {
 				delete j->second;
@@ -236,5 +241,5 @@ filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn) {
 		}
 		return NULL;
 	}
-	return make_filter(type, params);
+	return f;
 }

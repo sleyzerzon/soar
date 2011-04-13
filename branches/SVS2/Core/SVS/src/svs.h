@@ -73,7 +73,6 @@ public:
 	int             get_scene_num()      { return scene_num; }
 	scene          *get_scene()          { return scn;       }
 	sym_hnd         get_state()          { return state;     }
-	soar_interface *get_soar_interface() { return si;        }
 	svs            *get_svs()            { return svsp;      }
 
 private:
@@ -112,7 +111,8 @@ public:
 	void pre_env_callback();
 	void post_env_callback();
 
-	environment *get_env() { return &env; }
+	environment    *get_env() { return &env; }
+	soar_interface *get_soar_interface() { return si; }
 
 	std::string get_env_input(const std::string &sgel);
 

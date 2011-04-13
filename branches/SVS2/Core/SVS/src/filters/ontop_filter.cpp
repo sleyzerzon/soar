@@ -1,5 +1,6 @@
 #include "ontop_filter.h"
 #include "bbox_filter.h"
+#include "scene.h"
 
 ontop_filter::ontop_filter(filter *bottom_node, filter *top_node) 
 : container(this)
@@ -24,7 +25,7 @@ filter_result *ontop_filter::calc_result() {
 	return new bool_filter_result(bot.intersects(top) && bz2 == tz1);
 }
 
-filter* _make_ontop_filter_(const filter_params &p) {
+filter* _make_ontop_filter_(scene *scn, const filter_params &p) {
 	filter_params::const_iterator i, j;
 	
 	if ((i = p.find("bottom")) == p.end()) {

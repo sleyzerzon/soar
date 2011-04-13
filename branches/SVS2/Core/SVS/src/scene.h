@@ -15,8 +15,9 @@ public:
 
 	~scene();
 	
-	sg_node* get_root();
-	sg_node* get_node(std::string name);
+	sg_node *get_root();
+	sg_node *get_node(std::string name);
+	bool     add_node(std::string parent, sg_node *n);
 	bool     add_node(std::string parent, std::string name);
 	bool     add_node(std::string parent, std::string name, const ptlist &points);
 	bool     del_node(std::string name);
@@ -26,7 +27,6 @@ public:
 	void     parse_sgel(std::string s);
 	
 private:
-	bool add_node(std::string parent, sg_node *n);
 	
 	void disp_update_node(sg_node *n);
 	void disp_del_node(sg_node *n);

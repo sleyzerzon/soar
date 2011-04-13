@@ -1,4 +1,9 @@
+#include <iostream>
 #include "cmd_watcher.h"
+#include "filter.h"
+#include "svs.h"
+
+using namespace std;
 
 class extract_command : public command, public filter_listener {
 public:
@@ -23,9 +28,9 @@ public:
 			if (result_filter) {
 				delete result_filter;
 			}
-			result_filter = parse_filter_struct(root, state->get_scene());
+			result_filter = parse_filter_struct(state->get_svs()->get_soar_interface(), root, state->get_scene());
 			if (!result_filter) {
-				set_result("command error");
+				utils.set_result("command error");
 				return false;
 			}
 			result_filter->listen(this);
@@ -53,3 +58,7 @@ private:
 	filter         *result_filter;
 	bool            dirty;
 };
+
+command *_make_extract_command_(svs_state *state, Symbol *root) {
+	return new extract_command(state, root);
+}

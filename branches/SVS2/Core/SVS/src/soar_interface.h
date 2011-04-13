@@ -51,6 +51,7 @@ public:
 	bool         get_val(sym_hnd sym, std::string &v);
 	bool         get_val(sym_hnd sym, long &v);
 	bool         get_val(sym_hnd sym, float &v);
+	bool         get_val(sym_hnd sym, double &v);
 	
 	sym_hnd      get_wme_attr(wme_hnd w);
 	sym_hnd      get_wme_val(wme_hnd w);
@@ -151,6 +152,14 @@ inline bool soar_interface::get_val(sym_hnd sym, long &v) {
 }
 
 inline bool soar_interface::get_val(sym_hnd sym, float &v) {
+	if (is_float(sym)) {
+		v = sym->fc.value;
+		return true;
+	}
+	return false;
+}
+
+inline bool soar_interface::get_val(sym_hnd sym, double &v) {
 	if (is_float(sym)) {
 		v = sym->fc.value;
 		return true;

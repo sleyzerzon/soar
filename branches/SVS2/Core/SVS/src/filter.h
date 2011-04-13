@@ -15,7 +15,7 @@
 class filter;
 
 typedef std::multimap<std::string,filter*> filter_params;
-filter* make_filter(const std::string &name, const filter_params &params);
+filter* make_filter(const std::string &name, scene *scn, const filter_params &params);
 
 /* Interface for classes that need to respond to changes in the result
    of some filter. 

@@ -30,7 +30,7 @@ void cleanstring(string &s) {
 }
 
 cmd_utils::cmd_utils(svs_state *state, sym_hnd cmd_root)
-: state(state), si(state->get_soar_interface()), cmd_root(cmd_root), result_wme(NULL), subtree_size(0), max_time_tag(0)
+: state(state), si(state->get_svs()->get_soar_interface()), cmd_root(cmd_root), result_wme(NULL), subtree_size(0), max_time_tag(0)
 { }
 
 void cmd_utils::set_result(const string &r) {
@@ -116,6 +116,29 @@ bool cmd_utils::get_str_param(const string &name, string &val) {
 	return false;
 }
 
-command* make_command(svs_state *state, wme_hnd w) {
+command *_make_extract_command_(svs_state *state, Symbol *root);
+command *_make_generate_command_(svs_state *state, Symbol *root);
+command *_make_control_command_(svs_state *state, Symbol *root);
+
+command* make_command(svs_state *state, wme *w) {
+	string name;
+	Symbol *id;
+	soar_interface *si;
+	
+	si = state->get_svs()->get_soar_interface();
+	if (!si->get_val(si->get_wme_attr(w), name)) {
+		return NULL;
+	}
+	if (!si->is_identifier(si->get_wme_val(w))) {
+		return NULL;
+	}
+	id = si->get_wme_val(w);
+	if (name == "extract") {
+		return _make_extract_command_(state, id);
+	} else if (name == "generate") {
+		return _make_generate_command_(state, id);
+	} else if (name == "control") {
+		return _make_control_command_(state, id);
+	}
 	return NULL;
 }

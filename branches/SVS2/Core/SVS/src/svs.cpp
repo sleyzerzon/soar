@@ -188,6 +188,8 @@ void svs_state::process_cmds() {
 		command *c = make_command(this, *i);
 		if (c) {
 			curr_cmds.insert(make_pair(*i, c));
+		} else {
+			cerr << "make_command returned nil" << endl;
 		}
 	}
 }
