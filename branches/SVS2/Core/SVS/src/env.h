@@ -19,11 +19,11 @@ public:
 	env_output(const env_output_desc &d);
 	env_output(const env_output &other);
 	
-	double get(const std::string &dim);
+	double get(const std::string &dim) const;
 	void   set(const std::string &dim, double val);
 	
 	bool increment();
-	void serialize(std::string &out);
+	void serialize(std::string &out) const;
 	
 private:
 	std::map<std::string, double> value;

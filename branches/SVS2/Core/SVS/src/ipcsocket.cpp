@@ -102,7 +102,19 @@ bool ipcsocket::receive(string &msg) {
 	
 	if (!connected && !accept()) return false;
 	
-	while((p = recvbuf.find(TERMSTRING)) == string::npos) {
+	while(true) {
+		if (recvbuf.find(TERMSTRING+1) == 0) { // +1 to skip initial \n
+			// empty message (first line is ***)
+			msg = "";
+			recvbuf.erase(0, strlen(TERMSTRING) - 1);
+			return true;
+		}
+		if ((p = recvbuf.find(TERMSTRING)) != string::npos) {
+			msg.assign(recvbuf.substr(0, p));
+			recvbuf.erase(0, p+strlen(TERMSTRING));
+			return true;
+		}
+		
 		if ((n = recv(fd, buf, BUFFERSIZE, 0)) <= 0) {
 			disconnect();
 			return false;
@@ -110,6 +122,4 @@ bool ipcsocket::receive(string &msg) {
 		buf[n] = '\0';
 		recvbuf += buf;
 	}
-	msg.assign(recvbuf.substr(0, p));
-	recvbuf.erase(0, p+strlen(TERMSTRING));
 }

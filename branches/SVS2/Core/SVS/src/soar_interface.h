@@ -154,12 +154,20 @@ inline bool soar_interface::get_val(Symbol *sym, float &v) {
 		v = sym->fc.value;
 		return true;
 	}
+	if (is_int(sym)) {
+		v = sym->ic.value;
+		return true;
+	}
 	return false;
 }
 
 inline bool soar_interface::get_val(Symbol *sym, double &v) {
 	if (is_float(sym)) {
 		v = sym->fc.value;
+		return true;
+	}
+	if (is_int(sym)) {
+		v = sym->ic.value;
 		return true;
 	}
 	return false;

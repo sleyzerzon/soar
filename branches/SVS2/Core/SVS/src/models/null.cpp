@@ -7,6 +7,6 @@ public:
 	void predict(scene *scn, const env_output &out) {}
 };
 
-model *_make_null_model_(Symbol* id) {
+model *_make_null_model_(soar_interface *si, Symbol* root) {
 	return new null_model();
 }

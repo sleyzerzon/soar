@@ -45,7 +45,7 @@ bool parse_output_desc_struct(soar_interface *si, Symbol *root, env_output_desc 
 		    si->get_val(si->get_wme_val(min_wme), d.min) &&
 		    si->find_child_wme(dim_id, "max", max_wme)   &&
 		    si->get_val(si->get_wme_val(max_wme), d.max) &&
-		    si->find_child_wme(dim_id, "min", inc_wme)   &&
+		    si->find_child_wme(dim_id, "inc", inc_wme)   &&
 		    si->get_val(si->get_wme_val(inc_wme), d.inc))
 		{
 			desc[dim_name] = d;
@@ -68,6 +68,8 @@ vec3 calc_centroid(const ptlist &pts) {
 		for (d = 0; d < 3; ++d) {
 			c[d] += (*i)[d];
 		}
+	}
+	for (d = 0; d < 3; ++d) {
 		c[d] /= pts.size();
 	}
 	return vec3(c[0], c[1], c[2]);
@@ -157,8 +159,8 @@ public:
 			next = new scene(*scn);
 			mdl->predict(next, curr);
 			eval = obj->eval(next);
-			if (!bestout || eval > best) {
-				if (!bestout) {
+			if (!bestout || eval < best) {
+				if (bestout) {
 					delete bestout;
 				}
 				bestout = new env_output(curr);
@@ -180,24 +182,27 @@ private:
 class control_command : public command {
 public:
 	control_command(svs_state *state, Symbol *root)
-	: state(state), utils(state, root), si(state->get_svs()->get_soar_interface()), step(0), stepwme(NULL), broken(false)
+	: state(state), root(root), utils(state, root), 
+	  si(state->get_svs()->get_soar_interface()), step(0), 
+	  stepwme(NULL), broken(false)
 	{
-		wme *w;
-		int r;
-		
-		if (!parse_cmd()) {
-			broken = true;
-			return;
-		}
 		update_step();
 	}
 	
 	bool update_result() {
 		env_output *out;
+
+		if (utils.cmd_changed()) {
+			broken = !parse_cmd();
+		}
 		if (broken) {
 			return false;
 		}
-		out = ctrl->seek(state->get_scene());
+		
+		if ((out = ctrl->seek(state->get_scene())) == NULL) {
+			utils.set_result("no valid output found");
+			return false;
+		}
 		if (state->get_level() == 0) {
 			state->get_svs()->get_env()->output(*out);
 		}
@@ -221,22 +226,30 @@ private:
 		env_output_desc desc;
 		objective *obj;
 		wme *outputs_wme, *objective_wme, *model_wme;
+		model *mdl;
 		
 		if (!si->find_child_wme(root, "outputs", outputs_wme) ||
 		    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
-		    !si->find_child_wme(root, "objective", objective_wme) ||
-			!si->is_identifier(si->get_wme_val(objective_wme)) ||
-			!si->find_child_wme(root, "model", model_wme))
+		    !parse_output_desc_struct(si, si->get_wme_val(outputs_wme), desc))
 		{
+			utils.set_result("missing or invalid outputs specification");
 			return false;
 		}
-		if ((obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL) {
+		if (!si->find_child_wme(root, "objective", objective_wme) ||
+			!si->is_identifier(si->get_wme_val(objective_wme)) ||
+			(obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL)
+		{
+			utils.set_result("missing or invalid objective");
 			return false;
 		}
-		if (!parse_output_desc_struct(si, si->get_wme_val(outputs_wme), desc)) {
+		if (!si->find_child_wme(root, "model", model_wme) ||
+		    (mdl = parse_model_struct(si, si->get_wme_val(model_wme))) == NULL)
+		{
+			utils.set_result("missing or invalid model");
 			return false;
 		}
-		ctrl = new controller(parse_model_struct(si->get_wme_val(model_wme)), obj, desc);
+		ctrl = new controller(mdl, obj, desc);
+		return true;
 	}
 
 	void update_step() {
