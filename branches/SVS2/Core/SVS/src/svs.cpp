@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include "svs.h"
-#include "cmd_watcher.h"
+#include "command.h"
 #include "nsg_node.h"
 #include "soar_interface.h"
 #include "scene.h"
@@ -16,7 +16,7 @@
 
 using namespace std;
 
-typedef map<wme_hnd,command*>::iterator cmd_iter;
+typedef map<wme*,command*>::iterator cmd_iter;
 
 void print_tree(sg_node *n) {
 	if (n->is_group()) {
@@ -31,7 +31,7 @@ void print_tree(sg_node *n) {
 	}
 }
 
-sgwme::sgwme(soar_interface *si, sym_hnd ident, sgwme *parent, sg_node *node) 
+sgwme::sgwme(soar_interface *si, Symbol *ident, sgwme *parent, sg_node *node) 
 : soarint(si), id(ident), parent(parent), node(node)
 {
 	int i;
@@ -43,7 +43,7 @@ sgwme::sgwme(soar_interface *si, sym_hnd ident, sgwme *parent, sg_node *node)
 }
 
 sgwme::~sgwme() {
-	map<sgwme*,wme_hnd>::iterator i;
+	map<sgwme*,wme*>::iterator i;
 
 	if (node) {
 		node->unlisten(this);
@@ -54,7 +54,7 @@ sgwme::~sgwme() {
 		soarint->remove_wme(i->second);
 	}
 	if (parent) {
-		map<sgwme*, wme_hnd>::iterator ci = parent->childs.find(this);
+		map<sgwme*, wme*>::iterator ci = parent->childs.find(this);
 		assert(ci != parent->childs.end());
 		soarint->remove_wme(ci->second);
 		parent->childs.erase(ci);
@@ -91,7 +91,7 @@ void sgwme::add_child(sg_node *c) {
 	childs[child] = cid_wme.second;
 }
 
-svs_state::svs_state(svs *svsp, sym_hnd state, soar_interface *si, common_syms *syms)
+svs_state::svs_state(svs *svsp, Symbol *state, soar_interface *si, common_syms *syms)
 : svsp(svsp), parent(NULL), state(state), si(si), cs(syms), level(0),
   scene_num(-1), scene_num_wme(NULL), scn(NULL), scene_link(NULL),
   ltm_link(NULL)
@@ -100,7 +100,7 @@ svs_state::svs_state(svs *svsp, sym_hnd state, soar_interface *si, common_syms *
 	init();
 }
 
-svs_state::svs_state(sym_hnd state, svs_state *parent)
+svs_state::svs_state(Symbol *state, svs_state *parent)
 : parent(parent), state(state), svsp(parent->svsp), si(parent->si), cs(parent->cs),
   level(parent->level+1), scene_num(-1),
   scene_num_wme(NULL), scn(NULL), scene_link(NULL), ltm_link(NULL)
@@ -210,7 +210,7 @@ svs::~svs() {
 	delete si;
 }
 
-void svs::state_creation_callback(sym_hnd state) {
+void svs::state_creation_callback(Symbol *state) {
 	string type, msg;
 	svs_state *s;
 	
@@ -224,7 +224,7 @@ void svs::state_creation_callback(sym_hnd state) {
 	
 }
 
-void svs::state_deletion_callback(sym_hnd state) {
+void svs::state_deletion_callback(Symbol *state) {
 	string resp;
 	svs_state *s;
 	s = state_stack.back();

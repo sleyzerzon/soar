@@ -1,5 +1,5 @@
 #include <string>
-#include "cmd_watcher.h"
+#include "command.h"
 #include "scene.h"
 #include "filter.h"
 #include "svs.h"

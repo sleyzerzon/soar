@@ -3,7 +3,7 @@
 #include <sstream>
 #include <limits>
 
-#include "cmd_watcher.h"
+#include "command.h"
 #include "filter.h"
 #include "svs.h"
 #include "scene.h"
@@ -29,7 +29,7 @@ void cleanstring(string &s) {
 	}
 }
 
-cmd_utils::cmd_utils(svs_state *state, sym_hnd cmd_root)
+cmd_utils::cmd_utils(svs_state *state, Symbol *cmd_root)
 : state(state), si(state->get_svs()->get_soar_interface()), cmd_root(cmd_root), result_wme(NULL), subtree_size(0), max_time_tag(0)
 { }
 
@@ -49,10 +49,10 @@ void cmd_utils::set_result(const string &r) {
 bool cmd_utils::cmd_changed() {
 	tc_num tc;
 	bool changed;
-	stack< sym_hnd > to_process;
+	stack< Symbol *> to_process;
 	wme_list childs;
 	wme_list::iterator i;
-	sym_hnd parent, v;
+	Symbol *parent, *v;
 	int new_subtree_size = 0, tt;
 	string attr;
 

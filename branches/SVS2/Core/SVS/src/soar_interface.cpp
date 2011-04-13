@@ -18,7 +18,7 @@ soar_interface::~soar_interface() {
 }
 
 
-sym_wme_pair soar_interface::make_id_wme(sym_hnd id, const string &attr) {
+sym_wme_pair soar_interface::make_id_wme(Symbol *id, const string &attr) {
 	sym_wme_pair p;
 	Symbol *attrsym = make_sym_constant(agnt, attr.c_str());
 	Symbol *valsym = make_new_identifier(agnt, attr[0], id->id.level);
@@ -30,7 +30,7 @@ sym_wme_pair soar_interface::make_id_wme(sym_hnd id, const string &attr) {
 	return p;
 }
 
-sym_wme_pair soar_interface::make_id_wme(sym_hnd id, sym_hnd attr) {
+sym_wme_pair soar_interface::make_id_wme(Symbol *id, Symbol *attr) {
 	char n;
 	sym_wme_pair p;
 	Symbol *val;
@@ -51,11 +51,11 @@ sym_wme_pair soar_interface::make_id_wme(sym_hnd id, sym_hnd attr) {
 	return p;
 }
 
-void soar_interface::remove_wme(wme_hnd w) {
+void soar_interface::remove_wme(wme *w) {
 	soar_module::remove_module_wme(agnt, w);
 }
 
-bool soar_interface::get_child_wmes(sym_hnd id, wme_list &childs) {
+bool soar_interface::get_child_wmes(Symbol *id, wme_list &childs) {
 	slot *s;
 	wme *w;
 	
@@ -73,7 +73,7 @@ bool soar_interface::get_child_wmes(sym_hnd id, wme_list &childs) {
 	return true;
 }
 
-bool soar_interface::find_child_wme(sym_hnd id, const string &attr, wme_hnd &w) {
+bool soar_interface::find_child_wme(Symbol *id, const string &attr, wme *&w) {
 	slot *s;
 	wme *w1;
 	string a; 

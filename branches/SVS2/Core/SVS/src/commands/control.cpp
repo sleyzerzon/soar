@@ -1,6 +1,6 @@
 #include <string>
 #include <limits>
-#include "cmd_watcher.h"
+#include "command.h"
 #include "svs.h"
 #include "env.h"
 #include "scene.h"
@@ -25,12 +25,12 @@ using namespace std;
 		...
 	)
 */
-bool parse_output_desc_struct(soar_interface *si, sym_hnd root, env_output_desc &desc) {
+bool parse_output_desc_struct(soar_interface *si, Symbol *root, env_output_desc &desc) {
 	wme_list dim_wmes;
 	wme_list::iterator i;
 	string dim_name;
-	sym_hnd dim_id;
-	wme_hnd min_wme, max_wme, inc_wme;
+	Symbol *dim_id;
+	wme *min_wme, *max_wme, *inc_wme;
 	dim_desc d;
 	
 	if (!si->is_identifier(root)) {
@@ -112,7 +112,7 @@ private:
 	   ...
    )
 */
-objective *parse_obj_struct(soar_interface *si, sym_hnd root) {
+objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 	wme_list param_wmes;
 	wme_list::iterator i;
 	map<string, string> params;
@@ -182,7 +182,7 @@ public:
 	control_command(svs_state *state, Symbol *root)
 	: state(state), utils(state, root), si(state->get_svs()->get_soar_interface()), step(0), stepwme(NULL), broken(false)
 	{
-		wme_hnd w;
+		wme *w;
 		int r;
 		
 		if (!parse_cmd()) {
@@ -250,7 +250,7 @@ private:
 	svs_state      *state;
 	Symbol         *root;
 	controller     *ctrl;
-	wme_hnd         stepwme;
+	wme            *stepwme;
 	int             step;
 	bool            broken;
 };

@@ -14,7 +14,7 @@ public:
 
 class cmd_utils {
 public:
-	cmd_utils(svs_state *state, sym_hnd cmd_root);
+	cmd_utils(svs_state *state, Symbol *cmd_root);
 	
 	/* create or change value of a (C1 ^result <msg>) wme */
 	void set_result(const std::string &r);
@@ -29,11 +29,11 @@ private:
 	svs_state      *state;
 	Symbol         *cmd_root;
 	soar_interface *si;
-	wme_hnd         result_wme;
+	wme            *result_wme;
 	int             subtree_size;
 	int             max_time_tag;
 };
 
-command *make_command(svs_state *state, wme_hnd w);
+command *make_command(svs_state *state, wme *w);
 
 #endif

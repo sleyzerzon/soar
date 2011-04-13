@@ -26,18 +26,18 @@ public:
 		result     = NULL;
 	}
 	
-	sym_hnd svs;
-	sym_hnd ltm;
-	sym_hnd cmd;
-	sym_hnd scene;
-	sym_hnd child;
-	sym_hnd result;
+	Symbol *svs;
+	Symbol *ltm;
+	Symbol *cmd;
+	Symbol *scene;
+	Symbol *child;
+	Symbol *result;
 };
 
 /* working memory scene graph object - mediates between wmes and scene graph nodes */
 class sgwme : public sg_listener {
 public:
-	sgwme(soar_interface *si, sym_hnd ident, sgwme *parent, sg_node *node);
+	sgwme(soar_interface *si, Symbol *ident, sgwme *parent, sg_node *node);
 	~sgwme();
 	void update(sg_node *n, sg_node::change_type t, int added_child);
 
@@ -46,11 +46,11 @@ private:
 	
 	sgwme*          parent;
 	sg_node*        node;
-	sym_hnd         id;
-	wme_hnd         name_wme;
+	Symbol         *id;
+	wme            *name_wme;
 	soar_interface* soarint;
 
-	std::map<sgwme*,wme_hnd> childs;
+	std::map<sgwme*,wme*> childs;
 
 };
 
@@ -58,8 +58,8 @@ class svs;
 
 class svs_state {
 public:
-	svs_state(svs *svsp, sym_hnd state, soar_interface *soar, common_syms *syms);
-	svs_state(sym_hnd state, svs_state *parent);
+	svs_state(svs *svsp, Symbol *state, soar_interface *soar, common_syms *syms);
+	svs_state(Symbol *state, svs_state *parent);
 
 	~svs_state();
 	
@@ -72,7 +72,7 @@ public:
 	int             get_level()          { return level;     }
 	int             get_scene_num()      { return scene_num; }
 	scene          *get_scene()          { return scn;       }
-	sym_hnd         get_state()          { return state;     }
+	Symbol         *get_state()          { return state;     }
 	svs            *get_svs()            { return svsp;      }
 
 private:
@@ -88,17 +88,17 @@ private:
 	ipcsocket      *ipc;
 	common_syms    *cs;
 	
-	sym_hnd state;
-	sym_hnd svs_link;
-	sym_hnd ltm_link;
-	sym_hnd scene_link;
-	sym_hnd cmd_link;
+	Symbol *state;
+	Symbol *svs_link;
+	Symbol *ltm_link;
+	Symbol *scene_link;
+	Symbol *cmd_link;
 
 	int scene_num;
-	wme_hnd scene_num_wme;
+	wme *scene_num_wme;
 	
 	/* command changes per decision cycle */
-	std::map<wme_hnd, command*> curr_cmds;
+	std::map<wme*, command*> curr_cmds;
 };
 
 class svs {
@@ -106,8 +106,8 @@ public:
 	svs(agent *a);
 	~svs();
 	
-	void state_creation_callback(sym_hnd goal);
-	void state_deletion_callback(sym_hnd goal);
+	void state_creation_callback(Symbol *goal);
+	void state_deletion_callback(Symbol *goal);
 	void pre_env_callback();
 	void post_env_callback();
 
