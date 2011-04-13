@@ -19,8 +19,8 @@ using namespace std;
 const char TERMSTRING[] = "\n***\n";
 const int BUFFERSIZE = 10240;
 
-ipcsocket::ipcsocket(string socketfile) 
-: recvbuf()
+ipcsocket::ipcsocket(string socketfile, bool recvfirst) 
+: recvbuf(), recvfirst(recvfirst)
 {
 	socklen_t len;
 	struct sockaddr_un addr;
@@ -78,7 +78,7 @@ bool ipcsocket::send(const string &s) {
 	int n, l, t = 0;
 	char *buf; 
 	
-	if (!connected && !accept()) return false;
+	if (!connected && (recvfirst || !accept())) return false;
 	
 	l = s.size() + strlen(TERMSTRING);
 	buf = new char[l];
@@ -100,7 +100,7 @@ bool ipcsocket::receive(string &msg) {
 	char buf[BUFFERSIZE+1];
 	size_t p, n;
 	
-	if (!connected && !accept()) return false;
+	if (!connected && (!recvfirst || !accept())) return false;
 	
 	while(true) {
 		if (recvbuf.find(TERMSTRING+1) == 0) { // +1 to skip initial \n

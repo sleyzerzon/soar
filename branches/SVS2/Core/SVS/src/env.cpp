@@ -58,7 +58,7 @@ void env_output::serialize(string &out) const {
 }
 
 environment::environment(string path)
-: sock(path)
+: sock(path, true)
 {}
 
 bool environment::output(env_output &out) {

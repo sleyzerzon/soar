@@ -17,7 +17,7 @@ scene::scene(string name, string rootname)
 : name(name), rootname(rootname)
 {
 	if (!disp) {
-		disp = new ipcsocket(getnamespace() + "disp");
+		disp = new ipcsocket(getnamespace() + "disp", false);
 	}
 	add_node("", rootname);
 	root = nodes[rootname];
