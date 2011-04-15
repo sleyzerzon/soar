@@ -3,10 +3,12 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include "sg_node.h"
 #include "linalg.h"
 
 typedef std::map<std::string, sg_node*> node_map;
+typedef std::set<std::pair<std::string, std::string> > scene_sig;
 
 class scene {
 public:
@@ -24,6 +26,7 @@ public:
 	bool     set_node_trans(std::string name, char type, vec3 trans);
 	void     clear();
 
+	void     get_signature(scene_sig &sig);
 	void     parse_sgel(std::string s);
 	
 private:
@@ -38,10 +41,11 @@ private:
 	int  parse_change(std::vector<std::string> &f);
     bool parse_transforms(std::vector<std::string> &f, int &start);
 
-	std::string name;
-	std::string rootname;
+	std::string  name;
+	std::string  rootname;
 	sg_node     *root;
-	node_map    nodes;
+	node_map     nodes;
+	bool         iscopy;
 };
 
 #endif

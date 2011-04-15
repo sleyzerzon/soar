@@ -4,7 +4,7 @@
 class null_model : public model {
 public:
 	null_model() { }
-	void predict(scene *scn, const env_output &out) {}
+	bool predict(scene *scn, const env_output &out) { return true; }
 };
 
 model *_make_null_model_(soar_interface *si, Symbol* root) {

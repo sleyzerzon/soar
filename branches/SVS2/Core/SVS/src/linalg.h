@@ -2,6 +2,7 @@
 #define LINALG_H
 
 #include <math.h>
+#include <assert.h>
 #include <ostream>
 #include <vector>
 
@@ -28,7 +29,20 @@ public:
 			case 2:
 				return z;
 			default:
-				return 0.0;
+				assert(false);
+		}
+	}
+	
+	double& operator[](int i) {
+		switch (i) {
+			case 0:
+				return x;
+			case 1:
+				return y;
+			case 2:
+				return z;
+			default:
+				assert(false);
 		}
 	}
 	

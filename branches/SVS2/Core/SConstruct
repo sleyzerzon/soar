@@ -401,9 +401,9 @@ for d in subdirs:
 # Special environment
 compEnv = env.Clone()
 compEnv.Prepend(CPPPATH = ['$PREFIX/include'])
-libadd = ['ClientSML', 'ConnectionSML', 'ElementXML',]
+libadd = ['ClientSML', 'ConnectionSML', 'ElementXML', 'armadillo']
 if compEnv['STATIC_LINKED']:
-        libadd = ['ClientSML', 'ConnectionSML', 'ElementXML', 'SoarKernelSML', 'SoarKernel', 'CommandLineInterface', 'sqlite3', 'svs']
+        libadd.extend(['SoarKernelSML', 'SoarKernel', 'CommandLineInterface', 'sqlite3', 'svs'])
 compEnv.Append(LIBS = libadd, LIBPATH = ['$PREFIX/lib'])
 Export('compEnv')
 

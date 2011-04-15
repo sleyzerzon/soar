@@ -14,7 +14,7 @@ using namespace std;
 ipcsocket *disp = NULL;
 
 scene::scene(string name, string rootname) 
-: name(name), rootname(rootname)
+: name(name), rootname(rootname), iscopy(false)
 {
 	if (!disp) {
 		disp = new ipcsocket(getnamespace() + "disp", false);
@@ -25,7 +25,7 @@ scene::scene(string name, string rootname)
 }
 
 scene::scene(scene &other)
-: name(other.name), rootname(other.rootname)
+: name(other.name), rootname(other.rootname), iscopy(true)
 {
 	std::list<sg_node*> all_nodes;
 	std::list<sg_node*>::iterator i;
@@ -38,7 +38,9 @@ scene::scene(scene &other)
 }
 
 scene::~scene() {
-	disp_del_scene(name);
+	if (!iscopy) {
+		disp_del_scene(name);
+	}
 	delete root;
 }
 
@@ -65,7 +67,9 @@ bool scene::add_node(string parent, sg_node *n) {
 		return false;
 	}
 	nodes[n->get_name()] = n;
-	disp_update_node(n);
+	if (!iscopy) {
+		disp_update_node(n);
+	}
 	return true;
 }
 
@@ -82,7 +86,9 @@ bool scene::del_node(string name) {
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return false;
 	}
-	disp_del_node(i->second);
+	if (!iscopy) {
+		disp_del_node(i->second);
+	}
 	delete i->second;
 	nodes.erase(i);
 	return true;
@@ -92,6 +98,9 @@ bool scene::set_node_trans(string name, char type, vec3 trans) {
 	sg_node *n = get_node(name);
 	if (!n) return false;
 	n->set_trans(type, trans);
+	if (!iscopy) {
+		disp_update_node(n);
+	}
 	return true;
 }
 
@@ -280,3 +289,15 @@ void scene::disp_del_scene(string name) {
 	if (disp) disp->send("delscene\n" + name);
 }
 
+void scene::get_signature(scene_sig &sig) {
+	node_map::iterator i;
+	sg_node *parent;
+	for(i = nodes.begin(); i != nodes.end(); ++i) {
+		parent = i->second->get_parent();
+		if (parent) {
+			sig.insert(make_pair(i->first, parent->get_name()));
+		} else {
+			sig.insert(make_pair(i->first, string("NONE")));
+		}
+	}
+}
