@@ -204,7 +204,7 @@ public:
 			return false;
 		}
 		if (state->get_level() == 0) {
-			state->get_svs()->get_env()->output(*out);
+			state->get_svs()->set_next_output(*out);
 		}
 		// need to update scene with model otherwise
 		delete out;

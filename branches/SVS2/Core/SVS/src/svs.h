@@ -115,15 +115,18 @@ public:
 	soar_interface *get_soar_interface() { return si; }
 
 	std::string get_env_input(const std::string &sgel);
+	void set_next_output(const env_output &out);
 
 private:
 	void make_common_syms();
 	void del_common_syms();
 	
-	soar_interface*         si;
-	common_syms             cs;
-	std::vector<svs_state*> state_stack;
-	environment             env;
+	soar_interface*          si;
+	common_syms              cs;
+	std::vector<svs_state*>  state_stack;
+	environment              env;
+	learning_model          *lwr;
+	env_output              *output;
 };
 
 #endif

@@ -1,9 +1,9 @@
 #ifndef ENV_H
 #define ENV_H
 
-#include <vector>
 #include <string>
 #include <map>
+#include <set>
 #include "ipcsocket.h"
 
 typedef struct dim_desc_struct {
@@ -13,7 +13,7 @@ typedef struct dim_desc_struct {
 } dim_desc;
 
 typedef std::map<std::string, dim_desc> env_output_desc;
-
+typedef std::set<std::string> env_output_sig;
 class env_output {
 public:
 	env_output(const env_output_desc &d);
@@ -21,9 +21,10 @@ public:
 	
 	double get(const std::string &dim) const;
 	void   set(const std::string &dim, double val);
+	void   get_signature(env_output_sig &sig) const;
 	
 	bool increment();
-	void serialize(std::string &out) const;
+	std::string serialize() const;
 	
 private:
 	std::map<std::string, double> value;
@@ -34,7 +35,7 @@ class environment {
 public:
 	environment(std::string path);
 
-	bool output(env_output &out);
+	bool output(const env_output &out);
 	bool input(std::string &sgel);
 	
 private:

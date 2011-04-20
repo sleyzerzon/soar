@@ -25,6 +25,13 @@ double env_output::get(const string &dim) const {
 	return i->second;
 }
 
+void env_output::get_signature(env_output_sig &sig) const {
+	map<string, double>::const_iterator i;
+	for (i = value.begin(); i != value.end(); ++i) {
+		sig.insert(i->first);
+	}
+}
+
 void env_output::set(const string &dim, double val) {
 	map<string, double>::iterator i;
 	if ((i = value.find(dim)) == value.end()) {
@@ -47,23 +54,22 @@ bool env_output::increment() {
 	return false;
 }
 
-void env_output::serialize(string &out) const {
+string env_output::serialize() const {
 	map<string, double>::const_iterator i;
 	stringstream ss;
 	
 	for (i = value.begin(); i != value.end(); ++i) {
 		ss << i->first << " " << i->second << endl;
 	}
-	out = ss.str();
+	return ss.str();
 }
 
 environment::environment(string path)
 : sock(path, true)
 {}
 
-bool environment::output(env_output &out) {
-	string s;
-	out.serialize(s);
+bool environment::output(const env_output &out) {
+	string s = out.serialize();
 	return sock.send(s);
 }
 

@@ -17,6 +17,7 @@
 using namespace std;
 
 typedef map<wme*,command*>::iterator cmd_iter;
+learning_model *make_lwr_model();
 
 void print_tree(sg_node *n) {
 	if (n->is_group()) {
@@ -199,9 +200,10 @@ void svs_state::clear_scene() {
 }
 
 svs::svs(agent *a)
-: env(getnamespace() + "env")
+: env(getnamespace() + "env"), output(NULL)
 {
 	si = new soar_interface(a);
+	lwr = make_lwr_model();
 	make_common_syms();
 }
 
@@ -236,6 +238,7 @@ void svs::state_deletion_callback(Symbol *state) {
 void svs::pre_env_callback() {
 	vector<svs_state*>::iterator i;
 	string sgel;
+	bool updatemodel = true;
 	
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).process_cmds();
@@ -243,8 +246,19 @@ void svs::pre_env_callback() {
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results(true);
 	}
-	env.input(sgel);
-	state_stack.front()->get_scene()->parse_sgel(sgel);
+	
+	/* environment IO */
+	if (!output || !env.output(*output)) {
+		updatemodel = false;
+	}
+	if (!env.input(sgel)) {
+		updatemodel = false;
+	} else {
+		state_stack.front()->get_scene()->parse_sgel(sgel);
+	}
+	if (updatemodel) {
+		lwr->add(*output, state_stack.front()->get_scene());
+	}
 }
 
 void svs::post_env_callback() {
@@ -274,4 +288,11 @@ void svs::del_common_syms() {
 
 string svs::get_env_input(const string &sgel) {
 	return "";
+}
+
+void svs::set_next_output(const env_output &out) {
+	if (output) {
+		delete output;
+	}
+	output = new env_output(out);
 }
