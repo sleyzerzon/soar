@@ -38,7 +38,7 @@ switches for each parameter.  Running `epmem` without any switches
 displays a summary of the parameter settings.
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
-|| `balance` || Weight of match cardinality used in calculating match score || `[`0, 1`]` || 0.5 ||
+|| `balance` || Linear weight of match cardinality (1) vs. working memory activation (0) used in calculating match score || `[`0, 1`]` || 1 ||
 || `cache_size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
 || `commit` || Number of episode encodings between committing changes to disk || 1, 2, ... || 1 ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
@@ -94,9 +94,11 @@ opened concurrently by another SQLite process such as SQLiteMan.  The
 lock can be relinquished by issuing `epmem --close` or shutting down
 the Soar kernel.
 
-A last note is that when the `path` parameter is set to a non-empty value
+When the `path` parameter is set to a non-empty value
 for the first time, the value of the `database` parameter is
 automatically changed to `file`.
+
+The `balance` parameter sets the linear weight of match cardinality vs. cue activation. As a performance optimization, when the value is 1 (default), activation is not computed. If this value is not 1 (even close, such as 0.99), and working memory activation is enabled, this value will be computed for each leaf WME, which may incur a noticeable cost, depending upon the overall complexity of the retrieval.
 
 
 === Statistics ===
