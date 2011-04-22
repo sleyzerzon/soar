@@ -29,8 +29,14 @@ Running `smem` without any switches displays a summary of the parameter settings
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
 || `activation` || Enable working memory activation || `on`, `off` || `off` ||
-|| `decay-rate` || WME decay factor || `[`0, 1`]` || 0.8 ||
+|| `decay-rate` || WME decay factor || `[`0, 1`]` || 0.5 ||
+|| `decay-thresh` || Forgetting threshold || `(`0, inf`)` || 2.0 ||
+|| `petrov-approx` || Enables the (Petrov 2006) long-tail approximation || `on`, `off` || `off` ||
 || `forgetting` || Enable removal of WMEs with low activation values || `on`, `off` || `off` ||
+
+The `decay-rate` and `decay-thresh` parameters are entered as positive decimals, but are internally converted to, and printed out as, negative.
+
+The `petrov-approx` may provide additional validity to the activation value, but comes at a significant computational cost, as the model includes unbounded positive exponential computations, which cannot be reasonably cached.
 
 == See Also ==
 
