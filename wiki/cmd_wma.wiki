@@ -38,6 +38,13 @@ The `decay-rate` and `decay-thresh` parameters are entered as positive decimals,
 
 The `petrov-approx` may provide additional validity to the activation value, but comes at a significant computational cost, as the model includes unbounded positive exponential computations, which cannot be reasonably cached.
 
+When `activation` is enabled, the system produces a cache of results of calls to the `exp` function, as these can be expensive during runtime. The size of the cache is based upon two run-time parameters (`decay-rate` and `decay-thresh`), and one compile time parameter, `WMA_REFERENCES_PER_DECISION` (default value of 10), which estimates the maximum number of times a WME will be referenced during a decision. The cache is composed of `double` variables (i.e. 64-bits, currently) and the number of cache items is computed as follows:
+
+,,e,,^(thresh - ln(max_refs)) / decay_rate^
+
+With the current default parameter values, this will incur 42.65KB of memory. Holding the `decay-rate` constant, reasonable changes to `decay-thresh` (i.e. +/- 5) does not greatly change this value. However, small changes to `decay-rate` will dramatically change this profile. For instance, keeping everything else constant, a `decay-thresh` of 0.3 requires 12.9MB and 0.2 requires 16.4GB.
+
+
 == See Also ==
 
 [cmd_print print]
