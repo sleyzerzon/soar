@@ -40,12 +40,12 @@ switches for each parameter.  Running `smem` without any switches
 displays a summary of the parameter settings.
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
-|| `cache_size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
+|| `cache-size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `lazy-commit` || Delay writing semantic store changes to file until agent exits || `on`, `off` || `on` ||
 || `learning` || Semantic memory enabled || `on`, `off` || `off` ||
 || `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
-|| `page_size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
+|| `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
 || `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
 || `thresh` || Threshold for activation locality || 0, 1, ... || 100 ||
 || `timers` || Timer granularity || `off`, `one`, `two`, `three` || `off` ||
