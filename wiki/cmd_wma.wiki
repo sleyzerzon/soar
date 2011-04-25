@@ -33,6 +33,7 @@ Running `smem` without any switches displays a summary of the parameter settings
 || `decay-thresh` || Forgetting threshold || `(`0, inf`)` || 2.0 ||
 || `petrov-approx` || Enables the (Petrov 2006) long-tail approximation || `on`, `off` || `off` ||
 || `forgetting` || Enable removal of WMEs with low activation values || `on`, `off` || `off` ||
+|| `forget-wme` || If `lti` only remove WMEs with a long-term id || `all`, `lti` || `all` ||
 
 The `decay-rate` and `decay-thresh` parameters are entered as positive decimals, but are internally converted to, and printed out as, negative.
 
@@ -44,6 +45,7 @@ When `activation` is enabled, the system produces a cache of results of calls to
 
 With the current default parameter values, this will incur 42.65KB of memory. Holding the `decay-rate` constant, reasonable changes to `decay-thresh` (i.e. +/- 5) does not greatly change this value. However, small changes to `decay-rate` will dramatically change this profile. For instance, keeping everything else constant, a `decay-thresh` of 0.3 requires 12.9MB and 0.2 requires 16.4GB.
 
+If `forget-wme` is `lti` and `forgetting` is `on`, only those WMEs whose id is a long-term identifier *at the decision of forgetting* will be removed from working memory. If, for instance, the id is stored to semantic memory after the decision of forgetting, the WME will not be removed till some time after the next WME reference (such as testing/creation by a rule).
 
 == See Also ==
 
