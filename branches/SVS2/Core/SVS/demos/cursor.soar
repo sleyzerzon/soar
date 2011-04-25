@@ -1,0 +1,48 @@
+waitsnc -e
+
+sp {cursor-target-int
+	(state <s> 
+		^superstate nil
+		^svs (
+			^command <c>
+			^spatial-scene (
+				^child.id cursor
+				^child.id target
+			)
+		)
+	)
+-->
+	(<c> ^extract <e>)
+	(<e> ^type bbox_int
+	     ^a <a>
+	     ^b <b>)
+	(<a> ^type node ^name cursor)
+	(<b> ^type node ^name target)
+}
+
+sp {seek-target
+	(state <s>
+		^superstate nil
+		^svs (
+			^command <c>
+			^spatial-scene (
+				^child.id cursor
+				^child.id target
+			)
+		)
+	)
+-->
+	(<c> ^control <ctrl>)
+	(<ctrl> ^outputs <out>
+	        ^objective <obj>
+	        ^model <mdl>)
+	(<out> ^vx <vx> ^vy <vy> ^vz <vz>)
+	(<vx> ^min -5.0 ^max 5.0 ^inc 1.0)
+	(<vy> ^min -5.0 ^max 5.0 ^inc 1.0)
+	(<vz> ^min -5.0 ^max 5.0 ^inc 1.0)
+	(<obj> ^name euclidean
+	       ^a cursor
+	       ^b target)
+	(<mdl> ^type velocity
+	       ^obj cursor ^x vx ^y vy ^z vz)
+}
