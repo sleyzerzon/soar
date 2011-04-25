@@ -11,7 +11,6 @@ using namespace std;
 using namespace arma;
 
 const int NNBRS = 30;   // number of nearest neighbors to use
-const int OBJ_DOF = 9;  // 3 transforms with 3 dimensions each
 
 typedef set<string> output_sig;
 typedef pair<scene_sig, output_sig> model_sig;
@@ -24,14 +23,18 @@ void scene_to_vec(scene *scn, rowvec &v) {
 	::vec3 trans;
 	sg_node *n;
 	
+	v.reshape(1, scn->get_dof());
 	scn->get_signature(sig);
-	v.reshape(1, sig.size() * OBJ_DOF);
 	for (i = sig.begin(), j = 0; i != sig.end(); ++i) {
-		n = scn->get_node(i->first);
-		for (k = 0; k < 3; ++k) {
-			trans = n->get_trans(types[k]);
-			for (l = 0; l < 3; ++l) {
-				v(j++) = trans[l];
+		if (i->second == "PROPERTY") {
+			v(j++) = scn->get_property(i->first);
+		} else {
+			n = scn->get_node(i->first);
+			for (k = 0; k < 3; ++k) {
+				trans = n->get_trans(types[k]);
+				for (l = 0; l < 3; ++l) {
+					v(j++) = trans[l];
+				}
 			}
 		}
 	}
@@ -213,7 +216,7 @@ public:
 		lastscn->get_signature(last_ssig);
 		scn->get_signature(curr_ssig);
 		out.get_signature(osig);
-		ydim = curr_ssig.size() * OBJ_DOF;
+		ydim = scn->get_dof();
 		xdim = ydim + osig.size();
 		
 		if (last_ssig != curr_ssig) {

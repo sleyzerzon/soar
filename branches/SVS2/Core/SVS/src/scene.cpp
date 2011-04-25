@@ -25,7 +25,7 @@ scene::scene(string name, string rootname)
 }
 
 scene::scene(scene &other)
-: name(other.name), rootname(other.rootname), iscopy(true)
+: name(other.name), rootname(other.rootname), iscopy(true), properties(other.properties)
 {
 	std::list<sg_node*> all_nodes;
 	std::list<sg_node*>::iterator i;
@@ -219,7 +219,21 @@ int scene::parse_change(vector<string> &f) {
 	return -1;
 }
 
-void scene::parse_sgel(string s) {
+int scene::parse_property(vector<string> &f) {
+	if (f.size() != 2) {
+		return f.size();
+	}
+	stringstream ss(f[1]);
+	double val;
+	
+	if (!(ss >> val)) {
+		return 1;
+	}
+	properties[f[0]] = val;
+	return -1;
+}
+
+void scene::parse_sgel(const string &s) {
 	vector<string> lines, fields;
 	vector<string>::iterator i;
 	char cmd;
@@ -249,13 +263,16 @@ void scene::parse_sgel(string s) {
 			case 'c':
 				errfield = parse_change(fields);
 				break;
+			case 'p':
+				errfield = parse_property(fields);
+				break;
 			default:
 				cerr << "expecting a|d|c at beginning of line '" << *i << "'" << endl;
 				exit(1);
 		}
 		
 		if (errfield >= 0) {
-			cerr << "error in field " << errfield << " of line '" << *i << "' " << endl;
+			cerr << "error in field " << errfield + 1 << " of line '" << *i << "' " << endl;
 			exit(1);
 		}
 	}
@@ -291,13 +308,40 @@ void scene::disp_del_scene(string name) {
 
 void scene::get_signature(scene_sig &sig) {
 	node_map::iterator i;
+	property_map::iterator j;
 	sg_node *parent;
+	string ns = "NONE", ps = "PROPERTY";
+	
 	for(i = nodes.begin(); i != nodes.end(); ++i) {
 		parent = i->second->get_parent();
 		if (parent) {
 			sig.insert(make_pair(i->first, parent->get_name()));
 		} else {
-			sig.insert(make_pair(i->first, string("NONE")));
+			sig.insert(make_pair(i->first, ns));
 		}
 	}
+	for(j = properties.begin(); j != properties.end(); ++j) {
+		sig.insert(make_pair(j->first, ps));
+	}
+}
+
+double scene::get_property(const string &prop) {
+	property_map::const_iterator i;
+	
+	if ((i = properties.find(prop)) == properties.end()) {
+		assert(false);
+	}
+	return i->second;
+}
+
+int scene::get_num_nodes() {
+	return nodes.size();
+}
+
+int scene::get_num_properties() {
+	return properties.size();
+}
+
+int scene::get_dof() {
+	return nodes.size() * 9 + properties.size();
 }

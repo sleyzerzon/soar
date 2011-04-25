@@ -28,15 +28,16 @@ transform3::transform3(transform_tags::Translation t, vec3 v)
   m20(0.0), m21(0.0), m22(1.0), m23(v.z)
 {}
 
-/* http://mathworld.wolfram.com/EulerAngles.html */
+/* Application order - roll, pitch, yaw
+   http://mathworld.wolfram.com/EulerAngles.html */
 transform3::transform3(transform_tags::Rotation t, vec3 v)
 {
-	double siny = sin(v.x), sinp = sin(v.y), sinr = sin(v.z),
-	       cosy = cos(v.x), cosp = cos(v.y), cosr = cos(v.z);
+	double sinr = sin(v.x), sinp = sin(v.y), siny = sin(v.z),
+	       cosr = cos(v.x), cosp = cos(v.y), cosy = cos(v.z);
 	
-	m00=cosp*cosy;                 m01=cosp*-siny;                m02=sinp;       m03=0;
-	m10=sinr*sinp*cosy+cosr*siny;  m11=-sinr*sinp*siny+cosr*cosy; m12=-sinr*cosp; m13=0;
-	m20=cosr*-sinp*cosy+sinr*siny; m21=cosr*sinp*siny+sinr*cosy;  m22=cosr*cosp;  m23=0;
+	m00=cosy*cosp; m01=-siny*cosr+cosy*sinp*sinr; m02=-siny*-sinr+cosy*sinp*cosr; m03=0;
+	m10=siny*cosp; m11=cosy*cosr+siny*sinp*sinr;  m12=cosy*-sinr+siny*sinp*cosr;  m13=0;
+	m20=-sinp;     m21=cosp*sinr;                 m22=cosp*cosr;                  m23=0;
 }
 
 transform3::transform3(transform_tags::Scaling t, vec3 v)
@@ -92,49 +93,48 @@ awk 'BEGIN {
 	exit
 }'
 
-# "Symbolic" matrix multiplication with awk. Actually correctly unrolled
-# the transform matrix for 3D rotation using yaw, pitch, and roll.
+# Poor man's symbolic matrix multiplication with awk. Unrolls
+# the transform matrix for 3D rotation using roll, pitch, and yaw.
 
 awk 'BEGIN {
-	ys="cos(y) -sin(y) 0.0 0.0 " \
-	   "sin(y)  cos(y) 0.0 0.0 " \
-	   "   0.0     0.0 1.0 0.0 " \
-	   "   0.0     0.0 0.0 1.0 "
+	ys="cosy -siny 0.0 0.0 " \
+	   "siny  cosy 0.0 0.0 " \
+	   " 0.0   0.0 1.0 0.0 " \
+	   " 0.0   0.0 0.0 1.0 "
 
-	ps=" cos(p) 0.0 sin(p) 0.0 " \
-	   "    0.0 1.0    0.0 0.0 " \
-	   "-sin(p) 0.0 cos(p) 0.0 " \
-	   "    0.0 0.0    0.0 1.0 "
+	ps=" cosp 0.0 sinp 0.0 " \
+	   "  0.0 1.0  0.0 0.0 " \
+	   "-sinp 0.0 cosp 0.0 " \
+	   "  0.0 0.0  0.0 1.0 "
 
-	rs="1.0    0.0     0.0 0.0 " \
-	   "0.0 cos(r) -sin(r) 0.0 " \
-	   "0.0 sin(r)  cos(r) 0.0 " \
-	   "0.0    0.0     0.0 1.0 "
+	rs="1.0  0.0   0.0 0.0 " \
+	   "0.0 cosr -sinr 0.0 " \
+	   "0.0 sinr  cosr 0.0 " \
+	   "0.0  0.0   0.0 1.0 "
 	
 	parse(RY, ys)
 	parse(RP, ps)
 	parse(RR, rs)
-	
-	printmat(RY)
-	printmat(RP)
-	printmat(RR)
-	
-	mult(RR, RP, F)
-	mult(F, RY, FF)
+
+	mult(RY, RP, F)
+	mult(F, RR, FF)
 	
 	printmat(FF)
 	exit
 }
 
 function printmat(M) {
+	print "{"
 	for (i = 0; i <= 3; i++) {
+		printf "{ "
 		sep = ""
 		for (j = 0; j <= 3; j++) {
 			printf sep M[i,j]
 			sep = ", "
 		}
-		print ""
+		print "},"
 	}
+	print "}"
 }
 
 function parse(M, s) {

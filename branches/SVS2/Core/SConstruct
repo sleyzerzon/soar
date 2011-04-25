@@ -112,11 +112,11 @@ env = Environment(
 	STATIC_LINKED = GetOption('static'),
 	SOAR_VERSION = SOAR_VERSION,
 	CPPFLAGS = ['-DSCONS', '-Wfatal-errors'],
-	CPPPATH = ['#shared'],
+	CPPPATH = ['#shared'] + os.environ.get('CPATH', '').split(':'),
 	LINKFLAGS = [],
+	LIBPATH = os.environ.get('LD_LIBRARY_PATH', '').split(':'),
 	)
 #################
-
 
 #################
 # Get g++ Version
@@ -405,6 +405,7 @@ libadd = ['ClientSML', 'ConnectionSML', 'ElementXML', 'armadillo']
 if compEnv['STATIC_LINKED']:
         libadd.extend(['SoarKernelSML', 'SoarKernel', 'CommandLineInterface', 'sqlite3', 'svs'])
 compEnv.Append(LIBS = libadd, LIBPATH = ['$PREFIX/lib'])
+
 Export('compEnv')
 
 components.insert(0, 'Core/s')
