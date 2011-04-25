@@ -39,7 +39,7 @@ displays a summary of the parameter settings.
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
 || `balance` || Linear weight of match cardinality (1) vs. working memory activation (0) used in calculating match score || `[`0, 1`]` || 1 ||
-|| `cache_size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
+|| `cache-size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
 || `commit` || Number of episode encodings between committing changes to disk || 1, 2, ... || 1 ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `exclusions` || Toggle the exclusion of an attribute string constant || _any string_ || `epmem, smem` ||
@@ -47,7 +47,7 @@ displays a summary of the parameter settings.
 || `graph-match` || Graph matching enabled || `on`, `off` || `on` ||
 || `learning` ||  Episodic memory enabled  || `on`, `off` || `off` ||
 || `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
-|| `page_size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
+|| `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
 || `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
 || `phase` || Decision cycle phase to encode new episodes and process epmem link commands || `output`, `selection` || `output` ||
 || `timers` || Timer granularity || `off`, `one`, `two`, `three` || `off` ||
