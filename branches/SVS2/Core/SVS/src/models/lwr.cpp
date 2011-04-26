@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <sys/time.h>
 #include <iostream>
 #include <vector>
 #include <set>
@@ -14,6 +15,26 @@ const int NNBRS = 30;   // number of nearest neighbors to use
 
 typedef set<string> output_sig;
 typedef pair<scene_sig, output_sig> model_sig;
+
+class timer {
+public:
+	timer() {}
+	
+	void start() {
+		gettimeofday(&t1, NULL);
+	}
+	
+	double stop() {
+		timeval t2, t3;
+		gettimeofday(&t2, NULL);
+		timersub(&t2, &t1, &t3);
+		return t3.tv_sec + t3.tv_usec / 1000000.0;
+	}
+	
+	timeval t1;
+};
+
+
 
 void scene_to_vec(scene *scn, rowvec &v) {
 	scene_sig sig;
@@ -84,16 +105,22 @@ public:
 		db.push_back(make_pair(x, y));
 	}
 
-	bool predict(rowvec x, rowvec &y) {
-		int i, k = db.size() > nnbrs ? nnbrs : db.size();
+	bool predict(const rowvec &x, rowvec &y) {
+		timer tall, tnn, tslv;
+		tall.start();
+		int k = db.size() > nnbrs ? nnbrs : db.size();
 		
 		if (k == 0) {
 			return false;
 		}
+		
 		mat X = zeros<mat>(k, xdim);
 		mat Y = zeros<mat>(k, ydim);
 		vec w = zeros<vec>(k);
+		
+		tnn.start();
 		nearest(x, X, Y, w);
+		cout << "NN:  " << tnn.stop() << endl;
 		
 		/* Any neighbor whose weight is infinity is close
 		   enough to provide an exact solution.  If any
@@ -103,25 +130,38 @@ public:
 		*/
 		rowvec closeavg = zeros<rowvec>(ydim);
 		int nclose = 0;
-		for (i = 0; i < w.n_elem; ++i) {
-			if (w(i) == numeric_limits<double>::infinity()) {
+		for (int i = 0; i < w.n_elem; ++i) {
+			if (w(i) == math::inf()) {
 				closeavg += Y.row(i);
 				++nclose;
 			}
 		}
 		if (nclose > 0) {
-			for(i = 0; i < closeavg.n_elem; ++i) {
+			for(int i = 0; i < closeavg.n_elem; ++i) {
 				closeavg(i) /= nclose;
 			}
 			y = closeavg;
 			return true;
 		}
 		
-		X.insert_cols(xdim, ones<vec>(k));
+		mat Xt, Yt;
+		vector<int> xd, yd;
+		remove_static(X, Xt, xd);
+		remove_static(Y, Yt, yd);
+		
+		if (yd.size() == 0) {
+			// all neighbors are identical, use first as prediction
+			y = Y.row(0);
+			return true;
+		}
+		
+		Xt.insert_cols(Xt.n_cols, ones<vec>(k));
 		mat W = diagmat(w);
-		mat Z = W * X;
-		mat V = W * Y;
+		mat Z = W * Xt;
+		mat V = W * Yt;
+		tslv.start();
 		mat C = solve(Z, V);
+		cout << "SLV: " << tslv.stop() << endl;
 		if (C.n_elem == 0) {
 			// solve failed
 			w.print("w:");
@@ -129,8 +169,24 @@ public:
 			V.print("V:");
 			assert(false);
 		}
-		x.insert_cols(xdim, ones<rowvec>(1,1));
-		y = x * C;
+		
+		// xt is input x without static columns 
+		rowvec xt = ones<rowvec>(xd.size() + 1);
+		for (int i = 0; i < xd.size(); ++i) {
+			xt(i) = x(xd[i]);
+		}
+		// yt is output y without static columns
+		rowvec yt = xt * C;
+		
+		/* final answer is first (actually any will do) row of
+		   Y with dynamic columns changed
+		*/
+		y = Y.row(0);
+		for (int i = 0; i < yd.size(); ++i) {
+			y(yd[i]) = yt(i);
+		}
+		
+		cout << "ALL: " << tall.stop() << endl;
 		return true;
 	}
 	
@@ -167,6 +223,24 @@ private:
 			X.row(i) = db[*j].first;
 			Y.row(i) = db[*j].second;
 			w(i) = ::pow(*k, -3);
+		}
+	}
+	
+	/* Output a matrix composed only of those columns in the input
+	   matrix with different values.
+	*/
+	void remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
+		for (int c = 0; c < X.n_cols; ++c) {
+			for (int r = 1; r < X.n_rows; ++r) {
+				if (X(r, c) != X(0, c)) {
+					dynamic.push_back(c);
+					break;
+				}
+			}
+		}
+		Xout.reshape(X.n_rows, dynamic.size());
+		for (int i = 0; i < dynamic.size(); ++i) {
+			Xout.col(i) = X.col(dynamic[i]);
 		}
 	}
 	
