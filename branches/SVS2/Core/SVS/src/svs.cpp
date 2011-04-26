@@ -200,7 +200,7 @@ void svs_state::clear_scene() {
 }
 
 svs::svs(agent *a)
-: env(getnamespace() + "env"), output(NULL)
+: envsock(getnamespace() + "env", true), output(NULL)
 {
 	si = new soar_interface(a);
 	lwr = make_lwr_model();
@@ -248,10 +248,13 @@ void svs::pre_env_callback() {
 	}
 	
 	/* environment IO */
-	if (!output || !env.output(*output)) {
+	if (!output) {
 		updatemodel = false;
+		envsock.send("");
+	} else {
+		updatemodel = envsock.send(output->serialize());
 	}
-	if (!env.input(sgel)) {
+	if (!envsock.receive(sgel)) {
 		updatemodel = false;
 	} else {
 		state_stack.front()->get_scene()->parse_sgel(sgel);

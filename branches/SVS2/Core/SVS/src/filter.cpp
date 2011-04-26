@@ -22,6 +22,29 @@ bool get_bool_filter_result_value(filter *requester, filter *f, bool &v) {
 	return true;
 }
 
+/* allow for both integer and double values */
+bool get_double_filter_result_value(filter *requester, filter *f, double &v) {
+	filter_result *fr;
+	double_filter_result *dfr;
+	int_filter_result *ifr;
+	
+	if (!(fr = f->get_result())) {
+		if (requester) requester->set_error(f->get_error());
+		return false;
+	} 
+	if (!(dfr = dynamic_cast<double_filter_result*>(fr))) {
+		if (!(ifr = dynamic_cast<int_filter_result*>(fr))) {
+			if (requester) requester->set_error("invalid input");
+			return false;
+		} else {
+			v = ifr->get_value();
+		}
+	} else {
+		v = dfr->get_value();
+	}
+	return true;
+}
+
 bool get_string_filter_result_value(filter *requester, filter *f, string &v) {
 	filter_result *fr;
 	string_filter_result *cfr;
@@ -226,7 +249,7 @@ filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn) {
 		} else if (si->get_val(cval, intval)) {
 			params.insert(make_pair(pname, new const_int_filter(intval)));
 		} else if (si->get_val(cval, floatval)) {
-			params.insert(make_pair(pname, new const_float_filter(floatval)));
+			params.insert(make_pair(pname, new const_double_filter(floatval)));
 		} else {
 			// must be identifier
 			params.insert(make_pair(pname, parse_filter_struct(si, cval, scn)));

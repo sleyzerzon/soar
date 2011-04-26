@@ -9,7 +9,6 @@
 #include "scene.h"
 #include "soar_interface.h"
 #include "ipcsocket.h"
-#include "filters/gen_filter.h"
 
 using namespace std;
 

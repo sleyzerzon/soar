@@ -4,7 +4,6 @@
 #include "filter.h"
 #include "scene.h"
 #include "bbox_filter.h"
-#include "ptlist_filter.h"
 
 using namespace std;
 
@@ -37,7 +36,7 @@ bbox bbox_filter_result::get_value() {
 }
 
 bbox_filter::bbox_filter(filter* node)
-: container(this, new ptlist_filter(false, node))
+: container(this, node)
 { }
 
 bbox_filter::bbox_filter(vector<filter*> nodes)
@@ -45,16 +44,14 @@ bbox_filter::bbox_filter(vector<filter*> nodes)
 {
 	vector<filter*>::iterator i;
 	for (i = nodes.begin(); i != nodes.end(); ++i) {
-		container.add(new ptlist_filter(false, *i));
+		container.add(*i);
 	}
 }
 
 filter_result *bbox_filter::calc_result() {
 	int i;
-	ptlist *l, allpts;
-	filter_result *fr;
-	ptlist_filter_result *pfr;
-	bbox *b;
+	sg_node *n;
+	ptlist npts, allpts;
 	
 	if (container.size() == 0) {
 		set_error("no inputs to bbox filter");
@@ -62,8 +59,10 @@ filter_result *bbox_filter::calc_result() {
 	}
 
 	for (i = 0; i < container.size(); i++) {
-		if (!get_ptlist_filter_result_value(this, container.get(i), l)) return NULL;
-		allpts.insert(allpts.end(), l->begin(), l->end());
+		if (!get_node_filter_result_value(this, container.get(i), n)) return NULL;
+		npts.clear();
+		n->get_world_points(npts);
+		allpts.insert(allpts.end(), npts.begin(), npts.end());
 	}
 	return new bbox_filter_result(bbox(allpts));
 }
@@ -73,8 +72,6 @@ filter* _make_bbox_filter_(scene *scn, const filter_params &inputs) {
 	vector<filter*> filters;
 	filter_params::const_iterator i;
 	
-	ptlist_filter *q;
-
 	filters.reserve(inputs.size());
 	for (i = inputs.begin(); i != inputs.end(); ++i) {
 		filters.push_back(i->second);

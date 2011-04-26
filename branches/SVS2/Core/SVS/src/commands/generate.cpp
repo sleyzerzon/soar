@@ -9,7 +9,7 @@ using namespace std;
 class generate_command : public command {
 public:
 	generate_command(svs_state *state, Symbol *root)
-	: utils(state, root), root(root), scn(state->get_scene()), gen_filter(NULL), si(state->get_svs()->get_soar_interface())
+	: utils(state, root), root(root), scn(state->get_scene()), node_filter(NULL), gen_node(NULL), si(state->get_svs()->get_soar_interface())
 	{}
 	
 	~generate_command() {
@@ -35,11 +35,11 @@ public:
 			utils.set_result("parent name must be a string");
 			return false;
 		}
-		if ((gen_filter = parse_filter_struct(si, si->get_wme_val(gen_wme), scn)) == NULL) {
+		if ((node_filter = parse_filter_struct(si, si->get_wme_val(gen_wme), scn)) == NULL) {
 			utils.set_result("incorrect gen filter syntax");
 			return false;
 		}
-		if (!get_node_filter_result_value(NULL, gen_filter, gen_node)) {
+		if (!get_node_filter_result_value(NULL, node_filter, gen_node)) {
 			utils.set_result("node parameter must be a node filter");
 			return false;
 		}
@@ -51,8 +51,8 @@ public:
 	}
 	
 	void reset() {
-		if (gen_filter) {
-			delete gen_filter;
+		if (node_filter) {
+			delete node_filter;
 		}
 		if (gen_node) {
 			scn->del_node(gen_node->get_name());
@@ -68,7 +68,7 @@ private:
 	soar_interface *si;
 	cmd_utils       utils;
 	string          parent;
-	filter         *gen_filter;
+	filter         *node_filter;
 	sg_node        *gen_node;
 	bool            dirty;
 };

@@ -1,0 +1,63 @@
+waitsnc -e
+
+sp {gen-target
+	(state <s>
+		^superstate nil
+		^svs.command <c>)
+-->
+	(<c> ^generate <g>)
+	(<g> ^parent world
+	     ^node <n>)
+	(<n> ^type gen
+	     ^name target
+	     ^points.type singleton
+	     ^pos <pos>)
+	(<pos> ^type vec3
+	       ^x 5.0
+	       ^y -5.0
+	       ^z 0.0)
+}
+
+sp {cursor-target-int
+	(state <s> 
+		^superstate nil
+		^svs (
+			^command <c>
+			^spatial-scene (
+				^child.id splinter
+				^child.id target
+			)
+		)
+	)
+-->
+	(<c> ^extract <e>)
+	(<e> ^type bbox_int
+	     ^a <a>
+	     ^b <b>)
+	(<a> ^type node ^name splinter)
+	(<b> ^type node ^name target)
+}
+
+sp {seek-target
+	(state <s>
+		^superstate nil
+		^svs (
+			^command <c>
+			^spatial-scene (
+				^child.id splinter
+				^child.id target
+			)
+		)
+	)
+-->
+	(<c> ^control <ctrl>)
+	(<ctrl> ^outputs <out>
+	        ^objective <obj>
+	        ^model.type lwr)
+	(<out> ^left <left> ^right <right>)
+	(<left>  ^min -1.0 ^max 1.0 ^inc 0.1)
+	(<right> ^min -1.0 ^max 1.0 ^inc 0.1)
+	(<obj> ^name euclidean
+	       ^a splinter
+	       ^b target)
+}

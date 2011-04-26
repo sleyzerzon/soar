@@ -62,11 +62,15 @@ void vec_to_scene(const rowvec &v, scene *scn) {
 	
 	scn->get_signature(sig);
 	for (i = sig.begin(), j = 0; i != sig.end(); ++i) {
-		for (k = 0; k < 3; ++k) {
-			for (l = 0; l < 3; ++l) {
-				trans[l] = v(j++);
+		if (i->second == "PROPERTY") {
+			scn->set_property(i->first, v(j++));
+		} else {
+			for (k = 0; k < 3; ++k) {
+				for (l = 0; l < 3; ++l) {
+					trans[l] = v(j++);
+				}
+				scn->set_node_trans(i->first, types[k], trans);
 			}
-			scn->set_node_trans(i->first, types[k], trans);
 		}
 	}
 }

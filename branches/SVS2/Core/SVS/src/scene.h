@@ -28,6 +28,7 @@ public:
 	void     clear();
 
 	double   get_property(const std::string &prop);
+	void     set_property(const std::string &prop, double val);
 	
 	int      get_num_nodes();
 	int      get_num_properties();

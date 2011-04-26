@@ -63,17 +63,3 @@ string env_output::serialize() const {
 	}
 	return ss.str();
 }
-
-environment::environment(string path)
-: sock(path, true)
-{}
-
-bool environment::output(const env_output &out) {
-	string s = out.serialize();
-	return sock.send(s);
-}
-
-bool environment::input(string &sgel) {
-	string type;
-	return sock.receive(sgel);
-}

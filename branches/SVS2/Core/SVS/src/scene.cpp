@@ -334,6 +334,14 @@ double scene::get_property(const string &prop) {
 	return i->second;
 }
 
+void scene::set_property(const string &prop, double v) {
+	property_map::iterator i;
+	if ((i = properties.find(prop)) == properties.end()) {
+		assert(false);
+	}
+	i->second = v;
+}
+
 int scene::get_num_nodes() {
 	return nodes.size();
 }

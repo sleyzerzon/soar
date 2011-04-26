@@ -31,15 +31,4 @@ private:
 	env_output_desc desc;
 };
 
-class environment {
-public:
-	environment(std::string path);
-
-	bool output(const env_output &out);
-	bool input(std::string &sgel);
-	
-private:
-	ipcsocket sock;
-};
-
 #endif

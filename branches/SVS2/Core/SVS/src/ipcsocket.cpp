@@ -75,24 +75,18 @@ void ipcsocket::disconnect() {
 }
 
 bool ipcsocket::send(const string &s) {
-	int n, l, t = 0;
-	char *buf; 
+	int n;
 	
 	if (!connected && (recvfirst || !accept())) return false;
+	string t = s + TERMSTRING;
 	
-	l = s.size() + strlen(TERMSTRING);
-	buf = new char[l];
-	strcpy(buf, s.c_str());
-	strcpy(buf + s.size(), TERMSTRING);
-	while (t < l) {
-		if ((n = ::send(fd, buf + t, l - t, 0)) <= 0) {
+	while (t.size() > 0) {
+		if ((n = ::send(fd, t.c_str(), t.size(), 0)) <= 0) {
 			disconnect();
-			delete[] buf;
 			return false;
 		}
-		t += n;
+		t.erase(0, n);
 	}
-	delete[] buf;
 	return true;
 }
 

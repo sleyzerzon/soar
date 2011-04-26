@@ -111,7 +111,6 @@ public:
 	void pre_env_callback();
 	void post_env_callback();
 
-	environment    *get_env() { return &env; }
 	soar_interface *get_soar_interface() { return si; }
 
 	std::string get_env_input(const std::string &sgel);
@@ -124,7 +123,7 @@ private:
 	soar_interface*          si;
 	common_syms              cs;
 	std::vector<svs_state*>  state_stack;
-	environment              env;
+	ipcsocket                envsock;
 	learning_model          *lwr;
 	env_output              *output;
 };
