@@ -54,37 +54,45 @@ public:
 		rot = (orient * quaternion(rotrate)).to_rpy();
 	}
     
-    bool predict(scene *scn, const env_output &out) {
+    bool predict(flat_scene &scn, const env_output &out) {
 		vec3 pos, vel, rot, rotrate;
 		quaternion orient;
 		double left_voltage, right_voltage, dt;
 		sg_node *splinter;
 		
-		if (!(splinter = scn->get_node("splinter"))) {
+		if (!scn.get_node_trans("splinter", 'p', pos) ||
+		    !scn.get_node_trans("splinter", 'r', rot))
+		{
 			return false;
 		}
-		pos = splinter->get_trans('p');
-		rot = splinter->get_trans('r');
 		
-		vel.x = scn->get_property("vel_0");
-		vel.y = scn->get_property("vel_1");
-		vel.z = scn->get_property("vel_2");
-		rotrate.x = scn->get_property("rotation_rate_0");
-		rotrate.y = scn->get_property("rotation_rate_1");
-		rotrate.z = scn->get_property("rotation_rate_2");
+		if (!scn.get_property("vel_0", vel.x) ||
+		    !scn.get_property("vel_1", vel.y) ||
+		    !scn.get_property("vel_2", vel.z))
+		{
+			return false;
+		}
+
+		if (!scn.get_property("rotation_rate_0", rotrate.x) ||
+		    !scn.get_property("rotation_rate_1", rotrate.y) ||
+		    !scn.get_property("rotation_rate_2", rotrate.z))
+		{
+			return false;
+		}
+		
 		left_voltage = out.get("left");
 		right_voltage = out.get("right");
 		
 		sim(left_voltage, right_voltage, dt, pos, vel, rot, rotrate);
 		
-		splinter->set_trans('p', pos);
-		splinter->set_trans('r', rot);
-		scn->set_property("vel_0", vel.x);
-		scn->set_property("vel_1", vel.y);
-		scn->set_property("vel_2", vel.z);
-		scn->set_property("rotation_rate_0", rotrate.x);
-		scn->set_property("rotation_rate_1", rotrate.y);
-		scn->set_property("rotation_rate_2", rotrate.z);
+		scn.set_node_trans("splinter", 'p', pos);
+		scn.set_node_trans("splinter", 'r', rot);
+		scn.set_property("vel_0", vel.x);
+		scn.set_property("vel_1", vel.y);
+		scn.set_property("vel_2", vel.z);
+		scn.set_property("rotation_rate_0", rotrate.x);
+		scn.set_property("rotation_rate_1", rotrate.y);
+		scn.set_property("rotation_rate_2", rotrate.z);
 		
 		return true;
 	}

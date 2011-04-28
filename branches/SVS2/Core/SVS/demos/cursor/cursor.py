@@ -35,5 +35,7 @@ while True:
 			sys.exit(1)
 
 	cp = [ sum(pv) for pv in zip(cp, v) ]
+	print("INPUT: ", v, file=sys.stderr)
+	print("POS:   ", cp, file=sys.stderr)
 	print('c cursor p {} {} {}\n***'.format(*cp))
 	sys.stdout.flush()

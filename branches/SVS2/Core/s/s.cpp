@@ -194,6 +194,11 @@ int main(int argc, char *argv[]) {
 		signal(SIGTSTP, sigstophandler);
 	}
 	
+	for (int i = 1; i < argc; ++i) {
+		string cmd = "source ";
+		cmd.append(argv[i]);
+		execcmd(cmd);
+	}
 	repl();
 	return 0;
 }

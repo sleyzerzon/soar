@@ -37,37 +37,21 @@ public:
 	}
 };
 
-void scene_to_vec(scene *scn, rowvec &v) {
-	scene_sig sig;
-	scene_sig::iterator i;
-	int j, k, l;
-	const char *types = "prs";
-	::vec3 trans;
-	sg_node *n;
-	
-	v.reshape(1, scn->get_dof());
-	scn->get_signature(sig);
-	for (i = sig.begin(), j = 0; i != sig.end(); ++i) {
-		if (i->second == "PROPERTY") {
-			v(j++) = scn->get_property(i->first);
-		} else {
-			n = scn->get_node(i->first);
-			for (k = 0; k < 3; ++k) {
-				trans = n->get_trans(types[k]);
-				for (l = 0; l < 3; ++l) {
-					v(j++) = trans[l];
-				}
-			}
-		}
+void scene_to_vec(const flat_scene &scn, rowvec &v) {
+	vector<double>::const_iterator i;
+	int j;
+	v.reshape(1, scn.vals.size());
+	for (i = scn.vals.begin(), j = 0; i != scn.vals.end(); ++i, ++j) {
+		v(j) = *i;
 	}
 }
 
-void scene_out_to_vec(scene *scn, const env_output &out, rowvec &v) {
+void scene_out_to_vec(const flat_scene &scn, const env_output &out, rowvec &v) {
 	env_output_sig s;
 	env_output_sig::const_iterator i;
 	int j;
-	scene_to_vec(scn, v);
 	out.get_signature(s);
+	scene_to_vec(scn, v);
 	j = v.n_elem;
 	v.reshape(1, v.n_elem + s.size());
 	for (i = s.begin(); i != s.end(); ++i, ++j) {
@@ -75,25 +59,11 @@ void scene_out_to_vec(scene *scn, const env_output &out, rowvec &v) {
 	}
 }
 
-void vec_to_scene(const rowvec &v, scene *scn) {
-	scene_sig sig;
-	scene_sig::iterator i;
-	int j, k, l;
-	::vec3 trans;
-	const char *types = "prs";
-	
-	scn->get_signature(sig);
-	for (i = sig.begin(), j = 0; i != sig.end(); ++i) {
-		if (i->second == "PROPERTY") {
-			scn->set_property(i->first, v(j++));
-		} else {
-			for (k = 0; k < 3; ++k) {
-				for (l = 0; l < 3; ++l) {
-					trans[l] = v(j++);
-				}
-				scn->set_node_trans(i->first, types[k], trans);
-			}
-		}
+void vec_to_scene(const rowvec &v, flat_scene &scn) {
+	vector<double>::iterator i;
+	int j;
+	for (i = scn.vals.begin(), j = 0; i != scn.vals.end(); ++i, ++j) {
+		*i = v(j);
 	}
 }
 
@@ -101,19 +71,20 @@ class lwr_model : public learning_model {
 public:
 	lwr_model() : lastscn(NULL) {}
 	
-	bool predict(scene *scn, const env_output &out) {
+	bool predict(flat_scene &scn, const env_output &out) {
 		scene_sig ssig;
 		env_output_sig osig;
 		map<model_sig, lwr*>::iterator i;
 		rowvec x, y;
 		
-		scn->get_signature(ssig);
+		scn.get_signature(ssig);
 		out.get_signature(osig);
 		model_sig msig = make_pair(ssig, osig);
 		
 		if ((i = models.find(msig)) == models.end()) {
 			return false;
 		}
+		
 		scene_out_to_vec(scn, out, x);
 		if (!i->second->predict(x, y)) {
 			return false;
@@ -125,7 +96,7 @@ public:
 	   is encoded as a pair of vectors (x, y) where
 	   x = [prev_state, output], y = [next_state]
 	*/
-	void add(const env_output &out, scene *scn) {
+	void add(const env_output &out, const flat_scene &scn) {
 		scene_sig last_ssig, curr_ssig;
 		env_output_sig osig;
 		rowvec x, y;
@@ -136,20 +107,20 @@ public:
 		
 		if (lastscn == NULL) {
 			// incomplete example, wait for next time
-			lastscn = new scene(*scn);
+			lastscn = new flat_scene(scn);
 			return;
 		}
 		
 		lastscn->get_signature(last_ssig);
-		scn->get_signature(curr_ssig);
+		scn.get_signature(curr_ssig);
 		out.get_signature(osig);
-		ydim = scn->get_dof();
+		ydim = scn.vals.size();
 		xdim = ydim + osig.size();
 		
 		if (last_ssig != curr_ssig) {
 			// scene structure changed, can't predict this so don't train
 			delete lastscn;
-			lastscn = new scene(*scn);
+			lastscn = new flat_scene(scn);
 			return;
 		}
 		
@@ -161,17 +132,17 @@ public:
 			mdl = i->second;
 		}
 
-		scene_out_to_vec(lastscn, out, x);
+		scene_out_to_vec(*lastscn, out, x);
 		scene_to_vec(scn, y);
 		mdl->add(x, y);
 		lg.log(x, y);
 		delete lastscn;
-		lastscn = new scene(*scn);
+		lastscn = new flat_scene(scn);
 	}
 	
 private:
 	map<model_sig, lwr*> models;
-	scene *lastscn;
+	flat_scene *lastscn;
 	logger lg;
 };
 

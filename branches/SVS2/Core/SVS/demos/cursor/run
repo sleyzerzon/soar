@@ -1,0 +1,15 @@
+#!/bin/sh
+
+soar=../../../../out/bin/s
+
+socat unix-connect:env,retry=100 system:'python cursor.py' &
+spid=$!
+
+if [ "$1" == "-g" ]
+then
+	gdb --args $soar cursor.soar
+else
+	$soar cursor.soar
+fi
+
+kill $spid

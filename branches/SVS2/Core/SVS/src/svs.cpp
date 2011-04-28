@@ -260,7 +260,7 @@ void svs::pre_env_callback() {
 		state_stack.front()->get_scene()->parse_sgel(sgel);
 	}
 	if (updatemodel) {
-		lwr->add(*output, state_stack.front()->get_scene());
+		lwr->add(*output, flat_scene(state_stack.front()->get_scene()));
 	}
 }
 

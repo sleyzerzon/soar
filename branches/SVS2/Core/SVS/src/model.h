@@ -7,12 +7,12 @@
 
 class model {
 public:
-	virtual bool predict(scene *scn, const env_output &out) = 0;
+	virtual bool predict(flat_scene &scn, const env_output &out) = 0;
 };
 
 class learning_model : model {
 public:
-	virtual void add(const env_output &out, scene *scn) = 0;
+	virtual void add(const env_output &out, const flat_scene &scn) = 0;
 };
 
 model *parse_model_struct(soar_interface *si, Symbol *root);

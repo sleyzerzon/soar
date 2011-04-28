@@ -153,12 +153,16 @@ public:
 		env_output curr(outdesc);
 		env_output *bestout = NULL;
 		double eval, best;
-		scene *next;
+		flat_scene flat(scn);
+		vector<double> origvals = flat.vals;
+		scene next(*scn);
 		
 		while (curr.increment()) {
-			next = new scene(*scn);
-			mdl->predict(next, curr);
-			eval = obj->eval(next);
+			/* this part is kind of a hack to avoid expensive copying */
+			flat.vals = origvals;
+			mdl->predict(flat, curr);
+			flat.update_scene(&next);
+			eval = obj->eval(&next);
 			if (!bestout || eval < best) {
 				if (bestout) {
 					delete bestout;
@@ -166,7 +170,6 @@ public:
 				bestout = new env_output(curr);
 				best = eval;
 			}
-			delete next;
 		}
 		step++;
 		return bestout;
