@@ -8,49 +8,30 @@
 
 class vec3 {
 public:
-	vec3( )
-	: x(0.0), y(0.0), z(0.0)
-	{}
+	double x, y, z;
 	
-	vec3(double x, double y, double z)
-	: x(x), y(y), z(z)
-	{}
+	vec3();
+	vec3(double x, double y, double z);
+	vec3(const vec3 &v);
 	
-	vec3(const vec3 &v)
-	: x(v.x), y(v.y), z(v.z)
-	{}
+	double  operator[](int i) const;
+	double &operator[](int i);
+	vec3 operator+(const vec3 &v) const;
+};
+
+class quaternion {
+public:
+	double a, b, c, d;
 	
-	double operator[](int i) const {
-		switch (i) {
-			case 0:
-				return x;
-			case 1:
-				return y;
-			case 2:
-				return z;
-			default:
-				assert(false);
-		}
-	}
+	quaternion();
+	quaternion(double a, double b, double c, double d);
+	quaternion(const quaternion &q);
+	quaternion(const vec3 &rpy);  // roll, pitch, yaw -> quaternion
 	
-	double& operator[](int i) {
-		switch (i) {
-			case 0:
-				return x;
-			case 1:
-				return y;
-			case 2:
-				return z;
-			default:
-				assert(false);
-		}
-	}
-	
-	vec3 operator+(const vec3 &v) const {
-		return vec3(x + v.x, y + v.y, z + v.z);
-	}
-	
-	double x; double y; double z;
+	vec3 rotate(const vec3 &v) const;
+	vec3 to_rpy() const;
+	quaternion operator*(const quaternion &q) const;
+	quaternion operator*=(const quaternion &q);
 };
 
 std::ostream& operator<<(std::ostream &os, const vec3 &v);

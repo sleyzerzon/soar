@@ -3,9 +3,114 @@
 
 using namespace std;
 
+vec3::vec3() : x(0.0), y(0.0), z(0.0) { }
+
+vec3::vec3(double x, double y, double z) : x(x), y(y), z(z) { }
+
+vec3::vec3(const vec3 &v) : x(v.x), y(v.y), z(v.z) { }
+
+double vec3::operator[](int i) const {
+	switch (i) {
+		case 0: return x;
+		case 1: return y;
+		case 2: return z;
+		default: assert(false);
+	}	
+}
+
+double &vec3::operator[](int i) {
+	switch (i) {
+		case 0: return x;
+		case 1: return y;
+		case 2: return z;
+		default: assert(false);
+	}	
+}
+
+vec3 vec3::operator+(const vec3 &v) const {
+	return vec3(x+v.x, y+v.y, z+v.z);
+}
+
 ostream& operator<<(ostream &os, const vec3 &v) {
 	os << v.x << " " << v.y << " " << v.z;
 	return os;
+}
+
+quaternion::quaternion() : a(0.0), b(0.0), c(0.0), d(0.0) {}
+quaternion::quaternion(double a, double b, double c, double d) : a(a), b(b), c(c), d(d) {}
+quaternion::quaternion(const quaternion &q) : a(q.a), b(q.b), c(q.c), d(q.d) {}
+
+/* from april.jmat.LinAlg.rollPitchYawToQuat */
+quaternion::quaternion(const vec3 &rpy) {
+	double halfroll = rpy.x / 2;
+	double halfpitch = rpy.y / 2;
+	double halfyaw = rpy.z / 2;
+
+	double sin_r2 = sin( halfroll );
+	double sin_p2 = sin( halfpitch );
+	double sin_y2 = sin( halfyaw );
+
+	double cos_r2 = cos( halfroll );
+	double cos_p2 = cos( halfpitch );
+	double cos_y2 = cos( halfyaw );
+
+	a = cos_r2 * cos_p2 * cos_y2 + sin_r2 * sin_p2 * sin_y2;
+	b = sin_r2 * cos_p2 * cos_y2 - cos_r2 * sin_p2 * sin_y2;
+	c = cos_r2 * sin_p2 * cos_y2 + sin_r2 * cos_p2 * sin_y2;
+	d = cos_r2 * cos_p2 * sin_y2 - sin_r2 * sin_p2 * cos_y2;
+}
+
+/* from april.jmat.LinAlg.quatRotate */
+vec3 quaternion::rotate(const vec3 &v) const {
+	double t2, t3, t4, t5, t6, t7, t8, t9, t10;
+	vec3 r;
+
+	t2 = a*b;
+	t3 = a*c;
+	t4 = a*d;
+	t5 = -b*b;
+	t6 = b*c;
+	t7 = b*d;
+	t8 = -c*b;
+	t9 = c*d;
+	t10 = -d*d;
+
+	r.x = 2*((t8+t10)*v.x + (t6-t4)*v.y  + (t3+t7)*v.z) + v.x;
+	r.y = 2*((t4+t6)*v.x  + (t5+t10)*v.y + (t9-t2)*v.z) + v.y;
+	r.z = 2*((t7-t3)*v.x  + (t2+t9)*v.y  + (t5+t8)*v.z) + v.z;
+	
+	return r;
+}
+
+/* from april.jmat.LinAlg.quatToRollPitchYaw */
+vec3 quaternion::to_rpy() const {
+	double roll_a = 2 * (a*b + c*d);
+	double roll_b = 1 - 2 * (b*b + c*c);
+	double pitch_sin = 2 * ( a*c - d*b );
+	double yaw_a = 2 * (a*d + b*c);
+	double yaw_b = 1 - 2 * (c*c + d*d);
+
+	return vec3(atan2(roll_a, roll_b), asin(pitch_sin), atan2(yaw_a, yaw_b));
+}
+
+/* from april.jmat.LinAlg.quatMultiply */
+quaternion quaternion::operator*(const quaternion &q) const {
+	quaternion r;
+	r.a = a*q.a - b*q.b - c*q.c - d*q.d;
+	r.b = a*q.b + b*q.a + c*q.d - d*q.c;
+	r.c = a*q.c - b*q.d + c*q.a + d*q.b;
+	r.d = a*q.d + b*q.c - c*q.b + d*q.a;
+	return r;
+}
+
+/* from april.jmat.LinAlg.quatMultiply */
+quaternion quaternion::operator*=(const quaternion &q) {
+	double ta, tb, tc, td;
+	ta = a*q.a - b*q.b - c*q.c - d*q.d;
+	tb = a*q.b + b*q.a + c*q.d - d*q.c;
+	tc = a*q.c - b*q.d + c*q.a + d*q.b;
+	td = a*q.d + b*q.c - c*q.b + d*q.a;
+	a = ta; b = tb; c = tc; d = td;
 }
 
 transform3::transform3()
