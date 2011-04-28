@@ -3,6 +3,10 @@
 
 = 2011 =
 
+Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011_derbinsky_laird.pdf A Functional Analysis of Historical Memory Retrieval Bias in the Word Sense Disambiguation Task.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
+
+Derbinsky, N., Essl, G.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2011.pdf Cognitive Architecture in Mobile Music Interactions.]_ Proceedings of the International Conference on New Interfaces for Musical Expression (NIME-2011). Oslo, Norway.
+
 Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2011_smem.pdf A Preliminary Functional Analysis of Memory in the Word Sense Disambiguation Task.]_ The 2nd Symposium on Human Memory for Artificial Agents, AISB (2011)
 
 Gorski, N. A., Laird, J. E. (2011) [http://www.sciencedirect.com/science?_ob=MImg&_imagekey=B6W6C-50R6KGK-1-1&_cdi=6595&_user=99318&_pii=S1389041710000537&_origin=browse&_zone=rslt_list_item&_coverDate=06%2F30%2F2011&_sk=999879997&wchp=dGLzVlb-zSkzS&md5=4e9b6c793735b716156e24816ce49574&ie=/sdarticle.pdf Learning to use episodic memory] _Cognitive Systems Research_, 12, 144-153. doi:10.1016/j.cogsys.2010.08.001
