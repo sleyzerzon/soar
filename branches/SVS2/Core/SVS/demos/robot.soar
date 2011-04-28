@@ -53,10 +53,10 @@ sp {seek-target
 	(<c> ^control <ctrl>)
 	(<ctrl> ^outputs <out>
 	        ^objective <obj>
-	        ^model.type lwr)
+	        ^model.type splinter)
 	(<out> ^left <left> ^right <right>)
-	(<left>  ^min -1.0 ^max 1.0 ^inc 0.1)
-	(<right> ^min -1.0 ^max 1.0 ^inc 0.1)
+	(<left>  ^min -0.5 ^max 0.5 ^inc 0.05)
+	(<right> ^min -0.5 ^max 0.5 ^inc 0.05)
 	(<obj> ^name euclidean
 	       ^a splinter
 	       ^b target)

@@ -7,6 +7,7 @@ using namespace std;
 model *_make_null_model_(soar_interface *si, Symbol* root);
 model *_make_velocity_model_(soar_interface *si, Symbol *root);
 model *_make_lwr_model_(soar_interface *si, Symbol *root);
+model *_make_splinter_model_(soar_interface *si, Symbol *root);
 
 model *parse_model_struct(soar_interface *si, Symbol *root) {
 	wme *type_wme;
@@ -25,6 +26,8 @@ model *parse_model_struct(soar_interface *si, Symbol *root) {
 		return _make_velocity_model_(si, root);
 	} else if (type == "lwr") {
 		return _make_lwr_model_(si, root);
+	} else if (type == "splinter") {
+		return _make_splinter_model_(si, root);
 	}
 	return NULL;
 }
