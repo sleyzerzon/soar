@@ -59,7 +59,7 @@ history (60/5999999, first @ d1):
  6 @ d999991 (-10)
 }}}
 
-This shows the last 60 references (of 5999999 in total, where the first occurred at decision cycle 1). For each reference, it says how many references occurred in the cycle (such as 6 at decision 1000000, which was one cycle ago at the time of executing this command).
+This shows the last 60 references (of 5999999 in total, where the first occurred at decision cycle 1). For each reference, it says how many references occurred in the cycle (such as 6 at decision 1000000, which was one cycle ago at the time of executing this command). Note that references during the current cycle will not be reflected in this command (or computed activation value) until the end of output phase.
 
 === Parameters ===
 
