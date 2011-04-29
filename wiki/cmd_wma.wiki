@@ -74,9 +74,10 @@ Running `wma` without any switches displays a summary of the parameter settings.
 || `activation` || Enable working memory activation || `on`, `off` || `off` ||
 || `decay-rate` || WME decay factor || `[`0, 1`]` || 0.5 ||
 || `decay-thresh` || Forgetting threshold || `(`0, inf`)` || 2.0 ||
-|| `petrov-approx` || Enables the (Petrov 2006) long-tail approximation || `on`, `off` || `off` ||
 || `forgetting` || Enable removal of WMEs with low activation values || `on`, `off` || `off` ||
 || `forget-wme` || If `lti` only remove WMEs with a long-term id || `all`, `lti` || `all` ||
+|| `petrov-approx` || Enables the (Petrov 2006) long-tail approximation || `on`, `off` || `off` ||
+|| `timers` || Timer granularity || `off`, `one` || `off` ||
 
 The `decay-rate` and `decay-thresh` parameters are entered as positive decimals, but are internally converted to, and printed out as, negative.
 
@@ -89,6 +90,34 @@ e^((thresh - ln(max_refs)) / decay_rate)
 With the current default parameter values, this will incur 42.65KB of memory. Holding the `decay-rate` constant, reasonable changes to `decay-thresh` (i.e. +/- 5) does not greatly change this value. However, small changes to `decay-rate` will dramatically change this profile. For instance, keeping everything else constant, a `decay-thresh` of 0.3 requires 12.9MB and 0.2 requires 16.4GB.
 
 If `forget-wme` is `lti` and `forgetting` is `on`, only those WMEs whose id is a long-term identifier *at the decision of forgetting* will be removed from working memory. If, for instance, the id is stored to semantic memory after the decision of forgetting, the WME will not be removed till some time after the next WME reference (such as testing/creation by a rule).
+
+=== Statistics ===
+
+Working memory activation tracks statistics over the lifetime of the agent.
+These can be accessed using `wma --stats <statistic>`.  Running
+`wma --stats` without a statistic will list the values of all
+statistics.  Unlike timers, statistics will always be updated.
+Available statistics are:
+
+|| *Name* || *Label* || *Description* ||
+|| `forgotten-wmes` || Forgotten WMEs || Number of WMEs removed from working memory due to forgetting ||
+
+=== Timers ===
+
+Working memory activation also has a set of internal timers that record the
+durations of certain operations.  Because fine-grained timing can
+incur runtime costs, working memory activation timers are off by default.
+Timers of different levels of detail can be turned on by issuing
+`wma --set timers <level>`, 
+where the levels can be `off` or `one`, `one` being
+most detailed and resulting in all timers being turned on.  Note that
+none of the working memory activation statistics nor timing information is
+reported by the `stats` command.
+
+Level one
+
+|| `wma_forgetting` || Time to process forgetting operations each cycle ||
+|| `wma_history` || Time to consolidate reference histories each cycle ||
 
 == See Also ==
 
