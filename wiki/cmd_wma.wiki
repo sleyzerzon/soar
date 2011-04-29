@@ -64,7 +64,7 @@ This shows the last 60 references (of 5999999 in total, where the first occurred
 === Parameters ===
 
 The `wma` command uses the `--get|--set <parameter> <value>` convention rather than individual switches for each parameter.
-Running `smem` without any switches displays a summary of the parameter settings.
+Running `wma` without any switches displays a summary of the parameter settings.
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
 || `activation` || Enable working memory activation || `on`, `off` || `off` ||
