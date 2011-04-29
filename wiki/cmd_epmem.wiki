@@ -21,6 +21,7 @@ epmem -v|--viz <episode id>
 || `-g, --get` || Print current parameter setting ||
 || `-s, --set` || Set parameter value ||
 || `-S, --stats` || Print statistic summary or specific statistic ||
+|| `-t, --timers` || Print timer summary or specific statistic ||
 || `-c, --close` || Close epmem database and commit to disk (if applicable) ||
 || `-v, --viz` || Print episode in graphviz format ||
 
