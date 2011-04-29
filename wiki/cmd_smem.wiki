@@ -22,6 +22,7 @@ smem -i|--init
 || `-g, --get` || Print current parameter setting ||
 || `-s, --set` || Set parameter value ||
 || `-S, --stats` || Print statistic summary or specific statistic ||
+|| `-t, --timers` || Print timer summary or specific statistic ||
 || `-a, --add` || Add concepts to semantic memory ||
 || `-v, --viz` || Print semantic store in graphviz format ||
 || `-i, --init` || Reinitialize ALL memories ||
