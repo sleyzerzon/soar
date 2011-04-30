@@ -12,7 +12,7 @@ public class RobotClient implements LCMSubscriber {
 	map_metadata_t map;
 	boolean mapreceived, mapwritten, posechanged;
 	
-	SimListener() {
+	RobotClient() {
 		pose = null;
 		dc = new differential_drive_command_t();
 		dc.left_enabled = true;
@@ -50,31 +50,33 @@ public class RobotClient implements LCMSubscriber {
 		}
 		posechanged  = false;
 		
-        Formatter fmt = new Formatter();
-        pose_t p;
-        
-        if (pose == null) {
-        	return;
-        }
-        synchronized (this) {
-        	p = pose.copy();
-        }
-        
-        double rot[] = LinAlg.quatToRollPitchYaw(p.orientation);
-        fmt.format("c splinter p %g %g %g r %g %g %g\n", p.pos[0], p.pos[1], p.pos[2], rot[0], rot[1], rot[2]);
-        for (int i = 0; i < p.vel.length; ++i) {
-            fmt.format("p vel_%d %g\n", i, p.vel[i]);
-        }
-        /*
-        for (int i = 0; i < p.accel.length; ++i) {
-            fmt.format("p accel_%d %g\n", i, p.accel[i]);
-        }
-        */
-        for (int i = 0; i < p.rotation_rate.length; ++i) {
-            fmt.format("p rotation_rate_%d %g\n", i, p.rotation_rate[i]);
-        }
-        System.out.print(fmt.toString());
-    }
+		Formatter fmt = new Formatter();
+		pose_t p;
+		
+		if (pose == null) {
+			return;
+		}
+		synchronized (this) {
+			p = pose.copy();
+		}
+		
+		double rot[] = LinAlg.quatToRollPitchYaw(p.orientation);
+		fmt.format("c splinter p %g %g %g r %g %g %g\n", p.pos[0], p.pos[1], p.pos[2], rot[0], rot[1], rot[2]);
+		for (int i = 0; i < p.vel.length; ++i) {
+			fmt.format("p vel_%d %g\n", i, p.vel[i]);
+		}
+		/*
+		for (int i = 0; i < p.accel.length; ++i) {
+			fmt.format("p accel_%d %g\n", i, p.accel[i]);
+		}
+		*/
+		for (int i = 0; i < p.rotation_rate.length; ++i) {
+			fmt.format("p rotation_rate_%d %g\n", i, p.rotation_rate[i]);
+		}
+		fmt.format("p left_rads_per_sec %g\n", p.rads_per_sec[0]);
+		fmt.format("p right_rads_per_sec %g\n", p.rads_per_sec[1]);
+		System.out.print(fmt.toString());
+	}
 	
 	public void writeMap() {
 		if (!mapreceived || mapwritten) {
@@ -100,47 +102,47 @@ public class RobotClient implements LCMSubscriber {
 		System.out.print(fmt.toString());
 	}
 	
-    public boolean readInput() {
-        String line = "";
-        String fields[];
-        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-        
-        while (true) {
-        	try {
-        		line = stdin.readLine();
-        	} catch (IOException e) {
-        		perror(e);
-        	}
-        	
-            if (line == null) {
-                return false;
-            } else if (line.equals("***")) {
-                break;
-            }
-            fields = line.split(" +");
-            if (fields.length != 2) {
-                continue;
-            }
-            if (fields[0].equals("left")) {
-                try {
-                    dc.left = Double.parseDouble(fields[1]);
-                } catch (NumberFormatException err) {
-                    continue;
-                }
-            } else if (fields[0].equals("right")) {
-                try {
-                    dc.right = Double.parseDouble(fields[1]);
-                } catch (NumberFormatException err) {
-                    continue;
-                }
-            } else {
-                continue;
-            }
-        }
-        dc.utime = TimeUtil.utime();
-        lcm.publish("DIFFERENTIAL_DRIVE_COMMAND_seek", dc);
-        return true;
-    }
+	public boolean readInput() {
+		String line = "";
+		String fields[];
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		
+		while (true) {
+			try {
+				line = stdin.readLine();
+			} catch (IOException e) {
+				perror(e);
+			}
+			
+			if (line == null) {
+				return false;
+			} else if (line.equals("***")) {
+				break;
+			}
+			fields = line.split(" +");
+			if (fields.length != 2) {
+				continue;
+			}
+			if (fields[0].equals("left")) {
+				try {
+					dc.left = Double.parseDouble(fields[1]);
+				} catch (NumberFormatException err) {
+					continue;
+				}
+			} else if (fields[0].equals("right")) {
+				try {
+					dc.right = Double.parseDouble(fields[1]);
+				} catch (NumberFormatException err) {
+					continue;
+				}
+			} else {
+				continue;
+			}
+		}
+		dc.utime = TimeUtil.utime();
+		lcm.publish("DIFFERENTIAL_DRIVE_COMMAND_seek", dc);
+		return true;
+	}
 
 	public static void perror(Exception err) {
 		System.err.println(err);
@@ -148,14 +150,23 @@ public class RobotClient implements LCMSubscriber {
 	}
 	
 	public static void main(String args[]) {
-		SimListener test = new SimListener();
-
-		test.writeInitialPose();
+		RobotClient r = new RobotClient();
+		double dt = 0.02;
+		long lasttime = -1, currtime;
+		
+		r.writeInitialPose();
 		while (true) {
-			test.writeMap();
-			test.writePose();
+			currtime = TimeUtil.mstime() / 1000;
+			if (lasttime > 0) {
+				dt = currtime - lasttime;
+			}
+			lasttime = currtime;
+			
+			r.writeMap();
+			r.writePose();
+			System.out.println("p dt " + dt);
 			System.out.println("***");
-			test.readInput();
+			r.readInput();
 		}
 	}
 }

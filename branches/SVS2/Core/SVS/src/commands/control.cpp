@@ -62,7 +62,7 @@ public:
 vec3 calc_centroid(const ptlist &pts) {
 	ptlist::const_iterator i;
 	int d;
-	double c[3];
+	vec3 c;
 	
 	for (i = pts.begin(); i != pts.end(); ++i) {
 		for (d = 0; d < 3; ++d) {
@@ -72,7 +72,7 @@ vec3 calc_centroid(const ptlist &pts) {
 	for (d = 0; d < 3; ++d) {
 		c[d] /= pts.size();
 	}
-	return vec3(c[0], c[1], c[2]);
+	return c;
 }
 
 /* Squared Euclidean distance between centroids of two objects */
@@ -97,7 +97,7 @@ public:
 		c1 = calc_centroid(p1);
 		c2 = calc_centroid(p2);
 
-		return pow(c1[0]-c2[0], 2) + pow(c1[1]-c2[1], 2) + pow(c1[2]-c2[2], 2);
+		return c1.dist(c2);
 	}
 	
 private:
@@ -150,25 +150,28 @@ public:
 
 	/* Don't forget to make this a PID controller later */
 	env_output *seek(scene *scn) {
-		env_output curr(outdesc);
+		env_output out(outdesc);
 		env_output *bestout = NULL;
-		double eval, best;
+		double eval, best = numeric_limits<double>::infinity();
 		flat_scene flat(scn);
 		vector<double> origvals = flat.vals;
 		scene next(*scn);
 		
-		while (curr.increment()) {
+		while (true) {
 			/* this part is kind of a hack to avoid expensive copying */
 			flat.vals = origvals;
-			mdl->predict(flat, curr);
+			mdl->predict(flat, out);
 			flat.update_scene(&next);
 			eval = obj->eval(&next);
 			if (!bestout || eval < best) {
 				if (bestout) {
 					delete bestout;
 				}
-				bestout = new env_output(curr);
+				bestout = new env_output(out);
 				best = eval;
+			}
+			if (!out.increment()) {
+				break;
 			}
 		}
 		step++;
@@ -187,9 +190,14 @@ public:
 	control_command(svs_state *state, Symbol *root)
 	: state(state), root(root), utils(state, root), 
 	  si(state->get_svs()->get_soar_interface()), step(0), 
-	  stepwme(NULL), broken(false)
+	  stepwme(NULL), broken(false), 
+	  mdl(NULL), ctrl(NULL), obj(NULL)
 	{
 		update_step();
+	}
+	
+	~control_command() {
+		cleanup();
 	}
 	
 	bool update_result() {
@@ -227,10 +235,9 @@ private:
 	*/
 	bool parse_cmd() {
 		env_output_desc desc;
-		objective *obj;
 		wme *outputs_wme, *objective_wme, *model_wme;
-		model *mdl;
 		
+		cleanup();
 		if (!si->find_child_wme(root, "outputs", outputs_wme) ||
 		    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
 		    !parse_output_desc_struct(si, si->get_wme_val(outputs_wme), desc))
@@ -251,10 +258,21 @@ private:
 			utils.set_result("missing or invalid model");
 			return false;
 		}
+		state->get_svs()->register_model(mdl);
 		ctrl = new controller(mdl, obj, desc);
 		return true;
 	}
 
+	void cleanup() {
+		if (mdl) {
+			state->get_svs()->unregister_model(mdl);
+			delete mdl;
+			mdl = NULL;
+		}
+		delete obj; obj = NULL;
+		delete ctrl; ctrl = NULL;
+	}
+	
 	void update_step() {
 		if (stepwme)
 			si->remove_wme(stepwme);
@@ -266,6 +284,8 @@ private:
 	svs_state      *state;
 	Symbol         *root;
 	controller     *ctrl;
+	model          *mdl;
+	objective      *obj;
 	wme            *stepwme;
 	int             step;
 	bool            broken;

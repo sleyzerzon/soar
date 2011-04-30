@@ -31,6 +31,11 @@ vec3 vec3::operator+(const vec3 &v) const {
 	return vec3(x+v.x, y+v.y, z+v.z);
 }
 
+double vec3::dist(const vec3 &v) const {
+	double dx = x-v.x, dy = y-v.y, dz = z-v.z;
+	return dx * dx + dy * dy + dz * dz;
+}
+
 ostream& operator<<(ostream &os, const vec3 &v) {
 	os << v.x << " " << v.y << " " << v.z;
 	return os;

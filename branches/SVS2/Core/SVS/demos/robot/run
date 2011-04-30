@@ -1,1 +1,12 @@
-socat unix-connect:/tmp/svs/env system:"java SimListener"
+soar=../../../../out/bin/s
+
+socat unix-connect:env,retry=100 system:"java RobotClient" &
+cpid=$!
+if [ "$1" == "-g" ]
+then
+	gdb --args $soar robot.soar
+else
+	$soar robot.soar
+fi
+
+kill $cpid

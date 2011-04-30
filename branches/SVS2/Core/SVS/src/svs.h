@@ -115,17 +115,21 @@ public:
 
 	std::string get_env_input(const std::string &sgel);
 	void set_next_output(const env_output &out);
-
+	void register_model(model *m);
+	void unregister_model(model *m);
+	
 private:
 	void make_common_syms();
 	void del_common_syms();
+	void update_models();
 	
 	soar_interface*          si;
 	common_syms              cs;
 	std::vector<svs_state*>  state_stack;
 	ipcsocket                envsock;
-	learning_model          *lwr;
 	env_output              *output;
+	std::list<model*>        models;
+	flat_scene               lastscene;
 };
 
 #endif

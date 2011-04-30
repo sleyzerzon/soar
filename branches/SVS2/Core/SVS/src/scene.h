@@ -67,10 +67,14 @@ public:
 	bool set_node_trans(const std::string &name, char type, const vec3 &t);
 	bool get_property(const std::string &prop, double &val) const;
 	bool set_property(const std::string &prop, double val);
+	int dof() const;
 	
 	void get_signature(scene_sig &sig) const;
 	void update_scene(scene *scn) const;
-
+	
+	bool compare_sigs(const flat_scene &s) const;
+	double distance(const flat_scene &s) const;
+	
 	std::vector<double> vals;
 	
 private:

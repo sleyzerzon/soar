@@ -8,11 +8,12 @@
 class model {
 public:
 	virtual bool predict(flat_scene &scn, const env_output &out) = 0;
-};
-
-class learning_model : model {
-public:
-	virtual void add(const env_output &out, const flat_scene &scn) = 0;
+	
+	/* Add a training example to a learning model. The training
+	   example is encoded as a pair of vectors (x, y) where
+	   x = [prev_state, output], y = [next_state]
+	*/
+	virtual void learn(const flat_scene &pre, const env_output &out, const flat_scene &post) {}
 };
 
 model *parse_model_struct(soar_interface *si, Symbol *root);

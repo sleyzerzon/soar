@@ -3,6 +3,7 @@
 #include <iterator>
 #include <iostream>
 #include <sstream>
+#include <limits>
 #include "scene.h"
 #include "nsg_node.h"
 #include "linalg.h"
@@ -459,4 +460,25 @@ void flat_scene::get_signature(scene_sig &sig) const {
 	for(j = prop_info.begin(); j != prop_info.end(); ++j) {
 		sig.insert(make_pair(j->first, property));
 	}
+}
+
+int flat_scene::dof() const {
+	return vals.size();
+}
+
+bool flat_scene::compare_sigs(const flat_scene &s) const {
+	return node_info == s.node_info && prop_info == s.prop_info;
+}
+
+double flat_scene::distance(const flat_scene &s) const {
+	vector<double>::const_iterator i, j;
+	double d = 0.0;
+	
+	if (vals.size() != s.vals.size()) {
+		return numeric_limits<double>::infinity();
+	}
+	for (i = vals.begin(), j = s.vals.begin(); i != vals.end(); ++i, ++j) {
+		d += pow(*i - *j, 2);
+	}
+	return d;
 }

@@ -17,6 +17,7 @@ public:
 	double  operator[](int i) const;
 	double &operator[](int i);
 	vec3 operator+(const vec3 &v) const;
+	double dist(const vec3 &v) const;
 };
 
 class quaternion {

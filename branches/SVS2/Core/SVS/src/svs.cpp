@@ -17,7 +17,22 @@
 using namespace std;
 
 typedef map<wme*,command*>::iterator cmd_iter;
-learning_model *make_lwr_model();
+
+class timer {
+public:
+	timer() {
+		gettimeofday(&t1, NULL);
+	}
+	
+	double stop() {
+		timeval t2, t3;
+		gettimeofday(&t2, NULL);
+		timersub(&t2, &t1, &t3);
+		return t3.tv_sec + t3.tv_usec / 1000000.0;
+	}
+	
+	timeval t1;
+};
 
 void print_tree(sg_node *n) {
 	if (n->is_group()) {
@@ -203,7 +218,6 @@ svs::svs(agent *a)
 : envsock(getnamespace() + "env", true), output(NULL)
 {
 	si = new soar_interface(a);
-	lwr = make_lwr_model();
 	make_common_syms();
 }
 
@@ -238,8 +252,9 @@ void svs::state_deletion_callback(Symbol *state) {
 void svs::pre_env_callback() {
 	vector<svs_state*>::iterator i;
 	string sgel;
-	bool updatemodel = true;
-	
+	bool validout, validin;
+	//timer t;
+	//t.start();
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).process_cmds();
 	}
@@ -249,27 +264,50 @@ void svs::pre_env_callback() {
 	
 	/* environment IO */
 	if (!output) {
-		updatemodel = false;
+		validout = false;
 		envsock.send("");
 	} else {
-		updatemodel = envsock.send(output->serialize());
+		validout = envsock.send(output->serialize());
 	}
 	if (!envsock.receive(sgel)) {
-		updatemodel = false;
+		validin = false;
 	} else {
+		validin = true;
 		state_stack.front()->get_scene()->parse_sgel(sgel);
 	}
-	if (updatemodel) {
-		lwr->add(*output, flat_scene(state_stack.front()->get_scene()));
+	if (validout && validin) {
+		update_models();
 	}
+
+	//cout << "SVSPRE " << t.stop() << endl;
+}
+
+void svs::update_models() {
+	std::list<model*>::iterator i;
+	flat_scene fs(state_stack.front()->get_scene());
+	
+	if (lastscene.dof() > 0 || lastscene.compare_sigs(fs)) {
+		for (i = models.begin(); i != models.end(); ++i) {
+			flat_scene predicted(lastscene);
+			if ((**i).predict(predicted, *output)) {
+				cout << "Prediction Error: " << predicted.distance(fs) << endl;
+			} else {
+				cout << "No prediction" << endl;
+			}
+			(**i).learn(lastscene, *output, fs);
+		}
+	}
+	lastscene = fs;
 }
 
 void svs::post_env_callback() {
 	string resp;
 	vector<svs_state*>::iterator i;
+	//timer t;
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results(false);
 	}
+	//cout << "SVSPOST " << t.stop() << endl;
 }
 
 void svs::make_common_syms() {
@@ -299,3 +337,12 @@ void svs::set_next_output(const env_output &out) {
 	}
 	output = new env_output(out);
 }
+
+void svs::register_model(model *m) {
+	models.push_back(m);
+}
+
+void svs::unregister_model(model *m) {
+	models.remove(m);
+}
+
