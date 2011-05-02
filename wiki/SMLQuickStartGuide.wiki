@@ -71,6 +71,7 @@ ready to dive in.
 #include "sml_Client.h"
 
 using namespace sml ;
+using namespace std ;
 
 void main() {
 
@@ -160,7 +161,7 @@ char const* pResult = pKernel->ExecuteCommandLine(cmd.c_str(),pAgent->GetAgentNa
 
 // Shutdown and clean up
 pKernel->Shutdown() ;	// Deletes all agents (unless using a remote connection)
-delete pKernel() ;		// Deletes the kernel itself
+delete pKernel ;		// Deletes the kernel itself
 
 } // end main
 }}}
