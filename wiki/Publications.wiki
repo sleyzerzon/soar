@@ -15,6 +15,8 @@ Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar
 
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~yongjiaw/WangThesis.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
+Xu, J. Z., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2011.pdf Combining Learned Discrete and Continuous Action Models.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
+
 = 2010 =
 
 Derbinsky, N., Gorski, N.A.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_exploring.pdf Exploring the Space of Computational Memory Models.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
