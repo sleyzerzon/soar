@@ -127,7 +127,7 @@ private:
 	common_syms              cs;
 	std::vector<svs_state*>  state_stack;
 	ipcsocket                envsock;
-	env_output              *output;
+	env_output               output;
 	std::list<model*>        models;
 	flat_scene               lastscene;
 };

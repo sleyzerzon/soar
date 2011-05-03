@@ -12,6 +12,7 @@
 using namespace std;
 using namespace sml;
 
+const int stopsig = SIGINT;
 Kernel* kernel = NULL;
 Agent* agent = NULL;
 
@@ -129,11 +130,11 @@ void repl() {
 	}
 }
 
-void sigstophandler(int sig) {
+void sighandler(int sig) {
 	if (agent) {
 		agent->StopSelf();
 	}
-	signal(SIGTSTP, sigstophandler);
+	signal(stopsig, sighandler);
 }
 
 string exit_handler(smlRhsEventId id, void *userdata, Agent *agent, char const *fname, char const *args) {
@@ -190,8 +191,8 @@ int main(int argc, char *argv[]) {
 	agent->RegisterForPrintEvent(smlEVENT_PRINT, printcb, NULL);
 	agent->SetOutputLinkChangeTracking(false);
 	
-	if (signal(SIGTSTP, SIG_IGN) != SIG_IGN) {
-		signal(SIGTSTP, sigstophandler);
+	if (signal(stopsig, SIG_IGN) != SIG_IGN) {
+		signal(stopsig, sighandler);
 	}
 	
 	for (int i = 1; i < argc; ++i) {

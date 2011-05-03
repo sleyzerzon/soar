@@ -10,3 +10,9 @@ else
 fi
 
 kill $cpid
+javapid=`ps | awk '$4 == "java" {print $1}'`
+
+if [ -n "$javapid" ]
+then
+	kill "$javapid"
+fi

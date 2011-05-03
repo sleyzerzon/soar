@@ -4,6 +4,8 @@
 
 using namespace std;
 
+env_output::env_output() {}
+
 env_output::env_output(const env_output_desc &d)
 : desc(d)
 {
@@ -62,4 +64,13 @@ string env_output::serialize() const {
 		ss << i->first << " " << i->second << endl;
 	}
 	return ss.str();
+}
+
+void env_output::operator=(const env_output &o) {
+	desc = o.desc;
+	value = o.value;
+}
+
+int env_output::size() const {
+	return value.size();
 }

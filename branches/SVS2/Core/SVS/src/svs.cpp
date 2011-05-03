@@ -215,7 +215,7 @@ void svs_state::clear_scene() {
 }
 
 svs::svs(agent *a)
-: envsock(getnamespace() + "env", true), output(NULL)
+: envsock(getnamespace() + "env", true)
 {
 	si = new soar_interface(a);
 	make_common_syms();
@@ -263,11 +263,11 @@ void svs::pre_env_callback() {
 	}
 	
 	/* environment IO */
-	if (!output) {
+	if (output.size() == 0) {
 		validout = false;
 		envsock.send("");
 	} else {
-		validout = envsock.send(output->serialize());
+		validout = envsock.send(output.serialize());
 	}
 	if (!envsock.receive(sgel)) {
 		validin = false;
@@ -288,13 +288,13 @@ void svs::update_models() {
 	
 	if (lastscene.dof() > 0 || lastscene.compare_sigs(fs)) {
 		for (i = models.begin(); i != models.end(); ++i) {
-			flat_scene predicted(lastscene);
-			if ((**i).predict(predicted, *output)) {
-				cout << "Prediction Error: " << predicted.distance(fs) << endl;
-			} else {
-				cout << "No prediction" << endl;
-			}
-			(**i).learn(lastscene, *output, fs);
+//			flat_scene predicted(lastscene);
+//			if ((**i).predict(predicted, *output)) {
+//				cout << "Prediction Error: " << predicted.distance(fs) << endl;
+//			} else {
+//				cout << "No prediction" << endl;
+//			}
+			(**i).learn(lastscene, output, fs);
 		}
 	}
 	lastscene = fs;
@@ -332,10 +332,7 @@ string svs::get_env_input(const string &sgel) {
 }
 
 void svs::set_next_output(const env_output &out) {
-	if (output) {
-		delete output;
-	}
-	output = new env_output(out);
+	output = out;
 }
 
 void svs::register_model(model *m) {

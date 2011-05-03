@@ -82,10 +82,13 @@ bool ipcsocket::send(const string &s) {
 	
 	while (t.size() > 0) {
 		if ((n = ::send(fd, t.c_str(), t.size(), 0)) <= 0) {
-			disconnect();
-			return false;
+			if (errno != EINTR) {
+				disconnect();
+				return false;
+			}
+		} else {
+			t.erase(0, n);
 		}
-		t.erase(0, n);
 	}
 	return true;
 }
@@ -110,10 +113,13 @@ bool ipcsocket::receive(string &msg) {
 		}
 		
 		if ((n = recv(fd, buf, BUFFERSIZE, 0)) <= 0) {
-			disconnect();
-			return false;
+			if (errno != EINTR) {
+				disconnect();
+				return false;
+			}
+		} else {
+			buf[n] = '\0';
+			recvbuf += buf;
 		}
-		buf[n] = '\0';
-		recvbuf += buf;
 	}
 }

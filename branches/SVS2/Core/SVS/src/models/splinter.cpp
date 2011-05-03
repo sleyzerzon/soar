@@ -1,4 +1,7 @@
+#include <iostream>
 #include "model.h"
+
+using namespace std;
 
 const double wheel_diameter     = 0.25;
 const double baseline           = 0.35;
@@ -7,9 +10,9 @@ const double emf_constant       = 2.0; // volts per rad_per_sec
 const double winding_resistance = 5.5; // ohms
 const double inertia            = 0.5; // kg*m^2
 const double drag_constant      = 1.0; // drag (Nm per rad_per_sec) ( >= 0)
+const double dt                 = 0.016; // need a better way to figure this out
 
-
-double update_rps(double rps, double input_volts, double dt) {
+double calc_rps(double rps, double input_volts) {
 	double volts_emf = rps * emf_constant;
 	double amps = (input_volts - volts_emf) / winding_resistance;
 	double torque0 = amps * torque_constant;
@@ -19,16 +22,14 @@ double update_rps(double rps, double input_volts, double dt) {
 	return rps + (acceleration * dt);
 }
 
-void splinter_sim(double leftvoltage, double rightvoltage, double dt,
-                 double &leftrps, double &rightrps,
-                 vec3 &pos, vec3 &vel, vec3 &rot, vec3 &rotrate) 
+void splinter_sim(double leftvoltage, double rightvoltage,
+                  double &leftrps, double &rightrps,
+                  vec3 &pos, vec3 &vel, vec3 &rot, vec3 &rotrate) 
 {
-	leftrps = update_rps(leftrps, leftvoltage * 12, dt);
-	rightrps = update_rps(rightrps, rightvoltage * 12, dt);
-	
+	leftrps = calc_rps(leftrps, leftvoltage * 12);
+	rightrps = calc_rps(rightrps, rightvoltage * 12);
 	double dleft  = dt * leftrps  * wheel_diameter;
 	double dright = dt * rightrps * wheel_diameter;
-	
 	quaternion orient(rot);
 	vel = orient.rotate(vec3((dleft + dright) / 2, 0, 0));
 	rotrate.z = (dright - dleft) / baseline; rotrate.x = 0; rotrate.y = 0;
@@ -43,7 +44,7 @@ public:
     bool predict(flat_scene &scn, const env_output &out) {
 		vec3 pos, vel, rot, rotrate;
 		quaternion orient;
-		double lv, rv, lrps, rrps, dt;
+		double lv, rv, lrps, rrps;
 		
 		if (!scn.get_node_trans("splinter", 'p', pos) ||
 		    !scn.get_node_trans("splinter", 'r', rot) ||
@@ -54,8 +55,7 @@ public:
 		    !scn.get_property("rotation_rate_1", rotrate.y) ||
 		    !scn.get_property("rotation_rate_2", rotrate.z) ||
 		    !scn.get_property("left_rads_per_sec", lrps) ||
-		    !scn.get_property("right_rads_per_sec", rrps) ||
-		    !scn.get_property("dt", dt))
+		    !scn.get_property("right_rads_per_sec", rrps))
 		{
 			return false;
 		}
@@ -63,7 +63,7 @@ public:
 		lv = out.get("left");
 		rv = out.get("right");
 		
-		splinter_sim(lv, rv, dt, lrps, rrps, pos, vel, rot, rotrate);
+		splinter_sim(lv, rv, lrps, rrps, pos, vel, rot, rotrate);
 		
 		scn.set_node_trans("splinter", 'p', pos);
 		scn.set_node_trans("splinter", 'r', rot);

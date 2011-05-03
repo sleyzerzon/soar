@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <limits>
 #include "command.h"
@@ -149,25 +150,25 @@ public:
 	: mdl(mdl), obj(obj), outdesc(outdesc), step(0) {}
 
 	/* Don't forget to make this a PID controller later */
-	env_output *seek(scene *scn) {
+	bool seek(scene *scn, env_output &bestout) {
 		env_output out(outdesc);
-		env_output *bestout = NULL;
 		double eval, best = numeric_limits<double>::infinity();
 		flat_scene flat(scn);
 		vector<double> origvals = flat.vals;
 		scene next(*scn);
+		bool found = false;
 		
 		while (true) {
 			/* this part is kind of a hack to avoid expensive copying */
 			flat.vals = origvals;
-			mdl->predict(flat, out);
+			if (!mdl->predict(flat, out)) {
+				return false;
+			}
 			flat.update_scene(&next);
 			eval = obj->eval(&next);
-			if (!bestout || eval < best) {
-				if (bestout) {
-					delete bestout;
-				}
-				bestout = new env_output(out);
+			if (eval < best) {
+				found = true;
+				bestout = out;
 				best = eval;
 			}
 			if (!out.increment()) {
@@ -175,7 +176,7 @@ public:
 			}
 		}
 		step++;
-		return bestout;
+		return found;
 	}
 	
 private:
@@ -201,7 +202,7 @@ public:
 	}
 	
 	bool update_result() {
-		env_output *out;
+		env_output out;
 
 		if (utils.cmd_changed()) {
 			broken = !parse_cmd();
@@ -210,15 +211,14 @@ public:
 			return false;
 		}
 		
-		if ((out = ctrl->seek(state->get_scene())) == NULL) {
+		if (!ctrl->seek(state->get_scene(), out)) {
 			utils.set_result("no valid output found");
 			return false;
 		}
 		if (state->get_level() == 0) {
-			state->get_svs()->set_next_output(*out);
+			state->get_svs()->set_next_output(out);
 		}
 		// need to update scene with model otherwise
-		delete out;
 		
 		utils.set_result("success");
 		step++;
