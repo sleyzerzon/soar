@@ -15,7 +15,7 @@ Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar
 
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~yongjiaw/WangThesis.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
-Xu, J. Z., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2011.pdf Combining Learned Discrete and Continuous Action Models.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
+Xu, J. Z., Laird, J. E. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2011.pdf Combining Learned Discrete and Continuous Action Models.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
 
 = 2010 =
 
@@ -37,6 +37,8 @@ Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~yongjiaw/WangICCM10.
 Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute_aaai2010.pdf Using Imagery to Simplify Perceptual Abstraction in Reinforcement Learning Agents]_. Proceedings of the Twenty-Fourth AAAI Conference on Artificial Intelligence (AAAI-10), Atlanta, Georgia
 
 Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute_thesis.pdf Abstraction, Imagery, and Control in Cognitive Architecture]_. PhD Thesis, University of Michigan, Ann Arbor.
+
+Xu, J. Z., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2010.pdf Instance-Based Online Learning of Deterministic Relational Action Models]_. Proceedings of the 24th AAAI Conference on Artificial Intelligence. Atlanta, GA.
 
 = 2009 =
 
