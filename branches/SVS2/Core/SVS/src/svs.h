@@ -114,7 +114,7 @@ public:
 	soar_interface *get_soar_interface() { return si; }
 
 	std::string get_env_input(const std::string &sgel);
-	void set_next_output(const env_output &out);
+	void set_next_output(const output &out);
 	void register_model(model *m);
 	void unregister_model(model *m);
 	
@@ -127,7 +127,7 @@ private:
 	common_syms              cs;
 	std::vector<svs_state*>  state_stack;
 	ipcsocket                envsock;
-	env_output               output;
+	output                   next_out;
 	std::list<model*>        models;
 	flat_scene               lastscene;
 };

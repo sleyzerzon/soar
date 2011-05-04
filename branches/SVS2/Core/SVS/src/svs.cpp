@@ -263,11 +263,11 @@ void svs::pre_env_callback() {
 	}
 	
 	/* environment IO */
-	if (output.size() == 0) {
+	if (next_out.size() == 0) {
 		validout = false;
 		envsock.send("");
 	} else {
-		validout = envsock.send(output.serialize());
+		validout = envsock.send(next_out.serialize());
 	}
 	if (!envsock.receive(sgel)) {
 		validin = false;
@@ -289,12 +289,12 @@ void svs::update_models() {
 	if (lastscene.dof() > 0 || lastscene.compare_sigs(fs)) {
 		for (i = models.begin(); i != models.end(); ++i) {
 //			flat_scene predicted(lastscene);
-//			if ((**i).predict(predicted, *output)) {
+//			if ((**i).predict(predicted, *next_out)) {
 //				cout << "Prediction Error: " << predicted.distance(fs) << endl;
 //			} else {
 //				cout << "No prediction" << endl;
 //			}
-			(**i).learn(lastscene, output, fs);
+			(**i).learn(lastscene, next_out, fs);
 		}
 	}
 	lastscene = fs;
@@ -331,8 +331,8 @@ string svs::get_env_input(const string &sgel) {
 	return "";
 }
 
-void svs::set_next_output(const env_output &out) {
-	output = out;
+void svs::set_next_output(const output &out) {
+	next_out = out;
 }
 
 void svs::register_model(model *m) {

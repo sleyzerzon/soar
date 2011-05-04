@@ -12,7 +12,8 @@ using namespace arma;
 const int NNBRS = 30;   // number of nearest neighbors to use
 
 typedef set<string> output_sig;
-typedef pair<scene_sig, output_sig> model_sig;
+typedef pair<scene_sig, outdesc> modelsig;
+typedef map<modelsig, lwr*> modeltbl;
 
 void scene_to_vec(const flat_scene &scn, rowvec &v) {
 	vector<double>::const_iterator i;
@@ -23,16 +24,14 @@ void scene_to_vec(const flat_scene &scn, rowvec &v) {
 	}
 }
 
-void scene_out_to_vec(const flat_scene &scn, const env_output &out, rowvec &v) {
-	env_output_sig s;
-	env_output_sig::const_iterator i;
+void scene_out_to_vec(const flat_scene &scn, const output &out, rowvec &v) {
+	vector<double>::const_iterator i;
 	int j;
-	out.get_signature(s);
 	scene_to_vec(scn, v);
 	j = v.n_elem;
-	v.reshape(1, v.n_elem + s.size());
-	for (i = s.begin(); i != s.end(); ++i, ++j) {
-		v(j) = out.get(*i);
+	v.reshape(1, v.n_elem + out.size());
+	for (i = out.vals.begin(); i != out.vals.end(); ++i, ++j) {
+		v(j) = *i;
 	}
 }
 
@@ -48,17 +47,15 @@ class lwr_model : public model {
 public:
 	lwr_model() {}
 	
-	bool predict(flat_scene &scn, const env_output &out) {
+	bool predict(flat_scene &scn, const output &out) {
 		scene_sig ssig;
-		env_output_sig osig;
-		map<model_sig, lwr*>::iterator i;
+		modeltbl::iterator i;
 		rowvec x, y;
 		
 		scn.get_signature(ssig);
-		out.get_signature(osig);
-		model_sig msig = make_pair(ssig, osig);
+		modelsig msig = make_pair(ssig, *out.desc);
 		
-		if ((i = models.find(msig)) == models.end()) {
+		if ((i = mdls.find(msig)) == mdls.end()) {
 			return false;
 		}
 		
@@ -69,23 +66,21 @@ public:
 		vec_to_scene(y, scn);
 	}
 	
-	void learn(const flat_scene &pre, const env_output &out, const flat_scene &post) {
+	void learn(const flat_scene &pre, const output &out, const flat_scene &post) {
 		scene_sig ssig;
-		env_output_sig osig;
 		rowvec x, y;
-		map<model_sig, lwr*>::iterator i;
+		modeltbl::iterator i;
 		int k, xdim, ydim;
 		lwr* mdl;
 
 		post.get_signature(ssig);
-		out.get_signature(osig);
 		ydim = post.dof();
-		xdim = ydim + osig.size();
+		xdim = ydim + out.size();
 		
-		model_sig msig = make_pair(ssig, osig);
-		if ((i = models.find(msig)) == models.end()) {
+		modelsig msig = make_pair(ssig, *out.desc);
+		if ((i = mdls.find(msig)) == mdls.end()) {
 			mdl = new lwr(xdim, ydim, NNBRS);				
-			models[msig] = mdl;
+			mdls[msig] =mdl;
 		} else {
 			mdl = i->second;
 		}
@@ -96,7 +91,7 @@ public:
 	}
 	
 private:
-	map<model_sig, lwr*> models;
+	modeltbl mdls;
 };
 
 model *_make_lwr_model_(soar_interface *si, Symbol *root) {

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include <algorithm>
+#include <armadillo>
 #include "command.h"
 #include "svs.h"
 #include "env.h"
@@ -8,6 +10,14 @@
 #include "model.h"
 
 using namespace std;
+using namespace arma;
+
+const double rcoef = 1.0;
+const double ecoef = 2.0;
+const double ccoef = 0.5;
+const double scoef = 0.5;
+
+const int trajectory_len = 10;
 
 /* Parses a WME structure that describes the output the environment expects.
    Assumes this format:
@@ -26,13 +36,12 @@ using namespace std;
 		...
 	)
 */
-bool parse_output_desc_struct(soar_interface *si, Symbol *root, env_output_desc &desc) {
+bool parse_output_desc_struct(soar_interface *si, Symbol *root, outdesc &desc) {
 	wme_list dim_wmes;
 	wme_list::iterator i;
-	string dim_name;
 	Symbol *dim_id;
 	wme *min_wme, *max_wme, *inc_wme;
-	dim_desc d;
+	out_dim_desc d;
 	
 	if (!si->is_identifier(root)) {
 		return false;
@@ -40,7 +49,7 @@ bool parse_output_desc_struct(soar_interface *si, Symbol *root, env_output_desc 
 	si->get_child_wmes(root, dim_wmes);
 	for (i = dim_wmes.begin(); i != dim_wmes.end(); ++i) {
 		dim_id = si->get_wme_val(*i);
-		if (si->get_val(si->get_wme_attr(*i), dim_name)  &&
+		if (si->get_val(si->get_wme_attr(*i), d.name)    &&
 		    si->is_identifier(dim_id)                    &&
 		    si->find_child_wme(dim_id, "min", min_wme)   &&
 		    si->get_val(si->get_wme_val(min_wme), d.min) &&
@@ -49,21 +58,23 @@ bool parse_output_desc_struct(soar_interface *si, Symbol *root, env_output_desc 
 		    si->find_child_wme(dim_id, "inc", inc_wme)   &&
 		    si->get_val(si->get_wme_val(inc_wme), d.inc))
 		{
-			desc[dim_name] = d;
+			desc.push_back(d);
 		}
 	}
+	sort(desc.begin(), desc.end());
 	return true;
 }
+
 
 class objective {
 public:
 	virtual double eval(scene *scn) = 0;
 };
 
-vec3 calc_centroid(const ptlist &pts) {
+::vec3 calc_centroid(const ptlist &pts) {
 	ptlist::const_iterator i;
 	int d;
-	vec3 c;
+	::vec3 c;
 	
 	for (i = pts.begin(); i != pts.end(); ++i) {
 		for (d = 0; d < 3; ++d) {
@@ -85,7 +96,7 @@ public:
 	double eval(scene *scn) {
 		sg_node *n1, *n2;
 		ptlist p1, p2;
-		vec3 c1, c2;
+		::vec3 c1, c2;
 		
 		if ((n1 = scn->get_node(obj1)) == NULL ||
 		    (n2 = scn->get_node(obj2)) == NULL)
@@ -144,34 +155,169 @@ objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 	return NULL;
 }
 
-class controller {
+/* this class is a little dirty to avoid as much allocation and copying as possible */
+class traj_eval {
 public:
-	controller(model *mdl, objective *obj, const env_output_desc &outdesc)
-	: mdl(mdl), obj(obj), outdesc(outdesc), step(0) {}
+	traj_eval(outdesc *desc, int length, model *mdl, objective *obj, scene *init)
+	: cachedtrj(length, desc), mdl(mdl), obj(obj), next(*init), flat(init)
+	{
+		initvals = flat.vals;
+	}
 
-	/* Don't forget to make this a PID controller later */
-	bool seek(scene *scn, env_output &bestout) {
-		env_output out(outdesc);
-		double eval, best = numeric_limits<double>::infinity();
-		flat_scene flat(scn);
-		vector<double> origvals = flat.vals;
-		scene next(*scn);
-		bool found = false;
+	/* version to be used in incremental search */
+	bool eval(const trajectory &traj, double &value) {
+		vector<output>::const_iterator i;
 		
-		while (true) {
-			/* this part is kind of a hack to avoid expensive copying */
-			flat.vals = origvals;
-			if (!mdl->predict(flat, out)) {
+		flat.vals = initvals;
+		for (i = traj.t.begin(); i != traj.t.end(); ++i) {
+			if (!mdl->predict(flat, *i)) {
 				return false;
 			}
-			flat.update_scene(&next);
-			eval = obj->eval(&next);
-			if (eval < best) {
-				found = true;
-				bestout = out;
-				best = eval;
+		}
+		flat.update_scene(&next);
+		value = obj->eval(&next);
+		return true;
+	}
+	
+	/* version to be used in Nelder-Mead search */
+	bool eval(vec traj, double &value) {
+		cachedtrj.from_vec(traj);
+		return eval(cachedtrj, value);
+	}
+	
+private:
+	model         *mdl;
+	objective     *obj;
+	trajectory     cachedtrj; // keep around to avoid reallocation
+	scene          next;      // copy of initial scene to be modified after prediction
+	flat_scene     flat;      // keep around to avoid reallocation
+	vector<double> initvals;  // flattened values of initial scene for resetting flat
+};
+
+void constrain(vec &v, const vec &min, const vec &max) {
+	for (int i = 0; i < v.n_elem; ++i) {
+		if (v(i) < min(i)) {
+			v(i) = min(i);
+		} else if (v(i) > max(i)) {
+			v(i) = max(i);
+		}
+	}
+}
+
+void argmax(const vec &v, int &worst, int &nextworst, int &best) {
+	worst = 0; nextworst = 0; best = 0;
+	for (int i = 1; i < v.n_elem; ++i) {
+		if (v(i) > v(worst)) {
+			nextworst = worst;
+			worst = i;
+		} else if (v(i) > v(nextworst)) {
+			nextworst = i;
+		} else if (v(i) < v(best)) {
+			best = i;
+		}
+	}
+}
+
+bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
+	int ndim = t.dof(), i, wi, ni, bi;
+	outdesc::const_iterator j;
+	vec min = zeros(t.dof(), 1), max = zeros(t.dof(), 1);
+	for (i = 0; i < min.n_elem; ) {
+		for (j = t.desc->begin(); j != t.desc->end(); ++j) {
+			min(i) = j->min;
+			max(i) = j->max;
+			++i;
+		}
+	}
+	
+	vec range = max - min;
+	mat simplex = zeros<mat>(ndim, ndim+1);
+	vec eval = zeros<vec>(ndim+1, 1);
+	double reval, eeval, ceval;
+	vec centroid, dir, reflect, expand, contract, best, worst;
+	
+	/* random initialization */
+	for (i = 0; i < simplex.n_cols; ++i) {
+		simplex.col(i) = min + randu<vec>(ndim, 1) % range;
+		if (!ev.eval(simplex.col(i), eval(i))) return false;
+	}
+	
+	for(int iters = 0; iters < 100; ++iters) {
+		argmax(eval, wi, ni, bi);
+		worst = simplex.col(wi);
+		best = simplex.col(bi);
+		centroid = (sum(simplex, 1) - worst) / (simplex.n_cols - 1);
+		dir = centroid - worst;
+		reflect = centroid + rcoef * dir;
+		constrain(reflect, min, max);
+		
+		if (!ev.eval(reflect, reval)) return false;
+		if (eval(bi) <= reval && reval < eval(ni)) {
+			// reflection
+			simplex.col(wi) = reflect;
+			eval(wi) = reval;
+			continue;
+		}
+		
+		if (reval < eval(bi)) {
+			// expansion
+			expand = centroid + ecoef * dir;
+			constrain(expand, min, max);
+			if (!ev.eval(expand, eeval)) return false;
+			if (eeval < reval) {
+				simplex.col(wi) = expand;
+				eval(wi) = eeval;
+			} else {
+				simplex.col(wi) = reflect;
+				eval(wi) = reval;
 			}
-			if (!out.increment()) {
+			continue;
+		}
+		
+		assert(reval >= eval(ni));
+		
+		contract = worst + ccoef * dir;
+		if (!ev.eval(contract, ceval)) return false;
+		if (ceval < eval(wi)) {
+			// contraction
+			simplex.col(wi) = contract;
+			eval(wi) = ceval;
+			continue;
+		}
+		
+		// shrink
+		for (i = 0; i < simplex.n_cols; ++i) {
+			if (i == bi) {
+				continue;
+			}
+			simplex.col(i) = best + scoef * (simplex.col(i) - best);
+			if (!ev.eval(simplex.col(i), eval(i))) return false;
+		}
+	}
+	t.from_vec(best);
+	return true;
+}
+
+class controller {
+public:
+	controller(model *mdl, objective *obj, const outdesc &odesc)
+	: mdl(mdl), obj(obj), odesc(odesc), step(0) {}
+
+	/* Don't forget to make this a PID controller later */
+	bool seek(scene *scn, output &bestout) {
+		double val, best = numeric_limits<double>::infinity();
+		bool found = false;
+		traj_eval evaluator(&odesc, trajectory_len, mdl, obj, scn);
+		trajectory trj(trajectory_len, &odesc);
+		
+		while (true) {
+			if (!evaluator.eval(trj, val)) return false;
+			if (val < best) {
+				found = true;
+				bestout = trj.t.front();
+				best = val;
+			}
+			if (!trj.next()) {
 				break;
 			}
 		}
@@ -179,11 +325,22 @@ public:
 		return found;
 	}
 	
+	bool seek2(scene *scn, output &bestout) {
+		traj_eval evaluator(&odesc, trajectory_len, mdl, obj, scn);
+		trajectory trj(trajectory_len, &odesc);
+		if (!nelder_mead_constrained(trj, evaluator)) {
+			return false;
+		}
+		bestout = trj.t.front();
+		return true;
+	}
+	
+	
 private:
-	model *mdl;
+	model     *mdl;
 	objective *obj;
-	env_output_desc outdesc;
-	int step;
+	outdesc    odesc;
+	int        step;
 };
 
 class control_command : public command {
@@ -202,7 +359,7 @@ public:
 	}
 	
 	bool update_result() {
-		env_output out;
+		output out;
 
 		if (utils.cmd_changed()) {
 			broken = !parse_cmd();
@@ -211,7 +368,7 @@ public:
 			return false;
 		}
 		
-		if (!ctrl->seek(state->get_scene(), out)) {
+		if (!ctrl->seek2(state->get_scene(), out)) {
 			utils.set_result("no valid output found");
 			return false;
 		}
@@ -234,7 +391,7 @@ private:
 	      ^objective ( ... )
 	*/
 	bool parse_cmd() {
-		env_output_desc desc;
+		outdesc desc;
 		wme *outputs_wme, *objective_wme, *model_wme;
 		
 		cleanup();

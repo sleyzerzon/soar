@@ -1,37 +1,57 @@
-#ifndef ENV_H
-#define ENV_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
 #include <string>
-#include <map>
-#include <set>
+#include <vector>
+#include <armadillo>
 
-typedef struct dim_desc_struct {
+class out_dim_desc {
+public:
+	std::string name;
 	double min;
 	double max;
 	double inc;
-} dim_desc;
+	
+	bool operator<(const out_dim_desc &other) const;
+	bool operator==(const out_dim_desc &other) const;
+	bool operator!=(const out_dim_desc &other) const;
+};
 
-typedef std::map<std::string, dim_desc> env_output_desc;
-typedef std::set<std::string> env_output_sig;
-class env_output {
+typedef std::vector<out_dim_desc> outdesc;
+
+class output {
 public:
-	env_output();
-	env_output(const env_output_desc &d);
-	env_output(const env_output &other);
+	output();
+	output(const outdesc *d);
+	output(const output &other);
 	
 	double get(const std::string &dim) const;
 	void   set(const std::string &dim, double val);
-	void   get_signature(env_output_sig &sig) const;
 	int    size() const;
+	bool   valid() const;
 	
-	bool increment();
+	void reset();
+	bool next();
 	std::string serialize() const;
 	
-	void operator=(const env_output &o);
+	void operator=(const output &o);
 	
-private:
-	std::map<std::string, double> value;
-	env_output_desc desc;
+	const outdesc *desc;
+	std::vector<double> vals;
+};
+
+class trajectory {
+public:
+	trajectory(int length, const outdesc *d);
+	
+	void from_vec(const arma::vec &traj);
+	void reset();
+	bool next();
+	int dof();
+	
+	const outdesc *desc;
+	int length;
+	std::vector<output> t;
 };
 
 #endif

@@ -9,7 +9,7 @@ public:
 	velocity_model(string obj, string xdim, string ydim, string zdim)
 	: obj(obj), xdim(xdim), ydim(ydim), zdim(zdim) {}
 	
-	bool predict(flat_scene &scn, const env_output &out) {
+	bool predict(flat_scene &scn, const output &out) {
 		vec3 v, p;
 		if (!scn.get_node_trans(obj, 'p', p)) {
 			return false;

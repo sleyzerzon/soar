@@ -41,7 +41,7 @@ class splinter_model : public model {
 public:
 	splinter_model() {}
 	
-    bool predict(flat_scene &scn, const env_output &out) {
+    bool predict(flat_scene &scn, const output &out) {
 		vec3 pos, vel, rot, rotrate;
 		quaternion orient;
 		double lv, rv, lrps, rrps;
