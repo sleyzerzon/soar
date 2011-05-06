@@ -31,7 +31,7 @@ class LWR:
 		k = min(self.nnbrs, self.xarray.shape[0])
 		distsq = np.power(self.xarray - x, 2).sum(axis=1)
 		inds = heapq.nsmallest(k, range(len(distsq)), key=lambda i: distsq[i])
-		print(np.min(distsq[inds]), np.mean(distsq[inds]), np.max(distsq[inds]), end=' ')
+		#print(np.min(distsq[inds]), np.mean(distsq[inds]), np.max(distsq[inds]), end=' ')
 		return inds, distsq[inds]
 	
 	def predict(self, x):

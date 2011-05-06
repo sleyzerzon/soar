@@ -1,3 +1,4 @@
+#include <math.h>
 #include <iostream>
 #include <string>
 #include <limits>
@@ -12,12 +13,13 @@
 using namespace std;
 using namespace arma;
 
-const double rcoef = 1.0;
-const double ecoef = 2.0;
-const double ccoef = 0.5;
-const double scoef = 0.5;
+const double RCOEF = 1.0;
+const double ECOEF = 2.0;
+const double CCOEF = 0.5;
+const double SCOEF = 0.5;
 
-const int trajectory_len = 10;
+const int MAXITERS = 50;
+const double INF = numeric_limits<double>::infinity();
 
 /* Parses a WME structure that describes the output the environment expects.
    Assumes this format:
@@ -101,7 +103,7 @@ public:
 		if ((n1 = scn->get_node(obj1)) == NULL ||
 		    (n2 = scn->get_node(obj2)) == NULL)
 		{
-			return numeric_limits<double>::infinity();
+			return INF;
 		}
 		
 		n1->get_world_points(p1);
@@ -169,10 +171,8 @@ public:
 		vector<output>::const_iterator i;
 		
 		flat.vals = initvals;
-		for (i = traj.t.begin(); i != traj.t.end(); ++i) {
-			if (!mdl->predict(flat, *i)) {
-				return false;
-			}
+		if (!mdl->predict(flat, traj)) {
+			return false;
 		}
 		flat.update_scene(&next);
 		value = obj->eval(&next);
@@ -242,13 +242,13 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 		if (!ev.eval(simplex.col(i), eval(i))) return false;
 	}
 	
-	for(int iters = 0; iters < 100; ++iters) {
+	for(int iters = 0; iters < MAXITERS; ++iters) {
 		argmax(eval, wi, ni, bi);
 		worst = simplex.col(wi);
 		best = simplex.col(bi);
 		centroid = (sum(simplex, 1) - worst) / (simplex.n_cols - 1);
 		dir = centroid - worst;
-		reflect = centroid + rcoef * dir;
+		reflect = centroid + RCOEF * dir;
 		constrain(reflect, min, max);
 		
 		if (!ev.eval(reflect, reval)) return false;
@@ -261,7 +261,7 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 		
 		if (reval < eval(bi)) {
 			// expansion
-			expand = centroid + ecoef * dir;
+			expand = centroid + ECOEF * dir;
 			constrain(expand, min, max);
 			if (!ev.eval(expand, eeval)) return false;
 			if (eeval < reval) {
@@ -276,7 +276,7 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 		
 		assert(reval >= eval(ni));
 		
-		contract = worst + ccoef * dir;
+		contract = worst + CCOEF * dir;
 		if (!ev.eval(contract, ceval)) return false;
 		if (ceval < eval(wi)) {
 			// contraction
@@ -290,7 +290,7 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 			if (i == bi) {
 				continue;
 			}
-			simplex.col(i) = best + scoef * (simplex.col(i) - best);
+			simplex.col(i) = best + SCOEF * (simplex.col(i) - best);
 			if (!ev.eval(simplex.col(i), eval(i))) return false;
 		}
 	}
@@ -300,18 +300,36 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 
 class controller {
 public:
-	controller(model *mdl, objective *obj, const outdesc &odesc)
-	: mdl(mdl), obj(obj), odesc(odesc), step(0) {}
+	controller(model *mdl, objective *obj, const outdesc &odesc, int depth, string type)
+	: mdl(mdl), obj(obj), odesc(odesc), step(0), depth(depth), type(type) {}
 
 	/* Don't forget to make this a PID controller later */
 	bool seek(scene *scn, output &bestout) {
-		double val, best = numeric_limits<double>::infinity();
+		if (type == "simplex") {
+			return simplex_seek(scn, bestout);
+		} else if (type == "random") {
+			return random_seek(scn, bestout);
+		}
+		return naive_seek(scn, bestout);
+	}
+	
+	bool random_seek(scene *scn, output &bestout) {
+		bestout = random_out(&odesc);
+		return true;
+	}
+	
+	bool naive_seek(scene *scn, output &bestout) {
+		double val, best = INF;
 		bool found = false;
-		traj_eval evaluator(&odesc, trajectory_len, mdl, obj, scn);
-		trajectory trj(trajectory_len, &odesc);
+		traj_eval evaluator(&odesc, depth, mdl, obj, scn);
+		trajectory trj(depth, &odesc);
 		
 		while (true) {
-			if (!evaluator.eval(trj, val)) return false;
+			if (!evaluator.eval(trj, val)) {
+				cout << "WARNING: Using random output" << endl;
+				bestout = random_out(&odesc);
+				return true;
+			}
 			if (val < best) {
 				found = true;
 				bestout = trj.t.front();
@@ -325,22 +343,25 @@ public:
 		return found;
 	}
 	
-	bool seek2(scene *scn, output &bestout) {
-		traj_eval evaluator(&odesc, trajectory_len, mdl, obj, scn);
-		trajectory trj(trajectory_len, &odesc);
+	bool simplex_seek(scene *scn, output &bestout) {
+		traj_eval evaluator(&odesc, depth, mdl, obj, scn);
+		trajectory trj(depth, &odesc);
 		if (!nelder_mead_constrained(trj, evaluator)) {
-			return false;
+			cout << "WARNING: Using random output" << endl;
+			bestout = random_out(&odesc);
+			return true;
 		}
 		bestout = trj.t.front();
 		return true;
 	}
-	
 	
 private:
 	model     *mdl;
 	objective *obj;
 	outdesc    odesc;
 	int        step;
+	int        depth;
+	string     type;
 };
 
 class control_command : public command {
@@ -351,7 +372,7 @@ public:
 	  stepwme(NULL), broken(false), 
 	  mdl(NULL), ctrl(NULL), obj(NULL)
 	{
-		update_step();
+		//update_step();
 	}
 	
 	~control_command() {
@@ -368,7 +389,7 @@ public:
 			return false;
 		}
 		
-		if (!ctrl->seek2(state->get_scene(), out)) {
+		if (!ctrl->seek(state->get_scene(), out)) {
 			utils.set_result("no valid output found");
 			return false;
 		}
@@ -379,7 +400,7 @@ public:
 		
 		utils.set_result("success");
 		step++;
-		update_step();
+		//update_step();
 		return true;
 	}
 	
@@ -392,7 +413,9 @@ private:
 	*/
 	bool parse_cmd() {
 		outdesc desc;
-		wme *outputs_wme, *objective_wme, *model_wme;
+		wme *outputs_wme, *objective_wme, *model_wme, *depth_wme, *type_wme;
+		long depth;
+		string type;
 		
 		cleanup();
 		if (!si->find_child_wme(root, "outputs", outputs_wme) ||
@@ -402,21 +425,39 @@ private:
 			utils.set_result("missing or invalid outputs specification");
 			return false;
 		}
-		if (!si->find_child_wme(root, "objective", objective_wme) ||
-			!si->is_identifier(si->get_wme_val(objective_wme)) ||
-			(obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL)
+		if (!si->find_child_wme(root, "type", type_wme) ||
+			!si->get_val(si->get_wme_val(type_wme), type))
 		{
-			utils.set_result("missing or invalid objective");
+			utils.set_result("missing or invalid type");
 			return false;
 		}
-		if (!si->find_child_wme(root, "model", model_wme) ||
-		    (mdl = parse_model_struct(si, si->get_wme_val(model_wme))) == NULL)
-		{
-			utils.set_result("missing or invalid model");
-			return false;
+		if (type != "random") {
+			if (!si->find_child_wme(root, "objective", objective_wme) ||
+				!si->is_identifier(si->get_wme_val(objective_wme)) ||
+				(obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL)
+			{
+				utils.set_result("missing or invalid objective");
+				return false;
+			}
+			if (!si->find_child_wme(root, "model", model_wme) ||
+			    (mdl = parse_model_struct(si, si->get_wme_val(model_wme))) == NULL)
+			{
+				utils.set_result("missing or invalid model");
+				return false;
+			}
+			if (!si->find_child_wme(root, "depth", depth_wme) ||
+				!si->get_val(si->get_wme_val(depth_wme), depth))
+			{
+				utils.set_result("missing or invalid depth");
+				return false;
+			}
+			state->get_svs()->register_model(mdl);
+		} else {
+			obj = NULL;
+			mdl = NULL;
+			depth = 0;
 		}
-		state->get_svs()->register_model(mdl);
-		ctrl = new controller(mdl, obj, desc);
+		ctrl = new controller(mdl, obj, desc, depth, type);
 		return true;
 	}
 

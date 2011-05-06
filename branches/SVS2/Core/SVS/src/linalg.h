@@ -18,6 +18,7 @@ public:
 	double &operator[](int i);
 	vec3    operator+ (const vec3 &v) const;
 	bool    operator==(const vec3 &v) const;
+	void    operator+=(const vec3 &v);
 	
 	double dist(const vec3 &v) const;
 };

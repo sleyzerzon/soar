@@ -13,5 +13,9 @@ svs = clone.StaticLibrary('svs', src)
 env.Install('$PREFIX/lib', svs)
 
 clone.Prepend(LIBS = ['armadillo'])
+
 lwrtest = clone.Program('lwrtest', ['src/models/lwr.cpp', '#SVS/tests/lwrtest.cpp'])
 env.Install('#SVS/tests', lwrtest)
+
+splintersim = clone.Program('splintersim', ['#SVS/demos/robot/splintersim.cpp', 'src/linalg.cpp'])
+env.Install('#SVS/demos/robot', splintersim)

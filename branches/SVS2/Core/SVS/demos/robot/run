@@ -2,6 +2,8 @@ soar=../../../../out/bin/s
 
 socat unix-connect:env,retry=100 system:"java RobotClient" &
 cpid=$!
+
+while [ -n "$
 if [ "$1" == "-g" ]
 then
 	gdb --args $soar robot.soar

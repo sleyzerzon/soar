@@ -40,8 +40,11 @@ public:
 	std::vector<double> vals;
 };
 
+output random_out(const outdesc *d);
+
 class trajectory {
 public:
+	trajectory(const output &out);
 	trajectory(int length, const outdesc *d);
 	
 	void from_vec(const arma::vec &traj);

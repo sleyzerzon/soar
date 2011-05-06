@@ -16,6 +16,8 @@
 
 using namespace std;
 
+const bool CHECK_MODELS = false;
+
 typedef map<wme*,command*>::iterator cmd_iter;
 
 class timer {
@@ -288,14 +290,23 @@ void svs::update_models() {
 	
 	if (lastscene.dof() > 0 || lastscene.compare_sigs(fs)) {
 		for (i = models.begin(); i != models.end(); ++i) {
-//			flat_scene predicted(lastscene);
-//			if ((**i).predict(predicted, *next_out)) {
-//				cout << "Prediction Error: " << predicted.distance(fs) << endl;
-//			} else {
-//				cout << "No prediction" << endl;
-//			}
+			if (CHECK_MODELS) {
+				flat_scene predicted(lastscene);
+				if ((**i).predict(predicted, trajectory(next_out))) {
+					cout << "Prediction Error: " << predicted.distance(fs) << endl;
+				} else {
+					cout << "No prediction" << endl;
+				}
+			}
 			(**i).learn(lastscene, next_out, fs);
 		}
+		ofstream log("model.log", ios_base::app);
+		copy(lastscene.vals.begin(), lastscene.vals.end(), ostream_iterator<double>(log, " "));
+		log << " ";
+		copy(next_out.vals.begin(), next_out.vals.end(), ostream_iterator<double>(log, " "));
+		log << " ; ";
+		copy(fs.vals.begin(), fs.vals.end(), ostream_iterator<double>(log, " "));
+		log << endl;
 	}
 	lastscene = fs;
 }

@@ -7,7 +7,7 @@
 
 class model {
 public:
-	virtual bool predict(flat_scene &scn, const output &out) = 0;
+	virtual bool predict(flat_scene &scn, const trajectory &trj) = 0;
 	
 	/* Add a training example to a learning model. The training
 	   example is encoded as a pair of vectors (x, y) where

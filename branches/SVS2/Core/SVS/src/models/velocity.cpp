@@ -9,15 +9,20 @@ public:
 	velocity_model(string obj, string xdim, string ydim, string zdim)
 	: obj(obj), xdim(xdim), ydim(ydim), zdim(zdim) {}
 	
-	bool predict(flat_scene &scn, const output &out) {
+	bool predict(flat_scene &scn, const trajectory &trj) {
 		vec3 v, p;
+		vector<output>::const_iterator i;
+		
 		if (!scn.get_node_trans(obj, 'p', p)) {
 			return false;
 		}
-		v.x = out.get(xdim);
-		v.y = out.get(ydim);
-		v.z = out.get(zdim);
-		scn.set_node_trans(obj, 'p', p + v);
+		for (i = trj.t.begin(); i != trj.t.end(); ++i) {
+			v.x = i->get(xdim);
+			v.y = i->get(ydim);
+			v.z = i->get(zdim);
+			p += v;
+		}
+		scn.set_node_trans(obj, 'p', p);
 		return true;
 	}
 	

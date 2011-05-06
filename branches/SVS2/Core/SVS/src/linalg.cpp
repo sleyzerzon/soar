@@ -35,6 +35,10 @@ bool vec3::operator==(const vec3 &v) const {
 	return (x == v.x && y == v.y && z == v.z);
 }
 
+void vec3::operator+=(const vec3 &v) {
+	x += v.x; y += v.y; z += v.z;
+}
+
 double vec3::dist(const vec3 &v) const {
 	double dx = x-v.x, dy = y-v.y, dz = z-v.z;
 	return dx * dx + dy * dy + dz * dz;

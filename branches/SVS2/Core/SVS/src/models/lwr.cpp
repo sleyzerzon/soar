@@ -173,3 +173,7 @@ void lwr::remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
 		Xout.col(i) = X.col(dynamic[i]);
 	}
 }
+
+int lwr::size() {
+	return db.size();
+}

@@ -51,9 +51,11 @@ sp {seek-target
 	)
 -->
 	(<c> ^control <ctrl>)
-	(<ctrl> ^outputs <out>
+	(<ctrl> ^type naive
+	        ^depth 1
+	        ^outputs <out>
 	        ^objective <obj>
-	        ^model.type splinter)
+	        ^model.type lwr)
 	(<out> ^left <left> ^right <right>)
 	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
 	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)

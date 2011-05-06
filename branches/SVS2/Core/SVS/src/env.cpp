@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <assert.h>
 #include <sstream>
 #include "env.h"
@@ -98,6 +99,21 @@ int output::size() const {
 	return desc->size();
 }
 
+output random_out(const outdesc *d) {
+	output r(d);
+	outdesc::const_iterator i;
+	vector<double>::iterator j;
+	for (i = d->begin(), j = r.vals.begin(); i != d->end(); ++i, ++j) {
+		*j = i->min + ((i->max - i->min) * rand()) / RAND_MAX;
+	}
+	return r;
+}
+
+trajectory::trajectory(const output &out) 
+: length(1), desc(out.desc)
+{
+	t.push_back(out);
+}
 
 trajectory::trajectory(int length, const outdesc *d) 
 : length(length), desc(d)

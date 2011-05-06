@@ -18,8 +18,12 @@ def regress(nnbrs, text):
 	return toarray(out)
 
 nnbrs = int(sys.argv[1])
-lines = [l.strip() for l in open(sys.argv[2]).readlines()]
-xdim, ydim = map(int, lines[0].split())
+m = None
+for line in open(sys.argv[2]):
+	x, y = map(toarray, line.split(';'))
+	if m == None:
+		
+
 data = lines[1:]
 
 rdata = random.sample(data, int(len(data) * 0.5))
