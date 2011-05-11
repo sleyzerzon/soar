@@ -1,5 +1,0 @@
-python divide.py "$1" "$2" < "$4" > t1
-echo "python"
-python lwrtest.py "$3" < t1
-echo "C++"
-./lwrtest "$3" < t1

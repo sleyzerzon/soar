@@ -17,11 +17,16 @@ def regress(nnbrs, text):
 	out = p.communicate(text)[0]
 	return toarray(out)
 
+if len(sys.argv) != 3:
+	print('usage: lwrtest.py <num neighbors> <data file>', file=sys.stderr)
+	sys.exit(1)
+
 m = None
 nnbrs = int(sys.argv[1])
 diffs = []
+nulldiffs = []
 training = True
-for line in sys.stdin:
+for line in open(sys.argv[2]):
 	if line.startswith('$'):
 		training = False
 		continue
@@ -34,7 +39,12 @@ for line in sys.stdin:
 	else:
 		p = m.predict(x)
 		diffs.append(dist(p, y))
+		nulldiffs.append(dist(x[:len(y)], y))
 	
 diffa = np.array(diffs)
 print('Mean: ', np.mean(diffa))
 print('STD:  ', np.std(diffa))
+
+ndiffa = np.array(nulldiffs)
+print('NULL Mean: ', np.mean(ndiffa))
+print('NULL STD:  ', np.std(ndiffa))

@@ -17,12 +17,13 @@ int main(int argc, char *argv[]) {
 			return 0;
 		}
 		line.erase(line.find_last_not_of(" \t\n")+1);
-		cout << "'" << line << "'" << endl;
 		if (line.size() == 0) {
 			continue;
 		}
 		if (line == "***") {
 			splinter_update(lvolt, rvolt, lrps, rrps, pos, vel, rot, rotrate);
+			cerr << "POS: " << pos << endl;
+			cerr << "OUT: " << lvolt << " " << rvolt << endl;
 			cout << "c splinter p " << pos << " r " << rot << endl;
 			cout << "p left_rads_per_sec " << lrps << endl;
 			cout << "p right_rads_per_sec " << rrps << endl;

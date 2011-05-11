@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <utility>
 #include <iterator>
@@ -50,16 +51,28 @@ int main(int argc, char *argv[]) {
 	vector<double> diffs;
 	bool learning = true;
 	
-	stringstream ss(argv[1]);
+	if (argc != 4) {
+		cerr << "usage: lwrtest <method> <num neighbors> <data file>" << endl;
+		exit(1);
+	}
+	
+	stringstream ss(argv[2]);
 	if (!(ss >> nnbrs)) {
 		cerr << "nnbrs parse error" << endl;
 		exit(1);
 	}
+	
+	ifstream input(argv[3]);
+	if (!input) {
+		cerr << "couldn't open " << argv[2] << endl;
+		exit(1);
+	}
+	
 	while (true) {
 		vector<string> parts;
 		rowvec x, y;
 		
-		if (!getline(cin, line)) {
+		if (!getline(input, line)) {
 			break;
 		}
 		
@@ -80,7 +93,7 @@ int main(int argc, char *argv[]) {
 			m->add(x, y);
 		} else {
 			rowvec py;
-			m->predict(x, py);
+			m->predict(x, py, argv[1][0]);
 			diffs.push_back(dist(py, y));
 		}
 	}

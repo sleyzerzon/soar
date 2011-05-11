@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <algorithm>
+#include <iterator>
 #include <armadillo>
 #include "model.h"
 #include "scene.h"
@@ -9,7 +10,7 @@
 using namespace std;
 using namespace arma;
 
-const int NNBRS = 30;   // number of nearest neighbors to use
+const int NNBRS = 50;   // number of nearest neighbors to use
 
 typedef pair<scene_sig, outdesc> modelsig;
 typedef map<modelsig, lwr*> modeltbl;
@@ -48,7 +49,7 @@ public:
 		scene_sig ssig;
 		modeltbl::iterator i;
 		rowvec x, y, outvec;
-		flat_scene copy(scn);
+		flat_scene ref(scn);
 		vector<output>::const_iterator j;
 		
 		scn.get_signature(ssig);
@@ -64,13 +65,15 @@ public:
 			x.subvec(0, y.n_elem - 1) = y;
 			output_to_vec(*j, outvec);
 			x.subvec(y.n_elem, x.n_elem - 1) = outvec;
-			if (!i->second->predict(x, y)) {
+			if (!i->second->predict(x, y, 'l')) {
 				return false;
 			}
-			splinter_scene_update(copy, *j);
+			splinter_scene_update(ref, *j);
 		}
 		vec_to_scene(y, scn);
-		double error = copy.distance(scn);
+		ofstream f("ref.dat");
+		copy(ref.vals.begin(), ref.vals.end(), ostream_iterator<double>(f, " "));
+		double error = ref.distance(scn);
 		
 		cout << "E " << error << endl;
 		

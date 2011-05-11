@@ -1,20 +1,39 @@
+#!/bin/sh
+
 soar=../../../../out/bin/s
 
-socat unix-connect:env,retry=100 system:"java RobotClient" &
-cpid=$!
+while test -n "$1"
+do
+	case "$1" in
+	-g)
+		debug=1
+		;;
+	-s)
+		sim=1
+		;;
+	esac
+	shift
+done
 
-while [ -n "$
-if [ "$1" == "-g" ]
+if test "$sim" == "1"
+then
+	socat system:./splintersim unix-connect:env,retry=100 &
+else
+	socat system:"java RobotClient" unix-connect:env,retry=100 &
+fi
+
+if test "$debug" == "1"
 then
 	gdb --args $soar robot.soar
 else
 	$soar robot.soar
 fi
 
-kill $cpid
-javapid=`ps | awk '$4 == "java" {print $1}'`
-
-if [ -n "$javapid" ]
+if test "$sim" != "1"
 then
-	kill "$javapid"
+	pids=`ps x | awk '/RobotClient/ { print $1 }'`
+	if test -n "$pids"
+	then
+		kill $pids
+	fi
 fi
