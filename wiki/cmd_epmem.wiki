@@ -46,6 +46,7 @@ displays a summary of the parameter settings.
 || `exclusions` || Toggle the exclusion of an attribute string constant || _any string_ || `epmem, smem` ||
 || `force` || Forces episode encoding/ignoring in the next storage phase || `ignore`, `remember`, `off` || `off` ||
 || `graph-match` || Graph matching enabled || `on`, `off` || `on` ||
+|| `graph-match-ordering` || Ordering of identifiers during graph match || `undefined`, `dfs`, `mcv` || `undefined` ||
 || `learning` ||  Episodic memory enabled  || `on`, `off` || `off` ||
 || `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
 || `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
@@ -100,6 +101,8 @@ for the first time, the value of the `database` parameter is
 automatically changed to `file`.
 
 The `balance` parameter sets the linear weight of match cardinality vs. cue activation. As a performance optimization, when the value is 1 (default), activation is not computed. If this value is not 1 (even close, such as 0.99), and working memory activation is enabled, this value will be computed for each leaf WME, which may incur a noticeable cost, depending upon the overall complexity of the retrieval.
+
+The `graph-match-ordering` parameter sets the heuristic by which identifiers are ordered during graph match (assuming `graph-match` is `on`). The default, `undefined`, does not enforce any order and may be sufficient for small cues. For more complex cues, there will be a one-time sorting cost, during each retrieval, if the parameter value is changed. The currently available heuristics are depth-first search (`dfs`) and most-constrained variable (`mcv`). It is advised that you attempt these heuristics to improve performance if the `query_graph_match` timer reveals that graph matching is dominating retrieval time.
 
 
 === Statistics ===
