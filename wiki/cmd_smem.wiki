@@ -41,6 +41,11 @@ switches for each parameter.  Running `smem` without any switches
 displays a summary of the parameter settings.
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
+|| `activation-mode` || Sets the ordering bias for retrievals that match more than one memory || `recency`, `frequency`, `base-level` || `recency` ||
+|| `activate-on-query` || Determines if the results of queries should be activated || `on`, `off` || `on` ||
+|| `base-decay` || Sets the decay parameter for base-level activation computation || `>` 0 || 0.5 ||
+|| `base-update-policy` || Sets the policy for re-computing base-level activation || `stable`, `naive`, `incremental` || `stable` ||
+|| `base-incremental-threshes` || Sets time deltas after which base-level activation is re-computed for old memories || 1, 2, 3, ... || 10 ||
 || `cache-size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `lazy-commit` || Delay writing semantic store changes to file until agent exits || `on`, `off` || `on` ||
@@ -51,6 +56,8 @@ displays a summary of the parameter settings.
 || `thresh` || Threshold for activation locality || 0, 1, ... || 100 ||
 || `timers` || Timer granularity || `off`, `one`, `two`, `three` || `off` ||
 
+If `activation-mode` is `base-level`, three parameters control bias values. The `base-decay` parameter sets the free decay parameter in the base-level model. Note that we do implement the (Petrov, 2006) approximation, with a history size set as a compile-time parameter (default=10). The `base-update-policy` sets the frequency with which activation is recomputed. The default, `stable`, only recomputes activation when a memory is referenced (through storage or retrieval). The `naive` setting will update the entire candidate set of memories (defined as those that match the most constraining cue WME) during a retrieval, which has severe performance detriment and should be used for experimentation or those agents that require high-fidelity retrievals. The `incremental` policy updates a constant number of memories, those with last-access ages defined by the `base-incremental-threshes` set.
+
 === Statistics ===
 
 Semantic memory tracks statistics over the lifetime of the agent.
@@ -60,6 +67,7 @@ statistics.  Unlike timers, statistics will always be updated.
 Available statistics are:
 
 || *Name* || *Label* || *Description* ||
+|| `act_updates` || Activation Updates || Number of times memory activation has been calculated ||
 || `edges` || Edges || Number of edges in the semantic store ||
 || `mem-usage` || Memory Usage || Current SQLite memory usage in bytes ||
 || `mem-high` || Memory Highwater || High SQLite memory usage watermark in bytes ||
