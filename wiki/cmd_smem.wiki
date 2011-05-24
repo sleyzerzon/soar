@@ -68,6 +68,7 @@ Available statistics are:
 
 || *Name* || *Label* || *Description* ||
 || `act_updates` || Activation Updates || Number of times memory activation has been calculated ||
+|| `db-lib-version` || SQLite Version || SQLite library version ||
 || `edges` || Edges || Number of edges in the semantic store ||
 || `mem-usage` || Memory Usage || Current SQLite memory usage in bytes ||
 || `mem-high` || Memory Highwater || High SQLite memory usage watermark in bytes ||
