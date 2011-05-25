@@ -26,8 +26,10 @@ smem -b|--backup <file name>
 || `-S, --stats` || Print statistic summary or specific statistic ||
 || `-t, --timers` || Print timer summary or specific statistic ||
 || `-a, --add` || Add concepts to semantic memory ||
+|| `-p, --print` || Print semantic store in user-readable format ||
 || `-v, --viz` || Print semantic store in graphviz format ||
 || `-i, --init` || Reinitialize ALL memories ||
+|| `-b, --print` || Creates a backup of the semantic database on disk ||
 
 == Description ==
 
