@@ -14,6 +14,7 @@ epmem -S|--stats [<statistic>]
 epmem -t|--timers [<timer>]
 epmem -c|--close
 epmem -v|--viz <episode id>
+epmem -p|--print <episode id>
 epmem -b|--backup <file name>
 }}}
 
@@ -25,6 +26,8 @@ epmem -b|--backup <file name>
 || `-t, --timers` || Print timer summary or specific statistic ||
 || `-c, --close` || Close epmem database and commit to disk (if applicable) ||
 || `-v, --viz` || Print episode in graphviz format ||
+|| `-p, --print` || Print episode in user-readable format ||
+|| `-b, --backup` || Creates a backup of the episodic database on disk ||
 
 == Description ==
 
@@ -179,14 +182,16 @@ Level three
 || `query_pos_start_now` || Interval search for positive cue, start point, now ||
 || `query_pos_start_point` || Interval search for positivecue, start point, points ||
 
-=== Graphviz ===
+=== Visualization ===
 
 When debugging agents using episodic memory it is often useful to
 inspect the contents of individual episodes.  Running 
 `epmem --viz <episode id>` 
 will output the contents of an episode in graphviz
 format.  For more information on this format and visualization tools,
-see http://www.graphviz.org .
+see http://www.graphviz.org. The `epmem --print` option has the same syntax, 
+but outputs text that is similar to using the `print` command to get the substructure 
+of an identifier in working memory, which is possibly more useful for interactive debugging.  
 
 == See Also ==
 
