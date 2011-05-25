@@ -16,6 +16,7 @@ smem -a|--add <concept>
 smem -p|--print [<lti>] [<depth>]
 smem -v|--viz [<lti>] [<depth>]
 smem -i|--init
+smem -b|--backup <file name>
 }}}
 
 == Options ==
@@ -58,6 +59,11 @@ displays a summary of the parameter settings.
 || `timers` || Timer granularity || `off`, `one`, `two`, `three` || `off` ||
 
 If `activation-mode` is `base-level`, three parameters control bias values. The `base-decay` parameter sets the free decay parameter in the base-level model. Note that we do implement the (Petrov, 2006) approximation, with a history size set as a compile-time parameter (default=10). The `base-update-policy` sets the frequency with which activation is recomputed. The default, `stable`, only recomputes activation when a memory is referenced (through storage or retrieval). The `naive` setting will update the entire candidate set of memories (defined as those that match the most constraining cue WME) during a retrieval, which has severe performance detriment and should be used for experimentation or those agents that require high-fidelity retrievals. The `incremental` policy updates a constant number of memories, those with last-access ages defined by the `base-incremental-threshes` set.
+
+The `epmem --backup` command can be used to make 
+a copy of the current state of the database, whether in memory or on
+disk. This command will commit all outstanding changes before
+initiating the copy.
 
 === Statistics ===
 
