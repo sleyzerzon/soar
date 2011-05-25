@@ -14,6 +14,7 @@ epmem -S|--stats [<statistic>]
 epmem -t|--timers [<timer>]
 epmem -c|--close
 epmem -v|--viz <episode id>
+epmem -b|--backup <file name>
 }}}
 
 == Options ==
@@ -41,12 +42,12 @@ displays a summary of the parameter settings.
 || *Parameter* || *Description* || *Possible values* || *Default* ||
 || `balance` || Linear weight of match cardinality (1) vs. working memory activation (0) used in calculating match score || `[`0, 1`]` || 1 ||
 || `cache-size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
-|| `commit` || Number of episode encodings between committing changes to disk || 1, 2, ... || 1 ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `exclusions` || Toggle the exclusion of an attribute string constant || _any string_ || `epmem, smem` ||
 || `force` || Forces episode encoding/ignoring in the next storage phase || `ignore`, `remember`, `off` || `off` ||
 || `graph-match` || Graph matching enabled || `on`, `off` || `on` ||
 || `graph-match-ordering` || Ordering of identifiers during graph match || `undefined`, `dfs`, `mcv` || `undefined` ||
+|| `lazy-commit` || Delay writing semantic store changes to file until agent exits || `on`, `off` || `on` ||
 || `learning` ||  Episodic memory enabled  || `on`, `off` || `off` ||
 || `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
 || `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
@@ -94,7 +95,10 @@ performance.  When `optimization` is set to `performance`, the agent
 will have an exclusive lock on the database, meaning it cannot be
 opened concurrently by another SQLite process such as SQLiteMan.  The
 lock can be relinquished by issuing `epmem --close` or shutting down
-the Soar kernel.
+the Soar kernel. The `epmem --backup` command can be used to make 
+a copy of the current state of the database, whether in memory or on
+disk. This command will commit all outstanding changes before
+initiating the copy.
 
 When the `path` parameter is set to a non-empty value
 for the first time, the value of the `database` parameter is
