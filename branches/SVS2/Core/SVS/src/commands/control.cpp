@@ -186,12 +186,12 @@ public:
 	}
 	
 private:
-	model         *mdl;
-	objective     *obj;
-	trajectory     cachedtrj; // keep around to avoid reallocation
-	scene          next;      // copy of initial scene to be modified after prediction
-	flat_scene     flat;      // keep around to avoid reallocation
-	vector<double> initvals;  // flattened values of initial scene for resetting flat
+	model       *mdl;
+	objective   *obj;
+	trajectory   cachedtrj; // keep around to avoid reallocation
+	scene        next;      // copy of initial scene to be modified after prediction
+	flat_scene   flat;      // keep around to avoid reallocation
+	floatvec     initvals;  // flattened values of initial scene for resetting flat
 };
 
 void constrain(vec &v, const vec &min, const vec &max) {
@@ -204,7 +204,7 @@ void constrain(vec &v, const vec &min, const vec &max) {
 	}
 }
 
-void argmax(const vec &v, int &worst, int &nextworst, int &best) {
+void argmin(const vec &v, int &worst, int &nextworst, int &best) {
 	worst = 0; nextworst = 0; best = 0;
 	for (int i = 1; i < v.n_elem; ++i) {
 		if (v(i) > v(worst)) {
@@ -243,7 +243,7 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 	}
 	
 	for(int iters = 0; iters < MAXITERS; ++iters) {
-		argmax(eval, wi, ni, bi);
+		argmin(eval, wi, ni, bi);
 		worst = simplex.col(wi);
 		best = simplex.col(bi);
 		centroid = (sum(simplex, 1) - worst) / (simplex.n_cols - 1);
@@ -300,8 +300,9 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 
 class controller {
 public:
-	controller(model *mdl, objective *obj, const outdesc &odesc, int depth, string type)
-	: mdl(mdl), obj(obj), odesc(odesc), step(0), depth(depth), type(type) {}
+	controller(svs *svsp, string modelname, objective *obj, const outdesc &odesc, int depth, string type)
+	: svsp(svsp), modelname(modelname), obj(obj), odesc(odesc), step(0), depth(depth), type(type) 
+	{}
 
 	/* Don't forget to make this a PID controller later */
 	bool seek(scene *scn, output &bestout) {
@@ -321,6 +322,12 @@ public:
 	bool naive_seek(scene *scn, output &bestout) {
 		double val, best = INF;
 		bool found = false;
+		model *mdl = svsp->get_model(modelname);
+		
+		if (!mdl) {
+			return false;
+		}
+		
 		traj_eval evaluator(&odesc, depth, mdl, obj, scn);
 		trajectory trj(depth, &odesc);
 		
@@ -344,6 +351,11 @@ public:
 	}
 	
 	bool simplex_seek(scene *scn, output &bestout) {
+		model *mdl = svsp->get_model(modelname);
+		if (!mdl) {
+			return false;
+		}
+		
 		traj_eval evaluator(&odesc, depth, mdl, obj, scn);
 		trajectory trj(depth, &odesc);
 		if (!nelder_mead_constrained(trj, evaluator)) {
@@ -356,12 +368,13 @@ public:
 	}
 	
 private:
-	model     *mdl;
+	svs       *svsp;
 	objective *obj;
 	outdesc    odesc;
 	int        step;
 	int        depth;
 	string     type;
+	string     modelname;
 };
 
 class control_command : public command {
@@ -369,8 +382,7 @@ public:
 	control_command(svs_state *state, Symbol *root)
 	: state(state), root(root), utils(state, root), 
 	  si(state->get_svs()->get_soar_interface()), step(0), 
-	  stepwme(NULL), broken(false), 
-	  mdl(NULL), ctrl(NULL), obj(NULL)
+	  stepwme(NULL), broken(false), ctrl(NULL), obj(NULL)
 	{
 		//update_step();
 	}
@@ -415,7 +427,7 @@ private:
 		outdesc desc;
 		wme *outputs_wme, *objective_wme, *model_wme, *depth_wme, *type_wme;
 		long depth;
-		string type;
+		string type, modelname;
 		
 		cleanup();
 		if (!si->find_child_wme(root, "outputs", outputs_wme) ||
@@ -431,7 +443,10 @@ private:
 			utils.set_result("missing or invalid type");
 			return false;
 		}
-		if (type != "random") {
+		if (type == "random") {
+			obj = NULL;
+			depth = 0;
+		} else {
 			if (!si->find_child_wme(root, "objective", objective_wme) ||
 				!si->is_identifier(si->get_wme_val(objective_wme)) ||
 				(obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL)
@@ -439,10 +454,11 @@ private:
 				utils.set_result("missing or invalid objective");
 				return false;
 			}
+			
 			if (!si->find_child_wme(root, "model", model_wme) ||
-			    (mdl = parse_model_struct(si, si->get_wme_val(model_wme))) == NULL)
+			    !si->get_val(si->get_wme_val(model_wme), modelname))
 			{
-				utils.set_result("missing or invalid model");
+				utils.set_result("missing model name");
 				return false;
 			}
 			if (!si->find_child_wme(root, "depth", depth_wme) ||
@@ -451,22 +467,12 @@ private:
 				utils.set_result("missing or invalid depth");
 				return false;
 			}
-			state->get_svs()->register_model(mdl);
-		} else {
-			obj = NULL;
-			mdl = NULL;
-			depth = 0;
 		}
-		ctrl = new controller(mdl, obj, desc, depth, type);
+		ctrl = new controller(state->get_svs(), modelname, obj, desc, depth, type);
 		return true;
 	}
 
 	void cleanup() {
-		if (mdl) {
-			state->get_svs()->unregister_model(mdl);
-			delete mdl;
-			mdl = NULL;
-		}
 		delete obj; obj = NULL;
 		delete ctrl; ctrl = NULL;
 	}
@@ -482,7 +488,6 @@ private:
 	svs_state      *state;
 	Symbol         *root;
 	controller     *ctrl;
-	model          *mdl;
 	objective      *obj;
 	wme            *stepwme;
 	int             step;

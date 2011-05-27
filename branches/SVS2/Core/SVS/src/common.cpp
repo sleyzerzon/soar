@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include "common.h"
 
 using namespace std;
 
@@ -31,4 +32,14 @@ string getnamespace() {
 		ns.push_back('/');
 	}
 	return ns;
+}
+
+ostream &operator<<(ostream &os, const floatvec &v) {
+	for(int i = 0; i < v.size(); ++i) {
+		os << v[i];
+		if (i < v.size() - 1) {
+			os << " ";
+		}
+	}
+	return os;
 }

@@ -338,40 +338,54 @@ void scene::set_property(const string &prop, double v) {
 	i->second = v;
 }
 
+int scene::num_properties() const {
+	return properties.size();
+}
+
+int scene::num_nodes() const {
+	return nodes.size();
+}
+
 flat_scene::flat_scene() {}
 
 flat_scene::flat_scene(const flat_scene &s) 
 : vals(s.vals), node_info(s.node_info), prop_info(s.prop_info)
 {}
 
-flat_scene::flat_scene(scene *scn) {
+flat_scene::flat_scene(scene *scn) 
+: vals(scn->num_nodes() - 1 + scn->num_properties())  // -1 for world
+{
 	vector<sg_node*> nodes;
-	vector<sg_node*>::iterator i;
+	vector<sg_node*>::iterator n;
 	vector<pair<string, double> > props;
-	vector<pair<string, double> >::iterator j;
+	vector<pair<string, double> >::iterator p;
 	const char *types = "prs";
 	vec3 trans;
+	int i, j, k;
 	
 	scn->get_all_nodes(nodes);
-	for (i = nodes.begin(); i != nodes.end(); ++i) {
-		sg_node *n = *i;
+	
+	i = 0;
+	for (n = nodes.begin(); n != nodes.end(); ++n) {
 		string parent = "";
-		if (n->get_parent()) {
-			parent = n->get_parent()->get_name();
+		if (!(**n).get_parent()) {
+			continue;
 		}
-		node_info[n->get_name()] = make_pair(parent, vals.size());
-		for (int k = 0; k < 3; ++k) {
-			trans = n->get_trans(types[k]);
-			for (int l = 0; l < 3; ++l) {
-				vals.push_back(trans[l]);
+		
+		parent = (**n).get_parent()->get_name();
+		node_info[(**n).get_name()] = make_pair(parent, i);
+		for (j = 0; j < 3; ++j) {
+			trans = (**n).get_trans(types[j]);
+			for (k = 0; k < 3; ++k) {
+				vals[i++] = trans[k];
 			}
 		}
 	}
 	
 	scn->get_all_properties(props);
-	for (j = props.begin(); j != props.end(); ++j) {
-		prop_info[j->first] = vals.size();
-		vals.push_back(j->second);
+	for (p = props.begin(); p != props.end(); ++p) {
+		prop_info[p->first] = i;
+		vals[i++] = p->second;
 	}
 }
 
@@ -449,16 +463,27 @@ void flat_scene::update_scene(scene *scn) const {
 	}
 }
 
-void flat_scene::get_signature(scene_sig &sig) const {
+void flat_scene::get_column_names(vector<string> &names) const {
 	map<string, pair<string, int> >::const_iterator i;
 	map<string, int>::const_iterator j;
-	string property = "PROPERTY";
+	names.resize(vals.size());
 	
 	for(i = node_info.begin(); i != node_info.end(); ++i) {
-		sig.insert(make_pair(i->first, i->second.first));
+		for(int k = 0; k < 9; ++k) {
+			stringstream name;
+			if (k < 3) {
+				name << i->first << ":pos:" << k;
+			} else if (k < 6) {
+				name << i->first << ":rot:" << k - 3;
+			} else {
+				name << i->first << ":scl:" << k - 6;
+			}
+			names[i->second.second + k] = name.str();
+		}
 	}
+	
 	for(j = prop_info.begin(); j != prop_info.end(); ++j) {
-		sig.insert(make_pair(j->first, property));
+		names[j->second] = j->first;
 	}
 }
 
@@ -466,7 +491,7 @@ int flat_scene::dof() const {
 	return vals.size();
 }
 
-bool flat_scene::compare_sigs(const flat_scene &s) const {
+bool flat_scene::congruent(const flat_scene &s) const {
 	return node_info == s.node_info && prop_info == s.prop_info;
 }
 
@@ -477,8 +502,5 @@ double flat_scene::distance(const flat_scene &s) const {
 	if (vals.size() != s.vals.size()) {
 		return numeric_limits<double>::infinity();
 	}
-	for (i = vals.begin(), j = s.vals.begin(); i != vals.end(); ++i, ++j) {
-		d += pow(*i - *j, 2);
-	}
-	return d;
+	return sqrt(vals.distsq(s.vals));
 }

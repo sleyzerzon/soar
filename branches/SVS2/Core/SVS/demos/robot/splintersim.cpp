@@ -22,8 +22,8 @@ int main(int argc, char *argv[]) {
 		}
 		if (line == "***") {
 			splinter_update(lvolt, rvolt, lrps, rrps, pos, vel, rot, rotrate);
-			cerr << "POS: " << pos << endl;
 			cerr << "OUT: " << lvolt << " " << rvolt << endl;
+			cerr << pos << " , " << rot << " , " << lrps << " , " << rrps << " , " << rotrate << " , " << vel << endl;
 			cout << "c splinter p " << pos << " r " << rot << endl;
 			cout << "p left_rads_per_sec " << lrps << endl;
 			cout << "p right_rads_per_sec " << rrps << endl;

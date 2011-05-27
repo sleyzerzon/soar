@@ -7,6 +7,8 @@ vec3::vec3() : x(0.0), y(0.0), z(0.0) { }
 
 vec3::vec3(double x, double y, double z) : x(x), y(y), z(z) { }
 
+vec3::vec3(double v[]) : x(v[0]), y(v[1]), z(v[2]) {}
+
 vec3::vec3(const vec3 &v) : x(v.x), y(v.y), z(v.z) { }
 
 double vec3::operator[](int i) const {

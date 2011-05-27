@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <armadillo>
+#include "common.h"
 
 class out_dim_desc {
 public:
@@ -37,7 +38,7 @@ public:
 	void operator=(const output &o);
 	
 	const outdesc *desc;
-	std::vector<double> vals;
+	floatvec vals;
 };
 
 output random_out(const outdesc *d);

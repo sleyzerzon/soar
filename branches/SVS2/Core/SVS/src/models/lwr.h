@@ -1,20 +1,25 @@
 #ifndef LWR_H
 #define LWR_H
 
+#include <vector>
+#include "common.h"
+
 class lwr {
 public:
 	lwr(int xdim, int ydim, int nnbrs);
-	void add(const arma::rowvec &x, const arma::rowvec &y);
-	bool predict(const arma::rowvec &x, arma::rowvec &y, char method);
-	
+	void add(const floatvec &x, const floatvec &y);
+	bool load_file(const char *file);
+	bool predict(const floatvec &x, floatvec &y, char method, bool mahalanobis);
 	int size();
 	
 private:
-	void nearest(int k, arma::rowvec x, arma::mat &X, arma::mat &Y, arma::vec &d);
-	void remove_static(arma::mat &X, arma::mat &Xout, std::vector<int> &dynamic);
+	void normalize();
 	
 	int xdim, ydim, nnbrs;
-	std::vector<std::pair<arma::rowvec, arma::rowvec> > db;
+	std::vector<std::pair<floatvec, floatvec> > examples;
+	std::vector<floatvec> xnorm;
+	floatvec xmin, xmax, xrange;
+	bool normalized;
 };
 
 #endif

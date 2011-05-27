@@ -3,15 +3,15 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <list>
-#include <set>
+#include <algorithm>
 #include <armadillo>
 #include "lwr.h"
+#include "balltree.h"
 
 using namespace std;
 using namespace arma;
 
-const double RLAMBDA = 0.01;
+const double RLAMBDA = 0.0000001;
 
 class timer {
 public:
@@ -43,16 +43,16 @@ void print_rowvec(const rowvec &v) {
 	v.print("");
 }
 
-void log_mat(const mat &m, const string &path) {
-	ofstream f(path.c_str());
-	m.print(f, "");
-	f.close();
-}
-
-void log_vec(const rowvec &v, const string &path) {
-	ofstream f(path.c_str());
-	v.print(f, "");
-	f.close();
+void naive_knn(const floatvec &q, const vector<floatvec> &all, int k, di_queue &nn) {
+	for (int i = 0; i < all.size(); ++i) {
+		double d = q.distsq(all[i]);
+		if (nn.size() < k || (nn.size() > 0 && d < nn.top().first)) {
+			nn.push(make_pair(d, i));
+			if (nn.size() > k) {
+				nn.pop();
+			}
+		}
+	}
 }
 
 void lsqr(const mat &X, const mat &Y, const vec &w, const rowvec &x, rowvec &yout) {
@@ -75,139 +75,26 @@ void lsqr(const mat &X, const mat &Y, const vec &w, const rowvec &x, rowvec &you
 }
 
 void ridge(const mat &X, const mat &Y, const vec &w, const rowvec &x, rowvec &yout) {
-	rowvec Xmean = mean(X, 0);
-	mat Xcenter = X - (ones<vec>(X.n_rows, 1) * Xmean);
-	rowvec Ymean = mean(Y, 0);
-	mat Ycenter = Y - (ones<vec>(Y.n_rows, 1) * Ymean);
 	mat W = diagmat(w);
-	mat Z = W * Xcenter;
-	mat V = W * Ycenter;
-	mat Zt = trans(Z);
-	mat lambdaeye = RLAMBDA * eye<mat>(X.n_cols, X.n_cols);
-	mat C = inv(Zt * Z + lambdaeye) * Zt * V;
-	yout = (x - Xmean) * C + Ymean;
-}
-
-lwr::lwr(int xdim, int ydim, int nnbrs) : xdim(xdim), ydim(ydim), nnbrs(nnbrs) 
-{}
-	
-void lwr::add(const rowvec &x, const rowvec &y) {
-	assert(x.n_cols == xdim && y.n_cols == ydim);
-	db.push_back(make_pair(x, y));
-}
-
-bool lwr::predict(const rowvec &x, rowvec &y, char method) {
-	mat X, Y, Xd, Yd;
-	rowvec xd, yd;
-	vec d;
-	vector<int> xdi, ydi;
-	//timer tall, tnn, tslv;
-	//tall.start();
-	int k = db.size() > nnbrs ? nnbrs : db.size();
-	
-	if (k == 0) {
-		return false;
-	}
-	
-	//tnn.start();
-	nearest(k, x, X, Y, d);
-	//cout << "NN:  " << tnn.stop() << endl;
-	
-	vec w = pow(d, -3);
-	
-	/* Any neighbor whose weight is infinity is close
-	   enough to provide an exact solution.  If any
-	   exist, take their average as the solution.  If we
-	   don't do this the solve() will fail due to infinite
-	   values in Z and V.
-	*/
-	rowvec closeavg = zeros<rowvec>(ydim);
-	int nclose = 0;
-	for (int i = 0; i < w.n_elem; ++i) {
-		if (w(i) == math::inf()) {
-			closeavg += Y.row(i);
-			++nclose;
-		}
-	}
-	if (nclose > 0) {
-		for(int i = 0; i < closeavg.n_elem; ++i) {
-			closeavg(i) /= nclose;
-		}
-		y = closeavg;
-		return true;
-	}
-	
-	remove_static(X, Xd, xdi);
-	remove_static(Y, Yd, ydi);
-	
-	if (ydi.size() == 0) {
-		// all neighbors are identical, use first as prediction
-		y = Y.row(0);
-		return true;
-	}
-	
-	xd = ones<rowvec>(1, xdi.size());
-	for (int i = 0; i < xdi.size(); ++i) {
-		xd(i) = x(xdi[i]);
-	}
-	
-	if (method == 'r') {
-		ridge(Xd, Yd, w, xd, yd);
-	} else {
-		lsqr(Xd, Yd, w, xd, yd);
-	}
-	
-	/* final answer is first (actually any will do) row of
-	   Y with dynamic columns changed
-	*/
-	y = Y.row(0);
-	for (int i = 0; i < ydi.size(); ++i) {
-		y(ydi[i]) = yd(i);
-	}
-	
-	//cout << "ALL: " << tall.stop() << endl;
-	return true;
-}
-
-void lwr::nearest(int k, rowvec x, mat &X, mat &Y, vec &d) {
-	int i;
-	std::list<pair<int, double> > near;
-	std::list<pair<int, double> >::iterator j;
-	double dist;
-	rowvec t;
-	
-	X.reshape(k, db.front().first.n_cols);
-	Y.reshape(k, db.front().second.n_cols);
-	d.reshape(k, 1);
-	
-	for (i = 0; i < db.size(); ++i) {
-		t = db[i].first - x;
-		dist = dot(t, t);
-		for (j = near.begin(); ; ++j) {
-			if (j->second > dist || (j == near.end() && near.size() < k)) {
-				near.insert(j, make_pair(i, dist));
-				if (near.size() > k) {
-					near.pop_back();
-				}
-				break;
-			}
-			if (j == near.end()) {
-				break;
-			}
-		}
-	}
-	
-	for(i = 0, j = near.begin(); j != near.end(); ++i, ++j) {
-		X.row(i) = db[j->first].first;
-		Y.row(i) = db[j->first].second;
-		d(i) = j->second;
-	}
+	//mat W = eye<mat>(X.n_rows, X.n_rows);
+	mat Z = W * X;
+	mat V = W * Y;
+	rowvec Zmean = mean(Z, 0);
+	mat Zcenter = Z - (ones<vec>(Z.n_rows, 1) * Zmean);
+	rowvec Vmean = mean(V, 0);
+	mat Vcenter = V - (ones<vec>(V.n_rows, 1) * Vmean);
+	mat Zt = trans(Zcenter);
+	mat lambdaeye = RLAMBDA * eye<mat>(Z.n_cols, Z.n_cols);
+	mat A = Zt * Zcenter + lambdaeye;
+	mat B = Zt * Vcenter;
+	mat C = solve(A, B);
+	yout = (x - mean(X, 0)) * C + mean(Y, 0);
 }
 
 /* Output a matrix composed only of those columns in the input
    matrix with different values.
 */
-void lwr::remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
+void remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
 	for (int c = 0; c < X.n_cols; ++c) {
 		for (int r = 1; r < X.n_rows; ++r) {
 			if (X(r, c) != X(0, c)) {
@@ -222,6 +109,190 @@ void lwr::remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
 	}
 }
 
+lwr::lwr(int xdim, int ydim, int nnbrs) 
+: xdim(xdim), ydim(ydim), nnbrs(nnbrs), normalized(false),
+  xmin(xdim), xmax(xdim), xrange(xdim)
+{}
+	
+void lwr::add(const floatvec &x, const floatvec &y) {
+	assert(x.size() == xdim && y.size() == ydim);
+	examples.push_back(make_pair(x, y));
+	
+	if (examples.size() == 1) {
+		xmin = x;
+		xmax = x;
+		xrange.zero();
+	} else {
+		for (int i = 0; i < x.size(); ++i) {
+			if (x[i] < xmin[i]) {
+				xmin[i] = x[i];
+				normalized = false;
+			} else if (x[i] > xmax[i]) {
+				xmax[i] = x[i];
+				normalized = false;
+			}
+		}
+	}
+	
+	if (normalized) {
+		// otherwise just wait for renormalization
+		// this looks ugly because I'm trying to avoid unnecessary copying
+		xnorm.push_back(x);
+		xnorm.back() -= xmin;
+		xnorm.back() /= xrange;
+	}
+}
+
+void lwr::normalize() {
+	vector<pair<floatvec, floatvec> >::iterator i;
+	
+	xrange = xmax;
+	xrange -= xmin;
+	xrange.replace(0.0, 1.0);  // can't have division by 0
+	xnorm.clear();
+	xnorm.reserve(examples.size());
+	for (i = examples.begin(); i != examples.end(); ++i) {
+		xnorm.push_back(i->first);
+		xnorm.back() -= xmin;
+		xnorm.back() /= xrange;
+	}
+}
+
+bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis) {
+	mat X, Y, Xd, Yd;
+	rowvec xd, yd;
+	vec d;
+	vector<int> xdi, ydi;
+	timer tall, tnn, tslv;
+	tall.start();
+	
+	int i, j, k = examples.size() > nnbrs ? nnbrs : examples.size();
+	di_queue neighbors;
+	
+	if (!normalized) {
+		normalize();
+		normalized = true;
+	}
+	floatvec xn(x);
+	xn = x;
+	xn -= xmin;
+	xn /= xrange;
+	
+	tnn.start();
+	naive_knn(xn, xnorm, k, neighbors);
+	cout << "NN:  " << tnn.stop() << endl;
+	
+	X.reshape(k, xdim);
+	Y.reshape(k, ydim);
+	d.reshape(k, 1);
+	for(i = 0; i < k; ++i) {
+		floatvec &tx = examples[neighbors.top().second].first;
+		floatvec &ty = examples[neighbors.top().second].second;
+		for(j = 0; j < xdim; ++j) {
+			X(i, j) = tx[j];
+		}
+		for(j = 0; j < ydim; ++j) {
+			Y(i, j) = ty[j];
+		}
+		d(i) = neighbors.top().first;
+		neighbors.pop();
+	}
+	
+	vec w = sqrt(pow(d, -3));
+	
+	/* Any neighbor whose weight is infinity is close
+	   enough to provide an exact solution.  If any
+	   exist, take their average as the solution.  If we
+	   don't do this the solve() will fail due to infinite
+	   values in Z and V.
+	*/
+	rowvec closeavg = zeros<rowvec>(ydim);
+	int nclose = 0;
+	for (i = 0; i < w.n_elem; ++i) {
+		if (w(i) == math::inf()) {
+			closeavg += Y.row(i);
+			++nclose;
+		}
+	}
+	if (nclose > 0) {
+		for(i = 0; i < closeavg.n_elem; ++i) {
+			y[i] = closeavg(i) / nclose;
+		}
+		return true;
+	}
+	
+	remove_static(X, Xd, xdi);
+	remove_static(Y, Yd, ydi);
+	
+	if (ydi.size() == 0) {
+		// all neighbors are identical, use first as prediction
+		for (i = 0; i < ydim; ++i) {
+			y[i] = Y(0, i);
+		}
+		return true;
+	}
+	
+	if (X.n_rows < xdi.size()) {
+		// would result in underconstrained system
+		return false;
+	}
+	
+	xd = ones<rowvec>(1, xdi.size());
+	for (i = 0; i < xdi.size(); ++i) {
+		xd(i) = x[xdi[i]];
+	}
+	
+	if (method == 'r') {
+		ridge(Xd, Yd, w, xd, yd);
+	} else {
+		lsqr(Xd, Yd, w, xd, yd);
+	}
+	
+	/* final answer is first (actually any will do) row of
+	   Y with dynamic columns changed
+	*/
+	for (i = 0; i < ydim; ++i) {
+		y[i] = Y(0, i);
+	}
+	for (i = 0; i < ydi.size(); ++i) {
+		y[ydi[i]] = yd(i);
+	}
+	
+	cout << "ALL: " << tall.stop() << endl;
+	return true;
+}
+
 int lwr::size() {
-	return db.size();
+	return examples.size();
+}
+
+bool lwr::load_file(const char *file) {
+	ifstream f(file);
+	string line;
+	floatvec x(xdim), y(ydim);
+	int linenum = 0;
+	size_t p;
+	while (getline(f, line)) {
+		++linenum;
+		if ((p = line.find('#')) != string::npos) {
+			line.erase(p);
+		}
+		if (line.find_first_not_of(" \t\n") == string::npos) {
+			continue;
+		}
+		stringstream ss(line);
+		for(int i = 0; i < xdim; ++i) {
+			if (!(ss >> x[i])) {
+				cerr << "Error in file \"" << file << "\" on line " << linenum << endl;
+				return false;
+			}
+		}
+		for(int i = 0; i < ydim; ++i) {
+			if (!(ss >> y[i])) {
+				cerr << "Error in file \"" << file << "\" on line " << linenum << endl;
+				return false;
+			}
+		}
+		add(x, y);
+	}
 }

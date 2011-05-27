@@ -9,14 +9,19 @@ model *_make_velocity_model_(soar_interface *si, Symbol *root);
 model *_make_lwr_model_(soar_interface *si, Symbol *root);
 model *_make_splinter_model_(soar_interface *si, Symbol *root);
 
-model *parse_model_struct(soar_interface *si, Symbol *root) {
-	wme *type_wme;
+model *parse_model_struct(soar_interface *si, Symbol *root, string &name) {
+	wme *type_wme, *name_wme;
 	string type;
 	
-	if (!si->find_child_wme(root, "type", type_wme)) {
+	if (!si->find_child_wme(root, "type", type_wme) ||
+		!si->get_val(si->get_wme_val(type_wme), type))
+	{
 		return NULL;
 	}
-	if (!si->get_val(si->get_wme_val(type_wme), type)) {
+	
+	if (!si->find_child_wme(root, "name", name_wme) ||
+		!si->get_val(si->get_wme_val(name_wme), name))
+	{
 		return NULL;
 	}
 	

@@ -34,7 +34,7 @@ inline void splinter_update(double lvolt, double rvolt, double &lrps, double &rr
 	vel = orient.rotate(vec3((dleft + dright) / 2, 0, 0));
 	rotrate.z = (dright - dleft) / baseline; rotrate.x = 0; rotrate.y = 0;
 	pos = pos + vel;
-	rot = (orient * quaternion(rotrate)).to_rpy();
+	rot += rotrate;
 }
 
 #endif

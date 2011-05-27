@@ -118,6 +118,7 @@ bool cmd_utils::get_str_param(const string &name, string &val) {
 command *_make_extract_command_(svs_state *state, Symbol *root);
 command *_make_generate_command_(svs_state *state, Symbol *root);
 command *_make_control_command_(svs_state *state, Symbol *root);
+command *_make_model_command_(svs_state *state, Symbol *root);
 
 command* make_command(svs_state *state, wme *w) {
 	string name;
@@ -138,6 +139,8 @@ command* make_command(svs_state *state, wme *w) {
 		return _make_generate_command_(state, id);
 	} else if (name == "control") {
 		return _make_control_command_(state, id);
+	} else if (name == "model") {
+		return _make_model_command_(state, id);
 	}
 	return NULL;
 }

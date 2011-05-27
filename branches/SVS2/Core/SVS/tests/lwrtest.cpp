@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <assert.h>
 #include <math.h>
 #include <iostream>
@@ -5,11 +6,11 @@
 #include <vector>
 #include <utility>
 #include <iterator>
-#include <armadillo>
+#include <sstream>
 #include "lwr.h"
+#include "common.h"
 
 using namespace std;
-using namespace arma;
 
 void split(const string &s, const string &delims, vector<string> &result) {
 	int i = 0, j = 0;
@@ -20,28 +21,16 @@ void split(const string &s, const string &delims, vector<string> &result) {
 	result.push_back(s.substr(i));
 }
 
-void vectortovec(const vector<double> &v1, rowvec &v2) {
-	v2.reshape(1, v1.size());
-	copy(v1.begin(), v1.end(), v2.begin());
-}
-
-void strtovec(const string &s, rowvec &v) {
+void parsefloats(const string &s, vector<float> &v) {
 	stringstream ss(s);
-	vector<double> n;
 	double f;
 	
 	while (ss) {
 		if (!(ss >> f)) {
 			break;
 		}
-		n.push_back(f);
+		v.push_back(f);
 	}
-	vectortovec(n, v);
-}
-
-double dist(const rowvec& a, const rowvec& b) {
-	rowvec d = a - b;
-	return sqrt(dot(d, d));
 }
 
 int main(int argc, char *argv[]) {
@@ -64,13 +53,12 @@ int main(int argc, char *argv[]) {
 	
 	ifstream input(argv[3]);
 	if (!input) {
-		cerr << "couldn't open " << argv[2] << endl;
+		cerr << "couldn't open " << argv[3] << endl;
 		exit(1);
 	}
 	
 	while (true) {
 		vector<string> parts;
-		rowvec x, y;
 		
 		if (!getline(input, line)) {
 			break;
@@ -83,23 +71,41 @@ int main(int argc, char *argv[]) {
 		
 		split(line, ";", parts);
 		assert(parts.size() == 2);
-		strtovec(parts[0], x);
-		strtovec(parts[1], y);
+		
+		vector<float> x1, y1;
+		parsefloats(parts[0], x1);
+		parsefloats(parts[1], y1);
+		floatvec x2(x1), y2(y1);
 		
 		if (learning) {
 			if (!m) {
-				m = new lwr(x.n_elem, y.n_elem, nnbrs);
+				m = new lwr(x2.size(), y2.size(), nnbrs);
 			}
-			m->add(x, y);
+			m->add(x2, y2);
 		} else {
-			rowvec py;
-			m->predict(x, py, argv[1][0]);
-			diffs.push_back(dist(py, y));
+			floatvec py(y2.size());
+			m->predict(x2, py, argv[1][0], false);
+			diffs.push_back(sqrt(py.distsq(y2)));
 		}
 	}
-	rowvec diffv;
-	vectortovec(diffs, diffv);
-	cout << "MEAN: " << mean(diffv) << endl;
-	cout << "STD:  " << stddev(diffv) << endl;
+	
+	if (diffs.size() == 0) {
+		cout << "No predictions" << endl;
+		return 0;
+	}
+	
+	double mean = 0.0, std = 0.0;
+	for (int i = 0; i < diffs.size(); ++i) {
+		mean += diffs[i];
+	}
+	mean /= diffs.size();
+	
+	for (int i = 0; i < diffs.size(); ++i) {
+		std += pow(diffs[i] - mean, 2);
+	}
+	std = sqrt(std / diffs.size());
+	
+	cout << "MEAN: " << mean << endl;
+	cout << "STD:  " << std << endl;
 	return 0;
 }

@@ -21,7 +21,7 @@ bool out_dim_desc::operator==(const out_dim_desc &other) const {
 output::output() : desc(NULL) {}
 
 output::output(const outdesc *d)
-: desc(d), vals(d->size(), 0.0)
+: desc(d), vals(d->size())
 {
 	reset();
 }
@@ -32,11 +32,11 @@ output::output(const output &other)
 
 double output::get(const string &dim) const {
 	outdesc::const_iterator i;
-	vector<double>::const_iterator j;
+	int j;
 	
-	for (i = desc->begin(), j = vals.begin(); i != desc->end(); ++i, ++j) {
+	for (i = desc->begin(), j = 0; i != desc->end(); ++i, ++j) {
 		if (i->name == dim) {
-			return *j;
+			return vals[j];
 		}
 	}
 	assert(false);
@@ -44,11 +44,12 @@ double output::get(const string &dim) const {
 
 void output::set(const string &dim, double val) {
 	outdesc::const_iterator i;
-	vector<double>::iterator j;
+	int j;
 	
-	for (i = desc->begin(), j = vals.begin(); i != desc->end(); ++i, ++j) {
+	for (i = desc->begin(), j = 0; i != desc->end(); ++i, ++j) {
 		if (i->name == dim) {
-			*j = val;
+			vals[j] = val;
+			return;
 		}
 	}
 	assert(false);
@@ -56,13 +57,14 @@ void output::set(const string &dim, double val) {
 
 bool output::next() {
 	outdesc::const_iterator i;
-	vector<double>::iterator j;
-	for (i = desc->begin(), j = vals.begin(); i != desc->end(); ++i, ++j) {
-		*j += i->inc;
-		if (*j <= i->max) {
+	int j;
+	
+	for (i = desc->begin(), j = 0; i != desc->end(); ++i, ++j) {
+		vals[j] += i->inc;
+		if (vals[j] <= i->max) {
 			return true;
 		} else {
-			*j = i->min;  // roll over and move on to the next value
+			vals[j] = i->min;  // roll over and move on to the next value
 		}
 	}
 	return false;
@@ -70,19 +72,19 @@ bool output::next() {
 
 void output::reset() {
 	outdesc::const_iterator i;
-	vector<double>::iterator j;
-	for (i = desc->begin(), j = vals.begin(); i != desc->end(); ++i, ++j) {
-		*j = i->min;
+	int j;
+	for (i = desc->begin(), j = 0; i != desc->end(); ++i, ++j) {
+		vals[j] = i->min;
 	}
 }
 
 string output::serialize() const {
 	outdesc::const_iterator i;
-	vector<double>::const_iterator j;
+	int j;
 	stringstream ss;
 	
-	for (i = desc->begin(), j = vals.begin(); i != desc->end(); ++i, ++j) {
-		ss << i->name << " " << *j << endl;
+	for (i = desc->begin(), j = 0; i != desc->end(); ++i, ++j) {
+		ss << i->name << " " << vals[j] << endl;
 	}
 	return ss.str();
 }
@@ -102,9 +104,10 @@ int output::size() const {
 output random_out(const outdesc *d) {
 	output r(d);
 	outdesc::const_iterator i;
-	vector<double>::iterator j;
-	for (i = d->begin(), j = r.vals.begin(); i != d->end(); ++i, ++j) {
-		*j = i->min + ((i->max - i->min) * rand()) / RAND_MAX;
+	int j;
+	
+	for (i = d->begin(), j = 0; i != d->end(); ++i, ++j) {
+		r.vals[j] = i->min + ((i->max - i->min) * rand()) / RAND_MAX;
 	}
 	return r;
 }
@@ -126,15 +129,14 @@ trajectory::trajectory(int length, const outdesc *d)
 }
 
 void trajectory::from_vec(const vec &traj) {
-	int i = 0;
+	int i = 0, k;
 	vector<output>::iterator j;
-	vector<double>::iterator k;
 	
 	assert(traj.n_elem == desc->size() * length);
 	t.reserve(traj.n_elem / desc->size());
 	for (j = t.begin(); j != t.end(); ++j) {
-		for (k = j->vals.begin(); k != j->vals.end(); ++k, ++i) {
-			*k = traj(i);
+		for (k = 0; k < j->vals.size(); ++k, ++i) {
+			j->vals[k] = traj(i);
 		}
 	}
 }

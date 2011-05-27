@@ -3,13 +3,12 @@
 
 #include <string>
 #include <map>
-#include <set>
 #include "sg_node.h"
 #include "linalg.h"
+#include "common.h"
 
 typedef std::map<std::string, sg_node*> node_map;
 typedef std::map<std::string, double> property_map;
-typedef std::set<std::pair<std::string, std::string> > scene_sig;
 
 class scene {
 public:
@@ -22,6 +21,8 @@ public:
 	sg_node *get_node(std::string name);
 	// nodes will be in alphabetical name order
 	void get_all_nodes(std::vector<sg_node*> &nodes);
+	int num_nodes() const;
+	
 	bool add_node(std::string parent, sg_node *n);
 	bool add_node(std::string parent, std::string name);
 	bool add_node(std::string parent, std::string name, const ptlist &points);
@@ -30,6 +31,7 @@ public:
 	void clear();
 
 	double get_property(const std::string &prop) const;
+	int num_properties() const;
 	// properties will be in alphabetical name order
 	void get_all_properties(std::vector<std::pair<std::string, double> > &props) const;
 	void set_property(const std::string &prop, double val);
@@ -69,13 +71,14 @@ public:
 	bool set_property(const std::string &prop, double val);
 	int dof() const;
 	
-	void get_signature(scene_sig &sig) const;
+	void get_column_names(std::vector<std::string> &names) const;
+	
 	void update_scene(scene *scn) const;
 	
-	bool compare_sigs(const flat_scene &s) const;
+	bool congruent(const flat_scene &s) const;
 	double distance(const flat_scene &s) const;
 	
-	std::vector<double> vals;
+	floatvec vals;
 	
 private:
 	int get_trans_offset(const std::string &name, char type) const;

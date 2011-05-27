@@ -12,6 +12,7 @@ public:
 	
 	vec3();
 	vec3(double x, double y, double z);
+	vec3(double v[]);
 	vec3(const vec3 &v);
 	
 	double  operator[](int i) const;

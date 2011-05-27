@@ -7,7 +7,7 @@ then
 	exit 1
 fi
 
-python divide.py $1 $2 < "$4" > temp
+python divide.py $1 $2 "$4" > temp
 
 echo 'python ref:'
 python lwrtest.py $3 temp

@@ -1,5 +1,18 @@
 waitsnc -e
 
+sp {init
+	(state <s> ^superstate nil)
+-->
+	(<s> ^time 0)
+}
+
+sp {make-model
+	(state <s> ^superstate nil ^svs.command <c>)
+-->
+	(<c> ^model <mdl>)
+	(<mdl> ^name model1 ^type lwr)
+}
+
 sp {gen-target
 	(state <s>
 		^superstate nil
@@ -13,8 +26,8 @@ sp {gen-target
 	     ^points.type singleton
 	     ^pos <pos>)
 	(<pos> ^type vec3
-	       ^x 5.0
-	       ^y -5.0
+	       ^x 2.0
+	       ^y -2.0
 	       ^z 0.0)
 }
 
@@ -38,6 +51,38 @@ sp {cursor-target-int
 	(<b> ^type node ^name target)
 }
 
+sp {explore
+	(state <s>
+		^superstate nil
+		^svs.command <c>
+	)
+	-(<s> ^time >= 100)
+-->
+	(<c> ^control <ctl>)
+	(<ctl> ^type random
+	        ^outputs <out>)
+	(<out> ^left <left> ^right <right>)
+	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
+	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
+}
+
+sp {propose*count-time
+	(state <s> ^superstate nil ^time <t>)
+-->
+	(<s> ^operator <o> +)
+	(<o> ^name count-time)
+}
+
+sp {apply*count-time
+	(state <s>
+		^superstate nil
+		^time <t>
+		^operator.name count-time
+	)
+-->
+	(<s> ^time <t> - (+ <t> 1))
+}
+
 sp {seek-target
 	(state <s>
 		^superstate nil
@@ -49,13 +94,14 @@ sp {seek-target
 			)
 		)
 	)
+	-(<s> ^time < 100)
 -->
-	(<c> ^control <ctrl>)
-	(<ctrl> ^type naive
-	        ^depth 1
-	        ^outputs <out>
-	        ^objective <obj>
-	        ^model.type lwr)
+	(<c> ^control <ctl>)
+	(<ctl> ^type naive
+	       ^depth 1
+	       ^outputs <out>
+	       ^objective <obj>
+	       ^model model1)
 	(<out> ^left <left> ^right <right>)
 	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
 	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)

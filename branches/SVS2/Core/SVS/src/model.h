@@ -16,6 +16,6 @@ public:
 	virtual void learn(const flat_scene &pre, const output &out, const flat_scene &post) {}
 };
 
-model *parse_model_struct(soar_interface *si, Symbol *root);
+model *parse_model_struct(soar_interface *si, Symbol *root, std::string &name);
 
 #endif

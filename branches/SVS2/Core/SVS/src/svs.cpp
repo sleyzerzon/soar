@@ -285,28 +285,23 @@ void svs::pre_env_callback() {
 }
 
 void svs::update_models() {
-	std::list<model*>::iterator i;
+	std::map<string, model*>::iterator i;
 	flat_scene fs(state_stack.front()->get_scene());
 	
-	if (lastscene.dof() > 0 || lastscene.compare_sigs(fs)) {
+	if (lastscene.dof() > 0 || lastscene.congruent(fs)) {
 		for (i = models.begin(); i != models.end(); ++i) {
 			if (CHECK_MODELS) {
 				flat_scene predicted(lastscene);
-				if ((**i).predict(predicted, trajectory(next_out))) {
+				if (i->second->predict(predicted, trajectory(next_out))) {
 					cout << "Prediction Error: " << predicted.distance(fs) << endl;
 				} else {
 					cout << "No prediction" << endl;
 				}
 			}
-			(**i).learn(lastscene, next_out, fs);
+			i->second->learn(lastscene, next_out, fs);
 		}
 		ofstream log("model.log", ios_base::app);
-		copy(lastscene.vals.begin(), lastscene.vals.end(), ostream_iterator<double>(log, " "));
-		log << " ";
-		copy(next_out.vals.begin(), next_out.vals.end(), ostream_iterator<double>(log, " "));
-		log << " ; ";
-		copy(fs.vals.begin(), fs.vals.end(), ostream_iterator<double>(log, " "));
-		log << endl;
+		log << lastscene.vals << " " << next_out.vals << " ; " << fs.vals << endl;
 	}
 	lastscene = fs;
 }
@@ -346,11 +341,21 @@ void svs::set_next_output(const output &out) {
 	next_out = out;
 }
 
-void svs::register_model(model *m) {
-	models.push_back(m);
+void svs::register_model(const std::string &name, model *m) {
+	map<string, model*>::iterator i = models.find(name);
+	assert(i == models.end());
+	models[name] = m;
 }
 
-void svs::unregister_model(model *m) {
-	models.remove(m);
+model *svs::get_model(const std::string &name) {
+	map<string, model*>::iterator i = models.find(name);
+	if (i == models.end()) {
+		return NULL;
+	}
+	return i->second;
+}
+
+void svs::unregister_model(const std::string &name) {
+	models.erase(name);
 }
 
