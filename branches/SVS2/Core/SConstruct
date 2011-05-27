@@ -70,8 +70,8 @@ AddOption('--cxx', action='store', type='string', dest='cxx', default='g++', nar
 AddOption('--build-warnings', action='store', type='choice', choices=['none','all','error'], dest='build-warnings', default='error', nargs=1, metavar='WARN_LEVEL',
 	help='Set warning level when building. Must be one of none, all, error (default).')
 
-AddOption('--optimization', action='store', type='choice', choices=['none','partial','full'], dest='optimization', default='none', nargs=1, metavar='LEVEL',
-	help='Set optimization level. Must be one of none, partial, full (default).')
+AddOption('--optimization', action='store', type='choice', choices=['0','1','2','3'], dest='optimization', default='0', nargs=1, metavar='LEVEL',
+	help='Set optimization level. 0 means no optimization.')
 
 AddOption('--platform', action='store', type='choice', choices=['32','64'], dest='platform', default=m64_default, nargs=1, metavar='PLATFORM',
 	help='Target platform. Must be one of 32, 64. Default is detected system architecture.')
@@ -186,10 +186,8 @@ if GetOption('build-warnings') == 'all':
 elif GetOption('build-warnings') == 'error':
 	env.Append(CPPFLAGS = ['-Werror'])
 
-if GetOption('optimization') == 'partial':
-	env.Append(CPPFLAGS = ['-O2'])
-elif GetOption('optimization') == 'full':
-	env.Append(CPPFLAGS = ['-O3'])
+if GetOption('optimization') != '0':
+	env.Append(CPPFLAGS = ['-O' + GetOption('optimization')])
 
 if GetOption('preprocessor'):
 	env.Append(CPPFLAGS = ['-E'])

@@ -320,7 +320,7 @@ public:
 	}
 	
 	bool naive_seek(scene *scn, output &bestout) {
-		double val, best = INF;
+		double val, best;
 		bool found = false;
 		model *mdl = svsp->get_model(modelname);
 		
@@ -337,7 +337,7 @@ public:
 				bestout = random_out(&odesc);
 				return true;
 			}
-			if (val < best) {
+			if (!found || val < best) {
 				found = true;
 				bestout = trj.t.front();
 				best = val;

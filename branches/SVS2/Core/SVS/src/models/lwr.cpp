@@ -180,7 +180,7 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 	
 	tnn.start();
 	naive_knn(xn, xnorm, k, neighbors);
-	cout << "NN:  " << tnn.stop() << endl;
+	//cout << "NN:  " << tnn.stop() << endl;
 	
 	X.reshape(k, xdim);
 	Y.reshape(k, ydim);
@@ -258,7 +258,7 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 		y[ydi[i]] = yd(i);
 	}
 	
-	cout << "ALL: " << tall.stop() << endl;
+	//cout << "ALL: " << tall.stop() << endl;
 	return true;
 }
 

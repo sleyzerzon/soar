@@ -152,10 +152,11 @@ bool trajectory::next() {
 	vector<output>::iterator i;
 	for (i = t.begin(); i != t.end(); ++i) {
 		if (i->next()) {
-			break;
+			return true;
 		}
 		i->reset();
 	}
+	return false;
 }
 
 int trajectory::dof() {

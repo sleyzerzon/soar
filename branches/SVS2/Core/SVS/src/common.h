@@ -74,7 +74,12 @@ public:
 	}
 	
 	void operator=(const floatvec &v) {
-		assert(sz == v.sz);
+		if (sz != v.sz) {
+			sz = v.sz;
+			delete [] mem;
+			mem = new float[sz];
+			end = mem + sz;
+		}
 		memcpy(mem, v.mem, sz * sizeof(float));
 	}
 	

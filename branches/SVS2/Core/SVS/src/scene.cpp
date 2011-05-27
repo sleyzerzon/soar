@@ -353,7 +353,7 @@ flat_scene::flat_scene(const flat_scene &s)
 {}
 
 flat_scene::flat_scene(scene *scn) 
-: vals(scn->num_nodes() - 1 + scn->num_properties())  // -1 for world
+: vals(9 * (scn->num_nodes() - 1) + scn->num_properties())  // -1 for world
 {
 	vector<sg_node*> nodes;
 	vector<sg_node*>::iterator n;
