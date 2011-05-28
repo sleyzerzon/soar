@@ -13,7 +13,7 @@ public:
 	   example is encoded as a pair of vectors (x, y) where
 	   x = [prev_state, output], y = [next_state]
 	*/
-	virtual void learn(const flat_scene &pre, const output &out, const flat_scene &post) {}
+	virtual void learn(const flat_scene &pre, const output &out, const flat_scene &post, float dt) {}
 };
 
 model *parse_model_struct(soar_interface *si, Symbol *root, std::string &name);

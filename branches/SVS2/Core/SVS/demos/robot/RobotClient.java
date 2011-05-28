@@ -11,6 +11,22 @@ public class RobotClient implements LCMSubscriber {
 	pose_t pose;
 	map_metadata_t map;
 	boolean mapreceived, mapwritten, posechanged;
+	double rotz;
+
+	public static void perror(Exception err) {
+		System.err.println(err);
+		System.exit(1);
+	}
+	
+	public static boolean close(double a, double b) {
+		double tol = Math.abs(0.001 * a);
+		return (a - tol <= b) && (b <= a + tol);
+	}
+	
+	public static void main(String args[]) {
+		RobotClient r = new RobotClient();
+		r.run();
+	}
 	
 	RobotClient() {
 		pose = null;
@@ -22,6 +38,7 @@ public class RobotClient implements LCMSubscriber {
 		mapreceived = false;
 		mapwritten = false;
 		posechanged = false;
+		rotz = Double.NaN;
 	}
 	
 	public void messageReceived(LCM lcm, String channel, LCMDataInputStream ins) {
@@ -44,24 +61,18 @@ public class RobotClient implements LCMSubscriber {
 		System.out.println("a splinter world v -1 -1 0 1 -1 0 1 1 0 -1 1 0");
 	}
 	
-	public void writePose() {
-		if (!posechanged) {
-			return;
-		}
-		posechanged  = false;
-		
+	public void writePose(pose_t p) {
 		Formatter fmt = new Formatter();
-		pose_t p;
-		
-		if (pose == null) {
-			return;
-		}
-		synchronized (this) {
-			p = pose.copy();
-		}
-		
 		double rot[] = LinAlg.quatToRollPitchYaw(p.orientation);
-		fmt.format("c splinter p %g %g %g r %g %g %g\n", p.pos[0], p.pos[1], p.pos[2], rot[0], rot[1], rot[2]);
+		
+		if (Double.isNaN(rotz)) {
+			rotz = rot[2];
+		} else {
+			rotz = rotz + p.rotation_rate[2];
+		}
+		assert close(rotz % (2 * Math.PI), rot[2]);
+		
+		fmt.format("c splinter p %g %g %g r 0.0 0.0 %g\n", p.pos[0], p.pos[1], p.pos[2], rotz);
 		for (int i = 0; i < p.vel.length; ++i) {
 			fmt.format("p vel_%d %g\n", i, p.vel[i]);
 		}
@@ -144,29 +155,30 @@ public class RobotClient implements LCMSubscriber {
 		return true;
 	}
 
-	public static void perror(Exception err) {
-		System.err.println(err);
-		System.exit(1);
-	}
-	
-	public static void main(String args[]) {
-		RobotClient r = new RobotClient();
-		double dt = 0.02;
-		long lasttime = -1, currtime;
+	public void run() {
+		long lasttime = -1;
+		pose_t p;
 		
-		r.writeInitialPose();
+		writeInitialPose();
 		while (true) {
-			currtime = TimeUtil.mstime() / 1000;
-			if (lasttime > 0) {
-				dt = currtime - lasttime;
+			if (posechanged && pose != null) {
+				posechanged = false;
+				
+				synchronized (this) {
+					p = pose.copy();
+				}
+				
+				if (lasttime > 0) {
+					System.out.println("t " + (p.utime - lasttime));
+				}
+				lasttime = p.utime;
+				
+				writeMap();
+				writePose(p);
 			}
-			lasttime = currtime;
-			
-			r.writeMap();
-			r.writePose();
-			System.out.println("p dt " + dt);
 			System.out.println("***");
-			r.readInput();
+			readInput();
 		}
 	}
+	
 }

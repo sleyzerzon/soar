@@ -35,6 +35,7 @@ public:
 	// properties will be in alphabetical name order
 	void get_all_properties(std::vector<std::pair<std::string, double> > &props) const;
 	void set_property(const std::string &prop, double val);
+	double get_dt() const;
 	
 	void parse_sgel(const std::string &s);
 	
@@ -49,6 +50,7 @@ private:
 	int  parse_del(std::vector<std::string> &f);
 	int  parse_change(std::vector<std::string> &f);
     int  parse_property(std::vector<std::string> &f);
+    int  parse_dt(std::vector<std::string> &f);
     bool parse_transforms(std::vector<std::string> &f, int &start);
 
 	std::string   name;
@@ -57,6 +59,7 @@ private:
 	node_map      nodes;
 	property_map  properties;
 	bool          iscopy;
+	double        dt;          // time passed since last update (as reported by environment)
 };
 
 class flat_scene {

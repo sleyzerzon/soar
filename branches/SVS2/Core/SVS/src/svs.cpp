@@ -286,24 +286,25 @@ void svs::pre_env_callback() {
 
 void svs::update_models() {
 	std::map<string, model*>::iterator i;
-	flat_scene fs(state_stack.front()->get_scene());
+	flat_scene curr(state_stack.front()->get_scene());
+	double dt = state_stack.front()->get_scene()->get_dt();
 	
-	if (lastscene.dof() > 0 || lastscene.congruent(fs)) {
+	if (lastscene.dof() > 0 || lastscene.congruent(curr)) {
 		for (i = models.begin(); i != models.end(); ++i) {
 			if (CHECK_MODELS) {
 				flat_scene predicted(lastscene);
 				if (i->second->predict(predicted, trajectory(next_out))) {
-					cout << "Prediction Error: " << predicted.distance(fs) << endl;
+					cout << "Prediction Error: " << predicted.distance(curr) << endl;
 				} else {
 					cout << "No prediction" << endl;
 				}
 			}
-			i->second->learn(lastscene, next_out, fs);
+			i->second->learn(lastscene, next_out, curr, dt);
 		}
 		ofstream log("model.log", ios_base::app);
-		log << lastscene.vals << " " << next_out.vals << " ; " << fs.vals << endl;
+		log << lastscene.vals << " " << next_out.vals << " ; " << curr.vals << endl;
 	}
-	lastscene = fs;
+	lastscene = curr;
 }
 
 void svs::post_env_callback() {

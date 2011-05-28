@@ -10,7 +10,24 @@ sp {make-model
 	(state <s> ^superstate nil ^svs.command <c>)
 -->
 	(<c> ^model <mdl>)
-	(<mdl> ^name model1 ^type lwr)
+	(<mdl> ^name model1 
+	       ^type lwr
+	       ^num-neighbors 20)
+}
+
+sp {gen-distractor
+	(state <s>
+		^superstate nil
+		^svs.command <c>)
+-->
+	(<c> ^generate <g>)
+	(<g> ^parent world
+	     ^node <n>)
+	(<n> ^type gen
+	     ^name distractor
+	     ^points.type singleton
+	     ^pos <pos>)
+	(<pos> ^x 0.0 ^y 0.0 ^z 0.0)
 }
 
 sp {gen-target
@@ -26,8 +43,8 @@ sp {gen-target
 	     ^points.type singleton
 	     ^pos <pos>)
 	(<pos> ^type vec3
-	       ^x 2.0
-	       ^y -2.0
+	       ^x 5.0
+	       ^y -5.0
 	       ^z 0.0)
 }
 
@@ -97,8 +114,8 @@ sp {seek-target
 	-(<s> ^time < 100)
 -->
 	(<c> ^control <ctl>)
-	(<ctl> ^type naive
-	       ^depth 1
+	(<ctl> ^type simplex
+	       ^depth 5
 	       ^outputs <out>
 	       ^objective <obj>
 	       ^model model1)

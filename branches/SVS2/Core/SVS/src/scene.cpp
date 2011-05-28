@@ -15,7 +15,7 @@ using namespace std;
 ipcsocket *disp = NULL;
 
 scene::scene(string name, string rootname) 
-: name(name), rootname(rootname), iscopy(false)
+: name(name), rootname(rootname), iscopy(false), dt(1.0)
 {
 	if (!disp) {
 		disp = new ipcsocket(getnamespace() + "disp", false);
@@ -26,7 +26,7 @@ scene::scene(string name, string rootname)
 }
 
 scene::scene(scene &other)
-: name(other.name), rootname(other.rootname), iscopy(true), properties(other.properties)
+: name(other.name), rootname(other.rootname), iscopy(true), properties(other.properties), dt(other.dt)
 {
 	std::list<sg_node*> all_nodes;
 	std::list<sg_node*>::iterator i;
@@ -241,6 +241,18 @@ int scene::parse_property(vector<string> &f) {
 	return -1;
 }
 
+int scene::parse_dt(vector<string> &f) {
+	if (f.size() != 1) {
+		return f.size();
+	}
+	stringstream ss(f[0]);
+	
+	if (!(ss >> dt)) {
+		return 1;
+	}
+	return -1;
+}
+
 void scene::parse_sgel(const string &s) {
 	vector<string> lines, fields;
 	vector<string>::iterator i;
@@ -274,8 +286,11 @@ void scene::parse_sgel(const string &s) {
 			case 'p':
 				errfield = parse_property(fields);
 				break;
+			case 't':
+				errfield = parse_dt(fields);
+				break;
 			default:
-				cerr << "expecting a|d|c at beginning of line '" << *i << "'" << endl;
+				cerr << "expecting a|d|c|p|t at beginning of line '" << *i << "'" << endl;
 				exit(1);
 		}
 		
@@ -344,6 +359,10 @@ int scene::num_properties() const {
 
 int scene::num_nodes() const {
 	return nodes.size();
+}
+
+double scene::get_dt() const {
+	return dt;
 }
 
 flat_scene::flat_scene() {}

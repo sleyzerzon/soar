@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <string>
@@ -15,13 +16,13 @@ public:
 	floatvec() : mem(NULL), end(NULL), sz(0) {}
 	
 	floatvec(const floatvec &v) : sz(v.sz) { 
-		mem = new float[sz];
+		mem = (float *) malloc(sz * sizeof(float));
 		end = mem + sz;
 		memcpy(mem, v.mem, sizeof(float) * sz);
 	}
 	
 	floatvec(int sz) : sz(sz) {
-		mem = new float[sz];
+		mem = (float *) malloc(sz * sizeof(float));
 		end = mem + sz;
 	}
 	
@@ -30,7 +31,7 @@ public:
 		std::vector<float>::const_iterator p2;
 		
 		sz = v.size();
-		mem = new float[sz];
+		mem = (float *) malloc(sz * sizeof(float));
 		end = mem + sz;
 		for (p1 = mem, p2 = v.begin(); p1 != end; ++p1, ++p2) {
 			*p1 = *p2;
@@ -38,10 +39,12 @@ public:
 	}
 	
 	~floatvec() {
-		delete[] mem;
+		free(mem);
 	}
 	
 	float distsq(const floatvec &v) const {
+		assert(sz == v.sz);
+		
 		float *p1, *p2;
 		double s, d;
 		for(p1 = mem, p2 = v.mem; p1 != end; ++p1, ++p2) {
@@ -63,6 +66,20 @@ public:
 		}
 	}
 	
+	void resize(int size) {
+		sz = size;
+		mem = (float*) realloc(mem, sz * sizeof(float));
+		end = mem + sz;
+	}
+	
+	float sum() const {
+		float s = 0.0, *p;
+		for (p = mem; p != end; ++p) {
+			s += *p;
+		}
+		return s;
+	}
+	
 	float &operator[](int i) {
 		assert(i >= 0 && i < sz);
 		return mem[i];
@@ -76,8 +93,8 @@ public:
 	void operator=(const floatvec &v) {
 		if (sz != v.sz) {
 			sz = v.sz;
-			delete [] mem;
-			mem = new float[sz];
+			free(mem);
+			mem = (float*) malloc(sizeof(float) * sz);
 			end = mem + sz;
 		}
 		memcpy(mem, v.mem, sz * sizeof(float));
@@ -94,6 +111,15 @@ public:
 		}
 	}
 	
+	void operator+=(const floatvec &v) {
+		assert(sz == v.sz);
+		float *p1, *p2;
+		
+		for(p1 = mem, p2 = v.mem; p1 != end; ++p1, ++p2) {
+			*p1 += *p2;
+		}
+	}
+	
 	void operator-=(const floatvec &v) {
 		assert(sz == v.sz);
 		float *p1, *p2;
@@ -103,12 +129,33 @@ public:
 		}
 	}
 	
+	void operator*=(const floatvec &v) {
+		assert(sz == v.sz);
+		float *p1, *p2;
+		
+		for(p1 = mem, p2 = v.mem; p1 != end; ++p1, ++p2) {
+			*p1 *= *p2;
+		}
+	}
+	
+	void operator*=(float v) {
+		for(float *p = mem; p != end; ++p) {
+			*p *= v;
+		}
+	}
+	
 	void operator/=(const floatvec &v) {
 		assert(sz == v.sz);
 		float *p1, *p2;
 		
 		for(p1 = mem, p2 = v.mem; p1 != end; ++p1, ++p2) {
 			*p1 /= *p2;
+		}
+	}
+	
+	void operator/=(float v) {
+		for(float *p = mem; p != end; ++p) {
+			*p /= v;
 		}
 	}
 	
