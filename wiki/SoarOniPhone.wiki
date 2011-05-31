@@ -18,7 +18,7 @@ The easiest way to do this is to download a release and point XCode to the "incl
 The basic process is to compile Soar statically for an iPhone-specific architecture and SDK:
 
   # Checkout Core from SVN
-  # `make ios-simulator` or `make ios-device`
+  # `make ios-simulator` or `make ios-armv6` or `make ios-armv7`
 
 All lib`*`.a files in the out/lib folder should be added to your project (drag+drop), except for SQLite.
 
