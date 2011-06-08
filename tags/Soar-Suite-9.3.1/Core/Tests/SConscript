@@ -1,0 +1,34 @@
+#!/usr/bin/python
+# Project: Soar <http://soar.googlecode.com>
+# Author: Jonathan Voigt <voigtjr@gmail.com>
+#
+import sys
+
+Import('env')
+clone = env.Clone()
+
+clone.Prepend(CPPPATH = Split('src #ClientSML/src #KernelSML/src #CLI/src #SoarKernel/src #ElementXML/src #ConnectionSML/src'))
+
+libadd = Split('ClientSML ConnectionSML ElementXML SoarKernelSML SoarKernel CommandLineInterface sqlite3')
+
+if sys.platform == "darwin":
+	if GetOption('platform') == '64':
+		libadd.append('cppunit-osx-64')
+	else:
+		libadd.append('cppunit-osx')
+else:
+	if GetOption('platform') == '64':
+		libadd.append('cppunit-linux-64')
+	else:
+		libadd.append('cppunit-linux')
+libpath = Split('$PREFIX/lib lib') 
+clone.Append(LIBS = libadd, LIBPATH = libpath)
+
+Tests = clone.Program('Tests', Glob('src/*.cpp'))
+
+env.Install('$PREFIX/bin', Tests)
+
+# Install resources
+Import('InstallDir')
+InstallDir(Tests, '$PREFIX/share/soar/Tests', '#Tests/Agents')
+
