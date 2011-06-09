@@ -38,8 +38,12 @@ XCode needs one more, which must go before the others:
 
   * portability.h
 
-= Demo Application =
+= Downloads =
 
-The following link allows you to download a self-contained sample application that works out-of-the-box on the iOS simulator.
+The following link contains all include files from the 9.3.1 release, as well as built libraries for the iOS simulator, armv6, and armv7 architectures. It has been tested with iOS 4.3.
+
+[http://www.eecs.umich.edu/~soar/sitemaker/misc/Soar931-iOS43.tar.gz Soar931-iOS43]
+
+The following link allows you to download a self-contained sample application that works out-of-the-box on the iOS simulator (it has copies of the includes and simulator libs from the previous link).
 
 [http://www.eecs.umich.edu/~soar/sitemaker/misc/ios-example.tar.gz iSoar]
