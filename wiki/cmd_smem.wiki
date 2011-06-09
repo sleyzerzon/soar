@@ -98,6 +98,8 @@ most detailed and resulting in all timers being turned on.  Note that
 none of the semantic memory statistics nor timing information is
 reported by the `stats` command.
 
+All timer values are reported in seconds.
+
 Level one
 
 || `_total` || Total smem operations ||
