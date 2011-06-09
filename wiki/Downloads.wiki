@@ -5,7 +5,7 @@
 
 The current stable version of Soar is *9.3.1*.
 
-This release of Soar continues the 9.3 line which includes modules for reinforcement learning, episodic memory, semantic memory, and working memory activation, as well as everything from previous versions of Soar. All learning mechanisms are disabled by default. This release is primarily a bug fix release.
+This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes many bugfixes, a major reworking of working memory activation, and under-the-hood improvements to support very long agent runs. All learning mechanisms are disabled by default.
 
 Downloading and installing [http://java.sun.com Java] is recommended since most users will want to use the Soar Java Debugger and other Soar components written in Java. The [http://java.sun.com/javase/downloads/index.jsp latest version of the Sun JRE or JDK] is recommended. 
 
