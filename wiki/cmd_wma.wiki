@@ -117,6 +117,8 @@ most detailed and resulting in all timers being turned on.  Note that
 none of the working memory activation statistics nor timing information is
 reported by the `stats` command.
 
+All timer values are reported in seconds.
+
 Level one
 
 || `wma_forgetting` || Time to process forgetting operations each cycle ||
