@@ -10,7 +10,9 @@ Soar 9.3.1 Release Notes, June 2011
 
 This release of Soar continues the 9.3 line which includes modules for
 reinforcement learning (RL), episodic memory (EpMem), and semantic
-memory (SMem), as well as everything from previous versions of Soar. It includes many bugfixes, a major reworking of working memory activation, and under-the-hood improvements to support very long agent runs. All
+memory (SMem), as well as everything from previous versions of Soar. It
+includes many bugfixes, a major reworking of working memory activation,
+and under-the-hood improvements to support very long agent runs. All
 learning mechanisms are disabled by default.
 
 Soar can be downloaded from the Soar home page at:
