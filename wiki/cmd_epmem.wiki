@@ -126,6 +126,8 @@ Available statistics are:
 || `mem-usage` || Memory Usage || Current SQLite memory usage in bytes ||
 || `mem-high` || Memory Highwater || High SQLite memory usage watermark in bytes ||
 || `queries` || Queries || Number of times the *query* command has been processed ||
+|| `nexts` || Nexts || Number of times the *next* command has been processed ||
+|| `prevs` || Prevs || Number of times the *previous* command has been processed ||
 || `ncb-wmes` || Last Retrieval WMEs || Number of WMEs added to working memory in last reconstruction ||
 || `qry-pos` || Last Query Positive || Number of leaf WMEs in the *query* cue of last cue-based retrieval ||
 || `qry-neg` || Last Query Negative || Number of leaf WMEs in the *neg-query* cue of the last cue-based retrieval ||
