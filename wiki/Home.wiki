@@ -12,7 +12,7 @@ Visit the [http://sitemaker.umich.edu/soar Soar home page] for news and general 
 
 = Soar Manual =
 
-The Soar Users Manual is available here: http://soar.googlecode.com/svn/tags/Soar-Suite-9.3.0/Core/Documentation/SoarManual.pdf
+The Soar Users Manual is available here: http://soar.googlecode.com/svn/tags/Soar-Suite-9.3.1/Core/Documentation/SoarManual.pdf
 
 = Tutorial =
 
