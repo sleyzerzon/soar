@@ -1,0 +1,23 @@
+#summary max-goal-depth command documentation
+= max-goal-depth =
+
+Limit the sub-state stack depth.
+
+== Synopsis ==
+
+{{{
+max-goal-depth [n]
+}}}
+
+== Options ==
+
+|| `n` || Maximum depth of sub-states allowed. ||
+
+== Description ==
+
+The max-goal-depth command is used to limit the maximum depth of sub-states. 
+The initial value of this variable is 100; allowable settings are any integer greater than 0.
+
+This limit is included in Soar to prevent getting stuck in an infinite recursive loop, which
+may come about due to deliberate actions or via an agent bug, such as dropping inadvertently 
+to state-no-change impasses.
