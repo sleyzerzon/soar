@@ -36,6 +36,7 @@ listed with each command's synopsis under "Default Aliases".
  * [cmd_max_chunks max-chunks]
  * [cmd_max_dc_time max-dc-time]
  * [cmd_max_elaborations max-elaborations]
+ * [cmd_max_goal_depth max-goal-depth]
  * [cmd_max_memory_usage max-memory-usage]
  * [cmd_max_nil_output_cycles max-nil-output-cycles]
  * [cmd_memories memories]
