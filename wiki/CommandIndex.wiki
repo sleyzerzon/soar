@@ -52,7 +52,6 @@ listed with each command's synopsis under "Default Aliases".
  * [cmd_pushd pushd]
  * [cmd_pwatch pwatch]
  * [cmd_pwd pwd]
- * [cmd_quit quit]
  * [cmd_rand rand]
  * [cmd_remove_wme remove-wme]
  * [cmd_replay_input replay-input]
