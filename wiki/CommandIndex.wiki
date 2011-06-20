@@ -1,4 +1,5 @@
 #summary Index of CLI commands
+#labels Featured
 
 When issuing commands, the command name can be shortened so long as there is no
 ambiguity (e.g., `pref` instead of `preferences`). Arbitrary aliases may also
