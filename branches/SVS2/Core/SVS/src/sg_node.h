@@ -33,7 +33,6 @@ public:
 
 	virtual void        set_trans(char type, vec3 trans) = 0;
 	virtual vec3        get_trans(char type) = 0;
-	virtual vec3        get_world_trans(char type) = 0;
 	
 	virtual void        get_local_points(ptlist &result) = 0;
 	virtual void        get_world_points(ptlist &result) = 0;

@@ -18,6 +18,7 @@ public:
 	// nodes will be in alphabetical name order
 	void get_all_nodes(std::vector<sg_node*> &nodes);
 	int num_nodes() const;
+	int get_dof() const;
 	
 	bool add_node(std::string parent, sg_node *n);
 	bool add_node(std::string parent, std::string name);
@@ -26,11 +27,11 @@ public:
 	bool set_node_trans(std::string name, char type, vec3 trans);
 	void clear();
 
-	double get_property(const std::string &obj, const std::string &prop) const;
-	void get_node_properties(const std::string &obj, std::map<std::string, std::double> &props) const;
-	void set_property(const std::string &obj, const std::string &prop, double val);
+	float get_property(const std::string &obj, const std::string &prop) const;
+	void get_node_properties(const std::string &obj, std::map<std::string, float> &props) const;
+	void set_property(const std::string &obj, const std::string &prop, float val);
 	
-	double get_dt() const;
+	float get_dt() const;
 	
 	void parse_sgel(const std::string &s);
 	
@@ -48,7 +49,7 @@ private:
     bool parse_transforms(std::vector<std::string> &f, int &start);
 	
 	typedef std::map<std::string, sg_node*> node_map;
-	typedef std::map<std::pair<std::string, std::string>, double> property_map;
+	typedef std::map<std::pair<std::string, std::string>, float> property_map;
 
 	std::string   name;
 	std::string   rootname;
@@ -56,7 +57,7 @@ private:
 	node_map      nodes;
 	property_map  properties;
 	bool          iscopy;
-	double        dt;          // time passed since last update (as reported by environment)
+	float         dt;          // time passed since last update (as reported by environment)
 };
 
 class flat_scene {
@@ -68,19 +69,18 @@ public:
 	bool get_node_trans(const std::string &name, vec3 &p, vec3 &r, vec3 &s) const;
 	bool get_node_trans(const std::string &name, char type, vec3 &t) const;
 	bool set_node_trans(const std::string &name, char type, const vec3 &t);
-	bool get_property(const std::string &name, const std::string &prop, double &val) const;
-	bool set_property(const std::string &name, const std::string &prop, double val);
+	bool get_property(const std::string &name, const std::string &prop, float &val) const;
+	bool set_property(const std::string &name, const std::string &prop, float val);
 	int get_dof() const;
-	void get_nodes(std::vector<std::string> &nodes);
+	void get_nodes(std::vector<std::string> &nodes) const;
 	
 	void get_column_names(std::vector<std::string> &names) const;
 	
 	void update_scene(scene *scn) const;
 	
 	bool congruent(const flat_scene &s) const;
-	double distance(const flat_scene &s) const;
-	
-	floatvec get_nodes_vals(const std::string &name);
+	float distance(const flat_scene &s) const;
+	floatvec get_node_vals(const std::string &name) const;
 	
 	floatvec vals;
 	
@@ -91,10 +91,17 @@ private:
 		std::string parent;
 		int begin;
 		int length;
+		
+		bool operator==(const node_info &n) const {
+			return parent == n.parent && begin == n.begin && length == n.length;
+		}
 	};
 	
-	std::map<std::string, node_info> node_table; // node name -> (parent name, index)
-	std::map<std::pair<std::string, std::string>, int> prop_table; // property name -> index
+	typedef std::map<std::string, node_info> node_table;
+	typedef std::map<std::pair<std::string, std::string>, int> prop_table;
+	
+	node_table nodes;
+	prop_table properties;
 };
 
 #endif

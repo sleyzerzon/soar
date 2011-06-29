@@ -119,7 +119,7 @@ void scene::clear() {
 	}
 }
 
-bool parse_n_floats(vector<string> &f, int &start, int n, double *x) {
+bool parse_n_floats(vector<string> &f, int &start, int n, float *x) {
 	stringstream ss;
 	if (start + n > f.size()) {
 		start = f.size();
@@ -135,7 +135,7 @@ bool parse_n_floats(vector<string> &f, int &start, int n, double *x) {
 }
 
 bool parse_verts(vector<string> &f, int &start, ptlist &verts) {
-	double x[3];
+	float x[3];
 	verts.clear();
 	int i;
 	if (start >= f.size() || f[start] != "v") {
@@ -153,7 +153,7 @@ bool parse_verts(vector<string> &f, int &start, ptlist &verts) {
 }
 
 bool scene::parse_transforms(vector<string> &f, int &start) {
-	double x[3];
+	float x[3];
 	char type;
 	while (start < f.size()) {
 		if (f[start] != "p" && f[start] != "r" && f[start] != "s") {
@@ -232,7 +232,7 @@ int scene::parse_property(vector<string> &f) {
 		return f.size();
 	}
 	stringstream ss(f[2]);
-	double val;
+	float val;
 	
 	if (!(ss >> val)) {
 		return 1;
@@ -332,7 +332,7 @@ void scene::disp_del_scene(string name) {
 	if (disp) disp->send("delscene\n" + name);
 }
 
-double scene::get_property(const string &obj, const string &prop) const {
+float scene::get_property(const string &obj, const string &prop) const {
 	property_map::const_iterator i;
 	if ((i = properties.find(make_pair(obj, prop))) == properties.end()) {
 		assert(false);
@@ -340,7 +340,7 @@ double scene::get_property(const string &obj, const string &prop) const {
 	return i->second;
 }
 
-void scene::get_node_properties(const string &obj, map<string, double> &props) const {
+void scene::get_node_properties(const string &obj, map<string, float> &props) const {
 	property_map::const_iterator i;
 	for (i = properties.begin(); i != properties.end(); ++i) {
 		if (i->first.first == obj) {
@@ -349,7 +349,7 @@ void scene::get_node_properties(const string &obj, map<string, double> &props) c
 	}
 }
 
-void scene::set_property(const string &obj, const string &prop, double v) {
+void scene::set_property(const string &obj, const string &prop, float v) {
 	pair<string, string> key = make_pair(obj, prop);
 	property_map::iterator i;
 	if ((i = properties.find(key)) == properties.end()) {
@@ -363,33 +363,33 @@ int scene::num_nodes() const {
 	return nodes.size();
 }
 
-double scene::get_dt() const {
+float scene::get_dt() const {
 	return dt;
 }
 
 int scene::get_dof() const {
-	return (nodes.size() - 1) * 9 + properties.size() // -1 for world
+	return (nodes.size() - 1) * 9 + properties.size(); // -1 for world
 }
 
 flat_scene::flat_scene() {}
 
 flat_scene::flat_scene(const flat_scene &s) 
-: vals(s.vals), node_table(s.node_table), prop_table(s.prop_table)
+: vals(s.vals), nodes(s.nodes), properties(s.properties)
 {}
 
 flat_scene::flat_scene(scene *scn) : vals(scn->get_dof()) {
-	vector<sg_node*> nodes;
+	vector<sg_node*> ns;
 	vector<sg_node*>::iterator n;
 	const char *types = "prs";
 	vec3 trans;
 	int i, j, k;
 	
-	scn->get_all_nodes(nodes);
+	scn->get_all_nodes(ns);
 	
 	i = 0;
-	for (n = nodes.begin(); n != nodes.end(); ++n) {
+	for (n = ns.begin(); n != ns.end(); ++n) {
 		string name = (**n).get_name();
-		node_info &info = node_table[name];
+		node_info &info = nodes[name];
 		info.begin = i;
 		sg_node *parent = (**n).get_parent();
 		if (parent) {
@@ -405,11 +405,11 @@ flat_scene::flat_scene(scene *scn) : vals(scn->get_dof()) {
 			info.parent = "";
 		}
 		
-		map<string, double> props;
-		map<string, double>::iterator pi;
+		map<string, float> props;
+		map<string, float>::iterator pi;
 		scn->get_node_properties(name, props);
 		for (pi = props.begin(); pi != props.end(); ++pi) {
-			prop_table[make_pair(name, pi->first)] = i;
+			properties[make_pair(name, pi->first)] = i;
 			vals[i++] = pi->second;
 		}
 		info.length = i - info.begin;
@@ -417,8 +417,8 @@ flat_scene::flat_scene(scene *scn) : vals(scn->get_dof()) {
 }
 
 int flat_scene::get_trans_offset(const string &name, char type) const {
-	map<string, pair<string, int> >::const_iterator i;
-	if ((i = node_table.find(name)) == node_table.end()) {
+	map<string, node_info>::const_iterator i;
+	if ((i = nodes.find(name)) == nodes.end()) {
 		return -1;
 	}
 	switch (type) {
@@ -445,17 +445,20 @@ bool flat_scene::get_node_trans(const string &name, char type, vec3 &t) const {
 }
 
 bool flat_scene::get_node_trans(const string &name, vec3 &p, vec3 &r, vec3 &s) const {
-	int i, offset = get_trans_offset(name, type);
-	if (offset < 0) return false;
+	map<string, node_info>::const_iterator i = nodes.find(name);
+	if (i == nodes.end()) {
+		return false;
+	}
+	int j, offset = i->second.begin;
 	
-	for (i = 0; i < 3; ++i) {
-		p[i] = vals[offset + i];
+	for (j = 0; j < 3; ++j) {
+		p[j] = vals[offset + j];
 	}
-	for (i = 0; i < 3; ++i) {
-		r[i] = vals[offset + 3 + i];
+	for (j = 0; j < 3; ++j) {
+		r[j] = vals[offset + 3 + j];
 	}
-	for (i = 0; i < 3; ++i) {
-		s[i] = vals[offset + 6 + i];
+	for (j = 0; j < 3; ++j) {
+		s[j] = vals[offset + 6 + j];
 	}
 	
 	return true;
@@ -471,18 +474,18 @@ bool flat_scene::set_node_trans(const string &name, char type, const vec3 &t) {
 	return true;
 }
 
-bool flat_scene::get_property(const string &name, const string &prop, double &val) const {
-	map<string, int>::const_iterator i = prop_table.find(make_pair(name, prop));
-	if (i == prop_table.end()) {
+bool flat_scene::get_property(const string &name, const string &prop, float &val) const {
+	prop_table::const_iterator i = properties.find(make_pair(name, prop));
+	if (i == properties.end()) {
 		return false;
 	}
 	val = vals[i->second];
 	return true;
 }
 
-bool flat_scene::set_property(const string &name, const string &prop, double val) {
-	map<string, int>::const_iterator i = prop_table.find(make_pair(name, prop));
-	if (i == prop_table.end()) {
+bool flat_scene::set_property(const string &name, const string &prop, float val) {
+	prop_table::const_iterator i = properties.find(make_pair(name, prop));
+	if (i == properties.end()) {
 		return false;
 	}
 	vals[i->second] = val;
@@ -490,10 +493,10 @@ bool flat_scene::set_property(const string &name, const string &prop, double val
 }
 
 void flat_scene::update_scene(scene *scn) const {
-	map<string, pair<string, int> >::const_iterator i;
-	map<pair<string, string>, int>::const_iterator j;
+	node_table::const_iterator i;
+	prop_table::const_iterator j;
 	
-	for (i = node_table.begin(); i != node_table.end(); ++i) {
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
 		string nodename = i->first;
 		int offset = i->second.begin;
 		vec3 pos(vals[offset], vals[offset+1], vals[offset+2]);
@@ -503,17 +506,17 @@ void flat_scene::update_scene(scene *scn) const {
 		scn->set_node_trans(nodename, 'r', rot);
 		scn->set_node_trans(nodename, 's', scale);
 	}
-	for (j = prop_table.begin(); j != prop_table.end(); ++j) {
+	for (j = properties.begin(); j != properties.end(); ++j) {
 		scn->set_property(j->first.first, j->first.second, vals[j->second]);
 	}
 }
 
 void flat_scene::get_column_names(vector<string> &names) const {
-	map<string, pair<string, int> >::const_iterator i;
-	map<string, int>::const_iterator j;
+	node_table::const_iterator i;
+	prop_table::const_iterator j;
 	names.resize(vals.size());
 	
-	for(i = node_table.begin(); i != node_table.end(); ++i) {
+	for(i = nodes.begin(); i != nodes.end(); ++i) {
 		for(int k = 0; k < 9; ++k) {
 			stringstream name;
 			if (k < 3) {
@@ -523,12 +526,12 @@ void flat_scene::get_column_names(vector<string> &names) const {
 			} else {
 				name << i->first << ":scl:" << k - 6;
 			}
-			names[i->second.second + k] = name.str();
+			names[i->second.begin + k] = name.str();
 		}
 	}
 	
-	for(j = prop_table.begin(); j != prop_table.end(); ++j) {
-		names[j->second] = j->first;
+	for(j = properties.begin(); j != properties.end(); ++j) {
+		names[j->second] = j->first.second;
 	}
 }
 
@@ -537,29 +540,26 @@ int flat_scene::get_dof() const {
 }
 
 bool flat_scene::congruent(const flat_scene &s) const {
-	return node_table == s.node_table && prop_table == s.prop_table;
+	return nodes == s.nodes && properties == s.properties;
 }
 
-double flat_scene::distance(const flat_scene &s) const {
-	vector<double>::const_iterator i, j;
-	double d = 0.0;
-	
+float flat_scene::distance(const flat_scene &s) const {
 	if (vals.size() != s.vals.size()) {
-		return numeric_limits<double>::infinity();
+		return numeric_limits<float>::infinity();
 	}
 	return vals.dist(s.vals);
 }
 
-void flat_scene::get_nodes(vector<string> &nodes) {
-	std::map<std::string, std::pair<std::string, int> >::iterator i;
-	for (i = node_table.begin(); i != node_table.end(); ++i) {
-		nodes.push_back(i->first);
+void flat_scene::get_nodes(vector<string> &ns) const {
+	node_table::const_iterator i;
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		ns.push_back(i->first);
 	}
 }
 
-floatvec flat_scene::get_node_vals(const string &name) {
-	std::map<std::string, std::pair<std::string, int> >::iterator i;
-	if ((i = node_table.find(name)) == node_table.end()) {
+floatvec flat_scene::get_node_vals(const string &name) const {
+	node_table::const_iterator i;
+	if ((i = nodes.find(name)) == nodes.end()) {
 		return floatvec();
 	}
 	return vals.slice(i->second.begin, i->second.length);

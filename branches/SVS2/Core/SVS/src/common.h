@@ -180,10 +180,11 @@ public:
 		return mem[i];
 	}
 	
-	floatvec operator[](int i, int j) {
+	floatvec slice(int i, int j) const {
 		assert(0 <= i && i <= j && j < sz);
 		floatvec s(j - i);
 		memcpy(s.mem, &mem[i], (j - i) * sizeof(float));
+		return s;
 	}
 	
 	void operator=(const floatvec &v) {

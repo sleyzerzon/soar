@@ -22,7 +22,7 @@ public:
 		ptlist l;
 		vec3 r;
 		for (int i = 0; i < 3; ++i) {
-			if (cf[i] && !get_double_filter_result_value(this, cf[i], r[i])) {
+			if (cf[i] && !get_float_filter_result_value(this, cf[i], r[i])) {
 				return NULL;
 			}
 		}

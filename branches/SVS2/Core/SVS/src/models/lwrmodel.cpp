@@ -65,7 +65,7 @@ public:
 		
 		float dt = dtwin.mean();
 		m = i->second;
-		floatvec x(scn.dof() + trj.t.front().size()), y(scn.vals), dy(scn.vals.size());
+		floatvec x(scn.get_dof() + trj.t.front().size()), y(scn.vals), dy(scn.vals.size());
 		for (j = trj.t.begin(); j != trj.t.end(); ++j) {
 			x.combine(y, j->vals);
 			if (!m->predict(x, dy, 'r', false)) {
@@ -87,7 +87,7 @@ public:
 		lwr* mdl;
 
 		pre.get_column_names(colnames);
-		ydim = post.dof();
+		ydim = post.get_dof();
 		xdim = ydim + out.size();
 		
 		modelsig msig = make_pair(colnames, *out.desc);

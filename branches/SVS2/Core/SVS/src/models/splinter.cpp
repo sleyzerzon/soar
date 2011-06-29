@@ -6,18 +6,18 @@ using namespace std;
 
 bool splinter_scene_update(flat_scene &scn, const output &out) {
 	vec3 pos, vel, rot, rotrate;
-	double lvolt, rvolt, lrps, rrps;
+	float lvolt, rvolt, lrps, rrps;
 	
 	if (!scn.get_node_trans("splinter", 'p', pos) ||
 	    !scn.get_node_trans("splinter", 'r', rot) ||
-	    !scn.get_property("vel_0", vel[0]) ||
-	    !scn.get_property("vel_1", vel[1]) ||
-	    !scn.get_property("vel_2", vel[2]) ||
-	    !scn.get_property("rotation_rate_0", rotrate[0]) ||
-	    !scn.get_property("rotation_rate_1", rotrate[1]) ||
-	    !scn.get_property("rotation_rate_2", rotrate[2]) ||
-	    !scn.get_property("left_rads_per_sec", lrps) ||
-	    !scn.get_property("right_rads_per_sec", rrps))
+	    !scn.get_property("splinter", "vel_0", vel[0]) ||
+	    !scn.get_property("splinter", "vel_1", vel[1]) ||
+	    !scn.get_property("splinter", "vel_2", vel[2]) ||
+	    !scn.get_property("splinter", "rotation_rate_0", rotrate[0]) ||
+	    !scn.get_property("splinter", "rotation_rate_1", rotrate[1]) ||
+	    !scn.get_property("splinter", "rotation_rate_2", rotrate[2]) ||
+	    !scn.get_property("splinter", "left_rads_per_sec", lrps) ||
+	    !scn.get_property("splinter", "right_rads_per_sec", rrps))
 	{
 		return false;
 	}
@@ -29,14 +29,14 @@ bool splinter_scene_update(flat_scene &scn, const output &out) {
 	
 	scn.set_node_trans("splinter", 'p', pos);
 	scn.set_node_trans("splinter", 'r', rot);
-	scn.set_property("vel_0", vel[0]);
-	scn.set_property("vel_1", vel[1]);
-	scn.set_property("vel_2", vel[2]);
-	scn.set_property("rotation_rate_0", rotrate[0]);
-	scn.set_property("rotation_rate_1", rotrate[1]);
-	scn.set_property("rotation_rate_2", rotrate[2]);
-	scn.set_property("left_rads_per_sec", lrps);
-	scn.set_property("right_rads_per_sec", rrps);
+	scn.set_property("splinter", "vel_0", vel[0]);
+	scn.set_property("splinter", "vel_1", vel[1]);
+	scn.set_property("splinter", "vel_2", vel[2]);
+	scn.set_property("splinter", "rotation_rate_0", rotrate[0]);
+	scn.set_property("splinter", "rotation_rate_1", rotrate[1]);
+	scn.set_property("splinter", "rotation_rate_2", rotrate[2]);
+	scn.set_property("splinter", "left_rads_per_sec", lrps);
+	scn.set_property("splinter", "right_rads_per_sec", rrps);
 	
 	return true;
 }

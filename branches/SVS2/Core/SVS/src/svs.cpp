@@ -280,7 +280,7 @@ void svs::update_models() {
 	flat_scene curr(state_stack.front()->get_scene());
 	double dt = state_stack.front()->get_scene()->get_dt();
 	
-	if (lastscene.dof() > 0 || lastscene.congruent(curr)) {
+	if (lastscene.get_dof() > 0 || lastscene.congruent(curr)) {
 		for (i = models.begin(); i != models.end(); ++i) {
 			bool learn = true;
 			flat_scene predicted(lastscene);

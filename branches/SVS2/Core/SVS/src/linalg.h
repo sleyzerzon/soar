@@ -84,8 +84,8 @@ public:
 		memset(a, 0, 4 * sizeof(float));
 	}
 	
-	quaternion(float a, float b, float c, float d) {
-		a[0] = a; a[1] = b; a[2] = c; a[3] = d;
+	quaternion(float q0, float q1, float q2, float q3) {
+		a[0] = q0; a[1] = q1; a[2] = q2; a[3] = q3;
 	}
 	
 	quaternion(const quaternion &q) {
@@ -144,10 +144,10 @@ public:
 	/* from april.jmat.LinAlg.quatMultiply */
 	quaternion operator*(const quaternion &q) const {
 		quaternion r;
-		r.a[0] = a[0]*q.a[0] - a[1]*q.a[1] - a[2]*q.a[2] - d*q.a[3];
-		r.a[1] = a[0]*q.a[1] + a[1]*q.a[0] + a[2]*q.a[3] - d*q.a[2];
-		r.a[2] = a[0]*q.a[2] - a[1]*q.a[3] + a[2]*q.a[0] + d*q.a[1];
-		r.a[3] = a[0]*q.a[3] + a[1]*q.a[2] - a[2]*q.a[1] + d*q.a[0];
+		r.a[0] = a[0]*q.a[0] - a[1]*q.a[1] - a[2]*q.a[2] - a[3]*q.a[3];
+		r.a[1] = a[0]*q.a[1] + a[1]*q.a[0] + a[2]*q.a[3] - a[3]*q.a[2];
+		r.a[2] = a[0]*q.a[2] - a[1]*q.a[3] + a[2]*q.a[0] + a[3]*q.a[1];
+		r.a[3] = a[0]*q.a[3] + a[1]*q.a[2] - a[2]*q.a[1] + a[3]*q.a[0];
 		return r;
 	}
 	

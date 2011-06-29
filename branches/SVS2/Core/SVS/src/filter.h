@@ -64,17 +64,17 @@ private:
 	int v;
 };
 
-class double_filter_result : public filter_result {
+class float_filter_result : public filter_result {
 public:
-	double_filter_result(double v) : v(v) {}
+	float_filter_result(float v) : v(v) {}
 	std::string get_string() {
 		std::stringstream ss;
 		ss << v;
 		return ss.str();
 	}
-	double get_value() { return v; }
+	float get_value() { return v; }
 private:
-	double v;
+	float v;
 };
 
 class vec3_filter_result : public filter_result {
@@ -121,7 +121,7 @@ private:
  */
 bool get_bool_filter_result_value(filter *requester, filter *f, bool &v);
 bool get_string_filter_result_value(filter *requester, filter *f, std::string &v);
-bool get_double_filter_result_value(filter *requester, filter *f, double &v);
+bool get_float_filter_result_value(filter *requester, filter *f, float &v);
 bool get_vec3_filter_result_value(filter *requester, filter *f, vec3 &v);
 bool get_ptlist_filter_result_value(filter *requester, filter *f, ptlist *&v);
 bool get_node_filter_result_value(filter *requester, filter *f, sg_node *&v);
@@ -167,12 +167,12 @@ private:
 	int v;
 };
 
-class const_double_filter : public filter {
+class const_float_filter : public filter {
 public:
-	const_double_filter(double v) : v(v) {}
-	filter_result *calc_result() { return new double_filter_result(v); }
+	const_float_filter(float v) : v(v) {}
+	filter_result *calc_result() { return new float_filter_result(v); }
 private:
-	double v;
+	float v;
 };
 
 class filter_container : public filter_listener {
