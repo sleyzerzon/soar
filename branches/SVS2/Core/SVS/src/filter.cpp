@@ -255,8 +255,9 @@ filter *parse_filter_struct(soar_interface *si, Symbol *root, scene *scn) {
 			params.insert(make_pair(pname, parse_filter_struct(si, cval, scn)));
 		}
 	}
+	f = make_filter(type, scn, params);
 	
-	if (fail || type == "" || !(f = make_filter(type, scn, params))) {
+	if (fail || type == "" || f == NULL) {
 		for (j = params.begin(); j != params.end(); ++j) {
 			if (j->second) {
 				delete j->second;

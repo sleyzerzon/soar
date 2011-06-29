@@ -11,6 +11,8 @@ using namespace std;
 typedef pair<vector<string>, outdesc> modelsig;
 typedef map<modelsig, lwr*> modeltbl;
 
+bool splinter_scene_update(flat_scene &scn, const output &out);
+
 class window {
 public:
 	window(int n) : w(n), i(0) {}
@@ -35,11 +37,19 @@ class lwr_model : public model {
 public:
 	lwr_model(int nnbrs) : nnbrs(nnbrs), dtwin(20) {}
 	
+	~lwr_model() {
+		modeltbl::iterator i;
+		for (i = mdls.begin(); i != mdls.end(); ++i) {
+			delete i->second;
+		}
+	}
+	
 	bool predict(flat_scene &scn, const trajectory &trj) {
 		vector<string> colnames;
 		modeltbl::iterator i;
 		lwr *m;
 		flat_scene orig(scn);
+		//flat_scene ref(scn);
 		vector<output>::const_iterator j;
 		
 		if (trj.t.size() == 0) {
@@ -63,9 +73,10 @@ public:
 			}
 			dy *= dt;
 			y += dy;
+			//splinter_scene_update(ref, *j);
 		}
+		//cout << sqrt(ref.vals.distsq(y)) << endl;
 		scn.vals = y;
-		
 		return true;
 	}
 	
@@ -82,7 +93,7 @@ public:
 		modelsig msig = make_pair(colnames, *out.desc);
 		if ((i = mdls.find(msig)) == mdls.end()) {
 			mdl = new lwr(xdim, ydim, nnbrs);
-			mdl->load_file("training_data");
+			//mdl->load_file("training_data");
 			mdls[msig] = mdl;
 		} else {
 			mdl = i->second;
@@ -94,6 +105,15 @@ public:
 		y /= dt;
 		mdl->add(x, y);
 		dtwin.insert(dt);
+	}
+	
+	void printinfo() const {
+		modeltbl::const_iterator i;
+		cout << "LWR ";
+		for (i = mdls.begin(); i != mdls.end(); ++i) {
+			cout << i->second->size() << " ";
+		}
+		cout << endl;
 	}
 	
 private:
