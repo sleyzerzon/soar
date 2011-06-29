@@ -222,7 +222,7 @@ void nsg_node::send_update(sg_node::change_type t, int added) {
 	std::list<sg_listener*> c;
 	std::copy(listeners.begin(), listeners.end(), back_inserter(c));
 	for (i = c.begin(); i != c.end(); ++i) {
-		(**i).update(this, t, added);
+		(**i).node_update(this, t, added);
 	}
 }
 

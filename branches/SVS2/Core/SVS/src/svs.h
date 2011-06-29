@@ -39,7 +39,7 @@ class sgwme : public sg_listener {
 public:
 	sgwme(soar_interface *si, Symbol *ident, sgwme *parent, sg_node *node);
 	~sgwme();
-	void update(sg_node *n, sg_node::change_type t, int added_child);
+	void node_update(sg_node *n, sg_node::change_type t, int added_child);
 
 private:
 	void add_child(sg_node *c);

@@ -20,7 +20,7 @@ public:
 		}
 	}
 	
-	void update(sg_node *n, sg_node::change_type t, int added) {
+	void node_update(sg_node *n, sg_node::change_type t, int added) {
 		set_dirty();
 		if (t == sg_node::DELETED) {
 			node = NULL;
