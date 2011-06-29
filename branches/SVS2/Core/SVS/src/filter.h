@@ -26,7 +26,7 @@ public:
 	virtual void update(filter *u) = 0;
 };
 
-/* Wrapper for all filter result types to get around the type system
+/* Wrapper for all filter result types so we can treat them uniformly
 */
 class filter_result {
 public:
@@ -82,7 +82,7 @@ public:
 	vec3_filter_result(const vec3 &v) : v(v) {}
 	std::string get_string() {
 		std::stringstream ss;
-		ss << v;
+		v.print(ss);
 		return ss.str();
 	}
 	vec3 get_value() { return v; }
@@ -95,7 +95,11 @@ public:
 	ptlist_filter_result(const ptlist &v) : v(v) {}
 	std::string get_string() {
 		std::stringstream ss;
-		copy(v.begin(), v.end(), std::ostream_iterator<vec3>(ss, ", "));
+		ptlist::const_iterator i;
+		for (i = v.begin(); i != v.end(); ++i) {
+			i->print(ss);
+			ss << " ";
+		}
 		return ss.str();
 	}
 	ptlist *get_value() { return &v; }

@@ -10,12 +10,12 @@ bool splinter_scene_update(flat_scene &scn, const output &out) {
 	
 	if (!scn.get_node_trans("splinter", 'p', pos) ||
 	    !scn.get_node_trans("splinter", 'r', rot) ||
-	    !scn.get_property("vel_0", vel.x) ||
-	    !scn.get_property("vel_1", vel.y) ||
-	    !scn.get_property("vel_2", vel.z) ||
-	    !scn.get_property("rotation_rate_0", rotrate.x) ||
-	    !scn.get_property("rotation_rate_1", rotrate.y) ||
-	    !scn.get_property("rotation_rate_2", rotrate.z) ||
+	    !scn.get_property("vel_0", vel[0]) ||
+	    !scn.get_property("vel_1", vel[1]) ||
+	    !scn.get_property("vel_2", vel[2]) ||
+	    !scn.get_property("rotation_rate_0", rotrate[0]) ||
+	    !scn.get_property("rotation_rate_1", rotrate[1]) ||
+	    !scn.get_property("rotation_rate_2", rotrate[2]) ||
 	    !scn.get_property("left_rads_per_sec", lrps) ||
 	    !scn.get_property("right_rads_per_sec", rrps))
 	{
@@ -29,12 +29,12 @@ bool splinter_scene_update(flat_scene &scn, const output &out) {
 	
 	scn.set_node_trans("splinter", 'p', pos);
 	scn.set_node_trans("splinter", 'r', rot);
-	scn.set_property("vel_0", vel.x);
-	scn.set_property("vel_1", vel.y);
-	scn.set_property("vel_2", vel.z);
-	scn.set_property("rotation_rate_0", rotrate.x);
-	scn.set_property("rotation_rate_1", rotrate.y);
-	scn.set_property("rotation_rate_2", rotrate.z);
+	scn.set_property("vel_0", vel[0]);
+	scn.set_property("vel_1", vel[1]);
+	scn.set_property("vel_2", vel[2]);
+	scn.set_property("rotation_rate_0", rotrate[0]);
+	scn.set_property("rotation_rate_1", rotrate[1]);
+	scn.set_property("rotation_rate_2", rotrate[2]);
 	scn.set_property("left_rads_per_sec", lrps);
 	scn.set_property("right_rads_per_sec", rrps);
 	
@@ -53,6 +53,10 @@ public:
     		}
     	}
     	return true;
+	}
+	
+	void printinfo() const {
+		cout << "SPLINTER" << endl;
 	}
 };
 

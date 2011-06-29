@@ -14,6 +14,8 @@ public:
 	   x = [prev_state, output], y = [next_state]
 	*/
 	virtual void learn(const flat_scene &pre, const output &out, const flat_scene &post, float dt) {}
+	
+	virtual void printinfo() const = 0;
 };
 
 model *parse_model_struct(soar_interface *si, Symbol *root, std::string &name);

@@ -17,13 +17,17 @@ public:
 			return false;
 		}
 		for (i = trj.t.begin(); i != trj.t.end(); ++i) {
-			v.x = i->get(xdim);
-			v.y = i->get(ydim);
-			v.z = i->get(zdim);
+			v[0] = i->get(xdim);
+			v[1] = i->get(ydim);
+			v[2] = i->get(zdim);
 			p += v;
 		}
 		scn.set_node_trans(obj, 'p', p);
 		return true;
+	}
+	
+	void printinfo() const {
+		cout << "VELOCITY" << endl;
 	}
 	
 private:

@@ -16,25 +16,12 @@
 
 using namespace std;
 
-const bool CHECK_MODELS = false;
+const bool CHECK_MODELS = true;
 
 typedef map<wme*,command*>::iterator cmd_iter;
 
-class timer {
-public:
-	timer() {
-		gettimeofday(&t1, NULL);
-	}
-	
-	double stop() {
-		timeval t2, t3;
-		gettimeofday(&t2, NULL);
-		timersub(&t2, &t1, &t3);
-		return t3.tv_sec + t3.tv_usec / 1000000.0;
-	}
-	
-	timeval t1;
-};
+ofstream trainlog("train.log");
+bool headerwritten = false;
 
 void print_tree(sg_node *n) {
 	if (n->is_group()) {
@@ -44,7 +31,11 @@ void print_tree(sg_node *n) {
 	} else {
 		ptlist pts;
 		n->get_world_points(pts);
-		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(cout, ","));
+		ptlist::const_iterator j;
+		for (j = pts.begin(); j != pts.end(); ++j) {
+			j->print(cout);
+			cout << ",";
+		}
 		cout << endl;
 	}
 }
@@ -79,7 +70,7 @@ sgwme::~sgwme() {
 	}
 }
 
-void sgwme::update(sg_node *n, sg_node::change_type t, int added_child) {
+void sgwme::node_update(sg_node *n, sg_node::change_type t, int added_child) {
 	switch (t) {
 		case sg_node::CHILD_ADDED:
 			add_child(node->get_child(added_child));
@@ -255,8 +246,8 @@ void svs::pre_env_callback() {
 	vector<svs_state*>::iterator i;
 	string sgel;
 	bool validout, validin;
-	//timer t;
-	//t.start();
+	timer t;
+	t.start();
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).process_cmds();
 	}
@@ -281,7 +272,7 @@ void svs::pre_env_callback() {
 		update_models();
 	}
 
-	//cout << "SVSPRE " << t.stop() << endl;
+	cout << "SVSPRE " << t.stop() << endl;
 }
 
 void svs::update_models() {
@@ -291,18 +282,37 @@ void svs::update_models() {
 	
 	if (lastscene.dof() > 0 || lastscene.congruent(curr)) {
 		for (i = models.begin(); i != models.end(); ++i) {
-			if (CHECK_MODELS) {
-				flat_scene predicted(lastscene);
-				if (i->second->predict(predicted, trajectory(next_out))) {
-					cout << "Prediction Error: " << predicted.distance(curr) << endl;
-				} else {
-					cout << "No prediction" << endl;
+			bool learn = true;
+			flat_scene predicted(lastscene);
+			timer t;
+			t.start();
+			if (i->second->predict(predicted, trajectory(next_out))) {
+				double d = predicted.distance(curr);
+				cout << "Prediction Error: " << d << endl;
+				if (d < 1e-4) {
+					learn = false;
 				}
+			} else {
+				cout << "No prediction" << endl;
 			}
-			i->second->learn(lastscene, next_out, curr, dt);
+			cout << "time " << t.stop() << endl;
+			if (true) {
+				i->second->learn(lastscene, next_out, curr, dt);
+			} else {
+				cout << "Not learning" << endl;
+			}
+			cout << "model info: ";
+			i->second->printinfo();
 		}
-		ofstream log("model.log", ios_base::app);
-		log << lastscene.vals << " " << next_out.vals << " ; " << curr.vals << endl;
+		if (!headerwritten) {
+			vector<string> colnames;
+			curr.get_column_names(colnames);
+			trainlog << "# ";
+			copy(colnames.begin(), colnames.end(), ostream_iterator<string>(trainlog, " "));
+			trainlog << endl;
+			headerwritten = true;
+		}
+		trainlog << lastscene.vals << " " << next_out.vals << " ; " << curr.vals << " ; " << dt << endl;
 	}
 	lastscene = curr;
 }
@@ -310,11 +320,9 @@ void svs::update_models() {
 void svs::post_env_callback() {
 	string resp;
 	vector<svs_state*>::iterator i;
-	//timer t;
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).update_cmd_results(false);
 	}
-	//cout << "SVSPOST " << t.stop() << endl;
 }
 
 void svs::make_common_syms() {
