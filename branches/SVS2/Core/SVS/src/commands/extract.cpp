@@ -17,6 +17,10 @@ public:
 		}
 	}
 	
+	string description() {
+		return string("extract");
+	}
+	
 	void update(filter *f) {
 		dirty = true;
 	}

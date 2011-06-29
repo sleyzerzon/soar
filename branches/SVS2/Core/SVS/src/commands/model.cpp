@@ -18,7 +18,11 @@ public:
 			delete m;
 		}
 	}
-		
+	
+	string description() {
+		return string("model");
+	}
+	
 	bool update_result() {
 		if (m != NULL) {
 			return true;

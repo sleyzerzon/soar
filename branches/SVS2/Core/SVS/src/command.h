@@ -7,6 +7,7 @@ class svs_state;
 
 class command {
 public:
+	virtual std::string description() = 0;
 	virtual bool update_result() = 0;
 	virtual bool early() = 0;
 	virtual ~command() {};

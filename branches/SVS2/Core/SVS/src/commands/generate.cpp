@@ -16,6 +16,10 @@ public:
 		reset();
 	}
 	
+	string description() {
+		return string("generate");
+	}
+	
 	bool update_result() {
 		wme *parent_wme, *gen_wme;
 		sg_node *gen_node;

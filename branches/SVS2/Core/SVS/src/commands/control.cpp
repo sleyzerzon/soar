@@ -391,6 +391,10 @@ public:
 		cleanup();
 	}
 	
+	string description() {
+		return string("control");
+	}
+	
 	bool update_result() {
 		output out;
 
