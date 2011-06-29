@@ -15,22 +15,32 @@ bool splinter_scene_update(flat_scene &scn, const output &out);
 
 class window {
 public:
-	window(int n) : w(n), i(0) {}
+	window(int n) : w(n), i(0), full(false) {}
 	
 	void insert(float v) {
 		w[i++] = v;
 		if ( i == w.size() ) {
+			full = true;
 			i = 0;
 		}
 	}
 	
 	float mean() {
-		return w.sum() / w.size();
+		if (full) {
+			return w.sum() / w.size();
+		} else {
+			float s = 0.0;
+			for (int j = 0; j < i; ++j) {
+				s += w[j];
+			}
+			return s / i;
+		}
 	}
 	
 private:
 	floatvec w;
 	int i;
+	bool full;
 };
 
 class lwr_model : public model {

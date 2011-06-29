@@ -368,7 +368,7 @@ float scene::get_dt() const {
 }
 
 int scene::get_dof() const {
-	return (nodes.size() - 1) * 9 + properties.size(); // -1 for world
+	return nodes.size() * 9 + properties.size(); 
 }
 
 flat_scene::flat_scene() {}
@@ -394,15 +394,15 @@ flat_scene::flat_scene(scene *scn) : vals(scn->get_dof()) {
 		sg_node *parent = (**n).get_parent();
 		if (parent) {
 			info.parent = parent->get_name();
-			for (j = 0; j < 3; ++j) {
-				trans = (**n).get_trans(types[j]);
-				for (k = 0; k < 3; ++k) {
-					vals[i++] = trans[k];
-				}
-			}
 		} else {
 			assert(name == "world");
 			info.parent = "";
+		}
+		for (j = 0; j < 3; ++j) {
+			trans = (**n).get_trans(types[j]);
+			for (k = 0; k < 3; ++k) {
+				vals[i++] = trans[k];
+			}
 		}
 		
 		map<string, float> props;

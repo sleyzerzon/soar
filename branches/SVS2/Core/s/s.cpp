@@ -183,7 +183,6 @@ string log_handler(smlRhsEventId id, void *userdata, Agent *agent, char const *f
 }
 
 int main(int argc, char *argv[]) {
-	std::srand(1);
 	kernel = Kernel::CreateKernelInCurrentThread(Kernel::kDefaultLibraryName, true, 0);
 	kernel->AddRhsFunction("exit", exit_handler, NULL);
 	kernel->AddRhsFunction("log", log_handler, NULL);
