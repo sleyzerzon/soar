@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "common.h"
+#include "nn.h"
 
 class lwr {
 public:
@@ -20,6 +21,7 @@ private:
 	std::vector<floatvec> xnorm;
 	floatvec xmin, xmax, xrange;
 	bool normalized;
+	nearest_neighbor *nn;
 };
 
 #endif

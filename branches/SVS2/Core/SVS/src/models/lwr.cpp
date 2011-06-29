@@ -1,35 +1,19 @@
 #include <assert.h>
-#include <sys/time.h>
+#include <math.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
 #include <armadillo>
 #include "lwr.h"
-#include "balltree.h"
+#include "nn.h"
+#include "common.h"
 
 using namespace std;
 using namespace arma;
 
 const double RLAMBDA = 0.0000001;
-
-class timer {
-public:
-	timer() {}
-	
-	void start() {
-		gettimeofday(&t1, NULL);
-	}
-	
-	double stop() {
-		timeval t2, t3;
-		gettimeofday(&t2, NULL);
-		timersub(&t2, &t1, &t3);
-		return t3.tv_sec + t3.tv_usec / 1000000.0;
-	}
-	
-	timeval t1;
-};
+const double INF = numeric_limits<double>::infinity();
 
 void print_mat(const mat &X) {
 	X.print("");
@@ -41,18 +25,6 @@ void print_vec(const vec &v) {
 
 void print_rowvec(const rowvec &v) {
 	v.print("");
-}
-
-void naive_knn(const floatvec &q, const vector<floatvec> &all, int k, di_queue &nn) {
-	for (int i = 0; i < all.size(); ++i) {
-		double d = q.distsq(all[i]);
-		if (nn.size() < k || (nn.size() > 0 && d < nn.top().first)) {
-			nn.push(make_pair(d, i));
-			if (nn.size() > k) {
-				nn.pop();
-			}
-		}
-	}
 }
 
 void lsqr(const mat &X, const mat &Y, const vec &w, const rowvec &x, rowvec &yout) {
@@ -75,19 +47,33 @@ void lsqr(const mat &X, const mat &Y, const vec &w, const rowvec &x, rowvec &you
 }
 
 void ridge(const mat &X, const mat &Y, const vec &w, const rowvec &x, rowvec &yout) {
+	int i;
 	mat W = diagmat(w);
-	//mat W = eye<mat>(X.n_rows, X.n_rows);
 	mat Z = W * X;
 	mat V = W * Y;
 	rowvec Zmean = mean(Z, 0);
-	mat Zcenter = Z - (ones<vec>(Z.n_rows, 1) * Zmean);
+	mat Zcenter = Z;
+	for (i = 0; i < Z.n_rows; ++i) {
+		Zcenter.row(i) -= Zmean;
+	}
 	rowvec Vmean = mean(V, 0);
-	mat Vcenter = V - (ones<vec>(V.n_rows, 1) * Vmean);
+	mat Vcenter = V;
+	for (i = 0; i < Z.n_rows; ++i) {
+		Vcenter.row(i) -= Vmean;
+	}
 	mat Zt = trans(Zcenter);
-	mat lambdaeye = RLAMBDA * eye<mat>(Z.n_cols, Z.n_cols);
-	mat A = Zt * Zcenter + lambdaeye;
+	mat A = Zt * Zcenter;
+	double lambda = RLAMBDA;
+	for (i = 0; i < A.n_cols; ++i) {
+		double inc = nextafter(A(i, i), INF) - A(i, i);
+		lambda = max(lambda, inc);
+	}
+	for (i = 0; i < A.n_cols; ++i) {
+		A(i, i) += lambda;
+	}
 	mat B = Zt * Vcenter;
 	mat C = solve(A, B);
+	assert(C.n_elem != 0);
 	yout = (x - mean(X, 0)) * C + mean(Y, 0);
 }
 
@@ -112,7 +98,9 @@ void remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
 lwr::lwr(int xdim, int ydim, int nnbrs) 
 : xdim(xdim), ydim(ydim), nnbrs(nnbrs), normalized(false),
   xmin(xdim), xmax(xdim), xrange(xdim)
-{}
+{
+	nn = new brute_nn(&xnorm);
+}
 	
 void lwr::add(const floatvec &x, const floatvec &y) {
 	assert(x.size() == xdim && y.size() == ydim);
@@ -179,23 +167,24 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 	xn /= xrange;
 	
 	tnn.start();
-	naive_knn(xn, xnorm, k, neighbors);
+	nn->query(xn, k, neighbors);
 	//cout << "NN:  " << tnn.stop() << endl;
 	
 	X.reshape(k, xdim);
 	Y.reshape(k, ydim);
 	d.reshape(k, 1);
 	for(i = 0; i < k; ++i) {
-		floatvec &tx = examples[neighbors.top().second].first;
-		floatvec &ty = examples[neighbors.top().second].second;
+		d(i) = neighbors.top().first;
+		int ind = neighbors.top().second;
+		neighbors.pop();
+		floatvec &tx = examples[ind].first;
+		floatvec &ty = examples[ind].second;
 		for(j = 0; j < xdim; ++j) {
 			X(i, j) = tx[j];
 		}
 		for(j = 0; j < ydim; ++j) {
 			Y(i, j) = ty[j];
 		}
-		d(i) = neighbors.top().first;
-		neighbors.pop();
 	}
 	
 	vec w = sqrt(pow(d, -3));
@@ -209,7 +198,7 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 	rowvec closeavg = zeros<rowvec>(ydim);
 	int nclose = 0;
 	for (i = 0; i < w.n_elem; ++i) {
-		if (w(i) == math::inf()) {
+		if (w(i) == INF) {
 			closeavg += Y.row(i);
 			++nclose;
 		}
