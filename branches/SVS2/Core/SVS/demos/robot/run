@@ -17,7 +17,8 @@ done
 
 if test "$sim" == "1"
 then
-	socat system:./splintersim unix-connect:env,retry=100 &
+	python splintersim.py &
+	#socat system:./splintersim unix-connect:env,retry=100 &
 else
 	socat system:"java RobotClient" unix-connect:env,retry=100 &
 fi

@@ -7,13 +7,12 @@ import lcm.lcm.*;
 
 public class RobotClient implements LCMSubscriber {
 	LCM lcm;
-	differential_drive_command_t dc;
 	pose_t pose;
 	map_metadata_t map;
 	boolean mapreceived, mapwritten, posechanged;
-	double rotz;
+	double lastrotz, adjrotz;
 
-	public static void perror(Exception err) {
+	public static void perror(String err) {
 		System.err.println(err);
 		System.exit(1);
 	}
@@ -30,15 +29,13 @@ public class RobotClient implements LCMSubscriber {
 	
 	RobotClient() {
 		pose = null;
-		dc = new differential_drive_command_t();
-		dc.left_enabled = true;
-		dc.right_enabled = true;
 		lcm = LCM.getSingleton();
 		lcm.subscribe(".*", this);
 		mapreceived = false;
 		mapwritten = false;
 		posechanged = false;
-		rotz = Double.NaN;
+		lastrotz = Double.NaN;
+		adjrotz = 0.0;
 	}
 	
 	public void messageReceived(LCM lcm, String channel, LCMDataInputStream ins) {
@@ -47,12 +44,41 @@ public class RobotClient implements LCMSubscriber {
 				if (channel.startsWith("POSE")) {
 					pose = new pose_t(ins);
 					posechanged = true;
+					double rot[] = LinAlg.quatToRollPitchYaw(pose.orientation);
+					if (Double.isNaN(lastrotz)) {
+						adjrotz = rot[2];
+					} else {
+						double diff = rot[2] - lastrotz;
+						if (Math.abs(diff) < Math.PI) {
+							adjrotz += diff;
+						} else {
+							if (diff < 0) {
+								adjrotz += 2 * Math.PI + diff;
+							} else {
+								adjrotz -= 2 * Math.PI - diff;
+							}
+						}
+					}
+					lastrotz = rot[2];
+					double t = adjrotz % (adjrotz < 0 ? -2 * Math.PI : 2 * Math.PI);
+					if (t < -Math.PI) {
+						t += 2 * Math.PI;
+					} else if (t > Math.PI) {
+						t -= 2 * Math.PI;
+					}
+					double error = rot[2] - t;
+					if (error < -0.01 || error > 0.01) {
+						System.err.println("" + t + " " + rot[2]);
+						System.exit(1);
+					}
+					adjrotz += error;
+					
 				} else if (channel.startsWith("AREA_DESCRIPTION")) {
 					map = new map_metadata_t(ins);
 					mapreceived = true;
 				}
 			} catch (IOException err) {
-				perror(err);
+				perror(err.toString());
 			}
 		}
 	}
@@ -63,16 +89,7 @@ public class RobotClient implements LCMSubscriber {
 	
 	public void writePose(pose_t p) {
 		Formatter fmt = new Formatter();
-		double rot[] = LinAlg.quatToRollPitchYaw(p.orientation);
-		
-		if (Double.isNaN(rotz)) {
-			rotz = rot[2];
-		} else {
-			rotz = rotz + p.rotation_rate[2];
-		}
-		assert close(rotz % (2 * Math.PI), rot[2]);
-		
-		fmt.format("c splinter p %g %g %g r 0.0 0.0 %g\n", p.pos[0], p.pos[1], p.pos[2], rotz);
+		fmt.format("c splinter p %g %g %g r 0.0 0.0 %g\n", p.pos[0], p.pos[1], p.pos[2], adjrotz);
 		for (int i = 0; i < p.vel.length; ++i) {
 			fmt.format("p vel_%d %g\n", i, p.vel[i]);
 		}
@@ -114,6 +131,9 @@ public class RobotClient implements LCMSubscriber {
 	}
 	
 	public boolean readInput() {
+		differential_drive_command_t dc = new differential_drive_command_t();
+		dc.left_enabled = true;
+		dc.right_enabled = true;
 		String line = "";
 		String fields[];
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
@@ -122,32 +142,33 @@ public class RobotClient implements LCMSubscriber {
 			try {
 				line = stdin.readLine();
 			} catch (IOException e) {
-				perror(e);
+				perror(e.toString());
 			}
-			
 			if (line == null) {
 				return false;
+			} else if (line.trim().length() == 0) {
+				continue;
 			} else if (line.equals("***")) {
 				break;
 			}
 			fields = line.split(" +");
 			if (fields.length != 2) {
-				continue;
+				perror("Invalid output message " + line);
 			}
 			if (fields[0].equals("left")) {
 				try {
 					dc.left = Double.parseDouble(fields[1]);
 				} catch (NumberFormatException err) {
-					continue;
+					perror("Incorrect left output " + fields[1]);
 				}
 			} else if (fields[0].equals("right")) {
 				try {
 					dc.right = Double.parseDouble(fields[1]);
 				} catch (NumberFormatException err) {
-					continue;
+					perror("Incorrect right output " + fields[1]);
 				}
 			} else {
-				continue;
+				perror("Unknown output parameter " + fields[0]);
 			}
 		}
 		dc.utime = TimeUtil.utime();
@@ -156,26 +177,25 @@ public class RobotClient implements LCMSubscriber {
 	}
 
 	public void run() {
-		long lasttime = -1;
 		pose_t p;
 		
 		writeInitialPose();
 		while (true) {
-			if (posechanged && pose != null) {
-				posechanged = false;
-				
-				synchronized (this) {
-					p = pose.copy();
+			while (!posechanged || pose == null) {
+				try {
+					Thread.sleep(5);
+				} catch (InterruptedException err) {
+					continue;
 				}
-				
-				if (lasttime > 0) {
-					System.out.println("t " + (p.utime - lasttime));
-				}
-				lasttime = p.utime;
-				
-				writeMap();
-				writePose(p);
 			}
+			synchronized (this) {
+				p = pose.copy();
+				posechanged = false;
+			}
+			
+			System.out.println("t 1.0");
+			writeMap();
+			writePose(p);
 			System.out.println("***");
 			readInput();
 		}
