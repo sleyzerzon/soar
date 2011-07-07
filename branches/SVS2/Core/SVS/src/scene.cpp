@@ -308,10 +308,7 @@ void scene::disp_update_node(sg_node *n) {
 	if (!n->is_group() && disp) {
 		ss << "updateobject\n" << name << '\n' << n->get_name() << '\n';
 		n->get_world_points(pts);
-		for (i = pts.begin(); i != pts.end(); ++i) {
-			i->print(ss);
-			ss << endl;
-		}
+		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(ss, "\n"));
 		disp->send(ss.str());
 	}
 }

@@ -7,10 +7,11 @@ using namespace std;
 
 class model_command : public command {
 public:
-	model_command(svs_state *state, Symbol *root) 
-	: root(root), utils(state, root), svsp(state->get_svs()), 
-	  si(state->get_svs()->get_soar_interface()), m(NULL)
-	{}
+	model_command(svs_state *state, Symbol *root)
+	 : command(state, root), root(root), svsp(state->get_svs()), m(NULL)
+	{
+		si = state->get_svs()->get_soar_interface();
+	}
 	
 	~model_command() {
 		if (m) {
@@ -23,18 +24,18 @@ public:
 		return string("model");
 	}
 	
-	bool update_result() {
+	bool update() {
 		if (m != NULL) {
 			return true;
 		}
 		
 		m = parse_model_struct(si, root, name);
 		if (m == NULL) {
-			utils.set_result("invalid syntax");
+			set_status("invalid syntax");
 			return false;
 		}
 		svsp->register_model(name, m);
-		utils.set_result("success");
+		set_status("success");
 		return true;
 	}
 	
@@ -42,7 +43,6 @@ public:
 	
 private:
 	soar_interface *si;
-	cmd_utils       utils;
 	Symbol         *root;
 	svs            *svsp;
 	string          name;

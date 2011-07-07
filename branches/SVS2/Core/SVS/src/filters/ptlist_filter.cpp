@@ -1,3 +1,4 @@
+#include <list>
 #include "filter.h"
 #include "sg_node.h"
 #include "linalg.h"
@@ -5,41 +6,53 @@
 
 using namespace std;
 
-class ptlist_filter : public filter {
+class ptlist_filter : public map_filter<ptlist*> {
 public:
-	ptlist_filter(bool local, filter *node)
-	: local(local), container(this, node)
-	{}
+	ptlist_filter(filter_input *input, bool local) : map_filter<ptlist*>(input), local(local) {}
 	
-	filter_result *calc_result() {
-		sg_node *n;
-		ptlist pts;
-		
-		if (!get_node_filter_result_value(this, container.get(0), n)) return NULL;
-		if (local) {
-			n->get_local_points(pts);
-		} else {
-			n->get_world_points(pts);
+	~ptlist_filter() {
+		std::list<ptlist*>::iterator i;
+		for (i = lists.begin(); i != lists.end(); ++i) {
+			delete *i;
 		}
-		return new ptlist_filter_result(pts);
+	}
+	
+	bool compute(filter_param_set *params, ptlist *&res, bool adding) {
+		sg_node *n;
+		if (!get_filter_param(this, params, "node", n)) {
+			return false;
+		}
+		
+		if (adding) {
+			res = new ptlist();
+			lists.push_back(res);
+		}
+		res->clear();
+		
+		if (local) {
+			n->get_local_points(*res);
+		} else {
+			n->get_world_points(*res);
+		}
+		
+		return true;
+	}
+	
+	void result_removed(ptlist *&res) {
+		lists.erase(find(lists.begin(), lists.end(), res));
+		delete res;
 	}
 	
 private:
-	bool              local;
-	filter_container  container;
+	bool local;
+	std::list<ptlist*> lists;
 };
 
-filter* _make_local_filter_(scene *scn, const filter_params &params) {
-	if (params.empty()) {
-		return NULL;
-	}
-	return new ptlist_filter(true, params.begin()->second);
+filter* _make_local_filter_(scene *scn, filter_input *input) {
+	return new ptlist_filter(input, true);
 }
 
-filter* _make_world_filter_(scene *scn, const filter_params &params) {
-	if (params.empty()) {
-		return NULL;
-	}
-	return new ptlist_filter(false, params.begin()->second);
+filter* _make_world_filter_(scene *scn, filter_input *input) {
+	return new ptlist_filter(input, false);
 }
 

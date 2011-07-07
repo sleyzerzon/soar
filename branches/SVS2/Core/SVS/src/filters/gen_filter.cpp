@@ -7,105 +7,57 @@
 using namespace std;
 int gen_counter = 0;
 
-class gen_filter : public filter {
+/*
+ Need to have better memory management of nodes in general. Right now
+ whenever a node is deleted all its children are also deleted, which
+ may break the caching that's going on in the map_filter class.
+*/
+class gen_filter : public map_filter<sg_node*> {
 public:
-	gen_filter(filter *nf,
-	           filter *ptsf,
-	           filter *pos, 
-	           filter *rot,
-	           filter *scale)
-	: namef(nf), pointf(ptsf), posf(pos), rotf(rot), scalef(scale), container(this)
-	{
-		vector<filter*>::iterator i;
-		
-		if (namef)  container.add(namef);
-		if (pointf) container.add(pointf);
-		if (posf)   container.add(posf);
-		if (rotf)   container.add(rotf);
-		if (scalef) container.add(scalef);
-	}
+	gen_filter(filter_input *input) : map_filter<sg_node*>(input) {}
 
-	filter_result *calc_result() {
+	bool compute(filter_param_set *params, sg_node *&res, bool adding) {
 		string name;
+		vec3 pos, rot, scale, singlept;
+		filter_val *ptsval;
 		ptlist *pts;
-		vec3 pos(0.0,0.0,0.0), rot(0.0,0.0,0.0), scale(1.0,1.0,1.0);
-		sg_node *n;
-	
-		if (namef) {
-			if (!get_string_filter_result_value(this, namef, name)) {
-				return NULL;
-			}
-		} else {
-			stringstream ss;
+		bool dealloc_pts = false;
+		stringstream ss;
+		
+		if (!get_filter_param(NULL, params, "name", name)) {
 			ss << "gen_node_" << gen_counter++;
 			name = ss.str();
 		}
-		if (posf && !get_vec3_filter_result_value(this, posf, pos)) {
-			return NULL;
+		if (!get_filter_param(NULL, params, "pos", pos)) {
+			pos = vec3(0., 0., 0.);
 		}
-		if (rotf && !get_vec3_filter_result_value(this, rotf, rot)) {
-			return NULL;
+		if (!get_filter_param(NULL, params, "rot", rot)) {
+			rot = vec3(0., 0., 0.);
 		}
-		if (scalef && !get_vec3_filter_result_value(this, scalef, scale)) {
-			return NULL;
+		if (!get_filter_param(NULL, params, "scale", scale)) {
+			pos = vec3(1., 1., 1.);
 		}
 		
-		if (pointf) {
-			if (!get_ptlist_filter_result_value(this, pointf, pts)) return NULL;
-			n = new nsg_node(name, *pts);
+		if (get_filter_param(NULL, params, "points", pts)) {
+			res = new nsg_node(name, *pts);
 		} else {
-			n = new nsg_node(name);
+			if (get_filter_param(this, params, "points", singlept)) {
+				pts = new ptlist();
+				dealloc_pts = true;
+				pts->push_back(singlept);
+				res = new nsg_node(name, *pts);
+			} else {
+				res = new nsg_node(name);
+			}
 		}
-		n->set_trans('p', pos);
-		n->set_trans('r', rot);
-		n->set_trans('s', scale);
 		
-		if (!attach_children(n)) {
-			delete n;
-			return NULL;
-		}
-		return new node_filter_result(n);
-	}
-	
-private:
-	bool attach_children(sg_node *n) {
-		sg_node *c;
-		vector<filter*>::iterator i;
-		
-		for (i = childf.begin(); i != childf.end(); ++i) {
-			if (!get_node_filter_result_value(this, *i, c)) return false;
-			n->attach_child(c);
-		}
+		res->set_trans('p', pos);
+		res->set_trans('r', rot);
+		res->set_trans('s', scale);
 		return true;
 	}
-	
-	filter*              namef;
-	filter*              pointf;
-	filter*              posf;
-	filter*              rotf;
-	filter*              scalef;
-	std::vector<filter*> childf;
-	filter_container     container;
 };
 
-filter* _make_gen_filter_(scene *scn, const filter_params &p) {
-	filter_params::const_iterator i;
-	filter *ptsf = NULL;
-	filter *nf = NULL, *posf = NULL, *rotf = NULL, *scalef = NULL;
-
-	ptsf = NULL; posf = NULL; rotf = NULL; scalef = NULL;
-	for (i = p.begin(); i != p.end(); ++i) {
-		if (i->first == "name") {
-			nf = i->second;
-		} else if (i->first == "points") {
-			ptsf = i->second;
-		} else if (i->first == "pos") {
-			posf = i->second;
-		} else if (i->first == "rot") {
-			rotf = i->second;
-		} else if (i->first == "scale") {
-			scalef = i->second;
-		}
-	}
-	return new gen_filter(nf, ptsf, posf, rotf, scalef);
+filter* _make_gen_filter_(scene *scn, filter_input *input) {
+	return new gen_filter(input);
 }

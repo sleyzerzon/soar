@@ -5,6 +5,7 @@
 #include <math.h>
 #include <assert.h>
 #include <ostream>
+#include <iterator>
 #include <vector>
 
 class vec3 {
@@ -68,13 +69,19 @@ public:
 		}
 		return sqrt(sum);
 	}
-	
-	void print(std::ostream &os) const {
-		os << a[0] << " " << a[1] << " " << a[2];
-	}
 };
 
 typedef std::vector<vec3> ptlist;
+
+inline std::ostream &operator<<(std::ostream &os, const vec3 &v) {
+	os << v.a[0] << " " << v.a[1] << " " << v.a[2];
+	return os;
+}
+
+inline std::ostream &operator<<(std::ostream &os, const ptlist &lst) {
+	std::copy(lst.begin(), lst.end(), std::ostream_iterator<vec3>(os, "\n"));
+	return os;
+}
 
 class quaternion {
 public:

@@ -16,8 +16,8 @@ sp {cursor-target-int
 	(<e> ^type bbox_int
 	     ^a <a>
 	     ^b <b>)
-	(<a> ^type node ^name cursor)
-	(<b> ^type node ^name target)
+	(<a> ^type bbox ^node <anode>) (<anode> ^type node ^name cursor)
+	(<b> ^type bbox ^node <bnode>) (<bnode> ^type node ^name target)
 }
 
 sp {seek-target

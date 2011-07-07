@@ -8,29 +8,25 @@ class svs_state;
 class command {
 public:
 	virtual std::string description() = 0;
-	virtual bool update_result() = 0;
+	virtual bool update() = 0;
 	virtual bool early() = 0;
-	virtual ~command() {};
-};
+	
+	command(svs_state *state, Symbol *root);
+	virtual ~command();
 
-class cmd_utils {
-public:
-	cmd_utils(svs_state *state, Symbol *cmd_root);
-	
-	/* create or change value of a (C1 ^result <msg>) wme */
-	void set_result(const std::string &r);
-	
 	/* check if any substructure in the command changed */
-	bool cmd_changed();
+	bool changed();
 	
 	/* get the value of a string wme */
 	bool get_str_param(const std::string &name, std::string &val);
 	
+	void set_status(const std::string &s);
+	
 private:
 	svs_state      *state;
-	Symbol         *cmd_root;
 	soar_interface *si;
-	wme            *result_wme;
+	Symbol         *root;
+	wme            *status_wme;
 	int             subtree_size;
 	int             max_time_tag;
 };

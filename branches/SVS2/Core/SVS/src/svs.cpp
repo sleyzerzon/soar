@@ -31,11 +31,7 @@ void print_tree(sg_node *n) {
 	} else {
 		ptlist pts;
 		n->get_world_points(pts);
-		ptlist::const_iterator j;
-		for (j = pts.begin(); j != pts.end(); ++j) {
-			j->print(cout);
-			cout << ",";
-		}
+		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(cout, ", "));
 		cout << endl;
 	}
 }
@@ -170,7 +166,7 @@ void svs_state::update_cmd_results(bool early) {
 	cmd_iter i;
 	for (i = curr_cmds.begin(); i != curr_cmds.end(); ++i) {
 		if (i->second->early() == early) {
-			i->second->update_result();
+			i->second->update();
 		}
 	}
 }

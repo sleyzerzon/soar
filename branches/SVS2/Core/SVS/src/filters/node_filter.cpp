@@ -1,57 +1,62 @@
+#include <assert.h>
 #include <string>
+#include <map>
 #include "filter.h"
 #include "sg_node.h"
+#include "scene.h"
 
 using namespace std;
 
-class node_filter : public filter, public sg_listener {
+/*
+ This filter takes a "name" parameter and outputs a pointer to the node
+ with that name in the scene graph.
+*/
+class node_filter : public map_filter<sg_node*>, public sg_listener {
 public:
-	node_filter(sg_node *node) 
-	: node(node)
-	{
-		if (node) {
-			node->listen(this);
-		}
-	}
+	node_filter(scene *scn, filter_input *input) : map_filter<sg_node*>(input), scn(scn) {}
 	
-	virtual ~node_filter() {
-		if (node) {
-			node->unlisten(this);
+	bool compute(filter_param_set *params, sg_node *&n, bool adding) {
+		filter_val *nameval;
+		string name;
+		
+		if (!adding) {
+			sg_node *old = n;
+			map<sg_node*, filter_param_set*>::iterator i = node2param.find(old);
+			assert(i != node2param.end());
+			old->unlisten(this);
+			node2param.erase(i);
 		}
+		
+		if (!get_filter_param(this, params, "name", name)) {
+			return false;
+		}
+		if ((n = scn->get_node(name)) == NULL) {
+			stringstream ss;
+			ss << "no node called \"" << name << "\"";
+			set_error(ss.str());
+			return false;
+		}
+		
+		n->listen(this);
+		node2param[n] = params;
+		return true;
 	}
 	
 	void node_update(sg_node *n, sg_node::change_type t, int added) {
-		set_dirty();
-		if (t == sg_node::DELETED) {
-			node = NULL;
-			set_error("node deleted");
+		if (t == sg_node::DELETED || t == sg_node::POINTS_CHANGED) {
+			filter_param_set *s;
+			if (!map_get(node2param, n, s)) {
+				assert(false);
+			}
+			mark_stale(s);
 		}
-	}
-
-	filter_result *calc_result() {
-		if (node) {
-			return new node_filter_result(node);
-		}
-		return NULL;
 	}
 
 private:
-	sg_node *node;
+	scene *scn;
+	map<sg_node*, filter_param_set*> node2param;
 };
 
-filter *_make_node_filter_(scene *scn, const filter_params &params) {
-	filter_params::const_iterator i;
-	string name;
-	sg_node *n;
-	
-	if ((i = params.find("name")) == params.end()) {
-		return NULL;
-	}
-	if (!get_string_filter_result_value(NULL, i->second, name)) {
-		return NULL;
-	}
-	if ((n = scn->get_node(name)) == NULL) {
-		return NULL;
-	}
-	return new node_filter(n);
+filter *_make_node_filter_(scene *scn, filter_input *input) {
+	return new node_filter(scn, input);
 }

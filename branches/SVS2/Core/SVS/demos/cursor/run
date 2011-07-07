@@ -2,8 +2,8 @@
 
 soar=../../../../out/bin/s
 
-socat unix-connect:env,retry=100 system:'python cursor.py' &
-spid=$!
+#socat unix-connect:env,retry=100 system:'python cursor.py' &
+#spid=$!
 
 if [ "$1" == "-g" ]
 then
@@ -12,4 +12,4 @@ else
 	$soar cursor.soar
 fi
 
-kill $spid
+#kill $spid

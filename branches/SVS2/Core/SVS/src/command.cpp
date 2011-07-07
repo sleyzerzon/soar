@@ -28,24 +28,14 @@ void cleanstring(string &s) {
 	}
 }
 
-cmd_utils::cmd_utils(svs_state *state, Symbol *cmd_root)
-: state(state), si(state->get_svs()->get_soar_interface()), cmd_root(cmd_root), result_wme(NULL), subtree_size(0), max_time_tag(0)
-{ }
+command::command(svs_state *state, Symbol *cmd_root)
+: state(state), si(state->get_svs()->get_soar_interface()), root(cmd_root), 
+  subtree_size(0), max_time_tag(0), status_wme(NULL)
+{}
 
-void cmd_utils::set_result(const string &r) {
-	string current;
-	if (result_wme) {
-		if (si->get_val(si->get_wme_val(result_wme), current)) {
-			if (r == current) {
-				return;
-			}
-		}
-		si->remove_wme(result_wme);
-	}
-	result_wme = si->make_wme(cmd_root, "result", r);
-}
+command::~command() {}
 
-bool cmd_utils::cmd_changed() {
+bool command::changed() {
 	tc_num tc;
 	bool changed;
 	stack< Symbol *> to_process;
@@ -58,14 +48,14 @@ bool cmd_utils::cmd_changed() {
 	tc = si->new_tc_num();
 	changed = false;
 	
-	to_process.push(cmd_root);
+	to_process.push(root);
 	while (!to_process.empty()) {
 		parent = to_process.top();
 		to_process.pop();
 		
 		si->get_child_wmes(parent, childs);
 		for (i = childs.begin(); i != childs.end(); ++i) {
-			if (parent == cmd_root) {
+			if (parent == root) {
 				if (si->get_val(si->get_wme_attr(*i), attr) && attr == "result") {
 					/* result wmes are added by svs */
 					continue;
@@ -95,12 +85,12 @@ bool cmd_utils::cmd_changed() {
 	return changed;
 }
 
-bool cmd_utils::get_str_param(const string &name, string &val) {
+bool command::get_str_param(const string &name, string &val) {
 	wme_list children;
 	wme_list::iterator i;
 	string attr, v;
 	
-	si->get_child_wmes(cmd_root, children);
+	si->get_child_wmes(root, children);
 	for(i = children.begin(); i != children.end(); ++i) {
 		if (si->get_val(si->get_wme_attr(*i), attr)) {
 			if (name != attr) {
@@ -113,6 +103,13 @@ bool cmd_utils::get_str_param(const string &name, string &val) {
 		}
 	}
 	return false;
+}
+
+void command::set_status(const string &s) {
+	if (status_wme) {
+		si->remove_wme(status_wme);
+	}
+	status_wme = si->make_wme(root, "status", s);
 }
 
 command *_make_extract_command_(svs_state *state, Symbol *root);

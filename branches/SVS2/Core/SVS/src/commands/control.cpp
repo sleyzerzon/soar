@@ -380,8 +380,8 @@ private:
 class control_command : public command {
 public:
 	control_command(svs_state *state, Symbol *root)
-	: state(state), root(root), utils(state, root), 
-	  si(state->get_svs()->get_soar_interface()), step(0), 
+	: command(state, root), state(state), root(root),
+	  si(state->get_svs()->get_soar_interface()), step(0),
 	  stepwme(NULL), broken(false), ctrl(NULL), obj(NULL)
 	{
 		//update_step();
@@ -395,10 +395,10 @@ public:
 		return string("control");
 	}
 	
-	bool update_result() {
+	bool update() {
 		output out;
 
-		if (utils.cmd_changed()) {
+		if (changed()) {
 			broken = !parse_cmd();
 		}
 		if (broken) {
@@ -406,7 +406,7 @@ public:
 		}
 		
 		if (!ctrl->seek(state->get_scene(), out)) {
-			utils.set_result("no valid output found");
+			set_status("no valid output found");
 			return false;
 		}
 		if (state->get_level() == 0) {
@@ -414,7 +414,7 @@ public:
 		}
 		// need to update scene with model otherwise
 		
-		utils.set_result("success");
+		set_status("success");
 		step++;
 		//update_step();
 		return true;
@@ -438,13 +438,13 @@ private:
 		    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
 		    !parse_output_desc_struct(si, si->get_wme_val(outputs_wme), desc))
 		{
-			utils.set_result("missing or invalid outputs specification");
+			set_status("missing or invalid outputs specification");
 			return false;
 		}
 		if (!si->find_child_wme(root, "type", type_wme) ||
 			!si->get_val(si->get_wme_val(type_wme), type))
 		{
-			utils.set_result("missing or invalid type");
+			set_status("missing or invalid type");
 			return false;
 		}
 		if (type == "random") {
@@ -455,20 +455,20 @@ private:
 				!si->is_identifier(si->get_wme_val(objective_wme)) ||
 				(obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL)
 			{
-				utils.set_result("missing or invalid objective");
+				set_status("missing or invalid objective");
 				return false;
 			}
 			
 			if (!si->find_child_wme(root, "model", model_wme) ||
 			    !si->get_val(si->get_wme_val(model_wme), modelname))
 			{
-				utils.set_result("missing model name");
+				set_status("missing model name");
 				return false;
 			}
 			if (!si->find_child_wme(root, "depth", depth_wme) ||
 				!si->get_val(si->get_wme_val(depth_wme), depth))
 			{
-				utils.set_result("missing or invalid depth");
+				set_status("missing or invalid depth");
 				return false;
 			}
 		}
@@ -488,7 +488,6 @@ private:
 	}
 
 	soar_interface *si;
-	cmd_utils       utils;
 	svs_state      *state;
 	Symbol         *root;
 	controller     *ctrl;

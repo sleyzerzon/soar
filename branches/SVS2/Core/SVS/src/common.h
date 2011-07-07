@@ -10,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <ostream>
+#include <map>
 
 void split(const std::string &s, const std::string &delim, std::vector<std::string> &fields);
 std::string getnamespace();
@@ -300,5 +301,27 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &os, const floatvec &v);
+
+template <typename A, typename B>
+inline bool map_get(const std::map<A, B> &m, const A &key, B &val) {
+	typename std::map<A, B>::const_iterator i = m.find(key);
+	if (i == m.end()) {
+		return false;
+	}
+	val = i->second;
+	return true;
+}
+
+template <typename A, typename B>
+inline bool map_pop(std::map<A, B> &m, const A &key, B &val) {
+	typename std::map<A, B>::iterator i = m.find(key);
+	if (i == m.end()) {
+		return false;
+	}
+	val = i->second;
+	m.erase(i);
+	return true;
+}
+
 
 #endif

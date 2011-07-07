@@ -6,29 +6,20 @@
 
 class bbox {
 public:
-	bbox() {
-		for(int d = 0; d < 3; ++d) {
-			min[d] = 0.0;
-			max[d] = 0.0;
-		}
-	}
+	bbox() {}
 	
+	/* bounding box around single point */
 	bbox(vec3 &v) {
-		for(int d = 0; d < 3; ++d) {
-			min[d] = v[d];
-			max[d] = v[d];
-		}
+		min = v;
+		max = v;
 	}
 	
 	bbox(ptlist &pts) {
-		ptlist::iterator i = pts.begin();
-		for(int d = 0; d < 3; ++d) {
-			min[d] = (*i)[d];
-			max[d] = (*i)[d];
-		}
+		min = pts[0];
+		max = pts[0];
 		
-		for(++i; i != pts.end(); ++i) {
-			include(*i);
+		for(int i = 1; i < pts.size(); ++i) {
+			include(pts[i]);
 		}
 	}
 	
@@ -66,21 +57,19 @@ public:
 		return true;
 	}
 	
-	void get_vals(double &x1, double &y1, double &z1, 
-	              double &x2, double &y2, double &z2)
+	void get_vals(vec3 &minv, vec3 &maxv)
 	{
-		x1 = min[0]; y1 = min[1]; z1 = min[2];
-		x2 = max[0]; y2 = max[1]; z2 = max[2];
+		minv = min; maxv = max;
 	}
 	
-	friend std::ostream& operator<<(std::ostream &os, bbox &b);
+	friend std::ostream& operator<<(std::ostream &os, const bbox &b);
 	
 private:
-	double min[3];
-	double max[3];
+	vec3 min;
+	vec3 max;
 };
 
-inline std::ostream& operator<<(std::ostream &os, bbox &b) {
+inline std::ostream& operator<<(std::ostream &os, const bbox &b) {
 	os << b.min[0] << " " << b.min[1] << " " << b.min[2] << " " << b.max[0] << " " << b.max[1] << " " << b.max[2];
 	return os;
 }
