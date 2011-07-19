@@ -1,9 +1,9 @@
 #!/bin/sh
 
+export LD_LIBRARY_PATH=../../../../out/lib:$HOME/local/lib
 soar=../../../../out/bin/s
 
-#socat unix-connect:env,retry=100 system:'python cursor.py' &
-#spid=$!
+#socat unix-connect:env,retry=10 system:'python cursor.py' &
 
 if [ "$1" == "-g" ]
 then
@@ -12,4 +12,3 @@ else
 	$soar cursor.soar
 fi
 
-#kill $spid

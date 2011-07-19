@@ -48,9 +48,7 @@ sp {create-velocity-model
 -->
 	(<c> ^create-model <m>)
 	(<m> ^type velocity
-	     ^name vel
-	     ^inputs <in>
-	     ^outputs <out>)
+	     ^name vel)
 }
 
 sp {assign-vel-model
@@ -87,7 +85,7 @@ sp {seek-target
 	        ^objective <obj>
 	        ^model <mdl>
 	        ^depth 1
-	        ^type random)
+	        ^type simplex)
 	(<out> ^vx <vx> ^vy <vy> ^vz <vz>)
 	(<vx> ^min -3.0 ^max 3.0 ^inc 1.0)
 	(<vy> ^min -3.0 ^max 3.0 ^inc 1.0)
@@ -95,6 +93,4 @@ sp {seek-target
 	(<obj> ^name euclidean
 	       ^a cursor
 	       ^b target)
-	(<mdl> ^type lwr)
-#	(<mdl> ^type velocity ^obj cursor ^x vx ^y vy ^z vz)
 }

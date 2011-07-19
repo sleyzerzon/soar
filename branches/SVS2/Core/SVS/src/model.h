@@ -93,12 +93,14 @@ public:
 		
 		for (i = active_models.begin(); i != active_models.end(); ++i) {
 			int index = -1;
+			in_slots.clear(); out_slots.clear();
 			i->mdl->get_slots(in_slots, out_slots);
 			i->in_indexes.clear();
 			if (!assign_slot_indexes(props, in_slots, i->in_slot_props, i->in_indexes)) {
 				i->error = true;
 				continue;
 			}
+			i->out_indexes.clear();
 			if (!assign_slot_indexes(props, out_slots, i->out_slot_props, i->out_indexes)) {
 				i->error = true;
 				continue;

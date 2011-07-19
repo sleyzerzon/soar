@@ -14,7 +14,7 @@ v = [0, 0, 0]
 inputs = ['vx', 'vy', 'vz']
 
 print('''a cursor world v 0 0 0 0 0 1 0 1 0 0 1 1 1 0 0 1 0 1 1 1 0 1 1 1
-         a target world v 0 0 0 0 0 10 0 10 0 0 10 10 10 0 0 10 0 10 10 10 0 10 10 10 p -5 -5 -5
+         a target world v 0 0 0 0 0 1 0 1 0 0 1 1 1 0 0 1 0 1 1 1 0 1 1 1 p -20 -20 -20
 ***''')
 sys.stdout.flush()
 

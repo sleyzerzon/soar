@@ -176,7 +176,6 @@ public:
 	/* version to be used in incremental search */
 	bool eval(const trajectory &traj, float &value) {
 		vector<output>::const_iterator i;
-		vector<string> names;
 		
 		mdl->set_indexes(names);
 		
