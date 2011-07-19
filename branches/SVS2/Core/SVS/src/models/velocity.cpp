@@ -6,23 +6,16 @@ using namespace std;
 
 class velocity_model : public model {
 public:
-	velocity_model(string obj, string xdim, string ydim, string zdim)
-	: obj(obj), xdim(xdim), ydim(ydim), zdim(zdim) {}
-	
-	bool predict(flat_scene &scn, const trajectory &trj) {
-		vec3 v, p;
-		vector<output>::const_iterator i;
-		
-		if (!scn.get_node_trans(obj, 'p', p)) {
+	velocity_model() { }
+
+	bool predict(const floatvec &x, floatvec &y) {
+		if (x.size() != 6 || y.size() != 3) {
 			return false;
 		}
-		for (i = trj.t.begin(); i != trj.t.end(); ++i) {
-			v[0] = i->get(xdim);
-			v[1] = i->get(ydim);
-			v[2] = i->get(zdim);
-			p += v;
+
+		for (int i = 0; i < 3; ++i) {
+			y[i] = x[i] + x[i + 3];
 		}
-		scn.set_node_trans(obj, 'p', p);
 		return true;
 	}
 	
@@ -30,29 +23,20 @@ public:
 		cout << "VELOCITY" << endl;
 	}
 	
-private:
-	string obj, xdim, ydim, zdim;
+	void get_slots(vector<string> &in_slots, vector<string> &out_slots) const {
+		const char *in_names[] = { "px", "py", "pz", "vx", "vy", "vz" };
+		const char *out_names[] = { "px", "py", "pz" };
+		int i;
+
+		for (i = 0; i < 6; ++i) {
+			in_slots.push_back(in_names[i]);
+		}
+		for (i = 0; i < 3; ++i) {
+			out_slots.push_back(out_names[i]);
+		}
+	}
 };
 
 model *_make_velocity_model_(soar_interface *si, Symbol *root) {
-	wme_list children;
-	wme_list::iterator i;
-	string attr, obj, xdim, ydim, zdim;
-	
-	si->get_child_wmes(root, children);
-	for (i = children.begin(); i != children.end(); ++i) {
-		if (!si->get_val(si->get_wme_attr(*i), attr)) {
-			continue;
-		}
-		if (attr == "obj") {
-			if (!si->get_val(si->get_wme_val(*i), obj)) return NULL;
-		} else if (attr == "x") {
-			if (!si->get_val(si->get_wme_val(*i), xdim)) return NULL;
-		} else if (attr == "y") {
-			if (!si->get_val(si->get_wme_val(*i), ydim)) return NULL;
-		} else if (attr == "z") {
-			if (!si->get_val(si->get_wme_val(*i), zdim)) return NULL;
-		}
-	}
-	return new velocity_model(obj, xdim, ydim, zdim);
+	return new velocity_model();
 }

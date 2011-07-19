@@ -13,7 +13,6 @@ class sg_node {
 public:
 	enum change_type {
 		CHILD_ADDED,    // get_child(get_nchilds()-1) is the added child
-		DETACHED,
 		DELETED,        // sent from destructor
 		POINTS_CHANGED
 	};

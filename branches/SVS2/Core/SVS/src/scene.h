@@ -27,9 +27,12 @@ public:
 	bool set_node_trans(std::string name, char type, vec3 trans);
 	void clear();
 
-	float get_property(const std::string &obj, const std::string &prop) const;
-	void get_node_properties(const std::string &obj, std::map<std::string, float> &props) const;
-	void set_property(const std::string &obj, const std::string &prop, float val);
+	void get_property_names(std::vector<std::string> &names) const;
+	void get_properties(floatvec &vals) const;
+	bool get_property(const std::string &obj, const std::string &prop, float &val) const;
+	bool get_node_properties(const std::string &obj, std::map<std::string, float> &props) const;
+	bool set_property(const std::string &obj, const std::string &prop, float val);
+	bool set_properties(const floatvec &vals);
 	
 	float get_dt() const;
 	
@@ -48,14 +51,19 @@ private:
     int  parse_dt(std::vector<std::string> &f);
     bool parse_transforms(std::vector<std::string> &f, int &start);
 	
-	typedef std::map<std::string, sg_node*> node_map;
-	typedef std::map<std::pair<std::string, std::string>, float> property_map;
+	typedef std::map<std::string, float> property_map;
+	
+	struct node_info {
+		sg_node *node;
+		property_map props;
+	};
+	
+	typedef std::map<std::string, node_info> node_map;
 
 	std::string   name;
 	std::string   rootname;
 	sg_node      *root;
 	node_map      nodes;
-	property_map  properties;
 	bool          iscopy;
 	float         dt;          // time passed since last update (as reported by environment)
 };
@@ -81,6 +89,8 @@ public:
 	bool congruent(const flat_scene &s) const;
 	float distance(const flat_scene &s) const;
 	floatvec get_node_vals(const std::string &name) const;
+	
+	int get_index(const std::string &name, const std::string &property) const;
 	
 	floatvec vals;
 	

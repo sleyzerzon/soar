@@ -6,8 +6,11 @@ lwrtest: ../src/models/lwr.cpp ../src/common.cpp lwrtest.cpp
 	g++ -g -o lwrtest $(OPTS) $^ -larmadillo
 
 balltree_test: ../src/models/balltree.cpp balltree_test.cpp
-	g++ -pg -o balltree_test $(OPTS) $^ -larmadillo
+	g++ -pg -o $@ $(OPTS) $^ -larmadillo
 
+solidtest: solidtest.cpp
+	g++ -g -o $@ -L/home/jzxu/local/lib $^ -lsolid
+	
 clean:
 	rm -f lwrtest balltree_test floatvec_test
 	

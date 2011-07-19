@@ -33,6 +33,27 @@ public:
 	timeval t1;
 };
 
+template <typename A, typename B>
+inline bool map_get(const std::map<A, B> &m, const A &key, B &val) {
+	typename std::map<A, B>::const_iterator i = m.find(key);
+	if (i == m.end()) {
+		return false;
+	}
+	val = i->second;
+	return true;
+}
+
+template <typename A, typename B>
+inline bool map_pop(std::map<A, B> &m, const A &key, B &val) {
+	typename std::map<A, B>::iterator i = m.find(key);
+	if (i == m.end()) {
+		return false;
+	}
+	val = i->second;
+	m.erase(i);
+	return true;
+}
+
 class floatvec {
 public:
 	floatvec() : sz(0), mem(NULL) {}
@@ -44,6 +65,7 @@ public:
 	
 	floatvec(int sz) : sz(sz) {
 		mem = (float *) malloc(sz * sizeof(float));
+		zero();
 	}
 	
 	floatvec(int sz, float *data) : sz(sz) {
@@ -52,9 +74,6 @@ public:
 	}
 	
 	floatvec(const std::vector<float> &v) {
-		float *p1;
-		std::vector<float>::const_iterator p2;
-		
 		sz = v.size();
 		mem = (float *) malloc(sz * sizeof(float));
 		std::copy(v.begin(), v.end(), mem);
@@ -129,6 +148,14 @@ public:
 			}
 		}
 	}
+
+	void multi_set(const std::vector<int> &inds, const floatvec &v) {
+		assert(v.size() == inds.size());
+		for (int i = 0; i < inds.size(); ++i) {
+			assert(0 <= inds[i] && inds[i] < sz);
+			mem[inds[i]] = v[i];
+		}
+	}
 	
 	void resize(int size) {
 		sz = size;
@@ -136,8 +163,9 @@ public:
 	}
 	
 	void extend(const floatvec &v) {
+		int oldsz = sz;
 		resize(sz + v.sz);
-		memcpy(mem + sz, v.mem, v.sz * sizeof(float));
+		memcpy(mem + oldsz, v.mem, v.sz * sizeof(float));
 	}
 	
 	void combine(const floatvec &v1, const floatvec &v2) {
@@ -188,11 +216,19 @@ public:
 		return s;
 	}
 	
+	floatvec slice(const std::vector<int> &inds) const {
+		floatvec s(inds.size());
+		for (int i = 0; i < inds.size(); ++i) {
+			assert(0 <= inds[i] && inds[i] < sz);
+			s[i] = mem[inds[i]];
+		}
+		return s;
+	}
+
 	void operator=(const floatvec &v) {
 		if (sz != v.sz) {
 			sz = v.sz;
-			free(mem);
-			mem = (float*) malloc(sizeof(float) * sz);
+			mem = (float*) realloc(mem, sizeof(float) * sz);
 		}
 		memcpy(mem, v.mem, sz * sizeof(float));
 	}
@@ -215,7 +251,7 @@ public:
 	}
 	
 	void operator+=(const floatvec &v) {
-		//assert(sz == v.sz);
+		assert(sz == v.sz);
 		for(int i = 0; i < sz; ++i) {
 			mem[i] += v.mem[i];
 		}
@@ -295,33 +331,60 @@ public:
 		}
 	}
 	
+	void randomize(const floatvec &min, const floatvec &max) {
+		assert(sz == min.sz && sz == max.sz);
+		for (int i = 0; i < sz; ++i) {
+			mem[i] = min[i] + (((float) rand()) / RAND_MAX) * (max[i] - min[i]);
+		}
+	}
+	
 private:
-	float * __restrict__ mem;
+	float *mem;
 	int sz;
 };
 
 std::ostream &operator<<(std::ostream &os, const floatvec &v);
 
-template <typename A, typename B>
-inline bool map_get(const std::map<A, B> &m, const A &key, B &val) {
-	typename std::map<A, B>::const_iterator i = m.find(key);
-	if (i == m.end()) {
-		return false;
+/*
+class labeled_floatvec : public floatvec {
+public:
+	labeled_floatvec() : floatvec() {}
+	
+	void set_label(int index, const std::string &label) {
+		label2ind[label] = index;
+		ind2label[index] = label;
 	}
-	val = i->second;
-	return true;
-}
-
-template <typename A, typename B>
-inline bool map_pop(std::map<A, B> &m, const A &key, B &val) {
-	typename std::map<A, B>::iterator i = m.find(key);
-	if (i == m.end()) {
-		return false;
+	
+	bool get_label(int index, std::string &label) {
+		return map_get(ind2label, index, label);
 	}
-	val = i->second;
-	m.erase(i);
-	return true;
-}
-
+	
+	bool get_by_label(const std::string &label, float &val) {
+		int index;
+		if (!map_get(label2ind, label, index)) {
+			return false;
+		}
+		val = floatvec::operator[](index);
+		return true;
+	}
+	
+	bool set_by_label(const std::string &label, float val) {
+		int index;
+		if (!map_get(label2ind, label, index)) {
+			return false;
+		}
+		floatvec::operator[](index) = val;
+		return true;
+	}
+	
+	bool congruent(const labeled_floatvec &v) 
+		return label2ind == v.label2ind;
+	}
+	
+private:
+	std::map<std::string, int> label2ind;
+	std::map<int, std::string> ind2label;
+};
+*/
 
 #endif

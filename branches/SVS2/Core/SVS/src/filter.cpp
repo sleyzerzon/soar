@@ -39,13 +39,15 @@ filter *parse_filter_spec(soar_interface *si, Symbol *root, scene *scn) {
 			if (!si->get_val(cval, itype)) {
 				return NULL;
 			}
-		} else {
+		} else if (pname != "status" && pname != "result") {
 			params.push_back(*i);
 		}
 	}
 	
 	if (itype == "concat") {
 		input = new concat_filter_input();
+	} else if (params.size() == 0) {
+		input = new null_filter_input();
 	} else {
 		input = new product_filter_input();
 	}

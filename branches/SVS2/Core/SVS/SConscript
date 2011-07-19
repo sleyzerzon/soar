@@ -23,5 +23,3 @@ Command('#SVS/src/filter_factory.cpp', Glob('src/filters/*.cpp'), './gen_filter_
 nnobj = clone.Object('src/models/nn.cpp', CPPFLAGS = '-O3 -ffast-math -ftree-vectorizer-verbose=2 -march=native')
 svs = clone.StaticLibrary('svs', src + [nnobj])
 env.Install('$PREFIX/lib', svs)
-
-clone.Prepend(LIBS = ['armadillo'])

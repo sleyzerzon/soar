@@ -1,6 +1,27 @@
 waitsnc -e
 
-sp {cursor-target-int
+#sp {cursor-target-bbox-int
+#	(state <s> 
+#		^superstate nil
+#		^svs (
+#			^command <c>
+#			^spatial-scene (
+#				^child.id cursor
+#				^child.id target
+#			)
+#		)
+#	)
+#-->
+#	(<c> ^extract <e>)
+#	(<e> ^negate t
+#	     ^type bbox_int
+#	     ^a <a>
+#	     ^b <b>)
+#	(<a> ^type bbox ^node <anode>) (<anode> ^type node ^name cursor)
+#	(<b> ^type bbox ^node <bnode>) (<bnode> ^type node ^name target)
+#}
+
+sp {cursor-target-intersect
 	(state <s> 
 		^superstate nil
 		^svs (
@@ -13,11 +34,40 @@ sp {cursor-target-int
 	)
 -->
 	(<c> ^extract <e>)
-	(<e> ^type bbox_int
+	(<e> ^type intersect
 	     ^a <a>
 	     ^b <b>)
-	(<a> ^type bbox ^node <anode>) (<anode> ^type node ^name cursor)
-	(<b> ^type bbox ^node <bnode>) (<bnode> ^type node ^name target)
+	(<a> ^type node ^name cursor)
+	(<b> ^type all_nodes)
+	#(<b> ^type node ^name target)
+}
+
+sp {create-velocity-model
+	(state <s> ^superstate nil
+	           ^svs.command <c>)
+-->
+	(<c> ^create-model <m>)
+	(<m> ^type velocity
+	     ^name vel
+	     ^inputs <in>
+	     ^outputs <out>)
+}
+
+sp {assign-vel-model
+	(state <s> ^superstate nil
+	           ^svs.command <c>)
+-->
+	(<c> ^assign-model <m>)
+	(<m> ^name vel ^inputs <in> ^outputs <out>)
+	(<in> ^px cursor:px
+	      ^py cursor:py
+		  ^pz cursor:pz
+		  ^vx vx
+		  ^vy vy
+		  ^vz vz)
+	(<out> ^px cursor:px
+	       ^py cursor:py
+		   ^pz cursor:pz)
 }
 
 sp {seek-target

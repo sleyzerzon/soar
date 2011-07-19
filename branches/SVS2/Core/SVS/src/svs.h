@@ -116,22 +116,26 @@ public:
 	std::string get_env_input(const std::string &sgel);
 	void set_next_output(const output &out);
 
-	void   register_model(const std::string &name, model *m);
-	model *get_model(const std::string &name);
-	void   unregister_model(const std::string &name);
+	void   add_model(const std::string &name, model *m);
+	bool   assign_model(const std::string &name,
+	                    const std::map<std::string, std::string> &inputs,
+	                    const std::map<std::string, std::string> &outputs);
+	
+	model *get_model();
 	
 private:
 	void make_common_syms();
 	void del_common_syms();
 	void update_models();
 	
-	soar_interface*               si;
-	common_syms                   cs;
-	std::vector<svs_state*>       state_stack;
-	ipcsocket                     envsock;
-	output                        next_out;
-	std::map<std::string, model*> models;
-	flat_scene                    lastscene;
+	soar_interface*          si;
+	common_syms              cs;
+	std::vector<svs_state*>  state_stack;
+	ipcsocket                envsock;
+	output                   next_out;
+	std::vector<std::string> prev_pnames;
+	floatvec                 prev_pvals;
+	multi_model              models;
 };
 
 #endif

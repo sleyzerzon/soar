@@ -2,21 +2,28 @@
 #define LWR_H
 
 #include <vector>
+#include "model.h"
 #include "common.h"
 #include "nn.h"
 
-class lwr {
+class lwr : public model{
 public:
-	lwr(int xdim, int ydim, int nnbrs);
-	void add(const floatvec &x, const floatvec &y);
+	lwr(int nnbrs, const std::vector<std::string> &inputs, const std::vector<std::string> &outputs);
+	void learn(const floatvec &x, const floatvec &y, float dt);
+	bool predict(const floatvec &x, floatvec &y);
+	void printinfo() const;
+	void get_slots(std::vector<std::string> &ins, std::vector<std::string> &outs) const;
+
 	bool load_file(const char *file);
-	bool predict(const floatvec &x, floatvec &y, char method, bool mahalanobis);
-	int size();
+	int size() const;
 	
 private:
 	void normalize();
 	
-	int xdim, ydim, nnbrs;
+	int xsize, ysize, nnbrs;
+	std::vector<std::string> xnames;
+	std::vector<std::string> ynames;
+
 	std::vector<std::pair<floatvec, floatvec> > examples;
 	std::vector<floatvec> xnorm;
 	floatvec xmin, xmax, xrange;

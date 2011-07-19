@@ -95,23 +95,24 @@ void remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
 	}
 }
 
-lwr::lwr(int xdim, int ydim, int nnbrs) 
-: xdim(xdim), ydim(ydim), nnbrs(nnbrs), normalized(false),
-  xmin(xdim), xmax(xdim), xrange(xdim)
+lwr::lwr(int nnbrs, const vector<string> &xnames, const vector<string> &ynames)
+: nnbrs(nnbrs), xnames(xnames), ynames(ynames), xsize(xnames.size()), ysize(ynames.size()),
+  normalized(false), xmin(xnames.size()), xmax(xnames.size()), xrange(xnames.size())
 {
+	int i;
 	nn = new brute_nn(&xnorm);
 }
-	
-void lwr::add(const floatvec &x, const floatvec &y) {
-	assert(x.size() == xdim && y.size() == ydim);
+
+void lwr::learn(const floatvec &x, const floatvec &y, float dt) {
+	int i;
+
 	examples.push_back(make_pair(x, y));
-	
 	if (examples.size() == 1) {
 		xmin = x;
 		xmax = x;
 		xrange.zero();
 	} else {
-		for (int i = 0; i < x.size(); ++i) {
+		for (int i = 0; i < xsize; ++i) {
 			if (x[i] < xmin[i]) {
 				xmin[i] = x[i];
 				normalized = false;
@@ -124,10 +125,7 @@ void lwr::add(const floatvec &x, const floatvec &y) {
 	
 	if (normalized) {
 		// otherwise just wait for renormalization
-		// this looks ugly because I'm trying to avoid unnecessary copying
-		xnorm.push_back(x);
-		xnorm.back() -= xmin;
-		xnorm.back() /= xrange;
+		xnorm.push_back((x - xmin) / xrange);
 	}
 }
 
@@ -146,32 +144,30 @@ void lwr::normalize() {
 	}
 }
 
-bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis) {
+bool lwr::predict(const floatvec &x, floatvec &y) {
 	mat X, Y, Xd, Yd;
 	rowvec xd, yd;
 	vec d;
 	vector<int> xdi, ydi;
+	di_queue neighbors;
 	timer tall, tnn, tslv;
 	tall.start();
 	
 	int i, j, k = examples.size() > nnbrs ? nnbrs : examples.size();
-	di_queue neighbors;
 	
 	if (!normalized) {
 		normalize();
 		normalized = true;
 	}
-	floatvec xn(x);
-	xn = x;
-	xn -= xmin;
-	xn /= xrange;
+	
+	floatvec xn((x - xmin) / xrange);
 	
 	tnn.start();
 	nn->query(xn, k, neighbors);
 	//cout << "NN:  " << tnn.stop() << endl;
 	
-	X.reshape(k, xdim);
-	Y.reshape(k, ydim);
+	X.reshape(k, xsize);
+	Y.reshape(k, ysize);
 	d.reshape(k, 1);
 	for(i = 0; i < k; ++i) {
 		d(i) = neighbors.top().first;
@@ -179,10 +175,10 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 		neighbors.pop();
 		floatvec &tx = examples[ind].first;
 		floatvec &ty = examples[ind].second;
-		for(j = 0; j < xdim; ++j) {
+		for(j = 0; j < xsize; ++j) {
 			X(i, j) = tx[j];
 		}
-		for(j = 0; j < ydim; ++j) {
+		for(j = 0; j < ysize; ++j) {
 			Y(i, j) = ty[j];
 		}
 	}
@@ -195,7 +191,7 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 	   don't do this the solve() will fail due to infinite
 	   values in Z and V.
 	*/
-	rowvec closeavg = zeros<rowvec>(ydim);
+	rowvec closeavg = zeros<rowvec>(ysize);
 	int nclose = 0;
 	for (i = 0; i < w.n_elem; ++i) {
 		if (w(i) == INF) {
@@ -215,7 +211,7 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 	
 	if (ydi.size() == 0) {
 		// all neighbors are identical, use first as prediction
-		for (i = 0; i < ydim; ++i) {
+		for (i = 0; i < ysize; ++i) {
 			y[i] = Y(0, i);
 		}
 		return true;
@@ -231,16 +227,12 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 		xd(i) = x[xdi[i]];
 	}
 	
-	if (method == 'r') {
-		ridge(Xd, Yd, w, xd, yd);
-	} else {
-		lsqr(Xd, Yd, w, xd, yd);
-	}
+	ridge(Xd, Yd, w, xd, yd);
 	
 	/* final answer is first (actually any will do) row of
 	   Y with dynamic columns changed
 	*/
-	for (i = 0; i < ydim; ++i) {
+	for (i = 0; i < ysize; ++i) {
 		y[i] = Y(0, i);
 	}
 	for (i = 0; i < ydi.size(); ++i) {
@@ -251,14 +243,19 @@ bool lwr::predict(const floatvec &x, floatvec &y, char method, bool mahalanobis)
 	return true;
 }
 
-int lwr::size() {
+int lwr::size() const {
 	return examples.size();
+}
+
+void lwr::printinfo() const {
+	cout << "LWR" << endl;
 }
 
 bool lwr::load_file(const char *file) {
 	ifstream f(file);
 	string line;
-	floatvec x(xdim), y(ydim);
+	floatvec x(xsize), y(ysize);
+	float dt;
 	int linenum = 0;
 	size_t p;
 	while (getline(f, line)) {
@@ -270,18 +267,78 @@ bool lwr::load_file(const char *file) {
 			continue;
 		}
 		stringstream ss(line);
-		for(int i = 0; i < xdim; ++i) {
+		for(int i = 0; i < xsize; ++i) {
 			if (!(ss >> x[i])) {
 				cerr << "Error in file \"" << file << "\" on line " << linenum << endl;
 				return false;
 			}
 		}
-		for(int i = 0; i < ydim; ++i) {
+		for(int i = 0; i < ysize; ++i) {
 			if (!(ss >> y[i])) {
 				cerr << "Error in file \"" << file << "\" on line " << linenum << endl;
 				return false;
 			}
 		}
-		add(x, y);
+		if (!(ss >> dt)) {
+			cerr << "Error in file \"" << file << "\" on line " << linenum << endl;
+			return false;
+		}
+		
+		learn(x, y, dt);
 	}
 }
+
+model *_make_lwr_model_(soar_interface *si, Symbol *root) {
+	Symbol *input_root = NULL, *output_root = NULL, *attr;
+	wme_list children;
+	wme_list::iterator i;
+	long nnbrs = 50;
+	string attrstr;
+	vector<string> inputs, outputs;
+	
+	si->get_child_wmes(root, children);
+	for (i = children.begin(); i != children.end(); ++i) {
+		attr = si->get_wme_attr(*i);
+		if (!si->get_val(attr, attrstr)) {
+			continue;
+		}
+		if (attrstr == "num-neighbors") {
+			if (!si->get_val(si->get_wme_val(*i), nnbrs)) {
+				cerr << "WARNING: attribute num-neighbors does not have integer value, using default 50 neighbors" << endl;
+			}
+		} else if (attrstr == "inputs") {
+			input_root = si->get_wme_val(*i);
+		} else if (attrstr == "outputs") {
+			output_root = si->get_wme_val(*i);
+		}
+			
+	}
+	if (input_root == NULL || output_root == NULL) {
+		return NULL;
+	}
+	children.clear();
+	si->get_child_wmes(input_root, children);
+	for (i = children.begin(); i != children.end(); ++i) {
+		attr = si->get_wme_attr(*i);
+		if (!si->get_val(attr, attrstr)) {
+			continue;
+		}
+		inputs.push_back(attrstr);
+	}
+	children.clear();
+	si->get_child_wmes(output_root, children);
+	for (i = children.begin(); i != children.end(); ++i) {
+		attr = si->get_wme_attr(*i);
+		if (!si->get_val(attr, attrstr)) {
+			continue;
+		}
+		outputs.push_back(attrstr);
+	}
+	return new lwr(nnbrs, inputs, outputs);
+}
+
+void lwr::get_slots(vector<string> &in_slots, vector<string> &out_slots) const {
+	copy(xnames.begin(), xnames.end(), in_slots.begin());
+	copy(ynames.begin(), ynames.end(), out_slots.begin());
+}
+

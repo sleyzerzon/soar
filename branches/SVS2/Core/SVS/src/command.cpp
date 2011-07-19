@@ -56,7 +56,9 @@ bool command::changed() {
 		si->get_child_wmes(parent, childs);
 		for (i = childs.begin(); i != childs.end(); ++i) {
 			if (parent == root) {
-				if (si->get_val(si->get_wme_attr(*i), attr) && attr == "result") {
+				if (si->get_val(si->get_wme_attr(*i), attr) && 
+				    (attr == "result" || attr == "status"))
+				{
 					/* result wmes are added by svs */
 					continue;
 				}
@@ -115,7 +117,8 @@ void command::set_status(const string &s) {
 command *_make_extract_command_(svs_state *state, Symbol *root);
 command *_make_generate_command_(svs_state *state, Symbol *root);
 command *_make_control_command_(svs_state *state, Symbol *root);
-command *_make_model_command_(svs_state *state, Symbol *root);
+command *_make_create_model_command_(svs_state *state, Symbol *root);
+command *_make_assign_model_command_(svs_state *state, Symbol *root);
 
 command* make_command(svs_state *state, wme *w) {
 	string name;
@@ -136,8 +139,10 @@ command* make_command(svs_state *state, wme *w) {
 		return _make_generate_command_(state, id);
 	} else if (name == "control") {
 		return _make_control_command_(state, id);
-	} else if (name == "model") {
-		return _make_model_command_(state, id);
+	} else if (name == "create-model") {
+		return _make_create_model_command_(state, id);
+	} else if (name == "assign-model") {
+		return _make_assign_model_command_(state, id);
 	}
 	return NULL;
 }

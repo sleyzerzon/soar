@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
+#include <utility>
 #include "scene.h"
 #include "nsg_node.h"
 #include "linalg.h"
@@ -14,6 +15,30 @@ using namespace std;
 
 ipcsocket *disp = NULL;
 
+/*
+ Native properties are currently the position, rotation, and scaling
+ transforms of a node, named px, py, pz, rx, ry, rz, sx, sy, sz.
+*/
+const int NUM_NATIVE_PROPS = 9;
+const char *NATIVE_PROPS[] = { "px", "py", "pz", "rx", "ry", "rz", "sx", "sy", "sz" };
+
+bool is_native_prop(const string &name, char &type, int &dim) {
+	int d;
+	if (name.size() != 2) {
+		return false;
+	}
+	if (name[0] != 'p' && name[0] != 'r' && name[0] != 's') {
+		return false;
+	}
+	d = name[1] - 'x';
+	if (d < 0 || d > 2) {
+		return false;
+	}
+	type = name[0];
+	dim = d;
+	return true;
+}
+
 scene::scene(string name, string rootname) 
 : name(name), rootname(rootname), iscopy(false), dt(1.0)
 {
@@ -21,20 +46,24 @@ scene::scene(string name, string rootname)
 		disp = new ipcsocket(getnamespace() + "disp", false);
 	}
 	add_node("", rootname);
-	root = nodes[rootname];
+	root = nodes[rootname].node;
 	disp_new_scene(name);
 }
 
 scene::scene(scene &other)
-: name(other.name), rootname(other.rootname), iscopy(true), properties(other.properties), dt(other.dt)
+: name(other.name), rootname(other.rootname), iscopy(true), dt(other.dt)
 {
+	string name;
 	std::list<sg_node*> all_nodes;
 	std::list<sg_node*>::iterator i;
 	
 	root = other.root->copy();
 	root->walk(all_nodes);
 	for(i = all_nodes.begin(); i != all_nodes.end(); ++i) {
-		nodes[(**i).get_name()] = *i;
+		name = (**i).get_name();
+		node_info &info = nodes[name];
+		info.node = *i;
+		info.props = other.nodes[name].props;
 	}
 }
 
@@ -54,17 +83,19 @@ sg_node* scene::get_node(string name) {
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return NULL;
 	}
-	return i->second;
+	return i->second.node;
 }
 
 void scene::get_all_nodes(vector<sg_node*> &n) {
 	node_map::const_iterator i;
 	for (i = nodes.begin(); i != nodes.end(); ++i) {
-		n.push_back(i->second);
+		n.push_back(i->second.node);
 	}
 }
 
 bool scene::add_node(string parent, sg_node *n) {
+	node_info info;
+	info.node = n;
 	sg_node *p = get_node(parent);
 	
 	if (parent != "" && !p) {
@@ -74,7 +105,7 @@ bool scene::add_node(string parent, sg_node *n) {
 		delete n;
 		return false;
 	}
-	nodes[n->get_name()] = n;
+	nodes[n->get_name()] = info;
 	if (!iscopy) {
 		disp_update_node(n);
 	}
@@ -95,9 +126,9 @@ bool scene::del_node(string name) {
 		return false;
 	}
 	if (!iscopy) {
-		disp_del_node(i->second);
+		disp_del_node(i->second.node);
 	}
-	delete i->second;
+	delete i->second.node;
 	nodes.erase(i);
 	return true;
 }
@@ -228,6 +259,7 @@ int scene::parse_change(vector<string> &f) {
 }
 
 int scene::parse_property(vector<string> &f) {
+	node_map::iterator i;
 	if (f.size() != 3) {
 		return f.size();
 	}
@@ -235,9 +267,12 @@ int scene::parse_property(vector<string> &f) {
 	float val;
 	
 	if (!(ss >> val)) {
-		return 1;
+		return 2;
 	}
-	properties[make_pair(f[0], f[1])] = val;
+	if ((i = nodes.find(f[0])) == nodes.end()) {
+		return 0;
+	}
+	i->second.props[f[1]] = val;
 	return -1;
 }
 
@@ -329,32 +364,122 @@ void scene::disp_del_scene(string name) {
 	if (disp) disp->send("delscene\n" + name);
 }
 
-float scene::get_property(const string &obj, const string &prop) const {
-	property_map::const_iterator i;
-	if ((i = properties.find(make_pair(obj, prop))) == properties.end()) {
-		assert(false);
-	}
-	return i->second;
-}
-
-void scene::get_node_properties(const string &obj, map<string, float> &props) const {
-	property_map::const_iterator i;
-	for (i = properties.begin(); i != properties.end(); ++i) {
-		if (i->first.first == obj) {
-			props[i->first.second] = i->second;
+void scene::get_property_names(vector<string> &names) const {
+	node_map::const_iterator i;
+	property_map::const_iterator j;
+	int k;
+	stringstream ss;
+	
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		for (k = 0; k < NUM_NATIVE_PROPS; ++k) {
+			ss.str("");
+			ss << i->first << ":" << NATIVE_PROPS[k];
+			names.push_back(ss.str());
+		}
+		for (j = i->second.props.begin(); j != i->second.props.end(); ++j) {
+			ss.str("");
+			ss << i->first << ":" << j->first;
+			names.push_back(ss.str());
 		}
 	}
 }
 
-void scene::set_property(const string &obj, const string &prop, float v) {
-	pair<string, string> key = make_pair(obj, prop);
-	property_map::iterator i;
-	if ((i = properties.find(key)) == properties.end()) {
-		properties[key] = v;
-	} else {
-		i->second = v;
- 	}
+void scene::get_properties(floatvec &vals) const {
+	node_map::const_iterator i;
+	property_map::const_iterator j;
+	int k1, k2, l = 0;
+	const char *types = "prs";
+	vec3 trans;
+	
+	vals.resize(get_dof());
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		for (k1 = 0; k1 < 3; ++k1) {
+			trans = i->second.node->get_trans(types[k1]);
+			for (k2 = 0; k2 < 3; ++k2) {
+				vals[l++] = trans[k2];
+			}
+		}
+		for (j = i->second.props.begin(); j != i->second.props.end(); ++j) {
+			vals[l++] = j->second;
+		}
+	}
 }
+
+bool scene::get_property(const string &obj, const string &prop, float &val) const {
+	node_map::const_iterator i;
+	property_map::const_iterator j;
+	char type; int d;
+	if ((i = nodes.find(obj)) == nodes.end()) {
+		return false;
+	}
+	if (is_native_prop(prop, type, d)) {
+		val = i->second.node->get_trans(type)[d];
+	} else {
+		if ((j = i->second.props.find(prop)) == i->second.props.end()) {
+			return false;
+		}
+		val = j->second;
+	}
+	return true;
+}
+
+bool scene::get_node_properties(const string &obj, map<string, float> &props) const {
+	node_map::const_iterator i;
+	property_map::const_iterator j;
+	if ((i = nodes.find(obj)) == nodes.end()) {
+		return false;
+	}
+	props = i->second.props;
+	return true;
+}
+
+bool scene::set_property(const string &obj, const string &prop, float val) {
+	node_map::iterator i;
+	property_map::iterator j;
+	char type; int d;
+	if ((i = nodes.find(obj)) == nodes.end()) {
+		return false;
+	}
+	if (is_native_prop(prop, type, d)) {
+		vec3 trans = i->second.node->get_trans(type);
+		trans[d] = val;
+		i->second.node->set_trans(type, trans);
+	} else {
+		if ((j = i->second.props.find(prop)) == i->second.props.end()) {
+			return false;
+		}
+		j->second = val;
+	}
+	return true;
+}
+
+bool scene::set_properties(const floatvec &vals) {
+	node_map::iterator i;
+	property_map::iterator j;
+	int k1, k2, l = 0;
+	const char *types = "prs";
+	vec3 trans;
+	
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		for (k1 = 0; k1 < 3; ++k1) {
+			for (k2 = 0; k2 < 3; ++k2) {
+				trans[k2] = vals[l++];
+				if (l >= vals.size()) {
+					return false;
+				}
+			}
+			i->second.node->set_trans(types[k1], trans);
+		}
+		for (j = i->second.props.begin(); j != i->second.props.end(); ++j) {
+			j->second = vals[l++];
+			if (l >= vals.size()) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 
 int scene::num_nodes() const {
 	return nodes.size();
@@ -365,8 +490,14 @@ float scene::get_dt() const {
 }
 
 int scene::get_dof() const {
-	return nodes.size() * 9 + properties.size(); 
+	int dof = 0;
+	node_map::const_iterator i;
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		dof += NUM_NATIVE_PROPS + i->second.props.size();
+	}
+	return dof;
 }
+
 
 flat_scene::flat_scene() {}
 
@@ -514,7 +645,7 @@ void flat_scene::get_column_names(vector<string> &names) const {
 	names.resize(vals.size());
 	
 	for(i = nodes.begin(); i != nodes.end(); ++i) {
-		for(int k = 0; k < 9; ++k) {
+		for(int k = 0; k < NUM_NATIVE_PROPS; ++k) {
 			stringstream name;
 			if (k < 3) {
 				name << i->first << ":pos:" << k;
@@ -560,4 +691,38 @@ floatvec flat_scene::get_node_vals(const string &name) const {
 		return floatvec();
 	}
 	return vals.slice(i->second.begin, i->second.length);
+}
+
+int flat_scene::get_index(const string &name, const string &property) const {
+	node_info info;
+	int base;
+	
+	if (map_get(properties, make_pair(name, property), base)) {
+		return base;
+	}
+	if (!map_get(nodes, name, info)) {
+		return -1;
+	}
+	
+	base = info.begin;
+	if (property == "px") {
+		return base;
+	} else if (property == "py") {
+		return base + 1;
+	} else if (property == "pz") {
+		return base + 2;
+	} else if (property == "rx") {
+		return base;
+	} else if (property == "ry") {
+		return base + 1;
+	} else if (property == "rz") {
+		return base + 2;
+	} else if (property == "sx") {
+		return base;
+	} else if (property == "sy") {
+		return base + 1;
+	} else if (property == "sz") {
+		return base + 2;
+	}
+	return -1;
 }

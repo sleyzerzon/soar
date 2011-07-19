@@ -1,6 +1,7 @@
 #ifndef FILTER_H
 #define FILTER_H
 
+#include <iostream>
 #include <string>
 #include <list>
 #include <map>
@@ -190,7 +191,7 @@ public:
 	}
 	
 	iter removed_end() const {
-		return removed.begin();
+		return removed.end();
 	}
 	
 	iter changed_begin() const {
@@ -198,7 +199,7 @@ public:
 	}
 	
 	iter changed_end() const {
-		return changed.begin();
+		return changed.end();
 	}
 	
 private:
@@ -226,16 +227,7 @@ class filter;
  Every filter generates a list of filter values as a result, even if
  the list is empty or a singleton.
 */
-class filter_result : public change_tracking_list<filter_val> {
-public:
-	filter_result(filter *owner) : owner(owner) {}
-	
-	/* can't define the body until filter has been defined */
-	void update();
-	
-private:
-	filter *owner;
-};
+typedef change_tracking_list<filter_val> filter_result;
 
 /*
  A filter parameter set represents one complete input into a filter. It's
@@ -466,11 +458,11 @@ private:
 */
 class filter {
 public:
-	filter() : result(this) {
+	filter() {
 		input = new null_filter_input();
 	}
 	
-	filter(filter_input *in) : input(in), result(this) {
+	filter(filter_input *in) : input(in) {
 		if (input == NULL) {
 			input = new null_filter_input();
 		}
@@ -499,12 +491,18 @@ public:
 		errmsg.clear();
 	}
 	
-	void add_result(filter_val *v) {
+	void add_result(filter_val *v, filter_param_set *p) {
 		result.add(v);
+		result2params[v] = p;
+	}
+	
+	bool get_result_params(filter_val *v, filter_param_set *&p) {
+		return map_get(result2params, v, p);
 	}
 	
 	void remove_result(filter_val *v) {
 		result.remove(v);
+		result2params.erase(v);
 	}
 	
 	void change_result(filter_val *v) {
@@ -560,11 +558,8 @@ private:
 	filter_input *input;
 	filter_result result;
 	std::string errmsg;
+	std::map<filter_val*, filter_param_set*> result2params;
 };
-
-inline void filter_result::update() {
-	owner->update_results();
-}
 
 inline filter_input::~filter_input() {
 	input_table::iterator i;
@@ -648,7 +643,7 @@ public:
 				return false;
 			}
 			filter_val_c<T> *fv = new filter_val_c<T>(val);
-			add_result(fv);
+			add_result(fv, *i);
 			io_map[*i] = fv;
 		}
 		for ( i = removed_input_begin(); i != removed_input_end(); ++i ) {
@@ -711,7 +706,7 @@ public:
 		if (!added) {
 			typename std::vector<T>::const_iterator i;
 			for (i = v.begin(); i != v.end(); ++i) {
-				add_result(new filter_val_c<T>(*i));
+				add_result(new filter_val_c<T>(*i), NULL);
 			}
 			added = true;
 		}

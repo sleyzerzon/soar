@@ -22,19 +22,18 @@ inline float calc_rps(float &rps, float input_volts) {
 	rps += acceleration * dt;
 }
 
-inline void splinter_update(float lvolt, float rvolt, float &lrps, float &rrps, 
-                     vec3 &pos, vec3 &vel, vec3 &rot, vec3 &rotrate)
-{
+inline void splinter_update(float &px, float &py, float &vx, float &vy, float &rz, float &rtz, float &lrps, float &rrps, float lvolt, float rvolt) {
 	calc_rps(lrps, lvolt * 12);
 	calc_rps(rrps, rvolt * 12);
 	float dleft  = dt * lrps * wheel_diameter;
 	float dright = dt * rrps * wheel_diameter;
 	
-	quaternion orient(rot);
-	vel = orient.rotate(vec3((dleft + dright) / 2, 0, 0));
-	rotrate[0] = 0; rotrate[1] = 0; rotrate[2] = (dright - dleft) / baseline;
-	pos = pos + vel;
-	rot += rotrate;
+	quaternion orient(vec3(0., 0., rz));
+	vec3 vel = orient.rotate(vec3((dleft + dright) / 2, 0., 0.));
+	rtz = (dright - dleft) / baseline;
+	px += vel[0];
+	py += vel[1];
+	rz += rtz;
 }
 
 #endif

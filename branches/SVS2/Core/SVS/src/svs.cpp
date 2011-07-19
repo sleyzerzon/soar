@@ -5,6 +5,7 @@
 #include <iterator>
 #include <utility>
 #include <algorithm>
+#include <fstream>
 
 #include "svs.h"
 #include "command.h"
@@ -71,7 +72,6 @@ void sgwme::node_update(sg_node *n, sg_node::change_type t, int added_child) {
 		case sg_node::CHILD_ADDED:
 			add_child(node->get_child(added_child));
 			break;
-		case sg_node::DETACHED:
 		case sg_node::DELETED:
 			node = NULL;
 			delete this;
@@ -272,45 +272,41 @@ void svs::pre_env_callback() {
 }
 
 void svs::update_models() {
-	std::map<string, model*>::iterator i;
-	flat_scene curr(state_stack.front()->get_scene());
-	double dt = state_stack.front()->get_scene()->get_dt();
+	map<string, model*>::iterator i;
+	outdesc::iterator j;
+	vector<string> curr_pnames, out_names;
+	floatvec curr_pvals;
+	double dt;
 	
-	if (lastscene.get_dof() > 0 || lastscene.congruent(curr)) {
-		for (i = models.begin(); i != models.end(); ++i) {
-			bool learn = true;
-			flat_scene predicted(lastscene);
-			timer t;
-			t.start();
-			if (i->second->predict(predicted, trajectory(next_out))) {
-				double d = predicted.distance(curr);
-				cout << "Prediction Error: " << d << endl;
-				if (d < 1e-4) {
-					learn = false;
-				}
-			} else {
-				cout << "No prediction" << endl;
-			}
-			cout << "time " << t.stop() << endl;
-			if (true) {
-				i->second->learn(lastscene, next_out, curr, dt);
-			} else {
-				cout << "Not learning" << endl;
-			}
-			cout << "model info: ";
-			i->second->printinfo();
+	scene *scn = state_stack.front()->get_scene();
+	scn->get_property_names(curr_pnames);
+	scn->get_properties(curr_pvals);
+	next_out.get_names(out_names);
+	copy(out_names.begin(), out_names.end(), back_inserter(curr_pnames));
+	dt = scn->get_dt();
+	
+	if (prev_pnames.size() > 0 || prev_pnames == curr_pnames) {
+		floatvec x(prev_pvals), y(prev_pvals);
+		x.extend(next_out.vals);
+		if (models.predict(x, y)) {
+			cout << "prediction error: " << y.dist(curr_pvals) << endl;
+		} else {
+			cout << "no prediction" << endl;
 		}
+		models.learn(x, curr_pvals, dt);
+		
 		if (!headerwritten) {
-			vector<string> colnames;
-			curr.get_column_names(colnames);
 			trainlog << "# ";
-			copy(colnames.begin(), colnames.end(), ostream_iterator<string>(trainlog, " "));
+			copy(curr_pnames.begin(), curr_pnames.end(), ostream_iterator<string>(trainlog, " "));
 			trainlog << endl;
 			headerwritten = true;
 		}
-		trainlog << lastscene.vals << " " << next_out.vals << " ; " << curr.vals << " ; " << dt << endl;
+		trainlog << prev_pvals << " " << next_out.vals << " ; " << curr_pvals << " ; " << dt << endl;
+	} else {
+		models.set_indexes(curr_pnames);
 	}
-	lastscene = curr;
+	prev_pnames = curr_pnames;
+	prev_pvals = curr_pvals;
 }
 
 void svs::post_env_callback() {
@@ -346,21 +342,18 @@ void svs::set_next_output(const output &out) {
 	next_out = out;
 }
 
-void svs::register_model(const std::string &name, model *m) {
-	map<string, model*>::iterator i = models.find(name);
-	assert(i == models.end());
-	models[name] = m;
+void svs::add_model(const std::string &name, model *m) {
+	models.add_model(name, m);
 }
 
-model *svs::get_model(const std::string &name) {
-	map<string, model*>::iterator i = models.find(name);
-	if (i == models.end()) {
-		return NULL;
-	}
-	return i->second;
+bool svs::assign_model(const string &name,
+	                   const map<string,string> &inputs,
+	                   const map<string,string> &outputs)
+{
+	models.assign_model(name, inputs, outputs);
 }
 
-void svs::unregister_model(const std::string &name) {
-	models.erase(name);
+model *svs::get_model() {
+	return &models;
 }
 

@@ -3,7 +3,6 @@
 #include <string>
 #include <limits>
 #include <algorithm>
-#include <armadillo>
 #include "command.h"
 #include "svs.h"
 #include "env.h"
@@ -11,8 +10,8 @@
 #include "model.h"
 
 using namespace std;
-using namespace arma;
 
+// constants for simplex search
 const double RCOEF = 1.0;
 const double ECOEF = 2.0;
 const double CCOEF = 0.5;
@@ -70,7 +69,7 @@ bool parse_output_desc_struct(soar_interface *si, Symbol *root, outdesc &desc) {
 
 class objective {
 public:
-	virtual double eval(scene *scn) = 0;
+	virtual float eval(scene *scn) = 0;
 };
 
 ::vec3 calc_centroid(const ptlist &pts) {
@@ -95,7 +94,7 @@ public:
 	euclidean_obj(string obj1, string obj2)
 	: obj1(obj1), obj2(obj2) {}
 	
-	double eval(scene *scn) {
+	float eval(scene *scn) {
 		sg_node *n1, *n2;
 		ptlist p1, p2;
 		::vec3 c1, c2;
@@ -160,138 +159,183 @@ objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 /* this class is a little dirty to avoid as much allocation and copying as possible */
 class traj_eval {
 public:
-	traj_eval(outdesc *desc, int length, model *mdl, objective *obj, scene *init)
-	: cachedtrj(length, desc), mdl(mdl), obj(obj), next(*init), flat(init)
+	traj_eval(outdesc *desc, int length, model *m, objective *obj, scene *init)
+	: cachedtrj(length, desc), obj(obj), next(*init)
 	{
-		initvals = flat.vals;
+		outdesc::const_iterator i;
+		mdl = dynamic_cast<multi_model*>(m);
+		assert(mdl);
+		
+		init->get_property_names(names);
+		for (i = desc->begin(); i != desc->end(); ++i) {
+			names.push_back(i->name);
+		}
+		init->get_properties(initvals);
 	}
 
 	/* version to be used in incremental search */
-	bool eval(const trajectory &traj, double &value) {
+	bool eval(const trajectory &traj, float &value) {
 		vector<output>::const_iterator i;
+		vector<string> names;
 		
-		flat.vals = initvals;
-		if (!mdl->predict(flat, traj)) {
-			return false;
+		mdl->set_indexes(names);
+		
+		floatvec x(names.size()), y = initvals;
+		
+		if (traj.t.size() > 0) {
+			for (i = traj.t.begin(); i != traj.t.end(); ++i) {
+				x.combine(y, i->vals);
+				if (!mdl->predict(x, y)) {
+					return false;
+				}
+			}
+			next.set_properties(y);
 		}
-		flat.update_scene(&next);
 		value = obj->eval(&next);
 		return true;
 	}
 	
 	/* version to be used in Nelder-Mead search */
-	bool eval(vec traj, double &value) {
-		cachedtrj.from_vec(traj);
+	bool eval(const floatvec &v, float &value) {
+		cachedtrj.from_vec(v);
 		return eval(cachedtrj, value);
 	}
 	
 private:
-	model       *mdl;
-	objective   *obj;
-	trajectory   cachedtrj; // keep around to avoid reallocation
-	scene        next;      // copy of initial scene to be modified after prediction
-	flat_scene   flat;      // keep around to avoid reallocation
-	floatvec     initvals;  // flattened values of initial scene for resetting flat
+	multi_model   *mdl;
+	objective     *obj;
+	trajectory     cachedtrj; // keep around to avoid reallocation
+	scene          next;      // copy of initial scene to be modified after prediction
+	floatvec       initvals;  // flattened values of initial scene for resetting flat
+	vector<string> names;
 };
 
-void constrain(vec &v, const vec &min, const vec &max) {
-	for (int i = 0; i < v.n_elem; ++i) {
-		if (v(i) < min(i)) {
-			v(i) = min(i);
-		} else if (v(i) > max(i)) {
-			v(i) = max(i);
+void constrain(floatvec &v, const floatvec &min, const floatvec &max) {
+	for (int i = 0; i < v.size(); ++i) {
+		if (v[i] < min[i]) {
+			v[i] = min[i];
+		} else if (v[i] > max[i]) {
+			v[i] = max[i];
 		}
 	}
 }
 
-void argmin(const vec &v, int &worst, int &nextworst, int &best) {
+void argmin(const floatvec &v, int &worst, int &nextworst, int &best) {
 	worst = 0; nextworst = 0; best = 0;
-	for (int i = 1; i < v.n_elem; ++i) {
-		if (v(i) > v(worst)) {
+	for (int i = 1; i < v.size(); ++i) {
+		if (v[i] > v[worst]) {
 			nextworst = worst;
 			worst = i;
-		} else if (v(i) > v(nextworst)) {
+		} else if (v[i] > v[nextworst]) {
 			nextworst = i;
-		} else if (v(i) < v(best)) {
+		} else if (v[i] < v[best]) {
 			best = i;
 		}
 	}
 }
 
+void calc_centroid(const vector<floatvec> &simplex, floatvec &sum, int exclude) {
+	for (int i = 0; i < simplex.size(); ++i) {
+		if (i != exclude) {
+			sum += simplex[i];
+		}
+	}
+	sum /= (simplex.size() - 1);
+}
+
 bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 	int ndim = t.dof(), i, wi, ni, bi;
 	outdesc::const_iterator j;
-	vec min = zeros(t.dof(), 1), max = zeros(t.dof(), 1);
-	for (i = 0; i < min.n_elem; ) {
+	floatvec min(t.dof()), max(t.dof());
+	floatvec eval(ndim+1);
+	for (i = 0; i < min.size(); ) {
 		for (j = t.desc->begin(); j != t.desc->end(); ++j) {
-			min(i) = j->min;
-			max(i) = j->max;
+			min[i] = j->min;
+			max[i] = j->max;
 			++i;
 		}
 	}
 	
-	vec range = max - min;
-	mat simplex = zeros<mat>(ndim, ndim+1);
-	vec eval = zeros<vec>(ndim+1, 1);
-	double reval, eeval, ceval;
-	vec centroid, dir, reflect, expand, contract, best, worst;
+	floatvec range = max - min;
+	vector<floatvec> simplex;
+	float reval, eeval, ceval;
+	floatvec centroid(ndim), dir(ndim), reflect(ndim), expand(ndim), 
+	         contract(ndim), best(ndim), worst(ndim);
 	
 	/* random initialization */
-	for (i = 0; i < simplex.n_cols; ++i) {
-		simplex.col(i) = min + randu<vec>(ndim, 1) % range;
-		if (!ev.eval(simplex.col(i), eval(i))) return false;
+	floatvec rtmp(ndim);
+	for (i = 0; i < ndim + 1; ++i) {
+		rtmp.randomize(min, max);
+		if (!ev.eval(rtmp, eval[i])) {
+			return false;
+		}
+		simplex.push_back(rtmp);
 	}
 	
 	for(int iters = 0; iters < MAXITERS; ++iters) {
 		argmin(eval, wi, ni, bi);
-		worst = simplex.col(wi);
-		best = simplex.col(bi);
-		centroid = (sum(simplex, 1) - worst) / (simplex.n_cols - 1);
+		worst = simplex[wi];
+		best = simplex[bi];
+		floatvec sum(ndim);
+		
+		/*
+		 This used to be
+		 
+		 centroid = (sum(simplex, 1) - worst) / (simplex.n_cols - 1);
+		 
+		 which I'm pretty sure was wrong.
+		*/
+		calc_centroid(simplex, centroid, wi);
+		
 		dir = centroid - worst;
-		reflect = centroid + RCOEF * dir;
+		reflect = centroid + dir * RCOEF;
 		constrain(reflect, min, max);
 		
-		if (!ev.eval(reflect, reval)) return false;
-		if (eval(bi) <= reval && reval < eval(ni)) {
+		if (!ev.eval(reflect, reval)) {
+			return false;
+		}
+		if (eval[bi] <= reval && reval < eval[ni]) {
 			// reflection
-			simplex.col(wi) = reflect;
-			eval(wi) = reval;
+			simplex[wi] = reflect;
+			eval[wi] = reval;
 			continue;
 		}
 		
-		if (reval < eval(bi)) {
+		if (reval < eval[bi]) {
 			// expansion
-			expand = centroid + ECOEF * dir;
+			expand = centroid + dir * ECOEF;
 			constrain(expand, min, max);
 			if (!ev.eval(expand, eeval)) return false;
 			if (eeval < reval) {
-				simplex.col(wi) = expand;
-				eval(wi) = eeval;
+				simplex[wi] = expand;
+				eval[wi] = eeval;
 			} else {
-				simplex.col(wi) = reflect;
-				eval(wi) = reval;
+				simplex[wi] = reflect;
+				eval[wi] = reval;
 			}
 			continue;
 		}
 		
-		assert(reval >= eval(ni));
+		assert(reval >= eval[ni]);
 		
-		contract = worst + CCOEF * dir;
-		if (!ev.eval(contract, ceval)) return false;
-		if (ceval < eval(wi)) {
+		contract = worst + dir * CCOEF;
+		if (!ev.eval(contract, ceval)) {
+			return false;
+		}
+		if (ceval < eval[wi]) {
 			// contraction
-			simplex.col(wi) = contract;
-			eval(wi) = ceval;
+			simplex[wi] = contract;
+			eval[wi] = ceval;
 			continue;
 		}
 		
 		// shrink
-		for (i = 0; i < simplex.n_cols; ++i) {
+		for (i = 0; i < simplex.size(); ++i) {
 			if (i == bi) {
 				continue;
 			}
-			simplex.col(i) = best + SCOEF * (simplex.col(i) - best);
-			if (!ev.eval(simplex.col(i), eval(i))) return false;
+			simplex[i] = best + (simplex[i] - best) * SCOEF;
+			if (!ev.eval(simplex[i], eval[i])) return false;
 		}
 	}
 	t.from_vec(best);
@@ -300,8 +344,8 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 
 class controller {
 public:
-	controller(svs *svsp, string modelname, objective *obj, const outdesc &odesc, int depth, string type)
-	: svsp(svsp), modelname(modelname), obj(obj), odesc(odesc), step(0), depth(depth), type(type) 
+	controller(svs *svsp, objective *obj, const outdesc &odesc, int depth, string type)
+	: svsp(svsp), obj(obj), odesc(odesc), step(0), depth(depth), type(type) 
 	{}
 
 	/* Don't forget to make this a PID controller later */
@@ -315,14 +359,15 @@ public:
 	}
 	
 	bool random_seek(scene *scn, output &bestout) {
-		bestout = random_out(&odesc);
+		bestout = output(&odesc);
+		bestout.randomize();
 		return true;
 	}
 	
 	bool naive_seek(scene *scn, output &bestout) {
-		double val, best;
+		float val, best;
 		bool found = false;
-		model *mdl = svsp->get_model(modelname);
+		model *mdl = svsp->get_model();
 		
 		if (!mdl) {
 			return false;
@@ -334,7 +379,8 @@ public:
 		while (true) {
 			if (!evaluator.eval(trj, val)) {
 				cout << "WARNING: Using random output" << endl;
-				bestout = random_out(&odesc);
+				bestout = output(&odesc);
+				bestout.randomize();
 				return true;
 			}
 			if (!found || val < best) {
@@ -351,7 +397,7 @@ public:
 	}
 	
 	bool simplex_seek(scene *scn, output &bestout) {
-		model *mdl = svsp->get_model(modelname);
+		model *mdl = svsp->get_model();
 		if (!mdl) {
 			return false;
 		}
@@ -360,7 +406,8 @@ public:
 		trajectory trj(depth, &odesc);
 		if (!nelder_mead_constrained(trj, evaluator)) {
 			cout << "WARNING: Using random output" << endl;
-			bestout = random_out(&odesc);
+			bestout = output(&odesc);
+			bestout.randomize();
 			return true;
 		}
 		bestout = trj.t.front();
@@ -374,7 +421,6 @@ private:
 	int        step;
 	int        depth;
 	string     type;
-	string     modelname;
 };
 
 class control_command : public command {
@@ -431,7 +477,7 @@ private:
 		outdesc desc;
 		wme *outputs_wme, *objective_wme, *model_wme, *depth_wme, *type_wme;
 		long depth;
-		string type, modelname;
+		string type;
 		
 		cleanup();
 		if (!si->find_child_wme(root, "outputs", outputs_wme) ||
@@ -459,12 +505,6 @@ private:
 				return false;
 			}
 			
-			if (!si->find_child_wme(root, "model", model_wme) ||
-			    !si->get_val(si->get_wme_val(model_wme), modelname))
-			{
-				set_status("missing model name");
-				return false;
-			}
 			if (!si->find_child_wme(root, "depth", depth_wme) ||
 				!si->get_val(si->get_wme_val(depth_wme), depth))
 			{
@@ -472,7 +512,7 @@ private:
 				return false;
 			}
 		}
-		ctrl = new controller(state->get_svs(), modelname, obj, desc, depth, type);
+		ctrl = new controller(state->get_svs(), obj, desc, depth, type);
 		return true;
 	}
 
