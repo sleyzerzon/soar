@@ -34,7 +34,7 @@ public:
 			negated = (get_str_param("negate", neg) && (neg == "t" || neg == "true" || neg == "1"));
 			fltr = parse_filter_spec(state->get_svs()->get_soar_interface(), root, state->get_scene());
 			if (!fltr) {
-				set_status("command error");
+				set_status("incorrect filter syntax");
 				return false;
 			}
 			res = fltr->get_result();

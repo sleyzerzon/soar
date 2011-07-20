@@ -423,13 +423,21 @@ bool scene::get_property(const string &obj, const string &prop, float &val) cons
 	return true;
 }
 
-bool scene::get_node_properties(const string &obj, map<string, float> &props) const {
-	node_map::const_iterator i;
-	property_map::const_iterator j;
+bool scene::add_property(const string &obj, const string &prop, float val) {
+	node_map::iterator i;
+	property_map::iterator j;
+	char type; int d;
 	if ((i = nodes.find(obj)) == nodes.end()) {
 		return false;
 	}
-	props = i->second.props;
+	if (is_native_prop(prop, type, d)) {
+		return false;
+	} else {
+		if ((j = i->second.props.find(prop)) != i->second.props.end()) {
+			return false;
+		}
+		i->second.props[prop] = val;
+	}
 	return true;
 }
 
@@ -480,6 +488,19 @@ bool scene::set_properties(const floatvec &vals) {
 	return true;
 }
 
+bool scene::remove_property(const std::string &obj, const std::string &prop) {
+	node_map::iterator i;
+	property_map::iterator j;
+	
+	if ((i = nodes.find(obj)) == nodes.end()) {
+		return false;
+	}
+	if ((j = i->second.props.find(prop)) == i->second.props.end()) {
+		return false;
+	}
+	i->second.props.erase(j);
+	return true;
+}
 
 int scene::num_nodes() const {
 	return nodes.size();

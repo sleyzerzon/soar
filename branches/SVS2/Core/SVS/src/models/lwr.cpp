@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <iterator>
 #include <armadillo>
 #include "lwr.h"
 #include "nn.h"
@@ -151,9 +152,13 @@ bool lwr::predict(const floatvec &x, floatvec &y) {
 	vector<int> xdi, ydi;
 	di_queue neighbors;
 	timer tall, tnn, tslv;
+	int i, j, k;
+
 	tall.start();
-	
-	int i, j, k = examples.size() > nnbrs ? nnbrs : examples.size();
+	k = examples.size() > nnbrs ? nnbrs : examples.size();
+	if (k == 0) {
+		return false;
+	}
 	
 	if (!normalized) {
 		normalize();
@@ -338,7 +343,7 @@ model *_make_lwr_model_(soar_interface *si, Symbol *root) {
 }
 
 void lwr::get_slots(vector<string> &in_slots, vector<string> &out_slots) const {
-	copy(xnames.begin(), xnames.end(), in_slots.begin());
-	copy(ynames.begin(), ynames.end(), out_slots.begin());
+	copy(xnames.begin(), xnames.end(), back_inserter(in_slots));
+	copy(ynames.begin(), ynames.end(), back_inserter(out_slots));
 }
 

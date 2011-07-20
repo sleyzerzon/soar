@@ -285,7 +285,7 @@ void svs::update_models() {
 	copy(out_names.begin(), out_names.end(), back_inserter(curr_pnames));
 	dt = scn->get_dt();
 	
-	if (prev_pnames.size() > 0 || prev_pnames == curr_pnames) {
+	if (prev_pnames == curr_pnames) {
 		floatvec x(prev_pvals), y(prev_pvals);
 		x.extend(next_out.vals);
 		if (models.predict(x, y)) {

@@ -119,6 +119,7 @@ command *_make_generate_command_(svs_state *state, Symbol *root);
 command *_make_control_command_(svs_state *state, Symbol *root);
 command *_make_create_model_command_(svs_state *state, Symbol *root);
 command *_make_assign_model_command_(svs_state *state, Symbol *root);
+command *_make_property_command_(svs_state *state, Symbol *root);
 
 command* make_command(svs_state *state, wme *w) {
 	string name;
@@ -143,6 +144,8 @@ command* make_command(svs_state *state, wme *w) {
 		return _make_create_model_command_(state, id);
 	} else if (name == "assign-model") {
 		return _make_assign_model_command_(state, id);
+	} else if (name == "property") {
+		return _make_property_command_(state, id);
 	}
 	return NULL;
 }

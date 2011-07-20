@@ -30,9 +30,10 @@ public:
 	void get_property_names(std::vector<std::string> &names) const;
 	void get_properties(floatvec &vals) const;
 	bool get_property(const std::string &obj, const std::string &prop, float &val) const;
-	bool get_node_properties(const std::string &obj, std::map<std::string, float> &props) const;
+	bool add_property(const std::string &obj, const std::string &prop, float val);
 	bool set_property(const std::string &obj, const std::string &prop, float val);
 	bool set_properties(const floatvec &vals);
+	bool remove_property(const std::string &obj, const std::string &prop);
 	
 	float get_dt() const;
 	

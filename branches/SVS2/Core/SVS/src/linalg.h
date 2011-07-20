@@ -58,6 +58,12 @@ public:
 		}
 	}
 	
+	void operator/=(float d) {
+		for (int i = 0; i < 3; ++i) {
+			a[i] /= d;
+		}
+	}
+	
 	float dist(const vec3 &v) const {
 		float w[3], sum = 0.;
 		int i;
