@@ -345,7 +345,7 @@ private:
 
 std::ostream &operator<<(std::ostream &os, const floatvec &v);
 
-class namedvec : public floatvec {
+class namedvec {
 public:
 	namedvec() {}
 	
