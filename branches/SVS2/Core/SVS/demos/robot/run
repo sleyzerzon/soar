@@ -1,6 +1,8 @@
 #!/bin/sh
 
-soar=../../../../out/bin/s
+root=../../../../out
+export LD_LIBRARY_PATH=$root/lib:$HOME/local/lib
+soar=$root/bin/s
 
 while test -n "$1"
 do
@@ -18,6 +20,7 @@ done
 if test "$sim" == "1"
 then
 	python splintersim.py &
+	envid=$!
 	#socat system:./splintersim unix-connect:env,retry=100 &
 else
 	socat system:"java RobotClient" unix-connect:env,retry=100 &
@@ -37,4 +40,6 @@ then
 	then
 		kill $pids
 	fi
+else
+	kill $envid
 fi

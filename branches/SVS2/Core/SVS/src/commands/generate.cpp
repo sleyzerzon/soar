@@ -27,6 +27,7 @@ public:
 		sg_node *gen_node;
 		
 		if (changed()) {
+			reset();
 			if (!si->find_child_wme(root, "parent", parent_wme) ||
 			    !si->find_child_wme(root, "node", gen_wme))
 			{
@@ -41,39 +42,41 @@ public:
 				set_status("incorrect gen filter syntax");
 				return false;
 			}
-			reset();
-			gen_first();
-		} else {
-			gen_filter->update_results();
-			if (!gen_filter->is_error()) {
-				get_changes();
+		}
+		if (gen_filter) {
+			if (!proc_changes()) {
+				return false;
 			}
+			set_status("success");
+			return true;
 		}
+		return false;
+	}
+	
+	bool early() { return false; }
+
+private:
+	bool proc_changes() {
+		filter_result::iter i;
+		filter_result *res;
 		
-		return true;
-	}
-	
-	void gen_first() {
-		filter_result::iter i;
-		filter_result *res = gen_filter->get_result();
-		for (i = res->curr_begin(); i != res->curr_end(); ++i) {
-			add_node(*i);
+		if (!gen_filter->update()) {
+			set_status(gen_filter->get_error());
+			return false;
 		}
-	}
-	
-	void get_changes() {
-		filter_result *res = gen_filter->get_result();
-		filter_result::iter i;
+		res = gen_filter->get_result();
 		for (i = res->added_begin(); i != res->added_end(); ++i) {
 			if (!add_node(*i)) {
-				return;
+				return false;
 			}
 		}
 		for (i = res->removed_begin(); i != res->removed_end(); ++i) {
 			if (!del_node(*i)) {
-				return;
+				return false;
 			}
 		}
+		res->clear_changes();
+		return true;
 	}
 	
 	bool add_node(filter_val *v) {
@@ -89,6 +92,7 @@ public:
 			return false;
 		}
 		nodes.push_back(n->get_name());
+		return true;
 	}
 	
 	bool del_node(filter_val *v) {
@@ -104,6 +108,7 @@ public:
 			return false;
 		}
 		nodes.erase(find(nodes.begin(), nodes.end(), n->get_name()));
+		return true;
 	}
 	
 	void reset() {
@@ -117,9 +122,6 @@ public:
 		}
 	}
 	
-	bool early() { return false; }
-	
-private:
 	scene             *scn;
 	Symbol            *root;
 	soar_interface    *si;

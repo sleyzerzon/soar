@@ -7,7 +7,6 @@
 #include "sg_node.h"
 #include "ipcsocket.h"
 #include "soar_interface.h"
-#include "env.h"
 #include "model.h"
 
 class command;
@@ -114,12 +113,12 @@ public:
 	soar_interface *get_soar_interface() { return si; }
 
 	std::string get_env_input(const std::string &sgel);
-	void set_next_output(const output &out);
+	void set_next_output(const namedvec &out);
 
-	void   add_model(const std::string &name, model *m);
-	bool   assign_model(const std::string &name,
-	                    const std::map<std::string, std::string> &inputs,
-	                    const std::map<std::string, std::string> &outputs);
+	void add_model(const std::string &name, model *m);
+	bool assign_model(const std::string &name,
+	                  const std::map<std::string, std::string> &inputs,
+	                  const std::map<std::string, std::string> &outputs);
 	
 	model *get_model();
 	
@@ -132,7 +131,7 @@ private:
 	common_syms              cs;
 	std::vector<svs_state*>  state_stack;
 	ipcsocket                envsock;
-	output                   next_out;
+	namedvec                 next_out;
 	std::vector<std::string> prev_pnames;
 	floatvec                 prev_pvals;
 	multi_model              models;

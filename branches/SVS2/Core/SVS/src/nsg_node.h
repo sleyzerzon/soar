@@ -14,20 +14,20 @@ public:
 	nsg_node(std::string name, const ptlist &points);
 	~nsg_node();
 	
-	sg_node*    copy();
+	sg_node*    copy() const;
 
-	std::string get_name();
+	std::string get_name() const;
 	void        set_name(std::string nm);
-	bool        is_group();
+	bool        is_group() const;
 
 	sg_node*    get_parent();
-	int         num_children();
+	int         num_children() const;
 	sg_node*    get_child(int i);
 	void        walk(std::list<sg_node*> &result);
 	bool        attach_child(sg_node *c);
 	
 	void        set_trans(char type, vec3 trans);
-	vec3        get_trans(char type);
+	vec3        get_trans(char type) const;
 	
 	void        get_local_points(ptlist &result);
 	void        get_world_points(ptlist &result);

@@ -18,6 +18,7 @@ using namespace std;
 
 const char TERMSTRING[] = "\n***\n";
 const int BUFFERSIZE = 10240;
+int totalrecv = 0;
 
 ipcsocket::ipcsocket(string socketfile, bool recvfirst) 
 : recvbuf(), recvfirst(recvfirst)
@@ -39,7 +40,7 @@ ipcsocket::ipcsocket(string socketfile, bool recvfirst)
 		exit(1);
 	}
 
-	if (listen(listenfd, 1) == -1) {
+	if (::listen(listenfd, 1) == -1) {
 		perror("ipcsocket::ipcsocket");
 		exit(1);
 	}
@@ -57,6 +58,8 @@ ipcsocket::~ipcsocket() {
 bool ipcsocket::accept() {
 	socklen_t len;
 	struct sockaddr_un remote;
+	list<ipc_listener*>::iterator i;
+	
 	len = sizeof(struct sockaddr_un);
 	if ((fd = ::accept(listenfd, (struct sockaddr *) &remote, &len)) == -1) {
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
@@ -66,12 +69,21 @@ bool ipcsocket::accept() {
 		return false;
 	}
 	connected = true;
+	
+	for (i = listeners.begin(); i != listeners.end(); ++i) {
+		(**i).ipc_connect(this);
+	}
 	return true;
 }
 
 void ipcsocket::disconnect() {
+	list<ipc_listener*>::iterator i;
+	
 	close(fd);
 	connected = false;
+	for (i = listeners.begin(); i != listeners.end(); ++i) {
+		(**i).ipc_disconnect(this);
+	}
 }
 
 bool ipcsocket::send(const string &s) {
@@ -120,6 +132,16 @@ bool ipcsocket::receive(string &msg) {
 		} else {
 			buf[n] = '\0';
 			recvbuf += buf;
+			totalrecv += n;
+			cerr << "Total Received: " << totalrecv << endl;
 		}
 	}
+}
+
+void ipcsocket::listen(ipc_listener *l) {
+	listeners.push_back(l);
+}
+
+void ipcsocket::unlisten(ipc_listener *l) {
+	listeners.remove(l);
 }

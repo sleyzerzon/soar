@@ -472,8 +472,6 @@ public:
 		delete input;
 	}
 	
-	virtual bool update_results() = 0;
-	
 	std::string get_error() {
 		return errmsg;
 	}
@@ -555,6 +553,8 @@ public:
 	}
 	
 private:
+	virtual bool update_results() = 0;
+	
 	filter_input *input;
 	filter_result result;
 	std::string errmsg;

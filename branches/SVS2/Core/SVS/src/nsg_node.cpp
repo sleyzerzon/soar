@@ -7,6 +7,7 @@
 using namespace std;
 
 typedef vector<nsg_node*>::iterator childiter;
+typedef vector<nsg_node*>::const_iterator const_childiter;
 
 nsg_node::nsg_node(std::string name) 
 : name(name), parent(NULL), tdirty(false), pdirty(false), isgroup(true),
@@ -31,9 +32,9 @@ nsg_node::~nsg_node() {
 	send_update(sg_node::DELETED);
 }
 
-sg_node* nsg_node::copy() {
+sg_node* nsg_node::copy() const {
 	nsg_node *c;
-	childiter i;
+	const_childiter i;
 	
 	if (isgroup) {
 		c = new nsg_node(name);
@@ -50,7 +51,7 @@ sg_node* nsg_node::copy() {
 	return c;
 }
 
-std::string nsg_node::get_name() {
+std::string nsg_node::get_name() const {
 	return name;
 }
 
@@ -58,7 +59,7 @@ void nsg_node::set_name(string nm) {
 	name = nm;
 }
 
-bool nsg_node::is_group() {
+bool nsg_node::is_group() const {
 	return isgroup;
 }
 
@@ -66,7 +67,7 @@ sg_node* nsg_node::get_parent() {
 	return parent;
 }
 
-int nsg_node::num_children() {
+int nsg_node::num_children() const {
 	return children.size();
 }
 
@@ -123,7 +124,7 @@ void nsg_node::set_trans(char type, vec3 trans) {
 	set_transform_dirty();
 }
 
-vec3 nsg_node::get_trans(char type) {
+vec3 nsg_node::get_trans(char type) const {
 	switch (type) {
 		case 'p':
 			return pos;

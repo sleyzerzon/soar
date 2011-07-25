@@ -1,26 +1,11 @@
 from __future__ import print_function
 import sys, os, socket, time
+sys.path.append('..')
+import sock
 import random, math
 import numpy as num
 import pymunk as munk
 import Tkinter as tk
-
-WHEEL_DIAMETER     = 0.25
-BASELINE           = 0.35
-TORQUE_CONSTANT    = 3.0   # torque (Nm) per amp
-EMF_CONSTANT       = 2.0   # volts per rad_per_sec
-WINDING_RESISTANCE = 5.5   # ohms
-INERTIA            = 0.5   # kg*m^2
-DRAG_CONSTANT      = 1.0   # drag (Nm per rad_per_sec) ( >= 0)
-DT                 = 0.016 # need a better way to figure this out
-
-MASS               = 1.0
-LENGTH             = 0.5
-SCALE              = 50.0
-
-TERMSTRING         = '\n***\n'
-
-nupdates = 0
 
 def rotate(rot, v):
 	halfroll = rot[0] / 2
@@ -60,143 +45,68 @@ def close(a, b, tol):
 	t = abs(a * tol)
 	return a - t <= b <= a + t
 	
-def calc_rps(rps, volts):
-	volts_emf = rps * EMF_CONSTANT
-	amps = (volts - volts_emf) / WINDING_RESISTANCE
-	torque0 = amps * TORQUE_CONSTANT
-	torque_drag = rps * DRAG_CONSTANT
-	torque_net = torque0 - torque_drag
-	acceleration = torque_net / INERTIA
-	return rps + acceleration * DT
-
-class Sock(object):
-	def __init__(self):
-		self.sock = None
-		self.recvbuf = ''
-
-	def connect(self, path_or_host, port=None):
-		if port == None:
-			self.sock = socket.socket(socket.AF_UNIX)
-			print('waiting for domain socket {} to be created'.format(path_or_host), file=sys.stderr)
-			while not os.path.exists(path_or_host):
-				time.sleep(0.1)
-				
-			while True:
-				try:
-					self.sock.connect(path_or_host)
-					break
-				except socket.error:
-					time.sleep(0.5)
-			
-			print('connected to {}'.format(path_or_host))
-		else:
-			self.sock = socket.socket(socket.AF_INET)
-			self.sock.connect((path_or_host, port))
-	
-	def serve(self, path):
-		listener = socket.socket(socket.AF_UNIX)
-		if os.path.exists(path):
-			os.unlink(path)
-		listener.bind(path)
-		listener.listen(1)
-		self.sock, addr = listener.accept()
-		
-	def receive(self):
-		while not TERMSTRING in self.recvbuf:
-			r = self.sock.recv(1024)
-			if len(r) == 0:
-				return None
-			self.recvbuf += r
-		
-		msg, self.recvbuf = self.recvbuf.split(TERMSTRING, 1)
-		return msg.decode('ascii')
-	
-	def send(self, msg):
-		self.sock.sendall(msg + TERMSTRING)
-
-	def close(self):
-		self.sock.close()
-
-	def has_buffered(self):
-		return TERMSTRING in self.recvbuf
-
-class Display(object):
-	def __init__(self, root):
-		self.canvas = tk.Canvas(root)
-		self.canvas.bind('<Button-1>', lambda evt: self.canvas.scan_mark(evt.x, evt.y))
-		self.canvas.bind('<B1-Motion>', lambda evt: self.canvas.scan_dragto(evt.x, evt.y))
-		self.canvas.create_oval((0,0,5,5))
-		self.canvas.pack(fill=tk.BOTH, expand=True)
-		self.splinter = None
-		self.prevpos = None
-	
-	def update_splinter(self, pos, verts):
-		p = (pos[0] * SCALE, pos[1] * SCALE)
-		if self.splinter != None:
-			self.canvas.delete(self.splinter)
-			self.canvas.create_line(self.prevpos, p, fill='blue')
-		
-		sverts = [ (x * SCALE, y * SCALE) for x, y in verts ]
-		self.splinter = self.canvas.create_polygon(sverts, fill='', outline='blue')
-		self.prevpos = p
-
 class Splinter(object):
-	def __init__(self, space, display, sockfile):
-		self.display = display
-		self.sock = Sock()
-		self.sock.connect(sockfile)
-		self.display.canvas.tk.createfilehandler(self.sock.sock, tk.READABLE, self.read)
-		
+	WHEEL_DIAMETER     = 0.25
+	BASELINE           = 0.35
+	TORQUE_CONSTANT    = 3.0   # torque (Nm) per amp
+	EMF_CONSTANT       = 2.0   # volts per rad_per_sec
+	WINDING_RESISTANCE = 5.5   # ohms
+	INERTIA            = 0.5   # kg*m^2
+	DRAG_CONSTANT      = 1.0   # drag (Nm per rad_per_sec) ( >= 0)
+	DT                 = 0.016 # need a better way to figure this out
+	MASS               = 1.0
+	LENGTH             = 0.5
+	
+	def __init__(self, space, name, initpos):
 		self.space = space
-		self.body = munk.Body(MASS, munk.moment_for_box(MASS, LENGTH, BASELINE))
-		l2 = LENGTH / 2
-		b2 = BASELINE / 2
-		verts = [(-l2, -b2), (-l2, b2), (l2, b2), (l2, -b2)]
-		self.shape = munk.Poly(self.body, verts)
+		self.name = name
+		self.body = munk.Body(Splinter.MASS, munk.moment_for_box(Splinter.MASS, Splinter.LENGTH, Splinter.BASELINE))
+		l2 = Splinter.LENGTH / 2
+		b2 = Splinter.BASELINE / 2
+		self.verts = [(-l2, -b2), (-l2, b2), (l2, b2), (l2, -b2)]
+		self.shape = munk.Poly(self.body, self.verts)
 		self.space.add(self.body, self.shape)
+		self.body.position = initpos
 
 		self.lrps = 0.
 		self.rrps = 0.
-		self.lvolt = 0.
-		self.rvolt = 0.
+	
+	def calc_rps(self, rps, volts):
+		volts_emf = rps * Splinter.EMF_CONSTANT
+		amps = (volts - volts_emf) / Splinter.WINDING_RESISTANCE
+		torque0 = amps * Splinter.TORQUE_CONSTANT
+		torque_drag = rps * Splinter.DRAG_CONSTANT
+		torque_net = torque0 - torque_drag
+		acceleration = torque_net / Splinter.INERTIA
+		return rps + acceleration * Splinter.DT
 		
-		self.update(True)
+	def update(self, inputs):
+		if 'left' not in inputs or 'right' not in inputs:
+			return
+			
+		lvolt = inputs['left']
+		rvolt = inputs['right']
+		self.lrps = self.calc_rps(self.lrps, lvolt * 12)
+		self.rrps = self.calc_rps(self.rrps, rvolt * 12)
 		
-	def update(self, first=False):
-		global nupdates
-		nupdates += 1
-		if nupdates < 0:
-			self.lrps = calc_rps(self.lrps, self.lvolt * -12)
-			self.rrps = calc_rps(self.rrps, self.rvolt * -12)
-		else:
-			self.lrps = calc_rps(self.lrps, self.lvolt * 12)
-			self.rrps = calc_rps(self.rrps, self.rvolt * 12)
-		
-		dleft  = DT * self.lrps * WHEEL_DIAMETER;
-		dright = DT * self.rrps * WHEEL_DIAMETER;
+		dleft  = Splinter.DT * self.lrps * Splinter.WHEEL_DIAMETER;
+		dright = Splinter.DT * self.rrps * Splinter.WHEEL_DIAMETER;
 	
 		rot = (0., 0., self.body.angle)
 		self.body.velocity = munk.Vec2d(rotate(rot, num.array([(dleft + dright) / 2.0, 0.0, 0.0]))[:2])
-		self.body.angular_velocity = (dright - dleft) / BASELINE
-
-		self.space.step(1.0)
-		self.display.update_splinter(self.body.position, self.shape.get_points())
-		self.print_sgel(first)
-		
-		p = self.body.position
-		dist = math.sqrt((5 - p[0]) ** 2 + (-5 - p[1]) ** 2)
-		print('Distance', dist)
-		sys.stdout.flush()
+		self.body.angular_velocity = (dright - dleft) / Splinter.BASELINE
 	
-	def print_sgel(self, first):
+	def get_sgel(self, first):
 		lines = []
 		ps = ' '.join(str(x) for x in self.body.position) + ' 0'
 		rs = '0 0 {}'.format(self.body.angle)
-		vs = ' '.join('{} {} 0'.format(x, y) for x, y in self.shape.get_points())
+		vs = ' '.join('{} {} 0'.format(x, y) for x, y in self.verts)
+		wvs = ' '.join('{} {} 0'.format(x, y) for x, y in self.shape.get_points())
+		#print('splinter: ' + ps + ' ; ' + rs + ' ; ' + wvs)
 		if first:
-			lines.append('a splinter world v {} p {} r {}'.format(vs, ps, rs))
+			lines.append('a {} world v {} p {} r {}'.format(self.name, vs, ps, rs))
 		else:
-			lines.append('c splinter p {} r {}'.format(ps, rs))
+			lines.append('c {} p {} r {}'.format(self.name, ps, rs))
 			
 		lines.append('p splinter left_rads_per_sec {}'.format(self.lrps))
 		lines.append('p splinter right_rads_per_sec {}'.format(self.rrps))
@@ -206,13 +116,114 @@ class Splinter(object):
 		lines.append('p splinter rotation_rate_0 0.')
 		lines.append('p splinter rotation_rate_1 0.')
 		lines.append('p splinter rotation_rate_2 {}'.format(self.body.angular_velocity))
-		self.sock.send('\n'.join(lines))
+		return '\n'.join(lines)
 	
-	def read(self, f, m):
+	def get_name(self):
+		return self.name
+	
+	def get_pos(self):
+		return self.body.position
+	
+	def get_points(self):
+		return self.shape.get_points()
+	
+	def get_color(self):
+		return 'blue'
+
+class Block(object):
+	MASS = 0.5
+	WIDTH = 1.0
+	
+	def __init__(self, space, name, initpos):
+		self.name = name
+		self.space = space
+		self.body = munk.Body(Block.MASS, munk.moment_for_box(Block.MASS, Block.WIDTH, Block.WIDTH))
+		w2 = Block.WIDTH / 2
+		self.verts = [(-w2, -w2), (-w2, w2), (w2, w2), (w2, -w2)]
+		self.shape = munk.Poly(self.body, self.verts)
+		self.space.add(self.body, self.shape)
+		self.body.position = initpos
+	
+	def update(self, inputs):
+		pass
+	
+	def get_sgel(self, first):
+		vs = ' '.join('{} {} 0'.format(x, y) for x, y in self.verts)
+		ps = '{} {} 0'.format(*self.body.position)
+		rs = '0 0 {}'.format(self.body.angle)
+		wvs = ' '.join('{} {} 0'.format(x, y) for x, y in self.shape.get_points())
+		#print('block: ' + ps + ' ; ' + rs + ' ; ' + wvs)
+		if first:
+			return 'a {} world v {} p {} r {}'.format(self.name, vs, ps, rs)
+		else:
+			return 'c {} p {} r {}'.format(self.name, ps, rs)
+	
+	def get_name(self):
+		return self.name
+		
+	def get_pos(self):
+		return self.body.position
+	
+	def get_points(self):
+		return self.shape.get_points()
+	
+	def get_color(self):
+		return 'yellow'
+		
+class Display(object):
+	SCALE = 50.0
+	
+	def __init__(self, root):
+		self.canvas = tk.Canvas(root)
+		self.canvas.bind('<Button-1>', lambda evt: self.canvas.scan_mark(evt.x, evt.y))
+		self.canvas.bind('<B1-Motion>', lambda evt: self.canvas.scan_dragto(evt.x, evt.y))
+		self.canvas.create_oval((0,0,5,5))
+		self.canvas.pack(fill=tk.BOTH, expand=True)
+		self.objs = {}  # name -> (display polygon, prev position)
+	
+	def update_obj(self, name, pos, verts, color):
+		p = (pos[0] * Display.SCALE, pos[1] * Display.SCALE)
+		if name in self.objs:
+			poly, oldpos = self.objs[name]
+			self.canvas.delete(poly)
+			self.canvas.create_line(oldpos, p, fill=color)
+		
+		sverts = [ (x * Display.SCALE, y * Display.SCALE) for x, y in verts ]
+		poly = self.canvas.create_polygon(sverts, fill='', outline=color)
+		self.objs[name] = (poly, p)
+
+class World(object):
+	def __init__(self, space, display, sockfile):
+		self.space = space
+		self.objects = []
+		self.inputs = {}
+		self.display = display
+		self.sock = sock.Sock()
+		self.sock.connect(sockfile)
+		self.display.canvas.tk.createfilehandler(self.sock.sock, tk.READABLE, self.read)
+		self.first = True
+
+	def update(self):
+		for obj in self.objects:
+			obj.update(self.inputs)
+		
+		self.space.step(1.0)
+		
+		msg = []
+		for obj in self.objects:
+			self.display.update_obj(obj.get_name(), obj.get_pos(), obj.get_points(), obj.get_color())
+			msg.append(obj.get_sgel(self.first))
+			
+		self.sock.send('\n'.join(msg))
+		self.first = False
+		
+	def read(self, dummy, dummy2):
 		msg = self.sock.receive()
 		if msg == None:
-			return
-			
+			sys.exit(0)
+		
+		#print('received\n-----\n{}\n-----'.format(msg))
+		self.inputs = {}
 		for line in msg.split('\n'):
 			if len(line) == 0:
 				continue
@@ -221,15 +232,19 @@ class Splinter(object):
 			if len(f) != 2:
 				print('Ignoring input "{}"'.format(line), file=sys.stderr)
 			else:
-				if f[0] == 'left':
-					self.lvolt = float(f[1])
-				elif f[0] == 'right':
-					self.rvolt = float(f[1])
+				self.inputs[f[0]] = float(f[1])
 		
 		self.update()
+	
+	def add_object(self, obj):
+		self.objects.append(obj)
 			
 if __name__ == '__main__':
+	munk.init_pymunk()
 	disp = Display(tk.Tk())
-	splinter = Splinter(munk.Space(), disp, 'env')
+	space = munk.Space()
+	world = World(space, disp, 'env')
+	world.add_object(Splinter(space, 'splinter', (0., 0.)))
+	world.add_object(Block(space, 'block', (1., 1.)))
+	world.update()
 	tk.mainloop()
-	

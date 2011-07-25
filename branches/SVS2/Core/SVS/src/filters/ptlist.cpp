@@ -6,11 +6,11 @@
 
 using namespace std;
 
-class ptlist_filter : public map_filter<ptlist*> {
+class node_ptlist_filter : public map_filter<ptlist*> {
 public:
-	ptlist_filter(filter_input *input, bool local) : map_filter<ptlist*>(input), local(local) {}
+	node_ptlist_filter(filter_input *input, bool local) : map_filter<ptlist*>(input), local(local) {}
 	
-	~ptlist_filter() {
+	~node_ptlist_filter() {
 		std::list<ptlist*>::iterator i;
 		for (i = lists.begin(); i != lists.end(); ++i) {
 			delete *i;
@@ -49,10 +49,10 @@ private:
 };
 
 filter* _make_local_filter_(scene *scn, filter_input *input) {
-	return new ptlist_filter(input, true);
+	return new node_ptlist_filter(input, true);
 }
 
 filter* _make_world_filter_(scene *scn, filter_input *input) {
-	return new ptlist_filter(input, false);
+	return new node_ptlist_filter(input, false);
 }
 

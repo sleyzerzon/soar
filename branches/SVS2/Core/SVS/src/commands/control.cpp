@@ -5,7 +5,6 @@
 #include <algorithm>
 #include "command.h"
 #include "svs.h"
-#include "env.h"
 #include "scene.h"
 #include "model.h"
 
@@ -16,9 +15,154 @@ const double RCOEF = 1.0;
 const double ECOEF = 2.0;
 const double CCOEF = 0.5;
 const double SCOEF = 0.5;
-
 const int MAXITERS = 50;
 const double INF = numeric_limits<double>::infinity();
+
+struct output_dim_info {
+	string name;
+	float min;
+	float max;
+	float inc;
+};
+
+bool output_comp(const output_dim_info &a, const output_dim_info &b) {
+	return a.name < b.name;
+}
+
+typedef std::vector<output_dim_info> output_info_vec;
+
+bool parse_wm_output_struct(soar_interface *si, Symbol *root, output_info_vec &out_info) {
+	
+	wme_list dim_wmes;
+	wme_list::iterator i;
+	Symbol *dim_id;
+	wme *min_wme, *max_wme, *inc_wme;
+	output_dim_info d;
+	
+	out_info.clear();
+	if (!si->is_identifier(root)) {
+		return false;
+	}
+	si->get_child_wmes(root, dim_wmes);
+	for (i = dim_wmes.begin(); i != dim_wmes.end(); ++i) {
+		dim_id = si->get_wme_val(*i);
+		if (si->get_val(si->get_wme_attr(*i), d.name)    &&
+		    si->is_identifier(dim_id)                    &&
+		    si->find_child_wme(dim_id, "min", min_wme)   &&
+		    si->get_val(si->get_wme_val(min_wme), d.min) &&
+		    si->find_child_wme(dim_id, "max", max_wme)   &&
+		    si->get_val(si->get_wme_val(max_wme), d.max) &&
+		    si->find_child_wme(dim_id, "inc", inc_wme)   &&
+		    si->get_val(si->get_wme_val(inc_wme), d.inc))
+		{
+			out_info.push_back(d);
+		}
+	}
+	sort(out_info.begin(), out_info.end(), output_comp);
+	return true;
+}
+
+class output_incr {
+public:
+	output_incr(const output_info_vec &dims) : dims(dims), current(dims.size()) {
+		reset();
+	}
+
+	output_incr(const output_incr &other): current(other.current), dims(other.dims) {}
+	
+
+	
+	void reset() {
+		output_info_vec::const_iterator i;
+		int j;
+		for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
+			current[j] = i->min;
+		}
+	}
+	
+	bool next() {
+		output_info_vec::const_iterator i;
+		int j;
+		
+		for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
+			current[j] += i->inc;
+			if (current[j] <= i->max) {
+				return true;
+			} else {
+				current[j] = i->min;  // roll over and move on to the next value
+			}
+		}
+		return false;
+	}
+	
+	void get_current(floatvec &v) const {
+		v = current;
+	}
+	
+	int size() const {
+		return current.size();
+	}
+	
+private:
+	output_info_vec dims;
+	floatvec current;
+};
+
+typedef vector<floatvec> trajectory;
+
+class traj_incr {
+public:
+	traj_incr() : len(0) {}
+	
+	traj_incr(int len, const output_incr &prototype)
+	: len(len), current(len, prototype)
+	{
+		reset();
+	}
+	
+	void reset() {
+		std::vector<output_incr>::iterator i;
+		for (i = current.begin(); i != current.end(); ++i) {
+			i->reset();
+		}
+	}
+	
+	bool next() {
+		std::vector<output_incr>::iterator i;
+		for (i = current.begin(); i != current.end(); ++i) {
+			if (i->next()) {
+				return true;
+			}
+			i->reset();
+		}
+		return false;
+	}
+	
+	void get_current(trajectory &t) const {
+		std::vector<output_incr>::const_iterator i;
+		trajectory::iterator j;
+		
+		if (len == 0) {
+			t.clear();
+			return;
+		}
+		t.resize(current.size());
+		for (i = current.begin(), j = t.begin(); i != current.end(); ++i, ++j) {
+			i->get_current(*j);
+		}
+	}
+	
+	int dof() {
+		if (len == 0) {
+			return 0;
+		}
+		return len * current.front().size();
+	}
+
+private:
+	int len;
+	std::vector<output_incr> current;
+};
 
 /* Parses a WME structure that describes the output the environment expects.
    Assumes this format:
@@ -37,39 +181,11 @@ const double INF = numeric_limits<double>::infinity();
 		...
 	)
 */
-bool parse_output_desc_struct(soar_interface *si, Symbol *root, outdesc &desc) {
-	wme_list dim_wmes;
-	wme_list::iterator i;
-	Symbol *dim_id;
-	wme *min_wme, *max_wme, *inc_wme;
-	out_dim_desc d;
-	
-	if (!si->is_identifier(root)) {
-		return false;
-	}
-	si->get_child_wmes(root, dim_wmes);
-	for (i = dim_wmes.begin(); i != dim_wmes.end(); ++i) {
-		dim_id = si->get_wme_val(*i);
-		if (si->get_val(si->get_wme_attr(*i), d.name)    &&
-		    si->is_identifier(dim_id)                    &&
-		    si->find_child_wme(dim_id, "min", min_wme)   &&
-		    si->get_val(si->get_wme_val(min_wme), d.min) &&
-		    si->find_child_wme(dim_id, "max", max_wme)   &&
-		    si->get_val(si->get_wme_val(max_wme), d.max) &&
-		    si->find_child_wme(dim_id, "inc", inc_wme)   &&
-		    si->get_val(si->get_wme_val(inc_wme), d.inc))
-		{
-			desc.push_back(d);
-		}
-	}
-	sort(desc.begin(), desc.end());
-	return true;
-}
 
 
 class objective {
 public:
-	virtual float eval(scene *scn) = 0;
+	virtual float eval(scene &scn) const = 0;
 };
 
 ::vec3 calc_centroid(const ptlist &pts) {
@@ -94,13 +210,13 @@ public:
 	euclidean_obj(string obj1, string obj2)
 	: obj1(obj1), obj2(obj2) {}
 	
-	float eval(scene *scn) {
+	float eval(scene &scn) const {
 		sg_node *n1, *n2;
 		ptlist p1, p2;
 		::vec3 c1, c2;
 		
-		if ((n1 = scn->get_node(obj1)) == NULL ||
-		    (n2 = scn->get_node(obj2)) == NULL)
+		if ((n1 = scn.get_node(obj1)) == NULL ||
+		    (n2 = scn.get_node(obj2)) == NULL)
 		{
 			return INF;
 		}
@@ -159,54 +275,56 @@ objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 /* this class is a little dirty to avoid as much allocation and copying as possible */
 class traj_eval {
 public:
-	traj_eval(outdesc *desc, int length, model *m, objective *obj, scene *init)
-	: cachedtrj(length, desc), obj(obj), next(*init)
+	traj_eval(int outsize, model *m, objective *obj, const scene &init)
+	: outsize(outsize), obj(obj), scn(init)
 	{
-		outdesc::const_iterator i;
 		mdl = dynamic_cast<multi_model*>(m);
 		assert(mdl);
-		
-		init->get_property_names(names);
-		for (i = desc->begin(); i != desc->end(); ++i) {
-			names.push_back(i->name);
-		}
-		init->get_properties(initvals);
+		scn.get_properties(initvals);
 	}
 
 	/* version to be used in incremental search */
 	bool eval(const trajectory &traj, float &value) {
-		vector<output>::const_iterator i;
-		
-		mdl->set_indexes(names);
-		
-		floatvec x(names.size()), y = initvals;
-		
-		if (traj.t.size() > 0) {
-			for (i = traj.t.begin(); i != traj.t.end(); ++i) {
-				x.combine(y, i->vals);
+		if (traj.size() > 0) {
+			trajectory::const_iterator i;
+			floatvec x(initvals.size() + outsize), y = initvals;
+			for (i = traj.begin(); i != traj.end(); ++i) {
+				x.combine(y, *i);
 				if (!mdl->predict(x, y)) {
 					return false;
 				}
 			}
-			next.set_properties(y);
+			scn.set_properties(y);
 		}
-		value = obj->eval(&next);
+		value = obj->eval(scn);
 		return true;
 	}
 	
 	/* version to be used in Nelder-Mead search */
 	bool eval(const floatvec &v, float &value) {
-		cachedtrj.from_vec(v);
-		return eval(cachedtrj, value);
+		assert(v.size() % outsize == 0);
+		if (t.size() * outsize != v.size()) {
+			t.resize(v.size() / outsize, floatvec(outsize));
+		}
+		
+		int offset = 0;
+		trajectory::iterator i;
+		for (i = t.begin(); i != t.end(); ++i) {
+			for (int j = 0; j < outsize; ++j) {
+				(*i)[j] = v[offset + j];
+			}
+			offset += outsize;
+		}
+		return eval(t, value);
 	}
 	
 private:
 	multi_model   *mdl;
 	objective     *obj;
-	trajectory     cachedtrj; // keep around to avoid reallocation
-	scene          next;      // copy of initial scene to be modified after prediction
-	floatvec       initvals;  // flattened values of initial scene for resetting flat
-	vector<string> names;
+	int            outsize;   // dimensionality of output
+	trajectory     t;         // cached to prevent repeated memory allocation
+	scene          scn;       // copy of initial scene to be modified after prediction
+	floatvec       initvals;  // flattened values of initial scene
 };
 
 void constrain(floatvec &v, const floatvec &min, const floatvec &max) {
@@ -242,24 +360,15 @@ void calc_centroid(const vector<floatvec> &simplex, floatvec &sum, int exclude) 
 	sum /= (simplex.size() - 1);
 }
 
-bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
-	int ndim = t.dof(), i, wi, ni, bi;
-	outdesc::const_iterator j;
-	floatvec min(t.dof()), max(t.dof());
+bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec &best, traj_eval &ev) {
+	int ndim = min.size(), i, wi, ni, bi;
 	floatvec eval(ndim+1);
-	for (i = 0; i < min.size(); ) {
-		for (j = t.desc->begin(); j != t.desc->end(); ++j) {
-			min[i] = j->min;
-			max[i] = j->max;
-			++i;
-		}
-	}
+	float reval, eeval, ceval;
 	
 	floatvec range = max - min;
 	vector<floatvec> simplex;
-	float reval, eeval, ceval;
 	floatvec centroid(ndim), dir(ndim), reflect(ndim), expand(ndim), 
-	         contract(ndim), best(ndim), worst(ndim);
+	         contract(ndim), worst(ndim);
 	
 	/* random initialization */
 	floatvec rtmp(ndim);
@@ -337,33 +446,34 @@ bool nelder_mead_constrained(trajectory &t, traj_eval &ev) {
 			if (!ev.eval(simplex[i], eval[i])) return false;
 		}
 	}
-	t.from_vec(best);
 	return true;
 }
 
 class controller {
 public:
-	controller(svs *svsp, objective *obj, const outdesc &odesc, int depth, string type)
-	: svsp(svsp), obj(obj), odesc(odesc), step(0), depth(depth), type(type) 
-	{}
+	controller(svs *svsp, objective *obj, const output_info_vec &out_info, int depth, string type)
+	: svsp(svsp), obj(obj), out_info(out_info), step(0), depth(depth), type(type) 
+	{
+		int i, j;
+		min.resize(depth * out_info.size());
+		max.resize(depth * out_info.size());
+		for (i = 0; i < depth; ++i) {
+			for (j = 0; j < out_info.size(); ++j) {
+				min[i * depth + j] = out_info[j].min;
+				max[i * depth + j] = out_info[j].max;
+			}
+		}
+	}
 
 	/* Don't forget to make this a PID controller later */
-	bool seek(scene *scn, output &bestout) {
+	bool seek(scene *scn, floatvec &bestout) {
 		if (type == "simplex") {
 			return simplex_seek(scn, bestout);
-		} else if (type == "random") {
-			return random_seek(scn, bestout);
 		}
 		return naive_seek(scn, bestout);
 	}
 	
-	bool random_seek(scene *scn, output &bestout) {
-		bestout = output(&odesc);
-		bestout.randomize();
-		return true;
-	}
-	
-	bool naive_seek(scene *scn, output &bestout) {
+	bool naive_seek(scene *scn, floatvec &bestout) {
 		float val, best;
 		bool found = false;
 		model *mdl = svsp->get_model();
@@ -372,22 +482,21 @@ public:
 			return false;
 		}
 		
-		traj_eval evaluator(&odesc, depth, mdl, obj, scn);
-		trajectory trj(depth, &odesc);
+		traj_eval evaluator(out_info.size(), mdl, obj, *scn);
+		traj_incr incr(depth, output_incr(out_info));
+		trajectory t;
 		
 		while (true) {
-			if (!evaluator.eval(trj, val)) {
-				cout << "WARNING: Using random output" << endl;
-				bestout = output(&odesc);
-				bestout.randomize();
-				return true;
+			incr.get_current(t);
+			if (!evaluator.eval(t, val)) {
+				return false;
 			}
 			if (!found || val < best) {
 				found = true;
-				bestout = trj.t.front();
+				bestout = t.front();
 				best = val;
 			}
-			if (!trj.next()) {
+			if (!incr.next()) {
 				break;
 			}
 		}
@@ -395,44 +504,42 @@ public:
 		return found;
 	}
 	
-	bool simplex_seek(scene *scn, output &bestout) {
+	bool simplex_seek(scene *scn, floatvec &bestout) {
 		model *mdl = svsp->get_model();
 		if (!mdl) {
 			return false;
 		}
 		
-		traj_eval evaluator(&odesc, depth, mdl, obj, scn);
-		trajectory trj(depth, &odesc);
-		if (!nelder_mead_constrained(trj, evaluator)) {
-			cout << "WARNING: Using random output" << endl;
-			bestout = output(&odesc);
-			bestout.randomize();
-			return true;
+		traj_eval evaluator(out_info.size(), mdl, obj, *scn);
+		floatvec best(min.size());
+		if (!nelder_mead_constrained(min, max, best, evaluator)) {
+			return false;
 		}
-		bestout = trj.t.front();
+		bestout = best.slice(0, out_info.size());
 		return true;
 	}
 	
 private:
-	svs       *svsp;
-	objective *obj;
-	outdesc    odesc;
-	int        step;
-	int        depth;
-	string     type;
+	svs             *svsp;
+	objective       *obj;
+	output_info_vec  out_info;
+	floatvec         min, max;   // for Nelder-Mead
+	int              step;
+	int              depth;
+	string           type;
 };
 
-class control_command : public command {
+class seek_command : public command {
 public:
-	control_command(svs_state *state, Symbol *root)
-	: command(state, root), state(state), root(root),
-	  si(state->get_svs()->get_soar_interface()), step(0),
+	seek_command(svs_state *state, Symbol *root)
+	: command(state, root), state(state), step(0),
 	  stepwme(NULL), broken(false), ctrl(NULL), obj(NULL)
 	{
+		si = state->get_svs()->get_soar_interface();
 		//update_step();
 	}
 	
-	~control_command() {
+	~seek_command() {
 		cleanup();
 	}
 	
@@ -441,8 +548,6 @@ public:
 	}
 	
 	bool update() {
-		output out;
-
 		if (changed()) {
 			broken = !parse_cmd();
 		}
@@ -450,7 +555,7 @@ public:
 			return false;
 		}
 		
-		if (!ctrl->seek(state->get_scene(), out)) {
+		if (!ctrl->seek(state->get_scene(), out.vals)) {
 			set_status("no valid output found");
 			return false;
 		}
@@ -473,45 +578,45 @@ private:
 	      ^objective ( ... )
 	*/
 	bool parse_cmd() {
-		outdesc desc;
+		output_info_vec out_info;
+		output_info_vec::iterator i;
 		wme *outputs_wme, *objective_wme, *model_wme, *depth_wme, *type_wme;
 		long depth;
 		string type;
 		
 		cleanup();
-		if (!si->find_child_wme(root, "outputs", outputs_wme) ||
+		if (!si->find_child_wme(get_root(), "outputs", outputs_wme) ||
 		    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
-		    !parse_output_desc_struct(si, si->get_wme_val(outputs_wme), desc))
+		    !parse_wm_output_struct(si, si->get_wme_val(outputs_wme), out_info))
 		{
 			set_status("missing or invalid outputs specification");
 			return false;
 		}
-		if (!si->find_child_wme(root, "type", type_wme) ||
+		if (!si->find_child_wme(get_root(), "type", type_wme) ||
 			!si->get_val(si->get_wme_val(type_wme), type))
 		{
 			set_status("missing or invalid type");
 			return false;
 		}
-		if (type == "random") {
-			obj = NULL;
-			depth = 0;
-		} else {
-			if (!si->find_child_wme(root, "objective", objective_wme) ||
-				!si->is_identifier(si->get_wme_val(objective_wme)) ||
-				(obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL)
-			{
-				set_status("missing or invalid objective");
-				return false;
-			}
-			
-			if (!si->find_child_wme(root, "depth", depth_wme) ||
-				!si->get_val(si->get_wme_val(depth_wme), depth))
-			{
-				set_status("missing or invalid depth");
-				return false;
-			}
+		if (!si->find_child_wme(get_root(), "objective", objective_wme) ||
+			!si->is_identifier(si->get_wme_val(objective_wme)) ||
+			(obj = parse_obj_struct(si, si->get_wme_val(objective_wme))) == NULL)
+		{
+			set_status("missing or invalid objective");
+			return false;
 		}
-		ctrl = new controller(state->get_svs(), obj, desc, depth, type);
+		
+		if (!si->find_child_wme(get_root(), "depth", depth_wme) ||
+			!si->get_val(si->get_wme_val(depth_wme), depth))
+		{
+			set_status("missing or invalid depth");
+			return false;
+		}
+		ctrl = new controller(state->get_svs(), obj, out_info, depth, type);
+		out.clear();
+		for (i = out_info.begin(); i != out_info.end(); ++i) {
+			out.add_name(i->name, 0.0);
+		}
 		return true;
 	}
 
@@ -523,19 +628,125 @@ private:
 	void update_step() {
 		if (stepwme)
 			si->remove_wme(stepwme);
-		stepwme = si->make_wme(root, "step", step);
+		stepwme = si->make_wme(get_root(), "step", step);
 	}
 
 	soar_interface *si;
 	svs_state      *state;
-	Symbol         *root;
 	controller     *ctrl;
 	objective      *obj;
 	wme            *stepwme;
 	int             step;
 	bool            broken;
+	namedvec        out;
 };
 
-command *_make_control_command_(svs_state *state, Symbol *root) {
-	return new control_command(state, root);
+command *_make_seek_command_(svs_state *state, Symbol *root) {
+	return new seek_command(state, root);
+}
+
+class random_control_command : public command {
+public:
+	random_control_command(svs_state *state, Symbol *root)
+	: command(state, root), state(state)
+	{
+		si = state->get_svs()->get_soar_interface();
+	}
+	
+	string description() {
+		return string("random control");
+	}
+	
+	bool update() {
+		if (changed()) {
+			wme *outputs_wme;
+			output_info_vec out_info;
+			if (!si->find_child_wme(get_root(), "outputs", outputs_wme) ||
+			    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
+			    !parse_wm_output_struct(si, si->get_wme_val(outputs_wme), out_info))
+			{
+				set_status("missing or invalid outputs specification");
+				return false;
+			}
+			min.resize(out_info.size());
+			max.resize(out_info.size());
+			out.clear();
+			for (int i = 0; i < out_info.size(); ++i) {
+				min[i] = out_info[i].min;
+				max[i] = out_info[i].max;
+				out.add_name(out_info[i].name, 0.0);
+			}
+		}
+		
+		out.vals.randomize(min, max);
+		if (state->get_level() == 0) {
+			state->get_svs()->set_next_output(out);
+		}
+		set_status("success");
+		return true;
+	}
+	
+	bool early() { return true; }
+	
+private:
+	soar_interface  *si;
+	svs_state       *state;
+	namedvec         out;
+	floatvec         min, max;
+};
+
+command *_make_random_control_command_(svs_state *state, Symbol *root) {
+	return new random_control_command(state, root);
+}
+
+class manual_control_command : public command {
+public:
+	manual_control_command(svs_state *state, Symbol *root) : command(state, root), state(state) {
+		sock = new ipcsocket("ctrl", false);
+	}
+	
+	~manual_control_command() {
+		delete sock;
+	}
+	
+	string description() {
+		return string("manual control");
+	}
+	
+	bool update() {
+		string msg, line;
+		stringstream ss1;
+
+		sock->send("dummy");
+		sock->receive(msg);
+		ss1.str(msg);
+		
+		namedvec out;
+		while (getline(ss1, line)) {
+			stringstream ss2(line);
+			string label;
+			float val;
+			if (!(ss2 >> label) || !(ss2 >> val)) {
+				set_status("input error");
+				return false;
+			}
+			out.add_name(label, val);
+		}
+		
+		if (state->get_level() == 0) {
+			state->get_svs()->set_next_output(out);
+		}
+		set_status("success");
+		return true;
+	}
+	
+	bool early() { return true; }
+	
+private:
+	svs_state *state;
+	ipcsocket *sock;
+};
+
+command *_make_manual_control_command_(svs_state *state, Symbol *root) {
+	return new manual_control_command(state, root);
 }

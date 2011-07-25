@@ -22,6 +22,8 @@ public:
 	
 	void set_status(const std::string &s);
 	
+	Symbol *get_root() { return root; }
+	
 private:
 	svs_state      *state;
 	soar_interface *si;

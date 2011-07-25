@@ -345,46 +345,101 @@ private:
 
 std::ostream &operator<<(std::ostream &os, const floatvec &v);
 
-/*
-class labeled_floatvec : public floatvec {
+class namedvec : public floatvec {
 public:
-	labeled_floatvec() : floatvec() {}
+	namedvec() {}
 	
-	void set_label(int index, const std::string &label) {
-		label2ind[label] = index;
-		ind2label[index] = label;
+	namedvec(const namedvec &v) 
+	: vals(v.vals), name2ind(v.name2ind), ind2name(v.ind2name)
+	{}
+	
+	namedvec(std::vector<std::string> &names) 
+	: vals(names.size())
+	{
+		for (int i = 0; i < names.size(); ++i) {
+			name2ind[names[i]] = i;
+			ind2name[i] = names[i];
+		}
 	}
 	
-	bool get_label(int index, std::string &label) {
-		return map_get(ind2label, index, label);
+	void set_name(int index, const std::string &name) {
+		name2ind[name] = index;
+		ind2name[index] = name;
 	}
 	
-	bool get_by_label(const std::string &label, float &val) {
+	void set_names(const std::vector<std::string> &names) {
+		for (int i = 0; i < names.size(); ++i) {
+			name2ind[names[i]] = i;
+			ind2name[i] = names[i];
+		}
+	}
+	
+	void add_name(const std::string &name, float v) {
+		name2ind[name] = vals.size();
+		ind2name[vals.size()] = name;
+		vals.resize(vals.size() + 1);
+		vals[vals.size() - 1] = v;
+	}
+	
+	bool get_name(int index, std::string &name) const {
+		return map_get(ind2name, index, name);
+	}
+	
+	bool get_by_name(const std::string &name, float &val) const {
 		int index;
-		if (!map_get(label2ind, label, index)) {
+		if (!map_get(name2ind, name, index)) {
 			return false;
 		}
-		val = floatvec::operator[](index);
+		val = vals[index];
 		return true;
 	}
 	
-	bool set_by_label(const std::string &label, float val) {
+	bool set_by_name(const std::string &name, float val) {
 		int index;
-		if (!map_get(label2ind, label, index)) {
+		if (!map_get(name2ind, name, index)) {
 			return false;
 		}
-		floatvec::operator[](index) = val;
+		vals[index] = val;
 		return true;
 	}
 	
-	bool congruent(const labeled_floatvec &v) 
-		return label2ind == v.label2ind;
+	bool congruent(const namedvec &v) {
+		return name2ind == v.name2ind;
 	}
+	
+	void operator=(const namedvec &v) {
+		vals = v.vals;
+		name2ind = v.name2ind;
+		ind2name = v.ind2name;
+	}
+	
+	int size() const {
+		return vals.size();
+	}
+	
+	void get_names(std::vector<std::string> &names) const {
+		std::map<int, std::string>::const_iterator i;
+		
+		names.clear();
+		names.reserve(ind2name.size());
+		for (i = ind2name.begin(); i != ind2name.end(); ++i) {
+			names.push_back(i->second);
+		}
+	}
+	
+	void clear() {
+		vals.resize(0);
+		name2ind.clear();
+		ind2name.clear();
+	}
+	
+	floatvec vals;
 	
 private:
-	std::map<std::string, int> label2ind;
-	std::map<int, std::string> ind2label;
+	std::map<std::string, int> name2ind;
+	std::map<int, std::string> ind2name;
 };
-*/
+
+std::ostream &operator<<(std::ostream &os, const namedvec &v);
 
 #endif

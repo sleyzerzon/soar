@@ -116,10 +116,12 @@ void command::set_status(const string &s) {
 
 command *_make_extract_command_(svs_state *state, Symbol *root);
 command *_make_generate_command_(svs_state *state, Symbol *root);
-command *_make_control_command_(svs_state *state, Symbol *root);
 command *_make_create_model_command_(svs_state *state, Symbol *root);
 command *_make_assign_model_command_(svs_state *state, Symbol *root);
 command *_make_property_command_(svs_state *state, Symbol *root);
+command *_make_seek_command_(svs_state *state, Symbol *root);
+command *_make_random_control_command_(svs_state *state, Symbol *root);
+command *_make_manual_control_command_(svs_state *state, Symbol *root);
 
 command* make_command(svs_state *state, wme *w) {
 	string name;
@@ -138,8 +140,12 @@ command* make_command(svs_state *state, wme *w) {
 		return _make_extract_command_(state, id);
 	} else if (name == "generate") {
 		return _make_generate_command_(state, id);
-	} else if (name == "control") {
-		return _make_control_command_(state, id);
+	} else if (name == "seek") {
+		return _make_seek_command_(state, id);
+	} else if (name == "random_control") {
+		return _make_random_control_command_(state, id);
+	} else if (name == "manual_control") {
+		return _make_manual_control_command_(state, id);
 	} else if (name == "create-model") {
 		return _make_create_model_command_(state, id);
 	} else if (name == "assign-model") {

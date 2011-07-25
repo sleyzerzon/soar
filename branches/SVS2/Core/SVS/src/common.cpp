@@ -43,3 +43,14 @@ ostream &operator<<(ostream &os, const floatvec &v) {
 	}
 	return os;
 }
+
+ostream &operator<<(ostream &os, const namedvec &v) {
+	string name;
+	for (int i = 0; i < v.size(); ++i) {
+		if (!v.get_name(i, name)) {
+			assert(false);
+		}
+		os << name << " " << v.vals[i] << endl;
+	}
+	return os;
+}

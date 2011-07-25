@@ -5,7 +5,7 @@
 using namespace std;
 
 const char *in_slots[] =  { "px", "py", "vx", "vy", "rz", "rtz", "lrps", "rrps", "lvolts", "rvolts" };
-const char *out_slots[] = { "px", "py", "vx", "vy", "rz", "lrps", "rrps" };
+const char *out_slots[] = { "px", "py", "vx", "vy", "rz", "rtz", "lrps", "rrps" };
 
 class splinter_model : public model {
 public:
@@ -28,8 +28,8 @@ public:
 	}
 
 	void get_slots(vector<string> &ins, vector<string> &outs) const {
-		copy(in_slots, in_slots + 9, ins.begin());
-		copy(in_slots, in_slots + 7, outs.begin());
+		copy(in_slots, in_slots + 10, back_inserter(ins));
+		copy(in_slots, in_slots + 8, back_inserter(outs));
 	}
 };
 

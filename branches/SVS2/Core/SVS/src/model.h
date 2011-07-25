@@ -7,7 +7,6 @@
 #include <map>
 #include <vector>
 #include "scene.h"
-#include "env.h"
 #include "soar_interface.h"
 #include "common.h"
 

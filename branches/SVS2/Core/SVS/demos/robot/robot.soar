@@ -6,101 +6,120 @@ sp {init
 	(<s> ^time 0)
 }
 
-sp {make-model
+sp {make-free-move-model
 	(state <s> ^superstate nil ^svs.command <c>)
 -->
-	(<c> ^model <mdl>)
-	(<mdl> ^name model1
-	       ^type lwr
-	       #^type splinter
-	       ^num-neighbors 20)
+	(<c> ^create-model <cm>)
+	(<cm> ^name free-move
+	      ^type splinter)
 }
 
-#sp {gen-distractor
-#	(state <s>
-#		^superstate nil
-#		^svs.command <c>)
-#-->
-#	(<c> ^generate <g>)
-#	(<g> ^parent world
-#	     ^node <n>)
-#	(<n> ^type gen
-#	     ^name distractor
-#	     ^points.type singleton
-#	     ^pos <pos>)
-#	(<pos> ^x 0.0 ^y 0.0 ^z 0.0)
-#}
+# for now, assume that colliding with the box doesn't affect the robot's movement
+sp {assign-free-move-model
+	(state <s> ^superstate nil ^svs.command <c>)
+-->
+	(<c> ^assign-model <am>)
+	(<am> ^name free-move ^inputs <in> ^outputs <out>)
+	(<in> ^px splinter:px
+	      ^py splinter:py
+	      ^rz splinter:rz
+	      ^vx splinter:vel_0
+	      ^vy splinter:vel_1
+	      ^rtz splinter:rotation_rate_2
+	      ^lrps splinter:left_rads_per_sec
+	      ^rrps splinter:right_rads_per_sec
+	      ^lvolts left
+	      ^rvolts right)
+	(<out> ^px splinter:px
+	       ^py splinter:py
+	       ^rz splinter:rz
+	       ^vx splinter:vel_0
+	       ^vy splinter:vel_1
+	       ^rtz splinter:rotation_rate_2
+	       ^lrps splinter:left_rads_per_sec
+	       ^rrps splinter:right_rads_per_sec)
+}
+
+sp {make-collision-model
+	(state <s> ^superstate nil ^svs.command <c>)
+-->
+	(<c> ^create-model <cm>)
+	(<cm> ^name collision
+	      ^type lwr
+	      ^inputs <in> ^outputs <out>)
+	(<in> ^spx  <spx>
+	      ^spy  <spy>
+	      ^bpx  <bpx>
+	      ^bpy  <bpy>
+	      ^srz  <srz>
+	      ^brz  <brz>
+	      ^vx   <vx>
+	      ^vy   <vy>
+	      ^lvolts <lvolts>
+	      ^rvolts <rvolts>)
+	(<out> ^bpx <obpx>
+	       ^bpy <obpy>
+	       ^brz <obrz>)
+}
+
+sp {assign-collision-model
+	(state <s> ^superstate nil ^colliding t ^svs.command <c>)
+-->
+	(<c> ^assign-model <am>)
+	(<am> ^name free-move ^inputs <in> ^outputs <out>)
+	(<in> ^spx splinter:px
+	      ^spy splinter:py
+	      ^srz splinter:rz
+	      ^bpx box:px
+	      ^bpy box:py
+	      ^brz box:rz
+	      ^vx splinter:vel_0
+	      ^vy splinter:vel_1
+	      ^lvolts left
+	      ^rvolts right)
+	(<out> ^bpx block:px
+	       ^bpy block:py
+	       ^brz block:rz)
+}
+
 
 sp {gen-target
 	(state <s>
 		^superstate nil
 		^svs.command <c>)
 -->
-	(<c> ^generate <g1>
-	     ^generate <g2>)
+	(<c> ^generate <g1>)
 	(<g1> ^parent world
 	      ^node <n1>)
 	(<n1> ^type gen
 	      ^name target1
-	      ^points.type singleton
+	      ^points.type origin
 	      ^pos <pos1>)
 	(<pos1> ^type vec3
 	        ^x 5.0
 	        ^y -5.0
 	        ^z 0.0)
-	(<g2> ^parent world
-	      ^node <n2>)
-	(<n2> ^type gen
-	      ^name target2
-	      ^points.type singleton
-	      ^pos <pos2>)
-	(<pos2> ^type vec3
-	        ^x 0.0
-	        ^y -5.0
-	        ^z 0.0)
 }
 
-sp {cursor-target-int
+sp {cursor-box-int
 	(state <s> 
 		^superstate nil
 		^svs (
 			^command <c>
 			^spatial-scene (
 				^child.id splinter
-				^child.id target1
-				^child.id target2
+				^child.id block
 			)
 		)
 	)
 -->
-	(<c> ^extract <e1>
-	     ^extract <e2>)
-	(<e1> ^type bbox_int
+	(<c> ^extract <e1>)
+	(<e1> ^type intersect
 	      ^a <a1>
 	      ^b <b1>)
 	(<a1> ^type node ^name splinter)
-	(<b1> ^type node ^name target1)
-	(<e2> ^type bbox_int
-	      ^a <a2>
-	      ^b <b2>)
-	(<a2> ^type node ^name splinter)
-	(<b2> ^type node ^name target2)
+	(<b1> ^type node ^name block)
 }
-
-#sp {explore
-#	(state <s>
-#		^superstate nil
-#		^svs.command <c>
-#	)
-#	-(<s> ^time >= 100)
-#-->
-#	(<c> ^control <ctl>)
-#	(<ctl> ^type random
-#	        ^outputs <out>)
-#	(<out> ^left <left> ^right <right>)
-#	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
-#	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
-#}
 
 sp {propose*count-time
 	(state <s> ^superstate nil ^time <t>)
@@ -119,78 +138,36 @@ sp {apply*count-time
 	(<s> ^time <t> - (+ <t> 1))
 }
 
-sp {seek-target1
-	(state <s>
-		^superstate nil
-		-^target1-reached
-		^svs (
-			^command <c>
-			^spatial-scene (
-				^child.id splinter
-				^child.id target1
-			)
-		)
-	)
--->
-	(<c> ^control <ctl>)
-	(<ctl> ^type simplex
-	       ^depth 20
-	       ^outputs <out>
-	       ^objective <obj>
-	       ^model model1)
-	(<out> ^left <left> ^right <right>)
-	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
-	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
-	(<obj> ^name euclidean
-	       ^a splinter
-	       ^b target1)
-}
+#sp {seek-target1
+#	(state <s>
+#		^superstate nil
+#		^svs (
+#			^command <c>
+#			^spatial-scene (
+#				^child.id splinter
+#				^child.id target1
+#			)
+#		)
+#	)
+#-->
+#	(<c> ^seek <sk>)
+#	(<sk> ^type simplex
+#	      ^depth 20
+#	      ^outputs <out>
+#	      ^objective <obj>)
+#	(<out> ^left <left> ^right <right>)
+#	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
+#	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
+#	(<obj> ^name euclidean
+#	       ^a splinter
+#	       ^b target1)
+#}
 
-sp {propose*mark-target1-reached
-	(state <s>
-		^superstate nil
-		-^target1-reached
-		^svs.command.extract (
-			^type bbox_int
-			^a.name splinter
-			^b.name target1
-			^result true
-		)
-	)
+sp {manual
+(state <s> ^superstate nil ^svs.command <c>)
 -->
-	(<s> ^operator <o> + >)
-	(<o> ^name mark-target1-reached)
-}
-
-sp {apply*mark-target1-reached
-	(state <s> ^operator.name mark-target1-reached)
--->
-	(<s> ^target1-reached 1)
-}
-
-sp {seek-target2
-	(state <s>
-		^superstate nil
-		^target1-reached 1
-		^svs (
-			^command <c>
-			^spatial-scene (
-				^child.id splinter
-				^child.id target2
-			)
-		)
-	)
--->
-	(<c> ^control <ctl>)
-	(<ctl> ^type simplex
-	       ^depth 20
-	       ^outputs <out>
-	       ^objective <obj>
-	       ^model model1)
-	(<out> ^left <left> ^right <right>)
-	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
-	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
-	(<obj> ^name euclidean
-	       ^a splinter
-	       ^b target2)
+(<c> ^manual_control.outputs <out>)
+(<out> ^left <left> ^right <right>)
+(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
+(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
 }

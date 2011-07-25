@@ -6,15 +6,18 @@
 #include "sg_node.h"
 #include "linalg.h"
 #include "common.h"
+#include "ipcsocket.h"
 
-class scene {
+class scene : public ipc_listener {
 public:
 	scene(std::string name, std::string rootname);
-	scene(scene &other);
+	scene(const scene &other);
 	~scene();
 	
 	sg_node *get_root();
-	sg_node *get_node(std::string name);
+	sg_node *get_node(const std::string &name);
+	sg_node const* get_node(const std::string &name) const;
+	
 	// nodes will be in alphabetical name order
 	void get_all_nodes(std::vector<sg_node*> &nodes);
 	int num_nodes() const;
@@ -39,11 +42,14 @@ public:
 	
 	void parse_sgel(const std::string &s);
 	
+	void ipc_connect(ipcsocket *sock);
+	void ipc_disconnect(ipcsocket *sock);
+	
 private:
 	void disp_update_node(sg_node *n);
 	void disp_del_node(sg_node *n);
-	void disp_new_scene(std::string name);
-	void disp_del_scene(std::string name);
+	void disp_new_scene();
+	void disp_del_scene();
 
 	int  parse_add(std::vector<std::string> &f);
 	int  parse_del(std::vector<std::string> &f);

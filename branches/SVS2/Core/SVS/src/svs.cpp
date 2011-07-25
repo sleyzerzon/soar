@@ -12,7 +12,6 @@
 #include "nsg_node.h"
 #include "soar_interface.h"
 #include "scene.h"
-#include "env.h"
 #include "common.h"
 
 using namespace std;
@@ -192,9 +191,11 @@ void svs_state::process_cmds() {
 	for (i = all.begin(); i != all.end(); ++i) {
 		command *c = make_command(this, *i);
 		if (c) {
-			curr_cmds.insert(make_pair(*i, c));
+			curr_cmds[*i] = c;
 		} else {
-			cerr << "make_command returned nil" << endl;
+			string attr;
+			si->get_val(si->get_wme_attr(*i), attr);
+			cerr << "could not create command " << attr << endl;
 		}
 	}
 }
@@ -256,7 +257,9 @@ void svs::pre_env_callback() {
 		validout = false;
 		envsock.send("");
 	} else {
-		validout = envsock.send(next_out.serialize());
+		stringstream ss;
+		ss << next_out << endl;
+		validout = envsock.send(ss.str());
 	}
 	if (!envsock.receive(sgel)) {
 		validin = false;
@@ -273,7 +276,6 @@ void svs::pre_env_callback() {
 
 void svs::update_models() {
 	map<string, model*>::iterator i;
-	outdesc::iterator j;
 	vector<string> curr_pnames, out_names;
 	floatvec curr_pvals;
 	double dt;
@@ -338,7 +340,7 @@ string svs::get_env_input(const string &sgel) {
 	return "";
 }
 
-void svs::set_next_output(const output &out) {
+void svs::set_next_output(const namedvec &out) {
 	next_out = out;
 }
 

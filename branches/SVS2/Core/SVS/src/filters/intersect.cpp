@@ -1,3 +1,4 @@
+#include <iostream>
 #include <map>
 #include <set>
 #include <SOLID/SOLID.h>
@@ -7,6 +8,8 @@
 #include "common.h"
 
 using namespace std;
+
+const float MARGIN = 0.05;
 
 DT_Bool collision_callback(void *client_data, void *obj1, void *obj2, const DT_CollData *coll_data);
 
@@ -32,6 +35,7 @@ void update_transforms(sg_node *n, DT_ObjectHandle obj) {
 	DT_SetPosition(obj, pos.a);
 	DT_SetOrientation(obj, rot.a);
 	DT_SetScaling(obj, scale.a);
+	//cout << "Moving " << n->get_name() << " to " << pos << endl;
 }
 
 class intersect_filter : public filter {
@@ -155,6 +159,7 @@ private:
 		info.shape = create_shape(info.node);
 		info.obj = DT_CreateObject((void*) v, info.shape);
 		update_transforms(info.node, info.obj);
+		DT_SetMargin(info.obj, MARGIN);
 		DT_AddObject(scene, info.obj);
 		DT_SetResponseClass(resp_table, info.obj, resp_class);
 	}

@@ -45,12 +45,13 @@ scene::scene(string name, string rootname)
 	if (!disp) {
 		disp = new ipcsocket(getnamespace() + "disp", false);
 	}
+	disp->listen(this);
 	add_node("", rootname);
 	root = nodes[rootname].node;
-	disp_new_scene(name);
+	disp_new_scene();
 }
 
-scene::scene(scene &other)
+scene::scene(const scene &other)
 : name(other.name), rootname(other.rootname), iscopy(true), dt(other.dt)
 {
 	string name;
@@ -59,27 +60,42 @@ scene::scene(scene &other)
 	
 	root = other.root->copy();
 	root->walk(all_nodes);
+	
+	/*
+	 Make a deep copy of the nodes table, which will result in
+	 a table with pointers to other's nodes, then go through and
+	 change to point to our nodes.
+	*/
+	nodes = other.nodes;
 	for(i = all_nodes.begin(); i != all_nodes.end(); ++i) {
-		name = (**i).get_name();
-		node_info &info = nodes[name];
-		info.node = *i;
-		info.props = other.nodes[name].props;
+		nodes[(**i).get_name()].node = *i;
 	}
 }
 
 scene::~scene() {
 	if (!iscopy) {
-		disp_del_scene(name);
+		disp_del_scene();
 	}
 	delete root;
+	if (disp) {
+		disp->unlisten(this);
+	}
 }
 
 sg_node* scene::get_root() {
 	return root;
 }
 
-sg_node* scene::get_node(string name) {
-	node_map::iterator i;
+sg_node* scene::get_node(const string &name) {
+	node_map::const_iterator i;
+	if ((i = nodes.find(name)) == nodes.end()) {
+		return NULL;
+	}
+	return i->second.node;
+}
+
+sg_node const *scene::get_node(const string &name) const {
+	node_map::const_iterator i;
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return NULL;
 	}
@@ -294,6 +310,7 @@ void scene::parse_sgel(const string &s) {
 	char cmd;
 	int errfield;
 	
+	//cerr << "received sgel" << endl << "---------" << endl << s << endl << "---------" << endl;
 	split(s, "\n", lines);
 	for (i = lines.begin(); i != lines.end(); ++i) {
 		split(*i, " \t", fields);
@@ -356,11 +373,11 @@ void scene::disp_del_node(sg_node *n){
 	}
 }
 
-void scene::disp_new_scene(string name) {
+void scene::disp_new_scene() {
 	if (disp) disp->send("newscene\n" + name);
 }
 
-void scene::disp_del_scene(string name) {
+void scene::disp_del_scene() {
 	if (disp) disp->send("delscene\n" + name);
 }
 
@@ -518,3 +535,13 @@ int scene::get_dof() const {
 	}
 	return dof;
 }
+
+void scene::ipc_connect(ipcsocket *sock) {
+	node_map::iterator i;
+	disp_new_scene();
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		disp_update_node(i->second.node);
+	}
+}
+
+void scene::ipc_disconnect(ipcsocket *sock) {}
