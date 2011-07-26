@@ -17,6 +17,8 @@ _Important: the 64-bit Soar downloads require 64-bit Java!_
   * [http://windows.microsoft.com/en-US/windows-vista/32-bit-and-64-bit-Windows-frequently-asked-questions How to tell if you're running 32- or 64-bit Windows]
   * [http://soar.googlecode.com/files/SoarSuite-9.3.1-win-i686.zip 9.3.1 for Windows, 32-bit] (use this if not sure)
   * [http://soar.googlecode.com/files/SoarSuite-9.3.1-win-x86_64.zip 9.3.1 for Windows, 64-bit] (make sure you have 64-bit Java)
+  * [http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=29 Microsoft Visual C++ 2008 redistributable, 32-bit] (run if getting an error like "Native code library failed to load.")
+  * [http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=15336 Microsoft Visual C++ 2008 redistributable, 64-bit] (run if getting an error like "Native code library failed to load.")
 
 == OS X ==
   * [http://support.apple.com/kb/HT3696 How to tell if you're running 32- or 64-bit OS X]
