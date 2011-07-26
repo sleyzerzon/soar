@@ -96,10 +96,12 @@ justifications are created by specifying one of the following arguments to the
 === Watching other Functions ===
 
 || *Option Flag* || *Argument to Option* || *Description* ||
+|| `-a, --wma` || `remove` (optional) || Print log of working memory activation events  ||
 || `-b, --backtracing` || `remove` (optional) || Print backtracing information when a chunk or justification is created ||
 || `-e, --epmem` || `remove` (optional) || Print episodic retrieval traces and IDs of newly encoded episodes  ||
 || `-i, --indifferent-selection` || `remove` (optional) || Print scores for tied operators in random indifferent selection mode ||
 || `-R, --rl` || `remove` (optional) || Print RL debugging output ||
+|| `-s, --smem` || `remove` (optional) || Print log of semantic memory storage events ||
 
 
 == Description ==
