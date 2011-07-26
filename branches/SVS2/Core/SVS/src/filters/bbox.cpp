@@ -7,7 +7,7 @@ public:
 	bbox_filter(filter_input *input) : map_filter<bbox>(input) {}
 	
 	bool compute(filter_param_set *params, bbox &b, bool adding) {
-		sg_node *n;
+		sgnode *n;
 		ptlist pts;
 		
 		if (!get_filter_param(this , params, "node", n)) {

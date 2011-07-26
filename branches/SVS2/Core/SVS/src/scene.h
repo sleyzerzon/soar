@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-#include "sg_node.h"
+#include "sgnode.h"
 #include "linalg.h"
 #include "common.h"
 #include "ipcsocket.h"
@@ -14,16 +14,16 @@ public:
 	scene(const scene &other);
 	~scene();
 	
-	sg_node *get_root();
-	sg_node *get_node(const std::string &name);
-	sg_node const* get_node(const std::string &name) const;
+	sgnode *get_root();
+	sgnode *get_node(const std::string &name);
+	sgnode const* get_node(const std::string &name) const;
 	
 	// nodes will be in alphabetical name order
-	void get_all_nodes(std::vector<sg_node*> &nodes);
+	void get_all_nodes(std::vector<sgnode*> &nodes);
 	int num_nodes() const;
 	int get_dof() const;
 	
-	bool add_node(std::string parent, sg_node *n);
+	bool add_node(std::string parent, sgnode *n);
 	bool add_node(std::string parent, std::string name);
 	bool add_node(std::string parent, std::string name, const ptlist &points);
 	bool del_node(std::string name);
@@ -46,8 +46,8 @@ public:
 	void ipc_disconnect(ipcsocket *sock);
 	
 private:
-	void disp_update_node(sg_node *n);
-	void disp_del_node(sg_node *n);
+	void disp_update_node(sgnode *n);
+	void disp_del_node(sgnode *n);
 	void disp_new_scene();
 	void disp_del_scene();
 
@@ -61,18 +61,18 @@ private:
 	typedef std::map<std::string, float> property_map;
 	
 	struct node_info {
-		sg_node *node;
+		sgnode *node;
 		property_map props;
 	};
 	
 	typedef std::map<std::string, node_info> node_map;
 
-	std::string   name;
-	std::string   rootname;
-	sg_node      *root;
-	node_map      nodes;
-	bool          iscopy;
-	float         dt;          // time passed since last update (as reported by environment)
+	std::string  name;
+	std::string  rootname;
+	sgnode      *root;
+	node_map     nodes;
+	bool         iscopy;
+	float        dt;          // time passed since last update (as reported by environment)
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include <sstream>
 #include <vector>
 #include "filter.h"
-#include "nsg_node.h"
+#include "sgnode.h"
 #include "scene.h"
 
 using namespace std;
@@ -12,11 +12,11 @@ int gen_counter = 0;
  whenever a node is deleted all its children are also deleted, which
  may break the caching that's going on in the map_filter class.
 */
-class gen_filter : public map_filter<sg_node*> {
+class gen_filter : public map_filter<sgnode*> {
 public:
-	gen_filter(filter_input *input) : map_filter<sg_node*>(input) {}
+	gen_filter(filter_input *input) : map_filter<sgnode*>(input) {}
 
-	bool compute(filter_param_set *params, sg_node *&res, bool adding) {
+	bool compute(filter_param_set *params, sgnode *&res, bool adding) {
 		string name;
 		vec3 pos, rot, scale, singlept;
 		filter_val *ptsval;
@@ -39,15 +39,15 @@ public:
 		}
 		
 		if (get_filter_param(NULL, params, "points", pts)) {
-			res = new nsg_node(name, *pts);
+			res = new sgnode(name, *pts);
 		} else {
 			if (get_filter_param(this, params, "points", singlept)) {
 				pts = new ptlist();
 				dealloc_pts = true;
 				pts->push_back(singlept);
-				res = new nsg_node(name, *pts);
+				res = new sgnode(name, *pts);
 			} else {
-				res = new nsg_node(name);
+				res = new sgnode(name);
 			}
 		}
 		

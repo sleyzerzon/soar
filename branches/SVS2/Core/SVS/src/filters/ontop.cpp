@@ -9,7 +9,7 @@ public:
 
 	bool compute(filter_param_set *params, bool &result, bool adding) {
 		filter_val *tfv, *bfv;
-		sg_node *tn, *bn;
+		sgnode *tn, *bn;
 		ptlist tp, bp;
 		vec3 tmin, tmax, bmin, bmax;
 		

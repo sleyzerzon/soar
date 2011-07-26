@@ -13,7 +13,7 @@ const float MARGIN = 0.1;
 
 DT_Bool collision_callback(void *client_data, void *obj1, void *obj2, const DT_CollData *coll_data);
 
-DT_ShapeHandle create_shape(sg_node *n) {
+DT_ShapeHandle create_shape(sgnode *n) {
 	ptlist pts;
 	ptlist::const_iterator i;
 	DT_ShapeHandle s = DT_NewComplexShape(NULL);
@@ -28,7 +28,7 @@ DT_ShapeHandle create_shape(sg_node *n) {
 	return s;
 }
 
-void update_transforms(sg_node *n, DT_ObjectHandle obj) {
+void update_transforms(sgnode *n, DT_ObjectHandle obj) {
 	vec3 pos = n->get_trans('p');
 	quaternion rot = quaternion(n->get_trans('r'));
 	vec3 scale = n->get_trans('s');
@@ -51,7 +51,7 @@ public:
 		filter_input::iter i;
 		result_table_t::iterator j;
 		filter_val *av, *bv;
-		sg_node *an, *bn;
+		sgnode *an, *bn;
 		
 		for (i = added_input_begin(); i != added_input_end(); ++i) {
 			if (!map_get<string, filter_val*>(**i, "a", av) ||
@@ -127,7 +127,7 @@ public:
 private:
 	
 	struct node_info {
-		sg_node *node;
+		sgnode *node;
 		DT_ShapeHandle shape;
 		DT_ObjectHandle obj;
 		vector<vec3> vertexbase;
@@ -159,7 +159,7 @@ private:
 	}
 	
 	bool add_node(filter_val *v) {
-		sg_node *n;
+		sgnode *n;
 		
 		if (input_table.find(v) != input_table.end()) {
 			return true;
@@ -184,7 +184,7 @@ private:
 	}
 	
 	bool change_node(filter_val *v) {
-		sg_node *newnode;
+		sgnode *newnode;
 		
 		if (!get_filter_val(v, newnode)) {
 			return false;

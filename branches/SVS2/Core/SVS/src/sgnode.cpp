@@ -228,9 +228,9 @@ void sgnode::send_update(sgnode::change_type t, int added) {
 }
 
 void sgnode::listen(sgnode_listener *o) {
-	listeners.insert(o);
+	listeners.push_back(o);
 }
 
 void sgnode::unlisten(sgnode_listener *o) {
-	listeners.erase(o);
+	listeners.remove(o);
 }

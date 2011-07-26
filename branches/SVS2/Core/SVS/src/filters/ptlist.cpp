@@ -1,6 +1,6 @@
 #include <list>
 #include "filter.h"
-#include "sg_node.h"
+#include "sgnode.h"
 #include "linalg.h"
 #include "scene.h"
 
@@ -18,7 +18,7 @@ public:
 	}
 	
 	bool compute(filter_param_set *params, ptlist *&res, bool adding) {
-		sg_node *n;
+		sgnode *n;
 		if (!get_filter_param(this, params, "node", n)) {
 			return false;
 		}

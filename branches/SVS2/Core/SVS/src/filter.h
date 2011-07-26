@@ -9,7 +9,7 @@
 #include <iterator>
 
 #include "linalg.h"
-#include "sg_node.h"
+#include "sgnode.h"
 #include "scene.h"
 #include "soar_interface.h"
 #include "common.h"
@@ -40,14 +40,14 @@ private:
 };
 
 template <>
-class filter_val_c <sg_node*> : public filter_val {
+class filter_val_c <sgnode*> : public filter_val {
 public:
-	filter_val_c(sg_node *v) : v(v) {}
+	filter_val_c(sgnode *v) : v(v) {}
 	std::string get_string() { return v->get_name(); }
-	sg_node *get_value() { return v; }
-	void set_value(sg_node *n) { v = n; }
+	sgnode *get_value() { return v; }
+	void set_value(sgnode *n) { v = n; }
 private:
-	sg_node *v;
+	sgnode *v;
 };
 
 /*

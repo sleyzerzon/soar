@@ -211,7 +211,7 @@ public:
 	: obj1(obj1), obj2(obj2) {}
 	
 	float eval(scene &scn) const {
-		sg_node *n1, *n2;
+		sgnode *n1, *n2;
 		ptlist p1, p2;
 		::vec3 c1, c2;
 		

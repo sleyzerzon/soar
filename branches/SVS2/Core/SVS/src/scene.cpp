@@ -6,7 +6,7 @@
 #include <limits>
 #include <utility>
 #include "scene.h"
-#include "nsg_node.h"
+#include "sgnode.h"
 #include "linalg.h"
 #include "ipcsocket.h"
 #include "common.h"
@@ -55,8 +55,8 @@ scene::scene(const scene &other)
 : name(other.name), rootname(other.rootname), iscopy(true), dt(other.dt)
 {
 	string name;
-	std::list<sg_node*> all_nodes;
-	std::list<sg_node*>::iterator i;
+	std::list<sgnode*> all_nodes;
+	std::list<sgnode*>::iterator i;
 	
 	root = other.root->copy();
 	root->walk(all_nodes);
@@ -82,11 +82,11 @@ scene::~scene() {
 	}
 }
 
-sg_node* scene::get_root() {
+sgnode* scene::get_root() {
 	return root;
 }
 
-sg_node* scene::get_node(const string &name) {
+sgnode* scene::get_node(const string &name) {
 	node_map::const_iterator i;
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return NULL;
@@ -94,7 +94,7 @@ sg_node* scene::get_node(const string &name) {
 	return i->second.node;
 }
 
-sg_node const *scene::get_node(const string &name) const {
+sgnode const *scene::get_node(const string &name) const {
 	node_map::const_iterator i;
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return NULL;
@@ -102,17 +102,17 @@ sg_node const *scene::get_node(const string &name) const {
 	return i->second.node;
 }
 
-void scene::get_all_nodes(vector<sg_node*> &n) {
+void scene::get_all_nodes(vector<sgnode*> &n) {
 	node_map::const_iterator i;
 	for (i = nodes.begin(); i != nodes.end(); ++i) {
 		n.push_back(i->second.node);
 	}
 }
 
-bool scene::add_node(string parent, sg_node *n) {
+bool scene::add_node(string parent, sgnode *n) {
 	node_info info;
 	info.node = n;
-	sg_node *p = get_node(parent);
+	sgnode *p = get_node(parent);
 	
 	if (parent != "" && !p) {
 		return false;
@@ -129,11 +129,11 @@ bool scene::add_node(string parent, sg_node *n) {
 }
 
 bool scene::add_node(string parent, string name) {
-	return add_node(parent, new nsg_node(name));
+	return add_node(parent, new sgnode(name));
 }
 
 bool scene::add_node(string parent, string name, const ptlist &points) {
-	return add_node(parent, new nsg_node(name, points));
+	return add_node(parent, new sgnode(name, points));
 }
 
 bool scene::del_node(string name) {
@@ -150,7 +150,7 @@ bool scene::del_node(string name) {
 }
 
 bool scene::set_node_trans(string name, char type, vec3 trans) {
-	sg_node *n = get_node(name);
+	sgnode *n = get_node(name);
 	if (!n) return false;
 	n->set_trans(type, trans);
 	if (!iscopy) {
@@ -353,7 +353,7 @@ void scene::parse_sgel(const string &s) {
 	}
 }
 
-void scene::disp_update_node(sg_node *n) {
+void scene::disp_update_node(sgnode *n) {
 	stringstream ss;
 	ptlist pts;
 	ptlist::const_iterator i;
@@ -365,7 +365,7 @@ void scene::disp_update_node(sg_node *n) {
 	}
 }
 
-void scene::disp_del_node(sg_node *n){
+void scene::disp_del_node(sgnode *n){
 	stringstream ss;
 	if (!n->is_group() && disp) {
 		ss << "delobject\n" << name << '\n' << n->get_name();

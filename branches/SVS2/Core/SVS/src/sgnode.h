@@ -5,7 +5,7 @@
 
 #include "linalg.h"
 #include <vector>
-#include <set>
+#include <list>
 
 class sgnode_listener;
 
@@ -30,8 +30,8 @@ public:
 	sgnode*     get_parent();
 	int         num_children() const;
 	sgnode*     get_child(int i);
-	void        walk(std::list<sg_node*> &result);
-	bool        attach_child(sg_node *c);
+	void        walk(std::list<sgnode*> &result);
+	bool        attach_child(sgnode *c);
 	
 	void        set_trans(char type, vec3 trans);
 	vec3        get_trans(char type) const;
@@ -39,8 +39,8 @@ public:
 	void        get_local_points(ptlist &result);
 	void        get_world_points(ptlist &result);
 	
-	void        listen(sg_listener *o);
-	void        unlisten(sg_listener *o);
+	void        listen(sgnode_listener *o);
+	void        unlisten(sgnode_listener *o);
 	
 private:
 	void detach_child(sgnode *c);
@@ -48,7 +48,7 @@ private:
 	void update_transform();
 	void set_points_dirty();
 	void update_points();
-	void send_update(sg_node::change_type t, int added=-1);
+	void send_update(change_type t, int added=-1);
 	
 	std::string          name;
 	sgnode*              parent;
@@ -64,7 +64,7 @@ private:
 	bool                 tdirty;       // transforms dirty
 	bool                 pdirty;       // convex hull dirty
 	
-	std::set<sgnode_listener*> listeners;
+	std::list<sgnode_listener*> listeners;
 };
 
 class sgnode_listener {

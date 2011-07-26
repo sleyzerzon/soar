@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 #include "filter.h"
-#include "sg_node.h"
+#include "sgnode.h"
 #include "scene.h"
 
 using namespace std;
@@ -12,22 +12,22 @@ using namespace std;
  This filter takes a "name" parameter and outputs a pointer to the node
  with that name in the scene graph.
 */
-class node_filter : public map_filter<sg_node*>, public sg_listener {
+class node_filter : public map_filter<sgnode*>, public sgnode_listener {
 public:
-	node_filter(scene *scn, filter_input *input) : map_filter<sg_node*>(input), scn(scn) {}
+	node_filter(scene *scn, filter_input *input) : map_filter<sgnode*>(input), scn(scn) {}
 	
 	~node_filter() {
-		map<sg_node*, filter_param_set*>::iterator i;
+		map<sgnode*, filter_param_set*>::iterator i;
 		for (i = node2param.begin(); i != node2param.end(); ++i) {
 			i->first->unlisten(this);
 		}
 	}
 	
-	bool compute(filter_param_set *params, sg_node *&n, bool adding) {
+	bool compute(filter_param_set *params, sgnode *&n, bool adding) {
 		filter_val *nameval;
 		string name;
 		if (!adding) {
-			sg_node *old = n;
+			sgnode *old = n;
 			old->unlisten(this);
 			node2param.erase(old);
 		}
@@ -47,8 +47,8 @@ public:
 		return true;
 	}
 	
-	void node_update(sg_node *n, sg_node::change_type t, int added) {
-		if (t == sg_node::DELETED || t == sg_node::POINTS_CHANGED) {
+	void node_update(sgnode *n, sgnode::change_type t, int added) {
+		if (t == sgnode::DELETED || t == sgnode::POINTS_CHANGED) {
 			filter_param_set *s;
 			if (!map_get(node2param, n, s)) {
 				assert(false);
@@ -59,24 +59,24 @@ public:
 
 private:
 	scene *scn;
-	map<sg_node*, filter_param_set*> node2param;
+	map<sgnode*, filter_param_set*> node2param;
 };
 
 /* Return all nodes from the scene */
-class all_nodes_filter : public filter, public sg_listener {
+class all_nodes_filter : public filter, public sgnode_listener {
 public:
 	all_nodes_filter(scene *scn) : scn(scn), first(true) {}
 	
 	~all_nodes_filter() {
-		map<sg_node*, filter_val*>::iterator i;
+		map<sgnode*, filter_val*>::iterator i;
 		for (i = results.begin(); i != results.end(); ++i) {
 			i->first->unlisten(this);
 		}
 	}
 	
 	bool update_results() {
-		vector<sg_node*> nodes;
-		vector<sg_node*>::iterator i;
+		vector<sgnode*> nodes;
+		vector<sgnode*>::iterator i;
 		
 		if (!first) {
 			return true;
@@ -90,19 +90,19 @@ public:
 		return true;
 	}
 	
-	void node_update(sg_node *n, sg_node::change_type t, int added_child) {
+	void node_update(sgnode *n, sgnode::change_type t, int added_child) {
 		filter_val *r;
 		switch (t) {
-			case sg_node::CHILD_ADDED:
+			case sgnode::CHILD_ADDED:
 				add_node(n->get_child(added_child));
 				break;
-			case sg_node::DELETED:
+			case sgnode::DELETED:
 				if (!map_get(results, n, r)) {
 					assert(false);
 				}
 				remove_result(r);
 				break;
-			case sg_node::POINTS_CHANGED:
+			case sgnode::POINTS_CHANGED:
 				if (!map_get(results, n, r)) {
 					assert(false);
 				}
@@ -112,9 +112,9 @@ public:
 	}
 	
 private:
-	filter_val *add_node(sg_node *n) {
+	filter_val *add_node(sgnode *n) {
 		n->listen(this);
-		filter_val *r = new filter_val_c<sg_node*>(n);
+		filter_val *r = new filter_val_c<sgnode*>(n);
 		results[n] = r;
 		add_result(r, NULL);
 		return r;
@@ -123,7 +123,7 @@ private:
 	scene *scn;
 	bool first;
 	
-	map<sg_node*, filter_val*> results;
+	map<sgnode*, filter_val*> results;
 };
 
 filter *_make_node_filter_(scene *scn, filter_input *input) {

@@ -9,7 +9,7 @@
 
 #include "svs.h"
 #include "command.h"
-#include "nsg_node.h"
+#include "sgnode.h"
 #include "soar_interface.h"
 #include "scene.h"
 #include "common.h"
@@ -23,7 +23,7 @@ typedef map<wme*,command*>::iterator cmd_iter;
 ofstream trainlog("train.log");
 bool headerwritten = false;
 
-void print_tree(sg_node *n) {
+void print_tree(sgnode *n) {
 	if (n->is_group()) {
 		for(int i = 0; i < n->num_children(); ++i) {
 			print_tree(n->get_child(i));
@@ -36,7 +36,7 @@ void print_tree(sg_node *n) {
 	}
 }
 
-sgwme::sgwme(soar_interface *si, Symbol *ident, sgwme *parent, sg_node *node) 
+sgwme::sgwme(soar_interface *si, Symbol *ident, sgwme *parent, sgnode *node) 
 : soarint(si), id(ident), parent(parent), node(node)
 {
 	int i;
@@ -66,19 +66,19 @@ sgwme::~sgwme() {
 	}
 }
 
-void sgwme::node_update(sg_node *n, sg_node::change_type t, int added_child) {
+void sgwme::node_update(sgnode *n, sgnode::change_type t, int added_child) {
 	switch (t) {
-		case sg_node::CHILD_ADDED:
+		case sgnode::CHILD_ADDED:
 			add_child(node->get_child(added_child));
 			break;
-		case sg_node::DELETED:
+		case sgnode::DELETED:
 			node = NULL;
 			delete this;
 			break;
 	};
 }
 
-void sgwme::add_child(sg_node *c) {
+void sgwme::add_child(sgnode *c) {
 	sym_wme_pair cid_wme;
 	char letter;
 	string cname = c->get_name();

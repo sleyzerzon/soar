@@ -11,7 +11,6 @@
 #include <string>
 
 #include "ipcsocket.h"
-#include "sg_node.h"
 #include "linalg.h"
 
 using namespace std;

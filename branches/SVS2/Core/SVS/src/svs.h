@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "sg_node.h"
+#include "sgnode.h"
 #include "ipcsocket.h"
 #include "soar_interface.h"
 #include "model.h"
@@ -12,7 +12,7 @@
 class command;
 class scene;
 
-typedef std::map<std::string,sg_node*> node_name_map;
+typedef std::map<std::string,sgnode*> node_name_map;
 
 class common_syms {
 public:
@@ -34,20 +34,20 @@ public:
 };
 
 /* working memory scene graph object - mediates between wmes and scene graph nodes */
-class sgwme : public sg_listener {
+class sgwme : public sgnode_listener {
 public:
-	sgwme(soar_interface *si, Symbol *ident, sgwme *parent, sg_node *node);
+	sgwme(soar_interface *si, Symbol *ident, sgwme *parent, sgnode *node);
 	~sgwme();
-	void node_update(sg_node *n, sg_node::change_type t, int added_child);
+	void node_update(sgnode *n, sgnode::change_type t, int added_child);
 
 private:
-	void add_child(sg_node *c);
+	void add_child(sgnode *c);
 	
 	sgwme*          parent;
-	sg_node*        node;
+	sgnode*         node;
 	Symbol         *id;
 	wme            *name_wme;
-	soar_interface* soarint;
+	soar_interface *soarint;
 
 	std::map<sgwme*,wme*> childs;
 

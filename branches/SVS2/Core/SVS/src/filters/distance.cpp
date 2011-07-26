@@ -7,7 +7,7 @@ public:
 	distance_filter(filter_input *input) : map_filter<float>(input) {}
 
 	bool compute(filter_param_set *params, float &v, bool adding) {
-		sg_node *a, *b;
+		sgnode *a, *b;
 		vec3 ac, bc;
 		ptlist apts, bpts;
 		

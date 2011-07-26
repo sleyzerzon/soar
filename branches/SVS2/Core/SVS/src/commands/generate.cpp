@@ -24,7 +24,7 @@ public:
 	
 	bool update() {
 		wme *parent_wme, *gen_wme;
-		sg_node *gen_node;
+		sgnode *gen_node;
 		
 		if (changed()) {
 			reset();
@@ -80,7 +80,7 @@ private:
 	}
 	
 	bool add_node(filter_val *v) {
-		sg_node *n;
+		sgnode *n;
 		stringstream ss;
 		if (!get_filter_val(v, n)) {
 			set_status("filter result must be a node");
@@ -96,7 +96,7 @@ private:
 	}
 	
 	bool del_node(filter_val *v) {
-		sg_node *n;
+		sgnode *n;
 		stringstream ss;
 		if (!get_filter_val(v, n)) {
 			set_status("filter result must be a node");
