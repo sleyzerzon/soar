@@ -2,24 +2,24 @@
 #include <list>
 #include <vector>
 #include <algorithm>
-#include "nsg_node.h"
+#include "sgnode.h"
 
 using namespace std;
 
-typedef vector<nsg_node*>::iterator childiter;
-typedef vector<nsg_node*>::const_iterator const_childiter;
+typedef vector<sgnode*>::iterator childiter;
+typedef vector<sgnode*>::const_iterator const_childiter;
 
-nsg_node::nsg_node(std::string name) 
+sgnode::sgnode(std::string name) 
 : name(name), parent(NULL), tdirty(false), pdirty(false), isgroup(true),
   pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
 {}
 
-nsg_node::nsg_node(std::string name, const ptlist &points)
+sgnode::sgnode(std::string name, const ptlist &points)
 : name(name), parent(NULL), tdirty(false), pdirty(false), isgroup(false), points(points),
   pos(0.0, 0.0, 0.0), rot(0.0, 0.0, 0.0), scale(1.0, 1.0, 1.0)
 { }
 
-nsg_node::~nsg_node() {
+sgnode::~sgnode() {
 	childiter i;
 	
 	if (parent) {
@@ -29,17 +29,17 @@ nsg_node::~nsg_node() {
 		(**i).parent = NULL;  // so it doesn't try to detach itself
 		delete *i;
 	}
-	send_update(sg_node::DELETED);
+	send_update(sgnode::DELETED);
 }
 
-sg_node* nsg_node::copy() const {
-	nsg_node *c;
+sgnode* sgnode::copy() const {
+	sgnode *c;
 	const_childiter i;
 	
 	if (isgroup) {
-		c = new nsg_node(name);
+		c = new sgnode(name);
 	} else {
-		c = new nsg_node(name, points);
+		c = new sgnode(name, points);
 	}
 	c->set_trans('p', pos);
 	c->set_trans('r', rot);
@@ -51,27 +51,27 @@ sg_node* nsg_node::copy() const {
 	return c;
 }
 
-std::string nsg_node::get_name() const {
+std::string sgnode::get_name() const {
 	return name;
 }
 
-void nsg_node::set_name(string nm) {
+void sgnode::set_name(string nm) {
 	name = nm;
 }
 
-bool nsg_node::is_group() const {
+bool sgnode::is_group() const {
 	return isgroup;
 }
 
-sg_node* nsg_node::get_parent() {
+sgnode* sgnode::get_parent() {
 	return parent;
 }
 
-int nsg_node::num_children() const {
+int sgnode::num_children() const {
 	return children.size();
 }
 
-sg_node* nsg_node::get_child(int i) {
+sgnode* sgnode::get_child(int i) {
 	if (!isgroup) {
 		return NULL;
 	}
@@ -81,7 +81,7 @@ sg_node* nsg_node::get_child(int i) {
 	return NULL;
 }
 
-void nsg_node::walk(std::list<sg_node*> &result) {
+void sgnode::walk(std::list<sgnode*> &result) {
 	childiter i;
 	result.push_back(this);
 	for(i = children.begin(); i != children.end(); ++i) {
@@ -89,12 +89,12 @@ void nsg_node::walk(std::list<sg_node*> &result) {
 	}
 }
 
-bool nsg_node::attach_child(sg_node *c) {
-	nsg_node* t;
+bool sgnode::attach_child(sgnode *c) {
+	sgnode* t;
 	if (!isgroup) {
 		return false;
 	}
-	t = dynamic_cast<nsg_node*>(c);
+	t = dynamic_cast<sgnode*>(c);
 	if (!t) {
 		return false;
 	}
@@ -102,12 +102,12 @@ bool nsg_node::attach_child(sg_node *c) {
 	t->parent = this;
 	t->set_transform_dirty();
 	set_points_dirty();
-	send_update(sg_node::CHILD_ADDED, children.size() - 1);
+	send_update(sgnode::CHILD_ADDED, children.size() - 1);
 	
 	return true;
 }
 
-void nsg_node::set_trans(char type, vec3 trans) {
+void sgnode::set_trans(char type, vec3 trans) {
 	switch (type) {
 		case 'p':
 			pos = trans;
@@ -124,7 +124,7 @@ void nsg_node::set_trans(char type, vec3 trans) {
 	set_transform_dirty();
 }
 
-vec3 nsg_node::get_trans(char type) const {
+vec3 sgnode::get_trans(char type) const {
 	switch (type) {
 		case 'p':
 			return pos;
@@ -137,12 +137,12 @@ vec3 nsg_node::get_trans(char type) const {
 	}
 }
 
-void nsg_node::get_local_points(ptlist &result) {
+void sgnode::get_local_points(ptlist &result) {
 	update_points();
 	result = points;
 }
 
-void nsg_node::get_world_points(ptlist &result) {
+void sgnode::get_world_points(ptlist &result) {
 	update_points();
 	update_transform();
 	result.clear();
@@ -150,7 +150,7 @@ void nsg_node::get_world_points(ptlist &result) {
 	transform(points.begin(), points.end(), back_inserter(result), wtransform);
 }
 
-void nsg_node::detach_child(nsg_node *c) {
+void sgnode::detach_child(sgnode *c) {
 	childiter i;
 	for (i = children.begin(); i != children.end(); ++i) {
 		if (*i == c) {
@@ -161,7 +161,7 @@ void nsg_node::detach_child(nsg_node *c) {
 	}
 }
 
-void nsg_node::set_transform_dirty() {
+void sgnode::set_transform_dirty() {
 	tdirty = true;
 	if (parent) {
 		parent->set_points_dirty();
@@ -169,10 +169,10 @@ void nsg_node::set_transform_dirty() {
 	for (childiter i = children.begin(); i != children.end(); ++i) {
 		(**i).set_transform_dirty();
 	}
-	send_update(sg_node::POINTS_CHANGED);
+	send_update(sgnode::POINTS_CHANGED);
 }
 
-void nsg_node::update_transform() {
+void sgnode::update_transform() {
 	if (!tdirty) {
 		return;
 	}
@@ -188,7 +188,7 @@ void nsg_node::update_transform() {
 	}
 }
 
-void nsg_node::set_points_dirty() {
+void sgnode::set_points_dirty() {
 	if (!isgroup) {  // may change if we allow modifying primitive geometries
 		return;
 	}
@@ -196,10 +196,10 @@ void nsg_node::set_points_dirty() {
 	if (parent) {
 		parent->set_points_dirty();
 	}
-	send_update(sg_node::POINTS_CHANGED);
+	send_update(sgnode::POINTS_CHANGED);
 }
 
-void nsg_node::update_points() {
+void sgnode::update_points() {
 	back_insert_iterator<ptlist> pbi(points);
 	
 	if (!isgroup || !pdirty) {
@@ -218,19 +218,19 @@ void nsg_node::update_points() {
 
 /* if updates result in observers removing themselves, the iteration may
  * screw up, so make a copy of the std::list first */
-void nsg_node::send_update(sg_node::change_type t, int added) {
-	std::list<sg_listener*>::iterator i;
-	std::list<sg_listener*> c;
+void sgnode::send_update(sgnode::change_type t, int added) {
+	std::list<sgnode_listener*>::iterator i;
+	std::list<sgnode_listener*> c;
 	std::copy(listeners.begin(), listeners.end(), back_inserter(c));
 	for (i = c.begin(); i != c.end(); ++i) {
 		(**i).node_update(this, t, added);
 	}
 }
 
-void nsg_node::listen(sg_listener *o) {
+void sgnode::listen(sgnode_listener *o) {
 	listeners.insert(o);
 }
 
-void nsg_node::unlisten(sg_listener *o) {
+void sgnode::unlisten(sgnode_listener *o) {
 	listeners.erase(o);
 }

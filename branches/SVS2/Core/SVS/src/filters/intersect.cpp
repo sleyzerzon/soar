@@ -125,10 +125,12 @@ public:
 	}
 	
 private:
+	
 	struct node_info {
 		sg_node *node;
 		DT_ShapeHandle shape;
 		DT_ObjectHandle obj;
+		vector<vec3> vertexbase;
 	};
 	
 	struct result_info {
