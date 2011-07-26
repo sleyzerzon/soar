@@ -243,8 +243,7 @@ void svs::pre_env_callback() {
 	vector<svs_state*>::iterator i;
 	string sgel;
 	bool validout, validin;
-	timer t;
-	t.start();
+	
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).process_cmds();
 	}
@@ -270,8 +269,6 @@ void svs::pre_env_callback() {
 	if (validout && validin) {
 		update_models();
 	}
-
-	cout << "SVSPRE " << t.stop() << endl;
 }
 
 void svs::update_models() {
@@ -290,11 +287,13 @@ void svs::update_models() {
 	if (prev_pnames == curr_pnames) {
 		floatvec x(prev_pvals), y(prev_pvals);
 		x.extend(next_out.vals);
+		/*
 		if (models.predict(x, y)) {
 			cout << "prediction error: " << y.dist(curr_pvals) << endl;
 		} else {
 			cout << "no prediction" << endl;
 		}
+		*/
 		models.learn(x, curr_pvals, dt);
 		
 		if (!headerwritten) {

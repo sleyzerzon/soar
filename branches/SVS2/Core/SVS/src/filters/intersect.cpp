@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const float MARGIN = 0.05;
+const float MARGIN = 0.1;
 
 DT_Bool collision_callback(void *client_data, void *obj1, void *obj2, const DT_CollData *coll_data);
 
@@ -50,7 +50,7 @@ public:
 	bool update_results() {
 		filter_input::iter i;
 		result_table_t::iterator j;
-		filter_val *av, *bv, *result;
+		filter_val *av, *bv;
 		sg_node *an, *bn;
 		
 		for (i = added_input_begin(); i != added_input_end(); ++i) {
@@ -60,11 +60,11 @@ public:
 				set_error("missing parameter(s)");
 				return false;
 			}
-			result = new filter_val_c<bool>(false);
-			result_pair &rp = results[make_pair(av, bv)];
-			rp.val = result;
-			rp.status = 'n';
-			add_result(result, *i);
+			result_info &rp = results[make_pair(av, bv)];
+			rp.oldval = false;
+			rp.newval = false;
+			rp.fval = new filter_val_c<bool>(false);
+			add_result(rp.fval, *i);
 			add_node(av);
 			add_node(bv);
 		}
@@ -75,11 +75,11 @@ public:
 				set_error("missing parameter(s)");
 				return false;
 			}
-			result_pair rp;
+			result_info rp;
 			if (!map_pop(results, make_pair(av, bv), rp)) {
 				assert(false);
 			}
-			remove_result(rp.val);
+			remove_result(rp.fval);
 			del_node(av);
 			del_node(bv);
 		}
@@ -94,16 +94,16 @@ public:
 			change_node(bv);
 		}
 		
-		reset_status();
+		for (j = results.begin(); j != results.end(); ++j) {
+			j->second.newval = false;
+		}
 		DT_Test(scene, resp_table);
 		for (j = results.begin(); j != results.end(); ++j) {
-			switch (j->second.status) {
-				case 'n':
-					j->second.status = 'u';
-					break;
-				case 'c':
-					change_result(j->second.val);
-					break;
+			result_info &r = j->second;
+			if (r.oldval != r.newval) {
+				set_filter_val(r.fval, r.newval);
+				change_result(r.fval);
+				r.oldval = r.newval;
 			}
 		}
 		return true;
@@ -111,31 +111,16 @@ public:
 	
 	
 	void add_collision(filter_val *a, filter_val *b) {
-		bool currval;
-		fval_pair p1, p2;
-		p1.first = a;
-		p1.second = b;
-		p2.first = b;
-		p2.second = a;
+		fval_pair p1 = make_pair(a, b), p2 = make_pair(b, a);
 		result_table_t::iterator i;
 		
+		/* have to check both orderings */
 		if ((i = results.find(p1)) == results.end()) {
 			i = results.find(p2);
 		}
 		
 		if (i != results.end()) {
-			if (!get_filter_val(i->second.val, currval)) {
-				assert(false);
-			}
-			if (!set_filter_val(i->second.val, true)) {
-				assert(false);
-			}
-			if (i->second.status == 'u' && !currval) {
-				i->second.status = 'c';
-			}
-			if (i->second.status == 'c' && currval) {
-				i->second.status = 'u';
-			}
+			i->second.newval = true;
 		}
 	}
 	
@@ -146,14 +131,15 @@ private:
 		DT_ObjectHandle obj;
 	};
 	
-	struct result_pair {
-		filter_val *val;
-		char status;       // u = unchanged, c = changed, n = new
+	struct result_info {
+		bool oldval;
+		bool newval;
+		filter_val *fval;
 	};
 
 	typedef map<filter_val*, node_info> input_table_t;
 	typedef pair<filter_val*, filter_val*> fval_pair;
-	typedef map<fval_pair, result_pair> result_table_t;
+	typedef map<fval_pair, result_info> result_table_t;
 	
 	void add_object(filter_val *v, node_info &info) {
 		info.shape = create_shape(info.node);
@@ -214,32 +200,6 @@ private:
 			update_transforms(info.node, info.obj);
 		}
 		return true;
-	}
-	
-	/*
-	 Because SOLID only triggers callbacks for collisions, I'm going
-	 to preemptively set the status of all currently non-colliding
-	 pairs to "unchanged" and all currently colliding pairs to
-	 "changed". I will flip this status value in each collision
-	 callback, which will result in the correct final status
-	 values. New results are ignored in all this.
-	*/
-	void reset_status() {
-		result_table_t::iterator i;
-		bool currval;
-		for (i = results.begin(); i != results.end(); ++i) {
-			if (i->second.status == 'n') {
-				continue;
-			}
-			if (!get_filter_val(i->second.val, currval)) {
-				assert(false);
-			}
-			if (currval) {
-				i->second.status = 'c';
-			} else {
-				i->second.status = 'u';
-			}
-		}
 	}
 	
 	DT_SceneHandle     scene;

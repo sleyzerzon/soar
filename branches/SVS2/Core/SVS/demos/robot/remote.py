@@ -7,10 +7,9 @@ import sock
 sck = sock.Sock()
 sck.connect('ctrl')
 
-wrcount = 0
 currcmd = (0.0, 0.0)
 
-def handlekey(evt):
+def handle_key(evt):
 	global currcmd
 	
 	currcmd = {
@@ -20,14 +19,16 @@ def handlekey(evt):
 		's' : (1.0, -1.0)
 	}.get(evt.char, (0.0, 0.0))
 
-def handlemsg(file, mask):
-	global wrcount
-	print(wrcount)
-	wrcount += 1
+def handle_release(evt):
+	global currcmd
+	currcmd = (0.0, 0.0)
+	
+def handle_msg(file, mask):
 	sck.receive()
 	sck.send('left {}\nright {}'.format(*currcmd))
 	
 win = tk.Tk()
-win.bind('<Key>', handlekey)
-win.tk.createfilehandler(sck.sock, tk.READABLE, handlemsg)
+win.bind('<KeyPress>', handle_key)
+win.bind('<KeyRelease>', handle_release)
+win.tk.createfilehandler(sck.sock, tk.READABLE, handle_msg)
 tk.mainloop()

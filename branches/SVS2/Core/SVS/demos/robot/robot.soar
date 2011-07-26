@@ -101,7 +101,7 @@ sp {gen-target
 	        ^z 0.0)
 }
 
-sp {cursor-box-int
+sp {splinter-box-int
 	(state <s> 
 		^superstate nil
 		^svs (
@@ -120,6 +120,20 @@ sp {cursor-box-int
 	(<a1> ^type node ^name splinter)
 	(<b1> ^type node ^name block)
 }
+
+sp {report-int
+(state <s> ^svs.command.extract <e>)
+(<e> ^type intersect ^result.literal <l>)
+(<l> ^a splinter ^b block)
+-->
+(write |INTERSECT!| (crlf))}
+
+sp {report-no-int
+(state <s> ^svs.command.extract <e>)
+(<e> ^type intersect ^result <r>)
+(<r> -^literal)
+-->
+(write |NO INTERSECT!| (crlf))}
 
 sp {propose*count-time
 	(state <s> ^superstate nil ^time <t>)

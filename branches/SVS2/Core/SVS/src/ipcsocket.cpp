@@ -18,7 +18,6 @@ using namespace std;
 
 const char TERMSTRING[] = "\n***\n";
 const int BUFFERSIZE = 10240;
-int totalrecv = 0;
 
 ipcsocket::ipcsocket(string socketfile, bool recvfirst) 
 : recvbuf(), recvfirst(recvfirst)
@@ -132,8 +131,6 @@ bool ipcsocket::receive(string &msg) {
 		} else {
 			buf[n] = '\0';
 			recvbuf += buf;
-			totalrecv += n;
-			cerr << "Total Received: " << totalrecv << endl;
 		}
 	}
 }

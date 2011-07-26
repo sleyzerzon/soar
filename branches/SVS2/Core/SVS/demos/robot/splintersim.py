@@ -131,7 +131,7 @@ class Splinter(object):
 		return 'blue'
 
 class Block(object):
-	MASS = 0.5
+	MASS = 2.0
 	WIDTH = 1.0
 	
 	def __init__(self, space, name, initpos):
@@ -145,7 +145,9 @@ class Block(object):
 		self.body.position = initpos
 	
 	def update(self, inputs):
-		pass
+		vx, vy = self.body.velocity
+		self.body.velocity = (vx * 0.5, vy * 0.5)
+		self.body.angular_velocity *= 0.5
 	
 	def get_sgel(self, first):
 		vs = ' '.join('{} {} 0'.format(x, y) for x, y in self.verts)
@@ -242,7 +244,7 @@ class World(object):
 if __name__ == '__main__':
 	munk.init_pymunk()
 	disp = Display(tk.Tk())
-	space = munk.Space()
+	space = munk.Space(iterations = 100, elastic_iterations = 100)
 	world = World(space, disp, 'env')
 	world.add_object(Splinter(space, 'splinter', (0., 0.)))
 	world.add_object(Block(space, 'block', (1., 1.)))
