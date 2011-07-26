@@ -287,13 +287,7 @@ void svs::update_models() {
 	if (prev_pnames == curr_pnames) {
 		floatvec x(prev_pvals), y(prev_pvals);
 		x.extend(next_out.vals);
-		/*
-		if (models.predict(x, y)) {
-			cout << "prediction error: " << y.dist(curr_pvals) << endl;
-		} else {
-			cout << "no prediction" << endl;
-		}
-		*/
+		models.test(x, y);
 		models.learn(x, curr_pvals, dt);
 		
 		if (!headerwritten) {
@@ -304,7 +298,7 @@ void svs::update_models() {
 		}
 		trainlog << prev_pvals << " " << next_out.vals << " ; " << curr_pvals << " ; " << dt << endl;
 	} else {
-		models.set_indexes(curr_pnames);
+		models.set_property_vector(curr_pnames);
 	}
 	prev_pnames = curr_pnames;
 	prev_pvals = curr_pvals;
@@ -346,15 +340,3 @@ void svs::set_next_output(const namedvec &out) {
 void svs::add_model(const std::string &name, model *m) {
 	models.add_model(name, m);
 }
-
-bool svs::assign_model(const string &name,
-	                   const map<string,string> &inputs,
-	                   const map<string,string> &outputs)
-{
-	models.assign_model(name, inputs, outputs);
-}
-
-model *svs::get_model() {
-	return &models;
-}
-

@@ -25,14 +25,22 @@ public:
 		return true;
 	}
 	
-	void printinfo() const {
-		cout << "VELOCITY" << endl;
+	std::string get_type() const {
+		return "velocity";
+	}
+	
+	int get_input_size() const {
+		return sizeof(in_names) / sizeof(char*);
+	}
+	
+	int get_output_size() const {
+		return sizeof(out_names) / sizeof(char*);
 	}
 	
 	void get_slots(vector<string> &in_slots, vector<string> &out_slots) const {
 		in_slots.clear(); out_slots.clear();
-		copy(in_names, in_names + 6, back_inserter(in_slots));
-		copy(out_names, out_names + 3, back_inserter(out_slots));
+		copy(in_names, in_names + get_input_size(), back_inserter(in_slots));
+		copy(out_names, out_names + get_output_size(), back_inserter(out_slots));
 	}
 };
 

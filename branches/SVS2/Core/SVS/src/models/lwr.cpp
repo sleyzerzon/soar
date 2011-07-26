@@ -252,10 +252,6 @@ int lwr::size() const {
 	return examples.size();
 }
 
-void lwr::printinfo() const {
-	cout << "LWR" << endl;
-}
-
 bool lwr::load_file(const char *file) {
 	ifstream f(file);
 	string line;

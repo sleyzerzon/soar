@@ -1,139 +1,145 @@
 waitsnc -e
 
 sp {init
-	(state <s> ^superstate nil)
+(state <s> ^superstate nil)
 -->
-	(<s> ^time 0)
+(<s> ^time 0)
 }
 
-sp {make-free-move-model
-	(state <s> ^superstate nil ^svs.command <c>)
+sp {splinter-box-int
+(state <s> ^superstate nil 
+           ^svs
+	( ^command <c> 
+	  ^spatial-scene 
+		( ^child.id splinter 
+		  ^child.id block)))
 -->
-	(<c> ^create-model <cm>)
-	(<cm> ^name free-move
-	      ^type splinter)
+(<c> ^extract <e1>)
+(<e1> ^type intersect ^a <a1> ^b <b1>)
+(<a1> ^type node ^name splinter)
+(<b1> ^type node ^name block)}
+
+sp {report-int
+(state <s>
+	^svs.command.extract (
+		^type intersect
+		^result.literal (
+			^a splinter ^b block)))
+-->
+(<s> ^colliding t)
+(write |INTERSECT!| (crlf))}
+
+sp {report-no-int-1
+(state <s>
+	^svs.command.extract (
+		^type intersect 
+		^result ( -^literal)))
+-->
+(<s> ^colliding f)
+(write |NO INTERSECT!| (crlf))}
+
+sp {report-no-int-2
+(state <s>
+	^svs.command.extract (
+		^type intersect 
+		-^result))
+-->
+(<s> ^colliding f)
+(write |NO INTERSECT!| (crlf))}
+
+sp {make-free-move-model
+(state <s> ^superstate nil ^svs.command <c>)
+-->
+(<c> ^create-model <cm>)
+(<cm> ^name free-move ^type splinter)
 }
 
 # for now, assume that colliding with the box doesn't affect the robot's movement
 sp {assign-free-move-model
-	(state <s> ^superstate nil ^svs.command <c>)
+(state <s> ^superstate nil ^svs.command <c>)
 -->
-	(<c> ^assign-model <am>)
-	(<am> ^name free-move ^inputs <in> ^outputs <out>)
-	(<in> ^px splinter:px
-	      ^py splinter:py
-	      ^rz splinter:rz
-	      ^vx splinter:vel_0
-	      ^vy splinter:vel_1
-	      ^rtz splinter:rotation_rate_2
-	      ^lrps splinter:left_rads_per_sec
-	      ^rrps splinter:right_rads_per_sec
-	      ^lvolts left
-	      ^rvolts right)
-	(<out> ^px splinter:px
-	       ^py splinter:py
-	       ^rz splinter:rz
-	       ^vx splinter:vel_0
-	       ^vy splinter:vel_1
-	       ^rtz splinter:rotation_rate_2
-	       ^lrps splinter:left_rads_per_sec
-	       ^rrps splinter:right_rads_per_sec)
+(<c> ^assign-model <am>)
+(<am> ^name free-move ^inputs <in> ^outputs <out>)
+(<in> ^px splinter:px
+      ^py splinter:py
+      ^rz splinter:rz
+      ^vx splinter:vel_0
+      ^vy splinter:vel_1
+      ^rtz splinter:rotation_rate_2
+      ^lrps splinter:left_rads_per_sec
+      ^rrps splinter:right_rads_per_sec
+      ^lvolts left
+      ^rvolts right)
+(<out> ^px splinter:px
+       ^py splinter:py
+       ^rz splinter:rz
+       ^vx splinter:vel_0
+       ^vy splinter:vel_1
+       ^rtz splinter:rotation_rate_2
+       ^lrps splinter:left_rads_per_sec
+       ^rrps splinter:right_rads_per_sec)
 }
 
 sp {make-collision-model
-	(state <s> ^superstate nil ^svs.command <c>)
+(state <s> ^superstate nil ^svs.command <c>)
 -->
-	(<c> ^create-model <cm>)
-	(<cm> ^name collision
-	      ^type lwr
-	      ^inputs <in> ^outputs <out>)
-	(<in> ^spx  <spx>
-	      ^spy  <spy>
-	      ^bpx  <bpx>
-	      ^bpy  <bpy>
-	      ^srz  <srz>
-	      ^brz  <brz>
-	      ^vx   <vx>
-	      ^vy   <vy>
-	      ^lvolts <lvolts>
-	      ^rvolts <rvolts>)
-	(<out> ^bpx <obpx>
-	       ^bpy <obpy>
-	       ^brz <obrz>)
+(<c> ^create-model <cm>)
+(<cm> ^name collision
+      ^type lwr
+      ^inputs <in> ^outputs <out>)
+(<in> ^spx  <spx>
+      ^spy  <spy>
+      ^srz  <srz>
+      ^bpx  <bpx>
+      ^bpy  <bpy>
+      ^brz  <brz>
+      ^vx   <vx>
+      ^vy   <vy>
+      ^lvolts <lvolts>
+      ^rvolts <rvolts>)
+(<out> ^bpx <obpx>
+       ^bpy <obpy>
+       ^brz <obrz>)
 }
 
 sp {assign-collision-model
-	(state <s> ^superstate nil ^colliding t ^svs.command <c>)
+(state <s> ^superstate nil ^colliding t ^svs.command <c>)
 -->
-	(<c> ^assign-model <am>)
-	(<am> ^name free-move ^inputs <in> ^outputs <out>)
-	(<in> ^spx splinter:px
-	      ^spy splinter:py
-	      ^srz splinter:rz
-	      ^bpx box:px
-	      ^bpy box:py
-	      ^brz box:rz
-	      ^vx splinter:vel_0
-	      ^vy splinter:vel_1
-	      ^lvolts left
-	      ^rvolts right)
-	(<out> ^bpx block:px
-	       ^bpy block:py
-	       ^brz block:rz)
+(<c> ^assign-model <am>)
+(<am> ^name collision ^inputs <in> ^outputs <out>)
+(<in> ^spx splinter:px
+      ^spy splinter:py
+      ^srz splinter:rz
+      ^bpx block:px
+      ^bpy block:py
+      ^brz block:rz
+      ^vx splinter:vel_0
+      ^vy splinter:vel_1
+      ^lvolts left
+      ^rvolts right)
+(<out> ^bpx block:px
+       ^bpy block:py
+       ^brz block:rz)
 }
 
 
 sp {gen-target
-	(state <s>
-		^superstate nil
-		^svs.command <c>)
+(state <s> ^superstate nil ^svs.command <c>)
 -->
-	(<c> ^generate <g1>)
-	(<g1> ^parent world
-	      ^node <n1>)
-	(<n1> ^type gen
-	      ^name target1
-	      ^points.type origin
-	      ^pos <pos1>)
-	(<pos1> ^type vec3
-	        ^x 5.0
-	        ^y -5.0
-	        ^z 0.0)
+(<c> ^generate <g1>)
+(<g1> ^parent world
+      ^node <n1>)
+(<n1> ^type gen
+      ^name target1
+      ^points.type origin
+      ^pos <pos1>)
+(<pos1> ^type vec3
+        ^x 5.0
+        ^y -5.0
+        ^z 0.0)
 }
 
-sp {splinter-box-int
-	(state <s> 
-		^superstate nil
-		^svs (
-			^command <c>
-			^spatial-scene (
-				^child.id splinter
-				^child.id block
-			)
-		)
-	)
--->
-	(<c> ^extract <e1>)
-	(<e1> ^type intersect
-	      ^a <a1>
-	      ^b <b1>)
-	(<a1> ^type node ^name splinter)
-	(<b1> ^type node ^name block)
-}
 
-sp {report-int
-(state <s> ^svs.command.extract <e>)
-(<e> ^type intersect ^result.literal <l>)
-(<l> ^a splinter ^b block)
--->
-(write |INTERSECT!| (crlf))}
-
-sp {report-no-int
-(state <s> ^svs.command.extract <e>)
-(<e> ^type intersect ^result <r>)
-(<r> -^literal)
--->
-(write |NO INTERSECT!| (crlf))}
 
 sp {propose*count-time
 	(state <s> ^superstate nil ^time <t>)

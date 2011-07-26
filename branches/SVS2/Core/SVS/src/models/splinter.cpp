@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "model.h"
 #include "splinter.h"
 
@@ -23,13 +24,21 @@ public:
     	return true;
 	}
 	
-	void printinfo() const {
-		cout << "SPLINTER" << endl;
+	string get_type() const {
+		return "splinter";
 	}
 
+	int get_input_size() const {
+		return sizeof(in_slots) / sizeof(char*);
+	}
+	
+	int get_output_size() const {
+		return sizeof(out_slots) / sizeof(char*);
+	}
+	
 	void get_slots(vector<string> &ins, vector<string> &outs) const {
-		copy(in_slots, in_slots + 10, back_inserter(ins));
-		copy(in_slots, in_slots + 8, back_inserter(outs));
+		copy(in_slots, in_slots + get_input_size(), back_inserter(ins));
+		copy(in_slots, in_slots + get_output_size(), back_inserter(outs));
 	}
 };
 

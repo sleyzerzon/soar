@@ -85,6 +85,11 @@ public:
 		si = state->get_svs()->get_soar_interface();
 	}
 	
+	~assign_model_command() {
+		cout << "DESTRUCTOR " << name << endl;
+		svsp->unassign_model(name);
+	}
+	
 	string description() {
 		return string("activate model");
 	}
@@ -99,7 +104,7 @@ public:
 		wme_list children;
 		wme_list::iterator j;
 		Symbol *attr, *val;
-		string name, attrstr, valstr;
+		string attrstr, valstr;
 		map<string, string> inputs;
 		map<string, string> outputs;
 		
@@ -155,6 +160,7 @@ private:
 	soar_interface *si;
 	Symbol         *root;
 	svs            *svsp;
+	string          name;
 };
 
 command *_make_create_model_command_(svs_state *state, Symbol *root) {
