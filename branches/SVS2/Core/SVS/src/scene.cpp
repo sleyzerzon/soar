@@ -46,8 +46,9 @@ scene::scene(string name, string rootname)
 		disp = new ipcsocket(getnamespace() + "disp", false);
 	}
 	disp->listen(this);
-	add_node("", rootname);
-	root = nodes[rootname].node;
+	root = new sgnode(rootname);
+	nodes[rootname].node = root;
+	root->listen(this);
 	disp_new_scene();
 }
 
@@ -69,6 +70,7 @@ scene::scene(const scene &other)
 	nodes = other.nodes;
 	for(i = all_nodes.begin(); i != all_nodes.end(); ++i) {
 		nodes[(**i).get_name()].node = *i;
+		(**i).listen(this);
 	}
 }
 
@@ -109,59 +111,29 @@ void scene::get_all_nodes(vector<sgnode*> &n) {
 	}
 }
 
-bool scene::add_node(string parent, sgnode *n) {
-	node_info info;
-	info.node = n;
-	sgnode *p = get_node(parent);
-	
-	if (parent != "" && !p) {
+bool scene::add_node(const string &name, sgnode *n) {
+	sgnode *par = get_node(name);
+	if (!par) {
 		return false;
 	}
-	if (parent != "" && !p->attach_child(n)) {
-		delete n;
-		return false;
-	}
-	nodes[n->get_name()] = info;
-	if (!iscopy) {
-		disp_update_node(n);
-	}
+	par->attach_child(n);
+	/* rest is handled in node_update */
 	return true;
 }
 
-bool scene::add_node(string parent, string name) {
-	return add_node(parent, new sgnode(name));
-}
-
-bool scene::add_node(string parent, string name, const ptlist &points) {
-	return add_node(parent, new sgnode(name, points));
-}
-
-bool scene::del_node(string name) {
+bool scene::del_node(const string &name) {
 	node_map::iterator i;
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return false;
 	}
-	if (!iscopy) {
-		disp_del_node(i->second.node);
-	}
+	disp_del_node(i->second.node);
 	delete i->second.node;
-	nodes.erase(i);
-	return true;
-}
-
-bool scene::set_node_trans(string name, char type, vec3 trans) {
-	sgnode *n = get_node(name);
-	if (!n) return false;
-	n->set_trans(type, trans);
-	if (!iscopy) {
-		disp_update_node(n);
-	}
+	/* rest is handled in node_update */
 	return true;
 }
 
 void scene::clear() {
-	int i;
-	for (i = 0; i < root->num_children(); ++i) {
+	for (int i = 0; i < root->num_children(); ++i) {
 		delete root->get_child(i);
 	}
 }
@@ -182,43 +154,59 @@ bool parse_n_floats(vector<string> &f, int &start, int n, float *x) {
 }
 
 bool parse_verts(vector<string> &f, int &start, ptlist &verts) {
-	float x[3];
-	verts.clear();
+	vec3 v;
 	int i;
 	if (start >= f.size() || f[start] != "v") {
 		return true;
 	}
 	start++;
+	verts.clear();
 	while (start < f.size()) {
 		i = start;
-		if (!parse_n_floats(f, start, 3, x)) {
+		if (!parse_n_floats(f, start, 3, v.a)) {
 			return (i == start);  // end of list
 		}
-		verts.push_back(vec3(x[0], x[1], x[2]));
+		verts.push_back(v);
 	}
 	return true;
 }
 
-bool scene::parse_transforms(vector<string> &f, int &start) {
-	float x[3];
+bool scene::parse_transforms(vector<string> &f, int &start, vec3 &pos, vec3 &rot, vec3 &scale) {	
+	vec3 t;
 	char type;
+	sgnode *n;
+	
 	while (start < f.size()) {
 		if (f[start] != "p" && f[start] != "r" && f[start] != "s") {
 			return true;
 		}
 		type = f[start][0];
 		start++;
-		if (!parse_n_floats(f, start, 3, x)) {
+		if (!parse_n_floats(f, start, 3, t.a)) {
 			return false;
 		}
-		set_node_trans(f[0], type, vec3(x[0], x[1], x[2]));
+		switch (type) {
+			case 'p':
+				pos = t;
+				break;
+			case 'r':
+				rot = t;
+				break;
+			case 's':
+				scale = t;
+				break;
+			default:
+				assert(false);
+		}
 	}
 	return true;
 }
 
 int scene::parse_add(vector<string> &f) {
 	ptlist verts;
-	int pos;
+	int p;
+	sgnode *n, *par;
+	vec3 pos, rot, scale(1., 1., 1.);
 
 	if (f.size() < 2) {
 		return f.size();
@@ -227,24 +215,25 @@ int scene::parse_add(vector<string> &f) {
 		return 0;  // already exists
 	}
 	
-	pos = 2;
-	if (!parse_verts(f, pos, verts)) {
-		return pos;
+	p = 2;
+	if (!parse_verts(f, p, verts)) {
+		return p;
 	}
-	if (verts.size() == 0) {
-		if (!add_node(f[1], f[0])) {
-			return pos;
-		}
-	} else {
-		if (!add_node(f[1], f[0], verts)) {
-			return pos;
-		}
-	}
-	if (!parse_transforms(f, pos)) {
-		del_node(f[0]);
-		return pos;
+	if (!parse_transforms(f, p, pos, rot, scale)) {
+		return p;
 	}
 	
+	par = get_node(f[1]);
+	if (!par || !par->is_group()) {
+		return 1;
+	}
+	if (verts.size() == 0) {
+		n = new sgnode(f[0]);
+	} else {
+		n = new sgnode(f[0], verts);
+	}
+	n->set_trans(pos, rot, scale);
+	par->attach_child(n);
 	return -1;
 }
 
@@ -259,18 +248,22 @@ int scene::parse_del(vector<string> &f) {
 }
 
 int scene::parse_change(vector<string> &f) {
-	int pos;
+	int p;
+	sgnode *n;
+	vec3 pos, rot, scale;
 
 	if (f.size() < 1) {
 		return f.size();
 	}
-	if (!get_node(f[0])) {
+	if (!(n = get_node(f[0]))) {
 		return 0;
 	}
-	pos = 1;
-	if (!parse_transforms(f, pos)) {
-		return pos;
+	n->get_trans(pos, rot, scale);
+	p = 1;
+	if (!parse_transforms(f, p, pos, rot, scale)) {
+		return p;
 	}
+	n->set_trans(pos, rot, scale);
 	return -1;
 }
 
@@ -354,6 +347,10 @@ void scene::parse_sgel(const string &s) {
 }
 
 void scene::disp_update_node(sgnode *n) {
+	if (iscopy) {
+		return;
+	}
+	
 	stringstream ss;
 	ptlist pts;
 	ptlist::const_iterator i;
@@ -365,7 +362,11 @@ void scene::disp_update_node(sgnode *n) {
 	}
 }
 
-void scene::disp_del_node(sgnode *n){
+void scene::disp_del_node(sgnode *n) {
+	if (iscopy) {
+		return;
+	}
+	
 	stringstream ss;
 	if (!n->is_group() && disp) {
 		ss << "delobject\n" << name << '\n' << n->get_name();
@@ -545,3 +546,23 @@ void scene::ipc_connect(ipcsocket *sock) {
 }
 
 void scene::ipc_disconnect(ipcsocket *sock) {}
+
+void scene::node_update(sgnode *n, sgnode::change_type t, int added_child) {
+	sgnode *child;
+	switch (t) {
+		case sgnode::CHILD_ADDED:
+			child = n->get_child(added_child);
+			child->listen(this);
+			nodes[child->get_name()].node = child;
+			disp_update_node(child);
+			break;
+		case sgnode::DELETED:
+			nodes.erase(n->get_name());
+			disp_del_node(n);
+			break;
+		case sgnode::POINTS_CHANGED:
+		case sgnode::TRANSFORM_CHANGED:
+			disp_update_node(n);
+			break;
+	}
+}

@@ -24,7 +24,6 @@ public:
 	}
 	
 	bool compute(filter_param_set *params, sgnode *&n, bool adding) {
-		filter_val *nameval;
 		string name;
 		if (!adding) {
 			sgnode *old = n;
@@ -48,7 +47,7 @@ public:
 	}
 	
 	void node_update(sgnode *n, sgnode::change_type t, int added) {
-		if (t == sgnode::DELETED || t == sgnode::POINTS_CHANGED) {
+		if (t == sgnode::DELETED || t == sgnode::TRANSFORM_CHANGED || t == sgnode::POINTS_CHANGED) {
 			filter_param_set *s;
 			if (!map_get(node2param, n, s)) {
 				assert(false);
@@ -102,6 +101,7 @@ public:
 				}
 				remove_result(r);
 				break;
+			case sgnode::TRANSFORM_CHANGED:
 			case sgnode::POINTS_CHANGED:
 				if (!map_get(results, n, r)) {
 					assert(false);
@@ -126,10 +126,32 @@ private:
 	map<sgnode*, filter_val*> results;
 };
 
+class node_centroid_filter : public map_filter<vec3> {
+public:
+	node_centroid_filter(filter_input *input) : map_filter<vec3>(input) {}
+	
+	bool compute(filter_param_set *params, vec3 &v, bool adding) {
+		sgnode *n;
+		ptlist pts;
+		
+		if (!get_filter_param(this, params, "node", n)) {
+			return false;
+		}
+		
+		n->get_world_points(pts);
+		v = calc_centroid(pts);
+		return true;
+	}
+};
+
 filter *_make_node_filter_(scene *scn, filter_input *input) {
 	return new node_filter(scn, input);
 }
 
 filter *_make_all_nodes_filter_(scene *scn, filter_input *input) {
 	return new all_nodes_filter(scn);
+}
+
+filter *_make_node_centroid_filter_(scene *scn, filter_input *input) {
+	return new node_centroid_filter(input);
 }

@@ -122,7 +122,6 @@ sp {assign-collision-model
        ^brz block:rz)
 }
 
-
 sp {gen-target
 (state <s> ^superstate nil ^svs.command <c>)
 -->
@@ -139,23 +138,36 @@ sp {gen-target
         ^z 0.0)
 }
 
-
+sp {gen-splinter-target-line
+(state <s> ^superstate nil ^svs
+	( ^spatial-scene.child.id target1
+	  ^command <c>))
+-->
+(<c> ^generate <g>)
+(<g> ^parent world ^node <n>)
+(<n> ^type gen
+     ^name splinter-target-line
+     ^points <p>)
+(<p> ^type ptlist ^a <pa> ^b <pb>)
+(<pa> ^type node_centroid ^node <na>)
+(<na> ^type node ^name splinter)
+(<pb> ^type node_centroid ^node <nb>)
+(<nb> ^type node ^name target1)
+}
 
 sp {propose*count-time
-	(state <s> ^superstate nil ^time <t>)
+(state <s> ^superstate nil ^time <t>)
 -->
-	(<s> ^operator <o> +)
-	(<o> ^name count-time)
+(<s> ^operator <o> +)
+(<o> ^name count-time)
 }
 
 sp {apply*count-time
-	(state <s>
-		^superstate nil
-		^time <t>
-		^operator.name count-time
-	)
+(state <s> ^superstate nil
+           ^time <t>
+           ^operator.name count-time)
 -->
-	(<s> ^time <t> - (+ <t> 1))
+(<s> ^time <t> - (+ <t> 1))
 }
 
 #sp {seek-target1

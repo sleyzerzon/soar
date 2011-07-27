@@ -54,3 +54,19 @@ ostream &operator<<(ostream &os, const namedvec &v) {
 	}
 	return os;
 }
+
+vec3 calc_centroid(const ptlist &pts) {
+	ptlist::const_iterator i;
+	int d;
+	vec3 c;
+	
+	for (i = pts.begin(); i != pts.end(); ++i) {
+		for (d = 0; d < 3; ++d) {
+			c[d] += (*i)[d];
+		}
+	}
+	for (d = 0; d < 3; ++d) {
+		c[d] /= pts.size();
+	}
+	return c;
+}

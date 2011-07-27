@@ -8,7 +8,7 @@
 #include "common.h"
 #include "ipcsocket.h"
 
-class scene : public ipc_listener {
+class scene : public ipc_listener, sgnode_listener {
 public:
 	scene(std::string name, std::string rootname);
 	scene(const scene &other);
@@ -23,11 +23,8 @@ public:
 	int num_nodes() const;
 	int get_dof() const;
 	
-	bool add_node(std::string parent, sgnode *n);
-	bool add_node(std::string parent, std::string name);
-	bool add_node(std::string parent, std::string name, const ptlist &points);
-	bool del_node(std::string name);
-	bool set_node_trans(std::string name, char type, vec3 trans);
+	bool add_node(const std::string &name, sgnode *n);
+	bool del_node(const std::string &name);
 	void clear();
 
 	void get_property_names(std::vector<std::string> &names) const;
@@ -45,6 +42,8 @@ public:
 	void ipc_connect(ipcsocket *sock);
 	void ipc_disconnect(ipcsocket *sock);
 	
+	void node_update(sgnode *n, sgnode::change_type t, int added_child);
+	
 private:
 	void disp_update_node(sgnode *n);
 	void disp_del_node(sgnode *n);
@@ -56,7 +55,7 @@ private:
 	int  parse_change(std::vector<std::string> &f);
     int  parse_property(std::vector<std::string> &f);
     int  parse_dt(std::vector<std::string> &f);
-    bool parse_transforms(std::vector<std::string> &f, int &start);
+    bool parse_transforms(std::vector<std::string> &f, int &start, vec3 &pos, vec3 &rot, vec3 &scale);
 	
 	typedef std::map<std::string, float> property_map;
 	

@@ -188,22 +188,6 @@ public:
 	virtual float eval(scene &scn) const = 0;
 };
 
-::vec3 calc_centroid(const ptlist &pts) {
-	ptlist::const_iterator i;
-	int d;
-	::vec3 c;
-	
-	for (i = pts.begin(); i != pts.end(); ++i) {
-		for (d = 0; d < 3; ++d) {
-			c[d] += (*i)[d];
-		}
-	}
-	for (d = 0; d < 3; ++d) {
-		c[d] /= pts.size();
-	}
-	return c;
-}
-
 /* Squared Euclidean distance between centroids of two objects */
 class euclidean_obj : public objective {
 public:
@@ -351,15 +335,6 @@ void argmin(const floatvec &v, int &worst, int &nextworst, int &best) {
 	}
 }
 
-void calc_centroid(const vector<floatvec> &simplex, floatvec &sum, int exclude) {
-	for (int i = 0; i < simplex.size(); ++i) {
-		if (i != exclude) {
-			sum += simplex[i];
-		}
-	}
-	sum /= (simplex.size() - 1);
-}
-
 bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec &best, traj_eval &ev) {
 	int ndim = min.size(), i, wi, ni, bi;
 	floatvec eval(ndim+1);
@@ -393,7 +368,13 @@ bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec 
 		 
 		 which I'm pretty sure was wrong.
 		*/
-		calc_centroid(simplex, centroid, wi);
+		centroid.zero();
+		for (i = 0; i < simplex.size(); ++i) {
+			if (i != wi) {
+				centroid += simplex[i];
+			}
+		}
+		centroid /= (simplex.size() - 1);
 		
 		dir = centroid - worst;
 		reflect = centroid + dir * RCOEF;

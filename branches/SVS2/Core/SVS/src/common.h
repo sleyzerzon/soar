@@ -12,6 +12,8 @@
 #include <ostream>
 #include <map>
 
+#include "linalg.h"
+
 void split(const std::string &s, const std::string &delim, std::vector<std::string> &fields);
 std::string getnamespace();
 
@@ -441,5 +443,7 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &os, const namedvec &v);
+
+vec3 calc_centroid(const ptlist &pts);
 
 #endif

@@ -41,9 +41,7 @@ sgnode* sgnode::copy() const {
 	} else {
 		c = new sgnode(name, points);
 	}
-	c->set_trans('p', pos);
-	c->set_trans('r', rot);
-	c->set_trans('s', scale);
+	c->set_trans(pos, rot, scale);
 	
 	for(i = children.begin(); i != children.end(); ++i) {
 		c->attach_child((**i).copy());
@@ -90,38 +88,50 @@ void sgnode::walk(std::list<sgnode*> &result) {
 }
 
 bool sgnode::attach_child(sgnode *c) {
-	sgnode* t;
 	if (!isgroup) {
 		return false;
 	}
-	t = dynamic_cast<sgnode*>(c);
-	if (!t) {
-		return false;
-	}
-	children.push_back(t);
-	t->parent = this;
-	t->set_transform_dirty();
+	children.push_back(c);
+	c->parent = this;
+	c->set_transform_dirty();
 	set_points_dirty();
 	send_update(sgnode::CHILD_ADDED, children.size() - 1);
 	
 	return true;
 }
 
-void sgnode::set_trans(char type, vec3 trans) {
+void sgnode::set_trans(char type, const vec3 &t) {
 	switch (type) {
 		case 'p':
-			pos = trans;
+			if (pos != t) {
+				pos = t;
+				set_transform_dirty();
+			}
 			break;
 		case 'r':
-			rot = trans;
+			if (rot != t) {
+				rot = t;
+				set_transform_dirty();
+			}
 			break;
 		case 's':
-			scale = trans;
+			if (scale != t) {
+				scale = t;
+				set_transform_dirty();
+			}
 			break;
 		default:
 			assert(false);
 	}
-	set_transform_dirty();
+}
+
+void sgnode::set_trans(const vec3 &p, const vec3 &r, const vec3 &s) {
+	if (pos != p || rot != r || scale != s) {
+		pos = p;
+		rot = r;
+		scale = s;
+		set_transform_dirty();
+	}
 }
 
 vec3 sgnode::get_trans(char type) const {
@@ -137,9 +147,22 @@ vec3 sgnode::get_trans(char type) const {
 	}
 }
 
+void sgnode::get_trans(vec3 &p, vec3 &r, vec3 &s) const {
+	p = pos;
+	r = rot;
+	s = scale;
+}
+
 void sgnode::get_local_points(ptlist &result) {
 	update_points();
 	result = points;
+}
+
+void sgnode::set_local_points(const ptlist &pts) {
+	if (points != pts) {
+		points = pts;
+		set_points_dirty();
+	}
 }
 
 void sgnode::get_world_points(ptlist &result) {
@@ -169,7 +192,7 @@ void sgnode::set_transform_dirty() {
 	for (childiter i = children.begin(); i != children.end(); ++i) {
 		(**i).set_transform_dirty();
 	}
-	send_update(sgnode::POINTS_CHANGED);
+	send_update(sgnode::TRANSFORM_CHANGED);
 }
 
 void sgnode::update_transform() {
@@ -189,9 +212,6 @@ void sgnode::update_transform() {
 }
 
 void sgnode::set_points_dirty() {
-	if (!isgroup) {  // may change if we allow modifying primitive geometries
-		return;
-	}
 	pdirty = true;
 	if (parent) {
 		parent->set_points_dirty();

@@ -10,6 +10,7 @@ AXIS_LEN=100
 AXIS_NAMES =  { 0 : 'x',   1 : 'y',     2 : 'z' }
 AXIS_COLORS = { 0 : 'red', 1 : 'green', 2 : 'blue' }
 SCALE = 50.0
+POINTSIZE = 2
 
 class Object3D(object):
 	def __init__(self, name, scene, ptlist):
@@ -23,6 +24,26 @@ class Object3D(object):
 		
 	def draw(self, axes):
 		self.canvas.delete(self.name)
+		if len(self.ptlist) == 1:
+			self.draw_point(axes)
+		elif len(self.ptlist) == 2:
+			self.draw_line(axes)
+		else:
+			self.draw_bbox(axes)
+	
+	def draw_point(self, axes):
+		c1, c2 = self.ptlist[0][axes[0]] * SCALE, self.ptlist[0][axes[1]] * SCALE
+		bbox = (c1 - POINTSIZE, c2 - POINTSIZE, c1 + POINTSIZE, c2 + POINTSIZE)
+		self.canvas.create_oval(bbox, tags=self.name)
+		self.canvas.create_text((c1, c2), anchor=tk.NW, text=self.name, tags=self.name)
+	
+	def draw_line(self, axes):
+		a1, a2 = self.ptlist[0][axes[0]] * SCALE, self.ptlist[0][axes[1]] * SCALE
+		b1, b2 = self.ptlist[1][axes[0]] * SCALE, self.ptlist[1][axes[1]] * SCALE
+		self.canvas.create_line(a1, a2, b1, b2, tags=self.name)
+		self.canvas.create_text((a1, a2), anchor=tk.NW, text=self.name, tags=self.name)
+		
+	def draw_bbox(self, axes):
 		c1 = [ x[axes[0]] for x in self.ptlist ]
 		c2 = [ x[axes[1]] for x in self.ptlist ]
 		min1 = min(c1) * SCALE; min2 = min(c2) * SCALE

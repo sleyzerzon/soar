@@ -31,6 +31,10 @@ public:
 		return memcmp(a, v.a, sizeof(float) * 3) == 0;
 	}
 	
+	bool operator!=(const vec3 &v) const {
+		return memcmp(a, v.a, sizeof(float) * 3) != 0;
+	}
+	
 	bool operator<(const vec3 &v) const {
 		for (int i = 0; i < 3; ++i) {
 			if (a[i] != v.a[i]) {

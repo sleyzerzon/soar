@@ -14,6 +14,7 @@ public:
 	enum change_type {
 		CHILD_ADDED,
 		DELETED,        // sent from destructor
+		TRANSFORM_CHANGED,
 		POINTS_CHANGED
 	};
 	
@@ -21,6 +22,7 @@ public:
 	sgnode(std::string name, const ptlist &points);
 	~sgnode();
 	
+	/* copied node doesn't inherit listeners */
 	sgnode*     copy() const;
 
 	std::string get_name() const;
@@ -33,10 +35,18 @@ public:
 	void        walk(std::list<sgnode*> &result);
 	bool        attach_child(sgnode *c);
 	
-	void        set_trans(char type, vec3 trans);
+	void        set_trans(char type, const vec3 &t);
+	void        set_trans(const vec3 &p, const vec3 &r, const vec3 &s);
 	vec3        get_trans(char type) const;
+	void        get_trans(vec3 &p, vec3 &r, vec3 &s) const;
 	
+	/*
+	 get_local_points and get_world_points intuitively should be
+	 const, but are not because they might have to run some lazily
+	 deferred updates.
+	*/
 	void        get_local_points(ptlist &result);
+	void        set_local_points(const ptlist &pts);
 	void        get_world_points(ptlist &result);
 	
 	void        listen(sgnode_listener *o);

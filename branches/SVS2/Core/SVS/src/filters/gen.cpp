@@ -20,7 +20,7 @@ public:
 		string name;
 		vec3 pos, rot, scale, singlept;
 		filter_val *ptsval;
-		ptlist *pts;
+		ptlist *pts = NULL;
 		bool dealloc_pts = false;
 		stringstream ss;
 		
@@ -35,25 +35,38 @@ public:
 			rot = vec3(0., 0., 0.);
 		}
 		if (!get_filter_param(NULL, params, "scale", scale)) {
-			pos = vec3(1., 1., 1.);
+			scale = vec3(1., 1., 1.);
 		}
 		
-		if (get_filter_param(NULL, params, "points", pts)) {
-			res = new sgnode(name, *pts);
-		} else {
+		if (!get_filter_param(NULL, params, "points", pts)) {
 			if (get_filter_param(this, params, "points", singlept)) {
 				pts = new ptlist();
 				dealloc_pts = true;
 				pts->push_back(singlept);
 				res = new sgnode(name, *pts);
-			} else {
-				res = new sgnode(name);
 			}
 		}
 		
-		res->set_trans('p', pos);
-		res->set_trans('r', rot);
-		res->set_trans('s', scale);
+		if (adding || name != res->get_name()) {
+			if (!adding) {
+				delete res;
+			}
+			if (pts) {
+				res = new sgnode(name, *pts);
+			} else {
+				res = new sgnode(name);
+			}
+		} else {
+			if (pts) {
+				res->set_local_points(*pts);
+			}
+		}
+		
+		if (dealloc_pts) {
+			delete pts;
+		}
+		
+		res->set_trans(pos, rot, scale);
 		return true;
 	}
 };

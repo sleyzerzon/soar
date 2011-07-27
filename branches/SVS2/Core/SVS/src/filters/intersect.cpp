@@ -13,20 +13,23 @@ const float MARGIN = 0.1;
 
 DT_Bool collision_callback(void *client_data, void *obj1, void *obj2, const DT_CollData *coll_data);
 
-DT_ShapeHandle create_shape(sgnode *n) {
-	ptlist pts;
-	ptlist::const_iterator i;
-	DT_ShapeHandle s = DT_NewComplexShape(NULL);
-	DT_Begin();
-	
-	n->get_local_points(pts);
-	for (i = pts.begin(); i != pts.end(); ++i) {
-		DT_Vertex(i->a);
-	}
-	DT_End();
-	DT_EndComplexShape();
-	return s;
-}
+struct node_info {
+	sgnode *node;
+	ptlist vertices;
+	DT_ShapeHandle shape;
+	DT_ObjectHandle obj;
+	DT_VertexBaseHandle vertexbase;
+};
+
+struct result_info {
+	bool oldval;
+	bool newval;
+	filter_val *fval;
+};
+
+typedef map<filter_val*, node_info> input_table_t;
+typedef pair<filter_val*, filter_val*> fval_pair;
+typedef map<fval_pair, result_info> result_table_t;
 
 void update_transforms(sgnode *n, DT_ObjectHandle obj) {
 	vec3 pos = n->get_trans('p');
@@ -37,6 +40,7 @@ void update_transforms(sgnode *n, DT_ObjectHandle obj) {
 	DT_SetScaling(obj, scale.a);
 	//cout << "Moving " << n->get_name() << " to " << pos << endl;
 }
+
 
 class intersect_filter : public filter {
 public:
@@ -125,26 +129,13 @@ public:
 	}
 	
 private:
-	
-	struct node_info {
-		sgnode *node;
-		DT_ShapeHandle shape;
-		DT_ObjectHandle obj;
-		vector<vec3> vertexbase;
-	};
-	
-	struct result_info {
-		bool oldval;
-		bool newval;
-		filter_val *fval;
-	};
-
-	typedef map<filter_val*, node_info> input_table_t;
-	typedef pair<filter_val*, filter_val*> fval_pair;
-	typedef map<fval_pair, result_info> result_table_t;
-	
 	void add_object(filter_val *v, node_info &info) {
-		info.shape = create_shape(info.node);
+		info.node->get_local_points(info.vertices);
+		info.vertexbase = DT_NewVertexBase(&info.vertices[0], 0);
+		info.shape = DT_NewComplexShape(info.vertexbase);
+		DT_VertexRange(0, info.vertices.size());
+		DT_EndComplexShape();
+		
 		info.obj = DT_CreateObject((void*) v, info.shape);
 		update_transforms(info.node, info.obj);
 		DT_SetMargin(info.obj, MARGIN);
@@ -198,7 +189,13 @@ private:
 			remove_object(info);
 			add_object(v, info);
 		} else {
-			/* can't handle point updating right now */
+			ptlist newverts;
+			info.node->get_local_points(newverts);
+			if (info.vertices != newverts) {
+				assert(newverts.size() == info.vertices.size());
+				info.vertices = newverts;
+				DT_ChangeVertexBase(info.vertexbase, &info.vertices[0]);
+			}
 			update_transforms(info.node, info.obj);
 		}
 		return true;

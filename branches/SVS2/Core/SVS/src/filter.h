@@ -637,7 +637,7 @@ public:
 		filter_input::iter i;
 		std::vector<filter_param_set*>::iterator j;
 		
-		for( i = added_input_begin(); i != added_input_end(); ++i ) {
+		for (i = added_input_begin(); i != added_input_end(); ++i) {
 			T val;
 			if (!compute(*i, val, true)) {
 				return false;
@@ -646,13 +646,13 @@ public:
 			add_result(fv, *i);
 			io_map[*i] = fv;
 		}
-		for ( i = removed_input_begin(); i != removed_input_end(); ++i ) {
+		for (i = removed_input_begin(); i != removed_input_end(); ++i) {
 			filter_val_c<T>* r = io_map[*i];
 			result_removed(r->get_value());
 			remove_result(r);
 			io_map.erase(*i);
 		}
-		for ( i = changed_input_begin(); i != changed_input_end(); ++i ) {
+		for (i = changed_input_begin(); i != changed_input_end(); ++i) {
 			if (!update_one(*i)) {
 				return false;
 			}
@@ -662,6 +662,7 @@ public:
 				return false;
 			}
 		}
+		stale.clear();
 		return true;
 	}
 	
