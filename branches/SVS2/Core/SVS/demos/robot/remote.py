@@ -14,9 +14,9 @@ def handle_key(evt):
 	
 	currcmd = {
 		'w' : (1.0, 1.0),
-		'a' : (-1.0, 1.0),
+		'a' : (-.5, .5),
 		'r' : (-1.0, -1.0),
-		's' : (1.0, -1.0)
+		's' : (.5, -.5)
 	}.get(evt.char, (0.0, 0.0))
 
 def handle_release(evt):

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const float MARGIN = 0.1;
+const float MARGIN = 0.01;
 
 DT_Bool collision_callback(void *client_data, void *obj1, void *obj2, const DT_CollData *coll_data);
 
@@ -32,11 +32,11 @@ typedef pair<filter_val*, filter_val*> fval_pair;
 typedef map<fval_pair, result_info> result_table_t;
 
 void update_transforms(sgnode *n, DT_ObjectHandle obj) {
-	vec3 pos = n->get_trans('p');
-	quaternion rot = quaternion(n->get_trans('r'));
-	vec3 scale = n->get_trans('s');
+	vec3 pos, rot, scale;
+	n->get_trans(pos, rot, scale);
+	quaternion qrot = quaternion(rot);
 	DT_SetPosition(obj, pos.a);
-	DT_SetOrientation(obj, rot.a);
+	DT_SetOrientation(obj, qrot.a);
 	DT_SetScaling(obj, scale.a);
 	//cout << "Moving " << n->get_name() << " to " << pos << endl;
 }
@@ -130,14 +130,15 @@ public:
 	
 private:
 	void add_object(filter_val *v, node_info &info) {
-		info.node->get_local_points(info.vertices);
+		//info.node->get_local_points(info.vertices);
+		info.node->get_world_points(info.vertices);
 		info.vertexbase = DT_NewVertexBase(&info.vertices[0], 0);
 		info.shape = DT_NewComplexShape(info.vertexbase);
 		DT_VertexRange(0, info.vertices.size());
 		DT_EndComplexShape();
 		
 		info.obj = DT_CreateObject((void*) v, info.shape);
-		update_transforms(info.node, info.obj);
+		//update_transforms(info.node, info.obj);
 		DT_SetMargin(info.obj, MARGIN);
 		DT_AddObject(scene, info.obj);
 		DT_SetResponseClass(resp_table, info.obj, resp_class);
@@ -190,13 +191,19 @@ private:
 			add_object(v, info);
 		} else {
 			ptlist newverts;
-			info.node->get_local_points(newverts);
+			//info.node->get_local_points(newverts);
+			info.node->get_world_points(newverts);
 			if (info.vertices != newverts) {
+				/*
+				cout << "SETTING NEW VERTICES" << endl;
+				copy(newverts.begin(), newverts.end(), ostream_iterator<vec3>(cout, " / "));
+				cout << endl;
+				*/
 				assert(newverts.size() == info.vertices.size());
 				info.vertices = newverts;
 				DT_ChangeVertexBase(info.vertexbase, &info.vertices[0]);
 			}
-			update_transforms(info.node, info.obj);
+			//update_transforms(info.node, info.obj);
 		}
 		return true;
 	}

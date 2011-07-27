@@ -6,46 +6,6 @@ sp {init
 (<s> ^time 0)
 }
 
-sp {splinter-box-int
-(state <s> ^superstate nil 
-           ^svs
-	( ^command <c> 
-	  ^spatial-scene 
-		( ^child.id splinter 
-		  ^child.id block)))
--->
-(<c> ^extract <e1>)
-(<e1> ^type intersect ^a <a1> ^b <b1>)
-(<a1> ^type node ^name splinter)
-(<b1> ^type node ^name block)}
-
-sp {report-int
-(state <s>
-	^svs.command.extract (
-		^type intersect
-		^result.literal (
-			^a splinter ^b block)))
--->
-(<s> ^colliding t)
-(write |INTERSECT!| (crlf))}
-
-sp {report-no-int-1
-(state <s>
-	^svs.command.extract (
-		^type intersect 
-		^result ( -^literal)))
--->
-(<s> ^colliding f)
-(write |NO INTERSECT!| (crlf))}
-
-sp {report-no-int-2
-(state <s>
-	^svs.command.extract (
-		^type intersect 
-		-^result))
--->
-(<s> ^colliding f)
-(write |NO INTERSECT!| (crlf))}
 
 sp {make-free-move-model
 (state <s> ^superstate nil ^svs.command <c>)
@@ -103,7 +63,9 @@ sp {make-collision-model
 }
 
 sp {assign-collision-model
-(state <s> ^superstate nil ^colliding t ^svs.command <c>)
+(state <s> ^superstate nil 
+           ^svs.command <c>
+           ^intersect ( ^a splinter ^b block))
 -->
 (<c> ^assign-model <am>)
 (<am> ^name collision ^inputs <in> ^outputs <out>)
@@ -119,8 +81,7 @@ sp {assign-collision-model
       ^rvolts right)
 (<out> ^bpx block:px
        ^bpy block:py
-       ^brz block:rz)
-}
+       ^brz block:rz)}
 
 sp {gen-target
 (state <s> ^superstate nil ^svs.command <c>)
@@ -170,36 +131,119 @@ sp {apply*count-time
 (<s> ^time <t> - (+ <t> 1))
 }
 
-#sp {seek-target1
-#	(state <s>
-#		^superstate nil
-#		^svs (
-#			^command <c>
-#			^spatial-scene (
-#				^child.id splinter
-#				^child.id target1
-#			)
-#		)
-#	)
-#-->
-#	(<c> ^seek <sk>)
-#	(<sk> ^type simplex
-#	      ^depth 20
-#	      ^outputs <out>
-#	      ^objective <obj>)
-#	(<out> ^left <left> ^right <right>)
-#	(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
-#	(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
-#	(<obj> ^name euclidean
-#	       ^a splinter
-#	       ^b target1)
-#}
+sp {splinter-box-int
+(state <s> ^superstate nil 
+           ^svs
+	( ^command <c> 
+	  ^spatial-scene 
+		( ^child.id splinter 
+		  ^child.id block)))
+-->
+(<c> ^extract <e>)
+(<e> ^type intersect ^a <a> ^b <b>)
+(<a> ^type node ^name splinter)
+(<b> ^type node ^name block)}
+
+sp {line-box-int
+(state <s> ^superstate nil
+           ^svs
+	( ^command <c>
+	  ^spatial-scene
+		( ^child.id splinter-target-line
+		  ^child.id block )))
+-->
+(<c> ^extract <e>)
+(<e> ^type intersect ^a <a> ^b <b>)
+(<a> ^type node ^name splinter-target-line)
+(<b> ^type node ^name block)}
+
+sp {report-int
+(state <s> ^svs.command.extract
+	( ^type intersect
+	  ^a.name <a>
+	  ^b.name <b>
+	  ^result.literal
+		( ^a <a> ^b <b>)))
+-->
+(<s> ^intersect <i>)
+(<i> ^a <a> ^b <b>)
+(write |INTERSECT | <a> | | <b> (crlf))}
+
+sp {report-no-int-1
+(state <s> ^svs.command.extract
+	( ^type intersect
+	  ^a.name <a>
+	  ^b.name <b>
+	  ^result ( -^literal)))
+-->
+(write |NO INTERSECT | <a> | | <b> (crlf))}
+
+sp {report-no-int-2
+(state <s> ^svs.command.extract
+	( ^type intersect
+	  ^a.name <a>
+	  ^b.name <b>
+	  -^result))
+-->
+(write |NO INTERSECT | <a> | | <b> (crlf))}
+
+
+sp {move-to-block
+(state <s> ^superstate nil
+           ^auto-control t
+           ^svs
+	( ^command <c>
+	  ^spatial-scene
+		( ^child.id splinter
+		  ^child.id target1 )))
+-{
+	(<s> ^intersect <i>)
+	(<i> ^a splinter ^b block)
+}
+-->
+(<c> ^seek <sk>)
+(<sk> ^type simplex
+      ^depth 20
+      ^outputs <out>
+      ^objective <obj>)
+(<out> ^left <left> ^right <right>)
+(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
+(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
+(<obj> ^name euclidean
+       ^a splinter
+       ^b block)
+}
+
+sp {push-block-to-target
+(state <s> ^superstate nil
+           ^auto-control t
+           ^svs
+	( ^command <c>
+	  ^spatial-scene
+		( ^child.id splinter
+		  ^child.id block
+		  ^child.id target1 )))
+(<s> ^intersect ( ^a splinter ^b block )
+     ^intersect ( ^a splinter-target-line ^b block ))
+-->
+(<c> ^seek <sk>)
+(<sk> ^type simplex
+      ^depth 20
+      ^outputs <out>
+      ^objective <obj>)
+(<out> ^left <left> ^right <right>)
+(<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
+(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
+(<obj> ^name euclidean
+       ^a block
+       ^b target1)}
 
 sp {manual
-(state <s> ^superstate nil ^svs.command <c>)
+(state <s> ^superstate nil 
+           ^svs.command <c>
+          -^auto-control t)
 -->
 (<c> ^manual_control.outputs <out>)
 (<out> ^left <left> ^right <right>)
 (<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
-(<right> ^min -1.0 ^max 1.0 ^inc 1.0)
-}
+(<right> ^min -1.0 ^max 1.0 ^inc 1.0)}

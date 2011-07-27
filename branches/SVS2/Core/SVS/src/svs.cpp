@@ -287,7 +287,7 @@ void svs::update_models() {
 	if (prev_pnames == curr_pnames) {
 		floatvec x(prev_pvals), y(prev_pvals);
 		x.extend(next_out.vals);
-		models.test(x, y);
+		//models.test(x, y);
 		models.learn(x, curr_pvals, dt);
 		
 		if (!headerwritten) {

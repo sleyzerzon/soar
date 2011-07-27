@@ -80,7 +80,6 @@ class Scene(object):
 	
 	def enddrag(self, x, y):
 		self.offset = (self.offset[0] + x - self.anchor[0], self.offset[1] + y - self.anchor[1])
-		print(self.offset)
 		
 	def update_object(self, name, ptlist):
 		o = self.objects.get(name, None)
@@ -184,7 +183,6 @@ class Connection(object):
 	def dispatch(self, sock, mask):
 		while True:
 			msg = self.sock.receive()
-			print(msg)
 			header, _, rest = msg.partition('\n')
 			if header == None:
 				sys.exit(0)

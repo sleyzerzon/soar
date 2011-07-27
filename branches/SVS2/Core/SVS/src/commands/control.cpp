@@ -440,8 +440,8 @@ public:
 		max.resize(depth * out_info.size());
 		for (i = 0; i < depth; ++i) {
 			for (j = 0; j < out_info.size(); ++j) {
-				min[i * depth + j] = out_info[j].min;
-				max[i * depth + j] = out_info[j].max;
+				min[i * out_info.size() + j] = out_info[j].min;
+				max[i * out_info.size() + j] = out_info[j].max;
 			}
 		}
 	}

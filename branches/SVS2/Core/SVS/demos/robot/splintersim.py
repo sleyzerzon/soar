@@ -100,8 +100,10 @@ class Splinter(object):
 		lines = []
 		ps = ' '.join(str(x) for x in self.body.position) + ' 0'
 		rs = '0 0 {}'.format(self.body.angle)
-		vs = ' '.join('{} {} 0'.format(x, y) for x, y in self.verts)
-		wvs = ' '.join('{} {} 0'.format(x, y) for x, y in self.shape.get_points())
+		vs1 = ' '.join('{} {} 0'.format(x, y) for x, y in self.verts)
+		vs2 = ' '.join('{} {} 1'.format(x, y) for x, y in self.verts)
+		vs = vs1 + ' ' + vs2
+		#wvs = ' '.join('{} {} 0'.format(x, y) for x, y in self.shape.get_points())
 		#print('splinter: ' + ps + ' ; ' + rs + ' ; ' + wvs)
 		if first:
 			lines.append('a {} world v {} p {} r {}'.format(self.name, vs, ps, rs))
@@ -150,10 +152,12 @@ class Block(object):
 		self.body.angular_velocity *= 0.5
 	
 	def get_sgel(self, first):
-		vs = ' '.join('{} {} 0'.format(x, y) for x, y in self.verts)
 		ps = '{} {} 0'.format(*self.body.position)
 		rs = '0 0 {}'.format(self.body.angle)
-		wvs = ' '.join('{} {} 0'.format(x, y) for x, y in self.shape.get_points())
+		vs1 = ' '.join('{} {} 0'.format(x, y) for x, y in self.verts)
+		vs2 = ' '.join('{} {} 1'.format(x, y) for x, y in self.verts)
+		vs = vs1 + ' ' + vs2
+		#wvs = ' '.join('{} {} 0'.format(x, y) for x, y in self.shape.get_points())
 		#print('block: ' + ps + ' ; ' + rs + ' ; ' + wvs)
 		if first:
 			return 'a {} world v {} p {} r {}'.format(self.name, vs, ps, rs)
