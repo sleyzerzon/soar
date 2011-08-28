@@ -2,13 +2,15 @@
 #define LWR_H
 
 #include <vector>
+#include <fstream>
 #include "model.h"
 #include "common.h"
 #include "nn.h"
 
 class lwr : public model {
 public:
-	lwr(int nnbrs, const std::vector<std::string> &inputs, const std::vector<std::string> &outputs);
+	lwr(int nnbrs, const std::vector<std::string> &xnames, const std::vector<std::string> &ynames, const std::string &logpath, bool test);
+	~lwr();
 	void learn(const floatvec &x, const floatvec &y, float dt);
 	bool predict(const floatvec &x, floatvec &y);
 	std::string get_type() const { return "lwr"; }
@@ -31,6 +33,8 @@ private:
 	floatvec xmin, xmax, xrange;
 	bool normalized;
 	nearest_neighbor *nn;
+	std::ofstream *log;
+	bool test;
 };
 
 #endif

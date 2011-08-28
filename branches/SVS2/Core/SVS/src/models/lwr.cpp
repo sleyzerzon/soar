@@ -96,17 +96,46 @@ void remove_static(mat &X, mat &Xout, vector<int> &dynamic) {
 	}
 }
 
-lwr::lwr(int nnbrs, const vector<string> &xnames, const vector<string> &ynames)
+lwr::lwr(int nnbrs, const vector<string> &xnames, const vector<string> &ynames, const string &logpath, bool test)
 : nnbrs(nnbrs), xnames(xnames), ynames(ynames), xsize(xnames.size()), ysize(ynames.size()),
-  normalized(false), xmin(xnames.size()), xmax(xnames.size()), xrange(xnames.size())
+  normalized(false), xmin(xnames.size()), xmax(xnames.size()), xrange(xnames.size()), test(test)
 {
-	int i;
+	vector<string>::const_iterator i;
+	
 	nn = new brute_nn(&xnorm);
+	if (!logpath.empty()) {
+		log = new ofstream(logpath.c_str());
+		(*log) << "@relation model" << endl;
+		for (i = xnames.begin(); i != xnames.end(); ++i) {
+			(*log) << "@attribute " << *i << "_in real" << endl;
+		}
+		for (i = ynames.begin(); i != ynames.end(); ++i) {
+			(*log) << "@attribute " << *i << "_out real" << endl;
+		}
+		(*log) << "@data" << endl;
+	} else {
+		log = NULL;
+	}
+}
+
+lwr::~lwr() {
+	log->close();
+	delete log;
 }
 
 void lwr::learn(const floatvec &x, const floatvec &y, float dt) {
-	int i;
-
+	if (log) {
+		(*log) << x << y << endl;
+	}
+	
+	if (test) {
+		floatvec p(y.size());
+		if (!predict(x, p)) {
+			cerr << "NO PREDICTION" << endl;
+		}
+		cerr << "PREDICTION ERROR: " << p.dist(y) << endl;
+	}
+	
 	examples.push_back(make_pair(x, y));
 	if (examples.size() == 1) {
 		xmin = x;
@@ -287,6 +316,12 @@ bool lwr::load_file(const char *file) {
 		
 		learn(x, y, dt);
 	}
+	return true;
+}
+
+void lwr::get_slots(vector<string> &in_slots, vector<string> &out_slots) const {
+	copy(xnames.begin(), xnames.end(), back_inserter(in_slots));
+	copy(ynames.begin(), ynames.end(), back_inserter(out_slots));
 }
 
 model *_make_lwr_model_(soar_interface *si, Symbol *root) {
@@ -294,8 +329,10 @@ model *_make_lwr_model_(soar_interface *si, Symbol *root) {
 	wme_list children;
 	wme_list::iterator i;
 	long nnbrs = 50;
-	string attrstr;
+	string attrstr, logpath, testval;
 	vector<string> inputs, outputs;
+	wme *logwme, *testwme;
+	bool test = false;
 	
 	si->get_child_wmes(root, children);
 	for (i = children.begin(); i != children.end(); ++i) {
@@ -312,7 +349,6 @@ model *_make_lwr_model_(soar_interface *si, Symbol *root) {
 		} else if (attrstr == "outputs") {
 			output_root = si->get_wme_val(*i);
 		}
-			
 	}
 	if (input_root == NULL || output_root == NULL) {
 		return NULL;
@@ -335,11 +371,16 @@ model *_make_lwr_model_(soar_interface *si, Symbol *root) {
 		}
 		outputs.push_back(attrstr);
 	}
-	return new lwr(nnbrs, inputs, outputs);
+	
+	if (si->find_child_wme(root, "log", logwme)) {
+		si->get_val(si->get_wme_val(logwme), logpath);
+	}
+	if (si->find_child_wme(root, "test", testwme)) {
+		si->get_val(si->get_wme_val(testwme), testval);
+		if (testval == "t") {
+			test = true;
+		}
+	}
+	
+	return new lwr(nnbrs, inputs, outputs, logpath, test);
 }
-
-void lwr::get_slots(vector<string> &in_slots, vector<string> &out_slots) const {
-	copy(xnames.begin(), xnames.end(), back_inserter(in_slots));
-	copy(ynames.begin(), ynames.end(), back_inserter(out_slots));
-}
-

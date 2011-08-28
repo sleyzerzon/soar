@@ -38,7 +38,7 @@ public:
 	
 	void get_slots(vector<string> &ins, vector<string> &outs) const {
 		copy(in_slots, in_slots + get_input_size(), back_inserter(ins));
-		copy(in_slots, in_slots + get_output_size(), back_inserter(outs));
+		copy(out_slots, out_slots + get_output_size(), back_inserter(outs));
 	}
 };
 

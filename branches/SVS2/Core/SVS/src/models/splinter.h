@@ -12,7 +12,7 @@ const float inertia            = 0.5; // kg*m^2
 const float drag_constant      = 1.0; // drag (Nm per rad_per_sec) ( >= 0)
 const float dt                 = 0.016; // need a better way to figure this out
 
-inline float calc_rps(float &rps, float input_volts) {
+inline void calc_rps(float &rps, float input_volts) {
 	float volts_emf = rps * emf_constant;
 	float amps = (input_volts - volts_emf) / winding_resistance;
 	float torque0 = amps * torque_constant;
@@ -34,6 +34,8 @@ inline void splinter_update(float &px, float &py, float &vx, float &vy, float &r
 	px += vel[0];
 	py += vel[1];
 	rz += rtz;
+	vx = vel[0];
+	vy = vel[1];
 }
 
 #endif
