@@ -10,20 +10,22 @@ do
 	-g)
 		debug=1
 		;;
-	-s)
-		sim=1
+	-j)
+		java=1
 		;;
 	esac
 	shift
 done
 
-if test "$sim" == "1"
+if test "$java" == "1"
 then
-	python splintersim.py &
-	envid=$!
-	#socat system:./splintersim unix-connect:env,retry=100 &
-else
 	socat system:"java RobotClient" unix-connect:env,retry=100 &
+else
+	#python splintersim.py &
+	#envid=$!
+	#socat system:./splintersim unix-connect:env,retry=100 &
+	splintersim3 | python splintersim3_disp.py &
+	envid=`ps | awk '$4 ~ "splintersim3" {print $1}'`
 fi
 
 if test "$debug" == "1"
@@ -33,7 +35,7 @@ else
 	$soar robot.soar
 fi
 
-if test "$sim" != "1"
+if test "$java" == "1"
 then
 	pids=`ps x | awk '/RobotClient/ { print $1 }'`
 	if test -n "$pids"

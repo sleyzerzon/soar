@@ -110,14 +110,14 @@ class Splinter(object):
 		else:
 			lines.append('c {} p {} r {}'.format(self.name, ps, rs))
 			
-		lines.append('p splinter left_rads_per_sec {}'.format(self.lrps))
-		lines.append('p splinter right_rads_per_sec {}'.format(self.rrps))
+		lines.append('p {} left_rads_per_sec {}'.format(self.name, self.lrps))
+		lines.append('p {} right_rads_per_sec {}'.format(self.name, self.rrps))
 		for d in range(2):
-			lines.append('p splinter vel_{} {}'.format(d, self.body.velocity[d]))
-		lines.append('p splinter vel_2 0.0')
-		lines.append('p splinter rotation_rate_0 0.')
-		lines.append('p splinter rotation_rate_1 0.')
-		lines.append('p splinter rotation_rate_2 {}'.format(self.body.angular_velocity))
+			lines.append('p {} vel_{} {}'.format(self.name, d, self.body.velocity[d]))
+		lines.append('p {} vel_2 0.0'.format(self.name))
+		lines.append('p {} rotation_rate_0 0.'.format(self.name))
+		lines.append('p {} rotation_rate_1 0.'.format(self.name))
+		lines.append('p {} rotation_rate_2 {}'.format(self.name, self.body.angular_velocity))
 		return '\n'.join(lines)
 	
 	def get_name(self):

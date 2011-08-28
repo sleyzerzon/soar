@@ -1,34 +1,51 @@
-import sys, os
+from __future__ import print_function
+import sys, os, time
 import Tkinter as tk
 
 sys.path.append('../')
 import sock
 
+DELAY = 50
+
+if len(sys.argv[1]) == 0:
+	print('usage: {} <socket path>'.format(sys.argv[0]))
+	sys.exit(1)
+	
 sck = sock.Sock()
-sck.connect('ctrl')
+sck.connect(sys.argv[1])
 
 currcmd = (0.0, 0.0)
 
-def handle_key(evt):
+def press(dir):
 	global currcmd
-	
+	print('press ' + dir)
 	currcmd = {
-		'w' : (1.0, 1.0),
-		'a' : (-.5, .5),
-		'r' : (-1.0, -1.0),
-		's' : (.5, -.5)
-	}.get(evt.char, (0.0, 0.0))
+		'L' : (-0.5,  0.5),
+		'R' : ( 0.5, -0.5),
+		'F' : ( 1.0,  1.0),
+		'B' : (-1.0, -1.0)
+	}.get(dir, (0.0, 0.0))
+	
 
-def handle_release(evt):
+def release():
 	global currcmd
 	currcmd = (0.0, 0.0)
+	#sck.send('left {}\nright {}'.format(*cmd))
 	
-def handle_msg(file, mask):
+def send_cmd(): # (file, mask):
+	global win
+	global sck
 	sck.receive()
 	sck.send('left {}\nright {}'.format(*currcmd))
+	win.after(DELAY, send_cmd)
 	
 win = tk.Tk()
-win.bind('<KeyPress>', handle_key)
-win.bind('<KeyRelease>', handle_release)
-win.tk.createfilehandler(sck.sock, tk.READABLE, handle_msg)
+for b in 'LFBR':
+	btn = tk.Button(win, text = b)
+	btn.bind('<Button-1>', lambda e, b=b: press(b))
+	btn.bind('<ButtonRelease-1>', lambda e: release())
+	btn.pack(side = tk.LEFT)
+	
+#win.tk.createfilehandler(sck.sock, tk.READABLE, handle_msg)
+win.after(DELAY, send_cmd)
 tk.mainloop()

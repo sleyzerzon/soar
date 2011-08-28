@@ -29,7 +29,7 @@ class Object3D(object):
 		elif len(self.ptlist) == 2:
 			self.draw_line(axes)
 		else:
-			self.draw_bbox(axes)
+			self.draw_poly(axes)
 	
 	def draw_point(self, axes):
 		c1, c2 = self.ptlist[0][axes[0]] * SCALE, self.ptlist[0][axes[1]] * SCALE
@@ -50,6 +50,11 @@ class Object3D(object):
 		max1 = max(c1) * SCALE; max2 = max(c2) * SCALE
 		self.canvas.create_rectangle((min1,min2,max1,max2), tags=self.name)
 		self.canvas.create_text((min1,min2), anchor=tk.NW, text=self.name, tags=self.name)
+	
+	def draw_poly(self, axes):
+		pts = [ (p[axes[0]] * SCALE, p[axes[1]] * SCALE) for p in self.ptlist ]
+		self.canvas.create_polygon(pts, tags=self.name, fill="", outline="black")	
+		self.canvas.create_text(pts[0], anchor=tk.NW, text=self.name, tags=self.name)
 		
 class Scene(object):
 	def __init__(self, name, root):
