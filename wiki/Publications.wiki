@@ -3,15 +3,15 @@
 
 = 2011 =
 
-Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011_derbinsky_laird.pdf A Functional Analysis of Historical Memory Retrieval Bias in the Word Sense Disambiguation Task.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
+Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011_derbinsky_laird.pdf A Functional Analysis of Historical Memory Retrieval Bias in the Word Sense Disambiguation Task.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence, 663-668. San Francisco, CA.
 
-Derbinsky, N., Essl, G.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2011.pdf Cognitive Architecture in Mobile Music Interactions.]_ Proceedings of the International Conference on New Interfaces for Musical Expression (NIME-2011). Oslo, Norway.
+Derbinsky, N., Essl, G.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2011.pdf Cognitive Architecture in Mobile Music Interactions.]_ Proceedings of the International Conference on New Interfaces for Musical Expression, 104-107. Oslo, Norway.
 
-Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2011_smem.pdf A Preliminary Functional Analysis of Memory in the Word Sense Disambiguation Task.]_ The 2nd Symposium on Human Memory for Artificial Agents, AISB (2011)
+Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2011_smem.pdf A Preliminary Functional Analysis of Memory in the Word Sense Disambiguation Task.]_ Proceedings of the 2nd Symposium on Human Memory for Artificial Agents, AISB, 25-29. York, England.
 
 Gorski, N. A., Laird, J. E. (2011) [http://www.sciencedirect.com/science?_ob=MImg&_imagekey=B6W6C-50R6KGK-1-1&_cdi=6595&_user=99318&_pii=S1389041710000537&_origin=browse&_zone=rslt_list_item&_coverDate=06%2F30%2F2011&_sk=999879997&wchp=dGLzVlb-zSkzS&md5=4e9b6c793735b716156e24816ce49574&ie=/sdarticle.pdf Learning to use episodic memory] _Cognitive Systems Research_, 12, 144-153. doi:10.1016/j.cogsys.2010.08.001
 
-Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/laird_brims2011.pdf Performance Evaluation of Declarative Memory Systems in Soar]_, Proceedings of BRIMS 2011, Sundance, UT.
+Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/laird_brims2011.pdf Performance Evaluation of Declarative Memory Systems in Soar]_, Proceedings of the 20th Behavior Representation in Modeling & Simulation Conference, 33-40. Sundance, UT.
 
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~yongjiaw/WangThesis.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
@@ -19,12 +19,11 @@ Xu, J. Z., Laird, J. E. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs
 
 = 2010 =
 
-Derbinsky, N., Gorski, N.A.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_exploring.pdf Exploring the Space of Computational Memory Models.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
+Derbinsky, N., Gorski, N.A.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_exploring.pdf Exploring the Space of Computational Memory Models.]_ Proceedings of the 1st Symposium on Human Memory for Artificial Agents, AISB, 38-41. Leicester, England.
 
-Derbinsky, N., Laird, J. E., Smith, B.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm2010_smem.pdf Towards Efficiently Supporting Large Symbolic Declarative Memories.]_
-International Conference on Cognitive Modeling, ICCM (2010)
+Derbinsky, N., Laird, J. E., Smith, B.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm2010_smem.pdf Towards Efficiently Supporting Large Symbolic Declarative Memories.]_ Proceedings of the 10th International Conference on Cognitive Modeling, 49-54. Philadelphia, PA.
 
-Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_soar9.pdf Extending Soar with Dissociated Symbolic Memories.]_ Symposium on Human Memory for Artificial Agents, AISB (2010)
+Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_soar9.pdf Extending Soar with Dissociated Symbolic Memories.]_ Proceedings of the 1st Symposium on Human Memory for Artificial Agents, AISB, 31-37. Leicester, England.
 
 Laird, J. E., Wray III, R. E.  (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-Wray-AGI.pdf Cognitive Architecture Requirements for Achieving AGI]_. Proceedings of the Third Conference on Artificial General Intelligence (AGI)
 
@@ -44,7 +43,7 @@ Xu, J. Z., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs
 
 Bloch, M.K. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Hierarchical Reinforcement Learning in the Taxicab Domain.]_ (Report No. CCA-TR-2009-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
 
-Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccbr09.pdf Efficiently Implementing Episodic Memory.]_ Proceedings of the 8th International Conference on Case-Based Reasoning, ICCBR (2009)
+Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccbr09.pdf Efficiently Implementing Episodic Memory.]_ Proceedings of the 8th International Conference on Case-Based Reasoning, 403-417. Seattle, WA.
 
 Fridman, N. & Kaminka, G.A. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper130.pdf Comparing Human and Synthetic Group Behaviors: A Model Based on Social Psychology.]_ Proceedings of the 9th International Conference on Cognitive Modeling (ICCM-09). Manchester, UK.
 
@@ -56,7 +55,7 @@ Jones, R.M., Stensrud, B.S. and Taylor, G. (2009), _[http://www.eecs.umich.edu/~
 
 Laird, J.E. (2009). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/SPIE.pdf Towards Cognitive Robotics]_, SPIE Defense and Sensing Conferences, Orlando, FL.
 
-Laird, J.E., Derbinsky, N.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/ijcai09.pdf A Year of Episodic Memory.]_ Workshop on Grand Challenges for Reasoning from Experiences, 21st IJCAI (2009)
+Laird, J.E., Derbinsky, N.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/ijcai09.pdf A Year of Episodic Memory.]_ Proceedings of the Workshop on Grand Challenges for Reasoning from Experiences, IJCAI, 7-10. Pasadena, CA.
 
 Laird, J.E., Wray, R.E., Marinier, R.P., Langley, P. (2009) _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-agi-09.pdf Claims and Challenges in Evaluating Human-Level Intelligent Systems]_, Proceedings of the Second Conference on Artificial General Intelligence.
 
