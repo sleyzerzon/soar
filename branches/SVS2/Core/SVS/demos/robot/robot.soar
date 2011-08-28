@@ -211,7 +211,7 @@ sp {splinter-box-int
 		  ^child.id box1)))
 -->
 (<c> ^extract <e>)
-(<e> ^type intersect_bt ^a <a> ^b <b>)
+(<e> ^type intersect ^a <a> ^b <b>)
 (<a> ^type node ^name splinter)
 (<b> ^type node ^name box1)}
 
@@ -224,13 +224,13 @@ sp {splinter-box-int
 # 		  ^child.id box1 )))
 # -->
 # (<c> ^extract <e>)
-# (<e> ^type intersect_bt ^a <a> ^b <b>)
+# (<e> ^type intersect ^a <a> ^b <b>)
 # (<a> ^type node ^name splinter-target-line)
 # (<b> ^type node ^name box1)}
 
 sp {report-int
 (state <s> ^svs.command.extract
-	( ^type intersect_bt
+	( ^type intersect
 	  ^a.name <a>
 	  ^b.name <b>
 	  ^result.literal
@@ -243,7 +243,7 @@ sp {report-int
 
 sp {report-no-int-1
 (state <s> ^svs.command.extract
-	( ^type intersect_bt
+	( ^type intersect
 	  ^a.name <a>
 	  ^b.name <b>
 	  ^result ( -^literal)))
@@ -252,7 +252,7 @@ sp {report-no-int-1
 
 sp {report-no-int-2
 (state <s> ^svs.command.extract
-	( ^type intersect_bt
+	( ^type intersect
 	  ^a.name <a>
 	  ^b.name <b>
 	  -^result))

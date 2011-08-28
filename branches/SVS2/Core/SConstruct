@@ -111,8 +111,8 @@ env = Environment(
 	PREFIX = os.path.realpath(GetOption('prefix')),
 	STATIC_LINKED = GetOption('static'),
 	SOAR_VERSION = SOAR_VERSION,
-	CPPFLAGS = ['-DSCONS', '-Wfatal-errors'],
-	CPPPATH = ['#shared'] + os.environ.get('CPATH', '').split(':'),
+	CPPFLAGS = ['-DSCONS', '-Wfatal-errors', '-Wreturn-type'],
+	CPPPATH = ['#shared', '/home/jzxu/local/include', '/home/jzxu/local/include/bullet'],
 	LINKFLAGS = [],
 	LIBPATH = os.environ.get('LD_LIBRARY_PATH', '').split(':'),
 	)
@@ -399,7 +399,7 @@ for d in subdirs:
 # Special environment
 compEnv = env.Clone()
 compEnv.Prepend(CPPPATH = ['$PREFIX/include'])
-libadd = ['ClientSML', 'ConnectionSML', 'ElementXML', 'armadillo', 'solid']
+libadd = ['ClientSML', 'ConnectionSML', 'ElementXML', 'armadillo', 'chipmunk', 'BulletCollision', 'LinearMath']
 if compEnv['STATIC_LINKED']:
         libadd.extend(['SoarKernelSML', 'SoarKernel', 'CommandLineInterface', 'sqlite3', 'svs'])
 compEnv.Append(LIBS = libadd, LIBPATH = ['$PREFIX/lib'])
